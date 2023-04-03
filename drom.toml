@@ -1,0 +1,81 @@
+[project]
+drom-version = "0.1"
+share-repo = "https://github.com/OCamlPro/drom-share"
+share-version = "0.9.1"
+
+[project]
+authors = ["Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"]
+ci-systems = ["ubuntu-latest", "macos-latest", "windows-latest"]
+copyright = "OCamlPro SAS"
+edition = "4.13.0"
+github-organization = "ocamlpro"
+license = "LGPL2"
+min-edition = "4.07.0"
+name = "superbol-vscode-extension"
+skeleton = "mini_prg"
+synopsis = "The superbol-vscode-extension project"
+version = "0.1.0"
+
+# keys that you could also define:
+# odoc-target = "...odoc-target..."
+# sphinx-target = "...sphinx-target..."
+# archive = "...archive..."
+# dev-repo = "...dev-repo..."
+# bug-reports = "...bug-reports..."
+# doc-api = "...doc-api..."
+# doc-gen = "...doc-gen..."
+# homepage = "...homepage..."
+
+[project]
+description = """
+This is the description
+of the superbol-vscode-extension OCaml project
+"""
+
+[project]
+skip = ["@test", "@sphinx", "@docs", "@ocamlformat", "@ocp-indent"]
+
+# project-wide library dependencies (not for package-specific deps)
+[dependencies]
+
+# project-wide tools dependencies (not for package-specific deps)
+[tools.ocamlformat]
+for-test = true
+[tools.odoc]
+for-doc = true
+[tools.ppx_expect]
+for-test = true
+[tools.ppx_inline_test]
+for-test = true
+
+[project]
+
+# dirs to skip while scanning for dune files
+skip-dirs = []
+
+# dirs to scan for share/ folders (with package names)
+share-dirs = ["share"]
+
+# build profile to use by default
+# build-profile = ...
+
+# Profile options for this project
+#    [profile]
+#    dev = { ocaml-flags = "-w +a-4-40-41-42-44" }
+#    release = { ocaml-flags = "-w -a" }
+[profile]
+# ...
+
+# project-wide fields (depends on project skeleton)
+# examples:
+#  docker-alpine-image = "ocamlpro/ocaml:4.13"
+#  dune-lang = "2.1"
+#  readme-trailer = "..."
+#  dot-gitignore-trailer = "..."
+[fields]
+# ...
+
+[[package]]
+dir = "src/superbol-vscode-extension"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+

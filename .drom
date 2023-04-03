@@ -1,0 +1,104 @@
+# Keep this file in your GIT repo to help drom track generated files
+# begin version
+version:0.9.0
+# end version
+
+# hash of toml configuration files
+# used for generation of all files
+1fa76c49c5f7082d264367886d5fee55:.
+# end context for .
+
+# begin context for .github/workflows/workflow.yml
+# file .github/workflows/workflow.yml
+b27148b8c3ba3a429e8bb2cbf668f690:.github/workflows/workflow.yml
+# end context for .github/workflows/workflow.yml
+
+# begin context for .gitignore
+# file .gitignore
+32f72c1ed6995d8ecd3d7c2bb89d7458:.gitignore
+# end context for .gitignore
+
+# begin context for CHANGES.md
+# file CHANGES.md
+d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
+# end context for CHANGES.md
+
+# begin context for LICENSE.md
+# file LICENSE.md
+e31b19b601ab25353ef16d67127735f1:LICENSE.md
+# end context for LICENSE.md
+
+# begin context for Makefile
+# file Makefile
+66a3af89fc3b550b5e2c1911ead8b9e3:Makefile
+# end context for Makefile
+
+# begin context for README.md
+# file README.md
+292425d1654e9d13b4140ef9188ddbe1:README.md
+# end context for README.md
+
+# begin context for drom.toml
+# file drom.toml
+8767711b343fe80faaf85b3c62e08379:drom.toml
+# end context for drom.toml
+
+# begin context for dune
+# file dune
+0d57afa9756f983af2551804954af609:dune
+# end context for dune
+
+# begin context for dune-project
+# file dune-project
+df67d6a4ce977cf49c344f4c24c3f869:dune-project
+# end context for dune-project
+
+# begin context for opam/superbol-vscode-extension.opam
+# file opam/superbol-vscode-extension.opam
+354c614e7972665ef6611806091bcc80:opam/superbol-vscode-extension.opam
+# end context for opam/superbol-vscode-extension.opam
+
+# begin context for scripts/after.sh
+# file scripts/after.sh
+62c6489217feef26dac343e709b89c1a:scripts/after.sh
+# end context for scripts/after.sh
+
+# begin context for scripts/before.sh
+# file scripts/before.sh
+371e627833d9ac7ae2f906b5ec97aae2:scripts/before.sh
+# end context for scripts/before.sh
+
+# begin context for scripts/copy-bin.sh
+# file scripts/copy-bin.sh
+bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
+# end context for scripts/copy-bin.sh
+
+# begin context for scripts/static-build.sh
+# file scripts/static-build.sh
+f03b2c27419cb7c506e8d771ffa97fce:scripts/static-build.sh
+# end context for scripts/static-build.sh
+
+# begin context for src/superbol-vscode-extension/dune
+# file src/superbol-vscode-extension/dune
+f0e52d59eb8d410be49e874cd26001c2:src/superbol-vscode-extension/dune
+# end context for src/superbol-vscode-extension/dune
+
+# begin context for src/superbol-vscode-extension/linking_flags.sh
+# file src/superbol-vscode-extension/linking_flags.sh
+0a2fe9095ac85798a954cea4a04944b7:src/superbol-vscode-extension/linking_flags.sh
+# end context for src/superbol-vscode-extension/linking_flags.sh
+
+# begin context for src/superbol-vscode-extension/main.ml
+# file src/superbol-vscode-extension/main.ml
+e7ebe648b86b0ac2cd670f3d2185797a:src/superbol-vscode-extension/main.ml
+# end context for src/superbol-vscode-extension/main.ml
+
+# begin context for src/superbol-vscode-extension/package.toml
+# file src/superbol-vscode-extension/package.toml
+33c9fe2cd89e581e5b1159834511f356:src/superbol-vscode-extension/package.toml
+# end context for src/superbol-vscode-extension/package.toml
+
+# begin context for src/superbol-vscode-extension/version.mlt
+# file src/superbol-vscode-extension/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/superbol-vscode-extension/version.mlt
+# end context for src/superbol-vscode-extension/version.mlt
