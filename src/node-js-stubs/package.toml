@@ -1,7 +1,7 @@
 
 # name of package
-name = "superbol-vscode-extension"
-skeleton = "js_program"
+name = "node-js-stubs"
+skeleton = "js_library"
 
 # version if different from project version
 # version = "0.1.0"
@@ -32,15 +32,14 @@ gen-version = "version.ml"
 # optional = true
 
 # module name used to pack modules (if pack-modules is true)
-# pack = "Mylib"
+pack = "Node"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving_encoding"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
-skip = []
+skip = [ "main.ml" ]
 
 # package library dependencies
 #   [dependencies]
@@ -51,11 +50,8 @@ gen_js_api = "1.1.1"
 js_of_ocaml = "5.0.0"
 promise_jsoo = "0.3.1"
 jsonoo = "0.2.1"
-# polka-js-stubs = "version"
-# node-js-stubs = "version"
-#  vscode-js-stubs = "version"
-#  vscode-languageclient-js-stubs = "version"
- 
+interop-js-stubs = "version"
+
 [tools]
 js_of_ocaml-ppx = "5.0.0"
 
@@ -72,7 +68,5 @@ js_of_ocaml-ppx = "5.0.0"
 #  static-clibs = "unix" 
 [fields]
 dune-stanzas = """
- (preprocess (pps gen_js_api.ppx))
- (modes js)
- (js_of_ocaml (flags --source-map --pretty))
+ (js_of_ocaml (javascript_files node_stub.js))
 """

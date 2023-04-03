@@ -1,4 +1,9 @@
 /superbol-vscode-extension
+/polka-js-stubs
+/interop-js-stubs
+/node-js-stubs
+/vscode-js-stubs
+/vscode-languageclient-js-stubs
 *~
 _build
 .merlin
@@ -7,5 +12,10 @@ _build
 /_opam
 /_build
 .drom.config
+/dist
+/node_modules
+/yarn-error.log
+/yarn.lock
+ATTIC
 
 

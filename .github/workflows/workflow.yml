@@ -23,11 +23,6 @@ jobs:
         skip_test:
           - false
 
-        include:
-          - os: ubuntu-latest
-            ocaml-compiler: 4.07.0
-            skip_test: true
-
 
     runs-on: ${{ matrix.os }}
 
@@ -62,7 +57,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-vscode-extension
+      - run: opam depext -y superbol-vscode-extension polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test

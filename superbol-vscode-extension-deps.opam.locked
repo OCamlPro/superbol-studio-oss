@@ -1,0 +1,44 @@
+opam-version: "2.0"
+name: "superbol-vscode-extension-deps"
+version: "0.1.0"
+synopsis: "The superbol-vscode-extension project (all deps)"
+description: """\
+This is the description
+of the superbol-vscode-extension OCaml project"""
+maintainer: "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
+authors: "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
+license: "MIT"
+tags: "org:ocamlpro"
+homepage: "https://ocamlpro.github.io/superbol-vscode-extension"
+doc: "https://ocamlpro.github.io/superbol-vscode-extension/sphinx"
+bug-reports: "https://github.com/ocamlpro/superbol-vscode-extension/issues"
+depends: [
+  "base-bigarray" {= "base+bin+6aa7b5b3+f2cc4984"}
+  "base-threads" {= "base+bin+88ec833a+f2cc4984"}
+  "base-unix" {= "base+bin+6c5a8d56+f2cc4984"}
+  "cmdliner" {= "1.1.1"}
+  "cppo" {= "1.6.9"}
+  "dune" {= "3.7.0"}
+  "gen_js_api" {= "1.1.2"}
+  "js_of_ocaml" {= "5.0.1"}
+  "js_of_ocaml-compiler" {= "5.0.1"}
+  "js_of_ocaml-ppx" {= "5.0.1"}
+  "jsonoo" {= "0.2.1"}
+  "menhir" {= "20220210"}
+  "menhirLib" {= "20220210"}
+  "menhirSdk" {= "20220210"}
+  "ocaml" {= "4.14.1"}
+  "ocaml-base-compiler" {= "4.14.1"}
+  "ocaml-compiler-libs" {= "v0.12.4"}
+  "ocaml-config" {= "2"}
+  "ocaml-options-vanilla" {= "1+bin+8afbbae3+f2cc4984"}
+  "ojs" {= "1.1.2"}
+  "ppx_derivers" {= "1.2.1"}
+  "ppxlib" {= "0.29.1"}
+  "promise_jsoo" {= "0.3.1"}
+  "seq" {= "base"}
+  "sexplib0" {= "v0.15.1"}
+  "stdlib-shims" {= "0.3.0"}
+  "yojson" {= "2.0.2"}
+]
+dev-repo: "git+https://github.com/ocamlpro/superbol-vscode-extension.git"

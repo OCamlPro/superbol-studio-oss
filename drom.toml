@@ -1,7 +1,7 @@
 [project]
 drom-version = "0.1"
 share-repo = "https://github.com/OCamlPro/drom-share"
-share-version = "0.9.1"
+share-version = "branch:local:z-2023-03-15-version-0.9.2"
 
 [project]
 authors = ["Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"]
@@ -9,8 +9,8 @@ ci-systems = ["ubuntu-latest", "macos-latest", "windows-latest"]
 copyright = "OCamlPro SAS"
 edition = "4.13.0"
 github-organization = "ocamlpro"
-license = "LGPL2"
-min-edition = "4.07.0"
+license = "MIT"
+min-edition = "4.13.0"
 name = "superbol-vscode-extension"
 skeleton = "mini_prg"
 synopsis = "The superbol-vscode-extension project"
@@ -33,7 +33,7 @@ of the superbol-vscode-extension OCaml project
 """
 
 [project]
-skip = ["@test", "@sphinx", "@docs", "@ocamlformat", "@ocp-indent"]
+skip = ["@test", "@sphinx", "@docs", "@ocamlformat", "@ocp-indent", "README.md"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
@@ -51,7 +51,7 @@ for-test = true
 [project]
 
 # dirs to skip while scanning for dune files
-skip-dirs = []
+skip-dirs = [ "node_modules" ]
 
 # dirs to scan for share/ folders (with package names)
 share-dirs = ["share"]
@@ -73,9 +73,35 @@ share-dirs = ["share"]
 #  readme-trailer = "..."
 #  dot-gitignore-trailer = "..."
 [fields]
-# ...
+dot-gitignore-trailer = """
+/dist
+/node_modules
+/yarn-error.log
+/yarn.lock
+ATTIC
+"""
 
 [[package]]
 dir = "src/superbol-vscode-extension"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+
+[[package]]
+dir = "src/polka-js-stubs"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+
+[[package]]
+dir = "src/interop-js-stubs"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+
+[[package]]
+dir = "src/node-js-stubs"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vscode-js-stubs"
+# edit 'src/superbol-vscode-extension/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vscode-languageclient-js-stubs"
 # edit 'src/superbol-vscode-extension/package.toml' for package-specific options
 
