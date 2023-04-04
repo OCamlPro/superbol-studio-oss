@@ -4,4 +4,11 @@
 )
 (dirs share src test vendors )
 
+(install
+ (files
+   ( "share/superbol-vscode-extension/www/index.html"
+    as "www/index.html")
+ )
+ (section share)
+ (package superbol-vscode-extension))
 

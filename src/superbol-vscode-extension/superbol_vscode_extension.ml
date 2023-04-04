@@ -14,4 +14,10 @@
 (* If you delete or rename this file, you should add
    'src/superbol-vscode-extension/main.ml' to the 'skip' field in "drom.toml" *)
 
-let () = Printf.printf "Hello world!\n"
+let activate (_extension: Vscode.ExtensionContext.t) =
+  let str = Interop.Js.String.t_to_js "Hello from OCaml" in
+  Js_of_ocaml.Firebug.console##log str;
+  Promise.return ()
+
+let () =
+  Js_of_ocaml.Js.(export "activate" (wrap_callback activate))

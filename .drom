@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-e8604de1b9f0009861b698345285c16b:.
+867caa9727b4b1b43022d2ea2d85d6ed:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -40,12 +40,12 @@ e31b19b601ab25353ef16d67127735f1:LICENSE.md
 
 # begin context for drom.toml
 # file drom.toml
-14ce20ee9aa33d220971f86d4a4800dc:drom.toml
+a3ea499b5e99d927997d4bd42ca2f5f1:drom.toml
 # end context for drom.toml
 
 # begin context for dune
 # file dune
-0d57afa9756f983af2551804954af609:dune
+6b3419b72dde9dae338ab92a5fd70da3:dune
 # end context for dune
 
 # begin context for dune-project
@@ -93,6 +93,11 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
+# begin context for share/superbol-vscode-extension/www/index.html
+# file share/superbol-vscode-extension/www/index.html
+8421bf35aa5c6f6c23aff327fda92473:share/superbol-vscode-extension/www/index.html
+# end context for share/superbol-vscode-extension/www/index.html
+
 # begin context for src/interop/dune
 # file src/interop/dune
 0272aced98d78bf64075d0b18e0cce78:src/interop/dune
@@ -110,7 +115,7 @@ b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 
 # begin context for src/superbol-vscode-extension/dune
 # file src/superbol-vscode-extension/dune
-2dd363ca36766601d1e80f954022c18c:src/superbol-vscode-extension/dune
+e06c24e47a9d13f6040464eb19bfcf0f:src/superbol-vscode-extension/dune
 # end context for src/superbol-vscode-extension/dune
 
 # begin context for src/superbol-vscode-extension/linking_flags.sh
@@ -118,14 +123,9 @@ b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 c7aa7ad8967d43dd0e7ea2f013af7376:src/superbol-vscode-extension/linking_flags.sh
 # end context for src/superbol-vscode-extension/linking_flags.sh
 
-# begin context for src/superbol-vscode-extension/main.ml
-# file src/superbol-vscode-extension/main.ml
-e7ebe648b86b0ac2cd670f3d2185797a:src/superbol-vscode-extension/main.ml
-# end context for src/superbol-vscode-extension/main.ml
-
 # begin context for src/superbol-vscode-extension/package.toml
 # file src/superbol-vscode-extension/package.toml
-33c9fe2cd89e581e5b1159834511f356:src/superbol-vscode-extension/package.toml
+4971e3a01d1a31abc9f237a11b9eb7ac:src/superbol-vscode-extension/package.toml
 # end context for src/superbol-vscode-extension/package.toml
 
 # begin context for src/superbol-vscode-extension/version.mlt
@@ -140,7 +140,7 @@ e7ebe648b86b0ac2cd670f3d2185797a:src/superbol-vscode-extension/main.ml
 
 # begin context for src/vscode-languageclient/package.toml
 # file src/vscode-languageclient/package.toml
-0c59e598b660f9afdd8d08754ec1082a:src/vscode-languageclient/package.toml
+54201d6fa1064ea9483a4850556a1a3a:src/vscode-languageclient/package.toml
 # end context for src/vscode-languageclient/package.toml
 
 # begin context for src/vscode-languageclient/version.mlt

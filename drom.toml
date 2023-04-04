@@ -12,7 +12,7 @@ github-organization = "ocamlpro"
 license = "LGPL2"
 min-edition = "4.07.0"
 name = "superbol-vscode-extension"
-skeleton = "mini_prg"
+skeleton = "js_prg"
 synopsis = "The superbol-vscode-extension project"
 version = "0.1.0"
 
@@ -33,7 +33,7 @@ of the superbol-vscode-extension OCaml project
 """
 
 [project]
-skip = ["@test", "@sphinx", "@docs", "@ocamlformat", "@ocp-indent", "src/interop/main.ml", "src/vscode/main.ml", "src/vscode-languageclient/main.ml"]
+skip = ["@test", "@sphinx", "@docs", "@ocamlformat", "@ocp-indent", "src/interop/main.ml", "src/vscode/main.ml", "src/vscode-languageclient/main.ml", "src/superbol-vscode-extension/main.ml"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
