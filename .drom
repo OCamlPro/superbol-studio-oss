@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-1fa76c49c5f7082d264367886d5fee55:.
+69b5c3b63e82de9ace876620ab5acaeb:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-b27148b8c3ba3a429e8bb2cbf668f690:.github/workflows/workflow.yml
+b4a5097b080a710564ad25ac77512642:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -30,7 +30,7 @@ e31b19b601ab25353ef16d67127735f1:LICENSE.md
 
 # begin context for Makefile
 # file Makefile
-66a3af89fc3b550b5e2c1911ead8b9e3:Makefile
+e0125b3ebb4ccecacedca4af7e0167e3:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -40,7 +40,7 @@ e31b19b601ab25353ef16d67127735f1:LICENSE.md
 
 # begin context for drom.toml
 # file drom.toml
-8767711b343fe80faaf85b3c62e08379:drom.toml
+0a7a53bb3ba47c0ad4bbb6d23506cc93:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -50,13 +50,23 @@ e31b19b601ab25353ef16d67127735f1:LICENSE.md
 
 # begin context for dune-project
 # file dune-project
-df67d6a4ce977cf49c344f4c24c3f869:dune-project
+e5e1ad767c8768cf3c10be94a0f7798e:dune-project
 # end context for dune-project
+
+# begin context for opam/interop.opam
+# file opam/interop.opam
+9d1ccdb378f0cbdef413ff9c3ce8f1a9:opam/interop.opam
+# end context for opam/interop.opam
 
 # begin context for opam/superbol-vscode-extension.opam
 # file opam/superbol-vscode-extension.opam
-354c614e7972665ef6611806091bcc80:opam/superbol-vscode-extension.opam
+1b7dd014c8dd0a317369df6f6b7c3b05:opam/superbol-vscode-extension.opam
 # end context for opam/superbol-vscode-extension.opam
+
+# begin context for opam/vscode.opam
+# file opam/vscode.opam
+14cb9dc8f37ce9cbf19567eba8d274d8:opam/vscode.opam
+# end context for opam/vscode.opam
 
 # begin context for scripts/after.sh
 # file scripts/after.sh
@@ -75,17 +85,37 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for scripts/static-build.sh
 # file scripts/static-build.sh
-f03b2c27419cb7c506e8d771ffa97fce:scripts/static-build.sh
+b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 # end context for scripts/static-build.sh
+
+# begin context for src/interop/dune
+# file src/interop/dune
+0272aced98d78bf64075d0b18e0cce78:src/interop/dune
+# end context for src/interop/dune
+
+# begin context for src/interop/main.ml
+# file src/interop/main.ml
+d4f37962eb10a005066d290cc611a4f7:src/interop/main.ml
+# end context for src/interop/main.ml
+
+# begin context for src/interop/package.toml
+# file src/interop/package.toml
+5944bb30d5a9666b0ec2fe7a65f055d6:src/interop/package.toml
+# end context for src/interop/package.toml
+
+# begin context for src/interop/version.mlt
+# file src/interop/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/interop/version.mlt
+# end context for src/interop/version.mlt
 
 # begin context for src/superbol-vscode-extension/dune
 # file src/superbol-vscode-extension/dune
-f0e52d59eb8d410be49e874cd26001c2:src/superbol-vscode-extension/dune
+2b13b70658f8f6cde3c37572bbd8b526:src/superbol-vscode-extension/dune
 # end context for src/superbol-vscode-extension/dune
 
 # begin context for src/superbol-vscode-extension/linking_flags.sh
 # file src/superbol-vscode-extension/linking_flags.sh
-0a2fe9095ac85798a954cea4a04944b7:src/superbol-vscode-extension/linking_flags.sh
+c7aa7ad8967d43dd0e7ea2f013af7376:src/superbol-vscode-extension/linking_flags.sh
 # end context for src/superbol-vscode-extension/linking_flags.sh
 
 # begin context for src/superbol-vscode-extension/main.ml
@@ -102,3 +132,23 @@ e7ebe648b86b0ac2cd670f3d2185797a:src/superbol-vscode-extension/main.ml
 # file src/superbol-vscode-extension/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/superbol-vscode-extension/version.mlt
 # end context for src/superbol-vscode-extension/version.mlt
+
+# begin context for src/vscode/dune
+# file src/vscode/dune
+d244d624d9a28075daaea986d53c2952:src/vscode/dune
+# end context for src/vscode/dune
+
+# begin context for src/vscode/main.ml
+# file src/vscode/main.ml
+d4f37962eb10a005066d290cc611a4f7:src/vscode/main.ml
+# end context for src/vscode/main.ml
+
+# begin context for src/vscode/package.toml
+# file src/vscode/package.toml
+cf89c085f43e295850740ad6f244ed90:src/vscode/package.toml
+# end context for src/vscode/package.toml
+
+# begin context for src/vscode/version.mlt
+# file src/vscode/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/version.mlt
+# end context for src/vscode/version.mlt

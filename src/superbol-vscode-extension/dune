@@ -3,7 +3,10 @@
   (name main)
   (public_name superbol-vscode-extension)
   (package superbol-vscode-extension)
+  ; use field 'dune-libraries' to add libraries without opam deps
   (libraries  )
+  (flags (:standard))
+  ; use field 'dune-stanzas' to add more stanzas here
   
   
   )
@@ -33,4 +36,5 @@
 (documentation
   (package superbol-vscode-extension))
 
+; use field 'dune-trailer' to add more stuff here
 

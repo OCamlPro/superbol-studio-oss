@@ -21,4 +21,39 @@
   )
  )
 
+(package
+ (name vscode)
+ (synopsis "The superbol-vscode-extension project")
+ (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
+ (depends
+   (ocaml (>= 4.07.0))
+   (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
+   (jsonoo (and (>= 0.2.1) (< 1.0.0)))
+   (js_of_ocaml ( >= 3.0 ))
+   (interop (= version))
+   (gen_js_api (and (>= 1.1.2) (< 2.0.0)))
+   (js_of_ocaml-ppx ( >= 3.0 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name interop)
+ (synopsis "The superbol-vscode-extension project")
+ (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
+ (depends
+   (ocaml (>= 4.07.0))
+   (js_of_ocaml ( >= 3.0 ))
+   (gen_js_api (and (>= 1.1.2) (< 2.0.0)))
+   (js_of_ocaml-ppx ( >= 3.0 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
 
