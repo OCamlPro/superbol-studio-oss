@@ -47,10 +47,10 @@ preprocess = "pps gen_js_api.ppx js_of_ocaml-ppx"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 gen_js_api = "1.1.2"
+interop = "version"
 js_of_ocaml = ">=3.0"
 jsonoo = "0.2.1"
 promise_jsoo = "0.3.1"
-interop = "version"
 
 # package tools dependencies
 [tools]

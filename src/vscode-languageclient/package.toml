@@ -1,6 +1,6 @@
 
 # name of package
-name = "interop"
+name = "vscode-languageclient"
 skeleton = "js_library"
 
 # version if different from project version
@@ -46,8 +46,12 @@ preprocess = "pps gen_js_api.ppx js_of_ocaml-ppx"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-gen_js_api = "1.1.2"
+vscode = "version"
+interop = "version"
+jsonoo = "0.2.1"
+promise_jsoo = "0.3.1"
 js_of_ocaml = ">=3.0"
+gen_js_api = "1.1.2"
 
 # package tools dependencies
 [tools]
@@ -65,4 +69,7 @@ js_of_ocaml-ppx = ">=3.0"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-stanzas = """
+(js_of_ocaml
+  (javascript_files vscode_languageclient_stub.js))
+"""

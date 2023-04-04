@@ -20,7 +20,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh superbol-vscode-extension vscode interop
+	./scripts/copy-bin.sh superbol-vscode-extension vscode interop vscode-languageclient
 	./scripts/after.sh build
 
 build-deps:

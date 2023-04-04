@@ -36,7 +36,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving_encoding"
+preprocess = "pps gen_js_api.ppx js_of_ocaml-ppx"
 
 # files to skip while updating at package level
 # skip = []
@@ -46,11 +46,13 @@ gen-version = "version.ml"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-# ...
+vscode = "version"
+js_of_ocaml = ">=3.0"
+gen_js_api = "1.1.2"
 
 # package tools dependencies
 [tools]
-# ...
+js_of_ocaml-ppx = ">=3.0"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -64,4 +66,8 @@ gen-version = "version.ml"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-stanzas = """
+(modes js)
+(js_of_ocaml
+  (flags --source-map --pretty))
+"""

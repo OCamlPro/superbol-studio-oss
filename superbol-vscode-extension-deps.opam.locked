@@ -83,3 +83,11 @@ depends: [
   "yojson" {= "2.0.2"}
 ]
 dev-repo: "git+https://github.com/ocamlpro/superbol-vscode-extension.git"
+maintainer: [
+  "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
+  "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
+]
+authors: [
+  "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
+  "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
+]
