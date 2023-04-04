@@ -7,5 +7,10 @@ _build
 /_opam
 /_build
 .drom.config
+out
+dist
+node_modules
+.vscode-test/
+*.vsix
 
 

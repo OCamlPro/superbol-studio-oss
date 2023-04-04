@@ -71,9 +71,14 @@ share-dirs = ["share"]
 #  docker-alpine-image = "ocamlpro/ocaml:4.13"
 #  dune-lang = "2.1"
 #  readme-trailer = "..."
-#  dot-gitignore-trailer = "..."
 [fields]
-# ...
+dot-gitignore-trailer = """
+out
+dist
+node_modules
+.vscode-test/
+*.vsix
+"""
 
 [[package]]
 dir = "src/superbol-vscode-extension"
