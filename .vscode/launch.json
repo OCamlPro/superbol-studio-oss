@@ -1,0 +1,19 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run Extension",
+			"type": "extensionHost",
+			"request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "outFiles": [
+                "${workspaceRoot}/_build/default/src/superbol-vscode-extension/superbol_vscode_extension.bc.js"
+            ],
+			"args": [
+                "--disable-extensions",
+				"--extensionDevelopmentPath=${workspaceFolder}"
+			],
+			"preLaunchTask": "${defaultBuildTask}"
+		}
+	]
+}

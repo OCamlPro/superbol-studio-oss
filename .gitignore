@@ -2,7 +2,7 @@
 *~
 _build
 .merlin
-.vscode
+.vscode/settings.json
 /_drom
 /_opam
 /_build
