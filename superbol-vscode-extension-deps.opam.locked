@@ -13,16 +13,26 @@ homepage: "https://ocamlpro.github.io/superbol-vscode-extension"
 doc: "https://ocamlpro.github.io/superbol-vscode-extension/sphinx"
 bug-reports: "https://github.com/ocamlpro/superbol-vscode-extension/issues"
 depends: [
+  "angstrom" {= "0.15.0"}
   "base-bigarray" {= "base+bin+6aa7b5b3+f2cc4984"}
   "base-threads" {= "base+bin+88ec833a+f2cc4984"}
   "base-unix" {= "base+bin+6c5a8d56+f2cc4984"}
+  "bigstringaf" {= "0.9.0"}
   "cmdliner" {= "1.1.1"}
+  "conf-pkg-config" {= "2"}
   "cppo" {= "1.6.9"}
+  "cstruct" {= "6.1.1"}
   "dune" {= "3.7.0"}
+  "ez_file" {= "0.3.0"}
+  "ezjsonm" {= "1.3.0"}
+  "fmt" {= "0.9.0"}
   "gen_js_api" {= "1.1.2"}
+  "hex" {= "1.5.0"}
   "js_of_ocaml" {= "5.0.1"}
   "js_of_ocaml-compiler" {= "5.0.1"}
   "js_of_ocaml-ppx" {= "5.0.1"}
+  "json-data-encoding" {= "0.12.1"}
+  "jsonm" {= "1.0.2"}
   "jsonoo" {= "0.2.1"}
   "menhir" {= "20220210"}
   "menhirLib" {= "20220210"}
@@ -32,13 +42,24 @@ depends: [
   "ocaml-compiler-libs" {= "v0.12.4"}
   "ocaml-config" {= "2"}
   "ocaml-options-vanilla" {= "1+bin+8afbbae3+f2cc4984"}
+  "ocaml-syntax-shims" {= "1.0.0"}
+  "ocamlbuild" {= "0.14.2"}
+  "ocamlfind" {= "1.9.6"}
+  "ocplib_stuff" {= "0.3.0"}
   "ojs" {= "1.1.2"}
   "ppx_derivers" {= "1.2.1"}
+  "ppx_deriving_encoding" {= "0.3.0"}
   "ppxlib" {= "0.29.1"}
   "promise_jsoo" {= "0.3.1"}
+  "re" {= "1.10.4"}
+  "result" {= "1.5"}
   "seq" {= "base"}
   "sexplib0" {= "v0.15.1"}
   "stdlib-shims" {= "0.3.0"}
+  "stringext" {= "1.6.0"}
+  "topkg" {= "1.0.7"}
+  "uri" {= "4.2.0"}
+  "uutf" {= "1.0.3"}
   "yojson" {= "2.0.2"}
 ]
 dev-repo: "git+https://github.com/ocamlpro/superbol-vscode-extension.git"

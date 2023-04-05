@@ -1,6 +1,6 @@
 {
   "name": "superbol",
-  "displayName": "Superbol COBOL Mode",
+  "displayName": "Superbol COBOL",
   "description": "Provides a COBOL mode in VSCode based on Superbol",
   "license": "MIT",
   "version": "0.1.0",
@@ -9,20 +9,28 @@
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-vscode-extension"
   },
+  "homepage": "https://ocamlpro.com/cobol",
+  "author": {
+    "name": "OCamlPro SAS",
+    "email": "contact@ocamlpro.com"
+  },
+  "keywords": [ "cobol", "gnucobol" ],
   "engines": {
     "vscode": "^1.64.0"
   },
   "categories": [
       "Formatters",
-      "Programming Languages"
+      "Programming Languages",
+      "Linters",
+      "Snippets",
+      "Other"
   ],
   "activationEvents": [
-    "onLanguage:ocaml",
-    "onLanguage:ocaml.interface"
+      "onLanguage:cobol"
   ],
   "contributes": {
     "configuration": {
-      "title": "Superbol COBOL Mode",
+      "title": "Superbol COBOL",
       "properties": {
         "superbol.globalFormatTakesSelection": {
           "type": "boolean",

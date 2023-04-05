@@ -39,7 +39,7 @@ pack = "Vscode_languageclient"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
-skip = [ "main.ml" ]
+skip = ["main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -47,12 +47,13 @@ skip = [ "main.ml" ]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 gen_js_api = "1.1.1"
-js_of_ocaml = "5.0.0"
-promise_jsoo = "0.3.1"
-jsonoo = "0.2.1"
 interop-js-stubs = "version"
+js_of_ocaml = "5.0.0"
+jsonoo = "0.2.1"
+promise_jsoo = "0.3.1"
 vscode-js-stubs = "version"
 
+# package tools dependencies
 [tools]
 js_of_ocaml-ppx = "5.0.0"
 

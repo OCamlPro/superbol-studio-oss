@@ -4,6 +4,7 @@
 /node-js-stubs
 /vscode-js-stubs
 /vscode-languageclient-js-stubs
+/package-json
 *~
 _build
 .merlin

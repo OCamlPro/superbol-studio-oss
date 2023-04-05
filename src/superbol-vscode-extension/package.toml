@@ -36,7 +36,6 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving_encoding"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
@@ -49,13 +48,14 @@ skip = []
 [dependencies]
 gen_js_api = "1.1.1"
 js_of_ocaml = "5.0.0"
-promise_jsoo = "0.3.1"
 jsonoo = "0.2.1"
-# polka-js-stubs = "version"
-# node-js-stubs = "version"
-#  vscode-js-stubs = "version"
-#  vscode-languageclient-js-stubs = "version"
- 
+node-js-stubs = "version"
+polka-js-stubs = "version"
+promise_jsoo = "0.3.1"
+vscode-js-stubs = "version"
+vscode-languageclient-js-stubs = "version"
+
+# package tools dependencies
 [tools]
 js_of_ocaml-ppx = "5.0.0"
 

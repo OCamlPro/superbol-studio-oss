@@ -1,7 +1,7 @@
 
 # name of package
-name = "interop-js-stubs"
-skeleton = "js_library"
+name = "package-json"
+skeleton = "program"
 
 # version if different from project version
 # version = "0.1.0"
@@ -32,26 +32,26 @@ gen-version = "version.ml"
 # optional = true
 
 # module name used to pack modules (if pack-modules is true)
-pack = "Interop"
+# pack = "Mylib"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps gen_js_api.ppx"
+preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
-skip = ["main.ml"]
+# skip = []
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-gen_js_api = "1.1.1"
-js_of_ocaml = "5.0.0"
+ezjsonm = ""
+ez_file = "0.3.0"
 
 # package tools dependencies
 [tools]
-js_of_ocaml-ppx = "5.0.0"
+ppx_deriving_encoding = ""
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -65,4 +65,4 @@ js_of_ocaml-ppx = "5.0.0"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-flags = ":standard (:include linking.sexp)"

@@ -5,17 +5,17 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-086147ae59aaab01746d38c4d9538225:.
+6c4745d9b958fd36a74ce5a34f13a6d2:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-25253364c8c43b69496f4e4dccc8265c:.github/workflows/workflow.yml
+3c16bbaff1158ecfc19480e0744aaf2a:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-cc3b4ea827a9bcc0000f014086140784:.gitignore
+a9baccd9eedd2f924ca9b9879b70c3e0:.gitignore
 # end context for .gitignore
 
 # begin context for CHANGES.md
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-7f459f03c5f1cf0fe1fd58fecfda5a46:Makefile
+923cec84b4c88ee7a39817739aa83cb0:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -40,7 +40,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for drom.toml
 # file drom.toml
-8767711b343fe80faaf85b3c62e08379:drom.toml
+edfecf246f5178999b757bb30a11aaba:drom.toml
 # end context for drom.toml
 
 # begin context for dune
@@ -50,7 +50,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for dune-project
 # file dune-project
-a9b87c4c12c2fdff58fc5b53a14c8c47:dune-project
+7147afeddc222b46b556c83201c1e4d5:dune-project
 # end context for dune-project
 
 # begin context for opam/interop-js-stubs.opam
@@ -63,6 +63,11 @@ a9b87c4c12c2fdff58fc5b53a14c8c47:dune-project
 dd7dde4e293ba0e8c85514b5d478e1c8:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
+# begin context for opam/package-json.opam
+# file opam/package-json.opam
+dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
+# end context for opam/package-json.opam
+
 # begin context for opam/polka-js-stubs.opam
 # file opam/polka-js-stubs.opam
 0d5af23c7fa13408fbcb4c4ebf6998b5:opam/polka-js-stubs.opam
@@ -70,7 +75,7 @@ dd7dde4e293ba0e8c85514b5d478e1c8:opam/node-js-stubs.opam
 
 # begin context for opam/superbol-vscode-extension.opam
 # file opam/superbol-vscode-extension.opam
-b51309f4c2cb210eb966b5bbc0062652:opam/superbol-vscode-extension.opam
+49da3d109b0d2a783198d2754ca3d016:opam/superbol-vscode-extension.opam
 # end context for opam/superbol-vscode-extension.opam
 
 # begin context for opam/vscode-js-stubs.opam
@@ -108,6 +113,11 @@ b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 707a0383f1e544fb37662db29a4f14ad:src/interop-js-stubs/dune
 # end context for src/interop-js-stubs/dune
 
+# begin context for src/interop-js-stubs/package.toml
+# file src/interop-js-stubs/package.toml
+c2bbd2b7f9ee6d3e9e594e57cb1e399b:src/interop-js-stubs/package.toml
+# end context for src/interop-js-stubs/package.toml
+
 # begin context for src/interop-js-stubs/version.mlt
 # file src/interop-js-stubs/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/interop-js-stubs/version.mlt
@@ -118,15 +128,50 @@ b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
 # end context for src/node-js-stubs/dune
 
+# begin context for src/node-js-stubs/package.toml
+# file src/node-js-stubs/package.toml
+032f732ff13a1505fadbef77c29969a7:src/node-js-stubs/package.toml
+# end context for src/node-js-stubs/package.toml
+
 # begin context for src/node-js-stubs/version.mlt
 # file src/node-js-stubs/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/node-js-stubs/version.mlt
 # end context for src/node-js-stubs/version.mlt
 
+# begin context for src/package-json/dune
+# file src/package-json/dune
+9f4e3c0bfa0afc5164a25346c401380b:src/package-json/dune
+# end context for src/package-json/dune
+
+# begin context for src/package-json/linking_flags.sh
+# file src/package-json/linking_flags.sh
+c7aa7ad8967d43dd0e7ea2f013af7376:src/package-json/linking_flags.sh
+# end context for src/package-json/linking_flags.sh
+
+# begin context for src/package-json/main.ml
+# file src/package-json/main.ml
+dd19135f4f49d3c99b5658d0e58f4460:src/package-json/main.ml
+# end context for src/package-json/main.ml
+
+# begin context for src/package-json/package.toml
+# file src/package-json/package.toml
+1ce8790167330967a712ed12f27f26c3:src/package-json/package.toml
+# end context for src/package-json/package.toml
+
+# begin context for src/package-json/version.mlt
+# file src/package-json/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/package-json/version.mlt
+# end context for src/package-json/version.mlt
+
 # begin context for src/polka-js-stubs/dune
 # file src/polka-js-stubs/dune
 569424afbc851a410f6f388591417035:src/polka-js-stubs/dune
 # end context for src/polka-js-stubs/dune
+
+# begin context for src/polka-js-stubs/package.toml
+# file src/polka-js-stubs/package.toml
+4bb2ac81e8d2d4e38edb70f56afddfa0:src/polka-js-stubs/package.toml
+# end context for src/polka-js-stubs/package.toml
 
 # begin context for src/polka-js-stubs/version.mlt
 # file src/polka-js-stubs/version.mlt
@@ -135,7 +180,7 @@ cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
 
 # begin context for src/superbol-vscode-extension/dune
 # file src/superbol-vscode-extension/dune
-6fd8f0801d7fc8f8fcee8028ffd212b3:src/superbol-vscode-extension/dune
+b1688b8279b524e7d5fff4842fb0d902:src/superbol-vscode-extension/dune
 # end context for src/superbol-vscode-extension/dune
 
 # begin context for src/superbol-vscode-extension/linking_flags.sh
@@ -145,7 +190,7 @@ cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
 
 # begin context for src/superbol-vscode-extension/package.toml
 # file src/superbol-vscode-extension/package.toml
-33c9fe2cd89e581e5b1159834511f356:src/superbol-vscode-extension/package.toml
+f2786e16f8517cf93f7ee5f4d655ab12:src/superbol-vscode-extension/package.toml
 # end context for src/superbol-vscode-extension/package.toml
 
 # begin context for src/superbol-vscode-extension/version.mlt
@@ -158,6 +203,11 @@ cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
 f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
 # end context for src/vscode-js-stubs/dune
 
+# begin context for src/vscode-js-stubs/package.toml
+# file src/vscode-js-stubs/package.toml
+6436cbcc372bb6d0795d4527277f5dd9:src/vscode-js-stubs/package.toml
+# end context for src/vscode-js-stubs/package.toml
+
 # begin context for src/vscode-js-stubs/version.mlt
 # file src/vscode-js-stubs/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode-js-stubs/version.mlt
@@ -167,6 +217,11 @@ f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
 # file src/vscode-languageclient-js-stubs/dune
 935c7469b455b26a8ec1f08627aae863:src/vscode-languageclient-js-stubs/dune
 # end context for src/vscode-languageclient-js-stubs/dune
+
+# begin context for src/vscode-languageclient-js-stubs/package.toml
+# file src/vscode-languageclient-js-stubs/package.toml
+9808848df715eb9bf1265b76d7d8ee3b:src/vscode-languageclient-js-stubs/package.toml
+# end context for src/vscode-languageclient-js-stubs/package.toml
 
 # begin context for src/vscode-languageclient-js-stubs/version.mlt
 # file src/vscode-languageclient-js-stubs/version.mlt
