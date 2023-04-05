@@ -127,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 (* open Js_of_ocaml *)
 
-(* let indentRange
+let indentRange
     ~document
     ~options:_
     ~token:_
@@ -157,6 +157,8 @@ export function activate(context: vscode.ExtensionContext) {
 *)
   `Value promise
 
+let client = ref None
+
 let activate (extension : Vscode.ExtensionContext.t) =
   let providerFull = Vscode.DocumentFormattingEditProvider.create
       ~provideDocumentFormattingEdits:(indentRange ~range:None)
@@ -167,18 +169,6 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
   Vscode.ExtensionContext.subscribe extension ~disposable;
 
-  Promise.return ()
-
-
-(* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
-   activate() *)
-let () =
-  let open Js_of_ocaml.Js in
-  export "activate" (wrap_callback activate) *)
-
-let client = ref None
-
-let activate (_extension: Vscode.ExtensionContext.t) =
   let command =
     Vscode.Workspace.getConfiguration ()
     |> Vscode.WorkspaceConfiguration.get ~section:"superbol.path"
@@ -192,7 +182,7 @@ let activate (_extension: Vscode.ExtensionContext.t) =
       ()
   in
   let documentSelector =
-    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
+    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"COBOL" ()) |]
   in
   let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector () in
   client :=
@@ -211,6 +201,8 @@ let deactivate () =
   | None -> Promise.return ()
   | Some client -> Vscode_languageclient.LanguageClient.stop client
 
+(* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
+   activate() *)
 let () =
   Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
   Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))

@@ -32,7 +32,7 @@
   "contributes": {
     "languages": [
       {
-        "id": "cobol",
+        "id": "COBOL",
         "filenamePatterns": ["*.cbl", "*.cob"]
       }
     ],
@@ -54,7 +54,7 @@
   },
   "main": "./dist/superbol_vscode_extension.bc.js",
   "scripts": {
-    "compile" : "drom build && node build.js",
+    "compile" : "make compile",
     "package": "vsce package --out superbol-vscode-extension.vsix --yarn",
     "deploy:vsce": "vsce publish --packagePath superbol-vscode-extension.vsix --yarn",
     "deploy:ovsx": "ovsx publish --yarn"
