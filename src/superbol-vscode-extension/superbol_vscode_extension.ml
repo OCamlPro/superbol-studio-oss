@@ -127,7 +127,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 (* open Js_of_ocaml *)
 
-let indentRange
+(* let indentRange
     ~document
     ~options:_
     ~token:_
@@ -174,4 +174,44 @@ let activate (extension : Vscode.ExtensionContext.t) =
    activate() *)
 let () =
   let open Js_of_ocaml.Js in
-  export "activate" (wrap_callback activate)
+  export "activate" (wrap_callback activate) *)
+
+let client = ref None
+
+let activate (_extension: Vscode.ExtensionContext.t) =
+  let command =
+    Vscode.Workspace.getConfiguration ()
+    |> Vscode.WorkspaceConfiguration.get ~section:"superbol.path"
+    |> function Some o -> Ojs.string_of_js o
+              | None -> "superbol"
+  in
+  let args = ["x-lsp"] in
+  let serverOptions = Vscode_languageclient.ServerOptions.create
+      ~command
+      ~args
+      ()
+  in
+  let documentSelector =
+    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
+  in
+  let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector () in
+  client :=
+    Some (Vscode_languageclient.LanguageClient.make
+            ~id:"cobolServer"
+            ~name:"Cobol Server"
+            ~serverOptions
+            ~clientOptions
+            ());
+  match !client with
+  | Some client -> Vscode_languageclient.LanguageClient.start client
+  | None -> Promise.return ()
+
+let deactivate () =
+  match !client with
+  | None -> Promise.return ()
+  | Some client -> Vscode_languageclient.LanguageClient.stop client
+
+let () =
+  Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
+  Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
+
