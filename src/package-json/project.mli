@@ -9,4 +9,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val p : Manifest.vscode_package
+val p : Manifest.vscode

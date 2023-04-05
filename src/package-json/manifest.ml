@@ -9,32 +9,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type 'a list_object = ( string * 'a ) list
+(* Some doc on deriving json_encoding:
+   * Field attributes : [@dft default], [@opt],
+     [@ddft default] (forced field on construct),
+     [@req] (forced option), [@key "keyName"], [@title "titleName"],
+     [@description "descr"], [@exclude default],
+     [@merge],
+     [@camel], [@snake],
+     [@set encoding], [@map encoding]
+   * Type attributes :
+     [@assoc] ( (string * 'a) list encoded as object )
+     [@enum]
+     [@encoding encoding_name]
+     [@wrap "field"] (wrap within an obj1)
+   * Variant attributes:
+     [@kind "label"], [@kind_label "type"], [@empty]
+   * Definition attributes: [@@deriving json_encoding {...}]
+     {ignore} : ignore other fields
+     {remove_prefix = "prefix"}
+     {recursive}
+     {title = "title" }
+     {description = "description"}
+     {schema = "schema"}
+     {option = "req/opt/dft" }
+     {debug}
+     {name = "..._enc" }
+     {camel}, {snake}
+     {wrap}
+*)
 
-let list_object_enc encoding :
-  ( string * 'a ) list Json_encoding.encoding =
-  Json_encoding.custom
-    (fun scripts ->
-       `O ( List.map (fun (label, field) ->
-           label,
-           Json_encoding.construct encoding field
-         ) scripts )
-    )
-    (function
-        `O scripts ->
-        List.map (fun (label, field) ->
-            let field =
-              try
-                Json_encoding.destruct encoding field
-              with exn ->
-                Printf.eprintf "Exn in destruct label %S\n%!" label;
-                raise exn
-            in
-            label, field
-          ) scripts
-      | _ -> raise (Json_encoding.Cannot_destruct ([], Exit))
-    )
-    ~schema:Json_schema.any
 
 
 type any = Json_repr.ezjsonm [@@deriving json_encoding]
@@ -50,6 +53,8 @@ type engines = {
   vscode : string ;
 }
 [@@deriving json_encoding]
+let engines ~vscode = { vscode }
+
 
 type author = {
   author_name : string ;
@@ -75,13 +80,44 @@ type package = {
   keywords : string list ; [@dft []]
   main : string option ;
   browser : string option ;
-  scripts : string list_object ; [@dft []]
-  dependencies : string list_object ; [@dft []]
-  devDependencies : string list_object ; [@dft []]
+  scripts : (string * string) list [@assoc] ; [@dft []]
+  dependencies : (string * string) list [@assoc] ; [@dft []]
+  devDependencies : (string * string) list [@assoc] ; [@dft []]
   bugs : bug option ;
 }
 [@@deriving json_encoding]
-
+let package
+    ~displayName
+    ~description
+    ?license
+    ~version
+    ?repository
+    ?homepage
+    ?author
+    ?( keywords = [] )
+    ?main
+    ?browser
+    ?( scripts = [] )
+    ?( dependencies = [] )
+    ?( devDependencies = [] )
+    ?bugs
+    name =
+  { name ;
+    displayName ;
+    description ;
+    license ;
+    version ;
+    repository ;
+    homepage ;
+    author ;
+    keywords ;
+    main ;
+    browser ;
+    scripts ;
+    dependencies ;
+    devDependencies ;
+    bugs
+  }
 
 
 type breakpoint = {
@@ -129,6 +165,14 @@ type command = {
   command_enablement : string option ; (* Javascript condition *)
 }
 [@@deriving json_encoding]
+let command ~command ~title ?category ?icon ?enablement () =
+  {
+    command_command = command ;
+    command_title = title ;
+    command_category = category ;
+    command_icon = icon ;
+    command_enablement = enablement ;
+  }
 
 type property = {
   prop_title : string option ;
@@ -148,22 +192,109 @@ type property = {
     language-overridable - Resource settings that can be overridable at a language level.
 *)
   prop_scope : string option ;
-    prop_items : any option ;
-  prop_uniqueItems : any option ;
-  prop_enum : any option ;
-  prop_enumDescriptions : any option ;
+  prop_items : any option ;
+  prop_uniqueItems : bool option ;
+  prop_enum : string list ; [@dft []]
+  prop_enumDescriptions : string list ; [@dft []]
   prop_minimum : int option ;
   prop_maximum : int option ;
   prop_minItems : int option ;
 }
 [@@deriving json_encoding]
 
+let property
+    ?title: prop_title
+    ?markdownDescription: prop_markdownDescription
+    ?deprecationMessage: prop_deprecationMessage
+
+    ?type_: (prop_type = `String "string")
+    ?default: prop_default
+    ?description: prop_description
+    ?scope: prop_scope
+    ?items: prop_items
+    ?uniqueItems: prop_uniqueItems
+    ?enum: (prop_enum = [])
+    ?enumDescriptions: (prop_enumDescriptions = [])
+    ?minimum: prop_minimum
+    ?maximum: prop_maximum
+    ?minItems: prop_minItems
+
+    () =
+  {
+    prop_title ;
+    prop_markdownDescription ;
+    prop_deprecationMessage ;
+    prop_type ;
+    prop_default ;
+    prop_description ;
+    prop_scope ;
+    prop_items ;
+    prop_uniqueItems ;
+    prop_enum ;
+    prop_enumDescriptions ;
+    prop_minimum ;
+    prop_maximum ;
+    prop_minItems ;
+  }
+
+let bool_property ?default =
+  property
+    ~type_:(`String "boolean")
+    ?default:(match default with
+        | None -> None
+        | Some bool -> Some (`Bool bool))
+
+let int_property ?default =
+  property
+    ~type_:(`String "number")
+    ?default:(match default with
+        | None -> None
+        | Some int -> Some (`Float (float_of_int int)))
+
+let string_property ?default =
+  property
+    ~type_:(`String "string")
+    ?default:(match default with
+        | None -> None
+        | Some s -> Some (`String s))
+
+let null_string_property ?default =
+  property
+    ~type_:(`A [`String "string"; `String "null"])
+    ?default:(match default with
+        | None -> None
+        | Some None -> Some `Null
+        | Some Some s -> Some (`String s))
+
+let strings_property ?default =
+  property
+    ~type_:(`String "array")
+    ?default:(match default with
+        | None -> None
+        | Some strings ->
+          Some (`A (List.map (fun s -> `String s) strings)))
+    ~items: (`String "string")
+
+let null_strings_property ?default =
+  property
+    ~type_:(`A [ `String "array"; `String "null" ])
+    ?default:(match default with
+        | None -> None
+        | Some None -> Some `Null
+        | Some Some strings ->
+          Some (`A (List.map (fun s -> `String s) strings)))
+    ~items: (`String "string")
+
 type configuration = {
   conf_type : string option ; (* should always be None *)
   conf_title : string option ;
-  conf_properties : property list_object ; [@dft []]
+  conf_properties : ( string * property ) list [@assoc] ; [@dft []]
 }
 [@@deriving json_encoding]
+let configuration ?title properties =
+  { conf_type = None ;
+    conf_title = title ;
+    conf_properties = properties }
 
 type selector = {
   filenamePattern : string ; (* glob *)
@@ -190,7 +321,7 @@ type debugger = {
   (* if the path to the debug adapter is not an executable but needs a
      runtime.*)
 
-  debugger_variables : string list_object ; [@dft []]
+  debugger_variables : (string * string) list [@assoc] ; [@dft []]
   (* introduces substitution variables and binds them to commands
      implemented by the debugger extension. *)
 
@@ -220,13 +351,13 @@ type grammar = { (* TextMate grammar for syntax highlighting *)
   grammar_scopeName : string ; (* "source.COBOL" *)
   grammar_path : string ; (* path to grammar file *)
   grammar_injectTo : string list ; [@dft []]
-  grammar_embeddedLanguages : string list_object ; [@dft []]
+  grammar_embeddedLanguages : (string * string) list [@assoc] ; [@dft []]
 }
 [@@deriving json_encoding]
 
 type icon = {
   icon_description : string ;
-  icon_default : string list_object ;
+  icon_default : (string * string) list [@assoc] ;
 }
 [@@deriving json_encoding]
 
@@ -248,9 +379,20 @@ type keybinding = {
   key_key : string ; (* "ctrl+f1" *)
   key_mac : string option ;
   key_when : string option ; (* Javascript condition *)
-  key_args : string list_object ; [@dft []]
+  key_args : (string * string) list [@assoc] ; [@dft []]
 }
 [@@deriving json_encoding]
+let keybinding
+    ~key
+    ?mac ?when_ ?( args = [] )
+    key_command =
+  {
+    key_command ;
+    key_key  = key ;
+    key_mac = mac ;
+    key_when = when_ ;
+    key_args = args ;
+  }
 
 type language = {
   lang_id : string ;
@@ -264,6 +406,27 @@ type language = {
 }
 [@@deriving json_encoding]
 
+let language
+    ?( extensions = [] )
+    ?( aliases = [] )
+    ?( filenames = [] )
+    ?( filenamePatterns = [] )
+    ?firstLine
+    ?configuration
+    ?icon
+    id
+  =
+  {
+    lang_id = id ;
+    lang_extensions = extensions ;
+    lang_aliases = aliases ;
+    lang_filenames = filenames ;
+    lang_filenamePatterns = filenamePatterns ;
+    lang_firstLine = firstLine ;
+    lang_configuration = configuration ;
+    lang_icon = icon ;
+  }
+
 type menu = {
   menu_command : string option ;
   menu_group : string option ;
@@ -272,6 +435,15 @@ type menu = {
   menu_submenu : string option ;
 }
 [@@deriving json_encoding]
+let menu ?command ?group ?when_ ?key ?submenu () =
+  {
+    menu_command = command ;
+    menu_group = group ;
+    menu_when = when_ ;
+    menu_key = key ;
+    menu_submenu = submenu ;
+  }
+
 
 type fileLocation = string list
 
@@ -288,7 +460,10 @@ let fileLocation_enc =
     ]
 
 type problemPattern = {
-  pat_regexp : string ;
+  pat_name : string option ; (* only in problemPatterns *)
+  pat_regexp : string option ;
+
+  (* group positions within regexp *)
   pat_file : int option ;
   pat_line : int option ;
   pat_endLine : int option ;
@@ -296,9 +471,42 @@ type problemPattern = {
   pat_endColumn : int option ;
   pat_severity : int option ;
   pat_code : int option ;
+  pat_location : int option ;
   pat_message : int option ;
+
+  pat_loop : bool option ;
+  pat_patterns : problemPattern list ; [@dft []] (* instead of regexp *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding {recursive}]
+
+let problemPattern
+    ?name
+    ?file
+    ?line
+    ?endLine
+    ?column
+    ?endColumn
+    ?severity
+    ?code
+    ?location
+    ?message
+    ?loop
+    regexp =
+  {
+    pat_name = name ;
+    pat_regexp = regexp ;
+    pat_file = file ;
+    pat_line = line ;
+    pat_endLine = endLine ;
+    pat_column = column ;
+    pat_endColumn = endColumn ;
+    pat_severity = severity ;
+    pat_code = code ;
+    pat_location = location ;
+    pat_message = message ;
+    pat_loop = loop ;
+    pat_patterns = [] ;
+  }
 
 type pattern =
     ProblemPattern of problemPattern
@@ -339,6 +547,108 @@ type problemMatcher = {
   pm_severity : string option ; (* info, error, warning *)
 }
 [@@deriving json_encoding]
+let problemMatcher ~name ?owner ?(fileLocation = []) ?( pattern = [])
+    ?source ?severity () =
+  {
+    pm_name = name;
+    pm_owner = owner;
+    pm_fileLocation = fileLocation;
+    pm_pattern = pattern;
+    pm_source = source;
+    pm_severity = severity;
+  }
+
+
+type productIconTheme = {
+  pit_id : string ;
+  pit_label : string ;
+  pit_path : string ;
+}
+[@@deriving json_encoding]
+
+type snippet = {
+  snippet_language : string ;
+  snippet_path : string ;
+}
+[@@deriving json_encoding]
+let snippet ~language ~path = {
+  snippet_language = language ;
+  snippet_path = path }
+
+type submenu = {
+  submenu_id : string ;
+  submenu_label : string ;
+}
+[@@deriving json_encoding]
+let submenu ~id ~label =
+  { submenu_id = id ; submenu_label = label }
+
+type taskDefinition = {
+  task_type : string ;
+  task_required : string list ; [@dft []]
+  task_properties : ( string * any ) list [@assoc] ; [@dft []]
+}
+[@@deriving json_encoding]
+let taskDefinition ~type_ ?(required = []) ?(properties = []) () =
+  {
+    task_type = type_ ;
+    task_required = required ;
+    task_properties = properties ;
+  }
+
+type view = {
+  view_id : string ;
+  view_name : string ;
+  view_when : string option;
+  view_icon : string option;
+  view_contextualTitle : string option;
+}
+[@@deriving json_encoding]
+let view ~id ~name ?when_ ?icon ?contextualTitle () =
+  {
+    view_id = id ;
+    view_name = name ;
+    view_when = when_ ;
+    view_icon = icon ;
+    view_contextualTitle = contextualTitle ;
+  }
+
+type viewsContainer = {
+  vc_id : string ;
+  vc_title : string ;
+  vc_icon : string option;
+}
+[@@deriving json_encoding]
+let viewsContainer ~id ~title ?icon () =
+  { vc_id = id ; vc_title = title ; vc_icon = icon }
+
+type viewsWelcome = {
+  vw_view : string ;
+  vw_contents : string ;
+  vw_when : string option;
+}
+[@@deriving json_encoding]
+let viewsWelcome ~view ~contents ?when_ () =
+  { vw_view = view ; vw_contents = contents ; vw_when = when_ }
+
+type configurationDefaults =
+ ( string * any ) list [@assoc]
+[@@deriving json_encoding]
+
+type configurationDefault =
+  | Default of string
+  | Defaults of ( string * any ) list
+
+let configurationDefault_enc =
+  let open Json_encoding in
+  union [
+    case string
+      (function Default s -> Some s | _ -> None )
+      (fun s -> Default s) ;
+    case configurationDefaults_enc
+      (function Defaults s -> Some s | _ -> None )
+      (fun s -> Defaults s) ;
+  ]
 
 
 type contributes = {
@@ -346,57 +656,112 @@ type contributes = {
     colors : color list ; [@dft []]
     commands : command list ; [@dft []]
     configuration : configuration option ;
-    configurationDefaults : any list_object ; [@dft []]
+    configurationDefaults :
+      ( string * configurationDefault ) list [@assoc] ; [@dft []]
     customEditors : customEditor list ; [@dft []]
     debuggers : debugger list ; [@dft []]
     grammars : grammar list ; [@dft []]
-    icons : icon list_object ; [@dft []]
+    icons : icon list [@assoc] ; [@dft []]
     iconThemes : iconTheme list ; [@dft []]
     jsonValidation : jsonValidation list ; [@dft []]
     keybindings : keybinding list ; [@dft []]
     languages : language list ; [@dft []]
-    menus : menu list list_object ; [@dft []]
+    menus : ( string * menu list ) list [@assoc] ; [@dft []]
     problemMatchers : problemMatcher list ; [@dft []]
-    problemPatterns : any option ;
-    productIconThemes : any option ;
+    problemPatterns : problemPattern list ; [@dft []]
+    productIconThemes : productIconTheme list ; [@dft []]
+    snippets : snippet list ; [@dft []]
+    submenus : submenu list ; [@dft []]
+    taskDefinitions : taskDefinition list ; [@dft []]
+    views : ( string * view list ) list [@assoc] ; [@dft []]
+
+    (* "activitybar" or "panel" *)
+    viewsContainers : ( string * viewsContainer list ) list [@assoc] ; [@dft []]
+    viewsWelcome : viewsWelcome list ; [@dft []]
+
+    (* TODO *)
     resourceLabelFormatters : any option ;
     semanticTokenModifiers : any option ;
     semanticTokenScopes : any option ;
     semanticTokenTypes : any option ;
-    snippets : any option ;
-    submenus : any option ;
-    taskDefinitions : any option ;
     terminal : any option ;
     themes : any option ;
     typescriptServerPlugins : any option ;
-    views : any option ;
-    viewsContainers : any option ;
-    viewsWelcome : any option ;
     walkthroughs : any option ;
   }
   [@@deriving json_encoding]
-
-type vscode = {
-  engines : engines ;
-
-  activationEvents : string list ; [@dft []]
-  contributes : contributes option ;
-  extensionKind :  string list ; [@dft []] (* "ui" or/and "workspace" *)
-  extensionPack : string list ; [@dft []]
-  extensionDependencies : string list ; [@dft []]
-}
-[@@deriving json_encoding]
+let contributes
+  ?( breakpoints = [] )
+  ?( colors = [] )
+  ?( commands = [] )
+  ?configuration
+  ?( configurationDefaults = [] )
+  ?( customEditors = [] )
+  ?( debuggers = [] )
+  ?( grammars = [] )
+  ?( icons = [] )
+  ?( iconThemes = [] )
+  ?( jsonValidation = [] )
+  ?( keybindings = [] )
+  ?( languages = [] )
+  ?( menus = [] )
+  ?( problemMatchers = [] )
+  ?( problemPatterns = [] )
+  ?( productIconThemes = [] )
+  ?( snippets = [] )
+  ?( submenus = [] )
+  ?( taskDefinitions = [] )
+  ?( views = [] )
+  ?( viewsContainers = [] )
+  ?( viewsWelcome = [] )
+  () =
+  {
+    breakpoints ;
+    colors ;
+    commands ;
+    configuration ;
+    configurationDefaults ;
+    customEditors ;
+    debuggers ;
+    grammars ;
+    icons ;
+    iconThemes ;
+    jsonValidation ;
+    keybindings ;
+    languages ;
+    menus ;
+    problemMatchers ;
+    problemPatterns ;
+    productIconThemes ;
+    snippets ;
+    submenus ;
+    taskDefinitions ;
+    views ;
+    viewsContainers ;
+    viewsWelcome ;
+    resourceLabelFormatters = None ;
+    semanticTokenModifiers = None ;
+    semanticTokenScopes  = None;
+    semanticTokenTypes = None ;
+    terminal = None ;
+    themes = None ;
+    typescriptServerPlugins = None ;
+    walkthroughs = None ;
+  }
 
 type sponsor = {
   sponsor_url : string ; [@key "url"]
 }
 [@@deriving json_encoding]
+let sponsor sponsor_url = { sponsor_url }
 
 type galleryBanner = {
   gallery_color : string option ;
   gallery_theme : string option ;
 }
 [@@deriving json_encoding]
+let galleryBanner ?color ?theme () =
+  { gallery_color = color ; gallery_theme = theme }
 
 type marketplace = {
   (* `Programming Languages`, `Snippets`, `Linters`, `Themes`,
@@ -415,17 +780,54 @@ type marketplace = {
 }
 [@@deriving json_encoding]
 
-type others = {
-  prettier : any option ;
-  capabilities : any option ;
-  types : any option ;
-  metadata : any option ; [@key "__metadata"]
+let marketplace
+    ?(categories=[]) ?icon ?preview ?(badges=[])
+    ?markdown ?qna ?sponsor ?galleryBanner
+    publisher =
+  {
+    publisher ;
+    categories ;
+    icon ;
+    preview ;
+    badges ;
+    markdown ;
+    qna ;
+    sponsor ;
+    galleryBanner ;
+  }
+
+type vscode = {
+  engines : engines ;
+
+  activationEvents : string list ; [@dft []]
+  contributes : contributes option ;
+  extensionKind :  string list ; [@dft []] (* "ui" or/and "workspace" *)
+  extensionPack : string list ; [@dft []]
+  extensionDependencies : string list ; [@dft []]
+
+  package : package ; [@merge]
+  marketplace : marketplace ; [@merge]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding {ignore}]
 
-type vscode_package = ( package * vscode ) * ( marketplace * others )
-
-let vscode_package_enc =
-  Json_encoding.merge_objs
-    ( Json_encoding.merge_objs package_enc vscode_enc )
-    ( Json_encoding.merge_objs marketplace_enc others_enc )
+let make_engines = engines
+let vscode
+    ~engines
+    ?(activationEvents=[])
+    ?contributes
+    ?(extensionKind = [])
+    ?(extensionPack = [])
+    ?(extensionDependencies = [])
+    ~marketplace
+    package
+  =
+  {
+    engines = make_engines ~vscode:engines ;
+    activationEvents ;
+    contributes ;
+    extensionKind ;
+    extensionPack ;
+    extensionDependencies ;
+    marketplace ;
+    package ;
+  }

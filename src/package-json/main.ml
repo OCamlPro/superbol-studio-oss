@@ -43,7 +43,7 @@ let () =
   Arg.parse [] (fun file ->
       read := true;
       let s = EzFile.read_file file in
-      match Json_encoding.destruct Manifest.vscode_package_enc s with
+      match Json_encoding.destruct Manifest.vscode_enc s with
       | exception Json_encoding.DestructError ->
         Printf.eprintf "File %S parsing failed\n%!" file
       | _ ->
@@ -51,6 +51,6 @@ let () =
     ) "package-json [FILES]: parse files or generate file" ;
 
   if not !read then
-    let p = Json_encoding.construct Manifest.vscode_package_enc Project.p in
+    let p = Json_encoding.construct Manifest.vscode_enc Project.p in
     let s = Ezjsonm.value_to_string ~minify:false p in
     Printf.printf "%s\n%!" s
