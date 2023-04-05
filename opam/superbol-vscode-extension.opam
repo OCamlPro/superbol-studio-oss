@@ -44,6 +44,7 @@ install: [
 depends: [
   "ocaml" {>= "4.07.0"}
   "dune" {>= "2.7.0"}
+  "vscode-languageclient" {= version}
   "vscode" {= version}
   "js_of_ocaml" {>= "3.0"}
   "gen_js_api" {>= "1.1.2" & < "2.0.0"}

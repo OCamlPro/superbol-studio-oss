@@ -14,6 +14,7 @@
  (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
  (depends
    (ocaml (>= 4.07.0))
+   (vscode-languageclient (= version))
    (vscode (= version))
    (js_of_ocaml ( >= 3.0 ))
    (gen_js_api (and (>= 1.1.2) (< 2.0.0)))

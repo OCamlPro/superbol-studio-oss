@@ -7,7 +7,7 @@
 			"request": "launch",
             "runtimeExecutable": "${execPath}",
             "outFiles": [
-                "${workspaceRoot}/_build/default/src/superbol-vscode-extension/superbol_vscode_extension.bc.js"
+                "${workspaceRoot}/dist/superbol_vscode_extension.bc.js"
             ],
 			"args": [
                 "--disable-extensions",

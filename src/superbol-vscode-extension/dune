@@ -2,7 +2,7 @@
 
 (executable
   (name superbol_vscode_extension)
-  (libraries vscode js_of_ocaml gen_js_api )
+  (libraries vscode-languageclient vscode js_of_ocaml gen_js_api )
   (modes js)
   (preprocess (pps gen_js_api.ppx js_of_ocaml-ppx))
   )

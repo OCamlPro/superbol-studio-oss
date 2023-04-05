@@ -49,6 +49,7 @@ preprocess = "pps gen_js_api.ppx js_of_ocaml-ppx"
 gen_js_api = "1.1.2"
 js_of_ocaml = ">=3.0"
 vscode = "version"
+vscode-languageclient = "version"
 
 # package tools dependencies
 [tools]

@@ -9,6 +9,18 @@
     "engines": {
         "vscode": "^1.64.0"
     },
+    "activationEvents": [],
+    "categories": [
+        "Other"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "cobol",
+                "filenamePatterns": ["*.cbl", "*.cob"]
+            }
+        ]
+    },
     "scripts": {
         "vscode:prepublish": "yarn run compile",
         "compile": "node build.js",
