@@ -32,7 +32,7 @@
   "contributes": {
     "languages": [
       {
-        "id": "COBOL",
+        "id": "cobol",
         "filenamePatterns": ["*.cbl", "*.cob"]
       }
     ],
