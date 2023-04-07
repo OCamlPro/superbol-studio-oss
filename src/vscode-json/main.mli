@@ -15,5 +15,5 @@ type 'a result =
 
 val check_project : string ->
   (* warnings *) string list * (* errors *) string list
-val manifest_of_file : string -> Manifest.vscode result
-val file_of_manifest : string -> Manifest.vscode -> unit
+val read_file : string -> 'a Json_encoding.encoding -> 'a result
+val write_file : string -> 'a Json_encoding.encoding -> 'a -> unit

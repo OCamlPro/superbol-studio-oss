@@ -30,4 +30,4 @@ let () =
     ) "package-json [FILES]: parse files or generate file" ;
 
   if not !read then
-    Vscode_json.Main.file_of_manifest "-" Project.manifest
+    Vscode_json.Main.write_file "-" Vscode_json.Manifest.vscode_enc Project.manifest

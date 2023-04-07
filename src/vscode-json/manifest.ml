@@ -415,7 +415,7 @@ type language = {
   lang_filenames : string list ; [@dft []]
   lang_filenamePatterns : string list ; [@dft []]
   lang_firstLine : string option ;
-  lang_configuration : string option ;
+  lang_configuration : string option ; (* path *)
   lang_icon : command_icon option ;
 }
 [@@deriving json_encoding]

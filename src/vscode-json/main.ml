@@ -41,12 +41,12 @@ module Json_encoding = struct
 
 end
 
-let manifest_of_file file =
+let read_file file encoding =
   let s = EzFile.read_file file in
-  Json_encoding.destruct Manifest.vscode_enc s
+  Json_encoding.destruct encoding s
 
-let file_of_manifest filename p =
-  let p = Json_encoding.construct Manifest.vscode_enc p in
+let write_file filename encoding p =
+  let p = Json_encoding.construct encoding p in
   let s = Ezjsonm.value_to_string ~minify:false p in
   if filename = "-" then
     Printf.printf "%s\n%!" s
@@ -86,19 +86,20 @@ let check_option_exists state ~field ?error file =
   | Some file -> check_exists state ~field ?error file
 
 let check_encoding state encoding ~field ?error file =
-  check_exists state ~field:"p.contributes.snippets.path"
+  check_exists state ~field
     ?error file ;
   let filename = state.dir // file in
-  let s = EzFile.read_file filename in
-  match Json_encoding.destruct encoding s with
-  | Ok _ -> ()
-  | Error s ->
-    add_error ?error state
-      "Could not destruct %S in field %s:\n      %s" filename field s
+  if Sys.file_exists filename then
+    let s = EzFile.read_file filename in
+    match Json_encoding.destruct encoding s with
+    | Ok _ -> ()
+    | Error s ->
+      add_error ?error state
+        "Could not destruct %S in field %s:\n      %s" filename field s
 
 open Manifest
 let check_project file =
-  match manifest_of_file file with
+  match read_file file Manifest.vscode_enc with
   | Error s -> [], [s]
   | Ok p ->
     let dir = Filename.dirname file in
@@ -126,6 +127,15 @@ let check_project file =
               ~field:"p.contributes.grammars.path"
               g.grammar_path
           ) contributes.grammars ;
+
+        List.iter (fun l ->
+            match l.lang_configuration with
+            | None -> ()
+            | Some path ->
+              check_encoding state Language.language_enc
+                ~field:"p.contributes.languages.configuration"
+                path
+          ) contributes.languages ;
 
         List.iter (fun g ->
             check_exists state ~field:"p.contributes.iconThemes.path"
