@@ -4,7 +4,8 @@
 /node-js-stubs
 /vscode-js-stubs
 /vscode-languageclient-js-stubs
-/package-json
+/vscode-package-json
+/vscode-json
 *~
 _build
 .merlin
@@ -17,6 +18,7 @@ _build
 /node_modules
 /yarn-error.log
 /yarn.lock
+/package-json
 ATTIC
 
 

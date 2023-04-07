@@ -125,7 +125,24 @@
  )
 
 (package
- (name package-json)
+ (name vscode-package-json)
+ (synopsis "The superbol-vscode-extension project")
+ (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (vscode-json (= version))
+   ezjsonm
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   ppx_deriving_encoding
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name vscode-json)
  (synopsis "The superbol-vscode-extension project")
  (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
  (depends

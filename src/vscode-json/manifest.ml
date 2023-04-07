@@ -42,6 +42,20 @@
 
 type any = Json_repr.ezjsonm [@@deriving json_encoding]
 
+type 'a list_or_one = 'a list
+
+let list_or_one_enc encoding =
+  let open Json_encoding in
+  union [
+    case encoding
+      (function [s] -> Some s | _ -> None)
+      (fun s -> [s]) ;
+    case (list encoding)
+      (fun s -> Some s)
+      (fun s -> s)
+  ]
+
+
 
 type repository = {
   type_ : string option ; [@key "type"]
@@ -523,20 +537,6 @@ let pattern_enc =
         (function ProblemPattern s -> Some s | _ -> None)
         (function s -> ProblemPattern s) ;
     ]
-
-type 'a list_or_one = 'a list
-
-let list_or_one_enc encoding =
-  let open Json_encoding in
-  union [
-    case encoding
-      (function [s] -> Some s | _ -> None)
-      (fun s -> [s]) ;
-    case (list encoding)
-      (fun s -> Some s)
-      (fun s -> s)
-  ]
-
 
 type problemMatcher = {
   pm_name : string ;

@@ -9,6 +9,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Vscode_json
 open Manifest
 
 let vscode_engine = "1.64.0"
@@ -67,7 +68,7 @@ let package =
       "vscode-test" , "1.6.1"
     ]
 
-let p =
+let manifest =
   Manifest.vscode
     package
     ~marketplace

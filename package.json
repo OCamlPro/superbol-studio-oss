@@ -45,7 +45,7 @@
       }
     }
   },
-  "main": "./out/superbol_vscode_extension.bc.js",
+  "main": "./dist/superbol_vscode_extension.bc.js",
   "scripts": {
     "package": "vsce package --out superbol-vscode-extension.vsix --yarn",
     "deploy:vsce": "vsce publish --packagePath superbol-vscode-extension.vsix --yarn",
@@ -66,6 +66,5 @@
     "prettier": "^2.5.1",
     "vsce": "2.14.0",
     "vscode-test": "1.6.1"
-  },
-  "icon": "assets/logo.png"
+  }
 }
