@@ -47,7 +47,7 @@ skip = []
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 gen_js_api = "1.1.1"
-js_of_ocaml = "5.0.0"
+js_of_ocaml = "4"
 jsonoo = "0.2.1"
 node-js-stubs = "version"
 polka-js-stubs = "version"
@@ -57,7 +57,7 @@ vscode-languageclient-js-stubs = "version"
 
 # package tools dependencies
 [tools]
-js_of_ocaml-ppx = "5.0.0"
+js_of_ocaml-ppx = "4"
 
 # package fields (depends on package skeleton)
 #Examples:
