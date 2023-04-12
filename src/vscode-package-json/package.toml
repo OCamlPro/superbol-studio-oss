@@ -1,6 +1,6 @@
 
 # name of package
-name = "package-json"
+name = "vscode-package-json"
 skeleton = "program"
 
 # version if different from project version
@@ -48,6 +48,7 @@ preprocess = "pps ppx_deriving_encoding"
 [dependencies]
 ezjsonm = ""
 ez_file = "0.3.0"
+vscode-json = "version"
 
 # package tools dependencies
 [tools]

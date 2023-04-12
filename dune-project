@@ -20,9 +20,9 @@
    (polka-js-stubs (= version))
    (node-js-stubs (= version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -39,10 +39,10 @@
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (node-js-stubs (= version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -56,9 +56,9 @@
  (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
  (depends
    (ocaml (>= 4.13.0))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -74,10 +74,10 @@
    (ocaml (>= 4.13.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -93,10 +93,10 @@
    (ocaml (>= 4.13.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -113,10 +113,10 @@
    (vscode-js-stubs (= version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
-   (js_of_ocaml (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (js_of_ocaml-ppx (and (>= 5.0.0) (< 6.0.0)))
+   (js_of_ocaml-ppx ( >= 4 ))
    ppx_inline_test
    ppx_expect
    odoc
@@ -125,7 +125,24 @@
  )
 
 (package
- (name package-json)
+ (name vscode-package-json)
+ (synopsis "The superbol-vscode-extension project")
+ (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (vscode-json (= version))
+   ezjsonm
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   ppx_deriving_encoding
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name vscode-json)
  (synopsis "The superbol-vscode-extension project")
  (description "This is the description\nof the superbol-vscode-extension OCaml project\n")
  (depends

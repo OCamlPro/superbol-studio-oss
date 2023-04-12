@@ -9,115 +9,74 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Vscode_json
 open Manifest
 
 let vscode_engine = "1.64.0"
 
 
-let marketplace = {
-  publisher = "ocamlpro" ;
-  icon = None ; (* "assets/logo.png" *)
-  categories = [
-      "Formatters" ;
-      "Programming Languages" ;
-      "Linters" ;
-      "Snippets" ;
-      "Other"
-    ] ;
-  preview = None ;
-  badges = [] ;
-  markdown = None ;
-  qna = None ;
-  sponsor = None ;
-  galleryBanner = None ;
-}
+let marketplace = Manifest.marketplace
+    "ocamlpro"
+  ~categories: [
+    "Formatters" ;
+    "Programming Languages" ;
+    "Linters" ;
+    "Snippets" ;
+    "Other"
+  ]
 
-let package = {
-  name = "superbol" ;
-  displayName = "Superbol COBOL" ;
-  description = "Provides a COBOL mode in VSCode based on Superbol" ;
-  license = Some "MIT" ;
-  version = "0.1.0" ;
-  repository = Some {
-    type_ = Some "git" ;
-    url = "https://github.com/OCamlPro/superbol-vscode-extension" ;
-  } ;
-  homepage = Some "https://ocamlpro.com/cobol" ;
-  author = Some {
-    author_name = "OCamlPro SAS" ;
-    author_email = "contact@ocamlpro.com"
-  } ;
-  keywords = [ "cobol" ; "gnucobol" ] ;
-  main = Some "./out/superbol_vscode_extension.bc.js" ;
-  browser = None ;
-  scripts = [
-    "package" ,
-    "vsce package --out superbol-vscode-extension.vsix --yarn" ;
-    "deploy:vsce" ,
-    "vsce publish --packagePath superbol-vscode-extension.vsix --yarn" ;
-    "deploy:ovsx" ,
-    "ovsx publish --yarn"
-  ] ;
-  dependencies = [
-    "polka" , "^1.0.0-next.22" ;
-    "sirv" , "^2.0.2" ;
-    "vscode-languageclient" , "8.0.2"
-  ] ;
-  devDependencies = [
-    "@types/vscode" , vscode_engine ;
-    "esbuild" , "0.15.16" ;
-    "fs-extra" , "10.0.1" ;
-    "mocha" , "9.2.2" ;
-    "npm-run-all" , "4.1.5" ;
-    "ovsx" , "0.1.0-next.97d460c" ;
-    "prettier" , "^2.5.1" ;
-    "vsce" , "2.14.0" ;
-    "vscode-test" , "1.6.1"
-  ] ;
-  bugs = None ;
-}
-
-let vscode = {
-  engines = {
-    vscode = "^" ^ vscode_engine ;
-  } ;
-  activationEvents = [
-    "onLanguage:cobol"
-  ] ;
-  extensionPack = [] ;
-  extensionKind = [] ;
-  contributes = None ;
- (*
-  contributes = {
-    configuration = {
-      title = "Superbol COBOL" ;
-      properties = {
-        superbol.globalFormatTakesSelection = {
-          type = "boolean" ;
-          default = false,
-          description = "If something is selected, only format the selection"
-        } ;
-        superbol.path = {
-          type = "string" ;
-          default = "" ;
-          description = "Path to the `superbol` command"
-        }
-      }
+let package =
+  Manifest.package
+    "superbol"
+    ~displayName: "Superbol COBOL"
+    ~description: "Provides a COBOL mode in VSCode based on Superbol"
+    ~license: "MIT"
+    ~version: "0.1.0"
+    ~repository: {
+      type_ = Some "git" ;
+      url = "https://github.com/OCamlPro/superbol-vscode-extension"
     }
-  } ;
-}
-*)
-  extensionDependencies = [] ;
-}
+    ~homepage: "https://ocamlpro.com/cobol"
+    ~author: {
+      author_name = "OCamlPro SAS" ;
+      author_email = "contact@ocamlpro.com"
+    }
+    ~keywords: [ "cobol" ; "gnucobol" ]
+    ~main: "./out/superbol_vscode_extension.bc.js"
+    ~scripts: [
+      "package" ,
+      "vsce package --out superbol-vscode-extension.vsix --yarn" ;
+      "deploy:vsce" ,
+      "vsce publish --packagePath superbol-vscode-extension.vsix --yarn" ;
+      "deploy:ovsx" ,
+      "ovsx publish --yarn"
+    ]
+    ~dependencies: [
+      "polka" , "^1.0.0-next.22" ;
+      "sirv" , "^2.0.2" ;
+      "vscode-languageclient" , "8.0.2"
+    ]
+    ~devDependencies: [
+      "@types/vscode" , vscode_engine ;
+      "esbuild" , "0.15.16" ;
+      "fs-extra" , "10.0.1" ;
+      "mocha" , "9.2.2" ;
+      "npm-run-all" , "4.1.5" ;
+      "ovsx" , "0.1.0-next.97d460c" ;
+      "prettier" , "^2.5.1" ;
+      "vsce" , "2.14.0" ;
+      "vscode-test" , "1.6.1"
+    ]
 
-let others = {
-  prettier = None ;
-  capabilities = None ;
-  types = None ;
-  metadata = None ;
-}
-
-let p = (package, vscode), (marketplace, others)
+let manifest =
+  Manifest.vscode
+    package
+    ~marketplace
+    ~engines: ( "^" ^ vscode_engine )
+    ~activationEvents: [
+      "onLanguage:cobol"
+    ]
+    ?contributes: None
 
 
 (*

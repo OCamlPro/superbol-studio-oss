@@ -5,17 +5,17 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-6c4745d9b958fd36a74ce5a34f13a6d2:.
+2286c35e1ea29c82696bcde84496f156:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-3c16bbaff1158ecfc19480e0744aaf2a:.github/workflows/workflow.yml
+2986d80caed72cdc485bf24526c80c81:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-a9baccd9eedd2f924ca9b9879b70c3e0:.gitignore
+fef04f16f98ac1ba77b226e28deeaedc:.gitignore
 # end context for .gitignore
 
 # begin context for CHANGES.md
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-923cec84b4c88ee7a39817739aa83cb0:Makefile
+d768fb221fd49646ac83e91c15640e63:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -50,17 +50,17 @@ edfecf246f5178999b757bb30a11aaba:drom.toml
 
 # begin context for dune-project
 # file dune-project
-7147afeddc222b46b556c83201c1e4d5:dune-project
+8025269a065c6464908d6c6a5986c3fe:dune-project
 # end context for dune-project
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
-3704b46ac5cd4793fd61714f3bd6cf10:opam/interop-js-stubs.opam
+7d19f8e0a7f83c11dabf928ee75c0c87:opam/interop-js-stubs.opam
 # end context for opam/interop-js-stubs.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
-dd7dde4e293ba0e8c85514b5d478e1c8:opam/node-js-stubs.opam
+12385b6240dcaa9a1f4542350426a732:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
 # begin context for opam/package-json.opam
@@ -70,23 +70,33 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 
 # begin context for opam/polka-js-stubs.opam
 # file opam/polka-js-stubs.opam
-0d5af23c7fa13408fbcb4c4ebf6998b5:opam/polka-js-stubs.opam
+f9e64ee80e101f435248cab1582af699:opam/polka-js-stubs.opam
 # end context for opam/polka-js-stubs.opam
 
 # begin context for opam/superbol-vscode-extension.opam
 # file opam/superbol-vscode-extension.opam
-49da3d109b0d2a783198d2754ca3d016:opam/superbol-vscode-extension.opam
+c32800ad616a3e394ed271d057f6a2aa:opam/superbol-vscode-extension.opam
 # end context for opam/superbol-vscode-extension.opam
 
 # begin context for opam/vscode-js-stubs.opam
 # file opam/vscode-js-stubs.opam
-b439593de026c1aff0dad24461c827b3:opam/vscode-js-stubs.opam
+5cadb3d65abcf1766ed39b491e6450ad:opam/vscode-js-stubs.opam
 # end context for opam/vscode-js-stubs.opam
+
+# begin context for opam/vscode-json.opam
+# file opam/vscode-json.opam
+1e7a6028ac6526885fcfdfdcdfa3bd63:opam/vscode-json.opam
+# end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-b2c08001aca6fbb3ce109c87fc2896ec:opam/vscode-languageclient-js-stubs.opam
+9de01bf6be8ea7266e1d2bc0ed5947a3:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
+
+# begin context for opam/vscode-package-json.opam
+# file opam/vscode-package-json.opam
+322332c2d6ea5ade8adbfb82587adb86:opam/vscode-package-json.opam
+# end context for opam/vscode-package-json.opam
 
 # begin context for scripts/after.sh
 # file scripts/after.sh
@@ -138,31 +148,6 @@ cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
 940d29cde7f16cd0916ed1d5f9c41154:src/node-js-stubs/version.mlt
 # end context for src/node-js-stubs/version.mlt
 
-# begin context for src/package-json/dune
-# file src/package-json/dune
-9f4e3c0bfa0afc5164a25346c401380b:src/package-json/dune
-# end context for src/package-json/dune
-
-# begin context for src/package-json/linking_flags.sh
-# file src/package-json/linking_flags.sh
-c7aa7ad8967d43dd0e7ea2f013af7376:src/package-json/linking_flags.sh
-# end context for src/package-json/linking_flags.sh
-
-# begin context for src/package-json/main.ml
-# file src/package-json/main.ml
-dd19135f4f49d3c99b5658d0e58f4460:src/package-json/main.ml
-# end context for src/package-json/main.ml
-
-# begin context for src/package-json/package.toml
-# file src/package-json/package.toml
-1ce8790167330967a712ed12f27f26c3:src/package-json/package.toml
-# end context for src/package-json/package.toml
-
-# begin context for src/package-json/version.mlt
-# file src/package-json/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/package-json/version.mlt
-# end context for src/package-json/version.mlt
-
 # begin context for src/polka-js-stubs/dune
 # file src/polka-js-stubs/dune
 569424afbc851a410f6f388591417035:src/polka-js-stubs/dune
@@ -213,6 +198,16 @@ f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode-js-stubs/version.mlt
 # end context for src/vscode-js-stubs/version.mlt
 
+# begin context for src/vscode-json/dune
+# file src/vscode-json/dune
+a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
+# end context for src/vscode-json/dune
+
+# begin context for src/vscode-json/version.mlt
+# file src/vscode-json/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode-json/version.mlt
+# end context for src/vscode-json/version.mlt
+
 # begin context for src/vscode-languageclient-js-stubs/dune
 # file src/vscode-languageclient-js-stubs/dune
 935c7469b455b26a8ec1f08627aae863:src/vscode-languageclient-js-stubs/dune
@@ -227,3 +222,18 @@ f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
 # file src/vscode-languageclient-js-stubs/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode-languageclient-js-stubs/version.mlt
 # end context for src/vscode-languageclient-js-stubs/version.mlt
+
+# begin context for src/vscode-package-json/dune
+# file src/vscode-package-json/dune
+1418db38f60b30eacfab7a22d0cc2ad7:src/vscode-package-json/dune
+# end context for src/vscode-package-json/dune
+
+# begin context for src/vscode-package-json/linking_flags.sh
+# file src/vscode-package-json/linking_flags.sh
+c7aa7ad8967d43dd0e7ea2f013af7376:src/vscode-package-json/linking_flags.sh
+# end context for src/vscode-package-json/linking_flags.sh
+
+# begin context for src/vscode-package-json/version.mlt
+# file src/vscode-package-json/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode-package-json/version.mlt
+# end context for src/vscode-package-json/version.mlt

@@ -44,9 +44,9 @@ depends: [
   "polka-js-stubs" {= version}
   "node-js-stubs" {= version}
   "jsonoo" {>= "0.2.1" & < "1.0.0"}
-  "js_of_ocaml" {>= "5.0.0" & < "6.0.0"}
+  "js_of_ocaml" {>= "4"}
   "gen_js_api" {>= "1.1.1" & < "2.0.0"}
-  "js_of_ocaml-ppx" {>= "5.0.0" & < "6.0.0"}
+  "js_of_ocaml-ppx" {>= "4"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}

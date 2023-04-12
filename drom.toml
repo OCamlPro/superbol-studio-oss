@@ -78,6 +78,7 @@ dot-gitignore-trailer = """
 /node_modules
 /yarn-error.log
 /yarn.lock
+/package-json
 ATTIC
 """
 
@@ -106,6 +107,10 @@ dir = "src/vscode-languageclient-js-stubs"
 # edit 'src/vscode-languageclient-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/package-json"
+dir = "src/vscode-package-json"
+# edit 'src/package-json/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vscode-json"
 # edit 'src/package-json/package.toml' for package-specific options
 
