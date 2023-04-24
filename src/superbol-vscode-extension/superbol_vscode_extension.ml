@@ -164,7 +164,7 @@ let activate (extension : Vscode.ExtensionContext.t) =
       ~provideDocumentFormattingEdits:(indentRange ~range:None)
   in
   let disposable = Vscode.Languages.registerDocumentFormattingEditProvider
-      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"COBOL" ()))
+      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"cobol" ()))
       ~provider:providerFull
   in
   Vscode.ExtensionContext.subscribe extension ~disposable;
@@ -182,7 +182,7 @@ let activate (extension : Vscode.ExtensionContext.t) =
       ()
   in
   let documentSelector =
-    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"COBOL" ()) |]
+    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
   in
   let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector () in
   client :=

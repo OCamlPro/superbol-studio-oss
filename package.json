@@ -33,6 +33,7 @@
     "languages": [
       {
         "id": "cobol",
+        "aliases": ["COBOL"],
         "filenamePatterns": ["*.cbl", "*.cob"]
       }
     ],
