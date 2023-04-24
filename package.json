@@ -28,10 +28,15 @@
     "Snippets",
     "Other"
   ],
-  "activationEvents": [
-    "onLanguage:cobol"
-  ],
+  "activationEvents": [],
   "contributes": {
+    "languages": [
+      {
+        "id": "cobol",
+        "aliases": ["COBOL"],
+        "filenamePatterns": ["*.cbl", "*.cob"]
+      }
+    ],
     "configuration": {
       "title": "Superbol COBOL",
       "properties": {
@@ -50,6 +55,7 @@
   },
   "main": "./dist/superbol_vscode_extension.bc.js",
   "scripts": {
+    "compile" : "make compile",
     "package": "vsce package --out superbol-vscode-extension.vsix --yarn",
     "deploy:vsce": "vsce publish --packagePath superbol-vscode-extension.vsix --yarn",
     "deploy:ovsx": "ovsx publish --yarn"

@@ -9,7 +9,7 @@
 *~
 _build
 .merlin
-.vscode
+.vscode/settings.json
 /_drom
 /_opam
 /_build
@@ -20,5 +20,6 @@ _build
 /yarn.lock
 /package-json
 ATTIC
+/out
 
 

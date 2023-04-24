@@ -157,21 +157,53 @@ let indentRange
 *)
   `Value promise
 
+let client = ref None
+
 let activate (extension : Vscode.ExtensionContext.t) =
   let providerFull = Vscode.DocumentFormattingEditProvider.create
       ~provideDocumentFormattingEdits:(indentRange ~range:None)
   in
   let disposable = Vscode.Languages.registerDocumentFormattingEditProvider
-      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"COBOL" ()))
+      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"cobol" ()))
       ~provider:providerFull
   in
   Vscode.ExtensionContext.subscribe extension ~disposable;
 
-  Promise.return ()
+  let command =
+    Vscode.Workspace.getConfiguration ()
+    |> Vscode.WorkspaceConfiguration.get ~section:"superbol.path"
+    |> function Some o -> Ojs.string_of_js o
+              | None -> "superbol"
+  in
+  let args = ["x-lsp"] in
+  let serverOptions = Vscode_languageclient.ServerOptions.create
+      ~command
+      ~args
+      ()
+  in
+  let documentSelector =
+    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
+  in
+  let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector () in
+  client :=
+    Some (Vscode_languageclient.LanguageClient.make
+            ~id:"cobolServer"
+            ~name:"Cobol Server"
+            ~serverOptions
+            ~clientOptions
+            ());
+  match !client with
+  | Some client -> Vscode_languageclient.LanguageClient.start client
+  | None -> Promise.return ()
 
+let deactivate () =
+  match !client with
+  | None -> Promise.return ()
+  | Some client -> Vscode_languageclient.LanguageClient.stop client
 
 (* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
    activate() *)
 let () =
-  let open Js_of_ocaml.Js in
-  export "activate" (wrap_callback activate)
+  Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
+  Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
+
