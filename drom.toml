@@ -12,7 +12,7 @@ github-organization = "ocamlpro"
 license = "MIT"
 min-edition = "4.13.0"
 name = "superbol-vscode-extension"
-skeleton = "mini_prg"
+skeleton = "program"
 synopsis = "The superbol-vscode-extension project"
 version = "0.1.0"
 

@@ -2,7 +2,8 @@
 
 (executable
   (name superbol_vscode_extension)
-  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo polka-js-stubs node-js-stubs jsonoo js_of_ocaml gen_js_api )
+  (libraries 
+  vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo polka-js-stubs node-js-stubs jsonoo js_of_ocaml gen_js_api )
   (modes js)
   (preprocess (pps gen_js_api.ppx))
   )

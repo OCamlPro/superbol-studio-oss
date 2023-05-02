@@ -54,6 +54,7 @@ polka-js-stubs = "version"
 promise_jsoo = "0.3.1"
 vscode-js-stubs = "version"
 vscode-languageclient-js-stubs = "version"
+# cobol_indentation = "0.1"
 
 # package tools dependencies
 [tools]

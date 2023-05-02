@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2286c35e1ea29c82696bcde84496f156:.
+e44889d2dc0716c662aa60ea717c24c1:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-d768fb221fd49646ac83e91c15640e63:Makefile
+aea9a402c9521e5096fe7d90ba52c7c7:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -230,7 +230,7 @@ a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
 
 # begin context for src/vscode-package-json/linking_flags.sh
 # file src/vscode-package-json/linking_flags.sh
-c7aa7ad8967d43dd0e7ea2f013af7376:src/vscode-package-json/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/vscode-package-json/linking_flags.sh
 # end context for src/vscode-package-json/linking_flags.sh
 
 # begin context for src/vscode-package-json/version.mlt
