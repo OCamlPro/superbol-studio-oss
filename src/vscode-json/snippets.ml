@@ -17,6 +17,9 @@ type snippet = {
 }
 [@@deriving json_encoding]
 
+
+(* paths to files are available from the 'path' field of the 'snippets' field
+   of 'package.json' *)
 type snippets =
   ( string * snippet ) list [@assoc]
 [@@deriving json_encoding]
