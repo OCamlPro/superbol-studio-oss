@@ -9,6 +9,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let file = "package.json"
+let filename = file
+
 (* Some doc on deriving json_encoding:
    * Field attributes : [@dft default], [@opt],
      [@ddft default] (forced field on construct),
@@ -566,6 +569,7 @@ type productIconTheme = {
 }
 [@@deriving json_encoding]
 
+(* A set of completions for a specific language *)
 type snippet = {
   snippet_language : string ;
   snippet_path : string ;

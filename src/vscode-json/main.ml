@@ -16,6 +16,8 @@ type 'a result =
   | Ok of 'a
   | Error of string
 
+type errors = (* warnings *) string list * (* errors *) string list
+
 module Json_encoding = struct
 
   include Json_encoding
@@ -174,3 +176,8 @@ let check_project file =
 
     end ;
     state.warnings, state.errors
+
+let check_file encoding file =
+  match read_file file encoding with
+  | Error s -> [], [s]
+  | Ok _p -> [], []
