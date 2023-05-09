@@ -112,43 +112,11 @@ in src/superbol-vscode-extension/package.toml, add Cobol_indentation
     let promise = Some [ Vscode.TextEdit.replace ~range ~newText:output_text ] in
     `Value promise *)
 
-
-let testformat  
-    ~document
-    ~options:_
-    ~token:_
-    =
-
-    let editor = Vscode.Window.activeTextEditor () in
-    let selection = Option.get editor |> Vscode.TextEditor.selection in 
-    let anchor = Vscode.Selection.anchor selection in 
-    let start_line = Vscode.Position.line anchor in 
-    let active = Vscode.Selection.active selection in     
-
-    let end_line = Vscode.Position.line active in 
-    let start_line, end_line = 
-        if start_line > end_line then end_line, start_line 
-        else
-            start_line, end_line
-    in 
-    let start_pos = Vscode.Position.make ~line:start_line ~character:0 in 
-    let endCharacter =
-        String.length @@ Vscode.TextLine.text @@ Vscode.TextDocument.lineAt document ~line:end_line
-    in
-    let end_pos = Vscode.Position.make ~line:end_line ~character:endCharacter in 
-    let range =  Vscode.Range.makePositions ~start:start_pos ~end_:end_pos in
-
-    let input_text = Vscode.TextDocument.getText document ~range () in 
-
-    let output_text = input_text ^ "~~~" in 
-    let promise = Some [ Vscode.TextEdit.replace ~range ~newText:output_text ] in
-    `Value promise 
-
 let activate (extension: Vscode.ExtensionContext.t) =
 
     let providerFull = 
         Vscode.DocumentFormattingEditProvider.create 
-        ~provideDocumentFormattingEdits: (testformat)
+        ~provideDocumentFormattingEdits: (indentRange)
     in 
     
     let disposable = Vscode.Languages.registerDocumentFormattingEditProvider
