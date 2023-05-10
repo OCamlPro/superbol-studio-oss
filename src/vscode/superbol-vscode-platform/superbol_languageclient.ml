@@ -12,21 +12,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let command =
-  Vscode.Workspace.getConfiguration ()
-  |> Vscode.WorkspaceConfiguration.get ~section:"superbol.path"
-  |> function Some o -> Ojs.string_of_js o
-            | None -> "superbol"
+let config = Vscode.Workspace.getConfiguration ()
 
-let args = ["x-lsp"]
-
-let serverOptions = Vscode_languageclient.ServerOptions.create
+let serverOptions =
+  let command =
+    match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
+    | Some o -> Ojs.string_of_js o
+    | None -> "superbol-free"
+  in
+  Vscode_languageclient.ServerOptions.create ()
     ~command
-    ~args
-    ()
+    ~args:["lsp"]
 
-let documentSelector =
-  [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
-
-let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector ()
-
+let clientOptions =
+  Vscode_languageclient.ClientOptions.create ()
+    ~documentSelector:[|
+      `Filter (Vscode_languageclient.DocumentFilter.createLanguage ()
+                 ~language:"cobol");
+    |]

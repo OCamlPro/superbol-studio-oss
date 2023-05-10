@@ -1,16 +1,20 @@
-# Superbol VSCode Platform for COBOL
+# Superbol Studio OSS: A New Platform for COBOL
 
 ## Features
 
-* LSP (superbol) with following capabilities:
+* LSP (`superbol-free`) with following capabilities:
     * Syntax diagnostics
     * Go to definitions
     * Find references
-    * Peek on copybook (Superbol PR #211)
-    * Semantic highlighting (Superbol PR #212)
+    * Peek on copybook and source text replacements
+    * Semantic highlighting
     * File and range indentation
 
-## Install
+* VSCode extension
+
+* GNU/Emacs mode
+
+## VSCode Extension
 
 ### From binary and VSIX
 
@@ -64,6 +68,10 @@ Go to your VSCode settings and in the extension submenu select `Superbol COBOL`.
 In the `superbol` field past the path to the `superbol` executable.
 
 You can check the documentation on using the extension on [this page](https://ocamlpro.github.io/superbol-vscode-platform/sphinx).
+
+## GNU/Emacs mode
+
+You can check the documentation on using the Superbol LSP with GNU/Emacs on [this page](https://ocamlpro.github.io/superbol-vscode-platform/sphinx/emacs.html).
 
 ## Resources
 
