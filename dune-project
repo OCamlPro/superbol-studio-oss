@@ -149,7 +149,7 @@
    (ocaml (>= 4.13.0))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   ppx_deriving_encoding
+   (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    ppx_inline_test
    ppx_expect
    odoc

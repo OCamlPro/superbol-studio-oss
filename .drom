@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2286c35e1ea29c82696bcde84496f156:.
+54399bba81549732cbd3f451ec6248d0:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -30,13 +30,33 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-d768fb221fd49646ac83e91c15640e63:Makefile
+f650bafbbdb55b7e7d2218d2fce56273:Makefile
 # end context for Makefile
 
 # begin context for README.md
 # file README.md
 292425d1654e9d13b4140ef9188ddbe1:README.md
 # end context for README.md
+
+# begin context for docs/README.txt
+# file docs/README.txt
+bfbacf00053bb9ab2a6e2ce94ed4a642:docs/README.txt
+# end context for docs/README.txt
+
+# begin context for docs/favicon.png
+# file docs/favicon.png
+e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
+# end context for docs/favicon.png
+
+# begin context for docs/index.html
+# file docs/index.html
+00568067371eb1933263153d3da82bf4:docs/index.html
+# end context for docs/index.html
+
+# begin context for docs/style.css
+# file docs/style.css
+c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
+# end context for docs/style.css
 
 # begin context for drom.toml
 # file drom.toml
@@ -50,7 +70,7 @@ edfecf246f5178999b757bb30a11aaba:drom.toml
 
 # begin context for dune-project
 # file dune-project
-8025269a065c6464908d6c6a5986c3fe:dune-project
+6c2f94491337e315686c005ec642e600:dune-project
 # end context for dune-project
 
 # begin context for opam/interop-js-stubs.opam
@@ -85,7 +105,7 @@ c32800ad616a3e394ed271d057f6a2aa:opam/superbol-vscode-extension.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-1e7a6028ac6526885fcfdfdcdfa3bd63:opam/vscode-json.opam
+380748e9e8177fcb1f1ed4f306c6cb01:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
@@ -117,6 +137,31 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 # file scripts/static-build.sh
 b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 # end context for scripts/static-build.sh
+
+# begin context for sphinx/about.rst
+# file sphinx/about.rst
+f63f86982df8417ce9157fd3c213f9a8:sphinx/about.rst
+# end context for sphinx/about.rst
+
+# begin context for sphinx/conf.py
+# file sphinx/conf.py
+76061a2f78a52ceeb831977de515cb7a:sphinx/conf.py
+# end context for sphinx/conf.py
+
+# begin context for sphinx/index.rst
+# file sphinx/index.rst
+eb3deffe184887e5ee0b897028c0f969:sphinx/index.rst
+# end context for sphinx/index.rst
+
+# begin context for sphinx/install.rst
+# file sphinx/install.rst
+721a43bc2478aef9660f49fd0d2def12:sphinx/install.rst
+# end context for sphinx/install.rst
+
+# begin context for sphinx/license.rst
+# file sphinx/license.rst
+f4bbb4a41a8b3b39f19a4fc62a5f4841:sphinx/license.rst
+# end context for sphinx/license.rst
 
 # begin context for src/interop-js-stubs/dune
 # file src/interop-js-stubs/dune
@@ -203,6 +248,11 @@ f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
 a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
 # end context for src/vscode-json/dune
 
+# begin context for src/vscode-json/index.mld
+# file src/vscode-json/index.mld
+165b03fd1e14503a7e3095d447e46da6:src/vscode-json/index.mld
+# end context for src/vscode-json/index.mld
+
 # begin context for src/vscode-json/version.mlt
 # file src/vscode-json/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode-json/version.mlt
@@ -230,7 +280,7 @@ a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
 
 # begin context for src/vscode-package-json/linking_flags.sh
 # file src/vscode-package-json/linking_flags.sh
-c7aa7ad8967d43dd0e7ea2f013af7376:src/vscode-package-json/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/vscode-package-json/linking_flags.sh
 # end context for src/vscode-package-json/linking_flags.sh
 
 # begin context for src/vscode-package-json/version.mlt
