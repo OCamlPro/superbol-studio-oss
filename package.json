@@ -28,7 +28,9 @@
     "Snippets",
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:cobol"
+  ],
   "contributes": {
     "languages": [
       {
