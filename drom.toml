@@ -112,9 +112,17 @@ dir = "src/vscode-languageclient-js-stubs"
 
 [[package]]
 dir = "src/vscode-package-json"
-# edit 'src/package-json/package.toml' for package-specific options
+# edit 'src/vscode-package-json/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vscode-json"
-# edit 'src/package-json/package.toml' for package-specific options
+# edit 'src/vscode-json/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vscode-debugadapter"
+# edit 'src/vscode-debugadapter/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vscode-debugprotocol"
+# edit 'src/vscode-debugprotocol/package.toml' for package-specific options
 

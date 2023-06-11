@@ -29,14 +29,63 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:cobol"
+    "onLanguage:cobol",
+    "onDebug"
   ],
   "contributes": {
     "languages": [
       {
         "id": "cobol",
-        "aliases": ["COBOL"],
-        "filenamePatterns": ["*.cbl", "*.cob"]
+        "aliases": [
+          "COBOL"
+        ],
+        "filenamePatterns": [
+          "*.cbl",
+          "*.cob"
+        ]
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "cobol",
+        "languages": [
+          "cobol"
+        ],
+        "program": "gdb",
+        "args": [
+          "--init-eval-command=\"source /usr/local/bin/cobcd.py\""
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "type": "cobol",
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "default": "${workspaceFolder}/a.out"
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "Debug COBOL",
+            "description": "New COBOL debugging configuration",
+            "body": {
+              "type": "cobol",
+              "request": "launch",
+              "name": "${2:Launch Program}",
+              "program": "${workspaceFolder}/${1:Program}"
+            }
+          }
+        ]
+      }
+    ],
+    "breakpoints": [
+      {
+        "language": "COBOL"
       }
     ],
     "configuration": {
@@ -53,16 +102,45 @@
           "description": "Path to the `superbol` command"
         }
       }
-    }
+    },
+    "taskDefinitions": [
+        {
+            "type": "superbol",
+            "properties": {
+                "copybooks": {
+                    "type": "array",
+                    "description": "The list of copybooks paths"
+                },
+                "sourceFormat": {
+                    "type": "string",
+                    "description": "The source format of the code"
+                },
+                "dialect": {
+                    "type": "string",
+                    "description": "The COBOL dialect used"
+                },
+                "forDebugging": {
+                    "type": "boolean",
+                    "description": "Build for debugging"
+                },
+                "extensions": {
+                    "type": "array",
+                    "description": "Add cobol file extensions"
+                }
+            }
+        }
+    ]
   },
   "main": "./dist/superbol_vscode_extension.bc.js",
   "scripts": {
-    "compile" : "make compile",
+    "compile": "make compile",
     "package": "vsce package --out superbol-vscode-extension.vsix --yarn",
     "deploy:vsce": "vsce publish --packagePath superbol-vscode-extension.vsix --yarn",
     "deploy:ovsx": "ovsx publish --yarn"
   },
   "dependencies": {
+    "@vscode/debugadapter": "^1.61.0",
+    "@vscode/debugprotocol": "^1.61.0",
     "polka": "^1.0.0-next.22",
     "sirv": "^2.0.2",
     "vscode-languageclient": "8.0.2"

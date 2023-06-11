@@ -46,8 +46,8 @@ preprocess = "pps ppx_deriving_encoding"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ezjsonm = ""
 ez_file = "0.3.0"
+ezjsonm = ""
 
 # package tools dependencies
 [tools]
@@ -65,4 +65,4 @@ ppx_deriving_encoding = "0.3.0"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-
+# ...

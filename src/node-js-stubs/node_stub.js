@@ -14,3 +14,5 @@ joo_global_object.path = require("path");
 joo_global_object.os = require("os");
 
 joo_global_object.net = require("net");
+
+joo_global_object.events = require("events");

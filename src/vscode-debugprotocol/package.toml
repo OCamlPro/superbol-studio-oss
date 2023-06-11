@@ -1,6 +1,6 @@
 
 # name of package
-name = "polka-js-stubs"
+name = "vscode-debugprotocol"
 skeleton = "js_library"
 
 # version if different from project version
@@ -32,7 +32,7 @@ gen-version = "version.ml"
 # optional = true
 
 # module name used to pack modules (if pack-modules is true)
-# pack = "Mylib"
+pack = "DebugProtocol"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
@@ -50,12 +50,11 @@ gen_js_api = "1.1.1"
 interop-js-stubs = "version"
 js_of_ocaml = ">=4"
 jsonoo = "0.2.1"
-node-js-stubs = "version"
 promise_jsoo = "0.3.1"
 
 # package tools dependencies
 [tools]
-js_of_ocaml-ppx = ">=4"
+js_of_ocaml-ppx = ">=3.0"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -70,5 +69,5 @@ js_of_ocaml-ppx = ">=4"
 #  static-clibs = "unix" 
 [fields]
 dune-stanzas = """
- (js_of_ocaml (javascript_files polka_stub.js))
+  (js_of_ocaml (javascript_files vscode_debugprotocol_stub.js))
 """

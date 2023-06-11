@@ -46,8 +46,8 @@ preprocess = "pps ppx_deriving_encoding"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ezjsonm = ""
 ez_file = "0.3.0"
+ezjsonm = ""
 vscode-json = "version"
 
 # package tools dependencies

@@ -2,7 +2,7 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
-DEV_DEPS := merlin ocamlformat odoc ppx_expect ppx_inline_test
+DEV_DEPS := merlin ocamlformat odoc
 
 
 SPHINX_TARGET:=_drom/docs/sphinx
@@ -20,7 +20,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh superbol-vscode-extension polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json
+	./scripts/copy-bin.sh superbol-vscode-extension polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol
 	./scripts/after.sh build
 
 build-deps:

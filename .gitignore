@@ -6,6 +6,8 @@
 /vscode-languageclient-js-stubs
 /vscode-package-json
 /vscode-json
+/vscode-debugadapter
+/vscode-debugprotocol
 *~
 _build
 .merlin

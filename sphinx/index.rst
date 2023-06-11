@@ -15,6 +15,7 @@ Welcome to superbol-vscode-extension
    install
    settings
    features
+   tasks
    API doc <https://ocamlpro.github.io/superbol-vscode-extension/doc>
    license
 

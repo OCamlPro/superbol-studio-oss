@@ -3225,6 +3225,299 @@ module Languages = struct
       [@@js.global "vscode.languages.getDiagnostics"]]
 end
 
+module DebugProtocolMessage = struct
+  include Interface.Make ()
+end
+
+module DebugProtocolBreakpoint = struct
+  include Interface.Make ()
+end
+
+module DebugConfiguration = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val name: t -> string [@@js.get]
+    val request: t -> string [@@js.get]
+    val type_: t -> string [@@js.get]]
+
+  let get_property t = Ojs.get_prop_ascii ([%js.of: t] t)
+  let set_property t = Ojs.set_prop_ascii ([%js.of: t] t)
+
+  let create ~name ~request ~type_ ?(properties = []) () =
+    let obj = Ojs.obj [| ("type", [%js.of: string] type_);
+                         ("name", [%js.of: string] name);
+                         ("request", [%js.of: string] request)|]
+    in
+    let set (key, value) = Ojs.set_prop_ascii obj key value in
+    List.iter set properties;
+    [%js.to: t] obj
+end
+
+module Breakpoint = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val id: t -> string [@@js.get]
+    val enabled: t -> string [@@js.get]
+    val condition: t -> string or_undefined [@@js.get]
+    val hitCondition: t -> string or_undefined [@@js.get]
+    val logMessage: t -> string or_undefined [@@js.get]
+    val make:
+         ?enabled: bool
+      -> ?condition: string
+      -> ?hitCondition: string
+      -> ?logMessage: string
+      -> unit
+      -> t
+    [@@js.new "vscode.Breakpoint"]]
+end
+
+module DebugSession = struct
+  include Interface.Make ()
+
+  module AnyThenable = Typings.Thenable.Make (Js.Any)
+
+  module DebugProtocolBreakpointThenable =
+    Typings.Thenable.Make (Js.Or_undefined (DebugProtocolBreakpoint))
+
+  include
+    [%js:
+      val id: t -> string [@@js.get]
+      val type_: t -> string [@@js.get "type"]
+      val parentSession: t -> t or_undefined [@@js.get]
+      val name: t -> string [@@js.get]
+      val workspaceFolder: t -> WorkspaceFolder.t or_undefined [@@js.get]
+      val configuration: t -> DebugConfiguration.t [@@js.get]
+      val customRequest: t -> command:string -> ?args:Js.Any.t -> unit -> AnyThenable.t [@@js.call]
+      val getDebugProtocolBreakpoint:
+           t
+        -> breakpoint: Breakpoint.t
+        -> DebugProtocolBreakpointThenable.t
+      [@@js.call]
+
+      val create:
+           name:string
+        -> customRequest:
+           (command:string -> ?args:Js.Any.t -> unit -> AnyThenable.t)
+        -> getDebugProtocolBreakpoint:
+           (breakpoint: Breakpoint.t -> DebugProtocolBreakpointThenable.t)
+        -> t
+      [@@js.create]]
+end
+
+module DebugConfigurationProvider = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val provideDebugConfigurations:
+         t
+      -> folder: WorkspaceFolder.t
+      -> ?token: CancellationToken.t
+      -> unit
+      -> DebugConfiguration.t list ProviderResult.t
+      [@@js.call]
+
+    val resolveDebugConfiguration:
+         t
+      -> folder: WorkspaceFolder.t
+      -> debugConfiguration: DebugConfiguration.t
+      -> ?token: CancellationToken.t
+      -> unit
+      -> DebugConfiguration.t ProviderResult.t
+      [@@js.call]
+
+    val resolveDebugConfigurationWithSubstitutedVariables:
+         t
+      -> folder: WorkspaceFolder.t
+      -> debugConfiguration: DebugConfiguration.t
+      -> ?token: CancellationToken.t
+      -> unit
+      -> DebugConfiguration.t ProviderResult.t
+      [@@js.call]
+
+    val create :
+         provideDebugConfigurations:
+           (folder: WorkspaceFolder.t
+            -> ?token: CancellationToken.t
+            -> unit
+            -> DebugConfiguration.t list ProviderResult.t)
+      -> resolveDebugConfiguration:
+           (folder: WorkspaceFolder.t
+            -> debugConfiguration: DebugConfiguration.t
+            -> ?token: CancellationToken.t
+            -> unit
+            -> DebugConfiguration.t ProviderResult.t)
+      -> resolveDebugConfigurationWithSubstitutedVariables:
+           (folder: WorkspaceFolder.t
+            -> debugConfiguration: DebugConfiguration.t
+            -> ?token: CancellationToken.t
+            -> unit
+            -> DebugConfiguration.t ProviderResult.t)
+      -> t
+    [@@js.builder]]
+end
+
+module DebugAdapterExecutableOptions = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+      val env: t -> string Dict.t or_undefined [@@js.get]
+      val cwd: t -> string or_undefined [@@js.get]
+
+      val create:
+           ?env: string Dict.t
+        -> ?cwd: string
+        -> unit
+        -> t
+      [@@js.create]]
+end
+
+module DebugAdapterExecutable = struct
+  include Class.Make ()
+
+  include
+    [%js:
+      val command: t -> string [@@js.get]
+      val args: t -> string list [@@js.get]
+      val options: t -> DebugAdapterExecutableOptions.t or_undefined [@@js.get]
+
+      val make:
+           command:string
+        -> ?args: string list
+        -> ?options: DebugAdapterExecutableOptions.t
+        -> unit
+        -> t
+      [@@js.new "vscode.DebugAdapterExecutable"]]
+end
+
+module DebugAdapterServer = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val port: t -> int [@@js.get]
+    val host: t -> string or_undefined [@@js.get]
+
+    val make:
+         port:int
+      -> ?host: string
+      -> unit
+      -> t
+    [@@js.new "vscode.DebugAdapterServer"]]
+end
+
+module DebugAdapterNamedPipeServer = struct
+  include Class.Make ()
+
+  include
+    [%js:
+      val path: t -> string [@@js.get]
+      val make: path:string -> t [@@js.new "vscode.DebugAdapterNamedPipeServer"]]
+end
+
+module DebugAdapter = struct
+  include Interface.Extend (Disposable) ()
+
+  include Disposable
+
+  module OnDidSendMessage = Event.Make (DebugProtocolMessage)
+
+  include
+    [%js:
+      val onDidSendMessage: t -> OnDidSendMessage.t [@@js.get]
+      val handleMessage:
+           t
+        -> message:DebugProtocolMessage.t
+        -> unit
+          [@@js.call]
+
+      val create :
+           handleMessage:
+             (message: DebugProtocolMessage.t
+              -> unit)
+        -> t
+      [@@js.create]
+    ]
+end
+
+module DebugAdapterInlineImplementation = struct
+  include Class.Make ()
+
+  include
+    [%js:
+      val make:
+        implementation: DebugAdapter.t
+        -> t
+      [@@js.new "vscode.DebugAdapterInlineImplementation"]]
+end
+
+module DebugAdapterDescriptor = struct
+  type t = ([
+      | `DebugAdapterExecutable of DebugAdapterExecutable.t
+      | `DebugAdapterServer of DebugAdapterServer.t
+      | `DebugAdapterNamedPipeServer of DebugAdapterNamedPipeServer.t
+      | `DebugAdapterInlineImplementation of DebugAdapterInlineImplementation.t]
+      [@js.union])
+      [@@js]
+
+  let t_of_js js_val: t =
+    if Ojs.has_property js_val "path" then
+      `DebugAdapterNamedPipeServer ([%js.to: DebugAdapterNamedPipeServer.t] js_val)
+    else if Ojs.has_property js_val "port" then
+      `DebugAdapterServer ([%js.to: DebugAdapterServer.t] js_val)
+    else if Ojs.has_property js_val "command" then
+      `DebugAdapterExecutable ([%js.to: DebugAdapterExecutable.t] js_val)
+    else
+      `DebugAdapterInlineImplementation ([%js.to: DebugAdapterInlineImplementation.t] js_val)
+end
+
+module DebugAdapterDescriptorFactory = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val createDebugAdapterDescriptor :
+         t
+      -> session: DebugSession.t
+      -> executable: DebugAdapterExecutable.t or_undefined
+      -> DebugAdapterDescriptor.t ProviderResult.t
+    [@@js.call]
+
+    val create :
+         createDebugAdapterDescriptor :
+           (session: DebugSession.t
+            -> executable: DebugAdapterExecutable.t or_undefined
+            -> DebugAdapterDescriptor.t ProviderResult.t)
+      -> t
+    [@@js.builder]
+  ]
+end
+
+module DebugConfigurationProviderTriggerKind = struct
+  type t =
+    | Initial [@js 1]
+    | Dynamic [@js 2]
+  [@@js.enum] [@@js]
+end
+
+module Debug = struct
+  include
+    [%js:
+    val registerDebugConfigurationProvider:
+         debugType: string
+      -> provider: DebugConfigurationProvider.t
+      -> ?triggerKind: DebugConfigurationProviderTriggerKind.t
+      -> unit
+      -> Disposable.t
+        [@@js.global "vscode.debug.registerDebugConfigurationProvider"]
+    ]
+end
+
 module Tasks = struct
   include
     [%js:
