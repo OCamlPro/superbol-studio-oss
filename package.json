@@ -7,7 +7,7 @@
   "publisher": "ocamlpro",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OCamlPro/superbol-vscode-extension"
+    "url": "https://github.com/OCamlPro/superbol-vscode-platform"
   },
   "homepage": "https://ocamlpro.com/cobol",
   "author": {
@@ -134,8 +134,8 @@
   "main": "./dist/superbol_vscode_extension.bc.js",
   "scripts": {
     "compile": "make compile",
-    "package": "vsce package --out superbol-vscode-extension.vsix --yarn",
-    "deploy:vsce": "vsce publish --packagePath superbol-vscode-extension.vsix --yarn",
+    "package": "vsce package --out superbol-vscode-platform.vsix --yarn",
+    "deploy:vsce": "vsce publish --packagePath superbol-vscode-platform.vsix --yarn",
     "deploy:ovsx": "ovsx publish --yarn"
   },
   "dependencies": {

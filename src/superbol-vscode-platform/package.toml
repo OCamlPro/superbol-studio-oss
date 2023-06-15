@@ -1,6 +1,6 @@
 
 # name of package
-name = "superbol-vscode-extension"
+name = "superbol-vscode-platform"
 skeleton = "js_program"
 
 # version if different from project version
@@ -24,6 +24,13 @@ gen-version = "version.ml"
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
 # generators = [ "ocamllex", "menhir" ]
+
+# menhir options for the package
+#Example:
+#version = "2.0"
+#parser = { modules = ["parser"]; tokens = "Tokens" }
+#tokens = { modules = ["tokens"]}
+# menhir = ...
 
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
@@ -49,10 +56,10 @@ skip = []
 gen_js_api = "1.1.1"
 js_of_ocaml = ">=4"
 jsonoo = "0.2.1"
-promise_jsoo = "0.3.1"
-ocplib_stuff = "0.4.0"
 node-js-stubs = "version"
+ocplib_stuff = "0.4.0"
 polka-js-stubs = "version"
+promise_jsoo = "0.3.1"
 vscode-js-stubs = "version"
 vscode-languageclient-js-stubs = "version"
 

@@ -16,7 +16,7 @@ module Message = struct
 
   include
     [%js:
-    val seq: t -> int [@@js.get]
+    val seq:   t -> int [@@js.get]
     val type_: t -> string [@@js.get "type"]]
 end
 
@@ -27,8 +27,8 @@ module Response = struct
   include
     [%js:
     val request_seq: t -> int [@@js.get]
-    val success: t -> bool [@@js.get]
-    val command: t -> string [@@js.get]
+    val success:     t -> bool [@@js.get]
+    val command:     t -> string [@@js.get]
     val create:
          request: DebugProtocol.Request.t
       -> ?message: string
@@ -43,6 +43,6 @@ module Event = struct
 
   include
     [%js:
-    val event: t -> string [@@js.get]
+    val event:  t -> string [@@js.get]
     val create: event: string -> ?body: 'a -> unit -> t [@@js.new "debugadapter.Event"]]
 end

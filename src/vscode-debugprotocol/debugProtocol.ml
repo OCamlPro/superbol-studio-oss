@@ -281,10 +281,10 @@ module VariablePresentationHint = struct
 
   include
     [%js:
-    val kind: t -> kind or_undefined [@@js.get]
+    val kind:       t -> kind or_undefined [@@js.get]
     val attributes: t -> attribute list or_undefined [@@js.get]
     val visibility: t -> visibility or_undefined [@@js.get]
-    val lazy_: t -> bool or_undefined [@@js.get "lazy"]]
+    val lazy_:      t -> bool or_undefined [@@js.get "lazy"]]
 end
 
 module Variable = struct
@@ -292,13 +292,13 @@ module Variable = struct
 
   include
     [%js:
-    val name: t -> string [@@js.get]
-    val value: t -> string [@@js.get]
-    val type_: t -> string or_undefined [@@js.get "type"]
+    val name:             t -> string [@@js.get]
+    val value:            t -> string [@@js.get]
+    val type_:            t -> string or_undefined [@@js.get "type"]
     val presentationHint: t -> VariablePresentationHint.t or_undefined [@@js.get]
-    val namedVariables: t -> int or_undefined [@@js.get]
+    val namedVariables:   t -> int or_undefined [@@js.get]
     val indexedVariables: t -> int or_undefined [@@js.get]
-    val memoryReference: t -> string or_undefined [@@js.get]]
+    val memoryReference:  t -> string or_undefined [@@js.get]]
 end
 
 module BreakpointLocation = struct
@@ -410,24 +410,24 @@ end
 
 module CompletionItemType = struct
   type t =
-    | Method [@js "method"]
-    | Function [@js "function"]
+    | Method      [@js "method"]
+    | Function    [@js "function"]
     | Constructor [@js "constructor"]
-    | Field [@js "field"]
-    | Variable [@js "variable"]
-    | Class [@js "class"]
-    | Interface [@js "interface"]
-    | Module [@js "module"]
-    | Property [@js "property"]
-    | Unit [@js "unit"]
-    | Value [@js "value"]
-    | Enum [@js "enum"]
-    | Keyword [@js "keyword"]
-    | Snippet [@js "snippet"]
-    | Text [@js "text"]
-    | Color [@js "color"]
-    | File [@js "file"]
-    | Reference [@js "reference"]
+    | Field       [@js "field"]
+    | Variable    [@js "variable"]
+    | Class       [@js "class"]
+    | Interface   [@js "interface"]
+    | Module      [@js "module"]
+    | Property    [@js "property"]
+    | Unit        [@js "unit"]
+    | Value       [@js "value"]
+    | Enum        [@js "enum"]
+    | Keyword     [@js "keyword"]
+    | Snippet     [@js "snippet"]
+    | Text        [@js "text"]
+    | Color       [@js "color"]
+    | File        [@js "file"]
+    | Reference   [@js "reference"]
     | Customcolor [@js "customcolor"]
   [@@js.enum] [@@js]
 end
@@ -502,11 +502,11 @@ module ExceptionDetails = struct
 
   include
     [%js:
-    val message: t -> string or_undefined [@@js.get]
-    val typeName: t -> string or_undefined [@@js.get]
-    val fullTypeName: t -> string or_undefined [@@js.get]
-    val evaluateName: t -> string or_undefined [@@js.get]
-    val stackTrace: t -> string or_undefined [@@js.get]
+    val message:        t -> string or_undefined [@@js.get]
+    val typeName:       t -> string or_undefined [@@js.get]
+    val fullTypeName:   t -> string or_undefined [@@js.get]
+    val evaluateName:   t -> string or_undefined [@@js.get]
+    val stackTrace:     t -> string or_undefined [@@js.get]
     val innerException: t -> t or_undefined [@@js.get]]
 end
 
@@ -712,13 +712,13 @@ module StoppedEvent = struct
 
   module M = struct
     type body = {
-      reason: reason;
-      description: string or_undefined;
-      threadId: string or_undefined;
+      reason:            reason;
+      description:       string or_undefined;
+      threadId:          string or_undefined;
       preserveFocusHint: string or_undefined;
-      text: string or_undefined;
-      allThreadStopped: bool or_undefined;
-      hitBreakpointIds: int list or_undefined;
+      text:              string or_undefined;
+      allThreadStopped:  bool or_undefined;
+      hitBreakpointIds:  int list or_undefined;
     } [@@js]
 
     let event = "stopped"
@@ -730,7 +730,7 @@ end
 module ContinuedEvent = struct
   module M = struct
     type body = {
-      threadId: int;
+      threadId:         int;
       allThreadStopped: bool or_undefined;
     } [@@js]
 
@@ -754,7 +754,9 @@ end
 
 module TerminatedEvent = struct
   module M = struct
-    type b = { restart: Js.Any.t or_undefined} [@@js]
+    type b = {
+      restart: Js.Any.t or_undefined
+    } [@@js]
     type body = b or_undefined [@@js]
 
     let event = "terminated"
@@ -772,7 +774,7 @@ module ThreadEvent = struct
     [@@js.enum] [@@js]
 
     type body = {
-      reason: reason;
+      reason:   reason;
       threadId: int;
     } [@@js]
 
@@ -800,14 +802,14 @@ module OutputEvent = struct
     [@@js.enum] [@@js]
 
     type body = {
-      category: category or_undefined;
-      output: string;
-      group: group or_undefined;
+      category:           category or_undefined;
+      output:             string;
+      group:              group or_undefined;
       variablesReference: int or_undefined;
-      source: Source.t or_undefined;
-      line: int or_undefined;
-      column: int or_undefined;
-      data: Js.Any.t or_undefined;
+      source:             Source.t or_undefined;
+      line:               int or_undefined;
+      column:             int or_undefined;
+      data:               Js.Any.t or_undefined;
     } [@@js]
 
     let event = "output"
@@ -835,7 +837,7 @@ module BreakpointEvent = struct
     [@@js.enum] [@@js]
 
     type body = {
-      reason: reason;
+      reason:     reason;
       breakpoint: Breakpoint.t
     } [@@js]
 
@@ -880,11 +882,11 @@ module ProcessEvent = struct
     [@@js.enum] [@@js]
 
     type body = {
-      name: string;
+      name:            string;
       systemProcessId: int or_undefined;
-      isLocalProcess: bool or_undefined;
-      startMethod: start_method or_undefined;
-      pointerSize: int or_undefined;
+      isLocalProcess:  bool or_undefined;
+      startMethod:     start_method or_undefined;
+      pointerSize:     int or_undefined;
     } [@@js]
 
     let event = "process"
@@ -908,12 +910,12 @@ end
 module ProgressStartEvent = struct
   module M = struct
     type body = {
-      progressId: string;
-      title: string;
-      requestId: int or_undefined;
+      progressId:  string;
+      title:       string;
+      requestId:   int or_undefined;
       cancellable: bool or_undefined;
-      message: string or_undefined;
-      percentage: int or_undefined;
+      message:     string or_undefined;
+      percentage:  int or_undefined;
     } [@@js]
 
     let event = "progressStart"
@@ -926,7 +928,7 @@ module ProgressUpdateEvent = struct
   module M = struct
     type body = {
       progressId: string;
-      message: string or_undefined;
+      message:    string or_undefined;
       percentage: int or_undefined;
     } [@@js]
 
@@ -940,7 +942,7 @@ module ProgressEndEvent = struct
   module M = struct
     type body = {
       progressId: string;
-      message: string
+      message:    string
     } [@@js]
 
     let event = "progressEnd"
@@ -962,8 +964,8 @@ end
 module InvalidatedEvent = struct
   module M = struct
     type body = {
-      areas: InvalidatedAreas.t list or_undefined;
-      threadId: int or_undefined;
+      areas:        InvalidatedAreas.t list or_undefined;
+      threadId:     int or_undefined;
       stackFrameId: int or_undefined;
     } [@@js]
 
@@ -977,8 +979,8 @@ module MemoryEvent = struct
   module M = struct
      type body = {
        memoryReference: string;
-       offset: int;
-       count: int;
+       offset:          int;
+       count:           int;
      } [@@js]
 
      let event = "memory"
@@ -1017,7 +1019,7 @@ end
 module RunInTerminalResponse = struct
   module M = struct
     type body = {
-      processId: string or_undefined;
+      processId:      string or_undefined;
       shellProcessId: string or_undefined
     } [@@js]
   end
@@ -1036,7 +1038,7 @@ module StartDebuggingArguments = struct
   include
     [%js:
     val configuration: t -> Js.Any.t Dict.t [@@js.get]
-    val request: t -> request [@@js.get]]
+    val request:       t -> request [@@js.get]]
 end
 
 module StartDebuggingRequest = struct
@@ -1068,22 +1070,22 @@ module InitializeArguments = struct
 
   include
     [%js:
-      val clientID: t -> string or_undefined [@@js.get]
-      val clientName: t -> string or_undefined [@@js.get]
-      val adapterID: t -> string [@@js.get]
-      val locale: t -> string or_undefined [@@js.get]
-      val linesStartAt1: t -> bool or_undefined [@@js.get]
-      val columnsStartAt1: t -> bool or_undefined [@@js.get]
-      val pathFormat: t -> path_format or_undefined [@@js.get]
-      val supportsVariableType: t -> bool or_undefined [@@js.get]
-      val supportsVariablePaging: t -> bool or_undefined [@@js.get]
-      val supportsRunInTerminalRequest: t -> bool or_undefined [@@js.get]
-      val supportsMemoryReferences: t -> bool or_undefined [@@js.get]
-      val supportsProgressReporting: t -> bool or_undefined [@@js.get]
-      val supportsInvalidatedEvent: t -> bool or_undefined [@@js.get]
-      val supportsMemoryEvent: t -> bool or_undefined [@@js.get]
+      val clientID:                            t -> string or_undefined [@@js.get]
+      val clientName:                          t -> string or_undefined [@@js.get]
+      val adapterID:                           t -> string [@@js.get]
+      val locale:                              t -> string or_undefined [@@js.get]
+      val linesStartAt1:                       t -> bool or_undefined [@@js.get]
+      val columnsStartAt1:                     t -> bool or_undefined [@@js.get]
+      val pathFormat:                          t -> path_format or_undefined [@@js.get]
+      val supportsVariableType:                t -> bool or_undefined [@@js.get]
+      val supportsVariablePaging:              t -> bool or_undefined [@@js.get]
+      val supportsRunInTerminalRequest:        t -> bool or_undefined [@@js.get]
+      val supportsMemoryReferences:            t -> bool or_undefined [@@js.get]
+      val supportsProgressReporting:           t -> bool or_undefined [@@js.get]
+      val supportsInvalidatedEvent:            t -> bool or_undefined [@@js.get]
+      val supportsMemoryEvent:                 t -> bool or_undefined [@@js.get]
       val supportsArgsCanBeInterpretedByShell: t -> bool or_undefined [@@js.get]
-      val supportsStartDebuggingRequest: t -> bool or_undefined [@@js.get]
+      val supportsStartDebuggingRequest:       t -> bool or_undefined [@@js.get]
     ]
 end
 
@@ -1210,9 +1212,9 @@ module DisconnectArguments = struct
 
   include
     [%js:
-    val restart: t -> bool or_undefined [@@js.get]
+    val restart:           t -> bool or_undefined [@@js.get]
     val terminateDebuggee: t -> bool or_undefined [@@js.get]
-    val suspendDebuggee: t -> bool or_undefined [@@js.get]]
+    val suspendDebuggee:   t -> bool or_undefined [@@js.get]]
 end
 
 module DisconnectRequest = struct
@@ -1262,10 +1264,10 @@ module BreakpointLocationsArguments = struct
 
   include
     [%js:
-    val source: t -> Source.t [@@js.get]
-    val line: t -> int [@@js.get]
-    val column: t -> int or_undefined [@@js.get]
-    val endLine: t -> int or_undefined [@@js.get]
+    val source:    t -> Source.t [@@js.get]
+    val line:      t -> int [@@js.get]
+    val column:    t -> int or_undefined [@@js.get]
+    val endLine:   t -> int or_undefined [@@js.get]
     val endColumn: t -> int or_undefined [@@js.get]]
 end
 
@@ -1293,9 +1295,9 @@ module SetBreakpointsArguments = struct
 
   include
     [%js:
-    val source: t -> Source.t [@@js.get]
-    val breakpoints: t -> SourceBreakpoint.t list or_undefined [@@js.get]
-    val lines: t -> int list or_undefined [@@js.get]
+    val source:         t -> Source.t [@@js.get]
+    val breakpoints:    t -> SourceBreakpoint.t list or_undefined [@@js.get]
+    val lines:          t -> int list or_undefined [@@js.get]
     val sourceModified: t -> bool or_undefined [@@js.get]]
 end
 
@@ -1397,10 +1399,10 @@ end
 module DataBreakpointInfoResponse = struct
    module M = struct
      type body = {
-       dataId: string or_undefined;
+       dataId:      string or_undefined;
        description: string;
-       accessType: DataBreakpointAccessType.t list or_undefined;
-       canPersist: bool or_undefined;
+       accessType:  DataBreakpointAccessType.t list or_undefined;
+       canPersist:  bool or_undefined;
      } [@@js]
    end
 
@@ -1821,11 +1823,11 @@ end
 module SetVariableResponse = struct
   module M = struct
     type body = {
-      value: string;
-      type_: string or_undefined [@js "type"];
+      value:              string;
+      type_:              string or_undefined [@js "type"];
       variablesReference: int or_undefined;
-      namedVariables: int or_undefined;
-      indexedVariables: int or_undefined;
+      namedVariables:     int or_undefined;
+      indexedVariables:   int or_undefined;
     } [@@js]
   end
 
@@ -1926,7 +1928,7 @@ end
 module ModulesResponse = struct
   module M = struct
     type body = {
-      modules: Module.t list;
+      modules:      Module.t list;
       totalModules: int or_undefined;
     } [@@js]
   end
@@ -1989,13 +1991,13 @@ end
 module EvaluateResponse = struct
   module M = struct
     type body = {
-      result: string;
-      type_: string or_undefined [@js "type"];
-      presentationHint: VariablePresentationHint.t or_undefined;
+      result:             string;
+      type_:              string or_undefined [@js "type"];
+      presentationHint:   VariablePresentationHint.t or_undefined;
       variablesReference: int;
-      namedVatiables: int or_undefined;
-      indexedVariables: int or_undefined;
-      memoryReference: string or_undefined;
+      namedVariables:     int or_undefined;
+      indexedVariables:   int or_undefined;
+      memoryReference:    string or_undefined;
     } [@@js]
   end
 
@@ -2025,12 +2027,12 @@ end
 module SetExpressionResponse = struct
   module M = struct
     type body = {
-      value: string;
-      type_: string or_undefined [@js "type"];
-      presentationHint: VariablePresentationHint.t or_undefined;
+      value:              string;
+      type_:              string or_undefined [@js "type"];
+      presentationHint:   VariablePresentationHint.t or_undefined;
       variablesReference: int or_undefined;
-      namedVatiables: int or_undefined;
-      indexedVariables: int or_undefined;
+      namedVariables:     int or_undefined;
+      indexedVariables:   int or_undefined;
     } [@@js]
   end
 
@@ -2145,8 +2147,8 @@ module ExceptionInfoResponse = struct
     type body = {
       exceptionId: string;
       description: string or_undefined;
-      breakMode: ExceptionBreakMode.t;
-      details: ExceptionDetails.t or_undefined;
+      breakMode:   ExceptionBreakMode.t;
+      details:     ExceptionDetails.t or_undefined;
     } [@@js]
   end
 
@@ -2175,9 +2177,9 @@ end
 module ReadMemoryResponse = struct
   module M = struct
     type b ={
-      address: string;
+      address:         string;
       unreadableBytes: int or_undefined;
-      data: string or_undefined;
+      data:            string or_undefined;
     } [@@js]
     type body = b or_undefined [@@js]
   end
@@ -2208,7 +2210,7 @@ end
 module WriteMemoryResponse = struct
   module M = struct
     type b = {
-      offset: int or_undefined;
+      offset:       int or_undefined;
       bytesWritten: int or_undefined;
     } [@@js]
     type body = b or_undefined  [@@js]

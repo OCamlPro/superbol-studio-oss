@@ -1,5 +1,5 @@
 PROJECT=superbol_vscode_extension
-SRCDIR=src/superbol-vscode-extension
+SRCDIR=src/superbol-vscode-platform
 
 compile:
 	opam exec -- dune build

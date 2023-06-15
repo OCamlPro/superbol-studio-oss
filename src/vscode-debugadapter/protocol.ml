@@ -59,10 +59,10 @@ module Emitter = struct
 
     include
       [%js:
-      val event: t -> Event.t [@@js.get]
-      val fire: t -> event:T.t -> t [@@js.call]
+      val event:       t -> Event.t [@@js.get]
+      val fire:        t -> event:T.t -> t [@@js.call]
       val hasListener: t -> bool [@@js.call]
-      val dispose: t -> unit [@@js.call]]
+      val dispose:     t -> unit [@@js.call]]
   end
 end
 
@@ -72,7 +72,7 @@ module VSCodeDebugAdapter = struct
   include
     [%js:
     val onDidSendMessage: t -> DebugProtocalMessage.t Event0.t [@@js.get]
-    val handleMessage: t -> message: DebugProtocol.ProtocolMessage.t -> unit [@@js.call]]
+    val handleMessage:    t -> message: DebugProtocol.ProtocolMessage.t -> unit [@@js.call]]
 end
 
 module ProtocolServer = struct
@@ -81,17 +81,17 @@ module ProtocolServer = struct
 
   include
     [%js:
-    val dispose: t -> Js.Any.t [@@js.call]
+    val dispose:          t -> Js.Any.t [@@js.call]
     val onDidSendMessage: t -> DebugProtocalMessage.t Event0.t [@@js.get]
-    val handleMessage: t -> msg: DebugProtocol.ProtocolMessage.t -> unit [@@js.call]
+    val handleMessage:    t -> msg: DebugProtocol.ProtocolMessage.t -> unit [@@js.call]
     val start:
          t
       -> inStream: Node.Stream.Readable.t
       -> outStream: Node.Stream.Writable.t
       -> unit [@@js.call]
-    val stop: t -> unit [@@js.call]
-    val sendEvent: t -> event: DebugProtocol.Event.t -> unit [@@js.call]
-    val sendResponse: t -> response: DebugProtocol.Response.t -> unit [@@js.call]
+    val stop:             t -> unit [@@js.call]
+    val sendEvent:        t -> event: DebugProtocol.Event.t -> unit [@@js.call]
+    val sendResponse:     t -> response: DebugProtocol.Response.t -> unit [@@js.call]
     val sendRequest:
          t
       -> command: string
