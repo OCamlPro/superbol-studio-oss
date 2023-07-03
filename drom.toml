@@ -80,6 +80,10 @@ dot-gitignore-trailer = """
 /yarn.lock
 /package-json
 ATTIC
+/out
+!.vscode/tasks.json
+!.vscode/launch.json
+*.vsix
 """
 
 [[package]]

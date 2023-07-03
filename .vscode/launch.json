@@ -9,6 +9,9 @@
       "name": "Extension",
       "type": "extensionHost",
       "request": "launch",
+      "env": {
+        "OCAMLRUNPARAMS": "b"
+      },
       "runtimeExecutable": "${execPath}",
       "outFiles": [
         "${workspaceRoot}/_build/default/src/superbol-vscode-extension/superbol_vscode_extension.bc.js"

@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-54399bba81549732cbd3f451ec6248d0:.
+bf8e552c6ca5a6d6f48411e9af99aa0e:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,7 +15,7 @@ version:0.9.0
 
 # begin context for .gitignore
 # file .gitignore
-fef04f16f98ac1ba77b226e28deeaedc:.gitignore
+d8174921aa9704c9107229a127ff6cce:.gitignore
 # end context for .gitignore
 
 # begin context for CHANGES.md
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-f650bafbbdb55b7e7d2218d2fce56273:Makefile
+d768fb221fd49646ac83e91c15640e63:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -43,6 +43,11 @@ f650bafbbdb55b7e7d2218d2fce56273:Makefile
 bfbacf00053bb9ab2a6e2ce94ed4a642:docs/README.txt
 # end context for docs/README.txt
 
+# begin context for docs/doc/index.html
+# file docs/doc/index.html
+972cbb364863f844c85b9d889635c5f2:docs/doc/index.html
+# end context for docs/doc/index.html
+
 # begin context for docs/favicon.png
 # file docs/favicon.png
 e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
@@ -52,6 +57,11 @@ e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
 # file docs/index.html
 00568067371eb1933263153d3da82bf4:docs/index.html
 # end context for docs/index.html
+
+# begin context for docs/sphinx/index.html
+# file docs/sphinx/index.html
+4e71c95414de93447be3b81ac62ec959:docs/sphinx/index.html
+# end context for docs/sphinx/index.html
 
 # begin context for docs/style.css
 # file docs/style.css
@@ -137,6 +147,11 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 # file scripts/static-build.sh
 b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
 # end context for scripts/static-build.sh
+
+# begin context for sphinx/_static/css/fixes.css
+# file sphinx/_static/css/fixes.css
+20bbe7a5dbb3c3278a1511d960616fe5:sphinx/_static/css/fixes.css
+# end context for sphinx/_static/css/fixes.css
 
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
@@ -280,7 +295,7 @@ a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
 
 # begin context for src/vscode-package-json/linking_flags.sh
 # file src/vscode-package-json/linking_flags.sh
-9fdfca3cc53df639758ff04fe09d3243:src/vscode-package-json/linking_flags.sh
+c7aa7ad8967d43dd0e7ea2f013af7376:src/vscode-package-json/linking_flags.sh
 # end context for src/vscode-package-json/linking_flags.sh
 
 # begin context for src/vscode-package-json/version.mlt
