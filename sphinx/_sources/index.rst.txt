@@ -1,24 +1,25 @@
-.. superbol-vscode-extension documentation master file, created by
+.. superbol-vscode-platform documentation master file, created by
    drom new
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to superbol-vscode-extension
+Welcome to superbol-vscode-platform
 ================
 
 .. toctree::
    :maxdepth: 2
    :caption: Documentation
 
-   Home <https://ocamlpro.github.io/superbol-vscode-extension>
+   Home <https://ocamlpro.github.io/superbol-vscode-platform>
    about
    install
    settings
    features
-   API doc <https://ocamlpro.github.io/superbol-vscode-extension/doc>
+   tasks
+   API doc <https://ocamlpro.github.io/superbol-vscode-platform/doc>
    license
 
-   Devel and Issues on Github <https://github.com/ocamlpro/superbol-vscode-extension>
+   Devel and Issues on Github <https://github.com/ocamlpro/superbol-vscode-platform>
 
 
 Indices and tables
