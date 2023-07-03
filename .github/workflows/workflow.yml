@@ -37,16 +37,26 @@ jobs:
         id: cache-opam
         with:
           path: ~/.opam
-          key: v2-${{ runner.os }}-superbol-vscode-extension-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
+          key: v2-${{ runner.os }}-superbol-vscode-platform-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
 #          restore-keys: |
 #            v2-${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
 
-      - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: avsm/setup-ocaml@v2
+      - name: Set-up OCaml on Windows
+        uses: ocaml/setup-ocaml@v2
+        if: runner.os == 'Windows'
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-pin: false
-          opam-depext: false
+          opam-repositories: |
+            opam-repository-mingw: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
+            default: https://github.com/ocaml/opam-repository.git
+
+      - name: Set-up OCaml on Unix
+        uses: ocaml/setup-ocaml@v2
+        if: runner.os != 'Windows'
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-repositories: |
+            default: https://github.com/ocaml/opam-repository.git
 
       - name: Set git user
         run: |
@@ -57,7 +67,8 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-vscode-extension polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json
+      - run: opam depext -y superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol
+        if: matrix.os != 'windows-latest'
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test

@@ -169,28 +169,28 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
   Vscode.ExtensionContext.subscribe extension ~disposable;
 
-  let command =
-    Vscode.Workspace.getConfiguration ()
-    |> Vscode.WorkspaceConfiguration.get ~section:"superbol.path"
-    |> function Some o -> Ojs.string_of_js o
-              | None -> "superbol"
+  let debug =
+    Vscode.Debug.registerDebugConfigurationProvider ()
+      ~debugType:"cobol"
+      ~provider:Debugger.debugConfigurationProvider
   in
-  let args = ["x-lsp"] in
-  let serverOptions = Vscode_languageclient.ServerOptions.create
-      ~command
-      ~args
-      ()
+
+  Vscode.ExtensionContext.subscribe extension ~disposable:debug;
+
+  let task =
+    Vscode.Tasks.registerTaskProvider
+      ~type_:Superbol_tasks.type_
+      ~provider:Superbol_tasks.provider
   in
-  let documentSelector =
-    [| `Filter (Vscode_languageclient.DocumentFilter.createLanguage ~language:"cobol" ()) |]
-  in
-  let clientOptions = Vscode_languageclient.ClientOptions.create ~documentSelector () in
+
+  Vscode.ExtensionContext.subscribe extension ~disposable:task;
+
   client :=
     Some (Vscode_languageclient.LanguageClient.make
             ~id:"cobolServer"
             ~name:"Cobol Server"
-            ~serverOptions
-            ~clientOptions
+            ~serverOptions:Superbol_languageclient.serverOptions
+            ~clientOptions:Superbol_languageclient.clientOptions
             ());
   match !client with
   | Some client -> Vscode_languageclient.LanguageClient.start client

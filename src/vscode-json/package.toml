@@ -25,6 +25,13 @@ gen-version = "version.ml"
 # default is [ "ocamllex", "ocamlyacc" ] 
 # generators = [ "ocamllex", "menhir" ]
 
+# menhir options for the package
+#Example:
+#version = "2.0"
+#parser = { modules = ["parser"]; tokens = "Tokens" }
+#tokens = { modules = ["tokens"]}
+# menhir = ...
+
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
 
@@ -46,8 +53,8 @@ preprocess = "pps ppx_deriving_encoding"
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-ezjsonm = ""
 ez_file = "0.3.0"
+ezjsonm = ""
 
 # package tools dependencies
 [tools]
@@ -65,4 +72,4 @@ ppx_deriving_encoding = "0.3.0"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-
+# ...

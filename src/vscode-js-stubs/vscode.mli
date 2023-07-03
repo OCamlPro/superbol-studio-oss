@@ -2422,6 +2422,228 @@ module Languages : sig
   val getDiagnostics_all : unit -> (Uri.t * Diagnostic.t list) list
 end
 
+module DebugProtocolMessage : sig
+  include Js.T
+end
+
+module DebugProtocolBreakpoint : sig
+  include Js.T
+end
+
+module DebugConfiguration : sig
+  include Js.T
+
+  val name: t -> string
+  val request: t -> string
+  val type_: t -> string
+
+  val get_property: t -> string -> Ojs.t
+  val set_property: t -> string -> Ojs.t -> unit
+
+  val create:
+    name:string
+    -> request:string
+    -> type_:string
+    -> ?properties: (string * Ojs.t) list
+    -> unit
+    -> t
+end
+
+module Breakpoint : sig
+  include Js.T
+
+  val id: t -> string
+  val enabled: t -> string
+  val condition: t -> string or_undefined
+  val hitCondition: t -> string or_undefined
+  val logMessage: t -> string or_undefined
+  val make:
+    ?enabled: bool
+    -> ?condition: string
+    -> ?hitCondition: string
+    -> ?logMessage: string
+    -> unit
+    -> t
+end
+
+module DebugSession : sig
+  include Js.T
+
+  module AnyThenable: module type of Typings.Thenable.Make (Js.Any)
+
+  module DebugProtocolBreakpointThenable:
+    module type of Typings.Thenable.Make (Js.Or_undefined (DebugProtocolBreakpoint))
+
+  val id: t -> string
+  val type_: t -> string
+  val parentSession: t -> t or_undefined
+  val name: t -> string
+  val workspaceFolder: t -> WorkspaceFolder.t or_undefined
+  val configuration: t -> DebugConfiguration.t
+  val customRequest: t -> command:string -> ?args:Js.Any.t -> unit -> AnyThenable.t
+  val getDebugProtocolBreakpoint:
+    t
+    -> breakpoint: Breakpoint.t
+    -> DebugProtocolBreakpointThenable.t
+
+  val create:
+    name:string
+    -> customRequest:
+         (command:string -> ?args:Js.Any.t -> unit -> AnyThenable.t)
+    -> getDebugProtocolBreakpoint:
+         (breakpoint: Breakpoint.t -> DebugProtocolBreakpointThenable.t)
+    -> t
+end
+
+module DebugConfigurationProvider : sig
+  include Js.T
+
+  val provideDebugConfigurations:
+    t
+    -> folder: WorkspaceFolder.t
+    -> ?token: CancellationToken.t
+    -> unit
+    -> DebugConfiguration.t list ProviderResult.t
+
+  val resolveDebugConfiguration:
+    t
+    -> folder: WorkspaceFolder.t
+    -> debugConfiguration: DebugConfiguration.t
+    -> ?token: CancellationToken.t
+    -> unit
+    -> DebugConfiguration.t ProviderResult.t
+
+  val resolveDebugConfigurationWithSubstitutedVariables:
+    t
+    -> folder: WorkspaceFolder.t
+    -> debugConfiguration: DebugConfiguration.t
+    -> ?token: CancellationToken.t
+    -> unit
+    -> DebugConfiguration.t ProviderResult.t
+
+  val create :
+    provideDebugConfigurations:
+      (   folder: WorkspaceFolder.t
+          -> ?token: CancellationToken.t
+          -> unit
+          -> DebugConfiguration.t list ProviderResult.t)
+    -> resolveDebugConfiguration:
+         (  folder: WorkspaceFolder.t
+            -> debugConfiguration: DebugConfiguration.t
+            -> ?token: CancellationToken.t
+            -> unit
+            -> DebugConfiguration.t ProviderResult.t)
+    -> resolveDebugConfigurationWithSubstitutedVariables:
+         (folder: WorkspaceFolder.t
+          -> debugConfiguration: DebugConfiguration.t
+          -> ?token: CancellationToken.t
+          -> unit
+          -> DebugConfiguration.t ProviderResult.t)
+    -> t
+end
+
+module DebugAdapterExecutableOptions : sig
+  include Js.T
+
+  val env: t -> string Dict.t or_undefined
+  val cwd: t -> string or_undefined
+
+  val create:
+    ?env: string Dict.t
+    -> ?cwd: string
+    -> unit
+    -> t
+end
+
+module DebugAdapterExecutable : sig
+  include Js.T
+
+  val command: t -> string
+  val args: t -> string list
+  val options: t -> DebugAdapterExecutableOptions.t or_undefined
+
+  val make:
+    command:string
+    -> ?args: string list
+    -> ?options: DebugAdapterExecutableOptions.t
+    -> unit
+    -> t
+end
+
+module DebugAdapterServer : sig
+  include Js.T
+
+  val port: t -> int
+  val host: t -> string or_undefined
+
+  val make: port:int -> ?host: string -> unit -> t
+end
+
+module DebugAdapterNamedPipeServer : sig
+  include Js.T
+
+  val path: t -> string
+  val make: path:string -> t
+end
+
+module DebugAdapter : sig
+  include module type of Disposable with type t = private Disposable.t
+
+  val onDidSendMessage: t -> DebugProtocolMessage.t Event.t
+  val handleMessage: t -> message:DebugProtocolMessage.t -> unit
+
+  val create : handleMessage: (message: DebugProtocolMessage.t -> unit) -> t
+end
+
+module DebugAdapterInlineImplementation : sig
+  include Js.T
+
+  val make: implementation: DebugAdapter.t -> t
+end
+
+module DebugAdapterDescriptor : sig
+  type t =
+    [ `DebugAdapterExecutable of DebugAdapterExecutable.t
+    | `DebugAdapterServer of DebugAdapterServer.t
+    | `DebugAdapterNamedPipeServer of DebugAdapterNamedPipeServer.t
+    | `DebugAdapterInlineImplementation of DebugAdapterInlineImplementation.t]
+
+  val t_of_js: Ojs.t -> t
+end
+
+module DebugAdapterDescriptorFactory : sig
+  include Js.T
+
+  val createDebugAdapterDescriptor :
+    t
+    -> session: DebugSession.t
+    -> executable: DebugAdapterExecutable.t or_undefined
+    -> DebugAdapterDescriptor.t ProviderResult.t
+
+  val create :
+    createDebugAdapterDescriptor :
+      (session: DebugSession.t
+       -> executable: DebugAdapterExecutable.t or_undefined
+       -> DebugAdapterDescriptor.t ProviderResult.t)
+    -> t
+end
+
+module DebugConfigurationProviderTriggerKind : sig
+  type t =
+    | Initial
+    | Dynamic
+end
+
+module Debug : sig
+
+  val registerDebugConfigurationProvider:
+    debugType: string
+    -> provider: DebugConfigurationProvider.t
+    -> ?triggerKind: DebugConfigurationProviderTriggerKind.t
+    -> unit
+    -> Disposable.t
+end
+
 module Tasks : sig
   val registerTaskProvider :
     type_:string -> provider:Task.t TaskProvider.t -> Disposable.t

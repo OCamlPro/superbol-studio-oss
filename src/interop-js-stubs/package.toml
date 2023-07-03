@@ -25,6 +25,13 @@ gen-version = "version.ml"
 # default is [ "ocamllex", "ocamlyacc" ] 
 # generators = [ "ocamllex", "menhir" ]
 
+# menhir options for the package
+#Example:
+#version = "2.0"
+#parser = { modules = ["parser"]; tokens = "Tokens" }
+#tokens = { modules = ["tokens"]}
+# menhir = ...
+
 # whether all modules should be packed/wrapped (default is true)
 # pack-modules = false
 
@@ -47,11 +54,11 @@ skip = ["main.ml"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 gen_js_api = "1.1.1"
-js_of_ocaml = "4"
+js_of_ocaml = ">=4"
 
 # package tools dependencies
 [tools]
-js_of_ocaml-ppx = "4"
+js_of_ocaml-ppx = ">=4"
 
 # package fields (depends on package skeleton)
 #Examples:

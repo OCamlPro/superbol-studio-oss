@@ -194,3 +194,36 @@ module ChildProcess : sig
     -> string array
     -> return Promise.t
 end
+
+module Events : sig
+  module EventEmitterOptions : sig
+    include Js.T
+
+    val captureRejections: t -> bool or_undefined
+  end
+
+  module EventEmitter : sig
+    include Js.T
+
+    type listener =
+      args:(Js.Any.t list [@js.variadic])
+      -> unit
+
+    val create: ?options: EventEmitterOptions.t -> unit -> t
+    val addListener: t -> eventName: string -> listener: listener -> t
+    val on: t -> eventName: string -> listener: listener -> t
+    val once: t -> eventName: string -> listener: listener -> t
+    val removeListener: t -> eventName: string -> listener: listener -> t
+    val off: t -> eventName: string -> listener: listener -> t
+    val removeAllListeners: t -> ?event: string -> unit -> t
+    val setMaxListener: t -> n: int -> t
+    val getMaxListener: t -> int
+    val listeners: t -> eventName: string -> listener list
+    val rawListeners: t -> eventName: string -> listener list
+    val emit: t -> eventName: string -> args:(Js.Any.t list [@js.variadic]) -> bool
+    val listenerCount: t -> eventName: string -> ?listener: listener -> unit -> int
+    val prependListener: t -> eventName: string -> listener: listener -> t
+    val prependOnceListener: t -> eventName: string -> listener: listener -> t
+    val eventNames: t -> string list
+  end
+end

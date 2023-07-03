@@ -1,4 +1,4 @@
-/superbol-vscode-extension
+/superbol-vscode-platform
 /polka-js-stubs
 /interop-js-stubs
 /node-js-stubs
@@ -6,6 +6,8 @@
 /vscode-languageclient-js-stubs
 /vscode-package-json
 /vscode-json
+/vscode-debugadapter
+/vscode-debugprotocol
 *~
 _build
 .merlin

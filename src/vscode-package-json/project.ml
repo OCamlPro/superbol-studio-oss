@@ -34,7 +34,7 @@ let package =
     ~version: "0.1.0"
     ~repository: {
       type_ = Some "git" ;
-      url = "https://github.com/OCamlPro/superbol-vscode-extension"
+      url = "https://github.com/OCamlPro/superbol-vscode-platform"
     }
     ~homepage: "https://ocamlpro.com/cobol"
     ~author: {
@@ -42,12 +42,12 @@ let package =
       author_email = "contact@ocamlpro.com"
     }
     ~keywords: [ "cobol" ; "gnucobol" ]
-    ~main: "./out/superbol_vscode_extension.bc.js"
+    ~main: "./out/superbol_vscode_platform.bc.js"
     ~scripts: [
       "package" ,
-      "vsce package --out superbol-vscode-extension.vsix --yarn" ;
+      "vsce package --out superbol-vscode-platform.vsix --yarn" ;
       "deploy:vsce" ,
-      "vsce publish --packagePath superbol-vscode-extension.vsix --yarn" ;
+      "vsce publish --packagePath superbol-vscode-platform.vsix --yarn" ;
       "deploy:ovsx" ,
       "ovsx publish --yarn"
     ]
@@ -3796,7 +3796,7 @@ let manifest =
     "pretest": "npm run compile && npm run lint",
     "test": "node ./out/test/runTest.js",
     "find-deadcode": "./node_modules/.bin/ts-prune | grep -v \"used in module\"",
-    "open-in-browser": "vscode-test-web -version=stable --browserType=chromium --extensionDevelopmentPath=. ."
+    "open-in-browser": "vscode-test-web -version=stable --browserType=chromium --platformDevelopmentPath=. ."
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",

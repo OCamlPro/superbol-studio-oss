@@ -1,4 +1,4 @@
-# Superbol VSCode Extension for COBOL
+# Superbol VSCode Platform for COBOL
 
 ## Features
 
@@ -16,11 +16,11 @@
 
 Get the `superbol` executable and install it in `/usr/local/bin`.
 
-Get the `superbol-vscode-extension.vsix` file from the releases.
+Get the `superbol-vscode-platform.vsix` file from the releases.
 
 In VSCode open the `extension` view and select the three dots on the top right of the sidebar.
 
-Select `Install from VSIX ...` and select the `superbol-vscode-extension.vsix` file.
+Select `Install from VSIX ...` and select the `superbol-vscode-platform.vsix` file.
 
 ### Build
 
@@ -28,12 +28,12 @@ Get the `superbol` executable and install it in `/usr/local/bin`.
 
 Clone the source code of this extension:
 ```bash
-git clone https://github.com/OCamlPro/superbol-vscode-extension.git
+git clone https://github.com/OCamlPro/superbol-vscode-platform.git
 ```
 
 Go to the created folder and install the dependencies with
 ```bash
-cd superbol-vscode-extension
+cd superbol-vscode-platform
 yarn install
 ```
 
@@ -49,7 +49,7 @@ yarn package
 Open VSCode and go to the extension view.
 
 In the sidebar click on the three dots on the top right (just above `search`) and select
-`install from VSIX ...` and select the `superbol-vscode-extension.vsix` generated from
+`install from VSIX ...` and select the `superbol-vscode-platform.vsix` generated from
 this extension.
 
 ### Configure the extension
@@ -63,12 +63,12 @@ Go to your VSCode settings and in the extension submenu select `Superbol COBOL`.
 
 In the `superbol` field past the path to the `superbol` executable.
 
-You can check the documentation on using the extension on [this page](https://ocamlpro.github.io/superbol-vscode-extension/sphinx).
+You can check the documentation on using the extension on [this page](https://ocamlpro.github.io/superbol-vscode-platform/sphinx).
 
 ## Resources
 
-* Website: https://ocamlpro.github.io/superbol-vscode-extension
-* General Documentation: https://ocamlpro.github.io/superbol-vscode-extension/sphinx
-* Sources: https://github.com/ocamlpro/superbol-vscode-extension
+* Website: https://ocamlpro.github.io/superbol-vscode-platform
+* General Documentation: https://ocamlpro.github.io/superbol-vscode-platform/sphinx
+* Sources: https://github.com/ocamlpro/superbol-vscode-platform
 
 

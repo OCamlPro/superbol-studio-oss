@@ -316,3 +316,95 @@ module ChildProcess = struct
     let cp = spawn cmd args ?options () in
     handle_child_process cp ?logger ?stdin resolve
 end
+
+module Events = struct
+  module EventEmitterOptions = struct
+    include Interface.Make ()
+
+    include
+      [%js:
+        val captureRejections: t -> bool or_undefined [@@js.get]]
+  end
+
+  module EventEmitter = struct
+    include Class.Make ()
+
+
+    include
+      [%js:
+      type listener =
+        args:(Js.Any.t list [@js.variadic])
+        -> unit
+
+      val create: ?options: EventEmitterOptions.t -> unit -> t [@@js.new "events.EventEmitter"]
+      val addListener:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val on:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val once:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val removeListener:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val off:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val removeAllListeners:
+           t
+        -> ?event: string
+        -> unit
+        -> t [@@js.call]
+      val setMaxListener:
+           t
+        -> n: int
+        -> t [@@js.call]
+      val getMaxListener:
+           t
+        -> int [@@js.call]
+      val listeners:
+           t
+        -> eventName: string
+        -> listener list [@@js.call]
+      val rawListeners:
+           t
+        -> eventName: string
+        -> listener list [@@js.call]
+      val emit:
+           t
+        -> eventName: string
+        -> args:(Js.Any.t list [@js.variadic])
+        -> bool [@@js.call]
+      val listenerCount:
+           t
+        -> eventName: string
+        -> ?listener: listener
+        -> unit
+        -> int [@@js.call]
+      val prependListener:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val prependOnceListener:
+           t
+        -> eventName: string
+        -> listener: listener
+        -> t [@@js.call]
+      val eventNames:
+           t
+        -> string list [@@js.call]]
+  end
+end
