@@ -13,6 +13,8 @@ Welcome to superbol-vscode-extension
    Home <https://ocamlpro.github.io/superbol-vscode-extension>
    about
    install
+   settings
+   features
    API doc <https://ocamlpro.github.io/superbol-vscode-extension/doc>
    license
 

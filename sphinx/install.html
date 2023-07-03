@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How to install &mdash; superbol-vscode-extension master
- (abaa728
-) (2023/05/12 15:50) documentation</title>
+ (9dbf6bc
+) (2023/07/03 14:47) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -19,7 +19,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Copyright and License" href="license.html" />
+    <link rel="next" title="VSCode settings" href="settings.html" />
     <link rel="prev" title="About" href="about.html" /> 
 </head>
 
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (abaa728
+ (9dbf6bc
 )
               </div>
 <div role="search">
@@ -47,11 +47,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-extension">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">How to install</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#install-with-opam">Install with <code class="code docutils literal notranslate"><span class="pre">opam</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#build-and-install-with-dune">Build and install with <code class="code docutils literal notranslate"><span class="pre">dune</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">VSCode settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#lsp-settings">LSP Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Superbol extension features</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-extension/doc">API doc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-extension">Devel and Issues on Github</a></li>
@@ -83,45 +82,8 @@
              
   <section id="how-to-install">
 <h1>How to install<a class="headerlink" href="#how-to-install" title="Permalink to this headline"></a></h1>
-<section id="install-with-opam">
-<h2>Install with <code class="code docutils literal notranslate"><span class="pre">opam</span></code><a class="headerlink" href="#install-with-opam" title="Permalink to this headline"></a></h2>
-<p>If <code class="code docutils literal notranslate"><span class="pre">superbol-vscode-extension</span></code> is available in your opam repository, you can just call:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">opam</span> <span class="n">install</span> <span class="n">superbol</span><span class="o">-</span><span class="n">vscode</span><span class="o">-</span><span class="n">extension</span>
-</pre></div>
-</div>
-</section>
-<section id="build-and-install-with-dune">
-<h2>Build and install with <code class="code docutils literal notranslate"><span class="pre">dune</span></code><a class="headerlink" href="#build-and-install-with-dune" title="Permalink to this headline"></a></h2>
-<p>Checkout the sources of <code class="code docutils literal notranslate"><span class="pre">superbol-vscode-extension</span></code> in a directory.</p>
-<p>You need a switch with at least version <code class="code docutils literal notranslate"><span class="pre">4.13.0</span></code> of OCaml,
-you can for example create it with:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">opam</span> <span class="n">switch</span> <span class="n">create</span> <span class="mi">4</span><span class="o">.</span><span class="mi">13</span><span class="o">.</span><span class="mi">0</span>
-</pre></div>
-</div>
-<p>Then, you need to install all the dependencies:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">opam</span> <span class="n">install</span> <span class="o">--</span><span class="n">deps</span><span class="o">-</span><span class="n">only</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>Finally, you can build the package and install it:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">eval</span> <span class="o">$(</span><span class="n">opam</span> <span class="n">env</span><span class="o">)</span>
-<span class="n">dune</span> <span class="n">build</span>
-<span class="n">dune</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p>Note that a <code class="code docutils literal notranslate"><span class="pre">Makefile</span></code> is provided, it contains the following
-targets:</p>
-<ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">build</span></code>: build the code</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">install</span></code>: install the generated files</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">build-deps</span></code>: install opam dependencies</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">sphinx</span></code>: build sphinx documentation (from the <code class="code docutils literal notranslate"><span class="pre">sphinx/</span></code> directory)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">dev-deps</span></code>: build development dependencies, in particular
-<code class="code docutils literal notranslate"><span class="pre">ocamlformat</span></code>, <code class="code docutils literal notranslate"><span class="pre">odoc</span></code> and <code class="code docutils literal notranslate"><span class="pre">merlin</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">doc</span></code>: build documentation with <code class="code docutils literal notranslate"><span class="pre">odoc</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">fmt</span></code>: format the code using <code class="code docutils literal notranslate"><span class="pre">ocamlformat</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">test</span></code>: run tests</p></li>
-</ul>
-</section>
+<p>Please check <a class="reference external" href="https://github.com/OCamlPro/superbol-vscode-extension/blob/master/README.md">README.md</a> for
+installation guidelines.</p>
 </section>
 
 
@@ -129,7 +91,7 @@ targets:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="about.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="license.html" class="btn btn-neutral float-right" title="Copyright and License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="settings.html" class="btn btn-neutral float-right" title="VSCode settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
