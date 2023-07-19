@@ -14,8 +14,8 @@ open Cobol_common.Srcloc.INFIX
 type folding_range = {
   startLine:int;
   endLine:int;
-  startCharacter:int;
-  endCharacter:int;
+  startCharacter:int; (*not really used *)
+  endCharacter:int;   (*not really used *)
   (* kind:Lsp.Types.FoldingRangeKind.t option *)
   (* collapsedText:string option*)
 }
@@ -39,31 +39,33 @@ let add_folding_range r l =
 let add_folding_range_of_loc loc l =
   add_folding_range (folding_range_of_loc loc) l
 
-
-let folding_range_division ast =
-
+(*Define the folding_range of program/division/statement...
+  We do not need to do any analyze here.
+  However, we need to refine the code of parser/visitor first.*)
+let folding_range_simple ast =
+  let add_node n acc =
+    Visitor.do_children @@ add_folding_range_of_loc ~@n acc
+  in
   let visitor = Cobol_parser.PTree_visitor.fold_compilation_group (object
     inherit [folding_range list] Cobol_parser.PTree_visitor.folder
 
-    method! fold_program_unit' {loc; _} acc =
-      Visitor.do_children @@
-        add_folding_range_of_loc loc acc
+    method! fold_program_unit' = add_node
+    method! fold_data_division' = add_node
+    method! fold_procedure_division' = add_node
+    method! fold_statement' = add_node
 
-    method! fold_procedure_division' {loc; _} acc =
-      Visitor.skip_children @@
-        add_folding_range_of_loc loc acc
+    (*TODO:
+      - add location for some nodes in the ast
+        so that we can define folding_range for
+        environment division, file section... (predefined section)
 
-    method! fold_data_division' {loc; _} acc =
-      Visitor.skip_children @@
-        add_folding_range_of_loc loc acc
+      - it is possible to add folding_range for
+        - branch of statement(else_branch, evaluate_branch...)
+        - handler(on_size_error)
+        - inline_call
 
-    (*TODO: add location for some nodes in the ast
-            so we can define folding_range for
-            environment division, file section... (predefined section)*)
-    (* method! fold_environment_division' {loc; _} acc =
-      Visitor.skip_children @@
-        let folding_range = folding_range_of_loc loc in
-        add_folding_range folding_range acc *)
+      - add folding_range for other type of compilation_unit (not program) *)
+
   end) in
   visitor ast []
 
@@ -98,7 +100,7 @@ let folding_range_paragraph ast =
 
 
 (*TODO:
-  Now we use the result of Cobol_typeck (need to be rewritten),
+  Now we use the type Group.t (need to be rewritten),
   which does not work for renames-item, condition-item ... *)
 let folding_range_data ({cu_wss; _}:Cobol_data.Types.compilation_unit) =
   let update r group_range =
@@ -135,13 +137,12 @@ let folding_range_data ({cu_wss; _}:Cobol_data.Types.compilation_unit) =
         let r', l = add group l in
         update r' r, l
   in
-  Pretty.error "%a @." Cobol_data.Group.pp_data_group_list cu_wss;
   List.fold_left
     (fun acc group -> snd @@ add group acc) [] cu_wss
 
 
 let folding_range Lsp_document.TYPES.{ast; cus; _ }=
-  folding_range_paragraph ast @ folding_range_division ast @
+  folding_range_paragraph ast @ folding_range_simple ast @
   ( Cobol_data.Compilation_unit.SET.to_seq cus
     |> Seq.map (fun cu -> folding_range_data cu)
     |> List.of_seq
