@@ -131,7 +131,7 @@
         }
     ]
   },
-  "main": "./dist/superbol_vscode_extension.bc.js",
+  "main": "./dist/superbol_vscode_platform.bc.js",
   "scripts": {
     "compile": "make compile",
     "package": "vsce package --out superbol-vscode-platform.vsix --yarn",

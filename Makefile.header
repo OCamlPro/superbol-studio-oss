@@ -1,4 +1,4 @@
-PROJECT=superbol_vscode_extension
+PROJECT=superbol_vscode_platform
 SRCDIR=src/superbol-vscode-platform
 
 compile:
