@@ -133,9 +133,9 @@ let copy_replacing_text_identifier :=
       and rpar = Text.pseudoword_of_string (")" &@<- _rpar) in
       c @ [lpar] @ cl @ [rpar] }
 
-let leading_or_trailing :=
-  | LEADING;  { Cobol_common.Srcloc.Leading }
-  | TRAILING; { Cobol_common.Srcloc.Trailing }
+let leading_or_trailing ==
+  | LEADING;  { Preproc.Leading }
+  | TRAILING; { Preproc.Trailing }
 
 (* --- REPLACE -------------------------------------------------------------- *)
 

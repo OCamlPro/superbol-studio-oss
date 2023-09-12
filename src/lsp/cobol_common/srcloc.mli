@@ -14,13 +14,14 @@
 module TYPES: sig
   type lexloc = Lexing.position * Lexing.position
   type srcloc
-  type 'a with_loc = { payload: 'a; loc: srcloc; }
-  [@@deriving ord]
+  type copylocs
+  type 'a with_loc = { payload: 'a; loc: srcloc; }                [@@deriving ord]
 end
 type lexloc = TYPES.lexloc
 type srcloc = TYPES.srcloc
+type copylocs = TYPES.copylocs
 type 'a with_loc = 'a TYPES.with_loc =
-  { payload: 'a; loc: srcloc; } [@@deriving ord]
+  { payload: 'a; loc: srcloc; }                                  [@@deriving ord]
 
 module INFIX: sig
   (* Meaning of letters:
@@ -107,12 +108,6 @@ val concat_locs: _ with_loc list -> srcloc option
 val concat_strings_with_loc: string with_loc -> string with_loc -> string with_loc
 val copy_from: filename:string -> copyloc:srcloc -> 'a with_loc -> 'a with_loc
 
-module COPYLOCS: sig
-  type t
-  val none: t
-  val append: copyloc:srcloc -> string -> t -> t
-  val mem: string -> t -> bool
-end
-
-type leading_or_trailing = Leading | Trailing
-[@@deriving show, ord]
+val no_copy: copylocs
+val new_copy: copyloc:srcloc -> string -> copylocs -> copylocs
+val mem_copy: string -> copylocs -> bool

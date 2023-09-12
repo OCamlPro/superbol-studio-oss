@@ -446,8 +446,8 @@ module Make (Config: Cobol_config.T) = struct
         Only res, all_diags ps
     | Eidetic ->
         let tokens = Tokzr.parsed_tokens ps.preproc.tokzr
-        and rev_log = Cobol_preproc.rev_log ps.preproc.pp in
-        WithTokens (res, tokens, rev_log), all_diags ps
+        and log = Cobol_preproc.log ps.preproc.pp in
+        WithTokens (res, tokens, log), all_diags ps
 
 end
 

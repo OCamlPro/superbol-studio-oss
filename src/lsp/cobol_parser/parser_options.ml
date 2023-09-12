@@ -34,7 +34,7 @@ type tokens_with_locs = Grammar_tokens.token with_loc list
 type ('a, 'm) output =
   | Only: 'a ->
       ('a, Cobol_common.Behaviors.amnesic) output
-  | WithTokens: 'a * tokens_with_locs Lazy.t * Cobol_preproc.rev_log ->
+  | WithTokens: 'a * tokens_with_locs Lazy.t * Cobol_preproc.log ->
       ('a, Cobol_common.Behaviors.eidetic) output
 
 type ('a, 'm) parsed_result =

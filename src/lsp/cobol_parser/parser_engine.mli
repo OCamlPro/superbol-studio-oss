@@ -30,4 +30,4 @@ val parse_with_tokens: Cobol_common.Behaviors.eidetic parsing_function
 val parsed_tokens
   : (_, Cobol_common.Behaviors.eidetic) parsed_result -> tokens_with_locs Lazy.t
 val preproc_rev_log
-  : (_, Cobol_common.Behaviors.eidetic) parsed_result -> Cobol_preproc.rev_log
+  : (_, Cobol_common.Behaviors.eidetic) parsed_result -> Cobol_preproc.log

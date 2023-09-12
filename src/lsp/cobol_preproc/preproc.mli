@@ -54,20 +54,14 @@ and library =
 and fileloc = [`Word | `Alphanum] * string
 and replacing
 
-type log_entry =
-  {
-    matched_loc: srcloc;
-    replacement_text: text;
-  }
-type log = log_entry list
-
 type (_, _) repl_attempt =
   | OnPartText: ([`NoReplacement | `MissingText],
                  partial_text_repl_result) repl_attempt
   | OnFullText: ([`NoReplacement],
-                 text * log) repl_attempt
+                 text * Preproc_trace.log) repl_attempt
 and partial_text_repl_result =
-  (text * log, [`MissingText of text * log * text]) result
+  (text * Preproc_trace.log,
+   [`MissingText of text * Preproc_trace.log * text]) result
 
 module type ENTRY_POINTS = sig
   type 'x entry
@@ -90,9 +84,11 @@ end
 
 type partial_replacing =
   {
-    repl_dir: Cobol_common.Srcloc.leading_or_trailing;
+    repl_dir: replacing_direction;
     repl_strict: bool;
   }
+and replacing_direction = Leading | Trailing
+
 val replacing
   : ?partial:partial_replacing
   -> pseudotext with_loc
@@ -101,7 +97,7 @@ val replacing
 val apply_replacing
   : (_, 'a) repl_attempt
   -> replacing with_loc list
-  -> log
+  -> Preproc_trace.log
   -> text
   -> 'a
 

@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
@@ -36,22 +36,12 @@ let decide_source_format _input
 
 (* --- *)
 
-type log = log_entry list
-and rev_log = log
-and log_entry = Preproc.log_entry =
-  {
-    matched_loc: Cobol_common.Srcloc.srcloc;
-    replacement_text: Text.text;
-  }
-
-(* --- *)
-
 type preprocessor =
   {
     buff: Text.text;
     srclex: Preproc.any_srclexer;
     ppstate: Preproc.state;
-    pplog: Preproc.log;
+    pplog: Preproc_trace.log;
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
   }
@@ -62,7 +52,7 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     config: Cobol_config.t;
     replacing: Preproc.replacing with_loc list list;
-    copybooks: COPYLOCS.t;                                (* opened copybooks *)
+    copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -72,19 +62,21 @@ let diags { diags; srclex; _ } =
   DIAGS.Set.union diags @@ Preproc.srclex_diags srclex
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
-let log { pplog; _ } = List.rev pplog
-let rev_log { pplog; _ } = pplog
+let log { pplog; _ } = (* List.rev *) pplog
+(* let rev_log { pplog; _ } = pplog *)
 let srclexer { srclex; _ } = srclex
 let position { srclex; _ } = Preproc.srclex_pos srclex
 
 let with_srclex lp srclex =
   if lp.srclex == srclex then lp else { lp with srclex }
-let with_diags lp diags =
-  if lp.diags == diags then lp else { lp with diags }
+(* let with_diags lp diags = *)
+(*   if lp.diags == diags then lp else { lp with diags } *)
 let with_buff lp buff =
   if lp.buff == buff then lp else { lp with buff }
 let with_pplog lp pplog =
   if lp.pplog == pplog then lp else { lp with pplog }
+let with_diags_n_pplog lp diags pplog =
+  if lp.diags == diags && lp.pplog == pplog then lp else { lp with diags; pplog }
 let with_buff_n_pplog lp buff pplog =
   if lp.buff == buff && lp.pplog == pplog then lp else { lp with buff; pplog }
 let with_replacing lp replacing =
@@ -121,15 +113,15 @@ let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
         buff = [];
         srclex = make_srclex ~on_period_only ~source_format input;
         ppstate = Preproc.initial_state;
-        pplog = [];
-        diags = diags;
+        pplog = Preproc_trace.empty;
+        diags;
         persist =
           {
             pparser = (module Pp);
             overlay_manager = (module Om);
             config = (module Config);
             replacing = [];
-            copybooks = COPYLOCS.none;
+            copybooks = Cobol_common.Srcloc.no_copy;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -144,7 +136,8 @@ let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
         persist =
           {
             persist with
-            copybooks = COPYLOCS.append ~copyloc copybook persist.copybooks;
+            copybooks =
+              Cobol_common.Srcloc.new_copy ~copyloc copybook persist.copybooks;
             verbose = persist.verbose || verbose;
           };
       }
@@ -306,28 +299,30 @@ and do_replace lp rev_prefix repl suffix =
   `ReplaceDone (lp, prefix, suffix)
 
 
-and read_lib ({ diags; persist = { libpath; copybooks; verbose; _ }; _ } as lp)
+and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
     loc { libname; cbkname } =
   let libpath = match ~&?cbkname with None -> libpath | Some (_, d) -> [d] in
-  let text, diags = match Copybook.find_lib ~libpath ~&libname with
-    | Ok filename when COPYLOCS.mem filename copybooks ->
+  let text, diags, pplog = match Copybook.find_lib ~libpath ~&libname with
+    | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         (* TODO: `note addendum *)
         [],
-        DIAGS.Acc.error diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename
+        DIAGS.Acc.error lp.diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename,
+        Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
     | Ok filename ->
         if verbose then
           Pretty.error "Reading library `%s'@." filename;
-        let text, pp' =
-          full_text
+        let text, lp =             (* note: [lp] holds all prev and new diags *)
+          full_text                (* likewise for pplog *)
             (preprocessor (Filename filename) (`Fork (lp, loc, filename)))
             ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
         in
-        text, pp'.diags
+        text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
         [],
-        Copybook.lib_not_found_error (DIAGS.Acc.error diags ~loc "%t") lnf
+        Copybook.lib_not_found_error (DIAGS.Acc.error lp.diags ~loc "%t") lnf,
+        Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
   in
-  text, with_diags lp diags
+  text, with_diags_n_pplog lp diags pplog
 
 and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   let eofp p = ~&p = Text.Eof in

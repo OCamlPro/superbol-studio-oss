@@ -57,6 +57,9 @@ module TYPES = struct
   (* ... but forbids other cats directly on its right. *)
   and right_ = [raw_|cpy_|rpl_]
 
+  (** Sets of copied libraries *)
+  type copylocs = copyloc list
+
   (** Values attached with a source location. *)
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
   [@@ deriving ord]
@@ -644,23 +647,6 @@ let copy_from ~filename ~copyloc { payload; loc } =
 
 (* --- *)
 
-module COPYLOCS = struct
-  (** Helper to record and format chains of copied libraries. *)
-
-  type t = copyloc list                                           (* reversed *)
-
-  let none: t = []
-  let append ~copyloc filename : t -> t = List.cons { filename; copyloc }
-  let mem: string -> t -> bool = fun f ->
-    List.exists (fun { filename; _ } -> filename = f)
-
-end
-
-(* TODO: move me to a better place. This type declaration has to be
-   shared by Common_ast and Common_preproc *)
-(* NB: not necessarily.  One refers to pre-processing concept, the other to the
-   semantics of some COBOL statements like INSPECT or EXAMINE. *)
-type leading_or_trailing =
-  | Leading
-  | Trailing
-[@@deriving show, ord]
+let no_copy: copylocs = []
+let new_copy ~copyloc filename = List.cons { filename; copyloc }
+let mem_copy f  = List.exists (fun { filename; _ } -> filename = f)

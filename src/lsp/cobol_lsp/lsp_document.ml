@@ -25,7 +25,7 @@ module TYPES = struct
       project: Lsp_project.t;
       textdoc: Lsp.Text_document.t;
       copybook: bool;
-      pplog: Cobol_preproc.rev_log;
+      pplog: Cobol_preproc.log;
       tokens: Cobol_parser.tokens_with_locs Lazy.t;
       parsed: parsed_data option;
       (* Used for caching, when loading a cache file as the file is not reparsed,
@@ -52,7 +52,7 @@ module TYPES = struct
       doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
       doc_cache_langid: string;
       doc_cache_version: int;
-      doc_cache_pplog: Cobol_preproc.rev_log;
+      doc_cache_pplog: Cobol_preproc.log;
       doc_cache_tokens: Cobol_parser.tokens_with_locs;
       doc_cache_parsed: (PTREE.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
@@ -103,7 +103,7 @@ let lazy_references ast cus defs =
 let analyze ({ project; textdoc; copybook; _ } as doc) =
   let pplog, tokens, (parsed, diags) =
     if copybook then
-      [], lazy [], (None, DIAGS.Set.none)
+      Cobol_preproc.Trace.empty, lazy [], (None, DIAGS.Set.none)
     else
       let ptree = parse ~project textdoc in
       Cobol_parser.preproc_rev_log ptree,
@@ -129,7 +129,7 @@ let blank ~project ?copybook textdoc =
   {
     project;
     textdoc;
-    pplog = [];
+    pplog = Cobol_preproc.Trace.empty;
     tokens = lazy [];
     diags = DIAGS.Set.none;
     parsed = None;

@@ -233,36 +233,36 @@ let handle_semantic_tokens_full registry (params: SemanticTokensParams.t) =
 
 let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
-  let find_hovered_replacement pplog =
-    List.find_opt begin fun Cobol_preproc.{ matched_loc; _ } ->
-      Lsp_position.is_in_lexloc params.position
-        (Cobol_common.Srcloc.lexloc_in ~filename matched_loc)
-    end pplog
+  let find_hovered_pplog_event pplog =
+    List.find_opt begin function
+      | Cobol_preproc.Replacement { matched_loc = loc; _ }
+      | Cobol_preproc.FileCopy { copyloc = loc; _ } ->
+          Lsp_position.is_in_lexloc params.position
+            (Cobol_common.Srcloc.lexloc_in ~filename loc)
+    end (Cobol_preproc.Trace.events pplog)
   in
   let hover_markdown ~loc value =
     let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
     let range = Lsp_position.range_of_srcloc_in ~filename loc in
     Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
-  try_with_document_data registry params.textDocument
-    ~f:begin fun ~project ~textdoc:_ ~pplog ~tokens:_ { ast; _ } ->
-      match Lsp_lookup.copy_at_pos ~filename params.position ast with
-      | Some { payload = lib; loc } ->
-          let text = EzFile.read_file lib in
-          (* TODO: grab source-format from preprocessor state? *)
-          let module Config = (val project.cobol_config) in
-          let mdlang = match Config.format#value with
-            | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
-            | SF _ | Auto -> "cobol"
-          in
-          Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
-      | None ->
-          match find_hovered_replacement pplog with
-          | None -> None
-          | Some Cobol_preproc.{ matched_loc = loc; replacement_text; _ } ->
-              Pretty.string_to (hover_markdown ~loc) "``@[<h>%a@]``"
-                Cobol_preproc.Text.pp_text replacement_text
-    end
+  let Lsp_document.{ project; pplog; _ } =
+    Lsp_server.find_document params.textDocument registry in
+  match find_hovered_pplog_event pplog with
+  | Some Replacement { matched_loc = loc; replacement_text; _ } ->
+      Pretty.string_to (hover_markdown ~loc) "``@[<h>%a@]``"
+        Cobol_preproc.Text.pp_text replacement_text
+  | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
+      let text = EzFile.read_file lib in
+      (* TODO: grab source-format from preprocessor state? *)
+      let module Config = (val project.cobol_config) in
+      let mdlang = match Config.format#value with
+        | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
+        | SF _ | Auto -> "cobol"
+      in
+      Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
+  | Some FileCopy { status = MissingCopy _; _ } | None ->
+      None
 
 let handle_completion registry (params:CompletionParams.t) =
   let open Lsp_completion in
