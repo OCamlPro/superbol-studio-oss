@@ -1,0 +1,7 @@
+{1 Program superbol}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package is the main driver of [superbol].
+

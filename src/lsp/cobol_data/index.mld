@@ -1,0 +1,10 @@
+{1 Library cobol_data}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package contains data structures for reprensenting COBOL programs and values, as well as some
+logic on the COBOL data items and values such ast {!Cobol_data.Picture} or {!Cobol_data.Types}.
+
+The entry point of this library is the module: {!Cobol_data}.
+

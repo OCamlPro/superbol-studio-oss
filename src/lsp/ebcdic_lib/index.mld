@@ -1,0 +1,11 @@
+{1 Library ebcdic_lib}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package contains functions to translate EBCDIC characters to ASCII characters and ASCII characters
+to EBCDIC characters.
+
+This library exposes the following toplevel modules:
+{!modules:Ebcdic}
+

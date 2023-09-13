@@ -1,0 +1,9 @@
+{1 Library cobol_ast}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This library contains the abstract version of the AST, to be specialized in other packages.
+
+The entry point of this library is the module: {!Cobol_ast}.
+

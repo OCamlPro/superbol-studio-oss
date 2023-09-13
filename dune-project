@@ -7,6 +7,7 @@
 (generate_opam_files false)
 (version 0.1.0)
 (formatting (enabled_for ocaml reason))
+(using menhir 2.0)
 
 (package
  (name superbol-vscode-platform)
@@ -191,6 +192,241 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name superbol-free)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (superbol_free_lib (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name superbol_free_lib)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ez_file ( >= 0.3 ))
+   (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_typeck (= version))
+   (cobol_parser (= version))
+   (cobol_lsp (= version))
+   (cobol_indent (= version))
+   (cobol_common (= version))
+   (cobol_ast (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_common)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (pretty (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_parser)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppx_deriving ( >= 5.2.1 ))
+   (menhir ( >= 1.2 ))
+   (ez_file ( >= 0.3 ))
+   (ebcdic_lib (= version))
+   (cobol_preproc (= version))
+   (cobol_common (= version))
+   (cobol_ast (= version))
+   (menhir ( = 20220210 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name ebcdic_lib)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_lsp)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (toml (and (>= 7.1.0) (< 8.0.0)))
+   (pretty (= version))
+   (lsp (and ( >= 1.15 )( < 1.16 )))
+   (jsonrpc ( >= 1.15 ))
+   (cobol_typeck (= version))
+   (cobol_parser (= version))
+   (cobol_indent (= version))
+   (cobol_data (= version))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name ppx_cobcflags)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppxlib ( >= 0.15 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name pretty)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (fmt ( >= 0.9 ))
+   (ez_file ( >= 0.3 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_config)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (pretty (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   (menhir ( >= 1.2 ))
+   (cobol_common (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_ast)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppx_deriving ( >= 5.2.1 ))
+   (cobol_common (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_indent)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (fmt ( >= 0.9 ))
+   (cobol_preproc (= version))
+   (cobol_common (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_preproc)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppx_deriving ( >= 5.2.1 ))
+   (menhir ( >= 1.2 ))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_data)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppx_deriving ( >= 5.2.1 ))
+   (cobol_parser (= version))
+   (cobol_ast (= version))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_typeck)
+ (synopsis "The superbol-vscode-platform project")
+ (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (depends
+   (ocaml (>= 4.13.0))
+   (ppx_deriving ( >= 5.2.1 ))
+   (cobol_parser (= version))
+   (cobol_data (= version))
+   (cobol_common (= version))
+   (cobol_ast (= version))
    ppx_inline_test
    ppx_expect
    odoc

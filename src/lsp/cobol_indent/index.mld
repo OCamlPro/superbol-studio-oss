@@ -1,0 +1,9 @@
+{1 Library cobol_indent}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+
+
+The entry point of this library is the module: {!Cobol_indent}.
+
