@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LSP Server &mdash; superbol master
+ (83db76b
+) (2023/09/14 13:27) documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> superbol
+          </a>
+              <div class="version">
+                master
+ (83db76b
+)
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform/doc">API doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-platform">Devel and Issues on Github</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">superbol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>LSP Server</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lsp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lsp-server">
+<h1>LSP Server<a class="headerlink" href="#lsp-server" title="Permalink to this headline"></a></h1>
+<p><em>Superbol</em> provides an LSP server for COBOL. Every dialect supported by superbol is supported by the LSP server.</p>
+<p>The server operates on the notion of <em>projects</em>, that bundle COBOL source files within a <em>root directory</em>, along with a configuration.</p>
+<section id="project-layout">
+<h2>Project layout<a class="headerlink" href="#project-layout" title="Permalink to this headline"></a></h2>
+<p>A project layout associates a configuration given in a file named <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> that is located at the root of the project, with a set of files that contain COBOL source code.  A typical structure for a project may look as follows:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project
+├── superbol.toml
+├── src
+│  └── prog1.cob
+│  └── prog2.cob
+│  └── ...
+└── COPY
+   └── copy1.cpy
+   └── copy2.cpy
+   └── ...
+</pre></div>
+</div>
+<p>When a user opens any file that contains COBOL source code, the LSP server looks for the closest parent directory <code class="file docutils literal notranslate"><span class="pre">dir</span></code> that directly contains a configuration file <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code>, and sets <code class="file docutils literal notranslate"><span class="pre">dir</span></code> as the root project directory for that file.  If no configuration file is found, the project’s root is defined as the directory that directly contains the opened file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note that files from distinct projects may be edited all at once via the same LSP server.</p>
+</div>
+</section>
+<section id="project-configuration">
+<h2>Project configuration<a class="headerlink" href="#project-configuration" title="Permalink to this headline"></a></h2>
+<p>The <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> at the root of a project is a <a class="reference external" href="https://toml.io/">TOML</a> file that defines the following configuration fields for the project:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">dialect</span></code>: Sets the dialect for your project.  Possible values are:</p>
+<ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> (default if not provided)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;COBOL85&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;GnuCOBOL&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;MicroFocus&quot;</span></code> or <code class="code docutils literal notranslate"><span class="pre">&quot;MF&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;ACU&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;GCOS&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;IBM&quot;</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">strict</span></code>: Whether to use the strict configuration for the dialect (default is <code class="code docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">source-format</span></code>: Select a specific COBOL source format. Possible values are:</p>
+<ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Auto&quot;</span></code> (default)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Free&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Fixed&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Variable&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;XOpen&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;xCard&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;CRT&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Terminal&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;COBOLX&quot;</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">copybook</span></code>: This array is to be filled with all the directories where copybooks are located.  It only contains the current working directory by default.  Each element of the array must have a <code class="code docutils literal notranslate"><span class="pre">dir</span></code> field.  This field may contain the name of a directory that is either:
+1. relative to the project root; or
+2. relative to the directory that contains the COBOL source file that defines the compilation group (when the associated Boolean field <code class="code docutils literal notranslate"><span class="pre">file-relative</span></code> holds).</p></li>
+</ul>
+<p>Every value given as a string for a configuration field is case insensitive, except when it describes a file or directory name.</p>
+<section id="example-configuration">
+<h3>Example configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline"></a></h3>
+<p>Consider the following project layout:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project
+├── superbol.toml
+├── GLOBAL_COPYBOOKS
+│  └── global.cpy
+└── src
+   ├── prog1
+   │  ├── LOCAL_COPYBOOKS
+   │  │  └── local.cpy
+   │  └── prog1.cob
+   └── prog2
+      ├── LOCAL_COPYBOOKS
+      │  └── local.cpy
+      └── prog2.cob
+</pre></div>
+</div>
+<p>Then you can provide the following configuration file:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GCOS&quot;</span><span class="w"></span>
+<span class="n">strict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w"></span>
+<span class="n">source-format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;COBOLX&quot;</span><span class="w"></span>
+
+<span class="k">[[copybook]]</span><span class="w"></span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GLOBAL_COPYBOOKS&quot;</span><span class="w"></span>
+
+<span class="k">[[copybook]]</span><span class="w"></span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;LOCAL_COPYBOOKS&quot;</span><span class="w"></span>
+<span class="n">file-relative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<p>All COBOL code in this project will be considered in GCOS dialect and written in COBOLX source format.</p>
+<p>In addition, the copybook <code class="file docutils literal notranslate"><span class="pre">global.cpy</span></code> can be used by any source file from this project.
+Furthermore, a <code class="code docutils literal notranslate"><span class="pre">COPY</span> <span class="pre">&quot;local.cpy&quot;</span></code> in <code class="file docutils literal notranslate"><span class="pre">prog1.cob</span></code> will include the copybook <code class="file docutils literal notranslate"><span class="pre">src/prog1/LOCAL_COPYBOOKS/local.copy</span></code> (and respectively for <code class="file docutils literal notranslate"><span class="pre">prog2.cob</span></code> and <code class="file docutils literal notranslate"><span class="pre">src/prog2/LOCAL_COPYBOOKS/local.copy</span></code>).</p>
+</section>
+</section>
+<section id="server-capabilities">
+<h2>Server capabilities<a class="headerlink" href="#server-capabilities" title="Permalink to this headline"></a></h2>
+<p>This is a list of all the capabilities the server has, to see how they are used in VSCode, you
+can check the <code class="code docutils literal notranslate"><span class="pre">Superbol</span></code> extension documentation <a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-extension/sphinx/features.html">here</a>.</p>
+<section id="go-to-definition">
+<h3>Go to definition<a class="headerlink" href="#go-to-definition" title="Permalink to this headline"></a></h3>
+<p>The server handles the <code class="code docutils literal notranslate"><span class="pre">textDocument/definition</span></code> request, and can find definition of any
+data item in your code.</p>
+</section>
+<section id="find-references">
+<h3>Find references<a class="headerlink" href="#find-references" title="Permalink to this headline"></a></h3>
+<p>The server can list all the references to a data item in your code with the <code class="code docutils literal notranslate"><span class="pre">textDocument/references</span></code>
+request</p>
+</section>
+<section id="code-formatting">
+<h3>Code formatting<a class="headerlink" href="#code-formatting" title="Permalink to this headline"></a></h3>
+<p>The server provides a formatter both for the full file or for a selection range. This formatter handles
+the <code class="code docutils literal notranslate"><span class="pre">FIXED</span></code> and <code class="code docutils literal notranslate"><span class="pre">FREE</span></code> format.</p>
+</section>
+<section id="hover">
+<h3>Hover<a class="headerlink" href="#hover" title="Permalink to this headline"></a></h3>
+<p>The server provides a way to peek into copybooks via the <code class="code docutils literal notranslate"><span class="pre">textDocument/hover</span></code> request (more
+hovering features to come)</p>
+</section>
+<section id="semantic-tokens">
+<h3>Semantic tokens<a class="headerlink" href="#semantic-tokens" title="Permalink to this headline"></a></h3>
+<p>The server can provide semantic tokens data via the <code class="code docutils literal notranslate"><span class="pre">textDocument/semanticTokens/full</span></code> request.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright OCamlPro SAS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

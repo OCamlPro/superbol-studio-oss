@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Superbol VSCode Debug &mdash; superbol master
+ (83db76b
+) (2023/09/14 13:27) documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> superbol
+          </a>
+              <div class="version">
+                master
+ (83db76b
+)
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform/doc">API doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-platform">Devel and Issues on Github</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">superbol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Superbol VSCode Debug</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/debug.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="superbol-vscode-debug">
+<h1>Superbol VSCode Debug<a class="headerlink" href="#superbol-vscode-debug" title="Permalink to this headline"></a></h1>
+<p>This extension is used debug and check coverage of your COBOL code. It must be used with <code class="code docutils literal notranslate"><span class="pre">Superbol</span> <span class="pre">VSCode</span> <span class="pre">Platform</span></code>
+to recognize the <code class="code docutils literal notranslate"><span class="pre">COBOL</span></code> files.</p>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline"></a></h2>
+<p>If you do not already have a configuration, go to the <code class="code docutils literal notranslate"><span class="pre">Run</span> <span class="pre">and</span> <span class="pre">Debug</span></code> pane (<code class="code docutils literal notranslate"><span class="pre">Ctrl</span> <span class="pre">+</span> <span class="pre">Shift</span> <span class="pre">+</span> <span class="pre">D</span></code>),</p>
+<p>Click on <code class="code docutils literal notranslate"><span class="pre">Show</span> <span class="pre">all</span> <span class="pre">automatic</span> <span class="pre">debug</span> <span class="pre">configurations</span></code> and select <code class="code docutils literal notranslate"><span class="pre">Add</span> <span class="pre">configuration...</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">COBOL</span> <span class="pre">Debugger</span></code>.</p>
+<p>This will add the necessary configurations to your <code class="code docutils literal notranslate"><span class="pre">launch.json</span></code> file (or create it if needed).</p>
+<p>Once you have your debugging configuration (see <a class="reference internal" href="#configuration"><span class="std std-ref">Debugging configurations</span></a>), you can launch debugging
+by pressing <code class="code docutils literal notranslate"><span class="pre">F5</span></code> while being in the COBOL file you wish to debug.</p>
+<p>TODO: screenshots.</p>
+</section>
+<section id="extension-settings">
+<h2>Extension settings<a class="headerlink" href="#extension-settings" title="Permalink to this headline"></a></h2>
+<p>These settings are to be modified by going to <code class="code docutils literal notranslate"><span class="pre">File</span></code> &gt; <code class="code docutils literal notranslate"><span class="pre">Preferences</span></code> &gt; <code class="code docutils literal notranslate"><span class="pre">Settings</span></code></p>
+<p>Then select the <code class="code docutils literal notranslate"><span class="pre">Extensions</span></code> submenu and select <code class="code docutils literal notranslate"><span class="pre">Superbol</span> <span class="pre">Debugger</span></code>.</p>
+<section id="cobcpath-1">
+<h3><code class="code docutils literal notranslate"><span class="pre">cobcpath</span></code> <a class="footnote-reference brackets" href="#id5" id="id1">1</a><a class="headerlink" href="#cobcpath-1" title="Permalink to this headline"></a></h3>
+<p>This is the path to the <code class="code docutils literal notranslate"><span class="pre">cobc</span></code> executable, which will be used to build your application.</p>
+<p>Default is <code class="code docutils literal notranslate"><span class="pre">cobc</span></code>.</p>
+</section>
+<section id="gdbpath">
+<h3><code class="code docutils literal notranslate"><span class="pre">gdbpath</span></code><a class="headerlink" href="#gdbpath" title="Permalink to this headline"></a></h3>
+<p>This is the path to the <code class="code docutils literal notranslate"><span class="pre">gdb</span></code> executable, which will be used to launch the debugger.</p>
+<p>Default is <code class="code docutils literal notranslate"><span class="pre">gdb</span></code>.</p>
+</section>
+<section id="target">
+<h3><code class="code docutils literal notranslate"><span class="pre">target</span></code><a class="headerlink" href="#target" title="Permalink to this headline"></a></h3>
+<p>This is the path to your source code, it is relative to the VSCode workspace (or it can
+be an absolute path). This will be overriden by the <code class="code docutils literal notranslate"><span class="pre">target</span></code> field in the debugging
+configurations if specified (cf. next section).</p>
+<p>Default is <code class="code docutils literal notranslate"><span class="pre">${file}</span></code>.</p>
+</section>
+<section id="cwd">
+<h3><code class="code docutils literal notranslate"><span class="pre">cwd</span></code><a class="headerlink" href="#cwd" title="Permalink to this headline"></a></h3>
+<p>This is the root directory of your project. This will be overriden by the <code class="code docutils literal notranslate"><span class="pre">cwd</span></code> field in
+the debugging configurations if specified (cf. next section).</p>
+<p>Default is <code class="code docutils literal notranslate"><span class="pre">${workspaceRoot}</span></code>.</p>
+</section>
+<section id="display-variable-attributes">
+<h3><code class="code docutils literal notranslate"><span class="pre">display_variable_attributes</span></code><a class="headerlink" href="#display-variable-attributes" title="Permalink to this headline"></a></h3>
+<p>Set this to <code class="code docutils literal notranslate"><span class="pre">true</span></code> if you want to display data storages and fields attributes (e.g. size of
+alphanumerics or digits and scale of numerics).</p>
+<p>Default is <code class="code docutils literal notranslate"><span class="pre">false</span></code>.</p>
+</section>
+</section>
+<section id="debugging-configurations">
+<span id="configuration"></span><h2>Debugging configurations<a class="headerlink" href="#debugging-configurations" title="Permalink to this headline"></a></h2>
+<p>These configurations are to be added in your <code class="code docutils literal notranslate"><span class="pre">.vscode/launch.json</span></code> file. There are two
+types of configurations: <code class="code docutils literal notranslate"><span class="pre">launch</span></code> and <code class="code docutils literal notranslate"><span class="pre">attach</span></code>.
+Attach can be <code class="code docutils literal notranslate"><span class="pre">local</span></code> or <code class="code docutils literal notranslate"><span class="pre">remote</span></code>.</p>
+<section id="launch-configuration">
+<span id="launch"></span><h3><code class="code docutils literal notranslate"><span class="pre">launch</span></code> Configuration<a class="headerlink" href="#launch-configuration" title="Permalink to this headline"></a></h3>
+<p>This configuration is used to launch the compiled program with the debugger. This configuration
+has the following defaults:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Superbol debugger&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${file}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceRoot}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;gdbpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cobcpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cobc&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cobcargs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">     </span><span class="s2">&quot;-free&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="s2">&quot;-x&quot;</span><span class="w"></span>
+<span class="w">   </span><span class="p">],</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;coverage&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;verbose&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The minimal configuration is as follow (all missing elements are either using the extension
+settings value if they exists or the default value given just above):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Superbol debugger&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The items of the configuration have the following effects:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">target</span></code>: changes the target to be executed with the debugger;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">arguments</span></code>: the arguments that the debugger will pass to the target;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cwd</span></code>: the path to the project root;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">gdbpath</span></code>: the path to the <code class="code docutils literal notranslate"><span class="pre">gdb</span></code> executable;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cobcpath</span></code>: the path to the <code class="code docutils literal notranslate"><span class="pre">cobc</span></code> executable <a class="footnote-reference brackets" href="#id5" id="id2">1</a>;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">cobcargs</span></code>: the arguments to pass to <code class="code docutils literal notranslate"><span class="pre">cobc</span></code> <a class="footnote-reference brackets" href="#id5" id="id3">1</a>;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">group</span></code>: other files in the compilation group (other than <code class="code docutils literal notranslate"><span class="pre">target</span></code>) <a class="footnote-reference brackets" href="#id5" id="id4">1</a>;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">env</span></code>: an object containing environment variables</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">coverage</span></code>: weither to show the coverage of the debugged file;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">verbose</span></code>: show the debugger output in the <code class="code docutils literal notranslate"><span class="pre">Debug</span> <span class="pre">Console</span></code> view (for debugging only).</p></li>
+</ul>
+</section>
+<section id="attach-configuration">
+<h3><code class="code docutils literal notranslate"><span class="pre">attach</span></code> Configuration<a class="headerlink" href="#attach-configuration" title="Permalink to this headline"></a></h3>
+<p>The default configuration is as follow:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Superbol debugger&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;request&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;launch&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;target&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${file}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;arguments&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cwd&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;${workspaceRoot}&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;gdbpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gdb&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cobcpath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cobc&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;cobcargs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">     </span><span class="s2">&quot;-free&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="s2">&quot;-x&quot;</span><span class="w"></span>
+<span class="w">   </span><span class="p">],</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;env&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;coverage&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;verbose&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;pid&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"></span>
+<span class="w">   </span><span class="nt">&quot;remoteDebugger&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>However this configuration will not work, as either <code class="code docutils literal notranslate"><span class="pre">pid</span></code> or <code class="code docutils literal notranslate"><span class="pre">remoteDebugger</span></code> must
+have a value. All other values have the same usage as in <a class="reference internal" href="#launch"><span class="std std-ref">launch Configuration</span></a>.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">pid</span></code>: The id of the process to attach to in a local attach configuration;</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">remoteDebugger</span></code>: The address of the <code class="code docutils literal notranslate"><span class="pre">gdb</span></code> server to attach to, with format <code class="code docutils literal notranslate"><span class="pre">host:port</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="coverage">
+<h2>Coverage<a class="headerlink" href="#coverage" title="Permalink to this headline"></a></h2>
+<p>If you are running the debugger with a <code class="code docutils literal notranslate"><span class="pre">launch</span></code> request and set <code class="code docutils literal notranslate"><span class="pre">coverage</span></code> to <code class="code docutils literal notranslate"><span class="pre">true</span></code>,
+then once the debugger has stopped running, you will see the coverage status of every line in the
+<code class="code docutils literal notranslate"><span class="pre">PROCEDURE</span> <span class="pre">DIVISION</span></code>.</p>
+<p>A red line signifies that the line is never runned.</p>
+<p>A green line signifies that the line is runned.</p>
+<hr class="docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>,<a href="#id3">3</a>,<a href="#id4">4</a>)</span></dt>
+<dd><p>These options are to be removed to use the <code class="code docutils literal notranslate"><span class="pre">Superbol</span> <span class="pre">VSCode</span> <span class="pre">Platform</span></code> build tasks.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright OCamlPro SAS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
