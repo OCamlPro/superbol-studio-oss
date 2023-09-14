@@ -1,0 +1,9 @@
+(executable
+ (name gen_context)
+ (modules Gen_context)
+ (libraries unix fmt menhirSdk))
+
+(executable
+  (name gen_contexts)
+  (modules Gen_contexts)
+  (libraries unix fmt menhirSdk))

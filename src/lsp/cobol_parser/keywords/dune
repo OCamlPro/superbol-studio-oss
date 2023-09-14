@@ -1,0 +1,3 @@
+(executable
+ (name gen_keywords)
+ (libraries unix fmt menhirSdk))

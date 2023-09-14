@@ -1,0 +1,10 @@
+{1 Library pretty}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This library defines various types and functions for pretty printing. It is a slightly abstracted
+version of {!fmt} with renamed bindings.
+
+The entry point of this library is the module: {!Pretty}.
+

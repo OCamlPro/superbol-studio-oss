@@ -8,6 +8,7 @@
 /vscode-json
 /vscode-debugadapter
 /vscode-debugprotocol
+/superbol-free
 *~
 _build
 .merlin

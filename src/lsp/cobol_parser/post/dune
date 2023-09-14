@@ -1,0 +1,3 @@
+(executable
+ (name gen_post_actions)
+ (libraries unix fmt str menhirSdk))

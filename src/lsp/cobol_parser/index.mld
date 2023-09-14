@@ -1,0 +1,10 @@
+{1 Library cobol_parser}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package contains all the parsing logic and grammar definitions. as well as our Menhir extensions
+used to parse COBOL.
+
+The entry point of this library is the module: {!Cobol_parser}.
+

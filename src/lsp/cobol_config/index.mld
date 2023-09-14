@@ -1,0 +1,10 @@
+{1 Library cobol_config}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package is used to parse configuration files and generate the corresponding configuration to
+use inside [superbol].
+
+The entry point of this library is the module: {!Cobol_config}.
+

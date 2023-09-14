@@ -1,0 +1,16 @@
+{1 Library cobol_common}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This library contains utility modules that are used in all other {b Superbol} packages:
+{ul
+  {- {!Cobol_common.Basics} contains basic helper modules such as [StringMap], [StringSet] and
+     helper functions for pairs and lists.}
+  {- {!Cobol_common.Diagnostics} which contains all the logic to create and print diagnostics.}
+  {- {!Cobol_common.Srcloc} which contains all the logic to handle locations.}
+  {- {!Cobol_common.Visitors} which contains all the basic definitions for our visitors.}}
+
+
+The entry point of this library is the module: {!Cobol_common}.
+

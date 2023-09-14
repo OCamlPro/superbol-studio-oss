@@ -5,17 +5,17 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-02ec1db03cfcdaa26f420861e4cbbada:.
+704ff33fe81d2283b6fb83bf38fd258e:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-d4d64d0996ebf1e854157ace013e0dc4:.github/workflows/workflow.yml
+c6c1b4e6ee5a318dd5db6e3f841a556c:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-8d7837a54815c58ebb1de939c8ea312a:.gitignore
+073e803bbf1723d6e227a9fbffe98fb4:.gitignore
 # end context for .gitignore
 
 # begin context for CHANGES.md
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-7b235cd906ac2e7c97c9d3254b9b3eef:Makefile
+58b368dfbfaad51a22806a8d5808227c:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,8 +80,58 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-be4305154328f2ac976081bd8895b75b:dune-project
+ee62251347488c11c3742f152edc1cbe:dune-project
 # end context for dune-project
+
+# begin context for opam/cobol_ast.opam
+# file opam/cobol_ast.opam
+1c093791236b02c989e11c8e4277e6b7:opam/cobol_ast.opam
+# end context for opam/cobol_ast.opam
+
+# begin context for opam/cobol_common.opam
+# file opam/cobol_common.opam
+2684c65869bf3fb2c73292774c68db80:opam/cobol_common.opam
+# end context for opam/cobol_common.opam
+
+# begin context for opam/cobol_config.opam
+# file opam/cobol_config.opam
+1133aaf02d613ada678aef1c241ff541:opam/cobol_config.opam
+# end context for opam/cobol_config.opam
+
+# begin context for opam/cobol_data.opam
+# file opam/cobol_data.opam
+4bd93877af6f2710de8abcbc63bab7f6:opam/cobol_data.opam
+# end context for opam/cobol_data.opam
+
+# begin context for opam/cobol_indent.opam
+# file opam/cobol_indent.opam
+5ca055edfd5fc90ecfac3b085343f8df:opam/cobol_indent.opam
+# end context for opam/cobol_indent.opam
+
+# begin context for opam/cobol_lsp.opam
+# file opam/cobol_lsp.opam
+78c01ac9d637a0430e4c430d51f4ff6d:opam/cobol_lsp.opam
+# end context for opam/cobol_lsp.opam
+
+# begin context for opam/cobol_parser.opam
+# file opam/cobol_parser.opam
+6d3c6e64262a9c24c13162ce387faf77:opam/cobol_parser.opam
+# end context for opam/cobol_parser.opam
+
+# begin context for opam/cobol_preproc.opam
+# file opam/cobol_preproc.opam
+5e6c04d126c530509b79a509dc1ada53:opam/cobol_preproc.opam
+# end context for opam/cobol_preproc.opam
+
+# begin context for opam/cobol_typeck.opam
+# file opam/cobol_typeck.opam
+8826cd23206fa658d2cc63beccabb5b1:opam/cobol_typeck.opam
+# end context for opam/cobol_typeck.opam
+
+# begin context for opam/ebcdic_lib.opam
+# file opam/ebcdic_lib.opam
+c365b582bacd1274b4bfb2599d5cd4dc:opam/ebcdic_lib.opam
+# end context for opam/ebcdic_lib.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
@@ -103,6 +153,21 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 8f12d7db1569d79ec6043b50df393de3:opam/polka-js-stubs.opam
 # end context for opam/polka-js-stubs.opam
 
+# begin context for opam/ppx_cobcflags.opam
+# file opam/ppx_cobcflags.opam
+a71b8dfe67612b506e31c13e89075556:opam/ppx_cobcflags.opam
+# end context for opam/ppx_cobcflags.opam
+
+# begin context for opam/pretty.opam
+# file opam/pretty.opam
+8cca8f124c3c0a999f8a185f09f4693c:opam/pretty.opam
+# end context for opam/pretty.opam
+
+# begin context for opam/superbol-free.opam
+# file opam/superbol-free.opam
+09da22a50ff0d10a1b21364bc27aa345:opam/superbol-free.opam
+# end context for opam/superbol-free.opam
+
 # begin context for opam/superbol-vscode-extension.opam
 # file opam/superbol-vscode-extension.opam
 38d272283b51b83690fa806b0868b764:opam/superbol-vscode-extension.opam
@@ -112,6 +177,11 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 # file opam/superbol-vscode-platform.opam
 f4782070d6b32d738ffc3d5435fc879a:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
+
+# begin context for opam/superbol_free_lib.opam
+# file opam/superbol_free_lib.opam
+e618a6aa0b5f55717ae192be2c854b0f:opam/superbol_free_lib.opam
+# end context for opam/superbol_free_lib.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
@@ -175,17 +245,17 @@ a4431c32911b7499fbdc49e2e62932d2:sphinx/about.rst
 
 # begin context for sphinx/conf.py
 # file sphinx/conf.py
-76061a2f78a52ceeb831977de515cb7a:sphinx/conf.py
+0f6a35278b93d5d9ceca6431677766e6:sphinx/conf.py
 # end context for sphinx/conf.py
 
 # begin context for sphinx/index.rst
 # file sphinx/index.rst
-eb3deffe184887e5ee0b897028c0f969:sphinx/index.rst
+15f9d714c36b467b4d6bb3eb5bf3ebbb:sphinx/index.rst
 # end context for sphinx/index.rst
 
 # begin context for sphinx/install.rst
 # file sphinx/install.rst
-721a43bc2478aef9660f49fd0d2def12:sphinx/install.rst
+e26cbe1b90e78660bd7f93418551c1a1:sphinx/install.rst
 # end context for sphinx/install.rst
 
 # begin context for sphinx/license.rst
@@ -193,162 +263,252 @@ eb3deffe184887e5ee0b897028c0f969:sphinx/index.rst
 f4bbb4a41a8b3b39f19a4fc62a5f4841:sphinx/license.rst
 # end context for sphinx/license.rst
 
-# begin context for src/interop-js-stubs/dune
-# file src/interop-js-stubs/dune
-707a0383f1e544fb37662db29a4f14ad:src/interop-js-stubs/dune
-# end context for src/interop-js-stubs/dune
+# begin context for src/lsp/cobol_ast/dune
+# file src/lsp/cobol_ast/dune
+066a301d0d3a2cc4f1f8eea6e9b48a7f:src/lsp/cobol_ast/dune
+# end context for src/lsp/cobol_ast/dune
 
-# begin context for src/interop-js-stubs/package.toml
-# file src/interop-js-stubs/package.toml
-cbce59b282479c51946165a86e98583e:src/interop-js-stubs/package.toml
-# end context for src/interop-js-stubs/package.toml
+# begin context for src/lsp/cobol_ast/version.mlt
+# file src/lsp/cobol_ast/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_ast/version.mlt
+# end context for src/lsp/cobol_ast/version.mlt
 
-# begin context for src/interop-js-stubs/version.mlt
-# file src/interop-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/interop-js-stubs/version.mlt
-# end context for src/interop-js-stubs/version.mlt
+# begin context for src/lsp/cobol_common/dune
+# file src/lsp/cobol_common/dune
+85e200450b66aa3e32a935a09370eeee:src/lsp/cobol_common/dune
+# end context for src/lsp/cobol_common/dune
 
-# begin context for src/node-js-stubs/dune
-# file src/node-js-stubs/dune
-cf30d5557250e864c9020afd9e2389fd:src/node-js-stubs/dune
-# end context for src/node-js-stubs/dune
+# begin context for src/lsp/cobol_common/version.mlt
+# file src/lsp/cobol_common/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_common/version.mlt
+# end context for src/lsp/cobol_common/version.mlt
 
-# begin context for src/node-js-stubs/package.toml
-# file src/node-js-stubs/package.toml
-09a788f8a36173eefb4ea91caf00a4ec:src/node-js-stubs/package.toml
-# end context for src/node-js-stubs/package.toml
+# begin context for src/lsp/cobol_config/dune
+# file src/lsp/cobol_config/dune
+631869db8237af96d5ff71c2c8209654:src/lsp/cobol_config/dune
+# end context for src/lsp/cobol_config/dune
 
-# begin context for src/node-js-stubs/version.mlt
-# file src/node-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/node-js-stubs/version.mlt
-# end context for src/node-js-stubs/version.mlt
+# begin context for src/lsp/cobol_config/version.mlt
+# file src/lsp/cobol_config/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_config/version.mlt
+# end context for src/lsp/cobol_config/version.mlt
 
-# begin context for src/polka-js-stubs/dune
-# file src/polka-js-stubs/dune
-569424afbc851a410f6f388591417035:src/polka-js-stubs/dune
-# end context for src/polka-js-stubs/dune
+# begin context for src/lsp/cobol_data/dune
+# file src/lsp/cobol_data/dune
+81bbf8b89cb2c2065539f6c083343849:src/lsp/cobol_data/dune
+# end context for src/lsp/cobol_data/dune
 
-# begin context for src/polka-js-stubs/package.toml
-# file src/polka-js-stubs/package.toml
-a7d6afd419b3a2cc0b4b8c9df2a8e70c:src/polka-js-stubs/package.toml
-# end context for src/polka-js-stubs/package.toml
+# begin context for src/lsp/cobol_data/version.mlt
+# file src/lsp/cobol_data/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_data/version.mlt
+# end context for src/lsp/cobol_data/version.mlt
 
-# begin context for src/polka-js-stubs/version.mlt
-# file src/polka-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/polka-js-stubs/version.mlt
-# end context for src/polka-js-stubs/version.mlt
+# begin context for src/lsp/cobol_indent/dune
+# file src/lsp/cobol_indent/dune
+206291029ab9b39c62663475e37e57cd:src/lsp/cobol_indent/dune
+# end context for src/lsp/cobol_indent/dune
 
-# begin context for src/superbol-vscode-platform/dune
-# file src/superbol-vscode-platform/dune
-f336ca790e61d4cc6371e8501b902bbd:src/superbol-vscode-platform/dune
-# end context for src/superbol-vscode-platform/dune
+# begin context for src/lsp/cobol_indent/version.mlt
+# file src/lsp/cobol_indent/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_indent/version.mlt
+# end context for src/lsp/cobol_indent/version.mlt
 
-# begin context for src/superbol-vscode-platform/package.toml
-# file src/superbol-vscode-platform/package.toml
-52a57c098d260447652f7f0beb2872bc:src/superbol-vscode-platform/package.toml
-# end context for src/superbol-vscode-platform/package.toml
+# begin context for src/lsp/cobol_lsp/dune
+# file src/lsp/cobol_lsp/dune
+957f078deb602f8e0114c8abcc771abf:src/lsp/cobol_lsp/dune
+# end context for src/lsp/cobol_lsp/dune
 
-# begin context for src/superbol-vscode-platform/version.mlt
-# file src/superbol-vscode-platform/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/superbol-vscode-platform/version.mlt
-# end context for src/superbol-vscode-platform/version.mlt
+# begin context for src/lsp/cobol_lsp/version.mlt
+# file src/lsp/cobol_lsp/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_lsp/version.mlt
+# end context for src/lsp/cobol_lsp/version.mlt
 
-# begin context for src/vscode-debugadapter/dune
-# file src/vscode-debugadapter/dune
-12ae4bbbcdd1df098363da163e1cbe4e:src/vscode-debugadapter/dune
-# end context for src/vscode-debugadapter/dune
+# begin context for src/lsp/cobol_parser/dune
+# file src/lsp/cobol_parser/dune
+b68ae0e16fe9fde7a4b6b03d84be2680:src/lsp/cobol_parser/dune
+# end context for src/lsp/cobol_parser/dune
 
-# begin context for src/vscode-debugadapter/package.toml
-# file src/vscode-debugadapter/package.toml
-dc0d8943797599850bd0180ffadaadaa:src/vscode-debugadapter/package.toml
-# end context for src/vscode-debugadapter/package.toml
+# begin context for src/lsp/cobol_parser/version.mlt
+# file src/lsp/cobol_parser/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_parser/version.mlt
+# end context for src/lsp/cobol_parser/version.mlt
 
-# begin context for src/vscode-debugadapter/version.mlt
-# file src/vscode-debugadapter/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-debugadapter/version.mlt
-# end context for src/vscode-debugadapter/version.mlt
+# begin context for src/lsp/cobol_preproc/dune
+# file src/lsp/cobol_preproc/dune
+801b4cd6ad70e6c633b48431afb67519:src/lsp/cobol_preproc/dune
+# end context for src/lsp/cobol_preproc/dune
 
-# begin context for src/vscode-debugprotocol/dune
-# file src/vscode-debugprotocol/dune
-20bb8bb628d36d6baca51f4a9f54c8f7:src/vscode-debugprotocol/dune
-# end context for src/vscode-debugprotocol/dune
+# begin context for src/lsp/cobol_preproc/version.mlt
+# file src/lsp/cobol_preproc/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_preproc/version.mlt
+# end context for src/lsp/cobol_preproc/version.mlt
 
-# begin context for src/vscode-debugprotocol/package.toml
-# file src/vscode-debugprotocol/package.toml
-f14b34b55e33de7475b9c54938fec6d7:src/vscode-debugprotocol/package.toml
-# end context for src/vscode-debugprotocol/package.toml
+# begin context for src/lsp/cobol_typeck/dune
+# file src/lsp/cobol_typeck/dune
+bb6994bfe27f29a441abee11c82b032f:src/lsp/cobol_typeck/dune
+# end context for src/lsp/cobol_typeck/dune
 
-# begin context for src/vscode-debugprotocol/version.mlt
-# file src/vscode-debugprotocol/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-debugprotocol/version.mlt
-# end context for src/vscode-debugprotocol/version.mlt
+# begin context for src/lsp/cobol_typeck/version.mlt
+# file src/lsp/cobol_typeck/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_typeck/version.mlt
+# end context for src/lsp/cobol_typeck/version.mlt
 
-# begin context for src/vscode-js-stubs/dune
-# file src/vscode-js-stubs/dune
-f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode-js-stubs/dune
-# end context for src/vscode-js-stubs/dune
+# begin context for src/lsp/ebcdic_lib/dune
+# file src/lsp/ebcdic_lib/dune
+963d41cf5fce1985fce4ba6f43244817:src/lsp/ebcdic_lib/dune
+# end context for src/lsp/ebcdic_lib/dune
 
-# begin context for src/vscode-js-stubs/package.toml
-# file src/vscode-js-stubs/package.toml
-ebc05174a1892c2e98fe8aee174b5cb9:src/vscode-js-stubs/package.toml
-# end context for src/vscode-js-stubs/package.toml
+# begin context for src/lsp/ebcdic_lib/ebcdic_version.mlt
+# file src/lsp/ebcdic_lib/ebcdic_version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/ebcdic_lib/ebcdic_version.mlt
+# end context for src/lsp/ebcdic_lib/ebcdic_version.mlt
 
-# begin context for src/vscode-js-stubs/version.mlt
-# file src/vscode-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-js-stubs/version.mlt
-# end context for src/vscode-js-stubs/version.mlt
+# begin context for src/lsp/ppx_cobcflags/dune
+# file src/lsp/ppx_cobcflags/dune
+86758f07c1c4f6bef04e0520a41cb8f6:src/lsp/ppx_cobcflags/dune
+# end context for src/lsp/ppx_cobcflags/dune
 
-# begin context for src/vscode-json/dune
-# file src/vscode-json/dune
-a18d965350ea19e9be91b3784887f1ef:src/vscode-json/dune
-# end context for src/vscode-json/dune
+# begin context for src/lsp/ppx_cobcflags/version.mlt
+# file src/lsp/ppx_cobcflags/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/ppx_cobcflags/version.mlt
+# end context for src/lsp/ppx_cobcflags/version.mlt
 
-# begin context for src/vscode-json/index.mld
-# file src/vscode-json/index.mld
-14bb358dfa3587175fe0ee1a39d81977:src/vscode-json/index.mld
-# end context for src/vscode-json/index.mld
+# begin context for src/lsp/pretty/dune
+# file src/lsp/pretty/dune
+99a706a3180a431ed103230d66dd9013:src/lsp/pretty/dune
+# end context for src/lsp/pretty/dune
 
-# begin context for src/vscode-json/package.toml
-# file src/vscode-json/package.toml
-9b831fff3824e035b2d9ef1696f89361:src/vscode-json/package.toml
-# end context for src/vscode-json/package.toml
+# begin context for src/lsp/pretty/version.mlt
+# file src/lsp/pretty/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/pretty/version.mlt
+# end context for src/lsp/pretty/version.mlt
 
-# begin context for src/vscode-json/version.mlt
-# file src/vscode-json/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-json/version.mlt
-# end context for src/vscode-json/version.mlt
+# begin context for src/lsp/superbol-free/dune
+# file src/lsp/superbol-free/dune
+095155be06e2840753e52b3d03d541b9:src/lsp/superbol-free/dune
+# end context for src/lsp/superbol-free/dune
 
-# begin context for src/vscode-languageclient-js-stubs/dune
-# file src/vscode-languageclient-js-stubs/dune
-935c7469b455b26a8ec1f08627aae863:src/vscode-languageclient-js-stubs/dune
-# end context for src/vscode-languageclient-js-stubs/dune
+# begin context for src/lsp/superbol-free/linking_flags.sh
+# file src/lsp/superbol-free/linking_flags.sh
+b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
+# end context for src/lsp/superbol-free/linking_flags.sh
 
-# begin context for src/vscode-languageclient-js-stubs/package.toml
-# file src/vscode-languageclient-js-stubs/package.toml
-553168fe21b0362e0d450c5de7f4216e:src/vscode-languageclient-js-stubs/package.toml
-# end context for src/vscode-languageclient-js-stubs/package.toml
+# begin context for src/lsp/superbol_free_lib/dune
+# file src/lsp/superbol_free_lib/dune
+6625329103c4f2ffacd92354431cce4e:src/lsp/superbol_free_lib/dune
+# end context for src/lsp/superbol_free_lib/dune
 
-# begin context for src/vscode-languageclient-js-stubs/version.mlt
-# file src/vscode-languageclient-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-languageclient-js-stubs/version.mlt
-# end context for src/vscode-languageclient-js-stubs/version.mlt
+# begin context for src/lsp/superbol_free_lib/version.mlt
+# file src/lsp/superbol_free_lib/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/superbol_free_lib/version.mlt
+# end context for src/lsp/superbol_free_lib/version.mlt
 
-# begin context for src/vscode-package-json/dune
-# file src/vscode-package-json/dune
-1418db38f60b30eacfab7a22d0cc2ad7:src/vscode-package-json/dune
-# end context for src/vscode-package-json/dune
+# begin context for src/vscode/interop-js-stubs/dune
+# file src/vscode/interop-js-stubs/dune
+707a0383f1e544fb37662db29a4f14ad:src/vscode/interop-js-stubs/dune
+# end context for src/vscode/interop-js-stubs/dune
 
-# begin context for src/vscode-package-json/linking_flags.sh
-# file src/vscode-package-json/linking_flags.sh
-9fdfca3cc53df639758ff04fe09d3243:src/vscode-package-json/linking_flags.sh
-# end context for src/vscode-package-json/linking_flags.sh
+# begin context for src/vscode/interop-js-stubs/version.mlt
+# file src/vscode/interop-js-stubs/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/interop-js-stubs/version.mlt
+# end context for src/vscode/interop-js-stubs/version.mlt
 
-# begin context for src/vscode-package-json/package.toml
-# file src/vscode-package-json/package.toml
-4b3c04a3df2a4be1259088d71bc55846:src/vscode-package-json/package.toml
-# end context for src/vscode-package-json/package.toml
+# begin context for src/vscode/node-js-stubs/dune
+# file src/vscode/node-js-stubs/dune
+cf30d5557250e864c9020afd9e2389fd:src/vscode/node-js-stubs/dune
+# end context for src/vscode/node-js-stubs/dune
 
-# begin context for src/vscode-package-json/version.mlt
-# file src/vscode-package-json/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode-package-json/version.mlt
-# end context for src/vscode-package-json/version.mlt
+# begin context for src/vscode/node-js-stubs/version.mlt
+# file src/vscode/node-js-stubs/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/node-js-stubs/version.mlt
+# end context for src/vscode/node-js-stubs/version.mlt
+
+# begin context for src/vscode/polka-js-stubs/dune
+# file src/vscode/polka-js-stubs/dune
+569424afbc851a410f6f388591417035:src/vscode/polka-js-stubs/dune
+# end context for src/vscode/polka-js-stubs/dune
+
+# begin context for src/vscode/polka-js-stubs/version.mlt
+# file src/vscode/polka-js-stubs/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/polka-js-stubs/version.mlt
+# end context for src/vscode/polka-js-stubs/version.mlt
+
+# begin context for src/vscode/superbol-vscode-platform/dune
+# file src/vscode/superbol-vscode-platform/dune
+f336ca790e61d4cc6371e8501b902bbd:src/vscode/superbol-vscode-platform/dune
+# end context for src/vscode/superbol-vscode-platform/dune
+
+# begin context for src/vscode/superbol-vscode-platform/version.mlt
+# file src/vscode/superbol-vscode-platform/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/superbol-vscode-platform/version.mlt
+# end context for src/vscode/superbol-vscode-platform/version.mlt
+
+# begin context for src/vscode/vscode-debugadapter/dune
+# file src/vscode/vscode-debugadapter/dune
+12ae4bbbcdd1df098363da163e1cbe4e:src/vscode/vscode-debugadapter/dune
+# end context for src/vscode/vscode-debugadapter/dune
+
+# begin context for src/vscode/vscode-debugadapter/version.mlt
+# file src/vscode/vscode-debugadapter/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-debugadapter/version.mlt
+# end context for src/vscode/vscode-debugadapter/version.mlt
+
+# begin context for src/vscode/vscode-debugprotocol/dune
+# file src/vscode/vscode-debugprotocol/dune
+20bb8bb628d36d6baca51f4a9f54c8f7:src/vscode/vscode-debugprotocol/dune
+# end context for src/vscode/vscode-debugprotocol/dune
+
+# begin context for src/vscode/vscode-debugprotocol/version.mlt
+# file src/vscode/vscode-debugprotocol/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-debugprotocol/version.mlt
+# end context for src/vscode/vscode-debugprotocol/version.mlt
+
+# begin context for src/vscode/vscode-js-stubs/dune
+# file src/vscode/vscode-js-stubs/dune
+f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode/vscode-js-stubs/dune
+# end context for src/vscode/vscode-js-stubs/dune
+
+# begin context for src/vscode/vscode-js-stubs/version.mlt
+# file src/vscode/vscode-js-stubs/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-js-stubs/version.mlt
+# end context for src/vscode/vscode-js-stubs/version.mlt
+
+# begin context for src/vscode/vscode-json/dune
+# file src/vscode/vscode-json/dune
+a18d965350ea19e9be91b3784887f1ef:src/vscode/vscode-json/dune
+# end context for src/vscode/vscode-json/dune
+
+# begin context for src/vscode/vscode-json/index.mld
+# file src/vscode/vscode-json/index.mld
+14bb358dfa3587175fe0ee1a39d81977:src/vscode/vscode-json/index.mld
+# end context for src/vscode/vscode-json/index.mld
+
+# begin context for src/vscode/vscode-json/version.mlt
+# file src/vscode/vscode-json/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-json/version.mlt
+# end context for src/vscode/vscode-json/version.mlt
+
+# begin context for src/vscode/vscode-languageclient-js-stubs/dune
+# file src/vscode/vscode-languageclient-js-stubs/dune
+935c7469b455b26a8ec1f08627aae863:src/vscode/vscode-languageclient-js-stubs/dune
+# end context for src/vscode/vscode-languageclient-js-stubs/dune
+
+# begin context for src/vscode/vscode-languageclient-js-stubs/version.mlt
+# file src/vscode/vscode-languageclient-js-stubs/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-languageclient-js-stubs/version.mlt
+# end context for src/vscode/vscode-languageclient-js-stubs/version.mlt
+
+# begin context for src/vscode/vscode-package-json/dune
+# file src/vscode/vscode-package-json/dune
+1418db38f60b30eacfab7a22d0cc2ad7:src/vscode/vscode-package-json/dune
+# end context for src/vscode/vscode-package-json/dune
+
+# begin context for src/vscode/vscode-package-json/linking_flags.sh
+# file src/vscode/vscode-package-json/linking_flags.sh
+9fdfca3cc53df639758ff04fe09d3243:src/vscode/vscode-package-json/linking_flags.sh
+# end context for src/vscode/vscode-package-json/linking_flags.sh
+
+# begin context for src/vscode/vscode-package-json/version.mlt
+# file src/vscode/vscode-package-json/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-package-json/version.mlt
+# end context for src/vscode/vscode-package-json/version.mlt

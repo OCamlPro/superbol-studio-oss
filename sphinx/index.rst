@@ -13,9 +13,6 @@ Welcome to superbol-vscode-platform
    Home <https://ocamlpro.github.io/superbol-vscode-platform>
    about
    install
-   settings
-   features
-   tasks
    API doc <https://ocamlpro.github.io/superbol-vscode-platform/doc>
    license
 

@@ -5,7 +5,7 @@ share-version = "0.9.2"
 
 [project]
 authors = ["Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>", "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"]
-ci-systems = ["ubuntu-latest", "macos-latest", "windows-latest"]
+ci-systems = ["ubuntu-latest", "macos-latest"]
 copyright = "OCamlPro SAS"
 edition = "4.13.0"
 github-organization = "ocamlpro"
@@ -33,7 +33,7 @@ of the superbol-vscode-platform OCaml project
 """
 
 [project]
-skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md"]
+skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "sphinx/about.rst", "LICENSE.md"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
@@ -51,7 +51,7 @@ for-test = true
 [project]
 
 # dirs to skip while scanning for dune files
-skip-dirs = ["node_modules"]
+skip-dirs = ["node_modules" ]
 
 # dirs to scan for share/ folders (with package names)
 share-dirs = ["share"]
@@ -85,44 +85,109 @@ ATTIC
 !.vscode/launch.json
 *.vsix
 """
+github-workflow-before-build = """
+
+      - run: git submodule init
+
+      - run: git submodule update
+
+"""
+
 
 [[package]]
-dir = "src/superbol-vscode-platform"
-# edit 'src/superbol-vscode-platform/package.toml' for package-specific options
+dir = "src/vscode/superbol-vscode-platform"
+# edit 'src/vscode/superbol-vscode-platform/package.toml' for package-specific options
 
 [[package]]
-dir = "src/polka-js-stubs"
-# edit 'src/polka-js-stubs/package.toml' for package-specific options
+dir = "src/vscode/polka-js-stubs"
+# edit 'src/vscode/polka-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/interop-js-stubs"
-# edit 'src/interop-js-stubs/package.toml' for package-specific options
+dir = "src/vscode/interop-js-stubs"
+# edit 'src/vscode/interop-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/node-js-stubs"
-# edit 'src/node-js-stubs/package.toml' for package-specific options
+dir = "src/vscode/node-js-stubs"
+# edit 'src/vscode/node-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-js-stubs"
-# edit 'src/vscode-js-stubs/package.toml' for package-specific options
+dir = "src/vscode/vscode-js-stubs"
+# edit 'src/vscode/vscode-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-languageclient-js-stubs"
-# edit 'src/vscode-languageclient-js-stubs/package.toml' for package-specific options
+dir = "src/vscode/vscode-languageclient-js-stubs"
+# edit 'src/vscode/vscode-languageclient-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-package-json"
-# edit 'src/vscode-package-json/package.toml' for package-specific options
+dir = "src/vscode/vscode-package-json"
+# edit 'src/vscode/vscode-package-json/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-json"
-# edit 'src/vscode-json/package.toml' for package-specific options
+dir = "src/vscode/vscode-json"
+# edit 'src/vscode/vscode-json/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-debugadapter"
-# edit 'src/vscode-debugadapter/package.toml' for package-specific options
+dir = "src/vscode/vscode-debugadapter"
+# edit 'src/vscode/vscode-debugadapter/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode-debugprotocol"
-# edit 'src/vscode-debugprotocol/package.toml' for package-specific options
+dir = "src/vscode/vscode-debugprotocol"
+# edit 'src/vscode/vscode-debugprotocol/package.toml' for package-specific options
 
+
+
+[[package]]
+dir = "src/lsp/superbol-free"
+# edit 'src/lsp/superbol/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/superbol_free_lib"
+# edit 'src/lsp/superbol_lib/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_common"
+# edit 'src/lsp/cobol_common/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_parser"
+# edit 'src/lsp/cobol_parser/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/ebcdic_lib"
+# edit 'src/lsp/ebcdic_lib/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_lsp"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/ppx_cobcflags"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/pretty"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_config"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_ast"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_indent"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_preproc"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_data"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_typeck"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options

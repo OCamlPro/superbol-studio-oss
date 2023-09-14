@@ -1,0 +1,8 @@
+{1 Program ppx_cobcflags}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package contains ppx rewriters to generate the cobc cli flags in [superbol]. To see which
+rewriters are provided, and what they generate, please look at the {!Superbol.Gnucobol_args}
+documentation.

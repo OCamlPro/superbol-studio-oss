@@ -1,0 +1,173 @@
+file: WARNING
+##
+## Ends in an error in state: 0.
+##
+## file' -> . file [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+Expecting at least one rule in the configuration file.
+
+file: RESERVED WARNING
+##
+## Ends in an error in state: 2.
+##
+## word_rule -> RESERVED . option(COLON) ANY option(STAR) EQ ANY [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+## word_rule -> RESERVED . option(COLON) ANY option(STAR) [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## RESERVED
+##
+
+Expecting a ':', a word or an alias after 'reserved'.
+
+file: RESERVED COLON WARNING
+##
+## Ends in an error in state: 4.
+##
+## word_rule -> RESERVED option(COLON) . ANY option(STAR) EQ ANY [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+## word_rule -> RESERVED option(COLON) . ANY option(STAR) [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## RESERVED option(COLON)
+##
+
+Expecting a word or an alias after 'reserved'.
+
+file: RESERVED ANY WARNING
+##
+## Ends in an error in state: 5.
+##
+## word_rule -> RESERVED option(COLON) ANY . option(STAR) EQ ANY [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+## word_rule -> RESERVED option(COLON) ANY . option(STAR) [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## RESERVED option(COLON) ANY
+##
+
+Expecting another rule or end of file after a configuration rule.
+
+file: RESERVED ANY STAR WARNING
+##
+## Ends in an error in state: 7.
+##
+## word_rule -> RESERVED option(COLON) ANY option(STAR) . EQ ANY [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+## word_rule -> RESERVED option(COLON) ANY option(STAR) . [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## RESERVED option(COLON) ANY option(STAR)
+##
+
+Expecting another rule or end of file after a configuration rule.
+
+file: RESERVED ANY EQ WARNING
+##
+## Ends in an error in state: 8.
+##
+## word_rule -> RESERVED option(COLON) ANY option(STAR) EQ . ANY [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## RESERVED option(COLON) ANY option(STAR) EQ
+##
+
+Expecting another word after '='.
+
+file: INCLUDE WARNING
+##
+## Ends in an error in state: 16.
+##
+## rule -> INCLUDE . option(COLON) STRING [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## INCLUDE
+##
+
+Expecting a ':' or a string after 'include'.
+
+file: INCLUDE COLON WARNING
+##
+## Ends in an error in state: 17.
+##
+## rule -> INCLUDE option(COLON) . STRING [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## INCLUDE option(COLON)
+##
+
+Expecting a string after 'include'.
+
+file: IDENT SYSTEM_NAME
+##
+## Ends in an error in state: 19.
+##
+## rule -> IDENT . option(COLON) value [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## IDENT
+##
+
+Expecting a ':' or a value after an rule identifier.
+
+file: IDENT COLON SYSTEM_NAME
+##
+## Ends in an error in state: 20.
+##
+## rule -> IDENT option(COLON) . value [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## IDENT option(COLON)
+##
+
+Expecting a value after a rule identifier.
+
+file: IDENT PLUS SYSTEM_NAME
+##
+## Ends in an error in state: 25.
+##
+## support -> PLUS . support_value [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## PLUS
+##
+
+Expecting a support value after a '+'.
+
+file: INTRINSIC_FUNCTION WARNING
+##
+## Ends in an error in state: 40.
+##
+## word_rule -> word_key . option(COLON) any_or_string [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## word_key
+##
+
+Expecting a word for this configuration rule.
+
+file: INTRINSIC_FUNCTION COLON WARNING
+##
+## Ends in an error in state: 41.
+##
+## word_rule -> word_key option(COLON) . any_or_string [ SYSTEM_NAME RESERVED REGISTER NOT_SYSTEM_NAME NOT_RESERVED NOT_REGISTER NOT_INTRINSIC_FUNCTION INTRINSIC_FUNCTION INCLUDE IDENT EOF ]
+##
+## The known suffix of the stack is as follows:
+## word_key option(COLON)
+##
+
+Expecting a word for this configuration rule.
+
+file: INTRINSIC_FUNCTION ANY WARNING
+##
+## Ends in an error in state: 48.
+##
+## rules -> rule . [ EOF ]
+## rules -> rule . rules [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## rule
+##
+
+Expecting another rule or end of file after a configuration rule.
+

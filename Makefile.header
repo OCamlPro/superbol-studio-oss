@@ -1,9 +1,9 @@
 PROJECT=superbol_vscode_platform
-SRCDIR=src/superbol-vscode-platform
+SRCDIR=src/vscode/superbol-vscode-platform
 
 compile:
 	opam exec -- dune build
-	cp -f _build/default/src/vscode-package-json/main.exe vscode-package-json
+	cp -f _build/default/src/vscode/vscode-package-json/main.exe vscode-package-json
 	yarn esbuild _build/default/$(SRCDIR)/$(PROJECT).bc.js \
                 --bundle \
                 --external:vscode \

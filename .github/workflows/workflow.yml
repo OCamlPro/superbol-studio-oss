@@ -17,7 +17,6 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-          - windows-latest
         ocaml-compiler:
           - 4.13.0
         skip_test:
@@ -41,22 +40,12 @@ jobs:
 #          restore-keys: |
 #            v2-${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
 
-      - name: Set-up OCaml on Windows
-        uses: ocaml/setup-ocaml@v2
-        if: runner.os == 'Windows'
+      - name: Use OCaml ${{ matrix.ocaml-compiler }}
+        uses: avsm/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-repositories: |
-            opam-repository-mingw: https://github.com/ocaml-opam/opam-repository-mingw.git#sunset
-            default: https://github.com/ocaml/opam-repository.git
-
-      - name: Set-up OCaml on Unix
-        uses: ocaml/setup-ocaml@v2
-        if: runner.os != 'Windows'
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
-          opam-repositories: |
-            default: https://github.com/ocaml/opam-repository.git
+          opam-pin: false
+          opam-depext: false
 
       - name: Set git user
         run: |
@@ -67,8 +56,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol
-        if: matrix.os != 'windows-latest'
+      - run: opam depext -y superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_ast cobol_indent cobol_preproc cobol_data cobol_typeck
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test
@@ -82,6 +70,11 @@ jobs:
         if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
+
+      - run: git submodule init
+
+      - run: git submodule update
+
 
       - run: make build
 
