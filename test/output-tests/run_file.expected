@@ -7624,85 +7624,25 @@ run_file.at-12281-reference:1.8-1.14:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12369:0
-run_file.at-12369-prog.cob:31.36:
-  28              WRITE f-rec FROM "a"
-  29              CLOSE f
-  30   
-  31 >            SET LAST EXCEPTION TO OFF
-----                                       ^
-  32              >>TURN EC-I-O CHECKING ON
-  33              *> Read f too many times without libcob error
->> Hint: Missing .
-
-run_file.at-12369-prog.cob:32.11-32.17:
+run_file.at-12369-prog.cob:32.11-32.36:
   29              CLOSE f
   30   
   31              SET LAST EXCEPTION TO OFF
   32 >            >>TURN EC-I-O CHECKING ON
-----              ^^^^^^
+----              ^^^^^^^^^^^^^^^^^^^^^^^^^
   33              *> Read f too many times without libcob error
   34              OPEN INPUT f
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
-run_file.at-12369-prog.cob:32.24:
-  29              CLOSE f
-  30   
-  31              SET LAST EXCEPTION TO OFF
-  32 >            >>TURN EC-I-O CHECKING ON
-----                           ^
-  33              *> Read f too many times without libcob error
-  34              OPEN INPUT f
->> Hint: Missing .
-
-run_file.at-12369-prog.cob:32.25-32.33:
-  29              CLOSE f
-  30   
-  31              SET LAST EXCEPTION TO OFF
-  32 >            >>TURN EC-I-O CHECKING ON
-----                            ^^^^^^^^
-  33              *> Read f too many times without libcob error
-  34              OPEN INPUT f
->> Warning: Invalid syntax
-
-run_file.at-12369-prog.cob:32.33:
-  29              CLOSE f
-  30   
-  31              SET LAST EXCEPTION TO OFF
-  32 >            >>TURN EC-I-O CHECKING ON
-----                                    ^
-  33              *> Read f too many times without libcob error
-  34              OPEN INPUT f
->> Hint: Missing .
-
-run_file.at-12369-prog.cob:32.34-32.36:
-  29              CLOSE f
-  30   
-  31              SET LAST EXCEPTION TO OFF
-  32 >            >>TURN EC-I-O CHECKING ON
-----                                     ^^
-  33              *> Read f too many times without libcob error
-  34              OPEN INPUT f
->> Warning: Invalid syntax
-
-run_file.at-12369-prog.cob:46.11-46.17:
+run_file.at-12369-prog.cob:46.11-46.38:
   43   
   44              CLOSE f
   45   
   46 >            >>TURN EC-I-O g CHECKING ON
-----              ^^^^^^
+----              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   47   
   48              *> Read f too many times without libcob error
->> Error: Invalid syntax
-
-run_file.at-12369-prog.cob:46.36-46.38:
-  43   
-  44              CLOSE f
-  45   
-  46 >            >>TURN EC-I-O g CHECKING ON
-----                                       ^^
-  47   
-  48              *> Read f too many times without libcob error
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12582:0
 run_file.at-12582-prog.cob:10.34-10.42:
@@ -8066,6 +8006,14 @@ run_file.at-13896-expected.txt:2.7-2.11:
    4   READ FILE1
 >> Warning: Unexpected non-blank area A on continuation line
 
+run_file.at-13896-expected.txt:2.11-2.13:
+   1   ERROR ON FILE2
+   2 >   STAT-FILE1: 00
+----              ^^
+   3     STAT-FILE2: 35
+   4   READ FILE1
+>> Error: Unexpected `1:' in continuation
+
 run_file.at-13896-expected.txt:3.7-3.11:
    1   ERROR ON FILE2
    2     STAT-FILE1: 00
@@ -8074,6 +8022,15 @@ run_file.at-13896-expected.txt:3.7-3.11:
    4   READ FILE1
    5   ERROR ON FILE1
 >> Warning: Unexpected non-blank area A on continuation line
+
+run_file.at-13896-expected.txt:3.11-3.13:
+   1   ERROR ON FILE2
+   2     STAT-FILE1: 00
+   3 >   STAT-FILE2: 35
+----              ^^
+   4   READ FILE1
+   5   ERROR ON FILE1
+>> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:4.6-4.7:
    1   ERROR ON FILE2
@@ -8105,6 +8062,16 @@ run_file.at-13896-expected.txt:6.7-6.11:
    8   READ FILE2
 >> Warning: Unexpected non-blank area A on continuation line
 
+run_file.at-13896-expected.txt:6.11-6.13:
+   3     STAT-FILE2: 35
+   4   READ FILE1
+   5   ERROR ON FILE1
+   6 >   STAT-FILE1: 10
+----              ^^
+   7     STAT-FILE2: 35
+   8   READ FILE2
+>> Error: Unexpected `1:' in continuation
+
 run_file.at-13896-expected.txt:7.7-7.11:
    4   READ FILE1
    5   ERROR ON FILE1
@@ -8114,6 +8081,16 @@ run_file.at-13896-expected.txt:7.7-7.11:
    8   READ FILE2
    9   ERROR ON FILE2
 >> Warning: Unexpected non-blank area A on continuation line
+
+run_file.at-13896-expected.txt:7.11-7.13:
+   4   READ FILE1
+   5   ERROR ON FILE1
+   6     STAT-FILE1: 10
+   7 >   STAT-FILE2: 35
+----              ^^
+   8   READ FILE2
+   9   ERROR ON FILE2
+>> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:8.6-8.7:
    5   ERROR ON FILE1
@@ -8145,6 +8122,16 @@ run_file.at-13896-expected.txt:10.7-10.11:
   12   CLOSE FILES
 >> Warning: Unexpected non-blank area A on continuation line
 
+run_file.at-13896-expected.txt:10.11-10.13:
+   7     STAT-FILE2: 35
+   8   READ FILE2
+   9   ERROR ON FILE2
+  10 >   STAT-FILE1: 10
+----              ^^
+  11     STAT-FILE2: 47
+  12   CLOSE FILES
+>> Error: Unexpected `1:' in continuation
+
 run_file.at-13896-expected.txt:11.7-11.11:
    8   READ FILE2
    9   ERROR ON FILE2
@@ -8154,6 +8141,16 @@ run_file.at-13896-expected.txt:11.7-11.11:
   12   CLOSE FILES
   13   ERROR ON FILE2
 >> Warning: Unexpected non-blank area A on continuation line
+
+run_file.at-13896-expected.txt:11.11-11.13:
+   8   READ FILE2
+   9   ERROR ON FILE2
+  10     STAT-FILE1: 10
+  11 >   STAT-FILE2: 47
+----              ^^
+  12   CLOSE FILES
+  13   ERROR ON FILE2
+>> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:12.6-12.7:
    9   ERROR ON FILE2
@@ -8185,6 +8182,16 @@ run_file.at-13896-expected.txt:14.7-14.11:
   16   DELETE FILES
 >> Warning: Unexpected non-blank area A on continuation line
 
+run_file.at-13896-expected.txt:14.11-14.13:
+  11     STAT-FILE2: 47
+  12   CLOSE FILES
+  13   ERROR ON FILE2
+  14 >   STAT-FILE1: 00
+----              ^^
+  15     STAT-FILE2: 42
+  16   DELETE FILES
+>> Error: Unexpected `1:' in continuation
+
 run_file.at-13896-expected.txt:15.7-15.11:
   12   CLOSE FILES
   13   ERROR ON FILE2
@@ -8193,6 +8200,15 @@ run_file.at-13896-expected.txt:15.7-15.11:
 ----          ^^^^
   16   DELETE FILES
 >> Warning: Unexpected non-blank area A on continuation line
+
+run_file.at-13896-expected.txt:15.11-15.13:
+  12   CLOSE FILES
+  13   ERROR ON FILE2
+  14     STAT-FILE1: 00
+  15 >   STAT-FILE2: 42
+----              ^^
+  16   DELETE FILES
+>> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:1.7-1.8:
    1 > ERROR ON FILE2

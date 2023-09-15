@@ -85,13 +85,13 @@ let with_replacing lp replacing =
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
-let make_srclex ?(on_period_only = true) ~source_format = function
+let make_srclex ~source_format = function
   | Filename filename ->
-      Preproc.srclex_from_file on_period_only ~source_format filename
+      Preproc.srclex_from_file ~source_format filename
   | String { contents; filename } ->
-      Preproc.srclex_from_string on_period_only ~filename ~source_format contents
+      Preproc.srclex_from_string ~filename ~source_format contents
   | Channel { contents; filename } ->
-      Preproc.srclex_from_channel on_period_only ~filename ~source_format contents
+      Preproc.srclex_from_channel ~filename ~source_format contents
 
 type init =
   {
@@ -100,7 +100,7 @@ type init =
     init_source_format: Cobol_config.source_format_spec;
   }
 
-let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
+let preprocessor ?(verbose = false) input = function
   | `WithLibpath { init_libpath = libpath;
                    init_config = (module Config);
                    init_source_format = source_format; } ->
@@ -111,7 +111,7 @@ let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
         = decide_source_format input source_format in
       {
         buff = [];
-        srclex = make_srclex ~on_period_only ~source_format input;
+        srclex = make_srclex ~source_format input;
         ppstate = Preproc.initial_state;
         pplog = Preproc_trace.empty;
         diags;
@@ -389,33 +389,33 @@ let pp_pptokens: pptokens Pretty.printer =
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_file ?(on_period_only = true) ~source_format ?(ppf = default_oppf) =
-  Cobol_common.do_unit begin fun (module DIAGS) filename ->
+let lex_file ~source_format ?(ppf = default_oppf) =
+  Cobol_common.do_unit begin fun (module DIAGS) input ->
     let source_format =
-      DIAGS.grab_diags @@ decide_source_format filename source_format in
-    let pl = Preproc.srclex_from_file on_period_only ~source_format filename in
+      DIAGS.grab_diags @@ decide_source_format input source_format in
+    let pl = make_srclex ~source_format input in
     Preproc.print_source_lines ppf pl
   end
 
-let lex_lib ?(on_period_only = true)~source_format ~libpath ?(ppf = default_oppf) =
+let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) libname ->
     match Copybook.find_lib ~libpath libname with
     | Ok filename ->
         let source_format =
-          DIAGS.grab_diags @@ decide_source_format filename source_format in
-        let pl = Preproc.srclex_from_file on_period_only ~source_format filename in
+          DIAGS.grab_diags @@
+          decide_source_format (Filename filename) source_format in
+        let pl = Preproc.srclex_from_file ~source_format filename in
         Preproc.print_source_lines ppf pl
     | Error lnf ->
         Copybook.lib_not_found_error (DIAGS.error "%t") lnf
   end
 
-(* TODO: get rid of `on_period_only` *)
-let fold_text_lines ?(on_period_only = true) ~source_format ?epf f =
-  Cobol_common.do_any ?epf begin fun (module DIAGS) filename ->
+let fold_text_lines ~source_format ?epf f =
+  Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
     let source_format =
-      DIAGS.grab_diags @@ decide_source_format filename source_format in
-    let lex = Preproc.srclex_from_file on_period_only ~source_format filename in
-    Preproc.(fold_source_lines lex) f
+      DIAGS.grab_diags @@ decide_source_format input source_format in
+    let pl = make_srclex ~source_format input in
+    Preproc.fold_source_lines pl f
   end
 
 let pp_preprocessed ppf lp =

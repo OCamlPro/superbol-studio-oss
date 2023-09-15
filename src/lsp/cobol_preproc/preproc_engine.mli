@@ -43,32 +43,28 @@ val decide_source_format
   -> Cobol_config.source_format Cobol_common.Diagnostics.with_diags
 
 val preprocessor
-  : ?on_period_only:bool
-  -> ?verbose:bool
+  : ?verbose:bool
   -> input
   -> [< `WithLibpath of init ]
   -> preprocessor
 
 val lex_file
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter
-  -> string
+  -> input
   -> unit
 
 val fold_text_lines
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> ?epf:Format.formatter
   -> (Text.text -> 'a -> 'a)
-  -> string
+  -> input
   -> 'a
   -> 'a
 
 val lex_lib
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> libpath:string list
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter

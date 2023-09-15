@@ -1206,6 +1206,14 @@ syn_misc.at-1903-prog.cob:8.0:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1936:0
+syn_misc.at-1936-prog.cob:6.11-6.15:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5              GO
+   6 >       -    BACK.
+----              ^^^^
+>> Error: Unexpected `BACK' in continuation
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2005:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2045:0
 syn_misc.at-2045-prog2.cob:11.7-11.46:
@@ -3552,15 +3560,15 @@ syn_misc.at-7027-prog.cob:6.7-6.24:
    8          >> DISPLAY "NOT OK (not both definitions)"
 >> Error: Malformed or unknown compiler directive
 
-syn_misc.at-7027-prog.cob:8.7-8.17:
+syn_misc.at-7027-prog.cob:8.7-8.49:
    5          >>IF A IS DEFINED
    6          >>IF B IS DEFINED
    7              CONTINUE
    8 >        >> DISPLAY "NOT OK (not both definitions)"
-----          ^^^^^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9              .
   10          >>ELSE
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7027-prog.cob:10.7-10.13:
    7              CONTINUE
@@ -3572,15 +3580,15 @@ syn_misc.at-7027-prog.cob:10.7-10.13:
   12          >> DISPLAY "NOT OK (no definitions)"
 >> Error: Malformed or unknown compiler directive
 
-syn_misc.at-7027-prog.cob:12.7-12.17:
+syn_misc.at-7027-prog.cob:12.7-12.43:
    9              .
   10          >>ELSE
   11              CONTINUE
   12 >        >> DISPLAY "NOT OK (no definitions)"
-----          ^^^^^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13              .
   14          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7027-prog.cob:14.7-14.15:
   11              CONTINUE
@@ -3602,15 +3610,15 @@ syn_misc.at-7027-prog.cob:15.7-15.13:
   17          >> DISPLAY "OK"
 >> Error: Malformed or unknown compiler directive
 
-syn_misc.at-7027-prog.cob:17.7-17.17:
+syn_misc.at-7027-prog.cob:17.7-17.22:
   14          >>END-IF
   15          >>ELSE
   16              CONTINUE
   17 >        >> DISPLAY "OK"
-----          ^^^^^^^^^^
+----          ^^^^^^^^^^^^^^^
   18              .
   19          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7027-prog.cob:19.7-19.15:
   16              CONTINUE

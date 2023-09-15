@@ -85,18 +85,17 @@ let with_source_format
       | Ok s -> Plx (s, lexbuf)
       | Error s -> Plx (s, lexbuf)
 
-let make_srclex make_lexing on_period_only ?filename ~source_format input =
+let make_srclex make_lexing ?filename ~source_format input =
   let SF source_format = Src_lexing.select_source_format source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state on_period_only source_format, lexbuf)
+  Plx (Src_lexing.init_state source_format, lexbuf)
 
 let srclex_from_string = make_srclex Lexing.from_string
 let srclex_from_channel = make_srclex Lexing.from_channel
-let srclex_from_file on_period_only ~source_format filename : any_srclexer =
-  srclex_from_string on_period_only ~source_format ~filename
-    (EzFile.read_file filename)
+let srclex_from_file ~source_format filename : any_srclexer =
+  srclex_from_string ~source_format ~filename (EzFile.read_file filename)
 
 (* --- Compiler Directives -------------------------------------------------- *)
 

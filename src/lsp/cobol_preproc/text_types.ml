@@ -51,3 +51,10 @@ and pseudoword_item =
   | PwText of string
   | PwDelim of pseudotext_delimiter
 and pseudotext_delimiter = string * Str.regexp       (* with pre-built regexp *)
+
+type comment =
+  {
+    comment_loc: lexloc;
+    comment_kind: [`Line | `Floating];
+    comment_contents: string;
+  }

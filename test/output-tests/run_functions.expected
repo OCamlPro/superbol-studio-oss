@@ -19,45 +19,15 @@ run_functions.at-410-prog.cob:19.7-19.31:
   21          >>ELIF CHARSET = 'EBCDIC'
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-410-prog.cob:20.61:
-  17              STRING FUNCTION BIT-OF (TXT) DELIMITED BY SIZE INTO BITX.
-  18         *> Discover if running ASCII or EBCDIC
-  19          >>IF   CHARSET = 'ASCII'
-  20 >            IF BITX NOT = "01001000010010010010111000100000--"
-----                                                                ^
-  21          >>ELIF CHARSET = 'EBCDIC'
-  22              IF BITX NOT = "11001000110010010100101101000000--"
->> Hint: Missing .
-
-run_functions.at-410-prog.cob:21.7-21.13:
+run_functions.at-410-prog.cob:21.7-21.32:
   18         *> Discover if running ASCII or EBCDIC
   19          >>IF   CHARSET = 'ASCII'
   20              IF BITX NOT = "01001000010010010010111000100000--"
   21 >        >>ELIF CHARSET = 'EBCDIC'
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^
   22              IF BITX NOT = "11001000110010010100101101000000--"
   23          >>ELSE
->> Error: Invalid syntax
-
-run_functions.at-410-prog.cob:21.21:
-  18         *> Discover if running ASCII or EBCDIC
-  19          >>IF   CHARSET = 'ASCII'
-  20              IF BITX NOT = "01001000010010010010111000100000--"
-  21 >        >>ELIF CHARSET = 'EBCDIC'
-----                        ^
-  22              IF BITX NOT = "11001000110010010100101101000000--"
-  23          >>ELSE
->> Hint: Missing .
-
-run_functions.at-410-prog.cob:21.22-21.23:
-  18         *> Discover if running ASCII or EBCDIC
-  19          >>IF   CHARSET = 'ASCII'
-  20              IF BITX NOT = "01001000010010010010111000100000--"
-  21 >        >>ELIF CHARSET = 'EBCDIC'
-----                         ^
-  22              IF BITX NOT = "11001000110010010100101101000000--"
-  23          >>ELSE
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:23.7-23.13:
   20              IF BITX NOT = "01001000010010010010111000100000--"
@@ -67,7 +37,7 @@ run_functions.at-410-prog.cob:23.7-23.13:
 ----          ^^^^^^
   24              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
   25          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:25.7-25.15:
   22              IF BITX NOT = "11001000110010010100101101000000--"
@@ -77,7 +47,7 @@ run_functions.at-410-prog.cob:25.7-25.15:
 ----          ^^^^^^^^
   26                 DISPLAY "UNEXPECTED BIT-VALUE OF 'HI. ': " BITX.
   27   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:30.7-30.31:
   27   
@@ -97,7 +67,7 @@ run_functions.at-410-prog.cob:32.7-32.13:
 ----          ^^^^^^
   33              IF BITX NOT = "111100001111000100000000----------"
   34          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:34.7-34.15:
   31              IF BITX NOT = "001100000011000100000000----------"
@@ -107,7 +77,7 @@ run_functions.at-410-prog.cob:34.7-34.15:
 ----          ^^^^^^^^
   35   
   36              IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:36.55-36.59:
   33              IF BITX NOT = "111100001111000100000000----------"
@@ -160,45 +130,15 @@ run_functions.at-541-prog.cob:36.7-36.31:
   38          >>ELIF CHARSET = 'EBCDIC'
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-541-prog.cob:37.37:
-  34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
-  35         *> Discover if running ASCII or EBCDIC
-  36          >>IF   CHARSET = 'ASCII'
-  37 >            IF HEXX NOT = "20303132--"
-----                                        ^
-  38          >>ELIF CHARSET = 'EBCDIC'
-  39              IF HEXX NOT = "40F0F1F2--"
->> Hint: Missing .
-
-run_functions.at-541-prog.cob:38.7-38.13:
+run_functions.at-541-prog.cob:38.7-38.32:
   35         *> Discover if running ASCII or EBCDIC
   36          >>IF   CHARSET = 'ASCII'
   37              IF HEXX NOT = "20303132--"
   38 >        >>ELIF CHARSET = 'EBCDIC'
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^
   39              IF HEXX NOT = "40F0F1F2--"
   40          >>ELSE
->> Error: Invalid syntax
-
-run_functions.at-541-prog.cob:38.21:
-  35         *> Discover if running ASCII or EBCDIC
-  36          >>IF   CHARSET = 'ASCII'
-  37              IF HEXX NOT = "20303132--"
-  38 >        >>ELIF CHARSET = 'EBCDIC'
-----                        ^
-  39              IF HEXX NOT = "40F0F1F2--"
-  40          >>ELSE
->> Hint: Missing .
-
-run_functions.at-541-prog.cob:38.22-38.23:
-  35         *> Discover if running ASCII or EBCDIC
-  36          >>IF   CHARSET = 'ASCII'
-  37              IF HEXX NOT = "20303132--"
-  38 >        >>ELIF CHARSET = 'EBCDIC'
-----                         ^
-  39              IF HEXX NOT = "40F0F1F2--"
-  40          >>ELSE
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:40.7-40.13:
   37              IF HEXX NOT = "20303132--"
@@ -208,7 +148,7 @@ run_functions.at-541-prog.cob:40.7-40.13:
 ----          ^^^^^^
   41              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
   42          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:42.7-42.15:
   39              IF HEXX NOT = "40F0F1F2--"
@@ -218,7 +158,7 @@ run_functions.at-541-prog.cob:42.7-42.15:
 ----          ^^^^^^^^
   43                 DISPLAY "UNEXPECTED HEX-VALUE OF '0012': " HEXX.
   44   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:47.7-47.31:
   44   
@@ -238,7 +178,7 @@ run_functions.at-541-prog.cob:49.7-49.14:
 ----          ^^^^^^^
   50              IF HEXX NOT = "C8C94B40--"
   51          >> END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:51.7-51.16:
   48              IF HEXX NOT = "48492E20--"
@@ -248,7 +188,7 @@ run_functions.at-541-prog.cob:51.7-51.16:
 ----          ^^^^^^^^^
   52                 DISPLAY "UNEXPECTED HEX-VALUE OF 'HI! ': " HEXX.
   53   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:66.7-66.31:
   63   
@@ -268,7 +208,7 @@ run_functions.at-541-prog.cob:68.7-68.14:
 ----          ^^^^^^^
   69              IF HEXX NOT = "F0F100----"
   70          >> END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:70.7-70.16:
   67              IF HEXX NOT = "303100----"
@@ -278,7 +218,7 @@ run_functions.at-541-prog.cob:70.7-70.16:
 ----          ^^^^^^^^^
   71                 DISPLAY "UNEXPECTED HEX-VALUE OF z'01': " HEXX.
   72   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:75.7-75.31:
   72   
@@ -298,7 +238,7 @@ run_functions.at-541-prog.cob:77.7-77.14:
 ----          ^^^^^^^
   78              IF HEXX NOT = "40--------"
   79          >> END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:79.7-79.16:
   76              IF HEXX NOT = "20--------"
@@ -308,7 +248,7 @@ run_functions.at-541-prog.cob:79.7-79.16:
 ----          ^^^^^^^^^
   80                 DISPLAY "UNEXPECTED HEX-VALUE OF ' ': " HEXX.
   81   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:107.54-107.58:
  104              SET  HEXX-FILLER TO TRUE

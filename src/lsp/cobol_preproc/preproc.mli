@@ -121,19 +121,16 @@ val srclex_pos
   : any_srclexer
   -> Lexing.position
 val srclex_from_file
-  : bool
-  -> source_format:Cobol_config.source_format
+  : source_format:Cobol_config.source_format
   -> string
   -> any_srclexer
 val srclex_from_string
-  : bool
-  -> ?filename: string
+  : ?filename: string
   -> source_format:Cobol_config.source_format
   -> string
   -> any_srclexer
 val srclex_from_channel
-  : bool
-  -> ?filename: string
+  : ?filename: string
   -> source_format:Cobol_config.source_format
   -> in_channel
   -> any_srclexer
