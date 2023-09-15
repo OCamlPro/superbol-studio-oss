@@ -80,7 +80,6 @@ module Make = struct
     (* high-level structures and branches *)
     method fold_handler'            : (handler with_loc           , 'a) fold = default
     method fold_dual_handler        : (dual_handler               , 'a) fold = default
-    method fold_perform_target      : (perform_target             , 'a) fold = default
     method fold_call_error_handler  : (call_error_handler         , 'a) fold = default
     method fold_search_when_clause' : (search_when_clause with_loc, 'a) fold = default
     method fold_search_spec         : (search_spec                , 'a) fold = default
@@ -114,7 +113,8 @@ module Make = struct
     method fold_move'          : (move_stmt with_loc            , 'a) fold = default
     method fold_multiply'      : (multiply_stmt with_loc        , 'a) fold = default
     method fold_open'          : (open_stmt with_loc            , 'a) fold = default
-    method fold_perform'       : (perform_stmt with_loc         , 'a) fold = default
+    method fold_perform_target': (perform_target_stmt with_loc  , 'a) fold = default
+    method fold_perform_inline': (perform_inline_stmt with_loc  , 'a) fold = default
     method fold_raise'         : (raise_operand with_loc        , 'a) fold = default
     method fold_read'          : (read_stmt with_loc            , 'a) fold = default
     method fold_release'       : (release_stmt with_loc         , 'a) fold = default
@@ -632,7 +632,8 @@ module Make = struct
         | Move          s -> fold_move'           v (s &@ loc)
         | Multiply      s -> fold_multiply'       v (s &@ loc)
         | Open          s -> fold_open'           v (s &@ loc)
-        | Perform       s -> fold_perform'        v (s &@ loc)
+        | PerformTarget s -> fold_perform_target' v (s &@ loc)
+        | PerformInline s -> fold_perform_inline' v (s &@ loc)
         | Raise         s -> fold_raise'          v (s &@ loc)
         | Read          s -> fold_read'           v (s &@ loc)
         | Release       s -> fold_release'        v (s &@ loc)
@@ -808,20 +809,18 @@ module Make = struct
         >> fold_dual_handler v multiply_on_size_error
       end
 
-  and fold_perform' (v: _ #folder) : perform_stmt with_loc -> 'a -> 'a =
-    handle' v#fold_perform' v
-      ~fold:begin fun v { perform_target; perform_mode } x -> x
-        >> fold_perform_target v perform_target
+  and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
+    handle' v#fold_perform_target' v
+      ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
+        >> fold_procedure_range ~fold:fold_qualname v proc_range
         >> fold_option ~fold:fold_perform_mode v perform_mode
       end
 
-  and fold_perform_target (v: _ #folder) =
-    handle v#fold_perform_target
-      ~continue:begin function
-        | PerformOutOfLine proc_range ->
-            fold_procedure_range ~fold:fold_qualname v proc_range
-        | PerformInline stmts ->
-            fold_statements v stmts
+  and fold_perform_inline' (v: _ #folder) : perform_inline_stmt with_loc -> 'a -> 'a =
+    handle' v#fold_perform_inline' v
+      ~fold:begin fun v { perform_inline_mode; perform_statements } x -> x
+        >> fold_option ~fold:fold_perform_mode v perform_inline_mode
+        >> fold_statements v perform_statements
       end
 
   and fold_read_error_handler (v: _ #folder) =

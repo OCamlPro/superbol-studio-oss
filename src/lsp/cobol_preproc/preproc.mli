@@ -101,10 +101,6 @@ val apply_replacing
   -> text
   -> 'a
 
-val srclex_diags
-  : any_srclexer
-  -> Cobol_common.Diagnostics.Set.t
-
 val cdir_source_format
   : dialect: Cobol_config.dialect
   -> string with_loc
@@ -117,9 +113,6 @@ val with_source_format
   -> any_srclexer
   -> any_srclexer
 
-val srclex_pos
-  : any_srclexer
-  -> Lexing.position
 val srclex_from_file
   : source_format:Cobol_config.source_format
   -> string
@@ -134,6 +127,15 @@ val srclex_from_channel
   -> source_format:Cobol_config.source_format
   -> in_channel
   -> any_srclexer
+val srclex_diags
+  : any_srclexer
+  -> Cobol_common.Diagnostics.Set.t
+val srclex_pos
+  : any_srclexer
+  -> Lexing.position
+val srclex_comments
+  : any_srclexer
+  -> comments
 
 val next_source_line: any_srclexer -> any_srclexer * text
 val fold_source_lines: any_srclexer -> (text -> 'a -> 'a) -> 'a -> 'a

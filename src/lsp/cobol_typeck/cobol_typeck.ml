@@ -1163,10 +1163,10 @@ let analyze_compilation_group ?(config = Cobol_config.default)
     Ok (Typeck.typeck_compilation_group cg, DIAGS.Set.none)
   in
   function
-  | { parsed_output = Only None | WithTokens (None, _, _);
+  | { parsed_output = Only None | WithArtifacts (None, _);
       parsed_diags; _ } ->
       Error parsed_diags
-  | { parsed_output = Only Some cg | WithTokens (Some cg, _, _);
+  | { parsed_output = Only Some cg | WithArtifacts (Some cg, _);
       parsed_diags; _ } ->
       match Cobol_common.catch_diagnostics analyze_cg cg with
       | Ok (res, diags) ->

@@ -3353,12 +3353,12 @@ let perform_statement :=
  | PERFORM; i = qualified_procedure_name;
    io = ro(pf(THROUGH,qualified_procedure_name));
    po = io(perform_phrase);
-   { Perform { perform_target = PerformOutOfLine { procedure_start = i;
-                                                   procedure_end = io };
-               perform_mode = po } }
+   { PerformTarget { perform_target = { procedure_start = i;
+                                        procedure_end = io };
+                     perform_mode = po } }
  | PERFORM; po = ro(perform_phrase); isl = imp_stmts; END_PERFORM;
-   { Perform { perform_target = PerformInline isl;
-               perform_mode = po } }
+   { PerformInline { perform_inline_mode = po;
+                     perform_statements = isl } }
 
 let perform_phrase :=
  | ~ = ident_or_integer; TIMES; <PerformNTimes>

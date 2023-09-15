@@ -42,7 +42,8 @@ module TYPES: sig
     | InvalidStatus of state
     | UnhandledRequest of 'a Lsp.Client_request.t
     | UnknownRequest of string
-    | FormattingError of string
+
+  exception Document_not_found of Lsp.Types.TextDocumentIdentifier.t
 
 end
 include module type of TYPES

@@ -20,5 +20,7 @@ module Text_printer = Text_printer
 module Copybook = Copybook
 module Trace = Preproc_trace
 
+type text = Text.text
+type comments = Text.comments
 include Trace.TYPES
 include Preproc_engine

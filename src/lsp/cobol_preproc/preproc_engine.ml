@@ -62,10 +62,10 @@ let diags { diags; srclex; _ } =
   DIAGS.Set.union diags @@ Preproc.srclex_diags srclex
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
-let log { pplog; _ } = (* List.rev *) pplog
-(* let rev_log { pplog; _ } = pplog *)
+let log { pplog; _ } = pplog
 let srclexer { srclex; _ } = srclex
 let position { srclex; _ } = Preproc.srclex_pos srclex
+let comments { srclex; _ } = Preproc.srclex_comments srclex
 
 let with_srclex lp srclex =
   if lp.srclex == srclex then lp else { lp with srclex }

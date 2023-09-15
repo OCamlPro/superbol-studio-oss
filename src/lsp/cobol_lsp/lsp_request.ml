@@ -20,7 +20,7 @@ open Lsp.Types
 open Ez_file.V1
 
 
-(** Some preliminary utilities for manipulating source locations *)
+(** {2 Some preliminary utilities for manipulating source locations} *)
 
 type loc_translator =
   {
@@ -39,19 +39,39 @@ let loc_translator TextDocumentIdentifier.{ uri } =
     location_of = fun { loc; _ } -> location_of_srcloc loc;
   }
 
+(** {2 Error handling} *)
 
-(** Catching cases where we miss some document data *)
+(** Raises {!Jsonrpc.Response.Error.E} *)
+let error ~code fmt =
+  Pretty.string_to begin fun message ->
+    Jsonrpc.Response.Error.(raise @@ make ~code ~message ())
+  end fmt
 
-let try_with_document_data ?(on_error = None) ~f registry document_id =
-  try
-    let Lsp_document.{ project; textdoc; pplog; tokens; _ } as doc =
-      Lsp_server.find_document document_id registry in
-    f ~project ~textdoc ~pplog ~tokens @@ Lsp_document.retrieve_parsed_data doc
+let request_failed fmt =
+  error ~code:Jsonrpc.Response.Error.Code.RequestFailed fmt
+let internal_error fmt =
+  error ~code:Jsonrpc.Response.Error.Code.InternalError fmt
+
+(** Catch generic exception cases, and report errors using {!error} above *)
+let try_doc ~f registry doc_id =
+  let doc =
+    try Lsp_server.find_document doc_id registry
+    with Not_found ->
+      request_failed
+        "Received a request about a document that has not been opened yet (uri = \
+         %s) --- possible cause is the client did not manage to send the didOpen \
+         notification; this may happen due to unhandled character encodings.\
+        " (DocumentUri.to_string doc_id.TextDocumentIdentifier.uri)
+  in
+  try f ~doc
   with e ->
-    Lsp_io.pretty_notification ~type_:Warning "Caught exception: %a" Fmt.exn e;
-    on_error
+    internal_error "Caught exception: %a" Fmt.exn e
 
-(** Handling requests *)
+(** Same as [try_doc], with some additional document data *)
+let try_with_document_data ~f =
+  try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.retrieve_parsed_data doc)
+
+(** {2 Handling requests} *)
 
 (* Client capabilities are to be used for special request response, for example
    a definition request can be answered with a LocationLink iff the client
@@ -128,8 +148,7 @@ let lookup_definition_in_doc
 
 let handle_definition registry (params: DefinitionParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:(fun ~project:_ ~textdoc:_ ~pplog:_ ~tokens:_ ->
-        lookup_definition_in_doc params)
+    ~f:(fun ~doc:_ -> lookup_definition_in_doc params)
 
 let lookup_references_in_doc
     ReferenceParams.{ textDocument = doc; position; context; _ }
@@ -163,8 +182,7 @@ let lookup_references_in_doc
 
 let handle_references state (params: ReferenceParams.t) =
   try_with_document_data state params.textDocument
-    ~f:(fun ~project:_ ~textdoc:_ ~pplog:_ ~tokens:_ ->
-        lookup_references_in_doc params)
+    ~f:(fun ~doc:_ -> lookup_references_in_doc params)
 
 
 (*Remark:
@@ -215,20 +233,27 @@ let handle_formatting registry params =
       ~end_:(Position.create ~character:width ~line:length)
   in
   let path = Lsp.Uri.to_path doc.uri in
-  let newText =
-    Cobol_indent.indent_range'
-      ~source_format:project.source_format
-      ~indent_config:None
-      ~file:path
-      ~range:None
-  in
-  Some [TextEdit.create ~newText ~range:edit_range]
+  try
+    let newText =
+      Cobol_indent.indent_range'
+        ~source_format:project.source_format
+        ~indent_config:None
+        ~file:path
+        ~range:None
+    in
+    Some [TextEdit.create ~newText ~range:edit_range]
+  with Failure msg ->
+    internal_error "Formatting error: %s" msg
 
 let handle_semantic_tokens_full registry (params: SemanticTokensParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:begin fun ~project:_ ~textdoc:_ ~pplog:_ ~tokens Lsp_document.{ ast; _ } ->
+    ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments };
+                        _ } Lsp_document.{ ast; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
-      let data = Lsp_semtoks.data ~filename (Lazy.force tokens) ast in
+      let data =
+        Lsp_semtoks.data ~filename ~pplog ~comments
+          ~tokens:(Lazy.force tokens) ~ptree:ast
+      in
       Some (SemanticTokens.create ~data ())
     end
 
@@ -247,28 +272,31 @@ let handle_hover registry (params: HoverParams.t) =
     let range = Lsp_position.range_of_srcloc_in ~filename loc in
     Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
-  let Lsp_document.{ project; pplog; _ } =
-    Lsp_server.find_document params.textDocument registry in
-  match find_hovered_pplog_event pplog with
-  | Some Replacement { matched_loc = loc; replacement_text; _ } ->
-      Pretty.string_to (hover_markdown ~loc) "``@[<h>%a@]``"
-        Cobol_preproc.Text.pp_text replacement_text
-  | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
-      let text = EzFile.read_file lib in
-      (* TODO: grab source-format from preprocessor state? *)
-      let module Config = (val project.cobol_config) in
-      let mdlang = match Config.format#value with
-        | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
-        | SF _ | Auto -> "cobol"
-      in
-      Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
-  | Some FileCopy { status = MissingCopy _; _ } | None ->
-      None
+  try_doc registry params.textDocument
+    ~f:begin fun ~doc:{ project; artifacts = { pplog; _ }; _ } ->
+      match find_hovered_pplog_event pplog with
+      | Some Replacement { matched_loc = loc;
+                           replacement_text; _ } ->
+          Pretty.string_to (hover_markdown ~loc) "``@[<h>%a@]``"
+            Cobol_preproc.Text.pp_text replacement_text
+      | Some FileCopy { copyloc = loc;
+                        status = CopyDone lib | CyclicCopy lib } ->
+          let text = EzFile.read_file lib in
+          (* TODO: grab source-format from preprocessor state? *)
+          let module Config = (val project.cobol_config) in
+          let mdlang = match Config.format#value with
+            | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
+            | SF _ | Auto -> "cobol"
+          in
+          Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
+      | Some FileCopy { status = MissingCopy _; _ } | None ->
+          None
+    end
 
 let handle_completion registry (params:CompletionParams.t) =
   let open Lsp_completion in
   try_with_document_data registry params.textDocument
-    ~f:begin fun ~project:_ ~textdoc ~pplog:_ ~tokens:_ { ast; _ } ->
+    ~f:begin fun ~doc:{ textdoc; _ } { ast; _ } ->
       let items = completion_items textdoc params.position ast in
       let completionlist = CompletionList.create ~isIncomplete:false ~items () in
       Some (`CompletionList completionlist)
@@ -276,8 +304,9 @@ let handle_completion registry (params:CompletionParams.t) =
 
 let handle_shutdown registry =
   try Lsp_server.save_project_caches registry
-  with e -> Pretty.error "Exception caught while saving project caches: %a@.\
-                         " Fmt.exn e
+  with e ->
+    internal_error
+      "Exception caught while saving project caches: %a@." Fmt.exn e
 
 let on_request
   : type r. state -> r Lsp.Client_request.t ->
@@ -300,8 +329,7 @@ let on_request
     | TextDocumentRangeFormatting params ->
         Ok (handle_range_formatting registry params, state)
     | TextDocumentFormatting params ->
-        begin try Ok (handle_formatting registry params, state)
-        with Failure msg -> Error (FormattingError msg) end
+        Ok (handle_formatting registry params, state)
     | SemanticTokensFull params ->
         Ok (handle_semantic_tokens_full registry params, state)
     | TextDocumentHover hover_params ->
@@ -347,28 +375,28 @@ let on_request
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
       ->
         Error (UnhandledRequest client_req)
-    | UnknownRequest { meth ; params=_ } ->
+    | UnknownRequest { meth; _ } ->
         Error (UnknownRequest meth)
 
-let handle req state =
+let handle (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
+  | Error message ->
+      let code = Jsonrpc.Response.Error.Code.InvalidRequest in
+      let err = Jsonrpc.Response.Error.make ~message ~code () in
+      state, Jsonrpc.Response.(error id err)
   | Ok (E r) ->
-      let response, state =
-        match on_request state r ~id:req.id with
-        | Ok (reply, state) ->
-            let reply_json = Lsp.Client_request.yojson_of_result r reply in
-            Jsonrpc.Response.ok req.id reply_json, state
-        | Error server_error ->
-            let json_error =
-              Lsp_server.jsonrpc_of_error server_error req.method_ in
-            Jsonrpc.Response.error req.id json_error, state
-        | exception e ->
-            Jsonrpc.Response.error req.id @@ Jsonrpc.Response.Error.of_exn e, state
-      in
-      Lsp_io.send_response response;
-      state
-  | Error str ->
-      Pretty.failwith "Could not read request: %s" str
+      match on_request state r ~id with
+      | Ok (reply, state) ->
+          let reply_json = Lsp.Client_request.yojson_of_result r reply in
+          state, Jsonrpc.Response.ok id reply_json
+      | Error server_error ->
+          state,
+          Jsonrpc.Response.error id @@
+          Lsp_server.jsonrpc_of_error server_error req.method_
+      | exception Jsonrpc.Response.Error.E e ->
+          state, Jsonrpc.Response.error id e
+      | exception e ->
+          state, Jsonrpc.Response.(error id @@ Error.of_exn e)
 
 module INTERNAL = struct
   let lookup_definition = handle_definition

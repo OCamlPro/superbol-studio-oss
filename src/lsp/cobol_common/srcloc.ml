@@ -102,6 +102,22 @@ let rec start_pos: type t. t slt -> Lexing.position = function
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
 
+let shallow_multiline_lexloc_in ~filename loc =
+  let rec aux: type t. t slt -> lexloc option = function
+    | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+    | Raw _ | Cpy _ | Rpl _ -> None
+    | Cat { left; right } -> match aux left, aux right with
+      | Some (s, _), Some (_, e)
+      | Some (s, e), None
+      | None, Some (s, e) -> Some (s, e)
+      | None, None -> None
+  in
+  aux loc
+
+let shallow_single_line_lexloc_in ~filename = function
+  | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+  | Raw _ | Cpy _ | Rpl _ | Cat _ -> None
+
 let start_pos_in ~filename =
   let rec aux: type t. t slt -> Lexing.position option = function
     | Raw (s, _, _) when s.pos_fname = filename -> Some s
@@ -176,15 +192,46 @@ let as_lexloc: srcloc -> lexloc =
   forget_preproc ~favor_direction:`Left
     ~traverse_copies:true ~traverse_replaces:false
 
-let lookup_pos ~lookup ~lookup_name ~filename loc =
+let lookup_ ~lookup ~lookup_name ~filename loc =
   match lookup ~filename loc with
-  | None -> Fmt.invalid_arg "%s.%s: no part of \"%s\" was used to construct the \
-                             given location (loc = %a)" __MODULE__ lookup_name filename
-              pp_srcloc_struct loc
-  | Some s -> s
+  | None ->
+      Pretty.invalid_arg
+        "%s.%s: no part of \"%s\" was used to construct the given location (loc \
+         = %a)" __MODULE__ lookup_name filename pp_srcloc_struct loc
+  | Some s ->
+      s
 
-let start_pos_in = lookup_pos ~lookup:start_pos_in ~lookup_name:"start_pos_in"
-let end_pos_in = lookup_pos ~lookup:end_pos_in ~lookup_name:"end_pos_in"
+let start_pos_in =
+  lookup_ ~lookup:start_pos_in
+    ~lookup_name:"start_pos_in"
+let end_pos_in =
+  lookup_ ~lookup:end_pos_in
+    ~lookup_name:"end_pos_in"
+let shallow_multiline_lexloc_in =
+  lookup_ ~lookup:shallow_multiline_lexloc_in
+    ~lookup_name:"shallow_multiline_lexloc_in"
+let shallow_single_line_lexloc_in =
+  lookup_ ~lookup:shallow_single_line_lexloc_in
+    ~lookup_name:"shallow_single_line_lexloc_in"
+(* let shallow_single_line_lexlocs_in = *)
+(*   lookup_ ~lookup:shallow_single_line_lexlocs_in *)
+(*     ~lookup_name:"shallow_single_line_lexlocs_in" *)
+
+let shallow_single_line_lexlocs_in
+    ?(ignore_invalid_filename = false) ~filename loc =
+  let rec aux: type t. t slt -> (lexloc list as 'a) -> 'a = function
+    | Raw (s, e, _) when s.pos_fname = filename -> List.cons (s, e)
+    | Raw _ | Cpy _ | Rpl _ -> Fun.id
+    | Cat { left; right } -> fun acc -> acc |> aux right |> aux left
+  in
+  match aux loc [] with
+  | l when ignore_invalid_filename -> l
+  | _ :: _ as l -> l
+  | [] ->
+      Pretty.invalid_arg
+        "%s.%s: no part of \"%s\" was used to construct the given location (loc \
+         = %a)" __MODULE__ "shallow_single_line_lexlocs_in"
+        filename pp_srcloc_struct loc
 
 (** [lexloc_in ~filename loc] projects the source location [loc] on the file
     [filename] by eliminating relevant preprocessor-related locations.
@@ -233,18 +280,18 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
   in
   aux
 
-let fold_lexlocs f loc acc =
-  let rec aux: type t. t slt -> 'a -> 'a = fun loc -> match loc with
-    | Raw (s, e, _) -> f (s, e)
-    | Cpy { copied; _ } -> aux copied
-    | Rpl { old; _ } -> aux old
-    | Cat { left; right } -> fun acc -> acc |> aux left |> aux right
-  in
-  aux loc acc
+(* let fold_lexlocs f loc acc = *)
+(*   let rec aux: type t. t slt -> 'a -> 'a = fun loc -> match loc with *)
+(*     | Raw (s, e, _) -> f (s, e) *)
+(*     | Cpy { copied; _ } -> aux copied *)
+(*     | Rpl { old; _ } -> aux old *)
+(*     | Cat { left; right } -> fun acc -> acc |> aux left |> aux right *)
+(*   in *)
+(*   aux loc acc *)
 
-let has_lexloc p loc =
-  try fold_lexlocs (fun lexloc () -> if p lexloc then raise Exit) loc (); false
-  with Exit -> true
+(* let has_lexloc p loc = *)
+(*   try fold_lexlocs (fun lexloc () -> if p lexloc then raise Exit) loc (); false *)
+(*   with Exit -> true *)
 
 let retrieve_file_lines =
   let module Cache =

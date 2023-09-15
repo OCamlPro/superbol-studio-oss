@@ -143,7 +143,7 @@ type 'k state =
     lex_prods: text;
     continued: continued;
     pseudotext: (srcloc * text) option;
-    comments: comment list;
+    comments: comments;
     cdir_seen: bool;
     newline: bool;
     diags: DIAGS.Set.t;
@@ -186,13 +186,9 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
   }
 
 let diagnostics { diags; _ } = diags
-let comments { comments; _ } = comments
-
-let source_format { config = { source_format; _ }; _ } =
-  source_format
-
-let allow_debug { config = { debug; _ }; _ } =
-  debug
+let comments { comments; _ } = List.rev comments
+let source_format { config = { source_format; _ }; _ } = source_format
+let allow_debug { config = { debug; _ }; _ } = debug
 
 (* Just check there are no buffered stuffs.  *)
 let flushed = function

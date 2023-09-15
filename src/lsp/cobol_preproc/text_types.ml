@@ -58,3 +58,4 @@ type comment =
     comment_kind: [`Line | `Floating];
     comment_contents: string;
   }
+and comments = comment list

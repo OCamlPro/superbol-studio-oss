@@ -34,9 +34,18 @@ let on_notification state notif =
   | _ ->
       state
 
-let handle notif status =
+let handle notif state =
   match Lsp.Client_notification.of_jsonrpc notif with
   | Error str ->
-      Pretty.failwith "LSP@ sever@ could@ not@ decode@ notification:@ %s" str
+      Lsp_io.pretty_notification ~type_:Error "Invalid@ notification:@ %s" str;
+      state
   | Ok notif ->
-      on_notification status notif
+      try on_notification state notif with
+      | Lsp_server.Document_not_found { uri } ->
+          Lsp_io.pretty_notification ~type_:Error
+            "Document@ %s@ is@ not@ opened@ yet"
+            (Lsp.Types.DocumentUri.to_string uri);
+          state
+      | e ->
+          Lsp_io.pretty_notification ~type_:Error "%a" Fmt.exn e;
+          state

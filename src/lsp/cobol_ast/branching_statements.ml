@@ -60,15 +60,17 @@ and evaluate_branch =
 
 
 (* PERFORM *)
-and perform_stmt =
+and perform_target_stmt =
   {
-    perform_target: perform_target;
+    perform_target: qualname procedure_range;
     perform_mode: perform_mode option;
   }
 
-and perform_target =
-  | PerformOutOfLine of qualname procedure_range
-  | PerformInline of statements
+and perform_inline_stmt =
+  {
+    perform_inline_mode: perform_mode option;
+    perform_statements: statements;
+  }
 
 and perform_mode =
   | PerformNTimes of ident_or_intlit
@@ -396,7 +398,8 @@ and statement =
   | Move of move_stmt
   | Multiply of multiply_stmt
   | Open of open_stmt
-  | Perform of perform_stmt
+  | PerformTarget of perform_target_stmt
+  | PerformInline of perform_inline_stmt
   | Purge of name with_loc
   | Raise of raise_operand
   | Read of read_stmt
@@ -525,21 +528,15 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
 
 (* PERFORM *)
 
-and pp_perform_stmt ppf { perform_target; perform_mode } =
-  match perform_target with
-  | PerformInline _ ->
-    Fmt.pf ppf "@[<v>@[PERFORM%a@]@;<1 2>%a@]"
-      Fmt.(option (sp ++ pp_perform_mode)) perform_mode
-      pp_perform_target perform_target
-  | PerformOutOfLine _ ->
-    Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
-      pp_perform_target perform_target
-      Fmt.(option (sp ++ pp_perform_mode)) perform_mode
+and pp_perform_target_stmt ppf { perform_target; perform_mode } =
+  Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
+    (pp_procedure_range pp_qualname) perform_target
+    Fmt.(option (sp ++ pp_perform_mode)) perform_mode
 
-and pp_perform_target ppf = function
-  | PerformOutOfLine qnpr -> pp_procedure_range pp_qualname ppf qnpr
-  | PerformInline isl ->
-    Fmt.pf ppf "%a@ END-PERFORM" pp_statements isl
+and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
+  Fmt.pf ppf "@[<v>@[PERFORM%a@]@;<1 2>%a@ END-PERFORM@]"
+    Fmt.(option (sp ++ pp_perform_mode)) perform_inline_mode
+    pp_statements perform_statements
 
 and pp_perform_mode ppf = function
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
@@ -877,7 +874,8 @@ and pp_statement ppf = function
   | Move s -> pp_move_stmt ppf s
   | Multiply s -> pp_multiply_stmt ppf s
   | Open s -> pp_open_stmt ppf s
-  | Perform s -> pp_perform_stmt ppf s
+  | PerformInline s -> pp_perform_inline_stmt ppf s
+  | PerformTarget s -> pp_perform_target_stmt ppf s
   | Purge n -> Fmt.pf ppf "PURGE %a" (pp_with_loc pp_name) n
   | Raise ro -> pp_raise_operand ppf ro
   | Read s -> pp_read_stmt ppf s

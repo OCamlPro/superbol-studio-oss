@@ -45,7 +45,8 @@ module TYPES = struct
     | InvalidStatus of state
     | UnhandledRequest of 'a Lsp.Client_request.t
     | UnknownRequest of string
-    | FormattingError of string
+
+  exception Document_not_found of TextDocumentIdentifier.t
 
 end
 include TYPES
@@ -158,23 +159,20 @@ let add (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
   in
   aux ~try_cache:true registry
 
+(** Raises {!Document_not_found} if the document is not currently opened. *)
+let find_document (TextDocumentIdentifier.{ uri; _ } as doc) { docs; _ } =
+  try URIMap.find uri docs
+  with Not_found -> raise @@ Document_not_found doc
+
 let update DidChangeTextDocumentParams.{ textDocument = { uri; _ };
                                          contentChanges; _ } registry =
-  try
-    let doc = URIMap.find uri registry.docs in
-    let doc = Lsp_document.update doc contentChanges in
-    let registry = dispatch_diagnostics doc registry in
-    add_or_replace_doc doc registry
-  with Not_found ->
-    Pretty.failwith "Document@ %s@ was@ not@ opened@ before@ changes"
-      (DocumentUri.to_string uri)
+  let doc = find_document TextDocumentIdentifier.{ uri } registry in
+  let doc = Lsp_document.update doc contentChanges in
+  let registry = dispatch_diagnostics doc registry in
+  add_or_replace_doc doc registry
 
 let remove DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
   { registry with docs = URIMap.remove uri registry.docs }
-
-(** Raises {!Not_found} if the document is not currently opened. *)
-let find_document TextDocumentIdentifier.{ uri; _ } { docs; _ } =
-  URIMap.find uri docs
 
 (** {2 Miscellaneous} *)
 
@@ -194,7 +192,5 @@ let jsonrpc_of_error error method_ =
         RequestFailed, Fmt.str "Unhandled request: %s" method_
     | UnknownRequest method_ ->
         MethodNotFound, Fmt.str "Unknown request method: %s" method_
-    | FormattingError msg ->
-        RequestFailed, Fmt.str "Formatting request error: %s" msg
   in
   Jsonrpc.Response.Error.make ~code ~message ()

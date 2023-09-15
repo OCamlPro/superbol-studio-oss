@@ -55,7 +55,7 @@ type 'k state
 
 val init_state: 'k source_format -> 'k state
 val diagnostics: _ state -> Cobol_common.Diagnostics.Set.t
-val comments: _ state -> Text.comment list
+val comments: _ state -> Text.comments
 val source_format: 'k state -> 'k source_format
 val change_source_format: 'k state -> 'c source_format Cobol_common.Srcloc.with_loc
   -> ('c state, 'k state) result

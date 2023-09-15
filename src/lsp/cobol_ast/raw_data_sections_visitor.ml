@@ -229,6 +229,9 @@ struct
         | DataGlobal
         | DataJustified -> Fun.id
         | DataOccurs c -> fold_data_occurs_clause v c
+        | DataRedefines n
+        | DataType n
+        | DataSameAs n -> fold_name' v n
         | _ -> partial __LINE__ "fold_data_clause"
       end
 

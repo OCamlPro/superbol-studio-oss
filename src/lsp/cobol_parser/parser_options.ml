@@ -31,10 +31,16 @@ type 'a memory =
   | Eidetic: Cobol_common.Behaviors.eidetic memory
 
 type tokens_with_locs = Grammar_tokens.token with_loc list
+type parsing_artifacts =
+  {
+    tokens: tokens_with_locs Lazy.t;
+    pplog: Cobol_preproc.log;
+    comments: Cobol_preproc.comments
+  }
 type ('a, 'm) output =
   | Only: 'a ->
       ('a, Cobol_common.Behaviors.amnesic) output
-  | WithTokens: 'a * tokens_with_locs Lazy.t * Cobol_preproc.log ->
+  | WithArtifacts: 'a * parsing_artifacts ->
       ('a, Cobol_common.Behaviors.eidetic) output
 
 type ('a, 'm) parsed_result =

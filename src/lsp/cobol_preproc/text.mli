@@ -22,6 +22,7 @@ include module type of Text_types
    and type quotation = Text_types.quotation
    and type pseudotext = Text_types.pseudotext
    and type comment = Text_types.comment
+   and type comments = Text_types.comments
 
 val textwordp : text_word with_loc -> bool
 val textword_eqp : eq:string -> text_word with_loc -> bool

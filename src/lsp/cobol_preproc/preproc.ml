@@ -33,6 +33,8 @@ let srclex_lexbuf (Plx (_, lexbuf)) = lexbuf
 let srclex_pos pl = (srclex_lexbuf pl).Lexing.lex_curr_p
 let srclex_diags (Plx (pl, _)) =
   Src_lexing.diagnostics pl
+let srclex_comments (Plx (pl, _)) =
+  Src_lexing.comments pl
 let srclex_source_format (Plx (pl, _)) =
   Src_lexing.(source_format_spec @@ source_format pl)
 

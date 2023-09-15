@@ -70,6 +70,19 @@ val lexloc_in
   : filename: string
   -> srcloc
   -> lexloc
+val shallow_multiline_lexloc_in
+  : filename: string
+  -> srcloc
+  -> lexloc
+val shallow_single_line_lexloc_in
+  : filename: string
+  -> srcloc
+  -> lexloc
+val shallow_single_line_lexlocs_in
+  : ?ignore_invalid_filename: bool
+  -> filename: string
+  -> srcloc
+  -> lexloc list
 val as_unique_lexloc
   : srcloc
   -> lexloc option
@@ -82,8 +95,8 @@ val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
 
-val fold_lexlocs: (lexloc -> 'a -> 'a) -> srcloc -> 'a -> 'a
-val has_lexloc: (lexloc -> bool) -> srcloc -> bool
+(* val fold_lexlocs: (lexloc -> 'a -> 'a) -> srcloc -> 'a -> 'a *)
+(* val has_lexloc: (lexloc -> bool) -> srcloc -> bool *)
 
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
@@ -95,6 +108,7 @@ val sub : srcloc -> pos:int -> len:int -> srcloc
 
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
+val pp_raw_loc: (string * (int * int) * (int * int)) Pretty.printer
 val flagit: 'a -> srcloc -> 'a with_loc
 val payload: 'a with_loc -> 'a
 val loc: 'a with_loc -> srcloc

@@ -48,21 +48,33 @@ let config ~project_config_filename ~relative_work_dirname =
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
 let run ~config =
-  let process_msg = function
+  let rec loop state =
+    match Lsp_io.read_message () with
     | Jsonrpc.Packet.Notification n ->
-        Lsp_notif.handle n
-    | Request r ->
-        Lsp_request.handle r
-    | _ ->
-        Fun.id
-  in
-  let rec loop status =
-    let status = match Lsp_io.read_message () with
-      | Error e -> Jsonrpc.Response.Error.raise e
-      | Ok m -> process_msg m status
-    in
-    match status with
-    | Exit code -> code
-    | _ -> loop status
+        continue @@ Lsp_notif.handle n state
+    | Jsonrpc.Packet.Request r ->
+        continue @@ reply @@ Lsp_request.handle r state
+    | Jsonrpc.Packet.Batch_call calls ->
+        batch calls state
+    | Jsonrpc.Packet.Response _ | Batch_response _ ->
+        Pretty.error "Response@ recieved@ unexpectedly@.";
+        continue state
+    | exception Lsp_io.Parse_error msg ->
+        Lsp_io.pretty_notification ~type_:Error "%s" msg;
+        Error msg                                                (* exit loop *)
+  and batch calls state =
+    match calls with
+    | [] ->
+        continue state
+    | `Notification n :: calls' ->
+        batch calls' @@ Lsp_notif.handle n state
+    | `Request n :: calls' ->
+        batch calls' @@ reply @@ Lsp_request.handle n state
+  and reply (state, response) =
+    Lsp_io.send_response response;
+    state
+  and continue = function
+    | Lsp_server.Exit code -> code                                (* exit loop *)
+    | state -> loop state
   in
   loop (NotInitialized config)
