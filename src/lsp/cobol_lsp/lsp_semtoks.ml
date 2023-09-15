@@ -453,13 +453,15 @@ let semtoks_from_ptree ~filename ptree =
           |> add_name' name FileName
           |> Visitor.skip_children
 
-    method! fold_search_spec search_spec acc =
-      match search_spec with
-      | SearchSerial { varying; when_clauses } -> acc
-          |> add_option add_ident varying VarModif
-          |> fold_list ~fold:fold_search_when_clause' self when_clauses
-          |> Visitor.skip_children
-      | SearchAll _ -> Visitor.do_children acc
+    method! fold_search' { payload = { search_item;
+                                       search_varying;
+                                       search_at_end;
+                                       search_when_clauses }; _ } acc = acc
+      |> fold_qualname self search_item
+      |> add_option add_ident search_varying VarModif
+      |> fold_statements self search_at_end
+      |> fold_list ~fold:fold_search_when_clause' self search_when_clauses
+      |> Visitor.skip_children
 
     method! fold_set_switch_spec {set_switch_targets;
                                   set_switch_value } acc = acc

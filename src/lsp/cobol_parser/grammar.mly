@@ -3496,24 +3496,26 @@ let rewrite_statement :=
 (* SEARCH STATEMENT *)
 (* TODO: merge when_clause / statements_or_next *)
 
-%public let unconditional_action := ~ = search_statement; <Search>
+%public let unconditional_action := ~ = search_statement; < >
 let search_statement :=
  | SEARCH; i = qualname;
    io = ro(pf(VARYING,ident));
    ae = ilo(pf(at_end,imp_stmts));
    wcl = nell(loc(when_clause));
    end_search;
-   { { search_item = i;
-       search_at_end = ae;
-       search_spec = SearchSerial { varying = io; when_clauses = wcl } } }
+   { Search { search_item = i;
+              search_varying = io;
+              search_at_end = ae;
+              search_when_clauses = wcl } }
  | SEARCH; ALL; i = qualname;
    ae = ilo(pf(at_end,imp_stmts));
    WHEN; sc = search_condition; scl = ll(and_clause);
    sn = statements_or_next;
    end_search;
-   { { search_item = i;
-       search_at_end = ae;
-       search_spec = SearchAll { conditions = sc :: scl; action = sn } } }
+   { SearchAll { search_all_item = i;
+                 search_all_at_end = ae;
+                 search_all_conditions = sc :: scl;
+                 search_all_action = sn } }
 
 let end_search := oterm_(END_SEARCH)
 

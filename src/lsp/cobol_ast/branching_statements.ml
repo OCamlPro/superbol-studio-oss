@@ -99,26 +99,24 @@ and varying_phrase =
 and search_stmt =
   {
     search_item: qualname;
+    search_varying: ident option;
     search_at_end: handler;
-    search_spec: search_spec;
+    search_when_clauses: search_when_clause with_loc list;
   }
-
-and search_spec =
-  | SearchSerial of
-      {
-        varying: ident option;
-        when_clauses: search_when_clause with_loc list;
-      }
-  | SearchAll of
-      {
-        conditions: search_condition list;
-        action: branch;
-      }
 
 and search_when_clause =
   {
     search_when_cond: condition;
     search_when_stmts: branch;
+  }
+
+(* SEARCH ALL *)
+and search_all_stmt =
+  {
+    search_all_item: qualname;
+    search_all_at_end: handler;
+    search_all_conditions: search_condition list;
+    search_all_action: branch;
   }
 
 
@@ -410,6 +408,7 @@ and statement =
   | Return of return_stmt
   | Rewrite of rewrite_stmt
   | Search of search_stmt
+  | SearchAll of search_all_stmt
   | Send of send_stmt
   | Set of set_stmt
   | Sort of sort_stmt
@@ -560,23 +559,25 @@ and pp_varying_phrase ppf
 
 (* SEARCH *)
 
-and pp_search_stmt ppf { search_item = si; search_at_end = h; search_spec = ss } =
-  match ss with
-  | SearchSerial { varying; when_clauses } ->
-    Fmt.pf ppf "SEARCH %a" pp_qualname si;
-    Fmt.(option (any "@ VARYING " ++ pp_ident)) ppf varying;
-    List.iter (fun pf -> pf ppf ()) @@
-    list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
-    Fmt.(sp ++ list ~sep:sp (pp_with_loc pp_search_when_clause)) ppf when_clauses;
-    Fmt.pf ppf "@ END-SEARCH"
-  | SearchAll { conditions; action } ->
-    Fmt.pf ppf "SEARCH ALL %a" pp_qualname si;
-    List.iter (fun pf -> pf ppf ()) @@
-    list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
-    Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition)
-      ppf conditions;
-    Fmt.(sp ++ pp_branch) ppf action;
-    Fmt.pf ppf "@ END-SEARCH"
+and pp_search_stmt ppf { search_item = si; search_varying = sv;
+                         search_at_end = h; search_when_clauses = swc } =
+  Fmt.pf ppf "SEARCH %a" pp_qualname si;
+  Fmt.(option (any "@ VARYING " ++ pp_ident)) ppf sv;
+  List.iter (fun pf -> pf ppf ()) @@
+  list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
+  Fmt.(sp ++ list ~sep:sp (pp_with_loc pp_search_when_clause)) ppf swc;
+  Fmt.pf ppf "@ END-SEARCH"
+
+and pp_search_all_stmt ppf { search_all_item = si;
+                             search_all_at_end = h;
+                             search_all_conditions = c;
+                             search_all_action = a } =
+  Fmt.pf ppf "SEARCH ALL %a" pp_qualname si;
+  List.iter (fun pf -> pf ppf ()) @@
+  list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
+  Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition) ppf c;
+  Fmt.(sp ++ pp_branch) ppf a;
+  Fmt.pf ppf "@ END-SEARCH"
 
 and pp_search_when_clause ppf { search_when_cond = c; search_when_stmts = w } =
   Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_branch w
@@ -886,6 +887,7 @@ and pp_statement ppf = function
   | Return s -> pp_return_stmt ppf s
   | Rewrite s -> pp_rewrite_stmt ppf s
   | Search s -> pp_search_stmt ppf s
+  | SearchAll s -> pp_search_all_stmt ppf s
   | Send s -> pp_send_stmt ppf s
   | Set s -> pp_set_stmt ppf s
   | Sort s -> pp_sort_stmt ppf s

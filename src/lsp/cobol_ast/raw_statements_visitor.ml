@@ -82,7 +82,6 @@ module Make = struct
     method fold_dual_handler        : (dual_handler               , 'a) fold = default
     method fold_call_error_handler  : (call_error_handler         , 'a) fold = default
     method fold_search_when_clause' : (search_when_clause with_loc, 'a) fold = default
-    method fold_search_spec         : (search_spec                , 'a) fold = default
     method fold_read_error_handler  : (read_error * dual_handler  , 'a) fold = default
     method fold_write_error_handler : (write_error * dual_handler , 'a) fold = default
 
@@ -122,6 +121,7 @@ module Make = struct
     method fold_return'        : (return_stmt with_loc          , 'a) fold = default
     method fold_rewrite'       : (rewrite_stmt with_loc         , 'a) fold = default
     method fold_search'        : (search_stmt with_loc          , 'a) fold = default
+    method fold_search_all'    : (search_all_stmt with_loc      , 'a) fold = default
     method fold_set'           : (set_stmt with_loc             , 'a) fold = default
     method fold_start'         : (start_stmt with_loc           , 'a) fold = default
     method fold_stop'          : (stop_stmt with_loc            , 'a) fold = default
@@ -632,8 +632,8 @@ module Make = struct
         | Move          s -> fold_move'           v (s &@ loc)
         | Multiply      s -> fold_multiply'       v (s &@ loc)
         | Open          s -> fold_open'           v (s &@ loc)
-        | PerformTarget s -> fold_perform_target' v (s &@ loc)
         | PerformInline s -> fold_perform_inline' v (s &@ loc)
+        | PerformTarget s -> fold_perform_target' v (s &@ loc)
         | Raise         s -> fold_raise'          v (s &@ loc)
         | Read          s -> fold_read'           v (s &@ loc)
         | Release       s -> fold_release'        v (s &@ loc)
@@ -641,6 +641,7 @@ module Make = struct
         | Return        s -> fold_return'         v (s &@ loc)
         | Rewrite       s -> fold_rewrite'        v (s &@ loc)
         | Search        s -> fold_search'         v (s &@ loc)
+        | SearchAll     s -> fold_search_all'     v (s &@ loc)
         | Set           s -> fold_set'            v (s &@ loc)
         | Start         s -> fold_start'          v (s &@ loc)
         | Stop          s -> fold_stop'           v (s &@ loc)
@@ -809,18 +810,18 @@ module Make = struct
         >> fold_dual_handler v multiply_on_size_error
       end
 
-  and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
-    handle' v#fold_perform_target' v
-      ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
-        >> fold_procedure_range ~fold:fold_qualname v proc_range
-        >> fold_option ~fold:fold_perform_mode v perform_mode
-      end
-
   and fold_perform_inline' (v: _ #folder) : perform_inline_stmt with_loc -> 'a -> 'a =
     handle' v#fold_perform_inline' v
       ~fold:begin fun v { perform_inline_mode; perform_statements } x -> x
         >> fold_option ~fold:fold_perform_mode v perform_inline_mode
         >> fold_statements v perform_statements
+      end
+
+  and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
+    handle' v#fold_perform_target' v
+      ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
+        >> fold_procedure_range ~fold:fold_qualname v proc_range
+        >> fold_option ~fold:fold_perform_mode v perform_mode
       end
 
   and fold_read_error_handler (v: _ #folder) =
@@ -872,24 +873,24 @@ module Make = struct
         >> fold_branch v search_when_stmts
       end
 
-  and fold_search_spec (v: _ #folder) =
-    handle v#fold_search_spec
-      ~continue:begin fun s x -> match s with
-        | SearchSerial { varying; when_clauses } -> x
-            >> fold_option ~fold:fold_ident v varying
-            >> fold_list ~fold:fold_search_when_clause' v when_clauses
-        | SearchAll { conditions; action } -> x
-            >> fold_list ~fold:fold_search_condition v conditions
-            >> fold_branch v action
-      end
-
   and fold_search' (v: _ #folder) =
     handle' v#fold_search' v
-      ~fold:begin fun v { search_item; search_spec;
-                          search_at_end} x -> x
+      ~fold:begin fun v { search_item; search_at_end;
+                          search_varying; search_when_clauses } x -> x
         >> fold_qualname v search_item
         >> fold_handler v search_at_end
-        >> fold_search_spec v search_spec
+        >> fold_option ~fold:fold_ident v search_varying
+        >> fold_list ~fold:fold_search_when_clause' v search_when_clauses
+      end
+
+  and fold_search_all' (v: _ #folder) =
+    handle' v#fold_search_all' v
+      ~fold:begin fun v { search_all_item; search_all_at_end;
+                          search_all_conditions; search_all_action } x -> x
+        >> fold_qualname v search_all_item
+        >> fold_handler v search_all_at_end
+        >> fold_list ~fold:fold_search_condition v search_all_conditions
+        >> fold_branch v search_all_action
       end
 
   and fold_start' (v: _ #folder) =
