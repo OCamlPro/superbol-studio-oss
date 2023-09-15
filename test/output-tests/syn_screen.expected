@@ -1,0 +1,564 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:243:0
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:334:0
+syn_screen.at-334-prog.cob:9.37-9.41:
+   6          01  foo          PIC X.
+   7          SCREEN           SECTION.
+   8          01  scr.
+   9 >            03  a        PIC X TO foo FULL, REQUIRED,
+----                                        ^^^^
+  10                           LEFTLINE, RIGHTLINE, OVERLINE, UNDERLINE,
+  11                           GRID.
+>> Error: Invalid syntax
+
+syn_screen.at-334-prog.cob:10.24-10.32:
+   7          SCREEN           SECTION.
+   8          01  scr.
+   9              03  a        PIC X TO foo FULL, REQUIRED,
+  10 >                         LEFTLINE, RIGHTLINE, OVERLINE, UNDERLINE,
+----                           ^^^^^^^^
+  11                           GRID.
+  12          PROCEDURE        DIVISION.
+>> Error: Invalid syntax
+
+syn_screen.at-334-prog.cob:11.24-11.28:
+   8          01  scr.
+   9              03  a        PIC X TO foo FULL, REQUIRED,
+  10                           LEFTLINE, RIGHTLINE, OVERLINE, UNDERLINE,
+  11 >                         GRID.
+----                           ^^^^
+  12          PROCEDURE        DIVISION.
+  13              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:367:0
+syn_screen.at-367-prog.cob:16.15-16.21:
+  13              END-ACCEPT
+  14   
+  15              ACCEPT foo
+  16 >                ESCAPE
+----                  ^^^^^^
+  17                      CONTINUE
+  18                  NOT ON ESCAPE
+>> Error: Invalid syntax
+
+syn_screen.at-367-prog.cob:18.15-18.18:
+  15              ACCEPT foo
+  16                  ESCAPE
+  17                      CONTINUE
+  18 >                NOT ON ESCAPE
+----                  ^^^
+  19                      CONTINUE
+  20              END-ACCEPT
+>> Error: Invalid syntax
+
+syn_screen.at-367-prog.cob:20.11-20.21:
+  17                      CONTINUE
+  18                  NOT ON ESCAPE
+  19                      CONTINUE
+  20 >            END-ACCEPT
+----              ^^^^^^^^^^
+  21              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:556:0
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:587:0
+syn_screen.at-587-prog.cob:9.13-9.31:
+   6          SCREEN  SECTION.
+   7          01 SG.
+   8             05 LINE 21 COL 1 VALUE "TESTING".
+   9 >           05 " IMPLICIT VALUE " HIGHLIGHT.
+----                ^^^^^^^^^^^^^^^^^^
+  10          PROCEDURE        DIVISION.
+  11              DISPLAY SG END-DISPLAY.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:609:0
+syn_screen.at-609-prog.cob:11.45-11.49:
+   8   
+   9          SCREEN SECTION.
+  10          01  scr.
+  11 >            03  full-pointless PIC 999 TO num FULL.
+----                                                ^^^^
+  12              03  full-useful PIC ZZZ TO num FULL.
+>> Error: Invalid syntax
+
+syn_screen.at-609-prog.cob:12.42-12.46:
+   9          SCREEN SECTION.
+  10          01  scr.
+  11              03  full-pointless PIC 999 TO num FULL.
+  12 >            03  full-useful PIC ZZZ TO num FULL.
+----                                             ^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:758:0
+syn_screen.at-758-prog.cob:19.50-19.54:
+  16              03  only-pic PIC 9.
+  17              03  from-to-using-without-pic FROM x.
+  18              03  auto-without-from-to-using PIC 9 AUTO.
+  19 >            03  full-without-to-using PIC X FROM x FULL.
+----                                                     ^^^^
+  20              03  full-and-justified PIC X USING x, FULL, JUST.
+  21              03  secure-with-from PIC X FROM x SECURE.
+>> Error: Invalid syntax
+
+syn_screen.at-758-prog.cob:20.49-20.53:
+  17              03  from-to-using-without-pic FROM x.
+  18              03  auto-without-from-to-using PIC 9 AUTO.
+  19              03  full-without-to-using PIC X FROM x FULL.
+  20 >            03  full-and-justified PIC X USING x, FULL, JUST.
+----                                                    ^^^^
+  21              03  secure-with-from PIC X FROM x SECURE.
+  22              03  secure-justified-no-clauses VALUE "Hello" SECURE, JUST.
+>> Error: Invalid syntax
+
+syn_screen.at-758-prog.cob:33.39-33.43:
+  30              03  numeric-value-no-pic VALUE 1.
+  31   
+  32          01 always-ok-scr.
+  33 >            03  my-group LINE 1, COL 1, FULL.
+----                                          ^^^^
+  34                  05  PIC X FROM "x" TO x.
+  35                  05  PIC Z USING num.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:817:0
+syn_screen.at-817-prog.cob:10.37:
+   7          01 A        PIC X.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY ERASE
+  10 >            MOVE 10 TO LIN. MOVE 15 TO COL.
+----                                        ^
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+>> Hint: Missing <identifiers>
+
+syn_screen.at-817-prog.cob:10.38-10.41:
+   7          01 A        PIC X.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY ERASE
+  10 >            MOVE 10 TO LIN. MOVE 15 TO COL.
+----                                         ^^^
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:11.19-11.23:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11 >            DISPLAY (LIN , COL - 3) FIELD-A.
+----                      ^^^^
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:11.26-11.29:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11 >            DISPLAY (LIN , COL - 3) FIELD-A.
+----                             ^^^
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:11.33-11.34:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11 >            DISPLAY (LIN , COL - 3) FIELD-A.
+----                                    ^
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:12.19-12.23:
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12 >            DISPLAY (LIN + 1 , COL) FIELD-A.
+----                      ^^^^
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:12.24-12.25:
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12 >            DISPLAY (LIN + 1 , COL) FIELD-A.
+----                           ^
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:12.30-12.34:
+   9              DISPLAY ERASE
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12 >            DISPLAY (LIN + 1 , COL) FIELD-A.
+----                                 ^^^^
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:13.17:
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13 >            ACCEPT  (   , 10) A.
+----                    ^
+  14              DISPLAY (08 , 12) FIELD-A.
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+>> Hint: Missing <identifier> .
+
+syn_screen.at-817-prog.cob:13.19-13.20:
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13 >            ACCEPT  (   , 10) A.
+----                      ^
+  14              DISPLAY (08 , 12) FIELD-A.
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:13.28:
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13 >            ACCEPT  (   , 10) A.
+----                               ^
+  14              DISPLAY (08 , 12) FIELD-A.
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+>> Hint: Missing .
+
+syn_screen.at-817-prog.cob:13.27-13.28:
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13 >            ACCEPT  (   , 10) A.
+----                              ^
+  14              DISPLAY (08 , 12) FIELD-A.
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+>> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:14.19-14.22:
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14 >            DISPLAY (08 , 12) FIELD-A.
+----                      ^^^
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:14.27-14.28:
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14 >            DISPLAY (08 , 12) FIELD-A.
+----                              ^
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:15.17:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                    ^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Hint: Missing <identifier> .
+
+syn_screen.at-817-prog.cob:15.19-15.20:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                      ^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:15.28:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                               ^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Hint: Missing .
+
+syn_screen.at-817-prog.cob:15.27-15.28:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                              ^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:15.31-15.35:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                                  ^^^^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:19.27-19.30:
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+  18              SUBTRACT 2 FROM LIN.
+  19 >            SUBTRACT 3 FROM COL.
+----                              ^^^
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:20.45:
+  17              ACCEPT  A       AT COLUMN 8.
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20 >            DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+----                                                ^
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+>> Hint: Missing <identifier>
+
+syn_screen.at-817-prog.cob:20.46-20.49:
+  17              ACCEPT  A       AT COLUMN 8.
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20 >            DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+----                                                 ^^^
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:21.17:
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21 >            ACCEPT  (   , 10) A.
+----                    ^
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+>> Hint: Missing <identifier> .
+
+syn_screen.at-817-prog.cob:21.19-21.20:
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21 >            ACCEPT  (   , 10) A.
+----                      ^
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:21.28:
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21 >            ACCEPT  (   , 10) A.
+----                               ^
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+>> Hint: Missing .
+
+syn_screen.at-817-prog.cob:21.27-21.28:
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21 >            ACCEPT  (   , 10) A.
+----                              ^
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+>> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:22.19-22.20:
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22 >            DISPLAY ( 1 , 1 ) ERASE.
+----                      ^
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:22.27-22.28:
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22 >            DISPLAY ( 1 , 1 ) ERASE.
+----                              ^
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:23.19-23.20:
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23 >            DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+----                      ^
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:23.27-23.28:
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23 >            DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+----                              ^
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:24.19-24.20:
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24 >            DISPLAY ( 3 , 1 ) A " --> A value"
+----                      ^
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26              ACCEPT (11 , 1 ) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:24.27-24.28:
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24 >            DISPLAY ( 3 , 1 ) A " --> A value"
+----                              ^
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26              ACCEPT (11 , 1 ) A.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:25.19-25.20:
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25 >            DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+----                      ^
+  26              ACCEPT (11 , 1 ) A.
+  27              STOP RUN.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:25.27-25.28:
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25 >            DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+----                              ^
+  26              ACCEPT (11 , 1 ) A.
+  27              STOP RUN.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:26.17:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                    ^
+  27              STOP RUN.
+>> Hint: Missing <identifier> .
+
+syn_screen.at-817-prog.cob:26.18-26.21:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                     ^^^
+  27              STOP RUN.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:26.21:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                        ^
+  27              STOP RUN.
+>> Hint: Missing .
+
+syn_screen.at-817-prog.cob:26.24-26.25:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                           ^
+  27              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:26.25:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                            ^
+  27              STOP RUN.
+>> Hint: Missing .
+
+syn_screen.at-817-prog.cob:26.26-26.27:
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+  25              DISPLAY ( 5 , 1 ) "Press ENTER to exit".
+  26 >            ACCEPT (11 , 1 ) A.
+----                             ^
+  27              STOP RUN.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:880:0
+syn_screen.at-880-prog.cob:7.18:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            DISPLAY WITH CONVERSION "Whatever".
+----                     ^
+   8              STOP RUN.
+>> Hint: Missing <identifier or literal>
+
+syn_screen.at-880-prog.cob:7.19-7.23:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            DISPLAY WITH CONVERSION "Whatever".
+----                      ^^^^
+   8              STOP RUN.
+>> Error: Invalid syntax
+
+syn_screen.at-880-prog.cob:7.23:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            DISPLAY WITH CONVERSION "Whatever".
+----                          ^
+   8              STOP RUN.
+>> Hint: Missing NO ADVANCING .
+
+syn_screen.at-880-prog.cob:7.24-7.34:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            DISPLAY WITH CONVERSION "Whatever".
+----                           ^^^^^^^^^^
+   8              STOP RUN.
+>> Error: Invalid syntax
+
+syn_screen.at-880-prog.cob:7.35-7.45:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            DISPLAY WITH CONVERSION "Whatever".
+----                                      ^^^^^^^^^^
+   8              STOP RUN.
+>> Error: Invalid syntax
+

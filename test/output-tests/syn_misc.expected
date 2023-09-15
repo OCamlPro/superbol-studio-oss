@@ -1,0 +1,4685 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:46:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:84:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:292:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:420:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:711:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:753:0
+syn_misc.at-753-prog.cob:2.7-2.22:
+   1   
+   2 >        SOURCE-COMPUTER. GNU-LINUX.
+----          ^^^^^^^^^^^^^^^
+   3          SPECIAL-NAMES.
+   4               SYMBOLIC NL IS 101
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:784:0
+syn_misc.at-784-prog.cob:1.11-1.18:
+   1 >            DISPLAY "minimal".
+----              ^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:809:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:821:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:830:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:895:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1192:0
+syn_misc.at-1192-prog.cob:33.19:
+  30              CONTINUE.  *> explicit no unreachable warning
+  31          P03.
+  32              GO TO P04
+  33 >            CONTINUE AFTER 2 SECONDS.  *> that's one again
+----                      ^
+  34          P04.
+  35              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1192-prog.cob:33.20-33.25:
+  30              CONTINUE.  *> explicit no unreachable warning
+  31          P03.
+  32              GO TO P04
+  33 >            CONTINUE AFTER 2 SECONDS.  *> that's one again
+----                       ^^^^^
+  34          P04.
+  35              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1192-prog.cob:33.27:
+  30              CONTINUE.  *> explicit no unreachable warning
+  31          P03.
+  32              GO TO P04
+  33 >            CONTINUE AFTER 2 SECONDS.  *> that's one again
+----                              ^
+  34          P04.
+  35              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1192-prog.cob:33.28-33.35:
+  30              CONTINUE.  *> explicit no unreachable warning
+  31          P03.
+  32              GO TO P04
+  33 >            CONTINUE AFTER 2 SECONDS.  *> that's one again
+----                               ^^^^^^^
+  34          P04.
+  35              STOP RUN.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1239:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1335:0
+syn_misc.at-1335-prog3.cob:6.27-6.29:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+----                              ^^
+   7              03  CURSOR-ROW   PIC 999.
+   8              03  CURSOR-COL   PIC 999.
+>> Error: Invalid syntax
+
+syn_misc.at-1335-prog3.cob:9.37-9.39:
+   6          01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+   7              03  CURSOR-ROW   PIC 999.
+   8              03  CURSOR-COL   PIC 999.
+   9 >        77  CRT-STATUS       PIC X(4) IS SPECIAL-NAMES CRT STATUS.
+----                                        ^^
+  10          PROCEDURE        DIVISION.
+  11              ACCEPT OMITTED END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1335-prog3.cob:11.17:
+   8              03  CURSOR-COL   PIC 999.
+   9          77  CRT-STATUS       PIC X(4) IS SPECIAL-NAMES CRT STATUS.
+  10          PROCEDURE        DIVISION.
+  11 >            ACCEPT OMITTED END-ACCEPT.
+----                    ^
+  12              STOP RUN.
+>> Hint: Missing <identifier>
+
+syn_misc.at-1335-prog3.cob:11.18-11.25:
+   8              03  CURSOR-COL   PIC 999.
+   9          77  CRT-STATUS       PIC X(4) IS SPECIAL-NAMES CRT STATUS.
+  10          PROCEDURE        DIVISION.
+  11 >            ACCEPT OMITTED END-ACCEPT.
+----                     ^^^^^^^
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1336:0
+syn_misc.at-1336-prog4.cob:6.27-6.29:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+----                              ^^
+   7              03  CURSOR-ROW   PIC 999.
+   8              03  CURSOR-COL   PIC 999.
+>> Error: Invalid syntax
+
+syn_misc.at-1336-prog4.cob:9.37-9.39:
+   6          01  CURSOR-POSITION IS SPECIAL-NAMES CURSOR.
+   7              03  CURSOR-ROW   PIC 999.
+   8              03  CURSOR-COL   PIC 999.
+   9 >        77  CRT-STATUS       PIC 9(5) IS SPECIAL-NAMES CRT STATUS.
+----                                        ^^
+  10          PROCEDURE        DIVISION.
+  11              ACCEPT OMITTED END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1336-prog4.cob:11.17:
+   8              03  CURSOR-COL   PIC 999.
+   9          77  CRT-STATUS       PIC 9(5) IS SPECIAL-NAMES CRT STATUS.
+  10          PROCEDURE        DIVISION.
+  11 >            ACCEPT OMITTED END-ACCEPT.
+----                    ^
+  12              STOP RUN.
+>> Hint: Missing <identifier>
+
+syn_misc.at-1336-prog4.cob:11.18-11.25:
+   8              03  CURSOR-COL   PIC 999.
+   9          77  CRT-STATUS       PIC 9(5) IS SPECIAL-NAMES CRT STATUS.
+  10          PROCEDURE        DIVISION.
+  11 >            ACCEPT OMITTED END-ACCEPT.
+----                     ^^^^^^^
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1340:0
+syn_misc.at-1340-prog6.cob:6.33-6.35:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        77  CRT-STATUS   PIC X(3) IS SPECIAL-NAMES CRT STATUS.
+----                                    ^^
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT OMITTED END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1340-prog6.cob:8.17:
+   5          WORKING-STORAGE  SECTION.
+   6          77  CRT-STATUS   PIC X(3) IS SPECIAL-NAMES CRT STATUS.
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT OMITTED END-ACCEPT.
+----                    ^
+   9              STOP RUN.
+>> Hint: Missing <identifier>
+
+syn_misc.at-1340-prog6.cob:8.18-8.25:
+   5          WORKING-STORAGE  SECTION.
+   6          77  CRT-STATUS   PIC X(3) IS SPECIAL-NAMES CRT STATUS.
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT OMITTED END-ACCEPT.
+----                     ^^^^^^^
+   9              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1435:0
+syn_misc.at-1435-prog3.cob:8.30:
+   5          CONFIGURATION SECTION.
+   6          SPECIAL-NAMES.
+   7              CURRENCY 'DOLLAR'
+   8 >            WITH PICTURE SYMBOL '$'.
+----                                 ^
+   9          DATA             DIVISION.
+  10          WORKING-STORAGE  SECTION.
+>> Hint: Missing SYMBOL
+
+syn_misc.at-1435-prog3.cob:8.31-8.34:
+   5          CONFIGURATION SECTION.
+   6          SPECIAL-NAMES.
+   7              CURRENCY 'DOLLAR'
+   8 >            WITH PICTURE SYMBOL '$'.
+----                                  ^^^
+   9          DATA             DIVISION.
+  10          WORKING-STORAGE  SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1452:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1671:0
+syn_misc.at-1671-prog.cob:8.27:
+   5          WORKING-STORAGE SECTION.
+   6          77 var          PIC x.
+   7          PROCEDURE       DIVISION.
+   8 >            ACCEPT var  FROM COMMAND-LINE
+----                              ^
+   9              DISPLAY var UPON COMMAND-LINE
+  10              .
+>> Hint: Missing <word>
+
+syn_misc.at-1671-prog.cob:8.28-8.40:
+   5          WORKING-STORAGE SECTION.
+   6          77 var          PIC x.
+   7          PROCEDURE       DIVISION.
+   8 >            ACCEPT var  FROM COMMAND-LINE
+----                               ^^^^^^^^^^^^
+   9              DISPLAY var UPON COMMAND-LINE
+  10              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1706:0
+syn_misc.at-1706-prog.cob:11.20-11.24:
+   8          01 X             PIC X.
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                 END-ACCEPT.
+  11 >            ACCEPT X WITH    UPDATE  END-ACCEPT.
+----                       ^^^^
+  12              ACCEPT X WITH    DEFAULT END-ACCEPT.
+  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1706-prog.cob:12.20-12.24:
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                 END-ACCEPT.
+  11              ACCEPT X WITH    UPDATE  END-ACCEPT.
+  12 >            ACCEPT X WITH    DEFAULT END-ACCEPT.
+----                       ^^^^
+  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
+  14              ACCEPT X WITH NO DEFAULT END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1706-prog.cob:13.20-13.24:
+  10              ACCEPT X                 END-ACCEPT.
+  11              ACCEPT X WITH    UPDATE  END-ACCEPT.
+  12              ACCEPT X WITH    DEFAULT END-ACCEPT.
+  13 >            ACCEPT X WITH NO UPDATE  END-ACCEPT.
+----                       ^^^^
+  14              ACCEPT X WITH NO DEFAULT END-ACCEPT.
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1706-prog.cob:14.20-14.24:
+  11              ACCEPT X WITH    UPDATE  END-ACCEPT.
+  12              ACCEPT X WITH    DEFAULT END-ACCEPT.
+  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
+  14 >            ACCEPT X WITH NO DEFAULT END-ACCEPT.
+----                       ^^^^
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1731:0
+syn_misc.at-1731-prog.cob:11.19:
+   8          01 X             PIC X.
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                       END-ACCEPT.
+  11 >            ACCEPT X WITH    AUTO          END-ACCEPT.
+----                      ^
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1731-prog.cob:11.20-11.24:
+   8          01 X             PIC X.
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                       END-ACCEPT.
+  11 >            ACCEPT X WITH    AUTO          END-ACCEPT.
+----                       ^^^^
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1731-prog.cob:11.42-11.52:
+   8          01 X             PIC X.
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                       END-ACCEPT.
+  11 >            ACCEPT X WITH    AUTO          END-ACCEPT.
+----                                             ^^^^^^^^^^
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1731-prog.cob:12.20-12.24:
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                       END-ACCEPT.
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12 >            ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+----                       ^^^^
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+  14              ACCEPT X WITH    TAB           END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1731-prog.cob:13.20-13.24:
+  10              ACCEPT X                       END-ACCEPT.
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13 >            ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+----                       ^^^^
+  14              ACCEPT X WITH    TAB           END-ACCEPT.
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1731-prog.cob:14.19:
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+  14 >            ACCEPT X WITH    TAB           END-ACCEPT.
+----                      ^
+  15              STOP RUN.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1731-prog.cob:14.20-14.24:
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+  14 >            ACCEPT X WITH    TAB           END-ACCEPT.
+----                       ^^^^
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1731-prog.cob:14.42-14.52:
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+  14 >            ACCEPT X WITH    TAB           END-ACCEPT.
+----                                             ^^^^^^^^^^
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1753:0
+syn_misc.at-1753-prog.cob:8.19:
+   5          WORKING-STORAGE  SECTION.
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT X WITH LOWER     END-ACCEPT.
+----                      ^
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+>> Hint: Missing COUNT .
+
+syn_misc.at-1753-prog.cob:8.20-8.24:
+   5          WORKING-STORAGE  SECTION.
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT X WITH LOWER     END-ACCEPT.
+----                       ^^^^
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:8.35-8.45:
+   5          WORKING-STORAGE  SECTION.
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT X WITH LOWER     END-ACCEPT.
+----                                      ^^^^^^^^^^
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:9.19:
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9 >            ACCEPT X WITH UPPER     END-ACCEPT.
+----                      ^
+  10              ACCEPT X      LOWER
+  11              ACCEPT X      UPPER
+>> Hint: Missing COUNT .
+
+syn_misc.at-1753-prog.cob:9.20-9.24:
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9 >            ACCEPT X WITH UPPER     END-ACCEPT.
+----                       ^^^^
+  10              ACCEPT X      LOWER
+  11              ACCEPT X      UPPER
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:9.35-9.45:
+   6          01 X             PIC X(05).
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9 >            ACCEPT X WITH UPPER     END-ACCEPT.
+----                                      ^^^^^^^^^^
+  10              ACCEPT X      LOWER
+  11              ACCEPT X      UPPER
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:10.19:
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10 >            ACCEPT X      LOWER
+----                      ^
+  11              ACCEPT X      UPPER
+  12              STOP RUN.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1753-prog.cob:10.25-10.30:
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10 >            ACCEPT X      LOWER
+----                            ^^^^^
+  11              ACCEPT X      UPPER
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:10.30:
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10 >            ACCEPT X      LOWER
+----                                 ^
+  11              ACCEPT X      UPPER
+  12              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1753-prog.cob:11.11-11.17:
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+  11 >            ACCEPT X      UPPER
+----              ^^^^^^
+  12              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1753-prog.cob:11.19:
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+  11 >            ACCEPT X      UPPER
+----                      ^
+  12              STOP RUN.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1753-prog.cob:11.25-11.30:
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+  11 >            ACCEPT X      UPPER
+----                            ^^^^^
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1753-prog.cob:11.30:
+   8              ACCEPT X WITH LOWER     END-ACCEPT.
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+  11 >            ACCEPT X      UPPER
+----                                 ^
+  12              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1753-prog.cob:12.11-12.15:
+   9              ACCEPT X WITH UPPER     END-ACCEPT.
+  10              ACCEPT X      LOWER
+  11              ACCEPT X      UPPER
+  12 >            STOP RUN.
+----              ^^^^
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1782:0
+syn_misc.at-1782-prog.cob:9.19:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9 >            ACCEPT X WITH           SIZE    0 END-ACCEPT.
+----                      ^
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:9.20-9.24:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9 >            ACCEPT X WITH           SIZE    0 END-ACCEPT.
+----                       ^^^^
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:9.45-9.55:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9 >            ACCEPT X WITH           SIZE    0 END-ACCEPT.
+----                                                ^^^^^^^^^^
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:10.19:
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10 >            ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+----                      ^
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:10.20-10.24:
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10 >            ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+----                       ^^^^
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:10.45-10.55:
+   7          01 Y             PIC 9(04) BINARY VALUE 4.
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10 >            ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+----                                                ^^^^^^^^^^
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:11.19:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+----                      ^
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:11.20-11.24:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+----                       ^^^^
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:11.34:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+----                                     ^
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:11.35-11.39:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+----                                      ^^^^
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:11.45-11.55:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+----                                                ^^^^^^^^^^
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:12.19:
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+----                      ^
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:12.20-12.24:
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+----                       ^^^^
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:12.34:
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+----                                     ^
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:12.35-12.39:
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+----                                      ^^^^
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:12.45-12.55:
+   9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+----                                                ^^^^^^^^^^
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:13.19:
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13 >            ACCEPT X                SIZE    Y END-ACCEPT.
+----                      ^
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:13.35-13.39:
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13 >            ACCEPT X                SIZE    Y END-ACCEPT.
+----                                      ^^^^
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:13.45-13.55:
+  10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13 >            ACCEPT X                SIZE    Y END-ACCEPT.
+----                                                ^^^^^^^^^^
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:14.19:
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14 >            ACCEPT X                SIZE    0
+----                      ^
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:14.35-14.39:
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14 >            ACCEPT X                SIZE    0
+----                                      ^^^^
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:14.44:
+  11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14 >            ACCEPT X                SIZE    0
+----                                               ^
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:15.11-15.17:
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15 >            ACCEPT X                SIZE IS 1
+----              ^^^^^^
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:15.19:
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15 >            ACCEPT X                SIZE IS 1
+----                      ^
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:15.35-15.39:
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15 >            ACCEPT X                SIZE IS 1
+----                                      ^^^^
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:15.44:
+  12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15 >            ACCEPT X                SIZE IS 1
+----                                               ^
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:16.11-16.17:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----              ^^^^^^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:16.19:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----                      ^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:16.25-16.34:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----                            ^^^^^^^^^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:16.34:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----                                     ^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:16.35-16.39:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----                                      ^^^^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:16.44:
+  13              ACCEPT X                SIZE    Y END-ACCEPT.
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16 >            ACCEPT X      PROTECTED SIZE    2
+----                                               ^
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:17.11-17.17:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----              ^^^^^^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:17.19:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----                      ^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:17.25-17.34:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----                            ^^^^^^^^^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:17.34:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----                                     ^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:17.35-17.39:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----                                      ^^^^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:17.44:
+  14              ACCEPT X                SIZE    0
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17 >            ACCEPT X      PROTECTED SIZE IS 3
+----                                               ^
+  18              ACCEPT X                SIZE    Y
+  19              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:18.11-18.17:
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18 >            ACCEPT X                SIZE    Y
+----              ^^^^^^
+  19              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1782-prog.cob:18.19:
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18 >            ACCEPT X                SIZE    Y
+----                      ^
+  19              STOP RUN.
+>> Hint: Missing COUNT .
+
+syn_misc.at-1782-prog.cob:18.35-18.39:
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18 >            ACCEPT X                SIZE    Y
+----                                      ^^^^
+  19              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1782-prog.cob:18.44:
+  15              ACCEPT X                SIZE IS 1
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18 >            ACCEPT X                SIZE    Y
+----                                               ^
+  19              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1782-prog.cob:19.11-19.15:
+  16              ACCEPT X      PROTECTED SIZE    2
+  17              ACCEPT X      PROTECTED SIZE IS 3
+  18              ACCEPT X                SIZE    Y
+  19 >            STOP RUN.
+----              ^^^^
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1807:0
+syn_misc.at-1807-prog.cob:9.23:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+----                          ^
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:9.24-9.28:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+----                           ^^^^
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:9.28:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+----                               ^
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:9.29-9.33:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+----                                ^^^^
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:9.44-9.55:
+   6          01 X             PIC X(05).
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:10.23:
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+----                          ^
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:10.24-10.28:
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+----                           ^^^^
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:10.28:
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+----                               ^
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:10.29-10.33:
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+----                                ^^^^
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:10.44-10.55:
+   7          01 Y             PIC 9(04) BINARY VALUE 7.
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:11.23:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+----                          ^
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:11.24-11.28:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+----                           ^^^^
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:11.28:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+----                               ^
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:11.29-11.33:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+----                                ^^^^
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:11.44-11.55:
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:12.23:
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+----                          ^
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:12.24-12.28:
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+----                           ^^^^
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:12.28:
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+----                               ^
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:12.34-12.38:
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+----                                     ^^^^
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:12.44-12.55:
+   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:13.23:
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+----                          ^
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+  15              STOP RUN.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:13.24-13.28:
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+----                           ^^^^
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:13.28:
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+----                               ^
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+  15              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:13.34-13.38:
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+----                                     ^^^^
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+  15              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:13.44-13.55:
+  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:14.23:
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+----                          ^
+  15              STOP RUN.
+>> Hint: Missing COL <identifier> .
+
+syn_misc.at-1807-prog.cob:14.24-14.28:
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+----                           ^^^^
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-1807-prog.cob:14.28:
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+----                               ^
+  15              STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-1807-prog.cob:14.34-14.38:
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+----                                     ^^^^
+  15              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-1807-prog.cob:14.44-14.55:
+  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
+  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
+  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
+  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
+----                                               ^^^^^^^^^^^
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1826:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1858:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1903:0
+syn_misc.at-1903-prog.cob:7.19:
+   4          ENVIRONMENT DIVISION.
+   5          CONFIGURATION SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >            CONTINUE
+----                      ^
+>> Hint: Missing .
+
+syn_misc.at-1903-prog.cob:8.0:
+   5          CONFIGURATION SECTION.
+   6          PROCEDURE        DIVISION.
+   7              CONTINUE
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1936:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2005:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2045:0
+syn_misc.at-2045-prog2.cob:11.7-11.46:
+   8          PROCEDURE        DIVISION.
+   9         *    DISPLAY 'COMMENT'       END-DISPLAY
+  10         /    DISPLAY 'COMMENTSLASH'  END-DISPLAY
+  11 >       $    DISPLAY 'COMMENTDOLLAR' END-DISPLAY
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
+  13    *         DISPLAY 'NOMFCOMMENT'   END-DISPLAY
+>> Error: Unexpected characters
+
+syn_misc.at-2045-prog2.cob:15.8-15.9:
+  12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
+  13    *         DISPLAY 'NOMFCOMMENT'   END-DISPLAY
+  14           *> DISPLAY 'FLOATING'      END-DISPLAY
+  15 >         |  DISPLAY 'ACUFLOATING'   END-DISPLAY
+----           ^
+  16    |         DISPLAY 'NOACUFLOATING' END-DISPLAY
+  17    *>        DISPLAY 'NOFLOATING'    END-DISPLAY
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2232:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2377:0
+syn_misc.at-2377-prog.cob:9.29:
+   6          77 KEYNUM        PIC 9(04).
+   7          PROCEDURE        DIVISION.
+   8   
+   9 >            ACCEPT KEYNUM FROM ESCAPE KEY
+----                                ^
+  10              DISPLAY "Key pressed: " KEYNUM
+  11              ACCEPT KEYNUM FROM ESCAPE
+>> Hint: Missing <word>
+
+syn_misc.at-2377-prog.cob:9.30-9.36:
+   6          77 KEYNUM        PIC 9(04).
+   7          PROCEDURE        DIVISION.
+   8   
+   9 >            ACCEPT KEYNUM FROM ESCAPE KEY
+----                                 ^^^^^^
+  10              DISPLAY "Key pressed: " KEYNUM
+  11              ACCEPT KEYNUM FROM ESCAPE
+>> Error: Invalid syntax
+
+syn_misc.at-2377-prog.cob:11.29:
+   8   
+   9              ACCEPT KEYNUM FROM ESCAPE KEY
+  10              DISPLAY "Key pressed: " KEYNUM
+  11 >            ACCEPT KEYNUM FROM ESCAPE
+----                                ^
+  12              DISPLAY "Key pressed: " KEYNUM
+  13              ACCEPT OMITTED
+>> Hint: Missing <word>
+
+syn_misc.at-2377-prog.cob:11.30-11.36:
+   8   
+   9              ACCEPT KEYNUM FROM ESCAPE KEY
+  10              DISPLAY "Key pressed: " KEYNUM
+  11 >            ACCEPT KEYNUM FROM ESCAPE
+----                                 ^^^^^^
+  12              DISPLAY "Key pressed: " KEYNUM
+  13              ACCEPT OMITTED
+>> Error: Invalid syntax
+
+syn_misc.at-2377-prog.cob:13.17:
+  10              DISPLAY "Key pressed: " KEYNUM
+  11              ACCEPT KEYNUM FROM ESCAPE
+  12              DISPLAY "Key pressed: " KEYNUM
+  13 >            ACCEPT OMITTED
+----                    ^
+  14   
+  15              STOP RUN.
+>> Hint: Missing <identifier>
+
+syn_misc.at-2377-prog.cob:13.18-13.25:
+  10              DISPLAY "Key pressed: " KEYNUM
+  11              ACCEPT KEYNUM FROM ESCAPE
+  12              DISPLAY "Key pressed: " KEYNUM
+  13 >            ACCEPT OMITTED
+----                     ^^^^^^^
+  14   
+  15              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2400:0
+syn_misc.at-2400-prog.cob:6.30:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        77  myfloat       usage float
+----                                 ^
+   7                            value is 3.97E+24.
+   8          77  mydouble      usage double
+>> Hint: Missing BINARY
+
+syn_misc.at-2400-prog.cob:6.31-6.36:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        77  myfloat       usage float
+----                                  ^^^^^
+   7                            value is 3.97E+24.
+   8          77  mydouble      usage double
+>> Error: Invalid syntax
+
+syn_misc.at-2400-prog.cob:8.30:
+   5          WORKING-STORAGE SECTION.
+   6          77  myfloat       usage float
+   7                            value is 3.97E+24.
+   8 >        77  mydouble      usage double
+----                                 ^
+   9                            value is 3.97E+44.
+  10          PROCEDURE DIVISION.
+>> Hint: Missing BINARY
+
+syn_misc.at-2400-prog.cob:8.31-8.37:
+   5          WORKING-STORAGE SECTION.
+   6          77  myfloat       usage float
+   7                            value is 3.97E+24.
+   8 >        77  mydouble      usage double
+----                                  ^^^^^^
+   9                            value is 3.97E+44.
+  10          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2668:0
+syn_misc.at-2668-prog.cob:6.30:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        77  window-handle USAGE HANDLE OF WINDOW.
+----                                 ^
+   7          77  lb-row        PIC X(10).
+   8          77  lb-color      PIC 9(05) VALUE 8192.
+>> Hint: Missing BINARY
+
+syn_misc.at-2668-prog.cob:6.31-6.37:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        77  window-handle USAGE HANDLE OF WINDOW.
+----                                  ^^^^^^
+   7          77  lb-row        PIC X(10).
+   8          77  lb-color      PIC 9(05) VALUE 8192.
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:16.20:
+  13          77  selection-idx PIC S9(02).
+  14          SCREEN SECTION.
+  15          01 lb-screen.
+  16 >            03 lb-frm LIST-BOX 3-D
+----                       ^
+  17         *             FIXME: the following should be possible in any order
+  18                       UNSORTED
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:16.21-16.29:
+  13          77  selection-idx PIC S9(02).
+  14          SCREEN SECTION.
+  15          01 lb-screen.
+  16 >            03 lb-frm LIST-BOX 3-D
+----                        ^^^^^^^^
+  17         *             FIXME: the following should be possible in any order
+  18                       UNSORTED
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:20.20-20.25:
+  17         *             FIXME: the following should be possible in any order
+  18                       UNSORTED
+  19                       EXCEPTION-VALUE = 13
+  20 >                     COLOR lb-color
+----                       ^^^^^
+  21                       CLINE 1 CCOL 1
+  22                       LINES = lb-num-lines
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:20.34:
+  17         *             FIXME: the following should be possible in any order
+  18                       UNSORTED
+  19                       EXCEPTION-VALUE = 13
+  20 >                     COLOR lb-color
+----                                     ^
+  21                       CLINE 1 CCOL 1
+  22                       LINES = lb-num-lines
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:21.20-21.25:
+  18                       UNSORTED
+  19                       EXCEPTION-VALUE = 13
+  20                       COLOR lb-color
+  21 >                     CLINE 1 CCOL 1
+----                       ^^^^^
+  22                       LINES = lb-num-lines
+  23                       SIZE  IS lb-num-rows
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:21.32:
+  18                       UNSORTED
+  19                       EXCEPTION-VALUE = 13
+  20                       COLOR lb-color
+  21 >                     CLINE 1 CCOL 1
+----                                   ^
+  22                       LINES = lb-num-lines
+  23                       SIZE  IS lb-num-rows
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:21.33-21.34:
+  18                       UNSORTED
+  19                       EXCEPTION-VALUE = 13
+  20                       COLOR lb-color
+  21 >                     CLINE 1 CCOL 1
+----                                    ^
+  22                       LINES = lb-num-lines
+  23                       SIZE  IS lb-num-rows
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:22.20-22.25:
+  19                       EXCEPTION-VALUE = 13
+  20                       COLOR lb-color
+  21                       CLINE 1 CCOL 1
+  22 >                     LINES = lb-num-lines
+----                       ^^^^^
+  23                       SIZE  IS lb-num-rows
+  24         *             VALUE lb-row  raises error as no identifer according
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:23.20-23.24:
+  20                       COLOR lb-color
+  21                       CLINE 1 CCOL 1
+  22                       LINES = lb-num-lines
+  23 >                     SIZE  IS lb-num-rows
+----                       ^^^^
+  24         *             VALUE lb-row  raises error as no identifer according
+  25         *                           to cobol2002, but here it is fine
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:29.11-29.17:
+  26                       .
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+----              ^^^^^^
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:29.24:
+  26                       .
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+----                           ^
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:29.25-29.36:
+  26                       .
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+----                            ^^^^^^^^^^^
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:29.36:
+  26                       .
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+----                                       ^
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:29.37-29.38:
+  26                       .
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+----                                        ^
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:30.24:
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+----                           ^
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:30.25-30.36:
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+----                            ^^^^^^^^^^^
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:30.36:
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+----                                       ^
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:30.37-30.38:
+  27          PROCEDURE DIVISION.
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+----                                        ^
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:31.24:
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+----                           ^
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:31.25-31.36:
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+----                            ^^^^^^^^^^^
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:31.36:
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+----                                       ^
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:31.37-31.38:
+  28          MAIN.
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+----                                        ^
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:32.24:
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+----                           ^
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:32.25-32.36:
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+----                            ^^^^^^^^^^^
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:32.36:
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+----                                       ^
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:32.37-32.38:
+  29              MODIFY lb-frm ITEM-TO-ADD = 'Row 1'
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+----                                        ^
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:33.24:
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+----                           ^
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:33.25-33.36:
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+----                            ^^^^^^^^^^^
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:33.36:
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+----                                       ^
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:33.37-33.38:
+  30              MODIFY lb-frm ITEM-TO-ADD = 'Row 2'
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+----                                        ^
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:34.24:
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+----                           ^
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:34.25-34.36:
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+----                            ^^^^^^^^^^^
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:34.36:
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+----                                       ^
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:34.37-34.38:
+  31              MODIFY lb-frm ITEM-TO-ADD = 'Row 3'
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+----                                        ^
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:35.24:
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+----                           ^
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:35.25-35.36:
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+----                            ^^^^^^^^^^^
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:35.36:
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+----                                       ^
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:35.37-35.38:
+  32              MODIFY lb-frm ITEM-TO-ADD = 'Row 4'
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35 >            MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+----                                        ^
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:36.19-36.27:
+  33              MODIFY lb-frm ITEM-TO-ADD = 'Row 5'
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36 >            DISPLAY FLOATING WINDOW
+----                      ^^^^^^^^
+  37                  LINE 5 COL 5
+  38                  LINES window-lines
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:37.22-37.25:
+  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+  37 >                LINE 5 COL 5
+----                         ^^^
+  38                  LINES window-lines
+  39                  SIZE  window-rows
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:38.15-38.20:
+  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+  38 >                LINES window-lines
+----                  ^^^^^
+  39                  SIZE  window-rows
+  40                  BOXED
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:39.15-39.19:
+  36              DISPLAY FLOATING WINDOW
+  37                  LINE 5 COL 5
+  38                  LINES window-lines
+  39 >                SIZE  window-rows
+----                  ^^^^
+  40                  BOXED
+  41                  COLOR lb-color
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:41.15-41.20:
+  38                  LINES window-lines
+  39                  SIZE  window-rows
+  40                  BOXED
+  41 >                COLOR lb-color
+----                  ^^^^^
+  42                  HANDLE IS window-handle
+  43              END-DISPLAY
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:42.15-42.21:
+  39                  SIZE  window-rows
+  40                  BOXED
+  41                  COLOR lb-color
+  42 >                HANDLE IS window-handle
+----                  ^^^^^^
+  43              END-DISPLAY
+  44              DISPLAY lb-screen
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:46.29:
+  43              END-DISPLAY
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46 >            IF lb-row = SPACES
+----                                ^
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:47.14-47.21:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                 ^^^^^^^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:47.28:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                               ^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:47.29-47.44:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                                ^^^^^^^^^^^^^^^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:47.44:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                                               ^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:47.45-47.47:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                                                ^^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:47.61:
+  44              DISPLAY lb-screen
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47 >               INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+----                                                                ^
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:48.14-48.16:
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48 >               IF selection-idx > ZERO
+----                 ^^
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:48.37:
+  45              ACCEPT  lb-screen
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48 >               IF selection-idx > ZERO
+----                                        ^
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:49.17-49.23:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                    ^^^^^^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:49.31:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                                  ^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:49.32-49.43:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                                   ^^^^^^^^^^^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:49.43:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                                              ^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:49.44-49.45:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                                               ^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:49.59:
+  46              IF lb-row = SPACES
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49 >                  MODIFY  lb-frm QUERY-INDEX = selection-idx
+----                                                              ^
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:50.17-50.24:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                    ^^^^^^^
+  51                 END-IF
+  52              END-IF
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:50.31:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                                  ^
+  51                 END-IF
+  52              END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:50.32-50.42:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                                   ^^^^^^^^^^
+  51                 END-IF
+  52              END-IF
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:50.42:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                                             ^
+  51                 END-IF
+  52              END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:50.43-50.45:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                                              ^^
+  51                 END-IF
+  52              END-IF
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:50.52:
+  47                 INQUIRE lb-frm SELECTION-INDEX IN selection-idx
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50 >                  INQUIRE lb-frm ITEM-VALUE IN lb-row
+----                                                       ^
+  51                 END-IF
+  52              END-IF
+>> Hint: Missing .
+
+syn_misc.at-2668-prog.cob:51.14-51.20:
+  48                 IF selection-idx > ZERO
+  49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51 >               END-IF
+----                 ^^^^^^
+  52              END-IF
+  53              CLOSE WINDOW window-handle
+>> Warning: Invalid syntax
+
+syn_misc.at-2668-prog.cob:53.17-53.23:
+  50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
+  51                 END-IF
+  52              END-IF
+  53 >            CLOSE WINDOW window-handle
+----                    ^^^^^^
+  54              DISPLAY "chosen row value was '" lb-row "'"
+  55              ACCEPT OMITTED
+>> Error: Invalid syntax
+
+syn_misc.at-2668-prog.cob:55.17:
+  52              END-IF
+  53              CLOSE WINDOW window-handle
+  54              DISPLAY "chosen row value was '" lb-row "'"
+  55 >            ACCEPT OMITTED
+----                    ^
+  56         *
+  57              STOP RUN.
+>> Hint: Missing <identifier>
+
+syn_misc.at-2668-prog.cob:55.18-55.25:
+  52              END-IF
+  53              CLOSE WINDOW window-handle
+  54              DISPLAY "chosen row value was '" lb-row "'"
+  55 >            ACCEPT OMITTED
+----                     ^^^^^^^
+  56         *
+  57              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2715:0
+syn_misc.at-2715-prog.cob:18.19-18.26:
+  15          78  MB-WARNING-ICON     VALUE 2.
+  16          78  MB-ERROR-ICON       VALUE 3.
+  17          PROCEDURE DIVISION.
+  18 >            DISPLAY MESSAGE "Important"
+----                      ^^^^^^^
+  19                      TITLE "Very important"
+  20                      TYPE = MB-OK
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:20.19-20.23:
+  17          PROCEDURE DIVISION.
+  18              DISPLAY MESSAGE "Important"
+  19                      TITLE "Very important"
+  20 >                    TYPE = MB-OK
+----                      ^^^^
+  21                      ICON IS MB-WARNING-ICON
+  22              DISPLAY MESSAGE "This is" space "my" space my-text
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:21.24-21.26:
+  18              DISPLAY MESSAGE "Important"
+  19                      TITLE "Very important"
+  20                      TYPE = MB-OK
+  21 >                    ICON IS MB-WARNING-ICON
+----                           ^^
+  22              DISPLAY MESSAGE "This is" space "my" space my-text
+  23              DISPLAY MESSAGE BOX "More messages?"
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:22.19-22.26:
+  19                      TITLE "Very important"
+  20                      TYPE = MB-OK
+  21                      ICON IS MB-WARNING-ICON
+  22 >            DISPLAY MESSAGE "This is" space "my" space my-text
+----                      ^^^^^^^
+  23              DISPLAY MESSAGE BOX "More messages?"
+  24                      TYPE  MB-YES-NO
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:23.19-23.26:
+  20                      TYPE = MB-OK
+  21                      ICON IS MB-WARNING-ICON
+  22              DISPLAY MESSAGE "This is" space "my" space my-text
+  23 >            DISPLAY MESSAGE BOX "More messages?"
+----                      ^^^^^^^
+  24                      TYPE  MB-YES-NO
+  25                      TITLE = "box title"
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:24.19-24.23:
+  21                      ICON IS MB-WARNING-ICON
+  22              DISPLAY MESSAGE "This is" space "my" space my-text
+  23              DISPLAY MESSAGE BOX "More messages?"
+  24 >                    TYPE  MB-YES-NO
+----                      ^^^^
+  25                      TITLE = "box title"
+  26                      DEFAULT IS MB-YES
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:25.25-25.26:
+  22              DISPLAY MESSAGE "This is" space "my" space my-text
+  23              DISPLAY MESSAGE BOX "More messages?"
+  24                      TYPE  MB-YES-NO
+  25 >                    TITLE = "box title"
+----                            ^
+  26                      DEFAULT IS MB-YES
+  27                      RETURNING RETURN-CODE
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:26.19-26.26:
+  23              DISPLAY MESSAGE BOX "More messages?"
+  24                      TYPE  MB-YES-NO
+  25                      TITLE = "box title"
+  26 >                    DEFAULT IS MB-YES
+----                      ^^^^^^^
+  27                      RETURNING RETURN-CODE
+  28         *
+>> Error: Invalid syntax
+
+syn_misc.at-2715-prog.cob:27.19-27.28:
+  24                      TYPE  MB-YES-NO
+  25                      TITLE = "box title"
+  26                      DEFAULT IS MB-YES
+  27 >                    RETURNING RETURN-CODE
+----                      ^^^^^^^^^
+  28         *
+  29              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2737:0
+syn_misc.at-2737-prog.cob:5.18:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5 >            DISPLAY OMITTED WITH BELL
+----                     ^
+   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+   7         *
+>> Hint: Missing <identifier or literal>
+
+syn_misc.at-2737-prog.cob:5.19-5.26:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5 >            DISPLAY OMITTED WITH BELL
+----                      ^^^^^^^
+   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+   7         *
+>> Error: Invalid syntax
+
+syn_misc.at-2737-prog.cob:5.31:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5 >            DISPLAY OMITTED WITH BELL
+----                                  ^
+   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+   7         *
+>> Hint: Missing NO ADVANCING .
+
+syn_misc.at-2737-prog.cob:5.32-5.36:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5 >            DISPLAY OMITTED WITH BELL
+----                                   ^^^^
+   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+   7         *
+>> Error: Invalid syntax
+
+syn_misc.at-2737-prog.cob:5.36:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5 >            DISPLAY OMITTED WITH BELL
+----                                       ^
+   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+   7         *
+>> Hint: Missing .
+
+syn_misc.at-2737-prog.cob:6.11-6.18:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5              DISPLAY OMITTED WITH BELL
+   6 >            DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+----              ^^^^^^^
+   7         *
+   8              STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-2737-prog.cob:6.19-6.26:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5              DISPLAY OMITTED WITH BELL
+   6 >            DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+----                      ^^^^^^^
+   7         *
+   8              STOP RUN.
+>> Error: Invalid syntax
+
+syn_misc.at-2737-prog.cob:6.35-6.38:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE DIVISION.
+   5              DISPLAY OMITTED WITH BELL
+   6 >            DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
+----                                      ^^^
+   7         *
+   8              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2788:0
+syn_misc.at-2788-prog.cob:6.24-6.26:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6 >        01  GNUCOBOL-URL IS EXTERNAL-FORM
+----                           ^^
+   7                   IDENTIFIED BY "http://www.gnu.org/software/gnucobol/".
+   8          01  WEB-PAGE-1 EXTERNAL-FORM,
+>> Error: Invalid syntax
+
+syn_misc.at-2788-prog.cob:8.22-8.35:
+   5          WORKING-STORAGE SECTION.
+   6          01  GNUCOBOL-URL IS EXTERNAL-FORM
+   7                   IDENTIFIED BY "http://www.gnu.org/software/gnucobol/".
+   8 >        01  WEB-PAGE-1 EXTERNAL-FORM,
+----                         ^^^^^^^^^^^^^
+   9                   IDENTIFIED "cgipage1".
+  10          01  SIMPLE-FORM IS EXTERNAL-FORM.
+>> Error: Invalid syntax
+
+syn_misc.at-2788-prog.cob:10.23-10.25:
+   7                   IDENTIFIED BY "http://www.gnu.org/software/gnucobol/".
+   8          01  WEB-PAGE-1 EXTERNAL-FORM,
+   9                   IDENTIFIED "cgipage1".
+  10 >        01  SIMPLE-FORM IS EXTERNAL-FORM.
+----                          ^^
+  11              03  SIMPLE-FORM-VAR1  PIC X(10).
+  12              03  SIMPLE-FORM-VAR2  PIC 9(5).
+>> Error: Invalid syntax
+
+syn_misc.at-2788-prog.cob:13.19-13.32:
+  10          01  SIMPLE-FORM IS EXTERNAL-FORM.
+  11              03  SIMPLE-FORM-VAR1  PIC X(10).
+  12              03  SIMPLE-FORM-VAR2  PIC 9(5).
+  13 >        01  MY-FORM EXTERNAL-FORM.
+----                      ^^^^^^^^^^^^^
+  14              03  CGI-VAR1 PIC X(20) IDENTIFIED "Name".
+  15              03  CGI-VAR2 PIC X(50) IDENTIFIED BY CGI-VAR1.
+>> Error: Invalid syntax
+
+syn_misc.at-2788-prog.cob:14.34-14.44:
+  11              03  SIMPLE-FORM-VAR1  PIC X(10).
+  12              03  SIMPLE-FORM-VAR2  PIC 9(5).
+  13          01  MY-FORM EXTERNAL-FORM.
+  14 >            03  CGI-VAR1 PIC X(20) IDENTIFIED "Name".
+----                                     ^^^^^^^^^^
+  15              03  CGI-VAR2 PIC X(50) IDENTIFIED BY CGI-VAR1.
+  16   
+>> Error: Invalid syntax
+
+syn_misc.at-2788-prog.cob:15.34-15.44:
+  12              03  SIMPLE-FORM-VAR2  PIC 9(5).
+  13          01  MY-FORM EXTERNAL-FORM.
+  14              03  CGI-VAR1 PIC X(20) IDENTIFIED "Name".
+  15 >            03  CGI-VAR2 PIC X(50) IDENTIFIED BY CGI-VAR1.
+----                                     ^^^^^^^^^^
+  16   
+  17          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2826:0
+syn_misc.at-2826-prog.cob:10.11-10.15:
+   7          01  hello       PIC X.
+   8          01  foo         PIC X.
+   9          01  bars        PIC X.
+  10 >        01  file        PIC X.
+----              ^^^^
+  11          01  background-color PIC X.
+  12   
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2858:0
+syn_misc.at-2858-prog.cob:6.15-6.30:
+   3          PROGRAM-ID.  prog.
+   4   
+   5          PROCEDURE DIVISION.
+   6 >            FOO "Hello, world!"
+----                  ^^^^^^^^^^^^^^^
+   7              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2876:0
+syn_misc.at-2876-prog.cob:6.11-6.17:
+   3          PROGRAM-ID.  prog.
+   4   
+   5          PROCEDURE DIVISION.
+   6 >            COMP-1 "Hello, world!"
+----              ^^^^^^
+   7              DISPLAY "Hello, world!".
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2910:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2943:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2987:0
+syn_misc.at-2987-prog.cob:8.7-8.22:
+   5          ENVIRONMENT    DIVISION.
+   6          CONFIGURATION  SECTION.
+   7          OBJECT-COMPUTER. a.
+   8 >        SOURCE-COMPUTER. b.
+----          ^^^^^^^^^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3048:0
+syn_misc.at-3048-prog.cob:8.7-8.22:
+   5          ENVIRONMENT    DIVISION.
+   6          CONFIGURATION  SECTION.
+   7          REPOSITORY.
+   8 >        SOURCE-COMPUTER. b.
+----          ^^^^^^^^^^^^^^^
+   9          OBJECT-COMPUTER. a.
+  10          SPECIAL-NAMES.
+>> Error: Invalid syntax
+
+syn_misc.at-3048-prog.cob:22.7-22.20:
+  19          SOURCE-COMPUTER. b.
+  20          OBJECT-COMPUTER. a.
+  21          REPOSITORY.
+  22 >        SPECIAL-NAMES.
+----          ^^^^^^^^^^^^^
+  23   
+  24          END PROGRAM prog2.
+>> Error: Invalid syntax
+
+syn_misc.at-3048-prog.cob:32.7-32.22:
+  29          ENVIRONMENT    DIVISION.
+  30          CONFIGURATION  SECTION.
+  31          REPOSITORY.
+  32 >        SOURCE-COMPUTER. b.
+----          ^^^^^^^^^^^^^^^
+  33          OBJECT-COMPUTER. a.
+  34   
+>> Error: Invalid syntax
+
+syn_misc.at-3048-prog.cob:43.7-43.20:
+  40          ENVIRONMENT    DIVISION.
+  41          CONFIGURATION  SECTION.
+  42          REPOSITORY.
+  43 >        SPECIAL-NAMES.
+----          ^^^^^^^^^^^^^
+  44          SOURCE-COMPUTER. b.
+  45          OBJECT-COMPUTER. a.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3104:0
+syn_misc.at-3104-prog.cob:5.23-5.30:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >            CALL STATIC "stuff"
+----                          ^^^^^^^
+   6                 ON EXCEPTION
+   7                    CONTINUE
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3107:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3109:0
+syn_misc.at-3109-prog3.cob:2.7-2.32:
+   1   
+   2 >        >> CALL-CONVENTION STATIC
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^
+   3          IDENTIFICATION DIVISION.
+   4          PROGRAM-ID.    prog3.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3175:0
+syn_misc.at-3175-prog.cob:39.15-39.27:
+  36              END-WRITE
+  37   
+  38              DISPLAY "blah"
+  39 >                ON EXCEPTION
+----                  ^^^^^^^^^^^^
+  40                      CALL "err"
+  41                          NOT ON EXCEPTION
+>> Error: Invalid syntax
+
+syn_misc.at-3175-prog.cob:46.15-46.31:
+  43                          ON EXCEPTION
+  44                              CONTINUE.
+  45              DISPLAY "blah"
+  46 >                NOT ON EXCEPTION
+----                  ^^^^^^^^^^^^^^^^
+  47                      CALL "err"
+  48                          ON EXCEPTION
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3227:0
+syn_misc.at-3227-prog.cob:10.7-10.15:
+   7          REPLACE ==a== BY ==b==.. *> blah blah
+   8          .
+   9   
+  10 >        COPY a..
+----          ^^^^^^^^
+  11   
+  12          78  var VALUE "hello".
+>> Error: Library `A.' not found in search path (search path: )
+
+syn_misc.at-3227-prog.cob:7.30-7.31:
+   4   
+   5          DATA DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7 >        REPLACE ==a== BY ==b==.. *> blah blah
+----                                 ^
+   8          .
+   9   
+>> Error: Invalid syntax
+
+syn_misc.at-3227-prog.cob:14.10-14.11:
+  11   
+  12          78  var VALUE "hello".
+  13         * blah blah
+  14 >           .
+----             ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3266:0
+syn_misc.at-3266-prog.cob:14.19:
+  11              IF NOT DONE = 1
+  12                 DISPLAY "SEC-1 NOT EXECUTED"
+  13              END-IF
+  14 >            STOP RUN
+----                      ^
+  15          SEC-1 SECTION.
+  16              MOVE 1 TO DONE
+>> Hint: Missing .
+
+syn_misc.at-3266-prog.cob:15.7-15.12:
+  12                 DISPLAY "SEC-1 NOT EXECUTED"
+  13              END-IF
+  14              STOP RUN
+  15 >        SEC-1 SECTION.
+----          ^^^^^
+  16              MOVE 1 TO DONE
+  17              GOBACK.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3321:0
+syn_misc.at-3321-prog.cob:7.7-7.21:
+   4   
+   5          DATA DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7 >        COPY "ok.inc".
+----          ^^^^^^^^^^^^^^
+   8   
+   9          PROCEDURE DIVISION.
+>> Error: Library `ok.inc' not found in search path (search path: )
+
+syn_misc.at-3321-prog.cob:16.11-16.28:
+  13         * Directive purposefully in Area A
+  14           REPLACE ==RUNNN== BY ==RUN==.
+  15              STOP RUNNN
+  16 >            COPY "sec-1.inc".
+----              ^^^^^^^^^^^^^^^^^
+  17         * Also purposefully in Area A
+  18           COPY "sec-2.inc".
+>> Error: Library `sec-1.inc' not found in search path (search path: )
+
+syn_misc.at-3321-prog.cob:18.8-18.25:
+  15              STOP RUNNN
+  16              COPY "sec-1.inc".
+  17         * Also purposefully in Area A
+  18 >         COPY "sec-2.inc".
+----           ^^^^^^^^^^^^^^^^^
+>> Error: Library `sec-2.inc' not found in search path (search path: )
+
+syn_misc.at-3321-prog.cob:19.0:
+  16              COPY "sec-1.inc".
+  17         * Also purposefully in Area A
+  18           COPY "sec-2.inc".
+>> Hint: Missing .
+
+syn_misc.at-3321-prog.cob:19.0:
+  16              COPY "sec-1.inc".
+  17         * Also purposefully in Area A
+  18           COPY "sec-2.inc".
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3386:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3436:0
+syn_misc.at-3436-prog.cob:7.11-9.12:
+   4   
+   5          DATA DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7 >            COPY "ok.inc" REPLACING == 01 REPLACE-ME == BY ==
+----              ^
+   8 >        01  OK PIC XX VALUE "OK". ==
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 >            .
+----  ^^^^^^^^^^^^^
+  10   
+  11              PERFORM SEC-2
+>> Error: Library `ok.inc' not found in search path (search path: )
+
+syn_misc.at-3436-prog.cob:11.11-11.18:
+   8          01  OK PIC XX VALUE "OK". ==
+   9              .
+  10   
+  11 >            PERFORM SEC-2
+----              ^^^^^^^
+  12              STOP RUN
+  13              CONTINUE
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3969:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4209:0
+syn_misc.at-4209-prog.cob:9.27-9.28:
+   6          ENVIRONMENT DIVISION.
+   7          CONFIGURATION SECTION.
+   8          SPECIAL-NAMES.
+   9 >            CALL-CONVENTION 0 IS EXTERN.
+----                              ^
+  10   
+  11          PROCEDURE     DIVISION EXTERN.
+>> Error: Invalid syntax
+
+syn_misc.at-4209-prog.cob:11.29:
+   8          SPECIAL-NAMES.
+   9              CALL-CONVENTION 0 IS EXTERN.
+  10   
+  11 >        PROCEDURE     DIVISION EXTERN.
+----                                ^
+  12              CONTINUE
+  13              .
+>> Hint: Missing .
+
+syn_misc.at-4209-prog.cob:11.30-11.36:
+   8          SPECIAL-NAMES.
+   9              CALL-CONVENTION 0 IS EXTERN.
+  10   
+  11 >        PROCEDURE     DIVISION EXTERN.
+----                                 ^^^^^^
+  12              CONTINUE
+  13              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4225:0
+syn_misc.at-4225-prog2.cob:9.29:
+   6          ENVIRONMENT DIVISION.
+   7          CONFIGURATION SECTION.
+   8   
+   9 >        PROCEDURE     DIVISION WITH C LINKAGE.
+----                                ^
+  10              CONTINUE
+  11              .
+>> Hint: Missing .
+
+syn_misc.at-4225-prog2.cob:9.30-9.34:
+   6          ENVIRONMENT DIVISION.
+   7          CONFIGURATION SECTION.
+   8   
+   9 >        PROCEDURE     DIVISION WITH C LINKAGE.
+----                                 ^^^^
+  10              CONTINUE
+  11              .
+>> Error: Invalid syntax
+
+syn_misc.at-4225-prog2.cob:9.37-9.44:
+   6          ENVIRONMENT DIVISION.
+   7          CONFIGURATION SECTION.
+   8   
+   9 >        PROCEDURE     DIVISION WITH C LINKAGE.
+----                                        ^^^^^^^
+  10              CONTINUE
+  11              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4337:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4385:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4578:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4614:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4771:0
+syn_misc.at-4771-prog.cob:17.11-17.22:
+  14          PROCEDURE DIVISION.
+  15              PERFORM VARYING i FROM 1 BY 1
+  16                      UNTIL i = 5
+  17 >            END-PERFORM
+----              ^^^^^^^^^^^
+  18              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4859:0
+syn_misc.at-4859-prog1.cob:5.11-6.18:
+   2          IDENTIFICATION
+   3              DIVISION
+   4              .
+   5 >            author.
+----              ^^^^^^^
+   6 >            tester.
+----  ^^^^^^^^^^^^^^^^^^^
+   7          PROGRAM-ID
+   8              .
+>> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
+
+syn_misc.at-4859-prog1.cob:11.11-11.34:
+   8              .
+   9              prog1
+  10              .
+  11 >            REMARKS;. Should work.,,
+----              ^^^^^^^^^^^^^^^^^^^^^^^
+  12   
+  13          ENVIRONMENT
+>> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
+
+syn_misc.at-4859-prog1.cob:30.7-30.22:
+  27         DDATA
+  28         D   DIVISION
+  29         D   .
+  30 >        WORKING-STORAGE
+----          ^^^^^^^^^^^^^^^
+  31             SECTION
+  32             .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4860:0
+syn_misc.at-4860-prog2.cob:2.7-2.9:
+   1   
+   2 >        ID,;DIVISION;,.,;
+----          ^^
+   3              author,.;tester.
+   4          PROGRAM-ID,;.;,prog2;,.;,
+>> Error: Invalid syntax
+
+syn_misc.at-4860-prog2.cob:5.11-5.34:
+   2          ID,;DIVISION;,.,;
+   3              author,.;tester.
+   4          PROGRAM-ID,;.;,prog2;,.;,
+   5 >            REMARKS;. Should work.,,
+----              ^^^^^^^^^^^^^^^^^^^^^^^
+   6          ENVIRONMENT,;DIVISION;,.,;
+   7          CONFIGURATION;;,,SECTION;;,,.
+>> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
+
+syn_misc.at-4860-prog2.cob:12.7-12.9:
+   9   
+  10         DDATA;DIVISION,.
+  11         DWORKING-STORAGE,SECTION;.
+  12 >        01;i,PIC;9;.
+----          ^^
+  13   
+  14          PROCEDURE;DIVISION,.;
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4882:0
+syn_misc.at-4882-prog.cob:8.31:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  x           PIC 9(5) VALUE 1.
+   8 >        01  y           CONSTANT "ab".
+----                                  ^
+   9   
+  10          PROCEDURE       DIVISION.
+>> Hint: Missing RECORD
+
+syn_misc.at-4882-prog.cob:8.32-8.36:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          01  x           PIC 9(5) VALUE 1.
+   8 >        01  y           CONSTANT "ab".
+----                                   ^^^^
+   9   
+  10          PROCEDURE       DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-4882-prog.cob:11.15:
+   8          01  y           CONSTANT "ab".
+   9   
+  10          PROCEDURE       DIVISION.
+  11 >            STOP x
+----                  ^
+  12              STOP y
+  13              .
+>> Hint: Missing <literal> .
+
+syn_misc.at-4882-prog.cob:11.16-11.17:
+   8          01  y           CONSTANT "ab".
+   9   
+  10          PROCEDURE       DIVISION.
+  11 >            STOP x
+----                   ^
+  12              STOP y
+  13              .
+>> Error: Invalid syntax
+
+syn_misc.at-4882-prog.cob:11.17:
+   8          01  y           CONSTANT "ab".
+   9   
+  10          PROCEDURE       DIVISION.
+  11 >            STOP x
+----                    ^
+  12              STOP y
+  13              .
+>> Hint: Missing .
+
+syn_misc.at-4882-prog.cob:12.11-12.15:
+   9   
+  10          PROCEDURE       DIVISION.
+  11              STOP x
+  12 >            STOP y
+----              ^^^^
+  13              .
+>> Warning: Invalid syntax
+
+syn_misc.at-4882-prog.cob:12.15:
+   9   
+  10          PROCEDURE       DIVISION.
+  11              STOP x
+  12 >            STOP y
+----                  ^
+  13              .
+>> Hint: Missing <literal> .
+
+syn_misc.at-4882-prog.cob:12.16-12.17:
+   9   
+  10          PROCEDURE       DIVISION.
+  11              STOP x
+  12 >            STOP y
+----                   ^
+  13              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5068:0
+syn_misc.at-5068-prog.cob:7.16-7.24:
+   4          ENVIRONMENT DIVISION.
+   5          CONFIGURATION SECTION.
+   6          SPECIAL-NAMES.
+   7 >        SYMBOLIC CONSTANT
+----                   ^^^^^^^^
+   8            con-1  IS 1
+   9            25156c   "25156c".
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5260:0
+syn_misc.at-5260-prog.cob:7.29:
+   4          DATA  DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6          78  const1    value 115.
+   7 >        01  const2    CONSTANT 200.
+----                                ^
+   8          78  const3    value const2.
+   9          78  const4    value const2 + const1.
+>> Hint: Missing RECORD .
+
+syn_misc.at-5260-prog.cob:7.30-7.33:
+   4          DATA  DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6          78  const1    value 115.
+   7 >        01  const2    CONSTANT 200.
+----                                 ^^^
+   8          78  const3    value const2.
+   9          78  const4    value const2 + const1.
+>> Error: Invalid syntax
+
+syn_misc.at-5260-prog.cob:8.26:
+   5          WORKING-STORAGE SECTION.
+   6          78  const1    value 115.
+   7          01  const2    CONSTANT 200.
+   8 >        78  const3    value const2.
+----                             ^
+   9          78  const4    value const2 + const1.
+  10          77  othervar  PIC X(const1).
+>> Hint: Missing <literal>
+
+syn_misc.at-5260-prog.cob:8.27-8.33:
+   5          WORKING-STORAGE SECTION.
+   6          78  const1    value 115.
+   7          01  const2    CONSTANT 200.
+   8 >        78  const3    value const2.
+----                              ^^^^^^
+   9          78  const4    value const2 + const1.
+  10          77  othervar  PIC X(const1).
+>> Error: Invalid syntax
+
+syn_misc.at-5260-prog.cob:9.26:
+   6          78  const1    value 115.
+   7          01  const2    CONSTANT 200.
+   8          78  const3    value const2.
+   9 >        78  const4    value const2 + const1.
+----                             ^
+  10          77  othervar  PIC X(const1).
+  11          01  var       PIC X(const2).
+>> Hint: Missing <literal>
+
+syn_misc.at-5260-prog.cob:9.27-9.33:
+   6          78  const1    value 115.
+   7          01  const2    CONSTANT 200.
+   8          78  const3    value const2.
+   9 >        78  const4    value const2 + const1.
+----                              ^^^^^^
+  10          77  othervar  PIC X(const1).
+  11          01  var       PIC X(const2).
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5309:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5485:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5576:0
+syn_misc.at-5576-prog.cob:16.11-16.15:
+  13          PROCEDURE DIVISION.
+  14   
+  15              IF var-len < 16
+  16 >            ELSE
+----              ^^^^
+  17                  move othervar to var
+  18              END-IF
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:21.11-21.15:
+  18              END-IF
+  19   
+  20              IF var-len > 16
+  21 >            ELSE
+----              ^^^^
+  22                  move othervar to var
+  23              END-IF
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:26.11-26.15:
+  23              END-IF
+  24   
+  25              IF (2 = 3)
+  26 >            ELSE
+----              ^^^^
+  27                 IF 1 = 1
+  28                 ELSE
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:28.14-28.18:
+  25              IF (2 = 3)
+  26              ELSE
+  27                 IF 1 = 1
+  28 >               ELSE
+----                 ^^^^
+  29                    IF 1 = 1
+  30                       move var to othervar
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:39.11-39.23:
+  36              WHEN  A = B
+  37                  move var      to othervar
+  38              WHEN OTHER
+  39 >            END-EVALUATE
+----              ^^^^^^^^^^^^
+  40   
+  41              PERFORM WITH TEST BEFORE UNTIL 1 <> 3
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:42.11-42.22:
+  39              END-EVALUATE
+  40   
+  41              PERFORM WITH TEST BEFORE UNTIL 1 <> 3
+  42 >            END-PERFORM
+----              ^^^^^^^^^^^
+  43   
+  44              EVALUATE FALSE
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:47.11-47.23:
+  44              EVALUATE FALSE
+  45              WHEN  A = B
+  46              WHEN  B = A
+  47 >            END-EVALUATE.
+----              ^^^^^^^^^^^^
+  48   
+  49              EVALUATE TRUE
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:53.11-53.12:
+  50              WHEN  A = B
+  51                  move var      to othervar
+  52              WHEN OTHER
+  53 >            .
+----              ^
+  54   
+  55              EVALUATE TRUE
+>> Error: Invalid syntax
+
+syn_misc.at-5576-prog.cob:58.11-58.12:
+  55              EVALUATE TRUE
+  56              WHEN  A = B
+  57              WHEN  B = A
+  58 >            .
+----              ^
+  59   
+  60              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5649:0
+syn_misc.at-5649-prog.cob:12.53:
+   9              05  item-05-b     pic x(01).
+  10          01 myk-01 constant           as      length of item-01.
+  11          01 myk-02 constant is global as      length item-05-a.
+  12 >        01 myk-03 constant    global as      length of pointer. *> extension
+----                                                        ^
+  13          01 myk-04 constant    global as byte-length of item-01.
+  14          01 myk-05 constant is global as byte-length item-05-a.
+>> Hint: Missing <word>
+
+syn_misc.at-5649-prog.cob:12.54-12.61:
+   9              05  item-05-b     pic x(01).
+  10          01 myk-01 constant           as      length of item-01.
+  11          01 myk-02 constant is global as      length item-05-a.
+  12 >        01 myk-03 constant    global as      length of pointer. *> extension
+----                                                         ^^^^^^^
+  13          01 myk-04 constant    global as byte-length of item-01.
+  14          01 myk-05 constant is global as byte-length item-05-a.
+>> Error: Invalid syntax
+
+syn_misc.at-5649-prog.cob:15.53:
+  12          01 myk-03 constant    global as      length of pointer. *> extension
+  13          01 myk-04 constant    global as byte-length of item-01.
+  14          01 myk-05 constant is global as byte-length item-05-a.
+  15 >        01 myk-06 constant           as byte-length of pointer. *> extension
+----                                                        ^
+>> Hint: Missing <word>
+
+syn_misc.at-5649-prog.cob:15.54-15.61:
+  12          01 myk-03 constant    global as      length of pointer. *> extension
+  13          01 myk-04 constant    global as byte-length of item-01.
+  14          01 myk-05 constant is global as byte-length item-05-a.
+  15 >        01 myk-06 constant           as byte-length of pointer. *> extension
+----                                                         ^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5735:0
+syn_misc.at-5735-prog.cob:7.26-7.34:
+   4          DATA DIVISION.
+   5          WORKING-STORAGE SECTION.
+   6          01 DATA-COLLECTION.
+   7 >           03 DATA-ITEMS-A VOLATILE.
+----                             ^^^^^^^^
+   8                05 DATA-A1 PIC S9(9) BINARY.
+   9                05 DATA-A2 PIC S9(9) BINARY.
+>> Error: Invalid syntax
+
+syn_misc.at-5735-prog.cob:10.13-10.21:
+   7             03 DATA-ITEMS-A VOLATILE.
+   8                05 DATA-A1 PIC S9(9) BINARY.
+   9                05 DATA-A2 PIC S9(9) BINARY.
+  10 >           03 VOLATILE.
+----                ^^^^^^^^
+  11                05 DATA-FILLER PIC S9(9) BINARY.
+  12             03 DATA-ITEMS-B.
+>> Error: Invalid syntax
+
+syn_misc.at-5735-prog.cob:14.34-14.42:
+  11                05 DATA-FILLER PIC S9(9) BINARY.
+  12             03 DATA-ITEMS-B.
+  13                05 DATA-B1 PIC S9(9).
+  14 >              05 DATA-B2 PIC S9(9) VOLATILE.
+----                                     ^^^^^^^^
+  15             03 DATA-ITEMS-C.
+  16                05 DATA-C1 PIC S9(9).
+>> Error: Invalid syntax
+
+syn_misc.at-5735-prog.cob:18.52-18.60:
+  15             03 DATA-ITEMS-C.
+  16                05 DATA-C1 PIC S9(9).
+  17                05 DATA-C2 PIC S9(9).
+  18 >        01 STEP    PIC 9(8)  BINARY VALUE 0 EXTERNAL VOLATILE.
+----                                                       ^^^^^^^^
+  19         *01 WRONGY    PIC X.
+  20         *   88 TESTVAL-A VALUE 'A' VOLATILE.
+>> Error: Invalid syntax
+
+syn_misc.at-5735-prog.cob:24.31-24.39:
+  21         *   88 TESTVAL-B VOLATILE VALUE 'B'.
+  22          LINKAGE SECTION.
+  23          01  XMYREC.
+  24 >           05  XFLD1   PIC 9(2) VOLATILE.
+----                                  ^^^^^^^^
+  25         *SCREEN SECTION.
+  26         *01  WRONG-SCREEN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5791:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5830:0
+syn_misc.at-5830-prog.cob:6.26-6.29:
+   3          PROGRAM-ID. prog.
+   4   
+   5          PROCEDURE DIVISION.
+   6 >            MOVE 1 TO LIN, COL
+----                             ^^^
+   7              .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5857:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5874:0
+syn_misc.at-5874-valid.cob:2.7-2.15:
+   1   
+   2 > 000100 @OPTIONS NOMAIN,APOST
+----          ^^^^^^^^
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-5874-valid.cob:5.18:
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+   5 > 000400 PROGRAM-ID. VALID.
+----                     ^
+>> Hint: Missing <word>
+
+syn_misc.at-5874-valid.cob:5.19-5.24:
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+   5 > 000400 PROGRAM-ID. VALID.
+----                      ^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5963:0
+syn_misc.at-5963-valid.cob:2.7-2.14:
+   1   
+   2 > 000100 Process codepage(1047)
+----          ^^^^^^^
+   3   000200 CBL CODEPAGE(1208)
+   4   000300 CBL
+>> Error: Invalid syntax
+
+syn_misc.at-5963-valid.cob:6.18:
+   3   000200 CBL CODEPAGE(1208)
+   4   000300 CBL
+   5   000400 IDENTIFICATION  DIVISION.
+   6 > 000500 PROGRAM-ID. VALID.
+----                     ^
+>> Hint: Missing <word>
+
+syn_misc.at-5963-valid.cob:6.19-6.24:
+   3   000200 CBL CODEPAGE(1208)
+   4   000300 CBL
+   5   000400 IDENTIFICATION  DIVISION.
+   6 > 000500 PROGRAM-ID. VALID.
+----                      ^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5999:0
+syn_misc.at-5999-valid.cob:3.8-3.16:
+   1   
+   2         *CONTROL LIST
+   3 >         *CONTROL SOURCE
+----           ^^^^^^^^
+   4         *CBL MAP LIST
+   5   000100 *CBL NOMAP NOSOURCE NOLIST
+>> Error: Invalid syntax
+
+syn_misc.at-5999-valid.cob:3.16:
+   1   
+   2         *CONTROL LIST
+   3 >         *CONTROL SOURCE
+----                   ^
+   4         *CBL MAP LIST
+   5   000100 *CBL NOMAP NOSOURCE NOLIST
+>> Hint: Missing DIVISION .
+
+syn_misc.at-5999-valid.cob:3.17-3.23:
+   1   
+   2         *CONTROL LIST
+   3 >         *CONTROL SOURCE
+----                    ^^^^^^
+   4         *CBL MAP LIST
+   5   000100 *CBL NOMAP NOSOURCE NOLIST
+>> Error: Invalid syntax
+
+syn_misc.at-5999-valid.cob:7.18:
+   4         *CBL MAP LIST
+   5   000100 *CBL NOMAP NOSOURCE NOLIST
+   6   000200 IDENTIFICATION  DIVISION.
+   7 > 000300 PROGRAM-ID. VALID.
+----                     ^
+>> Hint: Missing <word>
+
+syn_misc.at-5999-valid.cob:7.19-7.24:
+   4         *CBL MAP LIST
+   5   000100 *CBL NOMAP NOSOURCE NOLIST
+   6   000200 IDENTIFICATION  DIVISION.
+   7 > 000300 PROGRAM-ID. VALID.
+----                      ^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6601:0
+syn_misc.at-6601-prog.cob:9.15-9.26:
+   6          INPUT-OUTPUT     SECTION.
+   7          FILE-CONTROL.
+   8              SELECT f ASSIGN "f.dat" SEQUENTIAL
+   9 >                FILE-LIMITS ARE 1 THRU 10, 100 THRU f-max
+----                  ^^^^^^^^^^^
+  10                  TRACK-AREA 100 CHARACTERS
+  11                  TRACK-LIMIT 5 TRACKS.
+>> Error: Invalid syntax
+
+syn_misc.at-6601-prog.cob:14.15-14.21:
+  11                  TRACK-LIMIT 5 TRACKS.
+  12              SELECT g ASSIGN "g.dat" RELATIVE
+  13                  RELATIVE KEY g-key
+  14 >                ACTUAL KEY g-actual-key.
+----                  ^^^^^^
+  15   
+  16          I-O-CONTROL.
+>> Error: Invalid syntax
+
+syn_misc.at-6601-prog.cob:17.11-17.16:
+  14                  ACTUAL KEY g-actual-key.
+  15   
+  16          I-O-CONTROL.
+  17 >            APPLY RECORD-OVERFLOW f, g
+----              ^^^^^
+  18              APPLY CORE-INDEX core-idx ON f
+  19              APPLY CYL-INDEX TO 5 ON f
+>> Error: Invalid syntax
+
+syn_misc.at-6601-prog.cob:25.38:
+  22              APPLY MASTER-INDEX TO 5 on g
+  23              APPLY WRITE-VERIFY f, g
+  24              APPLY REORG-CRITERIA f-rec, f
+  25 >            RERUN ON "g2.dat" EVERY END REEL g
+----                                         ^
+  26              .
+  27          DATA             DIVISION.
+>> Hint: Missing PROGRAM
+
+syn_misc.at-6601-prog.cob:25.39-25.43:
+  22              APPLY MASTER-INDEX TO 5 on g
+  23              APPLY WRITE-VERIFY f, g
+  24              APPLY REORG-CRITERIA f-rec, f
+  25 >            RERUN ON "g2.dat" EVERY END REEL g
+----                                          ^^^^
+  26              .
+  27          DATA             DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-6601-prog.cob:27.7-27.11:
+  24              APPLY REORG-CRITERIA f-rec, f
+  25              RERUN ON "g2.dat" EVERY END REEL g
+  26              .
+  27 >        DATA             DIVISION.
+----          ^^^^
+  28          FILE             SECTION.
+  29          FD  f.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6642:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6806:0
+syn_misc.at-6806-prog.cob:5.7-5.21:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5 >        >>DISPLAY "OK"
+----          ^^^^^^^^^^^^^^
+   6              STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6826:0
+syn_misc.at-6826-prog.cob:5.7-5.19:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5 >        >>DISPLAY OK
+----          ^^^^^^^^^^^^
+   6              STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6845:0
+syn_misc.at-6845-prog.cob:5.7-5.17:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5 >       $DISPLAY OK
+----          ^^^^^^^^^^
+   6              STOP RUN.
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6924:0
+syn_misc.at-6924-prog.cob:2.7-2.11:
+   1   
+   2 >        $SET CONSTANT DOGGY "Barky"
+----          ^^^^
+   3          $SET CONSTANT PONY "Blacky"
+   4          IDENTIFICATION DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-6924-prog.cob:8.35:
+   5          PROGRAM-ID. prog.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                      ^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          $SET CONSTANT PONY "White"
+>> Hint: Missing <literal>
+
+syn_misc.at-6924-prog.cob:8.36-8.41:
+   5          PROGRAM-ID. prog.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                       ^^^^^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          $SET CONSTANT PONY "White"
+>> Error: Invalid syntax
+
+syn_misc.at-6924-prog.cob:9.35:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                      ^
+  10          $SET CONSTANT PONY "White"
+  11         *
+>> Hint: Missing <literal>
+
+syn_misc.at-6924-prog.cob:9.36-9.40:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                       ^^^^
+  10          $SET CONSTANT PONY "White"
+  11         *
+>> Error: Invalid syntax
+
+syn_misc.at-6924-prog.cob:10.7-10.11:
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10 >        $SET CONSTANT PONY "White"
+----          ^^^^
+  11         *
+  12         * ensure to test a numeric, too (not actually used):
+>> Error: Invalid syntax
+
+syn_misc.at-6924-prog.cob:13.35:
+  10          $SET CONSTANT PONY "White"
+  11         *
+  12         * ensure to test a numeric, too (not actually used):
+  13 >        $SET CONSTANT C-UNUSED-NUM 0
+----                                      ^
+  14          PROCEDURE DIVISION.
+  15          MAIN.
+>> Hint: Missing .
+
+syn_misc.at-6924-prog.cob:14.7-14.16:
+  11         *
+  12         * ensure to test a numeric, too (not actually used):
+  13          $SET CONSTANT C-UNUSED-NUM 0
+  14 >        PROCEDURE DIVISION.
+----          ^^^^^^^^^
+  15          MAIN.
+  16              DISPLAY "Your Dog's name is " DOGGY ";".
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6930:0
+syn_misc.at-6930-prog2.cob:2.7-2.35:
+   1   
+   2 >        >>SET CONSTANT DOGGY "Barky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3          >>SET CONSTANT PONY "Blacky"
+   4          IDENTIFICATION DIVISION.
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6930-prog2.cob:3.7-3.35:
+   1   
+   2          >>SET CONSTANT DOGGY "Barky"
+   3 >        >>SET CONSTANT PONY "Blacky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4          IDENTIFICATION DIVISION.
+   5          PROGRAM-ID. prog2.
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6930-prog2.cob:8.35:
+   5          PROGRAM-ID. prog2.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                      ^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          >>SET CONSTANT PONY "White"
+>> Hint: Missing <literal>
+
+syn_misc.at-6930-prog2.cob:8.36-8.41:
+   5          PROGRAM-ID. prog2.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                       ^^^^^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          >>SET CONSTANT PONY "White"
+>> Error: Invalid syntax
+
+syn_misc.at-6930-prog2.cob:9.35:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                      ^
+  10          >>SET CONSTANT PONY "White"
+  11         *
+>> Hint: Missing <literal>
+
+syn_misc.at-6930-prog2.cob:9.36-9.40:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                       ^^^^
+  10          >>SET CONSTANT PONY "White"
+  11         *
+>> Error: Invalid syntax
+
+syn_misc.at-6930-prog2.cob:10.7-10.34:
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10 >        >>SET CONSTANT PONY "White"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11         *
+  12          PROCEDURE DIVISION.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6934:0
+syn_misc.at-6934-prog3.cob:2.7-2.38:
+   1   
+   2 >        >>DEFINE CONSTANT DOGGY "Barky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3          >>DEFINE CONSTANT PONY "Blacky"
+   4          IDENTIFICATION DIVISION.
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6934-prog3.cob:3.7-3.38:
+   1   
+   2          >>DEFINE CONSTANT DOGGY "Barky"
+   3 >        >>DEFINE CONSTANT PONY "Blacky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4          IDENTIFICATION DIVISION.
+   5          PROGRAM-ID. prog3.
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6934-prog3.cob:8.35:
+   5          PROGRAM-ID. prog3.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                      ^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          >>DEFINE CONSTANT PONY "White" OVERRIDE
+>> Hint: Missing <literal>
+
+syn_misc.at-6934-prog3.cob:8.36-8.41:
+   5          PROGRAM-ID. prog3.
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8 >        01  THEDOG    PIC X(6) VALUE DOGGY.
+----                                       ^^^^^
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10          >>DEFINE CONSTANT PONY "White" OVERRIDE
+>> Error: Invalid syntax
+
+syn_misc.at-6934-prog3.cob:9.35:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                      ^
+  10          >>DEFINE CONSTANT PONY "White" OVERRIDE
+  11         *
+>> Hint: Missing <literal>
+
+syn_misc.at-6934-prog3.cob:9.36-9.40:
+   6          DATA DIVISION.
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9 >        77  MYHORSE   PIC X(7) VALUE PONY.
+----                                       ^^^^
+  10          >>DEFINE CONSTANT PONY "White" OVERRIDE
+  11         *
+>> Error: Invalid syntax
+
+syn_misc.at-6934-prog3.cob:10.7-10.46:
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10 >        >>DEFINE CONSTANT PONY "White" OVERRIDE
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11         *
+  12          PROCEDURE DIVISION.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6969:0
+syn_misc.at-6969-prog.cob:7.7-7.28:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7 >        >>IF ACTIVATE DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^
+   8          >>DISPLAY "NOTOK"
+   9          >>ELIF ACTIVATE2 DEFINED
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:8.7-8.24:
+   5          WORKING-STORAGE  SECTION.
+   6          PROCEDURE        DIVISION.
+   7          >>IF ACTIVATE DEFINED
+   8 >        >>DISPLAY "NOTOK"
+----          ^^^^^^^^^^^^^^^^^
+   9          >>ELIF ACTIVATE2 DEFINED
+  10          >>DISPLAY "OK"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:9.7-9.31:
+   6          PROCEDURE        DIVISION.
+   7          >>IF ACTIVATE DEFINED
+   8          >>DISPLAY "NOTOK"
+   9 >        >>ELIF ACTIVATE2 DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  10          >>DISPLAY "OK"
+  11          >>ELSE
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:10.7-10.21:
+   7          >>IF ACTIVATE DEFINED
+   8          >>DISPLAY "NOTOK"
+   9          >>ELIF ACTIVATE2 DEFINED
+  10 >        >>DISPLAY "OK"
+----          ^^^^^^^^^^^^^^
+  11          >>ELSE
+  12          >>DISPLAY "NOTOK"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:11.7-11.13:
+   8          >>DISPLAY "NOTOK"
+   9          >>ELIF ACTIVATE2 DEFINED
+  10          >>DISPLAY "OK"
+  11 >        >>ELSE
+----          ^^^^^^
+  12          >>DISPLAY "NOTOK"
+  13          >>END-IF
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:12.7-12.24:
+   9          >>ELIF ACTIVATE2 DEFINED
+  10          >>DISPLAY "OK"
+  11          >>ELSE
+  12 >        >>DISPLAY "NOTOK"
+----          ^^^^^^^^^^^^^^^^^
+  13          >>END-IF
+  14              STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6969-prog.cob:13.7-13.15:
+  10          >>DISPLAY "OK"
+  11          >>ELSE
+  12          >>DISPLAY "NOTOK"
+  13 >        >>END-IF
+----          ^^^^^^^^
+  14              STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6994:0
+syn_misc.at-6994-prog.cob:5.7-5.22:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >        >> IF X DEFINED
+----          ^^^^^^^^^^^^^^^
+   6            >>DISPLAY "X defined"
+   7          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6994-prog.cob:6.9-6.30:
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5          >> IF X DEFINED
+   6 >          >>DISPLAY "X defined"
+----            ^^^^^^^^^^^^^^^^^^^^^
+   7          >> ELSE
+   8            >> DISPLAY "X not defined"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6994-prog.cob:7.7-7.14:
+   4          PROCEDURE      DIVISION.
+   5          >> IF X DEFINED
+   6            >>DISPLAY "X defined"
+   7 >        >> ELSE
+----          ^^^^^^^
+   8            >> DISPLAY "X not defined"
+   9            >> DEFINE X 1
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6994-prog.cob:8.9-8.35:
+   5          >> IF X DEFINED
+   6            >>DISPLAY "X defined"
+   7          >> ELSE
+   8 >          >> DISPLAY "X not defined"
+----            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9            >> DEFINE X 1
+  10          >> END-IF
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6994-prog.cob:9.9-9.22:
+   6            >>DISPLAY "X defined"
+   7          >> ELSE
+   8            >> DISPLAY "X not defined"
+   9 >          >> DEFINE X 1
+----            ^^^^^^^^^^^^^
+  10          >> END-IF
+  11              CONTINUE
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-6994-prog.cob:10.7-10.16:
+   7          >> ELSE
+   8            >> DISPLAY "X not defined"
+   9            >> DEFINE X 1
+  10 >        >> END-IF
+----          ^^^^^^^^^
+  11              CONTINUE
+  12              .
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7027:0
+syn_misc.at-7027-prog.cob:5.7-5.24:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >        >>IF A IS DEFINED
+----          ^^^^^^^^^^^^^^^^^
+   6          >>IF B IS DEFINED
+   7              CONTINUE
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7027-prog.cob:6.7-6.24:
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5          >>IF A IS DEFINED
+   6 >        >>IF B IS DEFINED
+----          ^^^^^^^^^^^^^^^^^
+   7              CONTINUE
+   8          >> DISPLAY "NOT OK (not both definitions)"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7027-prog.cob:8.7-8.17:
+   5          >>IF A IS DEFINED
+   6          >>IF B IS DEFINED
+   7              CONTINUE
+   8 >        >> DISPLAY "NOT OK (not both definitions)"
+----          ^^^^^^^^^^
+   9              .
+  10          >>ELSE
+>> Error: Invalid syntax
+
+syn_misc.at-7027-prog.cob:10.7-10.13:
+   7              CONTINUE
+   8          >> DISPLAY "NOT OK (not both definitions)"
+   9              .
+  10 >        >>ELSE
+----          ^^^^^^
+  11              CONTINUE
+  12          >> DISPLAY "NOT OK (no definitions)"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7027-prog.cob:12.7-12.17:
+   9              .
+  10          >>ELSE
+  11              CONTINUE
+  12 >        >> DISPLAY "NOT OK (no definitions)"
+----          ^^^^^^^^^^
+  13              .
+  14          >>END-IF
+>> Error: Invalid syntax
+
+syn_misc.at-7027-prog.cob:14.7-14.15:
+  11              CONTINUE
+  12          >> DISPLAY "NOT OK (no definitions)"
+  13              .
+  14 >        >>END-IF
+----          ^^^^^^^^
+  15          >>ELSE
+  16              CONTINUE
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7027-prog.cob:15.7-15.13:
+  12          >> DISPLAY "NOT OK (no definitions)"
+  13              .
+  14          >>END-IF
+  15 >        >>ELSE
+----          ^^^^^^
+  16              CONTINUE
+  17          >> DISPLAY "OK"
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7027-prog.cob:17.7-17.17:
+  14          >>END-IF
+  15          >>ELSE
+  16              CONTINUE
+  17 >        >> DISPLAY "OK"
+----          ^^^^^^^^^^
+  18              .
+  19          >>END-IF
+>> Error: Invalid syntax
+
+syn_misc.at-7027-prog.cob:19.7-19.15:
+  16              CONTINUE
+  17          >> DISPLAY "OK"
+  18              .
+  19 >        >>END-IF
+----          ^^^^^^^^
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7051:0
+syn_misc.at-7051-prog.cob:5.7-5.24:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >        >>IF A IS DEFINED
+----          ^^^^^^^^^^^^^^^^^
+   6              CONTINUE
+   7              .
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7051-prog.cob:8.7-8.13:
+   5          >>IF A IS DEFINED
+   6              CONTINUE
+   7              .
+   8 >        >>else
+----          ^^^^^^
+   9              CONTINUE
+  10              .
+>> Error: Malformed or unknown compiler directive
+
+syn_misc.at-7051-prog.cob:11.7-11.15:
+   8          >>else
+   9              CONTINUE
+  10              .
+  11 >        >>eNd-If
+----          ^^^^^^^^
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7109:0
+syn_misc.at-7109-prog.cob:8.7-8.19:
+   5          WORKING-STORAGE SECTION.
+   6          78 Y            VALUE 'a'.
+   7          PROCEDURE       DIVISION.
+   8 >       $IF X DEFINED
+----          ^^^^^^^^^^^^
+   9         $DISPLAY X defined
+  10         $ELIF Y DEFINED
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:9.7-9.24:
+   6          78 Y            VALUE 'a'.
+   7          PROCEDURE       DIVISION.
+   8         $IF X DEFINED
+   9 >       $DISPLAY X defined
+----          ^^^^^^^^^^^^^^^^^
+  10         $ELIF Y DEFINED
+  11         $DISPLAY X not defined, but Y via lvl 78
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:10.7-10.21:
+   7          PROCEDURE       DIVISION.
+   8         $IF X DEFINED
+   9         $DISPLAY X defined
+  10 >       $ELIF Y DEFINED
+----          ^^^^^^^^^^^^^^
+  11         $DISPLAY X not defined, but Y via lvl 78
+  12         $ELSE
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:11.7-11.46:
+   8         $IF X DEFINED
+   9         $DISPLAY X defined
+  10         $ELIF Y DEFINED
+  11 >       $DISPLAY X not defined, but Y via lvl 78
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12         $ELSE
+  13         $DISPLAY X not defined
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:12.7-12.11:
+   9         $DISPLAY X defined
+  10         $ELIF Y DEFINED
+  11         $DISPLAY X not defined, but Y via lvl 78
+  12 >       $ELSE
+----          ^^^^
+  13         $DISPLAY X not defined
+  14         $END
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:13.7-13.28:
+  10         $ELIF Y DEFINED
+  11         $DISPLAY X not defined, but Y via lvl 78
+  12         $ELSE
+  13 >       $DISPLAY X not defined
+----          ^^^^^^^^^^^^^^^^^^^^^
+  14         $END
+  15              CONTINUE
+>> Error: Unexpected characters
+
+syn_misc.at-7109-prog.cob:14.7-14.10:
+  11         $DISPLAY X not defined, but Y via lvl 78
+  12         $ELSE
+  13         $DISPLAY X not defined
+  14 >       $END
+----          ^^^
+  15              CONTINUE
+  16              .
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7160:0
+syn_misc.at-7160-prog.cob:11.7-11.17:
+   8          78 X            VALUE 2.
+   9          78 Z            VALUE 354.
+  10          PROCEDURE       DIVISION.
+  11 >       $IF Y = Y2X
+----          ^^^^^^^^^^
+  12         $DISPLAY correct Y = Y2
+  13         $ELSE
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:12.7-12.29:
+   9          78 Z            VALUE 354.
+  10          PROCEDURE       DIVISION.
+  11         $IF Y = Y2X
+  12 >       $DISPLAY correct Y = Y2
+----          ^^^^^^^^^^^^^^^^^^^^^^
+  13         $ELSE
+  14         $DISPLAY bad: Y should be = Y2
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:13.7-13.11:
+  10          PROCEDURE       DIVISION.
+  11         $IF Y = Y2X
+  12         $DISPLAY correct Y = Y2
+  13 >       $ELSE
+----          ^^^^
+  14         $DISPLAY bad: Y should be = Y2
+  15         $END
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:14.7-14.36:
+  11         $IF Y = Y2X
+  12         $DISPLAY correct Y = Y2
+  13         $ELSE
+  14 >       $DISPLAY bad: Y should be = Y2
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15         $END
+  16         $IF Y > X
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:15.7-15.10:
+  12         $DISPLAY correct Y = Y2
+  13         $ELSE
+  14         $DISPLAY bad: Y should be = Y2
+  15 >       $END
+----          ^^^
+  16         $IF Y > X
+  17         $DISPLAY BAD - Y is not > X
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:16.7-16.15:
+  13         $ELSE
+  14         $DISPLAY bad: Y should be = Y2
+  15         $END
+  16 >       $IF Y > X
+----          ^^^^^^^^
+  17         $DISPLAY BAD - Y is not > X
+  18         $ELIF Y < X
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:17.7-17.33:
+  14         $DISPLAY bad: Y should be = Y2
+  15         $END
+  16         $IF Y > X
+  17 >       $DISPLAY BAD - Y is not > X
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  18         $ELIF Y < X
+  19         $DISPLAY correct Y < X
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:18.7-18.17:
+  15         $END
+  16         $IF Y > X
+  17         $DISPLAY BAD - Y is not > X
+  18 >       $ELIF Y < X
+----          ^^^^^^^^^^
+  19         $DISPLAY correct Y < X
+  20         $ELSE
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:19.7-19.28:
+  16         $IF Y > X
+  17         $DISPLAY BAD - Y is not > X
+  18         $ELIF Y < X
+  19 >       $DISPLAY correct Y < X
+----          ^^^^^^^^^^^^^^^^^^^^^
+  20         $ELSE
+  21         $DISPLAY BROKEN
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:20.7-20.11:
+  17         $DISPLAY BAD - Y is not > X
+  18         $ELIF Y < X
+  19         $DISPLAY correct Y < X
+  20 >       $ELSE
+----          ^^^^
+  21         $DISPLAY BROKEN
+  22         $END
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:21.7-21.21:
+  18         $ELIF Y < X
+  19         $DISPLAY correct Y < X
+  20         $ELSE
+  21 >       $DISPLAY BROKEN
+----          ^^^^^^^^^^^^^^
+  22         $END
+  23         
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:22.7-22.10:
+  19         $DISPLAY correct Y < X
+  20         $ELSE
+  21         $DISPLAY BROKEN
+  22 >       $END
+----          ^^^
+  23         
+  24         $IF X > Y
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:24.7-24.15:
+  21         $DISPLAY BROKEN
+  22         $END
+  23         
+  24 >       $IF X > Y
+----          ^^^^^^^^
+  25         $DISPLAY correct X > Y
+  26         $ELIF X < Y
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:25.7-25.28:
+  22         $END
+  23         
+  24         $IF X > Y
+  25 >       $DISPLAY correct X > Y
+----          ^^^^^^^^^^^^^^^^^^^^^
+  26         $ELIF X < Y
+  27         $DISPLAY BAD - X is not < Y
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:26.7-26.17:
+  23         
+  24         $IF X > Y
+  25         $DISPLAY correct X > Y
+  26 >       $ELIF X < Y
+----          ^^^^^^^^^^
+  27         $DISPLAY BAD - X is not < Y
+  28         $ELSE
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:27.7-27.33:
+  24         $IF X > Y
+  25         $DISPLAY correct X > Y
+  26         $ELIF X < Y
+  27 >       $DISPLAY BAD - X is not < Y
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  28         $ELSE
+  29         $DISPLAY BROKEN
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:28.7-28.11:
+  25         $DISPLAY correct X > Y
+  26         $ELIF X < Y
+  27         $DISPLAY BAD - X is not < Y
+  28 >       $ELSE
+----          ^^^^
+  29         $DISPLAY BROKEN
+  30         $END
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:29.7-29.21:
+  26         $ELIF X < Y
+  27         $DISPLAY BAD - X is not < Y
+  28         $ELSE
+  29 >       $DISPLAY BROKEN
+----          ^^^^^^^^^^^^^^
+  30         $END
+  31              CONTINUE
+>> Error: Unexpected characters
+
+syn_misc.at-7160-prog.cob:30.7-30.10:
+  27         $DISPLAY BAD - X is not < Y
+  28         $ELSE
+  29         $DISPLAY BROKEN
+  30 >       $END
+----          ^^^
+  31              CONTINUE
+  32              .
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7193:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7264:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7417:0
+syn_misc.at-7417-prog.cob:41.18:
+  38               05  FILLER REDEFINES IN-NAME  PIC X(20) *> should PIC be optional?
+  39                                    PRESENT WHEN IN-TYPE = 2
+  40                                    DESTINATION OUT-NAME.
+  41 >                 88               VALUE SPACES IS VALID.
+----                     ^
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+>> Hint: Missing <word>
+
+syn_misc.at-7417-prog.cob:41.33-41.38:
+  38               05  FILLER REDEFINES IN-NAME  PIC X(20) *> should PIC be optional?
+  39                                    PRESENT WHEN IN-TYPE = 2
+  40                                    DESTINATION OUT-NAME.
+  41 >                 88               VALUE SPACES IS VALID.
+----                                    ^^^^^
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:41.46-41.48:
+  38               05  FILLER REDEFINES IN-NAME  PIC X(20) *> should PIC be optional?
+  39                                    PRESENT WHEN IN-TYPE = 2
+  40                                    DESTINATION OUT-NAME.
+  41 >                 88               VALUE SPACES IS VALID.
+----                                                 ^^
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:45.16-45.23:
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45 >                 INVALID WHEN IN-WEEK-NO < 5
+----                   ^^^^^^^
+  46                   AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:45.39:
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45 >                 INVALID WHEN IN-WEEK-NO < 5
+----                                          ^
+  46                   AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+>> Hint: Missing .
+
+syn_misc.at-7417-prog.cob:45.40-45.41:
+  42      *>The values of IN-WEEK are checked to be in non-descending order.
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45 >                 INVALID WHEN IN-WEEK-NO < 5
+----                                           ^
+  46                   AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:46.16-46.19:
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45                   INVALID WHEN IN-WEEK-NO < 5
+  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+----                   ^^^
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+  48      *>or zero for any one that failed the format (PICTURE) test.
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:46.27:
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45                   INVALID WHEN IN-WEEK-NO < 5
+  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+----                              ^
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+  48      *>or zero for any one that failed the format (PICTURE) test.
+>> Hint: Missing RENAMES
+
+syn_misc.at-7417-prog.cob:46.28-46.40:
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45                   INVALID WHEN IN-WEEK-NO < 5
+  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+----                               ^^^^^^^^^^^^
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+  48      *>or zero for any one that failed the format (PICTURE) test.
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:46.39-46.40:
+  43               05  IN-WEEK       PIC 99  OCCURS 5
+  44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
+  45                   INVALID WHEN IN-WEEK-NO < 5
+  46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
+----                                          ^
+  47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
+  48      *>or zero for any one that failed the format (PICTURE) test.
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:51.17:
+  48      *>or zero for any one that failed the format (PICTURE) test.
+  49                   DESTINATION OUT-WEEK (IN-WEEK-NO).
+  50      *>The 88-level INVALID entries check for invalid ranges of values.
+  51 >                88  VALUES 0, 53 THRU 99 ARE INVALID.
+----                    ^
+  52      *>REDEFINES and another PRESENT WHEN define an alternate format.
+  53           03  IN-REC-FORMAT-2 REDEFINES IN-REC-FORMAT-1
+>> Hint: Missing <word>
+
+syn_misc.at-7417-prog.cob:51.19-51.25:
+  48      *>or zero for any one that failed the format (PICTURE) test.
+  49                   DESTINATION OUT-WEEK (IN-WEEK-NO).
+  50      *>The 88-level INVALID entries check for invalid ranges of values.
+  51 >                88  VALUES 0, 53 THRU 99 ARE INVALID.
+----                      ^^^^^^
+  52      *>REDEFINES and another PRESENT WHEN define an alternate format.
+  53           03  IN-REC-FORMAT-2 REDEFINES IN-REC-FORMAT-1
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:51.40-51.43:
+  48      *>or zero for any one that failed the format (PICTURE) test.
+  49                   DESTINATION OUT-WEEK (IN-WEEK-NO).
+  50      *>The 88-level INVALID entries check for invalid ranges of values.
+  51 >                88  VALUES 0, 53 THRU 99 ARE INVALID.
+----                                           ^^^
+  52      *>REDEFINES and another PRESENT WHEN define an alternate format.
+  53           03  IN-REC-FORMAT-2 REDEFINES IN-REC-FORMAT-1
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:60.68-60.71:
+  57      *>The 88-level VALID entries check for valid ranges of values;
+  58      *>the condition-name, if present, may be used in the usual way.
+  59      *>The following assume that DECIMAL POINT IS COMMA is not specified.
+  60 >                  88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+----                                                                       ^^^
+  61      *>88-level entries may also have a condition attached.
+  62                    88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:62.19:
+  59      *>The following assume that DECIMAL POINT IS COMMA is not specified.
+  60                    88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+  61      *>88-level entries may also have a condition attached.
+  62 >                  88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+----                      ^
+  63                                          WHEN IN-TYPE = 8.
+  64      *>exceptional cases can be specified using PRESENT WHEN
+>> Hint: Missing <word>
+
+syn_misc.at-7417-prog.cob:62.39-62.45:
+  59      *>The following assume that DECIMAL POINT IS COMMA is not specified.
+  60                    88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+  61      *>88-level entries may also have a condition attached.
+  62 >                  88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+----                                          ^^^^^^
+  63                                          WHEN IN-TYPE = 8.
+  64      *>exceptional cases can be specified using PRESENT WHEN
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:62.75-62.78:
+  59      *>The following assume that DECIMAL POINT IS COMMA is not specified.
+  60                    88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+  61      *>88-level entries may also have a condition attached.
+  62 >                  88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+----                                                                              ^^^
+  63                                          WHEN IN-TYPE = 8.
+  64      *>exceptional cases can be specified using PRESENT WHEN
+>> Error: Invalid syntax
+
+syn_misc.at-7417-prog.cob:63.43:
+  60                    88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+  61      *>88-level entries may also have a condition attached.
+  62                    88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+  63 >                                        WHEN IN-TYPE = 8.
+----                                              ^
+  64      *>exceptional cases can be specified using PRESENT WHEN
+  65               05  IN-CODE                PIC AX(3)9(4) 
+>> Hint: Missing FALSE
+
+syn_misc.at-7417-prog.cob:63.44-63.51:
+  60                    88  IN-PAY-OK  VALUES "10,000.00" THRU "20,000.00" ARE VALID.
+  61      *>88-level entries may also have a condition attached.
+  62                    88                    VALUES "20,000.01" THRU "30,000.00" ARE VALID
+  63 >                                        WHEN IN-TYPE = 8.
+----                                               ^^^^^^^
+  64      *>exceptional cases can be specified using PRESENT WHEN
+  65               05  IN-CODE                PIC AX(3)9(4) 
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7524:0
+syn_misc.at-7524-prog.cob:48.49-48.50:
+  45          77 x36            pic x(36) is typedef.
+  46         * In the following block, "sync" prevents SIGBUS errors on SOLARIS systems.
+  47          01  special-data.
+  48 >            05 r2d2       usage bit pic 111 value b'110'.
+----                                                    ^
+  49         *>   disabled for now because of varying size
+  50         *>   05 point      usage pointer         sync.
+>> Error: Invalid syntax
+
+syn_misc.at-7524-prog.cob:55.30:
+  52         *>   05 idx        usage index           sync.
+  53         *>   05 hnd        usage handle          sync.
+  54          01  alphanumeric-data.
+  55 >            05 alpnum     usage x36 value "some numb3rs 4 n00bs l1k3 m3".
+----                                 ^
+  56              05 alpha      pic a(36) value "thats some text".
+  57              05 edit-num1  pic --9.999.
+>> Hint: Missing BINARY
+
+syn_misc.at-7524-prog.cob:55.31-55.34:
+  52         *>   05 idx        usage index           sync.
+  53         *>   05 hnd        usage handle          sync.
+  54          01  alphanumeric-data.
+  55 >            05 alpnum     usage x36 value "some numb3rs 4 n00bs l1k3 m3".
+----                                  ^^^
+  56              05 alpha      pic a(36) value "thats some text".
+  57              05 edit-num1  pic --9.999.
+>> Error: Invalid syntax
+
+syn_misc.at-7524-prog.cob:79.45-79.47:
+  76          01  x-rms.                  
+  77              05  x-rms-a             pic x(01) value space.
+  78          01 filler redefines x-rms   pic x(01).
+  79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
+----                                                ^^
+  80   
+  81          local-storage section.
+>> Error: Invalid syntax
+
+syn_misc.at-7524-prog.cob:79.61-79.63:
+  76          01  x-rms.                  
+  77              05  x-rms-a             pic x(01) value space.
+  78          01 filler redefines x-rms   pic x(01).
+  79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
+----                                                                ^^
+  80   
+  81          local-storage section.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7712:0
+syn_misc.at-7712-empty.cob:2.7-2.33:
+   1   
+   2 >        CONTROL          DIVISION.
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3          IDENTIFICATION   DIVISION.
+   4          PROGRAM-ID.      empty.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7729:0
+syn_misc.at-7729-replace.cob:2.7-2.33:
+   1   
+   2 >        CONTROL          DIVISION.
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3          SUBSTITUTION     SECTION.
+   4              REPLACE ==TEST-VAR== BY ==VAR==.
+>> Error: CONTROL DIVISION does not conform to default
+
+syn_misc.at-7729-replace.cob:6.18:
+   3          SUBSTITUTION     SECTION.
+   4              REPLACE ==TEST-VAR== BY ==VAR==.
+   5          IDENTIFICATION   DIVISION.
+   6 >        PROGRAM-ID.      replace.
+----                     ^
+   7          DATA             DIVISION.
+   8          WORKING-STORAGE  SECTION.
+>> Hint: Missing <word>
+
+syn_misc.at-7729-replace.cob:6.24-6.31:
+   3          SUBSTITUTION     SECTION.
+   4              REPLACE ==TEST-VAR== BY ==VAR==.
+   5          IDENTIFICATION   DIVISION.
+   6 >        PROGRAM-ID.      replace.
+----                           ^^^^^^^
+   7          DATA             DIVISION.
+   8          WORKING-STORAGE  SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7772:0
+syn_misc.at-7772-prog.cob:2.7-3.24:
+   1   
+   2 >        CONTROL		DIVISION.
+----          ^^^^^^^^^^^^^^^^^
+   3 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   4          IDENTIFICATION   DIVISION.
+   5          PROGRAM-ID.      prog.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7801:0
+syn_misc.at-7801-prog.cob:4.18-4.27:
+   1   
+   2          CONTROL		DIVISION.
+   3          DEFAULT		SECTION.
+   4 >            ACCEPT ALTERNATE CONSOLE
+----                     ^^^^^^^^^
+   5              DISPLAY IS TERMINAL
+   6   	   .
+>> Error: Invalid syntax
+
+syn_misc.at-7801-prog.cob:2.7-6.5:
+   1   
+   2 >        CONTROL		DIVISION.
+----        
+   3 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >            ACCEPT ALTERNATE CONSOLE
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 >            DISPLAY IS TERMINAL
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 > 	   .
+----  ^^^^^^
+   7          IDENTIFICATION   DIVISION.
+   8          PROGRAM-ID.      prog.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7828:0
+syn_misc.at-7828-empties.cob:2.7-4.24:
+   1   
+   2 >        CONTROL		DIVISION.
+----          ^^^^^^^^^^^^^^^^^
+   3 >        SUBSTITUTION	SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   5          IDENTIFICATION   DIVISION.
+   6          PROGRAM-ID.      empties.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7842:0
+syn_misc.at-7842-empty0.cob:5.18-5.27:
+   2          CONTROL		DIVISION.
+   3          SUBSTITUTION	SECTION.
+   4          DEFAULT		SECTION.
+   5 >            ACCEPT ALTERNATE CONSOLE
+----                     ^^^^^^^^^
+   6   	   .
+   7          IDENTIFICATION   DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-7842-empty0.cob:2.7-6.5:
+   1   
+   2 >        CONTROL		DIVISION.
+----        
+   3 >        SUBSTITUTION	SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 >            ACCEPT ALTERNATE CONSOLE
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 > 	   .
+----  ^^^^^^
+   7          IDENTIFICATION   DIVISION.
+   8          PROGRAM-ID.      empty0.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7861:0
+syn_misc.at-7861-empty1.cob:2.7-5.24:
+   1   
+   2 >        CONTROL		DIVISION.
+----          ^^^^^^^^^^^^^^^^^
+   3 >        SUBSTITUTION	SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >            REPLACE "KO" BY "OK".
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   6          IDENTIFICATION   DIVISION.
+   7          PROGRAM-ID.      empty1.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7885:0
+syn_misc.at-7885-prog.cob:4.27-4.29:
+   1   
+   2          CONTROL		DIVISION.
+   3          SUBSTITUTION	SECTION.
+   4 >            REPLACE IISS BY IS
+----                              ^^
+   5   	           TERM BY TERMINAL
+   6   	           "KO" BY "OK".
+>> Error: Malformed REPLACE statement
+
+syn_misc.at-7885-prog.cob:8.18-8.27:
+   5   	           TERM BY TERMINAL
+   6   	           "KO" BY "OK".
+   7          DEFAULT		SECTION.
+   8 >            ACCEPT ALTERNATE CONSOLE
+----                     ^^^^^^^^^
+   9              DISPLAY IISS TERM
+  10   	   .
+>> Error: Invalid syntax
+
+syn_misc.at-7885-prog.cob:9.24-9.28:
+   6   	           "KO" BY "OK".
+   7          DEFAULT		SECTION.
+   8              ACCEPT ALTERNATE CONSOLE
+   9 >            DISPLAY IISS TERM
+----                           ^^^^
+  10   	   .
+  11          IDENTIFICATION   DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-7885-prog.cob:2.7-10.5:
+   1   
+   2 >        CONTROL		DIVISION.
+----        
+   3 >        SUBSTITUTION	SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >            REPLACE IISS BY IS
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 > 	           TERM BY TERMINAL
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 > 	           "KO" BY "OK".
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   7 >        DEFAULT		SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 >            ACCEPT ALTERNATE CONSOLE
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 >            DISPLAY IISS TERM
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 > 	   .
+----  ^^^^^^
+  11          IDENTIFICATION   DIVISION.
+  12          PROGRAM-ID.      prog.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7918:0
+syn_misc.at-7918-prog.cob:5.26-5.28:
+   2          CONTROL          DIVISION.
+   3          SUBSTITUTION     SECTION.
+   4         *> This REPLACE in Area A is ignored for now:
+   5 >           REPLACE IISS BY IS
+----                             ^^
+   6                     TERM BY TERMINAL
+   7                     "KO" BY "OK".
+>> Error: Malformed REPLACE statement
+
+syn_misc.at-7918-prog.cob:9.17-9.26:
+   6                     TERM BY TERMINAL
+   7                     "KO" BY "OK".
+   8          DEFAULT          SECTION.
+   9 >           ACCEPT ALTERNATE CONSOLE
+----                    ^^^^^^^^^
+  10             DISPLAY IISS TERM
+  11          .
+>> Error: Invalid syntax
+
+syn_misc.at-7918-prog.cob:10.23-10.27:
+   7                     "KO" BY "OK".
+   8          DEFAULT          SECTION.
+   9             ACCEPT ALTERNATE CONSOLE
+  10 >           DISPLAY IISS TERM
+----                          ^^^^
+  11          .
+  12          IDENTIFICATION   DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-7918-prog.cob:2.7-11.8:
+   1   
+   2 >        CONTROL          DIVISION.
+----          ^
+   3 >        SUBSTITUTION     SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4 >       *> This REPLACE in Area A is ignored for now:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   5 >           REPLACE IISS BY IS
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   6 >                   TERM BY TERMINAL
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   7 >                   "KO" BY "OK".
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 >        DEFAULT          SECTION.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 >           ACCEPT ALTERNATE CONSOLE
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10 >           DISPLAY IISS TERM
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11 >        .
+----  ^^^^^^^^^
+  12          IDENTIFICATION   DIVISION.
+  13          PROGRAM-ID.      prog.
+>> Error: CONTROL DIVISION does not conform to default
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8018:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8056:0
+syn_misc.at-8056-prog.cob:2.7-2.11:
+   1   
+   2 >        $SET NO-AREA-CHECK
+----          ^^^^
+   3          IDENTIFICATION  DIVISION.
+   4          PROGRAM-ID.     prog.
+>> Error: Invalid syntax
+
+syn_misc.at-8056-prog.cob:10.7-10.11:
+   7          PROCEDURE       DIVISION.
+   8          MAIN-1 SECTION.
+   9          DISPLAY "SOMETHING".
+  10 >        $SET AREA-CHECK
+----          ^^^^
+  11          MAIN-2 SECTION.
+  12              CONTINUE.
+>> Error: Invalid syntax
+
+syn_misc.at-8056-prog.cob:10.22:
+   7          PROCEDURE       DIVISION.
+   8          MAIN-1 SECTION.
+   9          DISPLAY "SOMETHING".
+  10 >        $SET AREA-CHECK
+----                         ^
+  11          MAIN-2 SECTION.
+  12              CONTINUE.
+>> Hint: Missing ATTRIBUTE .
+
+syn_misc.at-8056-prog.cob:11.7-11.13:
+   8          MAIN-1 SECTION.
+   9          DISPLAY "SOMETHING".
+  10          $SET AREA-CHECK
+  11 >        MAIN-2 SECTION.
+----          ^^^^^^
+  12              CONTINUE.
+  13          CONTINUE.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8158:0
+syn_misc.at-8158-cobol85.cob:2.31:
+   1   
+   2 >        IDENTIFICATION  DIVISION
+----                                  ^
+   3          PROGRAM-ID.     cobol85.
+   4          DATA            DIVISION
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:3.7-3.17:
+   1   
+   2          IDENTIFICATION  DIVISION
+   3 >        PROGRAM-ID.     cobol85.
+----          ^^^^^^^^^^
+   4          DATA            DIVISION
+   5          WORKING-STORAGE SECTION
+>> Warning: Invalid syntax
+
+syn_misc.at-8158-cobol85.cob:4.31:
+   1   
+   2          IDENTIFICATION  DIVISION
+   3          PROGRAM-ID.     cobol85.
+   4 >        DATA            DIVISION
+----                                  ^
+   5          WORKING-STORAGE SECTION
+   6          01 X PIC X *> dot optional here because of cobol85 format
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:5.7-5.22:
+   2          IDENTIFICATION  DIVISION
+   3          PROGRAM-ID.     cobol85.
+   4          DATA            DIVISION
+   5 >        WORKING-STORAGE SECTION
+----          ^^^^^^^^^^^^^^^
+   6          01 X PIC X *> dot optional here because of cobol85 format
+   7          01 Y PIC X.
+>> Warning: Invalid syntax
+
+syn_misc.at-8158-cobol85.cob:5.30:
+   2          IDENTIFICATION  DIVISION
+   3          PROGRAM-ID.     cobol85.
+   4          DATA            DIVISION
+   5 >        WORKING-STORAGE SECTION
+----                                 ^
+   6          01 X PIC X *> dot optional here because of cobol85 format
+   7          01 Y PIC X.
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:6.7-6.9:
+   3          PROGRAM-ID.     cobol85.
+   4          DATA            DIVISION
+   5          WORKING-STORAGE SECTION
+   6 >        01 X PIC X *> dot optional here because of cobol85 format
+----          ^^
+   7          01 Y PIC X.
+   8          PROCEDURE       DIVISION.
+>> Warning: Invalid syntax
+
+syn_misc.at-8158-cobol85.cob:6.17:
+   3          PROGRAM-ID.     cobol85.
+   4          DATA            DIVISION
+   5          WORKING-STORAGE SECTION
+   6 >        01 X PIC X *> dot optional here because of cobol85 format
+----                    ^
+   7          01 Y PIC X.
+   8          PROCEDURE       DIVISION.
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:7.7-7.9:
+   4          DATA            DIVISION
+   5          WORKING-STORAGE SECTION
+   6          01 X PIC X *> dot optional here because of cobol85 format
+   7 >        01 Y PIC X.
+----          ^^
+   8          PROCEDURE       DIVISION.
+   9          MAIN SECTION.
+>> Error: Invalid syntax
+
+syn_misc.at-8158-cobol85.cob:11.19:
+   8          PROCEDURE       DIVISION.
+   9          MAIN SECTION.
+  10              PERFORM P
+  11 >            STOP RUN *> dot optional here because of cobol85 format
+----                      ^
+  12          P.
+  13              GOBACK
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:12.7-12.8:
+   9          MAIN SECTION.
+  10              PERFORM P
+  11              STOP RUN *> dot optional here because of cobol85 format
+  12 >        P.
+----          ^
+  13              GOBACK
+>> Error: Invalid syntax
+
+syn_misc.at-8158-cobol85.cob:13.17:
+  10              PERFORM P
+  11              STOP RUN *> dot optional here because of cobol85 format
+  12          P.
+  13 >            GOBACK
+----                    ^
+>> Hint: Missing .
+
+syn_misc.at-8158-cobol85.cob:14.0:
+  11              STOP RUN *> dot optional here because of cobol85 format
+  12          P.
+  13              GOBACK
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8135:0
+syn_misc.at-8135-prog.cob:2.31:
+   1   
+   2 >        IDENTIFICATION  DIVISION
+----                                  ^
+   3          PROGRAM-ID.     prog.
+   4          DATA            DIVISION
+>> Hint: Missing .
+
+syn_misc.at-8135-prog.cob:3.7-3.17:
+   1   
+   2          IDENTIFICATION  DIVISION
+   3 >        PROGRAM-ID.     prog.
+----          ^^^^^^^^^^
+   4          DATA            DIVISION
+   5          WORKING-STORAGE SECTION.
+>> Warning: Invalid syntax
+
+syn_misc.at-8135-prog.cob:4.31:
+   1   
+   2          IDENTIFICATION  DIVISION
+   3          PROGRAM-ID.     prog.
+   4 >        DATA            DIVISION
+----                                  ^
+   5          WORKING-STORAGE SECTION.
+   6          01 X PIC X.
+>> Hint: Missing .
+
+syn_misc.at-8135-prog.cob:5.7-5.22:
+   2          IDENTIFICATION  DIVISION
+   3          PROGRAM-ID.     prog.
+   4          DATA            DIVISION
+   5 >        WORKING-STORAGE SECTION.
+----          ^^^^^^^^^^^^^^^
+   6          01 X PIC X.
+   7          01 Y PIC X.
+>> Warning: Invalid syntax
+
+syn_misc.at-8135-prog.cob:13.17:
+  10              PERFORM P
+  11              STOP RUN.
+  12          P.
+  13 >            GOBACK
+----                    ^
+>> Hint: Missing .
+
+syn_misc.at-8135-prog.cob:14.0:
+  11              STOP RUN.
+  12          P.
+  13              GOBACK
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8199:0
+syn_misc.at-8199-prog.cob:2.30:
+   1   
+   2 >        IDENTIFICATION DIVISION
+----                                 ^
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION
+>> Hint: Missing .
+
+syn_misc.at-8199-prog.cob:3.7-3.17:
+   1   
+   2          IDENTIFICATION DIVISION
+   3 >        PROGRAM-ID. prog.
+----          ^^^^^^^^^^
+   4          DATA DIVISION
+   5          WORKING-STORAGE SECTION
+>> Warning: Invalid syntax
+
+syn_misc.at-8199-prog.cob:4.20:
+   1   
+   2          IDENTIFICATION DIVISION
+   3          PROGRAM-ID. prog.
+   4 >        DATA DIVISION
+----                       ^
+   5          WORKING-STORAGE SECTION
+   6          77 PMODE   PIC X
+>> Hint: Missing .
+
+syn_misc.at-8199-prog.cob:5.7-5.22:
+   2          IDENTIFICATION DIVISION
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION
+   5 >        WORKING-STORAGE SECTION
+----          ^^^^^^^^^^^^^^^
+   6          77 PMODE   PIC X
+   7          PROCEDURE DIVISION.
+>> Warning: Invalid syntax
+
+syn_misc.at-8199-prog.cob:5.30:
+   2          IDENTIFICATION DIVISION
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION
+   5 >        WORKING-STORAGE SECTION
+----                                 ^
+   6          77 PMODE   PIC X
+   7          PROCEDURE DIVISION.
+>> Hint: Missing .
+
+syn_misc.at-8199-prog.cob:6.7-6.9:
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION
+   5          WORKING-STORAGE SECTION
+   6 >        77 PMODE   PIC X
+----          ^^
+   7          PROCEDURE DIVISION.
+   8             STOP RUN.
+>> Warning: Invalid syntax
+
+syn_misc.at-8199-prog.cob:6.23:
+   3          PROGRAM-ID. prog.
+   4          DATA DIVISION
+   5          WORKING-STORAGE SECTION
+   6 >        77 PMODE   PIC X
+----                          ^
+   7          PROCEDURE DIVISION.
+   8             STOP RUN.
+>> Hint: Missing .
+
+syn_misc.at-8199-prog.cob:7.7-7.16:
+   4          DATA DIVISION
+   5          WORKING-STORAGE SECTION
+   6          77 PMODE   PIC X
+   7 >        PROCEDURE DIVISION.
+----          ^^^^^^^^^
+   8             STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8235:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8284:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8286:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8283:0
+Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8340:0

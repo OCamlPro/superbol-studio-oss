@@ -31,6 +31,11 @@ end
 
 let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found -> "."
 
+let target =
+  let target = ref None in
+  Arg.parse [] (fun f -> target := Some f) "gnucobol.exe <target-basename.at>";
+  !target
+
 (** [pp_relloc ppf filename] prints [filename] relative to [srcdir] if the
     latter is a directory (prefix) of [filename].  Otherwise, prints [filename]
     as a whole. *)
@@ -51,13 +56,20 @@ let _pconf, _tconf, testsuite =
   let project_config = Project_config.from_file toml in
   Testsuite.read project_config (List.hd project_config.project_testsuites)
 
-let init_test_filter () =
-  let open Ezcmd.V2.EZCMD.TYPES in
-  begin match Filter.args with
-    | (_, Arg.String f, _) :: _ -> f "move"
-    | _ -> failwith "unexpected non-String argument descriptor"
-  end;
-  Filter.select_tests (fun _ -> ()) testsuite
+(* let init_test_filter () = *)
+(*   let open Ezcmd.V2.EZCMD.TYPES in *)
+(*   begin match Filter.args with *)
+(*     | (x, Arg.String f, _) :: _ -> *)
+(*         Fmt.epr "%a@." Fmt.(list string) x; *)
+(*         f "move" *)
+(*     | _ -> failwith "unexpected non-String argument descriptor" *)
+(*   end; *)
+(*   Filter.select_tests (fun _ -> ()) testsuite *)
+
+let targetted_test ({ test_loc = { file; _ }; _ }: test) =
+  match target with
+  | Some t -> t = Filename.basename file
+  | _ -> true
 
 (** Extact AT_CHECK actions that expect a successful return code.*)
 let extract_successful_test_actions ({ test_actions; _ }: test) =
@@ -147,11 +159,11 @@ let do_check_parse (test_filename, contents, _, { check_loc;
 let () =
   Pretty.pp_set_margin Format.std_formatter 120;   (* fix a margin for stdout *)
   let _rundir = make_n_enter_rundir () in
-  init_test_filter ();
+  (* init_test_filter (); *)
   List.to_seq testsuite.suite_tests |>
+  Seq.filter targetted_test |>
   Seq.flat_map extract_successful_test_actions |>
   Seq.flat_map extract_data_file_of_check_command |>
   List.of_seq |>
-  (* EzList.take 200 |> *)
   List.sort_uniq compare_data_files |>
   List.iter do_check_parse

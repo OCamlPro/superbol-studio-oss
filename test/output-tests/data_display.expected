@@ -1,0 +1,131 @@
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:64:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:121:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:167:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:205:0
+data_display.at-205-prog.cob:11.24-11.38:
+   8          01 X-BIU         BINARY-INT    UNSIGNED.
+   9          01 X-BLU         BINARY-LONG   UNSIGNED.
+  10          01 X-BDU         BINARY-DOUBLE UNSIGNED.
+  11 >        01 X-US          UNSIGNED-SHORT.
+----                           ^^^^^^^^^^^^^^
+  12          01 X-UI          UNSIGNED-INT.
+  13          PROCEDURE        DIVISION.
+>> Error: Invalid syntax
+
+data_display.at-205-prog.cob:12.24-12.36:
+   9          01 X-BLU         BINARY-LONG   UNSIGNED.
+  10          01 X-BDU         BINARY-DOUBLE UNSIGNED.
+  11          01 X-US          UNSIGNED-SHORT.
+  12 >        01 X-UI          UNSIGNED-INT.
+----                           ^^^^^^^^^^^^
+  13          PROCEDURE        DIVISION.
+  14              MOVE 127 TO X-BCU.               DISPLAY X-BCU END-DISPLAY.  
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:402:0
+data_display.at-402-prog.cob:28.7-28.34:
+  25          MAIN.
+  26         *    Test with DISPLAY on error
+  27              PERFORM DO-CHECK.
+  28 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  29              SET  NO-DISP    TO TRUE
+  30         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+data_display.at-402-prog.cob:32.7-32.16:
+  29              SET  NO-DISP    TO TRUE
+  30         *    some performance checks on the way...
+  31              PERFORM DO-CHECK 20000 TIMES.
+  32 >        >> END-IF
+----          ^^^^^^^^^
+  33              GOBACK.
+  34   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:462:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:527:0
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:8730:0
+data_display.at-8730-prog.cob:4513.7-4513.34:
+4510          MAIN.
+4511         *    Test with DISPLAY on error
+4512              PERFORM DO-CHECK.
+4513 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4514              SET  NO-DISP    TO TRUE
+4515         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+data_display.at-8730-prog.cob:4517.7-4517.16:
+4514              SET  NO-DISP    TO TRUE
+4515         *    some performance checks on the way...
+4516              PERFORM DO-CHECK 10000 TIMES.
+4517 >        >> END-IF
+----          ^^^^^^^^^
+4518              GOBACK.
+4519   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:16934:0
+data_display.at-16934-prog2.cob:4520.7-4520.34:
+4517          MAIN.
+4518         *    Test with DISPLAY on error
+4519              PERFORM DO-CHECK.
+4520 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4521              SET  NO-DISP    TO TRUE
+4522         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+data_display.at-16934-prog2.cob:4524.7-4524.16:
+4521              SET  NO-DISP    TO TRUE
+4522         *    some performance checks on the way...
+4523              PERFORM DO-CHECK 10000 TIMES.
+4524 >        >> END-IF
+----          ^^^^^^^^^
+4525              GOBACK.
+4526   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:22976:0
+data_display.at-22976-prog.cob:3515.7-3515.34:
+3512          MAIN.
+3513         *    Test with DISPLAY on error
+3514              PERFORM DO-CHECK.
+3515 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3516              SET  NO-DISP    TO TRUE
+3517         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+data_display.at-22976-prog.cob:3519.7-3519.16:
+3516              SET  NO-DISP    TO TRUE
+3517         *    some performance checks on the way...
+3518              PERFORM DO-CHECK 10000 TIMES.
+3519 >        >> END-IF
+----          ^^^^^^^^^
+3520              GOBACK.
+3521   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/data_display.at:29024:0
+data_display.at-29024-prog2.cob:3528.7-3528.34:
+3525          MAIN.
+3526         *    Test with DISPLAY on error
+3527              PERFORM DO-CHECK.
+3528 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3529              SET  NO-DISP    TO TRUE
+3530         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+data_display.at-29024-prog2.cob:3532.7-3532.16:
+3529              SET  NO-DISP    TO TRUE
+3530         *    some performance checks on the way...
+3531              PERFORM DO-CHECK 10000 TIMES.
+3532 >        >> END-IF
+----          ^^^^^^^^^
+3533              GOBACK.
+3534   
+>> Error: Malformed or unknown compiler directive
+

@@ -1,0 +1,1917 @@
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:50:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:92:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:137:0
+run_fundamental.at-137-dump.c:5.6-5.7:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----         ^
+   6   dump (unsigned char *data)
+   7   {
+>> Error: Unexpected indicator: `T'
+
+run_fundamental.at-137-dump.c:6.6-6.7:
+   3   #include <libcob.h>
+   4   
+   5   COB_EXT_EXPORT int
+   6 > dump (unsigned char *data)
+----         ^
+   7   {
+   8     int i;
+>> Error: Unexpected indicator: `u'
+
+run_fundamental.at-137-dump.c:8.6-8.7:
+   5   COB_EXT_EXPORT int
+   6   dump (unsigned char *data)
+   7   {
+   8 >   int i;
+----         ^
+   9     for (i = 0; i < 4; i++)
+  10       printf ("%02x", data[i]);
+>> Error: Unexpected indicator: `i'
+
+run_fundamental.at-137-dump.c:9.6-9.7:
+   6   dump (unsigned char *data)
+   7   {
+   8     int i;
+   9 >   for (i = 0; i < 4; i++)
+----         ^
+  10       printf ("%02x", data[i]);
+  11     return 0;
+>> Error: Unexpected indicator: `('
+
+run_fundamental.at-137-dump.c:10.6-10.7:
+   7   {
+   8     int i;
+   9     for (i = 0; i < 4; i++)
+  10 >     printf ("%02x", data[i]);
+----         ^
+  11     return 0;
+  12   }
+>> Error: Unexpected indicator: `i'
+
+run_fundamental.at-137-dump.c:11.6-11.7:
+   8     int i;
+   9     for (i = 0; i < 4; i++)
+  10       printf ("%02x", data[i]);
+  11 >   return 0;
+----         ^
+  12   }
+>> Error: Unexpected indicator: `r'
+
+run_fundamental.at-137-dump.c:5.7-5.14:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^^^^^^^
+   6   dump (unsigned char *data)
+   7   {
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:138:0
+run_fundamental.at-138-prog.cob:5.7-5.30:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5 >        >>IF CHARSET = 'EBCDIC'
+----          ^^^^^^^^^^^^^^^^^^^^^^^
+   6              DISPLAY X"F1F2F3"
+   7          >>ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-138-prog.cob:7.7-7.13:
+   4          PROCEDURE        DIVISION.
+   5          >>IF CHARSET = 'EBCDIC'
+   6              DISPLAY X"F1F2F3"
+   7 >        >>ELSE
+----          ^^^^^^
+   8              DISPLAY X"313233"
+   9          >>END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-138-prog.cob:9.7-9.15:
+   6              DISPLAY X"F1F2F3"
+   7          >>ELSE
+   8              DISPLAY X"313233"
+   9 >        >>END-IF
+----          ^^^^^^^^
+  10              END-DISPLAY.
+  11              CALL "dump" USING X"000102"
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:284:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:333:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:444:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:475:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:518:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:547:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:614:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:737:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:868:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:904:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:951:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:952:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:988:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1032:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1033:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1065:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1097:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1129:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1174:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1223:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1306:0
+run_fundamental.at-1306-prog.cob:16.37:
+  13          01  TEST-REC     PIC X(4).
+  14          WORKING-STORAGE  SECTION.
+  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
+  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+----                                        ^
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+>> Hint: Missing AS <expression>
+
+run_fundamental.at-1306-prog.cob:16.44-16.52:
+  13          01  TEST-REC     PIC X(4).
+  14          WORKING-STORAGE  SECTION.
+  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
+  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+----                                               ^^^^^^^^
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+>> Error: Invalid syntax
+
+run_fundamental.at-1306-prog.cob:19.37:
+  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
+----                                        ^
+  20          PROCEDURE        DIVISION.
+  21              DISPLAY GLOB-PATH GLOB-VAR
+>> Hint: Missing AS <expression>
+
+run_fundamental.at-1306-prog.cob:19.44-19.52:
+  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
+----                                               ^^^^^^^^
+  20          PROCEDURE        DIVISION.
+  21              DISPLAY GLOB-PATH GLOB-VAR
+>> Error: Invalid syntax
+
+run_fundamental.at-1306-prog.cob:64.47-64.56:
+  61              DISPLAY 'in prog3'
+  62              END-DISPLAY
+  63              IF GLOB-PATH NOT = SPACES
+  64 >               DISPLAY FUNCTION TRIM (GLOB-PATH TRAILING)
+----                                                  ^^^^^^^^^
+  65                 END-DISPLAY
+  66              END-IF
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1390:0
+run_fundamental.at-1390-prog.cob:7.11-7.15:
+   4          LINKAGE SECTION.
+   5          01 r BINARY-LONG.
+   6          PROCEDURE DIVISION RETURNING r.
+   7 >            move 1 to r
+----              ^^^^
+   8              GOBACK
+   9              .
+>> Error: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:7.17:
+   4          LINKAGE SECTION.
+   5          01 r BINARY-LONG.
+   6          PROCEDURE DIVISION RETURNING r.
+   7 >            move 1 to r
+----                    ^
+   8              GOBACK
+   9              .
+>> Hint: Missing .
+
+run_fundamental.at-1390-prog.cob:7.18-7.20:
+   4          LINKAGE SECTION.
+   5          01 r BINARY-LONG.
+   6          PROCEDURE DIVISION RETURNING r.
+   7 >            move 1 to r
+----                     ^^
+   8              GOBACK
+   9              .
+>> Warning: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:7.22:
+   4          LINKAGE SECTION.
+   5          01 r BINARY-LONG.
+   6          PROCEDURE DIVISION RETURNING r.
+   7 >            move 1 to r
+----                         ^
+   8              GOBACK
+   9              .
+>> Hint: Missing .
+
+run_fundamental.at-1390-prog.cob:8.11-8.17:
+   5          01 r BINARY-LONG.
+   6          PROCEDURE DIVISION RETURNING r.
+   7              move 1 to r
+   8 >            GOBACK
+----              ^^^^^^
+   9              .
+  10          END FUNCTION f1.
+>> Warning: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:17.11-17.14:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----              ^^^
+  18              GOBACK
+  19              .
+>> Error: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:17.16:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----                   ^
+  18              GOBACK
+  19              .
+>> Hint: Missing .
+
+run_fundamental.at-1390-prog.cob:17.17-17.19:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----                    ^^
+  18              GOBACK
+  19              .
+>> Warning: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:17.21:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----                        ^
+  18              GOBACK
+  19              .
+>> Hint: Missing .
+
+run_fundamental.at-1390-prog.cob:17.22-17.28:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----                         ^^^^^^
+  18              GOBACK
+  19              .
+>> Warning: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:17.30:
+  14          01 i BINARY-LONG.
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17 >            add i to i giving r
+----                                 ^
+  18              GOBACK
+  19              .
+>> Hint: Missing .
+
+run_fundamental.at-1390-prog.cob:18.11-18.17:
+  15          01 r BINARY-LONG.
+  16          PROCEDURE DIVISION USING i RETURNING r.
+  17              add i to i giving r
+  18 >            GOBACK
+----              ^^^^^^
+  19              .
+  20          END FUNCTION f2.
+>> Warning: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:29.7-29.20:
+  26          REPOSITORY.
+  27              FUNCTION f1
+  28              FUNCTION f2.
+  29 >        SPECIAL-NAMES.
+----          ^^^^^^^^^^^^^
+  30              CURRENCY SIGN IS "Y"
+  31              DECIMAL-POINT IS COMMA.
+>> Error: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:45.20:
+  42          77  curr  PIC 9.9999,99Y.
+  43   
+  44          PROCEDURE DIVISION.
+  45 >            MOVE f1()   TO n1
+----                       ^
+  46              IF n1 NOT = 1
+  47                DISPLAY "ERROR 1" GOBACK
+>> Hint: Missing <subscript>
+
+run_fundamental.at-1390-prog.cob:45.19-45.20:
+  42          77  curr  PIC 9.9999,99Y.
+  43   
+  44          PROCEDURE DIVISION.
+  45 >            MOVE f1()   TO n1
+----                      ^
+  46              IF n1 NOT = 1
+  47                DISPLAY "ERROR 1" GOBACK
+>> Error: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:53.20:
+  50              IF n1 NOT = 2
+  51                DISPLAY "ERROR 2" GOBACK
+  52              END-IF
+  53 >            MOVE f1()   TO n1
+----                       ^
+  54              IF n1 NOT = 1
+  55                DISPLAY "ERROR 1 2nd" GOBACK
+>> Hint: Missing <subscript>
+
+run_fundamental.at-1390-prog.cob:53.19-53.20:
+  50              IF n1 NOT = 2
+  51                DISPLAY "ERROR 2" GOBACK
+  52              END-IF
+  53 >            MOVE f1()   TO n1
+----                      ^
+  54              IF n1 NOT = 1
+  55                DISPLAY "ERROR 1 2nd" GOBACK
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1412:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1494:0
+run_fundamental.at-1494-prog.cob:11.71:
+   8          01 argument  PIC X ANY LENGTH.
+   9          01 result.
+  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
+  11 >        PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+----                                                                          ^
+  12              MOVE FUNCTION LENGTH (argument) TO arg-len
+  13              MOVE argument TO result.
+>> Hint: Missing END
+
+run_fundamental.at-1494-prog.cob:12.11-12.15:
+   9          01 result.
+  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
+  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+  12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
+----              ^^^^
+  13              MOVE argument TO result.
+  14          END FUNCTION reply.
+>> Error: Invalid syntax
+
+run_fundamental.at-1494-prog.cob:12.25-12.31:
+   9          01 result.
+  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
+  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+  12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
+----                            ^^^^^^
+  13              MOVE argument TO result.
+  14          END FUNCTION reply.
+>> Error: Invalid syntax
+
+run_fundamental.at-1494-prog.cob:12.41-12.42:
+   9          01 result.
+  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
+  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+  12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
+----                                            ^
+  13              MOVE argument TO result.
+  14          END FUNCTION reply.
+>> Error: Invalid syntax
+
+run_fundamental.at-1494-prog.cob:14.7-14.10:
+  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+  12              MOVE FUNCTION LENGTH (argument) TO arg-len
+  13              MOVE argument TO result.
+  14 >        END FUNCTION reply.
+----          ^^^
+  15   
+  16          IDENTIFICATION DIVISION.
+>> Error: Invalid syntax
+
+run_fundamental.at-1494-prog.cob:55.17-55.28:
+  52                        FUNCTION LENGTH (REPLY (arg)) " #"
+  53                        FUNCTION         REPLY (arg)  "#".
+  54         *>
+  55 >            MOVE z"echo this" to arg
+----                    ^^^^^^^^^^^
+  56              IF not (FUNCTION         REPLY (arg)  = arg
+  57                  and FUNCTION LENGTH (REPLY (arg)) = 100 )
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1526:0
+run_fundamental.at-1526-module.cob:8.7-8.12:
+   5          PROCEDURE        DIVISION.
+   6              DISPLAY 'A' WITH NO ADVANCING
+   7              GOBACK.
+   8 >        ENTRY 'modulepart'.
+----          ^^^^^
+   9              DISPLAY 'B' WITH NO ADVANCING
+  10              GOBACK.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1525:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1558:0
+run_fundamental.at-1558-module.c:5.6-5.7:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----         ^
+   6   some (void)
+   7   {
+>> Error: Unexpected indicator: `T'
+
+run_fundamental.at-1558-module.c:6.6-6.7:
+   3   #include <libcob.h>
+   4   
+   5   COB_EXT_EXPORT int
+   6 > some (void)
+----         ^
+   7   {
+   8     return 0;
+>> Error: Unexpected indicator: `v'
+
+run_fundamental.at-1558-module.c:8.6-8.7:
+   5   COB_EXT_EXPORT int
+   6   some (void)
+   7   {
+   8 >   return 0;
+----         ^
+   9   }
+>> Error: Unexpected indicator: `r'
+
+run_fundamental.at-1558-module.c:5.7-5.14:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^^^^^^^
+   6   some (void)
+   7   {
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1557:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1617:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1670:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1723:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1777:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1856:0
+run_fundamental.at-1856-prog.cob:20.20:
+  17              DISPLAY "<"
+  18   
+  19              MOVE "dummy-call" TO prgm
+  20 >            CALL prgm
+----                       ^
+  21          >> IF CHECK-PERF IS DEFINED
+  22              PERFORM 500000 TIMES
+>> Hint: Missing .
+
+run_fundamental.at-1856-prog.cob:21.7-21.12:
+  18   
+  19              MOVE "dummy-call" TO prgm
+  20              CALL prgm
+  21 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^
+  22              PERFORM 500000 TIMES
+  23                 CALL prgm
+>> Error: Invalid syntax
+
+run_fundamental.at-1856-prog.cob:21.23:
+  18   
+  19              MOVE "dummy-call" TO prgm
+  20              CALL prgm
+  21 >        >> IF CHECK-PERF IS DEFINED
+----                          ^
+  22              PERFORM 500000 TIMES
+  23                 CALL prgm
+>> Hint: Missing .
+
+run_fundamental.at-1856-prog.cob:21.24-21.26:
+  18   
+  19              MOVE "dummy-call" TO prgm
+  20              CALL prgm
+  21 >        >> IF CHECK-PERF IS DEFINED
+----                           ^^
+  22              PERFORM 500000 TIMES
+  23                 CALL prgm
+>> Warning: Invalid syntax
+
+run_fundamental.at-1856-prog.cob:21.34:
+  18   
+  19              MOVE "dummy-call" TO prgm
+  20              CALL prgm
+  21 >        >> IF CHECK-PERF IS DEFINED
+----                                     ^
+  22              PERFORM 500000 TIMES
+  23                 CALL prgm
+>> Hint: Missing .
+
+run_fundamental.at-1856-prog.cob:22.11-22.18:
+  19              MOVE "dummy-call" TO prgm
+  20              CALL prgm
+  21          >> IF CHECK-PERF IS DEFINED
+  22 >            PERFORM 500000 TIMES
+----              ^^^^^^^
+  23                 CALL prgm
+  24              END-PERFORM
+>> Warning: Invalid syntax
+
+run_fundamental.at-1856-prog.cob:25.7-25.16:
+  22              PERFORM 500000 TIMES
+  23                 CALL prgm
+  24              END-PERFORM
+  25 >        >> END-IF
+----          ^^^^^^^^^
+  26              .
+  27          END PROGRAM     prog.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1956:0
+run_fundamental.at-1956-prog.cob:28.24:
+  25              DISPLAY "<"
+  26   
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28 >            CALL prog-ptr
+----                           ^
+  29          >> IF CHECK-PERF IS DEFINED
+  30              PERFORM 500000 TIMES
+>> Hint: Missing .
+
+run_fundamental.at-1956-prog.cob:29.7-29.12:
+  26   
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28              CALL prog-ptr
+  29 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^
+  30              PERFORM 500000 TIMES
+  31                 CALL prog-ptr
+>> Error: Invalid syntax
+
+run_fundamental.at-1956-prog.cob:29.23:
+  26   
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28              CALL prog-ptr
+  29 >        >> IF CHECK-PERF IS DEFINED
+----                          ^
+  30              PERFORM 500000 TIMES
+  31                 CALL prog-ptr
+>> Hint: Missing .
+
+run_fundamental.at-1956-prog.cob:29.24-29.26:
+  26   
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28              CALL prog-ptr
+  29 >        >> IF CHECK-PERF IS DEFINED
+----                           ^^
+  30              PERFORM 500000 TIMES
+  31                 CALL prog-ptr
+>> Warning: Invalid syntax
+
+run_fundamental.at-1956-prog.cob:29.34:
+  26   
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28              CALL prog-ptr
+  29 >        >> IF CHECK-PERF IS DEFINED
+----                                     ^
+  30              PERFORM 500000 TIMES
+  31                 CALL prog-ptr
+>> Hint: Missing .
+
+run_fundamental.at-1956-prog.cob:30.11-30.18:
+  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
+  28              CALL prog-ptr
+  29          >> IF CHECK-PERF IS DEFINED
+  30 >            PERFORM 500000 TIMES
+----              ^^^^^^^
+  31                 CALL prog-ptr
+  32              END-PERFORM
+>> Warning: Invalid syntax
+
+run_fundamental.at-1956-prog.cob:33.7-33.16:
+  30              PERFORM 500000 TIMES
+  31                 CALL prog-ptr
+  32              END-PERFORM
+  33 >        >> END-IF
+----          ^^^^^^^^^
+  34              .
+  35          END PROGRAM     prog.
+>> Error: Invalid syntax
+
+run_fundamental.at-1956-prog.cob:60.50:
+  57   
+  58          DATA            DIVISION.
+  59          WORKING-STORAGE SECTION.
+  60 >        77  self-ptr    USAGE PROGRAM-POINTER VALUE NULL.
+----                                                     ^
+  61          01  x           PIC 9 VALUE 1.
+  62   
+>> Hint: Missing <literal>
+
+run_fundamental.at-1956-prog.cob:60.51-60.55:
+  57   
+  58          DATA            DIVISION.
+  59          WORKING-STORAGE SECTION.
+  60 >        77  self-ptr    USAGE PROGRAM-POINTER VALUE NULL.
+----                                                      ^^^^
+  61          01  x           PIC 9 VALUE 1.
+  62   
+>> Error: Invalid syntax
+
+run_fundamental.at-1956-prog.cob:64.27-64.32:
+  61          01  x           PIC 9 VALUE 1.
+  62   
+  63          PROCEDURE       DIVISION.
+  64 >            SET self-ptr TO ENTRY "cancel-test"
+----                              ^^^^^
+  65              IF  self-ptr = NULL
+  66                  DISPLAY 'self-address not set' UPON SYSERR.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2060:0
+run_fundamental.at-2060-prog.cob:28.50:
+  25              .
+  26          DATA            DIVISION.
+  27          WORKING-STORAGE SECTION.
+  28 >        77  prog-ptr    USAGE PROGRAM-POINTER VALUE NULL.
+----                                                     ^
+  29          01  num         PIC 9 VALUE 0.
+  30   
+>> Hint: Missing <literal>
+
+run_fundamental.at-2060-prog.cob:28.51-28.55:
+  25              .
+  26          DATA            DIVISION.
+  27          WORKING-STORAGE SECTION.
+  28 >        77  prog-ptr    USAGE PROGRAM-POINTER VALUE NULL.
+----                                                      ^^^^
+  29          01  num         PIC 9 VALUE 0.
+  30   
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2119:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2170:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2219:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2271:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2293:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2329:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2330:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2371:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2372:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2397:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2429:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2453:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2477:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2501:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2526:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2549:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2571:0
+run_fundamental.at-2571-prog.cob:11.20-11.26:
+   8          01  NORMAL       PIC 9 VALUE 0.
+   9          PROCEDURE        DIVISION.
+  10              DISPLAY NORMAL NO ADVANCING *> Intentionally no period or END-DISPLAY
+  11 >            STOP RUN NORMAL.
+----                       ^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2598:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2625:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2688:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2751:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2814:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2877:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2940:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3003:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3066:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3102:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3338:0
+run_fundamental.at-3338-prog.cob:19.7-19.34:
+  16          MAIN.
+  17         *    Test with DISPLAY on error
+  18              PERFORM DO-CHECK.
+  19 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  20              SET  NO-DISP    TO TRUE
+  21         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-3338-prog.cob:23.7-23.16:
+  20              SET  NO-DISP    TO TRUE
+  21         *    some performance checks on the way...
+  22              PERFORM DO-CHECK 20000 TIMES.
+  23 >        >> END-IF
+----          ^^^^^^^^^
+  24              GOBACK.
+  25   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3642:0
+run_fundamental.at-3642-prog.cob:23.7-23.34:
+  20          PROCEDURE        DIVISION.
+  21         *    Test with DISPLAY on error
+  22              PERFORM DO-CHECK.
+  23 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  24              SET  NO-DISP    TO TRUE
+  25         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-3642-prog.cob:27.7-27.16:
+  24              SET  NO-DISP    TO TRUE
+  25         *    some performance checks on the way...
+  26              PERFORM DO-CHECK 20000 TIMES.
+  27 >        >> END-IF
+----          ^^^^^^^^^
+  28              GOBACK.
+  29   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3877:0
+run_fundamental.at-3877-prog.cob:18.7-18.34:
+  15          PROCEDURE        DIVISION.
+  16         *    Test with DISPLAY on error
+  17              PERFORM DO-CHECK.
+  18 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  19              SET  NO-DISP    TO TRUE
+  20         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-3877-prog.cob:22.7-22.16:
+  19              SET  NO-DISP    TO TRUE
+  20         *    some performance checks on the way...
+  21              PERFORM DO-CHECK 20000 TIMES.
+  22 >        >> END-IF
+----          ^^^^^^^^^
+  23              GOBACK.
+  24   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4112:0
+run_fundamental.at-4112-prog.cob:18.7-18.34:
+  15          PROCEDURE        DIVISION.
+  16         *    Test with DISPLAY on error
+  17              PERFORM DO-CHECK.
+  18 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  19              SET  NO-DISP    TO TRUE
+  20         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-4112-prog.cob:22.7-22.16:
+  19              SET  NO-DISP    TO TRUE
+  20         *    some performance checks on the way...
+  21              PERFORM DO-CHECK 20000 TIMES.
+  22 >        >> END-IF
+----          ^^^^^^^^^
+  23              GOBACK.
+  24   
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4171:0
+run_fundamental.at-4171-dump.c:5.6-5.7:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----         ^
+   6   dump (char *p)
+   7   {
+>> Error: Unexpected indicator: `T'
+
+run_fundamental.at-4171-dump.c:6.6-6.7:
+   3   #include <libcob.h>
+   4   
+   5   COB_EXT_EXPORT int
+   6 > dump (char *p)
+----         ^
+   7   {
+   8     printf ("%c%c", p[0], p[1]);
+>> Error: Unexpected indicator: `c'
+
+run_fundamental.at-4171-dump.c:8.6-8.7:
+   5   COB_EXT_EXPORT int
+   6   dump (char *p)
+   7   {
+   8 >   printf ("%c%c", p[0], p[1]);
+----         ^
+   9     return 0;
+  10   }
+>> Error: Unexpected indicator: `t'
+
+run_fundamental.at-4171-dump.c:9.6-9.7:
+   6   dump (char *p)
+   7   {
+   8     printf ("%c%c", p[0], p[1]);
+   9 >   return 0;
+----         ^
+  10   }
+>> Error: Unexpected indicator: `r'
+
+run_fundamental.at-4171-dump.c:5.7-5.14:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^^^^^^^
+   6   dump (char *p)
+   7   {
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4172:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4462:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4508:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4560:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4608:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4648:0
+run_fundamental.at-4648-prog.cob:12.7-12.11:
+   9                  05  misalign-1           PIC X.
+  10                  05  ptr                  POINTER, SYNC.
+  11                  05  ptr-num              REDEFINES ptr,
+  12 >        >>IF P64 SET
+----          ^^^^
+  13                                           USAGE BINARY-DOUBLE UNSIGNED.
+  14          >>ELSE
+>> Error: Invalid syntax
+
+run_fundamental.at-4648-prog.cob:14.7-14.13:
+  11                  05  ptr-num              REDEFINES ptr,
+  12          >>IF P64 SET
+  13                                           USAGE BINARY-DOUBLE UNSIGNED.
+  14 >        >>ELSE
+----          ^^^^^^
+  15                                           USAGE BINARY-LONG UNSIGNED.
+  16          >>END-IF
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-4648-prog.cob:16.7-16.15:
+  13                                           USAGE BINARY-DOUBLE UNSIGNED.
+  14          >>ELSE
+  15                                           USAGE BINARY-LONG UNSIGNED.
+  16 >        >>END-IF
+----          ^^^^^^^^
+  17                  05  misalign-2           PIC X.
+  18   
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-4648-prog.cob:15.40-15.45:
+  12          >>IF P64 SET
+  13                                           USAGE BINARY-DOUBLE UNSIGNED.
+  14          >>ELSE
+  15 >                                         USAGE BINARY-LONG UNSIGNED.
+----                                           ^^^^^
+  16          >>END-IF
+  17                  05  misalign-2           PIC X.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4745:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4774:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4802:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4828:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4861:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4982:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5018:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5040:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5063:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5089:0
+run_fundamental.at-5089-prog.cob:12.36:
+   9          PROCEDURE        DIVISION.
+  10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
+  11         D    END-DISPLAY.
+  12 >            DISPLAY "OK" NO ADVANCING UPON STDOUT
+----                                       ^
+  13              END-DISPLAY.
+  14              STOP RUN.
+>> Hint: Missing .
+
+run_fundamental.at-5089-prog.cob:12.37-12.41:
+   9          PROCEDURE        DIVISION.
+  10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
+  11         D    END-DISPLAY.
+  12 >            DISPLAY "OK" NO ADVANCING UPON STDOUT
+----                                        ^^^^
+  13              END-DISPLAY.
+  14              STOP RUN.
+>> Warning: Invalid syntax
+
+run_fundamental.at-5089-prog.cob:13.11-13.22:
+  10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
+  11         D    END-DISPLAY.
+  12              DISPLAY "OK" NO ADVANCING UPON STDOUT
+  13 >            END-DISPLAY.
+----              ^^^^^^^^^^^
+  14              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5112:0
+run_fundamental.at-5112-prog.cob:9.6-9.38:
+   6          PROCEDURE        DIVISION.
+   7                DISPLAY "OK" NO ADVANCING
+   8                END-DISPLAY.
+   9 >       >>D    DISPLAY "KO" NO ADVANCING
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10         >>D    END-DISPLAY.
+  11                STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-5112-prog.cob:10.6-10.25:
+   7                DISPLAY "OK" NO ADVANCING
+   8                END-DISPLAY.
+   9         >>D    DISPLAY "KO" NO ADVANCING
+  10 >       >>D    END-DISPLAY.
+----         ^^^^^^^^^^^^^^^^^^^
+  11                STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5135:0
+run_fundamental.at-5135-prog.cob:9.6-9.38:
+   6          PROCEDURE        DIVISION.
+   7                DISPLAY "OK" NO ADVANCING
+   8                END-DISPLAY.
+   9 >       >>D    DISPLAY "KO" NO ADVANCING
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10         >>D    END-DISPLAY.
+  11                STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+run_fundamental.at-5135-prog.cob:10.6-10.25:
+   7                DISPLAY "OK" NO ADVANCING
+   8                END-DISPLAY.
+   9         >>D    DISPLAY "KO" NO ADVANCING
+  10 >       >>D    END-DISPLAY.
+----         ^^^^^^^^^^^^^^^^^^^
+  11                STOP RUN.
+>> Error: Malformed or unknown compiler directive
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5172:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5217:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5262:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5313:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5363:0
+run_fundamental.at-5363-prog.cob:15.14:
+  12              DISPLAY DEBUG-ITEM "|" END-DISPLAY.
+  13          END DECLARATIVES.
+  14          FIRST-PAR.
+  15 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "false"
+----                 ^
+  16              DISPLAY "OK1" END-DISPLAY.
+  17              GO TO SECOND-PAR.
+>> Hint: Missing rnell_rev___anonymous_88_
+
+run_fundamental.at-5363-prog.cob:15.15-15.26:
+  12              DISPLAY DEBUG-ITEM "|" END-DISPLAY.
+  13          END DECLARATIVES.
+  14          FIRST-PAR.
+  15 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "false"
+----                  ^^^^^^^^^^^
+  16              DISPLAY "OK1" END-DISPLAY.
+  17              GO TO SECOND-PAR.
+>> Error: Invalid syntax
+
+run_fundamental.at-5363-prog.cob:24.14:
+  21              DISPLAY "OK3" END-DISPLAY.
+  22              PERFORM FIRST-PAR THRU SECOND-PAR.
+  23              DISPLAY "OK4" END-DISPLAY.
+  24 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "Y"
+----                 ^
+  25              PERFORM SECOND-PAR.
+  26              DISPLAY "OK5" END-DISPLAY.
+>> Hint: Missing rnell_rev___anonymous_88_
+
+run_fundamental.at-5363-prog.cob:24.15-24.26:
+  21              DISPLAY "OK3" END-DISPLAY.
+  22              PERFORM FIRST-PAR THRU SECOND-PAR.
+  23              DISPLAY "OK4" END-DISPLAY.
+  24 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "Y"
+----                  ^^^^^^^^^^^
+  25              PERFORM SECOND-PAR.
+  26              DISPLAY "OK5" END-DISPLAY.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5426:0
+run_fundamental.at-5426-prog.cob:30.11-30.22:
+  27              PERFORM VARYING MY-DATA-FIELD-1 FROM 1 BY 1
+  28                      UNTIL   MY-DATA-FIELD-1 > MY-DATA-FIELD-2
+  29                 *> empty by design
+  30 >            END-PERFORM.
+----              ^^^^^^^^^^^
+  31          END-PAR.
+  32              MOVE "99" TO MY-DATA-FIELD-B.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5486:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5538:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5576:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5623:0
+run_fundamental.at-5623-prog.cob:10.43:
+   7          DATA             DIVISION.
+   8          WORKING-STORAGE  SECTION.
+   9          01  DATA-FIELD   PIC X(40) VALUE "ABCD" BASED.
+  10 >        77  PTR          USAGE POINTER VALUE NULL.
+----                                              ^
+  11          01  DATA-FIELD3  PIC X(13) VALUE "42"   BASED.
+  12          LINKAGE SECTION.
+>> Hint: Missing <literal>
+
+run_fundamental.at-5623-prog.cob:10.44-10.48:
+   7          DATA             DIVISION.
+   8          WORKING-STORAGE  SECTION.
+   9          01  DATA-FIELD   PIC X(40) VALUE "ABCD" BASED.
+  10 >        77  PTR          USAGE POINTER VALUE NULL.
+----                                               ^^^^
+  11          01  DATA-FIELD3  PIC X(13) VALUE "42"   BASED.
+  12          LINKAGE SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5670:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6013:0
+run_fundamental.at-6013-prog.cob:24.7-24.12:
+  21   
+  22         *>   Test with DISPLAY on error
+  23              PERFORM DO-CHECK
+  24 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^
+  25              SET  NO-DISP    TO TRUE
+  26         *>   minimal side-test for performance comparisons
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:24.23:
+  21   
+  22         *>   Test with DISPLAY on error
+  23              PERFORM DO-CHECK
+  24 >        >> IF CHECK-PERF IS DEFINED
+----                          ^
+  25              SET  NO-DISP    TO TRUE
+  26         *>   minimal side-test for performance comparisons
+>> Hint: Missing TIMES .
+
+run_fundamental.at-6013-prog.cob:24.24-24.26:
+  21   
+  22         *>   Test with DISPLAY on error
+  23              PERFORM DO-CHECK
+  24 >        >> IF CHECK-PERF IS DEFINED
+----                           ^^
+  25              SET  NO-DISP    TO TRUE
+  26         *>   minimal side-test for performance comparisons
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:24.34:
+  21   
+  22         *>   Test with DISPLAY on error
+  23              PERFORM DO-CHECK
+  24 >        >> IF CHECK-PERF IS DEFINED
+----                                     ^
+  25              SET  NO-DISP    TO TRUE
+  26         *>   minimal side-test for performance comparisons
+>> Hint: Missing .
+
+run_fundamental.at-6013-prog.cob:25.11-25.14:
+  22         *>   Test with DISPLAY on error
+  23              PERFORM DO-CHECK
+  24          >> IF CHECK-PERF IS DEFINED
+  25 >            SET  NO-DISP    TO TRUE
+----              ^^^
+  26         *>   minimal side-test for performance comparisons
+  27              PERFORM DO-CHECK 20000 TIMES
+>> Warning: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:28.7-28.16:
+  25              SET  NO-DISP    TO TRUE
+  26         *>   minimal side-test for performance comparisons
+  27              PERFORM DO-CHECK 20000 TIMES
+  28 >        >> END-IF
+----          ^^^^^^^^^
+  29              GOBACK.
+  30   
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:76.29-76.33:
+  73              ELSE                        DISPLAY '! LOW-VALUE <= "X"'.
+  74              IF LOW-VALUE  >= FLDX       DISPLAY '  LOW-VALUE >= "X"!'.
+  75   
+  76 >            IF FLDX       >  x"00"      CONTINUE
+----                                ^^^^
+  77              ELSE                        DISPLAY '! "X" > x"00"'.
+  78              IF FLDX       <  x"00"      DISPLAY '  "X" < x"00"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:78.29-78.33:
+  75   
+  76              IF FLDX       >  x"00"      CONTINUE
+  77              ELSE                        DISPLAY '! "X" > x"00"'.
+  78 >            IF FLDX       <  x"00"      DISPLAY '  "X" < x"00"!'.
+----                                ^^^^
+  79              IF FLDX       >= x"00"      CONTINUE
+  80              ELSE                        DISPLAY '! "X" >= x"00"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:79.29-79.33:
+  76              IF FLDX       >  x"00"      CONTINUE
+  77              ELSE                        DISPLAY '! "X" > x"00"'.
+  78              IF FLDX       <  x"00"      DISPLAY '  "X" < x"00"!'.
+  79 >            IF FLDX       >= x"00"      CONTINUE
+----                                ^^^^
+  80              ELSE                        DISPLAY '! "X" >= x"00"'.
+  81              IF FLDX       <= x"00"      DISPLAY '  "X" <= x"00"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:81.29-81.33:
+  78              IF FLDX       <  x"00"      DISPLAY '  "X" < x"00"!'.
+  79              IF FLDX       >= x"00"      CONTINUE
+  80              ELSE                        DISPLAY '! "X" >= x"00"'.
+  81 >            IF FLDX       <= x"00"      DISPLAY '  "X" <= x"00"!'.
+----                                ^^^^
+  82   
+  83              IF x"00"      <  FLDX       CONTINUE
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:83.15-83.19:
+  80              ELSE                        DISPLAY '! "X" >= x"00"'.
+  81              IF FLDX       <= x"00"      DISPLAY '  "X" <= x"00"!'.
+  82   
+  83 >            IF x"00"      <  FLDX       CONTINUE
+----                  ^^^^
+  84              ELSE                        DISPLAY '! x"00" < "X"'.
+  85              IF x"00"      >  FLDX       DISPLAY '  x"00" > "X"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:85.15-85.19:
+  82   
+  83              IF x"00"      <  FLDX       CONTINUE
+  84              ELSE                        DISPLAY '! x"00" < "X"'.
+  85 >            IF x"00"      >  FLDX       DISPLAY '  x"00" > "X"!'.
+----                  ^^^^
+  86              IF x"00"      <= FLDX       CONTINUE
+  87              ELSE                        DISPLAY '! x"00" <= "X"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:86.15-86.19:
+  83              IF x"00"      <  FLDX       CONTINUE
+  84              ELSE                        DISPLAY '! x"00" < "X"'.
+  85              IF x"00"      >  FLDX       DISPLAY '  x"00" > "X"!'.
+  86 >            IF x"00"      <= FLDX       CONTINUE
+----                  ^^^^
+  87              ELSE                        DISPLAY '! x"00" <= "X"'.
+  88              IF x"00"      >= FLDX       DISPLAY '  x"00" >= "X"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:88.15-88.19:
+  85              IF x"00"      >  FLDX       DISPLAY '  x"00" > "X"!'.
+  86              IF x"00"      <= FLDX       CONTINUE
+  87              ELSE                        DISPLAY '! x"00" <= "X"'.
+  88 >            IF x"00"      >= FLDX       DISPLAY '  x"00" >= "X"!'.
+----                  ^^^^
+  89   
+  90   
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:105.29-105.33:
+ 102              ELSE                        DISPLAY '! HIGH-VALUE >= "X"'.
+ 103              IF HIGH-VALUE <= FLDX       DISPLAY '  HIGH-VALUE <= "X"!'.
+ 104   
+ 105 >            IF FLDX       <  x"FF"      CONTINUE
+----                                ^^^^
+ 106              ELSE                        DISPLAY '! "X" < x"FF"'.
+ 107              IF FLDX       >  x"FF"      DISPLAY '  "X" > x"FF"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:107.29-107.33:
+ 104   
+ 105              IF FLDX       <  x"FF"      CONTINUE
+ 106              ELSE                        DISPLAY '! "X" < x"FF"'.
+ 107 >            IF FLDX       >  x"FF"      DISPLAY '  "X" > x"FF"!'.
+----                                ^^^^
+ 108              IF FLDX       <= x"FF"      CONTINUE
+ 109              ELSE                        DISPLAY '! "X" <= x"FF"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:108.29-108.33:
+ 105              IF FLDX       <  x"FF"      CONTINUE
+ 106              ELSE                        DISPLAY '! "X" < x"FF"'.
+ 107              IF FLDX       >  x"FF"      DISPLAY '  "X" > x"FF"!'.
+ 108 >            IF FLDX       <= x"FF"      CONTINUE
+----                                ^^^^
+ 109              ELSE                        DISPLAY '! "X" <= x"FF"'.
+ 110              IF FLDX       >= x"FF"      DISPLAY '  "X" >= x"FF"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:110.29-110.33:
+ 107              IF FLDX       >  x"FF"      DISPLAY '  "X" > x"FF"!'.
+ 108              IF FLDX       <= x"FF"      CONTINUE
+ 109              ELSE                        DISPLAY '! "X" <= x"FF"'.
+ 110 >            IF FLDX       >= x"FF"      DISPLAY '  "X" >= x"FF"!'.
+----                                ^^^^
+ 111   
+ 112              IF x"FF"      >  FLDX       CONTINUE
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:112.15-112.19:
+ 109              ELSE                        DISPLAY '! "X" <= x"FF"'.
+ 110              IF FLDX       >= x"FF"      DISPLAY '  "X" >= x"FF"!'.
+ 111   
+ 112 >            IF x"FF"      >  FLDX       CONTINUE
+----                  ^^^^
+ 113              ELSE                        DISPLAY '! x"FF" > "X"'.
+ 114              IF x"FF"      <  FLDX       DISPLAY '  x"FF" < "X"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:114.15-114.19:
+ 111   
+ 112              IF x"FF"      >  FLDX       CONTINUE
+ 113              ELSE                        DISPLAY '! x"FF" > "X"'.
+ 114 >            IF x"FF"      <  FLDX       DISPLAY '  x"FF" < "X"!'.
+----                  ^^^^
+ 115              IF x"FF"      >= FLDX       CONTINUE
+ 116              ELSE                        DISPLAY '! x"FF" >= "X"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:115.15-115.19:
+ 112              IF x"FF"      >  FLDX       CONTINUE
+ 113              ELSE                        DISPLAY '! x"FF" > "X"'.
+ 114              IF x"FF"      <  FLDX       DISPLAY '  x"FF" < "X"!'.
+ 115 >            IF x"FF"      >= FLDX       CONTINUE
+----                  ^^^^
+ 116              ELSE                        DISPLAY '! x"FF" >= "X"'.
+ 117              IF x"FF"      <= FLDX       DISPLAY '  x"FF" <= "X"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:117.15-117.19:
+ 114              IF x"FF"      <  FLDX       DISPLAY '  x"FF" < "X"!'.
+ 115              IF x"FF"      >= FLDX       CONTINUE
+ 116              ELSE                        DISPLAY '! x"FF" >= "X"'.
+ 117 >            IF x"FF"      <= FLDX       DISPLAY '  x"FF" <= "X"!'.
+----                  ^^^^
+ 118   
+ 119   
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:192.29-192.33:
+ 189              ELSE                        DISPLAY '! LOW-VALUE <= "X"'.
+ 190              IF LOW-VALUE  >= FLDX32K    DISPLAY '  LOW-VALUE >= "X"!'.
+ 191   
+ 192 >            IF FLDX32K    >  x"00"      CONTINUE
+----                                ^^^^
+ 193              ELSE                        DISPLAY '! "X " > x"00"'.
+ 194              IF FLDX32K    <  x"00"      DISPLAY '  "X " < x"00"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:194.29-194.33:
+ 191   
+ 192              IF FLDX32K    >  x"00"      CONTINUE
+ 193              ELSE                        DISPLAY '! "X " > x"00"'.
+ 194 >            IF FLDX32K    <  x"00"      DISPLAY '  "X " < x"00"!'.
+----                                ^^^^
+ 195              IF FLDX32K    >= x"00"      CONTINUE
+ 196              ELSE                        DISPLAY '! "X " >= x"00"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:195.29-195.33:
+ 192              IF FLDX32K    >  x"00"      CONTINUE
+ 193              ELSE                        DISPLAY '! "X " > x"00"'.
+ 194              IF FLDX32K    <  x"00"      DISPLAY '  "X " < x"00"!'.
+ 195 >            IF FLDX32K    >= x"00"      CONTINUE
+----                                ^^^^
+ 196              ELSE                        DISPLAY '! "X " >= x"00"'.
+ 197              IF FLDX32K    <= x"00"      DISPLAY '  "X " <= x"00"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:197.29-197.33:
+ 194              IF FLDX32K    <  x"00"      DISPLAY '  "X " < x"00"!'.
+ 195              IF FLDX32K    >= x"00"      CONTINUE
+ 196              ELSE                        DISPLAY '! "X " >= x"00"'.
+ 197 >            IF FLDX32K    <= x"00"      DISPLAY '  "X " <= x"00"!'.
+----                                ^^^^
+ 198   
+ 199              IF x"00"      <  FLDX32K    CONTINUE
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:199.15-199.19:
+ 196              ELSE                        DISPLAY '! "X " >= x"00"'.
+ 197              IF FLDX32K    <= x"00"      DISPLAY '  "X " <= x"00"!'.
+ 198   
+ 199 >            IF x"00"      <  FLDX32K    CONTINUE
+----                  ^^^^
+ 200              ELSE                        DISPLAY '! x"00" < "X "'.
+ 201              IF x"00"      >  FLDX32K    DISPLAY '  x"00" > "X "!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:201.15-201.19:
+ 198   
+ 199              IF x"00"      <  FLDX32K    CONTINUE
+ 200              ELSE                        DISPLAY '! x"00" < "X "'.
+ 201 >            IF x"00"      >  FLDX32K    DISPLAY '  x"00" > "X "!'.
+----                  ^^^^
+ 202              IF x"00"      <= FLDX32K    CONTINUE
+ 203              ELSE                        DISPLAY '! x"00" <= "X "'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:202.15-202.19:
+ 199              IF x"00"      <  FLDX32K    CONTINUE
+ 200              ELSE                        DISPLAY '! x"00" < "X "'.
+ 201              IF x"00"      >  FLDX32K    DISPLAY '  x"00" > "X "!'.
+ 202 >            IF x"00"      <= FLDX32K    CONTINUE
+----                  ^^^^
+ 203              ELSE                        DISPLAY '! x"00" <= "X "'.
+ 204              IF x"00"      >= FLDX32K    DISPLAY '  x"00" >= "X "!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:204.15-204.19:
+ 201              IF x"00"      >  FLDX32K    DISPLAY '  x"00" > "X "!'.
+ 202              IF x"00"      <= FLDX32K    CONTINUE
+ 203              ELSE                        DISPLAY '! x"00" <= "X "'.
+ 204 >            IF x"00"      >= FLDX32K    DISPLAY '  x"00" >= "X "!'.
+----                  ^^^^
+ 205   
+ 206   
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:221.29-221.33:
+ 218              ELSE                        DISPLAY '! HIGH-VALUE >= "X "'.
+ 219              IF HIGH-VALUE <= FLDX32K    DISPLAY '  HIGH-VALUE <= "X "!'.
+ 220   
+ 221 >            IF FLDX32K    <  x"FF"      CONTINUE
+----                                ^^^^
+ 222              ELSE                        DISPLAY '! "X " < x"FF"'.
+ 223              IF FLDX32K    >  x"FF"      DISPLAY '  "X " > x"FF"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:223.29-223.33:
+ 220   
+ 221              IF FLDX32K    <  x"FF"      CONTINUE
+ 222              ELSE                        DISPLAY '! "X " < x"FF"'.
+ 223 >            IF FLDX32K    >  x"FF"      DISPLAY '  "X " > x"FF"!'.
+----                                ^^^^
+ 224              IF FLDX32K    <= x"FF"      CONTINUE
+ 225              ELSE                        DISPLAY '! "X " <= x"FF"'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:224.29-224.33:
+ 221              IF FLDX32K    <  x"FF"      CONTINUE
+ 222              ELSE                        DISPLAY '! "X " < x"FF"'.
+ 223              IF FLDX32K    >  x"FF"      DISPLAY '  "X " > x"FF"!'.
+ 224 >            IF FLDX32K    <= x"FF"      CONTINUE
+----                                ^^^^
+ 225              ELSE                        DISPLAY '! "X " <= x"FF"'.
+ 226              IF FLDX32K    >= x"FF"      DISPLAY '  "X " >= x"FF"!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:226.29-226.33:
+ 223              IF FLDX32K    >  x"FF"      DISPLAY '  "X " > x"FF"!'.
+ 224              IF FLDX32K    <= x"FF"      CONTINUE
+ 225              ELSE                        DISPLAY '! "X " <= x"FF"'.
+ 226 >            IF FLDX32K    >= x"FF"      DISPLAY '  "X " >= x"FF"!'.
+----                                ^^^^
+ 227   
+ 228              IF x"FF"      >  FLDX32K    CONTINUE
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:228.15-228.19:
+ 225              ELSE                        DISPLAY '! "X " <= x"FF"'.
+ 226              IF FLDX32K    >= x"FF"      DISPLAY '  "X " >= x"FF"!'.
+ 227   
+ 228 >            IF x"FF"      >  FLDX32K    CONTINUE
+----                  ^^^^
+ 229              ELSE                        DISPLAY '! x"FF" > "X "'.
+ 230              IF x"FF"      <  FLDX32K    DISPLAY '  x"FF" < "X "!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:230.15-230.19:
+ 227   
+ 228              IF x"FF"      >  FLDX32K    CONTINUE
+ 229              ELSE                        DISPLAY '! x"FF" > "X "'.
+ 230 >            IF x"FF"      <  FLDX32K    DISPLAY '  x"FF" < "X "!'.
+----                  ^^^^
+ 231              IF x"FF"      >= FLDX32K    CONTINUE
+ 232              ELSE                        DISPLAY '! x"FF" >= "X "'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:231.15-231.19:
+ 228              IF x"FF"      >  FLDX32K    CONTINUE
+ 229              ELSE                        DISPLAY '! x"FF" > "X "'.
+ 230              IF x"FF"      <  FLDX32K    DISPLAY '  x"FF" < "X "!'.
+ 231 >            IF x"FF"      >= FLDX32K    CONTINUE
+----                  ^^^^
+ 232              ELSE                        DISPLAY '! x"FF" >= "X "'.
+ 233              IF x"FF"      <= FLDX32K    DISPLAY '  x"FF" <= "X "!'.
+>> Error: Invalid syntax
+
+run_fundamental.at-6013-prog.cob:233.15-233.19:
+ 230              IF x"FF"      <  FLDX32K    DISPLAY '  x"FF" < "X "!'.
+ 231              IF x"FF"      >= FLDX32K    CONTINUE
+ 232              ELSE                        DISPLAY '! x"FF" >= "X "'.
+ 233 >            IF x"FF"      <= FLDX32K    DISPLAY '  x"FF" <= "X "!'.
+----                  ^^^^
+ 234   
+ 235   
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6072:0
+run_fundamental.at-6072-prog.cob:22.7-22.12:
+  19   
+  20         *>   Test with DISPLAY on error
+  21              PERFORM DO-CHECK
+  22 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^
+  23              SET  NO-DISP    TO TRUE
+  24         *>   minimal side-test for performance comparisons
+>> Error: Invalid syntax
+
+run_fundamental.at-6072-prog.cob:22.23:
+  19   
+  20         *>   Test with DISPLAY on error
+  21              PERFORM DO-CHECK
+  22 >        >> IF CHECK-PERF IS DEFINED
+----                          ^
+  23              SET  NO-DISP    TO TRUE
+  24         *>   minimal side-test for performance comparisons
+>> Hint: Missing TIMES .
+
+run_fundamental.at-6072-prog.cob:22.24-22.26:
+  19   
+  20         *>   Test with DISPLAY on error
+  21              PERFORM DO-CHECK
+  22 >        >> IF CHECK-PERF IS DEFINED
+----                           ^^
+  23              SET  NO-DISP    TO TRUE
+  24         *>   minimal side-test for performance comparisons
+>> Error: Invalid syntax
+
+run_fundamental.at-6072-prog.cob:22.34:
+  19   
+  20         *>   Test with DISPLAY on error
+  21              PERFORM DO-CHECK
+  22 >        >> IF CHECK-PERF IS DEFINED
+----                                     ^
+  23              SET  NO-DISP    TO TRUE
+  24         *>   minimal side-test for performance comparisons
+>> Hint: Missing .
+
+run_fundamental.at-6072-prog.cob:23.11-23.14:
+  20         *>   Test with DISPLAY on error
+  21              PERFORM DO-CHECK
+  22          >> IF CHECK-PERF IS DEFINED
+  23 >            SET  NO-DISP    TO TRUE
+----              ^^^
+  24         *>   minimal side-test for performance comparisons
+  25              PERFORM DO-CHECK 20000 TIMES
+>> Warning: Invalid syntax
+
+run_fundamental.at-6072-prog.cob:26.7-26.16:
+  23              SET  NO-DISP    TO TRUE
+  24         *>   minimal side-test for performance comparisons
+  25              PERFORM DO-CHECK 20000 TIMES
+  26 >        >> END-IF
+----          ^^^^^^^^^
+  27              GOBACK.
+  28   
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6161:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6229:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6281:0
+run_fundamental.at-6281-callee.cob:8.28:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          77  EXT-INT     IS TYPEDEF BINARY-LONG EXTERNAL.
+   8 >        77  SOMEEXT     USAGE EXT-INT.
+----                               ^
+   9   
+  10          PROCEDURE       DIVISION.
+>> Hint: Missing BINARY
+
+run_fundamental.at-6281-callee.cob:8.29-8.36:
+   5          DATA            DIVISION.
+   6          WORKING-STORAGE SECTION.
+   7          77  EXT-INT     IS TYPEDEF BINARY-LONG EXTERNAL.
+   8 >        77  SOMEEXT     USAGE EXT-INT.
+----                                ^^^^^^^
+   9   
+  10          PROCEDURE       DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6280:0
+run_fundamental.at-6280-caller.cob:12.28:
+   9         *> should this be possible?
+  10         *>77  INT-VAL     IS TYPEDEF USAGE INT VALUE 12.
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12 >        77  SOMEVAR     USAGE INT VALUE 10.
+----                               ^
+  13          77  SOMEVAL     USAGE INT-VAL.
+  14          77  SOMEEXT     USAGE EXT-INT.
+>> Hint: Missing BINARY
+
+run_fundamental.at-6280-caller.cob:12.29-12.32:
+   9         *> should this be possible?
+  10         *>77  INT-VAL     IS TYPEDEF USAGE INT VALUE 12.
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12 >        77  SOMEVAR     USAGE INT VALUE 10.
+----                                ^^^
+  13          77  SOMEVAL     USAGE INT-VAL.
+  14          77  SOMEEXT     USAGE EXT-INT.
+>> Error: Invalid syntax
+
+run_fundamental.at-6280-caller.cob:13.28:
+  10         *>77  INT-VAL     IS TYPEDEF USAGE INT VALUE 12.
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12          77  SOMEVAR     USAGE INT VALUE 10.
+  13 >        77  SOMEVAL     USAGE INT-VAL.
+----                               ^
+  14          77  SOMEEXT     USAGE EXT-INT.
+  15   
+>> Hint: Missing BINARY
+
+run_fundamental.at-6280-caller.cob:13.29-13.36:
+  10         *>77  INT-VAL     IS TYPEDEF USAGE INT VALUE 12.
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12          77  SOMEVAR     USAGE INT VALUE 10.
+  13 >        77  SOMEVAL     USAGE INT-VAL.
+----                                ^^^^^^^
+  14          77  SOMEEXT     USAGE EXT-INT.
+  15   
+>> Error: Invalid syntax
+
+run_fundamental.at-6280-caller.cob:14.28:
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12          77  SOMEVAR     USAGE INT VALUE 10.
+  13          77  SOMEVAL     USAGE INT-VAL.
+  14 >        77  SOMEEXT     USAGE EXT-INT.
+----                               ^
+  15   
+  16          PROCEDURE       DIVISION.
+>> Hint: Missing BINARY
+
+run_fundamental.at-6280-caller.cob:14.29-14.36:
+  11          77  INT-VAL     IS TYPEDEF BINARY-LONG VALUE 12.
+  12          77  SOMEVAR     USAGE INT VALUE 10.
+  13          77  SOMEVAL     USAGE INT-VAL.
+  14 >        77  SOMEEXT     USAGE EXT-INT.
+----                                ^^^^^^^
+  15   
+  16          PROCEDURE       DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6308:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6385:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6348:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6440:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6484:0
+run_fundamental.at-6484-prog.cob:13.26:
+  10          PROCEDURE DIVISION.
+  11          MAIN-PROGRAM SECTION.
+  12          INIZIO.
+  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+----                             ^
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+>> Hint: Missing )
+
+run_fundamental.at-6484-prog.cob:13.27-13.30:
+  10          PROCEDURE DIVISION.
+  11          MAIN-PROGRAM SECTION.
+  12          INIZIO.
+  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+----                              ^^^
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-6484-prog.cob:13.44-13.45:
+  10          PROCEDURE DIVISION.
+  11          MAIN-PROGRAM SECTION.
+  12          INIZIO.
+  13 >            IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+----                                               ^
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-6484-prog.cob:16.30:
+  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+----                                 ^
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+>> Hint: Missing )
+
+run_fundamental.at-6484-prog.cob:16.31-16.34:
+  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+----                                  ^^^
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-6484-prog.cob:16.48-16.49:
+  13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
+  14                 DISPLAY "TRUE 1"
+  15              END-IF
+  16 >            IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+----                                                   ^
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-6484-prog.cob:19.30:
+  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
+----                                 ^
+  20                 DISPLAY "TRUE 3"
+  21              END-IF
+>> Hint: Missing )
+
+run_fundamental.at-6484-prog.cob:19.31-19.34:
+  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
+----                                  ^^^
+  20                 DISPLAY "TRUE 3"
+  21              END-IF
+>> Error: Invalid syntax
+
+run_fundamental.at-6484-prog.cob:19.48-19.49:
+  16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
+  17                 DISPLAY "TRUE 2"
+  18              END-IF
+  19 >            IF VAR1 NOT > (VAR2 AND VAR3 AND VAR4)
+----                                                   ^
+  20                 DISPLAY "TRUE 3"
+  21              END-IF
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6560:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6764:0
+run_fundamental.at-6764-prog.cob:174.16-174.22:
+ 171          CHECK-LENGTH.
+ 172         *>-----------
+ 173         *>
+ 174 >            MOVE LENGTH OF P-PIC-1 TO W01-I .
+----                   ^^^^^^
+ 175              IF W01-I NOT = 2
+ 176              THEN
+>> Error: Invalid syntax
+
+run_fundamental.at-6764-prog.cob:179.16-179.22:
+ 176              THEN
+ 177                  DISPLAY 'Error 1 size <' W01-I '> !=2' .
+ 178         *>
+ 179 >            MOVE LENGTH OF P-PIC-2 TO W01-I .
+----                   ^^^^^^
+ 180              IF W01-I NOT = 2
+ 181              THEN
+>> Error: Invalid syntax
+
+run_fundamental.at-6764-prog.cob:184.16-184.22:
+ 181              THEN
+ 182                  DISPLAY 'Error 2 size <' W01-I '> !=2' .
+ 183         *>
+ 184 >            MOVE LENGTH OF P-PIC-3 TO W01-I .
+----                   ^^^^^^
+ 185              IF W01-I NOT = 1
+ 186              THEN
+>> Error: Invalid syntax
+
+run_fundamental.at-6764-prog.cob:190.16-190.22:
+ 187                  DISPLAY 'Error 3 size <' W01-I '> !=1' .
+ 188         *>
+ 189   
+ 190 >            MOVE LENGTH OF P-PIC-4 TO W01-I .
+----                   ^^^^^^
+ 191              IF W01-I NOT = 1
+ 192              THEN
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6816:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6874:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6925:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6977:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7029:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7158:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7232:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9015:0
+run_fundamental.at-9015-prog.cob:14.21:
+  11          WORKING-STORAGE  SECTION.
+  12   
+  13          01 ALL-SRC .
+  14 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
+----                        ^
+  15             05 FIELD-03 BINARY-C-LONG UNSIGNED .
+  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
+>> Hint: Missing RENAMES
+
+run_fundamental.at-9015-prog.cob:14.22-14.35:
+  11          WORKING-STORAGE  SECTION.
+  12   
+  13          01 ALL-SRC .
+  14 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
+----                         ^^^^^^^^^^^^^
+  15             05 FIELD-03 BINARY-C-LONG UNSIGNED .
+  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:15.21:
+  12   
+  13          01 ALL-SRC .
+  14             05 FIELD-02 BINARY-C-LONG  SIGNED  .
+  15 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
+----                        ^
+  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
+  17             05 FIELD-05 BINARY-CHAR UNSIGNED .
+>> Hint: Missing RENAMES
+
+run_fundamental.at-9015-prog.cob:15.22-15.35:
+  12   
+  13          01 ALL-SRC .
+  14             05 FIELD-02 BINARY-C-LONG  SIGNED  .
+  15 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
+----                         ^^^^^^^^^^^^^
+  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
+  17             05 FIELD-05 BINARY-CHAR UNSIGNED .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:30.22-30.32:
+  27             05 FIELD-15 FLOAT-DECIMAL-34 .
+  28             05 FIELD-16 FLOAT-LONG .
+  29             05 FIELD-17 FLOAT-SHORT .
+  30 >           05 FIELD-18 SIGNED-INT .
+----                         ^^^^^^^^^^
+  31             05 FIELD-19 SIGNED-LONG .
+  32             05 FIELD-20 SIGNED-SHORT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:31.22-31.33:
+  28             05 FIELD-16 FLOAT-LONG .
+  29             05 FIELD-17 FLOAT-SHORT .
+  30             05 FIELD-18 SIGNED-INT .
+  31 >           05 FIELD-19 SIGNED-LONG .
+----                         ^^^^^^^^^^^
+  32             05 FIELD-20 SIGNED-SHORT .
+  33             05 FIELD-21 UNSIGNED-INT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:32.22-32.34:
+  29             05 FIELD-17 FLOAT-SHORT .
+  30             05 FIELD-18 SIGNED-INT .
+  31             05 FIELD-19 SIGNED-LONG .
+  32 >           05 FIELD-20 SIGNED-SHORT .
+----                         ^^^^^^^^^^^^
+  33             05 FIELD-21 UNSIGNED-INT .
+  34             05 FIELD-22 UNSIGNED-LONG .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:33.22-33.34:
+  30             05 FIELD-18 SIGNED-INT .
+  31             05 FIELD-19 SIGNED-LONG .
+  32             05 FIELD-20 SIGNED-SHORT .
+  33 >           05 FIELD-21 UNSIGNED-INT .
+----                         ^^^^^^^^^^^^
+  34             05 FIELD-22 UNSIGNED-LONG .
+  35             05 FIELD-23 UNSIGNED-SHORT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:34.22-34.35:
+  31             05 FIELD-19 SIGNED-LONG .
+  32             05 FIELD-20 SIGNED-SHORT .
+  33             05 FIELD-21 UNSIGNED-INT .
+  34 >           05 FIELD-22 UNSIGNED-LONG .
+----                         ^^^^^^^^^^^^^
+  35             05 FIELD-23 UNSIGNED-SHORT .
+  36             05 FIELD-24            COMP-1 .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:35.22-35.36:
+  32             05 FIELD-20 SIGNED-SHORT .
+  33             05 FIELD-21 UNSIGNED-INT .
+  34             05 FIELD-22 UNSIGNED-LONG .
+  35 >           05 FIELD-23 UNSIGNED-SHORT .
+----                         ^^^^^^^^^^^^^^
+  36             05 FIELD-24            COMP-1 .
+  37             05 FIELD-25            COMP-2 .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:50.21:
+  47          01 EXPTD-RESULT PIC 9(09)     .
+  48         *>
+  49          01 ALL-DST .
+  50 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
+----                        ^
+  51             05 FIELD-03 BINARY-C-LONG UNSIGNED .
+  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
+>> Hint: Missing RENAMES
+
+run_fundamental.at-9015-prog.cob:50.22-50.35:
+  47          01 EXPTD-RESULT PIC 9(09)     .
+  48         *>
+  49          01 ALL-DST .
+  50 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
+----                         ^^^^^^^^^^^^^
+  51             05 FIELD-03 BINARY-C-LONG UNSIGNED .
+  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:51.21:
+  48         *>
+  49          01 ALL-DST .
+  50             05 FIELD-02 BINARY-C-LONG  SIGNED  .
+  51 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
+----                        ^
+  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
+  53             05 FIELD-05 BINARY-CHAR UNSIGNED .
+>> Hint: Missing RENAMES
+
+run_fundamental.at-9015-prog.cob:51.22-51.35:
+  48         *>
+  49          01 ALL-DST .
+  50             05 FIELD-02 BINARY-C-LONG  SIGNED  .
+  51 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
+----                         ^^^^^^^^^^^^^
+  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
+  53             05 FIELD-05 BINARY-CHAR UNSIGNED .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:66.22-66.32:
+  63             05 FIELD-15 FLOAT-DECIMAL-34 .
+  64             05 FIELD-16 FLOAT-LONG .
+  65             05 FIELD-17 FLOAT-SHORT .
+  66 >           05 FIELD-18 SIGNED-INT .
+----                         ^^^^^^^^^^
+  67             05 FIELD-19 SIGNED-LONG .
+  68             05 FIELD-20 SIGNED-SHORT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:67.22-67.33:
+  64             05 FIELD-16 FLOAT-LONG .
+  65             05 FIELD-17 FLOAT-SHORT .
+  66             05 FIELD-18 SIGNED-INT .
+  67 >           05 FIELD-19 SIGNED-LONG .
+----                         ^^^^^^^^^^^
+  68             05 FIELD-20 SIGNED-SHORT .
+  69             05 FIELD-21 UNSIGNED-INT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:68.22-68.34:
+  65             05 FIELD-17 FLOAT-SHORT .
+  66             05 FIELD-18 SIGNED-INT .
+  67             05 FIELD-19 SIGNED-LONG .
+  68 >           05 FIELD-20 SIGNED-SHORT .
+----                         ^^^^^^^^^^^^
+  69             05 FIELD-21 UNSIGNED-INT .
+  70             05 FIELD-22 UNSIGNED-LONG .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:69.22-69.34:
+  66             05 FIELD-18 SIGNED-INT .
+  67             05 FIELD-19 SIGNED-LONG .
+  68             05 FIELD-20 SIGNED-SHORT .
+  69 >           05 FIELD-21 UNSIGNED-INT .
+----                         ^^^^^^^^^^^^
+  70             05 FIELD-22 UNSIGNED-LONG .
+  71             05 FIELD-23 UNSIGNED-SHORT .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:70.22-70.35:
+  67             05 FIELD-19 SIGNED-LONG .
+  68             05 FIELD-20 SIGNED-SHORT .
+  69             05 FIELD-21 UNSIGNED-INT .
+  70 >           05 FIELD-22 UNSIGNED-LONG .
+----                         ^^^^^^^^^^^^^
+  71             05 FIELD-23 UNSIGNED-SHORT .
+  72             05 FIELD-24            COMP-1 .
+>> Error: Invalid syntax
+
+run_fundamental.at-9015-prog.cob:71.22-71.36:
+  68             05 FIELD-20 SIGNED-SHORT .
+  69             05 FIELD-21 UNSIGNED-INT .
+  70             05 FIELD-22 UNSIGNED-LONG .
+  71 >           05 FIELD-23 UNSIGNED-SHORT .
+----                         ^^^^^^^^^^^^^^
+  72             05 FIELD-24            COMP-1 .
+  73             05 FIELD-25            COMP-2 .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9060:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9123:0
+run_fundamental.at-9123-prog.cob:10.7-10.12:
+   7          SPECIAL-NAMES         .
+   8          CLASS HEXA IS '0' THRU '9'
+   9                        'A' THRU 'F' .
+  10 >        CLASS ODD   IS '1' '3' '5' '7' '9'   .
+----          ^^^^^
+  11   
+  12         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+>> Error: Invalid syntax
+
