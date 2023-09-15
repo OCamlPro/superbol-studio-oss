@@ -50,6 +50,7 @@ depends: [
   "dune" {>= "2.8.0"}
   "toml" {>= "7.1.0" & < "8.0.0"}
   "pretty" {= version}
+  "ppx_expect" {>= "v0.16" with-test}
   "lsp" {>= "1.15" & < "1.16"}
   "jsonrpc" {>= "1.15"}
   "cobol_typeck" {= version}
@@ -62,5 +63,7 @@ depends: [
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}
+  "menhir" {< "20230608"}
+  "alcotest" {with-test}
 ]
 # Content of `opam-trailer` field:

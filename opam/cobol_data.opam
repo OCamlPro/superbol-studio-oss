@@ -51,9 +51,12 @@ depends: [
   "ppx_deriving" {>= "5.2.1"}
   "cobol_parser" {= version}
   "cobol_ast" {= version}
+  "alcotest" {>= "1" with-test}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}
+  "menhir" {< "20230608"}
+  "alcotest" {with-test}
 ]
 # Content of `opam-trailer` field:

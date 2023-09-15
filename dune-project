@@ -29,6 +29,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -49,6 +51,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -65,6 +69,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -84,6 +90,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -103,6 +111,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -123,6 +133,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -140,6 +152,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -156,6 +170,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -177,6 +193,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -196,6 +214,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -210,6 +230,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -231,6 +253,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -246,6 +270,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -267,6 +293,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -280,6 +308,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -291,6 +321,7 @@
    (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (pretty (= version))
+   (ppx_expect ( >= v0.16 ))
    (lsp (and ( >= 1.15 )( < 1.16 )))
    (jsonrpc ( >= 1.15 ))
    (cobol_typeck (= version))
@@ -303,6 +334,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -317,6 +350,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -332,6 +367,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -349,6 +386,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -364,6 +403,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -380,6 +421,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -397,6 +440,8 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -409,10 +454,13 @@
    (ppx_deriving ( >= 5.2.1 ))
    (cobol_parser (= version))
    (cobol_ast (= version))
+   (alcotest ( >= 1 ))
    ppx_inline_test
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 
@@ -431,6 +479,23 @@
    ppx_expect
    odoc
    ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
+  )
+ )
+
+(package
+ (name superbol_testutils)
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
+ (depends
+   (ocaml (>= 4.14.0))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+   (menhir ( < 20230608 ))
+   alcotest
   )
  )
 

@@ -20,7 +20,7 @@ all: build
 build:
 	./scripts/before.sh build
 	opam exec -- dune build @install
-	./scripts/copy-bin.sh superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_ast cobol_indent cobol_preproc cobol_data cobol_typeck
+	./scripts/copy-bin.sh superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_ast cobol_indent cobol_preproc cobol_data cobol_typeck superbol_testutils
 	./scripts/after.sh build
 
 build-deps:

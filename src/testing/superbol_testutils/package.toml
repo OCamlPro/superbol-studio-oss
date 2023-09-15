@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_lsp"
+name = "superbol_testutils"
 skeleton = "library"
 
 # version if different from project version
@@ -43,27 +43,17 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_deriving.show"
+# preprocess = "pps ppx_deriving_encoding"
 
 # files to skip while updating at package level
-skip = ["index.mld"]
+# skip = []
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-cobol_common = "version"
-cobol_config = "version"
-cobol_data = "version"
-cobol_indent = "version"
-cobol_parser = "version"
-cobol_typeck = "version"
-jsonrpc = ">=1.15"
-lsp = ">=1.15 <1.16"
-pretty = "version"
-toml = "7.1.0"
-ppx_expect = { version = ">=v0.16", for-test = true }
+# ...
 
 # package tools dependencies
 [tools]

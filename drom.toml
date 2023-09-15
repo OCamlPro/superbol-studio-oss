@@ -39,6 +39,10 @@ skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "sphinx/about.rst",
 [dependencies]
 
 # project-wide tools dependencies (not for package-specific deps)
+[tools]
+menhir = "<20230608"
+[tools.alcotest]
+for-test = true
 [tools.ocamlformat]
 for-test = true
 [tools.odoc]
@@ -193,3 +197,7 @@ dir = "src/lsp/cobol_data"
 [[package]]
 dir = "src/lsp/cobol_typeck"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/testing/superbol_testutils"
+# edit 'src/testing/superbol_testutils/package.toml' for package-specific options
