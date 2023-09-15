@@ -46,7 +46,7 @@ module TOKTYP = struct
   (* "enumMember"; *)
   (* "event"; *)
   (* "method"; *)
-  (* "macro"; *)
+  let macro     = mk "macro"
   (* "regexp"; *)
   let all =
     List.sort (fun a b -> b.index - a.index) !all |>
@@ -121,6 +121,12 @@ type token_category =
   | MnemonicName
   | FileName
 
+
+(* TODO: incrementally build a map that associates locations in filename with
+   token types and modifiers, and then extract the (sorted) list at the end.  In
+   this way, we don't need to worry about the order in which parse-tree elements
+   are visited.  If really needed, the accumulator may carry some context
+   information that can be used in generic methods like `fold_name'`. *)
 let semtoks_from_ptree ~filename ptree =
   let open Cobol_parser.PTree_visitor in
   let open Cobol_ast.Terms_visitor in
@@ -553,6 +559,16 @@ let semtoks_of_comments ~filename comments = comments |>
         None
   end
 
+let semtoks_of_preproc_statements ~filename pplog =
+  List.fold_left begin fun acc -> function
+    | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
+    | Cobol_preproc.Trace.Replace { replloc = loc } ->
+        List.rev_map (semtok TOKTYP.macro)
+          (single_line_lexlocs_in ~filename loc) @ acc
+    | Cobol_preproc.Trace.Replacement _ ->
+        acc
+  end [] (Cobol_preproc.Trace.events pplog)
+
 (** [semtoks_of_non_ambigious_tokens ~filename tokens] returns tokens that do
     not need to have more analyzing to get their type. *)
 let semtoks_of_non_ambigious_tokens ~filename tokens =
@@ -641,10 +657,11 @@ let ensure_sorted name ~filename cmp l =
       List.fast_sort cmp l
 
 
-let data ~filename ~tokens ~pplog:_ ~comments ~ptree : int array =
+let data ~filename ~tokens ~pplog ~comments ~ptree : int array =
   let semtoks1 = semtoks_of_non_ambigious_tokens ~filename tokens in
-  let semtoks2 = semtoks_from_ptree ~filename ptree in
-  let semtoks3 = semtoks_of_comments ~filename comments in
+  let semtoks2 = semtoks_from_ptree              ~filename ptree in
+  let semtoks3 = semtoks_of_comments             ~filename comments in
+  let semtoks4 = semtoks_of_preproc_statements   ~filename pplog in
   (* NB: In *principle* all those lists are already sorted w.r.t lexical
      locations in [filename].  We just check that for now and raise a warning,
      in case. *)
@@ -652,8 +669,10 @@ let data ~filename ~tokens ~pplog:_ ~comments ~ptree : int array =
   (* and semtoks2 = List.fast_sort compare_semtoks semtoks2 *)
   (* and semtoks3 = List.fast_sort compare_semtoks semtoks3 in *)
   let semtoks1 = ensure_sorted "nonambiguous" ~filename compare_semtoks semtoks1
-  and semtoks2 = ensure_sorted "ptree" ~filename compare_semtoks semtoks2
-  and semtoks3 = ensure_sorted "comments" ~filename compare_semtoks semtoks3 in
+  and semtoks2 = ensure_sorted "ptree"        ~filename compare_semtoks semtoks2
+  and semtoks3 = ensure_sorted "comments"     ~filename compare_semtoks semtoks3
+  and semtoks4 = ensure_sorted "preproc"      ~filename compare_semtoks semtoks4 in
   relative_semtoks
     List.(merge compare_semtoks semtoks1 @@
-          merge compare_semtoks semtoks2 semtoks3)
+          merge compare_semtoks semtoks2 @@
+          merge compare_semtoks semtoks3 @@ semtoks4)

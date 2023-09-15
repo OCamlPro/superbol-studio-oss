@@ -274,7 +274,7 @@ and do_copy lp rev_prefix copy suffix =
   `CopyDone (lp, text)
 
 and do_replace lp rev_prefix repl suffix =
-  let { result = repl; diags } = ~&repl in
+  let { payload = { result = repl; diags }; loc } = repl in
   let lp = add_diags lp diags in
   let prefix, pplog =
     (* NB: this applies the current replacing on all remaining text leading to
@@ -283,7 +283,7 @@ and do_replace lp rev_prefix repl suffix =
        replacing phrase. *)
     apply_active_replacing_full lp @@ List.rev rev_prefix
   in
-  let lp = with_pplog lp pplog in
+  let lp = with_pplog lp @@ Preproc_trace.new_replace ~loc pplog in
   let lp = match repl, lp.persist.replacing with
     | CDirReplace { replacing = repl; _ }, ([] as replacing)
     | CDirReplace { replacing = repl; also = false }, replacing ->

@@ -12,12 +12,16 @@ module TYPES: sig
   type log_entry =
     | FileCopy of
         {
-          copyloc: Cobol_common.Srcloc.srcloc;
+          copyloc: Cobol_common.srcloc;
           status: copy_event_status;
+        }
+    | Replace of
+        {
+          replloc: Cobol_common.srcloc;
         }
     | Replacement of
         {
-          matched_loc: Cobol_common.Srcloc.srcloc;
+          matched_loc: Cobol_common.srcloc;
           replacement_text: Text.text;
         }
 
@@ -49,6 +53,9 @@ val cyclic_copy
 val missing_copy
   : loc: Cobol_common.srcloc
   -> info: Copybook.lib_not_found_info
+  -> log -> log
+val new_replace
+  : loc: Cobol_common.srcloc
   -> log -> log
 
 (* --- *)

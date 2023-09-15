@@ -19,6 +19,10 @@ module TYPES = struct
           copyloc: srcloc;
           status: copy_event_status;
         }
+    | Replace of
+        {
+          replloc: srcloc;
+        }
     | Replacement of
         {
           matched_loc: srcloc;
@@ -45,6 +49,8 @@ let cyclic_copy ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CyclicCopy filename }
 let missing_copy ~loc ~info : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = MissingCopy info }
+let new_replace ~loc : log -> log =
+  List.cons @@ Replace { replloc = loc }
 
 (* --- *)
 
