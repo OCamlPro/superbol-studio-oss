@@ -27,5 +27,6 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+*.opam.locked
 
 

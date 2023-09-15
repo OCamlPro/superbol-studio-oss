@@ -11,10 +11,10 @@
 
 (package
  (name superbol-vscode-platform)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (vscode-languageclient-js-stubs (= version))
    (vscode-js-stubs (= version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
@@ -34,10 +34,10 @@
 
 (package
  (name polka-js-stubs)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (node-js-stubs (= version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
@@ -54,10 +54,10 @@
 
 (package
  (name interop-js-stubs)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
@@ -70,10 +70,10 @@
 
 (package
  (name node-js-stubs)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
@@ -89,10 +89,10 @@
 
 (package
  (name vscode-js-stubs)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
@@ -108,10 +108,10 @@
 
 (package
  (name vscode-languageclient-js-stubs)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (vscode-js-stubs (= version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
@@ -128,10 +128,10 @@
 
 (package
  (name vscode-package-json)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (vscode-json (= version))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
@@ -145,10 +145,10 @@
 
 (package
  (name vscode-json)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
@@ -161,10 +161,10 @@
 
 (package
  (name vscode-debugadapter)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (vscode-debugprotocol (= version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (node-js-stubs (= version))
@@ -182,10 +182,10 @@
 
 (package
  (name vscode-debugprotocol)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
@@ -201,10 +201,10 @@
 
 (package
  (name superbol-free)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (superbol_free_lib (= version))
    ppx_inline_test
    ppx_expect
@@ -215,10 +215,10 @@
 
 (package
  (name superbol_free_lib)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (cobol_typeck (= version))
@@ -236,10 +236,10 @@
 
 (package
  (name cobol_common)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (pretty (= version))
    (ppx_deriving ( >= 5.2.1 ))
    ppx_inline_test
@@ -251,10 +251,10 @@
 
 (package
  (name cobol_parser)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 1.2 ))
    (ez_file ( >= 0.3 ))
@@ -272,10 +272,10 @@
 
 (package
  (name ebcdic_lib)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    ppx_inline_test
    ppx_expect
    odoc
@@ -285,10 +285,10 @@
 
 (package
  (name cobol_lsp)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (pretty (= version))
    (lsp (and ( >= 1.15 )( < 1.16 )))
@@ -308,10 +308,10 @@
 
 (package
  (name ppx_cobcflags)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppxlib ( >= 0.15 ))
    ppx_inline_test
    ppx_expect
@@ -322,10 +322,10 @@
 
 (package
  (name pretty)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
    (ez_file ( >= 0.3 ))
    ppx_inline_test
@@ -337,10 +337,10 @@
 
 (package
  (name cobol_config)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (pretty (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 1.2 ))
@@ -354,10 +354,10 @@
 
 (package
  (name cobol_ast)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppx_deriving ( >= 5.2.1 ))
    (cobol_common (= version))
    ppx_inline_test
@@ -369,10 +369,10 @@
 
 (package
  (name cobol_indent)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
    (cobol_preproc (= version))
    (cobol_common (= version))
@@ -385,10 +385,10 @@
 
 (package
  (name cobol_preproc)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 1.2 ))
    (cobol_config (= version))
@@ -402,10 +402,10 @@
 
 (package
  (name cobol_data)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppx_deriving ( >= 5.2.1 ))
    (cobol_parser (= version))
    (cobol_ast (= version))
@@ -418,10 +418,10 @@
 
 (package
  (name cobol_typeck)
- (synopsis "The superbol-vscode-platform project")
- (description "This is the description\nof the superbol-vscode-platform OCaml project\n")
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
-   (ocaml (>= 4.13.0))
+   (ocaml (>= 4.14.0))
    (ppx_deriving ( >= 5.2.1 ))
    (cobol_parser (= version))
    (cobol_data (= version))

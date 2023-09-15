@@ -4,16 +4,16 @@ share-repo = "https://github.com/OCamlPro/drom-share"
 share-version = "0.9.2"
 
 [project]
-authors = ["Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>", "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"]
+authors = ["Nicolas Berthier <nicolas.berthier@ocamlpro.com>", "David Declerck <david.declerck@ocamlpro.com>", "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>", "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"]
 ci-systems = ["ubuntu-latest", "macos-latest"]
 copyright = "OCamlPro SAS"
-edition = "4.13.0"
+edition = "4.14.1"
 github-organization = "ocamlpro"
 license = "MIT"
-min-edition = "4.13.0"
+min-edition = "4.14.0"
 name = "superbol-vscode-platform"
 skeleton = "program"
-synopsis = "The superbol-vscode-platform project"
+synopsis = "The superbol-studio-oss project"
 version = "0.1.0"
 
 # keys that you could also define:
@@ -29,7 +29,7 @@ version = "0.1.0"
 [project]
 description = """
 This is the description
-of the superbol-vscode-platform OCaml project
+of the superbol-studio-oss OCaml project
 """
 
 [project]
@@ -51,7 +51,7 @@ for-test = true
 [project]
 
 # dirs to skip while scanning for dune files
-skip-dirs = ["node_modules" ]
+skip-dirs = ["import", "node_modules"]
 
 # dirs to scan for share/ folders (with package names)
 share-dirs = ["share"]
@@ -85,6 +85,7 @@ ATTIC
 !.vscode/tasks.json
 !.vscode/launch.json
 *.vsix
+*.opam.locked
 """
 github-workflow-before-build = """
 
