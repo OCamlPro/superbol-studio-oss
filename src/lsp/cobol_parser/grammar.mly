@@ -14,6 +14,7 @@
 open PTree
 open Grammar_utils
 open Cobol_ast
+open Cobol_ast.HELPERS
 open Cobol_common.Srcloc.INFIX
 
 let split_last l =
@@ -2469,9 +2470,9 @@ complex_condition:
  | OR            { LOr }
 
 %inline flat_relation_condition:
- | n = ibo(NOT) c = relation_condition
-                suff = io (pair (logop, flat_combination_operand))
-   { expand_relation_condition n c suff }
+ | neg = ibo(NOT) c = relation_condition
+   suff = io (pair (logop, flat_combination_operand))
+   { relation_condition ~neg c suff }
 
 nonrel_condition:
  | n = ibo(NOT)     e = expression %prec lowest { neg_cond n @@ Expr e }

@@ -124,7 +124,7 @@ and qualname_or_alphanum = [qualname_|alnum_] term
 and qualname_or_intlit = [qualname_|int_] term
 and qualname_or_literal = [qualname_|lit_] term
 and strlit = strlit_ term
-and strlit_or_intlit = [strlit_|int_] term   (* strlit_or_intlit *)
+and strlit_or_intlit = [strlit_|int_] term
 
 and binop =
   | BPlus
@@ -149,12 +149,27 @@ and expression =
 and _ cond =
   (* TODO: group generalized expressions together (class, sign, omitted) *)
   | Expr: expression -> [>simple_] cond (* exp (bool), ident (bool, cond, switch) *)
-  | Relation: expression * relop * expression -> [>simple_] cond (* general, bool, pointer *)
+  | Relation: binary_relation -> [>simple_] cond     (* general, bool, pointer *)
+  | Abbrev: abbrev_combined_relation -> [>simple_] cond (* abbreviated *)
   | ClassCond: expression * class_ -> [>simple_] cond (* exp = ident *)
   | SignCond: expression * signz -> [>simple_] cond (* exp = arith exp *)
   | Omitted: expression -> [>simple_] cond (* exp = ident *)
   | Not: _ cond -> [>complex_] cond
-  | Logop: _ cond * logop * _ cond -> [>complex_] cond (* TODO: move logop left *)
+  | Logop: _ cond * logop * _ cond -> [>complex_] cond
+
+and binary_relation =
+  expression * relop * expression
+
+and abbrev_combined_relation =
+  bool * binary_relation * logop * flat_combined_relation
+
+(** Suffix of non-parenthesized relational combined conditions *)
+and flat_combined_relation =
+  | FlatAmbiguous of relop option * expression                    (* relop? e *)
+  | FlatNotExpr of expression                                     (* NOT e *)
+  | FlatRel of bool * binary_relation                             (* NOT? rel *)
+  | FlatOther of condition            (* extended- or parenthesized condition *)
+  | FlatComb of (flat_combined_relation as 'x) * logop * 'x       (* _ AND/OR _ *)
 
 and condition = [simple_|complex_] cond
 and simple_condition = simple_ cond
@@ -615,13 +630,20 @@ module FMT = struct
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
 
+  and pp_binary_relation ppf (a, o, b) =
+    fmt "%a@ %s@ %a" ppf
+      pp_expression a ([%derive.show: relop] o) pp_expression b
+
   and pp_cond
     : type k. ?pos:_ -> k cond Pretty.printer = fun ?(pos = true) ppf -> function
     | Expr e ->
         fmt "%a%a" ppf not_ pos pp_expression e
-    | Relation (a, o, b) ->
-        fmt "@[<1>%a(%a@ %s@ %a)@]" ppf
-          not_ pos pp_expression a ([%derive.show: relop] o) pp_expression b
+    | Relation rel ->
+        fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
+    | Abbrev (neg, rel, o, comb) ->
+        fmt "%a@[<1>(%a%a@ %a@ %a)@]" ppf
+          not_ pos not_ neg pp_binary_relation rel pp_logop o
+          pp_flat_combined_relation comb
     | ClassCond (e, c) ->
         fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
     | SignCond (e, s) ->
@@ -633,6 +655,24 @@ module FMT = struct
     | Logop (a, o, b) ->
         fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
           not_ pos (pp_cond ~pos:true) a pp_logop o (pp_cond ~pos:true) b
+
+  and pp_flat_combined_relation ppf = function
+    | FlatAmbiguous (None, e) ->
+        pp_expression ppf e
+    | FlatAmbiguous (Some r, e) ->
+        fmt "%a@ %a" ppf pp_relop r pp_expression e
+    | FlatNotExpr e ->
+        fmt "NOT@ %a" ppf pp_expression e
+    | FlatRel (neg, rel) ->
+        fmt "%a%a" ppf not_ neg pp_binary_relation rel
+    | FlatOther c ->
+        fmt "@[<1>(%a)@]" ppf pp_condition c
+    | FlatComb (c1, o, c2) ->
+        fmt "%a@ %a@ %a" ppf
+          pp_flat_combined_relation c1
+          pp_logop o
+          pp_flat_combined_relation c2
+
   and pp_condition ppf = pp_cond ppf
   and not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
 
@@ -816,6 +856,7 @@ module UPCAST = struct
   let simple_cond: simple_condition -> condition = function
     | Expr _ as c -> c
     | Relation _ as c -> c
+    | Abbrev _ as c -> c
     | ClassCond _ as c -> c
     | SignCond _ as c -> c
     | Omitted _ as c -> c
@@ -847,3 +888,78 @@ and rounding_mode =
 
 and rounded_idents = rounded_ident list
 [@@deriving ord]
+
+(* --- *)
+
+module HELPERS = struct
+
+  let neg_cond neg : simple_condition -> condition =
+    if not neg then UPCAST.simple_cond else fun c -> Not c
+  let neg_cond' neg : condition -> condition =
+    if not neg then Fun.id else fun c -> Not c
+
+  (** [expand_every_abbrev_cond cond] recursively substitutes every abbreviated
+      combined relation condition from [cond] by an equivalent non-abbreviated
+      condition (with abbreviated relations replaced with binary relations). *)
+  let rec expand_every_abbrev_cond
+    : type k. k cond -> _ cond = function
+    | Expr _ | Relation _ | ClassCond _ | SignCond _ | Omitted _ as c ->
+        c
+    | Abbrev a ->
+        expand_abbrev_cond a
+    | Not c ->
+        Not (expand_every_abbrev_cond c)
+    | Logop (c1, o, c2) ->
+        Logop (expand_every_abbrev_cond c1, o, expand_every_abbrev_cond c2)
+
+  (** [expand_abbreviated_combined_relation abbrev_combined_relation], expands
+      the non-parenthesized relation condition encoded by
+      [abbrev_combined_relation] ([= neg, relation_condition, logop, flatop]).
+
+      The result is an expression without any abbreviated combined relation
+      condition: {i [relation_condition] [logop] abbrev-combined-conditions} (or
+      {i NOT [relation_condition] [logop] abbrev-combined-conditions} if [neg]
+      holds), where [logop] and {i abbrev-combined-conditions} are given via
+      [logop], and [flatop]. *)
+  and expand_abbrev_cond: abbrev_combined_relation -> condition =
+
+    let rec disambiguate ?cond_prefix flatop sr =
+      (* Recursively constructs a valid condition based on the non-parenthesized
+         relational combined condition [flatop], assuming [sr] is the most
+         recent subject and relation operator (when reading from the left of the
+         sentence, canceling out on non-relational conditions).
+
+         If [cond_prefix] is given, places it with a conjunction at the
+         bottom-left of the result, i.e, substitutes the bottom-left node [c]
+         with [Logop (cond_prefix, LAnd, c)]. *)
+      let c, sr = match flatop, sr with
+        | FlatAmbiguous (Some rel, e), Some (subj,   _)
+        | FlatAmbiguous (None,     e), Some (subj, rel) ->
+            UPCAST.simple_cond @@ Relation (subj, rel, e), Some (subj, rel)
+        | FlatAmbiguous (_, e), None ->
+            Expr e, sr
+        | FlatNotExpr e, Some (subj, rel) ->
+            Not (UPCAST.simple_cond @@ Relation (subj, rel, e)), sr
+        | FlatNotExpr e, None ->
+            Not (UPCAST.simple_cond @@ Expr e), sr
+        | FlatRel (neg, (e1, rel, e2)), _ ->
+            neg_cond' neg @@ Relation (e1, rel, e2), Some (e1, rel)
+        | FlatOther c, _ ->
+            expand_every_abbrev_cond c, None
+        | FlatComb (f1, logop, f2), sr ->
+            let c1, sr = disambiguate ?cond_prefix f1 sr in
+            let c2, sr = disambiguate f2 sr in
+            Logop (c1, logop, c2), sr
+      in
+      match flatop, cond_prefix with
+      | FlatComb _, _ | _, None -> c, sr
+      | _, Some c0 -> Logop (c0, LAnd, c), sr
+    in
+
+    fun (neg, (e1, relop, e2), logop, flatop) ->
+      let c0 = neg_cond' neg @@ Relation (e1, relop, e2) in
+      match logop with
+      | LOr -> Logop (c0, LOr, fst @@ disambiguate flatop (Some (e1, relop)))
+      | LAnd -> fst @@ disambiguate ~cond_prefix:c0 flatop (Some (e1, relop))
+
+end
