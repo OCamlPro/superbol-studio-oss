@@ -15,27 +15,28 @@ open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
 open Cobol_parser.Grammar_tokens
 
-type semantic_token = {
-  line: int;
-  start: int;
-  length: int;
-  token_type: string;
-  token_modifiers: string list;
-}
-
-let tokens_types = [
-  "type";
-  "operator";
-  "variable";
-  "function";
-  "parameter";
-  "keyword";
-  "string";
-  "number";
-  "namespace";
-  "decorator";
-  "modifier";
-  "comment";
+module TOKTYP = struct
+  type t = { index: int; name: string }
+  let all: t list ref = ref []
+  let mk: string -> t =
+    let idx = ref 0 in
+    fun name ->
+      let res = { index = !idx; name } in
+      incr idx;
+      all := res :: !all;
+      res
+  let type_     = mk "type"
+  let operator  = mk "operator"
+  let variable  = mk "variable"
+  let function_ = mk "function"
+  let parameter = mk "parameter"
+  let keyword   = mk "keyword"
+  let string    = mk "string"
+  let number    = mk "number"
+  let namespace = mk "namespace"
+  let decorator = mk "decorator"
+  (* let modifier  = mk "modifier" *)
+  (* let comment   = mk "comment" *)
   (* "class"; *)
   (* "enum"; *)
   (* "interface"; *)
@@ -47,29 +48,63 @@ let tokens_types = [
   (* "method"; *)
   (* "macro"; *)
   (* "regexp"; *)
-]
+  let all =
+    List.sort (fun a b -> b.index - a.index) !all |>
+    List.rev_map (fun a -> a.name)
+end
 
-let tokens_modifiers = [
-  "declaration";
-  "definition";
-  "readonly";
-  "modification";
-  "defaultLibrary";
-(*"static";
-  "deprecated";
-  "abstract";
-  "async";
-  "documentation";*)
-]
+module TOKMOD = struct
+  type t = { mask: int; name: string }
+  let all: t list ref = ref []
+  let mk: string -> t =
+    let mask = ref 0b1 in
+    fun name ->
+      let res = { mask = !mask; name } in
+      mask := !mask lsl 1;
+      all := res :: !all;
+      res
+  let declaration    = mk "declaration"
+  let definition     = mk "definition"
+  let readonly       = mk "readonly"
+  let modification   = mk "modification"
+  let defaultLibrary = mk "defaultLibrary"
+  (*"static";
+    "deprecated";
+    "abstract";
+    "async";
+    "documentation";*)
+  let all =
+    List.sort (fun a b -> b.mask - a.mask) !all |>
+    List.rev_map (fun a -> a.name)
+  type set = { flags: int }
+  let none = { flags = 0b0 }
+  let one { mask; _ } = { flags = mask }
+  let union: t list -> set =
+    List.fold_left (fun set m -> { flags = set.flags lor m.mask }) none
+end
 
-let semantic_token lexloc token_type token_modifiers =
+type token_type = TOKTYP.t
+type token_modifiers = TOKMOD.set
+
+let token_types = TOKTYP.all
+let token_modifiers = TOKMOD.all
+
+type semtok = {
+  line: int;
+  start: int;
+  length: int;
+  toktyp: token_type;
+  tokmods: token_modifiers;
+}
+
+let semtok lexloc ?(tokmods = TOKMOD.none) toktyp =
   let range = Lsp_position.range_of_lexloc lexloc in
   let line = range.start.line in
   let start = range.start.character in
   let length = range.end_.character - start in
-  { line; start; length; token_type; token_modifiers }
+  { line; start; length; toktyp; tokmods }
 
-type token_type =
+type token_category =
   | ProgramName
   | ParagraphName
   | ProcName
@@ -89,53 +124,53 @@ let semantic_visitor ~filename =
   let open Cobol_ast.Operands_visitor in
   let open Cobol_common.Visitor in
 
-  let semantic_token_of lexloc token_type =
-    let semantic_token_of lexloc (token_type, token_modifiers) =
-      semantic_token lexloc token_type token_modifiers
+  let semtok_of lexloc category =
+    let semtok_of lexloc (toktyp, tokmods) =
+      semtok lexloc toktyp ~tokmods
     in
-    semantic_token_of lexloc @@ match token_type with
-      | ProgramName -> "string", ["definition"; "readonly"]
-      | ParagraphName -> "function", ["definition"]
-      | ProcName -> "function", []
-      | Parameter -> "parameter", []
-      | DataDecl -> "variable", ["declaration"]
-      | DataLevel -> "decorator", []
-      | Var -> "variable", []
-      | VarModif -> "variable", ["modification"]
-      | ReportName
-      | ExceptionName
-      | MnemonicName
-      | FileName -> "variable", ["readonly"]
+    semtok_of lexloc @@ match category with
+    | ProgramName -> TOKTYP.string, TOKMOD.(union [definition; readonly])
+    | ParagraphName -> TOKTYP.function_, TOKMOD.(one definition)
+    | ProcName -> TOKTYP.function_, TOKMOD.none
+    | Parameter -> TOKTYP.parameter, TOKMOD.none
+    | DataDecl -> TOKTYP.variable, TOKMOD.(one declaration)
+    | DataLevel -> TOKTYP.decorator, TOKMOD.none
+    | Var -> TOKTYP.variable, TOKMOD.none
+    | VarModif -> TOKTYP.variable, TOKMOD.(one modification)
+    | ReportName
+    | ExceptionName
+    | MnemonicName
+    | FileName -> TOKTYP.variable, TOKMOD.(one readonly)
   in
-  let add_name' name token_type acc =
+  let add_name' name toktyp acc =
     match Srcloc.lexloc_in ~filename ~@name with
-    | lexloc -> List.cons (semantic_token_of lexloc token_type) acc
+    | lexloc -> List.cons (semtok_of lexloc toktyp) acc
     | exception Invalid_argument _ -> acc
   in
-  let rec add_qualname (qn:Cobol_ast.qualname) token_type acc =
+  let rec add_qualname (qn:Cobol_ast.qualname) toktyp acc =
     match qn with
     | Name name ->
-        add_name' name token_type acc
+        add_name' name toktyp acc
     | Qual (name, qn) ->
-        add_name' name token_type acc |> add_qualname qn token_type
+        add_name' name toktyp acc |> add_qualname qn toktyp
   in
-  let add_ident (id:Cobol_ast.ident) token_type acc =
+  let add_ident (id:Cobol_ast.ident) toktyp acc =
     match id with
-    | QualIdent {ident_name; _} -> add_qualname ident_name token_type acc
+    | QualIdent {ident_name; _} -> add_qualname ident_name toktyp acc
     | _ -> acc (* TODO *)
   in
   let add_ident' id = add_ident ~&id in
-  let add_list add_fun l token_type acc =
-    List.fold_left (fun acc n -> add_fun n token_type acc) acc l
+  let add_list add_fun l toktyp acc =
+    List.fold_left (fun acc n -> add_fun n toktyp acc) acc l
   in
-  let add_option add_fun v token_type acc =
+  let add_option add_fun v toktyp acc =
     match v with
     | None -> acc
-    | Some v -> add_fun v token_type acc
+    | Some v -> add_fun v toktyp acc
   in
 
   Cobol_parser.PTree_visitor.fold_compilation_group (object (self)
-    inherit [semantic_token List.t] Cobol_parser.PTree_visitor.folder
+    inherit [semtok List.t] Cobol_parser.PTree_visitor.folder
 
     (* program-name *)
     method! fold_program_unit {program_name; _} acc = acc
@@ -522,22 +557,23 @@ let make_non_ambigious ~filename tokens = tokens |>
        match token with
        | WORD _ | WORD_IN_AREA_A _ -> None
        | ALPHANUM _ | ALPHANUM_PREFIX _ ->
-          Some (semantic_token lexloc "string" [])
+           Some (semtok lexloc TOKTYP.string)
        | BOOLIT _
        | HEXLIT _ | NULLIT _
        | NATLIT _ | SINTLIT _
        | FIXEDLIT _ | FLOATLIT _
        | DIGITS _
        | EIGHTY_EIGHT ->
-          Some (semantic_token lexloc "number" [])
+           Some (semtok lexloc TOKTYP.number)
        | PICTURE_STRING _ ->
-          Some (semantic_token lexloc "type" ["declaration"])
+           Some (semtok lexloc TOKTYP.type_
+                   ~tokmods:TOKMOD.(one declaration))
        (* | EQUAL | PLUS | MINUS  *)
        | AMPERSAND | ASTERISK | COLON | DASH_SIGN | DOUBLE_ASTERISK | DOUBLE_COLON
        | EQ | GE | GT | LE | LPAR | LT | NE | PLUS_SIGN | RPAR | SLASH ->
-          Some (semantic_token lexloc "operator" [])
+           Some (semtok lexloc TOKTYP.operator)
        | PARAGRAPH | STATEMENT | PROGRAM |SECTION | DIVISION ->
-          Some (semantic_token lexloc "namespace" [])
+           Some (semtok lexloc TOKTYP.namespace)
        | ACCEPT | ACCESS | ADD | ALLOCATE | ALTER | APPLY | ARE | ASSIGN | CALL | CANCEL | CHAIN | CLOSE
        | COMMIT | COMPUTE | CONTINUE | CONTROL | CONTROLS | COPY | COPY_SELECTION | COUNT | CYCLE
        | DELETE | DESTROY | DISABLE | DISP | DISPLAY | DISPLAY_1 | DISPLAY_COLUMNS | DISPLAY_FORMAT
@@ -553,69 +589,35 @@ let make_non_ambigious ~filename tokens = tokens |>
        | END_ACCEPT | END_ADD | END_CALL | END_COMPUTE | END_DELETE | END_DISPLAY | END_DIVIDE | END_EVALUATE
        | END_IF | END_MULTIPLY | END_PERFORM | END_READ | END_RETURN | END_REWRITE | END_SEARCH | END_START
        | END_STRING | END_SUBTRACT | END_UNSTRING | END_WRITE ->
-          Some (semantic_token lexloc "function" ["defaultLibrary";])
+           Some (semtok lexloc TOKTYP.function_
+                   ~tokmods:TOKMOD.(one defaultLibrary))
        | _ ->
-          Some (semantic_token lexloc "keyword" []))
+           Some (semtok lexloc TOKTYP.keyword))
 
-let semantic_tbl = Hashtbl.create 16
-let () = List.iteri (fun i elt -> Hashtbl.add semantic_tbl elt i) tokens_types
-let index i = Hashtbl.find semantic_tbl i
-
-let tokens_modifiers_bit_flag = Hashtbl.create 8
-let () =
-  List.iteri (fun i v ->
-    Hashtbl.add tokens_modifiers_bit_flag
-    v (0b1 lsl i))
-  tokens_modifiers
-
-let token_modifiers_flag modifiers =
-  List.fold_left
-    (fun acc modifier ->
-       let modifier_flag = Hashtbl.find tokens_modifiers_bit_flag modifier  in
-       acc lor modifier_flag)
-    0b0
-    modifiers
-
-let data_of_semantic_token semantic_token =
-  let data = Array.make 5 0 in
-  data.(0) <- semantic_token.line;
-  data.(1) <- semantic_token.start;
-  data.(2) <- semantic_token.length;
-  data.(3) <- index semantic_token.token_type;
-  data.(4) <- token_modifiers_flag semantic_token.token_modifiers;
-  data
-
-let data_of_semantic_tokens semantic_tokens =
-  let data = Array.make (5 * List.length semantic_tokens) 0 in
-  ignore @@ List.fold_left
-    (fun (idx, last_line, last_start) semantic_token ->
-       let token_data = data_of_semantic_token semantic_token in
-       let delta_line = token_data.(0) - last_line in
-       let delta_start = if delta_line = 0 then
-           token_data.(1) - last_start
-         else
-           token_data.(1)
-       in
-       data.(5 * idx) <- delta_line;
-       data.(5 * idx + 1) <- delta_start;
-       data.(5 * idx + 2) <- token_data.(2);
-       data.(5 * idx + 3) <- token_data.(3);
-       data.(5 * idx + 4) <- token_data.(4);
-       (idx + 1, semantic_token.line, semantic_token.start))
-    (0, 0, 0)
-    semantic_tokens;
-  data
-
-let sort_semantic_token first second = (* TODO: use Lexing.position, and then a
-                                          comparison on `pos_cnum` only? *)
+let compare_semtoks first second =      (* TODO: use Lexing.position, and then a
+                                           comparison on `pos_cnum` only? *)
   let cmp = Stdlib.compare first.line second.line in
   if cmp = 0
   then Stdlib.compare first.start second.start
   else cmp
 
+let relative_semtoks semtoks =
+  let semtoks = Array.of_list semtoks in
+  Array.fast_sort compare_semtoks semtoks;
+  let data = Array.make (5 * Array.length semtoks) 0 in
+  ignore @@ Array.fold_left begin fun (i, prev_line, prev_start) semtok ->
+    data.(5 * i + 0) <- semtok.line - prev_line;
+    data.(5 * i + 1) <- semtok.start -
+                        if semtok.line = prev_line then prev_start else 0;
+    data.(5 * i + 2) <- semtok.length;
+    data.(5 * i + 3) <- semtok.toktyp.index;
+    data.(5 * i + 4) <- semtok.tokmods.flags;
+    (succ i, semtok.line, semtok.start)
+  end (0, 0, 0) semtoks;
+  data
+
 let data ~filename tokens ptree : int array =
   tokens
   |> make_non_ambigious ~filename
   |> semantic_visitor ~filename ptree
-  |> List.fast_sort sort_semantic_token
-  |> data_of_semantic_tokens
+  |> relative_semtoks

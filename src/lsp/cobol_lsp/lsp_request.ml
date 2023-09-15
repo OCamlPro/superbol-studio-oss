@@ -64,19 +64,20 @@ let make_capabilities _ =
     TextDocumentSyncOptions.create ()
       ~openClose:true
       ~change:Incremental
-  in
-  let semantic =
-    let full = SemanticTokensOptions.create_full ~delta:false () in
-    let legend = SemanticTokensLegend.create
-        ~tokenTypes:Lsp_semantic.tokens_types
-        ~tokenModifiers:Lsp_semantic.tokens_modifiers
+  and semantic =
+    let legend =
+      SemanticTokensLegend.create
+        ~tokenTypes:Lsp_semtoks.token_types
+        ~tokenModifiers:Lsp_semtoks.token_modifiers
     in
     SemanticTokensOptions.create ()
-      ~full:(`Full full) ~legend
+      ~full:(`Full (SemanticTokensOptions.create_full ~delta:false ()))
+      ~legend
+  and hover =
+    HoverOptions.create ()
+  and completion_option =
+    CompletionOptions.create ()
   in
-  let hover = HoverOptions.create () in
-  let completion_option = CompletionOptions.create () in
-
   ServerCapabilities.create ()
     ~textDocumentSync:(`TextDocumentSyncOptions sync)
     ~definitionProvider:(`Bool true)
@@ -227,7 +228,7 @@ let handle_semantic_tokens_full registry (params: SemanticTokensParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~project:_ ~textdoc:_ ~pplog:_ ~tokens Lsp_document.{ ast; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
-      let data = Lsp_semantic.data ~filename (Lazy.force tokens) ast in
+      let data = Lsp_semtoks.data ~filename (Lazy.force tokens) ast in
       Some (SemanticTokens.create ~data ())
     end
 
@@ -301,8 +302,8 @@ let on_request
     | TextDocumentFormatting params ->
         begin try Ok (handle_formatting registry params, state)
         with Failure msg -> Error (FormattingError msg) end
-    | SemanticTokensFull semantic_params ->
-        Ok (handle_semantic_tokens_full registry semantic_params, state)
+    | SemanticTokensFull params ->
+        Ok (handle_semantic_tokens_full registry params, state)
     | TextDocumentHover hover_params ->
         Ok (handle_hover registry hover_params, state)
     | TextDocumentCompletion completion_params ->
