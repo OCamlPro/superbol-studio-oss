@@ -59,6 +59,7 @@ class ['a] folder = object
   method fold_class: (class_, 'a) fold = default
   method fold_cond: 'k. ('k cond, 'a) fold = default
   method fold_simple_cond: (simple_condition, 'a) fold = default
+  method fold_flat_combined_relation: (flat_combined_relation, 'a) fold = default
   method fold_logop: (logop, 'a) fold = default
   method fold_relop: (relop, 'a) fold = default
   method fold_rounding_mode: (rounding_mode, 'a) fold = default
@@ -306,7 +307,8 @@ let fold_class (v: _ #folder) =
 let rec fold_cond: type k. _ #folder -> k cond -> _ = fun v ->
   handle v#fold_cond
     ~continue:begin fun (c: k cond) x -> match c with
-      | Expr _ | Omitted _ | Relation _ | ClassCond _ | SignCond _ as c -> x
+      | Expr _ | Omitted _ | Relation _
+      | Abbrev _ | ClassCond _ | SignCond _ as c -> x
           >> fold_simple_cond v c
       | Not c -> x
           >> fold_cond v c
@@ -321,16 +323,42 @@ and fold_simple_cond (v: _ #folder) =
     ~continue:begin fun c x -> match c with
       | Expr e | Omitted e -> x
           >> fold_expr v e
-      | Relation (e, r, f) -> x
-          >> fold_expr v e
-          >> fold_relop v r
-          >> fold_expr v f
+      | Relation rel -> x
+          >> fold_binary_relation v rel
+      | Abbrev (_n, rel, o, comb) -> x
+          >> fold_binary_relation v rel
+          >> fold_logop v o
+          >> fold_flat_combined_relation v comb
       | ClassCond (e, c) -> x
           >> fold_expr v e
           >> fold_class v c
       | SignCond (e, s) -> x
           >> fold_expr v e
           >> fold_signz v s
+    end
+
+and fold_binary_relation (v: _ #folder) (e, r, f) x = x
+  >> fold_expr v e
+  >> fold_relop v r
+  >> fold_expr v f
+
+and fold_flat_combined_relation (v: _ #folder) =
+  handle v#fold_flat_combined_relation
+    ~continue:begin fun c x -> match c with
+      | FlatAmbiguous (r, e) -> x
+          >> fold_option ~fold:fold_relop v r
+          >> fold_expr v e
+      | FlatNotExpr e -> x
+          >> fold_expr v e
+      | FlatRel (neg, rel) -> x
+          >> fold_bool v neg
+          >> fold_binary_relation v rel
+      | FlatOther c -> x
+          >> fold_cond v c
+      | FlatComb (c1, o, c2) -> x
+          >> fold_flat_combined_relation v c1
+          >> fold_logop v o
+          >> fold_flat_combined_relation v c2
     end
 
 let fold_expression = fold_expr                                      (* alias *)
