@@ -241,6 +241,7 @@
    (ocaml (>= 4.14.0))
    (pretty (= version))
    (ppx_deriving ( >= 5.2.1 ))
+   (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    ppx_inline_test
    ppx_expect
    odoc

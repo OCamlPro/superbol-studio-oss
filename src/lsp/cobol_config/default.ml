@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 (** Module containing all the default options *)
-open Cobol_common.Basics
+open EzCompat
 
 let not_reserved =
   ["TERMINAL"; "EXAMINE"]

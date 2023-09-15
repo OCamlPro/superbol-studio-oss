@@ -15,8 +15,8 @@
 
 open Cobol_ast
 open Cobol_common.Srcloc.INFIX
+module CharSet = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
-module StrMap = Cobol_common.Basics.StrMap
 module Visitor = Cobol_common.Visitor
 module PTree_visitor = Cobol_parser.PTree_visitor
 module CU = Cobol_data.Compilation_unit
@@ -64,7 +64,7 @@ struct
         | CurrencySign { picture_symbol = Some (Alphanum s | National s); _ } ->
             Visitor.skip @@
             { env with
-              currency_signs = Cobol_data.CharSet.add s.[0] env.currency_signs }
+              currency_signs = CharSet.add s.[0] env.currency_signs }
         | _ ->                       (* TODO: other clauses? *)
             Visitor.proceed env     (* may report unfinished visitor warnings *)
     end in
@@ -74,8 +74,8 @@ struct
           env_div base_env
       in
       (* Currency sign defaults to '$' *)
-      if Cobol_data.CharSet.is_empty env.currency_signs
-      then { env with currency_signs = Cobol_data.CharSet.singleton '$' }
+      if CharSet.is_empty env.currency_signs
+      then { env with currency_signs = CharSet.singleton '$' }
       else env
 
   let try_making_env_of_compilation_unit,

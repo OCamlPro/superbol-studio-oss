@@ -13,7 +13,8 @@
 
 open Types
 open Options
-open Cobol_common.Basics
+
+open EzCompat
 
 module Make
     (Diags: Cobol_common.Diagnostics.STATEFUL)

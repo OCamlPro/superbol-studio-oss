@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
+
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
@@ -105,12 +107,12 @@ module Make (Words: module type of Text_keywords) = struct
     Hashtbl.add token_of_keyword kwd token_handle
 
   let silenced_keywords =
-    Cobol_common.Basics.Strings.of_list Words.silenced_keywords
+    StringSet.of_list Words.silenced_keywords
 
   let reserve_words: Cobol_config.words_spec -> unit =
     let on_token_handle_of kwd descr ~f =
       try f @@ handle_of_keyword kwd with
-      | Not_found when Cobol_common.Basics.Strings.mem kwd silenced_keywords ->
+      | Not_found when StringSet.mem kwd silenced_keywords ->
           ()                                        (* Ignore silently? Warn? *)
       | Not_found ->
           Pretty.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
