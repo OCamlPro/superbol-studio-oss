@@ -560,7 +560,7 @@ let semtoks_of_comments ~filename comments = comments |>
   end
 
 let semtoks_of_preproc_statements ~filename pplog =
-  List.fold_left begin fun acc -> function
+  List.rev @@ List.fold_left begin fun acc -> function
     | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
     | Cobol_preproc.Trace.Replace { replloc = loc } ->
         List.rev_map (semtok TOKTYP.macro)

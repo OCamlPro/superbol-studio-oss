@@ -40,6 +40,7 @@ module INFIX: sig
 end
 
 val pp_srcloc: srcloc Pretty.printer
+val pp_srcloc_struct: srcloc Pretty.printer
 val pp_file_loc: srcloc Pretty.printer
 val raw
   : ?in_area_a:bool
@@ -94,9 +95,6 @@ val in_area_a: srcloc -> bool
 val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *)
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
-
-(* val fold_lexlocs: (lexloc -> 'a -> 'a) -> srcloc -> 'a -> 'a *)
-(* val has_lexloc: (lexloc -> bool) -> srcloc -> bool *)
 
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
