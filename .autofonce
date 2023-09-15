@@ -1,0 +1,45 @@
+[project]
+# name to use to infer config
+name = "superbol-studio-oss"
+
+# files used to locate the project top directory
+#   and to set the AUTOFONCE_SOURCE_DIR
+source_anchors = [ "import/gnucobol/tests/testsuite.at", "!" ]
+
+# files used to locate the project build directory
+#   where the _autofonce/ directory will be created
+#   and to set the AUTOFONCE_BUILD_DIR
+#   use "!" to trigger an error if build dir is mandatory
+build_anchors = [ "default" ]
+
+# paths in project sources that are good candidates to
+#   be tested as build dirs. Useful to run autofonce
+#   from outside the build directory
+build_dir_candidates = [ "_build" ]
+
+# where the _autofonce/ dir should be created:
+#   * 'build': in the build directory
+#   * 'source': in the source directory
+#   * 'config': in the directory of the config file
+run_from = "build"
+
+[testsuites]
+# alias = "path-from-topdir"
+[testsuites.testsuite]
+file = "import/gnucobol/tests/testsuite.at"
+path = [ "import/gnucobol/tests/testsuite.src"]
+env = "testsuite"
+
+[envs]
+# env_name = """..."""
+# env_name = "<local-path-to-env-file"
+testsuite = """
+export COMPILE_ONLY="$AUTOFONCE_BUILD_DIR/default/src/superbol/main.exe x-parse file"
+export COB_CONFIG_DIR="$AUTOFONCE_SOURCE_DIR/import/gnucobol/config"
+"""
+
+[project]
+# files to be captured into results.log
+#   in case of test failure.
+captured_files = [  ]
+

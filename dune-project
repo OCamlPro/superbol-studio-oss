@@ -288,6 +288,7 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    (cobol_ast (= version))
+   (autofonce_lib ( >= 0.8 ))
    (menhir ( = 20230415 ))
    ppx_inline_test
    ppx_expect

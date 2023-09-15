@@ -1,0 +1,4 @@
+(tests
+  (names test_qualified_map)
+  (modules test_qualified_map)
+  (libraries alcotest cobol_data))
