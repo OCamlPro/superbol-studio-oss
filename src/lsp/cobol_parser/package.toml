@@ -65,7 +65,7 @@ version = ">=1.2"
 
 # package tools dependencies
 [tools]
-menhir = "=20220210"
+menhir = "=20230415"
 
 # package fields (depends on package skeleton)
 #Examples:

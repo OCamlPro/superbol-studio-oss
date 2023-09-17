@@ -262,7 +262,7 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    (cobol_ast (= version))
-   (menhir ( = 20220210 ))
+   (menhir ( = 20230415 ))
    ppx_inline_test
    ppx_expect
    odoc
