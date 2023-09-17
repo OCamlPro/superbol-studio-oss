@@ -27,3 +27,13 @@ compile-release:
                 --sourcemap \
                 --sources-content=false
 
+.PHONY: opam-cross
+
+opam-cross:
+	drom dep --cross osx
+	rm -f opam/osx/*vscode*.opam
+	rm -f opam/osx/*-js-*.opam
+	drom dep --cross windows
+	rm -f opam/windows/*vscode*.opam
+	rm -f opam/windows/*-js-*.opam
+
