@@ -19,43 +19,59 @@ open Srcloc.TYPES
 open Lsp.Types
 
 (** Range of length [0], at position [0, 0] *)
-let none_range =
-  let none_pos = Position.create ~line:0 ~character:0 in
-  Range.create ~start:none_pos ~end_:none_pos
+let pointwise_range_at_start =
+  let start_pos = Position.create ~line:0 ~character:0 in
+  Range.create ~start:start_pos ~end_:start_pos
 
 (** {1 Postions {i w.r.t} lexical locations} *)
 
+(** [start_of_lexloc] creates a representation of the start of the given lexical
+    location that is suitable for the LSP library. *)
+let start_of_lexloc ((start_pos, _end_pos): lexloc) =
+  Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
+    ~line:(start_pos.pos_lnum - 1)
+    ~character:(start_pos.pos_cnum - start_pos.pos_bol)
+
+(** [end_of_lexloc] creates a representation of the end of the given lexical
+    location that is suitable for the LSP library. *)
+let end_of_lexloc ((_start_pos, end_pos): lexloc) =
+  Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
+    ~line:(end_pos.pos_lnum - 1)
+    ~character:(end_pos.pos_cnum - end_pos.pos_bol)
+
 (** [range_of_lexloc] creates a representation of the given lexical location
     that is suitable for the LSP library. *)
-let range_of_lexloc ((start_pos, end_pos): lexloc) =
-  (* NOTE: Line numbers start at 0 in LSP protocol. *)
-  let sl = start_pos.pos_lnum - 1
-  and sc = start_pos.pos_cnum - start_pos.pos_bol
-  and el = end_pos.pos_lnum - 1
-  and ec = end_pos.pos_cnum - end_pos.pos_bol in
-  Range.create
-    ~start:(Position.create ~line:sl ~character:sc)
-    ~end_:(Position.create ~line:el ~character:ec)
+let range_of_lexloc lexloc =
+  Range.create ~start:(start_of_lexloc lexloc) ~end_:(end_of_lexloc lexloc)
 
-(** [is_before_lexloc pos lexloc] holds when [pos] is strictly before [lexloc] *)
-let is_before_lexloc pos lexloc =
-  let Range.{start = {line; character;}; _} = range_of_lexloc lexloc in
-  Position.(pos.line < line || (pos.line = line && pos.character < character))
+(** [is_before_lexloc pos lexloc] holds when [pos] strictly precedes [lexloc] *)
+let is_before_lexloc (pos: Position.t) lexloc =
+  let Position.{ line; character } = start_of_lexloc lexloc in
+  pos.line < line ||
+  pos.line = line && pos.character < character
 
-(** [is_after_lexloc pos lexloc] holds when [pos] is strictly after [lexloc] *)
-let is_after_lexloc pos lexloc =
-  let Range.{end_ = {line; character;}; _} = range_of_lexloc lexloc in
-  Position.(pos.line > line || (pos.line = line && pos.character > character))
+(** [is_after_lexloc pos lexloc] holds when [pos] strictly follows [lexloc] *)
+let is_after_lexloc (pos: Position.t) lexloc =
+  let Position.{ line; character } = end_of_lexloc lexloc in
+  pos.line > line ||
+  pos.line = line && pos.character > character
 
-(** [is_in_lexloc pos lexloc] holds when [pos] is neither before or after
-    [lexloc] *)
+(** [is_in_lexloc pos lexloc] holds when [pos] is strictly neither before nor
+    after [lexloc] *)
 let is_in_lexloc pos lexloc =
-  (not @@ is_after_lexloc pos lexloc) && (not @@ is_before_lexloc pos lexloc)
+  not (is_before_lexloc pos lexloc || is_after_lexloc pos lexloc)
 
-(** [contains_lexloc range lexloc] holds when [lexloc] is strictly contained
-    inside [range]. *)
-let contains_lexloc Range.{start; end_} lexloc =
+(** [contains_lexloc range lexloc] holds when the range described by [lexloc] is
+    strictly contained within [range]. *)
+let contains_lexloc Range.{ start; end_ } lexloc =
   is_before_lexloc start lexloc && is_after_lexloc end_ lexloc
+
+(** [intersects_lexloc range lexloc] holds when the range described by [lexloc]
+    and [range] have a non-empty intersection. *)
+let intersects_lexloc (Range.{ start; end_ } as range) lexloc =
+  is_in_lexloc start lexloc ||
+  is_in_lexloc end_ lexloc ||
+  contains_lexloc range lexloc
 
 (* --- *)
 

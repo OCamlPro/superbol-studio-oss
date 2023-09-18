@@ -79,12 +79,12 @@ let try_with_document_data ~f =
 
    NOTE: For now we don't use them because we don't have any special
    response. *)
-let make_capabilities _ =
+let make_capabilities (_: ClientCapabilities.t) =
   let sync =
     TextDocumentSyncOptions.create ()
       ~openClose:true
       ~change:Incremental
-  and semantic =
+  and semtoks =
     let legend =
       SemanticTokensLegend.create
         ~tokenTypes:Lsp_semtoks.token_types
@@ -92,6 +92,7 @@ let make_capabilities _ =
     in
     SemanticTokensOptions.create ()
       ~full:(`Full (SemanticTokensOptions.create_full ~delta:false ()))
+      ~range:true
       ~legend
   and hover =
     HoverOptions.create ()
@@ -104,7 +105,7 @@ let make_capabilities _ =
     ~referencesProvider:(`Bool true)
     ~documentRangeFormattingProvider: (`Bool true)
     ~documentFormattingProvider: (`Bool true)
-    ~semanticTokensProvider:(`SemanticTokensOptions semantic)
+    ~semanticTokensProvider:(`SemanticTokensOptions semtoks)
     ~hoverProvider:(`HoverOptions hover)
     ~completionProvider:(completion_option)
 
@@ -245,17 +246,23 @@ let handle_formatting registry params =
   with Failure msg ->
     internal_error "Formatting error: %s" msg
 
-let handle_semantic_tokens_full registry (params: SemanticTokensParams.t) =
-  try_with_document_data registry params.textDocument
-    ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments };
-                        _ } Lsp_document.{ ast; _ } ->
-      let filename = Lsp.Uri.to_path params.textDocument.uri in
-      let data =
-        Lsp_semtoks.data ~filename ~pplog ~comments
-          ~tokens:(Lazy.force tokens) ~ptree:ast
-      in
-      Some (SemanticTokens.create ~data ())
-    end
+let handle_semtoks_full,
+    handle_semtoks_range =
+  let handle registry ?range (doc: TextDocumentIdentifier.t) =
+    try_with_document_data registry doc
+      ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments };
+                          _ } Lsp_document.{ ast; _ } ->
+        let data =
+          Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
+            ~pplog ~comments ~tokens:(Lazy.force tokens) ~ptree:ast
+        in
+        Some (SemanticTokens.create ~data ())
+      end
+  in
+  (fun registry (SemanticTokensParams.{ textDocument; _ }) ->
+     handle registry textDocument),
+  (fun registry (SemanticTokensRangeParams.{ textDocument; range; _ }) ->
+     handle registry ~range textDocument)
 
 let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
@@ -335,7 +342,9 @@ let on_request
     | TextDocumentFormatting params ->
         Ok (handle_formatting registry params, state)
     | SemanticTokensFull params ->
-        Ok (handle_semantic_tokens_full registry params, state)
+        Ok (handle_semtoks_full registry params, state)
+    | SemanticTokensRange params ->
+        Ok (handle_semtoks_range registry params, state)
     | TextDocumentHover hover_params ->
         Ok (handle_hover registry hover_params, state)
     | TextDocumentCompletion completion_params ->
@@ -370,7 +379,6 @@ let on_request
     | SelectionRange  (* SelectionRangeParams.t.t *) _
     | ExecuteCommand  (* ExecuteCommandParams.t.t *) _
     | SemanticTokensDelta  (* SemanticTokensDeltaParams.t.t *) _
-    | SemanticTokensRange  (* SemanticTokensRangeParams.t.t *) _
     | LinkedEditingRange  (* LinkedEditingRangeParams.t.t *) _
     | CallHierarchyIncomingCalls  (* CallHierarchyIncomingCallsParams.t.t *) _
     | CallHierarchyOutgoingCalls  (* CallHierarchyOutgoingCallsParams.t.t *) _

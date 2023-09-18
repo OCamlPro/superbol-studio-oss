@@ -18,6 +18,7 @@ val token_modifiers: string list
    to lsp>=16, and avoid having to use an array below. *)
 val data
   : filename: string
+  -> range: Lsp.Types.Range.t option
   -> tokens: Cobol_parser.tokens_with_locs
   -> pplog: Cobol_preproc.log
   -> comments: Cobol_preproc.comments

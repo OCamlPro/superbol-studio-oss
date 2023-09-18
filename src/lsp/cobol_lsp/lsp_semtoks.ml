@@ -107,6 +107,12 @@ let semtok ?(tokmods = TOKMOD.none) toktyp lexloc =
 let single_line_lexlocs_in ~filename =
   Srcloc.shallow_single_line_lexlocs_in ~ignore_invalid_filename:true ~filename
 
+let acc_semtoks ~filename ?range ?tokmods toktyp loc acc =
+  List.fold_left begin fun acc lexloc -> match range with
+    | Some r when not (Lsp_position.intersects_lexloc r lexloc) -> acc
+    | _ -> semtok toktyp ?tokmods lexloc :: acc
+  end acc @@ single_line_lexlocs_in ~filename loc
+
 type token_category =
   | ProgramName
   | ParagraphName
@@ -127,13 +133,13 @@ type token_category =
    this way, we don't need to worry about the order in which parse-tree elements
    are visited.  If really needed, the accumulator may carry some context
    information that can be used in generic methods like `fold_name'`. *)
-let semtoks_from_ptree ~filename ptree =
+let semtoks_from_ptree ~filename ?range ptree =
   let open Cobol_parser.PTree_visitor in
   let open Cobol_ast.Terms_visitor in
   let open Cobol_ast.Operands_visitor in
   let open Cobol_common.Visitor in
 
-  let semtok_of lexloc category =
+  let acc_semtoks category loc acc =
     let toktyp, tokmods = match category with
       | ProgramName -> TOKTYP.string, TOKMOD.(union [definition; readonly])
       | ParagraphName -> TOKTYP.function_, TOKMOD.(one definition)
@@ -148,12 +154,10 @@ let semtoks_from_ptree ~filename ptree =
       | MnemonicName
       | FileName -> TOKTYP.variable, TOKMOD.(one readonly)
     in
-    semtok ~tokmods toktyp lexloc
+    acc_semtoks ~filename ?range ~tokmods toktyp loc acc
   in
-  let add_name' name toktyp acc =
-    List.rev_map
-      (fun lexloc -> semtok_of lexloc toktyp)
-      (single_line_lexlocs_in ~filename ~@name) @ acc
+  let add_name' name category acc =
+    acc_semtoks category ~@name acc
   in
   let rec add_qualname (qn:Cobol_ast.qualname) toktyp acc =
     match qn with
@@ -550,28 +554,30 @@ let semtoks_from_ptree ~filename ptree =
 
   end) ptree [] |> List.rev
 
-let semtoks_of_comments ~filename comments = comments |>
+let semtoks_of_comments ~filename ?range comments = comments |>
   List.filter_map begin function
     | Cobol_preproc.Text.{ comment_loc = s, _ as lexloc; _ }
-      when s.Lexing.pos_fname = filename ->
+      when s.Lexing.pos_fname = filename &&
+           Option.fold range
+             ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+             ~none:true ->
         Some (semtok TOKTYP.comment lexloc)
     | _ ->
         None
   end
 
-let semtoks_of_preproc_statements ~filename pplog =
+let semtoks_of_preproc_statements ~filename ?range pplog =
   List.rev @@ List.fold_left begin fun acc -> function
     | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
     | Cobol_preproc.Trace.Replace { replloc = loc } ->
-        List.rev_map (semtok TOKTYP.macro)
-          (single_line_lexlocs_in ~filename loc) @ acc
+        acc_semtoks ~filename ?range TOKTYP.macro loc acc
     | Cobol_preproc.Trace.Replacement _ ->
         acc
   end [] (Cobol_preproc.Trace.events pplog)
 
 (** [semtoks_of_non_ambigious_tokens ~filename tokens] returns tokens that do
     not need to have more analyzing to get their type. *)
-let semtoks_of_non_ambigious_tokens ~filename tokens =
+let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
   List.rev @@ List.fold_left begin fun acc { payload = token; loc } ->
     let semtok_infos = match token with
       | WORD _ | WORD_IN_AREA_A _ -> None
@@ -612,10 +618,10 @@ let semtoks_of_non_ambigious_tokens ~filename tokens =
           Some (TOKTYP.keyword, TOKMOD.none)
     in
     match semtok_infos with
-    | None -> acc
+    | None ->
+        acc
     | Some (toktyp, tokmods) ->
-        List.rev_map (semtok toktyp ~tokmods)
-          (single_line_lexlocs_in ~filename loc) @ acc
+        acc_semtoks ~filename ?range ~tokmods toktyp loc acc
   end [] tokens
 
 let compare_semtoks first second =
@@ -657,11 +663,11 @@ let ensure_sorted name ~filename cmp l =
       List.fast_sort cmp l
 
 
-let data ~filename ~tokens ~pplog ~comments ~ptree : int array =
-  let semtoks1 = semtoks_of_non_ambigious_tokens ~filename tokens in
-  let semtoks2 = semtoks_from_ptree              ~filename ptree in
-  let semtoks3 = semtoks_of_comments             ~filename comments in
-  let semtoks4 = semtoks_of_preproc_statements   ~filename pplog in
+let data ~filename ~range ~tokens ~pplog ~comments ~ptree : int array =
+  let semtoks1 = semtoks_of_non_ambigious_tokens ~filename ?range tokens in
+  let semtoks2 = semtoks_from_ptree              ~filename ?range ptree in
+  let semtoks3 = semtoks_of_comments             ~filename ?range comments in
+  let semtoks4 = semtoks_of_preproc_statements   ~filename ?range pplog in
   (* NB: In *principle* all those lists are already sorted w.r.t lexical
      locations in [filename].  We just check that for now and raise a warning,
      in case. *)
