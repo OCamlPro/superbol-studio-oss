@@ -1,9 +1,14 @@
+# -*- Makefile -*-
 PROJECT=superbol_vscode_platform
 SRCDIR=src/vscode/superbol-vscode-platform
+CP ?= cp -f
 
-compile:
-	opam exec -- dune build
-	cp -f _build/default/src/vscode/vscode-package-json/main.exe vscode-package-json
+all: superbol-free
+superbol-free: build
+	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
+
+compile: build
+	$(CP) _build/default/src/vscode/vscode-package-json/main.exe vscode-package-json
 	yarn esbuild _build/default/$(SRCDIR)/$(PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
@@ -27,9 +32,13 @@ compile-release:
                 --sourcemap \
                 --sources-content=false
 
+.PHONY: clean-execs
+distclean: clean-execs
+clean-execs:
+	rm -f superbol-free vscode-package-json
+
 .PHONY: opam-cross
 
 opam-cross:
 	drom dep --cross osx
 	drom dep --cross windows
-
