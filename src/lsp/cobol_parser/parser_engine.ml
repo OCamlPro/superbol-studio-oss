@@ -50,18 +50,20 @@ module Make (Config: Cobol_config.T) = struct
       prev_limit': Cobol_preproc.Src_overlay.limit option;  (* second-to-last *)
       preproc: 'm preproc;
     }
+
+  (** Part of the parser state that typically changes on a sentence-by-sentence
+      basis (mostly the pre-processor and tokenizer's states). *)
   and 'm preproc =
-    (** state that typically change on a sentence-by-sentence basis (mostly the
-        pre-processor and tokenizer's states) *)
     {
-      tokzr: 'm Tokzr.state;
       pp: Cobol_preproc.preprocessor;               (* also holds diagnistics *)
+      tokzr: 'm Tokzr.state;
+      context_stack: Context.stack;
       persist: 'm persist;
     }
+
+  (** Part of the parser state that changes very rarely, if at all. *)
   and 'm persist =
-    (** state that change very rarely, if at all *)
     {
-      context_stack: Context.stack;
       recovery: recovery;
       tokenizer_memory: 'm memory;
       verbose: bool;
@@ -95,9 +97,9 @@ module Make (Config: Cobol_config.T) = struct
         {
           pp;
           tokzr;
+          context_stack = Context.empty_stack;
           persist =
             {
-              context_stack = Context.empty_stack;
               recovery;
               tokenizer_memory;
               verbose;
@@ -147,7 +149,6 @@ module Make (Config: Cobol_config.T) = struct
 
   let update_context_stack ~stack_update ~tokenizer_update
       ({ preproc; _ } as ps) tokens : Context.t list -> 's * 'a =
-    let { tokzr; persist; _ } = preproc in
     function
     | [] ->
         ps, tokens
@@ -156,19 +157,17 @@ module Make (Config: Cobol_config.T) = struct
           List.fold_left begin fun (context_stack, set) ctx ->
             let context_stack, set' = stack_update context_stack ctx in
             context_stack, Text_lexer.TokenHandles.union set set'
-          end (persist.context_stack, Text_lexer.TokenHandles.empty) contexts
+          end (preproc.context_stack, Text_lexer.TokenHandles.empty) contexts
         in
 
         (* Update tokenizer state *)
-        let tokzr, tokens = tokenizer_update tokzr tokens tokens_set in
+        let tokzr, tokens = tokenizer_update preproc.tokzr tokens tokens_set in
         if show `Tks ps then
           Pretty.error "Tks': %a@." Text_tokenizer.pp_tokens tokens;
 
-        (if context_stack == persist.context_stack && tokzr == preproc.tokzr
+        (if context_stack == preproc.context_stack && tokzr == preproc.tokzr
          then ps
-         else { ps with
-                preproc = { preproc with
-                            tokzr; persist = { persist with context_stack }}}),
+         else { ps with preproc = { preproc with tokzr; context_stack }}),
         tokens
 
   (** Use recovery trace (assumptions on missing tokens) to generate syntax
@@ -243,7 +242,7 @@ module Make (Config: Cobol_config.T) = struct
     in
 
     let leaving_context ps prod =
-      match Context.top ps.preproc.persist.context_stack with
+      match Context.top ps.preproc.context_stack with
       | None -> false                                          (* first filter *)
       | Some top_ctx ->
           match Grammar_interpr.lhs prod with
@@ -253,14 +252,13 @@ module Make (Config: Cobol_config.T) = struct
             | _ -> false
     in
 
-    let pop_context ({ preproc = { tokzr; persist; _ }; _ } as ps) tokens =
-      let context_stack, tokens_set = Context.pop persist.context_stack in
+    let pop_context ({ preproc = { tokzr; context_stack; _ }; _ } as ps)
+        tokens =
+      let context_stack, tokens_set = Context.pop context_stack in
       if show `Ctx ps then
         Pretty.error "Outgoing: %a@." Context.pp_context tokens_set;
       let tokzr, tokens = Tokzr.disable_tokens tokzr tokens tokens_set in
-      { ps with
-        preproc = { ps.preproc with
-                    tokzr; persist = { persist with context_stack }}},
+      { ps with preproc = { ps.preproc with tokzr; context_stack }},
       tokens
     in
 
