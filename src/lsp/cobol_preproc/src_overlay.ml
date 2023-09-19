@@ -47,6 +47,12 @@ module Limit = struct
 
   let hash (l: limit) = l.pos_cnum
 
+  (* l1 = l2, or l1 was emitted before l2 *)
+  let surely_predates (l1: limit) (l2: limit) =                  (* or equals *)
+    if l1.pos_cnum < (-1)
+    then l2.pos_cnum <= l1.pos_cnum
+    else l1.pos_cnum > 0 && l1.pos_cnum <= l2.pos_cnum &&
+         l1.pos_fname = l2.pos_fname
 end
 
 (** Weak hashtable where keys are overlay limits (internal) *)
@@ -60,6 +66,7 @@ type manager =
                                             corresponding right limit. *)
     over_right_gap: limit Links.t;  (** associates the right limit of a token to
                                         the left limit of the next *)
+    cache: (srcloc * limit) Links.t;
     id: string;                (** manager identifier (for logging/debugging) *)
   }
 
@@ -71,11 +78,13 @@ let new_manager: string -> manager =
     {
       right_of = Links.create 42;
       over_right_gap = Links.create 42;
+      cache = Links.create 42;
       id = Pretty.to_string "%s-%u" manager_name !id;
     }
 
 (** Returns left and right (potentially fresh) limits for the given source
-    location *)
+    location; for any given file, must be called with the leftmost location
+    first. *)
 let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
   let s, e = match Cobol_common.Srcloc.as_unique_lexloc loc with
     | Some lexloc -> lexloc
@@ -114,18 +123,35 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     Cobol_common.Srcloc.raw (pos, pos)
   in
   let try_limits (s, e) =
-    let rec jump_right loc e' =
-      let s' = Links.find ctx.over_right_gap e' in
-      let loc', e' = Links.find ctx.right_of s' in
-      check (Cobol_common.Srcloc.concat loc loc') e'
-    and check loc e' =
+
+    let rec proceed_from ?loc s =         (* start search from left limit [s] *)
+      check ?loc @@ Links.find ctx.right_of s
+
+    and check ?loc (loc', e') =
+      (* continue search with ([loc] concatenated with) [loc'] if [e'] is not
+         the sought after right limit; raises {!Not_found} when reaching an
+         unknown gap or limit *)
+      let loc = match loc with
+        | None -> loc'
+        | Some loc -> Cobol_common.Srcloc.concat loc loc'
+      in
       if e == e'                                        (* physical comparison *)
-      then loc
-      else jump_right loc e'
+      then (Links.replace ctx.cache s (loc, e); loc)
+      else try_cache_from ~loc @@ Links.find ctx.over_right_gap e'
+
+    and try_cache_from ?loc s =
+      (* attempt with cache first; proceed via small-step upon miss or
+         failure *)
+      match Links.find_opt ctx.cache s with
+      | Some ((_, e') as hit) when Limit.surely_predates e' e ->
+          (try check ?loc hit with Not_found -> proceed_from ?loc s)
+      | Some _ | None ->
+          proceed_from ?loc s
     in
+
     if s == e
     then pointwise s
-    else let loc, e' = Links.find ctx.right_of s in check loc e'
+    else try_cache_from s
   in
   let join_failure (s, e) =
     let loc = Cobol_common.Srcloc.raw (s, e) in
@@ -138,7 +164,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   (* first attempt assumes proper token limits: `s` is a left and `e` is a right
      of tokens *)
   try try_limits (s, e) with Not_found ->
-  (* try assuming `s` is an end of token *)
+  (* otherwise try assuming `s` is an end of token *)
   try try_limits (Links.find ctx.over_right_gap s, e) with Not_found ->
     if s.pos_cnum = 0 (* potential special case with left-position forged by the
                          parser: retry with leftmost limit if it differs from

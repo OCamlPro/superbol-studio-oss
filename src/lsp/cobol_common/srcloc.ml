@@ -374,7 +374,7 @@ let pp_file_loc ppf loc =
 let raw ?(in_area_a = false) ((s, e): lexloc) : srcloc =
   assert Lexing.(s.pos_cnum <= e.pos_cnum);               (* ensure proper use *)
   let loc = Raw (s, e, in_area_a) in
-  if Lexing.(s.pos_fname != e.pos_fname) then
+  if Lexing.(s.pos_fname <> e.pos_fname) then
     Pretty.error
       "%a@\n>> Internal warning in `%s.raw`: file names mismatch (`%s` != `%s`)\
       " pp_srcloc loc __MODULE__ s.pos_fname e.pos_fname;
@@ -402,12 +402,26 @@ let replacement ~old ~new_ ~in_area_a ~replloc : srcloc =
 (*       end *)
 (*   | Cpy {copyloc = {filename; _}; _} -> Some filename *)
 
+(** [may_join_as_single_raw a b] checks whether a lexloc {i l{_ a}} with a a
+    left-hand lexing position [a] and a lexloc {i l{_ b}} with a right-hand
+    position [b], may be joined to form a single raw source location
+    (internal). *)
+let may_join_as_single_raw (a: Lexing.position) (b: Lexing.position) =
+  a.pos_fname = b.pos_fname &&
+  a.pos_lnum  == b.pos_lnum &&           (* ensure we are stay on a single line *)
+  a.pos_cnum  >= b.pos_cnum - 1
+
 (** [concat l1 l2] concatenates two adjacent source locations [l1] and [l2]. *)
 let rec concat: srcloc -> srcloc -> srcloc = fun l1 l2 -> match l1, l2 with
   | Raw (s1, e1, in_area_a),
     Raw (s2, e2, _)
-    when e1.pos_fname = s2.pos_fname && e1.pos_cnum = s2.pos_cnum - 1 ->
+    when may_join_as_single_raw e1 s2 ->
       Raw (s1, e2, in_area_a)
+
+  | Cat { left; right = Raw (s1, e1, in_area_a) },
+    Raw (s2, e2, _)
+    when may_join_as_single_raw e1 s2 ->
+      Cat { left; right = Raw (s1, e2, in_area_a) }
 
   | Cpy { copied = l1; copyloc = c1 },
     Cpy { copied = l2; copyloc = c2 }
