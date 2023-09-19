@@ -33,19 +33,20 @@ module Limit = struct
   type t = limit
 
   let make_virtual: unit -> t =
-    let id = ref 0 in
+    let id = ref (-1) in (* Actually start at -2 (-1 is used in Lexing.dummy) *)
     fun () ->
       decr id;
-      Lexing.{ dummy_pos with pos_lnum = !id }
+      Lexing.{ dummy_pos with pos_cnum = !id }
 
-  let is_virtual: t -> bool =
-    fun l -> l.Lexing.pos_lnum < 0
+  let is_virtual (l: t) : bool =
+    l.pos_cnum < (-1)
 
-  (* Structural equality is required below, to deal with cases where we
-     construct the limits of a token several times, for instance at the
-     beginning of recovery. *)
-  let equal = (=)
-  let hash = Hashtbl.hash
+  let equal (l1: t) (l2: t) =
+    l1.pos_cnum == l2.pos_cnum  &&
+    l1.pos_fname = l2.pos_fname
+
+  let hash (l: limit) = l.pos_cnum
+
 end
 
 (** Weak hashtable where keys are overlay limits (internal) *)
