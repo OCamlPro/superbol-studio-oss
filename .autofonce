@@ -34,7 +34,6 @@ env = "testsuite"
 # env_name = """..."""
 # env_name = "<local-path-to-env-file"
 testsuite = """
-export COMPILE_ONLY="$AUTOFONCE_BUILD_DIR/default/src/superbol/main.exe x-parse file"
 export COB_CONFIG_DIR="$AUTOFONCE_SOURCE_DIR/import/gnucobol/config"
 """
 
