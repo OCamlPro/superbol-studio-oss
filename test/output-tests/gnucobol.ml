@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Ez_file.V1
 open Autofonce_lib
 open Autofonce_config
 open Autofonce_core.Types
@@ -53,7 +54,9 @@ let make_n_enter_rundir () =
 
 let _pconf, _tconf, testsuite =
   let toml = Filename.concat srcdir ".autofonce" in
-  let project_config = Project_config.from_file toml in
+  let contents = EzFile.read_file toml in
+  let project_config =
+    Project_config.from_string ~computed:false ~file:toml contents in
   Testsuite.read project_config (List.hd project_config.project_testsuites)
 
 (* let init_test_filter () = *)
