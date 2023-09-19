@@ -44,11 +44,13 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
-  "pretty-osx" {= version}
+  "ocaml-osx" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "ppx_deriving" {>= "5.2.1"}
   "ppx_deriving-osx" {>= "5.2.1"}
+  "menhir" {>= "1.2"}
   "menhir-osx" {>= "1.2"}
+  "pretty-osx" {= version}
   "cobol_common-osx" {= version}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

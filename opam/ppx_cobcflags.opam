@@ -43,7 +43,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "dune" {>= "2.8.0"}
   "ppxlib" {>= "0.15"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

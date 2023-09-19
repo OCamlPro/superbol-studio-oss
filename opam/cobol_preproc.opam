@@ -43,7 +43,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "dune" {>= "2.8.0"}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {>= "1.2"}
   "cobol_config" {= version}

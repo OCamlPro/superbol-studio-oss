@@ -43,7 +43,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "dune" {>= "2.8.0"}
   "toml" {>= "7.1.0" & < "8.0.0"}
   "pretty" {= version}
   "lsp" {>= "1.15" & < "1.16"}

@@ -73,6 +73,7 @@ share-dirs = ["share"]
 #  readme-trailer = "..."
 #  dot-gitignore-trailer = "..."
 [fields]
+dune = "2.8.0"
 dot-gitignore-trailer = """
 /dist
 /node_modules

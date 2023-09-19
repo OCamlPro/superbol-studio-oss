@@ -44,9 +44,11 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-osx" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "ez_file" {>= "0.3"}
   "ez_file-osx" {>= "0.3"}
+  "ez_cmdliner" {>= "0.3.0" & < "1.0.0"}
   "ez_cmdliner-osx" {>= "0.3.0" & < "1.0.0"}
   "cobol_typeck-osx" {= version}
   "cobol_parser-osx" {= version}

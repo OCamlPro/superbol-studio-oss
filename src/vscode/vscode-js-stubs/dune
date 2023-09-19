@@ -8,6 +8,7 @@
   (modes byte)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (javascript_files vscode_stub.js))
+ (enabled_if (= %{context_name} "default"))
 
   )
 

@@ -44,8 +44,8 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-osx" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
   "superbol_free_lib-osx" {= version}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

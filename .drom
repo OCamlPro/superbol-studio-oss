@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-b702e5529a16cf2d07b69012566f7071:.
+3555bef92a5c701a41e17743de7e5743:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -80,67 +80,67 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-04194ca260cbfc6524d5d64a4e935d69:dune-project
+365496ada34e36085687aef332a51cc1:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
 # file opam/cobol_ast.opam
-1c093791236b02c989e11c8e4277e6b7:opam/cobol_ast.opam
+1abd7e52775c913a57b69b51d8a40dc8:opam/cobol_ast.opam
 # end context for opam/cobol_ast.opam
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
-2684c65869bf3fb2c73292774c68db80:opam/cobol_common.opam
+ada93e0359cb3d89da51ace80c9d981a:opam/cobol_common.opam
 # end context for opam/cobol_common.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-1133aaf02d613ada678aef1c241ff541:opam/cobol_config.opam
+e202292c92921c0b23ebb5d4795d7cc6:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
 # file opam/cobol_data.opam
-4bd93877af6f2710de8abcbc63bab7f6:opam/cobol_data.opam
+865c7cd0ae13a7d592a8a646099ac72d:opam/cobol_data.opam
 # end context for opam/cobol_data.opam
 
 # begin context for opam/cobol_indent.opam
 # file opam/cobol_indent.opam
-5ca055edfd5fc90ecfac3b085343f8df:opam/cobol_indent.opam
+db8b6a55eaa140f90fba413612d11ea8:opam/cobol_indent.opam
 # end context for opam/cobol_indent.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-78c01ac9d637a0430e4c430d51f4ff6d:opam/cobol_lsp.opam
+b3030133cc0ddc1c5a722e9a7a98af47:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-f74597b71bd29a3e384359d155d92ab1:opam/cobol_parser.opam
+1e1d933afecb336c4c0ac2198f3a0c82:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-5e6c04d126c530509b79a509dc1ada53:opam/cobol_preproc.opam
+1f92ae13996b06e78d07d7586bc9f940:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
-8826cd23206fa658d2cc63beccabb5b1:opam/cobol_typeck.opam
+865521571fc0583a863aeed1a6212dc7:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/ebcdic_lib.opam
 # file opam/ebcdic_lib.opam
-c365b582bacd1274b4bfb2599d5cd4dc:opam/ebcdic_lib.opam
+3ab3e8d84eb528b0cd74c53a2b6d0b79:opam/ebcdic_lib.opam
 # end context for opam/ebcdic_lib.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
-e557ed4bc7c593fac0877c7327facaf6:opam/interop-js-stubs.opam
+afb85a68ac677d9a3515c1af6b85260e:opam/interop-js-stubs.opam
 # end context for opam/interop-js-stubs.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
-8256fdbb8b4dc6da20b61c69249b356c:opam/node-js-stubs.opam
+8b680e1929f669f2b069a5f408984987:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
 # begin context for opam/package-json.opam
@@ -150,22 +150,22 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 
 # begin context for opam/polka-js-stubs.opam
 # file opam/polka-js-stubs.opam
-8f12d7db1569d79ec6043b50df393de3:opam/polka-js-stubs.opam
+e49714817e72c897f6e933ea5f55bb9f:opam/polka-js-stubs.opam
 # end context for opam/polka-js-stubs.opam
 
 # begin context for opam/ppx_cobcflags.opam
 # file opam/ppx_cobcflags.opam
-a71b8dfe67612b506e31c13e89075556:opam/ppx_cobcflags.opam
+92b182b0e3525087260b293177b34a17:opam/ppx_cobcflags.opam
 # end context for opam/ppx_cobcflags.opam
 
 # begin context for opam/pretty.opam
 # file opam/pretty.opam
-8cca8f124c3c0a999f8a185f09f4693c:opam/pretty.opam
+5c1d0eedd96fbaba500bfc1045af277d:opam/pretty.opam
 # end context for opam/pretty.opam
 
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
-09da22a50ff0d10a1b21364bc27aa345:opam/superbol-free.opam
+e757ab64a72d3aff8c46c4870d5f157b:opam/superbol-free.opam
 # end context for opam/superbol-free.opam
 
 # begin context for opam/superbol-vscode-extension.opam
@@ -175,42 +175,42 @@ a71b8dfe67612b506e31c13e89075556:opam/ppx_cobcflags.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-f4782070d6b32d738ffc3d5435fc879a:opam/superbol-vscode-platform.opam
+fdb9e32b9e36a6462d61d02a644f8138:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-e618a6aa0b5f55717ae192be2c854b0f:opam/superbol_free_lib.opam
+56eec30e76ac1c961125322cfde58685:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
-49375af72a2ef6a3a464bc88553f1043:opam/vscode-debugadapter.opam
+110b8096e67fb43715e76452898f2702:opam/vscode-debugadapter.opam
 # end context for opam/vscode-debugadapter.opam
 
 # begin context for opam/vscode-debugprotocol.opam
 # file opam/vscode-debugprotocol.opam
-6a8c87cbc6d32091830518c1bf7e50ff:opam/vscode-debugprotocol.opam
+ea348d86901f7bce526b0d5c94d7eaf1:opam/vscode-debugprotocol.opam
 # end context for opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-js-stubs.opam
 # file opam/vscode-js-stubs.opam
-57a5c922a192e339bfb18e778e43ec97:opam/vscode-js-stubs.opam
+43b3dd244dd4e75b4d16ac25f70f7cd2:opam/vscode-js-stubs.opam
 # end context for opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-c945c8e78029c9fd639afc2247fa4743:opam/vscode-json.opam
+59a282e75df2d60b50c4706a9804b1cf:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-d71959af1a2c7a513c15afa5107dba11:opam/vscode-languageclient-js-stubs.opam
+6dcf0aae7277eb190d392c80e473a07b:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
 # begin context for opam/vscode-package-json.opam
 # file opam/vscode-package-json.opam
-6ebebf3e4341605200b5e2487710af9a:opam/vscode-package-json.opam
+a4937538e88284bfd27632cbaf203a88:opam/vscode-package-json.opam
 # end context for opam/vscode-package-json.opam
 
 # begin context for scripts/after.sh
@@ -405,7 +405,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/vscode/interop-js-stubs/dune
 # file src/vscode/interop-js-stubs/dune
-707a0383f1e544fb37662db29a4f14ad:src/vscode/interop-js-stubs/dune
+16728fcdbeb298d01bad407ec5bb76eb:src/vscode/interop-js-stubs/dune
 # end context for src/vscode/interop-js-stubs/dune
 
 # begin context for src/vscode/interop-js-stubs/version.mlt
@@ -415,7 +415,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/vscode/node-js-stubs/dune
 # file src/vscode/node-js-stubs/dune
-cf30d5557250e864c9020afd9e2389fd:src/vscode/node-js-stubs/dune
+38cc9d96ddb1981744e3ccc33a974d5a:src/vscode/node-js-stubs/dune
 # end context for src/vscode/node-js-stubs/dune
 
 # begin context for src/vscode/node-js-stubs/version.mlt
@@ -425,7 +425,7 @@ cf30d5557250e864c9020afd9e2389fd:src/vscode/node-js-stubs/dune
 
 # begin context for src/vscode/polka-js-stubs/dune
 # file src/vscode/polka-js-stubs/dune
-569424afbc851a410f6f388591417035:src/vscode/polka-js-stubs/dune
+35cfe02c249a09237f452bc126cfe703:src/vscode/polka-js-stubs/dune
 # end context for src/vscode/polka-js-stubs/dune
 
 # begin context for src/vscode/polka-js-stubs/version.mlt
@@ -435,7 +435,7 @@ cf30d5557250e864c9020afd9e2389fd:src/vscode/node-js-stubs/dune
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-f336ca790e61d4cc6371e8501b902bbd:src/vscode/superbol-vscode-platform/dune
+664342638a68e3f2f79d39343772e32f:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt
@@ -445,7 +445,7 @@ f336ca790e61d4cc6371e8501b902bbd:src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/vscode-debugadapter/dune
 # file src/vscode/vscode-debugadapter/dune
-12ae4bbbcdd1df098363da163e1cbe4e:src/vscode/vscode-debugadapter/dune
+95d8c6a4d92e07ecf1c81ba45560bc3a:src/vscode/vscode-debugadapter/dune
 # end context for src/vscode/vscode-debugadapter/dune
 
 # begin context for src/vscode/vscode-debugadapter/version.mlt
@@ -455,7 +455,7 @@ f336ca790e61d4cc6371e8501b902bbd:src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/vscode-debugprotocol/dune
 # file src/vscode/vscode-debugprotocol/dune
-20bb8bb628d36d6baca51f4a9f54c8f7:src/vscode/vscode-debugprotocol/dune
+592b86dca8fd4200e8550eae713517e3:src/vscode/vscode-debugprotocol/dune
 # end context for src/vscode/vscode-debugprotocol/dune
 
 # begin context for src/vscode/vscode-debugprotocol/version.mlt
@@ -465,7 +465,7 @@ f336ca790e61d4cc6371e8501b902bbd:src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/vscode-js-stubs/dune
 # file src/vscode/vscode-js-stubs/dune
-f8e015ab8ad6d1dc7c7c8d63c86e446d:src/vscode/vscode-js-stubs/dune
+1abfa6d0707e3727987cd9e4f74d47f6:src/vscode/vscode-js-stubs/dune
 # end context for src/vscode/vscode-js-stubs/dune
 
 # begin context for src/vscode/vscode-js-stubs/version.mlt
@@ -490,7 +490,7 @@ a18d965350ea19e9be91b3784887f1ef:src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-languageclient-js-stubs/dune
 # file src/vscode/vscode-languageclient-js-stubs/dune
-935c7469b455b26a8ec1f08627aae863:src/vscode/vscode-languageclient-js-stubs/dune
+995d796d5acbb0b17aef1bc888c34531:src/vscode/vscode-languageclient-js-stubs/dune
 # end context for src/vscode/vscode-languageclient-js-stubs/dune
 
 # begin context for src/vscode/vscode-languageclient-js-stubs/version.mlt

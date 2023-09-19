@@ -72,4 +72,6 @@ js_of_ocaml-ppx = ">=4"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-stanzas = """
+ (enabled_if (= %{context_name} \"default\"))
+"""
