@@ -67,6 +67,7 @@ type manager =
     over_right_gap: limit Links.t;  (** associates the right limit of a token to
                                         the left limit of the next *)
     cache: (srcloc * limit) Links.t;
+    leftmost_in_file: (string, limit) Hashtbl.t;
     id: string;                (** manager identifier (for logging/debugging) *)
   }
 
@@ -79,18 +80,24 @@ let new_manager: string -> manager =
       right_of = Links.create 42;
       over_right_gap = Links.create 42;
       cache = Links.create 42;
+      leftmost_in_file = Hashtbl.create 3;
       id = Pretty.to_string "%s-%u" manager_name !id;
     }
 
 (** Returns left and right (potentially fresh) limits for the given source
     location; for any given file, must be called with the leftmost location
     first. *)
+(* TODO: try to see whether registering the leftmost location in each file could
+   be done more efficiently wihtout a membership test on each new location (but
+   the pre-processor does not provide change-of-file info to the parser). *)
 let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
   let s, e = match Cobol_common.Srcloc.as_unique_lexloc loc with
     | Some lexloc -> lexloc
     | _ -> Limit.make_virtual (), Limit.make_virtual ()
   in
   Links.replace ctx.right_of s (loc, e);   (* replace to deal with duplicates *)
+  if not (Hashtbl.mem ctx.leftmost_in_file s.pos_fname)
+  then  Hashtbl.add ctx.leftmost_in_file s.pos_fname s;
   s, e
 
 (** Links token limits *)
@@ -102,12 +109,7 @@ let link_limits ctx left right =
     in [filename] that is registered in [ctx] (internal).  Use with moderation
     as this is quite inefficient. *)
 let leftmost_limit_in ~filename ctx =
-  Links.fold begin fun l _ -> function
-    | None when l.Lexing.pos_fname = filename -> Some l
-    | Some l' when l.Lexing.pos_cnum < l'.pos_cnum &&
-                   l.Lexing.pos_fname = filename -> Some l
-    | res -> res
-  end ctx.right_of None
+  Hashtbl.find_opt ctx.leftmost_in_file filename
 
 (** Returns a source location that spans between two given limits; returns a
     valid pointwise location if the two given limits are physically equal. *)
