@@ -67,7 +67,6 @@ type manager =
     over_right_gap: limit Links.t;  (** associates the right limit of a token to
                                         the left limit of the next *)
     cache: (srcloc * limit) Links.t;
-    leftmost_in_file: (string, limit) Hashtbl.t;
     id: string;                (** manager identifier (for logging/debugging) *)
   }
 
@@ -80,36 +79,24 @@ let new_manager: string -> manager =
       right_of = Links.create 42;
       over_right_gap = Links.create 42;
       cache = Links.create 42;
-      leftmost_in_file = Hashtbl.create 3;
       id = Pretty.to_string "%s-%u" manager_name !id;
     }
 
 (** Returns left and right (potentially fresh) limits for the given source
     location; for any given file, must be called with the leftmost location
     first. *)
-(* TODO: try to see whether registering the leftmost location in each file could
-   be done more efficiently wihtout a membership test on each new location (but
-   the pre-processor does not provide change-of-file info to the parser). *)
 let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
   let s, e = match Cobol_common.Srcloc.as_unique_lexloc loc with
     | Some lexloc -> lexloc
     | _ -> Limit.make_virtual (), Limit.make_virtual ()
   in
   Links.replace ctx.right_of s (loc, e);   (* replace to deal with duplicates *)
-  if not (Hashtbl.mem ctx.leftmost_in_file s.pos_fname)
-  then  Hashtbl.add ctx.leftmost_in_file s.pos_fname s;
   s, e
 
 (** Links token limits *)
 let link_limits ctx left right =
   (* Replace to deal with overriding of limits during recovery. *)
   Links.replace ctx.over_right_gap left right
-
-(** [leftmost_limit_in ~filename ctx] finds the leftmost limit from a location
-    in [filename] that is registered in [ctx] (internal).  Use with moderation
-    as this is quite inefficient. *)
-let leftmost_limit_in ~filename ctx =
-  Hashtbl.find_opt ctx.leftmost_in_file filename
 
 (** Returns a source location that spans between two given limits; returns a
     valid pointwise location if the two given limits are physically equal. *)
@@ -124,7 +111,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     in
     Cobol_common.Srcloc.raw (pos, pos)
   in
-  let try_limits (s, e) =
+  let try_limits (s, e: limit * limit) =
 
     let rec proceed_from ?loc s =         (* start search from left limit [s] *)
       check ?loc @@ Links.find ctx.right_of s
@@ -137,7 +124,8 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
         | None -> loc'
         | Some loc -> Cobol_common.Srcloc.concat loc loc'
       in
-      if e == e'                                        (* physical comparison *)
+      if e.pos_cnum  = e'.pos_cnum &&   (* compare only the fields that matter *)
+         e.pos_fname = e'.pos_fname
       then (Links.replace ctx.cache s (loc, e); loc)
       else try_cache_from ~loc @@ Links.find ctx.over_right_gap e'
 
@@ -163,18 +151,14 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 10); *)
     loc
   in
-  (* first attempt assumes proper token limits: `s` is a left and `e` is a right
-     of tokens *)
-  try try_limits (s, e) with Not_found ->
-  (* otherwise try assuming `s` is an end of token *)
-  try try_limits (Links.find ctx.over_right_gap s, e) with Not_found ->
-    if s.pos_cnum = 0 (* potential special case with left-position forged by the
-                         parser: retry with leftmost limit if it differs from
-                         s *)
-    then match leftmost_limit_in ~filename:s.pos_fname ctx with
-      | Some l when l != s -> try_limits (l, e)  (* physical equality is enough *)
-      | Some _ | None -> join_failure (s, e)
-    else join_failure (s, e)
+  try   (* first attempt assumes proper token limits: `s` is a left and `e` is a
+           right of tokens *)
+    try_limits (s, e)
+  with Not_found ->
+  try                        (* otherwise try assuming `s` is an end of token *)
+    try_limits (Links.find ctx.over_right_gap s, e)
+  with Not_found ->
+    join_failure (s, e)
 
 module New_manager (Id: sig val name: string end) : MANAGER = struct
   let ctx = new_manager Id.name
