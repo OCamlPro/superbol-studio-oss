@@ -43,7 +43,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "dune" {>= "2.8.0"}
   "vscode-js-stubs" {= version}
   "promise_jsoo" {>= "0.3.1" & < "1.0.0"}
   "jsonoo" {>= "0.2.1" & < "1.0.0"}

@@ -5,6 +5,9 @@
   (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo polka-js-stubs ocplib_stuff node-js-stubs jsonoo js_of_ocaml gen_js_api )
   (modes js)
   (preprocess (pps gen_js_api.ppx))
+   (js_of_ocaml (flags --source-map --pretty))
+ (enabled_if (= %{context_name} "default"))
+
   )
 
 (install
@@ -21,5 +24,9 @@
 (documentation
   (package superbol-vscode-platform))
 
+(rule
+ (target superbol_vscode_platform.bc.js)
+ (action (write-file %{target} ""))
+ (enabled_if (<> %{context_name} "default")))
 
 

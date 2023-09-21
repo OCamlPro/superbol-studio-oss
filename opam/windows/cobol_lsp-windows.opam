@@ -44,12 +44,15 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-windows" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "toml" {>= "7.1.0" & < "8.0.0"}
   "toml-windows" {>= "7.1.0" & < "8.0.0"}
-  "pretty-windows" {= version}
+  "lsp" {>= "1.15" & < "1.16"}
   "lsp-windows" {>= "1.15" & < "1.16"}
+  "jsonrpc" {>= "1.15"}
   "jsonrpc-windows" {>= "1.15"}
+  "pretty-windows" {= version}
   "cobol_typeck-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_indent-windows" {= version}
