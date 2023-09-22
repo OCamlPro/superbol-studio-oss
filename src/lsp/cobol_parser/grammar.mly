@@ -2581,10 +2581,10 @@ let rounding_mode :=
  | NEAREST_AWAY_FROM_ZERO;   {NearestAwayFromZero}
  | NEAREST_EVEN;             {NearestEven}
  | NEAREST_TOWARD_ZERO;      {NearestTowardZero}
- | PROHIBITED;               {TowardGreater}
- | TOWARD_GREATER;           {TowardLesser}
- | TOWARD_LESSER;            {Truncation}
- | TRUNCATION;               {Prohibited}
+ | PROHIBITED;               {Prohibited}
+ | TOWARD_GREATER;           {TowardGreater}
+ | TOWARD_LESSER;            {TowardLesser}
+ | TRUNCATION;               {Truncation}
 
 
 
