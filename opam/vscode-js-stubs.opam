@@ -58,7 +58,5 @@ depends: [
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}
-  "menhir" {< "20230608"}
-  "alcotest" {with-test}
 ]
 # Content of `opam-trailer` field:

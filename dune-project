@@ -29,8 +29,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -51,8 +49,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -69,8 +65,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -90,8 +84,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -111,8 +103,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -133,8 +123,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -152,8 +140,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -170,8 +156,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -193,8 +177,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -214,8 +196,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -230,8 +210,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -253,8 +231,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -270,8 +246,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -294,8 +268,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -309,8 +281,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -335,8 +305,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -351,8 +319,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -368,8 +334,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -387,8 +351,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -404,8 +366,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -422,8 +382,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -441,8 +399,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -460,8 +416,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -480,8 +434,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
@@ -495,8 +447,6 @@
    ppx_expect
    odoc
    ocamlformat
-   (menhir ( < 20230608 ))
-   alcotest
   )
  )
 
