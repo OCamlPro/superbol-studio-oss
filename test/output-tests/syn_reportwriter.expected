@@ -1,0 +1,38 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_reportwriter.at:303:0
+syn_reportwriter.at-303-prog.cob:23.23:
+  20             02  LINE PLUS 0.
+  21                 03 COLUMN  1      PIC X(09) VALUE 'CUST. No.'.
+  22                 03 COLUMN PLUS 0  PIC X(09) VALUE 'ITEM'.
+  23 >           02  LINE PLUS ZERO.
+----                          ^
+  24                 03 COLUMN 1       PIC X(09) VALUE 'Cust. No.'.
+  25                 03 COLUMN + 10    PIC X(09) VALUE 'Item'.
+>> Hint: Missing <integer literal>
+
+syn_reportwriter.at-303-prog.cob:23.24-23.28:
+  20             02  LINE PLUS 0.
+  21                 03 COLUMN  1      PIC X(09) VALUE 'CUST. No.'.
+  22                 03 COLUMN PLUS 0  PIC X(09) VALUE 'ITEM'.
+  23 >           02  LINE PLUS ZERO.
+----                           ^^^^
+  24                 03 COLUMN 1       PIC X(09) VALUE 'Cust. No.'.
+  25                 03 COLUMN + 10    PIC X(09) VALUE 'Item'.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_reportwriter.at:621:0
+syn_reportwriter.at-621-prog.cob:17.43:
+  14   
+  15          REPORT          SECTION.
+  16          RD  r.
+  17 >        01  r0          TYPE DETAIL, PRESENT AFTER NEW f-rec.
+----                                              ^
+>> Hint: Missing WHEN
+
+syn_reportwriter.at-621-prog.cob:17.44-17.49:
+  14   
+  15          REPORT          SECTION.
+  16          RD  r.
+  17 >        01  r0          TYPE DETAIL, PRESENT AFTER NEW f-rec.
+----                                               ^^^^^
+>> Error: Invalid syntax
+

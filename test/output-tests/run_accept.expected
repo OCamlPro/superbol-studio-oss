@@ -1,0 +1,341 @@
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:43:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:42:0
+run_accept.at-42-prog.cob:5.17:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >            ACCEPT OMITTED.
+----                    ^
+>> Hint: Missing <identifier>
+
+run_accept.at-42-prog.cob:5.18-5.25:
+   2          IDENTIFICATION DIVISION.
+   3          PROGRAM-ID.    prog.
+   4          PROCEDURE      DIVISION.
+   5 >            ACCEPT OMITTED.
+----                     ^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:112:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:260:0
+run_accept.at-260-prog.cob:43.7-43.34:
+  40          PROCEDURE DIVISION.
+  41              PERFORM RUN-TEST.
+  42              PERFORM RUN-VALIDATION.
+  43 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  44         *>   included performance check
+  45              PERFORM RUN-TEST 50000 TIMES
+>> Error: Malformed or unknown compiler directive
+
+run_accept.at-260-prog.cob:46.7-46.16:
+  43          >> IF CHECK-PERF IS DEFINED
+  44         *>   included performance check
+  45              PERFORM RUN-TEST 50000 TIMES
+  46 >        >> END-IF
+----          ^^^^^^^^^
+  47              GOBACK.
+  48   
+>> Error: Invalid syntax
+
+run_accept.at-260-prog.cob:63.36:
+  60              MOVE WS-NOW-MM    TO WS-TIME-MM
+  61              MOVE WS-NOW-SS    TO WS-TIME-SS
+  62              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+  63 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:63.37-63.41:
+  60              MOVE WS-NOW-MM    TO WS-TIME-MM
+  61              MOVE WS-NOW-SS    TO WS-TIME-SS
+  62              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+  63 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:63.48:
+  60              MOVE WS-NOW-MM    TO WS-TIME-MM
+  61              MOVE WS-NOW-SS    TO WS-TIME-SS
+  62              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+  63 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:64.11-64.22:
+  61              MOVE WS-NOW-SS    TO WS-TIME-SS
+  62              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+  63                      WITH NO ADVANCING UPON SYSOUT
+  64 >            END-DISPLAY
+----              ^^^^^^^^^^^
+  65              DISPLAY ' MICROSECOND-TIME '
+  66                      WITH NO ADVANCING UPON SYSOUT
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:66.36:
+  63                      WITH NO ADVANCING UPON SYSOUT
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+  66 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:66.37-66.41:
+  63                      WITH NO ADVANCING UPON SYSOUT
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+  66 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:66.48:
+  63                      WITH NO ADVANCING UPON SYSOUT
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+  66 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:67.11-67.22:
+  64              END-DISPLAY
+  65              DISPLAY ' MICROSECOND-TIME '
+  66                      WITH NO ADVANCING UPON SYSOUT
+  67 >            END-DISPLAY
+----              ^^^^^^^^^^^
+  68              DISPLAY WS-MICROSECOND-TIME
+  69                      WITH NO ADVANCING UPON SYSOUT
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:69.36:
+  66                      WITH NO ADVANCING UPON SYSOUT
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+  69 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+  70              END-DISPLAY
+  71              DISPLAY '.' UPON SYSOUT.
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:69.37-69.41:
+  66                      WITH NO ADVANCING UPON SYSOUT
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+  69 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+  70              END-DISPLAY
+  71              DISPLAY '.' UPON SYSOUT.
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:69.48:
+  66                      WITH NO ADVANCING UPON SYSOUT
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+  69 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+  70              END-DISPLAY
+  71              DISPLAY '.' UPON SYSOUT.
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:70.11-70.22:
+  67              END-DISPLAY
+  68              DISPLAY WS-MICROSECOND-TIME
+  69                      WITH NO ADVANCING UPON SYSOUT
+  70 >            END-DISPLAY
+----              ^^^^^^^^^^^
+  71              DISPLAY '.' UPON SYSOUT.
+  72         *>   Bigger fields return 8/12 depending on std
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:76.36:
+  73         *>   CHECKME: we may should limit to 6 depending on std, too
+  74              ACCEPT WS-TIME-MICRO FROM TIME
+  75              DISPLAY 'PROCESS BIG TIME : '
+  76 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+  77              DISPLAY WS-MICROSECOND-TIME UPON SYSOUT.
+  78              ACCEPT WS-YYYYMMDD   FROM DATE YYYYMMDD
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:76.37-76.41:
+  73         *>   CHECKME: we may should limit to 6 depending on std, too
+  74              ACCEPT WS-TIME-MICRO FROM TIME
+  75              DISPLAY 'PROCESS BIG TIME : '
+  76 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+  77              DISPLAY WS-MICROSECOND-TIME UPON SYSOUT.
+  78              ACCEPT WS-YYYYMMDD   FROM DATE YYYYMMDD
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:76.48:
+  73         *>   CHECKME: we may should limit to 6 depending on std, too
+  74              ACCEPT WS-TIME-MICRO FROM TIME
+  75              DISPLAY 'PROCESS BIG TIME : '
+  76 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+  77              DISPLAY WS-MICROSECOND-TIME UPON SYSOUT.
+  78              ACCEPT WS-YYYYMMDD   FROM DATE YYYYMMDD
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:77.11-77.18:
+  74              ACCEPT WS-TIME-MICRO FROM TIME
+  75              DISPLAY 'PROCESS BIG TIME : '
+  76                      WITH NO ADVANCING UPON SYSOUT
+  77 >            DISPLAY WS-MICROSECOND-TIME UPON SYSOUT.
+----              ^^^^^^^
+  78              ACCEPT WS-YYYYMMDD   FROM DATE YYYYMMDD
+  79              IF WS-YYYYMMDD not = "20150405"
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:106.36:
+ 103              MOVE WS-NOW-MM    TO WS-TIME-MM
+ 104              MOVE WS-NOW-SS    TO WS-TIME-SS
+ 105              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+ 106 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:106.37-106.41:
+ 103              MOVE WS-NOW-MM    TO WS-TIME-MM
+ 104              MOVE WS-NOW-SS    TO WS-TIME-SS
+ 105              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+ 106 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:106.48:
+ 103              MOVE WS-NOW-MM    TO WS-TIME-MM
+ 104              MOVE WS-NOW-SS    TO WS-TIME-SS
+ 105              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+ 106 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:107.11-107.22:
+ 104              MOVE WS-NOW-SS    TO WS-TIME-SS
+ 105              DISPLAY 'PROCESS DATE/TIME : ' WS-DATE ' ' WS-TIME
+ 106                      WITH NO ADVANCING UPON SYSOUT
+ 107 >            END-DISPLAY
+----              ^^^^^^^^^^^
+ 108              DISPLAY ' MICROSECOND-TIME '
+ 109                      WITH NO ADVANCING UPON SYSOUT
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:109.36:
+ 106                      WITH NO ADVANCING UPON SYSOUT
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+ 109 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:109.37-109.41:
+ 106                      WITH NO ADVANCING UPON SYSOUT
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+ 109 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:109.48:
+ 106                      WITH NO ADVANCING UPON SYSOUT
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+ 109 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:110.11-110.22:
+ 107              END-DISPLAY
+ 108              DISPLAY ' MICROSECOND-TIME '
+ 109                      WITH NO ADVANCING UPON SYSOUT
+ 110 >            END-DISPLAY
+----              ^^^^^^^^^^^
+ 111              DISPLAY WS-MICROSECOND-TIME
+ 112                      WITH NO ADVANCING UPON SYSOUT
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:112.36:
+ 109                      WITH NO ADVANCING UPON SYSOUT
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+ 112 >                    WITH NO ADVANCING UPON SYSOUT
+----                                       ^
+ 113              END-DISPLAY
+ 114              DISPLAY '.' UPON SYSOUT.
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:112.37-112.41:
+ 109                      WITH NO ADVANCING UPON SYSOUT
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+ 112 >                    WITH NO ADVANCING UPON SYSOUT
+----                                        ^^^^
+ 113              END-DISPLAY
+ 114              DISPLAY '.' UPON SYSOUT.
+>> Warning: Invalid syntax
+
+run_accept.at-260-prog.cob:112.48:
+ 109                      WITH NO ADVANCING UPON SYSOUT
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+ 112 >                    WITH NO ADVANCING UPON SYSOUT
+----                                                   ^
+ 113              END-DISPLAY
+ 114              DISPLAY '.' UPON SYSOUT.
+>> Hint: Missing .
+
+run_accept.at-260-prog.cob:113.11-113.22:
+ 110              END-DISPLAY
+ 111              DISPLAY WS-MICROSECOND-TIME
+ 112                      WITH NO ADVANCING UPON SYSOUT
+ 113 >            END-DISPLAY
+----              ^^^^^^^^^^^
+ 114              DISPLAY '.' UPON SYSOUT.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:316:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:355:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:390:0
+Considering: import/gnucobol/tests/testsuite.src/run_accept.at:389:0
+run_accept.at-389-prog.cob:11.17:
+   8              03  VALUE "Hello!" LINE 3 COL 3.
+   9   
+  10          PROCEDURE      DIVISION.
+  11 >            ACCEPT OMITTED
+----                    ^
+  12              END-ACCEPT.
+>> Hint: Missing <identifier>
+
+run_accept.at-389-prog.cob:11.18-11.25:
+   8              03  VALUE "Hello!" LINE 3 COL 3.
+   9   
+  10          PROCEDURE      DIVISION.
+  11 >            ACCEPT OMITTED
+----                     ^^^^^^^
+  12              END-ACCEPT.
+>> Error: Invalid syntax
+

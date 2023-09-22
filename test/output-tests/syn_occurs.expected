@@ -1,0 +1,89 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:51:0
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:219:0
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:225:0
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:331:0
+syn_occurs.at-331-prog.cob:9.18:
+   6          01 G-1.
+   7             07 G-2-ELEMENTS   PIC 9(08).
+   8             07 G-2
+   9 >             OCCURS UNBOUNDED
+----                     ^
+  10               DEPENDING ON    G-2-ELEMENTS.
+  11              10 X             PIC X.
+>> Hint: Missing <integer literal>
+
+syn_occurs.at-331-prog.cob:9.19-9.28:
+   6          01 G-1.
+   7             07 G-2-ELEMENTS   PIC 9(08).
+   8             07 G-2
+   9 >             OCCURS UNBOUNDED
+----                      ^^^^^^^^^
+  10               DEPENDING ON    G-2-ELEMENTS.
+  11              10 X             PIC X.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:339:0
+syn_occurs.at-339-prog2.cob:12.18:
+   9            05 G-2.
+  10             07 G-3-ELEMENTS   PIC 9(08).
+  11             07 G-3
+  12 >             OCCURS UNBOUNDED
+----                     ^
+  13               DEPENDING ON    G-3-ELEMENTS.
+  14              10 G-4.
+>> Hint: Missing <integer literal>
+
+syn_occurs.at-339-prog2.cob:12.19-12.28:
+   9            05 G-2.
+  10             07 G-3-ELEMENTS   PIC 9(08).
+  11             07 G-3
+  12 >             OCCURS UNBOUNDED
+----                      ^^^^^^^^^
+  13               DEPENDING ON    G-3-ELEMENTS.
+  14              10 G-4.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:418:0
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:503:0
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:590:0
+syn_occurs.at-590-prog.cob:10.18-10.27:
+   7              05  TAB-ENTRY1
+   8                     OCCURS 5 TIMES
+   9                     INDEXED BY IDX1
+  10 >                   ASCENDING KEY IS X1
+----                     ^^^^^^^^^
+  11                     DESCENDING Y1.
+  12                10  X1 PIC 9(4).
+>> Error: Invalid syntax
+
+syn_occurs.at-590-prog.cob:11.18-11.28:
+   8                     OCCURS 5 TIMES
+   9                     INDEXED BY IDX1
+  10                     ASCENDING KEY IS X1
+  11 >                   DESCENDING Y1.
+----                     ^^^^^^^^^^
+  12                10  X1 PIC 9(4).
+  13                10  Y1 PIC X.
+>> Error: Invalid syntax
+
+syn_occurs.at-590-prog.cob:17.18-17.28:
+  14              05  TAB-ENTRY
+  15                     OCCURS 2 TIMES
+  16                     INDEXED BY IDX2
+  17 >                   DESCENDING KEY IS X2
+----                     ^^^^^^^^^^
+  18                     ASCENDING  Y2.
+  19                10  X2 PIC 9(4).
+>> Error: Invalid syntax
+
+syn_occurs.at-590-prog.cob:18.18-18.27:
+  15                     OCCURS 2 TIMES
+  16                     INDEXED BY IDX2
+  17                     DESCENDING KEY IS X2
+  18 >                   ASCENDING  Y2.
+----                     ^^^^^^^^^
+  19                10  X2 PIC 9(4).
+  20                10  Y2 PIC X.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:617:0

@@ -1,0 +1,12 @@
+1,This, one, is quite long
+3,12345678,1234567,ok for size,12 
+3,123456789,1234567,Date size wrong,23
+3,12345678,123456789,video code size wrong,43
+3,12345678,1234567,this video title is much to long for its good,45
+3,12345678,1234567,supplier code too long,1234
+4,12345678,12,Supplier Name Ok,Address of Valid supplier 
+4,123456789,13,Date size wrong,The date is too big
+43,12345678,1234567,Type Code too long,Record rejected
+4,12345678,25,The name is much too long,The adr is ok
+4,12345678,555,Supp Code Error,Supplier code is too long
+4,12345678,26,Title is ok,But this address is just a bit too long for its good

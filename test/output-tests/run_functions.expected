@@ -1,0 +1,798 @@
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:39:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:74:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:96:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:135:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:159:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:213:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:253:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:278:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:325:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:353:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:410:0
+run_functions.at-410-prog.cob:19.7-19.31:
+  16              SET  BITX-FILLER TO TRUE
+  17              STRING FUNCTION BIT-OF (TXT) DELIMITED BY SIZE INTO BITX.
+  18         *> Discover if running ASCII or EBCDIC
+  19 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21          >>ELIF CHARSET = 'EBCDIC'
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-410-prog.cob:20.61:
+  17              STRING FUNCTION BIT-OF (TXT) DELIMITED BY SIZE INTO BITX.
+  18         *> Discover if running ASCII or EBCDIC
+  19          >>IF   CHARSET = 'ASCII'
+  20 >            IF BITX NOT = "01001000010010010010111000100000--"
+----                                                                ^
+  21          >>ELIF CHARSET = 'EBCDIC'
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+>> Hint: Missing .
+
+run_functions.at-410-prog.cob:21.7-21.13:
+  18         *> Discover if running ASCII or EBCDIC
+  19          >>IF   CHARSET = 'ASCII'
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21 >        >>ELIF CHARSET = 'EBCDIC'
+----          ^^^^^^
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+  23          >>ELSE
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:21.21:
+  18         *> Discover if running ASCII or EBCDIC
+  19          >>IF   CHARSET = 'ASCII'
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21 >        >>ELIF CHARSET = 'EBCDIC'
+----                        ^
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+  23          >>ELSE
+>> Hint: Missing .
+
+run_functions.at-410-prog.cob:21.22-21.23:
+  18         *> Discover if running ASCII or EBCDIC
+  19          >>IF   CHARSET = 'ASCII'
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21 >        >>ELIF CHARSET = 'EBCDIC'
+----                         ^
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+  23          >>ELSE
+>> Warning: Invalid syntax
+
+run_functions.at-410-prog.cob:23.7-23.13:
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21          >>ELIF CHARSET = 'EBCDIC'
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+  23 >        >>ELSE
+----          ^^^^^^
+  24              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
+  25          >>END-IF
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:25.7-25.15:
+  22              IF BITX NOT = "11001000110010010100101101000000--"
+  23          >>ELSE
+  24              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
+  25 >        >>END-IF
+----          ^^^^^^^^
+  26                 DISPLAY "UNEXPECTED BIT-VALUE OF 'HI. ': " BITX.
+  27   
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:30.7-30.31:
+  27   
+  28              SET  BITX-FILLER TO TRUE
+  29              STRING FUNCTION BIT-OF (z"01") DELIMITED BY SIZE INTO BITX.
+  30 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  31              IF BITX NOT = "001100000011000100000000----------"
+  32          >>ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-410-prog.cob:32.7-32.13:
+  29              STRING FUNCTION BIT-OF (z"01") DELIMITED BY SIZE INTO BITX.
+  30          >>IF   CHARSET = 'ASCII'
+  31              IF BITX NOT = "001100000011000100000000----------"
+  32 >        >>ELSE
+----          ^^^^^^
+  33              IF BITX NOT = "111100001111000100000000----------"
+  34          >>END-IF
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:34.7-34.15:
+  31              IF BITX NOT = "001100000011000100000000----------"
+  32          >>ELSE
+  33              IF BITX NOT = "111100001111000100000000----------"
+  34 >        >>END-IF
+----          ^^^^^^^^
+  35   
+  36              IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:36.55-36.59:
+  33              IF BITX NOT = "111100001111000100000000----------"
+  34          >>END-IF
+  35   
+  36 >            IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
+----                                                          ^^^^
+  37                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
+  38                         BITX (1:24).
+>> Error: Invalid syntax
+
+run_functions.at-410-prog.cob:42.33-42.39:
+  39              SET  BITX-FILLER TO TRUE
+  40              STRING FUNCTION BIT-TO-CHAR ("0011000100110010")
+  41                     DELIMITED BY SIZE INTO BITX.
+  42 >            IF NOT (BITX (1:2) = x"3132" AND
+----                                    ^^^^^^
+  43                      BITX (3: ) = "--------------------------------")
+  44                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " BITX.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:541:0
+run_functions.at-541-prog.cob:25.7-25.34:
+  22          MAIN.
+  23         *    Test with DISPLAY on error
+  24              PERFORM DO-CHECK.
+  25 >        >> IF CHECK-PERF IS DEFINED
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  26              SET  NO-DISP    TO TRUE
+  27         *    some performance checks on the way...
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:29.7-29.16:
+  26              SET  NO-DISP    TO TRUE
+  27         *    some performance checks on the way...
+  28              PERFORM DO-CHECK 300000 TIMES.
+  29 >        >> END-IF
+----          ^^^^^^^^^
+  30              GOBACK.
+  31   
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:36.7-36.31:
+  33              SET  HEXX-FILLER TO TRUE
+  34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
+  35         *> Discover if running ASCII or EBCDIC
+  36 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  37              IF HEXX NOT = "20303132--"
+  38          >>ELIF CHARSET = 'EBCDIC'
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:37.37:
+  34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
+  35         *> Discover if running ASCII or EBCDIC
+  36          >>IF   CHARSET = 'ASCII'
+  37 >            IF HEXX NOT = "20303132--"
+----                                        ^
+  38          >>ELIF CHARSET = 'EBCDIC'
+  39              IF HEXX NOT = "40F0F1F2--"
+>> Hint: Missing .
+
+run_functions.at-541-prog.cob:38.7-38.13:
+  35         *> Discover if running ASCII or EBCDIC
+  36          >>IF   CHARSET = 'ASCII'
+  37              IF HEXX NOT = "20303132--"
+  38 >        >>ELIF CHARSET = 'EBCDIC'
+----          ^^^^^^
+  39              IF HEXX NOT = "40F0F1F2--"
+  40          >>ELSE
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:38.21:
+  35         *> Discover if running ASCII or EBCDIC
+  36          >>IF   CHARSET = 'ASCII'
+  37              IF HEXX NOT = "20303132--"
+  38 >        >>ELIF CHARSET = 'EBCDIC'
+----                        ^
+  39              IF HEXX NOT = "40F0F1F2--"
+  40          >>ELSE
+>> Hint: Missing .
+
+run_functions.at-541-prog.cob:38.22-38.23:
+  35         *> Discover if running ASCII or EBCDIC
+  36          >>IF   CHARSET = 'ASCII'
+  37              IF HEXX NOT = "20303132--"
+  38 >        >>ELIF CHARSET = 'EBCDIC'
+----                         ^
+  39              IF HEXX NOT = "40F0F1F2--"
+  40          >>ELSE
+>> Warning: Invalid syntax
+
+run_functions.at-541-prog.cob:40.7-40.13:
+  37              IF HEXX NOT = "20303132--"
+  38          >>ELIF CHARSET = 'EBCDIC'
+  39              IF HEXX NOT = "40F0F1F2--"
+  40 >        >>ELSE
+----          ^^^^^^
+  41              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
+  42          >>END-IF
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:42.7-42.15:
+  39              IF HEXX NOT = "40F0F1F2--"
+  40          >>ELSE
+  41              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
+  42 >        >>END-IF
+----          ^^^^^^^^
+  43                 DISPLAY "UNEXPECTED HEX-VALUE OF '0012': " HEXX.
+  44   
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:47.7-47.31:
+  44   
+  45              SET  HEXX-FILLER TO TRUE
+  46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
+  47 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  48              IF HEXX NOT = "48492E20--"
+  49          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:49.7-49.14:
+  46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
+  47          >>IF   CHARSET = 'ASCII'
+  48              IF HEXX NOT = "48492E20--"
+  49 >        >> ELSE
+----          ^^^^^^^
+  50              IF HEXX NOT = "C8C94B40--"
+  51          >> END-IF
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:51.7-51.16:
+  48              IF HEXX NOT = "48492E20--"
+  49          >> ELSE
+  50              IF HEXX NOT = "C8C94B40--"
+  51 >        >> END-IF
+----          ^^^^^^^^^
+  52                 DISPLAY "UNEXPECTED HEX-VALUE OF 'HI! ': " HEXX.
+  53   
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:66.7-66.31:
+  63   
+  64              SET  HEXX-FILLER TO TRUE
+  65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
+  66 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  67              IF HEXX NOT = "303100----"
+  68          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:68.7-68.14:
+  65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
+  66          >>IF   CHARSET = 'ASCII'
+  67              IF HEXX NOT = "303100----"
+  68 >        >> ELSE
+----          ^^^^^^^
+  69              IF HEXX NOT = "F0F100----"
+  70          >> END-IF
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:70.7-70.16:
+  67              IF HEXX NOT = "303100----"
+  68          >> ELSE
+  69              IF HEXX NOT = "F0F100----"
+  70 >        >> END-IF
+----          ^^^^^^^^^
+  71                 DISPLAY "UNEXPECTED HEX-VALUE OF z'01': " HEXX.
+  72   
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:75.7-75.31:
+  72   
+  73              SET  HEXX-FILLER TO TRUE
+  74              STRING FUNCTION HEX-OF (' ') DELIMITED BY SIZE INTO HEXX.
+  75 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  76              IF HEXX NOT = "20--------"
+  77          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:77.7-77.14:
+  74              STRING FUNCTION HEX-OF (' ') DELIMITED BY SIZE INTO HEXX.
+  75          >>IF   CHARSET = 'ASCII'
+  76              IF HEXX NOT = "20--------"
+  77 >        >> ELSE
+----          ^^^^^^^
+  78              IF HEXX NOT = "40--------"
+  79          >> END-IF
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:79.7-79.16:
+  76              IF HEXX NOT = "20--------"
+  77          >> ELSE
+  78              IF HEXX NOT = "40--------"
+  79 >        >> END-IF
+----          ^^^^^^^^^
+  80                 DISPLAY "UNEXPECTED HEX-VALUE OF ' ': " HEXX.
+  81   
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:107.54-107.58:
+ 104              SET  HEXX-FILLER TO TRUE
+ 105              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
+ 106   
+ 107 >            IF FUNCTION HEX-TO-CHAR (HEXX(1:6)) NOT = z"01"
+----                                                         ^^^^
+ 108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
+ 109                         HEXX (1:6).
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:113.33-113.39:
+ 110              SET  HEXX-FILLER TO TRUE
+ 111              STRING FUNCTION HEX-TO-CHAR ("3132")
+ 112                     DELIMITED BY SIZE INTO HEXX.
+ 113 >            IF NOT (HEXX (1:2) = x"3132" AND HEXX (3:) = "--------")
+----                                    ^^^^^^
+ 114                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " HEXX.
+ 115   
+>> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:119.33-119.39:
+ 116              SET  HEXX-FILLER TO TRUE
+ 117              STRING FUNCTION HEX-TO-CHAR ("3132")
+ 118                     DELIMITED BY SIZE INTO HEXX.
+ 119 >            IF NOT (HEXX (1:2) = x"3132" AND HEXX (3:) = "--------")
+----                                    ^^^^^^
+ 120                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " HEXX.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:575:0
+run_functions.at-575-prog.cob:7.43:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          01  P            USAGE    POINTER.
+   7 >        01  X            PIC      X(4) VALUE Z"ABC".
+----                                              ^
+   8          01  TEST-FLD     USAGE    BINARY-LONG.
+   9          PROCEDURE        DIVISION.
+>> Hint: Missing <literal>
+
+run_functions.at-575-prog.cob:7.44-7.50:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          01  P            USAGE    POINTER.
+   7 >        01  X            PIC      X(4) VALUE Z"ABC".
+----                                               ^^^^^^
+   8          01  TEST-FLD     USAGE    BINARY-LONG.
+   9          PROCEDURE        DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:650:0
+run_functions.at-650-prog.cob:7.34:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          01  P   USAGE    POINTER.
+   7 >        01  X   PIC      X(4) VALUE Z"ABC".
+----                                     ^
+   8          01  B   PIC      X(10) BASED.
+   9          PROCEDURE        DIVISION.
+>> Hint: Missing <literal>
+
+run_functions.at-650-prog.cob:7.35-7.41:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6          01  P   USAGE    POINTER.
+   7 >        01  X   PIC      X(4) VALUE Z"ABC".
+----                                      ^^^^^^
+   8          01  B   PIC      X(10) BASED.
+   9          PROCEDURE        DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:685:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:710:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:733:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:804:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:829:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:854:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:879:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:904:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:928:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:962:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1050:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1003:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1049:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1085:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1120:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1145:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1170:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1195:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1223:0
+run_functions.at-1223-prog.cob:6.35:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01  Datetime-Format CONSTANT "YYYYMMDDThhmmss.ss+hhmm".
+----                                      ^
+   7          01  str             PIC X(25).
+   8          PROCEDURE        DIVISION.
+>> Hint: Missing RECORD
+
+run_functions.at-1223-prog.cob:6.36-6.61:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01  Datetime-Format CONSTANT "YYYYMMDDThhmmss.ss+hhmm".
+----                                       ^^^^^^^^^^^^^^^^^^^^^^^^^
+   7          01  str             PIC X(25).
+   8          PROCEDURE        DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1286:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1311:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1368:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1394:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1481:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1512:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1537:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1568:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1636:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1669:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1694:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1719:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1769:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1795:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1877:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1907:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1931:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1957:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1983:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2009:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2033:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2061:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2087:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2140:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2160:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2182:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2204:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2226:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2248:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2280:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2311:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2344:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2345:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2370:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2395:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2416:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2441:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2462:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2487:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2510:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2533:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2556:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2579:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2652:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2713:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2741:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2776:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2796:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2817:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2838:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2861:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2881:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2904:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2926:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2948:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2975:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:2998:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3021:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3076:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3098:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3142:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3164:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3186:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3208:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3232:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3259:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3285:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3310:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3336:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3358:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3380:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3401:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3423:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3525:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3606:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3659:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3700:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3851:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3951:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4051:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4074:0
+run_functions.at-4074-prog.cob:10.37-10.45:
+   7          PROCEDURE        DIVISION.
+   8              DISPLAY FUNCTION TRIM ( X )
+   9              END-DISPLAY.
+  10 >            DISPLAY FUNCTION TRIM ( X TRAILING )
+----                                        ^^^^^^^^
+  11              END-DISPLAY.
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4100:0
+run_functions.at-4100-prog.cob:10.37-10.45:
+   7          PROCEDURE        DIVISION.
+   8              DISPLAY FUNCTION TRIM ( X ) (2 : 3)
+   9              END-DISPLAY.
+  10 >            DISPLAY FUNCTION TRIM ( X TRAILING ) (2 : 3)
+----                                        ^^^^^^^^
+  11              END-DISPLAY.
+  12              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4127:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4155:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4180:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4210:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4264:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4288:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4358:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4407:0
+run_functions.at-4407-prog.cob:11.54-11.68:
+   8   
+   9          PROCEDURE DIVISION.
+  10              MOVE FUNCTION FORMATTED-DATETIME
+  11 >                     ("YYYYDDDThhmmss+hhmm", 1, 45296, SYSTEM-OFFSET)
+----                                                         ^^^^^^^^^^^^^^
+  12                  TO str
+  13              MOVE FUNCTION TEST-FORMATTED-DATETIME
+>> Error: Invalid syntax
+
+run_functions.at-4407-prog.cob:20.42-20.56:
+  17              END-IF
+  18   
+  19              MOVE FUNCTION FORMATTED-TIME
+  20 >                     ("hhmmss.ssZ", 45296, SYSTEM-OFFSET)
+----                                             ^^^^^^^^^^^^^^
+  21                  TO str
+  22              MOVE FUNCTION TEST-FORMATTED-DATETIME
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4428:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4449:0
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4502:0
+run_functions.at-4502-prog.cob:9.11-9.14:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----              ^^^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Error: Invalid syntax
+
+run_functions.at-4502-prog.cob:9.16:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----                   ^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Hint: Missing .
+
+run_functions.at-4502-prog.cob:9.17-9.19:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----                    ^^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Warning: Invalid syntax
+
+run_functions.at-4502-prog.cob:9.26:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----                             ^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Hint: Missing .
+
+run_functions.at-4502-prog.cob:9.27-9.33:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----                              ^^^^^^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Warning: Invalid syntax
+
+run_functions.at-4502-prog.cob:9.42-9.49:
+   6          01 PAR-IN        PIC 9.
+   7          01 PAR-OUT       PIC 9.
+   8          PROCEDURE DIVISION USING PAR-IN RETURNING PAR-OUT.
+   9 >            ADD 1 TO PAR-IN GIVING PAR-OUT END-ADD.
+----                                             ^^^^^^^
+  10              GOBACK.
+  11          END FUNCTION WITHPAR.
+>> Error: Invalid syntax
+
+run_functions.at-4502-prog.cob:19.11-19.15:
+  16          LINKAGE          SECTION.
+  17          01 PAR           PIC 9.
+  18          PROCEDURE DIVISION RETURNING PAR.
+  19 >            MOVE 1 TO PAR.
+----              ^^^^
+  20              GOBACK.
+  21          END FUNCTION WITHOUTPAR.
+>> Error: Invalid syntax
+
+run_functions.at-4502-prog.cob:19.17:
+  16          LINKAGE          SECTION.
+  17          01 PAR           PIC 9.
+  18          PROCEDURE DIVISION RETURNING PAR.
+  19 >            MOVE 1 TO PAR.
+----                    ^
+  20              GOBACK.
+  21          END FUNCTION WITHOUTPAR.
+>> Hint: Missing .
+
+run_functions.at-4502-prog.cob:19.18-19.20:
+  16          LINKAGE          SECTION.
+  17          01 PAR           PIC 9.
+  18          PROCEDURE DIVISION RETURNING PAR.
+  19 >            MOVE 1 TO PAR.
+----                     ^^
+  20              GOBACK.
+  21          END FUNCTION WITHOUTPAR.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4543:0
+run_functions.at-4543-prog.cob:10.11-10.15:
+   7          01  num PIC 999.
+   8   
+   9          PROCEDURE DIVISION RETURNING num.
+  10 >            MOVE 100 TO num
+----              ^^^^
+  11              .
+  12          END FUNCTION func.
+>> Error: Invalid syntax
+
+run_functions.at-4543-prog.cob:10.19:
+   7          01  num PIC 999.
+   8   
+   9          PROCEDURE DIVISION RETURNING num.
+  10 >            MOVE 100 TO num
+----                      ^
+  11              .
+  12          END FUNCTION func.
+>> Hint: Missing .
+
+run_functions.at-4543-prog.cob:10.20-10.22:
+   7          01  num PIC 999.
+   8   
+   9          PROCEDURE DIVISION RETURNING num.
+  10 >            MOVE 100 TO num
+----                       ^^
+  11              .
+  12          END FUNCTION func.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4585:0
+run_functions.at-4585-prog.cob:12.11-12.15:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----              ^^^^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Error: Invalid syntax
+
+run_functions.at-4585-prog.cob:12.23:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                          ^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Hint: Missing .
+
+run_functions.at-4585-prog.cob:12.24-12.26:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                           ^^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Warning: Invalid syntax
+
+run_functions.at-4585-prog.cob:12.35:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                                      ^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Hint: Missing .
+
+run_functions.at-4585-prog.cob:13.11-13.18:
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12              MOVE func-in TO func-out
+  13 >            INSPECT func-out REPLACING ALL '%' BY func-sub
+----              ^^^^^^^
+  14              .
+  15          END FUNCTION SUBSTITUTE.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4648:0
+run_functions.at-4648-prog.cob:17.11-17.13:
+  14          01  ret PIC 9.
+  15   
+  16          PROCEDURE DIVISION USING arg RETURNING ret.
+  17 >            IF arg < 5
+----              ^^
+  18                 ADD 1 TO arg GIVING num END-ADD
+  19                 MOVE FUNCTION foo (num) TO ret
+>> Error: Invalid syntax
+
+run_functions.at-4648-prog.cob:17.17:
+  14          01  ret PIC 9.
+  15   
+  16          PROCEDURE DIVISION USING arg RETURNING ret.
+  17 >            IF arg < 5
+----                    ^
+  18                 ADD 1 TO arg GIVING num END-ADD
+  19                 MOVE FUNCTION foo (num) TO ret
+>> Hint: Missing .
+
+run_functions.at-4648-prog.cob:17.18-17.19:
+  14          01  ret PIC 9.
+  15   
+  16          PROCEDURE DIVISION USING arg RETURNING ret.
+  17 >            IF arg < 5
+----                     ^
+  18                 ADD 1 TO arg GIVING num END-ADD
+  19                 MOVE FUNCTION foo (num) TO ret
+>> Warning: Invalid syntax
+
+run_functions.at-4648-prog.cob:17.21:
+  14          01  ret PIC 9.
+  15   
+  16          PROCEDURE DIVISION USING arg RETURNING ret.
+  17 >            IF arg < 5
+----                        ^
+  18                 ADD 1 TO arg GIVING num END-ADD
+  19                 MOVE FUNCTION foo (num) TO ret
+>> Hint: Missing .
+
+run_functions.at-4648-prog.cob:18.14-18.17:
+  15   
+  16          PROCEDURE DIVISION USING arg RETURNING ret.
+  17              IF arg < 5
+  18 >               ADD 1 TO arg GIVING num END-ADD
+----                 ^^^
+  19                 MOVE FUNCTION foo (num) TO ret
+  20              ELSE
+>> Warning: Invalid syntax
+
+run_functions.at-4648-prog.cob:20.11-20.15:
+  17              IF arg < 5
+  18                 ADD 1 TO arg GIVING num END-ADD
+  19                 MOVE FUNCTION foo (num) TO ret
+  20 >            ELSE
+----              ^^^^
+  21                 MOVE arg TO ret
+  22              END-IF
+>> Error: Invalid syntax
+
+run_functions.at-4648-prog.cob:22.11-22.17:
+  19                 MOVE FUNCTION foo (num) TO ret
+  20              ELSE
+  21                 MOVE arg TO ret
+  22 >            END-IF
+----              ^^^^^^
+  23              DISPLAY "Step: " ttl ", Arg: " arg ", Return: " ret
+  24              END-DISPLAY
+>> Error: Invalid syntax
+

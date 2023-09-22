@@ -1,0 +1,485 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:197:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:198:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:199:0
+syn_file.at-199-prog3.cob:7.51-7.53:
+   4          ENVIRONMENT      DIVISION.
+   5          INPUT-OUTPUT     SECTION.
+   6          FILE-CONTROL.
+   7 >        SELECT TEST-FILE ASSIGN       TO DISK FNAME OF F1
+----                                                      ^^
+   8                           ORGANIZATION IS SEQUENTIAL.
+   9          DATA             DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:264:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:265:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:266:0
+syn_file.at-266-prog3.cob:7.56-7.58:
+   4          ENVIRONMENT      DIVISION.
+   5          INPUT-OUTPUT     SECTION.
+   6          FILE-CONTROL.
+   7 >        SELECT TEST-FILE ASSIGN       TO PRINTER-1 FNAME OF F1
+----                                                           ^^
+   8                           ORGANIZATION IS SEQUENTIAL.
+   9          DATA             DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:321:0
+syn_file.at-321-prog.cob:10.40-10.45:
+   7          SELECT TST-FILE1 ASSIGN       TO CARD-PUNCH  "F1".
+   8          SELECT TST-FILE2 ASSIGN       TO CARD-READER "F2".
+   9          SELECT TST-FILE3 ASSIGN       TO CASSETTE    "F3".
+  10 >        SELECT TST-FILE4 ASSIGN       TO INPUT       "F4".
+----                                           ^^^^^
+  11          SELECT TST-FILE5 ASSIGN       TO INPUT-OUTPUT.
+  12          SELECT TST-FILE6 ASSIGN       TO MAGNETIC-TAPE.
+>> Error: Invalid syntax
+
+syn_file.at-321-prog.cob:11.40-11.52:
+   8          SELECT TST-FILE2 ASSIGN       TO CARD-READER "F2".
+   9          SELECT TST-FILE3 ASSIGN       TO CASSETTE    "F3".
+  10          SELECT TST-FILE4 ASSIGN       TO INPUT       "F4".
+  11 >        SELECT TST-FILE5 ASSIGN       TO INPUT-OUTPUT.
+----                                           ^^^^^^^^^^^^
+  12          SELECT TST-FILE6 ASSIGN       TO MAGNETIC-TAPE.
+  13          SELECT TST-FILE7 ASSIGN       TO OUTPUT      "F7".
+>> Error: Invalid syntax
+
+syn_file.at-321-prog.cob:13.40-13.46:
+  10          SELECT TST-FILE4 ASSIGN       TO INPUT       "F4".
+  11          SELECT TST-FILE5 ASSIGN       TO INPUT-OUTPUT.
+  12          SELECT TST-FILE6 ASSIGN       TO MAGNETIC-TAPE.
+  13 >        SELECT TST-FILE7 ASSIGN       TO OUTPUT      "F7".
+----                                           ^^^^^^
+  14          DATA             DIVISION.
+  15          FILE             SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:416:0
+syn_file.at-416-prog.cob:11.40-11.47:
+   8                  ORGANIZATION IS SEQUENTIAL.
+   9              SELECT test-file-2 ASSIGN USING var-2
+  10                 ORGANIZATION IS SEQUENTIAL.
+  11 >            SELECT test-file-3 ASSIGN TO VARYING var-3
+----                                           ^^^^^^^
+  12                  ORGANIZATION IS SEQUENTIAL.
+  13              SELECT test-file-4 ASSIGN DISK USING var-4
+>> Error: Invalid syntax
+
+syn_file.at-416-prog.cob:15.37-15.44:
+  12                  ORGANIZATION IS SEQUENTIAL.
+  13              SELECT test-file-4 ASSIGN DISK USING var-4
+  14                  ORGANIZATION IS SEQUENTIAL.
+  15 >            SELECT test-file-5 ASSIGN DYNAMIC DISK var-5
+----                                        ^^^^^^^
+  16                  ORGANIZATION IS SEQUENTIAL.
+  17              SELECT test-file-6 ASSIGN DISK FROM var-6
+>> Error: Invalid syntax
+
+syn_file.at-416-prog.cob:17.42-17.46:
+  14                  ORGANIZATION IS SEQUENTIAL.
+  15              SELECT test-file-5 ASSIGN DYNAMIC DISK var-5
+  16                  ORGANIZATION IS SEQUENTIAL.
+  17 >            SELECT test-file-6 ASSIGN DISK FROM var-6
+----                                             ^^^^
+  18                  ORGANIZATION IS SEQUENTIAL.
+  19          DATA             DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:530:0
+syn_file.at-530-prog.cob:22.37:
+  19              READ TEST-FILE NEXT
+  20              END-READ
+  21              CLOSE TEST-FILE
+  22 >            OPEN  INPUT TEST-FILE WITH LOCK REVERSED
+----                                        ^
+  23              READ TEST-FILE NEXT
+  24              END-READ
+>> Hint: Missing NO REWIND
+
+syn_file.at-530-prog.cob:22.38-22.42:
+  19              READ TEST-FILE NEXT
+  20              END-READ
+  21              CLOSE TEST-FILE
+  22 >            OPEN  INPUT TEST-FILE WITH LOCK REVERSED
+----                                         ^^^^
+  23              READ TEST-FILE NEXT
+  24              END-READ
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:575:0
+syn_file.at-575-prog.cob:20.38-20.42:
+  17              WRITE TEST-REC FROM "TeSt"
+  18              END-WRITE
+  19              CLOSE TEST-FILE WITH NO REWIND
+  20 >            OPEN  INPUT TEST-FILE WITH LOCK WITH NO REWIND
+----                                         ^^^^
+  21              READ TEST-FILE NEXT  *> should get EOF
+  22              END-READ
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:628:0
+syn_file.at-628-prog.cob:11.33:
+   8                           ORGANIZATION  IS INDEXED
+   9                           ACCESS MODE   IS DYNAMIC
+  10                           RECORD    KEY IS TEST-P2 IN TEST-SOME
+  11 >                         ALTERNATE KEY IS TEST-P3 IN TEST-SOME.
+----                                    ^
+  12          SELECT TEST-FILE ASSIGN TO 'FILE-TEST2'
+  13                           ORGANIZATION  IS INDEXED
+>> Hint: Missing RECORD
+
+syn_file.at-628-prog.cob:11.34-11.37:
+   8                           ORGANIZATION  IS INDEXED
+   9                           ACCESS MODE   IS DYNAMIC
+  10                           RECORD    KEY IS TEST-P2 IN TEST-SOME
+  11 >                         ALTERNATE KEY IS TEST-P3 IN TEST-SOME.
+----                                     ^^^
+  12          SELECT TEST-FILE ASSIGN TO 'FILE-TEST2'
+  13                           ORGANIZATION  IS INDEXED
+>> Error: Invalid syntax
+
+syn_file.at-628-prog.cob:16.33:
+  13                           ORGANIZATION  IS INDEXED
+  14                           ACCESS MODE   IS DYNAMIC
+  15                           RECORD    KEY IS TEST-P1
+  16 >                         ALTERNATE KEY IS TEST-P4.
+----                                    ^
+  17          DATA             DIVISION.
+  18          FILE             SECTION.
+>> Hint: Missing RECORD
+
+syn_file.at-628-prog.cob:16.34-16.37:
+  13                           ORGANIZATION  IS INDEXED
+  14                           ACCESS MODE   IS DYNAMIC
+  15                           RECORD    KEY IS TEST-P1
+  16 >                         ALTERNATE KEY IS TEST-P4.
+----                                     ^^^
+  17          DATA             DIVISION.
+  18          FILE             SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:783:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:798:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:962:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1064:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1592:0
+syn_file.at-1592-prog.cob:16.50-16.58:
+  13                           ORGANIZATION IS INDEXED
+  14                           ACCESS MODE  IS DYNAMIC
+  15                           RECORD KEY   IS file2-key
+  16 >                         STATUS       IS STATUS-1, STATUS-2.
+----                                                     ^^^^^^^^
+  17          DATA DIVISION.
+  18          FILE SECTION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1738:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1829:0
+syn_file.at-1829-prog.cob:10.26-10.33:
+   7              SELECT file1 ASSIGN DISK.
+   8          DATA DIVISION.
+   9          FILE SECTION.
+  10 >        FD  file1 VALUE OF FILE-ID fid-file1.
+----                             ^^^^^^^
+  11          01  file1-rec PIC X.
+  12          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+syn_file.at-1829-prog.cob:10.43:
+   7              SELECT file1 ASSIGN DISK.
+   8          DATA DIVISION.
+   9          FILE SECTION.
+  10 >        FD  file1 VALUE OF FILE-ID fid-file1.
+----                                              ^
+  11          01  file1-rec PIC X.
+  12          PROCEDURE DIVISION.
+>> Hint: Missing <literal>
+
+syn_file.at-1829-prog.cob:10.43-10.44:
+   7              SELECT file1 ASSIGN DISK.
+   8          DATA DIVISION.
+   9          FILE SECTION.
+  10 >        FD  file1 VALUE OF FILE-ID fid-file1.
+----                                              ^
+  11          01  file1-rec PIC X.
+  12          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1856:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1937:0
+syn_file.at-1937-prog.cob:16.37:
+  13          01  TEST-REC     PIC X(4).
+  14          WORKING-STORAGE  SECTION.
+  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
+  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+----                                        ^
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+>> Hint: Missing AS <expression>
+
+syn_file.at-1937-prog.cob:16.44-16.52:
+  13          01  TEST-REC     PIC X(4).
+  14          WORKING-STORAGE  SECTION.
+  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
+  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+----                                               ^^^^^^^^
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+>> Error: Invalid syntax
+
+syn_file.at-1937-prog.cob:19.37:
+  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
+----                                        ^
+  20          PROCEDURE        DIVISION.
+  21              DISPLAY GLOB-PATH GLOB-VAR
+>> Hint: Missing AS <expression>
+
+syn_file.at-1937-prog.cob:19.44-19.52:
+  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
+  17         * Test global vars because of implicitly defined ASSIGN var, too.
+  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
+  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
+----                                               ^^^^^^^^
+  20          PROCEDURE        DIVISION.
+  21              DISPLAY GLOB-PATH GLOB-VAR
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2011:0
+syn_file.at-2011-prog.cob:14.17-14.25:
+  11                 RECORD KEY    TESTKEY-P1
+  12                 ALTERNATE RECORD KEY TESTKEY-P2
+  13                    WITH DUPLICATES
+  14 >                  SUPPRESS WHEN ZEROES
+----                    ^^^^^^^^
+  15                 ALTERNATE RECORD KEY TESTKEY-P3
+  16                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2011-prog.cob:17.17-17.25:
+  14                    SUPPRESS WHEN ZEROES
+  15                 ALTERNATE RECORD KEY TESTKEY-P3
+  16                    WITH DUPLICATES
+  17 >                  SUPPRESS WHEN SPACES
+----                    ^^^^^^^^
+  18                 ALTERNATE RECORD KEY TESTKEY-P4
+  19                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2011-prog.cob:20.17-20.25:
+  17                    SUPPRESS WHEN SPACES
+  18                 ALTERNATE RECORD KEY TESTKEY-P4
+  19                    WITH DUPLICATES
+  20 >                  SUPPRESS WHEN ALL "A"
+----                    ^^^^^^^^
+  21                 ALTERNATE RECORD KEY TESTKEY-P5
+  22                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2011-prog.cob:23.17-23.25:
+  20                    SUPPRESS WHEN ALL "A"
+  21                 ALTERNATE RECORD KEY TESTKEY-P5
+  22                    WITH DUPLICATES
+  23 >                  SUPPRESS WHEN ALL SPACES
+----                    ^^^^^^^^
+  24                 .
+  25          DATA             DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2062:0
+syn_file.at-2062-prog.cob:13.27-13.28:
+  10                 ORGANIZATION   INDEXED
+  11                 RECORD KEY     TESTKEY-P1 OF TEST-REC1
+  12                 ALTERNATE RECORD KEY
+  13 >                  TEST1KEY2 = TESTKEY-P2 OF TEST-REC1,
+----                              ^
+  14                                TESTKEY-P3 OF TEST-REC1
+  15                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2062-prog.cob:23.48-23.50:
+  20                 ORGANIZATION   INDEXED
+  21                 RECORD KEY     TESTKEY-P1 OF TEST-REC2
+  22                 ALTERNATE RECORD KEY
+  23 >                  TEST2KEY2 SOURCE IS TESTKEY-P2 OF TEST-REC2,
+----                                                   ^^
+  24                                        TESTKEY-P3 OF TEST-REC2
+  25                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2062-prog.cob:24.48-24.50:
+  21                 RECORD KEY     TESTKEY-P1 OF TEST-REC2
+  22                 ALTERNATE RECORD KEY
+  23                    TEST2KEY2 SOURCE IS TESTKEY-P2 OF TEST-REC2,
+  24 >                                      TESTKEY-P3 OF TEST-REC2
+----                                                   ^^
+  25                    WITH DUPLICATES
+  26                    .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2092:0
+syn_file.at-2092-prog.cob:15.36-15.38:
+  12                 ALTERNATE RECORD KEY TESTKEY2
+  13                                  WITH DUPLICATES
+  14                 ALTERNATE RECORD KEY TESTKEY3
+  15 >                                WITH NO DUPLICATES
+----                                       ^^
+  16                 .
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2121:0
+syn_file.at-2121-prog.cob:12.23:
+   9                 ACCESS        DYNAMIC
+  10                 ORGANIZATION  INDEXED
+  11                 RECORD     KEY  TESTKEY1
+  12 >               ALTERNATE  KEY  TESTKEY2
+----                          ^
+  13                 .
+  14          PROCEDURE DIVISION.
+>> Hint: Missing RECORD
+
+syn_file.at-2121-prog.cob:12.25-12.28:
+   9                 ACCESS        DYNAMIC
+  10                 ORGANIZATION  INDEXED
+  11                 RECORD     KEY  TESTKEY1
+  12 >               ALTERNATE  KEY  TESTKEY2
+----                            ^^^
+  13                 .
+  14          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2203:0
+syn_file.at-2203-prog.cob:13.17-13.21:
+  10                 ORGANIZATION  INDEXED
+  11                 ACCESS        DYNAMIC
+  12                 RECORD KEY    TESTKEY-1P1
+  13 >                  WITH DUPLICATES
+----                    ^^^^
+  14                 ALTERNATE RECORD KEY TESTKEY-1P2
+  15                    WITH NO DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:15.22-15.24:
+  12                 RECORD KEY    TESTKEY-1P1
+  13                    WITH DUPLICATES
+  14                 ALTERNATE RECORD KEY TESTKEY-1P2
+  15 >                  WITH NO DUPLICATES
+----                         ^^
+  16                 LOCK EXCLUSIVE MASS-UPDATE
+  17                 .
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:16.18:
+  13                    WITH DUPLICATES
+  14                 ALTERNATE RECORD KEY TESTKEY-1P2
+  15                    WITH NO DUPLICATES
+  16 >               LOCK EXCLUSIVE MASS-UPDATE
+----                     ^
+  17                 .
+  18          SELECT TEST-FILE2
+>> Hint: Missing AUTOMATIC
+
+syn_file.at-2203-prog.cob:16.19-16.28:
+  13                    WITH DUPLICATES
+  14                 ALTERNATE RECORD KEY TESTKEY-1P2
+  15                    WITH NO DUPLICATES
+  16 >               LOCK EXCLUSIVE MASS-UPDATE
+----                      ^^^^^^^^^
+  17                 .
+  18          SELECT TEST-FILE2
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:24.17-24.21:
+  21                 ORGANIZATION  INDEXED
+  22                 ACCESS        DYNAMIC
+  23                 RECORD KEY    TESTKEY-2P1
+  24 >                  WITH NO DUPLICATES
+----                    ^^^^
+  25                 ALTERNATE RECORD KEY TESTKEY-2P2
+  26                    WITH DUPLICATES
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:41.16-41.25:
+  38              03  ALLOWING    PIC X(4).
+  39              03  TESTKEY-2P2 PIC 9(4).
+  40          PROCEDURE DIVISION.
+  41 >            OPEN EXCLUSIVE INPUT TEST-FILE2
+----                   ^^^^^^^^^
+  42              CLOSE TEST-FILE2
+  43              OPEN I-O TEST-FILE1 TEST-FILE2 ALLOWING UPDATERS
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:54.40-54.43:
+  51              OPEN I-O TEST-FILE1 ALLOWING WRITERS
+  52              CLOSE TEST-FILE1
+  53              CLOSE TEST-FILE1
+  54 >            OPEN I-O TEST-FILE1 ALLOWING ALL
+----                                           ^^^
+  55              CLOSE TEST-FILE1
+  56              CLOSE TEST-FILE1
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:57.42:
+  54              OPEN I-O TEST-FILE1 ALLOWING ALL
+  55              CLOSE TEST-FILE1
+  56              CLOSE TEST-FILE1
+  57 >            OPEN I-O TEST-FILE1 ALLOWING NO
+----                                             ^
+  58              CLOSE TEST-FILE1
+  59              OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
+>> Hint: Missing REWIND
+
+syn_file.at-2203-prog.cob:58.11-58.16:
+  55              CLOSE TEST-FILE1
+  56              CLOSE TEST-FILE1
+  57              OPEN I-O TEST-FILE1 ALLOWING NO
+  58 >            CLOSE TEST-FILE1
+----              ^^^^^
+  59              OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
+  60              CLOSE TEST-FILE1
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:59.42:
+  56              CLOSE TEST-FILE1
+  57              OPEN I-O TEST-FILE1 ALLOWING NO
+  58              CLOSE TEST-FILE1
+  59 >            OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
+----                                             ^
+  60              CLOSE TEST-FILE1
+  61              OPEN I-O TEST-FILE1 FOR LOCK
+>> Hint: Missing REWIND
+
+syn_file.at-2203-prog.cob:59.43-59.49:
+  56              CLOSE TEST-FILE1
+  57              OPEN I-O TEST-FILE1 ALLOWING NO
+  58              CLOSE TEST-FILE1
+  59 >            OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
+----                                              ^^^^^^
+  60              CLOSE TEST-FILE1
+  61              OPEN I-O TEST-FILE1 FOR LOCK
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:61.31-61.34:
+  58              CLOSE TEST-FILE1
+  59              OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
+  60              CLOSE TEST-FILE1
+  61 >            OPEN I-O TEST-FILE1 FOR LOCK
+----                                  ^^^
+  62              CLOSE TEST-FILE1
+  63              OPEN I-O TEST-FILE1 LOCK
+>> Error: Invalid syntax
+
+syn_file.at-2203-prog.cob:63.31-63.35:
+  60              CLOSE TEST-FILE1
+  61              OPEN I-O TEST-FILE1 FOR LOCK
+  62              CLOSE TEST-FILE1
+  63 >            OPEN I-O TEST-FILE1 LOCK
+----                                  ^^^^
+  64              CLOSE TEST-FILE1
+  65              OPEN I-O TEST-FILE1 BULK-ADDITION
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2253:0

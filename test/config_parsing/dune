@@ -1,0 +1,8 @@
+(library
+ (name test_gnucobol_config)
+ (modules test_gnucobol_config)
+ (preprocess
+  (pps ppx_inline_test))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_config))

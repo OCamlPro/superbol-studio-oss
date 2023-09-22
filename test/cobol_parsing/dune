@@ -1,0 +1,14 @@
+(tests
+  (names test_picture_parsing test_combined_relations_parsing)
+  (modules test_picture_parsing test_combined_relations_parsing)
+  (libraries alcotest cobol_parser cobol_data))
+
+(library
+ (name test_cobol_parser)
+ (modules cS_tokens decimal_point tokens parser_testing)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_parser)
+ )
