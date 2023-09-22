@@ -14,8 +14,6 @@
 (** Gathers some types used to define options for the parser engine. *)
 (* We are only defining types here so an MLI would only be redundant. *)
 
-open Cobol_common.Srcloc.TYPES
-
 (** Switch for the recovery mechanism *)
 type recovery =
   | DisableRecovery
@@ -26,26 +24,23 @@ and recovery_options =
                                          missing tokens (e.g, periods).  *)
   }
 
-type 'a memory =
+type 'm memory =
   | Amnesic: Cobol_common.Behaviors.amnesic memory
   | Eidetic: Cobol_common.Behaviors.eidetic memory
 
-type tokens_with_locs = Grammar_tokens.token with_loc list
-type parsing_artifacts =
+type parser_options =
   {
-    tokens: tokens_with_locs Lazy.t;
-    pplog: Cobol_preproc.log;
-    comments: Cobol_preproc.comments
+    verbose: bool;
+    show: [`Pending] list;
+    recovery: recovery;
   }
-type ('a, 'm) output =
-  | Only: 'a ->
-      ('a, Cobol_common.Behaviors.amnesic) output
-  | WithArtifacts: 'a * parsing_artifacts ->
-      ('a, Cobol_common.Behaviors.eidetic) output
 
-type ('a, 'm) parsed_result =
+let default_recovery =
+  EnableRecovery { silence_benign_recoveries = false }
+
+let default =
   {
-    parsed_input: Cobol_preproc.input;
-    parsed_diags: Cobol_common.Diagnostics.Set.t;
-    parsed_output: ('a, 'm) output;
+    verbose = false;
+    show = [`Pending];
+    recovery = default_recovery;
   }

@@ -199,6 +199,8 @@ let simple_result r = result r
 let some_result ?diags r = result ?diags (Some r)
 let no_result ~diags = { result = None; diags }
 let map_result f { result; diags } = { result = f result; diags }
+let more_result f { result; diags } = with_more_diags ~diags (f result)
+let forget_result { diags; _ } = diags
 
 let hint_result r = Cont.khint (with_diag r)
 let note_result r = Cont.knote (with_diag r)

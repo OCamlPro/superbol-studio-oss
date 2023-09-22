@@ -13,7 +13,7 @@
 
 open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
-open Cobol_parser.Grammar_tokens
+open Cobol_parser.Tokens
 
 module TOKTYP = struct
   type t = { index: int; name: string }

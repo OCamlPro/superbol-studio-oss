@@ -19,7 +19,7 @@ val token_modifiers: string list
 val data
   : filename: string
   -> range: Lsp.Types.Range.t option
-  -> tokens: Cobol_parser.tokens_with_locs
+  -> tokens: Cobol_parser.Outputs.tokens_with_locs
   -> pplog: Cobol_preproc.log
   -> comments: Cobol_preproc.comments
   -> ptree: Lsp_imports.PTREE.compilation_group

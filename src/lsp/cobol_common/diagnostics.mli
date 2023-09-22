@@ -108,6 +108,8 @@ val simple_result: 'a -> 'a with_diags
 val some_result: ?diags:diagnostics -> 'a -> 'a option with_diags
 val no_result: diags:diagnostics -> _ option with_diags
 val map_result: ('a -> 'b) -> 'a with_diags -> 'b with_diags
+val more_result: ('a -> 'b with_diags) -> 'a with_diags -> 'b with_diags
+val forget_result: _ with_diags -> diagnostics
 
 val hint_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func
 val note_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func

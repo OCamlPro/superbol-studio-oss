@@ -51,7 +51,7 @@ let add_cobol_doc server ?copybook ~projdir filename text =
   let uri = Lsp.Uri.of_path path in
   EzFile.write_file path text;
   let server =
-    LSP.Server.add ?copybook
+    LSP.Server.did_open ?copybook
       DidOpenTextDocumentParams.{
         textDocument = TextDocumentItem.{
             languageId = "cobol"; version = 0; text; uri;

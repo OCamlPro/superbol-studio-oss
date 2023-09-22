@@ -214,7 +214,7 @@ let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
     try_with_document_data registry doc
-      ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments };
+      ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments; _ };
                           _ } Lsp_document.{ ast; _ } ->
         let data =
           Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range

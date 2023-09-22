@@ -16,6 +16,8 @@ open Autofonce_lib
 open Autofonce_config
 open Autofonce_core.Types
 
+module DIAGS = Cobol_common.Diagnostics
+
 let () =
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
      output of tests that fail expectedly. *)
@@ -155,14 +157,21 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     then Cobol_config.(SF SFFree)
     else Cobol_config.(SF SFFixed)
   in
+  let parse_simple input =
+    Cobol_parser.parse_simple @@
+    Cobol_preproc.preprocessor
+      { init_source_format = source_format;
+        init_config = Cobol_config.default;
+        init_libpath = [] } input
+  in
   try
     let input = setup_input ~filename contents in
-    match Cobol_parser.parse_simple ~source_format ~libpath:[] input with
-    | { parsed_diags; parsed_output = Only Some _; _ } ->
-        Cobol_common.show_diagnostics ~ppf:Fmt.stdout parsed_diags;
+    match parse_simple input with
+    | DIAGS.{ diags; result = Only Some _ } ->
+        Cobol_common.show_diagnostics ~ppf:Fmt.stdout diags;
         terminate "ok"
-    | { parsed_diags; _ } ->
-        Cobol_common.show_diagnostics ~ppf:Fmt.stdout parsed_diags;
+    | DIAGS.{ diags; _ } ->
+        Cobol_common.show_diagnostics ~ppf:Fmt.stdout diags;
         terminate "ok (with errors)"
     | exception e ->
         Pretty.out "Failure (%s)@\n%s@\n" (Printexc.to_string e) contents;

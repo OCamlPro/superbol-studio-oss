@@ -146,6 +146,8 @@ type 'k state =
     comments: comments;
     cdir_seen: bool;
     newline: bool;
+    newline_cnums: int list;    (** index of all newline characters encountered
+                                    so far (in reverse order) *)
     diags: DIAGS.Set.t;
     config: 'k config;
   }
@@ -177,6 +179,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
     comments = [];
     cdir_seen = false;
     newline = true;
+    newline_cnums = [];
     diags = DIAGS.Set.none;
     config =
       {
@@ -187,6 +190,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
 
 let diagnostics { diags; _ } = diags
 let comments { comments; _ } = List.rev comments
+let newline_cnums { newline_cnums; _ } = List.rev newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
 let allow_debug { config = { debug; _ }; _ } = debug
 
@@ -252,12 +256,17 @@ let append t state =
 
 let new_line state lexbuf =
   Lexing.new_line lexbuf;
+  let state =
+    { state with
+      newline = true;
+      newline_cnums = Lexing.lexeme_end lexbuf :: state.newline_cnums }
+  in
   match state.lex_prods, state.cdir_seen with
   | { payload = TextWord _ | Alphanum _ | Pseudo _ | Eof; _ } :: _, _
   | _, true ->
-      flush { state with newline = true }
+      flush state
   | _ ->
-      { state with newline = true }, []
+      state, []
 
 (* --- *)
 

@@ -15,13 +15,13 @@ open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Cobol_parser.Options
+
 type t = {
   config: (module Cobol_config.T);
   source_format: Cobol_config.source_format_spec;
   libpath: string list;
-  verbose: bool;
-  recovery: Cobol_parser.recovery;
-  show: [`Pending] list;
+  parser_options: parser_options;
 }
 
 let showable =
@@ -130,12 +130,12 @@ let get () =
     in
     let recovery =
       if !recovery
-      then Cobol_parser.EnableRecovery { silence_benign_recoveries = false }
-      else Cobol_parser.DisableRecovery
+      then EnableRecovery { silence_benign_recoveries = false }
+      else DisableRecovery
     in
     let verbose = !Globals.verbosity > 0 in
-    { config ; source_format ; libpath = !libpath ; recovery; verbose;
-      show = !show }
+    { config; source_format; libpath = !libpath;
+      parser_options = { recovery; verbose; show = !show } }
 
   in
   get, args

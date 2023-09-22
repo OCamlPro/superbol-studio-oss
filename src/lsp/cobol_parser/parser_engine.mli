@@ -11,21 +11,54 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include module type of Parser_options
+open Parser_options
+open Parser_outputs
 
-type 'm parsing_function
-  = ?source_format:Cobol_config.source_format_spec
+(** {1 Basic (one-shot) parsing} *)
+
+type 'm simple_parsing
+  = ?options:Parser_options.parser_options
   -> ?config:Cobol_config.t
-  -> ?recovery:recovery
-  -> ?verbose:bool
-  -> ?show:[`Pending] list
-  -> libpath:string list
-  -> Cobol_preproc.input
-  -> (PTree.compilation_group option, 'm) parsed_result
+  -> Cobol_preproc.preprocessor
+  -> (PTree.compilation_group option, 'm) output
+    Cobol_common.Diagnostics.with_diags
 
-val parse: memory: 'm Parser_options.memory -> 'm parsing_function
-val parse_simple: Cobol_common.Behaviors.amnesic parsing_function
-val parse_with_tokens: Cobol_common.Behaviors.eidetic parsing_function
+val parse
+  : memory: 'm memory -> 'm simple_parsing
+val parse_simple
+  : Cobol_common.Behaviors.amnesic simple_parsing
+val parse_with_artifacts
+  : Cobol_common.Behaviors.eidetic simple_parsing
 
-val parsing_artifacts
-  : (_, Cobol_common.Behaviors.eidetic) parsed_result -> parsing_artifacts
+(** {1 Rewindable parsing} *)
+
+type 'm rewindable_parsing
+  = ?options:parser_options
+  -> ?config:Cobol_config.t
+  -> Cobol_preproc.preprocessor
+  -> (((PTree.compilation_group option, 'm) output as 'x) *
+      'x rewinder)
+    Cobol_common.Diagnostics.with_diags
+and 'x rewinder
+and preprocessor_rewind =
+  ?new_position:Lexing.position -> (Cobol_preproc.preprocessor as 'r) -> 'r
+
+val rewindable_parse
+  : memory:'m memory
+  -> 'm rewindable_parsing
+val rewindable_parse_simple
+  : Cobol_common.Behaviors.amnesic rewindable_parsing
+val rewindable_parse_with_artifacts
+  : Cobol_common.Behaviors.eidetic rewindable_parsing
+
+val rewind_and_parse
+  : 'x rewinder
+  -> preprocessor_rewind
+  -> position: Lexing.position
+  -> (((PTree.compilation_group option, 'm) output as 'x) * 'x rewinder)
+    Cobol_common.Diagnostics.with_diags
+
+(** {1 Accessing artifacts} *)
+
+val artifacts
+  : (_, Cobol_common.Behaviors.eidetic) output -> artifacts

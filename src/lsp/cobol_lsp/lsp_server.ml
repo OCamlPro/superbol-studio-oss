@@ -132,8 +132,20 @@ let create_or_retrieve_project ~uri registry =
     let project = Lsp_project.for_ ~rootdir ~layout in
     project, add_project project registry
 
-let add (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
-                                     _ } as doc) ?copybook registry =
+let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
+    ?copybook registry =
+  let project, registry = create_or_retrieve_project ~uri registry in
+  try
+    let doc = Lsp_document.load ~project ?copybook doc in
+    let registry = dispatch_diagnostics doc registry in
+    add_or_replace_doc doc registry
+  with Lsp_document.Internal_error (doc, e) ->
+    Lsp_io.pretty_notification ~log:true ~type_:Error
+      "Internal error while opening document: %a" Fmt.exn e;
+    add_or_replace_doc doc registry
+
+let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
+                                          _ } as doc) ?copybook registry =
   (* Try first with a lookup for the project in a cache, and then by
      creating/loading the project. *)
   let rec aux ~try_cache registry =
@@ -152,10 +164,7 @@ let add (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
         in
         aux ~try_cache:false registry          (* try again without the cache *)
     | None | Some _ ->
-        let project, registry = create_or_retrieve_project ~uri registry in
-        let doc = Lsp_document.load ~project ?copybook doc in
-        let registry = dispatch_diagnostics doc registry in
-        add_or_replace_doc doc registry
+        add doc ?copybook registry
   in
   aux ~try_cache:true registry
 
@@ -164,14 +173,19 @@ let find_document (TextDocumentIdentifier.{ uri; _ } as doc) { docs; _ } =
   try URIMap.find uri docs
   with Not_found -> raise @@ Document_not_found doc
 
-let update DidChangeTextDocumentParams.{ textDocument = { uri; _ };
-                                         contentChanges; _ } registry =
-  let doc = find_document TextDocumentIdentifier.{ uri } registry in
-  let doc = Lsp_document.update doc contentChanges in
-  let registry = dispatch_diagnostics doc registry in
-  add_or_replace_doc doc registry
+let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
+                                             contentChanges; _ } registry =
+  try
+    let doc = find_document TextDocumentIdentifier.{ uri } registry in
+    let doc = Lsp_document.update doc contentChanges in
+    let registry = dispatch_diagnostics doc registry in
+    add_or_replace_doc doc registry
+  with Lsp_document.Internal_error (doc, e) ->
+    Lsp_io.pretty_notification ~log:true ~type_:Error
+      "Internal error while updating document: %a" Fmt.exn e;
+    add_or_replace_doc doc registry
 
-let remove DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
+let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
   { registry with docs = URIMap.remove uri registry.docs }
 
 (** {2 Miscellaneous} *)

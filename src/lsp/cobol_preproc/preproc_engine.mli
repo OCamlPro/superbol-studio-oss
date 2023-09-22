@@ -25,6 +25,17 @@ type init =
     init_source_format: Cobol_config.source_format_spec;
   }
 
+val preprocessor
+  : ?verbose:bool
+  -> init
+  -> input
+  -> preprocessor
+val reset_preprocessor
+  : ?new_position:Lexing.position
+  -> preprocessor
+  -> input
+  -> preprocessor
+
 (* --- *)
 
 val diags: preprocessor -> Cobol_common.Diagnostics.Set.t
@@ -34,6 +45,8 @@ val log: preprocessor -> Preproc_trace.log
 val comments: preprocessor -> Text.comments
 val srclexer: preprocessor -> Preproc.any_srclexer
 val position: preprocessor -> Lexing.position
+val newline_cnums: preprocessor -> int list
+
 val next_sentence: preprocessor -> Text.text * preprocessor
 
 (** {2 High-level commands} *)
@@ -42,12 +55,6 @@ val decide_source_format
   : string
   -> Cobol_config.source_format_spec
   -> Cobol_config.source_format Cobol_common.Diagnostics.with_diags
-
-val preprocessor
-  : ?verbose:bool
-  -> input
-  -> [< `WithLibpath of init ]
-  -> preprocessor
 
 val lex_file
   : source_format: Cobol_config.source_format_spec

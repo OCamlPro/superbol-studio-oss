@@ -18,10 +18,8 @@ module CUs = Cobol_data.Compilation_unit.SET
 
 val analyze_compilation_group
   : ?config:(module Cobol_config.T)
-  -> _ Cobol_parser.parsed_compilation_group
-  -> (CUs.t * Cobol_parser.PTree.compilation_group * DIAGS.diagnostics,
-      DIAGS.diagnostics)
-    result
+  -> _ Cobol_parser.Outputs.parsed_compilation_group
+  -> (CUs.t * Cobol_parser.PTree.compilation_group, unit) result DIAGS.with_diags
 
 module Make
     (Config: Cobol_config.T)                      (* for dialect-based checks *)

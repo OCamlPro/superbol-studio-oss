@@ -29,12 +29,14 @@ include Preproc_trace                          (* include log events *)
 type 'k srclexer = 'k Src_lexing.state * Lexing.lexbuf
 and any_srclexer =
   | Plx: 'k srclexer -> any_srclexer                                   [@@unboxed]
-let srclex_lexbuf (Plx (_, lexbuf)) = lexbuf
-let srclex_pos pl = (srclex_lexbuf pl).Lexing.lex_curr_p
+let srclex_pos (Plx (_, lexbuf)) =
+  lexbuf.Lexing.lex_curr_p
 let srclex_diags (Plx (pl, _)) =
   Src_lexing.diagnostics pl
 let srclex_comments (Plx (pl, _)) =
   Src_lexing.comments pl
+let srclex_newline_cnums (Plx (pl, _)) =
+  Src_lexing.newline_cnums pl
 let srclex_source_format (Plx (pl, _)) =
   Src_lexing.(source_format_spec @@ source_format pl)
 
@@ -98,6 +100,27 @@ let srclex_from_string = make_srclex Lexing.from_string
 let srclex_from_channel = make_srclex Lexing.from_channel
 let srclex_from_file ~source_format filename : any_srclexer =
   srclex_from_string ~source_format ~filename (EzFile.read_file filename)
+
+(** Note: If given, assumes [position] corresponds to the begining of the
+    input. If absent, restarts from first position.  File name is kept from the
+    previous input. *)
+let srclex_restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
+  let lexbuf = make_lexing ?with_positions:(Some true) input in
+  let pos_fname = match position with
+    | Some p ->
+        Lexing.set_position lexbuf p;
+        p.Lexing.pos_fname
+    | None ->
+        prev_lexbuf.Lexing.lex_curr_p.pos_fname
+  in
+  Lexing.set_filename lexbuf pos_fname;
+  Plx (s, lexbuf)
+
+let srclex_restart_on_string = srclex_restart Lexing.from_string
+let srclex_restart_on_channel = srclex_restart Lexing.from_channel
+let srclex_restart_on_file ?position filename =
+  srclex_restart_on_string ?position (EzFile.read_file filename)
+
 
 (* --- Compiler Directives -------------------------------------------------- *)
 
@@ -474,7 +497,6 @@ let delim left text right =
   textword_cat (fun w s -> concat_strings s w) Fun.id left
 
 let try_replacing_clause: replacing with_loc -> text -> _ result = fun replacing ->
-  (* Helpers to record replacement operations on source locations: *)
   let replloc = ~@replacing in
   match ~&replacing with
   | ReplaceExact { repl_from; repl_to } ->

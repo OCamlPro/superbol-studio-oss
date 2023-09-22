@@ -45,19 +45,28 @@ let preprocess_file ~source_format ?config =
   preprocess_file ~source_format ?config ~verbose:false ~libpath:[]
     ~ppf:std_formatter ~epf:std_formatter
 
-let reparse_file ~source_format ?config filename =
-  let parse =
-    Cobol_parser.parse_simple ~recovery:DisableRecovery ?config ~libpath:[]
+let reparse_file ~source_format ~config filename =
+  let parse ~source_format input =
+    Cobol_parser.parse_simple
+      ~options:Cobol_parser.Options.{
+          default with
+          recovery = DisableRecovery
+        } @@
+    Cobol_preproc.preprocessor
+      { init_libpath = [];
+        init_config = config;
+        init_source_format = source_format }
+      input
   in
   let print =
     Format.asprintf "@[%a@]@." Cobol_parser.PTree.pp_compilation_group
   in
   match parse ~source_format (Filename filename) with
-  | { parsed_output = Only Some cg; _ } -> (
+  | { result = Only Some cg; _ } -> (
       Format.printf "Parse: OK. ";
       let contents = print cg in
       match parse ~source_format:(SF SFFree) (String { contents; filename }) with
-      | { parsed_output = Only Some cg'; _ } ->
+      | { result = Only Some cg'; _ } ->
         if Cobol_parser.PTree.compare_compilation_group cg cg' = 0 then
           Format.printf "Reparse: OK."
         else

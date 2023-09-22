@@ -394,7 +394,7 @@ module Make (Config: Cobol_config.T) = struct
     | Eidetic [] -> Fmt.invalid_arg "put_token_back: unexpected memory state"
     | Eidetic (_ :: toks) -> { s with memory = Eidetic toks }
 
-  let next_token (type m) (s: m state) =
+  let next_token (s: _ state) =
     let rec aux = function
       | { payload = INTERVENING_ ','; _ } :: tokens ->
           aux tokens

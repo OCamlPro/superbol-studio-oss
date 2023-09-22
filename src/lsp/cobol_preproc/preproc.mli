@@ -101,6 +101,8 @@ val apply_replacing
   -> text
   -> 'a
 
+(** {3 Source format} *)
+
 val cdir_source_format
   : dialect: Cobol_config.dialect
   -> string with_loc
@@ -112,6 +114,8 @@ val with_source_format
   : 'k Src_lexing.source_format with_loc
   -> any_srclexer
   -> any_srclexer
+
+(** {3 Instantiation} *)
 
 val srclex_from_file
   : source_format:Cobol_config.source_format
@@ -127,6 +131,30 @@ val srclex_from_channel
   -> source_format:Cobol_config.source_format
   -> in_channel
   -> any_srclexer
+
+(** {3 Resetting the input} *)
+
+(** Note: the functions below assume [position] corresponds to the begining of
+    the input.} *)
+
+val srclex_restart_on_file
+  : ?position: Lexing.position
+  -> string
+  -> any_srclexer
+  -> any_srclexer
+val srclex_restart_on_string
+  : ?position: Lexing.position
+  -> string
+  -> any_srclexer
+  -> any_srclexer
+val srclex_restart_on_channel
+  : ?position: Lexing.position
+  -> in_channel
+  -> any_srclexer
+  -> any_srclexer
+
+(** {3 Queries} *)
+
 val srclex_diags
   : any_srclexer
   -> Cobol_common.Diagnostics.Set.t
@@ -136,6 +164,9 @@ val srclex_pos
 val srclex_comments
   : any_srclexer
   -> comments
+val srclex_newline_cnums
+  : any_srclexer
+  -> int list
 
 val next_source_line: any_srclexer -> any_srclexer * text
 val fold_source_lines: any_srclexer -> (text -> 'a -> 'a) -> 'a -> 'a

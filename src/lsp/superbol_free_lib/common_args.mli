@@ -15,9 +15,7 @@ type t = {
   config: (module Cobol_config.T);
   source_format: Cobol_config.source_format_spec;
   libpath: string list;
-  verbose: bool;
-  recovery: Cobol_parser.recovery;
-  show: [`Pending] list;
+  parser_options: Cobol_parser.Options.parser_options;
 }
 
 val get : unit -> (unit -> t) * Ezcmd.V2.EZCMD.TYPES.arg_list
