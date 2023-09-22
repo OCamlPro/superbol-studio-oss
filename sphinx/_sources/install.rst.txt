@@ -13,10 +13,10 @@ Build and install with :code:`dune`
 
 Checkout the sources of :code:`superbol-vscode-platform` in a directory.
 
-You need a switch with at least version :code:`4.13.0` of OCaml,
+You need a switch with at least version :code:`4.14.0` of OCaml,
 you can for example create it with::
 
-  opam switch create 4.13.0
+  opam switch create 4.14.1
 
 Then, you need to install all the dependencies::
 
