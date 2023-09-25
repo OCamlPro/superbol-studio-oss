@@ -9,126 +9,6 @@ run_reportwriter.at-82-prog.cob:11.44-11.52:
   13          DATA DIVISION.
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-82-prog.cob:19.22:
-  16              REPORT IS RWCS-Report.
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19 >        RD  RWCS-Report
-----                         ^
-  20              PAGE LIMIT 12
-  21                  HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-82-prog.cob:20.11-20.15:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----              ^^^^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Error: Invalid syntax
-
-run_reportwriter.at-82-prog.cob:20.24:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----                           ^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Hint: Missing .
-
-run_reportwriter.at-82-prog.cob:21.15-21.22:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                  ^^^^^^^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7.
->> Error: Invalid syntax
-
-run_reportwriter.at-82-prog.cob:21.24:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                           ^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7.
->> Hint: Missing .
-
-run_reportwriter.at-82-prog.cob:22.15-22.20:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                  ^^^^^
-  23                  LAST DETAIL 7.
-  24                  
->> Error: Invalid syntax
-
-run_reportwriter.at-82-prog.cob:22.29:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                                ^
-  23                  LAST DETAIL 7.
-  24                  
->> Hint: Missing .
-
-run_reportwriter.at-82-prog.cob:23.15-23.19:
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
-  23 >                LAST DETAIL 7.
-----                  ^^^^
-  24                  
-  25          01  TYPE REPORT HEADING LINE 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-82-prog.cob:28.15:
-  25          01  TYPE REPORT HEADING LINE 1.
-  26              05 COL 1 VALUE 'RH'.
-  27              
-  28 >        01  TYPE PAGE HEADING LINE PLUS 1.
-----                  ^
-  29              05 COL 1 VALUE 'PH'.
-  30                 
->> Hint: Missing DETAIL
-
-run_reportwriter.at-82-prog.cob:28.16-28.20:
-  25          01  TYPE REPORT HEADING LINE 1.
-  26              05 COL 1 VALUE 'RH'.
-  27              
-  28 >        01  TYPE PAGE HEADING LINE PLUS 1.
-----                   ^^^^
-  29              05 COL 1 VALUE 'PH'.
-  30                 
->> Error: Invalid syntax
-
-run_reportwriter.at-82-prog.cob:34.15:
-  31          01  Detail-Line TYPE DETAIL LINE PLUS 1.
-  32              05 COL 1 VALUE 'DE'.
-  33   
-  34 >        01  TYPE PAGE FOOTING LINE NUMBER 10.
-----                  ^
-  35              05 COL 1 VALUE 'PF'.
-  36                 
->> Hint: Missing DETAIL
-
-run_reportwriter.at-82-prog.cob:34.16-34.20:
-  31          01  Detail-Line TYPE DETAIL LINE PLUS 1.
-  32              05 COL 1 VALUE 'DE'.
-  33   
-  34 >        01  TYPE PAGE FOOTING LINE NUMBER 10.
-----                   ^^^^
-  35              05 COL 1 VALUE 'PF'.
-  36                 
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:115:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:163:0
 run_reportwriter.at-163-prog.cob:11.49-11.57:
@@ -140,86 +20,6 @@ run_reportwriter.at-163-prog.cob:11.49-11.57:
   12                                          LINE SEQUENTIAL.
   13          DATA DIVISION.
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-163-prog.cob:19.22:
-  16              REPORT IS RWCS-Report.
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19 >        RD  RWCS-Report
-----                         ^
-  20              PAGE LIMIT 12
-  21                  HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-163-prog.cob:20.11-20.15:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----              ^^^^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Error: Invalid syntax
-
-run_reportwriter.at-163-prog.cob:20.24:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----                           ^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Hint: Missing .
-
-run_reportwriter.at-163-prog.cob:21.15-21.22:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                  ^^^^^^^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7.
->> Error: Invalid syntax
-
-run_reportwriter.at-163-prog.cob:21.24:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                           ^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7.
->> Hint: Missing .
-
-run_reportwriter.at-163-prog.cob:22.15-22.20:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                  ^^^^^
-  23                  LAST DETAIL 7.
-  24                  
->> Error: Invalid syntax
-
-run_reportwriter.at-163-prog.cob:22.29:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                                ^
-  23                  LAST DETAIL 7.
-  24                  
->> Hint: Missing .
-
-run_reportwriter.at-163-prog.cob:23.15-23.19:
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
-  23 >                LAST DETAIL 7.
-----                  ^^^^
-  24                  
-  25          01  Detail-Line TYPE DETAIL.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:184:0
 run_reportwriter.at-184-reference:4.6-4.7:
@@ -253,86 +53,6 @@ run_reportwriter.at-232-prog.cob:12.49-12.57:
   14          DATA DIVISION.
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-232-prog.cob:20.22:
-  17              REPORT IS RWCS-Report.
-  18          WORKING-STORAGE SECTION.
-  19          REPORT SECTION.
-  20 >        RD  RWCS-Report
-----                         ^
-  21              PAGE LIMIT 12
-  22                  HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-232-prog.cob:21.11-21.15:
-  18          WORKING-STORAGE SECTION.
-  19          REPORT SECTION.
-  20          RD  RWCS-Report
-  21 >            PAGE LIMIT 12
-----              ^^^^
-  22                  HEADING 1
-  23                  FIRST DETAIL 4
->> Error: Invalid syntax
-
-run_reportwriter.at-232-prog.cob:21.24:
-  18          WORKING-STORAGE SECTION.
-  19          REPORT SECTION.
-  20          RD  RWCS-Report
-  21 >            PAGE LIMIT 12
-----                           ^
-  22                  HEADING 1
-  23                  FIRST DETAIL 4
->> Hint: Missing .
-
-run_reportwriter.at-232-prog.cob:22.15-22.22:
-  19          REPORT SECTION.
-  20          RD  RWCS-Report
-  21              PAGE LIMIT 12
-  22 >                HEADING 1
-----                  ^^^^^^^
-  23                  FIRST DETAIL 4
-  24                  LAST DETAIL 7.
->> Error: Invalid syntax
-
-run_reportwriter.at-232-prog.cob:22.24:
-  19          REPORT SECTION.
-  20          RD  RWCS-Report
-  21              PAGE LIMIT 12
-  22 >                HEADING 1
-----                           ^
-  23                  FIRST DETAIL 4
-  24                  LAST DETAIL 7.
->> Hint: Missing .
-
-run_reportwriter.at-232-prog.cob:23.15-23.20:
-  20          RD  RWCS-Report
-  21              PAGE LIMIT 12
-  22                  HEADING 1
-  23 >                FIRST DETAIL 4
-----                  ^^^^^
-  24                  LAST DETAIL 7.
-  25   
->> Error: Invalid syntax
-
-run_reportwriter.at-232-prog.cob:23.29:
-  20          RD  RWCS-Report
-  21              PAGE LIMIT 12
-  22                  HEADING 1
-  23 >                FIRST DETAIL 4
-----                                ^
-  24                  LAST DETAIL 7.
-  25   
->> Hint: Missing .
-
-run_reportwriter.at-232-prog.cob:24.15-24.19:
-  21              PAGE LIMIT 12
-  22                  HEADING 1
-  23                  FIRST DETAIL 4
-  24 >                LAST DETAIL 7.
-----                  ^^^^
-  25   
-  26          01  Detail-Line TYPE DETAIL.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:253:0
 run_reportwriter.at-253-reference:4.6-4.7:
    1   
@@ -365,136 +85,6 @@ run_reportwriter.at-313-prog.cob:11.49-11.57:
   13          DATA DIVISION.
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-313-prog.cob:19.22:
-  16              REPORT IS RWCS-Report.
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19 >        RD  RWCS-Report
-----                         ^
-  20              PAGE LIMIT 12
-  21                  HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-313-prog.cob:20.11-20.15:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----              ^^^^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:20.24:
-  17          WORKING-STORAGE SECTION.
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20 >            PAGE LIMIT 12
-----                           ^
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
->> Hint: Missing .
-
-run_reportwriter.at-313-prog.cob:21.15-21.22:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                  ^^^^^^^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:21.24:
-  18          REPORT SECTION.
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21 >                HEADING 1
-----                           ^
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7
->> Hint: Missing .
-
-run_reportwriter.at-313-prog.cob:22.15-22.20:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                  ^^^^^
-  23                  LAST DETAIL 7
-  24              CONTROL IS FINAL.
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:22.29:
-  19          RD  RWCS-Report
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22 >                FIRST DETAIL 4
-----                                ^
-  23                  LAST DETAIL 7
-  24              CONTROL IS FINAL.
->> Hint: Missing .
-
-run_reportwriter.at-313-prog.cob:23.15-23.19:
-  20              PAGE LIMIT 12
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
-  23 >                LAST DETAIL 7
-----                  ^^^^
-  24              CONTROL IS FINAL.
-  25   
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:24.11-24.18:
-  21                  HEADING 1
-  22                  FIRST DETAIL 4
-  23                  LAST DETAIL 7
-  24 >            CONTROL IS FINAL.
-----              ^^^^^^^
-  25   
-  26          01  TYPE REPORT HEADING LINE 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:29.15:
-  26          01  TYPE REPORT HEADING LINE 1.
-  27              05 COL 1 VALUE 'RH'.
-  28   
-  29 >        01  TYPE PAGE HEADING LINE PLUS 1.
-----                  ^
-  30              05 COL 1 VALUE 'PH'.
-  31   
->> Hint: Missing DETAIL
-
-run_reportwriter.at-313-prog.cob:29.16-29.20:
-  26          01  TYPE REPORT HEADING LINE 1.
-  27              05 COL 1 VALUE 'RH'.
-  28   
-  29 >        01  TYPE PAGE HEADING LINE PLUS 1.
-----                   ^^^^
-  30              05 COL 1 VALUE 'PH'.
-  31   
->> Error: Invalid syntax
-
-run_reportwriter.at-313-prog.cob:38.15:
-  35          01  TYPE CONTROL FOOTING FINAL.
-  36              05 COL 1 VALUE 'CFF'.
-  37   
-  38 >        01  TYPE PAGE FOOTING LINE NUMBER 10.
-----                  ^
-  39              05 COL 1 VALUE 'PF'.
-  40   
->> Hint: Missing DETAIL
-
-run_reportwriter.at-313-prog.cob:38.16-38.20:
-  35          01  TYPE CONTROL FOOTING FINAL.
-  36              05 COL 1 VALUE 'CFF'.
-  37   
-  38 >        01  TYPE PAGE FOOTING LINE NUMBER 10.
-----                   ^^^^
-  39              05 COL 1 VALUE 'PF'.
-  40   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:322:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:371:0
 run_reportwriter.at-371-prog.cob:8.33-8.41:
@@ -506,26 +96,6 @@ run_reportwriter.at-371-prog.cob:8.33-8.41:
    9               ORGANIZATION LINE SEQUENTIAL.
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-371-prog.cob:20.13:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                ^
-  21   
-  22          01  rp-detail TYPE DE.
->> Hint: Missing .
-
-run_reportwriter.at-371-prog.cob:20.14-20.18:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                 ^^^^
-  21   
-  22          01  rp-detail TYPE DE.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:383:0
 run_reportwriter.at-383-reference:2.6-2.7:
@@ -552,46 +122,6 @@ run_reportwriter.at-440-prog.cob:7.33-7.41:
    8               ORGANIZATION LINE SEQUENTIAL.
    9   
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-440-prog.cob:18.13:
-  15          01  foo  PIC X(20).
-  16   
-  17          REPORT SECTION.
-  18 >        RD  rp PAGE LIMIT 3 LINES.
-----                ^
-  19   
-  20          01  rp-detail TYPE DE.
->> Hint: Missing .
-
-run_reportwriter.at-440-prog.cob:18.14-18.18:
-  15          01  foo  PIC X(20).
-  16   
-  17          REPORT SECTION.
-  18 >        RD  rp PAGE LIMIT 3 LINES.
-----                 ^^^^
-  19   
-  20          01  rp-detail TYPE DE.
->> Error: Invalid syntax
-
-run_reportwriter.at-440-prog.cob:18.32:
-  15          01  foo  PIC X(20).
-  16   
-  17          REPORT SECTION.
-  18 >        RD  rp PAGE LIMIT 3 LINES.
-----                                   ^
-  19   
-  20          01  rp-detail TYPE DE.
->> Hint: Missing ARE
-
-run_reportwriter.at-440-prog.cob:18.32-18.33:
-  15          01  foo  PIC X(20).
-  16   
-  17          REPORT SECTION.
-  18 >        RD  rp PAGE LIMIT 3 LINES.
-----                                   ^
-  19   
-  20          01  rp-detail TYPE DE.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:455:0
 run_reportwriter.at-455-reference:5.6-5.7:
@@ -1208,86 +738,6 @@ run_reportwriter.at-630-prog.cob:20.39-20.48:
 ----                                          ^^^^^^^^^
   21         
   22          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:48.26:
-  45              88  END-OF-FILE                         VALUE 'Y'.
-  46         
-  47          REPORT SECTION.
-  48 >        RD  CUSTOMER-REPORT
-----                             ^
-  49              PAGE LIMIT IS 66 LINES
-  50              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-630-prog.cob:49.11-49.15:
-  46         
-  47          REPORT SECTION.
-  48          RD  CUSTOMER-REPORT
-  49 >            PAGE LIMIT IS 66 LINES
-----              ^^^^
-  50              HEADING 1
-  51              FIRST DETAIL 5
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:49.33:
-  46         
-  47          REPORT SECTION.
-  48          RD  CUSTOMER-REPORT
-  49 >            PAGE LIMIT IS 66 LINES
-----                                    ^
-  50              HEADING 1
-  51              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-630-prog.cob:50.11-50.18:
-  47          REPORT SECTION.
-  48          RD  CUSTOMER-REPORT
-  49              PAGE LIMIT IS 66 LINES
-  50 >            HEADING 1
-----              ^^^^^^^
-  51              FIRST DETAIL 5
-  52              LAST DETAIL 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:51.11-51.16:
-  48          RD  CUSTOMER-REPORT
-  49              PAGE LIMIT IS 66 LINES
-  50              HEADING 1
-  51 >            FIRST DETAIL 5
-----              ^^^^^
-  52              LAST DETAIL 58.
-  53         
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:52.11-52.15:
-  49              PAGE LIMIT IS 66 LINES
-  50              HEADING 1
-  51              FIRST DETAIL 5
-  52 >            LAST DETAIL 58.
-----              ^^^^
-  53         
-  54          01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:54.31:
-  51              FIRST DETAIL 5
-  52              LAST DETAIL 58.
-  53         
-  54 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                  ^
-  55              02  LINE 1.
-  56                  03  COLUMN 27   PIC X(41) VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-630-prog.cob:54.32-54.36:
-  51              FIRST DETAIL 5
-  52              LAST DETAIL 58.
-  53         
-  54 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                   ^^^^
-  55              02  LINE 1.
-  56                  03  COLUMN 27   PIC X(41) VALUE
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:770:0
@@ -1917,86 +1367,6 @@ run_reportwriter.at-983-prog.cob:19.39-19.48:
   21          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-983-prog.cob:68.15:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROL IS TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                  ^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-983-prog.cob:68.16-68.21:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROL IS TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                   ^^^^^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-983-prog.cob:68.33:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROL IS TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                                    ^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-983-prog.cob:69.11-69.18:
-  66          RD  CUSTOMER-REPORT
-  67              CONTROL IS TR-CUSTOMER-NUMBER
-  68              PAGE LIMIT IS 66 LINES
-  69 >            HEADING 1
-----              ^^^^^^^
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-983-prog.cob:70.11-70.16:
-  67              CONTROL IS TR-CUSTOMER-NUMBER
-  68              PAGE LIMIT IS 66 LINES
-  69              HEADING 1
-  70 >            FIRST DETAIL 5
-----              ^^^^^
-  71              LAST DETAIL 58.
-  72         
->> Error: Invalid syntax
-
-run_reportwriter.at-983-prog.cob:71.11-71.15:
-  68              PAGE LIMIT IS 66 LINES
-  69              HEADING 1
-  70              FIRST DETAIL 5
-  71 >            LAST DETAIL 58.
-----              ^^^^
-  72         
-  73          01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-983-prog.cob:73.31:
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
-  72         
-  73 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                  ^
-  74              02  LINE 1.
-  75                  03  COLUMN 27   PIC X(41) VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-983-prog.cob:73.32-73.36:
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
-  72         
-  73 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                   ^^^^
-  74              02  LINE 1.
-  75                  03  COLUMN 27   PIC X(41) VALUE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1123:0
 run_reportwriter.at-1123-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
@@ -2624,86 +1994,6 @@ run_reportwriter.at-1353-prog.cob:19.39-19.48:
   21          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-1353-prog.cob:68.15:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROLS ARE FINAL, TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                  ^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-1353-prog.cob:68.16-68.21:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROLS ARE FINAL, TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                   ^^^^^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-1353-prog.cob:68.33:
-  65          REPORT SECTION.
-  66          RD  CUSTOMER-REPORT
-  67              CONTROLS ARE FINAL, TR-CUSTOMER-NUMBER
-  68 >            PAGE LIMIT IS 66 LINES
-----                                    ^
-  69              HEADING 1
-  70              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-1353-prog.cob:69.11-69.18:
-  66          RD  CUSTOMER-REPORT
-  67              CONTROLS ARE FINAL, TR-CUSTOMER-NUMBER
-  68              PAGE LIMIT IS 66 LINES
-  69 >            HEADING 1
-----              ^^^^^^^
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-1353-prog.cob:70.11-70.16:
-  67              CONTROLS ARE FINAL, TR-CUSTOMER-NUMBER
-  68              PAGE LIMIT IS 66 LINES
-  69              HEADING 1
-  70 >            FIRST DETAIL 5
-----              ^^^^^
-  71              LAST DETAIL 58.
-  72         
->> Error: Invalid syntax
-
-run_reportwriter.at-1353-prog.cob:71.11-71.15:
-  68              PAGE LIMIT IS 66 LINES
-  69              HEADING 1
-  70              FIRST DETAIL 5
-  71 >            LAST DETAIL 58.
-----              ^^^^
-  72         
-  73          01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-1353-prog.cob:73.31:
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
-  72         
-  73 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                  ^
-  74              02  LINE 1.
-  75                  03  COLUMN 27   PIC X(41) VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-1353-prog.cob:73.32-73.36:
-  70              FIRST DETAIL 5
-  71              LAST DETAIL 58.
-  72         
-  73 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                   ^^^^
-  74              02  LINE 1.
-  75                  03  COLUMN 27   PIC X(41) VALUE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1493:0
 run_reportwriter.at-1493-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
@@ -3329,86 +2619,6 @@ run_reportwriter.at-1718-prog.cob:26.39-26.48:
 ----                                          ^^^^^^^^^
   27         
   28          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:76.15:
-  73          REPORT SECTION.
-  74          RD  CUSTOMER-REPORT
-  75              CONTROLS ARE FINAL, TR-CUSTOMER
-  76 >            PAGE LIMIT IS 66 LINES
-----                  ^
-  77              HEADING 1
-  78              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-1718-prog.cob:76.16-76.21:
-  73          REPORT SECTION.
-  74          RD  CUSTOMER-REPORT
-  75              CONTROLS ARE FINAL, TR-CUSTOMER
-  76 >            PAGE LIMIT IS 66 LINES
-----                   ^^^^^
-  77              HEADING 1
-  78              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:76.33:
-  73          REPORT SECTION.
-  74          RD  CUSTOMER-REPORT
-  75              CONTROLS ARE FINAL, TR-CUSTOMER
-  76 >            PAGE LIMIT IS 66 LINES
-----                                    ^
-  77              HEADING 1
-  78              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-1718-prog.cob:77.11-77.18:
-  74          RD  CUSTOMER-REPORT
-  75              CONTROLS ARE FINAL, TR-CUSTOMER
-  76              PAGE LIMIT IS 66 LINES
-  77 >            HEADING 1
-----              ^^^^^^^
-  78              FIRST DETAIL 5
-  79              LAST DETAIL 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:78.11-78.16:
-  75              CONTROLS ARE FINAL, TR-CUSTOMER
-  76              PAGE LIMIT IS 66 LINES
-  77              HEADING 1
-  78 >            FIRST DETAIL 5
-----              ^^^^^
-  79              LAST DETAIL 58.
-  80         
->> Error: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:79.11-79.15:
-  76              PAGE LIMIT IS 66 LINES
-  77              HEADING 1
-  78              FIRST DETAIL 5
-  79 >            LAST DETAIL 58.
-----              ^^^^
-  80         
-  81          01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:81.31:
-  78              FIRST DETAIL 5
-  79              LAST DETAIL 58.
-  80         
-  81 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                  ^
-  82              02  LINE 1.
-  83                  03  COLUMN 27   PIC X(41) VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-1718-prog.cob:81.32-81.36:
-  78              FIRST DETAIL 5
-  79              LAST DETAIL 58.
-  80         
-  81 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                   ^^^^
-  82              02  LINE 1.
-  83                  03  COLUMN 27   PIC X(41) VALUE
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1793:0
@@ -4478,86 +3688,6 @@ run_reportwriter.at-2069-prog.cob:20.39-20.48:
   22          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-2069-prog.cob:65.15:
-  62          REPORT SECTION.
-  63          RD  DISTRICT-SALES-REPORT
-  64              CONTROLS ARE FINAL, SR-DISTRICT-CODE, SR-SALESMAN-NUMBER
-  65 >            PAGE LIMIT IS 66 LINES
-----                  ^
-  66              HEADING 1
-  67              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-2069-prog.cob:65.16-65.21:
-  62          REPORT SECTION.
-  63          RD  DISTRICT-SALES-REPORT
-  64              CONTROLS ARE FINAL, SR-DISTRICT-CODE, SR-SALESMAN-NUMBER
-  65 >            PAGE LIMIT IS 66 LINES
-----                   ^^^^^
-  66              HEADING 1
-  67              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-2069-prog.cob:65.33:
-  62          REPORT SECTION.
-  63          RD  DISTRICT-SALES-REPORT
-  64              CONTROLS ARE FINAL, SR-DISTRICT-CODE, SR-SALESMAN-NUMBER
-  65 >            PAGE LIMIT IS 66 LINES
-----                                    ^
-  66              HEADING 1
-  67              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-2069-prog.cob:66.11-66.18:
-  63          RD  DISTRICT-SALES-REPORT
-  64              CONTROLS ARE FINAL, SR-DISTRICT-CODE, SR-SALESMAN-NUMBER
-  65              PAGE LIMIT IS 66 LINES
-  66 >            HEADING 1
-----              ^^^^^^^
-  67              FIRST DETAIL 5
-  68              LAST DETAIL 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-2069-prog.cob:67.11-67.16:
-  64              CONTROLS ARE FINAL, SR-DISTRICT-CODE, SR-SALESMAN-NUMBER
-  65              PAGE LIMIT IS 66 LINES
-  66              HEADING 1
-  67 >            FIRST DETAIL 5
-----              ^^^^^
-  68              LAST DETAIL 58.
-  69         
->> Error: Invalid syntax
-
-run_reportwriter.at-2069-prog.cob:68.11-68.15:
-  65              PAGE LIMIT IS 66 LINES
-  66              HEADING 1
-  67              FIRST DETAIL 5
-  68 >            LAST DETAIL 58.
-----              ^^^^
-  69         
-  70          01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-2069-prog.cob:70.31:
-  67              FIRST DETAIL 5
-  68              LAST DETAIL 58.
-  69         
-  70 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                  ^
-  71              02  LINE 1.
-  72                  03  COLUMN 27   PIC X(41) VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-2069-prog.cob:70.32-70.36:
-  67              FIRST DETAIL 5
-  68              LAST DETAIL 58.
-  69         
-  70 >        01  PAGE-HEAD-GROUP TYPE PAGE HEADING.
-----                                   ^^^^
-  71              02  LINE 1.
-  72                  03  COLUMN 27   PIC X(41) VALUE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2209:0
 run_reportwriter.at-2209-reference:1.26-1.27:
    1 >                           D I S T R I C T   S A L E S   R E P O R T                      PAGE     1
@@ -5576,86 +4706,6 @@ run_reportwriter.at-2794-prog.cob:24.39-24.48:
   26          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-2794-prog.cob:108.15:
- 105          RD  QUARTERLY-PAY-REGISTER
- 106              CONTROLS ARE FINAL, PRR-DEPARTMENT-NUMBER,
- 107                  PRR-EMPLOYEE-KEY
- 108 >            PAGE LIMIT IS 66 LINES
-----                  ^
- 109              HEADING 1
- 110              FIRST DETAIL 7
->> Hint: Missing .
-
-run_reportwriter.at-2794-prog.cob:108.16-108.21:
- 105          RD  QUARTERLY-PAY-REGISTER
- 106              CONTROLS ARE FINAL, PRR-DEPARTMENT-NUMBER,
- 107                  PRR-EMPLOYEE-KEY
- 108 >            PAGE LIMIT IS 66 LINES
-----                   ^^^^^
- 109              HEADING 1
- 110              FIRST DETAIL 7
->> Warning: Invalid syntax
-
-run_reportwriter.at-2794-prog.cob:108.33:
- 105          RD  QUARTERLY-PAY-REGISTER
- 106              CONTROLS ARE FINAL, PRR-DEPARTMENT-NUMBER,
- 107                  PRR-EMPLOYEE-KEY
- 108 >            PAGE LIMIT IS 66 LINES
-----                                    ^
- 109              HEADING 1
- 110              FIRST DETAIL 7
->> Hint: Missing ARE
-
-run_reportwriter.at-2794-prog.cob:109.11-109.18:
- 106              CONTROLS ARE FINAL, PRR-DEPARTMENT-NUMBER,
- 107                  PRR-EMPLOYEE-KEY
- 108              PAGE LIMIT IS 66 LINES
- 109 >            HEADING 1
-----              ^^^^^^^
- 110              FIRST DETAIL 7
- 111              LAST DETAIL 60.
->> Error: Invalid syntax
-
-run_reportwriter.at-2794-prog.cob:110.11-110.16:
- 107                  PRR-EMPLOYEE-KEY
- 108              PAGE LIMIT IS 66 LINES
- 109              HEADING 1
- 110 >            FIRST DETAIL 7
-----              ^^^^^
- 111              LAST DETAIL 60.
- 112         
->> Error: Invalid syntax
-
-run_reportwriter.at-2794-prog.cob:111.11-111.15:
- 108              PAGE LIMIT IS 66 LINES
- 109              HEADING 1
- 110              FIRST DETAIL 7
- 111 >            LAST DETAIL 60.
-----              ^^^^
- 112         
- 113          01  TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-2794-prog.cob:113.15:
- 110              FIRST DETAIL 7
- 111              LAST DETAIL 60.
- 112         
- 113 >        01  TYPE PAGE HEADING.
-----                  ^
- 114              02  LINE 1.
- 115                  03  COLUMN 39   PIC X(13) VALUE 'C E N T U R Y'.
->> Hint: Missing DETAIL
-
-run_reportwriter.at-2794-prog.cob:113.16-113.20:
- 110              FIRST DETAIL 7
- 111              LAST DETAIL 60.
- 112         
- 113 >        01  TYPE PAGE HEADING.
-----                   ^^^^
- 114              02  LINE 1.
- 115                  03  COLUMN 39   PIC X(13) VALUE 'C E N T U R Y'.
->> Error: Invalid syntax
-
 run_reportwriter.at-2794-prog.cob:154.38:
  151              02  LINE + 1.
  152                  03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
@@ -5674,6 +4724,26 @@ run_reportwriter.at-2794-prog.cob:154.39-154.44:
 ----                                          ^^^^^
  155                                                 OR PAGE.
  156                  03  COLUMN 30   PIC X(5) VALUE " ''  "
+>> Error: Invalid syntax
+
+run_reportwriter.at-2794-prog.cob:155.48:
+ 152                  03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
+ 153                  03  COLUMN 30   PIC X(5) VALUE "Hello"
+ 154                                  PRESENT AFTER NEW PRR-EMPLOYEE-KEY
+ 155 >                                               OR PAGE.
+----                                                   ^
+ 156                  03  COLUMN 30   PIC X(5) VALUE " ''  "
+ 157                                  ABSENT AFTER NEW PRR-EMPLOYEE-KEY
+>> Hint: Missing <expression>
+
+run_reportwriter.at-2794-prog.cob:155.49-155.53:
+ 152                  03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
+ 153                  03  COLUMN 30   PIC X(5) VALUE "Hello"
+ 154                                  PRESENT AFTER NEW PRR-EMPLOYEE-KEY
+ 155 >                                               OR PAGE.
+----                                                    ^^^^
+ 156                  03  COLUMN 30   PIC X(5) VALUE " ''  "
+ 157                                  ABSENT AFTER NEW PRR-EMPLOYEE-KEY
 >> Error: Invalid syntax
 
 run_reportwriter.at-2794-prog.cob:157.31-157.37:
@@ -6054,175 +5124,25 @@ run_reportwriter.at-3014-prog.cob:25.13-25.22:
   27               REPORT IS STUDENT-REPORT.
 >> Error: Invalid syntax
 
-run_reportwriter.at-3014-prog.cob:34.26:
-  31          01   ARE-THERE-MORE-RECORDS       PIC  XXX   VALUE  "YES".
-  32   
-  33          REPORT SECTION.
-  34 >        RD   STUDENT-REPORT
-----                             ^
-  35              PAGE LIMIT 30
-  36              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-3014-prog.cob:35.11-35.15:
-  32   
-  33          REPORT SECTION.
-  34          RD   STUDENT-REPORT
-  35 >            PAGE LIMIT 30
-----              ^^^^
-  36              HEADING 1
-  37              FIRST DETAIL  5
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:35.24:
-  32   
-  33          REPORT SECTION.
-  34          RD   STUDENT-REPORT
-  35 >            PAGE LIMIT 30
-----                           ^
-  36              HEADING 1
-  37              FIRST DETAIL  5
->> Hint: Missing .
-
-run_reportwriter.at-3014-prog.cob:36.11-36.18:
-  33          REPORT SECTION.
-  34          RD   STUDENT-REPORT
-  35              PAGE LIMIT 30
-  36 >            HEADING 1
-----              ^^^^^^^
-  37              FIRST DETAIL  5
-  38              LAST  DETAIL 25
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:36.20:
-  33          REPORT SECTION.
-  34          RD   STUDENT-REPORT
-  35              PAGE LIMIT 30
-  36 >            HEADING 1
-----                       ^
-  37              FIRST DETAIL  5
-  38              LAST  DETAIL 25
->> Hint: Missing .
-
-run_reportwriter.at-3014-prog.cob:37.11-37.16:
-  34          RD   STUDENT-REPORT
-  35              PAGE LIMIT 30
-  36              HEADING 1
-  37 >            FIRST DETAIL  5
-----              ^^^^^
-  38              LAST  DETAIL 25
-  39              FOOTING 28
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:37.26:
-  34          RD   STUDENT-REPORT
-  35              PAGE LIMIT 30
-  36              HEADING 1
-  37 >            FIRST DETAIL  5
-----                             ^
-  38              LAST  DETAIL 25
-  39              FOOTING 28
->> Hint: Missing .
-
-run_reportwriter.at-3014-prog.cob:38.11-38.15:
-  35              PAGE LIMIT 30
-  36              HEADING 1
-  37              FIRST DETAIL  5
-  38 >            LAST  DETAIL 25
-----              ^^^^
-  39              FOOTING 28
-  40              LINE LIMIT 90
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:38.26:
-  35              PAGE LIMIT 30
-  36              HEADING 1
-  37              FIRST DETAIL  5
-  38 >            LAST  DETAIL 25
-----                             ^
-  39              FOOTING 28
-  40              LINE LIMIT 90
->> Hint: Missing .
-
-run_reportwriter.at-3014-prog.cob:39.11-39.18:
+run_reportwriter.at-3014-prog.cob:39.21:
   36              HEADING 1
   37              FIRST DETAIL  5
   38              LAST  DETAIL 25
   39 >            FOOTING 28
-----              ^^^^^^^
+----                        ^
   40              LINE LIMIT 90
   41              .
->> Error: Invalid syntax
+>> Hint: Missing .
 
-run_reportwriter.at-3014-prog.cob:40.16-40.21:
+run_reportwriter.at-3014-prog.cob:40.11-40.15:
   37              FIRST DETAIL  5
   38              LAST  DETAIL 25
   39              FOOTING 28
   40 >            LINE LIMIT 90
-----                   ^^^^^
+----              ^^^^
   41              .
   42          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:43.17:
-  40              LINE LIMIT 90
-  41              .
-  42          01 HEADING-LINE.
-  43 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  44               05  COLUMN 1      PIC X(50) VALUE 
-  45                   "         1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3014-prog.cob:43.18-43.22:
-  40              LINE LIMIT 90
-  41              .
-  42          01 HEADING-LINE.
-  43 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  44               05  COLUMN 1      PIC X(50) VALUE 
-  45                   "         1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:47.17:
-  44               05  COLUMN 1      PIC X(50) VALUE 
-  45                   "         1         2         3         4         5".
-  46               05  COLUMN 51     PIC X(20) VALUE "         6         7".
-  47 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  48               05  COLUMN 1      PIC X(50) VALUE 
-  49                   "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3014-prog.cob:47.18-47.22:
-  44               05  COLUMN 1      PIC X(50) VALUE 
-  45                   "         1         2         3         4         5".
-  46               05  COLUMN 51     PIC X(20) VALUE "         6         7".
-  47 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  48               05  COLUMN 1      PIC X(50) VALUE 
-  49                   "12345678901234567890123456789012345678901234567890".
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:51.17:
-  48               05  COLUMN 1      PIC X(50) VALUE 
-  49                   "12345678901234567890123456789012345678901234567890".
-  50               05  COLUMN 51     PIC X(20) VALUE "12345678901234567890".
-  51 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  52               05  COLUMN 1      PIC X(2)  VALUE "Ln".
-  53               05  COLUMN 5      PIC X(6)  VALUE "--ID--".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3014-prog.cob:51.18-51.22:
-  48               05  COLUMN 1      PIC X(50) VALUE 
-  49                   "12345678901234567890123456789012345678901234567890".
-  50               05  COLUMN 51     PIC X(20) VALUE "12345678901234567890".
-  51 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  52               05  COLUMN 1      PIC X(2)  VALUE "Ln".
-  53               05  COLUMN 5      PIC X(6)  VALUE "--ID--".
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3058:0
 run_reportwriter.at-3058-reference:2.6-2.7:
@@ -6477,146 +5397,6 @@ run_reportwriter.at-3171-prog.cob:11.35-11.44:
 ----                                      ^^^^^^^^^
   12   
   13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:29.26:
-  26          01   ARE-THERE-MORE-RECORDS       PIC  XXX   VALUE  "YES".
-  27   
-  28          REPORT SECTION.
-  29 >        RD   STUDENT-REPORT
-----                             ^
-  30              PAGE LIMIT 30 LINES
-  31              HEADING 2
->> Hint: Missing .
-
-run_reportwriter.at-3171-prog.cob:30.11-30.15:
-  27   
-  28          REPORT SECTION.
-  29          RD   STUDENT-REPORT
-  30 >            PAGE LIMIT 30 LINES
-----              ^^^^
-  31              HEADING 2
-  32              FIRST DETAIL 3
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:30.30:
-  27   
-  28          REPORT SECTION.
-  29          RD   STUDENT-REPORT
-  30 >            PAGE LIMIT 30 LINES
-----                                 ^
-  31              HEADING 2
-  32              FIRST DETAIL 3
->> Hint: Missing ARE
-
-run_reportwriter.at-3171-prog.cob:31.11-31.18:
-  28          REPORT SECTION.
-  29          RD   STUDENT-REPORT
-  30              PAGE LIMIT 30 LINES
-  31 >            HEADING 2
-----              ^^^^^^^
-  32              FIRST DETAIL 3
-  33              LAST DETAIL 25
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:32.11-32.16:
-  29          RD   STUDENT-REPORT
-  30              PAGE LIMIT 30 LINES
-  31              HEADING 2
-  32 >            FIRST DETAIL 3
-----              ^^^^^
-  33              LAST DETAIL 25
-  34              FOOTING 28.
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:33.11-33.15:
-  30              PAGE LIMIT 30 LINES
-  31              HEADING 2
-  32              FIRST DETAIL 3
-  33 >            LAST DETAIL 25
-----              ^^^^
-  34              FOOTING 28.
-  35          01   REPORT-LINE
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:34.11-34.18:
-  31              HEADING 2
-  32              FIRST DETAIL 3
-  33              LAST DETAIL 25
-  34 >            FOOTING 28.
-----              ^^^^^^^
-  35          01   REPORT-LINE
-  36               TYPE DETAIL
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:46.26:
-  43               05  COLUMN 45     PIC XXX      VALUE "-*-".
-  44               05  COLUMN 52     PIC 99       SOURCE    NUM-COURSES.
-  45   
-  46 >        RD  STUDENT-REPORT2
-----                             ^
-  47              PAGE LIMIT 60 LINES
-  48              HEADING 2
->> Hint: Missing .
-
-run_reportwriter.at-3171-prog.cob:47.11-47.15:
-  44               05  COLUMN 52     PIC 99       SOURCE    NUM-COURSES.
-  45   
-  46          RD  STUDENT-REPORT2
-  47 >            PAGE LIMIT 60 LINES
-----              ^^^^
-  48              HEADING 2
-  49              FIRST DETAIL 5
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:47.30:
-  44               05  COLUMN 52     PIC 99       SOURCE    NUM-COURSES.
-  45   
-  46          RD  STUDENT-REPORT2
-  47 >            PAGE LIMIT 60 LINES
-----                                 ^
-  48              HEADING 2
-  49              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-3171-prog.cob:48.11-48.18:
-  45   
-  46          RD  STUDENT-REPORT2
-  47              PAGE LIMIT 60 LINES
-  48 >            HEADING 2
-----              ^^^^^^^
-  49              FIRST DETAIL 5
-  50              LAST DETAIL 55
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:49.11-49.16:
-  46          RD  STUDENT-REPORT2
-  47              PAGE LIMIT 60 LINES
-  48              HEADING 2
-  49 >            FIRST DETAIL 5
-----              ^^^^^
-  50              LAST DETAIL 55
-  51              FOOTING 58.
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:50.11-50.15:
-  47              PAGE LIMIT 60 LINES
-  48              HEADING 2
-  49              FIRST DETAIL 5
-  50 >            LAST DETAIL 55
-----              ^^^^
-  51              FOOTING 58.
-  52          01   REPORT-LINE2
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:51.11-51.18:
-  48              HEADING 2
-  49              FIRST DETAIL 5
-  50              LAST DETAIL 55
-  51 >            FOOTING 58.
-----              ^^^^^^^
-  52          01   REPORT-LINE2
-  53               TYPE DETAIL
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3210:0
@@ -7688,66 +6468,6 @@ run_reportwriter.at-3439-prog.cob:11.31-11.40:
   13          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-3439-prog.cob:42.15:
-  39          REPORT SECTION.
-  40          RD    ORDER-REPORT
-  41              CONTROLS ARE FINAL
-  42 >            PAGE 55 LINES
-----                  ^
-  43              FIRST DETAIL 6.
-  44          01    TYPE REPORT HEADING
->> Hint: Missing .
-
-run_reportwriter.at-3439-prog.cob:42.16-42.18:
-  39          REPORT SECTION.
-  40          RD    ORDER-REPORT
-  41              CONTROLS ARE FINAL
-  42 >            PAGE 55 LINES
-----                   ^^
-  43              FIRST DETAIL 6.
-  44          01    TYPE REPORT HEADING
->> Warning: Invalid syntax
-
-run_reportwriter.at-3439-prog.cob:42.24:
-  39          REPORT SECTION.
-  40          RD    ORDER-REPORT
-  41              CONTROLS ARE FINAL
-  42 >            PAGE 55 LINES
-----                           ^
-  43              FIRST DETAIL 6.
-  44          01    TYPE REPORT HEADING
->> Hint: Missing ARE
-
-run_reportwriter.at-3439-prog.cob:43.11-43.16:
-  40          RD    ORDER-REPORT
-  41              CONTROLS ARE FINAL
-  42              PAGE 55 LINES
-  43 >            FIRST DETAIL 6.
-----              ^^^^^
-  44          01    TYPE REPORT HEADING
-  45                     LINE 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-3439-prog.cob:48.15:
-  45                     LINE 1.
-  46              10    COLUMN 44    PIC X(21)    
-  47                                     VALUE 'CUSTOMER ORDER REPORT'.
-  48 >        01  TYPE PAGE HEADING.
-----                  ^
-  49              05  LINE 2.
-  50                  10  COLUMN  10   PIC X(8) VALUE " Time:".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3439-prog.cob:48.16-48.20:
-  45                     LINE 1.
-  46              10    COLUMN 44    PIC X(21)    
-  47                                     VALUE 'CUSTOMER ORDER REPORT'.
-  48 >        01  TYPE PAGE HEADING.
-----                   ^^^^
-  49              05  LINE 2.
-  50                  10  COLUMN  10   PIC X(8) VALUE " Time:".
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3558:0
 run_reportwriter.at-3558-reference:1.43-1.51:
    1 >                                            CUSTOMER ORDER REPORT
@@ -7974,126 +6694,6 @@ run_reportwriter.at-3704-prog.cob:11.31-11.40:
 ----                                  ^^^^^^^^^
   12   
   13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:39.15:
-  36          REPORT SECTION.
-  37          RD    CONTROL-BREAK
-  38              CONTROLS ARE MAJOR ADVISOR
-  39 >            PAGE LIMIT 25 LINES
-----                  ^
-  40              HEADING 1
-  41              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-3704-prog.cob:39.16-39.21:
-  36          REPORT SECTION.
-  37          RD    CONTROL-BREAK
-  38              CONTROLS ARE MAJOR ADVISOR
-  39 >            PAGE LIMIT 25 LINES
-----                   ^^^^^
-  40              HEADING 1
-  41              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:39.30:
-  36          REPORT SECTION.
-  37          RD    CONTROL-BREAK
-  38              CONTROLS ARE MAJOR ADVISOR
-  39 >            PAGE LIMIT 25 LINES
-----                                 ^
-  40              HEADING 1
-  41              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-3704-prog.cob:40.11-40.18:
-  37          RD    CONTROL-BREAK
-  38              CONTROLS ARE MAJOR ADVISOR
-  39              PAGE LIMIT 25 LINES
-  40 >            HEADING 1
-----              ^^^^^^^
-  41              FIRST DETAIL 5
-  42              FOOTING 23.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:41.11-41.16:
-  38              CONTROLS ARE MAJOR ADVISOR
-  39              PAGE LIMIT 25 LINES
-  40              HEADING 1
-  41 >            FIRST DETAIL 5
-----              ^^^^^
-  42              FOOTING 23.
-  43          01  TYPE IS PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:42.11-42.18:
-  39              PAGE LIMIT 25 LINES
-  40              HEADING 1
-  41              FIRST DETAIL 5
-  42 >            FOOTING 23.
-----              ^^^^^^^
-  43          01  TYPE IS PAGE HEADING.
-  44              05  LINE 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:43.18:
-  40              HEADING 1
-  41              FIRST DETAIL 5
-  42              FOOTING 23.
-  43 >        01  TYPE IS PAGE HEADING.
-----                     ^
-  44              05  LINE 1.
-  45                   10  COLUMN 61    PIC X(4) VALUE 'PAGE'.
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3704-prog.cob:43.19-43.23:
-  40              HEADING 1
-  41              FIRST DETAIL 5
-  42              FOOTING 23.
-  43 >        01  TYPE IS PAGE HEADING.
-----                      ^^^^
-  44              05  LINE 1.
-  45                   10  COLUMN 61    PIC X(4) VALUE 'PAGE'.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:52.27:
-  49                          VALUE 'STUDENT ADVISEMENT LIST'.
-  50   
-  51          01  TYPE IS CONTROL HEADING MAJOR.
-  52 >            05     LINE 5 ON NEXT PAGE .
-----                              ^
-  53                   10  COLUMN 37    PIC X(5)  VALUE 'MAJOR'.
-  54                   10  COLUMN 44    PIC X(20) SOURCE MAJOR.
->> Hint: Missing NEXT_PAGE
-
-run_reportwriter.at-3704-prog.cob:52.28-52.32:
-  49                          VALUE 'STUDENT ADVISEMENT LIST'.
-  50   
-  51          01  TYPE IS CONTROL HEADING MAJOR.
-  52 >            05     LINE 5 ON NEXT PAGE .
-----                               ^^^^
-  53                   10  COLUMN 37    PIC X(5)  VALUE 'MAJOR'.
-  54                   10  COLUMN 44    PIC X(20) SOURCE MAJOR.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:52.32:
-  49                          VALUE 'STUDENT ADVISEMENT LIST'.
-  50   
-  51          01  TYPE IS CONTROL HEADING MAJOR.
-  52 >            05     LINE 5 ON NEXT PAGE .
-----                                   ^
-  53                   10  COLUMN 37    PIC X(5)  VALUE 'MAJOR'.
-  54                   10  COLUMN 44    PIC X(20) SOURCE MAJOR.
->> Hint: Missing GROUP <integer literal>
-
-run_reportwriter.at-3704-prog.cob:52.33-52.37:
-  49                          VALUE 'STUDENT ADVISEMENT LIST'.
-  50   
-  51          01  TYPE IS CONTROL HEADING MAJOR.
-  52 >            05     LINE 5 ON NEXT PAGE .
-----                                    ^^^^
-  53                   10  COLUMN 37    PIC X(5)  VALUE 'MAJOR'.
-  54                   10  COLUMN 44    PIC X(20) SOURCE MAJOR.
 >> Error: Invalid syntax
 
 run_reportwriter.at-3704-prog.cob:70.37:
@@ -8579,96 +7179,6 @@ run_reportwriter.at-3896-prog.cob:11.35-11.44:
   13          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-3896-prog.cob:33.15:
-  30          REPORT SECTION.
-  31          RD  INV-REPORT
-  32              CONTROLS ARE FINAL DEPT-IN MONTH-IN
-  33 >            PAGE LIMIT 25 LINES
-----                  ^
-  34              HEADING 2
-  35              FIRST DETAIL 5
->> Hint: Missing .
-
-run_reportwriter.at-3896-prog.cob:33.16-33.21:
-  30          REPORT SECTION.
-  31          RD  INV-REPORT
-  32              CONTROLS ARE FINAL DEPT-IN MONTH-IN
-  33 >            PAGE LIMIT 25 LINES
-----                   ^^^^^
-  34              HEADING 2
-  35              FIRST DETAIL 5
->> Warning: Invalid syntax
-
-run_reportwriter.at-3896-prog.cob:33.30:
-  30          REPORT SECTION.
-  31          RD  INV-REPORT
-  32              CONTROLS ARE FINAL DEPT-IN MONTH-IN
-  33 >            PAGE LIMIT 25 LINES
-----                                 ^
-  34              HEADING 2
-  35              FIRST DETAIL 5
->> Hint: Missing ARE
-
-run_reportwriter.at-3896-prog.cob:34.11-34.18:
-  31          RD  INV-REPORT
-  32              CONTROLS ARE FINAL DEPT-IN MONTH-IN
-  33              PAGE LIMIT 25 LINES
-  34 >            HEADING 2
-----              ^^^^^^^
-  35              FIRST DETAIL 5
-  36              LAST DETAIL 18
->> Error: Invalid syntax
-
-run_reportwriter.at-3896-prog.cob:35.11-35.16:
-  32              CONTROLS ARE FINAL DEPT-IN MONTH-IN
-  33              PAGE LIMIT 25 LINES
-  34              HEADING 2
-  35 >            FIRST DETAIL 5
-----              ^^^^^
-  36              LAST DETAIL 18
-  37              FOOTING 20.
->> Error: Invalid syntax
-
-run_reportwriter.at-3896-prog.cob:36.11-36.15:
-  33              PAGE LIMIT 25 LINES
-  34              HEADING 2
-  35              FIRST DETAIL 5
-  36 >            LAST DETAIL 18
-----              ^^^^
-  37              FOOTING 20.
-  38          01  TYPE IS REPORT HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-3896-prog.cob:37.11-37.18:
-  34              HEADING 2
-  35              FIRST DETAIL 5
-  36              LAST DETAIL 18
-  37 >            FOOTING 20.
-----              ^^^^^^^
-  38          01  TYPE IS REPORT HEADING.
-  39              05 LINE 2  COLUMN  50  PIC X(16) VALUE 'INVENTORY REPORT'.
->> Error: Invalid syntax
-
-run_reportwriter.at-3896-prog.cob:68.18:
-  65              LINE PLUS 2.
-  66              05 FINAL-TOTAL COLUMN 95 PIC ZZZ,ZZZ,ZZZ.99 SUM DEPT-TOTAL.
-  67   
-  68 >        01  TYPE IS PAGE FOOTING LINE 24.
-----                     ^
-  69              05  COLUMN 30      PIC X(30) VALUE "-+* End of Page *+-".
-  70              05  COLUMN 55      PIC X(12) VALUE "************".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-3896-prog.cob:68.19-68.23:
-  65              LINE PLUS 2.
-  66              05 FINAL-TOTAL COLUMN 95 PIC ZZZ,ZZZ,ZZZ.99 SUM DEPT-TOTAL.
-  67   
-  68 >        01  TYPE IS PAGE FOOTING LINE 24.
-----                      ^^^^
-  69              05  COLUMN 30      PIC X(30) VALUE "-+* End of Page *+-".
-  70              05  COLUMN 55      PIC X(12) VALUE "************".
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3980:0
 run_reportwriter.at-3980-reference:5.6-5.7:
    2                                                    INVENTORY REPORT
@@ -8718,56 +7228,6 @@ run_reportwriter.at-4054-prog.cob:10.21-10.29:
   11          DATA DIVISION.
   12          FILE SECTION.
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-4054-prog.cob:21.15:
-  18          REPORT SECTION.
-  19          RD MYREPORT
-  20              CONTROLS ARE SAVE-ITEM
-  21 >            PAGE LIMIT IS 15 LINES
-----                  ^
-  22              FIRST DETAIL 1
-  23              LAST DETAIL 12.
->> Hint: Missing .
-
-run_reportwriter.at-4054-prog.cob:21.16-21.21:
-  18          REPORT SECTION.
-  19          RD MYREPORT
-  20              CONTROLS ARE SAVE-ITEM
-  21 >            PAGE LIMIT IS 15 LINES
-----                   ^^^^^
-  22              FIRST DETAIL 1
-  23              LAST DETAIL 12.
->> Warning: Invalid syntax
-
-run_reportwriter.at-4054-prog.cob:21.33:
-  18          REPORT SECTION.
-  19          RD MYREPORT
-  20              CONTROLS ARE SAVE-ITEM
-  21 >            PAGE LIMIT IS 15 LINES
-----                                    ^
-  22              FIRST DETAIL 1
-  23              LAST DETAIL 12.
->> Hint: Missing ARE
-
-run_reportwriter.at-4054-prog.cob:22.11-22.16:
-  19          RD MYREPORT
-  20              CONTROLS ARE SAVE-ITEM
-  21              PAGE LIMIT IS 15 LINES
-  22 >            FIRST DETAIL 1
-----              ^^^^^
-  23              LAST DETAIL 12.
-  24          
->> Error: Invalid syntax
-
-run_reportwriter.at-4054-prog.cob:23.11-23.15:
-  20              CONTROLS ARE SAVE-ITEM
-  21              PAGE LIMIT IS 15 LINES
-  22              FIRST DETAIL 1
-  23 >            LAST DETAIL 12.
-----              ^^^^
-  24          
-  25          01 TYPE IS CONTROL HEADING SAVE-ITEM.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4108:0
 run_reportwriter.at-4108-reference:1.6-1.7:
@@ -8844,96 +7304,6 @@ run_reportwriter.at-4193-prog.cob:8.34-8.42:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-4193-prog.cob:16.13:
-  13          FD  rp-file REPORT rp.
-  14   
-  15          REPORT SECTION.
-  16 >        RD  RP 
-----                ^
-  17              PAGE LIMIT 10 LINES
-  18              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-4193-prog.cob:17.11-17.15:
-  14   
-  15          REPORT SECTION.
-  16          RD  RP 
-  17 >            PAGE LIMIT 10 LINES
-----              ^^^^
-  18              HEADING 1
-  19              FIRST DETAIL 4.
->> Error: Invalid syntax
-
-run_reportwriter.at-4193-prog.cob:17.30:
-  14   
-  15          REPORT SECTION.
-  16          RD  RP 
-  17 >            PAGE LIMIT 10 LINES
-----                                 ^
-  18              HEADING 1
-  19              FIRST DETAIL 4.
->> Hint: Missing ARE
-
-run_reportwriter.at-4193-prog.cob:18.11-18.18:
-  15          REPORT SECTION.
-  16          RD  RP 
-  17              PAGE LIMIT 10 LINES
-  18 >            HEADING 1
-----              ^^^^^^^
-  19              FIRST DETAIL 4.
-  20          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-4193-prog.cob:19.11-19.16:
-  16          RD  RP 
-  17              PAGE LIMIT 10 LINES
-  18              HEADING 1
-  19 >            FIRST DETAIL 4.
-----              ^^^^^
-  20          01 HEADING-LINE.
-  21             02 TYPE PAGE HEADING LINE PLUS 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-4193-prog.cob:21.17:
-  18              HEADING 1
-  19              FIRST DETAIL 4.
-  20          01 HEADING-LINE.
-  21 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  22               05  COLUMN 1      PIC X(50) VALUE 
-  23                   "         1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4193-prog.cob:21.18-21.22:
-  18              HEADING 1
-  19              FIRST DETAIL 4.
-  20          01 HEADING-LINE.
-  21 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  22               05  COLUMN 1      PIC X(50) VALUE 
-  23                   "         1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-4193-prog.cob:24.17:
-  21             02 TYPE PAGE HEADING LINE PLUS 1.
-  22               05  COLUMN 1      PIC X(50) VALUE 
-  23                   "         1         2         3         4         5".
-  24 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  25               05  COLUMN 1      PIC X(50) VALUE 
-  26                   "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4193-prog.cob:24.18-24.22:
-  21             02 TYPE PAGE HEADING LINE PLUS 1.
-  22               05  COLUMN 1      PIC X(50) VALUE 
-  23                   "         1         2         3         4         5".
-  24 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  25               05  COLUMN 1      PIC X(50) VALUE 
-  26                   "12345678901234567890123456789012345678901234567890".
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4212:0
 run_reportwriter.at-4212-reference:2.6-2.7:
    1            1         2         3         4         5
@@ -8971,6 +7341,16 @@ run_reportwriter.at-4405-progl.cob:8.34-8.42:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
+run_reportwriter.at-4405-progl.cob:23.18:
+  20   
+  21          REPORT SECTION.
+  22          RD  RP 
+  23 >            CODE IS "Hi-Q: " *> literal
+----                     ^
+  24              PAGE LIMIT 10 LINES 
+  25                         50 COLUMNS *> literal
+>> Hint: Missing <identifier>
+
 run_reportwriter.at-4405-progl.cob:23.19-23.27:
   20   
   21          REPORT SECTION.
@@ -8979,106 +7359,6 @@ run_reportwriter.at-4405-progl.cob:23.19-23.27:
 ----                      ^^^^^^^^
   24              PAGE LIMIT 10 LINES 
   25                         50 COLUMNS *> literal
->> Error: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:24.15:
-  21          REPORT SECTION.
-  22          RD  RP 
-  23              CODE IS "Hi-Q: " *> literal
-  24 >            PAGE LIMIT 10 LINES 
-----                  ^
-  25                         50 COLUMNS *> literal
-  26              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-4405-progl.cob:24.16-24.21:
-  21          REPORT SECTION.
-  22          RD  RP 
-  23              CODE IS "Hi-Q: " *> literal
-  24 >            PAGE LIMIT 10 LINES 
-----                   ^^^^^
-  25                         50 COLUMNS *> literal
-  26              HEADING 1
->> Warning: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:24.30:
-  21          REPORT SECTION.
-  22          RD  RP 
-  23              CODE IS "Hi-Q: " *> literal
-  24 >            PAGE LIMIT 10 LINES 
-----                                 ^
-  25                         50 COLUMNS *> literal
-  26              HEADING 1
->> Hint: Missing ARE
-
-run_reportwriter.at-4405-progl.cob:25.22-25.24:
-  22          RD  RP 
-  23              CODE IS "Hi-Q: " *> literal
-  24              PAGE LIMIT 10 LINES 
-  25 >                       50 COLUMNS *> literal
-----                         ^^
-  26              HEADING 1
-  27              FIRST DETAIL 4.
->> Error: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:26.11-26.18:
-  23              CODE IS "Hi-Q: " *> literal
-  24              PAGE LIMIT 10 LINES 
-  25                         50 COLUMNS *> literal
-  26 >            HEADING 1
-----              ^^^^^^^
-  27              FIRST DETAIL 4.
-  28          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:27.11-27.16:
-  24              PAGE LIMIT 10 LINES 
-  25                         50 COLUMNS *> literal
-  26              HEADING 1
-  27 >            FIRST DETAIL 4.
-----              ^^^^^
-  28          01 HEADING-LINE.
-  29             02 TYPE PAGE HEADING LINE PLUS 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:29.17:
-  26              HEADING 1
-  27              FIRST DETAIL 4.
-  28          01 HEADING-LINE.
-  29 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  30               05  COLUMN 1      PIC X(50) VALUE 
-  31                   "         1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4405-progl.cob:29.18-29.22:
-  26              HEADING 1
-  27              FIRST DETAIL 4.
-  28          01 HEADING-LINE.
-  29 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  30               05  COLUMN 1      PIC X(50) VALUE 
-  31                   "         1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-4405-progl.cob:32.17:
-  29             02 TYPE PAGE HEADING LINE PLUS 1.
-  30               05  COLUMN 1      PIC X(50) VALUE 
-  31                   "         1         2         3         4         5".
-  32 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  33         *     05  COLUMN 1      PIC X(50) VALUE 
-  34         *         "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4405-progl.cob:32.18-32.22:
-  29             02 TYPE PAGE HEADING LINE PLUS 1.
-  30               05  COLUMN 1      PIC X(50) VALUE 
-  31                   "         1         2         3         4         5".
-  32 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  33         *     05  COLUMN 1      PIC X(50) VALUE 
-  34         *         "12345678901234567890123456789012345678901234567890".
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4310:0
@@ -9092,36 +7372,6 @@ run_reportwriter.at-4310-progv.cob:8.34-8.42:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-4310-progv.cob:25.25:
-  22   
-  23          REPORT SECTION.
-  24          RD  RP 
-  25 >            CODE IS MYCODE *> variable
-----                            ^
-  26              PAGE LIMIT 10 LINES 
-  27                         MAXCOL COLUMNS *> variable
->> Hint: Missing .
-
-run_reportwriter.at-4310-progv.cob:26.11-26.15:
-  23          REPORT SECTION.
-  24          RD  RP 
-  25              CODE IS MYCODE *> variable
-  26 >            PAGE LIMIT 10 LINES 
-----              ^^^^
-  27                         MAXCOL COLUMNS *> variable
-  28              HEADING 1
->> Warning: Invalid syntax
-
-run_reportwriter.at-4310-progv.cob:26.30:
-  23          REPORT SECTION.
-  24          RD  RP 
-  25              CODE IS MYCODE *> variable
-  26 >            PAGE LIMIT 10 LINES 
-----                                 ^
-  27                         MAXCOL COLUMNS *> variable
-  28              HEADING 1
->> Hint: Missing ARE
-
 run_reportwriter.at-4310-progv.cob:27.22-27.28:
   24          RD  RP 
   25              CODE IS MYCODE *> variable
@@ -9130,66 +7380,6 @@ run_reportwriter.at-4310-progv.cob:27.22-27.28:
 ----                         ^^^^^^
   28              HEADING 1
   29              FIRST DETAIL 4.
->> Error: Invalid syntax
-
-run_reportwriter.at-4310-progv.cob:28.11-28.18:
-  25              CODE IS MYCODE *> variable
-  26              PAGE LIMIT 10 LINES 
-  27                         MAXCOL COLUMNS *> variable
-  28 >            HEADING 1
-----              ^^^^^^^
-  29              FIRST DETAIL 4.
-  30          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-4310-progv.cob:29.11-29.16:
-  26              PAGE LIMIT 10 LINES 
-  27                         MAXCOL COLUMNS *> variable
-  28              HEADING 1
-  29 >            FIRST DETAIL 4.
-----              ^^^^^
-  30          01 HEADING-LINE.
-  31             02 TYPE PAGE HEADING LINE PLUS 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-4310-progv.cob:31.17:
-  28              HEADING 1
-  29              FIRST DETAIL 4.
-  30          01 HEADING-LINE.
-  31 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  32               05  COLUMN 1      PIC X(50) VALUE 
-  33                   "         1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4310-progv.cob:31.18-31.22:
-  28              HEADING 1
-  29              FIRST DETAIL 4.
-  30          01 HEADING-LINE.
-  31 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  32               05  COLUMN 1      PIC X(50) VALUE 
-  33                   "         1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-4310-progv.cob:34.17:
-  31             02 TYPE PAGE HEADING LINE PLUS 1.
-  32               05  COLUMN 1      PIC X(50) VALUE 
-  33                   "         1         2         3         4         5".
-  34 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  35         *     05  COLUMN 1      PIC X(50) VALUE 
-  36         *         "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4310-progv.cob:34.18-34.22:
-  31             02 TYPE PAGE HEADING LINE PLUS 1.
-  32               05  COLUMN 1      PIC X(50) VALUE 
-  33                   "         1         2         3         4         5".
-  34 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  35         *     05  COLUMN 1      PIC X(50) VALUE 
-  36         *         "12345678901234567890123456789012345678901234567890".
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4429:0
@@ -9251,6 +7441,16 @@ run_reportwriter.at-4553-prog.cob:8.34-8.42:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
+run_reportwriter.at-4553-prog.cob:35.18:
+  32   
+  33          REPORT SECTION.
+  34          RD  RP 
+  35 >            CODE IS "Hi-Q: "
+----                     ^
+  36              PAGE LIMIT 10 LINES 
+  37                         50 COLUMNS
+>> Hint: Missing <identifier>
+
 run_reportwriter.at-4553-prog.cob:35.19-35.27:
   32   
   33          REPORT SECTION.
@@ -9259,106 +7459,6 @@ run_reportwriter.at-4553-prog.cob:35.19-35.27:
 ----                      ^^^^^^^^
   36              PAGE LIMIT 10 LINES 
   37                         50 COLUMNS
->> Error: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:36.15:
-  33          REPORT SECTION.
-  34          RD  RP 
-  35              CODE IS "Hi-Q: "
-  36 >            PAGE LIMIT 10 LINES 
-----                  ^
-  37                         50 COLUMNS
-  38              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-4553-prog.cob:36.16-36.21:
-  33          REPORT SECTION.
-  34          RD  RP 
-  35              CODE IS "Hi-Q: "
-  36 >            PAGE LIMIT 10 LINES 
-----                   ^^^^^
-  37                         50 COLUMNS
-  38              HEADING 1
->> Warning: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:36.30:
-  33          REPORT SECTION.
-  34          RD  RP 
-  35              CODE IS "Hi-Q: "
-  36 >            PAGE LIMIT 10 LINES 
-----                                 ^
-  37                         50 COLUMNS
-  38              HEADING 1
->> Hint: Missing ARE
-
-run_reportwriter.at-4553-prog.cob:37.22-37.24:
-  34          RD  RP 
-  35              CODE IS "Hi-Q: "
-  36              PAGE LIMIT 10 LINES 
-  37 >                       50 COLUMNS
-----                         ^^
-  38              HEADING 1
-  39              FIRST DETAIL 4.
->> Error: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:38.11-38.18:
-  35              CODE IS "Hi-Q: "
-  36              PAGE LIMIT 10 LINES 
-  37                         50 COLUMNS
-  38 >            HEADING 1
-----              ^^^^^^^
-  39              FIRST DETAIL 4.
-  40          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:39.11-39.16:
-  36              PAGE LIMIT 10 LINES 
-  37                         50 COLUMNS
-  38              HEADING 1
-  39 >            FIRST DETAIL 4.
-----              ^^^^^
-  40          01 HEADING-LINE.
-  41             02 TYPE PAGE HEADING LINE PLUS 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:41.17:
-  38              HEADING 1
-  39              FIRST DETAIL 4.
-  40          01 HEADING-LINE.
-  41 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  42               05  COLUMN 1      PIC X(50) VALUE 
-  43                   "         1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4553-prog.cob:41.18-41.22:
-  38              HEADING 1
-  39              FIRST DETAIL 4.
-  40          01 HEADING-LINE.
-  41 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  42               05  COLUMN 1      PIC X(50) VALUE 
-  43                   "         1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-4553-prog.cob:44.17:
-  41             02 TYPE PAGE HEADING LINE PLUS 1.
-  42               05  COLUMN 1      PIC X(50) VALUE 
-  43                   "         1         2         3         4         5".
-  44 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                    ^
-  45               05  COLUMN 1      PIC X(50) VALUE
-  46                   "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-4553-prog.cob:44.18-44.22:
-  41             02 TYPE PAGE HEADING LINE PLUS 1.
-  42               05  COLUMN 1      PIC X(50) VALUE 
-  43                   "         1         2         3         4         5".
-  44 >           02 TYPE PAGE HEADING LINE PLUS 1.
-----                     ^^^^
-  45               05  COLUMN 1      PIC X(50) VALUE
-  46                   "12345678901234567890123456789012345678901234567890".
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4575:0
@@ -9428,26 +7528,6 @@ run_reportwriter.at-4626-prog.cob:8.33-8.41:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-4626-prog.cob:20.13:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                ^
-  21   
-  22          01  rp-detail TYPE DE.
->> Hint: Missing .
-
-run_reportwriter.at-4626-prog.cob:20.14-20.18:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                 ^^^^
-  21   
-  22          01  rp-detail TYPE DE.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4641:0
 run_reportwriter.at-4641-reference:2.6-2.7:
    1   hello                         <--->
@@ -9474,26 +7554,6 @@ run_reportwriter.at-4689-prog.cob:8.33-8.41:
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-4689-prog.cob:20.13:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                ^
-  21   
-  22          01  rp-detail TYPE DE.
->> Hint: Missing .
-
-run_reportwriter.at-4689-prog.cob:20.14-20.18:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                 ^^^^
-  21   
-  22          01  rp-detail TYPE DE.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4701:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4743:0
 run_reportwriter.at-4743-prog.cob:8.33-8.41:
@@ -9505,26 +7565,6 @@ run_reportwriter.at-4743-prog.cob:8.33-8.41:
    9               ORGANIZATION LINE SEQUENTIAL.
   10   
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-4743-prog.cob:20.13:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                ^
-  21   
-  22          01  rp-detail TYPE DE.
->> Hint: Missing .
-
-run_reportwriter.at-4743-prog.cob:20.14-20.18:
-  17          01  hedpos PIC 99 VALUE 10.
-  18   
-  19          REPORT SECTION.
-  20 >        RD  rp PAGE LIMIT 3.
-----                 ^^^^
-  21   
-  22          01  rp-detail TYPE DE.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4755:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:5051:0
@@ -10547,122 +8587,42 @@ run_reportwriter.at-5049-prog.cob:18.24-18.32:
   20          
 >> Warning: Ignored EXTERNAL (implementation pending)
 
-run_reportwriter.at-5049-prog.cob:63.15:
-  60                TEMP-BRANCH,
-  61                TEMP-INVOICE
-  62          
-  63 >            PAGE LIMIT IS 60 LINES
-----                  ^
-  64              HEADING 1
-  65              FIRST DETAIL 8
->> Hint: Missing .
-
-run_reportwriter.at-5049-prog.cob:63.16-63.21:
-  60                TEMP-BRANCH,
-  61                TEMP-INVOICE
-  62          
-  63 >            PAGE LIMIT IS 60 LINES
-----                   ^^^^^
-  64              HEADING 1
-  65              FIRST DETAIL 8
->> Warning: Invalid syntax
-
-run_reportwriter.at-5049-prog.cob:63.33:
-  60                TEMP-BRANCH,
-  61                TEMP-INVOICE
-  62          
-  63 >            PAGE LIMIT IS 60 LINES
-----                                    ^
-  64              HEADING 1
-  65              FIRST DETAIL 8
->> Hint: Missing ARE
-
-run_reportwriter.at-5049-prog.cob:64.11-64.18:
-  61                TEMP-INVOICE
-  62          
-  63              PAGE LIMIT IS 60 LINES
-  64 >            HEADING 1
-----              ^^^^^^^
-  65              FIRST DETAIL 8
-  66              LAST DETAIL  48.
->> Error: Invalid syntax
-
-run_reportwriter.at-5049-prog.cob:65.11-65.16:
-  62          
-  63              PAGE LIMIT IS 60 LINES
-  64              HEADING 1
-  65 >            FIRST DETAIL 8
-----              ^^^^^
-  66              LAST DETAIL  48.
-  67          
->> Error: Invalid syntax
-
-run_reportwriter.at-5049-prog.cob:66.11-66.15:
-  63              PAGE LIMIT IS 60 LINES
-  64              HEADING 1
-  65              FIRST DETAIL 8
-  66 >            LAST DETAIL  48.
-----              ^^^^
-  67          
-  68          01 RPTA-PAGE-HEADING TYPE PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-5049-prog.cob:68.32:
-  65              FIRST DETAIL 8
-  66              LAST DETAIL  48.
-  67          
-  68 >        01 RPTA-PAGE-HEADING TYPE PAGE HEADING.
-----                                   ^
-  69             03 LINE NUMBER IS 1.
-  70                05 COLUMN 1    PIC X(4)    VALUE "Run:".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-5049-prog.cob:68.33-68.37:
-  65              FIRST DETAIL 8
-  66              LAST DETAIL  48.
-  67          
-  68 >        01 RPTA-PAGE-HEADING TYPE PAGE HEADING.
-----                                    ^^^^
-  69             03 LINE NUMBER IS 1.
-  70                05 COLUMN 1    PIC X(4)    VALUE "Run:".
->> Error: Invalid syntax
-
-run_reportwriter.at-5049-prog.cob:122.48:
+run_reportwriter.at-5049-prog.cob:122.43:
  119                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
  120          
  121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH 
  122 >                                  NEXT GROUP NEXT PAGE.
-----                                                   ^
+----                                              ^
  123             03  LINE NUMBER IS PLUS 2.
  124                05 COLUMN  69        PIC X(15)    VALUE "Branch Total: ".
->> Hint: Missing PAGE
+>> Hint: Missing <integer literal>
 
-run_reportwriter.at-5049-prog.cob:122.49-122.53:
+run_reportwriter.at-5049-prog.cob:122.44-122.53:
  119                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
  120          
  121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH 
  122 >                                  NEXT GROUP NEXT PAGE.
-----                                                    ^^^^
+----                                               ^^^^^^^^^
  123             03  LINE NUMBER IS PLUS 2.
  124                05 COLUMN  69        PIC X(15)    VALUE "Branch Total: ".
 >> Error: Invalid syntax
 
-run_reportwriter.at-5049-prog.cob:129.48:
+run_reportwriter.at-5049-prog.cob:129.43:
  126                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
  127          
  128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION 
  129 >                                  NEXT GROUP NEXT PAGE.
-----                                                   ^
+----                                              ^
  130             03  LINE NUMBER IS PLUS 2.
  131                05 COLUMN  69        PIC X(15)    VALUE "Region Total: ".
->> Hint: Missing PAGE
+>> Hint: Missing <integer literal>
 
-run_reportwriter.at-5049-prog.cob:129.49-129.53:
+run_reportwriter.at-5049-prog.cob:129.44-129.53:
  126                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
  127          
  128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION 
  129 >                                  NEXT GROUP NEXT PAGE.
-----                                                    ^^^^
+----                                               ^^^^^^^^^
  130             03  LINE NUMBER IS PLUS 2.
  131                05 COLUMN  69        PIC X(15)    VALUE "Region Total: ".
 >> Error: Invalid syntax
@@ -14416,36 +12376,6 @@ run_reportwriter.at-9265-prog.cob:33.11-33.20:
   35   
 >> Error: Invalid syntax
 
-run_reportwriter.at-9265-prog.cob:66.17:
-  63   
-  64          REPORT SECTION.
-  65   
-  66 >        RD REPORT1
-----                    ^
-  67             PAGE LIMIT IS 65 LINES
-  68             LINE LIMIT 132
->> Hint: Missing .
-
-run_reportwriter.at-9265-prog.cob:67.10-67.14:
-  64          REPORT SECTION.
-  65   
-  66          RD REPORT1
-  67 >           PAGE LIMIT IS 65 LINES
-----             ^^^^
-  68             LINE LIMIT 132
-  69             HEADING 1
->> Error: Invalid syntax
-
-run_reportwriter.at-9265-prog.cob:67.32:
-  64          REPORT SECTION.
-  65   
-  66          RD REPORT1
-  67 >           PAGE LIMIT IS 65 LINES
-----                                   ^
-  68             LINE LIMIT 132
-  69             HEADING 1
->> Hint: Missing ARE
-
 run_reportwriter.at-9265-prog.cob:68.10-68.14:
   65   
   66          RD REPORT1
@@ -14456,15 +12386,15 @@ run_reportwriter.at-9265-prog.cob:68.10-68.14:
   70             CONTROL ARE WS-SALARY.
 >> Error: Invalid syntax
 
-run_reportwriter.at-9265-prog.cob:68.15-68.20:
+run_reportwriter.at-9265-prog.cob:68.24:
   65   
   66          RD REPORT1
   67             PAGE LIMIT IS 65 LINES
   68 >           LINE LIMIT 132
-----                  ^^^^^
+----                           ^
   69             HEADING 1
   70             CONTROL ARE WS-SALARY.
->> Error: Invalid syntax
+>> Hint: Missing COLUMNS
 
 run_reportwriter.at-9265-prog.cob:69.10-69.17:
   66          RD REPORT1
@@ -14476,54 +12406,14 @@ run_reportwriter.at-9265-prog.cob:69.10-69.17:
   71   
 >> Error: Invalid syntax
 
-run_reportwriter.at-9265-prog.cob:70.10-70.17:
+run_reportwriter.at-9265-prog.cob:70.18-70.21:
   67             PAGE LIMIT IS 65 LINES
   68             LINE LIMIT 132
   69             HEADING 1
   70 >           CONTROL ARE WS-SALARY.
-----             ^^^^^^^
+----                     ^^^
   71   
   72          01  MAIN-HEADER TYPE IS PAGE HEADING.
->> Error: Invalid syntax
-
-run_reportwriter.at-9265-prog.cob:72.30:
-  69             HEADING 1
-  70             CONTROL ARE WS-SALARY.
-  71   
-  72 >        01  MAIN-HEADER TYPE IS PAGE HEADING.
-----                                 ^
-  73              05 LINE 1.
-  74                 10 COLUMN CENTER 45  PIC X(35)  VALUE
->> Hint: Missing DETAIL
-
-run_reportwriter.at-9265-prog.cob:72.31-72.35:
-  69             HEADING 1
-  70             CONTROL ARE WS-SALARY.
-  71   
-  72 >        01  MAIN-HEADER TYPE IS PAGE HEADING.
-----                                  ^^^^
-  73              05 LINE 1.
-  74                 10 COLUMN CENTER 45  PIC X(35)  VALUE
->> Error: Invalid syntax
-
-run_reportwriter.at-9265-prog.cob:88.32:
-  85                 10 COLUMN 35  PIC 99    SOURCE WS-MI.
-  86   
-  87          01  TYPE IS CONTROL HEADING
-  88 >                 FOR WS-SALARY OR PAGE.
-----                                   ^
-  89              05 LINE PLUS 2 PRESENT AFTER NEW WS-SALARY.
-  90                 10 COLUMN 6   PIC X(9)   VALUE 'EMP NAME:'.
->> Hint: Missing PAGE
-
-run_reportwriter.at-9265-prog.cob:88.33-88.37:
-  85                 10 COLUMN 35  PIC 99    SOURCE WS-MI.
-  86   
-  87          01  TYPE IS CONTROL HEADING
-  88 >                 FOR WS-SALARY OR PAGE.
-----                                    ^^^^
-  89              05 LINE PLUS 2 PRESENT AFTER NEW WS-SALARY.
-  90                 10 COLUMN 6   PIC X(9)   VALUE 'EMP NAME:'.
 >> Error: Invalid syntax
 
 run_reportwriter.at-9265-prog.cob:89.33:
@@ -14714,6 +12604,16 @@ run_reportwriter.at-9340-reference:1.27-1.32:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9469:0
+run_reportwriter.at-9469-prog.cob:32.18:
+  29   
+  30          REPORT SECTION.
+  31          RD  RP
+  32 >            CODE IS "VarQ: "
+----                     ^
+  33              PAGE LIMIT 10 LINES
+  34                         60 COLUMNS
+>> Hint: Missing <identifier>
+
 run_reportwriter.at-9469-prog.cob:32.19-32.27:
   29   
   30          REPORT SECTION.
@@ -14722,106 +12622,6 @@ run_reportwriter.at-9469-prog.cob:32.19-32.27:
 ----                      ^^^^^^^^
   33              PAGE LIMIT 10 LINES
   34                         60 COLUMNS
->> Error: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:33.15:
-  30          REPORT SECTION.
-  31          RD  RP
-  32              CODE IS "VarQ: "
-  33 >            PAGE LIMIT 10 LINES
-----                  ^
-  34                         60 COLUMNS
-  35              HEADING 1
->> Hint: Missing .
-
-run_reportwriter.at-9469-prog.cob:33.16-33.21:
-  30          REPORT SECTION.
-  31          RD  RP
-  32              CODE IS "VarQ: "
-  33 >            PAGE LIMIT 10 LINES
-----                   ^^^^^
-  34                         60 COLUMNS
-  35              HEADING 1
->> Warning: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:33.30:
-  30          REPORT SECTION.
-  31          RD  RP
-  32              CODE IS "VarQ: "
-  33 >            PAGE LIMIT 10 LINES
-----                                 ^
-  34                         60 COLUMNS
-  35              HEADING 1
->> Hint: Missing ARE
-
-run_reportwriter.at-9469-prog.cob:34.22-34.24:
-  31          RD  RP
-  32              CODE IS "VarQ: "
-  33              PAGE LIMIT 10 LINES
-  34 >                       60 COLUMNS
-----                         ^^
-  35              HEADING 1
-  36              FIRST DETAIL 4.
->> Error: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:35.11-35.18:
-  32              CODE IS "VarQ: "
-  33              PAGE LIMIT 10 LINES
-  34                         60 COLUMNS
-  35 >            HEADING 1
-----              ^^^^^^^
-  36              FIRST DETAIL 4.
-  37          01 HEADING-LINE.
->> Error: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:36.11-36.16:
-  33              PAGE LIMIT 10 LINES
-  34                         60 COLUMNS
-  35              HEADING 1
-  36 >            FIRST DETAIL 4.
-----              ^^^^^
-  37          01 HEADING-LINE.
-  38             02  TYPE PAGE HEADING LINE PLUS 1.
->> Error: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:38.18:
-  35              HEADING 1
-  36              FIRST DETAIL 4.
-  37          01 HEADING-LINE.
-  38 >           02  TYPE PAGE HEADING LINE PLUS 1.
-----                     ^
-  39               05  COLUMN 1      PIC X(50) VALUE
-  40                   "H        1         2         3         4         5".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-9469-prog.cob:38.19-38.23:
-  35              HEADING 1
-  36              FIRST DETAIL 4.
-  37          01 HEADING-LINE.
-  38 >           02  TYPE PAGE HEADING LINE PLUS 1.
-----                      ^^^^
-  39               05  COLUMN 1      PIC X(50) VALUE
-  40                   "H        1         2         3         4         5".
->> Error: Invalid syntax
-
-run_reportwriter.at-9469-prog.cob:43.18:
-  40                   "H        1         2         3         4         5".
-  41               05                PIC X(7) VALUE "  Page".
-  42               05                PIC ZZ9  SOURCE PAGE-COUNTER.
-  43 >           02  TYPE PAGE HEADING LINE PLUS 1.
-----                     ^
-  44         *     05  COLUMN 1      PIC X(50) VALUE
-  45         *         "12345678901234567890123456789012345678901234567890".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-9469-prog.cob:43.19-43.23:
-  40                   "H        1         2         3         4         5".
-  41               05                PIC X(7) VALUE "  Page".
-  42               05                PIC ZZ9  SOURCE PAGE-COUNTER.
-  43 >           02  TYPE PAGE HEADING LINE PLUS 1.
-----                      ^^^^
-  44         *     05  COLUMN 1      PIC X(50) VALUE
-  45         *         "12345678901234567890123456789012345678901234567890".
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9514:0
@@ -15018,26 +12818,6 @@ run_reportwriter.at-9514-reference:1.15-1.16:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9617:0
-run_reportwriter.at-9617-prog.cob:32.19:
-  29   
-  30              RD  REPORT-1
-  31                  CONTROLS ARE     FINAL
-  32 >                PAGE     LIMIT   IS 21
-----                      ^
-  33                  LINE     LIMIT   IS 71
-  34                  FIRST    DETAIL  IS 08
->> Hint: Missing .
-
-run_reportwriter.at-9617-prog.cob:32.24-32.29:
-  29   
-  30              RD  REPORT-1
-  31                  CONTROLS ARE     FINAL
-  32 >                PAGE     LIMIT   IS 21
-----                           ^^^^^
-  33                  LINE     LIMIT   IS 71
-  34                  FIRST    DETAIL  IS 08
->> Warning: Invalid syntax
-
 run_reportwriter.at-9617-prog.cob:33.24-33.29:
   30              RD  REPORT-1
   31                  CONTROLS ARE     FINAL
@@ -15048,6 +12828,16 @@ run_reportwriter.at-9617-prog.cob:33.24-33.29:
   35                  LAST     DETAIL  IS 18
 >> Error: Invalid syntax
 
+run_reportwriter.at-9617-prog.cob:33.37:
+  30              RD  REPORT-1
+  31                  CONTROLS ARE     FINAL
+  32                  PAGE     LIMIT   IS 21
+  33 >                LINE     LIMIT   IS 71
+----                                        ^
+  34                  FIRST    DETAIL  IS 08
+  35                  LAST     DETAIL  IS 18
+>> Hint: Missing COLUMNS
+
 run_reportwriter.at-9617-prog.cob:34.15-34.20:
   31                  CONTROLS ARE     FINAL
   32                  PAGE     LIMIT   IS 21
@@ -15056,45 +12846,5 @@ run_reportwriter.at-9617-prog.cob:34.15-34.20:
 ----                  ^^^^^
   35                  LAST     DETAIL  IS 18
   36                  FOOTING          IS 20
->> Error: Invalid syntax
-
-run_reportwriter.at-9617-prog.cob:35.15-35.19:
-  32                  PAGE     LIMIT   IS 21
-  33                  LINE     LIMIT   IS 71
-  34                  FIRST    DETAIL  IS 08
-  35 >                LAST     DETAIL  IS 18
-----                  ^^^^
-  36                  FOOTING          IS 20
-  37                 .
->> Error: Invalid syntax
-
-run_reportwriter.at-9617-prog.cob:36.15-36.22:
-  33                  LINE     LIMIT   IS 71
-  34                  FIRST    DETAIL  IS 08
-  35                  LAST     DETAIL  IS 18
-  36 >                FOOTING          IS 20
-----                  ^^^^^^^
-  37                 .
-  38         *>---------------------------------------------------------------
->> Error: Invalid syntax
-
-run_reportwriter.at-9617-prog.cob:40.19:
-  37                 .
-  38         *>---------------------------------------------------------------
-  39              01  PAGE-HEADING
-  40 >                TYPE PAGE HEADING.
-----                      ^
-  41                  02 LINE 01.
-  42                     03 COLUMN 1        VALUE "PAGE HEADING".
->> Hint: Missing DETAIL
-
-run_reportwriter.at-9617-prog.cob:40.20-40.24:
-  37                 .
-  38         *>---------------------------------------------------------------
-  39              01  PAGE-HEADING
-  40 >                TYPE PAGE HEADING.
-----                       ^^^^
-  41                  02 LINE 01.
-  42                     03 COLUMN 1        VALUE "PAGE HEADING".
 >> Error: Invalid syntax
 

@@ -1749,16 +1749,6 @@ run_file.at-5011-reference-report:122.68-122.72:
  124   000002         after advancing page
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:123.38:
- 120   
- 121   
- 122   PAGE: 0006                         LC: 000015                       DATE: 150206
- 123 > 000001         from report-line-header
-----                                         ^
- 124   000002         after advancing page
- 125   000003     end-write.
->> Hint: Missing .
-
 run_file.at-5011-reference-report:124.15-124.20:
  121   
  122   PAGE: 0006                         LC: 000015                       DATE: 150206
@@ -1767,16 +1757,6 @@ run_file.at-5011-reference-report:124.15-124.20:
 ----                  ^^^^^
  125   000003     end-write.
  126   000004
->> Warning: Invalid syntax
-
-run_file.at-5011-reference-report:125.11-125.20:
- 122   PAGE: 0006                         LC: 000015                       DATE: 150206
- 123   000001         from report-line-header
- 124   000002         after advancing page
- 125 > 000003     end-write.
-----              ^^^^^^^^^
- 126   000004
- 127   000005     perform readwrite-loop until endofdata.
 >> Error: Invalid syntax
 
 run_file.at-5011-reference-report:142.6-142.7:
@@ -2310,16 +2290,6 @@ run_file.at-5301-reference-report:123.15-123.19:
  125   000003     end-write.
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:123.38:
- 120   
- 121   
- 122   PAGE: 0006                         LC: 000015
- 123 > 000001         from report-line-header
-----                                         ^
- 124   000002         after advancing page
- 125   000003     end-write.
->> Hint: Missing .
-
 run_file.at-5301-reference-report:124.15-124.20:
  121   
  122   PAGE: 0006                         LC: 000015
@@ -2328,16 +2298,6 @@ run_file.at-5301-reference-report:124.15-124.20:
 ----                  ^^^^^
  125   000003     end-write.
  126   000004
->> Warning: Invalid syntax
-
-run_file.at-5301-reference-report:125.11-125.20:
- 122   PAGE: 0006                         LC: 000015
- 123   000001         from report-line-header
- 124   000002         after advancing page
- 125 > 000003     end-write.
-----              ^^^^^^^^^
- 126   000004
- 127   000005     perform readwrite-loop until endofdata.
 >> Error: Invalid syntax
 
 run_file.at-5301-reference-report:142.6-142.7:
