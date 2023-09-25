@@ -4,9 +4,9 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Emacs modes &mdash; superbol master
- (f4d5b99
-) (2023/09/25 14:41) documentation</title>
+  <title>GNU/Emacs modes &mdash; superbol master
+ (0a05abe
+) (2023/09/25 14:57) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -30,7 +30,7 @@
           </a>
               <div class="version">
                 master
- (f4d5b99
+ (0a05abe
 )
               </div>
 <div role="search">
@@ -65,7 +65,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Emacs modes</li>
+      <li>GNU/Emacs modes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/emacs.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -75,8 +75,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="emacs-modes">
-<h1>Emacs modes<a class="headerlink" href="#emacs-modes" title="Permalink to this headline"></a></h1>
+  <section id="gnu-emacs-modes">
+<h1>GNU/Emacs modes<a class="headerlink" href="#gnu-emacs-modes" title="Permalink to this headline"></a></h1>
+<p>We document two means that are available for editing COBOL files using
+GNU/Emacs.  One makes use of a modified version of
+<code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> that can be found on ELPA.  The other is a new
+mode, <code class="code docutils literal notranslate"><span class="pre">superbol-mode</span></code>, that simply makes use of the LSP to
+provide a powerful COBOL IDE.</p>
 <section id="standard-file-cobol-mode-el">
 <h2>Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code><a class="headerlink" href="#standard-file-cobol-mode-el" title="Permalink to this headline"></a></h2>
 <p>We provide our own fork of <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> from ELPA, with a fix
@@ -102,7 +107,7 @@ change this option using <code class="code docutils literal notranslate"><span c
 </section>
 <section id="features">
 <h3>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h3>
-<p>The <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> provides a following features:</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> provides the following features:</p>
 <ul class="simple">
 <li><p>colorization</p></li>
 <li><p>indentation</p></li>
@@ -119,6 +124,74 @@ change this option using <code class="code docutils literal notranslate"><span c
 <p>We advise to also use the <code class="code docutils literal notranslate"><span class="pre">auto-complete</span></code> mode also. This mode
 will propose completions while typing keywords (use TAB or RET to
 complete).</p>
+</section>
+</section>
+<section id="superbol-mode">
+<h2>Superbol-mode<a class="headerlink" href="#superbol-mode" title="Permalink to this headline"></a></h2>
+<p>The new Superbol mode provides an IDE that makes use of the Superbol
+LSP to provide advanced navigation and editing facilities for COBOL
+projects.  It can be used in combination with any of the two main LSP
+clients that exist within the GNU/Emacs ecosystem to interact with LSP
+servers: <cite>lsp-mode</cite> and <cite>eglot</cite>.</p>
+<section id="superbol-mode-with-lsp-mode">
+<h3>Superbol-mode with <cite>lsp-mode</cite><a class="headerlink" href="#superbol-mode-with-lsp-mode" title="Permalink to this headline"></a></h3>
+<p><a class="reference external" href="https://github.com/emacs-lsp/lsp-mode">lsp-mode</a> appears to be the most prominent at the moment.  This
+client benefits from a large user-base, but is also considered
+“bloated” by some.</p>
+<p>The main advantages for using it in our context is its support for
+<a class="reference external" href="https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide">semantic tokens</a>, that provide a way for LSPs to issue information
+about the semantics of symbols from the source code.  Compared to
+traditional regexp-based highlighting, semantic tokens-based
+highlighting can drastically improve code readability of various
+source code elements based on their syntactic location;</p>
+</section>
+<section id="superbol-mode-with-eglot">
+<h3>Superbol-mode with <cite>eglot</cite><a class="headerlink" href="#superbol-mode-with-eglot" title="Permalink to this headline"></a></h3>
+<p>Another possibility is to use <a class="reference external" href="https://elpa.gnu.org/packages/eglot.html">eglot</a>, that is sometimes considered
+easier to configure and more lightweight than <cite>lsp-mode</cite> (which
+notably makes it more reactive to user inputs).  Being more recent, it
+lacks some of the features of <cite>lsp-mode</cite>, among which is the support
+for semantic tokens <a class="footnote-reference brackets" href="#eglot-semtok-issue" id="id1">1</a>.  However, additionally
+enabling the aforementioned <cite>cobol-mode.el</cite> provides reasonable syntax
+highlighting.</p>
+</section>
+<section id="setup">
+<h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline"></a></h3>
+<p>Let us first define an environment variable that indicates where the
+<code class="docutils literal notranslate"><span class="pre">superbol-free</span></code> executable can be found.  Additionally, define a
+variable that points to the root of the source directory for the
+extension:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">SUPERBOL_DIR</span><span class="o">=</span><span class="s2">&quot;&lt;directory where superbol-free can be found&gt;&quot;</span><span class="p">;</span>
+<span class="nb">export</span> <span class="nv">SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>After this, the following command launches a GNU/Emacs instance with
+an <cite>lsp-mode</cite>-based client configured for COBOL files:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
+      --load lsp-superbol <span class="se">\</span>
+      --eval <span class="s2">&quot;(custom-set-variables &#39;(lsp-superbol-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;))&quot;</span> <span class="se">\</span>
+      --funcall superbol-mode-enable-for-default-extensions
+</pre></div>
+</div>
+<p>To use <cite>eglot</cite>, type the following instead:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
+      --load eglot-superbol <span class="se">\</span>
+      --eval <span class="s2">&quot;(add-to-list &#39;exec-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;)&quot;</span> <span class="se">\</span>
+      --funcall superbol-mode-enable-for-default-extensions
+</pre></div>
+</div>
+</section>
+<section id="further-configuration-for-auto-indentation">
+<h3>Further configuration for auto-indentation:<a class="headerlink" href="#further-configuration-for-auto-indentation" title="Permalink to this headline"></a></h3>
+<p><cite>lsp-mode</cite> provides a <code class="docutils literal notranslate"><span class="pre">lsp-format-region</span></code> function that may be used
+to use the LSP-provided intentation.  When using <cite>eglot</cite>, the same
+functionality is provided by <code class="docutils literal notranslate"><span class="pre">eglot-format</span></code>.</p>
+<dl class="footnote brackets">
+<dt class="label" id="eglot-semtok-issue"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Note there is a pending issue on this point
+at <a class="reference external" href="https://github.com/joaotavora/eglot/issues/615">https://github.com/joaotavora/eglot/issues/615</a> .</p>
+</dd>
+</dl>
 </section>
 </section>
 </section>
