@@ -17,7 +17,7 @@ run_subscripts.at-493-prog.cob:2.7-2.16:
 ----          ^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:494:0
 run_subscripts.at-494-progn.cob:2.7-2.18:
@@ -26,7 +26,7 @@ run_subscripts.at-494-progn.cob:2.7-2.18:
 ----          ^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progn.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:495:0
 run_subscripts.at-495-progn2.cob:2.7-2.19:
@@ -35,7 +35,7 @@ run_subscripts.at-495-progn2.cob:2.7-2.19:
 ----          ^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progn2.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:532:0
 run_subscripts.at-532-prog.cob:13.7-13.20:
@@ -46,7 +46,7 @@ run_subscripts.at-532-prog.cob:13.7-13.20:
 ----          ^^^^^^^^^^^^^
   14              DISPLAY y (idx)
   15         *> Note: MF says "sets BOUND"
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 run_subscripts.at-532-prog.cob:16.7-16.18:
   13         $SET NOSSRANGE
@@ -56,6 +56,6 @@ run_subscripts.at-532-prog.cob:16.7-16.18:
 ----          ^^^^^^^^^^^
   17              DISPLAY y (idx)
   18              .
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:581:0

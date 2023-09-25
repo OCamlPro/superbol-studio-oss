@@ -24,6 +24,11 @@ module TYPES: sig
           matched_loc: Cobol_common.srcloc;
           replacement_text: Text.text;
         }
+    | LexDir of
+        {
+          lexdir: Preproc_directives.lexing_directive option;
+          loc: Cobol_common.srcloc;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -41,6 +46,10 @@ include module type of TYPES
 val empty: log
 val append
   : log_entry
+  -> log -> log
+val new_lexdir
+  : loc: Cobol_common.srcloc
+  -> ?lexdir: Preproc_directives.lexing_directive
   -> log -> log
 val copy_done
   : loc: Cobol_common.srcloc

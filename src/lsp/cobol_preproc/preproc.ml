@@ -16,6 +16,7 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 open Text.TYPES
+open Preproc_directives                         (* import types of directives *)
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -126,10 +127,6 @@ let srclex_restart_on_file ?position filename =
 
 (* SOURCE FORMAT *)
 
-type lexing_directive =
-  | LexDirSource:
-      'k Src_format.source_format with_loc -> lexing_directive         [@@unboxed]
-
 let cdir_source_format ~dialect format =
   match Src_format.decypher ~dialect ~&format with
   | Ok (SF sf) ->
@@ -140,50 +137,6 @@ let cdir_source_format ~dialect format =
                 DIAGS.One.error ~loc:~@format "Unknown@ source@ format@ `%s'" f)
 
 (* COPY/REPLACING *)
-
-type copy_statement =
-  | CDirCopy of
-      {
-        library: library;
-        suppress_printing: bool;
-        replacing: replacing with_loc list;
-      }
-and replace_statement =
-  | CDirReplace of
-      {
-        also: bool;
-        replacing: replacing with_loc list;
-      }
-  | CDirReplaceOff of
-      {
-        last: bool;
-      }
-and library =
-  {
-    libname: fileloc with_loc;
-    cbkname: fileloc with_loc option;
-  }
-and fileloc = [`Word | `Alphanum] * string
-and replacing =
-  | ReplaceExact of
-      {
-        repl_from: pseudotext with_loc;
-        repl_to: pseudotext with_loc;
-      }
-  | ReplacePartial of
-      {
-        repl_subst: partial_subst with_loc;
-        repl_to: string with_loc option;
-      }
-and partial_subst =
-  {
-    partial_subst_dir: replacing_direction;
-    partial_subst_len: int;
-    partial_subst_regexp: Str.regexp;
-  }
-and replacing_direction = Leading | Trailing
-
-(* --- Implementation of replacing operations ------------------------------- *)
 
 let concat_strings = Cobol_common.Srcloc.concat_strings_with_loc
 let lift_textword w = TextWord ~&w &@<- w
@@ -217,12 +170,6 @@ let partial_word (type k) (req: k partial_word_request) words : (k, _) result =
       Error (DIAGS.One.error ~loc:~@words "Expected@ at@ most@ one@ text-word")
   | _, _ ->
       Error (DIAGS.One.error ~loc:~@words "Expected@ one@ text-word")
-
-type partial_replacing =
-  {
-    repl_dir: replacing_direction;
-    repl_strict: bool;
-  }
 
 let partial_subst (k: partial_replacing) ({ payload = pat; _ } as repl_from) =
   { partial_subst_dir = k.repl_dir;

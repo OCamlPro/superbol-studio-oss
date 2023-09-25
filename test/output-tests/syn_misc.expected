@@ -1224,7 +1224,7 @@ syn_misc.at-2045-prog2.cob:11.7-11.46:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
   13    *         DISPLAY 'NOMFCOMMENT'   END-DISPLAY
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-2045-prog2.cob:15.8-15.9:
   12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
@@ -3143,7 +3143,7 @@ syn_misc.at-6845-prog.cob:5.7-5.17:
    5 >       $DISPLAY OK
 ----          ^^^^^^^^^^
    6              STOP RUN.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6924:0
 syn_misc.at-6924-prog.cob:2.7-2.11:
@@ -3618,7 +3618,7 @@ syn_misc.at-7109-prog.cob:8.7-8.19:
 ----          ^^^^^^^^^^^^
    9         $DISPLAY X defined
   10         $ELIF Y DEFINED
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:9.7-9.24:
    6          78 Y            VALUE 'a'.
@@ -3628,7 +3628,7 @@ syn_misc.at-7109-prog.cob:9.7-9.24:
 ----          ^^^^^^^^^^^^^^^^^
   10         $ELIF Y DEFINED
   11         $DISPLAY X not defined, but Y via lvl 78
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:10.7-10.21:
    7          PROCEDURE       DIVISION.
@@ -3638,7 +3638,7 @@ syn_misc.at-7109-prog.cob:10.7-10.21:
 ----          ^^^^^^^^^^^^^^
   11         $DISPLAY X not defined, but Y via lvl 78
   12         $ELSE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:11.7-11.46:
    8         $IF X DEFINED
@@ -3648,7 +3648,7 @@ syn_misc.at-7109-prog.cob:11.7-11.46:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   12         $ELSE
   13         $DISPLAY X not defined
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:12.7-12.11:
    9         $DISPLAY X defined
@@ -3658,7 +3658,7 @@ syn_misc.at-7109-prog.cob:12.7-12.11:
 ----          ^^^^
   13         $DISPLAY X not defined
   14         $END
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:13.7-13.28:
   10         $ELIF Y DEFINED
@@ -3668,7 +3668,7 @@ syn_misc.at-7109-prog.cob:13.7-13.28:
 ----          ^^^^^^^^^^^^^^^^^^^^^
   14         $END
   15              CONTINUE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7109-prog.cob:14.7-14.10:
   11         $DISPLAY X not defined, but Y via lvl 78
@@ -3678,7 +3678,7 @@ syn_misc.at-7109-prog.cob:14.7-14.10:
 ----          ^^^
   15              CONTINUE
   16              .
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7160:0
 syn_misc.at-7160-prog.cob:11.7-11.17:
@@ -3689,7 +3689,7 @@ syn_misc.at-7160-prog.cob:11.7-11.17:
 ----          ^^^^^^^^^^
   12         $DISPLAY correct Y = Y2
   13         $ELSE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:12.7-12.29:
    9          78 Z            VALUE 354.
@@ -3699,7 +3699,7 @@ syn_misc.at-7160-prog.cob:12.7-12.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
   13         $ELSE
   14         $DISPLAY bad: Y should be = Y2
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:13.7-13.11:
   10          PROCEDURE       DIVISION.
@@ -3709,7 +3709,7 @@ syn_misc.at-7160-prog.cob:13.7-13.11:
 ----          ^^^^
   14         $DISPLAY bad: Y should be = Y2
   15         $END
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:14.7-14.36:
   11         $IF Y = Y2X
@@ -3719,7 +3719,7 @@ syn_misc.at-7160-prog.cob:14.7-14.36:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15         $END
   16         $IF Y > X
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:15.7-15.10:
   12         $DISPLAY correct Y = Y2
@@ -3729,7 +3729,7 @@ syn_misc.at-7160-prog.cob:15.7-15.10:
 ----          ^^^
   16         $IF Y > X
   17         $DISPLAY BAD - Y is not > X
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:16.7-16.15:
   13         $ELSE
@@ -3739,7 +3739,7 @@ syn_misc.at-7160-prog.cob:16.7-16.15:
 ----          ^^^^^^^^
   17         $DISPLAY BAD - Y is not > X
   18         $ELIF Y < X
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:17.7-17.33:
   14         $DISPLAY bad: Y should be = Y2
@@ -3749,7 +3749,7 @@ syn_misc.at-7160-prog.cob:17.7-17.33:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   18         $ELIF Y < X
   19         $DISPLAY correct Y < X
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:18.7-18.17:
   15         $END
@@ -3759,7 +3759,7 @@ syn_misc.at-7160-prog.cob:18.7-18.17:
 ----          ^^^^^^^^^^
   19         $DISPLAY correct Y < X
   20         $ELSE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:19.7-19.28:
   16         $IF Y > X
@@ -3769,7 +3769,7 @@ syn_misc.at-7160-prog.cob:19.7-19.28:
 ----          ^^^^^^^^^^^^^^^^^^^^^
   20         $ELSE
   21         $DISPLAY BROKEN
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:20.7-20.11:
   17         $DISPLAY BAD - Y is not > X
@@ -3779,7 +3779,7 @@ syn_misc.at-7160-prog.cob:20.7-20.11:
 ----          ^^^^
   21         $DISPLAY BROKEN
   22         $END
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:21.7-21.21:
   18         $ELIF Y < X
@@ -3789,7 +3789,7 @@ syn_misc.at-7160-prog.cob:21.7-21.21:
 ----          ^^^^^^^^^^^^^^
   22         $END
   23         
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:22.7-22.10:
   19         $DISPLAY correct Y < X
@@ -3799,7 +3799,7 @@ syn_misc.at-7160-prog.cob:22.7-22.10:
 ----          ^^^
   23         
   24         $IF X > Y
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:24.7-24.15:
   21         $DISPLAY BROKEN
@@ -3809,7 +3809,7 @@ syn_misc.at-7160-prog.cob:24.7-24.15:
 ----          ^^^^^^^^
   25         $DISPLAY correct X > Y
   26         $ELIF X < Y
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:25.7-25.28:
   22         $END
@@ -3819,7 +3819,7 @@ syn_misc.at-7160-prog.cob:25.7-25.28:
 ----          ^^^^^^^^^^^^^^^^^^^^^
   26         $ELIF X < Y
   27         $DISPLAY BAD - X is not < Y
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:26.7-26.17:
   23         
@@ -3829,7 +3829,7 @@ syn_misc.at-7160-prog.cob:26.7-26.17:
 ----          ^^^^^^^^^^
   27         $DISPLAY BAD - X is not < Y
   28         $ELSE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:27.7-27.33:
   24         $IF X > Y
@@ -3839,7 +3839,7 @@ syn_misc.at-7160-prog.cob:27.7-27.33:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   28         $ELSE
   29         $DISPLAY BROKEN
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:28.7-28.11:
   25         $DISPLAY correct X > Y
@@ -3849,7 +3849,7 @@ syn_misc.at-7160-prog.cob:28.7-28.11:
 ----          ^^^^
   29         $DISPLAY BROKEN
   30         $END
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:29.7-29.21:
   26         $ELIF X < Y
@@ -3859,7 +3859,7 @@ syn_misc.at-7160-prog.cob:29.7-29.21:
 ----          ^^^^^^^^^^^^^^
   30         $END
   31              CONTINUE
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 syn_misc.at-7160-prog.cob:30.7-30.10:
   27         $DISPLAY BAD - X is not < Y
@@ -3869,7 +3869,7 @@ syn_misc.at-7160-prog.cob:30.7-30.10:
 ----          ^^^
   31              CONTINUE
   32              .
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7193:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7264:0

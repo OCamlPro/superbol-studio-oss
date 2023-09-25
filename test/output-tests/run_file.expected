@@ -110,7 +110,7 @@ run_file.at-790-prog.cob:10.7-10.28:
 ----          ^^^^^^^^^^^^^^^^^^^^^
   11              SELECT g ASSIGN whatever
   12                  ORGANIZATION LINE SEQUENTIAL.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:816:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:860:0
@@ -3261,7 +3261,7 @@ run_file.at-8591-prog.cob:9.7-9.17:
 ----          ^^^^^^^^^^
   10          INPUT-OUTPUT SECTION.
   11          FILE-CONTROL.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 run_file.at-8591-prog.cob:88.54:
   85              05  FILLER PIC X(8) VALUE "PRE00000".
@@ -5714,7 +5714,7 @@ run_file.at-10488-progs.cob:2.7-2.19:
 ----          ^^^^^^^^^^^^
    3         **  CREATE KEY-DEF-AREA FROM ACB ARRAY
    4          IDENTIFICATION DIVISION.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10676:0
 run_file.at-10676-prog.cob:86.12-86.24:

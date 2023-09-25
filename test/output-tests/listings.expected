@@ -4039,7 +4039,7 @@ listings.at-2876-prog2.cob:7.7-7.26:
 ----          ^^^^^^^^^^^^^^^^^^^
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 listings.at-2876-prog2.cob:10.7-10.29:
    7         $IF ACTIVATE DEFINED
@@ -4049,7 +4049,7 @@ listings.at-2876-prog2.cob:10.7-10.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 listings.at-2876-prog2.cob:13.7-13.11:
   10         $ELIF ACTIVATE2 DEFINED
@@ -4059,7 +4059,7 @@ listings.at-2876-prog2.cob:13.7-13.11:
 ----          ^^^^
   14              DISPLAY "NOTOK" NO ADVANCING
   15              END-DISPLAY
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 listings.at-2876-prog2.cob:16.7-16.10:
   13         $ELSE
@@ -4068,7 +4068,7 @@ listings.at-2876-prog2.cob:16.7-16.10:
   16 >       $END
 ----          ^^^
   17              STOP RUN.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3684:0
 listings.at-3684-expected.lst:1.6-1.7:

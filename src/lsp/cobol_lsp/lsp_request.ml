@@ -236,7 +236,8 @@ let handle_hover registry (params: HoverParams.t) =
       | Cobol_preproc.FileCopy { copyloc = loc; _ } ->
           Lsp_position.is_in_lexloc params.position
             (Cobol_common.Srcloc.lexloc_in ~filename loc)
-      | Cobol_preproc.Replace _ ->
+      | Cobol_preproc.Replace _
+      | Cobol_preproc.LexDir _ ->
           false
     end (Cobol_preproc.Trace.events pplog)
   in
@@ -264,6 +265,7 @@ let handle_hover registry (params: HoverParams.t) =
           Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
+      | Some LexDir _
       | None ->
           None
     end
