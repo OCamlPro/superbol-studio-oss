@@ -73,45 +73,9 @@ let try_with_document_data ~f =
 
 (** {2 Handling requests} *)
 
-(* Client capabilities are to be used for special request response, for example
-   a definition request can be answered with a LocationLink iff the client
-   supports it.
-
-   NOTE: For now we don't use them because we don't have any special
-   response. *)
-let make_capabilities (_: ClientCapabilities.t) =
-  let sync =
-    TextDocumentSyncOptions.create ()
-      ~openClose:true
-      ~change:Incremental
-  and semtoks =
-    let legend =
-      SemanticTokensLegend.create
-        ~tokenTypes:Lsp_semtoks.token_types
-        ~tokenModifiers:Lsp_semtoks.token_modifiers
-    in
-    SemanticTokensOptions.create ()
-      ~full:(`Full (SemanticTokensOptions.create_full ~delta:false ()))
-      ~range:true
-      ~legend
-  and hover =
-    HoverOptions.create ()
-  and completion_option =
-    CompletionOptions.create ()
-  in
-  ServerCapabilities.create ()
-    ~textDocumentSync:(`TextDocumentSyncOptions sync)
-    ~definitionProvider:(`Bool true)
-    ~referencesProvider:(`Bool true)
-    ~documentRangeFormattingProvider: (`Bool true)
-    ~documentFormattingProvider: (`Bool true)
-    ~semanticTokensProvider:(`SemanticTokensOptions semtoks)
-    ~hoverProvider:(`HoverOptions hover)
-    ~completionProvider:(completion_option)
-
 let handle_initialize (params: InitializeParams.t) =
   InitializeResult.create ()
-    ~capabilities:(make_capabilities params.capabilities)
+    ~capabilities:(Lsp_capabilities.reply params.capabilities)
 
 let find_definitions { location_of; _ } cu_name qn defs =
   let location_of_item { item_definition; _ } =
@@ -305,12 +269,11 @@ let handle_hover registry (params: HoverParams.t) =
     end
 
 let handle_completion registry (params:CompletionParams.t) =
-  let open Lsp_completion in
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:{ textdoc; _ } { ast; _ } ->
-      let items = completion_items textdoc params.position ast in
-      let completionlist = CompletionList.create ~isIncomplete:false ~items () in
-      Some (`CompletionList completionlist)
+      let items = Lsp_completion.completion_items textdoc params.position ast in
+      Some (`CompletionList (CompletionList.create ()
+                               ~isIncomplete:false ~items))
     end
 
 let handle_shutdown registry =
