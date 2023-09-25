@@ -36,8 +36,8 @@ let reply (_: ClientCapabilities.t) =
       ~legend
   and hover =
     HoverOptions.create ()
-  and completion_option =
-    CompletionOptions.create ()
+  (* and completion_option = *)
+  (*   CompletionOptions.create () *)
   in
   ServerCapabilities.create ()
     ~textDocumentSync:(`TextDocumentSyncOptions sync)
@@ -47,4 +47,4 @@ let reply (_: ClientCapabilities.t) =
     ~documentFormattingProvider: (`Bool true)
     ~semanticTokensProvider:(`SemanticTokensOptions semtoks)
     ~hoverProvider:(`HoverOptions hover)
-    ~completionProvider:(completion_option)
+    (* ~completionProvider:completion_option *)
