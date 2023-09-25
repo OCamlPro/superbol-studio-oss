@@ -54,7 +54,6 @@ skip = ["main.ml", "index.mld"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-ppx_deriving = ">=5.2.1"
 pretty = "version"
 [dependencies.menhir]
 libname = "menhirLib"
@@ -62,7 +61,7 @@ version = ">=1.2"
 
 # package tools dependencies
 [tools]
-# ...
+ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:

@@ -74,3 +74,7 @@ ppx_deriving_encoding = ""
 #  static-clibs = "unix" 
 [fields]
 dune-flags = ":standard (:include linking.sexp)"
+dune-stanzas = """
+ (enabled_if (= %{context_name} \"default\"))
+"""
+static-alpine-clibs = "bigstringaf_stubs cstruct_stubs"

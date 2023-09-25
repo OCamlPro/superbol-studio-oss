@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-6f7df8d2091bc13dc43421301fba391e:.
+817e4b96072d8107ce0332774e85e0a5:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -80,27 +80,28 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-8fb34e9de0ffbbef84e1cf59c7cc253a:dune-project
+0331551296e3a627ef039388cc6be5e9:dune-project
+474ade77f279147fb20510c3425249bf:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
 # file opam/cobol_ast.opam
-b6b1d67f29bbabc8a3825c45ead06ef4:opam/cobol_ast.opam
+cd81f73b2943f40e9995f9e6385ee2bf:opam/cobol_ast.opam
 # end context for opam/cobol_ast.opam
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
-4f07f5a80400f64ce93c09c440d87cce:opam/cobol_common.opam
+66a9fdbb37c258b3e83f645b9b29652a:opam/cobol_common.opam
 # end context for opam/cobol_common.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-01dcda62c118c85b3fbddcc53d8b917a:opam/cobol_config.opam
+94dcce2bc73eb9b6bd93dc56f3e765fe:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
 # file opam/cobol_data.opam
-9c93ec4a7891cfacb4d760758ce081d2:opam/cobol_data.opam
+84e4e132df53f8ee77d23d9e8d46e3dd:opam/cobol_data.opam
 # end context for opam/cobol_data.opam
 
 # begin context for opam/cobol_indent.opam
@@ -110,12 +111,12 @@ c6fec16adad1f18d8439ee2d18c04b01:opam/cobol_indent.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-215c4e9546d425b936c48558800b7a1b:opam/cobol_lsp.opam
+738b3855cf6d52fd27028289f752387e:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-84607566583632066b6be9dc55695442:opam/cobol_parser.opam
+ca4a2140278e7f62ed96b3d4b0fd2744:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
@@ -125,7 +126,7 @@ f37dfd0c7c01be00342e0b10ebeabb91:opam/cobol_preproc.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
-7c2fd4e5ba5059d4f91d11b7e769e058:opam/cobol_typeck.opam
+0095d89de6e8a3a0b154bed10f1071bc:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/ebcdic_lib.opam
@@ -190,7 +191,7 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 
 # begin context for opam/superbol_testutils.opam
 # file opam/superbol_testutils.opam
-5af41508ad1bb17705a86126acf8a7c0:opam/superbol_testutils.opam
+05a6cab04de68ff6aa6b4fb7e467c8ff:opam/superbol_testutils.opam
 # end context for opam/superbol_testutils.opam
 
 # begin context for opam/vscode-debugadapter.opam
@@ -210,7 +211,7 @@ fa0d293d04760149271fed31ae820474:opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-36b75bd115cd632b5e384d559ace9a88:opam/vscode-json.opam
+19a10d37d7e8e32e9346aba46935dfe9:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
@@ -285,7 +286,7 @@ f4bbb4a41a8b3b39f19a4fc62a5f4841:sphinx/license.rst
 
 # begin context for src/lsp/cobol_common/dune
 # file src/lsp/cobol_common/dune
-d8c6c287051b039df6db8f740973e784:src/lsp/cobol_common/dune
+9edd2c6c082e67ed0b683e87e60c485e:src/lsp/cobol_common/dune
 # end context for src/lsp/cobol_common/dune
 
 # begin context for src/lsp/cobol_common/version.mlt
@@ -305,7 +306,7 @@ d8c6c287051b039df6db8f740973e784:src/lsp/cobol_common/dune
 
 # begin context for src/lsp/cobol_data/dune
 # file src/lsp/cobol_data/dune
-7d01cb2c52deab141e4a1c0517a4bb3b:src/lsp/cobol_data/dune
+96aea17a4204c0956ed345a99db938f2:src/lsp/cobol_data/dune
 # end context for src/lsp/cobol_data/dune
 
 # begin context for src/lsp/cobol_data/version.mlt
@@ -325,7 +326,7 @@ d8c6c287051b039df6db8f740973e784:src/lsp/cobol_common/dune
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-f5b5ba58f2a9ef21787bfca4f4268580:src/lsp/cobol_lsp/dune
+957f078deb602f8e0114c8abcc771abf:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/version.mlt
@@ -335,7 +336,7 @@ f5b5ba58f2a9ef21787bfca4f4268580:src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_parser/dune
 # file src/lsp/cobol_parser/dune
-08706ca64cceec7220b7ffc2d654be97:src/lsp/cobol_parser/dune
+6dd0111741c7ae8474d5bdea70ac7af9:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
 
 # begin context for src/lsp/cobol_parser/version.mlt
@@ -415,7 +416,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/testing/superbol_testutils/dune
 # file src/testing/superbol_testutils/dune
-7750c38b7b159782010b6ff0beaacab2:src/testing/superbol_testutils/dune
+0da5d475bb1c2675efbab0a833620514:src/testing/superbol_testutils/dune
 # end context for src/testing/superbol_testutils/dune
 
 # begin context for src/testing/superbol_testutils/index.mld
@@ -500,7 +501,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/vscode/vscode-json/dune
 # file src/vscode/vscode-json/dune
-a18d965350ea19e9be91b3784887f1ef:src/vscode/vscode-json/dune
+452540098fd6ae61c5f364330d4ec493:src/vscode/vscode-json/dune
 # end context for src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-json/index.mld
@@ -525,12 +526,12 @@ a18d965350ea19e9be91b3784887f1ef:src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-package-json/dune
 # file src/vscode/vscode-package-json/dune
-1418db38f60b30eacfab7a22d0cc2ad7:src/vscode/vscode-package-json/dune
+3daa53b1ba5e5b962bd4a4a2d126f35d:src/vscode/vscode-package-json/dune
 # end context for src/vscode/vscode-package-json/dune
 
 # begin context for src/vscode/vscode-package-json/linking_flags.sh
 # file src/vscode/vscode-package-json/linking_flags.sh
-9fdfca3cc53df639758ff04fe09d3243:src/vscode/vscode-package-json/linking_flags.sh
+91c1ee3f5f358d3e2ffe2e7031ca4363:src/vscode/vscode-package-json/linking_flags.sh
 # end context for src/vscode/vscode-package-json/linking_flags.sh
 
 # begin context for src/vscode/vscode-package-json/version.mlt

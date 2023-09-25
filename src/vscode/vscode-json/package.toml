@@ -55,6 +55,7 @@ preprocess = "pps ppx_deriving_encoding"
 [dependencies]
 ez_file = "0.3.0"
 ezjsonm = ""
+ppx_deriving_encoding = "0.3.0"
 
 # package tools dependencies
 [tools]

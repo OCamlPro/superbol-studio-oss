@@ -63,11 +63,10 @@ jsonrpc = ">=1.15"
 lsp = ">=1.15 <1.16"
 pretty = "version"
 toml = "7.1.0"
-ppx_expect = { version = ">=v0.16", for-test = true }
 
 # package tools dependencies
 [tools]
-# ...
+ppx_expect = { version = ">=v0.16", for-test = true }
 
 # package fields (depends on package skeleton)
 #Examples:
