@@ -2,10 +2,10 @@ GNU/Emacs modes
 ===============
 
 We document two means that are available for editing COBOL files using
-GNU/Emacs.  One makes use of a modified version of :code:`cobol-mode`
-that can be found on ELPA.  The other is a new mode,
-:code:`superbol-mode`, that simply makes use of the LSP to provide a
-poweful COBOL IDE.
+GNU/Emacs.  One makes use of a modified version of
+:code:`cobol-mode.el` that can be found on ELPA.  The other is a new
+mode, :code:`superbol-mode`, that simply makes use of the LSP to
+provide a powerful COBOL IDE.
 
 Standard file :code:`cobol-mode.el`
 -----------------------------------
@@ -56,39 +56,40 @@ complete).
 Superbol-mode
 -------------
 
-The new Superbol mode is intended to provide an IDE that makes use of
-the Superbol LSP to provide advanced navigation and editing facilities
-for COBOL projects.  It can be used in combination with any of the two
-main LSP clients that exist within the GNU/Emacs ecosystem to interact
-with LSP servers: `lsp-mode` and `eglot`.
+The new Superbol mode provides an IDE that makes use of the Superbol
+LSP to provide advanced navigation and editing facilities for COBOL
+projects.  It can be used in combination with any of the two main LSP
+clients that exist within the GNU/Emacs ecosystem to interact with LSP
+servers: `lsp-mode` and `eglot`.
 
 Superbol-mode with `lsp-mode`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`lsp-mode`_ appears to be the most prominent at the moment.  The main
-advantages for using it in our context is its support for `semantic
-tokens`_, that provide a way for LSPs to issue information about the
-semantics of symbols from the source code.  Compared to traditional
-regexp-based hightligting, semantic tokens provided by LSPs can
-drastically improve code readability via more detailed hightligting of
-source code elements;
+`lsp-mode`_ appears to be the most prominent at the moment.  This
+client benefits from a large user-base, but is also considered
+"bloated" by some.
+
+The main advantages for using it in our context is its support for
+`semantic tokens`_, that provide a way for LSPs to issue information
+about the semantics of symbols from the source code.  Compared to
+traditional regexp-based highlighting, semantic tokens-based
+highlighting can drastically improve code readability of various
+source code elements based on their syntactic location;
 
 .. _lsp-mode: https://github.com/emacs-lsp/lsp-mode
 .. _semantic tokens:
     https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 
-`lsp-mode` benefits from a large user-base, but is also considered
-"bloated" by some.
 
 Superbol-mode with `eglot`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another possiblity is to use `eglot`_, that is sometimes considered
+Another possibility is to use `eglot`_, that is sometimes considered
 easier to configure and more lightweight than `lsp-mode` (which
 notably makes it more reactive to user inputs).  Being more recent, it
 lacks some of the features of `lsp-mode`, among which is the support
 for semantic tokens [#eglot-semtok-issue]_.  However, additionally
-enabling the aforementioned `cobol-mode` provides reasonable syntax
+enabling the aforementioned `cobol-mode.el` provides reasonable syntax
 highlighting.
 
 .. _eglot: https://elpa.gnu.org/packages/eglot.html
@@ -96,18 +97,18 @@ highlighting.
 Setup
 ~~~~~
 
-To ease the setup process, we first define an environment variable
-that indicates where the ``superbol-free`` executable can be found.
-We additionally define a variable that points to the root of the
-source directory for the extension:
+Let us first define an environment variable that indicates where the
+``superbol-free`` executable can be found.  Additionally, define a
+variable that points to the root of the source directory for the
+extension:
 
 .. code-block:: shell
 
    export SUPERBOL_DIR="<directory where superbol-free can be found>";
    export SUPERBOL_VSCODE_PLATFORM_DIR="$PWD";
 
-Then, the following command launches a GNU/Emacs instance with an
-`lsp-mode`-based client configured for COBOL files:
+After this, the following command launches a GNU/Emacs instance with
+an `lsp-mode`-based client configured for COBOL files:
 
 .. code-block:: shell
 
