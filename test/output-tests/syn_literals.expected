@@ -1,0 +1,20 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_literals.at:924:0
+Considering: import/gnucobol/tests/testsuite.src/syn_literals.at:1155:0
+syn_literals.at-1155-prog.cob:9.21-9.40:
+   6              DISPLAY N'0123456789ABCDEF'.
+   7              DISPLAY N"0123456789ABCDEF"-
+   8                      N"0123456789ABCDEF".
+   9 >            DISPLAY NC"0123456789ABCDEF"-
+----                        ^^^^^^^^^^^^^^^^^^^
+  10                      NC'0123456789ABCDEF'.
+>> Error: Missing continuation of `0123456789ABCDEF'
+
+syn_literals.at-1155-prog.cob:10.19-10.21:
+   7              DISPLAY N"0123456789ABCDEF"-
+   8                      N"0123456789ABCDEF".
+   9              DISPLAY NC"0123456789ABCDEF"-
+  10 >                    NC'0123456789ABCDEF'.
+----                      ^^
+>> Error: Unexpected text word
+
+Considering: import/gnucobol/tests/testsuite.src/syn_literals.at:1553:0

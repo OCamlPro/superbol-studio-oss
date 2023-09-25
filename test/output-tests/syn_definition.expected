@@ -1,0 +1,1201 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:60:0
+syn_definition.at-60-SHORT2.cob:3.18:
+   1   
+   2          IDENTIFICATION   DIVISION.
+   3 >        PROGRAM-ID.      "_short".
+----                     ^
+   4          PROCEDURE        DIVISION.
+   5              STOP RUN.
+>> Hint: Missing <word>
+
+syn_definition.at-60-SHORT2.cob:3.24-3.32:
+   1   
+   2          IDENTIFICATION   DIVISION.
+   3 >        PROGRAM-ID.      "_short".
+----                           ^^^^^^^^
+   4          PROCEDURE        DIVISION.
+   5              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:145:0
+syn_definition.at-145-containing-prog.cob:8.42-8.48:
+   5          PROCEDURE        DIVISION.
+   6   
+   7          IDENTIFICATION   DIVISION.
+   8 >        PROGRAM-ID.      prog-1 IS INITIAL COMMON.
+----                                             ^^^^^^
+   9          PROCEDURE        DIVISION.
+  10              STOP RUN.
+>> Error: Invalid syntax
+
+syn_definition.at-145-containing-prog.cob:14.44-14.50:
+  11          END PROGRAM      prog-1.
+  12   
+  13          IDENTIFICATION   DIVISION.
+  14 >        PROGRAM-ID.      prog-2 IS RECURSIVE COMMON.
+----                                               ^^^^^^
+  15          PROCEDURE        DIVISION.
+  16              STOP RUN.
+>> Error: Invalid syntax
+
+syn_definition.at-145-containing-prog.cob:17.31:
+  14          PROGRAM-ID.      prog-2 IS RECURSIVE COMMON.
+  15          PROCEDURE        DIVISION.
+  16              STOP RUN.
+  17 >        END PROGRAM      prog-2.
+----                                  ^
+>> Hint: Missing END PROGRAM <word> .
+
+syn_definition.at-145-containing-prog.cob:18.0:
+  15          PROCEDURE        DIVISION.
+  16              STOP RUN.
+  17          END PROGRAM      prog-2.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:366:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:397:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:425:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:454:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:487:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:507:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:527:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:548:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:703:0
+syn_definition.at-703-prog.cob:4.42:
+   1   
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4 >        PROCEDURE        DIVISION RETURNING OMITTED.
+----                                             ^
+   5              MOVE 42 TO RETURN-CODE
+   6              GOBACK.
+>> Hint: Missing <identifier>
+
+syn_definition.at-703-prog.cob:4.43-4.50:
+   1   
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4 >        PROCEDURE        DIVISION RETURNING OMITTED.
+----                                              ^^^^^^^
+   5              MOVE 42 TO RETURN-CODE
+   6              GOBACK.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:806:0
+syn_definition.at-806-prog.cob:8.11-8.15:
+   5          LINKAGE          SECTION.
+   6          01 PAR-OUT       PIC 9.
+   7          PROCEDURE        DIVISION RETURNING PAR-OUT.
+   8 >            MOVE 4 TO PAR-OUT
+----              ^^^^
+   9              GOBACK.
+  10          END FUNCTION     func.
+>> Error: Invalid syntax
+
+syn_definition.at-806-prog.cob:8.17:
+   5          LINKAGE          SECTION.
+   6          01 PAR-OUT       PIC 9.
+   7          PROCEDURE        DIVISION RETURNING PAR-OUT.
+   8 >            MOVE 4 TO PAR-OUT
+----                    ^
+   9              GOBACK.
+  10          END FUNCTION     func.
+>> Hint: Missing .
+
+syn_definition.at-806-prog.cob:8.18-8.20:
+   5          LINKAGE          SECTION.
+   6          01 PAR-OUT       PIC 9.
+   7          PROCEDURE        DIVISION RETURNING PAR-OUT.
+   8 >            MOVE 4 TO PAR-OUT
+----                     ^^
+   9              GOBACK.
+  10          END FUNCTION     func.
+>> Warning: Invalid syntax
+
+syn_definition.at-806-prog.cob:8.28:
+   5          LINKAGE          SECTION.
+   6          01 PAR-OUT       PIC 9.
+   7          PROCEDURE        DIVISION RETURNING PAR-OUT.
+   8 >            MOVE 4 TO PAR-OUT
+----                               ^
+   9              GOBACK.
+  10          END FUNCTION     func.
+>> Hint: Missing .
+
+syn_definition.at-806-prog.cob:9.11-9.17:
+   6          01 PAR-OUT       PIC 9.
+   7          PROCEDURE        DIVISION RETURNING PAR-OUT.
+   8              MOVE 4 TO PAR-OUT
+   9 >            GOBACK.
+----              ^^^^^^
+  10          END FUNCTION     func.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:847:0
+syn_definition.at-847-prog.cob:7.46:
+   4          DATA            DIVISION.
+   5          LINKAGE         SECTION.
+   6          01  ret         PIC 99.
+   7 >        PROCEDURE       DIVISION RETURNING ret.
+----                                                 ^
+   8              CONTINUE
+   9              .
+>> Hint: Missing END FUNCTION <word>
+
+syn_definition.at-847-prog.cob:8.11-8.19:
+   5          LINKAGE         SECTION.
+   6          01  ret         PIC 99.
+   7          PROCEDURE       DIVISION RETURNING ret.
+   8 >            CONTINUE
+----              ^^^^^^^^
+   9              .
+  10          END FUNCTION x.
+>> Error: Invalid syntax
+
+syn_definition.at-847-prog.cob:10.7-10.10:
+   7          PROCEDURE       DIVISION RETURNING ret.
+   8              CONTINUE
+   9              .
+  10 >        END FUNCTION x.
+----          ^^^
+  11   
+  12   
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:950:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:975:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1101:0
+syn_definition.at-1101-prog.cob:15.19:
+  12              move 0 to word
+  13              perform word
+  14         *
+  15 >            stop run returning word.
+----                      ^
+  16         *-----------------------------------------------------------------
+  17          word section.
+>> Hint: Missing .
+
+syn_definition.at-1101-prog.cob:15.20-15.29:
+  12              move 0 to word
+  13              perform word
+  14         *
+  15 >            stop run returning word.
+----                       ^^^^^^^^^
+  16         *-----------------------------------------------------------------
+  17          word section.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1118:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1180:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1205:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1227:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1264:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
+syn_definition.at-1323-prog1.cob:5.24-5.33:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog1.
+   4          PROCEDURE        DIVISION.
+   5 >            EXIT PROGRAM RETURNING -1.
+----                           ^^^^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
+syn_definition.at-1323-prog2.cob:5.17:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog2.
+   4          PROCEDURE        DIVISION.
+   5 >            GOBACK GIVING 2.
+----                    ^
+>> Hint: Missing .
+
+syn_definition.at-1323-prog2.cob:5.18-5.24:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog2.
+   4          PROCEDURE        DIVISION.
+   5 >            GOBACK GIVING 2.
+----                     ^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
+syn_definition.at-1323-prog3.cob:5.19:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog3.
+   4          PROCEDURE        DIVISION.
+   5 >            STOP RUN GIVING 0.
+----                      ^
+>> Hint: Missing .
+
+syn_definition.at-1323-prog3.cob:5.20-5.26:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog3.
+   4          PROCEDURE        DIVISION.
+   5 >            STOP RUN GIVING 0.
+----                       ^^^^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1462:0
+syn_definition.at-1462-prog.cob:13.24:
+  10          IDENTIFICATION DIVISION.
+  11          PROGRAM-ID. prog-3.
+  12   
+  13 >        END PROGRAM prog.
+----                           ^
+>> Hint: Missing END PROGRAM <word> . END PROGRAM <word> .
+
+syn_definition.at-1462-prog.cob:14.0:
+  11          PROGRAM-ID. prog-3.
+  12   
+  13          END PROGRAM prog.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1497:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1845:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2043:0
+syn_definition.at-2043-prog3.cob:12.38:
+   9                                                         ALPHABET-2.
+  10          SPECIAL-NAMES.
+  11              ALPHABET ALPHABET-1 IS
+  12 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                         ^
+  13              ALPHABET ALPHABET-2
+  14                       n'A' also n'B' ALSO n'f',
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:12.38-12.42:
+   9                                                         ALPHABET-2.
+  10          SPECIAL-NAMES.
+  11              ALPHABET ALPHABET-1 IS
+  12 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                         ^^^^
+  13              ALPHABET ALPHABET-2
+  14                       n'A' also n'B' ALSO n'f',
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:12.49:
+   9                                                         ALPHABET-2.
+  10          SPECIAL-NAMES.
+  11              ALPHABET ALPHABET-1 IS
+  12 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                                    ^
+  13              ALPHABET ALPHABET-2
+  14                       n'A' also n'B' ALSO n'f',
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:12.49-12.53:
+   9                                                         ALPHABET-2.
+  10          SPECIAL-NAMES.
+  11              ALPHABET ALPHABET-1 IS
+  12 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                                    ^^^^
+  13              ALPHABET ALPHABET-2
+  14                       n'A' also n'B' ALSO n'f',
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:13.11-13.19:
+  10          SPECIAL-NAMES.
+  11              ALPHABET ALPHABET-1 IS
+  12                       'A' THROUGH 'Z', x'00' thru x'05'.
+  13 >            ALPHABET ALPHABET-2
+----              ^^^^^^^^
+  14                       n'A' also n'B' ALSO n'f',
+  15                       n'g' also n'G', n'1' thru n'9'.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:28.38:
+  25                                                         ALPHABET-2.
+  26          SPECIAL-NAMES.
+  27              ALPHABET ALPHABET-1 IS
+  28 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                         ^
+  29              ALPHABET ALPHABET-2 IS
+  30                       n'A' ALSO n'f',
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:28.38-28.42:
+  25                                                         ALPHABET-2.
+  26          SPECIAL-NAMES.
+  27              ALPHABET ALPHABET-1 IS
+  28 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                         ^^^^
+  29              ALPHABET ALPHABET-2 IS
+  30                       n'A' ALSO n'f',
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:28.49:
+  25                                                         ALPHABET-2.
+  26          SPECIAL-NAMES.
+  27              ALPHABET ALPHABET-1 IS
+  28 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                                    ^
+  29              ALPHABET ALPHABET-2 IS
+  30                       n'A' ALSO n'f',
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:28.49-28.53:
+  25                                                         ALPHABET-2.
+  26          SPECIAL-NAMES.
+  27              ALPHABET ALPHABET-1 IS
+  28 >                     'A' THROUGH 'Z', x'00' thru x'05'.
+----                                                    ^^^^
+  29              ALPHABET ALPHABET-2 IS
+  30                       n'A' ALSO n'f',
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:29.11-29.19:
+  26          SPECIAL-NAMES.
+  27              ALPHABET ALPHABET-1 IS
+  28                       'A' THROUGH 'Z', x'00' thru x'05'.
+  29 >            ALPHABET ALPHABET-2 IS
+----              ^^^^^^^^
+  30                       n'A' ALSO n'f',
+  31                       n'g' also n'G'.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:41.30:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                 ^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Hint: Missing IS
+
+syn_definition.at-2043-prog3.cob:41.34-41.35:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                     ^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:41.35:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                      ^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:41.35-41.39:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                      ^^^^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:41.46:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                                 ^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:41.46-41.50:
+  38          SOURCE-COMPUTER. GNU-LINUX.
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41 >            ALPHABET ALPHABET-1    x'00' thru x'05'.
+----                                                 ^^^^
+  42              ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+  43          END PROGRAM prog3c.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:42.11-42.19:
+  39          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  40          SPECIAL-NAMES.
+  41              ALPHABET ALPHABET-1    x'00' thru x'05'.
+  42 >            ALPHABET ALPHABET-2 IS n'g' also n'G', n'1' thru n'9'.
+----              ^^^^^^^^
+  43          END PROGRAM prog3c.
+  44   
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:53.11-53.19:
+  50          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1, ALPHABET-2.
+  51          SPECIAL-NAMES.
+  52              ALPHABET ALPHABET-1 IS 'A' THROUGH 'Z'.
+  53 >            ALPHABET ALPHABET-2   n'A' also n'B', n'1' thru n'9'.
+----              ^^^^^^^^
+  54          END PROGRAM prog3d.
+  55   
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:63.40:
+  60          SOURCE-COMPUTER. GNU-LINUX.
+  61          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1.
+  62          SPECIAL-NAMES.
+  63 >            ALPHABET ALPHABET-1 IS 'Z', x'00'.
+----                                           ^
+  64          END PROGRAM prog3e.
+  65   
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:63.40-63.44:
+  60          SOURCE-COMPUTER. GNU-LINUX.
+  61          OBJECT-COMPUTER. GC-MACHINE, SEQUENCE ALPHABET-1.
+  62          SPECIAL-NAMES.
+  63 >            ALPHABET ALPHABET-1 IS 'Z', x'00'.
+----                                           ^^^^
+  64          END PROGRAM prog3e.
+  65   
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:76.38:
+  73                             FOR ALPHANUMERIC IS ALPHABET-1.
+  74          SPECIAL-NAMES.
+  75              ALPHABET ALPHABET-1 IS
+  76 >                     'A' THROUGH 'Z', x'00', x'05'.
+----                                         ^
+  77          END PROGRAM prog3f.
+  78   
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:76.38-76.42:
+  73                             FOR ALPHANUMERIC IS ALPHABET-1.
+  74          SPECIAL-NAMES.
+  75              ALPHABET ALPHABET-1 IS
+  76 >                     'A' THROUGH 'Z', x'00', x'05'.
+----                                         ^^^^
+  77          END PROGRAM prog3f.
+  78   
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:76.45:
+  73                             FOR ALPHANUMERIC IS ALPHABET-1.
+  74          SPECIAL-NAMES.
+  75              ALPHABET ALPHABET-1 IS
+  76 >                     'A' THROUGH 'Z', x'00', x'05'.
+----                                                ^
+  77          END PROGRAM prog3f.
+  78   
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:76.45-76.49:
+  73                             FOR ALPHANUMERIC IS ALPHABET-1.
+  74          SPECIAL-NAMES.
+  75              ALPHABET ALPHABET-1 IS
+  76 >                     'A' THROUGH 'Z', x'00', x'05'.
+----                                                ^^^^
+  77          END PROGRAM prog3f.
+  78   
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:85.33-85.45:
+  82          CONFIGURATION SECTION.
+  83          SOURCE-COMPUTER. GNU-LINUX.
+  84          OBJECT-COMPUTER. GC-MACHINE,
+  85 >                         SEQUENCE ALPHANUMERIC ALPHABET-1.
+----                                    ^^^^^^^^^^^^
+  86          SPECIAL-NAMES.
+  87              ALPHABET ALPHABET-1 IS
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:99.30-99.38:
+  96          OBJECT-COMPUTER. GC-MACHINE,
+  97                           COLLATING SEQUENCE
+  98                             FOR ALPHANUMERIC IS ALPHABET-1
+  99 >                               NATIONAL     IS ALPHABET-2.
+----                                 ^^^^^^^^
+ 100          SPECIAL-NAMES.
+ 101              ALPHABET ALPHABET-1 IS
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:102.31:
+  99                                 NATIONAL     IS ALPHABET-2.
+ 100          SPECIAL-NAMES.
+ 101              ALPHABET ALPHABET-1 IS
+ 102 >                     'A', 'C', x'05'.
+----                                  ^
+ 103              ALPHABET ALPHABET-2
+ 104                       n'A', n'1' thru n'9'.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:102.31-102.35:
+  99                                 NATIONAL     IS ALPHABET-2.
+ 100          SPECIAL-NAMES.
+ 101              ALPHABET ALPHABET-1 IS
+ 102 >                     'A', 'C', x'05'.
+----                                  ^^^^
+ 103              ALPHABET ALPHABET-2
+ 104                       n'A', n'1' thru n'9'.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:103.11-103.19:
+ 100          SPECIAL-NAMES.
+ 101              ALPHABET ALPHABET-1 IS
+ 102                       'A', 'C', x'05'.
+ 103 >            ALPHABET ALPHABET-2
+----              ^^^^^^^^
+ 104                       n'A', n'1' thru n'9'.
+ 105          END PROGRAM prog3h.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:114.26-114.34:
+ 111          SOURCE-COMPUTER. GNU-LINUX.
+ 112          OBJECT-COMPUTER. GC-MACHINE,
+ 113                           COLLATING SEQUENCE
+ 114 >                           NATIONAL     ALPHABET-2
+----                             ^^^^^^^^
+ 115                             ALPHANUMERIC ALPHABET-1.
+ 116          SPECIAL-NAMES.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:115.26-115.38:
+ 112          OBJECT-COMPUTER. GC-MACHINE,
+ 113                           COLLATING SEQUENCE
+ 114                             NATIONAL     ALPHABET-2
+ 115 >                           ALPHANUMERIC ALPHABET-1.
+----                             ^^^^^^^^^^^^
+ 116          SPECIAL-NAMES.
+ 117              ALPHABET ALPHABET-1 IS
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:119.11-119.19:
+ 116          SPECIAL-NAMES.
+ 117              ALPHABET ALPHABET-1 IS
+ 118                       'a' THROUGH 'z'.
+ 119 >            ALPHABET ALPHABET-2
+----              ^^^^^^^^
+ 120                       n'B', n'C'; n'g' also n'G'.
+ 121          END PROGRAM prog3i.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:130.26-130.34:
+ 127          SOURCE-COMPUTER. GNU-LINUX.
+ 128          OBJECT-COMPUTER. GC-MACHINE,
+ 129                           COLLATING SEQUENCE
+ 130 >                           NATIONAL     ALPHABET-2.
+----                             ^^^^^^^^
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:132.30:
+ 129                           COLLATING SEQUENCE
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132 >            ALPHABET ALPHABET-2
+----                                 ^
+ 133                       n'B', n'C'; n'g' also n'G'.
+ 134          END PROGRAM prog3j.
+>> Hint: Missing IS
+
+syn_definition.at-2043-prog3.cob:133.20-133.21:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                       ^
+ 134          END PROGRAM prog3j.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:133.21:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                        ^
+ 134          END PROGRAM prog3j.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:133.21-133.24:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                        ^^^
+ 134          END PROGRAM prog3j.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:133.27:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                              ^
+ 134          END PROGRAM prog3j.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:133.27-133.30:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                              ^^^
+ 134          END PROGRAM prog3j.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:133.33:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                                    ^
+ 134          END PROGRAM prog3j.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:133.33-133.36:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                                    ^^^
+ 134          END PROGRAM prog3j.
+>> Error: Invalid syntax
+
+syn_definition.at-2043-prog3.cob:133.43:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                                              ^
+ 134          END PROGRAM prog3j.
+>> Hint: Missing IS <word>
+
+syn_definition.at-2043-prog3.cob:133.43-133.46:
+ 130                             NATIONAL     ALPHABET-2.
+ 131          SPECIAL-NAMES.
+ 132              ALPHABET ALPHABET-2
+ 133 >                     n'B', n'C'; n'g' also n'G'.
+----                                              ^^^
+ 134          END PROGRAM prog3j.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2150:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2201:0
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2357:0
+syn_definition.at-2357-prog.cob:10.28:
+   7          01 SOME-VERY-LONG-TYPEDEF-NAME  PIC 9999  IS TYPEDEF.
+   8          01 AUSGABE-FILE-NAME-2T         IS TYPEDEF.
+   9             05 FILLER    PIC 9999.
+  10 >           05 DETAIL-NO USAGE SOME-VERY-LONG-TYPEDEF-NAME.
+----                               ^
+  11         *
+  12          01  MESSAGE-TEXT-2T IS TYPEDEF.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:10.29-10.56:
+   7          01 SOME-VERY-LONG-TYPEDEF-NAME  PIC 9999  IS TYPEDEF.
+   8          01 AUSGABE-FILE-NAME-2T         IS TYPEDEF.
+   9             05 FILLER    PIC 9999.
+  10 >           05 DETAIL-NO USAGE SOME-VERY-LONG-TYPEDEF-NAME.
+----                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11         *
+  12          01  MESSAGE-TEXT-2T IS TYPEDEF.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:13.39:
+  10             05 DETAIL-NO USAGE SOME-VERY-LONG-TYPEDEF-NAME.
+  11         *
+  12          01  MESSAGE-TEXT-2T IS TYPEDEF.
+  13 >          02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
+----                                          ^
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:13.40-13.59:
+  10             05 DETAIL-NO USAGE SOME-VERY-LONG-TYPEDEF-NAME.
+  11         *
+  12          01  MESSAGE-TEXT-2T IS TYPEDEF.
+  13 >          02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
+----                                           ^^^^^^^^^^^^^^^^^^^
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:16.39:
+  13            02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+  16 >          02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+----                                          ^
+  17            02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+  18         *
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:16.40-16.60:
+  13            02 AUSGABE-FILE-NAME     USAGE AUSGABE-FILE-NAME-T.
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+  16 >          02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+----                                           ^^^^^^^^^^^^^^^^^^^^
+  17            02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+  18         *
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:17.39:
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+  16            02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+  17 >          02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+----                                          ^
+  18         *
+  19          01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:17.40-17.59:
+  14            02 FILLER REDEFINES AUSGABE-FILE-NAME.
+  15                05 FILLER PIC 9999.
+  16            02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+  17 >          02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+----                                           ^^^^^^^^^^^^^^^^^^^
+  18         *
+  19          01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:19.40:
+  16            02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+  17            02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+  18         *
+  19 >        01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+----                                           ^
+  20         
+  21          77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:19.41-19.56:
+  16            02 AUSGABE-FILE-NAME-2   USAGE AUSGABE-FILE-NAME-2T.
+  17            02 FILLER                USAGE AUSGABE-FILE-NAME-T.
+  18         *
+  19 >        01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+----                                            ^^^^^^^^^^^^^^^
+  20         
+  21          77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:21.27:
+  18         *
+  19          01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+  20         
+  21 >        77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+----                              ^
+  22   
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:21.28-21.55:
+  18         *
+  19          01  MESSAGE-TEXT-2 EXTERNAL USAGE MESSAGE-TEXT-2T.
+  20         
+  21 >        77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+----                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  22   
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:23.28:
+  20         
+  21          77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+  22   
+  23 >        01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+----                               ^
+  24          01 Z-MESSAGE-T3.
+  25             49 MT3                    USAGE MESSAGE-TEXT-2T.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:23.29-23.49:
+  20         
+  21          77 OUTPUT-NAME USAGE SOME-VERY-LONG-TYPEDEF-NAME GLOBAL.
+  22   
+  23 >        01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+----                                ^^^^^^^^^^^^^^^^^^^^
+  24          01 Z-MESSAGE-T3.
+  25             49 MT3                    USAGE MESSAGE-TEXT-2T.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:25.41:
+  22   
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+  24          01 Z-MESSAGE-T3.
+  25 >           49 MT3                    USAGE MESSAGE-TEXT-2T.
+----                                            ^
+  26             49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
+  27   
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:25.42-25.57:
+  22   
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+  24          01 Z-MESSAGE-T3.
+  25 >           49 MT3                    USAGE MESSAGE-TEXT-2T.
+----                                             ^^^^^^^^^^^^^^^
+  26             49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
+  27   
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:26.41:
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+  24          01 Z-MESSAGE-T3.
+  25             49 MT3                    USAGE MESSAGE-TEXT-2T.
+  26 >           49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
+----                                            ^
+  27   
+  28          01 CALCULUS             PIC S9(15)V9(03) IS TYPEDEF.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:26.42-26.57:
+  23          01 Z-MESSAGE-T2 USAGE AUSGABE-FILE-NAME-2T.
+  24          01 Z-MESSAGE-T3.
+  25             49 MT3                    USAGE MESSAGE-TEXT-2T.
+  26 >           49 MT3-REN  REDEFINES MT3 USAGE MESSAGE-TEXT-2T.
+----                                             ^^^^^^^^^^^^^^^
+  27   
+  28          01 CALCULUS             PIC S9(15)V9(03) IS TYPEDEF.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:32.36:
+  29             88 NO-DETAIL         VALUE ZERO.
+  30             88 MIN-DETAIL        VALUE 0.001.
+  31          01 USER-TYPE            IS TYPEDEF.
+  32 >           02 AMOUNT            USAGE CALCULUS.
+----                                       ^
+  33             02 FILLER            OCCURS 100.
+  34                05 GRP-AMOUNT     USAGE CALCULUS.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:32.37-32.45:
+  29             88 NO-DETAIL         VALUE ZERO.
+  30             88 MIN-DETAIL        VALUE 0.001.
+  31          01 USER-TYPE            IS TYPEDEF.
+  32 >           02 AMOUNT            USAGE CALCULUS.
+----                                        ^^^^^^^^
+  33             02 FILLER            OCCURS 100.
+  34                05 GRP-AMOUNT     USAGE CALCULUS.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:34.36:
+  31          01 USER-TYPE            IS TYPEDEF.
+  32             02 AMOUNT            USAGE CALCULUS.
+  33             02 FILLER            OCCURS 100.
+  34 >              05 GRP-AMOUNT     USAGE CALCULUS.
+----                                       ^
+  35          01 USER-VAR             USAGE USER-TYPE.
+  36   
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:34.37-34.45:
+  31          01 USER-TYPE            IS TYPEDEF.
+  32             02 AMOUNT            USAGE CALCULUS.
+  33             02 FILLER            OCCURS 100.
+  34 >              05 GRP-AMOUNT     USAGE CALCULUS.
+----                                        ^^^^^^^^
+  35          01 USER-VAR             USAGE USER-TYPE.
+  36   
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:35.36:
+  32             02 AMOUNT            USAGE CALCULUS.
+  33             02 FILLER            OCCURS 100.
+  34                05 GRP-AMOUNT     USAGE CALCULUS.
+  35 >        01 USER-VAR             USAGE USER-TYPE.
+----                                       ^
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:35.37-35.46:
+  32             02 AMOUNT            USAGE CALCULUS.
+  33             02 FILLER            OCCURS 100.
+  34                05 GRP-AMOUNT     USAGE CALCULUS.
+  35 >        01 USER-VAR             USAGE USER-TYPE.
+----                                        ^^^^^^^^^
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:38.37-38.41:
+  35          01 USER-VAR             USAGE USER-TYPE.
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+  38 >           88 PROC-UNSET        VALUE NULL.
+----                                        ^^^^
+  39          77 MY-PROC              USAGE PROC VALUE NULL.
+  40   
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:39.36:
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+  38             88 PROC-UNSET        VALUE NULL.
+  39 >        77 MY-PROC              USAGE PROC VALUE NULL.
+----                                       ^
+  40   
+  41          PROCEDURE DIVISION.
+>> Hint: Missing BINARY
+
+syn_definition.at-2357-prog.cob:39.37-39.41:
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+  38             88 PROC-UNSET        VALUE NULL.
+  39 >        77 MY-PROC              USAGE PROC VALUE NULL.
+----                                        ^^^^
+  40   
+  41          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+syn_definition.at-2357-prog.cob:39.47:
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+  38             88 PROC-UNSET        VALUE NULL.
+  39 >        77 MY-PROC              USAGE PROC VALUE NULL.
+----                                                  ^
+  40   
+  41          PROCEDURE DIVISION.
+>> Hint: Missing <literal>
+
+syn_definition.at-2357-prog.cob:39.48-39.52:
+  36   
+  37          01 PROC                 USAGE PROGRAM-POINTER IS TYPEDEF.
+  38             88 PROC-UNSET        VALUE NULL.
+  39 >        77 MY-PROC              USAGE PROC VALUE NULL.
+----                                                   ^^^^
+  40   
+  41          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2374:0
+syn_definition.at-2374-progstd.cob:41.43-41.44:
+  38             02 SOME2-VALUES      OCCURS 1 TO 6 DEPENDING ON SOME2-DATA
+  39                                  DESCENDING KEY SB SA
+  40                                  INDEXED BY SOME2-INDEX.
+  41 >              05 SA             PIC X VALUE x'12'.
+----                                              ^
+  42                05 SB             PIC 9 VALUE 0.
+  43                05 SDATA          PIC X(12).
+>> Error: Invalid syntax
+
+syn_definition.at-2374-progstd.cob:65.61-65.65:
+  62              INITIALIZE OTHER-VALUES (2, 3, 2)
+  63              SEARCH ALL SOME2-VALUES OF MY-NAME2
+  64         *>     WHEN SA(SOME2-INDEX) = x'12'  CHECKME: Should work
+  65 >              WHEN SA OF MY-NAME2(SOME2-INDEX OF MY-NAME2) = x'12'
+----                                                                ^^^^
+  66                   CONTINUE.
+  67              GOBACK.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:2617:0
+syn_definition.at-2617-prog.cob:13.19-13.23:
+  10            02 AUSGABE-FILE-NAME-2.
+  11                05 FILLER PIC 9999.
+  12                05 DETAIL-NO PIC 9999.
+  13 >          02 FILLER LIKE AUSGABE-FILE-NAME.
+----                      ^^^^
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:15.20:
+  12                05 DETAIL-NO PIC 9999.
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15 >        77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+----                       ^
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:15.25-15.29:
+  12                05 DETAIL-NO PIC 9999.
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15 >        77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+----                            ^^^^
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:15.40-15.46:
+  12                05 DETAIL-NO PIC 9999.
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15 >        77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+----                                           ^^^^^^
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:16.23:
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16 >        77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+----                          ^
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:16.25-16.29:
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16 >        77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+----                            ^^^^
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:16.40-16.44:
+  13            02 FILLER LIKE AUSGABE-FILE-NAME.
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16 >        77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+----                                           ^^^^
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:17.24:
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+----                           ^
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:17.25-17.29:
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+----                            ^^^^
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:17.39:
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+----                                          ^
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+>> Hint: Missing .
+
+syn_definition.at-2617-prog.cob:17.40-17.43:
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+----                                           ^^^
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+>> Warning: Invalid syntax
+
+syn_definition.at-2617-prog.cob:17.42-17.43:
+  14         
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+----                                             ^
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:18.23:
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18 >        77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+----                          ^
+  19   
+  20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:18.25-18.29:
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18 >        77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+----                            ^^^^
+  19   
+  20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:18.40-18.44:
+  15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
+  16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18 >        77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+----                                           ^^^^
+  19   
+  20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:20.22:
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+  20 >        01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+----                         ^
+  21          01 Z-MESSAGE-T3.
+  22             49 MT3      LIKE MESSAGE-TEXT-2.
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:20.23-20.27:
+  17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
+  18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
+  19   
+  20 >        01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+----                          ^^^^
+  21          01 Z-MESSAGE-T3.
+  22             49 MT3      LIKE MESSAGE-TEXT-2.
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:22.16:
+  19   
+  20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+  21          01 Z-MESSAGE-T3.
+  22 >           49 MT3      LIKE MESSAGE-TEXT-2.
+----                   ^
+  23   
+  24          PROCEDURE DIVISION.
+>> Hint: Missing RENAMES
+
+syn_definition.at-2617-prog.cob:22.22-22.26:
+  19   
+  20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
+  21          01 Z-MESSAGE-T3.
+  22 >           49 MT3      LIKE MESSAGE-TEXT-2.
+----                         ^^^^
+  23   
+  24          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:26.36-26.42:
+  23   
+  24          PROCEDURE DIVISION.
+  25              DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
+  26 >            DISPLAY Z-MESSAGE-T2 (55:LENGTH OF DETAIL-NO)
+----                                       ^^^^^^
+  27              DISPLAY MT3 (1:LENGTH OF AUSGABE-FILE-NAME)
+  28              ADD OUTPUT-VAL TO DETAIL-NO
+>> Error: Invalid syntax
+
+syn_definition.at-2617-prog.cob:27.26-27.32:
+  24          PROCEDURE DIVISION.
+  25              DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
+  26              DISPLAY Z-MESSAGE-T2 (55:LENGTH OF DETAIL-NO)
+  27 >            DISPLAY MT3 (1:LENGTH OF AUSGABE-FILE-NAME)
+----                             ^^^^^^
+  28              ADD OUTPUT-VAL TO DETAIL-NO
+  29              GOBACK.
+>> Error: Invalid syntax
+

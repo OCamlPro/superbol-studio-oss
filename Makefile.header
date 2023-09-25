@@ -3,12 +3,17 @@ PROJECT=superbol_vscode_platform
 SRCDIR=src/vscode/superbol-vscode-platform
 CP ?= cp -f
 
+# Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
+# (could be a submodule)
+LSP_MODE_SRCDIR ?= ../lsp-mode
+
 all: superbol-free
 superbol-free: build
 	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
 
+.PHONY: compile
 compile: build
-	$(CP) _build/default/src/vscode/vscode-package-json/main.exe vscode-package-json
+	cp -f _build/default/src/vscode/vscode-package-json/main.exe vscode-package-json
 	yarn esbuild _build/default/$(SRCDIR)/$(PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
@@ -42,3 +47,15 @@ clean-execs:
 opam-cross:
 	drom dep --cross osx
 	drom dep --cross windows
+
+# emacs-lsp:
+emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json
+	emacs --batch > "$@" \
+	      --load "$(LSP_MODE_SRCDIR)/scripts/lsp-generate-settings.el" \
+	      --eval "(dolist (l (lsp-generate-settings \"package.json\")) (print l))" \
+	  && echo "Generated $@" 1>&2 \
+	  || rm -f "$@"
+
+# 8.0.1
+# --eval "(princ (lsp-generate-settings \"package.json\" 'lsp-superbol))" \
+# --eval '(princ "\n")' \

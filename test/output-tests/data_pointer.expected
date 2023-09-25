@@ -1,0 +1,21 @@
+Considering: import/gnucobol/tests/testsuite.src/data_pointer.at:41:0
+data_pointer.at-41-prog.cob:6.43:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01 PTR           USAGE POINTER VALUE NULL.
+----                                              ^
+   7          PROCEDURE        DIVISION.
+   8              DISPLAY PTR
+>> Hint: Missing <literal>
+
+data_pointer.at-41-prog.cob:6.44-6.48:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        01 PTR           USAGE POINTER VALUE NULL.
+----                                               ^^^^
+   7          PROCEDURE        DIVISION.
+   8              DISPLAY PTR
+>> Error: Invalid syntax
+

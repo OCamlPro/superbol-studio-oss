@@ -59,6 +59,8 @@ cobol_preproc = "version"
 ebcdic_lib = "version"
 ez_file = ">=0.3"
 ppx_deriving = ">=5.2.1"
+autofonce_lib = ">=0.8"
+
 [dependencies.menhir]
 libname = "menhirLib"
 version = ">=1.2"

@@ -3,7 +3,7 @@
 The sources in this project are distributed:
 
 * Under the terms of the GNU Affero GPL License v3 for files in the
-  src/ directory. The corresponding binary is `superbol-free` that
+  src/lsp directory. The corresponding binary is `superbol-free` that
   runs the LSP server;
 
 * Under the terms of the MIT License for all other files, in

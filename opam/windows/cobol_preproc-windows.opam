@@ -44,9 +44,11 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-windows" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "ppx_deriving" {>= "5.2.1"}
   "ppx_deriving-windows" {>= "5.2.1"}
+  "menhir" {>= "1.2"}
   "menhir-windows" {>= "1.2"}
   "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}

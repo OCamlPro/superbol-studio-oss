@@ -1,0 +1,61 @@
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:43:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:62:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:93:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:113:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:139:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:167:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:202:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:236:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:292:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:342:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:374:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:422:0
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:493:0
+run_subscripts.at-493-prog.cob:2.7-2.16:
+   1   
+   2 >       $SET BOUND
+----          ^^^^^^^^^
+   3          IDENTIFICATION DIVISION.
+   4          PROGRAM-ID. prog.
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:494:0
+run_subscripts.at-494-progn.cob:2.7-2.18:
+   1   
+   2 >       $SET NOBOUND
+----          ^^^^^^^^^^^
+   3          IDENTIFICATION DIVISION.
+   4          PROGRAM-ID. progn.
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:495:0
+run_subscripts.at-495-progn2.cob:2.7-2.19:
+   1   
+   2 >       $SET NO-BOUND
+----          ^^^^^^^^^^^^
+   3          IDENTIFICATION DIVISION.
+   4          PROGRAM-ID. progn2.
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:532:0
+run_subscripts.at-532-prog.cob:13.7-13.20:
+  10          01  idx         PIC 99 VALUE 6.
+  11              
+  12          PROCEDURE DIVISION.
+  13 >       $SET NOSSRANGE
+----          ^^^^^^^^^^^^^
+  14              DISPLAY y (idx)
+  15         *> Note: MF says "sets BOUND"
+>> Error: Unexpected characters
+
+run_subscripts.at-532-prog.cob:16.7-16.18:
+  13         $SET NOSSRANGE
+  14              DISPLAY y (idx)
+  15         *> Note: MF says "sets BOUND"
+  16 >       $SET SSRANGE
+----          ^^^^^^^^^^^
+  17              DISPLAY y (idx)
+  18              .
+>> Error: Unexpected characters
+
+Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:581:0

@@ -408,7 +408,7 @@ let all, sensitive_tokens, sensitive_tokens_unimplemented =
     OTHERS, [];
     OVERLAP_LEFT, [];
     OVERLAP_TOP, [];
-    PAGE, [];
+    PAGED, [];
     PAGE_SETUP, [];
     PARAGRAPH, [exit_stmt];
     PARENT, [];

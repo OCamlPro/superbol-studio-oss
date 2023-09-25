@@ -1,0 +1,227 @@
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:71:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:193:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:254:0
+used_binaries.at-254-prog.cob:10.8-10.18:
+   7           PROCEDURE DIVISION.
+   8           MAIN-PROC SECTION.
+   9           00.
+  10 >         COPY PROC.
+----           ^^^^^^^^^^
+  11           END-PROC  SECTION.
+  12           COPY PROCE in "sub".
+>> Error: Library `PROC' not found in search path (search path: )
+
+used_binaries.at-254-prog.cob:12.8-12.28:
+   9           00.
+  10           COPY PROC.
+  11           END-PROC  SECTION.
+  12 >         COPY PROCE in "sub".
+----           ^^^^^^^^^^^^^^^^^^^^
+  13           EX.
+  14               STOP RUN.
+>> Error: Library `PROCE' not found in search path (search path: sub)
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:277:0
+Fatal: used_binaries.at-277-sub/copy/PROC.cpy: No such file or directory
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:315:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:343:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:390:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:421:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:439:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:533:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:534:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:602:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:603:0
+used_binaries.at-603-caller.cob:24.30:
+  21              MOVE "Aloha" TO EXT-VAR.
+  22              CALL "callee" END-CALL.
+  23              DISPLAY EXT-VAR END-DISPLAY.
+  24 >            ACCEPT CLA-VAR FROM COMMAND-LINE END-ACCEPT.
+----                                 ^
+  25              DISPLAY CLA-VAR END-DISPLAY.
+  26              STOP RUN.
+>> Hint: Missing <word>
+
+used_binaries.at-603-caller.cob:24.31-24.43:
+  21              MOVE "Aloha" TO EXT-VAR.
+  22              CALL "callee" END-CALL.
+  23              DISPLAY EXT-VAR END-DISPLAY.
+  24 >            ACCEPT CLA-VAR FROM COMMAND-LINE END-ACCEPT.
+----                                  ^^^^^^^^^^^^
+  25              DISPLAY CLA-VAR END-DISPLAY.
+  26              STOP RUN.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:610:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:654:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:655:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:706:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:707:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
+used_binaries.at-743-called.cob:9.31:
+   6          01 CLI-ARGS      PIC X(27).
+   7          01 ARG-TWO       PIC X(6).
+   8          PROCEDURE        DIVISION.
+   9 >            ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
+----                                  ^
+  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
+  11              ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
+>> Hint: Missing <word>
+
+used_binaries.at-743-called.cob:9.32-9.44:
+   6          01 CLI-ARGS      PIC X(27).
+   7          01 ARG-TWO       PIC X(6).
+   8          PROCEDURE        DIVISION.
+   9 >            ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
+----                                   ^^^^^^^^^^^^
+  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
+  11              ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
+>> Error: Invalid syntax
+
+used_binaries.at-743-called.cob:11.30:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
+  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
+  11 >            ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
+----                                 ^
+  12              DISPLAY CLI-ARGS ":" ARG-TWO END-DISPLAY.
+  13              EXIT PROGRAM.
+>> Hint: Missing <word>
+
+used_binaries.at-743-called.cob:11.31-11.45:
+   8          PROCEDURE        DIVISION.
+   9              ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
+  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
+  11 >            ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
+----                                  ^^^^^^^^^^^^^^
+  12              DISPLAY CLI-ARGS ":" ARG-TWO END-DISPLAY.
+  13              EXIT PROGRAM.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:826:0
+used_binaries.at-826-prog.cob:6.38:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Hint: Missing <identifier or literal>
+
+used_binaries.at-826-prog.cob:6.38-6.39:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:844:0
+used_binaries.at-844-prog.cob:6.38:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Hint: Missing <identifier or literal>
+
+used_binaries.at-844-prog.cob:6.38-6.39:
+   3          PROGRAM-ID.      prog.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:865:0
+used_binaries.at-865-prog.cob:8.26:
+   5          WORKING-STORAGE  SECTION.
+   6          01 CLI           PIC X(8).
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT CLI FROM COMMAND-LINE
+----                             ^
+   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
+  10              STOP RUN WITH NORMAL STATUS.
+>> Hint: Missing <word>
+
+used_binaries.at-865-prog.cob:8.27-8.39:
+   5          WORKING-STORAGE  SECTION.
+   6          01 CLI           PIC X(8).
+   7          PROCEDURE        DIVISION.
+   8 >            ACCEPT CLI FROM COMMAND-LINE
+----                              ^^^^^^^^^^^^
+   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
+  10              STOP RUN WITH NORMAL STATUS.
+>> Error: Invalid syntax
+
+used_binaries.at-865-prog.cob:10.38:
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT CLI FROM COMMAND-LINE
+   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
+  10 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Hint: Missing <identifier or literal>
+
+used_binaries.at-865-prog.cob:10.38-10.39:
+   7          PROCEDURE        DIVISION.
+   8              ACCEPT CLI FROM COMMAND-LINE
+   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
+  10 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:882:0
+used_binaries.at-882-prog.cob:5.38:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      a.
+   4          PROCEDURE        DIVISION.
+   5 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Hint: Missing <identifier or literal>
+
+used_binaries.at-882-prog.cob:5.38-5.39:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      a.
+   4          PROCEDURE        DIVISION.
+   5 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:911:0
+used_binaries.at-911-prog.cob:6.38:
+   3          PROGRAM-ID.      a.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Hint: Missing <identifier or literal>
+
+used_binaries.at-911-prog.cob:6.38-6.39:
+   3          PROGRAM-ID.      a.
+   4          PROCEDURE        DIVISION.
+   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
+   6 >            STOP RUN WITH NORMAL STATUS.
+----                                         ^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:944:0
+used_binaries.at-944-progprep.cob:5.36-5.37:
+   2          IDENTIFICATION   DIVISION.
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5 >        WORKING-STORAGE  SECTION.	  	#
+----                                       ^
+   6          01 TEST-VAR PIC 9(2) VALUE 'A'.
+   7          COPY 'CRUD.CPY'.
+>> Error: Invalid syntax
+
+used_binaries.at-944-progprep.cob:7.7-7.23:
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.	  	#
+   6          01 TEST-VAR PIC 9(2) VALUE 'A'.
+   7 >        COPY 'CRUD.CPY'.
+----          ^^^^^^^^^^^^^^^^
+   8          PROCEDURE        DIVISION.
+   9              DISPLAY TEST-VAR NO ADVANCING
+>> Error: Library `CRUD.CPY' not found in search path (search path: )
+

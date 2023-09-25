@@ -220,7 +220,7 @@ module Make (Config: Cobol_config.T) = struct
 
   (* --- *)
 
-  let do_parse: type m. m state -> _ -> _ * m state =
+  let do_parse: type m. m state -> _ -> _ -> _ * m state =
 
     let rec next_tokens ({ preproc = { tokzr; _ }; _ } as ps) tokens =
       match Tokzr.next_token tokzr tokens with
@@ -424,16 +424,22 @@ module Make (Config: Cobol_config.T) = struct
       Some v, ps
 
     in
-    fun ps c -> normal ps [] c
+    fun ps tokens c -> normal ps tokens c
 
   let parse ?verbose ?show ~recovery
-      (type m) ~(memory: m memory) pp checkpoint
+      (type m) ~(memory: m memory) pp make_checkpoint
     : ('a option, m) output * _ =
     let ps = init_parser ?verbose ?show ~recovery
         ~tokenizer_memory:memory pp in
     let res, ps =
       (* TODO: catch in a deeper context to grab parsed tokens *)
-      try do_parse ps checkpoint with e -> None, add_diag (DIAGS.of_exn e) ps
+      let ps, tokens = produce_tokens ps in
+      let first_pos = match tokens with
+        | [] -> Cobol_preproc.position ps.preproc.pp
+        | t :: _ -> Cobol_common.Srcloc.start_pos ~@t
+      in
+      try do_parse ps tokens (make_checkpoint first_pos)
+      with e -> None, add_diag (DIAGS.of_exn e) ps
     in
     match memory with
     | Amnesic ->
@@ -480,9 +486,8 @@ let parse
                                          init_source_format = source_format}
           in
           let module P = Make (val config) in
-          P.parse ?verbose ?show ~memory ~recovery pp @@
-          Grammar.Incremental.compilation_group @@
-          Cobol_preproc.position pp
+          P.parse ?verbose ?show ~memory ~recovery pp
+          Grammar.Incremental.compilation_group
         end
     in
     {

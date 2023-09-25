@@ -77,4 +77,5 @@ js_of_ocaml-ppx = ">=3.0"
 [fields]
 dune-stanzas = """
   (js_of_ocaml (javascript_files vscode_debugprotocol_stub.js))
+  (enabled_if (= %{context_name} \"default\"))
 """

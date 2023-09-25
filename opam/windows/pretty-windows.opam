@@ -44,9 +44,11 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-windows" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "fmt" {>= "0.9"}
   "fmt-windows" {>= "0.9"}
+  "ez_file" {>= "0.3"}
   "ez_file-windows" {>= "0.3"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

@@ -4,16 +4,20 @@ opam-version: "2.0"
 name: "vscode-debugadapter"
 version: "0.1.0"
 license: "MIT"
-synopsis: "The superbol-vscode-platform project"
+synopsis: "The superbol-studio-oss project"
 description: """\
 This is the description
-of the superbol-vscode-platform OCaml project
+of the superbol-studio-oss OCaml project
 """
 authors: [
+  "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
+  "David Declerck <david.declerck@ocamlpro.com>"
   "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
   "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
 ]
 maintainer: [
+  "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
+  "David Declerck <david.declerck@ocamlpro.com>"
   "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
   "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
 ]
@@ -42,8 +46,8 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml" {>= "4.14.0"}
+  "dune" {>= "2.8.0"}
   "vscode-debugprotocol" {= version}
   "promise_jsoo" {>= "0.3.1" & < "1.0.0"}
   "node-js-stubs" {= version}

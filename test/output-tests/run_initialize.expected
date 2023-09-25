@@ -1,0 +1,115 @@
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:51:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:84:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:152:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:183:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:211:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:243:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:292:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:405:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:407:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:436:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:503:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:554:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:590:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:647:0
+Considering: import/gnucobol/tests/testsuite.src/run_initialize.at:777:0
+run_initialize.at-777-prog.cob:41.54:
+  38            05  MONTH-IN-YEAR OCCURS 13 TIMES PICTURE X(3)
+  39                           VALUES "jan" "feb" "mar" "apr"
+  40                                  "may" "jun" "jul" "aug"
+  41 >                                "sep" "oct" "nov" "dec".
+----                                                         ^
+  42            05  DAYS-IN-MONTH OCCURS 13 TIMES PICTURE 9(2) BINARY
+  43                            VALUES 31 28 31 30 31 30 31 31 30 31 30 31.
+>> Hint: Missing FROM <subscripts>
+
+run_initialize.at-777-prog.cob:41.54-41.55:
+  38            05  MONTH-IN-YEAR OCCURS 13 TIMES PICTURE X(3)
+  39                           VALUES "jan" "feb" "mar" "apr"
+  40                                  "may" "jun" "jul" "aug"
+  41 >                                "sep" "oct" "nov" "dec".
+----                                                         ^
+  42            05  DAYS-IN-MONTH OCCURS 13 TIMES PICTURE 9(2) BINARY
+  43                            VALUES 31 28 31 30 31 30 31 31 30 31 30 31.
+>> Error: Invalid syntax
+
+run_initialize.at-777-prog.cob:43.67:
+  40                                  "may" "jun" "jul" "aug"
+  41                                  "sep" "oct" "nov" "dec".
+  42            05  DAYS-IN-MONTH OCCURS 13 TIMES PICTURE 9(2) BINARY
+  43 >                          VALUES 31 28 31 30 31 30 31 31 30 31 30 31.
+----                                                                      ^
+  44            05  DAYS-MONTHS  OCCURS 2 TIMES.
+  45             06  DAYX-MONTHX OCCURS 4 TIMES.
+>> Hint: Missing FROM <subscripts>
+
+run_initialize.at-777-prog.cob:43.67-43.68:
+  40                                  "may" "jun" "jul" "aug"
+  41                                  "sep" "oct" "nov" "dec".
+  42            05  DAYS-IN-MONTH OCCURS 13 TIMES PICTURE 9(2) BINARY
+  43 >                          VALUES 31 28 31 30 31 30 31 31 30 31 30 31.
+----                                                                      ^
+  44            05  DAYS-MONTHS  OCCURS 2 TIMES.
+  45             06  DAYX-MONTHX OCCURS 4 TIMES.
+>> Error: Invalid syntax
+
+run_initialize.at-777-prog.cob:54.54:
+  51                                  "Sep" "Oct" "Nov" "Dec"
+  52                                  "JAN" "FEB" "MAR" "APR"
+  53                                  "MAY" "JUN" "JUL" "AUG"
+  54 >                                "SEP" "OCT" "NOV" "DEC".
+----                                                         ^
+  55                10  SEPX   PICTURE XX VALUE ", ".
+  56                10  DAYS   PICTURE 99
+>> Hint: Missing FROM <subscripts>
+
+run_initialize.at-777-prog.cob:54.54-54.55:
+  51                                  "Sep" "Oct" "Nov" "Dec"
+  52                                  "JAN" "FEB" "MAR" "APR"
+  53                                  "MAY" "JUN" "JUL" "AUG"
+  54 >                                "SEP" "OCT" "NOV" "DEC".
+----                                                         ^
+  55                10  SEPX   PICTURE XX VALUE ", ".
+  56                10  DAYS   PICTURE 99
+>> Error: Invalid syntax
+
+run_initialize.at-777-prog.cob:58.66:
+  55                10  SEPX   PICTURE XX VALUE ", ".
+  56                10  DAYS   PICTURE 99
+  57                           VALUES 31 28 31 30 31 30 31 31 30 31 30 31
+  58 >                                91 28 91 90 91 90 91 91 90 91 90 91.
+----                                                                     ^
+  59                10  PER    PICTURE X VALUE ".".
+  60              07  FLR    PICTURE X(4) VALUES " <A>" " <B>" " <C>" " <D>"
+>> Hint: Missing FROM <subscripts>
+
+run_initialize.at-777-prog.cob:58.66-58.67:
+  55                10  SEPX   PICTURE XX VALUE ", ".
+  56                10  DAYS   PICTURE 99
+  57                           VALUES 31 28 31 30 31 30 31 31 30 31 30 31
+  58 >                                91 28 91 90 91 90 91 91 90 91 90 91.
+----                                                                     ^
+  59                10  PER    PICTURE X VALUE ".".
+  60              07  FLR    PICTURE X(4) VALUES " <A>" " <B>" " <C>" " <D>"
+>> Error: Invalid syntax
+
+run_initialize.at-777-prog.cob:61.69:
+  58                                  91 28 91 90 91 90 91 91 90 91 90 91.
+  59                10  PER    PICTURE X VALUE ".".
+  60              07  FLR    PICTURE X(4) VALUES " <A>" " <B>" " <C>" " <D>"
+  61 >                                           " <E>" " <F>" " <G>" " <*>".
+----                                                                        ^
+  62   
+  63          PROCEDURE DIVISION.
+>> Hint: Missing FROM <subscripts>
+
+run_initialize.at-777-prog.cob:61.69-61.70:
+  58                                  91 28 91 90 91 90 91 91 90 91 90 91.
+  59                10  PER    PICTURE X VALUE ".".
+  60              07  FLR    PICTURE X(4) VALUES " <A>" " <B>" " <C>" " <D>"
+  61 >                                           " <E>" " <F>" " <G>" " <*>".
+----                                                                        ^
+  62   
+  63          PROCEDURE DIVISION.
+>> Error: Invalid syntax
+

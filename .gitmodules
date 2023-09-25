@@ -3,4 +3,4 @@
 	url = https://github.com/OcamlPro/gnucobol.git
 [submodule "import/merlin"]
 	path = import/merlin
-	url = https://github.com/nberth/merlin.git
+	url = https://github.com/OCamlPro/merlin.git

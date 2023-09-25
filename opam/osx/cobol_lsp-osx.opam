@@ -44,12 +44,15 @@ install: [
   ["sh" "-c" "./scripts/before.sh install '%{name}%'"]
 ]
 depends: [
-  "ocaml" {>= "4.13.0"}
-  "dune" {>= "2.7.0"}
+  "ocaml-osx" {>= "4.13.0"}
+  "dune" {>= "2.8.0"}
+  "toml" {>= "7.1.0" & < "8.0.0"}
   "toml-osx" {>= "7.1.0" & < "8.0.0"}
-  "pretty-osx" {= version}
+  "lsp" {>= "1.15" & < "1.16"}
   "lsp-osx" {>= "1.15" & < "1.16"}
+  "jsonrpc" {>= "1.15"}
   "jsonrpc-osx" {>= "1.15"}
+  "pretty-osx" {= version}
   "cobol_typeck-osx" {= version}
   "cobol_parser-osx" {= version}
   "cobol_indent-osx" {= version}

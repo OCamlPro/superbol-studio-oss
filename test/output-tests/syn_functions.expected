@@ -1,0 +1,153 @@
+Considering: import/gnucobol/tests/testsuite.src/syn_functions.at:83:0
+Considering: import/gnucobol/tests/testsuite.src/syn_functions.at:131:0
+syn_functions.at-131-prog.cob:10.11-10.15:
+   7          01  ret PIC 9(4).
+   8   
+   9          PROCEDURE DIVISION RETURNING ret.
+  10 >            MOVE 100 TO ret
+----              ^^^^
+  11              .
+  12          END FUNCTION x.
+>> Error: Invalid syntax
+
+syn_functions.at-131-prog.cob:10.19:
+   7          01  ret PIC 9(4).
+   8   
+   9          PROCEDURE DIVISION RETURNING ret.
+  10 >            MOVE 100 TO ret
+----                      ^
+  11              .
+  12          END FUNCTION x.
+>> Hint: Missing .
+
+syn_functions.at-131-prog.cob:10.20-10.22:
+   7          01  ret PIC 9(4).
+   8   
+   9          PROCEDURE DIVISION RETURNING ret.
+  10 >            MOVE 100 TO ret
+----                       ^^
+  11              .
+  12          END FUNCTION x.
+>> Warning: Invalid syntax
+
+syn_functions.at-131-prog.cob:22.11-22.15:
+  19          01  ret PIC 9(5).
+  20   
+  21          PROCEDURE DIVISION RETURNING ret.
+  22 >            MOVE 1 TO ret
+----              ^^^^
+  23              .
+  24          END FUNCTION z.
+>> Error: Invalid syntax
+
+syn_functions.at-131-prog.cob:22.17:
+  19          01  ret PIC 9(5).
+  20   
+  21          PROCEDURE DIVISION RETURNING ret.
+  22 >            MOVE 1 TO ret
+----                    ^
+  23              .
+  24          END FUNCTION z.
+>> Hint: Missing .
+
+syn_functions.at-131-prog.cob:22.18-22.20:
+  19          01  ret PIC 9(5).
+  20   
+  21          PROCEDURE DIVISION RETURNING ret.
+  22 >            MOVE 1 TO ret
+----                     ^^
+  23              .
+  24          END FUNCTION z.
+>> Warning: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_functions.at:198:0
+syn_functions.at-198-prog.cob:15.40:
+  12          LINKAGE SECTION.
+  13          01  ret PIC X.
+  14              
+  15 >        PROCEDURE DIVISION RETURNING ret.
+----                                           ^
+  16              MOVE FUNCTION x TO ret
+  17              MOVE FUNCTION x TO ret
+>> Hint: Missing END
+
+syn_functions.at-198-prog.cob:16.11-16.15:
+  13          01  ret PIC X.
+  14              
+  15          PROCEDURE DIVISION RETURNING ret.
+  16 >            MOVE FUNCTION x TO ret
+----              ^^^^
+  17              MOVE FUNCTION x TO ret
+  18              .
+>> Error: Invalid syntax
+
+syn_functions.at-198-prog.cob:16.27-16.29:
+  13          01  ret PIC X.
+  14              
+  15          PROCEDURE DIVISION RETURNING ret.
+  16 >            MOVE FUNCTION x TO ret
+----                              ^^
+  17              MOVE FUNCTION x TO ret
+  18              .
+>> Error: Invalid syntax
+
+syn_functions.at-198-prog.cob:19.7-19.10:
+  16              MOVE FUNCTION x TO ret
+  17              MOVE FUNCTION x TO ret
+  18              .
+  19 >        END FUNCTION blah.
+----          ^^^
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_functions.at:271:0
+Considering: import/gnucobol/tests/testsuite.src/syn_functions.at:314:0
+syn_functions.at-314-prog.cob:12.11-12.15:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----              ^^^^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Error: Invalid syntax
+
+syn_functions.at-314-prog.cob:12.23:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                          ^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Hint: Missing .
+
+syn_functions.at-314-prog.cob:12.24-12.26:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                           ^^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Warning: Invalid syntax
+
+syn_functions.at-314-prog.cob:12.35:
+   9          01  func-out PIC X(15).
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12 >            MOVE func-in TO func-out
+----                                      ^
+  13              INSPECT func-out REPLACING ALL '%' BY func-sub
+  14              .
+>> Hint: Missing .
+
+syn_functions.at-314-prog.cob:13.11-13.18:
+  10   
+  11          PROCEDURE DIVISION USING func-in, func-sub RETURNING func-out.
+  12              MOVE func-in TO func-out
+  13 >            INSPECT func-out REPLACING ALL '%' BY func-sub
+----              ^^^^^^^
+  14              .
+  15          END FUNCTION SUBSTITUTE.
+>> Warning: Invalid syntax
+

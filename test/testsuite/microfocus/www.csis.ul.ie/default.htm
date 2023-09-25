@@ -1,0 +1,1418 @@
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<title>COBOL example programs</title>
+<META name="resource-type" content="document">
+<META name="description" content="These pages contain a large number of example COBOL programs. The example COBOL programs may be downloaded or viewed in your browser.  Test data for the example COBOL programs is also provided.">
+<META name="keywords" content="COBOL,programming,example,program,example program,learn,learning,COBOL programming">
+<META name="distribution" content="Global">
+<META name="copyright" content="Michael Coughlan">
+<META name="author" content="Michael Coughlan">
+<META name="generator" content="Mozilla/4.0 [en] (WinNT; I) [Netscape]">
+<META name="robots" content="All">
+<META name="rating" content="General">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#FF0000" ALINK="#009B00">
+<h2><img src="/pics/i-program.gif" width="40" height="42"> <IMG SRC="/pics/T-Dept.gif" HSPACE=5 HEIGHT=36 WIDTH=297>&nbsp;<BR>
+  COBOL Example Programs </h2>
+ <HR WIDTH="100%">
+  
+<table width="700" border="0" align="center">
+  <tr> 
+      
+    <td> 
+      <p><font size="-1">These pages contain a large number of example COBOL programs. 
+        The programs may be downloaded, or viewed in your browser. Test data for 
+        the example COBOL programs is also provided where appropriate. </font></p>
+        
+      <p><font size="-1">The programs have been compiled and tested using Microfocus 
+        NetExpress but they should work on any COBOL-85 complient compiler with 
+        very few changes. <br>
+        You may have to reformat the programs if your compiler does not have the 
+        equivalent of the $ SET SOURCEFORMAT"FREE". This compiler directive frees 
+        Microfocus COBOL programs from the normal COBOL formatting conventions.<br>
+        You may also have to remove the </font><font size="-1"> ORGANIZATION IS 
+        LINE SEQUENTIAL phrase in the SELECT and ASSIGN clause of sequential files. 
+        In Microfocus COBOL, LINE SEQUENTIAL files terminate each record with 
+        a carriage return and line feed.</font></p>
+        
+      <p align="center"><font size="-1"><b>Copyright Notice</b></font></p>
+      <p align="left"><font size="-1">These programs are the copyright property 
+        of Michael Coughlan. You have permission to use these programs for your 
+        own personal use but you may not reproduce them in any published work 
+        without written permission from the author.</font></p>
+</td>
+    </tr>
+  </table>
+<hr>
+<a name="pagetop"></a> 
+<ul>
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#SimplePrograms">Beginners 
+    Programs </a> - <font size="-1"> Simple programs using ACCEPT, DISPLAY and 
+    some arithmetic verbs.</font></p>
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Selection">Selection 
+    and Iteration</a> <font size="-1">- Selection (IF, EVALUATE) and Iteration 
+    (PERFORM) example programs. </font> </p>
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#SequentialFiles">Sequential 
+    Files</a>&nbsp; - <font size=-1>Programs that demonstrate how to process sequential 
+    files.</font></p>
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Sort">Sorting 
+    and Merging</a> - <font size=-1>Examples that use INPUT PROCEDURE's and the 
+    SORT and MERGE verbs</font> 
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Direct">Direct 
+    Access Files</a> - <font size=-1>Example programs that show how to process 
+    Indexed and Relative files.</font> 
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Call">CALLing 
+    sub-programs</a> - <font size=-1>Example programs that Demonstrate contained, 
+    and external, sub-programs.</font> 
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Strings">String 
+    handling </a> - <font size=-1>Example programs that show how to use Reference 
+    Modification, INSPECT and UNSTRING.</font> 
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Reports">The 
+    COBOL Report Writer</a> - <font size=-1>Example programs using the COBOL Report 
+    Writer.</font> 
+  <p><img src="/pics/BallGreenG.gif" hspace=4 height=13 width=13><a href="#Tables">COBOL 
+    Tables </a> - <font size=-1>Example programs using tables.</font> 
+  <p>&nbsp; 
+</ul>
+
+<table width="725" border="0" bordercolorlight="#FFFFFF" bordercolordark="#000000">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">Beginners programs<a name="SimplePrograms"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Shortest.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">This example program is almost 
+      the shortest COBOL program we can have. We could make it shorter still by 
+      leaving out the STOP RUN.</font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">DISPLAY</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Accept/Shortest.CBL">Download</a><br>
+        <a href="Accept/Shortest.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center">Accept.cbl</p>
+    </td>
+    <td width="298" align="left"><font size="-1"> The program accepts a simple 
+      student record from the user and displays the individual fields. Also shows 
+      how the ACCEPT may be used to get and DISPLAY the system time and date. 
+      </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">ACCEPT, DISPLAY, ACCEPT FROM DATE, ACCEPT 
+        FROM DAY, ACCEPT FROM TIME</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Accept/ACCEPT.CBL">Download</a><br>
+        <a href="Accept/ACCEPT.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Multiplier.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Accepts two single digit numbers 
+      from the user, multiplies them together and displays the result.</font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">ACCEPT, DISPLAY, MULTIPLY</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Accept/MULTIPLIER.CBL">Download</a><br>
+        <a href="Accept/Multiplier.htm">View</a></div>
+      </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr>
+    <td>
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF" bordercolordark="#999999">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">Selection and Interation<a name="Selection"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="49"> 
+      <div align="center">IterIf.cbl</div>
+    </td>
+    <td width="298" align="left" height="49"> 
+      <P><font size="-1">An example program that implements a primative calculator. 
+        The calculator only does additions and multiplications.<BR>
+        </font>&nbsp; </P>
+      </td>
+    <td width="189" height="49"> 
+      <div align="center"><font size="-1">IF, PERFORM..TIMES, ADD, MULTIPLY</font></div>
+    </td>
+    <td width="71" height="49"> 
+      <div align="center"><a href="Conditn/IterIf.cbl">Download</a><br>
+        <a href="Conditn/IterIf.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="24"> 
+      <div align="center">Conditions.cbl</div>
+    </td>
+    <td width="298" align="left" height="24"><font size="-1">An example program 
+      demonstrating the use of Condition Names (level 88's). <BR>
+      &nbsp; </font></td>
+    <td width="189" height="24"> 
+      <div align="center">Condition Names (level 88's), <font size="-1">EVALUATE, 
+        PERFORM..UNTIL</font></div>
+    </td>
+    <td width="71" height="24"> 
+      <div align="center"><a href="Conditn/CONDITIONS.CBL">Download</a><br>
+        <a href="Conditn/Conditions.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Perform1.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">An example program demonstrating 
+      how the first format of the PERFORM may be used to change the flow of control 
+      through a program.<BR>
+      &nbsp; <BR>
+      </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">PERFORM</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Perform/PERFORM1.CBL">Download</a><br>
+        <a href="Perform/Perform1.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Perform2.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Demonstrates the second format 
+      of the PERFORM. The PERFORM..TIMES may be used to execute a block of code 
+      x number of times.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">PERFORM..TIMES</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Perform/PERFORM1.CBL">Download</a><br>
+        <a href="Perform/Perform2.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Perform3.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">Demonstrates how the PERFORM..UNTIL 
+      (third format) may be used to process a stream of values where the length 
+      of the stream cannot be determined in advance (although in this case there 
+      is a set maximum number of values in the stream).</font><BR>
+      &nbsp; <br>
+    </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">PERFORM..UNTI, ADD, COMPUTE, ON SIZE 
+        ERROR, INITIALIZE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Perform/PERFORM3.CBL">Download</a><br>
+        <a href="Perform/Perform3.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td width="135">
+      <div align="center">Perform4.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Demonstrates how the PERFORM..VARYING 
+      and the PERFORM..VARYING..AFTER (fourth format) may be used for counting 
+      iteration. Also introduces the WITH TEST BEFORE and WITH TEST AFTER phrases.<BR>
+      &nbsp; </font></td>
+    <td width="189">
+      <div align="center"><font size="-1">PERFORM..VARYING..AFTER, DISPLAY</font></div>
+    </td>
+    <td width="71"><a href="Perform/PERFORM4.CBL">Download</a><br>
+      <a href="Perform/Perform4.htm">View</a></td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">MileageCount.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Demonstrates how the PERFORM..VARYING 
+      and the PERFORM..VARYING..AFTER (fourth format) may be used to simulate 
+      a mileage counter.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">PERFORM..VARYING..AFTER, DISPLAY</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Perform/MileageCount.CBL">Download</a><br>
+        <a href="Perform/MileageCount.htm">View</a></div>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">Sequential Files<a name="SequentialFiles"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="31"> 
+      <div align="center">SeqWrite.cbl</div>
+    </td>
+    <td width="298" align="left" height="31"><font size="-1">Example program demonstrating 
+      how to create a sequential file from data input by the user.<BR>
+      &nbsp; </font></td>
+    <td width="189" height="31"> 
+      <div align="center"><font size="-1">Sequential Files, WRITE, OPEN, CLOSE, 
+        File Description (FD), SELECT..ASSIGN<BR>
+        &nbsp; </font><FONT size="-1"></FONT><font size="-1"> </font></div>
+    </td>
+    <td width="71" height="31"> 
+      <div align="center"><a href="SeqWrite/SEQWRITE.CBL">Download</a><br>
+        <a href="SeqWrite/SEQWRITE.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td height="21" width="135"> 
+      <div align="center">SeqReadno88.cbl</div>
+    </td>
+    <td width="298" height="21" align="left"> 
+      <font size="-1">An example program that reads a sequential file and displays 
+        the records. This version does not use level 88's to signal when the end 
+        of the file has been reached.<br>
+      To test the program download this<a href="SeqRead/STUDENTS.DAT">testdata 
+      file</a>.</font> <BR>
+      &nbsp; </td>
+    <td width="189" height="21"> 
+      <div align="center"><font size="-1">Sequential Files, READ, OPEN, CLOSE, 
+        File Description (FD), SELECT..ASSIGN</font></div>
+    </td>
+    <td width="71" height="21"> 
+      <div align="center"><a href="SeqRead/SeqreadNo88.cbl">Download</a><br>
+        <a href="SeqRead/SEQREADno88.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">SeqRead.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">An example program that reads 
+      a sequential file and displays the records. This is the correct version 
+      which uses the Condition Name (level 88) &quot;EndOfFile&quot;to signal 
+      when the end of the file has been reached.<br>
+      To test the program download this</font><font size="-1"> <a href="SeqRead/STUDENTS.DAT">testdata 
+      file</a>.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Sequential Files, Condition Names (level 
+        88's) READ, OPEN, CLOSE, File Description (FD), SELECT..ASSIGN</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SeqRead/Seqread.cbl">Download</a><br>
+        <a href="SeqRead/SEQREAD.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">SeqInsert.cbl</div>
+    </td>
+    <td width="298" align="left"> 
+     <font size="-1">Demonstrates how to insert records into a sequential 
+        file from a file of transaction records. A new file is created which contains 
+        the inserted records.<br>
+      To test this program you will need to download Student Masterfile - <a href="SeqIns/STUDENTS.DAT">Students.Dat</a> 
+      and the Transaction file <a href="SeqIns/TRANSINS.DAT">Transins.dat</a></font><font size="-1">.</font><BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Sequential Files, Condition Names (level 
+        88's) READ, WRITE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SeqIns/seqinsert.CBL">Download</a><br>
+        <a href="SeqIns/SEQINSERT.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">SeqRpt.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">This program reads records from 
+      the student file, counts the total number of student records in the file 
+      and the number records for females and males. Prints the results in a very 
+      short report.</font><font size="-1"><br>
+      To test the program download <a href="SeqIns/STUDENTS.DAT">Students.Dat</a><BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Sequential Files, Condition Names (level 
+        88's) READ, WRITE</font>, Writing to a report file.</div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SeqRpt/SeqRpt.CBL">Download</a><br>
+        <a href="SeqRpt/SEQRPT.htm">View</a></div>
+      </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">Sorting and Merging <a name="Sort"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">InputSort.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Uses the SORT and an INPUT PROCEDURE 
+      to accept records from the user and sort them on ascending StudentId.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">SORT, Input Procedure</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Sort/InputSORT.CBL">Download</a><br>
+        <a href="Sort/InputSort.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">MaleSort.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Sorts the student masterfile 
+      (sorted on ascending Student Id) and produces a new file, sorted on ascending 
+      student name, containing only the records of male students. </font><font size="-1"><br>
+      To test the program download <a href="SeqIns/STUDENTS.DAT">Students.Dat</a><BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">SORT, Input Procedure</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Sort/MaleSORT.cbl">Download</a><br>
+        <a href="Sort/MaleSort.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Merge.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">Uses the MERGE to insert records 
+      from a transaction file into a sequential master file. </font><font size="-1">.<br>
+      To test this program you will need to download Student Masterfile - <a href="SeqIns/STUDENTS.DAT">Students.Dat</a> 
+      and the Transaction file <a href="SeqIns/TRANSINS.DAT">Transins.dat</a></font><font size="-1">.</font><BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">MERGE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Merge/MERGE.CBL">Download</a><br>
+        <a href="Merge/Merge.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <DIV align="center">AromaSalesRpt.Cbl</DIV>
+    </td>
+    <td width="298" align="left"><FONT size="-1">Exam paper model answer. A program 
+      is required to produce a summary sales report from an unsorted sequential 
+      file containing the details of sales of essential and base oils to Aromamora 
+      customers.<BR>
+      Read the<A href="../exercises/Exm-AromaSalesRpt/Exm-AromaSalesSummaryRpt.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there.<BR>
+      &nbsp; <BR>
+      </FONT></td>
+    <td width="189"> 
+      <DIV align="center"><FONT size="-1">SORT with Input Procedure and Output 
+        Procedure, Print Files, Sequential Files, COMPUTE</FONT><BR>
+      </DIV>
+    </td>
+    <td width="71"> 
+      <DIV align="center"><A href="../exercises/Exm-AromaSalesRpt/AromaSalesRpt.CBL">Download</A><BR>
+        <A href="../exercises/Exm-AromaSalesRpt/Prg-AromaSalesSummaryRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="75">CSISEmailDomain.Cbl</td>
+    <td width="298" align="left" height="75"> 
+      <P><FONT size="-1">Exam paper model answer. A program is required which 
+        will produce a file, sorted on ascending email domain, from the unsorted 
+        GraduateInfo file.<BR>
+        Read the<A href="../exercises/Exm-AromaSalesRpt/Exm-AromaSalesSummaryRpt.htm"> 
+        program specification</A> first. The required data files may be downloaded 
+        from there.<BR>
+        &nbsp; </FONT></P>
+    </td>
+    <td width="189" height="75"> 
+      <DIV align="center"><FONT size="-1">SORT with Input Procedure and Output 
+        Procedure, Sequential Files, Pre-Defined Tables, Run time filled tables, 
+        SEARCH</FONT></DIV>
+    </td>
+    <td width="71" height="75"> 
+      <DIV align="center"><A href="../exercises/Exm-CSISEmailDomain/CSISEmailDomain.cbl">Download</A><BR>
+        <A href="../exercises/Exm-CSISEmailDomain/Prg-CSISEmailDomain.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="75"> 
+      <DIV align="center">BestSellers.Cbl</DIV>
+    </td>
+    <td width="298" align="left" height="75"><FONT size="-1">Exam paper model 
+      answer. The Folio Society is a Book Club that sells fine books to customers 
+      all over the world. A program is required to print a list of the ten best 
+      selling books (by copies sold) in the Book Club.<BR>
+      Read the<A href="../exercises/Exm-BestSellersRpt/Exm-FolioBestSellersRpt.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there.<BR>
+      &nbsp; <BR>
+      </FONT></td>
+    <td width="189" height="75"><FONT size="-1">(Sequential Files, Print Files, 
+      SORT with Input Procedure and Output Procedure, Tables)</FONT></td>
+    <td width="71" height="75"> 
+      <DIV align="center"><A href="../exercises/Exm-BestSellersRpt/BestSellers.cbl">Download</A><BR>
+        <A href="../exercises/Exm-BestSellersRpt/Prg-FolioBestSellersRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="116"> 
+      <DIV align="center">DueSubRpt.Cbl</DIV>
+    </td>
+    <td width="298" align="left" height="116"><FONT size="-1">Exam paper model 
+      answer. NetNews is a company which runs an NNTP server carrying the complete 
+      USENET news feed with over 15,000 news groups. Access to this server is 
+      available to internet users all over the world. Users of the system pay 
+      a subscription fee for access. A program is required to produce a report 
+      showing the subscriptions which are now due. The report will be based on 
+      the Due Subscriptions file. <BR>
+      &nbsp; </FONT></td>
+    <td width="189" height="116"><FONT size="-1">(Sequential Files, Print Files, 
+      SORT with Input Procedure, Tables, SEARCH ALL)</FONT></td>
+    <td width="71" height="116">
+      <DIV align="center"><A href="../exercises/Exm-DueSubsRpt/DueSubsRpt.CBL">Download</A><BR>
+        <A href="../exercises/Exm-DueSubsRpt/Prg-DueSubsRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">Direct Access Files<a name="Direct"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Seq2Rel.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">Creates a direct access Relative 
+      file from a Sequential File. Note that Relative files are not standard ASCII 
+      files and so cannot be created with an editor as Sequential files can.<br>
+      To create the Relative file you will need to download the supplier file 
+      <a href="Relative/SEQSUPP.dat">SEQSUPP.DAT</a></font><BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Relative files, Sequential Files, ACCESS 
+        MODE, RELATIVE KEY, FILE STATUS, READ..AT END, WRITE..INVALID KEY</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Relative/Seq2Rel.cbl">Download<br>
+        </a><a href="Relative/Seq2Rel.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">ReadRel.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Reads the Relative file - RELSUPP.DAT 
+      - created in the previous example program and displays the records. Allows 
+      the user to choose to read through and display all the records in the file 
+      sequentially, or to use a key to read just one record directly.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Relative files, ACCESS MODE, RELATIVE 
+        KEY, FILE STATUS, READ..NEXT RECORD, READ..INVALID KEY, Condition Names, 
+        IF</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Relative/ReadREL.CBL">Download<br>
+        </a><a href="Relative/ReadRel.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Seq2Index.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Creates a direct access Indexed 
+      file from a Sequential file. Note that Microfocus Indexed files actually 
+      consist of two files - the data file and the index file (.idx). <br>
+      </font><font size="-1">To create the Indexed file you will need to download 
+      the supplier file <a href="Indexed/SEQVIDEO.DAT">SEQVIDEO.DAT</a><BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Indexed files, Sequential Files, RECORD 
+        KEY, ALTERNATE KEY,READ..AT END, WRITE..INVALID KEY</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Indexed/Seq2Index.CBL">Download</a><br>
+        <a href="Indexed/Seq2Index.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">DirectReadIdx.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Does a direct read on the Indexed 
+      file created by the previous example program. Allows the user to choose 
+      which of the keys to use for the direct read.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Indexed files, READ..KEY IS.</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Indexed/DirectReadIdx.CBL">Download</a><br>
+        <a href="Indexed/DirectReadIdx.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">SeqReadIdx.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Reads the Indexed file sequentially 
+      on whichever key is chosen by the user. Displays all the records in the 
+      file.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Indexed files, READ..NEXT RECORD, START</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Indexed/SeqReadIdx.cbl">Download</a><br>
+        <a href="Indexed/SeqReadIdx.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="87"> 
+      <DIV align="center">StudFees.cbl</DIV>
+    </td>
+    <td width="298" align="left" height="87"> 
+      <P><FONT size="-1">Exam paper model answer. A program which applies a transaction 
+        file of student payments to a Student Master File and which then produces 
+        a report showing those students whose fees are partially or wholly outstanding. 
+        Read the<A href="../exercises/Exm-StudFeesRpt/Exm-StudPay.htm"> program 
+        specification</A> first. The required data files may be downloaded from 
+        there.<BR>
+        &nbsp; </FONT></P>
+    </td>
+    <td width="189" height="87"> 
+      <DIV align="center"><FONT size="-1">Indexed files, Print files, READ..NEXT 
+        RECORD, START, WRITE, REWRITE, IF, PERFORM, ADD, SUBTRACT</FONT></DIV>
+    </td>
+    <td width="71" height="87"> 
+      <DIV align="center"><A href="../exercises/Exm-StudFeesRpt/STUDFEES.CBL">Download</A><BR>
+        <A href="../exercises/Exm-StudFeesRpt/Prg-StudPay.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="87"> 
+      <DIV align="center">Aroma96.cbl</DIV>
+    </td>
+    <td width="298" align="left" height="87"><FONT size="-1">Exam paper model 
+      answer. A program is required which will apply a file of sorted, validated 
+      transactions to the Oil-Stock-File and then produce a report based on the 
+      contents of both the Oil-Details-File and the Oil-Stock-File. The report 
+      writer must be used to produce the report which must be printed sequenced 
+      on ascending Oil-Name.</FONT><BR>
+      <FONT size="-1">Read the<A href="../exercises/Exm-AromaOilFileMainRpt/Exm-AromaOilFileMainRpt.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there.<BR>
+      &nbsp; </FONT><BR>
+    </td>
+    <td width="189" height="87"> 
+      <DIV align="center"><FONT size="-1">Indexed files, Relative Files, Sequential 
+        Files, EVALUATE, COMPUTE, READ, WRITE, REWRITE, START, Report Writer, 
+        Report Section, INITIATE, GENERATE, TERMINATE, </FONT></DIV>
+    </td>
+    <td width="71" height="87"> 
+      <DIV align="center"><A href="../exercises/Exm-AromaOilFileMainRpt/AROMA96.CBL">Download</A><BR>
+        <A href="../exercises/Exm-AromaOilFileMainRpt/Prg-AromaOilFileMainRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="131"> 
+      <DIV align="center">BookshopRpt91.Cbl</DIV>
+    </td>
+    <td width="298" align="left" height="131"> 
+      <P><FONT size="-1">Exam paper model answer. A program is required to produce 
+        a Purchase Requirements Report from the Publisher, Book and Purchase Requirements 
+        files. The report should be sequenced on ascending Publisher Name and 
+        should only detail the purchase requirements for the semester under scrutiny.<BR>
+        Read the<A href="../exercises/Exm-BookshopLectReqRpt/Exm-BookshopLectReqRpt.htm"> 
+        program specification</A> first. The required data files may be downloaded 
+        from there.<BR>
+        &nbsp; </FONT></P>
+    </td>
+    <td width="189" height="131"> 
+      <DIV align="center"><FONT size="-1">Indexed files, Report Writer, Report 
+        Section, INITIATE, GENERATE, TERMINATE, READ, WRITE, REWRITE, START</FONT></DIV>
+    </td>
+    <td width="71" height="131"> 
+      <DIV align="center"><A href="../exercises/Exm-BookshopLectReqRpt/BookshopRpt91.Cbl">Download</A><BR>
+        <A href="../exercises/Exm-BookshopLectReqRpt/Prg-BookshopLectReqRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="159"> 
+      <DIV align="center">LibRoyaltyRpt.Cbl</DIV>
+    </td>
+    <td width="298" align="left" height="159"><FONT size="-1">Exam paper model 
+      answer. Each time a book is borrowed, the Pascal Memorial Library pays the 
+      author a small sum of money as royalty.  Royalties are paid to authors through 
+      their agents. A report is required which processes the Authors file and 
+      the Books File to produce a report which shows the amount to be sent to 
+      each agent, shows the breakdown of the agent payment into author payments, 
+      and shows the breakdown of each author payment into royalty payments per 
+      book.<BR>
+      Read the<A href="../exercises/Exm-RoyaltyPaymentsRpt/Exm-LibRoyaltyRpt.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there. <BR>
+      &nbsp; </FONT></td>
+    <td width="189" height="159"> 
+      <DIV align="center"><FONT size="-1">Indexed Files, Print Files, READ..NEXT 
+        RECORD, READ..KEY IS, START, REWRITE, WRITE, MULTIPLY, SET</FONT></DIV>
+    </td>
+    <td width="71" height="159"> 
+      <DIV align="center"><A href="../exercises/Exm-RoyaltyPaymentsRpt/LibRoyaltyRpt.Cbl">Download</A><BR>
+        <A href="../exercises/Exm-RoyaltyPaymentsRpt/Prg-LibRoyaltyRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td width="135" height="138">TopSuppliersRpt.Cbl</td>
+    <td width="298" align="left" height="138"><FONT size="-1">Exam paper model 
+      answer.</FONT> <FONT size="-1">The manager of Metropolis Videos has asked 
+      you to write a program to produce a report showing the top three Video Suppliers 
+      (by total store video earnings) and for each of the top three the most popular 
+      video title (by average earnings) must be shown.<BR>
+      Read the<A href="../exercises/Exm-TopSupplierRpt/Exm-TopSupplierRpt.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there. <BR>
+      &nbsp; </FONT></td>
+    <td width="189" height="138"> 
+      <DIV align="center"><FONT size="-1">Indexed Files, Relative Files, Print 
+        Files, READ, START, Tables, DIVIDE</FONT></DIV>
+    </td>
+    <td width="71" height="138"> 
+      <DIV align="center"><A href="../exercises/Exm-TopSupplierRpt/TopSupplierRpt.Cbl">Download</A><BR>
+        <A href="../exercises/Exm-TopSupplierRpt/Prg-TopSupplierRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">CALLing sub-programs <a name="Call"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">DriverProg.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">This program demonstrates the 
+      CALL verb by calling three external sub-programs. <br>
+      The "MultiplyNums" sub-program demonstrates flow of control - from caller 
+      to called and back again - and the use of parameters.<br>
+      The "Fickle" sub-program demonstrates State Memory.<br>
+      The "Steadfast" sub-program shows how a sub-program can use the IS INITIAL 
+      phrase to avoid State Memory</font>.<BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Calling external sub-programs. CALL..BY 
+        REFERENCE, CALL..BY CONTENT, COMP, CANCEL</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/Multiply/DriverProg.cbl">Download</a><br>
+        <a href="SubProg/Multiply/DriverProg.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">MultiplyNums.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">The "MultiplyNums" sub-program, 
+      called from the driver program above, demonstrates the flow of control from 
+      the driver program to the called sub-program and back again. It uses numeric 
+      and string parameters and demonstrates the BY REFERENCE (the default) and 
+      BY CONTENT parameter passing mechanisms.</font><BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Calling external sub-programs, LINKAGE 
+        SECTION, EXIT PROGRAM</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/Multiply/MultiplyNums.cbl">Download</a><br>
+        <a href="SubProg/Multiply/MultiplyNums.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Fickle.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Fickle is a sub-program called 
+      from DriverProg.cbl above. Fickle is a program that demonstrates State Memory. 
+      Each time the program is called it remembers its state from the previous 
+      call.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Calling external sub-programs, LINKAGE 
+        SECTION, EXIT PROGRAM</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/Multiply/Fickle.cbl">Download<br>
+        </a><a href="SubProg/Multiply/Fickle.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">Steadfast.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">Steadfast is a sub-program called 
+      from DriverProg.cbl above. Steadfast is identical to Fickle except that 
+      it uses the IS INITIAL phrase to avoid State Memory.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Calling external sub-programs, IS INITIAL, 
+        LINKAGE SECTION, EXIT PROGRAM</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/Multiply/Steadfast.cbl">Download</a><br>
+        <a href="SubProg/Multiply/Steadfast.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">DateDriver.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">A driver program for the date 
+      validation sub-program below. Accepts a date from the user, passes it to 
+      the date validation sub-program and interprets and displays the result.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">External sub-programs, CALL, ACCEPT, 
+        DISPLAY, EVALUATE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/DateValid/DateDriver.cbl">Download</a><br>
+        <a href="SubProg/DateValid/DateDriver.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">ValiDate.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">A date validation sub-program. 
+      Takes a date parameter in the form DDMMYYYY and returns a code indicating 
+      if the date was valid or not. If not valid, the code indicates why the date 
+      was not valid (e.g. day to great for month).</font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">External sub-programs, IS INITIAL, LINKAGE 
+        SECTION, EVALUATE, IF..ELSE, DIVIDE..REMAINDER, SET ConditionName, EXIT 
+        PROGRAM<BR>
+        &nbsp; </font><FONT size="-1"></FONT><font size="-1"> </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/DateValid/ValiDate.cbl">Download</a><br>
+        <a href="SubProg/DateValid/ValiDate.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">DayDiffDriver.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">A driver program that accepts 
+      two dates from the user and displays the difference in days between them. 
+      This program uses the <a href="SubProg/DateValid/ValiDate.cbl">ValiDate.cbl</a> 
+      sub-program above and also contains a number of contained sub-programs.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">CALL, LINKAGE SECTION, Contained Sub-Programs, 
+        External Sub-Programs, Intrinsic Functions, EXIT PROGRAM, END PROGRAM, 
+        FUNCTION INTEGER-OF-DATE<BR>
+        &nbsp; </font><FONT size="-1"></FONT><font size="-1"> </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="SubProg/DayDiff/DayDiffDriver.cbl">Download</a><br>
+        <a href="SubProg/DayDiff/DayDiffDriver.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135" height="157"> 
+      <DIV align="center">ACME99.cbl</DIV>
+    </td>
+    <td width="298" align="left" height="157"> 
+      <P><FONT size="-1">Exam paper model answer. A program is required which 
+        will process the Stock and Manufacturer files to create an Orders file 
+        containing ordering information for all the parts that need to be re-ordered 
+        (i.e. where the QtyInStock is less than the ReorderLevel). For EU countries 
+        only, the COSTOFITEMS and POSTAGE fields of each Orders file record must 
+        be calculated. The Postage rate is obtained by calling an existing program.<BR>
+        Read the<A href="../exercises/Exm-AcmeStockReorder/Exm-AcmeStockReorder.htm"> 
+        program specification</A> first. The required data files may be downloaded 
+        from there.<BR>
+        &nbsp; </FONT><FONT size="-1"></FONT><FONT size="-1"> </FONT></P>
+    </td>
+    <td width="189" height="157"> 
+      <DIV align="center"><FONT size="-1">Indexed files, Relative Files, SubPrograms, 
+        CALL..USING, READ, WRITE, REWRITE, Condition Names (level 88s), EVALUATE, 
+        UNSTRING, MULTIPLY..ON SIZE ERROR</FONT></DIV>
+    </td>
+    <td width="71" height="157"> 
+      <DIV align="center"><A href="../exercises/Exm-AcmeStockReorder/Acme99.CBL">Download</A><BR>
+        <A href="../exercises/Exm-AcmeStockReorder/Prg-AcmeStockReorder.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td width="135" height="157">
+      <DIV align="center">SFbyMail.cbl</DIV>
+    </td>
+    <td width="298" align="left" height="157"><FONT size="-1">Exam paper model 
+      answer.</FONT> <FONT size="-1">A program is required to apply the Orders 
+      file (containing customer orders) to the indexed Book Stock file and to 
+      produce the Processed Orders file.<BR>
+      Read the<A href="../exercises/Exm-SFbyMail/Exm-SFbyMai.htm"> program specification</A> 
+      first. The required data files may be downloaded from there. <BR>
+      </FONT></td>
+    <td width="189" height="157">
+      <DIV align="center"><FONT size="-1">CALL, subprograms, Sequential files, 
+        Indexed files, READ, WRITE, REWRITE, COMPUTE, UNSTRING</FONT></DIV>
+    </td>
+    <td width="71" height="157">
+      <DIV align="center"><A href="../exercises/Exm-SFbyMail/sfbymail.cbl">Download</A><BR>
+        <A href="../exercises/Exm-SFbyMail/Prg-SFbyMail.htm">View</A></DIV>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">String handling<a name="Strings"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">RefMod.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">Solves a number of string handling 
+      tasks such as : - Extracting a substring from a string given the start position 
+      and length of the substring. <br>
+      Extracting the first x number of chars from a string.<br>
+      Extracting the last x number of chars from a string.<br>
+      Removing trailing blanks from a string. <br>
+      Removing leading blanks from a string. <br>
+      Finding the location of the first occurrence of any of a substring's chars 
+      in a string</font><BR>
+      &nbsp; </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Reference Modification, INSPECT, Intrinsic 
+        Functions, FUNCTION REVERSE </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Strings/RefMod.cbl">Download</a><br>
+        <a href="Strings/RefMod.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">UnstringFileEg.cbl</div>
+    </td>
+    <td width="298" align="left"> <font size="-1">An example showing the unpacking 
+      of comma separated records and the size validation of the unpacked fields.<br>
+      To test this program use the data file <a href="/cobol/examples/Strings/varlen.dat">VarLen.dat</a>.<BR>
+      &nbsp; </font> </td>
+    <td width="189"> 
+      <div align="center"><font size="-1">UNSTRING, Reference Modification, IF, 
+        Condition Names, Sequential files </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="Strings/UnstringFileEg.cbl">Download</a><br>
+        <a href="Strings/UnstringFileEg.htm">View</a></div>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td width="135" height="154"> 
+      <DIV align="center">FileConv.Cbl</DIV>
+    </td>
+    <td width="298" align="left" height="154"><FONT size="-1">Exam paper model 
+      answer. A program is required to convert the unsorted Client-Names file 
+      of free-format, variable length, records into a sorted file of fixed length 
+      records. The sorted file must be sorted into ascending Client-Name within 
+      ascending County-Name. In addition to converting and sorting the file, the 
+      program must ensure that the county name is valid and must convert it to 
+      a county number.<BR>
+      Read the<A href="../exercises/Exm-FileConversion/Exm-FileConversion.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there. <BR>
+      </FONT>&nbsp; &nbsp; </td>
+    <td width="189" height="154"> 
+      <DIV align="center"><FONT size="-1">Sequential files, SORT with Input Procedure, 
+        Pre-Defined Table of values, STRING, UNSTRING, INSPECT, SEARCH ALL </FONT></DIV>
+    </td>
+    <td width="71" height="154"> 
+      <DIV align="center"><A href="../exercises/Exm-FileConversion/FileConv.cbl">Download</A><BR>
+        <A href="../exercises/Exm-FileConversion/Prg-FileConversion.htm">View</A></DIV>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">The COBOL Report Writer<a name="Reports"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">RepWriteA.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">A simplified version of RepWriteFull.cbl 
+      using only one control break.<br>
+      All four of these Report Writer programs use the <a href="/COBOL/Examples/ReportWriter/GBSALES.DAT.dat">GBsales.dat</a> 
+      data file.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Report Writer, Report Section, INITIATE, 
+        GENERATE, TERMINATE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="ReportWriter/RepWriteA.cbl">Download<br>
+        </a><a href="ReportWriter/RepWriteA.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">RepWriteB.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">A simplified version of RepWriteFull.cbl 
+      containing all the control breaks but not using Declaratives.<br>
+      All four of these Report Writer programs use the <a href="/COBOL/Examples/ReportWriter/GBSALES.DAT.dat">GBsales.dat</a> 
+      data file.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Report Writer, Report Section, INITIATE, 
+        GENERATE, TERMINATE</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="ReportWriter/RepWriteB.cbl">Download</a><br>
+        <a href="ReportWriter/RepWriteB.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">RepWriteFull.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">The full version of the report 
+      program containing all the control breaks and using Declaratives to calculate 
+      the salesperson salary and commission.<br>
+      All four of these Report Writer programs use the <a href="/COBOL/Examples/ReportWriter/GBSALES.DAT.dat">GBsales.dat</a> 
+      data file.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Report Writer, Report Section, INITIATE, 
+        GENERATE, TERMINATE, Declaratives, USE BEFORE REPORTING </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="ReportWriter/RepWriteFull.cbl">Download</a><br>
+        <a href="ReportWriter/RepWriteFull.htm">View</a></div>
+      </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">RepWriteSumm.cbl</div>
+    </td>
+    <td width="298" align="left"><font size="-1">The summary version of the full 
+      report program containing all the control breaks and using Declaratives 
+      to calculate the salesperson salary and commission.<br>
+      All four of these Report Writer programs use the <a href="/COBOL/Examples/ReportWriter/GBSALES.DAT.dat">GBsales.dat</a> 
+      data file.<BR>
+      &nbsp; </font></td>
+    <td width="189"> 
+      <div align="center"><font size="-1">Report Writer, Report Section, INITIATE, 
+        GENERATE, TERMINATE, Declaratives, USE BEFORE REPORTING </font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"><a href="ReportWriter/RepWriteSumm.cbl">Download</a><br>
+        <a href="ReportWriter/RepWriteSumm.htm">View</a></div>
+      </td>
+  </tr>
+</table>
+
+<table width="725" border="0">
+  <tr> 
+    <td> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0" bordercolorlight="#FFFFFF">
+  <tr valign="top" bgcolor="#990000"> 
+    <td colspan="4"> 
+      <h2 align="center"><b><font color="#FFFF00">COBOL Tables<a name="Tables"></a></font></b></h2>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <p align="center"><b>Program Name</b></p>
+    </td>
+    <td width="298" align="left"> 
+      <p align="center"><b>Description</b></p>
+    </td>
+    <td width="189"> 
+      <p align="center"><b>Major constructs</b></p>
+    </td>
+    <td width="71"> 
+      <p align="center"><b>Action</b></p>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <div align="center">MonthTable.cbl</div>
+    </td>
+    <td width="298" align="left"> 
+      <p><font size="-1">This program counts the number of students born in each 
+        month and displays the result.<br>
+        The program uses a pre-filled table of month names.<br>
+        This program is the solution to one of the programming exercises.<BR>
+        Read the<A href="/cobol/exercises/MonthTable.htm"> program specification</A> 
+        first.<BR>
+        &nbsp; </font></p>
+    </td>
+    <td width="189"> 
+      <div align="center"><font size="-1"> Pre-Filled Tables, Sequential files, 
+        PERFORM..VARYING, PERFORM..UNTIL</font></div>
+    </td>
+    <td width="71"> 
+      <div align="center"> 
+        <p><A href="ftp://www.csis.ul.ie/cobol/exercises/MonthTable.cbl">Download</A><BR>
+          <a href="/cobol/examples/Tables/MonthTable.htm">View</a></p>
+      </div>
+    </td>
+  </tr>
+  <tr valign="top"> 
+    <td width="135"> 
+      <DIV align="center">FlyByNight.cbl</DIV>
+    </td>
+    <td width="298" align="left"><FONT size="-1">Exam paper model answer. A program 
+      is required which will read the Booking Master file to produce a Summary 
+      file sequenced upon ascending Destination-Name. <BR>
+      Read the<A href="../exercises/Exm-FlyByNightTravel/Exm-FlyByNight.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there.<BR>
+      &nbsp; <BR>
+      </FONT></td>
+    <td width="189">
+      <DIV align="center"><FONT size="-1">Pre-Filled Tables, Sequential Files, 
+        SORT with Input Procedure, SEARCH, INSPECT</FONT></DIV>
+    </td>
+    <td width="71"> 
+      <DIV align="center"><A href="../exercises/Exm-FlyByNightTravel/FlyByNight.CBL">Download</A><BR>
+        <A href="../exercises/Exm-FlyByNightTravel/Prg-FlyByNight.htm">View</A></DIV>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td width="135">
+      <DIV align="center">USSRship.cbl</DIV>
+    </td>
+    <td width="298" align="left"><FONT size="-1">Exam paper model answer. A program 
+      is required to produce a report detailing the major vessels (Vessels of 
+      tonnage 3,500 or greater and all submarines) in each of oceans and major 
+      seas of the world.</FONT> <FONT size="-1"><BR>
+      Read the<A href="../exercises/Exm-FlyByNightTravel/Exm-FlyByNight.htm"> 
+      program specification</A> first. The required data files may be downloaded 
+      from there.</FONT><BR>
+      <FONT size="-1">&nbsp; </FONT> <BR>
+    </td>
+    <td width="189">
+      <DIV align="center"><FONT size="-1">Sequential files, SORT with Input Procedure, 
+        Print Files, Pre-defined tables, Condition Names</FONT></DIV>
+    </td>
+    <td width="71">
+      <DIV align="center"><A href="../exercises/Exm-USSRshipRpt/USSRSHIP.CBL">Download</A><BR>
+        <A href="../exercises/Exm-USSRshipRpt/Prg-USSRshipRpt.htm">View</A></DIV>
+    </td>
+  </tr>
+</table>
+<table width="725" border="0">
+  <tr> 
+    <td height="2"> 
+      <div align="center"><a href="#pagetop"><img src="/pics/i-pagetop.gif" width="132" height="38" border="0"></a></div>
+    </td>
+  </tr>
+</table>
+<p align="center">&nbsp;</p>
+<HR>
+<TABLE CELLSPACING=0 CELLPADDING=0 COLS=3 WIDTH="200" ><TR ALIGN=CENTER VALIGN=TOP>
+<TD> <A HREF="http://www.csis.ul.ie/currentstudents"><IMG SRC="/pics/B-BackArrow.gif" ALT="Back to Student Resources" BORDER=0 HEIGHT=52 WIDTH=52></A> 
+      <FONT SIZE=-2>To Student Resources</FONT></TD>
+    <TD><A HREF="http://www.csis.ul.ie/"><IMG SRC="/pics/B-Evaluation.gif" ALT="Please fill out our evaluation form" BORDER=0 HEIGHT=52 WIDTH=52></A> 
+      <FONT SIZE=-2>Evaluation Form</FONT></TD>
+    <TD><A HREF="http://www.csis.ul.ie/"><IMG SRC="/pics/B-WebSearch.gif" ALT="Search the CSIS Web Site" BORDER=0 HEIGHT=52 WIDTH=52></A> 
+      <FONT SIZE=-2>Search CSIS Web Site</FONT></TD>
+    <TD> 
+
+<CENTER>
+<FORM>
+          Selectable Site Contents 
+          <SELECT name="list">
+            <OPTION value="http://www.ul.ie/">University of Limerick Home Page</OPTION>
+            <!--<OPTION value="http://www.ul.ie/~informat/">College of I&amp;E Home 
+            Page</OPTION>-->
+            <OPTION value="http://www.csis.ul.ie/">CSIS Home Page</OPTION>
+            <OPTION value="http://www.csis.ul.ie/undergraduate">Undergraduate - Prospective Students</OPTION>
+            <OPTION value="http://www.csis.ul.ie/postgraduate">Postgraduate - Prospective Students</OPTION>            
+            <OPTION value="http://www.csis.ul.ie/currentstudents">Current Students</OPTION>
+            <OPTION value="http://www.csis.ul.ie/research">Research</OPTION>
+            <OPTION value="http://www.csis.ul.ie/csis_staff">Staff</OPTION>
+          <!--  <OPTION value="http://www.csis.ul.ie/CompSys.HTM">...Computer Systems 
+            Degree</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GradDip.HTM">...Graduate Diploma 
+            in Computing</OPTION>
+            <OPTION value="http://www.csis.ul.ie/software_localisation/default.htm">...Graduate 
+            Diploma/MSc in Software Localisation</OPTION>
+            <OPTION value="http://www.csis.ul.ie/ccmcm/default.htm">...MSc in 
+            Music Technology</OPTION>
+            <OPTION value="http://www.csis.ul.ie/soft_re_eng.html/default.htm">...MSc 
+            in Software Reengineering</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Directory/Staff.HTM">Department 
+            Personnel</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Directory/phone.HTM">...CSIS 
+            Telephone Directory</OPTION>
+            <OPTION value="http://www.ul.ie/ITD/PhoneBook.html">...UL Internal 
+            Telephone Directory</OPTION>-->
+            <!--
+            <OPTION value="http://www.csis.ul.ie/Research/ResearchCntr.HTM">...Research 
+            Centres</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Research/ResearchPrj.HTM">...Research 
+            Projects</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Research/RsrchPubs.htm">...Research 
+            Publications</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Research/techrpts.htm">...Technical 
+            Reports</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Research/PhdTheses.htm">...Ph.D 
+            Theses</OPTION>
+            <OPTION value="http://www.csis.ul.ie/Research/masters.htm">...M.Sc. 
+            Theses</OPTION>
+            <OPTION value="http://www.csis.ul.ie/StudentResources.HTM">Student 
+            Resources</OPTION>
+            <OPTION value="http://www.csis.ul.ie/photoalbum/classes/namesonly.htm">...Computer 
+            Systems Graduated Classes </OPTION>
+            <OPTION value="http://www.csis.ul.ie/staff/norahpower/FYPSuggestions9798.htm">...Final 
+            Year Project suggestions</OPTION>
+            <OPTION value="http://www.csis.ul.ie/fyp97/index.html">...Final Year 
+            Projects web page</OPTION>
+            <OPTION value="http://www.csis.ul.ie/studentresources/schedules/csislabs.htm">...Lab 
+            Schedules</OPTION>
+            <OPTION value="http://www.csis.ul.ie/studentresources/ModuleMaterial.htm">...Module 
+            Materials</OPTION>
+            <OPTION value="http://www.csis.ul.ie/studentresources/links.htm">...Useful 
+            Links</OPTION>
+            <OPTION value="http://www.csis.ul.ie/StudentResources/fyproj.htm">...Completed 
+            Final Year Projects</OPTION>
+            <OPTION value="http://www.csis.ul.ie/meetings/Meetings.HTM">Meetings</OPTION>
+            <OPTION value="http://www.csis.ul.ie/PhotoAlbum/Album.htm">Photo Album</OPTION>
+            <OPTION value="http://www.csis.ul.ie/PhotoAlbum/classes/default.htm">...Computer 
+            Systems - Class Photos</OPTION>
+            <OPTION value="http://www.csis.ul.ie/PhotoAlbum/schuman/schuin.htm">...Schuman 
+            Interior</OPTION>
+            <OPTION value="http://www.csis.ul.ie/PhotoAlbum/schuman/schuout.htm">...Schuman 
+            Environs</OPTION>
+            <OPTION value="http://www.csis.ul.ie/PhotoAlbum/ULgrounds/default.htm">...University 
+            Grounds</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GenInfo.HTM">General Information</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GenInfo.HTM#Department">...Department 
+            Information</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GenInfo.HTM#Getting">...Getting 
+            Around</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GenInfo.HTM#Contacting">...Contacting 
+            the department</OPTION>
+            <OPTION value="http://www.csis.ul.ie/TOYS/WHOSON.HTM">...Who's on 
+            the server</OPTION>
+            <OPTION value="http://www.csis.ul.ie/GenInfo.HTM#About">...About these 
+            pages</OPTION>-->
+          </SELECT>
+          <INPUT TYPE=BUTTON VALUE="Go!" 
+onClick="top.location.href=this.form.list.options[this.form.list.selectedIndex].value">
+        </FORM><P></P>
+</CENTER>
+
+</TD>
+</TR>
+</TABLE>
+
+<HR>
+<I><FONT SIZE=-1>Last updated : June 2002</FONT></I> <BR>
+<FONT SIZE=-1><A HREF="mailto:michael.coughlan@ul.ie">e-mail : CSISwebeditor@ul.ie</A></FONT>
+</BODY>
+</HTML>

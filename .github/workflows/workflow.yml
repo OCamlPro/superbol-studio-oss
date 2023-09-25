@@ -18,9 +18,14 @@ jobs:
           - ubuntu-latest
           - macos-latest
         ocaml-compiler:
-          - 4.13.0
+          - 4.14.1
         skip_test:
           - false
+
+        include:
+          - os: ubuntu-latest
+            ocaml-compiler: 4.14.0
+            skip_test: true
 
 
     runs-on: ${{ matrix.os }}
@@ -56,7 +61,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_ast cobol_indent cobol_preproc cobol_data cobol_typeck
+      - run: opam depext -y superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-package-json vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_ast cobol_indent cobol_preproc cobol_data cobol_typeck superbol_testutils
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test
@@ -92,10 +97,10 @@ jobs:
       - name: test source is well formatted
         run: make fmt
         continue-on-error: true
-        if: matrix.ocaml-compiler == '4.13.0' && matrix.os == 'ubuntu-latest'
+        if: matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
 
       - name: build-doc
-        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.13.0' && matrix.os == 'ubuntu-latest'
+        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
         run: |
              sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme
              opam install -y dune odoc
@@ -106,7 +111,7 @@ jobs:
 
       - name: deploy-doc
         uses: JamesIves/github-pages-deploy-action@3.6.2
-        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.13.0' && matrix.os == 'ubuntu-latest'
+        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages

@@ -1,0 +1,31 @@
+; if you modify this file, add 'test' to the 'skip' field in drom.toml
+
+(executable
+ (name preproc)
+ (modules Preproc)
+ (libraries cobol_preproc)
+ )
+
+(executable
+ (name gnucobol)
+ (modules Gnucobol)
+ (libraries autofonce_lib superbol_testutils cobol_parser)
+ )
+
+(alias
+ (name buildtest)
+ (deps preproc.exe gnucobol.exe))
+
+(rule
+ (with-stdout-to
+  preproc.output
+  ; (setenv COB_CONFIG_DIR "%{env:PWD=.}/%{project_root}/import/gnucobol/config"
+  (setenv COB_CONFIG_DIR "%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config"
+   (run %{exe:preproc.exe}))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff preproc.expected preproc.output)))
+
+(include gnucobol-tests.inc)
