@@ -28,5 +28,6 @@ ATTIC
 !.vscode/launch.json
 *.vsix
 *.opam.locked
+/emacs/lsp-superbol-customs.el
 
 
