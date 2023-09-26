@@ -11,12 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 open Cobol_ast
 open Types
 
-module StringSet = Cobol_common.Basics.StringSet
-module StringMap = Cobol_common.Basics.StringMap
-module CharSet = Cobol_common.Basics.CharSet
 module FATAL = Cobol_common.Diagnostics.Fatal
 
 (*FIXME: Quite a bit of rework for c translation and analysis alike *)
@@ -81,7 +79,7 @@ module PROG_ENV = struct
     { name: name;
       parent_prog: t option;
       data_items: DATA_ITEM.t Qualmap.t;
-      currency_signs: CharSet.t;
+      currency_signs: Cobol_common.Basics.CharSet.t;
       decimal_point: char;
       using_items: NameSet.t; }
 
@@ -91,7 +89,7 @@ module PROG_ENV = struct
         { name = name;
           parent_prog = None;
           data_items = Qualmap.empty;
-          currency_signs = CharSet.empty;
+          currency_signs = Cobol_common.Basics.CharSet.empty;
           decimal_point = '.';
           using_items = NameSet.empty }
     | Some parent ->

@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Basics
+open EzCompat
 
 include Types
 

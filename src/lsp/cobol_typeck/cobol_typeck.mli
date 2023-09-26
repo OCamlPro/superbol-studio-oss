@@ -12,7 +12,6 @@
 (**************************************************************************)
 
 module DIAGS = Cobol_common.Diagnostics
-module StrMap = Cobol_common.Basics.StrMap
 module Visitor = Cobol_common.Visitor
 module PTree_visitor = Cobol_parser.PTree_visitor
 module CUs = Cobol_data.Compilation_unit.SET

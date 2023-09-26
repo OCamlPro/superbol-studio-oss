@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Basics
+open EzCompat
 
 module FATAL = Cobol_common.Diagnostics.Fatal
 

@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Basics
+open EzCompat
 
 (** This functor is used to build a config ({! Types.T}) module from a file *)
 module Make

@@ -11,9 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common
-open Cobol_common.Basics
-(* open Cobol_common.Srcloc.TYPES *)
+open EzCompat
+
+open Cobol_common                                                  (* Visitor *)
 open Cobol_common.Srcloc.INFIX
 
 open Lsp_completion_keywords

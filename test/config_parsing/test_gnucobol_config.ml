@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
+
 let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found -> ".";;
 let confdir = Filename.concat srcdir "import/gnucobol/config";;
 Unix.putenv "COB_CONFIG_DIR" confdir;;
@@ -27,8 +29,6 @@ module Parsed_conf =
 module MF_conf =
   (val Cobol_config.from_dialect (module Diags) ~strict:true
       Cobol_config.DIALECT.MicroFocus)
-
-open Cobol_common.Basics
 
 let both_diff s1 s2 =
   StringSet.union

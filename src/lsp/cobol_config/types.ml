@@ -13,6 +13,7 @@
 
 (** Module containing most of the types definitions used in {!Cobol_config}. *)
 
+open EzCompat
 open Cobol_common.Diagnostics.TYPES
 
 module DIAGS = Cobol_common.Diagnostics
@@ -363,9 +364,9 @@ module type COMP_OPTS = sig
 
   (* reserved words *)
   val words: words_spec
-  val intrinsic_functions: Cobol_common.Basics.StringSet.t
-  val system_names: Cobol_common.Basics.StringSet.t
-  val registers: Cobol_common.Basics.StringSet.t
+  val intrinsic_functions: StringSet.t
+  val system_names: StringSet.t
+  val registers: StringSet.t
 
   (* int options *)
   val text_column: int valued_option

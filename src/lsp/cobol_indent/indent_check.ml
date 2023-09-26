@@ -11,8 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
+
 open Cobol_common.Srcloc
-open Cobol_common.Basics
 
 open Indent_type
 open Indent_keywords
