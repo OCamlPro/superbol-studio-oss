@@ -19,6 +19,7 @@ let version = "2.0.0"
 type 'a string_or =
   | String of string
   | Or of 'a
+[@@deriving show]
 
 let string_or_enc encoding =
   let open Json_encoding in
@@ -57,7 +58,7 @@ type runOptions = {
    *)
   runOn :  string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type problemPattern = {
   (**
@@ -138,7 +139,7 @@ type problemPattern = {
    *)
   loop :  bool option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 (**
@@ -162,7 +163,7 @@ type backgroundMatcher = {
    *)
   endsPattern :  string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 (**
@@ -229,7 +230,7 @@ type problemMatcher = {
    *)
   background :  backgroundMatcher option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 type presentationOptions = {
@@ -277,13 +278,13 @@ type presentationOptions = {
    *)
   group :  string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type groupDescription = {
     kind : string option ; (* 'build' | 'test' *)
     isDefault : bool
     }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 (**
@@ -293,7 +294,7 @@ type taskDescription = {
   (**
    * The task's name
    *)
-  label : string;
+  label : string option;
 
   (**
    * The type of a custom task. Tasks of type "shell" are executed
@@ -344,7 +345,7 @@ type taskDescription = {
   dependsOn : string Manifest.list_or_one ; [@dft []]
   dependsOrder : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 type shellDescription = {
@@ -359,7 +360,7 @@ type shellDescription = {
      *)
     args :  string list ; [@dft []]
   }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 (**
  * Options to be passed to the external program or shell
@@ -382,7 +383,7 @@ type commandOptions = {
    *)
   shell: shellDescription option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type baseTaskConfiguration = {
   (**
@@ -428,9 +429,9 @@ type baseTaskConfiguration = {
    * The configuration of the available tasks. A tasks.json file can either
    * contain a global problemMatcher property or a tasks property but not both.
    *)
-  (* TODO tasks: taskDescription list; [@dft []] *)
+  tasks: taskDescription list; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type taskConfiguration = {
   base : baseTaskConfiguration ; [@merge]
@@ -454,6 +455,7 @@ type taskConfiguration = {
    *)
   linux: baseTaskConfiguration option;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let encoding = taskConfiguration_enc
+let pp = pp_taskConfiguration
