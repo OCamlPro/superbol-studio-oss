@@ -102,7 +102,7 @@ let folding_range_paragraph ast =
 (*TODO:
   Now we use the type Group.t (need to be rewritten),
   which does not work for renames-item, condition-item ... *)
-let folding_range_data ({cu_wss; _}:Cobol_data.Types.compilation_unit) =
+let folding_range_data ({ cu_wss; _ }:Cobol_data.Types.compilation_unit) =
   let update r group_range =
     match r with
     | None -> group_range
@@ -141,9 +141,13 @@ let folding_range_data ({cu_wss; _}:Cobol_data.Types.compilation_unit) =
     (fun acc group -> snd @@ add group acc) [] cu_wss
 
 
-let folding_range Lsp_document.TYPES.{ast; cus; _ }=
-  folding_range_paragraph ast @ folding_range_simple ast @
-  ( Cobol_data.Compilation_unit.SET.to_seq cus
+let folding_range ptree cus =
+  let folding_range_cus =
+    Cobol_data.Compilation_unit.SET.to_seq cus
     |> Seq.map (fun cu -> folding_range_data cu)
     |> List.of_seq
-    |> List.flatten)
+    |> List.flatten
+  in
+  folding_range_paragraph ptree @
+  folding_range_simple ptree @
+  folding_range_cus

@@ -47,4 +47,5 @@ let reply (_: ClientCapabilities.t) =
     ~documentFormattingProvider: (`Bool true)
     ~semanticTokensProvider:(`SemanticTokensOptions semtoks)
     ~hoverProvider:(`HoverOptions hover)
+    ~foldingRangeProvider:(`Bool true)
     (* ~completionProvider:completion_option *)

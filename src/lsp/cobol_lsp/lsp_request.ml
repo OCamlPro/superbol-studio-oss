@@ -268,12 +268,27 @@ let handle_hover registry (params: HoverParams.t) =
           None
     end
 
-let handle_completion registry (params:CompletionParams.t) =
+let handle_completion registry (params: CompletionParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:{ textdoc; _ } { ast; _ } ->
       let items = Lsp_completion.completion_items textdoc params.position ast in
       Some (`CompletionList (CompletionList.create ()
                                ~isIncomplete:false ~items))
+    end
+
+(*TODO(if necessary):
+    Now, the request folding has the default perfomance (in VS Code)
+    It only supports folding complete lines, and does
+    not support FoldingRangeKind or CollapsedText
+    (To support these features, need to change the client capability) *)
+let handle_folding_range registry (params: FoldingRangeParams.t) =
+  try_with_document_data registry params.textDocument
+    ~f:begin fun ~doc:_ { ast; cus; _ } ->
+      Some (List.map
+              (fun Lsp_folding.{startLine; endLine; _} ->
+                 FoldingRange.create ~startLine ~endLine ())
+              (Lsp_folding.folding_range ast cus)
+            )
     end
 
 let handle_shutdown registry =
@@ -308,10 +323,12 @@ let on_request
         Ok (handle_semtoks_full registry params, state)
     | SemanticTokensRange params ->
         Ok (handle_semtoks_range registry params, state)
-    | TextDocumentHover hover_params ->
-        Ok (handle_hover registry hover_params, state)
-    | TextDocumentCompletion completion_params ->
-        Ok (handle_completion registry completion_params, state)
+    | TextDocumentHover params ->
+        Ok (handle_hover registry params, state)
+    | TextDocumentCompletion params ->
+        Ok (handle_completion registry params, state)
+    | TextDocumentFoldingRange params ->
+        Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
@@ -330,7 +347,6 @@ let on_request
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
     | TextDocumentHighlight  (* DocumentHighlightParams.t.t *) _
-    | TextDocumentFoldingRange  (* FoldingRangeParams.t.t *) _
     | SignatureHelp  (* SignatureHelpParams.t.t *) _
     | CodeAction  (* CodeActionParams.t.t *) _
     | CodeActionResolve  (* CodeAction.t.t *) _
