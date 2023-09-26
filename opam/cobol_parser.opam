@@ -48,14 +48,13 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
-  "ppx_deriving" {>= "5.2.1"}
   "menhir" {>= "1.2"}
   "ez_file" {>= "0.3"}
   "ebcdic_lib" {= version}
   "cobol_preproc" {= version}
   "cobol_common" {= version}
   "cobol_ast" {= version}
-  "autofonce_lib" {>= "0.8"}
+  "ppx_deriving" {>= "5.2.1"}
   "menhir" {= "20230415"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

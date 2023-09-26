@@ -36,7 +36,13 @@ compile-release:
 
 opam-cross:
 	drom dep --cross osx
+	rm -f opam/osx/*-js-*.opam
+	rm -f opam/osx/vscode-debug*.opam
+	rm -f opam/osx/*-vscode-*.opam
 	drom dep --cross windows
+	rm -f opam/windows/*-js-*.opam
+	rm -f opam/windows/vscode-debug*.opam
+	rm -f opam/windows/*-vscode-*.opam
 
 # emacs-lsp:
 emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json

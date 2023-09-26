@@ -49,8 +49,8 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
   "pretty" {= version}
-  "ppx_deriving" {>= "5.2.1"}
   "ocplib_stuff" {>= "0.4.0" & < "1.0.0"}
+  "ppx_deriving" {>= "5.2.1"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}

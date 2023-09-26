@@ -47,7 +47,7 @@ case "$1" in
     linux)
         case $(. /etc/os-release && echo $ID) in
             alpine)
-                COMMON_LIBS="bigstringaf_stubs cstruct_stubs camlstr unix c"
+                COMMON_LIBS="!(static-alpine-clibs) camlstr unix c"
                 # `m` and `pthread` are built-in musl
                 echo2 '(-noautolink'
                 echo2 ' -cclib -Wl,-Bstatic'
@@ -63,7 +63,7 @@ case "$1" in
         esac
         ;;
     macosx)
-        COMMON_LIBS=" unix"
+        COMMON_LIBS="!(static-macos-clibs) unix"
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
         for l in $COMMON_LIBS; do

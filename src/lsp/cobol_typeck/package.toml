@@ -57,11 +57,10 @@ cobol_ast = "version"
 cobol_common = "version"
 cobol_data = "version"
 cobol_parser = "version"
-ppx_deriving = ">=5.2.1"
 
 # package tools dependencies
 [tools]
-# ...
+ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:

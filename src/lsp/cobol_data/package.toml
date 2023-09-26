@@ -55,12 +55,11 @@ skip = ["index.mld"]
 [dependencies]
 cobol_ast = "version"
 cobol_parser = "version"
-ppx_deriving = ">=5.2.1"
-alcotest = { version = "1", for-test = true }
 
 # package tools dependencies
 [tools]
-# ...
+ppx_deriving = ">=5.2.1"
+alcotest = { version = "1", for-test = true }
 
 # package fields (depends on package skeleton)
 #Examples:

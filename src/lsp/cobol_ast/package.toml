@@ -54,11 +54,10 @@ skip = ["index.mld"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-ppx_deriving = ">=5.2.1"
 
 # package tools dependencies
 [tools]
-# ...
+ppx_deriving = ">=5.2.1"
 
 # package fields (depends on package skeleton)
 #Examples:

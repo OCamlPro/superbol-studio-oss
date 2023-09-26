@@ -8,7 +8,8 @@
   (flags (:standard (:include linking.sexp)))
   ; use field 'dune-stanzas' to add more stanzas here
   (preprocess (pps ppx_deriving_encoding))
-  
+   (enabled_if (= %{context_name} "default"))
+
   )
 
 ; Use `static-clibs` to specify static C libs (without lib prefix)
