@@ -284,11 +284,8 @@ let handle_completion registry (params: CompletionParams.t) =
 let handle_folding_range registry (params: FoldingRangeParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:_ { ast; cus; _ } ->
-      Some (List.map
-              (fun Lsp_folding.{startLine; endLine; _} ->
-                 FoldingRange.create ~startLine ~endLine ())
-              (Lsp_folding.folding_range ast cus)
-            )
+      let filename = Lsp.Uri.to_path params.textDocument.uri in
+      Some (Lsp_folding.ranges_in ~filename ast cus)
     end
 
 let handle_shutdown registry =
