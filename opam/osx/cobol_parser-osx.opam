@@ -56,7 +56,6 @@ depends: [
   "cobol_preproc-osx" {= version}
   "cobol_common-osx" {= version}
   "cobol_ast-osx" {= version}
-  "autofonce_lib-osx" {>= "0.8" with-test}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {= "20230415"}
   "ppx_inline_test" {with-test}

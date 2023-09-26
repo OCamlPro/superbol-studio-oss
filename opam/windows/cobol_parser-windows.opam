@@ -56,7 +56,6 @@ depends: [
   "cobol_preproc-windows" {= version}
   "cobol_common-windows" {= version}
   "cobol_ast-windows" {= version}
-  "autofonce_lib-windows" {>= "0.8" with-test}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {= "20230415"}
   "ppx_inline_test" {with-test}
