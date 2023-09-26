@@ -307,7 +307,7 @@ struct
             Visitor.do_children_and_then acc (fun (_, progs) -> parents, progs)
 
       (* skip some divisions *)
-      method! fold_environment_division _ = Visitor.skip
+      method! fold_environment_division' _ = Visitor.skip
       method! fold_data_division' _ = Visitor.skip
       method! fold_procedure_division' _ = Visitor.skip
     end in

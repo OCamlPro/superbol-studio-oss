@@ -565,27 +565,22 @@ module Data_division (Data_sections: Abstract.DATA_SECTIONS) = struct
 
   type data_division =
     {
-      file_section: file_section option;
-      working_storage_section: working_storage_section option;
-      linkage_section: linkage_section option;
-      communication_section: communication_section option;
-      local_storage_section: local_storage_section option;
-      report_section: report_section option;
-      screen_section: screen_section option;
+      file_section: file_section with_loc option;
+      working_storage_section: working_storage_section with_loc option;
+      linkage_section: linkage_section with_loc option;
+      communication_section: communication_section with_loc option;
+      local_storage_section: local_storage_section with_loc option;
+      report_section: report_section with_loc option;
+      screen_section: screen_section with_loc option;
     }
   [@@deriving ord]
 
-  let pp_data_division ppf {
-      file_section;
-      working_storage_section;
-      linkage_section;
-      communication_section;
-      local_storage_section;
-      report_section;
-      screen_section;
-  } =
+  let pp_data_division ppf { file_section;
+                             working_storage_section; linkage_section;
+                             communication_section; local_storage_section;
+                             report_section; screen_section } =
     let pp_section pp ppf section =
-      Fmt.(option (sp ++ vbox pp)) ppf section
+      Fmt.(option (sp ++ vbox (pp_with_loc pp))) ppf section
     in
     Fmt.pf ppf "@[<v 2>DATA DIVISION.";
     pp_section pp_file_section ppf file_section;
@@ -813,7 +808,7 @@ struct
       program_name: name with_loc;
       program_as: strlit option;
       program_level: program_level;
-      program_options: options_paragraph option;
+      program_options: options_paragraph with_loc option;
       program_env: environment_division with_loc option;
       program_data: data_division with_loc option;
       program_proc: procedure_division with_loc option;
@@ -878,7 +873,7 @@ struct
       | ProgramPrototype -> Fmt.pf ppf "@ PROTOTYPE"
     );
     Fmt.pf ppf ".@]";
-    Fmt.(option (sp ++ pp_options_paragraph)) ppf program_options;
+    Fmt.(option (sp ++ pp_with_loc pp_options_paragraph)) ppf program_options;
     Fmt.(option (sp ++ pp_with_loc pp_environment_division)) ppf program_env;
     Fmt.(option (sp ++ pp_with_loc pp_data_division)) ppf program_data;
     Fmt.(option (sp ++ pp_with_loc pp_procedure_division)) ppf program_proc;
@@ -892,7 +887,7 @@ struct
       function_name: name with_loc;
       function_as: strlit option;
       function_is_proto: bool;
-      function_options: options_paragraph option;
+      function_options: options_paragraph with_loc option;
       function_env: environment_division with_loc option;
       function_data: data_division with_loc option;
       function_proc: procedure_division option;
@@ -926,7 +921,7 @@ struct
     pp_id_paragraph ~name:en "FUNCTION-ID" "FUNCTION" ppf
       Fmt.(sp ++ pp_function_id_paragraph ++ any ".") (n, fas, is_proto)
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const (pp_with_loc pp_data_division)) data;
         Option.map (const pp_procedure_division) proc;
@@ -938,7 +933,7 @@ struct
       method_kind: method_kind;
       method_override: bool;
       method_final: bool;
-      method_options: options_paragraph option;
+      method_options: options_paragraph with_loc option;
       method_env: environment_division with_loc option;
       method_data: data_division with_loc option;
       method_proc: procedure_division option;
@@ -967,7 +962,7 @@ struct
     pp_id_paragraph ~name:en "METHOD-ID" "METHOD" ppf
       Fmt.(sp ++ pp_method_id_paragraph ++ any ".") (n, k, o, f)
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const (pp_with_loc pp_data_division)) data;
         Option.map (const pp_procedure_division) proc;
@@ -976,7 +971,7 @@ struct
   type factory_definition = (* Note: could be merged with instance_definition *)
     {
       factory_implements: name with_loc list;
-      factory_options: options_paragraph option;
+      factory_options: options_paragraph with_loc option;
       factory_env: environment_division with_loc option;
       factory_data: data_division with_loc option;
       factory_methods: method_definition with_loc list option;
@@ -1001,7 +996,7 @@ struct
     pp_id_paragraph ~end_:true "FACTORY" "FACTORY" ppf
       pp_implements impl
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const (pp_with_loc pp_data_division)) data;
         Option.map (const pp_object_procedure_division) meths;
@@ -1010,7 +1005,7 @@ struct
   type instance_definition =
     {
       instance_implements: name with_loc list;
-      instance_options: options_paragraph option;
+      instance_options: options_paragraph with_loc option;
       instance_env: environment_division with_loc option;
       instance_data: data_division with_loc option;
       instance_methods: method_definition with_loc list option;
@@ -1024,7 +1019,7 @@ struct
     pp_id_paragraph ~end_:true "OBJECT" "OBJECT" ppf
       pp_implements impl
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const (pp_with_loc pp_data_division)) data;
         Option.map (const pp_object_procedure_division) meths;
@@ -1038,7 +1033,7 @@ struct
       class_final: bool;
       class_inherits: name with_loc list;
       class_usings: name with_loc list;
-      class_options: options_paragraph option;
+      class_options: options_paragraph with_loc option;
       class_env: environment_division with_loc option;
       class_factory: factory_definition option;
       class_instance: instance_definition option;
@@ -1064,7 +1059,7 @@ struct
     pp_id_paragraph ~name:en "CLASS-ID" "CLASS" ppf
       Fmt.(sp ++ pp_class_id_paragraph) (cn, cas, f, inh, us)
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const pp_factory_definition) fac;
         Option.map (const pp_instance_definition) inst;
@@ -1077,7 +1072,7 @@ struct
       interface_as: strlit option;
       interface_inherits: name with_loc list;
       interface_usings: name with_loc list;
-      interface_options: options_paragraph option;
+      interface_options: options_paragraph with_loc option;
       interface_env: environment_division with_loc option;
       interface_methods: method_definition with_loc list option;
       interface_end_name: name with_loc;
@@ -1105,7 +1100,7 @@ struct
     pp_id_paragraph ~name:en "INTERFACE-ID" "INTERFACE" ppf
       Fmt.(sp ++ pp_interface_id_paragraph ++ any ".") (n, a, inh, us)
       Fmt.[
-        Option.map (const pp_options_paragraph) opts;
+        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
         Option.map (const (pp_with_loc pp_environment_division)) env;
         Option.map (const pp_object_procedure_division) meths;
       ]

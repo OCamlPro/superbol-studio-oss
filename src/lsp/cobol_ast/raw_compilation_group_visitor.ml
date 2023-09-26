@@ -46,6 +46,8 @@ struct
     inherit ['a] Terms_visitor.folder
     inherit ['a] Misc_sections_visitor.folder
     inherit ['a] Data_division_visitor.folder
+    method fold_options_paragraph'       : (options_paragraph with_loc   , 'a) fold = default
+    method fold_environment_division'    : (environment_division with_loc, 'a) fold = default
     method fold_data_division'           : (data_division with_loc       , 'a) fold = default
     inherit ['a] Proc_division_visitor.folder
     method fold_procedure_division'      : (procedure_division with_loc  , 'a) fold = default
@@ -67,11 +69,16 @@ struct
   let todo    x = todo    __MODULE__ x
   let partial x = partial __MODULE__ x
 
-  let fold_options_paragraph_opt (v: _ #folder) =
-    fold_option ~fold:(fun v -> v#continue_with_options_paragraph) v
+  let fold_options_paragraph' (v: _ #folder) =
+    handle' v#fold_options_paragraph' v
+      ~fold:(fun v -> v#continue_with_options_paragraph)
+
+  let fold_options_paragraph'_opt (v: _ #folder) =
+    fold_option ~fold:fold_options_paragraph' v
 
   let fold_environment_division' (v: _ #folder) =
-    fold' ~fold:(fun v -> v#continue_with_environment_division) v
+    handle' v#fold_environment_division' v
+      ~fold:(fun v -> v#continue_with_environment_division)
 
   let fold_environment_division'_opt (v: _ #folder) =
     fold_option ~fold:fold_environment_division' v
@@ -99,7 +106,7 @@ struct
                             program_proc; program_end_name } x -> x
         >> fold_name' v program_name
         >> fold_strlit_opt v program_as
-        >> fold_options_paragraph_opt v program_options
+        >> fold_options_paragraph'_opt v program_options
         >> fold_environment_division'_opt v program_env
         >> fold_data_division'_opt v program_data
         >> (fun x -> match program_level with
@@ -126,7 +133,7 @@ struct
         >> fold_name' v function_name
         >> fold_strlit_opt v function_as
         >> fold_bool v function_is_proto                      (* XXX: useful? *)
-        >> fold_options_paragraph_opt v function_options
+        >> fold_options_paragraph'_opt v function_options
         >> fold_environment_division'_opt v function_env
         >> fold_data_division'_opt v function_data
         >> fold_procedure_division_opt v function_proc
@@ -153,7 +160,7 @@ struct
         >> fold_method_kind v method_kind
         >> fold_bool v method_override
         >> fold_bool v method_final
-        >> fold_options_paragraph_opt v method_options
+        >> fold_options_paragraph'_opt v method_options
         >> fold_environment_division'_opt v method_env
         >> fold_data_division'_opt v method_data
         >> fold_procedure_division_opt v method_proc
@@ -165,7 +172,7 @@ struct
       ~continue:begin fun { factory_implements; factory_options; factory_env;
                             factory_data; factory_methods } x -> x
         >> fold_name'_list v factory_implements
-        >> fold_options_paragraph_opt v factory_options
+        >> fold_options_paragraph'_opt v factory_options
         >> fold_environment_division'_opt v factory_env
         >> fold_data_division'_opt v factory_data
         >> fold_option v factory_methods
@@ -180,7 +187,7 @@ struct
         partial __LINE__ "fold_instance_definition" ();
         x
         >> fold_name'_list v instance_implements
-        >> fold_options_paragraph_opt v instance_options
+        >> fold_options_paragraph'_opt v instance_options
         >> fold_data_division'_opt v instance_data
         >> fold_option v instance_methods
           ~fold:(fold_with_loc_list ~fold:fold_method_definition)

@@ -1262,8 +1262,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_with_test_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_with_status_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_step_phrase_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_special_names_paragraph_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_source_computer_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_signedness_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_sign_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_sharing_phrase_ -> None
@@ -1271,7 +1269,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_s_delimited_by_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_returning_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_retry_phrase_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_repository_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_report_section_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_read_direction_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_raising_exception_ -> None
@@ -1309,33 +1306,36 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_BY_expression__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_AS_string_literal__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_perform_phrase_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_options_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_object_reference_kind_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_object_procedure_division_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_object_computer_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_name_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_lock_or_retry_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_locale_phrase_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_local_storage_section_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_upon__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_special_names_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_source_computer_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_repository_paragraph__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_program_procedure_division__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_procedure_division__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_options_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_object_computer_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_io_control_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_input_output_section__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_file_control_paragraph__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_environment_division__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_entry_name_clause__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_data_division__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_configuration_section__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_linkage_section_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_io_control_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_integer_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_instance_definition_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_input_output_section_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_identification_division_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_file_section_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_file_control_paragraph_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_expression_no_all_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_expands_phrase_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_endianness_mode_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_depending_phrase_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_configuration_section_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_communication_section_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_collating_sequence_phrase_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_close_format_ -> None
@@ -1493,8 +1493,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_with_test_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_with_status_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_step_phrase_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_special_names_paragraph_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_source_computer_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_signedness_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_sign_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_sharing_phrase_ -> raise Not_found
@@ -1502,7 +1500,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_s_delimited_by_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_returning_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_retry_phrase_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_repository_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_report_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_read_direction_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_raising_exception_ -> raise Not_found
@@ -1545,22 +1542,29 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_or__LINE_LINES__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_or__IS_ARE__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_or__AREA_AREAS__ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_options_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_object_reference_kind_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_object_procedure_division_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_object_computer_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_name_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_mr___anonymous_0__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_lock_or_retry_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_locale_phrase_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_local_storage_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_upon__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_special_names_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_source_computer_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_repository_paragraph__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_program_procedure_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_program_definition_no_end__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_procedure_division__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_options_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_object_computer_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_io_control_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_input_output_section__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_file_control_paragraph__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_environment_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_entry_name_clause__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_data_division__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_configuration_section__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_SECURITY__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_INSTALLATION__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_DATE_WRITTEN__ -> raise Not_found
@@ -1568,14 +1572,11 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_AUTHOR__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_linkage_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_limit_is__ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_io_control_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_io_control_entry_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_integer_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_instance_definition_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_input_output_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_identification_division_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_file_section_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_file_control_paragraph_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_expression_no_all_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_expands_phrase_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_endianness_mode_ -> raise Not_found
@@ -1584,7 +1585,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_default_display_clause_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_default_accept_clause_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_control_division_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_configuration_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_communication_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_collating_sequence_phrase_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_close_format_ -> raise Not_found
@@ -3220,10 +3220,10 @@ let can_pop (type a) : a terminal -> bool = function
 
 let recover =
   let r0 = [R 335] in
-  let r1 = R 1336 :: r0 in
+  let r1 = R 1334 :: r0 in
   let r2 = S (T T_PERIOD) :: r1 in
   let r3 = [R 396] in
-  let r4 = R 1397 :: r3 in
+  let r4 = R 1407 :: r3 in
   let r5 = [R 395] in
   let r6 = Sub (r4) :: r5 in
   let r7 = S (T T_PERIOD) :: r6 in
@@ -3237,7 +3237,7 @@ let recover =
   let r15 = Sub (r9) :: r14 in
   let r16 = [R 287] in
   let r17 = S (T T_EOF) :: r16 in
-  let r18 = R 1385 :: r17 in
+  let r18 = R 1389 :: r17 in
   let r19 = [R 664] in
   let r20 = S (T T_PERIOD) :: r19 in
   let r21 = [R 90] in
@@ -3256,7 +3256,7 @@ let recover =
   let r34 = S (N N_ro_procedure_division_) :: r33 in
   let r35 = S (N N_ro_loc_data_division__) :: r34 in
   let r36 = S (N N_ro_loc_environment_division__) :: r35 in
-  let r37 = S (N N_ro_options_paragraph_) :: r36 in
+  let r37 = S (N N_ro_loc_options_paragraph__) :: r36 in
   let r38 = [R 734] in
   let r39 = S (T T_PERIOD) :: r38 in
   let r40 = R 887 :: r39 in
@@ -3265,7 +3265,7 @@ let recover =
   let r43 = S (N N_name) :: r42 in
   let r44 = [R 2162] in
   let r45 = S (N N_figurative_constant) :: r44 in
-  let r46 = [R 1424] in
+  let r46 = [R 1430] in
   let r47 = [R 1131] in
   let r48 = S (T T_HIGH_VALUE) :: r47 in
   let r49 = [R 553] in
@@ -3331,14 +3331,14 @@ let recover =
   let r109 = Sub (r107) :: r108 in
   let r110 = [R 906] in
   let r111 = [R 479] in
-  let r112 = S (N N_ro_input_output_section_) :: r111 in
-  let r113 = S (N N_ro_configuration_section_) :: r112 in
+  let r112 = S (N N_ro_loc_input_output_section__) :: r111 in
+  let r113 = S (N N_ro_loc_configuration_section__) :: r112 in
   let r114 = S (T T_PERIOD) :: r113 in
   let r115 = [R 311] in
-  let r116 = S (N N_ro_repository_paragraph_) :: r115 in
-  let r117 = S (N N_ro_special_names_paragraph_) :: r116 in
-  let r118 = S (N N_ro_object_computer_paragraph_) :: r117 in
-  let r119 = S (N N_ro_source_computer_paragraph_) :: r118 in
+  let r116 = S (N N_ro_loc_repository_paragraph__) :: r115 in
+  let r117 = S (N N_ro_loc_special_names_paragraph__) :: r116 in
+  let r118 = S (N N_ro_loc_object_computer_paragraph__) :: r117 in
+  let r119 = S (N N_ro_loc_source_computer_paragraph__) :: r118 in
   let r120 = S (T T_PERIOD) :: r119 in
   let r121 = [R 2082] in
   let r122 = R 1248 :: r121 in
@@ -3392,7 +3392,7 @@ let recover =
   let r170 = S (N N_nel___anonymous_16_) :: r169 in
   let r171 = R 591 :: r170 in
   let r172 = [R 592] in
-  let r173 = [R 1436] in
+  let r173 = [R 1442] in
   let r174 = [R 732] in
   let r175 = S (N N_rnel_integer_) :: r174 in
   let r176 = [R 1003] in
@@ -3423,7 +3423,7 @@ let recover =
   let r201 = S (N N_ro_pf___anonymous_14_string_literal__) :: r200 in
   let r202 = Sub (r45) :: r201 in
   let r203 = R 1222 :: r202 in
-  let r204 = [R 1464] in
+  let r204 = [R 1470] in
   let r205 = Sub (r45) :: r204 in
   let r206 = S (T T_SYMBOL) :: r205 in
   let r207 = S (T T_PICTURE_STRING) :: r206 in
@@ -3439,7 +3439,7 @@ let recover =
   let r217 = [R 1001] in
   let r218 = [R 2174] in
   let r219 = S (N N_figurative_constant) :: r218 in
-  let r220 = [R 1452] in
+  let r220 = [R 1458] in
   let r221 = [R 2175] in
   let r222 = Sub (r52) :: r221 in
   let r223 = [R 220] in
@@ -3487,8 +3487,8 @@ let recover =
   let r265 = Sub (r22) :: r264 in
   let r266 = [R 1744] in
   let r267 = [R 720] in
-  let r268 = S (N N_ro_io_control_paragraph_) :: r267 in
-  let r269 = S (N N_ro_file_control_paragraph_) :: r268 in
+  let r268 = S (N N_ro_loc_io_control_paragraph__) :: r267 in
+  let r269 = S (N N_ro_loc_file_control_paragraph__) :: r268 in
   let r270 = S (T T_PERIOD) :: r269 in
   let r271 = [R 554] in
   let r272 = S (N N_rl_select_) :: r271 in
@@ -3504,7 +3504,7 @@ let recover =
   let r282 = [R 2056] in
   let r283 = [R 2055] in
   let r284 = [R 1751] in
-  let r285 = R 1409 :: r284 in
+  let r285 = R 1415 :: r284 in
   let r286 = [R 1651] in
   let r287 = S (N N_name) :: r286 in
   let r288 = R 1222 :: r287 in
@@ -3544,7 +3544,7 @@ let recover =
   let r322 = [R 91] in
   let r323 = S (N N_ro_pf_USING_name__) :: r322 in
   let r324 = S (N N_rnel_name_or_alphanum_) :: r323 in
-  let r325 = [R 1456] in
+  let r325 = [R 1462] in
   let r326 = [R 56] in
   let r327 = R 154 :: r326 in
   let r328 = R 899 :: r327 in
@@ -3570,13 +3570,13 @@ let recover =
   let r348 = [R 1141] in
   let r349 = [R 828] in
   let r350 = [R 745] in
-  let r351 = R 1358 :: r350 in
+  let r351 = R 1352 :: r350 in
   let r352 = [R 1750] in
   let r353 = S (N N_name) :: r352 in
   let r354 = [R 1745] in
   let r355 = Sub (r353) :: r354 in
   let r356 = R 1208 :: r355 in
-  let r357 = [R 1442] in
+  let r357 = [R 1448] in
   let r358 = [R 1746] in
   let r359 = S (N N_name) :: r358 in
   let r360 = R 1240 :: r359 in
@@ -3600,7 +3600,7 @@ let recover =
   let r378 = R 1200 :: r377 in
   let r379 = R 1274 :: r378 in
   let r380 = [R 1005] in
-  let r381 = [R 1444] in
+  let r381 = [R 1450] in
   let r382 = [R 798] in
   let r383 = [R 810] in
   let r384 = [R 1154] in
@@ -3621,7 +3621,7 @@ let recover =
   let r399 = S (N N_ro_procedure_division_) :: r398 in
   let r400 = S (N N_ro_loc_data_division__) :: r399 in
   let r401 = S (N N_ro_loc_environment_division__) :: r400 in
-  let r402 = S (N N_ro_options_paragraph_) :: r401 in
+  let r402 = S (N N_ro_loc_options_paragraph__) :: r401 in
   let r403 = [R 922] in
   let r404 = R 150 :: r403 in
   let r405 = R 134 :: r404 in
@@ -3680,7 +3680,7 @@ let recover =
   let r458 = [R 2413] in
   let r459 = [R 1009] in
   let r460 = S (N N_ro_pf_BY_expression__) :: r459 in
-  let r461 = [R 1430] in
+  let r461 = [R 1436] in
   let r462 = [R 526] in
   let r463 = [R 340] in
   let r464 = [R 99] in
@@ -3794,7 +3794,7 @@ let recover =
   let r572 = S (N N_ro_expression_no_all_) :: r571 in
   let r573 = [R 529] in
   let r574 = [R 530] in
-  let r575 = [R 1426] in
+  let r575 = [R 1432] in
   let r576 = [R 379] in
   let r577 = S (N N_literal) :: r576 in
   let r578 = [R 1013] in
@@ -3819,7 +3819,7 @@ let recover =
   let r597 = [R 2366] in
   let r598 = Sub (r596) :: r597 in
   let r599 = [R 2352] in
-  let r600 = [R 1487] in
+  let r600 = [R 1493] in
   let r601 = [R 2351] in
   let r602 = [R 2349] in
   let r603 = S (N N_ro_object_reference_kind_) :: r602 in
@@ -3854,7 +3854,7 @@ let recover =
   let r632 = [R 1595] in
   let r633 = R 160 :: r632 in
   let r634 = [R 161] in
-  let r635 = [R 1480] in
+  let r635 = [R 1486] in
   let r636 = S (T T_GET) :: r635 in
   let r637 = [R 1133] in
   let r638 = S (N N_expression) :: r637 in
@@ -3928,7 +3928,7 @@ let recover =
   let r706 = S (N N_integer) :: r705 in
   let r707 = R 1222 :: r706 in
   let r708 = S (T T_SIZE) :: r707 in
-  let r709 = [R 1485] in
+  let r709 = [R 1491] in
   let r710 = [R 1169] in
   let r711 = R 891 :: r710 in
   let r712 = S (N N_rl_key_is_) :: r711 in
@@ -3941,8 +3941,8 @@ let recover =
   let r719 = S (N N_ro_pf_FROM_integer__) :: r718 in
   let r720 = [R 201] in
   let r721 = S (N N_name) :: r720 in
-  let r722 = [R 1434] in
-  let r723 = [R 1454] in
+  let r722 = [R 1440] in
+  let r723 = [R 1460] in
   let r724 = [R 1609] in
   let r725 = S (N N_rnel_qualname_) :: r724 in
   let r726 = [R 748] in
@@ -3971,7 +3971,7 @@ let recover =
   let r749 = [R 433] in
   let r750 = S (N N_ro_pf___anonymous_43_integer__) :: r749 in
   let r751 = S (N N_ro_name_) :: r750 in
-  let r752 = [R 1478] in
+  let r752 = [R 1484] in
   let r753 = S (N N_integer) :: r752 in
   let r754 = [R 406] in
   let r755 = S (N N_idents) :: r754 in
@@ -4066,10 +4066,10 @@ let recover =
   let r844 = S (N N_ro_pf___anonymous_32_qualname_or_integer__) :: r843 in
   let r845 = Sub (r823) :: r844 in
   let r846 = S (T T_TOP) :: r845 in
-  let r847 = [R 1468] in
+  let r847 = [R 1474] in
   let r848 = Sub (r823) :: r847 in
   let r849 = S (T T_BOTTOM) :: r848 in
-  let r850 = [R 1466] in
+  let r850 = [R 1472] in
   let r851 = Sub (r823) :: r850 in
   let r852 = R 1190 :: r851 in
   let r853 = [R 792] in
@@ -4167,14 +4167,14 @@ let recover =
   let r945 = S (N N_ro_pf___anonymous_34_integer__) :: r944 in
   let r946 = S (N N_ro_pf___anonymous_33_integer__) :: r945 in
   let r947 = Sub (r941) :: r946 in
-  let r948 = [R 1364] in
-  let r949 = [R 1363] in
-  let r950 = [R 1470] in
+  let r948 = [R 1356] in
+  let r949 = [R 1355] in
+  let r950 = [R 1476] in
   let r951 = S (N N_integer) :: r950 in
-  let r952 = [R 1472] in
+  let r952 = [R 1478] in
   let r953 = S (N N_integer) :: r952 in
   let r954 = R 1222 :: r953 in
-  let r955 = [R 1474] in
+  let r955 = [R 1480] in
   let r956 = S (N N_integer) :: r955 in
   let r957 = R 1222 :: r956 in
   let r958 = [R 931] in
@@ -4182,7 +4182,7 @@ let recover =
   let r960 = S (N N_ro_pf___anonymous_38_integer__) :: r959 in
   let r961 = S (N N_ro_pf___anonymous_37_integer__) :: r960 in
   let r962 = S (N N_integer) :: r961 in
-  let r963 = [R 1476] in
+  let r963 = [R 1482] in
   let r964 = S (N N_integer) :: r963 in
   let r965 = [R 1551] in
   let r966 = [R 1550] in
@@ -4246,7 +4246,7 @@ let recover =
   let r1024 = [R 169] in
   let r1025 = [R 764] in
   let r1026 = [R 948] in
-  let r1027 = R 1412 :: r1026 in
+  let r1027 = R 1418 :: r1026 in
   let r1028 = [R 763] in
   let r1029 = [R 947] in
   let r1030 = [R 946] in
@@ -4447,7 +4447,7 @@ let recover =
   let r1225 = S (N N_ro_advancing_phrase_) :: r1224 in
   let r1226 = S (N N_ro_pf_FROM_ident_or_literal__) :: r1225 in
   let r1227 = [R 2454] in
-  let r1228 = [R 1432] in
+  let r1228 = [R 1438] in
   let r1229 = [R 42] in
   let r1230 = [R 1756] in
   let r1231 = [R 1755] in
@@ -4473,9 +4473,9 @@ let recover =
   let r1251 = Sub (r1244) :: r1250 in
   let r1252 = [R 2323] in
   let r1253 = S (N N_ro_pf___anonymous_101_ident__) :: r1252 in
-  let r1254 = [R 1460] in
+  let r1254 = [R 1466] in
   let r1255 = S (N N_ident) :: r1254 in
-  let r1256 = [R 1462] in
+  let r1256 = [R 1468] in
   let r1257 = S (N N_ident) :: r1256 in
   let r1258 = [R 2300] in
   let r1259 = S (N N_ident) :: r1258 in
@@ -4538,7 +4538,7 @@ let recover =
   let r1316 = S (N N_ro_pf_THROUGH_procedure_name__) :: r1315 in
   let r1317 = Sub (r1314) :: r1316 in
   let r1318 = R 1222 :: r1317 in
-  let r1319 = [R 1448] in
+  let r1319 = [R 1454] in
   let r1320 = [R 1544] in
   let r1321 = Sub (r57) :: r1320 in
   let r1322 = S (T T_GIVING) :: r1321 in
@@ -4665,7 +4665,7 @@ let recover =
   let r1443 = Sub (r1440) :: r1442 in
   let r1444 = S (N N_ro_pf_INTO_loc_ident___) :: r1443 in
   let r1445 = R 1256 :: r1444 in
-  let r1446 = [R 1440] in
+  let r1446 = [R 1446] in
   let r1447 = [R 1752] in
   let r1448 = S (T T_STATEMENT) :: r1447 in
   let r1449 = S (T T_NEXT) :: r1448 in
@@ -4685,11 +4685,11 @@ let recover =
   let r1463 = S (N N_ro_pf_INTO_ident__) :: r1462 in
   let r1464 = R 1256 :: r1463 in
   let r1465 = S (N N_ro_read_direction_) :: r1464 in
-  let r1466 = [R 1438] in
+  let r1466 = [R 1444] in
   let r1467 = [R 873] in
   let r1468 = [R 872] in
   let r1469 = S (T T_LOCK) :: r1468 in
-  let r1470 = [R 1483] in
+  let r1470 = [R 1489] in
   let r1471 = S (N N_qualname) :: r1470 in
   let r1472 = [R 1632] in
   let r1473 = [R 1611] in
@@ -4712,7 +4712,7 @@ let recover =
   let r1490 = S (N N_l_pf_AFTER_loc_varying_phrase___) :: r1489 in
   let r1491 = [R 754] in
   let r1492 = S (N N_l_pf_AFTER_loc_varying_phrase___) :: r1491 in
-  let r1493 = [R 1428] in
+  let r1493 = [R 1434] in
   let r1494 = [R 1564] in
   let r1495 = S (T T_END_PERFORM) :: r1494 in
   let r1496 = [R 1183] in
@@ -5048,7 +5048,7 @@ let recover =
   let r1826 = R 461 :: r1825 in
   let r1827 = S (N N_ro_pf_REMAINDER_ident__) :: r1826 in
   let r1828 = S (N N_rnel_rounded_ident_) :: r1827 in
-  let r1829 = [R 1446] in
+  let r1829 = [R 1452] in
   let r1830 = [R 426] in
   let r1831 = R 461 :: r1830 in
   let r1832 = [R 427] in
@@ -5078,7 +5078,7 @@ let recover =
   let r1856 = [R 990] in
   let r1857 = R 463 :: r1856 in
   let r1858 = [R 991] in
-  let r1859 = [R 1450] in
+  let r1859 = [R 1456] in
   let r1860 = S (T T_AFTER) :: r1229 in
   let r1861 = [R 2435] in
   let r1862 = Sub (r1860) :: r1861 in
@@ -5122,7 +5122,7 @@ let recover =
   let r1900 = [R 1997] in
   let r1901 = R 465 :: r1900 in
   let r1902 = Sub (r1899) :: r1901 in
-  let r1903 = [R 1458] in
+  let r1903 = [R 1464] in
   let r1904 = [R 2416] in
   let r1905 = [R 1998] in
   let r1906 = R 465 :: r1905 in
@@ -5214,7 +5214,7 @@ let recover =
   let r1992 = S (N N_ro_object_procedure_division_) :: r1991 in
   let r1993 = S (N N_ro_loc_data_division__) :: r1992 in
   let r1994 = S (N N_ro_loc_environment_division__) :: r1993 in
-  let r1995 = S (N N_ro_options_paragraph_) :: r1994 in
+  let r1995 = S (N N_ro_loc_options_paragraph__) :: r1994 in
   let r1996 = [R 1153] in
   let r1997 = R 883 :: r1996 in
   let r1998 = S (T T_PERIOD) :: r1997 in
@@ -5229,7 +5229,7 @@ let recover =
   let r2007 = S (N N_ro_object_procedure_division_) :: r2006 in
   let r2008 = S (N N_ro_loc_data_division__) :: r2007 in
   let r2009 = S (N N_ro_loc_environment_division__) :: r2008 in
-  let r2010 = S (N N_ro_options_paragraph_) :: r2009 in
+  let r2010 = S (N N_ro_loc_options_paragraph__) :: r2009 in
   let r2011 = [R 243] in
   let r2012 = S (T T_PERIOD) :: r2011 in
   let r2013 = S (N N_name) :: r2012 in
@@ -5250,16 +5250,16 @@ let recover =
   let r2028 = S (T T_PERIOD) :: r2027 in
   let r2029 = S (T T_PROGRAM_ID) :: r2028 in
   let r2030 = [R 679] in
-  let r2031 = R 1375 :: r2030 in
-  let r2032 = R 1369 :: r2031 in
-  let r2033 = R 1371 :: r2032 in
-  let r2034 = R 1373 :: r2033 in
-  let r2035 = R 1367 :: r2034 in
+  let r2031 = R 1367 :: r2030 in
+  let r2032 = R 1361 :: r2031 in
+  let r2033 = R 1363 :: r2032 in
+  let r2034 = R 1365 :: r2033 in
+  let r2035 = R 1359 :: r2034 in
   let r2036 = [R 1584] in
   let r2037 = S (N N_ro_loc_program_procedure_division__) :: r2036 in
   let r2038 = S (N N_ro_loc_data_division__) :: r2037 in
   let r2039 = S (N N_ro_loc_environment_division__) :: r2038 in
-  let r2040 = S (N N_ro_options_paragraph_) :: r2039 in
+  let r2040 = S (N N_ro_loc_options_paragraph__) :: r2039 in
   let r2041 = Sub (r2035) :: r2040 in
   let r2042 = Sub (r2029) :: r2041 in
   let r2043 = [R 1586] in
@@ -6106,78 +6106,78 @@ let recover =
   | 3138 -> One ([R 1323])
   | 2524 -> One ([R 1325])
   | 2182 -> One ([R 1327])
-  | 704 -> One ([R 1329])
-  | 4041 -> One ([R 1331])
-  | 23 -> One ([R 1333])
-  | 14 -> One (R 1334 :: r13)
-  | 20 -> One ([R 1335])
-  | 25 -> One ([R 1337])
-  | 765 -> One ([R 1339])
-  | 1147 -> One ([R 1341])
-  | 451 -> One ([R 1343])
-  | 904 -> One ([R 1345])
-  | 699 -> One ([R 1347])
-  | 2189 -> One ([R 1349])
-  | 3879 -> One ([R 1351])
-  | 702 -> One ([R 1353])
-  | 3935 -> One ([R 1355])
-  | 2363 -> One ([R 1357])
-  | 694 -> One ([R 1359])
-  | 697 -> One ([R 1361])
-  | 1805 -> One (R 1362 :: r947)
-  | 2184 -> One ([R 1366])
-  | 3963 -> One ([R 1368])
-  | 3969 -> One ([R 1370])
-  | 3967 -> One ([R 1372])
-  | 3965 -> One ([R 1374])
-  | 3971 -> One ([R 1376])
-  | 3870 -> One ([R 1378])
-  | 1553 -> One ([R 1380])
-  | 3872 -> One ([R 1382])
-  | 4039 -> One ([R 1384])
-  | 3944 -> One ([R 1386])
-  | 4007 -> One ([R 1388])
-  | 3429 -> One ([R 1390])
-  | 2186 -> One ([R 1392])
-  | 258 -> One ([R 1394])
-  | 3558 -> One ([R 1396])
-  | 21 -> One ([R 1398])
-  | 232 -> One ([R 1400])
-  | 476 -> One ([R 1402])
-  | 3887 -> One ([R 1404])
-  | 1123 -> One ([R 1406])
-  | 3873 -> One ([R 1408])
-  | 501 -> One ([R 1410])
-  | 500 -> One ([R 1411])
-  | 287 -> One (R 1412 :: r177)
-  | 2044 -> One (R 1412 :: r1057)
-  | 288 -> One ([R 1413])
-  | 289 -> One ([R 1414])
-  | 1847 -> One ([R 1416])
-  | 1844 -> One ([R 1417])
-  | 1982 -> One (R 1418 :: r1036)
-  | 1987 -> One (R 1418 :: r1038)
-  | 1984 -> One ([R 1419])
-  | 1983 -> One ([R 1420])
-  | 3533 -> One ([R 1422])
-  | 1209 -> One ([R 1481])
-  | 1370 -> One (R 1484 :: r708)
-  | 1379 -> One ([R 1489])
-  | 3867 -> One ([R 1491])
-  | 3011 -> One ([R 1493])
-  | 3560 -> One ([R 1495])
-  | 2179 -> One ([R 1497])
-  | 472 -> One ([R 1499])
-  | 2801 -> One ([R 1501])
-  | 2849 -> One ([R 1503])
-  | 3723 -> One ([R 1505])
-  | 2176 -> One ([R 1507])
-  | 2785 -> One ([R 1509])
-  | 2591 -> One ([R 1511])
-  | 1169 -> One ([R 1513])
-  | 1168 -> One ([R 1514])
-  | 191 -> One ([R 1516])
-  | 432 -> One ([R 1518])
+  | 4041 -> One ([R 1329])
+  | 23 -> One ([R 1331])
+  | 14 -> One (R 1332 :: r13)
+  | 20 -> One ([R 1333])
+  | 25 -> One ([R 1335])
+  | 765 -> One ([R 1337])
+  | 1147 -> One ([R 1339])
+  | 451 -> One ([R 1341])
+  | 904 -> One ([R 1343])
+  | 2189 -> One ([R 1345])
+  | 3879 -> One ([R 1347])
+  | 3935 -> One ([R 1349])
+  | 2363 -> One ([R 1351])
+  | 694 -> One ([R 1353])
+  | 1805 -> One (R 1354 :: r947)
+  | 2184 -> One ([R 1358])
+  | 3963 -> One ([R 1360])
+  | 3969 -> One ([R 1362])
+  | 3967 -> One ([R 1364])
+  | 3965 -> One ([R 1366])
+  | 3971 -> One ([R 1368])
+  | 704 -> One ([R 1370])
+  | 3870 -> One ([R 1372])
+  | 1553 -> One ([R 1374])
+  | 3872 -> One ([R 1376])
+  | 699 -> One ([R 1378])
+  | 702 -> One ([R 1380])
+  | 697 -> One ([R 1382])
+  | 476 -> One ([R 1384])
+  | 3873 -> One ([R 1386])
+  | 4039 -> One ([R 1388])
+  | 3944 -> One ([R 1390])
+  | 4007 -> One ([R 1392])
+  | 472 -> One ([R 1394])
+  | 191 -> One ([R 1396])
+  | 432 -> One ([R 1398])
+  | 3429 -> One ([R 1400])
+  | 2186 -> One ([R 1402])
+  | 258 -> One ([R 1404])
+  | 3558 -> One ([R 1406])
+  | 21 -> One ([R 1408])
+  | 232 -> One ([R 1410])
+  | 3887 -> One ([R 1412])
+  | 1123 -> One ([R 1414])
+  | 501 -> One ([R 1416])
+  | 500 -> One ([R 1417])
+  | 287 -> One (R 1418 :: r177)
+  | 2044 -> One (R 1418 :: r1057)
+  | 288 -> One ([R 1419])
+  | 289 -> One ([R 1420])
+  | 1847 -> One ([R 1422])
+  | 1844 -> One ([R 1423])
+  | 1982 -> One (R 1424 :: r1036)
+  | 1987 -> One (R 1424 :: r1038)
+  | 1984 -> One ([R 1425])
+  | 1983 -> One ([R 1426])
+  | 3533 -> One ([R 1428])
+  | 1209 -> One ([R 1487])
+  | 1370 -> One (R 1490 :: r708)
+  | 1379 -> One ([R 1495])
+  | 3867 -> One ([R 1497])
+  | 3011 -> One ([R 1499])
+  | 3560 -> One ([R 1501])
+  | 2179 -> One ([R 1503])
+  | 2801 -> One ([R 1505])
+  | 2849 -> One ([R 1507])
+  | 3723 -> One ([R 1509])
+  | 2176 -> One ([R 1511])
+  | 2785 -> One ([R 1513])
+  | 2591 -> One ([R 1515])
+  | 1169 -> One ([R 1517])
+  | 1168 -> One ([R 1518])
   | 1944 -> One ([R 1520])
   | 2478 -> One ([R 1522])
   | 2753 -> One ([R 1524])
@@ -6365,80 +6365,80 @@ let recover =
   | 3133 -> One ([R 1851])
   | 2512 -> One ([R 1852])
   | 2181 -> One ([R 1853])
-  | 703 -> One ([R 1854])
-  | 764 -> One ([R 1855])
-  | 1145 -> One ([R 1856])
-  | 450 -> One ([R 1857])
-  | 903 -> One ([R 1858])
-  | 698 -> One ([R 1859])
-  | 2188 -> One ([R 1860])
-  | 3876 -> One ([R 1861])
-  | 701 -> One ([R 1862])
-  | 3934 -> One ([R 1863])
-  | 2362 -> One ([R 1864])
-  | 696 -> One ([R 1865])
-  | 2183 -> One ([R 1866])
-  | 3869 -> One ([R 1867])
-  | 1545 -> One ([R 1868])
-  | 3871 -> One ([R 1869])
-  | 4040 -> One ([R 1870])
-  | 4008 -> One ([R 1871])
-  | 3434 -> One ([R 1872])
-  | 2185 -> One ([R 1873])
-  | 257 -> One ([R 1874])
-  | 3557 -> One ([R 1875])
-  | 231 -> One ([R 1876])
-  | 475 -> One ([R 1877])
-  | 3886 -> One ([R 1878])
-  | 1122 -> One ([R 1879])
-  | 3874 -> One ([R 1880])
-  | 3534 -> One ([R 1881])
-  | 75 -> One ([R 1882])
-  | 1061 -> One ([R 1883])
-  | 2773 -> One ([R 1884])
-  | 1062 -> One ([R 1885])
-  | 2713 -> One ([R 1886])
-  | 1418 -> One ([R 1887])
-  | 286 -> One ([R 1888])
-  | 3559 -> One ([R 1889])
-  | 3577 -> One ([R 1890])
-  | 656 -> One ([R 1891])
-  | 683 -> One ([R 1892])
-  | 3463 -> One ([R 1893])
-  | 2502 -> One ([R 1894])
-  | 3532 -> One ([R 1895])
-  | 363 -> One ([R 1896])
-  | 1417 -> One ([R 1897])
-  | 568 -> One ([R 1898])
-  | 3639 -> One ([R 1899])
-  | 2423 -> One ([R 1900])
-  | 2422 -> One ([R 1901])
-  | 334 -> One ([R 1902])
-  | 1663 -> One ([R 1903])
-  | 1652 -> One ([R 1904])
-  | 1842 -> One ([R 1905])
-  | 1841 -> One ([R 1906])
-  | 1838 -> One ([R 1907])
-  | 1837 -> One ([R 1908])
-  | 1457 -> One ([R 1909])
-  | 1206 -> One ([R 1910])
-  | 3555 -> One ([R 1911])
-  | 1111 -> One ([R 1912])
-  | 1380 -> One ([R 1913])
-  | 3868 -> One ([R 1914])
-  | 3012 -> One ([R 1915])
-  | 3561 -> One ([R 1916])
-  | 2180 -> One ([R 1917])
-  | 473 -> One ([R 1918])
-  | 2802 -> One ([R 1919])
-  | 2850 -> One ([R 1920])
-  | 3725 -> One ([R 1921])
-  | 2178 -> One ([R 1922])
-  | 2803 -> One ([R 1923])
-  | 2593 -> One ([R 1924])
-  | 1172 -> One ([R 1925])
-  | 477 -> One ([R 1926])
-  | 474 -> One ([R 1927])
+  | 764 -> One ([R 1854])
+  | 1145 -> One ([R 1855])
+  | 450 -> One ([R 1856])
+  | 903 -> One ([R 1857])
+  | 2188 -> One ([R 1858])
+  | 3876 -> One ([R 1859])
+  | 3934 -> One ([R 1860])
+  | 2362 -> One ([R 1861])
+  | 2183 -> One ([R 1862])
+  | 703 -> One ([R 1863])
+  | 3869 -> One ([R 1864])
+  | 1545 -> One ([R 1865])
+  | 3871 -> One ([R 1866])
+  | 698 -> One ([R 1867])
+  | 701 -> One ([R 1868])
+  | 696 -> One ([R 1869])
+  | 475 -> One ([R 1870])
+  | 3874 -> One ([R 1871])
+  | 4040 -> One ([R 1872])
+  | 4008 -> One ([R 1873])
+  | 473 -> One ([R 1874])
+  | 477 -> One ([R 1875])
+  | 474 -> One ([R 1876])
+  | 3434 -> One ([R 1877])
+  | 2185 -> One ([R 1878])
+  | 257 -> One ([R 1879])
+  | 3557 -> One ([R 1880])
+  | 231 -> One ([R 1881])
+  | 3886 -> One ([R 1882])
+  | 1122 -> One ([R 1883])
+  | 3534 -> One ([R 1884])
+  | 75 -> One ([R 1885])
+  | 1061 -> One ([R 1886])
+  | 2773 -> One ([R 1887])
+  | 1062 -> One ([R 1888])
+  | 2713 -> One ([R 1889])
+  | 1418 -> One ([R 1890])
+  | 286 -> One ([R 1891])
+  | 3559 -> One ([R 1892])
+  | 3577 -> One ([R 1893])
+  | 656 -> One ([R 1894])
+  | 683 -> One ([R 1895])
+  | 3463 -> One ([R 1896])
+  | 2502 -> One ([R 1897])
+  | 3532 -> One ([R 1898])
+  | 363 -> One ([R 1899])
+  | 1417 -> One ([R 1900])
+  | 568 -> One ([R 1901])
+  | 3639 -> One ([R 1902])
+  | 2423 -> One ([R 1903])
+  | 2422 -> One ([R 1904])
+  | 334 -> One ([R 1905])
+  | 1663 -> One ([R 1906])
+  | 1652 -> One ([R 1907])
+  | 1842 -> One ([R 1908])
+  | 1841 -> One ([R 1909])
+  | 1838 -> One ([R 1910])
+  | 1837 -> One ([R 1911])
+  | 1457 -> One ([R 1912])
+  | 1206 -> One ([R 1913])
+  | 3555 -> One ([R 1914])
+  | 1111 -> One ([R 1915])
+  | 1380 -> One ([R 1916])
+  | 3868 -> One ([R 1917])
+  | 3012 -> One ([R 1918])
+  | 3561 -> One ([R 1919])
+  | 2180 -> One ([R 1920])
+  | 2802 -> One ([R 1921])
+  | 2850 -> One ([R 1922])
+  | 3725 -> One ([R 1923])
+  | 2178 -> One ([R 1924])
+  | 2803 -> One ([R 1925])
+  | 2593 -> One ([R 1926])
+  | 1172 -> One ([R 1927])
   | 1946 -> One ([R 1928])
   | 2480 -> One ([R 1929])
   | 3526 -> One ([R 1930])
@@ -6947,10 +6947,10 @@ let recover =
   | 678 -> One (S (N N_ro_pf_POSITION_integer__) :: r380)
   | 634 -> One (S (N N_ro_pf_ON_name__) :: r356)
   | 794 -> One (S (N N_ro_pf_FROM_expression__) :: r460)
-  | 113 -> One (S (N N_ro_options_paragraph_) :: r80)
-  | 3897 -> One (S (N N_ro_options_paragraph_) :: r1983)
-  | 4030 -> One (S (N N_ro_options_paragraph_) :: r2073)
   | 3428 -> One (S (N N_ro_loc_upon__) :: r1820)
+  | 113 -> One (S (N N_ro_loc_options_paragraph__) :: r80)
+  | 3897 -> One (S (N N_ro_loc_options_paragraph__) :: r1983)
+  | 4030 -> One (S (N N_ro_loc_options_paragraph__) :: r2073)
   | 789 -> One (S (N N_ro_loc_entry_name_clause__) :: r457)
   | 1867 -> One (S (N N_ro_loc_entry_name_clause__) :: r977)
   | 2078 -> One (S (N N_ro_loc_entry_name_clause__) :: r1068)

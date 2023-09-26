@@ -38,18 +38,18 @@ type informational_paragraphs =
 (* ------------------------- ENVIRONMENT DIVISION -------------------------- *)
 type environment_division =
   {
-    env_configuration: configuration_section option;
-    env_input_output: input_output_section option;
+    env_configuration: configuration_section with_loc option;
+    env_input_output: input_output_section with_loc option;
   }
 [@@deriving ord]
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 and configuration_section =
   {
-    source_computer_paragraph: source_computer_paragraph option;
-    object_computer_paragraph: object_computer_paragraph option;
-    special_names_paragraph: special_names_paragraph option;
-    repository_paragraph: repository_paragraph option; (* +COB2002 *)
+    source_computer_paragraph: source_computer_paragraph with_loc option;
+    object_computer_paragraph: object_computer_paragraph with_loc option;
+    special_names_paragraph: special_names_paragraph with_loc option;
+    repository_paragraph: repository_paragraph with_loc option;   (* +COB2002 *)
   }
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
@@ -237,8 +237,8 @@ and expands =
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)
 and input_output_section =
   {
-    file_control_paragraph: file_control_paragraph option; (* COB85: mandatory *)
-    io_control_paragraph: io_control_paragraph option;
+    file_control_paragraph: file_control_paragraph with_loc option; (* COB85: mandatory *)
+    io_control_paragraph: io_control_paragraph with_loc option;
   }
 
 (* - ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL PARAGRAPH -- *)
@@ -592,10 +592,10 @@ let pp_configuration_section ppf
     special_names_paragraph = snp; repository_paragraph = rp }
 =
   Fmt.pf ppf "CONFIGURATION SECTION.%a%a%a%a"
-    Fmt.(option (sp ++ pp_source_computer_paragraph)) scp
-    Fmt.(option (sp ++ pp_object_computer_paragraph)) ocp
-    Fmt.(option (sp ++ pp_special_names_paragraph)) snp
-    Fmt.(option (sp ++ pp_repository_paragraph)) rp
+    Fmt.(option (sp ++ pp_with_loc pp_source_computer_paragraph)) scp
+    Fmt.(option (sp ++ pp_with_loc pp_object_computer_paragraph)) ocp
+    Fmt.(option (sp ++ pp_with_loc pp_special_names_paragraph)) snp
+    Fmt.(option (sp ++ pp_with_loc pp_repository_paragraph)) rp
 
 let pp_record_delimiter ppf = function
   | Standard_1 -> Fmt.pf ppf "STANDARD-1"
@@ -678,15 +678,15 @@ let pp_input_output_section ppf
   { file_control_paragraph = fcp ; io_control_paragraph = icp }
 =
   Fmt.pf ppf "INPUT-OUTPUT SECTION.";
-  Fmt.(option (sp ++ pp_file_control_paragraph)) ppf fcp;
-  Fmt.(option (sp ++ pp_io_control_paragraph)) ppf icp
+  Fmt.(option (sp ++ pp_with_loc pp_file_control_paragraph)) ppf fcp;
+  Fmt.(option (sp ++ pp_with_loc pp_io_control_paragraph)) ppf icp
 
 let pp_environment_division ppf
   { env_configuration = ec; env_input_output = eio }
 =
   Fmt.pf ppf "ENVIRONMENT DIVISION.%a%a"
-    Fmt.(option (sp ++ pp_configuration_section)) ec
-    Fmt.(option (sp ++ pp_input_output_section)) eio
+    Fmt.(option (sp ++ pp_with_loc pp_configuration_section)) ec
+    Fmt.(option (sp ++ pp_with_loc pp_input_output_section)) eio
 
 type options_paragraph =
   options_clause with_loc list

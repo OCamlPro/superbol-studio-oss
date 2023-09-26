@@ -291,7 +291,7 @@ program_definition_no_end:
  | id = bo(identification_division)                       (* COB85: mandatory *)
    pid = program_id_paragraph
    ipo = informational_paragraphs             (* Allowed in nested programs ? *)
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(program_procedure_division))
@@ -313,7 +313,7 @@ program_definition_no_end:
 program_prototype [@cost 999]:
  | bo(identification_division) (* Note: bo instead of ? to avoid conflict *)
    pid = program_prototype_id_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(procedure_division))
@@ -331,7 +331,7 @@ program_prototype [@cost 999]:
 function_unit [@cost 999]:
  | ro(identification_division)
    fid = function_id_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(procedure_division)
@@ -349,7 +349,7 @@ function_unit [@cost 999]:
 class_definition [@cost 999]:
  | ro(identification_division)
    cid = class_id_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    fdo = io(factory_definition) (* Note: inline to avoid conflict *)
    ido = ro(instance_definition)
@@ -370,7 +370,7 @@ class_definition [@cost 999]:
 factory_definition:
  | ro(identification_division)
    fp = factory_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(object_procedure_division)
@@ -384,7 +384,7 @@ factory_definition:
 instance_definition:
  | ro(identification_division)
    op = object_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(object_procedure_division)
@@ -398,7 +398,7 @@ instance_definition:
 interface_definition [@cost 999]:
  | ro(identification_division)
    iid = interface_id_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    pdo = ro(object_procedure_division)
    END INTERFACE ei = name "."
@@ -416,7 +416,7 @@ interface_definition [@cost 999]:
 method_definition: (* Note: used in PROCEDURE DIVISION, see below *)
  | ro(identification_division)
    mid = method_id_paragraph
-   opo = ro(options_paragraph)
+   opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(procedure_division)
@@ -539,25 +539,24 @@ let intermediate_rounding_clause [@context intermediate_rounding_clause] :=
 
 let environment_division :=
  | ENVIRONMENT; DIVISION; ".";
-   c = ro(configuration_section);
-   io = ro(input_output_section);
-   { { env_configuration = c;
-       env_input_output = io; } }
+   env_configuration = ro(loc(configuration_section));
+   env_input_output  = ro(loc(input_output_section));
+   { { env_configuration; env_input_output } }
 
 
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
-configuration_section:
- | CONFIGURATION SECTION "."
-   sco = ro(source_computer_paragraph)
-   oco = ro(object_computer_paragraph)
-   sno = ro(special_names_paragraph)
-   ro = ro(repository_paragraph)       (* +COB2002 *)
-    { { source_computer_paragraph = sco;
-        object_computer_paragraph = oco;
-        special_names_paragraph = sno;
-        repository_paragraph = ro; } }
+let configuration_section :=
+ | CONFIGURATION; SECTION; ".";
+   source_computer_paragraph = ro(loc(source_computer_paragraph));
+   object_computer_paragraph = ro(loc(object_computer_paragraph));
+   special_names_paragraph   = ro(loc(special_names_paragraph));
+   repository_paragraph      = ro(loc(repository_paragraph));     (* +COB2002 *)
+   { { source_computer_paragraph;
+       object_computer_paragraph;
+       special_names_paragraph;
+       repository_paragraph } }
 
 
 
@@ -785,10 +784,9 @@ let function_specifier [@context function_specifier] :=
 
 let input_output_section :=
  | INPUT_OUTPUT; SECTION; ".";
-   fco = ro(file_control_paragraph); (* COB85: mandatory *)
-   ioco = ro(io_control_paragraph);
-    { { file_control_paragraph = fco;
-        io_control_paragraph = ioco; } }
+   file_control_paragraph = ro(loc(file_control_paragraph)); (* COB85: mandatory *)
+   io_control_paragraph = ro(loc(io_control_paragraph));
+    { { file_control_paragraph; io_control_paragraph } }
 
 
 
@@ -998,26 +996,26 @@ type declaration entry =
 
 *)
 
-data_division:
- | DATA DIVISION "."
-   fso  = ro(file_section)
-   wsso = ro(working_storage_section)
-   lsso = ro(local_storage_section)   (* +COB2002 *)
-   lso  = ro(linkage_section)
-   cso  = ro(communication_section)    (* -COB2002 *)
-   rso  = ro(report_section)
-   sso  = ro(screen_section)           (* +COB2002 *)
-    { { file_section = fso;
-        working_storage_section = wsso;
-        local_storage_section = lsso;
-        linkage_section = lso;
-        communication_section = cso;
-        report_section = rso;
-        screen_section = sso; } }
+let data_division :=
+ | DATA; DIVISION; ".";
+   fso  = ro(file_section);
+   wsso = ro(working_storage_section);
+   lsso = ro(local_storage_section);                              (* +COB2002 *)
+   lso  = ro(linkage_section);
+   cso  = ro(communication_section);                              (* -COB2002 *)
+   rso  = ro(report_section);
+   sso  = ro(screen_section);                                     (* +COB2002 *)
+   { { file_section = fso;
+       working_storage_section = wsso;
+       local_storage_section = lsso;
+       linkage_section = lso;
+       communication_section = cso;
+       report_section = rso;
+       screen_section = sso; } }
 
 
 let section(K, L) ==
-  | K; SECTION; "."; ~ = rl(loc(L)); < >
+  | K; SECTION; "."; ~ = loc(rl(loc(L))); < >
 
 let file_section :=
   | ~ = section (FILE, file_or_sort_merge_descr_entry); < >
