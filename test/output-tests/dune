@@ -12,20 +12,42 @@
  (libraries autofonce_lib superbol_testutils cobol_parser)
  )
 
+(executable
+ (name reparse)
+ (modules Reparse)
+ (libraries cobol_parser)
+ )
+
 (alias
  (name buildtest)
  (deps preproc.exe gnucobol.exe))
 
 (rule
- (with-stdout-to
-  preproc.output
-  ; (setenv COB_CONFIG_DIR "%{env:PWD=.}/%{project_root}/import/gnucobol/config"
-  (setenv COB_CONFIG_DIR "%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config"
-   (run %{exe:preproc.exe}))))
+ (deps (source_tree ../testsuite))
+ (action
+  (with-stdout-to
+   preproc.output
+   ; (setenv COB_CONFIG_DIR "%{env:PWD=.}/%{project_root}/import/gnucobol/config"
+   (setenv COB_CONFIG_DIR "%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config"
+    (run %{exe:preproc.exe})))))
 
 (rule
  (alias runtest)
  (action
   (diff preproc.expected preproc.output)))
+
+(rule
+ (deps (source_tree ../testsuite))
+ (action
+  (with-stdout-to
+   reparse.output
+   ; (setenv COB_CONFIG_DIR "%{env:PWD=.}/%{project_root}/import/gnucobol/config"
+   (setenv COB_CONFIG_DIR "%{env:DUNE_SOURCEROOT=.}/import/gnucobol/config"
+    (run %{exe:reparse.exe})))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff reparse.expected reparse.output)))
 
 (include gnucobol-tests.inc)

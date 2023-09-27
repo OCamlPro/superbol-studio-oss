@@ -24,6 +24,7 @@ module Picture = struct
   type picture = string with_loc
   let pp_picture fmt str = Pretty.string fmt (~&str)
   let show_picture = Pretty.to_string "%a" pp_picture
+  let compare_picture = Cobol_common.Srcloc.compare_with_loc String.compare
 end
 module Data_sections =
   Cobol_ast.Raw.Data_sections (Picture)

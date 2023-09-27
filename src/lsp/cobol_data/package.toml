@@ -43,7 +43,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_deriving.show"
+preprocess = "pps ppx_deriving.show ppx_deriving.ord"
 
 # files to skip while updating at package level
 skip = ["index.mld"]

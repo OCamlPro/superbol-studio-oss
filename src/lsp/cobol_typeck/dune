@@ -9,7 +9,7 @@
   ; use field 'dune-flags' to set this value
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
-  (preprocess (pps ppx_deriving.show))
+  (preprocess (pps ppx_deriving.show ppx_deriving.ord))
   
   )
 
