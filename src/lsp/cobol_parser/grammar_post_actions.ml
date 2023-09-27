@@ -25,17 +25,17 @@ struct
              Post_pending ((fun () -> "EXTERNAL") value)
         | N N_control_division, 335 ->
              Post_diagnostic ((fun _ -> Config.control_division#verify) value)
-        | N N_special_names_clause, 2082 -> Post_special_names value
-        | N N_special_names_clause, 2083 -> Post_special_names value
-        | N N_special_names_clause, 2084 -> Post_special_names value
-        | N N_special_names_clause, 2085 -> Post_special_names value
-        | N N_special_names_clause, 2086 -> Post_special_names value
-        | N N_special_names_clause, 2087 -> Post_special_names value
-        | N N_special_names_clause, 2088 -> Post_special_names value
-        | N N_special_names_clause, 2089 -> Post_special_names value
-        | N N_special_names_clause, 2090 -> Post_special_names value
-        | N N_special_names_clause, 2091 -> Post_special_names value
         | N N_special_names_clause, 2092 -> Post_special_names value
+        | N N_special_names_clause, 2093 -> Post_special_names value
+        | N N_special_names_clause, 2094 -> Post_special_names value
+        | N N_special_names_clause, 2095 -> Post_special_names value
+        | N N_special_names_clause, 2096 -> Post_special_names value
+        | N N_special_names_clause, 2097 -> Post_special_names value
+        | N N_special_names_clause, 2098 -> Post_special_names value
+        | N N_special_names_clause, 2099 -> Post_special_names value
+        | N N_special_names_clause, 2100 -> Post_special_names value
+        | N N_special_names_clause, 2101 -> Post_special_names value
+        | N N_special_names_clause, 2102 -> Post_special_names value
         | _ -> NoPost
   
   let post_production

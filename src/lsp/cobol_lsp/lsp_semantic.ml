@@ -227,10 +227,9 @@ let semantic_visitor ~filename =
         |> Visitor.skip_children
 
     (* inline call of function *)
-    method! fold_inline_call { call_fun; call_args; call_refmod } acc = acc
+    method! fold_inline_call { call_fun; call_args } acc = acc
       |> add_name' call_fun ProcName
       |> fold_list ~fold:fold_effective_arg self call_args
-      |> fold_option ~fold:fold_refmod self call_refmod
       |> Visitor.skip_children
 
     (* Statement *)
