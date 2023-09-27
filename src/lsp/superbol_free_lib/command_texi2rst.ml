@@ -91,16 +91,16 @@ end
 type line = inline list
 
 and inline =
-  | S of string
-  | M of LOCATION.t * string * line
-  | Q of line
-
+  | STRING of string
+  | MACRO of LOCATION.t * string * line
+  | QUOTE of line
 
 type blocks = block list
 
 and block =
     EMPTY_LINE
   | LINE of line
+  | NODE of string
   | BLOCK of string * blocks
   | LEVEL of int * string option * line * blocks
   | ITEMS of string * string * ( line * blocks ) list
@@ -118,10 +118,10 @@ type document = {
 let rec string_of_line line =
   String.concat ""
     (List.map (function
-         | S s -> s
-         | Q arg ->
+         | STRING s -> s
+         | QUOTE arg ->
              Printf.sprintf "@QUOTE[%s]" ( string_of_line arg )
-         | M (_loc, macro, arg) ->
+         | MACRO (_loc, macro, arg) ->
              Printf.sprintf "@@%s{{%s}}" macro
                ( string_of_line arg )) line)
 
@@ -159,7 +159,7 @@ type closer =
   | BRACE
   | QUOTE
 
-let read filename =
+let read ~path filename =
 
   let file = Filename.basename filename in
   let dirname = Filename.dirname filename in
@@ -172,7 +172,7 @@ let read filename =
   let maybe b =
     let s = Buffer.contents b in
     Buffer.clear b;
-    if s = "" then [] else [ S s ]
+    if s = "" then [] else [ STRING s ]
   in
   let parse_line ic line =
     let len = String.length line in
@@ -187,49 +187,52 @@ let read filename =
       else
         match line.[i] with
         | '}' ->
-            if braced <> BRACE then
-              INPUT.error ~ic "unbalanced closing brace" ;
-            i+1, maybe b
+          if braced <> BRACE then
+            INPUT.error ~ic "unbalanced closing brace" ;
+          i+1, maybe b
         | '@' ->
-            let i = i+1 in
-            if i = len then
-              if braced <> EOL then
-                INPUT.error ~ic "unexpected end of line"
-              else
-                len, maybe b
+          let i = i+1 in
+          if i = len then
+            if braced <> EOL then
+              INPUT.error ~ic "unexpected end of line"
             else
-              begin
-                let c = line.[i] in
-                match c with
-                | '{' | '}' | '@' | '.' | '!' | '?' ->
-                    Buffer.add_char b c ;
-                    iter (i+1) braced
-                | '\n' ->
-                    iter (i+1) braced
-                | '*' ->
-                    let before = maybe b in
-                    let i, line = iter (i+1) braced in
-                    i, before @ M (INPUT.loc ic, "linebreak", []) :: line
-                | _ ->
-                    let before = maybe b in
-                    let i, line = iter_macro i i braced in
-                    i, before @ line
-              end
+              len, maybe b
+          else
+            begin
+              let c = line.[i] in
+              match c with
+              | '{' | '}' | '@' | '.' | '!' | '?' ->
+                Buffer.add_char b c ;
+                iter (i+1) braced
+              | '\n' ->
+                iter (i+1) braced
+              | '*' ->
+                let before = maybe b in
+                let i, line = iter (i+1) braced in
+                i, before @ MACRO (INPUT.loc ic, "linebreak", []) :: line
+              | _ ->
+                let before = maybe b in
+                let i, line = iter_macro i i braced in
+                i, before @ line
+            end
         | '`' when i+1 < len && line.[i+1] = '`' ->
-            let before = maybe b in
-            let i = i+2 in
-            let i, quoted = iter i QUOTE in
-            let i, line = iter i braced in
-            i, before @ Q quoted :: line
+          let before = maybe b in
+          let i = i+2 in
+          let i, quoted = iter i QUOTE in
+          let i, line = iter i braced in
+          i, before @ QUOTE quoted :: line
         | '\'' when i+1 < len && line.[i+1] = '\'' ->
-            if braced <> QUOTE then
-              INPUT.error ~ic "unbalanced ending quote";
+          if braced <> QUOTE then begin
+            (* INPUT.error ~ic "unbalanced ending quote"; *)
+            Buffer.add_string b "''";
+            iter (i+2) braced
+          end else
             let before = maybe b in
             let i = i+2 in
             i, before
         | c ->
-            Buffer.add_char b c ;
-            iter (i+1) braced
+          Buffer.add_char b c ;
+          iter (i+1) braced
 
     and iter_macro i pos0 braced =
       if i = len then
@@ -237,30 +240,30 @@ let read filename =
           INPUT.error ~ic "unexpected end of line"
         else
           let macro = String.sub line pos0 (i-pos0) in
-          len, [ M (INPUT.loc ic, macro, []) ]
+          len, [ MACRO (INPUT.loc ic, macro, []) ]
       else
         match line.[i] with
         | '{' ->
-            let macro = String.sub line pos0 (i-pos0) in
-            let i, arg = iter (i+1) BRACE in
-            let i, line = iter i braced in
-            i, begin
-              match macro with
-              | "value" ->
-                  let arg = string_of_line arg in
-                  begin
-                    match StringMap.find arg !map with
-                    | s -> S s :: line
-                    | exception Not_found ->
-                        INPUT.error ~ic "Unknown variable %S" arg
-                  end
-              | _ -> M (INPUT.loc ic, macro, arg) :: line
-            end
+          let macro = String.sub line pos0 (i-pos0) in
+          let i, arg = iter (i+1) BRACE in
+          let i, line = iter i braced in
+          i, begin
+            match macro with
+            | "value" ->
+              let arg = string_of_line arg in
+              begin
+                match StringMap.find arg !map with
+                | s -> STRING s :: line
+                | exception Not_found ->
+                  INPUT.error ~ic "Unknown variable %S" arg
+              end
+            | _ -> MACRO (INPUT.loc ic, macro, arg) :: line
+          end
 
         | ' ' | '\t' ->
-            let macro = String.sub line pos0 (i-pos0) in
-            let i, line = iter (i+1) braced in
-            i, M (INPUT.loc ic, macro, []) :: line
+          let macro = String.sub line pos0 (i-pos0) in
+          let i, line = iter (i+1) braced in
+          i, MACRO (INPUT.loc ic, macro, []) :: line
         | _ -> iter_macro (i+1) pos0 braced
 
     in
@@ -283,221 +286,249 @@ let read filename =
       Some number, title
   in
 
-  let rec iter_file file rev stack =
-    let filename = Filename.concat dirname file in
+  let find_file ?ic file =
+
+    let rec find_in_path path file =
+      match path with
+      | [] ->
+        INPUT.error ?ic "Could not find file %S" file
+      | dir :: path ->
+        let filename = Filename.concat dir file in
+        if Sys.file_exists filename then
+          filename
+        else
+          find_in_path path file
+    in
+    find_in_path ( dirname :: path) file
+  in
+  let rec iter_file ?ic file rev stack =
+    let filename = find_file ?ic file in
     Printf.eprintf "Reading %S\n%!" filename;
-    let ic = INPUT.open_in filename in
-    iter_lines ic rev stack
+    match INPUT.open_in filename with
+    | ic -> iter_lines ic rev stack
 
   and iter_lines ic rev stack =
     match INPUT.input_line ic with
     | exception _ ->
-        INPUT.close_in ic;
-        rev, stack
+      INPUT.close_in ic;
+      rev, stack
     | line ->
-        let command, arg = split_command line in
-        match command with
+      let command, arg = split_command line in
+      match command with
 
-        (* Discard these lines *)
-        | "@paragraphindent"
-        | "@sp"
-        | "@c"
-        | "@top"
-        | "@settitle"
-        | "\\input"
-        | "@page"
-        | "@unnumbered"
-        | "@printindex"
-        | "@bye"
-        | "@headings"
-        | "@oddheading"
-        | "@oddfooting"
-        | "@evenheading"
-        | "@evenfooting"
-        | "@validatemenus"
-        | "@node"
-        | "@contents"
-        | "@comment"
-        | "@comment*"
-        | "@setfilename"
-        | "@finalout"
-        | "@setchapternewpage"
-        | "@dircategory"
-        | "@*Document"
-        | "@*Updates:"
-        | "@vskip"
-        | "@insertcopying"
-          ->
-            iter_lines ic rev stack
+      (* Discard these lines *)
+      | "@paragraphindent"
+      | "@sp"
+      | "@c"
+      | "@top"
+      | "@settitle"
+      | "\\input"
+      | "@page"
+      | "@unnumbered"
+      | "@printindex"
+      | "@bye"
+      | "@headings"
+      | "@oddheading"
+      | "@oddfooting"
+      | "@evenheading"
+      | "@evenfooting"
+      | "@validatemenus"
+      | "@contents"
+      | "@comment"
+      | "@comment*"
+      | "@setfilename"
+      | "@finalout"
+      | "@setchapternewpage"
+      | "@dircategory"
+      | "@*Document"
+      | "@*Updates:"
+      | "@vskip"
+      | "@insertcopying"
+      | "@exampleindent"
+        ->
+        iter_lines ic rev stack
 
-        | "@cindex" ->
-            iter_lines ic (INDEX arg :: rev) stack
-        | "@set" ->
-            let name, value = EzString.cut_at arg ' ' in
-            map := StringMap.add name value !map;
-            iter_lines ic rev stack
-        | "@title" ->
-            title := Some ( parse_line ic arg ) ;
-            iter_lines ic rev stack
-        | "@subtitle" ->
-            subtitle := Some ( parse_line ic arg ) ;
-            iter_lines ic rev stack ;
-        | "@author" ->
-            authors := ( parse_line ic arg ) :: !authors ;
-            iter_lines ic rev stack
-        | "@include" ->
-            let rev, stack =
-              if arg = "Macros.texi" then rev, stack else
-                iter_file arg rev stack in
-            iter_lines ic rev stack
+      | "@node" ->
+        let arg, _ = EzString.cut_at arg ',' in
+        iter_lines ic (NODE arg :: rev) stack
+      | "@cindex" ->
+        iter_lines ic (INDEX arg :: rev) stack
+      | "@set" ->
+        let name, value = EzString.cut_at arg ' ' in
+        map := StringMap.add name value !map;
+        iter_lines ic rev stack
+      | "@title" ->
+        title := Some ( parse_line ic arg ) ;
+        iter_lines ic rev stack
+      | "@subtitle" ->
+        subtitle := Some ( parse_line ic arg ) ;
+        iter_lines ic rev stack ;
+      | "@author" ->
+        authors := ( parse_line ic arg ) :: !authors ;
+        iter_lines ic rev stack
+      | "@include" ->
+        let rev, stack =
+          if arg = "Macros.texi" then rev, stack else
+            iter_file ~ic arg rev stack in
+        iter_lines ic rev stack
 
-        | "@end" ->
-            iter_end ic rev stack arg
-        | "@enddict" ->
-            iter_end ic rev stack "table"
+      | "@verbatiminclude" ->
+        let lines = EzFile.read_lines_to_list (find_file ~ic arg) in
+        let lines = List.map (fun line -> LINE [STRING line]) lines in
+        iter_lines ic ( BLOCK("verbatim", lines ) :: rev ) stack
 
-        | "@float"
-        | "@format"
-        | "@smallformat"
-        | "@cartouche"
-        | "@ifhtml"
-        | "@html"
-        | "@display"
-        | "@group"
-        | "@raggedright"
-        | "@example"
-        | "@smallexample"
-        | "@ifinfo"
-        | "@iftex"
-        | "@ifnottex"
-        | "@titlepage"
-        | "@quotation"
-        | "@direntry"
-        | "@copying"
-        | "@detailmenu"
-        | "@menu"
-          ->
-            let name = String.sub command 1 ( String.length command - 1 ) in
-            iter_lines ic [] ( ( name, RawBlock, rev ) :: stack )
+      | "@end" ->
+        iter_end ic rev stack arg
+      | "@enddict" ->
+        iter_end ic rev stack "table"
 
-        | "@verbatim"
-        | "@tex"
-          ->
-            let name = String.sub command 1 ( String.length command - 1 ) in
-            let rec verbatim ic rev =
-              match INPUT.input_line ic with
-              | exception _ ->
-                  INPUT.close_in ic;
-                  INPUT.error ~ic "unclosed verbatim block"
-              | "@end verbatim"
-              | "@end tex"
-                -> List.rev rev
-              | line ->
-                  verbatim ic ( LINE [S line] :: rev )
+      | "@float"
+      | "@format"
+      | "@smallformat"
+      | "@cartouche"
+      | "@ifhtml"
+      | "@html"
+      | "@display"
+      | "@group"
+      | "@raggedright"
+      | "@example"
+      | "@smallexample"
+      | "@ifinfo"
+      | "@iftex"
+      | "@ifnottex"
+      | "@titlepage"
+      | "@quotation"
+      | "@direntry"
+      | "@copying"
+      | "@ignore"
+      | "@detailmenu"
+      | "@menu"
+        ->
+        let name = String.sub command 1 ( String.length command - 1 ) in
+        iter_lines ic [] ( ( name, RawBlock, rev ) :: stack )
+
+      | "@verbatim"
+      | "@tex"
+        ->
+        let name = String.sub command 1 ( String.length command - 1 ) in
+        let rec verbatim ic rev =
+          match INPUT.input_line ic with
+          | exception _ ->
+            INPUT.close_in ic;
+            INPUT.error ~ic "unclosed verbatim block"
+          | "@end verbatim"
+          | "@end tex"
+            -> List.rev rev
+          | line ->
+            verbatim ic ( LINE [STRING line] :: rev )
+        in
+        (* TODO: because we don't interprete these lines, there are @w{} inside. *)
+        let verbatim = verbatim ic [] in
+        iter_lines ic  ( BLOCK (name, verbatim) :: rev ) stack
+
+      | "@multitable"
+      | "@table"
+      | "@vtable"
+      | "@itemize"
+      | "@enumerate"
+        ->
+        let name = String.sub command 1 ( String.length command - 1 ) in
+        iter_lines ic [] ( ( name, Items (arg, None, []), rev ) :: stack )
+
+      | "@headitem" (* TODO: for multitable *)
+      | "@item"
+      | "@itemx" (* TODO Must improve *)
+        (* TODO: ~~~~~~~~~~ in diagrams are removed by rst *)
+        ->
+        let arg = parse_line ic arg in
+        let stack = end_item ic rev stack (Some arg) in
+        iter_lines ic [] stack
+
+      | "@chapter"
+      | "@newchapter" ->
+        iter_section ic rev stack 1 arg
+      | "@appendix"
+      | "@newappendix" ->
+        iter_section ic rev stack 1 arg
+      | "@newsection"
+      | "@section" ->
+        iter_section ic rev stack 2 arg
+      | "@subsection"
+      | "@newsubsection" ->
+        iter_section ic rev stack 3 arg
+      | "@newunit"
+      | "@subsubsection" ->
+        iter_section ic rev stack 4 arg
+
+      | "@diagram" ->
+        let len = String.length arg in
+        if len < 3 ||
+           arg.[0] <> '{' || arg.[len-1] <> '}' then
+          INPUT.error ~ic "invalid argument for @diagram";
+        let arg = String.sub arg 1 (len-2) in
+        begin
+          match List.map String.trim @@ EzString.split arg ',' with
+          | [ title ; id1 ; id2 ; note ] ->
+
+            if id1 <> id2 then
+              INPUT.warning ic "diagram with %s <> %s\n%!"
+                id1 id2;
+
+            let lines = EzFile.read_lines_to_list
+                ( dirname //
+                  Printf.sprintf "SYN-%s.texi" id1) in
+            let block =
+              DIAGRAM (title, List.map (fun s -> LINE [ STRING s]) lines)
             in
-            (* TODO: because we don't interprete these lines, there are @w{} inside. *)
-            let verbatim = verbatim ic [] in
-            iter_lines ic  ( BLOCK (name, verbatim) :: rev ) stack
+            let note =
+              if note = "None" then []
+              else
 
-        | "@multitable"
-        | "@table"
-        | "@itemize"
-        | "@enumerate"
-          ->
-            let name = String.sub command 1 ( String.length command - 1 ) in
-            iter_lines ic [] ( ( name, Items (arg, None, []), rev ) :: stack )
+                let rev, _stack =
+                  iter_file ~ic (Printf.sprintf "NOTE-%s.texi" note) [] []
+                in
+                rev
+            in
+            iter_lines ic ( note @ block :: rev ) stack
+          | _ ->
+            INPUT.error ~ic "invalid arguments for @diagram";
+        end
 
-        | "@headitem" (* TODO: for multitable *)
-        | "@item"
-        | "@itemx" (* TODO Must improve *)
-          (* TODO: ~~~~~~~~~~ in diagrams are removed by rst *)
-          ->
-            let arg = parse_line ic arg in
-            let stack = end_item ic rev stack (Some arg) in
-            iter_lines ic [] stack
-
-        | "@newchapter" ->
-            iter_section ic rev stack 1 arg
-        | "@newappendix" ->
-            iter_section ic rev stack 1 arg
-        | "@section" ->
-            iter_section ic rev stack 2 arg
-        | "@newsection" ->
-            iter_section ic rev stack 2 arg
-        | "@newsubsection" ->
-            iter_section ic rev stack 3 arg
-        | "@newunit" ->
-            iter_section ic rev stack 4 arg
-
-        | "@diagram" ->
-            let len = String.length arg in
-            if len < 3 ||
-               arg.[0] <> '{' || arg.[len-1] <> '}' then
-              INPUT.error ~ic "invalid argument for @diagram";
-            let arg = String.sub arg 1 (len-2) in
-            begin
-              match List.map String.trim @@ EzString.split arg ',' with
-              | [ title ; id1 ; id2 ; note ] ->
-
-                  if id1 <> id2 then
-                    INPUT.warning ic "diagram with %s <> %s\n%!"
-                      id1 id2;
-
-                  let lines = EzFile.read_lines_to_list
-                      ( dirname //
-                        Printf.sprintf "SYN-%s.texi" id1) in
-                  let block =
-                    DIAGRAM (title, List.map (fun s -> LINE [ S s]) lines)
-                  in
-                  let note =
-                    if note = "None" then []
-                    else
-
-                      let rev, _stack =
-                        iter_file (Printf.sprintf "NOTE-%s.texi" note) [] []
-                      in
-                      rev
-                  in
-                  iter_lines ic ( note @ block :: rev ) stack
-              | _ ->
-                  INPUT.error ~ic "invalid arguments for @diagram";
-            end
-
-        | _ ->
-            if line = "" then
-              iter_lines ic ( EMPTY_LINE :: rev ) stack
-            else
-              let line = parse_line ic line in
-              iter_lines ic ( LINE line :: rev ) stack
+      | _ ->
+        if line = "" then
+          iter_lines ic ( EMPTY_LINE :: rev ) stack
+        else
+          let line = parse_line ic line in
+          iter_lines ic ( LINE line :: rev ) stack
 
   and end_item ic rev stack item_arg =
     match stack with
     | [] ->
-        INPUT.error ~ic "@end/@item with empty stack"
+      INPUT.error ~ic "@end/@item with empty stack"
     | (name, Items (header, item_arg_before, items), rev_before)
       :: stack_before ->
-        let middle =
-          match item_arg_before, rev with
-          | None, rev ->
-              if not ( List.for_all (fun line ->
-                  match line with
-                  | EMPTY_LINE -> true
-                  | _ -> false) rev) then
-                let items =
-                  ( [], List.rev rev ) :: items
-                in
-                Items (header, item_arg, items)
-              else
-                Items (header, item_arg, items)
-          | Some item_arg_before, _ ->
-              let items =
-                ( item_arg_before, List.rev rev ) :: items
-              in
-              Items (header, item_arg, items)
-        in
-        (name, middle, rev_before) :: stack_before
+      let middle =
+        match item_arg_before, rev with
+        | None, rev ->
+          if not ( List.for_all (fun line ->
+              match line with
+              | EMPTY_LINE -> true
+              | _ -> false) rev) then
+            let items =
+              ( [], List.rev rev ) :: items
+            in
+            Items (header, item_arg, items)
+          else
+            Items (header, item_arg, items)
+        | Some item_arg_before, _ ->
+          let items =
+            ( item_arg_before, List.rev rev ) :: items
+          in
+          Items (header, item_arg, items)
+      in
+      (name, middle, rev_before) :: stack_before
     | (name, _, _) :: _ ->
-        INPUT.error ~ic "@item in %S block" name
+      INPUT.error ~ic "@item in %S block" name
 
   and iter_section ic rev stack level arg =
     let rev, stack = end_section ~ic rev stack level in
@@ -507,62 +538,64 @@ let read filename =
   and end_section ?ic rev stack level =
     match stack with
     | [] ->
-        if level > 1 then
-          INPUT.error ?ic "[sub]section at topelevel";
-        rev, stack
+      if level > 1 then
+        INPUT.error ?ic "[sub]section at toplevel";
+      rev, stack
     | ("section", Level (level_before, number, title), rev_before ) ::
       stack_before ->
-        if level_before >= level then
-          let item = LEVEL (level_before, number, title, List.rev rev) in
-          let rev = item :: rev_before in
-          end_section rev stack_before level
-        else
-          rev, stack
+      if level_before >= level then
+        let item = LEVEL (level_before, number, title, List.rev rev) in
+        let rev = item :: rev_before in
+        end_section rev stack_before level
+      else
+        rev, stack
     | (name, _, _) :: _ ->
-        INPUT.error ?ic "missing @end %s\n%!" name
+      INPUT.error ?ic "missing @end %s\n%!" name
 
   and iter_end ic rev stack arg =
     let rev, stack =
       match arg with
       | "table"
+      | "vtable"
       | "multitable"
       | "enumerate"
       | "itemize" ->
-          [], end_item ic rev stack None
+        [], end_item ic rev stack None
       | _ -> rev, stack
     in
     begin
       match stack with
       | [] ->
-          INPUT.error ~ic "@end %s with empty stack" arg
+        INPUT.error ~ic "@end %s with empty stack" arg
       | ( name, content, rev_before ) :: stack_before ->
-          if name <> arg then
-            INPUT.error ~ic "@end %s but %S expected\n%!"
-              arg name ;
-          let rev = match name with
+        if name <> arg then
+          INPUT.error ~ic "@end %s but %S expected\n%!"
+            arg name ;
+        let rev = match name with
 
-            | "iftex"
-            | "ifhtml"
-            | "titlepage"
-            | "direntry"
-            | "menu"
-              -> rev_before
+          | "iftex"
+          | "ifhtml"
+          | "titlepage"
+          | "direntry"
+          | "menu"
+            -> rev_before
 
-            | "multitable"
-            | "table"
-            | "enumerate"
-            | "itemize"
-              ->
-                begin
-                  match content with
-                  | Items (header, None, items) ->
-                      ITEMS ( name, header, List.rev items) :: rev_before
-                  | _ -> assert false
-                end
+          | "multitable"
+          | "table"
+          | "vtable"
+          | "enumerate"
+          | "itemize"
+            ->
+            begin
+              match content with
+              | Items (header, None, items) ->
+                ITEMS ( name, header, List.rev items) :: rev_before
+              | _ -> assert false
+            end
 
-            | _ -> BLOCK ( name, List.rev rev ) :: rev_before
-          in
-          iter_lines ic rev stack_before
+          | _ -> BLOCK ( name, List.rev rev ) :: rev_before
+        in
+        iter_lines ic rev stack_before
 
     end
 
@@ -591,6 +624,8 @@ let print_blocks oc doc =
         begin
           match item with
           | EMPTY_LINE -> Printf.fprintf oc "%sEMPTY_LINE\n" (spaces indent)
+          | NODE index ->
+              Printf.fprintf oc "%sNODE %s\n" (spaces indent) index
           | INDEX index ->
               Printf.fprintf oc "%sINDEX %s\n" (spaces indent) index
           | LINE line ->
@@ -766,7 +801,7 @@ let rst_trim s =
 let rec rst_of_line ctx line =
   String.concat "" @@
   List.map (function
-      | S s ->
+      | STRING s ->
           begin
             match ctx.math, ctx.verbatim with
             | true :: _, _
@@ -774,15 +809,16 @@ let rec rst_of_line ctx line =
             | _ ->
                 rst_escape s
           end
-      | Q q -> Printf.sprintf "\"%s\"" ( rst_of_line ctx q )
+      | QUOTE q -> Printf.sprintf "\"%s\"" ( rst_of_line ctx q )
 
-      | M ( loc, name, arg) ->
+      | MACRO ( loc, name, arg) ->
           match name with
 
           | "_" -> rst_of_line ctx arg
 
           (******                               texinfo generic macros *)
 
+          | "`" -> if List.hd ctx.verbatim = LiteralBlock then "`" else "\\`"
           | "TeX" -> "TeX"
           | "w" -> ""
           | "noindent" -> ""
@@ -800,8 +836,8 @@ let rec rst_of_line ctx line =
               Printf.sprintf "\\ *%s*\\ " arg
           | "kbd"
           | "option"
-          | "env" -> rst_of_line ctx [ M (loc, "code", arg)]
-          | "sc" -> rst_of_line ctx [ M (loc, "small-caps", arg)]
+          | "env" -> rst_of_line ctx [ MACRO (loc, "code", arg)]
+          | "sc" -> rst_of_line ctx [ MACRO (loc, "small-caps", arg)]
           | "code" ->
               let arg =
                 let verbatim_stack = ctx.verbatim in
@@ -843,6 +879,7 @@ let rec rst_of_line ctx line =
           | "var" ->
               let arg = rst_of_line0 ctx arg in
               Printf.sprintf "<%s>" arg
+          | "emph"
           | "strong"
           | "b"
             ->
@@ -889,43 +926,44 @@ let rec rst_of_line ctx line =
 
 
           | "anchoridx" ->
-              rst_of_line ctx [ M (loc, "idx", arg);
-                                M (loc, "anchor", arg) ]
+              rst_of_line ctx [ MACRO (loc, "idx", arg);
+                                MACRO (loc, "anchor", arg) ]
           | "define"
           | "itemdfn"
             ->
-              rst_of_line ctx [ M (loc, "idx", arg ) ;
-                                M (loc, "dfn", arg ) ]
+              rst_of_line ctx [ MACRO (loc, "idx", arg ) ;
+                                MACRO (loc, "dfn", arg ) ]
           | "directive" ->
-              rst_of_line ctx [ M (loc, "code", arg) ; S " CDF directive" ]
+            rst_of_line ctx [ MACRO (loc, "code", arg) ;
+                              STRING " CDF directive" ]
           | "directiveref" ->
               with_pxref ctx loc "directive" arg
           | "envvarcompile" ->
               with_pxref ctx loc "code" ~arg
                 ~prefix: [
-                  M (loc, "idx", arg @ [ S " Environment Variable"]) ;
-                  M (loc, "idx", [ S " Environment Variables, "] @ arg) ;
+                  MACRO (loc, "idx", arg @ [ STRING " Environment Variable"]) ;
+                  MACRO (loc, "idx", [ STRING " Environment Variables, "] @ arg) ;
                 ]
                 ~suffix:" compilation-time environment variable"
-                [ S "Compilation Time Environment Variables" ]
+                [ STRING "Compilation Time Environment Variables" ]
           | "envvarruntime" ->
               rst_of_line ctx [
-                M (loc, "idx", arg @ [ S " Environment Variable"]) ;
-                M (loc, "idx", [ S " Environment Variables, "] @ arg) ;
-                S " run-time environment variable" ]
+                MACRO (loc, "idx", arg @ [ STRING " Environment Variable"]) ;
+                MACRO (loc, "idx", [ STRING " Environment Variables, "] @ arg) ;
+                STRING " run-time environment variable" ]
           | "envvarruntimeref" ->
               with_pxref ctx loc "envvarruntime" ~arg
-                [ S "Run Time Environment Variables" ]
+                [ STRING "Run Time Environment Variables" ]
           | "envvarruntimerefs" ->
               with_pxref ctx loc "envvarruntime" ~arg
                 ~suffix: " run-time environment variables"
-                [ S "Run Time Environment Variables" ]
+                [ STRING "Run Time Environment Variables" ]
           | "idx" ->
               let arg = rst_of_line0 ctx arg in
               add_index ctx arg;
               if List.hd ctx.verbatim = Block then "\\ " else ""
           | "intrinsic" ->
-              rst_of_line ctx [ M (loc, "code", arg) ; S " intrinsic function" ]
+              rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " intrinsic function" ]
           | "intrinsicref" ->
               with_pxref ctx loc "intrinsic" arg
           (* newappendix *)
@@ -935,37 +973,37 @@ let rec rst_of_line ctx line =
           (* newsubsection *)
           (* newunit *)
           | "registertext" ->
-              rst_of_line ctx [ M (loc, "code", arg) ; S " special register" ]
+              rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " special register" ]
           | "register" ->
-              rst_of_line ctx [ M (loc, "idx", arg @ [ S " Special Register" ] );
-                                M (loc, "idx", [ S " Special Registers, " ] @ arg  );
-                                M (loc, "registertext", arg);
+              rst_of_line ctx [ MACRO (loc, "idx", arg @ [ STRING " Special Register" ] );
+                                MACRO (loc, "idx", [ STRING " Special Registers, " ] @ arg  );
+                                MACRO (loc, "registertext", arg);
                               ]
           | "registerref" ->
-              with_pxref ctx loc "register" ~arg [ S "Special Registers" ]
+              with_pxref ctx loc "register" ~arg [ STRING "Special Registers" ]
           | "registerrefalt" ->
               with_pxrefalt ctx loc "register" arg
           | "statement" ->
-              rst_of_line ctx [ M (loc, "code", arg) ; S " statement" ]
+              rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " statement" ]
           | "statementref" ->
               with_pxref ctx loc "statement" arg
           | "statementrefalt" ->
               with_pxrefalt ctx loc "statement" arg
           | "subpgm" ->
-              rst_of_line ctx [ M (loc, "code", arg) ; S " built-in system subroutine" ]
+              rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " built-in system subroutine" ]
           | "subpgmref" ->
               with_pxref ctx loc "subpgm" arg
           | "switch" ->
-              rst_of_line ctx [ M (loc, "option", arg) ; S " switch" ]
+              rst_of_line ctx [ MACRO (loc, "option", arg) ; STRING " switch" ]
           | "switchidx" ->
-              rst_of_line ctx [ M (loc, "idx", [ S "Compiler Switches, " ] @ arg) ;
-                                M (loc, "idx", arg @ [ S " Compiler Switch" ]) ;
-                                M (loc, "switch", arg) ]
+              rst_of_line ctx [ MACRO (loc, "idx", [ STRING "Compiler Switches, " ] @ arg) ;
+                                MACRO (loc, "idx", arg @ [ STRING " Compiler Switch" ]) ;
+                                MACRO (loc, "switch", arg) ]
           | "syntaxidx" ->
-              rst_of_line ctx [ M (loc, "idx", arg);
-                                M (loc, "code", arg); ]
+              rst_of_line ctx [ MACRO (loc, "idx", arg);
+                                MACRO (loc, "code", arg); ]
           | "plainidx" ->
-              rst_of_line ctx ( [ M (loc, "idx", arg) ] @ arg )
+              rst_of_line ctx ( [ MACRO (loc, "idx", arg) ] @ arg )
           | "syntaxref" ->
               with_pxref ctx loc "code" arg
           | "syntaxrefalt" ->
@@ -976,7 +1014,7 @@ let rec rst_of_line ctx line =
               with_pxref ctx loc "_" arg
 
 
-          | "t" -> rst_of_line ctx [ M (loc, "code", arg) ]
+          | "t" -> rst_of_line ctx [ MACRO (loc, "code", arg) ]
           | "key"
             ->
               let arg = rst_of_line0 ctx arg in
@@ -1035,15 +1073,15 @@ and with_pxref ctx loc name ?arg ?(prefix=[]) ?suffix ref =
     | Some arg -> arg
   in
   let prefix = match suffix with
-    | None ->  prefix @ [ M (loc, name, arg) ]
-    | Some suffix -> prefix @ [ M (loc, name, arg); S suffix ]
+    | None ->  prefix @ [ MACRO (loc, name, arg) ]
+    | Some suffix -> prefix @ [ MACRO (loc, name, arg); STRING suffix ]
   in
-  rst_of_line ctx (prefix @ [ S " ("; M (loc, "pxref", ref); S ")" ])
+  rst_of_line ctx (prefix @ [ STRING " ("; MACRO (loc, "pxref", ref); STRING ")" ])
 
 and with_pxrefalt ctx loc name arg =
   match parse_args ctx arg with
   | [ text ; ref ] ->
-      with_pxref ctx loc name ~arg:[ S text ] [ S ref ]
+      with_pxref ctx loc name ~arg:[ STRING text ] [ STRING ref ]
   | _ -> assert false
 
 let rst_of_line = rst_of_line0
@@ -1083,7 +1121,7 @@ let output_level ctx oc level ?number title =
 
 let linebreaks line =
   if List.exists (function
-        M (_loc, "linebreak", []) -> true
+        MACRO (_loc, "linebreak", []) -> true
       | _ -> false ) line then
     let rec iter lines rev line =
       match line with
@@ -1092,7 +1130,7 @@ let linebreaks line =
             ( match rev with
               | [] ->  lines
               | _ -> List.rev rev :: lines )
-      | M ( _loc, "linebreak", [] ) :: line ->
+      | MACRO ( _loc, "linebreak", [] ) :: line ->
           iter (List.rev rev :: lines ) [] line
       | inline :: line ->
           iter lines ( inline :: rev ) line
@@ -1129,6 +1167,8 @@ and output_block ctx oc indent block =
       end
   | INDEX index ->
       add_index ctx index
+  | NODE index ->
+      add_anchor ctx index
   | EMPTY_LINE ->
       OUTPUT.fprintf oc "%s\n" indent ;
       place_for_indexes ctx oc indent ;
@@ -1151,7 +1191,7 @@ and output_block ctx oc indent block =
   | DIAGRAM (title, blocks) ->
       if ctx.doc.basename = "gnucobqr" then begin
         place_for_indexes ctx oc "" ;
-        output_level ctx oc 2 [ S ( title ^ " Syntax") ] ;
+        output_level ctx oc 2 [ STRING ( title ^ " Syntax") ] ;
       end
       else
         OUTPUT.fprintf oc "%s%s Syntax\n" indent title;
@@ -1202,7 +1242,7 @@ and output_block ctx oc indent block =
             OUTPUT.fprintf oc "%s\n" indent;
             ctx.verbatim <- verbatim_stack
       end;
-  | BLOCK ( ("ifnottex" | "ifinfo" ), _ ) -> ()
+  | BLOCK ( ("ifnottex" | "ifinfo" | "ignore"), _ ) -> ()
   | BLOCK (name, blocks) -> (* TODO *)
 
       begin
@@ -1230,7 +1270,7 @@ and output_block ctx oc indent block =
                 if style = "asis" then
                   title
                 else
-                  [ M (LOCATION.any, style, title)]
+                  [ MACRO (LOCATION.any, style, title)]
               in
               OUTPUT.fprintf oc "\n\n%s* %s\n\n" indent
                 (rst_of_line ctx title);
@@ -1321,50 +1361,51 @@ let to_rst doc dir =
 
         match block with
         | BLOCK ( "copying", blocks ) ->
-            let file = "copying.rst" in
-            ctx.files <- file :: ctx.files ;
-            let oc = OUTPUT.open_out ( dir // file ) in
+          let file = "copying.rst" in
+          ctx.files <- file :: ctx.files ;
+          let oc = OUTPUT.open_out ( dir // file ) in
 
-            OUTPUT.fprintf oc "%s" rst_header;
-            place_for_indexes ctx oc "" ;
-            output_level ctx oc 1 [ S "Copyright" ] ;
-            output_blocks ctx oc "" blocks ;
+          OUTPUT.fprintf oc "%s" rst_header;
+          place_for_indexes ctx oc "" ;
+          output_level ctx oc 1 [ STRING "Copyright" ] ;
+          output_blocks ctx oc "" blocks ;
 
-            List.iter (fun arg ->
-                OUTPUT.fprintf oc "\n\n.. [#] %s\n" arg;
-              ) ( List.rev ctx.footnotes );
+          List.iter (fun arg ->
+              OUTPUT.fprintf oc "\n\n.. [#] %s\n" arg;
+            ) ( List.rev ctx.footnotes );
 
-            if gen_files then OUTPUT.close_out oc
+          if gen_files then OUTPUT.close_out oc
 
 
         | LEVEL (1, number, title, blocks) ->
-            incr chapters ;
-            let file = Printf.sprintf "chapter%d.rst" !chapters in
-            ctx.files <- file :: ctx.files ;
-            ctx.footnotes <- [] ;
-            let oc = OUTPUT.open_out ( dir // file ) in
+          incr chapters ;
+          let file = Printf.sprintf "chapter%d.rst" !chapters in
+          ctx.files <- file :: ctx.files ;
+          ctx.footnotes <- [] ;
+          let oc = OUTPUT.open_out ( dir // file ) in
 
-            OUTPUT.fprintf oc "%s" rst_header;
-            place_for_indexes ctx oc "" ;
-            output_level ctx oc 1 ?number title ;
-            output_blocks ctx oc "" blocks ;
+          OUTPUT.fprintf oc "%s" rst_header;
+          place_for_indexes ctx oc "" ;
+          output_level ctx oc 1 ?number title ;
+          output_blocks ctx oc "" blocks ;
 
-            List.iter (fun arg ->
-                OUTPUT.fprintf oc "\n\n.. [#] %s\n" arg;
-              ) ( List.rev ctx.footnotes );
+          List.iter (fun arg ->
+              OUTPUT.fprintf oc "\n\n.. [#] %s\n" arg;
+            ) ( List.rev ctx.footnotes );
 
-            if gen_files then OUTPUT.close_out oc
+          if gen_files then OUTPUT.close_out oc
         | BLOCK ("ifnottex", _ ) -> ()
         | BLOCK ("ifinfo", _ ) -> ()
         | LINE line ->
-            Printf.eprintf "Discarding toplevel line %s\n%!"
-              ( string_of_line line )
+          Printf.eprintf "Discarding toplevel line %s\n%!"
+            ( string_of_line line )
         | EMPTY_LINE -> ()
+        | NODE _ -> ()
         | _ ->
-            Printf.eprintf "ERROR:<<<\n%!";
-            print_blocks stderr [block];
-            Printf.eprintf ">>>\n%!";
-            assert false
+          Printf.eprintf "ERROR:<<<\n%!";
+          print_blocks stderr [block];
+          Printf.eprintf ">>>\n%!";
+          assert false
       ) doc.content ;
 
 
@@ -1434,9 +1475,9 @@ let to_rst doc dir =
 
   ()
 
-let action ~filename ?target () =
+let action ~path ~filename ?target () =
 
-  let doc = read filename in
+  let doc = read ~path filename in
   match target with
   | None ->
       print_doc doc
@@ -1448,17 +1489,22 @@ let action ~filename ?target () =
 let cmd =
   let filename = ref None in
   let target = ref None in
+  let path = ref [] in
   EZCMD.sub
     "texi2rst"
     (fun () ->
+       let path = List.rev !path in
        match !filename with
        | None -> Fatal.error "You must specify a filename"
-       | Some filename -> action ~filename ?target:!target ()
+       | Some filename -> action ~path ~filename ?target:!target ()
     )
     ~args:
       [
         [ "o" ], Arg.String (fun s -> target := Some s),
         EZCMD.info ~docv:"DIR" "Target directory for RST generation";
+
+        [ "I" ], Arg.String (fun s -> path := s :: !path),
+        EZCMD.info ~docv:"DIR" "Add to lookup path for files";
 
         [],
         Arg.Anon (0, fun s -> filename := Some s),
