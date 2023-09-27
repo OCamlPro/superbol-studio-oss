@@ -5,11 +5,12 @@
 
 ## Features
 
-* LSP (`superbol-free`) with following capabilities:
+* LSP (`superbol-free`) with the following capabilities:
     * Syntax diagnostics
     * Go to definitions
     * Find references
     * Peek on copybook and source text replacements
+    * Folding of whole divisions, sections, and paragraphs
     * Semantic highlighting
     * File and range indentation
 
