@@ -171,14 +171,16 @@ and fold_ident (v: _ #folder) =
       | ObjectView ov -> fold_object_view v ov
       | ObjectRef po -> fold_object_ref v po
       | QualIdent qi -> fold_qualident v qi
+      | RefMod (i, r) -> fun x -> x
+        >> fold_ident v (UPCAST.base_ident_with_refmod i)
+        >> fold_refmod v r
     end
 
 and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
-    ~continue:begin fun { ident_name; ident_subscripts; ident_refmod } x -> x
+    ~continue:begin fun { ident_name; ident_subscripts } x -> x
       >> fold_qualname v ident_name
       >> fold_list ~fold:fold_subscript v ident_subscripts
-      >> fold_option ~fold:fold_refmod v ident_refmod
     end
 
 and fold_qualname (v: _ #folder) =
@@ -201,9 +203,9 @@ and fold_subscript (v: _ #folder) =
 
 and fold_refmod (v: _ #folder) =
   handle v#fold_refmod
-    ~continue:begin fun { leftmost; length_opt } x -> x
-      >> fold_expr v leftmost
-      >> fold_option ~fold:fold_expr v length_opt
+    ~continue:begin fun { refmod_left; refmod_length } x -> x
+      >> fold_expr v refmod_left
+      >> fold_option ~fold:fold_expr v refmod_length
     end
 
 and fold_address (v: _ #folder) =
@@ -215,10 +217,9 @@ and fold_address (v: _ #folder) =
 
 and fold_inline_call (v: _ #folder) =
   handle v#fold_inline_call
-    ~continue:begin fun { call_fun; call_args; call_refmod } x -> x
+    ~continue:begin fun { call_fun; call_args } x -> x
       >> fold_name' v call_fun
       >> fold_list ~fold:fold_effective_arg v call_args
-      >> fold_option ~fold:fold_refmod v call_refmod
     end
 
 and fold_inline_invocation (v: _ #folder) =
@@ -273,7 +274,8 @@ and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = functi
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
   | Alphanum _
   | Boolean _
   | Fixed _
@@ -344,7 +346,8 @@ let fold_ident_or_alphanum (v: _ #folder) : ident_or_alphanum -> 'a -> 'a = func
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
 
 let fold_ident_or_intlit (v: _ #folder) : ident_or_intlit -> 'a -> 'a = function
   | Address _
@@ -353,7 +356,8 @@ let fold_ident_or_intlit (v: _ #folder) : ident_or_intlit -> 'a -> 'a = function
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
 let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
@@ -363,7 +367,8 @@ let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
   | Fixed _ | Floating _
   | Integer _ | NumFig _ as i -> fold_numlit v i
 
@@ -374,7 +379,8 @@ let fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
   | Alphanum _
   | Boolean _
   | National _
@@ -389,7 +395,8 @@ let fold_ident_or_strlit (v: _ #folder) : ident_or_strlit -> 'a -> 'a = function
   | InlineInvoke _
   | ObjectView _
   | ObjectRef _
-  | QualIdent _ as i -> fold_ident v i
+  | QualIdent _
+  | RefMod _ as i -> fold_ident v i
   | Alphanum _
   | National _
   | Fig _

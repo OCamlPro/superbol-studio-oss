@@ -41,11 +41,13 @@ type alnum_ = [ `AlphaNum ]
 type bool_ = [ `Bool ]
 type fixed_ = [ `Fixed ]
 type float_ = [ `Float ]
-type ident_ = [ `Ident ]
 type int_ = [ `Int ]
 type name_ = [ `Name ]
 type national_ = [ `National ]
 type 'a qual_ = [ `Qual of 'a ]
+type base_ident_ = [ `DirectIdent ]
+type refmod_ident_ = [ `RefmodIdent ]
+type ident_ = [base_ident_|refmod_ident_]
 type qualname_ = [name_|name qual_]
 type num_ = [int_|fixed_|float_]
 type nonnum_ = [alnum_|national_|bool_]
@@ -76,13 +78,14 @@ type _ term =
   | Name: name with_loc -> [>name_] term
   | Qual: name with_loc * qualname_ term -> [>name qual_] term
 
-  | Address: address -> [>ident_] term
-  | Counter: counter -> [>ident_] term
-  | InlineCall: inline_call -> [>ident_] term
-  | InlineInvoke: inline_invocation -> [>ident_] term
-  | ObjectView: object_view -> [>ident_] term
-  | ObjectRef: object_ref -> [>ident_] term (* Includes predefined address (NULL) *)
-  | QualIdent: qualident -> [>ident_] term (* Includes subscripts and ref-mod *)
+  | Address: address -> [>base_ident_] term
+  | Counter: counter -> [>base_ident_] term
+  | InlineCall: inline_call -> [>base_ident_] term
+  | InlineInvoke: inline_invocation -> [>base_ident_] term
+  | ObjectView: object_view -> [>base_ident_] term
+  | ObjectRef: object_ref -> [>base_ident_] term (* Includes predefined address (NULL) *)
+  | QualIdent: qualident -> [>base_ident_] term  (* Includes subscripts *)
+  | RefMod: base_ident_ term * refmod -> [>ident_] term (* Reference modification *)
 
   | StrConcat: strlit_ term * strlit_ term -> [>strlit_] term
   | Concat: nonnum_ term * nonnum_ term -> [>nonnum_] term
@@ -191,7 +194,6 @@ and inline_call =                               (* in ancient terms: funident *)
   {
     call_fun: name with_loc;
     call_args: effective_arg list;
-    call_refmod: refmod option;
   }
 
 and effective_arg =                  (* TODO: could be an [expression option] *)
@@ -202,7 +204,6 @@ and qualident =
   {
     ident_name: qualname;
     ident_subscripts: subscript list;
-    ident_refmod: refmod option;
   }
 
 and subscript =
@@ -219,8 +220,8 @@ and signz = loose_ sign_cond
 
 and refmod =
   {
-    leftmost: expression;
-    length_opt: expression option;
+    refmod_left: expression;
+    refmod_length: expression option;
   }
 
 and inline_invocation =
@@ -367,11 +368,10 @@ module COMPARE = struct
     | a, b ->
         Stdlib.compare a b
   and compare_qualident
-      { ident_name = a; ident_subscripts = c; ident_refmod = e }
-      { ident_name = b; ident_subscripts = d; ident_refmod = f } =
+      { ident_name = a; ident_subscripts = c }
+      { ident_name = b; ident_subscripts = d } =
     compare_struct (compare_term a b) @@
-    lazy (compare_struct (List.compare compare_subcript c d) @@
-          lazy (Option.compare compare_refmod e f))
+    lazy (List.compare compare_subcript c d)
   and compare_subcript x y = match x,y with
     | SubSExpr a ,SubSExpr b ->
         compare_expression a b
@@ -382,8 +382,8 @@ module COMPARE = struct
     | a, b ->
         Stdlib.compare a b
   and compare_refmod
-      { leftmost = a; length_opt = c }
-      { leftmost = b; length_opt = d } =
+      { refmod_left = a; refmod_length = c }
+      { refmod_left = b; refmod_length = d } =
     compare_struct (compare_expression a b) @@
     lazy (Option.compare compare_expression c d)
   and compare_sign : strict_ sign_cond compare_fun = compare
@@ -412,11 +412,10 @@ module COMPARE = struct
     lazy (compare_struct (compare_term c d) @@
           lazy (List.compare compare_effective_arg e f))
   and compare_inline_call
-      { call_fun = a; call_args = c; call_refmod = r1 }
-      { call_fun = b; call_args = d; call_refmod = r2 } =
+      { call_fun = a; call_args = c }
+      { call_fun = b; call_args = d } =
     compare_struct (compare_with_loc_name a b) @@
-    lazy (compare_struct (List.compare compare_effective_arg c d) @@
-          lazy (Option.compare compare_refmod r1 r2))
+    lazy (List.compare compare_effective_arg c d)
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
         compare_expression a b
@@ -517,6 +516,7 @@ module FMT = struct
     | ObjectView o -> pp_object_view ppf o
     | ObjectRef o -> pp_object_ref ppf o
     | QualIdent i -> pp_qualident ppf i
+    | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
 
     | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
     | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
@@ -534,16 +534,15 @@ module FMT = struct
     | SubSExpr e -> pp_expression ppf e
     | SubSIdx (n, s, i) -> fmt "%a@ %a@ %a" ppf pp_name' n pp_sign s pp_integer i
 
-  and pp_refmod ppf { leftmost; length_opt } =
+  and pp_refmod ppf { refmod_left; refmod_length } =
     fmt "@[<1>(%a:%a)@]" ppf
-      pp_expression leftmost
-      (option pp_expression) length_opt
+      pp_expression refmod_left
+      (option pp_expression) refmod_length
 
-  and pp_qualident ppf { ident_name = n; ident_refmod; ident_subscripts } =
+  and pp_qualident ppf { ident_name = n; ident_subscripts } =
     pp_qualname ppf n;
     if ident_subscripts <> []
-    then fmt "@[<1>(%a)@]" ppf (list pp_subscript) ident_subscripts;
-    option pp_refmod ppf ident_refmod
+    then fmt "@[<1>(%a)@]" ppf (list pp_subscript) ident_subscripts
 
   and pp_qualname ppf = pp_term ppf
 
@@ -551,10 +550,9 @@ module FMT = struct
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
     | ProgAddress i -> fmt "ADDRESS@ OF@ PROGRAM@ %a" ppf pp_term i
 
-  and pp_inline_call ppf { call_fun; call_args; call_refmod } =
-    fmt "FUNCTION@ %a@ @[<1>(%a)%a@]" ppf pp_name' call_fun
+  and pp_inline_call ppf { call_fun; call_args } =
+    fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
       (list ~sep:nop pp_effective_arg) call_args
-      (option (fun ppf -> fmt "@ %a" ppf pp_refmod)) call_refmod
 
   and pp_inline_invocation ppf { invoke_class; invoke_meth; invoke_args } =
     fmt "%a::%a@ @[<1>(%a)@]" ppf pp_ident invoke_class pp_literal invoke_meth
@@ -705,6 +703,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let ident_with_nonnum: ident -> ident_or_nonnum = function
     | QualIdent _ as v -> v
@@ -714,6 +713,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let ident_with_numeric: ident -> ident_or_numlit = function
     | QualIdent _ as v -> v
@@ -723,6 +723,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let ident_with_string: ident -> ident_or_strlit = function
     | QualIdent _ as v -> v
@@ -732,6 +733,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let ident_with_literal: ident -> ident_or_literal = function
     | QualIdent _ as v -> v
@@ -741,6 +743,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let ident_with_integer: ident -> ident_or_intlit = function
     | QualIdent _ as v -> v
@@ -750,6 +753,7 @@ module UPCAST = struct
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | RefMod _ as v -> v
 
   let string_with_name: strlit -> name_or_string = function
     | Alphanum _ as v -> v
@@ -812,6 +816,15 @@ module UPCAST = struct
   let qualname_with_integer: qualname -> qualname_or_intlit = function
     | Name _ as v -> v
     | Qual _ as v -> v
+
+  let base_ident_with_refmod: base_ident_ term -> ident = function
+    | QualIdent _ as v -> v
+    | InlineCall _ as v -> v
+    | InlineInvoke _ as v -> v
+    | ObjectView _ as v -> v
+    | ObjectRef _ as v -> v
+    | Address _ as v -> v
+    | Counter _ as v -> v
 
   let simple_cond: simple_condition -> condition = function
     | Expr _ as c -> c
