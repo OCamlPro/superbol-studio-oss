@@ -27,10 +27,10 @@ type t' =
                   constant_item_descr: constant_item_descr }
   | Elementary of { name: name; data_item: data_item_descr }
   | Group of { name: name; elements: t list; data_item: data_item_descr }
-[@@deriving show]
+[@@deriving show, ord]
 
 and t = t' with_loc
-[@@deriving show]
+[@@deriving show, ord]
 
 let pp_data_group_list ppf =
   Pretty.list ~fsep:"@ " ~fopen:"@[" ~fclose:"@]" ~fempty:""

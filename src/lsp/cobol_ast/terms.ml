@@ -98,7 +98,6 @@ and _ figurative =
   | HighValue: [>strlit_] figurative            (* ALPHA/NAT *)
   | All: nonnumlit -> [<nonnum_] figurative      (* ALPHA/NAT/BOOL + fig const *)
 (* (\* | Symbolic of ident (\* use in alphanum, national *\) *\) *)
-(* (\* [@@deriving show] *\) *)
 
 (** and then particular instantiations. *)
 
@@ -339,6 +338,8 @@ module COMPARE = struct
           compare_object_ref a b
       | QualIdent a, QualIdent b ->
           compare_qualident a b
+      | RefMod (b1, r1), RefMod (b2, r2) ->
+          compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
           compare_struct (compare_term a b) @@ lazy (compare_term c d)
       | Concat(a,c), Concat(b,d) ->
@@ -363,19 +364,76 @@ module COMPARE = struct
         -1
     | _, Unop _ ->
         1
-  and compare_cond a b = match a, b with
+  and compare_binary_relation (x1, r1, y1) (x2, r2, y2) =
+    compare_struct (compare_expression x1 x2) @@
+    lazy (compare_struct (compare r1 r2) @@ lazy (compare_expression y1 y2))
+  and compare_abbrev_combined_relation (b1, r1, x1, y1) (b2, r2, x2, y2) =
+    compare_struct (Bool.compare b1 b2) @@ lazy (
+      compare_struct (compare_binary_relation r1 r2) @@ lazy (
+        compare_struct (compare_logop x1 x2) @@
+        lazy (compare_flat_combined_relation y1 y2)
+      )
+    )
+  and compare_flat_combined_relation a b = match a, b with
+    | FlatAmbiguous (ro1, e1), FlatAmbiguous (ro2, e2) ->
+      compare_struct (Option.compare compare_relop ro1 ro2) @@
+      lazy (compare_expression e1 e2)
+    | FlatAmbiguous _, _ -> -1
+    | _, FlatAmbiguous _ -> 1
+    | FlatNotExpr e1, FlatNotExpr e2 -> compare_expression e1 e2
+    | FlatNotExpr _, _ -> -1
+    | _, FlatNotExpr _ -> 1
+    | FlatRel (b1, r1), FlatRel (b2, r2) ->
+      compare_struct (Bool.compare b1 b2) @@
+      lazy (compare_binary_relation r1 r2)
+    | FlatRel _, _ -> -1
+    | _, FlatRel _ -> 1
+    | FlatOther c1, FlatOther c2 -> compare_cond c1 c2
+    | FlatOther _, _ -> -1
+    | _, FlatOther _ -> 1
+    | FlatComb (x1, o1, y1), FlatComb (x2, o2, y2) ->
+      compare_struct (compare_flat_combined_relation x1 x2) @@ lazy (
+        compare_struct (compare_logop o1 o2) @@
+        lazy (compare_flat_combined_relation y1 y2)
+      )
+
+  and compare_cond : type a b. a cond -> b cond -> int =
+    fun a b -> match a, b with
     | Expr x, Expr y ->
         compare_expression x y
-    | Relation (x1, r1, y1), Relation (x2, r2, y2) ->
-        compare_struct (compare_expression x1 x2) @@
-        lazy (compare_struct (compare r1 r2) @@ lazy (compare_expression y1 y2))
+    | Expr _, _ -> -1
+    | _, Expr _ -> 1
+    | Relation x, Relation y -> compare_binary_relation x y
+    | Relation _, _ -> -1
+    | _, Relation _ -> 1
+    | Abbrev x, Abbrev y -> compare_abbrev_combined_relation x y
+    | Abbrev _, _ -> -1
+    | _, Abbrev _ -> 1
     | ClassCond (x1, c1), ClassCond (x2, c2) ->
         compare_struct (compare_expression x1 x2) @@ lazy (compare_class_ c1 c2)
+    | ClassCond _, _ -> -1
+    | _, ClassCond _ -> 1
     | SignCond (x1, s1), SignCond(x2, s2) ->
         compare_struct (compare_expression x1 x2) @@ lazy (compare_signz s1 s2)
-    | a, b ->
-        Stdlib.compare a b
+    | SignCond _, _ -> -1
+    | _, SignCond _ -> 1
+    | Omitted x, Omitted y ->
+        compare_expression x y
+    | Omitted _, _ -> -1
+    | _, Omitted _ -> 1
+    | Not x, Not y ->
+        compare_cond x y
+    | Not _, _ -> -1
+    | _, Not _ -> 1
+    | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
+        compare_struct (compare_logop o1 o2) @@ lazy (
+          compare_struct (compare_cond x1 x2) @@ lazy (
+            compare_cond y1 y2
+          )
+        )
   and compare_relop =
+    Stdlib.compare
+  and compare_logop =
     Stdlib.compare
   and compare_class_ a b = match a, b with
     | AlphabetOrClass n1, AlphabetOrClass n2 ->
@@ -386,8 +444,8 @@ module COMPARE = struct
       { ident_name = a; ident_subscripts = c }
       { ident_name = b; ident_subscripts = d } =
     compare_struct (compare_term a b) @@
-    lazy (List.compare compare_subcript c d)
-  and compare_subcript x y = match x,y with
+    lazy (List.compare compare_subscript c d)
+  and compare_subscript x y = match x,y with
     | SubSExpr a ,SubSExpr b ->
         compare_expression a b
     | SubSIdx(n1, s1, i1),
@@ -512,12 +570,12 @@ module FMT = struct
         string ppf bool_value
 
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
-    | Alphanum s -> fmt "@[%S:@ alphanum@]" ppf s
-    | Boolean b -> fmt "@[%a:@ boolean@]" ppf pp_boolean b
+    | Alphanum s -> fmt "\"%s\"" ppf s (* Not correct: missing H for hex *)
+    | Boolean b -> pp_boolean ppf b
     | Fixed f -> pp_fixed ppf f
     | Floating f -> pp_floating ppf f
     | Integer i -> pp_integer ppf i
-    | National s -> fmt "@[%S:@ national@]" ppf s
+    | National s -> fmt "N%S" ppf s
     | NumFig f -> pp_figurative ppf f
     | Fig f -> pp_figurative ppf f
 
@@ -540,9 +598,9 @@ module FMT = struct
     | Zero -> string ppf "ZERO"
     | Space -> string ppf "SPACE"
     | Quote -> string ppf "QUOTE"
-    | LowValue -> fmt "LOW@ VALUE" ppf
-    | HighValue -> fmt "HIGH@ VALUE" ppf
-    | All l -> fmt "ALL@ OF@ %a" ppf pp_term l
+    | LowValue -> fmt "LOW-VALUES" ppf
+    | HighValue -> fmt "HIGH-VALUES" ppf
+    | All l -> fmt "ALL@ %a" ppf pp_term l
 
   and pp_subscript ppf : subscript -> unit = function
     | SubSAll -> string ppf "ALL"
@@ -557,7 +615,7 @@ module FMT = struct
   and pp_qualident ppf { ident_name = n; ident_subscripts } =
     pp_qualname ppf n;
     if ident_subscripts <> []
-    then fmt "@[<1>(%a)@]" ppf (list pp_subscript) ident_subscripts
+    then fmt "@[<1>(%a)@]" ppf (list ~sep:comma pp_subscript) ident_subscripts
 
   and pp_qualname ppf = pp_term ppf
 
@@ -567,15 +625,18 @@ module FMT = struct
 
   and pp_inline_call ppf { call_fun; call_args } =
     fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
-      (list ~sep:nop pp_effective_arg) call_args
+      (list ~sep:comma pp_effective_arg) call_args
 
   and pp_inline_invocation ppf { invoke_class; invoke_meth; invoke_args } =
     fmt "%a::%a@ @[<1>(%a)@]" ppf pp_ident invoke_class pp_literal invoke_meth
-      (list ~sep:nop pp_effective_arg) invoke_args
+      (list ~sep:comma pp_effective_arg) invoke_args
 
   and pp_effective_arg ppf = function
     | ArgOmitted -> string ppf "OMITTED"
-    | ArgExpr e -> pp_expression ppf e
+    (* In a sequence of arguments, `1, - X` is parsed as `1 - X` so we need to
+       parenthesize the unary part to get `1 (- X)`. But then *)
+    | ArgExpr (Atom _ | Unop _ as e) -> Fmt.parens pp_expression ppf e
+    | ArgExpr (Binop _ as e) -> pp_expression ppf e
 
   and pp_object_view ppf { object_view_ident; object_view_spec } =
     fmt "%a@ AS@ " ppf pp_ident object_view_ident;
@@ -602,21 +663,36 @@ module FMT = struct
     string ppf k;
     Option.iter (fmt "@ OF@ %a" ppf pp_name') counter_name
 
-  and pp_expression ppf = function
-    | Atom a ->
-        pp_term ppf a
-    | Unop (o, e) ->
-        fmt "@[<1>(%s@ %a)@]" ppf ([%derive.show: unop] o) pp_expression e
-    | Binop (a, o, b) ->
-        fmt "@[<1>(%a@ %s@ %a)@]" ppf
-          pp_expression a ([%derive.show: binop] o) pp_expression b
+  and pp_expression ppf e = Unparse.Expression.pp ppf (pretty_expression e)
 
+  and pretty_expression = function
+    | Atom a -> Unparse.Expression.atom pp_term a
+    | Unop (o, e) ->
+      Unparse.Expression.unary (pretty_unop o) (pretty_expression e)
+    | Binop (a, o, b) ->
+      Unparse.Expression.binary
+        (pretty_expression a) (pretty_binop o) (pretty_expression b)
+
+  and pretty_unop = function
+    | UPlus -> Unparse.Expression.prefix ~prec:4 (Fmt.const pp_unop UPlus)
+    | UMinus -> Unparse.Expression.prefix ~prec:4 (Fmt.const pp_unop UMinus)
+    | UNot -> Unparse.Expression.prefix ~prec:4 (Fmt.const pp_unop UNot)
   and show_unop = function
     | UPlus  -> "+"
     | UMinus -> "-"
     | UNot -> "B-NOT"
   and pp_unop ppf o = string ppf (show_unop o)
 
+  and pretty_binop op =
+    match op with
+    | BPlus -> Unparse.Expression.infixl ~prec:1 (Fmt.const pp_binop op)
+    | BMinus -> Unparse.Expression.infixl ~prec:1 (Fmt.const pp_binop op)
+    | BMul -> Unparse.Expression.infixl ~prec:2 (Fmt.const pp_binop op)
+    | BDiv -> Unparse.Expression.infixl ~prec:2 (Fmt.const pp_binop op)
+    | BPow -> Unparse.Expression.infixr ~prec:3 (Fmt.const pp_binop op)
+    | BAnd -> Unparse.Expression.infixl ~prec:3 (Fmt.const pp_binop op)
+    | BOr -> Unparse.Expression.infixl ~prec:1 (Fmt.const pp_binop op)
+    | BXor -> Unparse.Expression.infixl ~prec:2 (Fmt.const pp_binop op)
   and show_binop = function
     | BPlus -> "+"
     | BMinus -> "-"
@@ -640,7 +716,7 @@ module FMT = struct
         fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
     | Abbrev (neg, rel, o, comb) ->
         fmt "%a@[<1>(%a%a@ %a@ %a)@]" ppf
-          not_ pos not_ neg pp_binary_relation rel pp_logop o
+          not_ pos not_ (not neg) pp_binary_relation rel pp_logop o
           pp_flat_combined_relation comb
     | ClassCond (e, c) ->
         fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
@@ -662,7 +738,7 @@ module FMT = struct
     | FlatNotExpr e ->
         fmt "NOT@ %a" ppf pp_expression e
     | FlatRel (neg, rel) ->
-        fmt "%a%a" ppf not_ neg pp_binary_relation rel
+        fmt "%a%a" ppf not_ (not neg) pp_binary_relation rel
     | FlatOther c ->
         fmt "@[<1>(%a)@]" ppf pp_condition c
     | FlatComb (c1, o, c2) ->
@@ -880,13 +956,13 @@ type rounded_ident =
     rounded_ident: ident;
     rounded_rounding: rounding;
   }
-[@@deriving show, ord]
+[@@deriving ord]
 
 and rounding =
   | RoundingNotAny
   | RoundingDefault
   | RoundingMode of rounding_mode
-[@@deriving show, ord]
+[@@deriving ord]
 
 and rounding_mode =
   | AwayFromZero
@@ -897,10 +973,32 @@ and rounding_mode =
   | TowardLesser
   | Truncation
   | Prohibited
-[@@deriving show, ord]
+[@@deriving ord]
 
 and rounded_idents = rounded_ident list
 [@@deriving ord]
+
+let pp_rounding_mode ppf = function
+  | AwayFromZero -> Fmt.pf ppf "AWAY-FROM-ZERO"
+  | NearestAwayFromZero -> Fmt.pf ppf "NEAREST-AWAY-FROM-ZERO"
+  | NearestEven -> Fmt.pf ppf "NEAREST-EVEN"
+  | NearestTowardZero -> Fmt.pf ppf "NEAREST-TOWARD-ZERO"
+  | TowardGreater -> Fmt.pf ppf "TOWARD-GREATER"
+  | TowardLesser -> Fmt.pf ppf "TOWARD-LESSER"
+  | Truncation -> Fmt.pf ppf "TRUNCATION"
+  | Prohibited -> Fmt.pf ppf "PROHIBITED"
+
+let pp_rounding ppf = function
+  | RoundingNotAny -> ()
+  | RoundingDefault -> Fmt.pf ppf "ROUNDED"
+  | RoundingMode rm -> Fmt.pf ppf "ROUNDED MODE IS %a" pp_rounding_mode rm
+
+let pp_rounded_ident ppf { rounded_ident = i; rounded_rounding = r } =
+  match r with
+  | RoundingNotAny | RoundingMode Truncation -> pp_ident ppf i
+  | _ -> Fmt.pf ppf "%a %a" pp_ident i pp_rounding r
+
+let pp_rounded_idents = Fmt.(list ~sep:sp pp_rounded_ident)
 
 (* --- *)
 

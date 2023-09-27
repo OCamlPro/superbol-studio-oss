@@ -1,0 +1,104 @@
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Accept/Shortest.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM1.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFull.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSumm.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/Seqread.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/SeqreadNo88.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SeqWrite/SEQWRITE.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateDriver.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiDate.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiffDriver.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/DriverProg.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Fickle.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/MultiplyNums.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Steadfast.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob1.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob10.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob11.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob12.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob13.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob14.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob15.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob16.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob17.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob2.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob3.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob4.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob5.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob6.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob7.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob8.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob9.cbl':
+ Parse: OK. Reparse: OK.
