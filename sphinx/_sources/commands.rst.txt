@@ -201,4 +201,6 @@ Where options are:
 
 * :code:`FILE`   .texi file
 
+* :code:`-I DIR`   Add to lookup path for files
+
 * :code:`-o DIR`   Target directory for RST generation
