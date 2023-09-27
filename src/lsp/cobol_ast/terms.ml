@@ -642,7 +642,7 @@ module FMT = struct
         fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
     | Abbrev (neg, rel, o, comb) ->
         fmt "%a@[<1>(%a%a@ %a@ %a)@]" ppf
-          not_ pos not_ neg pp_binary_relation rel pp_logop o
+          not_ pos not_ (not neg) pp_binary_relation rel pp_logop o
           pp_flat_combined_relation comb
     | ClassCond (e, c) ->
         fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
@@ -664,7 +664,7 @@ module FMT = struct
     | FlatNotExpr e ->
         fmt "NOT@ %a" ppf pp_expression e
     | FlatRel (neg, rel) ->
-        fmt "%a%a" ppf not_ neg pp_binary_relation rel
+        fmt "%a%a" ppf not_ (not neg) pp_binary_relation rel
     | FlatOther c ->
         fmt "@[<1>(%a)@]" ppf pp_condition c
     | FlatComb (c1, o, c2) ->
