@@ -16,8 +16,22 @@ open Ez_file
 open FileString.OP
 open Cobol_preproc
 
+let find_dir anchor =
+  let curdir = Sys.getcwd () in
+  let rec iter path =
+    if Sys.file_exists (path // anchor) then
+      path
+    else
+      let path' = Filename.dirname path in
+      if path = path' then
+        Printf.kprintf failwith "Anchor %S not found from %s" anchor curdir;
+      iter path'
+  in
+  iter curdir
+
 let deep_iter = FileString.(make_select iter_dir) ~deep:true
-let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found -> "."
+let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found ->
+  find_dir "test"
 let testsuites = "test/testsuite"
 let ibm_testsuite = testsuites // "ibm/ibmmainframes.com"
 let ibm_root = srcdir // ibm_testsuite
