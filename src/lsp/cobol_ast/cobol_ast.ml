@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Helpers = Helpers
-
 include Ast
 
 module Terms_visitor = Terms_visitor
@@ -25,3 +23,5 @@ module Abstract_visitor = Abstract_visitor
 
 module Raw = Raw
 module Raw_visitor = Raw_visitor
+
+module Testing_helpers = Testing_helpers
