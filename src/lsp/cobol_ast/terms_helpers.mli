@@ -11,21 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ast
+(** Some utilities to construct or rewrite terms (mostly conditions for now) *)
 
-(* Note: we can share the same source overlay manager across several parsers as
-   long as we don't parse localized tokens using multiple instances of the
-   parser and in parallel.  If that were to change, the manager would need to be
-   passed as parameter to the grammar. *)
-module Overlay_manager =
-  Cobol_preproc.Src_overlay.New_manager (struct
-    let name = __MODULE__
-  end)
+val neg_simple_cond: neg:bool -> Terms.simple_condition -> Terms.condition
+val neg_condition: neg:bool -> Terms.condition -> Terms.condition
 
-let relation_condition ~neg (binrel: binary_relation) = function
-  | None ->
-      Cobol_ast.Terms_helpers.neg_condition ~neg @@ Relation binrel
-  | Some (LOr, flatop) ->
-      Abbrev (neg, binrel, LOr, flatop)
-  | Some (LAnd, flatop) ->
-      Abbrev (neg, binrel, LAnd, flatop)
+val expand_every_abbrev_cond: 'k Terms.cond -> Terms.condition
+val expand_abbrev_cond: Terms.abbrev_combined_relation -> Terms.condition

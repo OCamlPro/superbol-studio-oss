@@ -11,21 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Traversal = Traversal
-module Helpers =  Helpers
+module Helpers = Helpers
 
 include Ast
 
 module Terms_visitor = Terms_visitor
 module Operands_visitor = Operands_visitor
 
+module Terms_helpers = Terms_helpers
+
 module Abstract = Abstract
 module Abstract_visitor = Abstract_visitor
 
 module Raw = Raw
 module Raw_visitor = Raw_visitor
-(* module Raw_misc_sections_visitor = Raw_misc_sections_visitor *)
-(* module Raw_data_sections_visitor = Raw_data_sections_visitor *)
-(* module Raw_data_division_visitor = Raw_data_division_visitor *)
-(* module Raw_proc_division_visitor = Raw_proc_division_visitor *)
-(* module Raw_compilation_group_visitor = Raw_compilation_group_visitor *)
