@@ -17,23 +17,23 @@
 type comments = {
   lineComment : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type markers = {
   marker_start : string ;
   marker_end : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type folding = ( string * markers ) list [@assoc] (* "markers" *)
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type pair = {
   pair_open : string ;
   pair_close : string ;
   pair_notIn : string list ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let pair_enc =
   let open Json_encoding in
@@ -53,7 +53,7 @@ type onEnterRule = {
   endTest : string option ;
   action : ( string * string ) list ;[@assoc] [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type language = {
   comments : comments option ;
@@ -64,4 +64,4 @@ type language = {
   folding : folding ; [@dft []]
   onEnterRules : onEnterRule list ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]

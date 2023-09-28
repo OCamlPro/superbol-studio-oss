@@ -42,7 +42,7 @@ let package =
     ~homepage: "https://ocamlpro.com/cobol"
     ~author: {
       author_name = "OCamlPro SAS" ;
-      author_email = "contact@ocamlpro.com"
+      author_email = Some "contact@ocamlpro.com"
     }
     ~keywords: [ "cobol" ; "gnucobol" ]
     ~main: "./out/superbol_vscode_platform.bc.js"

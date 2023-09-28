@@ -17,18 +17,18 @@
 type capture_pattern = {
   pattern_include : string ; [@key "include"]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type capture = {
   capture_name : string option ;
   capture_patterns : capture_pattern list option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type captures = (string * capture) list [@assoc]
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
-type endCaptures = captures
+type endCaptures = captures [@@deriving show]
 
 let endCaptures_enc =
   let open Json_encoding in
@@ -56,10 +56,10 @@ type pattern = {
   pat_contentName : string option ;
   pat_while : string option ;
 }
-[@@deriving json_encoding {recursive}]
+[@@deriving json_encoding {recursive}, show]
 
 type patterns = (string * pattern) list [@assoc]
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 type grammar = {
@@ -76,7 +76,7 @@ type grammar = {
   schema : string option ; [@key "$schema"]
   injectionSelector : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let schema = {|{
   "$schema": "http://json-schema.org/schema#",

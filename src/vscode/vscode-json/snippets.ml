@@ -18,11 +18,11 @@ type snippet = {
   scope : string option ;
   description : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 (* paths to files are available from the 'path' field of the 'snippets' field
    of 'package.json' *)
 type snippets =
   ( string * snippet ) list [@assoc]
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]

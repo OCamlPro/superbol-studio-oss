@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-817e4b96072d8107ce0332774e85e0a5:.
+7ea428816b44f1b6dae75197a477ee15:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -501,7 +501,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/vscode/vscode-json/dune
 # file src/vscode/vscode-json/dune
-452540098fd6ae61c5f364330d4ec493:src/vscode/vscode-json/dune
+c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
 # end context for src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-json/index.mld
