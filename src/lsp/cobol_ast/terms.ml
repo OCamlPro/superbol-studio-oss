@@ -124,7 +124,7 @@ and qualname_or_alphanum = [qualname_|alnum_] term
 and qualname_or_intlit = [qualname_|int_] term
 and qualname_or_literal = [qualname_|lit_] term
 and strlit = strlit_ term
-and strlit_or_intlit = [strlit_|int_] term   (* strlit_or_intlit *)
+and strlit_or_intlit = [strlit_|int_] term
 
 and binop =
   | BPlus
@@ -146,15 +146,49 @@ and expression =
   | Unop of unop * expression
   | Binop of expression * binop * expression (* split arith/bool ? *)
 
+(** Any form of condition {v c v} *)
 and _ cond =
-  (* TODO: group generalized expressions together (class, sign, omitted) *)
-  | Expr: expression -> [>simple_] cond (* exp (bool), ident (bool, cond, switch) *)
-  | Relation: expression * relop * expression -> [>simple_] cond (* general, bool, pointer *)
-  | ClassCond: expression * class_ -> [>simple_] cond (* exp = ident *)
-  | SignCond: expression * signz -> [>simple_] cond (* exp = arith exp *)
-  | Omitted: expression -> [>simple_] cond (* exp = ident *)
-  | Not: _ cond -> [>complex_] cond
-  | Logop: _ cond * logop * _ cond -> [>complex_] cond (* TODO: move logop left *)
+  | Expr:
+      expression -> [>simple_] cond         (** expression used as a condition *)
+  | Relation:
+      binary_relation -> [>simple_] cond            (** simple binary relation *)
+  | Abbrev:
+      abbrev_combined_relation -> [>simple_] cond     (** abbreviated relation *)
+  | ClassCond:
+      expression * class_ -> [>simple_] cond               (** class condition *)
+  | SignCond:
+      expression * signz -> [>simple_] cond (** {v e POSITIVE/NEGATIVE/ZERO v} *)
+  | Omitted:
+      expression -> [>simple_] cond                        (** {v c OMITTED v} *)
+  | Not:
+      _ cond -> [>complex_] cond                               (** {v NOT c v} *)
+  | Logop:
+      _ cond * logop * _ cond -> [>complex_] cond      (** {v c <AND/OR> c' v} *)
+
+and binary_relation =
+  expression * relop * expression                      (** {v e <relop> e' v} *)
+
+(** An abbreviated combined relation describes a non-parenthesized condition:
+
+    - {v e <relop> e' <AND/OR> <abbreviated-suffix> v} if [not neg] holds (the
+      first item in the tuple);
+
+    - {v NOT e <relop> e' <AND/OR> <abbreviated-suffix> v} otherwise. *)
+and abbrev_combined_relation =
+  bool * binary_relation * logop * flat_combined_relation
+
+(** Suffix of non-parenthesized relational combined conditions ({v a v}) *)
+and flat_combined_relation =
+  | FlatAmbiguous of
+      relop option * expression                          (** {v <relop>? e v} *)
+  | FlatNotExpr of
+      expression                                              (** {v NOT e v} *)
+  | FlatRel of
+      bool * binary_relation                     (**  {v NOT? e <relop> e' v} *)
+  | FlatOther of
+      condition            (** {v <non-relational/parenthesized condition> v} *)
+  | FlatComb of
+      (flat_combined_relation as 'x) * logop * 'x   (** {v a' <AND/OR> a'' v} *)
 
 and condition = [simple_|complex_] cond
 and simple_condition = simple_ cond
@@ -593,10 +627,10 @@ module FMT = struct
     | Atom a ->
         pp_term ppf a
     | Unop (o, e) ->
-        fmt "@[<1>(%s@ %a)@]" ppf ([%derive.show: unop] o) pp_expression e
+        fmt "@[<1>(%a@ %a)@]" ppf pp_unop o pp_expression e
     | Binop (a, o, b) ->
-        fmt "@[<1>(%a@ %s@ %a)@]" ppf
-          pp_expression a ([%derive.show: binop] o) pp_expression b
+        fmt "@[<1>(%a@ %a@ %a)@]" ppf
+          pp_expression a pp_binop o pp_expression b
 
   and show_unop = function
     | UPlus  -> "+"
@@ -615,13 +649,20 @@ module FMT = struct
     | BXor -> "B-XOR"
   and pp_binop ppf o = string ppf (show_binop o)
 
+  and pp_binary_relation ppf (a, o, b) =
+    fmt "%a@ %a@ %a" ppf
+      pp_expression a pp_relop o pp_expression b
+
   and pp_cond
     : type k. ?pos:_ -> k cond Pretty.printer = fun ?(pos = true) ppf -> function
     | Expr e ->
         fmt "%a%a" ppf not_ pos pp_expression e
-    | Relation (a, o, b) ->
-        fmt "@[<1>%a(%a@ %s@ %a)@]" ppf
-          not_ pos pp_expression a ([%derive.show: relop] o) pp_expression b
+    | Relation rel ->
+        fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
+    | Abbrev (neg, rel, o, comb) ->
+        fmt "%a@[<1>(%a%a@ %a@ %a)@]" ppf
+          not_ pos not_ (not neg) pp_binary_relation rel pp_logop o
+          pp_flat_combined_relation comb
     | ClassCond (e, c) ->
         fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
     | SignCond (e, s) ->
@@ -633,6 +674,24 @@ module FMT = struct
     | Logop (a, o, b) ->
         fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
           not_ pos (pp_cond ~pos:true) a pp_logop o (pp_cond ~pos:true) b
+
+  and pp_flat_combined_relation ppf = function
+    | FlatAmbiguous (None, e) ->
+        pp_expression ppf e
+    | FlatAmbiguous (Some r, e) ->
+        fmt "%a@ %a" ppf pp_relop r pp_expression e
+    | FlatNotExpr e ->
+        fmt "NOT@ %a" ppf pp_expression e
+    | FlatRel (neg, rel) ->
+        fmt "%a%a" ppf not_ (not neg) pp_binary_relation rel
+    | FlatOther c ->
+        fmt "@[<1>(%a)@]" ppf pp_condition c
+    | FlatComb (c1, o, c2) ->
+        fmt "%a@ %a@ %a" ppf
+          pp_flat_combined_relation c1
+          pp_logop o
+          pp_flat_combined_relation c2
+
   and pp_condition ppf = pp_cond ppf
   and not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()
 
@@ -816,6 +875,7 @@ module UPCAST = struct
   let simple_cond: simple_condition -> condition = function
     | Expr _ as c -> c
     | Relation _ as c -> c
+    | Abbrev _ as c -> c
     | ClassCond _ as c -> c
     | SignCond _ as c -> c
     | Omitted _ as c -> c

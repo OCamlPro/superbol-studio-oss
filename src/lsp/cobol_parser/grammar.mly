@@ -14,6 +14,7 @@
 open PTree
 open Grammar_utils
 open Cobol_ast
+open Cobol_ast.Terms_helpers
 open Cobol_common.Srcloc.INFIX
 
 let split_last l =
@@ -2469,21 +2470,21 @@ complex_condition:
  | OR            { LOr }
 
 %inline flat_relation_condition:
- | n = ibo(NOT) c = relation_condition
-                suff = io (pair (logop, flat_combination_operand))
-   { expand_relation_condition n c suff }
+ | neg = ibo(NOT) c = relation_condition
+   suff = io (pair (logop, flat_combination_operand))
+   { relation_condition ~neg c suff }
 
 nonrel_condition:
- | n = ibo(NOT)     e = expression %prec lowest { neg_cond n @@ Expr e }
- | n = ibo(NOT)     c = extended_condition      { neg_cond' n c }
- | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_cond' n c }
+ | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
+ | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
+ | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
 
 flat_combination_operand:
  | r = io(relop)    e = expression             { FlatAmbiguous (r, e) }
  |         NOT      e = expression             { FlatNotExpr e }
  | n = ibo(NOT)     c = relation_condition     { FlatRel (n, c) }
- | n = ibo(NOT)     c = extended_condition     { FlatOther (neg_cond' n c) }
- | n = ibo(NOT) "(" c =  complex_condition ")" { FlatOther (neg_cond' n c) }
+ | n = ibo(NOT)     c = extended_condition     { FlatOther (neg_condition ~neg:n c) }
+ | n = ibo(NOT) "(" c =  complex_condition ")" { FlatOther (neg_condition ~neg:n c) }
  | flat_combination_operand logop flat_combination_operand
                                                { FlatComb ($1, $2, $3) }
 
@@ -2492,11 +2493,11 @@ relation_condition:
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
-    { neg_cond n @@ ClassCond (e, c) } (* exp = ident *)
+    { neg_simple_cond ~neg:n @@ ClassCond (e, c) } (* exp = ident *)
  | e = expression io(IS) n = bo(NOT) s = sign_condition
-    { neg_cond n @@ SignCond (e, s) } (* exp = arith exp *)
+    { neg_simple_cond ~neg:n @@ SignCond (e, s) } (* exp = arith exp *)
  | e = expression io(IS) n = bo(NOT) OMITTED
-    { neg_cond n @@ Omitted e } (* exp = ident *)
+    { neg_simple_cond ~neg:n @@ Omitted e } (* exp = ident *)
 
 relop [@recovery Eq] [@symbol "<relational arithmetic operator>"]:
  | io(IS) n = ibo(NOT) GREATER THAN?
