@@ -146,30 +146,49 @@ and expression =
   | Unop of unop * expression
   | Binop of expression * binop * expression (* split arith/bool ? *)
 
+(** Any form of condition {v c v} *)
 and _ cond =
-  (* TODO: group generalized expressions together (class, sign, omitted) *)
-  | Expr: expression -> [>simple_] cond (* exp (bool), ident (bool, cond, switch) *)
-  | Relation: binary_relation -> [>simple_] cond     (* general, bool, pointer *)
-  | Abbrev: abbrev_combined_relation -> [>simple_] cond (* abbreviated *)
-  | ClassCond: expression * class_ -> [>simple_] cond (* exp = ident *)
-  | SignCond: expression * signz -> [>simple_] cond (* exp = arith exp *)
-  | Omitted: expression -> [>simple_] cond (* exp = ident *)
-  | Not: _ cond -> [>complex_] cond
-  | Logop: _ cond * logop * _ cond -> [>complex_] cond
+  | Expr:
+      expression -> [>simple_] cond         (** expression used as a condition *)
+  | Relation:
+      binary_relation -> [>simple_] cond            (** simple binary relation *)
+  | Abbrev:
+      abbrev_combined_relation -> [>simple_] cond     (** abbreviated relation *)
+  | ClassCond:
+      expression * class_ -> [>simple_] cond               (** class condition *)
+  | SignCond:
+      expression * signz -> [>simple_] cond (** {v e POSITIVE/NEGATIVE/ZERO v} *)
+  | Omitted:
+      expression -> [>simple_] cond                        (** {v c OMITTED v} *)
+  | Not:
+      _ cond -> [>complex_] cond                               (** {v NOT c v} *)
+  | Logop:
+      _ cond * logop * _ cond -> [>complex_] cond      (** {v c <AND/OR> c' v} *)
 
 and binary_relation =
-  expression * relop * expression
+  expression * relop * expression                      (** {v e <relop> e' v} *)
 
+(** An abbreviated combined relation describes a non-parenthesized condition:
+
+    - {v e <relop> e' <AND/OR> <abbreviated-suffix> v} if [not neg] holds (the
+      first item in the tuple);
+
+    - {v NOT e <relop> e' <AND/OR> <abbreviated-suffix> v} otherwise. *)
 and abbrev_combined_relation =
   bool * binary_relation * logop * flat_combined_relation
 
-(** Suffix of non-parenthesized relational combined conditions *)
+(** Suffix of non-parenthesized relational combined conditions ({v a v}) *)
 and flat_combined_relation =
-  | FlatAmbiguous of relop option * expression                    (* relop? e *)
-  | FlatNotExpr of expression                                     (* NOT e *)
-  | FlatRel of bool * binary_relation                             (* NOT? rel *)
-  | FlatOther of condition            (* extended- or parenthesized condition *)
-  | FlatComb of (flat_combined_relation as 'x) * logop * 'x       (* _ AND/OR _ *)
+  | FlatAmbiguous of
+      relop option * expression                          (** {v <relop>? e v} *)
+  | FlatNotExpr of
+      expression                                              (** {v NOT e v} *)
+  | FlatRel of
+      bool * binary_relation                     (**  {v NOT? e <relop> e' v} *)
+  | FlatOther of
+      condition            (** {v <non-relational/parenthesized condition> v} *)
+  | FlatComb of
+      (flat_combined_relation as 'x) * logop * 'x   (** {v a' <AND/OR> a'' v} *)
 
 and condition = [simple_|complex_] cond
 and simple_condition = simple_ cond
