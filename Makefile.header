@@ -1,10 +1,15 @@
 # -*- Makefile -*-
 PROJECT=superbol_vscode_platform
 SRCDIR=src/vscode/superbol-vscode-platform
+CP ?= cp -f
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
+
+all: superbol-free
+superbol-free: build
+	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
 
 .PHONY: compile
 compile: build
@@ -31,6 +36,11 @@ compile-release:
                 --minify-syntax \
                 --sourcemap \
                 --sources-content=false
+
+.PHONY: clean-execs
+distclean: clean-execs
+clean-execs:
+	rm -f superbol-free vscode-package-json
 
 .PHONY: opam-cross
 
