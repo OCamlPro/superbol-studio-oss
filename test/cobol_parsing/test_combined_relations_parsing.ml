@@ -23,7 +23,7 @@ let condition: condition testable = testable pp_condition (=)
 let parse_condition = parse_list_as standalone_condition
 let expand_condition = Cobol_ast.Terms_helpers.expand_every_abbrev_cond
 let check_condition toks cond =
-  check condition "correct consitions parsing" cond
+  check condition "correct conditions parsing" cond
     (expand_condition @@ parse_condition toks)
 and fail_condition toks =
   check_raises "syntax-error" Error
