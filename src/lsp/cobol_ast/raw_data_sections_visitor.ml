@@ -18,7 +18,8 @@ open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 
 let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
+let partial modname line funcname =
+  Cobol_common.Visitor.partial __FILE__ modname line funcname
 
 (* --- *)
 
@@ -85,7 +86,7 @@ struct
   end
 
   let todo    x = todo    __MODULE__ x
-  and partial x = partial __MODULE__ x
+  and partial line funcname = partial __MODULE__ line funcname
 
   let fold_data_level (v: _ #folder) =
     leaf v#fold_data_level

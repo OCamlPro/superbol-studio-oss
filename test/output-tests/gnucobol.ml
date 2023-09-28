@@ -40,12 +40,28 @@ let target =
 (** [pp_relloc ppf filename] prints [filename] relative to [srcdir] if the
     latter is a directory (prefix) of [filename].  Otherwise, prints [filename]
     as a whole. *)
+    (*
 let pp_relloc =
   let srcdir_prefix = srcdir ^ Ez_file.FileOS.dir_separator_string in
   fun ppf s ->
-    match EzString.chop_prefix ~prefix:srcdir_prefix s with
-    | Some s -> Fmt.string ppf s
-    | None -> Fmt.string ppf s
+    let s =
+      match EzString.chop_prefix ~prefix:srcdir_prefix s with
+      | Some s -> s
+      | None -> s
+    in
+    Fmt.string ppf s
+*)
+
+let pp_relloc ppf s =
+  let path = EzString.split s '/' in
+  let rec iter path =
+    match path with
+    | [] -> s
+    | "import" :: "gnucobol" :: _ -> String.concat "/" path
+    | _ :: path -> iter path
+  in
+  let s = iter path in
+  Fmt.string ppf s
 
 let make_n_enter_rundir () =
   Superbol_testutils.Tempdir.make_n_enter "superbol-gnucobol-tests"

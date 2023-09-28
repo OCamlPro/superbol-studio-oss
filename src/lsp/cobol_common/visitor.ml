@@ -57,6 +57,8 @@ module INFIX = struct
 end
 open INFIX
 
+let in_testsuite = ref false
+
 let report =                        (* to be kept until visitors are complete *)
   let module REPORTED =
     Hashtbl.Make (struct
@@ -68,6 +70,9 @@ let report =                        (* to be kept until visitors are complete *)
   let reported_table = lazy (REPORTED.create 17) in
   fun k file_name module_name line_num func_name ->
     let tbl = Lazy.force reported_table in
+    let file_name =
+      if !in_testsuite then Filename.basename file_name else file_name in
+    let line_num = if !in_testsuite then 0 else line_num in
     if not (REPORTED.mem tbl (file_name, module_name, line_num, func_name))
     then begin
       Pretty.error "@[<2>%s:%u:@ (%s.%s):@ %s@ visitor@ implementation@]@."
