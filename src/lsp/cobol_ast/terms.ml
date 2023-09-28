@@ -627,10 +627,10 @@ module FMT = struct
     | Atom a ->
         pp_term ppf a
     | Unop (o, e) ->
-        fmt "@[<1>(%s@ %a)@]" ppf ([%derive.show: unop] o) pp_expression e
+        fmt "@[<1>(%a@ %a)@]" ppf pp_unop o pp_expression e
     | Binop (a, o, b) ->
-        fmt "@[<1>(%a@ %s@ %a)@]" ppf
-          pp_expression a ([%derive.show: binop] o) pp_expression b
+        fmt "@[<1>(%a@ %a@ %a)@]" ppf
+          pp_expression a pp_binop o pp_expression b
 
   and show_unop = function
     | UPlus  -> "+"
@@ -650,8 +650,8 @@ module FMT = struct
   and pp_binop ppf o = string ppf (show_binop o)
 
   and pp_binary_relation ppf (a, o, b) =
-    fmt "%a@ %s@ %a" ppf
-      pp_expression a ([%derive.show: relop] o) pp_expression b
+    fmt "%a@ %a@ %a" ppf
+      pp_expression a pp_relop o pp_expression b
 
   and pp_cond
     : type k. ?pos:_ -> k cond Pretty.printer = fun ?(pos = true) ppf -> function
