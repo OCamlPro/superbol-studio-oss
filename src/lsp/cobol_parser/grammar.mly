@@ -1562,8 +1562,8 @@ usage [@context usage_clause   (* ok as none of leftmost terminals are C/S *)]:
   | COMP                                          { Binary }
   | COMP_0                                        { UsagePending `Comp0 }
   | COMP_1                                        { UsagePending `Comp1 }
-  | COMP_2                                        { FloatLong }
-  | COMP_3                                        { PackedDecimal }
+  | COMP_2                                        { UsagePending `Comp2 }
+  | COMP_3                                        { UsagePending `Comp3 }
   | COMP_4                                        { Binary }
   | COMP_5                                        { UsagePending `Comp5 }
   | COMP_6                                        { UsagePending `Comp6 }

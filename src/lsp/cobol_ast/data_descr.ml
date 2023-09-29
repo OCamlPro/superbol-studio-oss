@@ -221,8 +221,8 @@ type usage_clause =
  | Pointer of name with_loc option                                (* +COB2002 *)
  | FunctionPointer of name with_loc                               (* +COB2002 *)
  | ProgramPointer of name with_loc option                         (* +COB2002 *)
- | UsagePending of [`Comp0 | `Comp1 | `Comp5 | `Comp6 | `CompX |
-                    `CompN | `Comp9 | `Comp10 | `Comp15 ]
+ | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
+                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 ]
 [@@deriving show, ord]
 
 and signedness =
