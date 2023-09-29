@@ -5,17 +5,17 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-7ea428816b44f1b6dae75197a477ee15:.
+b602227bcc8caec31bc7877658492520:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-fc10b0887fb072e04e5bcbdd5a0c6668:.github/workflows/workflow.yml
+1ff6f1c9a62d2172393a77d0c39b0347:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-0727863b8e681aec0cc8d969f8cfb747:.gitignore
+5d7ba25fe849cca450aff51db71881f3:.gitignore
 # end context for .gitignore
 
 # begin context for CHANGES.md
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-8c1798510e3d14cdfd80b0ebd931773b:Makefile
+720048052459a394dc73cc71e8ad9fdc:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,8 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0331551296e3a627ef039388cc6be5e9:dune-project
-474ade77f279147fb20510c3425249bf:dune-project
+ce7b96b842d3f265df300ce6c72e52d4:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
@@ -186,7 +185,7 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-8af34e95431d46524a132682225e4c84:opam/superbol_free_lib.opam
+c86beae68d4d0173c716a8449fc2dfaf:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_testutils.opam
@@ -406,7 +405,7 @@ b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
-6625329103c4f2ffacd92354431cce4e:src/lsp/superbol_free_lib/dune
+562cdec92233a9d9156b6db06c636cde:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/version.mlt
@@ -523,18 +522,3 @@ c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
 # file src/vscode/vscode-languageclient-js-stubs/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-languageclient-js-stubs/version.mlt
 # end context for src/vscode/vscode-languageclient-js-stubs/version.mlt
-
-# begin context for src/vscode/vscode-package-json/dune
-# file src/vscode/vscode-package-json/dune
-3daa53b1ba5e5b962bd4a4a2d126f35d:src/vscode/vscode-package-json/dune
-# end context for src/vscode/vscode-package-json/dune
-
-# begin context for src/vscode/vscode-package-json/linking_flags.sh
-# file src/vscode/vscode-package-json/linking_flags.sh
-91c1ee3f5f358d3e2ffe2e7031ca4363:src/vscode/vscode-package-json/linking_flags.sh
-# end context for src/vscode/vscode-package-json/linking_flags.sh
-
-# begin context for src/vscode/vscode-package-json/version.mlt
-# file src/vscode/vscode-package-json/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-package-json/version.mlt
-# end context for src/vscode/vscode-package-json/version.mlt

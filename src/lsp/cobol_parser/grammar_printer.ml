@@ -1422,9 +1422,6 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname_or_alphanum) -> "qualname_or_alphanum"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname) -> "<qualified name>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualified_procedure_name) -> "qualified_procedure_name"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualident_refmod) -> "qualident_refmod"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualident_no_refmod) -> "qualident_no_refmod"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualident) -> "<(qualified) identifier>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_purge_statement) -> "purge_statement"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_property_clause) -> "property_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_program_prototype_id_paragraph) -> "program_prototype_id_paragraph"
@@ -1875,7 +1872,6 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_function_unit) -> "function_unit"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_function_specifier) -> "function_specifier"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_function_name) -> "<function-name>"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_function_ident) -> "function_ident"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_function_id_paragraph) -> "function_id_paragraph"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_from_to_characters_opt) -> "from_to_characters_opt"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_free_statement) -> "free_statement"
@@ -1898,7 +1894,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factory_definition) -> "factory_definition"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_external_clause) -> "external_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_extended_condition) -> "extended_condition"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop) -> "expression_par_unop"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop) -> "<expression>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_no_all) -> "<expression>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression) -> "<expression>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_unary) -> "expr_unary"
@@ -3504,9 +3500,6 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_qualname_or_alphanum -> (fun _ -> "qualname_or_alphanum")
   | MenhirInterpreter.N MenhirInterpreter.N_qualname -> (fun _ -> "<qualified name>")
   | MenhirInterpreter.N MenhirInterpreter.N_qualified_procedure_name -> (fun _ -> "qualified_procedure_name")
-  | MenhirInterpreter.N MenhirInterpreter.N_qualident_refmod -> (fun _ -> "qualident_refmod")
-  | MenhirInterpreter.N MenhirInterpreter.N_qualident_no_refmod -> (fun _ -> "qualident_no_refmod")
-  | MenhirInterpreter.N MenhirInterpreter.N_qualident -> (fun _ -> "<(qualified) identifier>")
   | MenhirInterpreter.N MenhirInterpreter.N_purge_statement -> (fun _ -> "purge_statement")
   | MenhirInterpreter.N MenhirInterpreter.N_property_clause -> (fun _ -> "property_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_program_prototype_id_paragraph -> (fun _ -> "program_prototype_id_paragraph")
@@ -3957,7 +3950,6 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_function_unit -> (fun _ -> "function_unit")
   | MenhirInterpreter.N MenhirInterpreter.N_function_specifier -> (fun _ -> "function_specifier")
   | MenhirInterpreter.N MenhirInterpreter.N_function_name -> (fun _ -> "<function-name>")
-  | MenhirInterpreter.N MenhirInterpreter.N_function_ident -> (fun _ -> "function_ident")
   | MenhirInterpreter.N MenhirInterpreter.N_function_id_paragraph -> (fun _ -> "function_id_paragraph")
   | MenhirInterpreter.N MenhirInterpreter.N_from_to_characters_opt -> (fun _ -> "from_to_characters_opt")
   | MenhirInterpreter.N MenhirInterpreter.N_free_statement -> (fun _ -> "free_statement")
@@ -3980,7 +3972,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_factory_definition -> (fun _ -> "factory_definition")
   | MenhirInterpreter.N MenhirInterpreter.N_external_clause -> (fun _ -> "external_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_extended_condition -> (fun _ -> "extended_condition")
-  | MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop -> (fun _ -> "expression_par_unop")
+  | MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop -> (fun _ -> "<expression>")
   | MenhirInterpreter.N MenhirInterpreter.N_expression_no_all -> (fun _ -> "<expression>")
   | MenhirInterpreter.N MenhirInterpreter.N_expression -> (fun _ -> "<expression>")
   | MenhirInterpreter.N MenhirInterpreter.N_expr_unary -> (fun _ -> "expr_unary")

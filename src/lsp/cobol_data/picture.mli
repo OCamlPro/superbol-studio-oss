@@ -136,7 +136,7 @@ module TYPES: sig
       category: category;
       pic: symbols list;
     }
-  [@@deriving show]
+  [@@deriving show, ord]
 
   type picture_config = {
     max_pic_length : int ;
@@ -173,7 +173,7 @@ module TYPES: sig
 end
 
 type t = TYPES.picture
-[@@deriving show]
+[@@deriving show, ord]
 
 open TYPES
 

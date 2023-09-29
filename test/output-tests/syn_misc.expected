@@ -263,7 +263,7 @@ syn_misc.at-1731-prog.cob:11.19:
 ----                      ^
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1731-prog.cob:11.20-11.24:
    8          01 X             PIC X.
@@ -273,7 +273,7 @@ syn_misc.at-1731-prog.cob:11.20-11.24:
 ----                       ^^^^
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1731-prog.cob:11.42-11.52:
    8          01 X             PIC X.
@@ -312,7 +312,7 @@ syn_misc.at-1731-prog.cob:14.19:
   14 >            ACCEPT X WITH    TAB           END-ACCEPT.
 ----                      ^
   15              STOP RUN.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1731-prog.cob:14.20-14.24:
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
@@ -321,7 +321,7 @@ syn_misc.at-1731-prog.cob:14.20-14.24:
   14 >            ACCEPT X WITH    TAB           END-ACCEPT.
 ----                       ^^^^
   15              STOP RUN.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1731-prog.cob:14.42-14.52:
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
@@ -341,7 +341,7 @@ syn_misc.at-1753-prog.cob:8.19:
 ----                      ^
    9              ACCEPT X WITH UPPER     END-ACCEPT.
   10              ACCEPT X      LOWER
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1753-prog.cob:8.20-8.24:
    5          WORKING-STORAGE  SECTION.
@@ -351,7 +351,7 @@ syn_misc.at-1753-prog.cob:8.20-8.24:
 ----                       ^^^^
    9              ACCEPT X WITH UPPER     END-ACCEPT.
   10              ACCEPT X      LOWER
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1753-prog.cob:8.35-8.45:
    5          WORKING-STORAGE  SECTION.
@@ -371,7 +371,7 @@ syn_misc.at-1753-prog.cob:9.19:
 ----                      ^
   10              ACCEPT X      LOWER
   11              ACCEPT X      UPPER
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1753-prog.cob:9.20-9.24:
    6          01 X             PIC X(05).
@@ -381,7 +381,7 @@ syn_misc.at-1753-prog.cob:9.20-9.24:
 ----                       ^^^^
   10              ACCEPT X      LOWER
   11              ACCEPT X      UPPER
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1753-prog.cob:9.35-9.45:
    6          01 X             PIC X(05).
@@ -401,7 +401,7 @@ syn_misc.at-1753-prog.cob:10.19:
 ----                      ^
   11              ACCEPT X      UPPER
   12              STOP RUN.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1753-prog.cob:10.25-10.30:
    7          PROCEDURE        DIVISION.
@@ -411,7 +411,7 @@ syn_misc.at-1753-prog.cob:10.25-10.30:
 ----                            ^^^^^
   11              ACCEPT X      UPPER
   12              STOP RUN.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1753-prog.cob:10.30:
    7          PROCEDURE        DIVISION.
@@ -439,7 +439,7 @@ syn_misc.at-1753-prog.cob:11.19:
   11 >            ACCEPT X      UPPER
 ----                      ^
   12              STOP RUN.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1753-prog.cob:11.25-11.30:
    8              ACCEPT X WITH LOWER     END-ACCEPT.
@@ -448,7 +448,7 @@ syn_misc.at-1753-prog.cob:11.25-11.30:
   11 >            ACCEPT X      UPPER
 ----                            ^^^^^
   12              STOP RUN.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1753-prog.cob:11.30:
    8              ACCEPT X WITH LOWER     END-ACCEPT.
@@ -476,7 +476,7 @@ syn_misc.at-1782-prog.cob:9.19:
 ----                      ^
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:9.20-9.24:
    6          01 X             PIC X(05).
@@ -486,7 +486,7 @@ syn_misc.at-1782-prog.cob:9.20-9.24:
 ----                       ^^^^
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:9.45-9.55:
    6          01 X             PIC X(05).
@@ -506,7 +506,7 @@ syn_misc.at-1782-prog.cob:10.19:
 ----                      ^
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:10.20-10.24:
    7          01 Y             PIC 9(04) BINARY VALUE 4.
@@ -516,7 +516,7 @@ syn_misc.at-1782-prog.cob:10.20-10.24:
 ----                       ^^^^
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:10.45-10.55:
    7          01 Y             PIC 9(04) BINARY VALUE 4.
@@ -536,7 +536,7 @@ syn_misc.at-1782-prog.cob:11.19:
 ----                      ^
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
   13              ACCEPT X                SIZE    Y END-ACCEPT.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:11.20-11.24:
    8          PROCEDURE        DIVISION.
@@ -546,7 +546,7 @@ syn_misc.at-1782-prog.cob:11.20-11.24:
 ----                       ^^^^
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
   13              ACCEPT X                SIZE    Y END-ACCEPT.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:11.34:
    8          PROCEDURE        DIVISION.
@@ -586,7 +586,7 @@ syn_misc.at-1782-prog.cob:12.19:
 ----                      ^
   13              ACCEPT X                SIZE    Y END-ACCEPT.
   14              ACCEPT X                SIZE    0
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:12.20-12.24:
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
@@ -596,7 +596,7 @@ syn_misc.at-1782-prog.cob:12.20-12.24:
 ----                       ^^^^
   13              ACCEPT X                SIZE    Y END-ACCEPT.
   14              ACCEPT X                SIZE    0
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:12.34:
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
@@ -636,7 +636,7 @@ syn_misc.at-1782-prog.cob:13.19:
 ----                      ^
   14              ACCEPT X                SIZE    0
   15              ACCEPT X                SIZE IS 1
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:13.35-13.39:
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
@@ -646,7 +646,7 @@ syn_misc.at-1782-prog.cob:13.35-13.39:
 ----                                      ^^^^
   14              ACCEPT X                SIZE    0
   15              ACCEPT X                SIZE IS 1
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:13.45-13.55:
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
@@ -666,7 +666,7 @@ syn_misc.at-1782-prog.cob:14.19:
 ----                      ^
   15              ACCEPT X                SIZE IS 1
   16              ACCEPT X      PROTECTED SIZE    2
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:14.35-14.39:
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
@@ -676,7 +676,7 @@ syn_misc.at-1782-prog.cob:14.35-14.39:
 ----                                      ^^^^
   15              ACCEPT X                SIZE IS 1
   16              ACCEPT X      PROTECTED SIZE    2
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:14.44:
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
@@ -706,7 +706,7 @@ syn_misc.at-1782-prog.cob:15.19:
 ----                      ^
   16              ACCEPT X      PROTECTED SIZE    2
   17              ACCEPT X      PROTECTED SIZE IS 3
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:15.35-15.39:
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
@@ -716,7 +716,7 @@ syn_misc.at-1782-prog.cob:15.35-15.39:
 ----                                      ^^^^
   16              ACCEPT X      PROTECTED SIZE    2
   17              ACCEPT X      PROTECTED SIZE IS 3
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:15.44:
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
@@ -746,7 +746,7 @@ syn_misc.at-1782-prog.cob:16.19:
 ----                      ^
   17              ACCEPT X      PROTECTED SIZE IS 3
   18              ACCEPT X                SIZE    Y
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:16.25-16.34:
   13              ACCEPT X                SIZE    Y END-ACCEPT.
@@ -756,7 +756,7 @@ syn_misc.at-1782-prog.cob:16.25-16.34:
 ----                            ^^^^^^^^^
   17              ACCEPT X      PROTECTED SIZE IS 3
   18              ACCEPT X                SIZE    Y
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:16.34:
   13              ACCEPT X                SIZE    Y END-ACCEPT.
@@ -806,7 +806,7 @@ syn_misc.at-1782-prog.cob:17.19:
 ----                      ^
   18              ACCEPT X                SIZE    Y
   19              STOP RUN.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:17.25-17.34:
   14              ACCEPT X                SIZE    0
@@ -816,7 +816,7 @@ syn_misc.at-1782-prog.cob:17.25-17.34:
 ----                            ^^^^^^^^^
   18              ACCEPT X                SIZE    Y
   19              STOP RUN.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:17.34:
   14              ACCEPT X                SIZE    0
@@ -864,7 +864,7 @@ syn_misc.at-1782-prog.cob:18.19:
   18 >            ACCEPT X                SIZE    Y
 ----                      ^
   19              STOP RUN.
->> Hint: Missing COUNT .
+>> Hint: Missing .
 
 syn_misc.at-1782-prog.cob:18.35-18.39:
   15              ACCEPT X                SIZE IS 1
@@ -873,7 +873,7 @@ syn_misc.at-1782-prog.cob:18.35-18.39:
   18 >            ACCEPT X                SIZE    Y
 ----                                      ^^^^
   19              STOP RUN.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-1782-prog.cob:18.44:
   15              ACCEPT X                SIZE IS 1

@@ -56,15 +56,12 @@ skip = ["index.mld", "main.ml" ]
 cobol_ast = "version"
 cobol_common = "version"
 cobol_indent = "version"
-#cobol_linting = "version"
 cobol_lsp = "version"
 cobol_parser = "version"
 cobol_typeck = "version"
-#jcl_parser = "version"
 ez_file = ">=0.3"
-#ocabol_lib = "version"
-#ppx_cobcflags = "version"
 ez_cmdliner = "0.3.0"
+vscode-json = "version"
 
 # package tools dependencies
 [tools]

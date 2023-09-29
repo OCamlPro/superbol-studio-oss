@@ -15,8 +15,8 @@ module Misc_sections =
   Cobol_ast.Raw.Misc_sections
 module Data_sections = struct
   include Cobol_data.Pictured_ast.Data_sections
-  type working_storage_section = Cobol_data.Group.t list [@@deriving show]
-  type linkage_section = Cobol_data.Group.t list [@@deriving show]
+  type working_storage_section = Cobol_data.Group.t list [@@deriving show, ord]
+  type linkage_section = Cobol_data.Group.t list [@@deriving show, ord]
 end
 module Data_division =
   Cobol_ast.Raw.Data_division (Data_sections)

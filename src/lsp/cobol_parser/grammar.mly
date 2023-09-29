@@ -76,7 +76,6 @@ let dual_handler_none =
 
   let dummy_qualident =
     Cobol_ast.{ ident_name = dummy_qualname;
-                ident_refmod = None;
                 ident_subscripts = [] }
 
   let dummy_ident =
@@ -2026,8 +2025,9 @@ let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
 let refmod ==
- | "("; leftmost = expression_no_all; ":"; length = ro(expression_no_all); ")";
-   { { leftmost; length_opt = length } }
+ | "("; refmod_left = expression_no_all;
+   ":"; refmod_length = ro(expression_no_all); ")";
+   { { refmod_left; refmod_length } }
 
 let literal_int_ident :=
  | ~ = loc(DIGITS); < >
@@ -2073,22 +2073,6 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
  | "("; s = subscript_first; ")";                                 { [s] }
 
-let qualident [@symbol "<(qualified) identifier>"] [@recovery dummy_qualident] :=
-  | ~ = qualident_refmod;    < >
-  | ~ = qualident_no_refmod; < >
-
-let qualident_no_refmod :=
- | qdn = qualname; %prec lowest
-   { { ident_name = qdn; ident_refmod = None; ident_subscripts = [] } }
- | qdn = qualname; sl = subscripts; %prec lowest
-   { { ident_name = qdn; ident_refmod = None; ident_subscripts = sl } }
-
-let qualident_refmod :=
- | qdn = qualname; rm = refmod;
-   { { ident_name = qdn; ident_refmod = Some rm; ident_subscripts = [] } }
- | qdn = qualname; sl = subscripts; rm = refmod;
-   { { ident_name = qdn; ident_refmod = Some rm; ident_subscripts = sl } }
-
 (* Only for functions which name is also a keyword in COBOL *)
 let intrinsic_function_name :=
  | LENGTH;      { "LENGTH" }
@@ -2100,12 +2084,6 @@ let intrinsic_function_name :=
 let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
  | ~ = name;                         < >
  | ~ = loc(intrinsic_function_name); < >
-
-let function_ident :=
- | FUNCTION; n = function_name; al = arguments; rm = io(refmod); %prec lowest
-   { { call_fun = n; call_args = al; call_refmod = rm } }
- | FUNCTION; n = function_name; rm = io(refmod); %prec below_RPAR
-   { { call_fun = n; call_args = []; call_refmod = rm } }
 
 let inline_invocation :=
  | i = ident; "::"; l = literal; al = optional_arguments_list;
@@ -2142,15 +2120,26 @@ let counter_kind ==
  | PAGE_COUNTER;   {PageCounter}
  | LINE_COUNTER;   {LineCounter}
 
-let ident [@symbol "<identifier>"] [@recovery dummy_ident] :=
- | q = qualident_no_refmod;      {QualIdent q} (* Works for object property too *)
+let qualident ==
+ | qdn = qualname;                  { { ident_name = qdn; ident_subscripts = [] } }
+ | qdn = qualname; sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
+
+let function_ident ==
+ | FUNCTION; n = function_name; al = arguments; { { call_fun = n; call_args = al } }
+ | FUNCTION; n = function_name;                 { { call_fun = n; call_args = [] } }
+
+let base_ident ==                 (* identifier without reference modification *)
+ | q = qualident;                {QualIdent q} (* Works for object property too *)
  | f = function_ident;           {InlineCall f}
  | i = inline_invocation;        {InlineInvoke i}
  | o = object_view;              {ObjectView o}
  | r = object_ref;               {ObjectRef r} (* Includes predefined address (NULL) *)
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
- | q = qualident_refmod;         {QualIdent q} (* Works for object property too *)
+
+let ident [@symbol "<identifier>"] [@recovery dummy_ident] :=
+  | i = base_ident; %prec below_RPAR { UPCAST.base_ident_with_refmod i }
+  | i = base_ident; r = refmod;      { RefMod (i, r) }
 
 let idents [@symbol "<identifiers>"] [@recovery []] :=
   | ~ = rnel(ident); < >
@@ -2191,8 +2180,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
   | (i, _, d, e) = FLOATLIT; { Cobol_ast.floating_of_strings i d e }
 
 let alphanum ==             (* TODO: attach interpretation (hex, etc) into AST *)
- | a = ALPHANUM; { fst a }
- | h = HEXLIT;   { h }
+ | a = ALPHANUM; { fst a, (match snd a with Apostrophe -> Squote | Quote -> Dquote ) }
+ | h = HEXLIT;   { h, Hex }
 
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
@@ -2359,46 +2348,72 @@ let ident_or_integer :=
 
 (* ---------- Expressions ---------- *)
 
-expression_par_unop: (* arith or boolean *)
- | e1 = expression_par_unop "+" e2 = expr_term { Binop (e1, BPlus, e2) }
- | e1 = expression_par_unop "-" e2 = expr_term { Binop (e1, BMinus, e2) }
- | e = expr_term_par_unop                      { e }
-         (* but not both ALL literal *)
-  (* when a +/- follows an arith exp or ident, it must be between () *)
-
-expr_term_par_unop:
- | e1 = expr_term_par_unop o = binop e2 = expr_factor { Binop (e1, o, e2) }
- | e = expr_factor_par_unop                           { e }
-
-expr_factor_par_unop:
- | e1 = expr_unary_par "**" e2 = expr_factor { Binop (e1, BPow, e2) }
- | e = expr_unary_par                       { e }
-
-let expr_unary_par == atomic_expression_no_all
-
 let expression [@recovery Atom (Fig Zero)] [@symbol "<expression>"] [@cost 0] :=
-  (* arith or boolean *)
  | e1 = expression; "+"; e2 = expr_term; { Binop (e1, BPlus, e2) }
  | e1 = expression; "-"; e2 = expr_term; { Binop (e1, BMinus, e2) }
  | e = expr_term;                        { e }
-   (* but not both ALL literal *)
-   (* when a +/- follows an arith exp or ident, it must be between () *)
+
+let expression_no_all [@recovery dummy_expr] [@symbol "<expression>"] (* [@cost 0]  *):=
+ | e1 = expression_no_all; "+"; e2 = expr_term_no_all; { Binop (e1, BPlus, e2) }
+ | e1 = expression_no_all; "-"; e2 = expr_term_no_all; { Binop (e1, BMinus, e2) }
+ | e = expr_term_no_all;                               { e }
+
+let expression_par_unop  [@recovery dummy_expr] [@symbol "<expression>"] (* [@cost 0]  *) :=
+ | e1 = expression_par_unop; "+"; e2 = expr_term; { Binop (e1, BPlus, e2) }
+ | e1 = expression_par_unop; "-"; e2 = expr_term; { Binop (e1, BMinus, e2) }
+ | e = expr_term_par_unop;                        { e }
+
+(* --- *)
 
 expr_term:
  | e1 = expr_term o = binop e2 = expr_factor { Binop (e1, o, e2) }
  | e = expr_factor                           { e }
 
+expr_term_no_all:
+ | e1 = expr_term_no_all o = binop e2 = expr_factor_no_all { Binop (e1, o, e2) }
+ | e = expr_factor_no_all                           { e }
+
+expr_term_par_unop:
+ | e1 = expr_term_par_unop o = binop e2 = expr_factor { Binop (e1, o, e2) }
+ | e = expr_factor_par_unop                           { e }
+
+(* --- *)
+
 expr_factor:
  | e1 = expr_unary "**" e2 = expr_factor { Binop (e1, BPow, e2) }
  | e = expr_unary                       { e }
+
+expr_factor_no_all:
+ | e1 = expr_unary_no_all "**" e2 = expr_factor_no_all { Binop (e1, BPow, e2) }
+ | e = expr_unary_no_all                       { e }
+
+expr_factor_par_unop:
+ | e1 = expr_unary_par "**" e2 = expr_factor { Binop (e1, BPow, e2) }
+ | e = expr_unary_par                       { e }
+
+(* --- *)
 
 expr_unary:
  | e = atomic_expression          { e }
  | o = unop e = atomic_expression { Unop (o, e) }
 
+let expr_unary_no_all ==
+ | e = atomic_expression_no_all;           { e }
+ | o = unop; e = atomic_expression_no_all; { Unop (o, e) }
+
+let expr_unary_par == atomic_expression_no_all
+
+(* --- *)
+
 let atomic_expression [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
  | e = arithmetic_term;      { e }
  | "("; e = expression; ")"; { e } (* arith or boolean *)
+
+let atomic_expression_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
+ | e = arithmetic_term_no_all;      { e }
+ | "("; e = expression_no_all; ")"; { e } (* arith or boolean *)
+
+(* --- *)
 
 arithmetic_term:
  | i = ident               { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
@@ -2409,29 +2424,6 @@ arithmetic_term:
  | f = figurative_constant { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | a = alphanum            { Atom (Alphanum a) } (* NB: quick relaxation for now *)
 
-let expression_no_all [@recovery dummy_expr] [@symbol "<expression>"] (* [@cost 0]  *):=
- | e1 = expression_no_all; "+"; e2 = expr_term_no_all; { Binop (e1, BPlus, e2) }
- | e1 = expression_no_all; "-"; e2 = expr_term_no_all; { Binop (e1, BMinus, e2) }
- | e = expr_term_no_all;                               { e }
-         (* but not both ALL literal *)
-  (* when a +/- follows an arith exp or ident, it must be between () *)
-
-expr_term_no_all:
- | e1 = expr_term_no_all o = binop e2 = expr_factor_no_all { Binop (e1, o, e2) }
- | e = expr_factor_no_all                           { e }
-
-expr_factor_no_all:
- | e1 = expr_unary_no_all "**" e2 = expr_factor_no_all { Binop (e1, BPow, e2) }
- | e = expr_unary_no_all                       { e }
-
-let expr_unary_no_all ==
- | e = atomic_expression_no_all;           { e }
- | o = unop; e = atomic_expression_no_all; { Unop (o, e) }
-
-let atomic_expression_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
- | e = arithmetic_term_no_all;      { e }
- | "("; e = expression_no_all; ")"; { e } (* arith or boolean *)
-
 arithmetic_term_no_all:
  | i = ident    { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
  | i = integer  { Atom (Integer i) }
@@ -2440,6 +2432,8 @@ arithmetic_term_no_all:
  | b = BOOLIT   { Atom (Boolean b) } (* boolean *)
  | a = alphanum { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
  | f = figurative_constant_no_all { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
+
+(* --- *)
 
 %inline binop:
  | "*"   { BMul }
