@@ -3521,14 +3521,6 @@ run_extensions.at-5149-fit.cob:10.6-10.7:
   11   STOP RUN.
 >> Error: Unexpected indicator: `L'
 
-run_extensions.at-5149-fit.cob:11.6-11.7:
-   8   PROCEDURE        DIVISION.
-   9   DISPLAY '         20        30        40        50        60        70       79'
-  10   D DISPLAY '       20        30        40        50        60        70       79'
-  11 > STOP RUN.
-----         ^
->> Error: Unexpected indicator: `U'
-
 run_extensions.at-5149-fit.cob:9.8-9.72:
    6   DATA             DIVISION.
    7   WORKING-STORAGE  SECTION.
@@ -3538,6 +3530,14 @@ run_extensions.at-5149-fit.cob:9.8-9.72:
   10   D DISPLAY '       20        30        40        50        60        70       79'
   11   STOP RUN.
 >> Error: Missing continuation of `         20        30        40        50        60        70  '
+
+run_extensions.at-5149-fit.cob:11.6-11.7:
+   8   PROCEDURE        DIVISION.
+   9   DISPLAY '         20        30        40        50        60        70       79'
+  10   D DISPLAY '       20        30        40        50        60        70       79'
+  11 > STOP RUN.
+----         ^
+>> Error: Unexpected indicator: `U'
 
 run_extensions.at-5149-fit.cob:10.10-10.72:
    7   WORKING-STORAGE  SECTION.

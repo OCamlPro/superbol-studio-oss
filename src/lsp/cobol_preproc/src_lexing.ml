@@ -82,13 +82,22 @@ let newline_cnums { newline_cnums; _ } = List.rev newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
 let allow_debug { config = { debug; _ }; _ } = debug
 
-(* Just check there are no buffered stuffs.  *)
+(* Just check there is no text that requires continuation. *)
 let flushed = function
-  | { lex_prods = []; continued = CNone; pseudotext = None; _ } -> true
+  | { continued = CNone; pseudotext = None; _ } -> true
   | _ -> false
 
-let flush state =
-  { state with lex_prods = []; cdir_seen = false }, List.rev state.lex_prods
+(** Flush buffered lexing productions, possibly holding onto one that may be
+    subject to continuation on the following line.
+
+    Always flushes completely whenever a compiler-directive word has been seen.
+*)
+let flush ({ lex_prods; _ } as state) : _ state * text =
+  match lex_prods with
+  | h :: prods when not state.cdir_seen ->
+      { state with lex_prods = [h]                   }, List.rev prods
+  | prods ->
+      { state with lex_prods = []; cdir_seen = false }, List.rev prods
 
 let reset_cont state =
   { state with continued = CNone }

@@ -7986,14 +7986,6 @@ run_file.at-13896-expected.txt:2.7-2.11:
    4   READ FILE1
 >> Warning: Unexpected non-blank area A on continuation line
 
-run_file.at-13896-expected.txt:2.11-2.13:
-   1   ERROR ON FILE2
-   2 >   STAT-FILE1: 00
-----              ^^
-   3     STAT-FILE2: 35
-   4   READ FILE1
->> Error: Unexpected `1:' in continuation
-
 run_file.at-13896-expected.txt:3.7-3.11:
    1   ERROR ON FILE2
    2     STAT-FILE1: 00
@@ -8002,15 +7994,6 @@ run_file.at-13896-expected.txt:3.7-3.11:
    4   READ FILE1
    5   ERROR ON FILE1
 >> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:3.11-3.13:
-   1   ERROR ON FILE2
-   2     STAT-FILE1: 00
-   3 >   STAT-FILE2: 35
-----              ^^
-   4   READ FILE1
-   5   ERROR ON FILE1
->> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:4.6-4.7:
    1   ERROR ON FILE2
@@ -8042,16 +8025,6 @@ run_file.at-13896-expected.txt:6.7-6.11:
    8   READ FILE2
 >> Warning: Unexpected non-blank area A on continuation line
 
-run_file.at-13896-expected.txt:6.11-6.13:
-   3     STAT-FILE2: 35
-   4   READ FILE1
-   5   ERROR ON FILE1
-   6 >   STAT-FILE1: 10
-----              ^^
-   7     STAT-FILE2: 35
-   8   READ FILE2
->> Error: Unexpected `1:' in continuation
-
 run_file.at-13896-expected.txt:7.7-7.11:
    4   READ FILE1
    5   ERROR ON FILE1
@@ -8061,16 +8034,6 @@ run_file.at-13896-expected.txt:7.7-7.11:
    8   READ FILE2
    9   ERROR ON FILE2
 >> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:7.11-7.13:
-   4   READ FILE1
-   5   ERROR ON FILE1
-   6     STAT-FILE1: 10
-   7 >   STAT-FILE2: 35
-----              ^^
-   8   READ FILE2
-   9   ERROR ON FILE2
->> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:8.6-8.7:
    5   ERROR ON FILE1
@@ -8102,16 +8065,6 @@ run_file.at-13896-expected.txt:10.7-10.11:
   12   CLOSE FILES
 >> Warning: Unexpected non-blank area A on continuation line
 
-run_file.at-13896-expected.txt:10.11-10.13:
-   7     STAT-FILE2: 35
-   8   READ FILE2
-   9   ERROR ON FILE2
-  10 >   STAT-FILE1: 10
-----              ^^
-  11     STAT-FILE2: 47
-  12   CLOSE FILES
->> Error: Unexpected `1:' in continuation
-
 run_file.at-13896-expected.txt:11.7-11.11:
    8   READ FILE2
    9   ERROR ON FILE2
@@ -8121,16 +8074,6 @@ run_file.at-13896-expected.txt:11.7-11.11:
   12   CLOSE FILES
   13   ERROR ON FILE2
 >> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:11.11-11.13:
-   8   READ FILE2
-   9   ERROR ON FILE2
-  10     STAT-FILE1: 10
-  11 >   STAT-FILE2: 47
-----              ^^
-  12   CLOSE FILES
-  13   ERROR ON FILE2
->> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:12.6-12.7:
    9   ERROR ON FILE2
@@ -8162,16 +8105,6 @@ run_file.at-13896-expected.txt:14.7-14.11:
   16   DELETE FILES
 >> Warning: Unexpected non-blank area A on continuation line
 
-run_file.at-13896-expected.txt:14.11-14.13:
-  11     STAT-FILE2: 47
-  12   CLOSE FILES
-  13   ERROR ON FILE2
-  14 >   STAT-FILE1: 00
-----              ^^
-  15     STAT-FILE2: 42
-  16   DELETE FILES
->> Error: Unexpected `1:' in continuation
-
 run_file.at-13896-expected.txt:15.7-15.11:
   12   CLOSE FILES
   13   ERROR ON FILE2
@@ -8180,15 +8113,6 @@ run_file.at-13896-expected.txt:15.7-15.11:
 ----          ^^^^
   16   DELETE FILES
 >> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:15.11-15.13:
-  12   CLOSE FILES
-  13   ERROR ON FILE2
-  14     STAT-FILE1: 00
-  15 >   STAT-FILE2: 42
-----              ^^
-  16   DELETE FILES
->> Error: Unexpected `2:' in continuation
 
 run_file.at-13896-expected.txt:1.7-1.8:
    1 > ERROR ON FILE2

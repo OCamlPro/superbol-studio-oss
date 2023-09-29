@@ -44,7 +44,7 @@ let srclex_newline_cnums (Plx (pl, _)) =
 type 'k source_line =
   | Line: 'k srclexer * text -> 'k source_line
 
-let source_lines_reader lexer =
+let source_chunks_reader lexer =
   let rec next_source_line (state, lexbuf) =
     let state, pseutoks = lexer state lexbuf in
     match pseutoks with
@@ -53,31 +53,67 @@ let source_lines_reader lexer =
   in
   next_source_line
 
-let fold_source_lines lexer f pl =
-  let next_source_line = source_lines_reader lexer in
-  let rec aux pl acc = match next_source_line pl with
+let fold_source_chunks lexer f pl =
+  let next_source_chunk = source_chunks_reader lexer in
+  let rec aux pl acc = match next_source_chunk pl with
     | Line (_, [{ payload = Eof; _}]) -> acc
     | Line (pl, text) -> f text acc |> aux pl
   in
   aux pl
 
-let print_source_lines lexer ppf pl =
-  fold_source_lines lexer (fun t () -> Pretty.print ppf "%a@." Text.pp_text t)
+let print_source lexer ppf pl =
+  fold_source_chunks lexer (fun t () -> Pretty.print ppf "%a@." Text.pp_text t)
     pl ()
 
-let next_source_line (Plx pl) =
-  let Line (pl, text) = source_lines_reader Src_lexer.line pl in
+let next_source_chunk (Plx pl) =
+  let Line (pl, text) = source_chunks_reader Src_lexer.line pl in
   Plx pl, text
 
-let print_source_lines ppf (Plx pl) =
-  print_source_lines Src_lexer.line ppf pl
+let print_source ppf (Plx pl) =
+  print_source Src_lexer.line ppf pl
 
-let fold_source_lines pl f acc =
-  let rec aux pl acc = match next_source_line pl with
+let fold_source_chunks pl f acc =
+  let rec aux pl acc = match next_source_chunk pl with
     | _, [{ payload = Eof; _}] -> acc
     | pl, text -> aux pl (f text acc)
   in
   aux pl acc
+
+(** [fold_source_lines pl ~f acc] applies [f line_number line acc] for each
+    successive line [line] of the input lexed by [pl].  [line_number] gives the
+    line number for [line] (starting at [1]).  [line] is given empty to [f] if
+    it corresponds to empty line in the input, or was a line continuation. *)
+let fold_source_lines pl ~f acc =
+  let tok_lnum tok =
+    (* On source text, which is NOT manipulated, we only have lexical locations,
+       so using [start_pos] is enough. *)
+    (Cobol_common.Srcloc.start_pos ~@tok).pos_lnum
+  in
+  let spit_empty_lines ~until_lnum cur_lnum acc =
+    let rec aux cur_lnum acc =
+      if cur_lnum < until_lnum
+      then aux (succ cur_lnum) (f cur_lnum [] acc)
+      else acc
+    in
+    aux cur_lnum acc
+  in
+  let rec spit_chunk chunk (acc, cur_lnum, cur_prefix) =
+    match
+      Cobol_common.Basics.LIST.split_at_first ~prefix:`Same ~where:`Before
+        (fun tok -> tok_lnum tok > cur_lnum) chunk
+    with
+    | Error () ->                                    (* still on the same line *)
+        (acc, cur_lnum, cur_prefix @ chunk)
+    | Ok (prefix, []) ->           (* should not happen (in case, just append) *)
+        (acc, cur_lnum, cur_prefix @ prefix)
+    | Ok (prefix, (tok :: _ as suffix)) ->                (* terminating a line *)
+        let acc = f cur_lnum (cur_prefix @ prefix) acc in
+        let new_lnum = tok_lnum tok in
+        let acc = spit_empty_lines ~until_lnum:new_lnum (succ cur_lnum) acc in
+        spit_chunk suffix (acc, new_lnum, [])
+  in
+  let acc, last_lnum, tail = fold_source_chunks pl spit_chunk (acc, 1, []) in
+  f last_lnum tail acc                     (* fold on the last line upon exit *)
 
 (* --- *)
 

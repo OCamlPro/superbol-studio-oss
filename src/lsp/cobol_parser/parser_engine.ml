@@ -154,7 +154,7 @@ module Make (Config: Cobol_config.T) = struct
   (* --- *)
 
   let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
-    let text, pp = Cobol_preproc.next_sentence ps.preproc.pp in
+    let text, pp = Cobol_preproc.next_chunk ps.preproc.pp in
     let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
     assert (text <> []);
     (* Note: this is the source format in use at the end of the sentence. *)

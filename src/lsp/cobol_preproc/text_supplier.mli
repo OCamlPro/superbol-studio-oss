@@ -19,8 +19,3 @@ val pptoks_of_text_supplier
   : (module Src_overlay.MANAGER)
   -> Text.t
   -> Preproc_tokens.token supplier
-
-val supply_text_if_compiler_directive
-  : (module Src_overlay.MANAGER)
-  -> Text.t
-  -> (Preproc_tokens.token supplier, [> `NotCDir]) result

@@ -87,15 +87,20 @@ val srclex_comments
 val srclex_newline_cnums
   : any_srclexer
   -> int list
-val next_source_line
+val next_source_chunk
   : any_srclexer
   -> any_srclexer * text
-val fold_source_lines
+val fold_source_chunks
   : any_srclexer
   -> (text -> 'a -> 'a)
   -> 'a
   -> 'a
-val print_source_lines
+val fold_source_lines
+  : any_srclexer
+  -> f:(int -> text -> 'a -> 'a)
+  -> 'a
+  -> 'a
+val print_source
   : Format.formatter
   -> any_srclexer
   -> unit
