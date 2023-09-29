@@ -1,59 +1,38 @@
 {
-  "name": "superbol",
-  "displayName": "Superbol COBOL",
-  "description": "Provides a COBOL mode in VSCode based on Superbol",
-  "license": "MIT",
-  "version": "0.1.0",
-  "publisher": "ocamlpro",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/OCamlPro/superbol-vscode-platform"
-  },
-  "homepage": "https://ocamlpro.com/cobol",
-  "author": {
-    "name": "OCamlPro SAS",
-    "email": "contact@ocamlpro.com"
-  },
-  "keywords": [
-    "cobol",
-    "gnucobol"
-  ],
   "engines": {
     "vscode": "^1.64.0"
   },
-  "categories": [
-    "Formatters",
-    "Programming Languages",
-    "Linters",
-    "Snippets",
-    "Other"
-  ],
   "activationEvents": [
     "onLanguage:cobol",
     "onDebug"
   ],
   "contributes": {
-    "languages": [
+    "breakpoints": [
       {
-        "id": "cobol",
-        "aliases": [
-          "COBOL"
-        ],
-        "filenamePatterns": [
-          "*.cbl",
-          "*.cob"
-        ]
+        "language": "COBOL"
       }
     ],
+    "configuration": {
+      "title": "Superbol COBOL",
+      "properties": {
+        "superbol.globalFormatTakesSelection": {
+          "type": "boolean",
+          "default": false,
+          "description": "If something is selected, only format the selection"
+        },
+        "superbol.path": {
+          "default": "",
+          "description": "Path to the `superbol` command"
+        }
+      }
+    },
     "debuggers": [
       {
         "type": "cobol",
+        "label": "GnuCOBOL Debugger",
+        "program": "gdb",
         "languages": [
           "cobol"
-        ],
-        "program": "gdb",
-        "args": [
-          "--init-eval-command=\"source /usr/local/bin/cobcd.py\""
         ],
         "configurationAttributes": {
           "launch": {
@@ -83,57 +62,66 @@
         ]
       }
     ],
-    "breakpoints": [
+    "languages": [
       {
-        "language": "COBOL"
+        "id": "cobol",
+        "aliases": [
+          "COBOL"
+        ],
+        "filenamePatterns": [
+          "*.cbl",
+          "*.cob"
+        ]
       }
     ],
-    "configuration": {
-      "title": "Superbol COBOL",
-      "properties": {
-        "superbol.globalFormatTakesSelection": {
-          "type": "boolean",
-          "default": false,
-          "description": "If something is selected, only format the selection"
-        },
-        "superbol.path": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the `superbol` command"
+    "taskDefinitions": [
+      {
+        "type": "superbol",
+        "properties": {
+          "copybooks": {
+            "type": "array",
+            "description": "The list of copybooks paths"
+          },
+          "sourceFormat": {
+            "description": "The source format of the code"
+          },
+          "dialect": {
+            "description": "The COBOL dialect used"
+          },
+          "forDebugging": {
+            "type": "boolean",
+            "description": "Build for debugging"
+          },
+          "extensions": {
+            "type": "array",
+            "description": "Add cobol file extensions"
+          }
         }
       }
-    },
-    "taskDefinitions": [
-        {
-            "type": "superbol",
-            "properties": {
-                "copybooks": {
-                    "type": "array",
-                    "description": "The list of copybooks paths"
-                },
-                "sourceFormat": {
-                    "type": "string",
-                    "description": "The source format of the code"
-                },
-                "dialect": {
-                    "type": "string",
-                    "description": "The COBOL dialect used"
-                },
-                "forDebugging": {
-                    "type": "boolean",
-                    "description": "Build for debugging"
-                },
-                "extensions": {
-                    "type": "array",
-                    "description": "Add cobol file extensions"
-                }
-            }
-        }
     ]
   },
-  "main": "./dist/superbol_vscode_platform.bc.js",
+  "name": "superbol",
+  "displayName": "Superbol Studio OSS",
+  "description": "Provides a COBOL mode in VSCode, based on SuperBOL Language Server Protocol for COBOL",
+  "license": "MIT",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OCamlPro/superbol-studio-oss"
+  },
+  "homepage": "https://get-superbol.com",
+  "author": {
+    "name": "SuperBOL at OCamlPro",
+    "email": "contact@ocamlpro.com"
+  },
+  "keywords": [
+    "cobol",
+    "gnucobol"
+  ],
+  "main": "./_dist/superbol_vscode_platform.bc.js",
   "scripts": {
     "compile": "make compile",
+    "release": "make release",
     "package": "vsce package --out superbol-vscode-platform.vsix --yarn",
     "deploy:vsce": "vsce publish --packagePath superbol-vscode-platform.vsix --yarn",
     "deploy:ovsx": "ovsx publish --yarn"
@@ -155,5 +143,13 @@
     "prettier": "^2.5.1",
     "vsce": "^2.15.0",
     "vscode-test": "1.6.1"
-  }
+  },
+  "publisher": "ocamlpro",
+  "categories": [
+    "Formatters",
+    "Programming Languages",
+    "Linters",
+    "Snippets",
+    "Other"
+  ]
 }

@@ -16,7 +16,7 @@ _build
 /_opam
 /_build
 .drom.config
-/dist
+/_dist
 /node_modules
 /yarn-error.log
 /yarn.lock
@@ -28,5 +28,6 @@ ATTIC
 *.vsix
 *.opam.locked
 /emacs/lsp-superbol-customs.el
+/_out
 
 

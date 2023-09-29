@@ -47,7 +47,7 @@ let filename = file
 
 
 type any = Json_repr.ezjsonm [@@deriving json_encoding]
-
+let any s = Ezjsonm.from_string s
 
 type 'a list_or_one = 'a list [@@deriving show]
 
@@ -161,6 +161,8 @@ type breakpoint = {
 }
 [@@deriving json_encoding,show]
 
+let breakpoint language = { language }
+
 type color_defaults = {
   color_dark : string option ;
   color_light : string option ;
@@ -255,7 +257,8 @@ let property
     ?maximum: prop_maximum
     ?minItems: prop_minItems
 
-    () =
+    name =
+  name,
   {
     prop_title ;
     prop_markdownDescription ;
@@ -273,53 +276,88 @@ let property
     prop_minItems ;
   }
 
-let bool_property ?default =
-  property
-    ~type_:(`String "boolean")
-    ?default:(match default with
-        | None -> None
-        | Some bool -> Some (`Bool bool))
+module PROPERTY = struct
 
-let int_property ?default =
-  property
-    ~type_:(`String "number")
-    ?default:(match default with
-        | None -> None
-        | Some int -> Some (`Float (float_of_int int)))
+  let bool ?default =
+    property
+      ~type_:(`String "boolean")
+      ?default:(match default with
+          | None -> None
+          | Some bool -> Some (`Bool bool))
 
-let string_property ?default =
-  property
-    ~type_:(`String "string")
-    ?default:(match default with
-        | None -> None
-        | Some s -> Some (`String s))
+  let int ?default =
+    property
+      ~type_:(`String "number")
+      ?default:(match default with
+          | None -> None
+          | Some int -> Some (`Float (float_of_int int)))
 
-let null_string_property ?default =
-  property
-    ~type_:(`A [`String "string"; `String "null"])
-    ?default:(match default with
-        | None -> None
-        | Some None -> Some `Null
-        | Some Some s -> Some (`String s))
+  let string ?default =
+    property
+      ~type_:(`String "string")
+      ?default:(match default with
+          | None -> None
+          | Some s -> Some (`String s))
 
-let strings_property ?default =
-  property
-    ~type_:(`String "array")
-    ?default:(match default with
-        | None -> None
-        | Some strings ->
-          Some (`A (List.map (fun s -> `String s) strings)))
-    ~items: (`String "string")
+  let null_string ?default =
+    property
+      ~type_:(`A [`String "string"; `String "null"])
+      ?default:(match default with
+          | None -> None
+          | Some None -> Some `Null
+          | Some Some s -> Some (`String s))
 
-let null_strings_property ?default =
-  property
-    ~type_:(`A [ `String "array"; `String "null" ])
-    ?default:(match default with
-        | None -> None
-        | Some None -> Some `Null
-        | Some Some strings ->
-          Some (`A (List.map (fun s -> `String s) strings)))
-    ~items: (`String "string")
+  let strings ?default =
+    property
+      ~type_:(`String "array")
+      ?default:(match default with
+          | None -> None
+          | Some strings ->
+            Some (`A (List.map (fun s -> `String s) strings)))
+      ~items: (`String "string")
+
+  let array = property ~type_:(`String "array")
+
+  let ints ?default =
+    property
+      ~type_:(`String "array")
+      ?default:(match default with
+          | None -> None
+          | Some strings ->
+            Some (`A (List.map (fun s -> `Float (float_of_string s)) strings)))
+      ~items: (`String "number")
+
+  let tabstops ?default =
+    property
+      ~type_:(`String "array")
+      ?default:(match default with
+          | None -> None
+          | Some strings ->
+            Some (`A (List.map (fun s -> `Float (float_of_string s)) strings)))
+      ~items: (any {|
+{
+  "type": "number",
+  "title": "tabstops",
+  "properties": {
+     "tabstop": {
+        "type": "number",
+        "description": "tabstop"
+     }
+  }
+}
+|})
+
+  let null_strings ?default =
+    property
+      ~type_:(`A [ `String "array"; `String "null" ])
+      ?default:(match default with
+          | None -> None
+          | Some None -> Some `Null
+          | Some Some strings ->
+            Some (`A (List.map (fun s -> `String s) strings)))
+      ~items: (`String "string")
+
+end
 
 type configuration = {
   conf_type : string option ; (* should always be None *)
@@ -353,7 +391,7 @@ type debugger = {
   (* path to the debug adapter that implements the VS Code debug
      protocol against the real debugger or runtime *)
 
-  debugger_runtime : string ;
+  debugger_runtime : string option ;
   (* if the path to the debug adapter is not an executable but needs a
      runtime.*)
 
@@ -381,6 +419,27 @@ type debugger = {
 }
 [@@deriving json_encoding,show]
 
+let debugger
+    ~label:debugger_label
+    ?program:debugger_program
+    ?runtime:debugger_runtime
+    ?variables:(debugger_variables = [])
+    ?languages:(debugger_languages = [])
+    ?configurationAttributes:debugger_configurationAttributes
+    ?initialConfigurations:(debugger_initialConfigurations = [])
+    ?configurationSnippets:(debugger_configurationSnippets = [])
+    debugger_type
+  =
+  { debugger_type ;
+    debugger_label ;
+    debugger_program ;
+    debugger_runtime ;
+    debugger_variables ;
+    debugger_languages ;
+    debugger_configurationAttributes ;
+    debugger_initialConfigurations ;
+    debugger_configurationSnippets
+  }
 
 type grammar = { (* TextMate grammar for syntax highlighting *)
   grammar_language : string option ; (* existing language ID *)
@@ -611,12 +670,12 @@ let submenu ~id ~label =
 type taskDefinition = {
   task_type : string ;
   task_required : string list ; [@dft []]
-  task_properties : ( string * any ) list [@assoc] ; [@dft []]
+  task_properties : ( string * property ) list [@assoc] ; [@dft []]
 }
 [@@deriving json_encoding,show]
-let taskDefinition ~type_ ?(required = []) ?(properties = []) () =
+let taskDefinition ?(required = []) ?(properties = []) task_type =
   {
-    task_type = type_ ;
+    task_type ;
     task_required = required ;
     task_properties = properties ;
   }
