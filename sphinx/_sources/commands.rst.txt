@@ -16,6 +16,9 @@ Overview of sub-commands::
   indent range
     Indentation range
   
+  json vscode
+    parse VSODE JSON files or generate package.json
+  
   lsp
     run LSP server
   
@@ -112,6 +115,41 @@ Where options are:
 Overrides `format` from configuration file if present.
 
 * :code:`--strict`   Use the strict configuration
+
+
+main.exe json vscode
+~~~~~~~~~~~~~~~~~~~~~~
+
+parse VSODE JSON files or generate package.json
+
+
+
+**DESCRIPTION**
+
+
+
+
+**USAGE**
+::
+  
+  main.exe json vscode FILES [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILES`   JSON Files to parse
+
+* :code:`--gen FILE`   Generate FILE from current configuration
+
+* :code:`--grammar`   Parse files as syntaxes/*.json files
+
+* :code:`--language`   Parse files as language/configuration *.json files
+
+* :code:`--manifest`   Parse files as package.json files
+
+* :code:`--snippets`   Parse files as snippets/*.json files
+
+* :code:`--tasks`   Parse files as .vscode/tasks.json files
 
 
 main.exe lsp
