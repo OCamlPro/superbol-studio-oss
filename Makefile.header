@@ -10,31 +10,70 @@ LSP_MODE_SRCDIR ?= ../lsp-mode
 all: superbol-free
 superbol-free: build
 	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
+	cp -f package.json package.json.prev
+	./superbol-free json vscode --gen package.json
+	diff -u package.json.prev package.json && rm -f package.json.prev 
 
-.PHONY: compile
-compile: build
-	yarn esbuild _build/default/$(SRCDIR)/$(PROJECT).bc.js \
+.PHONY: build-debug yarn-debug
+
+build-debug:
+	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
+	mkdir -p _out
+	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	$(MAKE) yarn-debug
+
+# Use 'make build-debug' before to copy the JS file in _out/
+yarn-debug:
+	yarn esbuild _out/$(PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
-                --outdir=dist \
+                --outdir=_dist \
                 --platform=node \
                 --target=es6 \
                 --sourcemap
-# the last command generated dist/$(PROJECT).bs.js
+# the last command generated _dist/$(PROJECT).bs.js
 
-.PHONY: compile-release
-compile-release:
+.PHONY: build-release yarn-release
+
+build-release:
 	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
-	yarn esbuild _build/default/$(SRCDIR)/$(PROJECT).bc.js \
+	mkdir -p _out
+	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	$(MAKE) yarn-release
+
+# Use 'make build-release' before to copy the JS file in _out/
+yarn-release:
+	yarn esbuild _out/$(PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
-                --outdir=dist \
+                --outdir=_dist \
                 --platform=node \
                 --target=es6 \
                 --minify-whitespace \
                 --minify-syntax \
                 --sourcemap \
                 --sources-content=false
+
+.PHONY: vsix-package vsix-debug vsix-release deploy-vsce deploy-ovsx vsix-step
+
+vsix-debug: build-debug
+	$(MAKE) vsix-package
+
+vsix-release: build-release
+	$(MAKE) vsix-package
+
+vsix-clean: clean
+	rm -rf _out _dist *.vsix
+
+# need 'make build-debug' or 'make build-release' before
+vsix-package:
+	vsce package --out superbol-vscode-platform.vsix --yarn
+
+deploy-vsce:
+	vsce publish --packagePath superbol-vscode-platform.vsix --yarn
+
+deploy-ovsx:
+	ovsx publish --yarn
 
 .PHONY: clean-execs
 distclean: clean-execs

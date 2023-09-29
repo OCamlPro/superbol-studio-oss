@@ -46,9 +46,7 @@ yarn install
 
 Finally build the extension with:
 ```bash
-drom build
-make compile
-yarn package
+make vsix-debug
 ```
 
 ### Add the extension to VSCode

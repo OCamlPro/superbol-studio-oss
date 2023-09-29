@@ -1,11 +1,11 @@
 **
 !assets/
-!dist/
+!_dist/
 !languages/
 !snippets/
 !syntaxes/
 !README.md
 !CHANGELOG.md
-!LICENSE
+!LICENSE.md
 !package.json
 !astexplorer/dist/index.html
