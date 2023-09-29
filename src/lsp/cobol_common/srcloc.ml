@@ -102,6 +102,9 @@ let rec start_pos: type t. t slt -> Lexing.position = function
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
 
+(** [shallow_multiline_lexloc_in ~filename loc] retrieves a lexical location in
+    [filename] from [loc], iff [loc] directly originates from [filename] and was
+    not subject to any replacement or copy.  Returns [None] otherwise. *)
 let shallow_multiline_lexloc_in ~filename loc =
   let rec aux: type t. t slt -> lexloc option = function
     | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
@@ -114,6 +117,9 @@ let shallow_multiline_lexloc_in ~filename loc =
   in
   aux loc
 
+(** [shallow_single_line_lexloc_in ~filename loc] is similar to
+    {!shallow_multiline_lexloc_in}, except that any returned lexical location is
+    guaranteed to span a single line. *)
 let shallow_single_line_lexloc_in ~filename = function
   | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
   | Raw _ | Cpy _ | Rpl _ | Cat _ -> None
