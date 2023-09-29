@@ -60,6 +60,22 @@ let rec of_data_group
               (*     Result.ok @@ Elementary (({typ = Types.Pointer (\* L8 *\); level}, None) &@ loc) *)
               | ObjectReference _ ->
                   Ok (Elementary ({typ = Types.Object; level}, None) &@ loc)
+              | BinaryChar _
+              | BinaryShort _
+              | BinaryLong _
+              | BinaryDouble _
+              | FloatBinary32 _
+              | FloatBinary64 _
+              | FloatBinary128 _
+              | FloatDecimal16 _
+              | FloatDecimal34 _
+              | FloatShort
+              | FloatLong
+              | FloatExtended ->
+                  (* As per ISO/IEC 1989:2014, 8.5.2.10 Numeric category *)
+                  Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
+              | UsagePending (`Comp1 | `Comp2) ->
+                  Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
               | _ ->
                   Diags.error ~loc "Missing@ PICTURE@ clause";
                   Result.Error ()
@@ -67,9 +83,11 @@ let rec of_data_group
         | Some picture, Some usage ->
             let cobol_class = cobol_class_of_picture ~&picture in
             begin match usage, cobol_class with
-              | (Binary | PackedDecimal), Numeric ->
+              | (Binary | PackedDecimal |
+                UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), Numeric ->
                   Ok (Elementary ({ typ = cobol_class; level }, Some ~&picture) &@ loc)
-              | (Binary | PackedDecimal), _ ->
+              | (Binary | PackedDecimal |
+                UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), _ ->
                   Diags.error ~loc
                     "The picture associated with a USAGE clause of type BINARY \
                      (COMP) or PACKED-DECIMAL must be a numeric picture";

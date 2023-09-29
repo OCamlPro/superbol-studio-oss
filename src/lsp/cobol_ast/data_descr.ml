@@ -382,8 +382,8 @@ type usage_clause =
  | Pointer of name with_loc option                                (* +COB2002 *)
  | FunctionPointer of name with_loc                               (* +COB2002 *)
  | ProgramPointer of name with_loc option                         (* +COB2002 *)
- | UsagePending of [`Comp0 | `Comp1 | `Comp5 | `Comp6 | `CompX |
-                    `CompN | `Comp9 | `Comp10 | `Comp15 ]
+ | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
+                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 ]
 [@@deriving ord]
 
 and signedness =
@@ -493,6 +493,8 @@ let pp_usage_clause ppf usage =
     match comp with
     | `Comp0 -> Fmt.pf ppf "COMP-0"
     | `Comp1 -> Fmt.pf ppf "COMP-1"
+    | `Comp2 -> Fmt.pf ppf "COMP-2"
+    | `Comp3 -> Fmt.pf ppf "COMP-3"
     | `Comp5 -> Fmt.pf ppf "COMP-5"
     | `Comp6 -> Fmt.pf ppf "COMP-6"
     | `CompX -> Fmt.pf ppf "COMP-X"
