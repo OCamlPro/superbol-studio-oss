@@ -197,6 +197,8 @@ Where options are:
 
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
+* :code:`--check`   If true, check the output (implies --parse)
+
 * :code:`--cobc`   Activate cobc specific features
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
@@ -206,6 +208,8 @@ Where options are:
 * :code:`--free`   Shorthand for `--source-format FREE`
 
 * :code:`--output FILE` or :code:`-o FILE`   Output File (use '-' for stdout)
+
+* :code:`--parse`   If true, parse the generated cobol before printing
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 

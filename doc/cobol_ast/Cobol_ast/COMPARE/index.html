@@ -5,16 +5,42 @@
   <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_term"><a href="#val-compare_term" class="anchor"></a><code><span><span class="keyword">val</span> compare_term : 'a. <span><span><span class="type-var">'a</span> <span class="xref-unresolved">Cobol_ast__.Terms.term</span></span> <a href="#type-compare_fun">compare_fun</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_expression"><a href="#val-compare_expression" class="anchor"></a><code><span><span class="keyword">val</span> compare_expression : 
   <span><span class="xref-unresolved">Cobol_ast__.Terms.expression</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ast__.Terms.expression</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_binary_relation"><a href="#val-compare_binary_relation" class="anchor"></a><code><span><span class="keyword">val</span> compare_binary_relation : 
+  <span><span>(<span class="xref-unresolved">Cobol_ast__.Terms.expression</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.relop</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.expression</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(<span class="xref-unresolved">Cobol_ast__.Terms.expression</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.relop</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.expression</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_abbrev_combined_relation"><a href="#val-compare_abbrev_combined_relation" class="anchor"></a><code><span><span class="keyword">val</span> compare_abbrev_combined_relation : 
+  <span><span>(bool
+   * <span>(<span class="xref-unresolved">Cobol_ast__.Terms.expression</span>
+      * <span class="xref-unresolved">Cobol_ast__.Terms.relop</span>
+      * <span class="xref-unresolved">Cobol_ast__.Terms.expression</span>)</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.logop</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.flat_combined_relation</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(bool
+   * <span>(<span class="xref-unresolved">Cobol_ast__.Terms.expression</span>
+      * <span class="xref-unresolved">Cobol_ast__.Terms.relop</span>
+      * <span class="xref-unresolved">Cobol_ast__.Terms.expression</span>)</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.logop</span>
+   * <span class="xref-unresolved">Cobol_ast__.Terms.flat_combined_relation</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_flat_combined_relation"><a href="#val-compare_flat_combined_relation" class="anchor"></a><code><span><span class="keyword">val</span> compare_flat_combined_relation : 
+  <span><span class="xref-unresolved">Cobol_ast__.Terms.flat_combined_relation</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ast__.Terms.flat_combined_relation</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_cond"><a href="#val-compare_cond" class="anchor"></a><code><span><span class="keyword">val</span> compare_cond : 
-  <span><span><span>[&gt; <span class="xref-unresolved">Cobol_ast__.Terms.simple_</span> ]</span> <span class="keyword">as</span> 'a <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span><span class="type-var">'a</span> <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
-  int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_relop"><a href="#val-compare_relop" class="anchor"></a><code><span><span class="keyword">val</span> compare_relop : <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_class_"><a href="#val-compare_class_" class="anchor"></a><code><span><span class="keyword">val</span> compare_class_ : 
+  'a 'b. <span><span><span class="type-var">'a</span> <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span class="type-var">'b</span> <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_relop"><a href="#val-compare_relop" class="anchor"></a><code><span><span class="keyword">val</span> compare_relop : <span><span class="xref-unresolved">Cobol_ast__.Terms.relop</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="xref-unresolved">Cobol_ast__.Terms.relop</span> <span class="arrow">&#45;&gt;</span></span> int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_logop"><a href="#val-compare_logop" class="anchor"></a><code><span><span class="keyword">val</span> compare_logop : 
+  <span><span class="xref-unresolved">Cobol_ast__.Terms.logop</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ast__.Terms.logop</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_class_"><a href="#val-compare_class_" class="anchor"></a><code><span><span class="keyword">val</span> compare_class_ : 
   <span><span class="xref-unresolved">Cobol_ast__.Terms.class_</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ast__.Terms.class_</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_qualident"><a href="#val-compare_qualident" class="anchor"></a><code><span><span class="keyword">val</span> compare_qualident : 
   <span><span class="xref-unresolved">Cobol_ast__.Terms.qualident</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ast__.Terms.qualident</span> <span class="arrow">&#45;&gt;</span></span>
-  int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_subcript"><a href="#val-compare_subcript" class="anchor"></a><code><span><span class="keyword">val</span> compare_subcript : 
+  int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_subscript"><a href="#val-compare_subscript" class="anchor"></a><code><span><span class="keyword">val</span> compare_subscript : 
   <span><span class="xref-unresolved">Cobol_ast__.Terms.subscript</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ast__.Terms.subscript</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_refmod"><a href="#val-compare_refmod" class="anchor"></a><code><span><span class="keyword">val</span> compare_refmod : 
@@ -90,6 +116,6 @@
     <a href="#type-compare_fun">compare_fun</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_strlit_or_intlit"><a href="#val-compare_strlit_or_intlit" class="anchor"></a><code><span><span class="keyword">val</span> compare_strlit_or_intlit : 
   <span><span><span>[ <span class="xref-unresolved">Cobol_ast__.Terms.strlit_</span> <span>| <span class="xref-unresolved">Cobol_ast__.Terms.int_</span></span> ]</span> <span class="xref-unresolved">Cobol_ast__.Terms.term</span></span>
     <a href="#type-compare_fun">compare_fun</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-compare_condition"><a href="#val-compare_condition" class="anchor"></a><code><span><span class="keyword">val</span> compare_condition : 
-  <span><span><span>[&gt; <span class="xref-unresolved">Cobol_ast__.Terms.simple_</span> ]</span> <span class="keyword">as</span> 'a <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span><span class="type-var">'a</span> <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
-  int</span></code></div></div></div></body></html>
+  <span><span><span class="type-var">'b</span> <span class="xref-unresolved">Cobol_ast__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="xref-unresolved">Ppx_deriving_runtime</span>.int</span></code></div></div></div></body></html>
