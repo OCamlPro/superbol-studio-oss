@@ -126,23 +126,6 @@
  )
 
 (package
- (name vscode-package-json)
- (synopsis "The superbol-studio-oss project")
- (description "This is the description\nof the superbol-studio-oss OCaml project\n")
- (depends
-   (ocaml (>= 4.14.0))
-   (vscode-json (= version))
-   ezjsonm
-   (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   ppx_deriving_encoding
-   ppx_inline_test
-   ppx_expect
-   odoc
-   ocamlformat
-  )
- )
-
-(package
  (name vscode-json)
  (synopsis "The superbol-studio-oss project")
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
@@ -219,6 +202,7 @@
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
    (ocaml (>= 4.14.0))
+   (vscode-json (= version))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (cobol_typeck (= version))

@@ -123,10 +123,6 @@ dir = "src/vscode/vscode-languageclient-js-stubs"
 # edit 'src/vscode/vscode-languageclient-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/vscode-package-json"
-# edit 'src/vscode/vscode-package-json/package.toml' for package-specific options
-
-[[package]]
 dir = "src/vscode/vscode-json"
 # edit 'src/vscode/vscode-json/package.toml' for package-specific options
 

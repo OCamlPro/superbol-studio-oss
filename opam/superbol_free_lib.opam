@@ -48,6 +48,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "vscode-json" {= version}
   "ez_file" {>= "0.3"}
   "ez_cmdliner" {>= "0.3.0" & < "1.0.0"}
   "cobol_typeck" {= version}
