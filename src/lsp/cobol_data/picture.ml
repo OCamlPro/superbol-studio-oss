@@ -40,6 +40,7 @@ module TYPES = struct
     | X
     | Z
     | Zero
+  [@@deriving ord]
 
   let pp_symbol ppf = function
     | A -> Fmt.char ppf 'A'
@@ -70,7 +71,7 @@ module TYPES = struct
       symbol: symbol;
       symbol_occurences: int;
     }
-  [@@deriving show]
+  [@@deriving show, ord]
 
   type editions =
     {
@@ -78,7 +79,7 @@ module TYPES = struct
       floating: floating_insertion option;
       zerorepl: zero_replacement option;
     }
-  [@@deriving show]
+  [@@deriving show, ord]
 
   and basic_edition =
     | SimpleInsertion of simple_insertion
@@ -158,6 +159,7 @@ module TYPES = struct
           exponent_digits: int;
           editions: basic_edition list;
         }
+  [@@deriving ord]
 
 
   let pp_category ppf = function
@@ -199,7 +201,7 @@ module TYPES = struct
       category: category;
       pic: symbols list;
     }
-  [@@deriving show]
+  [@@deriving show, ord]
 
   type picture_config = {
     max_pic_length : int ;
@@ -234,7 +236,7 @@ module TYPES = struct
 end
 
 type t = TYPES.picture
-[@@deriving show]
+[@@deriving show, ord]
 
 open TYPES
 

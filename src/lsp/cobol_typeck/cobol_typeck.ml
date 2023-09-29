@@ -47,21 +47,21 @@ struct
         match clause with
         | DecimalPointIsComma ->
             Visitor.skip { env with decimal_point = ',' }
-        | CurrencySign { sign = (Alphanum s | National s);
+        | CurrencySign { sign = (Alphanum (s, _) | National s);
                          picture_symbol = None }
-        | CurrencySign { picture_symbol = Some (Alphanum s | National s); _ }
+        | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
           when String.length s != 1 ->
             Diags.error ~loc "%s@ is@ not@ a@ valid@ picture@ symbol." s;
             Visitor.skip env
-        | CurrencySign { sign = Alphanum s | National s;
+        | CurrencySign { sign = Alphanum (s, _) | National s;
                          picture_symbol = None }
-        | CurrencySign { picture_symbol = Some (Alphanum s | National s); _ }
+        | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
           when not (valid_picture_symbol s.[0]) ->
             Diags.error ~loc "%c@ is@ not@ a@ valid@ PICTURE@ symbol." s.[0];
             Visitor.skip env
-        | CurrencySign { sign = Alphanum s | National s;
+        | CurrencySign { sign = Alphanum (s, _) | National s;
                          picture_symbol = None }
-        | CurrencySign { picture_symbol = Some (Alphanum s | National s); _ } ->
+        | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ } ->
             Visitor.skip @@
             { env with
               currency_signs = CharSet.add s.[0] env.currency_signs }

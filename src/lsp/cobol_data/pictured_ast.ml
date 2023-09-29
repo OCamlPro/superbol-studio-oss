@@ -21,7 +21,7 @@ module CharSet = Cobol_common.Basics.CharSet
 module Misc_sections =
   Cobol_ast.Raw.Misc_sections
 module Picture = struct
-  type picture = Picture.t with_loc [@@deriving show]
+  type picture = Picture.t with_loc [@@deriving show, ord]
 end
 module Data_sections =
   Cobol_ast.Raw.Data_sections (Picture)
