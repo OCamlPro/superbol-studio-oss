@@ -67,13 +67,13 @@ vsix-clean: clean
 
 # need 'make build-debug' or 'make build-release' before
 vsix-package:
-	vsce package --out superbol-vscode-platform.vsix --yarn
+	yarn vsce package --out superbol-vscode-platform.vsix --yarn
 
 deploy-vsce:
-	vsce publish --packagePath superbol-vscode-platform.vsix --yarn
+	yarn vsce publish --packagePath superbol-vscode-platform.vsix --yarn
 
 deploy-ovsx:
-	ovsx publish --yarn
+	yarn ovsx publish --yarn
 
 .PHONY: clean-execs
 distclean: clean-execs
