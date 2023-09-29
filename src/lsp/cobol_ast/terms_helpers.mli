@@ -11,17 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Ast
+(** Some utilities to construct or rewrite terms (mostly conditions for now) *)
 
-module Terms_visitor = Terms_visitor
-module Operands_visitor = Operands_visitor
+val neg_simple_cond: neg:bool -> Terms.simple_condition -> Terms.condition
+val neg_condition: neg:bool -> Terms.condition -> Terms.condition
 
-module Terms_helpers = Terms_helpers
-
-module Abstract = Abstract
-module Abstract_visitor = Abstract_visitor
-
-module Raw = Raw
-module Raw_visitor = Raw_visitor
-
-module Testing_helpers = Testing_helpers
+val expand_every_abbrev_cond: 'k Terms.cond -> Terms.condition
+val expand_abbrev_cond: Terms.abbrev_combined_relation -> Terms.condition

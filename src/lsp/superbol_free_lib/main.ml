@@ -22,6 +22,7 @@ let public_subcommands = [
   Command_texi2rst.cmd ;
   Command_indent_range.cmd;
   Command_indent_file.cmd;
+  Command_json_package.cmd;
 ]
 
 let main ?style_renderer ?utf_8 () =

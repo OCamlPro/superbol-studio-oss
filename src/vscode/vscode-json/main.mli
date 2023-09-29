@@ -19,8 +19,11 @@ type 'a result =
 type errors = (* warnings *) string list * (* errors *) string list
 
 
-val check_project : string -> errors
-val check_file : 'a Json_encoding.encoding -> string -> errors
+val check_project : ?verbose:bool -> string -> errors
+val check_file :
+  'a Json_encoding.encoding ->
+  ( Format.formatter -> 'a -> unit) ->
+  string -> errors
 
 val read_file : string -> 'a Json_encoding.encoding -> 'a result
 val write_file : string -> 'a Json_encoding.encoding -> 'a -> unit

@@ -48,7 +48,10 @@ let filename = file
 
 type any = Json_repr.ezjsonm [@@deriving json_encoding]
 
-type 'a list_or_one = 'a list
+
+type 'a list_or_one = 'a list [@@deriving show]
+
+let pp_any _fmt _ezjsonm = ()
 
 let list_or_one_enc encoding =
   let open Json_encoding in
@@ -67,26 +70,39 @@ type repository = {
   type_ : string option ; [@key "type"]
   url : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type engines = {
   vscode : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let engines ~vscode = { vscode }
 
 
 type author = {
   author_name : string ;
-  author_email : string ;
+  author_email : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
+
+let author_enc =
+  let open Json_encoding in
+  union [
+    case string
+      (function { author_email = None ; author_name } -> Some author_name
+              | _ -> None)
+      (fun author_name -> { author_name ; author_email = None }) ;
+    case author_enc
+      (function { author_email = None ; _ } -> None
+              | a -> Some a)
+      (fun s -> s) ;
+  ]
 
 type bug = {
   bug_url : string option ;
   bug_email : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type package = {
   name : string ;
@@ -105,7 +121,7 @@ type package = {
   devDependencies : (string * string) list [@assoc] ; [@dft []]
   bugs : bug option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let package
     ~displayName
     ~description
@@ -143,7 +159,7 @@ let package
 type breakpoint = {
   language : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type color_defaults = {
   color_dark : string option ;
@@ -151,20 +167,20 @@ type color_defaults = {
   color_highContrast : string option ;
   color_highContrastLight : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type color = {
   color_id : string ;
   color_description : string ;
   color_defaults : color_defaults ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type command_icon = {
   icon_light : string ; (* path *)
   icon_dark : string ; (* path *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 let command_icon_enc = Json_encoding.union [
@@ -184,7 +200,7 @@ type command = {
   command_icon : command_icon option ;
   command_enablement : string option ; (* Javascript condition *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let command ~command ~title ?category ?icon ?enablement () =
   {
     command_command = command ;
@@ -220,7 +236,7 @@ type property = {
   prop_maximum : int option ;
   prop_minItems : int option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let property
     ?title: prop_title
@@ -310,7 +326,7 @@ type configuration = {
   conf_title : string option ;
   conf_properties : ( string * property ) list [@assoc] ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let configuration ?title properties =
   { conf_type = None ;
     conf_title = title ;
@@ -319,7 +335,7 @@ let configuration ?title properties =
 type selector = {
   filenamePattern : string ; (* glob *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type customEditor = {
   edit_viewType : string ;
@@ -327,7 +343,7 @@ type customEditor = {
   edit_selector : selector list ;
   edit_priority : string option ; (* "default" or "option" *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type debugger = {
   debugger_type : string ; (* unique ID *)
@@ -363,7 +379,7 @@ type debugger = {
      IntelliSense when editing a launch.json. *)
 
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 
 type grammar = { (* TextMate grammar for syntax highlighting *)
@@ -373,26 +389,26 @@ type grammar = { (* TextMate grammar for syntax highlighting *)
   grammar_injectTo : string list ; [@dft []]
   grammar_embeddedLanguages : (string * string) list [@assoc] ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type icon = {
   icon_description : string ;
   icon_default : (string * string) list [@assoc] ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type iconTheme = {
   iconTheme_id : string ;
   iconTheme_label : string ;
   iconTheme_path : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type jsonValidation = {
   jsonValidation_fileMatch : string ; (* ".json" *)
   jsonValidation_url : string ; (* scheme URL *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type keybinding = {
   key_command : string ;
@@ -401,7 +417,7 @@ type keybinding = {
   key_when : string option ; (* Javascript condition *)
   key_args : (string * string) list [@assoc] ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let keybinding
     ~key
     ?mac ?when_ ?( args = [] )
@@ -421,10 +437,10 @@ type language = {
   lang_filenames : string list ; [@dft []]
   lang_filenamePatterns : string list ; [@dft []]
   lang_firstLine : string option ;
-  lang_configuration : string option ; (* path *)
+  lang_configuration : string option ; [@dft None](* path *)
   lang_icon : command_icon option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let language
     ?( extensions = [] )
@@ -454,7 +470,7 @@ type menu = {
   menu_key : string option ;
   menu_submenu : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let menu ?command ?group ?when_ ?key ?submenu () =
   {
     menu_command = command ;
@@ -465,7 +481,7 @@ let menu ?command ?group ?when_ ?key ?submenu () =
   }
 
 
-type fileLocation = string list
+type fileLocation = string list [@@deriving show]
 
 let fileLocation_enc =
   let open Json_encoding in
@@ -497,7 +513,7 @@ type problemPattern = {
   pat_loop : bool option ;
   pat_patterns : problemPattern list ; [@dft []] (* instead of regexp *)
 }
-[@@deriving json_encoding {recursive}]
+[@@deriving json_encoding {recursive}, show]
 
 let problemPattern
     ?name
@@ -531,6 +547,7 @@ let problemPattern
 type pattern =
     ProblemPattern of problemPattern
   | ProblemName of string
+[@@deriving show]
 
 let pattern_enc =
   let open Json_encoding in
@@ -552,7 +569,8 @@ type problemMatcher = {
   pm_source : string option ;
   pm_severity : string option ; (* info, error, warning *)
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
+
 let problemMatcher ~name ?owner ?(fileLocation = []) ?( pattern = [])
     ?source ?severity () =
   {
@@ -570,14 +588,14 @@ type productIconTheme = {
   pit_label : string ;
   pit_path : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 (* A set of completions for a specific language *)
 type snippet = {
   snippet_language : string ;
   snippet_path : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let snippet ~language ~path = {
   snippet_language = language ;
   snippet_path = path }
@@ -586,7 +604,7 @@ type submenu = {
   submenu_id : string ;
   submenu_label : string ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let submenu ~id ~label =
   { submenu_id = id ; submenu_label = label }
 
@@ -595,7 +613,7 @@ type taskDefinition = {
   task_required : string list ; [@dft []]
   task_properties : ( string * any ) list [@assoc] ; [@dft []]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let taskDefinition ~type_ ?(required = []) ?(properties = []) () =
   {
     task_type = type_ ;
@@ -610,7 +628,7 @@ type view = {
   view_icon : string option;
   view_contextualTitle : string option;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let view ~id ~name ?when_ ?icon ?contextualTitle () =
   {
     view_id = id ;
@@ -625,7 +643,7 @@ type viewsContainer = {
   vc_title : string ;
   vc_icon : string option;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let viewsContainer ~id ~title ?icon () =
   { vc_id = id ; vc_title = title ; vc_icon = icon }
 
@@ -634,17 +652,18 @@ type viewsWelcome = {
   vw_contents : string ;
   vw_when : string option;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let viewsWelcome ~view ~contents ?when_ () =
   { vw_view = view ; vw_contents = contents ; vw_when = when_ }
 
 type configurationDefaults =
  ( string * any ) list [@assoc]
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 type configurationDefault =
   | Default of string
   | Defaults of ( string * any ) list
+[@@deriving show]
 
 let configurationDefault_enc =
   let open Json_encoding in
@@ -696,7 +715,7 @@ type contributes = {
     typescriptServerPlugins : any option ;
     walkthroughs : any option ;
   }
-  [@@deriving json_encoding]
+  [@@deriving json_encoding,show]
 let contributes
   ?( breakpoints = [] )
   ?( colors = [] )
@@ -759,14 +778,14 @@ let contributes
 type sponsor = {
   sponsor_url : string ; [@key "url"]
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let sponsor sponsor_url = { sponsor_url }
 
 type galleryBanner = {
   gallery_color : string option ;
   gallery_theme : string option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 let galleryBanner ?color ?theme () =
   { gallery_color = color ; gallery_theme = theme }
 
@@ -785,7 +804,7 @@ type marketplace = {
   sponsor : sponsor option ;
   galleryBanner : galleryBanner option ;
 }
-[@@deriving json_encoding]
+[@@deriving json_encoding,show]
 
 let marketplace
     ?(categories=[]) ?icon ?preview ?(badges=[])

@@ -62,6 +62,7 @@ let write_file filename encoding p =
 
 type state = {
   dir : string ;
+  verbose : bool ;
   mutable warnings : string list ;
   mutable errors : string list ;
 }
@@ -96,23 +97,33 @@ let check_encoding state encoding ~field ?error file =
   let filename = state.dir // file in
   if Sys.file_exists filename then
     let s = EzFile.read_file filename in
+    if state.verbose then
+      Printf.eprintf "  Check encoding of %s\n%!" filename;
     match Json_encoding.destruct encoding s with
     | Ok _ -> ()
     | Error s ->
       add_error ?error state
         "Could not destruct %S in field %s:\n      %s" filename field s
+    | exception exn ->
+      add_error ?error state
+        "File %S raised exception %s" filename (Printexc.to_string exn)
 
 open Manifest
-let check_project file =
+let check_project ?(verbose=false) file =
+  if verbose then
+    Printf.eprintf "Checking project file %S\n%!" file;
   match read_file file Manifest.vscode_enc with
   | Error s -> [], [s]
   | Ok p ->
+    if verbose then
+      Printf.eprintf "  File OK\n%!";
     let dir = Filename.dirname file in
     let dir = match dir with
       | "." | "./" -> ""
       | _ -> dir
     in
     let state = {
+      verbose ;
       warnings = [] ;
       errors = [];
       dir ;
@@ -180,7 +191,9 @@ let check_project file =
     end ;
     state.warnings, state.errors
 
-let check_file encoding file =
+let check_file encoding pp file =
   match read_file file encoding with
   | Error s -> [], [s]
-  | Ok _p -> [], []
+  | Ok p ->
+    pp Format.std_formatter p;
+    [], []

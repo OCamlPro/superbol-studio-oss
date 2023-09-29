@@ -65,7 +65,7 @@ module INTERNAL = struct
   (** {2 Parser with dummy source locations, that can be fed directly with a
       list of tokens} *)
   module Dummy = struct
-    module Tags: Cobol_ast.Helpers.TAGS = struct
+    module Tags: Cobol_ast.Testing_helpers.TAGS = struct
       let loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)
     end
 
