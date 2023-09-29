@@ -41,10 +41,6 @@ let mf_root = srcdir // mf_testsuite
 
 module Diags = Cobol_common.Diagnostics.InitStateful ()
 
-let preprocess_file ~source_format ?config =
-  preprocess_file ~source_format ?config ~verbose:false ~libpath:[]
-    ~ppf:std_formatter ~epf:std_formatter
-
 let reparse_file ~source_format ~config filename =
   let parse ~source_format input =
     Cobol_parser.parse_simple

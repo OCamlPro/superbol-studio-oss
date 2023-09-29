@@ -20,7 +20,7 @@ let%expect_test "tokens" =
             STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., WORD[PROG], ., PROCEDURE,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., PROCEDURE,
     DIVISION, ., STOP, RUN, ., EOF
 |}];;
 
@@ -34,6 +34,6 @@ let%expect_test "tokens-after-syntax-errors" =
             STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, PROGRAM-ID, ., PROCEDURE, DIVISION, MOVE, WORD[X], WORD[Y],
-    STOP, RUN, ., EOF
+    IDENTIFICATION, PROGRAM-ID, ., INFO_WORD[PROCEDURE], DIVISION, MOVE, WORD[X],
+    WORD[Y], STOP, RUN, ., EOF
 |}];;

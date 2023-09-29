@@ -312,26 +312,6 @@ configuration.at-768-defunc.cfg:2.8-2.27:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:851:0
-configuration.at-851-fixed.cob:4.18:
-   1   
-   2         *Example prog in fixed format (the default)
-   3          IDENTIFICATION   DIVISION.
-   4 >        PROGRAM-ID.      fixed.
-----                     ^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-configuration.at-851-fixed.cob:4.24-4.29:
-   1   
-   2         *Example prog in fixed format (the default)
-   3          IDENTIFICATION   DIVISION.
-   4 >        PROGRAM-ID.      fixed.
-----                           ^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:880:0
 configuration.at-880-wide.cob:9.19-9.72:
    6          WORKING-STORAGE  SECTION.

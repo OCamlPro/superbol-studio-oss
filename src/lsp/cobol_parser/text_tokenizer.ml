@@ -54,6 +54,33 @@ let combined_tokens =
       NEXT_PAGE, "NEXT_PAGE";
     ]
 
+let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
+  let string s = Pretty.string ppf s
+  and print format = Pretty.print ppf format in
+  function
+  | WORD w
+  | WORD_IN_AREA_A w
+  | PICTURE_STRING w
+  | INFO_WORD w
+  | DIGITS w
+  | SINTLIT w -> string w
+  | EIGHTY_EIGHT -> string "88"
+  | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
+  | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
+  | ALPHANUM (s, q) -> print "%a%s%a" TEXT.pp_quote q s TEXT.pp_quote q
+  | ALPHANUM_PREFIX (s, q) -> print "%a%s" TEXT.pp_quote q s
+  | NATLIT s -> print "N\"%s\"" s
+  | BOOLIT b -> print "B\"%a\"" Cobol_ast.pp_boolean b
+  | HEXLIT s -> print "X\"%s\"" s
+  | NULLIT s -> print "Z\"%s\"" s
+  | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
+  | INTERVENING_ c -> print "%c" c
+  | t -> string @@
+      try Text_lexer.show_token t
+      with Not_found ->
+      try Hashtbl.find combined_tokens t
+      with Not_found -> "<unknown/unexpected token>"
+
 let pp_token: token Pretty.printer = fun ppf ->
   let string s = Pretty.string ppf s
   and print format = Pretty.print ppf format in
@@ -61,25 +88,15 @@ let pp_token: token Pretty.printer = fun ppf ->
     | WORD w -> print "WORD[%s]" w
     | WORD_IN_AREA_A w -> print "WORD_IN_AREA_A[%s]" w
     | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
-    | AUTHOR s -> print "AUTHOR[%s]" s
+    | INFO_WORD s -> print "INFO_WORD[%s]" s
+    | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
     | DIGITS i -> print "DIGITS[%s]" i
     | SINTLIT i -> print "SINT[%s]" i
-    | EIGHTY_EIGHT -> string "88"
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
-    | ALPHANUM (s, q) -> print "%a%s%a" TEXT.pp_quote q s TEXT.pp_quote q
-    | ALPHANUM_PREFIX (s, q) -> print "%a%s" TEXT.pp_quote q s
-    | NATLIT s -> print "N\"%s\"" s
-    | BOOLIT b -> print "B\"%a\"" Cobol_ast.pp_boolean b
-    | HEXLIT s -> print "X\"%s\"" s
-    | NULLIT s -> print "Z\"%s\"" s
     | INTERVENING_ c -> print "<%c>" c
     | EOF -> string "EOF"
-    | t -> string @@
-        try Text_lexer.show_token t
-        with Not_found ->
-        try Hashtbl.find combined_tokens t
-        with Not_found -> "<unknown token>"
+    | t -> pp_token_string ppf t
 
 let pp_tokens = Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
 
@@ -93,11 +110,23 @@ let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
 (* Tokenization of manipulated text, to feed the compilation group parser: *)
 
 let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
-  (* Simplifies the grammar. *)
+  (* Simplifies the grammar, and applies some token-based pre-processsing to
+     deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
-  and start_pos = Cobol_common.Srcloc.start_pos
-  and comment_entry_termination
-    = Cobol_preproc.Src_lexing.comment_entry_termination source_format in
+  and start_pos = Cobol_common.Srcloc.start_pos in
+  let comment_entry_termination
+    = Cobol_preproc.Src_lexing.comment_entry_termination source_format
+  and info_word = function
+    | WORD w ->
+        INFO_WORD w
+    | t ->
+        (* Try de-tokenizing to accept, e.g, PROGRAM-ID. nested. (as NESTED is a
+           keyword). *)
+        try INFO_WORD (Hashtbl.find Text_lexer.keyword_of_token t)
+        with Not_found -> t
+  and comment_entry revtoks =
+    COMMENT_ENTRY (List.rev_map (Pretty.to_string "%a" pp_token_string) revtoks)
+  in
   let open List in
   let rec skip ((p', l', dgs) as acc) ((p, l) as pl) = function
     | 0 -> acc, pl
@@ -110,36 +139,34 @@ let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
         | i -> cons x acc (tl p, hd l +@+ hd (tl l) :: tl (tl l)) (i - 1)
       in
       cons x acc (p, l) y
-    and word_after n =
-      let word = function
-        | WORD _ as t -> t
-        | t -> try WORD (Hashtbl.find Text_lexer.keyword_of_token t) with
-          | Not_found -> t
-      in
+    and info_word_after n =
       let (p', l', dgs), (p, l) = skip acc (p, l) n in
       match p with
       | [] -> Result.Error `MissingInputs
-      | t :: _ -> aux (word t :: p', hd l :: l', dgs) (tl p, tl l)  (* XXX: +@+ ? *)
+      | t :: _ -> aux (info_word t :: p', hd l :: l', dgs) (tl p, tl l)
     and lex_err msg =
       Pretty.delayed_to begin fun dmsg ->
         let (p', l', diags), pl = skip acc (p, l) 1 in
         aux (p', l', DIAGS.Acc.error diags ~loc:(hd l) "%t" dmsg) pl
       end msg
-    and comment_paragraph t =
-      let subst_comment_entry = match comment_entry_termination with
-        | Newline ->
-            subst_comment_line ~init_pos:(Cobol_common.Srcloc.start_pos @@ hd l)
-        | Period ->
-            subst_comment_entry ?stop_column:None
-        | AreaB { first_area_b_column } ->
-            subst_comment_entry ~stop_column:first_area_b_column
-      and at_end ~loc ((p', l', diags) as acc) =
-        match Config.comment_paragraphs#verify ~loc:(Some loc) with
-        | Ok ((), None)   | Error  None    -> acc
-        | Ok ((), Some d) | Error (Some d) -> p', l', DIAGS.Set.cons d diags
-      in
-      subst_comment_entry ~loc:(hd l) ~at_end
-        ("comment@ paragraph": Pretty.simple) t acc (tl (tl p), tl (tl l))
+    and comment_entry_after n =
+      let acc, ((p, _) as suff) = skip acc (p, l) n in
+      if p = [] then Result.Error `MissingInputs else
+        let consume_comment = match comment_entry_termination with
+          | Newline ->
+              comment_line ~init_pos:(Cobol_common.Srcloc.start_pos @@ hd l)
+          | Period ->
+              comment_paragraph ?stop_column:None
+          | AreaB { first_area_b_column } ->
+              comment_paragraph ~stop_column:first_area_b_column
+        and at_end ~loc ~revtoks (p', l', diags) =
+          let p', l' = comment_entry revtoks :: p', loc :: l' in
+          match Config.comment_paragraphs#verify ~loc:(Some loc) with
+          | Ok ((), None)   | Error  None    -> p', l', diags
+          | Ok ((), Some d) | Error (Some d) -> p', l', DIAGS.Set.cons d diags
+        in
+        consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
+          ("comment@ entry": Pretty.simple) acc suff
     in
     match p with
 
@@ -190,49 +217,55 @@ let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
     | [NEXT]                         -> Error `MissingInputs
     | NEXT :: PAGE :: _                -> subst_n NEXT_PAGE 2
 
-    | PROGRAM_ID :: PERIOD :: _        -> word_after 2
+    | [PROGRAM_ID]                   -> Error `MissingInputs
+    | PROGRAM_ID :: PERIOD :: _        -> info_word_after 2
 
-    | (AUTHOR _ |
-       INSTALLATION _ |
-       DATE_WRITTEN _ |
-       DATE_MODIFIED _ |
-       DATE_COMPILED _ |
-       REMARKS _ |
-       SECURITY _) as t :: PERIOD :: _ -> comment_paragraph t
+    | [AUTHOR | INSTALLATION |
+       DATE_WRITTEN | DATE_MODIFIED |
+       DATE_COMPILED | REMARKS |
+       SECURITY]                     -> Error `MissingInputs
+    | (AUTHOR | INSTALLATION |
+       DATE_WRITTEN | DATE_MODIFIED |
+       DATE_COMPILED | REMARKS |
+       SECURITY) :: PERIOD :: _        -> comment_entry_after 2
 
     | ALPHANUM_PREFIX (s, _) :: _     -> lex_err "Missing continuation of `%s'" s
 
     | tok :: _                        -> subst_n tok 1
 
     | []                             -> Ok acc
-  and subst_comment_entry ?stop_column ~loc ~at_end descr x acc = function
-    | [], _ ->
-        Result.Error `MissingInputs (* no word starting in Area A, or not period yet *)
-    | EOF :: _ as p, l ->
-        let _, _, diags = at_end ~loc acc in   (* ignore all tokens until EOF *)
+
+  and comment_paragraph ?stop_column ~loc ~revtoks ~at_end descr acc = function
+    | [], _ ->                (* no word starting in Area A, or not period yet *)
+        Result.Error `MissingInputs
+    | EOF :: _ as p, l ->                        (* ignore all tokens until EOF *)
+        let _, _, diags = at_end ~loc ~revtoks acc in
         Error (`ReachedEOF (loc, descr, diags, p, l))
-    | PERIOD :: p, period_loc :: l
+    | PERIOD as period :: p, period_loc :: l
       when Option.is_none stop_column ->
-        aux (at_end ~loc:(loc +@+ period_loc) acc) (p, l)
+        let revtoks = period :: revtoks and loc = loc +@+ period_loc in
+        aux (at_end ~loc ~revtoks acc) (p, l)
     | p, (p_loc :: _ as l)
       when (let Lexing.{ pos_bol; pos_cnum; _ } = start_pos p_loc in
-            Option.fold stop_column
-              ~some:(fun col -> pos_cnum - pos_bol < col) ~none:false) ->
-        aux (at_end ~loc acc) (p, l)
-    | _ :: tlp, l ->
-        subst_comment_entry ?stop_column ~loc:(loc +@+ hd l) ~at_end
-          descr x acc (tlp, tl l)
-  and subst_comment_line ~init_pos ~loc ~at_end descr x acc = function
-    | [], _ ->
-        Result.Error `MissingInputs  (* found no word starting on anther line *)
+            Option.fold stop_column                (* stop_column starts at 1 *)
+              ~some:(fun col -> pos_cnum - pos_bol + 1 < col) ~none:false) ->
+        aux (at_end ~loc ~revtoks acc) (p, l)
+    | t :: tlp, l ->
+        comment_paragraph ?stop_column ~at_end descr acc (tlp, tl l)
+          ~loc:(loc +@+ hd l) ~revtoks:(t :: revtoks)
+
+  and comment_line ~init_pos ~loc ~revtoks ~at_end descr acc = function
+    | [], _ ->                  (* found no word starting on anther line (yet) *)
+        Result.Error `MissingInputs
     | p, (p_loc :: _ as l)
       when (let Lexing.{ pos_fname; pos_bol; _ } = start_pos p_loc in
             pos_bol > init_pos.Lexing.pos_bol ||
             pos_fname <> init_pos.pos_fname) ->
-        aux (at_end ~loc acc) (p, l)
-    | _ :: tlp, l ->
-        subst_comment_line ~init_pos ~loc:(loc +@+ hd l) ~at_end
-          descr x acc (tlp, tl l)
+        aux (at_end ~loc ~revtoks acc) (p, l)
+    | t :: tlp, l ->
+        comment_line ~init_pos ~at_end descr acc (tlp, tl l)
+          ~loc:(loc +@+ hd l) ~revtoks:(t :: revtoks)
+
   in
   fun tokens ->
     let p, srclocs = split @@ map (~&@) tokens in

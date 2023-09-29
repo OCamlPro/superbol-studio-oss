@@ -13,17 +13,10 @@
 
 open Ast
 
-module Misc_sections = struct
-  type informational_paragraphs        = Ast.informational_paragraphs
-  let pp_informational_paragraphs      = Ast.pp_informational_paragraphs
-  let compare_informational_paragraphs = Ast.compare_informational_paragraphs
-  type options_paragraph               = Ast.options_paragraph
-  let pp_options_paragraph             = Ast.pp_options_paragraph
-  let compare_options_paragraph        = Ast.compare_options_paragraph
-  type environment_division            = Ast.environment_division
-  let pp_environment_division          = Ast.pp_environment_division
-  let compare_environment_division     = Ast.compare_environment_division
-end
+module Misc_sections: Abstract.MISC_SECTIONS
+  with type informational_paragraphs = Ast.informational_paragraphs
+   and type options_paragraph        = Ast.options_paragraph
+   and type environment_division     = Ast.environment_division = Ast
 
 module Data_sections (Picture: Abstract.PICTURE) = struct
   include Picture
@@ -819,9 +812,13 @@ struct
     | ProgramDefinition of
         {       (* Note: more general than before (allows nested prototypes): *)
           kind: program_kind option;
-          has_identification_division: bool;
-          informational_paragraphs: informational_paragraphs
-            [@compare fun _ _ -> 0]; (* ~COB85, -COB2002 *)
+          has_identification_division_header: bool;
+          preliminary_informational_paragraphs:
+            informational_paragraphs         (* GC extension (before PROGRAM-ID) *)
+            [@compare fun _ _ -> 0];
+          supplementary_informational_paragraphs:
+            informational_paragraphs
+            [@compare fun _ _ -> 0];                         (* ~COB85, -COB2002 *)
           nested_programs: program_unit with_loc list;
         }
     | ProgramPrototype
@@ -837,42 +834,37 @@ struct
     | Initial -> Fmt.pf ppf "INITIAL"
     | Recursive -> Fmt.pf ppf "RECURSIVE"
 
-  let rec pp_program_unit ppf {
-    program_name;
-    program_as;
-    program_level;
-    program_options;
-    program_env;
-    program_data;
-    program_proc;
-    program_end_name;
-  } =
-    let has_identification_division =
+  let rec pp_program_unit ppf { program_name;
+                                program_as;
+                                program_level;
+                                program_options;
+                                program_env;
+                                program_data;
+                                program_proc;
+                                program_end_name } =
+    let has_identification_division_header,
+        preliminary_info, supplementary_info,
+        nested_programs,
+        kind =
       match program_level with
-      | ProgramDefinition { has_identification_division = true; _ } -> true
-      | _ -> false
+      | ProgramDefinition { has_identification_division_header = p;
+                            preliminary_informational_paragraphs = ip0;
+                            supplementary_informational_paragraphs = ip1;
+                            nested_programs;
+                            kind } ->
+          p, Some ip0, Some ip1, nested_programs, Some kind
+      | ProgramPrototype ->
+          false, None, None, [], None
     in
-    let nested_programs =
-      match program_level with
-      | ProgramDefinition { nested_programs; _ } -> nested_programs
-      | ProgramPrototype -> []
-    in
-    let _informational_paragraphs =
-      match program_level with
-      | ProgramDefinition { informational_paragraphs = ip; _ } -> Some ip
-      | ProgramPrototype -> None
-    in
-    if has_identification_division then
-      Fmt.pf ppf "@[IDENTIFICATION@ DIVISION@].@ ";
+    if has_identification_division_header then
+      Fmt.pf ppf "@[IDENTIFICATION@ DIVISION@].@\n";
+    Fmt.(option pp_informational_paragraphs) ppf preliminary_info;
     Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_name) program_name;
     Fmt.(option (any "@ AS " ++ pp_strlit)) ppf program_as;
-    (
-      match program_level with
-      | ProgramDefinition { kind; _ } ->
-        Fmt.(option (sp ++ pp_program_kind)) ppf kind
-      | ProgramPrototype -> Fmt.pf ppf "@ PROTOTYPE"
-    );
-    Fmt.pf ppf ".@]";
+    Fmt.(option (option (sp ++ pp_program_kind))
+           ~none:(any "@ PROTOTYPE")) ppf kind;
+    Fmt.pf ppf ".@]@\n";
+    Fmt.(option pp_informational_paragraphs) ppf supplementary_info;
     Fmt.(option (sp ++ pp_with_loc pp_options_paragraph)) ppf program_options;
     Fmt.(option (sp ++ pp_with_loc pp_environment_division)) ppf program_env;
     Fmt.(option (sp ++ pp_with_loc pp_data_division)) ppf program_data;

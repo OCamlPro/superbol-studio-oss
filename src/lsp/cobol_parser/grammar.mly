@@ -69,7 +69,8 @@ let dual_handler_none =
   let dummy_loc =
     Grammar_utils.Overlay_manager.(join_limits (dummy_limit, dummy_limit))
 
-  let dummy_name = "_" &@ dummy_loc
+  let dummy_string = "_" &@ dummy_loc
+  let dummy_name = dummy_string
 
   let dummy_qualname: Cobol_ast.qualname =
     Cobol_ast.Name dummy_name
@@ -269,6 +270,41 @@ let compilation_unit :=
  | ~ = interface_definition ; <InterfaceDefinition>
 
 
+let program_definition_identification :=
+ | h = identification_division_header;                    (* COB85: mandatory *)
+   id = program_definition_id_paragraph;
+   ip = informational_paragraphs;
+   { h, id, ip }
+
+let program_prototype_identification ==
+ | ~ = identification_division_header; ~ = program_prototype_id_paragraph; < >
+
+let function_identification :=
+ | ~ = identification_division_header; ~ = function_id_paragraph; < >
+
+let class_identification :=
+ | ~ = identification_division_header; ~ = class_id_paragraph; < >
+
+let factory_identification :=
+ | ~ = identification_division_header; ~ = factory_paragraph; < >
+
+let instance_identification :=
+ | ~ = identification_division_header; ~ = object_paragraph; < >
+
+let interface_identification :=
+ | ~ = identification_division_header; ~ = interface_id_paragraph; < >
+
+let method_identification :=
+ | ~ = identification_division_header; ~ = method_id_paragraph; < >
+
+let identification_division_header ==
+  | IDENTIFICATION; DIVISION; ".";
+    (* GnuCOBOL allows informational paragraphs before the `*-ID` entry; to
+       simplify we allow them here for any kind of compilation unit (but ignore,
+       except for normal programs, for now). *)
+    ~ = informational_paragraphs; <Some>
+  |                               {None}
+
 
 program_definition [@cost 0]:
  | pd = program_definition_no_end
@@ -276,32 +312,35 @@ program_definition [@cost 0]:
    END PROGRAM ep = name "."
    { match pd.program_level with
        | ProgramDefinition { kind;
-                           has_identification_division;
-                           informational_paragraphs;
-                           nested_programs = [] } ->
+                             has_identification_division_header;
+                             preliminary_informational_paragraphs;
+                             supplementary_informational_paragraphs;
+                             nested_programs = [] } ->
            { pd with
-             program_level = ProgramDefinition { kind;
-                                                 has_identification_division;
-                                                 informational_paragraphs;
-                                                 nested_programs = pdl };
+             program_level =
+               ProgramDefinition { kind;
+                                   has_identification_division_header;
+                                   preliminary_informational_paragraphs;
+                                   supplementary_informational_paragraphs;
+                                   nested_programs = pdl };
              program_end_name = Some ep }
        | _ -> failwith "Cannot happen as per the grammar." }
 
 program_definition_no_end:
- | id = bo(identification_division)                       (* COB85: mandatory *)
-   pid = program_id_paragraph
-   ipo = informational_paragraphs             (* Allowed in nested programs ? *)
+ | pid = program_definition_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(program_procedure_division))
-   { let program_name, program_as, kind = pid in
+   { let h, ((program_name, program_as), kind), ip1 = pid in
+     let ip0 = match h with None -> [] | Some h -> h in
      { program_name;
        program_as;
-       program_level = ProgramDefinition { kind;
-                                           has_identification_division = id;
-                                           informational_paragraphs = ipo;
-                                           nested_programs = [] };
+       program_level =
+         ProgramDefinition { has_identification_division_header = h <> None;
+                             preliminary_informational_paragraphs = ip0;
+                             supplementary_informational_paragraphs = ip1;
+                             nested_programs = []; kind };
        program_options = opo;
        program_env = edo;
        program_data = ddo;
@@ -311,14 +350,13 @@ program_definition_no_end:
    if it does not contain nested programs (it may be used though) *)
 
 program_prototype [@cost 999]:
- | bo(identification_division) (* Note: bo instead of ? to avoid conflict *)
-   pid = program_prototype_id_paragraph
+ | pid = program_prototype_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(procedure_division))
    END PROGRAM ep = name "."
-   { let program_name, program_as = pid in
+   { let _, (program_name, program_as) = pid in
      { program_name;
        program_as;
        program_level = ProgramPrototype;
@@ -329,14 +367,13 @@ program_prototype [@cost 999]:
        program_end_name = Some ep } }
 
 function_unit [@cost 999]:
- | ro(identification_division)
-   fid = function_id_paragraph
+ | fid = function_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(procedure_division)
    END FUNCTION ef = name "."
-   { let name, as_, is_proto = fid in
+   { let _, (name, as_, is_proto) = fid in
      { function_name = name;
        function_as = as_;
        function_is_proto = is_proto;
@@ -347,15 +384,14 @@ function_unit [@cost 999]:
        function_end_name = ef } } (* TODO: shoudn't we just check ef == name? *)
 
 class_definition [@cost 999]:
- | ro(identification_division)
-   cid = class_id_paragraph
+ | cid = class_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    fdo = io(factory_definition) (* Note: inline to avoid conflict *)
    ido = ro(instance_definition)
    END CLASS ec = name "."
-   { let class_name, class_as, class_final,
-         class_inherits, class_usings = cid in
+   { let _, (class_name, class_as, class_final,
+             class_inherits, class_usings) = cid in
      { class_name;
        class_as;
        class_final;
@@ -368,42 +404,39 @@ class_definition [@cost 999]:
        class_end_name = ec } }
 
 factory_definition:
- | ro(identification_division)
-   fp = factory_paragraph
+ | fp = factory_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(object_procedure_division)
    END FACTORY "."
-    { { factory_implements = fp;
+    { { factory_implements = snd fp;
         factory_options = opo;
         factory_env = edo;
         factory_data = ddo;
         factory_methods = pdo } }
 
 instance_definition:
- | ro(identification_division)
-   op = object_paragraph
+ | op = instance_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(object_procedure_division)
    END OBJECT "."
-    { { instance_implements = op;
+    { { instance_implements = snd op;
         instance_options = opo;
         instance_env = edo;
         instance_data = ddo;
         instance_methods = pdo } }
 
 interface_definition [@cost 999]:
- | ro(identification_division)
-   iid = interface_id_paragraph
+ | iid = interface_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    pdo = ro(object_procedure_division)
    END INTERFACE ei = name "."
-   { let interface_name, interface_as,
-         interface_inherits, interface_usings = iid in
+   { let _, (interface_name, interface_as,
+             interface_inherits, interface_usings) = iid in
      { interface_name;
        interface_as;
        interface_inherits;
@@ -414,14 +447,14 @@ interface_definition [@cost 999]:
        interface_end_name = ei } }
 
 method_definition: (* Note: used in PROCEDURE DIVISION, see below *)
- | ro(identification_division)
-   mid = method_id_paragraph
+ | mid = method_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(procedure_division)
    END METHOD em = name "."
-   { let method_name, method_kind, method_override, method_final = mid in
+   { let _, (method_name, method_kind,
+             method_override, method_final) = mid in
      { method_name;
        method_kind;
        method_override;
@@ -433,28 +466,33 @@ method_definition: (* Note: used in PROCEDURE DIVISION, see below *)
        method_end_name = em } }
 
 
-
-let identification_division :=
- | IDENTIFICATION; DIVISION; "."
-
 let informational_paragraphs :=                            (* ~COB85, -COB2002 *)
- | ao = loc(AUTHOR)?;
-   io = loc(INSTALLATION)?;
-   dwo = loc(DATE_WRITTEN)?;
-   dco = loc(DATE_COMPILED)?;
-   so = loc(SECURITY)?;
-    { { author = ao;
-        installation = io;
-        date_written = dwo;
-        date_compiled = dco;
-        security = so } }
+ rl(loc(informational_paragraph))
+
+let informational_paragraph :=
+  | ~ = informational_paragraph_header; "."; ~ = loc(comment_entry); < >
+
+let informational_paragraph_header ==
+  | AUTHOR;        {Author}
+  | INSTALLATION;  {Installation}
+  | DATE_WRITTEN;  {DateWritten}
+  | DATE_MODIFIED; {DateModified}
+  | DATE_COMPILED; {DateCompiled}
+  | REMARKS;       {Remarks}
+  | SECURITY;      {Security}
+
+let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
+let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
-let program_id_paragraph [@context program_id_paragraph] :=
-  | PROGRAM_ID; "."; i = name; slo = as__strlit_;
+let program_id_header_prefix ==
+  | PROGRAM_ID; "."; ~ = loc(info_word); ~ = as__strlit_; < >
+
+let program_definition_id_paragraph [@context program_id_paragraph] :=
+  | ids = program_id_header_prefix;
     pko = o(IS?; pk = program_kind; PROGRAM?; { pk }); ".";
-    { i, slo, pko }
+    { ids, pko }
 
 let program_kind :=
   | COMMON;     {Common}                      (* Only within a nested program *)
@@ -462,8 +500,7 @@ let program_kind :=
   | RECURSIVE;  {Recursive}
 
 let program_prototype_id_paragraph :=                              (* +COB2002 *)
-  | PROGRAM_ID; "."; i = name; slo = as__strlit_; IS?; PROTOTYPE; ".";
-    { i, slo }
+  | ~ = program_id_header_prefix; IS?; PROTOTYPE; "."; < >
 
 let function_id_paragraph :=
   | FUNCTION_ID; "."; i = name; slo = as__strlit_;
@@ -495,6 +532,7 @@ let method_id_paragraph :=                                         (* +COB2002 *
   | METHOD_ID; "."; pk = property_kind; PROPERTY; i = name;
     o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
     { i, PropertyMethod { kind = pk }, o, f }
+
 
 let options_paragraph [@context options_paragraph] :=              (* +COB2002 *)
   | OPTIONS; "."; ~ = lo(sf(rnel(loc(options_clause)),".")); < >

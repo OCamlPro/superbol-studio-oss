@@ -31,6 +31,7 @@ module Make = struct
   class virtual ['a] folder = object
     inherit ['a] Terms_visitor.folder
     inherit ['a] Misc_sections_visitor.folder
+    method fold_informational_paragraph': (informational_paragraph with_loc, 'a) fold = default
     method fold_options_clause: (options_clause, 'a) fold = default
     method fold_configuration_section: (configuration_section, 'a) fold = default
     method fold_configuration_section': (configuration_section with_loc, 'a) fold = default
@@ -161,16 +162,12 @@ module Make = struct
 
   (* --- *)
 
+  let fold_informational_paragraph' (v: _ #folder) =
+    leaf' v#fold_informational_paragraph' v
+
   let fold_informational_paragraphs (v: _ #folder) =
     handle v#fold_informational_paragraphs
-      ~continue:begin fun { author; installation; date_written;
-                            date_compiled; security } x -> x
-        >> fold_string'_opt v author
-        >> fold_string'_opt v installation
-        >> fold_string'_opt v date_written
-        >> fold_string'_opt v date_compiled
-        >> fold_string'_opt v security
-      end
+      ~continue:(fold_list ~fold:fold_informational_paragraph' v)
 
   let fold_options_paragraph (v: _ #folder) =
     handle v#fold_options_paragraph
