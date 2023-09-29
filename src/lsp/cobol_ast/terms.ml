@@ -667,9 +667,12 @@ module FMT = struct
   and pp_effective_arg ppf = function
     | ArgOmitted -> string ppf "OMITTED"
     (* In a sequence of arguments, `1, - X` is parsed as `1 - X` so we need to
-       parenthesize the unary part to get `1 (- X)`. But then *)
-    | ArgExpr (Atom _ | Unop _ as e) -> Fmt.parens pp_expression ppf e
-    | ArgExpr (Binop _ as e) -> pp_expression ppf e
+       parenthesize the unary part to get `1 (- X)`. But then if we have
+        `Y (- X)`  that is no longer correct. And even consider `(1 + X) (- 2)`
+       So we just put parentheses everywhere and call it a day for now (which is
+       a pity, given that we do work in pp_expression to avoid unnecessary
+       parentheses). *)
+    | ArgExpr e -> Fmt.parens pp_expression ppf e
 
   and pp_object_view ppf { object_view_ident; object_view_spec } =
     fmt "%a@ AS@ " ppf pp_ident object_view_ident;
