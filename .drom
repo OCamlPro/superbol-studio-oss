@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-b602227bcc8caec31bc7877658492520:.
+0b8b0a34a1a2cc1f1b27ccb09438599a:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -218,11 +218,6 @@ fa0d293d04760149271fed31ae820474:opam/vscode-js-stubs.opam
 f951d9038416ddabc15e92ae09d8d54c:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
-# begin context for opam/vscode-package-json.opam
-# file opam/vscode-package-json.opam
-d409e0c4b5466dcd38315b2ee8fba4a8:opam/vscode-package-json.opam
-# end context for opam/vscode-package-json.opam
-
 # begin context for scripts/after.sh
 # file scripts/after.sh
 62c6489217feef26dac343e709b89c1a:scripts/after.sh
@@ -400,7 +395,7 @@ bb6994bfe27f29a441abee11c82b032f:src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/superbol-free/linking_flags.sh
 # file src/lsp/superbol-free/linking_flags.sh
-b9a14c96cce8e365e1d7494d078d73fe:src/lsp/superbol-free/linking_flags.sh
+4481ce2bc21d3553716a7914d2cc015a:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/lsp/superbol_free_lib/dune
