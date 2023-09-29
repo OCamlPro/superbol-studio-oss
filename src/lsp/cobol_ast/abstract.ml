@@ -13,11 +13,11 @@
 
 module type MISC_SECTIONS = sig
   (* IDENTIFICATION_DIVISION *)
-  type[@deriving ord] informational_paragraphs
+  type informational_paragraphs [@@deriving ord]
   val pp_informational_paragraphs : informational_paragraphs Fmt.t
-  type[@deriving ord] options_paragraph
+  type options_paragraph [@@deriving ord]
   val pp_options_paragraph : options_paragraph Fmt.t
-  type[@deriving ord] environment_division
+  type environment_division [@@deriving ord]
   val pp_environment_division : environment_division Fmt.t
 end
 
@@ -26,38 +26,38 @@ module type PICTURE = sig
 end
 
 module type DATA_SECTIONS = sig
-  type[@deriving ord] working_storage_section
+  type working_storage_section [@@deriving ord]
   val pp_working_storage_section : working_storage_section Pretty.printer
-  type[@deriving ord] linkage_section
+  type linkage_section [@@deriving ord]
   val pp_linkage_section : linkage_section Pretty.printer
-  type[@deriving ord] file_section
+  type file_section [@@deriving ord]
   val pp_file_section : file_section Pretty.printer
-  type[@deriving ord] communication_section
+  type communication_section [@@deriving ord]
   val pp_communication_section : communication_section Pretty.printer
-  type[@deriving ord] local_storage_section
+  type local_storage_section [@@deriving ord]
   val pp_local_storage_section : local_storage_section Pretty.printer
-  type[@deriving ord] report_section
+  type report_section [@@deriving ord]
   val pp_report_section : report_section Pretty.printer
-  type[@deriving ord] screen_section
+  type screen_section [@@deriving ord]
   val pp_screen_section : screen_section Pretty.printer
 end
 
 module type DATA_DIVISION = sig
   (* NOTE: could become PROG_DIVISIONS if relevant *)
-  type[@deriving ord] data_division
+  type data_division [@@deriving ord]
   val pp_data_division : data_division Pretty.printer
 end
 
 module type STATEMENTS = sig
-  type[@deriving ord] statement
+  type statement [@@deriving ord]
   val pp_statement : statement Fmt.t
-  type[@deriving ord] statements
+  type statements [@@deriving ord]
   val pp_statements : statements Fmt.t
   val pp_dump_statements : statements Fmt.t
 end
 
 module type PROC_DIVISION = sig
-  type[@deriving ord] procedure_division
+  type procedure_division [@@deriving ord]
   val pp_procedure_division : procedure_division Fmt.t
 end
 

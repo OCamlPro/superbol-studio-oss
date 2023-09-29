@@ -521,15 +521,15 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
 
   (* Actual sections *)
 
-  type[@deriving ord] file_section = file_descr with_loc list
-  type[@deriving ord] working_storage_section =
-    working_storage_item_descr with_loc list
-  type[@deriving ord] linkage_section = linkage_item_descr with_loc list
-  type[@deriving ord] communication_section = communication_descr with_loc list
-  type[@deriving ord] local_storage_section =
-    local_storage_item_descr with_loc list
-  type[@deriving ord] report_section = report_descr with_loc list
-  type[@deriving ord] screen_section = screen_item_descr with_loc list
+  type file_section = file_descr with_loc list [@@deriving ord]
+  type working_storage_section = working_storage_item_descr with_loc list
+    [@@deriving ord]
+  type linkage_section = linkage_item_descr with_loc list [@@deriving ord]
+  type communication_section = communication_descr with_loc list [@@deriving ord]
+  type local_storage_section = local_storage_item_descr with_loc list
+    [@@deriving ord]
+  type report_section = report_descr with_loc list [@@deriving ord]
+  type screen_section = screen_item_descr with_loc list [@@deriving ord]
 
   let pp_section k pp_item_descr =
     Fmt.(
