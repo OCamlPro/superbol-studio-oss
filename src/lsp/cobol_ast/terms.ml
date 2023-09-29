@@ -63,9 +63,24 @@ type complex_ = [ `Complex ]
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
 
+type alphanum_kind =
+  | Squote (* '...' *)
+  | Dquote (* "..." *)
+  | Hex (* X"..." *)
+[@@deriving ord]
+
+type alphanum_string = string * alphanum_kind
+[@@deriving ord]
+
+let pp_alphanum_string ppf (s, k) =
+  match k with
+  | Squote -> Fmt.pf ppf "'%s'" s
+  | Dquote -> Fmt.pf ppf "\"%s\"" s
+  | Hex -> Fmt.pf ppf "X\"%s\"" s
+
 (** Now comes the type of all/most terms *)
 type _ term =
-  | Alphanum: string -> [>alnum_] term
+  | Alphanum: alphanum_string -> [>alnum_] term
   | Boolean: boolean -> [>bool_] term
   | Fixed: fixed -> [>fixed_] term
   | Floating: floating -> [>float_] term
@@ -310,8 +325,7 @@ module COMPARE = struct
 
   let rec compare_term: type a. a term compare_fun =
     fun x y -> match x , y with
-      | Alphanum a, Alphanum b ->
-          String.compare a b
+      | Alphanum a, Alphanum b -> compare_alphanum_string a b
       | Alphanum _, Fig HighValue ->
           -1
       | Alphanum _, Fig _ -> 1
@@ -589,7 +603,7 @@ module FMT = struct
         string ppf bool_value
 
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
-    | Alphanum s -> fmt "\"%s\"" ppf s (* Not correct: missing H for hex *)
+    | Alphanum s -> pp_alphanum_string ppf s
     | Boolean b -> pp_boolean ppf b
     | Fixed f -> pp_fixed ppf f
     | Floating f -> pp_floating ppf f
