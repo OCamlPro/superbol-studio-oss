@@ -493,6 +493,8 @@ let pp_usage_clause ppf usage =
     match comp with
     | `Comp0 -> Fmt.pf ppf "COMP-0"
     | `Comp1 -> Fmt.pf ppf "COMP-1"
+    | `Comp2 -> Fmt.pf ppf "COMP-2"
+    | `Comp3 -> Fmt.pf ppf "COMP-3"
     | `Comp5 -> Fmt.pf ppf "COMP-5"
     | `Comp6 -> Fmt.pf ppf "COMP-6"
     | `CompX -> Fmt.pf ppf "COMP-X"
