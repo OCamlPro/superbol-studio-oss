@@ -14,9 +14,11 @@
 (** Simple communication functions for the LSP server to send an receive json
     RPC messages. *)
 
+exception Parse_error of string
+
 (** [read_message ()] tries to read a json RPC message from the standard input
     stream. *)
-val read_message: unit -> (Jsonrpc.Packet.t, Jsonrpc.Response.Error.t) result
+val read_message: unit -> Jsonrpc.Packet.t
 
 (** [send_response response] sends out a json RPC response on standard
     output. *)

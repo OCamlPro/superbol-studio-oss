@@ -124,9 +124,9 @@ rule fixed_line state
       {
         fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
       }
-  | sna ['*' '/']                                             (* comment line *)
+  | sna (['*' '/'] as marker)                                 (* comment line *)
       {
-        gobble_line state lexbuf
+        comment_line marker state lexbuf
       }
   | sna ['d' 'D']
       {
@@ -189,9 +189,9 @@ and xopen_or_crt_or_acutrm_followup state
       {
         fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
       }
-  | ['*' '/']                                                 (* comment line *)
+  | (['*' '/'] as marker)                                     (* comment line *)
       {
-        gobble_line state lexbuf
+        comment_line marker state lexbuf
       }
   | epsilon
       {
@@ -211,9 +211,9 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       {
         fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
       }
-  | ['*' '/']                                                 (* comment line *)
+  | (['*' '/'] as marker)                                     (* comment line *)
       {
-        gobble_line state lexbuf
+        comment_line marker state lexbuf
       }
   | ['D' 'd']
       {
@@ -257,9 +257,9 @@ and fixed_nominal state
       {
         fixed_nominal state lexbuf
       }
-  | "*>" nnl*                                             (* floating comment *)
+  | "*>" nnl* (newline | eof)                             (* floating comment *)
       {
-        gobble_line state lexbuf
+        Src_lexing.comment ~floating:true state lexbuf
       }
   | "=="
       {
@@ -422,9 +422,9 @@ and free_nominal state
       {
         free_nominal state lexbuf
       }
-  | "*>" nnl*                                      (* floating/inline comment *)
+  | "*>" nnl* (newline | eof)                             (* floating comment *)
       {
-        free_gobble_line state lexbuf
+        Src_lexing.comment ~floating:true state lexbuf
       }
   | "=="
       {
@@ -454,6 +454,12 @@ and gobble_line state
   | (nnl* eof)
       {
         Src_lexing.(flush @@ eof state lexbuf)
+      }
+and comment_line marker state
+  = parse
+  | (nnl* (newline | eof))
+      {
+        Src_lexing.comment ~marker:(String.make 1 marker) state lexbuf
       }
 and free_gobble_line state
   = parse

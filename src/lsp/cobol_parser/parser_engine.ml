@@ -40,9 +40,8 @@ module Make (Config: Cobol_config.T) = struct
       log of operations performed by the pre-processor.  An
       {!Cobol_common.Behaviors.amnesic} parser does not provide this ability,
       contrary to an {!Cobol_common.Behaviors.eidetic} parser.  This is
-      reflected in the final result (see {!parsed_result}), as {!parsed_tokens}
-      and {!preproc_rev_log} may only be called on results of eidetic
-      parsers. *)
+      reflected in the final result (see {!parsed_result}), as
+      {!parsing_artifacts} may only be called on results of eidetic parsers. *)
   type 'm state =
     {
       prev_limit: Cobol_preproc.Src_overlay.limit option; (* last right-limit *)
@@ -445,9 +444,12 @@ module Make (Config: Cobol_config.T) = struct
     | Amnesic ->
         Only res, all_diags ps
     | Eidetic ->
-        let tokens = Tokzr.parsed_tokens ps.preproc.tokzr
-        and rev_log = Cobol_preproc.rev_log ps.preproc.pp in
-        WithTokens (res, tokens, rev_log), all_diags ps
+        let artifacts = {
+          tokens = Tokzr.parsed_tokens ps.preproc.tokzr;
+          pplog = Cobol_preproc.log ps.preproc.pp;
+          comments = Cobol_preproc.comments ps.preproc.pp;
+        } in
+        WithArtifacts (res, artifacts), all_diags ps
 
 end
 
@@ -499,12 +501,6 @@ let parse
 let parse_simple = parse ~memory:Amnesic
 let parse_with_tokens = parse ~memory:Eidetic
 
-let parsed_tokens
+let parsing_artifacts
   : (_, Cobol_common.Behaviors.eidetic) parsed_result -> _ = function
-  | { parsed_output = WithTokens (_, parsed_token_memory, _); _ } ->
-      parsed_token_memory
-
-let preproc_rev_log
-  : (_, Cobol_common.Behaviors.eidetic) parsed_result -> _ = function
-  | { parsed_output = WithTokens (_, _, preproc_rev_log); _ } ->
-      preproc_rev_log
+  | { parsed_output = WithArtifacts (_, artifacts); _ } -> artifacts

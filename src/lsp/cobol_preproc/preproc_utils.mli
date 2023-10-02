@@ -17,7 +17,7 @@ open Cobol_common.Diagnostics.TYPES
 module Make (Config: Cobol_config.T) : sig
 
   val replacing'
-    : ?repl_dir:Cobol_common.Srcloc.leading_or_trailing
+    : ?repl_dir:Preproc.replacing_direction
     -> [< `Alphanum of Text.pseudotext
        | `PseudoText of Text.pseudotext ] Cobol_common.Srcloc.with_loc
     -> Text.pseudotext Cobol_common.Srcloc.with_loc

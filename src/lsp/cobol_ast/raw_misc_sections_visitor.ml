@@ -33,16 +33,20 @@ module Make = struct
     inherit ['a] Misc_sections_visitor.folder
     method fold_options_clause: (options_clause, 'a) fold = default
     method fold_configuration_section: (configuration_section, 'a) fold = default
+    method fold_configuration_section': (configuration_section with_loc, 'a) fold = default
     method fold_special_names_paragraph: (special_names_paragraph, 'a) fold = default
     method fold_special_names_clause: (special_names_clause, 'a) fold = default
     method fold_special_names_clause': (special_names_clause with_loc, 'a) fold = default
     method fold_repository_paragraph: (repository_paragraph, 'a) fold = default
+    method fold_repository_paragraph': (repository_paragraph with_loc, 'a) fold = default
     method fold_specifier: (specifier, 'a) fold = default
     method fold_expands: (expands, 'a) fold = default
     method fold_select: (select, 'a) fold = default
     method fold_select_clause: (select_clause, 'a) fold = default
     method fold_file_control_paragraph: (file_control_paragraph, 'a) fold = default
+    method fold_file_control_paragraph': (file_control_paragraph with_loc, 'a) fold = default
     method fold_io_control_paragraph: (io_control_paragraph, 'a) fold = default
+    method fold_io_control_paragraph': (io_control_paragraph with_loc, 'a) fold = default
     method fold_io_control_entry: (io_control_entry, 'a) fold = default
     method fold_rerun_clause: (rerun_clause, 'a) fold = default
     method fold_rerun_frequency: (rerun_frequency, 'a) fold = default
@@ -51,6 +55,7 @@ module Make = struct
     method fold_multiple_file_clause: (multiple_file_clause, 'a) fold = default
     method fold_file_portion: (file_portion, 'a) fold = default
     method fold_input_output_section: (input_output_section, 'a) fold = default
+    method fold_input_output_section': (input_output_section with_loc, 'a) fold = default
     method fold_alphabet_specification: (alphabet_specification, 'a) fold = default
   end
 
@@ -76,6 +81,10 @@ module Make = struct
   let fold_file_control_paragraph (v: _ #folder) =
     handle v#fold_file_control_paragraph
       ~continue:(fold_list ~fold:fold_select v)
+
+  let fold_file_control_paragraph' (v: _ #folder) =
+    handle' v#fold_file_control_paragraph' v
+      ~fold:fold_file_control_paragraph
 
   let fold_rerun_frequency (v: _ #folder) =
     handle v#fold_rerun_frequency
@@ -133,14 +142,22 @@ module Make = struct
     handle v#fold_io_control_paragraph
       ~continue:(fold_option ~fold:fold_io_control_entry v)
 
+  let fold_io_control_paragraph' (v: _ #folder) =
+    handle' v#fold_io_control_paragraph' v
+      ~fold:fold_io_control_paragraph
+
   let fold_input_output_section (v: _ #folder) =
     handle v#fold_input_output_section
       ~continue:begin fun { file_control_paragraph; io_control_paragraph } x -> x
         >> fold_option v file_control_paragraph
-          ~fold:fold_file_control_paragraph
+          ~fold:fold_file_control_paragraph'
         >> fold_option v io_control_paragraph
-          ~fold:fold_io_control_paragraph
+          ~fold:fold_io_control_paragraph'
       end
+
+  let fold_input_output_section' (v: _ #folder) =
+    handle' v#fold_input_output_section' v
+      ~fold:fold_input_output_section
 
   (* --- *)
 
@@ -189,6 +206,10 @@ module Make = struct
     handle v#fold_repository_paragraph
       ~continue:(fold_list ~fold:fold_specifier v)
 
+  let fold_repository_paragraph' (v: _ #folder) =
+    handle' v#fold_repository_paragraph' v
+      ~fold:fold_repository_paragraph
+
   let fold_special_names_clause (v: _ #folder) =
     handle v#fold_special_names_clause
       ~continue:begin fun c x -> match c with
@@ -217,14 +238,18 @@ module Make = struct
         ignore special_names_paragraph;
         x
         >> partial __LINE__ "fold_configuration_section"
-        >> fold_option ~fold:fold_repository_paragraph v repository_paragraph
+        >> fold_option ~fold:fold_repository_paragraph' v repository_paragraph
       end
+
+  let fold_configuration_section' (v: _ #folder) =
+    handle' v#fold_configuration_section' v
+      ~fold:fold_configuration_section
 
   let fold_environment_division (v: _ #folder) =
     handle v#fold_environment_division
       ~continue:begin fun { env_configuration; env_input_output } x -> x
-        >> fold_option ~fold:fold_configuration_section v env_configuration
-        >> fold_option ~fold:fold_input_output_section v env_input_output
+        >> fold_option ~fold:fold_configuration_section' v env_configuration
+        >> fold_option ~fold:fold_input_output_section' v env_input_output
       end
 
   let fold_alphabet_specification (v: _ #folder) =

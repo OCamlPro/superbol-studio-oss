@@ -60,15 +60,17 @@ and evaluate_branch =
 
 
 (* PERFORM *)
-and perform_stmt =
+and perform_target_stmt =
   {
-    perform_target: perform_target;
+    perform_target: qualname procedure_range;
     perform_mode: perform_mode option;
   }
 
-and perform_target =
-  | PerformOutOfLine of qualname procedure_range
-  | PerformInline of statements
+and perform_inline_stmt =
+  {
+    perform_inline_mode: perform_mode option;
+    perform_statements: statements;
+  }
 
 and perform_mode =
   | PerformNTimes of ident_or_intlit
@@ -97,26 +99,24 @@ and varying_phrase =
 and search_stmt =
   {
     search_item: qualname;
+    search_varying: ident option;
     search_at_end: handler;
-    search_spec: search_spec;
+    search_when_clauses: search_when_clause with_loc list;
   }
-
-and search_spec =
-  | SearchSerial of
-      {
-        varying: ident option;
-        when_clauses: search_when_clause with_loc list;
-      }
-  | SearchAll of
-      {
-        conditions: search_condition list;
-        action: branch;
-      }
 
 and search_when_clause =
   {
     search_when_cond: condition;
     search_when_stmts: branch;
+  }
+
+(* SEARCH ALL *)
+and search_all_stmt =
+  {
+    search_all_item: qualname;
+    search_all_at_end: handler;
+    search_all_conditions: search_condition list;
+    search_all_action: branch;
   }
 
 
@@ -396,7 +396,8 @@ and statement =
   | Move of move_stmt
   | Multiply of multiply_stmt
   | Open of open_stmt
-  | Perform of perform_stmt
+  | PerformTarget of perform_target_stmt
+  | PerformInline of perform_inline_stmt
   | Purge of name with_loc
   | Raise of raise_operand
   | Read of read_stmt
@@ -407,6 +408,7 @@ and statement =
   | Return of return_stmt
   | Rewrite of rewrite_stmt
   | Search of search_stmt
+  | SearchAll of search_all_stmt
   | Send of send_stmt
   | Set of set_stmt
   | Sort of sort_stmt
@@ -525,21 +527,15 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
 
 (* PERFORM *)
 
-and pp_perform_stmt ppf { perform_target; perform_mode } =
-  match perform_target with
-  | PerformInline _ ->
-    Fmt.pf ppf "@[<v>@[PERFORM%a@]@;<1 2>%a@]"
-      Fmt.(option (sp ++ pp_perform_mode)) perform_mode
-      pp_perform_target perform_target
-  | PerformOutOfLine _ ->
-    Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
-      pp_perform_target perform_target
-      Fmt.(option (sp ++ pp_perform_mode)) perform_mode
+and pp_perform_target_stmt ppf { perform_target; perform_mode } =
+  Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
+    (pp_procedure_range pp_qualname) perform_target
+    Fmt.(option (sp ++ pp_perform_mode)) perform_mode
 
-and pp_perform_target ppf = function
-  | PerformOutOfLine qnpr -> pp_procedure_range pp_qualname ppf qnpr
-  | PerformInline isl ->
-    Fmt.pf ppf "%a@ END-PERFORM" pp_statements isl
+and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
+  Fmt.pf ppf "@[<v>@[PERFORM%a@]@;<1 2>%a@ END-PERFORM@]"
+    Fmt.(option (sp ++ pp_perform_mode)) perform_inline_mode
+    pp_statements perform_statements
 
 and pp_perform_mode ppf = function
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
@@ -563,23 +559,25 @@ and pp_varying_phrase ppf
 
 (* SEARCH *)
 
-and pp_search_stmt ppf { search_item = si; search_at_end = h; search_spec = ss } =
-  match ss with
-  | SearchSerial { varying; when_clauses } ->
-    Fmt.pf ppf "SEARCH %a" pp_qualname si;
-    Fmt.(option (any "@ VARYING " ++ pp_ident)) ppf varying;
-    List.iter (fun pf -> pf ppf ()) @@
-    list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
-    Fmt.(sp ++ list ~sep:sp (pp_with_loc pp_search_when_clause)) ppf when_clauses;
-    Fmt.pf ppf "@ END-SEARCH"
-  | SearchAll { conditions; action } ->
-    Fmt.pf ppf "SEARCH ALL %a" pp_qualname si;
-    List.iter (fun pf -> pf ppf ()) @@
-    list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
-    Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition)
-      ppf conditions;
-    Fmt.(sp ++ pp_branch) ppf action;
-    Fmt.pf ppf "@ END-SEARCH"
+and pp_search_stmt ppf { search_item = si; search_varying = sv;
+                         search_at_end = h; search_when_clauses = swc } =
+  Fmt.pf ppf "SEARCH %a" pp_qualname si;
+  Fmt.(option (any "@ VARYING " ++ pp_ident)) ppf sv;
+  List.iter (fun pf -> pf ppf ()) @@
+  list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
+  Fmt.(sp ++ list ~sep:sp (pp_with_loc pp_search_when_clause)) ppf swc;
+  Fmt.pf ppf "@ END-SEARCH"
+
+and pp_search_all_stmt ppf { search_all_item = si;
+                             search_all_at_end = h;
+                             search_all_conditions = c;
+                             search_all_action = a } =
+  Fmt.pf ppf "SEARCH ALL %a" pp_qualname si;
+  List.iter (fun pf -> pf ppf ()) @@
+  list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
+  Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition) ppf c;
+  Fmt.(sp ++ pp_branch) ppf a;
+  Fmt.pf ppf "@ END-SEARCH"
 
 and pp_search_when_clause ppf { search_when_cond = c; search_when_stmts = w } =
   Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_branch w
@@ -877,7 +875,8 @@ and pp_statement ppf = function
   | Move s -> pp_move_stmt ppf s
   | Multiply s -> pp_multiply_stmt ppf s
   | Open s -> pp_open_stmt ppf s
-  | Perform s -> pp_perform_stmt ppf s
+  | PerformInline s -> pp_perform_inline_stmt ppf s
+  | PerformTarget s -> pp_perform_target_stmt ppf s
   | Purge n -> Fmt.pf ppf "PURGE %a" (pp_with_loc pp_name) n
   | Raise ro -> pp_raise_operand ppf ro
   | Read s -> pp_read_stmt ppf s
@@ -888,6 +887,7 @@ and pp_statement ppf = function
   | Return s -> pp_return_stmt ppf s
   | Rewrite s -> pp_rewrite_stmt ppf s
   | Search s -> pp_search_stmt ppf s
+  | SearchAll s -> pp_search_all_stmt ppf s
   | Send s -> pp_send_stmt ppf s
   | Set s -> pp_set_stmt ppf s
   | Sort s -> pp_sort_stmt ppf s

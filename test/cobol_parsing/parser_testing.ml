@@ -15,7 +15,7 @@ let show_parsed_tokens
     ?(verbose = false)
     ?(source_format = Cobol_config.(SF SFFixed))
     prog =
-  let { parsed_output = WithTokens (_, tokens, _log); _ } =
+  let { parsed_output = WithArtifacts (_, { tokens; _ }); _ } =
     Cobol_parser.parse_with_tokens ~verbose ~source_format
       ~recovery:(EnableRecovery { silence_benign_recoveries = false })
       ~libpath:[] @@

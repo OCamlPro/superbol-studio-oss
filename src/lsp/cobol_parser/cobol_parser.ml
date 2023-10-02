@@ -42,8 +42,7 @@ type 'x source_handling = ?source_format:Cobol_config.source_format_spec -> 'x
 
 let parse_simple: _ source_handling = Parser_engine.parse_simple
 let parse_with_tokens: _ source_handling = Parser_engine.parse_with_tokens
-let parsed_tokens = Parser_engine.parsed_tokens
-let preproc_rev_log = Parser_engine.preproc_rev_log
+let parsing_artifacts = Parser_engine.parsing_artifacts
 
 (* --- *)
 

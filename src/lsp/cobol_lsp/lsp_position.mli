@@ -15,7 +15,7 @@
     {!Lsp.Types.Range} types with {!Srcloc.lexloc} and {!Srcloc.srcloc}. *)
 
 (** Range of length [0], at position [0, 0] *)
-val none_range: Lsp.Types.Range.t
+val pointwise_range_at_start: Lsp.Types.Range.t
 
 (** [range_of_lexloc] creates a representation of the given lexical location
     that is suitable for the LSP library. *)
@@ -32,9 +32,8 @@ val is_after_lexloc: Lsp.Types.Position.t -> Cobol_common.Srcloc.lexloc -> bool
     [lexloc] *)
 val is_in_lexloc: Lsp.Types.Position.t -> Cobol_common.Srcloc.lexloc -> bool
 
-(** [contains_lexloc range lexloc] holds when [lexloc] is strictly contained
-    within [range]. *)
 val contains_lexloc: Lsp.Types.Range.t -> Cobol_common.Srcloc.lexloc -> bool
+val intersects_lexloc: Lsp.Types.Range.t -> Cobol_common.Srcloc.lexloc -> bool
 
 (* --- *)
 

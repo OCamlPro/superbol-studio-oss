@@ -1696,56 +1696,6 @@ run_extensions.at-2060-caller.cob:14.6-14.7:
   16         >> ELSE
 >> Error: Unexpected indicator: `>'
 
-run_extensions.at-2060-caller.cob:16.6-16.7:
-  13   
-  14         >> IF P64 DEFINED
-  15              MOVE "callee64" TO CALL-NAME
-  16 >       >> ELSE
-----         ^
-  17              MOVE "callee32" TO CALL-NAME
-  18         >> END-IF
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:18.6-18.7:
-  15              MOVE "callee64" TO CALL-NAME
-  16         >> ELSE
-  17              MOVE "callee32" TO CALL-NAME
-  18 >       >> END-IF
-----         ^
-  19   
-  20              MOVE 12345678 TO ADR-BUFFER
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:28.6-28.7:
-  25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
-  26   
-  27              MOVE -42 TO ADR-BUFFER
-  28 >       >> IF P64 DEFINED
-----         ^
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:31.6-31.7:
-  28         >> IF P64 DEFINED
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
-  31 >       >> ELSE
-----         ^
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:34.6-34.7:
-  31         >> ELSE
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
-  34 >       >> END-IF
-----         ^
-  35   
-  36              GOBACK.
->> Error: Unexpected indicator: `>'
-
 run_extensions.at-2060-caller.cob:14.7-14.8:
   11          77 BIG-BUFF      USAGE COMP-5 PIC S9(18) VALUE 99999999999999.
   12          PROCEDURE        DIVISION  CHAINING CALL-NAME.
@@ -1756,6 +1706,16 @@ run_extensions.at-2060-caller.cob:14.7-14.8:
   16         >> ELSE
 >> Error: Invalid syntax
 
+run_extensions.at-2060-caller.cob:16.6-16.7:
+  13   
+  14         >> IF P64 DEFINED
+  15              MOVE "callee64" TO CALL-NAME
+  16 >       >> ELSE
+----         ^
+  17              MOVE "callee32" TO CALL-NAME
+  18         >> END-IF
+>> Error: Unexpected indicator: `>'
+
 run_extensions.at-2060-caller.cob:16.7-16.8:
   13   
   14         >> IF P64 DEFINED
@@ -1765,6 +1725,16 @@ run_extensions.at-2060-caller.cob:16.7-16.8:
   17              MOVE "callee32" TO CALL-NAME
   18         >> END-IF
 >> Error: Invalid syntax
+
+run_extensions.at-2060-caller.cob:18.6-18.7:
+  15              MOVE "callee64" TO CALL-NAME
+  16         >> ELSE
+  17              MOVE "callee32" TO CALL-NAME
+  18 >       >> END-IF
+----         ^
+  19   
+  20              MOVE 12345678 TO ADR-BUFFER
+>> Error: Unexpected indicator: `>'
 
 run_extensions.at-2060-caller.cob:18.7-18.8:
   15              MOVE "callee64" TO CALL-NAME
@@ -1786,6 +1756,16 @@ run_extensions.at-2060-caller.cob:25.41-25.47:
   27              MOVE -42 TO ADR-BUFFER
 >> Error: Invalid syntax
 
+run_extensions.at-2060-caller.cob:28.6-28.7:
+  25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
+  26   
+  27              MOVE -42 TO ADR-BUFFER
+  28 >       >> IF P64 DEFINED
+----         ^
+  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
+  30              CALL "callee64" USING BY VALUE BIG-BUFF
+>> Error: Unexpected indicator: `>'
+
 run_extensions.at-2060-caller.cob:28.7-28.8:
   25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
   26   
@@ -1806,6 +1786,16 @@ run_extensions.at-2060-caller.cob:29.42-29.46:
   31         >> ELSE
 >> Error: Invalid syntax
 
+run_extensions.at-2060-caller.cob:31.6-31.7:
+  28         >> IF P64 DEFINED
+  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
+  30              CALL "callee64" USING BY VALUE BIG-BUFF
+  31 >       >> ELSE
+----         ^
+  32              CALL "callee32" USING BY VALUE ADR-BUFFER
+  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
+>> Error: Unexpected indicator: `>'
+
 run_extensions.at-2060-caller.cob:31.7-31.8:
   28         >> IF P64 DEFINED
   29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
@@ -1825,6 +1815,16 @@ run_extensions.at-2060-caller.cob:33.42-33.46:
   34         >> END-IF
   35   
 >> Error: Invalid syntax
+
+run_extensions.at-2060-caller.cob:34.6-34.7:
+  31         >> ELSE
+  32              CALL "callee32" USING BY VALUE ADR-BUFFER
+  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
+  34 >       >> END-IF
+----         ^
+  35   
+  36              GOBACK.
+>> Error: Unexpected indicator: `>'
 
 run_extensions.at-2060-caller.cob:34.7-34.8:
   31         >> ELSE
@@ -3349,7 +3349,7 @@ run_extensions.at-4921-prog.cob:10.7-10.13:
 ----          ^^^^^^
   11              DISPLAY "NOTOK" NO ADVANCING
   12              END-DISPLAY
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-4921-prog.cob:13.7-13.15:
   10          >>ELSE
@@ -3358,7 +3358,7 @@ run_extensions.at-4921-prog.cob:13.7-13.15:
   13 >        >>END-IF
 ----          ^^^^^^^^
   14              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4946:0
 run_extensions.at-4946-prog.cob:7.7-7.28:
@@ -3379,7 +3379,7 @@ run_extensions.at-4946-prog.cob:10.7-10.13:
 ----          ^^^^^^
   11              DISPLAY "NOTOK" NO ADVANCING
   12              END-DISPLAY
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-4946-prog.cob:13.7-13.15:
   10          >>ELSE
@@ -3388,7 +3388,7 @@ run_extensions.at-4946-prog.cob:13.7-13.15:
   13 >        >>END-IF
 ----          ^^^^^^^^
   14              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4974:0
 run_extensions.at-4974-prog.cob:7.7-7.28:
@@ -3401,65 +3401,15 @@ run_extensions.at-4974-prog.cob:7.7-7.28:
    9              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-run_extensions.at-4974-prog.cob:9.22:
-   6          PROCEDURE        DIVISION.
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9 >            END-DISPLAY
-----                         ^
-  10          >>ELIF ACTIVATE2 DEFINED
-  11              DISPLAY "OK" NO ADVANCING
->> Hint: Missing .
-
-run_extensions.at-4974-prog.cob:10.7-10.13:
+run_extensions.at-4974-prog.cob:10.7-10.31:
    7          >>IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
   10 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
->> Warning: Invalid syntax
-
-run_extensions.at-4974-prog.cob:10.23:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                          ^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Hint: Missing .
-
-run_extensions.at-4974-prog.cob:10.24-10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                           ^^^^^^^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Warning: Invalid syntax
-
-run_extensions.at-4974-prog.cob:10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                                  ^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Hint: Missing .
-
-run_extensions.at-4974-prog.cob:11.11-11.18:
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10          >>ELIF ACTIVATE2 DEFINED
-  11 >            DISPLAY "OK" NO ADVANCING
-----              ^^^^^^^
-  12              END-DISPLAY
-  13          >>ELSE
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-4974-prog.cob:13.7-13.13:
   10          >>ELIF ACTIVATE2 DEFINED
@@ -3469,7 +3419,7 @@ run_extensions.at-4974-prog.cob:13.7-13.13:
 ----          ^^^^^^
   14              DISPLAY "NOTOK" NO ADVANCING
   15              END-DISPLAY
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-4974-prog.cob:16.7-16.15:
   13          >>ELSE
@@ -3478,7 +3428,7 @@ run_extensions.at-4974-prog.cob:16.7-16.15:
   16 >        >>END-IF
 ----          ^^^^^^^^
   17              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5000:0
 run_extensions.at-5000-prog.cob:7.7-7.28:
@@ -3491,45 +3441,15 @@ run_extensions.at-5000-prog.cob:7.7-7.28:
    9              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-run_extensions.at-5000-prog.cob:9.22:
-   6          PROCEDURE        DIVISION.
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9 >            END-DISPLAY
-----                         ^
-  10          >>ELIF ACTIVATE2 DEFINED
-  11          >>ELSE
->> Hint: Missing .
-
-run_extensions.at-5000-prog.cob:10.7-10.13:
+run_extensions.at-5000-prog.cob:10.7-10.31:
    7          >>IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
   10 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
   11          >>ELSE
   12              DISPLAY "NOTOK" NO ADVANCING
->> Warning: Invalid syntax
-
-run_extensions.at-5000-prog.cob:10.23:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                          ^
-  11          >>ELSE
-  12              DISPLAY "NOTOK" NO ADVANCING
->> Hint: Missing .
-
-run_extensions.at-5000-prog.cob:10.24-10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                           ^^^^^^^
-  11          >>ELSE
-  12              DISPLAY "NOTOK" NO ADVANCING
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-5000-prog.cob:11.7-11.13:
    8              DISPLAY "NOTOK" NO ADVANCING
@@ -3541,26 +3461,6 @@ run_extensions.at-5000-prog.cob:11.7-11.13:
   13              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-run_extensions.at-5000-prog.cob:10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----                                  ^
-  11          >>ELSE
-  12              DISPLAY "NOTOK" NO ADVANCING
->> Hint: Missing .
-
-run_extensions.at-5000-prog.cob:12.11-12.18:
-   9              END-DISPLAY
-  10          >>ELIF ACTIVATE2 DEFINED
-  11          >>ELSE
-  12 >            DISPLAY "NOTOK" NO ADVANCING
-----              ^^^^^^^
-  13              END-DISPLAY
-  14          >>END-IF
->> Warning: Invalid syntax
-
 run_extensions.at-5000-prog.cob:14.7-14.15:
   11          >>ELSE
   12              DISPLAY "NOTOK" NO ADVANCING
@@ -3568,7 +3468,7 @@ run_extensions.at-5000-prog.cob:14.7-14.15:
   14 >        >>END-IF
 ----          ^^^^^^^^
   15              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5065:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5049:0
@@ -4113,6 +4013,26 @@ run_extensions.at-5351-prog.cob:2.7-2.36:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3              $SET COMP-1(BINARY)
    4          >>ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_extensions.at-5351-prog.cob:4.7-4.13:
+   1   
+   2          >>IF BINARY-COMP-1 IS DEFINED
+   3              $SET COMP-1(BINARY)
+   4 >        >>ELSE
+----          ^^^^^^
+   5              $SET COMP1 "float"
+   6          >>END-IF
+>> Error: Malformed or unknown compiler directive
+
+run_extensions.at-5351-prog.cob:6.7-6.15:
+   3              $SET COMP-1(BINARY)
+   4          >>ELSE
+   5              $SET COMP1 "float"
+   6 >        >>END-IF
+----          ^^^^^^^^
+   7          IDENTIFICATION  DIVISION.
+   8          PROGRAM-ID.     prog.
 >> Error: Malformed or unknown compiler directive
 
 run_extensions.at-5351-prog.cob:3.11-3.15:

@@ -77,18 +77,19 @@ let indent_range' ~source_format ~range ~file =
     this function has an argument which is the name of file,
     so when using lsp, every time using the formatting,
     we must save the file before, it is not convenient.
+     (* NB: not anymore. *)
   *)
   let state =
-    Cobol_preproc.fold_text_lines ~on_period_only:false ~source_format check_indent file state
+    Cobol_preproc.fold_text_lines ~source_format check_indent
+      (Filename file) state
   in
   let ind_recds = state.acc in
   indenter ~source_format file_content ind_recds state.range
 
 (*indent a range of file, with the user-defined indent_config*)
 let indent_range' ~source_format ~indent_config ~range ~file =
-  match indent_config with
-  | Some indent_config ->
-      Indent_config.set_config ~indent_config;
-      indent_range' ~source_format ~range ~file
-  | None ->
-      indent_range' ~source_format ~range ~file
+  begin match indent_config with
+    | Some indent_config -> Indent_config.set_config ~indent_config
+    | None -> ()
+  end;
+  indent_range' ~source_format ~range ~file

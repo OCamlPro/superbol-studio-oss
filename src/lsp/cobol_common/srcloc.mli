@@ -14,13 +14,14 @@
 module TYPES: sig
   type lexloc = Lexing.position * Lexing.position
   type srcloc
-  type 'a with_loc = { payload: 'a; loc: srcloc; }
-  [@@deriving ord]
+  type copylocs
+  type 'a with_loc = { payload: 'a; loc: srcloc; }                [@@deriving ord]
 end
 type lexloc = TYPES.lexloc
 type srcloc = TYPES.srcloc
+type copylocs = TYPES.copylocs
 type 'a with_loc = 'a TYPES.with_loc =
-  { payload: 'a; loc: srcloc; } [@@deriving ord]
+  { payload: 'a; loc: srcloc; }                                  [@@deriving ord]
 
 module INFIX: sig
   (* Meaning of letters:
@@ -39,6 +40,7 @@ module INFIX: sig
 end
 
 val pp_srcloc: srcloc Pretty.printer
+val pp_srcloc_struct: srcloc Pretty.printer
 val pp_file_loc: srcloc Pretty.printer
 val raw
   : ?in_area_a:bool
@@ -69,6 +71,19 @@ val lexloc_in
   : filename: string
   -> srcloc
   -> lexloc
+val shallow_multiline_lexloc_in
+  : filename: string
+  -> srcloc
+  -> lexloc
+val shallow_single_line_lexloc_in
+  : filename: string
+  -> srcloc
+  -> lexloc
+val shallow_single_line_lexlocs_in
+  : ?ignore_invalid_filename: bool
+  -> filename: string
+  -> srcloc
+  -> lexloc list
 val as_unique_lexloc
   : srcloc
   -> lexloc option
@@ -81,9 +96,6 @@ val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position
 
-val fold_lexlocs: (lexloc -> 'a -> 'a) -> srcloc -> 'a -> 'a
-val has_lexloc: (lexloc -> bool) -> srcloc -> bool
-
 val concat: srcloc -> srcloc -> srcloc
 val concat_srclocs: srcloc list -> srcloc option
 val prefix: int -> srcloc -> srcloc
@@ -94,6 +106,7 @@ val sub : srcloc -> pos:int -> len:int -> srcloc
 
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
+val pp_raw_loc: (string * (int * int) * (int * int)) Pretty.printer
 val flagit: 'a -> srcloc -> 'a with_loc
 val payload: 'a with_loc -> 'a
 val loc: 'a with_loc -> srcloc
@@ -107,12 +120,6 @@ val concat_locs: _ with_loc list -> srcloc option
 val concat_strings_with_loc: string with_loc -> string with_loc -> string with_loc
 val copy_from: filename:string -> copyloc:srcloc -> 'a with_loc -> 'a with_loc
 
-module COPYLOCS: sig
-  type t
-  val none: t
-  val append: copyloc:srcloc -> string -> t -> t
-  val mem: string -> t -> bool
-end
-
-type leading_or_trailing = Leading | Trailing
-[@@deriving show, ord]
+val no_copy: copylocs
+val new_copy: copyloc:srcloc -> string -> copylocs -> copylocs
+val mem_copy: string -> copylocs -> bool

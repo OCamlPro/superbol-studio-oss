@@ -89,7 +89,7 @@ run_fundamental.at-138-prog.cob:7.7-7.13:
 ----          ^^^^^^
    8              DISPLAY X"313233"
    9          >>END-IF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-138-prog.cob:9.7-9.15:
    6              DISPLAY X"F1F2F3"
@@ -99,7 +99,7 @@ run_fundamental.at-138-prog.cob:9.7-9.15:
 ----          ^^^^^^^^
   10              END-DISPLAY.
   11              CALL "dump" USING X"000102"
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
@@ -465,65 +465,15 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1670:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1723:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1777:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1856:0
-run_fundamental.at-1856-prog.cob:20.20:
-  17              DISPLAY "<"
-  18   
-  19              MOVE "dummy-call" TO prgm
-  20 >            CALL prgm
-----                       ^
-  21          >> IF CHECK-PERF IS DEFINED
-  22              PERFORM 500000 TIMES
->> Hint: Missing .
-
-run_fundamental.at-1856-prog.cob:21.7-21.12:
+run_fundamental.at-1856-prog.cob:21.7-21.34:
   18   
   19              MOVE "dummy-call" TO prgm
   20              CALL prgm
   21 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   22              PERFORM 500000 TIMES
   23                 CALL prgm
->> Error: Invalid syntax
-
-run_fundamental.at-1856-prog.cob:21.23:
-  18   
-  19              MOVE "dummy-call" TO prgm
-  20              CALL prgm
-  21 >        >> IF CHECK-PERF IS DEFINED
-----                          ^
-  22              PERFORM 500000 TIMES
-  23                 CALL prgm
->> Hint: Missing .
-
-run_fundamental.at-1856-prog.cob:21.24-21.26:
-  18   
-  19              MOVE "dummy-call" TO prgm
-  20              CALL prgm
-  21 >        >> IF CHECK-PERF IS DEFINED
-----                           ^^
-  22              PERFORM 500000 TIMES
-  23                 CALL prgm
->> Warning: Invalid syntax
-
-run_fundamental.at-1856-prog.cob:21.34:
-  18   
-  19              MOVE "dummy-call" TO prgm
-  20              CALL prgm
-  21 >        >> IF CHECK-PERF IS DEFINED
-----                                     ^
-  22              PERFORM 500000 TIMES
-  23                 CALL prgm
->> Hint: Missing .
-
-run_fundamental.at-1856-prog.cob:22.11-22.18:
-  19              MOVE "dummy-call" TO prgm
-  20              CALL prgm
-  21          >> IF CHECK-PERF IS DEFINED
-  22 >            PERFORM 500000 TIMES
-----              ^^^^^^^
-  23                 CALL prgm
-  24              END-PERFORM
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-1856-prog.cob:25.7-25.16:
   22              PERFORM 500000 TIMES
@@ -533,68 +483,18 @@ run_fundamental.at-1856-prog.cob:25.7-25.16:
 ----          ^^^^^^^^^
   26              .
   27          END PROGRAM     prog.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1956:0
-run_fundamental.at-1956-prog.cob:28.24:
-  25              DISPLAY "<"
-  26   
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28 >            CALL prog-ptr
-----                           ^
-  29          >> IF CHECK-PERF IS DEFINED
-  30              PERFORM 500000 TIMES
->> Hint: Missing .
-
-run_fundamental.at-1956-prog.cob:29.7-29.12:
+run_fundamental.at-1956-prog.cob:29.7-29.34:
   26   
   27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
   28              CALL prog-ptr
   29 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   30              PERFORM 500000 TIMES
   31                 CALL prog-ptr
->> Error: Invalid syntax
-
-run_fundamental.at-1956-prog.cob:29.23:
-  26   
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28              CALL prog-ptr
-  29 >        >> IF CHECK-PERF IS DEFINED
-----                          ^
-  30              PERFORM 500000 TIMES
-  31                 CALL prog-ptr
->> Hint: Missing .
-
-run_fundamental.at-1956-prog.cob:29.24-29.26:
-  26   
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28              CALL prog-ptr
-  29 >        >> IF CHECK-PERF IS DEFINED
-----                           ^^
-  30              PERFORM 500000 TIMES
-  31                 CALL prog-ptr
->> Warning: Invalid syntax
-
-run_fundamental.at-1956-prog.cob:29.34:
-  26   
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28              CALL prog-ptr
-  29 >        >> IF CHECK-PERF IS DEFINED
-----                                     ^
-  30              PERFORM 500000 TIMES
-  31                 CALL prog-ptr
->> Hint: Missing .
-
-run_fundamental.at-1956-prog.cob:30.11-30.18:
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28              CALL prog-ptr
-  29          >> IF CHECK-PERF IS DEFINED
-  30 >            PERFORM 500000 TIMES
-----              ^^^^^^^
-  31                 CALL prog-ptr
-  32              END-PERFORM
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-1956-prog.cob:33.7-33.16:
   30              PERFORM 500000 TIMES
@@ -604,7 +504,7 @@ run_fundamental.at-1956-prog.cob:33.7-33.16:
 ----          ^^^^^^^^^
   34              .
   35          END PROGRAM     prog.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-1956-prog.cob:60.50:
   57   
@@ -832,15 +732,15 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4508:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4560:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4608:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4648:0
-run_fundamental.at-4648-prog.cob:12.7-12.11:
+run_fundamental.at-4648-prog.cob:12.7-12.19:
    9                  05  misalign-1           PIC X.
   10                  05  ptr                  POINTER, SYNC.
   11                  05  ptr-num              REDEFINES ptr,
   12 >        >>IF P64 SET
-----          ^^^^
+----          ^^^^^^^^^^^^
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-4648-prog.cob:14.7-14.13:
   11                  05  ptr-num              REDEFINES ptr,
@@ -1033,55 +933,15 @@ run_fundamental.at-5623-prog.cob:10.44-10.48:
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5670:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6013:0
-run_fundamental.at-6013-prog.cob:24.7-24.12:
+run_fundamental.at-6013-prog.cob:24.7-24.34:
   21   
   22         *>   Test with DISPLAY on error
   23              PERFORM DO-CHECK
   24 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   25              SET  NO-DISP    TO TRUE
   26         *>   minimal side-test for performance comparisons
->> Error: Invalid syntax
-
-run_fundamental.at-6013-prog.cob:24.23:
-  21   
-  22         *>   Test with DISPLAY on error
-  23              PERFORM DO-CHECK
-  24 >        >> IF CHECK-PERF IS DEFINED
-----                          ^
-  25              SET  NO-DISP    TO TRUE
-  26         *>   minimal side-test for performance comparisons
->> Hint: Missing TIMES .
-
-run_fundamental.at-6013-prog.cob:24.24-24.26:
-  21   
-  22         *>   Test with DISPLAY on error
-  23              PERFORM DO-CHECK
-  24 >        >> IF CHECK-PERF IS DEFINED
-----                           ^^
-  25              SET  NO-DISP    TO TRUE
-  26         *>   minimal side-test for performance comparisons
->> Error: Invalid syntax
-
-run_fundamental.at-6013-prog.cob:24.34:
-  21   
-  22         *>   Test with DISPLAY on error
-  23              PERFORM DO-CHECK
-  24 >        >> IF CHECK-PERF IS DEFINED
-----                                     ^
-  25              SET  NO-DISP    TO TRUE
-  26         *>   minimal side-test for performance comparisons
->> Hint: Missing .
-
-run_fundamental.at-6013-prog.cob:25.11-25.14:
-  22         *>   Test with DISPLAY on error
-  23              PERFORM DO-CHECK
-  24          >> IF CHECK-PERF IS DEFINED
-  25 >            SET  NO-DISP    TO TRUE
-----              ^^^
-  26         *>   minimal side-test for performance comparisons
-  27              PERFORM DO-CHECK 20000 TIMES
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-6013-prog.cob:28.7-28.16:
   25              SET  NO-DISP    TO TRUE
@@ -1091,7 +951,7 @@ run_fundamental.at-6013-prog.cob:28.7-28.16:
 ----          ^^^^^^^^^
   29              GOBACK.
   30   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-6013-prog.cob:76.29-76.33:
   73              ELSE                        DISPLAY '! LOW-VALUE <= "X"'.
@@ -1414,55 +1274,15 @@ run_fundamental.at-6013-prog.cob:233.15-233.19:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6072:0
-run_fundamental.at-6072-prog.cob:22.7-22.12:
+run_fundamental.at-6072-prog.cob:22.7-22.34:
   19   
   20         *>   Test with DISPLAY on error
   21              PERFORM DO-CHECK
   22 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   23              SET  NO-DISP    TO TRUE
   24         *>   minimal side-test for performance comparisons
->> Error: Invalid syntax
-
-run_fundamental.at-6072-prog.cob:22.23:
-  19   
-  20         *>   Test with DISPLAY on error
-  21              PERFORM DO-CHECK
-  22 >        >> IF CHECK-PERF IS DEFINED
-----                          ^
-  23              SET  NO-DISP    TO TRUE
-  24         *>   minimal side-test for performance comparisons
->> Hint: Missing TIMES .
-
-run_fundamental.at-6072-prog.cob:22.24-22.26:
-  19   
-  20         *>   Test with DISPLAY on error
-  21              PERFORM DO-CHECK
-  22 >        >> IF CHECK-PERF IS DEFINED
-----                           ^^
-  23              SET  NO-DISP    TO TRUE
-  24         *>   minimal side-test for performance comparisons
->> Error: Invalid syntax
-
-run_fundamental.at-6072-prog.cob:22.34:
-  19   
-  20         *>   Test with DISPLAY on error
-  21              PERFORM DO-CHECK
-  22 >        >> IF CHECK-PERF IS DEFINED
-----                                     ^
-  23              SET  NO-DISP    TO TRUE
-  24         *>   minimal side-test for performance comparisons
->> Hint: Missing .
-
-run_fundamental.at-6072-prog.cob:23.11-23.14:
-  20         *>   Test with DISPLAY on error
-  21              PERFORM DO-CHECK
-  22          >> IF CHECK-PERF IS DEFINED
-  23 >            SET  NO-DISP    TO TRUE
-----              ^^^
-  24         *>   minimal side-test for performance comparisons
-  25              PERFORM DO-CHECK 20000 TIMES
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_fundamental.at-6072-prog.cob:26.7-26.16:
   23              SET  NO-DISP    TO TRUE
@@ -1472,7 +1292,7 @@ run_fundamental.at-6072-prog.cob:26.7-26.16:
 ----          ^^^^^^^^^
   27              GOBACK.
   28   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6161:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6229:0

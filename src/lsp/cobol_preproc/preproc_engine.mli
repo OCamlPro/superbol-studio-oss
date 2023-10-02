@@ -25,21 +25,13 @@ type init =
     init_source_format: Cobol_config.source_format_spec;
   }
 
-type log = log_entry list
-and rev_log = log
-and log_entry = Preproc.log_entry =
-  {
-    matched_loc: Cobol_common.Srcloc.srcloc;
-    replacement_text: Text.text;
-  }
-
 (* --- *)
 
 val diags: preprocessor -> Cobol_common.Diagnostics.Set.t
 val add_diag: preprocessor -> Cobol_common.Diagnostics.t -> preprocessor
 val add_diags: preprocessor -> Cobol_common.Diagnostics.Set.t -> preprocessor
-val log: preprocessor -> log
-val rev_log: preprocessor -> rev_log
+val log: preprocessor -> Preproc_trace.log
+val comments: preprocessor -> Text.comments
 val srclexer: preprocessor -> Preproc.any_srclexer
 val position: preprocessor -> Lexing.position
 val next_sentence: preprocessor -> Text.text * preprocessor
@@ -52,32 +44,28 @@ val decide_source_format
   -> Cobol_config.source_format Cobol_common.Diagnostics.with_diags
 
 val preprocessor
-  : ?on_period_only:bool
-  -> ?verbose:bool
+  : ?verbose:bool
   -> input
   -> [< `WithLibpath of init ]
   -> preprocessor
 
 val lex_file
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter
-  -> string
+  -> input
   -> unit
 
 val fold_text_lines
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> ?epf:Format.formatter
   -> (Text.text -> 'a -> 'a)
-  -> string
+  -> input
   -> 'a
   -> 'a
 
 val lex_lib
-  : ?on_period_only:bool
-  -> source_format: Cobol_config.source_format_spec
+  : source_format: Cobol_config.source_format_spec
   -> libpath:string list
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter

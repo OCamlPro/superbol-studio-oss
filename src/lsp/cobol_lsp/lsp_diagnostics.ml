@@ -46,7 +46,7 @@ let translate_one ~rootdir ~uri (diag: DIAG.t) =
     | Some (Lexing.{ pos_fname = f; _ }, _ as lexloc) ->
         pseudo_normalized_uri ~rootdir f, Lsp_position.range_of_lexloc lexloc
     | None ->
-        uri, Lsp_position.none_range
+        uri, Lsp_position.pointwise_range_at_start
   in
   let diag =
     Lsp.Types.Diagnostic.create ()

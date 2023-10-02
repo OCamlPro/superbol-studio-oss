@@ -143,9 +143,9 @@ type 'k state =
     lex_prods: text;
     continued: continued;
     pseudotext: (srcloc * text) option;
+    comments: comments;
     cdir_seen: bool;
     newline: bool;
-    on_period_only: bool; (*newline on TextWord "." only if true, on any TextWord when false *)
     diags: DIAGS.Set.t;
     config: 'k config;
   }
@@ -169,16 +169,15 @@ and 'k config =
     source_format: 'k source_format;
   }
 
-(* TODO: get rid of `on_period_only` *)
-let init_state on_period_only: 'k source_format -> 'k state = fun source_format ->
+let init_state : 'k source_format -> 'k state = fun source_format ->
   {
     lex_prods = [];
     continued = CNone;
     pseudotext = None;
+    comments = [];
     cdir_seen = false;
     newline = true;
     diags = DIAGS.Set.none;
-    on_period_only;
     config =
       {
         debug = false;
@@ -187,12 +186,9 @@ let init_state on_period_only: 'k source_format -> 'k state = fun source_format 
   }
 
 let diagnostics { diags; _ } = diags
-
-let source_format { config = { source_format; _ }; _ } =
-  source_format
-
-let allow_debug { config = { debug; _ }; _ } =
-  debug
+let comments { comments; _ } = List.rev comments
+let source_format { config = { source_format; _ }; _ } = source_format
+let allow_debug { config = { debug; _ }; _ } = debug
 
 (* Just check there are no buffered stuffs.  *)
 let flushed = function
@@ -257,13 +253,8 @@ let append t state =
 let new_line state lexbuf =
   Lexing.new_line lexbuf;
   match state.lex_prods, state.cdir_seen with
-  | { payload = (Pseudo _ | Eof); _ } :: _, _ | _, true ->
-      flush { state with newline = true }
-  | { payload = (TextWord "." ); _ } :: _, _
-    when state.on_period_only ->
-      flush { state with newline = true }
-  | { payload = (TextWord _ | Alphanum _); _ } :: _, _
-    when not @@ state.on_period_only ->
+  | { payload = TextWord _ | Alphanum _ | Pseudo _ | Eof; _ } :: _, _
+  | _, true ->
       flush { state with newline = true }
   | _ ->
       { state with newline = true }, []
@@ -560,6 +551,26 @@ let extract_knd str state lexbuf =
 type lexeme_info = string * Lexing.position * Lexing.position
 let lexeme_info lexbuf : lexeme_info =
   Lexing.(lexeme lexbuf, lexeme_start_p lexbuf, lexeme_end_p lexbuf)
+
+let comment ?(marker = "") ?(floating = false) state lexbuf =
+  let (s, start_pos, end_pos) = lexeme_info lexbuf in
+  let start_pos =                       (* include location of comment marker *)
+    Lexing.{ start_pos with
+             pos_cnum = start_pos.pos_cnum - String.length marker } in
+  let comment_contents, end_pos =
+    if EzString.ends_with ~suffix:"\n" s          (* remove potential newline *)
+    then marker ^ String.(sub s 0 (String.length s - 1)),
+         Lexing.{ end_pos with pos_cnum = end_pos.pos_cnum - 1 }
+    else marker ^ s, end_pos
+  in
+  let comment =
+    {
+      comment_loc = start_pos, end_pos;
+      comment_kind = if floating then `Floating else `Line;
+      comment_contents;
+    }
+  in
+  new_line { state with comments = comment :: state.comments } lexbuf
 
 let trunc_to_col n ((s, sp, ep) as info: lexeme_info) =
   let sc = pos_column sp and ec = pos_column ep in

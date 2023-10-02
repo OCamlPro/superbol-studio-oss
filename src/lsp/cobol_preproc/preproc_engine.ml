@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
@@ -36,22 +36,12 @@ let decide_source_format _input
 
 (* --- *)
 
-type log = log_entry list
-and rev_log = log
-and log_entry = Preproc.log_entry =
-  {
-    matched_loc: Cobol_common.Srcloc.srcloc;
-    replacement_text: Text.text;
-  }
-
-(* --- *)
-
 type preprocessor =
   {
     buff: Text.text;
     srclex: Preproc.any_srclexer;
     ppstate: Preproc.state;
-    pplog: Preproc.log;
+    pplog: Preproc_trace.log;
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
   }
@@ -62,7 +52,7 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     config: Cobol_config.t;
     replacing: Preproc.replacing with_loc list list;
-    copybooks: COPYLOCS.t;                                (* opened copybooks *)
+    copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -72,19 +62,21 @@ let diags { diags; srclex; _ } =
   DIAGS.Set.union diags @@ Preproc.srclex_diags srclex
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
-let log { pplog; _ } = List.rev pplog
-let rev_log { pplog; _ } = pplog
+let log { pplog; _ } = pplog
 let srclexer { srclex; _ } = srclex
 let position { srclex; _ } = Preproc.srclex_pos srclex
+let comments { srclex; _ } = Preproc.srclex_comments srclex
 
 let with_srclex lp srclex =
   if lp.srclex == srclex then lp else { lp with srclex }
-let with_diags lp diags =
-  if lp.diags == diags then lp else { lp with diags }
+(* let with_diags lp diags = *)
+(*   if lp.diags == diags then lp else { lp with diags } *)
 let with_buff lp buff =
   if lp.buff == buff then lp else { lp with buff }
 let with_pplog lp pplog =
   if lp.pplog == pplog then lp else { lp with pplog }
+let with_diags_n_pplog lp diags pplog =
+  if lp.diags == diags && lp.pplog == pplog then lp else { lp with diags; pplog }
 let with_buff_n_pplog lp buff pplog =
   if lp.buff == buff && lp.pplog == pplog then lp else { lp with buff; pplog }
 let with_replacing lp replacing =
@@ -93,13 +85,13 @@ let with_replacing lp replacing =
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
-let make_srclex ?(on_period_only = true) ~source_format = function
+let make_srclex ~source_format = function
   | Filename filename ->
-      Preproc.srclex_from_file on_period_only ~source_format filename
+      Preproc.srclex_from_file ~source_format filename
   | String { contents; filename } ->
-      Preproc.srclex_from_string on_period_only ~filename ~source_format contents
+      Preproc.srclex_from_string ~filename ~source_format contents
   | Channel { contents; filename } ->
-      Preproc.srclex_from_channel on_period_only ~filename ~source_format contents
+      Preproc.srclex_from_channel ~filename ~source_format contents
 
 type init =
   {
@@ -108,7 +100,7 @@ type init =
     init_source_format: Cobol_config.source_format_spec;
   }
 
-let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
+let preprocessor ?(verbose = false) input = function
   | `WithLibpath { init_libpath = libpath;
                    init_config = (module Config);
                    init_source_format = source_format; } ->
@@ -119,17 +111,17 @@ let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
         = decide_source_format input source_format in
       {
         buff = [];
-        srclex = make_srclex ~on_period_only ~source_format input;
+        srclex = make_srclex ~source_format input;
         ppstate = Preproc.initial_state;
-        pplog = [];
-        diags = diags;
+        pplog = Preproc_trace.empty;
+        diags;
         persist =
           {
             pparser = (module Pp);
             overlay_manager = (module Om);
             config = (module Config);
             replacing = [];
-            copybooks = COPYLOCS.none;
+            copybooks = Cobol_common.Srcloc.no_copy;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -144,7 +136,8 @@ let preprocessor ?(on_period_only = true) ?(verbose = false) input = function
         persist =
           {
             persist with
-            copybooks = COPYLOCS.append ~copyloc copybook persist.copybooks;
+            copybooks =
+              Cobol_common.Srcloc.new_copy ~copyloc copybook persist.copybooks;
             verbose = persist.verbose || verbose;
           };
       }
@@ -281,7 +274,7 @@ and do_copy lp rev_prefix copy suffix =
   `CopyDone (lp, text)
 
 and do_replace lp rev_prefix repl suffix =
-  let { result = repl; diags } = ~&repl in
+  let { payload = { result = repl; diags }; loc } = repl in
   let lp = add_diags lp diags in
   let prefix, pplog =
     (* NB: this applies the current replacing on all remaining text leading to
@@ -290,7 +283,7 @@ and do_replace lp rev_prefix repl suffix =
        replacing phrase. *)
     apply_active_replacing_full lp @@ List.rev rev_prefix
   in
-  let lp = with_pplog lp pplog in
+  let lp = with_pplog lp @@ Preproc_trace.new_replace ~loc pplog in
   let lp = match repl, lp.persist.replacing with
     | CDirReplace { replacing = repl; _ }, ([] as replacing)
     | CDirReplace { replacing = repl; also = false }, replacing ->
@@ -306,28 +299,30 @@ and do_replace lp rev_prefix repl suffix =
   `ReplaceDone (lp, prefix, suffix)
 
 
-and read_lib ({ diags; persist = { libpath; copybooks; verbose; _ }; _ } as lp)
+and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
     loc { libname; cbkname } =
   let libpath = match ~&?cbkname with None -> libpath | Some (_, d) -> [d] in
-  let text, diags = match Copybook.find_lib ~libpath ~&libname with
-    | Ok filename when COPYLOCS.mem filename copybooks ->
+  let text, diags, pplog = match Copybook.find_lib ~libpath ~&libname with
+    | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         (* TODO: `note addendum *)
         [],
-        DIAGS.Acc.error diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename
+        DIAGS.Acc.error lp.diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename,
+        Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
     | Ok filename ->
         if verbose then
           Pretty.error "Reading library `%s'@." filename;
-        let text, pp' =
-          full_text
+        let text, lp =             (* note: [lp] holds all prev and new diags *)
+          full_text                (* likewise for pplog *)
             (preprocessor (Filename filename) (`Fork (lp, loc, filename)))
             ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
         in
-        text, pp'.diags
+        text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
         [],
-        Copybook.lib_not_found_error (DIAGS.Acc.error diags ~loc "%t") lnf
+        Copybook.lib_not_found_error (DIAGS.Acc.error lp.diags ~loc "%t") lnf,
+        Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
   in
-  text, with_diags lp diags
+  text, with_diags_n_pplog lp diags pplog
 
 and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   let eofp p = ~&p = Text.Eof in
@@ -394,33 +389,33 @@ let pp_pptokens: pptokens Pretty.printer =
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_file ?(on_period_only = true) ~source_format ?(ppf = default_oppf) =
-  Cobol_common.do_unit begin fun (module DIAGS) filename ->
+let lex_file ~source_format ?(ppf = default_oppf) =
+  Cobol_common.do_unit begin fun (module DIAGS) input ->
     let source_format =
-      DIAGS.grab_diags @@ decide_source_format filename source_format in
-    let pl = Preproc.srclex_from_file on_period_only ~source_format filename in
+      DIAGS.grab_diags @@ decide_source_format input source_format in
+    let pl = make_srclex ~source_format input in
     Preproc.print_source_lines ppf pl
   end
 
-let lex_lib ?(on_period_only = true)~source_format ~libpath ?(ppf = default_oppf) =
+let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) libname ->
     match Copybook.find_lib ~libpath libname with
     | Ok filename ->
         let source_format =
-          DIAGS.grab_diags @@ decide_source_format filename source_format in
-        let pl = Preproc.srclex_from_file on_period_only ~source_format filename in
+          DIAGS.grab_diags @@
+          decide_source_format (Filename filename) source_format in
+        let pl = Preproc.srclex_from_file ~source_format filename in
         Preproc.print_source_lines ppf pl
     | Error lnf ->
         Copybook.lib_not_found_error (DIAGS.error "%t") lnf
   end
 
-(* TODO: get rid of `on_period_only` *)
-let fold_text_lines ?(on_period_only = true) ~source_format ?epf f =
-  Cobol_common.do_any ?epf begin fun (module DIAGS) filename ->
+let fold_text_lines ~source_format ?epf f =
+  Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
     let source_format =
-      DIAGS.grab_diags @@ decide_source_format filename source_format in
-    let lex = Preproc.srclex_from_file on_period_only ~source_format filename in
-    Preproc.(fold_source_lines lex) f
+      DIAGS.grab_diags @@ decide_source_format input source_format in
+    let pl = make_srclex ~source_format input in
+    Preproc.fold_source_lines pl f
   end
 
 let pp_preprocessed ppf lp =

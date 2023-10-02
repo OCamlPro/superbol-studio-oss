@@ -25,8 +25,7 @@ module TYPES = struct
       project: Lsp_project.t;
       textdoc: Lsp.Text_document.t;
       copybook: bool;
-      pplog: Cobol_preproc.rev_log;
-      tokens: Cobol_parser.tokens_with_locs Lazy.t;
+      artifacts: Cobol_parser.parsing_artifacts;
       parsed: parsed_data option;
       (* Used for caching, when loading a cache file as the file is not reparsed,
          then diagnostics are not sent. *)
@@ -34,7 +33,7 @@ module TYPES = struct
     }
   and parsed_data =
     {
-      ast: PTREE.compilation_group;
+      ast: PTREE.compilation_group;                (* TODO: rename into ptree *)
       cus: CUs.t;
       (* Extracted info: lazy to only ever retrieve what's relevant upon a first
          request. *)
@@ -52,8 +51,9 @@ module TYPES = struct
       doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
       doc_cache_langid: string;
       doc_cache_version: int;
-      doc_cache_pplog: Cobol_preproc.rev_log;
+      doc_cache_pplog: Cobol_preproc.log;
       doc_cache_tokens: Cobol_parser.tokens_with_locs;
+      doc_cache_comments: Cobol_preproc.comments;
       doc_cache_parsed: (PTREE.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
     }
@@ -88,26 +88,29 @@ let lazy_definitions ast cus =
 let lazy_references ast cus defs =
   lazy begin
     let defs = Lazy.force defs in
-    try
-      List.fold_left
-        (fun map cu ->
-           let cu_name = Lsp_lookup.name_of_compunit cu in
-           let _, cu_defs = CUMap.find_by_name cu_name defs in
-           CUMap.add
-             (CUs.find_by_name cu_name cus)
-             (Lsp_lookup.references cu_defs cu) map )
-        CUMap.empty ast
-    with Not_found -> CUMap.empty
+    List.fold_left begin fun map cu ->
+        let cu_name = Lsp_lookup.name_of_compunit cu in
+        try
+          let _, cu_defs = CUMap.find_by_name cu_name defs in
+          CUMap.add
+            (CUs.find_by_name cu_name cus)
+          (Lsp_lookup.references cu_defs cu) map
+        with Not_found -> map
+    end CUMap.empty ast
   end
 
+let no_parsing_artifacts =
+  Cobol_parser.{ tokens = lazy [];
+                 pplog = Cobol_preproc.Trace.empty;
+                 comments = [] }
+
 let analyze ({ project; textdoc; copybook; _ } as doc) =
-  let pplog, tokens, (parsed, diags) =
+  let artifacts, (parsed, diags) =
     if copybook then
-      [], lazy [], (None, DIAGS.Set.none)
+      no_parsing_artifacts, (None, DIAGS.Set.none)
     else
       let ptree = parse ~project textdoc in
-      Cobol_parser.preproc_rev_log ptree,
-      Cobol_parser.parsed_tokens ptree,
+      Cobol_parser.parsing_artifacts ptree,
       match Cobol_typeck.analyze_compilation_group ptree with
       | Ok (cus, ast, diags) ->
           let definitions = lazy_definitions ast cus in
@@ -117,7 +120,7 @@ let analyze ({ project; textdoc; copybook; _ } as doc) =
           None, diags (* NB: no token if unrecoverable error (e.g, wrong
                          indicator) *)
   in
-  { doc with pplog; tokens; diags; parsed }
+  { doc with artifacts; diags; parsed }
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
 let blank ~project ?copybook textdoc =
@@ -129,8 +132,7 @@ let blank ~project ?copybook textdoc =
   {
     project;
     textdoc;
-    pplog = [];
-    tokens = lazy [];
+    artifacts = no_parsing_artifacts;
     diags = DIAGS.Set.none;
     parsed = None;
     copybook;
@@ -157,7 +159,8 @@ let retrieve_parsed_data: document -> parsed_data = function
 
 (** Caching utilities *)
 
-let to_cache ({ project; textdoc; pplog; tokens; parsed; diags; _ } as doc) =
+let to_cache ({ project; textdoc; parsed; diags;
+                artifacts = { pplog; tokens; comments }; _ } as doc) =
   {
     doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
     doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
@@ -165,6 +168,7 @@ let to_cache ({ project; textdoc; pplog; tokens; parsed; diags; _ } as doc) =
     doc_cache_version = Lsp.Text_document.version textdoc;
     doc_cache_pplog = pplog;
     doc_cache_tokens = Lazy.force tokens;
+    doc_cache_comments = comments;
     doc_cache_parsed = Option.map (fun { ast; cus; _ } -> ast, cus) parsed;
     doc_cache_diags = DIAGS.Set.apply_delayed_formatting diags;
   }
@@ -179,6 +183,7 @@ let of_cache ~project
       doc_cache_version = version;
       doc_cache_pplog = pplog;
       doc_cache_tokens = tokens;
+      doc_cache_comments = comments;
       doc_cache_parsed = parsed;
       doc_cache_diags = diags } =
   let absolute_filename = Lsp_project.absolute_path_for ~filename project in
@@ -199,8 +204,9 @@ let of_cache ~project
           { ast; cus; definitions; references})
         parsed
     in
-    let diags = DIAGS.Set.of_serializable diags in
-    { doc with pplog; tokens = lazy tokens; parsed; diags }
+    { doc with artifacts = { pplog; tokens = lazy tokens; comments };
+               diags = DIAGS.Set.of_serializable diags;
+               parsed }
 
 (* --- *)
 

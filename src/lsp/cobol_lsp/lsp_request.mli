@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Request.t -> (Lsp_server.state as 's) -> 's
+val handle: Jsonrpc.Request.t -> (Lsp_server.state as 's) -> 's * Jsonrpc.Response.t
 
 module INTERNAL: sig
   val lookup_definition

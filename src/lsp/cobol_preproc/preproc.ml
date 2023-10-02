@@ -22,6 +22,7 @@ module DIAGS = Cobol_common.Diagnostics
 (* --- *)
 
 include Preproc_tokens                         (* include token type directly *)
+include Preproc_trace                          (* include log events *)
 
 (* --- *)
 
@@ -32,6 +33,8 @@ let srclex_lexbuf (Plx (_, lexbuf)) = lexbuf
 let srclex_pos pl = (srclex_lexbuf pl).Lexing.lex_curr_p
 let srclex_diags (Plx (pl, _)) =
   Src_lexing.diagnostics pl
+let srclex_comments (Plx (pl, _)) =
+  Src_lexing.comments pl
 let srclex_source_format (Plx (pl, _)) =
   Src_lexing.(source_format_spec @@ source_format pl)
 
@@ -84,18 +87,17 @@ let with_source_format
       | Ok s -> Plx (s, lexbuf)
       | Error s -> Plx (s, lexbuf)
 
-let make_srclex make_lexing on_period_only ?filename ~source_format input =
+let make_srclex make_lexing ?filename ~source_format input =
   let SF source_format = Src_lexing.select_source_format source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state on_period_only source_format, lexbuf)
+  Plx (Src_lexing.init_state source_format, lexbuf)
 
 let srclex_from_string = make_srclex Lexing.from_string
 let srclex_from_channel = make_srclex Lexing.from_channel
-let srclex_from_file on_period_only ~source_format filename : any_srclexer =
-  srclex_from_string on_period_only ~source_format ~filename
-    (EzFile.read_file filename)
+let srclex_from_file ~source_format filename : any_srclexer =
+  srclex_from_string ~source_format ~filename (EzFile.read_file filename)
 
 (* --- Compiler Directives -------------------------------------------------- *)
 
@@ -153,17 +155,11 @@ and replacing =
       }
 and partial_subst =
   {
-    partial_subst_dir: Cobol_common.Srcloc.leading_or_trailing;
+    partial_subst_dir: replacing_direction;
     partial_subst_len: int;
     partial_subst_regexp: Str.regexp;
   }
-
-type log_entry =
-  {
-    matched_loc: srcloc;
-    replacement_text: text;
-  }
-type log = log_entry list
+and replacing_direction = Leading | Trailing
 
 (* --- Implementation of replacing operations ------------------------------- *)
 
@@ -202,7 +198,7 @@ let partial_word (type k) (req: k partial_word_request) words : (k, _) result =
 
 type partial_replacing =
   {
-    repl_dir: Cobol_common.Srcloc.leading_or_trailing;
+    repl_dir: replacing_direction;
     repl_strict: bool;
   }
 
@@ -486,7 +482,7 @@ let try_replacing_clause: replacing with_loc -> text -> _ result = fun replacing
         match pseudotext_exact_match ~&repl_from text with
         | Ok (l, r, matched_loc, suffix) ->
             let replacement_text = to_text ~replloc repl_to ~old:matched_loc in
-            let log_entry = { matched_loc; replacement_text } in
+            let log_entry = Replacement { matched_loc; replacement_text } in
             Ok (delim l replacement_text r, log_entry, suffix)
         | Error _ as e ->
             e
@@ -495,10 +491,10 @@ let try_replacing_clause: replacing with_loc -> text -> _ result = fun replacing
       begin fun text ->
         match textword_partial_replace ~replloc repl_subst repl_to text with
         | Ok ((t, matched_loc), suffix) when ~&t = "" ->
-            Ok ([], { matched_loc; replacement_text = [] }, suffix)
+            Ok ([], Replacement { matched_loc; replacement_text = [] }, suffix)
         | Ok ((t, matched_loc), suffix) ->
             let replacement_text = [lift_textword t] in
-            let log_entry = { matched_loc; replacement_text } in
+            let log_entry = Replacement { matched_loc; replacement_text } in
             Ok (replacement_text, log_entry, suffix)
         | Error _ as e ->
             e
@@ -531,11 +527,11 @@ let apply_replacing k repl log =
     fun k done_text log text ->
       match k, try_replacing_phrase k repl text, text with
       | OnPartText, Ok (done_text', le, []), _ ->
-          Ok (done_text @ done_text', le :: log)
+          Ok (done_text @ done_text', Preproc_trace.append le log)
       | OnFullText, Ok (done_text', le, []), _ ->
-          done_text @ done_text', le :: log
+          done_text @ done_text', Preproc_trace.append le log
       | _, Ok (done_text', le, text), _ ->
-          aux k (done_text @ done_text') (le :: log) text
+          aux k (done_text @ done_text') (Preproc_trace.append le log) text
       | OnPartText, Error `MissingText, _ ->
           Error (`MissingText (done_text, log, text))
       | OnPartText, Error `NoReplacement, [] ->

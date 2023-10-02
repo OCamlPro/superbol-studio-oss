@@ -36,7 +36,7 @@ run_accept.at-260-prog.cob:46.7-46.16:
 ----          ^^^^^^^^^
   47              GOBACK.
   48   
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_accept.at-260-prog.cob:63.36:
   60              MOVE WS-NOW-MM    TO WS-TIME-MM

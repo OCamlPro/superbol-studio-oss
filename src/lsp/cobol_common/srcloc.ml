@@ -57,6 +57,9 @@ module TYPES = struct
   (* ... but forbids other cats directly on its right. *)
   and right_ = [raw_|cpy_|rpl_]
 
+  (** Sets of copied libraries *)
+  type copylocs = copyloc list
+
   (** Values attached with a source location. *)
   type 'a with_loc = { payload: 'a; loc: srcloc [@compare fun _ _ -> 0] }
   [@@ deriving ord]
@@ -90,7 +93,7 @@ let pp_srcloc_struct: srcloc Pretty.printer =
   in
   pp
 
-(** {2 Manipulating source locations} *)
+(** {2 Querying source locations} *)
 
 (** copied, but original (replaced) position upon replacing *)
 let rec start_pos: type t. t slt -> Lexing.position = function
@@ -99,27 +102,49 @@ let rec start_pos: type t. t slt -> Lexing.position = function
   | Rpl { old; _ } -> start_pos old
   | Cat { left; _ } -> start_pos left
 
-let start_pos_in ~filename =
+(** [shallow_multiline_lexloc_in ~filename loc] retrieves a lexical location in
+    [filename] from [loc], iff [loc] directly originates from [filename] and was
+    not subject to any replacement or copy.  Returns [None] otherwise. *)
+let shallow_multiline_lexloc_in ~filename loc =
+  let rec aux: type t. t slt -> lexloc option = function
+    | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+    | Raw _ | Cpy _ | Rpl _ -> None
+    | Cat { left; right } -> match aux left, aux right with
+      | Some (s, _), Some (_, e)
+      | Some (s, e), None
+      | None, Some (s, e) -> Some (s, e)
+      | None, None -> None
+  in
+  aux loc
+
+(** [shallow_single_line_lexloc_in ~filename loc] is similar to
+    {!shallow_multiline_lexloc_in}, except that any returned lexical location is
+    guaranteed to span a single line. *)
+let shallow_single_line_lexloc_in ~filename = function
+  | Raw (s, e, _) when s.pos_fname = filename -> Some (s, e)
+  | Raw _ | Cpy _ | Rpl _ | Cat _ -> None
+
+let start_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
     | Raw (s, _, _) when s.pos_fname = filename -> Some s
     | Raw _ -> None
     | Cat { left; right } -> or_else left right
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
-    | Rpl { new_; old; replloc; _ } ->
-        match aux new_ with None -> or_else old replloc | res -> res
+    | Rpl { old; new_; _ } ->
+        aux (if traverse_replaces then new_ else old)
   and or_else: type t u. t slt -> u slt -> _ = fun a b ->
     match aux a with None -> aux b | res -> res
   in
   aux
 
-let end_pos_in ~filename =
+let end_pos_in ~filename ~traverse_replaces =
   let rec aux: type t. t slt -> Lexing.position option = function
     | Raw (_, e, _) when e.pos_fname = filename -> Some e
     | Raw _ -> None
     | Cat { left; right } -> or_else right left
     | Cpy { copied; copyloc = { copyloc; _ } } -> or_else copied copyloc
-    | Rpl { new_; old; replloc; _ } ->
-        match aux new_ with None -> or_else old replloc | res -> res
+    | Rpl { old; new_; _ } ->
+        aux (if traverse_replaces then new_ else old)
   and or_else: type t u. t slt -> u slt -> _ = fun a b ->
     match aux a with None -> aux b | res -> res
   in
@@ -149,6 +174,8 @@ let forget_preproc
     ~(favor_direction: [`Left | `Right])
     ~(traverse_copies: bool)
     ~(traverse_replaces: bool) =
+  let start_pos_in = start_pos_in ~traverse_replaces
+  and end_pos_in = end_pos_in ~traverse_replaces in
   let rec aux: type t. t slt -> lexloc = function
     | Raw (s, e, _) ->
         s, e
@@ -173,15 +200,46 @@ let as_lexloc: srcloc -> lexloc =
   forget_preproc ~favor_direction:`Left
     ~traverse_copies:true ~traverse_replaces:false
 
-let lookup_pos ~lookup ~lookup_name ~filename loc =
+let lookup_ ~lookup ~lookup_name ~filename loc =
   match lookup ~filename loc with
-  | None -> Fmt.invalid_arg "%s.%s: no part of \"%s\" was used to construct the \
-                             given location (loc = %a)" __MODULE__ lookup_name filename
-              pp_srcloc_struct loc
-  | Some s -> s
+  | None ->
+      Pretty.invalid_arg
+        "%s.%s: no part of \"%s\" was used to construct the given location (loc \
+         = %a)" __MODULE__ lookup_name filename pp_srcloc_struct loc
+  | Some s ->
+      s
 
-let start_pos_in = lookup_pos ~lookup:start_pos_in ~lookup_name:"start_pos_in"
-let end_pos_in = lookup_pos ~lookup:end_pos_in ~lookup_name:"end_pos_in"
+let start_pos_in =
+  lookup_ ~lookup:(start_pos_in ~traverse_replaces:false)
+    ~lookup_name:"start_pos_in"
+let end_pos_in =
+  lookup_ ~lookup:(end_pos_in ~traverse_replaces:false)
+    ~lookup_name:"end_pos_in"
+let shallow_multiline_lexloc_in =
+  lookup_ ~lookup:shallow_multiline_lexloc_in
+    ~lookup_name:"shallow_multiline_lexloc_in"
+let shallow_single_line_lexloc_in =
+  lookup_ ~lookup:shallow_single_line_lexloc_in
+    ~lookup_name:"shallow_single_line_lexloc_in"
+(* let shallow_single_line_lexlocs_in = *)
+(*   lookup_ ~lookup:shallow_single_line_lexlocs_in *)
+(*     ~lookup_name:"shallow_single_line_lexlocs_in" *)
+
+let shallow_single_line_lexlocs_in
+    ?(ignore_invalid_filename = false) ~filename loc =
+  let rec aux: type t. t slt -> (lexloc list as 'a) -> 'a = function
+    | Raw (s, e, _) when s.pos_fname = filename -> List.cons (s, e)
+    | Raw _ | Cpy _ | Rpl _ -> Fun.id
+    | Cat { left; right } -> fun acc -> acc |> aux right |> aux left
+  in
+  match aux loc [] with
+  | l when ignore_invalid_filename -> l
+  | _ :: _ as l -> l
+  | [] ->
+      Pretty.invalid_arg
+        "%s.%s: no part of \"%s\" was used to construct the given location (loc \
+         = %a)" __MODULE__ "shallow_single_line_lexlocs_in"
+        filename pp_srcloc_struct loc
 
 (** [lexloc_in ~filename loc] projects the source location [loc] on the file
     [filename] by eliminating relevant preprocessor-related locations.
@@ -230,18 +288,7 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
   in
   aux
 
-let fold_lexlocs f loc acc =
-  let rec aux: type t. t slt -> 'a -> 'a = fun loc -> match loc with
-    | Raw (s, e, _) -> f (s, e)
-    | Cpy { copied; _ } -> aux copied
-    | Rpl { old; _ } -> aux old
-    | Cat { left; right } -> fun acc -> acc |> aux left |> aux right
-  in
-  aux loc acc
-
-let has_lexloc p loc =
-  try fold_lexlocs (fun lexloc () -> if p lexloc then raise Exit) loc (); false
-  with Exit -> true
+(** {2 Pretty-printing} *)
 
 let retrieve_file_lines =
   let module Cache =
@@ -367,6 +414,8 @@ let pp_srcloc: srcloc Pretty.printer =
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
 
+(** {2 Constructors} *)
+
 (** [raw ~in_area_a lexloc] builds a raw source location from a pair of left-
     and right- lexing positions from the same file, optionally setting an
     [in_area_a] flag (that defaults to [false]) to indicate whether the location
@@ -386,21 +435,7 @@ let copy ~filename ~copyloc copied : srcloc =
 let replacement ~old ~new_ ~in_area_a ~replloc : srcloc =
   Rpl { old; new_; in_area_a; replloc }
 
-
-(* let is_copy = function *)
-(*   | Cpy _ -> true *)
-(*   | _ -> false *)
-
-(* let rec last_copy_origin: type t. t slt -> string option = function *)
-(*   | Raw _ -> None *)
-(*   | Rpl { replaced; _ } -> *)
-(*       last_copy_origin replaced *)
-(*   | Cat {left; right} -> *)
-(*       begin match last_copy_origin left with *)
-(*       | None -> last_copy_origin right *)
-(*       | _ as v -> v *)
-(*       end *)
-(*   | Cpy {copyloc = {filename; _}; _} -> Some filename *)
+(** {2 Composition & truncation} *)
 
 (** [may_join_as_single_raw a b] checks whether a lexloc {i l{_ a}} with a a
     left-hand lexing position [a] and a lexloc {i l{_ b}} with a right-hand
@@ -644,23 +679,6 @@ let copy_from ~filename ~copyloc { payload; loc } =
 
 (* --- *)
 
-module COPYLOCS = struct
-  (** Helper to record and format chains of copied libraries. *)
-
-  type t = copyloc list                                           (* reversed *)
-
-  let none: t = []
-  let append ~copyloc filename : t -> t = List.cons { filename; copyloc }
-  let mem: string -> t -> bool = fun f ->
-    List.exists (fun { filename; _ } -> filename = f)
-
-end
-
-(* TODO: move me to a better place. This type declaration has to be
-   shared by Common_ast and Common_preproc *)
-(* NB: not necessarily.  One refers to pre-processing concept, the other to the
-   semantics of some COBOL statements like INSPECT or EXAMINE. *)
-type leading_or_trailing =
-  | Leading
-  | Trailing
-[@@deriving show, ord]
+let no_copy: copylocs = []
+let new_copy ~copyloc filename = List.cons { filename; copyloc }
+let mem_copy f  = List.exists (fun { filename; _ } -> filename = f)

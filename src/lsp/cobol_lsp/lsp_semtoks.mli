@@ -11,21 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include module type of Parser_options
+val token_types: string list
+val token_modifiers: string list
 
-type 'm parsing_function
-  = ?source_format:Cobol_config.source_format_spec
-  -> ?config:Cobol_config.t
-  -> ?recovery:recovery
-  -> ?verbose:bool
-  -> ?show:[`Pending] list
-  -> libpath:string list
-  -> Cobol_preproc.input
-  -> (PTree.compilation_group option, 'm) parsed_result
-
-val parse: memory: 'm Parser_options.memory -> 'm parsing_function
-val parse_simple: Cobol_common.Behaviors.amnesic parsing_function
-val parse_with_tokens: Cobol_common.Behaviors.eidetic parsing_function
-
-val parsing_artifacts
-  : (_, Cobol_common.Behaviors.eidetic) parsed_result -> parsing_artifacts
+(* TODO: once we decide to fix the min OCaml version to >=4.14, we can upgrade
+   to lsp>=16, and avoid having to use an array below. *)
+val data
+  : filename: string
+  -> range: Lsp.Types.Range.t option
+  -> tokens: Cobol_parser.tokens_with_locs
+  -> pplog: Cobol_preproc.log
+  -> comments: Cobol_preproc.comments
+  -> ptree: Lsp_imports.PTREE.compilation_group
+  -> int array

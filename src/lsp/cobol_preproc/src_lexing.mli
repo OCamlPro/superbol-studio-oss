@@ -52,8 +52,10 @@ val decypher_source_format
   -> (Cobol_config.source_format, [> `SFUnknown of string ]) result
 
 type 'k state
-val init_state: bool -> 'k source_format -> 'k state
+
+val init_state: 'k source_format -> 'k state
 val diagnostics: _ state -> Cobol_common.Diagnostics.Set.t
+val comments: _ state -> Text.comments
 val source_format: 'k state -> 'k source_format
 val change_source_format: 'k state -> 'c source_format Cobol_common.Srcloc.with_loc
   -> ('c state, 'k state) result
@@ -62,6 +64,13 @@ val flush: 'a state -> 'a state * Text.text
 val flush_continued: ?force:bool -> 'a state -> 'a state
 val eof: 'a state -> Lexing.lexbuf -> 'a state
 val new_line: 'a state -> Lexing.lexbuf -> 'a state * Text.text
+
+val comment
+  : ?marker:string
+  -> ?floating:bool
+  -> 'a state
+  -> Lexing.lexbuf
+  -> 'a state * Text.text
 
 type alphanumeric_continuation =
   | Nominal

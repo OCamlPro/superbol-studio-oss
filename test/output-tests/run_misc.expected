@@ -274,65 +274,15 @@ run_misc.at-942-prog.cob:14.7-14.45:
   16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
 >> Error: Malformed or unknown compiler directive
 
-run_misc.at-942-prog.cob:15.44:
-  12   
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15 >            DISPLAY y (idx) WITH NO ADVANCING
-----                                               ^
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:16.7-16.13:
+run_misc.at-942-prog.cob:16.7-16.58:
   13          PROCEDURE DIVISION.
   14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
   15              DISPLAY y (idx) WITH NO ADVANCING
   16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
   18              DISPLAY y (idx) WITH NO ADVANCING
->> Warning: Invalid syntax
-
-run_misc.at-942-prog.cob:16.32:
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----                                   ^
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:16.33-16.41:
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----                                    ^^^^^^^^
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
->> Warning: Invalid syntax
-
-run_misc.at-942-prog.cob:16.41:
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----                                            ^
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:16.42-16.44:
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----                                             ^^
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_misc.at-942-prog.cob:17.7-17.47:
   14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
@@ -344,85 +294,15 @@ run_misc.at-942-prog.cob:17.7-17.47:
   19          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
 >> Error: Malformed or unknown compiler directive
 
-run_misc.at-942-prog.cob:16.58:
-  13          PROCEDURE DIVISION.
-  14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-----                                                             ^
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:18.11-18.18:
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18 >            DISPLAY y (idx) WITH NO ADVANCING
-----              ^^^^^^^
-  19          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-  20              DISPLAY y (idx) WITH NO ADVANCING
->> Warning: Invalid syntax
-
-run_misc.at-942-prog.cob:18.44:
-  15              DISPLAY y (idx) WITH NO ADVANCING
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18 >            DISPLAY y (idx) WITH NO ADVANCING
-----                                               ^
-  19          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-  20              DISPLAY y (idx) WITH NO ADVANCING
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:19.7-19.13:
+run_misc.at-942-prog.cob:19.7-19.44:
   16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
   17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
   18              DISPLAY y (idx) WITH NO ADVANCING
   19 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-----          ^^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   20              DISPLAY y (idx) WITH NO ADVANCING
   21              .
->> Warning: Invalid syntax
-
-run_misc.at-942-prog.cob:19.32:
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
-  19 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-----                                   ^
-  20              DISPLAY y (idx) WITH NO ADVANCING
-  21              .
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:19.33-19.41:
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
-  19 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-----                                    ^^^^^^^^
-  20              DISPLAY y (idx) WITH NO ADVANCING
-  21              .
->> Warning: Invalid syntax
-
-run_misc.at-942-prog.cob:19.41:
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
-  19 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-----                                            ^
-  20              DISPLAY y (idx) WITH NO ADVANCING
-  21              .
->> Hint: Missing .
-
-run_misc.at-942-prog.cob:19.42-19.44:
-  16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
-  17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
-  18              DISPLAY y (idx) WITH NO ADVANCING
-  19 >        >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
-----                                             ^^
-  20              DISPLAY y (idx) WITH NO ADVANCING
-  21              .
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:974:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:996:0
@@ -1079,26 +959,6 @@ run_misc.at-3626-prog.cob:5.6-5.7:
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Unexpected indicator: `>'
 
-run_misc.at-3626-prog.cob:7.6-7.7:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3626-prog.cob:9.6-9.7:
-   6              IF "1" NOT < "a"
-   7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-   8              IF "a" NOT < "1"
-   9 >       >>END-IF
-----         ^
-  10                 DISPLAY "ERROR" END-DISPLAY
-  11              END-IF.
->> Error: Unexpected indicator: `>'
-
 run_misc.at-3626-prog.cob:5.7-5.8:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
@@ -1108,6 +968,16 @@ run_misc.at-3626-prog.cob:5.7-5.8:
    6              IF "1" NOT < "a"
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Invalid syntax
+
+run_misc.at-3626-prog.cob:7.6-7.7:
+   4          PROCEDURE        DIVISION.
+   5         >>IF   EXPECT-ORDER  =  'ASCII'
+   6              IF "1" NOT < "a"
+   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
+----         ^
+   8              IF "a" NOT < "1"
+   9         >>END-IF
+>> Error: Unexpected indicator: `>'
 
 run_misc.at-3626-prog.cob:6.27:
    3          PROGRAM-ID.      prog.
@@ -1169,6 +1039,16 @@ run_misc.at-3626-prog.cob:7.27-7.28:
    9         >>END-IF
 >> Warning: Invalid syntax
 
+run_misc.at-3626-prog.cob:9.6-9.7:
+   6              IF "1" NOT < "a"
+   7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
+   8              IF "a" NOT < "1"
+   9 >       >>END-IF
+----         ^
+  10                 DISPLAY "ERROR" END-DISPLAY
+  11              END-IF.
+>> Error: Unexpected indicator: `>'
+
 run_misc.at-3626-prog.cob:9.7-9.8:
    6              IF "1" NOT < "a"
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
@@ -1199,36 +1079,6 @@ run_misc.at-3663-prog.cob:12.6-12.7:
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Unexpected indicator: `>'
 
-run_misc.at-3663-prog.cob:14.6-14.7:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3663-prog.cob:16.6-16.7:
-  13              IF G NOT = "12345abcde"
-  14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  15              IF G NOT = "abcde12345"
-  16 >       >>ELSE           *>  =  'NATIVE'
-----         ^
-  17              IF NOT G = "12345abcde" OR "abcde12345"
-  18         >>END-IF
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3663-prog.cob:18.6-18.7:
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
-  17              IF NOT G = "12345abcde" OR "abcde12345"
-  18 >       >>END-IF
-----         ^
-  19                 DISPLAY G END-DISPLAY
-  20              END-IF.
->> Error: Unexpected indicator: `>'
-
 run_misc.at-3663-prog.cob:12.7-12.8:
    9              03 X         PIC X.
   10          PROCEDURE        DIVISION.
@@ -1238,6 +1088,16 @@ run_misc.at-3663-prog.cob:12.7-12.8:
   13              IF G NOT = "12345abcde"
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Invalid syntax
+
+run_misc.at-3663-prog.cob:14.6-14.7:
+  11              SORT TBL ASCENDING KEY X.
+  12         >>IF   EXPECT-ORDER  =  'ASCII'
+  13              IF G NOT = "12345abcde"
+  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
+----         ^
+  15              IF G NOT = "abcde12345"
+  16         >>ELSE           *>  =  'NATIVE'
+>> Error: Unexpected indicator: `>'
 
 run_misc.at-3663-prog.cob:13.34:
   10          PROCEDURE        DIVISION.
@@ -1299,6 +1159,16 @@ run_misc.at-3663-prog.cob:14.27-14.28:
   16         >>ELSE           *>  =  'NATIVE'
 >> Warning: Invalid syntax
 
+run_misc.at-3663-prog.cob:16.6-16.7:
+  13              IF G NOT = "12345abcde"
+  14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
+  15              IF G NOT = "abcde12345"
+  16 >       >>ELSE           *>  =  'NATIVE'
+----         ^
+  17              IF NOT G = "12345abcde" OR "abcde12345"
+  18         >>END-IF
+>> Error: Unexpected indicator: `>'
+
 run_misc.at-3663-prog.cob:16.7-16.8:
   13              IF G NOT = "12345abcde"
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
@@ -1308,6 +1178,16 @@ run_misc.at-3663-prog.cob:16.7-16.8:
   17              IF NOT G = "12345abcde" OR "abcde12345"
   18         >>END-IF
 >> Error: Invalid syntax
+
+run_misc.at-3663-prog.cob:18.6-18.7:
+  15              IF G NOT = "abcde12345"
+  16         >>ELSE           *>  =  'NATIVE'
+  17              IF NOT G = "12345abcde" OR "abcde12345"
+  18 >       >>END-IF
+----         ^
+  19                 DISPLAY G END-DISPLAY
+  20              END-IF.
+>> Error: Unexpected indicator: `>'
 
 run_misc.at-3663-prog.cob:18.8:
   15              IF G NOT = "abcde12345"
@@ -1371,26 +1251,6 @@ run_misc.at-3961-prog.cob:20.6-20.7:
   22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Unexpected indicator: `>'
 
-run_misc.at-3961-prog.cob:22.6-22.7:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3961-prog.cob:24.6-24.7:
-  21              IF I NOT = 3
-  22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  23              IF I NOT = 8
-  24 >       >>END-IF
-----         ^
-  25                 DISPLAY "ERROR" END-DISPLAY
-  26              STOP RUN.
->> Error: Unexpected indicator: `>'
-
 run_misc.at-3961-prog.cob:20.7-20.8:
   17                 WHEN K (I) = KK
   18                    CONTINUE
@@ -1400,6 +1260,16 @@ run_misc.at-3961-prog.cob:20.7-20.8:
   21              IF I NOT = 3
   22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
 >> Error: Invalid syntax
+
+run_misc.at-3961-prog.cob:22.6-22.7:
+  19              END-SEARCH
+  20         >>IF   EXPECT-ORDER  =  'ASCII'
+  21              IF I NOT = 3
+  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
+----         ^
+  23              IF I NOT = 8
+  24         >>END-IF
+>> Error: Unexpected indicator: `>'
 
 run_misc.at-3961-prog.cob:21.23:
   18                    CONTINUE
@@ -1460,6 +1330,16 @@ run_misc.at-3961-prog.cob:22.27-22.28:
   23              IF I NOT = 8
   24         >>END-IF
 >> Warning: Invalid syntax
+
+run_misc.at-3961-prog.cob:24.6-24.7:
+  21              IF I NOT = 3
+  22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
+  23              IF I NOT = 8
+  24 >       >>END-IF
+----         ^
+  25                 DISPLAY "ERROR" END-DISPLAY
+  26              STOP RUN.
+>> Error: Unexpected indicator: `>'
 
 run_misc.at-3961-prog.cob:24.7-24.8:
   21              IF I NOT = 3
@@ -5303,26 +5183,6 @@ run_misc.at-10739-reference_tmpl:73.6-73.7:
   75   01        X                               000005441
 >> Error: Unexpected indicator: `E'
 
-run_misc.at-10739-reference_tmpl:81.6-81.7:
-  78   END OF DUMP - sub1
-  79   **********************
-  80   
-  81 > Dump Program-Id sub2 from sub2.cob compiled MMM DD YYYY HH:MM:SS
-----         ^
-  82   
-  83   WORKING-STORAGE
->> Error: Unexpected indicator: `r'
-
-run_misc.at-10739-reference_tmpl:83.6-83.7:
-  80   
-  81   Dump Program-Id sub2 from sub2.cob compiled MMM DD YYYY HH:MM:SS
-  82   
-  83 > WORKING-STORAGE
-----         ^
-  84   **********************
-  85   77        RETURN-CODE                     +000000000
->> Error: Unexpected indicator: `G'
-
 run_misc.at-10739-reference_tmpl:56.41-56.72:
   53     05      TSTTAIL1                        X  _
   54                                        1 x 5811
@@ -5342,6 +5202,26 @@ run_misc.at-10739-reference_tmpl:70.41-70.72:
   71                                     trailing LOW-VALUES
   72   
 >> Error: Missing continuation of `Quick brown fox jumped over th'
+
+run_misc.at-10739-reference_tmpl:81.6-81.7:
+  78   END OF DUMP - sub1
+  79   **********************
+  80   
+  81 > Dump Program-Id sub2 from sub2.cob compiled MMM DD YYYY HH:MM:SS
+----         ^
+  82   
+  83   WORKING-STORAGE
+>> Error: Unexpected indicator: `r'
+
+run_misc.at-10739-reference_tmpl:83.6-83.7:
+  80   
+  81   Dump Program-Id sub2 from sub2.cob compiled MMM DD YYYY HH:MM:SS
+  82   
+  83 > WORKING-STORAGE
+----         ^
+  84   **********************
+  85   77        RETURN-CODE                     +000000000
+>> Error: Unexpected indicator: `G'
 
 run_misc.at-10739-reference_tmpl:116.41-116.72:
  113     05      TSTTAIL1                        X  _
@@ -5573,55 +5453,15 @@ run_misc.at-11129-prog.cob:106.43-106.49:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11365:0
-run_misc.at-11365-caller.cob:9.7-9.12:
+run_misc.at-11365-caller.cob:9.7-9.34:
    6          MAIN-LINE.
    7   
    8              PERFORM DO-CHECK
    9 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   10         *>   minimal side-test for performance comparisons
   11              PERFORM DO-CHECK 10000 TIMES
->> Error: Invalid syntax
-
-run_misc.at-11365-caller.cob:9.23:
-   6          MAIN-LINE.
-   7   
-   8              PERFORM DO-CHECK
-   9 >        >> IF CHECK-PERF IS DEFINED
-----                          ^
-  10         *>   minimal side-test for performance comparisons
-  11              PERFORM DO-CHECK 10000 TIMES
->> Hint: Missing TIMES .
-
-run_misc.at-11365-caller.cob:9.24-9.26:
-   6          MAIN-LINE.
-   7   
-   8              PERFORM DO-CHECK
-   9 >        >> IF CHECK-PERF IS DEFINED
-----                           ^^
-  10         *>   minimal side-test for performance comparisons
-  11              PERFORM DO-CHECK 10000 TIMES
->> Error: Invalid syntax
-
-run_misc.at-11365-caller.cob:9.34:
-   6          MAIN-LINE.
-   7   
-   8              PERFORM DO-CHECK
-   9 >        >> IF CHECK-PERF IS DEFINED
-----                                     ^
-  10         *>   minimal side-test for performance comparisons
-  11              PERFORM DO-CHECK 10000 TIMES
->> Hint: Missing .
-
-run_misc.at-11365-caller.cob:11.11-11.18:
-   8              PERFORM DO-CHECK
-   9          >> IF CHECK-PERF IS DEFINED
-  10         *>   minimal side-test for performance comparisons
-  11 >            PERFORM DO-CHECK 10000 TIMES
-----              ^^^^^^^
-  12          >> END-IF
-  13              DISPLAY 'DONE' UPON SYSERR WITH NO ADVANCING
->> Warning: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_misc.at-11365-caller.cob:12.7-12.16:
    9          >> IF CHECK-PERF IS DEFINED
@@ -5631,7 +5471,7 @@ run_misc.at-11365-caller.cob:12.7-12.16:
 ----          ^^^^^^^^^
   13              DISPLAY 'DONE' UPON SYSERR WITH NO ADVANCING
   14              GOBACK.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11339:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11409:0
