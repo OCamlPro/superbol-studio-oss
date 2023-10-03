@@ -137,7 +137,40 @@ let setup_input ~filename contents =
 let delete_file ~filename =
   Ez_file.FileString.remove filename
 
-let free_format_regexp = Str.regexp {re|\(^-free\|[ \t]-free\b\)|re}
+let free_flag_regexp = Str.regexp {re|\(^-free\|[ \t]-free\b\)|re}
+let fixd_format_regexp = Str.regexp_string "-fformat=fixed"
+let free_format_regexp = Str.regexp_string "-fformat=free"
+let cb85_format_regexp = Str.regexp_string "-fformat=cobol85"
+let vrbl_format_regexp = Str.regexp_string "-fformat=variable"
+let xopn_format_regexp = Str.regexp_string "-fformat=xopen"
+let xcrd_format_regexp = Str.regexp_string "-fformat=xcard"
+let crt__format_regexp = Str.regexp_string "-fformat=crt"
+let term_format_regexp = Str.regexp_string "-fformat=terminal"
+let cblx_format_regexp = Str.regexp_string "-fformat=cobolx"
+let auto_format_regexp = Str.regexp_string "-fformat=auto"
+
+let guess_source_format ~filename ~command =   (* hackish detection of format *)
+  let filename_suffixp suffix =
+    EzString.ends_with ~suffix filename
+  and command_matchp regexp =
+    try ignore (Str.search_forward regexp command 0); true
+    with Not_found -> false
+  in
+  Option.value ~default:Cobol_config.(SF SFFixed) @@
+  List.find_map (fun (p, f) -> if Lazy.force p then Some f else None) [
+    lazy (filename_suffixp "free.cob"),       Cobol_config.(SF SFFree);
+    lazy (command_matchp free_flag_regexp),   Cobol_config.(SF SFFree);
+    lazy (command_matchp fixd_format_regexp), Cobol_config.(SF SFFixed);
+    lazy (command_matchp free_format_regexp), Cobol_config.(SF SFFree);
+    lazy (command_matchp cb85_format_regexp), Cobol_config.(SF SFFixed);
+    lazy (command_matchp vrbl_format_regexp), Cobol_config.(SF SFVariable);
+    lazy (command_matchp xopn_format_regexp), Cobol_config.(SF SFXOpen);
+    lazy (command_matchp xcrd_format_regexp), Cobol_config.(SF SFxCard);
+    lazy (command_matchp term_format_regexp), Cobol_config.(SF SFTrm);
+    lazy (command_matchp cblx_format_regexp), Cobol_config.(SF SFCOBOLX);
+    lazy (command_matchp auto_format_regexp), Cobol_config.Auto;
+  ]
+
 let do_check_parse (test_filename, contents, _, { check_loc;
                                                   check_command; _ }) =
   let filename = filename_for_loc test_filename check_loc in
@@ -150,13 +183,7 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   let loc = Autofonce_m4.M4Printer.string_of_location check_loc in
   Pretty.error "Considering: %a... " pp_relloc loc;
   Pretty.out   "Considering: %a@\n" pp_relloc loc;
-  let source_format =                          (* hackish detection of format *)
-    if EzString.ends_with ~suffix:"free.cob" filename ||
-       try ignore (Str.search_forward free_format_regexp check_command 0); true
-       with Not_found -> false
-    then Cobol_config.(SF SFFree)
-    else Cobol_config.(SF SFFixed)
-  in
+  let source_format = guess_source_format ~filename ~command:check_command in
   let parse_simple input =
     input |>
     Cobol_preproc.preprocessor

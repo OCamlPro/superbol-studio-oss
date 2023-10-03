@@ -4613,5 +4613,7 @@ syn_misc.at-8199-prog.cob:7.7-7.16:
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8235:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8284:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8286:0
+>> Warning: Source format `auto` is not supported yet, using `fixed`
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8283:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8340:0
