@@ -35,10 +35,10 @@ let srclex_diags (Plx (pl, _)) =
   Src_lexing.diagnostics pl
 let srclex_comments (Plx (pl, _)) =
   Src_lexing.comments pl
+let source_format (Plx (pl, _)) =
+  Src_format.SF (Src_lexing.source_format pl)
 let srclex_newline_cnums (Plx (pl, _)) =
   Src_lexing.newline_cnums pl
-let srclex_source_format (Plx (pl, _)) =
-  Src_lexing.(source_format_spec @@ source_format pl)
 
 type 'k source_line =
   | Line: 'k srclexer * text -> 'k source_line
@@ -81,16 +81,16 @@ let fold_source_lines pl f acc =
 (* --- *)
 
 let with_source_format
-  : 'k Src_lexing.source_format with_loc -> (any_srclexer as 'x) -> 'x
+  : 'k Src_format.source_format with_loc -> (any_srclexer as 'x) -> 'x
   = fun format ((Plx (s, lexbuf)) as pl) ->
-    if Src_lexing.(same_source_formats @@ source_format s) ~&format
+    if Src_format.equal (Src_lexing.source_format s) ~&format
     then pl
     else match Src_lexing.change_source_format s format with
       | Ok s -> Plx (s, lexbuf)
       | Error s -> Plx (s, lexbuf)
 
 let make_srclex make_lexing ?filename ~source_format input =
-  let SF source_format = Src_lexing.select_source_format source_format in
+  let SF source_format = Src_format.from_config source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
@@ -127,13 +127,12 @@ let srclex_restart_on_file ?position filename =
 (* SOURCE FORMAT *)
 
 type lexing_directive =
-  | LexDirSource
-    : 'k Src_lexing.source_format with_loc -> lexing_directive [@@unboxed]
+  | LexDirSource:
+      'k Src_format.source_format with_loc -> lexing_directive         [@@unboxed]
 
 let cdir_source_format ~dialect format =
-  match Src_lexing.decypher_source_format ~dialect ~&format with
-  | Ok sf ->
-      let SF sf = Src_lexing.select_source_format sf in
+  match Src_format.decypher ~dialect ~&format with
+  | Ok (SF sf) ->
       DIAGS.some_result @@ LexDirSource (sf &@<- format)
   | Error (`SFUnknown f) ->
       DIAGS.no_result

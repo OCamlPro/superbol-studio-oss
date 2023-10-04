@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 module Src_overlay = Src_overlay
-module Src_lexing = Src_lexing
+module Src_format = Src_format
 
 module Text = Text
 module Text_printer = Text_printer

@@ -48,7 +48,7 @@ module Make (Config: Cobol_config.T): sig
       when needed.  *)
   val init
     : 'a memory
-    -> context_sensitive_tokens:Text_lexer.TokenHandles.t
+    -> context_sensitive_tokens: Text_lexer.TokenHandles.t
     -> 'a state
 
   val diagnostics
@@ -60,7 +60,7 @@ module Make (Config: Cobol_config.T): sig
     -> tokens Lazy.t
 
   val tokenize_text
-    : source_format: _ Cobol_preproc.Src_lexing.source_format
+    : source_format: Cobol_preproc.Src_format.any
     -> 'a state
     -> TEXT.t
     -> (tokens, [>`MissingInputs | `ReachedEOF of tokens]) result * 'a state

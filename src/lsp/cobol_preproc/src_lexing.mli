@@ -11,54 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Paging *)
-
-type free = |
-type fixed = |
-type _ paging =
-  | FreePaging: free paging
-  | FixedWidth: fixed_paging_params -> fixed paging
-and fixed_paging_params =
-  {
-    cut_at_col: int;
-    alphanum_padding: char option;
-  }
-
-(* Actual format and indicator positioning *)
-
-type 'k source_format = 'k indicator_position * 'k paging
-and _ indicator_position =
-  |    NoIndic:  free indicator_position
-  | FixedIndic: fixed indicator_position
-  | XOpenIndic: fixed indicator_position
-  |   CRTIndic: fixed indicator_position
-  |   TrmIndic: fixed indicator_position
-  |  CBLXIndic: fixed indicator_position
-and any_source_format =
-  | SF: 'k source_format -> any_source_format                          [@@unboxed]
-
-type comment_entry_termination =                  (* skip until... *)
-  | Newline                                       (* ... newline *)
-  | Period                                        (* ... next period (unused) *)
-  | AreaB of { first_area_b_column: int }         (* ... next word in area A *)
-
-val select_source_format: Cobol_config.source_format -> any_source_format
-val source_format_spec: 'k source_format -> Cobol_config.source_format
-val same_source_formats: 'k source_format -> 'r source_format -> bool
-val comment_entry_termination: 'k source_format -> comment_entry_termination
-val decypher_source_format
-  : dialect:Cobol_config.dialect
-  -> string
-  -> (Cobol_config.source_format, [> `SFUnknown of string ]) result
-
 type 'k state
 
-val init_state: 'k source_format -> 'k state
+val init_state: 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Cobol_common.Diagnostics.Set.t
 val comments: _ state -> Text.comments
 val newline_cnums: _ state -> int list
-val source_format: 'k state -> 'k source_format
-val change_source_format: 'k state -> 'c source_format Cobol_common.Srcloc.with_loc
+val source_format: 'k state -> 'k Src_format.source_format
+val change_source_format
+  : 'k state
+  -> 'c Src_format.source_format Cobol_common.Srcloc.with_loc
   -> ('c state, 'k state) result
 val allow_debug: 'a state -> bool
 val flush: 'a state -> 'a state * Text.text
@@ -81,37 +43,39 @@ val continue_quoted_alphanum
   : 'a state
   -> alphanumeric_continuation
 
-val eqeq :
-  fixed state ->
-  ktkd:(fixed state -> Lexing.lexbuf -> 'a) ->
-  knom:(fixed state -> Lexing.lexbuf -> 'a) -> Lexing.lexbuf -> 'a
-val eqeq' :
-  k:('a state -> Lexing.lexbuf -> 'b) ->
-  'a state -> Lexing.lexbuf -> 'b
+val eqeq
+  : (Src_format.fixed state as 's)
+  -> ktkd:('s -> Lexing.lexbuf -> 'a)
+  -> knom:('s -> Lexing.lexbuf -> 'a)
+  -> Lexing.lexbuf -> 'a
+val eqeq'
+  : k:('a state -> Lexing.lexbuf -> 'b)
+  -> 'a state -> Lexing.lexbuf -> 'b
 
-val cdir_word :
-  fixed state ->
-  ktkd:(fixed state -> Lexing.lexbuf -> 'a) ->
-  knom:(fixed state -> Lexing.lexbuf -> 'a) -> Lexing.lexbuf -> 'a
-val cdir_word' :
-  k:('a state -> Lexing.lexbuf -> 'b) ->
-  'a state -> Lexing.lexbuf -> 'b
-val text_word :
-  ?cont:bool ->
-  ktkd:(fixed state -> Lexing.lexbuf -> 'a) ->
-  knom:(fixed state -> Lexing.lexbuf -> 'a) ->
-  fixed state -> Lexing.lexbuf -> 'a
-val text_word' :
-  k:('a state -> Lexing.lexbuf -> 'b) ->
-  'a state -> Lexing.lexbuf -> 'b
-val alphanum_lit :
-  ?doubled_opener:bool ->
-  ktkd:(fixed state -> Lexing.lexbuf -> 'a) ->
-  knom:(fixed state -> Lexing.lexbuf -> 'a) ->
-  fixed state -> Lexing.lexbuf -> 'a
-val alphanum_lit' :
-  k:('a state -> Lexing.lexbuf -> 'b) ->
-  'a state -> Lexing.lexbuf -> 'b
+val cdir_word
+  : (Src_format.fixed state as 's)
+  -> ktkd:('s -> Lexing.lexbuf -> 'a)
+  -> knom:('s -> Lexing.lexbuf -> 'a)
+  -> Lexing.lexbuf -> 'a
+val cdir_word'
+  : k:('a state -> Lexing.lexbuf -> 'b)
+  -> 'a state -> Lexing.lexbuf -> 'b
+val text_word
+  : ?cont:bool
+  -> ktkd:('s -> Lexing.lexbuf -> 'a)
+  -> knom:('s -> Lexing.lexbuf -> 'a)
+  -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a
+val text_word'
+  : k:('a state -> Lexing.lexbuf -> 'b)
+  -> 'a state -> Lexing.lexbuf -> 'b
+val alphanum_lit
+  : ?doubled_opener:bool
+  -> ktkd:('s -> Lexing.lexbuf -> 'a)
+  -> knom:('s -> Lexing.lexbuf -> 'a)
+  -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a
+val alphanum_lit'
+  : k:('a state -> Lexing.lexbuf -> 'b)
+  -> 'a state -> Lexing.lexbuf -> 'b
 
 (* --- *)
 

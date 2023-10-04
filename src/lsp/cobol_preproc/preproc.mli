@@ -25,7 +25,7 @@ and any_srclexer =
 
 type lexing_directive =
   | LexDirSource:
-      'k Src_lexing.source_format with_loc -> lexing_directive [@@unboxed]
+      'k Src_format.source_format with_loc -> lexing_directive         [@@unboxed]
 
 (* COPY/REPLACING *)
 
@@ -103,15 +103,15 @@ val apply_replacing
 
 (** {3 Source format} *)
 
+val source_format
+  : any_srclexer
+  -> Src_format.any
 val cdir_source_format
   : dialect: Cobol_config.dialect
   -> string with_loc
   -> lexing_directive option with_diags
-val srclex_source_format
-  : any_srclexer
-  -> Cobol_config.source_format
 val with_source_format
-  : 'k Src_lexing.source_format with_loc
+  : 'k Src_format.source_format with_loc
   -> any_srclexer
   -> any_srclexer
 

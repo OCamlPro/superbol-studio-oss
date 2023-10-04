@@ -160,8 +160,7 @@ module Make (Config: Cobol_config.T) = struct
     let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
     assert (text <> []);
     (* Note: this is the source format in use at the end of the sentence. *)
-    let Plx (pl, _) = Cobol_preproc.srclexer pp in
-    let source_format = Cobol_preproc.Src_lexing.source_format pl in
+    let source_format = Cobol_preproc.source_format pp in
     match Tokzr.tokenize_text ~source_format tokzr text with
     | Error `MissingInputs, tokzr ->
         produce_tokens (update_tokzr ps tokzr)

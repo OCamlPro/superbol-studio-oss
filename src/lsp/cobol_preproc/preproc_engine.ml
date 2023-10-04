@@ -62,7 +62,7 @@ let diags { diags; srclex; _ } =
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
 let log { pplog; _ } = pplog
-let srclexer { srclex; _ } = srclex
+let source_format { srclex; _ } = Preproc.source_format srclex
 let position { srclex; _ } = Preproc.srclex_pos srclex
 let comments { srclex; _ } = Preproc.srclex_comments srclex
 let newline_cnums { srclex; _ } = Preproc.srclex_newline_cnums srclex
@@ -135,7 +135,8 @@ let preprocessor ?(verbose = false) input = function
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
-      let source_format = Preproc.srclex_source_format from.srclex in
+      let SF source_format = Preproc.source_format from.srclex in
+      let source_format = Src_format.to_config source_format in
       {
         from with
         buff = [];

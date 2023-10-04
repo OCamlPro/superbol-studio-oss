@@ -60,7 +60,7 @@ let lexdir_microfocus_phrase :=
 
 let lexdir_source_format :=
   | CDIR_SOURCE; FORMAT?; IS?; _free = loc(FREE);
-    { let SF sf = Src_lexing.select_source_format Cobol_config.SFFree in
+    { let SF sf = Src_format.from_config Cobol_config.SFFree in
       Cobol_common.Diagnostics.some_result @@
         Preproc.LexDirSource (sf &@<- _free) }
   | CDIR_SOURCE; FORMAT?; IS?; i = text_word;

@@ -114,8 +114,9 @@ let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
      deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
   and start_pos = Cobol_common.Srcloc.start_pos in
-  let comment_entry_termination
-    = Cobol_preproc.Src_lexing.comment_entry_termination source_format
+  let comment_entry_termination =
+    let Cobol_preproc.Src_format.SF sf = source_format in
+    Cobol_preproc.Src_format.comment_entry_termination sf
   and info_word = function
     | WORD w ->
         INFO_WORD w
