@@ -159,6 +159,8 @@ type closer =
   | BRACE
   | QUOTE
 
+exception Unexpected_eol
+
 let read ~path filename =
 
   let file = Filename.basename filename in
@@ -174,13 +176,13 @@ let read ~path filename =
     Buffer.clear b;
     if s = "" then [] else [ STRING s ]
   in
-  let parse_line ic line =
+  let parse_line_exn ic line =
     let len = String.length line in
     let b = Buffer.create len in
     let rec iter i braced =
       if i = len then
         if braced <> EOL then
-          INPUT.error ~ic "unexpected end of line"
+          raise Unexpected_eol
         else
           len,
           maybe b
@@ -271,6 +273,13 @@ let read ~path filename =
     if i<len then
       INPUT.error ~ic "unbalanced ending brace";
     line
+  in
+  let parse_line ic arg =
+    try
+      parse_line_exn ic arg
+    with
+    | Unexpected_eol ->
+      INPUT.error ~ic "unexpected end of line"
   in
   let parse_level ic arg =
     let len = String.length arg in
@@ -498,8 +507,21 @@ let read ~path filename =
         if line = "" then
           iter_lines ic ( EMPTY_LINE :: rev ) stack
         else
-          let line = parse_line ic line in
-          iter_lines ic ( LINE line :: rev ) stack
+          parse_line_rec true ic line rev stack
+
+  and parse_line_rec again ic line rev stack =
+    match parse_line_exn ic line with
+    | line -> iter_lines ic ( LINE line :: rev ) stack
+    | exception Unexpected_eol ->
+      if again then
+        match INPUT.input_line ic with
+        | exception _ ->
+          INPUT.close_in ic;
+          rev, stack
+        | line2 ->
+          parse_line_rec false ic (line ^ "\n" ^ line2) rev stack
+      else
+        INPUT.error ~ic "unexpected end of line after continuation"
 
   and end_item ic rev stack item_arg =
     match stack with
