@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-0b8b0a34a1a2cc1f1b27ccb09438599a:.
+2bd67fa4ae612570df974dbd6cb91edc:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-ce7b96b842d3f265df300ce6c72e52d4:dune-project
+a56e5e78f9707d2e306293c9466e84b0:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
@@ -185,7 +185,7 @@ dcf0ebaa8b12787df9efcaa0ce8cbbe5:opam/package-json.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-c86beae68d4d0173c716a8449fc2dfaf:opam/superbol_free_lib.opam
+e0cc097fe8a8d66f719468909a2ceaab:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_testutils.opam
@@ -400,7 +400,7 @@ bb6994bfe27f29a441abee11c82b032f:src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
-562cdec92233a9d9156b6db06c636cde:src/lsp/superbol_free_lib/dune
+677e1d075fd0901268bc712c9af5325b:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/version.mlt

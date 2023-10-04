@@ -5,11 +5,11 @@
   (public_name superbol_free_lib)
   (wrapped true)
   ; use field 'dune-libraries' to add libraries without opam deps
-  (libraries vscode-json ez_file ez_cmdliner cobol_typeck cobol_parser cobol_lsp cobol_indent cobol_common cobol_ast )
+  (libraries vscode-json ez_file ez_cmdliner ez_api cobol_typeck cobol_parser cobol_lsp cobol_indent cobol_common cobol_ast )
   ; use field 'dune-flags' to set this value
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
-  (preprocess (pps ppx_cobcflags))
+  (preprocess (pps ppx_cobcflags ppx_deriving_encoding))
   
   )
 

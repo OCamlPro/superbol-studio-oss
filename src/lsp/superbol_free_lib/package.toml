@@ -43,7 +43,7 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_cobcflags"
+preprocess = "pps ppx_cobcflags ppx_deriving_encoding"
 
 # files to skip while updating at package level
 skip = ["index.mld", "main.ml" ]
@@ -62,6 +62,7 @@ cobol_typeck = "version"
 ez_file = ">=0.3"
 ez_cmdliner = "0.3.0"
 vscode-json = "version"
+ez_api = "2.0"
 
 # package tools dependencies
 [tools]
