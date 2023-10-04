@@ -56,16 +56,16 @@ let equal
     |  CBLXIndic,  CBLXIndic -> p1 = p2
     | _ -> false
 
-let to_config
-    (type k) : k source_format -> Cobol_config.source_format = function
-  |    NoIndic, _ -> SFFree
-  | FixedIndic, FixedWidth p when p == fixed_paging -> SFFixed
-  | FixedIndic, FixedWidth p when p == variable_paging -> SFVariable
-  | FixedIndic, FixedWidth _ (* when p == xcard_paging *) -> SFxCard
-  | XOpenIndic, FixedWidth _ (* when p == xopen_paging *) -> SFXOpen
-  |   CRTIndic, FixedWidth _ (* when p == crt_paging *) -> SFCRT
-  |   TrmIndic, FixedWidth _ (* when p == terminal_paging *) -> SFTrm
-  |  CBLXIndic, FixedWidth _ (* when p == cobolx_paging *) -> SFCOBOLX
+(* let to_config *)
+(*     (type k) : k source_format -> Cobol_config.source_format = function *)
+(*   |    NoIndic, _ -> SFFree *)
+(*   | FixedIndic, FixedWidth p when p == fixed_paging -> SFFixed *)
+(*   | FixedIndic, FixedWidth p when p == variable_paging -> SFVariable *)
+(*   | FixedIndic, FixedWidth _ (\* when p == xcard_paging *\) -> SFxCard *)
+(*   | XOpenIndic, FixedWidth _ (\* when p == xopen_paging *\) -> SFXOpen *)
+(*   |   CRTIndic, FixedWidth _ (\* when p == crt_paging *\) -> SFCRT *)
+(*   |   TrmIndic, FixedWidth _ (\* when p == terminal_paging *\) -> SFTrm *)
+(*   |  CBLXIndic, FixedWidth _ (\* when p == cobolx_paging *\) -> SFCOBOLX *)
 
 let from_config
   : Cobol_config.source_format -> any = function

@@ -90,7 +90,7 @@ let with_source_format
       | Error s -> Plx (s, lexbuf)
 
 let make_srclex make_lexing ?filename ~source_format input =
-  let SF source_format = Src_format.from_config source_format in
+  let Src_format.SF source_format = source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;

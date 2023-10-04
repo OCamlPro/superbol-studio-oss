@@ -46,7 +46,7 @@ val next_sentence: preprocessor -> Text.text * preprocessor
 val decide_source_format
   : string
   -> Cobol_config.source_format_spec
-  -> Cobol_config.source_format Cobol_common.Diagnostics.with_diags
+  -> Src_format.any Cobol_common.Diagnostics.with_diags
 
 val lex_file
   : source_format: Cobol_config.source_format_spec

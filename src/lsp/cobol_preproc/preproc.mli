@@ -118,17 +118,17 @@ val with_source_format
 (** {3 Instantiation} *)
 
 val srclex_from_file
-  : source_format:Cobol_config.source_format
+  : source_format: Src_format.any
   -> string
   -> any_srclexer
 val srclex_from_string
   : ?filename: string
-  -> source_format:Cobol_config.source_format
+  -> source_format: Src_format.any
   -> string
   -> any_srclexer
 val srclex_from_channel
   : ?filename: string
-  -> source_format:Cobol_config.source_format
+  -> source_format: Src_format.any
   -> in_channel
   -> any_srclexer
 

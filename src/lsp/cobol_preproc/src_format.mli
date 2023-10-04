@@ -42,12 +42,14 @@ type comment_entry_termination =                  (* skip until... *)
   | Period                                        (* ... next period (unused) *)
   | AreaB of { first_area_b_column: int }         (* ... next word in area A *)
 
-val from_config: Cobol_config.source_format -> any
-val to_config: 'k source_format -> Cobol_config.source_format
+(* --- *)
+
 val equal: 'k source_format -> 'r source_format -> bool
 
+val from_config: Cobol_config.source_format -> any
+(* val to_config: 'k source_format -> Cobol_config.source_format *)
 val decypher
-  : dialect:Cobol_config.dialect
+  : dialect: Cobol_config.dialect
   -> string
   -> (any, [> `SFUnknown of string ]) result
 

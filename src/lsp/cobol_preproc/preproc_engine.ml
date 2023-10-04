@@ -27,11 +27,11 @@ type input =
 
 let decide_source_format _input
   : Cobol_config.source_format_spec ->
-    Cobol_config.source_format with_diags = function
+    Src_format.any with_diags = function
   | SF result ->
-      { result; diags = DIAGS.Set.none }
+      { result = Src_format.from_config result; diags = DIAGS.Set.none }
   | Auto ->
-      { result = SFFixed;
+      { result = Src_format.from_config SFFixed;
         diags = DIAGS.(Acc.warn Set.none) "Source format `auto` is not supported \
                                            yet, using `fixed`" }
 
@@ -128,8 +128,7 @@ let preprocessor input = function
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
-      let SF source_format = Preproc.source_format from.srclex in
-      let source_format = Src_format.to_config source_format in
+      let source_format = Preproc.source_format from.srclex in
       {
         from with
         buff = [];
