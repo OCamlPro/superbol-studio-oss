@@ -102,10 +102,7 @@ module Make (Config: Cobol_config.T) = struct
       show: [`Pending] list;
     }
 
-  (* TODO: reset/restore text lexer's state w.r.t reserved/alias and
-     context-stack will be needed when we want a persistent parser state.  Best
-     place for this is probaly in the tokenizer.*)
-
+  (** Initializes a parser state, given a preprocessor. *)
   let make_parser
       (type m) Parser_options.{ verbose; show; recovery }
       ?(show_if_verbose = [`Tks; `Ctx]) ~(tokenizer_memory: m memory) pp =
@@ -156,6 +153,8 @@ module Make (Config: Cobol_config.T) = struct
   let all_diags { preproc = { pp; tokzr; _ }; _ } =
     DIAGS.Set.union (Cobol_preproc.diags pp) @@ Tokzr.diagnostics tokzr
 
+  (* --- *)
+
   let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
     let text, pp = Cobol_preproc.next_sentence ps.preproc.pp in
     let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
@@ -172,28 +171,28 @@ module Make (Config: Cobol_config.T) = struct
           Pretty.error "Tks: %a@." Text_tokenizer.pp_tokens tokens;
         update_tokzr ps tokzr, tokens
 
-  let update_context_stack ~stack_update ~tokenizer_update
-      ({ preproc; _ } as ps) tokens : Context.t list -> 's * 'a =
-    function
-    | [] ->
-        ps, tokens
-    | contexts ->
-        let context_stack, tokens_set =
-          List.fold_left begin fun (context_stack, set) ctx ->
-            let context_stack, set' = stack_update context_stack ctx in
-            context_stack, Text_lexer.TokenHandles.union set set'
-          end (preproc.context_stack, Text_lexer.TokenHandles.empty) contexts
-        in
+  let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
+    match Tokzr.next_token tokzr tokens with
+    | Some (tokzr, token, tokens) ->
+        (update_tokzr ps tokzr, token, tokens)
+    | None ->
+        let ps, tokens = produce_tokens ps in
+        next_token ps tokens
 
-        (* Update tokenizer state *)
-        let tokzr, tokens = tokenizer_update preproc.tokzr tokens tokens_set in
-        if show `Tks ps then
-          Pretty.error "Tks': %a@." Text_tokenizer.pp_tokens tokens;
+  let token_n_srcloc_limits ?prev_limit token =
+    let s, e = Overlay_manager.limits ~@token in
+    Option.iter (fun e -> Overlay_manager.link_limits e s) prev_limit;
+    ~&token, s, e
 
-        (if context_stack == preproc.context_stack && tokzr == preproc.tokzr
-         then ps
-         else { ps with preproc = { preproc with tokzr; context_stack }}),
-        tokens
+  let put_token_back ({ preproc; _ } as ps) token tokens =
+    let tokzr, tokens = Tokzr.put_token_back preproc.tokzr token tokens in
+    (* The limits of the re-submitted token will be re-constructed in
+       `token_n_srcloc_limits`, so `prev_limit` needs to be re-adjusted to the
+       second-to-last right-limit. *)
+    { ps with prev_limit = ps.prev_limit';
+              preproc = { ps.preproc with tokzr } }, tokens
+
+  (* --- *)
 
   (** Use recovery trace (assumptions on missing tokens) to generate syntax
       hints and report on an invalid syntax error. *)
@@ -243,23 +242,27 @@ module Make (Config: Cobol_config.T) = struct
 
   (* --- *)
 
-  let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
-    match Tokzr.next_token tokzr tokens with
-    | Some (tokzr, token, tokens) ->
-        (update_tokzr ps tokzr, token, tokens)
-    | None ->
-        let ps, tokens = produce_tokens ps in
-        next_token ps tokens
+  let update_context_stack ~stack_update ~tokenizer_update
+      ({ preproc; _ } as ps) tokens : Context.t list -> 's * 'a = function
+    | [] ->
+        ps, tokens
+    | contexts ->
+        let context_stack, tokens_set =
+          List.fold_left begin fun (context_stack, set) ctx ->
+            let context_stack, set' = stack_update context_stack ctx in
+            context_stack, Text_lexer.TokenHandles.union set set'
+          end (preproc.context_stack, Text_lexer.TokenHandles.empty) contexts
+        in
 
-  let token_n_srcloc_limits ?prev_limit token =
-    let s, e = Overlay_manager.limits ~@token in
-    Option.iter (fun e -> Overlay_manager.link_limits e s) prev_limit;
-    ~&token, s, e
+        (* Update tokenizer state *)
+        let tokzr, tokens = tokenizer_update preproc.tokzr tokens tokens_set in
+        if show `Tks ps then
+          Pretty.error "Tks': %a@." Text_tokenizer.pp_tokens tokens;
 
-  let put_token_back ({ preproc; _ } as ps) token tokens =
-    let tokzr, tokens = Tokzr.put_token_back preproc.tokzr token tokens in
-    { ps with prev_limit = ps.prev_limit';
-              preproc = { ps.preproc with tokzr } }, tokens
+        (if context_stack == preproc.context_stack && tokzr == preproc.tokzr
+         then ps
+         else { ps with preproc = { preproc with tokzr; context_stack }}),
+        tokens
 
   let leaving_context ps prod =
     match Context.top ps.preproc.context_stack with
@@ -314,6 +317,8 @@ module Make (Config: Cobol_config.T) = struct
       | Grammar_recovery.Prod p -> pop_outgoing_context ps tokens p
     end (ps, tokens) operations
 
+  (* --- *)
+
   let env_loc env =
     match Grammar_interpr.top env with
     | None -> None
@@ -349,6 +354,7 @@ module Make (Config: Cobol_config.T) = struct
     | NoPost ->
         ps, token, tokens
 
+  (** To be called {e after} a reduction of production [prod]. *)
   let on_reduction ps token tokens prod = function
     | Grammar_interpr.HandlingError env
     | AboutToReduce (env, _)
@@ -359,16 +365,21 @@ module Make (Config: Cobol_config.T) = struct
 
   (* Main code for driving the parser with recovery and lexical contexts: *)
 
-  type ('a, 'm) step =
-    | OnTok of ('a, 'm) new_token_step
+  (** We call "stage" a high(er)-level parsing state (than {!type:state}). *)
+  type ('a, 'm) stage =
+    | Trans of ('a, 'm) interim_stage
     | Final of ('a option * 'm state)
-  and ('a, 'm) new_token_step =
-    (('m state * Text_tokenizer.token * Text_tokenizer.tokens) *
-     'a Grammar_interpr.env)                (* Always valid input_needed  env. *)
+
+  (** Interim stage, at which the parser may be stopped, restarted or
+      rewound. *)
+  and ('a, 'm) interim_stage =
+    'm state *
+    Text_tokenizer.tokens *
+    'a Grammar_interpr.env                   (* Always valid input_needed env. *)
 
   let rec normal ps tokens = function
     | Grammar_interpr.InputNeeded env ->
-        OnTok (next_token ps tokens, env)
+        Trans (ps, tokens, env)
     | Shifting (_e1, e2, _) as c ->
         let ps, tokens = push_incoming_contexts ps tokens e2 in
         normal ps tokens @@ Grammar_interpr.resume c
@@ -378,8 +389,9 @@ module Make (Config: Cobol_config.T) = struct
     | Rejected | HandlingError _ ->
         assert false                                   (* should never happen *)
 
-  and on_new_token (({ prev_limit; _ } as ps, token, tokens), env) =
+  and on_interim_stage ({ prev_limit; _ } as ps, tokens, env) =
     let c = Grammar_interpr.input_needed env in
+    let ps, token, tokens = next_token ps tokens in
     let _t, _, e as tok = token_n_srcloc_limits ?prev_limit token in
     let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
     check ps token tokens env @@ Grammar_interpr.offer c tok
@@ -413,9 +425,6 @@ module Make (Config: Cobol_config.T) = struct
     in
     match ps.preproc.persist.recovery with
     | EnableRecovery recovery_options ->
-        (* The limits of the re-submitted token will be re-constructed in
-           `token_n_srcloc_limits`, so `prev_limit` needs to be re-adjusted to
-           the second-to-last right-limit. *)
         let ps, tokens = put_token_back ps token tokens in
         recover ps tokens (Grammar_recovery.generate env)
           ~report_syntax_hints_n_error:(report_syntax_hints_n_error
@@ -450,7 +459,9 @@ module Make (Config: Cobol_config.T) = struct
 
   (* --- *)
 
-  let init_parse ps ~make_checkpoint =
+  (** [first_stage ps ~make_checkpoint] is the first stage for parsing a ['a] out
+      of a parser in state [ps]. *)
+  let first_stage (ps: 'm state) ~make_checkpoint : ('a, 'm) stage =
     let ps, tokens = produce_tokens ps in
     let first_pos = match tokens with
       | [] -> Cobol_preproc.position ps.preproc.pp
@@ -458,74 +469,18 @@ module Make (Config: Cobol_config.T) = struct
     in
     normal ps tokens (make_checkpoint first_pos)
 
-  let rec full_parse = function
+  (** [full_parse stage] completes parsing from the given stage [stage]. *)
+  let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
     | Final (res, ps) ->
         res, ps
-    | OnTok (((ps, _, _), _) as state) ->
-        full_parse @@ try on_new_token state with e -> on_exn ps e
+    | Trans ((ps, _, _) as state) ->
+        full_parse @@ try on_interim_stage state with e -> on_exn ps e
 
   (* --- *)
 
-  type ('a, 'm) rewindable_parsing_state =
-    {
-      init: 'm state;
-      step: ('a, 'm) step;
-      store: ('a, 'm) rewindable_history;
-    }
-  and ('a, 'm) rewindable_history = ('a, 'm) rewindable_history_event list
-  and ('a, 'm) rewindable_history_event =
-    {
-      preproc_position: Lexing.position;
-      event_step: ('a, 'm) new_token_step;
-    }
-
-  let save_history_event
-      (((ps, _, _), _) as state) (store: _ rewindable_history) =
-    let preproc_position = Cobol_preproc.position ps.preproc.pp in
-    match store with
-    | { preproc_position = prev_pos; _ } :: store'
-      when prev_pos.pos_cnum  = preproc_position.pos_cnum  &&
-           prev_pos.pos_fname = preproc_position.pos_fname ->
-        (* Preprocessor did not advance further since last save: replace event
-           with new parser state: *)
-        { preproc_position; event_step = state } :: store'
-    | store' ->
-        { preproc_position; event_step = state } :: store'
-
-  let init_rewindable_parse ps ~make_checkpoint =
-    {
-      init = ps;
-      step = init_parse ps ~make_checkpoint;
-      store = [];
-    }
-
-  let rewindable_parser_state = function
-    | { step = Final (_, ps) | OnTok ((ps, _, _), _); _ } -> ps
-
-  let with_context_sensitive_tokens ~f = function
-    | { step = Final (_, ps) | OnTok ((ps, _, _), _); _ } ->
-        f (Context.all_tokens ps.preproc.context_stack)
-
-  let parse_with_trace ?(save_step = 10) rwps =
-    let rec loop count ({ store; step; _ } as rwps) = match step with
-      | Final (res, _ps) ->
-          with_context_sensitive_tokens rwps ~f:Text_lexer.disable_tokens;
-          res, rwps
-      | OnTok (((ps, _, _), _) as state) ->
-          let store, count =
-            if count = save_step then store, succ count
-            else save_history_event state store, 0
-          and step =
-            try on_new_token state with e -> on_exn ps e
-          in
-          loop count { rwps with store; step }
-    in
-    with_context_sensitive_tokens rwps ~f:Text_lexer.enable_tokens;
-    loop 0 rwps
-
-  (* --- *)
-
-  let aggregate_output (type m) res (ps: m state) : ('a option, m) output =
+  (** Gathers outputs that depend on the memorization behavior of the parser. *)
+  let aggregate_output (type m) (ps: m state) res
+    : ('a option, m) output =
     match ps.preproc.persist.tokenizer_memory with
     | Amnesic ->
         Only res
@@ -536,12 +491,86 @@ module Make (Config: Cobol_config.T) = struct
             comments = Cobol_preproc.comments ps.preproc.pp } in
         WithArtifacts (res, artifacts)
 
+  (** Simple parsing *)
   let parse_once
       ~options (type m) ~(memory: m memory) ~make_checkpoint pp
     : (('a option, m) output) with_diags =
     let ps = make_parser options ~tokenizer_memory:memory pp in
-    let res, ps = full_parse @@ init_parse ~make_checkpoint ps in
-    DIAGS.with_diags (aggregate_output res ps) (all_diags ps)
+    let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
+    DIAGS.with_diags (aggregate_output ps res) (all_diags ps)
+
+  (* --- *)
+
+  (* Rewindable parsing *)
+
+  (** The state of a rewindable parser combines a current stage [stage], and a
+      store [store] that represent a rewindable history.  The initial state is
+      kept in case parsing needs to restart at the very beginning of the
+      input. *)
+  type ('a, 'm) rewindable_parsing_state =
+    {
+      init: 'm state;
+      stage: ('a, 'm) stage;
+      store: ('a, 'm) rewindable_history;
+    }
+
+  (** The rewindable history is a list of events... *)
+  and ('a, 'm) rewindable_history = ('a, 'm) rewindable_history_event list
+
+  (** ... that associate pre-processor lexing positions ([preproc_position])
+      with intermediate parsing stages [event_stage]. *)
+  and ('a, 'm) rewindable_history_event =
+    {
+      preproc_position: Lexing.position;
+      event_stage: ('a, 'm) interim_stage;
+    }
+
+  let init_rewindable_parse ps ~make_checkpoint =
+    {
+      init = ps;
+      stage = first_stage ps ~make_checkpoint;
+      store = [];
+    }
+
+  (** Stores a stage as part of the memorized rewindable history events. *)
+  let save_history_event ((ps, _, _) as stage) (store: _ rewindable_history) =
+    let preproc_position = Cobol_preproc.position ps.preproc.pp in
+    match store with
+    | { preproc_position = prev_pos; _ } :: store'
+      when prev_pos.pos_cnum  = preproc_position.pos_cnum  &&
+           prev_pos.pos_fname = preproc_position.pos_fname ->
+        (* Preprocessor did not advance further since last save: replace event
+           with new parser state: *)
+        { preproc_position; event_stage = stage } :: store'
+    | store' ->
+        { preproc_position; event_stage = stage } :: store'
+
+  let rewindable_parser_state = function
+    | { stage = Final (_, ps) | Trans (ps, _, _); _ } -> ps
+
+  (** Applies [f] on the set of all context-sensitive tokens that belong to the
+      context stack of the given parsing state. *)
+  let with_context_sensitive_tokens ~f rwps =
+    f (Context.all_tokens (rewindable_parser_state rwps).preproc.context_stack)
+
+  (** Parses all the input, saving some rewindable history along the way. *)
+  (* TODO: configurable [save_stage] *)
+  let parse_with_history ?(save_stage = 10) rwps =
+    let rec loop count ({ store; stage; _ } as rwps) = match stage with
+      | Final (res, _) ->
+          with_context_sensitive_tokens rwps ~f:Text_lexer.disable_tokens;
+          res, rwps
+      | Trans ((ps, _, _) as state) ->
+          let store, count =
+            if count = save_stage then store, succ count
+            else save_history_event state store, 0
+          and stage =
+            try on_interim_stage state with e -> on_exn ps e
+          in
+          loop count { rwps with store; stage }
+    in
+    with_context_sensitive_tokens rwps ~f:Text_lexer.enable_tokens;
+    loop 0 rwps
 
   let lexing_postion_of ~position rwps = match position with
     | Lexing pos ->
@@ -572,6 +601,8 @@ module Make (Config: Cobol_config.T) = struct
     in
     aux store
 
+  (* --- *)
+
   let rec rewind_n_parse
     : type m. ('a, m) rewindable_parsing_state -> make_checkpoint:_
       -> preprocessor_rewind -> position: position
@@ -580,19 +611,19 @@ module Make (Config: Cobol_config.T) = struct
     let rwps =
       try
         let event, store = find_history_event_preceding ~position rwps in
-        let (ps, token, tokens), env = event.event_step in
+        let ps, tokens, env = event.event_stage in
         let pp = ps.preproc.pp in
         let pp = pp_rewind ?new_position:(Some event.preproc_position) pp in
         let ps = { ps with preproc = { ps.preproc with pp } } in
-        { rwps with step = OnTok ((ps, token, tokens), env); store }
+        { rwps with stage = Trans (ps, tokens, env); store }
       with Not_found ->                   (* rewinding before first checkpoint *)
         let pp = pp_rewind rwps.init.preproc.pp in
         let ps = { rwps.init with preproc = { rwps.init.preproc with pp } } in
         init_rewindable_parse ~make_checkpoint ps
     in
-    let res, rwps = parse_with_trace rwps in
+    let res, rwps = parse_with_history rwps in
     let ps = rewindable_parser_state rwps in
-    let output = aggregate_output res ps in
+    let output = aggregate_output ps res in
     let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
     DIAGS.with_diags (output, { rewind_n_parse }) (all_diags ps)
 
@@ -604,10 +635,10 @@ module Make (Config: Cobol_config.T) = struct
     let res, rwps =
       make_parser options ~tokenizer_memory:memory pp |>
       init_rewindable_parse ~make_checkpoint |>
-      parse_with_trace
+      parse_with_history
     in
     let ps = rewindable_parser_state rwps in
-    let output = aggregate_output res ps in
+    let output = aggregate_output ps res in
     let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
     DIAGS.with_diags (output, { rewind_n_parse }) (all_diags ps)
 
