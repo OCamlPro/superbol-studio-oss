@@ -23,7 +23,6 @@ type artifacts =
     tokens: tokens_with_locs Lazy.t;
     pplog: Cobol_preproc.log;
     comments: Cobol_preproc.comments;
-    newline_cnums: int list;
   }
 
 type ('a, 'm) output =

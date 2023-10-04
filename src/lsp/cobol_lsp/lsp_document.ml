@@ -127,8 +127,7 @@ let lazy_references ast cus defs =
 let no_artifacts =
   Cobol_parser.Outputs.{ tokens = lazy [];
                          pplog = Cobol_preproc.Trace.empty;
-                         comments = [];
-                         newline_cnums = [] }
+                         comments = [] }
 
 let gather_parsed_data ptree =
   Cobol_typeck.analyze_compilation_group ptree |>
@@ -205,37 +204,27 @@ let load ~project ?copybook doc =
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e)
 
-let first_change_pos ({ artifacts = { newline_cnums; _ }; _ } as doc) changes =
-  if newline_cnums = [] then None      (* straight out of cache: missing info *)
-  else
-    match
-      List.fold_left begin fun pos -> function
-        | Lsp.Types.TextDocumentContentChangeEvent.{ range = None; _ } ->
-            Some (0, 0, 0)                       (* meaning: full text change *)
-        | { range = Some { start = { line; character }; _ }; _ } ->
-            let bol =
-              try List.nth newline_cnums (line - 1)
-              with Not_found | Invalid_argument _ -> 0
-            in
-            let cnum = bol + character in
-            match pos with
-            | Some (_, _, cnum') when cnum' > cnum -> pos
-            | _ -> Some (line + 1, bol, cnum)
-      end None changes
-    with
-    | Some (pos_lnum, pos_bol, pos_cnum) ->
-        Some Lexing.{ pos_fname = Lsp.Uri.to_path (uri doc);
-                      pos_bol; pos_cnum; pos_lnum }
-    | None ->                        (* Humm... can |changes|=0 really happen? *)
-        None
+let first_change_pos changes =
+  let line, char =
+    List.fold_left begin fun ((l, c) as acc) -> function
+      | Lsp.Types.TextDocumentContentChangeEvent.{ range = None; _ } ->
+          (0, 0)                                 (* meaning: full text change *)
+      | { range = Some { start = { line; character }; _ }; _ }
+        when line < l || line = l && character < c ->
+          line, character
+      | _ ->
+          acc
+    end Int.(max_int, max_int) changes      (* can |changes|=0 really happen? *)
+  in
+  Cobol_parser.Indexed { line; char }
 
 let update ({ textdoc; _ } as doc) changes =
-  let position = first_change_pos doc changes in
+  let position = first_change_pos changes in
   let doc =
     { doc with
       textdoc = Lsp.Text_document.apply_content_changes textdoc changes }
   in
-  try reparse_and_analyze ?position doc
+  try reparse_and_analyze ~position doc
   with e -> raise @@ Internal_error (doc, e)
 
 (** Raises {!Unparseable} in case the document cannot be parsed entierely, or
@@ -292,11 +281,7 @@ let of_cache ~project
            { ast; cus; definitions; references })
         parsed
     in
-    { doc with artifacts = { pplog; tokens = lazy tokens; comments;
-                             (* We leave the folloing out of the cache: only
-                                used upon document update, which should only
-                                happen after a full parse in each session. *)
-                             newline_cnums = [] };
+    { doc with artifacts = { pplog; tokens = lazy tokens; comments };
                diags = DIAGS.Set.of_serializable diags;
                parsed }
 

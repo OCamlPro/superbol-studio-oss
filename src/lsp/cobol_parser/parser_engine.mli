@@ -36,8 +36,7 @@ type 'm rewindable_parsing
   = ?options:parser_options
   -> ?config:Cobol_config.t
   -> Cobol_preproc.preprocessor
-  -> (((PTree.compilation_group option, 'm) output as 'x) *
-      'x rewinder)
+  -> (((PTree.compilation_group option, 'm) output as 'x) * 'x rewinder)
     Cobol_common.Diagnostics.with_diags
 and 'x rewinder
 and preprocessor_rewind =
@@ -51,10 +50,25 @@ val rewindable_parse_simple
 val rewindable_parse_with_artifacts
   : Cobol_common.Behaviors.eidetic rewindable_parsing
 
+(** Specification of positions to rewind to. *)
+type position =
+  | Lexing of
+      Lexing.position                                 (** raw lexing position *)
+  | Indexed of
+      {
+        line: int;               (** line number (starting at 0) *)
+        char: int;               (** character number in line (starting at 0) *)
+      }
+
+(** [rewind_and_parse rewinder preprocessor_rewind ~position] uses [rewinder] to
+    restart parsing before the given [position].  Note that the [new_position]
+    argument that is given to [preprocessor_rewind] may {e not} correspond to
+    [position], as the parser typically needs to rewind earlier than
+    [position]. *)
 val rewind_and_parse
   : 'x rewinder
   -> preprocessor_rewind
-  -> position: Lexing.position
+  -> position: position
   -> (((PTree.compilation_group option, 'm) output as 'x) * 'x rewinder)
     Cobol_common.Diagnostics.with_diags
 

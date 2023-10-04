@@ -22,11 +22,14 @@ open Parser_outputs                               (* import types for outputs *)
 
 type 'x rewinder =
   {
-    rewind_n_parse: preprocessor_rewind -> position: Lexing.position ->
+    rewind_n_parse: preprocessor_rewind -> position: position ->
       ('x * ('x rewinder)) with_diags;
   }
 and preprocessor_rewind =
-  ?new_position:Lexing.position -> (Cobol_preproc.preprocessor as 'r) -> 'r
+  ?new_position: Lexing.position -> (Cobol_preproc.preprocessor as 'r) -> 'r
+and position =
+  | Lexing of Lexing.position
+  | Indexed of { line: int; char: int }                  (* all starting at 0 *)
 
 type 'm simple_parsing
   = ?options:parser_options
@@ -530,8 +533,7 @@ module Make (Config: Cobol_config.T) = struct
         let artifacts =
           { tokens = Tokzr.parsed_tokens ps.preproc.tokzr;
             pplog = Cobol_preproc.log ps.preproc.pp;
-            comments = Cobol_preproc.comments ps.preproc.pp;
-            newline_cnums = Cobol_preproc.newline_cnums ps.preproc.pp } in
+            comments = Cobol_preproc.comments ps.preproc.pp } in
         WithArtifacts (res, artifacts)
 
   let parse_once
@@ -541,13 +543,29 @@ module Make (Config: Cobol_config.T) = struct
     let res, ps = full_parse @@ init_parse ~make_checkpoint ps in
     DIAGS.with_diags (aggregate_output res ps) (all_diags ps)
 
-  let find_history_event_preceding ~(position: Lexing.position) store =
+  let lexing_postion_of ~position rwps = match position with
+    | Lexing pos ->
+        pos
+    | Indexed { line; char } ->
+        let ps = rewindable_parser_state rwps in
+        let lexpos = Cobol_preproc.position ps.preproc.pp in
+        let newline_cnums = Cobol_preproc.newline_cnums ps.preproc.pp in
+        let pos_bol =
+          try List.nth newline_cnums (line - 1)
+          with Not_found | Invalid_argument _ -> 0
+        in
+        Lexing.{ lexpos with pos_bol;
+                             pos_cnum = pos_bol + char;
+                             pos_lnum = line + 1 }
+
+  let find_history_event_preceding ~position ({ store; _ } as rwps) =
+    let lexpos = lexing_postion_of ~position rwps in
     let rec aux = function
       | [] ->
           raise Not_found
       | { preproc_position; _ } as event :: store
-        when preproc_position.pos_cnum  <= position.pos_cnum &&
-             preproc_position.pos_fname = position.pos_fname ->
+        when preproc_position.pos_cnum <= lexpos.pos_cnum &&
+             preproc_position.pos_fname = lexpos.pos_fname ->
           event, store
       | _ :: store ->
           aux store
@@ -556,12 +574,12 @@ module Make (Config: Cobol_config.T) = struct
 
   let rec rewind_n_parse
     : type m. ('a, m) rewindable_parsing_state -> make_checkpoint:_
-      -> preprocessor_rewind -> position:Lexing.position
+      -> preprocessor_rewind -> position: position
       -> ((('a option, m) output as 'x) * 'x rewinder) with_diags =
     fun rwps ~make_checkpoint pp_rewind ~position ->
     let rwps =
       try
-        let event, store = find_history_event_preceding ~position rwps.store in
+        let event, store = find_history_event_preceding ~position rwps in
         let (ps, token, tokens), env = event.event_step in
         let pp = ps.preproc.pp in
         let pp = pp_rewind ?new_position:(Some event.preproc_position) pp in
