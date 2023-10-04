@@ -15,12 +15,11 @@ open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
 
+open Cobol_preproc.Options
 open Cobol_parser.Options
 
 type t = {
-  config: (module Cobol_config.T);
-  source_format: Cobol_config.source_format_spec;
-  libpath: string list;
+  preproc_options: preproc_options;
   parser_options: parser_options;
 }
 
@@ -134,8 +133,8 @@ let get () =
       else DisableRecovery
     in
     let verbose = !Globals.verbosity > 0 in
-    { config; source_format; libpath = !libpath;
-      parser_options = { recovery; verbose; show = !show } }
+    { preproc_options = { config; verbose; source_format; libpath = !libpath };
+      parser_options = { config; recovery; verbose; show = !show } }
 
   in
   get, args

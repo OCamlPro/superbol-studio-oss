@@ -41,9 +41,10 @@ let mf_root = srcdir // mf_testsuite
 
 module Diags = Cobol_common.Diagnostics.InitStateful ()
 
-let preprocess_file ~source_format ?config =
-  preprocess_file ~source_format ?config ~verbose:false ~libpath:[]
-    ~ppf:std_formatter ~epf:std_formatter
+let preprocess_file ~source_format ~config =
+  preprocess_file ~ppf:std_formatter ~epf:std_formatter
+    ~options:Cobol_preproc.Options.{ source_format; config;
+                                     verbose = false; libpath = [] }
 
 let from_dialect = Cobol_config.from_dialect (module Diags)
 

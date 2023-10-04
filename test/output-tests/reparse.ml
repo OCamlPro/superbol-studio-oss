@@ -49,10 +49,13 @@ let reparse_file ~source_format ~config filename =
           recovery = DisableRecovery
         } @@
     Cobol_preproc.preprocessor
-      { init_libpath = [];
-        init_config = config;
-        init_source_format = source_format }
-      input
+      ~options:Cobol_preproc.Options.{
+          default with
+          libpath = [];
+          config;
+          source_format
+        } @@
+    input
   in
   let print =
     Format.asprintf "@[%a@]@." Cobol_parser.PTree.pp_compilation_group

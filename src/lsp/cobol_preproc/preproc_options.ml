@@ -11,25 +11,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module DIAGS = Cobol_common.Diagnostics
+type preproc_options =
+  {
+    verbose: bool;
+    libpath: string list;
+    config: Cobol_config.t;
+    source_format: Cobol_config.source_format_spec;
+  }
 
-let show_parsed_tokens
-    ?(verbose = false)
-    ?(source_format = Cobol_config.(SF SFFixed))
-    prog =
-  let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
-    Cobol_parser.parse_with_artifacts
-      ~options:Cobol_parser.Options.{
-          default with
-          verbose;
-          recovery = EnableRecovery { silence_benign_recoveries = true };
-        } @@
-    Cobol_preproc.preprocessor
-      ~options:Cobol_preproc.Options.{
-          default with
-          libpath = [];
-          source_format
-        } @@
-    String { filename = "prog.cob"; contents = prog }
-  in
-  Cobol_parser.INTERNAL.pp_tokens Fmt.stdout (Lazy.force tokens)
+let default =
+  {
+    verbose = false;
+    libpath = [];
+    config = Cobol_config.default;
+    source_format = Cobol_config.Auto;
+  }

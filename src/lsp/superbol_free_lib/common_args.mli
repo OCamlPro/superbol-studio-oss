@@ -12,9 +12,7 @@
 (**************************************************************************)
 
 type t = {
-  config: (module Cobol_config.T);
-  source_format: Cobol_config.source_format_spec;
-  libpath: string list;
+  preproc_options: Cobol_preproc.Options.preproc_options;
   parser_options: Cobol_parser.Options.parser_options;
 }
 

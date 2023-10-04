@@ -33,13 +33,11 @@ and position =
 
 type 'm simple_parsing
   = ?options:parser_options
-  -> ?config:Cobol_config.t
   -> Cobol_preproc.preprocessor
   -> (PTree.compilation_group option, 'm) output DIAGS.with_diags
 
 type 'm rewindable_parsing
   = ?options:parser_options
-  -> ?config:Cobol_config.t
   -> Cobol_preproc.preprocessor
   -> (((PTree.compilation_group option, 'm) output as 'x) *
       'x rewinder) DIAGS.with_diags
@@ -104,7 +102,7 @@ module Make (Config: Cobol_config.T) = struct
 
   (** Initializes a parser state, given a preprocessor. *)
   let make_parser
-      (type m) Parser_options.{ verbose; show; recovery }
+      (type m) Parser_options.{ verbose; show; recovery; _ }
       ?(show_if_verbose = [`Tks; `Ctx]) ~(tokenizer_memory: m memory) pp =
     let tokzr: m Tokzr.state =
       let memory: m Tokzr.memory = match tokenizer_memory with
@@ -651,10 +649,9 @@ let parse
     (type m)
     ~(memory: m memory)
     ?(options = Parser_options.default)
-    ?(config = Cobol_config.default)
   : Cobol_preproc.preprocessor ->
     (PTree.compilation_group option, m) output with_diags =
-  let module P = Make (val config) in
+ let module P = Make (val options.config) in
   P.parse_once ~options ~memory
     ~make_checkpoint:Grammar.Incremental.compilation_group
 
@@ -665,11 +662,10 @@ let rewindable_parse
     (type m)
     ~(memory: m memory)
     ?(options = Parser_options.default)
-    ?(config = Cobol_config.default)
   : Cobol_preproc.preprocessor ->
     (((PTree.compilation_group option, m) output as 'x) * 'x rewinder)
       with_diags =
-  let module P = Make (val config) in
+  let module P = Make (val options.config) in
   P.rewindable_parse ~options ~memory
     ~make_checkpoint:Grammar.Incremental.compilation_group
 

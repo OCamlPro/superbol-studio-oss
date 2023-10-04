@@ -18,16 +18,8 @@ type input =
   | String of { contents: string; filename: string }
   | Channel of { contents: in_channel; filename: string }
 
-type init =
-  {
-    init_libpath: string list;
-    init_config: Cobol_config.t;
-    init_source_format: Cobol_config.source_format_spec;
-  }
-
 val preprocessor
-  : ?verbose:bool
-  -> init
+  : ?options: Preproc_options.preproc_options
   -> input
   -> preprocessor
 val reset_preprocessor
@@ -80,29 +72,20 @@ val lex_lib
   -> unit
 
 val preprocess_file
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter
   -> string
   -> unit
 
 val text_of_file
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?epf:Format.formatter
   -> string
   -> Text.text
 
 val text_of_input
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?epf:Format.formatter
   -> input
   -> Text.text

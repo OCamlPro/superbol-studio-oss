@@ -56,14 +56,15 @@ let cmd =
                if !parse || !check then
                  let parse ?source_format input =
                    let common = common_get () in
-                   let source_format =
-                     Option.value ~default:common.source_format source_format
+                   let preproc_options =
+                     { common.preproc_options with
+                       source_format =
+                         Option.value source_format
+                         ~default:  common.preproc_options.source_format }
                    in
-                   Cobol_parser.parse_simple ~options:common.parser_options @@
-                   Cobol_preproc.preprocessor { init_libpath = common.libpath;
-                                                init_config = common.config;
-                                                init_source_format = source_format }
-                     input
+                   input |>
+                   Cobol_preproc.preprocessor ~options:preproc_options |>
+                   Cobol_parser.parse_simple ~options:common.parser_options
                  in
                  let my_text = parse (Filename file) in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
@@ -95,9 +96,7 @@ let cmd =
                  let text =
                    let common = common_get () in
                    Cobol_preproc.text_of_file file
-                     ~verbose: common.parser_options.verbose
-                     ~source_format:common.source_format
-                     ~libpath:common.libpath
+                     ~options:common.preproc_options
                  in
                  let s =
                    Cobol_preproc.Text_printer.string_of_text

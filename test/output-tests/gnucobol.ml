@@ -158,11 +158,10 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     else Cobol_config.(SF SFFixed)
   in
   let parse_simple input =
-    Cobol_parser.parse_simple @@
+    input |>
     Cobol_preproc.preprocessor
-      { init_source_format = source_format;
-        init_config = Cobol_config.default;
-        init_libpath = [] } input
+      ~options:Cobol_preproc.Options.{ default with source_format } |>
+    Cobol_parser.parse_simple
   in
   try
     let input = setup_input ~filename contents in

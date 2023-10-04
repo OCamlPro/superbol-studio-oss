@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
+open Preproc_options
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -101,17 +102,9 @@ let rewind_srclex srclex ?position = function
   | Channel { contents; _ } ->                                        (* ditto *)
       Preproc.srclex_restart_on_channel ?position contents srclex
 
-type init =
-  {
-    init_libpath: string list;
-    init_config: Cobol_config.t;
-    init_source_format: Cobol_config.source_format_spec;
-  }
-
-let preprocessor ?(verbose = false) input = function
-  | `WithLibpath { init_libpath = libpath;
-                   init_config = (module Config);
-                   init_source_format = source_format; } ->
+let preprocessor input = function
+  | `WithOptions { libpath; verbose; source_format;
+                   config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -146,7 +139,6 @@ let preprocessor ?(verbose = false) input = function
             persist with
             copybooks =
               Cobol_common.Srcloc.new_copy ~copyloc copybook persist.copybooks;
-            verbose = persist.verbose || verbose;
           };
       }
   | `ResetPosition ({ srclex; _ } as pp, position) ->
@@ -397,13 +389,12 @@ let pp_pptokens: pptokens Pretty.printer =
 (* --- *)
 
 let reset_preprocessor ?new_position pp input =
-  preprocessor ~verbose:pp.persist.verbose input
-    (`ResetPosition (pp, new_position))
+  preprocessor input (`ResetPosition (pp, new_position))
 
 (* --- *)
 
-let preprocessor ?verbose init input =
-  preprocessor ?verbose input (`WithLibpath init)
+let preprocessor ?(options = Preproc_options.default) input =
+  preprocessor input (`WithOptions options)
 
 (** Default pretty-printing formatter for {!lex_file}, {!lex_lib}, and
     {!preprocess_file}. *)
@@ -441,27 +432,17 @@ let fold_text_lines ~source_format ?epf f =
 let pp_preprocessed ppf lp =
   Pretty.print ppf "%a@." Text.pp_text (fst @@ full_text ~item:"file" lp)
 
-let preprocess_file ~source_format ?verbose ?(config = Cobol_config.default)
-    ~libpath ?(ppf = default_oppf) =
-  let preprocessor = preprocessor ?verbose in
+let preprocess_file ?options ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun _init_diags filename ->
-    pp_preprocessed ppf @@
-    preprocessor { init_libpath = libpath;
-                   init_config = config;
-                   init_source_format = source_format } (Filename filename)
+    pp_preprocessed ppf @@ preprocessor ?options (Filename filename)
   end
 
-let text_of_input ~source_format ?verbose ?(config = Cobol_config.default)
-    ~libpath ?epf a =
-  let preprocessor = preprocessor ?verbose in
+let text_of_input ?options ?epf a =
   Cobol_common.do_any begin fun _init_diags input ->
     fst @@
     full_text ~item:"file" @@
-    preprocessor { init_libpath = libpath;
-                   init_config = config;
-                   init_source_format = source_format } input
+    preprocessor ?options input
   end ?epf a
 
-let text_of_file ~source_format ?verbose ?(config = Cobol_config.default)
-  ~libpath ?epf filename =
-  text_of_input ~source_format ?verbose ~config ~libpath ?epf (Filename filename)
+let text_of_file ?options ?epf filename =
+  text_of_input ?options ?epf (Filename filename)
