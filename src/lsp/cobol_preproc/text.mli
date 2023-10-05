@@ -61,3 +61,4 @@ val pp_alphanum: alphanum Pretty.printer
 
 val prefix_of_literal_kind: literal_kind -> string
 val char_of_quotation: quotation -> char
+val strip_eof: text -> text

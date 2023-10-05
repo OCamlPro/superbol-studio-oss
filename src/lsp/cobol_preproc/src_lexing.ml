@@ -90,11 +90,12 @@ let flushed = function
 (** Flush buffered lexing productions, possibly holding onto one that may be
     subject to continuation on the following line.
 
-    Always flushes completely whenever a compiler-directive word has been seen.
+    Always flushes completely whenever a compiler-directive word has been seen,
+    or upon end-of-input/file.
 *)
 let flush ({ lex_prods; _ } as state) : _ state * text =
   match lex_prods with
-  | h :: prods when not state.cdir_seen ->
+  | h :: prods when not state.cdir_seen && ~&h <> Eof ->
       { state with lex_prods = [h]                   }, List.rev prods
   | prods ->
       { state with lex_prods = []; cdir_seen = false }, List.rev prods

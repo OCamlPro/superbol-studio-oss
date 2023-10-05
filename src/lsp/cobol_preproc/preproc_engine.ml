@@ -188,7 +188,7 @@ let rec next_chunk ({ srclex; buff; _ } as lp) =
       | Error `NotCDir ->
           preprocess_line { lp with srclex; buff = [] } (buff @ text)
       | Ok ([], lexdir_text) ->
-          next_chunk @@ on_lexing_directive lp lexdir_text
+          next_chunk @@ on_lexing_directive { lp with srclex } lexdir_text
       | Ok (text, lexdir_text) ->
           let lp = { lp with srclex; buff = [] } in
           preprocess_line (on_lexing_directive lp lexdir_text) (buff @ text)
@@ -228,7 +228,7 @@ and preprocess_line lp srctext =
                                         be a compiler directive. *)
       preprocess_line lp srctext
   | Ok (`ReplaceDone (lp, text, srctext)) ->
-      text, with_buff lp srctext
+      text, with_buff lp @@ Text.strip_eof srctext
   | Error (`MissingPeriod | `MissingText) ->
       next_chunk (with_buff lp srctext)
 
