@@ -73,20 +73,6 @@ include TYPES
 type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 
-(* let simple_parse ({ project; textdoc; _ } as doc) = *)
-(*   Cobol_parser.parse_with_artifacts *)
-(*     ~options:Cobol_parser.Options.{ *)
-(*         default with *)
-(*         recovery = EnableRecovery { silence_benign_recoveries = true }; *)
-(*       } *)
-(*     ~config:project.cobol_config @@ *)
-(*   Cobol_preproc.preprocessor *)
-(*     { init_libpath = Lsp_project.libpath_for ~uri:(uri doc) project; *)
-(*       init_config = project.cobol_config; *)
-(*       init_source_format = project.source_format } @@ *)
-(*   String { contents = Lsp.Text_document.text textdoc; *)
-(*            filename = Lsp.Uri.to_path (uri doc) } *)
-
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
@@ -158,7 +144,6 @@ let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
     { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
   else
-    (* extract_parsed_infos doc @@ simple_parse doc *)
     extract_parsed_infos doc @@ rewindable_parse doc
 
 let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =

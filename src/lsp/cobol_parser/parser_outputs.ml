@@ -25,8 +25,17 @@ type artifacts =
     comments: Cobol_preproc.comments;
   }
 
-type ('a, 'm) output =
-  | Only: 'a -> ('a, Cobol_common.Behaviors.amnesic) output
-  | WithArtifacts: 'a * artifacts -> ('a, Cobol_common.Behaviors.eidetic) output
+(** The output of parsing functions depends on its memorization abilities:
+
+    - an amnesic parse (when ['memo = Cobol_common.Behaviors.amnesic]) only
+      returns a parsing result (of type ['result]);
+
+    - an eidetic parse (when ['memo = Cobol_common.Behaviors.eidetic])
+      additionally returns some parsing artefacts. *)
+type ('result, 'memo) output =
+  | Only:
+      'result             -> ('result, Cobol_common.Behaviors.amnesic) output
+  | WithArtifacts:
+      'result * artifacts -> ('result, Cobol_common.Behaviors.eidetic) output
 
 type 'm parsed_compilation_group = (PTree.compilation_group option, 'm) output

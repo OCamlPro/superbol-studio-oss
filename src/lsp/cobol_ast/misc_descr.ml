@@ -656,8 +656,8 @@ let pp_select_clause ppf = function
   | SelectRecordKey { key; source } ->
     Fmt.pf ppf "RECORD %a%a"
       pp_qualname key
-      Pretty.(list ~fopen:"SOURCE " ~fsep:"@ " ~fclose:"" ~fempty:""
-                pp_name') source
+      (Pretty.list ~fopen:"SOURCE " ~fsep:"@ " ~fclose:"" ~fempty:""
+         pp_name') source
   | SelectRelativeKey n ->
     Fmt.pf ppf "RELATIVE %a" pp_name' n
   | SelectReserve n -> Fmt.pf ppf "RESERVE %a" pp_integer n
@@ -759,11 +759,10 @@ let pp_comment_entry: comment_entry Pretty.printer =
   Fmt.(list ~sep:sp string)
 
 let pp_informational_paragraph: informational_paragraph Pretty.printer =
-  Fmt.(any "@[<4>" ++                       (* <- indent by 4 to avoid Area A *)
+  Fmt.(box ~indent:4 @@                     (* <- indent by 4 to avoid Area A *)
        pair ~sep:(any ".@ ")
          pp_informational_paragraph_header
-         (pp_with_loc pp_comment_entry) ++
-       any "@]")
+         (pp_with_loc pp_comment_entry))
 
 let pp_informational_paragraphs: informational_paragraphs Pretty.printer =
   Fmt.(list ~sep:(any "@\n")                                (* force newlines *)
