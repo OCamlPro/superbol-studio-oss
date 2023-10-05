@@ -3254,16 +3254,6 @@ syn_misc.at-6930-prog2.cob:8.36-8.41:
   10          >>SET CONSTANT PONY "White"
 >> Error: Invalid syntax
 
-syn_misc.at-6930-prog2.cob:10.7-10.34:
-   7          WORKING-STORAGE SECTION.
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9          77  MYHORSE   PIC X(7) VALUE PONY.
-  10 >        >>SET CONSTANT PONY "White"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11         *
-  12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
-
 syn_misc.at-6930-prog2.cob:9.35:
    6          DATA DIVISION.
    7          WORKING-STORAGE SECTION.
@@ -3283,6 +3273,16 @@ syn_misc.at-6930-prog2.cob:9.36-9.40:
   10          >>SET CONSTANT PONY "White"
   11         *
 >> Error: Invalid syntax
+
+syn_misc.at-6930-prog2.cob:10.7-10.34:
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10 >        >>SET CONSTANT PONY "White"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11         *
+  12          PROCEDURE DIVISION.
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6934:0
 syn_misc.at-6934-prog3.cob:2.7-2.38:
@@ -3322,16 +3322,6 @@ syn_misc.at-6934-prog3.cob:8.36-8.41:
   10          >>DEFINE CONSTANT PONY "White" OVERRIDE
 >> Error: Invalid syntax
 
-syn_misc.at-6934-prog3.cob:10.7-10.46:
-   7          WORKING-STORAGE SECTION.
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9          77  MYHORSE   PIC X(7) VALUE PONY.
-  10 >        >>DEFINE CONSTANT PONY "White" OVERRIDE
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11         *
-  12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
-
 syn_misc.at-6934-prog3.cob:9.35:
    6          DATA DIVISION.
    7          WORKING-STORAGE SECTION.
@@ -3351,6 +3341,16 @@ syn_misc.at-6934-prog3.cob:9.36-9.40:
   10          >>DEFINE CONSTANT PONY "White" OVERRIDE
   11         *
 >> Error: Invalid syntax
+
+syn_misc.at-6934-prog3.cob:10.7-10.46:
+   7          WORKING-STORAGE SECTION.
+   8          01  THEDOG    PIC X(6) VALUE DOGGY.
+   9          77  MYHORSE   PIC X(7) VALUE PONY.
+  10 >        >>DEFINE CONSTANT PONY "White" OVERRIDE
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  11         *
+  12          PROCEDURE DIVISION.
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6969:0
 syn_misc.at-6969-prog.cob:7.7-7.28:

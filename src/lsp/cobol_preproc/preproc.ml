@@ -113,7 +113,9 @@ let fold_source_lines pl ~f acc =
         spit_chunk suffix (acc, new_lnum, [])
   in
   let acc, last_lnum, tail = fold_source_chunks pl spit_chunk (acc, 1, []) in
-  f last_lnum tail acc                     (* fold on the last line upon exit *)
+  match tail with                       (* fold on the last line upon exit... *)
+  | [] | { payload = Eof; _ } :: _ -> acc (* ... if non-empty *)
+  | _ -> f last_lnum tail acc
 
 (* --- *)
 

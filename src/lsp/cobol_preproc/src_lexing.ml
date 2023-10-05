@@ -82,20 +82,15 @@ let newline_cnums { newline_cnums; _ } = List.rev newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
 let allow_debug { config = { debug; _ }; _ } = debug
 
-(* Just check there is no text that requires continuation. *)
-let flushed = function
-  | { continued = CNone; pseudotext = None; _ } -> true
-  | _ -> false
-
 (** Flush buffered lexing productions, possibly holding onto one that may be
     subject to continuation on the following line.
 
     Always flushes completely whenever a compiler-directive word has been seen,
-    or upon end-of-input/file.
-*)
+    or the last token is a lonesome period. *)
 let flush ({ lex_prods; _ } as state) : _ state * text =
   match lex_prods with
-  | h :: prods when not state.cdir_seen && ~&h <> Eof ->
+  | { payload = TextWord w; _ } as h :: prods
+    when not state.cdir_seen && w <> "." ->
       { state with lex_prods = [h]                   }, List.rev prods
   | prods ->
       { state with lex_prods = []; cdir_seen = false }, List.rev prods
@@ -110,6 +105,11 @@ let lex_diag ~severity state =
 let lex_error state = lex_diag ~severity:DIAGS.Error state
 
 let change_source_format ({ config; _ } as state) { payload = sf; loc } =
+  (* Just check there is no text that requires continuation. *)
+  let flushed = function
+    | { continued = CNone; pseudotext = None; _ } -> true
+    | _ -> false
+  in
   if flushed state
   then Ok { state with config = { config with source_format = sf } }
   else Error (lex_error state ~loc "Forbidden@ change@ of@ source@ format")
