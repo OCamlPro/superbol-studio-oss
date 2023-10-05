@@ -205,6 +205,7 @@
    (vscode-json (= version))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
+   (ez_api ( >= 2.0 ))
    (cobol_typeck (= version))
    (cobol_parser (= version))
    (cobol_lsp (= version))

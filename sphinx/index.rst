@@ -13,6 +13,15 @@ Welcome to superbol-vscode-platform
    Home <https://ocamlpro.github.io/superbol-vscode-platform>
    about
    install
+   install-vscode
+   lsp
+   features
+   platform
+   tasks
+   settings
+   emacs
+   debug
+   commands
    API doc <https://ocamlpro.github.io/superbol-vscode-platform/doc>
    license
 

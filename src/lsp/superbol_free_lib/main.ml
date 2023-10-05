@@ -23,6 +23,7 @@ let public_subcommands = [
   Command_indent_range.cmd;
   Command_indent_file.cmd;
   Command_json_vscode.cmd;
+  Command_snapshot.cmd;
 ]
 
 let main ?style_renderer ?utf_8 () =
