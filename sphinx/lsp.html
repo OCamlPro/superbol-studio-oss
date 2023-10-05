@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LSP Server &mdash; superbol master
- (04fe167
-) (2023/10/04 15:11) documentation</title>
+ (08c6e61
+) (2023/10/05 07:46) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -18,7 +18,9 @@
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Superbol extension features" href="features.html" />
+    <link rel="prev" title="Install VSCode extensions" href="install-vscode.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (04fe167
+ (08c6e61
 )
               </div>
 <div role="search">
@@ -42,10 +44,35 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-vscode.html">Install VSCode extensions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LSP Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#project-layout">Project layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-configuration">Project configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-configuration">Example configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#server-capabilities">Server capabilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#go-to-definition">Go to definition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#find-references">Find references</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#code-formatting">Code formatting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hover">Hover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#semantic-tokens">Semantic tokens</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Superbol extension features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform.html">Superbol VSCode Platform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tasks.html">Superbol VSCode tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">VSCode settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#lsp-settings">LSP Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emacs.html">GNU/Emacs modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Superbol VSCode Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform/doc">API doc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-platform">Devel and Issues on Github</a></li>
@@ -207,7 +234,10 @@ hovering features to come)</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install-vscode.html" class="btn btn-neutral float-left" title="Install VSCode extensions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="features.html" class="btn btn-neutral float-right" title="Superbol extension features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

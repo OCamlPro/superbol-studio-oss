@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (04fe167
-) (2023/10/04 15:11) documentation</title>
+ (08c6e61
+) (2023/10/05 07:46) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -18,7 +18,9 @@
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Copyright and License" href="license.html" />
+    <link rel="prev" title="Superbol VSCode Debug" href="debug.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -30,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (04fe167
+ (08c6e61
 )
               </div>
 <div role="search">
@@ -42,10 +44,29 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install-vscode.html">Install VSCode extensions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lsp.html">LSP Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Superbol extension features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform.html">Superbol VSCode Platform</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tasks.html">Superbol VSCode tasks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html">VSCode settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="settings.html#lsp-settings">LSP Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emacs.html">GNU/Emacs modes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Superbol VSCode Debug</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-range">main.exe indent range</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-json-vscode">main.exe json vscode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-lsp">main.exe lsp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-pp">main.exe pp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-snapshot">main.exe snapshot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-texi2rst">main.exe texi2rst</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform/doc">API doc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-platform">Devel and Issues on Github</a></li>
@@ -97,6 +118,9 @@
 
 <span class="n">pp</span>
   <span class="nc">Preprocess</span> <span class="n">a</span> <span class="kt">list</span> <span class="k">of</span> <span class="nc">COBOL</span> <span class="n">files</span><span class="o">,</span> <span class="n">generating</span> <span class="n">a</span> <span class="n">preprocessed</span> <span class="n">file</span> <span class="k">with</span> <span class="n">extension</span> <span class="o">.</span><span class="n">i</span> <span class="k">for</span> <span class="n">each</span> <span class="k">of</span> <span class="n">them</span>
+
+<span class="n">snapshot</span>
+  <span class="nc">Manage</span> <span class="n">environment</span> <span class="n">snapshots</span>
 
 <span class="n">texi2rst</span>
   <span class="n">build</span> <span class="o">.</span><span class="n">texi</span> <span class="n">documentation</span> <span class="n">from</span> <span class="n">gnucobol</span><span class="o">-</span><span class="n">docs</span>
@@ -212,6 +236,83 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--strict</span></code>   Use the strict configuration</p></li>
 </ul>
 </section>
+<section id="main-exe-snapshot">
+<h2>main.exe snapshot<a class="headerlink" href="#main-exe-snapshot" title="Permalink to this headline"></a></h2>
+<p>Manage environment snapshots</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command can be used to snapshot the environment when a command is called, typically in a test script, to be able to run this command in the same environment from outside the script.</p>
+<p>A snapshot typically contains:</p>
+<ul>
+<li><ul class="simple">
+<li><p><strong>cmd</strong></p></li>
+</ul>
+<p>The command to run with its arguments</p>
+</li>
+<li><ul class="simple">
+<li><p><strong>pwd</strong></p></li>
+</ul>
+<p>The directory where the command should be run</p>
+</li>
+<li><ul class="simple">
+<li><p><strong>env</strong></p></li>
+</ul>
+<p>The environment variables for the command</p>
+</li>
+</ul>
+<p>Snapshots are stored in <strong>$HOME/.config/superbol/snapshots</strong>.</p>
+<p><strong>SNAPSHOT CREATION</strong></p>
+<p>To snapshot a command, use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">mname</span> <span class="n">tname</span> <span class="o">--</span><span class="n">save</span> <span class="nc">SNAP_ID</span> <span class="o">--</span> <span class="n">cmd</span> <span class="n">args</span>
+</pre></div>
+</div>
+<p>The previous command will create a snapshot <strong>SNAP_ID</strong>, and then run the command <strong>cmd args</strong>.</p>
+<p>You can use <strong>–quit</strong> if you don’t want to run the command at all (the command will exit with status 2)</p>
+<p><strong>SNAPSHOT USAGE</strong></p>
+<p>To run a command in a previously created snapshot, use:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">mname</span> <span class="n">tname</span> <span class="o">--</span><span class="n">load</span> <span class="nc">SNAP_ID</span> <span class="o">--</span> <span class="n">cmd</span> <span class="n">args</span>
+</pre></div>
+</div>
+<p>The previous command will load the snapshot <strong>SNAP_ID</strong>, go to its directory, set the environment and then run the command <strong>cmd args</strong>.</p>
+<p>If <strong>cmd args</strong> is empty, then the snapshot command is run.</p>
+<p>The argument <strong>–no-cd</strong> can be used to run the command in the current directory.</p>
+<p>The argument <strong>–env VAR=VALUE</strong> can be used to add an extra variable to the environment, after the one set by the snapshot.</p>
+<p>If a <strong>cmd args</strong> is provided, the following special items are substituted:</p>
+<ul>
+<li><ul class="simple">
+<li><p><strong>__</strong></p></li>
+</ul>
+<p>is replaced by all the arguments (including the command) from the snapshot</p>
+</li>
+<li><ul class="simple">
+<li><p><strong>_0</strong></p></li>
+</ul>
+<p>is replaced by the command from the snapshot</p>
+</li>
+<li><ul class="simple">
+<li><p><strong>_1</strong></p></li>
+</ul>
+<p>is replaced by all the arguments (excluding the commnad) from the snapshot</p>
+</li>
+</ul>
+<p>For example:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">mname</span> <span class="n">tname</span> <span class="o">--</span><span class="n">load</span> <span class="nc">ID</span> <span class="o">--</span> <span class="n">gdb</span> <span class="o">_</span><span class="mi">0</span> <span class="o">--</span><span class="n">args</span> <span class="o">__</span>
+</pre></div>
+</div>
+<p>will run the command inside <strong>gdb</strong> with its arguments as provided by the snapshot.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">snapshot</span> <span class="nc">ARGS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">ARGS</span></code>   Command line arguments</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--env</span> <span class="pre">VAR=VALUE</span></code>   Set a variable in the environment</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--load</span> <span class="pre">ID</span></code>   Load snapshot ID</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--no-cd</span></code>   Do not change directory to run the command</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--quit</span></code>   Do not run the command, just exit</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--save</span> <span class="pre">ID</span></code>   Create snapshot ID from state</p></li>
+</ul>
+</section>
 <section id="main-exe-texi2rst">
 <h2>main.exe texi2rst<a class="headerlink" href="#main-exe-texi2rst" title="Permalink to this headline"></a></h2>
 <p>build .texi documentation from gnucobol-docs</p>
@@ -233,7 +334,10 @@
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="debug.html" class="btn btn-neutral float-left" title="Superbol VSCode Debug" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license.html" class="btn btn-neutral float-right" title="Copyright and License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
