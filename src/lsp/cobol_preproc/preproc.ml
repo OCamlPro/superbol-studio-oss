@@ -101,9 +101,9 @@ let srclex_from_channel = make_srclex Lexing.from_channel
 let srclex_from_file ~source_format filename : any_srclexer =
   srclex_from_string ~source_format ~filename (EzFile.read_file filename)
 
-(** Note: If given, assumes [position] corresponds to the begining of the
-    input. If absent, restarts from first position.  File name is kept from the
-    previous input. *)
+(** Note: If given, assumes [position] corresponds to the beginning of the
+    input, which {e must} also be at the beginning of a line.  If absent,
+    restarts from first position.  File name is kept from the previous input. *)
 let srclex_restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   let pos_fname = match position with

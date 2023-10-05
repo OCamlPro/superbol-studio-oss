@@ -14,32 +14,7 @@
 open Format
 open Ez_file
 open FileString.OP
-open Cobol_preproc
-
-let find_dir anchor =
-  let curdir = Sys.getcwd () in
-  let rec iter path =
-    if Sys.file_exists (path // anchor) then
-      path
-    else
-      let path' = Filename.dirname path in
-      if path = path' then
-        Printf.kprintf failwith "Anchor %S not found from %s" anchor curdir;
-      iter path'
-  in
-  iter curdir
-
-let deep_iter = FileString.(make_select iter_dir) ~deep:true
-let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found ->
-  find_dir "test"
-let testsuites = "test/testsuite"
-let ibm_testsuite = testsuites // "ibm/ibmmainframes.com"
-let ibm_root = srcdir // ibm_testsuite
-let mf_testsuite = testsuites // "microfocus/www.csis.ul.ie"
-let mf_root = srcdir // mf_testsuite
-;;
-
-module Diags = Cobol_common.Diagnostics.InitStateful ()
+open Testsuite_utils
 
 let reparse_file ~source_format ~config filename =
   let parse ~source_format input =
@@ -73,8 +48,6 @@ let reparse_file ~source_format ~config filename =
       | _ | exception _ -> Format.printf "Reparse: Failure."
   )
   | _ | exception _ -> Format.printf "Parse: Failure."
-
-let from_dialect = Cobol_config.from_dialect (module Diags)
 
 let () =
   (* Print one token per line so we can diff outputs more easily. *)

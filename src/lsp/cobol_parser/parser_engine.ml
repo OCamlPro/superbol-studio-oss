@@ -519,8 +519,11 @@ module Make (Config: Cobol_config.T) = struct
   and ('a, 'm) rewindable_history_event =
     {
       preproc_position: Lexing.position;
-      event_stage: ('a, 'm) interim_stage;
+      event_stage: ('a, 'm) interim_stage_without_tokens;
     }
+
+  and ('a, 'm) interim_stage_without_tokens =
+    'm state * 'a Grammar_interpr.env         (* Always valid input_needed env. *)
 
   let init_rewindable_parse ps ~make_checkpoint =
     {
@@ -530,17 +533,23 @@ module Make (Config: Cobol_config.T) = struct
     }
 
   (** Stores a stage as part of the memorized rewindable history events. *)
-  let save_history_event ((ps, _, _) as stage) (store: _ rewindable_history) =
+  let save_interim_stage (ps, _, env) (store: _ rewindable_history) =
     let preproc_position = Cobol_preproc.position ps.preproc.pp in
     match store with
+    | store'
+      when preproc_position.pos_cnum <> preproc_position.pos_bol ->
+        (* We must only save positions that correspond to beginning of lines;
+           this should only make us skip recording events at the end of
+           inputs. *)
+        store'
     | { preproc_position = prev_pos; _ } :: store'
       when prev_pos.pos_cnum  = preproc_position.pos_cnum  &&
            prev_pos.pos_fname = preproc_position.pos_fname ->
         (* Preprocessor did not advance further since last save: replace event
            with new parser state: *)
-        { preproc_position; event_stage = stage } :: store'
+        { preproc_position; event_stage = (ps, env) } :: store'
     | store' ->
-        { preproc_position; event_stage = stage } :: store'
+        { preproc_position; event_stage = (ps, env) } :: store'
 
   let rewindable_parser_state = function
     | { stage = Final (_, ps) | Trans (ps, _, _); _ } -> ps
@@ -560,7 +569,7 @@ module Make (Config: Cobol_config.T) = struct
       | Trans ((ps, _, _) as state) ->
           let store, count =
             if count = save_stage then store, succ count
-            else save_history_event state store, 0
+            else save_interim_stage state store, 0
           and stage =
             try on_interim_stage state with e -> on_exn ps e
           in
@@ -574,15 +583,23 @@ module Make (Config: Cobol_config.T) = struct
         pos
     | Indexed { line; char } ->
         let ps = rewindable_parser_state rwps in
-        let lexpos = Cobol_preproc.position ps.preproc.pp in
         let newline_cnums = Cobol_preproc.newline_cnums ps.preproc.pp in
-        let pos_bol =
-          try List.nth newline_cnums (line - 1)
-          with Not_found | Invalid_argument _ -> 0
-        in
-        Lexing.{ lexpos with pos_bol;
-                             pos_cnum = pos_bol + char;
-                             pos_lnum = line + 1 }
+        if newline_cnums = []
+        then raise Not_found (* no complete line was processed yet; just skip *)
+        else
+          let lexpos = Cobol_preproc.position ps.preproc.pp in
+          try
+            let pos_bol =
+              try List.nth newline_cnums (line - 1)
+              with Not_found | Invalid_argument _ -> 0
+            in
+            Lexing.{ lexpos with pos_bol;
+                                 pos_cnum = pos_bol + char;
+                                 pos_lnum = line + 1 }
+          with Failure _ ->
+            (* The given line exceeds what was already processed, so we restart
+               from the current preprocessor position. *)
+            lexpos
 
   let find_history_event_preceding ~position ({ store; _ } as rwps) =
     let lexpos = lexing_postion_of ~position rwps in
@@ -608,10 +625,11 @@ module Make (Config: Cobol_config.T) = struct
     let rwps =
       try
         let event, store = find_history_event_preceding ~position rwps in
-        let ps, tokens, env = event.event_stage in
+        let ps, env = event.event_stage in
         let pp = ps.preproc.pp in
-        let pp = pp_rewind ?new_position:(Some event.preproc_position) pp in
+        let pp = pp_rewind ~new_position:event.preproc_position pp in
         let ps = { ps with preproc = { ps.preproc with pp } } in
+        let ps, tokens = produce_tokens ps in
         { rwps with stage = Trans (ps, tokens, env); store }
       with Not_found ->                   (* rewinding before first checkpoint *)
         let pp = pp_rewind rwps.init.preproc.pp in

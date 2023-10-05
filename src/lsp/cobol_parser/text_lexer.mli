@@ -31,7 +31,7 @@ val show_token_of_handle: token_handle -> string
 (* --- *)
 
 val handle_of_token: Grammar_tokens.token -> token_handle
-val reserve_words: Cobol_config.words_spec -> unit
+val reserve_words: Cobol_config.words_spec -> Cobol_common.Diagnostics.Set.t
 val enable_tokens: TokenHandles.t -> unit
 val disable_tokens: TokenHandles.t -> unit
 

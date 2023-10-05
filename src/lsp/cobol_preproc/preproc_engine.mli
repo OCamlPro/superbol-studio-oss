@@ -27,6 +27,12 @@ val reset_preprocessor
   -> preprocessor
   -> input
   -> preprocessor
+val reset_preprocessor_for_string
+  : string
+  -> ?new_position:Lexing.position
+  -> preprocessor
+  -> preprocessor
+
 
 (* --- *)
 

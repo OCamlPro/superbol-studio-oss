@@ -4,11 +4,27 @@
   (libraries alcotest cobol_parser cobol_data))
 
 (library
+ (name parser_testing)
+ (modules Parser_testing)
+ (libraries cobol_parser)
+ )
+
+(library
  (name test_cobol_parser)
- (modules cS_tokens decimal_point tokens parser_testing)
+ (modules cS_tokens decimal_point tokens)
  (preprocess
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries cobol_parser)
+ (libraries parser_testing)
+ )
+
+(library
+ (name test_cobol_parser_rewind)
+ (modules test_appending test_appending_large test_cutnpaste_large)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries parser_testing testsuite_utils)
  )

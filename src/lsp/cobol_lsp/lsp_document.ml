@@ -169,18 +169,9 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
       { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
   | Some position, Some rewinder ->
       extract_parsed_infos doc @@
-      Cobol_parser.rewind_and_parse rewinder ~position
-        begin fun ?new_position pp ->
-          let contents = Lsp.Text_document.text textdoc in
-          let contents = match new_position with
-            | None -> contents
-            | Some (Lexing.{ pos_cnum; _ } as _pos) ->
-                EzString.after contents (pos_cnum - 1)
-          in
-          (* Pretty.error "contents = %S@." contents; *)
-          Cobol_preproc.reset_preprocessor ?new_position pp
-            (String { contents; filename = Lsp.Uri.to_path (uri doc) })
-        end
+      Cobol_parser.rewind_and_parse rewinder ~position @@
+      Cobol_preproc.reset_preprocessor_for_string @@
+      Lsp.Text_document.text textdoc
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
 let blank ~project ?copybook textdoc =

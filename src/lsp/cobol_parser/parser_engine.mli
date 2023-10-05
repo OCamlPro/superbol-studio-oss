@@ -29,8 +29,8 @@ open Parser_outputs
     i.e,} {!Cobol_common.Diagnostics.Set.has_errors} holds).  This is in
     particular the case when the resulting parse-tree is provided and recovery
     is enabled ([options.recovery <> DisableRecovery]), as in such a case, the
-    parse-tree returned may contain dummy nodes and source locations produced
-    using the recovery mechanism. *)
+    parse-tree returned may contain dummy nodes and source locations produced by
+    the recovery mechanism. *)
 
 (** {1 Basic (one-shot) parsing} *)
 
@@ -92,8 +92,8 @@ type position =
       Lexing.position                                 (** raw lexing position *)
   | Indexed of
       {
-        line: int;               (** line number (starting at 0) *)
-        char: int;               (** character number in line (starting at 0) *)
+        line: int;             (** line number (starting from 0) *)
+        char: int;             (** character number in line (starting from 0) *)
       }
 
 (** [rewind_and_parse rewinder preprocessor_rewind ~position] uses [rewinder] to

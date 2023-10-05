@@ -390,6 +390,13 @@ let pp_pptokens: pptokens Pretty.printer =
 let reset_preprocessor ?new_position pp input =
   preprocessor input (`ResetPosition (pp, new_position))
 
+let reset_preprocessor_for_string string ?new_position pp =
+  let contents = match new_position with
+    | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
+    | None -> string
+  in                                                   (* filename is ignored *)
+  reset_preprocessor ?new_position pp @@ String { contents; filename = "" }
+
 (* --- *)
 
 let preprocessor ?(options = Preproc_options.default) input =
