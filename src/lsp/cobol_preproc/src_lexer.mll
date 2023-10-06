@@ -282,7 +282,7 @@ and fixed_nominal state
       }
 and fixed_cdir_line state                    (* microfocus compiler directive *)
   = parse
-  | blank text_word                                             (* XXX: '\t'? *)
+  | blanks? text_word
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }

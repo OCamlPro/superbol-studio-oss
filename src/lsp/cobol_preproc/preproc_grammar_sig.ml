@@ -31,11 +31,11 @@ module type S = sig
 
       (* The monolithic API. *)
 
-      val replace_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc.replace_statement Cobol_common.Srcloc.with_loc)
+      val replace_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc_directives.replace_statement Cobol_common.Srcloc.with_loc)
 
-      val lexing_directive: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc.lexing_directive Cobol_common.Srcloc.with_loc)
+      val lexing_directive: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc_directives.lexing_directive Cobol_common.Srcloc.with_loc)
 
-      val copy_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc.copy_statement Cobol_common.Srcloc.with_loc)
+      val copy_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc_directives.copy_statement Cobol_common.Srcloc.with_loc)
 
       val _unused_symbols: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (unit)
 
@@ -52,11 +52,11 @@ module type S = sig
 
       module Incremental : sig
 
-        val replace_statement: Lexing.position -> (Preproc.replace_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
+        val replace_statement: Lexing.position -> (Preproc_directives.replace_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
 
-        val lexing_directive: Lexing.position -> (Preproc.lexing_directive Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
+        val lexing_directive: Lexing.position -> (Preproc_directives.lexing_directive Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
 
-        val copy_statement: Lexing.position -> (Preproc.copy_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
+        val copy_statement: Lexing.position -> (Preproc_directives.copy_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
 
         val _unused_symbols: Lexing.position -> (unit) MenhirInterpreter.checkpoint
 

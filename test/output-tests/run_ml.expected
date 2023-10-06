@@ -2809,7 +2809,7 @@ run_ml.at-483-prog.cob:2.7-2.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 run_ml.at-483-prog.cob:17.11-17.14:
   14          01  out PIC X(100).
@@ -4301,7 +4301,7 @@ run_ml.at-863-prog.cob:2.7-2.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
->> Error: Unexpected characters
+>> Error: Malformed or unknown compiler directive
 
 run_ml.at-863-prog.cob:17.11-17.15:
   14          01  out PIC X(100).

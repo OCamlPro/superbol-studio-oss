@@ -23,13 +23,13 @@
 
 (* Entry points *)
 
-%start <Preproc.lexing_directive option
+%start <Preproc_directives.lexing_directive option
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> lexing_directive
-%start <Preproc.copy_statement
+%start <Preproc_directives.copy_statement
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> copy_statement
-%start <Preproc.replace_statement
+%start <Preproc_directives.replace_statement
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> replace_statement
 
@@ -62,7 +62,7 @@ let lexdir_source_format :=
   | CDIR_SOURCE; FORMAT?; IS?; _free = loc(FREE);
     { let SF sf = Src_format.from_config Cobol_config.SFFree in
       Cobol_common.Diagnostics.some_result @@
-        Preproc.LexDirSource (sf &@<- _free) }
+        Preproc_directives.LexDirSource (sf &@<- _free) }
   | CDIR_SOURCE; FORMAT?; IS?; i = text_word;
     { Preproc.cdir_source_format ~dialect i }
 
@@ -134,8 +134,8 @@ let copy_replacing_text_identifier :=
       c @ [lpar] @ cl @ [rpar] }
 
 let leading_or_trailing ==
-  | LEADING;  { Preproc.Leading }
-  | TRAILING; { Preproc.Trailing }
+  | LEADING;  { Preproc_directives.Leading }
+  | TRAILING; { Preproc_directives.Trailing }
 
 (* --- REPLACE -------------------------------------------------------------- *)
 
@@ -147,7 +147,7 @@ let replace_statement_ :=
       { result = CDirReplace { also; replacing }; diags } }
   | REPLACE; last = ibo(LAST); OFF; ".";
     { Cobol_common.Diagnostics.simple_result @@
-        Preproc.CDirReplaceOff { last } }
+        Preproc_directives.CDirReplaceOff { last } }
 
 (* ISO/IEC 1989:2014 only allows the following clauses in "REPLACE"; however we
    allow the same clauses as GnuCOBOL. *)

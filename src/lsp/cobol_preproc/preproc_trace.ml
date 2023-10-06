@@ -8,7 +8,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Some utilities to log preprocessing events. *)
+(** Some utilities to log preprocessing events.  `Preproc_journal` may be a
+    better name. *)
 
 open Cobol_common.Srcloc.TYPES
 
@@ -28,6 +29,12 @@ module TYPES = struct
           matched_loc: srcloc;
           replacement_text: Text.text;
         }
+    | LexDir of
+        {
+          lexdir: Preproc_directives.lexing_directive option;     (** invalid if
+                                                                      [None] *)
+          loc: srcloc;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -43,6 +50,8 @@ include TYPES
 let empty = []
 let append =
   List.cons
+let new_lexdir ~loc ?lexdir : log -> log =
+  List.cons @@ LexDir { lexdir; loc }
 let copy_done ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CopyDone filename }
 let cyclic_copy ~loc ~filename : log -> log =

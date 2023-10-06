@@ -51,7 +51,7 @@ and preprocessor_persist =
   {
     pparser: (module Preproc.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
-    replacing: Preproc.replacing with_loc list list;
+    replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     libpath: string list;
     verbose: bool;
@@ -179,16 +179,23 @@ and try_lexing_directive ({ persist = { pparser = (module Pp);
   | Error `NotCDir ->
       Error `NotLexDir
   | Ok supplier ->
+      (* Here, [srctext] is never empty as it's known to start with a compiler
+         directive marker `>>` (or `$` for MF-style directives), so we should
+         always have a loc: *)
+      let loc = Option.get @@ Cobol_common.Srcloc.concat_locs srctext in
       let parser = Pp.Incremental.lexing_directive (position lp) in
       match ~&(Pp.MenhirInterpreter.loop supplier parser) with
-      | { result = Some LexDirSource sf; diags } ->
+      | { result = Some Preproc_directives.LexDirSource sf as lexdir; diags } ->
+          let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
           let lp = add_diags lp diags in
+          let lp = with_pplog lp pplog in
           Ok (with_srclex lp (Preproc.with_source_format sf srclex))
       | { result = None; diags } ->   (* valid lexdir with erroneous semantics *)
+          let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
+          let lp = with_pplog lp pplog in
           Ok (add_diags lp diags)
       | exception Pp.Error ->
-          let loc = Cobol_common.Srcloc.concat_locs srctext in
-          Ok (DIAGS.Cont.kerror (add_diag lp) ?loc
+          Ok (DIAGS.Cont.kerror (add_diag lp) ~loc
                 "Malformed@ or@ unknown@ compiler@ directive")
 
 and preprocess_line lp srctext =
