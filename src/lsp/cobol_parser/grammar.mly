@@ -1607,6 +1607,7 @@ usage [@context usage_clause   (* ok as none of leftmost terminals are C/S *)]:
   | COMP_9                                        { UsagePending `Comp9 }
   | COMP_10                                       { UsagePending `Comp10 }
   | COMP_15                                       { UsagePending `Comp15 }
+  | BINARY_C_LONG so = signedness_                { UsagePending (`BinaryCLong so) }
 
 let signedness_ := ~ = ro(signedness); < >
 let signedness ==

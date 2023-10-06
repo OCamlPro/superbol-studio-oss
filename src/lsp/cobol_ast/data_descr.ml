@@ -383,7 +383,8 @@ type usage_clause =
  | FunctionPointer of name with_loc                               (* +COB2002 *)
  | ProgramPointer of name with_loc option                         (* +COB2002 *)
  | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
-                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 ]
+                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 |
+                    `BinaryCLong of signedness option]
 [@@deriving ord]
 
 and signedness =
@@ -502,6 +503,9 @@ let pp_usage_clause ppf usage =
     | `Comp9 -> Fmt.pf ppf "COMP-9"
     | `Comp10-> Fmt.pf ppf "COMP-10"
     | `Comp15 -> Fmt.pf ppf "COMP-15"
+    | `BinaryCLong so ->
+      Fmt.pf ppf "BINARY-C-LONG%a"
+        Fmt.(option (sp ++ pp_signedness)) so
 
 type validation_clause =
   | Class of class_clause

@@ -74,7 +74,7 @@ let rec of_data_group
               | FloatExtended ->
                   (* As per ISO/IEC 1989:2014, 8.5.2.10 Numeric category *)
                   Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
-              | UsagePending (`Comp1 | `Comp2) ->
+              | UsagePending (`Comp1 | `Comp2 | `BinaryCLong _) ->
                   Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
               | _ ->
                   Diags.error ~loc "Missing@ PICTURE@ clause";
