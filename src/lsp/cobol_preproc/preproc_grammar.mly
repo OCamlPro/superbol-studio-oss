@@ -64,11 +64,12 @@ let lexdir_source_format :=
       Cobol_common.Diagnostics.some_result @@
         Preproc_directives.LexDirSource (sf &@<- _free) }
   | CDIR_SOURCE; FORMAT?; IS?; i = text_word;
-    { Preproc.cdir_source_format ~dialect i }
+    { Src_processor.cdir_source_format ~dialect i }
 
 let lexdir_microfocus_sourceformat :=
   | CDIR_SET; SOURCEFORMAT; i = loc(ALPHANUM);  (* elementary_string_literal? *)
-    { Preproc.cdir_source_format ~dialect (Cobol_common.Srcloc.locmap fst i) }
+    { Src_processor.cdir_source_format ~dialect
+        (Cobol_common.Srcloc.locmap fst i) }
 
 (* --- COPY ----------------------------------------------------------------- *)
 
@@ -98,7 +99,7 @@ let copy_replacings :=
 let copy_replacing_clause ==
   | repl_from = copy_replacing_text; BY;
     repl_to   = copy_replacing_text;
-    { Preproc.replacing repl_from repl_to }
+    { Src_processor.replacing repl_from repl_to }
   | repl_dir = leading_or_trailing;
     repl_from = loc(replacing_src); BY;
     repl_to = loc(replacing_dst);

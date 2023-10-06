@@ -25,9 +25,9 @@ module Make (Config: Cobol_config.T) = struct
   let replacing' ?repl_dir repl_from repl_to =
     match repl_dir, ~&repl_from with
     | None, (`PseudoText src | `Alphanum src) ->
-        Preproc.replacing (src &@<- repl_from) repl_to
+        Src_processor.replacing (src &@<- repl_from) repl_to
     | Some repl_dir, `PseudoText src ->
-        Preproc.replacing ~partial:{ repl_dir; repl_strict = false }
+        Src_processor.replacing ~partial:{ repl_dir; repl_strict = false }
           (src &@<- repl_from) repl_to
     | Some repl_dir, `Alphanum src ->
         let { result = repl_strict; diags } =
@@ -46,17 +46,16 @@ module Make (Config: Cobol_config.T) = struct
               DIAGS.result false
         in
         DIAGS.with_more_diags ~diags @@
-        Preproc.replacing ~partial:{ repl_dir; repl_strict }
+        Src_processor.replacing ~partial:{ repl_dir; repl_strict }
           (src &@<- repl_from) repl_to
 
   let filter_map_4_list_with_diags'
     : 'a option with_diags with_loc list -> 'a with_loc list with_diags = fun l ->
-    List.fold_left begin fun (result, diags) { payload = { result = r; diags = d };
-                                               loc } ->
-      (match r with None -> result | Some r -> (r &@ loc) :: result),
-      DIAGS.Set.union diags d
-    end ([], DIAGS.Set.none) l |>
+    List.fold_left
+      begin fun (result, diags) { payload = { result = r; diags = d }; loc } ->
+        (match r with None -> result | Some r -> (r &@ loc) :: result),
+        DIAGS.Set.union diags d
+      end ([], DIAGS.Set.none) l |>
     fun (result, diags) -> { result = List.rev result; diags }
-
 
 end

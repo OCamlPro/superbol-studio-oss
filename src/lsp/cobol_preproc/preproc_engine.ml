@@ -40,8 +40,8 @@ let decide_source_format _input
 type preprocessor =
   {
     buff: Text.text;
-    srclex: Preproc.any_srclexer;
-    ppstate: Preproc.state;
+    srclex: Src_processor.any_srclexer;
+    ppstate: Src_processor.state;
     pplog: Preproc_trace.log;
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
@@ -49,7 +49,7 @@ type preprocessor =
 and preprocessor_persist =
   (** the preprocessor state that does not change very often *)
   {
-    pparser: (module Preproc.PPPARSER);
+    pparser: (module Src_processor.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
@@ -59,14 +59,14 @@ and preprocessor_persist =
   }
 
 let diags { diags; srclex; _ } =
-  DIAGS.Set.union diags @@ Preproc.srclex_diags srclex
+  DIAGS.Set.union diags @@ Src_processor.srclex_diags srclex
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
 let log { pplog; _ } = pplog
-let source_format { srclex; _ } = Preproc.source_format srclex
-let position { srclex; _ } = Preproc.srclex_pos srclex
-let comments { srclex; _ } = Preproc.srclex_comments srclex
-let newline_cnums { srclex; _ } = Preproc.srclex_newline_cnums srclex
+let source_format { srclex; _ } = Src_processor.source_format srclex
+let position { srclex; _ } = Src_processor.srclex_pos srclex
+let comments { srclex; _ } = Src_processor.srclex_comments srclex
+let newline_cnums { srclex; _ } = Src_processor.srclex_newline_cnums srclex
 
 let with_srclex lp srclex =
   if lp.srclex == srclex then lp else { lp with srclex }
@@ -88,19 +88,19 @@ let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
 
 let make_srclex ~source_format = function
   | Filename filename ->
-      Preproc.srclex_from_file ~source_format filename
+      Src_processor.srclex_from_file ~source_format filename
   | String { contents; filename } ->
-      Preproc.srclex_from_string ~filename ~source_format contents
+      Src_processor.srclex_from_string ~filename ~source_format contents
   | Channel { contents; filename } ->
-      Preproc.srclex_from_channel ~filename ~source_format contents
+      Src_processor.srclex_from_channel ~filename ~source_format contents
 
 let rewind_srclex srclex ?position = function
   | Filename filename ->
-      Preproc.srclex_restart_on_file ?position filename srclex
+      Src_processor.srclex_restart_on_file ?position filename srclex
   | String { contents; _ } ->    (* Let's avoid renaming the file in lexbuf... *)
-      Preproc.srclex_restart_on_string ?position contents srclex
+      Src_processor.srclex_restart_on_string ?position contents srclex
   | Channel { contents; _ } ->                                        (* ditto *)
-      Preproc.srclex_restart_on_channel ?position contents srclex
+      Src_processor.srclex_restart_on_channel ?position contents srclex
 
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format;
@@ -113,7 +113,7 @@ let preprocessor input = function
       {
         buff = [];
         srclex = make_srclex ~source_format input;
-        ppstate = Preproc.initial_state;
+        ppstate = Src_processor.initial_state;
         pplog = Preproc_trace.empty;
         diags;
         persist =
@@ -128,7 +128,7 @@ let preprocessor input = function
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
-      let source_format = Preproc.source_format from.srclex in
+      let source_format = Src_processor.source_format from.srclex in
       {
         from with
         buff = [];
@@ -148,11 +148,11 @@ let preprocessor input = function
 (* --- *)
 
 let apply_active_replacing { pplog; persist; _ } = match persist with
-  | { replacing = r :: _; _ } -> Preproc.apply_replacing OnPartText r pplog
+  | { replacing = r :: _; _ } -> Src_processor.apply_replacing OnPartText r pplog
   | _ -> fun text -> Ok (text, pplog)
 
 let apply_active_replacing_full { pplog; persist; _ } = match persist with
-  | { replacing = r :: _; _ } -> Preproc.apply_replacing OnFullText r pplog
+  | { replacing = r :: _; _ } -> Src_processor.apply_replacing OnFullText r pplog
   | _ -> fun text -> text, pplog
 
 (** [lookup_compiler_directive chunk] searches for a compiler-directive
@@ -162,7 +162,7 @@ let apply_active_replacing_full { pplog; persist; _ } = match persist with
     Returns [Ok (prefix, cdir_text)] if a compiler directive is recognised,
     where [cdir_text] is guaranteed to start with a compiler-directive word on a
     line [l] and terminates at the end [l]. *)
-(* Note: {!Preproc.next_source_chunk} never outputs compiler-directive
+(* Note: {!Src_processor.next_source_chunk} never outputs compiler-directive
    text-words in positions other than the first two.  Such a chunk also
    terminates at the end of the source line as it cannot be continued (contrary
    to normal source lines). *)
@@ -177,7 +177,7 @@ let lookup_compiler_directive: Text.text -> _ = function
     compiler directives along the way.  It never returns an empty result: the
     output text always containts at least {!Eof}. *)
 let rec next_chunk ({ srclex; buff; _ } as lp) =
-  match Preproc.next_source_chunk srclex with
+  match Src_processor.next_source_chunk srclex with
   | srclex, ([{ payload = Eof; _}] as eof) ->
       let text, pplog = apply_active_replacing_full lp (buff @ eof) in
       text, { lp with srclex; pplog; buff = [] }
@@ -207,7 +207,7 @@ and on_lexing_directive ({ persist = { pparser = (module Pp);
       let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
       let lp = add_diags lp diags in
       let lp = with_pplog lp pplog in
-      with_srclex lp (Preproc.with_source_format sf srclex)
+      with_srclex lp (Src_processor.with_source_format sf srclex)
   | { result = None; diags } ->       (* valid lexdir with erroneous semantics *)
       let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
       let lp = with_pplog lp pplog in
@@ -242,7 +242,7 @@ and do_replacing lp text =
       text, with_buff_n_pplog lp buff pplog
 
 and try_preproc lp srctext =
-  match Preproc.find_preproc_phrase ~prefix:`Rev lp.ppstate srctext with
+  match Src_processor.find_preproc_phrase ~prefix:`Rev lp.ppstate srctext with
   | Error (`MissingPeriod | `MissingText) as e -> e
   | Error `NoneFound -> Ok (`CDirNone (lp, srctext))
   | Ok (cdir, ppstate) -> Ok (process_preproc_phrase { lp with ppstate } cdir)
@@ -293,7 +293,7 @@ and do_copy lp rev_prefix copy suffix =
   let lp = add_diags lp diags in
   let libtext, lp = read_lib lp ~@copy library in
   let libtext, pplog =
-    Preproc.apply_replacing OnFullText replacing lp.pplog libtext
+    Src_processor.apply_replacing OnFullText replacing lp.pplog libtext
   in
   let lp = with_pplog lp pplog in
   (* eprintf "Library text: %a@." pp_text libtext; *)
@@ -435,7 +435,7 @@ let lex_file ~source_format ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    Preproc.print_source ppf (make_srclex ~source_format input)
+    Src_processor.print_source ppf (make_srclex ~source_format input)
   end
 
 let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
@@ -445,8 +445,8 @@ let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
         let source_format =
           DIAGS.grab_diags @@
           decide_source_format (Filename filename) source_format in
-        let pl = Preproc.srclex_from_file ~source_format filename in
-        Preproc.print_source ppf pl
+        let pl = Src_processor.srclex_from_file ~source_format filename in
+        Src_processor.print_source ppf pl
     | Error lnf ->
         Copybook.lib_not_found_error (DIAGS.error "%t") lnf
   end
@@ -455,7 +455,7 @@ let fold_source_lines ~source_format ?epf ~f =
   Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    Preproc.fold_source_lines (make_srclex ~source_format input) ~f
+    Src_processor.fold_source_lines (make_srclex ~source_format input) ~f
   end
 
 let pp_preprocessed ppf lp =
