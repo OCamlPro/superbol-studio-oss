@@ -75,10 +75,3 @@ let ondemand_list_supplier (module Om: Src_overlay.MANAGER) ~pp ~eoi l =
 
 let pptoks_of_text_supplier om text =
   ondemand_list_supplier ~eoi:Preproc_tokens.EOL ~pp:pptoks_of_chstr om text
-
-(** Tokenize the given text into pptokens if it starts with a {!CDirWord}. *)
-let supply_text_if_compiler_directive om = function
-  | t :: _ as text when Text.cdirp t ->
-      Ok (pptoks_of_text_supplier om text)
-  | _ ->
-      Error `NotCDir

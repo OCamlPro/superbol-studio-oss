@@ -64,14 +64,6 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
 (*indent a range of file, with the default indent_config*)
 let indent_range' ~source_format ~range ~file =
   let file_content = Ez_file.V1.EzFile.read_file file in
-  let check_indent = Indent_check.check_indentation in
-  let state = {
-    scope = BEGIN;
-    context  = [];
-    acc = [];
-    range;
-  }
-  in
   (*
     Not satisfied with the `Cobol_preproc.fold_text_lines`,
     this function has an argument which is the name of file,
@@ -80,8 +72,9 @@ let indent_range' ~source_format ~range ~file =
      (* NB: not anymore. *)
   *)
   let state =
-    Cobol_preproc.fold_text_lines ~source_format check_indent
-      (Filename file) state
+    Cobol_preproc.fold_source_lines ~source_format
+      ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
+      (Filename file) { scope = BEGIN; context  = []; acc = []; range }
   in
   let ind_recds = state.acc in
   indenter ~source_format file_content ind_recds state.range

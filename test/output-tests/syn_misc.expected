@@ -1206,14 +1206,6 @@ syn_misc.at-1903-prog.cob:8.0:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1936:0
-syn_misc.at-1936-prog.cob:6.11-6.15:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5              GO
-   6 >       -    BACK.
-----              ^^^^
->> Error: Unexpected `BACK' in continuation
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2005:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2045:0
 syn_misc.at-2045-prog2.cob:11.7-11.46:
@@ -4621,5 +4613,7 @@ syn_misc.at-8199-prog.cob:7.7-7.16:
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8235:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8284:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8286:0
+>> Warning: Source format `auto` is not supported yet, using `fixed`
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8283:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8340:0

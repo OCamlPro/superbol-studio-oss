@@ -155,53 +155,71 @@ let apply_active_replacing_full { pplog; persist; _ } = match persist with
   | { replacing = r :: _; _ } -> Preproc.apply_replacing OnFullText r pplog
   | _ -> fun text -> text, pplog
 
-(** [next_sentence lp] reads the next sentence from [lp], handling lexical and
-   compiler directives along the way.  It never returns an empty sentence: the
-   output text always terminates with a period or {!Eof}. *)
-let rec next_sentence ({ srclex; buff; _ } as lp) =
-  match Preproc.next_source_line srclex with
+(** [lookup_compiler_directive chunk] searches for a compiler-directive
+    text-word (that starts with either `{v >> v}' or `{v $ v}') in the given
+    chunk of source text.
+
+    Returns [Ok (prefix, cdir_text)] if a compiler directive is recognised,
+    where [cdir_text] is guaranteed to start with a compiler-directive word on a
+    line [l] and terminates at the end [l]. *)
+(* Note: {!Preproc.next_source_chunk} never outputs compiler-directive
+   text-words in positions other than the first two.  Such a chunk also
+   terminates at the end of the source line as it cannot be continued (contrary
+   to normal source lines). *)
+let lookup_compiler_directive: Text.text -> _ = function
+  |      t :: _ as text  when Text.cdirp t -> Ok ([ ], text)
+  | p :: (t :: _ as text) when Text.cdirp t -> Ok ([p], text)
+  | _ -> Error `NotCDir
+
+(* --- *)
+
+(** [next_chunk lp] reads the next chunk from [lp], handling lexical and
+    compiler directives along the way.  It never returns an empty result: the
+    output text always containts at least {!Eof}. *)
+let rec next_chunk ({ srclex; buff; _ } as lp) =
+  match Preproc.next_source_chunk srclex with
   | srclex, ([{ payload = Eof; _}] as eof) ->
       let text, pplog = apply_active_replacing_full lp (buff @ eof) in
       text, { lp with srclex; pplog; buff = [] }
   | srclex, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
-      match try_lexing_directive (with_srclex lp srclex) text with
-      | Ok lp ->
-          next_sentence lp
-      | Error `NotLexDir ->
+      match lookup_compiler_directive text with
+      | Error `NotCDir ->
           preprocess_line { lp with srclex; buff = [] } (buff @ text)
+      | Ok ([], lexdir_text) ->
+          next_chunk @@ on_lexing_directive { lp with srclex } lexdir_text
+      | Ok (text, lexdir_text) ->
+          let lp = { lp with srclex; buff = [] } in
+          preprocess_line (on_lexing_directive lp lexdir_text) (buff @ text)
 
-and try_lexing_directive ({ persist = { pparser = (module Pp);
-                                        overlay_manager = om; _ };
-                            srclex; _ } as lp) srctext =
-  match Text_supplier.supply_text_if_compiler_directive om srctext with
-  | Error `NotCDir ->
-      Error `NotLexDir
-  | Ok supplier ->
-      (* Here, [srctext] is never empty as it's known to start with a compiler
-         directive marker `>>` (or `$` for MF-style directives), so we should
-         always have a loc: *)
-      let loc = Option.get @@ Cobol_common.Srcloc.concat_locs srctext in
-      let parser = Pp.Incremental.lexing_directive (position lp) in
-      match ~&(Pp.MenhirInterpreter.loop supplier parser) with
-      | { result = Some Preproc_directives.LexDirSource sf as lexdir; diags } ->
-          let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
-          let lp = add_diags lp diags in
-          let lp = with_pplog lp pplog in
-          Ok (with_srclex lp (Preproc.with_source_format sf srclex))
-      | { result = None; diags } ->   (* valid lexdir with erroneous semantics *)
-          let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
-          let lp = with_pplog lp pplog in
-          Ok (add_diags lp diags)
-      | exception Pp.Error ->
-          Ok (DIAGS.Cont.kerror (add_diag lp) ~loc
-                "Malformed@ or@ unknown@ compiler@ directive")
+and on_lexing_directive ({ persist = { pparser = (module Pp);
+                                       overlay_manager = om; _ };
+                           srclex; _ } as lp) lexdir_text =
+  (* Here, [lexdir_text] is never empty as it's known to start with a compiler
+     directive marker `>>` (or `$` for MF-style directives), so we should always
+     have a loc: *)
+  let supplier = Text_supplier.pptoks_of_text_supplier om lexdir_text in
+  let loc = Option.get @@ Cobol_common.Srcloc.concat_locs lexdir_text in
+  let parser = Pp.Incremental.lexing_directive (position lp) in
+  match ~&(Pp.MenhirInterpreter.loop supplier parser) with
+  | { result = Some Preproc_directives.LexDirSource sf as lexdir; diags } ->
+      let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
+      let lp = add_diags lp diags in
+      let lp = with_pplog lp pplog in
+      with_srclex lp (Preproc.with_source_format sf srclex)
+  | { result = None; diags } ->       (* valid lexdir with erroneous semantics *)
+      let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
+      let lp = with_pplog lp pplog in
+      add_diags lp diags
+  | exception Pp.Error ->
+      DIAGS.Cont.kerror (add_diag lp) ~loc
+        "Malformed@ or@ unknown@ compiler@ directive"
 
 and preprocess_line lp srctext =
   match try_preproc lp srctext with
   | Ok (`CDirNone (lp, [])) ->    (* Never return empty: skip to next sentence *)
-      next_sentence lp
+      next_chunk lp
   | Ok (`CDirNone (lp, text)) ->
       do_replacing lp text
   | Ok (`CopyDone (lp, srctext))
@@ -210,16 +228,16 @@ and preprocess_line lp srctext =
                                         be a compiler directive. *)
       preprocess_line lp srctext
   | Ok (`ReplaceDone (lp, text, srctext)) ->
-      text, with_buff lp srctext
+      text, with_buff lp @@ Text.strip_eof srctext
   | Error (`MissingPeriod | `MissingText) ->
-      next_sentence (with_buff lp srctext)
+      next_chunk (with_buff lp srctext)
 
 and do_replacing lp text =
   match apply_active_replacing lp text with
   | Ok (text, pplog) ->
       text, with_pplog lp pplog
   | Error (`MissingText ([], pplog, buff)) ->
-      next_sentence (with_buff_n_pplog lp buff pplog)
+      next_chunk (with_buff_n_pplog lp buff pplog)
   | Error (`MissingText (text, pplog, buff)) ->
       text, with_buff_n_pplog lp buff pplog
 
@@ -336,7 +354,7 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
 and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   let eofp p = ~&p = Text.Eof in
   let rec aux acc lp =
-    let text, lp = next_sentence lp in
+    let text, lp = next_chunk lp in
     let text = match postproc with
       | None -> text
       | Some p -> List.(rev @@ rev_map p text)
@@ -351,8 +369,8 @@ and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   in
   aux [] lp
 
-let next_sentence lp =
-  let text, lp = next_sentence lp in
+let next_chunk lp =
+  let text, lp = next_chunk lp in
   if show `Txt lp then
     Pretty.error "Txt: %a@." Text.pp_text text;
   text, lp
@@ -417,8 +435,7 @@ let lex_file ~source_format ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    let pl = make_srclex ~source_format input in
-    Preproc.print_source_lines ppf pl
+    Preproc.print_source ppf (make_srclex ~source_format input)
   end
 
 let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
@@ -429,17 +446,16 @@ let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
           DIAGS.grab_diags @@
           decide_source_format (Filename filename) source_format in
         let pl = Preproc.srclex_from_file ~source_format filename in
-        Preproc.print_source_lines ppf pl
+        Preproc.print_source ppf pl
     | Error lnf ->
         Copybook.lib_not_found_error (DIAGS.error "%t") lnf
   end
 
-let fold_text_lines ~source_format ?epf f =
+let fold_source_lines ~source_format ?epf ~f =
   Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    let pl = make_srclex ~source_format input in
-    Preproc.fold_source_lines pl f
+    Preproc.fold_source_lines (make_srclex ~source_format input) ~f
   end
 
 let pp_preprocessed ppf lp =

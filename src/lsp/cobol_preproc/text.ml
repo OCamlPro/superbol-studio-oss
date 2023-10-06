@@ -132,3 +132,8 @@ let pseudotext_of_string = pseudotext_ pseudo_string
 let pseudotext_of_alphanum = pseudotext_ pseudo_alphanum
 let pseudotext_of_integer = pseudotext_ pseudo_integer
 let alphanum_as_pseudotext a = pseudotext_ alphanum_as_pseudo a
+
+(** Strips any end-of-input/file item from the beginning of the given text. *)
+let rec strip_eof = function
+  | { payload = Eof; _ } :: text -> strip_eof text
+  | text -> text

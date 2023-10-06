@@ -1140,6 +1140,16 @@ listings.at-2030-expected.lst:22.10-22.15:
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:24.6-24.7:
+  21   000016         EX. STOP RUN.
+  22   GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
+  23   
+  24 > SIZE  TYPE           LVL  NAME                           PICTURE
+----         ^
+  25   
+  26         WORKING-STORAGE SECTION
+>> Error: Unexpected indicator: `T'
+
 listings.at-2030-expected.lst:22.15:
   19   warning: unreachable statement 'DISPLAY'
   20   000015
@@ -1159,16 +1169,6 @@ listings.at-2030-expected.lst:22.25-22.35:
   23   
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:24.6-24.7:
-  21   000016         EX. STOP RUN.
-  22   GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
-  23   
-  24 > SIZE  TYPE           LVL  NAME                           PICTURE
-----         ^
-  25   
-  26         WORKING-STORAGE SECTION
->> Error: Unexpected indicator: `T'
 
 listings.at-2030-expected.lst:22.35:
   19   warning: unreachable statement 'DISPLAY'
@@ -1240,16 +1240,6 @@ listings.at-2030-expected.lst:26.6-26.7:
   28   00001 ALPHANUMERIC   01   blah                           X
 >> Error: Unexpected indicator: `W'
 
-listings.at-2030-expected.lst:24.57-24.64:
-  21   000016         EX. STOP RUN.
-  22   GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
-  23   
-  24 > SIZE  TYPE           LVL  NAME                           PICTURE
-----                                                            ^^^^^^^
-  25   
-  26         WORKING-STORAGE SECTION
->> Error: Invalid syntax
-
 listings.at-2030-expected.lst:28.6-28.7:
   25   
   26         WORKING-STORAGE SECTION
@@ -1259,6 +1249,16 @@ listings.at-2030-expected.lst:28.6-28.7:
   29   
   30   GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
 >> Error: Unexpected indicator: `A'
+
+listings.at-2030-expected.lst:24.57-24.64:
+  21   000016         EX. STOP RUN.
+  22   GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
+  23   
+  24 > SIZE  TYPE           LVL  NAME                           PICTURE
+----                                                            ^^^^^^^
+  25   
+  26         WORKING-STORAGE SECTION
+>> Error: Invalid syntax
 
 listings.at-2030-expected.lst:26.29:
   23   
@@ -1320,6 +1320,16 @@ listings.at-2030-expected.lst:28.26-28.30:
   30   GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:30.6-30.7:
+  27   
+  28   00001 ALPHANUMERIC   01   blah                           X
+  29   
+  30 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
+----         ^
+  31   
+  32   NAME                           DEFINED                REFERENCES
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:28.30:
   25   
   26         WORKING-STORAGE SECTION
@@ -1339,16 +1349,6 @@ listings.at-2030-expected.lst:28.57-28.58:
   29   
   30   GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:30.6-30.7:
-  27   
-  28   00001 ALPHANUMERIC   01   blah                           X
-  29   
-  30 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
-----         ^
-  31   
-  32   NAME                           DEFINED                REFERENCES
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:28.58:
   25   
@@ -1510,6 +1510,16 @@ listings.at-2030-expected.lst:34.56-34.58:
   36   GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:36.6-36.7:
+  33   
+  34   blah                           7       *10      11      14             x3
+  35   
+  36 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
+----         ^
+  37   
+  38   LABEL                          DEFINED                REFERENCES
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:34.58:
   31   
   32   NAME                           DEFINED                REFERENCES
@@ -1529,16 +1539,6 @@ listings.at-2030-expected.lst:34.71-34.72:
   35   
   36   GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:36.6-36.7:
-  33   
-  34   blah                           7       *10      11      14             x3
-  35   
-  36 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
-----         ^
-  37   
-  38   LABEL                          DEFINED                REFERENCES
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:34.72:
   31   
@@ -1710,6 +1710,16 @@ listings.at-2030-expected.lst:41.40-41.42:
   43   
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:42.6-42.7:
+  39   
+  40   E prog__1                      10
+  41   P EX                           16       12                             x1
+  42 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
+----         ^
+  43   
+  44   FUNCTION                       TYPE                   REFERENCES
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:41.42:
   38   LABEL                          DEFINED                REFERENCES
   39   
@@ -1729,16 +1739,6 @@ listings.at-2030-expected.lst:41.71-41.72:
   42   GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
   43   
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:42.6-42.7:
-  39   
-  40   E prog__1                      10
-  41   P EX                           16       12                             x1
-  42 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
-----         ^
-  43   
-  44   FUNCTION                       TYPE                   REFERENCES
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:41.72:
   38   LABEL                          DEFINED                REFERENCES
@@ -1780,6 +1780,16 @@ listings.at-2030-expected.lst:42.10-42.15:
   44   FUNCTION                       TYPE                   REFERENCES
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:44.6-44.7:
+  41   P EX                           16       12                             x1
+  42   GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
+  43   
+  44 > FUNCTION                       TYPE                   REFERENCES
+----         ^
+  45   
+  46   L prog-2                       EXTERN   11                             x1
+>> Error: Unexpected indicator: `O'
+
 listings.at-2030-expected.lst:42.15:
   39   
   40   E prog__1                      10
@@ -1799,16 +1809,6 @@ listings.at-2030-expected.lst:42.25-42.35:
   43   
   44   FUNCTION                       TYPE                   REFERENCES
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:44.6-44.7:
-  41   P EX                           16       12                             x1
-  42   GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
-  43   
-  44 > FUNCTION                       TYPE                   REFERENCES
-----         ^
-  45   
-  46   L prog-2                       EXTERN   11                             x1
->> Error: Unexpected indicator: `O'
 
 listings.at-2030-expected.lst:42.35:
   39   
@@ -1880,6 +1880,16 @@ listings.at-2030-expected.lst:46.40-46.42:
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:48.6-48.7:
+  45   
+  46   L prog-2                       EXTERN   11                             x1
+  47   
+  48 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
+----         ^
+  49   
+  50   Error/Warning summary:
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:46.42:
   43   
   44   FUNCTION                       TYPE                   REFERENCES
@@ -1899,16 +1909,6 @@ listings.at-2030-expected.lst:46.71-46.72:
   47   
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:48.6-48.7:
-  45   
-  46   L prog-2                       EXTERN   11                             x1
-  47   
-  48 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
-----         ^
-  49   
-  50   Error/Warning summary:
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:46.72:
   43   
@@ -1950,6 +1950,16 @@ listings.at-2030-expected.lst:48.10-48.15:
   50   Error/Warning summary:
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:50.6-50.7:
+  47   
+  48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
+  49   
+  50 > Error/Warning summary:
+----         ^
+  51   
+  52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
+>> Error: Unexpected indicator: `W'
+
 listings.at-2030-expected.lst:48.15:
   45   
   46   L prog-2                       EXTERN   11                             x1
@@ -1969,16 +1979,6 @@ listings.at-2030-expected.lst:48.25-48.35:
   49   
   50   Error/Warning summary:
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:50.6-50.7:
-  47   
-  48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
-  49   
-  50 > Error/Warning summary:
-----         ^
-  51   
-  52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
->> Error: Unexpected indicator: `W'
 
 listings.at-2030-expected.lst:48.35:
   45   
@@ -2000,6 +2000,16 @@ listings.at-2030-expected.lst:50.7-50.13:
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:52.6-52.7:
+  49   
+  50   Error/Warning summary:
+  51   
+  52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
+----         ^
+  53   
+  54   1 warning in compilation group
+>> Error: Unexpected indicator: `.'
+
 listings.at-2030-expected.lst:50.13:
   47   
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
@@ -2019,16 +2029,6 @@ listings.at-2030-expected.lst:50.14-50.22:
   51   
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:52.6-52.7:
-  49   
-  50   Error/Warning summary:
-  51   
-  52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
-----         ^
-  53   
-  54   1 warning in compilation group
->> Error: Unexpected indicator: `.'
 
 listings.at-2030-expected.lst:50.22:
   47   
@@ -2450,6 +2450,16 @@ listings.at-2030-expected.lst:80.10-80.15:
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:82.6-82.7:
+  79   000019
+  80   GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
+  81   
+  82 > SIZE  TYPE           LVL  NAME                           PICTURE
+----         ^
+  83   
+  84         WORKING-STORAGE SECTION
+>> Error: Unexpected indicator: `T'
+
 listings.at-2030-expected.lst:80.15:
   77   000017
   78   000018         EX. STOP RUN.
@@ -2469,16 +2479,6 @@ listings.at-2030-expected.lst:80.25-80.35:
   81   
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:82.6-82.7:
-  79   000019
-  80   GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
-  81   
-  82 > SIZE  TYPE           LVL  NAME                           PICTURE
-----         ^
-  83   
-  84         WORKING-STORAGE SECTION
->> Error: Unexpected indicator: `T'
 
 listings.at-2030-expected.lst:80.35:
   77   000017
@@ -2550,16 +2550,6 @@ listings.at-2030-expected.lst:84.6-84.7:
   86   00001 NUMERIC        01   data-b                         9
 >> Error: Unexpected indicator: `W'
 
-listings.at-2030-expected.lst:82.57-82.64:
-  79   000019
-  80   GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
-  81   
-  82 > SIZE  TYPE           LVL  NAME                           PICTURE
-----                                                            ^^^^^^^
-  83   
-  84         WORKING-STORAGE SECTION
->> Error: Invalid syntax
-
 listings.at-2030-expected.lst:86.6-86.7:
   83   
   84         WORKING-STORAGE SECTION
@@ -2569,6 +2559,16 @@ listings.at-2030-expected.lst:86.6-86.7:
   87   
   88         LINKAGE SECTION
 >> Error: Unexpected indicator: `N'
+
+listings.at-2030-expected.lst:82.57-82.64:
+  79   000019
+  80   GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
+  81   
+  82 > SIZE  TYPE           LVL  NAME                           PICTURE
+----                                                            ^^^^^^^
+  83   
+  84         WORKING-STORAGE SECTION
+>> Error: Invalid syntax
 
 listings.at-2030-expected.lst:84.29:
   81   
@@ -2630,6 +2630,16 @@ listings.at-2030-expected.lst:86.26-86.32:
   88         LINKAGE SECTION
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:88.6-88.7:
+  85   
+  86   00001 NUMERIC        01   data-b                         9
+  87   
+  88 >       LINKAGE SECTION
+----         ^
+  89   
+  90   00001 ALPHANUMERIC   01   stuff                          X
+>> Error: Unexpected indicator: `L'
+
 listings.at-2030-expected.lst:86.32:
   83   
   84         WORKING-STORAGE SECTION
@@ -2649,16 +2659,6 @@ listings.at-2030-expected.lst:86.57-86.58:
   87   
   88         LINKAGE SECTION
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:88.6-88.7:
-  85   
-  86   00001 NUMERIC        01   data-b                         9
-  87   
-  88 >       LINKAGE SECTION
-----         ^
-  89   
-  90   00001 ALPHANUMERIC   01   stuff                          X
->> Error: Unexpected indicator: `L'
 
 listings.at-2030-expected.lst:86.58:
   83   
@@ -2750,6 +2750,16 @@ listings.at-2030-expected.lst:90.26-90.31:
   92   GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:92.6-92.7:
+  89   
+  90   00001 ALPHANUMERIC   01   stuff                          X
+  91   
+  92 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
+----         ^
+  93   
+  94   NAME                           DEFINED                REFERENCES
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:90.31:
   87   
   88         LINKAGE SECTION
@@ -2769,16 +2779,6 @@ listings.at-2030-expected.lst:90.57-90.58:
   91   
   92   GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:92.6-92.7:
-  89   
-  90   00001 ALPHANUMERIC   01   stuff                          X
-  91   
-  92 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
-----         ^
-  93   
-  94   NAME                           DEFINED                REFERENCES
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:90.58:
   87   
@@ -3020,6 +3020,16 @@ listings.at-2030-expected.lst:98.55-98.58:
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:100.6-100.7:
+  97   
+  98   stuff                          9       *10      12     *16             x3
+  99   
+ 100 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
+----         ^
+ 101   
+ 102   LABEL                          DEFINED                REFERENCES
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:98.58:
   95   
   96   data-b                         7       *12      13                     x2
@@ -3039,16 +3049,6 @@ listings.at-2030-expected.lst:98.71-98.72:
   99   
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:100.6-100.7:
-  97   
-  98   stuff                          9       *10      12     *16             x3
-  99   
- 100 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
-----         ^
- 101   
- 102   LABEL                          DEFINED                REFERENCES
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:98.72:
   95   
@@ -3260,6 +3260,16 @@ listings.at-2030-expected.lst:106.40-106.42:
  108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:108.6-108.7:
+ 105   P MAIN                         11     not referenced
+ 106   P EX                           18       14                             x1
+ 107   
+ 108 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
+----         ^
+ 109   
+ 110   Error/Warning summary:
+>> Error: Unexpected indicator: `B'
+
 listings.at-2030-expected.lst:106.42:
  103   
  104   E prog__2                      11
@@ -3279,16 +3289,6 @@ listings.at-2030-expected.lst:106.71-106.72:
  107   
  108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:108.6-108.7:
- 105   P MAIN                         11     not referenced
- 106   P EX                           18       14                             x1
- 107   
- 108 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
-----         ^
- 109   
- 110   Error/Warning summary:
->> Error: Unexpected indicator: `B'
 
 listings.at-2030-expected.lst:106.72:
  103   
@@ -3330,6 +3330,16 @@ listings.at-2030-expected.lst:108.10-108.15:
  110   Error/Warning summary:
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:110.6-110.7:
+ 107   
+ 108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
+ 109   
+ 110 > Error/Warning summary:
+----         ^
+ 111   
+ 112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
+>> Error: Unexpected indicator: `W'
+
 listings.at-2030-expected.lst:108.15:
  105   P MAIN                         11     not referenced
  106   P EX                           18       14                             x1
@@ -3349,16 +3359,6 @@ listings.at-2030-expected.lst:108.25-108.35:
  109   
  110   Error/Warning summary:
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:110.6-110.7:
- 107   
- 108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
- 109   
- 110 > Error/Warning summary:
-----         ^
- 111   
- 112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
->> Error: Unexpected indicator: `W'
 
 listings.at-2030-expected.lst:108.35:
  105   P MAIN                         11     not referenced
@@ -3380,6 +3380,16 @@ listings.at-2030-expected.lst:110.7-110.13:
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Warning: Invalid syntax
 
+listings.at-2030-expected.lst:112.6-112.7:
+ 109   
+ 110   Error/Warning summary:
+ 111   
+ 112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
+----         ^
+ 113   
+ 114   2 warnings in compilation group
+>> Error: Unexpected indicator: `.'
+
 listings.at-2030-expected.lst:110.13:
  107   
  108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
@@ -3399,16 +3409,6 @@ listings.at-2030-expected.lst:110.14-110.22:
  111   
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:112.6-112.7:
- 109   
- 110   Error/Warning summary:
- 111   
- 112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
-----         ^
- 113   
- 114   2 warnings in compilation group
->> Error: Unexpected indicator: `.'
 
 listings.at-2030-expected.lst:110.22:
  107   

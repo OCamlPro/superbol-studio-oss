@@ -49,13 +49,20 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
                 (StringSet.elements unknowns))
 
 let get () =
-  let conf = ref "" in                                    (* Fixed by default *)
+  let conf = ref "" in
   let dialect = ref None in
   let strict = ref false in
   let format = ref Cobol_config.Auto in                   (* Fixed by default *)
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
-                 "cobolx"; "Cobolx"; "CobolX"; "COBOLX"] in
+                 "cobol85"; "COBOL85";
+                 "variable"; "VARIABLE";
+                 "xopen"; "XOPEN"; "XOpen";
+                 "xcard"; "xCard"; "XCARD";
+                 "crt"; "CRT";
+                 "terminal"; "Terminal"; "TERMINAL";
+                 "cobolx"; "Cobolx"; "CobolX"; "COBOLX";
+                 "auto"; "AUTO"] in
   let libpath = ref ["."] in
   let recovery = ref true in
   let show = ref [`Pending] in                                     (* default *)
@@ -80,9 +87,15 @@ let get () =
 
     ["source-format"],
     Arg.Symbol (formats, fun f -> format := match String.uppercase_ascii f with
-        | "FIXED" -> Cobol_config.SF Cobol_config.SFFixed
+        | "FIXED" | "COBOL85" -> Cobol_config.SF Cobol_config.SFFixed
         | "FREE" -> SF SFFree
+        | "VARIABLE" -> SF SFVariable
+        | "XOPEN" -> SF SFXOpen
+        | "XCARD" -> SF SFxCard
+        | "CRT" -> SF SFCRT
+        | "TERMINAL" -> SF SFTrm
         | "COBOLX" -> SF SFCOBOLX
+        | "AUTO" -> Auto
         | _ ->
             Cobol_common.Diagnostics.Now.warn
               Fmt.stderr

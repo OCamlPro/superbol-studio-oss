@@ -45,7 +45,7 @@ val position: preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
 val newline_cnums: preprocessor -> int list
 
-val next_sentence: preprocessor -> Text.text * preprocessor
+val next_chunk: preprocessor -> Text.text * preprocessor
 
 (** {2 High-level commands} *)
 
@@ -61,14 +61,6 @@ val lex_file
   -> input
   -> unit
 
-val fold_text_lines
-  : source_format: Cobol_config.source_format_spec
-  -> ?epf:Format.formatter
-  -> (Text.text -> 'a -> 'a)
-  -> input
-  -> 'a
-  -> 'a
-
 val lex_lib
   : source_format: Cobol_config.source_format_spec
   -> libpath:string list
@@ -76,6 +68,14 @@ val lex_lib
   -> ?epf:Format.formatter
   -> [< `Alphanum | `Word ] * string
   -> unit
+
+val fold_source_lines
+  : source_format: Cobol_config.source_format_spec
+  -> ?epf:Format.formatter
+  -> f:(int -> Text.text -> 'a -> 'a)
+  -> input
+  -> 'a
+  -> 'a
 
 val preprocess_file
   : ?options: Preproc_options.preproc_options
