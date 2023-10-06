@@ -16,6 +16,10 @@
 
 exception Parse_error of string
 
+(** [initialize_channels ()] sets stdin and stdout channels in binary mode; this
+    is required for proper operations on some systems. *)
+val initialize_channels: unit -> unit
+
 (** [read_message ()] tries to read a json RPC message from the standard input
     stream. *)
 val read_message: unit -> Jsonrpc.Packet.t
