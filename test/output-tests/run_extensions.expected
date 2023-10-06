@@ -1880,26 +1880,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2166:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2213:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2210:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2279:0
-run_extensions.at-2279-prog.cob:10.18:
-   7              STOP RUN.
-   8   
-   9          IDENTIFICATION   DIVISION.
-  10 >        PROGRAM-ID.      nested.
-----                     ^
-  11          PROCEDURE        DIVISION.
-  12              DISPLAY tally WITH NO ADVANCING.
->> Hint: Missing <word>
-
-run_extensions.at-2279-prog.cob:10.24-10.30:
-   7              STOP RUN.
-   8   
-   9          IDENTIFICATION   DIVISION.
-  10 >        PROGRAM-ID.      nested.
-----                           ^^^^^^
-  11          PROCEDURE        DIVISION.
-  12              DISPLAY tally WITH NO ADVANCING.
->> Error: Invalid syntax
-
 run_extensions.at-2279-prog.cob:14.18:
   11          PROCEDURE        DIVISION.
   12              DISPLAY tally WITH NO ADVANCING.
@@ -5746,62 +5726,8 @@ run_extensions.at-5732-prog.cob:77.27-77.33:
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5786:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5757:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5865:0
-run_extensions.at-5865-corr.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      corr.
-----                     ^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-run_extensions.at-5865-corr.cob:3.24-3.28:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      corr.
-----                           ^^^^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5934:0
-run_extensions.at-5934-nested.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      nested.
-----                     ^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-run_extensions.at-5934-nested.cob:3.24-3.30:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      nested.
-----                           ^^^^^^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6022:0
-run_extensions.at-6022-redefines.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      redefines.
-----                     ^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-run_extensions.at-6022-redefines.cob:3.24-3.33:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      redefines.
-----                           ^^^^^^^^^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6094:0
 run_extensions.at-6094-prog.cob:15.42-15.50:
   12         *>   

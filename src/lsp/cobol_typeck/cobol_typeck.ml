@@ -1156,20 +1156,18 @@ struct
 end
 
 let analyze_compilation_group ?(config = Cobol_config.default)
-    (type m) : m Cobol_parser.parsed_compilation_group -> _ =
+    (type m) : m Cobol_parser.Outputs.parsed_compilation_group -> _ =
 
   let analyze_cg (module Diags: DIAGS.STATEFUL) cg =
     let module Typeck = Make (val config) (Diags) in
     Ok (Typeck.typeck_compilation_group cg, DIAGS.Set.none)
   in
   function
-  | { parsed_output = Only None | WithArtifacts (None, _);
-      parsed_diags; _ } ->
-      Error parsed_diags
-  | { parsed_output = Only Some cg | WithArtifacts (Some cg, _);
-      parsed_diags; _ } ->
+  | Only None | WithArtifacts (None, _) ->
+      DIAGS.result @@ Error ()
+  | Only Some cg | WithArtifacts (Some cg, _) ->
       match Cobol_common.catch_diagnostics analyze_cg cg with
       | Ok (res, diags) ->
-          Ok (res, cg, DIAGS.Set.union parsed_diags diags)
+          DIAGS.result ~diags @@ Ok (res, cg)
       | Error diags ->
-          Error (DIAGS.Set.union parsed_diags diags)
+          DIAGS.result ~diags @@ Error ()

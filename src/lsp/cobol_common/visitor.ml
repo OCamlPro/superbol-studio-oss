@@ -157,8 +157,14 @@ module Fold = struct
 
   (** Helper to shorten definitions for traversal of nodes with source
       locations *)
+  (* NOTE: we consider the traversal of `t with_loc` as a whole before the
+     generic traversal of `_ with_loc` via [fold'].  Maybe doing it the other
+     way round would be more intuitive? *)
   let handle' vfold ~fold (v: _ #folder) =
     handle vfold ~continue:(fold' ~fold v)
+
+  let leaf' vfold =
+    handle' vfold ~fold:(fun _ _ -> Fun.id)
 
   (* --- *)
 

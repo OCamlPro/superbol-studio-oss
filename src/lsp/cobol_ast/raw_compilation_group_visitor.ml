@@ -104,21 +104,27 @@ struct
       ~continue:begin fun { program_name; program_as; program_level;
                             program_options; program_env; program_data;
                             program_proc; program_end_name } x -> x
-        >> fold_name' v program_name
-        >> fold_strlit_opt v program_as
+        >> (fun x -> match program_level with
+            | ProgramPrototype -> x
+                >> fold_name' v program_name
+                >> fold_strlit_opt v program_as
+            | ProgramDefinition { (* has_identification_division_header; *)
+                                  preliminary_informational_paragraphs = infos0;
+                                  supplementary_informational_paragraphs = infos1;
+                                  kind; _ } -> ignore kind; x
+                (* >> fold_bool v has_identification_division_header *)
+                >> v#continue_with_informational_paragraphs infos0
+                >> fold_name' v program_name
+                >> fold_strlit_opt v program_as
+                >> v#continue_with_informational_paragraphs infos1)
         >> fold_options_paragraph'_opt v program_options
         >> fold_environment_division'_opt v program_env
         >> fold_data_division'_opt v program_data
+        >> fold_procedure_division'_opt v program_proc
         >> (fun x -> match program_level with
             | ProgramPrototype -> x
-            | ProgramDefinition { kind;
-                                  has_identification_division;
-                                  informational_paragraphs = infos;
-                                  nested_programs } -> ignore kind; x
-                >> fold_bool v has_identification_division
-                >> v#continue_with_informational_paragraphs infos
-                >> fold_with_loc_list v nested_programs ~fold:fold_program_unit)
-        >> fold_procedure_division'_opt v program_proc
+            | ProgramDefinition { nested_programs; _ } -> x
+                >> fold_with_loc_list v ~fold:fold_program_unit nested_programs)
         >> fold_name'_opt v program_end_name                  (* XXX: useful? *)
       end
 

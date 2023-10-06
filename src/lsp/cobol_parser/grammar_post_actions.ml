@@ -23,19 +23,19 @@ struct
         match incoming_symbol state, prod_num with
         | N N__assign_external_, 2 ->
              Post_pending ((fun () -> "EXTERNAL") value)
-        | N N_control_division, 335 ->
+        | N N_control_division, 336 ->
              Post_diagnostic ((fun _ -> Config.control_division#verify) value)
-        | N N_special_names_clause, 2092 -> Post_special_names value
-        | N N_special_names_clause, 2093 -> Post_special_names value
-        | N N_special_names_clause, 2094 -> Post_special_names value
-        | N N_special_names_clause, 2095 -> Post_special_names value
-        | N N_special_names_clause, 2096 -> Post_special_names value
-        | N N_special_names_clause, 2097 -> Post_special_names value
-        | N N_special_names_clause, 2098 -> Post_special_names value
-        | N N_special_names_clause, 2099 -> Post_special_names value
-        | N N_special_names_clause, 2100 -> Post_special_names value
-        | N N_special_names_clause, 2101 -> Post_special_names value
-        | N N_special_names_clause, 2102 -> Post_special_names value
+        | N N_special_names_clause, 2103 -> Post_special_names value
+        | N N_special_names_clause, 2104 -> Post_special_names value
+        | N N_special_names_clause, 2105 -> Post_special_names value
+        | N N_special_names_clause, 2106 -> Post_special_names value
+        | N N_special_names_clause, 2107 -> Post_special_names value
+        | N N_special_names_clause, 2108 -> Post_special_names value
+        | N N_special_names_clause, 2109 -> Post_special_names value
+        | N N_special_names_clause, 2110 -> Post_special_names value
+        | N N_special_names_clause, 2111 -> Post_special_names value
+        | N N_special_names_clause, 2112 -> Post_special_names value
+        | N N_special_names_clause, 2113 -> Post_special_names value
         | _ -> NoPost
   
   let post_production

@@ -30,4 +30,5 @@ val top: stack -> context option
 (** {3 Context-specific operations} *)
 
 val top_tokens: stack -> Text_lexer.TokenHandles.t
+val all_tokens: stack -> Text_lexer.TokenHandles.t
 val pop: stack -> stack * Text_lexer.TokenHandles.t

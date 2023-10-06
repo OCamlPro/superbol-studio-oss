@@ -14,25 +14,26 @@
 open Terms
 open Operands
 
-let if_empty pp_el pp_nel ppf = function
-  | [] -> pp_el ppf ()
-  | xs -> pp_nel ppf xs
-
-let elist ?prefix:(prf = Fmt.nop) ?sep pp =
-  if_empty Fmt.nop Fmt.(prf ++ list ?sep pp)
-
 
 (* -------------------- IDENTIFICATION DIVISION (EXTRA) -------------------- *)
 
 type informational_paragraphs =
-  {
-    author: string with_loc option;
-    installation: string with_loc option;
-    date_written: string with_loc option;
-    date_compiled: string with_loc option;
-    security: string with_loc option;
-  }
-[@@deriving show, ord]
+  informational_paragraph with_loc list
+[@@deriving ord]
+
+and informational_paragraph =
+  informational_paragraph_header * comment_entry with_loc
+
+and informational_paragraph_header =
+  | Author
+  | DateCompiled
+  | DateModified
+  | DateWritten
+  | Installation
+  | Remarks
+  | Security
+
+and comment_entry = string list
 
 
 (* ------------------------- ENVIRONMENT DIVISION -------------------------- *)
@@ -655,7 +656,8 @@ let pp_select_clause ppf = function
   | SelectRecordKey { key; source } ->
     Fmt.pf ppf "RECORD %a%a"
       pp_qualname key
-      Fmt.(elist ~prefix:(any "SOURCE ") ~sep:sp pp_name') source
+      (Pretty.list ~fopen:"SOURCE " ~fsep:"@ " ~fclose:"" ~fempty:""
+         pp_name') source
   | SelectRelativeKey n ->
     Fmt.pf ppf "RELATIVE %a" pp_name' n
   | SelectReserve n -> Fmt.pf ppf "RESERVE %a" pp_integer n
@@ -711,6 +713,8 @@ and arithmetic_mode =
 and entry_convention =
   | COBOL
 
+(* --- *)
+
 let pp_entry_convention ppf = function
   | COBOL -> Fmt.pf ppf "COBOL"
 
@@ -721,21 +725,45 @@ let pp_arithmetic_mode ppf = function
   | StandardDecimal -> Fmt.pf ppf "STANDARD-DECIMAL"
 
 let pp_options_clause ppf = function
-  | Arithmetic am -> Fmt.pf ppf "ARITHMETIC %a" pp_arithmetic_mode am
+  | Arithmetic am ->
+      Fmt.pf ppf "ARITHMETIC %a" pp_arithmetic_mode am
   | DefaultRoundedMode rm ->
-    Fmt.pf ppf "DEFAULT ROUNDED MODE %a" pp_rounding_mode rm
+      Fmt.pf ppf "DEFAULT ROUNDED MODE %a" pp_rounding_mode rm
   | EntryConvention ec ->
-    Fmt.pf ppf "ENTRY-CONVENTION %a" pp_entry_convention ec
+      Fmt.pf ppf "ENTRY-CONVENTION %a" pp_entry_convention ec
   | FloatBinaryDefault em ->
-    Fmt.pf ppf "FLOAT-BINARY %a" Data_descr.pp_endianness_mode em
+      Fmt.pf ppf "FLOAT-BINARY %a" Data_descr.pp_endianness_mode em
   | FloatDecimalDefault ee ->
-    Fmt.pf ppf "FLOAT-DECIMAL %a" Data_descr.pp_encoding_endianness ee
+      Fmt.pf ppf "FLOAT-DECIMAL %a" Data_descr.pp_encoding_endianness ee
   | IntermediateRounding rm ->
-    Fmt.pf ppf "INTERMEDIATE-ROUNDING %a" pp_rounding_mode rm
+      Fmt.pf ppf "INTERMEDIATE-ROUNDING %a" pp_rounding_mode rm
 
 let pp_options_paragraph : options_paragraph Fmt.t =
-  Fmt.(
-    any "OPTIONS.@ " ++
-    box (list ~sep:sp (pp_with_loc pp_options_clause))
-    ++ any "."
-  )
+  Fmt.(any "OPTIONS.@ " ++
+       box (list ~sep:sp (pp_with_loc pp_options_clause)) ++
+       any ".")
+
+
+(* --- *)
+
+let pp_informational_paragraph_header ppf = function
+  | Author -> Fmt.pf ppf "AUTHOR"
+  | DateCompiled -> Fmt.pf ppf "DATE-COMPILED"
+  | DateModified -> Fmt.pf ppf "DATE-MODIFIED"
+  | DateWritten -> Fmt.pf ppf "DATE-WRITTEN"
+  | Installation -> Fmt.pf ppf "INSTALLATION"
+  | Remarks -> Fmt.pf ppf "REMARKS"
+  | Security -> Fmt.pf ppf "SECURITY"
+
+let pp_comment_entry: comment_entry Pretty.printer =
+  Fmt.(list ~sep:sp string)
+
+let pp_informational_paragraph: informational_paragraph Pretty.printer =
+  Fmt.(box ~indent:4 @@                     (* <- indent by 4 to avoid Area A *)
+       pair ~sep:(any ".@ ")
+         pp_informational_paragraph_header
+         (pp_with_loc pp_comment_entry))
+
+let pp_informational_paragraphs: informational_paragraphs Pretty.printer =
+  Fmt.(list ~sep:(any "@\n")                                (* force newlines *)
+         (pp_with_loc pp_informational_paragraph))

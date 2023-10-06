@@ -11,16 +11,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val token_types: string list
-val token_modifiers: string list
+type preproc_options =
+  {
+    verbose: bool;
+    libpath: string list;
+    config: Cobol_config.t;
+    source_format: Cobol_config.source_format_spec;
+  }
 
-(* TODO: once we decide to fix the min OCaml version to >=4.14, we can upgrade
-   to lsp>=16, and avoid having to use an array below. *)
-val data
-  : filename: string
-  -> range: Lsp.Types.Range.t option
-  -> tokens: Cobol_parser.Outputs.tokens_with_locs
-  -> pplog: Cobol_preproc.log
-  -> comments: Cobol_preproc.comments
-  -> ptree: Lsp_imports.PTREE.compilation_group
-  -> int array
+let default =
+  {
+    verbose = false;
+    libpath = [];
+    config = Cobol_config.default;
+    source_format = Cobol_config.Auto;
+  }

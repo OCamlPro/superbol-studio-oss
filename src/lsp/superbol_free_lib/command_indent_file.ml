@@ -17,7 +17,8 @@ open Cobol_indent
 
 open Common_args
 
-let action { source_format; _ } ~indent_config files =
+let action { preproc_options = { source_format; _ } ; _ } ~indent_config
+    files =
   List.to_seq files
   |> Seq.map (fun file ->
       indent_file ~source_format ~file ~indent_config)

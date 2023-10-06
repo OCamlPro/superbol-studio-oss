@@ -63,13 +63,13 @@ val init
     which case it is not parsed directly as a normal program).  When absent,
     copybook detection is performed via project configuration (see
     {!Lsp_project.detect_copybook}). *)
-val add
+val did_open
   : Lsp.Types.DidOpenTextDocumentParams.t -> ?copybook: bool -> t -> t
 
-val update
+val did_change
   : Lsp.Types.DidChangeTextDocumentParams.t -> t -> t
 
-val remove
+val did_close
   : Lsp.Types.DidCloseTextDocumentParams.t -> t -> t
 
 val find_document

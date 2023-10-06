@@ -16,125 +16,13 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Text.TYPES
+open Src_format
 
 module DIAGS =  Cobol_common.Diagnostics
 
 (* --- *)
 
 let remove_blanks = Str.global_replace (Str.regexp " ") ""           (* '\t'? *)
-
-(* SOURCE FORMAT *)
-
-(* Paging *)
-
-type free = |
-type fixed = |
-type _ paging =
-  | FreePaging: free paging
-  | FixedWidth: fixed_paging_params -> fixed paging
-and fixed_paging_params =
-  {
-    cut_at_col: int;
-    alphanum_padding: char option;
-  }
-
-let fixed_paging    = { cut_at_col = 72; alphanum_padding = Some ' ' }
-let variable_paging = { fixed_paging with cut_at_col = 250 }
-let xcard_paging    = { fixed_paging with cut_at_col = 255 }
-let xopen_paging    = { fixed_paging with cut_at_col = 80 }
-let crt_paging      = { fixed_paging with cut_at_col = 320 }
-let terminal_paging = crt_paging
-let cobolx_paging   = { cut_at_col = 255; alphanum_padding = None }
-
-(* Actual format and indicator positioning *)
-
-type 'k source_format = 'k indicator_position * 'k paging
-and _ indicator_position =
-  |    NoIndic:  free indicator_position
-  | FixedIndic: fixed indicator_position
-  | XOpenIndic: fixed indicator_position
-  |   CRTIndic: fixed indicator_position
-  |   TrmIndic: fixed indicator_position
-  |  CBLXIndic: fixed indicator_position
-and any_source_format =
-  | SF: 'k source_format -> any_source_format                          [@@unboxed]
-
-let same_source_formats
-  : type k r. k source_format -> r source_format -> bool =
-  fun (i1, p1) (i2, p2) -> match i1, i2 with
-    |    NoIndic,    NoIndic -> true
-    | FixedIndic, FixedIndic -> p1 = p2
-    | XOpenIndic, XOpenIndic -> p1 = p2
-    |   CRTIndic,   CRTIndic -> p1 = p2
-    |   TrmIndic,   TrmIndic -> p1 = p2
-    |  CBLXIndic,  CBLXIndic -> p1 = p2
-    | _ -> false
-
-let source_format_spec
-  : type k. k source_format -> Cobol_config.source_format = function
-  |    NoIndic, _ -> SFFree
-  | FixedIndic, FixedWidth p when p == fixed_paging -> SFFixed
-  | FixedIndic, FixedWidth p when p == variable_paging -> SFVariable
-  | FixedIndic, FixedWidth _ (* when p == xcard_paging *) -> SFxCard
-  | XOpenIndic, FixedWidth _ (* when p == xopen_paging *) -> SFXOpen
-  |   CRTIndic, FixedWidth _ (* when p == crt_paging *) -> SFCRT
-  |   TrmIndic, FixedWidth _ (* when p == terminal_paging *) -> SFTrm
-  |  CBLXIndic, FixedWidth _ (* when p == cobolx_paging *) -> SFCOBOLX
-
-let decypher_source_format ~dialect format =
-  match String.uppercase_ascii @@format, dialect with
-  (* SOURCEFORMAT"FREE" on MF means: X/Open free format *)
-  (* cf https://www.microfocus.com/documentation/visual-\
-       cobol/vc50pu7/VS2019/HRLHLHINTR01U008.html *)
-  | "FREE", Cobol_config.DIALECT.MicroFocus -> Ok Cobol_config.SFXOpen
-  | "FREE",                      _          -> Ok SFFree
-  | "FIXED",                     _          -> Ok SFFixed
-  | "VARIABLE",                  _          -> Ok SFVariable
-  | "XOPEN",                     _          -> Ok SFXOpen
-  | "XCARD",                     _          -> Ok SFxCard
-  | "CRT",                       _          -> Ok SFCRT
-  | "TERMINAL",                  _          -> Ok SFTrm
-  | "COBOLX",                    _          -> Ok SFCOBOLX
-  | _                                       -> Error (`SFUnknown format)
-
-let select_source_format
-  : Cobol_config.source_format -> any_source_format = function
-  | SFFree     -> SF (   NoIndic, FreePaging)
-  | SFFixed    -> SF (FixedIndic, FixedWidth    fixed_paging)
-  | SFVariable -> SF (FixedIndic, FixedWidth variable_paging)
-  | SFXOpen    -> SF (XOpenIndic, FixedWidth    xopen_paging)
-  | SFxCard    -> SF (FixedIndic, FixedWidth    xcard_paging)
-  | SFCRT      -> SF (  CRTIndic, FixedWidth      crt_paging)
-  | SFTrm      -> SF (  TrmIndic, FixedWidth terminal_paging)
-  | SFCOBOLX   -> SF ( CBLXIndic, FixedWidth   cobolx_paging)
-
-(* --- *)
-
-let first_area_b_column
-  : type k. k source_format -> int option = function
-  | _,                     FreePaging
-  | XOpenIndic,            _            -> None
-  | FixedIndic,            FixedWidth _ -> Some (7 + 4)
-  |(CRTIndic | TrmIndic |
-    CBLXIndic),            FixedWidth _ -> Some (1 + 4)
-
-(* --- *)
-
-type comment_entry_termination =                  (* skip until... *)
-  | Newline                                       (* ... newline *)
-  | Period                                        (* ... next period (unused) *)
-  | AreaB of { first_area_b_column: int }         (* ... next word in area A *)
-
-let comment_entry_termination
-  : type k. k source_format -> comment_entry_termination = fun sf ->
-  match sf, first_area_b_column sf with
-  |(_         , FreePaging   ), _
-  |(XOpenIndic, _            ), _
-  |(_         , _            ), None    -> Newline
-  | (FixedIndic, FixedWidth _), Some c -> AreaB { first_area_b_column = c }
-  |((CRTIndic |
-     TrmIndic |
-     CBLXIndic), FixedWidth _), Some c -> AreaB { first_area_b_column = c }
 
 (* --- *)
 
@@ -146,6 +34,8 @@ type 'k state =
     comments: comments;
     cdir_seen: bool;
     newline: bool;
+    newline_cnums: int list;    (** index of all newline characters encountered
+                                    so far (in reverse order) *)
     diags: DIAGS.Set.t;
     config: 'k config;
   }
@@ -177,6 +67,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
     comments = [];
     cdir_seen = false;
     newline = true;
+    newline_cnums = [];
     diags = DIAGS.Set.none;
     config =
       {
@@ -187,6 +78,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
 
 let diagnostics { diags; _ } = diags
 let comments { comments; _ } = List.rev comments
+let newline_cnums { newline_cnums; _ } = List.rev newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
 let allow_debug { config = { debug; _ }; _ } = debug
 
@@ -216,7 +108,8 @@ let pos_column Lexing.{ pos_bol; pos_cnum; _ } =         (* count cols from 1 *)
   pos_cnum - pos_bol + 1
 
 let raw_loc ~start_pos ~end_pos { newline; config = { source_format; _ }; _ } =
-  let in_area_a = newline && match first_area_b_column source_format with
+  let in_area_a =
+    newline && match Src_format.first_area_b_column source_format with
     | None -> false
     | Some c -> pos_column start_pos < c
   in
@@ -252,12 +145,17 @@ let append t state =
 
 let new_line state lexbuf =
   Lexing.new_line lexbuf;
+  let state =
+    { state with
+      newline = true;
+      newline_cnums = Lexing.lexeme_end lexbuf :: state.newline_cnums }
+  in
   match state.lex_prods, state.cdir_seen with
   | { payload = TextWord _ | Alphanum _ | Pseudo _ | Eof; _ } :: _, _
   | _, true ->
-      flush { state with newline = true }
+      flush state
   | _ ->
-      { state with newline = true }, []
+      state, []
 
 (* --- *)
 

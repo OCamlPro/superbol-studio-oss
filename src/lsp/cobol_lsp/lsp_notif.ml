@@ -24,11 +24,11 @@ let on_notification state notif =
   | Initialized config, Initialized ->
       Running (Lsp_server.init ~config)
   | Running registry, TextDocumentDidOpen params ->
-      Running (Lsp_server.add params registry)
+      Running (Lsp_server.did_open params registry)
   | Running registry, TextDocumentDidChange params ->
-      Running (Lsp_server.update params registry)
+      Running (Lsp_server.did_change params registry)
   | Running registry, TextDocumentDidClose params ->
-      Running (Lsp_server.remove params registry)
+      Running (Lsp_server.did_close params registry)
   | Running _, Exit ->
       Exit (Error "Received premature 'exit' notification")
   | _ ->

@@ -3,7 +3,7 @@
 (executable
  (name preproc)
  (modules Preproc)
- (libraries cobol_preproc)
+ (libraries cobol_preproc testsuite_utils)
  )
 
 (executable
@@ -15,7 +15,13 @@
 (executable
  (name reparse)
  (modules Reparse)
- (libraries cobol_parser)
+ (libraries cobol_parser testsuite_utils)
+ )
+
+(library
+ (name testsuite_utils)
+ (modules Testsuite_utils)
+ (libraries ez_file cobol_common cobol_config)
  )
 
 (alias

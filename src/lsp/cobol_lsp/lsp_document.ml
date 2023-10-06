@@ -25,8 +25,9 @@ module TYPES = struct
       project: Lsp_project.t;
       textdoc: Lsp.Text_document.t;
       copybook: bool;
-      artifacts: Cobol_parser.parsing_artifacts;
+      artifacts: Cobol_parser.Outputs.artifacts;
       parsed: parsed_data option;
+      rewinder: rewinder option;
       (* Used for caching, when loading a cache file as the file is not reparsed,
          then diagnostics are not sent. *)
       diags: DIAGS.Set.t;
@@ -40,10 +41,18 @@ module TYPES = struct
       definitions: name_definitions_in_compilation_unit CUMap.t Lazy.t;
       references: name_references_in_compilation_unit CUMap.t Lazy.t;
     }
+  and rewinder =
+    (PTREE.compilation_group option,
+     Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
+      Cobol_parser.rewinder
 
   (** Raised by {!retrieve_parsed_data}. *)
   exception Unparseable of Lsp.Types.DocumentUri.t
   exception Copybook of Lsp.Types.DocumentUri.t
+
+  (** Raised by {!load} and {!update}; allows keeping consistent document
+      contents. *)
+  exception Internal_error of document * exn
 
   type cached =                   (** Persistent representation (for caching) *)
     {
@@ -52,7 +61,7 @@ module TYPES = struct
       doc_cache_langid: string;
       doc_cache_version: int;
       doc_cache_pplog: Cobol_preproc.log;
-      doc_cache_tokens: Cobol_parser.tokens_with_locs;
+      doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
       doc_cache_comments: Cobol_preproc.comments;
       doc_cache_parsed: (PTREE.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
@@ -64,17 +73,22 @@ include TYPES
 type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 
-let parse ~project text =
-  let uri = Lsp.Text_document.documentUri text in
-  let libpath = Lsp_project.libpath_for ~uri project in
-  Cobol_parser.parse_with_tokens
-    (* Recovery policy for the parser: *)
-    ~recovery:(EnableRecovery { silence_benign_recoveries = true })
-    ~source_format:project.source_format
-    ~config:project.cobol_config
-    ~libpath
-    (String { contents = Lsp.Text_document.text text;
-              filename = Lsp.Uri.to_path uri })
+let rewindable_parse ({ project; textdoc; _ } as doc) =
+  Cobol_parser.rewindable_parse_with_artifacts
+    ~options:Cobol_parser.Options.{
+        default with
+        recovery = EnableRecovery { silence_benign_recoveries = true };
+        config = project.cobol_config;
+      } @@
+  Cobol_preproc.preprocessor
+    ~options:Cobol_preproc.Options.{
+        default with
+        libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
+        config = project.cobol_config;
+        source_format = project.source_format
+      } @@
+  String { contents = Lsp.Text_document.text textdoc;
+           filename = Lsp.Uri.to_path (uri doc) }
 
 let lazy_definitions ast cus =
   lazy begin cus |>
@@ -99,28 +113,50 @@ let lazy_references ast cus defs =
     end CUMap.empty ast
   end
 
-let no_parsing_artifacts =
-  Cobol_parser.{ tokens = lazy [];
-                 pplog = Cobol_preproc.Trace.empty;
-                 comments = [] }
+let no_artifacts =
+  Cobol_parser.Outputs.{ tokens = lazy [];
+                         pplog = Cobol_preproc.Trace.empty;
+                         comments = [] }
 
-let analyze ({ project; textdoc; copybook; _ } as doc) =
-  let artifacts, (parsed, diags) =
-    if copybook then
-      no_parsing_artifacts, (None, DIAGS.Set.none)
-    else
-      let ptree = parse ~project textdoc in
-      Cobol_parser.parsing_artifacts ptree,
-      match Cobol_typeck.analyze_compilation_group ptree with
-      | Ok (cus, ast, diags) ->
-          let definitions = lazy_definitions ast cus in
-          let references = lazy_references ast cus definitions in
-          Some { ast; cus; definitions; references}, diags
-      | Error diags ->
-          None, diags (* NB: no token if unrecoverable error (e.g, wrong
-                         indicator) *)
+let gather_parsed_data ptree =
+  Cobol_typeck.analyze_compilation_group ptree |>
+  DIAGS.map_result begin function
+    | Ok (cus, ast) ->
+        let definitions = lazy_definitions ast cus in
+        let references = lazy_references ast cus definitions in
+        Some { ast; cus; definitions; references}
+    | Error () ->
+        None
+  end
+
+let extract_parsed_infos doc ptree =
+  let DIAGS.{ result = artifacts, rewinder, parsed; diags} =
+    DIAGS.more_result begin fun (ptree, rewinder) ->
+      gather_parsed_data ptree |>
+      DIAGS.map_result begin fun parsed ->
+        Cobol_parser.artifacts ptree, Some rewinder, parsed
+      end
+    end ptree
   in
-  { doc with artifacts; diags; parsed }
+  { doc with artifacts; rewinder; diags; parsed }
+
+let parse_and_analyze ({ copybook; _ } as doc) =
+  if copybook then                                                    (* skip *)
+    { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
+  else
+    extract_parsed_infos doc @@ rewindable_parse doc
+
+let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
+  match position, rewinder with
+  | None, _ | _, None ->
+      parse_and_analyze doc
+  | _, Some _ when copybook ->                                         (* skip *)
+      { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
+  | Some position, Some rewinder ->
+      extract_parsed_infos doc @@
+      Cobol_parser.rewind_and_parse rewinder ~position @@
+      Cobol_preproc.reset_preprocessor_for_string @@
+      Lsp.Text_document.text textdoc
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
 let blank ~project ?copybook textdoc =
@@ -132,7 +168,8 @@ let blank ~project ?copybook textdoc =
   {
     project;
     textdoc;
-    artifacts = no_parsing_artifacts;
+    artifacts = no_artifacts;
+    rewinder = None;
     diags = DIAGS.Set.none;
     parsed = None;
     copybook;
@@ -141,17 +178,36 @@ let blank ~project ?copybook textdoc =
 let position_encoding = `UTF8
 
 let load ~project ?copybook doc =
-  Lsp.Text_document.make ~position_encoding doc
-  |> blank ~project ?copybook
-  |> analyze
+  let textdoc = Lsp.Text_document.make ~position_encoding doc in
+  let doc = blank ~project ?copybook textdoc in
+  try parse_and_analyze doc
+  with e -> raise @@ Internal_error (doc, e)
 
-let update { project; textdoc; _ } changes =
-  (* TODO: Make it not reparse everything when a change occurs. *)
-  Lsp.Text_document.apply_content_changes textdoc changes
-  |> blank ~project
-  |> analyze
+let first_change_pos changes =
+  let line, char =
+    List.fold_left begin fun ((l, c) as acc) -> function
+      | Lsp.Types.TextDocumentContentChangeEvent.{ range = None; _ } ->
+          (0, 0)                                 (* meaning: full text change *)
+      | { range = Some { start = { line; character }; _ }; _ }
+        when line < l || line = l && character < c ->
+          line, character
+      | _ ->
+          acc
+    end Int.(max_int, max_int) changes      (* can |changes|=0 really happen? *)
+  in
+  Cobol_parser.Indexed { line; char }
 
-(** Raises {!Unparseable} in case the document cannot be parsed entierely. *)
+let update ({ textdoc; _ } as doc) changes =
+  let position = first_change_pos changes in
+  let doc =
+    { doc with
+      textdoc = Lsp.Text_document.apply_content_changes textdoc changes }
+  in
+  try reparse_and_analyze ~position doc
+  with e -> raise @@ Internal_error (doc, e)
+
+(** Raises {!Unparseable} in case the document cannot be parsed entierely, or
+    {!Copybook} in case the document is not a main program. *)
 let retrieve_parsed_data: document -> parsed_data = function
   | { parsed = Some p; _ } -> p
   | { copybook = false; _ } as doc -> raise @@ Unparseable (uri doc)
@@ -160,7 +216,7 @@ let retrieve_parsed_data: document -> parsed_data = function
 (** Caching utilities *)
 
 let to_cache ({ project; textdoc; parsed; diags;
-                artifacts = { pplog; tokens; comments }; _ } as doc) =
+                artifacts = { pplog; tokens; comments; _ }; _ } as doc) =
   {
     doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
     doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
@@ -199,9 +255,9 @@ let of_cache ~project
     let parsed =
       Option.map
         (fun (ast, cus) ->
-          let definitions = lazy_definitions ast cus in
-          let references = lazy_references ast cus definitions in
-          { ast; cus; definitions; references})
+           let definitions = lazy_definitions ast cus in
+           let references = lazy_references ast cus definitions in
+           { ast; cus; definitions; references })
         parsed
     in
     { doc with artifacts = { pplog; tokens = lazy tokens; comments };

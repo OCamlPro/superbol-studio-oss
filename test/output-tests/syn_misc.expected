@@ -3016,22 +3016,6 @@ syn_misc.at-5874-valid.cob:2.7-2.15:
    4   000300 IDENTIFICATION  DIVISION.
 >> Error: Invalid syntax
 
-syn_misc.at-5874-valid.cob:5.18:
-   2   000100 @OPTIONS NOMAIN,APOST
-   3   000200 @OPTIONS APOST
-   4   000300 IDENTIFICATION  DIVISION.
-   5 > 000400 PROGRAM-ID. VALID.
-----                     ^
->> Hint: Missing <word>
-
-syn_misc.at-5874-valid.cob:5.19-5.24:
-   2   000100 @OPTIONS NOMAIN,APOST
-   3   000200 @OPTIONS APOST
-   4   000300 IDENTIFICATION  DIVISION.
-   5 > 000400 PROGRAM-ID. VALID.
-----                      ^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5963:0
 syn_misc.at-5963-valid.cob:2.7-2.14:
    1   
@@ -3039,22 +3023,6 @@ syn_misc.at-5963-valid.cob:2.7-2.14:
 ----          ^^^^^^^
    3   000200 CBL CODEPAGE(1208)
    4   000300 CBL
->> Error: Invalid syntax
-
-syn_misc.at-5963-valid.cob:6.18:
-   3   000200 CBL CODEPAGE(1208)
-   4   000300 CBL
-   5   000400 IDENTIFICATION  DIVISION.
-   6 > 000500 PROGRAM-ID. VALID.
-----                     ^
->> Hint: Missing <word>
-
-syn_misc.at-5963-valid.cob:6.19-6.24:
-   3   000200 CBL CODEPAGE(1208)
-   4   000300 CBL
-   5   000400 IDENTIFICATION  DIVISION.
-   6 > 000500 PROGRAM-ID. VALID.
-----                      ^^^^^
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5999:0
@@ -3083,22 +3051,6 @@ syn_misc.at-5999-valid.cob:3.17-3.23:
 ----                    ^^^^^^
    4         *CBL MAP LIST
    5   000100 *CBL NOMAP NOSOURCE NOLIST
->> Error: Invalid syntax
-
-syn_misc.at-5999-valid.cob:7.18:
-   4         *CBL MAP LIST
-   5   000100 *CBL NOMAP NOSOURCE NOLIST
-   6   000200 IDENTIFICATION  DIVISION.
-   7 > 000300 PROGRAM-ID. VALID.
-----                     ^
->> Hint: Missing <word>
-
-syn_misc.at-5999-valid.cob:7.19-7.24:
-   4         *CBL MAP LIST
-   5   000100 *CBL NOMAP NOSOURCE NOLIST
-   6   000200 IDENTIFICATION  DIVISION.
-   7 > 000300 PROGRAM-ID. VALID.
-----                      ^^^^^
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6601:0
@@ -4180,26 +4132,6 @@ syn_misc.at-7729-replace.cob:2.7-2.33:
    3          SUBSTITUTION     SECTION.
    4              REPLACE ==TEST-VAR== BY ==VAR==.
 >> Error: CONTROL DIVISION does not conform to default
-
-syn_misc.at-7729-replace.cob:6.18:
-   3          SUBSTITUTION     SECTION.
-   4              REPLACE ==TEST-VAR== BY ==VAR==.
-   5          IDENTIFICATION   DIVISION.
-   6 >        PROGRAM-ID.      replace.
-----                     ^
-   7          DATA             DIVISION.
-   8          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-syn_misc.at-7729-replace.cob:6.24-6.31:
-   3          SUBSTITUTION     SECTION.
-   4              REPLACE ==TEST-VAR== BY ==VAR==.
-   5          IDENTIFICATION   DIVISION.
-   6 >        PROGRAM-ID.      replace.
-----                           ^^^^^^^
-   7          DATA             DIVISION.
-   8          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7772:0
 syn_misc.at-7772-prog.cob:2.7-3.24:

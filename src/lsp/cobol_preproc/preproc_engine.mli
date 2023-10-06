@@ -18,12 +18,21 @@ type input =
   | String of { contents: string; filename: string }
   | Channel of { contents: in_channel; filename: string }
 
-type init =
-  {
-    init_libpath: string list;
-    init_config: Cobol_config.t;
-    init_source_format: Cobol_config.source_format_spec;
-  }
+val preprocessor
+  : ?options: Preproc_options.preproc_options
+  -> input
+  -> preprocessor
+val reset_preprocessor
+  : ?new_position:Lexing.position
+  -> preprocessor
+  -> input
+  -> preprocessor
+val reset_preprocessor_for_string
+  : string
+  -> ?new_position:Lexing.position
+  -> preprocessor
+  -> preprocessor
+
 
 (* --- *)
 
@@ -32,8 +41,10 @@ val add_diag: preprocessor -> Cobol_common.Diagnostics.t -> preprocessor
 val add_diags: preprocessor -> Cobol_common.Diagnostics.Set.t -> preprocessor
 val log: preprocessor -> Preproc_trace.log
 val comments: preprocessor -> Text.comments
-val srclexer: preprocessor -> Preproc.any_srclexer
 val position: preprocessor -> Lexing.position
+val source_format: preprocessor -> Src_format.any
+val newline_cnums: preprocessor -> int list
+
 val next_sentence: preprocessor -> Text.text * preprocessor
 
 (** {2 High-level commands} *)
@@ -41,13 +52,7 @@ val next_sentence: preprocessor -> Text.text * preprocessor
 val decide_source_format
   : string
   -> Cobol_config.source_format_spec
-  -> Cobol_config.source_format Cobol_common.Diagnostics.with_diags
-
-val preprocessor
-  : ?verbose:bool
-  -> input
-  -> [< `WithLibpath of init ]
-  -> preprocessor
+  -> Src_format.any Cobol_common.Diagnostics.with_diags
 
 val lex_file
   : source_format: Cobol_config.source_format_spec
@@ -73,29 +78,20 @@ val lex_lib
   -> unit
 
 val preprocess_file
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> ?epf:Format.formatter
   -> string
   -> unit
 
 val text_of_file
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?epf:Format.formatter
   -> string
   -> Text.text
 
 val text_of_input
-  : source_format: Cobol_config.source_format_spec
-  -> ?verbose:bool
-  -> ?config:Cobol_config.t
-  -> libpath:string list
+  : ?options: Preproc_options.preproc_options
   -> ?epf:Format.formatter
   -> input
   -> Text.text

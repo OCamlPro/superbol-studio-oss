@@ -18,33 +18,18 @@ module PTree = PTree
 module PTree_visitor = PTree_visitor
 
 (** Options to tune the parser engine *)
-include Parser_options
+module Options = Parser_options
 
-type ('a, 'm) parsed_result = ('a, 'm) Parser_engine.parsed_result =
-  {
-    parsed_input: Cobol_preproc.input;
-    parsed_diags: Cobol_common.Diagnostics.Set.t;
-    parsed_output: ('a, 'm) Parser_options.output;
-  }
+(** Output types for the engine *)
+module Outputs = Parser_outputs
 
-type 'm parsed_compilation_group =
-  (PTree.compilation_group option, 'm) parsed_result
-
-(** {1 Exported modules} *)
-(*TODO: remove these extra modules once the parser provides the proper tokens.*)
-module Grammar_contexts = Grammar_contexts
-module Grammar_tokens = Grammar_tokens
-module Text_keywords = Text_keywords
+module Contexts = Grammar_contexts
+module Tokens = Grammar_tokens
+module Keywords = Text_keywords
 
 (** {1 Exported functions} *)
 
-type 'x source_handling = ?source_format:Cobol_config.source_format_spec -> 'x
-
-let parse_simple: _ source_handling = Parser_engine.parse_simple
-let parse_with_tokens: _ source_handling = Parser_engine.parse_with_tokens
-let parsing_artifacts = Parser_engine.parsing_artifacts
-
-(* --- *)
+include Parser_engine
 
 (** {1 Modules and functions exported for testing purposes}
 
@@ -53,16 +38,20 @@ let parsing_artifacts = Parser_engine.parsing_artifacts
 module INTERNAL = struct
 
   (** {2 COBOL tokens} *)
+
   module Tokens = Grammar_tokens
 
   let pp_token = Text_tokenizer.pp_token
   let pp_tokens = Text_tokenizer.pp_tokens
 
   (** {2 COBOL grammar} *)
+
   module Grammar (* : Grammar_sig.S *) = Grammar
 
-  (** {2 Parser with dummy source locations, that can be fed directly with a
-      list of tokens} *)
+  (** {2 Dummy parser} *)
+
+  (** Parser with dummy source locations, that can be fed directly with a
+      list of tokens *)
   module Dummy = struct
     module Tags: Cobol_ast.Testing_helpers.TAGS = struct
       let loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)

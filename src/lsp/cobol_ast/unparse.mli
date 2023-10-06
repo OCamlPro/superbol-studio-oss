@@ -1,3 +1,19 @@
+(**************************************************************************)
+(*                                                                        *)
+(*                        SuperBOL OSS Studio                             *)
+(*                                                                        *)
+(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*                                                                        *)
+(* All rights reserved.                                                   *)
+(* This source code is licensed under the GNU Affero General Public       *)
+(* License version 3 found in the LICENSE.md file in the root directory   *)
+(* of this source tree.                                                   *)
+(*                                                                        *)
+(**************************************************************************)
+
+(* NB: This module is not specific to COBOL; it does not really fit within
+   `cobol_ast`. *)
+
 module Expression : sig
   type precedence = int
   (** Operator precedence is represented using integers. Operators with a higher

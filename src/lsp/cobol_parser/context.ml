@@ -85,3 +85,6 @@ let top_tokens: stack -> TH.t = function
 let pop: stack -> stack * TH.t = function
   | [] -> Pretty.invalid_arg "Unable to pop on an empty context stack"
   | { diff; _ } :: tl -> tl, diff
+
+let all_tokens: stack -> TH.t =
+  List.fold_left (fun th { diff; _ } -> TH.union th diff) TH.empty

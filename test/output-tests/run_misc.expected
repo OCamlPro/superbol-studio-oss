@@ -136,44 +136,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:464:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:506:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:507:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:570:0
-run_misc.at-570-bigger.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      error.
-----                     ^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-run_misc.at-570-bigger.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      error.
-----                           ^^^^^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:569:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:573:0
-run_misc.at-573-smaller.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      error.
-----                     ^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Hint: Missing <word>
-
-run_misc.at-573-smaller.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      error.
-----                           ^^^^^
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:610:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:634:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:658:0

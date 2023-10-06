@@ -29,14 +29,16 @@ include Preproc_trace                          (* include log events *)
 type 'k srclexer = 'k Src_lexing.state * Lexing.lexbuf
 and any_srclexer =
   | Plx: 'k srclexer -> any_srclexer                                   [@@unboxed]
-let srclex_lexbuf (Plx (_, lexbuf)) = lexbuf
-let srclex_pos pl = (srclex_lexbuf pl).Lexing.lex_curr_p
+let srclex_pos (Plx (_, lexbuf)) =
+  lexbuf.Lexing.lex_curr_p
 let srclex_diags (Plx (pl, _)) =
   Src_lexing.diagnostics pl
 let srclex_comments (Plx (pl, _)) =
   Src_lexing.comments pl
-let srclex_source_format (Plx (pl, _)) =
-  Src_lexing.(source_format_spec @@ source_format pl)
+let source_format (Plx (pl, _)) =
+  Src_format.SF (Src_lexing.source_format pl)
+let srclex_newline_cnums (Plx (pl, _)) =
+  Src_lexing.newline_cnums pl
 
 type 'k source_line =
   | Line: 'k srclexer * text -> 'k source_line
@@ -79,16 +81,16 @@ let fold_source_lines pl f acc =
 (* --- *)
 
 let with_source_format
-  : 'k Src_lexing.source_format with_loc -> (any_srclexer as 'x) -> 'x
+  : 'k Src_format.source_format with_loc -> (any_srclexer as 'x) -> 'x
   = fun format ((Plx (s, lexbuf)) as pl) ->
-    if Src_lexing.(same_source_formats @@ source_format s) ~&format
+    if Src_format.equal (Src_lexing.source_format s) ~&format
     then pl
     else match Src_lexing.change_source_format s format with
       | Ok s -> Plx (s, lexbuf)
       | Error s -> Plx (s, lexbuf)
 
 let make_srclex make_lexing ?filename ~source_format input =
-  let SF source_format = Src_lexing.select_source_format source_format in
+  let Src_format.SF source_format = source_format in
   (* Be sure to provide position informations *)
   let lexbuf = make_lexing ?with_positions:(Some true) input in
   Option.iter (Lexing.set_filename lexbuf) filename;
@@ -99,18 +101,38 @@ let srclex_from_channel = make_srclex Lexing.from_channel
 let srclex_from_file ~source_format filename : any_srclexer =
   srclex_from_string ~source_format ~filename (EzFile.read_file filename)
 
+(** Note: If given, assumes [position] corresponds to the beginning of the
+    input, which {e must} also be at the beginning of a line.  If absent,
+    restarts from first position.  File name is kept from the previous input. *)
+let srclex_restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
+  let lexbuf = make_lexing ?with_positions:(Some true) input in
+  let pos_fname = match position with
+    | Some p ->
+        Lexing.set_position lexbuf p;
+        p.Lexing.pos_fname
+    | None ->
+        prev_lexbuf.Lexing.lex_curr_p.pos_fname
+  in
+  Lexing.set_filename lexbuf pos_fname;
+  Plx (s, lexbuf)
+
+let srclex_restart_on_string = srclex_restart Lexing.from_string
+let srclex_restart_on_channel = srclex_restart Lexing.from_channel
+let srclex_restart_on_file ?position filename =
+  srclex_restart_on_string ?position (EzFile.read_file filename)
+
+
 (* --- Compiler Directives -------------------------------------------------- *)
 
 (* SOURCE FORMAT *)
 
 type lexing_directive =
-  | LexDirSource
-    : 'k Src_lexing.source_format with_loc -> lexing_directive [@@unboxed]
+  | LexDirSource:
+      'k Src_format.source_format with_loc -> lexing_directive         [@@unboxed]
 
 let cdir_source_format ~dialect format =
-  match Src_lexing.decypher_source_format ~dialect ~&format with
-  | Ok sf ->
-      let SF sf = Src_lexing.select_source_format sf in
+  match Src_format.decypher ~dialect ~&format with
+  | Ok (SF sf) ->
       DIAGS.some_result @@ LexDirSource (sf &@<- format)
   | Error (`SFUnknown f) ->
       DIAGS.no_result
@@ -474,7 +496,6 @@ let delim left text right =
   textword_cat (fun w s -> concat_strings s w) Fun.id left
 
 let try_replacing_clause: replacing with_loc -> text -> _ result = fun replacing ->
-  (* Helpers to record replacement operations on source locations: *)
   let replloc = ~@replacing in
   match ~&replacing with
   | ReplaceExact { repl_from; repl_to } ->

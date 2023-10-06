@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
+open Preproc_options
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -26,11 +27,11 @@ type input =
 
 let decide_source_format _input
   : Cobol_config.source_format_spec ->
-    Cobol_config.source_format with_diags = function
+    Src_format.any with_diags = function
   | SF result ->
-      { result; diags = DIAGS.Set.none }
+      { result = Src_format.from_config result; diags = DIAGS.Set.none }
   | Auto ->
-      { result = SFFixed;
+      { result = Src_format.from_config SFFixed;
         diags = DIAGS.(Acc.warn Set.none) "Source format `auto` is not supported \
                                            yet, using `fixed`" }
 
@@ -50,7 +51,6 @@ and preprocessor_persist =
   {
     pparser: (module Preproc.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
-    config: Cobol_config.t;
     replacing: Preproc.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     libpath: string list;
@@ -63,9 +63,10 @@ let diags { diags; srclex; _ } =
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
 let log { pplog; _ } = pplog
-let srclexer { srclex; _ } = srclex
+let source_format { srclex; _ } = Preproc.source_format srclex
 let position { srclex; _ } = Preproc.srclex_pos srclex
 let comments { srclex; _ } = Preproc.srclex_comments srclex
+let newline_cnums { srclex; _ } = Preproc.srclex_newline_cnums srclex
 
 let with_srclex lp srclex =
   if lp.srclex == srclex then lp else { lp with srclex }
@@ -93,17 +94,17 @@ let make_srclex ~source_format = function
   | Channel { contents; filename } ->
       Preproc.srclex_from_channel ~filename ~source_format contents
 
-type init =
-  {
-    init_libpath: string list;
-    init_config: Cobol_config.t;
-    init_source_format: Cobol_config.source_format_spec;
-  }
+let rewind_srclex srclex ?position = function
+  | Filename filename ->
+      Preproc.srclex_restart_on_file ?position filename srclex
+  | String { contents; _ } ->    (* Let's avoid renaming the file in lexbuf... *)
+      Preproc.srclex_restart_on_string ?position contents srclex
+  | Channel { contents; _ } ->                                        (* ditto *)
+      Preproc.srclex_restart_on_channel ?position contents srclex
 
-let preprocessor ?(verbose = false) input = function
-  | `WithLibpath { init_libpath = libpath;
-                   init_config = (module Config);
-                   init_source_format = source_format; } ->
+let preprocessor input = function
+  | `WithOptions { libpath; verbose; source_format;
+                   config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -119,7 +120,6 @@ let preprocessor ?(verbose = false) input = function
           {
             pparser = (module Pp);
             overlay_manager = (module Om);
-            config = (module Config);
             replacing = [];
             copybooks = Cobol_common.Srcloc.no_copy;
             libpath;
@@ -128,7 +128,7 @@ let preprocessor ?(verbose = false) input = function
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
-      let source_format = Preproc.srclex_source_format from.srclex in
+      let source_format = Preproc.source_format from.srclex in
       {
         from with
         buff = [];
@@ -138,8 +138,11 @@ let preprocessor ?(verbose = false) input = function
             persist with
             copybooks =
               Cobol_common.Srcloc.new_copy ~copyloc copybook persist.copybooks;
-            verbose = persist.verbose || verbose;
           };
+      }
+  | `ResetPosition ({ srclex; _ } as pp, position) ->
+      {
+        pp with srclex = rewind_srclex srclex ?position input;
       }
 
 (* --- *)
@@ -220,8 +223,7 @@ and try_preproc lp srctext =
   | Ok (cdir, ppstate) -> Ok (process_preproc_phrase { lp with ppstate } cdir)
 
 and process_preproc_phrase ({ persist = { pparser = (module Pp);
-                                          overlay_manager = (module Om);
-                                          config = (module Config); _ };
+                                          overlay_manager = (module Om); _ };
                               _ } as lp) =
   let parse ~stmt parser phrase : _ result =
     Pp.MenhirInterpreter.loop_handle
@@ -385,6 +387,21 @@ let pp_pptokens: pptokens Pretty.printer =
 
 (* --- *)
 
+let reset_preprocessor ?new_position pp input =
+  preprocessor input (`ResetPosition (pp, new_position))
+
+let reset_preprocessor_for_string string ?new_position pp =
+  let contents = match new_position with
+    | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
+    | None -> string
+  in                                                   (* filename is ignored *)
+  reset_preprocessor ?new_position pp @@ String { contents; filename = "" }
+
+(* --- *)
+
+let preprocessor ?(options = Preproc_options.default) input =
+  preprocessor input (`WithOptions options)
+
 (** Default pretty-printing formatter for {!lex_file}, {!lex_lib}, and
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
@@ -421,28 +438,17 @@ let fold_text_lines ~source_format ?epf f =
 let pp_preprocessed ppf lp =
   Pretty.print ppf "%a@." Text.pp_text (fst @@ full_text ~item:"file" lp)
 
-let preprocess_file ~source_format ?verbose ?(config = Cobol_config.default)
-    ~libpath ?(ppf = default_oppf) =
-  let preprocessor = preprocessor ?verbose in
+let preprocess_file ?options ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun _init_diags filename ->
-    pp_preprocessed ppf @@ preprocessor (Filename filename) @@
-    `WithLibpath { init_libpath = libpath;
-                   init_config = config;
-                   init_source_format = source_format}
+    pp_preprocessed ppf @@ preprocessor ?options (Filename filename)
   end
 
-let text_of_input ~source_format ?verbose ?(config = Cobol_config.default)
-    ~libpath ?epf a =
-  let preprocessor = preprocessor ?verbose in
+let text_of_input ?options ?epf a =
   Cobol_common.do_any begin fun _init_diags input ->
     fst @@
     full_text ~item:"file" @@
-    preprocessor input @@
-    `WithLibpath { init_libpath = libpath;
-                   init_config = config;
-                   init_source_format = source_format}
+    preprocessor ?options input
   end ?epf a
 
-let text_of_file ~source_format ?verbose ?(config = Cobol_config.default)
-  ~libpath ?epf filename =
-  text_of_input ~source_format ?verbose ~config ~libpath ?epf (Filename filename)
+let text_of_file ?options ?epf filename =
+  text_of_input ?options ?epf (Filename filename)

@@ -11,38 +11,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Gathers some types used to define options for the parser engine. *)
+(** Gathers some types used to define outputs for the parser engine. *)
 (* We are only defining types here so an MLI would only be redundant. *)
 
-(** Switch for the recovery mechanism *)
-type recovery =
-  | DisableRecovery
-  | EnableRecovery of recovery_options
-and recovery_options =
+open Cobol_common.Srcloc.TYPES
+
+type tokens_with_locs = Grammar_tokens.token with_loc list
+
+type artifacts =
   {
-    silence_benign_recoveries: bool; (** Whether to silence reports about some
-                                         missing tokens (e.g, periods).  *)
+    tokens: tokens_with_locs Lazy.t;
+    pplog: Cobol_preproc.log;
+    comments: Cobol_preproc.comments;
   }
 
-type 'm memory =
-  | Amnesic: Cobol_common.Behaviors.amnesic memory
-  | Eidetic: Cobol_common.Behaviors.eidetic memory
+(** The output of parsing functions depends on its memorization abilities:
 
-type parser_options =
-  {
-    verbose: bool;
-    show: [`Pending] list;
-    recovery: recovery;
-    config: Cobol_config.t;
-  }
+    - an amnesic parse (when ['memo = Cobol_common.Behaviors.amnesic]) only
+      returns a parsing result (of type ['result]);
 
-let default_recovery =
-  EnableRecovery { silence_benign_recoveries = false }
+    - an eidetic parse (when ['memo = Cobol_common.Behaviors.eidetic])
+      additionally returns some parsing artefacts. *)
+type ('result, 'memo) output =
+  | Only:
+      'result             -> ('result, Cobol_common.Behaviors.amnesic) output
+  | WithArtifacts:
+      'result * artifacts -> ('result, Cobol_common.Behaviors.eidetic) output
 
-let default =
-  {
-    verbose = false;
-    show = [`Pending];
-    recovery = default_recovery;
-    config = Cobol_config.default;
-  }
+type 'm parsed_compilation_group = (PTree.compilation_group option, 'm) output

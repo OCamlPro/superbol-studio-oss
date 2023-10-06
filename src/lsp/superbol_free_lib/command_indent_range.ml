@@ -17,7 +17,8 @@ open Cobol_indent
 
 open Common_args
 
-let action { source_format; _ } ~file ~range ~indent_config =
+let action { preproc_options = { source_format; _ }; _ } ~file ~range
+    ~indent_config =
   indent_range ~source_format ~file ~range ~indent_config
 
 let cmd =

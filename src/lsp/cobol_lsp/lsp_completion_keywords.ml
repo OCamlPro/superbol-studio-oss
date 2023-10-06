@@ -13,7 +13,7 @@
 
 (* open Cobol_common.Basics *)
 
-let keywords_all = fst @@ List.split Cobol_parser.Text_keywords.keywords
+let keywords_all = fst @@ List.split Cobol_parser.Keywords.keywords
 
 
 (* TODO: Too many keywords, hard to classification *)
@@ -326,4 +326,3 @@ let keywords_data = [
 let keywords_data = StringSet.elements @@ StringSet.of_list keywords_data
 let keywords_proc = StringSet.elements @@ StringSet.of_list (keywords_proc @ keywords_proc_other)
  *)
-

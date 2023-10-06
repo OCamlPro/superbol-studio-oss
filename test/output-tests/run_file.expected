@@ -409,26 +409,6 @@ run_file.at-2398-prog.cob:206.18-206.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2774:0
-run_file.at-2774-prog.cob:4.18:
-   1   
-   2   
-   3          identification division.
-   4 >        program-id. linage.
-----                     ^
-   5   
-   6          environment division.
->> Hint: Missing <word>
-
-run_file.at-2774-prog.cob:4.19-4.25:
-   1   
-   2   
-   3          identification division.
-   4 >        program-id. linage.
-----                      ^^^^^^
-   5   
-   6          environment division.
->> Error: Invalid syntax
-
 run_file.at-2774-prog.cob:79.21:
   76              open i-o indexed-file
   77              perform indexing-check
