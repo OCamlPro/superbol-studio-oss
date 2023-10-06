@@ -19,10 +19,17 @@ exception Parse_error of string
 let parse_error fmt =
   Pretty.string_to (fun msg -> raise (Parse_error msg)) fmt
 
+(** [initialize_channels ()] sets stdin and stdout channels in binary mode; this
+    is required for proper operations on some systems. *)
+let initialize_channels () =
+  Stdlib.set_binary_mode_in stdin true;
+  Stdlib.set_binary_mode_out stdout true
+
 (** [send_out msg] returns {!type:unit} and is used to send out a message. This
     function can be edited later to use other channels than stdin or stdout as
     IO. *)
-let send_out msg = print_string msg
+let send_out msg =
+  print_string msg
 
 (** [read_message ()] tries to read a json RPC message from the standard input
     stream.  Returns a proper [packet] upon success, or raises {!Parse_error} if

@@ -48,6 +48,7 @@ let config ~project_config_filename ~relative_work_dirname =
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
 let run ~config =
+  Lsp_io.initialize_channels ();
   let rec loop state =
     match Lsp_io.read_message () with
     | Jsonrpc.Packet.Notification n ->
