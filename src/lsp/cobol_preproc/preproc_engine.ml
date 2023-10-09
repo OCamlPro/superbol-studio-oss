@@ -94,14 +94,6 @@ let make_srclex ~source_format = function
   | Channel { contents; filename } ->
       Src_processor.srclex_from_channel ~filename ~source_format contents
 
-let rewind_srclex srclex ?position = function
-  | Filename filename ->
-      Src_processor.srclex_restart_on_file ?position filename srclex
-  | String { contents; _ } ->    (* Let's avoid renaming the file in lexbuf... *)
-      Src_processor.srclex_restart_on_string ?position contents srclex
-  | Channel { contents; _ } ->                                        (* ditto *)
-      Src_processor.srclex_restart_on_channel ?position contents srclex
-
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format;
                    config = (module Config) } ->
@@ -140,10 +132,11 @@ let preprocessor input = function
               Cobol_common.Srcloc.new_copy ~copyloc copybook persist.copybooks;
           };
       }
-  | `ResetPosition ({ srclex; _ } as pp, position) ->
-      {
-        pp with srclex = rewind_srclex srclex ?position input;
-      }
+
+let reset_preprocessor ~restart ?new_position ({ srclex; _ } as pp) input =
+  {
+    pp with srclex = restart ?position:new_position input srclex;
+  }
 
 (* --- *)
 
@@ -412,15 +405,13 @@ let pp_pptokens: pptokens Pretty.printer =
 
 (* --- *)
 
-let reset_preprocessor ?new_position pp input =
-  preprocessor input (`ResetPosition (pp, new_position))
-
 let reset_preprocessor_for_string string ?new_position pp =
   let contents = match new_position with
     | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
     | None -> string
-  in                                                   (* filename is ignored *)
-  reset_preprocessor ?new_position pp @@ String { contents; filename = "" }
+  in
+  reset_preprocessor ?new_position pp contents
+    ~restart: Src_processor.srclex_restart_on_string
 
 (* --- *)
 

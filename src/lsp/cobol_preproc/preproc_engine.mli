@@ -22,14 +22,9 @@ val preprocessor
   : ?options: Preproc_options.preproc_options
   -> input
   -> preprocessor
-val reset_preprocessor
-  : ?new_position:Lexing.position
-  -> preprocessor
-  -> input
-  -> preprocessor
 val reset_preprocessor_for_string
   : string
-  -> ?new_position:Lexing.position
+  -> ?new_position: Lexing.position
   -> preprocessor
   -> preprocessor
 
