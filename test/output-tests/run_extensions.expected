@@ -2814,26 +2814,6 @@ run_extensions.at-4247-prog.cob:35.11-35.17:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4381:0
-run_extensions.at-4381-prog.cob:18.24:
-  15          01 TZNAME   USAGE POINTER.
-  16          01 TZNAMES  USAGE POINTER BASED.
-  17             05 TZS      USAGE POINTER OCCURS 2 TIMES.
-  18 >        01 TIMEZONE USAGE BINARY-C-LONG.
-----                           ^
-  19          01 DAYLIGHT USAGE BINARY-LONG.
-  20          01 EXTPTR   USAGE POINTER. *> only for the check, otherwise unused
->> Hint: Missing BINARY
-
-run_extensions.at-4381-prog.cob:18.25-18.38:
-  15          01 TZNAME   USAGE POINTER.
-  16          01 TZNAMES  USAGE POINTER BASED.
-  17             05 TZS      USAGE POINTER OCCURS 2 TIMES.
-  18 >        01 TIMEZONE USAGE BINARY-C-LONG.
-----                            ^^^^^^^^^^^^^
-  19          01 DAYLIGHT USAGE BINARY-LONG.
-  20          01 EXTPTR   USAGE POINTER. *> only for the check, otherwise unused
->> Error: Invalid syntax
-
 run_extensions.at-4381-prog.cob:67.14:
   64                 DISPLAY "UNK CELL " CELL
   65              END-IF

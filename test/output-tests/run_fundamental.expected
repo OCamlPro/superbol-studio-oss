@@ -1523,46 +1523,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7029:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7158:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7232:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9015:0
-run_fundamental.at-9015-prog.cob:14.21:
-  11          WORKING-STORAGE  SECTION.
-  12   
-  13          01 ALL-SRC .
-  14 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
-----                        ^
-  15             05 FIELD-03 BINARY-C-LONG UNSIGNED .
-  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
->> Hint: Missing RENAMES
-
-run_fundamental.at-9015-prog.cob:14.22-14.35:
-  11          WORKING-STORAGE  SECTION.
-  12   
-  13          01 ALL-SRC .
-  14 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
-----                         ^^^^^^^^^^^^^
-  15             05 FIELD-03 BINARY-C-LONG UNSIGNED .
-  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
->> Error: Invalid syntax
-
-run_fundamental.at-9015-prog.cob:15.21:
-  12   
-  13          01 ALL-SRC .
-  14             05 FIELD-02 BINARY-C-LONG  SIGNED  .
-  15 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
-----                        ^
-  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
-  17             05 FIELD-05 BINARY-CHAR UNSIGNED .
->> Hint: Missing RENAMES
-
-run_fundamental.at-9015-prog.cob:15.22-15.35:
-  12   
-  13          01 ALL-SRC .
-  14             05 FIELD-02 BINARY-C-LONG  SIGNED  .
-  15 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
-----                         ^^^^^^^^^^^^^
-  16             05 FIELD-04 BINARY-CHAR  SIGNED  .
-  17             05 FIELD-05 BINARY-CHAR UNSIGNED .
->> Error: Invalid syntax
-
 run_fundamental.at-9015-prog.cob:30.22-30.32:
   27             05 FIELD-15 FLOAT-DECIMAL-34 .
   28             05 FIELD-16 FLOAT-LONG .
@@ -1621,46 +1581,6 @@ run_fundamental.at-9015-prog.cob:35.22-35.36:
 ----                         ^^^^^^^^^^^^^^
   36             05 FIELD-24            COMP-1 .
   37             05 FIELD-25            COMP-2 .
->> Error: Invalid syntax
-
-run_fundamental.at-9015-prog.cob:50.21:
-  47          01 EXPTD-RESULT PIC 9(09)     .
-  48         *>
-  49          01 ALL-DST .
-  50 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
-----                        ^
-  51             05 FIELD-03 BINARY-C-LONG UNSIGNED .
-  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
->> Hint: Missing RENAMES
-
-run_fundamental.at-9015-prog.cob:50.22-50.35:
-  47          01 EXPTD-RESULT PIC 9(09)     .
-  48         *>
-  49          01 ALL-DST .
-  50 >           05 FIELD-02 BINARY-C-LONG  SIGNED  .
-----                         ^^^^^^^^^^^^^
-  51             05 FIELD-03 BINARY-C-LONG UNSIGNED .
-  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
->> Error: Invalid syntax
-
-run_fundamental.at-9015-prog.cob:51.21:
-  48         *>
-  49          01 ALL-DST .
-  50             05 FIELD-02 BINARY-C-LONG  SIGNED  .
-  51 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
-----                        ^
-  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
-  53             05 FIELD-05 BINARY-CHAR UNSIGNED .
->> Hint: Missing RENAMES
-
-run_fundamental.at-9015-prog.cob:51.22-51.35:
-  48         *>
-  49          01 ALL-DST .
-  50             05 FIELD-02 BINARY-C-LONG  SIGNED  .
-  51 >           05 FIELD-03 BINARY-C-LONG UNSIGNED .
-----                         ^^^^^^^^^^^^^
-  52             05 FIELD-04 BINARY-CHAR  SIGNED  .
-  53             05 FIELD-05 BINARY-CHAR UNSIGNED .
 >> Error: Invalid syntax
 
 run_fundamental.at-9015-prog.cob:66.22-66.32:

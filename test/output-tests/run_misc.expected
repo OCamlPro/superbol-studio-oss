@@ -3172,36 +3172,6 @@ run_misc.at-5990-prog.cob:3.19-3.25:
    5          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_misc.at-5990-prog.cob:8.27-8.40:
-   5          DATA DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7         *
-   8 >        77  BCL-A           BINARY-C-LONG    VALUE 1.
-----                              ^^^^^^^^^^^^^
-   9          77  BCL-B           BINARY-C-LONG    VALUE 10.
-  10          77  BCL-RES         BINARY-C-LONG.
->> Error: Invalid syntax
-
-run_misc.at-5990-prog.cob:9.27-9.40:
-   6          WORKING-STORAGE SECTION.
-   7         *
-   8          77  BCL-A           BINARY-C-LONG    VALUE 1.
-   9 >        77  BCL-B           BINARY-C-LONG    VALUE 10.
-----                              ^^^^^^^^^^^^^
-  10          77  BCL-RES         BINARY-C-LONG.
-  11         *
->> Error: Invalid syntax
-
-run_misc.at-5990-prog.cob:10.27-10.40:
-   7         *
-   8          77  BCL-A           BINARY-C-LONG    VALUE 1.
-   9          77  BCL-B           BINARY-C-LONG    VALUE 10.
-  10 >        77  BCL-RES         BINARY-C-LONG.
-----                              ^^^^^^^^^^^^^
-  11         *
-  12          77  BC-A            BINARY-CHAR      VALUE 1.
->> Error: Invalid syntax
-
 run_misc.at-5990-prog.cob:93.7-93.34:
   90          MAIN.
   91         *    Test with DISPLAY on error
@@ -3239,36 +3209,6 @@ run_misc.at-6479-prog.cob:3.19-3.25:
 ----                      ^^^^^^
    4          ENVIRONMENT DIVISION.
    5          DATA DIVISION.
->> Error: Invalid syntax
-
-run_misc.at-6479-prog.cob:8.27-8.40:
-   5          DATA DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7         *
-   8 >        77  BCL-A           BINARY-C-LONG    VALUE 1.0.
-----                              ^^^^^^^^^^^^^
-   9          77  BCL-B           BINARY-C-LONG    VALUE 10.0.
-  10          77  BCL-RES         BINARY-C-LONG.
->> Error: Invalid syntax
-
-run_misc.at-6479-prog.cob:9.27-9.40:
-   6          WORKING-STORAGE SECTION.
-   7         *
-   8          77  BCL-A           BINARY-C-LONG    VALUE 1.0.
-   9 >        77  BCL-B           BINARY-C-LONG    VALUE 10.0.
-----                              ^^^^^^^^^^^^^
-  10          77  BCL-RES         BINARY-C-LONG.
-  11         *
->> Error: Invalid syntax
-
-run_misc.at-6479-prog.cob:10.27-10.40:
-   7         *
-   8          77  BCL-A           BINARY-C-LONG    VALUE 1.0.
-   9          77  BCL-B           BINARY-C-LONG    VALUE 10.0.
-  10 >        77  BCL-RES         BINARY-C-LONG.
-----                              ^^^^^^^^^^^^^
-  11         *
-  12          77  BC-A            BINARY-CHAR      VALUE 1.0.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:6528:0
