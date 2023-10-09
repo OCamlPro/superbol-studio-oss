@@ -23,16 +23,16 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 (* --- *)
 
 module Make
-    (Statements: Abstract.STATEMENTS) =
+    (Statements: Cobol_ast.Abstract.STATEMENTS) =
 struct
 
   module Proc_division =
     Raw.Proc_division (Statements)
 
   module Statements_visitor =
-    Abstract_visitor.For_statements (Statements)
+    Cobol_ast.Abstract_visitor.For_statements (Statements)
   module Proc_division_visitor =
-    Abstract_visitor.For_proc_division (Proc_division)
+    Cobol_ast.Abstract_visitor.For_proc_division (Proc_division)
 
   open Proc_division
 

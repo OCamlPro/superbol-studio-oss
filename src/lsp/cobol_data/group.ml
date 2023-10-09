@@ -11,10 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ast
+open Cobol_ptree
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Pictured_ast.Data_sections
+(* open Pictured_ast.Data_sections *)
+
+module DIAGS = Cobol_common.Diagnostics
 
 (** This module implements data_groups which are how we group together all the
     {!Cobol_parser.Ptree.data_description} in grouped items before typing them. *)
@@ -137,7 +139,7 @@ let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
                                    values = condition_name_values;
                                    target = element } &@<- condition_name)
                 cond_names
-          | _ -> invalid_arg "Expecting a name"
+          | _ -> invalid_arg "Expecting a name (1)"
         end
     | ({data_level = level; _}, _)::_ ->
         let groups = List.rev (group_at_level' level group) in
@@ -165,7 +167,7 @@ let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
                                            target = group} &@<- name)
                          cond_names)
                 end
-            | _ -> invalid_arg "Expecting a name")
+            | _ -> invalid_arg "Expecting a name (2)")
           groups
   in
   aux group
@@ -344,6 +346,15 @@ let group_range (module Diags: Cobol_common.Diagnostics.STATEFUL) first last gro
   let _, _, _, _, groups = aux (first, last, false, false, []) group in
   groups
 
+(** [list_of_qualname qualname] returns the list [nameN; ...; name1] when qualname is [Qual(name1, ... (Name nameN))],
+    (note that the major qualifier is first and the minor is last). *)
+let list_of_qualname qualname =
+  let rec aux acc = function
+    | Cobol_ptree.Qual(n, qn) -> aux (n::acc) qn
+    | Cobol_ptree.Name n -> n::acc
+  in
+  aux [] qualname
+
 (** [make_renames (module Diags) group renames] returns a list of {!(t, unit) result} which
     are all of the form [Renames _] and correspond to renaming items from the group [group]. *)
 let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames =
@@ -352,8 +363,8 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
     match rename_through with
     | Some through_name ->
         (* TODO: avoid reliance on a list representation. *)
-        let first = Cobol_ast.list_of_qualname rename_renamed in
-        let last = Cobol_ast.list_of_qualname through_name in
+        let first = list_of_qualname rename_renamed in
+        let last = list_of_qualname through_name in
         let groups =
           group_range
             (module Diags: Cobol_common.Diagnostics.STATEFUL)
@@ -364,7 +375,7 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
         Ok (Renames {name = ~&rename_to;
                      targets = List.rev groups} &@<- rename_to) :: acc
     | None ->
-        let name_list = Cobol_ast.list_of_qualname rename_renamed in
+        let name_list = list_of_qualname rename_renamed in
         let sub_groups = groups_of_list name_list group in
         if List.length sub_groups <> 1 then
           begin
@@ -377,11 +388,10 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
                        targets = [group]} &@<- rename_to) :: acc
   end [] renames
 
-(** [of_working_storage (module Diags) wss] returns the list of groups from wss in a hierarchical
-    form. *)
-let of_working_storage
-    (module Diags: Cobol_common.Diagnostics.STATEFUL)
-    (wss: working_storage_item_descr with_loc list) =
+(** [of_working_item_descrs data_items] returns the list of groups from wss in a
+    hierarchical form. *)
+let of_working_item_descrs (wss: working_item_descr with_loc list) =
+  let module Diags = Cobol_common.Diagnostics.InitStateful () in
   let groups =
     List.fold_left (fun acc {payload; loc} ->
         Result.bind acc (fun acc ->
@@ -425,24 +435,30 @@ let of_working_storage
     |> Result.map (List.map (fun (data, renames) -> List.rev data, Option.map List.rev renames))
     |> Result.map List.rev
   in
-  Result.bind groups (fun groups ->
-      Cobol_common.join_all @@
-      List.map (fun (group, rename) ->
-          let group = make_data_group (module Diags) group in
-          Result.bind group (fun group ->
-              Option.fold
-                ~none:[]
-                ~some:(fun renames -> make_renames (module Diags) group renames)
-                rename
-              |> Cobol_common.join_all
-              |> Result.map (fun renames ->
-                  List.map (function
-                      | { payload = Group {name; elements; data_item}; loc } ->
-                          Group { name;
-                                  elements = elements@renames;
-                                  data_item } &@ loc
-                      | _ as elem ->
-                          elem)
-                    group)))
-        groups)
-  |> Result.map List.flatten
+  let res =
+    Result.bind groups (fun groups ->
+        Cobol_common.join_all @@
+        List.map (fun (group, rename) ->
+            let group = make_data_group (module Diags) group in
+            Result.bind group (fun group ->
+                Option.fold
+                  ~none:[]
+                  ~some:(fun renames -> make_renames (module Diags) group renames)
+                  rename
+                |> Cobol_common.join_all
+                |> Result.map (fun renames ->
+                    List.map (function
+                        | { payload = Group {name; elements; data_item}; loc } ->
+                            Group { name;
+                                    elements = elements@renames;
+                                    data_item } &@ loc
+                        | _ as elem ->
+                            elem)
+                      group)))
+          groups)
+    |> Result.map List.flatten
+  in
+  let diags = Diags.inspect ~reset:true in
+  match res with
+  | Ok res -> DIAGS.result res ~diags
+  | Error () -> DIAGS.result [] ~diags

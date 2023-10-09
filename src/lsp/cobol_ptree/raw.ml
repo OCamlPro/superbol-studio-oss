@@ -11,14 +11,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ast
+(* open Cobol_common.Srcloc.TYPES *)
 
-module Misc_sections: Abstract.MISC_SECTIONS
-  with type informational_paragraphs = Ast.informational_paragraphs
-   and type options_paragraph        = Ast.options_paragraph
-   and type environment_division     = Ast.environment_division = Ast
+open Terms
+open Data_descr
+open Misc_descr
+open Operands
 
-module Data_sections (Picture: Abstract.PICTURE) = struct
+
+(* module Misc_sections: Cobol_ast.Abstract.MISC_SECTIONS *)
+(*   with type informational_paragraphs = Misc_descr.informational_paragraphs *)
+(*    and type options_paragraph        = Misc_descr.options_paragraph *)
+(*    and type environment_division     = Misc_descr.environment_division *)
+(*   = Misc_descr *)
+
+
+module Data_sections (Picture: Cobol_ast.Abstract.PICTURE) = struct
   include Picture
 
   type picture_clause =
@@ -33,9 +41,8 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     Fmt.pf ppf "PIC %a%a%a"
       pp_picture picture
       Fmt.(option (sp ++ pp_locale_phrase)) picture_locale
-      Fmt.(
-        option (any "@ DEPENDING ON@ " ++ pp_with_loc pp_qualname)
-      ) picture_depending
+      Fmt.(option (any "@ DEPENDING ON@ " ++
+                   pp_with_loc pp_qualname)) picture_depending
 
   (* TODO (can be delayed): Unify some of the types (probably like for terms) *)
 
@@ -82,9 +89,9 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | DataType n -> Fmt.pf ppf "TYPE %a" (pp_with_loc pp_name) n
     | DataValue dvc -> pp_data_value_clause ppf dvc
     | DataDynamicLength { dynamic_length_structure_name = sn; limit_is = l } ->
-      Fmt.pf ppf "DYNAMIC%a%a"
-        Fmt.(option (sp ++ pp_with_loc pp_name)) sn
-        Fmt.(option (any "@ LIMIT IS@ " ++ pp_integer)) l
+        Fmt.pf ppf "DYNAMIC%a%a"
+          Fmt.(option (sp ++ pp_with_loc pp_name)) sn
+          Fmt.(option (any "@ LIMIT IS@ " ++ pp_integer)) l
     | DataExternal ec -> pp_external_clause ppf ec
     | DataGlobal -> Fmt.pf ppf "GLOBAL"
     | DataGroupUsage guc -> pp_group_usage_clause ppf guc
@@ -97,8 +104,8 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | DataSign sc -> pp_sign_clause ppf sc
     | DataSynchronized sc -> pp_synchronized_clause ppf sc
     | DataTypedef { strong } ->
-      Fmt.pf ppf "TYPEDEF";
-      if strong then Fmt.pf ppf " STRONG"
+        Fmt.pf ppf "TYPEDEF";
+        if strong then Fmt.pf ppf " STRONG"
     | DataUsage uc -> pp_usage_clause ppf uc
     | DataValidation vc -> pp_validation_clause ppf vc
 
@@ -131,12 +138,12 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | ReportPresentWhen of condition                              (* +COB2002 *)
     | ReportGroupIndicate
     | ReportOccurs of                                             (* +COB2002 *)
-       {
-         from: integer;
-         to_: integer option;
-         depending: qualname with_loc option;
-         step: integer option;
-       }
+        {
+          from: integer;
+          to_: integer option;
+          depending: qualname with_loc option;
+          step: integer option;
+        }
     | ReportVarying of data_varying list                          (* +COB2002 *)
   [@@deriving ord]
 
@@ -148,35 +155,35 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | ReportNextGroup c -> pp_next_group_clause ppf c
     | ReportLine [ lp ] -> Fmt.pf ppf "LINE NUMBER %a" pp_line_position lp
     | ReportLine l ->
-      Fmt.pf ppf "LINE NUMBERS %a"
-        Fmt.(list ~sep:sp pp_line_position) l
+        Fmt.pf ppf "LINE NUMBERS %a"
+          Fmt.(list ~sep:sp pp_line_position) l
     | ReportPicture pc -> pp_with_loc pp_picture_clause ppf pc
     | ReportUsage c -> pp_report_screen_usage_clause ppf c
     | ReportSign c -> pp_sign_clause ppf c
     | ReportJustified -> Fmt.pf ppf "JUSTIFIED"
     | ReportColumn { alignment; position } ->
-      Fmt.pf ppf "COLUMN %a %a"
-        pp_alignment alignment
-        Fmt.(list ~sep:sp pp_column_position) position
+        Fmt.pf ppf "COLUMN %a %a"
+          pp_alignment alignment
+          Fmt.(list ~sep:sp pp_column_position) position
     | ReportBlankWhenZero -> Fmt.pf ppf "BLANK WHEN ZERO"
     | ReportSource { source; rounding } ->
-      Fmt.pf ppf "SOURCE %a %a"
-        Fmt.(list ~sep:sp pp_expression) source
-        pp_rounding rounding
+        Fmt.pf ppf "SOURCE %a %a"
+          Fmt.(list ~sep:sp pp_expression) source
+          pp_rounding rounding
     | ReportSum { sum_of; reset_on; rounding } ->
-      Fmt.(list ~sep:nop (hbox pp_sum_phrase ++ sp)) ppf sum_of;
-      Fmt.(option (any "RESET " ++ pp_report_data_name_or_final ++ sp))
-        ppf reset_on;
-      pp_rounding ppf rounding
+        Fmt.(list ~sep:nop (hbox pp_sum_phrase ++ sp)) ppf sum_of;
+        Fmt.(option (any "RESET " ++ pp_report_data_name_or_final ++ sp))
+          ppf reset_on;
+        pp_rounding ppf rounding
     | ReportValue v -> Fmt.pf ppf "VALUE %a" pp_literal v
     | ReportPresentWhen c -> Fmt.pf ppf "PRESENT WHEN %a" pp_condition c
     | ReportGroupIndicate -> Fmt.pf ppf "GROUP"
     | ReportOccurs { from; to_; depending; step } ->
-      Fmt.pf ppf "OCCURS %a%a%a%a"
-        pp_integer from
-        Fmt.(option (any "@ TO " ++ pp_integer)) to_
-        Fmt.(option (sp ++ pp_depending_phrase)) depending
-        Fmt.(option (sp ++ pp_step_phrase)) step
+        Fmt.pf ppf "OCCURS %a%a%a%a"
+          pp_integer from
+          Fmt.(option (any "@ TO " ++ pp_integer)) to_
+          Fmt.(option (sp ++ pp_depending_phrase)) depending
+          Fmt.(option (sp ++ pp_step_phrase)) step
     | ReportVarying dvs -> pp_varying_clause ppf dvs
 
   type screen_clause =
@@ -211,16 +218,16 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | ScreenUsage rsuc -> pp_report_screen_usage_clause ppf rsuc
     | ScreenRequired -> Fmt.pf ppf "REQUIRED"
     | ScreenAttribute sacs ->
-      Fmt.(list ~sep:sp (pp_with_loc pp_screen_attribute_clause)) ppf sacs
+        Fmt.(list ~sep:sp (pp_with_loc pp_screen_attribute_clause)) ppf sacs
     | ScreenColumn slcc ->
-      Fmt.pf ppf "COLUMN %a" pp_screen_line_column_clause slcc
+        Fmt.pf ppf "COLUMN %a" pp_screen_line_column_clause slcc
     | ScreenLine slcc ->
-      Fmt.pf ppf "LINE %a" pp_screen_line_column_clause slcc
+        Fmt.pf ppf "LINE %a" pp_screen_line_column_clause slcc
     | ScreenOccurs n -> Fmt.pf ppf "OCCURS %a TIMES" pp_integer n
     | ScreenSecure -> Fmt.pf ppf "SECURE"
     | ScreenSign sc -> pp_sign_clause ppf sc
     | ScreenSourceDestination sdcl ->
-      Fmt.(list ~sep:sp (pp_with_loc pp_source_destination_clause)) ppf sdcl
+        Fmt.(list ~sep:sp (pp_with_loc pp_source_destination_clause)) ppf sdcl
 
   let pp_item pp_clause ppf lvl name clauses =
     Fmt.pf ppf "%a%a%a."
@@ -236,7 +243,8 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     }
   [@@deriving ord]
 
-  let pp_data_item ppf { data_level = lvl; data_name = nc; data_clauses = cls } =
+  let pp_data_item ppf { data_level = lvl; data_name = nc;
+                         data_clauses = cls } =
     pp_item (pp_with_loc pp_data_clause) ppf lvl.payload nc cls
 
   type screen_item =
@@ -248,8 +256,7 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
   [@@deriving ord]
 
   let pp_screen_item ppf { screen_level; screen_data_name; screen_clauses } =
-    pp_item
-      (pp_with_loc pp_screen_clause) ppf
+    pp_item (pp_with_loc pp_screen_clause) ppf
       screen_level screen_data_name screen_clauses
 
   type report_group_item =
@@ -260,11 +267,9 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     }
   [@@deriving ord]
 
-  let pp_report_group_item ppf
-    { report_level; report_data_name; report_group_clauses }
-  =
-    pp_item
-      (pp_with_loc pp_report_group_clause) ppf
+  let pp_report_group_item ppf { report_level; report_data_name;
+                                 report_group_clauses } =
+    pp_item (pp_with_loc pp_report_group_clause) ppf
       report_level report_data_name report_group_clauses
 
   type data_ = [`data]
@@ -279,7 +284,7 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | Renames: rename_item -> [>rename_] item_descr
     | CondName: condition_name_item -> [>condition_name_] item_descr
     | Screen: screen_item -> [>screen_] item_descr
-    | ReportGroup: (report_group_item) -> [>report_group_] item_descr
+    | ReportGroup: report_group_item -> [>report_group_] item_descr
 
   let pp_item_descr (type k) : k item_descr Pretty.printer = fun ppf -> function
     | Constant c -> pp_constant_item ppf c
@@ -291,23 +296,23 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
 
   let compare_item_descr (type a b) : a item_descr -> b item_descr -> int =
     fun a b ->
-      match a, b with
-      | Constant a, Constant b -> compare_constant_item a b
-      | Constant _, _ -> -1
-      | _, Constant _ -> 1
-      | Data a, Data b -> compare_data_item a b
-      | Data _, _ -> -1
-      | _, Data _ -> 1
-      | Renames a, Renames b -> compare_rename_item a b
-      | Renames _, _ -> -1
-      | _, Renames _ -> 1
-      | CondName a, CondName b -> compare_condition_name_item a b
-      | CondName _, _ -> -1
-      | _, CondName _ -> 1
-      | Screen a, Screen b -> compare_screen_item a b
-      | Screen _, _ -> -1
-      | _, Screen _ -> 1
-      | ReportGroup a, ReportGroup b -> compare_report_group_item a b
+    match a, b with
+    | Constant a, Constant b -> compare_constant_item a b
+    | Constant _, _ -> -1
+    | _, Constant _ -> 1
+    | Data a, Data b -> compare_data_item a b
+    | Data _, _ -> -1
+    | _, Data _ -> 1
+    | Renames a, Renames b -> compare_rename_item a b
+    | Renames _, _ -> -1
+    | _, Renames _ -> 1
+    | CondName a, CondName b -> compare_condition_name_item a b
+    | CondName _, _ -> -1
+    | _, CondName _ -> 1
+    | Screen a, Screen b -> compare_screen_item a b
+    | Screen _, _ -> -1
+    | _, Screen _ -> 1
+    | ReportGroup a, ReportGroup b -> compare_report_group_item a b
 
   type data_item_descr    = data_ item_descr
   and constant_item_descr = constant_ item_descr
@@ -319,16 +324,17 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
                              report_group_|screen_] item_descr
 
   let pp_data_item_descr     = pp_item_descr
-  let compare_data_item_descr = compare_item_descr
   let pp_constant_item_descr = pp_item_descr
-  let compare_constant_item_descr = compare_item_descr
   let pp_working_item_descr  = pp_item_descr
-  let compare_working_item_descr = compare_item_descr
   let pp_report_item_descr   = pp_item_descr
-  let compare_report_item_descr = compare_item_descr
   let pp_screen_item_descr   = pp_item_descr
-  let compare_screen_item_descr = compare_item_descr
   let pp_any_item_descr      = pp_item_descr
+
+  let compare_data_item_descr = compare_item_descr
+  let compare_constant_item_descr = compare_item_descr
+  let compare_working_item_descr = compare_item_descr
+  let compare_report_item_descr = compare_item_descr
+  let compare_screen_item_descr = compare_item_descr
   let compare_any_item_descr = compare_item_descr
 
   let item_descr_level (type k) : k item_descr -> data_level = function
@@ -340,14 +346,15 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | ReportGroup { report_level = l; _ } -> l
 
   type working_storage_item_descr = working_item_descr
-  let compare_working_storage_item_descr = compare_item_descr
   type linkage_item_descr         = working_item_descr
-  let compare_linkage_item_descr = compare_item_descr
   type file_item_descr            = working_item_descr
-  let compare_file_item_descr = compare_item_descr
   type communication_item_descr   = working_item_descr
-  let compare_communication_item_descr = compare_item_descr
   type local_storage_item_descr   = working_item_descr
+
+  let compare_working_storage_item_descr = compare_item_descr
+  let compare_linkage_item_descr = compare_item_descr
+  let compare_file_item_descr = compare_item_descr
+  let compare_communication_item_descr = compare_item_descr
   let compare_local_storage_item_descr = compare_item_descr
 
   type file_descr =
@@ -390,24 +397,24 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | FileGlobal -> Fmt.pf ppf "GLOBAL"
     | FileFormat fc -> pp_format_clause ppf fc
     | FileBlockContains { from; to_; characters_or_records } ->
-      Fmt.pf ppf "BLOCK CONTAINS %a%a@ %a"
-        pp_integer from
-        Fmt.(option (any "@ TO " ++ pp_integer)) to_
-        pp_file_block_contents characters_or_records
+        Fmt.pf ppf "BLOCK CONTAINS %a%a@ %a"
+          pp_integer from
+          Fmt.(option (any "@ TO " ++ pp_integer)) to_
+          pp_file_block_contents characters_or_records
     | FileRecord rc -> pp_record_clause ppf rc
     | FileLabel lc -> pp_label_clause ppf lc
     | FileValueOf vcl ->
-      Fmt.pf ppf "VALUE OF %a"
-        Fmt.(list ~sep:sp pp_value_of_clause) vcl
+        Fmt.pf ppf "VALUE OF %a"
+          Fmt.(list ~sep:sp pp_value_of_clause) vcl
     | FileData fdc -> pp_file_data_clause ppf fdc
     | FileLinage flc -> pp_file_linage_clause ppf flc
     | FileCodeSet als ->
-      Fmt.pf ppf "CODE-SET %a" pp_alphabet_specification als
+        Fmt.pf ppf "CODE-SET %a" pp_alphabet_specification als
     | FileReport [ n ] ->
-      Fmt.pf ppf "REPORT IS %a" (pp_with_loc pp_name) n
+        Fmt.pf ppf "REPORT IS %a" (pp_with_loc pp_name) n
     | FileReport ns ->
-      Fmt.pf ppf "REPORTS ARE %a"
-        Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
+        Fmt.pf ppf "REPORTS ARE %a"
+          Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
 
 
   let pp_file_sd_clause ppf = function
@@ -426,12 +433,13 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     | _ :: boxes -> Fmt.pf ppf "@]"; pp_close_boxes_until l ppf boxes
 
   let rec pp_item_descr_list boxes ppf = function
-    | [] -> pp_close_boxes ppf boxes
+    | [] ->
+        pp_close_boxes ppf boxes
     | id :: ids ->
-      let idl = item_descr_level id.payload in
-      let boxes = pp_close_boxes_until idl ppf boxes in
-      Fmt.box (pp_with_loc pp_item_descr) ppf id;
-      pp_item_descr_list boxes ppf ids
+        let idl = item_descr_level id.payload in
+        let boxes = pp_close_boxes_until idl ppf boxes in
+        Fmt.box (pp_with_loc pp_item_descr) ppf id;
+        pp_item_descr_list boxes ppf ids
 
   let pp_file_descr ppf { file_name; file_clauses; file_items } =
     let pp_file_clauses pp_clause =
@@ -440,15 +448,15 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     let de, is_empty, pp =
       match file_clauses with
       | FileFD file_clauses ->
-        "FD", file_clauses == [],
-        fun ppf ->
-          Fmt.pf ppf "@ %a"
-            Fmt.(pp_file_clauses (box pp_file_fd_clause)) file_clauses
+          "FD", file_clauses == [],
+          fun ppf ->
+            Fmt.pf ppf "@ %a"
+              Fmt.(pp_file_clauses (box pp_file_fd_clause)) file_clauses
       | FileSD file_clauses ->
-        "SD", file_clauses == [],
-        fun ppf ->
-          Fmt.pf ppf "@ %a"
-            (pp_file_clauses pp_file_sd_clause) file_clauses
+          "SD", file_clauses == [],
+          fun ppf ->
+            Fmt.pf ppf "@ %a"
+              (pp_file_clauses pp_file_sd_clause) file_clauses
     in
     let pp = if is_empty then fun _ -> () else pp in
     Fmt.pf ppf "@[<v 2>%s %a%t@].%a" de
@@ -472,23 +480,23 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
 
   let pp_comm_direction ppf = function
     | CommInput { initial; items = _ } ->
-      if initial then Fmt.pf ppf "INITIAL ";
-      Fmt.pf ppf "INPUT"
-    | CommOutput -> Fmt.pf ppf "OUTPUT"
+        if initial then Fmt.pf ppf "INITIAL ";
+        Fmt.pf ppf "INPUT"
+    | CommOutput ->
+        Fmt.pf ppf "OUTPUT"
     | CommIO { initial; items = _ } ->
-      if initial then Fmt.pf ppf "INITIAL ";
-      Fmt.pf ppf "I-O"
+        if initial then Fmt.pf ppf "INITIAL ";
+        Fmt.pf ppf "I-O"
 
   let pp_comm_direction_items ppf = function
     | CommInput { initial = _; items } ->
-      Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_data_name)) ppf items
+        Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_data_name)) ppf items
     | CommOutput -> ()
     | CommIO { initial = _; items } ->
-      Fmt.(list ~sep:nop (sp ++ pp_name')) ppf items
+        Fmt.(list ~sep:nop (sp ++ pp_name')) ppf items
 
-  let pp_communication_descr ppf
-    { comm_name; comm_clauses; comm_items; comm_direction }
-  =
+  let pp_communication_descr ppf { comm_name; comm_clauses; comm_items;
+                                   comm_direction } =
     Fmt.pf ppf "@[<v 2>CD %a %a%a%a@].%a"
       (pp_with_loc pp_name) comm_name
       pp_comm_direction comm_direction
@@ -516,20 +524,17 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
 
   type file_section = file_descr with_loc list [@@deriving ord]
   type working_storage_section = working_storage_item_descr with_loc list
-    [@@deriving ord]
+  [@@deriving ord]
   type linkage_section = linkage_item_descr with_loc list [@@deriving ord]
   type communication_section = communication_descr with_loc list [@@deriving ord]
   type local_storage_section = local_storage_item_descr with_loc list
-    [@@deriving ord]
+  [@@deriving ord]
   type report_section = report_descr with_loc list [@@deriving ord]
   type screen_section = screen_item_descr with_loc list [@@deriving ord]
 
   let pp_section k pp_item_descr =
-    Fmt.(
-      vbox (
-      const string k ++ any " SECTION." ++
-      list ~sep:nop (sp ++ pp_with_loc pp_item_descr))
-    )
+    Fmt.(vbox (const string k ++ any " SECTION." ++
+               list ~sep:nop (sp ++ pp_with_loc pp_item_descr)))
 
   let pp_item_section k ppf xs =
     Fmt.pf ppf "@[<v>";
@@ -537,7 +542,8 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
     pp_item_descr_list [] ppf xs;
     Fmt.pf ppf "@]"
 
-  let pp_file_section : file_section Fmt.t = pp_section "FILE" pp_file_descr
+  let pp_file_section : file_section Fmt.t =
+    pp_section "FILE" pp_file_descr
   let pp_working_storage_section : working_storage_section Fmt.t =
     pp_item_section "WORKING-STORAGE"
   let pp_linkage_section : linkage_section Fmt.t =
@@ -553,7 +559,7 @@ module Data_sections (Picture: Abstract.PICTURE) = struct
 
 end
 
-module Data_division (Data_sections: Abstract.DATA_SECTIONS) = struct
+module Data_division (Data_sections: Cobol_ast.Abstract.DATA_SECTIONS) = struct
   include Data_sections
 
   type data_division =
@@ -588,17 +594,20 @@ module Data_division (Data_sections: Abstract.DATA_SECTIONS) = struct
 
 end
 
-module Statements = struct
-  type statement  = Ast.statement
-  let pp_statement = Ast.pp_statement
-  let compare_statement = Ast.compare_statement
-  type statements = Ast.statements
-  let pp_statements = Ast.pp_statements
-  let pp_dump_statements = Ast.pp_dump_statements
-  let compare_statements = Ast.compare_statements
-end
+module Statements: Cobol_ast.Abstract.STATEMENTS
+  with type statement = Branching_statements.statement
+   and type statements  = Branching_statements.statements
+  = Branching_statements
+(*   type statement  = Ast.statement *)
+(*   let pp_statement = Ast.pp_statement *)
+(*   let compare_statement = Ast.compare_statement *)
+(*   type statements = Ast.statements *)
+(*   let pp_statements = Ast.pp_statements *)
+(*   let pp_dump_statements = Ast.pp_dump_statements *)
+(*   let compare_statements = Ast.compare_statements *)
+(* end *)
 
-module Proc_division (Statements: Abstract.STATEMENTS) = struct
+module Proc_division (Statements: Cobol_ast.Abstract.STATEMENTS) = struct
   include Statements
 
   type procedure_division =
@@ -676,29 +685,24 @@ module Proc_division (Statements: Abstract.STATEMENTS) = struct
     }
   [@@deriving ord]
 
-  let pp_paragraph ppf {
-      paragraph_name = pn;
-      paragraph_is_section = pis;
-      paragraph_segment = ps;
-      paragraph_sentences = pss;
-  } =
-    (
-      match pn with
-      | Some n ->
-        if pis then Fmt.pf ppf "@[<v 2>" else Fmt.pf ppf "@[<v>";
-        pp_with_loc pp_name ppf n;
-        if pis then Fmt.pf ppf " SECTION";
-        Fmt.(option (sp ++ pp_integer)) ppf ps;
-        Fmt.pf ppf ".@ "
-      | None -> Fmt.pf ppf "@[<v>";
-    );
+  let pp_paragraph ppf { paragraph_name = pn;
+                         paragraph_is_section = pis;
+                         paragraph_segment = ps;
+                         paragraph_sentences = pss } =
+    (match pn with
+     | Some n ->
+         if pis then Fmt.pf ppf "@[<v 2>" else Fmt.pf ppf "@[<v>";
+         pp_with_loc pp_name ppf n;
+         if pis then Fmt.pf ppf " SECTION";
+         Fmt.(option (sp ++ pp_integer)) ppf ps;
+         Fmt.pf ppf ".@ "
+     | None -> Fmt.pf ppf "@[<v>");
     Fmt.(list ~sep:(any ".@,@ ") (pp_with_loc pp_statements)) ppf pss;
     if pss != [] then Fmt.pf ppf ".";
     Fmt.pf ppf "@]"
 
-  let pp_use_after_exception ppf
-    { use_after_exception = n; use_after_exception_on_files = af }
-  =
+  let pp_use_after_exception ppf { use_after_exception = n;
+                                   use_after_exception_on_files = af } =
     Fmt.pf ppf "%a%a"
       pp_name' n
       Fmt.(list ~sep:nop (any " FILE " ++ pp_name')) af
@@ -709,87 +713,81 @@ module Proc_division (Statements: Abstract.STATEMENTS) = struct
 
   let pp_use_for_debugging_target ppf = function
     | UseForDebuggingProcedure { all; procedure } ->
-      if all then Fmt.pf ppf "ALL ";
-      pp_qualname ppf procedure
+        if all then Fmt.pf ppf "ALL ";
+        pp_qualname ppf procedure
     | UseForDebuggingAllProcedures ->
-      Fmt.pf ppf "ALL PROCEDURES"
+        Fmt.pf ppf "ALL PROCEDURES"
 
   let pp_declarative_use ppf = function
     | UseAfterFileException { global; trigger} ->
-      Fmt.pf ppf "USE ";
-      if global then Fmt.pf ppf "GLOBAL ";
-      Fmt.pf ppf "AFTER EXCEPTION ON %a" pp_use_file_exception_on trigger;
+        Fmt.pf ppf "USE ";
+        if global then Fmt.pf ppf "GLOBAL ";
+        Fmt.pf ppf "AFTER EXCEPTION ON %a" pp_use_file_exception_on trigger;
     | UseBeforeReporting { global; report_group } ->
-      Fmt.pf ppf "USE ";
-      if global then Fmt.pf ppf "GLOBAL ";
-      Fmt.pf ppf "BEFORE REPORTING %a" pp_ident report_group
+        Fmt.pf ppf "USE ";
+        if global then Fmt.pf ppf "GLOBAL ";
+        Fmt.pf ppf "BEFORE REPORTING %a" pp_ident report_group
     | UseForDebugging ufdts ->
-      Fmt.pf ppf "USE FOR DEBUGGING ON@;<1 2>@[%a@]"
-        Fmt.(list ~sep:sp pp_use_for_debugging_target) ufdts
+        Fmt.pf ppf "USE FOR DEBUGGING ON@;<1 2>@[%a@]"
+          Fmt.(list ~sep:sp pp_use_for_debugging_target) ufdts
     | UseAfterIOException uaes ->
-      Fmt.pf ppf "USE AFTER EXCEPTION CONDITION@;<1 2>@[%a@]"
-        Fmt.(list ~sep:sp pp_use_after_exception) uaes
+        Fmt.pf ppf "USE AFTER EXCEPTION CONDITION@;<1 2>@[%a@]"
+          Fmt.(list ~sep:sp pp_use_after_exception) uaes
     | UseAfterExceptionObject n ->
-      Fmt.pf ppf "USE AFTER EXCEPTION OBJECT %a" pp_name' n
+        Fmt.pf ppf "USE AFTER EXCEPTION OBJECT %a" pp_name' n
 
-  let pp_declarative ppf {
-    declarative_name = n; declarative_segment = s;
-    declarative_use = u; declarative_sentences = ss }
-  =
+  let pp_declarative ppf { declarative_name = n; declarative_segment = s;
+                           declarative_use = u; declarative_sentences = ss } =
     pp_name' ppf n;
     let pp_seg = Fmt.(const (option (any " " ++ pp_integer)) s) in
-    Fmt.(
-      option (any " SECTION" ++ pp_seg ++ any ".@;<1 2>" ++ box pp_declarative_use)
-    ) ppf u;
+    Fmt.(option (any " SECTION" ++ pp_seg ++
+                 any ".@;<1 2>" ++ box pp_declarative_use)) ppf u;
     Fmt.pf ppf ".";
     Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_statements ++ any ".")) ppf ss
 
   let pp_declaratives ppf = function
-    | [] -> ()
+    | [] ->
+        ()
     | pd ->
-      Fmt.pf ppf "DECLARATIVES.%a@ END DECLARATIVES."
-        Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_declarative)) pd
+        Fmt.pf ppf "DECLARATIVES.%a@ END DECLARATIVES."
+          Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_declarative)) pd
 
-  let pp_using_by_reference ppf {
-    using_by_reference = n; using_by_reference_optional = o }
-  =
+  let pp_using_by_reference ppf { using_by_reference = n;
+                                  using_by_reference_optional = o } =
     if o then Fmt.pf ppf "OPTIONAL ";
     pp_name' ppf n
 
   let pp_using_clause ppf = function
     | UsingByReference ubrs ->
-      Fmt.pf ppf "USING ";
-      Fmt.(list ~sep:sp pp_using_by_reference) ppf ubrs
+        Fmt.pf ppf "USING ";
+        Fmt.(list ~sep:sp pp_using_by_reference) ppf ubrs
     | UsingByValue ns ->
-      Fmt.pf ppf "USING BY VALUE %a" Fmt.(list ~sep:sp pp_name') ns
+        Fmt.pf ppf "USING BY VALUE %a" Fmt.(list ~sep:sp pp_name') ns
 
   let pp_raising_phrase ppf { raising; raising_factory } =
     if raising_factory then Fmt.pf ppf "FACTORY ";
     pp_name' ppf raising
 
-  let pp_procedure_division ppf {
-    procedure_using_clauses = puc;
-    procedure_returning = pur;
-    procedure_raising_phrases = prp;
-    procedure_declaratives = pd;
-    procedure_paragraphs = pp;
-  } =
+  let pp_procedure_division ppf { procedure_using_clauses = puc;
+                                  procedure_returning = pur;
+                                  procedure_raising_phrases = prp;
+                                  procedure_declaratives = pd;
+                                  procedure_paragraphs = pp } =
     Fmt.pf ppf "PROCEDURE DIVISION%a%a%a.%a@;<1 2>@[<hv>%a@]"
       Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_using_clause)) puc
       Fmt.(option (any "@ RETURNING " ++ pp_with_loc pp_ident)) pur
-      Fmt.(
-        if prp == [] then nop else
-        any "RAISING " ++ list ~sep:sp (pp_with_loc pp_raising_phrase)
-      ) prp
+      Fmt.(if prp == [] then nop
+           else any "RAISING " ++
+                list ~sep:sp (pp_with_loc pp_raising_phrase)) prp
       Fmt.(if pd != [] then sp ++ pp_declaratives else nop) pd
       Fmt.(list ~sep:sp (pp_with_loc pp_paragraph)) pp
 
 end
 
 module Compilation_group
-    (Misc_sections: Abstract.MISC_SECTIONS)
-    (Data_division: Abstract.DATA_DIVISION)
-    (Proc_division: Abstract.PROC_DIVISION) =
+    (Misc_sections: Cobol_ast.Abstract.MISC_SECTIONS)
+    (Data_division: Cobol_ast.Abstract.DATA_DIVISION)
+    (Proc_division: Cobol_ast.Abstract.PROC_DIVISION) =
 struct
 
   include Misc_sections
@@ -873,7 +871,6 @@ struct
     Fmt.(option (any "@ @[END PROGRAM@ " ++ pp_with_loc pp_name ++ any ".@]"))
       ppf program_end_name
 
-
   type function_unit =
     {
       function_name: name with_loc;
@@ -888,16 +885,15 @@ struct
   [@@deriving ord]
 
   let pp_id_paragraph
-    ?(end_ = false) ?name
-    popen pclose ppf pp_header header sections
-  =
+      ?(end_ = false) ?name
+      popen pclose ppf pp_header header sections
+    =
     Fmt.pf ppf "@[%s.%a@]" popen pp_header header;
     List.iter (Fmt.(option (sp ++ fun ppf fp -> fp ppf ())) ppf) sections;
-    if end_ && Option.is_none name then
-      Fmt.pf ppf "@ @[END %s.@]" pclose
-    else
-      Fmt.(option (any "@ @[END " ++ const string pclose ++ any " " ++ pp_name' ++ any ".@]"))
-        ppf name
+    if end_ && Option.is_none name
+    then Fmt.pf ppf "@ @[END %s.@]" pclose
+    else Fmt.(option (any "@ @[END " ++ const string pclose ++
+                      any " " ++ pp_name' ++ any ".@]")) ppf name
 
   let pp_function_id_paragraph ppf (n, fas, is_proto) =
     Fmt.pf ppf "%a%a%a"
@@ -906,18 +902,16 @@ struct
       (if is_proto then Fmt.any "@ PROTOTYPE" else Fmt.nop) ()
 
   let pp_function_unit ppf
-    { function_name = n; function_as = fas; function_is_proto = is_proto;
-      function_options = opts; function_env = env; function_data = data;
-      function_proc = proc; function_end_name = en }
-  =
+      { function_name = n; function_as = fas; function_is_proto = is_proto;
+        function_options = opts; function_env = env; function_data = data;
+        function_proc = proc; function_end_name = en }
+    =
     pp_id_paragraph ~name:en "FUNCTION-ID" "FUNCTION" ppf
       Fmt.(sp ++ pp_function_id_paragraph ++ any ".") (n, fas, is_proto)
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const (pp_with_loc pp_data_division)) data;
-        Option.map (const pp_procedure_division) proc;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const (pp_with_loc pp_data_division)) data;
+            Option.map (const pp_procedure_division) proc ]
 
   type method_definition =
     {
@@ -946,19 +940,16 @@ struct
     if o then Fmt.pf ppf " OVERRIDE";
     if f then Fmt.pf ppf " FINAL"
 
-  let pp_method_definition ppf {
-    method_name = n; method_kind = k; method_override = o; method_final = f;
-    method_options = opts; method_env = env; method_data = data;
-    method_proc = proc; method_end_name = en
-  } =
+  let pp_method_definition ppf
+      { method_name = n; method_kind = k; method_override = o; method_final = f;
+        method_options = opts; method_env = env; method_data = data;
+        method_proc = proc; method_end_name = en } =
     pp_id_paragraph ~name:en "METHOD-ID" "METHOD" ppf
       Fmt.(sp ++ pp_method_id_paragraph ++ any ".") (n, k, o, f)
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const (pp_with_loc pp_data_division)) data;
-        Option.map (const pp_procedure_division) proc;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const (pp_with_loc pp_data_division)) data;
+            Option.map (const pp_procedure_division) proc ]
 
   type factory_definition = (* Note: could be merged with instance_definition *)
     {
@@ -971,28 +962,23 @@ struct
   [@@deriving ord]
 
   let pp_object_procedure_division =
-    Fmt.(
-        any "PROCEDURE DIVISION." ++
-        (list ~sep:nop (sp ++ pp_with_loc pp_method_definition))
-    )
+    Fmt.(any "PROCEDURE DIVISION." ++
+         (list ~sep:nop (sp ++ pp_with_loc pp_method_definition)))
 
   let pp_implements ppf = function
     | [] -> ()
     | names ->
-      Fmt.(list ~sep:sp (any "IMPLEMENTS " ++ pp_name')) ppf names
+        Fmt.(list ~sep:sp (any "IMPLEMENTS " ++ pp_name')) ppf names
 
   let pp_factory_definition ppf
-    { factory_implements = impl; factory_options = opts; factory_env = env;
-      factory_data = data; factory_methods = meths }
-  =
+      { factory_implements = impl; factory_options = opts; factory_env = env;
+        factory_data = data; factory_methods = meths } =
     pp_id_paragraph ~end_:true "FACTORY" "FACTORY" ppf
       pp_implements impl
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const (pp_with_loc pp_data_division)) data;
-        Option.map (const pp_object_procedure_division) meths;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const (pp_with_loc pp_data_division)) data;
+            Option.map (const pp_object_procedure_division) meths ]
 
   type instance_definition =
     {
@@ -1005,17 +991,14 @@ struct
   [@@deriving ord]
 
   let pp_instance_definition ppf
-    { instance_implements = impl; instance_options = opts; instance_env = env;
-      instance_data = data; instance_methods = meths }
-  =
+      { instance_implements = impl; instance_options = opts; instance_env = env;
+        instance_data = data; instance_methods = meths } =
     pp_id_paragraph ~end_:true "OBJECT" "OBJECT" ppf
       pp_implements impl
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const (pp_with_loc pp_data_division)) data;
-        Option.map (const pp_object_procedure_division) meths;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const (pp_with_loc pp_data_division)) data;
+            Option.map (const pp_object_procedure_division) meths ]
 
 
   type class_definition =
@@ -1036,26 +1019,25 @@ struct
   let pp_class_id_paragraph ppf (cn, cas, f, inh, us) =
     pp_name' ppf cn;
     Fmt.(option (any "@ AS " ++ pp_strlit)) ppf cas;
-    if f then Fmt.pf ppf " FINAL";
-    if inh != [] then
-      Fmt.pf ppf "@ INHERITS %a" Fmt.(list ~sep:sp pp_name') inh;
-    if us != [] then
-      Fmt.pf ppf "@ USING %a" Fmt.(list ~sep:sp pp_name') inh;
+    if f
+    then Fmt.pf ppf " FINAL";
+    if inh != []
+    then Fmt.pf ppf "@ INHERITS %a" Fmt.(list ~sep:sp pp_name') inh;
+    if us != []
+    then Fmt.pf ppf "@ USING %a" Fmt.(list ~sep:sp pp_name') inh;
     Fmt.pf ppf "."
 
   let pp_class_definition ppf
-    { class_name = cn; class_as = cas; class_final = f; class_inherits = inh;
-      class_usings = us; class_options = opts; class_env = env;
-      class_factory = fac; class_instance = inst; class_end_name = en }
-  =
+      { class_name = cn; class_as = cas; class_final = f; class_inherits = inh;
+        class_usings = us; class_options = opts; class_env = env;
+        class_factory = fac; class_instance = inst; class_end_name = en }
+    =
     pp_id_paragraph ~name:en "CLASS-ID" "CLASS" ppf
       Fmt.(sp ++ pp_class_id_paragraph) (cn, cas, f, inh, us)
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const pp_factory_definition) fac;
-        Option.map (const pp_instance_definition) inst;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const pp_factory_definition) fac;
+            Option.map (const pp_instance_definition) inst ]
 
 
   type interface_definition =
@@ -1075,27 +1057,20 @@ struct
     Fmt.pf ppf "%a%a%a%a"
       pp_name' n
       Fmt.(option (any "@ AS " ++ pp_strlit)) a
-      Fmt.(
-        if inh == [] then nop else
-        Fmt.(any "@ INHERITS " ++ list ~sep:sp pp_name')
-      ) inh
-      Fmt.(
-        if us == [] then nop else
-        Fmt.(any "@ USING " ++ list ~sep:sp pp_name')
-      ) us
+      Fmt.(if inh == [] then nop
+           else any "@ INHERITS " ++ list ~sep:sp pp_name') inh
+      Fmt.(if us == [] then nop
+           else any "@ USING " ++ list ~sep:sp pp_name') us
 
   let pp_interface_definition ppf
-    { interface_name = n; interface_as = a; interface_inherits = inh;
-      interface_usings = us; interface_options = opts; interface_env = env;
-      interface_methods = meths; interface_end_name = en }
-  =
+      { interface_name = n; interface_as = a; interface_inherits = inh;
+        interface_usings = us; interface_options = opts; interface_env = env;
+        interface_methods = meths; interface_end_name = en } =
     pp_id_paragraph ~name:en "INTERFACE-ID" "INTERFACE" ppf
       Fmt.(sp ++ pp_interface_id_paragraph ++ any ".") (n, a, inh, us)
-      Fmt.[
-        Option.map (const (pp_with_loc pp_options_paragraph)) opts;
-        Option.map (const (pp_with_loc pp_environment_division)) env;
-        Option.map (const pp_object_procedure_division) meths;
-      ]
+      Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
+            Option.map (const (pp_with_loc pp_environment_division)) env;
+            Option.map (const pp_object_procedure_division) meths ]
 
   type compilation_unit =
     | Program of program_unit

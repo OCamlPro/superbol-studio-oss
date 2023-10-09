@@ -11,10 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
+(* exception SemanticError of string * srcloc *)
 
-exception SemanticError of string * srcloc
-
-val validate_data_clauses :
-  (module Cobol_common.Diagnostics.STATEFUL) -> ?is_elementary:bool ->
-  Cobol_data.Pictured_ast.data_item with_loc -> unit
+val validate_data_clauses
+  : ?is_elementary: bool
+  -> Cobol_ptree.data_item Cobol_ptree.with_loc
+  -> Cobol_common.Diagnostics.Set.t

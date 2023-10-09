@@ -38,4 +38,5 @@ type ('result, 'memo) output =
   | WithArtifacts:
       'result * artifacts -> ('result, Cobol_common.Behaviors.eidetic) output
 
-type 'm parsed_compilation_group = (PTree.compilation_group option, 'm) output
+type 'm parsed_compilation_group =
+  (Cobol_ptree.compilation_group option, 'm) output

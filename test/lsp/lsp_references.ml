@@ -15,10 +15,6 @@ open EzCompat                                                    (* StringMap *)
 open Lsp.Types
 open Lsp_testing
 
-(* Used to remove full-path and lines in the test files *)
-let () =
-  Cobol_common.Visitor.in_testsuite := true
-
 let print_references ~projdir server (doc, positions) : unit =
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let location_as_srcloc = new srcloc_resuscitator_cache in
@@ -61,7 +57,7 @@ let%expect_test "simple-references-requests" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     raw_data_sections_visitor.ml:0:
-      (Cobol_ast__Raw_data_sections_visitor.fold_data_clause): partial visitor
+      (Cobol_ptree__Raw_data_sections_visitor.fold_data_clause): partial visitor
       implementation
     {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-def (line 5, character 16):

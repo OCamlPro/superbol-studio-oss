@@ -21,16 +21,16 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 (* --- *)
 
 module Make
-    (Data_sections: Abstract.DATA_SECTIONS) =
+    (Data_sections: Cobol_ast.Abstract.DATA_SECTIONS) =
 struct
 
   module Data_division =
     Raw.Data_division (Data_sections)
 
   module Data_sections_visitor =
-    Abstract_visitor.For_data_sections (Data_sections)
+    Cobol_ast.Abstract_visitor.For_data_sections (Data_sections)
   module Data_division_visitor =
-    Abstract_visitor.For_data_division (Data_division)
+    Cobol_ast.Abstract_visitor.For_data_division (Data_division)
 
   open Data_sections
 

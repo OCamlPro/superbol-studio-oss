@@ -11,10 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
-open Ast
+open Operands
+(* open Ast *)
 
 let todo    x = Cobol_common.Visitor.todo    __FILE__ __MODULE__ x
 let partial x = Cobol_common.Visitor.partial __FILE__ __MODULE__ x

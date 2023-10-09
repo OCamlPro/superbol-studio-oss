@@ -11,26 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.INFIX
+include PTree_types
+module Visitor = Visitor
 
-module type TAGS = sig
-  val loc: Terms.srcloc
-end
-
-module Make (Tags: TAGS) = struct
-  open Terms
-
-  module Term = struct
-    let name x : qualname = Name (x &@ Tags.loc)
-    let qualident x : qualident =
-      { ident_name = name x; ident_subscripts = [] }
-    let ident x : ident_or_literal = QualIdent (qualident x)
-    let strlit l : ident_or_literal = Alphanum (l, Dquote)
-  end
-
-  module Cond = struct
-    open Term
-    let ident x : condition = Expr (Atom (ident x))
-  end
-
-end
+module Terms_helpers = Terms_helpers

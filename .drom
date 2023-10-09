@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-b00649b7d0945742b6d301826224c09f:.
+95ae248ee3b5f1dcf71fb63162f11e90:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-a0de4b03f6615d0d564a713d91d1586b:.github/workflows/workflow.yml
+60260204e8c23fcc45e438fd3e37a85e:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -31,6 +31,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 # begin context for Makefile
 # file Makefile
 647c7904fad4cf46c3821da8425feeaa:Makefile
+daf417fec7d8991252208077863c282b:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -81,6 +82,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 1c5ff7cce770b8dcfbc2c824c53bdbfe:dune-project
+91f60b069aa7d84f945ebcdcf684b041:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
@@ -115,13 +117,18 @@ c6fec16adad1f18d8439ee2d18c04b01:opam/cobol_indent.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-ca4a2140278e7f62ed96b3d4b0fd2744:opam/cobol_parser.opam
+2115df89e6317584545ebfee9ec2a507:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
 f37dfd0c7c01be00342e0b10ebeabb91:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
+
+# begin context for opam/cobol_ptree.opam
+# file opam/cobol_ptree.opam
+5ffae45f916fe92395725fa5eb92fd36:opam/cobol_ptree.opam
+# end context for opam/cobol_ptree.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
@@ -335,7 +342,7 @@ f4bbb4a41a8b3b39f19a4fc62a5f4841:sphinx/license.rst
 
 # begin context for src/lsp/cobol_parser/dune
 # file src/lsp/cobol_parser/dune
-6dd0111741c7ae8474d5bdea70ac7af9:src/lsp/cobol_parser/dune
+09762dde0adad2bf9c7c37823db7919c:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
 
 # begin context for src/lsp/cobol_parser/version.mlt
@@ -352,6 +359,16 @@ f4bbb4a41a8b3b39f19a4fc62a5f4841:sphinx/license.rst
 # file src/lsp/cobol_preproc/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_preproc/version.mlt
 # end context for src/lsp/cobol_preproc/version.mlt
+
+# begin context for src/lsp/cobol_ptree/dune
+# file src/lsp/cobol_ptree/dune
+b01ece129f18f6bf9b7124e4528c75c9:src/lsp/cobol_ptree/dune
+# end context for src/lsp/cobol_ptree/dune
+
+# begin context for src/lsp/cobol_ptree/version.mlt
+# file src/lsp/cobol_ptree/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_ptree/version.mlt
+# end context for src/lsp/cobol_ptree/version.mlt
 
 # begin context for src/lsp/cobol_typeck/dune
 # file src/lsp/cobol_typeck/dune

@@ -13,10 +13,6 @@
 
 (** {1 Exported modules} *)
 
-(** Parse tree *)
-module PTree = PTree
-module PTree_visitor = PTree_visitor
-
 (** Options to tune the parser engine *)
 module Options = Parser_options
 
@@ -53,7 +49,7 @@ module INTERNAL = struct
   (** Parser with dummy source locations, that can be fed directly with a
       list of tokens *)
   module Dummy = struct
-    module Tags: Cobol_ast.Testing_helpers.TAGS = struct
+    module Tags = struct
       let loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)
     end
 

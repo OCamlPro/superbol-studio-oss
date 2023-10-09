@@ -11,12 +11,115 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* open Cobol_common.Srcloc.TYPES *)
 open Cobol_common.Srcloc.INFIX
-open Pictured_ast.Data_sections
+(* open Pictured_ast.Data_sections *)
+module CharSet = Cobol_common.Basics.CharSet
+module DIAGS = Cobol_common.Diagnostics
 open Types
-open Cobol_ast
+open Cobol_ptree
 
-let cobol_class_of_picture: Picture.t -> Types.elementary_data_class = fun pic ->
+let acc_result f DIAGS.{ result; diags } =
+  let module Visitor = Cobol_common.Visitor in
+  match f result with
+  | Visitor.SkipChildren result ->
+      Visitor.SkipChildren (DIAGS.with_more_diags result ~diags)
+  | Visitor.DoChildren result ->
+      Visitor.DoChildren (DIAGS.with_more_diags result ~diags)
+  | Visitor.DoChildrenAndThen (result, f) ->
+      Visitor.DoChildrenAndThen (DIAGS.with_more_diags result ~diags, f)
+
+(* TODO: extract this into a Prog_env_initializer module? *)
+let initialize_prog_env =
+  let module Visitor = Cobol_common.Visitor in
+  let valid_picture_symbol = function
+    | '0'..'9' | 'a'..'e' | 'A'..'E' | 'N' | 'P' | 'R' | 'S' | 'V'
+    | 'X' | 'Z' | 'n' | 'p' | 'r' | 's' | 'v' | 'x' | 'z'
+    | '+' | '-' | ',' | '.' | '/' | ';' | '(' | ')' | '='
+    | '\'' |'"' | ' ' -> false
+    | 'L' | 'G' | 'l' | 'g'           (* <- TODO: Check dialect for those *)
+    | _ -> true
+  in
+  let special_names_clause_folder = object
+    inherit [Env.PROG_ENV.t DIAGS.with_diags] Cobol_ptree.Visitor.folder
+
+    method! fold_special_names_clause' { loc; payload = clause } =
+      acc_result @@ fun env -> match clause with
+      | DecimalPointIsComma ->
+          Visitor.skip @@
+          DIAGS.result Env.PROG_ENV.{ env with decimal_point = ',' }
+      | CurrencySign { sign = (Alphanum (s, _) | National s);
+                       picture_symbol = None }
+      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
+        when String.length s != 1 ->
+          Visitor.skip @@
+          DIAGS.error_result env ~loc "%s@ is@ not@ a@ valid@ PICTURE@ symbol." s
+      | CurrencySign { sign = Alphanum (s, _) | National s;
+                       picture_symbol = None }
+      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
+        when not (valid_picture_symbol s.[0]) ->
+          Visitor.skip @@
+          DIAGS.error_result env ~loc "%c@ is@ not@ a@ valid@ PICTURE@ symbol."
+            s.[0]
+      | CurrencySign { sign = Alphanum (s, _) | National s;
+                       picture_symbol = None }
+      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ } ->
+          Visitor.skip @@
+          DIAGS.result { env with
+                         currency_signs = CharSet.add s.[0] env.currency_signs }
+      | _ ->                       (* TODO: other clauses? *)
+          Visitor.proceed @@      (* may report unfinished visitor warnings *)
+          DIAGS.result env
+  end in
+  let ensure_currency_sign_is_defined env =
+    (* Currency sign defaults to '$' *)
+    if CharSet.is_empty env.Env.PROG_ENV.currency_signs
+    then Env.PROG_ENV.{ env with currency_signs = CharSet.singleton '$' }
+    else env
+  in
+  fun env_div base_env ->
+    DIAGS.map_result ~f:ensure_currency_sign_is_defined @@
+    Cobol_ptree.Visitor.fold_environment_division'_opt
+      special_names_clause_folder env_div @@
+    DIAGS.result base_env
+
+let try_making_env_of_compilation_unit,
+    try_making_env_of_program_unit
+  =
+  let module Visitor = Cobol_common.Visitor in
+  let build_env ?parent_env name env =
+    let prog_env = Env.PROG_ENV.make ?parent:parent_env ~&name in
+    Visitor.skip @@
+    DIAGS.map_result ~f:Option.some (initialize_prog_env env prog_env)
+  in
+  let env_builder = object
+    inherit [(* Env.PROG_ENV.t option DIAGS.with_diags *)_] Cobol_ptree.Visitor.folder
+    method! fold_program_unit p =
+      acc_result @@ fun parent_env -> build_env p.program_name p.program_env ?parent_env
+    method! fold_function_unit f =
+      acc_result @@ fun _ -> build_env f.function_name f.function_env
+    method! fold_method_definition m =
+      acc_result @@ fun _ -> build_env m.method_name m.method_env
+    method! fold_class_definition' { payload = c; _ } =
+      acc_result @@ fun _ -> build_env c.class_name c.class_env
+    method! fold_interface_definition' { payload = i; _ } =
+      acc_result @@ fun _ -> build_env i.interface_name i.interface_env
+    method! fold_factory_definition _ =
+      Visitor.skip                                 (* NOTE: only lacks a name *)
+    method! fold_instance_definition _ =
+      Visitor.skip                                 (* NOTE: only lacks a name *)
+  end in
+  (fun cu' ->
+     Cobol_ptree.Visitor.fold_compilation_unit' env_builder cu' @@
+     DIAGS.result None),
+  (fun ~parents pu' ->
+     Cobol_ptree.Visitor.fold_program_unit' env_builder pu' @@
+     DIAGS.result (match parents with h :: _ -> Some h | [] -> None))
+
+
+
+let cobol_class_of_picture: Picture.t with_loc -> Types.elementary_data_class =
+  fun { payload = pic; _ } ->
   match pic.category with
   | Alphabetic _ -> Alphabetic
   | Alphanumeric _ -> Alphanumeric
@@ -25,20 +128,58 @@ let cobol_class_of_picture: Picture.t -> Types.elementary_data_class = fun pic -
   | FixedNum _ | FloatNum _ -> Numeric
 
 let rec of_data_group
-    ((module Diags: Cobol_common.Diagnostics.STATEFUL) as diags)
-    program_environment data_group =
+    (module Config: Cobol_config.T) program_environment data_group
+  : _ DIAGS.with_diags =
+
+  let picture_of_string Env.PROG_ENV.{ decimal_point;
+                                       currency_signs; _ } s =
+    let module E = struct
+      let decimal_char = decimal_point
+      let currency_signs = currency_signs
+    end in
+    let module PIC = Picture.Make (Config) (E) in
+    try DIAGS.result @@ PIC.of_string s with
+      PIC.InvalidPicture (str, diags, dummy) ->
+        DIAGS.result ~diags (dummy &@<- str)
+  in
+
+  let acc_occurs ~occurs_clause ~level ~loc element =
+    DIAGS.more_result ~f:begin fun element ->
+      match element, Option.map (~&) occurs_clause with
+      | None, _ ->
+          DIAGS.result None
+      | Some element, None ->
+          DIAGS.some_result element
+      | Some element, Some OccursFixed occurs_fixed ->
+          DIAGS.some_result @@
+          (Table { typ = { elements_type = element;
+                           length = Fixed occurs_fixed.times };
+                   level } &@ loc)
+      | Some element, Some OccursDepending { from; to_; depending; _ } ->
+          DIAGS.some_result @@
+          (Table { typ = { elements_type = element;
+                           length = OccursDepending { min_size = from;
+                                                      max_size = to_;
+                                                      depending } };
+                   level } &@ loc)
+      | Some _, Some OccursDynamic _ ->
+          DIAGS.warn_result None ~loc
+            "Table with dynamic capacity are not implemented yet."
+    end element
+  in
+
   match ~&data_group with
   | Group.Elementary {data_item = Data dde; name = _} ->
       let level = ~&(dde.data_level) and loc = ~@data_group in
       let picture, usage, occurs =
-        List.fold_left begin fun (pic, usage, occurs) { payload = clause; _ } ->
+        List.fold_left begin fun (pic, usage, occurs) { payload = clause; loc } ->
           match clause with
           | DataPicture { payload = { picture = pic; _ }; _ } ->
               Some pic, usage, occurs
           | DataUsage usage_clause ->
               pic, Some usage_clause, occurs
           | DataOccurs occurs_clause ->
-              pic, usage, Some occurs_clause
+              pic, usage, Some (occurs_clause &@ loc)
           | _ ->
               pic, usage, occurs
         end (None, None, None) dde.data_clauses
@@ -46,20 +187,23 @@ let rec of_data_group
       let element =
         match picture, usage with
         | Some pic, None ->
-            Ok (Elementary ({ typ = cobol_class_of_picture ~&pic; level },
-                            Some ~&pic) &@ loc)
+            let pic = picture_of_string program_environment pic in
+            DIAGS.map_result ~f:begin fun pic ->
+              Some (Elementary ({ typ = cobol_class_of_picture pic; level },
+                                Some ~&pic) &@ loc)
+            end pic
         | None, Some usage ->
             begin match usage with
               | Index ->
-                  Ok (Elementary ({typ = Index; level}, None) &@ loc)
+                  DIAGS.some_result (Elementary ({typ = Index; level}, None) &@ loc)
               | Pointer _
               | FunctionPointer _
               | ProgramPointer _ ->
-                  Ok (Elementary ({typ = Pointer; level}, None) &@ loc)
+                  DIAGS.some_result (Elementary ({typ = Pointer; level}, None) &@ loc)
               (* | ProgramPointer _ -> *)
               (*     Result.ok @@ Elementary (({typ = Types.Pointer (\* L8 *\); level}, None) &@ loc) *)
               | ObjectReference _ ->
-                  Ok (Elementary ({typ = Types.Object; level}, None) &@ loc)
+                  DIAGS.some_result (Elementary ({typ = Types.Object; level}, None) &@ loc)
               | BinaryChar _
               | BinaryShort _
               | BinaryLong _
@@ -73,52 +217,37 @@ let rec of_data_group
               | FloatLong
               | FloatExtended ->
                   (* As per ISO/IEC 1989:2014, 8.5.2.10 Numeric category *)
-                  Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
+                  DIAGS.some_result (Elementary ({typ = Numeric; level}, None) &@ loc)
               | UsagePending (`Comp1 | `Comp2 | `BinaryCLong _) ->
-                  Ok (Elementary ({typ = Numeric; level}, None) &@ loc)
+                  DIAGS.some_result (Elementary ({typ = Numeric; level}, None) &@ loc)
               | _ ->
-                  Diags.error ~loc "Missing@ PICTURE@ clause";
-                  Result.Error ()
+                  DIAGS.error_result None ~loc "Missing@ PICTURE@ clause"
             end
         | Some picture, Some usage ->
-            let cobol_class = cobol_class_of_picture ~&picture in
-            begin match usage, cobol_class with
+            let pic = picture_of_string program_environment picture in
+            let cls = DIAGS.map_result ~f:cobol_class_of_picture pic in
+            DIAGS.map2_results ~f:begin fun pic (cls: elementary_data_class) ->
+              match usage, cls with
               | (Binary | PackedDecimal |
-                UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), Numeric ->
-                  Ok (Elementary ({ typ = cobol_class; level }, Some ~&picture) &@ loc)
+                 UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)),
+                (Numeric as cls) ->
+                  DIAGS.some_result (Elementary ({ typ = cls; level },
+                                                 Some ~&pic) &@ loc)
               | (Binary | PackedDecimal |
-                UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), _ ->
-                  Diags.error ~loc
+                 UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), _ ->
+                  DIAGS.error_result None ~loc:~@data_group
                     "The picture associated with a USAGE clause of type BINARY \
-                     (COMP) or PACKED-DECIMAL must be a numeric picture";
-                  Error ()
+                     (COMP) or PACKED-DECIMAL must be a numeric picture"
               | _ ->
-                  Ok (Elementary ({typ = cobol_class; level}, Some ~&picture) &@ loc)
-            end
+                  DIAGS.some_result (Elementary ({ typ = cls; level },
+                                                 Some ~&pic) &@ loc)
+            end pic cls
         | None, None ->
-            Diags.error ~loc "Missing@ USAGE@ or@ PICTURE@ clause@ for@ \
-                              elementary@ item";
-            Error ()
+            DIAGS.error_result None
+              ~loc "Missing@ USAGE@ or@ PICTURE@ clause@ for@ elementary@ item"
       in
-      Result.bind
-        element
-        (fun element -> match occurs with
-           | Some occurs_clause ->
-               begin match occurs_clause with
-                 | OccursFixed occurs_fixed ->
-                     Ok (Table { typ = { elements_type = element;
-                                         length = Fixed occurs_fixed.times };
-                                 level } &@ loc)
-                 | OccursDepending { from; to_; depending; _ } ->
-                     let length = Types.OccursDepending { min_size = from;
-                                                          max_size = to_;
-                                                          depending } in
-                     Ok (Table { typ = { elements_type = element; length }; level } &@ loc)
-                 | OccursDynamic _ ->
-                     Diags.warn ~loc "Table with dynamic capacity are not implemented yet.";
-                     Result.Error ()
-               end
-           | None -> Result.Ok element)
+      acc_occurs ~occurs_clause:occurs ~level ~loc element
+
   | Group {elements = dgl; data_item = Data dde; name = _} ->
       let level = ~&(dde.data_level) and loc = ~@data_group in
       let elements =
@@ -147,40 +276,25 @@ let rec of_data_group
         with Not_found -> dgl
       in
       let elements =
-        List.map
-          (fun dg -> of_data_group diags program_environment dg)
-          elements
-        |> Cobol_common.join_all
+        DIAGS.map_result ~f:Option.some @@
+        DIAGS.map_result ~f:List.rev @@
+        List.fold_left begin fun acc data_group ->
+          DIAGS.cons_option_result
+            (of_data_group (module Config) program_environment data_group)
+            acc
+        end (DIAGS.result []) elements
       in
       let occurs =
-        List.find_opt begin fun ddc -> match ~&ddc with
-          | DataOccurs _ -> true
-          | _ -> false
+        List.find_map begin function
+          | { payload = DataOccurs c; loc } -> Some (c &@ loc)
+          | _ -> None
         end dde.data_clauses
       in
-      Result.map
-        (fun elements ->
-           match occurs with
-           | Some { payload = DataOccurs occurs_clause; _ } ->
-               let group = Group { typ = elements; level } &@ loc in
-               begin
-                 match occurs_clause with
-                 | OccursFixed occurs_fixed ->
-                     Types.Table { typ = { elements_type = group;
-                                           length = Fixed occurs_fixed.times };
-                                   level } &@ loc
-                 | OccursDepending { from; to_; depending; _ } ->
-                     let length =
-                       Types.OccursDepending { min_size = from;
-                                               max_size = to_;
-                                               depending }
-                     in
-                     Table { typ = { elements_type = group; length }; level } &@ loc
-                 | _ -> failwith "Not implemented yet"
-               end
-           | Some _ -> failwith "Unreachable"
-           | None -> Group { typ = elements; level } &@ loc)
-        elements
+      acc_occurs ~occurs_clause:occurs ~level ~loc @@
+      DIAGS.map_some_result ~f:begin fun elements ->
+        Group { typ = elements; level } &@ loc
+      end elements
+
   | Renames { targets; _ } ->
       (* RENAMES rules: first and last must not be occurs or subordinate to occurs, but can
                           have occurs subordinate to them. These subordinate occurs must be of
@@ -194,71 +308,89 @@ let rec of_data_group
                                   OccursDynamic _); _ } -> true
         | _ -> false
       in
-      let rec check_data_group is_first_or_last (data_group: Group.t) =
+      let rec check_data_group ~is_first_or_last (data_group: Group.t) =
         match ~&data_group with
-        | Renames _ | Constant _ -> true
+        | Renames _ | Constant _ ->
+            DIAGS.Set.none
+
         | ConditionName _  ->
-            Diags.error ~loc "RENAMES@ may@ not@ reference@ a@ level@ 88.";
-            false
+            DIAGS.Set.error ~loc
+              "RENAMES@ may@ not@ reference@ a@ level@ 88."
+
         | Elementary { data_item = Data data_item; _ }
         | Group { data_item = Data data_item; _ }
           when is_first_or_last &&
                List.exists has_occurs data_item.data_clauses ->
-            Diags.error ~loc "Forbidden@ RENAMES@ of@ data@ item@ with@ \
-                              OCCURS@ clause.";
-            false
+            DIAGS.Set.error ~loc
+              "Forbidden@ RENAMES@ of@ data@ item@ with@ OCCURS@ clause."
+
         | Elementary _
         | Group _
           when is_first_or_last ->
-            true
+            DIAGS.Set.none
+
         | Elementary { data_item = Data data_item; _ }
-          when List.exists has_complex_occurs data_item.data_clauses ->
-            Diags.error ~loc "RENAMES@ cannot@ reference@ a@ data@ item@ with@ \
-                              OCCURS@ DEPENDING@ or@ OCCURS@ DYNAMIC@ clause";
-            false
-        | Elementary _ ->
-            true
         | Group { data_item = Data data_item; _ }
           when List.exists has_complex_occurs data_item.data_clauses ->
-            Diags.error ~loc "RENAMES@ cannot@ reference@ a@ data@ item@ with@ \
-                              OCCURS@ DEPENDING@ or@ OCCURS@ DYNAMIC@ clause";
-            false
+            DIAGS.Set.error ~loc
+              "RENAMES@ cannot@ reference@ a@ data@ item@ with@ OCCURS@ \
+               DEPENDING@ or@ OCCURS@ DYNAMIC@ clause."
+
+        | Elementary _ ->
+            DIAGS.Set.none
+
         | Group { elements; _ } ->
-            List.for_all (check_data_group false) elements
+            check_intermediate_groups_elements elements
+      and check_intermediate_groups_elements elements =
+            List.fold_left begin fun diags dg ->
+              DIAGS.Set.union diags (check_data_group ~is_first_or_last:false dg)
+            end DIAGS.Set.none elements
       in
       begin match targets with
-        | hd::[] ->
-            if check_data_group true hd then
-              of_data_group diags program_environment hd
+        | [hd] ->
+            let diags = check_data_group ~is_first_or_last:true hd in
+            if DIAGS.Set.has_errors diags
+            then
+              DIAGS.no_result ~diags
             else
-              Error ()
-        | (hd::tl) ->
+              DIAGS.with_more_diags ~diags @@
+              of_data_group (module Config) program_environment hd
+        | hd :: tl ->
             let tl_rev = List.rev tl in
             let last = List.hd tl_rev in
             let middle = List.rev @@ List.tl tl_rev in
-            if check_data_group true hd && check_data_group true last
-               && List.for_all (check_data_group false) middle
+            let diags1 = check_data_group ~is_first_or_last:true hd
+            and diags2 = check_intermediate_groups_elements middle
+            and diags3 = check_data_group ~is_first_or_last:true last in
+            let diags = DIAGS.Set.(union diags1 (union diags2 diags3)) in
+            if DIAGS.Set.has_errors diags
             then
-              let elements =
-                List.map (of_data_group diags program_environment) targets
-                |> Cobol_common.join_all
-              in
-              Result.map (fun elements -> Group {typ = elements; level = 66} &@ loc) elements
+              DIAGS.no_result ~diags
             else
-              Error ()
+              let elements =
+                DIAGS.map_result ~f:Option.some @@
+                DIAGS.map_result ~f:List.rev @@
+                List.fold_left begin fun acc data_group ->
+                  DIAGS.cons_option_result
+                    (of_data_group (module Config) program_environment data_group)
+                    acc
+                end (DIAGS.result []) targets
+              in
+              DIAGS.with_more_diags ~diags @@
+              DIAGS.map_some_result ~f:begin fun elements ->
+                Group { typ = elements; level = 66 } &@ loc
+              end elements
         | [] ->
-            Diags.error ~loc "The@ RENAMES@ clause@ cannot@ be@ typed@ (empty@ group@ types)";
-            Error ()
+            DIAGS.error_result None ~loc
+              "Unable@ to@ type@ RENAMES@ clause:@ empty@ group@ types"
       end
   | Constant _ ->
-      Diags.error "Not implemented yet: Type of constant.";
-      Result.Error ()
+      DIAGS.error_result None "Not implemented yet: Type of constant."
   | ConditionName {name = _; _} ->
       (* Condition-names are not elementary data items.  Instead, they are
          subordicate to a group. *)
       (* Ok (Elementary (({typ = Conditional; level = 88L }, None) &@<- data_group)) *)
-      Diags.error "Not implemented yet: Type of condition name";
-      Result.Error ()
+      DIAGS.error_result None "Not implemented yet: Type of condition name"
 
 (*TODO: * Check if first or last item has an occurs clauses.
         * Take into account subordinates occurs clauses: Idea:

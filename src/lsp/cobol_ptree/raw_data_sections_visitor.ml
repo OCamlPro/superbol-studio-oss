@@ -16,6 +16,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
+open Data_descr_visitor
 
 let todo    x = Cobol_common.Visitor.todo    __FILE__ x
 let partial modname line funcname =
@@ -24,16 +25,16 @@ let partial modname line funcname =
 (* --- *)
 
 module Make
-    (Picture: Abstract.PICTURE) =
+    (Picture: Cobol_ast.Abstract.PICTURE) =
 struct
 
   module Data_sections =
     Raw.Data_sections (Picture)
 
   module Picture_visitor =
-    Abstract_visitor.For_picture (Picture)
+    Cobol_ast.Abstract_visitor.For_picture (Picture)
   module Data_sections_visitor =
-    Abstract_visitor.For_data_sections (Data_sections)
+    Cobol_ast.Abstract_visitor.For_data_sections (Data_sections)
 
   open Data_descr
   open Data_sections
@@ -46,7 +47,6 @@ struct
     method fold_data_level'         : (data_level with_loc         , 'a) fold = default
     method fold_data_name           : (data_name                   , 'a) fold = default
     method fold_data_name'          : (data_name with_loc          , 'a) fold = default
-    method fold_locale_phrase       : (locale_phrase               , 'a) fold = default
     method fold_constant_value      : (constant_value              , 'a) fold = default
     method fold_constant_value'     : (constant_value with_loc     , 'a) fold = default
     method fold_constant_item       : (constant_item               , 'a) fold = default
@@ -104,13 +104,6 @@ struct
 
   let fold_data_name'_opt (v: _ #folder) =
     fold_option ~fold:fold_data_name' v
-
-  let fold_locale_phrase (v: _ #folder) =
-    handle v#fold_locale_phrase
-      ~continue:begin fun { locale_name; locale_size } x -> x
-        >> fold_name'_opt v locale_name
-        >> fold_integer v locale_size
-      end
 
   let fold_locale_phrase_opt (v: _ #folder) =
     fold_option ~fold:fold_locale_phrase v

@@ -16,6 +16,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
+open Data_descr_visitor
 
 let todo    x = Cobol_common.Visitor.todo    __FILE__ x
 let partial x = Cobol_common.Visitor.partial __FILE__ x
@@ -23,22 +24,22 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 (* --- *)
 
 module Make
-    (Misc_sections: Abstract.MISC_SECTIONS)
-    (Data_division: Abstract.DATA_DIVISION)
-    (Proc_division: Abstract.PROC_DIVISION) =
+    (Misc_sections: Cobol_ast.Abstract.MISC_SECTIONS)
+    (Data_division: Cobol_ast.Abstract.DATA_DIVISION)
+    (Proc_division: Cobol_ast.Abstract.PROC_DIVISION) =
 struct
 
   module Compilation_group =
     Raw.Compilation_group (Misc_sections) (Data_division) (Proc_division)
 
   module Compilation_group_visitor =
-    Abstract_visitor.For_compilation_group (Compilation_group)
+    Cobol_ast.Abstract_visitor.For_compilation_group (Compilation_group)
   module Misc_sections_visitor =
-    Abstract_visitor.For_misc_sections (Misc_sections)
+    Cobol_ast.Abstract_visitor.For_misc_sections (Misc_sections)
   module Data_division_visitor =
-    Abstract_visitor.For_data_division (Data_division)
+    Cobol_ast.Abstract_visitor.For_data_division (Data_division)
   module Proc_division_visitor =
-    Abstract_visitor.For_proc_division (Proc_division)
+    Cobol_ast.Abstract_visitor.For_proc_division (Proc_division)
 
   open Compilation_group
 

@@ -1,6 +1,6 @@
 (tests
   (names test_picture_parsing test_combined_relations_parsing)
-  (modules test_picture_parsing test_combined_relations_parsing)
+  (modules test_picture_parsing test_combined_relations_parsing testing_helpers)
   (libraries alcotest cobol_parser cobol_data))
 
 (library

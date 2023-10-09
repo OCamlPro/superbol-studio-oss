@@ -11,31 +11,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module PTree = PTree_types
+
 module For_misc_sections =
-  Cobol_ast.Raw_visitor.Make_for_misc_sections
+  Raw_visitor.Make_for_misc_sections
 
 module For_picture = struct
-  include Cobol_ast.Abstract_visitor.For_picture (PTree.Picture)
+  include Cobol_ast.Abstract_visitor.For_picture (PTree.Picture_type)
   let fold_picture (v: _ #folder) = Cobol_common.Visitor.leaf v#fold_picture
 end
 
 module For_data_sections =
-  Cobol_ast.Raw_visitor.Make_for_data_sections (PTree.Picture)
+  Raw_visitor.Make_for_data_sections (PTree.Picture_type)
 
 module For_data_division =
-  Cobol_ast.Raw_visitor.Make_for_data_division (PTree.Data_sections)
+  Raw_visitor.Make_for_data_division (PTree.Data_sections)
 
 module For_statements =
-  Cobol_ast.Raw_visitor.Make_for_statements
+  Raw_visitor.Make_for_statements
 
 module For_proc_division =
-  Cobol_ast.Raw_visitor.Make_for_proc_division (PTree.Statements)
+  Raw_visitor.Make_for_proc_division (PTree.Statements)
 
 module For_compilation_group =
-  Cobol_ast.Raw_visitor.Make_for_compilation_group
+  Raw_visitor.Make_for_compilation_group
     (PTree.Misc_sections) (PTree.Data_division) (PTree.Proc_division)
 
 include For_picture
+
+include Terms_visitor
+include Operands_visitor
+
 include For_data_sections
 include For_data_division
 include For_statements
@@ -43,8 +49,10 @@ include For_proc_division
 include For_compilation_group
 
 class ['a] folder = object (v)
-  inherit ['a] For_misc_sections.folder
   inherit ['a] For_picture.folder
+  inherit ['a] Terms_visitor.folder
+  inherit! ['a] Operands_visitor.folder
+  inherit! ['a] For_misc_sections.folder
   inherit! ['a] For_data_sections.folder
   inherit! ['a] For_data_division.folder
   inherit! ['a] For_statements.folder

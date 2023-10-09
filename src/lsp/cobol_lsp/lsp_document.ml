@@ -34,7 +34,7 @@ module TYPES = struct
     }
   and parsed_data =
     {
-      ast: PTREE.compilation_group;                (* TODO: rename into ptree *)
+      ptree: Cobol_ptree.compilation_group;
       cus: CUs.t;
       (* Extracted info: lazy to only ever retrieve what's relevant upon a first
          request. *)
@@ -42,7 +42,7 @@ module TYPES = struct
       references: name_references_in_compilation_unit CUMap.t Lazy.t;
     }
   and rewinder =
-    (PTREE.compilation_group option,
+    (Cobol_ptree.compilation_group option,
      Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
       Cobol_parser.rewinder
 
@@ -63,7 +63,7 @@ module TYPES = struct
       doc_cache_pplog: Cobol_preproc.Trace.log;
       doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
       doc_cache_comments: Cobol_preproc.Text.comments;
-      doc_cache_parsed: (PTREE.compilation_group * CUs.t) option;
+      doc_cache_parsed: (Cobol_ptree.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
     }
 
@@ -90,16 +90,16 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }
 
-let lazy_definitions ast cus =
+let lazy_definitions ptree cus =
   lazy begin cus |>
     CUs.assoc Lsp_lookup.definitions |>
     (*this piece for handling renames is temporary*)
-    Lsp_lookup.add_rename_item_definitions ast |>
-    Lsp_lookup.add_paragraph_definitions ast |>
-    Lsp_lookup.add_redefine_definitions ast
+    Lsp_lookup.add_rename_item_definitions ptree |>
+    Lsp_lookup.add_paragraph_definitions ptree |>
+    Lsp_lookup.add_redefine_definitions ptree
   end
 
-let lazy_references ast cus defs =
+let lazy_references ptree cus defs =
   lazy begin
     let defs = Lazy.force defs in
     List.fold_left begin fun map cu ->
@@ -110,7 +110,7 @@ let lazy_references ast cus defs =
             (CUs.find_by_name cu_name cus)
           (Lsp_lookup.references cu_defs cu) map
         with Not_found -> map
-    end CUMap.empty ast
+    end CUMap.empty ptree
   end
 
 let no_artifacts =
@@ -120,20 +120,20 @@ let no_artifacts =
 
 let gather_parsed_data ptree =
   Cobol_typeck.analyze_compilation_group ptree |>
-  DIAGS.map_result begin function
-    | Ok (cus, ast) ->
-        let definitions = lazy_definitions ast cus in
-        let references = lazy_references ast cus definitions in
-        Some { ast; cus; definitions; references}
-    | Error () ->
+  DIAGS.map_result ~f:begin function
+    | cus, Some ptree ->
+        let definitions = lazy_definitions ptree cus in
+        let references = lazy_references ptree cus definitions in
+        Some { ptree; cus; definitions; references}
+    | _, None ->
         None
   end
 
 let extract_parsed_infos doc ptree =
   let DIAGS.{ result = artifacts, rewinder, parsed; diags} =
-    DIAGS.more_result begin fun (ptree, rewinder) ->
+    DIAGS.more_result ~f:begin fun (ptree, rewinder) ->
       gather_parsed_data ptree |>
-      DIAGS.map_result begin fun parsed ->
+      DIAGS.map_result ~f:begin fun parsed ->
         Cobol_parser.artifacts ptree, Some rewinder, parsed
       end
     end ptree
@@ -225,7 +225,7 @@ let to_cache ({ project; textdoc; parsed; diags;
     doc_cache_pplog = pplog;
     doc_cache_tokens = Lazy.force tokens;
     doc_cache_comments = comments;
-    doc_cache_parsed = Option.map (fun { ast; cus; _ } -> ast, cus) parsed;
+    doc_cache_parsed = Option.map (fun { ptree; cus; _ } -> ptree, cus) parsed;
     doc_cache_diags = DIAGS.Set.apply_delayed_formatting diags;
   }
 
@@ -254,10 +254,10 @@ let of_cache ~project
     let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
     let parsed =
       Option.map
-        (fun (ast, cus) ->
-           let definitions = lazy_definitions ast cus in
-           let references = lazy_references ast cus definitions in
-           { ast; cus; definitions; references })
+        (fun (ptree, cus) ->
+           let definitions = lazy_definitions ptree cus in
+           let references = lazy_references ptree cus definitions in
+           { ptree; cus; definitions; references })
         parsed
     in
     { doc with artifacts = { pplog; tokens = lazy tokens; comments };

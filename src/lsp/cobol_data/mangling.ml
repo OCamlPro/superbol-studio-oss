@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.INFIX
-open Cobol_ast
+open Cobol_ptree
 
 exception Not_mangled
 

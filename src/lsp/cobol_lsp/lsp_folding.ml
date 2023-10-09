@@ -66,8 +66,8 @@ let acc_ranges_in ~filename ptree acc =
   and leaf_region n = leaf_range     ~kind:FoldingRangeKind.Region n in
 
   let { section_range; ranges } =
-    Cobol_parser.PTree_visitor.fold_compilation_group (object
-      inherit [acc] Cobol_parser.PTree_visitor.folder
+    Cobol_ptree.Visitor.fold_compilation_group (object
+      inherit [acc] Cobol_ptree.Visitor.folder
 
       method! fold_compilation_unit' = wide_region
       method! fold_options_paragraph' = leaf_region

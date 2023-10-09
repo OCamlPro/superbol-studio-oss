@@ -566,29 +566,19 @@ module COMPARE = struct
 end
 include COMPARE
 
-(** [major_qualifier qualname] returns [Name name] when [qualname] is
-    [Qual (..., Qual (_, Name name)) | Name name]*)
-let rec major_qualifier_of_qualname qualname =
-  match (qualname: qualname) with
-  | Qual (_, qn) ->
-      major_qualifier_of_qualname qn
-  | Name n -> n
+(* (\** [major_qualifier qualname] returns [Name name] when [qualname] is *)
+(*     [Qual (..., Qual (_, Name name)) | Name name]*\) *)
+(* let rec major_qualifier_of_qualname qualname = *)
+(*   match (qualname: qualname) with *)
+(*   | Qual (_, qn) -> *)
+(*       major_qualifier_of_qualname qn *)
+(*   | Name n -> n *)
 
-(** [qualifier_of_qualname qualname] returns [name] when [qualname] is [Name name] or
-    [Qual (name, _)] *)
-let qualifier_of_qualname: qualname -> name with_loc = function
-  | Qual (name, _) -> name
-  | Name name -> name
-
-(** [list_of_qualname qualname] returns the list [nameN; ...; name1] when qualname is [Qual(name1, ... (Name nameN))],
-    (note that the major qualifier is first and the minor is last). *)
-let list_of_qualname qualname =
-  let rec aux acc = function
-    | Qual(n, qn) -> aux (n::acc) qn
-    | Name n -> n::acc
-  in
-  aux [] qualname
-
+(* (\** [qualifier_of_qualname qualname] returns [name] when [qualname] is [Name name] or *)
+(*     [Qual (name, _)] *\) *)
+(* let qualifier_of_qualname: qualname -> name with_loc = function *)
+(*   | Qual (name, _) -> name *)
+(*   | Name name -> name *)
 
 
 (** {2 Manual prettty-printing for terms} *)

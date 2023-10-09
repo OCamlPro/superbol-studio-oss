@@ -13,7 +13,7 @@
 
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
-open Ast
+open Terms
 
 (* --- *)
 
@@ -69,7 +69,6 @@ class ['a] folder = object
   (* method fold_constant_value: (constant_value, 'a) fold = default *)
   (* method fold_constant: (constant, 'a) fold = default *)
   (* method fold_constant': (constant with_loc, 'a) fold = default *)
-  method fold_property_kind: (property_kind, 'a) fold = default
 
 end
 
@@ -468,6 +467,3 @@ let fold_rounded_ident (v: _ #folder) =
 
 let fold_rounded_idents (v: _ #folder) =
   fold_list ~fold:fold_rounded_ident v
-
-let fold_property_kind (v: _ #folder) =
-  leaf v#fold_property_kind

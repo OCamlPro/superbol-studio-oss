@@ -68,7 +68,7 @@ type elementary_data_class =
 type data_type =
   | Elementary of elementary_data_class leveled pictured
   | Table of table_type leveled
-  | Group of data_type Cobol_ast.with_loc list leveled
+  | Group of data_type Cobol_ptree.with_loc list leveled
 [@@deriving show]
 
 and 'a leveled = {
@@ -79,17 +79,17 @@ and 'a leveled = {
 and 'a pictured = 'a * Picture.t option [@@deriving show]
 
 and table_type = {
-  elements_type: data_type Cobol_ast.with_loc;
+  elements_type: data_type Cobol_ptree.with_loc;
   length: table_length;
 }
 
 and table_length =
-  | Fixed of Cobol_ast.integer
+  | Fixed of Cobol_ptree.integer
   | OccursDepending of      (* TODO: get rid of that (duplicate of AST nodes) *)
       {      (* TODO: resolve depending before building the final type repr.  *)
-        min_size: Cobol_ast.integer;
-        max_size: Cobol_ast.integer;
-        depending: Cobol_ast.qualname Cobol_ast.with_loc;
+        min_size: Cobol_ptree.integer;
+        max_size: Cobol_ptree.integer;
+        depending: Cobol_ptree.qualname Cobol_ptree.with_loc;
       } [@@deriving show]
 
 (* let loc_of = function *)

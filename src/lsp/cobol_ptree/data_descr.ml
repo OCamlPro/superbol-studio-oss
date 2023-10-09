@@ -446,66 +446,64 @@ let pp_object_reference_kind ppf = function
     pp_name' ppf n;
     if only then Fmt.pf ppf " ONLY"
 
-let pp_usage_clause ppf usage =
-  match usage with
+let pp_usage_clause ppf = function
   | Binary -> Fmt.pf ppf "BINARY"
   | BinaryChar so ->
-    Fmt.pf ppf "BINARY-CHAR%a"
-      Fmt.(option (sp ++ pp_signedness)) so
+      Fmt.pf ppf "BINARY-CHAR%a"
+        Fmt.(option (sp ++ pp_signedness)) so
   | BinaryShort so ->
-    Fmt.pf ppf "BINARY-SHORT%a"
-      Fmt.(option (sp ++ pp_signedness)) so
+      Fmt.pf ppf "BINARY-SHORT%a"
+        Fmt.(option (sp ++ pp_signedness)) so
   | BinaryLong so ->
-    Fmt.pf ppf "BINARY-LONG%a"
-      Fmt.(option (sp ++ pp_signedness)) so
+      Fmt.pf ppf "BINARY-LONG%a"
+        Fmt.(option (sp ++ pp_signedness)) so
   | BinaryDouble so ->
-    Fmt.pf ppf "BINARY-DOUBLE%a"
-      Fmt.(option (sp ++ pp_signedness)) so
+      Fmt.pf ppf "BINARY-DOUBLE%a"
+        Fmt.(option (sp ++ pp_signedness)) so
   | Bit -> Fmt.pf ppf "BIT"
   | Display -> Fmt.pf ppf "DISPLAY"
   | FloatBinary32 emo ->
-    Fmt.pf ppf "FLOAT-BINARY-32%a"
-      Fmt.(option (sp ++ pp_endianness_mode)) emo
+      Fmt.pf ppf "FLOAT-BINARY-32%a"
+        Fmt.(option (sp ++ pp_endianness_mode)) emo
   | FloatBinary64 emo ->
-    Fmt.pf ppf "FLOAT-BINARY-64%a"
-      Fmt.(option (sp ++ pp_endianness_mode)) emo
+      Fmt.pf ppf "FLOAT-BINARY-64%a"
+        Fmt.(option (sp ++ pp_endianness_mode)) emo
   | FloatBinary128 emo ->
-    Fmt.pf ppf "FLOAT-BINARY-128%a"
-      Fmt.(option (sp ++ pp_endianness_mode)) emo
+      Fmt.pf ppf "FLOAT-BINARY-128%a"
+        Fmt.(option (sp ++ pp_endianness_mode)) emo
   | FloatDecimal16 ee ->
-    Fmt.pf ppf "FLOAT-DECIMAL-16 %a" pp_encoding_endianness ee
+      Fmt.pf ppf "FLOAT-DECIMAL-16 %a" pp_encoding_endianness ee
   | FloatDecimal34 ee ->
-    Fmt.pf ppf "FLOAT-DECIMAL-34 %a" pp_encoding_endianness ee
+      Fmt.pf ppf "FLOAT-DECIMAL-34 %a" pp_encoding_endianness ee
   | FloatExtended -> Fmt.pf ppf "FLOAT-EXTENDED"
   | FloatLong -> Fmt.pf ppf "FLOAT-LONG"
   | FloatShort -> Fmt.pf ppf "FLOAT-SHORT"
   | Index -> Fmt.pf ppf "INDEX"
   | National -> Fmt.pf ppf "NATIONAL"
   | ObjectReference orko ->
-    Fmt.pf ppf "OBJECT REFERENCE%a"
-      Fmt.(option (sp ++ pp_object_reference_kind)) orko
+      Fmt.pf ppf "OBJECT REFERENCE%a"
+        Fmt.(option (sp ++ pp_object_reference_kind)) orko
   | PackedDecimal -> Fmt.pf ppf "PACKED-DECIMAL"
   | Pointer no ->
-    Fmt.pf ppf "POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
+      Fmt.pf ppf "POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
   | FunctionPointer n -> Fmt.pf ppf "FUNCTION-POINTER TO %a" pp_name' n
   | ProgramPointer no ->
-    Fmt.pf ppf "PROGRAM-POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
+      Fmt.pf ppf "PROGRAM-POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
   | UsagePending comp ->
-    match comp with
-    | `Comp0 -> Fmt.pf ppf "COMP-0"
-    | `Comp1 -> Fmt.pf ppf "COMP-1"
-    | `Comp2 -> Fmt.pf ppf "COMP-2"
-    | `Comp3 -> Fmt.pf ppf "COMP-3"
-    | `Comp5 -> Fmt.pf ppf "COMP-5"
-    | `Comp6 -> Fmt.pf ppf "COMP-6"
-    | `CompX -> Fmt.pf ppf "COMP-X"
-    | `CompN -> Fmt.pf ppf "COMP-N"
-    | `Comp9 -> Fmt.pf ppf "COMP-9"
-    | `Comp10-> Fmt.pf ppf "COMP-10"
-    | `Comp15 -> Fmt.pf ppf "COMP-15"
-    | `BinaryCLong so ->
-      Fmt.pf ppf "BINARY-C-LONG%a"
-        Fmt.(option (sp ++ pp_signedness)) so
+      match comp with
+      | `Comp0 -> Fmt.pf ppf "COMP-0"
+      | `Comp1 -> Fmt.pf ppf "COMP-1"
+      | `Comp2 -> Fmt.pf ppf "COMP-2"
+      | `Comp3 -> Fmt.pf ppf "COMP-3"
+      | `Comp5 -> Fmt.pf ppf "COMP-5"
+      | `Comp6 -> Fmt.pf ppf "COMP-6"
+      | `CompX -> Fmt.pf ppf "COMP-X"
+      | `CompN -> Fmt.pf ppf "COMP-N"
+      | `Comp9 -> Fmt.pf ppf "COMP-9"
+      | `Comp10-> Fmt.pf ppf "COMP-10"
+      | `Comp15 -> Fmt.pf ppf "COMP-15"
+      | `BinaryCLong so ->
+          Fmt.pf ppf "BINARY-C-LONG%a" Fmt.(option (sp ++ pp_signedness)) so
 
 type validation_clause =
   | Class of class_clause

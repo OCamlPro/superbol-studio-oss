@@ -24,7 +24,7 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 module Make = struct
 
   module Misc_sections_visitor =
-    Abstract_visitor.For_misc_sections (Raw.Misc_sections)
+    Cobol_ast.Abstract_visitor.For_misc_sections (PTree_types.Misc_sections)
 
   open Misc_descr
 

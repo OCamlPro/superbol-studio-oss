@@ -11,10 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open PTree
 open Grammar_utils
-open Cobol_ast
-open Cobol_ast.Terms_helpers
+open Cobol_ptree
+open Cobol_ptree.Terms_helpers
 open Cobol_common.Srcloc.INFIX
 
 let split_last l =
@@ -57,7 +56,7 @@ let dual_handler_none =
 %[@post.tag diagnostic loc:Cobol_common.Srcloc.srcloc option ->
                            unit Cobol_common.Diagnostics.in_result]
 
-%[@post.tag special_names Cobol_ast.special_names_clause]
+%[@post.tag special_names Cobol_ptree.special_names_clause]
 
 %[@post.tag pending string]
 
@@ -72,23 +71,23 @@ let dual_handler_none =
   let dummy_string = "_" &@ dummy_loc
   let dummy_name = dummy_string
 
-  let dummy_qualname: Cobol_ast.qualname =
-    Cobol_ast.Name dummy_name
+  let dummy_qualname: Cobol_ptree.qualname =
+    Cobol_ptree.Name dummy_name
 
   let dummy_qualident =
-    Cobol_ast.{ ident_name = dummy_qualname;
-                ident_subscripts = [] }
+    Cobol_ptree.{ ident_name = dummy_qualname;
+                  ident_subscripts = [] }
 
   let dummy_ident =
-    Cobol_ast.QualIdent dummy_qualident
+    Cobol_ptree.QualIdent dummy_qualident
 
   let dummy_expr =
-    Cobol_ast.Atom (Fig Zero)
+    Cobol_ptree.Atom (Fig Zero)
 
   let dummy_picture =
-    PTree.{ picture = "X" &@ dummy_loc;
-            picture_locale = None;
-            picture_depending = None }
+    Cobol_ptree.{ picture = "X" &@ dummy_loc;
+                  picture_locale = None;
+                  picture_depending = None }
 ]
 
 %nonassoc lowest
@@ -203,7 +202,7 @@ let dual_handler_none =
 
 (* Entry points *)
 
-%start <PTree.compilation_group> compilation_group
+%start <Cobol_ptree.compilation_group> compilation_group
 %start <condition> standalone_condition
 
 %%
@@ -2188,7 +2187,7 @@ let idents [@symbol "<identifiers>"] [@recovery []] :=
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
-      [@recovery Cobol_ast.UPCAST.ident_with_literal dummy_ident] :=
+      [@recovery Cobol_ptree.UPCAST.ident_with_literal dummy_ident] :=
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 
@@ -2215,11 +2214,11 @@ let integer [@recovery "0"]
 
 let fixedlit [@recovery fixed_zero] [@cost 10]
       [@symbol "<fixed-point literal>"] :=
-  | (i, _, d) = FIXEDLIT; { Cobol_ast.fixed_of_strings i d }
+  | (i, _, d) = FIXEDLIT; { Cobol_ptree.fixed_of_strings i d }
 
 let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
-  | (i, _, d, e) = FLOATLIT; { Cobol_ast.floating_of_strings i d e }
+  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
 
 let alphanum ==             (* TODO: attach interpretation (hex, etc) into AST *)
  | a = ALPHANUM; { fst a, (match snd a with Apostrophe -> Squote | Quote -> Dquote ) }

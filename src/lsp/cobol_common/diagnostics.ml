@@ -191,6 +191,7 @@ include Cont
 (* --- *)
 
 let result ?(diags = Set.none) result = { result; diags }
+let result_only { result; _ } = result
 let with_diag r d = result ~diags:(Set.one d) r
 let with_diags r diags = result ~diags r
 let with_more_diags ~diags { result; diags = diags' } =
@@ -198,9 +199,18 @@ let with_more_diags ~diags { result; diags = diags' } =
 let simple_result r = result r
 let some_result ?diags r = result ?diags (Some r)
 let no_result ~diags = { result = None; diags }
-let map_result f { result; diags } = { result = f result; diags }
-let more_result f { result; diags } = with_more_diags ~diags (f result)
+let map_result ~f { result; diags } = { result = f result; diags }
+let more_result ~f { result; diags } = with_more_diags ~diags (f result)
+let map2_results ~f r1 r2 =
+  more_result ~f:(f r1.result) (with_more_diags ~diags:r1.diags r2)
+let map_some_result ~f =
+  map_result ~f:(Option.map f)
+let cons_option_result = function
+  | { result = None; diags } -> with_more_diags ~diags
+  | { result = Some r; diags } -> more_result ~f:(fun tl -> result ~diags @@ r :: tl)
 let forget_result { diags; _ } = diags
+let merge_results ~f r1 r2 =
+  result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags)
 
 let hint_result r = Cont.khint (with_diag r)
 let note_result r = Cont.knote (with_diag r)

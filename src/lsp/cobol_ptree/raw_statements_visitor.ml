@@ -25,7 +25,7 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 module Make = struct
 
   module Statements_visitor =
-    Abstract_visitor.For_statements (Raw.Statements)
+    Cobol_ast.Abstract_visitor.For_statements (Branching_statements)
 
   open Terms
   open Operands

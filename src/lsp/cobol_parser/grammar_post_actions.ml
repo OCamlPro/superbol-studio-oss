@@ -12,7 +12,7 @@ struct
     | Post_diagnostic: (loc:Cobol_common.Srcloc.srcloc option -> unit
                         Cobol_common.Diagnostics.in_result) -> post_action
     | Post_pending: (string) -> post_action
-    | Post_special_names: (Cobol_ast.special_names_clause) -> post_action
+    | Post_special_names: (Cobol_ptree.special_names_clause) -> post_action
     | NoPost: post_action
   
   let post_production_num

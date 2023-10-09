@@ -154,6 +154,10 @@ dir = "src/lsp/cobol_parser"
 # edit 'src/lsp/cobol_parser/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/cobol_ptree"
+# edit 'src/lsp/cobol_ptree/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/ebcdic_lib"
 # edit 'src/lsp/ebcdic_lib/package.toml' for package-specific options
 

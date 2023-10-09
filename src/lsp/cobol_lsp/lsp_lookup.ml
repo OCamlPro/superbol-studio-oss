@@ -26,21 +26,21 @@ module TYPES = struct
   (** Information returned by {!names_at_position}. *)
   type names_at_position =
     {
-      qualname_at_position: AST.qualname option;
+      qualname_at_position: Cobol_ptree.qualname option;
       enclosing_compilation_unit_name: string option;
     }
 
   type name_definition =
     {
-      as_paragraph: paragraph_definition option;     (* link to AST's paragraph *)
+      as_paragraph: paragraph_definition option;   (* link to AST's paragraph *)
       as_item: item_definition option;
     }                                                          [@@deriving show]
   and paragraph_definition =
-    AST.paragraph with_loc                                     [@@deriving show]
+    Cobol_ptree.paragraph with_loc                             [@@deriving show]
   and item_definition =
     {
-      item_definition: AST.any_item_descr with_loc;
-      item_redefinitions: AST.name with_loc list;
+      item_definition: Cobol_ptree.any_item_descr with_loc;
+      item_redefinitions: Cobol_ptree.name with_loc list;
     }                                                          [@@deriving show]
 
   type name_definitions_in_compilation_unit =
@@ -56,13 +56,13 @@ open TYPES
 
 (* --- *)
 
-let bare name : AST.qualname = AST.Name name
-let qual name : AST.qualname option -> AST.qualname = function
-  | None -> AST.Name name
-  | Some qn -> AST.Qual (name, qn)
-let simple_name : AST.qualname -> string = function
+let bare name : Cobol_ptree.qualname = Cobol_ptree.Name name
+let qual name : Cobol_ptree.qualname option -> Cobol_ptree.qualname = function
+  | None -> Cobol_ptree.Name name
+  | Some qn -> Cobol_ptree.Qual (name, qn)
+let simple_name : Cobol_ptree.qualname -> string = function
   | Qual (n, _) | Name n -> ~&n
-let baseloc_of_qualname: AST.qualname -> srcloc = function
+let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
   | Name name
   | Qual (name, _) -> ~@name
 
@@ -73,8 +73,8 @@ let baseloc_of_qualname: AST.qualname -> srcloc = function
     [qualname], from the first qualifier to the last.  This function is
     temporary and is expected to be replaced once a better way of getting this
     location is found. *)
-let lexloc_of_qualname_in ~filename (qn: AST.qualname) =
-  let rec end_pos: AST.qualname -> Lexing.position = function
+let lexloc_of_qualname_in ~filename (qn: Cobol_ptree.qualname) =
+  let rec end_pos: Cobol_ptree.qualname -> Lexing.position = function
     | Name n -> Cobol_common.Srcloc.end_pos_in ~filename ~@n
     | Qual (_, qn) -> end_pos qn
   in
@@ -86,7 +86,7 @@ let lexloc_of_qualname_in ~filename (qn: AST.qualname) =
     the qualifiers of [qualname] that are after or at position [pos] ion
     [filename].  This function is temporary and is expected to be replaced once
     a better way of finding the qualname is implemented. *)
-let rec qualname_at_pos ~filename (qn: AST.qualname) pos =
+let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
   match qn with
   | Name _ ->
       qn
@@ -97,14 +97,15 @@ let rec qualname_at_pos ~filename (qn: AST.qualname) pos =
       then qualname_at_pos ~filename qn' pos
       else qn
 
-let name_of_compunit (cu: PTREE.compilation_unit with_loc) =
+let name_of_compunit (cu: Cobol_ptree.compilation_unit with_loc) =
   match ~&cu with
   | Program {program_name = name; _}
   | Function {function_name = name; _}
   | ClassDefinition {class_name = name; _}
   | InterfaceDefinition {interface_name = name; _} -> ~&name
 
-let compilation_unit_by_name (cu_name: AST.name) (ptree: PTREE.compilation_group) =
+let compilation_unit_by_name (cu_name: Cobol_ptree.name)
+    (ptree: Cobol_ptree.compilation_group) =
   List.find_opt (fun cu -> cu_name = name_of_compunit cu) ptree
 
 (* --- *)
@@ -119,8 +120,8 @@ let names_at_position ~uri pos ptree : names_at_position =
     type acc =
       {
         names: names_at_position;
-        qualifiers: (AST.qualname * int) list;      (* qualifiers stack *)
-        qualifiers_for_redef: (AST.qualname * int) list;(* all qualnames can be redefined*)
+        qualifiers: (Cobol_ptree.qualname * int) list;      (* qualifiers stack *)
+        qualifiers_for_redef: (Cobol_ptree.qualname * int) list;(* all qualnames can be redefined*)
       }
 
     let init =
@@ -188,14 +189,14 @@ let names_at_position ~uri pos ptree : names_at_position =
     match name with
     | _ when acc.names.qualname_at_position <> None ->
         Visitor.skip_children acc
-    | Some { payload = AST.DataFiller; _ } | None ->
+    | Some { payload = Cobol_ptree.DataFiller; _ } | None ->
         on_filler level acc
     | Some { payload = DataName name; _ } ->
         on_item name level loc acc
   in
 
-  Cobol_parser.PTree_visitor.fold_compilation_group (object
-    inherit [acc] Cobol_parser.PTree_visitor.folder
+  Cobol_ptree.Visitor.fold_compilation_group (object
+    inherit [acc] Cobol_ptree.Visitor.folder
     inherit! [acc] Lsp_position.sieve ~filename ~pos
 
     method! fold_compilation_unit' cu ({ names; _ } as acc) =
@@ -295,7 +296,7 @@ let definitions: compilation_unit -> name_definitions_in_compilation_unit =
   let rec def_group ?cur_qn map { loc; payload = group } =
     let group_infos = match group with
       | Cobol_data.Group.Elementary { name; data_item = Data item; _ } ->
-          Some (name, AST.Data item, [])
+          Some (name, Cobol_ptree.Data item, [])
       | Constant { name; constant_item_descr = Constant c; _ } ->
           Some (name, Constant c, [])
       | Group { name; data_item = Data item; elements = children; _ } ->
@@ -337,7 +338,7 @@ let add_rename_item_definitions ptree defs =
   ISO/IEC 1989:2014 P379 13.18.45.2(3)                          *)
   let visitor = object
     inherit [name_definitions_in_compilation_unit *
-             AST.qualname option] Cobol_parser.PTree_visitor.folder
+             Cobol_ptree.qualname option] Cobol_ptree.Visitor.folder
 
     method! fold_data_item { data_level; data_name; _ } ((map, _) as acc) =
       Visitor.do_children @@
@@ -353,14 +354,14 @@ let add_rename_item_definitions ptree defs =
                                 loc } (map, cur_qn) =
       Visitor.skip_children @@
       (def_item (qual name cur_qn)
-         { item_definition = AST.Renames rename &@ loc;
+         { item_definition = Cobol_ptree.Renames rename &@ loc;
            item_redefinitions = [] } map,
        cur_qn)
   end in
 
   update_definitions_based_on_compilation_group_ptree ptree defs
     ~f:begin fun cu' defs ->
-      Cobol_parser.PTree_visitor.fold_compilation_unit' visitor
+      Cobol_ptree.Visitor.fold_compilation_unit' visitor
         cu' (defs, None) |> fst
     end
 
@@ -378,7 +379,7 @@ let add_paragraph_definitions ptree defs =
 
   let visitor = object
     inherit [name_definitions_in_compilation_unit *
-             AST.qualname option] Cobol_parser.PTree_visitor.folder
+             Cobol_ptree.qualname option] Cobol_ptree.Visitor.folder
 
     method! fold_environment_division _ = Visitor.skip
     method! fold_data_division' _ = Visitor.skip
@@ -392,7 +393,7 @@ let add_paragraph_definitions ptree defs =
   end in
   update_definitions_based_on_compilation_group_ptree ptree defs
     ~f:begin fun cu' defs ->
-      Cobol_parser.PTree_visitor.fold_compilation_unit' visitor
+      Cobol_ptree.Visitor.fold_compilation_unit' visitor
         cu' (defs, None) |> fst
     end
 
@@ -402,8 +403,8 @@ let add_redefine_definitions ptree defs =
     type acc =
       {
         defs: name_definitions_in_compilation_unit;
-        qualifiers: (AST.qualname * int) list;      (* qualifiers stack *)
-        aux: (AST.qualname * int) list;             (* all qualnames can be redefined*)
+        qualifiers: (Cobol_ptree.qualname * int) list;      (* qualifiers stack *)
+        aux: (Cobol_ptree.qualname * int) list;             (* all qualnames can be redefined*)
       }
 
     let qualify n = function
@@ -427,7 +428,7 @@ let add_redefine_definitions ptree defs =
   end in
 
   let visitor = object
-    inherit [acc] Cobol_parser.PTree_visitor.folder
+    inherit [acc] Cobol_ptree.Visitor.folder
 
     method! fold_environment_division _ = Visitor.skip
     method! fold_procedure_division _ = Visitor.skip
@@ -435,7 +436,7 @@ let add_redefine_definitions ptree defs =
     method! fold_data_item {data_level; data_name; _} ({qualifiers; aux; _} as acc) =
       let l = ~&data_level in
       match data_name with
-      | Some { payload = AST.DataFiller; _ } | None ->
+      | Some { payload = Cobol_ptree.DataFiller; _ } | None ->
           Visitor.do_children @@
             let aux = pop_qualifiers (l + 1) aux in
             let qualifiers = pop_qualifiers l qualifiers in
@@ -464,7 +465,7 @@ let add_redefine_definitions ptree defs =
   end in
   update_definitions_based_on_compilation_group_ptree ptree defs
     ~f:begin fun cu' defs ->
-      Cobol_parser.PTree_visitor.fold_compilation_unit' visitor
+      Cobol_ptree.Visitor.fold_compilation_unit' visitor
         cu' {defs; aux = []; qualifiers = []} |> result
     end
 
@@ -473,11 +474,11 @@ let references_of_qualname qn cu cu_defs =
 
   let visitor key = object
     (*[key] is the full qualname of the data*)
-    inherit [srcloc list] Cobol_parser.PTree_visitor.folder
+    inherit [srcloc list] Cobol_ptree.Visitor.folder
     method! fold_environment_division _ = Visitor.skip
     method! fold_qualname qn locs =
       match Cobol_data.Qualmap.find_full_qualname_opt qn cu_defs with
-      | Some full_qn when AST.compare_qualname full_qn key = 0 ->
+      | Some full_qn when Cobol_ptree.compare_qualname full_qn key = 0 ->
           Visitor.skip_children @@ baseloc_of_qualname qn :: locs
       | Some _ ->
           Visitor.do_children locs
@@ -490,7 +491,7 @@ let references_of_qualname qn cu cu_defs =
     | None -> qn
   in
   let refs_in_data_div_or_proc_div =
-    Cobol_parser.PTree_visitor.fold_compilation_unit'
+    Cobol_ptree.Visitor.fold_compilation_unit'
       (visitor qn) cu []
   and refs_in_redef_clauses =                            (* redefinitions *)
     match Cobol_data.Qualmap.find qn cu_defs with
@@ -508,8 +509,8 @@ let references cu_defs cu =
     cu_defs Cobol_data.Qualmap.empty
 
 let copy_at_pos ~filename pos ptree =
-  Cobol_parser.PTree_visitor.fold_compilation_group (object
-    inherit [copy_operation option] Cobol_parser.PTree_visitor.folder
+  Cobol_ptree.Visitor.fold_compilation_group (object
+    inherit [copy_operation option] Cobol_ptree.Visitor.folder
     method! fold' { loc; _ } = function
       | Some _ as acc ->
           Visitor.skip_children acc

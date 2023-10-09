@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ast
+open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 
 type t =

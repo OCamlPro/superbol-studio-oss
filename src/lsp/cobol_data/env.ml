@@ -12,10 +12,9 @@
 (**************************************************************************)
 
 open EzCompat
-open Cobol_ast
 open Types
 
-module FATAL = Cobol_common.Diagnostics.Fatal
+(* module FATAL = Cobol_common.Diagnostics.Fatal *)
 
 (*FIXME: Quite a bit of rework for c translation and analysis alike *)
 
@@ -37,29 +36,27 @@ module FATAL = Cobol_common.Diagnostics.Fatal
     * decimal_point (maybe algebric)
     * entry arguments *)
 
-module NameSet = Set.Make(struct
-    type t = name
+module Names = Set.Make (struct
+    type t = Cobol_ptree.name
     let compare = String.compare
   end)
 
-module Names = NameSet
-
 module DATA_ITEM = struct
   type condition = {
-    target: qualname;
-    values: condition_name_value list;
+    target: Cobol_ptree.qualname;
+    values: Cobol_ptree.condition_name_value list;
   } [@@deriving show]
 
   type t =
-    { name: name;
+    { name: Cobol_ptree.name;
       typ: data_type option;
       size: int;
       global: bool;
-      value: data_value_clause option;
-      renames: qualname list;
+      value: Cobol_ptree.data_value_clause option;
+      renames: Cobol_ptree.qualname list;
       condition: condition option;
-      redefines: qualname option;
-      constant: constant_value option; }
+      redefines: Cobol_ptree.qualname option;
+      constant: Cobol_ptree.constant_value option; }
   [@@deriving show]
 
   let make name =
@@ -76,12 +73,12 @@ end
 
 module PROG_ENV = struct
   type t =
-    { name: name;
+    { name: Cobol_ptree.name;
       parent_prog: t option;
       data_items: DATA_ITEM.t Qualmap.t;
       currency_signs: Cobol_common.Basics.CharSet.t;
       decimal_point: char;
-      using_items: NameSet.t; }
+      using_items: Names.t; }
 
   let make ?parent name =
     match parent with
@@ -91,7 +88,7 @@ module PROG_ENV = struct
           data_items = Qualmap.empty;
           currency_signs = Cobol_common.Basics.CharSet.empty;
           decimal_point = '.';
-          using_items = NameSet.empty }
+          using_items = Names.empty }
     | Some parent ->
         { parent with
           name = name;
@@ -101,7 +98,7 @@ module PROG_ENV = struct
              `prog_env` that is the (inherited and augmented) environment, and
              specific `prog_data`/`prog_using`. *)
           data_items = Qualmap.empty;
-          using_items = NameSet.empty }
+          using_items = Names.empty }
 
 end
 

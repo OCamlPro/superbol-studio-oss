@@ -27,7 +27,7 @@ module Make (Config: Cobol_config.T) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
     Config.safe_partial_replacing_when_src_literal#verify' ~loc:(Some loc) |>
-    DIAGS.map_result (function Some s -> s = `Safe | None -> false)
+    DIAGS.map_result ~f:(function Some s -> s = `Safe | None -> false)
 
   let replacing' ?repl_dir repl_from repl_to =
     match repl_dir, ~&repl_from with

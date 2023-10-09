@@ -33,7 +33,7 @@ let reparse_file ~source_format ~config filename =
     input
   in
   let print =
-    Format.asprintf "@[%a@]@." Cobol_parser.PTree.pp_compilation_group
+    Format.asprintf "@[%a@]@." Cobol_ptree.pp_compilation_group
   in
   match parse ~source_format (Filename filename) with
   | { result = Only Some cg; _ } -> (
@@ -41,7 +41,7 @@ let reparse_file ~source_format ~config filename =
       let contents = print cg in
       match parse ~source_format:(SF SFFree) (String { contents; filename }) with
       | { result = Only Some cg'; _ } ->
-        if Cobol_parser.PTree.compare_compilation_group cg cg' = 0 then
+        if Cobol_ptree.compare_compilation_group cg cg' = 0 then
           Format.printf "Reparse: OK."
         else
           Format.printf "Reparse: Different."

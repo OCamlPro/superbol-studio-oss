@@ -245,11 +245,27 @@
    (menhir ( >= 1.2 ))
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= version))
+   (cobol_ptree (= version))
    (cobol_preproc (= version))
+   (cobol_common (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   (menhir ( = 20230415 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name cobol_ptree)
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
+ (depends
+   (ocaml (>= 4.14.0))
    (cobol_common (= version))
    (cobol_ast (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( = 20230415 ))
    ppx_inline_test
    ppx_expect
    odoc

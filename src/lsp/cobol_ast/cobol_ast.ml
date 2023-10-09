@@ -11,17 +11,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Ast
-
-module Terms_visitor = Terms_visitor
-module Operands_visitor = Operands_visitor
-
-module Terms_helpers = Terms_helpers
-
 module Abstract = Abstract
 module Abstract_visitor = Abstract_visitor
-
-module Raw = Raw
-module Raw_visitor = Raw_visitor
-
-module Testing_helpers = Testing_helpers

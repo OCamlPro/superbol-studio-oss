@@ -13,15 +13,15 @@
 
 open Alcotest
 
-open Cobol_ast
-open Cobol_ast.Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
+open Cobol_ptree
+open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
 open Cobol_parser.INTERNAL.Tokens
 open Cobol_parser.INTERNAL.Grammar
 open Cobol_parser.INTERNAL.Dummy
 
 let condition: condition testable = testable pp_condition (=)
 let parse_condition = parse_list_as standalone_condition
-let expand_condition = Cobol_ast.Terms_helpers.expand_every_abbrev_cond
+let expand_condition = Cobol_ptree.Terms_helpers.expand_every_abbrev_cond
 let check_condition toks cond =
   check condition "correct conditions parsing" cond
     (expand_condition @@ parse_condition toks)

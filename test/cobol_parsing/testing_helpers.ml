@@ -11,34 +11,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* NB: not sure we need the full pictured AST. We may only need (part of)
-   Data_sections/division. *)
+open Cobol_common.Srcloc.INFIX
 
-open Cobol_ast
-
-module CharSet = Cobol_common.Basics.CharSet
-
-module Misc_sections =
-  Cobol_ast.Raw.Misc_sections
-module Picture = struct
-  type picture = Picture.t with_loc [@@deriving show, ord]
+module type TAGS = sig
+  val loc: Cobol_common.Srcloc.srcloc
 end
-module Data_sections =
-  Cobol_ast.Raw.Data_sections (Picture)
-module Data_division =
-  Cobol_ast.Raw.Data_division (Data_sections)
-module Statements =
-  Cobol_ast.Raw.Statements
-module Proc_division =
-  Cobol_ast.Raw.Proc_division (Statements)
-module Compilation_group =
-  Cobol_ast.Raw.Compilation_group
-    (Misc_sections) (Data_division) (Proc_division)
 
-include Compilation_group
-include Proc_division
-include Statements
-include Data_division
-include Data_sections
-include Picture
-include Misc_sections
+module Make (Tags: TAGS) = struct
+  open Cobol_ptree
+
+  module Term = struct
+    let name x : qualname = Name (x &@ Tags.loc)
+    let qualident x : qualident =
+      { ident_name = name x; ident_subscripts = [] }
+    let ident x : ident_or_literal = QualIdent (qualident x)
+    let strlit l : ident_or_literal = Alphanum (l, Dquote)
+  end
+
+  module Cond = struct
+    open Term
+    let ident x : condition = Expr (Atom (ident x))
+  end
+
+end
