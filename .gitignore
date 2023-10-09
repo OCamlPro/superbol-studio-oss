@@ -17,6 +17,7 @@ _build
 /_build
 .drom.config
 /dist
+/_*
 /node_modules
 /yarn-error.log
 /yarn.lock

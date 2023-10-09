@@ -11,37 +11,44 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*
-open Ezcmd.V2
-open EZCMD.TYPES
-*)
+open Ez_toml.V1
+open TOML.Types
 
-let public_subcommands = [
-  Command_pp.cmd ;
-  Command_lsp.cmd;
-  Command_texi2rst.cmd ;
-  Command_indent_range.cmd;
-  Command_indent_file.cmd;
-  Command_json_vscode.cmd;
-  Command_snapshot.cmd;
+module TYPES : sig
 
-  Command_switch.cmd;
-  Command_switch.env_cmd; (* env *)
-  Command_switch.switch_env_cmd;
-  Command_switch.import_cmd;
-  Command_switch.list_cmd;
-  Command_switch.set_cmd;
-  Command_switch.add_cmd;
-  Command_switch.build_cmd;
-]
+  type user_config = {
+    mutable toml : node ;
+    mutable modified : bool ;
+    mutable save_hooks : (string * (user_config -> unit)) list ;
+  }
 
-let main ?style_renderer ?utf_8 () =
-  Printf.eprintf
-    "SuperBOL, Copyright OCamlPro. https://get-superbol.com. Affero GPL version.\n%!";
-  Pretty.init_formatters ?style_renderer ?utf_8 ();
-  Globals.MAIN.main
-    (* ~on_error:Cobol_common.keep_temporary_files *)
-    ~on_exit:Cobol_common.exit
-    ~print_config:Config.print
-    ~common_args:[]
-    public_subcommands
+  type section_option = {
+    option_name : string ;
+    option_before : string list ;
+    option_value : value ;
+  }
+
+  type section = {
+    section_name : string ;
+    section_before : string list ;
+    section_options : section_option list ;
+  }
+
+end
+
+open TYPES
+
+val load : unit -> user_config
+val save : user_config -> unit
+
+val add_save_hook : user_config -> string -> (user_config -> unit) -> unit
+
+val section :
+  name:string ->
+  ?before:string list -> TYPES.section_option list -> TYPES.section
+val option :
+  name:string ->
+  ?before:string list -> Ez_toml.Types.value -> TYPES.section_option
+
+val add_section_hook :
+  TYPES.user_config -> string -> (name:string -> TYPES.section) -> unit

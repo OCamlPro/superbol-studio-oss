@@ -11,37 +11,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*
-open Ezcmd.V2
-open EZCMD.TYPES
-*)
+open Ez_file.V1
 
-let public_subcommands = [
-  Command_pp.cmd ;
-  Command_lsp.cmd;
-  Command_texi2rst.cmd ;
-  Command_indent_range.cmd;
-  Command_indent_file.cmd;
-  Command_json_vscode.cmd;
-  Command_snapshot.cmd;
+let error fmt =
+  Printf.kprintf (fun s ->
+      Printf.eprintf "Error: %s\n%!" s;
+      exit 2
+    ) fmt
 
-  Command_switch.cmd;
-  Command_switch.env_cmd; (* env *)
-  Command_switch.switch_env_cmd;
-  Command_switch.import_cmd;
-  Command_switch.list_cmd;
-  Command_switch.set_cmd;
-  Command_switch.add_cmd;
-  Command_switch.build_cmd;
-]
+let current_dir = Sys.getcwd ()
 
-let main ?style_renderer ?utf_8 () =
-  Printf.eprintf
-    "SuperBOL, Copyright OCamlPro. https://get-superbol.com. Affero GPL version.\n%!";
-  Pretty.init_formatters ?style_renderer ?utf_8 ();
-  Globals.MAIN.main
-    (* ~on_error:Cobol_common.keep_temporary_files *)
-    ~on_exit:Cobol_common.exit
-    ~print_config:Config.print
-    ~common_args:[]
-    public_subcommands
+(* Use Directories instead *)
+let home_dir = try Sys.getenv "HOME" with _ -> current_dir
+let config_dir = String.concat "/" [ home_dir ; ".config" ; "superbol" ]
+
+let rec mkdir_rec path =
+  if not ( Sys.file_exists path ) then begin
+    let dir = Filename.dirname path in
+    if dir <> path then mkdir_rec dir ;
+    Unix.mkdir path 0o755;
+  end
+
+let write_file ?(mkdir=false) file =
+  if mkdir then mkdir_rec ( Filename.dirname file );
+  EzFile.write_file file

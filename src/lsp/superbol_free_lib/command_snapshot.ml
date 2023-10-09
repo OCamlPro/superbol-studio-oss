@@ -14,6 +14,7 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 open Ez_file.V1
+open EzFile.OP
 
 module TYPES = struct
 
@@ -31,26 +32,18 @@ end
 
 open TYPES
 
-let error fmt =
-  Printf.kprintf (fun s ->
-      Printf.eprintf "Error: %s\n%!" s;
-      exit 2
-    ) fmt
-
-let current_dir = Sys.getcwd ()
-let home_dir = try Sys.getenv "HOME" with _ -> current_dir
-
 let set_env env =
   List.iter (fun v ->
       let v,s = EzString.cut_at v '=' in
       Unix.putenv v s
     ) env
 
+let snapshots_dir = Misc.config_dir // "snapshots"
+
 let load_and_exec ~snapshot_id ~args ~no_cd ~env () =
-  let snapshot_filename =
-    String.concat "/" [ home_dir ; ".config" ; "superbol" ; "snapshots" ; snapshot_id ^ ".json" ] in
+  let snapshot_filename = snapshots_dir // snapshot_id ^ ".json" in
   if not @@ Sys.file_exists snapshot_filename then
-    error "Snapshot %S does not exist (%s)" snapshot_id snapshot_filename;
+    Misc.error "Snapshot %S does not exist (%s)" snapshot_id snapshot_filename;
   let s = EzFile.read_file snapshot_filename in
   let snap = EzEncoding.destruct TYPES.snapshot_enc s in
   if not no_cd then Unix.chdir snap.pwd;
@@ -68,17 +61,8 @@ let load_and_exec ~snapshot_id ~args ~no_cd ~env () =
   in
   Unix.execvp args.(0) args
 
-let rec mkdir path =
-  if not ( Sys.file_exists path ) then begin
-    let dir = Filename.dirname path in
-    if dir <> path then mkdir dir ;
-    Unix.mkdir path 0o755;
-  end
-
 let save_and_run ~snapshot_id ~args ~quit ~env () =
-  let snapshot_filename =
-    String.concat "/" [ home_dir ; ".config" ; "superbol" ; "snapshots" ; snapshot_id ^ ".json" ] in
-  mkdir (Filename.dirname snapshot_filename);
+  let snapshot_filename = snapshots_dir // snapshot_id ^ ".json" in
   let command_env = Unix.environment () in
   let command_env = Array.to_list command_env in
   let command_env = command_env @ env in
@@ -88,8 +72,8 @@ let save_and_run ~snapshot_id ~args ~quit ~env () =
     env = command_env ;
   } in
   set_env env;
-  EzFile.write_file snapshot_filename
-    ( EzEncoding.construct TYPES.snapshot_enc snap);
+  Misc.write_file ~mkdir:true snapshot_filename
+    ( EzEncoding.construct ~compact:false TYPES.snapshot_enc snap);
   if quit then exit 2;
   Unix.execvp args.(0) args
 
@@ -109,16 +93,16 @@ let cmd =
     (fun () ->
        match !kind with
        | None ->
-         error "you must either use --save ID or --load ID"
+         Misc.error "you must either use --save ID or --load ID"
        | Some ( Load snapshot_id ) ->
          if !quit then
-           error "--load ID and --quit are incompatible options";
+           Misc.error "--load ID and --quit are incompatible options";
          load_and_exec ~snapshot_id ~args:!args ~no_cd:!no_cd ~env:!env ()
        | Some ( Save snapshot_id ) ->
          if !no_cd then
-           error "--save ID and --no-cd are incompatible options";
+           Misc.error "--save ID and --no-cd are incompatible options";
          if !args = [||] then
-           error "--save ID requires a command to call";
+           Misc.error "--save ID requires a command to call";
          save_and_run ~snapshot_id ~args:!args ~quit:!quit ~env:!env ()
     )
     ~args:[
