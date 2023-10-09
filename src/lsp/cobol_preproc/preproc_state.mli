@@ -11,24 +11,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
-open Cobol_common.Diagnostics.TYPES
+open Text.TYPES
 
-module Make (Config: Cobol_config.T) : sig
+(** {1 Preprocessor state}
 
-  val source_format_lexdir
-    : dialect:Cobol_config.dialect
-    -> string with_loc
-    -> Preproc_directives.lexing_directive option with_diags
+    This state is used to track some preprocessing-related divisions, like the
+    `CONTROL DIVISION` in the GCOS dialect. *)
 
-  val replacing'
-    : ?repl_dir:Preproc_directives.replacing_direction
-    -> [< `Alphanum of Text.pseudotext
-       | `PseudoText of Text.pseudotext ] Cobol_common.Srcloc.with_loc
-    -> Text.pseudotext Cobol_common.Srcloc.with_loc
-    -> Preproc_directives.replacing option Cobol_common.Diagnostics.with_diags
+type state
+type t = state
 
-  val filter_map_4_list_with_diags'
-    : 'a option with_diags with_loc list -> 'a with_loc list with_diags
+type preproc_phrase =
+  | Copy of phrase
+  | Replace of phrase
+  | Header of tracked_header * phrase
+and phrase =
+  {
+    prefix: text;
+    phrase: text;
+    suffix: text;
+  }
+and tracked_header =
+  | ControlDivision
+  | SubstitutionSection
+  | IdentificationDivision
 
-end
+val initial: state
+val find_preproc_phrase
+  : ?prefix:[ `Rev | `Same ]
+  -> state
+  -> text
+  -> (preproc_phrase * state,
+      [> `MissingPeriod | `MissingText | `NoneFound ]) result

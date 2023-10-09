@@ -14,9 +14,9 @@
 %parameter <Overlay_manager: Src_overlay.MANAGER>
 %{
   open CONFIG
-  open Preproc_utils.Make (CONFIG)
   open Cobol_common.Srcloc.INFIX
   open Cobol_common.Diagnostics.TYPES
+  module PP_UTILS = Preproc_utils.Make (CONFIG)
 %}
 
 (* Tokens are listed in `preproc_tokens.mly' *)
@@ -64,11 +64,11 @@ let lexdir_source_format :=
       Cobol_common.Diagnostics.some_result @@
         Preproc_directives.LexDirSource (sf &@<- _free) }
   | CDIR_SOURCE; FORMAT?; IS?; i = text_word;
-    { Src_processor.cdir_source_format ~dialect i }
+    { PP_UTILS.source_format_lexdir ~dialect i }
 
 let lexdir_microfocus_sourceformat :=
   | CDIR_SET; SOURCEFORMAT; i = loc(ALPHANUM);  (* elementary_string_literal? *)
-    { Src_processor.cdir_source_format ~dialect
+    { PP_UTILS.source_format_lexdir ~dialect
         (Cobol_common.Srcloc.locmap fst i) }
 
 (* --- COPY ----------------------------------------------------------------- *)
@@ -81,7 +81,7 @@ let copy_statement_ :=
     replacing = copy_replacings;
     ".";
     { let { result = replacing; diags }
-        = filter_map_4_list_with_diags' replacing in
+        = PP_UTILS.filter_map_4_list_with_diags' replacing in
       { result = CDirCopy { library = l; suppress_printing = sp; replacing };
         diags } }
 
@@ -99,11 +99,11 @@ let copy_replacings :=
 let copy_replacing_clause ==
   | repl_from = copy_replacing_text; BY;
     repl_to   = copy_replacing_text;
-    { Src_processor.replacing repl_from repl_to }
+    { Text_processor.replacing repl_from repl_to }
   | repl_dir = leading_or_trailing;
     repl_from = loc(replacing_src); BY;
     repl_to = loc(replacing_dst);
-    { replacing' ~repl_dir repl_from repl_to }
+    { PP_UTILS.replacing' ~repl_dir repl_from repl_to }
 
 let replacing_src :=
   | ~ = PSEUDO_TEXT; <`PseudoText>
@@ -144,7 +144,7 @@ let replace_statement := ~ = loc(replace_statement_); EOL; < >
 let replace_statement_ :=
   | REPLACE; also = ibo(ALSO); replacing = nell(loc(copy_replacing_clause)); ".";
     { let { result = replacing; diags }
-        = filter_map_4_list_with_diags' replacing in
+        = PP_UTILS.filter_map_4_list_with_diags' replacing in
       { result = CDirReplace { also; replacing }; diags } }
   | REPLACE; last = ibo(LAST); OFF; ".";
     { Cobol_common.Diagnostics.simple_result @@

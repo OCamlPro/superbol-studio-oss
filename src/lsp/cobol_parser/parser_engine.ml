@@ -84,7 +84,7 @@ module Make (Config: Cobol_config.T) = struct
       basis (mostly the pre-processor and tokenizer's states). *)
   and 'm preproc =
     {
-      pp: Cobol_preproc.preprocessor;               (* also holds diagnistics *)
+      pp: Cobol_preproc.preprocessor;               (* also holds diagnostics *)
       tokzr: 'm Tokzr.state;
       context_stack: Context.stack;
       persist: 'm persist;

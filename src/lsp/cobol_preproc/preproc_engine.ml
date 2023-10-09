@@ -39,9 +39,9 @@ let decide_source_format _input
 
 type preprocessor =
   {
-    buff: Text.text;
-    srclex: Src_processor.any_srclexer;
-    ppstate: Src_processor.state;
+    buff: Text.t;
+    reader: Src_reader.t;
+    ppstate: Preproc_state.t;
     pplog: Preproc_trace.log;
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
@@ -49,7 +49,7 @@ type preprocessor =
 and preprocessor_persist =
   (** the preprocessor state that does not change very often *)
   {
-    pparser: (module Src_processor.PPPARSER);
+    pparser: (module Text_processor.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
@@ -58,18 +58,17 @@ and preprocessor_persist =
     show_if_verbose: [`Txt | `Src] list;
   }
 
-let diags { diags; srclex; _ } =
-  DIAGS.Set.union diags @@ Src_processor.srclex_diags srclex
+let diags { diags; reader; _ } = DIAGS.Set.union diags @@ Src_reader.diags reader
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
 let log { pplog; _ } = pplog
-let source_format { srclex; _ } = Src_processor.source_format srclex
-let position { srclex; _ } = Src_processor.srclex_pos srclex
-let comments { srclex; _ } = Src_processor.srclex_comments srclex
-let newline_cnums { srclex; _ } = Src_processor.srclex_newline_cnums srclex
+let source_format { reader; _ } = Src_reader.source_format reader
+let position { reader; _ } = Src_reader.position reader
+let comments { reader; _ } = Src_reader.comments reader
+let newline_cnums { reader; _ } = Src_reader.newline_cnums reader
 
-let with_srclex lp srclex =
-  if lp.srclex == srclex then lp else { lp with srclex }
+let with_reader lp reader =
+  if lp.reader == reader then lp else { lp with reader }
 (* let with_diags lp diags = *)
 (*   if lp.diags == diags then lp else { lp with diags } *)
 let with_buff lp buff =
@@ -86,13 +85,13 @@ let with_replacing lp replacing =
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
-let make_srclex ~source_format = function
+let make_reader ~source_format = function
   | Filename filename ->
-      Src_processor.srclex_from_file ~source_format filename
+      Src_reader.from_file ~source_format filename
   | String { contents; filename } ->
-      Src_processor.srclex_from_string ~filename ~source_format contents
+      Src_reader.from_string ~filename ~source_format contents
   | Channel { contents; filename } ->
-      Src_processor.srclex_from_channel ~filename ~source_format contents
+      Src_reader.from_channel ~filename ~source_format contents
 
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format;
@@ -104,8 +103,8 @@ let preprocessor input = function
         = decide_source_format input source_format in
       {
         buff = [];
-        srclex = make_srclex ~source_format input;
-        ppstate = Src_processor.initial_state;
+        reader = make_reader ~source_format input;
+        ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags;
         persist =
@@ -120,11 +119,11 @@ let preprocessor input = function
           };
       }
   | `Fork ({ persist; _ } as from, copyloc, copybook) ->
-      let source_format = Src_processor.source_format from.srclex in
+      let source_format = Src_reader.source_format from.reader in
       {
         from with
         buff = [];
-        srclex = make_srclex ~source_format input;
+        reader = make_reader ~source_format input;
         persist =
           {
             persist with
@@ -133,19 +132,19 @@ let preprocessor input = function
           };
       }
 
-let reset_preprocessor ~restart ?new_position ({ srclex; _ } as pp) input =
+let reset_preprocessor ~restart ?new_position ({ reader; _ } as pp) input =
   {
-    pp with srclex = restart ?position:new_position input srclex;
+    pp with reader = restart ?position:new_position input reader;
   }
 
 (* --- *)
 
 let apply_active_replacing { pplog; persist; _ } = match persist with
-  | { replacing = r :: _; _ } -> Src_processor.apply_replacing OnPartText r pplog
+  | { replacing = r :: _; _ } -> Text_processor.apply_replacing OnPartText r pplog
   | _ -> fun text -> Ok (text, pplog)
 
 let apply_active_replacing_full { pplog; persist; _ } = match persist with
-  | { replacing = r :: _; _ } -> Src_processor.apply_replacing OnFullText r pplog
+  | { replacing = r :: _; _ } -> Text_processor.apply_replacing OnFullText r pplog
   | _ -> fun text -> text, pplog
 
 (** [lookup_compiler_directive chunk] searches for a compiler-directive
@@ -155,7 +154,7 @@ let apply_active_replacing_full { pplog; persist; _ } = match persist with
     Returns [Ok (prefix, cdir_text)] if a compiler directive is recognised,
     where [cdir_text] is guaranteed to start with a compiler-directive word on a
     line [l] and terminates at the end [l]. *)
-(* Note: {!Src_processor.next_source_chunk} never outputs compiler-directive
+(* Note: {!Text_processor.next_source_chunk} never outputs compiler-directive
    text-words in positions other than the first two.  Such a chunk also
    terminates at the end of the source line as it cannot be continued (contrary
    to normal source lines). *)
@@ -169,26 +168,26 @@ let lookup_compiler_directive: Text.text -> _ = function
 (** [next_chunk lp] reads the next chunk from [lp], handling lexical and
     compiler directives along the way.  It never returns an empty result: the
     output text always containts at least {!Eof}. *)
-let rec next_chunk ({ srclex; buff; _ } as lp) =
-  match Src_processor.next_source_chunk srclex with
-  | srclex, ([{ payload = Eof; _}] as eof) ->
+let rec next_chunk ({ reader; buff; _ } as lp) =
+  match Src_reader.next_chunk reader with
+  | reader, ([{ payload = Eof; _}] as eof) ->
       let text, pplog = apply_active_replacing_full lp (buff @ eof) in
-      text, { lp with srclex; pplog; buff = [] }
-  | srclex, text ->
+      text, { lp with reader; pplog; buff = [] }
+  | reader, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
       match lookup_compiler_directive text with
       | Error `NotCDir ->
-          preprocess_line { lp with srclex; buff = [] } (buff @ text)
+          preprocess_line { lp with reader; buff = [] } (buff @ text)
       | Ok ([], lexdir_text) ->
-          next_chunk @@ on_lexing_directive { lp with srclex } lexdir_text
+          next_chunk @@ on_lexing_directive { lp with reader } lexdir_text
       | Ok (text, lexdir_text) ->
-          let lp = { lp with srclex; buff = [] } in
+          let lp = { lp with reader; buff = [] } in
           preprocess_line (on_lexing_directive lp lexdir_text) (buff @ text)
 
 and on_lexing_directive ({ persist = { pparser = (module Pp);
                                        overlay_manager = om; _ };
-                           srclex; _ } as lp) lexdir_text =
+                           reader; _ } as lp) lexdir_text =
   (* Here, [lexdir_text] is never empty as it's known to start with a compiler
      directive marker `>>` (or `$` for MF-style directives), so we should always
      have a loc: *)
@@ -200,7 +199,7 @@ and on_lexing_directive ({ persist = { pparser = (module Pp);
       let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
       let lp = add_diags lp diags in
       let lp = with_pplog lp pplog in
-      with_srclex lp (Src_processor.with_source_format sf srclex)
+      with_reader lp (Src_reader.with_source_format sf reader)
   | { result = None; diags } ->       (* valid lexdir with erroneous semantics *)
       let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
       let lp = with_pplog lp pplog in
@@ -235,7 +234,7 @@ and do_replacing lp text =
       text, with_buff_n_pplog lp buff pplog
 
 and try_preproc lp srctext =
-  match Src_processor.find_preproc_phrase ~prefix:`Rev lp.ppstate srctext with
+  match Preproc_state.find_preproc_phrase ~prefix:`Rev lp.ppstate srctext with
   | Error (`MissingPeriod | `MissingText) as e -> e
   | Error `NoneFound -> Ok (`CDirNone (lp, srctext))
   | Ok (cdir, ppstate) -> Ok (process_preproc_phrase { lp with ppstate } cdir)
@@ -286,7 +285,7 @@ and do_copy lp rev_prefix copy suffix =
   let lp = add_diags lp diags in
   let libtext, lp = read_lib lp ~@copy library in
   let libtext, pplog =
-    Src_processor.apply_replacing OnFullText replacing lp.pplog libtext
+    Text_processor.apply_replacing OnFullText replacing lp.pplog libtext
   in
   let lp = with_pplog lp pplog in
   (* eprintf "Library text: %a@." pp_text libtext; *)
@@ -411,7 +410,7 @@ let reset_preprocessor_for_string string ?new_position pp =
     | None -> string
   in
   reset_preprocessor ?new_position pp contents
-    ~restart: Src_processor.srclex_restart_on_string
+    ~restart:Src_reader.restart_on_string
 
 (* --- *)
 
@@ -426,7 +425,7 @@ let lex_file ~source_format ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    Src_processor.print_source ppf (make_srclex ~source_format input)
+    Src_reader.print_lines ppf (make_reader ~source_format input)
   end
 
 let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
@@ -436,8 +435,8 @@ let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
         let source_format =
           DIAGS.grab_diags @@
           decide_source_format (Filename filename) source_format in
-        let pl = Src_processor.srclex_from_file ~source_format filename in
-        Src_processor.print_source ppf pl
+        Src_reader.print_lines ppf @@
+        Src_reader.from_file ~source_format filename
     | Error lnf ->
         Copybook.lib_not_found_error (DIAGS.error "%t") lnf
   end
@@ -446,7 +445,7 @@ let fold_source_lines ~source_format ?epf ~f =
   Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
     let source_format =
       DIAGS.grab_diags @@ decide_source_format input source_format in
-    Src_processor.fold_source_lines (make_srclex ~source_format input) ~f
+    Src_reader.fold_lines (make_reader ~source_format input) ~f
   end
 
 let pp_preprocessed ppf lp =

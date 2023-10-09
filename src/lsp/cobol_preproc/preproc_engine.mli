@@ -28,7 +28,6 @@ val reset_preprocessor_for_string
   -> preprocessor
   -> preprocessor
 
-
 (* --- *)
 
 val diags: preprocessor -> Cobol_common.Diagnostics.Set.t
