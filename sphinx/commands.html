@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (c2be8b1
-) (2023/10/10 09:09) documentation</title>
+ (2d0e72d
+) (2023/10/10 13:10) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (c2be8b1
+ (2d0e72d
 )
               </div>
 <div role="search">
@@ -58,12 +58,20 @@
 <li class="toctree-l1"><a class="reference internal" href="emacs.html">GNU/Emacs modes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">Superbol VSCode Debug</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-env">main.exe env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-range">main.exe indent range</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-json-vscode">main.exe json vscode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-lsp">main.exe lsp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-pp">main.exe pp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-snapshot">main.exe snapshot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch">main.exe switch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-add">main.exe switch add</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-build">main.exe switch build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-env">main.exe switch env</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-import">main.exe switch import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-list">main.exe switch list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-set">main.exe switch set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-texi2rst">main.exe texi2rst</a></li>
 </ul>
 </li>
@@ -104,7 +112,10 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">-v</span></code> or <code class="code docutils literal notranslate"><span class="pre">--verbose</span></code>   Increase verbosity level</p></li>
 </ul>
 <p>Overview of sub-commands:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">indent</span> <span class="n">file</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">env</span>
+  <span class="nc">Generate</span> <span class="n">commands</span> <span class="k">to</span> <span class="n">set</span> <span class="n">environment</span> <span class="n">variables</span> <span class="k">to</span> <span class="n">use</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">switch</span>
+
+<span class="n">indent</span> <span class="n">file</span>
   <span class="nc">Indentation</span>
 
 <span class="n">indent</span> <span class="n">range</span>
@@ -122,10 +133,93 @@
 <span class="n">snapshot</span>
   <span class="nc">Manage</span> <span class="n">environment</span> <span class="n">snapshots</span>
 
+<span class="n">switch</span>
+  <span class="nc">Print</span> <span class="n">current</span> <span class="n">switch</span>
+
+<span class="n">switch</span> <span class="n">add</span>
+  <span class="nc">Add</span> <span class="n">a</span> <span class="n">directory</span> <span class="k">as</span> <span class="n">a</span> <span class="n">switch</span>
+
+<span class="n">switch</span> <span class="n">build</span>
+  <span class="nc">Configure</span><span class="o">,</span> <span class="n">build</span><span class="o">,</span> <span class="n">install</span> <span class="nc">GnuCOBOL</span> <span class="ow">and</span> <span class="n">add</span> <span class="n">a</span> <span class="n">switch</span>
+
+<span class="n">switch</span> <span class="n">env</span>
+  <span class="nc">Generate</span> <span class="n">commands</span> <span class="k">to</span> <span class="n">set</span> <span class="n">environment</span> <span class="n">variables</span> <span class="k">to</span> <span class="n">use</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">switch</span>
+
+<span class="n">switch</span> <span class="n">import</span>
+  <span class="nc">Import</span> <span class="n">existing</span> <span class="nc">GnuCOBOL</span> <span class="n">installations</span> <span class="k">as</span> <span class="n">switches</span>
+
+<span class="n">switch</span> <span class="kt">list</span>
+  <span class="nc">List</span> <span class="n">known</span> <span class="n">switches</span>
+
+<span class="n">switch</span> <span class="n">set</span>
+  <span class="nc">Set</span> <span class="n">the</span> <span class="n">current</span> <span class="n">default</span> <span class="n">switch</span>
+
 <span class="n">texi2rst</span>
   <span class="n">build</span> <span class="o">.</span><span class="n">texi</span> <span class="n">documentation</span> <span class="n">from</span> <span class="n">gnucobol</span><span class="o">-</span><span class="n">docs</span>
 </pre></div>
 </div>
+<section id="main-exe-env">
+<h2>main.exe env<a class="headerlink" href="#main-exe-env" title="Permalink to this headline"></a></h2>
+<p>Generate commands to set environment variables to use the specified switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command generates a list of command to set environment variables for an existing switch.</p>
+<p>It is usually used as:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">eval</span> <span class="o">$(</span><span class="n">superbol</span> <span class="n">env</span><span class="o">)</span>
+<span class="o">#</span> <span class="n">cobc</span> <span class="o">--</span><span class="n">version</span>
+</pre></div>
+</div>
+<p>The <strong>–switch SWITCH</strong> option can be used to choose a different switch from the default one. SWITCH should match a sub-string of a switch name. <strong>–last</strong> can be used to select the most recent switch.</p>
+<p>The <strong>–global</strong> option can be used to generate a file <strong>$HOME/.config/superbol/env</strong> that can be loaded from shell init scripts, using a symlink to point PATH and LD_LIBRARY_PATH to the current switch at any time. Changing the current switch will then automatically redirect cobc to that new switch.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">env</span> <span class="nc">SWITCH</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SWITCH</span></code>   Switch to use, instead of current</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--global</span></code>   Use global configuration for default switch</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--last</span></code>   Use the latest imported switch</p></li>
+</ul>
+</section>
 <section id="main-exe-indent-file">
 <h2>main.exe indent file<a class="headerlink" href="#main-exe-indent-file" title="Permalink to this headline"></a></h2>
 <p>Indentation</p>
@@ -311,6 +405,388 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-cd</span></code>   Do not change directory to run the command</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--quit</span></code>   Do not run the command, just exit</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--save</span> <span class="pre">ID</span></code>   Create snapshot ID from state</p></li>
+</ul>
+</section>
+<section id="main-exe-switch">
+<h2>main.exe switch<a class="headerlink" href="#main-exe-switch" title="Permalink to this headline"></a></h2>
+<p>Print current switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command prints the current default switch.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+</section>
+<section id="main-exe-switch-add">
+<h2>main.exe switch add<a class="headerlink" href="#main-exe-switch-add" title="Permalink to this headline"></a></h2>
+<p>Add a directory as a switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command adds a new known switch.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="n">add</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Directory to add</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--no-set</span></code>   Do not set this directory as the current one</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--switch</span> <span class="pre">SWITCH</span></code>   Name of switch to add</p></li>
+</ul>
+</section>
+<section id="main-exe-switch-build">
+<h2>main.exe switch build<a class="headerlink" href="#main-exe-switch-build" title="Permalink to this headline"></a></h2>
+<p>Configure, build, install GnuCOBOL and add a switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command will build and install GnuCOBOL and add the corresponding switch. If DIR is specified, the installation directory will be created inside, otherwise the <strong>dir</strong> user option will be used. The name of the directory and the switch names are generated automatically from the GIT configuration. If <strong>–switch SWITCH</strong> is provided, it will be used for the switch name. The <strong>–sudo</strong> option will decide if installation should be performed with sudo. If the installation is successful, the switch is created and automatically set as the default switch, unless <strong>–no-set</strong> is specified.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="n">build</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Directory where GnuCOBOL should be installed</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--no-set</span></code>   Do not set this directory as the current one</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--sudo</span></code>   Use sudo for ‘make install’</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--switch</span> <span class="pre">SWITCH</span></code>   Name of switch to add</p></li>
+</ul>
+</section>
+<section id="main-exe-switch-env">
+<h2>main.exe switch env<a class="headerlink" href="#main-exe-switch-env" title="Permalink to this headline"></a></h2>
+<p>Generate commands to set environment variables to use the specified switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command generates a list of command to set environment variables for an existing switch.</p>
+<p>It is usually used as:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">#</span> <span class="n">eval</span> <span class="o">$(</span><span class="n">superbol</span> <span class="n">env</span><span class="o">)</span>
+<span class="o">#</span> <span class="n">cobc</span> <span class="o">--</span><span class="n">version</span>
+</pre></div>
+</div>
+<p>The <strong>–switch SWITCH</strong> option can be used to choose a different switch from the default one. SWITCH should match a sub-string of a switch name. <strong>–last</strong> can be used to select the most recent switch.</p>
+<p>The <strong>–global</strong> option can be used to generate a file <strong>$HOME/.config/superbol/env</strong> that can be loaded from shell init scripts, using a symlink to point PATH and LD_LIBRARY_PATH to the current switch at any time. Changing the current switch will then automatically redirect cobc to that new switch.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="n">env</span> <span class="nc">SWITCH</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SWITCH</span></code>   Switch to use, instead of current</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--global</span></code>   Use global configuration for default switch</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--last</span></code>   Use the latest imported switch</p></li>
+</ul>
+</section>
+<section id="main-exe-switch-import">
+<h2>main.exe switch import<a class="headerlink" href="#main-exe-switch-import" title="Permalink to this headline"></a></h2>
+<p>Import existing GnuCOBOL installations as switches</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command will scan the directories, looking for <strong>gnucobol-*</strong> folders with GnuCOBOL installed, and add them as switches. With no argument, it scans the default installation directory.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="n">import</span> <span class="nc">DIRS</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIRS</span></code>   Directories to scan</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--clear</span></code>   Clear the list before importing</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--no-set</span></code>   Do not set the last imported directory as the current one</p></li>
+</ul>
+</section>
+<section id="main-exe-switch-list">
+<h2>main.exe switch list<a class="headerlink" href="#main-exe-switch-list" title="Permalink to this headline"></a></h2>
+<p>List known switches</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command list existing switches.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="kt">list</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+</section>
+<section id="main-exe-switch-set">
+<h2>main.exe switch set<a class="headerlink" href="#main-exe-switch-set" title="Permalink to this headline"></a></h2>
+<p>Set the current default switch</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command sets the current default switch.</p>
+<p><strong>ABOUT SWITCHES</strong></p>
+<p>Switches are used to easily handle multiple GnuCOBOL installations. The section <strong>[switches]</strong> in the user configuration file <strong>$HOME/.config/superbol/config.toml</strong> contains several variables:</p>
+<ul>
+<li><ul class="simple">
+<li><p>‘dir’</p></li>
+</ul>
+<p>The directory where installations should be performed, and switches imported from.</p>
+</li>
+<li><ul class="simple">
+<li><p>‘current’</p></li>
+</ul>
+<p>The current switch name to use by default</p>
+</li>
+<li><ul class="simple">
+<li><p>‘list’</p></li>
+</ul>
+<p>The list of known switches, with the corresponding installation directory</p>
+</li>
+<li><ul class="simple">
+<li><p>‘num’</p></li>
+</ul>
+<p>A counter used to name switches</p>
+</li>
+</ul>
+<p>Switches can be created, imported and used using the following commands:</p>
+<ul class="simple">
+<li><p><strong>superbol env [SWITCH] [–last] [–global]</strong>
+Output a list of shell commands to set the environment variables to use a specific switch</p></li>
+<li><p><strong>superbol import [DIRS] [–clear] [–no-set]</strong>
+Scan directories to detect GnuCOBOL installations, and created associated switches</p></li>
+<li><p><strong>superbol add DIR [–switch SWITCH] [–no-set]</strong>
+Add a specific GnuCOBOL installation directory as a switch</p></li>
+<li><p><strong>superbol build [DIR] [–sudo] [–switch SWITCH] [–no-set]</strong>
+From inside GnuCOBOL sources, configure, build and install and add the corresponding switch</p></li>
+<li><p><strong>superbol list</strong>
+List known switches</p></li>
+<li><p><strong>superbol set [SWITCH] [–last]</strong>
+Set the current default switch</p></li>
+</ul>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">switch</span> <span class="n">set</span> <span class="nc">SWITCH</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">SWITCH</span></code>   Switch to use</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--last</span></code>   Use the latest imported switch</p></li>
 </ul>
 </section>
 <section id="main-exe-texi2rst">

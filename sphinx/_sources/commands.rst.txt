@@ -10,6 +10,9 @@ Common arguments to all sub-commands:
 
 Overview of sub-commands::
   
+  env
+    Generate commands to set environment variables to use the specified switch
+  
   indent file
     Indentation
   
@@ -28,8 +31,105 @@ Overview of sub-commands::
   snapshot
     Manage environment snapshots
   
+  switch
+    Print current switch
+  
+  switch add
+    Add a directory as a switch
+  
+  switch build
+    Configure, build, install GnuCOBOL and add a switch
+  
+  switch env
+    Generate commands to set environment variables to use the specified switch
+  
+  switch import
+    Import existing GnuCOBOL installations as switches
+  
+  switch list
+    List known switches
+  
+  switch set
+    Set the current default switch
+  
   texi2rst
     build .texi documentation from gnucobol-docs
+
+
+main.exe env
+~~~~~~~~~~~~~~
+
+Generate commands to set environment variables to use the specified switch
+
+
+
+**DESCRIPTION**
+
+
+This command generates a list of command to set environment variables for an existing switch.
+
+It is usually used as:
+::
+
+  # eval $(superbol env)
+  # cobc --version
+
+
+The **--switch SWITCH** option can be used to choose a different switch from the default one. SWITCH should match a sub-string of a switch name. **--last** can be used to select the most recent switch.
+
+The **--global** option can be used to generate a file **$HOME/.config/superbol/env** that can be loaded from shell init scripts, using a symlink to point PATH and LD_LIBRARY_PATH to the current switch at any time. Changing the current switch will then automatically redirect cobc to that new switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe env SWITCH [OPTIONS]
+
+Where options are:
+
+
+* :code:`SWITCH`   Switch to use, instead of current
+
+* :code:`--global`   Use global configuration for default switch
+
+* :code:`--last`   Use the latest imported switch
 
 
 main.exe indent file
@@ -319,6 +419,460 @@ Where options are:
 * :code:`--quit`   Do not run the command, just exit
 
 * :code:`--save ID`   Create snapshot ID from state
+
+
+main.exe switch
+~~~~~~~~~~~~~~~~~
+
+Print current switch
+
+
+
+**DESCRIPTION**
+
+
+This command prints the current default switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch [OPTIONS]
+
+Where options are:
+
+
+
+main.exe switch add
+~~~~~~~~~~~~~~~~~~~~~
+
+Add a directory as a switch
+
+
+
+**DESCRIPTION**
+
+
+This command adds a new known switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch add DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Directory to add
+
+* :code:`--no-set`   Do not set this directory as the current one
+
+* :code:`--switch SWITCH`   Name of switch to add
+
+
+main.exe switch build
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Configure, build, install GnuCOBOL and add a switch
+
+
+
+**DESCRIPTION**
+
+
+This command will build and install GnuCOBOL and add the corresponding switch. If DIR is specified, the installation directory will be created inside, otherwise the **dir** user option will be used. The name of the directory and the switch names are generated automatically from the GIT configuration. If **--switch SWITCH** is provided, it will be used for the switch name. The **--sudo** option will decide if installation should be performed with sudo. If the installation is successful, the switch is created and automatically set as the default switch, unless **--no-set** is specified.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch build DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Directory where GnuCOBOL should be installed
+
+* :code:`--no-set`   Do not set this directory as the current one
+
+* :code:`--sudo`   Use sudo for 'make install'
+
+* :code:`--switch SWITCH`   Name of switch to add
+
+
+main.exe switch env
+~~~~~~~~~~~~~~~~~~~~~
+
+Generate commands to set environment variables to use the specified switch
+
+
+
+**DESCRIPTION**
+
+
+This command generates a list of command to set environment variables for an existing switch.
+
+It is usually used as:
+::
+
+  # eval $(superbol env)
+  # cobc --version
+
+
+The **--switch SWITCH** option can be used to choose a different switch from the default one. SWITCH should match a sub-string of a switch name. **--last** can be used to select the most recent switch.
+
+The **--global** option can be used to generate a file **$HOME/.config/superbol/env** that can be loaded from shell init scripts, using a symlink to point PATH and LD_LIBRARY_PATH to the current switch at any time. Changing the current switch will then automatically redirect cobc to that new switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch env SWITCH [OPTIONS]
+
+Where options are:
+
+
+* :code:`SWITCH`   Switch to use, instead of current
+
+* :code:`--global`   Use global configuration for default switch
+
+* :code:`--last`   Use the latest imported switch
+
+
+main.exe switch import
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Import existing GnuCOBOL installations as switches
+
+
+
+**DESCRIPTION**
+
+
+This command will scan the directories, looking for **gnucobol-*** folders with GnuCOBOL installed, and add them as switches. With no argument, it scans the default installation directory.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch import DIRS [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIRS`   Directories to scan
+
+* :code:`--clear`   Clear the list before importing
+
+* :code:`--no-set`   Do not set the last imported directory as the current one
+
+
+main.exe switch list
+~~~~~~~~~~~~~~~~~~~~~~
+
+List known switches
+
+
+
+**DESCRIPTION**
+
+
+This command list existing switches.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch list [OPTIONS]
+
+Where options are:
+
+
+
+main.exe switch set
+~~~~~~~~~~~~~~~~~~~~~
+
+Set the current default switch
+
+
+
+**DESCRIPTION**
+
+
+This command sets the current default switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch set SWITCH [OPTIONS]
+
+Where options are:
+
+
+* :code:`SWITCH`   Switch to use
+
+* :code:`--last`   Use the latest imported switch
 
 
 main.exe texi2rst
