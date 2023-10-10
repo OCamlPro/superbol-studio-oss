@@ -11,16 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val token_types: string list
-val token_modifiers: string list
+val copybook_extensions: string list
 
-(* TODO: once we decide to fix the min OCaml version to >=4.14, we can upgrade
-   to lsp>=16, and avoid having to use an array below. *)
-val data
-  : filename: string
-  -> range: Lsp.Types.Range.t option
-  -> tokens: Cobol_parser.Outputs.tokens_with_locs
-  -> pplog: Cobol_preproc.Trace.log
-  -> comments: Cobol_preproc.Text.comments
-  -> ptree: Lsp_imports.PTREE.compilation_group
-  -> int array
+type lookup_info =
+  {
+    libname: string;
+    libpath: string list;
+  }
+
+val pp_lookup_error: lookup_info Pretty.printer
+
+val find_lib
+  : libpath:string list
+  -> [< `Alphanum | `Word ] * string
+  -> (string, lookup_info) result

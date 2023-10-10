@@ -11,176 +11,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 open Text.TYPES
 open Preproc_directives                         (* import types of directives *)
+open Preproc_trace                              (* import types of log events *)
 
 module DIAGS = Cobol_common.Diagnostics
 
-(* --- *)
-
-include Preproc_tokens                         (* include token type directly *)
-include Preproc_trace                          (* include log events *)
-
-(* --- *)
-
-type 'k srclexer = 'k Src_lexing.state * Lexing.lexbuf
-and any_srclexer =
-  | Plx: 'k srclexer -> any_srclexer                                   [@@unboxed]
-let srclex_pos (Plx (_, lexbuf)) =
-  lexbuf.Lexing.lex_curr_p
-let srclex_diags (Plx (pl, _)) =
-  Src_lexing.diagnostics pl
-let srclex_comments (Plx (pl, _)) =
-  Src_lexing.comments pl
-let source_format (Plx (pl, _)) =
-  Src_format.SF (Src_lexing.source_format pl)
-let srclex_newline_cnums (Plx (pl, _)) =
-  Src_lexing.newline_cnums pl
-
-type 'k source_line =
-  | Line: 'k srclexer * text -> 'k source_line
-
-let source_chunks_reader lexer =
-  let rec next_source_line (state, lexbuf) =
-    let state, pseutoks = lexer state lexbuf in
-    match pseutoks with
-    | [] -> next_source_line (state, lexbuf)               (* skip blank lines *)
-    | _ -> Line ((state, lexbuf), pseutoks)
-  in
-  next_source_line
-
-let fold_source_chunks lexer f pl =
-  let next_source_chunk = source_chunks_reader lexer in
-  let rec aux pl acc = match next_source_chunk pl with
-    | Line (_, [{ payload = Eof; _}]) -> acc
-    | Line (pl, text) -> f text acc |> aux pl
-  in
-  aux pl
-
-let print_source lexer ppf pl =
-  fold_source_chunks lexer (fun t () -> Pretty.print ppf "%a@." Text.pp_text t)
-    pl ()
-
-let next_source_chunk (Plx pl) =
-  let Line (pl, text) = source_chunks_reader Src_lexer.line pl in
-  Plx pl, text
-
-let print_source ppf (Plx pl) =
-  print_source Src_lexer.line ppf pl
-
-let fold_source_chunks pl f acc =
-  let rec aux pl acc = match next_source_chunk pl with
-    | _, [{ payload = Eof; _}] -> acc
-    | pl, text -> aux pl (f text acc)
-  in
-  aux pl acc
-
-(** [fold_source_lines pl ~f acc] applies [f line_number line acc] for each
-    successive line [line] of the input lexed by [pl].  [line_number] gives the
-    line number for [line] (starting at [1]).  [line] is given empty to [f] if
-    it corresponds to empty line in the input, or was a line continuation. *)
-let fold_source_lines pl ~f acc =
-  let tok_lnum tok =
-    (* On source text, which is NOT manipulated, we only have lexical locations,
-       so using [start_pos] is enough. *)
-    (Cobol_common.Srcloc.start_pos ~@tok).pos_lnum
-  in
-  let spit_empty_lines ~until_lnum cur_lnum acc =
-    let rec aux cur_lnum acc =
-      if cur_lnum < until_lnum
-      then aux (succ cur_lnum) (f cur_lnum [] acc)
-      else acc
-    in
-    aux cur_lnum acc
-  in
-  let rec spit_chunk chunk (acc, cur_lnum, cur_prefix) =
-    match
-      Cobol_common.Basics.LIST.split_at_first ~prefix:`Same ~where:`Before
-        (fun tok -> tok_lnum tok > cur_lnum) chunk
-    with
-    | Error () ->                                    (* still on the same line *)
-        (acc, cur_lnum, cur_prefix @ chunk)
-    | Ok (prefix, []) ->           (* should not happen (in case, just append) *)
-        (acc, cur_lnum, cur_prefix @ prefix)
-    | Ok (prefix, (tok :: _ as suffix)) ->                (* terminating a line *)
-        let acc = f cur_lnum (cur_prefix @ prefix) acc in
-        let new_lnum = tok_lnum tok in
-        let acc = spit_empty_lines ~until_lnum:new_lnum (succ cur_lnum) acc in
-        spit_chunk suffix (acc, new_lnum, [])
-  in
-  let acc, last_lnum, tail = fold_source_chunks pl spit_chunk (acc, 1, []) in
-  match tail with                       (* fold on the last line upon exit... *)
-  | [] | { payload = Eof; _ } :: _ -> acc (* ... if non-empty *)
-  | _ -> f last_lnum tail acc
-
-(* --- *)
-
-let with_source_format
-  : 'k Src_format.source_format with_loc -> (any_srclexer as 'x) -> 'x
-  = fun format ((Plx (s, lexbuf)) as pl) ->
-    if Src_format.equal (Src_lexing.source_format s) ~&format
-    then pl
-    else match Src_lexing.change_source_format s format with
-      | Ok s -> Plx (s, lexbuf)
-      | Error s -> Plx (s, lexbuf)
-
-let make_srclex make_lexing ?filename ~source_format input =
-  let Src_format.SF source_format = source_format in
-  (* Be sure to provide position informations *)
-  let lexbuf = make_lexing ?with_positions:(Some true) input in
-  Option.iter (Lexing.set_filename lexbuf) filename;
-  Plx (Src_lexing.init_state source_format, lexbuf)
-
-let srclex_from_string = make_srclex Lexing.from_string
-let srclex_from_channel = make_srclex Lexing.from_channel
-let srclex_from_file ~source_format filename : any_srclexer =
-  srclex_from_string ~source_format ~filename (EzFile.read_file filename)
-
-(** Note: If given, assumes [position] corresponds to the beginning of the
-    input, which {e must} also be at the beginning of a line.  If absent,
-    restarts from first position.  File name is kept from the previous input. *)
-let srclex_restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
-  let lexbuf = make_lexing ?with_positions:(Some true) input in
-  let pos_fname = match position with
-    | Some p ->
-        Lexing.set_position lexbuf p;
-        p.Lexing.pos_fname
-    | None ->
-        prev_lexbuf.Lexing.lex_curr_p.pos_fname
-  in
-  Lexing.set_filename lexbuf pos_fname;
-  Plx (s, lexbuf)
-
-let srclex_restart_on_string = srclex_restart Lexing.from_string
-let srclex_restart_on_channel = srclex_restart Lexing.from_channel
-let srclex_restart_on_file ?position filename =
-  srclex_restart_on_string ?position (EzFile.read_file filename)
-
-
 (* --- Compiler Directives -------------------------------------------------- *)
-
-(* SOURCE FORMAT *)
-
-let cdir_source_format ~dialect format =
-  match Src_format.decypher ~dialect ~&format with
-  | Ok (SF sf) ->
-      DIAGS.some_result @@ LexDirSource (sf &@<- format)
-  | Error (`SFUnknown f) ->
-      DIAGS.no_result
-        ~diags:(DIAGS.Set.one @@
-                DIAGS.One.error ~loc:~@format "Unknown@ source@ format@ `%s'" f)
 
 (* COPY/REPLACING *)
 
 let concat_strings = Cobol_common.Srcloc.concat_strings_with_loc
 let lift_textword w = TextWord ~&w &@<- w
-
-(* TODO: raise (a) dedicated exception(s), and catch it in the preprocessor
-   engine to try and continue pre-processing. *)
 
 let nonempty_words words : _ result = match ~&words with
   | [] ->
@@ -551,177 +396,6 @@ let apply_replacing k repl log =
 
 (* --- *)
 
-type state =
-  | AllowAll
-  | AfterControlDivisionHeader
-  | AfterSubstitSectionHeader
-  | AllowReplace
-  | ForbidReplace
-let initial_state = AllowAll
-
-type preproc_phrase =
-  | Copy of phrase
-  | Replace of phrase
-  | Header of tracked_header * phrase
-and phrase =
-  {
-    prefix: text;
-    phrase: text;
-    suffix: text;
-  }
-and tracked_header =
-  | ControlDivision
-  | SubstitutionSection
-  | IdentificationDivision
-
-(** [find_phrase first_word ~prefix text] looks for a phrase start starts with
-    [first_word] and terminates with a period in [text].  If [prefix = `Rev] and
-    upon success, the prefix is reveresed in the returned structure. *)
-let find_phrase first_word ?(prefix = `Same) text : _ result =
-  let split_at_first = Cobol_common.Basics.LIST.split_at_first in
-  let split_before_word =
-    split_at_first ~prefix ~where:`Before (Text.textword_eqp ~eq:first_word)
-  and split_after_period =
-    split_at_first ~prefix:`Same ~where:`After (Text.textword_eqp ~eq:".")
-  in
-  match split_before_word text with
-  | Error () ->
-      Error `NoneFound
-  | Ok (prefix, phrase) ->
-      match split_after_period phrase with
-      | Error () ->
-          Error `MissingPeriod
-      | Ok (phrase, suffix) ->
-          Ok { prefix; phrase; suffix }
-
-(** [find_full_phrase words ~search_deep ~try_hard ~prefix text] looks for a
-    pharse comprised of all words in [words] and termiates with a period in
-    [text].  If [prefix = `Rev] and upon success, the prefix is reveresed in the
-    returned structure.
-
-    - [search_deep] indicates whether the phrase may not start at the first
-      word;
-
-    - [try_hard] indicates whether the phrase may be preceded by incomplete
-      prefixes.
-*)
-let find_full_phrase all_words
-    ?(prefix = `Same) ?(search_deep = false) ?(try_hard = false)
-  : text -> _ result =
-  let all_words = all_words @ ["."] in
-  let split_at_first = Cobol_common.Basics.LIST.split_at_first in
-  let split_before_word first_word =
-    split_at_first ~prefix ~where:`Before (Text.textword_eqp ~eq:first_word)
-  and split_after_period =
-    split_at_first ~prefix:`Same ~where:`After (Text.textword_eqp ~eq:".")
-  and check_phrase =
-    let rec aux words phrase = match words, phrase with
-      | [], _ -> Ok ()
-      | _ :: _, [] -> Error `MissingText
-      | w :: wtl, w' :: w'tl when Text.textword_eqp ~eq:w w' -> aux wtl w'tl
-      | _ -> Error `NoneFound
-    in
-    aux all_words
-  in
-  let rec try_from text : _ result =
-    match split_before_word (List.hd all_words) text with
-    | Error () ->
-        Error `NoneFound
-    | Ok (prefix_text, phrase) ->
-        try_from_first_word prefix_text phrase
-  and try_from_first_word prefix_text phrase =
-    match split_after_period phrase with
-    | Error () ->
-        Error `MissingPeriod
-    | Ok (phrase, suffix) ->
-        match check_phrase phrase with
-        | Ok () ->
-            Ok { prefix = prefix_text; phrase; suffix }
-        | Error `MissingText as e ->
-            e
-        | Error `NoneFound as e when not try_hard ->
-            e
-        | Error `NoneFound ->
-            (* Note: even when trying hard, we make the simplifying
-               assumption the given words allow us to continue with `suffix`
-               and not from the second word in `phrase`. *)
-            match try_from suffix, prefix with
-            | Error _ as e, _ ->
-                e
-            | Ok phrase, `Same ->
-                Ok { phrase with prefix = prefix_text @ phrase.prefix }
-            | Ok phrase, `Rev ->
-                Ok { phrase with prefix = phrase.prefix @ prefix_text }
-  in
-  if search_deep
-  then try_from
-  else try_from_first_word []
-
-(** [find_preproc_phrase ~prefix state text] attempts to find a phrase in [text]
-    that is relevant in preprocessing state [state].  Returned phrases have a
-    [prefix] text that is reversed when [prefix = `Rev]. *)
-let find_preproc_phrase ?prefix =
-  (* NB: This is a somewhat hackish and manual encoding of a state machine, used
-     to only allow a single REPLACE wihtin the SUBSTITUTION SECTION of the
-     CONTROL DIVISION; if such a REPLACE is present, then it must be the only
-     one in the compilation group.
-
-     NOTE: for now the aforementiones division and section headers are detected
-     only when they start at the very begining of the given text.  This seems to
-     be ok as long as they are preceded with a period (.), since we perform the
-     search on a sentence-by-sentence basis.
-
-     CHECKME: the SUBSTITUTION SECTION may only be allowed after or before the
-     DEFAULT SECTION. *)
-  let find_phrase = find_phrase ?prefix
-  and find_full_phrase = find_full_phrase ?prefix in
-  let find_cntrl_div_header = find_full_phrase ["CONTROL"; "DIVISION"]
-  and find_ident_div_header = find_full_phrase ["IDENTIFICATION"; "DIVISION"]
-  and find_subst_sec_header = find_full_phrase ["SUBSTITUTION"; "SECTION"] in
-  let try_replace ~next src =
-    match find_phrase "REPLACE" src with
-    | Ok repl -> Ok (Replace repl, next)
-    | Error _ as e -> e
-  in
-  let try_identification_division_header ?(next = AllowReplace) src =
-    match find_ident_div_header src with
-    | Ok x -> Ok (Header (IdentificationDivision, x), next)
-    | Error `NoneFound -> try_replace ~next src
-    | Error _ as e -> e
-  in
-  let try_control_division_header src =
-    match find_cntrl_div_header src with
-    | Ok x -> Ok (Header (ControlDivision, x), AfterControlDivisionHeader)
-    | Error `NoneFound -> try_identification_division_header src
-    | Error _ as e -> e
-  in
-  let try_substitution_section_header src =
-    match find_subst_sec_header src with
-    | Ok x -> Ok (Header (SubstitutionSection, x), AfterSubstitSectionHeader)
-    | Error `NoneFound -> try_identification_division_header src
-    | Error _ as e -> e
-  in
-  fun state src ->
-    (* Note COPY takes precedence over REPLACE, as per the ISO/IEC 2014
-       standard, 7.2 Text manipulation. *)
-    match find_phrase "COPY" src, state with
-    | Ok copy, _ ->
-        Ok (Copy copy, state)
-    | Error `MissingPeriod as e, _ ->
-        e
-    | Error `NoneFound, AllowAll ->
-        try_control_division_header src
-    | Error `NoneFound, AllowReplace ->
-        try_replace ~next:AllowReplace src
-    | Error `NoneFound, ForbidReplace ->
-        Error `NoneFound
-    | Error `NoneFound, AfterControlDivisionHeader ->
-        try_substitution_section_header src
-    | Error `NoneFound, AfterSubstitSectionHeader ->
-        try_identification_division_header ~next:ForbidReplace src
-
-(* --- *)
-
 module type ENTRY_POINTS = sig
   type 'x entry
   val replace_statement: replace_statement with_diags with_loc entry
@@ -734,7 +408,7 @@ module type PPPARSER = sig
 
   (* The incremental API. *)
   module MenhirInterpreter: MenhirLib.IncrementalEngine.INCREMENTAL_ENGINE
-    with type token = token
+    with type token = Preproc_tokens.token
 
   (* The entry point(s) to the incremental API. *)
   module Incremental: ENTRY_POINTS with type

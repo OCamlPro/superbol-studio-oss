@@ -18,6 +18,13 @@ module DIAGS = Cobol_common.Diagnostics
 
 module Make (Config: Cobol_config.T) = struct
 
+  let source_format_lexdir ~dialect format =
+    match Src_format.decypher ~dialect ~&format with
+    | Ok (SF sf) ->
+        DIAGS.some_result @@ Preproc_directives.LexDirSource (sf &@<- format)
+    | Error (`SFUnknown f) ->
+        DIAGS.error_result None ~loc:~@format "Unknown@ source@ format@ `%s'" f
+
   let safe_partial_replacing_when_src_literal ~loc =
     Config.safe_partial_replacing_when_src_literal#verify' ~loc:(Some loc) |>
     DIAGS.map_result (function Some s -> s = `Safe | None -> false)
@@ -25,9 +32,9 @@ module Make (Config: Cobol_config.T) = struct
   let replacing' ?repl_dir repl_from repl_to =
     match repl_dir, ~&repl_from with
     | None, (`PseudoText src | `Alphanum src) ->
-        Preproc.replacing (src &@<- repl_from) repl_to
+        Text_processor.replacing (src &@<- repl_from) repl_to
     | Some repl_dir, `PseudoText src ->
-        Preproc.replacing ~partial:{ repl_dir; repl_strict = false }
+        Text_processor.replacing ~partial:{ repl_dir; repl_strict = false }
           (src &@<- repl_from) repl_to
     | Some repl_dir, `Alphanum src ->
         let { result = repl_strict; diags } =
@@ -46,17 +53,16 @@ module Make (Config: Cobol_config.T) = struct
               DIAGS.result false
         in
         DIAGS.with_more_diags ~diags @@
-        Preproc.replacing ~partial:{ repl_dir; repl_strict }
+        Text_processor.replacing ~partial:{ repl_dir; repl_strict }
           (src &@<- repl_from) repl_to
 
   let filter_map_4_list_with_diags'
     : 'a option with_diags with_loc list -> 'a with_loc list with_diags = fun l ->
-    List.fold_left begin fun (result, diags) { payload = { result = r; diags = d };
-                                               loc } ->
-      (match r with None -> result | Some r -> (r &@ loc) :: result),
-      DIAGS.Set.union diags d
-    end ([], DIAGS.Set.none) l |>
+    List.fold_left
+      begin fun (result, diags) { payload = { result = r; diags = d }; loc } ->
+        (match r with None -> result | Some r -> (r &@ loc) :: result),
+        DIAGS.Set.union diags d
+      end ([], DIAGS.Set.none) l |>
     fun (result, diags) -> { result = List.rev result; diags }
-
 
 end

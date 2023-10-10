@@ -33,7 +33,7 @@ module TYPES: sig
   and copy_event_status =
     | CopyDone of string
     | CyclicCopy of string
-    | MissingCopy of Copybook.lib_not_found_info
+    | MissingCopy of Cobol_common.Copybook.lookup_info
 
   type log
 end
@@ -61,7 +61,7 @@ val cyclic_copy
   -> log -> log
 val missing_copy
   : loc: Cobol_common.srcloc
-  -> info: Copybook.lib_not_found_info
+  -> info: Cobol_common.Copybook.lookup_info
   -> log -> log
 val new_replace
   : loc: Cobol_common.srcloc

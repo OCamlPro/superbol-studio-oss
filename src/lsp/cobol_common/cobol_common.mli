@@ -13,6 +13,7 @@
 
 module Basics = Basics
 module Srcloc = Srcloc
+module Copybook = Copybook
 module Diagnostics = Diagnostics
 module Visitor = Visitor
 module Behaviors = Behaviors

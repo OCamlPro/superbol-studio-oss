@@ -39,7 +39,7 @@ module TYPES = struct
   and copy_event_status =
     | CopyDone of string
     | CyclicCopy of string
-    | MissingCopy of Copybook.lib_not_found_info
+    | MissingCopy of Cobol_common.Copybook.lookup_info
 
   type log = log_entry list
 end

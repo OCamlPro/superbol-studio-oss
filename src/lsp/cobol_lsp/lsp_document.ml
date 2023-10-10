@@ -60,9 +60,9 @@ module TYPES = struct
       doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
       doc_cache_langid: string;
       doc_cache_version: int;
-      doc_cache_pplog: Cobol_preproc.log;
+      doc_cache_pplog: Cobol_preproc.Trace.log;
       doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
-      doc_cache_comments: Cobol_preproc.comments;
+      doc_cache_comments: Cobol_preproc.Text.comments;
       doc_cache_parsed: (PTREE.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
     }

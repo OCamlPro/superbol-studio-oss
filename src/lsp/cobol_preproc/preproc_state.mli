@@ -11,17 +11,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val copybook_extensions: string list
+open Text.TYPES
 
-type lib_not_found_info =
+(** {1 Preprocessor state}
+
+    This state is used to track some preprocessing-related divisions, like the
+    `CONTROL DIVISION` in the GCOS dialect. *)
+
+type state
+type t = state
+
+type preproc_phrase =
+  | Copy of phrase
+  | Replace of phrase
+  | Header of tracked_header * phrase
+and phrase =
   {
-    libname: string;
-    libpath: string list;
+    prefix: text;
+    phrase: text;
+    suffix: text;
   }
+and tracked_header =
+  | ControlDivision
+  | SubstitutionSection
+  | IdentificationDivision
 
-val lib_not_found_error: (Pretty.delayed -> 'a) -> lib_not_found_info -> 'a
-
-val find_lib
-  : libpath:string list
-  -> [< `Alphanum | `Word ] * string
-  -> (string, lib_not_found_info) result
+val initial: state
+val find_preproc_phrase
+  : ?prefix:[ `Rev | `Same ]
+  -> state
+  -> text
+  -> (preproc_phrase * state,
+      [> `MissingPeriod | `MissingText | `NoneFound ]) result

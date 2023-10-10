@@ -16,6 +16,11 @@ open Cobol_common.Diagnostics.TYPES
 
 module Make (Config: Cobol_config.T) : sig
 
+  val source_format_lexdir
+    : dialect:Cobol_config.dialect
+    -> string with_loc
+    -> Preproc_directives.lexing_directive option with_diags
+
   val replacing'
     : ?repl_dir:Preproc_directives.replacing_direction
     -> [< `Alphanum of Text.pseudotext

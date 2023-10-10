@@ -232,13 +232,13 @@ let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
   let find_hovered_pplog_event pplog =
     List.find_opt begin function
-      | Cobol_preproc.Replacement { matched_loc = loc; _ }
-      | Cobol_preproc.FileCopy { copyloc = loc; _ } ->
+      | Cobol_preproc.Trace.Replace _
+      | LexDir _ ->
+          false
+      | Replacement { matched_loc = loc; _ }
+      | FileCopy { copyloc = loc; _ } ->
           Lsp_position.is_in_lexloc params.position
             (Cobol_common.Srcloc.lexloc_in ~filename loc)
-      | Cobol_preproc.Replace _
-      | Cobol_preproc.LexDir _ ->
-          false
     end (Cobol_preproc.Trace.events pplog)
   in
   let hover_markdown ~loc value =

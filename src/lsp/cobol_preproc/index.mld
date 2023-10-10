@@ -3,7 +3,8 @@
 Superbol is a set of utilities for COBOL developers,
 that can be selected by sub-commands.
 
-This package contains all the preprocessing logic for cobol, as well as the lexing logic.
+This package contains a COBOL pre-processor that reads source text in
+many formats (fixed-width, free, etc), and perform copybook inclusion
+as well as text manipulations.
 
 The entry point of this library is the module: {!Cobol_preproc}.
-
