@@ -13,15 +13,15 @@
 
 val copybook_extensions: string list
 
-type lib_not_found_info =
+type lookup_info =
   {
     libname: string;
     libpath: string list;
   }
 
-val lib_not_found_error: (Pretty.delayed -> 'a) -> lib_not_found_info -> 'a
+val pp_lookup_error: lookup_info Pretty.printer
 
 val find_lib
   : libpath:string list
   -> [< `Alphanum | `Word ] * string
-  -> (string, lib_not_found_info) result
+  -> (string, lookup_info) result

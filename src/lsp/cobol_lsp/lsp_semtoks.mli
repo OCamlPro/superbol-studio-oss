@@ -20,7 +20,7 @@ val data
   : filename: string
   -> range: Lsp.Types.Range.t option
   -> tokens: Cobol_parser.Outputs.tokens_with_locs
-  -> pplog: Cobol_preproc.log
-  -> comments: Cobol_preproc.comments
+  -> pplog: Cobol_preproc.Trace.log
+  -> comments: Cobol_preproc.Text.comments
   -> ptree: Lsp_imports.PTREE.compilation_group
   -> int array

@@ -13,7 +13,7 @@
 
 open Ez_file.V1
 
-type lib_not_found_info =
+type lookup_info =
   {
     libname: string;
     libpath: string list;
@@ -32,21 +32,22 @@ let find_lib ~libpath libname : _ result =
     | [] ->
         Error { libname = base; libpath }
     | suff :: tl ->
-        try Ok (EzFile.find_in_path libpath (base ^ suff)) with
-        | Not_found -> try_file base tl
+        try Ok (EzFile.find_in_path libpath (base ^ suff))
+        with Not_found -> try_file base tl
   in
   match libname with
+  | `Alphanum, w ->
+      try_file w [""]
   | `Word, w ->
-      begin match try_file w libfile_extensions with
-        | Ok lib -> Ok lib
-        | Error _ -> match try_file (String.lowercase_ascii w) libfile_extensions with
+      match try_file w libfile_extensions with
+      | Ok lib -> Ok lib
+      | Error _ ->
+          match try_file (String.lowercase_ascii w) libfile_extensions with
           | Ok lib -> Ok lib
-          | Error err -> Error {err with libname = w; }
-      end
-  | `Alphanum, w -> try_file w [""]
+          | Error err -> Error { err with libname = w }
 
-let lib_not_found_error k { libname; libpath } =
+let pp_lookup_error ppf { libname; libpath } =
   (* TODO: `note addendum about search path *)
-  Pretty.delayed_to k
+  Pretty.print ppf
     "@[Library@ `%s'@ not@ found@ in@ search@ path@ (search@ path:@ @[%a@])@]"
     libname Pretty.path libpath

@@ -321,7 +321,8 @@ and do_replace lp rev_prefix repl suffix =
 and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
     loc { libname; cbkname } =
   let libpath = match ~&?cbkname with None -> libpath | Some (_, d) -> [d] in
-  let text, diags, pplog = match Copybook.find_lib ~libpath ~&libname with
+  let text, diags, pplog =
+    match Cobol_common.Copybook.find_lib ~libpath ~&libname with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         (* TODO: `note addendum *)
         [],
@@ -338,7 +339,8 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
         [],
-        Copybook.lib_not_found_error (DIAGS.Acc.error lp.diags ~loc "%t") lnf,
+        DIAGS.Acc.error lp.diags ~loc "%a"
+          Cobol_common.Copybook.pp_lookup_error lnf,
         Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
   in
   text, with_diags_n_pplog lp diags pplog
@@ -430,7 +432,7 @@ let lex_file ~source_format ?(ppf = default_oppf) =
 
 let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
   Cobol_common.do_unit begin fun (module DIAGS) libname ->
-    match Copybook.find_lib ~libpath libname with
+    match Cobol_common.Copybook.find_lib ~libpath libname with
     | Ok filename ->
         let source_format =
           DIAGS.grab_diags @@
@@ -438,7 +440,7 @@ let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
         Src_reader.print_lines ppf @@
         Src_reader.from_file ~source_format filename
     | Error lnf ->
-        Copybook.lib_not_found_error (DIAGS.error "%t") lnf
+        DIAGS.error "%a" Cobol_common.Copybook.pp_lookup_error lnf
   end
 
 let fold_source_lines ~source_format ?epf ~f =

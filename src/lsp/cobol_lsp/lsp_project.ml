@@ -109,7 +109,7 @@ let config_from_dialect_name ?(strict = false) dialect =
     Error (DIAGS.Set.error "Unknown dialect: %s" e)
 
 let default_libpath = [RelativeToProjectRoot "."]
-let default_copybook_extensions = Cobol_preproc.Copybook.copybook_extensions
+let default_copybook_extensions = Cobol_common.Copybook.copybook_extensions
 let default_copybook_if_no_extension = true
 
 let default ~rootdir = {

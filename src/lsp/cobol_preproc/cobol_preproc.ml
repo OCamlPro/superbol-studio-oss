@@ -19,17 +19,14 @@ module Src_format = Src_format
 
   "Text" refers to the source after manipulations by preprocessor statements. *)
 
-type text = Text.text
-type comments = Text.comments
 module Text = Text
 module Text_printer = Text_printer
 
 (** {1 Miscellaneous support modules}  *)
 
 module Src_overlay = Src_overlay
-module Copybook = Copybook
 module Trace = Preproc_trace
-include Trace.TYPES
+module Directives = Preproc_directives
 
 (** {1 Main entry points for the processor itself} *)
 

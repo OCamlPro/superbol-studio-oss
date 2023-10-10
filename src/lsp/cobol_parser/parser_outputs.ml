@@ -21,8 +21,8 @@ type tokens_with_locs = Grammar_tokens.token with_loc list
 type artifacts =
   {
     tokens: tokens_with_locs Lazy.t;
-    pplog: Cobol_preproc.log;
-    comments: Cobol_preproc.comments;
+    pplog: Cobol_preproc.Trace.log;
+    comments: Cobol_preproc.Text.comments;
   }
 
 (** The output of parsing functions depends on its memorization abilities:
