@@ -16,6 +16,9 @@ open Ezcmd.V2
 open EZCMD.TYPES
 *)
 
+open Ez_file.V1
+open EzFile.OP
+
 let public_subcommands = [
   Command_pp.cmd ;
   Command_lsp.cmd;
@@ -24,11 +27,23 @@ let public_subcommands = [
   Command_indent_file.cmd;
   Command_json_vscode.cmd;
   Command_snapshot.cmd;
+
+  Command_switch.cmd;
+  Command_switch.env_cmd; (* env *)
+  Command_switch.switch_env_cmd;
+  Command_switch.import_cmd;
+  Command_switch.list_cmd;
+  Command_switch.set_cmd;
+  Command_switch.add_cmd;
+  Command_switch.build_cmd;
 ]
 
 let main ?style_renderer ?utf_8 () =
-  Printf.eprintf
-    "SuperBOL, Copyright OCamlPro. https://get-superbol.com. Affero GPL version.\n";
+
+  (* Print a banner only if ~/.config/superbol/NO-BANNER is absent *)
+  if not @@ Sys.file_exists ( Misc.config_dir // "NO-BANNER" ) then
+    Printf.eprintf
+      "SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.\n%!";
   Pretty.init_formatters ?style_renderer ?utf_8 ();
   Globals.MAIN.main
     (* ~on_error:Cobol_common.keep_temporary_files *)

@@ -203,6 +203,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (vscode-json (= version))
+   (ez_toml (= version))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
    (ez_api ( >= 2.0 ))
@@ -429,6 +430,23 @@
  (depends
    (ocaml (>= 4.14.0))
    (autofonce_lib ( >= 0.8 ))
+   ppx_inline_test
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name ez_toml)
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
+ (depends
+   (ocaml (>= 4.14.0))
+   ocplib_stuff
+   (menhirLib ( > 2019 ))
+   (ez_file ( >= 0.3 ))
+   (ISO8601 ( >= 0.2 ))
    ppx_inline_test
    ppx_expect
    odoc

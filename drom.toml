@@ -77,6 +77,7 @@ share-dirs = ["share"]
 dune = "2.8.0"
 dot-gitignore-trailer = """
 /dist
+/_*
 /node_modules
 /yarn-error.log
 /yarn.lock
@@ -194,4 +195,8 @@ dir = "src/lsp/cobol_typeck"
 
 [[package]]
 dir = "src/testing/superbol_testutils"
+# edit 'src/testing/superbol_testutils/package.toml' for package-specific options
+
+[[package]]
+dir = "src/vendor/ez_toml"
 # edit 'src/testing/superbol_testutils/package.toml' for package-specific options
