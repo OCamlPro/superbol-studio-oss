@@ -11,9 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Common
+open Numericals
 open Terms
 open Operands
-
 
 (* -------------------- IDENTIFICATION DIVISION (EXTRA) -------------------- *)
 
@@ -100,6 +101,7 @@ and alphabet_specification =                      (* At least one is required *)
     alphanumeric: name with_loc option;
     national: name with_loc option;
   }
+
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SPECIAL-NAMES PARAGRAPH *)
 and special_names_paragraph =
   special_names_clause with_loc list
@@ -357,7 +359,10 @@ and file_portion =
     file_portion_position: integer option;
   }
 
-let pp_file_portion ppf { file_portion_name = fpn; file_portion_position = fpp } =
+(* -------------------------------------------------------------------------- *)
+
+let pp_file_portion ppf { file_portion_name = fpn;
+                          file_portion_position = fpp } =
   pp_with_loc pp_integer ppf fpn;
   Option.iter (Fmt.pf ppf " POSITION %a" pp_integer) fpp
 
@@ -369,9 +374,8 @@ let pp_area_source_opt ppf = function
   | AreaSourceRecord -> Fmt.pf ppf " RECORD"
   | AreaSourceSortMerge -> Fmt.pf ppf " SORT"
 
-let pp_same_area_clause ppf
-  { same_area_source = s; same_area_file_name = fn; same_area_file_names = fns }
-=
+let pp_same_area_clause ppf { same_area_source = s; same_area_file_name = fn;
+                              same_area_file_names = fns } =
   Fmt.pf ppf "SAME%a %a %a"
     pp_area_source_opt s
     pp_name' fn

@@ -11,42 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
-open Cobol_common.Srcloc.INFIX
-
 (** Parse tree: raw AST with pictures represented using plain, unchecked
     strings. *)
 
-module Misc_sections =
-  Misc_descr
-module Picture_type = struct
-  type picture = string with_loc
-  let pp_picture fmt str = Pretty.string fmt (~&str)
-  let show_picture = Pretty.to_string "%a" pp_picture
-  let compare_picture = Cobol_common.Srcloc.compare_with_loc String.compare
-end
-module Data_sections =
-  Raw.Data_sections (Picture_type)
-module Data_division =
-  Raw.Data_division (Data_sections)
-module Statements =
-  Raw.Statements
-module Proc_division =
-  Raw.Proc_division (Statements)
-module Compilation_group =
-  Raw.Compilation_group (Misc_sections) (Data_division) (Proc_division)
-
-include Compilation_group
-include Proc_division
-include Statements
-include Data_division
-include Data_sections
-include Picture_type
-include Misc_sections
-
+include Common
+include Numericals
 include Terms
+include Misc_sections
 include Data_descr
-include Misc_descr
+include Data_sections
+include Data_division
 include Operands
-include Simple_statements
-include Branching_statements
+include Statements
+include Proc_division
+include Compilation_group

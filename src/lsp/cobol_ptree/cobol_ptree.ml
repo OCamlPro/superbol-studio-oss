@@ -13,5 +13,4 @@
 
 include PTree_types
 module Visitor = Visitor
-
 module Terms_helpers = Terms_helpers

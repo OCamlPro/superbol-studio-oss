@@ -401,11 +401,11 @@ let%expect_test "formatting-request-whole-program" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    raw_misc_sections_visitor.ml:0:
-      (Cobol_ptree__Raw_misc_sections_visitor.fold_select_clause): missing
-      visitor implementation
-    raw_data_sections_visitor.ml:0:
-      (Cobol_ptree__Raw_data_sections_visitor.fold_file_section): missing visitor
+    misc_sections_visitor.ml:0:
+      (Cobol_ptree__Misc_sections_visitor.fold_select_clause): missing visitor
+      implementation
+    data_sections_visitor.ml:0:
+      (Cobol_ptree__Data_sections_visitor.fold_file_section): missing visitor
       implementation
     {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     >> Warning: Source format `auto` is not supported yet, using `fixed`

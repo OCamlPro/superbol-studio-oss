@@ -11,18 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Numericals
+open Common
+open Numericals
 
-type lexloc = Cobol_common.Srcloc.lexloc
-type srcloc = Cobol_common.Srcloc.srcloc
-
-type 'a with_loc = 'a Cobol_common.Srcloc.with_loc =
-  { payload: 'a; loc: srcloc [@compare fun _ _ -> 0]; }
-    [@@deriving ord]
-let pp_with_loc = Cobol_common.Srcloc.pp_with_loc
-
-type name = string
-[@@deriving ord]
+type name = string                                              [@@deriving ord]
 let pp_name = Pretty.string
 
 let pp_name' ppf { payload; _ } = pp_name ppf payload

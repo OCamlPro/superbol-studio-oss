@@ -11,11 +11,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Terms_visitor
-include Operands_visitor
-include Misc_sections_visitor
-include Data_sections_visitor
-include Data_division_visitor
-include Statements_visitor
-include Proc_division_visitor
-include Compilation_group_visitor
+type lexloc = Cobol_common.Srcloc.lexloc
+type srcloc = Cobol_common.Srcloc.srcloc
+
+type 'a with_loc = 'a Cobol_common.Srcloc.with_loc =
+  {
+    payload: 'a;
+    loc: srcloc [@compare fun _ _ -> 0];
+  }
+[@@deriving ord]
+
+let pp_with_loc = Cobol_common.Srcloc.pp_with_loc

@@ -13,6 +13,8 @@
 
 (** Potentially branching statements *)
 
+open Common
+open Numericals
 open Terms
 open Operands
 open Simple_statements

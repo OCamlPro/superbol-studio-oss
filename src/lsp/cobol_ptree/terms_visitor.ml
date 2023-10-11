@@ -11,9 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Common
+open Numericals
+open Terms
+
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
-open Terms
 
 (* --- *)
 

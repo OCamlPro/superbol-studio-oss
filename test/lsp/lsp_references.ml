@@ -56,8 +56,8 @@ let%expect_test "simple-references-requests" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    raw_data_sections_visitor.ml:0:
-      (Cobol_ptree__Raw_data_sections_visitor.fold_data_clause): partial visitor
+    data_sections_visitor.ml:0:
+      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
       implementation
     {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-def (line 5, character 16):

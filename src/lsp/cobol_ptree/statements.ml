@@ -11,9 +11,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make_for_misc_sections = Raw_misc_sections_visitor.Make
-module Make_for_data_sections = Raw_data_sections_visitor.Make
-module Make_for_data_division = Raw_data_division_visitor.Make
-module Make_for_statements = Raw_statements_visitor.Make
-module Make_for_proc_division = Raw_proc_division_visitor.Make
-module Make_for_compilation_group = Raw_compilation_group_visitor.Make
+include Simple_statements
+include Branching_statements

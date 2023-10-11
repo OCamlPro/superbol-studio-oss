@@ -258,7 +258,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_name' paragraph_name ParagraphName
       (*|> Visitor.do_children*)
       |> fold_integer_opt self paragraph_segment
-      |> fold_list ~fold:(fun v -> v#continue_with_statements') self paragraph_sentences
+      |> fold_list ~fold:fold_statements' self paragraph_sentences
       |> Visitor.skip_children
 
     (* procedure using *)
