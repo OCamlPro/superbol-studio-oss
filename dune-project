@@ -212,7 +212,6 @@
    (cobol_lsp (= version))
    (cobol_indent (= version))
    (cobol_common (= version))
-   (cobol_ast (= version))
    ppx_inline_test
    ppx_expect
    odoc
@@ -264,7 +263,6 @@
  (depends
    (ocaml (>= 4.14.0))
    (cobol_common (= version))
-   (cobol_ast (= version))
    (ppx_deriving ( >= 5.2.1 ))
    ppx_inline_test
    ppx_expect
@@ -357,21 +355,6 @@
  )
 
 (package
- (name cobol_ast)
- (synopsis "The superbol-studio-oss project")
- (description "This is the description\nof the superbol-studio-oss OCaml project\n")
- (depends
-   (ocaml (>= 4.14.0))
-   (cobol_common (= version))
-   (ppx_deriving ( >= 5.2.1 ))
-   ppx_inline_test
-   ppx_expect
-   odoc
-   ocamlformat
-  )
- )
-
-(package
  (name cobol_indent)
  (synopsis "The superbol-studio-oss project")
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
@@ -410,8 +393,9 @@
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
    (ocaml (>= 4.14.0))
-   (cobol_parser (= version))
-   (cobol_ast (= version))
+   (cobol_ptree (= version))
+   (cobol_config (= version))
+   (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (alcotest ( >= 1 ))
    ppx_inline_test
@@ -427,10 +411,10 @@
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
    (ocaml (>= 4.14.0))
+   (cobol_ptree (= version))
    (cobol_parser (= version))
    (cobol_data (= version))
    (cobol_common (= version))
-   (cobol_ast (= version))
    (ppx_deriving ( >= 5.2.1 ))
    ppx_inline_test
    ppx_expect

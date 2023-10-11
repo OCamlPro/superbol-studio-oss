@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 (* NB: This module is not specific to COBOL; it does not really fit within
-   `cobol_ast`. *)
+   `cobol_ptree`. *)
 
 module Expression : sig
   type precedence = int

@@ -49,7 +49,6 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
   "cobol_common" {= version}
-  "cobol_ast" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}

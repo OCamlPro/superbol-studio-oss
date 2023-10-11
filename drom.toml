@@ -178,10 +178,6 @@ dir = "src/lsp/cobol_config"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
-dir = "src/lsp/cobol_ast"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
-
-[[package]]
 dir = "src/lsp/cobol_indent"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
