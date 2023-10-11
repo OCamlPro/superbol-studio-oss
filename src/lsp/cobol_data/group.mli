@@ -32,8 +32,8 @@ and t = t' with_loc
 
 val pp_data_group_list: Format.formatter -> t list -> unit
 
-(** Extract the name from any kind of data item. *)
-val name_of: t -> name
+(* (\** Extract the name from any kind of data item. *\) *)
+(* val name_of: t -> name *)
 
 (* (\** Extract the location of the name of a data group. *\) *)
 (* val name_location: t -> srcloc *)

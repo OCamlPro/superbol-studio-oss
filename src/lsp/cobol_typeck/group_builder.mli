@@ -11,31 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.INFIX
-open Cobol_ptree
+open Cobol_common.Diagnostics.TYPES
 
-(* TODO: Don't require naming of fillers to avoid this kind of exceptions. *)
-exception Not_mangled
-
-let filler_num = ref 0
-
-let new_filler_num () =
-  let num = !filler_num in
-  incr filler_num;
-  num
-
-let new_filler_string () =
-  Printf.sprintf "Filler-%u" (new_filler_num ())
-
-let mangle_data_name ~default_loc data_name = match data_name with
-  | Some { payload = DataName _; _ } ->
-      data_name
-  | _ ->
-      let filler_name = new_filler_string () &@ default_loc in
-      Some (DataName filler_name &@ default_loc)
-
-let mangled_data_name data_name = match data_name with
-  | Some { payload = DataName name; _ } ->
-      ~&name
-  | _ ->
-      raise Not_mangled
+val working_data_of_compilation_unit'
+  : Cobol_config.t
+  -> Cobol_data.PROG_ENV.t
+  -> Cobol_ptree.compilation_unit Cobol_ptree.with_loc
+  -> Cobol_data.Group.t' Cobol_ptree.with_loc list with_diags

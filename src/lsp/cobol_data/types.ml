@@ -63,22 +63,20 @@ type elementary_data_class =
   | Pointer
 [@@deriving show]
 
-(* (\* TODO: Remove name from types *\) *)
-
 type data_type =
   | Elementary of elementary_data_class leveled pictured
   | Table of table_type leveled
   | Group of data_type Cobol_ptree.with_loc list leveled
 [@@deriving show]
 
-and 'a leveled = {
+and 'a leveled = {                             (* TODO: no need to keep levels *)
   typ: 'a;
   level: int;
 } [@@deriving show]
 
 and 'a pictured = 'a * Picture.t option [@@deriving show]
 
-and table_type = {
+and table_type = {                          (* TODO: inline in `Table/OCcurs` *)
   elements_type: data_type Cobol_ptree.with_loc;
   length: table_length;
 }

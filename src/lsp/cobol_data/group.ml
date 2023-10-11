@@ -11,6 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* NB: needs quite a bit of rework and cleanup; validation should also be moved
+   to `Cobol_typeck`. *)
+
 open Cobol_ptree
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
@@ -19,7 +22,7 @@ open Cobol_common.Srcloc.INFIX
 module DIAGS = Cobol_common.Diagnostics
 
 (** This module implements data_groups which are how we group together all the
-    {!Cobol_parser.Ptree.data_description} in grouped items before typing them. *)
+    {!Cobol_ptree.data_item_descrs} in grouped items before typing them. *)
 
 (*TODO: Maybe renames can be a list of qualnames*)
 type t' =
@@ -38,10 +41,10 @@ let pp_data_group_list ppf =
   Pretty.list ~fsep:"@ " ~fopen:"@[" ~fclose:"@]" ~fempty:""
     pp ppf
 
-let name_of: t -> name = fun g -> match ~&g with
-  | Group {name; _} | Elementary {name; _} | ConditionName {name; _}
-  | Constant {name; _} | Renames {name; _} ->
-      name
+(* let name_of: t -> name = fun g -> match ~&g with *)
+(*   | Group {name; _} | Elementary {name; _} | ConditionName {name; _} *)
+(*   | Constant {name; _} | Renames {name; _} -> *)
+(*       name *)
 
 (* let name_location g = ~@(name_of g) *)
 
@@ -139,7 +142,7 @@ let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
                                    values = condition_name_values;
                                    target = element } &@<- condition_name)
                 cond_names
-          | _ -> invalid_arg "Expecting a name (1)"
+          | _ -> invalid_arg "Expecting a name"
         end
     | ({data_level = level; _}, _)::_ ->
         let groups = List.rev (group_at_level' level group) in
@@ -167,7 +170,7 @@ let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
                                            target = group} &@<- name)
                          cond_names)
                 end
-            | _ -> invalid_arg "Expecting a name (2)")
+            | _ -> invalid_arg "Expecting a name")
           groups
   in
   aux group

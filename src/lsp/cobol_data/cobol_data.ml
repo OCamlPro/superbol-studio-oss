@@ -29,4 +29,3 @@ module Mangling = Mangling
 module Picture = Picture
 module Qualmap = Qualmap
 module Compilation_unit = Compilation_unit
-module Typing = Typing

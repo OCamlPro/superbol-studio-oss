@@ -11,31 +11,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.INFIX
-open Cobol_ptree
+(** Type-checking and validation of COBOL compilation groups *)
 
-(* TODO: Don't require naming of fillers to avoid this kind of exceptions. *)
-exception Not_mangled
+module DIAGS = Cobol_common.Diagnostics
+module CU = Cobol_data.Compilation_unit
+module CUs = CU.SET
 
-let filler_num = ref 0
-
-let new_filler_num () =
-  let num = !filler_num in
-  incr filler_num;
-  num
-
-let new_filler_string () =
-  Printf.sprintf "Filler-%u" (new_filler_num ())
-
-let mangle_data_name ~default_loc data_name = match data_name with
-  | Some { payload = DataName _; _ } ->
-      data_name
-  | _ ->
-      let filler_name = new_filler_string () &@ default_loc in
-      Some (DataName filler_name &@ default_loc)
-
-let mangled_data_name data_name = match data_name with
-  | Some { payload = DataName name; _ } ->
-      ~&name
-  | _ ->
-      raise Not_mangled
+let analyze_compilation_group
+    (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
+  fun ?(config = Cobol_config.default) ->
+  function
+  | Only None | WithArtifacts (None, _) ->
+      DIAGS.result (Cobol_data.Compilation_unit.SET.empty, None)
+  | Only Some cg | WithArtifacts (Some cg, _) ->
+      match Prog_builder.compilation_group config cg with
+      | { diags; _ } when DIAGS.Set.has_errors diags ->
+          DIAGS.result ~diags (CUs.empty, Some cg)
+      | { diags; result } ->
+          DIAGS.result ~diags (result, Some cg)
