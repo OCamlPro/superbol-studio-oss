@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Type-checking and validation of COBOL compilation groups *)
-
 include Typeck_engine
+
+module Env_builder = Env_builder
+module Group_builder = Group_builder
+module Prog_builder = Prog_builder

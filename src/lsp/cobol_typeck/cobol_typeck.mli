@@ -11,8 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Type-checking and validation of COBOL compilation groups *)
+
 val analyze_compilation_group
   : ?config: (module Cobol_config.T)
   -> _ Cobol_parser.Outputs.parsed_compilation_group
   -> (Cobol_data.Compilation_unit.SET.t * Cobol_ptree.compilation_group option)
     Cobol_common.Diagnostics.with_diags
+
+(** {1 Access to independent builder modules} *)
+
+module Env_builder = Env_builder
+module Group_builder = Group_builder
+module Prog_builder = Prog_builder
