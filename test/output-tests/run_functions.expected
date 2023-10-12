@@ -340,26 +340,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1145:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1170:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1195:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1223:0
-run_functions.at-1223-prog.cob:6.35:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        01  Datetime-Format CONSTANT "YYYYMMDDThhmmss.ss+hhmm".
-----                                      ^
-   7          01  str             PIC X(25).
-   8          PROCEDURE        DIVISION.
->> Hint: Missing RECORD
-
-run_functions.at-1223-prog.cob:6.36-6.61:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        01  Datetime-Format CONSTANT "YYYYMMDDThhmmss.ss+hhmm".
-----                                       ^^^^^^^^^^^^^^^^^^^^^^^^^
-   7          01  str             PIC X(25).
-   8          PROCEDURE        DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1286:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1311:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1368:0

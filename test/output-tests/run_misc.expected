@@ -5380,26 +5380,6 @@ run_misc.at-11365-caller.cob:12.7-12.16:
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11339:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11409:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11445:0
-run_misc.at-11445-prog.cob:7.31:
-   4   
-   5          DATA            DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7 >        01  foo-bar     CONSTANT 8.
-----                                  ^
-   8          01  x           PIC 9(foo-bar)9(foo-bar).
-   9   
->> Hint: Missing RECORD .
-
-run_misc.at-11445-prog.cob:7.32-7.33:
-   4   
-   5          DATA            DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7 >        01  foo-bar     CONSTANT 8.
-----                                   ^
-   8          01  x           PIC 9(foo-bar)9(foo-bar).
-   9   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11467:0
 run_misc.at-11467-prog.cob:4.7-4.72:
    1   
@@ -8003,62 +7983,12 @@ run_misc.at-13127-prog.cob:3.7-3.28:
    5          PROGRAM-ID. prog.
 >> Error: Malformed or unknown compiler directive
 
-run_misc.at-13127-prog.cob:15.29:
-  12             05  FLD4   PIC X(4).
-  13             05  FLD5   PIC X(4).
-  14          01  PICX      PIC XXX VALUE 'Abc'.
-  15 >        01  CAT       CONSTANT  'Cat '.
-----                                ^
-  16          01  DOG       CONSTANT  'Dog '.
-  17          01  YARD      CONSTANT  CAT & "& " & DOG.
->> Hint: Missing RECORD
-
-run_misc.at-13127-prog.cob:15.31-15.37:
-  12             05  FLD4   PIC X(4).
-  13             05  FLD5   PIC X(4).
-  14          01  PICX      PIC XXX VALUE 'Abc'.
-  15 >        01  CAT       CONSTANT  'Cat '.
-----                                  ^^^^^^
-  16          01  DOG       CONSTANT  'Dog '.
-  17          01  YARD      CONSTANT  CAT & "& " & DOG.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:16.29:
-  13             05  FLD5   PIC X(4).
-  14          01  PICX      PIC XXX VALUE 'Abc'.
-  15          01  CAT       CONSTANT  'Cat '.
-  16 >        01  DOG       CONSTANT  'Dog '.
-----                                ^
-  17          01  YARD      CONSTANT  CAT & "& " & DOG.
-  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
->> Hint: Missing RECORD
-
-run_misc.at-13127-prog.cob:16.31-16.37:
-  13             05  FLD5   PIC X(4).
-  14          01  PICX      PIC XXX VALUE 'Abc'.
-  15          01  CAT       CONSTANT  'Cat '.
-  16 >        01  DOG       CONSTANT  'Dog '.
-----                                  ^^^^^^
-  17          01  YARD      CONSTANT  CAT & "& " & DOG.
-  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:17.29:
+run_misc.at-13127-prog.cob:17.35-17.36:
   14          01  PICX      PIC XXX VALUE 'Abc'.
   15          01  CAT       CONSTANT  'Cat '.
   16          01  DOG       CONSTANT  'Dog '.
   17 >        01  YARD      CONSTANT  CAT & "& " & DOG.
-----                                ^
-  18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
->> Hint: Missing RECORD
-
-run_misc.at-13127-prog.cob:17.31-17.34:
-  14          01  PICX      PIC XXX VALUE 'Abc'.
-  15          01  CAT       CONSTANT  'Cat '.
-  16          01  DOG       CONSTANT  'Dog '.
-  17 >        01  YARD      CONSTANT  CAT & "& " & DOG.
-----                                  ^^^
+----                                      ^
   18          78  HUN       VALUE 10 * (10 + LENGTH OF PICX) + 12.35-2+3.
   19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
 >> Error: Invalid syntax
@@ -8211,146 +8141,6 @@ run_misc.at-13127-prog.cob:21.36-21.37:
 ----                                       ^
   22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
   23          01  CON4      CONSTANT AS 3.1416 + CON3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:22.29:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Hint: Missing RECORD .
-
-run_misc.at-13127-prog.cob:22.30-22.34:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                 ^^^^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:22.34:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                     ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Hint: Missing .
-
-run_misc.at-13127-prog.cob:22.35-22.36:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                      ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:22.38-22.39:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                         ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:22.47:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                                  ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Hint: Missing RENAMES <qualified name> .
-
-run_misc.at-13127-prog.cob:22.46-22.47:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                                 ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:22.51-22.52:
-  19          78  HUN2      VALUE HUN * (10 + LENGTH OF PICX) -4.
-  20          78  DIV1      VALUE 100 / 3.
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22 >        01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-----                                                      ^
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24          01  CON5      CONSTANT 1 + 2 * 3.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:24.29:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
->> Hint: Missing RECORD .
-
-run_misc.at-13127-prog.cob:24.30-24.31:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                 ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:24.31:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                  ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
->> Hint: Missing .
-
-run_misc.at-13127-prog.cob:24.32-24.33:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                   ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
->> Error: Invalid syntax
-
-run_misc.at-13127-prog.cob:24.35:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                      ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
->> Hint: Missing .
-
-run_misc.at-13127-prog.cob:24.36-24.37:
-  21          78  NUM2      VALUE 1 + 2 * 3.
-  22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
-  23          01  CON4      CONSTANT AS 3.1416 + CON3.
-  24 >        01  CON5      CONSTANT 1 + 2 * 3.
-----                                       ^
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
 >> Error: Invalid syntax
 
 run_misc.at-13127-prog.cob:28.7-28.25:

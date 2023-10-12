@@ -2657,26 +2657,6 @@ syn_misc.at-4860-prog2.cob:12.7-12.9:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4882:0
-syn_misc.at-4882-prog.cob:8.31:
-   5          DATA            DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7          01  x           PIC 9(5) VALUE 1.
-   8 >        01  y           CONSTANT "ab".
-----                                  ^
-   9   
-  10          PROCEDURE       DIVISION.
->> Hint: Missing RECORD
-
-syn_misc.at-4882-prog.cob:8.32-8.36:
-   5          DATA            DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7          01  x           PIC 9(5) VALUE 1.
-   8 >        01  y           CONSTANT "ab".
-----                                   ^^^^
-   9   
-  10          PROCEDURE       DIVISION.
->> Error: Invalid syntax
-
 syn_misc.at-4882-prog.cob:11.15:
    8          01  y           CONSTANT "ab".
    9   
@@ -2746,26 +2726,6 @@ syn_misc.at-5068-prog.cob:7.16-7.24:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5260:0
-syn_misc.at-5260-prog.cob:7.29:
-   4          DATA  DIVISION.
-   5          WORKING-STORAGE SECTION.
-   6          78  const1    value 115.
-   7 >        01  const2    CONSTANT 200.
-----                                ^
-   8          78  const3    value const2.
-   9          78  const4    value const2 + const1.
->> Hint: Missing RECORD .
-
-syn_misc.at-5260-prog.cob:7.30-7.33:
-   4          DATA  DIVISION.
-   5          WORKING-STORAGE SECTION.
-   6          78  const1    value 115.
-   7 >        01  const2    CONSTANT 200.
-----                                 ^^^
-   8          78  const3    value const2.
-   9          78  const4    value const2 + const1.
->> Error: Invalid syntax
-
 syn_misc.at-5260-prog.cob:8.26:
    5          WORKING-STORAGE SECTION.
    6          78  const1    value 115.
