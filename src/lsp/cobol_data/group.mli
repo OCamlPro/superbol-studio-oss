@@ -19,24 +19,18 @@ open Cobol_common.Srcloc.TYPES
 (** The type of hierarchical data items from cobol, used to describe different sections of the
     data division such as working storage section or linkage section. *)
 type t' =                                              (* TODO: extract `name` *)
-  | Renames of { name: name; targets: t list }
-  | ConditionName of { name: name; values: condition_name_value list; target: t }
-  | Constant of { name: name; value: constant_value with_loc;
+  | Renames of { name: name with_loc; targets: t list }
+  | ConditionName of { name: name with_loc; values: condition_name_value list; target: t }
+  | Constant of { name: name with_loc; value: constant_value with_loc;
                   constant_item_descr: constant_item_descr }
-  | Elementary of { name: name; data_item: data_item_descr }
-  | Group of { name: name; elements: t list; data_item: data_item_descr }
+  | Elementary of { name: name with_loc option; data_item: data_item_descr }
+  | Group of { name: name with_loc option; elements: t list; data_item: data_item_descr }
 [@@deriving show, ord]
 
 and t = t' with_loc
 [@@deriving show, ord]
 
 val pp_data_group_list: Format.formatter -> t list -> unit
-
-(* (\** Extract the name from any kind of data item. *\) *)
-(* val name_of: t -> name *)
-
-(* (\** Extract the location of the name of a data group. *\) *)
-(* val name_location: t -> srcloc *)
 
 (** Convert a list of located {!t working_item_descr_entry} to a list of {!t
     t}*)

@@ -81,14 +81,15 @@ let find_definitions { location_of; _ } cu_name qn defs =
   let location_of_item { item_definition; _ } =
     match item_definition.payload with
     | CondName {condition_name = name; _}
-    | Renames {rename_to = name; _}->
+    | Renames {rename_to = name; _}
+    | Constant {constant_name = name; _} ->
         location_of name
-    | Constant {constant_name = Some name; _}
     | Data {data_name = Some name; _}
     | Screen {screen_data_name = Some name; _}
     | ReportGroup {report_data_name = Some name; _} ->
         location_of name
-    | _ -> raise Not_found
+    | _ ->
+        raise Not_found
   in
   try
     let _cu, cu_defs = CUMap.find_by_name cu_name defs in

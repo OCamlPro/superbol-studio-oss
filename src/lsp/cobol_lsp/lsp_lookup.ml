@@ -171,7 +171,8 @@ let names_at_position ~uri pos ptree : names_at_position =
   let on_item n l loc { names; qualifiers; qualifiers_for_redef } =
     Visitor.do_children @@
       let qn, qualifiers = update_qualifiers n l qualifiers in
-      let qualifiers_for_redef = (qn, l) :: pop_qualifiers (l + 1) qualifiers_for_redef in
+      let qualifiers_for_redef =
+        (qn, l) :: pop_qualifiers (l + 1) qualifiers_for_redef in
       { names =
           if srcloc_contains pos loc
           then { names with qualname_at_position = Some qn }
@@ -253,7 +254,7 @@ let names_at_position ~uri pos ptree : names_at_position =
 
     method! fold_constant_item' { loc; payload = { constant_level = l;  (* 01 *)
                                                    constant_name = n; _ } } acc =
-      on_group_item n ~&l loc (reset_qualifiers acc)   (* CHECKME: should reset qualifiers... *)
+      on_item n ~&l loc (reset_qualifiers acc)
 
     method! fold_rename_item' { loc; payload = { rename_to; _ } } acc =
       (*rename_item can only be qualified by the data-name of level 01
@@ -298,8 +299,8 @@ let definitions: compilation_unit -> name_definitions_in_compilation_unit =
     let group_infos = match group with
       | Cobol_data.Group.Elementary { name; data_item = Data item; _ } ->
           Some (name, Cobol_ptree.Data item, [])
-      | Constant { name; constant_item_descr = Constant c; _ } ->
-          Some (name, Constant c, [])
+      | Constant {name; constant_item_descr = Constant c; _ } ->
+          Some (Some name, Constant c, [])
       | Group { name; data_item = Data item; elements = children; _ } ->
           Some (name, Data item, children)
       | Renames _                                (* TODO (needs _ item_descr) *)
@@ -307,12 +308,23 @@ let definitions: compilation_unit -> name_definitions_in_compilation_unit =
           None
     in
     match group_infos with
-    | Some (group_name, item_definition, children) ->
+    | Some (Some group_name, item_definition, children) ->
         (* TODO: group_name: `string with_loc` instead of just `string` *)
-        let qn = qual (group_name &@ loc) cur_qn in
+        let qn = qual (group_name (* &@ loc *)) cur_qn in
         let map = def_item qn { item_definition = item_definition &@ loc;
                                 item_redefinitions = [] } map in
         List.fold_left (def_group ~cur_qn:qn) map children
+    | Some (None, item_definition, children) ->
+        let map, qn = match cur_qn with
+          | Some qn ->
+              def_item qn
+                { item_definition = item_definition &@ loc;
+                  item_redefinitions = [] } map,
+              Some qn
+          | None ->
+              map, None
+        in
+        List.fold_left (def_group ?cur_qn:qn) map children
     | None ->                                                        (* ignore *)
         map
   in

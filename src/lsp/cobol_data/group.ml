@@ -26,12 +26,12 @@ module DIAGS = Cobol_common.Diagnostics
 
 (*TODO: Maybe renames can be a list of qualnames*)
 type t' =
-  | Renames of {name: name; targets: t list }
-  | ConditionName of {name: name; values: condition_name_value list; target: t }
-  | Constant of { name: name; value: constant_value with_loc;
+  | Renames of {name: name with_loc; targets: t list }
+  | ConditionName of {name: name with_loc; values: condition_name_value list; target: t }
+  | Constant of { name: name with_loc; value: constant_value with_loc;
                   constant_item_descr: constant_item_descr }
-  | Elementary of { name: name; data_item: data_item_descr }
-  | Group of { name: name; elements: t list; data_item: data_item_descr }
+  | Elementary of { name: name with_loc option; data_item: data_item_descr }
+  | Group of { name: name with_loc option; elements: t list; data_item: data_item_descr }
 [@@deriving show, ord]
 
 and t = t' with_loc
@@ -41,38 +41,31 @@ let pp_data_group_list ppf =
   Pretty.list ~fsep:"@ " ~fopen:"@[" ~fclose:"@]" ~fempty:""
     pp ppf
 
-(* let name_of: t -> name = fun g -> match ~&g with *)
-(*   | Group {name; _} | Elementary {name; _} | ConditionName {name; _} *)
-(*   | Constant {name; _} | Renames {name; _} -> *)
-(*       name *)
-
-(* let name_location g = ~@(name_of g) *)
-
 (** [group_at_level level acc groups] returns all the groups with the level [level]. The value
     returned is of type
     {!type:(data_item * condition_name_item list * (data_item * condition_name_item list) list) list}
     which represent the group at level [level] and the condition names associated with every entry of
     the group and a list of subgroups associated with every item of the group at level [level]. *)
-let rec group_at_level level acc (group: working_storage_item_descr list) =
+let rec group_at_level level acc (group: working_storage_item_descr with_loc list) =
   match group with
   | [] -> acc
-  | (Data hd)::tl ->
+  | { payload = Data hd; loc } :: tl ->
       let conditions, rest = conditions_from [] tl in
       let sub_group, rest = subgroup_of [] level rest in
-      group_at_level level ((hd, conditions, sub_group)::acc) rest
-  | (CondName cond)::rest ->
+      group_at_level level ((hd &@ loc, conditions, sub_group)::acc) rest
+  | { payload = CondName cond; loc } :: rest ->
       begin match acc with
       | (hd, conds, sub_group)::tl ->
-          group_at_level level ((hd, cond::conds, sub_group)::tl) rest
+          group_at_level level ((hd, (cond &@ loc)::conds, sub_group)::tl) rest
       | _ -> invalid_arg "Empty list"
       end
   | _ -> invalid_arg "Expecting Data or CondName"
 
 (** [conditions_from acc group] returns a list of condition names and the rest of the group from [group]. *)
 and conditions_from acc group =
-match group with
-  | (CondName cond)::tl ->
-      conditions_from (cond::acc) tl
+  match group with
+  | { payload = CondName cond; loc } :: tl ->
+      conditions_from ((cond &@ loc)::acc) tl
   | _ ->
       List.rev acc, group
 
@@ -83,15 +76,15 @@ match group with
 and subgroup_of acc curr_level group =
   match group with
   | [] -> List.rev acc, []
-  | (Data ({data_level; _} as hd))::tl ->
+  | { payload = Data ({data_level; _} as hd); loc } :: tl ->
       if data_level > curr_level then
-         subgroup_of ((hd, [])::acc) curr_level tl
+         subgroup_of ((hd &@ loc, [])::acc) curr_level tl
       else
         List.rev acc, group
-  | (CondName cond)::rest ->
+  | { payload = CondName cond; loc } :: rest ->
       begin match acc with
         | (hd, conds)::tl ->
-            subgroup_of ((hd, (cond::conds))::tl) curr_level rest
+            subgroup_of ((hd, ((cond &@ loc) ::conds))::tl) curr_level rest
         | _ ->
             invalid_arg "Empty list"
       end
@@ -101,11 +94,11 @@ and subgroup_of acc curr_level group =
 (** [subgroup_of' level group] has the same behavior as [subgroup_of level acc group] but
     the [group] is of type {!type:(data_item * condition_name_item list) list} instead of type
     {!type:working_storage_item_descr list}*)
-let subgroup_of' curr_level (group: (data_item * condition_name_item list) list) =
+let subgroup_of' curr_level (group: (data_item with_loc * condition_name_item with_loc list) list) =
   let rec aux acc curr_level group =
     match group with
     | [] -> (List.rev acc, [])
-    | (({data_level; _}, _) as hd)::tl ->
+    | (({ payload = {data_level; _}; loc = _ }, _) as hd)::tl ->
         if ~&data_level > ~&curr_level then
             aux (hd::acc) curr_level tl
         else
@@ -125,53 +118,51 @@ let group_at_level' level group =
   in
   aux [] level group
 
+let data_item_name: data_item -> _ = function
+  | { data_name = Some { payload = DataName name; _ }; _ } -> Some name
+  | _ -> None
+
+let data_item_descr_name (Data di: data_item_descr) =
+  data_item_name di
+
+let append_condition_names target condition_names =
+  List.cons target @@
+  List.map (fun {payload = {condition_name = name;
+                            condition_name_values = values; _};
+                 loc } ->
+             ConditionName {name; values; target} &@ loc) condition_names
+
 (** [make_data_subgroup (module Diags) group] returns a {!t list} from a {!(dde * condition_name list) list}
     specifically for groups of levels higher than 1 and different of 77. *)
 let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
-  let rec aux group =
-    match group with
+  let rec aux group = match group with
     | [] -> invalid_arg "Empty list"
-    | (({data_name; _}: data_item) as data_item, cond_names)::[] ->
-        begin match data_name with
-          | Some { payload = DataName name; loc } ->
-              let element = Elementary {name = ~&name;
-                                        data_item = Data data_item } &@ loc in
-              element :: List.map
-                (fun {condition_name; condition_name_values; _} ->
-                   ConditionName { name = ~&condition_name;
-                                   values = condition_name_values;
-                                   target = element } &@<- condition_name)
-                cond_names
-          | _ -> invalid_arg "Expecting a name"
-        end
-    | ({data_level = level; _}, _)::_ ->
+    | [{ payload = data_item; loc }, cond_names] ->
+        let element = Elementary {name = data_item_name data_item;
+                                  data_item = Data data_item } &@ loc in
+        element :: List.map
+          (fun { payload = {condition_name; condition_name_values; _}; _ } ->
+             ConditionName { name = condition_name;
+                             values = condition_name_values;
+                             target = element } &@<- condition_name)
+          cond_names
+    | ({ payload = {data_level = level; _}; loc = _ }, _)::_ ->
         let groups = List.rev (group_at_level' level group) in
         List.flatten @@ List.map
-          (fun (({ data_name = name; _ } as data_item, cond_names), sub_groups) ->
-            match name with
-            | Some { payload = DataName name; loc } ->
-                begin match sub_groups with
-                  | [] ->
-                      let element = Elementary { name = ~&name;
-                                                 data_item = Data data_item } &@ loc in
-                      element::
-                      (List.map
-                         (fun {condition_name = name; condition_name_values = values; _} ->
-                            ConditionName { name = ~&name; values;
-                                            target = element } &@<- name)
-                         cond_names)
-                  | sub_groups ->
-                      let group = Group { name = ~&name; elements = aux sub_groups;
-                                          data_item = Data data_item } &@ loc in
-                      group::
-                      (List.map
-                         (fun {condition_name = name; condition_name_values = values; _} ->
-                            ConditionName {name = ~&name; values;
-                                           target = group} &@<- name)
-                         cond_names)
-                end
-            | _ -> invalid_arg "Expecting a name")
-          groups
+          begin fun ((data_item, cond_names), sub_groups) ->
+            let name = data_item_name ~&data_item in
+            let loc = ~@data_item in
+            let data_item = Data ~&data_item in
+            match sub_groups with
+            | [] ->
+                let element = Elementary { name; data_item } &@ loc in
+                append_condition_names element cond_names
+            | sub_groups ->
+                let group = Group { name;
+                                    elements = aux sub_groups;
+                                    data_item } &@ loc in
+                append_condition_names group cond_names
+          end groups
   in
   aux group
 
@@ -179,78 +170,47 @@ let make_data_subgroup (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
     {!working_storage_item_descr list} which respect the hierarchy of the list in entry and results
     in error if any of the elements of the entry list does not respect the COBOL data groups rules. *)
 let make_data_group (module Diags: Cobol_common.Diagnostics.STATEFUL) group =
-  match (group: working_storage_item_descr list) with (* TODO: with_loc *)
-  | [Constant {constant_name; constant_value; _} as constant_item_descr] ->
-      begin match constant_name with
-        | Some { payload = DataName name; loc } ->
-            Result.ok [Constant { name = ~&name;
-                                  value = constant_value;
-                                  constant_item_descr } &@ loc ]
-        | _ ->
-            Diags.error "Undefined constant name";
-            Result.Error ()
-      end
-  | [Data { data_name; _ } as data_item] ->
-      begin match data_name with
-        | Some { payload = DataName name; loc } ->
-            Result.ok @@ [Elementary {name = ~&name; data_item } &@ loc ]
-        | _ ->
-            Diags.error "Unkown data item";
-            Result.Error ()
-      end
-  | CondName {condition_name = {loc; _}; _}::_ ->
+  match (group: working_storage_item_descr with_loc list) with
+  | [{ payload = Constant {constant_name; constant_value; _} as constant_item_descr;
+       loc }] ->
+      Result.Ok [Constant { name = constant_name;
+                            value = constant_value;
+                            constant_item_descr } &@ loc ]
+  | [{ payload = Data _ as data_item; loc }] ->
+      let name = data_item_descr_name data_item in
+      Result.Ok [Elementary {name; data_item } &@ loc ]
+  | { payload = CondName _; loc } :: _ ->
       Diags.error ~loc "A@ condition@ name@ must@ follow@ another@ data@ item@ entry";
       Result.Error ()
-  | Data {data_level = level; _} ::_ ->
+  | { payload = Data {data_level = level; _};
+      loc = _ } ::_ ->
       let same_level_groups = List.rev (group_at_level level [] group) in
       List.map
         (fun (data_item, cond_names, sub_group) ->
-           let name =
-             match data_item.data_name with
-             | Some {payload = DataName name; _} ->
-                 Result.Ok name
-             | _ ->
-                 Diags.error "Unnamed data item";
-                 Result.Error ()
-           in
+           let name = data_item_name ~&data_item in
+           let loc = ~@data_item in
+           let data_item = Data ~&data_item in
            match sub_group with
            | [] ->
-               Result.map
-                 (fun name ->
-                    let element = Elementary {name = ~&name;
-                                              data_item = Data data_item} &@<- name in
-                    element::
-                    List.map
-                      (fun {condition_name = name; condition_name_values = values; _} ->
-                         ConditionName { name = ~&name; values;
-                                         target = element } &@<- name)
-                      cond_names)
-                 name
+               let element = Elementary {name; data_item} &@ loc in
+               append_condition_names element cond_names
            | lst ->
-               Result.map
-                 (fun name ->
-                    let group =
-                      Group { name = ~&name;
-                              elements = make_data_subgroup (module Diags) lst;
-                              data_item = Data data_item } &@<- name
-                    in
-                    group::
-                    (List.map
-                       (fun {condition_name = name; condition_name_values = values; _} ->
-                          ConditionName {name = ~&name; values;
-                                         target = group} &@<- name)
-                       cond_names))
-                 name)
+               let group =
+                 Group { name;
+                         elements = make_data_subgroup (module Diags) lst;
+                         data_item } &@ loc
+               in
+               append_condition_names group cond_names)
         same_level_groups
-      |> Cobol_common.join_all
-      |> Result.map List.flatten
+      |> List.flatten
+      |> Result.ok
   | _ -> Result.error ()
 
 (** [group_of_name name group] return a list of groups that are named [name]. *)
 let groups_of_name {payload=group_name;_} group =
   let rec aux acc group =
     match ~&group with
-    | Elementary {name; _} | Group {name; _} when name = group_name ->
+    | Elementary {name = Some name; _} | Group {name = Some name; _} when ~&name = group_name ->
         group::acc
     | Group {elements; _} ->
         List.fold_left aux acc elements
@@ -284,6 +244,11 @@ let rec groups_of_list name_list groups =
     [first] and [last] should be the name of item defined inside [group].
     [first] and [last] should not be ambigious as to which item they define. *)
 let group_range (module Diags: Cobol_common.Diagnostics.STATEFUL) first last group =
+  let matching_name name list =
+    match name, list with
+    | Some name, [hd] -> ~&name = ~&hd
+    | _ -> false
+  in
   let rec aux (first, last, first_found, last_found, acc) group =
     if first_found && last_found then
       first, last, first_found, last_found, acc
@@ -291,35 +256,20 @@ let group_range (module Diags: Cobol_common.Diagnostics.STATEFUL) first last gro
       match ~&group with
       | Elementary {name; _} ->
           if first_found && not @@ last_found then
-            let last_found =
-              match last with
-              | hd::[] when name = ~&hd -> true
-              | _ -> false
-            in
+            let last_found = matching_name name last in
             first, last, first_found, last_found, group::acc
+          else if matching_name name first then
+            let last_found = matching_name name last in
+            first, last, true, last_found, group::acc
           else
-            begin match first with
-              | hd::[] when name = ~&hd ->
-                  let last_found =
-                    match last with
-                    | hd::[] when name = ~&hd -> true
-                    | _ -> false
-                  in
-                  first, last, true, last_found, group::acc
-              | _ ->
-                  first, last, first_found, last_found, acc
-            end
+            first, last, first_found, last_found, acc
       | Group {name; elements; _} ->
           if first_found && not last_found then
-            let last_found =
-              match last with
-              | hd::[] when name = ~&hd -> true
-              | _ -> false
-            in
-            match last with
-            | hd::[] when name = ~&hd ->
+            let last_found = matching_name name last in
+            match name, last with
+            | Some name, hd::[] when ~&name = ~&hd ->
                 List.fold_left aux (first, last, first_found, last_found, acc) elements
-            | hd::tl when name = ~&hd ->
+            | Some name, hd::tl when ~&name = ~&hd ->
                 List.fold_left aux (first, tl, first_found, last_found, acc) elements
             | _ ->
                 first, last, first_found, last_found, group::acc
@@ -327,15 +277,15 @@ let group_range (module Diags: Cobol_common.Diagnostics.STATEFUL) first last gro
             let _, _, first_found, last_found, acc =
               (* Fmt.pr "Name: %a, First: %a\n" pp_name name Fmt.(list pp_name) first; *)
               let first =
-                match first with
-                | hd::tl when name = ~&hd ->
+                match name, first with
+                | Some name, hd::tl when ~&name = ~&hd ->
                     (* Fmt.pr "New first: %a\n" Fmt.(list pp_name) tl; *)
                     tl
                 | _ -> first
               in
               let last =
-                match last with
-                | hd::tl when name = ~&hd ->
+                match name, last with
+                | Some name, hd::tl when ~&name = ~&hd ->
                     tl
                 | _ ->
                     last
@@ -375,7 +325,7 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
             last
             (List.hd group)
         in
-        Ok (Renames {name = ~&rename_to;
+        Ok (Renames {name = rename_to;
                      targets = List.rev groups} &@<- rename_to) :: acc
     | None ->
         let name_list = list_of_qualname rename_renamed in
@@ -387,7 +337,7 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
           end
         else
           let group = List.hd sub_groups in
-          Ok (Renames {name = ~&rename_to;
+          Ok (Renames {name = rename_to;
                        targets = [group]} &@<- rename_to) :: acc
   end [] renames
 
@@ -400,13 +350,13 @@ let of_working_item_descrs (wss: working_item_descr with_loc list) =
         Result.bind acc (fun acc ->
             match (payload: working_storage_item_descr) with
             | Constant _ ->
-                Result.ok @@ ([payload], None)::acc
+                Result.ok @@ ([payload &@ loc], None)::acc
             | Data {data_level = level; _} when ~&level = 1 || ~&level = 77 ->
-                Result.ok @@ ([payload], None)::acc
+                Result.ok @@ ([payload &@ loc], None)::acc
             | Data _ ->
                 begin match acc with
                   | (payload_list, None)::tl ->
-                      Result.ok @@ (payload::payload_list, None)::tl
+                      Result.ok @@ ((payload &@ loc)::payload_list, None)::tl
                   | (_, Some _)::_ ->
                       Diags.error ~loc "A@ renames@ entry@ can@ only@ be@ followed@ by@ a@ 01,@ 66,@ 77@ \
                                         or@ 88@ level@ data@ item.";
@@ -428,7 +378,7 @@ let of_working_item_descrs (wss: working_item_descr with_loc list) =
             | CondName _ ->
                 begin match acc with
                   | (data_list, renames)::tl ->
-                      Result.ok @@ (payload::data_list, renames)::tl
+                      Result.ok @@ ((payload &@ loc)::data_list, renames)::tl
                   | [] ->
                       Diags.error ~loc "An@ 88@ level@ entry@ must@ follow@ another@ data@ entry.";
                       Result.Error ()

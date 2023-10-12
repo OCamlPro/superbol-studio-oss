@@ -28,14 +28,9 @@ let new_filler_string () =
   Printf.sprintf "Filler-%u" (new_filler_num ())
 
 let mangle_data_name ~default_loc data_name = match data_name with
-  | Some { payload = DataName _; _ } ->
-      data_name
-  | _ ->
-      let filler_name = new_filler_string () &@ default_loc in
-      Some (DataName filler_name &@ default_loc)
+  | Some { payload = DataName _; _ } -> data_name
+  | _ -> Some (DataName (new_filler_string () &@ default_loc) &@ default_loc)
 
 let mangled_data_name data_name = match data_name with
-  | Some { payload = DataName name; _ } ->
-      ~&name
-  | _ ->
-      raise Not_mangled
+  | Some { payload = DataName name; _ } -> ~&name
+  | _ -> raise Not_mangled

@@ -1320,9 +1320,7 @@ let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
-  | l = loc(elementary_level);
-    n = ro(entry_name_clause);              (* FIXME: should NOT be optional! *)
-    spec = constant_spec; ".";
+  | l = loc(elementary_level); n = name; spec = constant_spec; ".";
     { let go, cv = spec in
       { constant_level = l;
         constant_name = n;

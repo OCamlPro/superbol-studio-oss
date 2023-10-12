@@ -115,7 +115,7 @@ let fold_constant_item (v: _ #folder) =
     ~continue:begin fun { constant_level; constant_name;
                           constant_global; constant_value } x -> x
       >> fold_data_level' v constant_level
-      >> fold_data_name'_opt v constant_name
+      >> fold_name' v constant_name
       >> fold_bool v constant_global
       >> fold_constant_value' v constant_value
     end

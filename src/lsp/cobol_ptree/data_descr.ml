@@ -835,7 +835,7 @@ let pp_report_clause ppf = function
 type constant_item =
   {
     constant_level: data_level with_loc;      (* is a constant *)     (* TODO: check \in {"1", "01"} *)
-    constant_name: data_name with_loc option; (* ident only (NB:refine the type???) *)
+    constant_name: name with_loc;
     constant_global: bool;
     constant_value: constant_value with_loc;
   }
@@ -857,9 +857,9 @@ let pp_constant_value ppf = function
 let pp_constant_item ppf {
   constant_level; constant_name; constant_global; constant_value
 } =
-  Fmt.pf ppf "%a%a@ CONSTANT%a@ %a."
+  Fmt.pf ppf "%a%a@ CONSTANT@ %a@ %a."
     (pp_with_loc pp_data_level) constant_level
-    Fmt.(option (sp ++ pp_with_loc pp_data_name)) constant_name
+    (pp_with_loc pp_name) constant_name
     Fmt.(if constant_global then any "@ IS GLOBAL" else nop) ()
     (pp_with_loc pp_constant_value) constant_value
 
