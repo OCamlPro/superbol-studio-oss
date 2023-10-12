@@ -218,6 +218,9 @@ let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
     | [NEXT]                         -> Error `MissingInputs
     | NEXT :: PAGE :: _                -> subst_n NEXT_PAGE 2
 
+    | [CONSTANT]                     -> Error `MissingInputs
+    | CONSTANT :: RECORD :: _          -> subst_n CONSTANT_RECORD 2
+
     | [PROGRAM_ID]                   -> Error `MissingInputs
     | PROGRAM_ID :: PERIOD :: _        -> info_word_after 2
 

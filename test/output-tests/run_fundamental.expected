@@ -124,46 +124,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1129:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1174:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1223:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1306:0
-run_fundamental.at-1306-prog.cob:16.37:
-  13          01  TEST-REC     PIC X(4).
-  14          WORKING-STORAGE  SECTION.
-  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
-  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
-----                                        ^
-  17         * Test global vars because of implicitly defined ASSIGN var, too.
-  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
->> Hint: Missing AS <expression>
-
-run_fundamental.at-1306-prog.cob:16.44-16.52:
-  13          01  TEST-REC     PIC X(4).
-  14          WORKING-STORAGE  SECTION.
-  15          78  GLOB-PATH           GLOBAL VALUE "GLOBP1".
-  16 >        01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
-----                                               ^^^^^^^^
-  17         * Test global vars because of implicitly defined ASSIGN var, too.
-  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
->> Error: Invalid syntax
-
-run_fundamental.at-1306-prog.cob:19.37:
-  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
-  17         * Test global vars because of implicitly defined ASSIGN var, too.
-  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
-  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
-----                                        ^
-  20          PROCEDURE        DIVISION.
-  21              DISPLAY GLOB-PATH GLOB-VAR
->> Hint: Missing AS <expression>
-
-run_fundamental.at-1306-prog.cob:19.44-19.52:
-  16          01  GLOB-PATH2 CONSTANT GLOBAL       "GLOBP2".
-  17         * Test global vars because of implicitly defined ASSIGN var, too.
-  18          78  GLOB-VAR            GLOBAL VALUE "GLOBV1".
-  19 >        01  GLOB-VAR2  CONSTANT GLOBAL       "GLOBV2".
-----                                               ^^^^^^^^
-  20          PROCEDURE        DIVISION.
-  21              DISPLAY GLOB-PATH GLOB-VAR
->> Error: Invalid syntax
-
 run_fundamental.at-1306-prog.cob:64.47-64.56:
   61              DISPLAY 'in prog3'
   62              END-DISPLAY

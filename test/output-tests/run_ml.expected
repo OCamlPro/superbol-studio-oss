@@ -1691,46 +1691,6 @@ run_ml.at-199-prog.cob:61.46-61.50:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_ml.at:311:0
-run_ml.at-311-prog.cob:16.38:
-  13          01  short-str2 PIC X(22).
-  14          01  xml-len    PIC 99.
-  15   
-  16 >        01  valid-namespace    CONSTANT "http://www.w3.org/1999/xhtml".
-----                                         ^
-  17          01  invalid-namespace  CONSTANT X"00".
-  18          01  invalid-prefix     PIC XXX VALUE "#<>".
->> Hint: Missing RECORD
-
-run_ml.at-311-prog.cob:16.39-16.69:
-  13          01  short-str2 PIC X(22).
-  14          01  xml-len    PIC 99.
-  15   
-  16 >        01  valid-namespace    CONSTANT "http://www.w3.org/1999/xhtml".
-----                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  17          01  invalid-namespace  CONSTANT X"00".
-  18          01  invalid-prefix     PIC XXX VALUE "#<>".
->> Error: Invalid syntax
-
-run_ml.at-311-prog.cob:17.38:
-  14          01  xml-len    PIC 99.
-  15   
-  16          01  valid-namespace    CONSTANT "http://www.w3.org/1999/xhtml".
-  17 >        01  invalid-namespace  CONSTANT X"00".
-----                                         ^
-  18          01  invalid-prefix     PIC XXX VALUE "#<>".
-  19          01  invalid-content    PIC X(3) VALUE X"8AFF00".
->> Hint: Missing RECORD
-
-run_ml.at-311-prog.cob:17.39-17.44:
-  14          01  xml-len    PIC 99.
-  15   
-  16          01  valid-namespace    CONSTANT "http://www.w3.org/1999/xhtml".
-  17 >        01  invalid-namespace  CONSTANT X"00".
-----                                          ^^^^^
-  18          01  invalid-prefix     PIC XXX VALUE "#<>".
-  19          01  invalid-content    PIC X(3) VALUE X"8AFF00".
->> Error: Invalid syntax
-
 run_ml.at-311-prog.cob:24.11-24.14:
   21   
   22          PROCEDURE DIVISION.

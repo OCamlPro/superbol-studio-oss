@@ -1100,7 +1100,7 @@ file_or_sort_merge_descr_entry:
 communication_descr_entry:
  | CD i = name FOR? in_ = bo(INITIAL) INPUT
    cl = rl(loc(communication_descr_clause))
-   il = rl(loc(entry_name_clause)) "."
+   il = rl(entry_name_clause) "."
    cdl = rl(loc(constant_or_data_descr_entry))
    { { comm_name = i;
        comm_clauses = cl;
@@ -1313,34 +1313,39 @@ let page_line_col :=
 
 
 
-let constant (* [@context constant] *) :=
+let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
   | l = loc(elementary_level);
-    eno = ro(loc(entry_name_clause)); CONSTANT;
-    go = ibo(global_clause);
-    cv = loc(constant_value); ".";
-    { { constant_level = l;
-        constant_name = eno;
+    n = ro(entry_name_clause);              (* FIXME: should NOT be optional! *)
+    spec = constant_spec; ".";
+    { let go, cv = spec in
+      { constant_level = l;
+        constant_name = n;
         constant_global = go;
         constant_value = cv } }
 
-let constant_value :=
-  | AS; ~ = expression;            <ConstExpr>  (* or plain ident *)
+let constant_spec_prefix ==
+  | CONSTANT; ~ = ibo(global_clause); < >
+
+let constant_spec :=
+  | go = constant_spec_prefix; AS?; e = loc(expression);
+    { go, ConstExpr ~&e &@<- e } (* or plain ident *)
   | p = constant_value_length; OF?; n = name;
-    { match p with
-        | `ByteLength -> ConstByteLength n
-        | `Length -> ConstLength n }
-  | FROM; ~ = name;                <ConstFrom>
+    { fst p, match snd p with
+        | `ByteLength -> ConstByteLength n &@<- n
+        | `Length -> ConstLength n &@<- n }
+  | go = constant_spec_prefix; FROM; n = name;
+    { go, ConstFrom n &@<- n }
 
 let constant_value_length [@context constant] :=
-  | AS; BYTE_LENGTH; {`ByteLength}
-  | AS; LENGTH; {`Length}
+  | go = constant_spec_prefix; AS?; BYTE_LENGTH; {go, `ByteLength}
+  | go = constant_spec_prefix; AS?; LENGTH;      {go, `Length}
 
 let data_descr_entry :=
   | l = loc(elementary_level);
-    eno = ro(loc(entry_name_clause));
+    eno = ro(entry_name_clause);
     dcl = rl(loc(data_descr_clause)); ".";
     { { data_level = l;
         data_name = eno;
@@ -1348,7 +1353,7 @@ let data_descr_entry :=
 
 let report_group_descr_entry :=
   | l = elementary_level;
-    eno = ro(loc(entry_name_clause));
+    eno = ro(entry_name_clause);
     rcl = rl(loc(report_group_descr_clause)); ".";
     { { report_level = l;
         report_data_name = eno;
@@ -1356,15 +1361,15 @@ let report_group_descr_entry :=
 
 let screen_descr_entry [@context screen_descr_entry] :=
   | l = elementary_level;
-    eno = ro(loc(entry_name_clause));
+    eno = ro(entry_name_clause);
     scl = rl(loc(screen_descr_clause)); ".";
     { { screen_level = l;
         screen_data_name = eno;
         screen_clauses = scl } }
 
 let entry_name_clause :=
-  | ~ = name; <DataName>                           (* data name / screen name *)
-  | FILLER;   {DataFiller}
+  | n = name; {         DataName n &@<- n}         (* data name / screen name *)
+  | FILLER;   {with_loc DataFiller $sloc }
 
 
 
@@ -1507,7 +1512,7 @@ let typedef_clause [@context typedef_clause] :=
 let aligned_clause := ALIGNED
 let any_length_clause := ANY; LENGTH
 let based_clause := BASED
-let constant_record_clause := CONSTANT; RECORD
+let constant_record_clause := CONSTANT_RECORD
 
 let dynamic_length_clause :=
   | DYNAMIC; LENGTH?; ido = ro(name); io = ro(pf(LIMIT; IS?,integer));
