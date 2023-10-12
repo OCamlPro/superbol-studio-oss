@@ -70,7 +70,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | ALPHANUM (s, q) -> print "%a%s%a" TEXT.pp_quote q s TEXT.pp_quote q
   | ALPHANUM_PREFIX (s, q) -> print "%a%s" TEXT.pp_quote q s
   | NATLIT s -> print "N\"%s\"" s
-  | BOOLIT b -> print "B\"%a\"" Cobol_ast.pp_boolean b
+  | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
   | HEXLIT s -> print "X\"%s\"" s
   | NULLIT s -> print "Z\"%s\"" s
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
@@ -340,9 +340,9 @@ module Make (Config: Cobol_config.T) = struct
     | Alphanum { knd = Basic; str; qte; _ }
       -> tok @@ ALPHANUM (str, qte)
     | Alphanum { knd = Bool; str; _ }
-      -> tok @@ BOOLIT (Cobol_ast.boolean_of_string ~base:`Bool str)
+      -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Bool str)
     | Alphanum { knd = BoolX; str; _ }
-      -> tok @@ BOOLIT (Cobol_ast.boolean_of_string ~base:`Hex str)
+      -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Hex str)
     | Alphanum { knd = Hex; str; _ }
       -> tok @@ HEXLIT str                 (* TODO: decide on a representation *)
     | Alphanum { knd = NullTerm; str; _ }

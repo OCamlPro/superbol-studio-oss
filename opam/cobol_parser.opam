@@ -51,9 +51,9 @@ depends: [
   "menhir" {>= "1.2"}
   "ez_file" {>= "0.3"}
   "ebcdic_lib" {= version}
+  "cobol_ptree" {= version}
   "cobol_preproc" {= version}
   "cobol_common" {= version}
-  "cobol_ast" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {= "20230415"}
   "ppx_inline_test" {with-test}

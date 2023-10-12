@@ -12,8 +12,9 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.INFIX
-open Cobol_ast
+open Cobol_ptree
 
+(* TODO: Don't require naming of fillers to avoid this kind of exceptions. *)
 exception Not_mangled
 
 let filler_num = ref 0
@@ -25,12 +26,6 @@ let new_filler_num () =
 
 let new_filler_string () =
   Printf.sprintf "Filler-%u" (new_filler_num ())
-
-(* TODO: Here we should employ types instead to describe that the "naming" pass,
-   if any, has been performed on the AST; just like for picture strings. *)
-
-(* TODO: Define a type (GADT) where we cannot have (Some Filler) instead.  Or
-   just don't name fillers and refer w.r.t parents in environment. *)
 
 let mangle_data_name ~default_loc data_name = match data_name with
   | Some { payload = DataName _; _ } ->

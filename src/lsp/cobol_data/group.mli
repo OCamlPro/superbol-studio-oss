@@ -12,8 +12,8 @@
 (**************************************************************************)
 
 (** This module implements a hierarchical version of cobol data items.*)
-open Cobol_ast
-open Pictured_ast.Data_sections
+open Cobol_ptree
+(* open Pictured_ast.Data_sections *)
 open Cobol_common.Srcloc.TYPES
 
 (** The type of hierarchical data items from cobol, used to describe different sections of the
@@ -32,14 +32,14 @@ and t = t' with_loc
 
 val pp_data_group_list: Format.formatter -> t list -> unit
 
-(** Extract the name from any kind of data item. *)
-val name_of: t -> name
+(* (\** Extract the name from any kind of data item. *\) *)
+(* val name_of: t -> name *)
 
 (* (\** Extract the location of the name of a data group. *\) *)
 (* val name_location: t -> srcloc *)
 
-(** Convert a list of located {!t constant_or_data_descr_entry} to a list of {!t t}*)
-val of_working_storage
-  : (module Cobol_common.Diagnostics.STATEFUL)
-  -> working_storage_item_descr with_loc list
-  -> (t list, unit) result
+(** Convert a list of located {!t working_item_descr_entry} to a list of {!t
+    t}*)
+val of_working_item_descrs
+  : Cobol_ptree.working_item_descr with_loc list
+  -> t list Cobol_common.Diagnostics.with_diags

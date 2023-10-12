@@ -134,9 +134,9 @@ type token_category =
    are visited.  If really needed, the accumulator may carry some context
    information that can be used in generic methods like `fold_name'`. *)
 let semtoks_from_ptree ~filename ?range ptree =
-  let open Cobol_parser.PTree_visitor in
-  let open Cobol_ast.Terms_visitor in
-  let open Cobol_ast.Operands_visitor in
+  let open Cobol_ptree.Visitor in
+  (* let open Cobol_ptree.Terms_visitor in *)
+  (* let open Cobol_ptree.Operands_visitor in *)
   let open Cobol_common.Visitor in
 
   let acc_semtoks category loc acc =
@@ -159,7 +159,7 @@ let semtoks_from_ptree ~filename ?range ptree =
   let add_name' name category acc =
     acc_semtoks category ~@name acc
   in
-  let rec add_qualname (qn:Cobol_ast.qualname) toktyp acc =
+  let rec add_qualname (qn: Cobol_ptree.qualname) toktyp acc =
     match qn with
     | Name name ->
         add_name' name toktyp acc
@@ -167,7 +167,7 @@ let semtoks_from_ptree ~filename ?range ptree =
         add_name' name toktyp acc |>
         add_qualname qn toktyp
   in
-  let add_ident (id:Cobol_ast.ident) toktyp acc =
+  let add_ident (id: Cobol_ptree.ident) toktyp acc =
     match id with
     | QualIdent {ident_name; _} -> add_qualname ident_name toktyp acc
     | _ -> acc (* TODO *)
@@ -182,8 +182,8 @@ let semtoks_from_ptree ~filename ?range ptree =
     | Some v -> add_fun v toktyp acc
   in
 
-  Cobol_parser.PTree_visitor.fold_compilation_group (object (self)
-    inherit [semtok List.t] Cobol_parser.PTree_visitor.folder
+  Cobol_ptree.Visitor.fold_compilation_group (object (self)
+    inherit [semtok List.t] Cobol_ptree.Visitor.folder
 
     (* program-name *)
     method! fold_program_unit {program_name; _} acc = acc
@@ -221,8 +221,8 @@ let semtoks_from_ptree ~filename ?range ptree =
       (* We can remove the code below and return do_children directly*)
       |> fold_data_level' self rename_level
       |> add_name' rename_to DataDecl
-      |> fold_qualname self rename_renamed
-      |> fold_qualname_opt self rename_through
+      |> Cobol_ptree.Visitor.fold_qualname self rename_renamed
+      |> Cobol_ptree.Visitor.fold_qualname_opt self rename_through
       |> Visitor.skip_children
 
     method! fold_condition_name_item { condition_name_level;
@@ -258,7 +258,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_name' paragraph_name ParagraphName
       (*|> Visitor.do_children*)
       |> fold_integer_opt self paragraph_segment
-      |> fold_list ~fold:(fun v -> v#continue_with_statements') self paragraph_sentences
+      |> fold_list ~fold:fold_statements' self paragraph_sentences
       |> Visitor.skip_children
 
     (* procedure using *)

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 let pp_ptree =
-  Fmt.option Cobol_parser.PTree.pp_compilation_group
+  Fmt.option Cobol_ptree.pp_compilation_group
     ~none:(Fmt.any "None")
 
 let show_ptree _i _n ptree (* _art *) _diags =

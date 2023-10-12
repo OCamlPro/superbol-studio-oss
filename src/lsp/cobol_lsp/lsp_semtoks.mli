@@ -22,5 +22,5 @@ val data
   -> tokens: Cobol_parser.Outputs.tokens_with_locs
   -> pplog: Cobol_preproc.Trace.log
   -> comments: Cobol_preproc.Text.comments
-  -> ptree: Lsp_imports.PTREE.compilation_group
+  -> ptree: Cobol_ptree.compilation_group
   -> int array

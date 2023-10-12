@@ -18,7 +18,7 @@ module TEXT = Cobol_preproc.Text
 (** {2 Compilation group tokens} *)
 
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
-type token = Grammar_tokens.token Cobol_ast.with_loc
+type token = Grammar_tokens.token Cobol_ptree.with_loc
 type tokens = token list
 val pp_token: token Pretty.printer
 val pp_tokens: tokens Pretty.printer

@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ast
+open Cobol_ptree
 
 (* Note: we can share the same source overlay manager across several parsers as
    long as we don't parse localized tokens using multiple instances of the
@@ -24,7 +24,7 @@ module Overlay_manager =
 
 let relation_condition ~neg (binrel: binary_relation) = function
   | None ->
-      Cobol_ast.Terms_helpers.neg_condition ~neg @@ Relation binrel
+      Cobol_ptree.Terms_helpers.neg_condition ~neg @@ Relation binrel
   | Some (LOr, flatop) ->
       Abbrev (neg, binrel, LOr, flatop)
   | Some (LAnd, flatop) ->

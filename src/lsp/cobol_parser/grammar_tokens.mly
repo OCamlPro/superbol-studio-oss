@@ -11,14 +11,14 @@
 %}
 
 %[@recovery.header
-  let fixed_zero = Cobol_ast.{ fixed_integer = "0";
-                               fixed_fractional = "0" }
+  let fixed_zero = Cobol_ptree.{ fixed_integer = "0";
+                                 fixed_fractional = "0" }
 
-  let floating_zero = Cobol_ast.{ float_significand = fixed_zero;
-                                  float_exponent = "1" }
+  let floating_zero = Cobol_ptree.{ float_significand = fixed_zero;
+                                    float_exponent = "1" }
 
-  let boolean_zero = Cobol_ast.{ bool_base = `Bool;
-                                 bool_value = "0" }
+  let boolean_zero = Cobol_ptree.{ bool_base = `Bool;
+                                   bool_value = "0" }
 ]
 
 %token EOF
@@ -27,10 +27,10 @@
 %token <string> WORD [@recovery "_"] (* [@symbol "<word>"] *)
 %token <string> WORD_IN_AREA_A [@recovery "_"] (* [@symbol "<word in area A>"] *)
 %token <string> INFO_WORD [@recovery "_"]
-%token <Cobol_ast.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
+%token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
 %token <string * Cobol_preproc.Text.quotation> ALPHANUM [@recovery ("_", Quote)]
 %token <string * Cobol_preproc.Text.quotation> ALPHANUM_PREFIX [@recovery ("_", Quote)]
-%token <Cobol_ast.boolean> BOOLIT [@recovery boolean_zero]
+%token <Cobol_ptree.boolean> BOOLIT [@recovery boolean_zero]
 %token <string> HEXLIT [@recovery "_"]
 %token <string> NULLIT [@recovery "_"]
 %token <string> NATLIT [@recovery "_"]

@@ -53,8 +53,9 @@ skip = ["index.mld"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-cobol_ast = "version"
-cobol_parser = "version"
+cobol_common = "version"
+cobol_config = "version"
+cobol_ptree = "version"
 
 # package tools dependencies
 [tools]

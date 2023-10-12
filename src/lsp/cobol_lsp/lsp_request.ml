@@ -99,7 +99,7 @@ let find_definitions { location_of; _ } cu_name qn defs =
 
 let lookup_definition_in_doc
     DefinitionParams.{ textDocument = doc; position; _ }
-    Lsp_document.{ ast = ptree; definitions = defs; _ }
+    Lsp_document.{ ptree; definitions = defs; _ }
   =
   match Lsp_lookup.names_at_position ~uri:doc.uri position ptree with
   | { qualname_at_position = None; _ }
@@ -117,7 +117,7 @@ let handle_definition registry (params: DefinitionParams.t) =
 
 let lookup_references_in_doc
     ReferenceParams.{ textDocument = doc; position; context; _ }
-    Lsp_document.{ ast = ptree; definitions = defs; references = refs; _ }
+    Lsp_document.{ ptree; definitions = defs; references = refs; _ }
   =
   match Lsp_lookup.names_at_position ~uri:doc.uri position ptree with
   | { enclosing_compilation_unit_name = None; _ } ->
@@ -215,10 +215,10 @@ let handle_semtoks_full,
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
     try_with_document_data registry doc
       ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments; _ };
-                          _ } Lsp_document.{ ast; _ } ->
+                          _ } Lsp_document.{ ptree; _ } ->
         let data =
           Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
-            ~pplog ~comments ~tokens:(Lazy.force tokens) ~ptree:ast
+            ~pplog ~comments ~tokens:(Lazy.force tokens) ~ptree
         in
         Some (SemanticTokens.create ~data ())
       end
@@ -272,8 +272,9 @@ let handle_hover registry (params: HoverParams.t) =
 
 let handle_completion registry (params: CompletionParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:begin fun ~doc:{ textdoc; _ } { ast; _ } ->
-      let items = Lsp_completion.completion_items textdoc params.position ast in
+    ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
+      let items =
+        Lsp_completion.completion_items textdoc params.position ptree in
       Some (`CompletionList (CompletionList.create ()
                                ~isIncomplete:false ~items))
     end
@@ -285,9 +286,9 @@ let handle_completion registry (params: CompletionParams.t) =
     (To support these features, need to change the client capability) *)
 let handle_folding_range registry (params: FoldingRangeParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:begin fun ~doc:_ { ast; cus; _ } ->
+    ~f:begin fun ~doc:_ { ptree; cus; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
-      Some (Lsp_folding.ranges_in ~filename ast cus)
+      Some (Lsp_folding.ranges_in ~filename ptree cus)
     end
 
 let handle_shutdown registry =

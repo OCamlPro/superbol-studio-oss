@@ -21,7 +21,7 @@ open Lsp.Types
 
 let name_proposals ast ~filename pos =
   let visitor = object
-    inherit [StringSet.t] Cobol_parser.PTree_visitor.folder
+    inherit [StringSet.t] Cobol_ptree.Visitor.folder
 
     method! fold_compilation_unit' cu =
       if Lsp_position.is_in_srcloc ~filename pos ~@cu
@@ -33,7 +33,7 @@ let name_proposals ast ~filename pos =
 
     end
   in
-  Cobol_parser.PTree_visitor.fold_compilation_group visitor ast StringSet.empty
+  Cobol_ptree.Visitor.fold_compilation_group visitor ast StringSet.empty
   |> StringSet.elements
 
 (*If need be, get the qualname_proposals "X OF Y"... from the definition maps*)

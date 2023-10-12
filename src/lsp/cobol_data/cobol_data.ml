@@ -27,7 +27,5 @@ include Env
 module Group = Group
 module Mangling = Mangling
 module Picture = Picture
-module Pictured_ast = Pictured_ast
 module Qualmap = Qualmap
 module Compilation_unit = Compilation_unit
-module Typing = Typing

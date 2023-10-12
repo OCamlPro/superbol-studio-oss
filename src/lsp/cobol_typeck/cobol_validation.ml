@@ -11,17 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
-open Cobol_data.Pictured_ast.Data_sections
+(* open Cobol_common.Srcloc.TYPES *)
+(* open Cobol_data.Pictured_ast.Data_sections *)
+module DIAGS = Cobol_common.Diagnostics
+open Cobol_ptree
 
-exception SemanticError of string * srcloc
+(* exception SemanticError of string * srcloc *)
 
 (* This follows the 85 standard and IBM dialect specification. *)
-(* TODO: accept a `data_item with_loc` instead *)
 let validate_data_clauses
-    (module Diags: Cobol_common.Diagnostics.STATEFUL)
     ?(is_elementary = false)
-    ({ payload = { data_clauses; _ }; loc }: data_item with_loc)
+    Cobol_ptree.{ payload = Cobol_ptree.{ data_clauses; _ }; loc }
   =
   (* This does not generalize well to other mutual exclusion constraints.
 
@@ -34,69 +34,85 @@ let validate_data_clauses
   let has_usage_procedure_pointer = ref false in
   let has_usage_object_reference  = ref false in
   let has_picture_clause          = ref false in
-  List.iter begin fun { payload = clause; loc } -> match clause with
-    | DataBlankWhenZero when not is_elementary ->
-        Diags.error ~loc "BLANK-WHEN-ZERO clause is forbidden in non elementary \
-                          data item"
-    | DataJustified when not is_elementary ->
-        Diags.error ~loc "JUSTIFIED clause is forbidden in non elementary data \
-                          item"
-    | DataPicture _ when not is_elementary ->
-        Diags.error ~loc "PICTURE clause is forbidden in non elementary data item"
-    | DataPicture _ ->
-        has_picture_clause := true;
-        if !has_usage_index then
-          Diags.error ~loc "PICTURE clause is forbidden when USAGE INDEX is \
-                            specified";
-        if !has_usage_pointer then
-          Diags.error ~loc "PICTURE clause is forbidden when USAGE POINTER is \
-                            specified";
-        if !has_usage_function_pointer then
-          Diags.error ~loc "PICTURE clause is forbidden when USAGE \
-                            FUNCTION-POINTER is specified";
-        if !has_usage_procedure_pointer then
-          Diags.error ~loc "PICTURE clause is forbidden when USAGE \
-                            PROCEDURE-POINTER is specified";
-        if !has_usage_object_reference then
-          Diags.error ~loc "PICTURE clause is forbidden when USAGE OBJECT \
-                            REFERENCE is specified";
-    | DataSynchronized _ when not is_elementary ->
-        Diags.error ~loc "SYNCHRONIZED clause is forbidden in non elementary \
-                          data item"
-    | DataUsage _ when !has_usage ->
-        Diags.error ~loc "Only one USAGE clause is allowed."
-    | DataUsage usage_clause ->
-        has_usage := true;
-        begin match usage_clause with
-          | Index when !has_picture_clause ->
-              Diags.error ~loc "USAGE INDEX clause is forbidden when PICTURE is \
-                                specified"
-          | Pointer _ when !has_picture_clause ->
-              Diags.error ~loc "USAGE POINTER clause is forbidden when PICTURE \
-                                is specified"
-          | FunctionPointer _ when !has_picture_clause ->
-              Diags.error ~loc "USAGE FUNCTION-POINTER clause is forbidden when \
-                                PICTURE is specified"
-          | ProgramPointer _ when !has_picture_clause ->
-              Diags.error ~loc "USAGE PROCEDURE-POINTER clause is forbidden when \
-                                PICTURE is specified"
-          | ObjectReference _ when !has_picture_clause ->
-              Diags.error ~loc "USAGE OBJECT REFERENCE clause is forbidden when \
-                                PICTURE is specified"
-          | Index ->
-              has_usage_index := true
-          | Pointer _ ->
-              has_usage_pointer := true
-          | FunctionPointer _ ->
-              has_usage_function_pointer := true
-          | ProgramPointer _ ->
-              has_usage_procedure_pointer := true
-          | ObjectReference _ ->
-              has_usage_object_reference := true
-          | _ -> ()
-        end
-    | _ -> ()
-  end data_clauses;
+  let error_if bool_ref diags ~loc fmt =
+    if bool_ref
+    then DIAGS.Acc.error diags ~loc fmt
+    else Format.(ikfprintf (fun _ -> diags) str_formatter) fmt
+  in
+  let diags =
+    List.fold_left begin fun diags { payload = clause; loc } -> match clause with
+      | DataBlankWhenZero when not is_elementary ->
+          DIAGS.Acc.error diags ~loc
+            "BLANK-WHEN-ZERO clause is forbidden in non elementary data item"
+      | DataJustified when not is_elementary ->
+          DIAGS.Acc.error diags ~loc
+            "JUSTIFIED clause is forbidden in non elementary data item"
+      | DataPicture _ when not is_elementary ->
+          DIAGS.Acc.error diags ~loc
+            "PICTURE clause is forbidden in non elementary data item"
+      | DataPicture _ ->
+          has_picture_clause := true;
+          diags |>
+          fun diags -> error_if !has_usage_index diags ~loc
+            "PICTURE clause is forbidden when USAGE INDEX is specified" |>
+          fun diags -> error_if !has_usage_pointer diags ~loc
+            "PICTURE clause is forbidden when USAGE POINTER is specified" |>
+          fun diags -> error_if !has_usage_function_pointer diags ~loc
+            "PICTURE clause is forbidden when USAGE FUNCTION-POINTER is \
+             specified" |>
+          fun diags -> error_if !has_usage_procedure_pointer diags ~loc
+            "PICTURE clause is forbidden when USAGE PROCEDURE-POINTER is \
+             specified" |>
+          fun diags -> error_if !has_usage_object_reference diags ~loc
+            "PICTURE clause is forbidden when USAGE OBJECT REFERENCE is \
+             specified"
+      | DataSynchronized _ when not is_elementary ->
+          DIAGS.Acc.error diags ~loc
+            "SYNCHRONIZED clause is forbidden in non elementary data item"
+      | DataUsage _ when !has_usage ->
+          DIAGS.Acc.error diags ~loc "Only one USAGE clause is allowed."
+      | DataUsage usage_clause ->
+          has_usage := true;
+          DIAGS.Set.union diags @@
+          (match usage_clause with
+           | Index when !has_picture_clause ->
+               DIAGS.Set.error ~loc
+                 "USAGE INDEX clause is forbidden when PICTURE is specified"
+           | Pointer _ when !has_picture_clause ->
+               DIAGS.Set.error ~loc
+                 "USAGE POINTER clause is forbidden when PICTURE is specified"
+           | FunctionPointer _ when !has_picture_clause ->
+               DIAGS.Set.error ~loc "USAGE FUNCTION-POINTER clause is forbidden \
+                                     when PICTURE is specified"
+           | ProgramPointer _ when !has_picture_clause ->
+               DIAGS.Set.error ~loc "USAGE PROCEDURE-POINTER clause is forbidden \
+                                     when PICTURE is specified"
+           | ObjectReference _ when !has_picture_clause ->
+               DIAGS.Set.error ~loc "USAGE OBJECT REFERENCE clause is forbidden \
+                                     when PICTURE is specified"
+           | Index ->
+               has_usage_index := true;
+               DIAGS.Set.none
+           | Pointer _ ->
+               has_usage_pointer := true;
+               DIAGS.Set.none
+           | FunctionPointer _ ->
+               has_usage_function_pointer := true;
+               DIAGS.Set.none
+           | ProgramPointer _ ->
+               has_usage_procedure_pointer := true;
+               DIAGS.Set.none
+           | ObjectReference _ ->
+               has_usage_object_reference := true;
+               DIAGS.Set.none
+           | _ ->
+               DIAGS.Set.none)
+      | _ ->
+          diags
+    end DIAGS.Set.none data_clauses
+  in
   if is_elementary && not !has_picture_clause && not !has_usage then
-    Diags.error ~loc "There must be either a PICTURE or a USAGE clause in an \
-                      elementary item description"
+    DIAGS.Acc.error diags ~loc
+      "There must be either a PICTURE or a USAGE clause in an elementary item \
+       description"
+  else diags

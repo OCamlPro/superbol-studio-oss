@@ -11,13 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ast
+open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 
 module QUAL_NAME = struct
   type t = qualname [@@deriving show]
 
-  let compare = Cobol_ast.compare_qualname
+  let compare = Cobol_ptree.compare_qualname
 
 end
 
@@ -84,13 +84,27 @@ let rec get_lower_key qualname =
       Qual (n, rest)
   | _ -> qualname
 
+(** [major_qualifier qualname] returns [Name name] when [qualname] is
+    [Qual (..., Qual (_, Name name)) | Name name]*)
+let rec major_qualifier_of_qualname qualname =
+  match (qualname: qualname) with
+  | Qual (_, qn) ->
+      major_qualifier_of_qualname qn
+  | Name n -> n
+
+(** [qualifier_of_qualname qualname] returns [name] when [qualname] is [Name name] or
+    [Qual (name, _)] *)
+let qualifier_of_qualname: qualname -> name with_loc = function
+  | Qual (name, _) -> name
+  | Name name -> name
+
 (** [find_with_subkey key map] returns the map with all the qualnames that can be accessed
     with the key [key]. *)
 let rec find_with_subkey key map =
   match key with
   | Qual (_, Qual _) ->
       (*we first look for all the items that are contained in the last qualifier. *)
-      let highest_level_name = Cobol_ast.major_qualifier_of_qualname key in
+      let highest_level_name = major_qualifier_of_qualname key in
       let new_map =
         QualNameMap.filter_map
           (fun _ ({contained_in; _} as binding) ->
@@ -124,7 +138,7 @@ let find_binding key map =
   if QualNameSet.mem key map.base_keys then
     (QualNameMap.find key map.bindings)
   else
-    let simple_name' = Cobol_ast.qualifier_of_qualname key in
+    let simple_name' = qualifier_of_qualname key in
     (* We look for all the qualnames that have the simple name `simple_name'`. *)
     let new_map =
       QualNameMap.filter (fun _ {simple_name; _} -> simple_name = ~&simple_name') map.bindings
@@ -150,7 +164,7 @@ let find_opt key map =
 
 (** [find_all qualname map] returns all the elements that can be qualified with [qualname] in [map]. *)
 let find_all key map =
-  let simple_name' = Cobol_ast.qualifier_of_qualname key in
+  let simple_name' = qualifier_of_qualname key in
   let new_map =
     QualNameMap.filter (fun _ {simple_name; _} -> simple_name = ~&simple_name') map.bindings
     |> find_with_subkey key
@@ -186,7 +200,7 @@ let add key elt map =
   let binding =
     { value = elt;
       full_key = key;
-      simple_name = ~&(Cobol_ast.qualifier_of_qualname key);
+      simple_name = ~&(qualifier_of_qualname key);
       contained_in = make_contained_in key; }
   in
   { base_keys = QualNameSet.add key map.base_keys;
@@ -201,4 +215,3 @@ let iter f map =
     of [f] is fully qualified name of the element. *)
 let fold f map init =
   QualNameMap.fold (fun key {value; _} acc -> f key value acc) map.bindings init
-

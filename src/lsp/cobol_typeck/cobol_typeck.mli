@@ -11,20 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module DIAGS = Cobol_common.Diagnostics
-module Visitor = Cobol_common.Visitor
-module PTree_visitor = Cobol_parser.PTree_visitor
-module CUs = Cobol_data.Compilation_unit.SET
+(** Type-checking and validation of COBOL compilation groups *)
 
 val analyze_compilation_group
-  : ?config:(module Cobol_config.T)
+  : ?config: (module Cobol_config.T)
   -> _ Cobol_parser.Outputs.parsed_compilation_group
-  -> (CUs.t * Cobol_parser.PTree.compilation_group, unit) result DIAGS.with_diags
+  -> (Cobol_data.Compilation_unit.SET.t * Cobol_ptree.compilation_group option)
+    Cobol_common.Diagnostics.with_diags
 
-module Make
-    (Config: Cobol_config.T)                      (* for dialect-based checks *)
-    (Diags: DIAGS.STATEFUL) : sig
-  val try_making_env_of_compilation_unit:
-    Cobol_parser.PTree.compilation_unit Cobol_common.Srcloc.TYPES.with_loc ->
-      Cobol_data.PROG_ENV.t option
-end
+(** {1 Access to independent builder modules} *)
+
+module Env_builder = Env_builder
+module Group_builder = Group_builder
+module Prog_builder = Prog_builder

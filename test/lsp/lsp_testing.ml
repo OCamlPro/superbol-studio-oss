@@ -25,6 +25,10 @@ open Ez_file.FileString.OP
 module StrMap = EzCompat.StringMap
 module LSP = Cobol_lsp.INTERNAL
 
+(* Used to remove full-path and lines in the test files *)
+let () =
+  Cobol_common.Visitor.in_testsuite := true
+
 (** {1 Server initialization} *)
 
 let layout =

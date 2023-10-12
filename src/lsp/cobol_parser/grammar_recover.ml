@@ -2,14 +2,14 @@ open Grammar
 
 module Default = struct
 
-  let fixed_zero = Cobol_ast.{ fixed_integer = "0";
-                               fixed_fractional = "0" }
+  let fixed_zero = Cobol_ptree.{ fixed_integer = "0";
+                                 fixed_fractional = "0" }
 
-  let floating_zero = Cobol_ast.{ float_significand = fixed_zero;
-                                  float_exponent = "1" }
+  let floating_zero = Cobol_ptree.{ float_significand = fixed_zero;
+                                    float_exponent = "1" }
 
-  let boolean_zero = Cobol_ast.{ bool_base = `Bool;
-                                 bool_value = "0" }
+  let boolean_zero = Cobol_ptree.{ bool_base = `Bool;
+                                   bool_value = "0" }
 
 
   open Cobol_common.Srcloc.INFIX
@@ -20,23 +20,23 @@ module Default = struct
   let dummy_string = "_" &@ dummy_loc
   let dummy_name = dummy_string
 
-  let dummy_qualname: Cobol_ast.qualname =
-    Cobol_ast.Name dummy_name
+  let dummy_qualname: Cobol_ptree.qualname =
+    Cobol_ptree.Name dummy_name
 
   let dummy_qualident =
-    Cobol_ast.{ ident_name = dummy_qualname;
-                ident_subscripts = [] }
+    Cobol_ptree.{ ident_name = dummy_qualname;
+                  ident_subscripts = [] }
 
   let dummy_ident =
-    Cobol_ast.QualIdent dummy_qualident
+    Cobol_ptree.QualIdent dummy_qualident
 
   let dummy_expr =
-    Cobol_ast.Atom (Fig Zero)
+    Cobol_ptree.Atom (Fig Zero)
 
   let dummy_picture =
-    PTree.{ picture = "X" &@ dummy_loc;
-            picture_locale = None;
-            picture_depending = None }
+    Cobol_ptree.{ picture = "X" &@ dummy_loc;
+                  picture_locale = None;
+                  picture_depending = None }
 
   let value (type a) : a MenhirInterpreter.symbol -> a = function
     | MenhirInterpreter.T T_error -> ()
@@ -1897,7 +1897,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nonnumeric_no_all -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nonnumeric -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nested -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_ident_or_literal -> Cobol_ast.UPCAST.ident_with_literal dummy_ident
+    | MenhirInterpreter.N MenhirInterpreter.N_ident_or_literal -> Cobol_ptree.UPCAST.ident_with_literal dummy_ident
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_integer -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_alphanum -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_by_after_before -> raise Not_found

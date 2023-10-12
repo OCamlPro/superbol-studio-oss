@@ -15,6 +15,6 @@ module Overlay_manager: Cobol_preproc.Src_overlay.MANAGER
 
 val relation_condition
   : neg: bool
-  -> Cobol_ast.binary_relation
-  -> (Cobol_ast.logop * Cobol_ast.flat_combined_relation) option
-  -> Cobol_ast.condition
+  -> Cobol_ptree.binary_relation
+  -> (Cobol_ptree.logop * Cobol_ptree.flat_combined_relation) option
+  -> Cobol_ptree.condition
