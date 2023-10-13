@@ -32,57 +32,57 @@ Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:305:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:337:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:374:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:413:0
-run_refmod.at-413-prog.cob:2.7-2.20:
+run_refmod.at-413-prog.cob:2.6-2.20:
    1   
    2 >       $SET NOSSRANGE
-----          ^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:435:0
-run_refmod.at-435-prog1.cob:2.7-2.21:
+run_refmod.at-435-prog1.cob:2.6-2.21:
    1   
    2 >       $SET SSRANGE"1"
-----          ^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progb.
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:466:0
-run_refmod.at-466-prog2.cob:2.7-2.21:
+run_refmod.at-466-prog2.cob:2.6-2.21:
    1   
    2 >       $SET SSRANGE"2"
-----          ^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog2.
 >> Error: Malformed or unknown compiler directive
 
-run_refmod.at-466-prog2.cob:15.7-15.39:
+run_refmod.at-466-prog2.cob:15.6-15.39:
   12          01  m           PIC 9 VALUE 2.
   13              
   14          PROCEDURE DIVISION.
   15 >       $IF TEST-ZERO-LEN-REF-MOD DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   16              DISPLAY y (1:n)
   17         $END
 >> Error: Malformed or unknown compiler directive
 
-run_refmod.at-466-prog2.cob:17.7-17.10:
+run_refmod.at-466-prog2.cob:17.6-17.10:
   14          PROCEDURE DIVISION.
   15         $IF TEST-ZERO-LEN-REF-MOD DEFINED
   16              DISPLAY y (1:n)
   17 >       $END
-----          ^^^
+----         ^^^^
   18              DISPLAY y (1:m)
   19              GOBACK.
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:490:0
-run_refmod.at-490-prog3.cob:2.7-2.21:
+run_refmod.at-490-prog3.cob:2.6-2.21:
    1   
    2 >       $SET SSRANGE"3"
-----          ^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog3.
 >> Error: Malformed or unknown compiler directive

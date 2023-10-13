@@ -913,265 +913,76 @@ run_misc.at-3603-prog2.cob:9.41-9.42:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3626:0
-run_misc.at-3626-prog.cob:5.6-5.7:
+run_misc.at-3626-prog.cob:5.6-5.37:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
    4          PROCEDURE        DIVISION.
    5 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6              IF "1" NOT < "a"
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3626-prog.cob:5.7-5.10:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----          ^^^
-   6              IF "1" NOT < "a"
-   7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Invalid syntax
-
-run_misc.at-3626-prog.cob:7.6-7.7:
+run_misc.at-3626-prog.cob:7.6-7.38:
    4          PROCEDURE        DIVISION.
    5         >>IF   EXPECT-ORDER  =  'ASCII'
    6              IF "1" NOT < "a"
    7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    8              IF "a" NOT < "1"
    9         >>END-IF
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3626-prog.cob:6.27:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6 >            IF "1" NOT < "a"
-----                              ^
-   7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-   8              IF "a" NOT < "1"
->> Hint: Missing .
-
-run_misc.at-3626-prog.cob:7.7-7.12:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----          ^^^^^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Error: Invalid syntax
-
-run_misc.at-3626-prog.cob:7.12:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----               ^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Hint: Missing .
-
-run_misc.at-3626-prog.cob:7.13-7.25:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                ^^^^^^^^^^^^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Warning: Invalid syntax
-
-run_misc.at-3626-prog.cob:7.25:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                            ^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Hint: Missing .
-
-run_misc.at-3626-prog.cob:7.27-7.28:
-   4          PROCEDURE        DIVISION.
-   5         >>IF   EXPECT-ORDER  =  'ASCII'
-   6              IF "1" NOT < "a"
-   7 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                              ^
-   8              IF "a" NOT < "1"
-   9         >>END-IF
->> Warning: Invalid syntax
-
-run_misc.at-3626-prog.cob:9.6-9.7:
+run_misc.at-3626-prog.cob:9.6-9.14:
    6              IF "1" NOT < "a"
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
    8              IF "a" NOT < "1"
    9 >       >>END-IF
-----         ^
+----         ^^^^^^^^
   10                 DISPLAY "ERROR" END-DISPLAY
   11              END-IF.
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3626-prog.cob:9.7-9.14:
-   6              IF "1" NOT < "a"
-   7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-   8              IF "a" NOT < "1"
-   9 >       >>END-IF
-----          ^^^^^^^
-  10                 DISPLAY "ERROR" END-DISPLAY
-  11              END-IF.
->> Error: Invalid syntax
-
-run_misc.at-3626-prog.cob:11.11-11.17:
-   8              IF "a" NOT < "1"
-   9         >>END-IF
-  10                 DISPLAY "ERROR" END-DISPLAY
-  11 >            END-IF.
-----              ^^^^^^
-  12              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3663:0
-run_misc.at-3663-prog.cob:12.6-12.7:
+run_misc.at-3663-prog.cob:12.6-12.37:
    9              03 X         PIC X.
   10          PROCEDURE        DIVISION.
   11              SORT TBL ASCENDING KEY X.
   12 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13              IF G NOT = "12345abcde"
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3663-prog.cob:12.7-12.10:
-   9              03 X         PIC X.
-  10          PROCEDURE        DIVISION.
-  11              SORT TBL ASCENDING KEY X.
-  12 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----          ^^^
-  13              IF G NOT = "12345abcde"
-  14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Invalid syntax
-
-run_misc.at-3663-prog.cob:14.6-14.7:
+run_misc.at-3663-prog.cob:14.6-14.38:
   11              SORT TBL ASCENDING KEY X.
   12         >>IF   EXPECT-ORDER  =  'ASCII'
   13              IF G NOT = "12345abcde"
   14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15              IF G NOT = "abcde12345"
   16         >>ELSE           *>  =  'NATIVE'
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3663-prog.cob:13.34:
-  10          PROCEDURE        DIVISION.
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13 >            IF G NOT = "12345abcde"
-----                                     ^
-  14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  15              IF G NOT = "abcde12345"
->> Hint: Missing .
-
-run_misc.at-3663-prog.cob:14.7-14.12:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----          ^^^^^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Error: Invalid syntax
-
-run_misc.at-3663-prog.cob:14.12:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----               ^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Hint: Missing .
-
-run_misc.at-3663-prog.cob:14.13-14.25:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                ^^^^^^^^^^^^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Warning: Invalid syntax
-
-run_misc.at-3663-prog.cob:14.25:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                            ^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Hint: Missing .
-
-run_misc.at-3663-prog.cob:14.27-14.28:
-  11              SORT TBL ASCENDING KEY X.
-  12         >>IF   EXPECT-ORDER  =  'ASCII'
-  13              IF G NOT = "12345abcde"
-  14 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                              ^
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
->> Warning: Invalid syntax
-
-run_misc.at-3663-prog.cob:16.6-16.7:
+run_misc.at-3663-prog.cob:16.6-16.12:
   13              IF G NOT = "12345abcde"
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
   15              IF G NOT = "abcde12345"
   16 >       >>ELSE           *>  =  'NATIVE'
-----         ^
+----         ^^^^^^
   17              IF NOT G = "12345abcde" OR "abcde12345"
   18         >>END-IF
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3663-prog.cob:16.7-16.12:
-  13              IF G NOT = "12345abcde"
-  14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  15              IF G NOT = "abcde12345"
-  16 >       >>ELSE           *>  =  'NATIVE'
-----          ^^^^^
-  17              IF NOT G = "12345abcde" OR "abcde12345"
-  18         >>END-IF
->> Error: Invalid syntax
-
-run_misc.at-3663-prog.cob:18.6-18.7:
+run_misc.at-3663-prog.cob:18.6-18.14:
   15              IF G NOT = "abcde12345"
   16         >>ELSE           *>  =  'NATIVE'
   17              IF NOT G = "12345abcde" OR "abcde12345"
   18 >       >>END-IF
-----         ^
+----         ^^^^^^^^
   19                 DISPLAY G END-DISPLAY
   20              END-IF.
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3663-prog.cob:18.14:
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
-  17              IF NOT G = "12345abcde" OR "abcde12345"
-  18 >       >>END-IF
-----                 ^
-  19                 DISPLAY G END-DISPLAY
-  20              END-IF.
->> Hint: Missing <expression>
-
-run_misc.at-3663-prog.cob:18.8-18.14:
-  15              IF G NOT = "abcde12345"
-  16         >>ELSE           *>  =  'NATIVE'
-  17              IF NOT G = "12345abcde" OR "abcde12345"
-  18 >       >>END-IF
-----           ^^^^^^
-  19                 DISPLAY G END-DISPLAY
-  20              END-IF.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3919:0
 run_misc.at-3919-prog.cob:35.11-35.39:
@@ -1205,115 +1016,35 @@ run_misc.at-3919-prog.cob:39.11-39.19:
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3961:0
-run_misc.at-3961-prog.cob:20.6-20.7:
+run_misc.at-3961-prog.cob:20.6-20.37:
   17                 WHEN K (I) = KK
   18                    CONTINUE
   19              END-SEARCH
   20 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   21              IF I NOT = 3
   22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3961-prog.cob:20.7-20.10:
-  17                 WHEN K (I) = KK
-  18                    CONTINUE
-  19              END-SEARCH
-  20 >       >>IF   EXPECT-ORDER  =  'ASCII'
-----          ^^^
-  21              IF I NOT = 3
-  22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Invalid syntax
-
-run_misc.at-3961-prog.cob:22.6-22.7:
+run_misc.at-3961-prog.cob:22.6-22.38:
   19              END-SEARCH
   20         >>IF   EXPECT-ORDER  =  'ASCII'
   21              IF I NOT = 3
   22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----         ^
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   23              IF I NOT = 8
   24         >>END-IF
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_misc.at-3961-prog.cob:21.23:
-  18                    CONTINUE
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21 >            IF I NOT = 3
-----                          ^
-  22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  23              IF I NOT = 8
->> Hint: Missing .
-
-run_misc.at-3961-prog.cob:22.7-22.12:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----          ^^^^^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Error: Invalid syntax
-
-run_misc.at-3961-prog.cob:22.12:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----               ^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Hint: Missing .
-
-run_misc.at-3961-prog.cob:22.13-22.25:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                ^^^^^^^^^^^^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Warning: Invalid syntax
-
-run_misc.at-3961-prog.cob:22.25:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                            ^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Hint: Missing .
-
-run_misc.at-3961-prog.cob:22.27-22.28:
-  19              END-SEARCH
-  20         >>IF   EXPECT-ORDER  =  'ASCII'
-  21              IF I NOT = 3
-  22 >       >>ELIF EXPECT-ORDER  =  'EBCDIC'
-----                              ^
-  23              IF I NOT = 8
-  24         >>END-IF
->> Warning: Invalid syntax
-
-run_misc.at-3961-prog.cob:24.6-24.7:
+run_misc.at-3961-prog.cob:24.6-24.14:
   21              IF I NOT = 3
   22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
   23              IF I NOT = 8
   24 >       >>END-IF
-----         ^
+----         ^^^^^^^^
   25                 DISPLAY "ERROR" END-DISPLAY
   26              STOP RUN.
->> Error: Unexpected indicator: `>'
-
-run_misc.at-3961-prog.cob:24.7-24.14:
-  21              IF I NOT = 3
-  22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
-  23              IF I NOT = 8
-  24 >       >>END-IF
-----          ^^^^^^^
-  25                 DISPLAY "ERROR" END-DISPLAY
-  26              STOP RUN.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4002:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4037:0

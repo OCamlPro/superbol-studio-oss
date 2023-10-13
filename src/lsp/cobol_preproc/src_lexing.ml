@@ -204,9 +204,17 @@ let unexpected (type k) (kind: k c)
 let textword s =
   TextWord (String.uppercase_ascii ~&s) &@<- s
 
-let cdirword: string with_loc -> text_word with_loc = fun { payload = s; loc } ->
-  let prefix = if String.(length s > 2 && sub s 0 2 <> ">>") then ">>" else "" in
-  CDirWord (String.uppercase_ascii @@ prefix ^ remove_blanks s) &@ loc
+let cdirword ?marker ~start_pos ~end_pos s state =
+  let s = remove_blanks s in
+  let s, start_pos = match marker with
+    | Some m ->
+        m ^ s, Lexing.{ start_pos with
+                        pos_cnum = start_pos.pos_cnum - String.length m }
+    | None ->
+        s, start_pos
+  in
+  let loc = raw_loc ~start_pos ~end_pos state in
+  emit (CDirWord (String.uppercase_ascii s) &@ loc) state
 
 
 let rev_pseudotext: text -> _ state -> pseudotext * _ state = fun text state ->
@@ -306,8 +314,10 @@ let eof state lexbuf =
 
 type line_fitting = Nominal | Tacked
 
-let text_word ?(cont = false) ?(fitting = Nominal) w state =
+let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
   ignore fitting;
+  let wloc = raw_loc ~start_pos ~end_pos state in
+  let w = w &@ wloc in
   match state.continued with
   | CNone when cont ->
       append (textword w) state
@@ -315,7 +325,7 @@ let text_word ?(cont = false) ?(fitting = Nominal) w state =
       emit (textword w) state
   | CText _ ->
       let state = flush_continued ~force:true state in
-      let state = lex_error state ~loc:~@w "Unexpected@ text@ word" in
+      let state = lex_error state ~loc:wloc "Unexpected@ text@ word" in
       emit (textword w) state
 
 
@@ -497,18 +507,22 @@ let fixed_text mk ({ config = { source_format; _ }; _ } as state) lexbuf =
     state, Tacked
   else
     let (s, start_pos, end_pos), fitting = trunc_to_col cut_at_col lexinf in
-    let sloc = raw_loc ~start_pos ~end_pos state in
-    mk ?fitting:(Some fitting) (s &@ sloc) state, fitting
+    mk ~start_pos ~end_pos ?fitting:(Some fitting) s state, fitting
 
-let fixed_text_word ?cont = fixed_text (text_word ?cont)
-let fixed_nocont mk = fixed_text (fun ?fitting s -> ignore fitting; emit (mk s))
-let fixed_cdir_word = fixed_nocont cdirword  (* cannot be broken across lines *)
-let fixed_eqeq = fixed_text begin fun ?fitting -> function
-    | { payload = "=="; loc } ->
-        pseudotext_delimiter ~loc
-    | { payload = str; _ } as s ->
-        assert (str = "=");                                (* necessarily "=" *)
-        text_word ?fitting s
+let fixed_text_word ?cont : fixed state -> _ =
+  fixed_text (text_word ?cont)
+
+let fixed_cdir_word ?marker : fixed state -> _ =
+  fixed_text begin fun ~start_pos ~end_pos ?fitting s state ->
+    ignore fitting;                          (* cannot be broken across lines *)
+    cdirword ~start_pos ~end_pos ?marker s state
+  end
+
+let fixed_eqeq: fixed state -> _ =
+  fixed_text begin fun ~start_pos ~end_pos ?fitting w state ->
+    if w = "=="               (* check [w] has not been truncated to only "=" *)
+    then pseudotext_delimiter ~loc:(raw_loc ~start_pos ~end_pos state) state
+    else text_word ~start_pos ~end_pos ?fitting w state
   end
 
 let continuing_unclosed_ebcdics = function
@@ -557,7 +571,7 @@ let fixed_text mk ~ktkd ~knom state lexbuf =
   (if fitting = Tacked then ktkd else knom) state lexbuf
 
 let text_word ?cont = fixed_text (fixed_text_word ?cont)
-let cdir_word s = fixed_text fixed_cdir_word s
+let cdir_word ?marker s = fixed_text (fixed_cdir_word ?marker) s
 let eqeq s = fixed_text fixed_eqeq s
 let alphanum_lit ?doubled_opener =
   fixed_text (fixed_alphanum_lit ?doubled_opener)
@@ -568,13 +582,22 @@ let free_srctok mk state lexbuf =
   let s = Lexing.lexeme lexbuf in
   let start_pos = Lexing.lexeme_start_p lexbuf
   and end_pos = Lexing.lexeme_end_p lexbuf in
-  mk (s &@ raw_loc ~start_pos ~end_pos state) state
+  mk ~start_pos ~end_pos s state
 
-let emit_srctok mk = free_srctok (fun s -> emit (mk s))
+let free_text_word state =
+  free_srctok begin fun ~start_pos ~end_pos s state ->
+    let loc = raw_loc ~start_pos ~end_pos state in
+    emit (textword (s &@ loc)) state
+  end state
 
-let free_text_word s = emit_srctok textword s
-let free_cdir_word s = emit_srctok cdirword s
-let free_eqeq s = free_srctok (fun { loc; _ } -> pseudotext_delimiter ~loc) s
+let free_cdir_word state =
+  free_srctok (cdirword ?marker:None) state
+
+let free_eqeq state =
+  free_srctok begin fun ~start_pos ~end_pos _ state ->
+    pseudotext_delimiter ~loc:(raw_loc ~start_pos ~end_pos state) state
+  end state
+
 let free_alphanum_lit state lexbuf =
   let s = Lexing.lexeme lexbuf
   and start_pos = Lexing.lexeme_start_p lexbuf

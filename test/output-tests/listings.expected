@@ -4031,42 +4031,42 @@ listings.at-2848-prog.cob:16.7-16.15:
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2876:0
-listings.at-2876-prog2.cob:7.7-7.26:
+listings.at-2876-prog2.cob:7.6-7.26:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          PROCEDURE        DIVISION.
    7 >       $IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-listings.at-2876-prog2.cob:10.7-10.29:
+listings.at-2876-prog2.cob:10.6-10.29:
    7         $IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
   10 >       $ELIF ACTIVATE2 DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-listings.at-2876-prog2.cob:13.7-13.11:
+listings.at-2876-prog2.cob:13.6-13.11:
   10         $ELIF ACTIVATE2 DEFINED
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
   13 >       $ELSE
-----          ^^^^
+----         ^^^^^
   14              DISPLAY "NOTOK" NO ADVANCING
   15              END-DISPLAY
 >> Error: Malformed or unknown compiler directive
 
-listings.at-2876-prog2.cob:16.7-16.10:
+listings.at-2876-prog2.cob:16.6-16.10:
   13         $ELSE
   14              DISPLAY "NOTOK" NO ADVANCING
   15              END-DISPLAY
   16 >       $END
-----          ^^^
+----         ^^^^
   17              STOP RUN.
 >> Error: Malformed or unknown compiler directive
 

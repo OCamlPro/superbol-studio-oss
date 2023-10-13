@@ -2763,10 +2763,10 @@ run_ml.at-452-prog.cob:81.11-81.13:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_ml.at:483:0
-run_ml.at-483-prog.cob:2.7-2.29:
+run_ml.at-483-prog.cob:2.6-2.29:
    1   
    2 >       $SET DPC-IN-DATA "JSON"
-----          ^^^^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
 >> Error: Malformed or unknown compiler directive
@@ -4255,10 +4255,10 @@ run_ml.at-832-prog.cob:84.11-84.13:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_ml.at:863:0
-run_ml.at-863-prog.cob:2.7-2.29:
+run_ml.at-863-prog.cob:2.6-2.29:
    1   
    2 >       $SET DPC-IN-DATA "JSON"
-----          ^^^^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
 >> Error: Malformed or unknown compiler directive
