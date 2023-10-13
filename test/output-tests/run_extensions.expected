@@ -3437,22 +3437,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5149:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5131:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5231:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5188:0
-run_extensions.at-5188-prog.cob:6.0-9.20:
-   3   
-   4   IDENTIFICATION   DIVISION.
-   5   PROGRAM-ID.      prog.
-   6 > AUTHOR.
-----   ^^^^^^^
-   7 >     Somebody.
-----  ^^^^^^^^^^^^^^
-   8 > \D    Somebody else.
-----  ^^^^^^^^^^^^^^^^^^^^^
-   9 >     One last author.
-----  ^^^^^^^^^^^^^^^^^^^^^
-  10   DATA             DIVISION.
-  11   WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5266:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5290:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5315:0

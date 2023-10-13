@@ -100,8 +100,12 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # [';' '\'' '"' '=' '<' '>']
-let text_word = (text_char # '*' | '*' (text_char # ['>']))+ | opers
+let text_char = nonblank # [';' '\'' '"' '=']
+let text_word_prefix =
+  ((text_char # ['*' '>'])  text_char       ?)  |
+  (             ['*' '>']  (text_char # ['>']))
+let text_word =
+  (text_word_prefix (text_char # ['*' '>'] | '*' (text_char # ['>']))*) | opers
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
