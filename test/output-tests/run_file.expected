@@ -102,12 +102,12 @@ Considering: import/gnucobol/tests/testsuite.src/run_file.at:699:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:705:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:744:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:790:0
-run_file.at-790-prog.cob:10.7-10.28:
+run_file.at-790-prog.cob:10.6-10.28:
    7          FILE-CONTROL.
    8              SELECT f ASSIGN whatever
    9                  ORGANIZATION LINE SEQUENTIAL.
   10 >       $SET ASSIGN "EXTERNAL"
-----          ^^^^^^^^^^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^^^^^^^^^^
   11              SELECT g ASSIGN whatever
   12                  ORGANIZATION LINE SEQUENTIAL.
 >> Error: Malformed or unknown compiler directive
@@ -3253,12 +3253,12 @@ run_file.at-8028-prog.cob:278.62-278.69:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8591:0
-run_file.at-8591-prog.cob:9.7-9.17:
+run_file.at-8591-prog.cob:9.6-9.17:
    6          ENVIRONMENT DIVISION.
    7          CONFIGURATION SECTION.
    8   
    9 >       $set fcdreg
-----          ^^^^^^^^^^
+----         ^^^^^^^^^^^
   10          INPUT-OUTPUT SECTION.
   11          FILE-CONTROL.
 >> Error: Malformed or unknown compiler directive
@@ -5708,10 +5708,10 @@ run_file.at-10488-prog.cob:97.11-97.23:
 >> Error: Library `XFHFCD' not found in search path (search path: )
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10488:0
-run_file.at-10488-progs.cob:2.7-2.19:
+run_file.at-10488-progs.cob:2.6-2.19:
    1   
    2 >       $SET ODOSLIDE
-----          ^^^^^^^^^^^^
+----         ^^^^^^^^^^^^^
    3         **  CREATE KEY-DEF-AREA FROM ACB ARRAY
    4          IDENTIFICATION DIVISION.
 >> Error: Malformed or unknown compiler directive

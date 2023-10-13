@@ -1,36 +1,6 @@
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:36:0
-configuration.at-36-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:56:0
-configuration.at-56-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:167:0
-configuration.at-167-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:167:0
 configuration.at-167-test.conf:2.6-2.7:
    1   
@@ -73,16 +43,6 @@ configuration.at-167-test.conf:2.8-2.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:234:0
-configuration.at-234-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:234:0
 configuration.at-234-test.conf:2.6-2.7:
    1   
@@ -125,27 +85,7 @@ configuration.at-234-test.conf:2.8-2.17:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:254:0
-configuration.at-254-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:280:0
-configuration.at-280-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:284:0
 configuration.at-284-test.conf:2.6-2.7:
    1   
@@ -211,16 +151,6 @@ configuration.at-396-defunc.conf:2.8-2.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:396:0
-configuration.at-396-prog.cob:4.7-4.22:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4 >        AUTHOR. tester.
-----          ^^^^^^^^^^^^^^^
-   5          DATA             DIVISION.
-   6          WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:399:0
 configuration.at-399-test.conf:2.6-2.7:
    1   

@@ -11,29 +11,40 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let%expect_test "tokens" =
-  (* Just check we extract tokens properly *)
-  Parser_testing.show_parsed_tokens {|
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. prog.
-       PROCEDURE DIVISION.
-           STOP RUN.
+let%expect_test "fixed-format-cdirs" =
+  Parser_testing.show_diagnostics {|
+       >>SET A
+      >>SET B
+      $ SET B
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., PROCEDURE,
-    DIVISION, ., STOP, RUN, ., EOF
+    prog.cob:2.7-2.14:
+    >> Error: Malformed or unknown compiler directive
+
+    prog.cob:3.6-3.13:
+    >> Error: Malformed or unknown compiler directive
+
+    prog.cob:4.6-4.13:
+    >> Error: Malformed or unknown compiler directive
 |}];;
 
-let%expect_test "tokens-after-syntax-errors" =
-  (* Check we extract tokens properly even after syntax errors *)
-  Parser_testing.show_parsed_tokens {|
-       IDENTIFICATION
-       PROGRAM-ID.
-       PROCEDURE DIVISION
-           MOVE X Y
-           STOP RUN.
+let%expect_test "hybrid-format-cdirs" =
+  Parser_testing.show_diagnostics {|
+      >>SOURCE FORMAT IS FREE
+>>SOURCE FORMAT IS FIXED
+       >>   SET SOURCEFORMAT "COBOLX"
+* comment line
+                *> floating comment
+$    Source format free
+  *> another floating comment
+   >> SET                               SOURCEFORMAT                                     "FIXED"
+      * fixed comment
+      $ SET SOURCEFORMAT "XOpen"
+/ comment line
+>>SET SOURCEFORMAT "CRT"
+/ still comment line
+$   SOURCE IS FREE
+                        *> ok let's terminate here
   |};
   [%expect {|
-    IDENTIFICATION, PROGRAM-ID, ., INFO_WORD[PROCEDURE], DIVISION, MOVE, WORD[X],
-    WORD[Y], STOP, RUN, ., EOF
 |}];;

@@ -1686,65 +1686,35 @@ run_extensions.at-2060-caller.cob:12.34-12.42:
   14         >> IF P64 DEFINED
 >> Error: Invalid syntax
 
-run_extensions.at-2060-caller.cob:14.6-14.7:
+run_extensions.at-2060-caller.cob:14.6-14.23:
   11          77 BIG-BUFF      USAGE COMP-5 PIC S9(18) VALUE 99999999999999.
   12          PROCEDURE        DIVISION  CHAINING CALL-NAME.
   13   
   14 >       >> IF P64 DEFINED
-----         ^
+----         ^^^^^^^^^^^^^^^^^
   15              MOVE "callee64" TO CALL-NAME
   16         >> ELSE
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_extensions.at-2060-caller.cob:14.7-14.8:
-  11          77 BIG-BUFF      USAGE COMP-5 PIC S9(18) VALUE 99999999999999.
-  12          PROCEDURE        DIVISION  CHAINING CALL-NAME.
-  13   
-  14 >       >> IF P64 DEFINED
-----          ^
-  15              MOVE "callee64" TO CALL-NAME
-  16         >> ELSE
->> Error: Invalid syntax
-
-run_extensions.at-2060-caller.cob:16.6-16.7:
+run_extensions.at-2060-caller.cob:16.6-16.13:
   13   
   14         >> IF P64 DEFINED
   15              MOVE "callee64" TO CALL-NAME
   16 >       >> ELSE
-----         ^
+----         ^^^^^^^
   17              MOVE "callee32" TO CALL-NAME
   18         >> END-IF
->> Error: Unexpected indicator: `>'
+>> Error: Malformed or unknown compiler directive
 
-run_extensions.at-2060-caller.cob:16.7-16.8:
-  13   
-  14         >> IF P64 DEFINED
-  15              MOVE "callee64" TO CALL-NAME
-  16 >       >> ELSE
-----          ^
-  17              MOVE "callee32" TO CALL-NAME
-  18         >> END-IF
->> Error: Invalid syntax
-
-run_extensions.at-2060-caller.cob:18.6-18.7:
+run_extensions.at-2060-caller.cob:18.6-18.15:
   15              MOVE "callee64" TO CALL-NAME
   16         >> ELSE
   17              MOVE "callee32" TO CALL-NAME
   18 >       >> END-IF
-----         ^
+----         ^^^^^^^^^
   19   
   20              MOVE 12345678 TO ADR-BUFFER
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:18.7-18.8:
-  15              MOVE "callee64" TO CALL-NAME
-  16         >> ELSE
-  17              MOVE "callee32" TO CALL-NAME
-  18 >       >> END-IF
-----          ^
-  19   
-  20              MOVE 12345678 TO ADR-BUFFER
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-2060-caller.cob:25.41-25.47:
   22   
@@ -1756,25 +1726,15 @@ run_extensions.at-2060-caller.cob:25.41-25.47:
   27              MOVE -42 TO ADR-BUFFER
 >> Error: Invalid syntax
 
-run_extensions.at-2060-caller.cob:28.6-28.7:
+run_extensions.at-2060-caller.cob:28.6-28.23:
   25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
   26   
   27              MOVE -42 TO ADR-BUFFER
   28 >       >> IF P64 DEFINED
-----         ^
+----         ^^^^^^^^^^^^^^^^^
   29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
   30              CALL "callee64" USING BY VALUE BIG-BUFF
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:28.7-28.8:
-  25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
-  26   
-  27              MOVE -42 TO ADR-BUFFER
-  28 >       >> IF P64 DEFINED
-----          ^
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-2060-caller.cob:29.42-29.46:
   26   
@@ -1786,25 +1746,15 @@ run_extensions.at-2060-caller.cob:29.42-29.46:
   31         >> ELSE
 >> Error: Invalid syntax
 
-run_extensions.at-2060-caller.cob:31.6-31.7:
+run_extensions.at-2060-caller.cob:31.6-31.13:
   28         >> IF P64 DEFINED
   29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
   30              CALL "callee64" USING BY VALUE BIG-BUFF
   31 >       >> ELSE
-----         ^
+----         ^^^^^^^
   32              CALL "callee32" USING BY VALUE ADR-BUFFER
   33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:31.7-31.8:
-  28         >> IF P64 DEFINED
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
-  31 >       >> ELSE
-----          ^
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-2060-caller.cob:33.42-33.46:
   30              CALL "callee64" USING BY VALUE BIG-BUFF
@@ -1816,25 +1766,15 @@ run_extensions.at-2060-caller.cob:33.42-33.46:
   35   
 >> Error: Invalid syntax
 
-run_extensions.at-2060-caller.cob:34.6-34.7:
+run_extensions.at-2060-caller.cob:34.6-34.15:
   31         >> ELSE
   32              CALL "callee32" USING BY VALUE ADR-BUFFER
   33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
   34 >       >> END-IF
-----         ^
+----         ^^^^^^^^^
   35   
   36              GOBACK.
->> Error: Unexpected indicator: `>'
-
-run_extensions.at-2060-caller.cob:34.7-34.8:
-  31         >> ELSE
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
-  34 >       >> END-IF
-----          ^
-  35   
-  36              GOBACK.
->> Error: Invalid syntax
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2118:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2143:0
@@ -3437,22 +3377,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5149:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5131:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5231:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5188:0
-run_extensions.at-5188-prog.cob:6.0-9.20:
-   3   
-   4   IDENTIFICATION   DIVISION.
-   5   PROGRAM-ID.      prog.
-   6 > AUTHOR.
-----   ^^^^^^^
-   7 >     Somebody.
-----  ^^^^^^^^^^^^^^
-   8 > \D    Somebody else.
-----  ^^^^^^^^^^^^^^^^^^^^^
-   9 >     One last author.
-----  ^^^^^^^^^^^^^^^^^^^^^
-  10   DATA             DIVISION.
-  11   WORKING-STORAGE  SECTION.
->> Warning: comment paragraph in IDENTIFICATION DIVISION is obsolete in default
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5266:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5290:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5315:0

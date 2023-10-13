@@ -18,7 +18,9 @@ let keywords = Preproc_tokens.[
   "FORMAT", FORMAT;
   "COPY", COPY;
   ">>SOURCE", CDIR_SOURCE;
+  "$SOURCE", CDIR_SOURCE;
   ">>SET", CDIR_SET;
+  "$SET", CDIR_SET;
   "BY", BY;
   "ALSO", ALSO;
 ]

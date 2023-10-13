@@ -53,7 +53,8 @@ val eqeq'
   -> 'a state -> Lexing.lexbuf -> 'b
 
 val cdir_word
-  : (Src_format.fixed state as 's)
+  : ?marker:string
+  -> (Src_format.fixed state as 's)
   -> ktkd:('s -> Lexing.lexbuf -> 'a)
   -> knom:('s -> Lexing.lexbuf -> 'a)
   -> Lexing.lexbuf -> 'a

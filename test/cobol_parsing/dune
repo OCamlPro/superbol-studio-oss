@@ -11,7 +11,7 @@
 
 (library
  (name test_cobol_parser)
- (modules cS_tokens decimal_point tokens)
+ (modules compiler_directives cS_tokens decimal_point tokens)
  (preprocess
   (pps ppx_expect))
  (inline_tests

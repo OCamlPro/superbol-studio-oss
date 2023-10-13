@@ -237,6 +237,8 @@ let compilation_group :=
 
 (* --- CONTROL DIVISION --- *)
 
+(* TODO: leave a flag/source location in the parse tree, and check support for
+   CONTROL DIVISION later. *)
 let control_division [@post.diagnostic fun _ -> Config.control_division#verify] :=
   | CONTROL; DIVISION; ".";
     option(default_section)

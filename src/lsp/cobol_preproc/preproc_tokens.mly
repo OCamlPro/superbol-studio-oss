@@ -29,8 +29,8 @@
 
 %token ALSO                      [@keyword]
 %token BY                        [@keyword]
-%token CDIR_SET                  [@keyword ">>SET"]
-%token CDIR_SOURCE               [@keyword ">>SOURCE"]
+%token CDIR_SET                  [@keyword ">>SET", "$SET"]
+%token CDIR_SOURCE               [@keyword ">>SOURCE", "$SOURCE"]
 %token COPY                      [@keyword]
 %token FORMAT                    [@keyword]
 %token FREE                      [@keyword]                       (* +COB2002 *)

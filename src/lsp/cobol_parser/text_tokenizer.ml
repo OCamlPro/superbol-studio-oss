@@ -109,7 +109,7 @@ let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
 
 (* Tokenization of manipulated text, to feed the compilation group parser: *)
 
-let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
+let preproc_n_combine_tokens ~source_format =
   (* Simplifies the grammar, and applies some token-based pre-processsing to
      deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
@@ -162,9 +162,7 @@ let preproc_n_combine_tokens (module Config: Cobol_config.T) ~source_format =
               comment_paragraph ~stop_column:first_area_b_column
         and at_end ~loc ~revtoks (p', l', diags) =
           let p', l' = comment_entry revtoks :: p', loc :: l' in
-          match Config.comment_paragraphs#verify ~loc:(Some loc) with
-          | Ok ((), None)   | Error  None    -> p', l', diags
-          | Ok ((), Some d) | Error (Some d) -> p', l', DIAGS.Set.cons d diags
+          p', l', diags
         in
         consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
           ("comment@ entry": Pretty.simple) acc suff
@@ -333,6 +331,7 @@ module Make (Config: Cobol_config.T) = struct
       -> let tokens = Text_lexer.tokens_of_string' ~options (w &@ loc) in
         List.map distinguish_words tokens, DIAGS.Set.none
     | Alphanum { knd = Basic; str; qte = quotation; _ }
+      (* TODO: Leave those as is in the parse-tree, and decode later *)
       when Config.ebcdic_symbolic_characters#value
       -> let token, diags =
            Text_lexer.decode_symbolic_ebcdics' ~quotation (str &@ loc) in
@@ -408,7 +407,7 @@ module Make (Config: Cobol_config.T) = struct
     let state = { state with leftover_tokens = [] } in
     let new_tokens, state = tokens_of_text state text in
     let tokens = leftover_tokens @ new_tokens in
-    match preproc_n_combine_tokens (module Config) ~source_format tokens with
+    match preproc_n_combine_tokens ~source_format tokens with
     | Ok (tokens, diags) ->
         Ok tokens, { state with diags = DIAGS.Set.union diags state.diags }
     | Error `MissingInputs ->

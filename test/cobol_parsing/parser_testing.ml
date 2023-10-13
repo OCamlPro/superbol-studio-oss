@@ -14,18 +14,21 @@
 module DIAGS = Cobol_common.Diagnostics
 module StrMap = EzCompat.StringMap
 
-let show_parsed_tokens
-    ?(verbose = false)
+let preproc
     ?(source_format = Cobol_config.(SF SFFixed))
-    prog =
+    prog
+  =
+  String { filename = "prog.cob"; contents = prog } |>
+  Cobol_preproc.preprocessor
+    ~options:Cobol_preproc.Options.{
+        default with
+        libpath = [];
+        source_format
+      }
+
+let show_parsed_tokens ?(verbose = false) ?source_format prog =
   let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
-    String { filename = "prog.cob"; contents = prog } |>
-    Cobol_preproc.preprocessor
-      ~options:Cobol_preproc.Options.{
-          default with
-          libpath = [];
-          source_format
-        } |>
+    preproc ?source_format prog |>
     Cobol_parser.parse_with_artifacts
       ~options:Cobol_parser.Options.{
           default with
@@ -34,6 +37,20 @@ let show_parsed_tokens
         }
   in
   Cobol_parser.INTERNAL.pp_tokens Fmt.stdout (Lazy.force tokens)
+
+(** Note: won't show detailed source locations as the openned file is not
+    actually on disk (that may be fixed later with a custom internal file
+    store). *)
+let show_diagnostics ?(verbose = false) ?source_format prog =
+  preproc ?source_format prog |>
+  Cobol_parser.parse_simple
+    ~options:Cobol_parser.Options.{
+        default with
+        verbose;
+        recovery = EnableRecovery { silence_benign_recoveries = true };
+      } |>
+  DIAGS.forget_result |>
+  Cobol_common.show_diagnostics ~ppf:Fmt.stdout
 
 (* --- *)
 

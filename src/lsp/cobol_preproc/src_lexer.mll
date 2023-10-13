@@ -100,13 +100,19 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # [';' '\'' '"' '=' '<' '>']
-let text_word = (text_char # '*' | '*' (text_char # ['>']))+ | opers
+let text_char = nonblank # [';' '\'' '"' '=']
+let text_word_prefix =
+  ((text_char # ['*' '>'])  text_char       ?)  |
+  (             ['*' '>']  (text_char # ['>']))
+let text_word =
+  (text_word_prefix (text_char # ['*' '>'] | '*' (text_char # ['>']))*) | opers
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
+let cdir_word_suffix =
+  (cdir_char+ ((cdir_char | '_' | '-') cdir_char*)*)
 let cdir_word =
-  (">>" ' '? cdir_char+ ((cdir_char | '_' | '-') cdir_char*)*)
+  (">>" blanks? cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -120,9 +126,13 @@ rule fixed_line state
       {
         fixed_continue_line state lexbuf
       }
-  | sna '$'                                  (* microfocus compiler directive *)
+  | sna ('$' as marker)                                 (* compiler directive *)
       {
-        fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
+        fixed_cdir_line (String.make 1 marker) state lexbuf
+      }
+  | sna ('>' as marker)
+      {
+        maybe_fixed_cdir_line marker state lexbuf
       }
   | sna (['*' '/'] as marker)                                 (* comment line *)
       {
@@ -185,9 +195,13 @@ and acutrm_line state   (* ACUCOBOL-GT Terminal (compat with VAX COBOL term.) *)
       }
 and xopen_or_crt_or_acutrm_followup state
   = parse
-  | '$'             (* microfocus compiler directive (CHECKME: also for CRT?) *)
+  | ('$' as marker)
       {
-        fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
+        fixed_cdir_line (String.make 1 marker) state lexbuf
+      }
+  | cdir_word
+      {
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }
   | (['*' '/'] as marker)                                     (* comment line *)
       {
@@ -207,9 +221,9 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       {
         fixed_continue_line state lexbuf
       }
-  | '$'          (* microfocus compiler directive (CHECKME: also for COBOLX?) *)
+  | ('$' | ">>" as marker)
       {
-        fixed_cdir_line (Src_lexing.flush_continued state) lexbuf
+        fixed_cdir_line marker state lexbuf
       }
   | (['*' '/'] as marker)                                     (* comment line *)
       {
@@ -223,6 +237,10 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       {
         Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
+      }
+  | cdir_word
+      {
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }
   | epsilon
       {
@@ -243,7 +261,7 @@ and fixed_nominal_line state
       {
         fixed_nominal_line state lexbuf
       }
-  | cdir_word            (* CHECKME: does this need to be first item on line? *)
+  | cdir_word
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }
@@ -280,15 +298,27 @@ and fixed_nominal state
       {
         newline_or_eof state lexbuf
       }
-and fixed_cdir_line state                    (* microfocus compiler directive *)
+and fixed_cdir_line marker state                        (* compiler directive *)
   = parse
-  | blanks? text_word
+  | blanks? cdir_word_suffix
       {
-        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
+          ~marker (Src_lexing.flush_continued state) lexbuf
       }
   | epsilon
       {
-        newline_or_eof state lexbuf
+        newline_or_eof (Src_lexing.flush_continued state) lexbuf
+      }
+and maybe_fixed_cdir_line c state (* we just read [c='>'] in indicator column *)
+  = parse
+  | '>'
+      {
+        fixed_cdir_line ">>" state lexbuf
+      }
+  | epsilon                                              (* report error on c *)
+      {
+        Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
+          ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
       }
 and fixed_continue_line state
   = parse
