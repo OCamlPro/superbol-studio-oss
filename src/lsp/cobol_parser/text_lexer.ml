@@ -109,16 +109,16 @@ module Make (Words: module type of Text_keywords) = struct
   let silenced_keywords =
     StringSet.of_list Words.silenced_keywords
 
-  let reserve_words: Cobol_config.words_spec -> DIAGS.Set.t =
+  let reserve_words: Cobol_config.words_spec -> unit =
     let on_token_handle_of kwd descr ~f =
-      try f @@ handle_of_keyword kwd; DIAGS.Set.none with
+      try f @@ handle_of_keyword kwd with
       | Not_found when StringSet.mem kwd silenced_keywords ->
-          DIAGS.Set.none                            (* Ignore silently? Warn? *)
+          ()                                        (* Ignore silently? Warn? *)
       | Not_found ->
-          DIAGS.Set.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
+          Pretty.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
     in
-    List.fold_left begin fun diags (w, word_spec) ->
-      DIAGS.Set.union diags @@ match word_spec with
+    List.iter begin fun (w, word_spec) ->
+      match word_spec with
       | Cobol_config.ReserveWord { preserve_context_sensitivity } ->
           on_token_handle_of w "reserve" ~f:begin fun h ->
             if preserve_context_sensitivity
@@ -133,7 +133,7 @@ module Make (Words: module type of Text_keywords) = struct
           end
       | NotReserved ->
           on_token_handle_of w "unreserve" ~f:unreserve_token
-    end DIAGS.Set.none
+    end
 
   let enable_tokens tokens =
     TokenHandles.iter enable_token tokens

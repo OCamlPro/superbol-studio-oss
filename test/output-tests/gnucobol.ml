@@ -137,6 +137,8 @@ let setup_input ~filename contents =
 let delete_file ~filename =
   Ez_file.FileString.remove filename
 
+(* TODO: try guessing dialect/standard as well *)
+
 let free_flag_regexp = Str.regexp {re|\(^-free\|[ \t]-free\b\)|re}
 let fixd_format_regexp = Str.regexp_string "-fformat=fixed"
 let free_format_regexp = Str.regexp_string "-fformat=free"

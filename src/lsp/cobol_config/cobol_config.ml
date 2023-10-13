@@ -270,9 +270,16 @@ let from_dialect (module Diags: DIAGS.STATEFUL) ~strict d =
   in
   match d with
   | DIALECT.Default -> (module Default: T)
-  | COBOL85         -> load_gnucobol_conf d ~strict:false "cobol85"
   | GnuCOBOL        -> load_gnucobol_conf d ~strict:false "default"
+  | COBOL85         -> load_gnucobol_conf d ~strict:false "cobol85"
+  | COBOL2002       -> load_gnucobol_conf d ~strict:false "COBOL2002"
+  | COBOL2014       -> load_gnucobol_conf d ~strict:false "COBOL2014"
   | ACU             -> load_gnucobol_conf d ~strict       "acu"
-  | MicroFocus      -> load_gnucobol_conf d ~strict       "mf"
+  | BS2000          -> load_gnucobol_conf d ~strict       "bs2000"
   | GCOS            -> load_gnucobol_conf d ~strict       "gcos"
   | IBM             -> load_gnucobol_conf d ~strict       "ibm"
+  | MicroFocus      -> load_gnucobol_conf d ~strict       "mf"
+  | MVS             -> load_gnucobol_conf d ~strict       "mvs"
+  | Realia          -> load_gnucobol_conf d ~strict       "realia"
+  | RM              -> load_gnucobol_conf d ~strict       "rm"
+  | XOpen           -> load_gnucobol_conf d ~strict       "xopen"
