@@ -46,9 +46,10 @@ module Make (Config: Cobol_config.T): sig
       (i.e, not considered as keywords) upon initialization; calls to
       {!enable_tokens} or {!disable_tokens} are needed to enable or disable them
       when needed.  *)
-  val init
-    : 'a memory
-    -> context_sensitive_tokens: Text_lexer.TokenHandles.t
+  val init                                      (* TODO: pass config as value *)
+    : ?verbose:bool
+    -> ?show_if_verbose:[> `Tks | `Ctx] list
+    -> 'a memory
     -> 'a state
 
   val diagnostics
@@ -70,28 +71,38 @@ module Make (Config: Cobol_config.T): sig
     -> tokens
     -> ('a state * token * tokens) option
 
-  val enable_tokens
-    : 'a state
-    -> tokens
-    -> Text_lexer.TokenHandles.t
-    -> 'a state * tokens
-
-  val disable_tokens
-    : 'a state
-    -> tokens
-    -> Text_lexer.TokenHandles.t
-    -> 'a state * tokens
-
   val put_token_back
     : 'a state
     -> token
     -> tokens
     -> 'a state * tokens
 
+  (* --- *)
+
   val decimal_point_is_comma
     : 'a state
     -> token
     -> tokens
     -> 'a state * token * tokens
+
+  (* --- *)
+
+  val push_contexts
+    : 'a state
+    -> tokens
+    -> Grammar_contexts.context list
+    -> 'a state * tokens
+
+  val top_context
+    : _ state
+    -> Grammar_contexts.context option
+
+  val pop_context
+    : 'a state
+    -> tokens
+    -> 'a state * tokens
+
+  val enable_context_sensitive_tokens: _ state -> unit
+  val disable_context_sensitive_tokens: _ state -> unit
 
 end

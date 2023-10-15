@@ -37,8 +37,6 @@ let tokens_module =
   | "" -> String.capitalize_ascii @@ Filename.basename Grammar.basename
   | s -> s
 
-let all_ctxts = ref []
-
 let context_list str =
   String.split_on_char ',' str |>
   List.filter_map (fun ctxt ->
@@ -54,6 +52,32 @@ let has_contexts attrs =
 let contexts attrs =
   List.find_opt (Attribute.has_label "contexts") attrs |>
   Option.fold ~none:[] ~some:(fun attr -> context_list @@ Attribute.payload attr)
+
+let all_ctxts =
+  List.sort_uniq (String.compare) @@
+  Terminal.fold begin fun t acc ->
+    let attrs = Terminal.attributes t in
+    if has_contexts attrs
+    then List.rev_append (contexts attrs) acc
+    else acc
+  end []
+
+let emit_prelude ppf =
+  Fmt.pf ppf "module TH = Text_lexer.TokenHandles@\n\
+              @[<v 2>type context =@;| %a@]@\n\
+              type t = context@\n@\n\
+              @[<v 2>type context_tokens =@;\
+              @[<v 2>{@;%a;@]@;}@]@;@\n\
+              @[<v 2>type handles =@;\
+              @[<v 2>{@;\
+              context_tokens: context_tokens;@;\
+              context_sensitive_tokens: TH.t;@;\
+              context_sensitive_tokens_unimplemented: TH.t;@]@;\
+              }@]@\n"
+    Fmt.(list ~sep:(any "@;| ")
+           (fun ppf c -> Fmt.string ppf (String.capitalize_ascii c))) all_ctxts
+    Fmt.(list ~sep:(any ";@;")
+           (fun ppf n -> Fmt.pf ppf "%s: TH.t" n)) all_ctxts
 
 let emit_contexts ppf t =
   match Terminal.kind t with
@@ -76,26 +100,19 @@ let emit_specs ppf =
   Fmt.pf ppf "@]]@\nin@\n"
 
 let emit_empty_record ppf =
-  Fmt.(list ~sep:(any ";@\n") (fun ppf c -> Fmt.pf ppf "    %s = empty" c) ppf) !all_ctxts
+  Fmt.(list ~sep:(any ";@\n") (fun ppf c -> Fmt.pf ppf "    %s = empty" c) ppf)
+    all_ctxts
 
 let emit_ctxt_funs ppf =
-  Fmt.(list
-         ~sep:(any "@\n")
+  Fmt.(list ~sep:(any "@\n")
          (fun ppf c ->
-            Fmt.pf ppf "let %s t c = { c with %s = add t c.%s } in" c c c)
-         ppf)
-    !all_ctxts
-
-let emit_fold ppf =
-  Fmt.pf ppf "List.fold_left (fun (acc, cstoks, unimpl) (t, add_contexts) ->@\n\
-             \  let h = Text_lexer.handle_of_token t in@\n\
-             \  List.fold_left (fun acc f -> f h acc) acc add_contexts,@\n\
-             \  TH.add h cstoks,@\n\
-             \  if add_contexts = [] then TH.add h unimpl else unimpl)@\n\
-             (empty, TH.empty, TH.empty) specs"
+            pf ppf "let %s t c = { c with %s = add t c.%s } in" c c c))
+    ppf
+    all_ctxts
 
 let emit_tokens_contexts ppf =
-  Fmt.pf ppf "let all, sensitive_tokens, sensitive_tokens_unimplemented =@\n\
+  (* Fmt.pf ppf "let all, sensitive_tokens, sensitive_tokens_unimplemented =@\n\ " *)
+  Fmt.pf ppf "let init ~handle_of_token =@\n\
               @[<2>  let open TH in@\n\
               let empty =@\n\
              \  {@\n\
@@ -104,38 +121,30 @@ let emit_tokens_contexts ppf =
               in@\n\
               %t@\n\
               %t\
-              %t@]"
+              @[<v 2>let @[<v>context_tokens,@;\
+              context_sensitive_tokens,@;\
+              context_sensitive_tokens_unimplemented@] =@;\
+              List.fold_left (fun (acc, cstoks, unimpl) (t, add_contexts) ->@\n\
+             \  let h = handle_of_token t in@\n\
+             \  List.fold_left (fun acc f -> f h acc) acc add_contexts,@\n\
+             \  TH.add h cstoks,@\n\
+             \  if add_contexts = [] then TH.add h unimpl else unimpl)@\n\
+              (empty, TH.empty, TH.empty) specs@]@;\
+              in@;\
+              @[<v 2>{ context_tokens;@;\
+              context_sensitive_tokens;@;\
+              context_sensitive_tokens_unimplemented }@]@]"
     emit_empty_record
     emit_ctxt_funs
     emit_specs
-    emit_fold
 
-let emit_context_type ppf =
-  let ctxts = ref [] in
-  Terminal.iter (fun t ->
-      let attrs = Terminal.attributes t in
-      if has_contexts attrs then
-        begin
-          ctxts := (contexts attrs) @ !ctxts
-        end);
-  let ctxts = List.sort_uniq (String.compare) !ctxts in
-  all_ctxts := ctxts;
-  Fmt.(list ~sep:(any ";@\n") (fun ppf n -> Fmt.pf ppf "    %s: t" n) ppf) ctxts
-
-let emit_prelude ppf =
-  Fmt.pf ppf "module TH = Text_lexer.TokenHandles@\n\
-              type context = TH.t@\n@\n\
-              type t = context@\n\
-              type contexts =@\n\
-              \  {@\n\
-              %t;@\n\
-              \  }@\n"
-    emit_context_type
-
-let emit_context_values ppf =
-  List.iter (fun ctxt ->
-      Fmt.pf ppf "let %s = all.%s@\n" ctxt ctxt)
-    !all_ctxts
+let emit_context_mapping ppf =
+  Fmt.pf ppf "@[<v 2>let tokens_of_context context_tokens : t -> TH.t = \
+              function@;| %a@]@\n"
+    Fmt.(list ~sep:(any "@;| ")
+           (fun ppf c -> Fmt.pf ppf "%s -> context_tokens.%s"
+               (String.capitalize_ascii c) c))
+    all_ctxts
 
 let emit ppf =
   Fmt.pf ppf
@@ -146,8 +155,7 @@ let emit ppf =
     !name
     emit_prelude
     emit_tokens_contexts
-    emit_context_values
+    emit_context_mapping
 
 let () =
   emit Fmt.stdout
-

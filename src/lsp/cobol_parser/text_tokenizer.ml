@@ -291,30 +291,64 @@ module Make (Config: Cobol_config.T) = struct
     | Amnesic: Cobol_common.Behaviors.amnesic memory
     | Eidetic: tokens -> Cobol_common.Behaviors.eidetic memory
 
-  type 'a state =
+  type 'm state =
     {
       expect_picture_string: bool;
       leftover_tokens: tokens; (* non-empty only when [preproc_n_combine_tokens]
                                   errors out for lack of input tokens. *)
-      memory: 'a memory;
+      memory: 'm memory;
+      context_stack: Context.stack;
       diags: DIAGS.Set.t;
       lexing_options: Text_lexer.lexing_options;
+      persist: persist;
+    }
+
+  (** Part of the state that never changes. *)
+  and persist =
+    {
+      context_tokens: Grammar_contexts.context_tokens;
+      verbose: bool;
+      show_if_verbose: [`Tks | `Ctx] list;
     }
 
   let amnesic = Amnesic
   let eidetic = Eidetic []
-  let init memory ~context_sensitive_tokens =
+  let init
+      ?(verbose = false)
+      ?(show_if_verbose = [`Tks; `Ctx])
+      memory
+    =
+    let Grammar_contexts.{ context_tokens;
+                           context_sensitive_tokens;
+                           context_sensitive_tokens_unimplemented = _ } =
+      Grammar_contexts.init
+        ~handle_of_token:Text_lexer.handle_of_token
+    in
     init_text_lexer ~context_sensitive_tokens;
     {
       expect_picture_string = false;
       leftover_tokens = [];
       memory;
+      context_stack = Context.empty_stack;
       diags = DIAGS.Set.none;
       lexing_options = Text_lexer.default_lexing_options;
+      persist =
+        {
+          context_tokens;
+          verbose;
+          show_if_verbose =
+            (if List.mem `Tks show_if_verbose then [`Tks] else []) @
+            (if List.mem `Ctx show_if_verbose then [`Ctx] else []);
+        }
     }
 
   let diagnostics { diags; _ } = diags
   let parsed_tokens { memory = Eidetic tokens; _ } = lazy (List.rev tokens)
+
+  let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
+    verbose && List.mem tag show_if_verbose
+
+  (* --- *)
 
   let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
     | { payload = WORD w; loc } when loc_in_area_a loc ->
@@ -410,6 +444,8 @@ module Make (Config: Cobol_config.T) = struct
     let tokens = leftover_tokens @ new_tokens in
     match preproc_n_combine_tokens ~source_format tokens with
     | Ok (tokens, diags) ->
+        if show `Tks state then
+          Pretty.error "Tks: %a@." pp_tokens tokens;
         Ok tokens, { state with diags = DIAGS.Set.union diags state.diags }
     | Error `MissingInputs ->
         Error `MissingInputs, { state with leftover_tokens = tokens }
@@ -539,9 +575,59 @@ module Make (Config: Cobol_config.T) = struct
     let tokens = token :: tokens in
     let tokens = retokenize_after CommaBecomesDecimalPoint state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in
+    if show `Tks state then
+      Pretty.error "Tks': %a@." pp_tokens tokens;
     emit_token state token, token, tokens
 
   let put_token_back state token tokens =
     put_token_back state, token :: tokens
+
+  (* --- *)
+
+  let push_contexts state tokens : Context.t list -> 's * 'a = function
+    | [] ->
+        state, tokens
+    | contexts ->
+        let context_stack, tokens_set =
+          let context_tokens = state.persist.context_tokens in
+          List.fold_left begin fun (stack, set) ctx ->
+            if show `Ctx state then
+              Pretty.error "Incoming: %a@."
+                (Context.pp_context context_tokens) ctx;
+
+            (* Push the new context on top of the stack *)
+            let stack = Context.push context_tokens ctx stack in
+
+            stack, Text_lexer.TokenHandles.union set @@ Context.top_tokens stack
+          end (state.context_stack, Text_lexer.TokenHandles.empty) contexts
+        in
+
+        (* Update tokenizer state *)
+        let state, tokens = enable_tokens state tokens tokens_set in
+        if show `Tks state then
+          Pretty.error "Tks': %a@." pp_tokens tokens;
+
+        (if context_stack == state.context_stack
+         then state
+         else { state with context_stack }),
+        tokens
+
+  let top_context state =
+    Context.top state.context_stack
+
+  let pop_context ({ context_stack; _ } as state) tokens =
+    let context_stack, tokens_set = Context.pop context_stack in
+
+    if show `Ctx state then
+      Pretty.error "Outgoing: %a@." Text_lexer.pp_tokens_via_handles tokens_set;
+
+    let state, tokens = disable_tokens state tokens tokens_set in
+    { state with context_stack }, tokens
+
+  let enable_context_sensitive_tokens state =
+    Text_lexer.enable_tokens (Context.all_tokens state.context_stack)
+
+  let disable_context_sensitive_tokens state =
+    Text_lexer.disable_tokens (Context.all_tokens state.context_stack)
 
 end

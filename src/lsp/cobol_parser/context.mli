@@ -13,10 +13,11 @@
 
 (** {2 Context(s)} *)
 
-type context = Grammar_contexts.t
-val pp_context: context Pretty.printer
+type context = Grammar_contexts.context
+val pp_context: Grammar_contexts.context_tokens -> context Pretty.printer
 
 type t = context
+
 (** {2 Context stack} *)
 
 type stack
@@ -24,7 +25,7 @@ type stack
 (** {3 Usual operations on context stacks} *)
 
 val empty_stack: stack
-val push: context -> stack -> stack
+val push: Grammar_contexts.context_tokens -> context -> stack -> stack
 val top: stack -> context option
 
 (** {3 Context-specific operations} *)

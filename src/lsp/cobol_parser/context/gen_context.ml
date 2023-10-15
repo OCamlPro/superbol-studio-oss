@@ -61,13 +61,14 @@ let emit_nonterminal_contexts ppf =
           Fmt.epr "%a:@\n\
                    @[<2>** Warning:@ context@ `%s'@ on@ nullable@ \
                    non-terminal@]@." pp_pos pos s;
-        Fmt.pf ppf "  | N_%s -> Some %s\n" (Nonterminal.name n) s
+        Fmt.pf ppf "  | N_%s -> Some %s\n" (Nonterminal.name n) (String.capitalize_ascii s)
     | None -> ()
   end;
   Fmt.pf ppf "\
     \  | _ -> None\n"
 
-let pp_contexts = Fmt.(list ~sep:(any ";@ ") string)
+let pp_contexts =
+  Fmt.(list ~sep:(any ";@ ") (fun ppf s -> pf ppf "%s" (String.capitalize_ascii s)))
 
 let emit_contexts_mapping ppf =
   Fmt.pf ppf "\

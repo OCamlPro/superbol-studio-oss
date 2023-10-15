@@ -25,8 +25,23 @@ module TokenHandles: sig
   val mem_text_token: Grammar_tokens.token -> t -> bool
 end
 
+(* --- *)
+
+val default_lexing_options: lexing_options
+
+(* --- *)
+
+(* module type WORDS = sig *)
+(*   val keywords : (string * Grammar_tokens.token) list *)
+(*   val silenced_keywords : string list *)
+(*   val puncts : (string * Grammar_tokens.token) list *)
+(* end *)
+
+(* module Make (Words: WORDS) : sig *)
+
 val show_token: Grammar_tokens.token -> string
 val show_token_of_handle: token_handle -> string
+val pp_tokens_via_handles: TokenHandles.t Pretty.printer
 
 (* --- *)
 
@@ -38,10 +53,6 @@ val disable_tokens: TokenHandles.t -> unit
 (** Only for debugging *)
 val keyword_of_token : (Grammar_tokens.token, string) Hashtbl.t
 val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
-
-(* --- *)
-
-val default_lexing_options: lexing_options
 
 (* --- *)
 
@@ -88,3 +99,5 @@ val decode_symbolic_ebcdics'
   -> string Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc *
      Cobol_common.Diagnostics.Set.t
+
+(* end *)

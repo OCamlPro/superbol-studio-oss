@@ -4,133 +4,133 @@ open MenhirInterpreter
 open Grammar_contexts
 
 let nonterminal_context: type k. k nonterminal -> _ option = function
-  | N_validate_status_clause -> Some validate_status_clause
-  | N_usage -> Some usage_clause   (* ok as none of leftmost terminals are C/S *)
-  | N_typedef_clause -> Some typedef_clause
-  | N_stop_statement -> Some stop_stmt
-  | N_sharing_phrase -> Some sharing_phrase
-  | N_sharing_clause -> Some sharing_clause
-  | N_set_statement -> Some set_stmt
-  | N_set_attribute_switches -> Some set_attribute_stmt
-  | N_screen_descr_entry -> Some screen_descr_entry
-  | N_rounded_phrase -> Some rounded_phrase
-  | N_rounded_clause -> Some rounded_phrase
-  | N_retry_phrase -> Some retry_phrase
-  | N_resume_statement -> Some resume_stmt
-  | N_report_occurs_clause -> Some occurs_clause
-  | N_read_statement -> Some read_stmt
-  | N_program_definition_id_paragraph -> Some program_id_paragraph
-  | N_options_paragraph -> Some options_paragraph
-  | N_occurs_fixed_clause -> Some occurs_clause
-  | N_occurs_dynamic_clause -> Some occurs_clause
-  | N_occurs_depending_clause -> Some occurs_clause
-  | N_object_paragraph -> Some object_paragraph
-  | N_object_computer_paragraph -> Some object_computer_paragraph
-  | N_lock_mode_clause -> Some lock_mode_clause
-  | N_line_header -> Some line_clause                             (*NUMBERS only*)
-  | N_intermediate_rounding_clause -> Some intermediate_rounding_clause
-  | N_interface_specifier -> Some interface_specifier
-  | N_function_specifier -> Some function_specifier
-  | N_float_decimal_clause -> Some float_decimal_clause
-  | N_float_binary_clause -> Some float_binary_clause
-  | N_factory_paragraph -> Some factory_paragraph
-  | N_exit_statement -> Some exit_stmt
-  | N_erase_clause -> Some erase_clause
-  | N_entry_convention_clause -> Some entry_convention_clause
-  | N_dynamic_length_structure_clause -> Some dynlen_struct_clause
-  | N_default_clause -> Some default_clause
-  | N_currency_sign_clause -> Some currency_clause
-  | N_constant_value_length -> Some constant
-  | N_column_header -> Some column_clause              (* NUMBERS & CENTER *)
-  | N_class_specifier -> Some class_specifier
-  | N_arithmetic_clause -> Some arithmetic_clause
-  | N_alphabet_name_clause -> Some alphabet_clause
-  | N_allocate_statement -> Some allocate_stmt
-  | N_accept_statement -> Some accept_stmt
+  | N_validate_status_clause -> Some Validate_status_clause
+  | N_usage -> Some Usage_clause   (* ok as none of leftmost terminals are C/S *)
+  | N_typedef_clause -> Some Typedef_clause
+  | N_stop_statement -> Some Stop_stmt
+  | N_sharing_phrase -> Some Sharing_phrase
+  | N_sharing_clause -> Some Sharing_clause
+  | N_set_statement -> Some Set_stmt
+  | N_set_attribute_switches -> Some Set_attribute_stmt
+  | N_screen_descr_entry -> Some Screen_descr_entry
+  | N_rounded_phrase -> Some Rounded_phrase
+  | N_rounded_clause -> Some Rounded_phrase
+  | N_retry_phrase -> Some Retry_phrase
+  | N_resume_statement -> Some Resume_stmt
+  | N_report_occurs_clause -> Some Occurs_clause
+  | N_read_statement -> Some Read_stmt
+  | N_program_definition_id_paragraph -> Some Program_id_paragraph
+  | N_options_paragraph -> Some Options_paragraph
+  | N_occurs_fixed_clause -> Some Occurs_clause
+  | N_occurs_dynamic_clause -> Some Occurs_clause
+  | N_occurs_depending_clause -> Some Occurs_clause
+  | N_object_paragraph -> Some Object_paragraph
+  | N_object_computer_paragraph -> Some Object_computer_paragraph
+  | N_lock_mode_clause -> Some Lock_mode_clause
+  | N_line_header -> Some Line_clause                             (*NUMBERS only*)
+  | N_intermediate_rounding_clause -> Some Intermediate_rounding_clause
+  | N_interface_specifier -> Some Interface_specifier
+  | N_function_specifier -> Some Function_specifier
+  | N_float_decimal_clause -> Some Float_decimal_clause
+  | N_float_binary_clause -> Some Float_binary_clause
+  | N_factory_paragraph -> Some Factory_paragraph
+  | N_exit_statement -> Some Exit_stmt
+  | N_erase_clause -> Some Erase_clause
+  | N_entry_convention_clause -> Some Entry_convention_clause
+  | N_dynamic_length_structure_clause -> Some Dynlen_struct_clause
+  | N_default_clause -> Some Default_clause
+  | N_currency_sign_clause -> Some Currency_clause
+  | N_constant_value_length -> Some Constant
+  | N_column_header -> Some Column_clause              (* NUMBERS & CENTER *)
+  | N_class_specifier -> Some Class_specifier
+  | N_arithmetic_clause -> Some Arithmetic_clause
+  | N_alphabet_name_clause -> Some Alphabet_clause
+  | N_allocate_statement -> Some Allocate_stmt
+  | N_accept_statement -> Some Accept_stmt
   | _ -> None
 
 let contexts_for_state_num: int -> _ list = function
-  | 28 -> [program_id_paragraph]
-  | 154 -> [options_paragraph]
-  | 156 -> [intermediate_rounding_clause]
-  | 168 -> [float_decimal_clause]
-  | 181 -> [float_binary_clause]
-  | 185 -> [entry_convention_clause]
-  | 188 -> [rounded_phrase]
-  | 194 -> [arithmetic_clause]
-  | 233 -> [object_computer_paragraph]
-  | 347 -> [dynlen_struct_clause]
-  | 367 -> [currency_clause]
-  | 405 -> [alphabet_clause]
-  | 481 -> [interface_specifier]
-  | 491 -> [function_specifier]
-  | 498 -> [class_specifier]
-  | 527 -> [sharing_clause]
-  | 579 -> [lock_mode_clause]
-  | 1094 -> [validate_status_clause]
-  | 1120 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1125 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1127 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1128 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1141 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1142 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1143 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1146 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1147 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1148 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1149 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1152 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1154 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1159 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1161 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1163 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1164 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1165 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1166 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1167 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1168 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1169 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1170 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1171 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1172 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1173 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1174 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1175 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1176 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1177 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1178 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1184 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1186 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1188 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1190 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1192 -> [usage_clause   (* ok as none of leftmost terminals are C/S *)]
-  | 1194 -> [typedef_clause]
-  | 1394 -> [occurs_clause]
-  | 1448 -> [typedef_clause]
-  | 1474 -> [default_clause]
-  | 1479 -> [constant]
-  | 1953 -> [occurs_clause]
-  | 1980 -> [line_clause                             (*NUMBERS only*)]
-  | 1982 -> [line_clause                             (*NUMBERS only*)]
-  | 1992 -> [column_clause              (* NUMBERS & CENTER *)]
-  | 1998 -> [column_clause              (* NUMBERS & CENTER *)]
-  | 2003 -> [column_clause              (* NUMBERS & CENTER *)]
-  | 2025 -> [rounded_phrase]
-  | 2094 -> [screen_descr_entry]
-  | 2135 -> [erase_clause]
-  | 2392 -> [retry_phrase]
-  | 2486 -> [stop_stmt]
-  | 2573 -> [set_stmt]
-  | 2633 -> [set_attribute_stmt]
-  | 2721 -> [resume_stmt]
-  | 2739 -> [read_stmt]
-  | 2798 -> [sharing_phrase]
-  | 3043 -> [exit_stmt]
-  | 3180 -> [allocate_stmt]
-  | 3194 -> [accept_stmt]
-  | 3909 -> [program_id_paragraph]
-  | 4039 -> [object_paragraph]
-  | 4049 -> [factory_paragraph]
+  | 28 -> [Program_id_paragraph]
+  | 154 -> [Options_paragraph]
+  | 156 -> [Intermediate_rounding_clause]
+  | 168 -> [Float_decimal_clause]
+  | 181 -> [Float_binary_clause]
+  | 185 -> [Entry_convention_clause]
+  | 188 -> [Rounded_phrase]
+  | 194 -> [Arithmetic_clause]
+  | 233 -> [Object_computer_paragraph]
+  | 347 -> [Dynlen_struct_clause]
+  | 367 -> [Currency_clause]
+  | 405 -> [Alphabet_clause]
+  | 481 -> [Interface_specifier]
+  | 491 -> [Function_specifier]
+  | 498 -> [Class_specifier]
+  | 527 -> [Sharing_clause]
+  | 579 -> [Lock_mode_clause]
+  | 1094 -> [Validate_status_clause]
+  | 1120 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1125 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1127 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1128 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1141 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1142 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1143 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1146 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1147 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1148 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1149 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1152 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1154 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1159 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1161 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1163 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1164 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1165 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1166 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1167 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1168 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1169 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1170 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1171 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1172 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1173 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1174 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1175 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1176 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1177 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1178 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1184 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1186 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1188 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1190 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1192 -> [Usage_clause   (* ok as none of leftmost terminals are C/S *)]
+  | 1194 -> [Typedef_clause]
+  | 1394 -> [Occurs_clause]
+  | 1448 -> [Typedef_clause]
+  | 1474 -> [Default_clause]
+  | 1479 -> [Constant]
+  | 1953 -> [Occurs_clause]
+  | 1980 -> [Line_clause                             (*NUMBERS only*)]
+  | 1982 -> [Line_clause                             (*NUMBERS only*)]
+  | 1992 -> [Column_clause              (* NUMBERS & CENTER *)]
+  | 1998 -> [Column_clause              (* NUMBERS & CENTER *)]
+  | 2003 -> [Column_clause              (* NUMBERS & CENTER *)]
+  | 2025 -> [Rounded_phrase]
+  | 2094 -> [Screen_descr_entry]
+  | 2135 -> [Erase_clause]
+  | 2392 -> [Retry_phrase]
+  | 2486 -> [Stop_stmt]
+  | 2573 -> [Set_stmt]
+  | 2633 -> [Set_attribute_stmt]
+  | 2721 -> [Resume_stmt]
+  | 2739 -> [Read_stmt]
+  | 2798 -> [Sharing_phrase]
+  | 3043 -> [Exit_stmt]
+  | 3180 -> [Allocate_stmt]
+  | 3194 -> [Accept_stmt]
+  | 3909 -> [Program_id_paragraph]
+  | 4039 -> [Object_paragraph]
+  | 4049 -> [Factory_paragraph]
   | _ -> []
 
 let contexts: type k. k lr1state -> _ list = fun s ->

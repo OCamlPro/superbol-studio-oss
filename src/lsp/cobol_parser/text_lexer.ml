@@ -55,7 +55,13 @@ let default_lexing_options =
 
 (* --- *)
 
-module Make (Words: module type of Text_keywords) = struct
+module type WORDS = sig
+  val keywords : (string * Grammar_tokens.token) list
+  val silenced_keywords : string list
+  val puncts : (string * Grammar_tokens.token) list
+end
+
+module Make (Words: WORDS) = struct
 
   let token_of_punct = Hashtbl.create 15
   let punct_of_token = Hashtbl.create 15
@@ -79,6 +85,11 @@ module Make (Words: module type of Text_keywords) = struct
   (** Never raises {!Not_found}. *)
   let show_token_of_handle h =
     show_token @@ token_of_handle h
+
+  let pp_tokens_via_handles ppf toks =
+    Pretty.list ~fopen:"{@[" ~fclose:"@]}" ~fempty:"{}" begin fun ppf h ->
+      Pretty.string ppf (show_token_of_handle h)
+    end ppf (TokenHandles.elements toks)
 
   let reserve_token   h = h.reserved <- true
   let unreserve_token h = h.reserved <- false

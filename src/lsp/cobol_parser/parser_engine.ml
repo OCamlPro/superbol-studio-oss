@@ -86,7 +86,6 @@ module Make (Config: Cobol_config.T) = struct
     {
       pp: Cobol_preproc.preprocessor;               (* also holds diagnostics *)
       tokzr: 'm Tokzr.state;
-      context_stack: Context.stack;
       persist: 'm persist;
     }
 
@@ -96,21 +95,19 @@ module Make (Config: Cobol_config.T) = struct
       tokenizer_memory: 'm memory;
       recovery: recovery;
       verbose: bool;
-      show_if_verbose: [`Tks | `Ctx] list;
       show: [`Pending] list;
     }
 
   (** Initializes a parser state, given a preprocessor. *)
   let make_parser
       (type m) Parser_options.{ verbose; show; recovery; _ }
-      ?(show_if_verbose = [`Tks; `Ctx]) ~(tokenizer_memory: m memory) pp =
+      ?show_if_verbose ~(tokenizer_memory: m memory) pp =
     let tokzr: m Tokzr.state =
       let memory: m Tokzr.memory = match tokenizer_memory with
         | Parser_options.Amnesic -> Tokzr.amnesic
         | Parser_options.Eidetic -> Tokzr.eidetic
       in
-      Tokzr.init memory
-        ~context_sensitive_tokens:Grammar_contexts.sensitive_tokens
+      Tokzr.init ~verbose ?show_if_verbose memory
     in
     {
       prev_limit = None;
@@ -119,13 +116,11 @@ module Make (Config: Cobol_config.T) = struct
         {
           pp;
           tokzr;
-          context_stack = Context.empty_stack;
           persist =
             {
               tokenizer_memory;
               recovery;
               verbose;
-              show_if_verbose;
               show;
             }
         }
@@ -138,10 +133,6 @@ module Make (Config: Cobol_config.T) = struct
   and update_tokzr ps tokzr =
     if tokzr == ps.preproc.tokzr then ps
     else { ps with preproc = { ps.preproc with tokzr } }
-
-  let show tag
-      { preproc = { persist = { verbose; show_if_verbose; _ }; _ }; _ } =
-    verbose && List.mem tag show_if_verbose
 
   let add_diag diag ({ preproc = { pp; _ }; _ } as ps) =
     update_pp ps (Cobol_preproc.add_diag pp diag)
@@ -164,8 +155,6 @@ module Make (Config: Cobol_config.T) = struct
         produce_tokens (update_tokzr ps tokzr)
     | Error `ReachedEOF tokens, tokzr
     | Ok tokens, tokzr ->
-        if show `Tks ps then
-          Pretty.error "Tks: %a@." Text_tokenizer.pp_tokens tokens;
         update_tokzr ps tokzr, tokens
 
   let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
@@ -239,68 +228,28 @@ module Make (Config: Cobol_config.T) = struct
 
   (* --- *)
 
-  let update_context_stack ~stack_update ~tokenizer_update
-      ({ preproc; _ } as ps) tokens : Context.t list -> 's * 'a = function
-    | [] ->
-        ps, tokens
-    | contexts ->
-        let context_stack, tokens_set =
-          List.fold_left begin fun (context_stack, set) ctx ->
-            let context_stack, set' = stack_update context_stack ctx in
-            context_stack, Text_lexer.TokenHandles.union set set'
-          end (preproc.context_stack, Text_lexer.TokenHandles.empty) contexts
-        in
-
-        (* Update tokenizer state *)
-        let tokzr, tokens = tokenizer_update preproc.tokzr tokens tokens_set in
-        if show `Tks ps then
-          Pretty.error "Tks': %a@." Text_tokenizer.pp_tokens tokens;
-
-        (if context_stack == preproc.context_stack && tokzr == preproc.tokzr
-         then ps
-         else { ps with preproc = { preproc with tokzr; context_stack }}),
-        tokens
-
-  let leaving_context ps prod =
-    match Context.top ps.preproc.context_stack with
-    | None -> false                                            (* first filter *)
+  let leaving_context { preproc = { tokzr; _ }; _ } prod =
+    match Tokzr.top_context tokzr with
+    | None -> false
     | Some top_ctx ->
         match Grammar_interpr.lhs prod with
         | X T _ -> false
         | X N nt -> match Grammar_context.nonterminal_context nt with
-          | Some ctx -> ctx == top_ctx
+          | Some ctx -> ctx = top_ctx
           | _ -> false
 
-  let pop_context ({ preproc = { tokzr; context_stack; _ }; _ } as ps)
-      tokens =
-    let context_stack, tokens_set = Context.pop context_stack in
-    if show `Ctx ps then
-      Pretty.error "Outgoing: %a@." Context.pp_context tokens_set;
-    let tokzr, tokens = Tokzr.disable_tokens tokzr tokens tokens_set in
-    { ps with preproc = { ps.preproc with tokzr; context_stack }},
-    tokens
+  let pop_context ({ preproc = { tokzr; _ }; _ } as ps) tokens =
+    let tokzr, tokens = Tokzr.pop_context tokzr tokens in
+    update_tokzr ps tokzr, tokens
 
-  let push_incoming_contexts ps tokens env =
-
-    let push context_stack ctx =
-      if show `Ctx ps then
-        Pretty.error "Incoming: %a@." Context.pp_context ctx;
-
-      (* Push the new context on top of the stack *)
-      let context_stack = Context.push ctx context_stack in
-
-      (* ... and retrieve newly reserved tokens *)
-      context_stack, Context.top_tokens context_stack
+  let on_shift ({ preproc = { tokzr; _ }; _ } as ps) tokens env =
+    let tokzr, tokens = Tokzr.push_contexts tokzr tokens @@
+      Grammar_context.contexts_for_state_num @@
+      Grammar_interpr.current_state_number env
     in
+    update_tokzr ps tokzr, tokens
 
-    (* Retrieve and enable all incoming contexts *)
-    update_context_stack ps tokens
-      (Grammar_context.contexts_for_state_num @@
-       Grammar_interpr.current_state_number env)
-      ~stack_update:push
-      ~tokenizer_update:Tokzr.enable_tokens
-
-  let pop_outgoing_context ps tokens prod =
+  let on_reduction ps tokens prod =
     if leaving_context ps prod
     then pop_context ps tokens
     else ps, tokens
@@ -308,11 +257,11 @@ module Make (Config: Cobol_config.T) = struct
   (** Traverses a path (sequence of parser states or productions) that starts
       with the state that matches the current context stack, and applies the
       induced changes to the context stack. *)
-  let seesaw_context_stack ps tokens operations =
+  let seesaw_context_stack ps tokens recovery_operations =
     List.fold_left begin fun (ps, tokens) -> function
-      | Grammar_recovery.Env e -> push_incoming_contexts ps tokens e
-      | Grammar_recovery.Prod p -> pop_outgoing_context ps tokens p
-    end (ps, tokens) operations
+      | Grammar_recovery.Env e -> on_shift ps tokens e
+      | Grammar_recovery.Prod p -> on_reduction ps tokens p
+    end (ps, tokens) recovery_operations
 
   (* --- *)
 
@@ -340,10 +289,8 @@ module Make (Config: Cobol_config.T) = struct
         in
         ps, token, tokens
     | Post_special_names DecimalPointIsComma ->
-        let tokzr, token, tokens =
-          Tokzr.decimal_point_is_comma tokzr token tokens in
-        if show `Tks ps then
-          Pretty.error "Tks': %a@." Text_tokenizer.pp_tokens tokens;
+        let tokzr, token, tokens
+          = Tokzr.decimal_point_is_comma tokzr token tokens in
         update_tokzr ps tokzr, token, tokens
     | Post_pending descr ->
         pending descr ps env, token, tokens
@@ -352,7 +299,7 @@ module Make (Config: Cobol_config.T) = struct
         ps, token, tokens
 
   (** To be called {e after} a reduction of production [prod]. *)
-  let on_reduction ps token tokens prod = function
+  let after_reduction ps token tokens prod = function
     | Grammar_interpr.HandlingError env
     | AboutToReduce (env, _)
     | Shifting (_, env, _) ->
@@ -378,7 +325,7 @@ module Make (Config: Cobol_config.T) = struct
     | Grammar_interpr.InputNeeded env ->
         Trans (ps, tokens, env)
     | Shifting (_e1, e2, _) as c ->
-        let ps, tokens = push_incoming_contexts ps tokens e2 in
+        let ps, tokens = on_shift ps tokens e2 in
         normal ps tokens @@ Grammar_interpr.resume c
     | Accepted v ->
         accept ps v
@@ -406,10 +353,10 @@ module Make (Config: Cobol_config.T) = struct
            maybe that's a tad too optimistic; if they did we may need to report
            that. *)
         let c = Grammar_interpr.resume c in
-        let ps, token, tokens = on_reduction ps token tokens prod c in
+        let ps, token, tokens = after_reduction ps token tokens prod c in
         check ps token tokens env c
     | Shifting (_e1, e2, _) as c ->
-        let ps, tokens = push_incoming_contexts ps tokens e2 in
+        let ps, tokens = on_shift ps tokens e2 in
         check ps token tokens env @@ Grammar_interpr.resume c
     | c ->
         normal ps tokens c
@@ -554,17 +501,11 @@ module Make (Config: Cobol_config.T) = struct
   let rewindable_parser_state = function
     | { stage = Final (_, ps) | Trans (ps, _, _); _ } -> ps
 
-  (** Applies [f] on the set of all context-sensitive tokens that belong to the
-      context stack of the given parsing state. *)
-  let with_context_sensitive_tokens ~f rwps =
-    f (Context.all_tokens (rewindable_parser_state rwps).preproc.context_stack)
-
   (** Parses all the input, saving some rewindable history along the way. *)
   (* TODO: configurable [save_stage] *)
   let parse_with_history ?(save_stage = 10) rwps =
     let rec loop count ({ store; stage; _ } as rwps) = match stage with
       | Final (res, _) ->
-          with_context_sensitive_tokens rwps ~f:Text_lexer.disable_tokens;
           res, rwps
       | Trans ((ps, _, _) as state) ->
           let store, count =
@@ -575,8 +516,13 @@ module Make (Config: Cobol_config.T) = struct
           in
           loop count { rwps with store; stage }
     in
-    with_context_sensitive_tokens rwps ~f:Text_lexer.enable_tokens;
-    loop 0 rwps
+    Tokzr.enable_context_sensitive_tokens
+      (rewindable_parser_state rwps).preproc.tokzr;
+    let res, rwps = loop 0 rwps in
+    Tokzr.disable_context_sensitive_tokens
+      (rewindable_parser_state rwps).preproc.tokzr;
+    res, rwps
+
 
   let lexing_postion_of ~position rwps = match position with
     | Lexing pos ->
