@@ -51,7 +51,7 @@ depends: [
   "fmt" {>= "0.9"}
   "cobol_preproc" {= version}
   "cobol_common" {= version}
-  "ppx_inline_test" {with-test}
+  "ppx_inline_test" {>= "v0.16.1" with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}
