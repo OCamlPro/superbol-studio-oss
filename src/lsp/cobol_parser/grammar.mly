@@ -42,8 +42,8 @@ let dual_handler_none =
    single production by means of an attribute to the last item of its producers.
    When both attributes are given, the latter takes precedence.  *)
 
-(* Parameter module specific to post-actions *)
-%[@post.parameter Config: Cobol_config.T]
+(* (\* Parameter module specific to post-actions *\) *)
+(* %[@post.parameter Config: Cobol_config.T] *)
 
 (* Tag declaration for post-actions.
 
@@ -53,8 +53,8 @@ let dual_handler_none =
    this definition, grammar attributes "[@post.diagnostic ...]" may be used to
    create diagnostics based on the result of configuration feature
    verifications. *)
-%[@post.tag diagnostic loc:Cobol_common.Srcloc.srcloc option ->
-                           unit Cobol_common.Diagnostics.in_result]
+(* %[@post.tag diagnostic loc:Cobol_common.Srcloc.srcloc option -> *)
+(*                            unit Cobol_common.Diagnostics.in_result] *)
 
 %[@post.tag special_names Cobol_ptree.special_names_clause]
 
@@ -228,20 +228,22 @@ let ioloc (X) ==
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
-  | option(control_division);
+  | control_division = option(loc(control_division));
     ul = ll(loc(compilation_unit));
     pdo = loc(program_definition_no_end)?; EOF;
-    { match pdo with
-        | None -> ul
-        | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] }
+    { { control_division;
+        compilation_units =
+          match pdo with
+            | None -> ul
+            | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
 
 (* --- CONTROL DIVISION --- *)
 
 (* TODO: leave a flag/source location in the parse tree, and check support for
    CONTROL DIVISION later. *)
-let control_division [@post.diagnostic fun _ -> Config.control_division#verify] :=
+let control_division (* [@post.diagnostic fun _ -> Config.control_division#verify] *) :=
   | CONTROL; DIVISION; ".";
-    option(default_section)
+    option(default_section); {()} (* TODO: actually keep the section's contents *)
 
 let default_section :=
   | DEFAULT; SECTION; "."; default_section_clauses

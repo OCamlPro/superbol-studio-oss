@@ -1,56 +1,106 @@
 (* Caution this file was automatically generated from grammar.cmly; do not edit *)
 module TH = Text_lexer.TokenHandles
-type context = TH.t
-
+type context =
+  | Accept_stmt
+  | Allocate_stmt
+  | Alphabet_clause
+  | Arithmetic_clause
+  | Class_specifier
+  | Column_clause
+  | Constant
+  | Currency_clause
+  | Default_clause
+  | Dynlen_struct_clause
+  | Entry_convention_clause
+  | Erase_clause
+  | Exit_stmt
+  | Factory_paragraph
+  | Float_binary_clause
+  | Float_decimal_clause
+  | Function_specifier
+  | Interface_specifier
+  | Intermediate_rounding_clause
+  | Line_clause
+  | Lock_mode_clause
+  | Object_computer_paragraph
+  | Object_paragraph
+  | Occurs_clause
+  | Options_paragrahp
+  | Options_paragraph
+  | Options_pragraph
+  | Program_id_paragraph
+  | Read_statement
+  | Read_stmt
+  | Resume_stmt
+  | Retry_phrase
+  | Rounded_phrase
+  | Screen_descr_entry
+  | Screnn_descr_entry
+  | Set_attribute_stmt
+  | Set_stmt
+  | Sharing_clause
+  | Sharing_phrase
+  | Stop_stmt
+  | Typedef_clause
+  | Usage_clause
+  | Validate_status_clause
 type t = context
-type contexts =
+
+type context_tokens =
   {
-    accept_stmt: t;
-    allocate_stmt: t;
-    alphabet_clause: t;
-    arithmetic_clause: t;
-    class_specifier: t;
-    column_clause: t;
-    constant: t;
-    currency_clause: t;
-    default_clause: t;
-    dynlen_struct_clause: t;
-    entry_convention_clause: t;
-    erase_clause: t;
-    exit_stmt: t;
-    factory_paragraph: t;
-    float_binary_clause: t;
-    float_decimal_clause: t;
-    function_specifier: t;
-    interface_specifier: t;
-    intermediate_rounding_clause: t;
-    line_clause: t;
-    lock_mode_clause: t;
-    object_computer_paragraph: t;
-    object_paragraph: t;
-    occurs_clause: t;
-    options_paragrahp: t;
-    options_paragraph: t;
-    options_pragraph: t;
-    program_id_paragraph: t;
-    read_statement: t;
-    read_stmt: t;
-    resume_stmt: t;
-    retry_phrase: t;
-    rounded_phrase: t;
-    screen_descr_entry: t;
-    screnn_descr_entry: t;
-    set_attribute_stmt: t;
-    set_stmt: t;
-    sharing_clause: t;
-    sharing_phrase: t;
-    stop_stmt: t;
-    typedef_clause: t;
-    usage_clause: t;
-    validate_status_clause: t;
+    accept_stmt: TH.t;
+    allocate_stmt: TH.t;
+    alphabet_clause: TH.t;
+    arithmetic_clause: TH.t;
+    class_specifier: TH.t;
+    column_clause: TH.t;
+    constant: TH.t;
+    currency_clause: TH.t;
+    default_clause: TH.t;
+    dynlen_struct_clause: TH.t;
+    entry_convention_clause: TH.t;
+    erase_clause: TH.t;
+    exit_stmt: TH.t;
+    factory_paragraph: TH.t;
+    float_binary_clause: TH.t;
+    float_decimal_clause: TH.t;
+    function_specifier: TH.t;
+    interface_specifier: TH.t;
+    intermediate_rounding_clause: TH.t;
+    line_clause: TH.t;
+    lock_mode_clause: TH.t;
+    object_computer_paragraph: TH.t;
+    object_paragraph: TH.t;
+    occurs_clause: TH.t;
+    options_paragrahp: TH.t;
+    options_paragraph: TH.t;
+    options_pragraph: TH.t;
+    program_id_paragraph: TH.t;
+    read_statement: TH.t;
+    read_stmt: TH.t;
+    resume_stmt: TH.t;
+    retry_phrase: TH.t;
+    rounded_phrase: TH.t;
+    screen_descr_entry: TH.t;
+    screnn_descr_entry: TH.t;
+    set_attribute_stmt: TH.t;
+    set_stmt: TH.t;
+    sharing_clause: TH.t;
+    sharing_phrase: TH.t;
+    stop_stmt: TH.t;
+    typedef_clause: TH.t;
+    usage_clause: TH.t;
+    validate_status_clause: TH.t;
   }
 
-let all, sensitive_tokens, sensitive_tokens_unimplemented =
+type handles =
+  {
+    context_tokens: context_tokens;
+    context_sensitive_tokens: TH.t;
+    context_sensitive_tokens_unimplemented: TH.t;
+  }
+
+let init ~handle_of_token =
   let open TH in
   let empty =
     {
@@ -572,54 +622,62 @@ let all, sensitive_tokens, sensitive_tokens_unimplemented =
     ZERO_FILL, [];
     ]
   in
-  List.fold_left (fun (acc, cstoks, unimpl) (t, add_contexts) ->
-    let h = Text_lexer.handle_of_token t in
-    List.fold_left (fun acc f -> f h acc) acc add_contexts,
-    TH.add h cstoks,
-    if add_contexts = [] then TH.add h unimpl else unimpl)
-  (empty, TH.empty, TH.empty) specs
+  let context_tokens,
+      context_sensitive_tokens,
+      context_sensitive_tokens_unimplemented =
+    List.fold_left (fun (acc, cstoks, unimpl) (t, add_contexts) ->
+      let h = handle_of_token t in
+      List.fold_left (fun acc f -> f h acc) acc add_contexts,
+      TH.add h cstoks,
+      if add_contexts = [] then TH.add h unimpl else unimpl)
+    (empty, TH.empty, TH.empty) specs
+  in
+  { context_tokens;
+    context_sensitive_tokens;
+    context_sensitive_tokens_unimplemented }
 
-let accept_stmt = all.accept_stmt
-let allocate_stmt = all.allocate_stmt
-let alphabet_clause = all.alphabet_clause
-let arithmetic_clause = all.arithmetic_clause
-let class_specifier = all.class_specifier
-let column_clause = all.column_clause
-let constant = all.constant
-let currency_clause = all.currency_clause
-let default_clause = all.default_clause
-let dynlen_struct_clause = all.dynlen_struct_clause
-let entry_convention_clause = all.entry_convention_clause
-let erase_clause = all.erase_clause
-let exit_stmt = all.exit_stmt
-let factory_paragraph = all.factory_paragraph
-let float_binary_clause = all.float_binary_clause
-let float_decimal_clause = all.float_decimal_clause
-let function_specifier = all.function_specifier
-let interface_specifier = all.interface_specifier
-let intermediate_rounding_clause = all.intermediate_rounding_clause
-let line_clause = all.line_clause
-let lock_mode_clause = all.lock_mode_clause
-let object_computer_paragraph = all.object_computer_paragraph
-let object_paragraph = all.object_paragraph
-let occurs_clause = all.occurs_clause
-let options_paragrahp = all.options_paragrahp
-let options_paragraph = all.options_paragraph
-let options_pragraph = all.options_pragraph
-let program_id_paragraph = all.program_id_paragraph
-let read_statement = all.read_statement
-let read_stmt = all.read_stmt
-let resume_stmt = all.resume_stmt
-let retry_phrase = all.retry_phrase
-let rounded_phrase = all.rounded_phrase
-let screen_descr_entry = all.screen_descr_entry
-let screnn_descr_entry = all.screnn_descr_entry
-let set_attribute_stmt = all.set_attribute_stmt
-let set_stmt = all.set_stmt
-let sharing_clause = all.sharing_clause
-let sharing_phrase = all.sharing_phrase
-let stop_stmt = all.stop_stmt
-let typedef_clause = all.typedef_clause
-let usage_clause = all.usage_clause
-let validate_status_clause = all.validate_status_clause
+let tokens_of_context context_tokens : t -> TH.t = function
+  | Accept_stmt -> context_tokens.accept_stmt
+  | Allocate_stmt -> context_tokens.allocate_stmt
+  | Alphabet_clause -> context_tokens.alphabet_clause
+  | Arithmetic_clause -> context_tokens.arithmetic_clause
+  | Class_specifier -> context_tokens.class_specifier
+  | Column_clause -> context_tokens.column_clause
+  | Constant -> context_tokens.constant
+  | Currency_clause -> context_tokens.currency_clause
+  | Default_clause -> context_tokens.default_clause
+  | Dynlen_struct_clause -> context_tokens.dynlen_struct_clause
+  | Entry_convention_clause -> context_tokens.entry_convention_clause
+  | Erase_clause -> context_tokens.erase_clause
+  | Exit_stmt -> context_tokens.exit_stmt
+  | Factory_paragraph -> context_tokens.factory_paragraph
+  | Float_binary_clause -> context_tokens.float_binary_clause
+  | Float_decimal_clause -> context_tokens.float_decimal_clause
+  | Function_specifier -> context_tokens.function_specifier
+  | Interface_specifier -> context_tokens.interface_specifier
+  | Intermediate_rounding_clause -> context_tokens.intermediate_rounding_clause
+  | Line_clause -> context_tokens.line_clause
+  | Lock_mode_clause -> context_tokens.lock_mode_clause
+  | Object_computer_paragraph -> context_tokens.object_computer_paragraph
+  | Object_paragraph -> context_tokens.object_paragraph
+  | Occurs_clause -> context_tokens.occurs_clause
+  | Options_paragrahp -> context_tokens.options_paragrahp
+  | Options_paragraph -> context_tokens.options_paragraph
+  | Options_pragraph -> context_tokens.options_pragraph
+  | Program_id_paragraph -> context_tokens.program_id_paragraph
+  | Read_statement -> context_tokens.read_statement
+  | Read_stmt -> context_tokens.read_stmt
+  | Resume_stmt -> context_tokens.resume_stmt
+  | Retry_phrase -> context_tokens.retry_phrase
+  | Rounded_phrase -> context_tokens.rounded_phrase
+  | Screen_descr_entry -> context_tokens.screen_descr_entry
+  | Screnn_descr_entry -> context_tokens.screnn_descr_entry
+  | Set_attribute_stmt -> context_tokens.set_attribute_stmt
+  | Set_stmt -> context_tokens.set_stmt
+  | Sharing_clause -> context_tokens.sharing_clause
+  | Sharing_phrase -> context_tokens.sharing_phrase
+  | Stop_stmt -> context_tokens.stop_stmt
+  | Typedef_clause -> context_tokens.typedef_clause
+  | Usage_clause -> context_tokens.usage_clause
+  | Validate_status_clause -> context_tokens.validate_status_clause
 

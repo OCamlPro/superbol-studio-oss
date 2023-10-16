@@ -13,10 +13,7 @@
 
 module TYPES: sig
   type token_handle
-  type lexing_options =
-    {
-      decimal_point_is_comma: bool;
-    }
+  type lexer
 end
 include module type of TYPES
 
@@ -25,15 +22,11 @@ module TokenHandles: sig
   val mem_text_token: Grammar_tokens.token -> t -> bool
 end
 
-val show_token: Grammar_tokens.token -> string
-val show_token_of_handle: token_handle -> string
-
 (* --- *)
 
-val handle_of_token: Grammar_tokens.token -> token_handle
-val reserve_words: Cobol_config.words_spec -> unit
-val enable_tokens: TokenHandles.t -> unit
-val disable_tokens: TokenHandles.t -> unit
+val show_token: Grammar_tokens.token -> string
+val show_token_of_handle: token_handle -> string
+val pp_tokens_via_handles: TokenHandles.t Pretty.printer
 
 (** Only for debugging *)
 val keyword_of_token : (Grammar_tokens.token, string) Hashtbl.t
@@ -41,7 +34,12 @@ val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
 
 (* --- *)
 
-val default_lexing_options: lexing_options
+val create: ?decimal_point_is_comma:bool -> unit -> lexer
+val handle_of_token: lexer -> Grammar_tokens.token -> token_handle
+val reserve_words: lexer -> Cobol_config.words_spec -> unit
+val enable_tokens: TokenHandles.t -> unit
+val disable_tokens: TokenHandles.t -> unit
+val decimal_point_is_comma: lexer -> lexer
 
 (* --- *)
 
@@ -52,7 +50,7 @@ exception MultiToks of
     token; may raise {!MultiToks} is the contents of the buffer is tokenized
     into more than one token. *)
 val token
-  : options: lexing_options
+  : lexer
   -> Lexing.lexbuf
   -> Grammar_tokens.token
 
@@ -60,23 +58,27 @@ val token
     localized string and returns a token with its location.  May also raise
     {!MultiToks}. *)
 val token_of_string'
-  : options: lexing_options
+  : lexer
   -> string Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc
 
 (** [tokens ~options lexbuf'] tokenizes a lexing buffer with location [lexbuf']
     into a list of localized tokens. *)
 val tokens
-  : options: lexing_options
+  : lexer
   -> Lexing.lexbuf Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc list
 
 (** [tokens_of_string'] is similar to {!token}, except that it operates on a
     localized string. *)
 val tokens_of_string'
-  : options: lexing_options
+  : lexer
   -> string Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc list
+
+(* --- *)
+
+(** {1 Alphanumerics with symbolic EBCDIC characters} *)
 
 (** [decode_symbolic_ebcdics' ~quotation s'] decodes the symbolic EBCDIC
     characters from the localized string [s'], and returns the resulting

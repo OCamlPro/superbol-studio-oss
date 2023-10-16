@@ -24,19 +24,14 @@
     - exited whenever the annotated rule is reduced.
 *)
 
-(** {2 Context types}
-
-    We concretely represent a context [ctx] as the set of keywords that are
-    sensitive to [ctx].
-*)
+(** {2 Context types} *)
 
 module TH = Text_lexer.TokenHandles
 
-type context = TH.t
-let pp_context ppf c =
-  Pretty.list ~fopen:"{@[" ~fclose:"@]}" ~fempty:"{}" begin fun ppf h ->
-    Pretty.string ppf (Text_lexer.show_token_of_handle h)
-  end ppf (TH.elements c)
+type context = Grammar_contexts.context
+let pp_context context_tokens ppf c =
+  Text_lexer.pp_tokens_via_handles ppf
+    (Grammar_contexts.tokens_of_context context_tokens c)
 
 type t = context
 
@@ -60,9 +55,11 @@ and tokens_diff = TH.t
 
 let empty_stack: stack = []
 
-let push: context -> stack -> stack = fun ctx -> function
-  | [] -> [ { ctx; diff = ctx } ]
-  | { diff = top; _ } :: _ as t -> { ctx; diff = TH.diff ctx top } :: t
+let push ths : context -> stack -> stack = fun ctx ->
+  let toks = Grammar_contexts.tokens_of_context ths ctx in
+  function
+  | [] -> [ { ctx; diff = toks } ]
+  | { diff = top; _ } :: _ as t -> { ctx; diff = TH.diff toks top } :: t
 
 let top: stack -> context option = function
   | { ctx; _ } :: _ -> Some ctx

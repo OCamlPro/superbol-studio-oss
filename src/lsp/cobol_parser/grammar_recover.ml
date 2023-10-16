@@ -1817,6 +1817,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_file_control_paragraph__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_environment_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_data_division__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_control_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_configuration_section__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_linkage_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_limit_is__ -> raise Not_found
@@ -1832,7 +1833,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_default_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_default_display_clause_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_default_accept_clause_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_control_division_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_communication_section_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_collating_sequence_phrase_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_close_format_ -> raise Not_found
@@ -3734,7 +3734,7 @@ let can_pop (type a) : a terminal -> bool = function
 
 let recover =
   let r0 = [R 339] in
-  let r1 = R 1359 :: r0 in
+  let r1 = R 1357 :: r0 in
   let r2 = S (T T_PERIOD) :: r1 in
   let r3 = [R 400] in
   let r4 = R 1420 :: r3 in
@@ -4107,7 +4107,7 @@ let recover =
   let r371 = [R 1164] in
   let r372 = [R 849] in
   let r373 = [R 764] in
-  let r374 = R 1377 :: r373 in
+  let r374 = R 1375 :: r373 in
   let r375 = [R 1766] in
   let r376 = S (N N_name) :: r375 in
   let r377 = [R 1761] in
@@ -4674,8 +4674,8 @@ let recover =
   let r938 = S (N N_ro_pf___anonymous_34_integer__) :: r937 in
   let r939 = S (N N_ro_pf___anonymous_33_integer__) :: r938 in
   let r940 = Sub (r934) :: r939 in
-  let r941 = [R 1381] in
-  let r942 = [R 1380] in
+  let r941 = [R 1379] in
+  let r942 = [R 1378] in
   let r943 = [R 1489] in
   let r944 = S (N N_integer) :: r943 in
   let r945 = [R 1491] in
@@ -6663,23 +6663,23 @@ let recover =
   | 3154 -> One ([R 1348])
   | 2540 -> One ([R 1350])
   | 2198 -> One ([R 1352])
-  | 4094 -> One ([R 1354])
-  | 23 -> One ([R 1356])
-  | 14 -> One (R 1357 :: r13)
-  | 20 -> One ([R 1358])
-  | 25 -> One ([R 1360])
-  | 776 -> One ([R 1362])
-  | 1158 -> One ([R 1364])
-  | 1570 -> One ([R 1366])
-  | 490 -> One ([R 1368])
-  | 915 -> One ([R 1370])
-  | 2205 -> One ([R 1372])
-  | 4072 -> One ([R 1374])
-  | 2379 -> One ([R 1376])
-  | 733 -> One ([R 1378])
-  | 1822 -> One (R 1379 :: r940)
-  | 2200 -> One ([R 1383])
-  | 743 -> One ([R 1385])
+  | 23 -> One ([R 1354])
+  | 14 -> One (R 1355 :: r13)
+  | 20 -> One ([R 1356])
+  | 25 -> One ([R 1358])
+  | 776 -> One ([R 1360])
+  | 1158 -> One ([R 1362])
+  | 1570 -> One ([R 1364])
+  | 490 -> One ([R 1366])
+  | 915 -> One ([R 1368])
+  | 2205 -> One ([R 1370])
+  | 4072 -> One ([R 1372])
+  | 2379 -> One ([R 1374])
+  | 733 -> One ([R 1376])
+  | 1822 -> One (R 1377 :: r940)
+  | 2200 -> One ([R 1381])
+  | 743 -> One ([R 1383])
+  | 4094 -> One ([R 1385])
   | 3886 -> One ([R 1387])
   | 3888 -> One ([R 1389])
   | 738 -> One ([R 1391])
