@@ -59,7 +59,7 @@ depends: [
   "cobol_config" {= version}
   "cobol_common" {= version}
   "ppx_expect" {>= "v0.16" with-test}
-  "ppx_inline_test" {with-test}
+  "ppx_inline_test" {>= "v0.16.1" with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}
   "ocamlformat" {with-test}

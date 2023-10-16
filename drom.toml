@@ -47,6 +47,7 @@ for-doc = true
 [tools.ppx_expect]
 for-test = true
 [tools.ppx_inline_test]
+version = "v0.16.1"
 for-test = true
 
 [project]

@@ -407,6 +407,9 @@ let%expect_test "formatting-request-whole-program" =
     data_sections_visitor.ml:0:
       (Cobol_ptree__Data_sections_visitor.fold_file_section): missing visitor
       implementation
+    data_sections_visitor.ml:0:
+      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
+      implementation
     {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     >> Warning: Source format `auto` is not supported yet, using `fixed`
             IDENTIFICATION DIVISION.
