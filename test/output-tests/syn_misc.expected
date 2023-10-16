@@ -4036,34 +4036,8 @@ syn_misc.at-7524-prog.cob:79.61-79.63:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7712:0
-syn_misc.at-7712-empty.cob:2.7-2.33:
-   1   
-   2 >        CONTROL          DIVISION.
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
-   3          IDENTIFICATION   DIVISION.
-   4          PROGRAM-ID.      empty.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7729:0
-syn_misc.at-7729-replace.cob:2.7-2.33:
-   1   
-   2 >        CONTROL          DIVISION.
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
-   3          SUBSTITUTION     SECTION.
-   4              REPLACE ==TEST-VAR== BY ==VAR==.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7772:0
-syn_misc.at-7772-prog.cob:2.7-3.24:
-   1   
-   2 >        CONTROL		DIVISION.
-----          ^^^^^^^^^^^^^^^^^
-   3 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   4          IDENTIFICATION   DIVISION.
-   5          PROGRAM-ID.      prog.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7801:0
 syn_misc.at-7801-prog.cob:4.18-4.27:
    1   
@@ -4075,35 +4049,7 @@ syn_misc.at-7801-prog.cob:4.18-4.27:
    6   	   .
 >> Error: Invalid syntax
 
-syn_misc.at-7801-prog.cob:2.7-6.5:
-   1   
-   2 >        CONTROL		DIVISION.
-----        
-   3 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >            ACCEPT ALTERNATE CONSOLE
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   5 >            DISPLAY IS TERMINAL
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   6 > 	   .
-----  ^^^^^^
-   7          IDENTIFICATION   DIVISION.
-   8          PROGRAM-ID.      prog.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7828:0
-syn_misc.at-7828-empties.cob:2.7-4.24:
-   1   
-   2 >        CONTROL		DIVISION.
-----          ^^^^^^^^^^^^^^^^^
-   3 >        SUBSTITUTION	SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   5          IDENTIFICATION   DIVISION.
-   6          PROGRAM-ID.      empties.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7842:0
 syn_misc.at-7842-empty0.cob:5.18-5.27:
    2          CONTROL		DIVISION.
@@ -4115,37 +4061,7 @@ syn_misc.at-7842-empty0.cob:5.18-5.27:
    7          IDENTIFICATION   DIVISION.
 >> Error: Invalid syntax
 
-syn_misc.at-7842-empty0.cob:2.7-6.5:
-   1   
-   2 >        CONTROL		DIVISION.
-----        
-   3 >        SUBSTITUTION	SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   5 >            ACCEPT ALTERNATE CONSOLE
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   6 > 	   .
-----  ^^^^^^
-   7          IDENTIFICATION   DIVISION.
-   8          PROGRAM-ID.      empty0.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7861:0
-syn_misc.at-7861-empty1.cob:2.7-5.24:
-   1   
-   2 >        CONTROL		DIVISION.
-----          ^^^^^^^^^^^^^^^^^
-   3 >        SUBSTITUTION	SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >            REPLACE "KO" BY "OK".
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   5 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   6          IDENTIFICATION   DIVISION.
-   7          PROGRAM-ID.      empty1.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7885:0
 syn_misc.at-7885-prog.cob:4.27-4.29:
    1   
@@ -4177,30 +4093,6 @@ syn_misc.at-7885-prog.cob:9.24-9.28:
   11          IDENTIFICATION   DIVISION.
 >> Error: Invalid syntax
 
-syn_misc.at-7885-prog.cob:2.7-10.5:
-   1   
-   2 >        CONTROL		DIVISION.
-----        
-   3 >        SUBSTITUTION	SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >            REPLACE IISS BY IS
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   5 > 	           TERM BY TERMINAL
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   6 > 	           "KO" BY "OK".
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
-   7 >        DEFAULT		SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^
-   8 >            ACCEPT ALTERNATE CONSOLE
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   9 >            DISPLAY IISS TERM
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  10 > 	   .
-----  ^^^^^^
-  11          IDENTIFICATION   DIVISION.
-  12          PROGRAM-ID.      prog.
->> Error: CONTROL DIVISION does not conform to default
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7918:0
 syn_misc.at-7918-prog.cob:5.26-5.28:
    2          CONTROL          DIVISION.
@@ -4231,32 +4123,6 @@ syn_misc.at-7918-prog.cob:10.23-10.27:
   11          .
   12          IDENTIFICATION   DIVISION.
 >> Error: Invalid syntax
-
-syn_misc.at-7918-prog.cob:2.7-11.8:
-   1   
-   2 >        CONTROL          DIVISION.
-----          ^
-   3 >        SUBSTITUTION     SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   4 >       *> This REPLACE in Area A is ignored for now:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   5 >           REPLACE IISS BY IS
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   6 >                   TERM BY TERMINAL
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   7 >                   "KO" BY "OK".
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   8 >        DEFAULT          SECTION.
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   9 >           ACCEPT ALTERNATE CONSOLE
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  10 >           DISPLAY IISS TERM
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11 >        .
-----  ^^^^^^^^^
-  12          IDENTIFICATION   DIVISION.
-  13          PROGRAM-ID.      prog.
->> Error: CONTROL DIVISION does not conform to default
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8018:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8056:0

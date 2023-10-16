@@ -33,6 +33,7 @@ class virtual ['a] folder = object
   inherit! ['a] Data_division_visitor.folder
   inherit! ['a] Proc_division_visitor.folder
   method fold_compilation_group: (compilation_group, 'a) fold = default
+  method fold_control_division': (control_division with_loc, 'a) fold = default
   method fold_program_unit             : (program_unit                 , 'a) fold = default
   method fold_program_unit'            : (program_unit with_loc        , 'a) fold = default
   method fold_function_unit            : (function_unit                , 'a) fold = default
@@ -182,6 +183,13 @@ let fold_compilation_unit' (v: _#folder) =
       | InterfaceDefinition d -> fold_interface_definition' v (d &@ loc)
     end
 
+let fold_control_division' (v: _#folder) =
+  handle' v#fold_control_division'
+    ~fold:(fun _ _ x -> x)
+
 let fold_compilation_group (v: _#folder) =
   handle v#fold_compilation_group
-    ~continue:(fold_list ~fold:fold_compilation_unit' v)
+    ~continue:begin fun { control_division; compilation_units } x -> x
+      >> fold_option ~fold:(fold' ~fold:(fun _ _ -> Fun.id)) v control_division
+      >> fold_list ~fold:fold_compilation_unit' v compilation_units
+    end

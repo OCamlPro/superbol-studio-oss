@@ -106,7 +106,8 @@ let name_of_compunit (cu: Cobol_ptree.compilation_unit with_loc) =
 
 let compilation_unit_by_name (cu_name: Cobol_ptree.name)
     (ptree: Cobol_ptree.compilation_group) =
-  List.find_opt (fun cu -> cu_name = name_of_compunit cu) ptree
+  List.find_opt (fun cu -> cu_name = name_of_compunit cu)
+    ptree.compilation_units
 
 (* --- *)
 
@@ -329,7 +330,7 @@ let update_definitions_based_on_compilation_group_ptree ~f ptree defs =
         Some (f cu' @@ Option.value cu_defs ~default:Cobol_data.Qualmap.empty)
       end defs
     with Not_found -> defs
-  end defs ptree
+  end defs ptree.Cobol_ptree.compilation_units
 
 
 (*TODO: remove this once Cobol_typeck implements Renames*)

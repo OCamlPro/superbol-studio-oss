@@ -110,7 +110,7 @@ let lazy_references ptree cus defs =
             (CUs.find_by_name cu_name cus)
           (Lsp_lookup.references cu_defs cu) map
         with Not_found -> map
-    end CUMap.empty ptree
+    end CUMap.empty ptree.Cobol_ptree.compilation_units
   end
 
 let no_artifacts =

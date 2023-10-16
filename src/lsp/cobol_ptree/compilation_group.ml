@@ -309,11 +309,20 @@ let pp_compilation_unit ppf = function
   | ClassDefinition cd -> pp_class_definition ppf cd
   | InterfaceDefinition id -> pp_interface_definition ppf id
 
-type compilation_group =
-  compilation_unit with_loc list
+type control_division = unit                               (* nothing for now *)
 [@@deriving ord]
 
-let pp_compilation_group =
+type compilation_group =
+  {
+    control_division: control_division with_loc option;
+    compilation_units: compilation_unit with_loc list;
+  }
+[@@deriving ord]
+
+let pp_compilation_group ppf { control_division; compilation_units } =
+  if control_division <> None
+  then Fmt.pf ppf "CONTROL DIVISION.@;";
   Fmt.(list ~sep:sp (Fmt.vbox @@ pp_with_loc pp_compilation_unit))
+    ppf compilation_units
 
 let show_compilation_group = Fmt.to_to_string pp_compilation_group

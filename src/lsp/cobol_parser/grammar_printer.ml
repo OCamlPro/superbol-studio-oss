@@ -1780,6 +1780,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_loc_file_control_paragraph__) -> "option_loc_file_control_paragraph__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_loc_environment_division__) -> "option_loc_environment_division__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_loc_data_division__) -> "option_loc_data_division__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_loc_control_division__) -> "option_loc_control_division__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_loc_configuration_section__) -> "option_loc_configuration_section__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_linkage_section_) -> "option_linkage_section_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_limit_is__) -> "option_limit_is__"
@@ -1795,7 +1796,6 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_default_section_) -> "option_default_section_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_default_display_clause_) -> "option_default_display_clause_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_default_accept_clause_) -> "option_default_accept_clause_"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_control_division_) -> "option_control_division_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_communication_section_) -> "option_communication_section_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_collating_sequence_phrase_) -> "option_collating_sequence_phrase_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_close_format_) -> "option_close_format_"
@@ -4114,6 +4114,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_option_loc_file_control_paragraph__ -> (fun _ -> "option_loc_file_control_paragraph__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_loc_environment_division__ -> (fun _ -> "option_loc_environment_division__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_loc_data_division__ -> (fun _ -> "option_loc_data_division__")
+  | MenhirInterpreter.N MenhirInterpreter.N_option_loc_control_division__ -> (fun _ -> "option_loc_control_division__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_loc_configuration_section__ -> (fun _ -> "option_loc_configuration_section__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_linkage_section_ -> (fun _ -> "option_linkage_section_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_limit_is__ -> (fun _ -> "option_limit_is__")
@@ -4129,7 +4130,6 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_option_default_section_ -> (fun _ -> "option_default_section_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_default_display_clause_ -> (fun _ -> "option_default_display_clause_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_default_accept_clause_ -> (fun _ -> "option_default_accept_clause_")
-  | MenhirInterpreter.N MenhirInterpreter.N_option_control_division_ -> (fun _ -> "option_control_division_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_communication_section_ -> (fun _ -> "option_communication_section_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_collating_sequence_phrase_ -> (fun _ -> "option_collating_sequence_phrase_")
   | MenhirInterpreter.N MenhirInterpreter.N_option_close_format_ -> (fun _ -> "option_close_format_")
