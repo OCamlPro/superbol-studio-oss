@@ -9,10 +9,14 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_YYYYDDD) -> "YYYYDDD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_Y) -> "Y"
   | MenhirInterpreter.X (MenhirInterpreter.T T_XOR) -> "XOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_XML_TEXT) -> "XML_TEXT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_XML_SCHEMA) -> "XML_SCHEMA"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_XML_NTEXT) -> "XML_NTEXT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_XML_EVENT) -> "XML_EVENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_XML_DECLARATION) -> "XML_DECLARATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_XML) -> "XML"
   | MenhirInterpreter.X (MenhirInterpreter.T T_X) -> "X"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_WRITING) -> "WRITING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WRITE_VERIFY) -> "WRITE_VERIFY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WRITE_ONLY) -> "WRITE_ONLY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WRITERS) -> "WRITERS"
@@ -27,6 +31,9 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_WINDOW) -> "WINDOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WIDTH_IN_CELLS) -> "WIDTH_IN_CELLS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WIDTH) -> "WIDTH"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_WIDE) -> "WIDE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_WHILE) -> "WHILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_WHEN_COMPILED) -> "WHEN_COMPILED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WHEN) -> "WHEN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WEB_BROWSER) -> "WEB_BROWSER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_WAIT) -> "WAIT"
@@ -37,14 +44,17 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_VPADDING) -> "VPADDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VOLATILE) -> "VOLATILE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VLR) -> "VLR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_VISIBLE) -> "VISIBLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VIRTUAL_WIDTH) -> "VIRTUAL_WIDTH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VIRTUAL) -> "VIRTUAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VIA) -> "VIA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VERY_HEAVY) -> "VERY_HEAVY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VERTICAL) -> "VERTICAL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_VERSION) -> "VERSION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VARYING) -> "VARYING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VARIANT) -> "VARIANT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VARIABLE) -> "VARIABLE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_VARBINARY) -> "VARBINARY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VALUE_FORMAT) -> "VALUE_FORMAT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VALUES) -> "VALUES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_VALUE) -> "VALUE"
@@ -59,7 +69,10 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_USE_TAB) -> "USE_TAB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USE_RETURN) -> "USE_RETURN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USE_ALT) -> "USE_ALT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_USER_WHITE) -> "USER_WHITE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_USER_GRAY) -> "USER_GRAY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USER_DEFAULT) -> "USER_DEFAULT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_USER_COLORS) -> "USER_COLORS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USER) -> "USER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USE) -> "USE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_USAGE) -> "USAGE"
@@ -81,6 +94,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_UNIVERSAL) -> "UNIVERSAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_UNIT) -> "UNIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_UNFRAMED) -> "UNFRAMED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_UNEQUAL) -> "UNEQUAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_UNDERLINE) -> "UNDERLINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_UNBOUNDED) -> "UNBOUNDED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_UFF) -> "UFF"
@@ -90,31 +104,50 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_TYPE) -> "TYPE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRUNCATION) -> "TRUNCATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRUE) -> "TRUE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRIMMED) -> "TRIMMED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TREE_VIEW) -> "TREE_VIEW"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSPARENT_COLOR) -> "TRANSPARENT_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSPARENT) -> "TRANSPARENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSFORM) -> "TRANSFORM"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSACTION_STATUS) -> "TRANSACTION_STATUS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSACTION) -> "TRANSACTION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRAILING_SIGN) -> "TRAILING_SIGN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRAILING_SHIFT) -> "TRAILING_SHIFT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRAILING) -> "TRAILING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRADITIONAL_FONT) -> "TRADITIONAL_FONT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRACK_THUMB) -> "TRACK_THUMB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRACK_LIMIT) -> "TRACK_LIMIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRACK_AREA) -> "TRACK_AREA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRACKS) -> "TRACKS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRACK) -> "TRACK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRACE) -> "TRACE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TOWARD_LESSER) -> "TOWARD_LESSER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TOWARD_GREATER) -> "TOWARD_GREATER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TOTALING) -> "TOTALING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TOTALED) -> "TOTALED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TOP_LEVEL) -> "TOP_LEVEL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TOP) -> "TOP"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TOOL_BAR) -> "TOOL_BAR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TO) -> "TO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TITLE_POSITION) -> "TITLE_POSITION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TITLE_BAR) -> "TITLE_BAR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TITLE) -> "TITLE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIME_RECORD) -> "TIME_RECORD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TIME_OUT) -> "TIME_OUT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIME_OF_DAY) -> "TIME_OF_DAY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIMESTAMP_RECORD) -> "TIMESTAMP_RECORD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIMESTAMP_OFFSET_RECORD) -> "TIMESTAMP_OFFSET_RECORD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIMESTAMP_OFFSET) -> "TIMESTAMP_OFFSET"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TIMESTAMP) -> "TIMESTAMP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TIMES) -> "TIMES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TIME) -> "TIME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TILED_HEADINGS) -> "TILED_HEADINGS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THUMB_POSITION) -> "THUMB_POSITION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THROUGH) -> "THROUGH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THREEDIMENSIONAL) -> "THREEDIMENSIONAL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_THREAD_POINTER) -> "THREAD_POINTER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_THREAD_LOCAL_STORAGE) -> "THREAD_LOCAL_STORAGE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_THREAD_LOCAL) -> "THREAD_LOCAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THREADS) -> "THREADS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THREAD) -> "THREAD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_THEN) -> "THEN"
@@ -134,8 +167,10 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_TEMP) -> "TEMP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TAPE) -> "TAPE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TALLYING) -> "TALLYING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TALLY) -> "TALLY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TAB_TO_DELETE) -> "TAB_TO_DELETE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TAB_TO_ADD) -> "TAB_TO_ADD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TAB_CONTROL) -> "TAB_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TABLE) -> "TABLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TAB) -> "TAB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SYSTEM_OFFSET) -> "SYSTEM_OFFSET"
@@ -159,16 +194,20 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUPPRESS) -> "SUPPRESS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUPER) -> "SUPER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUM) -> "SUM"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SUFFIXING) -> "SUFFIXING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUB_SCHEMA) -> "SUB_SCHEMA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUB_QUEUE_3) -> "SUB_QUEUE_3"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUB_QUEUE_2) -> "SUB_QUEUE_2"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUB_QUEUE_1) -> "SUB_QUEUE_1"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUBWINDOW) -> "SUBWINDOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SUBTRACT) -> "SUBTRACT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SUBFILE) -> "SUBFILE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STYLE) -> "STYLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STRUCTURE) -> "STRUCTURE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_STRONG_NAME) -> "STRONG_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STRONG) -> "STRONG"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STRING) -> "STRING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_STOP_BROWSER) -> "STOP_BROWSER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STOP) -> "STOP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STEP) -> "STEP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STDCALL) -> "STDCALL"
@@ -181,6 +220,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_STATEMENT) -> "STATEMENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_START_Y) -> "START_Y"
   | MenhirInterpreter.X (MenhirInterpreter.T T_START_X) -> "START_X"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_STARTING) -> "STARTING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_START) -> "START"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STANDARD_DECIMAL) -> "STANDARD_DECIMAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_STANDARD_BINARY) -> "STANDARD_BINARY"
@@ -190,6 +230,14 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_STACK) -> "STACK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SSF) -> "SSF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SQUARE) -> "SQUARE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_ROWID) -> "SQL_ROWID"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_NCLOB) -> "SQL_NCLOB"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_CURSOR) -> "SQL_CURSOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_CLOB) -> "SQL_CLOB"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_BLOB) -> "SQL_BLOB"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL_BFILE) -> "SQL_BFILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQLIMS) -> "SQLIMS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SQL) -> "SQL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SPINNER) -> "SPINNER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SPECIAL_NAMES) -> "SPECIAL_NAMES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SPACE_FILL) -> "SPACE_FILL"
@@ -197,11 +245,21 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_SOURCE_COMPUTER) -> "SOURCE_COMPUTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SOURCES) -> "SOURCES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SOURCE) -> "SOURCE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_WORK) -> "SORT_WORK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_RETURN) -> "SORT_RETURN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_ORDER) -> "SORT_ORDER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_MODE_SIZE) -> "SORT_MODE_SIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_MESSAGE) -> "SORT_MESSAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_MERGE) -> "SORT_MERGE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_FILE_SIZE) -> "SORT_FILE_SIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_CORE_SIZE) -> "SORT_CORE_SIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SORT_CONTROL) -> "SORT_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SORT) -> "SORT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SMALL_FONT) -> "SMALL_FONT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SLASH) -> "/"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SKIP3) -> "SKIP3"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SKIP2) -> "SKIP2"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SKIP1) -> "SKIP1"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SIZE) -> "SIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SINTLIT) -> "SINTLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SIGNED_SHORT) -> "SIGNED_SHORT"
@@ -214,25 +272,32 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHOW_LINES) -> "SHOW_LINES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHORT_DATE) -> "SHORT_DATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHORT) -> "SHORT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SHIFT_OUT) -> "SHIFT_OUT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SHIFT_IN) -> "SHIFT_IN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHARING) -> "SHARING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHADOW) -> "SHADOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SHADING) -> "SHADING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SET) -> "SET"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SERVICE) -> "SERVICE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEQUENTIAL) -> "SEQUENTIAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEQUENCE) -> "SEQUENCE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEPARATION) -> "SEPARATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEPARATE) -> "SEPARATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SENTENCE) -> "SENTENCE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEND) -> "SEND"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SEMAPHORE_POINTER) -> "SEMAPHORE_POINTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELF_ACT) -> "SELF_ACT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SELFCLASS) -> "SELFCLASS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELF) -> "SELF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELECT_ALL) -> "SELECT_ALL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SELECTIVE) -> "SELECTIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELECTION_TEXT) -> "SELECTION_TEXT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELECTION_INDEX) -> "SELECTION_INDEX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELECTION) -> "SELECTION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SELECT) -> "SELECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEGMENT_LIMIT) -> "SEGMENT_LIMIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SEGMENT) -> "SEGMENT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_SEEK) -> "SEEK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SECURITY) -> "SECURITY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SECURE) -> "SECURE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_SECTION) -> "SECTION"
@@ -258,8 +323,10 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROW_DIVIDERS) -> "ROW_DIVIDERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROW_COLOR_PATTERN) -> "ROW_COLOR_PATTERN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROW_COLOR) -> "ROW_COLOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ROWID) -> "ROWID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROUNDING) -> "ROUNDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROUNDED) -> "ROUNDED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ROLLING) -> "ROLLING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ROLLBACK) -> "ROLLBACK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RIMMED) -> "RIMMED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RIGHT_JUSTIFY) -> "RIGHT_JUSTIFY"
@@ -272,12 +339,18 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_REVERSE_VIDEO) -> "REVERSE_VIDEO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REVERSED) -> "REVERSED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REVERSE) -> "REVERSE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RETURN_UNSIGNED) -> "RETURN_UNSIGNED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RETURN_CODE) -> "RETURN_CODE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RETURNING) -> "RETURNING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RETURN) -> "RETURN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RETRY) -> "RETRY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RETENTION) -> "RETENTION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RESUME) -> "RESUME"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RESTRICTED) -> "RESTRICTED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RESIZABLE) -> "RESIZABLE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RESIDENT) -> "RESIDENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RESET_TABS) -> "RESET_TABS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RESET_SET_LOCATOR) -> "RESET_SET_LOCATOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RESET_LIST) -> "RESET_LIST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RESET_GRID) -> "RESET_GRID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RESET) -> "RESET"
@@ -290,6 +363,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_REPORTING) -> "REPORTING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REPORT) -> "REPORT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REPLACING) -> "REPLACING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_REPLACED) -> "REPLACED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REPLACE) -> "REPLACE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REPEATED) -> "REPEATED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REORG_CRITERIA) -> "REORG_CRITERIA"
@@ -297,6 +371,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_REMOVAL) -> "REMOVAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REMARKS) -> "REMARKS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REMAINDER) -> "REMAINDER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RELOAD) -> "RELOAD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RELEASE) -> "RELEASE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RELATIVE) -> "RELATIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RELATION) -> "RELATION"
@@ -305,10 +380,12 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_REFERENCES) -> "REFERENCES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REFERENCE) -> "REFERENCE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REEL) -> "REEL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_REDEFINITION) -> "REDEFINITION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_REDEFINES) -> "REDEFINES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECURSIVE) -> "RECURSIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECORD_TO_DELETE) -> "RECORD_TO_DELETE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECORD_TO_ADD) -> "RECORD_TO_ADD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RECORD_POSITION) -> "RECORD_POSITION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECORD_OVERFLOW) -> "RECORD_OVERFLOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECORD_DATA) -> "RECORD_DATA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECORDS) -> "RECORDS"
@@ -317,9 +394,12 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECEIVED) -> "RECEIVED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RECEIVE) -> "RECEIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_READ_ONLY) -> "READ_ONLY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_READY) -> "READY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_READING) -> "READING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_READERS) -> "READERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_READ) -> "READ"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RD) -> "RD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_RANGE) -> "RANGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RANDOM) -> "RANDOM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RAISING) -> "RAISING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_RAISED) -> "RAISED"
@@ -331,6 +411,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_QUERY_INDEX) -> "QUERY_INDEX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PUSH_BUTTON) -> "PUSH_BUTTON"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PURGE) -> "PURGE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PUBLIC) -> "PUBLIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROTOTYPE) -> "PROTOTYPE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROTECTED) -> "PROTECTED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROPERTY) -> "PROPERTY"
@@ -343,13 +424,18 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROGRAM) -> "PROGRAM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCESS_AREA) -> "PROCESS_AREA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCESSING) -> "PROCESSING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PROCESS) -> "PROCESS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCEED) -> "PROCEED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCEDURE_POINTER) -> "PROCEDURE_POINTER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PROCEDURE_NAME) -> "PROCEDURE_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCEDURES) -> "PROCEDURES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PROCEDURE) -> "PROCEDURE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PRIVATE) -> "PRIVATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRIORITY) -> "PRIORITY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PRIOR) -> "PRIOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRINT_PREVIEW) -> "PRINT_PREVIEW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRINT_NO_PROMPT) -> "PRINT_NO_PROMPT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PRINT_CONTROL) -> "PRINT_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRINTING) -> "PRINTING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRINTER_1) -> "PRINTER_1"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRINTER) -> "PRINTER"
@@ -357,12 +443,15 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRIMARY) -> "PRIMARY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PREVIOUS) -> "PREVIOUS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PRESENT) -> "PRESENT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PREFIXING) -> "PREFIXING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PREFIXED) -> "PREFIXED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POSITIVE) -> "POSITIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POSITION_SHIFT) -> "POSITION_SHIFT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_POSITIONING) -> "POSITIONING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POSITION) -> "POSITION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POS) -> "POS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POP_UP) -> "POP_UP"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_POINTER_32) -> "POINTER_32"
   | MenhirInterpreter.X (MenhirInterpreter.T T_POINTER) -> "POINTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PLUS_SIGN) -> "+"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PLUS) -> "PLUS"
@@ -381,19 +470,27 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_PARSE) -> "PARSE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PARENT) -> "PARENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PARAGRAPH) -> "PARAGRAPH"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PANEL_WIDTHS) -> "PANEL_WIDTHS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PANEL_TEXT) -> "PANEL_TEXT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PANEL_STYLE) -> "PANEL_STYLE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PANEL_INDEX) -> "PANEL_INDEX"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_PAGE_SIZE) -> "PAGE_SIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PAGE_SETUP) -> "PAGE_SETUP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PAGE_COUNTER) -> "PAGE_COUNTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PAGED) -> "PAGED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PAGE) -> "PAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PADDING) -> "PADDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_PACKED_DECIMAL) -> "PACKED_DECIMAL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_O_FILL) -> "O_FILL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERRIDING) -> "OVERRIDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERRIDE) -> "OVERRIDE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERLINE) -> "OVERLINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERLAP_TOP) -> "OVERLAP_TOP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERLAP_LEFT) -> "OVERLAP_LEFT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_OVERLAPPED) -> "OVERLAPPED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OVERFLOW) -> "OVERFLOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OUTPUT) -> "OUTPUT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_OTHERWISE) -> "OTHERWISE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OTHERS) -> "OTHERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OTHER) -> "OTHER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ORGANIZATION) -> "ORGANIZATION"
@@ -403,6 +500,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_OPTIONAL) -> "OPTIONAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OPERATIONAL) -> "OPERATIONAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OPEN) -> "OPEN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_OOSTACKPTR) -> "OOSTACKPTR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ON_SIZE_ERROR) -> "ON_SIZE_ERROR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ON_OVERFLOW) -> "ON_OVERFLOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ON_EXCEPTION) -> "ON_EXCEPTION"
@@ -413,12 +511,16 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_OFF) -> "OFF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OF) -> "OF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OCCURS) -> "OCCURS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT_STORAGE) -> "OBJECT_STORAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT_REFERENCE) -> "OBJECT_REFERENCE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT_PROGRAM) -> "OBJECT_PROGRAM"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT_ID) -> "OBJECT_ID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT_COMPUTER) -> "OBJECT_COMPUTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_OBJECT) -> "OBJECT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NUM_ROW_HEADINGS) -> "NUM_ROW_HEADINGS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NUM_ROWS) -> "NUM_ROWS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NUM_COL_HEADINGS) -> "NUM_COL_HEADINGS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NUMERIC_FILL) -> "NUMERIC_FILL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NUMERIC_EDITED) -> "NUMERIC_EDITED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NUMERIC) -> "NUMERIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NUMBERS) -> "NUMBERS"
@@ -427,6 +529,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NULLIT) -> "NULLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NULL) -> "NULL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_UPDOWN) -> "NO_UPDOWN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NO_TAB) -> "NO_TAB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_SEARCH) -> "NO_SEARCH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_KEY_LETTER) -> "NO_KEY_LETTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_GROUP_TAB) -> "NO_GROUP_TAB"
@@ -435,6 +538,8 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_ECHO) -> "NO_ECHO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_DIVIDERS) -> "NO_DIVIDERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_DATA) -> "NO_DATA"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NO_CLOSE) -> "NO_CLOSE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NO_CELL_DRAG) -> "NO_CELL_DRAG"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_BOX) -> "NO_BOX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_AUTO_DEFAULT) -> "NO_AUTO_DEFAULT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NO_AUTOSEL) -> "NO_AUTOSEL"
@@ -449,6 +554,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NOTIFY_CHANGE) -> "NOTIFY_CHANGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NOTIFY) -> "NOTIFY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NOTHING) -> "NOTHING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NOTE) -> "NOTE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NOTAB) -> "NOTAB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NOT) -> "NOT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NORMAL) -> "NORMAL"
@@ -460,6 +566,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEXT_ITEM) -> "NEXT_ITEM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEXT) -> "NEXT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEW) -> "NEW"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NET_EVENT_LIST) -> "NET_EVENT_LIST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NESTED) -> "NESTED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEGATIVE) -> "NEGATIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEAREST_TO_ZERO) -> "NEAREST_TO_ZERO"
@@ -467,6 +574,8 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEAREST_EVEN) -> "NEAREST_EVEN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NEAREST_AWAY_FROM_ZERO) -> "NEAREST_AWAY_FROM_ZERO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NE) -> "<>"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NCLOB) -> "NCLOB"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_NCHAR) -> "NCHAR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NAVIGATE_URL) -> "NAVIGATE_URL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NATLIT) -> "NATLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NATIVE) -> "NATIVE"
@@ -477,28 +586,48 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_NAMESPACE) -> "NAMESPACE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NAMED) -> "NAMED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_NAME) -> "NAME"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MUTEX_POINTER) -> "MUTEX_POINTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MULTIPLY) -> "MULTIPLY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MULTIPLE) -> "MULTIPLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MULTILINE) -> "MULTILINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MOVE) -> "MOVE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MORE_LABELS) -> "MORE_LABELS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MONITOR_POINTER) -> "MONITOR_POINTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MODULES) -> "MODULES"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MODULE) -> "MODULE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MODIFY) -> "MODIFY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MODIFIED) -> "MODIFIED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MODELESS) -> "MODELESS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MODE) -> "MODE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MODAL) -> "MODAL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_WIDTH) -> "MIN_WIDTH"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_VALUE) -> "MIN_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_VAL) -> "MIN_VAL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_SIZE) -> "MIN_SIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_LINES) -> "MIN_LINES"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MIN_HEIGHT) -> "MIN_HEIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MINUS) -> "MINUS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MICROSECOND_TIME) -> "MICROSECOND_TIME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_METHOD_ID) -> "METHOD_ID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_METHOD) -> "METHOD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_META_CLASS) -> "META_CLASS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MESSAGE_TAG) -> "MESSAGE_TAG"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MESSAGES) -> "MESSAGES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MESSAGE) -> "MESSAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MERGE) -> "MERGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MENU) -> "MENU"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MEMORY) -> "MEMORY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MEDIUM_FONT) -> "MEDIUM_FONT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MDI_FRAME) -> "MDI_FRAME"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MDI_CHILD) -> "MDI_CHILD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_WIDTH) -> "MAX_WIDTH"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_VALUE) -> "MAX_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_VAL) -> "MAX_VAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_TEXT) -> "MAX_TEXT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_SIZE) -> "MAX_SIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_PROGRESS) -> "MAX_PROGRESS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_LINES) -> "MAX_LINES"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_MAX_HEIGHT) -> "MAX_HEIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MASTER_INDEX) -> "MASTER_INDEX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MASS_UPDATE) -> "MASS_UPDATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_MANUAL) -> "MANUAL"
@@ -508,8 +637,12 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOW_VALUE) -> "LOW_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOW_COLOR) -> "LOW_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOWLIGHT) -> "LOWLIGHT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LOWEST_VALUE) -> "LOWEST_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOWERED) -> "LOWERED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOWER) -> "LOWER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LOW) -> "LOW"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LONG_VARCHAR) -> "LONG_VARCHAR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LONG_VARBINARY) -> "LONG_VARBINARY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LONG_DATE) -> "LONG_DATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOCK_HOLDING) -> "LOCK_HOLDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LOCKS) -> "LOCKS"
@@ -521,6 +654,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_LM_RESIZE) -> "LM_RESIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LIST_BOX) -> "LIST_BOX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINKAGE) -> "LINKAGE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LINK) -> "LINK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINE_SEQUENTIAL) -> "LINE_SEQUENTIAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINE_COUNTER) -> "LINE_COUNTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINES_PER_PAGE) -> "LINES_PER_PAGE"
@@ -529,6 +663,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINE) -> "LINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINAGE_COUNTER) -> "LINAGE_COUNTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LINAGE) -> "LINAGE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_LIN) -> "LIN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LIMITS) -> "LIMITS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LIMIT) -> "LIMIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_LIKE) -> "LIKE"
@@ -563,8 +698,15 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_KEYBOARD) -> "KEYBOARD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_KEY) -> "KEY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_KEPT) -> "KEPT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_KANJI) -> "KANJI"
   | MenhirInterpreter.X (MenhirInterpreter.T T_JUSTIFIED) -> "JUSTIFIED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JSON_STATUS) -> "JSON_STATUS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JSON_CODE) -> "JSON_CODE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_JSON) -> "JSON"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JOINING) -> "JOINING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JNIENVPTR) -> "JNIENVPTR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JAVA) -> "JAVA"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_JAPANESE) -> "JAPANESE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_I_O_CONTROL) -> "I_O_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_I_O) -> "I_O"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_VALUE) -> "ITEM_VALUE"
@@ -572,6 +714,8 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_TO_DELETE) -> "ITEM_TO_DELETE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_TO_ADD) -> "ITEM_TO_ADD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_TEXT) -> "ITEM_TEXT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_ID) -> "ITEM_ID"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM_BOLD) -> "ITEM_BOLD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ITEM) -> "ITEM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IS_TYPEDEF) -> "IS_TYPEDEF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IS_GLOBAL) -> "IS_GLOBAL"
@@ -579,29 +723,38 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_IS) -> "IS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IN_ARITHMETIC_RANGE) -> "IN_ARITHMETIC_RANGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INVOKING) -> "INVOKING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INVOKED) -> "INVOKED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INVOKE) -> "INVOKE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INVALID_KEY) -> "INVALID_KEY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INVALID) -> "INVALID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTRINSIC) -> "INTRINSIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTO) -> "INTO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTERVENING_) -> "INTERVENING_"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INTERVAL_TIMER) -> "INTERVAL_TIMER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTERMEDIATE) -> "INTERMEDIATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTERFACE_ID) -> "INTERFACE_ID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INTERFACE) -> "INTERFACE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INSTANCE) -> "INSTANCE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INSTALLATION) -> "INSTALLATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INSPECT) -> "INSPECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INSERT_ROWS) -> "INSERT_ROWS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INSERTION_INDEX) -> "INSERTION_INDEX"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INSERT) -> "INSERT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INQUIRE) -> "INQUIRE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INPUT_OUTPUT) -> "INPUT_OUTPUT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INPUT) -> "INPUT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INITIATE) -> "INITIATE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INITIAL_VALUE) -> "INITIAL_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INITIALIZED) -> "INITIALIZED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INITIALIZE) -> "INITIALIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INITIAL) -> "INITIAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INHERITS) -> "INHERITS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INHERITING) -> "INHERITING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INFO_WORD) -> "INFO_WORD"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INDICATORS) -> "INDICATORS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INDICATOR) -> "INDICATOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INDICATE) -> "INDICATE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_INDIC) -> "INDIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INDEX_2) -> "INDEX_2"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INDEX_1) -> "INDEX_1"
   | MenhirInterpreter.X (MenhirInterpreter.T T_INDEXED) -> "INDEXED"
@@ -609,6 +762,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_INDEPENDENT) -> "INDEPENDENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IN) -> "IN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IMPLEMENTS) -> "IMPLEMENTS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_IMP) -> "IMP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IGNORING) -> "IGNORING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IGNORE) -> "IGNORE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_IF) -> "IF"
@@ -620,15 +774,20 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_HSCROLL_POS) -> "HSCROLL_POS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HSCROLL) -> "HSCROLL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HOT_TRACK) -> "HOT_TRACK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_HORIZONTAL) -> "HORIZONTAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH_VALUE) -> "HIGH_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH_ORDER_RIGHT) -> "HIGH_ORDER_RIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH_ORDER_LEFT) -> "HIGH_ORDER_LEFT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH_COLOR) -> "HIGH_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGHLIGHT) -> "HIGHLIGHT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_HIGHEST_VALUE) -> "HIGHEST_VALUE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH) -> "HIGH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIDDEN_DATA) -> "HIDDEN_DATA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEXLIT) -> "HEXLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEX) -> "HEX"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_HELP_ID) -> "HELP_ID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEIGHT_IN_CELLS) -> "HEIGHT_IN_CELLS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_HEIGHT) -> "HEIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEAVY) -> "HEAVY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEADING_FONT) -> "HEADING_FONT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEADING_DIVIDER_COLOR) -> "HEADING_DIVIDER_COLOR"
@@ -640,6 +799,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_GROUP_VALUE) -> "GROUP_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_GROUP_USAGE) -> "GROUP_USAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_GROUP) -> "GROUP"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_GRIP) -> "GRIP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_GRID) -> "GRID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_GREATER) -> "GREATER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_GRAPHICAL) -> "GRAPHICAL"
@@ -702,7 +862,9 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILL_COLOR2) -> "FILL_COLOR2"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILL_COLOR) -> "FILL_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILLER) -> "FILLER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_PREFIX) -> "FILE_PREFIX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_POS) -> "FILE_POS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_PATH) -> "FILE_PATH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_NAME) -> "FILE_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_LIMITS) -> "FILE_LIMITS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_LIMIT) -> "FILE_LIMIT"
@@ -710,6 +872,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE_CONTROL) -> "FILE_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILES) -> "FILES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FILE) -> "FILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_FIELD_TERMINATOR) -> "FIELD_TERMINATOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FH__KEYDEF) -> "FH__KEYDEF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FH__FCD) -> "FH__FCD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_FD) -> "FD"
@@ -718,6 +881,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_FACTORY) -> "FACTORY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_F) -> "F"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXTERNAL_FORM) -> "EXTERNAL_FORM"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXTERNALLY_DESCRIBED_KEY) -> "EXTERNALLY_DESCRIBED_KEY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXTERNAL) -> "EXTERNAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXTERN) -> "EXTERN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXTENDED_SEARCH) -> "EXTENDED_SEARCH"
@@ -726,13 +890,19 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXPAND) -> "EXPAND"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXIT) -> "EXIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXHIBIT) -> "EXHIBIT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXECUTE) -> "EXECUTE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXEC) -> "EXEC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXCLUSIVE_OR) -> "EXCLUSIVE_OR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXCLUSIVE) -> "EXCLUSIVE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXCLUDE_EVENT_LIST) -> "EXCLUDE_EVENT_LIST"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXCESS_3) -> "EXCESS_3"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXCEPTION_VALUE) -> "EXCEPTION_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXCEPTION_OBJECT) -> "EXCEPTION_OBJECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXCEPTION) -> "EXCEPTION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EXCEEDS) -> "EXCEEDS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EXAMINE) -> "EXAMINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EVERY) -> "EVERY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EVENT_POINTER) -> "EVENT_POINTER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EVENT_LIST) -> "EVENT_LIST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EVENT) -> "EVENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EVALUATE) -> "EVALUATE"
@@ -760,26 +930,37 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_ENGRAVED) -> "ENGRAVED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_XML) -> "END_XML"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_WRITE) -> "END_WRITE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_WAIT) -> "END_WAIT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_USE) -> "END_USE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_UNSTRING) -> "END_UNSTRING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_SUBTRACT) -> "END_SUBTRACT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_STRING) -> "END_STRING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_START) -> "END_START"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_SET) -> "END_SET"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_SEND) -> "END_SEND"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_SEARCH) -> "END_SEARCH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_REWRITE) -> "END_REWRITE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_RETURN) -> "END_RETURN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_REPLACE) -> "END_REPLACE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_RECEIVE) -> "END_RECEIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_READ) -> "END_READ"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_PERFORM) -> "END_PERFORM"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_ON) -> "END_ON"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_OF_PAGE) -> "END_OF_PAGE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_MULTIPLY) -> "END_MULTIPLY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_MOVE) -> "END_MOVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_MODIFY) -> "END_MODIFY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_JSON) -> "END_JSON"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_INVOKE) -> "END_INVOKE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_IF) -> "END_IF"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_EXEC) -> "END_EXEC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_EVALUATE) -> "END_EVALUATE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_ENABLE) -> "END_ENABLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_DIVIDE) -> "END_DIVIDE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_DISPLAY) -> "END_DISPLAY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_DISABLE) -> "END_DISABLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_DELETE) -> "END_DELETE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_END_COPY) -> "END_COPY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_COMPUTE) -> "END_COMPUTE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_COLOR) -> "END_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_END_CHAIN) -> "END_CHAIN"
@@ -790,12 +971,16 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_END) -> "END"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ENCRYPTION) -> "ENCRYPTION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ENCODING) -> "ENCODING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ENABLED) -> "ENABLED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ENABLE) -> "ENABLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EMI) -> "EMI"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ELSE) -> "ELSE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ELEMENT) -> "ELEMENT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EJECT) -> "EJECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EIGHTY_EIGHT) -> "EIGHTY_EIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EGI) -> "EGI"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EGCS) -> "EGCS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_EGC) -> "EGC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EDITING) -> "EDITING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ECHO) -> "ECHO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_EC) -> "EC"
@@ -804,17 +989,21 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_DUPLICATES) -> "DUPLICATES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DROP_LIST) -> "DROP_LIST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DROP_DOWN) -> "DROP_DOWN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DROP) -> "DROP"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DRAW) -> "DRAW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DRAG_COLOR) -> "DRAG_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOWN) -> "DOWN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOUBLE_COLON) -> "::"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOUBLE_ASTERISK) -> "**"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOUBLE) -> "DOUBLE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DOT_DASH) -> "DOT_DASH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOTTED) -> "DOTTED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DOTDASH) -> "DOTDASH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DIVISION) -> "DIVISION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DIVIDER_COLOR) -> "DIVIDER_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DIVIDERS) -> "DIVIDERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DIVIDE) -> "DIVIDE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DISPLAY_ST) -> "DISPLAY_ST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISPLAY_FORMAT) -> "DISPLAY_FORMAT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISPLAY_COLUMNS) -> "DISPLAY_COLUMNS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISPLAY_4) -> "DISPLAY_4"
@@ -824,6 +1013,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISPLAY) -> "DISPLAY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISP) -> "DISP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISK) -> "DISK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DISJOINING) -> "DISJOINING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISCONNECT) -> "DISCONNECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISC) -> "DISC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DISABLE) -> "DISABLE"
@@ -831,6 +1021,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_DETAIL) -> "DETAIL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DESTROY) -> "DESTROY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DESTINATION) -> "DESTINATION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DESCRIPTOR) -> "DESCRIPTOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DESCENDING) -> "DESCENDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEPENDING) -> "DEPENDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DELIMITER) -> "DELIMITER"
@@ -840,6 +1031,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEFAULT_FONT) -> "DEFAULT_FONT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEFAULT_BUTTON) -> "DEFAULT_BUTTON"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEFAULT) -> "DEFAULT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DECLARE) -> "DECLARE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DECLARATIVES) -> "DECLARATIVES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DECIMAL_POINT) -> "DECIMAL_POINT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DECIMAL_ENCODING) -> "DECIMAL_ENCODING"
@@ -851,12 +1043,20 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEBUG_ITEM) -> "DEBUG_ITEM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEBUG_CONTENTS) -> "DEBUG_CONTENTS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DEBUGGING) -> "DEBUGGING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DEBUG) -> "DEBUG"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DBCS) -> "DBCS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DBCLOB_LOCATOR) -> "DBCLOB_LOCATOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DBCLOB_FILE) -> "DBCLOB_FILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DBCLOB) -> "DBCLOB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DAY_OF_WEEK) -> "DAY_OF_WEEK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DAY_AND_TIME) -> "DAY_AND_TIME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DAY) -> "DAY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_WRITTEN) -> "DATE_WRITTEN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_RECORD) -> "DATE_RECORD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_MODIFIED) -> "DATE_MODIFIED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_ENTRY) -> "DATE_ENTRY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_COMPILED) -> "DATE_COMPILED"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_DATE_AND_TIME) -> "DATE_AND_TIME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATE) -> "DATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATA_TYPES) -> "DATA_TYPES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_DATA_RECORDS) -> "DATA_RECORDS"
@@ -877,25 +1077,38 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_CURSOR_COLOR) -> "CURSOR_COLOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CURSOR_COL) -> "CURSOR_COL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CURSOR) -> "CURSOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CURRENT_DATE) -> "CURRENT_DATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CURRENT) -> "CURRENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CURRENCY) -> "CURRENCY"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CULTURE) -> "CULTURE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CS_GENERAL) -> "CS_GENERAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CS_BASIC) -> "CS_BASIC"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CSP) -> "CSP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CSIZE) -> "CSIZE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CRT_UNDER) -> "CRT_UNDER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CRT) -> "CRT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CREATE) -> "CREATE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COUNT_TRAILING) -> "COUNT_TRAILING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COUNT_MIN) -> "COUNT_MIN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COUNT_MAX) -> "COUNT_MAX"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COUNT_LEADLING) -> "COUNT_LEADLING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COUNT) -> "COUNT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CORRESPONDING) -> "CORRESPONDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CORE_INDEX) -> "CORE_INDEX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COPY_SELECTION) -> "COPY_SELECTION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COPY) -> "COPY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONVERTING) -> "CONVERTING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CONVERT) -> "CONVERT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONVERSION) -> "CONVERSION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CONTROL_AREA) -> "CONTROL_AREA"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CONTROLS_UNCROPPED) -> "CONTROLS_UNCROPPED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONTROLS) -> "CONTROLS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONTROL) -> "CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONTINUE) -> "CONTINUE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CONTENT_OF) -> "CONTENT_OF"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONTENT) -> "CONTENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONTAINS) -> "CONTAINS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CONSTRUCTOR) -> "CONSTRUCTOR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONSTANT_RECORD) -> "CONSTANT_RECORD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONSTANT) -> "CONSTANT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONSOLE_3) -> "CONSOLE_3"
@@ -905,6 +1118,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONNECT) -> "CONNECT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONFIGURATION) -> "CONFIGURATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CONDITION) -> "CONDITION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COM_REG) -> "COM_REG"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMP_X) -> "COMP_X"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMP_N) -> "COMP_N"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMP_9) -> "COMP_9"
@@ -928,11 +1142,13 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMPUTATIONAL_13) -> "COMPUTATIONAL_13"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMPUTATIONAL_12) -> "COMPUTATIONAL_12"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMPUTATIONAL_11) -> "COMPUTATIONAL_11"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COMPRESSION) -> "COMPRESSION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMPLEMENTARY) -> "COMPLEMENTARY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMPLE) -> "COMPLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMP) -> "COMP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMMUNICATION) -> "COMMUNICATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMMON) -> "COMMON"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COMMITMENT) -> "COMMITMENT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMMIT) -> "COMMIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMMENT_ENTRY) -> "COMMENT_ENTRY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COMMAND_LINE) -> "COMMAND_LINE"
@@ -950,27 +1166,39 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_COLON) -> ":"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COLLATING) -> "COLLATING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COL) -> "COL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_COERCION) -> "COERCION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CODE_SET) -> "CODE_SET"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CODE) -> "CODE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_COBOL) -> "COBOL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLOSE) -> "CLOSE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLOCK_UNITS) -> "CLOCK_UNITS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLOB_LOCATOR) -> "CLOB_LOCATOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLOB_FILE) -> "CLOB_FILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLOB) -> "CLOB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLINES) -> "CLINES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLINE) -> "CLINE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLEAR_SELECTION) -> "CLEAR_SELECTION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLASS_OBJECT) -> "CLASS_OBJECT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLASS_NAME) -> "CLASS_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLASS_ID) -> "CLASS_ID"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CLASS_CONTROL) -> "CLASS_CONTROL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLASSIFICATION) -> "CLASSIFICATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CLASS) -> "CLASS"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CICS) -> "CICS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHECK_BOX) -> "CHECK_BOX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHECKPOINT_FILE) -> "CHECKPOINT_FILE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHECK) -> "CHECK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CHAR_VARYING) -> "CHAR_VARYING"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CHART) -> "CHART"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHARACTERS) -> "CHARACTERS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHARACTER) -> "CHARACTER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CHAR) -> "CHAR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHANGED) -> "CHANGED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHAINING) -> "CHAINING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CHAIN) -> "CHAIN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CH) -> "CH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CF) -> "CF"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CENTURY_DAY) -> "CENTURY_DAY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CENTURY_DATE) -> "CENTURY_DATE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CENTERED_HEADINGS) -> "CENTERED_HEADINGS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CENTERED) -> "CENTERED"
@@ -982,14 +1210,18 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_CELL) -> "CELL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CD) -> "CD"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CCOL) -> "CCOL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CBL) -> "CBL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CATALOGUE_NAME) -> "CATALOGUE_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CATALOGUED) -> "CATALOGUED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CASSETTE) -> "CASSETTE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CASE_SENSITIVE) -> "CASE_SENSITIVE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CASE_INSENSITIVE) -> "CASE_INSENSITIVE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CARD_READER) -> "CARD_READER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CARD_PUNCH) -> "CARD_PUNCH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CAPACITY) -> "CAPACITY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CANCEL_BUTTON) -> "CANCEL_BUTTON"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CANCEL) -> "CANCEL"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_CALLED) -> "CALLED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CALL) -> "CALL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_CALENDAR_FONT) -> "CALENDAR_FONT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_C) -> "C"
@@ -1010,12 +1242,16 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_BUSY) -> "BUSY"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BULK_ADDITION) -> "BULK_ADDITION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BSN) -> "BSN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BROWSING) -> "BROWSING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BOXED) -> "BOXED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BOX) -> "BOX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BOTTOM) -> "BOTTOM"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BOOLIT) -> "BOOLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BOOLEAN) -> "BOOLEAN"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BLOCK) -> "BLOCK"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BLOB_LOCATOR) -> "BLOB_LOCATOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BLOB_FILE) -> "BLOB_FILE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BLOB) -> "BLOB"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BLINK) -> "BLINK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BLANK) -> "BLANK"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITS) -> "BITS"
@@ -1024,11 +1260,15 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_TRAILING) -> "BITMAP_TRAILING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_TIMER) -> "BITMAP_TIMER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_START) -> "BITMAP_START"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_SCALE) -> "BITMAP_SCALE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_RAW_WIDTH) -> "BITMAP_RAW_WIDTH"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_RAW_HEIGHT) -> "BITMAP_RAW_HEIGHT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_NUMBER) -> "BITMAP_NUMBER"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_HANDLE) -> "BITMAP_HANDLE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP_END) -> "BITMAP_END"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BITMAP) -> "BITMAP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BIT) -> "BIT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BIND) -> "BIND"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BINARY_SHORT) -> "BINARY_SHORT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BINARY_SEQUENTIAL) -> "BINARY_SEQUENTIAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BINARY_LONG) -> "BINARY_LONG"
@@ -1041,6 +1281,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_BEGINNING) -> "BEGINNING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BEFORE) -> "BEFORE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BECOMES) -> "BECOMES"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_BASIS) -> "BASIS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BASED) -> "BASED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BAR) -> "BAR"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BACKWARD) -> "BACKWARD"
@@ -1048,8 +1289,12 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_BACKGROUND_LOW) -> "BACKGROUND_LOW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BACKGROUND_HIGH) -> "BACKGROUND_HIGH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_BACKGROUND_COLOR) -> "BACKGROUND_COLOR"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_AX_EVENT_LIST) -> "AX_EVENT_LIST"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AWAY_FROM_ZERO) -> "AWAY_FROM_ZERO"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO_SPIN) -> "AUTO_SPIN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO_RESIZE) -> "AUTO_RESIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO_MINIMIZE) -> "AUTO_MINIMIZE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO_HYPHEN_SKIP) -> "AUTO_HYPHEN_SKIP"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO_DECIMAL) -> "AUTO_DECIMAL"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AUTOMATIC) -> "AUTOMATIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AUTO) -> "AUTO"
@@ -1061,6 +1306,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_AT) -> "AT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ASTERISK) -> "*"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ASSIGN) -> "ASSIGN"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ASSEMBLY_NAME) -> "ASSEMBLY_NAME"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ASCII) -> "ASCII"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ASCENDING) -> "ASCENDING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ASA) -> "ASA"
@@ -1068,6 +1314,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_ARITHMETIC) -> "ARITHMETIC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ARGUMENT_VALUE) -> "ARGUMENT_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ARGUMENT_NUMBER) -> "ARGUMENT_NUMBER"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_AREA_VALUES) -> "AREA_VALUES"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AREAS) -> "AREAS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_AREA) -> "AREA"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ARE) -> "ARE"
@@ -1106,8 +1353,10 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_ACTIVE_CLASS) -> "ACTIVE_CLASS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ACTIVATING) -> "ACTIVATING"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ACTION) -> "ACTION"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ACQUIRE) -> "ACQUIRE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ACCESS) -> "ACCESS"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ACCEPT) -> "ACCEPT"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_ABSTRACT) -> "ABSTRACT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_ABSENT) -> "ABSENT"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_write_target) -> "write_target"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_write_statement) -> "write_statement"
@@ -2094,10 +2343,14 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_YYYYDDD -> (fun _ -> "YYYYDDD")
   | MenhirInterpreter.T T_Y -> (fun _ -> "Y")
   | MenhirInterpreter.T T_XOR -> (fun _ -> "XOR")
+  | MenhirInterpreter.T T_XML_TEXT -> (fun _ -> "XML_TEXT")
   | MenhirInterpreter.T T_XML_SCHEMA -> (fun _ -> "XML_SCHEMA")
+  | MenhirInterpreter.T T_XML_NTEXT -> (fun _ -> "XML_NTEXT")
+  | MenhirInterpreter.T T_XML_EVENT -> (fun _ -> "XML_EVENT")
   | MenhirInterpreter.T T_XML_DECLARATION -> (fun _ -> "XML_DECLARATION")
   | MenhirInterpreter.T T_XML -> (fun _ -> "XML")
   | MenhirInterpreter.T T_X -> (fun _ -> "X")
+  | MenhirInterpreter.T T_WRITING -> (fun _ -> "WRITING")
   | MenhirInterpreter.T T_WRITE_VERIFY -> (fun _ -> "WRITE_VERIFY")
   | MenhirInterpreter.T T_WRITE_ONLY -> (fun _ -> "WRITE_ONLY")
   | MenhirInterpreter.T T_WRITERS -> (fun _ -> "WRITERS")
@@ -2112,6 +2365,9 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_WINDOW -> (fun _ -> "WINDOW")
   | MenhirInterpreter.T T_WIDTH_IN_CELLS -> (fun _ -> "WIDTH_IN_CELLS")
   | MenhirInterpreter.T T_WIDTH -> (fun _ -> "WIDTH")
+  | MenhirInterpreter.T T_WIDE -> (fun _ -> "WIDE")
+  | MenhirInterpreter.T T_WHILE -> (fun _ -> "WHILE")
+  | MenhirInterpreter.T T_WHEN_COMPILED -> (fun _ -> "WHEN_COMPILED")
   | MenhirInterpreter.T T_WHEN -> (fun _ -> "WHEN")
   | MenhirInterpreter.T T_WEB_BROWSER -> (fun _ -> "WEB_BROWSER")
   | MenhirInterpreter.T T_WAIT -> (fun _ -> "WAIT")
@@ -2122,14 +2378,17 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_VPADDING -> (fun _ -> "VPADDING")
   | MenhirInterpreter.T T_VOLATILE -> (fun _ -> "VOLATILE")
   | MenhirInterpreter.T T_VLR -> (fun _ -> "VLR")
+  | MenhirInterpreter.T T_VISIBLE -> (fun _ -> "VISIBLE")
   | MenhirInterpreter.T T_VIRTUAL_WIDTH -> (fun _ -> "VIRTUAL_WIDTH")
   | MenhirInterpreter.T T_VIRTUAL -> (fun _ -> "VIRTUAL")
   | MenhirInterpreter.T T_VIA -> (fun _ -> "VIA")
   | MenhirInterpreter.T T_VERY_HEAVY -> (fun _ -> "VERY_HEAVY")
   | MenhirInterpreter.T T_VERTICAL -> (fun _ -> "VERTICAL")
+  | MenhirInterpreter.T T_VERSION -> (fun _ -> "VERSION")
   | MenhirInterpreter.T T_VARYING -> (fun _ -> "VARYING")
   | MenhirInterpreter.T T_VARIANT -> (fun _ -> "VARIANT")
   | MenhirInterpreter.T T_VARIABLE -> (fun _ -> "VARIABLE")
+  | MenhirInterpreter.T T_VARBINARY -> (fun _ -> "VARBINARY")
   | MenhirInterpreter.T T_VALUE_FORMAT -> (fun _ -> "VALUE_FORMAT")
   | MenhirInterpreter.T T_VALUES -> (fun _ -> "VALUES")
   | MenhirInterpreter.T T_VALUE -> (fun _ -> "VALUE")
@@ -2144,7 +2403,10 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_USE_TAB -> (fun _ -> "USE_TAB")
   | MenhirInterpreter.T T_USE_RETURN -> (fun _ -> "USE_RETURN")
   | MenhirInterpreter.T T_USE_ALT -> (fun _ -> "USE_ALT")
+  | MenhirInterpreter.T T_USER_WHITE -> (fun _ -> "USER_WHITE")
+  | MenhirInterpreter.T T_USER_GRAY -> (fun _ -> "USER_GRAY")
   | MenhirInterpreter.T T_USER_DEFAULT -> (fun _ -> "USER_DEFAULT")
+  | MenhirInterpreter.T T_USER_COLORS -> (fun _ -> "USER_COLORS")
   | MenhirInterpreter.T T_USER -> (fun _ -> "USER")
   | MenhirInterpreter.T T_USE -> (fun _ -> "USE")
   | MenhirInterpreter.T T_USAGE -> (fun _ -> "USAGE")
@@ -2166,6 +2428,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_UNIVERSAL -> (fun _ -> "UNIVERSAL")
   | MenhirInterpreter.T T_UNIT -> (fun _ -> "UNIT")
   | MenhirInterpreter.T T_UNFRAMED -> (fun _ -> "UNFRAMED")
+  | MenhirInterpreter.T T_UNEQUAL -> (fun _ -> "UNEQUAL")
   | MenhirInterpreter.T T_UNDERLINE -> (fun _ -> "UNDERLINE")
   | MenhirInterpreter.T T_UNBOUNDED -> (fun _ -> "UNBOUNDED")
   | MenhirInterpreter.T T_UFF -> (fun _ -> "UFF")
@@ -2175,31 +2438,50 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_TYPE -> (fun _ -> "TYPE")
   | MenhirInterpreter.T T_TRUNCATION -> (fun _ -> "TRUNCATION")
   | MenhirInterpreter.T T_TRUE -> (fun _ -> "TRUE")
+  | MenhirInterpreter.T T_TRIMMED -> (fun _ -> "TRIMMED")
   | MenhirInterpreter.T T_TREE_VIEW -> (fun _ -> "TREE_VIEW")
+  | MenhirInterpreter.T T_TRANSPARENT_COLOR -> (fun _ -> "TRANSPARENT_COLOR")
   | MenhirInterpreter.T T_TRANSPARENT -> (fun _ -> "TRANSPARENT")
   | MenhirInterpreter.T T_TRANSFORM -> (fun _ -> "TRANSFORM")
+  | MenhirInterpreter.T T_TRANSACTION_STATUS -> (fun _ -> "TRANSACTION_STATUS")
+  | MenhirInterpreter.T T_TRANSACTION -> (fun _ -> "TRANSACTION")
   | MenhirInterpreter.T T_TRAILING_SIGN -> (fun _ -> "TRAILING_SIGN")
   | MenhirInterpreter.T T_TRAILING_SHIFT -> (fun _ -> "TRAILING_SHIFT")
   | MenhirInterpreter.T T_TRAILING -> (fun _ -> "TRAILING")
   | MenhirInterpreter.T T_TRADITIONAL_FONT -> (fun _ -> "TRADITIONAL_FONT")
+  | MenhirInterpreter.T T_TRACK_THUMB -> (fun _ -> "TRACK_THUMB")
   | MenhirInterpreter.T T_TRACK_LIMIT -> (fun _ -> "TRACK_LIMIT")
   | MenhirInterpreter.T T_TRACK_AREA -> (fun _ -> "TRACK_AREA")
   | MenhirInterpreter.T T_TRACKS -> (fun _ -> "TRACKS")
   | MenhirInterpreter.T T_TRACK -> (fun _ -> "TRACK")
+  | MenhirInterpreter.T T_TRACE -> (fun _ -> "TRACE")
   | MenhirInterpreter.T T_TOWARD_LESSER -> (fun _ -> "TOWARD_LESSER")
   | MenhirInterpreter.T T_TOWARD_GREATER -> (fun _ -> "TOWARD_GREATER")
+  | MenhirInterpreter.T T_TOTALING -> (fun _ -> "TOTALING")
+  | MenhirInterpreter.T T_TOTALED -> (fun _ -> "TOTALED")
   | MenhirInterpreter.T T_TOP_LEVEL -> (fun _ -> "TOP_LEVEL")
   | MenhirInterpreter.T T_TOP -> (fun _ -> "TOP")
+  | MenhirInterpreter.T T_TOOL_BAR -> (fun _ -> "TOOL_BAR")
   | MenhirInterpreter.T T_TO -> (fun _ -> "TO")
   | MenhirInterpreter.T T_TITLE_POSITION -> (fun _ -> "TITLE_POSITION")
+  | MenhirInterpreter.T T_TITLE_BAR -> (fun _ -> "TITLE_BAR")
   | MenhirInterpreter.T T_TITLE -> (fun _ -> "TITLE")
+  | MenhirInterpreter.T T_TIME_RECORD -> (fun _ -> "TIME_RECORD")
   | MenhirInterpreter.T T_TIME_OUT -> (fun _ -> "TIME_OUT")
+  | MenhirInterpreter.T T_TIME_OF_DAY -> (fun _ -> "TIME_OF_DAY")
+  | MenhirInterpreter.T T_TIMESTAMP_RECORD -> (fun _ -> "TIMESTAMP_RECORD")
+  | MenhirInterpreter.T T_TIMESTAMP_OFFSET_RECORD -> (fun _ -> "TIMESTAMP_OFFSET_RECORD")
+  | MenhirInterpreter.T T_TIMESTAMP_OFFSET -> (fun _ -> "TIMESTAMP_OFFSET")
+  | MenhirInterpreter.T T_TIMESTAMP -> (fun _ -> "TIMESTAMP")
   | MenhirInterpreter.T T_TIMES -> (fun _ -> "TIMES")
   | MenhirInterpreter.T T_TIME -> (fun _ -> "TIME")
   | MenhirInterpreter.T T_TILED_HEADINGS -> (fun _ -> "TILED_HEADINGS")
   | MenhirInterpreter.T T_THUMB_POSITION -> (fun _ -> "THUMB_POSITION")
   | MenhirInterpreter.T T_THROUGH -> (fun _ -> "THROUGH")
   | MenhirInterpreter.T T_THREEDIMENSIONAL -> (fun _ -> "THREEDIMENSIONAL")
+  | MenhirInterpreter.T T_THREAD_POINTER -> (fun _ -> "THREAD_POINTER")
+  | MenhirInterpreter.T T_THREAD_LOCAL_STORAGE -> (fun _ -> "THREAD_LOCAL_STORAGE")
+  | MenhirInterpreter.T T_THREAD_LOCAL -> (fun _ -> "THREAD_LOCAL")
   | MenhirInterpreter.T T_THREADS -> (fun _ -> "THREADS")
   | MenhirInterpreter.T T_THREAD -> (fun _ -> "THREAD")
   | MenhirInterpreter.T T_THEN -> (fun _ -> "THEN")
@@ -2219,8 +2501,10 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_TEMP -> (fun _ -> "TEMP")
   | MenhirInterpreter.T T_TAPE -> (fun _ -> "TAPE")
   | MenhirInterpreter.T T_TALLYING -> (fun _ -> "TALLYING")
+  | MenhirInterpreter.T T_TALLY -> (fun _ -> "TALLY")
   | MenhirInterpreter.T T_TAB_TO_DELETE -> (fun _ -> "TAB_TO_DELETE")
   | MenhirInterpreter.T T_TAB_TO_ADD -> (fun _ -> "TAB_TO_ADD")
+  | MenhirInterpreter.T T_TAB_CONTROL -> (fun _ -> "TAB_CONTROL")
   | MenhirInterpreter.T T_TABLE -> (fun _ -> "TABLE")
   | MenhirInterpreter.T T_TAB -> (fun _ -> "TAB")
   | MenhirInterpreter.T T_SYSTEM_OFFSET -> (fun _ -> "SYSTEM_OFFSET")
@@ -2244,16 +2528,20 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_SUPPRESS -> (fun _ -> "SUPPRESS")
   | MenhirInterpreter.T T_SUPER -> (fun _ -> "SUPER")
   | MenhirInterpreter.T T_SUM -> (fun _ -> "SUM")
+  | MenhirInterpreter.T T_SUFFIXING -> (fun _ -> "SUFFIXING")
   | MenhirInterpreter.T T_SUB_SCHEMA -> (fun _ -> "SUB_SCHEMA")
   | MenhirInterpreter.T T_SUB_QUEUE_3 -> (fun _ -> "SUB_QUEUE_3")
   | MenhirInterpreter.T T_SUB_QUEUE_2 -> (fun _ -> "SUB_QUEUE_2")
   | MenhirInterpreter.T T_SUB_QUEUE_1 -> (fun _ -> "SUB_QUEUE_1")
   | MenhirInterpreter.T T_SUBWINDOW -> (fun _ -> "SUBWINDOW")
   | MenhirInterpreter.T T_SUBTRACT -> (fun _ -> "SUBTRACT")
+  | MenhirInterpreter.T T_SUBFILE -> (fun _ -> "SUBFILE")
   | MenhirInterpreter.T T_STYLE -> (fun _ -> "STYLE")
   | MenhirInterpreter.T T_STRUCTURE -> (fun _ -> "STRUCTURE")
+  | MenhirInterpreter.T T_STRONG_NAME -> (fun _ -> "STRONG_NAME")
   | MenhirInterpreter.T T_STRONG -> (fun _ -> "STRONG")
   | MenhirInterpreter.T T_STRING -> (fun _ -> "STRING")
+  | MenhirInterpreter.T T_STOP_BROWSER -> (fun _ -> "STOP_BROWSER")
   | MenhirInterpreter.T T_STOP -> (fun _ -> "STOP")
   | MenhirInterpreter.T T_STEP -> (fun _ -> "STEP")
   | MenhirInterpreter.T T_STDCALL -> (fun _ -> "STDCALL")
@@ -2266,6 +2554,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_STATEMENT -> (fun _ -> "STATEMENT")
   | MenhirInterpreter.T T_START_Y -> (fun _ -> "START_Y")
   | MenhirInterpreter.T T_START_X -> (fun _ -> "START_X")
+  | MenhirInterpreter.T T_STARTING -> (fun _ -> "STARTING")
   | MenhirInterpreter.T T_START -> (fun _ -> "START")
   | MenhirInterpreter.T T_STANDARD_DECIMAL -> (fun _ -> "STANDARD_DECIMAL")
   | MenhirInterpreter.T T_STANDARD_BINARY -> (fun _ -> "STANDARD_BINARY")
@@ -2275,6 +2564,14 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_STACK -> (fun _ -> "STACK")
   | MenhirInterpreter.T T_SSF -> (fun _ -> "SSF")
   | MenhirInterpreter.T T_SQUARE -> (fun _ -> "SQUARE")
+  | MenhirInterpreter.T T_SQL_ROWID -> (fun _ -> "SQL_ROWID")
+  | MenhirInterpreter.T T_SQL_NCLOB -> (fun _ -> "SQL_NCLOB")
+  | MenhirInterpreter.T T_SQL_CURSOR -> (fun _ -> "SQL_CURSOR")
+  | MenhirInterpreter.T T_SQL_CLOB -> (fun _ -> "SQL_CLOB")
+  | MenhirInterpreter.T T_SQL_BLOB -> (fun _ -> "SQL_BLOB")
+  | MenhirInterpreter.T T_SQL_BFILE -> (fun _ -> "SQL_BFILE")
+  | MenhirInterpreter.T T_SQLIMS -> (fun _ -> "SQLIMS")
+  | MenhirInterpreter.T T_SQL -> (fun _ -> "SQL")
   | MenhirInterpreter.T T_SPINNER -> (fun _ -> "SPINNER")
   | MenhirInterpreter.T T_SPECIAL_NAMES -> (fun _ -> "SPECIAL_NAMES")
   | MenhirInterpreter.T T_SPACE_FILL -> (fun _ -> "SPACE_FILL")
@@ -2282,11 +2579,21 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_SOURCE_COMPUTER -> (fun _ -> "SOURCE_COMPUTER")
   | MenhirInterpreter.T T_SOURCES -> (fun _ -> "SOURCES")
   | MenhirInterpreter.T T_SOURCE -> (fun _ -> "SOURCE")
+  | MenhirInterpreter.T T_SORT_WORK -> (fun _ -> "SORT_WORK")
+  | MenhirInterpreter.T T_SORT_RETURN -> (fun _ -> "SORT_RETURN")
   | MenhirInterpreter.T T_SORT_ORDER -> (fun _ -> "SORT_ORDER")
+  | MenhirInterpreter.T T_SORT_MODE_SIZE -> (fun _ -> "SORT_MODE_SIZE")
+  | MenhirInterpreter.T T_SORT_MESSAGE -> (fun _ -> "SORT_MESSAGE")
   | MenhirInterpreter.T T_SORT_MERGE -> (fun _ -> "SORT_MERGE")
+  | MenhirInterpreter.T T_SORT_FILE_SIZE -> (fun _ -> "SORT_FILE_SIZE")
+  | MenhirInterpreter.T T_SORT_CORE_SIZE -> (fun _ -> "SORT_CORE_SIZE")
+  | MenhirInterpreter.T T_SORT_CONTROL -> (fun _ -> "SORT_CONTROL")
   | MenhirInterpreter.T T_SORT -> (fun _ -> "SORT")
   | MenhirInterpreter.T T_SMALL_FONT -> (fun _ -> "SMALL_FONT")
   | MenhirInterpreter.T T_SLASH -> (fun _ -> "/")
+  | MenhirInterpreter.T T_SKIP3 -> (fun _ -> "SKIP3")
+  | MenhirInterpreter.T T_SKIP2 -> (fun _ -> "SKIP2")
+  | MenhirInterpreter.T T_SKIP1 -> (fun _ -> "SKIP1")
   | MenhirInterpreter.T T_SIZE -> (fun _ -> "SIZE")
   | MenhirInterpreter.T T_SINTLIT -> (fun _ -> "SINTLIT")
   | MenhirInterpreter.T T_SIGNED_SHORT -> (fun _ -> "SIGNED_SHORT")
@@ -2299,25 +2606,32 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_SHOW_LINES -> (fun _ -> "SHOW_LINES")
   | MenhirInterpreter.T T_SHORT_DATE -> (fun _ -> "SHORT_DATE")
   | MenhirInterpreter.T T_SHORT -> (fun _ -> "SHORT")
+  | MenhirInterpreter.T T_SHIFT_OUT -> (fun _ -> "SHIFT_OUT")
+  | MenhirInterpreter.T T_SHIFT_IN -> (fun _ -> "SHIFT_IN")
   | MenhirInterpreter.T T_SHARING -> (fun _ -> "SHARING")
   | MenhirInterpreter.T T_SHADOW -> (fun _ -> "SHADOW")
   | MenhirInterpreter.T T_SHADING -> (fun _ -> "SHADING")
   | MenhirInterpreter.T T_SET -> (fun _ -> "SET")
+  | MenhirInterpreter.T T_SERVICE -> (fun _ -> "SERVICE")
   | MenhirInterpreter.T T_SEQUENTIAL -> (fun _ -> "SEQUENTIAL")
   | MenhirInterpreter.T T_SEQUENCE -> (fun _ -> "SEQUENCE")
   | MenhirInterpreter.T T_SEPARATION -> (fun _ -> "SEPARATION")
   | MenhirInterpreter.T T_SEPARATE -> (fun _ -> "SEPARATE")
   | MenhirInterpreter.T T_SENTENCE -> (fun _ -> "SENTENCE")
   | MenhirInterpreter.T T_SEND -> (fun _ -> "SEND")
+  | MenhirInterpreter.T T_SEMAPHORE_POINTER -> (fun _ -> "SEMAPHORE_POINTER")
   | MenhirInterpreter.T T_SELF_ACT -> (fun _ -> "SELF_ACT")
+  | MenhirInterpreter.T T_SELFCLASS -> (fun _ -> "SELFCLASS")
   | MenhirInterpreter.T T_SELF -> (fun _ -> "SELF")
   | MenhirInterpreter.T T_SELECT_ALL -> (fun _ -> "SELECT_ALL")
+  | MenhirInterpreter.T T_SELECTIVE -> (fun _ -> "SELECTIVE")
   | MenhirInterpreter.T T_SELECTION_TEXT -> (fun _ -> "SELECTION_TEXT")
   | MenhirInterpreter.T T_SELECTION_INDEX -> (fun _ -> "SELECTION_INDEX")
   | MenhirInterpreter.T T_SELECTION -> (fun _ -> "SELECTION")
   | MenhirInterpreter.T T_SELECT -> (fun _ -> "SELECT")
   | MenhirInterpreter.T T_SEGMENT_LIMIT -> (fun _ -> "SEGMENT_LIMIT")
   | MenhirInterpreter.T T_SEGMENT -> (fun _ -> "SEGMENT")
+  | MenhirInterpreter.T T_SEEK -> (fun _ -> "SEEK")
   | MenhirInterpreter.T T_SECURITY -> (fun _ -> "SECURITY")
   | MenhirInterpreter.T T_SECURE -> (fun _ -> "SECURE")
   | MenhirInterpreter.T T_SECTION -> (fun _ -> "SECTION")
@@ -2343,8 +2657,10 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_ROW_DIVIDERS -> (fun _ -> "ROW_DIVIDERS")
   | MenhirInterpreter.T T_ROW_COLOR_PATTERN -> (fun _ -> "ROW_COLOR_PATTERN")
   | MenhirInterpreter.T T_ROW_COLOR -> (fun _ -> "ROW_COLOR")
+  | MenhirInterpreter.T T_ROWID -> (fun _ -> "ROWID")
   | MenhirInterpreter.T T_ROUNDING -> (fun _ -> "ROUNDING")
   | MenhirInterpreter.T T_ROUNDED -> (fun _ -> "ROUNDED")
+  | MenhirInterpreter.T T_ROLLING -> (fun _ -> "ROLLING")
   | MenhirInterpreter.T T_ROLLBACK -> (fun _ -> "ROLLBACK")
   | MenhirInterpreter.T T_RIMMED -> (fun _ -> "RIMMED")
   | MenhirInterpreter.T T_RIGHT_JUSTIFY -> (fun _ -> "RIGHT_JUSTIFY")
@@ -2357,12 +2673,18 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_REVERSE_VIDEO -> (fun _ -> "REVERSE_VIDEO")
   | MenhirInterpreter.T T_REVERSED -> (fun _ -> "REVERSED")
   | MenhirInterpreter.T T_REVERSE -> (fun _ -> "REVERSE")
+  | MenhirInterpreter.T T_RETURN_UNSIGNED -> (fun _ -> "RETURN_UNSIGNED")
+  | MenhirInterpreter.T T_RETURN_CODE -> (fun _ -> "RETURN_CODE")
   | MenhirInterpreter.T T_RETURNING -> (fun _ -> "RETURNING")
   | MenhirInterpreter.T T_RETURN -> (fun _ -> "RETURN")
   | MenhirInterpreter.T T_RETRY -> (fun _ -> "RETRY")
   | MenhirInterpreter.T T_RETENTION -> (fun _ -> "RETENTION")
   | MenhirInterpreter.T T_RESUME -> (fun _ -> "RESUME")
+  | MenhirInterpreter.T T_RESTRICTED -> (fun _ -> "RESTRICTED")
+  | MenhirInterpreter.T T_RESIZABLE -> (fun _ -> "RESIZABLE")
+  | MenhirInterpreter.T T_RESIDENT -> (fun _ -> "RESIDENT")
   | MenhirInterpreter.T T_RESET_TABS -> (fun _ -> "RESET_TABS")
+  | MenhirInterpreter.T T_RESET_SET_LOCATOR -> (fun _ -> "RESET_SET_LOCATOR")
   | MenhirInterpreter.T T_RESET_LIST -> (fun _ -> "RESET_LIST")
   | MenhirInterpreter.T T_RESET_GRID -> (fun _ -> "RESET_GRID")
   | MenhirInterpreter.T T_RESET -> (fun _ -> "RESET")
@@ -2375,6 +2697,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_REPORTING -> (fun _ -> "REPORTING")
   | MenhirInterpreter.T T_REPORT -> (fun _ -> "REPORT")
   | MenhirInterpreter.T T_REPLACING -> (fun _ -> "REPLACING")
+  | MenhirInterpreter.T T_REPLACED -> (fun _ -> "REPLACED")
   | MenhirInterpreter.T T_REPLACE -> (fun _ -> "REPLACE")
   | MenhirInterpreter.T T_REPEATED -> (fun _ -> "REPEATED")
   | MenhirInterpreter.T T_REORG_CRITERIA -> (fun _ -> "REORG_CRITERIA")
@@ -2382,6 +2705,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_REMOVAL -> (fun _ -> "REMOVAL")
   | MenhirInterpreter.T T_REMARKS -> (fun _ -> "REMARKS")
   | MenhirInterpreter.T T_REMAINDER -> (fun _ -> "REMAINDER")
+  | MenhirInterpreter.T T_RELOAD -> (fun _ -> "RELOAD")
   | MenhirInterpreter.T T_RELEASE -> (fun _ -> "RELEASE")
   | MenhirInterpreter.T T_RELATIVE -> (fun _ -> "RELATIVE")
   | MenhirInterpreter.T T_RELATION -> (fun _ -> "RELATION")
@@ -2390,10 +2714,12 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_REFERENCES -> (fun _ -> "REFERENCES")
   | MenhirInterpreter.T T_REFERENCE -> (fun _ -> "REFERENCE")
   | MenhirInterpreter.T T_REEL -> (fun _ -> "REEL")
+  | MenhirInterpreter.T T_REDEFINITION -> (fun _ -> "REDEFINITION")
   | MenhirInterpreter.T T_REDEFINES -> (fun _ -> "REDEFINES")
   | MenhirInterpreter.T T_RECURSIVE -> (fun _ -> "RECURSIVE")
   | MenhirInterpreter.T T_RECORD_TO_DELETE -> (fun _ -> "RECORD_TO_DELETE")
   | MenhirInterpreter.T T_RECORD_TO_ADD -> (fun _ -> "RECORD_TO_ADD")
+  | MenhirInterpreter.T T_RECORD_POSITION -> (fun _ -> "RECORD_POSITION")
   | MenhirInterpreter.T T_RECORD_OVERFLOW -> (fun _ -> "RECORD_OVERFLOW")
   | MenhirInterpreter.T T_RECORD_DATA -> (fun _ -> "RECORD_DATA")
   | MenhirInterpreter.T T_RECORDS -> (fun _ -> "RECORDS")
@@ -2402,9 +2728,12 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_RECEIVED -> (fun _ -> "RECEIVED")
   | MenhirInterpreter.T T_RECEIVE -> (fun _ -> "RECEIVE")
   | MenhirInterpreter.T T_READ_ONLY -> (fun _ -> "READ_ONLY")
+  | MenhirInterpreter.T T_READY -> (fun _ -> "READY")
+  | MenhirInterpreter.T T_READING -> (fun _ -> "READING")
   | MenhirInterpreter.T T_READERS -> (fun _ -> "READERS")
   | MenhirInterpreter.T T_READ -> (fun _ -> "READ")
   | MenhirInterpreter.T T_RD -> (fun _ -> "RD")
+  | MenhirInterpreter.T T_RANGE -> (fun _ -> "RANGE")
   | MenhirInterpreter.T T_RANDOM -> (fun _ -> "RANDOM")
   | MenhirInterpreter.T T_RAISING -> (fun _ -> "RAISING")
   | MenhirInterpreter.T T_RAISED -> (fun _ -> "RAISED")
@@ -2416,6 +2745,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_QUERY_INDEX -> (fun _ -> "QUERY_INDEX")
   | MenhirInterpreter.T T_PUSH_BUTTON -> (fun _ -> "PUSH_BUTTON")
   | MenhirInterpreter.T T_PURGE -> (fun _ -> "PURGE")
+  | MenhirInterpreter.T T_PUBLIC -> (fun _ -> "PUBLIC")
   | MenhirInterpreter.T T_PROTOTYPE -> (fun _ -> "PROTOTYPE")
   | MenhirInterpreter.T T_PROTECTED -> (fun _ -> "PROTECTED")
   | MenhirInterpreter.T T_PROPERTY -> (fun _ -> "PROPERTY")
@@ -2428,13 +2758,18 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_PROGRAM -> (fun _ -> "PROGRAM")
   | MenhirInterpreter.T T_PROCESS_AREA -> (fun _ -> "PROCESS_AREA")
   | MenhirInterpreter.T T_PROCESSING -> (fun _ -> "PROCESSING")
+  | MenhirInterpreter.T T_PROCESS -> (fun _ -> "PROCESS")
   | MenhirInterpreter.T T_PROCEED -> (fun _ -> "PROCEED")
   | MenhirInterpreter.T T_PROCEDURE_POINTER -> (fun _ -> "PROCEDURE_POINTER")
+  | MenhirInterpreter.T T_PROCEDURE_NAME -> (fun _ -> "PROCEDURE_NAME")
   | MenhirInterpreter.T T_PROCEDURES -> (fun _ -> "PROCEDURES")
   | MenhirInterpreter.T T_PROCEDURE -> (fun _ -> "PROCEDURE")
+  | MenhirInterpreter.T T_PRIVATE -> (fun _ -> "PRIVATE")
   | MenhirInterpreter.T T_PRIORITY -> (fun _ -> "PRIORITY")
+  | MenhirInterpreter.T T_PRIOR -> (fun _ -> "PRIOR")
   | MenhirInterpreter.T T_PRINT_PREVIEW -> (fun _ -> "PRINT_PREVIEW")
   | MenhirInterpreter.T T_PRINT_NO_PROMPT -> (fun _ -> "PRINT_NO_PROMPT")
+  | MenhirInterpreter.T T_PRINT_CONTROL -> (fun _ -> "PRINT_CONTROL")
   | MenhirInterpreter.T T_PRINTING -> (fun _ -> "PRINTING")
   | MenhirInterpreter.T T_PRINTER_1 -> (fun _ -> "PRINTER_1")
   | MenhirInterpreter.T T_PRINTER -> (fun _ -> "PRINTER")
@@ -2442,12 +2777,15 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_PRIMARY -> (fun _ -> "PRIMARY")
   | MenhirInterpreter.T T_PREVIOUS -> (fun _ -> "PREVIOUS")
   | MenhirInterpreter.T T_PRESENT -> (fun _ -> "PRESENT")
+  | MenhirInterpreter.T T_PREFIXING -> (fun _ -> "PREFIXING")
   | MenhirInterpreter.T T_PREFIXED -> (fun _ -> "PREFIXED")
   | MenhirInterpreter.T T_POSITIVE -> (fun _ -> "POSITIVE")
   | MenhirInterpreter.T T_POSITION_SHIFT -> (fun _ -> "POSITION_SHIFT")
+  | MenhirInterpreter.T T_POSITIONING -> (fun _ -> "POSITIONING")
   | MenhirInterpreter.T T_POSITION -> (fun _ -> "POSITION")
   | MenhirInterpreter.T T_POS -> (fun _ -> "POS")
   | MenhirInterpreter.T T_POP_UP -> (fun _ -> "POP_UP")
+  | MenhirInterpreter.T T_POINTER_32 -> (fun _ -> "POINTER_32")
   | MenhirInterpreter.T T_POINTER -> (fun _ -> "POINTER")
   | MenhirInterpreter.T T_PLUS_SIGN -> (fun _ -> "+")
   | MenhirInterpreter.T T_PLUS -> (fun _ -> "PLUS")
@@ -2466,19 +2804,27 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_PARSE -> (fun _ -> "PARSE")
   | MenhirInterpreter.T T_PARENT -> (fun _ -> "PARENT")
   | MenhirInterpreter.T T_PARAGRAPH -> (fun _ -> "PARAGRAPH")
+  | MenhirInterpreter.T T_PANEL_WIDTHS -> (fun _ -> "PANEL_WIDTHS")
+  | MenhirInterpreter.T T_PANEL_TEXT -> (fun _ -> "PANEL_TEXT")
+  | MenhirInterpreter.T T_PANEL_STYLE -> (fun _ -> "PANEL_STYLE")
+  | MenhirInterpreter.T T_PANEL_INDEX -> (fun _ -> "PANEL_INDEX")
+  | MenhirInterpreter.T T_PAGE_SIZE -> (fun _ -> "PAGE_SIZE")
   | MenhirInterpreter.T T_PAGE_SETUP -> (fun _ -> "PAGE_SETUP")
   | MenhirInterpreter.T T_PAGE_COUNTER -> (fun _ -> "PAGE_COUNTER")
   | MenhirInterpreter.T T_PAGED -> (fun _ -> "PAGED")
   | MenhirInterpreter.T T_PAGE -> (fun _ -> "PAGE")
   | MenhirInterpreter.T T_PADDING -> (fun _ -> "PADDING")
   | MenhirInterpreter.T T_PACKED_DECIMAL -> (fun _ -> "PACKED_DECIMAL")
+  | MenhirInterpreter.T T_O_FILL -> (fun _ -> "O_FILL")
   | MenhirInterpreter.T T_OVERRIDING -> (fun _ -> "OVERRIDING")
   | MenhirInterpreter.T T_OVERRIDE -> (fun _ -> "OVERRIDE")
   | MenhirInterpreter.T T_OVERLINE -> (fun _ -> "OVERLINE")
   | MenhirInterpreter.T T_OVERLAP_TOP -> (fun _ -> "OVERLAP_TOP")
   | MenhirInterpreter.T T_OVERLAP_LEFT -> (fun _ -> "OVERLAP_LEFT")
+  | MenhirInterpreter.T T_OVERLAPPED -> (fun _ -> "OVERLAPPED")
   | MenhirInterpreter.T T_OVERFLOW -> (fun _ -> "OVERFLOW")
   | MenhirInterpreter.T T_OUTPUT -> (fun _ -> "OUTPUT")
+  | MenhirInterpreter.T T_OTHERWISE -> (fun _ -> "OTHERWISE")
   | MenhirInterpreter.T T_OTHERS -> (fun _ -> "OTHERS")
   | MenhirInterpreter.T T_OTHER -> (fun _ -> "OTHER")
   | MenhirInterpreter.T T_ORGANIZATION -> (fun _ -> "ORGANIZATION")
@@ -2488,6 +2834,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_OPTIONAL -> (fun _ -> "OPTIONAL")
   | MenhirInterpreter.T T_OPERATIONAL -> (fun _ -> "OPERATIONAL")
   | MenhirInterpreter.T T_OPEN -> (fun _ -> "OPEN")
+  | MenhirInterpreter.T T_OOSTACKPTR -> (fun _ -> "OOSTACKPTR")
   | MenhirInterpreter.T T_ON_SIZE_ERROR -> (fun _ -> "ON_SIZE_ERROR")
   | MenhirInterpreter.T T_ON_OVERFLOW -> (fun _ -> "ON_OVERFLOW")
   | MenhirInterpreter.T T_ON_EXCEPTION -> (fun _ -> "ON_EXCEPTION")
@@ -2498,12 +2845,16 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_OFF -> (fun _ -> "OFF")
   | MenhirInterpreter.T T_OF -> (fun _ -> "OF")
   | MenhirInterpreter.T T_OCCURS -> (fun _ -> "OCCURS")
+  | MenhirInterpreter.T T_OBJECT_STORAGE -> (fun _ -> "OBJECT_STORAGE")
   | MenhirInterpreter.T T_OBJECT_REFERENCE -> (fun _ -> "OBJECT_REFERENCE")
   | MenhirInterpreter.T T_OBJECT_PROGRAM -> (fun _ -> "OBJECT_PROGRAM")
+  | MenhirInterpreter.T T_OBJECT_ID -> (fun _ -> "OBJECT_ID")
   | MenhirInterpreter.T T_OBJECT_COMPUTER -> (fun _ -> "OBJECT_COMPUTER")
   | MenhirInterpreter.T T_OBJECT -> (fun _ -> "OBJECT")
+  | MenhirInterpreter.T T_NUM_ROW_HEADINGS -> (fun _ -> "NUM_ROW_HEADINGS")
   | MenhirInterpreter.T T_NUM_ROWS -> (fun _ -> "NUM_ROWS")
   | MenhirInterpreter.T T_NUM_COL_HEADINGS -> (fun _ -> "NUM_COL_HEADINGS")
+  | MenhirInterpreter.T T_NUMERIC_FILL -> (fun _ -> "NUMERIC_FILL")
   | MenhirInterpreter.T T_NUMERIC_EDITED -> (fun _ -> "NUMERIC_EDITED")
   | MenhirInterpreter.T T_NUMERIC -> (fun _ -> "NUMERIC")
   | MenhirInterpreter.T T_NUMBERS -> (fun _ -> "NUMBERS")
@@ -2512,6 +2863,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NULLIT -> (fun _ -> "NULLIT")
   | MenhirInterpreter.T T_NULL -> (fun _ -> "NULL")
   | MenhirInterpreter.T T_NO_UPDOWN -> (fun _ -> "NO_UPDOWN")
+  | MenhirInterpreter.T T_NO_TAB -> (fun _ -> "NO_TAB")
   | MenhirInterpreter.T T_NO_SEARCH -> (fun _ -> "NO_SEARCH")
   | MenhirInterpreter.T T_NO_KEY_LETTER -> (fun _ -> "NO_KEY_LETTER")
   | MenhirInterpreter.T T_NO_GROUP_TAB -> (fun _ -> "NO_GROUP_TAB")
@@ -2520,6 +2872,8 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NO_ECHO -> (fun _ -> "NO_ECHO")
   | MenhirInterpreter.T T_NO_DIVIDERS -> (fun _ -> "NO_DIVIDERS")
   | MenhirInterpreter.T T_NO_DATA -> (fun _ -> "NO_DATA")
+  | MenhirInterpreter.T T_NO_CLOSE -> (fun _ -> "NO_CLOSE")
+  | MenhirInterpreter.T T_NO_CELL_DRAG -> (fun _ -> "NO_CELL_DRAG")
   | MenhirInterpreter.T T_NO_BOX -> (fun _ -> "NO_BOX")
   | MenhirInterpreter.T T_NO_AUTO_DEFAULT -> (fun _ -> "NO_AUTO_DEFAULT")
   | MenhirInterpreter.T T_NO_AUTOSEL -> (fun _ -> "NO_AUTOSEL")
@@ -2534,6 +2888,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NOTIFY_CHANGE -> (fun _ -> "NOTIFY_CHANGE")
   | MenhirInterpreter.T T_NOTIFY -> (fun _ -> "NOTIFY")
   | MenhirInterpreter.T T_NOTHING -> (fun _ -> "NOTHING")
+  | MenhirInterpreter.T T_NOTE -> (fun _ -> "NOTE")
   | MenhirInterpreter.T T_NOTAB -> (fun _ -> "NOTAB")
   | MenhirInterpreter.T T_NOT -> (fun _ -> "NOT")
   | MenhirInterpreter.T T_NORMAL -> (fun _ -> "NORMAL")
@@ -2545,6 +2900,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NEXT_ITEM -> (fun _ -> "NEXT_ITEM")
   | MenhirInterpreter.T T_NEXT -> (fun _ -> "NEXT")
   | MenhirInterpreter.T T_NEW -> (fun _ -> "NEW")
+  | MenhirInterpreter.T T_NET_EVENT_LIST -> (fun _ -> "NET_EVENT_LIST")
   | MenhirInterpreter.T T_NESTED -> (fun _ -> "NESTED")
   | MenhirInterpreter.T T_NEGATIVE -> (fun _ -> "NEGATIVE")
   | MenhirInterpreter.T T_NEAREST_TO_ZERO -> (fun _ -> "NEAREST_TO_ZERO")
@@ -2552,6 +2908,8 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NEAREST_EVEN -> (fun _ -> "NEAREST_EVEN")
   | MenhirInterpreter.T T_NEAREST_AWAY_FROM_ZERO -> (fun _ -> "NEAREST_AWAY_FROM_ZERO")
   | MenhirInterpreter.T T_NE -> (fun _ -> "<>")
+  | MenhirInterpreter.T T_NCLOB -> (fun _ -> "NCLOB")
+  | MenhirInterpreter.T T_NCHAR -> (fun _ -> "NCHAR")
   | MenhirInterpreter.T T_NAVIGATE_URL -> (fun _ -> "NAVIGATE_URL")
   | MenhirInterpreter.T T_NATLIT -> (fun _ -> "NATLIT")
   | MenhirInterpreter.T T_NATIVE -> (fun _ -> "NATIVE")
@@ -2562,28 +2920,48 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_NAMESPACE -> (fun _ -> "NAMESPACE")
   | MenhirInterpreter.T T_NAMED -> (fun _ -> "NAMED")
   | MenhirInterpreter.T T_NAME -> (fun _ -> "NAME")
+  | MenhirInterpreter.T T_MUTEX_POINTER -> (fun _ -> "MUTEX_POINTER")
   | MenhirInterpreter.T T_MULTIPLY -> (fun _ -> "MULTIPLY")
   | MenhirInterpreter.T T_MULTIPLE -> (fun _ -> "MULTIPLE")
   | MenhirInterpreter.T T_MULTILINE -> (fun _ -> "MULTILINE")
   | MenhirInterpreter.T T_MOVE -> (fun _ -> "MOVE")
+  | MenhirInterpreter.T T_MORE_LABELS -> (fun _ -> "MORE_LABELS")
+  | MenhirInterpreter.T T_MONITOR_POINTER -> (fun _ -> "MONITOR_POINTER")
   | MenhirInterpreter.T T_MODULES -> (fun _ -> "MODULES")
+  | MenhirInterpreter.T T_MODULE -> (fun _ -> "MODULE")
   | MenhirInterpreter.T T_MODIFY -> (fun _ -> "MODIFY")
+  | MenhirInterpreter.T T_MODIFIED -> (fun _ -> "MODIFIED")
+  | MenhirInterpreter.T T_MODELESS -> (fun _ -> "MODELESS")
   | MenhirInterpreter.T T_MODE -> (fun _ -> "MODE")
+  | MenhirInterpreter.T T_MODAL -> (fun _ -> "MODAL")
+  | MenhirInterpreter.T T_MIN_WIDTH -> (fun _ -> "MIN_WIDTH")
+  | MenhirInterpreter.T T_MIN_VALUE -> (fun _ -> "MIN_VALUE")
   | MenhirInterpreter.T T_MIN_VAL -> (fun _ -> "MIN_VAL")
+  | MenhirInterpreter.T T_MIN_SIZE -> (fun _ -> "MIN_SIZE")
+  | MenhirInterpreter.T T_MIN_LINES -> (fun _ -> "MIN_LINES")
+  | MenhirInterpreter.T T_MIN_HEIGHT -> (fun _ -> "MIN_HEIGHT")
   | MenhirInterpreter.T T_MINUS -> (fun _ -> "MINUS")
   | MenhirInterpreter.T T_MICROSECOND_TIME -> (fun _ -> "MICROSECOND_TIME")
   | MenhirInterpreter.T T_METHOD_ID -> (fun _ -> "METHOD_ID")
   | MenhirInterpreter.T T_METHOD -> (fun _ -> "METHOD")
+  | MenhirInterpreter.T T_META_CLASS -> (fun _ -> "META_CLASS")
   | MenhirInterpreter.T T_MESSAGE_TAG -> (fun _ -> "MESSAGE_TAG")
+  | MenhirInterpreter.T T_MESSAGES -> (fun _ -> "MESSAGES")
   | MenhirInterpreter.T T_MESSAGE -> (fun _ -> "MESSAGE")
   | MenhirInterpreter.T T_MERGE -> (fun _ -> "MERGE")
   | MenhirInterpreter.T T_MENU -> (fun _ -> "MENU")
   | MenhirInterpreter.T T_MEMORY -> (fun _ -> "MEMORY")
   | MenhirInterpreter.T T_MEDIUM_FONT -> (fun _ -> "MEDIUM_FONT")
+  | MenhirInterpreter.T T_MDI_FRAME -> (fun _ -> "MDI_FRAME")
+  | MenhirInterpreter.T T_MDI_CHILD -> (fun _ -> "MDI_CHILD")
+  | MenhirInterpreter.T T_MAX_WIDTH -> (fun _ -> "MAX_WIDTH")
+  | MenhirInterpreter.T T_MAX_VALUE -> (fun _ -> "MAX_VALUE")
   | MenhirInterpreter.T T_MAX_VAL -> (fun _ -> "MAX_VAL")
   | MenhirInterpreter.T T_MAX_TEXT -> (fun _ -> "MAX_TEXT")
+  | MenhirInterpreter.T T_MAX_SIZE -> (fun _ -> "MAX_SIZE")
   | MenhirInterpreter.T T_MAX_PROGRESS -> (fun _ -> "MAX_PROGRESS")
   | MenhirInterpreter.T T_MAX_LINES -> (fun _ -> "MAX_LINES")
+  | MenhirInterpreter.T T_MAX_HEIGHT -> (fun _ -> "MAX_HEIGHT")
   | MenhirInterpreter.T T_MASTER_INDEX -> (fun _ -> "MASTER_INDEX")
   | MenhirInterpreter.T T_MASS_UPDATE -> (fun _ -> "MASS_UPDATE")
   | MenhirInterpreter.T T_MANUAL -> (fun _ -> "MANUAL")
@@ -2593,8 +2971,12 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_LOW_VALUE -> (fun _ -> "LOW_VALUE")
   | MenhirInterpreter.T T_LOW_COLOR -> (fun _ -> "LOW_COLOR")
   | MenhirInterpreter.T T_LOWLIGHT -> (fun _ -> "LOWLIGHT")
+  | MenhirInterpreter.T T_LOWEST_VALUE -> (fun _ -> "LOWEST_VALUE")
   | MenhirInterpreter.T T_LOWERED -> (fun _ -> "LOWERED")
   | MenhirInterpreter.T T_LOWER -> (fun _ -> "LOWER")
+  | MenhirInterpreter.T T_LOW -> (fun _ -> "LOW")
+  | MenhirInterpreter.T T_LONG_VARCHAR -> (fun _ -> "LONG_VARCHAR")
+  | MenhirInterpreter.T T_LONG_VARBINARY -> (fun _ -> "LONG_VARBINARY")
   | MenhirInterpreter.T T_LONG_DATE -> (fun _ -> "LONG_DATE")
   | MenhirInterpreter.T T_LOCK_HOLDING -> (fun _ -> "LOCK_HOLDING")
   | MenhirInterpreter.T T_LOCKS -> (fun _ -> "LOCKS")
@@ -2606,6 +2988,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_LM_RESIZE -> (fun _ -> "LM_RESIZE")
   | MenhirInterpreter.T T_LIST_BOX -> (fun _ -> "LIST_BOX")
   | MenhirInterpreter.T T_LINKAGE -> (fun _ -> "LINKAGE")
+  | MenhirInterpreter.T T_LINK -> (fun _ -> "LINK")
   | MenhirInterpreter.T T_LINE_SEQUENTIAL -> (fun _ -> "LINE_SEQUENTIAL")
   | MenhirInterpreter.T T_LINE_COUNTER -> (fun _ -> "LINE_COUNTER")
   | MenhirInterpreter.T T_LINES_PER_PAGE -> (fun _ -> "LINES_PER_PAGE")
@@ -2614,6 +2997,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_LINE -> (fun _ -> "LINE")
   | MenhirInterpreter.T T_LINAGE_COUNTER -> (fun _ -> "LINAGE_COUNTER")
   | MenhirInterpreter.T T_LINAGE -> (fun _ -> "LINAGE")
+  | MenhirInterpreter.T T_LIN -> (fun _ -> "LIN")
   | MenhirInterpreter.T T_LIMITS -> (fun _ -> "LIMITS")
   | MenhirInterpreter.T T_LIMIT -> (fun _ -> "LIMIT")
   | MenhirInterpreter.T T_LIKE -> (fun _ -> "LIKE")
@@ -2648,8 +3032,15 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_KEYBOARD -> (fun _ -> "KEYBOARD")
   | MenhirInterpreter.T T_KEY -> (fun _ -> "KEY")
   | MenhirInterpreter.T T_KEPT -> (fun _ -> "KEPT")
+  | MenhirInterpreter.T T_KANJI -> (fun _ -> "KANJI")
   | MenhirInterpreter.T T_JUSTIFIED -> (fun _ -> "JUSTIFIED")
+  | MenhirInterpreter.T T_JSON_STATUS -> (fun _ -> "JSON_STATUS")
+  | MenhirInterpreter.T T_JSON_CODE -> (fun _ -> "JSON_CODE")
   | MenhirInterpreter.T T_JSON -> (fun _ -> "JSON")
+  | MenhirInterpreter.T T_JOINING -> (fun _ -> "JOINING")
+  | MenhirInterpreter.T T_JNIENVPTR -> (fun _ -> "JNIENVPTR")
+  | MenhirInterpreter.T T_JAVA -> (fun _ -> "JAVA")
+  | MenhirInterpreter.T T_JAPANESE -> (fun _ -> "JAPANESE")
   | MenhirInterpreter.T T_I_O_CONTROL -> (fun _ -> "I_O_CONTROL")
   | MenhirInterpreter.T T_I_O -> (fun _ -> "I_O")
   | MenhirInterpreter.T T_ITEM_VALUE -> (fun _ -> "ITEM_VALUE")
@@ -2657,6 +3048,8 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_ITEM_TO_DELETE -> (fun _ -> "ITEM_TO_DELETE")
   | MenhirInterpreter.T T_ITEM_TO_ADD -> (fun _ -> "ITEM_TO_ADD")
   | MenhirInterpreter.T T_ITEM_TEXT -> (fun _ -> "ITEM_TEXT")
+  | MenhirInterpreter.T T_ITEM_ID -> (fun _ -> "ITEM_ID")
+  | MenhirInterpreter.T T_ITEM_BOLD -> (fun _ -> "ITEM_BOLD")
   | MenhirInterpreter.T T_ITEM -> (fun _ -> "ITEM")
   | MenhirInterpreter.T T_IS_TYPEDEF -> (fun _ -> "IS_TYPEDEF")
   | MenhirInterpreter.T T_IS_GLOBAL -> (fun _ -> "IS_GLOBAL")
@@ -2664,29 +3057,38 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_IS -> (fun _ -> "IS")
   | MenhirInterpreter.T T_IN_ARITHMETIC_RANGE -> (fun _ -> "IN_ARITHMETIC_RANGE")
   | MenhirInterpreter.T T_INVOKING -> (fun _ -> "INVOKING")
+  | MenhirInterpreter.T T_INVOKED -> (fun _ -> "INVOKED")
   | MenhirInterpreter.T T_INVOKE -> (fun _ -> "INVOKE")
   | MenhirInterpreter.T T_INVALID_KEY -> (fun _ -> "INVALID_KEY")
   | MenhirInterpreter.T T_INVALID -> (fun _ -> "INVALID")
   | MenhirInterpreter.T T_INTRINSIC -> (fun _ -> "INTRINSIC")
   | MenhirInterpreter.T T_INTO -> (fun _ -> "INTO")
   | MenhirInterpreter.T T_INTERVENING_ -> (fun _ -> "INTERVENING_")
+  | MenhirInterpreter.T T_INTERVAL_TIMER -> (fun _ -> "INTERVAL_TIMER")
   | MenhirInterpreter.T T_INTERMEDIATE -> (fun _ -> "INTERMEDIATE")
   | MenhirInterpreter.T T_INTERFACE_ID -> (fun _ -> "INTERFACE_ID")
   | MenhirInterpreter.T T_INTERFACE -> (fun _ -> "INTERFACE")
+  | MenhirInterpreter.T T_INSTANCE -> (fun _ -> "INSTANCE")
   | MenhirInterpreter.T T_INSTALLATION -> (fun _ -> "INSTALLATION")
   | MenhirInterpreter.T T_INSPECT -> (fun _ -> "INSPECT")
   | MenhirInterpreter.T T_INSERT_ROWS -> (fun _ -> "INSERT_ROWS")
   | MenhirInterpreter.T T_INSERTION_INDEX -> (fun _ -> "INSERTION_INDEX")
+  | MenhirInterpreter.T T_INSERT -> (fun _ -> "INSERT")
   | MenhirInterpreter.T T_INQUIRE -> (fun _ -> "INQUIRE")
   | MenhirInterpreter.T T_INPUT_OUTPUT -> (fun _ -> "INPUT_OUTPUT")
   | MenhirInterpreter.T T_INPUT -> (fun _ -> "INPUT")
   | MenhirInterpreter.T T_INITIATE -> (fun _ -> "INITIATE")
+  | MenhirInterpreter.T T_INITIAL_VALUE -> (fun _ -> "INITIAL_VALUE")
   | MenhirInterpreter.T T_INITIALIZED -> (fun _ -> "INITIALIZED")
   | MenhirInterpreter.T T_INITIALIZE -> (fun _ -> "INITIALIZE")
   | MenhirInterpreter.T T_INITIAL -> (fun _ -> "INITIAL")
   | MenhirInterpreter.T T_INHERITS -> (fun _ -> "INHERITS")
+  | MenhirInterpreter.T T_INHERITING -> (fun _ -> "INHERITING")
   | MenhirInterpreter.T T_INFO_WORD -> (fun _ -> "INFO_WORD")
+  | MenhirInterpreter.T T_INDICATORS -> (fun _ -> "INDICATORS")
+  | MenhirInterpreter.T T_INDICATOR -> (fun _ -> "INDICATOR")
   | MenhirInterpreter.T T_INDICATE -> (fun _ -> "INDICATE")
+  | MenhirInterpreter.T T_INDIC -> (fun _ -> "INDIC")
   | MenhirInterpreter.T T_INDEX_2 -> (fun _ -> "INDEX_2")
   | MenhirInterpreter.T T_INDEX_1 -> (fun _ -> "INDEX_1")
   | MenhirInterpreter.T T_INDEXED -> (fun _ -> "INDEXED")
@@ -2694,6 +3096,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_INDEPENDENT -> (fun _ -> "INDEPENDENT")
   | MenhirInterpreter.T T_IN -> (fun _ -> "IN")
   | MenhirInterpreter.T T_IMPLEMENTS -> (fun _ -> "IMPLEMENTS")
+  | MenhirInterpreter.T T_IMP -> (fun _ -> "IMP")
   | MenhirInterpreter.T T_IGNORING -> (fun _ -> "IGNORING")
   | MenhirInterpreter.T T_IGNORE -> (fun _ -> "IGNORE")
   | MenhirInterpreter.T T_IF -> (fun _ -> "IF")
@@ -2705,15 +3108,20 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_HSCROLL_POS -> (fun _ -> "HSCROLL_POS")
   | MenhirInterpreter.T T_HSCROLL -> (fun _ -> "HSCROLL")
   | MenhirInterpreter.T T_HOT_TRACK -> (fun _ -> "HOT_TRACK")
+  | MenhirInterpreter.T T_HORIZONTAL -> (fun _ -> "HORIZONTAL")
   | MenhirInterpreter.T T_HIGH_VALUE -> (fun _ -> "HIGH_VALUE")
   | MenhirInterpreter.T T_HIGH_ORDER_RIGHT -> (fun _ -> "HIGH_ORDER_RIGHT")
   | MenhirInterpreter.T T_HIGH_ORDER_LEFT -> (fun _ -> "HIGH_ORDER_LEFT")
   | MenhirInterpreter.T T_HIGH_COLOR -> (fun _ -> "HIGH_COLOR")
   | MenhirInterpreter.T T_HIGHLIGHT -> (fun _ -> "HIGHLIGHT")
+  | MenhirInterpreter.T T_HIGHEST_VALUE -> (fun _ -> "HIGHEST_VALUE")
+  | MenhirInterpreter.T T_HIGH -> (fun _ -> "HIGH")
   | MenhirInterpreter.T T_HIDDEN_DATA -> (fun _ -> "HIDDEN_DATA")
   | MenhirInterpreter.T T_HEXLIT -> (fun _ -> "HEXLIT")
   | MenhirInterpreter.T T_HEX -> (fun _ -> "HEX")
+  | MenhirInterpreter.T T_HELP_ID -> (fun _ -> "HELP_ID")
   | MenhirInterpreter.T T_HEIGHT_IN_CELLS -> (fun _ -> "HEIGHT_IN_CELLS")
+  | MenhirInterpreter.T T_HEIGHT -> (fun _ -> "HEIGHT")
   | MenhirInterpreter.T T_HEAVY -> (fun _ -> "HEAVY")
   | MenhirInterpreter.T T_HEADING_FONT -> (fun _ -> "HEADING_FONT")
   | MenhirInterpreter.T T_HEADING_DIVIDER_COLOR -> (fun _ -> "HEADING_DIVIDER_COLOR")
@@ -2725,6 +3133,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_GROUP_VALUE -> (fun _ -> "GROUP_VALUE")
   | MenhirInterpreter.T T_GROUP_USAGE -> (fun _ -> "GROUP_USAGE")
   | MenhirInterpreter.T T_GROUP -> (fun _ -> "GROUP")
+  | MenhirInterpreter.T T_GRIP -> (fun _ -> "GRIP")
   | MenhirInterpreter.T T_GRID -> (fun _ -> "GRID")
   | MenhirInterpreter.T T_GREATER -> (fun _ -> "GREATER")
   | MenhirInterpreter.T T_GRAPHICAL -> (fun _ -> "GRAPHICAL")
@@ -2787,7 +3196,9 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_FILL_COLOR2 -> (fun _ -> "FILL_COLOR2")
   | MenhirInterpreter.T T_FILL_COLOR -> (fun _ -> "FILL_COLOR")
   | MenhirInterpreter.T T_FILLER -> (fun _ -> "FILLER")
+  | MenhirInterpreter.T T_FILE_PREFIX -> (fun _ -> "FILE_PREFIX")
   | MenhirInterpreter.T T_FILE_POS -> (fun _ -> "FILE_POS")
+  | MenhirInterpreter.T T_FILE_PATH -> (fun _ -> "FILE_PATH")
   | MenhirInterpreter.T T_FILE_NAME -> (fun _ -> "FILE_NAME")
   | MenhirInterpreter.T T_FILE_LIMITS -> (fun _ -> "FILE_LIMITS")
   | MenhirInterpreter.T T_FILE_LIMIT -> (fun _ -> "FILE_LIMIT")
@@ -2795,6 +3206,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_FILE_CONTROL -> (fun _ -> "FILE_CONTROL")
   | MenhirInterpreter.T T_FILES -> (fun _ -> "FILES")
   | MenhirInterpreter.T T_FILE -> (fun _ -> "FILE")
+  | MenhirInterpreter.T T_FIELD_TERMINATOR -> (fun _ -> "FIELD_TERMINATOR")
   | MenhirInterpreter.T T_FH__KEYDEF -> (fun _ -> "FH__KEYDEF")
   | MenhirInterpreter.T T_FH__FCD -> (fun _ -> "FH__FCD")
   | MenhirInterpreter.T T_FD -> (fun _ -> "FD")
@@ -2803,6 +3215,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_FACTORY -> (fun _ -> "FACTORY")
   | MenhirInterpreter.T T_F -> (fun _ -> "F")
   | MenhirInterpreter.T T_EXTERNAL_FORM -> (fun _ -> "EXTERNAL_FORM")
+  | MenhirInterpreter.T T_EXTERNALLY_DESCRIBED_KEY -> (fun _ -> "EXTERNALLY_DESCRIBED_KEY")
   | MenhirInterpreter.T T_EXTERNAL -> (fun _ -> "EXTERNAL")
   | MenhirInterpreter.T T_EXTERN -> (fun _ -> "EXTERN")
   | MenhirInterpreter.T T_EXTENDED_SEARCH -> (fun _ -> "EXTENDED_SEARCH")
@@ -2811,13 +3224,19 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_EXPAND -> (fun _ -> "EXPAND")
   | MenhirInterpreter.T T_EXIT -> (fun _ -> "EXIT")
   | MenhirInterpreter.T T_EXHIBIT -> (fun _ -> "EXHIBIT")
+  | MenhirInterpreter.T T_EXECUTE -> (fun _ -> "EXECUTE")
+  | MenhirInterpreter.T T_EXEC -> (fun _ -> "EXEC")
   | MenhirInterpreter.T T_EXCLUSIVE_OR -> (fun _ -> "EXCLUSIVE_OR")
   | MenhirInterpreter.T T_EXCLUSIVE -> (fun _ -> "EXCLUSIVE")
+  | MenhirInterpreter.T T_EXCLUDE_EVENT_LIST -> (fun _ -> "EXCLUDE_EVENT_LIST")
+  | MenhirInterpreter.T T_EXCESS_3 -> (fun _ -> "EXCESS_3")
   | MenhirInterpreter.T T_EXCEPTION_VALUE -> (fun _ -> "EXCEPTION_VALUE")
   | MenhirInterpreter.T T_EXCEPTION_OBJECT -> (fun _ -> "EXCEPTION_OBJECT")
   | MenhirInterpreter.T T_EXCEPTION -> (fun _ -> "EXCEPTION")
+  | MenhirInterpreter.T T_EXCEEDS -> (fun _ -> "EXCEEDS")
   | MenhirInterpreter.T T_EXAMINE -> (fun _ -> "EXAMINE")
   | MenhirInterpreter.T T_EVERY -> (fun _ -> "EVERY")
+  | MenhirInterpreter.T T_EVENT_POINTER -> (fun _ -> "EVENT_POINTER")
   | MenhirInterpreter.T T_EVENT_LIST -> (fun _ -> "EVENT_LIST")
   | MenhirInterpreter.T T_EVENT -> (fun _ -> "EVENT")
   | MenhirInterpreter.T T_EVALUATE -> (fun _ -> "EVALUATE")
@@ -2845,26 +3264,37 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_ENGRAVED -> (fun _ -> "ENGRAVED")
   | MenhirInterpreter.T T_END_XML -> (fun _ -> "END_XML")
   | MenhirInterpreter.T T_END_WRITE -> (fun _ -> "END_WRITE")
+  | MenhirInterpreter.T T_END_WAIT -> (fun _ -> "END_WAIT")
+  | MenhirInterpreter.T T_END_USE -> (fun _ -> "END_USE")
   | MenhirInterpreter.T T_END_UNSTRING -> (fun _ -> "END_UNSTRING")
   | MenhirInterpreter.T T_END_SUBTRACT -> (fun _ -> "END_SUBTRACT")
   | MenhirInterpreter.T T_END_STRING -> (fun _ -> "END_STRING")
   | MenhirInterpreter.T T_END_START -> (fun _ -> "END_START")
+  | MenhirInterpreter.T T_END_SET -> (fun _ -> "END_SET")
   | MenhirInterpreter.T T_END_SEND -> (fun _ -> "END_SEND")
   | MenhirInterpreter.T T_END_SEARCH -> (fun _ -> "END_SEARCH")
   | MenhirInterpreter.T T_END_REWRITE -> (fun _ -> "END_REWRITE")
   | MenhirInterpreter.T T_END_RETURN -> (fun _ -> "END_RETURN")
+  | MenhirInterpreter.T T_END_REPLACE -> (fun _ -> "END_REPLACE")
   | MenhirInterpreter.T T_END_RECEIVE -> (fun _ -> "END_RECEIVE")
   | MenhirInterpreter.T T_END_READ -> (fun _ -> "END_READ")
   | MenhirInterpreter.T T_END_PERFORM -> (fun _ -> "END_PERFORM")
+  | MenhirInterpreter.T T_END_ON -> (fun _ -> "END_ON")
   | MenhirInterpreter.T T_END_OF_PAGE -> (fun _ -> "END_OF_PAGE")
   | MenhirInterpreter.T T_END_MULTIPLY -> (fun _ -> "END_MULTIPLY")
+  | MenhirInterpreter.T T_END_MOVE -> (fun _ -> "END_MOVE")
   | MenhirInterpreter.T T_END_MODIFY -> (fun _ -> "END_MODIFY")
   | MenhirInterpreter.T T_END_JSON -> (fun _ -> "END_JSON")
+  | MenhirInterpreter.T T_END_INVOKE -> (fun _ -> "END_INVOKE")
   | MenhirInterpreter.T T_END_IF -> (fun _ -> "END_IF")
+  | MenhirInterpreter.T T_END_EXEC -> (fun _ -> "END_EXEC")
   | MenhirInterpreter.T T_END_EVALUATE -> (fun _ -> "END_EVALUATE")
+  | MenhirInterpreter.T T_END_ENABLE -> (fun _ -> "END_ENABLE")
   | MenhirInterpreter.T T_END_DIVIDE -> (fun _ -> "END_DIVIDE")
   | MenhirInterpreter.T T_END_DISPLAY -> (fun _ -> "END_DISPLAY")
+  | MenhirInterpreter.T T_END_DISABLE -> (fun _ -> "END_DISABLE")
   | MenhirInterpreter.T T_END_DELETE -> (fun _ -> "END_DELETE")
+  | MenhirInterpreter.T T_END_COPY -> (fun _ -> "END_COPY")
   | MenhirInterpreter.T T_END_COMPUTE -> (fun _ -> "END_COMPUTE")
   | MenhirInterpreter.T T_END_COLOR -> (fun _ -> "END_COLOR")
   | MenhirInterpreter.T T_END_CHAIN -> (fun _ -> "END_CHAIN")
@@ -2875,12 +3305,16 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_END -> (fun _ -> "END")
   | MenhirInterpreter.T T_ENCRYPTION -> (fun _ -> "ENCRYPTION")
   | MenhirInterpreter.T T_ENCODING -> (fun _ -> "ENCODING")
+  | MenhirInterpreter.T T_ENABLED -> (fun _ -> "ENABLED")
   | MenhirInterpreter.T T_ENABLE -> (fun _ -> "ENABLE")
   | MenhirInterpreter.T T_EMI -> (fun _ -> "EMI")
   | MenhirInterpreter.T T_ELSE -> (fun _ -> "ELSE")
   | MenhirInterpreter.T T_ELEMENT -> (fun _ -> "ELEMENT")
+  | MenhirInterpreter.T T_EJECT -> (fun _ -> "EJECT")
   | MenhirInterpreter.T T_EIGHTY_EIGHT -> (fun _ -> "EIGHTY_EIGHT")
   | MenhirInterpreter.T T_EGI -> (fun _ -> "EGI")
+  | MenhirInterpreter.T T_EGCS -> (fun _ -> "EGCS")
+  | MenhirInterpreter.T T_EGC -> (fun _ -> "EGC")
   | MenhirInterpreter.T T_EDITING -> (fun _ -> "EDITING")
   | MenhirInterpreter.T T_ECHO -> (fun _ -> "ECHO")
   | MenhirInterpreter.T T_EC -> (fun _ -> "EC")
@@ -2889,17 +3323,21 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_DUPLICATES -> (fun _ -> "DUPLICATES")
   | MenhirInterpreter.T T_DROP_LIST -> (fun _ -> "DROP_LIST")
   | MenhirInterpreter.T T_DROP_DOWN -> (fun _ -> "DROP_DOWN")
+  | MenhirInterpreter.T T_DROP -> (fun _ -> "DROP")
+  | MenhirInterpreter.T T_DRAW -> (fun _ -> "DRAW")
   | MenhirInterpreter.T T_DRAG_COLOR -> (fun _ -> "DRAG_COLOR")
   | MenhirInterpreter.T T_DOWN -> (fun _ -> "DOWN")
   | MenhirInterpreter.T T_DOUBLE_COLON -> (fun _ -> "::")
   | MenhirInterpreter.T T_DOUBLE_ASTERISK -> (fun _ -> "**")
   | MenhirInterpreter.T T_DOUBLE -> (fun _ -> "DOUBLE")
+  | MenhirInterpreter.T T_DOT_DASH -> (fun _ -> "DOT_DASH")
   | MenhirInterpreter.T T_DOTTED -> (fun _ -> "DOTTED")
   | MenhirInterpreter.T T_DOTDASH -> (fun _ -> "DOTDASH")
   | MenhirInterpreter.T T_DIVISION -> (fun _ -> "DIVISION")
   | MenhirInterpreter.T T_DIVIDER_COLOR -> (fun _ -> "DIVIDER_COLOR")
   | MenhirInterpreter.T T_DIVIDERS -> (fun _ -> "DIVIDERS")
   | MenhirInterpreter.T T_DIVIDE -> (fun _ -> "DIVIDE")
+  | MenhirInterpreter.T T_DISPLAY_ST -> (fun _ -> "DISPLAY_ST")
   | MenhirInterpreter.T T_DISPLAY_FORMAT -> (fun _ -> "DISPLAY_FORMAT")
   | MenhirInterpreter.T T_DISPLAY_COLUMNS -> (fun _ -> "DISPLAY_COLUMNS")
   | MenhirInterpreter.T T_DISPLAY_4 -> (fun _ -> "DISPLAY_4")
@@ -2909,6 +3347,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_DISPLAY -> (fun _ -> "DISPLAY")
   | MenhirInterpreter.T T_DISP -> (fun _ -> "DISP")
   | MenhirInterpreter.T T_DISK -> (fun _ -> "DISK")
+  | MenhirInterpreter.T T_DISJOINING -> (fun _ -> "DISJOINING")
   | MenhirInterpreter.T T_DISCONNECT -> (fun _ -> "DISCONNECT")
   | MenhirInterpreter.T T_DISC -> (fun _ -> "DISC")
   | MenhirInterpreter.T T_DISABLE -> (fun _ -> "DISABLE")
@@ -2916,6 +3355,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_DETAIL -> (fun _ -> "DETAIL")
   | MenhirInterpreter.T T_DESTROY -> (fun _ -> "DESTROY")
   | MenhirInterpreter.T T_DESTINATION -> (fun _ -> "DESTINATION")
+  | MenhirInterpreter.T T_DESCRIPTOR -> (fun _ -> "DESCRIPTOR")
   | MenhirInterpreter.T T_DESCENDING -> (fun _ -> "DESCENDING")
   | MenhirInterpreter.T T_DEPENDING -> (fun _ -> "DEPENDING")
   | MenhirInterpreter.T T_DELIMITER -> (fun _ -> "DELIMITER")
@@ -2925,6 +3365,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_DEFAULT_FONT -> (fun _ -> "DEFAULT_FONT")
   | MenhirInterpreter.T T_DEFAULT_BUTTON -> (fun _ -> "DEFAULT_BUTTON")
   | MenhirInterpreter.T T_DEFAULT -> (fun _ -> "DEFAULT")
+  | MenhirInterpreter.T T_DECLARE -> (fun _ -> "DECLARE")
   | MenhirInterpreter.T T_DECLARATIVES -> (fun _ -> "DECLARATIVES")
   | MenhirInterpreter.T T_DECIMAL_POINT -> (fun _ -> "DECIMAL_POINT")
   | MenhirInterpreter.T T_DECIMAL_ENCODING -> (fun _ -> "DECIMAL_ENCODING")
@@ -2936,12 +3377,20 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_DEBUG_ITEM -> (fun _ -> "DEBUG_ITEM")
   | MenhirInterpreter.T T_DEBUG_CONTENTS -> (fun _ -> "DEBUG_CONTENTS")
   | MenhirInterpreter.T T_DEBUGGING -> (fun _ -> "DEBUGGING")
+  | MenhirInterpreter.T T_DEBUG -> (fun _ -> "DEBUG")
+  | MenhirInterpreter.T T_DBCS -> (fun _ -> "DBCS")
+  | MenhirInterpreter.T T_DBCLOB_LOCATOR -> (fun _ -> "DBCLOB_LOCATOR")
+  | MenhirInterpreter.T T_DBCLOB_FILE -> (fun _ -> "DBCLOB_FILE")
+  | MenhirInterpreter.T T_DBCLOB -> (fun _ -> "DBCLOB")
   | MenhirInterpreter.T T_DAY_OF_WEEK -> (fun _ -> "DAY_OF_WEEK")
+  | MenhirInterpreter.T T_DAY_AND_TIME -> (fun _ -> "DAY_AND_TIME")
   | MenhirInterpreter.T T_DAY -> (fun _ -> "DAY")
   | MenhirInterpreter.T T_DATE_WRITTEN -> (fun _ -> "DATE_WRITTEN")
+  | MenhirInterpreter.T T_DATE_RECORD -> (fun _ -> "DATE_RECORD")
   | MenhirInterpreter.T T_DATE_MODIFIED -> (fun _ -> "DATE_MODIFIED")
   | MenhirInterpreter.T T_DATE_ENTRY -> (fun _ -> "DATE_ENTRY")
   | MenhirInterpreter.T T_DATE_COMPILED -> (fun _ -> "DATE_COMPILED")
+  | MenhirInterpreter.T T_DATE_AND_TIME -> (fun _ -> "DATE_AND_TIME")
   | MenhirInterpreter.T T_DATE -> (fun _ -> "DATE")
   | MenhirInterpreter.T T_DATA_TYPES -> (fun _ -> "DATA_TYPES")
   | MenhirInterpreter.T T_DATA_RECORDS -> (fun _ -> "DATA_RECORDS")
@@ -2962,25 +3411,38 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_CURSOR_COLOR -> (fun _ -> "CURSOR_COLOR")
   | MenhirInterpreter.T T_CURSOR_COL -> (fun _ -> "CURSOR_COL")
   | MenhirInterpreter.T T_CURSOR -> (fun _ -> "CURSOR")
+  | MenhirInterpreter.T T_CURRENT_DATE -> (fun _ -> "CURRENT_DATE")
   | MenhirInterpreter.T T_CURRENT -> (fun _ -> "CURRENT")
   | MenhirInterpreter.T T_CURRENCY -> (fun _ -> "CURRENCY")
+  | MenhirInterpreter.T T_CULTURE -> (fun _ -> "CULTURE")
   | MenhirInterpreter.T T_CS_GENERAL -> (fun _ -> "CS_GENERAL")
   | MenhirInterpreter.T T_CS_BASIC -> (fun _ -> "CS_BASIC")
+  | MenhirInterpreter.T T_CSP -> (fun _ -> "CSP")
   | MenhirInterpreter.T T_CSIZE -> (fun _ -> "CSIZE")
   | MenhirInterpreter.T T_CRT_UNDER -> (fun _ -> "CRT_UNDER")
   | MenhirInterpreter.T T_CRT -> (fun _ -> "CRT")
+  | MenhirInterpreter.T T_CREATE -> (fun _ -> "CREATE")
+  | MenhirInterpreter.T T_COUNT_TRAILING -> (fun _ -> "COUNT_TRAILING")
+  | MenhirInterpreter.T T_COUNT_MIN -> (fun _ -> "COUNT_MIN")
+  | MenhirInterpreter.T T_COUNT_MAX -> (fun _ -> "COUNT_MAX")
+  | MenhirInterpreter.T T_COUNT_LEADLING -> (fun _ -> "COUNT_LEADLING")
   | MenhirInterpreter.T T_COUNT -> (fun _ -> "COUNT")
   | MenhirInterpreter.T T_CORRESPONDING -> (fun _ -> "CORRESPONDING")
   | MenhirInterpreter.T T_CORE_INDEX -> (fun _ -> "CORE_INDEX")
   | MenhirInterpreter.T T_COPY_SELECTION -> (fun _ -> "COPY_SELECTION")
   | MenhirInterpreter.T T_COPY -> (fun _ -> "COPY")
   | MenhirInterpreter.T T_CONVERTING -> (fun _ -> "CONVERTING")
+  | MenhirInterpreter.T T_CONVERT -> (fun _ -> "CONVERT")
   | MenhirInterpreter.T T_CONVERSION -> (fun _ -> "CONVERSION")
+  | MenhirInterpreter.T T_CONTROL_AREA -> (fun _ -> "CONTROL_AREA")
+  | MenhirInterpreter.T T_CONTROLS_UNCROPPED -> (fun _ -> "CONTROLS_UNCROPPED")
   | MenhirInterpreter.T T_CONTROLS -> (fun _ -> "CONTROLS")
   | MenhirInterpreter.T T_CONTROL -> (fun _ -> "CONTROL")
   | MenhirInterpreter.T T_CONTINUE -> (fun _ -> "CONTINUE")
+  | MenhirInterpreter.T T_CONTENT_OF -> (fun _ -> "CONTENT_OF")
   | MenhirInterpreter.T T_CONTENT -> (fun _ -> "CONTENT")
   | MenhirInterpreter.T T_CONTAINS -> (fun _ -> "CONTAINS")
+  | MenhirInterpreter.T T_CONSTRUCTOR -> (fun _ -> "CONSTRUCTOR")
   | MenhirInterpreter.T T_CONSTANT_RECORD -> (fun _ -> "CONSTANT_RECORD")
   | MenhirInterpreter.T T_CONSTANT -> (fun _ -> "CONSTANT")
   | MenhirInterpreter.T T_CONSOLE_3 -> (fun _ -> "CONSOLE_3")
@@ -2990,6 +3452,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_CONNECT -> (fun _ -> "CONNECT")
   | MenhirInterpreter.T T_CONFIGURATION -> (fun _ -> "CONFIGURATION")
   | MenhirInterpreter.T T_CONDITION -> (fun _ -> "CONDITION")
+  | MenhirInterpreter.T T_COM_REG -> (fun _ -> "COM_REG")
   | MenhirInterpreter.T T_COMP_X -> (fun _ -> "COMP_X")
   | MenhirInterpreter.T T_COMP_N -> (fun _ -> "COMP_N")
   | MenhirInterpreter.T T_COMP_9 -> (fun _ -> "COMP_9")
@@ -3013,11 +3476,13 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_COMPUTATIONAL_13 -> (fun _ -> "COMPUTATIONAL_13")
   | MenhirInterpreter.T T_COMPUTATIONAL_12 -> (fun _ -> "COMPUTATIONAL_12")
   | MenhirInterpreter.T T_COMPUTATIONAL_11 -> (fun _ -> "COMPUTATIONAL_11")
+  | MenhirInterpreter.T T_COMPRESSION -> (fun _ -> "COMPRESSION")
   | MenhirInterpreter.T T_COMPLEMENTARY -> (fun _ -> "COMPLEMENTARY")
   | MenhirInterpreter.T T_COMPLE -> (fun _ -> "COMPLE")
   | MenhirInterpreter.T T_COMP -> (fun _ -> "COMP")
   | MenhirInterpreter.T T_COMMUNICATION -> (fun _ -> "COMMUNICATION")
   | MenhirInterpreter.T T_COMMON -> (fun _ -> "COMMON")
+  | MenhirInterpreter.T T_COMMITMENT -> (fun _ -> "COMMITMENT")
   | MenhirInterpreter.T T_COMMIT -> (fun _ -> "COMMIT")
   | MenhirInterpreter.T T_COMMENT_ENTRY -> (fun _ -> "COMMENT_ENTRY")
   | MenhirInterpreter.T T_COMMAND_LINE -> (fun _ -> "COMMAND_LINE")
@@ -3035,27 +3500,39 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_COLON -> (fun _ -> ":")
   | MenhirInterpreter.T T_COLLATING -> (fun _ -> "COLLATING")
   | MenhirInterpreter.T T_COL -> (fun _ -> "COL")
+  | MenhirInterpreter.T T_COERCION -> (fun _ -> "COERCION")
   | MenhirInterpreter.T T_CODE_SET -> (fun _ -> "CODE_SET")
   | MenhirInterpreter.T T_CODE -> (fun _ -> "CODE")
   | MenhirInterpreter.T T_COBOL -> (fun _ -> "COBOL")
   | MenhirInterpreter.T T_CLOSE -> (fun _ -> "CLOSE")
   | MenhirInterpreter.T T_CLOCK_UNITS -> (fun _ -> "CLOCK_UNITS")
+  | MenhirInterpreter.T T_CLOB_LOCATOR -> (fun _ -> "CLOB_LOCATOR")
+  | MenhirInterpreter.T T_CLOB_FILE -> (fun _ -> "CLOB_FILE")
+  | MenhirInterpreter.T T_CLOB -> (fun _ -> "CLOB")
   | MenhirInterpreter.T T_CLINES -> (fun _ -> "CLINES")
   | MenhirInterpreter.T T_CLINE -> (fun _ -> "CLINE")
   | MenhirInterpreter.T T_CLEAR_SELECTION -> (fun _ -> "CLEAR_SELECTION")
+  | MenhirInterpreter.T T_CLASS_OBJECT -> (fun _ -> "CLASS_OBJECT")
+  | MenhirInterpreter.T T_CLASS_NAME -> (fun _ -> "CLASS_NAME")
   | MenhirInterpreter.T T_CLASS_ID -> (fun _ -> "CLASS_ID")
+  | MenhirInterpreter.T T_CLASS_CONTROL -> (fun _ -> "CLASS_CONTROL")
   | MenhirInterpreter.T T_CLASSIFICATION -> (fun _ -> "CLASSIFICATION")
   | MenhirInterpreter.T T_CLASS -> (fun _ -> "CLASS")
+  | MenhirInterpreter.T T_CICS -> (fun _ -> "CICS")
   | MenhirInterpreter.T T_CHECK_BOX -> (fun _ -> "CHECK_BOX")
   | MenhirInterpreter.T T_CHECKPOINT_FILE -> (fun _ -> "CHECKPOINT_FILE")
   | MenhirInterpreter.T T_CHECK -> (fun _ -> "CHECK")
+  | MenhirInterpreter.T T_CHAR_VARYING -> (fun _ -> "CHAR_VARYING")
+  | MenhirInterpreter.T T_CHART -> (fun _ -> "CHART")
   | MenhirInterpreter.T T_CHARACTERS -> (fun _ -> "CHARACTERS")
   | MenhirInterpreter.T T_CHARACTER -> (fun _ -> "CHARACTER")
+  | MenhirInterpreter.T T_CHAR -> (fun _ -> "CHAR")
   | MenhirInterpreter.T T_CHANGED -> (fun _ -> "CHANGED")
   | MenhirInterpreter.T T_CHAINING -> (fun _ -> "CHAINING")
   | MenhirInterpreter.T T_CHAIN -> (fun _ -> "CHAIN")
   | MenhirInterpreter.T T_CH -> (fun _ -> "CH")
   | MenhirInterpreter.T T_CF -> (fun _ -> "CF")
+  | MenhirInterpreter.T T_CENTURY_DAY -> (fun _ -> "CENTURY_DAY")
   | MenhirInterpreter.T T_CENTURY_DATE -> (fun _ -> "CENTURY_DATE")
   | MenhirInterpreter.T T_CENTERED_HEADINGS -> (fun _ -> "CENTERED_HEADINGS")
   | MenhirInterpreter.T T_CENTERED -> (fun _ -> "CENTERED")
@@ -3067,14 +3544,18 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_CELL -> (fun _ -> "CELL")
   | MenhirInterpreter.T T_CD -> (fun _ -> "CD")
   | MenhirInterpreter.T T_CCOL -> (fun _ -> "CCOL")
+  | MenhirInterpreter.T T_CBL -> (fun _ -> "CBL")
   | MenhirInterpreter.T T_CATALOGUE_NAME -> (fun _ -> "CATALOGUE_NAME")
   | MenhirInterpreter.T T_CATALOGUED -> (fun _ -> "CATALOGUED")
   | MenhirInterpreter.T T_CASSETTE -> (fun _ -> "CASSETTE")
+  | MenhirInterpreter.T T_CASE_SENSITIVE -> (fun _ -> "CASE_SENSITIVE")
+  | MenhirInterpreter.T T_CASE_INSENSITIVE -> (fun _ -> "CASE_INSENSITIVE")
   | MenhirInterpreter.T T_CARD_READER -> (fun _ -> "CARD_READER")
   | MenhirInterpreter.T T_CARD_PUNCH -> (fun _ -> "CARD_PUNCH")
   | MenhirInterpreter.T T_CAPACITY -> (fun _ -> "CAPACITY")
   | MenhirInterpreter.T T_CANCEL_BUTTON -> (fun _ -> "CANCEL_BUTTON")
   | MenhirInterpreter.T T_CANCEL -> (fun _ -> "CANCEL")
+  | MenhirInterpreter.T T_CALLED -> (fun _ -> "CALLED")
   | MenhirInterpreter.T T_CALL -> (fun _ -> "CALL")
   | MenhirInterpreter.T T_CALENDAR_FONT -> (fun _ -> "CALENDAR_FONT")
   | MenhirInterpreter.T T_C -> (fun _ -> "C")
@@ -3095,12 +3576,16 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_BUSY -> (fun _ -> "BUSY")
   | MenhirInterpreter.T T_BULK_ADDITION -> (fun _ -> "BULK_ADDITION")
   | MenhirInterpreter.T T_BSN -> (fun _ -> "BSN")
+  | MenhirInterpreter.T T_BROWSING -> (fun _ -> "BROWSING")
   | MenhirInterpreter.T T_BOXED -> (fun _ -> "BOXED")
   | MenhirInterpreter.T T_BOX -> (fun _ -> "BOX")
   | MenhirInterpreter.T T_BOTTOM -> (fun _ -> "BOTTOM")
   | MenhirInterpreter.T T_BOOLIT -> (fun _ -> "BOOLIT")
   | MenhirInterpreter.T T_BOOLEAN -> (fun _ -> "BOOLEAN")
   | MenhirInterpreter.T T_BLOCK -> (fun _ -> "BLOCK")
+  | MenhirInterpreter.T T_BLOB_LOCATOR -> (fun _ -> "BLOB_LOCATOR")
+  | MenhirInterpreter.T T_BLOB_FILE -> (fun _ -> "BLOB_FILE")
+  | MenhirInterpreter.T T_BLOB -> (fun _ -> "BLOB")
   | MenhirInterpreter.T T_BLINK -> (fun _ -> "BLINK")
   | MenhirInterpreter.T T_BLANK -> (fun _ -> "BLANK")
   | MenhirInterpreter.T T_BITS -> (fun _ -> "BITS")
@@ -3109,11 +3594,15 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_BITMAP_TRAILING -> (fun _ -> "BITMAP_TRAILING")
   | MenhirInterpreter.T T_BITMAP_TIMER -> (fun _ -> "BITMAP_TIMER")
   | MenhirInterpreter.T T_BITMAP_START -> (fun _ -> "BITMAP_START")
+  | MenhirInterpreter.T T_BITMAP_SCALE -> (fun _ -> "BITMAP_SCALE")
+  | MenhirInterpreter.T T_BITMAP_RAW_WIDTH -> (fun _ -> "BITMAP_RAW_WIDTH")
+  | MenhirInterpreter.T T_BITMAP_RAW_HEIGHT -> (fun _ -> "BITMAP_RAW_HEIGHT")
   | MenhirInterpreter.T T_BITMAP_NUMBER -> (fun _ -> "BITMAP_NUMBER")
   | MenhirInterpreter.T T_BITMAP_HANDLE -> (fun _ -> "BITMAP_HANDLE")
   | MenhirInterpreter.T T_BITMAP_END -> (fun _ -> "BITMAP_END")
   | MenhirInterpreter.T T_BITMAP -> (fun _ -> "BITMAP")
   | MenhirInterpreter.T T_BIT -> (fun _ -> "BIT")
+  | MenhirInterpreter.T T_BIND -> (fun _ -> "BIND")
   | MenhirInterpreter.T T_BINARY_SHORT -> (fun _ -> "BINARY_SHORT")
   | MenhirInterpreter.T T_BINARY_SEQUENTIAL -> (fun _ -> "BINARY_SEQUENTIAL")
   | MenhirInterpreter.T T_BINARY_LONG -> (fun _ -> "BINARY_LONG")
@@ -3126,6 +3615,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_BEGINNING -> (fun _ -> "BEGINNING")
   | MenhirInterpreter.T T_BEFORE -> (fun _ -> "BEFORE")
   | MenhirInterpreter.T T_BECOMES -> (fun _ -> "BECOMES")
+  | MenhirInterpreter.T T_BASIS -> (fun _ -> "BASIS")
   | MenhirInterpreter.T T_BASED -> (fun _ -> "BASED")
   | MenhirInterpreter.T T_BAR -> (fun _ -> "BAR")
   | MenhirInterpreter.T T_BACKWARD -> (fun _ -> "BACKWARD")
@@ -3133,8 +3623,12 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_BACKGROUND_LOW -> (fun _ -> "BACKGROUND_LOW")
   | MenhirInterpreter.T T_BACKGROUND_HIGH -> (fun _ -> "BACKGROUND_HIGH")
   | MenhirInterpreter.T T_BACKGROUND_COLOR -> (fun _ -> "BACKGROUND_COLOR")
+  | MenhirInterpreter.T T_AX_EVENT_LIST -> (fun _ -> "AX_EVENT_LIST")
   | MenhirInterpreter.T T_AWAY_FROM_ZERO -> (fun _ -> "AWAY_FROM_ZERO")
   | MenhirInterpreter.T T_AUTO_SPIN -> (fun _ -> "AUTO_SPIN")
+  | MenhirInterpreter.T T_AUTO_RESIZE -> (fun _ -> "AUTO_RESIZE")
+  | MenhirInterpreter.T T_AUTO_MINIMIZE -> (fun _ -> "AUTO_MINIMIZE")
+  | MenhirInterpreter.T T_AUTO_HYPHEN_SKIP -> (fun _ -> "AUTO_HYPHEN_SKIP")
   | MenhirInterpreter.T T_AUTO_DECIMAL -> (fun _ -> "AUTO_DECIMAL")
   | MenhirInterpreter.T T_AUTOMATIC -> (fun _ -> "AUTOMATIC")
   | MenhirInterpreter.T T_AUTO -> (fun _ -> "AUTO")
@@ -3146,6 +3640,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_AT -> (fun _ -> "AT")
   | MenhirInterpreter.T T_ASTERISK -> (fun _ -> "*")
   | MenhirInterpreter.T T_ASSIGN -> (fun _ -> "ASSIGN")
+  | MenhirInterpreter.T T_ASSEMBLY_NAME -> (fun _ -> "ASSEMBLY_NAME")
   | MenhirInterpreter.T T_ASCII -> (fun _ -> "ASCII")
   | MenhirInterpreter.T T_ASCENDING -> (fun _ -> "ASCENDING")
   | MenhirInterpreter.T T_ASA -> (fun _ -> "ASA")
@@ -3153,6 +3648,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_ARITHMETIC -> (fun _ -> "ARITHMETIC")
   | MenhirInterpreter.T T_ARGUMENT_VALUE -> (fun _ -> "ARGUMENT_VALUE")
   | MenhirInterpreter.T T_ARGUMENT_NUMBER -> (fun _ -> "ARGUMENT_NUMBER")
+  | MenhirInterpreter.T T_AREA_VALUES -> (fun _ -> "AREA_VALUES")
   | MenhirInterpreter.T T_AREAS -> (fun _ -> "AREAS")
   | MenhirInterpreter.T T_AREA -> (fun _ -> "AREA")
   | MenhirInterpreter.T T_ARE -> (fun _ -> "ARE")
@@ -3191,8 +3687,10 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_ACTIVE_CLASS -> (fun _ -> "ACTIVE_CLASS")
   | MenhirInterpreter.T T_ACTIVATING -> (fun _ -> "ACTIVATING")
   | MenhirInterpreter.T T_ACTION -> (fun _ -> "ACTION")
+  | MenhirInterpreter.T T_ACQUIRE -> (fun _ -> "ACQUIRE")
   | MenhirInterpreter.T T_ACCESS -> (fun _ -> "ACCESS")
   | MenhirInterpreter.T T_ACCEPT -> (fun _ -> "ACCEPT")
+  | MenhirInterpreter.T T_ABSTRACT -> (fun _ -> "ABSTRACT")
   | MenhirInterpreter.T T_ABSENT -> (fun _ -> "ABSENT")
   | MenhirInterpreter.N MenhirInterpreter.N_write_target -> (fun _ -> "write_target")
   | MenhirInterpreter.N MenhirInterpreter.N_write_statement -> (fun _ -> "write_statement")
@@ -4178,10 +4676,14 @@ let print_token = function
   | YYYYDDD -> print_value (MenhirInterpreter.T T_YYYYDDD) ()
   | Y -> print_value (MenhirInterpreter.T T_Y) ()
   | XOR -> print_value (MenhirInterpreter.T T_XOR) ()
+  | XML_TEXT -> print_value (MenhirInterpreter.T T_XML_TEXT) ()
   | XML_SCHEMA -> print_value (MenhirInterpreter.T T_XML_SCHEMA) ()
+  | XML_NTEXT -> print_value (MenhirInterpreter.T T_XML_NTEXT) ()
+  | XML_EVENT -> print_value (MenhirInterpreter.T T_XML_EVENT) ()
   | XML_DECLARATION -> print_value (MenhirInterpreter.T T_XML_DECLARATION) ()
   | XML -> print_value (MenhirInterpreter.T T_XML) ()
   | X -> print_value (MenhirInterpreter.T T_X) ()
+  | WRITING -> print_value (MenhirInterpreter.T T_WRITING) ()
   | WRITE_VERIFY -> print_value (MenhirInterpreter.T T_WRITE_VERIFY) ()
   | WRITE_ONLY -> print_value (MenhirInterpreter.T T_WRITE_ONLY) ()
   | WRITERS -> print_value (MenhirInterpreter.T T_WRITERS) ()
@@ -4196,6 +4698,9 @@ let print_token = function
   | WINDOW -> print_value (MenhirInterpreter.T T_WINDOW) ()
   | WIDTH_IN_CELLS -> print_value (MenhirInterpreter.T T_WIDTH_IN_CELLS) ()
   | WIDTH -> print_value (MenhirInterpreter.T T_WIDTH) ()
+  | WIDE -> print_value (MenhirInterpreter.T T_WIDE) ()
+  | WHILE -> print_value (MenhirInterpreter.T T_WHILE) ()
+  | WHEN_COMPILED -> print_value (MenhirInterpreter.T T_WHEN_COMPILED) ()
   | WHEN -> print_value (MenhirInterpreter.T T_WHEN) ()
   | WEB_BROWSER -> print_value (MenhirInterpreter.T T_WEB_BROWSER) ()
   | WAIT -> print_value (MenhirInterpreter.T T_WAIT) ()
@@ -4206,14 +4711,17 @@ let print_token = function
   | VPADDING -> print_value (MenhirInterpreter.T T_VPADDING) ()
   | VOLATILE -> print_value (MenhirInterpreter.T T_VOLATILE) ()
   | VLR -> print_value (MenhirInterpreter.T T_VLR) ()
+  | VISIBLE -> print_value (MenhirInterpreter.T T_VISIBLE) ()
   | VIRTUAL_WIDTH -> print_value (MenhirInterpreter.T T_VIRTUAL_WIDTH) ()
   | VIRTUAL -> print_value (MenhirInterpreter.T T_VIRTUAL) ()
   | VIA -> print_value (MenhirInterpreter.T T_VIA) ()
   | VERY_HEAVY -> print_value (MenhirInterpreter.T T_VERY_HEAVY) ()
   | VERTICAL -> print_value (MenhirInterpreter.T T_VERTICAL) ()
+  | VERSION -> print_value (MenhirInterpreter.T T_VERSION) ()
   | VARYING -> print_value (MenhirInterpreter.T T_VARYING) ()
   | VARIANT -> print_value (MenhirInterpreter.T T_VARIANT) ()
   | VARIABLE -> print_value (MenhirInterpreter.T T_VARIABLE) ()
+  | VARBINARY -> print_value (MenhirInterpreter.T T_VARBINARY) ()
   | VALUE_FORMAT -> print_value (MenhirInterpreter.T T_VALUE_FORMAT) ()
   | VALUES -> print_value (MenhirInterpreter.T T_VALUES) ()
   | VALUE -> print_value (MenhirInterpreter.T T_VALUE) ()
@@ -4228,7 +4736,10 @@ let print_token = function
   | USE_TAB -> print_value (MenhirInterpreter.T T_USE_TAB) ()
   | USE_RETURN -> print_value (MenhirInterpreter.T T_USE_RETURN) ()
   | USE_ALT -> print_value (MenhirInterpreter.T T_USE_ALT) ()
+  | USER_WHITE -> print_value (MenhirInterpreter.T T_USER_WHITE) ()
+  | USER_GRAY -> print_value (MenhirInterpreter.T T_USER_GRAY) ()
   | USER_DEFAULT -> print_value (MenhirInterpreter.T T_USER_DEFAULT) ()
+  | USER_COLORS -> print_value (MenhirInterpreter.T T_USER_COLORS) ()
   | USER -> print_value (MenhirInterpreter.T T_USER) ()
   | USE -> print_value (MenhirInterpreter.T T_USE) ()
   | USAGE -> print_value (MenhirInterpreter.T T_USAGE) ()
@@ -4250,6 +4761,7 @@ let print_token = function
   | UNIVERSAL -> print_value (MenhirInterpreter.T T_UNIVERSAL) ()
   | UNIT -> print_value (MenhirInterpreter.T T_UNIT) ()
   | UNFRAMED -> print_value (MenhirInterpreter.T T_UNFRAMED) ()
+  | UNEQUAL -> print_value (MenhirInterpreter.T T_UNEQUAL) ()
   | UNDERLINE -> print_value (MenhirInterpreter.T T_UNDERLINE) ()
   | UNBOUNDED -> print_value (MenhirInterpreter.T T_UNBOUNDED) ()
   | UFF -> print_value (MenhirInterpreter.T T_UFF) ()
@@ -4259,31 +4771,50 @@ let print_token = function
   | TYPE -> print_value (MenhirInterpreter.T T_TYPE) ()
   | TRUNCATION -> print_value (MenhirInterpreter.T T_TRUNCATION) ()
   | TRUE -> print_value (MenhirInterpreter.T T_TRUE) ()
+  | TRIMMED -> print_value (MenhirInterpreter.T T_TRIMMED) ()
   | TREE_VIEW -> print_value (MenhirInterpreter.T T_TREE_VIEW) ()
+  | TRANSPARENT_COLOR -> print_value (MenhirInterpreter.T T_TRANSPARENT_COLOR) ()
   | TRANSPARENT -> print_value (MenhirInterpreter.T T_TRANSPARENT) ()
   | TRANSFORM -> print_value (MenhirInterpreter.T T_TRANSFORM) ()
+  | TRANSACTION_STATUS -> print_value (MenhirInterpreter.T T_TRANSACTION_STATUS) ()
+  | TRANSACTION -> print_value (MenhirInterpreter.T T_TRANSACTION) ()
   | TRAILING_SIGN -> print_value (MenhirInterpreter.T T_TRAILING_SIGN) ()
   | TRAILING_SHIFT -> print_value (MenhirInterpreter.T T_TRAILING_SHIFT) ()
   | TRAILING -> print_value (MenhirInterpreter.T T_TRAILING) ()
   | TRADITIONAL_FONT -> print_value (MenhirInterpreter.T T_TRADITIONAL_FONT) ()
+  | TRACK_THUMB -> print_value (MenhirInterpreter.T T_TRACK_THUMB) ()
   | TRACK_LIMIT -> print_value (MenhirInterpreter.T T_TRACK_LIMIT) ()
   | TRACK_AREA -> print_value (MenhirInterpreter.T T_TRACK_AREA) ()
   | TRACKS -> print_value (MenhirInterpreter.T T_TRACKS) ()
   | TRACK -> print_value (MenhirInterpreter.T T_TRACK) ()
+  | TRACE -> print_value (MenhirInterpreter.T T_TRACE) ()
   | TOWARD_LESSER -> print_value (MenhirInterpreter.T T_TOWARD_LESSER) ()
   | TOWARD_GREATER -> print_value (MenhirInterpreter.T T_TOWARD_GREATER) ()
+  | TOTALING -> print_value (MenhirInterpreter.T T_TOTALING) ()
+  | TOTALED -> print_value (MenhirInterpreter.T T_TOTALED) ()
   | TOP_LEVEL -> print_value (MenhirInterpreter.T T_TOP_LEVEL) ()
   | TOP -> print_value (MenhirInterpreter.T T_TOP) ()
+  | TOOL_BAR -> print_value (MenhirInterpreter.T T_TOOL_BAR) ()
   | TO -> print_value (MenhirInterpreter.T T_TO) ()
   | TITLE_POSITION -> print_value (MenhirInterpreter.T T_TITLE_POSITION) ()
+  | TITLE_BAR -> print_value (MenhirInterpreter.T T_TITLE_BAR) ()
   | TITLE -> print_value (MenhirInterpreter.T T_TITLE) ()
+  | TIME_RECORD -> print_value (MenhirInterpreter.T T_TIME_RECORD) ()
   | TIME_OUT -> print_value (MenhirInterpreter.T T_TIME_OUT) ()
+  | TIME_OF_DAY -> print_value (MenhirInterpreter.T T_TIME_OF_DAY) ()
+  | TIMESTAMP_RECORD -> print_value (MenhirInterpreter.T T_TIMESTAMP_RECORD) ()
+  | TIMESTAMP_OFFSET_RECORD -> print_value (MenhirInterpreter.T T_TIMESTAMP_OFFSET_RECORD) ()
+  | TIMESTAMP_OFFSET -> print_value (MenhirInterpreter.T T_TIMESTAMP_OFFSET) ()
+  | TIMESTAMP -> print_value (MenhirInterpreter.T T_TIMESTAMP) ()
   | TIMES -> print_value (MenhirInterpreter.T T_TIMES) ()
   | TIME -> print_value (MenhirInterpreter.T T_TIME) ()
   | TILED_HEADINGS -> print_value (MenhirInterpreter.T T_TILED_HEADINGS) ()
   | THUMB_POSITION -> print_value (MenhirInterpreter.T T_THUMB_POSITION) ()
   | THROUGH -> print_value (MenhirInterpreter.T T_THROUGH) ()
   | THREEDIMENSIONAL -> print_value (MenhirInterpreter.T T_THREEDIMENSIONAL) ()
+  | THREAD_POINTER -> print_value (MenhirInterpreter.T T_THREAD_POINTER) ()
+  | THREAD_LOCAL_STORAGE -> print_value (MenhirInterpreter.T T_THREAD_LOCAL_STORAGE) ()
+  | THREAD_LOCAL -> print_value (MenhirInterpreter.T T_THREAD_LOCAL) ()
   | THREADS -> print_value (MenhirInterpreter.T T_THREADS) ()
   | THREAD -> print_value (MenhirInterpreter.T T_THREAD) ()
   | THEN -> print_value (MenhirInterpreter.T T_THEN) ()
@@ -4303,8 +4834,10 @@ let print_token = function
   | TEMP -> print_value (MenhirInterpreter.T T_TEMP) ()
   | TAPE -> print_value (MenhirInterpreter.T T_TAPE) ()
   | TALLYING -> print_value (MenhirInterpreter.T T_TALLYING) ()
+  | TALLY -> print_value (MenhirInterpreter.T T_TALLY) ()
   | TAB_TO_DELETE -> print_value (MenhirInterpreter.T T_TAB_TO_DELETE) ()
   | TAB_TO_ADD -> print_value (MenhirInterpreter.T T_TAB_TO_ADD) ()
+  | TAB_CONTROL -> print_value (MenhirInterpreter.T T_TAB_CONTROL) ()
   | TABLE -> print_value (MenhirInterpreter.T T_TABLE) ()
   | TAB -> print_value (MenhirInterpreter.T T_TAB) ()
   | SYSTEM_OFFSET -> print_value (MenhirInterpreter.T T_SYSTEM_OFFSET) ()
@@ -4328,16 +4861,20 @@ let print_token = function
   | SUPPRESS -> print_value (MenhirInterpreter.T T_SUPPRESS) ()
   | SUPER -> print_value (MenhirInterpreter.T T_SUPER) ()
   | SUM -> print_value (MenhirInterpreter.T T_SUM) ()
+  | SUFFIXING -> print_value (MenhirInterpreter.T T_SUFFIXING) ()
   | SUB_SCHEMA -> print_value (MenhirInterpreter.T T_SUB_SCHEMA) ()
   | SUB_QUEUE_3 -> print_value (MenhirInterpreter.T T_SUB_QUEUE_3) ()
   | SUB_QUEUE_2 -> print_value (MenhirInterpreter.T T_SUB_QUEUE_2) ()
   | SUB_QUEUE_1 -> print_value (MenhirInterpreter.T T_SUB_QUEUE_1) ()
   | SUBWINDOW -> print_value (MenhirInterpreter.T T_SUBWINDOW) ()
   | SUBTRACT -> print_value (MenhirInterpreter.T T_SUBTRACT) ()
+  | SUBFILE -> print_value (MenhirInterpreter.T T_SUBFILE) ()
   | STYLE -> print_value (MenhirInterpreter.T T_STYLE) ()
   | STRUCTURE -> print_value (MenhirInterpreter.T T_STRUCTURE) ()
+  | STRONG_NAME -> print_value (MenhirInterpreter.T T_STRONG_NAME) ()
   | STRONG -> print_value (MenhirInterpreter.T T_STRONG) ()
   | STRING -> print_value (MenhirInterpreter.T T_STRING) ()
+  | STOP_BROWSER -> print_value (MenhirInterpreter.T T_STOP_BROWSER) ()
   | STOP -> print_value (MenhirInterpreter.T T_STOP) ()
   | STEP -> print_value (MenhirInterpreter.T T_STEP) ()
   | STDCALL -> print_value (MenhirInterpreter.T T_STDCALL) ()
@@ -4350,6 +4887,7 @@ let print_token = function
   | STATEMENT -> print_value (MenhirInterpreter.T T_STATEMENT) ()
   | START_Y -> print_value (MenhirInterpreter.T T_START_Y) ()
   | START_X -> print_value (MenhirInterpreter.T T_START_X) ()
+  | STARTING -> print_value (MenhirInterpreter.T T_STARTING) ()
   | START -> print_value (MenhirInterpreter.T T_START) ()
   | STANDARD_DECIMAL -> print_value (MenhirInterpreter.T T_STANDARD_DECIMAL) ()
   | STANDARD_BINARY -> print_value (MenhirInterpreter.T T_STANDARD_BINARY) ()
@@ -4359,6 +4897,14 @@ let print_token = function
   | STACK -> print_value (MenhirInterpreter.T T_STACK) ()
   | SSF -> print_value (MenhirInterpreter.T T_SSF) ()
   | SQUARE -> print_value (MenhirInterpreter.T T_SQUARE) ()
+  | SQL_ROWID -> print_value (MenhirInterpreter.T T_SQL_ROWID) ()
+  | SQL_NCLOB -> print_value (MenhirInterpreter.T T_SQL_NCLOB) ()
+  | SQL_CURSOR -> print_value (MenhirInterpreter.T T_SQL_CURSOR) ()
+  | SQL_CLOB -> print_value (MenhirInterpreter.T T_SQL_CLOB) ()
+  | SQL_BLOB -> print_value (MenhirInterpreter.T T_SQL_BLOB) ()
+  | SQL_BFILE -> print_value (MenhirInterpreter.T T_SQL_BFILE) ()
+  | SQLIMS -> print_value (MenhirInterpreter.T T_SQLIMS) ()
+  | SQL -> print_value (MenhirInterpreter.T T_SQL) ()
   | SPINNER -> print_value (MenhirInterpreter.T T_SPINNER) ()
   | SPECIAL_NAMES -> print_value (MenhirInterpreter.T T_SPECIAL_NAMES) ()
   | SPACE_FILL -> print_value (MenhirInterpreter.T T_SPACE_FILL) ()
@@ -4366,11 +4912,21 @@ let print_token = function
   | SOURCE_COMPUTER -> print_value (MenhirInterpreter.T T_SOURCE_COMPUTER) ()
   | SOURCES -> print_value (MenhirInterpreter.T T_SOURCES) ()
   | SOURCE -> print_value (MenhirInterpreter.T T_SOURCE) ()
+  | SORT_WORK -> print_value (MenhirInterpreter.T T_SORT_WORK) ()
+  | SORT_RETURN -> print_value (MenhirInterpreter.T T_SORT_RETURN) ()
   | SORT_ORDER -> print_value (MenhirInterpreter.T T_SORT_ORDER) ()
+  | SORT_MODE_SIZE -> print_value (MenhirInterpreter.T T_SORT_MODE_SIZE) ()
+  | SORT_MESSAGE -> print_value (MenhirInterpreter.T T_SORT_MESSAGE) ()
   | SORT_MERGE -> print_value (MenhirInterpreter.T T_SORT_MERGE) ()
+  | SORT_FILE_SIZE -> print_value (MenhirInterpreter.T T_SORT_FILE_SIZE) ()
+  | SORT_CORE_SIZE -> print_value (MenhirInterpreter.T T_SORT_CORE_SIZE) ()
+  | SORT_CONTROL -> print_value (MenhirInterpreter.T T_SORT_CONTROL) ()
   | SORT -> print_value (MenhirInterpreter.T T_SORT) ()
   | SMALL_FONT -> print_value (MenhirInterpreter.T T_SMALL_FONT) ()
   | SLASH -> print_value (MenhirInterpreter.T T_SLASH) ()
+  | SKIP3 -> print_value (MenhirInterpreter.T T_SKIP3) ()
+  | SKIP2 -> print_value (MenhirInterpreter.T T_SKIP2) ()
+  | SKIP1 -> print_value (MenhirInterpreter.T T_SKIP1) ()
   | SIZE -> print_value (MenhirInterpreter.T T_SIZE) ()
   | SINTLIT v -> print_value (MenhirInterpreter.T T_SINTLIT) v
   | SIGNED_SHORT -> print_value (MenhirInterpreter.T T_SIGNED_SHORT) ()
@@ -4383,25 +4939,32 @@ let print_token = function
   | SHOW_LINES -> print_value (MenhirInterpreter.T T_SHOW_LINES) ()
   | SHORT_DATE -> print_value (MenhirInterpreter.T T_SHORT_DATE) ()
   | SHORT -> print_value (MenhirInterpreter.T T_SHORT) ()
+  | SHIFT_OUT -> print_value (MenhirInterpreter.T T_SHIFT_OUT) ()
+  | SHIFT_IN -> print_value (MenhirInterpreter.T T_SHIFT_IN) ()
   | SHARING -> print_value (MenhirInterpreter.T T_SHARING) ()
   | SHADOW -> print_value (MenhirInterpreter.T T_SHADOW) ()
   | SHADING -> print_value (MenhirInterpreter.T T_SHADING) ()
   | SET -> print_value (MenhirInterpreter.T T_SET) ()
+  | SERVICE -> print_value (MenhirInterpreter.T T_SERVICE) ()
   | SEQUENTIAL -> print_value (MenhirInterpreter.T T_SEQUENTIAL) ()
   | SEQUENCE -> print_value (MenhirInterpreter.T T_SEQUENCE) ()
   | SEPARATION -> print_value (MenhirInterpreter.T T_SEPARATION) ()
   | SEPARATE -> print_value (MenhirInterpreter.T T_SEPARATE) ()
   | SENTENCE -> print_value (MenhirInterpreter.T T_SENTENCE) ()
   | SEND -> print_value (MenhirInterpreter.T T_SEND) ()
+  | SEMAPHORE_POINTER -> print_value (MenhirInterpreter.T T_SEMAPHORE_POINTER) ()
   | SELF_ACT -> print_value (MenhirInterpreter.T T_SELF_ACT) ()
+  | SELFCLASS -> print_value (MenhirInterpreter.T T_SELFCLASS) ()
   | SELF -> print_value (MenhirInterpreter.T T_SELF) ()
   | SELECT_ALL -> print_value (MenhirInterpreter.T T_SELECT_ALL) ()
+  | SELECTIVE -> print_value (MenhirInterpreter.T T_SELECTIVE) ()
   | SELECTION_TEXT -> print_value (MenhirInterpreter.T T_SELECTION_TEXT) ()
   | SELECTION_INDEX -> print_value (MenhirInterpreter.T T_SELECTION_INDEX) ()
   | SELECTION -> print_value (MenhirInterpreter.T T_SELECTION) ()
   | SELECT -> print_value (MenhirInterpreter.T T_SELECT) ()
   | SEGMENT_LIMIT -> print_value (MenhirInterpreter.T T_SEGMENT_LIMIT) ()
   | SEGMENT -> print_value (MenhirInterpreter.T T_SEGMENT) ()
+  | SEEK -> print_value (MenhirInterpreter.T T_SEEK) ()
   | SECURITY -> print_value (MenhirInterpreter.T T_SECURITY) ()
   | SECURE -> print_value (MenhirInterpreter.T T_SECURE) ()
   | SECTION -> print_value (MenhirInterpreter.T T_SECTION) ()
@@ -4427,8 +4990,10 @@ let print_token = function
   | ROW_DIVIDERS -> print_value (MenhirInterpreter.T T_ROW_DIVIDERS) ()
   | ROW_COLOR_PATTERN -> print_value (MenhirInterpreter.T T_ROW_COLOR_PATTERN) ()
   | ROW_COLOR -> print_value (MenhirInterpreter.T T_ROW_COLOR) ()
+  | ROWID -> print_value (MenhirInterpreter.T T_ROWID) ()
   | ROUNDING -> print_value (MenhirInterpreter.T T_ROUNDING) ()
   | ROUNDED -> print_value (MenhirInterpreter.T T_ROUNDED) ()
+  | ROLLING -> print_value (MenhirInterpreter.T T_ROLLING) ()
   | ROLLBACK -> print_value (MenhirInterpreter.T T_ROLLBACK) ()
   | RIMMED -> print_value (MenhirInterpreter.T T_RIMMED) ()
   | RIGHT_JUSTIFY -> print_value (MenhirInterpreter.T T_RIGHT_JUSTIFY) ()
@@ -4441,12 +5006,18 @@ let print_token = function
   | REVERSE_VIDEO -> print_value (MenhirInterpreter.T T_REVERSE_VIDEO) ()
   | REVERSED -> print_value (MenhirInterpreter.T T_REVERSED) ()
   | REVERSE -> print_value (MenhirInterpreter.T T_REVERSE) ()
+  | RETURN_UNSIGNED -> print_value (MenhirInterpreter.T T_RETURN_UNSIGNED) ()
+  | RETURN_CODE -> print_value (MenhirInterpreter.T T_RETURN_CODE) ()
   | RETURNING -> print_value (MenhirInterpreter.T T_RETURNING) ()
   | RETURN -> print_value (MenhirInterpreter.T T_RETURN) ()
   | RETRY -> print_value (MenhirInterpreter.T T_RETRY) ()
   | RETENTION -> print_value (MenhirInterpreter.T T_RETENTION) ()
   | RESUME -> print_value (MenhirInterpreter.T T_RESUME) ()
+  | RESTRICTED -> print_value (MenhirInterpreter.T T_RESTRICTED) ()
+  | RESIZABLE -> print_value (MenhirInterpreter.T T_RESIZABLE) ()
+  | RESIDENT -> print_value (MenhirInterpreter.T T_RESIDENT) ()
   | RESET_TABS -> print_value (MenhirInterpreter.T T_RESET_TABS) ()
+  | RESET_SET_LOCATOR -> print_value (MenhirInterpreter.T T_RESET_SET_LOCATOR) ()
   | RESET_LIST -> print_value (MenhirInterpreter.T T_RESET_LIST) ()
   | RESET_GRID -> print_value (MenhirInterpreter.T T_RESET_GRID) ()
   | RESET -> print_value (MenhirInterpreter.T T_RESET) ()
@@ -4459,6 +5030,7 @@ let print_token = function
   | REPORTING -> print_value (MenhirInterpreter.T T_REPORTING) ()
   | REPORT -> print_value (MenhirInterpreter.T T_REPORT) ()
   | REPLACING -> print_value (MenhirInterpreter.T T_REPLACING) ()
+  | REPLACED -> print_value (MenhirInterpreter.T T_REPLACED) ()
   | REPLACE -> print_value (MenhirInterpreter.T T_REPLACE) ()
   | REPEATED -> print_value (MenhirInterpreter.T T_REPEATED) ()
   | REORG_CRITERIA -> print_value (MenhirInterpreter.T T_REORG_CRITERIA) ()
@@ -4466,6 +5038,7 @@ let print_token = function
   | REMOVAL -> print_value (MenhirInterpreter.T T_REMOVAL) ()
   | REMARKS -> print_value (MenhirInterpreter.T T_REMARKS) ()
   | REMAINDER -> print_value (MenhirInterpreter.T T_REMAINDER) ()
+  | RELOAD -> print_value (MenhirInterpreter.T T_RELOAD) ()
   | RELEASE -> print_value (MenhirInterpreter.T T_RELEASE) ()
   | RELATIVE -> print_value (MenhirInterpreter.T T_RELATIVE) ()
   | RELATION -> print_value (MenhirInterpreter.T T_RELATION) ()
@@ -4474,10 +5047,12 @@ let print_token = function
   | REFERENCES -> print_value (MenhirInterpreter.T T_REFERENCES) ()
   | REFERENCE -> print_value (MenhirInterpreter.T T_REFERENCE) ()
   | REEL -> print_value (MenhirInterpreter.T T_REEL) ()
+  | REDEFINITION -> print_value (MenhirInterpreter.T T_REDEFINITION) ()
   | REDEFINES -> print_value (MenhirInterpreter.T T_REDEFINES) ()
   | RECURSIVE -> print_value (MenhirInterpreter.T T_RECURSIVE) ()
   | RECORD_TO_DELETE -> print_value (MenhirInterpreter.T T_RECORD_TO_DELETE) ()
   | RECORD_TO_ADD -> print_value (MenhirInterpreter.T T_RECORD_TO_ADD) ()
+  | RECORD_POSITION -> print_value (MenhirInterpreter.T T_RECORD_POSITION) ()
   | RECORD_OVERFLOW -> print_value (MenhirInterpreter.T T_RECORD_OVERFLOW) ()
   | RECORD_DATA -> print_value (MenhirInterpreter.T T_RECORD_DATA) ()
   | RECORDS -> print_value (MenhirInterpreter.T T_RECORDS) ()
@@ -4486,9 +5061,12 @@ let print_token = function
   | RECEIVED -> print_value (MenhirInterpreter.T T_RECEIVED) ()
   | RECEIVE -> print_value (MenhirInterpreter.T T_RECEIVE) ()
   | READ_ONLY -> print_value (MenhirInterpreter.T T_READ_ONLY) ()
+  | READY -> print_value (MenhirInterpreter.T T_READY) ()
+  | READING -> print_value (MenhirInterpreter.T T_READING) ()
   | READERS -> print_value (MenhirInterpreter.T T_READERS) ()
   | READ -> print_value (MenhirInterpreter.T T_READ) ()
   | RD -> print_value (MenhirInterpreter.T T_RD) ()
+  | RANGE -> print_value (MenhirInterpreter.T T_RANGE) ()
   | RANDOM -> print_value (MenhirInterpreter.T T_RANDOM) ()
   | RAISING -> print_value (MenhirInterpreter.T T_RAISING) ()
   | RAISED -> print_value (MenhirInterpreter.T T_RAISED) ()
@@ -4500,6 +5078,7 @@ let print_token = function
   | QUERY_INDEX -> print_value (MenhirInterpreter.T T_QUERY_INDEX) ()
   | PUSH_BUTTON -> print_value (MenhirInterpreter.T T_PUSH_BUTTON) ()
   | PURGE -> print_value (MenhirInterpreter.T T_PURGE) ()
+  | PUBLIC -> print_value (MenhirInterpreter.T T_PUBLIC) ()
   | PROTOTYPE -> print_value (MenhirInterpreter.T T_PROTOTYPE) ()
   | PROTECTED -> print_value (MenhirInterpreter.T T_PROTECTED) ()
   | PROPERTY -> print_value (MenhirInterpreter.T T_PROPERTY) ()
@@ -4512,13 +5091,18 @@ let print_token = function
   | PROGRAM -> print_value (MenhirInterpreter.T T_PROGRAM) ()
   | PROCESS_AREA -> print_value (MenhirInterpreter.T T_PROCESS_AREA) ()
   | PROCESSING -> print_value (MenhirInterpreter.T T_PROCESSING) ()
+  | PROCESS -> print_value (MenhirInterpreter.T T_PROCESS) ()
   | PROCEED -> print_value (MenhirInterpreter.T T_PROCEED) ()
   | PROCEDURE_POINTER -> print_value (MenhirInterpreter.T T_PROCEDURE_POINTER) ()
+  | PROCEDURE_NAME -> print_value (MenhirInterpreter.T T_PROCEDURE_NAME) ()
   | PROCEDURES -> print_value (MenhirInterpreter.T T_PROCEDURES) ()
   | PROCEDURE -> print_value (MenhirInterpreter.T T_PROCEDURE) ()
+  | PRIVATE -> print_value (MenhirInterpreter.T T_PRIVATE) ()
   | PRIORITY -> print_value (MenhirInterpreter.T T_PRIORITY) ()
+  | PRIOR -> print_value (MenhirInterpreter.T T_PRIOR) ()
   | PRINT_PREVIEW -> print_value (MenhirInterpreter.T T_PRINT_PREVIEW) ()
   | PRINT_NO_PROMPT -> print_value (MenhirInterpreter.T T_PRINT_NO_PROMPT) ()
+  | PRINT_CONTROL -> print_value (MenhirInterpreter.T T_PRINT_CONTROL) ()
   | PRINTING -> print_value (MenhirInterpreter.T T_PRINTING) ()
   | PRINTER_1 -> print_value (MenhirInterpreter.T T_PRINTER_1) ()
   | PRINTER -> print_value (MenhirInterpreter.T T_PRINTER) ()
@@ -4526,12 +5110,15 @@ let print_token = function
   | PRIMARY -> print_value (MenhirInterpreter.T T_PRIMARY) ()
   | PREVIOUS -> print_value (MenhirInterpreter.T T_PREVIOUS) ()
   | PRESENT -> print_value (MenhirInterpreter.T T_PRESENT) ()
+  | PREFIXING -> print_value (MenhirInterpreter.T T_PREFIXING) ()
   | PREFIXED -> print_value (MenhirInterpreter.T T_PREFIXED) ()
   | POSITIVE -> print_value (MenhirInterpreter.T T_POSITIVE) ()
   | POSITION_SHIFT -> print_value (MenhirInterpreter.T T_POSITION_SHIFT) ()
+  | POSITIONING -> print_value (MenhirInterpreter.T T_POSITIONING) ()
   | POSITION -> print_value (MenhirInterpreter.T T_POSITION) ()
   | POS -> print_value (MenhirInterpreter.T T_POS) ()
   | POP_UP -> print_value (MenhirInterpreter.T T_POP_UP) ()
+  | POINTER_32 -> print_value (MenhirInterpreter.T T_POINTER_32) ()
   | POINTER -> print_value (MenhirInterpreter.T T_POINTER) ()
   | PLUS_SIGN -> print_value (MenhirInterpreter.T T_PLUS_SIGN) ()
   | PLUS -> print_value (MenhirInterpreter.T T_PLUS) ()
@@ -4550,19 +5137,27 @@ let print_token = function
   | PARSE -> print_value (MenhirInterpreter.T T_PARSE) ()
   | PARENT -> print_value (MenhirInterpreter.T T_PARENT) ()
   | PARAGRAPH -> print_value (MenhirInterpreter.T T_PARAGRAPH) ()
+  | PANEL_WIDTHS -> print_value (MenhirInterpreter.T T_PANEL_WIDTHS) ()
+  | PANEL_TEXT -> print_value (MenhirInterpreter.T T_PANEL_TEXT) ()
+  | PANEL_STYLE -> print_value (MenhirInterpreter.T T_PANEL_STYLE) ()
+  | PANEL_INDEX -> print_value (MenhirInterpreter.T T_PANEL_INDEX) ()
+  | PAGE_SIZE -> print_value (MenhirInterpreter.T T_PAGE_SIZE) ()
   | PAGE_SETUP -> print_value (MenhirInterpreter.T T_PAGE_SETUP) ()
   | PAGE_COUNTER -> print_value (MenhirInterpreter.T T_PAGE_COUNTER) ()
   | PAGED -> print_value (MenhirInterpreter.T T_PAGED) ()
   | PAGE -> print_value (MenhirInterpreter.T T_PAGE) ()
   | PADDING -> print_value (MenhirInterpreter.T T_PADDING) ()
   | PACKED_DECIMAL -> print_value (MenhirInterpreter.T T_PACKED_DECIMAL) ()
+  | O_FILL -> print_value (MenhirInterpreter.T T_O_FILL) ()
   | OVERRIDING -> print_value (MenhirInterpreter.T T_OVERRIDING) ()
   | OVERRIDE -> print_value (MenhirInterpreter.T T_OVERRIDE) ()
   | OVERLINE -> print_value (MenhirInterpreter.T T_OVERLINE) ()
   | OVERLAP_TOP -> print_value (MenhirInterpreter.T T_OVERLAP_TOP) ()
   | OVERLAP_LEFT -> print_value (MenhirInterpreter.T T_OVERLAP_LEFT) ()
+  | OVERLAPPED -> print_value (MenhirInterpreter.T T_OVERLAPPED) ()
   | OVERFLOW -> print_value (MenhirInterpreter.T T_OVERFLOW) ()
   | OUTPUT -> print_value (MenhirInterpreter.T T_OUTPUT) ()
+  | OTHERWISE -> print_value (MenhirInterpreter.T T_OTHERWISE) ()
   | OTHERS -> print_value (MenhirInterpreter.T T_OTHERS) ()
   | OTHER -> print_value (MenhirInterpreter.T T_OTHER) ()
   | ORGANIZATION -> print_value (MenhirInterpreter.T T_ORGANIZATION) ()
@@ -4572,6 +5167,7 @@ let print_token = function
   | OPTIONAL -> print_value (MenhirInterpreter.T T_OPTIONAL) ()
   | OPERATIONAL -> print_value (MenhirInterpreter.T T_OPERATIONAL) ()
   | OPEN -> print_value (MenhirInterpreter.T T_OPEN) ()
+  | OOSTACKPTR -> print_value (MenhirInterpreter.T T_OOSTACKPTR) ()
   | ON_SIZE_ERROR -> print_value (MenhirInterpreter.T T_ON_SIZE_ERROR) ()
   | ON_OVERFLOW -> print_value (MenhirInterpreter.T T_ON_OVERFLOW) ()
   | ON_EXCEPTION -> print_value (MenhirInterpreter.T T_ON_EXCEPTION) ()
@@ -4582,12 +5178,16 @@ let print_token = function
   | OFF -> print_value (MenhirInterpreter.T T_OFF) ()
   | OF -> print_value (MenhirInterpreter.T T_OF) ()
   | OCCURS -> print_value (MenhirInterpreter.T T_OCCURS) ()
+  | OBJECT_STORAGE -> print_value (MenhirInterpreter.T T_OBJECT_STORAGE) ()
   | OBJECT_REFERENCE -> print_value (MenhirInterpreter.T T_OBJECT_REFERENCE) ()
   | OBJECT_PROGRAM -> print_value (MenhirInterpreter.T T_OBJECT_PROGRAM) ()
+  | OBJECT_ID -> print_value (MenhirInterpreter.T T_OBJECT_ID) ()
   | OBJECT_COMPUTER -> print_value (MenhirInterpreter.T T_OBJECT_COMPUTER) ()
   | OBJECT -> print_value (MenhirInterpreter.T T_OBJECT) ()
+  | NUM_ROW_HEADINGS -> print_value (MenhirInterpreter.T T_NUM_ROW_HEADINGS) ()
   | NUM_ROWS -> print_value (MenhirInterpreter.T T_NUM_ROWS) ()
   | NUM_COL_HEADINGS -> print_value (MenhirInterpreter.T T_NUM_COL_HEADINGS) ()
+  | NUMERIC_FILL -> print_value (MenhirInterpreter.T T_NUMERIC_FILL) ()
   | NUMERIC_EDITED -> print_value (MenhirInterpreter.T T_NUMERIC_EDITED) ()
   | NUMERIC -> print_value (MenhirInterpreter.T T_NUMERIC) ()
   | NUMBERS -> print_value (MenhirInterpreter.T T_NUMBERS) ()
@@ -4596,6 +5196,7 @@ let print_token = function
   | NULLIT v -> print_value (MenhirInterpreter.T T_NULLIT) v
   | NULL -> print_value (MenhirInterpreter.T T_NULL) ()
   | NO_UPDOWN -> print_value (MenhirInterpreter.T T_NO_UPDOWN) ()
+  | NO_TAB -> print_value (MenhirInterpreter.T T_NO_TAB) ()
   | NO_SEARCH -> print_value (MenhirInterpreter.T T_NO_SEARCH) ()
   | NO_KEY_LETTER -> print_value (MenhirInterpreter.T T_NO_KEY_LETTER) ()
   | NO_GROUP_TAB -> print_value (MenhirInterpreter.T T_NO_GROUP_TAB) ()
@@ -4604,6 +5205,8 @@ let print_token = function
   | NO_ECHO -> print_value (MenhirInterpreter.T T_NO_ECHO) ()
   | NO_DIVIDERS -> print_value (MenhirInterpreter.T T_NO_DIVIDERS) ()
   | NO_DATA -> print_value (MenhirInterpreter.T T_NO_DATA) ()
+  | NO_CLOSE -> print_value (MenhirInterpreter.T T_NO_CLOSE) ()
+  | NO_CELL_DRAG -> print_value (MenhirInterpreter.T T_NO_CELL_DRAG) ()
   | NO_BOX -> print_value (MenhirInterpreter.T T_NO_BOX) ()
   | NO_AUTO_DEFAULT -> print_value (MenhirInterpreter.T T_NO_AUTO_DEFAULT) ()
   | NO_AUTOSEL -> print_value (MenhirInterpreter.T T_NO_AUTOSEL) ()
@@ -4618,6 +5221,7 @@ let print_token = function
   | NOTIFY_CHANGE -> print_value (MenhirInterpreter.T T_NOTIFY_CHANGE) ()
   | NOTIFY -> print_value (MenhirInterpreter.T T_NOTIFY) ()
   | NOTHING -> print_value (MenhirInterpreter.T T_NOTHING) ()
+  | NOTE -> print_value (MenhirInterpreter.T T_NOTE) ()
   | NOTAB -> print_value (MenhirInterpreter.T T_NOTAB) ()
   | NOT -> print_value (MenhirInterpreter.T T_NOT) ()
   | NORMAL -> print_value (MenhirInterpreter.T T_NORMAL) ()
@@ -4629,6 +5233,7 @@ let print_token = function
   | NEXT_ITEM -> print_value (MenhirInterpreter.T T_NEXT_ITEM) ()
   | NEXT -> print_value (MenhirInterpreter.T T_NEXT) ()
   | NEW -> print_value (MenhirInterpreter.T T_NEW) ()
+  | NET_EVENT_LIST -> print_value (MenhirInterpreter.T T_NET_EVENT_LIST) ()
   | NESTED -> print_value (MenhirInterpreter.T T_NESTED) ()
   | NEGATIVE -> print_value (MenhirInterpreter.T T_NEGATIVE) ()
   | NEAREST_TO_ZERO -> print_value (MenhirInterpreter.T T_NEAREST_TO_ZERO) ()
@@ -4636,6 +5241,8 @@ let print_token = function
   | NEAREST_EVEN -> print_value (MenhirInterpreter.T T_NEAREST_EVEN) ()
   | NEAREST_AWAY_FROM_ZERO -> print_value (MenhirInterpreter.T T_NEAREST_AWAY_FROM_ZERO) ()
   | NE -> print_value (MenhirInterpreter.T T_NE) ()
+  | NCLOB -> print_value (MenhirInterpreter.T T_NCLOB) ()
+  | NCHAR -> print_value (MenhirInterpreter.T T_NCHAR) ()
   | NAVIGATE_URL -> print_value (MenhirInterpreter.T T_NAVIGATE_URL) ()
   | NATLIT v -> print_value (MenhirInterpreter.T T_NATLIT) v
   | NATIVE -> print_value (MenhirInterpreter.T T_NATIVE) ()
@@ -4646,28 +5253,48 @@ let print_token = function
   | NAMESPACE -> print_value (MenhirInterpreter.T T_NAMESPACE) ()
   | NAMED -> print_value (MenhirInterpreter.T T_NAMED) ()
   | NAME -> print_value (MenhirInterpreter.T T_NAME) ()
+  | MUTEX_POINTER -> print_value (MenhirInterpreter.T T_MUTEX_POINTER) ()
   | MULTIPLY -> print_value (MenhirInterpreter.T T_MULTIPLY) ()
   | MULTIPLE -> print_value (MenhirInterpreter.T T_MULTIPLE) ()
   | MULTILINE -> print_value (MenhirInterpreter.T T_MULTILINE) ()
   | MOVE -> print_value (MenhirInterpreter.T T_MOVE) ()
+  | MORE_LABELS -> print_value (MenhirInterpreter.T T_MORE_LABELS) ()
+  | MONITOR_POINTER -> print_value (MenhirInterpreter.T T_MONITOR_POINTER) ()
   | MODULES -> print_value (MenhirInterpreter.T T_MODULES) ()
+  | MODULE -> print_value (MenhirInterpreter.T T_MODULE) ()
   | MODIFY -> print_value (MenhirInterpreter.T T_MODIFY) ()
+  | MODIFIED -> print_value (MenhirInterpreter.T T_MODIFIED) ()
+  | MODELESS -> print_value (MenhirInterpreter.T T_MODELESS) ()
   | MODE -> print_value (MenhirInterpreter.T T_MODE) ()
+  | MODAL -> print_value (MenhirInterpreter.T T_MODAL) ()
+  | MIN_WIDTH -> print_value (MenhirInterpreter.T T_MIN_WIDTH) ()
+  | MIN_VALUE -> print_value (MenhirInterpreter.T T_MIN_VALUE) ()
   | MIN_VAL -> print_value (MenhirInterpreter.T T_MIN_VAL) ()
+  | MIN_SIZE -> print_value (MenhirInterpreter.T T_MIN_SIZE) ()
+  | MIN_LINES -> print_value (MenhirInterpreter.T T_MIN_LINES) ()
+  | MIN_HEIGHT -> print_value (MenhirInterpreter.T T_MIN_HEIGHT) ()
   | MINUS -> print_value (MenhirInterpreter.T T_MINUS) ()
   | MICROSECOND_TIME -> print_value (MenhirInterpreter.T T_MICROSECOND_TIME) ()
   | METHOD_ID -> print_value (MenhirInterpreter.T T_METHOD_ID) ()
   | METHOD -> print_value (MenhirInterpreter.T T_METHOD) ()
+  | META_CLASS -> print_value (MenhirInterpreter.T T_META_CLASS) ()
   | MESSAGE_TAG -> print_value (MenhirInterpreter.T T_MESSAGE_TAG) ()
+  | MESSAGES -> print_value (MenhirInterpreter.T T_MESSAGES) ()
   | MESSAGE -> print_value (MenhirInterpreter.T T_MESSAGE) ()
   | MERGE -> print_value (MenhirInterpreter.T T_MERGE) ()
   | MENU -> print_value (MenhirInterpreter.T T_MENU) ()
   | MEMORY -> print_value (MenhirInterpreter.T T_MEMORY) ()
   | MEDIUM_FONT -> print_value (MenhirInterpreter.T T_MEDIUM_FONT) ()
+  | MDI_FRAME -> print_value (MenhirInterpreter.T T_MDI_FRAME) ()
+  | MDI_CHILD -> print_value (MenhirInterpreter.T T_MDI_CHILD) ()
+  | MAX_WIDTH -> print_value (MenhirInterpreter.T T_MAX_WIDTH) ()
+  | MAX_VALUE -> print_value (MenhirInterpreter.T T_MAX_VALUE) ()
   | MAX_VAL -> print_value (MenhirInterpreter.T T_MAX_VAL) ()
   | MAX_TEXT -> print_value (MenhirInterpreter.T T_MAX_TEXT) ()
+  | MAX_SIZE -> print_value (MenhirInterpreter.T T_MAX_SIZE) ()
   | MAX_PROGRESS -> print_value (MenhirInterpreter.T T_MAX_PROGRESS) ()
   | MAX_LINES -> print_value (MenhirInterpreter.T T_MAX_LINES) ()
+  | MAX_HEIGHT -> print_value (MenhirInterpreter.T T_MAX_HEIGHT) ()
   | MASTER_INDEX -> print_value (MenhirInterpreter.T T_MASTER_INDEX) ()
   | MASS_UPDATE -> print_value (MenhirInterpreter.T T_MASS_UPDATE) ()
   | MANUAL -> print_value (MenhirInterpreter.T T_MANUAL) ()
@@ -4677,8 +5304,12 @@ let print_token = function
   | LOW_VALUE -> print_value (MenhirInterpreter.T T_LOW_VALUE) ()
   | LOW_COLOR -> print_value (MenhirInterpreter.T T_LOW_COLOR) ()
   | LOWLIGHT -> print_value (MenhirInterpreter.T T_LOWLIGHT) ()
+  | LOWEST_VALUE -> print_value (MenhirInterpreter.T T_LOWEST_VALUE) ()
   | LOWERED -> print_value (MenhirInterpreter.T T_LOWERED) ()
   | LOWER -> print_value (MenhirInterpreter.T T_LOWER) ()
+  | LOW -> print_value (MenhirInterpreter.T T_LOW) ()
+  | LONG_VARCHAR -> print_value (MenhirInterpreter.T T_LONG_VARCHAR) ()
+  | LONG_VARBINARY -> print_value (MenhirInterpreter.T T_LONG_VARBINARY) ()
   | LONG_DATE -> print_value (MenhirInterpreter.T T_LONG_DATE) ()
   | LOCK_HOLDING -> print_value (MenhirInterpreter.T T_LOCK_HOLDING) ()
   | LOCKS -> print_value (MenhirInterpreter.T T_LOCKS) ()
@@ -4690,6 +5321,7 @@ let print_token = function
   | LM_RESIZE -> print_value (MenhirInterpreter.T T_LM_RESIZE) ()
   | LIST_BOX -> print_value (MenhirInterpreter.T T_LIST_BOX) ()
   | LINKAGE -> print_value (MenhirInterpreter.T T_LINKAGE) ()
+  | LINK -> print_value (MenhirInterpreter.T T_LINK) ()
   | LINE_SEQUENTIAL -> print_value (MenhirInterpreter.T T_LINE_SEQUENTIAL) ()
   | LINE_COUNTER -> print_value (MenhirInterpreter.T T_LINE_COUNTER) ()
   | LINES_PER_PAGE -> print_value (MenhirInterpreter.T T_LINES_PER_PAGE) ()
@@ -4698,6 +5330,7 @@ let print_token = function
   | LINE -> print_value (MenhirInterpreter.T T_LINE) ()
   | LINAGE_COUNTER -> print_value (MenhirInterpreter.T T_LINAGE_COUNTER) ()
   | LINAGE -> print_value (MenhirInterpreter.T T_LINAGE) ()
+  | LIN -> print_value (MenhirInterpreter.T T_LIN) ()
   | LIMITS -> print_value (MenhirInterpreter.T T_LIMITS) ()
   | LIMIT -> print_value (MenhirInterpreter.T T_LIMIT) ()
   | LIKE -> print_value (MenhirInterpreter.T T_LIKE) ()
@@ -4732,8 +5365,15 @@ let print_token = function
   | KEYBOARD -> print_value (MenhirInterpreter.T T_KEYBOARD) ()
   | KEY -> print_value (MenhirInterpreter.T T_KEY) ()
   | KEPT -> print_value (MenhirInterpreter.T T_KEPT) ()
+  | KANJI -> print_value (MenhirInterpreter.T T_KANJI) ()
   | JUSTIFIED -> print_value (MenhirInterpreter.T T_JUSTIFIED) ()
+  | JSON_STATUS -> print_value (MenhirInterpreter.T T_JSON_STATUS) ()
+  | JSON_CODE -> print_value (MenhirInterpreter.T T_JSON_CODE) ()
   | JSON -> print_value (MenhirInterpreter.T T_JSON) ()
+  | JOINING -> print_value (MenhirInterpreter.T T_JOINING) ()
+  | JNIENVPTR -> print_value (MenhirInterpreter.T T_JNIENVPTR) ()
+  | JAVA -> print_value (MenhirInterpreter.T T_JAVA) ()
+  | JAPANESE -> print_value (MenhirInterpreter.T T_JAPANESE) ()
   | I_O_CONTROL -> print_value (MenhirInterpreter.T T_I_O_CONTROL) ()
   | I_O -> print_value (MenhirInterpreter.T T_I_O) ()
   | ITEM_VALUE -> print_value (MenhirInterpreter.T T_ITEM_VALUE) ()
@@ -4741,6 +5381,8 @@ let print_token = function
   | ITEM_TO_DELETE -> print_value (MenhirInterpreter.T T_ITEM_TO_DELETE) ()
   | ITEM_TO_ADD -> print_value (MenhirInterpreter.T T_ITEM_TO_ADD) ()
   | ITEM_TEXT -> print_value (MenhirInterpreter.T T_ITEM_TEXT) ()
+  | ITEM_ID -> print_value (MenhirInterpreter.T T_ITEM_ID) ()
+  | ITEM_BOLD -> print_value (MenhirInterpreter.T T_ITEM_BOLD) ()
   | ITEM -> print_value (MenhirInterpreter.T T_ITEM) ()
   | IS_TYPEDEF -> print_value (MenhirInterpreter.T T_IS_TYPEDEF) ()
   | IS_GLOBAL -> print_value (MenhirInterpreter.T T_IS_GLOBAL) ()
@@ -4748,29 +5390,38 @@ let print_token = function
   | IS -> print_value (MenhirInterpreter.T T_IS) ()
   | IN_ARITHMETIC_RANGE -> print_value (MenhirInterpreter.T T_IN_ARITHMETIC_RANGE) ()
   | INVOKING -> print_value (MenhirInterpreter.T T_INVOKING) ()
+  | INVOKED -> print_value (MenhirInterpreter.T T_INVOKED) ()
   | INVOKE -> print_value (MenhirInterpreter.T T_INVOKE) ()
   | INVALID_KEY -> print_value (MenhirInterpreter.T T_INVALID_KEY) ()
   | INVALID -> print_value (MenhirInterpreter.T T_INVALID) ()
   | INTRINSIC -> print_value (MenhirInterpreter.T T_INTRINSIC) ()
   | INTO -> print_value (MenhirInterpreter.T T_INTO) ()
   | INTERVENING_ v -> print_value (MenhirInterpreter.T T_INTERVENING_) v
+  | INTERVAL_TIMER -> print_value (MenhirInterpreter.T T_INTERVAL_TIMER) ()
   | INTERMEDIATE -> print_value (MenhirInterpreter.T T_INTERMEDIATE) ()
   | INTERFACE_ID -> print_value (MenhirInterpreter.T T_INTERFACE_ID) ()
   | INTERFACE -> print_value (MenhirInterpreter.T T_INTERFACE) ()
+  | INSTANCE -> print_value (MenhirInterpreter.T T_INSTANCE) ()
   | INSTALLATION -> print_value (MenhirInterpreter.T T_INSTALLATION) ()
   | INSPECT -> print_value (MenhirInterpreter.T T_INSPECT) ()
   | INSERT_ROWS -> print_value (MenhirInterpreter.T T_INSERT_ROWS) ()
   | INSERTION_INDEX -> print_value (MenhirInterpreter.T T_INSERTION_INDEX) ()
+  | INSERT -> print_value (MenhirInterpreter.T T_INSERT) ()
   | INQUIRE -> print_value (MenhirInterpreter.T T_INQUIRE) ()
   | INPUT_OUTPUT -> print_value (MenhirInterpreter.T T_INPUT_OUTPUT) ()
   | INPUT -> print_value (MenhirInterpreter.T T_INPUT) ()
   | INITIATE -> print_value (MenhirInterpreter.T T_INITIATE) ()
+  | INITIAL_VALUE -> print_value (MenhirInterpreter.T T_INITIAL_VALUE) ()
   | INITIALIZED -> print_value (MenhirInterpreter.T T_INITIALIZED) ()
   | INITIALIZE -> print_value (MenhirInterpreter.T T_INITIALIZE) ()
   | INITIAL -> print_value (MenhirInterpreter.T T_INITIAL) ()
   | INHERITS -> print_value (MenhirInterpreter.T T_INHERITS) ()
+  | INHERITING -> print_value (MenhirInterpreter.T T_INHERITING) ()
   | INFO_WORD v -> print_value (MenhirInterpreter.T T_INFO_WORD) v
+  | INDICATORS -> print_value (MenhirInterpreter.T T_INDICATORS) ()
+  | INDICATOR -> print_value (MenhirInterpreter.T T_INDICATOR) ()
   | INDICATE -> print_value (MenhirInterpreter.T T_INDICATE) ()
+  | INDIC -> print_value (MenhirInterpreter.T T_INDIC) ()
   | INDEX_2 -> print_value (MenhirInterpreter.T T_INDEX_2) ()
   | INDEX_1 -> print_value (MenhirInterpreter.T T_INDEX_1) ()
   | INDEXED -> print_value (MenhirInterpreter.T T_INDEXED) ()
@@ -4778,6 +5429,7 @@ let print_token = function
   | INDEPENDENT -> print_value (MenhirInterpreter.T T_INDEPENDENT) ()
   | IN -> print_value (MenhirInterpreter.T T_IN) ()
   | IMPLEMENTS -> print_value (MenhirInterpreter.T T_IMPLEMENTS) ()
+  | IMP -> print_value (MenhirInterpreter.T T_IMP) ()
   | IGNORING -> print_value (MenhirInterpreter.T T_IGNORING) ()
   | IGNORE -> print_value (MenhirInterpreter.T T_IGNORE) ()
   | IF -> print_value (MenhirInterpreter.T T_IF) ()
@@ -4789,15 +5441,20 @@ let print_token = function
   | HSCROLL_POS -> print_value (MenhirInterpreter.T T_HSCROLL_POS) ()
   | HSCROLL -> print_value (MenhirInterpreter.T T_HSCROLL) ()
   | HOT_TRACK -> print_value (MenhirInterpreter.T T_HOT_TRACK) ()
+  | HORIZONTAL -> print_value (MenhirInterpreter.T T_HORIZONTAL) ()
   | HIGH_VALUE -> print_value (MenhirInterpreter.T T_HIGH_VALUE) ()
   | HIGH_ORDER_RIGHT -> print_value (MenhirInterpreter.T T_HIGH_ORDER_RIGHT) ()
   | HIGH_ORDER_LEFT -> print_value (MenhirInterpreter.T T_HIGH_ORDER_LEFT) ()
   | HIGH_COLOR -> print_value (MenhirInterpreter.T T_HIGH_COLOR) ()
   | HIGHLIGHT -> print_value (MenhirInterpreter.T T_HIGHLIGHT) ()
+  | HIGHEST_VALUE -> print_value (MenhirInterpreter.T T_HIGHEST_VALUE) ()
+  | HIGH -> print_value (MenhirInterpreter.T T_HIGH) ()
   | HIDDEN_DATA -> print_value (MenhirInterpreter.T T_HIDDEN_DATA) ()
   | HEXLIT v -> print_value (MenhirInterpreter.T T_HEXLIT) v
   | HEX -> print_value (MenhirInterpreter.T T_HEX) ()
+  | HELP_ID -> print_value (MenhirInterpreter.T T_HELP_ID) ()
   | HEIGHT_IN_CELLS -> print_value (MenhirInterpreter.T T_HEIGHT_IN_CELLS) ()
+  | HEIGHT -> print_value (MenhirInterpreter.T T_HEIGHT) ()
   | HEAVY -> print_value (MenhirInterpreter.T T_HEAVY) ()
   | HEADING_FONT -> print_value (MenhirInterpreter.T T_HEADING_FONT) ()
   | HEADING_DIVIDER_COLOR -> print_value (MenhirInterpreter.T T_HEADING_DIVIDER_COLOR) ()
@@ -4809,6 +5466,7 @@ let print_token = function
   | GROUP_VALUE -> print_value (MenhirInterpreter.T T_GROUP_VALUE) ()
   | GROUP_USAGE -> print_value (MenhirInterpreter.T T_GROUP_USAGE) ()
   | GROUP -> print_value (MenhirInterpreter.T T_GROUP) ()
+  | GRIP -> print_value (MenhirInterpreter.T T_GRIP) ()
   | GRID -> print_value (MenhirInterpreter.T T_GRID) ()
   | GREATER -> print_value (MenhirInterpreter.T T_GREATER) ()
   | GRAPHICAL -> print_value (MenhirInterpreter.T T_GRAPHICAL) ()
@@ -4871,7 +5529,9 @@ let print_token = function
   | FILL_COLOR2 -> print_value (MenhirInterpreter.T T_FILL_COLOR2) ()
   | FILL_COLOR -> print_value (MenhirInterpreter.T T_FILL_COLOR) ()
   | FILLER -> print_value (MenhirInterpreter.T T_FILLER) ()
+  | FILE_PREFIX -> print_value (MenhirInterpreter.T T_FILE_PREFIX) ()
   | FILE_POS -> print_value (MenhirInterpreter.T T_FILE_POS) ()
+  | FILE_PATH -> print_value (MenhirInterpreter.T T_FILE_PATH) ()
   | FILE_NAME -> print_value (MenhirInterpreter.T T_FILE_NAME) ()
   | FILE_LIMITS -> print_value (MenhirInterpreter.T T_FILE_LIMITS) ()
   | FILE_LIMIT -> print_value (MenhirInterpreter.T T_FILE_LIMIT) ()
@@ -4879,6 +5539,7 @@ let print_token = function
   | FILE_CONTROL -> print_value (MenhirInterpreter.T T_FILE_CONTROL) ()
   | FILES -> print_value (MenhirInterpreter.T T_FILES) ()
   | FILE -> print_value (MenhirInterpreter.T T_FILE) ()
+  | FIELD_TERMINATOR -> print_value (MenhirInterpreter.T T_FIELD_TERMINATOR) ()
   | FH__KEYDEF -> print_value (MenhirInterpreter.T T_FH__KEYDEF) ()
   | FH__FCD -> print_value (MenhirInterpreter.T T_FH__FCD) ()
   | FD -> print_value (MenhirInterpreter.T T_FD) ()
@@ -4887,6 +5548,7 @@ let print_token = function
   | FACTORY -> print_value (MenhirInterpreter.T T_FACTORY) ()
   | F -> print_value (MenhirInterpreter.T T_F) ()
   | EXTERNAL_FORM -> print_value (MenhirInterpreter.T T_EXTERNAL_FORM) ()
+  | EXTERNALLY_DESCRIBED_KEY -> print_value (MenhirInterpreter.T T_EXTERNALLY_DESCRIBED_KEY) ()
   | EXTERNAL -> print_value (MenhirInterpreter.T T_EXTERNAL) ()
   | EXTERN -> print_value (MenhirInterpreter.T T_EXTERN) ()
   | EXTENDED_SEARCH -> print_value (MenhirInterpreter.T T_EXTENDED_SEARCH) ()
@@ -4895,13 +5557,19 @@ let print_token = function
   | EXPAND -> print_value (MenhirInterpreter.T T_EXPAND) ()
   | EXIT -> print_value (MenhirInterpreter.T T_EXIT) ()
   | EXHIBIT -> print_value (MenhirInterpreter.T T_EXHIBIT) ()
+  | EXECUTE -> print_value (MenhirInterpreter.T T_EXECUTE) ()
+  | EXEC -> print_value (MenhirInterpreter.T T_EXEC) ()
   | EXCLUSIVE_OR -> print_value (MenhirInterpreter.T T_EXCLUSIVE_OR) ()
   | EXCLUSIVE -> print_value (MenhirInterpreter.T T_EXCLUSIVE) ()
+  | EXCLUDE_EVENT_LIST -> print_value (MenhirInterpreter.T T_EXCLUDE_EVENT_LIST) ()
+  | EXCESS_3 -> print_value (MenhirInterpreter.T T_EXCESS_3) ()
   | EXCEPTION_VALUE -> print_value (MenhirInterpreter.T T_EXCEPTION_VALUE) ()
   | EXCEPTION_OBJECT -> print_value (MenhirInterpreter.T T_EXCEPTION_OBJECT) ()
   | EXCEPTION -> print_value (MenhirInterpreter.T T_EXCEPTION) ()
+  | EXCEEDS -> print_value (MenhirInterpreter.T T_EXCEEDS) ()
   | EXAMINE -> print_value (MenhirInterpreter.T T_EXAMINE) ()
   | EVERY -> print_value (MenhirInterpreter.T T_EVERY) ()
+  | EVENT_POINTER -> print_value (MenhirInterpreter.T T_EVENT_POINTER) ()
   | EVENT_LIST -> print_value (MenhirInterpreter.T T_EVENT_LIST) ()
   | EVENT -> print_value (MenhirInterpreter.T T_EVENT) ()
   | EVALUATE -> print_value (MenhirInterpreter.T T_EVALUATE) ()
@@ -4929,26 +5597,37 @@ let print_token = function
   | ENGRAVED -> print_value (MenhirInterpreter.T T_ENGRAVED) ()
   | END_XML -> print_value (MenhirInterpreter.T T_END_XML) ()
   | END_WRITE -> print_value (MenhirInterpreter.T T_END_WRITE) ()
+  | END_WAIT -> print_value (MenhirInterpreter.T T_END_WAIT) ()
+  | END_USE -> print_value (MenhirInterpreter.T T_END_USE) ()
   | END_UNSTRING -> print_value (MenhirInterpreter.T T_END_UNSTRING) ()
   | END_SUBTRACT -> print_value (MenhirInterpreter.T T_END_SUBTRACT) ()
   | END_STRING -> print_value (MenhirInterpreter.T T_END_STRING) ()
   | END_START -> print_value (MenhirInterpreter.T T_END_START) ()
+  | END_SET -> print_value (MenhirInterpreter.T T_END_SET) ()
   | END_SEND -> print_value (MenhirInterpreter.T T_END_SEND) ()
   | END_SEARCH -> print_value (MenhirInterpreter.T T_END_SEARCH) ()
   | END_REWRITE -> print_value (MenhirInterpreter.T T_END_REWRITE) ()
   | END_RETURN -> print_value (MenhirInterpreter.T T_END_RETURN) ()
+  | END_REPLACE -> print_value (MenhirInterpreter.T T_END_REPLACE) ()
   | END_RECEIVE -> print_value (MenhirInterpreter.T T_END_RECEIVE) ()
   | END_READ -> print_value (MenhirInterpreter.T T_END_READ) ()
   | END_PERFORM -> print_value (MenhirInterpreter.T T_END_PERFORM) ()
+  | END_ON -> print_value (MenhirInterpreter.T T_END_ON) ()
   | END_OF_PAGE -> print_value (MenhirInterpreter.T T_END_OF_PAGE) ()
   | END_MULTIPLY -> print_value (MenhirInterpreter.T T_END_MULTIPLY) ()
+  | END_MOVE -> print_value (MenhirInterpreter.T T_END_MOVE) ()
   | END_MODIFY -> print_value (MenhirInterpreter.T T_END_MODIFY) ()
   | END_JSON -> print_value (MenhirInterpreter.T T_END_JSON) ()
+  | END_INVOKE -> print_value (MenhirInterpreter.T T_END_INVOKE) ()
   | END_IF -> print_value (MenhirInterpreter.T T_END_IF) ()
+  | END_EXEC -> print_value (MenhirInterpreter.T T_END_EXEC) ()
   | END_EVALUATE -> print_value (MenhirInterpreter.T T_END_EVALUATE) ()
+  | END_ENABLE -> print_value (MenhirInterpreter.T T_END_ENABLE) ()
   | END_DIVIDE -> print_value (MenhirInterpreter.T T_END_DIVIDE) ()
   | END_DISPLAY -> print_value (MenhirInterpreter.T T_END_DISPLAY) ()
+  | END_DISABLE -> print_value (MenhirInterpreter.T T_END_DISABLE) ()
   | END_DELETE -> print_value (MenhirInterpreter.T T_END_DELETE) ()
+  | END_COPY -> print_value (MenhirInterpreter.T T_END_COPY) ()
   | END_COMPUTE -> print_value (MenhirInterpreter.T T_END_COMPUTE) ()
   | END_COLOR -> print_value (MenhirInterpreter.T T_END_COLOR) ()
   | END_CHAIN -> print_value (MenhirInterpreter.T T_END_CHAIN) ()
@@ -4959,12 +5638,16 @@ let print_token = function
   | END -> print_value (MenhirInterpreter.T T_END) ()
   | ENCRYPTION -> print_value (MenhirInterpreter.T T_ENCRYPTION) ()
   | ENCODING -> print_value (MenhirInterpreter.T T_ENCODING) ()
+  | ENABLED -> print_value (MenhirInterpreter.T T_ENABLED) ()
   | ENABLE -> print_value (MenhirInterpreter.T T_ENABLE) ()
   | EMI -> print_value (MenhirInterpreter.T T_EMI) ()
   | ELSE -> print_value (MenhirInterpreter.T T_ELSE) ()
   | ELEMENT -> print_value (MenhirInterpreter.T T_ELEMENT) ()
+  | EJECT -> print_value (MenhirInterpreter.T T_EJECT) ()
   | EIGHTY_EIGHT -> print_value (MenhirInterpreter.T T_EIGHTY_EIGHT) ()
   | EGI -> print_value (MenhirInterpreter.T T_EGI) ()
+  | EGCS -> print_value (MenhirInterpreter.T T_EGCS) ()
+  | EGC -> print_value (MenhirInterpreter.T T_EGC) ()
   | EDITING -> print_value (MenhirInterpreter.T T_EDITING) ()
   | ECHO -> print_value (MenhirInterpreter.T T_ECHO) ()
   | EC -> print_value (MenhirInterpreter.T T_EC) ()
@@ -4973,17 +5656,21 @@ let print_token = function
   | DUPLICATES -> print_value (MenhirInterpreter.T T_DUPLICATES) ()
   | DROP_LIST -> print_value (MenhirInterpreter.T T_DROP_LIST) ()
   | DROP_DOWN -> print_value (MenhirInterpreter.T T_DROP_DOWN) ()
+  | DROP -> print_value (MenhirInterpreter.T T_DROP) ()
+  | DRAW -> print_value (MenhirInterpreter.T T_DRAW) ()
   | DRAG_COLOR -> print_value (MenhirInterpreter.T T_DRAG_COLOR) ()
   | DOWN -> print_value (MenhirInterpreter.T T_DOWN) ()
   | DOUBLE_COLON -> print_value (MenhirInterpreter.T T_DOUBLE_COLON) ()
   | DOUBLE_ASTERISK -> print_value (MenhirInterpreter.T T_DOUBLE_ASTERISK) ()
   | DOUBLE -> print_value (MenhirInterpreter.T T_DOUBLE) ()
+  | DOT_DASH -> print_value (MenhirInterpreter.T T_DOT_DASH) ()
   | DOTTED -> print_value (MenhirInterpreter.T T_DOTTED) ()
   | DOTDASH -> print_value (MenhirInterpreter.T T_DOTDASH) ()
   | DIVISION -> print_value (MenhirInterpreter.T T_DIVISION) ()
   | DIVIDER_COLOR -> print_value (MenhirInterpreter.T T_DIVIDER_COLOR) ()
   | DIVIDERS -> print_value (MenhirInterpreter.T T_DIVIDERS) ()
   | DIVIDE -> print_value (MenhirInterpreter.T T_DIVIDE) ()
+  | DISPLAY_ST -> print_value (MenhirInterpreter.T T_DISPLAY_ST) ()
   | DISPLAY_FORMAT -> print_value (MenhirInterpreter.T T_DISPLAY_FORMAT) ()
   | DISPLAY_COLUMNS -> print_value (MenhirInterpreter.T T_DISPLAY_COLUMNS) ()
   | DISPLAY_4 -> print_value (MenhirInterpreter.T T_DISPLAY_4) ()
@@ -4993,6 +5680,7 @@ let print_token = function
   | DISPLAY -> print_value (MenhirInterpreter.T T_DISPLAY) ()
   | DISP -> print_value (MenhirInterpreter.T T_DISP) ()
   | DISK -> print_value (MenhirInterpreter.T T_DISK) ()
+  | DISJOINING -> print_value (MenhirInterpreter.T T_DISJOINING) ()
   | DISCONNECT -> print_value (MenhirInterpreter.T T_DISCONNECT) ()
   | DISC -> print_value (MenhirInterpreter.T T_DISC) ()
   | DISABLE -> print_value (MenhirInterpreter.T T_DISABLE) ()
@@ -5000,6 +5688,7 @@ let print_token = function
   | DETAIL -> print_value (MenhirInterpreter.T T_DETAIL) ()
   | DESTROY -> print_value (MenhirInterpreter.T T_DESTROY) ()
   | DESTINATION -> print_value (MenhirInterpreter.T T_DESTINATION) ()
+  | DESCRIPTOR -> print_value (MenhirInterpreter.T T_DESCRIPTOR) ()
   | DESCENDING -> print_value (MenhirInterpreter.T T_DESCENDING) ()
   | DEPENDING -> print_value (MenhirInterpreter.T T_DEPENDING) ()
   | DELIMITER -> print_value (MenhirInterpreter.T T_DELIMITER) ()
@@ -5009,6 +5698,7 @@ let print_token = function
   | DEFAULT_FONT -> print_value (MenhirInterpreter.T T_DEFAULT_FONT) ()
   | DEFAULT_BUTTON -> print_value (MenhirInterpreter.T T_DEFAULT_BUTTON) ()
   | DEFAULT -> print_value (MenhirInterpreter.T T_DEFAULT) ()
+  | DECLARE -> print_value (MenhirInterpreter.T T_DECLARE) ()
   | DECLARATIVES -> print_value (MenhirInterpreter.T T_DECLARATIVES) ()
   | DECIMAL_POINT -> print_value (MenhirInterpreter.T T_DECIMAL_POINT) ()
   | DECIMAL_ENCODING -> print_value (MenhirInterpreter.T T_DECIMAL_ENCODING) ()
@@ -5020,12 +5710,20 @@ let print_token = function
   | DEBUG_ITEM -> print_value (MenhirInterpreter.T T_DEBUG_ITEM) ()
   | DEBUG_CONTENTS -> print_value (MenhirInterpreter.T T_DEBUG_CONTENTS) ()
   | DEBUGGING -> print_value (MenhirInterpreter.T T_DEBUGGING) ()
+  | DEBUG -> print_value (MenhirInterpreter.T T_DEBUG) ()
+  | DBCS -> print_value (MenhirInterpreter.T T_DBCS) ()
+  | DBCLOB_LOCATOR -> print_value (MenhirInterpreter.T T_DBCLOB_LOCATOR) ()
+  | DBCLOB_FILE -> print_value (MenhirInterpreter.T T_DBCLOB_FILE) ()
+  | DBCLOB -> print_value (MenhirInterpreter.T T_DBCLOB) ()
   | DAY_OF_WEEK -> print_value (MenhirInterpreter.T T_DAY_OF_WEEK) ()
+  | DAY_AND_TIME -> print_value (MenhirInterpreter.T T_DAY_AND_TIME) ()
   | DAY -> print_value (MenhirInterpreter.T T_DAY) ()
   | DATE_WRITTEN -> print_value (MenhirInterpreter.T T_DATE_WRITTEN) ()
+  | DATE_RECORD -> print_value (MenhirInterpreter.T T_DATE_RECORD) ()
   | DATE_MODIFIED -> print_value (MenhirInterpreter.T T_DATE_MODIFIED) ()
   | DATE_ENTRY -> print_value (MenhirInterpreter.T T_DATE_ENTRY) ()
   | DATE_COMPILED -> print_value (MenhirInterpreter.T T_DATE_COMPILED) ()
+  | DATE_AND_TIME -> print_value (MenhirInterpreter.T T_DATE_AND_TIME) ()
   | DATE -> print_value (MenhirInterpreter.T T_DATE) ()
   | DATA_TYPES -> print_value (MenhirInterpreter.T T_DATA_TYPES) ()
   | DATA_RECORDS -> print_value (MenhirInterpreter.T T_DATA_RECORDS) ()
@@ -5046,25 +5744,38 @@ let print_token = function
   | CURSOR_COLOR -> print_value (MenhirInterpreter.T T_CURSOR_COLOR) ()
   | CURSOR_COL -> print_value (MenhirInterpreter.T T_CURSOR_COL) ()
   | CURSOR -> print_value (MenhirInterpreter.T T_CURSOR) ()
+  | CURRENT_DATE -> print_value (MenhirInterpreter.T T_CURRENT_DATE) ()
   | CURRENT -> print_value (MenhirInterpreter.T T_CURRENT) ()
   | CURRENCY -> print_value (MenhirInterpreter.T T_CURRENCY) ()
+  | CULTURE -> print_value (MenhirInterpreter.T T_CULTURE) ()
   | CS_GENERAL -> print_value (MenhirInterpreter.T T_CS_GENERAL) ()
   | CS_BASIC -> print_value (MenhirInterpreter.T T_CS_BASIC) ()
+  | CSP -> print_value (MenhirInterpreter.T T_CSP) ()
   | CSIZE -> print_value (MenhirInterpreter.T T_CSIZE) ()
   | CRT_UNDER -> print_value (MenhirInterpreter.T T_CRT_UNDER) ()
   | CRT -> print_value (MenhirInterpreter.T T_CRT) ()
+  | CREATE -> print_value (MenhirInterpreter.T T_CREATE) ()
+  | COUNT_TRAILING -> print_value (MenhirInterpreter.T T_COUNT_TRAILING) ()
+  | COUNT_MIN -> print_value (MenhirInterpreter.T T_COUNT_MIN) ()
+  | COUNT_MAX -> print_value (MenhirInterpreter.T T_COUNT_MAX) ()
+  | COUNT_LEADLING -> print_value (MenhirInterpreter.T T_COUNT_LEADLING) ()
   | COUNT -> print_value (MenhirInterpreter.T T_COUNT) ()
   | CORRESPONDING -> print_value (MenhirInterpreter.T T_CORRESPONDING) ()
   | CORE_INDEX -> print_value (MenhirInterpreter.T T_CORE_INDEX) ()
   | COPY_SELECTION -> print_value (MenhirInterpreter.T T_COPY_SELECTION) ()
   | COPY -> print_value (MenhirInterpreter.T T_COPY) ()
   | CONVERTING -> print_value (MenhirInterpreter.T T_CONVERTING) ()
+  | CONVERT -> print_value (MenhirInterpreter.T T_CONVERT) ()
   | CONVERSION -> print_value (MenhirInterpreter.T T_CONVERSION) ()
+  | CONTROL_AREA -> print_value (MenhirInterpreter.T T_CONTROL_AREA) ()
+  | CONTROLS_UNCROPPED -> print_value (MenhirInterpreter.T T_CONTROLS_UNCROPPED) ()
   | CONTROLS -> print_value (MenhirInterpreter.T T_CONTROLS) ()
   | CONTROL -> print_value (MenhirInterpreter.T T_CONTROL) ()
   | CONTINUE -> print_value (MenhirInterpreter.T T_CONTINUE) ()
+  | CONTENT_OF -> print_value (MenhirInterpreter.T T_CONTENT_OF) ()
   | CONTENT -> print_value (MenhirInterpreter.T T_CONTENT) ()
   | CONTAINS -> print_value (MenhirInterpreter.T T_CONTAINS) ()
+  | CONSTRUCTOR -> print_value (MenhirInterpreter.T T_CONSTRUCTOR) ()
   | CONSTANT_RECORD -> print_value (MenhirInterpreter.T T_CONSTANT_RECORD) ()
   | CONSTANT -> print_value (MenhirInterpreter.T T_CONSTANT) ()
   | CONSOLE_3 -> print_value (MenhirInterpreter.T T_CONSOLE_3) ()
@@ -5074,6 +5785,7 @@ let print_token = function
   | CONNECT -> print_value (MenhirInterpreter.T T_CONNECT) ()
   | CONFIGURATION -> print_value (MenhirInterpreter.T T_CONFIGURATION) ()
   | CONDITION -> print_value (MenhirInterpreter.T T_CONDITION) ()
+  | COM_REG -> print_value (MenhirInterpreter.T T_COM_REG) ()
   | COMP_X -> print_value (MenhirInterpreter.T T_COMP_X) ()
   | COMP_N -> print_value (MenhirInterpreter.T T_COMP_N) ()
   | COMP_9 -> print_value (MenhirInterpreter.T T_COMP_9) ()
@@ -5097,11 +5809,13 @@ let print_token = function
   | COMPUTATIONAL_13 -> print_value (MenhirInterpreter.T T_COMPUTATIONAL_13) ()
   | COMPUTATIONAL_12 -> print_value (MenhirInterpreter.T T_COMPUTATIONAL_12) ()
   | COMPUTATIONAL_11 -> print_value (MenhirInterpreter.T T_COMPUTATIONAL_11) ()
+  | COMPRESSION -> print_value (MenhirInterpreter.T T_COMPRESSION) ()
   | COMPLEMENTARY -> print_value (MenhirInterpreter.T T_COMPLEMENTARY) ()
   | COMPLE -> print_value (MenhirInterpreter.T T_COMPLE) ()
   | COMP -> print_value (MenhirInterpreter.T T_COMP) ()
   | COMMUNICATION -> print_value (MenhirInterpreter.T T_COMMUNICATION) ()
   | COMMON -> print_value (MenhirInterpreter.T T_COMMON) ()
+  | COMMITMENT -> print_value (MenhirInterpreter.T T_COMMITMENT) ()
   | COMMIT -> print_value (MenhirInterpreter.T T_COMMIT) ()
   | COMMENT_ENTRY v -> print_value (MenhirInterpreter.T T_COMMENT_ENTRY) v
   | COMMAND_LINE -> print_value (MenhirInterpreter.T T_COMMAND_LINE) ()
@@ -5119,27 +5833,39 @@ let print_token = function
   | COLON -> print_value (MenhirInterpreter.T T_COLON) ()
   | COLLATING -> print_value (MenhirInterpreter.T T_COLLATING) ()
   | COL -> print_value (MenhirInterpreter.T T_COL) ()
+  | COERCION -> print_value (MenhirInterpreter.T T_COERCION) ()
   | CODE_SET -> print_value (MenhirInterpreter.T T_CODE_SET) ()
   | CODE -> print_value (MenhirInterpreter.T T_CODE) ()
   | COBOL -> print_value (MenhirInterpreter.T T_COBOL) ()
   | CLOSE -> print_value (MenhirInterpreter.T T_CLOSE) ()
   | CLOCK_UNITS -> print_value (MenhirInterpreter.T T_CLOCK_UNITS) ()
+  | CLOB_LOCATOR -> print_value (MenhirInterpreter.T T_CLOB_LOCATOR) ()
+  | CLOB_FILE -> print_value (MenhirInterpreter.T T_CLOB_FILE) ()
+  | CLOB -> print_value (MenhirInterpreter.T T_CLOB) ()
   | CLINES -> print_value (MenhirInterpreter.T T_CLINES) ()
   | CLINE -> print_value (MenhirInterpreter.T T_CLINE) ()
   | CLEAR_SELECTION -> print_value (MenhirInterpreter.T T_CLEAR_SELECTION) ()
+  | CLASS_OBJECT -> print_value (MenhirInterpreter.T T_CLASS_OBJECT) ()
+  | CLASS_NAME -> print_value (MenhirInterpreter.T T_CLASS_NAME) ()
   | CLASS_ID -> print_value (MenhirInterpreter.T T_CLASS_ID) ()
+  | CLASS_CONTROL -> print_value (MenhirInterpreter.T T_CLASS_CONTROL) ()
   | CLASSIFICATION -> print_value (MenhirInterpreter.T T_CLASSIFICATION) ()
   | CLASS -> print_value (MenhirInterpreter.T T_CLASS) ()
+  | CICS -> print_value (MenhirInterpreter.T T_CICS) ()
   | CHECK_BOX -> print_value (MenhirInterpreter.T T_CHECK_BOX) ()
   | CHECKPOINT_FILE -> print_value (MenhirInterpreter.T T_CHECKPOINT_FILE) ()
   | CHECK -> print_value (MenhirInterpreter.T T_CHECK) ()
+  | CHAR_VARYING -> print_value (MenhirInterpreter.T T_CHAR_VARYING) ()
+  | CHART -> print_value (MenhirInterpreter.T T_CHART) ()
   | CHARACTERS -> print_value (MenhirInterpreter.T T_CHARACTERS) ()
   | CHARACTER -> print_value (MenhirInterpreter.T T_CHARACTER) ()
+  | CHAR -> print_value (MenhirInterpreter.T T_CHAR) ()
   | CHANGED -> print_value (MenhirInterpreter.T T_CHANGED) ()
   | CHAINING -> print_value (MenhirInterpreter.T T_CHAINING) ()
   | CHAIN -> print_value (MenhirInterpreter.T T_CHAIN) ()
   | CH -> print_value (MenhirInterpreter.T T_CH) ()
   | CF -> print_value (MenhirInterpreter.T T_CF) ()
+  | CENTURY_DAY -> print_value (MenhirInterpreter.T T_CENTURY_DAY) ()
   | CENTURY_DATE -> print_value (MenhirInterpreter.T T_CENTURY_DATE) ()
   | CENTERED_HEADINGS -> print_value (MenhirInterpreter.T T_CENTERED_HEADINGS) ()
   | CENTERED -> print_value (MenhirInterpreter.T T_CENTERED) ()
@@ -5151,14 +5877,18 @@ let print_token = function
   | CELL -> print_value (MenhirInterpreter.T T_CELL) ()
   | CD -> print_value (MenhirInterpreter.T T_CD) ()
   | CCOL -> print_value (MenhirInterpreter.T T_CCOL) ()
+  | CBL -> print_value (MenhirInterpreter.T T_CBL) ()
   | CATALOGUE_NAME -> print_value (MenhirInterpreter.T T_CATALOGUE_NAME) ()
   | CATALOGUED -> print_value (MenhirInterpreter.T T_CATALOGUED) ()
   | CASSETTE -> print_value (MenhirInterpreter.T T_CASSETTE) ()
+  | CASE_SENSITIVE -> print_value (MenhirInterpreter.T T_CASE_SENSITIVE) ()
+  | CASE_INSENSITIVE -> print_value (MenhirInterpreter.T T_CASE_INSENSITIVE) ()
   | CARD_READER -> print_value (MenhirInterpreter.T T_CARD_READER) ()
   | CARD_PUNCH -> print_value (MenhirInterpreter.T T_CARD_PUNCH) ()
   | CAPACITY -> print_value (MenhirInterpreter.T T_CAPACITY) ()
   | CANCEL_BUTTON -> print_value (MenhirInterpreter.T T_CANCEL_BUTTON) ()
   | CANCEL -> print_value (MenhirInterpreter.T T_CANCEL) ()
+  | CALLED -> print_value (MenhirInterpreter.T T_CALLED) ()
   | CALL -> print_value (MenhirInterpreter.T T_CALL) ()
   | CALENDAR_FONT -> print_value (MenhirInterpreter.T T_CALENDAR_FONT) ()
   | C -> print_value (MenhirInterpreter.T T_C) ()
@@ -5179,12 +5909,16 @@ let print_token = function
   | BUSY -> print_value (MenhirInterpreter.T T_BUSY) ()
   | BULK_ADDITION -> print_value (MenhirInterpreter.T T_BULK_ADDITION) ()
   | BSN -> print_value (MenhirInterpreter.T T_BSN) ()
+  | BROWSING -> print_value (MenhirInterpreter.T T_BROWSING) ()
   | BOXED -> print_value (MenhirInterpreter.T T_BOXED) ()
   | BOX -> print_value (MenhirInterpreter.T T_BOX) ()
   | BOTTOM -> print_value (MenhirInterpreter.T T_BOTTOM) ()
   | BOOLIT v -> print_value (MenhirInterpreter.T T_BOOLIT) v
   | BOOLEAN -> print_value (MenhirInterpreter.T T_BOOLEAN) ()
   | BLOCK -> print_value (MenhirInterpreter.T T_BLOCK) ()
+  | BLOB_LOCATOR -> print_value (MenhirInterpreter.T T_BLOB_LOCATOR) ()
+  | BLOB_FILE -> print_value (MenhirInterpreter.T T_BLOB_FILE) ()
+  | BLOB -> print_value (MenhirInterpreter.T T_BLOB) ()
   | BLINK -> print_value (MenhirInterpreter.T T_BLINK) ()
   | BLANK -> print_value (MenhirInterpreter.T T_BLANK) ()
   | BITS -> print_value (MenhirInterpreter.T T_BITS) ()
@@ -5193,11 +5927,15 @@ let print_token = function
   | BITMAP_TRAILING -> print_value (MenhirInterpreter.T T_BITMAP_TRAILING) ()
   | BITMAP_TIMER -> print_value (MenhirInterpreter.T T_BITMAP_TIMER) ()
   | BITMAP_START -> print_value (MenhirInterpreter.T T_BITMAP_START) ()
+  | BITMAP_SCALE -> print_value (MenhirInterpreter.T T_BITMAP_SCALE) ()
+  | BITMAP_RAW_WIDTH -> print_value (MenhirInterpreter.T T_BITMAP_RAW_WIDTH) ()
+  | BITMAP_RAW_HEIGHT -> print_value (MenhirInterpreter.T T_BITMAP_RAW_HEIGHT) ()
   | BITMAP_NUMBER -> print_value (MenhirInterpreter.T T_BITMAP_NUMBER) ()
   | BITMAP_HANDLE -> print_value (MenhirInterpreter.T T_BITMAP_HANDLE) ()
   | BITMAP_END -> print_value (MenhirInterpreter.T T_BITMAP_END) ()
   | BITMAP -> print_value (MenhirInterpreter.T T_BITMAP) ()
   | BIT -> print_value (MenhirInterpreter.T T_BIT) ()
+  | BIND -> print_value (MenhirInterpreter.T T_BIND) ()
   | BINARY_SHORT -> print_value (MenhirInterpreter.T T_BINARY_SHORT) ()
   | BINARY_SEQUENTIAL -> print_value (MenhirInterpreter.T T_BINARY_SEQUENTIAL) ()
   | BINARY_LONG -> print_value (MenhirInterpreter.T T_BINARY_LONG) ()
@@ -5210,6 +5948,7 @@ let print_token = function
   | BEGINNING -> print_value (MenhirInterpreter.T T_BEGINNING) ()
   | BEFORE -> print_value (MenhirInterpreter.T T_BEFORE) ()
   | BECOMES -> print_value (MenhirInterpreter.T T_BECOMES) ()
+  | BASIS -> print_value (MenhirInterpreter.T T_BASIS) ()
   | BASED -> print_value (MenhirInterpreter.T T_BASED) ()
   | BAR -> print_value (MenhirInterpreter.T T_BAR) ()
   | BACKWARD -> print_value (MenhirInterpreter.T T_BACKWARD) ()
@@ -5217,8 +5956,12 @@ let print_token = function
   | BACKGROUND_LOW -> print_value (MenhirInterpreter.T T_BACKGROUND_LOW) ()
   | BACKGROUND_HIGH -> print_value (MenhirInterpreter.T T_BACKGROUND_HIGH) ()
   | BACKGROUND_COLOR -> print_value (MenhirInterpreter.T T_BACKGROUND_COLOR) ()
+  | AX_EVENT_LIST -> print_value (MenhirInterpreter.T T_AX_EVENT_LIST) ()
   | AWAY_FROM_ZERO -> print_value (MenhirInterpreter.T T_AWAY_FROM_ZERO) ()
   | AUTO_SPIN -> print_value (MenhirInterpreter.T T_AUTO_SPIN) ()
+  | AUTO_RESIZE -> print_value (MenhirInterpreter.T T_AUTO_RESIZE) ()
+  | AUTO_MINIMIZE -> print_value (MenhirInterpreter.T T_AUTO_MINIMIZE) ()
+  | AUTO_HYPHEN_SKIP -> print_value (MenhirInterpreter.T T_AUTO_HYPHEN_SKIP) ()
   | AUTO_DECIMAL -> print_value (MenhirInterpreter.T T_AUTO_DECIMAL) ()
   | AUTOMATIC -> print_value (MenhirInterpreter.T T_AUTOMATIC) ()
   | AUTO -> print_value (MenhirInterpreter.T T_AUTO) ()
@@ -5230,6 +5973,7 @@ let print_token = function
   | AT -> print_value (MenhirInterpreter.T T_AT) ()
   | ASTERISK -> print_value (MenhirInterpreter.T T_ASTERISK) ()
   | ASSIGN -> print_value (MenhirInterpreter.T T_ASSIGN) ()
+  | ASSEMBLY_NAME -> print_value (MenhirInterpreter.T T_ASSEMBLY_NAME) ()
   | ASCII -> print_value (MenhirInterpreter.T T_ASCII) ()
   | ASCENDING -> print_value (MenhirInterpreter.T T_ASCENDING) ()
   | ASA -> print_value (MenhirInterpreter.T T_ASA) ()
@@ -5237,6 +5981,7 @@ let print_token = function
   | ARITHMETIC -> print_value (MenhirInterpreter.T T_ARITHMETIC) ()
   | ARGUMENT_VALUE -> print_value (MenhirInterpreter.T T_ARGUMENT_VALUE) ()
   | ARGUMENT_NUMBER -> print_value (MenhirInterpreter.T T_ARGUMENT_NUMBER) ()
+  | AREA_VALUES -> print_value (MenhirInterpreter.T T_AREA_VALUES) ()
   | AREAS -> print_value (MenhirInterpreter.T T_AREAS) ()
   | AREA -> print_value (MenhirInterpreter.T T_AREA) ()
   | ARE -> print_value (MenhirInterpreter.T T_ARE) ()
@@ -5275,8 +6020,10 @@ let print_token = function
   | ACTIVE_CLASS -> print_value (MenhirInterpreter.T T_ACTIVE_CLASS) ()
   | ACTIVATING -> print_value (MenhirInterpreter.T T_ACTIVATING) ()
   | ACTION -> print_value (MenhirInterpreter.T T_ACTION) ()
+  | ACQUIRE -> print_value (MenhirInterpreter.T T_ACQUIRE) ()
   | ACCESS -> print_value (MenhirInterpreter.T T_ACCESS) ()
   | ACCEPT -> print_value (MenhirInterpreter.T T_ACCEPT) ()
+  | ABSTRACT -> print_value (MenhirInterpreter.T T_ABSTRACT) ()
   | ABSENT -> print_value (MenhirInterpreter.T T_ABSENT) ()
 
 let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : token =
@@ -5288,10 +6035,14 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_YYYYDDD -> YYYYDDD
   | T_Y -> Y
   | T_XOR -> XOR
+  | T_XML_TEXT -> XML_TEXT
   | T_XML_SCHEMA -> XML_SCHEMA
+  | T_XML_NTEXT -> XML_NTEXT
+  | T_XML_EVENT -> XML_EVENT
   | T_XML_DECLARATION -> XML_DECLARATION
   | T_XML -> XML
   | T_X -> X
+  | T_WRITING -> WRITING
   | T_WRITE_VERIFY -> WRITE_VERIFY
   | T_WRITE_ONLY -> WRITE_ONLY
   | T_WRITERS -> WRITERS
@@ -5306,6 +6057,9 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_WINDOW -> WINDOW
   | T_WIDTH_IN_CELLS -> WIDTH_IN_CELLS
   | T_WIDTH -> WIDTH
+  | T_WIDE -> WIDE
+  | T_WHILE -> WHILE
+  | T_WHEN_COMPILED -> WHEN_COMPILED
   | T_WHEN -> WHEN
   | T_WEB_BROWSER -> WEB_BROWSER
   | T_WAIT -> WAIT
@@ -5316,14 +6070,17 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_VPADDING -> VPADDING
   | T_VOLATILE -> VOLATILE
   | T_VLR -> VLR
+  | T_VISIBLE -> VISIBLE
   | T_VIRTUAL_WIDTH -> VIRTUAL_WIDTH
   | T_VIRTUAL -> VIRTUAL
   | T_VIA -> VIA
   | T_VERY_HEAVY -> VERY_HEAVY
   | T_VERTICAL -> VERTICAL
+  | T_VERSION -> VERSION
   | T_VARYING -> VARYING
   | T_VARIANT -> VARIANT
   | T_VARIABLE -> VARIABLE
+  | T_VARBINARY -> VARBINARY
   | T_VALUE_FORMAT -> VALUE_FORMAT
   | T_VALUES -> VALUES
   | T_VALUE -> VALUE
@@ -5338,7 +6095,10 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_USE_TAB -> USE_TAB
   | T_USE_RETURN -> USE_RETURN
   | T_USE_ALT -> USE_ALT
+  | T_USER_WHITE -> USER_WHITE
+  | T_USER_GRAY -> USER_GRAY
   | T_USER_DEFAULT -> USER_DEFAULT
+  | T_USER_COLORS -> USER_COLORS
   | T_USER -> USER
   | T_USE -> USE
   | T_USAGE -> USAGE
@@ -5360,6 +6120,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_UNIVERSAL -> UNIVERSAL
   | T_UNIT -> UNIT
   | T_UNFRAMED -> UNFRAMED
+  | T_UNEQUAL -> UNEQUAL
   | T_UNDERLINE -> UNDERLINE
   | T_UNBOUNDED -> UNBOUNDED
   | T_UFF -> UFF
@@ -5369,31 +6130,50 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_TYPE -> TYPE
   | T_TRUNCATION -> TRUNCATION
   | T_TRUE -> TRUE
+  | T_TRIMMED -> TRIMMED
   | T_TREE_VIEW -> TREE_VIEW
+  | T_TRANSPARENT_COLOR -> TRANSPARENT_COLOR
   | T_TRANSPARENT -> TRANSPARENT
   | T_TRANSFORM -> TRANSFORM
+  | T_TRANSACTION_STATUS -> TRANSACTION_STATUS
+  | T_TRANSACTION -> TRANSACTION
   | T_TRAILING_SIGN -> TRAILING_SIGN
   | T_TRAILING_SHIFT -> TRAILING_SHIFT
   | T_TRAILING -> TRAILING
   | T_TRADITIONAL_FONT -> TRADITIONAL_FONT
+  | T_TRACK_THUMB -> TRACK_THUMB
   | T_TRACK_LIMIT -> TRACK_LIMIT
   | T_TRACK_AREA -> TRACK_AREA
   | T_TRACKS -> TRACKS
   | T_TRACK -> TRACK
+  | T_TRACE -> TRACE
   | T_TOWARD_LESSER -> TOWARD_LESSER
   | T_TOWARD_GREATER -> TOWARD_GREATER
+  | T_TOTALING -> TOTALING
+  | T_TOTALED -> TOTALED
   | T_TOP_LEVEL -> TOP_LEVEL
   | T_TOP -> TOP
+  | T_TOOL_BAR -> TOOL_BAR
   | T_TO -> TO
   | T_TITLE_POSITION -> TITLE_POSITION
+  | T_TITLE_BAR -> TITLE_BAR
   | T_TITLE -> TITLE
+  | T_TIME_RECORD -> TIME_RECORD
   | T_TIME_OUT -> TIME_OUT
+  | T_TIME_OF_DAY -> TIME_OF_DAY
+  | T_TIMESTAMP_RECORD -> TIMESTAMP_RECORD
+  | T_TIMESTAMP_OFFSET_RECORD -> TIMESTAMP_OFFSET_RECORD
+  | T_TIMESTAMP_OFFSET -> TIMESTAMP_OFFSET
+  | T_TIMESTAMP -> TIMESTAMP
   | T_TIMES -> TIMES
   | T_TIME -> TIME
   | T_TILED_HEADINGS -> TILED_HEADINGS
   | T_THUMB_POSITION -> THUMB_POSITION
   | T_THROUGH -> THROUGH
   | T_THREEDIMENSIONAL -> THREEDIMENSIONAL
+  | T_THREAD_POINTER -> THREAD_POINTER
+  | T_THREAD_LOCAL_STORAGE -> THREAD_LOCAL_STORAGE
+  | T_THREAD_LOCAL -> THREAD_LOCAL
   | T_THREADS -> THREADS
   | T_THREAD -> THREAD
   | T_THEN -> THEN
@@ -5413,8 +6193,10 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_TEMP -> TEMP
   | T_TAPE -> TAPE
   | T_TALLYING -> TALLYING
+  | T_TALLY -> TALLY
   | T_TAB_TO_DELETE -> TAB_TO_DELETE
   | T_TAB_TO_ADD -> TAB_TO_ADD
+  | T_TAB_CONTROL -> TAB_CONTROL
   | T_TABLE -> TABLE
   | T_TAB -> TAB
   | T_SYSTEM_OFFSET -> SYSTEM_OFFSET
@@ -5438,16 +6220,20 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_SUPPRESS -> SUPPRESS
   | T_SUPER -> SUPER
   | T_SUM -> SUM
+  | T_SUFFIXING -> SUFFIXING
   | T_SUB_SCHEMA -> SUB_SCHEMA
   | T_SUB_QUEUE_3 -> SUB_QUEUE_3
   | T_SUB_QUEUE_2 -> SUB_QUEUE_2
   | T_SUB_QUEUE_1 -> SUB_QUEUE_1
   | T_SUBWINDOW -> SUBWINDOW
   | T_SUBTRACT -> SUBTRACT
+  | T_SUBFILE -> SUBFILE
   | T_STYLE -> STYLE
   | T_STRUCTURE -> STRUCTURE
+  | T_STRONG_NAME -> STRONG_NAME
   | T_STRONG -> STRONG
   | T_STRING -> STRING
+  | T_STOP_BROWSER -> STOP_BROWSER
   | T_STOP -> STOP
   | T_STEP -> STEP
   | T_STDCALL -> STDCALL
@@ -5460,6 +6246,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_STATEMENT -> STATEMENT
   | T_START_Y -> START_Y
   | T_START_X -> START_X
+  | T_STARTING -> STARTING
   | T_START -> START
   | T_STANDARD_DECIMAL -> STANDARD_DECIMAL
   | T_STANDARD_BINARY -> STANDARD_BINARY
@@ -5469,6 +6256,14 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_STACK -> STACK
   | T_SSF -> SSF
   | T_SQUARE -> SQUARE
+  | T_SQL_ROWID -> SQL_ROWID
+  | T_SQL_NCLOB -> SQL_NCLOB
+  | T_SQL_CURSOR -> SQL_CURSOR
+  | T_SQL_CLOB -> SQL_CLOB
+  | T_SQL_BLOB -> SQL_BLOB
+  | T_SQL_BFILE -> SQL_BFILE
+  | T_SQLIMS -> SQLIMS
+  | T_SQL -> SQL
   | T_SPINNER -> SPINNER
   | T_SPECIAL_NAMES -> SPECIAL_NAMES
   | T_SPACE_FILL -> SPACE_FILL
@@ -5476,11 +6271,21 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_SOURCE_COMPUTER -> SOURCE_COMPUTER
   | T_SOURCES -> SOURCES
   | T_SOURCE -> SOURCE
+  | T_SORT_WORK -> SORT_WORK
+  | T_SORT_RETURN -> SORT_RETURN
   | T_SORT_ORDER -> SORT_ORDER
+  | T_SORT_MODE_SIZE -> SORT_MODE_SIZE
+  | T_SORT_MESSAGE -> SORT_MESSAGE
   | T_SORT_MERGE -> SORT_MERGE
+  | T_SORT_FILE_SIZE -> SORT_FILE_SIZE
+  | T_SORT_CORE_SIZE -> SORT_CORE_SIZE
+  | T_SORT_CONTROL -> SORT_CONTROL
   | T_SORT -> SORT
   | T_SMALL_FONT -> SMALL_FONT
   | T_SLASH -> SLASH
+  | T_SKIP3 -> SKIP3
+  | T_SKIP2 -> SKIP2
+  | T_SKIP1 -> SKIP1
   | T_SIZE -> SIZE
   | T_SINTLIT -> SINTLIT v
   | T_SIGNED_SHORT -> SIGNED_SHORT
@@ -5493,25 +6298,32 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_SHOW_LINES -> SHOW_LINES
   | T_SHORT_DATE -> SHORT_DATE
   | T_SHORT -> SHORT
+  | T_SHIFT_OUT -> SHIFT_OUT
+  | T_SHIFT_IN -> SHIFT_IN
   | T_SHARING -> SHARING
   | T_SHADOW -> SHADOW
   | T_SHADING -> SHADING
   | T_SET -> SET
+  | T_SERVICE -> SERVICE
   | T_SEQUENTIAL -> SEQUENTIAL
   | T_SEQUENCE -> SEQUENCE
   | T_SEPARATION -> SEPARATION
   | T_SEPARATE -> SEPARATE
   | T_SENTENCE -> SENTENCE
   | T_SEND -> SEND
+  | T_SEMAPHORE_POINTER -> SEMAPHORE_POINTER
   | T_SELF_ACT -> SELF_ACT
+  | T_SELFCLASS -> SELFCLASS
   | T_SELF -> SELF
   | T_SELECT_ALL -> SELECT_ALL
+  | T_SELECTIVE -> SELECTIVE
   | T_SELECTION_TEXT -> SELECTION_TEXT
   | T_SELECTION_INDEX -> SELECTION_INDEX
   | T_SELECTION -> SELECTION
   | T_SELECT -> SELECT
   | T_SEGMENT_LIMIT -> SEGMENT_LIMIT
   | T_SEGMENT -> SEGMENT
+  | T_SEEK -> SEEK
   | T_SECURITY -> SECURITY
   | T_SECURE -> SECURE
   | T_SECTION -> SECTION
@@ -5537,8 +6349,10 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_ROW_DIVIDERS -> ROW_DIVIDERS
   | T_ROW_COLOR_PATTERN -> ROW_COLOR_PATTERN
   | T_ROW_COLOR -> ROW_COLOR
+  | T_ROWID -> ROWID
   | T_ROUNDING -> ROUNDING
   | T_ROUNDED -> ROUNDED
+  | T_ROLLING -> ROLLING
   | T_ROLLBACK -> ROLLBACK
   | T_RIMMED -> RIMMED
   | T_RIGHT_JUSTIFY -> RIGHT_JUSTIFY
@@ -5551,12 +6365,18 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_REVERSE_VIDEO -> REVERSE_VIDEO
   | T_REVERSED -> REVERSED
   | T_REVERSE -> REVERSE
+  | T_RETURN_UNSIGNED -> RETURN_UNSIGNED
+  | T_RETURN_CODE -> RETURN_CODE
   | T_RETURNING -> RETURNING
   | T_RETURN -> RETURN
   | T_RETRY -> RETRY
   | T_RETENTION -> RETENTION
   | T_RESUME -> RESUME
+  | T_RESTRICTED -> RESTRICTED
+  | T_RESIZABLE -> RESIZABLE
+  | T_RESIDENT -> RESIDENT
   | T_RESET_TABS -> RESET_TABS
+  | T_RESET_SET_LOCATOR -> RESET_SET_LOCATOR
   | T_RESET_LIST -> RESET_LIST
   | T_RESET_GRID -> RESET_GRID
   | T_RESET -> RESET
@@ -5569,6 +6389,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_REPORTING -> REPORTING
   | T_REPORT -> REPORT
   | T_REPLACING -> REPLACING
+  | T_REPLACED -> REPLACED
   | T_REPLACE -> REPLACE
   | T_REPEATED -> REPEATED
   | T_REORG_CRITERIA -> REORG_CRITERIA
@@ -5576,6 +6397,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_REMOVAL -> REMOVAL
   | T_REMARKS -> REMARKS
   | T_REMAINDER -> REMAINDER
+  | T_RELOAD -> RELOAD
   | T_RELEASE -> RELEASE
   | T_RELATIVE -> RELATIVE
   | T_RELATION -> RELATION
@@ -5584,10 +6406,12 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_REFERENCES -> REFERENCES
   | T_REFERENCE -> REFERENCE
   | T_REEL -> REEL
+  | T_REDEFINITION -> REDEFINITION
   | T_REDEFINES -> REDEFINES
   | T_RECURSIVE -> RECURSIVE
   | T_RECORD_TO_DELETE -> RECORD_TO_DELETE
   | T_RECORD_TO_ADD -> RECORD_TO_ADD
+  | T_RECORD_POSITION -> RECORD_POSITION
   | T_RECORD_OVERFLOW -> RECORD_OVERFLOW
   | T_RECORD_DATA -> RECORD_DATA
   | T_RECORDS -> RECORDS
@@ -5596,9 +6420,12 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_RECEIVED -> RECEIVED
   | T_RECEIVE -> RECEIVE
   | T_READ_ONLY -> READ_ONLY
+  | T_READY -> READY
+  | T_READING -> READING
   | T_READERS -> READERS
   | T_READ -> READ
   | T_RD -> RD
+  | T_RANGE -> RANGE
   | T_RANDOM -> RANDOM
   | T_RAISING -> RAISING
   | T_RAISED -> RAISED
@@ -5610,6 +6437,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_QUERY_INDEX -> QUERY_INDEX
   | T_PUSH_BUTTON -> PUSH_BUTTON
   | T_PURGE -> PURGE
+  | T_PUBLIC -> PUBLIC
   | T_PROTOTYPE -> PROTOTYPE
   | T_PROTECTED -> PROTECTED
   | T_PROPERTY -> PROPERTY
@@ -5622,13 +6450,18 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_PROGRAM -> PROGRAM
   | T_PROCESS_AREA -> PROCESS_AREA
   | T_PROCESSING -> PROCESSING
+  | T_PROCESS -> PROCESS
   | T_PROCEED -> PROCEED
   | T_PROCEDURE_POINTER -> PROCEDURE_POINTER
+  | T_PROCEDURE_NAME -> PROCEDURE_NAME
   | T_PROCEDURES -> PROCEDURES
   | T_PROCEDURE -> PROCEDURE
+  | T_PRIVATE -> PRIVATE
   | T_PRIORITY -> PRIORITY
+  | T_PRIOR -> PRIOR
   | T_PRINT_PREVIEW -> PRINT_PREVIEW
   | T_PRINT_NO_PROMPT -> PRINT_NO_PROMPT
+  | T_PRINT_CONTROL -> PRINT_CONTROL
   | T_PRINTING -> PRINTING
   | T_PRINTER_1 -> PRINTER_1
   | T_PRINTER -> PRINTER
@@ -5636,12 +6469,15 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_PRIMARY -> PRIMARY
   | T_PREVIOUS -> PREVIOUS
   | T_PRESENT -> PRESENT
+  | T_PREFIXING -> PREFIXING
   | T_PREFIXED -> PREFIXED
   | T_POSITIVE -> POSITIVE
   | T_POSITION_SHIFT -> POSITION_SHIFT
+  | T_POSITIONING -> POSITIONING
   | T_POSITION -> POSITION
   | T_POS -> POS
   | T_POP_UP -> POP_UP
+  | T_POINTER_32 -> POINTER_32
   | T_POINTER -> POINTER
   | T_PLUS_SIGN -> PLUS_SIGN
   | T_PLUS -> PLUS
@@ -5660,19 +6496,27 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_PARSE -> PARSE
   | T_PARENT -> PARENT
   | T_PARAGRAPH -> PARAGRAPH
+  | T_PANEL_WIDTHS -> PANEL_WIDTHS
+  | T_PANEL_TEXT -> PANEL_TEXT
+  | T_PANEL_STYLE -> PANEL_STYLE
+  | T_PANEL_INDEX -> PANEL_INDEX
+  | T_PAGE_SIZE -> PAGE_SIZE
   | T_PAGE_SETUP -> PAGE_SETUP
   | T_PAGE_COUNTER -> PAGE_COUNTER
   | T_PAGED -> PAGED
   | T_PAGE -> PAGE
   | T_PADDING -> PADDING
   | T_PACKED_DECIMAL -> PACKED_DECIMAL
+  | T_O_FILL -> O_FILL
   | T_OVERRIDING -> OVERRIDING
   | T_OVERRIDE -> OVERRIDE
   | T_OVERLINE -> OVERLINE
   | T_OVERLAP_TOP -> OVERLAP_TOP
   | T_OVERLAP_LEFT -> OVERLAP_LEFT
+  | T_OVERLAPPED -> OVERLAPPED
   | T_OVERFLOW -> OVERFLOW
   | T_OUTPUT -> OUTPUT
+  | T_OTHERWISE -> OTHERWISE
   | T_OTHERS -> OTHERS
   | T_OTHER -> OTHER
   | T_ORGANIZATION -> ORGANIZATION
@@ -5682,6 +6526,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_OPTIONAL -> OPTIONAL
   | T_OPERATIONAL -> OPERATIONAL
   | T_OPEN -> OPEN
+  | T_OOSTACKPTR -> OOSTACKPTR
   | T_ON_SIZE_ERROR -> ON_SIZE_ERROR
   | T_ON_OVERFLOW -> ON_OVERFLOW
   | T_ON_EXCEPTION -> ON_EXCEPTION
@@ -5692,12 +6537,16 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_OFF -> OFF
   | T_OF -> OF
   | T_OCCURS -> OCCURS
+  | T_OBJECT_STORAGE -> OBJECT_STORAGE
   | T_OBJECT_REFERENCE -> OBJECT_REFERENCE
   | T_OBJECT_PROGRAM -> OBJECT_PROGRAM
+  | T_OBJECT_ID -> OBJECT_ID
   | T_OBJECT_COMPUTER -> OBJECT_COMPUTER
   | T_OBJECT -> OBJECT
+  | T_NUM_ROW_HEADINGS -> NUM_ROW_HEADINGS
   | T_NUM_ROWS -> NUM_ROWS
   | T_NUM_COL_HEADINGS -> NUM_COL_HEADINGS
+  | T_NUMERIC_FILL -> NUMERIC_FILL
   | T_NUMERIC_EDITED -> NUMERIC_EDITED
   | T_NUMERIC -> NUMERIC
   | T_NUMBERS -> NUMBERS
@@ -5706,6 +6555,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NULLIT -> NULLIT v
   | T_NULL -> NULL
   | T_NO_UPDOWN -> NO_UPDOWN
+  | T_NO_TAB -> NO_TAB
   | T_NO_SEARCH -> NO_SEARCH
   | T_NO_KEY_LETTER -> NO_KEY_LETTER
   | T_NO_GROUP_TAB -> NO_GROUP_TAB
@@ -5714,6 +6564,8 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NO_ECHO -> NO_ECHO
   | T_NO_DIVIDERS -> NO_DIVIDERS
   | T_NO_DATA -> NO_DATA
+  | T_NO_CLOSE -> NO_CLOSE
+  | T_NO_CELL_DRAG -> NO_CELL_DRAG
   | T_NO_BOX -> NO_BOX
   | T_NO_AUTO_DEFAULT -> NO_AUTO_DEFAULT
   | T_NO_AUTOSEL -> NO_AUTOSEL
@@ -5728,6 +6580,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NOTIFY_CHANGE -> NOTIFY_CHANGE
   | T_NOTIFY -> NOTIFY
   | T_NOTHING -> NOTHING
+  | T_NOTE -> NOTE
   | T_NOTAB -> NOTAB
   | T_NOT -> NOT
   | T_NORMAL -> NORMAL
@@ -5739,6 +6592,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NEXT_ITEM -> NEXT_ITEM
   | T_NEXT -> NEXT
   | T_NEW -> NEW
+  | T_NET_EVENT_LIST -> NET_EVENT_LIST
   | T_NESTED -> NESTED
   | T_NEGATIVE -> NEGATIVE
   | T_NEAREST_TO_ZERO -> NEAREST_TO_ZERO
@@ -5746,6 +6600,8 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NEAREST_EVEN -> NEAREST_EVEN
   | T_NEAREST_AWAY_FROM_ZERO -> NEAREST_AWAY_FROM_ZERO
   | T_NE -> NE
+  | T_NCLOB -> NCLOB
+  | T_NCHAR -> NCHAR
   | T_NAVIGATE_URL -> NAVIGATE_URL
   | T_NATLIT -> NATLIT v
   | T_NATIVE -> NATIVE
@@ -5756,28 +6612,48 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_NAMESPACE -> NAMESPACE
   | T_NAMED -> NAMED
   | T_NAME -> NAME
+  | T_MUTEX_POINTER -> MUTEX_POINTER
   | T_MULTIPLY -> MULTIPLY
   | T_MULTIPLE -> MULTIPLE
   | T_MULTILINE -> MULTILINE
   | T_MOVE -> MOVE
+  | T_MORE_LABELS -> MORE_LABELS
+  | T_MONITOR_POINTER -> MONITOR_POINTER
   | T_MODULES -> MODULES
+  | T_MODULE -> MODULE
   | T_MODIFY -> MODIFY
+  | T_MODIFIED -> MODIFIED
+  | T_MODELESS -> MODELESS
   | T_MODE -> MODE
+  | T_MODAL -> MODAL
+  | T_MIN_WIDTH -> MIN_WIDTH
+  | T_MIN_VALUE -> MIN_VALUE
   | T_MIN_VAL -> MIN_VAL
+  | T_MIN_SIZE -> MIN_SIZE
+  | T_MIN_LINES -> MIN_LINES
+  | T_MIN_HEIGHT -> MIN_HEIGHT
   | T_MINUS -> MINUS
   | T_MICROSECOND_TIME -> MICROSECOND_TIME
   | T_METHOD_ID -> METHOD_ID
   | T_METHOD -> METHOD
+  | T_META_CLASS -> META_CLASS
   | T_MESSAGE_TAG -> MESSAGE_TAG
+  | T_MESSAGES -> MESSAGES
   | T_MESSAGE -> MESSAGE
   | T_MERGE -> MERGE
   | T_MENU -> MENU
   | T_MEMORY -> MEMORY
   | T_MEDIUM_FONT -> MEDIUM_FONT
+  | T_MDI_FRAME -> MDI_FRAME
+  | T_MDI_CHILD -> MDI_CHILD
+  | T_MAX_WIDTH -> MAX_WIDTH
+  | T_MAX_VALUE -> MAX_VALUE
   | T_MAX_VAL -> MAX_VAL
   | T_MAX_TEXT -> MAX_TEXT
+  | T_MAX_SIZE -> MAX_SIZE
   | T_MAX_PROGRESS -> MAX_PROGRESS
   | T_MAX_LINES -> MAX_LINES
+  | T_MAX_HEIGHT -> MAX_HEIGHT
   | T_MASTER_INDEX -> MASTER_INDEX
   | T_MASS_UPDATE -> MASS_UPDATE
   | T_MANUAL -> MANUAL
@@ -5787,8 +6663,12 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_LOW_VALUE -> LOW_VALUE
   | T_LOW_COLOR -> LOW_COLOR
   | T_LOWLIGHT -> LOWLIGHT
+  | T_LOWEST_VALUE -> LOWEST_VALUE
   | T_LOWERED -> LOWERED
   | T_LOWER -> LOWER
+  | T_LOW -> LOW
+  | T_LONG_VARCHAR -> LONG_VARCHAR
+  | T_LONG_VARBINARY -> LONG_VARBINARY
   | T_LONG_DATE -> LONG_DATE
   | T_LOCK_HOLDING -> LOCK_HOLDING
   | T_LOCKS -> LOCKS
@@ -5800,6 +6680,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_LM_RESIZE -> LM_RESIZE
   | T_LIST_BOX -> LIST_BOX
   | T_LINKAGE -> LINKAGE
+  | T_LINK -> LINK
   | T_LINE_SEQUENTIAL -> LINE_SEQUENTIAL
   | T_LINE_COUNTER -> LINE_COUNTER
   | T_LINES_PER_PAGE -> LINES_PER_PAGE
@@ -5808,6 +6689,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_LINE -> LINE
   | T_LINAGE_COUNTER -> LINAGE_COUNTER
   | T_LINAGE -> LINAGE
+  | T_LIN -> LIN
   | T_LIMITS -> LIMITS
   | T_LIMIT -> LIMIT
   | T_LIKE -> LIKE
@@ -5842,8 +6724,15 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_KEYBOARD -> KEYBOARD
   | T_KEY -> KEY
   | T_KEPT -> KEPT
+  | T_KANJI -> KANJI
   | T_JUSTIFIED -> JUSTIFIED
+  | T_JSON_STATUS -> JSON_STATUS
+  | T_JSON_CODE -> JSON_CODE
   | T_JSON -> JSON
+  | T_JOINING -> JOINING
+  | T_JNIENVPTR -> JNIENVPTR
+  | T_JAVA -> JAVA
+  | T_JAPANESE -> JAPANESE
   | T_I_O_CONTROL -> I_O_CONTROL
   | T_I_O -> I_O
   | T_ITEM_VALUE -> ITEM_VALUE
@@ -5851,6 +6740,8 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_ITEM_TO_DELETE -> ITEM_TO_DELETE
   | T_ITEM_TO_ADD -> ITEM_TO_ADD
   | T_ITEM_TEXT -> ITEM_TEXT
+  | T_ITEM_ID -> ITEM_ID
+  | T_ITEM_BOLD -> ITEM_BOLD
   | T_ITEM -> ITEM
   | T_IS_TYPEDEF -> IS_TYPEDEF
   | T_IS_GLOBAL -> IS_GLOBAL
@@ -5858,29 +6749,38 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_IS -> IS
   | T_IN_ARITHMETIC_RANGE -> IN_ARITHMETIC_RANGE
   | T_INVOKING -> INVOKING
+  | T_INVOKED -> INVOKED
   | T_INVOKE -> INVOKE
   | T_INVALID_KEY -> INVALID_KEY
   | T_INVALID -> INVALID
   | T_INTRINSIC -> INTRINSIC
   | T_INTO -> INTO
   | T_INTERVENING_ -> INTERVENING_ v
+  | T_INTERVAL_TIMER -> INTERVAL_TIMER
   | T_INTERMEDIATE -> INTERMEDIATE
   | T_INTERFACE_ID -> INTERFACE_ID
   | T_INTERFACE -> INTERFACE
+  | T_INSTANCE -> INSTANCE
   | T_INSTALLATION -> INSTALLATION
   | T_INSPECT -> INSPECT
   | T_INSERT_ROWS -> INSERT_ROWS
   | T_INSERTION_INDEX -> INSERTION_INDEX
+  | T_INSERT -> INSERT
   | T_INQUIRE -> INQUIRE
   | T_INPUT_OUTPUT -> INPUT_OUTPUT
   | T_INPUT -> INPUT
   | T_INITIATE -> INITIATE
+  | T_INITIAL_VALUE -> INITIAL_VALUE
   | T_INITIALIZED -> INITIALIZED
   | T_INITIALIZE -> INITIALIZE
   | T_INITIAL -> INITIAL
   | T_INHERITS -> INHERITS
+  | T_INHERITING -> INHERITING
   | T_INFO_WORD -> INFO_WORD v
+  | T_INDICATORS -> INDICATORS
+  | T_INDICATOR -> INDICATOR
   | T_INDICATE -> INDICATE
+  | T_INDIC -> INDIC
   | T_INDEX_2 -> INDEX_2
   | T_INDEX_1 -> INDEX_1
   | T_INDEXED -> INDEXED
@@ -5888,6 +6788,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_INDEPENDENT -> INDEPENDENT
   | T_IN -> IN
   | T_IMPLEMENTS -> IMPLEMENTS
+  | T_IMP -> IMP
   | T_IGNORING -> IGNORING
   | T_IGNORE -> IGNORE
   | T_IF -> IF
@@ -5899,15 +6800,20 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_HSCROLL_POS -> HSCROLL_POS
   | T_HSCROLL -> HSCROLL
   | T_HOT_TRACK -> HOT_TRACK
+  | T_HORIZONTAL -> HORIZONTAL
   | T_HIGH_VALUE -> HIGH_VALUE
   | T_HIGH_ORDER_RIGHT -> HIGH_ORDER_RIGHT
   | T_HIGH_ORDER_LEFT -> HIGH_ORDER_LEFT
   | T_HIGH_COLOR -> HIGH_COLOR
   | T_HIGHLIGHT -> HIGHLIGHT
+  | T_HIGHEST_VALUE -> HIGHEST_VALUE
+  | T_HIGH -> HIGH
   | T_HIDDEN_DATA -> HIDDEN_DATA
   | T_HEXLIT -> HEXLIT v
   | T_HEX -> HEX
+  | T_HELP_ID -> HELP_ID
   | T_HEIGHT_IN_CELLS -> HEIGHT_IN_CELLS
+  | T_HEIGHT -> HEIGHT
   | T_HEAVY -> HEAVY
   | T_HEADING_FONT -> HEADING_FONT
   | T_HEADING_DIVIDER_COLOR -> HEADING_DIVIDER_COLOR
@@ -5919,6 +6825,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_GROUP_VALUE -> GROUP_VALUE
   | T_GROUP_USAGE -> GROUP_USAGE
   | T_GROUP -> GROUP
+  | T_GRIP -> GRIP
   | T_GRID -> GRID
   | T_GREATER -> GREATER
   | T_GRAPHICAL -> GRAPHICAL
@@ -5981,7 +6888,9 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_FILL_COLOR2 -> FILL_COLOR2
   | T_FILL_COLOR -> FILL_COLOR
   | T_FILLER -> FILLER
+  | T_FILE_PREFIX -> FILE_PREFIX
   | T_FILE_POS -> FILE_POS
+  | T_FILE_PATH -> FILE_PATH
   | T_FILE_NAME -> FILE_NAME
   | T_FILE_LIMITS -> FILE_LIMITS
   | T_FILE_LIMIT -> FILE_LIMIT
@@ -5989,6 +6898,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_FILE_CONTROL -> FILE_CONTROL
   | T_FILES -> FILES
   | T_FILE -> FILE
+  | T_FIELD_TERMINATOR -> FIELD_TERMINATOR
   | T_FH__KEYDEF -> FH__KEYDEF
   | T_FH__FCD -> FH__FCD
   | T_FD -> FD
@@ -5997,6 +6907,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_FACTORY -> FACTORY
   | T_F -> F
   | T_EXTERNAL_FORM -> EXTERNAL_FORM
+  | T_EXTERNALLY_DESCRIBED_KEY -> EXTERNALLY_DESCRIBED_KEY
   | T_EXTERNAL -> EXTERNAL
   | T_EXTERN -> EXTERN
   | T_EXTENDED_SEARCH -> EXTENDED_SEARCH
@@ -6005,13 +6916,19 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_EXPAND -> EXPAND
   | T_EXIT -> EXIT
   | T_EXHIBIT -> EXHIBIT
+  | T_EXECUTE -> EXECUTE
+  | T_EXEC -> EXEC
   | T_EXCLUSIVE_OR -> EXCLUSIVE_OR
   | T_EXCLUSIVE -> EXCLUSIVE
+  | T_EXCLUDE_EVENT_LIST -> EXCLUDE_EVENT_LIST
+  | T_EXCESS_3 -> EXCESS_3
   | T_EXCEPTION_VALUE -> EXCEPTION_VALUE
   | T_EXCEPTION_OBJECT -> EXCEPTION_OBJECT
   | T_EXCEPTION -> EXCEPTION
+  | T_EXCEEDS -> EXCEEDS
   | T_EXAMINE -> EXAMINE
   | T_EVERY -> EVERY
+  | T_EVENT_POINTER -> EVENT_POINTER
   | T_EVENT_LIST -> EVENT_LIST
   | T_EVENT -> EVENT
   | T_EVALUATE -> EVALUATE
@@ -6039,26 +6956,37 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_ENGRAVED -> ENGRAVED
   | T_END_XML -> END_XML
   | T_END_WRITE -> END_WRITE
+  | T_END_WAIT -> END_WAIT
+  | T_END_USE -> END_USE
   | T_END_UNSTRING -> END_UNSTRING
   | T_END_SUBTRACT -> END_SUBTRACT
   | T_END_STRING -> END_STRING
   | T_END_START -> END_START
+  | T_END_SET -> END_SET
   | T_END_SEND -> END_SEND
   | T_END_SEARCH -> END_SEARCH
   | T_END_REWRITE -> END_REWRITE
   | T_END_RETURN -> END_RETURN
+  | T_END_REPLACE -> END_REPLACE
   | T_END_RECEIVE -> END_RECEIVE
   | T_END_READ -> END_READ
   | T_END_PERFORM -> END_PERFORM
+  | T_END_ON -> END_ON
   | T_END_OF_PAGE -> END_OF_PAGE
   | T_END_MULTIPLY -> END_MULTIPLY
+  | T_END_MOVE -> END_MOVE
   | T_END_MODIFY -> END_MODIFY
   | T_END_JSON -> END_JSON
+  | T_END_INVOKE -> END_INVOKE
   | T_END_IF -> END_IF
+  | T_END_EXEC -> END_EXEC
   | T_END_EVALUATE -> END_EVALUATE
+  | T_END_ENABLE -> END_ENABLE
   | T_END_DIVIDE -> END_DIVIDE
   | T_END_DISPLAY -> END_DISPLAY
+  | T_END_DISABLE -> END_DISABLE
   | T_END_DELETE -> END_DELETE
+  | T_END_COPY -> END_COPY
   | T_END_COMPUTE -> END_COMPUTE
   | T_END_COLOR -> END_COLOR
   | T_END_CHAIN -> END_CHAIN
@@ -6069,12 +6997,16 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_END -> END
   | T_ENCRYPTION -> ENCRYPTION
   | T_ENCODING -> ENCODING
+  | T_ENABLED -> ENABLED
   | T_ENABLE -> ENABLE
   | T_EMI -> EMI
   | T_ELSE -> ELSE
   | T_ELEMENT -> ELEMENT
+  | T_EJECT -> EJECT
   | T_EIGHTY_EIGHT -> EIGHTY_EIGHT
   | T_EGI -> EGI
+  | T_EGCS -> EGCS
+  | T_EGC -> EGC
   | T_EDITING -> EDITING
   | T_ECHO -> ECHO
   | T_EC -> EC
@@ -6083,17 +7015,21 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_DUPLICATES -> DUPLICATES
   | T_DROP_LIST -> DROP_LIST
   | T_DROP_DOWN -> DROP_DOWN
+  | T_DROP -> DROP
+  | T_DRAW -> DRAW
   | T_DRAG_COLOR -> DRAG_COLOR
   | T_DOWN -> DOWN
   | T_DOUBLE_COLON -> DOUBLE_COLON
   | T_DOUBLE_ASTERISK -> DOUBLE_ASTERISK
   | T_DOUBLE -> DOUBLE
+  | T_DOT_DASH -> DOT_DASH
   | T_DOTTED -> DOTTED
   | T_DOTDASH -> DOTDASH
   | T_DIVISION -> DIVISION
   | T_DIVIDER_COLOR -> DIVIDER_COLOR
   | T_DIVIDERS -> DIVIDERS
   | T_DIVIDE -> DIVIDE
+  | T_DISPLAY_ST -> DISPLAY_ST
   | T_DISPLAY_FORMAT -> DISPLAY_FORMAT
   | T_DISPLAY_COLUMNS -> DISPLAY_COLUMNS
   | T_DISPLAY_4 -> DISPLAY_4
@@ -6103,6 +7039,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_DISPLAY -> DISPLAY
   | T_DISP -> DISP
   | T_DISK -> DISK
+  | T_DISJOINING -> DISJOINING
   | T_DISCONNECT -> DISCONNECT
   | T_DISC -> DISC
   | T_DISABLE -> DISABLE
@@ -6110,6 +7047,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_DETAIL -> DETAIL
   | T_DESTROY -> DESTROY
   | T_DESTINATION -> DESTINATION
+  | T_DESCRIPTOR -> DESCRIPTOR
   | T_DESCENDING -> DESCENDING
   | T_DEPENDING -> DEPENDING
   | T_DELIMITER -> DELIMITER
@@ -6119,6 +7057,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_DEFAULT_FONT -> DEFAULT_FONT
   | T_DEFAULT_BUTTON -> DEFAULT_BUTTON
   | T_DEFAULT -> DEFAULT
+  | T_DECLARE -> DECLARE
   | T_DECLARATIVES -> DECLARATIVES
   | T_DECIMAL_POINT -> DECIMAL_POINT
   | T_DECIMAL_ENCODING -> DECIMAL_ENCODING
@@ -6130,12 +7069,20 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_DEBUG_ITEM -> DEBUG_ITEM
   | T_DEBUG_CONTENTS -> DEBUG_CONTENTS
   | T_DEBUGGING -> DEBUGGING
+  | T_DEBUG -> DEBUG
+  | T_DBCS -> DBCS
+  | T_DBCLOB_LOCATOR -> DBCLOB_LOCATOR
+  | T_DBCLOB_FILE -> DBCLOB_FILE
+  | T_DBCLOB -> DBCLOB
   | T_DAY_OF_WEEK -> DAY_OF_WEEK
+  | T_DAY_AND_TIME -> DAY_AND_TIME
   | T_DAY -> DAY
   | T_DATE_WRITTEN -> DATE_WRITTEN
+  | T_DATE_RECORD -> DATE_RECORD
   | T_DATE_MODIFIED -> DATE_MODIFIED
   | T_DATE_ENTRY -> DATE_ENTRY
   | T_DATE_COMPILED -> DATE_COMPILED
+  | T_DATE_AND_TIME -> DATE_AND_TIME
   | T_DATE -> DATE
   | T_DATA_TYPES -> DATA_TYPES
   | T_DATA_RECORDS -> DATA_RECORDS
@@ -6156,25 +7103,38 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_CURSOR_COLOR -> CURSOR_COLOR
   | T_CURSOR_COL -> CURSOR_COL
   | T_CURSOR -> CURSOR
+  | T_CURRENT_DATE -> CURRENT_DATE
   | T_CURRENT -> CURRENT
   | T_CURRENCY -> CURRENCY
+  | T_CULTURE -> CULTURE
   | T_CS_GENERAL -> CS_GENERAL
   | T_CS_BASIC -> CS_BASIC
+  | T_CSP -> CSP
   | T_CSIZE -> CSIZE
   | T_CRT_UNDER -> CRT_UNDER
   | T_CRT -> CRT
+  | T_CREATE -> CREATE
+  | T_COUNT_TRAILING -> COUNT_TRAILING
+  | T_COUNT_MIN -> COUNT_MIN
+  | T_COUNT_MAX -> COUNT_MAX
+  | T_COUNT_LEADLING -> COUNT_LEADLING
   | T_COUNT -> COUNT
   | T_CORRESPONDING -> CORRESPONDING
   | T_CORE_INDEX -> CORE_INDEX
   | T_COPY_SELECTION -> COPY_SELECTION
   | T_COPY -> COPY
   | T_CONVERTING -> CONVERTING
+  | T_CONVERT -> CONVERT
   | T_CONVERSION -> CONVERSION
+  | T_CONTROL_AREA -> CONTROL_AREA
+  | T_CONTROLS_UNCROPPED -> CONTROLS_UNCROPPED
   | T_CONTROLS -> CONTROLS
   | T_CONTROL -> CONTROL
   | T_CONTINUE -> CONTINUE
+  | T_CONTENT_OF -> CONTENT_OF
   | T_CONTENT -> CONTENT
   | T_CONTAINS -> CONTAINS
+  | T_CONSTRUCTOR -> CONSTRUCTOR
   | T_CONSTANT_RECORD -> CONSTANT_RECORD
   | T_CONSTANT -> CONSTANT
   | T_CONSOLE_3 -> CONSOLE_3
@@ -6184,6 +7144,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_CONNECT -> CONNECT
   | T_CONFIGURATION -> CONFIGURATION
   | T_CONDITION -> CONDITION
+  | T_COM_REG -> COM_REG
   | T_COMP_X -> COMP_X
   | T_COMP_N -> COMP_N
   | T_COMP_9 -> COMP_9
@@ -6207,11 +7168,13 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_COMPUTATIONAL_13 -> COMPUTATIONAL_13
   | T_COMPUTATIONAL_12 -> COMPUTATIONAL_12
   | T_COMPUTATIONAL_11 -> COMPUTATIONAL_11
+  | T_COMPRESSION -> COMPRESSION
   | T_COMPLEMENTARY -> COMPLEMENTARY
   | T_COMPLE -> COMPLE
   | T_COMP -> COMP
   | T_COMMUNICATION -> COMMUNICATION
   | T_COMMON -> COMMON
+  | T_COMMITMENT -> COMMITMENT
   | T_COMMIT -> COMMIT
   | T_COMMENT_ENTRY -> COMMENT_ENTRY v
   | T_COMMAND_LINE -> COMMAND_LINE
@@ -6229,27 +7192,39 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_COLON -> COLON
   | T_COLLATING -> COLLATING
   | T_COL -> COL
+  | T_COERCION -> COERCION
   | T_CODE_SET -> CODE_SET
   | T_CODE -> CODE
   | T_COBOL -> COBOL
   | T_CLOSE -> CLOSE
   | T_CLOCK_UNITS -> CLOCK_UNITS
+  | T_CLOB_LOCATOR -> CLOB_LOCATOR
+  | T_CLOB_FILE -> CLOB_FILE
+  | T_CLOB -> CLOB
   | T_CLINES -> CLINES
   | T_CLINE -> CLINE
   | T_CLEAR_SELECTION -> CLEAR_SELECTION
+  | T_CLASS_OBJECT -> CLASS_OBJECT
+  | T_CLASS_NAME -> CLASS_NAME
   | T_CLASS_ID -> CLASS_ID
+  | T_CLASS_CONTROL -> CLASS_CONTROL
   | T_CLASSIFICATION -> CLASSIFICATION
   | T_CLASS -> CLASS
+  | T_CICS -> CICS
   | T_CHECK_BOX -> CHECK_BOX
   | T_CHECKPOINT_FILE -> CHECKPOINT_FILE
   | T_CHECK -> CHECK
+  | T_CHAR_VARYING -> CHAR_VARYING
+  | T_CHART -> CHART
   | T_CHARACTERS -> CHARACTERS
   | T_CHARACTER -> CHARACTER
+  | T_CHAR -> CHAR
   | T_CHANGED -> CHANGED
   | T_CHAINING -> CHAINING
   | T_CHAIN -> CHAIN
   | T_CH -> CH
   | T_CF -> CF
+  | T_CENTURY_DAY -> CENTURY_DAY
   | T_CENTURY_DATE -> CENTURY_DATE
   | T_CENTERED_HEADINGS -> CENTERED_HEADINGS
   | T_CENTERED -> CENTERED
@@ -6261,14 +7236,18 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_CELL -> CELL
   | T_CD -> CD
   | T_CCOL -> CCOL
+  | T_CBL -> CBL
   | T_CATALOGUE_NAME -> CATALOGUE_NAME
   | T_CATALOGUED -> CATALOGUED
   | T_CASSETTE -> CASSETTE
+  | T_CASE_SENSITIVE -> CASE_SENSITIVE
+  | T_CASE_INSENSITIVE -> CASE_INSENSITIVE
   | T_CARD_READER -> CARD_READER
   | T_CARD_PUNCH -> CARD_PUNCH
   | T_CAPACITY -> CAPACITY
   | T_CANCEL_BUTTON -> CANCEL_BUTTON
   | T_CANCEL -> CANCEL
+  | T_CALLED -> CALLED
   | T_CALL -> CALL
   | T_CALENDAR_FONT -> CALENDAR_FONT
   | T_C -> C
@@ -6289,12 +7268,16 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_BUSY -> BUSY
   | T_BULK_ADDITION -> BULK_ADDITION
   | T_BSN -> BSN
+  | T_BROWSING -> BROWSING
   | T_BOXED -> BOXED
   | T_BOX -> BOX
   | T_BOTTOM -> BOTTOM
   | T_BOOLIT -> BOOLIT v
   | T_BOOLEAN -> BOOLEAN
   | T_BLOCK -> BLOCK
+  | T_BLOB_LOCATOR -> BLOB_LOCATOR
+  | T_BLOB_FILE -> BLOB_FILE
+  | T_BLOB -> BLOB
   | T_BLINK -> BLINK
   | T_BLANK -> BLANK
   | T_BITS -> BITS
@@ -6303,11 +7286,15 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_BITMAP_TRAILING -> BITMAP_TRAILING
   | T_BITMAP_TIMER -> BITMAP_TIMER
   | T_BITMAP_START -> BITMAP_START
+  | T_BITMAP_SCALE -> BITMAP_SCALE
+  | T_BITMAP_RAW_WIDTH -> BITMAP_RAW_WIDTH
+  | T_BITMAP_RAW_HEIGHT -> BITMAP_RAW_HEIGHT
   | T_BITMAP_NUMBER -> BITMAP_NUMBER
   | T_BITMAP_HANDLE -> BITMAP_HANDLE
   | T_BITMAP_END -> BITMAP_END
   | T_BITMAP -> BITMAP
   | T_BIT -> BIT
+  | T_BIND -> BIND
   | T_BINARY_SHORT -> BINARY_SHORT
   | T_BINARY_SEQUENTIAL -> BINARY_SEQUENTIAL
   | T_BINARY_LONG -> BINARY_LONG
@@ -6320,6 +7307,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_BEGINNING -> BEGINNING
   | T_BEFORE -> BEFORE
   | T_BECOMES -> BECOMES
+  | T_BASIS -> BASIS
   | T_BASED -> BASED
   | T_BAR -> BAR
   | T_BACKWARD -> BACKWARD
@@ -6327,8 +7315,12 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_BACKGROUND_LOW -> BACKGROUND_LOW
   | T_BACKGROUND_HIGH -> BACKGROUND_HIGH
   | T_BACKGROUND_COLOR -> BACKGROUND_COLOR
+  | T_AX_EVENT_LIST -> AX_EVENT_LIST
   | T_AWAY_FROM_ZERO -> AWAY_FROM_ZERO
   | T_AUTO_SPIN -> AUTO_SPIN
+  | T_AUTO_RESIZE -> AUTO_RESIZE
+  | T_AUTO_MINIMIZE -> AUTO_MINIMIZE
+  | T_AUTO_HYPHEN_SKIP -> AUTO_HYPHEN_SKIP
   | T_AUTO_DECIMAL -> AUTO_DECIMAL
   | T_AUTOMATIC -> AUTOMATIC
   | T_AUTO -> AUTO
@@ -6340,6 +7332,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_AT -> AT
   | T_ASTERISK -> ASTERISK
   | T_ASSIGN -> ASSIGN
+  | T_ASSEMBLY_NAME -> ASSEMBLY_NAME
   | T_ASCII -> ASCII
   | T_ASCENDING -> ASCENDING
   | T_ASA -> ASA
@@ -6347,6 +7340,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_ARITHMETIC -> ARITHMETIC
   | T_ARGUMENT_VALUE -> ARGUMENT_VALUE
   | T_ARGUMENT_NUMBER -> ARGUMENT_NUMBER
+  | T_AREA_VALUES -> AREA_VALUES
   | T_AREAS -> AREAS
   | T_AREA -> AREA
   | T_ARE -> ARE
@@ -6385,6 +7379,8 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_ACTIVE_CLASS -> ACTIVE_CLASS
   | T_ACTIVATING -> ACTIVATING
   | T_ACTION -> ACTION
+  | T_ACQUIRE -> ACQUIRE
   | T_ACCESS -> ACCESS
   | T_ACCEPT -> ACCEPT
+  | T_ABSTRACT -> ABSTRACT
   | T_ABSENT -> ABSENT

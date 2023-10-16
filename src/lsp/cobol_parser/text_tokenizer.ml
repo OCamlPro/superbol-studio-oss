@@ -304,11 +304,12 @@ module Make (Config: Cobol_config.T) = struct
   let amnesic = Amnesic
   let eidetic = Eidetic []
   let init memory ~context_sensitive_tokens =
+    init_text_lexer ~context_sensitive_tokens;
     {
       expect_picture_string = false;
       leftover_tokens = [];
       memory;
-      diags = init_text_lexer ~context_sensitive_tokens;
+      diags = DIAGS.Set.none;
       lexing_options = Text_lexer.default_lexing_options;
     }
 

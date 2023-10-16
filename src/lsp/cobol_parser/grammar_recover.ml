@@ -46,10 +46,14 @@ module Default = struct
     | MenhirInterpreter.T T_YYYYDDD -> ()
     | MenhirInterpreter.T T_Y -> ()
     | MenhirInterpreter.T T_XOR -> ()
+    | MenhirInterpreter.T T_XML_TEXT -> ()
     | MenhirInterpreter.T T_XML_SCHEMA -> ()
+    | MenhirInterpreter.T T_XML_NTEXT -> ()
+    | MenhirInterpreter.T T_XML_EVENT -> ()
     | MenhirInterpreter.T T_XML_DECLARATION -> ()
     | MenhirInterpreter.T T_XML -> ()
     | MenhirInterpreter.T T_X -> ()
+    | MenhirInterpreter.T T_WRITING -> ()
     | MenhirInterpreter.T T_WRITE_VERIFY -> ()
     | MenhirInterpreter.T T_WRITE_ONLY -> ()
     | MenhirInterpreter.T T_WRITERS -> ()
@@ -64,6 +68,9 @@ module Default = struct
     | MenhirInterpreter.T T_WINDOW -> ()
     | MenhirInterpreter.T T_WIDTH_IN_CELLS -> ()
     | MenhirInterpreter.T T_WIDTH -> ()
+    | MenhirInterpreter.T T_WIDE -> ()
+    | MenhirInterpreter.T T_WHILE -> ()
+    | MenhirInterpreter.T T_WHEN_COMPILED -> ()
     | MenhirInterpreter.T T_WHEN -> ()
     | MenhirInterpreter.T T_WEB_BROWSER -> ()
     | MenhirInterpreter.T T_WAIT -> ()
@@ -74,14 +81,17 @@ module Default = struct
     | MenhirInterpreter.T T_VPADDING -> ()
     | MenhirInterpreter.T T_VOLATILE -> ()
     | MenhirInterpreter.T T_VLR -> ()
+    | MenhirInterpreter.T T_VISIBLE -> ()
     | MenhirInterpreter.T T_VIRTUAL_WIDTH -> ()
     | MenhirInterpreter.T T_VIRTUAL -> ()
     | MenhirInterpreter.T T_VIA -> ()
     | MenhirInterpreter.T T_VERY_HEAVY -> ()
     | MenhirInterpreter.T T_VERTICAL -> ()
+    | MenhirInterpreter.T T_VERSION -> ()
     | MenhirInterpreter.T T_VARYING -> ()
     | MenhirInterpreter.T T_VARIANT -> ()
     | MenhirInterpreter.T T_VARIABLE -> ()
+    | MenhirInterpreter.T T_VARBINARY -> ()
     | MenhirInterpreter.T T_VALUE_FORMAT -> ()
     | MenhirInterpreter.T T_VALUES -> ()
     | MenhirInterpreter.T T_VALUE -> ()
@@ -96,7 +106,10 @@ module Default = struct
     | MenhirInterpreter.T T_USE_TAB -> ()
     | MenhirInterpreter.T T_USE_RETURN -> ()
     | MenhirInterpreter.T T_USE_ALT -> ()
+    | MenhirInterpreter.T T_USER_WHITE -> ()
+    | MenhirInterpreter.T T_USER_GRAY -> ()
     | MenhirInterpreter.T T_USER_DEFAULT -> ()
+    | MenhirInterpreter.T T_USER_COLORS -> ()
     | MenhirInterpreter.T T_USER -> ()
     | MenhirInterpreter.T T_USE -> ()
     | MenhirInterpreter.T T_USAGE -> ()
@@ -118,6 +131,7 @@ module Default = struct
     | MenhirInterpreter.T T_UNIVERSAL -> ()
     | MenhirInterpreter.T T_UNIT -> ()
     | MenhirInterpreter.T T_UNFRAMED -> ()
+    | MenhirInterpreter.T T_UNEQUAL -> ()
     | MenhirInterpreter.T T_UNDERLINE -> ()
     | MenhirInterpreter.T T_UNBOUNDED -> ()
     | MenhirInterpreter.T T_UFF -> ()
@@ -127,31 +141,50 @@ module Default = struct
     | MenhirInterpreter.T T_TYPE -> ()
     | MenhirInterpreter.T T_TRUNCATION -> ()
     | MenhirInterpreter.T T_TRUE -> ()
+    | MenhirInterpreter.T T_TRIMMED -> ()
     | MenhirInterpreter.T T_TREE_VIEW -> ()
+    | MenhirInterpreter.T T_TRANSPARENT_COLOR -> ()
     | MenhirInterpreter.T T_TRANSPARENT -> ()
     | MenhirInterpreter.T T_TRANSFORM -> ()
+    | MenhirInterpreter.T T_TRANSACTION_STATUS -> ()
+    | MenhirInterpreter.T T_TRANSACTION -> ()
     | MenhirInterpreter.T T_TRAILING_SIGN -> ()
     | MenhirInterpreter.T T_TRAILING_SHIFT -> ()
     | MenhirInterpreter.T T_TRAILING -> ()
     | MenhirInterpreter.T T_TRADITIONAL_FONT -> ()
+    | MenhirInterpreter.T T_TRACK_THUMB -> ()
     | MenhirInterpreter.T T_TRACK_LIMIT -> ()
     | MenhirInterpreter.T T_TRACK_AREA -> ()
     | MenhirInterpreter.T T_TRACKS -> ()
     | MenhirInterpreter.T T_TRACK -> ()
+    | MenhirInterpreter.T T_TRACE -> ()
     | MenhirInterpreter.T T_TOWARD_LESSER -> ()
     | MenhirInterpreter.T T_TOWARD_GREATER -> ()
+    | MenhirInterpreter.T T_TOTALING -> ()
+    | MenhirInterpreter.T T_TOTALED -> ()
     | MenhirInterpreter.T T_TOP_LEVEL -> ()
     | MenhirInterpreter.T T_TOP -> ()
+    | MenhirInterpreter.T T_TOOL_BAR -> ()
     | MenhirInterpreter.T T_TO -> ()
     | MenhirInterpreter.T T_TITLE_POSITION -> ()
+    | MenhirInterpreter.T T_TITLE_BAR -> ()
     | MenhirInterpreter.T T_TITLE -> ()
+    | MenhirInterpreter.T T_TIME_RECORD -> ()
     | MenhirInterpreter.T T_TIME_OUT -> ()
+    | MenhirInterpreter.T T_TIME_OF_DAY -> ()
+    | MenhirInterpreter.T T_TIMESTAMP_RECORD -> ()
+    | MenhirInterpreter.T T_TIMESTAMP_OFFSET_RECORD -> ()
+    | MenhirInterpreter.T T_TIMESTAMP_OFFSET -> ()
+    | MenhirInterpreter.T T_TIMESTAMP -> ()
     | MenhirInterpreter.T T_TIMES -> ()
     | MenhirInterpreter.T T_TIME -> ()
     | MenhirInterpreter.T T_TILED_HEADINGS -> ()
     | MenhirInterpreter.T T_THUMB_POSITION -> ()
     | MenhirInterpreter.T T_THROUGH -> ()
     | MenhirInterpreter.T T_THREEDIMENSIONAL -> ()
+    | MenhirInterpreter.T T_THREAD_POINTER -> ()
+    | MenhirInterpreter.T T_THREAD_LOCAL_STORAGE -> ()
+    | MenhirInterpreter.T T_THREAD_LOCAL -> ()
     | MenhirInterpreter.T T_THREADS -> ()
     | MenhirInterpreter.T T_THREAD -> ()
     | MenhirInterpreter.T T_THEN -> ()
@@ -171,8 +204,10 @@ module Default = struct
     | MenhirInterpreter.T T_TEMP -> ()
     | MenhirInterpreter.T T_TAPE -> ()
     | MenhirInterpreter.T T_TALLYING -> ()
+    | MenhirInterpreter.T T_TALLY -> ()
     | MenhirInterpreter.T T_TAB_TO_DELETE -> ()
     | MenhirInterpreter.T T_TAB_TO_ADD -> ()
+    | MenhirInterpreter.T T_TAB_CONTROL -> ()
     | MenhirInterpreter.T T_TABLE -> ()
     | MenhirInterpreter.T T_TAB -> ()
     | MenhirInterpreter.T T_SYSTEM_OFFSET -> ()
@@ -196,16 +231,20 @@ module Default = struct
     | MenhirInterpreter.T T_SUPPRESS -> ()
     | MenhirInterpreter.T T_SUPER -> ()
     | MenhirInterpreter.T T_SUM -> ()
+    | MenhirInterpreter.T T_SUFFIXING -> ()
     | MenhirInterpreter.T T_SUB_SCHEMA -> ()
     | MenhirInterpreter.T T_SUB_QUEUE_3 -> ()
     | MenhirInterpreter.T T_SUB_QUEUE_2 -> ()
     | MenhirInterpreter.T T_SUB_QUEUE_1 -> ()
     | MenhirInterpreter.T T_SUBWINDOW -> ()
     | MenhirInterpreter.T T_SUBTRACT -> ()
+    | MenhirInterpreter.T T_SUBFILE -> ()
     | MenhirInterpreter.T T_STYLE -> ()
     | MenhirInterpreter.T T_STRUCTURE -> ()
+    | MenhirInterpreter.T T_STRONG_NAME -> ()
     | MenhirInterpreter.T T_STRONG -> ()
     | MenhirInterpreter.T T_STRING -> ()
+    | MenhirInterpreter.T T_STOP_BROWSER -> ()
     | MenhirInterpreter.T T_STOP -> ()
     | MenhirInterpreter.T T_STEP -> ()
     | MenhirInterpreter.T T_STDCALL -> ()
@@ -218,6 +257,7 @@ module Default = struct
     | MenhirInterpreter.T T_STATEMENT -> ()
     | MenhirInterpreter.T T_START_Y -> ()
     | MenhirInterpreter.T T_START_X -> ()
+    | MenhirInterpreter.T T_STARTING -> ()
     | MenhirInterpreter.T T_START -> ()
     | MenhirInterpreter.T T_STANDARD_DECIMAL -> ()
     | MenhirInterpreter.T T_STANDARD_BINARY -> ()
@@ -227,6 +267,14 @@ module Default = struct
     | MenhirInterpreter.T T_STACK -> ()
     | MenhirInterpreter.T T_SSF -> ()
     | MenhirInterpreter.T T_SQUARE -> ()
+    | MenhirInterpreter.T T_SQL_ROWID -> ()
+    | MenhirInterpreter.T T_SQL_NCLOB -> ()
+    | MenhirInterpreter.T T_SQL_CURSOR -> ()
+    | MenhirInterpreter.T T_SQL_CLOB -> ()
+    | MenhirInterpreter.T T_SQL_BLOB -> ()
+    | MenhirInterpreter.T T_SQL_BFILE -> ()
+    | MenhirInterpreter.T T_SQLIMS -> ()
+    | MenhirInterpreter.T T_SQL -> ()
     | MenhirInterpreter.T T_SPINNER -> ()
     | MenhirInterpreter.T T_SPECIAL_NAMES -> ()
     | MenhirInterpreter.T T_SPACE_FILL -> ()
@@ -234,11 +282,21 @@ module Default = struct
     | MenhirInterpreter.T T_SOURCE_COMPUTER -> ()
     | MenhirInterpreter.T T_SOURCES -> ()
     | MenhirInterpreter.T T_SOURCE -> ()
+    | MenhirInterpreter.T T_SORT_WORK -> ()
+    | MenhirInterpreter.T T_SORT_RETURN -> ()
     | MenhirInterpreter.T T_SORT_ORDER -> ()
+    | MenhirInterpreter.T T_SORT_MODE_SIZE -> ()
+    | MenhirInterpreter.T T_SORT_MESSAGE -> ()
     | MenhirInterpreter.T T_SORT_MERGE -> ()
+    | MenhirInterpreter.T T_SORT_FILE_SIZE -> ()
+    | MenhirInterpreter.T T_SORT_CORE_SIZE -> ()
+    | MenhirInterpreter.T T_SORT_CONTROL -> ()
     | MenhirInterpreter.T T_SORT -> ()
     | MenhirInterpreter.T T_SMALL_FONT -> ()
     | MenhirInterpreter.T T_SLASH -> ()
+    | MenhirInterpreter.T T_SKIP3 -> ()
+    | MenhirInterpreter.T T_SKIP2 -> ()
+    | MenhirInterpreter.T T_SKIP1 -> ()
     | MenhirInterpreter.T T_SIZE -> ()
     | MenhirInterpreter.T T_SINTLIT -> "0"
     | MenhirInterpreter.T T_SIGNED_SHORT -> ()
@@ -251,25 +309,32 @@ module Default = struct
     | MenhirInterpreter.T T_SHOW_LINES -> ()
     | MenhirInterpreter.T T_SHORT_DATE -> ()
     | MenhirInterpreter.T T_SHORT -> ()
+    | MenhirInterpreter.T T_SHIFT_OUT -> ()
+    | MenhirInterpreter.T T_SHIFT_IN -> ()
     | MenhirInterpreter.T T_SHARING -> ()
     | MenhirInterpreter.T T_SHADOW -> ()
     | MenhirInterpreter.T T_SHADING -> ()
     | MenhirInterpreter.T T_SET -> ()
+    | MenhirInterpreter.T T_SERVICE -> ()
     | MenhirInterpreter.T T_SEQUENTIAL -> ()
     | MenhirInterpreter.T T_SEQUENCE -> ()
     | MenhirInterpreter.T T_SEPARATION -> ()
     | MenhirInterpreter.T T_SEPARATE -> ()
     | MenhirInterpreter.T T_SENTENCE -> ()
     | MenhirInterpreter.T T_SEND -> ()
+    | MenhirInterpreter.T T_SEMAPHORE_POINTER -> ()
     | MenhirInterpreter.T T_SELF_ACT -> ()
+    | MenhirInterpreter.T T_SELFCLASS -> ()
     | MenhirInterpreter.T T_SELF -> ()
     | MenhirInterpreter.T T_SELECT_ALL -> ()
+    | MenhirInterpreter.T T_SELECTIVE -> ()
     | MenhirInterpreter.T T_SELECTION_TEXT -> ()
     | MenhirInterpreter.T T_SELECTION_INDEX -> ()
     | MenhirInterpreter.T T_SELECTION -> ()
     | MenhirInterpreter.T T_SELECT -> ()
     | MenhirInterpreter.T T_SEGMENT_LIMIT -> ()
     | MenhirInterpreter.T T_SEGMENT -> ()
+    | MenhirInterpreter.T T_SEEK -> ()
     | MenhirInterpreter.T T_SECURITY -> ()
     | MenhirInterpreter.T T_SECURE -> ()
     | MenhirInterpreter.T T_SECTION -> ()
@@ -295,8 +360,10 @@ module Default = struct
     | MenhirInterpreter.T T_ROW_DIVIDERS -> ()
     | MenhirInterpreter.T T_ROW_COLOR_PATTERN -> ()
     | MenhirInterpreter.T T_ROW_COLOR -> ()
+    | MenhirInterpreter.T T_ROWID -> ()
     | MenhirInterpreter.T T_ROUNDING -> ()
     | MenhirInterpreter.T T_ROUNDED -> ()
+    | MenhirInterpreter.T T_ROLLING -> ()
     | MenhirInterpreter.T T_ROLLBACK -> ()
     | MenhirInterpreter.T T_RIMMED -> ()
     | MenhirInterpreter.T T_RIGHT_JUSTIFY -> ()
@@ -309,12 +376,18 @@ module Default = struct
     | MenhirInterpreter.T T_REVERSE_VIDEO -> ()
     | MenhirInterpreter.T T_REVERSED -> ()
     | MenhirInterpreter.T T_REVERSE -> ()
+    | MenhirInterpreter.T T_RETURN_UNSIGNED -> ()
+    | MenhirInterpreter.T T_RETURN_CODE -> ()
     | MenhirInterpreter.T T_RETURNING -> ()
     | MenhirInterpreter.T T_RETURN -> ()
     | MenhirInterpreter.T T_RETRY -> ()
     | MenhirInterpreter.T T_RETENTION -> ()
     | MenhirInterpreter.T T_RESUME -> ()
+    | MenhirInterpreter.T T_RESTRICTED -> ()
+    | MenhirInterpreter.T T_RESIZABLE -> ()
+    | MenhirInterpreter.T T_RESIDENT -> ()
     | MenhirInterpreter.T T_RESET_TABS -> ()
+    | MenhirInterpreter.T T_RESET_SET_LOCATOR -> ()
     | MenhirInterpreter.T T_RESET_LIST -> ()
     | MenhirInterpreter.T T_RESET_GRID -> ()
     | MenhirInterpreter.T T_RESET -> ()
@@ -327,6 +400,7 @@ module Default = struct
     | MenhirInterpreter.T T_REPORTING -> ()
     | MenhirInterpreter.T T_REPORT -> ()
     | MenhirInterpreter.T T_REPLACING -> ()
+    | MenhirInterpreter.T T_REPLACED -> ()
     | MenhirInterpreter.T T_REPLACE -> ()
     | MenhirInterpreter.T T_REPEATED -> ()
     | MenhirInterpreter.T T_REORG_CRITERIA -> ()
@@ -334,6 +408,7 @@ module Default = struct
     | MenhirInterpreter.T T_REMOVAL -> ()
     | MenhirInterpreter.T T_REMARKS -> ()
     | MenhirInterpreter.T T_REMAINDER -> ()
+    | MenhirInterpreter.T T_RELOAD -> ()
     | MenhirInterpreter.T T_RELEASE -> ()
     | MenhirInterpreter.T T_RELATIVE -> ()
     | MenhirInterpreter.T T_RELATION -> ()
@@ -342,10 +417,12 @@ module Default = struct
     | MenhirInterpreter.T T_REFERENCES -> ()
     | MenhirInterpreter.T T_REFERENCE -> ()
     | MenhirInterpreter.T T_REEL -> ()
+    | MenhirInterpreter.T T_REDEFINITION -> ()
     | MenhirInterpreter.T T_REDEFINES -> ()
     | MenhirInterpreter.T T_RECURSIVE -> ()
     | MenhirInterpreter.T T_RECORD_TO_DELETE -> ()
     | MenhirInterpreter.T T_RECORD_TO_ADD -> ()
+    | MenhirInterpreter.T T_RECORD_POSITION -> ()
     | MenhirInterpreter.T T_RECORD_OVERFLOW -> ()
     | MenhirInterpreter.T T_RECORD_DATA -> ()
     | MenhirInterpreter.T T_RECORDS -> ()
@@ -354,9 +431,12 @@ module Default = struct
     | MenhirInterpreter.T T_RECEIVED -> ()
     | MenhirInterpreter.T T_RECEIVE -> ()
     | MenhirInterpreter.T T_READ_ONLY -> ()
+    | MenhirInterpreter.T T_READY -> ()
+    | MenhirInterpreter.T T_READING -> ()
     | MenhirInterpreter.T T_READERS -> ()
     | MenhirInterpreter.T T_READ -> ()
     | MenhirInterpreter.T T_RD -> ()
+    | MenhirInterpreter.T T_RANGE -> ()
     | MenhirInterpreter.T T_RANDOM -> ()
     | MenhirInterpreter.T T_RAISING -> ()
     | MenhirInterpreter.T T_RAISED -> ()
@@ -368,6 +448,7 @@ module Default = struct
     | MenhirInterpreter.T T_QUERY_INDEX -> ()
     | MenhirInterpreter.T T_PUSH_BUTTON -> ()
     | MenhirInterpreter.T T_PURGE -> ()
+    | MenhirInterpreter.T T_PUBLIC -> ()
     | MenhirInterpreter.T T_PROTOTYPE -> ()
     | MenhirInterpreter.T T_PROTECTED -> ()
     | MenhirInterpreter.T T_PROPERTY -> ()
@@ -380,13 +461,18 @@ module Default = struct
     | MenhirInterpreter.T T_PROGRAM -> ()
     | MenhirInterpreter.T T_PROCESS_AREA -> ()
     | MenhirInterpreter.T T_PROCESSING -> ()
+    | MenhirInterpreter.T T_PROCESS -> ()
     | MenhirInterpreter.T T_PROCEED -> ()
     | MenhirInterpreter.T T_PROCEDURE_POINTER -> ()
+    | MenhirInterpreter.T T_PROCEDURE_NAME -> ()
     | MenhirInterpreter.T T_PROCEDURES -> ()
     | MenhirInterpreter.T T_PROCEDURE -> ()
+    | MenhirInterpreter.T T_PRIVATE -> ()
     | MenhirInterpreter.T T_PRIORITY -> ()
+    | MenhirInterpreter.T T_PRIOR -> ()
     | MenhirInterpreter.T T_PRINT_PREVIEW -> ()
     | MenhirInterpreter.T T_PRINT_NO_PROMPT -> ()
+    | MenhirInterpreter.T T_PRINT_CONTROL -> ()
     | MenhirInterpreter.T T_PRINTING -> ()
     | MenhirInterpreter.T T_PRINTER_1 -> ()
     | MenhirInterpreter.T T_PRINTER -> ()
@@ -394,12 +480,15 @@ module Default = struct
     | MenhirInterpreter.T T_PRIMARY -> ()
     | MenhirInterpreter.T T_PREVIOUS -> ()
     | MenhirInterpreter.T T_PRESENT -> ()
+    | MenhirInterpreter.T T_PREFIXING -> ()
     | MenhirInterpreter.T T_PREFIXED -> ()
     | MenhirInterpreter.T T_POSITIVE -> ()
     | MenhirInterpreter.T T_POSITION_SHIFT -> ()
+    | MenhirInterpreter.T T_POSITIONING -> ()
     | MenhirInterpreter.T T_POSITION -> ()
     | MenhirInterpreter.T T_POS -> ()
     | MenhirInterpreter.T T_POP_UP -> ()
+    | MenhirInterpreter.T T_POINTER_32 -> ()
     | MenhirInterpreter.T T_POINTER -> ()
     | MenhirInterpreter.T T_PLUS_SIGN -> ()
     | MenhirInterpreter.T T_PLUS -> ()
@@ -418,19 +507,27 @@ module Default = struct
     | MenhirInterpreter.T T_PARSE -> ()
     | MenhirInterpreter.T T_PARENT -> ()
     | MenhirInterpreter.T T_PARAGRAPH -> ()
+    | MenhirInterpreter.T T_PANEL_WIDTHS -> ()
+    | MenhirInterpreter.T T_PANEL_TEXT -> ()
+    | MenhirInterpreter.T T_PANEL_STYLE -> ()
+    | MenhirInterpreter.T T_PANEL_INDEX -> ()
+    | MenhirInterpreter.T T_PAGE_SIZE -> ()
     | MenhirInterpreter.T T_PAGE_SETUP -> ()
     | MenhirInterpreter.T T_PAGE_COUNTER -> ()
     | MenhirInterpreter.T T_PAGED -> ()
     | MenhirInterpreter.T T_PAGE -> ()
     | MenhirInterpreter.T T_PADDING -> ()
     | MenhirInterpreter.T T_PACKED_DECIMAL -> ()
+    | MenhirInterpreter.T T_O_FILL -> ()
     | MenhirInterpreter.T T_OVERRIDING -> ()
     | MenhirInterpreter.T T_OVERRIDE -> ()
     | MenhirInterpreter.T T_OVERLINE -> ()
     | MenhirInterpreter.T T_OVERLAP_TOP -> ()
     | MenhirInterpreter.T T_OVERLAP_LEFT -> ()
+    | MenhirInterpreter.T T_OVERLAPPED -> ()
     | MenhirInterpreter.T T_OVERFLOW -> ()
     | MenhirInterpreter.T T_OUTPUT -> ()
+    | MenhirInterpreter.T T_OTHERWISE -> ()
     | MenhirInterpreter.T T_OTHERS -> ()
     | MenhirInterpreter.T T_OTHER -> ()
     | MenhirInterpreter.T T_ORGANIZATION -> ()
@@ -440,6 +537,7 @@ module Default = struct
     | MenhirInterpreter.T T_OPTIONAL -> ()
     | MenhirInterpreter.T T_OPERATIONAL -> ()
     | MenhirInterpreter.T T_OPEN -> ()
+    | MenhirInterpreter.T T_OOSTACKPTR -> ()
     | MenhirInterpreter.T T_ON_SIZE_ERROR -> ()
     | MenhirInterpreter.T T_ON_OVERFLOW -> ()
     | MenhirInterpreter.T T_ON_EXCEPTION -> ()
@@ -450,12 +548,16 @@ module Default = struct
     | MenhirInterpreter.T T_OFF -> ()
     | MenhirInterpreter.T T_OF -> ()
     | MenhirInterpreter.T T_OCCURS -> ()
+    | MenhirInterpreter.T T_OBJECT_STORAGE -> ()
     | MenhirInterpreter.T T_OBJECT_REFERENCE -> ()
     | MenhirInterpreter.T T_OBJECT_PROGRAM -> ()
+    | MenhirInterpreter.T T_OBJECT_ID -> ()
     | MenhirInterpreter.T T_OBJECT_COMPUTER -> ()
     | MenhirInterpreter.T T_OBJECT -> ()
+    | MenhirInterpreter.T T_NUM_ROW_HEADINGS -> ()
     | MenhirInterpreter.T T_NUM_ROWS -> ()
     | MenhirInterpreter.T T_NUM_COL_HEADINGS -> ()
+    | MenhirInterpreter.T T_NUMERIC_FILL -> ()
     | MenhirInterpreter.T T_NUMERIC_EDITED -> ()
     | MenhirInterpreter.T T_NUMERIC -> ()
     | MenhirInterpreter.T T_NUMBERS -> ()
@@ -464,6 +566,7 @@ module Default = struct
     | MenhirInterpreter.T T_NULLIT -> "_"
     | MenhirInterpreter.T T_NULL -> ()
     | MenhirInterpreter.T T_NO_UPDOWN -> ()
+    | MenhirInterpreter.T T_NO_TAB -> ()
     | MenhirInterpreter.T T_NO_SEARCH -> ()
     | MenhirInterpreter.T T_NO_KEY_LETTER -> ()
     | MenhirInterpreter.T T_NO_GROUP_TAB -> ()
@@ -472,6 +575,8 @@ module Default = struct
     | MenhirInterpreter.T T_NO_ECHO -> ()
     | MenhirInterpreter.T T_NO_DIVIDERS -> ()
     | MenhirInterpreter.T T_NO_DATA -> ()
+    | MenhirInterpreter.T T_NO_CLOSE -> ()
+    | MenhirInterpreter.T T_NO_CELL_DRAG -> ()
     | MenhirInterpreter.T T_NO_BOX -> ()
     | MenhirInterpreter.T T_NO_AUTO_DEFAULT -> ()
     | MenhirInterpreter.T T_NO_AUTOSEL -> ()
@@ -486,6 +591,7 @@ module Default = struct
     | MenhirInterpreter.T T_NOTIFY_CHANGE -> ()
     | MenhirInterpreter.T T_NOTIFY -> ()
     | MenhirInterpreter.T T_NOTHING -> ()
+    | MenhirInterpreter.T T_NOTE -> ()
     | MenhirInterpreter.T T_NOTAB -> ()
     | MenhirInterpreter.T T_NOT -> ()
     | MenhirInterpreter.T T_NORMAL -> ()
@@ -497,6 +603,7 @@ module Default = struct
     | MenhirInterpreter.T T_NEXT_ITEM -> ()
     | MenhirInterpreter.T T_NEXT -> ()
     | MenhirInterpreter.T T_NEW -> ()
+    | MenhirInterpreter.T T_NET_EVENT_LIST -> ()
     | MenhirInterpreter.T T_NESTED -> ()
     | MenhirInterpreter.T T_NEGATIVE -> ()
     | MenhirInterpreter.T T_NEAREST_TO_ZERO -> ()
@@ -504,6 +611,8 @@ module Default = struct
     | MenhirInterpreter.T T_NEAREST_EVEN -> ()
     | MenhirInterpreter.T T_NEAREST_AWAY_FROM_ZERO -> ()
     | MenhirInterpreter.T T_NE -> ()
+    | MenhirInterpreter.T T_NCLOB -> ()
+    | MenhirInterpreter.T T_NCHAR -> ()
     | MenhirInterpreter.T T_NAVIGATE_URL -> ()
     | MenhirInterpreter.T T_NATLIT -> "_"
     | MenhirInterpreter.T T_NATIVE -> ()
@@ -514,28 +623,48 @@ module Default = struct
     | MenhirInterpreter.T T_NAMESPACE -> ()
     | MenhirInterpreter.T T_NAMED -> ()
     | MenhirInterpreter.T T_NAME -> ()
+    | MenhirInterpreter.T T_MUTEX_POINTER -> ()
     | MenhirInterpreter.T T_MULTIPLY -> ()
     | MenhirInterpreter.T T_MULTIPLE -> ()
     | MenhirInterpreter.T T_MULTILINE -> ()
     | MenhirInterpreter.T T_MOVE -> ()
+    | MenhirInterpreter.T T_MORE_LABELS -> ()
+    | MenhirInterpreter.T T_MONITOR_POINTER -> ()
     | MenhirInterpreter.T T_MODULES -> ()
+    | MenhirInterpreter.T T_MODULE -> ()
     | MenhirInterpreter.T T_MODIFY -> ()
+    | MenhirInterpreter.T T_MODIFIED -> ()
+    | MenhirInterpreter.T T_MODELESS -> ()
     | MenhirInterpreter.T T_MODE -> ()
+    | MenhirInterpreter.T T_MODAL -> ()
+    | MenhirInterpreter.T T_MIN_WIDTH -> ()
+    | MenhirInterpreter.T T_MIN_VALUE -> ()
     | MenhirInterpreter.T T_MIN_VAL -> ()
+    | MenhirInterpreter.T T_MIN_SIZE -> ()
+    | MenhirInterpreter.T T_MIN_LINES -> ()
+    | MenhirInterpreter.T T_MIN_HEIGHT -> ()
     | MenhirInterpreter.T T_MINUS -> ()
     | MenhirInterpreter.T T_MICROSECOND_TIME -> ()
     | MenhirInterpreter.T T_METHOD_ID -> ()
     | MenhirInterpreter.T T_METHOD -> ()
+    | MenhirInterpreter.T T_META_CLASS -> ()
     | MenhirInterpreter.T T_MESSAGE_TAG -> ()
+    | MenhirInterpreter.T T_MESSAGES -> ()
     | MenhirInterpreter.T T_MESSAGE -> ()
     | MenhirInterpreter.T T_MERGE -> ()
     | MenhirInterpreter.T T_MENU -> ()
     | MenhirInterpreter.T T_MEMORY -> ()
     | MenhirInterpreter.T T_MEDIUM_FONT -> ()
+    | MenhirInterpreter.T T_MDI_FRAME -> ()
+    | MenhirInterpreter.T T_MDI_CHILD -> ()
+    | MenhirInterpreter.T T_MAX_WIDTH -> ()
+    | MenhirInterpreter.T T_MAX_VALUE -> ()
     | MenhirInterpreter.T T_MAX_VAL -> ()
     | MenhirInterpreter.T T_MAX_TEXT -> ()
+    | MenhirInterpreter.T T_MAX_SIZE -> ()
     | MenhirInterpreter.T T_MAX_PROGRESS -> ()
     | MenhirInterpreter.T T_MAX_LINES -> ()
+    | MenhirInterpreter.T T_MAX_HEIGHT -> ()
     | MenhirInterpreter.T T_MASTER_INDEX -> ()
     | MenhirInterpreter.T T_MASS_UPDATE -> ()
     | MenhirInterpreter.T T_MANUAL -> ()
@@ -545,8 +674,12 @@ module Default = struct
     | MenhirInterpreter.T T_LOW_VALUE -> ()
     | MenhirInterpreter.T T_LOW_COLOR -> ()
     | MenhirInterpreter.T T_LOWLIGHT -> ()
+    | MenhirInterpreter.T T_LOWEST_VALUE -> ()
     | MenhirInterpreter.T T_LOWERED -> ()
     | MenhirInterpreter.T T_LOWER -> ()
+    | MenhirInterpreter.T T_LOW -> ()
+    | MenhirInterpreter.T T_LONG_VARCHAR -> ()
+    | MenhirInterpreter.T T_LONG_VARBINARY -> ()
     | MenhirInterpreter.T T_LONG_DATE -> ()
     | MenhirInterpreter.T T_LOCK_HOLDING -> ()
     | MenhirInterpreter.T T_LOCKS -> ()
@@ -558,6 +691,7 @@ module Default = struct
     | MenhirInterpreter.T T_LM_RESIZE -> ()
     | MenhirInterpreter.T T_LIST_BOX -> ()
     | MenhirInterpreter.T T_LINKAGE -> ()
+    | MenhirInterpreter.T T_LINK -> ()
     | MenhirInterpreter.T T_LINE_SEQUENTIAL -> ()
     | MenhirInterpreter.T T_LINE_COUNTER -> ()
     | MenhirInterpreter.T T_LINES_PER_PAGE -> ()
@@ -566,6 +700,7 @@ module Default = struct
     | MenhirInterpreter.T T_LINE -> ()
     | MenhirInterpreter.T T_LINAGE_COUNTER -> ()
     | MenhirInterpreter.T T_LINAGE -> ()
+    | MenhirInterpreter.T T_LIN -> ()
     | MenhirInterpreter.T T_LIMITS -> ()
     | MenhirInterpreter.T T_LIMIT -> ()
     | MenhirInterpreter.T T_LIKE -> ()
@@ -600,8 +735,15 @@ module Default = struct
     | MenhirInterpreter.T T_KEYBOARD -> ()
     | MenhirInterpreter.T T_KEY -> ()
     | MenhirInterpreter.T T_KEPT -> ()
+    | MenhirInterpreter.T T_KANJI -> ()
     | MenhirInterpreter.T T_JUSTIFIED -> ()
+    | MenhirInterpreter.T T_JSON_STATUS -> ()
+    | MenhirInterpreter.T T_JSON_CODE -> ()
     | MenhirInterpreter.T T_JSON -> ()
+    | MenhirInterpreter.T T_JOINING -> ()
+    | MenhirInterpreter.T T_JNIENVPTR -> ()
+    | MenhirInterpreter.T T_JAVA -> ()
+    | MenhirInterpreter.T T_JAPANESE -> ()
     | MenhirInterpreter.T T_I_O_CONTROL -> ()
     | MenhirInterpreter.T T_I_O -> ()
     | MenhirInterpreter.T T_ITEM_VALUE -> ()
@@ -609,6 +751,8 @@ module Default = struct
     | MenhirInterpreter.T T_ITEM_TO_DELETE -> ()
     | MenhirInterpreter.T T_ITEM_TO_ADD -> ()
     | MenhirInterpreter.T T_ITEM_TEXT -> ()
+    | MenhirInterpreter.T T_ITEM_ID -> ()
+    | MenhirInterpreter.T T_ITEM_BOLD -> ()
     | MenhirInterpreter.T T_ITEM -> ()
     | MenhirInterpreter.T T_IS_TYPEDEF -> ()
     | MenhirInterpreter.T T_IS_GLOBAL -> ()
@@ -616,29 +760,38 @@ module Default = struct
     | MenhirInterpreter.T T_IS -> ()
     | MenhirInterpreter.T T_IN_ARITHMETIC_RANGE -> ()
     | MenhirInterpreter.T T_INVOKING -> ()
+    | MenhirInterpreter.T T_INVOKED -> ()
     | MenhirInterpreter.T T_INVOKE -> ()
     | MenhirInterpreter.T T_INVALID_KEY -> ()
     | MenhirInterpreter.T T_INVALID -> ()
     | MenhirInterpreter.T T_INTRINSIC -> ()
     | MenhirInterpreter.T T_INTO -> ()
     | MenhirInterpreter.T T_INTERVENING_ -> raise Not_found
+    | MenhirInterpreter.T T_INTERVAL_TIMER -> ()
     | MenhirInterpreter.T T_INTERMEDIATE -> ()
     | MenhirInterpreter.T T_INTERFACE_ID -> ()
     | MenhirInterpreter.T T_INTERFACE -> ()
+    | MenhirInterpreter.T T_INSTANCE -> ()
     | MenhirInterpreter.T T_INSTALLATION -> ()
     | MenhirInterpreter.T T_INSPECT -> ()
     | MenhirInterpreter.T T_INSERT_ROWS -> ()
     | MenhirInterpreter.T T_INSERTION_INDEX -> ()
+    | MenhirInterpreter.T T_INSERT -> ()
     | MenhirInterpreter.T T_INQUIRE -> ()
     | MenhirInterpreter.T T_INPUT_OUTPUT -> ()
     | MenhirInterpreter.T T_INPUT -> ()
     | MenhirInterpreter.T T_INITIATE -> ()
+    | MenhirInterpreter.T T_INITIAL_VALUE -> ()
     | MenhirInterpreter.T T_INITIALIZED -> ()
     | MenhirInterpreter.T T_INITIALIZE -> ()
     | MenhirInterpreter.T T_INITIAL -> ()
     | MenhirInterpreter.T T_INHERITS -> ()
+    | MenhirInterpreter.T T_INHERITING -> ()
     | MenhirInterpreter.T T_INFO_WORD -> "_"
+    | MenhirInterpreter.T T_INDICATORS -> ()
+    | MenhirInterpreter.T T_INDICATOR -> ()
     | MenhirInterpreter.T T_INDICATE -> ()
+    | MenhirInterpreter.T T_INDIC -> ()
     | MenhirInterpreter.T T_INDEX_2 -> ()
     | MenhirInterpreter.T T_INDEX_1 -> ()
     | MenhirInterpreter.T T_INDEXED -> ()
@@ -646,6 +799,7 @@ module Default = struct
     | MenhirInterpreter.T T_INDEPENDENT -> ()
     | MenhirInterpreter.T T_IN -> ()
     | MenhirInterpreter.T T_IMPLEMENTS -> ()
+    | MenhirInterpreter.T T_IMP -> ()
     | MenhirInterpreter.T T_IGNORING -> ()
     | MenhirInterpreter.T T_IGNORE -> ()
     | MenhirInterpreter.T T_IF -> ()
@@ -657,15 +811,20 @@ module Default = struct
     | MenhirInterpreter.T T_HSCROLL_POS -> ()
     | MenhirInterpreter.T T_HSCROLL -> ()
     | MenhirInterpreter.T T_HOT_TRACK -> ()
+    | MenhirInterpreter.T T_HORIZONTAL -> ()
     | MenhirInterpreter.T T_HIGH_VALUE -> ()
     | MenhirInterpreter.T T_HIGH_ORDER_RIGHT -> ()
     | MenhirInterpreter.T T_HIGH_ORDER_LEFT -> ()
     | MenhirInterpreter.T T_HIGH_COLOR -> ()
     | MenhirInterpreter.T T_HIGHLIGHT -> ()
+    | MenhirInterpreter.T T_HIGHEST_VALUE -> ()
+    | MenhirInterpreter.T T_HIGH -> ()
     | MenhirInterpreter.T T_HIDDEN_DATA -> ()
     | MenhirInterpreter.T T_HEXLIT -> "_"
     | MenhirInterpreter.T T_HEX -> ()
+    | MenhirInterpreter.T T_HELP_ID -> ()
     | MenhirInterpreter.T T_HEIGHT_IN_CELLS -> ()
+    | MenhirInterpreter.T T_HEIGHT -> ()
     | MenhirInterpreter.T T_HEAVY -> ()
     | MenhirInterpreter.T T_HEADING_FONT -> ()
     | MenhirInterpreter.T T_HEADING_DIVIDER_COLOR -> ()
@@ -677,6 +836,7 @@ module Default = struct
     | MenhirInterpreter.T T_GROUP_VALUE -> ()
     | MenhirInterpreter.T T_GROUP_USAGE -> ()
     | MenhirInterpreter.T T_GROUP -> ()
+    | MenhirInterpreter.T T_GRIP -> ()
     | MenhirInterpreter.T T_GRID -> ()
     | MenhirInterpreter.T T_GREATER -> ()
     | MenhirInterpreter.T T_GRAPHICAL -> ()
@@ -739,7 +899,9 @@ module Default = struct
     | MenhirInterpreter.T T_FILL_COLOR2 -> ()
     | MenhirInterpreter.T T_FILL_COLOR -> ()
     | MenhirInterpreter.T T_FILLER -> ()
+    | MenhirInterpreter.T T_FILE_PREFIX -> ()
     | MenhirInterpreter.T T_FILE_POS -> ()
+    | MenhirInterpreter.T T_FILE_PATH -> ()
     | MenhirInterpreter.T T_FILE_NAME -> ()
     | MenhirInterpreter.T T_FILE_LIMITS -> ()
     | MenhirInterpreter.T T_FILE_LIMIT -> ()
@@ -747,6 +909,7 @@ module Default = struct
     | MenhirInterpreter.T T_FILE_CONTROL -> ()
     | MenhirInterpreter.T T_FILES -> ()
     | MenhirInterpreter.T T_FILE -> ()
+    | MenhirInterpreter.T T_FIELD_TERMINATOR -> ()
     | MenhirInterpreter.T T_FH__KEYDEF -> ()
     | MenhirInterpreter.T T_FH__FCD -> ()
     | MenhirInterpreter.T T_FD -> ()
@@ -755,6 +918,7 @@ module Default = struct
     | MenhirInterpreter.T T_FACTORY -> ()
     | MenhirInterpreter.T T_F -> ()
     | MenhirInterpreter.T T_EXTERNAL_FORM -> ()
+    | MenhirInterpreter.T T_EXTERNALLY_DESCRIBED_KEY -> ()
     | MenhirInterpreter.T T_EXTERNAL -> ()
     | MenhirInterpreter.T T_EXTERN -> ()
     | MenhirInterpreter.T T_EXTENDED_SEARCH -> ()
@@ -763,13 +927,19 @@ module Default = struct
     | MenhirInterpreter.T T_EXPAND -> ()
     | MenhirInterpreter.T T_EXIT -> ()
     | MenhirInterpreter.T T_EXHIBIT -> ()
+    | MenhirInterpreter.T T_EXECUTE -> ()
+    | MenhirInterpreter.T T_EXEC -> ()
     | MenhirInterpreter.T T_EXCLUSIVE_OR -> ()
     | MenhirInterpreter.T T_EXCLUSIVE -> ()
+    | MenhirInterpreter.T T_EXCLUDE_EVENT_LIST -> ()
+    | MenhirInterpreter.T T_EXCESS_3 -> ()
     | MenhirInterpreter.T T_EXCEPTION_VALUE -> ()
     | MenhirInterpreter.T T_EXCEPTION_OBJECT -> ()
     | MenhirInterpreter.T T_EXCEPTION -> ()
+    | MenhirInterpreter.T T_EXCEEDS -> ()
     | MenhirInterpreter.T T_EXAMINE -> ()
     | MenhirInterpreter.T T_EVERY -> ()
+    | MenhirInterpreter.T T_EVENT_POINTER -> ()
     | MenhirInterpreter.T T_EVENT_LIST -> ()
     | MenhirInterpreter.T T_EVENT -> ()
     | MenhirInterpreter.T T_EVALUATE -> ()
@@ -797,26 +967,37 @@ module Default = struct
     | MenhirInterpreter.T T_ENGRAVED -> ()
     | MenhirInterpreter.T T_END_XML -> ()
     | MenhirInterpreter.T T_END_WRITE -> ()
+    | MenhirInterpreter.T T_END_WAIT -> ()
+    | MenhirInterpreter.T T_END_USE -> ()
     | MenhirInterpreter.T T_END_UNSTRING -> ()
     | MenhirInterpreter.T T_END_SUBTRACT -> ()
     | MenhirInterpreter.T T_END_STRING -> ()
     | MenhirInterpreter.T T_END_START -> ()
+    | MenhirInterpreter.T T_END_SET -> ()
     | MenhirInterpreter.T T_END_SEND -> ()
     | MenhirInterpreter.T T_END_SEARCH -> ()
     | MenhirInterpreter.T T_END_REWRITE -> ()
     | MenhirInterpreter.T T_END_RETURN -> ()
+    | MenhirInterpreter.T T_END_REPLACE -> ()
     | MenhirInterpreter.T T_END_RECEIVE -> ()
     | MenhirInterpreter.T T_END_READ -> ()
     | MenhirInterpreter.T T_END_PERFORM -> ()
+    | MenhirInterpreter.T T_END_ON -> ()
     | MenhirInterpreter.T T_END_OF_PAGE -> ()
     | MenhirInterpreter.T T_END_MULTIPLY -> ()
+    | MenhirInterpreter.T T_END_MOVE -> ()
     | MenhirInterpreter.T T_END_MODIFY -> ()
     | MenhirInterpreter.T T_END_JSON -> ()
+    | MenhirInterpreter.T T_END_INVOKE -> ()
     | MenhirInterpreter.T T_END_IF -> ()
+    | MenhirInterpreter.T T_END_EXEC -> ()
     | MenhirInterpreter.T T_END_EVALUATE -> ()
+    | MenhirInterpreter.T T_END_ENABLE -> ()
     | MenhirInterpreter.T T_END_DIVIDE -> ()
     | MenhirInterpreter.T T_END_DISPLAY -> ()
+    | MenhirInterpreter.T T_END_DISABLE -> ()
     | MenhirInterpreter.T T_END_DELETE -> ()
+    | MenhirInterpreter.T T_END_COPY -> ()
     | MenhirInterpreter.T T_END_COMPUTE -> ()
     | MenhirInterpreter.T T_END_COLOR -> ()
     | MenhirInterpreter.T T_END_CHAIN -> ()
@@ -827,12 +1008,16 @@ module Default = struct
     | MenhirInterpreter.T T_END -> ()
     | MenhirInterpreter.T T_ENCRYPTION -> ()
     | MenhirInterpreter.T T_ENCODING -> ()
+    | MenhirInterpreter.T T_ENABLED -> ()
     | MenhirInterpreter.T T_ENABLE -> ()
     | MenhirInterpreter.T T_EMI -> ()
     | MenhirInterpreter.T T_ELSE -> ()
     | MenhirInterpreter.T T_ELEMENT -> ()
+    | MenhirInterpreter.T T_EJECT -> ()
     | MenhirInterpreter.T T_EIGHTY_EIGHT -> ()
     | MenhirInterpreter.T T_EGI -> ()
+    | MenhirInterpreter.T T_EGCS -> ()
+    | MenhirInterpreter.T T_EGC -> ()
     | MenhirInterpreter.T T_EDITING -> ()
     | MenhirInterpreter.T T_ECHO -> ()
     | MenhirInterpreter.T T_EC -> ()
@@ -841,17 +1026,21 @@ module Default = struct
     | MenhirInterpreter.T T_DUPLICATES -> ()
     | MenhirInterpreter.T T_DROP_LIST -> ()
     | MenhirInterpreter.T T_DROP_DOWN -> ()
+    | MenhirInterpreter.T T_DROP -> ()
+    | MenhirInterpreter.T T_DRAW -> ()
     | MenhirInterpreter.T T_DRAG_COLOR -> ()
     | MenhirInterpreter.T T_DOWN -> ()
     | MenhirInterpreter.T T_DOUBLE_COLON -> ()
     | MenhirInterpreter.T T_DOUBLE_ASTERISK -> ()
     | MenhirInterpreter.T T_DOUBLE -> ()
+    | MenhirInterpreter.T T_DOT_DASH -> ()
     | MenhirInterpreter.T T_DOTTED -> ()
     | MenhirInterpreter.T T_DOTDASH -> ()
     | MenhirInterpreter.T T_DIVISION -> ()
     | MenhirInterpreter.T T_DIVIDER_COLOR -> ()
     | MenhirInterpreter.T T_DIVIDERS -> ()
     | MenhirInterpreter.T T_DIVIDE -> ()
+    | MenhirInterpreter.T T_DISPLAY_ST -> ()
     | MenhirInterpreter.T T_DISPLAY_FORMAT -> ()
     | MenhirInterpreter.T T_DISPLAY_COLUMNS -> ()
     | MenhirInterpreter.T T_DISPLAY_4 -> ()
@@ -861,6 +1050,7 @@ module Default = struct
     | MenhirInterpreter.T T_DISPLAY -> ()
     | MenhirInterpreter.T T_DISP -> ()
     | MenhirInterpreter.T T_DISK -> ()
+    | MenhirInterpreter.T T_DISJOINING -> ()
     | MenhirInterpreter.T T_DISCONNECT -> ()
     | MenhirInterpreter.T T_DISC -> ()
     | MenhirInterpreter.T T_DISABLE -> ()
@@ -868,6 +1058,7 @@ module Default = struct
     | MenhirInterpreter.T T_DETAIL -> ()
     | MenhirInterpreter.T T_DESTROY -> ()
     | MenhirInterpreter.T T_DESTINATION -> ()
+    | MenhirInterpreter.T T_DESCRIPTOR -> ()
     | MenhirInterpreter.T T_DESCENDING -> ()
     | MenhirInterpreter.T T_DEPENDING -> ()
     | MenhirInterpreter.T T_DELIMITER -> ()
@@ -877,6 +1068,7 @@ module Default = struct
     | MenhirInterpreter.T T_DEFAULT_FONT -> ()
     | MenhirInterpreter.T T_DEFAULT_BUTTON -> ()
     | MenhirInterpreter.T T_DEFAULT -> ()
+    | MenhirInterpreter.T T_DECLARE -> ()
     | MenhirInterpreter.T T_DECLARATIVES -> ()
     | MenhirInterpreter.T T_DECIMAL_POINT -> ()
     | MenhirInterpreter.T T_DECIMAL_ENCODING -> ()
@@ -888,12 +1080,20 @@ module Default = struct
     | MenhirInterpreter.T T_DEBUG_ITEM -> ()
     | MenhirInterpreter.T T_DEBUG_CONTENTS -> ()
     | MenhirInterpreter.T T_DEBUGGING -> ()
+    | MenhirInterpreter.T T_DEBUG -> ()
+    | MenhirInterpreter.T T_DBCS -> ()
+    | MenhirInterpreter.T T_DBCLOB_LOCATOR -> ()
+    | MenhirInterpreter.T T_DBCLOB_FILE -> ()
+    | MenhirInterpreter.T T_DBCLOB -> ()
     | MenhirInterpreter.T T_DAY_OF_WEEK -> ()
+    | MenhirInterpreter.T T_DAY_AND_TIME -> ()
     | MenhirInterpreter.T T_DAY -> ()
     | MenhirInterpreter.T T_DATE_WRITTEN -> ()
+    | MenhirInterpreter.T T_DATE_RECORD -> ()
     | MenhirInterpreter.T T_DATE_MODIFIED -> ()
     | MenhirInterpreter.T T_DATE_ENTRY -> ()
     | MenhirInterpreter.T T_DATE_COMPILED -> ()
+    | MenhirInterpreter.T T_DATE_AND_TIME -> ()
     | MenhirInterpreter.T T_DATE -> ()
     | MenhirInterpreter.T T_DATA_TYPES -> ()
     | MenhirInterpreter.T T_DATA_RECORDS -> ()
@@ -914,25 +1114,38 @@ module Default = struct
     | MenhirInterpreter.T T_CURSOR_COLOR -> ()
     | MenhirInterpreter.T T_CURSOR_COL -> ()
     | MenhirInterpreter.T T_CURSOR -> ()
+    | MenhirInterpreter.T T_CURRENT_DATE -> ()
     | MenhirInterpreter.T T_CURRENT -> ()
     | MenhirInterpreter.T T_CURRENCY -> ()
+    | MenhirInterpreter.T T_CULTURE -> ()
     | MenhirInterpreter.T T_CS_GENERAL -> ()
     | MenhirInterpreter.T T_CS_BASIC -> ()
+    | MenhirInterpreter.T T_CSP -> ()
     | MenhirInterpreter.T T_CSIZE -> ()
     | MenhirInterpreter.T T_CRT_UNDER -> ()
     | MenhirInterpreter.T T_CRT -> ()
+    | MenhirInterpreter.T T_CREATE -> ()
+    | MenhirInterpreter.T T_COUNT_TRAILING -> ()
+    | MenhirInterpreter.T T_COUNT_MIN -> ()
+    | MenhirInterpreter.T T_COUNT_MAX -> ()
+    | MenhirInterpreter.T T_COUNT_LEADLING -> ()
     | MenhirInterpreter.T T_COUNT -> ()
     | MenhirInterpreter.T T_CORRESPONDING -> ()
     | MenhirInterpreter.T T_CORE_INDEX -> ()
     | MenhirInterpreter.T T_COPY_SELECTION -> ()
     | MenhirInterpreter.T T_COPY -> ()
     | MenhirInterpreter.T T_CONVERTING -> ()
+    | MenhirInterpreter.T T_CONVERT -> ()
     | MenhirInterpreter.T T_CONVERSION -> ()
+    | MenhirInterpreter.T T_CONTROL_AREA -> ()
+    | MenhirInterpreter.T T_CONTROLS_UNCROPPED -> ()
     | MenhirInterpreter.T T_CONTROLS -> ()
     | MenhirInterpreter.T T_CONTROL -> ()
     | MenhirInterpreter.T T_CONTINUE -> ()
+    | MenhirInterpreter.T T_CONTENT_OF -> ()
     | MenhirInterpreter.T T_CONTENT -> ()
     | MenhirInterpreter.T T_CONTAINS -> ()
+    | MenhirInterpreter.T T_CONSTRUCTOR -> ()
     | MenhirInterpreter.T T_CONSTANT_RECORD -> ()
     | MenhirInterpreter.T T_CONSTANT -> ()
     | MenhirInterpreter.T T_CONSOLE_3 -> ()
@@ -942,6 +1155,7 @@ module Default = struct
     | MenhirInterpreter.T T_CONNECT -> ()
     | MenhirInterpreter.T T_CONFIGURATION -> ()
     | MenhirInterpreter.T T_CONDITION -> ()
+    | MenhirInterpreter.T T_COM_REG -> ()
     | MenhirInterpreter.T T_COMP_X -> ()
     | MenhirInterpreter.T T_COMP_N -> ()
     | MenhirInterpreter.T T_COMP_9 -> ()
@@ -965,11 +1179,13 @@ module Default = struct
     | MenhirInterpreter.T T_COMPUTATIONAL_13 -> ()
     | MenhirInterpreter.T T_COMPUTATIONAL_12 -> ()
     | MenhirInterpreter.T T_COMPUTATIONAL_11 -> ()
+    | MenhirInterpreter.T T_COMPRESSION -> ()
     | MenhirInterpreter.T T_COMPLEMENTARY -> ()
     | MenhirInterpreter.T T_COMPLE -> ()
     | MenhirInterpreter.T T_COMP -> ()
     | MenhirInterpreter.T T_COMMUNICATION -> ()
     | MenhirInterpreter.T T_COMMON -> ()
+    | MenhirInterpreter.T T_COMMITMENT -> ()
     | MenhirInterpreter.T T_COMMIT -> ()
     | MenhirInterpreter.T T_COMMENT_ENTRY -> ["_"]
     | MenhirInterpreter.T T_COMMAND_LINE -> ()
@@ -987,27 +1203,39 @@ module Default = struct
     | MenhirInterpreter.T T_COLON -> ()
     | MenhirInterpreter.T T_COLLATING -> ()
     | MenhirInterpreter.T T_COL -> ()
+    | MenhirInterpreter.T T_COERCION -> ()
     | MenhirInterpreter.T T_CODE_SET -> ()
     | MenhirInterpreter.T T_CODE -> ()
     | MenhirInterpreter.T T_COBOL -> ()
     | MenhirInterpreter.T T_CLOSE -> ()
     | MenhirInterpreter.T T_CLOCK_UNITS -> ()
+    | MenhirInterpreter.T T_CLOB_LOCATOR -> ()
+    | MenhirInterpreter.T T_CLOB_FILE -> ()
+    | MenhirInterpreter.T T_CLOB -> ()
     | MenhirInterpreter.T T_CLINES -> ()
     | MenhirInterpreter.T T_CLINE -> ()
     | MenhirInterpreter.T T_CLEAR_SELECTION -> ()
+    | MenhirInterpreter.T T_CLASS_OBJECT -> ()
+    | MenhirInterpreter.T T_CLASS_NAME -> ()
     | MenhirInterpreter.T T_CLASS_ID -> ()
+    | MenhirInterpreter.T T_CLASS_CONTROL -> ()
     | MenhirInterpreter.T T_CLASSIFICATION -> ()
     | MenhirInterpreter.T T_CLASS -> ()
+    | MenhirInterpreter.T T_CICS -> ()
     | MenhirInterpreter.T T_CHECK_BOX -> ()
     | MenhirInterpreter.T T_CHECKPOINT_FILE -> ()
     | MenhirInterpreter.T T_CHECK -> ()
+    | MenhirInterpreter.T T_CHAR_VARYING -> ()
+    | MenhirInterpreter.T T_CHART -> ()
     | MenhirInterpreter.T T_CHARACTERS -> ()
     | MenhirInterpreter.T T_CHARACTER -> ()
+    | MenhirInterpreter.T T_CHAR -> ()
     | MenhirInterpreter.T T_CHANGED -> ()
     | MenhirInterpreter.T T_CHAINING -> ()
     | MenhirInterpreter.T T_CHAIN -> ()
     | MenhirInterpreter.T T_CH -> ()
     | MenhirInterpreter.T T_CF -> ()
+    | MenhirInterpreter.T T_CENTURY_DAY -> ()
     | MenhirInterpreter.T T_CENTURY_DATE -> ()
     | MenhirInterpreter.T T_CENTERED_HEADINGS -> ()
     | MenhirInterpreter.T T_CENTERED -> ()
@@ -1019,14 +1247,18 @@ module Default = struct
     | MenhirInterpreter.T T_CELL -> ()
     | MenhirInterpreter.T T_CD -> ()
     | MenhirInterpreter.T T_CCOL -> ()
+    | MenhirInterpreter.T T_CBL -> ()
     | MenhirInterpreter.T T_CATALOGUE_NAME -> ()
     | MenhirInterpreter.T T_CATALOGUED -> ()
     | MenhirInterpreter.T T_CASSETTE -> ()
+    | MenhirInterpreter.T T_CASE_SENSITIVE -> ()
+    | MenhirInterpreter.T T_CASE_INSENSITIVE -> ()
     | MenhirInterpreter.T T_CARD_READER -> ()
     | MenhirInterpreter.T T_CARD_PUNCH -> ()
     | MenhirInterpreter.T T_CAPACITY -> ()
     | MenhirInterpreter.T T_CANCEL_BUTTON -> ()
     | MenhirInterpreter.T T_CANCEL -> ()
+    | MenhirInterpreter.T T_CALLED -> ()
     | MenhirInterpreter.T T_CALL -> ()
     | MenhirInterpreter.T T_CALENDAR_FONT -> ()
     | MenhirInterpreter.T T_C -> ()
@@ -1047,12 +1279,16 @@ module Default = struct
     | MenhirInterpreter.T T_BUSY -> ()
     | MenhirInterpreter.T T_BULK_ADDITION -> ()
     | MenhirInterpreter.T T_BSN -> ()
+    | MenhirInterpreter.T T_BROWSING -> ()
     | MenhirInterpreter.T T_BOXED -> ()
     | MenhirInterpreter.T T_BOX -> ()
     | MenhirInterpreter.T T_BOTTOM -> ()
     | MenhirInterpreter.T T_BOOLIT -> boolean_zero
     | MenhirInterpreter.T T_BOOLEAN -> ()
     | MenhirInterpreter.T T_BLOCK -> ()
+    | MenhirInterpreter.T T_BLOB_LOCATOR -> ()
+    | MenhirInterpreter.T T_BLOB_FILE -> ()
+    | MenhirInterpreter.T T_BLOB -> ()
     | MenhirInterpreter.T T_BLINK -> ()
     | MenhirInterpreter.T T_BLANK -> ()
     | MenhirInterpreter.T T_BITS -> ()
@@ -1061,11 +1297,15 @@ module Default = struct
     | MenhirInterpreter.T T_BITMAP_TRAILING -> ()
     | MenhirInterpreter.T T_BITMAP_TIMER -> ()
     | MenhirInterpreter.T T_BITMAP_START -> ()
+    | MenhirInterpreter.T T_BITMAP_SCALE -> ()
+    | MenhirInterpreter.T T_BITMAP_RAW_WIDTH -> ()
+    | MenhirInterpreter.T T_BITMAP_RAW_HEIGHT -> ()
     | MenhirInterpreter.T T_BITMAP_NUMBER -> ()
     | MenhirInterpreter.T T_BITMAP_HANDLE -> ()
     | MenhirInterpreter.T T_BITMAP_END -> ()
     | MenhirInterpreter.T T_BITMAP -> ()
     | MenhirInterpreter.T T_BIT -> ()
+    | MenhirInterpreter.T T_BIND -> ()
     | MenhirInterpreter.T T_BINARY_SHORT -> ()
     | MenhirInterpreter.T T_BINARY_SEQUENTIAL -> ()
     | MenhirInterpreter.T T_BINARY_LONG -> ()
@@ -1078,6 +1318,7 @@ module Default = struct
     | MenhirInterpreter.T T_BEGINNING -> ()
     | MenhirInterpreter.T T_BEFORE -> ()
     | MenhirInterpreter.T T_BECOMES -> ()
+    | MenhirInterpreter.T T_BASIS -> ()
     | MenhirInterpreter.T T_BASED -> ()
     | MenhirInterpreter.T T_BAR -> ()
     | MenhirInterpreter.T T_BACKWARD -> ()
@@ -1085,8 +1326,12 @@ module Default = struct
     | MenhirInterpreter.T T_BACKGROUND_LOW -> ()
     | MenhirInterpreter.T T_BACKGROUND_HIGH -> ()
     | MenhirInterpreter.T T_BACKGROUND_COLOR -> ()
+    | MenhirInterpreter.T T_AX_EVENT_LIST -> ()
     | MenhirInterpreter.T T_AWAY_FROM_ZERO -> ()
     | MenhirInterpreter.T T_AUTO_SPIN -> ()
+    | MenhirInterpreter.T T_AUTO_RESIZE -> ()
+    | MenhirInterpreter.T T_AUTO_MINIMIZE -> ()
+    | MenhirInterpreter.T T_AUTO_HYPHEN_SKIP -> ()
     | MenhirInterpreter.T T_AUTO_DECIMAL -> ()
     | MenhirInterpreter.T T_AUTOMATIC -> ()
     | MenhirInterpreter.T T_AUTO -> ()
@@ -1098,6 +1343,7 @@ module Default = struct
     | MenhirInterpreter.T T_AT -> ()
     | MenhirInterpreter.T T_ASTERISK -> ()
     | MenhirInterpreter.T T_ASSIGN -> ()
+    | MenhirInterpreter.T T_ASSEMBLY_NAME -> ()
     | MenhirInterpreter.T T_ASCII -> ()
     | MenhirInterpreter.T T_ASCENDING -> ()
     | MenhirInterpreter.T T_ASA -> ()
@@ -1105,6 +1351,7 @@ module Default = struct
     | MenhirInterpreter.T T_ARITHMETIC -> ()
     | MenhirInterpreter.T T_ARGUMENT_VALUE -> ()
     | MenhirInterpreter.T T_ARGUMENT_NUMBER -> ()
+    | MenhirInterpreter.T T_AREA_VALUES -> ()
     | MenhirInterpreter.T T_AREAS -> ()
     | MenhirInterpreter.T T_AREA -> ()
     | MenhirInterpreter.T T_ARE -> ()
@@ -1143,8 +1390,10 @@ module Default = struct
     | MenhirInterpreter.T T_ACTIVE_CLASS -> ()
     | MenhirInterpreter.T T_ACTIVATING -> ()
     | MenhirInterpreter.T T_ACTION -> ()
+    | MenhirInterpreter.T T_ACQUIRE -> ()
     | MenhirInterpreter.T T_ACCESS -> ()
     | MenhirInterpreter.T T_ACCEPT -> ()
+    | MenhirInterpreter.T T_ABSTRACT -> ()
     | MenhirInterpreter.T T_ABSENT -> ()
     | MenhirInterpreter.N MenhirInterpreter.N_write_target -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_write_statement -> raise Not_found
@@ -2149,10 +2398,14 @@ let can_pop (type a) : a terminal -> bool = function
   | T_YYYYDDD -> true
   | T_Y -> true
   | T_XOR -> true
+  | T_XML_TEXT -> true
   | T_XML_SCHEMA -> true
+  | T_XML_NTEXT -> true
+  | T_XML_EVENT -> true
   | T_XML_DECLARATION -> true
   | T_XML -> true
   | T_X -> true
+  | T_WRITING -> true
   | T_WRITE_VERIFY -> true
   | T_WRITE_ONLY -> true
   | T_WRITERS -> true
@@ -2165,6 +2418,9 @@ let can_pop (type a) : a terminal -> bool = function
   | T_WINDOW -> true
   | T_WIDTH_IN_CELLS -> true
   | T_WIDTH -> true
+  | T_WIDE -> true
+  | T_WHILE -> true
+  | T_WHEN_COMPILED -> true
   | T_WHEN -> true
   | T_WEB_BROWSER -> true
   | T_WAIT -> true
@@ -2175,14 +2431,17 @@ let can_pop (type a) : a terminal -> bool = function
   | T_VPADDING -> true
   | T_VOLATILE -> true
   | T_VLR -> true
+  | T_VISIBLE -> true
   | T_VIRTUAL_WIDTH -> true
   | T_VIRTUAL -> true
   | T_VIA -> true
   | T_VERY_HEAVY -> true
   | T_VERTICAL -> true
+  | T_VERSION -> true
   | T_VARYING -> true
   | T_VARIANT -> true
   | T_VARIABLE -> true
+  | T_VARBINARY -> true
   | T_VALUE_FORMAT -> true
   | T_VALUES -> true
   | T_VALUE -> true
@@ -2197,7 +2456,10 @@ let can_pop (type a) : a terminal -> bool = function
   | T_USE_TAB -> true
   | T_USE_RETURN -> true
   | T_USE_ALT -> true
+  | T_USER_WHITE -> true
+  | T_USER_GRAY -> true
   | T_USER_DEFAULT -> true
+  | T_USER_COLORS -> true
   | T_USER -> true
   | T_USE -> true
   | T_USAGE -> true
@@ -2219,6 +2481,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_UNIVERSAL -> true
   | T_UNIT -> true
   | T_UNFRAMED -> true
+  | T_UNEQUAL -> true
   | T_UNDERLINE -> true
   | T_UNBOUNDED -> true
   | T_UFF -> true
@@ -2228,31 +2491,50 @@ let can_pop (type a) : a terminal -> bool = function
   | T_TYPE -> true
   | T_TRUNCATION -> true
   | T_TRUE -> true
+  | T_TRIMMED -> true
   | T_TREE_VIEW -> true
+  | T_TRANSPARENT_COLOR -> true
   | T_TRANSPARENT -> true
   | T_TRANSFORM -> true
+  | T_TRANSACTION_STATUS -> true
+  | T_TRANSACTION -> true
   | T_TRAILING_SIGN -> true
   | T_TRAILING_SHIFT -> true
   | T_TRAILING -> true
   | T_TRADITIONAL_FONT -> true
+  | T_TRACK_THUMB -> true
   | T_TRACK_LIMIT -> true
   | T_TRACK_AREA -> true
   | T_TRACKS -> true
   | T_TRACK -> true
+  | T_TRACE -> true
   | T_TOWARD_LESSER -> true
   | T_TOWARD_GREATER -> true
+  | T_TOTALING -> true
+  | T_TOTALED -> true
   | T_TOP_LEVEL -> true
   | T_TOP -> true
+  | T_TOOL_BAR -> true
   | T_TO -> true
   | T_TITLE_POSITION -> true
+  | T_TITLE_BAR -> true
   | T_TITLE -> true
+  | T_TIME_RECORD -> true
   | T_TIME_OUT -> true
+  | T_TIME_OF_DAY -> true
+  | T_TIMESTAMP_RECORD -> true
+  | T_TIMESTAMP_OFFSET_RECORD -> true
+  | T_TIMESTAMP_OFFSET -> true
+  | T_TIMESTAMP -> true
   | T_TIMES -> true
   | T_TIME -> true
   | T_TILED_HEADINGS -> true
   | T_THUMB_POSITION -> true
   | T_THROUGH -> true
   | T_THREEDIMENSIONAL -> true
+  | T_THREAD_POINTER -> true
+  | T_THREAD_LOCAL_STORAGE -> true
+  | T_THREAD_LOCAL -> true
   | T_THREADS -> true
   | T_THREAD -> true
   | T_THEN -> true
@@ -2272,8 +2554,10 @@ let can_pop (type a) : a terminal -> bool = function
   | T_TEMP -> true
   | T_TAPE -> true
   | T_TALLYING -> true
+  | T_TALLY -> true
   | T_TAB_TO_DELETE -> true
   | T_TAB_TO_ADD -> true
+  | T_TAB_CONTROL -> true
   | T_TABLE -> true
   | T_TAB -> true
   | T_SYSTEM_OFFSET -> true
@@ -2297,16 +2581,20 @@ let can_pop (type a) : a terminal -> bool = function
   | T_SUPPRESS -> true
   | T_SUPER -> true
   | T_SUM -> true
+  | T_SUFFIXING -> true
   | T_SUB_SCHEMA -> true
   | T_SUB_QUEUE_3 -> true
   | T_SUB_QUEUE_2 -> true
   | T_SUB_QUEUE_1 -> true
   | T_SUBWINDOW -> true
   | T_SUBTRACT -> true
+  | T_SUBFILE -> true
   | T_STYLE -> true
   | T_STRUCTURE -> true
+  | T_STRONG_NAME -> true
   | T_STRONG -> true
   | T_STRING -> true
+  | T_STOP_BROWSER -> true
   | T_STOP -> true
   | T_STEP -> true
   | T_STDCALL -> true
@@ -2319,6 +2607,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_STATEMENT -> true
   | T_START_Y -> true
   | T_START_X -> true
+  | T_STARTING -> true
   | T_START -> true
   | T_STANDARD_DECIMAL -> true
   | T_STANDARD_BINARY -> true
@@ -2328,6 +2617,14 @@ let can_pop (type a) : a terminal -> bool = function
   | T_STACK -> true
   | T_SSF -> true
   | T_SQUARE -> true
+  | T_SQL_ROWID -> true
+  | T_SQL_NCLOB -> true
+  | T_SQL_CURSOR -> true
+  | T_SQL_CLOB -> true
+  | T_SQL_BLOB -> true
+  | T_SQL_BFILE -> true
+  | T_SQLIMS -> true
+  | T_SQL -> true
   | T_SPINNER -> true
   | T_SPECIAL_NAMES -> true
   | T_SPACE_FILL -> true
@@ -2335,11 +2632,21 @@ let can_pop (type a) : a terminal -> bool = function
   | T_SOURCE_COMPUTER -> true
   | T_SOURCES -> true
   | T_SOURCE -> true
+  | T_SORT_WORK -> true
+  | T_SORT_RETURN -> true
   | T_SORT_ORDER -> true
+  | T_SORT_MODE_SIZE -> true
+  | T_SORT_MESSAGE -> true
   | T_SORT_MERGE -> true
+  | T_SORT_FILE_SIZE -> true
+  | T_SORT_CORE_SIZE -> true
+  | T_SORT_CONTROL -> true
   | T_SORT -> true
   | T_SMALL_FONT -> true
   | T_SLASH -> true
+  | T_SKIP3 -> true
+  | T_SKIP2 -> true
+  | T_SKIP1 -> true
   | T_SIZE -> true
   | T_SIGNED_SHORT -> true
   | T_SIGNED_LONG -> true
@@ -2351,25 +2658,32 @@ let can_pop (type a) : a terminal -> bool = function
   | T_SHOW_LINES -> true
   | T_SHORT_DATE -> true
   | T_SHORT -> true
+  | T_SHIFT_OUT -> true
+  | T_SHIFT_IN -> true
   | T_SHARING -> true
   | T_SHADOW -> true
   | T_SHADING -> true
   | T_SET -> true
+  | T_SERVICE -> true
   | T_SEQUENTIAL -> true
   | T_SEQUENCE -> true
   | T_SEPARATION -> true
   | T_SEPARATE -> true
   | T_SENTENCE -> true
   | T_SEND -> true
+  | T_SEMAPHORE_POINTER -> true
   | T_SELF_ACT -> true
+  | T_SELFCLASS -> true
   | T_SELF -> true
   | T_SELECT_ALL -> true
+  | T_SELECTIVE -> true
   | T_SELECTION_TEXT -> true
   | T_SELECTION_INDEX -> true
   | T_SELECTION -> true
   | T_SELECT -> true
   | T_SEGMENT_LIMIT -> true
   | T_SEGMENT -> true
+  | T_SEEK -> true
   | T_SECURITY -> true
   | T_SECURE -> true
   | T_SECTION -> true
@@ -2395,8 +2709,10 @@ let can_pop (type a) : a terminal -> bool = function
   | T_ROW_DIVIDERS -> true
   | T_ROW_COLOR_PATTERN -> true
   | T_ROW_COLOR -> true
+  | T_ROWID -> true
   | T_ROUNDING -> true
   | T_ROUNDED -> true
+  | T_ROLLING -> true
   | T_ROLLBACK -> true
   | T_RIMMED -> true
   | T_RIGHT_JUSTIFY -> true
@@ -2409,12 +2725,18 @@ let can_pop (type a) : a terminal -> bool = function
   | T_REVERSE_VIDEO -> true
   | T_REVERSED -> true
   | T_REVERSE -> true
+  | T_RETURN_UNSIGNED -> true
+  | T_RETURN_CODE -> true
   | T_RETURNING -> true
   | T_RETURN -> true
   | T_RETRY -> true
   | T_RETENTION -> true
   | T_RESUME -> true
+  | T_RESTRICTED -> true
+  | T_RESIZABLE -> true
+  | T_RESIDENT -> true
   | T_RESET_TABS -> true
+  | T_RESET_SET_LOCATOR -> true
   | T_RESET_LIST -> true
   | T_RESET_GRID -> true
   | T_RESET -> true
@@ -2427,6 +2749,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_REPORTING -> true
   | T_REPORT -> true
   | T_REPLACING -> true
+  | T_REPLACED -> true
   | T_REPLACE -> true
   | T_REPEATED -> true
   | T_REORG_CRITERIA -> true
@@ -2434,6 +2757,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_REMOVAL -> true
   | T_REMARKS -> true
   | T_REMAINDER -> true
+  | T_RELOAD -> true
   | T_RELEASE -> true
   | T_RELATIVE -> true
   | T_RELATION -> true
@@ -2442,10 +2766,12 @@ let can_pop (type a) : a terminal -> bool = function
   | T_REFERENCES -> true
   | T_REFERENCE -> true
   | T_REEL -> true
+  | T_REDEFINITION -> true
   | T_REDEFINES -> true
   | T_RECURSIVE -> true
   | T_RECORD_TO_DELETE -> true
   | T_RECORD_TO_ADD -> true
+  | T_RECORD_POSITION -> true
   | T_RECORD_OVERFLOW -> true
   | T_RECORD_DATA -> true
   | T_RECORDS -> true
@@ -2454,9 +2780,12 @@ let can_pop (type a) : a terminal -> bool = function
   | T_RECEIVED -> true
   | T_RECEIVE -> true
   | T_READ_ONLY -> true
+  | T_READY -> true
+  | T_READING -> true
   | T_READERS -> true
   | T_READ -> true
   | T_RD -> true
+  | T_RANGE -> true
   | T_RANDOM -> true
   | T_RAISING -> true
   | T_RAISED -> true
@@ -2468,6 +2797,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_QUERY_INDEX -> true
   | T_PUSH_BUTTON -> true
   | T_PURGE -> true
+  | T_PUBLIC -> true
   | T_PROTOTYPE -> true
   | T_PROTECTED -> true
   | T_PROPERTY -> true
@@ -2480,13 +2810,18 @@ let can_pop (type a) : a terminal -> bool = function
   | T_PROGRAM -> true
   | T_PROCESS_AREA -> true
   | T_PROCESSING -> true
+  | T_PROCESS -> true
   | T_PROCEED -> true
   | T_PROCEDURE_POINTER -> true
+  | T_PROCEDURE_NAME -> true
   | T_PROCEDURES -> true
   | T_PROCEDURE -> true
+  | T_PRIVATE -> true
   | T_PRIORITY -> true
+  | T_PRIOR -> true
   | T_PRINT_PREVIEW -> true
   | T_PRINT_NO_PROMPT -> true
+  | T_PRINT_CONTROL -> true
   | T_PRINTING -> true
   | T_PRINTER_1 -> true
   | T_PRINTER -> true
@@ -2494,12 +2829,15 @@ let can_pop (type a) : a terminal -> bool = function
   | T_PRIMARY -> true
   | T_PREVIOUS -> true
   | T_PRESENT -> true
+  | T_PREFIXING -> true
   | T_PREFIXED -> true
   | T_POSITIVE -> true
   | T_POSITION_SHIFT -> true
+  | T_POSITIONING -> true
   | T_POSITION -> true
   | T_POS -> true
   | T_POP_UP -> true
+  | T_POINTER_32 -> true
   | T_POINTER -> true
   | T_PLUS_SIGN -> true
   | T_PLUS -> true
@@ -2517,19 +2855,27 @@ let can_pop (type a) : a terminal -> bool = function
   | T_PARSE -> true
   | T_PARENT -> true
   | T_PARAGRAPH -> true
+  | T_PANEL_WIDTHS -> true
+  | T_PANEL_TEXT -> true
+  | T_PANEL_STYLE -> true
+  | T_PANEL_INDEX -> true
+  | T_PAGE_SIZE -> true
   | T_PAGE_SETUP -> true
   | T_PAGE_COUNTER -> true
   | T_PAGED -> true
   | T_PAGE -> true
   | T_PADDING -> true
   | T_PACKED_DECIMAL -> true
+  | T_O_FILL -> true
   | T_OVERRIDING -> true
   | T_OVERRIDE -> true
   | T_OVERLINE -> true
   | T_OVERLAP_TOP -> true
   | T_OVERLAP_LEFT -> true
+  | T_OVERLAPPED -> true
   | T_OVERFLOW -> true
   | T_OUTPUT -> true
+  | T_OTHERWISE -> true
   | T_OTHERS -> true
   | T_OTHER -> true
   | T_ORGANIZATION -> true
@@ -2539,6 +2885,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_OPTIONAL -> true
   | T_OPERATIONAL -> true
   | T_OPEN -> true
+  | T_OOSTACKPTR -> true
   | T_ON_SIZE_ERROR -> true
   | T_ON_OVERFLOW -> true
   | T_ON_EXCEPTION -> true
@@ -2549,12 +2896,16 @@ let can_pop (type a) : a terminal -> bool = function
   | T_OFF -> true
   | T_OF -> true
   | T_OCCURS -> true
+  | T_OBJECT_STORAGE -> true
   | T_OBJECT_REFERENCE -> true
   | T_OBJECT_PROGRAM -> true
+  | T_OBJECT_ID -> true
   | T_OBJECT_COMPUTER -> true
   | T_OBJECT -> true
+  | T_NUM_ROW_HEADINGS -> true
   | T_NUM_ROWS -> true
   | T_NUM_COL_HEADINGS -> true
+  | T_NUMERIC_FILL -> true
   | T_NUMERIC_EDITED -> true
   | T_NUMERIC -> true
   | T_NUMBERS -> true
@@ -2562,6 +2913,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NULLS -> true
   | T_NULL -> true
   | T_NO_UPDOWN -> true
+  | T_NO_TAB -> true
   | T_NO_SEARCH -> true
   | T_NO_KEY_LETTER -> true
   | T_NO_GROUP_TAB -> true
@@ -2570,6 +2922,8 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NO_ECHO -> true
   | T_NO_DIVIDERS -> true
   | T_NO_DATA -> true
+  | T_NO_CLOSE -> true
+  | T_NO_CELL_DRAG -> true
   | T_NO_BOX -> true
   | T_NO_AUTO_DEFAULT -> true
   | T_NO_AUTOSEL -> true
@@ -2584,6 +2938,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NOTIFY_CHANGE -> true
   | T_NOTIFY -> true
   | T_NOTHING -> true
+  | T_NOTE -> true
   | T_NOTAB -> true
   | T_NOT -> true
   | T_NORMAL -> true
@@ -2595,6 +2950,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NEXT_ITEM -> true
   | T_NEXT -> true
   | T_NEW -> true
+  | T_NET_EVENT_LIST -> true
   | T_NESTED -> true
   | T_NEGATIVE -> true
   | T_NEAREST_TO_ZERO -> true
@@ -2602,6 +2958,8 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NEAREST_EVEN -> true
   | T_NEAREST_AWAY_FROM_ZERO -> true
   | T_NE -> true
+  | T_NCLOB -> true
+  | T_NCHAR -> true
   | T_NAVIGATE_URL -> true
   | T_NATIVE -> true
   | T_NATIONAL_EDITED -> true
@@ -2611,28 +2969,48 @@ let can_pop (type a) : a terminal -> bool = function
   | T_NAMESPACE -> true
   | T_NAMED -> true
   | T_NAME -> true
+  | T_MUTEX_POINTER -> true
   | T_MULTIPLY -> true
   | T_MULTIPLE -> true
   | T_MULTILINE -> true
   | T_MOVE -> true
+  | T_MORE_LABELS -> true
+  | T_MONITOR_POINTER -> true
   | T_MODULES -> true
+  | T_MODULE -> true
   | T_MODIFY -> true
+  | T_MODIFIED -> true
+  | T_MODELESS -> true
   | T_MODE -> true
+  | T_MODAL -> true
+  | T_MIN_WIDTH -> true
+  | T_MIN_VALUE -> true
   | T_MIN_VAL -> true
+  | T_MIN_SIZE -> true
+  | T_MIN_LINES -> true
+  | T_MIN_HEIGHT -> true
   | T_MINUS -> true
   | T_MICROSECOND_TIME -> true
   | T_METHOD_ID -> true
   | T_METHOD -> true
+  | T_META_CLASS -> true
   | T_MESSAGE_TAG -> true
+  | T_MESSAGES -> true
   | T_MESSAGE -> true
   | T_MERGE -> true
   | T_MENU -> true
   | T_MEMORY -> true
   | T_MEDIUM_FONT -> true
+  | T_MDI_FRAME -> true
+  | T_MDI_CHILD -> true
+  | T_MAX_WIDTH -> true
+  | T_MAX_VALUE -> true
   | T_MAX_VAL -> true
   | T_MAX_TEXT -> true
+  | T_MAX_SIZE -> true
   | T_MAX_PROGRESS -> true
   | T_MAX_LINES -> true
+  | T_MAX_HEIGHT -> true
   | T_MASTER_INDEX -> true
   | T_MASS_UPDATE -> true
   | T_MANUAL -> true
@@ -2642,8 +3020,12 @@ let can_pop (type a) : a terminal -> bool = function
   | T_LOW_VALUE -> true
   | T_LOW_COLOR -> true
   | T_LOWLIGHT -> true
+  | T_LOWEST_VALUE -> true
   | T_LOWERED -> true
   | T_LOWER -> true
+  | T_LOW -> true
+  | T_LONG_VARCHAR -> true
+  | T_LONG_VARBINARY -> true
   | T_LONG_DATE -> true
   | T_LOCK_HOLDING -> true
   | T_LOCKS -> true
@@ -2655,6 +3037,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_LM_RESIZE -> true
   | T_LIST_BOX -> true
   | T_LINKAGE -> true
+  | T_LINK -> true
   | T_LINE_SEQUENTIAL -> true
   | T_LINE_COUNTER -> true
   | T_LINES_PER_PAGE -> true
@@ -2663,6 +3046,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_LINE -> true
   | T_LINAGE_COUNTER -> true
   | T_LINAGE -> true
+  | T_LIN -> true
   | T_LIMITS -> true
   | T_LIMIT -> true
   | T_LIKE -> true
@@ -2697,8 +3081,15 @@ let can_pop (type a) : a terminal -> bool = function
   | T_KEYBOARD -> true
   | T_KEY -> true
   | T_KEPT -> true
+  | T_KANJI -> true
   | T_JUSTIFIED -> true
+  | T_JSON_STATUS -> true
+  | T_JSON_CODE -> true
   | T_JSON -> true
+  | T_JOINING -> true
+  | T_JNIENVPTR -> true
+  | T_JAVA -> true
+  | T_JAPANESE -> true
   | T_I_O_CONTROL -> true
   | T_I_O -> true
   | T_ITEM_VALUE -> true
@@ -2706,6 +3097,8 @@ let can_pop (type a) : a terminal -> bool = function
   | T_ITEM_TO_DELETE -> true
   | T_ITEM_TO_ADD -> true
   | T_ITEM_TEXT -> true
+  | T_ITEM_ID -> true
+  | T_ITEM_BOLD -> true
   | T_ITEM -> true
   | T_IS_TYPEDEF -> true
   | T_IS_GLOBAL -> true
@@ -2713,27 +3106,36 @@ let can_pop (type a) : a terminal -> bool = function
   | T_IS -> true
   | T_IN_ARITHMETIC_RANGE -> true
   | T_INVOKING -> true
+  | T_INVOKED -> true
   | T_INVOKE -> true
   | T_INVALID_KEY -> true
   | T_INVALID -> true
   | T_INTRINSIC -> true
   | T_INTO -> true
+  | T_INTERVAL_TIMER -> true
   | T_INTERMEDIATE -> true
   | T_INTERFACE_ID -> true
   | T_INTERFACE -> true
+  | T_INSTANCE -> true
   | T_INSTALLATION -> true
   | T_INSPECT -> true
   | T_INSERT_ROWS -> true
   | T_INSERTION_INDEX -> true
+  | T_INSERT -> true
   | T_INQUIRE -> true
   | T_INPUT_OUTPUT -> true
   | T_INPUT -> true
   | T_INITIATE -> true
+  | T_INITIAL_VALUE -> true
   | T_INITIALIZED -> true
   | T_INITIALIZE -> true
   | T_INITIAL -> true
   | T_INHERITS -> true
+  | T_INHERITING -> true
+  | T_INDICATORS -> true
+  | T_INDICATOR -> true
   | T_INDICATE -> true
+  | T_INDIC -> true
   | T_INDEX_2 -> true
   | T_INDEX_1 -> true
   | T_INDEXED -> true
@@ -2741,6 +3143,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_INDEPENDENT -> true
   | T_IN -> true
   | T_IMPLEMENTS -> true
+  | T_IMP -> true
   | T_IGNORING -> true
   | T_IGNORE -> true
   | T_IF -> true
@@ -2752,14 +3155,19 @@ let can_pop (type a) : a terminal -> bool = function
   | T_HSCROLL_POS -> true
   | T_HSCROLL -> true
   | T_HOT_TRACK -> true
+  | T_HORIZONTAL -> true
   | T_HIGH_VALUE -> true
   | T_HIGH_ORDER_RIGHT -> true
   | T_HIGH_ORDER_LEFT -> true
   | T_HIGH_COLOR -> true
   | T_HIGHLIGHT -> true
+  | T_HIGHEST_VALUE -> true
+  | T_HIGH -> true
   | T_HIDDEN_DATA -> true
   | T_HEX -> true
+  | T_HELP_ID -> true
   | T_HEIGHT_IN_CELLS -> true
+  | T_HEIGHT -> true
   | T_HEAVY -> true
   | T_HEADING_FONT -> true
   | T_HEADING_DIVIDER_COLOR -> true
@@ -2771,6 +3179,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_GROUP_VALUE -> true
   | T_GROUP_USAGE -> true
   | T_GROUP -> true
+  | T_GRIP -> true
   | T_GRID -> true
   | T_GREATER -> true
   | T_GRAPHICAL -> true
@@ -2831,7 +3240,9 @@ let can_pop (type a) : a terminal -> bool = function
   | T_FILL_COLOR2 -> true
   | T_FILL_COLOR -> true
   | T_FILLER -> true
+  | T_FILE_PREFIX -> true
   | T_FILE_POS -> true
+  | T_FILE_PATH -> true
   | T_FILE_NAME -> true
   | T_FILE_LIMITS -> true
   | T_FILE_LIMIT -> true
@@ -2839,6 +3250,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_FILE_CONTROL -> true
   | T_FILES -> true
   | T_FILE -> true
+  | T_FIELD_TERMINATOR -> true
   | T_FH__KEYDEF -> true
   | T_FH__FCD -> true
   | T_FD -> true
@@ -2847,6 +3259,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_FACTORY -> true
   | T_F -> true
   | T_EXTERNAL_FORM -> true
+  | T_EXTERNALLY_DESCRIBED_KEY -> true
   | T_EXTERNAL -> true
   | T_EXTERN -> true
   | T_EXTENDED_SEARCH -> true
@@ -2855,13 +3268,19 @@ let can_pop (type a) : a terminal -> bool = function
   | T_EXPAND -> true
   | T_EXIT -> true
   | T_EXHIBIT -> true
+  | T_EXECUTE -> true
+  | T_EXEC -> true
   | T_EXCLUSIVE_OR -> true
   | T_EXCLUSIVE -> true
+  | T_EXCLUDE_EVENT_LIST -> true
+  | T_EXCESS_3 -> true
   | T_EXCEPTION_VALUE -> true
   | T_EXCEPTION_OBJECT -> true
   | T_EXCEPTION -> true
+  | T_EXCEEDS -> true
   | T_EXAMINE -> true
   | T_EVERY -> true
+  | T_EVENT_POINTER -> true
   | T_EVENT_LIST -> true
   | T_EVENT -> true
   | T_EVALUATE -> true
@@ -2888,26 +3307,37 @@ let can_pop (type a) : a terminal -> bool = function
   | T_ENGRAVED -> true
   | T_END_XML -> true
   | T_END_WRITE -> true
+  | T_END_WAIT -> true
+  | T_END_USE -> true
   | T_END_UNSTRING -> true
   | T_END_SUBTRACT -> true
   | T_END_STRING -> true
   | T_END_START -> true
+  | T_END_SET -> true
   | T_END_SEND -> true
   | T_END_SEARCH -> true
   | T_END_REWRITE -> true
   | T_END_RETURN -> true
+  | T_END_REPLACE -> true
   | T_END_RECEIVE -> true
   | T_END_READ -> true
   | T_END_PERFORM -> true
+  | T_END_ON -> true
   | T_END_OF_PAGE -> true
   | T_END_MULTIPLY -> true
+  | T_END_MOVE -> true
   | T_END_MODIFY -> true
   | T_END_JSON -> true
+  | T_END_INVOKE -> true
   | T_END_IF -> true
+  | T_END_EXEC -> true
   | T_END_EVALUATE -> true
+  | T_END_ENABLE -> true
   | T_END_DIVIDE -> true
   | T_END_DISPLAY -> true
+  | T_END_DISABLE -> true
   | T_END_DELETE -> true
+  | T_END_COPY -> true
   | T_END_COMPUTE -> true
   | T_END_COLOR -> true
   | T_END_CHAIN -> true
@@ -2918,12 +3348,16 @@ let can_pop (type a) : a terminal -> bool = function
   | T_END -> true
   | T_ENCRYPTION -> true
   | T_ENCODING -> true
+  | T_ENABLED -> true
   | T_ENABLE -> true
   | T_EMI -> true
   | T_ELSE -> true
   | T_ELEMENT -> true
+  | T_EJECT -> true
   | T_EIGHTY_EIGHT -> true
   | T_EGI -> true
+  | T_EGCS -> true
+  | T_EGC -> true
   | T_EDITING -> true
   | T_ECHO -> true
   | T_EC -> true
@@ -2932,17 +3366,21 @@ let can_pop (type a) : a terminal -> bool = function
   | T_DUPLICATES -> true
   | T_DROP_LIST -> true
   | T_DROP_DOWN -> true
+  | T_DROP -> true
+  | T_DRAW -> true
   | T_DRAG_COLOR -> true
   | T_DOWN -> true
   | T_DOUBLE_COLON -> true
   | T_DOUBLE_ASTERISK -> true
   | T_DOUBLE -> true
+  | T_DOT_DASH -> true
   | T_DOTTED -> true
   | T_DOTDASH -> true
   | T_DIVISION -> true
   | T_DIVIDER_COLOR -> true
   | T_DIVIDERS -> true
   | T_DIVIDE -> true
+  | T_DISPLAY_ST -> true
   | T_DISPLAY_FORMAT -> true
   | T_DISPLAY_COLUMNS -> true
   | T_DISPLAY_4 -> true
@@ -2952,12 +3390,14 @@ let can_pop (type a) : a terminal -> bool = function
   | T_DISPLAY -> true
   | T_DISP -> true
   | T_DISK -> true
+  | T_DISJOINING -> true
   | T_DISCONNECT -> true
   | T_DISC -> true
   | T_DISABLE -> true
   | T_DETAIL -> true
   | T_DESTROY -> true
   | T_DESTINATION -> true
+  | T_DESCRIPTOR -> true
   | T_DESCENDING -> true
   | T_DEPENDING -> true
   | T_DELIMITER -> true
@@ -2967,6 +3407,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_DEFAULT_FONT -> true
   | T_DEFAULT_BUTTON -> true
   | T_DEFAULT -> true
+  | T_DECLARE -> true
   | T_DECLARATIVES -> true
   | T_DECIMAL_POINT -> true
   | T_DECIMAL_ENCODING -> true
@@ -2978,12 +3419,20 @@ let can_pop (type a) : a terminal -> bool = function
   | T_DEBUG_ITEM -> true
   | T_DEBUG_CONTENTS -> true
   | T_DEBUGGING -> true
+  | T_DEBUG -> true
+  | T_DBCS -> true
+  | T_DBCLOB_LOCATOR -> true
+  | T_DBCLOB_FILE -> true
+  | T_DBCLOB -> true
   | T_DAY_OF_WEEK -> true
+  | T_DAY_AND_TIME -> true
   | T_DAY -> true
   | T_DATE_WRITTEN -> true
+  | T_DATE_RECORD -> true
   | T_DATE_MODIFIED -> true
   | T_DATE_ENTRY -> true
   | T_DATE_COMPILED -> true
+  | T_DATE_AND_TIME -> true
   | T_DATE -> true
   | T_DATA_TYPES -> true
   | T_DATA_RECORDS -> true
@@ -3004,25 +3453,38 @@ let can_pop (type a) : a terminal -> bool = function
   | T_CURSOR_COLOR -> true
   | T_CURSOR_COL -> true
   | T_CURSOR -> true
+  | T_CURRENT_DATE -> true
   | T_CURRENT -> true
   | T_CURRENCY -> true
+  | T_CULTURE -> true
   | T_CS_GENERAL -> true
   | T_CS_BASIC -> true
+  | T_CSP -> true
   | T_CSIZE -> true
   | T_CRT_UNDER -> true
   | T_CRT -> true
+  | T_CREATE -> true
+  | T_COUNT_TRAILING -> true
+  | T_COUNT_MIN -> true
+  | T_COUNT_MAX -> true
+  | T_COUNT_LEADLING -> true
   | T_COUNT -> true
   | T_CORRESPONDING -> true
   | T_CORE_INDEX -> true
   | T_COPY_SELECTION -> true
   | T_COPY -> true
   | T_CONVERTING -> true
+  | T_CONVERT -> true
   | T_CONVERSION -> true
+  | T_CONTROL_AREA -> true
+  | T_CONTROLS_UNCROPPED -> true
   | T_CONTROLS -> true
   | T_CONTROL -> true
   | T_CONTINUE -> true
+  | T_CONTENT_OF -> true
   | T_CONTENT -> true
   | T_CONTAINS -> true
+  | T_CONSTRUCTOR -> true
   | T_CONSTANT_RECORD -> true
   | T_CONSTANT -> true
   | T_CONSOLE_3 -> true
@@ -3032,6 +3494,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_CONNECT -> true
   | T_CONFIGURATION -> true
   | T_CONDITION -> true
+  | T_COM_REG -> true
   | T_COMP_X -> true
   | T_COMP_N -> true
   | T_COMP_9 -> true
@@ -3055,11 +3518,13 @@ let can_pop (type a) : a terminal -> bool = function
   | T_COMPUTATIONAL_13 -> true
   | T_COMPUTATIONAL_12 -> true
   | T_COMPUTATIONAL_11 -> true
+  | T_COMPRESSION -> true
   | T_COMPLEMENTARY -> true
   | T_COMPLE -> true
   | T_COMP -> true
   | T_COMMUNICATION -> true
   | T_COMMON -> true
+  | T_COMMITMENT -> true
   | T_COMMIT -> true
   | T_COMMAND_LINE -> true
   | T_COMMA -> true
@@ -3076,27 +3541,39 @@ let can_pop (type a) : a terminal -> bool = function
   | T_COLON -> true
   | T_COLLATING -> true
   | T_COL -> true
+  | T_COERCION -> true
   | T_CODE_SET -> true
   | T_CODE -> true
   | T_COBOL -> true
   | T_CLOSE -> true
   | T_CLOCK_UNITS -> true
+  | T_CLOB_LOCATOR -> true
+  | T_CLOB_FILE -> true
+  | T_CLOB -> true
   | T_CLINES -> true
   | T_CLINE -> true
   | T_CLEAR_SELECTION -> true
+  | T_CLASS_OBJECT -> true
+  | T_CLASS_NAME -> true
   | T_CLASS_ID -> true
+  | T_CLASS_CONTROL -> true
   | T_CLASSIFICATION -> true
   | T_CLASS -> true
+  | T_CICS -> true
   | T_CHECK_BOX -> true
   | T_CHECKPOINT_FILE -> true
   | T_CHECK -> true
+  | T_CHAR_VARYING -> true
+  | T_CHART -> true
   | T_CHARACTERS -> true
   | T_CHARACTER -> true
+  | T_CHAR -> true
   | T_CHANGED -> true
   | T_CHAINING -> true
   | T_CHAIN -> true
   | T_CH -> true
   | T_CF -> true
+  | T_CENTURY_DAY -> true
   | T_CENTURY_DATE -> true
   | T_CENTERED_HEADINGS -> true
   | T_CENTERED -> true
@@ -3108,14 +3585,18 @@ let can_pop (type a) : a terminal -> bool = function
   | T_CELL -> true
   | T_CD -> true
   | T_CCOL -> true
+  | T_CBL -> true
   | T_CATALOGUE_NAME -> true
   | T_CATALOGUED -> true
   | T_CASSETTE -> true
+  | T_CASE_SENSITIVE -> true
+  | T_CASE_INSENSITIVE -> true
   | T_CARD_READER -> true
   | T_CARD_PUNCH -> true
   | T_CAPACITY -> true
   | T_CANCEL_BUTTON -> true
   | T_CANCEL -> true
+  | T_CALLED -> true
   | T_CALL -> true
   | T_CALENDAR_FONT -> true
   | T_C -> true
@@ -3136,11 +3617,15 @@ let can_pop (type a) : a terminal -> bool = function
   | T_BUSY -> true
   | T_BULK_ADDITION -> true
   | T_BSN -> true
+  | T_BROWSING -> true
   | T_BOXED -> true
   | T_BOX -> true
   | T_BOTTOM -> true
   | T_BOOLEAN -> true
   | T_BLOCK -> true
+  | T_BLOB_LOCATOR -> true
+  | T_BLOB_FILE -> true
+  | T_BLOB -> true
   | T_BLINK -> true
   | T_BLANK -> true
   | T_BITS -> true
@@ -3149,11 +3634,15 @@ let can_pop (type a) : a terminal -> bool = function
   | T_BITMAP_TRAILING -> true
   | T_BITMAP_TIMER -> true
   | T_BITMAP_START -> true
+  | T_BITMAP_SCALE -> true
+  | T_BITMAP_RAW_WIDTH -> true
+  | T_BITMAP_RAW_HEIGHT -> true
   | T_BITMAP_NUMBER -> true
   | T_BITMAP_HANDLE -> true
   | T_BITMAP_END -> true
   | T_BITMAP -> true
   | T_BIT -> true
+  | T_BIND -> true
   | T_BINARY_SHORT -> true
   | T_BINARY_SEQUENTIAL -> true
   | T_BINARY_LONG -> true
@@ -3166,6 +3655,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_BEGINNING -> true
   | T_BEFORE -> true
   | T_BECOMES -> true
+  | T_BASIS -> true
   | T_BASED -> true
   | T_BAR -> true
   | T_BACKWARD -> true
@@ -3173,8 +3663,12 @@ let can_pop (type a) : a terminal -> bool = function
   | T_BACKGROUND_LOW -> true
   | T_BACKGROUND_HIGH -> true
   | T_BACKGROUND_COLOR -> true
+  | T_AX_EVENT_LIST -> true
   | T_AWAY_FROM_ZERO -> true
   | T_AUTO_SPIN -> true
+  | T_AUTO_RESIZE -> true
+  | T_AUTO_MINIMIZE -> true
+  | T_AUTO_HYPHEN_SKIP -> true
   | T_AUTO_DECIMAL -> true
   | T_AUTOMATIC -> true
   | T_AUTO -> true
@@ -3186,6 +3680,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_AT -> true
   | T_ASTERISK -> true
   | T_ASSIGN -> true
+  | T_ASSEMBLY_NAME -> true
   | T_ASCII -> true
   | T_ASCENDING -> true
   | T_ASA -> true
@@ -3193,6 +3688,7 @@ let can_pop (type a) : a terminal -> bool = function
   | T_ARITHMETIC -> true
   | T_ARGUMENT_VALUE -> true
   | T_ARGUMENT_NUMBER -> true
+  | T_AREA_VALUES -> true
   | T_AREAS -> true
   | T_AREA -> true
   | T_ARE -> true
@@ -3229,8 +3725,10 @@ let can_pop (type a) : a terminal -> bool = function
   | T_ACTIVE_CLASS -> true
   | T_ACTIVATING -> true
   | T_ACTION -> true
+  | T_ACQUIRE -> true
   | T_ACCESS -> true
   | T_ACCEPT -> true
+  | T_ABSTRACT -> true
   | T_ABSENT -> true
   | _ -> false
 

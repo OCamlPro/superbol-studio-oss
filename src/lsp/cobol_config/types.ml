@@ -297,47 +297,91 @@ and word_spec =
 
 module DIALECT = struct
 
-  let all_canonical_names =
-    [ "default";
-      "gnucobol"; "microfocus"; "mf"; "acu"; "gcos"; "ibm"; "cobol85";
-      "GnuCOBOL"; "MicroFocus"; "MF"; "ACU"; "GCOS"; "IBM"; "COBOL85" ]
+  let all_canonical_names = [
+    "default";
+    "gnucobol";
+
+    "cobol85";
+    "cobol2002";
+    "cobol2014";
+
+    "acu";
+    "bs2000";
+    "gcos";
+    "ibm";
+    "mf";
+    "mvs";
+    "realia";
+    "rm";
+    "xopen";
+  ]
 
   type t =
     | Default
-    | COBOL85
     | GnuCOBOL
-    | MicroFocus
+    | COBOL85
+    | COBOL2002
+    | COBOL2014
     | ACU
+    | BS2000
     | GCOS
     | IBM
+    | MicroFocus
+    | MVS
+    | Realia
+    | RM
+    | XOpen
 
   let name: t -> string = function
     | Default -> "default"
-    | COBOL85 -> "COBOL85"
     | GnuCOBOL -> "GnuCOBOL"
-    | MicroFocus -> "MicroFocus"
+
+    | COBOL85 -> "COBOL85"
+    | COBOL2002 -> "COBOL2002"
+    | COBOL2014 -> "COBOL2014"
+
     | ACU -> "ACU"
+    | BS2000 -> "BS2000"
     | GCOS -> "GCOS"
     | IBM -> "IBM"
+    | MicroFocus -> "MicroFocus"
+    | MVS -> "MVS"
+    | Realia -> "Realia"
+    | RM -> "RM"
+    | XOpen -> "XOpen"
 
   let of_string: string -> t = fun s ->
     match String.lowercase_ascii s with
     | "default" -> Default
-    | "cobol85" -> COBOL85
     | "gnucobol" -> GnuCOBOL
-    | "microfocus" | "mf" -> MicroFocus
+    | "cobol85" -> COBOL85
+    | "cobol2002" -> COBOL2002
+    | "cobol2014" -> COBOL2014
     | "acu" -> ACU
+    | "bs2000" -> BS2000
     | "gcos" -> GCOS
     | "ibm" -> IBM
+    | "mf" | "microfocus" -> MicroFocus
+    | "mvs" -> MVS
+    | "realia" -> Realia
+    | "rm" -> RM
+    | "xopen" -> XOpen
     | _ -> invalid_arg s
 
   let of_name: string -> t = function
     | "COBOL 85" -> COBOL85
-    | "GnuCOBOL" -> GnuCOBOL (*TODO: or maybe default *)
-    | "Micro Focus COBOL" | "Micro Focus COBOL (lax)" -> MicroFocus
-    | "IBM COBOL" | "IBM COBOL (lax)" -> IBM
-    | "GCOS" | "GCOS (lax)" -> GCOS
+    | "COBOL 2002" -> COBOL2002
+    | "COBOL 2014" -> COBOL2014
+    | "GnuCOBOL" -> GnuCOBOL                          (*TODO: or maybe default *)
     | "ACUCOBOL-GT" | "ACUCOBOL-GT (lax)" -> ACU
+    | "BS2000 COBOL" | "BS2000 COBOL (lax)" -> BS2000
+    | "GCOS" | "GCOS (lax)" -> GCOS
+    | "IBM COBOL" | "IBM COBOL (lax)" -> IBM
+    | "Micro Focus COBOL" | "Micro Focus COBOL (lax)" -> MicroFocus
+    | "IBM COBOL for MVS & VM" | "MVS/VM COBOL (lax)" -> MVS
+    | "CA Realia II" | "CA Realia II (lax)" -> Realia
+    | "RM-COBOL" | "RM-COBOL (lax)" -> RM
+    | "X/Open COBOL" -> XOpen
     | s -> of_string s
 
 end
