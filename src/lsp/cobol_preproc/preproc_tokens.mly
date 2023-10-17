@@ -13,8 +13,7 @@
 %}
 
 %token EOL
-%token <string> TEXT_WORD           (* Words before text manipulation stage. For
-                                       compiler_directive *)
+%token <string> TEXT_WORD             (* Words before text manipulation stage *)
 %token <string * Text.quotation> ALPHANUM
 %token <string * Text.quotation> ALPHANUM_PREFIX
 %token <string> NATLIT
@@ -29,13 +28,8 @@
 
 %token ALSO                      [@keyword]
 %token BY                        [@keyword]
-%token CDIR_SET                  [@keyword ">>SET", "$SET"]
-%token CDIR_SOURCE               [@keyword ">>SOURCE", "$SOURCE"]
 %token COPY                      [@keyword]
-%token FORMAT                    [@keyword]
-%token FREE                      [@keyword]                       (* +COB2002 *)
 %token IN                        [@keyword]
-%token IS                        [@keyword]
 %token LAST                      [@keyword]
 %token LEADING                   [@keyword]
 %token OF                        [@keyword]
@@ -43,7 +37,6 @@
 %token PRINTING                  [@keyword]
 %token REPLACE                   [@keyword]
 %token REPLACING                 [@keyword]
-%token SOURCEFORMAT              [@keyword]
 %token SUPPRESS                  [@keyword]                         (* +COB85 *)
 %token TRAILING                  [@keyword]
 

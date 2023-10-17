@@ -12,9 +12,10 @@
 (**************************************************************************)
 
 {
-  (* Two lexers:
-     * `line`: for lines of code before preprocessing
-     * `pptoken`: for simple tokens in the middle of preprocessing
+  (* Three lexers:
+     * `line`: for lines of source text before preprocessing
+     * `cdtoken`: for simple tokens used by compiler directives
+     * `pptoken`: for simple tokens used by text manipulation statements
   *)
 
   let pptoken_of_keyword = Hashtbl.create 15
@@ -24,6 +25,22 @@
       Hashtbl.add keyword_of_pptoken token kwd;
       Hashtbl.add pptoken_of_keyword kwd token;
     end Preproc_keywords.keywords
+
+  type pptoken_component =
+    | PPTok of Preproc_tokens.token
+    | PPEnd
+
+  let cdtoken_of_keyword = Hashtbl.create 15
+  let keyword_of_cdtoken = Hashtbl.create 15
+  let __init_keywords =
+    List.iter begin fun (kwd, token) ->
+      Hashtbl.add keyword_of_cdtoken token kwd;
+      Hashtbl.add cdtoken_of_keyword kwd token;
+    end Compdir_keywords.keywords
+
+  type cdtoken_component =
+    | CDTok of Compdir_grammar.token
+    | CDEnd
 
   let update_loc lexbuf file line absolute chars =
     let open Lexing in
@@ -37,10 +54,6 @@
         pos_fname = new_file;
         pos_lnum = if absolute then line else pos.pos_lnum + line;
         pos_bol = pos.pos_cnum - chars }
-
-  type pptoken_component =
-    | PPTok of Preproc_tokens.token
-    | PPEnd
 
 }
 
@@ -531,6 +544,19 @@ and free_newline_or_eof state
       {
         Src_lexing.unexpected Char state lexbuf ~k:free_gobble_line
       }
+
+(* Text-word tokenizer (compiler directives) *)
+and cdtoken = parse
+
+  | blanks
+      { cdtoken lexbuf }
+
+  | (nonblank+ as s)
+      { CDTok (try Hashtbl.find cdtoken_of_keyword s
+               with Not_found -> TEXT_WORD s) }
+
+  | eof
+      { CDEnd }
 
 (* Text-word tokenizer (text manipulation statements/replacing clauses) *)
 and pptoken = parse

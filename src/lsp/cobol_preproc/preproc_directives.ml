@@ -14,9 +14,8 @@
 open Cobol_common.Srcloc.TYPES
 open Text.TYPES
 
-type lexing_directive =
-  | LexDirSource:
-      'k Src_format.source_format with_loc -> lexing_directive         [@@unboxed]
+type compiler_directive =
+  | CDirSource of Src_format.any with_loc                            [@@unboxed]
 
 type copy_statement =
   | CDirCopy of

@@ -13,7 +13,6 @@
 %parameter <CONFIG: Cobol_config.T>
 %parameter <Overlay_manager: Src_overlay.MANAGER>
 %{
-  open CONFIG
   open Cobol_common.Srcloc.INFIX
   open Cobol_common.Diagnostics.TYPES
   module PP_UTILS = Preproc_utils.Make (CONFIG)
@@ -23,9 +22,6 @@
 
 (* Entry points *)
 
-%start <Preproc_directives.lexing_directive option
-          Cobol_common.Diagnostics.with_diags
-          Cobol_common.Srcloc.with_loc> lexing_directive
 %start <Preproc_directives.copy_statement
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> copy_statement
@@ -43,33 +39,6 @@
 
 let loc (X) ==
   | x = X; { x &@ Overlay_manager.join_limits $sloc }
-
-(* --- Entry points --------------------------------------------------------- *)
-
-let lexing_directive :=
-  | ~ = lexdir_phrase; option("."); EOL; < >
-  | ~ = lexdir_microfocus_phrase; EOL; < >
-
-let lexdir_phrase :=
-  | ~ = loc(lexdir_source_format); < >
-
-let lexdir_microfocus_phrase :=
-  | ~ = loc(lexdir_microfocus_sourceformat); < >
-
-(* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
-
-let lexdir_source_format :=
-  | CDIR_SOURCE; FORMAT?; IS?; _free = loc(FREE);
-    { let SF sf = Src_format.from_config Cobol_config.SFFree in
-      Cobol_common.Diagnostics.some_result @@
-        Preproc_directives.LexDirSource (sf &@<- _free) }
-  | CDIR_SOURCE; FORMAT?; IS?; i = text_word;
-    { PP_UTILS.source_format_lexdir ~dialect i }
-
-let lexdir_microfocus_sourceformat :=
-  | CDIR_SET; SOURCEFORMAT; i = loc(ALPHANUM);  (* elementary_string_literal? *)
-    { PP_UTILS.source_format_lexdir ~dialect
-        (Cobol_common.Srcloc.locmap fst i) }
 
 (* --- COPY ----------------------------------------------------------------- *)
 
@@ -158,7 +127,7 @@ let replace_statement_ :=
 (*     repl_to   = loc(replacing_dst); *)
 (*     { replacing' ?repl_dir repl_from repl_to } *)
 
-let text_word :=                                    (* text-word with position *)
+let text_word ==                                    (* text-word with position *)
   | ~ = loc(TEXT_WORD); < >
 
 let fileloc :=

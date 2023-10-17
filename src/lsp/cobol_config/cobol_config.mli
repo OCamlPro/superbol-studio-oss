@@ -38,3 +38,5 @@ val from_dialect
   -> strict: bool
   -> Types.DIALECT.t
   -> (module T)
+
+val dialect: t -> dialect

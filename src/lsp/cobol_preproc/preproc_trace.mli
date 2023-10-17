@@ -24,9 +24,9 @@ module TYPES: sig
           matched_loc: Cobol_common.srcloc;
           replacement_text: Text.text;
         }
-    | LexDir of
+    | CompilerDirective of
         {
-          lexdir: Preproc_directives.lexing_directive option;
+          compdir: Preproc_directives.compiler_directive;
           loc: Cobol_common.srcloc;
         }
 
@@ -47,9 +47,9 @@ val empty: log
 val append
   : log_entry
   -> log -> log
-val new_lexdir
+val new_compdir
   : loc: Cobol_common.srcloc
-  -> ?lexdir: Preproc_directives.lexing_directive
+  -> compdir:Preproc_directives.compiler_directive
   -> log -> log
 val copy_done
   : loc: Cobol_common.srcloc

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 let%expect_test "fixed-format-cdirs" =
-  Parser_testing.show_diagnostics {|
+  Preproc_testing.show_diagnostics {|
        >>SET A
       >>SET B
       $ SET B
@@ -29,7 +29,7 @@ let%expect_test "fixed-format-cdirs" =
 |}];;
 
 let%expect_test "hybrid-format-cdirs" =
-  Parser_testing.show_diagnostics {|
+  Preproc_testing.show_diagnostics {|
       >>SOURCE FORMAT IS FREE
 >>SOURCE FORMAT IS FIXED
        >>   SET SOURCEFORMAT "COBOLX"

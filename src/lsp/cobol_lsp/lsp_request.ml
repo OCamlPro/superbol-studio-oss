@@ -177,6 +177,7 @@ let handle_range_formatting registry params =
   in
   let newText =
     Cobol_indent.indent_range'
+      ~dialect:(Cobol_config.dialect project.cobol_config)
       ~source_format:project.source_format
       ~indent_config:None
       ~file:(Lsp.Uri.to_path doc.uri)
@@ -201,6 +202,7 @@ let handle_formatting registry params =
   try
     let newText =
       Cobol_indent.indent_range'
+        ~dialect:(Cobol_config.dialect project.cobol_config)
         ~source_format:project.source_format
         ~indent_config:None
         ~file:path
@@ -233,7 +235,7 @@ let handle_hover registry (params: HoverParams.t) =
   let find_hovered_pplog_event pplog =
     List.find_opt begin function
       | Cobol_preproc.Trace.Replace _
-      | LexDir _ ->
+      | CompilerDirective _ ->
           false
       | Replacement { matched_loc = loc; _ }
       | FileCopy { copyloc = loc; _ } ->
@@ -265,7 +267,7 @@ let handle_hover registry (params: HoverParams.t) =
           Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
-      | Some LexDir _
+      | Some CompilerDirective _
       | None ->
           None
     end

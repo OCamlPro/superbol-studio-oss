@@ -211,6 +211,10 @@ let cons_option_result = function
 let forget_result { diags; _ } = diags
 let merge_results ~f r1 r2 =
   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags)
+let show_n_forget ?(ppf = Fmt.stderr) { result; diags } =
+  Set.pp ppf diags;
+  result
+
 
 let hint_result r = Cont.khint (with_diag r)
 let note_result r = Cont.knote (with_diag r)

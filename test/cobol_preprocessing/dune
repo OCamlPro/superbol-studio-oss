@@ -1,0 +1,15 @@
+(library
+ (name preproc_testing)
+ (modules Preproc_testing)
+ (libraries cobol_preproc)
+ )
+
+(library
+ (name test_cobol_preproc)
+ (modules source_lines compiler_directives)
+ (preprocess
+   (pps ppx_expect))
+ (inline_tests
+   (modes best)) ; add js for testing with nodejs
+ (libraries preproc_testing)
+ )

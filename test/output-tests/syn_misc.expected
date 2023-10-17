@@ -4063,16 +4063,6 @@ syn_misc.at-7842-empty0.cob:5.18-5.27:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7861:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7885:0
-syn_misc.at-7885-prog.cob:4.27-4.29:
-   1   
-   2          CONTROL		DIVISION.
-   3          SUBSTITUTION	SECTION.
-   4 >            REPLACE IISS BY IS
-----                              ^^
-   5   	           TERM BY TERMINAL
-   6   	           "KO" BY "OK".
->> Error: Malformed REPLACE statement
-
 syn_misc.at-7885-prog.cob:8.18-8.27:
    5   	           TERM BY TERMINAL
    6   	           "KO" BY "OK".
@@ -4083,27 +4073,7 @@ syn_misc.at-7885-prog.cob:8.18-8.27:
   10   	   .
 >> Error: Invalid syntax
 
-syn_misc.at-7885-prog.cob:9.24-9.28:
-   6   	           "KO" BY "OK".
-   7          DEFAULT		SECTION.
-   8              ACCEPT ALTERNATE CONSOLE
-   9 >            DISPLAY IISS TERM
-----                           ^^^^
-  10   	   .
-  11          IDENTIFICATION   DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7918:0
-syn_misc.at-7918-prog.cob:5.26-5.28:
-   2          CONTROL          DIVISION.
-   3          SUBSTITUTION     SECTION.
-   4         *> This REPLACE in Area A is ignored for now:
-   5 >           REPLACE IISS BY IS
-----                             ^^
-   6                     TERM BY TERMINAL
-   7                     "KO" BY "OK".
->> Error: Malformed REPLACE statement
-
 syn_misc.at-7918-prog.cob:9.17-9.26:
    6                     TERM BY TERMINAL
    7                     "KO" BY "OK".
@@ -4112,16 +4082,6 @@ syn_misc.at-7918-prog.cob:9.17-9.26:
 ----                    ^^^^^^^^^
   10             DISPLAY IISS TERM
   11          .
->> Error: Invalid syntax
-
-syn_misc.at-7918-prog.cob:10.23-10.27:
-   7                     "KO" BY "OK".
-   8          DEFAULT          SECTION.
-   9             ACCEPT ALTERNATE CONSOLE
-  10 >           DISPLAY IISS TERM
-----                          ^^^^
-  11          .
-  12          IDENTIFICATION   DIVISION.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8018:0

@@ -14,6 +14,29 @@
 open Cobol_common.Srcloc.INFIX
 open Text.TYPES
 
+(** [cdtoks_of_chstr w] translates a COBOL character string [w] into
+    compiler directive tokens.  Note numeric literals keep their representation as
+    text-words ({!TEXT_WORD}) in the result.  *)
+let cdtoks_of_chstr (chstr: text_word Cobol_common.Srcloc.with_loc) =
+  let open Compdir_grammar in
+  let ( ~@@ ) t = Cobol_common.Srcloc.as_lexloc ~@t in
+  match ~&chstr with
+  | CDirWord w
+  | TextWord w ->
+      List.rev @@ Cobol_common.Tokenizing.fold_tokens (w &@<- chstr) []
+        ~tokenizer:(fun ~loc:_ -> Src_lexer.cdtoken)
+        ~until:(function CDEnd -> true | _ -> false)
+        ~f:begin fun t -> match ~&t with
+          | CDEnd -> Fun.id
+          | CDTok tok -> List.cons (tok, ~@@t)
+        end
+  | Alphanum { knd = Basic; str; qte = _; _ } ->
+      [ALPHANUM str, ~@@chstr]
+  | Eof ->
+      [EOL, ~@@chstr]
+  | _ ->
+      [INVALID_ ~&chstr, ~@@chstr]
+
 (** [pptoks_of_chstr w] translates a COBOL character string [w] into
     pre-processor tokens.  Note numeric literals keep their representation as
     text-words ({!TEXT_WORD}) in the result.  *)
@@ -50,28 +73,40 @@ type 'b supplier = unit -> 'b * Lexing.position * Lexing.position
 
 (** [ondemand_list_supplier ~pp ~eoi l] is a supplier that returns all tokens
     obtained after pre-processing of [l] by [pp], and then [eoi]. *)
-let ondemand_list_supplier (module Om: Src_overlay.MANAGER) ~pp ~eoi l =
-  let y_l = ref [] and l = ref l and prev_limit = ref None in
+let ondemand_list_supplier ~decompose ~endlimit ~pp ~eoi l =
+  let y_l = ref [] and l = ref l in
   let rec aux () =
     supply !y_l ~otherwise:begin fun () -> match !l with
       | x :: tl ->
           l := tl;
           supply (pp x) ~otherwise:aux
       | [] ->
-          let b = Option.value !prev_limit ~default:Om.dummy_limit in
+          let b = endlimit () in
           eoi, b, b
     end
   and supply ~otherwise = function
     | y :: y_tl ->
         y_l := y_tl;
-        let s, e = Om.limits ~@y in
-        Option.iter (fun e -> Om.link_limits e s) !prev_limit;
-        prev_limit := Some e;
-        ~&y, s, e
+        decompose y
     | [] ->
         otherwise ()
   in
   aux
 
-let pptoks_of_text_supplier om text =
-  ondemand_list_supplier ~eoi:Preproc_tokens.EOL ~pp:pptoks_of_chstr om text
+let cdtoks_of_text_supplier text =
+  ondemand_list_supplier ~eoi:Compdir_grammar.EOL ~pp:cdtoks_of_chstr text
+    ~decompose:(fun (y, (s, e)) -> y, s, e)
+    ~endlimit:(fun () -> Lexing.dummy_pos)
+
+let pptoks_of_text_supplier (module Om: Src_overlay.MANAGER) text =
+  let prev_limit = ref None in
+  ondemand_list_supplier ~eoi:Preproc_tokens.EOL ~pp:pptoks_of_chstr text
+    ~decompose:begin fun y ->
+      let s, e = Om.limits ~@y in
+      Option.iter (fun e -> Om.link_limits e s) !prev_limit;
+      prev_limit := Some e;
+      ~&y, s, e
+    end
+    ~endlimit:begin fun () ->
+      Option.value !prev_limit ~default:Om.dummy_limit
+    end

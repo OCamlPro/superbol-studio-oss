@@ -53,6 +53,7 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
+    dialect: Cobol_config.dialect;
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -113,6 +114,7 @@ let preprocessor input = function
             overlay_manager = (module Om);
             replacing = [];
             copybooks = Cobol_common.Srcloc.no_copy;
+            dialect = Config.dialect;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -147,28 +149,12 @@ let apply_active_replacing_full { pplog; persist; _ } = match persist with
   | { replacing = r :: _; _ } -> Text_processor.apply_replacing OnFullText r pplog
   | _ -> fun text -> text, pplog
 
-(** [lookup_compiler_directive chunk] searches for a compiler-directive
-    text-word (that starts with either `{v >> v}' or `{v $ v}') in the given
-    chunk of source text.
-
-    Returns [Ok (prefix, cdir_text)] if a compiler directive is recognised,
-    where [cdir_text] is guaranteed to start with a compiler-directive word on a
-    line [l] and terminates at the end [l]. *)
-(* Note: {!Text_processor.next_source_chunk} never outputs compiler-directive
-   text-words in positions other than the first two.  Such a chunk also
-   terminates at the end of the source line as it cannot be continued (contrary
-   to normal source lines). *)
-let lookup_compiler_directive: Text.text -> _ = function
-  |      t :: _ as text  when Text.cdirp t -> Ok ([ ], text)
-  | p :: (t :: _ as text) when Text.cdirp t -> Ok ([p], text)
-  | _ -> Error `NotCDir
-
 (* --- *)
 
 (** [next_chunk lp] reads the next chunk from [lp], handling lexical and
     compiler directives along the way.  It never returns an empty result: the
     output text always containts at least {!Eof}. *)
-let rec next_chunk ({ reader; buff; _ } as lp) =
+let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
   match Src_reader.next_chunk reader with
   | reader, ([{ payload = Eof; _}] as eof) ->
       let text, pplog = apply_active_replacing_full lp (buff @ eof) in
@@ -176,37 +162,23 @@ let rec next_chunk ({ reader; buff; _ } as lp) =
   | reader, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
-      match lookup_compiler_directive text with
-      | Error `NotCDir ->
+      match Src_reader.try_compiler_directive ~dialect text with
+      | Ok None ->
           preprocess_line { lp with reader; buff = [] } (buff @ text)
-      | Ok ([], lexdir_text) ->
-          next_chunk @@ on_lexing_directive { lp with reader } lexdir_text
-      | Ok (text, lexdir_text) ->
+      | Ok Some ([], compdir, _) ->
+          next_chunk (apply_compiler_directive { lp with reader } compdir)
+      | Ok Some (text, compdir, _) ->
           let lp = { lp with reader; buff = [] } in
-          preprocess_line (on_lexing_directive lp lexdir_text) (buff @ text)
+          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
+      | Error (text, e, _) ->
+          let diag = Src_reader.error_diagnostic e in
+          let lp = add_diag { lp with reader; buff = [] } diag in
+          preprocess_line lp (buff @ text)
 
-and on_lexing_directive ({ persist = { pparser = (module Pp);
-                                       overlay_manager = om; _ };
-                           reader; _ } as lp) lexdir_text =
-  (* Here, [lexdir_text] is never empty as it's known to start with a compiler
-     directive marker `>>` (or `$` for MF-style directives), so we should always
-     have a loc: *)
-  let supplier = Text_supplier.pptoks_of_text_supplier om lexdir_text in
-  let loc = Option.get @@ Cobol_common.Srcloc.concat_locs lexdir_text in
-  let parser = Pp.Incremental.lexing_directive (position lp) in
-  match ~&(Pp.MenhirInterpreter.loop supplier parser) with
-  | { result = Some Preproc_directives.LexDirSource sf as lexdir; diags } ->
-      let pplog = Preproc_trace.new_lexdir ~loc ?lexdir lp.pplog in
-      let lp = add_diags lp diags in
-      let lp = with_pplog lp pplog in
+and apply_compiler_directive ({ reader; pplog; _ } as lp) = function
+  | { payload = Preproc_directives.CDirSource sf as compdir; loc } ->
+      let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
       with_reader lp (Src_reader.with_source_format sf reader)
-  | { result = None; diags } ->       (* valid lexdir with erroneous semantics *)
-      let pplog = Preproc_trace.new_lexdir ~loc lp.pplog in
-      let lp = with_pplog lp pplog in
-      add_diags lp diags
-  | exception Pp.Error ->
-      DIAGS.Cont.kerror (add_diag lp) ~loc
-        "Malformed@ or@ unknown@ compiler@ directive"
 
 and preprocess_line lp srctext =
   match try_preproc lp srctext with
@@ -423,47 +395,44 @@ let preprocessor ?(options = Preproc_options.default) input =
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_file ~source_format ?(ppf = default_oppf) =
-  Cobol_common.do_unit begin fun (module DIAGS) input ->
-    let source_format =
-      DIAGS.grab_diags @@ decide_source_format input source_format in
-    Src_reader.print_lines ppf (make_reader ~source_format input)
-  end
+let lex_file ~dialect ~source_format ?(ppf = default_oppf) input =
+  let { result = source_format; diags } =
+    decide_source_format input source_format in
+  DIAGS.result ~diags @@
+  Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
+  make_reader ~source_format input
 
-let lex_lib ~source_format ~libpath ?(ppf = default_oppf) =
-  Cobol_common.do_unit begin fun (module DIAGS) libname ->
-    match Cobol_common.Copybook.find_lib ~libpath libname with
-    | Ok filename ->
-        let source_format =
-          DIAGS.grab_diags @@
-          decide_source_format (Filename filename) source_format in
-        Src_reader.print_lines ppf @@
-        Src_reader.from_file ~source_format filename
-    | Error lnf ->
-        DIAGS.error "%a" Cobol_common.Copybook.pp_lookup_error lnf
-  end
+let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) libname =
+  match Cobol_common.Copybook.find_lib ~libpath libname with
+  | Ok filename ->
+      let { result = source_format; diags } =
+        decide_source_format (Filename filename) source_format in
+      DIAGS.result ~diags @@
+      Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
+      Src_reader.from_file ~source_format filename
+  | Error lnf ->
+      DIAGS.error_result () "%a" Cobol_common.Copybook.pp_lookup_error lnf
 
-let fold_source_lines ~source_format ?epf ~f =
-  Cobol_common.do_any ?epf begin fun (module DIAGS) input ->
-    let source_format =
-      DIAGS.grab_diags @@ decide_source_format input source_format in
-    Src_reader.fold_lines (make_reader ~source_format input) ~f
-  end
+let fold_source_lines ~dialect ~source_format
+    ?skip_compiler_directives_text ?on_compiler_directive
+    ~f input acc =
+  let { result = source_format; diags } =
+    decide_source_format input source_format in
+  DIAGS.result ~diags @@
+  Src_reader.fold_lines ~dialect ~f (make_reader ~source_format input) acc
+    ?skip_compiler_directives_text ?on_compiler_directive
 
-let pp_preprocessed ppf lp =
-  Pretty.print ppf "%a@." Text.pp_text (fst @@ full_text ~item:"file" lp)
+let text_of_input ?options input =
+  let text, pp = full_text ~item:"file" @@ preprocessor ?options input in
+  DIAGS.result text ~diags:(diags pp)
 
-let preprocess_file ?options ?(ppf = default_oppf) =
-  Cobol_common.do_unit begin fun _init_diags filename ->
-    pp_preprocessed ppf @@ preprocessor ?options (Filename filename)
-  end
+let text_of_file ?options filename =
+  text_of_input ?options (Filename filename)
 
-let text_of_input ?options ?epf a =
-  Cobol_common.do_any begin fun _init_diags input ->
-    fst @@
-    full_text ~item:"file" @@
-    preprocessor ?options input
-  end ?epf a
+let preprocess_input ?options ?(ppf = default_oppf) input =
+  text_of_input ?options input |>
+  DIAGS.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
-let text_of_file ?options ?epf filename =
-  text_of_input ?options ?epf (Filename filename)
+let preprocess_file ?options ?(ppf = default_oppf) filename =
+  text_of_file ?options filename |>
+  DIAGS.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)

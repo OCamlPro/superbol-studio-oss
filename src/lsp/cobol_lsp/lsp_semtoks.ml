@@ -570,7 +570,7 @@ let semtoks_of_preproc_statements ~filename ?range pplog =
   List.rev @@ List.fold_left begin fun acc -> function
     | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
     | Cobol_preproc.Trace.Replace { replloc = loc }
-    | Cobol_preproc.Trace.LexDir { loc; _ } ->
+    | Cobol_preproc.Trace.CompilerDirective { loc; _ } ->
         acc_semtoks ~filename ?range TOKTYP.macro loc acc
     | Cobol_preproc.Trace.Replacement _ ->
         acc

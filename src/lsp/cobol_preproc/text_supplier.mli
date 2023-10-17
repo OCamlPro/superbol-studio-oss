@@ -15,6 +15,10 @@
 
 type 'b supplier = unit -> 'b * Lexing.position * Lexing.position
 
+val cdtoks_of_text_supplier
+  : Text.t
+  -> Compdir_grammar.token supplier
+
 val pptoks_of_text_supplier
   : (module Src_overlay.MANAGER)
   -> Text.t

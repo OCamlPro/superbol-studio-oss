@@ -29,10 +29,9 @@ module TYPES = struct
           matched_loc: srcloc;
           replacement_text: Text.text;
         }
-    | LexDir of
+    | CompilerDirective of
         {
-          lexdir: Preproc_directives.lexing_directive option;     (** invalid if
-                                                                      [None] *)
+          compdir: Preproc_directives.compiler_directive;
           loc: srcloc;
         }
 
@@ -50,8 +49,8 @@ include TYPES
 let empty = []
 let append =
   List.cons
-let new_lexdir ~loc ?lexdir : log -> log =
-  List.cons @@ LexDir { lexdir; loc }
+let new_compdir ~loc ~compdir : log -> log =
+  List.cons @@ CompilerDirective { compdir; loc }
 let copy_done ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CopyDone filename }
 let cyclic_copy ~loc ~filename : log -> log =

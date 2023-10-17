@@ -283,3 +283,5 @@ let from_dialect (module Diags: DIAGS.STATEFUL) ~strict d =
   | Realia          -> load_gnucobol_conf d ~strict       "realia"
   | RM              -> load_gnucobol_conf d ~strict       "rm"
   | XOpen           -> load_gnucobol_conf d ~strict       "xopen"
+
+let dialect (module C: T) = C.dialect

@@ -24,6 +24,19 @@
   (package cobol_preproc))
 
 ; use field 'dune-trailer' to add more stuff here
+(menhir (modules grammar_common compdir_grammar)
+        (merge_into compdir_grammar)
+        (flags --cmly --table))
+
+(rule
+  (targets compdir_keywords.ml)
+  (enabled_if (<> %{profile} "release"))
+  (deps    compdir_grammar.cmly)
+  (mode    promote)
+  (action
+    (with-stdout-to %{targets}
+       (run %{exe:../cobol_parser/keywords/gen_keywords.exe} %{deps}))))
+
 (menhir (modules preproc_tokens grammar_common preproc_grammar)
         (merge_into preproc_grammar)
         (flags --cmly --table

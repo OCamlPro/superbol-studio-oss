@@ -95,6 +95,7 @@ let cmd =
                else
                  let text =
                    let common = common_get () in
+                   Cobol_common.Diagnostics.show_n_forget @@
                    Cobol_preproc.text_of_file file
                      ~options:common.preproc_options
                  in
