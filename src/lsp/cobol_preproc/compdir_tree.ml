@@ -17,3 +17,4 @@ type directive =
   | Source_format_is_free of lexloc
   | Source_format_is of (string * lexloc)
   | Set_sourceformat of (string * lexloc)
+  | Set of (string * lexloc)

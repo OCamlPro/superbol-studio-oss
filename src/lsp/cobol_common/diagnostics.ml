@@ -66,6 +66,14 @@ let is_error = function
   | { severity = Error; _ } -> true
   | _ -> false
 
+let compare_severity a b =
+  if a = b then 0 else match a, b with
+    | Hint, _ -> -1 | _, Hint -> 1
+    | Note, _ -> -1 | _, Note -> 1
+    | Info, _ -> -1 | _, Info -> 1
+    | Warn, _ -> -1 | _, Warn -> 1
+    | Error, _ -> -1
+
 let pp_msg ppf diag = diag.message ppf
 let message diag = diag.message
 let severity diag = diag.severity
@@ -126,6 +134,9 @@ module Set = struct
   let pp ppf diags =
     Pretty.list ~fopen:"@[<v>" ~fclose:"@]@\n" ~fsep:"@\n" ~fempty:""
       pp ppf (sort diags)
+  let pp_above ~level ppf diags =
+    pp ppf @@
+    List.filter (fun { severity; _ } -> compare_severity level severity <= 0) diags
   let none: t = []
   let one d = [d]
   let two d d' = [d; d']
@@ -211,8 +222,8 @@ let cons_option_result = function
 let forget_result { diags; _ } = diags
 let merge_results ~f r1 r2 =
   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags)
-let show_n_forget ?(ppf = Fmt.stderr) { result; diags } =
-  Set.pp ppf diags;
+let show_n_forget ?(min_level = Hint) ?(ppf = Fmt.stderr) { result; diags } =
+  Set.pp_above ~level:min_level ppf diags;
   result
 
 

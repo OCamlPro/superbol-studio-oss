@@ -27,7 +27,7 @@ let%expect_test "hybrid-format-cdirs" =
   Preproc_testing.show_source_lines {|
       >>SOURCE FORMAT IS FREE
 >>SOURCE FORMAT IS FIXED
-       >>   SET SOURCEFORMAT "COBOLX"
+       >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
 $    Source format free
@@ -67,7 +67,7 @@ let%expect_test "hybrid-format-cdirs-with-cdir-markers" =
     ~with_line_numbers:true {|
       >>SOURCE FORMAT IS FREE
 >>SOURCE FORMAT IS FIXED
-       >>   SET SOURCEFORMAT "COBOLX"
+       >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
 $    Source format free
@@ -117,7 +117,7 @@ let%expect_test "hybrid-format-cdirs-with-cdir-markers-bis" =
     ~with_line_numbers:true {|
       >>SOURCE FORMAT IS FREE
 >>SOURCE FORMAT IS FIXED
-       >>   SET SOURCEFORMAT "COBOLX"
+       >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
 $    Source format free

@@ -17,7 +17,7 @@ open FileString.OP
 open Testsuite_utils
 
 let preprocess_file ~source_format ~config filename =
-  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_common.Diagnostics.show_n_forget ~min_level:Error @@
   Cobol_preproc.preprocess_file filename
     ~options:Cobol_preproc.Options.{ source_format; config;
                                      verbose = false; libpath = [] }

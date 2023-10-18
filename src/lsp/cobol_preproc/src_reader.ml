@@ -91,21 +91,23 @@ let decode_compiler_directive ~dialect compdir_text =
   let loc = Option.get @@ Cobol_common.Srcloc.concat_locs compdir_text in
   let start_pos = Cobol_common.Srcloc.start_pos loc in
   let parser = Compdir_grammar.Incremental.compiler_directive start_pos in
+  let raw_loc = Cobol_common.Srcloc.raw in
+  let open Preproc_directives in
   match Compdir_grammar.MenhirInterpreter.loop supplier parser with
-  | exception Compdir_grammar.Error ->
-      Error (Malformed_or_unknown_compiler_directive loc)
   | Source_format_is_free lexloc ->
       let sf = Src_format.from_config Cobol_config.SFFree in
-      let sf = sf &@ Cobol_common.Srcloc.raw lexloc in
-      Ok (Preproc_directives.CDirSource sf &@ loc)
+      Ok (CDirSource (sf &@ raw_loc lexloc) &@ loc)
   | Source_format_is (format, lexloc)
   | Set_sourceformat (format, lexloc) ->
-      let floc = Cobol_common.Srcloc.raw lexloc in
-      match Src_format.decypher ~dialect format with
+      (match Src_format.decypher ~dialect format with
        | Ok sf ->
-           Ok (Preproc_directives.CDirSource (sf &@ floc) &@ loc)
+           Ok (Preproc_directives.CDirSource (sf &@ raw_loc lexloc) &@ loc)
        | Error (`SFUnknown f) ->
-           Error (Unknown_source_format (f, floc))
+           Error (Unknown_source_format (f, raw_loc lexloc)))
+  | Set (string, lexloc) ->
+      Ok (Preproc_directives.CDirSet (string &@ raw_loc lexloc) &@ loc)
+  | exception Compdir_grammar.Error ->
+      Error (Malformed_or_unknown_compiler_directive loc)
 
 let try_compiler_directive ~dialect text =
   match lookup_compiler_directive text with
@@ -131,7 +133,7 @@ let fold_chunks
         match try_compiler_directive ~dialect text with
         | Ok None ->
             aux pl (f text acc)
-        | Ok Some (prefix, ({ payload = CDirSource sf; _ } as compdir), text) ->
+        | Ok Some (prefix, compdir, text) ->
             let acc = f prefix acc in
             let acc =
               if skip_compiler_directives_text
@@ -142,12 +144,15 @@ let fold_chunks
               | None -> acc
               | Some f -> f compdir acc
             in
-            aux (with_source_format sf pl) acc
-        | Error (prefix, _error, text) ->                           (* ignore? *)
+            aux (apply_compdir compdir pl) acc
+        | Error (prefix, _error, text) ->                     (* ignore error? *)
             let acc = f prefix acc in
             if skip_compiler_directives_text
             then aux pl acc
             else aux pl (f text acc)
+  and apply_compdir { payload = compdir; _ } = match compdir with
+    | CDirSource sf -> with_source_format sf
+    | CDirSet _ -> Fun.id                                            (* ignore *)
   in
   aux pl acc
 

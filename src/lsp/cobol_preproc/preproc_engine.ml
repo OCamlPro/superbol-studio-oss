@@ -175,10 +175,14 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           let lp = add_diag { lp with reader; buff = [] } diag in
           preprocess_line lp (buff @ text)
 
-and apply_compiler_directive ({ reader; pplog; _ } as lp) = function
-  | { payload = Preproc_directives.CDirSource sf as compdir; loc } ->
-      let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
+and apply_compiler_directive
+    ({ reader; pplog; _ } as lp) { payload = compdir; loc } =
+  let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
+  match (compdir : Preproc_directives.compiler_directive) with
+  | CDirSource sf ->
       with_reader lp (Src_reader.with_source_format sf reader)
+  | CDirSet _ ->
+      DIAGS.Cont.kwarn (add_diag lp) ~loc "Ignored@ compiler@ directive"
 
 and preprocess_line lp srctext =
   match try_preproc lp srctext with

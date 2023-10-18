@@ -38,7 +38,7 @@ run_refmod.at-413-prog.cob:2.6-2.20:
 ----         ^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
->> Error: Malformed or unknown compiler directive
+>> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:435:0
 run_refmod.at-435-prog1.cob:2.6-2.21:

@@ -15,7 +15,8 @@ open Cobol_common.Srcloc.TYPES
 open Text.TYPES
 
 type compiler_directive =
-  | CDirSource of Src_format.any with_loc                            [@@unboxed]
+  | CDirSource of Src_format.any with_loc
+  | CDirSet of string with_loc
 
 type copy_statement =
   | CDirCopy of

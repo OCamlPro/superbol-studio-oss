@@ -51,4 +51,6 @@ let show_source_lines
         match ~&cdir with
         | Cobol_preproc.Directives.CDirSource _ ->
             Pretty.out "|new source format|"
+        | _ ->                        (* ignore every other kind of directives *)
+            ()
     end

@@ -123,9 +123,9 @@ let text_word =
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
 let cdir_word_suffix =
-  (cdir_char+ ((cdir_char | '_' | '-') cdir_char*)*)
+  (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)? (* CHECKME: allow empty? *)
 let cdir_word =
-  (">>" blanks? cdir_word_suffix)
+  (">>" ' '? cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -141,7 +141,7 @@ rule fixed_line state
       }
   | sna ('$' as marker)                                 (* compiler directive *)
       {
-        fixed_cdir_line (String.make 1 marker) state lexbuf
+        fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
   | sna ('>' as marker)
       {
@@ -210,7 +210,7 @@ and xopen_or_crt_or_acutrm_followup state
   = parse
   | ('$' as marker)
       {
-        fixed_cdir_line (String.make 1 marker) state lexbuf
+        fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
   | cdir_word
       {
@@ -234,9 +234,9 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       {
         fixed_continue_line state lexbuf
       }
-  | ('$' | ">>" as marker)
+  | ('$' as marker)
       {
-        fixed_cdir_line marker state lexbuf
+        fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
   | (['*' '/'] as marker)                                     (* comment line *)
       {
@@ -311,7 +311,18 @@ and fixed_nominal state
       {
         newline_or_eof state lexbuf
       }
-and fixed_cdir_line marker state                        (* compiler directive *)
+and fixed_cdir_line marker state          (* `>>`-prefixed compiler directive *)
+  = parse
+  | ' '? cdir_word_suffix
+      {
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
+          ~marker (Src_lexing.flush_continued state) lexbuf
+      }
+  | epsilon
+      {
+        newline_or_eof (Src_lexing.flush_continued state) lexbuf
+      }
+and fixed_mf_cdir_line marker state   (* Micro-focus compiler directive (`$`) *)
   = parse
   | blanks? cdir_word_suffix
       {
@@ -440,7 +451,7 @@ and free_line state
       {
         free_line (Src_lexing.flush_continued ~force:true state) lexbuf
       }
-  | cdir_word
+  | (cdir_word | '$' blanks? cdir_word_suffix)
       {
         Src_lexing.cdir_word' ~k:free_nominal
           (Src_lexing.flush_continued ~force:true state) lexbuf
