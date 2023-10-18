@@ -18,13 +18,6 @@ module DIAGS = Cobol_common.Diagnostics
 
 module Make (Config: Cobol_config.T) = struct
 
-  let source_format_lexdir ~dialect format =
-    match Src_format.decypher ~dialect ~&format with
-    | Ok (SF sf) ->
-        DIAGS.some_result @@ Preproc_directives.LexDirSource (sf &@<- format)
-    | Error (`SFUnknown f) ->
-        DIAGS.error_result None ~loc:~@format "Unknown@ source@ format@ `%s'" f
-
   let safe_partial_replacing_when_src_literal ~loc =
     Config.safe_partial_replacing_when_src_literal#verify' ~loc:(Some loc) |>
     DIAGS.map_result ~f:(function Some s -> s = `Safe | None -> false)

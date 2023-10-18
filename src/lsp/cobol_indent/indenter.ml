@@ -62,7 +62,7 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
   String.concat "\n" strl
 
 (*indent a range of file, with the default indent_config*)
-let indent_range' ~source_format ~range ~file =
+let indent_range' ~dialect ~source_format ~range ~file =
   let file_content = Ez_file.V1.EzFile.read_file file in
   (*
     Not satisfied with the `Cobol_preproc.fold_text_lines`,
@@ -72,17 +72,19 @@ let indent_range' ~source_format ~range ~file =
      (* NB: not anymore. *)
   *)
   let state =
-    Cobol_preproc.fold_source_lines ~source_format
+    Cobol_preproc.fold_source_lines ~dialect ~source_format
+      ~skip_compiler_directives_text:false
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
       (Filename file) { scope = BEGIN; context  = []; acc = []; range }
   in
-  let ind_recds = state.acc in
-  indenter ~source_format file_content ind_recds state.range
+  (* NB: note here we ignore diagnostics *)
+  let ind_recds = state.result.acc in
+  indenter ~source_format file_content ind_recds state.result.range
 
 (*indent a range of file, with the user-defined indent_config*)
-let indent_range' ~source_format ~indent_config ~range ~file =
+let indent_range' ~dialect ~source_format ~indent_config ~range ~file =
   begin match indent_config with
     | Some indent_config -> Indent_config.set_config ~indent_config
     | None -> ()
   end;
-  indent_range' ~source_format ~range ~file
+  indent_range' ~dialect ~source_format ~range ~file

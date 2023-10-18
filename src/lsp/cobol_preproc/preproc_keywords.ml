@@ -4,7 +4,6 @@
 let keywords = Preproc_tokens.[
   "TRAILING", TRAILING;
   "SUPPRESS", SUPPRESS;
-  "SOURCEFORMAT", SOURCEFORMAT;
   "REPLACING", REPLACING;
   "REPLACE", REPLACE;
   "PRINTING", PRINTING;
@@ -12,15 +11,8 @@ let keywords = Preproc_tokens.[
   "OF", OF;
   "LEADING", LEADING;
   "LAST", LAST;
-  "IS", IS;
   "IN", IN;
-  "FREE", FREE;
-  "FORMAT", FORMAT;
   "COPY", COPY;
-  ">>SOURCE", CDIR_SOURCE;
-  "$SOURCE", CDIR_SOURCE;
-  ">>SET", CDIR_SET;
-  "$SET", CDIR_SET;
   "BY", BY;
   "ALSO", ALSO;
 ]

@@ -17,6 +17,15 @@ val line: ('k Src_lexing.state as 's) -> Lexing.lexbuf -> 's * Text.text
 
 (* Second lexer *)
 
+val keyword_of_cdtoken: (Compdir_grammar.token, string) Hashtbl.t
+
+type cdtoken_component =
+  | CDTok of Compdir_grammar.token
+  | CDEnd
+val cdtoken: Lexing.lexbuf -> cdtoken_component
+
+(* Third lexer *)
+
 val keyword_of_pptoken: (Preproc_tokens.token, string) Hashtbl.t
 
 type pptoken_component =

@@ -17,9 +17,11 @@ open Cobol_indent
 
 open Common_args
 
-let action { preproc_options = { source_format; _ }; _ } ~file ~range
+let action { preproc_options = { source_format; config; _ }; _ } ~file ~range
     ~indent_config =
+  let module Config = (val config) in
   indent_range ~source_format ~file ~range ~indent_config
+    ~dialect:Config.dialect
 
 let cmd =
   let file = ref "" in

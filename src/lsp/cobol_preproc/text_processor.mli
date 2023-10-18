@@ -46,8 +46,6 @@ module type ENTRY_POINTS = sig
   type 'x entry
   val replace_statement
     : Preproc_directives.replace_statement with_diags with_loc entry
-  val lexing_directive
-    : Preproc_directives.lexing_directive option with_diags with_loc entry
   val copy_statement
     : Preproc_directives.copy_statement with_diags with_loc entry
 end

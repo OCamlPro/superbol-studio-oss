@@ -115,6 +115,7 @@ val more_result: f:('a -> 'b with_diags) -> 'a with_diags -> 'b with_diags
 val cons_option_result: 'a option with_diags -> 'a list with_diags -> 'a list with_diags
 val forget_result: _ with_diags -> diagnostics
 val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags
+val show_n_forget: ?min_level:severity -> ?ppf:Format.formatter -> 'a with_diags -> 'a
 
 val hint_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func
 val note_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func
