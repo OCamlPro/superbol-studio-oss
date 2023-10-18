@@ -10,33 +10,42 @@
   <span>string <span class="arrow">&#45;&gt;</span></span>
   <span><a href="../../cobol_config/Cobol_config/index.html#type-source_format_spec">Cobol_config.source_format_spec</a> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="Src_format/index.html#type-any">Src_format.any</a> <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-lex_file"><a href="#val-lex_file" class="anchor"></a><code><span><span class="keyword">val</span> lex_file : 
+  <span><span class="label">dialect</span>:<a href="../../cobol_config/Cobol_config/index.html#type-dialect">Cobol_config.dialect</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="label">source_format</span>:<a href="../../cobol_config/Cobol_config/index.html#type-source_format_spec">Cobol_config.source_format_spec</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="optlabel">?ppf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-input">input</a> <span class="arrow">&#45;&gt;</span></span>
-  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-lex_lib"><a href="#val-lex_lib" class="anchor"></a><code><span><span class="keyword">val</span> lex_lib : 
+  <span>unit <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-lex_lib"><a href="#val-lex_lib" class="anchor"></a><code><span><span class="keyword">val</span> lex_lib : 
+  <span><span class="label">dialect</span>:<a href="../../cobol_config/Cobol_config/index.html#type-dialect">Cobol_config.dialect</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="label">source_format</span>:<a href="../../cobol_config/Cobol_config/index.html#type-source_format_spec">Cobol_config.source_format_spec</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="label">libpath</span>:<span>string list</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="optlabel">?ppf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><span>(<span>[&lt; `Alphanum <span>| `Word</span> ]</span> * string)</span> <span class="arrow">&#45;&gt;</span></span>
-  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_source_lines"><a href="#val-fold_source_lines" class="anchor"></a><code><span><span class="keyword">val</span> fold_source_lines : 
+  <span>unit <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_source_lines"><a href="#val-fold_source_lines" class="anchor"></a><code><span><span class="keyword">val</span> fold_source_lines : 
+  <span><span class="label">dialect</span>:<a href="../../cobol_config/Cobol_config/index.html#type-dialect">Cobol_config.dialect</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="label">source_format</span>:<a href="../../cobol_config/Cobol_config/index.html#type-source_format_spec">Cobol_config.source_format_spec</a> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?skip_compiler_directives_text</span>:bool <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?on_compiler_directive</span>:
+    <span>(<span>int <span class="arrow">&#45;&gt;</span></span>
+      <span><span><span class="xref-unresolved">Cobol_preproc__.Preproc_directives.compiler_directive</span>
+        <a href="../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+      <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+      <span class="type-var">'a</span>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="label">f</span>:<span>(<span>int <span class="arrow">&#45;&gt;</span></span> <span><a href="Text/index.html#type-text">Text.text</a> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'a</span>)</span> <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-input">input</a> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
-  <span class="type-var">'a</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-preprocess_file"><a href="#val-preprocess_file" class="anchor"></a><code><span><span class="keyword">val</span> preprocess_file : 
+  <span><span class="type-var">'a</span> <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div><div class="spec-doc"><p><code>fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
+    ~on_compiler_directive ~f input acc</code> applies <code>f line_number line acc</code> for each successive source line <code>line</code> of <code>input</code>. <code>line_number</code> gives the line number for <code>line</code> (starting at <code>1</code>). <code>line</code> is given empty to <code>f</code> if it corresponds to an empty line in the input, or was a line continuation in the case of fixed-width reference format.</p><p>When given, <code>on_compiler_directive</code> is called <em>after</em> <code>f</code> has been fed with the text of a compiler directive, with the same line number.</p><p>When set, <code>skip_compiler_directives_text</code> (<code>false</code> by default) prevents the text of compiler directives from being fed to <code>f</code>. If given, <code>on_compiler_directive</code> is called as if the text had been fed to <code>f</code>.</p><p>Diagnostics resulting from lexing and parsing the input are attached to the returned accumulated value.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-preprocess_input"><a href="#val-preprocess_input" class="anchor"></a><code><span><span class="keyword">val</span> preprocess_input : 
   <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="optlabel">?ppf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span>string <span class="arrow">&#45;&gt;</span></span>
-  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-text_of_file"><a href="#val-text_of_file" class="anchor"></a><code><span><span class="keyword">val</span> text_of_file : 
-  <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span>string <span class="arrow">&#45;&gt;</span></span>
-  <a href="Text/index.html#type-text">Text.text</a></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-text_of_input"><a href="#val-text_of_input" class="anchor"></a><code><span><span class="keyword">val</span> text_of_input : 
-  <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="optlabel">?epf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><a href="#type-input">input</a> <span class="arrow">&#45;&gt;</span></span>
-  <a href="Text/index.html#type-text">Text.text</a></span></code></div></div></div></body></html>
+  <span>unit <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-preprocess_file"><a href="#val-preprocess_file" class="anchor"></a><code><span><span class="keyword">val</span> preprocess_file : 
+  <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="optlabel">?ppf</span>:<span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
+  <span>string <span class="arrow">&#45;&gt;</span></span>
+  <span>unit <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-text_of_file"><a href="#val-text_of_file" class="anchor"></a><code><span><span class="keyword">val</span> text_of_file : 
+  <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
+  <span>string <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="Text/index.html#type-t">Text.t</a> <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-text_of_input"><a href="#val-text_of_input" class="anchor"></a><code><span><span class="keyword">val</span> text_of_input : 
+  <span><span class="optlabel">?options</span>:<span class="xref-unresolved">Cobol_preproc__.Preproc_options.preproc_options</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="#type-input">input</a> <span class="arrow">&#45;&gt;</span></span>
+  <span><a href="Text/index.html#type-t">Text.t</a> <a href="../../cobol_common/Cobol_common/Diagnostics/index.html#type-with_diags">Cobol_common.Diagnostics.with_diags</a></span></span></code></div></div></div></body></html>
