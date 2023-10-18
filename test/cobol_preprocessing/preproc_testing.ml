@@ -17,7 +17,7 @@ module DIAGS = Cobol_common.Diagnostics
 (** Note: won't show detailed source locations as the openned file is not
     actually on disk (that may be fixed later with a custom internal file
     store). *)
-let show_diagnostics
+let preprocess
     ?(verbose = false)
     ?(filename = "prog.cob")
     ?(source_format = Cobol_config.(SF SFFixed))

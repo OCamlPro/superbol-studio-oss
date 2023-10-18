@@ -37,7 +37,7 @@ let%expect_test "simple-formatting-request" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROGRAM-ID. HELLO.
            PROCEDURE DIVISION.
             para-1.
@@ -72,7 +72,7 @@ let%expect_test "formatting-request-nested-if" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":1},"start":{"character":8,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             para-1.
                 IF X>9
                 THEN
@@ -114,7 +114,7 @@ let%expect_test "formatting-request-data" =
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":23,"line":1},"start":{"character":8,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":23,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             WORKING-STORAGE SECTION.
             01 x.
                 05 y.
@@ -187,7 +187,7 @@ let%expect_test "formatting-request-nested-program" =
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             IDENTIFICATION DIVISION.
             PROGRAM-ID. X.
             PROCEDURE DIVISION.
@@ -245,7 +245,7 @@ let%expect_test "formatting-request-alignment-argument" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            MOVE VAR-1 TO VAR-2 VAR-3
                          VAR-4
                          VAR-5. |}]
@@ -277,7 +277,7 @@ let%expect_test "formatting-request-else-if" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":10,"line":1},"start":{"character":8,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":10,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             if x>1
                 move 1 to x
             else if x>2
@@ -404,7 +404,7 @@ let%expect_test "formatting-request-whole-program" =
     data_sections_visitor.ml:0:
       (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
       implementation
-    {"params":{"diagnostics":[{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             IDENTIFICATION DIVISION.
             PROGRAM-ID. MACESDS.
             ENVIRONMENT DIVISION.
@@ -521,7 +521,7 @@ let%expect_test "formatting-request-on-exception" =
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            CALL STH
                NOT ON EXCEPTION
                    RAISE EXCEPTION exception-name-1
@@ -556,7 +556,7 @@ let%expect_test "formatting-request-perform" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1},{"message":"Source format `auto` is not supported yet, using `fixed`","range":{"end":{"character":0,"line":0},"start":{"character":0,"line":0}},"severity":2}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROCEDURE DIVISION.
             para-1.
                 PERFORM 3 TIMES

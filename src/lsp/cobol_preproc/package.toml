@@ -43,7 +43,7 @@ generators = ["ocamllex"]
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_deriving.show"
+preprocess = "staged_pps ppx_import ppx_deriving.show"
 
 # files to skip while updating at package level
 skip = ["main.ml", "index.mld"]
@@ -56,6 +56,7 @@ skip = ["main.ml", "index.mld"]
 cobol_common = "version"
 cobol_config = "version"
 ppx_deriving = ">=5.2.1"
+ppx_import = "1"
 [dependencies.menhir]
 libname = "menhirLib"
 version = ">=1.2"

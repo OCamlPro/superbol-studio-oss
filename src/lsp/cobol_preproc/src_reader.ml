@@ -11,7 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Text.TYPES
@@ -124,8 +123,7 @@ let fold_chunks
     ~dialect
     ?(skip_compiler_directives_text = false)
     ?on_compiler_directive
-    ~f
-    pl acc =
+    ~f pl acc =
   let rec aux pl acc = match next_chunk pl with
     | _pl, { payload = Eof; _} :: _ ->
         acc
@@ -232,10 +230,41 @@ let make make_lexing ?filename ~source_format input =
   Option.iter (Lexing.set_filename lexbuf) filename;
   Plx (Src_lexing.init_state source_format, lexbuf)
 
+(* --- *)
+
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
-let from_file ~source_format filename : t =
-  from_string ~source_format ~filename (EzFile.read_file filename)
+
+let fill buff ~lookup_len (input: Src_input.t) =
+  match input with
+  | String { contents = str; _ } ->
+      Buffer.add_substring buff str 0 (min lookup_len (String.length str))
+  | Channel { ic; _ } ->
+      (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
+      Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
+
+let start_reading ?source_format input =
+  match source_format with
+  | Some format ->
+      (* TODO: read 3 bytes and skip any utf-8 BOM while shifting initial
+         pos_cnum. *)
+      format, input
+  | None ->
+      let lookup_len = 20 in                             (* 20 as in GnuCOBOL *)
+      let buff = Buffer.create lookup_len in
+      fill buff ~lookup_len input;
+      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
+      Src_format.guess_from ~contents_prefix:(Buffer.contents buff), input
+
+let from ?source_format (input: Src_input.t) =
+  let source_format, input = start_reading input ?source_format in
+  match input with
+  | String { contents; filename } ->
+      from_string ~source_format ~filename contents
+  | Channel { ic; filename } ->
+      from_channel ~source_format ~filename ic
+
+(* --- *)
 
 (** Note: If given, assumes [position] corresponds to the beginning of the
     input, which {e must} also be at the beginning of a line.  If absent,
@@ -254,5 +283,3 @@ let restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
 
 let restart_on_string = restart Lexing.from_string
 let restart_on_channel = restart Lexing.from_channel
-let restart_on_file ?position filename =
-  restart_on_string ?position (EzFile.read_file filename)

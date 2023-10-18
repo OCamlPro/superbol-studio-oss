@@ -25,12 +25,8 @@ val error_diagnostic: error -> Cobol_common.Diagnostics.t
 
 (** {1 Creation} *)
 
-val from_file
-  : source_format: Src_format.any -> string -> t
-val from_string
-  : ?filename: string -> source_format: Src_format.any -> string -> t
-val from_channel
-  : ?filename: string -> source_format: Src_format.any -> in_channel -> t
+val from
+  : ?source_format: Src_format.any -> Src_input.t -> t
 
 (** {1 Queries} *)
 
@@ -39,7 +35,6 @@ val position: t -> Lexing.position
 val comments: t -> Text.comments
 val source_format: t -> Src_format.any
 val newline_cnums: t -> int list
-
 val next_chunk: t -> t * Text.t
 
 val fold_lines
@@ -49,10 +44,12 @@ val fold_lines
      : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)
   -> f:(int -> Text.t -> 'a -> 'a)
   -> t -> 'a -> 'a
+
 val print_lines
   : dialect: Cobol_config.dialect
   -> ?skip_compiler_directives_text: bool
   -> Format.formatter -> t -> unit
+
 val try_compiler_directive
   : dialect: Cobol_config.dialect -> Text.t
   -> ((Text.t * Preproc_directives.compiler_directive with_loc * Text.t) option,
@@ -60,13 +57,15 @@ val try_compiler_directive
 
 (** {1 Change of source format} *)
 
-val with_source_format: Src_format.any with_loc -> t -> t
+val with_source_format
+  : Src_format.any with_loc -> t -> t
 
 (** {1 Resetting the input} *)
 
 (** Note: the functions below assume [position] corresponds to the begining of
     the input.} *)
 
-val restart_on_file: ?position: Lexing.position -> string -> t -> t
-val restart_on_string: ?position: Lexing.position -> string -> t -> t
-val restart_on_channel: ?position: Lexing.position -> in_channel -> t -> t
+val restart_on_string
+  : ?position: Lexing.position -> string -> t -> t
+val restart_on_channel
+  : ?position: Lexing.position -> in_channel -> t -> t

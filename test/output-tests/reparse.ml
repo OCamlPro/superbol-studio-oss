@@ -35,7 +35,7 @@ let reparse_file ~source_format ~config filename =
   let print =
     Format.asprintf "@[%a@]@." Cobol_ptree.pp_compilation_group
   in
-  match parse ~source_format (Filename filename) with
+  match Cobol_preproc.Input.from ~filename ~f:(parse ~source_format) with
   | { result = Only Some cg; _ } -> (
       Format.printf "Parse: OK. ";
       let contents = print cg in

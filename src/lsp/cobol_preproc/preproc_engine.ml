@@ -20,23 +20,6 @@ module DIAGS = Cobol_common.Diagnostics
 
 (* --- *)
 
-type input =
-  | Filename of string
-  | String of { contents: string; filename: string }
-  | Channel of { contents: in_channel; filename: string }
-
-let decide_source_format _input
-  : Cobol_config.source_format_spec ->
-    Src_format.any with_diags = function
-  | SF result ->
-      { result = Src_format.from_config result; diags = DIAGS.Set.none }
-  | Auto ->
-      { result = Src_format.from_config SFFixed;
-        diags = DIAGS.(Acc.warn Set.none) "Source format `auto` is not supported \
-                                           yet, using `fixed`" }
-
-(* --- *)
-
 type preprocessor =
   {
     buff: Text.t;
@@ -46,8 +29,9 @@ type preprocessor =
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
   }
+
+(** the preprocessor state that does not change very often *)
 and preprocessor_persist =
-  (** the preprocessor state that does not change very often *)
   {
     pparser: (module Text_processor.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
@@ -86,13 +70,9 @@ let with_replacing lp replacing =
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
-let make_reader ~source_format = function
-  | Filename filename ->
-      Src_reader.from_file ~source_format filename
-  | String { contents; filename } ->
-      Src_reader.from_string ~filename ~source_format contents
-  | Channel { contents; filename } ->
-      Src_reader.from_channel ~filename ~source_format contents
+let source_format_config = function
+  | Cobol_config.SF sf -> Some (Src_format.from_config sf)
+  | Auto -> None
 
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format;
@@ -100,14 +80,13 @@ let preprocessor input = function
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
-      let { result = source_format; diags }
-        = decide_source_format input source_format in
+      let source_format = source_format_config source_format in
       {
         buff = [];
-        reader = make_reader ~source_format input;
+        reader = Src_reader.from input ?source_format;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
-        diags;
+        diags = DIAGS.Set.none;
         persist =
           {
             pparser = (module Pp);
@@ -125,7 +104,7 @@ let preprocessor input = function
       {
         from with
         buff = [];
-        reader = make_reader ~source_format input;
+        reader = Src_reader.from input ~source_format;
         persist =
           {
             persist with
@@ -308,9 +287,11 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         if verbose then
           Pretty.error "Reading library `%s'@." filename;
         let text, lp =             (* note: [lp] holds all prev and new diags *)
-          full_text                (* likewise for pplog *)
-            (preprocessor (Filename filename) (`Fork (lp, loc, filename)))
-            ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
+          Src_input.from ~filename ~f:begin fun input ->
+            full_text                                   (* likewise for pplog *)
+              (preprocessor input (`Fork (lp, loc, filename)))
+              ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
+          end
         in
         text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
@@ -383,6 +364,7 @@ let pp_pptokens: pptokens Pretty.printer =
 (* --- *)
 
 let reset_preprocessor_for_string string ?new_position pp =
+  (* TODO: maybe we could auto-detect the source format again... *)
   let contents = match new_position with
     | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
     | None -> string
@@ -399,44 +381,43 @@ let preprocessor ?(options = Preproc_options.default) input =
     {!preprocess_file}. *)
 let default_oppf = Fmt.stdout
 
-let lex_file ~dialect ~source_format ?(ppf = default_oppf) input =
-  let { result = source_format; diags } =
-    decide_source_format input source_format in
-  DIAGS.result ~diags @@
+let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
+  DIAGS.result @@
   Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
-  make_reader ~source_format input
+  Src_reader.from input ?source_format:(source_format_config source_format)
+
+let lex_file ~dialect ~source_format ?ppf filename =
+  Src_input.from ~filename ~f:(lex_input ~dialect ~source_format ?ppf)
 
 let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) libname =
   match Cobol_common.Copybook.find_lib ~libpath libname with
   | Ok filename ->
-      let { result = source_format; diags } =
-        decide_source_format (Filename filename) source_format in
-      DIAGS.result ~diags @@
-      Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
-      Src_reader.from_file ~source_format filename
+      Src_input.from ~filename ~f:begin fun input ->
+        DIAGS.result @@
+        Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
+        Src_reader.from input ?source_format:(source_format_config source_format)
+      end
   | Error lnf ->
       DIAGS.error_result () "%a" Cobol_common.Copybook.pp_lookup_error lnf
 
 let fold_source_lines ~dialect ~source_format
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
-  let { result = source_format; diags } =
-    decide_source_format input source_format in
-  DIAGS.result ~diags @@
-  Src_reader.fold_lines ~dialect ~f (make_reader ~source_format input) acc
-    ?skip_compiler_directives_text ?on_compiler_directive
+  DIAGS.result @@
+  Src_reader.fold_lines ~dialect ~f
+    (Src_reader.from input ?source_format:(source_format_config source_format))
+    ?skip_compiler_directives_text ?on_compiler_directive acc
 
 let text_of_input ?options input =
   let text, pp = full_text ~item:"file" @@ preprocessor ?options input in
   DIAGS.result text ~diags:(diags pp)
 
 let text_of_file ?options filename =
-  text_of_input ?options (Filename filename)
+  Src_input.from ~filename ~f:(text_of_input ?options)
 
 let preprocess_input ?options ?(ppf = default_oppf) input =
   text_of_input ?options input |>
   DIAGS.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
-let preprocess_file ?options ?(ppf = default_oppf) filename =
-  text_of_file ?options filename |>
-  DIAGS.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
+let preprocess_file ?options ?ppf filename =
+  Src_input.from ~filename ~f:(preprocess_input ?options ?ppf)

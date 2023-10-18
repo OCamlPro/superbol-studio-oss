@@ -376,6 +376,7 @@
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
    (ocaml (>= 4.14.0))
+   (ppx_import ( >= 1 ))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 1.2 ))
    (cobol_config (= version))

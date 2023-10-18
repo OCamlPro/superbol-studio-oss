@@ -135,3 +135,20 @@ let comment_entry_termination
      CBLXIndic), FixedWidth _), Some c -> AreaB { first_area_b_column = c }
 
 (* --- *)
+
+let looks_like_fixed_format ?(tab_stop = 8) contents_prefix =
+  let rec sna ap vp =
+    match contents_prefix.[ap] with
+    | '\n' -> sna (succ ap) 1
+    | '\t' -> sna (succ ap) (vp + (tab_stop - (vp + tab_stop) mod tab_stop))
+    | '\r' -> sna (succ ap) vp
+    | _ when vp <> 7 -> sna (succ ap) (succ vp)
+    | ' ' | '-' | 'd' | 'D' | '*' | '/' | '\\' | '$' when vp = 7 -> true
+    | _ -> false
+  in
+  try sna 0 1 with Invalid_argument _ -> false
+
+let guess_from ~contents_prefix =
+  if looks_like_fixed_format contents_prefix
+  then from_config SFFixed
+  else from_config SFFree
