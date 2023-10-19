@@ -137,33 +137,37 @@ let get_config () =
     exit 2
 
 let add_switch ~dir ?switch_name ~file ~set config =
-  let dirname = dir // file in
-  match
-    StringMap.iter (fun _ x ->
-        if x = dirname then raise Exit) config.switch_list with
-  | exception Exit -> () (* already exists *)
-  | () ->
-    let switch_name =
+  let exception Found of string in
+  let switch_name =
+    let dirname = dir // file in
+    match
+      StringMap.iter (fun s x ->
+          if x = dirname then raise (Found s)) config.switch_list with
+    | exception Found s -> s (* already exists *)
+    | () ->
       let switch_name =
-        match switch_name with
-        | Some s -> s
-        | None ->
-          match EzString.chop_prefix file ~prefix:"gnucobol-" with
+        let switch_name =
+          match switch_name with
           | Some s -> s
           | None ->
-            match EzString.chop_prefix file ~prefix:"gnucobol" with
+            match EzString.chop_prefix file ~prefix:"gnucobol-" with
             | Some s -> s
-            | None -> file
+            | None ->
+              match EzString.chop_prefix file ~prefix:"gnucobol" with
+              | Some s -> s
+              | None -> file
+        in
+        let name = Printf.sprintf "S%02d-%s" config.switch_num switch_name in
+        config.switch_num <- config.switch_num + 1;
+        name
       in
-      let name = Printf.sprintf "S%02d-%s" config.switch_num switch_name in
-      config.switch_num <- config.switch_num + 1;
-      name
-    in
-    Printf.eprintf "Adding %S at\n   %s\n%!" switch_name dirname;
-    config.switch_list <- StringMap.add switch_name dirname config.switch_list;
-    if set then
-      config.switch_current <- Some switch_name;
-    ()
+      Printf.eprintf "Adding %S at\n   %s\n%!" switch_name dirname;
+      config.switch_list <- StringMap.add switch_name dirname config.switch_list;
+      switch_name
+  in
+  if set then
+    config.switch_current <- Some switch_name;
+  ()
 
 
 
@@ -235,7 +239,6 @@ let set_switch_link config =
 let switch_import ~dirs ~clear ~set () =
 
   let config = get_config () in
-  let current = config.switch_current in
   let dirs = match dirs with
       [] -> [ config.switch_dir ]
     | dirs -> dirs
@@ -255,6 +258,7 @@ let switch_import ~dirs ~clear ~set () =
         end;
       ) config.switch_list;
   end;
+  let current = config.switch_current in
   List.iter (fun dir ->
       let dir = if Filename.is_relative dir then
           Misc.current_dir // dir
@@ -362,6 +366,10 @@ case ":${PATH}:" in
     *)
         PATH="$HOME/.config/superbol/switch/bin:$PATH";
         export PATH;
+        MANPATH="$HOME/.config/superbol/switch/share/man:$MANPATH";
+        export MANPATH;
+        LOCPATH="$HOME/.config/superbol/switch/share/locale:$LOCPATH";
+        export LOCPATH;
         LD_LIBRARY_PATH="$HOME/.config/superbol/switch/lib:$LD_LIBRARY_PATH";
         export LD_LIBRARY_PATH;
         ;;
@@ -405,6 +413,8 @@ to your $HOME/.profile file.|};
       [ "GNUCOBOL_DIR", switch_dir;
         set_path "PATH" "bin";
         set_path "LD_LIBRARY_PATH" "lib" ;
+        set_path "MANPATH" "share/man" ;
+        set_path "LOCPATH" "share/locale" ;
       ];
     ()
 
@@ -455,9 +465,10 @@ let switch_env_cmd, env_cmd =
 let switch_set ?switch ~last () =
 
   let config = get_config () in
-  let switch = find_switch config ?switch ~last ~current:false in
+  let switch = find_switch config ?switch ~last ~current:true in
   config.switch_current <- Some switch ;
   set_switch_link config ;
+  Printf.eprintf "Current switch set to %S\n%!" switch;
   User_config.save config.user_config
 
 let set_cmd =
@@ -598,7 +609,7 @@ let switch_build ?dir ?switch_name ~set ~sudo () =
   let current = config.switch_current in
   add_switch config ?switch_name ~file ~dir ~set ;
   if config.switch_current <> current then
-    Printf.eprintf "Current switch modified\n%!";
+    set_switch_link config;
   User_config.save config.user_config
 
 let build_cmd =
