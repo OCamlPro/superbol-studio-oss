@@ -6,7 +6,10 @@
 
 (library
  (name test_cobol_preproc)
- (modules source_lines compiler_directives auto_sourceformat)
+ (modules source_lines
+          compiler_directives
+          auto_sourceformat
+          auto_sourceformat_rewind)
  (preprocess
    (pps ppx_expect))
  (inline_tests

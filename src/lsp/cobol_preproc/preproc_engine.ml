@@ -38,6 +38,7 @@ and preprocessor_persist =
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     dialect: Cobol_config.dialect;
+    source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -94,6 +95,7 @@ let preprocessor input = function
             replacing = [];
             copybooks = Cobol_common.Srcloc.no_copy;
             dialect = Config.dialect;
+            source_format;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -150,7 +152,7 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           let lp = { lp with reader; buff = [] } in
           preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
       | Error (text, e, _) ->
-          let diag = Src_reader.error_diagnostic e in
+          let diag = Preproc_diagnostics.error e in
           let lp = add_diag { lp with reader; buff = [] } diag in
           preprocess_line lp (buff @ text)
 
@@ -159,7 +161,9 @@ and apply_compiler_directive
   let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
   match (compdir : Preproc_directives.compiler_directive) with
   | CDirSource sf ->
-      with_reader lp (Src_reader.with_source_format sf reader)
+      (match Src_reader.with_source_format sf reader with
+       | Ok reader -> with_reader lp reader
+       | Error e -> add_diag lp (Preproc_diagnostics.error e))
   | CDirSet _ ->
       DIAGS.Cont.kwarn (add_diag lp) ~loc "Ignored@ compiler@ directive"
 
@@ -364,13 +368,12 @@ let pp_pptokens: pptokens Pretty.printer =
 (* --- *)
 
 let reset_preprocessor_for_string string ?new_position pp =
-  (* TODO: maybe we could auto-detect the source format again... *)
   let contents = match new_position with
     | Some Lexing.{ pos_cnum; _ } -> EzString.after string (pos_cnum - 1)
     | None -> string
-  in
+  and source_format = pp.persist.source_format in
   reset_preprocessor ?new_position pp contents
-    ~restart:Src_reader.restart_on_string
+    ~restart:(Src_reader.restart_on_string ?source_format)
 
 (* --- *)
 

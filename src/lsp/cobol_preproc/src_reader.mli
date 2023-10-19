@@ -17,12 +17,6 @@ open Cobol_common.Srcloc.TYPES
 
 type t
 
-type error =
-  | Malformed_or_unknown_compiler_directive of srcloc
-  | Unknown_source_format of string * srcloc
-
-val error_diagnostic: error -> Cobol_common.Diagnostics.t
-
 (** {1 Creation} *)
 
 val from
@@ -53,12 +47,12 @@ val print_lines
 val try_compiler_directive
   : dialect: Cobol_config.dialect -> Text.t
   -> ((Text.t * Preproc_directives.compiler_directive with_loc * Text.t) option,
-      Text.t * error * Text.t) result
+      Text.t * Preproc_diagnostics.error * Text.t) result
 
 (** {1 Change of source format} *)
 
 val with_source_format
-  : Src_format.any with_loc -> t -> t
+  : Src_format.any with_loc -> t -> (t, Preproc_diagnostics.error) result
 
 (** {1 Resetting the input} *)
 
@@ -66,6 +60,8 @@ val with_source_format
     the input.} *)
 
 val restart_on_string
-  : ?position: Lexing.position -> string -> t -> t
+  : ?source_format: Src_format.any -> ?position: Lexing.position
+  -> string -> t -> t
 val restart_on_channel
-  : ?position: Lexing.position -> in_channel -> t -> t
+  : ?source_format: Src_format.any -> ?position: Lexing.position
+  -> in_channel -> t -> t

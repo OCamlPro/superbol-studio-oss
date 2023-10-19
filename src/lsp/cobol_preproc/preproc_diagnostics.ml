@@ -11,19 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t =
-  | String of { contents: string; filename: string }
-  | Channel of { ic: in_channel; filename: string }
+open Cobol_common.Srcloc.TYPES
 
-let string ~filename contents =
-  String { contents; filename }
+module DIAGS =  Cobol_common.Diagnostics
 
-let channel ~filename ic =
-  Channel { ic; filename }
+type error =
+  | Malformed_or_unknown_compiler_directive of srcloc
+  | Unknown_source_format of string * srcloc
+  | Forbidden_change_of_source_format of srcloc
 
-let from ~filename ~f =
-  if filename = "-"
-  then f (Channel { ic = stdin; filename })          (* filename = "(stdin)"? *)
-  else let ic = open_in_bin filename in
-    try let res = f (Channel { ic; filename }) in close_in ic; res
-    with e -> close_in_noerr ic; raise e
+let error = function
+  | Malformed_or_unknown_compiler_directive loc ->
+      DIAGS.One.error ~loc "Malformed@ or@ unknown@ compiler@ directive"
+  | Unknown_source_format (f, loc) ->
+      DIAGS.One.error ~loc "Unknown@ source@ format@ `%s'" f
+  | Forbidden_change_of_source_format loc ->
+      DIAGS.One.error ~loc "Forbidden@ change@ of@ source@ format"
