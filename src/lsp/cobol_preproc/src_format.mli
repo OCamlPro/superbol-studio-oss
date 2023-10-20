@@ -52,6 +52,7 @@ val decypher
   : dialect: Cobol_config.dialect
   -> string
   -> (any, [> `SFUnknown of string ]) result
+val guess_from: contents_prefix: string -> any
 
 val comment_entry_termination: _ source_format -> comment_entry_termination
 val first_area_b_column: _ source_format -> int option

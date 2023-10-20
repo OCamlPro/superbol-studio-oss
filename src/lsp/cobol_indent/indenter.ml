@@ -75,7 +75,8 @@ let indent_range' ~dialect ~source_format ~range ~file =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
       ~skip_compiler_directives_text:false
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
-      (Filename file) { scope = BEGIN; context  = []; acc = []; range }
+      (String { contents = file_content; filename = file; })
+      { scope = BEGIN; context  = []; acc = []; range }
   in
   (* NB: note here we ignore diagnostics *)
   let ind_recds = state.result.acc in

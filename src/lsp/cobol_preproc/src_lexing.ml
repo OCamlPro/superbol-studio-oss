@@ -104,7 +104,7 @@ let lex_diag ~severity state =
 
 let lex_error state = lex_diag ~severity:DIAGS.Error state
 
-let change_source_format ({ config; _ } as state) { payload = sf; loc } =
+let change_source_format ({ config; _ } as state) sf =
   (* Just check there is no text that requires continuation. *)
   let flushed = function
     | { continued = CNone; pseudotext = None; _ } -> true
@@ -112,7 +112,7 @@ let change_source_format ({ config; _ } as state) { payload = sf; loc } =
   in
   if flushed state
   then Ok { state with config = { config with source_format = sf } }
-  else Error (lex_error state ~loc "Forbidden@ change@ of@ source@ format")
+  else Error ()
 
 let pos_column Lexing.{ pos_bol; pos_cnum; _ } =         (* count cols from 1 *)
   pos_cnum - pos_bol + 1

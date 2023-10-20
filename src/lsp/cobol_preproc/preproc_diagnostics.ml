@@ -11,27 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {1 Source format} *)
+open Cobol_common.Srcloc.TYPES
 
-module Src_format = Src_format
+module DIAGS =  Cobol_common.Diagnostics
 
-(** {1 Text}
+type error =
+  | Malformed_or_unknown_compiler_directive of srcloc
+  | Unknown_source_format of string * srcloc
+  | Forbidden_change_of_source_format of srcloc
 
-  "Text" refers to the source after manipulations by preprocessor statements. *)
-
-module Text = Text
-module Text_printer = Text_printer
-
-(** {1 Miscellaneous support modules}  *)
-
-module Src_overlay = Src_overlay
-module Trace = Preproc_trace
-module Directives = Preproc_directives
-
-(** {1 Main entry points for the processor itself} *)
-
-type input = [%import: Src_input.t]
-
-module Input = Src_input
-module Options = Preproc_options
-include Preproc_engine
+let error = function
+  | Malformed_or_unknown_compiler_directive loc ->
+      DIAGS.One.error ~loc "Malformed@ or@ unknown@ compiler@ directive"
+  | Unknown_source_format (f, loc) ->
+      DIAGS.One.error ~loc "Unknown@ source@ format@ `%s'" f
+  | Forbidden_change_of_source_format loc ->
+      DIAGS.One.error ~loc "Forbidden@ change@ of@ source@ format"

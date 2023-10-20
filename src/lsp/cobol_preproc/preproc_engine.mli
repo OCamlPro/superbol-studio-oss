@@ -15,14 +15,9 @@ open Cobol_common.Srcloc.TYPES
 
 type preprocessor
 
-type input =
-  | Filename of string
-  | String of { contents: string; filename: string }
-  | Channel of { contents: in_channel; filename: string }
-
 val preprocessor
   : ?options: Preproc_options.preproc_options
-  -> input
+  -> Src_input.t
   -> preprocessor
 val reset_preprocessor_for_string
   : string
@@ -45,16 +40,18 @@ val next_chunk: preprocessor -> Text.text * preprocessor
 
 (** {2 High-level commands} *)
 
-val decide_source_format
-  : string
-  -> Cobol_config.source_format_spec
-  -> Src_format.any Cobol_common.Diagnostics.with_diags
+val lex_input
+  : dialect: Cobol_config.dialect
+  -> source_format: Cobol_config.source_format_spec
+  -> ?ppf:Format.formatter
+  -> Src_input.t
+  -> unit Cobol_common.Diagnostics.with_diags
 
 val lex_file
   : dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
-  -> input
+  -> string
   -> unit Cobol_common.Diagnostics.with_diags
 
 val lex_lib
@@ -88,14 +85,14 @@ val fold_source_lines
   -> ?on_compiler_directive
      : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)
   -> f:(int -> Text.text -> 'a -> 'a)
-  -> input
+  -> Src_input.t
   -> 'a
   -> 'a Cobol_common.Diagnostics.with_diags
 
 val preprocess_input
   : ?options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
-  -> input
+  -> Src_input.t
   -> unit Cobol_common.Diagnostics.with_diags
 
 val preprocess_file
@@ -111,5 +108,5 @@ val text_of_file
 
 val text_of_input
   : ?options: Preproc_options.preproc_options
-  -> input
+  -> Src_input.t
   -> Text.t Cobol_common.Diagnostics.with_diags

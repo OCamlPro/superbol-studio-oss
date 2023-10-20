@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 let%expect_test "fixed-format-cdirs" =
-  Preproc_testing.show_diagnostics {|
+  Preproc_testing.preprocess {|
        >>SET A
       >>SET B
       $ SET B
@@ -28,7 +28,7 @@ let%expect_test "fixed-format-cdirs" =
     >> Warning: Ignored compiler directive |}];;
 
 let%expect_test "hybrid-format-cdirs" =
-  Preproc_testing.show_diagnostics {|
+  Preproc_testing.preprocess {|
       >>SOURCE FORMAT IS FREE
 >>SOURCE FORMAT IS FIXED
        >> SET SOURCEFORMAT "COBOLX"
@@ -45,12 +45,11 @@ $ Source format free
 $ SOURCE IS FREE
                         *> ok let's terminate here
   |};
-  [%expect {|
-|}];;
+  [%expect {||}];;
 
 let%expect_test "malformed-cdirs" =
   (* TODO: what should we do with the lonesome `>>`? *)
-  Preproc_testing.show_diagnostics {|
+  Preproc_testing.preprocess {|
       >>foo
       >>
       >>*> empty one?

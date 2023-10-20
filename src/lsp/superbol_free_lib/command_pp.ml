@@ -66,7 +66,7 @@ let cmd =
                    Cobol_preproc.preprocessor ~options:preproc_options |>
                    Cobol_parser.parse_simple ~options:common.parser_options
                  in
-                 let my_text = parse (Filename file) in
+                 let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (

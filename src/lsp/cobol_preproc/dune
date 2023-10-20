@@ -5,11 +5,11 @@
   (public_name cobol_preproc)
   (wrapped true)
   ; use field 'dune-libraries' to add libraries without opam deps
-  (libraries ppx_deriving menhirLib cobol_config cobol_common str)
+  (libraries ppx_import ppx_deriving menhirLib cobol_config cobol_common str)
   ; use field 'dune-flags' to set this value
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here
-  (preprocess (pps ppx_deriving.show))
+  (preprocess (staged_pps ppx_import ppx_deriving.show))
   
   )
 

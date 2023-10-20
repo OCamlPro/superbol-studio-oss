@@ -11,27 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** {1 Source format} *)
+type t =
+  | String of { contents: string; filename: string }
+  | Channel of { ic: in_channel; filename: string }
 
-module Src_format = Src_format
+let string ~filename contents =
+  String { contents; filename }
 
-(** {1 Text}
+let channel ~filename ic =
+  Channel { ic; filename }
 
-  "Text" refers to the source after manipulations by preprocessor statements. *)
-
-module Text = Text
-module Text_printer = Text_printer
-
-(** {1 Miscellaneous support modules}  *)
-
-module Src_overlay = Src_overlay
-module Trace = Preproc_trace
-module Directives = Preproc_directives
-
-(** {1 Main entry points for the processor itself} *)
-
-type input = [%import: Src_input.t]
-
-module Input = Src_input
-module Options = Preproc_options
-include Preproc_engine
+let from ~filename ~f =
+  if filename = "-"
+  then f (Channel { ic = stdin; filename })          (* filename = "(stdin)"? *)
+  else let ic = open_in_bin filename in
+    try let res = f (Channel { ic; filename }) in close_in ic; res
+    with e -> close_in_noerr ic; raise e

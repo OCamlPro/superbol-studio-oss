@@ -11,26 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Text.TYPES
+open Preproc_diagnostics
 
 module DIAGS = Cobol_common.Diagnostics
 
 type 'k reader = 'k Src_lexing.state * Lexing.lexbuf
 type 'k line = Line: 'k reader * text -> 'k line
 type t = Plx: 'k reader -> t                                           [@@unboxed]
-
-type error =
-  | Malformed_or_unknown_compiler_directive of srcloc
-  | Unknown_source_format of string * srcloc
-
-let error_diagnostic = function
-  | Malformed_or_unknown_compiler_directive loc ->
-      DIAGS.One.error ~loc "Malformed@ or@ unknown@ compiler@ directive"
-  | Unknown_source_format (f, loc) ->
-      DIAGS.One.error ~loc "Unknown@ source@ format@ `%s'" f
 
 (* --- *)
 
@@ -58,13 +48,13 @@ let next_chunk (Plx pl) =
 
 (* Change of source format *)
 
-let with_source_format: Src_format.any with_loc -> t -> t =
+let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
   fun { payload = SF format; loc } ((Plx (s, lexbuf)) as pl) ->
   if Src_format.equal (Src_lexing.source_format s) format
-  then pl
-  else match Src_lexing.change_source_format s (format &@ loc) with
-    | Ok s -> Plx (s, lexbuf)
-    | Error s -> Plx (s, lexbuf)
+  then Ok pl
+  else match Src_lexing.change_source_format s format with
+    | Ok s -> Ok (Plx (s, lexbuf))
+    | Error () -> Error (Forbidden_change_of_source_format loc)
 
 (* --- *)
 
@@ -124,8 +114,7 @@ let fold_chunks
     ~dialect
     ?(skip_compiler_directives_text = false)
     ?on_compiler_directive
-    ~f
-    pl acc =
+    ~f pl acc =
   let rec aux pl acc = match next_chunk pl with
     | _pl, { payload = Eof; _} :: _ ->
         acc
@@ -150,9 +139,12 @@ let fold_chunks
             if skip_compiler_directives_text
             then aux pl acc
             else aux pl (f text acc)
-  and apply_compdir { payload = compdir; _ } = match compdir with
-    | CDirSource sf -> with_source_format sf
-    | CDirSet _ -> Fun.id                                            (* ignore *)
+  and apply_compdir { payload = compdir; _ } pl = match compdir with
+    | CDirSet _ -> pl                                                (* ignore *)
+    | CDirSource sf ->
+        (match with_source_format sf pl with
+         | Ok pl -> pl
+         | Error _error -> pl)                                       (* ignore *)
   in
   aux pl acc
 
@@ -232,27 +224,56 @@ let make make_lexing ?filename ~source_format input =
   Option.iter (Lexing.set_filename lexbuf) filename;
   Plx (Src_lexing.init_state source_format, lexbuf)
 
+(* --- *)
+
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
-let from_file ~source_format filename : t =
-  from_string ~source_format ~filename (EzFile.read_file filename)
+
+let fill buff ~lookup_len (input: Src_input.t) =
+  match input with
+  | String { contents = str; _ } ->
+      Buffer.add_substring buff str 0 (min lookup_len (String.length str))
+  | Channel { ic; _ } ->
+      (try Buffer.add_channel buff ic lookup_len with End_of_file -> ());
+      Stdlib.seek_in ic 0                        (* FIXME: may break on pipes *)
+
+let start_reading ?source_format input =
+  match source_format with
+  | Some format ->
+      (* TODO: read 3 bytes and skip any utf-8 BOM while shifting initial
+         pos_cnum. *)
+      format, input
+  | None ->
+      let lookup_len = 20 in                             (* 20 as in GnuCOBOL *)
+      let buff = Buffer.create lookup_len in
+      fill buff ~lookup_len input;
+      (* TODO: skip any utf-8 BOM while shifting initial pos_cnum. *)
+      Src_format.guess_from ~contents_prefix:(Buffer.contents buff), input
+
+let from ?source_format (input: Src_input.t) =
+  let source_format, input = start_reading input ?source_format in
+  match input with
+  | String { contents; filename } ->
+      from_string ~source_format ~filename contents
+  | Channel { ic; filename } ->
+      from_channel ~source_format ~filename ic
+
+(* --- *)
 
 (** Note: If given, assumes [position] corresponds to the beginning of the
     input, which {e must} also be at the beginning of a line.  If absent,
     restarts from first position.  File name is kept from the previous input. *)
-let restart make_lexing ?position input (Plx (s, prev_lexbuf)) =
-  let lexbuf = make_lexing ?with_positions:(Some true) input in
-  let pos_fname = match position with
-    | Some p ->
-        Lexing.set_position lexbuf p;
-        p.Lexing.pos_fname
-    | None ->
-        prev_lexbuf.Lexing.lex_curr_p.pos_fname
-  in
-  Lexing.set_filename lexbuf pos_fname;
-  Plx (s, lexbuf)
+let restart make_lexing make_input ?source_format ?position
+    input (Plx (s, prev_lexbuf)) =
+  match position with
+  | Some position when position.Lexing.pos_cnum > 0 ->
+      let lexbuf = make_lexing ?with_positions:(Some true) input in
+      Lexing.set_position lexbuf position;
+      Lexing.set_filename lexbuf position.Lexing.pos_fname;        (* useful? *)
+      Plx (s, lexbuf)
+  | Some _ | None ->
+      from ?source_format @@
+      make_input ~filename:prev_lexbuf.Lexing.lex_curr_p.pos_fname input
 
-let restart_on_string = restart Lexing.from_string
-let restart_on_channel = restart Lexing.from_channel
-let restart_on_file ?position filename =
-  restart_on_string ?position (EzFile.read_file filename)
+let restart_on_string = restart Lexing.from_string Src_input.string
+let restart_on_channel = restart Lexing.from_channel Src_input.channel
