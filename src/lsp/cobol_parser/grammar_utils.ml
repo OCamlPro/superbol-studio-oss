@@ -20,7 +20,7 @@ open Cobol_ptree
 module Overlay_manager =
   Cobol_preproc.Src_overlay.New_manager (struct
     let name = __MODULE__
-  end)
+  end) ()
 
 let relation_condition ~neg (binrel: binary_relation) = function
   | None ->

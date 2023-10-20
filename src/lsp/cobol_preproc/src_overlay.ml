@@ -11,12 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.TYPES
+
 module TYPES = struct
   type limit = Lexing.position
 end
 include TYPES
-
-type srcloc = Cobol_common.Srcloc.srcloc  (* alias for shortening definitions *)
 
 module type MANAGER = sig
   type limit := limit
@@ -25,6 +25,7 @@ module type MANAGER = sig
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
   val dummy_limit: limit
+  val restart_at: limit -> unit
 end
 
 (** Overlay limits (internal) *)
@@ -91,8 +92,7 @@ let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
     | _ -> Limit.make_virtual (), Limit.make_virtual ()
   in
   Links.replace ctx.right_of s (loc, e);  (* Replace to deal with duplicates. *)
-  Links.remove ctx.cache s;  (* Manually remove from cache to prevent invalid *)
-  Links.remove ctx.cache e;  (* or even cyclic/infinite search upon rewind. *)
+  Links.remove ctx.cache s;               (* Manually remove from cache. *)
   s, e
 
 (** Links token limits *)
@@ -162,11 +162,15 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   with Not_found ->
     join_failure (s, e)
 
-module New_manager (Id: sig val name: string end) : MANAGER = struct
+let restart_at ctx _limit =
+  Links.clear ctx.cache
+
+module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let ctx = new_manager Id.name
   let id = ctx.id
   let limits = limits ctx
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
   let dummy_limit = Lexing.dummy_pos
+  let restart_at = restart_at ctx
 end
