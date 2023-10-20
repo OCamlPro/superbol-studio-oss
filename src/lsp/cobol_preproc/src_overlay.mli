@@ -15,13 +15,11 @@
     of lexing tokens that can be fed to parsers so as to tag ASTs with complex
     source locations. *)
 
-(* For now, it does not seem worth making this generic in
-   `Cobol_common.Srcloc.srcloc` via an additional functor. *)
-
-(** Source overlay limits, that MUST be considered abstract and whose contents
-    must not be inspected nor relied upon outside of this module.  Such limits
-    are to be fed to parsers, that usually expect lexing positons, so
-    unfortunately we can neither make this type abstract nor private.  *)
+(** Source overlay limits, that {e MUST} be considered abstract and whose
+    contents must not be inspected nor relied upon outside of this module.  Such
+    limits are to be fed to menhir-generated parsers, that expect lexing
+    positons from the {!Stdlib.Lexing} module, so unfortunately we can neither
+    make this type abstract nor private.  *)
 type limit = (* private *) Lexing.position
 
 (** Manager of source overlay limits.  Includes some mutable state. *)
@@ -48,7 +46,12 @@ module type MANAGER = sig
       but not given to {!link_limits} below. *)
   val dummy_limit: limit
 
+  (** [restart_at limit] instructs the manager that limits on the right of (but
+      not including) [limit] are now outdated and should not be relied upon.  At
+      the moment this just clears an internal cache. *)
+  val restart_at: limit -> unit
+
 end
 
 (** Nanager module instantiation *)
-module New_manager: functor (Id: sig val name: string end) -> MANAGER
+module New_manager: functor (Id: sig val name: string end) () -> MANAGER

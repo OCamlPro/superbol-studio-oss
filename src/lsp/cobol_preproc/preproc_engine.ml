@@ -79,7 +79,7 @@ let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format;
                    config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
-      let module Om = Src_overlay.New_manager (Om_name) in
+      let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
       let source_format = source_format_config source_format in
       {
