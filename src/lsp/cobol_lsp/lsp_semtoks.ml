@@ -67,7 +67,6 @@ module TOKMOD = struct
   let definition     = mk "definition"
   let readonly       = mk "readonly"
   let modification   = mk "modification"
-  let defaultLibrary = mk "defaultLibrary"
   (*"static";
     "deprecated";
     "abstract";
@@ -593,28 +592,11 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
           Some (TOKTYP.number, TOKMOD.none)
       | PICTURE_STRING _ ->
           Some (TOKTYP.type_, TOKMOD.(one declaration))
-      (* | EQUAL | PLUS | MINUS  *)
       | AMPERSAND | ASTERISK | COLON | DASH_SIGN | DOUBLE_ASTERISK | DOUBLE_COLON
       | EQ | GE | GT | LE | LPAR | LT | NE | PLUS_SIGN | RPAR | SLASH ->
           Some (TOKTYP.operator, TOKMOD.none)
       | PARAGRAPH | STATEMENT | PROGRAM |SECTION | DIVISION ->
           Some (TOKTYP.namespace, TOKMOD.none)
-      | ACCEPT | ACCESS | ADD | ALLOCATE | ALTER | APPLY | ARE | ASSIGN | CALL | CANCEL | CHAIN | CLOSE
-      | COMMIT | COMPUTE | CONTINUE | CONTROL | CONTROLS | COPY | COPY_SELECTION | COUNT | CYCLE
-      | DELETE | DESTROY | DISABLE | DISP | DISPLAY | DISPLAY_1 | DISPLAY_COLUMNS | DISPLAY_FORMAT
-      | DIVIDE | ENABLE | ENSURE_VISIBLE | ENTER | ERASE | ESCAPE | EVALUATE | EXAMINE | EXHIBIT | EXIT
-      | FREE | GENERATE | GET | GO | GOBACK | GO_BACK | GO_FORWARD | GO_HOME | GO_SEARCH | IF | IGNORE
-      | INITIALIZE | INITIATE | INSPECT | INVOKE | LEAVE | LOCK | LOCK_HOLDING | MERGE | MODIFY | MOVE
-      | MULTIPLY | NOTIFY | NOTIFY_CHANGE | OPEN | OUTPUT | OVERRIDE | PARSE | PERFORM | PRINT
-      | PRINT_NO_PROMPT | PRINT_PREVIEW | PROCEED | PURGE | RAISE | READ | RECEIVE | REFRESH
-      | RELEASE | REPLACE | RERUN | RESERVE | RESET | RESUME | RETRY | RETURN | REWRITE | ROLLBACK
-      | SEARCH | SELECT | SELECT_ALL | SEND | SET | SORT | SORT_MERGE | SORT_ORDER | STDCALL | START
-      | STEP | STOP | STRING | SUBTRACT | SUPPRESS | TEST | TERMINATE | TRANSFORM | UNLOCK | UNSTRING
-      | UPDATE | USE | USE_ALT | USE_RETURN | USE_TAB | VALIDATE | VALIDATE_STATUS | WRAP | WRITE
-      | END_ACCEPT | END_ADD | END_CALL | END_COMPUTE | END_DELETE | END_DISPLAY | END_DIVIDE | END_EVALUATE
-      | END_IF | END_MULTIPLY | END_PERFORM | END_READ | END_RETURN | END_REWRITE | END_SEARCH | END_START
-      | END_STRING | END_SUBTRACT | END_UNSTRING | END_WRITE ->
-          Some (TOKTYP.function_, TOKMOD.(one defaultLibrary))
       | _ ->
           Some (TOKTYP.keyword, TOKMOD.none)
     in

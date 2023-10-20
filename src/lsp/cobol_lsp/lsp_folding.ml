@@ -108,7 +108,7 @@ let acc_ranges_in ~filename ptree acc =
 
       method! fold_paragraph' {payload = { paragraph_is_section; _ }; loc} acc =
         let range = range_of_loc_in ~filename loc in
-        Visitor.skip_children @@
+        Visitor.do_children @@
         if paragraph_is_section
         then { section_range = range;
                ranges = acc_range acc.section_range acc.ranges }
