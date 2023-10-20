@@ -15,8 +15,9 @@ type 'k state
 
 val init_state: 'k Src_format.source_format -> 'k state
 val diagnostics: _ state -> Cobol_common.Diagnostics.Set.t
-val comments: _ state -> Text.comments
-val newline_cnums: _ state -> int list
+val rev_comments: _ state -> Text.comments
+val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
+val rev_newline_cnums: _ state -> int list
 val source_format: 'k state -> 'k Src_format.source_format
 val change_source_format
   : 'k state -> 'c Src_format.source_format -> ('c state, unit) result
@@ -50,6 +51,9 @@ val eqeq'
   : k:('a state -> Lexing.lexbuf -> 'b)
   -> 'a state -> Lexing.lexbuf -> 'b
 
+val sna
+  : (Src_format.fixed state as 's)
+  -> Lexing.lexbuf -> 's
 val cdir_word
   : ?marker:string
   -> (Src_format.fixed state as 's)

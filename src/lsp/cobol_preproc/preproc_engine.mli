@@ -30,11 +30,12 @@ val reset_preprocessor_for_string
 val diags: preprocessor -> Cobol_common.Diagnostics.Set.t
 val add_diag: preprocessor -> Cobol_common.Diagnostics.t -> preprocessor
 val add_diags: preprocessor -> Cobol_common.Diagnostics.Set.t -> preprocessor
-val log: preprocessor -> Preproc_trace.log
-val comments: preprocessor -> Text.comments
 val position: preprocessor -> Lexing.position
+val position_at: line:int -> char: int -> preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
-val newline_cnums: preprocessor -> int list
+val rev_log: preprocessor -> Preproc_trace.log
+val rev_comments: preprocessor -> Text.comments
+val rev_ignored: preprocessor -> lexloc list
 
 val next_chunk: preprocessor -> Text.text * preprocessor
 

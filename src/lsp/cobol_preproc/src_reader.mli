@@ -26,9 +26,10 @@ val from
 
 val diags: t -> Cobol_common.Diagnostics.Set.t
 val position: t -> Lexing.position
-val comments: t -> Text.comments
 val source_format: t -> Src_format.any
-val newline_cnums: t -> int list
+val rev_comments: t -> Text.comments
+val rev_ignored: t -> lexloc list
+val rev_newline_cnums: t -> int list
 val next_chunk: t -> t * Text.t
 
 val fold_lines

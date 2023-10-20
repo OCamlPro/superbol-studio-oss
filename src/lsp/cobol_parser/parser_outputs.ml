@@ -22,7 +22,8 @@ type artifacts =
   {
     tokens: tokens_with_locs Lazy.t;
     pplog: Cobol_preproc.Trace.log;
-    comments: Cobol_preproc.Text.comments;
+    rev_comments: Cobol_preproc.Text.comments;
+    rev_ignored: lexloc list;
   }
 
 (** The output of parsing functions depends on its memorization abilities:

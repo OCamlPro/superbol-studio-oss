@@ -59,7 +59,7 @@
 
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
-let sna = nnl nnl nnl nnl nnl nnl                                  (* 6 chars *)
+let sna = nnl nnl nnl nnl nnl nnl              (* 6 chars; TODO: exclude tabs *)
 let spaces = ([' ' '\t']*)
 let    blank        = [' ' '\009' '\r']
 let nonblank        = nnl # blank
@@ -131,42 +131,56 @@ let cdir_word =
 
 rule fixed_line state
   = shortest
-  | sna ' ' | '\t'                                                 (* nominal *)
+  | sna                                                            (* nominal *)
+      {
+        fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
+      }
+  | '\t'
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
       }
-  | sna '-'                                              (* continuation line *)
+  | (nnl* newline)                                  (* blank line (too short) *)
+      {
+        Src_lexing.new_line (Src_lexing.sna state lexbuf) lexbuf
+      }
+  | (nnl* eof)           (* blank line (too short), without newline character *)
+      {
+        Src_lexing.(flush @@ eof (Src_lexing.sna state lexbuf) lexbuf)
+      }
+and fixed_indicator state
+  = parse
+  | ' ' | '\t' (* second tab *)                                    (* nominal *)
+      {
+        fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
+      }
+  | '-'                                                  (* continuation line *)
       {
         fixed_continue_line state lexbuf
       }
-  | sna ('$' as marker)                                 (* compiler directive *)
+  | ('$' as marker)                                     (* compiler directive *)
       {
         fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
-  | sna ('>' as marker)
+  | ('>' as marker)
       {
         maybe_fixed_cdir_line marker state lexbuf
       }
-  | sna (['*' '/'] as marker)                                 (* comment line *)
+  | (['*' '/'] as marker)                                     (* comment line *)
       {
         comment_line marker state lexbuf
       }
-  | sna ['d' 'D']
+  | ['d' 'D']
       {
         fixed_debug_line state lexbuf
       }
-  | sna (_#['\n' '\r'] as c)                             (* unknown indicator *)
+  | (_#['\n' '\r'] as c)                                 (* unknown indicator *)
       {
         Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
       }
-  | (nnl* newline)                                  (* blank line (too short) *)
+  | epsilon
       {
-        Src_lexing.new_line state lexbuf
-      }
-  | (nnl* eof)           (* blank line (too short), without newline character *)
-      {
-        Src_lexing.(flush @@ eof state lexbuf)
+        gobble_line (Src_lexing.sna state lexbuf) lexbuf
       }
 and xopen_line state                                     (* X/Open free-form  *)
   = parse                            (* (note no continuation line indicator) *)

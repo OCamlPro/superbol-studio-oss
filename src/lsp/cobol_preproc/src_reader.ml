@@ -26,9 +26,10 @@ type t = Plx: 'k reader -> t                                           [@@unboxe
 
 let diags (Plx (pl, _)) = Src_lexing.diagnostics pl
 let position (Plx (_, lexbuf)) = lexbuf.Lexing.lex_curr_p
-let comments (Plx (pl, _)) = Src_lexing.comments pl
 let source_format (Plx (pl, _)) = Src_format.SF (Src_lexing.source_format pl)
-let newline_cnums (Plx (pl, _)) = Src_lexing.newline_cnums pl
+let rev_comments (Plx (pl, _)) = Src_lexing.rev_comments pl
+let rev_ignored (Plx (pl, _)) = Src_lexing.rev_ignored pl
+let rev_newline_cnums (Plx (pl, _)) = Src_lexing.rev_newline_cnums pl
 
 let chunks_reader lexer =
   let rec next_line (state, lexbuf) =

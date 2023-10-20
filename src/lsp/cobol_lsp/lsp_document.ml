@@ -63,6 +63,7 @@ module TYPES = struct
       doc_cache_pplog: Cobol_preproc.Trace.log;
       doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
       doc_cache_comments: Cobol_preproc.Text.comments;
+      doc_cache_ignored: Cobol_common.Srcloc.lexloc list;
       doc_cache_parsed: (Cobol_ptree.compilation_group * CUs.t) option;
       doc_cache_diags: DIAGS.Set.serializable;
     }
@@ -116,7 +117,8 @@ let lazy_references ptree cus defs =
 let no_artifacts =
   Cobol_parser.Outputs.{ tokens = lazy [];
                          pplog = Cobol_preproc.Trace.empty;
-                         comments = [] }
+                         rev_comments = [];
+                         rev_ignored = [] }
 
 let gather_parsed_data ptree =
   Cobol_typeck.analyze_compilation_group ptree |>
@@ -216,7 +218,8 @@ let retrieve_parsed_data: document -> parsed_data = function
 (** Caching utilities *)
 
 let to_cache ({ project; textdoc; parsed; diags;
-                artifacts = { pplog; tokens; comments; _ }; _ } as doc) =
+                artifacts = { pplog; tokens;
+                              rev_comments; rev_ignored; _ }; _ } as doc) =
   {
     doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
     doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
@@ -224,7 +227,8 @@ let to_cache ({ project; textdoc; parsed; diags;
     doc_cache_version = Lsp.Text_document.version textdoc;
     doc_cache_pplog = pplog;
     doc_cache_tokens = Lazy.force tokens;
-    doc_cache_comments = comments;
+    doc_cache_comments = rev_comments;
+    doc_cache_ignored = rev_ignored;
     doc_cache_parsed = Option.map (fun { ptree; cus; _ } -> ptree, cus) parsed;
     doc_cache_diags = DIAGS.Set.apply_delayed_formatting diags;
   }
@@ -239,7 +243,8 @@ let of_cache ~project
       doc_cache_version = version;
       doc_cache_pplog = pplog;
       doc_cache_tokens = tokens;
-      doc_cache_comments = comments;
+      doc_cache_comments = rev_comments;
+      doc_cache_ignored = rev_ignored;
       doc_cache_parsed = parsed;
       doc_cache_diags = diags } =
   let absolute_filename = Lsp_project.absolute_path_for ~filename project in
@@ -260,7 +265,8 @@ let of_cache ~project
            { ptree; cus; definitions; references })
         parsed
     in
-    { doc with artifacts = { pplog; tokens = lazy tokens; comments };
+    { doc with artifacts = { pplog; tokens = lazy tokens;
+                             rev_comments; rev_ignored };
                diags = DIAGS.Set.of_serializable diags;
                parsed }
 

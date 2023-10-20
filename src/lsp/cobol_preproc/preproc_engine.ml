@@ -47,11 +47,33 @@ and preprocessor_persist =
 let diags { diags; reader; _ } = DIAGS.Set.union diags @@ Src_reader.diags reader
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
-let log { pplog; _ } = pplog
-let source_format { reader; _ } = Src_reader.source_format reader
 let position { reader; _ } = Src_reader.position reader
-let comments { reader; _ } = Src_reader.comments reader
-let newline_cnums { reader; _ } = Src_reader.newline_cnums reader
+let source_format { reader; _ } = Src_reader.source_format reader
+let rev_log { pplog; _ } = pplog
+let rev_comments { reader; _ } = Src_reader.rev_comments reader
+let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
+
+(** [position_at ~line ~char pp] computes a lexing position that corresponds to
+    the given line and character indexes (all starting at 0) in the input
+    already read by [pp].  Raises {!Not_found} if no complete line was processed
+    yet, or the current position if the given line index doed not correspond to
+    already processed lines. *)
+let position_at ~line ~char { reader; _ } =
+  let rev_newline_cnums = Src_reader.rev_newline_cnums reader in
+  if rev_newline_cnums = []
+  then raise Not_found
+  else
+    let lexpos = Src_reader.position reader in
+    try
+      let pos_bol =
+        try List.nth rev_newline_cnums (lexpos.pos_lnum - line - 1)
+        with Not_found | Invalid_argument _ -> 0
+      in
+      Lexing.{ lexpos with pos_bol;
+                           pos_cnum = pos_bol + char;
+                           pos_lnum = line + 1 }
+    with Failure _ ->
+      lexpos
 
 let with_reader lp reader =
   if lp.reader == reader then lp else { lp with reader }

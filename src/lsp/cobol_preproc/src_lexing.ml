@@ -32,6 +32,7 @@ type 'k state =
     continued: continued;
     pseudotext: (srcloc * text) option;
     comments: comments;
+    ignored: lexloc list;               (** lexical locations of ignored text *)
     cdir_seen: bool;
     newline: bool;
     newline_cnums: int list;    (** index of all newline characters encountered
@@ -65,6 +66,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
     continued = CNone;
     pseudotext = None;
     comments = [];
+    ignored = [];
     cdir_seen = false;
     newline = true;
     newline_cnums = [];
@@ -77,8 +79,9 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
   }
 
 let diagnostics { diags; _ } = diags
-let comments { comments; _ } = List.rev comments
-let newline_cnums { newline_cnums; _ } = List.rev newline_cnums
+let rev_comments { comments; _ } = comments
+let rev_ignored { ignored; _ } = ignored
+let rev_newline_cnums { newline_cnums; _ } = newline_cnums
 let source_format { config = { source_format; _ }; _ } = source_format
 let allow_debug { config = { debug; _ }; _ } = debug
 
@@ -125,6 +128,9 @@ let raw_loc ~start_pos ~end_pos { newline; config = { source_format; _ }; _ } =
   in
   Cobol_common.Srcloc.raw ~in_area_a (start_pos, end_pos)
 
+let ignore_lexloc ~start_pos ~end_pos state =
+  { state with ignored = (start_pos, end_pos) :: state.ignored }
+
 let emit prod ({ pseudotext; cdir_seen; _ } as state) =
   match pseudotext with
   | None ->
@@ -152,6 +158,19 @@ let append t state =
                    newline = false }
   | _, { loc; _ } ->
       lex_error state ~loc "Unexpected@ `%a'@ in@ continuation" Text.pp_word t
+
+let sna ({ config = { source_format; _ }; _ } as state) lexbuf =
+  let indicator_pos, FixedWidth _ = source_format in
+  match indicator_pos with
+  | FixedIndic ->
+      let start_pos = Lexing.lexeme_start_p lexbuf in
+      let lex_len = Lexing.lexeme_end lexbuf - start_pos.pos_cnum in
+      let sna_len = min 6 lex_len in
+      let end_pos = { start_pos with
+                      pos_cnum = start_pos.pos_cnum + sna_len } in
+      ignore_lexloc ~start_pos ~end_pos state
+  | _ ->
+      state
 
 let new_line state lexbuf =
   Lexing.new_line lexbuf;
@@ -490,23 +509,26 @@ let comment ?(marker = "") ?(floating = false) state lexbuf =
   in
   new_line { state with comments = comment :: state.comments } lexbuf
 
-let trunc_to_col n ((s, sp, ep) as info: lexeme_info) =
+let trunc_to_col n ((s, sp, ep) as info: lexeme_info) state =
   let sc = pos_column sp and ec = pos_column ep in
   assert (sc <= n);        (* starts on last column (CHECKME: always avoided?) *)
   if ec <= n
   then
-    info, if ec = n + 1 then Tacked else Nominal
+    info, (if ec = n + 1 then Tacked else Nominal), state
   else                  (* truncate lexeme and shift end position accordingly *)
     let s = String.sub s 0 (n - sc + 1) in
-    (s, sp, { ep with pos_cnum = ep.pos_cnum - ec + n + 1}), Tacked
+    let ep' = { ep with pos_cnum = ep.pos_cnum - ec + n + 1} in
+    (s, sp, ep'), Tacked, ignore_lexloc ~start_pos:ep' ~end_pos:ep state
 
 let fixed_text mk ({ config = { source_format; _ }; _ } as state) lexbuf =
   let _, FixedWidth { cut_at_col; _ } = source_format in
-  let (_, start_pos, _) as lexinf = lexeme_info lexbuf in
+  let (_, start_pos, end_pos) as lexinf = lexeme_info lexbuf in
   if pos_column start_pos > cut_at_col then
-    state, Tacked
+    ignore_lexloc ~start_pos ~end_pos state, Tacked
   else
-    let (s, start_pos, end_pos), fitting = trunc_to_col cut_at_col lexinf in
+    let (s, start_pos, end_pos), fitting, state =
+      trunc_to_col cut_at_col lexinf state
+    in
     mk ~start_pos ~end_pos ?fitting:(Some fitting) s state, fitting
 
 let fixed_text_word ?cont : fixed state -> _ =
@@ -542,7 +564,9 @@ let fixed_alphanum_lit
   if pos_column start_pos > cut_at_col then
     state, Tacked
   else
-    let (s, start_pos, end_pos), fitting = trunc_to_col cut_at_col lexinf in
+    let (s, start_pos, end_pos), fitting, state =
+      trunc_to_col cut_at_col lexinf state
+    in
     let s, knd, state = extract_knd s state lexbuf in
     let s, end_pos, fitting =
       (* Actually double the opening delimiter ('\'' or '"'), to have the
