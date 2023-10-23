@@ -553,17 +553,32 @@ let semtoks_from_ptree ~filename ?range ptree =
 
   end) ptree [] |> List.rev
 
-let semtoks_of_comments ~filename ?range comments = comments |>
-  List.filter_map begin function
+let semtoks_of_comments ~filename ?range rev_comments =
+  rev_comments |>
+  List.fold_left begin fun acc -> function
     | Cobol_preproc.Text.{ comment_loc = s, _ as lexloc; _ }
       when s.Lexing.pos_fname = filename &&
            Option.fold range
              ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
              ~none:true ->
-        Some (semtok TOKTYP.comment lexloc)
+        semtok TOKTYP.comment lexloc :: acc
     | _ ->
-        None
-  end
+        acc
+  end []
+
+let semtoks_of_ignored ~filename ?range rev_ignored =
+  (* Decorate like comments, for lack of a better suited token type in the set
+     of available ones.  This could be improved later with some client-side code
+     or configuration.  *)
+  rev_ignored |>
+  List.fold_left begin fun acc ((s, _ ) as lexloc) ->
+    if s.Lexing.pos_fname = filename &&
+       Option.fold range
+         ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+         ~none:true
+    then semtok TOKTYP.comment lexloc :: acc
+    else acc
+  end []
 
 let semtoks_of_preproc_statements ~filename ?range pplog =
   List.rev @@ List.fold_left begin fun acc -> function
@@ -646,11 +661,13 @@ let ensure_sorted name ~filename cmp l =
       List.fast_sort cmp l
 
 
-let data ~filename ~range ~tokens ~pplog ~comments ~ptree : int array =
+let data ~filename ~range ~tokens ~pplog
+    ~rev_comments ~rev_ignored ~ptree : int array =
   let semtoks1 = semtoks_of_non_ambigious_tokens ~filename ?range tokens in
   let semtoks2 = semtoks_from_ptree              ~filename ?range ptree in
-  let semtoks3 = semtoks_of_comments             ~filename ?range comments in
-  let semtoks4 = semtoks_of_preproc_statements   ~filename ?range pplog in
+  let semtoks3 = semtoks_of_comments             ~filename ?range rev_comments in
+  let semtoks4 = semtoks_of_ignored              ~filename ?range rev_ignored in
+  let semtoks5 = semtoks_of_preproc_statements   ~filename ?range pplog in
   (* NB: In *principle* all those lists are already sorted w.r.t lexical
      locations in [filename].  We just check that for now and raise a warning,
      in case. *)
@@ -660,8 +677,10 @@ let data ~filename ~range ~tokens ~pplog ~comments ~ptree : int array =
   let semtoks1 = ensure_sorted "nonambiguous" ~filename compare_semtoks semtoks1
   and semtoks2 = ensure_sorted "ptree"        ~filename compare_semtoks semtoks2
   and semtoks3 = ensure_sorted "comments"     ~filename compare_semtoks semtoks3
-  and semtoks4 = ensure_sorted "preproc"      ~filename compare_semtoks semtoks4 in
+  and semtoks4 = ensure_sorted "ignored"      ~filename compare_semtoks semtoks4
+  and semtoks5 = ensure_sorted "preproc"      ~filename compare_semtoks semtoks5 in
   relative_semtoks
     List.(merge compare_semtoks semtoks1 @@
           merge compare_semtoks semtoks2 @@
-          merge compare_semtoks semtoks3 @@ semtoks4)
+          merge compare_semtoks semtoks3 @@
+          merge compare_semtoks semtoks4 @@ semtoks5)

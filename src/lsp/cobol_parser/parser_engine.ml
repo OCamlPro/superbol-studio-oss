@@ -419,8 +419,9 @@ let aggregate_output (type m) (ps: m state) res
   | Eidetic ->
       let artifacts =
         { tokens = Tokzr.parsed_tokens ps.preproc.tokzr;
-          pplog = Cobol_preproc.log ps.preproc.pp;
-          comments = Cobol_preproc.comments ps.preproc.pp } in
+          pplog = Cobol_preproc.rev_log ps.preproc.pp;
+          rev_comments = Cobol_preproc.rev_comments ps.preproc.pp;
+          rev_ignored = Cobol_preproc.rev_ignored ps.preproc.pp } in
       WithArtifacts (res, artifacts)
 
 (** Simple parsing *)
@@ -509,32 +510,14 @@ let parse_with_history ?(save_stage = 10) rwps =
     (rewindable_parser_state rwps).preproc.tokzr;
   res, rwps
 
-
-let lexing_postion_of ~position rwps = match position with
-  | Lexing pos ->
-      pos
-  | Indexed { line; char } ->
-      let ps = rewindable_parser_state rwps in
-      let newline_cnums = Cobol_preproc.newline_cnums ps.preproc.pp in
-      if newline_cnums = []
-      then raise Not_found   (* no complete line was processed yet; just skip *)
-      else
-        let lexpos = Cobol_preproc.position ps.preproc.pp in
-        try
-          let pos_bol =
-            try List.nth newline_cnums (line - 1)
-            with Not_found | Invalid_argument _ -> 0
-          in
-          Lexing.{ lexpos with pos_bol;
-                               pos_cnum = pos_bol + char;
-                               pos_lnum = line + 1 }
-        with Failure _ ->
-          (* The given line exceeds what was already processed, so we restart
-             from the current preprocessor position. *)
-          lexpos
-
 let find_history_event_preceding ~position ({ store; _ } as rwps) =
-  let lexpos = lexing_postion_of ~position rwps in
+  let lexpos = match position with
+    | Lexing pos ->
+        pos
+    | Indexed { line; char } ->
+        let ps = rewindable_parser_state rwps in
+        Cobol_preproc.position_at ~line ~char ps.preproc.pp
+  in
   let rec aux = function
     | [] ->
         raise Not_found

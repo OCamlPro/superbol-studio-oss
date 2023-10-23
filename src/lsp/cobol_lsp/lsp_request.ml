@@ -216,11 +216,13 @@ let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
     try_with_document_data registry doc
-      ~f:begin fun ~doc:{ artifacts = { pplog; tokens; comments; _ };
+      ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
+                                        rev_comments; rev_ignored; _ };
                           _ } Lsp_document.{ ptree; _ } ->
         let data =
           Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
-            ~pplog ~comments ~tokens:(Lazy.force tokens) ~ptree
+            ~pplog ~rev_comments ~rev_ignored
+            ~tokens:(Lazy.force tokens) ~ptree
         in
         Some (SemanticTokens.create ~data ())
       end

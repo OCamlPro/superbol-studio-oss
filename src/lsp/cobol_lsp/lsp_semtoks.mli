@@ -21,6 +21,7 @@ val data
   -> range: Lsp.Types.Range.t option
   -> tokens: Cobol_parser.Outputs.tokens_with_locs
   -> pplog: Cobol_preproc.Trace.log
-  -> comments: Cobol_preproc.Text.comments
+  -> rev_comments: Cobol_preproc.Text.comments
+  -> rev_ignored: Cobol_common.Srcloc.lexloc list
   -> ptree: Cobol_ptree.compilation_group
   -> int array
