@@ -11,30 +11,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This library is used to build configuration modules, either from file or
-    from a dialect.  All the [from_] functions will fail if a file is not found,
-    or use the default value of any options that is badly typed in the
-    configuration file or not set in the configuration file.*)
+open Ez_file.V1
 
-include module type of Types
-
-module Options = Options
-module Default = Default
-
-val print_options: Format.formatter -> unit
-
-val default: (module T)
-
-val from_file
-  : ?dialect: Types.DIALECT.t
-  -> string
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-(** [from_dialect (module Diags) ?strict dialect] returns the configuration
-    module according to the dialect defaults. *)
-val from_dialect
-  : strict: bool
-  -> Types.DIALECT.t
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-val dialect: t -> dialect
+(** [relative_path ~filename absolute_path] returns the relative path of
+    [filename] {i w.r.t} [absolute_path] if [absolute_path] is a prefix of
+    [filename], and raises {!Invalid_argument} otherwise. *)
+let relative_path ~filename:path absolute_path =
+  match EzString.chop_prefix ~prefix:absolute_path path with
+  | Some "" -> "."
+  | Some path when path.[0] = FileOS.dir_separator -> EzString.after path 0
+  | Some path -> path
+  | None -> Fmt.invalid_arg "%s is not contained within %s" path absolute_path

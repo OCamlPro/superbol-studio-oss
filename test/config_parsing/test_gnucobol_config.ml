@@ -23,12 +23,13 @@ module Default_conf =
   (val Cobol_config.default)
 
 module Parsed_conf =
-  (val Cobol_config.from_file (module Diags)
-      (Filename.concat confdir "default.conf"))
+  (val (Cobol_common.Diagnostics.show_n_forget @@
+        Cobol_config.from_file @@
+        Filename.concat confdir "default.conf"))
 
 module MF_conf =
-  (val Cobol_config.from_dialect (module Diags) ~strict:true
-      Cobol_config.DIALECT.MicroFocus)
+  (val (Cobol_common.Diagnostics.show_n_forget @@
+        Cobol_config.(from_dialect ~strict:true MicroFocus)))
 
 let both_diff s1 s2 =
   StringSet.union

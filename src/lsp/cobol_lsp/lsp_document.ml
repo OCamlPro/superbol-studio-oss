@@ -79,14 +79,14 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
     ~options:Cobol_parser.Options.{
         default with
         recovery = EnableRecovery { silence_benign_recoveries = true };
-        config = project.cobol_config;
+        config = project.config.cobol_config;
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
         libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
-        config = project.cobol_config;
-        source_format = project.source_format
+        config = project.config.cobol_config;
+        source_format = project.config.source_format
       } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }

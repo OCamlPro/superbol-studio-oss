@@ -11,30 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This library is used to build configuration modules, either from file or
-    from a dialect.  All the [from_] functions will fail if a file is not found,
-    or use the default value of any options that is badly typed in the
-    configuration file or not set in the configuration file.*)
+module Config = Project_config
 
-include module type of Types
-
-module Options = Options
-module Default = Default
-
-val print_options: Format.formatter -> unit
-
-val default: (module T)
-
-val from_file
-  : ?dialect: Types.DIALECT.t
-  -> string
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-(** [from_dialect (module Diags) ?strict dialect] returns the configuration
-    module according to the dialect defaults. *)
-val from_dialect
-  : strict: bool
-  -> Types.DIALECT.t
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-val dialect: t -> dialect
+include Project

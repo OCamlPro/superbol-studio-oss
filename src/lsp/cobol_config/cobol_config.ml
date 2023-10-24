@@ -196,7 +196,7 @@ let first_file paths filename =
     paths
 
 
-let from_file (module Diags: DIAGS.STATEFUL) ?(dialect: dialect option) file =
+let from_file ?(dialect: dialect option) file =
   let rec aux file =
     let options = parse_file file in
     let path_to_search =
@@ -235,6 +235,7 @@ let from_file (module Diags: DIAGS.STATEFUL) ?(dialect: dialect option) file =
   let options = aux file in
   let options, words, intrinsic, system_names, registers
     = make_conf options in
+  let module Diags = DIAGS.InitStateful () in
   let module Config =
     From_file.Make (Diags) (struct
       let config =
@@ -253,23 +254,23 @@ let from_file (module Diags: DIAGS.STATEFUL) ?(dialect: dialect option) file =
       let registers = registers
     end)
   in
-  (module Config: T)
+  DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
 
-let try_from_file (module Diags: DIAGS.STATEFUL) dialect file =
+let try_from_file dialect file =
   match first_file (Lazy.force path_to_search) file with
   | Some f ->
-      from_file (module Diags) ~dialect f
+      from_file ~dialect f
   | None ->
       FATAL.error "Unable@ to@ locate@ a@ configuration@ file@ for@ dialect:@ \
                    `%s'" (DIALECT.name dialect)
 
-let from_dialect (module Diags: DIAGS.STATEFUL) ~strict d =
+let from_dialect ~strict d =
   let load_gnucobol_conf dialect ~strict confname =
-    try_from_file (module Diags) dialect
+    try_from_file dialect
       (Pretty.to_string "%s%s.conf" confname (if strict then "-strict" else ""))
   in
   match d with
-  | DIALECT.Default -> (module Default: T)
+  | DIALECT.Default -> DIAGS.result (module Default: T)
   | GnuCOBOL        -> load_gnucobol_conf d ~strict:false "default"
   | COBOL85         -> load_gnucobol_conf d ~strict:false "cobol85"
   | COBOL2002       -> load_gnucobol_conf d ~strict:false "COBOL2002"

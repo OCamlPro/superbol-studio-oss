@@ -11,30 +11,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This library is used to build configuration modules, either from file or
-    from a dialect.  All the [from_] functions will fail if a file is not found,
-    or use the default value of any options that is badly typed in the
-    configuration file or not set in the configuration file.*)
+type error =
+  | Invalid_config of
+      {
+        loc: location;
+        msg: string;
+    }
+  | Unknown_dialect of string
 
-include module type of Types
+and location =
+  | Toml_loc of Toml.Parser.location
+  | Toml_file of string
 
-module Options = Options
-module Default = Default
-
-val print_options: Format.formatter -> unit
-
-val default: (module T)
-
-val from_file
-  : ?dialect: Types.DIALECT.t
-  -> string
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-(** [from_dialect (module Diags) ?strict dialect] returns the configuration
-    module according to the dialect defaults. *)
-val from_dialect
-  : strict: bool
-  -> Types.DIALECT.t
-  -> (module T) Cobol_common.Diagnostics.with_diags
-
-val dialect: t -> dialect
+let pp_error ppf = function
+  | Invalid_config { loc = Toml_loc { source; line; column; _ }; msg = _ } ->
+      (* Here we ignore the message as most error messages from `toml` just
+         repeat source location information. *)
+      Pretty.print ppf "%s:%d,%d: Syntax error" source line column
+  | Invalid_config { loc = Toml_file filename; msg } ->
+      Pretty.print ppf "%s: %s" filename msg
+  | Unknown_dialect name ->
+      Pretty.print ppf "Unknown@ dialect: `%s'" name

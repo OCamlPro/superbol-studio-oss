@@ -15,6 +15,8 @@ open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
 
+module DIAGS = Cobol_common.Diagnostics
+
 open Cobol_preproc.Options
 open Cobol_parser.Options
 
@@ -126,10 +128,11 @@ let get () =
     let config =
       let strict = !strict in
       let dialect = !dialect in
+      DIAGS.show_n_forget @@
       match !conf, dialect with
-      | "", None -> Cobol_config.default
-      | "", Some d -> Cobol_common.do_any (Cobol_config.from_dialect ~strict) d
-      | s, None -> Cobol_common.do_any (Cobol_config.from_file ?dialect) s
+      | "", None -> DIAGS.result Cobol_config.default
+      | "", Some d -> Cobol_config.from_dialect ~strict d
+      | s, None -> Cobol_config.from_file ?dialect s
       | _ -> Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
                               used together"
     in

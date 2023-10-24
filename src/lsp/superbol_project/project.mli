@@ -11,13 +11,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Diagnostics.TYPES
+
 module TYPES: sig
-  include module type of Superbol_project.Config.TYPES
-  include module type of Superbol_project.TYPES
+
+  type rootdir
+
+  type project = {
+    rootdir: rootdir;
+    config: Project_config.t;
+    config_filename: string;
+  }
+
+  type layout = {
+    project_config_filename: string;
+  }
+
 end
 include module type of TYPES
-  with type path = TYPES.path
-   and type rootdir = TYPES.rootdir
+  with type rootdir = TYPES.rootdir
    and type project = TYPES.project
    and type layout = TYPES.layout
 
@@ -25,39 +37,38 @@ type t = project
 
 (** [for_ ~rootdir ~layout] retrieves a project based on its root directory.
     This may trigger reading project configuration files if the project was not
-    yet loaded.  Any notification about the loading process is published
-    directly via {!Lsp_io.send_diagnostics} or {!Lsp_io.send_notification}. *)
-val for_: rootdir:rootdir -> layout:layout -> t
+    yet loaded. *)
+val for_: rootdir:rootdir -> layout:layout -> t with_diags
 
 (** [in_existing_dir dirname ~layout] retrieves a project after checking
     [dirname] actually refers to an exising directory that can serve as root for
-    the project.  The same notes as for {!for_} apply, with the addition that
-    {!Invalid_argument} may is raised in case [dirname] is not the name of an
-    existing directory.  *)
-val in_existing_dir: string -> layout:layout -> t
+    the project.  The same notes as {!for_} apply, with the addition that
+    {!Invalid_argument} is raised in case [dirname] is not the name of an
+    existing directory. *)
+val in_existing_dir: string -> layout:layout -> t with_diags
 
-(** [rootdir_for ~uri ~layout] locates the project directory (that contains a
-    file with given name [layout.project_config_filename]) for a file at the
-    given URI.  Returns the name of the directory that contains the file at URI
-    if no project file is found. *)
-val rootdir_for: uri:Lsp.Uri.t -> layout:layout -> rootdir
+(** [rootdir_for ~filename ~layout] locates the project directory (that contains
+    a file with given name [layout.project_config_filename]) for a given file
+    name.  Returns the name of the directory that contains the file if no
+    project file is found. *)
+val rootdir_for: filename:string -> layout:layout -> rootdir
 
-(** [libpath_for ~uri project] constructs a list of directory names where
-    copybooks are looked up, for a source file at the given URI, in the given
+(** [libpath_for ~filename project] constructs a list of directory names where
+    copybooks are looked up, for a given source file name, in the given
     project. *)
-val libpath_for: uri:Lsp.Uri.t -> t -> string list
+val libpath_for: filename:string -> t -> string list
 
-(** [detect_copybook ~uri project] indicates whether a document at the given URI
-    for [project] should be treated as a copybook. *)
-val detect_copybook: uri:Lsp.Uri.t -> t -> bool
+(** [detect_copybook ~filename project] indicates whether a file name should be
+    treated as a copybook within [project]. *)
+val detect_copybook: filename:string -> t -> bool
 
 (** Cached representation *)
 
 type cached
 val to_cache: t -> cached
-val of_cache: rootdir:rootdir -> layout:layout -> cached -> t
+val of_cache: rootdir:rootdir -> layout:layout -> cached -> t with_diags
 
-(** Sets and maps *)
+(** Collections *)
 
 module SET: sig
   include Set.S with type elt = t
@@ -69,6 +80,7 @@ module MAP: Map.S with type key = t
 (** Miscellaneous *)
 
 val rootdir: t -> rootdir
+val config: t -> Project_config.t
 val string_of_rootdir: rootdir -> string
-val relative_path_for: uri:Lsp.Uri.t -> t -> string
+val relative_path_for: filename:string -> t -> string
 val absolute_path_for: filename:string -> t -> string

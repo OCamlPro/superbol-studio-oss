@@ -44,6 +44,6 @@ let ibm_root = srcdir // ibm_testsuite
 let mf_testsuite = testsuites // "microfocus" // "www.csis.ul.ie"
 let mf_root = srcdir // mf_testsuite
 
-module Diags = Cobol_common.Diagnostics.InitStateful ()
-
-let from_dialect = Cobol_config.from_dialect (module Diags)
+let from_dialect ~strict dialect =
+  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_config.from_dialect ~strict dialect
