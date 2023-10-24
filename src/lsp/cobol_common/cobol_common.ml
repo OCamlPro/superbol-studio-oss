@@ -22,9 +22,7 @@ module Tokenizing = Tokenizing
 exception FatalError of string
 let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt
 
-let status_ref = ref 0
-let exit ?(status= 0) () =
-  exit (max status !status_ref)
+include Exit_status
 
 (* Register a printer for some common exceptions. *)
 let init_default_exn_printers () =
@@ -55,14 +53,6 @@ let join_all l =
     (Ok [])
     l
   |> Result.map List.rev
-
-(* (\** [show_diagnostics ~ppf diagnostics] prints the given set of diagnostics *)
-(*     using the formatter [ppf] (that defaults to [stderr]), and sets an internal *)
-(*     status flags to register whether [diagnostics] includes an error.  This flag *)
-(*     is used to determine the status code upon program termination.  *\) *)
-(* let show_diagnostics ?(ppf = Fmt.stderr) diags = *)
-(*   Pretty.print ppf "%a%!" Diagnostics.Set.pp diags; *)
-(*   if Diagnostics.Set.has_errors diags then status_ref := !status_ref lor 1 *)
 
 (* --- *)
 

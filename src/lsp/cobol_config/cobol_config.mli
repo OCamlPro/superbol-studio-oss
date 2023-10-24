@@ -20,20 +20,37 @@ include module type of Types
 
 module Options = Options
 module Default = Default
+module Diagnostics = Config_diagnostics
+
+exception ERROR of Diagnostics.error
 
 val print_options: Format.formatter -> unit
 
 val default: (module T)
 
+(** Search path (suspension).
+
+    {e When evaluated} (via {!Lazy.force}), [default_search_path] is a path that
+    is equivalent to {v ".:$XDG_CONFIG_HOME/superbol:$COB_CONFIG_DIR" v}.
+
+    Changing environment variables or the current working directory has no
+    impact on the resulting path when done {e after} evaluation.  *)
+val default_search_path: string list Lazy.t
+
+(** [from_file ~search_path filename] loads a configuration module from the
+    given filename.  Note: the evaluation of {!default_search_path} is forces in
+    case [search_path] is not provided. *)
 val from_file
-  : ?dialect: Types.DIALECT.t
+  : ?search_path: string list
   -> string
   -> (module T) Cobol_common.Diagnostics.with_diags
 
-(** [from_dialect (module Diags) ?strict dialect] returns the configuration
-    module according to the dialect defaults. *)
+(** [from_dialect ~search_path ~strict dialect] returns the configuration module
+    according to the dialect defaults.  The caveat about {!default_search_path}
+    given for {!from_file} applies here as well. *)
 val from_dialect
-  : strict: bool
+  : ?search_path: string list
+  -> strict: bool
   -> Types.DIALECT.t
   -> (module T) Cobol_common.Diagnostics.with_diags
 

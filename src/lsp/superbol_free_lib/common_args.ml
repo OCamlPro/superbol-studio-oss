@@ -126,15 +126,17 @@ let get () =
 
   let get () =
     let config =
-      let strict = !strict in
-      let dialect = !dialect in
       DIAGS.show_n_forget @@
-      match !conf, dialect with
-      | "", None -> DIAGS.result Cobol_config.default
-      | "", Some d -> Cobol_config.from_dialect ~strict d
-      | s, None -> Cobol_config.from_file ?dialect s
-      | _ -> Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
-                              used together"
+      match !conf, !dialect with
+      | "", None ->
+          DIAGS.result Cobol_config.default
+      | "", Some d ->
+          Cobol_config.from_dialect ~strict:!strict d
+      | s, None ->
+          Cobol_config.from_file s
+      | _ ->
+          Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
+                           used together"
     in
     let source_format =
       match !format with

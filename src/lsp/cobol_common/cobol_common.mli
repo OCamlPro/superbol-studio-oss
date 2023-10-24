@@ -41,7 +41,6 @@ val join_all: ('a, 'e) result list -> ('a list, 'e) result
 
 val init_default_exn_printers: unit -> unit
 
-
 (** Exit the program with a status that depends on diagnostics reported in
     {!catch_n_show_diagnostics}.  *)
 val exit: ?status:int -> unit -> _

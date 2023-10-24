@@ -42,8 +42,7 @@ let%expect_test "cut-n-paste-mf" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    Loading configuration from
-    `__srcdir__/import/gnucobol/config/mf-strict.conf'
+    Loading: `__srcdir__/import/gnucobol/config/mf-strict.conf'
     Considering `__srcdir__/test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiffDriver.cbl'.
     Cutting chunk 54/120 @ 75:10(2754)-79:7(2805) ("RFORM DisplayErrorMessage\...)
     Putting it back

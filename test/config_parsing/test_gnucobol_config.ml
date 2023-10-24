@@ -13,23 +13,21 @@
 
 open EzCompat
 
-let srcdir = try Unix.getenv "DUNE_SOURCEROOT" with Not_found -> ".";;
-let confdir = Filename.concat srcdir "import/gnucobol/config";;
-Unix.putenv "COB_CONFIG_DIR" confdir;;
-
-module Diags = Cobol_common.Diagnostics.InitStateful ()
+let srcdir = Testsuite_utils.srcdir     (* ../output-tests/testsuite_utils.ml *)
+let confdir = Testsuite_utils.confdir
+let search_path = Lazy.force Cobol_config.default_search_path
 
 module Default_conf =
   (val Cobol_config.default)
 
 module Parsed_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.from_file @@
+        Cobol_config.from_file ~search_path @@
         Filename.concat confdir "default.conf"))
 
 module MF_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.(from_dialect ~strict:true MicroFocus)))
+        Cobol_config.(from_dialect ~search_path ~strict:true MicroFocus)))
 
 let both_diff s1 s2 =
   StringSet.union
