@@ -35,17 +35,20 @@ include module type of TYPES
 
 type t = project
 
+(** [rootdir_at ~dirname] initializes a project into an existing directory.
+
+    Raises {!Invalid_argument} in case [dirname] is not the name of an existing
+    directory. *)
+val rootdir_at: dirname:string -> rootdir
+
 (** [for_ ~rootdir ~layout] retrieves a project based on its root directory.
     This may trigger reading project configuration files if the project was not
     yet loaded. *)
 val for_: rootdir:rootdir -> layout:layout -> t with_diags
 
-(** [in_existing_dir dirname ~layout] retrieves a project after checking
-    [dirname] actually refers to an exising directory that can serve as root for
-    the project.  The same notes as {!for_} apply, with the addition that
-    {!Invalid_argument} is raised in case [dirname] is not the name of an
-    existing directory. *)
-val in_existing_dir: string -> layout:layout -> t with_diags
+(** [with_default_config ~rootdir ~layout] initializes a project structure with
+    a default configuration. *)
+val with_default_config: rootdir:rootdir -> layout:layout -> t
 
 (** [rootdir_for ~filename ~layout] locates the project directory (that contains
     a file with given name [layout.project_config_filename]) for a given file
@@ -65,7 +68,13 @@ val detect_copybook: filename:string -> t -> bool
 (** Cached representation *)
 
 type cached
+
+(** [to_cache project] constructs a cached representation for [project]. *)
 val to_cache: t -> cached
+
+(** [of_cache ~rootdir ~layout cached_project] attempts to load and return a
+    cached project.  Behaves like [for_ ~rootdir ~layout] in case of error
+    (outdated or missing configuration file). *)
 val of_cache: rootdir:rootdir -> layout:layout -> cached -> t with_diags
 
 (** Collections *)

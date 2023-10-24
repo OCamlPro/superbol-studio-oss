@@ -36,7 +36,6 @@ let%expect_test "simple-formatting-request" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROGRAM-ID. HELLO.
            PROCEDURE DIVISION.
@@ -71,7 +70,6 @@ let%expect_test "formatting-request-nested-if" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             para-1.
                 IF X>9
@@ -113,7 +111,6 @@ let%expect_test "formatting-request-data" =
     end;
   end_with_postproc [%expect.output];
   [%expect{|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":23,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             WORKING-STORAGE SECTION.
             01 x.
@@ -186,7 +183,6 @@ let%expect_test "formatting-request-nested-program" =
     end;
   end_with_postproc [%expect.output];
   [%expect{|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             IDENTIFICATION DIVISION.
             PROGRAM-ID. X.
@@ -244,7 +240,6 @@ let%expect_test "formatting-request-alignment-argument" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            MOVE VAR-1 TO VAR-2 VAR-3
                          VAR-4
@@ -276,7 +271,6 @@ let%expect_test "formatting-request-else-if" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":10,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             if x>1
                 move 1 to x
@@ -394,7 +388,6 @@ let%expect_test "formatting-request-whole-program" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     misc_sections_visitor.ml:0:
       (Cobol_ptree__Misc_sections_visitor.fold_select_clause): missing visitor
       implementation
@@ -520,7 +513,6 @@ let%expect_test "formatting-request-on-exception" =
     end;
   end_with_postproc [%expect.output];
   [%expect{|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            CALL STH
                NOT ON EXCEPTION
@@ -555,7 +547,6 @@ let%expect_test "formatting-request-perform" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROCEDURE DIVISION.
             para-1.

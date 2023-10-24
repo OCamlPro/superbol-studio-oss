@@ -55,7 +55,6 @@ let%expect_test "simple-references-requests" =
   print_references ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     data_sections_visitor.ml:0:
       (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
       implementation
@@ -135,7 +134,6 @@ let%expect_test "references-requests-renames" =
   print_references ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-renamed (line 7, character 25):
     __rootdir__/prog.cob:7.15-7.16:
@@ -198,7 +196,6 @@ let%expect_test "references-requests-redefines" =
   print_references ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-display (line 15, character 20):
     __rootdir__/prog.cob:7.15-7.16:
@@ -265,7 +262,6 @@ let%expect_test "references-requests-filler" =
   print_references ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-display (line 11, character 18):
     __rootdir__/prog.cob:7.13-7.14:

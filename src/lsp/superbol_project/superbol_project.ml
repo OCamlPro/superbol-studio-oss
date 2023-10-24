@@ -12,5 +12,6 @@
 (**************************************************************************)
 
 module Config = Project_config
+module Diagnostics = Project_diagnostics
 
 include Project

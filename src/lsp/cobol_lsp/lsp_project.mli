@@ -25,13 +25,19 @@ type t = project
 
 (** [for_ ~rootdir ~layout] retrieves a project based on its root directory.
     This may trigger reading project configuration files if the project was not
-    yet loaded.  Any notification about the loading process is published
-    directly via {!Lsp_io.send_diagnostics} or {!Lsp_io.send_notification}. *)
+    yet loaded.
+
+    May puplish notifications about the loading process directly via
+    {!Lsp_io.send_diagnostics} or {!Lsp_io.send_notification}, and send
+    diagnostics about loaded configuration files via
+    {!Lsp_diagnostics.publish}. *)
 val for_: rootdir:rootdir -> layout:layout -> t
 
 (** [in_existing_dir dirname ~layout] retrieves a project after checking
     [dirname] actually refers to an exising directory that can serve as root for
-    the project.  The same notes as for {!for_} apply, with the addition that
+    the project.
+
+    The same notes as for {!for_} apply, with the addition that
     {!Invalid_argument} may is raised in case [dirname] is not the name of an
     existing directory.  *)
 val in_existing_dir: string -> layout:layout -> t
@@ -54,10 +60,16 @@ val detect_copybook: uri:Lsp.Uri.t -> t -> bool
 (** Cached representation *)
 
 type cached
+
+(** [to_cache project] constructs a cached representation for [project]. *)
 val to_cache: t -> cached
+
+(** [of_cache ~rootdir ~layout cached_project] attempts to load and return a
+    cached project.  Behaves like [for_ ~rootdir ~layout] in case of error
+    (outdated or missing configuration file). *)
 val of_cache: rootdir:rootdir -> layout:layout -> cached -> t
 
-(** Sets and maps *)
+(** Collections *)
 
 module SET: sig
   include Set.S with type elt = t
@@ -69,6 +81,7 @@ module MAP: Map.S with type key = t
 (** Miscellaneous *)
 
 val rootdir: t -> rootdir
+val config: t -> Superbol_project.Config.t
 val string_of_rootdir: rootdir -> string
 val relative_path_for: uri:Lsp.Uri.t -> t -> string
 val absolute_path_for: filename:string -> t -> string

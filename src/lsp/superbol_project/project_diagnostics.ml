@@ -18,6 +18,7 @@ type error =
         msg: string;
     }
   | Unknown_dialect of string
+  | Cobol_config_error of Cobol_config.Diagnostics.error
 
 and location =
   | Toml_loc of Toml.Parser.location
@@ -32,3 +33,5 @@ let pp_error ppf = function
       Pretty.print ppf "%s: %s" filename msg
   | Unknown_dialect name ->
       Pretty.print ppf "Unknown@ dialect: `%s'" name
+  | Cobol_config_error e ->
+      Cobol_config.Diagnostics.pp_error ppf e

@@ -75,12 +75,12 @@ let expected acc ~kind ~key =
 let expected_string = expected ~kind:"string"
 let expected_bool = expected ~kind:"Boolean"
 
-let config_from_dialect_name ?(strict = false) dialect =
-  try
-    let dialect = Cobol_config.DIALECT.of_string dialect in
-    Cobol_config.from_dialect ~strict dialect
-  with Invalid_argument e ->
-    raise @@ ERROR (Unknown_dialect e)
+let config_from_dialect_name ?(strict = false) dialect_name =
+  try Cobol_config.(from_dialect ~strict @@ DIALECT.of_string dialect_name) with
+  | Invalid_argument e ->
+      raise @@ ERROR (Unknown_dialect e)
+  | Cobol_config.ERROR e ->
+      raise @@ ERROR (Cobol_config_error e)
 
 let from_file ~config_filename =
   let copybook_entries table =
@@ -190,6 +190,6 @@ type cached = t                                        (* same representation *)
 let to_cache = Fun.id
 
 let of_cache ~config_filename ({ config_checksum; _ } as config) =
-  if config_checksum = Digest.file  config_filename
+  if config_checksum = Digest.file config_filename
   then config
   else raise BAD_CHECKSUM

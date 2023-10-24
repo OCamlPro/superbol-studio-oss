@@ -28,6 +28,7 @@ module MAP = Superbol_project.MAP
 (* --- *)
 
 let rootdir = Superbol_project.rootdir
+let config = Superbol_project.config
 let string_of_rootdir = Superbol_project.string_of_rootdir
 
 let rootdir_for ~uri ~layout =
@@ -41,13 +42,23 @@ let show_n_forget_diagnostics ?(force = false) { result = project; diags } =
       ~uri:(`Main (Lsp.Uri.of_path project.config_filename));
   project
 
-let for_ ~rootdir ~layout =
-  show_n_forget_diagnostics @@
-  Superbol_project.for_ ~rootdir ~layout
-
-let in_existing_dir dir ~layout =
+let on_project_config_error e ~rootdir ~layout =
+  Lsp_io.pretty_notification ~type_:Error
+    "Error@ in@ project@ configuration@ (%a):@ resorting@ to@ system@ defaults.\
+    " Superbol_project.Diagnostics.pp_error e;
+  let diags = DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e in
   show_n_forget_diagnostics ~force:true @@
-  Superbol_project.in_existing_dir dir ~layout
+  DIAGS.result ~diags @@ Superbol_project.with_default_config ~rootdir ~layout
+
+let for_ ~rootdir ~layout =
+  try
+    show_n_forget_diagnostics @@
+    Superbol_project.for_ ~rootdir ~layout
+  with Superbol_project.Config.ERROR e ->
+    on_project_config_error e ~rootdir ~layout
+
+let in_existing_dir dirname ~layout =
+  for_ ~rootdir:(Superbol_project.rootdir_at ~dirname) ~layout
 
 let libpath_for ~uri project =
   Superbol_project.libpath_for ~filename:(Lsp.Uri.to_path uri) project
@@ -69,5 +80,8 @@ let to_cache project =
   Superbol_project.to_cache project
 
 let of_cache ~rootdir ~layout cached =
-  show_n_forget_diagnostics @@
-  Superbol_project.of_cache ~rootdir ~layout cached
+  try
+    show_n_forget_diagnostics @@
+    Superbol_project.of_cache ~rootdir ~layout cached
+  with Superbol_project.Config.ERROR e ->
+    on_project_config_error e ~rootdir ~layout

@@ -46,6 +46,11 @@ module TABLE =
 
 let table = TABLE.create 1
 
+let rootdir_at ~dirname : rootdir =
+  if EzFile.is_directory dirname
+  then dirname
+  else Fmt.invalid_arg "Expected existing directory: %s" dirname
+
 let rootdir_for ~filename ~layout:{ project_config_filename; _ } =
   let rec try_dir dir =
     if EzFile.exists (dir // project_config_filename)
@@ -63,26 +68,24 @@ let rootdir_for ~filename ~layout:{ project_config_filename; _ } =
   (* Pretty.error "Project directory: %s@." dir; *)
   dir
 
+let with_default_config ~rootdir ~layout:{ project_config_filename; _ } =
+  let config_filename = rootdir // project_config_filename in
+  {
+    rootdir;
+    config = Project_config.default;
+    config_filename;
+  }
+
 let try_reading_config_file ~rootdir ~layout:{ project_config_filename; _ } =
   let config_filename = rootdir // project_config_filename in
   DIAGS.map_result ~f:(fun config -> { rootdir; config; config_filename }) @@
-  if EzFile.exists config_filename
-  then Project_config.from_file ~config_filename
-  else DIAGS.result Project_config.default
-
-let in_existing_dir dir ~layout =
-  if EzFile.is_directory dir then
-    let project = try_reading_config_file ~layout ~rootdir:dir in
-    TABLE.add table dir project.result;
-    project
-  else
-    Fmt.invalid_arg "Expected existing directory: %s" dir
+  Project_config.from_file ~config_filename
 
 let for_ ~rootdir ~layout =
   try DIAGS.result @@ TABLE.find table rootdir
   with Not_found ->
     let project = try_reading_config_file ~layout ~rootdir in
-    TABLE.add table rootdir project.result;
+    TABLE.replace table rootdir project.result;
     project
 
 let libpath_for ~filename { config; _ } =
@@ -115,11 +118,8 @@ let of_cache ~rootdir ~layout cached =
     let project = { rootdir; config; config_filename } in
     TABLE.replace table rootdir project;
     DIAGS.result project
-  with Project_config.BAD_CHECKSUM ->
+  with Project_config.BAD_CHECKSUM | Sys_error _ ->
     for_ ~rootdir ~layout
-    (* let project = try_reading_config_file ~rootdir ~layout in *)
-    (* TABLE.add table rootdir project.; *)
-    (* project *)
 
 (* Collections *)
 
