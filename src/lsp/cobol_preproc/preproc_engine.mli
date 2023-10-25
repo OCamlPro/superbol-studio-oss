@@ -64,14 +64,17 @@ val lex_lib
   -> unit Cobol_common.Diagnostics.with_diags
 
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
-    ~on_compiler_directive ~f input acc] applies [f line_number line acc] for
-    each successive source line [line] of [input].  [line_number] gives the line
-    number for [line] (starting at [1]).  [line] is given empty to [f] if it
-    corresponds to an empty line in the input, or was a line continuation in the
-    case of fixed-width reference format.
+    ~on_compiler_directive ~on_initial_source_format ~f input acc] applies [f
+    line_number line acc] for each successive source line [line] of [input].
+    [line_number] gives the line number for [line] (starting at [1]).  [line] is
+    given empty to [f] if it corresponds to an empty line in the input, or was a
+    line continuation in the case of fixed-width reference format.
 
     When given, [on_compiler_directive] is called {e after} [f] has been fed
     with the text of a compiler directive, with the same line number.
+
+    When given, [on_initial_source_format] is called {e before} either [f] or
+    [on_compiler_directive] has been called.
 
     When set, [skip_compiler_directives_text] ([false] by default) prevents the
     text of compiler directives from being fed to [f].  If given,
@@ -82,6 +85,7 @@ val lex_lib
 val fold_source_lines
   : dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
+  -> ?on_initial_source_format: (Src_format.any -> 'a -> 'a)
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive
      : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)

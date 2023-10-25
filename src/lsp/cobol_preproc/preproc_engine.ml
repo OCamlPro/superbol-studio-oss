@@ -425,12 +425,18 @@ let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) libname =
   | Error lnf ->
       DIAGS.error_result () "%a" Cobol_common.Copybook.pp_lookup_error lnf
 
-let fold_source_lines ~dialect ~source_format
+let fold_source_lines ~dialect ~source_format ?on_initial_source_format
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
+  let reader =
+    Src_reader.from input ?source_format:(source_format_config source_format)
+  in
+  let acc = match on_initial_source_format with
+    | Some f -> f (Src_reader.source_format reader) acc
+    | None -> acc
+  in
   DIAGS.result @@
-  Src_reader.fold_lines ~dialect ~f
-    (Src_reader.from input ?source_format:(source_format_config source_format))
+  Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
 
 let text_of_input ?options input =
