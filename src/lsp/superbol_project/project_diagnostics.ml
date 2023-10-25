@@ -29,8 +29,10 @@ let pp_error ppf = function
       (* Here we ignore the message as most error messages from `toml` just
          repeat source location information. *)
       Pretty.print ppf "%s:%d,%d: Syntax error" source line column
-  | Invalid_config { loc = Toml_file filename; msg } ->
-      Pretty.print ppf "%s: %s" filename msg
+  | Invalid_config { loc = _(* Toml_file filename *); msg } ->
+      (* Here the message from `toml` contains enough source information as
+         well. *)
+      Pretty.string ppf msg
   | Unknown_dialect name ->
       Pretty.print ppf "Unknown@ dialect: `%s'" name
   | Cobol_config_error e ->
