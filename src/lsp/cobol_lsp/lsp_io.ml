@@ -87,7 +87,7 @@ let read_message () : Jsonrpc.Packet.t =
 let send_json json =
   let str = Yojson.Safe.to_string json in
   let len = String.length str in
-  Pretty.string_to send_out "Content-Length: %d\r\n\r\n%s" len str
+  Pretty.string_to send_out "Content-Length: %d\r\n\r\n%s%!" len str
 
 (** [send_response response] sends out a json RPC response on standard
     output. *)
