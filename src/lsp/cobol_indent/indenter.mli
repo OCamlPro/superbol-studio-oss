@@ -17,5 +17,6 @@ val indent_range'
   -> source_format:Cobol_config.source_format_spec
   -> indent_config:string option
   -> range:Indent_type.range option
-  -> file:string
+  -> filename:string
+  -> contents:string
   -> string

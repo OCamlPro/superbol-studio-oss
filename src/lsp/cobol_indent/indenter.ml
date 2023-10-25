@@ -62,30 +62,22 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
   String.concat "\n" strl
 
 (*indent a range of file, with the default indent_config*)
-let indent_range' ~dialect ~source_format ~range ~file =
-  let file_content = Ez_file.V1.EzFile.read_file file in
-  (*
-    Not satisfied with the `Cobol_preproc.fold_text_lines`,
-    this function has an argument which is the name of file,
-    so when using lsp, every time using the formatting,
-    we must save the file before, it is not convenient.
-     (* NB: not anymore. *)
-  *)
+let indent_range' ~dialect ~source_format ~range ~filename ~contents =
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
-      ~skip_compiler_directives_text:false
+      ~skip_compiler_directives_text:true
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
-      (String { contents = file_content; filename = file; })
+      (String { filename; contents })
       { scope = BEGIN; context  = []; acc = []; range }
   in
   (* NB: note here we ignore diagnostics *)
   let ind_recds = state.result.acc in
-  indenter ~source_format file_content ind_recds state.result.range
+  indenter ~source_format contents ind_recds state.result.range
 
 (*indent a range of file, with the user-defined indent_config*)
-let indent_range' ~dialect ~source_format ~indent_config ~range ~file =
+let indent_range' ~dialect ~source_format ~indent_config ~range ~filename ~contents =
   begin match indent_config with
     | Some indent_config -> Indent_config.set_config ~indent_config
     | None -> ()
   end;
-  indent_range' ~dialect ~source_format ~range ~file
+  indent_range' ~dialect ~source_format ~range ~filename ~contents

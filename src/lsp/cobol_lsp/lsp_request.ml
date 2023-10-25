@@ -159,7 +159,9 @@ let handle_references state (params: ReferenceParams.t) =
 let handle_range_formatting registry params =
   let open DocumentRangeFormattingParams in
   let { textDocument = doc; range = {start; end_}; _ } = params in
-  let Lsp_document.{ project; _ } = Lsp_server.find_document doc registry in
+  let Lsp_document.{ project; textdoc; _ } =
+    Lsp_server.find_document doc registry
+  in
   let range_to_indent =
     Cobol_indent.Type.{
       start_line = start.line + 1;
@@ -180,7 +182,8 @@ let handle_range_formatting registry params =
       ~dialect:(Cobol_config.dialect project.cobol_config)
       ~source_format:project.source_format
       ~indent_config:None
-      ~file:(Lsp.Uri.to_path doc.uri)
+      ~filename:(Lsp.Uri.to_path doc.uri)
+      ~contents:(Lsp.Text_document.text textdoc)
       ~range:(Some range_to_indent)
   in
   Some [TextEdit.create ~newText ~range]
@@ -198,14 +201,14 @@ let handle_formatting registry params =
       ~start:(Position.create ~character:0 ~line:0)
       ~end_:(Position.create ~character:width ~line:length)
   in
-  let path = Lsp.Uri.to_path doc.uri in
   try
     let newText =
       Cobol_indent.indent_range'
         ~dialect:(Cobol_config.dialect project.cobol_config)
         ~source_format:project.source_format
         ~indent_config:None
-        ~file:path
+        ~filename:(Lsp.Uri.to_path doc.uri)
+        ~contents:(Lsp.Text_document.text textdoc)
         ~range:None
     in
     Some [TextEdit.create ~newText ~range:edit_range]
