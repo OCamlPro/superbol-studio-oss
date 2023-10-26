@@ -1,6 +1,6 @@
 
 # name of package
-name = "superbol_project"
+name = "ezr_toml"
 skeleton = "library"
 
 # version if different from project version
@@ -53,11 +53,9 @@ skip = ["index.mld"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
-cobol_common = "version"
-cobol_config = "version"
 ocplib_stuff = "0.4.0"
 ez_file = "0.3.0"
-ezr_toml = "version"
+ez_toml = "version"
 pretty = "version"
 
 # package tools dependencies

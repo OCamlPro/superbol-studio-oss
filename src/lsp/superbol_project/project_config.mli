@@ -17,13 +17,13 @@ module TYPES: sig
     | RelativeToProjectRoot of string
     | RelativeToFileDir of string
 
-  type config = private {
-    config_checksum: Digest.t;
-    cobol_config: Cobol_config.t;
-    source_format: Cobol_config.source_format_spec;
-    libpath: path list;
-    copybook_extensions: string list;
-    copybook_if_no_extension: bool;
+  type config = (* private *) {
+    mutable cobol_config: Cobol_config.t;
+    mutable source_format: Cobol_config.source_format_spec;
+    mutable libpath: path list;
+    mutable copybook_extensions: string list;
+    mutable copybook_if_no_extension: bool;
+    toml_handle: Ezr_toml.toml_handle;
   }
 
   exception ERROR of Project_diagnostics.error
@@ -35,11 +35,20 @@ include module type of TYPES
 
 type t = config
 
-val default: t
+val new_default: unit -> t
 
-(** [from_file ~config_filename] loads the given project configuration file.
-    Raises {!ERROR} or {!Sys_error} in case of failure. *)
-val from_file: config_filename:string -> t Cobol_common.Diagnostics.with_diags
+(** [load_file ~verbose config_filename] loads the given project configuration
+    file.  Raises {!ERROR} or {!Sys_error} in case of failure. *)
+val load_file
+  : ?verbose:bool
+  -> string
+  -> t Cobol_common.Diagnostics.with_diags
+
+val save
+  : ?verbose:bool
+  -> config_filename:string
+  -> t
+  -> unit
 
 (** [libpath_for ~filename project] constructs a list of directory names where
     copybooks are looked up, for a given source file name, in a project with the

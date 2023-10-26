@@ -233,9 +233,14 @@ let from_file ?search_path file =
   let module Config =
     From_file.Make (Diags) (struct
       let config =
-        { name = match StringMap.find "name" options with
-              | Conf_ast.String s -> s
-              | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v)) }
+        let name =
+          match StringMap.find "name" options with
+          | Conf_ast.String s -> s
+          | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v))
+        and strict =                                         (* NB: ugly hack *)
+          EzString.ends_with ~suffix:"-strict.conf" file
+        in
+        { name; strict }
       let dialect =
         try DIALECT.of_name config.name
         with Invalid_argument _ ->

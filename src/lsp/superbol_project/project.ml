@@ -28,6 +28,7 @@ module TYPES = struct
 
   type layout = {
     project_config_filename: string;
+    relative_work_dirname: string;
   }
 
 end
@@ -69,17 +70,16 @@ let rootdir_for ~filename ~layout:{ project_config_filename; _ } =
   dir
 
 let with_default_config ~rootdir ~layout:{ project_config_filename; _ } =
-  let config_filename = rootdir // project_config_filename in
   {
     rootdir;
-    config = Project_config.default;
-    config_filename;
+    config = Project_config.new_default ();
+    config_filename = rootdir // project_config_filename;
   }
 
 let try_reading_config_file ~rootdir ~layout:{ project_config_filename; _ } =
   let config_filename = rootdir // project_config_filename in
-  DIAGS.map_result ~f:(fun config -> { rootdir; config; config_filename }) @@
-  Project_config.from_file ~config_filename
+  Project_config.load_file config_filename |>
+  DIAGS.map_result ~f:(fun config -> { rootdir; config; config_filename })
 
 let for_ ~rootdir ~layout =
   try DIAGS.result @@ TABLE.find table rootdir
@@ -102,6 +102,9 @@ let absolute_path_for ~filename { rootdir; _ } =
   if EzFile.is_absolute filename
   then filename       (* in case the file is not within its project directory *)
   else rootdir // filename
+
+let save_config { config_filename; config; _ } =
+  Project_config.save ~config_filename config
 
 (* Caching *)
 

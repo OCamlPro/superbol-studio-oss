@@ -94,10 +94,22 @@ let format_of_string s =
   | "variable" -> SF SFVariable
   | "xopen" -> SF SFXOpen
   | "xcard" -> SF SFxCard
+  | "crt" -> SF SFCRT
   | "terminal" -> SF SFTrm
   | "cobolx" -> SF SFCOBOLX
   | "auto" -> Auto
   | _ -> invalid_arg s
+
+let string_of_format = function
+  | SF SFFixed -> "fixed"
+  | SF SFFree -> "free"
+  | SF SFVariable -> "variable"
+  | SF SFXOpen -> "xopen"
+  | SF SFxCard -> "xcard"
+  | SF SFCRT -> "crt"
+  | SF SFTrm -> "terminal"
+  | SF SFCOBOLX -> "cobolx"
+  | Auto -> "auto"
 
 let format: source_format_spec value =
   let kind = object

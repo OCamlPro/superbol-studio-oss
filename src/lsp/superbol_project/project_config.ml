@@ -13,7 +13,7 @@
 
 open Ez_file.V1
 open EzFile.OP
-open Toml.Types
+open Ez_toml.V1
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -23,13 +23,13 @@ module TYPES = struct
     | RelativeToProjectRoot of string
     | RelativeToFileDir of string
 
-  type config = {                                                  (* private *)
-    config_checksum: Digest.t;
-    cobol_config: Cobol_config.t;
-    source_format: Cobol_config.source_format_spec;
-    libpath: path list;
-    copybook_extensions: string list;
-    copybook_if_no_extension: bool;
+  type config = {
+    mutable cobol_config: Cobol_config.t;
+    mutable source_format: Cobol_config.source_format_spec;
+    mutable libpath: path list;
+    mutable copybook_extensions: string list;
+    mutable copybook_if_no_extension: bool;
+    toml_handle: Ezr_toml.toml_handle;
   }
 
   exception ERROR of Project_diagnostics.error
@@ -53,27 +53,63 @@ let default_copybook_extensions = Cobol_common.Copybook.copybook_extensions
 let default_copybook_if_no_extension = true
 
 let default = {
-  config_checksum = Digest.string "";
   cobol_config = Cobol_config.default;
   source_format = Cobol_config.(SF SFFixed);
   libpath = default_libpath;
   copybook_extensions = default_copybook_extensions;
   copybook_if_no_extension = default_copybook_if_no_extension;
+  toml_handle = Ezr_toml.make_empty ();
 }
 
-let dialect_key = Table.Key.of_string "dialect"
-and source_format_key = Table.Key.of_string "source-format"
-and strict_key = Table.Key.of_string "strict"
-and dir_key = Table.Key.of_string "dir"
-and file_relative_key = Table.Key.of_string "file-relative"
-and copybook_key = Table.Key.of_string "copybook"
+let new_default () =
+  { default with toml_handle = Ezr_toml.make_empty () }
 
-let expected acc ~kind ~key =
-  DIAGS.Acc.error acc
-    "Invalid@ entry@ type@ for@ key@ `%s',@ %s@ expected"
-    (Table.Key.to_string key) kind
-let expected_string = expected ~kind:"string"
-let expected_bool = expected ~kind:"Boolean"
+(* Translation to TOML *)
+
+let dialect_repr dialect =
+  TOML.value_of_string @@ Cobol_config.DIALECT.to_string dialect
+
+let format_repr format =
+  TOML.value_of_string @@ Cobol_config.Options.string_of_format format
+
+let path_repr = function
+  | RelativeToProjectRoot dir ->
+      TOML.table_of_list [
+        "dir", TOML.string dir;
+        "file-relative", TOML.bool false;
+      ]
+  | RelativeToFileDir dir ->
+      TOML.table_of_list [
+        "dir", TOML.string dir;
+        "file-relative", TOML.bool true;
+      ]
+
+let libpath_repr libpath =
+  TOML.value_of_array @@ Array.of_list @@ List.map path_repr libpath
+
+let config_repr config ~name =
+  Ezr_toml.section
+    ~name
+    ~after_comments: ["SuperBOL project configuration"]
+    Ezr_toml.[
+      option
+        ~name: "dialect"
+        ~after_comments: ["Default dialect for COBOL source files"]
+        (dialect_repr @@ Cobol_config.dialect config.cobol_config);
+
+      option
+        ~name: "source-format"
+        ~after_comments: ["Default source reference-format"]
+        (format_repr config.source_format);
+
+      option
+        ~name: "copybooks"
+        ~after_comments: ["Where to find copybooks"]
+        (libpath_repr config.libpath);
+    ]
+
+
+let config_section_name = "cobol"
 
 let config_from_dialect_name ?(strict = false) dialect_name =
   try Cobol_config.(from_dialect ~strict @@ DIALECT.of_string dialect_name) with
@@ -82,90 +118,53 @@ let config_from_dialect_name ?(strict = false) dialect_name =
   | Cobol_config.ERROR e ->
       raise @@ ERROR (Cobol_config_error e)
 
-let from_file ~config_filename =
-  let copybook_entries table =
-    List.fold_left begin fun (libpath, errors) entry ->
-      match Table.find_opt dir_key entry,
-            Table.find_opt file_relative_key entry with
-      | Some TString str, Some TBool true ->
-          RelativeToFileDir str :: libpath, errors
-      | Some TString str, (None | Some TBool false) ->
-          RelativeToProjectRoot str :: libpath, errors
-      | Some TString _, Some _ ->
-          libpath, expected_bool ~key:file_relative_key errors
-      | Some _, _ ->
-          libpath, expected_string ~key:dir_key errors
-      | None, _ ->
-          libpath, errors
-    end (default_libpath, DIAGS.Set.none) table
+let get_source_format toml =
+  try (Cobol_config.Options.format_of_string @@
+       TOML.get_string ["source-format"] toml)
+  with Not_found -> default.source_format
+
+let get_dialect toml =
+  TOML.get_string ["dialect"] ~default:"default" toml
+
+let get_path_entry toml =
+  let dir = TOML.get_string ["dir"] toml in
+  if TOML.get_bool ["file-relative"] toml ~default:false
+  then RelativeToFileDir dir
+  else RelativeToProjectRoot dir
+
+let get_libpath toml =
+  try
+    List.map get_path_entry @@
+    Array.to_list @@ TOML.get_array ["copybooks"] toml
+  with Not_found -> default_libpath
+
+let load_file ?verbose config_filename =
+  let toml_handle = Ezr_toml.load ?verbose config_filename in
+  let load_section keys toml =
+    let section = TOML.get keys toml in
+    DIAGS.map_result
+      (config_from_dialect_name @@ get_dialect section)
+      ~f:(fun cobol_config ->
+          { default with
+            cobol_config;
+            source_format = get_source_format section;
+            libpath = get_libpath section;
+            toml_handle = toml_handle })
   in
-  let load config_filename =
-    let config_string = EzFile.read_file config_filename in
-    let config_checksum = Digest.string config_string in
-    match Toml.Parser.from_string config_string with
-    | `Ok toml ->
-        let DIAGS.{ result = config; diags = errors } =
-          match Table.find_opt dialect_key toml,
-                Table.find_opt strict_key toml with
-          | Some TString dialect, Some TBool strict ->
-              config_from_dialect_name dialect ~strict
-          | Some TString dialect, None ->
-              config_from_dialect_name dialect
-          | None, (None | Some TBool _) ->   (* match on strict so it is not caught
-                                                in last case *)
-              DIAGS.result Cobol_config.default
-          | Some _, _ ->
-              DIAGS.result Cobol_config.default
-                ~diags:(expected_string ~key:dialect_key DIAGS.Set.none)
-          | _, Some _ ->
-              DIAGS.result Cobol_config.default
-                ~diags:(expected_bool ~key:strict_key DIAGS.Set.none)
-        in
-        let libpath, errors =
-          match Table.find copybook_key toml with
-          | TArray NodeTable tbl ->
-              copybook_entries tbl
-          | exception Not_found ->
-              default_libpath, errors
-          | _ ->
-              default_libpath,
-              expected ~key:copybook_key ~kind:"array of tables" errors
-        in
-        let source_format, errors =
-          match Table.find source_format_key toml with
-          | TString str ->
-              (try
-                 Cobol_config.Options.format_of_string str, errors
-               with Invalid_argument _ ->
-                 Auto,
-                 expected ~key:source_format_key ~kind:"source format" errors)
-          | exception Not_found ->
-              Auto, errors
-          | _ ->
-              Auto, expected_string ~key:source_format_key errors
-        in
-        {
-          config_checksum;
-          cobol_config = config;
-          source_format;
-          libpath;
-          copybook_extensions = default_copybook_extensions;
-          copybook_if_no_extension = default_copybook_if_no_extension;
-        }, errors
-    | `Error (msg, loc) ->
-        let loc = { loc with source = config_filename } in
-        raise @@ ERROR (Invalid_config { loc = Toml_loc loc; msg })
-  in
-  let config, diags =
-    try load config_filename with
-    | Toml.Parser.Error (msg, loc) ->
-        let loc = { loc with source = config_filename } in
-        raise @@ ERROR (Invalid_config { loc = Toml_loc loc; msg })
-    | Sys_error _ as e ->
-        raise @@ ERROR (Invalid_config { loc = Toml_file config_filename;
-                                         msg = Pretty.to_string "%a" Fmt.exn e})
-  in
-  DIAGS.result ~diags config
+  try
+    let DIAGS.{ result; _ } as config =
+      let toml = Ezr_toml.toml toml_handle in
+      try load_section [config_section_name] toml
+      with Not_found -> DIAGS.result { default with toml_handle }
+    in
+    Ezr_toml.add_section_update toml_handle
+      config_section_name (config_repr result);
+    config
+  with TOML.TYPES.Error (loc, _code, error) ->
+    raise @@ ERROR (Invalid_toml { loc; error })
+
+let save ?verbose ~config_filename config =
+  Ezr_toml.save ?verbose config_filename config.toml_handle
 
 (* --- *)
 
@@ -187,9 +186,13 @@ let detect_copybook ~filename { copybook_extensions;
 exception BAD_CHECKSUM
 
 type cached = t                                        (* same representation *)
-let to_cache = Fun.id
 
-let of_cache ~config_filename ({ config_checksum; _ } as config) =
-  if config_checksum = Digest.file config_filename
-  then config
-  else raise BAD_CHECKSUM
+let to_cache config =
+  { config with toml_handle = Ezr_toml.cacheable config.toml_handle }
+
+let of_cache ~config_filename ({ toml_handle; _ } as config) =
+  if Ezr_toml.checksum toml_handle <> Digest.file config_filename
+  then raise BAD_CHECKSUM;
+  Ezr_toml.add_section_update toml_handle
+    config_section_name (config_repr config);
+  config

@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-6ead53f67246f52d9c9447c55ab48504:.
+3b1faf25344f4faae93ba95094d29269:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-25b2d8529437886dba7c91ea35ad3bd3:Makefile
+d71d6060ee4fa0a89488a6d4c0178158:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-8f51467a0d8dc7baaff86479be853e8a:dune-project
+de3add436687f5413eb9cb4563b6e570:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
@@ -143,6 +143,11 @@ cf7dc739a839b17b205c2a21dd75e19e:opam/cobol_config.opam
 f7f42a209d8b673bda5d0b5d05f3de09:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
 
+# begin context for opam/ezr_toml.opam
+# file opam/ezr_toml.opam
+9455276280a2fb6d3aaa6425b401a419:opam/ezr_toml.opam
+# end context for opam/ezr_toml.opam
+
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
 d224826f8f433f8b0d53d83519693365:opam/interop-js-stubs.opam
@@ -200,7 +205,7 @@ b815611835e260ddcc4e14f317852cc4:opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_project.opam
 # file opam/superbol_project.opam
-85ee97bad157c3df23a7b4b78a6e837f:opam/superbol_project.opam
+da41008cb67ac8b63775b400ddd70dcd:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
 
 # begin context for opam/superbol_testutils.opam
@@ -383,6 +388,16 @@ aa698eb4d08863a11b6193190a5d5319:src/lsp/cobol_typeck/dune
 940d29cde7f16cd0916ed1d5f9c41154:src/lsp/ebcdic_lib/ebcdic_version.mlt
 # end context for src/lsp/ebcdic_lib/ebcdic_version.mlt
 
+# begin context for src/lsp/ezr_toml/dune
+# file src/lsp/ezr_toml/dune
+eab335ce600887c59f1baf9b0983d0ac:src/lsp/ezr_toml/dune
+# end context for src/lsp/ezr_toml/dune
+
+# begin context for src/lsp/ezr_toml/version.mlt
+# file src/lsp/ezr_toml/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/ezr_toml/version.mlt
+# end context for src/lsp/ezr_toml/version.mlt
+
 # begin context for src/lsp/ppx_cobcflags/dune
 # file src/lsp/ppx_cobcflags/dune
 86758f07c1c4f6bef04e0520a41cb8f6:src/lsp/ppx_cobcflags/dune
@@ -425,7 +440,7 @@ ffef64c84976f7655b4dd57e795d7097:src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_project/dune
 # file src/lsp/superbol_project/dune
-195483245939d48e85eafee4c44a198b:src/lsp/superbol_project/dune
+4f0eb93049700d37bb60c5fc13d155a3:src/lsp/superbol_project/dune
 # end context for src/lsp/superbol_project/dune
 
 # begin context for src/lsp/superbol_project/version.mlt

@@ -24,9 +24,9 @@ type doc = Pretty.simple
     a name for now, but we could add some more info later (like configuration
     files read). *)
 type configuration =
-  (* May become an object a well, if revelant *)
   {
     name: string;              (* e.g, "default", "MicroFocus", "ACU", "GCOS" *)
+    strict: bool;
   }
 
 (** Any object with a pretty-printing method. *)
@@ -332,7 +332,7 @@ module DIALECT = struct
     | RM
     | XOpen
 
-  let name: t -> string = function
+  let to_string: t -> string = function
     | Default -> "default"
     | GnuCOBOL -> "GnuCOBOL"
 

@@ -13,10 +13,8 @@
 
 open Ezcmd.V2
 
-let project_config_filename = "superbol.toml"
-let relative_work_dirname = "_superbol"
 let lsp_config =
-  Cobol_lsp.config ~project_config_filename ~relative_work_dirname
+  Cobol_lsp.config ~project_layout:Project_config.layout
 
 let run_lsp () =
   match Cobol_lsp.run ~config:lsp_config with

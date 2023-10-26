@@ -32,6 +32,7 @@ val defaultbyte: defaultbyte value
 val standard_define: standard value
 
 val format_of_string: string -> source_format_spec
+val string_of_format: source_format_spec -> string
 val format: source_format_spec value
 
 val binary_size: binary_size value

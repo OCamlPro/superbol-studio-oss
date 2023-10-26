@@ -11,18 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_toml.V1
+open Ez_file.V1
 
-type error =
-  | Invalid_toml of { loc: TOML.Types.location; error: TOML.Types.error }
-  | Unknown_dialect of string
-  | Cobol_config_error of Cobol_config.Diagnostics.error
+let rec mkdir_rec path =
+  if not ( Sys.file_exists path ) then begin
+    let dir = Filename.dirname path in
+    if dir <> path then mkdir_rec dir ;
+    Unix.mkdir path 0o755;
+  end
 
-let pp_error ppf = function
-  | Invalid_toml { loc; error } ->
-      Pretty.print ppf "%s: %s"
-        (TOML.string_of_location loc) (TOML.string_of_error error)
-  | Unknown_dialect name ->
-      Pretty.print ppf "Unknown@ dialect: `%s'" name
-  | Cobol_config_error e ->
-      Cobol_config.Diagnostics.pp_error ppf e
+let write_file ?(mkdir=false) file =
+  if mkdir then mkdir_rec ( Filename.dirname file );
+  EzFile.write_file file

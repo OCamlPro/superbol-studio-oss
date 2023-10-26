@@ -88,22 +88,12 @@ let get () =
     EZCMD.info "Use the strict configuration";
 
     ["source-format"],
-    Arg.Symbol (formats, fun f -> format := match String.uppercase_ascii f with
-        | "FIXED" | "COBOL85" -> Cobol_config.SF Cobol_config.SFFixed
-        | "FREE" -> SF SFFree
-        | "VARIABLE" -> SF SFVariable
-        | "XOPEN" -> SF SFXOpen
-        | "XCARD" -> SF SFxCard
-        | "CRT" -> SF SFCRT
-        | "TERMINAL" -> SF SFTrm
-        | "COBOLX" -> SF SFCOBOLX
-        | "AUTO" -> Auto
-        | _ ->
-            Cobol_common.Diagnostics.Now.warn
-              Fmt.stderr
-              "Unkown source format: %s, setting to default"
-              f;
-            Auto),
+    Arg.Symbol (formats, fun f ->
+        format := try Cobol_config.Options.format_of_string f with
+          | Invalid_argument _ ->
+              DIAGS.Now.warn Fmt.stderr
+                "Unkown source format: %s, setting to default" f;
+              Auto),
     EZCMD.info ~docv:"SOURCE_FORMAT"
       "Set the format of source code; allowed values are: { FIXED (the default), \
        FREE}\nOverrides `format` from configuration file if present.";

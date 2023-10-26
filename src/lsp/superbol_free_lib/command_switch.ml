@@ -18,8 +18,6 @@ open Ez_file.V1
 open Ez_toml.V1
 open EzFile.OP
 
-open User_config.TYPES
-
 module TYPES = struct
 
   type config = {
@@ -27,7 +25,7 @@ module TYPES = struct
     mutable switch_list : string StringMap.t ;
     mutable switch_num : int ;
     mutable switch_current : string option ;
-    user_config : user_config ;
+    user_config : Ezr_toml.toml_handle ;
   }
 
 end
@@ -65,35 +63,42 @@ let about man =
   man @ about
 
 let create_section config ~name =
-  User_config.section
+  Ezr_toml.section
     ~name
-    ~before:[ "Management of GnuCOBOL installations" ]
-    [
-      User_config.option
+    ~after_comments:[ "Management of GnuCOBOL installations" ]
+    Ezr_toml.[
+      option
         ~name: "dir"
-        ~before: [ "The directory where GnuCOBOL versions should be installed by default." ]
+        ~after_comments: [ "The directory where GnuCOBOL versions should be \
+                            installed by default." ]
         ( TOML.value_of_string config.switch_dir ) ;
 
-      User_config.option
+      option
         ~name: "list"
-        ~before: [ "The table of known switches" ]
+        ~after_comments: [ "The table of known switches" ]
         ( TOML.TYPES.Table ( StringMap.map TOML.string config.switch_list )) ;
 
-      User_config.option
+      option
         ~name: "num"
-        ~before: [ "Next ID to be used for switch prefix" ]
+        ~after_comments: [ "Next ID to be used for switch prefix" ]
         ( TOML.value_of_int config.switch_num ) ;
 
-      User_config.option
+      option
         ~name: "current"
-        ~before: [ "Current switch" ]
+        ~after_comments: [ "Current switch" ]
         ( TOML.value_of_string (match config.switch_current with
               | None -> ""
               | Some s -> s)) ;
-]
+    ]
+
+
+let user_config_file = Misc.config_dir // "config.toml"
+
+let save_user_config config =
+  Ezr_toml.save user_config_file config.user_config
 
 let get_config () =
-  let user_config = User_config.load () in
+  let user_config = Ezr_toml.load user_config_file in
   let default = {
     switch_dir = Misc.config_dir // "switches" ;
     switch_list = StringMap.empty ;
@@ -102,26 +107,26 @@ let get_config () =
     user_config ;
   } in
   let config =
-    match TOML.get [ section_name ] user_config.toml with
+    match TOML.get [ section_name ] (Ezr_toml.toml user_config) with
     | exception Not_found -> default
     | toml ->
-      let switch_dir = TOML.get_string [ "dir" ] toml ~default:default.switch_dir in
-      let switch_list =
-        TOML.get_table [ "list" ] toml ~default:StringMap.empty in
-      let switch_list = StringMap.map TOML.extract_string switch_list in
-      let switch_num =
-        TOML.get_int [ "num" ] toml ~default:default.switch_num in
-      let switch_current =
-        TOML.get_string [ "current" ] toml ~default:"" in
-      { default with
-        switch_dir ;
-        switch_num ;
-        switch_list ;
-        switch_current = if switch_current = "" then
-            None else Some switch_current ;
-      }
+        let switch_dir = TOML.get_string [ "dir" ] toml ~default:default.switch_dir in
+        let switch_list =
+          TOML.get_table [ "list" ] toml ~default:StringMap.empty in
+        let switch_list = StringMap.map TOML.extract_string switch_list in
+        let switch_num =
+          TOML.get_int [ "num" ] toml ~default:default.switch_num in
+        let switch_current =
+          TOML.get_string [ "current" ] toml ~default:"" in
+        { default with
+          switch_dir ;
+          switch_num ;
+          switch_list ;
+          switch_current = if switch_current = "" then
+              None else Some switch_current ;
+        }
   in
-  User_config.add_section_hook user_config section_name
+  Ezr_toml.add_section_update user_config section_name
     (create_section config);
   config
 
@@ -281,7 +286,7 @@ let switch_import ~dirs ~clear ~set () =
     ) dirs;
   if config.switch_current <> current then
     set_switch_link config ;
-  User_config.save config.user_config
+  save_user_config config
 
 let import_cmd =
   let dirs = ref [] in
@@ -469,7 +474,7 @@ let switch_set ?switch ~last () =
   config.switch_current <- Some switch ;
   set_switch_link config ;
   Printf.eprintf "Current switch set to %S\n%!" switch;
-  User_config.save config.user_config
+  save_user_config config
 
 let set_cmd =
   let switch = ref None in
@@ -507,7 +512,7 @@ let switch_add ~dirname ?switch_name ~set () =
   add_switch config ?switch_name ~file ~dir ~set ;
   if config.switch_current <> current then
     set_switch_link config ;
-  User_config.save config.user_config
+  Ezr_toml.save user_config_file config.user_config
 
 let add_cmd =
   let dirname = ref None in
@@ -610,7 +615,7 @@ let switch_build ?dir ?switch_name ~set ~sudo () =
   add_switch config ?switch_name ~file ~dir ~set ;
   if config.switch_current <> current then
     set_switch_link config;
-  User_config.save config.user_config
+  save_user_config config
 
 let build_cmd =
   let dir = ref None in
