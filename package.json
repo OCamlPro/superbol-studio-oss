@@ -26,6 +26,82 @@
         }
       }
     },
+        "problemPatterns": [
+            {
+                "name": "gnucobol-cobc",
+                "regexp": "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$",
+                "file": 1,
+                "line": 2,
+                "severity": 3,
+                "message": 4,
+                "code": 6
+            },
+            {
+                "name": "gnucobol-warning-cobc",
+                "regexp": "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$",
+                "file": 1,
+                "line": 2,
+                "message": 4,
+                "code": 6
+            },
+            {
+                "name": "gnucobol-error-cobc",
+                "regexp": "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$",
+                "file": 1,
+                "line": 2,
+                "message": 4,
+                "code": 6
+            },
+            {
+                "name": "gnucobol-note-cobc",
+                "regexp": "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$",
+                "file": 1,
+                "line": 2,
+                "message": 4,
+                "code": 6
+            }
+        ],
+        "problemMatchers": [
+            {
+                "name": "gnucobol-cobc",
+                "owner": "cobol",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": "$gnucobol-cobc",
+                "source": "GnuCOBOL"
+            },
+            {
+                "name": "gnucobol-warning-cobc",
+                "owner": "cobol",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": "$gnucobol-warning-cobc",
+                "severity": "warning",
+                "source": "GnuCOBOL"
+            },
+            {
+                "name": "gnucobol-error-cobc",
+                "owner": "cobol",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": "$gnucobol-error-cobc",
+                "severity": "error",
+                "source": "GnuCOBOL"
+            },
+            {
+                "name": "gnucobol-note-cobc",
+                "owner": "cobol",
+                "fileLocation": [
+                    "absolute"
+                ],
+                "pattern": "$gnucobol-note-cobc",
+                "severity": "info",
+                "source": "GnuCOBOL"
+            }
+        ]
     "debuggers": [
       {
         "type": "cobol",
