@@ -145,7 +145,9 @@ let contributes =
 
             Manifest.PROPERTY.string "superbol.path"
               ~default:"superbol-free"
-              ~description: "Path to the `superbol` command"
+              ~description:
+              "Name of the `superbol` command; path can be relative (deprecated) or \
+               absolute."
           ] )
     ~taskDefinitions: [
       Manifest.taskDefinition
