@@ -21,7 +21,7 @@
           "description": "If something is selected, only format the selection"
         },
         "superbol.path": {
-          "default": "",
+          "default": "superbol-free",
           "description": "Path to the `superbol` command"
         }
       }
