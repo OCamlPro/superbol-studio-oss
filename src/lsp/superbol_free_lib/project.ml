@@ -154,8 +154,10 @@ let contributes =
           Manifest.PROPERTY.array "copybooks"
             ~description:"The list of copybooks paths" ;
 
-          Manifest.PROPERTY.string "sourceFormat"
-            ~description: "The source format of the code" ;
+          Manifest.PROPERTY.enum "sourceFormat"
+            ~cases:Cobol_config.DIALECT.all_canonical_names
+            ~description: "The source format of the code"
+          ;
 
           Manifest.PROPERTY.string "dialect"
             ~description: "The COBOL dialect used" ;
