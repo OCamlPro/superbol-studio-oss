@@ -83,7 +83,24 @@
             "description": "The list of copybooks paths"
           },
           "sourceFormat": {
-            "description": "The source format of the code"
+            "description": "The source format of the code",
+            "items": "string",
+            "enum": [
+              "default",
+              "gnucobol",
+              "cobol85",
+              "cobol2002",
+              "cobol2014",
+              "acu",
+              "bs2000",
+              "gcos",
+              "ibm",
+              "mf",
+              "mvs",
+              "realia",
+              "rm",
+              "xopen"
+            ]
           },
           "dialect": {
             "description": "The COBOL dialect used"

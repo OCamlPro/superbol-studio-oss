@@ -357,6 +357,13 @@ module PROPERTY = struct
             Some (`A (List.map (fun s -> `String s) strings)))
       ~items: (`String "string")
 
+  let enum ?default ~cases =
+    property
+      ~type_:(`String "string")
+      ~enum:cases
+      ?default
+      ~items:(`String "string")
+
 end
 
 type configuration = {
