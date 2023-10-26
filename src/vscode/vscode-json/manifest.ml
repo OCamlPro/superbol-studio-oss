@@ -217,7 +217,7 @@ type property = {
   prop_markdownDescription : string option ;
   prop_deprecationMessage : string option ;
 
-  prop_type : any; [@dft `String "string"] (* "array", "boolean", "number", "object", "string" *)
+  prop_type : any; (* "array", "boolean", "number", "object", "string" *)
   prop_default : any option ; (* from type *)
   prop_description : string option ;
 
