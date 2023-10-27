@@ -143,9 +143,11 @@ let contributes =
               ~description:
                 "If something is selected, only format the selection" ;
 
-            Manifest.PROPERTY.string "superbol.path"
-              ~default:"superbol-free"
-              ~description: "Path to the `superbol` command"
+            Manifest.PROPERTY.null_string "superbol.path"
+              ~default:None
+              ~description:
+               "Path to the external `superbol` command. \
+                If `null`, use the bundled `superbol-free`."
           ] )
     ~taskDefinitions: [
       Manifest.taskDefinition

@@ -12,5 +12,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val serverOptions: Vscode_languageclient.Executable.t
+val serverOptions:
+  Vscode.ExtensionContext.t ->
+  Vscode_languageclient.Executable.t
 val clientOptions: Vscode_languageclient.ClientOptions.t

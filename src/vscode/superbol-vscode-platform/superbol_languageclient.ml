@@ -14,15 +14,27 @@
 
 let config = Vscode.Workspace.getConfiguration ()
 
-let serverOptions =
-  let command =
-    match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
-    | Some o -> Ojs.string_of_js o
-    | None -> "superbol-free"
+let serverOptions extension =
+  let args = [ "lsp" ] in
+  let ojs = Vscode.WorkspaceConfiguration.get config ~section:"superbol.path" in
+  let cmd_opt =
+    match ojs with
+    | None -> None
+    | Some o when Ojs.is_null o -> None
+    | Some o -> Some (Ojs.string_of_js o)
   in
-  Vscode_languageclient.ServerOptions.create ()
-    ~command
-    ~args:["lsp"]
+  match cmd_opt with
+  | Some command ->
+    Vscode_languageclient.ServerOptions.create ()
+        ~command ~args
+  | None ->
+    let superbol_path =
+        Vscode.ExtensionContext.asAbsolutePath extension
+            ~relativePath:"_dist/superbol-free.bc.js"
+    in
+    Vscode_languageclient.ServerOptions.create ()
+      ~command:"node"
+      ~args:(superbol_path :: args)
 
 let clientOptions =
   Vscode_languageclient.ClientOptions.create ()
