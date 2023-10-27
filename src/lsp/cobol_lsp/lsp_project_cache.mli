@@ -33,7 +33,7 @@ include module type of TYPES
 
     Some notifications about the saving process may be pushed via
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
-    ({!Sys_error}, {!Failure}). *)
+    ([Sys_error], [Failure]). *)
 val save
   : config: TYPES.config
   -> Lsp_document.t URIMap.t
@@ -48,7 +48,7 @@ val save
 
     Some notifications about the loading process may be pushed via
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
-    ({!Sys_error}, {!Failure}). *)
+    ([Sys_error], [Failure]). *)
 val load
   : rootdir:Lsp_project.rootdir
   -> layout: Lsp_project.layout

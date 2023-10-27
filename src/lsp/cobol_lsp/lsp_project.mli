@@ -38,7 +38,7 @@ val for_: rootdir:rootdir -> layout:layout -> t
     the project.
 
     The same notes as for {!for_} apply, with the addition that
-    {!Invalid_argument} may is raised in case [dirname] is not the name of an
+    [Invalid_argument] is raised in case [dirname] is not the name of an
     existing directory.  *)
 val in_existing_dir: string -> layout:layout -> t
 

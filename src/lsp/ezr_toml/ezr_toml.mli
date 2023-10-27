@@ -73,7 +73,7 @@ val add_section_update: toml_handle -> string -> (name: string -> section) -> un
 
 (** [load ~verbose filename] load and returns a handle for the TOML file
     [filename].  Returns an empty TOML if [filename] does not exist.  Raises
-    {!Sys_error} if the file exists but is not readavble. *)
+    [Sys_error] if the file exists but is not readable. *)
 val load: ?verbose: bool -> string -> toml_handle
 
 (** [save ~verbose filename handle] triggers update hooks (that update the TOML

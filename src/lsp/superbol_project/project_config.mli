@@ -38,7 +38,7 @@ type t = config
 val new_default: unit -> t
 
 (** [load_file ~verbose config_filename] loads the given project configuration
-    file.  Raises {!ERROR} or {!Sys_error} in case of failure. *)
+    file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
 val load_file
   : ?verbose:bool
   -> string

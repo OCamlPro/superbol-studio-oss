@@ -32,19 +32,26 @@ When a user opens any file that contains COBOL source code, the LSP server looks
 Project configuration
 ---------------------
 
-The :file:`superbol.toml` at the root of a project is a `TOML`_ file that defines the following configuration fields for the project:
+The :file:`superbol.toml` at the root of a project is a `TOML`_ file with a :code:`[cobol]` secton that defines the following configuration fields for the project:
 
-* :code:`dialect`: Sets the dialect for your project.  Possible values are:
+* :code:`dialect`: Sets the dialect for your project.  Possible values are (matched case-insensitively):
 
   * :code:`"default"` (default if not provided)
-  * :code:`"COBOL85"`
-  * :code:`"GnuCOBOL"`
-  * :code:`"MicroFocus"` or :code:`"MF"`
-  * :code:`"ACU"`
-  * :code:`"GCOS"`
-  * :code:`"IBM"`
+  * :code:`"gnucobol"`
+  * :code:`"cobol85"`
+  * :code:`"cobol2002"`
+  * :code:`"cobol2014"`
+  * :code:`"acu"`
+  * :code:`"bs2000"`
+  * :code:`"gcos"`
+  * :code:`"ibm"`
+  * :code:`"microfocus"` or :code:`"mf"`
+  * :code:`"mvs"`
+  * :code:`"realia"`
+  * :code:`"rm"`
+  * :code:`"xopen"`
 
-* :code:`strict`: Whether to use the strict configuration for the dialect (default is :code:`false`)
+  Every dialect strings from :code:`"acu"` to :code:`"rm"` (included) may be suffixed with :code:`"-strict"` to indicate a strict configuration for the dialect should be used instead of a lax one.
 
 * :code:`source-format`: Select a specific COBOL source format. Possible values are:
 
@@ -64,6 +71,9 @@ The :file:`superbol.toml` at the root of a project is a `TOML`_ file that define
 
 Every value given as a string for a configuration field is case insensitive, except when it describes a file or directory name.
 
+.. note::
+
+   The :code:`superbol-free project init` command enables you to automatically create a :file:`superbol.toml` file with the default configuration.  You can append a directory argument to indicate where the file should be placed; otherwise, the file is created in the current working directory.
 
 Example configuration
 ^^^^^^^^^^^^^^^^^^^^^
@@ -92,14 +102,14 @@ Then you can provide the following configuration file:
 .. code-block:: toml
    :caption: :file:`superbol.toml`
 
+   [cobol]
    dialect = "GCOS"
-   strict = false
    source-format = "COBOLX"
 
-   [[copybook]]
+   [[cobol.copybook]]
    dir = "GLOBAL_COPYBOOKS"
 
-   [[copybook]]
+   [[cobol.copybook]]
    dir = "LOCAL_COPYBOOKS"
    file-relative = true
 

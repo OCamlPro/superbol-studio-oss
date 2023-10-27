@@ -42,7 +42,7 @@ type t = project
 
 (** [rootdir_at ~dirname] initializes a project into an existing directory.
 
-    Raises {!Invalid_argument} in case [dirname] is not the name of an existing
+    Raises [Invalid_argument] in case [dirname] is not the name of an existing
     directory. *)
 val rootdir_at: dirname:string -> rootdir
 
