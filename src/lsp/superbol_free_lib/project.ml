@@ -169,6 +169,66 @@ let contributes =
             ~description: "Add cobol file extensions"
         ]
     ]
+    ~problemPatterns:[
+      Manifest.problemPattern
+        (Some "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$")
+        ~name:"gnucobol"
+        ~file:1
+        ~line:2
+        ~severity:3
+        ~message:4
+        ~code:6;
+      Manifest.problemPattern
+        (Some "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$")
+        ~name:"gnucobol-warning"
+        ~file:1
+        ~line:2
+        ~message:4
+        ~code:6;
+      Manifest.problemPattern
+        (Some "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$")
+        ~name:"gnucobol-error"
+        ~file:1
+        ~line:2
+        ~message:4
+        ~code:6;
+      Manifest.problemPattern
+        (Some "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$")
+        ~name:"gnucobol-note"
+        ~file:1
+        ~line:2
+        ~message:4
+        ~code:6;
+    ]
+    ~problemMatchers:[
+      Manifest.problemMatcher ()
+        ~name:"gnucobol"
+        ~owner:"cobol"
+        ~fileLocation:["absolute"]
+        ~pattern:[Manifest.ProblemName "$gnucobol"]
+        ~source:"GnuCOBOL";
+      Manifest.problemMatcher ()
+        ~name:"gnucobol-warning"
+        ~owner:"cobol"
+        ~fileLocation:["absolute"]
+        ~pattern:[Manifest.ProblemName "$gnucobol-warning"]
+        ~severity:"warning"
+        ~source:"GnuCOBOL";
+      Manifest.problemMatcher ()
+        ~name:"gnucobol-error"
+        ~owner:"cobol"
+        ~fileLocation:["absolute"]
+        ~pattern:[Manifest.ProblemName "$gnucobol-error"]
+        ~severity:"error"
+        ~source:"GnuCOBOL";
+      Manifest.problemMatcher ()
+        ~name:"gnucobol-note"
+        ~owner:"cobol"
+        ~fileLocation:["absolute"]
+        ~pattern:[Manifest.ProblemName "$gnucobol-note"]
+        ~severity:"info"
+        ~source:"GnuCOBOL";
+    ]
 
 let manifest =
   Manifest.vscode
