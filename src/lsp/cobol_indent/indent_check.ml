@@ -48,6 +48,7 @@ open Indent_util
 type text = Cobol_preproc.Text.t
 
 let rec check_ident_div (text:text) (state:indent_state) (ifcheck:bool) =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -118,6 +119,7 @@ let rec check_ident_div (text:text) (state:indent_state) (ifcheck:bool) =
 (*************ENVIRONMENT DIVISION****************)
 (*TODO:Add check of clause in ENV DIVISION if need be*)
 and check_env_div (text:text)  (state:indent_state) (ifcheck:bool)  =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -184,6 +186,7 @@ and check_env_div (text:text)  (state:indent_state) (ifcheck:bool)  =
 (*************DATA DIVISION****************)
 (*TODO: Refine the check of clause of DATA DIVISION*)
 and check_data_div (text:text) (state:indent_state) ifcheck  =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -264,6 +267,7 @@ and check_data_div (text:text) (state:indent_state) ifcheck  =
         check_data_div wordlist {state with context; acc} false
 
 and check_data_div_entry clauses key (text:text) state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -319,6 +323,7 @@ and check_data_desc text state ifcheck =
 
 (*************PROCEDURE DIVISION****************)
 and check_proc_div_header (text:text) (state:indent_state) ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -360,6 +365,7 @@ and check_proc_div_header (text:text) (state:indent_state) ifcheck =
       check_proc_div_header wordlist {state with context; acc} false
 
 and check_proc_div (text:text) (state:indent_state) ifcheck   =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | {payload = TextWord "IDENTIFICATION"; _} :: {payload = TextWord "DIVISION"; _}
@@ -477,6 +483,7 @@ and check_proc_div (text:text) (state:indent_state) ifcheck   =
    	    call `check_statement`.
 *)
 and check_statement (text:text) state ifcheck  =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -627,6 +634,7 @@ and check_statement (text:text) state ifcheck  =
   however, there are too many duplicate code to write...
   we could do that if the finer analysis is needed.  *)
 and check_if_stmt (text:text) state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -660,6 +668,7 @@ and check_if_stmt (text:text) state ifcheck =
              when check the wordlist, check the `context` top, if there is a DUMMY token,
              call `check_statement`                                                            *)
 and check_raise_stmt (text:text) state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -675,6 +684,7 @@ and check_raise_stmt (text:text) state ifcheck =
         check_statement text state ifcheck
 
 and check_goback_stmt (text:text) state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -709,6 +719,7 @@ and check_goback_stmt (text:text) state ifcheck =
         check_statement text state ifcheck
 
 and check_use_stmt (text:text) state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -731,6 +742,7 @@ and check_use_stmt (text:text) state ifcheck =
 (*For alignment of arguments*)
 (*fst_arg: if is the first argument in the line*)
 and check_arguments (text:text) state ifcheck ~fst_arg =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
@@ -798,6 +810,7 @@ and check_divide_stmt text state ifcheck = check_add_stmt text state ifcheck
    the check_function will call itself again (possibly stay in its scope) (except `check_statement`)
    the handle_function handles one token and go directly to another scope *)
 and handle_open_scope keyword loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = imp_scope_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
@@ -812,6 +825,7 @@ and handle_open_scope keyword loc wordlist state ifcheck =
       check_fun keyword wordlist {state with scope = keyword; context; acc} false
 
 and handle_close_scope keyword loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = exp_scope_termination keyword state.context in
   match context with
   | (key, _) :: ((prev, offset) :: _ as context) when key = keyword ->
@@ -828,6 +842,7 @@ and handle_close_scope keyword loc wordlist state ifcheck =
   | _ ->  failwith @@ failure_msg loc
 
 and handle_if_then loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = imp_scope_termination state.context in
   match context with
   | (THEN, _):: (IF, _) :: context' ->
@@ -837,6 +852,7 @@ and handle_if_then loc wordlist state ifcheck =
       failwith @@ failure_msg loc
 
 and handle_else loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = exp_scope_termination THEN state.context in
   match context with
   | (THEN, _) :: ((IF, _) :: context' as context) ->
@@ -848,6 +864,7 @@ and handle_else loc wordlist state ifcheck =
 
 (*for alignment of argument*)
 and handle_operator keyword loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = phrase_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
@@ -868,6 +885,7 @@ and handle_giving loc wordlist state ifcheck =
   handle_operator GIVING loc wordlist state ifcheck
 
 and handle_by loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = phrase_termination_until USING state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
@@ -878,6 +896,7 @@ and handle_by loc wordlist state ifcheck =
 (*using-phrase is the only phrase that we treat more carefully
   using-phrase can contain by content/reference phrase.       *)
 and handle_using loc text state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = phrase_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
@@ -905,6 +924,7 @@ and check_using (text:text) state ifcheck =
 
 
 and handle_phrase keyword loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   match keyword with
   | TO -> handle_to loc wordlist state ifcheck
   | INTO -> handle_into loc wordlist state ifcheck
@@ -925,6 +945,7 @@ and handle_phrase keyword loc wordlist state ifcheck =
       | _ -> failwith @@ failure_msg loc
 
 and handle_inline_phrase loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = phrase_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
@@ -935,6 +956,7 @@ and handle_inline_phrase loc wordlist state ifcheck =
 
 
 and handle_conditional_statement loc keyword wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let help keyword rev_keyword keyword_associated =
     let context, acc = state.context, state.acc in
     let context = phrase_termination context in
@@ -990,6 +1012,7 @@ and handle_conditional_statement loc keyword wordlist state ifcheck =
 
 
 and handle_when loc wordlist state ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = phrase_termination state.context in
   match context with
   | (key, offset) :: _ when key = EVALUATE || key = SEARCH ->
@@ -1017,6 +1040,7 @@ and handle_when loc wordlist state ifcheck =
 
 
 and end_compilation_unit loc wordlist ({context; acc; _} as state) ifcheck =
+  let check_pos = check_pos state.src_format in
   let context = exp_scope_termination COMPILATION_UNIT context in
   let context =
     match context with
@@ -1030,6 +1054,7 @@ and end_compilation_unit loc wordlist ({context; acc; _} as state) ifcheck =
 (*Remark: if the COPY does not copy a complete paragraph/statement/data entry...,
           but a phrase/clause/identifier..., the check_copy_replace does not work *)
 and check_copy_replace (text:text) (state:indent_state) (ifcheck:bool)  =
+  let check_pos = check_pos state.src_format in
   let context, acc = state.context, state.acc in
   match text with
   | [] -> state
