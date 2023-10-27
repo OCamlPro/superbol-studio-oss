@@ -69,6 +69,12 @@ let provide_tasks ~token:_ =
       ~name:"Build file"
       ~source:"superbol"
       ~execution:(execution "cobc")
+      ~problemMatchers:[
+        "$gnucobol";
+        "$gnucobol-warning";
+        "$gnucobol-error";
+        "$gnucobol-note";
+      ]
   in
   let build_debug_task = Task.make ()
       ~definition:definition_debug
@@ -76,6 +82,12 @@ let provide_tasks ~token:_ =
       ~name:"Build file for debug"
       ~source:"superbol"
       ~execution:(execution "cobcd")
+      ~problemMatchers:[
+        "$gnucobol";
+        "$gnucobol-warning";
+        "$gnucobol-error";
+        "$gnucobol-note";
+      ]
   in
   `Value (Some [build_task; build_debug_task])
 
