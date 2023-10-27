@@ -14,6 +14,12 @@
 open Lsp.Types
 open Lsp_testing
 
+let make_free_format_project () =
+  make_lsp_project () ~toml:{toml|
+    [cobol]
+    source-format = "free"
+  |toml}
+
 let doc = {cobol|
        PROGRAM-ID. HELLO.
        PROCEDURE DIVISION.
@@ -23,7 +29,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "simple-formatting-request" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -57,7 +63,7 @@ let doc = {cobol|
         move 1 to x.  |cobol};;
 
 let%expect_test "formatting-request-nested-if" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -98,7 +104,7 @@ let doc = {cobol|
         value 999.              |cobol};;
 
 let%expect_test "formatting-request-data" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -170,7 +176,7 @@ let doc = {cobol|
         |cobol};;
 
 let%expect_test "formatting-request-nested-program" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -227,7 +233,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-alignment-argument" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -258,7 +264,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-else-if" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -375,7 +381,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-whole-program" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -500,7 +506,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-on-exception" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -534,7 +540,7 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-perform" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in

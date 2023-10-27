@@ -21,7 +21,7 @@
           "description": "If something is selected, only format the selection"
         },
         "superbol.path": {
-          "default": "",
+          "default": "superbol-free",
           "description": "Path to the `superbol` command"
         }
       }
@@ -74,6 +74,74 @@
         ]
       }
     ],
+    "problemMatchers": [
+      {
+        "name": "gnucobol",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol",
+        "source": "GnuCOBOL"
+      },
+      {
+        "name": "gnucobol-warning",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-warning",
+        "source": "GnuCOBOL",
+        "severity": "warning"
+      },
+      {
+        "name": "gnucobol-error",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-error",
+        "source": "GnuCOBOL",
+        "severity": "error"
+      },
+      {
+        "name": "gnucobol-note",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-note",
+        "source": "GnuCOBOL",
+        "severity": "info"
+      }
+    ],
+    "problemPatterns": [
+      {
+        "name": "gnucobol",
+        "regexp": "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "severity": 3,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-warning",
+        "regexp": "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-error",
+        "regexp": "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-note",
+        "regexp": "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      }
+    ],
     "taskDefinitions": [
       {
         "type": "superbol",
@@ -83,7 +151,32 @@
             "description": "The list of copybooks paths"
           },
           "sourceFormat": {
-            "description": "The source format of the code"
+            "description": "The source format of the code",
+            "items": "string",
+            "enum": [
+              "default",
+              "gnucobol",
+              "cobol85",
+              "cobol2002",
+              "cobol2014",
+              "acu",
+              "acu-strict",
+              "bs2000",
+              "bs2000-strict",
+              "gcos",
+              "gcos-strict",
+              "ibm",
+              "ibm-strict",
+              "mf",
+              "mf-strict",
+              "mvs",
+              "mvs-strict",
+              "realia",
+              "realia-strict",
+              "rm",
+              "rm-strict",
+              "xopen"
+            ]
           },
           "dialect": {
             "description": "The COBOL dialect used"

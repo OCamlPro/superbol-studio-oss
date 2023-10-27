@@ -17,11 +17,15 @@ open Cobol_indent
 
 open Common_args
 
-let action { preproc_options = { source_format; _ } ; _ } ~indent_config
-    files =
+let action { preproc_options = { source_format; config; _ } ; _ }
+    ~indent_config files =
+  let module Config = (val config) in
   List.to_seq files
   |> Seq.map (fun file ->
-      indent_file ~source_format ~file ~indent_config)
+    let contents = Ez_file.V1.EzFile.read_file file in
+    indent_range
+      ~source_format ~filename:file ~contents ~indent_config ~range:None
+      ~dialect:Config.dialect |> Fmt.pr "%s")
 
 let cmd =
   let files = ref [] in
