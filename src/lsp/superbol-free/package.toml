@@ -72,5 +72,6 @@ superbol_free_lib = "version"
 #  static-clibs = "unix" 
 [fields]
 dune-flags = "(:standard (:include linking.sexp))"
+dune-stanzas = "(modes exe js)"
 static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs"
 static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"
