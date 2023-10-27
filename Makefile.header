@@ -1,6 +1,15 @@
 # -*- Makefile -*-
-PROJECT=superbol_vscode_platform
-SRCDIR=src/vscode/superbol-vscode-platform
+# Source directory for the LanguageClient
+CLIENT_PROJECT=superbol_vscode_platform
+CLIENT_SRCDIR=src/vscode/superbol-vscode-platform
+
+# Source directory for the LanguageServer
+SERVER_SRCDIR ?= src/lsp/superbol-free
+SERVER_PROJECT ?= superbol-free
+
+# Dune, through opam
+DUNE ?= opam exec -- dune
+
 CP ?= cp -f
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
@@ -15,35 +24,59 @@ superbol-free: build
 	diff -u package.json.prev package.json && rm -f package.json.prev 
 
 .PHONY: build-debug yarn-debug
+.PHONY: phony
 
-build-debug:
-	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
+phony:
+
+_out/$(SERVER_PROJECT).bc.js: phony
+	$(DUNE) build $(SERVER_SRCDIR)/main.bc.js --profile=release
 	mkdir -p _out
-	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	$(CP) _build/default/$(SERVER_SRCDIR)/main.bc.js _out/$(SERVER_PROJECT).bc.js
+
+_out/$(CLIENT_PROJECT).bc.js: phony
+	$(DUNE) build $(CLIENT_SRCDIR)/$(CLIENT_PROJECT).bc.js --profile=release
+	mkdir -p _out
+	$(CP) _build/default/$(CLIENT_SRCDIR)/$(CLIENT_PROJECT).bc.js _out/
+
+build-debug: _out/$(CLIENT_PROJECT).bc.js _out/$(SERVER_PROJECT).bc.js
 	$(MAKE) yarn-debug
 
 # Use 'make build-debug' before to copy the JS file in _out/
 yarn-debug:
-	yarn esbuild _out/$(PROJECT).bc.js \
+	yarn esbuild _out/$(CLIENT_PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
                 --platform=node \
                 --target=es6 \
                 --sourcemap
-# the last command generated _dist/$(PROJECT).bs.js
+	yarn esbuild _out/$(SERVER_PROJECT).bc.js \
+                --bundle \
+                --external:vscode \
+                --outdir=_dist \
+                --platform=node \
+                --target=es6 \
+                --sourcemap
+# the last command generated _dist/$(CLIENT_PROJECT).bs.js
 
 .PHONY: build-release yarn-release
 
-build-release:
-	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
-	mkdir -p _out
-	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+build-release: _out/$(CLIENT_PROJECT).bc.js
 	$(MAKE) yarn-release
 
 # Use 'make build-release' before to copy the JS file in _out/
 yarn-release:
-	yarn esbuild _out/$(PROJECT).bc.js \
+	yarn esbuild _out/$(CLIENT_PROJECT).bc.js \
+                --bundle \
+                --external:vscode \
+                --outdir=_dist \
+                --platform=node \
+                --target=es6 \
+                --minify-whitespace \
+                --minify-syntax \
+                --sourcemap \
+                --sources-content=false
+	yarn esbuild _out/$(SERVER_PROJECT).bc.js \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \

@@ -188,11 +188,13 @@ let activate (extension : Vscode.ExtensionContext.t) =
 
   Vscode.ExtensionContext.subscribe extension ~disposable:task;
 
+  let serverOptions = Superbol_languageclient.serverOptions extension in
+
   client :=
     Some (Vscode_languageclient.LanguageClient.make
             ~id:"cobolServer"
             ~name:"Cobol Server"
-            ~serverOptions:Superbol_languageclient.serverOptions
+            ~serverOptions
             ~clientOptions:Superbol_languageclient.clientOptions
             ());
   match !client with
@@ -209,4 +211,3 @@ let deactivate () =
 let () =
   Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
   Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
-

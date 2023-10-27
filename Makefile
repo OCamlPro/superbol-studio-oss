@@ -19,7 +19,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build @install
+	$(DUNE) build @install
 	./scripts/copy-bin.sh superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_preproc cobol_data cobol_typeck superbol_testutils ez_toml
 	./scripts/after.sh build
 
@@ -43,7 +43,7 @@ sphinx: doc-common
 odoc: doc-common
 	mkdir -p ${ODOC_TARGET}
 	./scripts/before.sh odoc ${ODOC_TARGET}
-	opam exec -- dune build @doc
+	$(DUNE) build @doc
 	rsync -auv --delete _build/default/_doc/_html/. ${ODOC_TARGET}
 	./scripts/after.sh odoc ${ODOC_TARGET}
 
@@ -53,10 +53,10 @@ view:
 	xdg-open file://$$(pwd)/_drom/docs/index.html
 
 fmt:
-	opam exec -- dune build @fmt --auto-promote
+	$(DUNE) build @fmt --auto-promote
 
 fmt-check:
-	opam exec -- dune build @fmt
+	$(DUNE) build @fmt
 
 install:
 	opam pin -y --no-action -k path .
@@ -73,7 +73,7 @@ dev-deps:
 
 test:
 	./scripts/before.sh test
-	opam exec -- dune build @runtest
+	$(DUNE) build @runtest
 	./scripts/after.sh test
 
 clean:
