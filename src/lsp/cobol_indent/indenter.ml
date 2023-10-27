@@ -27,14 +27,21 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
     let str = List.nth strl (lnum - 1) in
     let newstr =
       match source_format with
-      | Cobol_config.SF SFFree ->
+      | Cobol_preproc.Src_format.SF (NoIndic, FreePaging) ->
         if offset > 0 then
           let space = String.make offset ' ' in
           space^str
         else
           String.sub str (-offset) (String.length str + offset)
-      (*TODO: must change if Auto <> SF SFFixed once*)
-      | SF SFFixed | Auto ->
+      | SF (FixedIndic, FixedWidth _) ->
+        (* Indenting temporarily disabled in fixed format
+           https://github.com/OCamlPro/superbol-studio-oss/issues/52
+
+           Support must be improved before enabling again, in particular to
+           avoid pushing content into the margin.
+           https://github.com/OCamlPro/superbol-studio-oss/issues/45
+          *)
+        if true then str else
         let len = String.length str in
         let str1 = String.sub str 0 7 in
         let str = String.sub str 7 (len-7) in
@@ -46,8 +53,11 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
             String.sub str (-offset) (String.length str + offset)
           in
         str1^str
-      (*TODO*)
-      | _ -> str
+      (* TODO *)
+      | SF (XOpenIndic, FixedWidth _) -> str
+      | SF (CRTIndic, FixedWidth _) -> str
+      | SF (TrmIndic, FixedWidth _) -> str
+      | SF (CBLXIndic, FixedWidth _) -> str
     in
     List.mapi (fun i str -> if i = lnum - 1 then newstr else str) (strl)
   in
@@ -63,16 +73,27 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
 
 (*indent a range of file, with the default indent_config*)
 let indent_range ~dialect ~source_format ~range ~filename ~contents =
+  (* Note: this value doesn't actually matter, it will be overriden
+      immediately by [fold_source_lines] calling [on_initial_source_format]
+      below. *)
+  let src_format = Cobol_preproc.Src_format.from_config SFFixed in
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
+      ~on_initial_source_format:(fun src_format st -> { st with src_format })
+      ~on_compiler_directive:(fun _ { payload = cd;  _} st ->
+        match cd with
+        | CDirSource { payload = src_format; _ } -> { st with src_format }
+        | _ -> st
+      )
       ~skip_compiler_directives_text:true
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
       (String { filename; contents })
-      { scope = BEGIN; context  = []; acc = []; range }
+      { src_format; scope = BEGIN; context  = []; acc = []; range }
   in
   (* NB: note here we ignore diagnostics *)
   let ind_recds = state.result.acc in
-  indenter ~source_format contents ind_recds state.result.range
+  indenter
+    ~source_format:state.result.src_format contents ind_recds state.result.range
 
 (*indent a range of file, with the user-defined indent_config*)
 let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =

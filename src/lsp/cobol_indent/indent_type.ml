@@ -154,6 +154,7 @@ type context = (context_kind * int) list
 
 type indent_state =
     {
+      src_format: Cobol_preproc.Src_format.any;
       scope: context_kind; (*indicate where the current code is*)
       context: context;    (*the stack of (context_kind, offset)*)
       acc: indent_record list;
