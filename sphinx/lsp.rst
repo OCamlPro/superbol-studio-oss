@@ -34,7 +34,7 @@ Project configuration
 
 The :file:`superbol.toml` at the root of a project is a `TOML`_ file with a :code:`[cobol]` secton that defines the following configuration fields for the project:
 
-* :code:`dialect`: Sets the dialect for your project.  Possible values are (matched case-insensitively):
+* :code:`dialect`: Sets the dialect for your project.  Case insensitive. Possible values are:
 
   * :code:`"default"` (default if not provided)
   * :code:`"gnucobol"`
