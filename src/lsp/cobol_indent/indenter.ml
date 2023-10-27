@@ -62,7 +62,7 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
   String.concat "\n" strl
 
 (*indent a range of file, with the default indent_config*)
-let indent_range' ~dialect ~source_format ~range ~filename ~contents =
+let indent_range ~dialect ~source_format ~range ~filename ~contents =
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
       ~skip_compiler_directives_text:true
@@ -75,9 +75,9 @@ let indent_range' ~dialect ~source_format ~range ~filename ~contents =
   indenter ~source_format contents ind_recds state.result.range
 
 (*indent a range of file, with the user-defined indent_config*)
-let indent_range' ~dialect ~source_format ~indent_config ~range ~filename ~contents =
+let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =
   begin match indent_config with
     | Some indent_config -> Indent_config.set_config ~indent_config
     | None -> ()
   end;
-  indent_range' ~dialect ~source_format ~range ~filename ~contents
+  indent_range ~dialect ~source_format ~range ~filename ~contents

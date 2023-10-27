@@ -178,7 +178,7 @@ let handle_range_formatting registry params =
     }
   in
   let newText =
-    Cobol_indent.indent_range'
+    Cobol_indent.indent_range
       ~dialect:(Cobol_config.dialect project.cobol_config)
       ~source_format:project.source_format
       ~indent_config:None
@@ -203,7 +203,7 @@ let handle_formatting registry params =
   in
   try
     let newText =
-      Cobol_indent.indent_range'
+      Cobol_indent.indent_range
         ~dialect:(Cobol_config.dialect project.cobol_config)
         ~source_format:project.source_format
         ~indent_config:None

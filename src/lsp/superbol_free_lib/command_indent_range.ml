@@ -20,8 +20,9 @@ open Common_args
 let action { preproc_options = { source_format; config; _ }; _ } ~file ~range
     ~indent_config =
   let module Config = (val config) in
-  indent_range ~source_format ~file ~range ~indent_config
-    ~dialect:Config.dialect
+  let contents = Ez_file.V1.EzFile.read_file file in
+  indent_range ~source_format ~filename:file ~contents ~range ~indent_config
+    ~dialect:Config.dialect |> Fmt.pr "%s"
 
 let cmd =
   let file = ref "" in
