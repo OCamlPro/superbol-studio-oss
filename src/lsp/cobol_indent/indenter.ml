@@ -73,14 +73,10 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
 
 (*indent a range of file, with the default indent_config*)
 let indent_range ~dialect ~source_format ~range ~filename ~contents =
-  let src_format =
-    (* Note: this value doesn't actually matter, it will be overriden
-       immediately by [fold_source_lines] calling [on_initial_source_format]
-       below. *)
-    match source_format with
-    | Cobol_config.Auto -> Cobol_preproc.Src_format.from_config SFFixed
-    | SF source_format -> Cobol_preproc.Src_format.from_config source_format
-  in
+  (* Note: this value doesn't actually matter, it will be overriden
+      immediately by [fold_source_lines] calling [on_initial_source_format]
+      below. *)
+  let src_format = Cobol_preproc.Src_format.from_config SFFixed in
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
       ~on_initial_source_format:(fun src_format st -> { st with src_format })

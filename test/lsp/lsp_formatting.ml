@@ -23,7 +23,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "simple-formatting-request" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -58,7 +60,9 @@ let doc = {cobol|
         move 1 to x.  |cobol};;
 
 let%expect_test "formatting-request-nested-if" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -100,7 +104,9 @@ let doc = {cobol|
         value 999.              |cobol};;
 
 let%expect_test "formatting-request-data" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -173,7 +179,9 @@ let doc = {cobol|
         |cobol};;
 
 let%expect_test "formatting-request-nested-program" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -231,7 +239,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-alignment-argument" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -263,7 +273,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-else-if" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -381,7 +393,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-whole-program" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -400,9 +414,6 @@ let%expect_test "formatting-request-whole-program" =
       implementation
     data_sections_visitor.ml:0:
       (Cobol_ptree__Data_sections_visitor.fold_file_section): missing visitor
-      implementation
-    data_sections_visitor.ml:0:
-      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
       implementation
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             IDENTIFICATION DIVISION.
@@ -507,7 +518,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-on-exception" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
@@ -542,7 +555,9 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-perform" =
-  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let { projdir; end_with_postproc }, server =
+    make_lsp_project ~toml:"source-format = \"free\"\n" ()
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
