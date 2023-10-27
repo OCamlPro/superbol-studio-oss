@@ -1,0 +1,7 @@
+dune             linguist-generated
+linking_flags.sh linguist-generated
+/.drom           linguist-generated
+/Makefile        linguist-generated
+/dune-project    linguist-generated
+/sphinx/conf.py  linguist-generated
+/package.json    linguist-generated
