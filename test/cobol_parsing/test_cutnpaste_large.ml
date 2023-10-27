@@ -28,8 +28,7 @@ let check_new_ptree i n ~ptree0 ptree' diags =
   else Test_appending.show_ptree i n ptree' diags
 
 let%expect_test "cut-n-paste-mf" =
-  let config =
-    Testsuite_utils.from_dialect ~strict:true Cobol_config.DIALECT.MicroFocus in
+  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
   deep_iter mf_root ~glob:"DayDiffDriver.[cC][bB][lL]" (* <- pick large-ish file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in

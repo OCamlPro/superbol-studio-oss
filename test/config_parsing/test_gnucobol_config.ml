@@ -27,7 +27,7 @@ module Parsed_conf =
 
 module MF_conf =
   (val (Cobol_common.Diagnostics.show_n_forget @@
-        Cobol_config.(from_dialect ~search_path ~strict:true MicroFocus)))
+        Cobol_config.(from_dialect ~search_path DIALECT.mf_strict)))
 
 let both_diff s1 s2 =
   StringSet.union

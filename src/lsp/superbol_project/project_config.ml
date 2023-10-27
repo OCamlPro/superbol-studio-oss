@@ -111,8 +111,8 @@ let config_repr config ~name =
 
 let config_section_name = "cobol"
 
-let config_from_dialect_name ?(strict = false) dialect_name =
-  try Cobol_config.(from_dialect ~strict @@ DIALECT.of_string dialect_name) with
+let config_from_dialect_name dialect_name =
+  try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
   | Cobol_config.ERROR e ->

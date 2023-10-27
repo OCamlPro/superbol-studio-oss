@@ -46,6 +46,6 @@ let ibm_root = srcdir // ibm_testsuite
 let mf_testsuite = testsuites // "microfocus" // "www.csis.ul.ie"
 let mf_root = srcdir // mf_testsuite
 
-let from_dialect ~strict dialect =
+let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget @@
-  Cobol_config.from_dialect ~strict dialect
+  Cobol_config.from_dialect dialect

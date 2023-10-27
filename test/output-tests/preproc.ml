@@ -26,7 +26,7 @@ let preprocess_file ~source_format ~config filename =
 let () =
   (* Print one token per line so we can diff outputs more easily. *)
   Pretty.pp_set_margin std_formatter 3;
-  let config = from_dialect ~strict:true Cobol_config.DIALECT.MicroFocus in
+  let config = from_dialect Cobol_config.DIALECT.mf_strict in
   deep_iter mf_root ~glob:"*.[cC][bB][lL]"
     ~f:begin fun path ->
       printf "@[<1>Pre-processing `%s':@\n" @@ mf_testsuite // path;

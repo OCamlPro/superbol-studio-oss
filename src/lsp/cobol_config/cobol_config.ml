@@ -233,16 +233,11 @@ let from_file ?search_path file =
   let module Config =
     From_file.Make (Diags) (struct
       let config =
-        let name =
-          match StringMap.find "name" options with
-          | Conf_ast.String s -> s
-          | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v))
-        and strict =                                         (* NB: ugly hack *)
-          EzString.ends_with ~suffix:"-strict.conf" file
-        in
-        { name; strict }
+        { name = match StringMap.find "name" options with
+              | Conf_ast.String s -> s
+              | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v)) }
       let dialect =
-        try DIALECT.of_name config.name
+        try DIALECT.of_gnucobol_config_name config.name
         with Invalid_argument _ ->
           raise @@ ERROR (Unknown_dialect config.name)
       let options = options
@@ -254,29 +249,17 @@ let from_file ?search_path file =
   in
   DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
 
-let from_dialect ?search_path ~strict d =
+let from_dialect ?search_path d =
   let search_path = retrieve_search_path ?search_path () in
-  let config_filename ~strict conf =
-    Pretty.to_string "%s%s.conf" conf (if strict then "-strict" else "")
+  let config_filename dialect =
+    Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
   in
-  let load_gnucobol_conf ~strict conf =
+  let load_gnucobol_conf conf =
     from_file ~search_path @@
-    find_file ~search_path (config_filename ~strict conf)
+    find_file ~search_path (config_filename conf)
   in
   match d with
   | DIALECT.Default -> DIAGS.result (module Default: T)
-  | GnuCOBOL        -> load_gnucobol_conf ~strict:false "default"
-  | COBOL85         -> load_gnucobol_conf ~strict:false "cobol85"
-  | COBOL2002       -> load_gnucobol_conf ~strict:false "COBOL2002"
-  | COBOL2014       -> load_gnucobol_conf ~strict:false "COBOL2014"
-  | ACU             -> load_gnucobol_conf ~strict       "acu"
-  | BS2000          -> load_gnucobol_conf ~strict       "bs2000"
-  | GCOS            -> load_gnucobol_conf ~strict       "gcos"
-  | IBM             -> load_gnucobol_conf ~strict       "ibm"
-  | MicroFocus      -> load_gnucobol_conf ~strict       "mf"
-  | MVS             -> load_gnucobol_conf ~strict       "mvs"
-  | Realia          -> load_gnucobol_conf ~strict       "realia"
-  | RM              -> load_gnucobol_conf ~strict       "rm"
-  | XOpen           -> load_gnucobol_conf ~strict       "xopen"
+  | d               -> load_gnucobol_conf d
 
 let dialect (module C: T) = C.dialect

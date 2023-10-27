@@ -53,8 +53,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 let get () =
   let conf = ref "" in
   let dialect = ref None in
-  let strict = ref false in
-  let format = ref Cobol_config.Auto in                   (* Fixed by default *)
+  let format = ref Cobol_config.Auto in
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
                  "cobol85"; "COBOL85";
@@ -83,9 +82,6 @@ let get () =
        fun d -> dialect := Some (Cobol_config.DIALECT.of_string d)),
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
-
-    ["strict"], Arg.Set strict,
-    EZCMD.info "Use the strict configuration";
 
     ["source-format"],
     Arg.Symbol (formats, fun f ->
@@ -121,7 +117,7 @@ let get () =
       | "", None ->
           DIAGS.result Cobol_config.default
       | "", Some d ->
-          Cobol_config.from_dialect ~strict:!strict d
+          Cobol_config.from_dialect d
       | s, None ->
           Cobol_config.from_file s
       | _ ->

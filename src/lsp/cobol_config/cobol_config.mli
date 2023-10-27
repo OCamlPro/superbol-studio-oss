@@ -45,12 +45,11 @@ val from_file
   -> string
   -> (module T) Cobol_common.Diagnostics.with_diags
 
-(** [from_dialect ~search_path ~strict dialect] returns the configuration module
+(** [from_dialect ~search_path dialect] returns the configuration module
     according to the dialect defaults.  The caveat about {!default_search_path}
     given for {!from_file} applies here as well. *)
 val from_dialect
   : ?search_path: string list
-  -> strict: bool
   -> Types.DIALECT.t
   -> (module T) Cobol_common.Diagnostics.with_diags
 

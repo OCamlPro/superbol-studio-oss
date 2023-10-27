@@ -30,8 +30,7 @@ let%expect_test "line-by-line-incremental-mf" =
   (* 3142 ./ReportWriter/RepWriteA.cbl *)
   (* 3087 ./Strings/UnstringFileEg.cbl *)
   (* 2413 ./SubProg/DateValid/ValiDate.cbl *)
-  let config =
-    Testsuite_utils.from_dialect ~strict:true Cobol_config.DIALECT.MicroFocus in
+  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
   deep_iter mf_root ~glob:"RepWriteSumm.[cC][bB][lL]" (* <- pick largest file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in
