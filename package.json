@@ -74,6 +74,74 @@
         ]
       }
     ],
+    "problemMatchers": [
+      {
+        "name": "gnucobol",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol",
+        "source": "GnuCOBOL"
+      },
+      {
+        "name": "gnucobol-warning",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-warning",
+        "source": "GnuCOBOL",
+        "severity": "warning"
+      },
+      {
+        "name": "gnucobol-error",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-error",
+        "source": "GnuCOBOL",
+        "severity": "error"
+      },
+      {
+        "name": "gnucobol-note",
+        "owner": "cobol",
+        "fileLocation": "absolute",
+        "pattern": "$gnucobol-note",
+        "source": "GnuCOBOL",
+        "severity": "info"
+      }
+    ],
+    "problemPatterns": [
+      {
+        "name": "gnucobol",
+        "regexp": "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "severity": 3,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-warning",
+        "regexp": "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-error",
+        "regexp": "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      },
+      {
+        "name": "gnucobol-note",
+        "regexp": "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$",
+        "file": 1,
+        "line": 2,
+        "code": 6,
+        "message": 4
+      }
+    ],
     "taskDefinitions": [
       {
         "type": "superbol",
