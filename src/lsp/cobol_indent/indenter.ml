@@ -20,13 +20,13 @@ open Indent_type
   range: range of file to indent
   result: the Cobol code correctly indented (string)
 *)
-let indenter ~source_format (str:string) (rdl:indent_record list) range =
-  let do_one_record (strl:string list) (rd:indent_record) =
+let indenter (str:string) (rdl:indent_record list) range =
+  let do_one_record (strl:string array) (rd:indent_record) =
     let lnum = rd.lnum in
     let offset = rd.offset_modif - rd.offset_orig in
-    let str = List.nth strl (lnum - 1) in
+    let str = strl.(lnum - 1) in
     let newstr =
-      match source_format with
+      match rd.src_format with
       | Cobol_preproc.Src_format.SF (NoIndic, FreePaging) ->
         if offset > 0 then
           let space = String.make offset ' ' in
@@ -59,10 +59,11 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
       | SF (TrmIndic, FixedWidth _) -> str
       | SF (CBLXIndic, FixedWidth _) -> str
     in
-    List.mapi (fun i str -> if i = lnum - 1 then newstr else str) (strl)
+    strl.(lnum - 1) <- newstr
   in
-  let strl = String.split_on_char '\n' str in
-  let strl = List.fold_left (fun acc rd -> do_one_record acc rd) strl rdl in
+  let strl = String.split_on_char '\n' str |> Array.of_list in
+  List.iter (fun rd -> do_one_record strl rd) rdl;
+  let strl = Array.to_list strl in
   let strl =
     match range with
     | None -> strl
@@ -73,10 +74,12 @@ let indenter ~source_format (str:string) (rdl:indent_record list) range =
 
 (*indent a range of file, with the default indent_config*)
 let indent_range ~dialect ~source_format ~range ~filename ~contents =
-  (* Note: this value doesn't actually matter, it will be overriden
-      immediately by [fold_source_lines] calling [on_initial_source_format]
-      below. *)
-  let src_format = Cobol_preproc.Src_format.from_config SFFixed in
+  let src_format =
+    (* Note: this value doesn't actually matter, it will be overriden
+       immediately by [fold_source_lines] calling [on_initial_source_format]
+       below. *)
+    Cobol_preproc.Src_format.from_config SFFixed
+  in
   let state =
     Cobol_preproc.fold_source_lines ~dialect ~source_format
       ~on_initial_source_format:(fun src_format st -> { st with src_format })
@@ -91,9 +94,7 @@ let indent_range ~dialect ~source_format ~range ~filename ~contents =
       { src_format; scope = BEGIN; context  = []; acc = []; range }
   in
   (* NB: note here we ignore diagnostics *)
-  let ind_recds = state.result.acc in
-  indenter
-    ~source_format:state.result.src_format contents ind_recds state.result.range
+  indenter contents state.result.acc state.result.range
 
 (*indent a range of file, with the user-defined indent_config*)
 let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =

@@ -16,7 +16,13 @@ open Cobol_common.Srcloc
 open Indent_type
 open Indent_keywords
 
-let check_pos (pos:Lexing.position) (offset:int) (ind_recds:indent_record list) ~print_errors=
+let check_pos
+  (src_format : Cobol_preproc.Src_format.any)
+  (pos:Lexing.position)
+  (offset:int)
+  (ind_recds:indent_record list)
+  ~print_errors
+=
   let real_offset = pos.pos_cnum - pos.pos_bol in
   if real_offset <> offset then
     begin
@@ -28,7 +34,8 @@ let check_pos (pos:Lexing.position) (offset:int) (ind_recds:indent_record list) 
       end;
     {lnum = pos.pos_lnum;
      offset_orig = real_offset;
-     offset_modif = offset }
+     offset_modif = offset;
+     src_format }
     :: ind_recds
     end
   else
@@ -37,12 +44,12 @@ let check_pos (pos:Lexing.position) (offset:int) (ind_recds:indent_record list) 
 (* print_errors for debug *)
 let check_pos = check_pos ~print_errors:false
 
-let check_pos srcloc offset ind_recds ifcheck =
-  if ifcheck
-  then
+let check_pos src_format srcloc offset ind_recds ifcheck =
+  match src_format with
+  | Cobol_preproc.Src_format.SF (NoIndic, FreePaging) when ifcheck ->
     let pos = start_pos srcloc in
-    check_pos pos offset ind_recds
-  else ind_recds
+    check_pos src_format pos offset ind_recds
+  | _ -> ind_recds
 
 let failure_msg loc =
   let pos = start_pos loc in

@@ -13,7 +13,13 @@
 
 open Indent_type
 
-val check_pos: Cobol_common.Srcloc.srcloc -> int -> indent_record list -> bool -> indent_record list
+val check_pos:
+  Cobol_preproc.Src_format.any ->
+  Cobol_common.Srcloc.srcloc ->
+  int ->
+  indent_record list ->
+  bool ->
+  indent_record list
 
 val failure_msg: Cobol_common.Srcloc.srcloc -> string
 
