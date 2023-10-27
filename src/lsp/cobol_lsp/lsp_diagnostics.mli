@@ -36,8 +36,8 @@ val publish
   : diagnostics
   -> unit
 
-(* val as_notification *)
-(*   : ?log:bool -> Cobol_common.Diagnostics.t -> Lsp.Server_notification.t *)
+val as_notification
+  : ?log:bool -> Cobol_common.Diagnostics.t -> Lsp.Server_notification.t
 
-(* val as_notifications *)
-(*   : ?log:bool -> Cobol_common.Diagnostics.Set.t -> Lsp.Server_notification.t list *)
+val as_notifications
+  : ?log:bool -> Cobol_common.Diagnostics.Set.t -> Lsp.Server_notification.t list

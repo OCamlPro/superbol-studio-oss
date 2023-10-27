@@ -51,7 +51,7 @@ The :file:`superbol.toml` at the root of a project is a `TOML`_ file with a :cod
   * :code:`"rm"`
   * :code:`"xopen"`
 
-  Every dialect strings from :code:`"acu"` to :code:`"rm"` (included) may be suffixed with :code:`"-strict"` to indicate a strict configuration for the dialect should be used instead of a lax one.
+  Every dialect strings from :code:`"acu"` to :code:`"rm"` (included) may be suffixed with :code:`"-strict"` to indicate a *strict* configuration for the dialect should be used: such a configuration restricts the set of reserved words and disables GnuCOBOL extensions to match the language expected by other compilers for the dialect.
 
 * :code:`source-format`: Select a specific COBOL source format. Possible values are:
 

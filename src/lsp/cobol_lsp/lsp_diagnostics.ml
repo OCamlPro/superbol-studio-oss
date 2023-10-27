@@ -72,20 +72,23 @@ let publish diagnostics : unit =
 
 (* --- *)
 
-(* let as_notification ?(log = false) diag = *)
-(*   let type_ = match DIAG.severity diag with *)
-(*     | Hint | Note -> Lsp.Types.MessageType.Log *)
-(*     | Info -> Info *)
-(*     | Warn -> Warning *)
-(*     | Error -> Error *)
-(*   in *)
-(*   let message = Pretty.(to_string "%t%a" blast_margin DIAG.pp_msg diag) in *)
-(*   if log then *)
-(*     let params = Lsp.Types.LogMessageParams.create ~message ~type_ in *)
-(*     Lsp.Server_notification.LogMessage params *)
-(*   else *)
-(*     let params = Lsp.Types.ShowMessageParams.create ~message ~type_ in *)
-(*     Lsp.Server_notification.ShowMessage params *)
+(* NB: The following functions are currently not used anywhere, but the LSP
+   could actually send more notificatons in the future. *)
 
-(* let as_notifications ?log diags = *)
-(*   DIAG.Set.fold (fun diag -> List.cons (as_notification ?log diag)) diags [] *)
+let as_notification ?(log = false) diag =
+  let type_ = match DIAG.severity diag with
+    | Hint | Note -> Lsp.Types.MessageType.Log
+    | Info -> Info
+    | Warn -> Warning
+    | Error -> Error
+  in
+  let message = Pretty.(to_string "%t%a" blast_margin DIAG.pp_msg diag) in
+  if log then
+    let params = Lsp.Types.LogMessageParams.create ~message ~type_ in
+    Lsp.Server_notification.LogMessage params
+  else
+    let params = Lsp.Types.ShowMessageParams.create ~message ~type_ in
+    Lsp.Server_notification.ShowMessage params
+
+let as_notifications ?log diags =
+  DIAG.Set.fold (fun diag -> List.cons (as_notification ?log diag)) diags []
