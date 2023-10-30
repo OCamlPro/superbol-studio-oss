@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (f25f915
-) (2023/10/27 13:50) documentation</title>
+ (0878ae3
+) (2023/10/30 08:38) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (f25f915
+ (0878ae3
 )
               </div>
 <div role="search">
@@ -64,6 +64,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-json-vscode">main.exe json vscode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-lsp">main.exe lsp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-pp">main.exe pp</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-project-config">main.exe project config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-project-init">main.exe project init</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-snapshot">main.exe snapshot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch">main.exe switch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-add">main.exe switch add</a></li>
@@ -129,6 +131,12 @@
 
 <span class="n">pp</span>
   <span class="nc">Preprocess</span> <span class="n">a</span> <span class="kt">list</span> <span class="k">of</span> <span class="nc">COBOL</span> <span class="n">files</span><span class="o">,</span> <span class="n">generating</span> <span class="n">a</span> <span class="n">preprocessed</span> <span class="n">file</span> <span class="k">with</span> <span class="n">extension</span> <span class="o">.</span><span class="n">i</span> <span class="k">for</span> <span class="n">each</span> <span class="k">of</span> <span class="n">them</span>
+
+<span class="n">project</span> <span class="n">config</span>
+  <span class="nc">Print</span> <span class="n">current</span> <span class="n">project</span> <span class="n">configuration</span> <span class="k">in</span> <span class="nc">TOML</span> <span class="n">format</span>
+
+<span class="n">project</span> <span class="n">init</span>
+  <span class="nc">Project</span> <span class="n">initialization</span>
 
 <span class="n">snapshot</span>
   <span class="nc">Manage</span> <span class="n">environment</span> <span class="n">snapshots</span>
@@ -241,9 +249,6 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
 </ul>
 <p>Overrides <cite>format</cite> from configuration file if present.</p>
-<ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">--strict</span></code>   Use the strict configuration</p></li>
-</ul>
 </section>
 <section id="main-exe-indent-range">
 <h2>main.exe indent range<a class="headerlink" href="#main-exe-indent-range" title="Permalink to this headline"></a></h2>
@@ -268,9 +273,6 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
 </ul>
 <p>Overrides <cite>format</cite> from configuration file if present.</p>
-<ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">--strict</span></code>   Use the strict configuration</p></li>
-</ul>
 </section>
 <section id="main-exe-json-vscode">
 <h2>main.exe json vscode<a class="headerlink" href="#main-exe-json-vscode" title="Permalink to this headline"></a></h2>
@@ -326,8 +328,33 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
 </ul>
 <p>Overrides <cite>format</cite> from configuration file if present.</p>
+</section>
+<section id="main-exe-project-config">
+<h2>main.exe project config<a class="headerlink" href="#main-exe-project-config" title="Permalink to this headline"></a></h2>
+<p>Print current project configuration in TOML format</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command prints the current project configuration.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">project</span> <span class="n">config</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">--strict</span></code>   Use the strict configuration</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Project directory</p></li>
+</ul>
+</section>
+<section id="main-exe-project-init">
+<h2>main.exe project init<a class="headerlink" href="#main-exe-project-init" title="Permalink to this headline"></a></h2>
+<p>Project initialization</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command initializes a default project in a given directory (or the current directory if not provided).</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">project</span> <span class="n">init</span> <span class="nc">DIR</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">DIR</span></code>   Project directory</p></li>
 </ul>
 </section>
 <section id="main-exe-snapshot">

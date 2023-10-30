@@ -28,6 +28,12 @@ Overview of sub-commands::
   pp
     Preprocess a list of COBOL files, generating a preprocessed file with extension .i for each of them
   
+  project config
+    Print current project configuration in TOML format
+  
+  project init
+    Project initialization
+  
   snapshot
     Manage environment snapshots
   
@@ -171,8 +177,6 @@ Where options are:
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
 
-* :code:`--strict`   Use the strict configuration
-
 
 main.exe indent range
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -216,8 +220,6 @@ Where options are:
 
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
-
-* :code:`--strict`   Use the strict configuration
 
 
 main.exe json vscode
@@ -321,7 +323,51 @@ Where options are:
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
 
-* :code:`--strict`   Use the strict configuration
+
+main.exe project config
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Print current project configuration in TOML format
+
+
+
+**DESCRIPTION**
+
+
+This command prints the current project configuration.
+
+**USAGE**
+::
+  
+  main.exe project config DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Project directory
+
+
+main.exe project init
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Project initialization
+
+
+
+**DESCRIPTION**
+
+
+This command initializes a default project in a given directory (or the current directory if not provided).
+
+**USAGE**
+::
+  
+  main.exe project init DIR [OPTIONS]
+
+Where options are:
+
+
+* :code:`DIR`   Project directory
 
 
 main.exe snapshot

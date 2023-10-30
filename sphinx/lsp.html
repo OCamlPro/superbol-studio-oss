@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LSP Server &mdash; superbol master
- (f25f915
-) (2023/10/27 13:50) documentation</title>
+ (0878ae3
+) (2023/10/30 08:38) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (f25f915
+ (0878ae3
 )
               </div>
 <div role="search">
@@ -129,22 +129,29 @@
 </section>
 <section id="project-configuration">
 <h2>Project configuration<a class="headerlink" href="#project-configuration" title="Permalink to this headline"></a></h2>
-<p>The <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> at the root of a project is a <a class="reference external" href="https://toml.io/">TOML</a> file that defines the following configuration fields for the project:</p>
+<p>The <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> at the root of a project is a <a class="reference external" href="https://toml.io/">TOML</a> file with a <code class="code docutils literal notranslate"><span class="pre">[cobol]</span></code> secton that defines the following configuration fields for the project:</p>
+<ul>
+<li><p><code class="code docutils literal notranslate"><span class="pre">dialect</span></code>: Sets the dialect for your project.  Case insensitive. Possible values are:</p>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">dialect</span></code>: Sets the dialect for your project.  Possible values are:</p>
-<ul>
 <li><p><code class="code docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> (default if not provided)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;COBOL85&quot;</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;GnuCOBOL&quot;</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;MicroFocus&quot;</span></code> or <code class="code docutils literal notranslate"><span class="pre">&quot;MF&quot;</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;ACU&quot;</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;GCOS&quot;</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;IBM&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;gnucobol&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;cobol85&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;cobol2002&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;cobol2014&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;acu&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;bs2000&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;gcos&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;ibm&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;microfocus&quot;</span></code> or <code class="code docutils literal notranslate"><span class="pre">&quot;mf&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;mvs&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;realia&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;rm&quot;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&quot;xopen&quot;</span></code></p></li>
 </ul>
+<p>Every dialect strings from <code class="code docutils literal notranslate"><span class="pre">&quot;acu&quot;</span></code> to <code class="code docutils literal notranslate"><span class="pre">&quot;rm&quot;</span></code> (included) may be suffixed with <code class="code docutils literal notranslate"><span class="pre">&quot;-strict&quot;</span></code> to indicate a <em>strict</em> configuration for the dialect should be used: such a configuration restricts the set of reserved words and disables GnuCOBOL extensions to match the language expected by other compilers for the dialect.</p>
 </li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">strict</span></code>: Whether to use the strict configuration for the dialect (default is <code class="code docutils literal notranslate"><span class="pre">false</span></code>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">source-format</span></code>: Select a specific COBOL source format. Possible values are:</p>
-<ul>
+<ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Auto&quot;</span></code> (default)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Free&quot;</span></code></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">&quot;Fixed&quot;</span></code></p></li>
@@ -161,6 +168,10 @@
 2. relative to the directory that contains the COBOL source file that defines the compilation group (when the associated Boolean field <code class="code docutils literal notranslate"><span class="pre">file-relative</span></code> holds).</p></li>
 </ul>
 <p>Every value given as a string for a configuration field is case insensitive, except when it describes a file or directory name.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">superbol-free</span> <span class="pre">project</span> <span class="pre">init</span></code> command enables you to automatically create a <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> file with the default configuration.  You can append a directory argument to indicate where the file should be placed; otherwise, the file is created in the current working directory.</p>
+</div>
 <section id="example-configuration">
 <h3>Example configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline"></a></h3>
 <p>Consider the following project layout:</p>
@@ -182,14 +193,14 @@
 <p>Then you can provide the following configuration file:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text"><code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="n">dialect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GCOS&quot;</span><span class="w"></span>
-<span class="n">strict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w"></span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[cobol]</span><span class="w"></span>
+<span class="n">dialect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GCOS&quot;</span><span class="w"></span>
 <span class="n">source-format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;COBOLX&quot;</span><span class="w"></span>
 
-<span class="k">[[copybook]]</span><span class="w"></span>
+<span class="k">[[cobol.copybook]]</span><span class="w"></span>
 <span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GLOBAL_COPYBOOKS&quot;</span><span class="w"></span>
 
-<span class="k">[[copybook]]</span><span class="w"></span>
+<span class="k">[[cobol.copybook]]</span><span class="w"></span>
 <span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;LOCAL_COPYBOOKS&quot;</span><span class="w"></span>
 <span class="n">file-relative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
 </pre></div>
