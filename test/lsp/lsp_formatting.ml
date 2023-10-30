@@ -56,6 +56,29 @@ let%expect_test "simple-formatting-request" =
                 DISPLAY "HELLO"
                 STOP RUN. |}]
 
+let doc = {cobol|
+       PROGRAM-ID. HELLO.
+                   PROCEDURE DIVISION.
+                                   para-1.
+                                                                   DISPLAY "HELLO"
+                                                                                       STOP RUN.
+  |cobol};;
+
+let%expect_test "unindent-formatting-request" =
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
+  | None -> Pretty.out "formatting error"
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+           PROGRAM-ID. HELLO.
+           PROCEDURE DIVISION.
+            para-1.
+                DISPLAY "HELLO"
+                STOP RUN. |}]
+
 
 let doc = {cobol|
         para-1.
