@@ -55,25 +55,27 @@ let rev_ignored { reader; _ } = Src_reader.rev_ignored reader
 
 (** [position_at ~line ~char pp] computes a lexing position that corresponds to
     the given line and character indexes (all starting at 0) in the input
-    already read by [pp].  Raises {!Not_found} if no complete line was processed
-    yet, or the current position if the given line index doed not correspond to
-    already processed lines. *)
+    already read by [pp].  Raises [Not_found] if no complete line was processed
+    yet, or the current position if the given line index does not correspond to
+    an already processed line. *)
 let position_at ~line ~char { reader; _ } =
   let rev_newline_cnums = Src_reader.rev_newline_cnums reader in
-  if rev_newline_cnums = []
+  if rev_newline_cnums = []                                (* no newline seen *)
   then raise Not_found
-  else
-    let lexpos = Src_reader.position reader in
-    try
+  else     (* |rev_newline_cnums| is the number of newline chars seen upto... *)
+    let lexpos = Src_reader.position reader in       (* ... current position. *)
+    if line <= lexpos.pos_lnum - 1                   (* = |rev_newline_cnums| *)
+    then
       let pos_bol =
-        try List.nth rev_newline_cnums (lexpos.pos_lnum - line - 1)
-        with Not_found | Invalid_argument _ -> 0
+        if line <= 0
+        then 0
+        else List.nth rev_newline_cnums (lexpos.pos_lnum - 1 - line)
       in
-      Lexing.{ lexpos with pos_bol;
-                           pos_cnum = pos_bol + char;
-                           pos_lnum = line + 1 }
-    with Failure _ ->
-      lexpos
+      { lexpos with pos_bol;
+                    pos_cnum = pos_bol + char;
+                    pos_lnum = line + 1 }
+    else
+      lexpos                                           (* (line not seen yet) *)
 
 let with_reader lp reader =
   if lp.reader == reader then lp else { lp with reader }

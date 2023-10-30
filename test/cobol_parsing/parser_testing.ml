@@ -21,7 +21,11 @@ let preproc
   =
   String { filename; contents } |>
   Cobol_preproc.preprocessor
-    ~options:Cobol_preproc.Options.{ default with libpath = []; source_format }
+    ~options:Cobol_preproc.Options.{
+        default with
+        libpath = [];
+        source_format
+      }
 
 let show_parsed_tokens ?(verbose = false) ?source_format ?filename contents =
   let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
@@ -129,6 +133,9 @@ let insert_periodic_position_markers ?(period = 1) prog =
 let pairwise positions =
   List.(combine (rev (tl (rev positions))) (tl positions))
 
+let triplewise positions =
+  List.(combine (rev (tl (tl (rev positions)))) (pairwise (tl positions)))
+
 (* --- *)
 
 let rewindable_parse
@@ -161,6 +168,7 @@ let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
   f ptree diags;
   rewinder
 
+
 (** [iteratively_append_chunks ?config ~f (prog, positions)] starts a rewindable
     parser on a first chunk of input (until the first position in
     [positions.pos_anonymous]), and then iteralively appends the remaining
@@ -184,6 +192,50 @@ let iteratively_append_chunks ?config ~f (prog, positions) =
     rewind_n_parse ~f:(f i num_chunks) rewinder pos
       (Cobol_preproc.reset_preprocessor_for_string prog)
   end (1, rewinder) (pairwise positions.pos_anonymous)
+
+
+(** [iteratively_append_chunks_stuttering ?config ~f (prog, positions)] starts a
+    rewindable parser on a first chunk of input (until the first position in
+    [positions.pos_anonymous]), and then iteralively appends the remaining pairs
+    of chunks (from one position to the one after the next).  Each pair of chunk
+    (but the last) is added in three steps: first the entire pair is appended,
+    and then the second chunk of the pair is cut back.  [f] is called after each
+    successive chunk has been parsed, with chunk-pair number and total number of
+    chunks-pairs as first and second arguments, respectively. *)
+let iteratively_append_chunks_stuttering ?config ~f
+    (prog, positions) =
+  let _, _, rewinder =
+    rewindable_parse ?config @@            (* start with first chunk of input *)
+    EzString.before prog (List.hd positions.pos_anonymous).cnum
+  in
+  let num_chunks = List.length positions.pos_anonymous - 2 in
+  ignore @@
+  List.fold_left begin fun (i, rewinder) (pos, (next_pos_1, next_pos_2)) ->
+    let prog = EzString.before prog next_pos_2.cnum in
+    Pretty.out "Appending chunk %u/%u @@ %d:%d-%d:%d (%a)@."
+      i num_chunks
+      pos.line pos.char next_pos_2.line next_pos_2.char
+      Fmt.(truncated ~max:30)
+      Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
+    let rewinder =
+      rewind_n_parse ~f:(f i num_chunks) rewinder pos
+        (Cobol_preproc.reset_preprocessor_for_string prog)
+    in
+    let rewinder =
+      if i < num_chunks then begin
+        let prog'= EzString.before prog next_pos_1.cnum in
+        Pretty.out "Cutting chunk %u/%u back @@ %d:%d-%d:%d (%a)@."
+          i num_chunks
+          pos.line pos.char next_pos_1.line next_pos_1.char
+          Fmt.(truncated ~max:30)
+          Pretty.(to_string "%S" @@ EzString.after prog' (pos.cnum - 1));
+        rewind_n_parse ~f:(f i num_chunks) rewinder next_pos_1
+          (Cobol_preproc.reset_preprocessor_for_string prog')
+      end else rewinder
+    in
+    succ i, rewinder
+  end (1, rewinder) (triplewise positions.pos_anonymous)
+
 
 (** [simulate_cut_n_paste ?config ~f (prog, positions)] starts a rewindable
     parser on [prog], and then repeatedly cuts a chunk [c] form the input (from

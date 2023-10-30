@@ -168,7 +168,7 @@ _|_            STOP RUN._|_
         STOP RUN.
 |}];;
 
-let%expect_test "line-by-line-incremental-small-4" =
+let%expect_test "chunk-by-chunk-incremental-small-4" =
   Parser_testing.iteratively_append_chunks ~f:show_ptree @@
   Parser_testing.extract_position_markers @@
   Parser_testing.insert_periodic_position_markers ~period:5 {|

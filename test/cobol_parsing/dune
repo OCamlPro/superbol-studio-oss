@@ -21,7 +21,7 @@
 
 (library
  (name test_cobol_parser_rewind)
- (modules test_appending test_appending_large test_cutnpaste_large)
+ (modules test_appending test_appending_large test_stuttering test_cutnpaste_large)
  (preprocess
   (pps ppx_expect))
  (inline_tests

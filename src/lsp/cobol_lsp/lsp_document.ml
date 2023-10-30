@@ -52,7 +52,7 @@ module TYPES = struct
 
   (** Raised by {!val:Document.load} and {!val:Document.update}; allows keeping
       consistent document contents. *)
-  exception Internal_error of document * exn
+  exception Internal_error of document * exn * Printexc.raw_backtrace
 
   type cached =                   (** Persistent representation (for caching) *)
     {
@@ -183,7 +183,7 @@ let load ~project ?copybook doc =
   let textdoc = Lsp.Text_document.make ~position_encoding doc in
   let doc = blank ~project ?copybook textdoc in
   try parse_and_analyze doc
-  with e -> raise @@ Internal_error (doc, e)
+  with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 
 let first_change_pos changes =
   let line, char =
@@ -206,7 +206,7 @@ let update ({ textdoc; _ } as doc) changes =
       textdoc = Lsp.Text_document.apply_content_changes textdoc changes }
   in
   try reparse_and_analyze ~position doc
-  with e -> raise @@ Internal_error (doc, e)
+  with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 
 (** Raises {!Unparseable} in case the document cannot be parsed entierely, or
     {!Copybook} in case the document is not a main program. *)

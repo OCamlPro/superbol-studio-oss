@@ -132,6 +132,13 @@ let create_or_retrieve_project ~uri registry =
     let project = Lsp_project.for_ ~rootdir ~layout in
     project, add_project project registry
 
+let document_error_while_ operation doc e backtrace registry =
+  let backtrace = Printexc.raw_backtrace_to_string backtrace in
+  Lsp_io.pretty_notification ~log:true ~type_:Error
+    "Internal error while %(%) document: %a%s" operation Fmt.exn e
+    (if backtrace = "" then "" else "\n" ^ backtrace);
+  add_or_replace_doc doc registry
+
 let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ?copybook registry =
   let project, registry = create_or_retrieve_project ~uri registry in
@@ -139,10 +146,8 @@ let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     let doc = Lsp_document.load ~project ?copybook doc in
     let registry = dispatch_diagnostics doc registry in
     add_or_replace_doc doc registry
-  with Lsp_document.Internal_error (doc, e) ->
-    Lsp_io.pretty_notification ~log:true ~type_:Error
-      "Internal error while opening document: %a" Fmt.exn e;
-    add_or_replace_doc doc registry
+  with Lsp_document.Internal_error (doc, e, backtrace) ->
+    document_error_while_"opening" doc e backtrace registry
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
                                           _ } as doc) ?copybook registry =
@@ -180,10 +185,8 @@ let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
     let doc = Lsp_document.update doc contentChanges in
     let registry = dispatch_diagnostics doc registry in
     add_or_replace_doc doc registry
-  with Lsp_document.Internal_error (doc, e) ->
-    Lsp_io.pretty_notification ~log:true ~type_:Error
-      "Internal error while updating document: %a" Fmt.exn e;
-    add_or_replace_doc doc registry
+  with Lsp_document.Internal_error (doc, e, backtrace) ->
+    document_error_while_"updating" doc e backtrace registry
 
 let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =
   { registry with docs = URIMap.remove uri registry.docs }
