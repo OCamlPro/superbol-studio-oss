@@ -20,6 +20,11 @@ type t = {
 }
 type client = LanguageClient.t
 
+
+let id = "superbol-free-lsp"
+
+let name = "SuperBOL Language Server"
+
 let make ~context = { context; language_client = None }
 
 let client { language_client; _ } = language_client
@@ -38,12 +43,33 @@ let stop_language_server t =
 let start_language_server ({ context; _ } as t) =
   let open Promise.Syntax in
   let* () = stop_language_server t in
+  let serverOptions =
+    Superbol_languageclient.server_options ~context
+  in
   let client =
-    LanguageClient.make ()
-      ~id: "superbol-free-lsp"
-      ~name: "SuperBOL Language Server"
-      ~serverOptions:(Superbol_languageclient.server_options ~context)
-      ~clientOptions:(Superbol_languageclient.client_options ())
+    let cmd = Executable.command serverOptions in
+    if String.starts_with ~prefix:"ws://" cmd then
+      LanguageClient.make_stream
+        ~id
+        ~name
+        (fun () ->
+          let njs_stream =
+            Vscode_languageclient.StreamInfo.njs_stream_of_string cmd
+          in
+          Promise.return (
+              Vscode_languageclient.StreamInfo.create
+                ~writer:njs_stream
+                ~reader:njs_stream
+                ()
+            )
+        )
+    else
+      let clientOptions = Superbol_languageclient.client_options () in
+      LanguageClient.make ()
+        ~id
+        ~name
+        ~serverOptions
+        ~clientOptions
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client

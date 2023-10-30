@@ -21,6 +21,7 @@ Welcome to SuperBOL Studio OSS
    commands
    API doc <https://ocamlpro.github.io/superbol-studio-oss/doc>
    license
+   remote-lsp
 
    Sources and Issues on Github <https://github.com/ocamlpro/superbol-studio-oss>
 
