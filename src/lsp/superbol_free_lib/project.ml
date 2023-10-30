@@ -229,6 +229,12 @@ let contributes =
         ~severity:"info"
         ~source:"GnuCOBOL";
     ]
+    ~commands:[
+      Manifest.command ()
+        ~command:"superbol.server.restart"
+        ~title:"Restart Language Server"
+        ~category:"Superbol"
+    ]
 
 let manifest =
   Manifest.vscode

@@ -160,7 +160,7 @@ let indentRange
 *)
   `Value promise
 
-let client = ref None
+let instance = Superbol_instance.make ()
 
 let activate (extension : Vscode.ExtensionContext.t) =
   let providerFull = Vscode.DocumentFormattingEditProvider.create
@@ -188,25 +188,14 @@ let activate (extension : Vscode.ExtensionContext.t) =
 
   Vscode.ExtensionContext.subscribe extension ~disposable:task;
 
-  client :=
-    Some (Vscode_languageclient.LanguageClient.make
-            ~id:"cobolServer"
-            ~name:"Cobol Server"
-            ~serverOptions:Superbol_languageclient.serverOptions
-            ~clientOptions:Superbol_languageclient.clientOptions
-            ());
-  match !client with
-  | Some client -> Vscode_languageclient.LanguageClient.start client
-  | None -> Promise.return ()
+  Superbol_commands.register_all extension instance;
+  Superbol_instance.start_language_server instance
 
 let deactivate () =
-  match !client with
-  | None -> Promise.return ()
-  | Some client -> Vscode_languageclient.LanguageClient.stop client
+    Superbol_instance.stop_language_server instance
 
 (* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
    activate() *)
 let () =
   Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
   Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
-

@@ -12,5 +12,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val serverOptions: unit -> Vscode_languageclient.ServerOptions.t
-val clientOptions: unit -> Vscode_languageclient.ClientOptions.t
+type t
+
+val make : unit -> t
+
+val stop_language_server : t -> unit Promise.t
+
+val start_language_server : t -> unit Promise.t
