@@ -14,6 +14,12 @@
 open Indent_type
 open Indent_keywords
 
+type t = indent_config
+
+let of_list xs =
+  let table = Hashtbl.create 16 in
+  List.iter (fun (a, b) -> Hashtbl.add table a b) xs;
+  table
 
 (*
 TODO:
@@ -22,27 +28,8 @@ TODO:
   it activates some features like alignment of argument
 *)
 
-(*we read the file user_def, and save it into the Hashtable offset_table*)
-let rec build_table strlist offset_table =
-  let help str1 =
-    let str2 = String.split_on_char ';' str1 in
-    let name = List.hd str2 in
-    let value = List.nth str2 1 in
-    name,  Int32.to_int @@ Int32.of_string  value
-  in
-  match strlist with
-  | "" :: _ -> ()
-  | str :: stl ->
-     let x,y = help str in
-     Hashtbl.add offset_table x y;
-     build_table stl offset_table
-  | _ -> ()
-
-let offset_table = Hashtbl.create 16
 (*default offset table*)
-let () =
-  List.iter
-    (fun (a, b) -> Hashtbl.add offset_table a b)
+let default = of_list
     [ "DEFAULT", 4; (* DEFAULT offset *) (*Do not remove this one*)
       "DISPLAY", 8;
       "USING", 6;
@@ -61,21 +48,14 @@ let () =
       "DECLARATIVES", 0;
       "SECTION", 0 ]
 
-(* FIXME: This should be temporary, and the config for the indenter should come
-   as a pre-filled record for the cobol_indent library (typically,
-   indent_config.ml, bound as Cobol_indent.Config, would only define the type of
-   this record).
+let merge t1 t2 =
+  let len = Hashtbl.length t1 + Hashtbl.length t2 in
+  let table = Hashtbl.create len in
+  Hashtbl.iter (Hashtbl.add table) t1;
+  Hashtbl.iter (fun a b -> Hashtbl.replace table a b) t2;
+  table
 
-   See: https://github.com/OCamlPro/superbol-studio-oss/issues/46
- *)
-let set_config ~indent_config =
-  match Ez_file.V1.EzFile.read_file indent_config with
-  | str ->
-    let strlist = String.split_on_char '\n' str in
-    build_table strlist offset_table
-  | exception Sys_error _ -> ()
-
-let offset_of_keyword keyword =
+let offset_of_keyword offset_table keyword =
   match keyword with
   (*WARNING: these tokens must have offset 0*)
   | COMPILATION_UNIT

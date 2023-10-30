@@ -29,6 +29,7 @@ module TYPES = struct
     mutable libpath: path list;
     mutable copybook_extensions: string list;
     mutable copybook_if_no_extension: bool;
+    mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;
   }
 
@@ -51,12 +52,14 @@ let __init_default_exn_printers =
 let default_libpath = [RelativeToProjectRoot "."]
 let default_copybook_extensions = Cobol_common.Copybook.copybook_extensions
 let default_copybook_if_no_extension = true
+let default_indent_config = []
 
 let default = {
   cobol_config = Cobol_config.default;
   source_format = Cobol_config.(SF SFFixed);
   libpath = default_libpath;
   copybook_extensions = default_copybook_extensions;
+  indent_config = default_indent_config;
   copybook_if_no_extension = default_copybook_if_no_extension;
   toml_handle = Ezr_toml.make_empty ();
 }
@@ -87,6 +90,12 @@ let path_repr = function
 let libpath_repr libpath =
   TOML.value_of_array @@ Array.of_list @@ List.map path_repr libpath
 
+let indent_repr indent =
+  TOML.value_of_table @@
+  List.fold_left
+    (fun acc (n, v) -> TOML.StringMap.add n (TOML.int v) acc)
+    TOML.StringMap.empty indent
+
 let config_repr config ~name =
   Ezr_toml.section
     ~name
@@ -106,6 +115,11 @@ let config_repr config ~name =
         ~name: "copybooks"
         ~after_comments: ["Where to find copybooks"]
         (libpath_repr config.libpath);
+
+      option
+        ~name: "indent"
+        ~after_comments: ["Indenter configuration"]
+        (indent_repr config.indent_config)
     ]
 
 
@@ -138,6 +152,13 @@ let get_libpath toml =
     Array.to_list @@ TOML.get_array ["copybooks"] toml
   with Not_found -> default_libpath
 
+let get_indent_config toml =
+  try
+    TOML.StringMap.fold (fun name node v ->
+      (name, TOML.extract_int node) :: v
+    ) (TOML.get_table ["indent"] toml) []
+  with Not_found -> default_indent_config
+
 let load_file ?verbose config_filename =
   let toml_handle = Ezr_toml.load ?verbose config_filename in
   let load_section keys toml =
@@ -149,7 +170,8 @@ let load_file ?verbose config_filename =
             cobol_config;
             source_format = get_source_format section;
             libpath = get_libpath section;
-            toml_handle = toml_handle })
+            toml_handle = toml_handle ;
+            indent_config = get_indent_config section})
   in
   try
     let DIAGS.{ result; _ } as config =

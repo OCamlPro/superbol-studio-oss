@@ -152,9 +152,15 @@ type range = {start_line:int;
 
 type context = (context_kind * int) list
 
+(* Refrain from editing `indent_config` values directly and instead use
+   functions from the `Indent_config` module. Or don't, you're an adult, but
+   don't complain when it breaks. *)
+type indent_config = (string, int) Hashtbl.t
+
 type indent_state =
     {
       src_format: Cobol_preproc.Src_format.any;
+      indent_config: indent_config;
       scope: context_kind; (*indicate where the current code is*)
       context: context;    (*the stack of (context_kind, offset)*)
       acc: indent_record list;

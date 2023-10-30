@@ -19,6 +19,8 @@ let indent_range = Indenter.indent_range
 let indent_range_str
   ~dialect ~source_format ~indent_config ~range ~filename ~contents
 =
-indent_range
-  ~dialect ~source_format ~indent_config ~range ~filename ~contents
-|> Indent_util.apply contents
+  indent_range
+    ~dialect ~source_format ~indent_config ~range ~filename ~contents
+  |> Indent_util.apply contents
+
+let config l = Indent_config.(merge default (of_list l))

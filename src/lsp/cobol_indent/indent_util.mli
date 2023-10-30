@@ -23,11 +23,11 @@ val check_pos:
 
 val failure_msg: Cobol_common.Srcloc.srcloc -> string
 
-val offset_of_keyword: context_kind -> int
+val offset_of_keyword: indent_config -> context_kind -> int
 
 val offset_of_context: context -> int
 
-val push_context: context_kind -> context -> context
+val push_context: indent_state -> context_kind -> context -> context
 
 val is_data_decl: string -> bool
 

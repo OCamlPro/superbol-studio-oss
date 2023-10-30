@@ -185,7 +185,7 @@ let handle_range_formatting registry params =
     Cobol_indent.indent_range
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
-      ~indent_config:None
+      ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
       ~filename:(Lsp.Uri.to_path doc.uri)
       ~contents:(Lsp.Text_document.text textdoc)
       ~range:(Some range_to_indent)
@@ -201,7 +201,7 @@ let handle_formatting registry params =
       Cobol_indent.indent_range
         ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~source_format:project.config.source_format
-        ~indent_config:None
+        ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
         ~filename:(Lsp.Uri.to_path doc.uri)
         ~contents:(Lsp.Text_document.text textdoc)
         ~range:None
