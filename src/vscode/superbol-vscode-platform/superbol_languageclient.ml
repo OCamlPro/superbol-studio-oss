@@ -12,9 +12,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let config = Vscode.Workspace.getConfiguration ()
-
-let serverOptions =
+let serverOptions () =
+  let config = Vscode.Workspace.getConfiguration () in
   let command =
     match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
     | Some o -> Ojs.string_of_js o
@@ -24,7 +23,7 @@ let serverOptions =
     ~command
     ~args:["lsp"]
 
-let clientOptions =
+let clientOptions () =
   Vscode_languageclient.ClientOptions.create ()
     ~documentSelector:[|
       `Filter (Vscode_languageclient.DocumentFilter.createLanguage ()

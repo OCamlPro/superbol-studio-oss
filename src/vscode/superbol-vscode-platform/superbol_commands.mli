@@ -12,5 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val serverOptions: unit -> Vscode_languageclient.ServerOptions.t
-val clientOptions: unit -> Vscode_languageclient.ClientOptions.t
+val register_all :
+  Vscode.ExtensionContext.t -> Superbol_instance.t -> unit

@@ -12,6 +12,13 @@
         "language": "COBOL"
       }
     ],
+    "commands": [
+      {
+        "command": "superbol.server.restart",
+        "title": "Restart Language Server",
+        "category": "Superbol"
+      }
+    ],
     "configuration": {
       "title": "Superbol COBOL",
       "properties": {
