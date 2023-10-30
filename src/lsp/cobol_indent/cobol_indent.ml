@@ -18,7 +18,7 @@ let indent_range = Indenter.indent_range
 
 (** [apply s rdl] applies the changes in [rdl] to the text in [s]. [rdl] is
     expected to have been computed by calling [indent_range ~contents:s]. *)
-let apply =
+let apply : string -> Type.indent_record list -> string =
   (*
     [irs] contains a list of {!Type.indent_record} entries describing how to
      modify the indentation.  They must be sorted in increasing order, and there
@@ -43,17 +43,16 @@ let apply =
        [String.index_from] can also raise [Invalid_argument] in these
        conditions. *)
     match irs with
+    | [] when start = 0 -> s
     | [] ->
-      if start = 0 then s else (
-        Buffer.add_substring buf s start (String.length s - start);
-        Buffer.contents buf
-      )
+      Buffer.add_substring buf s start (String.length s - start);
+      Buffer.contents buf
     | { lnum; offset_orig; offset_modif } :: irs when line = lnum - 1 ->
       let eol =
         try String.index_from s bol '\n' + 1 with Not_found -> String.length s
       in
       let delta = offset_modif - offset_orig in
-      if delta > 0 || true then (
+      if delta > 0 then (
         Buffer.add_substring buf s start (bol + offset_orig - start);
         for _ = 0 to delta - 1 do
           Buffer.add_char buf ' '

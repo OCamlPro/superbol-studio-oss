@@ -61,6 +61,13 @@ let () =
       "DECLARATIVES", 0;
       "SECTION", 0 ]
 
+(* FIXME: This should be temporary, and the config for the indenter should come
+   as a pre-filled record for the cobol_indent library (typically,
+   indent_config.ml, bound as Cobol_indent.Config, would only define the type of
+   this record).
+
+   See: https://github.com/OCamlPro/superbol-studio-oss/issues/46
+ *)
 let set_config ~indent_config =
   match Ez_file.V1.EzFile.read_file indent_config with
   | str ->

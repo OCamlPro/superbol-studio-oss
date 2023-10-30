@@ -181,7 +181,7 @@ let handle_range_formatting registry params =
       end_line = end_.line + 1
     }
   in
-  let editList =
+  let edit_list =
     Cobol_indent.indent_range
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
@@ -190,7 +190,7 @@ let handle_range_formatting registry params =
       ~contents:(Lsp.Text_document.text textdoc)
       ~range:(Some range_to_indent)
   in
-  Some (List.map lsp_text_edit editList)
+  Some (List.map lsp_text_edit edit_list)
 
 let handle_formatting registry params =
   let DocumentFormattingParams.{ textDocument = doc; _ } = params in
