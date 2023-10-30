@@ -48,3 +48,11 @@ val imp_scope_termination: context -> context
 val phrase_termination: context -> context
 
 val phrase_termination_until: context_kind -> context -> context
+
+(** [apply s rdl] applies the changes in [rdl] to the text in [s]. [rdl] is
+    expected to have been computed by calling [indent_range ~contents:s].
+
+    Note: this function is currently untested. It is only used by the command
+    `superbol indent`. The main way to interact with the indenter is through LSP
+    requests, which are tested in lsp_formatting.ml *)
+val apply : string -> indent_record list -> string
