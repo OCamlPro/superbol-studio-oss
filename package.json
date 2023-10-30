@@ -30,7 +30,7 @@
         "superbol.path": {
           "type": "string",
           "default": "superbol-free",
-          "description": "Path to the `superbol` command"
+          "description": "Name of the `superbol` executable if available in PATH; otherwise may be an absolute path."
         }
       }
     },
@@ -159,6 +159,7 @@
             "description": "The list of copybooks paths"
           },
           "sourceFormat": {
+            "type": "string",
             "description": "The source format of the code",
             "items": "string",
             "enum": [
@@ -187,6 +188,7 @@
             ]
           },
           "dialect": {
+            "type": "string",
             "description": "The COBOL dialect used"
           },
           "forDebugging": {
