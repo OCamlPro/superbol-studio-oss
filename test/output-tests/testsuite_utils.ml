@@ -11,8 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file
-open FileString.OP
+open Ez_file.V1
+open EzFile.OP
 
 let find_dir anchor =
   let curdir = Sys.getcwd () in
@@ -27,11 +27,13 @@ let find_dir anchor =
   in
   iter curdir
 
-let deep_iter = FileString.(make_select iter_dir) ~deep:true
+let deep_iter = EzFile.(make_select iter_dir) ~deep:true
 let srcdir =
   try Unix.getenv "DUNE_SOURCEROOT" with Not_found -> find_dir "test"
+let confdir =
+  srcdir // "import" // "gnucobol" // "config"
 let () =            (* TODO: avoid relying on this var only in `Cobol_config` *)
-  Unix.putenv "COB_CONFIG_DIR" (srcdir // "import" // "gnucobol" // "config")
+  Unix.putenv "COB_CONFIG_DIR" confdir
 
 let srcdir_marker = "__srcdir__"
 let srcdir_regexp = Str.(regexp @@ quote srcdir)
@@ -44,6 +46,6 @@ let ibm_root = srcdir // ibm_testsuite
 let mf_testsuite = testsuites // "microfocus" // "www.csis.ul.ie"
 let mf_root = srcdir // mf_testsuite
 
-module Diags = Cobol_common.Diagnostics.InitStateful ()
-
-let from_dialect = Cobol_config.from_dialect (module Diags)
+let from_dialect dialect =
+  Cobol_common.Diagnostics.show_n_forget @@
+  Cobol_config.from_dialect dialect

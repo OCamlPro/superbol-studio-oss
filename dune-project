@@ -220,6 +220,25 @@
  )
 
 (package
+ (name superbol_project)
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= version))
+   (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
+   (ezr_toml (= version))
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   (ppx_inline_test ( >= v0.16.1 ))
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
  (name cobol_common)
  (synopsis "The superbol-studio-oss project")
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
@@ -291,6 +310,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
+   (superbol_project (= version))
    (pretty (= version))
    (lsp (and ( >= 1.15 )( < 1.16 )))
    (jsonrpc ( >= 1.15 ))
@@ -448,6 +468,23 @@
    (menhirLib ( > 2019 ))
    (ez_file ( >= 0.3 ))
    (ISO8601 ( >= 0.2 ))
+   (ppx_inline_test ( >= v0.16.1 ))
+   ppx_expect
+   odoc
+   ocamlformat
+  )
+ )
+
+(package
+ (name ezr_toml)
+ (synopsis "The superbol-studio-oss project")
+ (description "This is the description\nof the superbol-studio-oss OCaml project\n")
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= version))
+   (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
+   (ez_toml (= version))
+   (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (ppx_inline_test ( >= v0.16.1 ))
    ppx_expect
    odoc

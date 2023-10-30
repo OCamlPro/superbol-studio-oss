@@ -24,7 +24,8 @@ open Ez_file.V1.EzFile.OP
 
     - [relative_work_dirname] is the name of the directory where the LSP should
     put its working files (caches, etc). *)
-let config ~project_config_filename ~relative_work_dirname =
+let config ~(project_layout: Lsp_project.layout) =
+  let relative_work_dirname = project_layout.relative_work_dirname in
   let invalid_dir reason =
     Fmt.invalid_arg
       ("relative_work_dirname: "^^reason^^" (got `%s')") relative_work_dirname
@@ -38,9 +39,7 @@ let config ~project_config_filename ~relative_work_dirname =
       cache_relative_filename = relative_work_dirname // "lsp-cache";
       cache_verbose = true;
     };
-    project_layout = {
-      project_config_filename;
-    };
+    project_layout;
   }
 
 (** Start the lsp server, listening and responding on stdin and stdout.  This is

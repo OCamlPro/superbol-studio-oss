@@ -23,7 +23,7 @@ module TYPES = struct
 
   open Cobol_common.Srcloc                          (* with_loc & pp_with_loc *)
 
-  (** Information returned by {!names_at_position}. *)
+  (** Information returned by {!val:Lookup.names_at_position}. *)
   type names_at_position =
     {
       qualname_at_position: Cobol_ptree.qualname option;
@@ -49,7 +49,7 @@ module TYPES = struct
   type name_references_in_compilation_unit =
     Srcloc.srcloc list Cobol_data.Qualmap.t                    [@@deriving show]
 
-  type copy_operation = string with_loc          (** with loc of {[COPY ...]} *)
+  type copy_operation = string with_loc            (** with loc of [COPY ...] *)
 
 end
 open TYPES

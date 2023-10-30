@@ -46,12 +46,12 @@ module TYPES = struct
      Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
       Cobol_parser.rewinder
 
-  (** Raised by {!retrieve_parsed_data}. *)
+  (** Raised by {!val:Document.retrieve_parsed_data}. *)
   exception Unparseable of Lsp.Types.DocumentUri.t
   exception Copybook of Lsp.Types.DocumentUri.t
 
-  (** Raised by {!load} and {!update}; allows keeping consistent document
-      contents. *)
+  (** Raised by {!val:Document.load} and {!val:Document.update}; allows keeping
+      consistent document contents. *)
   exception Internal_error of document * exn
 
   type cached =                   (** Persistent representation (for caching) *)
@@ -79,14 +79,14 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
     ~options:Cobol_parser.Options.{
         default with
         recovery = EnableRecovery { silence_benign_recoveries = true };
-        config = project.cobol_config;
+        config = project.config.cobol_config;
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
         libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
-        config = project.cobol_config;
-        source_format = project.source_format
+        config = project.config.cobol_config;
+        source_format = project.config.source_format
       } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }
@@ -235,7 +235,7 @@ let to_cache ({ project; textdoc; parsed; diags;
 
 (* NB: Note this checks against the actual file on disk, which may be different
    from what a client sends upon opening. *)
-(** Raises {!Failure} in case of bad checksum. *)
+(** Raises [Failure] in case of bad checksum. *)
 let of_cache ~project
     { doc_cache_filename = filename;
       doc_cache_checksum = checksum;

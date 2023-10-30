@@ -14,7 +14,10 @@
 {
   open Lexing
   open Conf_parser
-  exception LexError of string * Lexing.position * Lexing.position
+  type error =
+    | Unexpected_char of char * Cobol_common.Srcloc.lexloc
+    | Unexpected_end_of_string of Cobol_common.Srcloc.lexloc
+  exception ERROR of error
 }
 
 let newline = '\r'* '\n'
@@ -76,7 +79,8 @@ rule main = parse
 | integer as i           { INT (int_of_string i) }
 | ident as i             { IDENT i }
 | value as x             { ANY x }
-| _ as c                 { raise @@ LexError (Format.sprintf "Invalid char: %c" c, lexbuf.lex_start_p, lexbuf.lex_curr_p) }
+| _ as c                 { raise @@ ERROR (Unexpected_char (c, (lexbuf.lex_start_p,
+                                                                lexbuf.lex_curr_p))) }
 | eof                    { EOF }
 
 and single_line_comment = parse
@@ -89,5 +93,7 @@ and read_string buf = parse
 | '\\' '\\'     { Buffer.add_string buf "\\"; read_string buf lexbuf }
 | '\\' '\ '     { Buffer.add_string buf "\ "; read_string buf lexbuf }
 | [^ '"' '\\']+ { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf }
-| _ as c        { raise @@ LexError (Format.sprintf "Invalid char: %c" c, lexbuf.lex_start_p, lexbuf.lex_curr_p) }
-| eof           { raise @@ LexError ("Unexpected end of string", lexbuf.lex_start_p, lexbuf.lex_curr_p) }
+| _ as c        { raise @@ ERROR (Unexpected_char (c, (lexbuf.lex_start_p,
+                                                       lexbuf.lex_curr_p))) }
+| eof           { raise @@ ERROR (Unexpected_end_of_string (lexbuf.lex_start_p,
+                                                            lexbuf.lex_curr_p)) }

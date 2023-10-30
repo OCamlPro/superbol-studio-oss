@@ -28,8 +28,7 @@ let check_new_ptree i n ~ptree0 ptree' diags =
   else Test_appending.show_ptree i n ptree' diags
 
 let%expect_test "cut-n-paste-mf" =
-  let config =
-    Testsuite_utils.from_dialect ~strict:true Cobol_config.DIALECT.MicroFocus in
+  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
   deep_iter mf_root ~glob:"DayDiffDriver.[cC][bB][lL]" (* <- pick large-ish file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in
@@ -42,8 +41,7 @@ let%expect_test "cut-n-paste-mf" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    Loading configuration from
-    `__srcdir__/import/gnucobol/config/mf-strict.conf'
+    Loading: `__srcdir__/import/gnucobol/config/mf-strict.conf'
     Considering `__srcdir__/test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiffDriver.cbl'.
     Cutting chunk 54/120 @ 75:10(2754)-79:7(2805) ("RFORM DisplayErrorMessage\...)
     Putting it back

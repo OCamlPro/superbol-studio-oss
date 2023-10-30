@@ -65,11 +65,11 @@ let blast_margin ppf =   (* see https://github.com/ocaml/ocaml/issues/10592 *)
 
 (** Version of {!Format.asprintf} with virtually no right margin *)
 let to_string: ('a, string) func = fun fmt ->
-  Fmt.str ("%t"^^fmt) blast_margin
+  Fmt.str ("%t@[<h>"^^fmt^^"@]") blast_margin
 
 (** Version of {!Format.kasprintf} with virtually no right margin *)
 let string_to: (string -> 'b) -> ('a, 'b) func = fun k fmt ->
-  Fmt.kstr k ("%t"^^fmt) blast_margin
+  Fmt.kstr k ("%t@[<h>"^^fmt^^"@]") blast_margin
 
 (** Shorhand for {!string_to} {!failwith}: [failwith] raises {!Failure} based on
     the format string [fmt] (possibly with arguments). *)

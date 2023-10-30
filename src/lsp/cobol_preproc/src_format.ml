@@ -84,16 +84,16 @@ let decypher ~dialect format =
   (* SOURCEFORMAT"FREE" on MF means: X/Open free format *)
   (* cf https://www.microfocus.com/documentation/visual-\
        cobol/vc50pu7/VS2019/HRLHLHINTR01U008.html *)
-  | "FREE", Cobol_config.DIALECT.MicroFocus -> Ok Cobol_config.SFXOpen
-  | "FREE",                      _          -> Ok SFFree
-  | "FIXED",                     _          -> Ok SFFixed
-  | "VARIABLE",                  _          -> Ok SFVariable
-  | "XOPEN",                     _          -> Ok SFXOpen
-  | "XCARD",                     _          -> Ok SFxCard
-  | "CRT",                       _          -> Ok SFCRT
-  | "TERMINAL",                  _          -> Ok SFTrm
-  | "COBOLX",                    _          -> Ok SFCOBOLX
-  | _                                       -> Error (`SFUnknown format)
+  | "FREE", Cobol_config.DIALECT.MicroFocus _ -> Ok Cobol_config.SFXOpen
+  | "FREE",                      _            -> Ok SFFree
+  | "FIXED",                     _            -> Ok SFFixed
+  | "VARIABLE",                  _            -> Ok SFVariable
+  | "XOPEN",                     _            -> Ok SFXOpen
+  | "XCARD",                     _            -> Ok SFxCard
+  | "CRT",                       _            -> Ok SFCRT
+  | "TERMINAL",                  _            -> Ok SFTrm
+  | "COBOLX",                    _            -> Ok SFCOBOLX
+  | _                                         -> Error (`SFUnknown format)
 
 (* --- *)
 

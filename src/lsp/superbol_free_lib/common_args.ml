@@ -15,6 +15,8 @@ open EzCompat
 open Ezcmd.V2
 open EZCMD.TYPES
 
+module DIAGS = Cobol_common.Diagnostics
+
 open Cobol_preproc.Options
 open Cobol_parser.Options
 
@@ -51,8 +53,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 let get () =
   let conf = ref "" in
   let dialect = ref None in
-  let strict = ref false in
-  let format = ref Cobol_config.Auto in                   (* Fixed by default *)
+  let format = ref Cobol_config.Auto in
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
                  "cobol85"; "COBOL85";
@@ -82,26 +83,13 @@ let get () =
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
 
-    ["strict"], Arg.Set strict,
-    EZCMD.info "Use the strict configuration";
-
     ["source-format"],
-    Arg.Symbol (formats, fun f -> format := match String.uppercase_ascii f with
-        | "FIXED" | "COBOL85" -> Cobol_config.SF Cobol_config.SFFixed
-        | "FREE" -> SF SFFree
-        | "VARIABLE" -> SF SFVariable
-        | "XOPEN" -> SF SFXOpen
-        | "XCARD" -> SF SFxCard
-        | "CRT" -> SF SFCRT
-        | "TERMINAL" -> SF SFTrm
-        | "COBOLX" -> SF SFCOBOLX
-        | "AUTO" -> Auto
-        | _ ->
-            Cobol_common.Diagnostics.Now.warn
-              Fmt.stderr
-              "Unkown source format: %s, setting to default"
-              f;
-            Auto),
+    Arg.Symbol (formats, fun f ->
+        format := try Cobol_config.Options.format_of_string f with
+          | Invalid_argument _ ->
+              DIAGS.Now.warn Fmt.stderr
+                "Unkown source format: %s, setting to default" f;
+              Auto),
     EZCMD.info ~docv:"SOURCE_FORMAT"
       "Set the format of source code; allowed values are: { FIXED (the default), \
        FREE}\nOverrides `format` from configuration file if present.";
@@ -124,14 +112,17 @@ let get () =
 
   let get () =
     let config =
-      let strict = !strict in
-      let dialect = !dialect in
-      match !conf, dialect with
-      | "", None -> Cobol_config.default
-      | "", Some d -> Cobol_common.do_any (Cobol_config.from_dialect ~strict) d
-      | s, None -> Cobol_common.do_any (Cobol_config.from_file ?dialect) s
-      | _ -> Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
-                              used together"
+      DIAGS.show_n_forget @@
+      match !conf, !dialect with
+      | "", None ->
+          DIAGS.result Cobol_config.default
+      | "", Some d ->
+          Cobol_config.from_dialect d
+      | s, None ->
+          Cobol_config.from_file s
+      | _ ->
+          Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
+                           used together"
     in
     let source_format =
       match !format with

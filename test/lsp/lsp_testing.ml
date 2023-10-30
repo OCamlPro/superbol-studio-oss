@@ -32,9 +32,7 @@ let () =
 (** {1 Server initialization} *)
 
 let layout =
-  LSP.Project.{
-    project_config_filename = Superbol_free_lib.Command_lsp.project_config_filename;
-  }
+  Superbol_free_lib.Project_config.layout;
 and cache_config =
   LSP.Project_cache.{
     cache_relative_filename = "lsp-cache";

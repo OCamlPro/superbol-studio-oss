@@ -12,8 +12,7 @@
 (**************************************************************************)
 
 val config
-  : project_config_filename: string
-  -> relative_work_dirname: string
+  : project_layout: Superbol_project.layout
   -> Lsp_server.config
 
 val run

@@ -179,8 +179,8 @@ let handle_range_formatting registry params =
   in
   let newText =
     Cobol_indent.indent_range
-      ~dialect:(Cobol_config.dialect project.cobol_config)
-      ~source_format:project.source_format
+      ~dialect:(Cobol_config.dialect project.config.cobol_config)
+      ~source_format:project.config.source_format
       ~indent_config:None
       ~filename:(Lsp.Uri.to_path doc.uri)
       ~contents:(Lsp.Text_document.text textdoc)
@@ -204,8 +204,8 @@ let handle_formatting registry params =
   try
     let newText =
       Cobol_indent.indent_range
-        ~dialect:(Cobol_config.dialect project.cobol_config)
-        ~source_format:project.source_format
+        ~dialect:(Cobol_config.dialect project.config.cobol_config)
+        ~source_format:project.config.source_format
         ~indent_config:None
         ~filename:(Lsp.Uri.to_path doc.uri)
         ~contents:(Lsp.Text_document.text textdoc)
@@ -264,7 +264,7 @@ let handle_hover registry (params: HoverParams.t) =
                         status = CopyDone lib | CyclicCopy lib } ->
           let text = EzFile.read_file lib in
           (* TODO: grab source-format from preprocessor state? *)
-          let module Config = (val project.cobol_config) in
+          let module Config = (val project.config.cobol_config) in
           let mdlang = match Config.format#value with
             | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
             | SF _ | Auto -> "cobol"

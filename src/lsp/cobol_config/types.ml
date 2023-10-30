@@ -24,7 +24,6 @@ type doc = Pretty.simple
     a name for now, but we could add some more info later (like configuration
     files read). *)
 type configuration =
-  (* May become an object a well, if revelant *)
   {
     name: string;              (* e.g, "default", "MicroFocus", "ACU", "GCOS" *)
   }
@@ -297,92 +296,137 @@ and word_spec =
 
 module DIALECT = struct
 
-  let all_canonical_names = [
-    "default";
-    "gnucobol";
-
-    "cobol85";
-    "cobol2002";
-    "cobol2014";
-
-    "acu";
-    "bs2000";
-    "gcos";
-    "ibm";
-    "mf";
-    "mvs";
-    "realia";
-    "rm";
-    "xopen";
-  ]
-
   type t =
     | Default
     | GnuCOBOL
     | COBOL85
     | COBOL2002
     | COBOL2014
-    | ACU
-    | BS2000
-    | GCOS
-    | IBM
-    | MicroFocus
-    | MVS
-    | Realia
-    | RM
+    | ACU        of dialect_strictness
+    | BS2000     of dialect_strictness
+    | GCOS       of dialect_strictness
+    | IBM        of dialect_strictness
+    | MicroFocus of dialect_strictness
+    | MVS        of dialect_strictness
+    | Realia     of dialect_strictness
+    | RM         of dialect_strictness
     | XOpen
+  and dialect_strictness = { strict: bool }
 
-  let name: t -> string = function
-    | Default -> "default"
-    | GnuCOBOL -> "GnuCOBOL"
+  let default       = Default
+  let gnucobol      = GnuCOBOL
+  let cobol85       = COBOL85
+  let cobol2002     = COBOL2002
+  let cobol2014     = COBOL2014
+  let acu           = ACU        { strict = false }
+  let acu_strict    = ACU        { strict = true }
+  let bs2000        = BS2000     { strict = false }
+  let bs2000_strict = BS2000     { strict = true }
+  let gcos          = GCOS       { strict = false }
+  let gcos_strict   = GCOS       { strict = true }
+  let ibm           = IBM        { strict = false }
+  let ibm_strict    = IBM        { strict = true }
+  let mf            = MicroFocus { strict = false }
+  let mf_strict     = MicroFocus { strict = true }
+  let mvs           = MVS        { strict = false }
+  let mvs_strict    = MVS        { strict = true }
+  let realia        = Realia     { strict = false }
+  let realia_strict = Realia     { strict = true }
+  let rm            = RM         { strict = false }
+  let rm_strict     = RM         { strict = true }
+  let xopen         = XOpen
 
-    | COBOL85 -> "COBOL85"
-    | COBOL2002 -> "COBOL2002"
-    | COBOL2014 -> "COBOL2014"
-
-    | ACU -> "ACU"
-    | BS2000 -> "BS2000"
-    | GCOS -> "GCOS"
-    | IBM -> "IBM"
-    | MicroFocus -> "MicroFocus"
-    | MVS -> "MVS"
-    | Realia -> "Realia"
-    | RM -> "RM"
-    | XOpen -> "XOpen"
+  let to_string: t -> string = function
+    | Default                       -> "default"
+    | GnuCOBOL                      -> "gnucobol"
+    | COBOL85                       -> "cobol85"
+    | COBOL2002                     -> "cobol2002"
+    | COBOL2014                     -> "cobol2014"
+    | ACU        { strict = false } -> "acu"
+    | ACU        { strict = true  } -> "acu-strict"
+    | BS2000     { strict = false } -> "bs2000"
+    | BS2000     { strict = true  } -> "bs2000-strict"
+    | GCOS       { strict = false } -> "gcos"
+    | GCOS       { strict = true  } -> "gcos-strict"
+    | IBM        { strict = false } -> "ibm"
+    | IBM        { strict = true  } -> "ibm-strict"
+    | MicroFocus { strict = false } -> "mf"
+    | MicroFocus { strict = true  } -> "mf-strict"
+    | MVS        { strict = false } -> "mvs"
+    | MVS        { strict = true  } -> "mvs-strict"
+    | Realia     { strict = false } -> "realia"
+    | Realia     { strict = true  } -> "realia-strict"
+    | RM         { strict = false } -> "rm"
+    | RM         { strict = true  } -> "rm-strict"
+    | XOpen                         -> "xopen"
 
   let of_string: string -> t = fun s ->
     match String.lowercase_ascii s with
-    | "default" -> Default
-    | "gnucobol" -> GnuCOBOL
-    | "cobol85" -> COBOL85
+    | "default"   -> Default
+    | "gnucobol"  -> GnuCOBOL
+    | "cobol85"   -> COBOL85
     | "cobol2002" -> COBOL2002
     | "cobol2014" -> COBOL2014
-    | "acu" -> ACU
-    | "bs2000" -> BS2000
-    | "gcos" -> GCOS
-    | "ibm" -> IBM
-    | "mf" | "microfocus" -> MicroFocus
-    | "mvs" -> MVS
-    | "realia" -> Realia
-    | "rm" -> RM
-    | "xopen" -> XOpen
-    | _ -> invalid_arg s
+    | "xopen"     -> XOpen
+    | l ->
+        let prefix, strict = match EzString.chop_suffix l ~suffix:"-strict" with
+          | Some prefix -> prefix, true
+          | None -> l, false
+        in
+        match prefix with
+        | "acu"               -> ACU { strict }
+        | "bs2000"            -> BS2000 { strict }
+        | "gcos"              -> GCOS { strict }
+        | "ibm"               -> IBM { strict }
+        | "mf" | "microfocus" -> MicroFocus { strict }
+        | "mvs"               -> MVS { strict }
+        | "realia"            -> Realia { strict }
+        | "rm"                -> RM { strict }
+        | _ -> invalid_arg s
 
-  let of_name: string -> t = function
-    | "COBOL 85" -> COBOL85
-    | "COBOL 2002" -> COBOL2002
-    | "COBOL 2014" -> COBOL2014
-    | "GnuCOBOL" -> GnuCOBOL                          (*TODO: or maybe default *)
-    | "ACUCOBOL-GT" | "ACUCOBOL-GT (lax)" -> ACU
-    | "BS2000 COBOL" | "BS2000 COBOL (lax)" -> BS2000
-    | "GCOS" | "GCOS (lax)" -> GCOS
-    | "IBM COBOL" | "IBM COBOL (lax)" -> IBM
-    | "Micro Focus COBOL" | "Micro Focus COBOL (lax)" -> MicroFocus
-    | "IBM COBOL for MVS & VM" | "MVS/VM COBOL (lax)" -> MVS
-    | "CA Realia II" | "CA Realia II (lax)" -> Realia
-    | "RM-COBOL" | "RM-COBOL (lax)" -> RM
-    | "X/Open COBOL" -> XOpen
-    | s -> of_string s
+  let all_canonical_names =
+    [
+      "default";
+      "gnucobol";
+      "cobol85";
+      "cobol2002";
+      "cobol2014";
+    ] @ List.concat_map (fun d -> [d; d ^ "-strict"]) [
+      "acu";
+      "bs2000";
+      "gcos";
+      "ibm";
+      "mf";
+      "mvs";
+      "realia";
+      "rm";
+    ] @ [
+      "xopen";
+    ]
+
+  let of_gnucobol_config_name: string -> t = function
+    | "COBOL 85"                -> COBOL85
+    | "COBOL 2002"              -> COBOL2002
+    | "COBOL 2014"              -> COBOL2014
+    | "GnuCOBOL"                -> GnuCOBOL
+    | "ACUCOBOL-GT"             -> ACU        { strict = true  }
+    | "ACUCOBOL-GT (lax)"       -> ACU        { strict = false }
+    | "BS2000 COBOL"            -> BS2000     { strict = true  }
+    | "BS2000 COBOL (lax)"      -> BS2000     { strict = false }
+    | "GCOS"                    -> GCOS       { strict = true  }
+    | "GCOS (lax)"              -> GCOS       { strict = false }
+    | "IBM COBOL"               -> IBM        { strict = true  }
+    | "IBM COBOL (lax)"         -> IBM        { strict = false }
+    | "Micro Focus COBOL"       -> MicroFocus { strict = true  }
+    | "Micro Focus COBOL (lax)" -> MicroFocus { strict = false }
+    | "IBM COBOL for MVS & VM"  -> MVS        { strict = true  }
+    | "MVS/VM COBOL (lax)"      -> MVS        { strict = false }
+    | "CA Realia II"            -> Realia     { strict = true  }
+    | "CA Realia II (lax)"      -> Realia     { strict = false }
+    | "RM-COBOL"                -> RM         { strict = true  }
+    | "RM-COBOL (lax)"          -> RM         { strict = false }
+    | "X/Open COBOL"            -> XOpen
+    | s                         -> of_string s
 
 end
 type dialect = DIALECT.t

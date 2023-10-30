@@ -36,7 +36,13 @@ let public_subcommands = [
   Command_switch.set_cmd;
   Command_switch.add_cmd;
   Command_switch.build_cmd;
+
+  Command_project.init_cmd;
+  Command_project.config_cmd;
 ]
+
+let () =
+  Cobol_common.init_default_exn_printers ()
 
 let main ?style_renderer ?utf_8 () =
 

@@ -147,6 +147,10 @@ dir = "src/lsp/superbol_free_lib"
 # edit 'src/lsp/superbol_lib/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/superbol_project"
+# edit 'src/lsp/superbol_project/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/cobol_common"
 # edit 'src/lsp/cobol_common/package.toml' for package-specific options
 
@@ -201,3 +205,7 @@ dir = "src/testing/superbol_testutils"
 [[package]]
 dir = "src/vendor/ez_toml"
 # edit 'src/testing/superbol_testutils/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/ezr_toml"
+# edit 'src/lsp/ezr_toml/package.toml' for package-specific options

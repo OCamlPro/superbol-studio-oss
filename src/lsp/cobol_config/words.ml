@@ -23,15 +23,44 @@ type kind =
   | Word of string
 
 let kind_of_string = function
-    | "DIALECT-ALL" -> DialectAll
-    | "DIALECT-ALL-DEVICES" -> DialectAllDevices
-    | "DIALECT-ALL-SWITCHES" -> DialectAllSwitches
-    | "DIALECT-ALL-FEATURES" -> DialectAllFeatures
-    | s -> Word s
+  | "DIALECT-ALL" -> DialectAll
+  | "DIALECT-ALL-DEVICES" -> DialectAllDevices
+  | "DIALECT-ALL-SWITCHES" -> DialectAllSwitches
+  | "DIALECT-ALL-FEATURES" -> DialectAllFeatures
+  | s -> Word s
 
 (** Module containing all the modules used to build all the reserved words sets *)
 
 (*NOTE: no `mli` as this module is not to be used outside of `Cobol_config` *)
+
+(* TODO: remove all the refs/mutability; for now we hide this using an
+   applicative functor. *)
+
+module type S = sig
+  module RESERVED: sig
+    val add_reserved : string -> unit
+    val add_alias : string -> string -> unit
+    val remove_reserved : string -> unit
+    val words : unit -> (string * Types.word_spec) list
+  end
+  module INTRINSIC: sig
+    val add_intrinsic : string -> unit
+    val remove_intrinsic : string -> unit
+    val intrinsic_functions : unit -> StringSet.t
+  end
+  module SYSTEM_NAMES: sig
+    val add_system_name : string -> unit
+    val remove_system_name : string -> unit
+    val system_names : unit -> StringSet.t
+  end
+  module REGISTERS: sig
+    val add_register : string -> unit
+    val remove_register : string -> unit
+    val registers : unit -> StringSet.t
+  end
+end
+
+module Make () : S = struct
 
 (** This module is used to build reserved words set and aliases map. *)
 module RESERVED = struct
@@ -151,4 +180,6 @@ module REGISTERS = struct
     | _ -> Pretty.failwith "Wrong DIALECT-* word %S" register
 
   let registers () = !registers
+end
+
 end

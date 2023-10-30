@@ -86,21 +86,35 @@ let standard_define: standard value =
   Value.def ~kind ~name:"standard-define"
     "Used@ standard"
 
+let format_of_string s =
+  match String.lowercase_ascii s with
+  | "fixed" -> SF SFFixed
+  | "free" -> SF SFFree
+  | "cobol85" -> SF SFFixed
+  | "variable" -> SF SFVariable
+  | "xopen" -> SF SFXOpen
+  | "xcard" -> SF SFxCard
+  | "crt" -> SF SFCRT
+  | "terminal" -> SF SFTrm
+  | "cobolx" -> SF SFCOBOLX
+  | "auto" -> Auto
+  | _ -> invalid_arg s
+
+let string_of_format = function
+  | SF SFFixed -> "fixed"
+  | SF SFFree -> "free"
+  | SF SFVariable -> "variable"
+  | SF SFXOpen -> "xopen"
+  | SF SFxCard -> "xcard"
+  | SF SFCRT -> "crt"
+  | SF SFTrm -> "terminal"
+  | SF SFCOBOLX -> "cobolx"
+  | Auto -> "auto"
+
 let format: source_format_spec value =
   let kind = object
     inherit [_] kind ~name:"format"
-    method parse s: source_format_spec =
-      match String.lowercase_ascii s with
-      | "fixed" -> SF SFFixed
-      | "free" -> SF SFFree
-      | "cobol85" -> SF SFFixed
-      | "variable" -> SF SFVariable
-      | "xopen" -> SF SFXOpen
-      | "xcard" -> SF SFxCard
-      | "terminal" -> SF SFTrm
-      | "cobolx" -> SF SFCOBOLX
-      | "auto" -> Auto
-      | _ -> invalid_arg s
+    method parse s: source_format_spec = format_of_string s
   end in
   Value.def ~kind ~name:"format"
     "Default@ reference@ format."

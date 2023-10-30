@@ -19,6 +19,7 @@ open Autofonce_core.Types
 module DIAGS = Cobol_common.Diagnostics
 
 let () =
+  Cobol_common.init_default_exn_printers ();
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
      output of tests that fail expectedly. *)
   Stdlib.Printexc.record_backtrace false
@@ -196,10 +197,10 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     let input = setup_input ~filename contents in
     match parse_simple input with
     | DIAGS.{ diags; result = Only Some _ } ->
-        Cobol_common.show_diagnostics ~ppf:Fmt.stdout diags;
+        DIAGS.Set.pp Fmt.stdout diags;
         terminate "ok"
     | DIAGS.{ diags; _ } ->
-        Cobol_common.show_diagnostics ~ppf:Fmt.stdout diags;
+        DIAGS.Set.pp Fmt.stdout diags;
         terminate "ok (with errors)"
     | exception e ->
         Pretty.out "Failure (%s)@\n%s@\n" (Printexc.to_string e) contents;

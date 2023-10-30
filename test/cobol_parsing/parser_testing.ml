@@ -47,7 +47,7 @@ let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
         recovery = EnableRecovery { silence_benign_recoveries = true };
       } |>
   DIAGS.forget_result |>
-  Cobol_common.show_diagnostics ~ppf:Fmt.stdout
+  DIAGS.Set.pp Fmt.stdout
 
 (* --- *)
 

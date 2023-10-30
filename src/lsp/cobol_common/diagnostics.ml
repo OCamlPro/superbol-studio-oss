@@ -222,9 +222,13 @@ let cons_option_result = function
 let forget_result { diags; _ } = diags
 let merge_results ~f r1 r2 =
   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags)
-let show_n_forget ?(min_level = Hint) ?(ppf = Fmt.stderr) { result; diags } =
+let show_n_forget ?(set_status = true) ?(min_level = Hint)
+    ?(ppf = Fmt.stderr) { result; diags } =
   Set.pp_above ~level:min_level ppf diags;
+  if set_status && Set.has_errors diags then Exit_status.raise ();
   result
+let sink_result ?set_status ?ppf r =
+  ignore @@ show_n_forget ?set_status ?ppf r
 
 
 let hint_result r = Cont.khint (with_diag r)
