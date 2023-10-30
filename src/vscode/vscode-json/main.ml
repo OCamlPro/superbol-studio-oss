@@ -58,6 +58,7 @@ let write_file filename encoding p =
   else
     let oc = open_out filename in
     output_string oc s;
+    output_char oc '\n';
     close_out oc;
     Printf.printf "File %S generated\n%!" filename
 
