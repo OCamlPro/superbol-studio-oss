@@ -62,9 +62,11 @@ let () =
       "SECTION", 0 ]
 
 let set_config ~indent_config =
-  let str = Ez_file.V1.EzFile.read_file indent_config in
-  let strlist = String.split_on_char '\n' str in
-  build_table strlist offset_table
+  match Ez_file.V1.EzFile.read_file indent_config with
+  | str ->
+    let strlist = String.split_on_char '\n' str in
+    build_table strlist offset_table
+  | exception Sys_error _ -> ()
 
 let offset_of_keyword keyword =
   match keyword with

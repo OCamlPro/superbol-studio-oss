@@ -17,7 +17,6 @@ open Indent_type
 open Indent_keywords
 
 let check_pos
-  (src_format : Cobol_preproc.Src_format.any)
   (pos:Lexing.position)
   (offset:int)
   (ind_recds:indent_record list)
@@ -34,8 +33,7 @@ let check_pos
       end;
     {lnum = pos.pos_lnum;
      offset_orig = real_offset;
-     offset_modif = offset;
-     src_format }
+     offset_modif = offset}
     :: ind_recds
     end
   else
@@ -48,8 +46,16 @@ let check_pos src_format srcloc offset ind_recds ifcheck =
   match src_format with
   | Cobol_preproc.Src_format.SF (NoIndic, FreePaging) when ifcheck ->
     let pos = start_pos srcloc in
-    check_pos src_format pos offset ind_recds
-  | _ -> ind_recds
+    check_pos pos offset ind_recds
+  | _ ->
+    (* Indenting temporarily disabled in fixed format
+        https://github.com/OCamlPro/superbol-studio-oss/issues/52
+
+        Support must be improved before enabling again, in particular to
+        avoid pushing content into the margin.
+        https://github.com/OCamlPro/superbol-studio-oss/issues/45
+      *)
+    ind_recds
 
 let failure_msg loc =
   let pos = start_pos loc in

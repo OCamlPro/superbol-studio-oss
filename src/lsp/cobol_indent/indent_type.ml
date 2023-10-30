@@ -145,13 +145,7 @@ ex.
 type indent_record =
   { lnum:int;
     offset_orig:int;
-    offset_modif: int;
-    src_format: Cobol_preproc.Src_format.any
-      (** This is the source format for the change. Ideally, this information
-      should not have to be recorded here, but could be obtained from the line
-      number -- however, we don't have the infrastructure for that currently.
-      *)
-  }
+    offset_modif: int}
 
 type range = {start_line:int;
               end_line  :int  }

@@ -22,7 +22,7 @@ let action { preproc_options = { source_format; config; _ }; _ } ~file ~range
   let module Config = (val config) in
   let contents = Ez_file.V1.EzFile.read_file file in
   indent_range ~source_format ~filename:file ~contents ~range ~indent_config
-    ~dialect:Config.dialect |> Fmt.pr "%s"
+    ~dialect:Config.dialect |> apply contents |> Fmt.pr "%s"
 
 let cmd =
   let file = ref "" in
