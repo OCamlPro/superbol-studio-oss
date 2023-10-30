@@ -44,13 +44,30 @@ let start_language_server t =
     Superbol_languageclient.serverOptions
       ~bundled_superbol:t.bundled_superbol
   in
-  let clientOptions = Superbol_languageclient.clientOptions () in
   let client =
-    LanguageClient.make ()
-      ~id: "superbol-free-lsp"
-      ~name: "SuperBOL Language Server"
-      ~serverOptions
-      ~clientOptions
+    let cmd = Executable.command serverOptions in
+    if String.starts_with ~prefix:"ws://" cmd then
+      LanguageClient.make_
+        ~id:"cobolServer"
+        ~name:"Cobol Server"
+        (fun () ->
+          let njs_stream =
+            Vscode_languageclient.StreamInfo.njs_stream_of_string cmd
+          in
+          Promise.return (
+              Vscode_languageclient.StreamInfo.create
+                ~writer:njs_stream
+                ~reader:njs_stream
+                ()
+            )
+        )
+    else
+      let clientOptions = Superbol_languageclient.clientOptions () in
+      LanguageClient.make ()
+        ~id: "superbol-free-lsp"
+        ~name: "SuperBOL Language Server"
+        ~serverOptions
+        ~clientOptions
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
