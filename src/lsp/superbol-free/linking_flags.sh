@@ -1,5 +1,4 @@
 #!/bin/sh
-
 set -ue
 
 # This script is called by dune to generate the linking flags for static builds
@@ -33,6 +32,12 @@ case "$1" in
 esac
 
 shift
+case "$1" in
+    macosx) shift; EXTRA_LIBS="curses $*";;
+    linux) shift; EXTRA_LIBS="$*";;
+    --) shift; EXTRA_LIBS="$*";;
+    *) echo "Not supported %{ocamlc-config:system} '$1'." >&2; help_exit
+esac
 
 ## Static linking configuration ##
 
@@ -43,16 +48,18 @@ shift
 # from the gcc command-line.
 # The Makefile contains a target to automate this: `make detect-libs`.
 
-case "$1" in
-    linux)
+case $(uname -s) in
+    Linux)
         case $(. /etc/os-release && echo $ID) in
             alpine)
+		# Use `static-alpine-clibs` field to add libs more here
+		# (or `static-clibs` for both Linux and Macos)
                 COMMON_LIBS="bigstringaf_stubs cstruct_stubs camlstr unix c"
                 # `m` and `pthread` are built-in musl
                 echo2 '(-noautolink'
                 echo2 ' -cclib -Wl,-Bstatic'
                 echo2 ' -cclib -static-libgcc'
-                for l in $COMMON_LIBS; do
+                for l in $EXTRA_LIBS $COMMON_LIBS; do
                     echo2 " -cclib -l$l"
                 done
                 echo2 ' -cclib -static)'
@@ -62,11 +69,12 @@ case "$1" in
                 exit 3
         esac
         ;;
-    macosx)
+    Darwin)
+	# Use `static-macos-clibs` field to add libs more here
         COMMON_LIBS="camlstr bigstringaf_stubs cstruct_stubs unix"
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
-        for l in $COMMON_LIBS; do
+        for l in $EXTRA_LIBS $COMMON_LIBS; do
             if [ "${l%.a}" != "${l}" ]; then echo2 " -cclib $l"
             else echo2 " -cclib -l$l"
             fi

@@ -2,7 +2,7 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
-DEV_DEPS := merlin ocamlformat odoc
+DEV_DEPS := merlin ocamlformat odoc ppx_expect ppx_inline_test
 
 
 SPHINX_TARGET:=_drom/docs/sphinx
@@ -25,7 +25,7 @@ build:
 
 build-deps:
 	if ! [ -e _opam ]; then \
-	   opam switch create . 4.14.1 --no-install ; \
+	   opam switch create . 4.14.1 ; \
 	fi
 	opam install ./opam/*.opam --deps-only
 

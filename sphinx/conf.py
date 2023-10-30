@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# superbol documentation build configuration file, created by
+# superbol-vscode-platform documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its
@@ -50,7 +50,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'superbol'
+project = 'superbol-vscode-platform'
 copyright = 'OCamlPro SAS'
 author = 'Nicolas Berthier <nicolas.berthier@ocamlpro.com> & David Declerck <david.declerck@ocamlpro.com> & Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com> & Emilien Lemaire <emilien.lemaire@ocamlpro.com>'
 
@@ -167,7 +167,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'superbol.tex', 'superbol Documentation',
+    (master_doc, 'superbol-vscode-platform.tex', 'superbol-vscode-platform Documentation',
      'author', 'manual'),
 ]
 
@@ -177,7 +177,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'superbol', 'superbol Documentation',
+    (master_doc, 'superbol-vscode-platform', 'superbol-vscode-platform Documentation',
      [author], 1)
 ]
 
@@ -188,8 +188,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'superbol', 'superbol Documentation',
-     author, 'superbol', 'One line description of project.',
+    (master_doc, 'superbol-vscode-platform', 'superbol-vscode-platform Documentation',
+     author, 'superbol-vscode-platform', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -220,4 +220,4 @@ epub_exclude_files = ['search.html']
 
 # entry point for setup
 def setup(app):
-    app.add_css_file('css/fixes.css')
+    app.add_stylesheet('css/fixes.css')

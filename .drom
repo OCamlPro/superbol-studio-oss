@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-3b1faf25344f4faae93ba95094d29269:.
+663f90017e3c5790a062517820a3e6ad:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-d71d6060ee4fa0a89488a6d4c0178158:Makefile
+312a3b90d7157dcdb12c1fdfe4e1ad8e:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-de3add436687f5413eb9cb4563b6e570:dune-project
+0789670db0bdf3e661b3515a9d8dfa3b:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_ast.opam
@@ -270,7 +270,7 @@ a4431c32911b7499fbdc49e2e62932d2:sphinx/about.rst
 
 # begin context for sphinx/conf.py
 # file sphinx/conf.py
-0f6a35278b93d5d9ceca6431677766e6:sphinx/conf.py
+ccc62713dbcdd2c46d19abc75e68f8f9:sphinx/conf.py
 # end context for sphinx/conf.py
 
 # begin context for sphinx/index.rst
@@ -425,7 +425,7 @@ eab335ce600887c59f1baf9b0983d0ac:src/lsp/ezr_toml/dune
 
 # begin context for src/lsp/superbol-free/linking_flags.sh
 # file src/lsp/superbol-free/linking_flags.sh
-4481ce2bc21d3553716a7914d2cc015a:src/lsp/superbol-free/linking_flags.sh
+7d3dc8d16165ef74c2866a6d0c42bec4:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/lsp/superbol_free_lib/dune
@@ -510,7 +510,7 @@ ffef64c84976f7655b4dd57e795d7097:src/lsp/superbol_free_lib/dune
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-664342638a68e3f2f79d39343772e32f:src/vscode/superbol-vscode-platform/dune
+00f2c3534d6e97da83741e1e1b94374c:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt
