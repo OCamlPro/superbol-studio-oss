@@ -149,6 +149,19 @@ let handle_references state (params: ReferenceParams.t) =
   try_with_document_data state params.textDocument
     ~f:(fun ~doc:_ -> lookup_references_in_doc params)
 
+let lsp_text_edit (ir : Cobol_indent.Type.indent_record) =
+  match ir with { lnum; offset_orig; offset_modif } ->
+  let delta = offset_modif - offset_orig in
+  let position = Position.create ~line:(lnum - 1) ~character:offset_orig in
+  let range = Range.create ~start:position ~end_:position in
+  if delta > 0 then
+    TextEdit.create ~newText:(String.make delta ' ') ~range
+  else
+    let start =
+      Position.create ~line:(lnum - 1) ~character:(offset_orig + delta)
+    in
+    let range = Range.create ~start ~end_:position in
+    TextEdit.create ~newText:"" ~range
 
 (*Remark:
     The first line of the text selected to RangeFormatting must be
@@ -168,16 +181,7 @@ let handle_range_formatting registry params =
       end_line = end_.line + 1
     }
   in
-  (*the range must contain the whole lines*)
-  let range =
-    (*TODO:find a simple method to get the number of letters of one line
-           (the code below use 1000 as the upperbound)                   *)
-    Range.{
-      start = Position.create ~line:start.line ~character:0;
-      end_ = Position.create ~line:end_.line ~character:1000;
-    }
-  in
-  let newText =
+  let edit_list =
     Cobol_indent.indent_range
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
@@ -186,23 +190,14 @@ let handle_range_formatting registry params =
       ~contents:(Lsp.Text_document.text textdoc)
       ~range:(Some range_to_indent)
   in
-  Some [TextEdit.create ~newText ~range]
+  Some (List.map lsp_text_edit edit_list)
 
 let handle_formatting registry params =
   let DocumentFormattingParams.{ textDocument = doc; _ } = params in
   let Lsp_document.{ project; textdoc; _ } =
     Lsp_server.find_document doc registry in
-  let lines = String.split_on_char '\n' (Lsp.Text_document.text textdoc) in
-  let length = List.length lines - 1 in
-  (* TODO: formatting on empty files will break here *)
-  let width = String.length @@ List.hd @@ List.rev lines in
-  let edit_range =
-    Range.create
-      ~start:(Position.create ~character:0 ~line:0)
-      ~end_:(Position.create ~character:width ~line:length)
-  in
   try
-    let newText =
+    let editList =
       Cobol_indent.indent_range
         ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~source_format:project.config.source_format
@@ -211,7 +206,7 @@ let handle_formatting registry params =
         ~contents:(Lsp.Text_document.text textdoc)
         ~range:None
     in
-    Some [TextEdit.create ~newText ~range:edit_range]
+    Some (List.map lsp_text_edit editList)
   with Failure msg ->
     internal_error "Formatting error: %s" msg
 

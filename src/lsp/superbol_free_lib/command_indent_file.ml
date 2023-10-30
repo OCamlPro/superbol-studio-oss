@@ -23,7 +23,7 @@ let action { preproc_options = { source_format; config; _ } ; _ }
   List.to_seq files
   |> Seq.map (fun file ->
     let contents = Ez_file.V1.EzFile.read_file file in
-    indent_range
+    indent_range_str
       ~source_format ~filename:file ~contents ~indent_config ~range:None
       ~dialect:Config.dialect |> Fmt.pr "%s")
 

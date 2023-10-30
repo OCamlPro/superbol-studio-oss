@@ -20,6 +20,19 @@ let make_free_format_project () =
     source-format = "free"
   |toml}
 
+let format_doc doc =
+  let { projdir; end_with_postproc }, server = make_free_format_project () in
+  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
+  let params =
+    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
+    DocumentFormattingParams.create ~options ~textDocument:prog ()
+  in
+  let doc = (LSP.Types.URIMap.find prog.uri server.docs).textdoc in
+  let formatted = LSP.Request.formatting server params in
+  Option.map (fun edits ->
+    Lsp.Text_document.apply_text_document_edits doc edits |> Lsp.Text_document.text
+  ) formatted, end_with_postproc
+
 let doc = {cobol|
        PROGRAM-ID. HELLO.
        PROCEDURE DIVISION.
@@ -29,17 +42,34 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "simple-formatting-request" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+           PROGRAM-ID. HELLO.
+           PROCEDURE DIVISION.
+            para-1.
+                DISPLAY "HELLO"
+                STOP RUN. |}]
+
+let doc = {cobol|
+       PROGRAM-ID. HELLO.
+                   PROCEDURE DIVISION.
+                                   para-1.
+                                                                   DISPLAY "HELLO"
+                                                                                       STOP RUN.
+  |cobol};;
+
+let%expect_test "unindent-formatting-request" =
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
+  | None -> Pretty.out "formatting error"
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -63,17 +93,11 @@ let doc = {cobol|
         move 1 to x.  |cobol};;
 
 let%expect_test "formatting-request-nested-if" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -104,17 +128,11 @@ let doc = {cobol|
         value 999.              |cobol};;
 
 let%expect_test "formatting-request-data" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":23,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -176,17 +194,11 @@ let doc = {cobol|
         |cobol};;
 
 let%expect_test "formatting-request-nested-program" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -233,17 +245,11 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-alignment-argument" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -264,17 +270,11 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-else-if" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":10,"line":1},"start":{"character":8,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -381,17 +381,11 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-whole-program" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     misc_sections_visitor.ml:0:
@@ -506,17 +500,11 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-on-exception" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect{|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":11,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -540,17 +528,11 @@ let doc = {cobol|
   |cobol};;
 
 let%expect_test "formatting-request-perform" =
-  let { projdir; end_with_postproc }, server = make_free_format_project () in
-  let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
-  let params =
-    let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
-    DocumentFormattingParams.create ~options ~textDocument:prog ()
-  in
-  begin match LSP.Request.formatting server params with
+  let doc', end_with_postproc = format_doc doc in
+  begin match doc' with
   | None -> Pretty.out "formatting error"
-  | Some l ->
-      List.iter (fun TextEdit.{newText;_} -> Pretty.out "%s" newText) l
-    end;
+  | Some doc' -> Pretty.out "%s" doc'
+  end;
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}

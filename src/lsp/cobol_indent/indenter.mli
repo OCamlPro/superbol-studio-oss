@@ -19,4 +19,4 @@ val indent_range
   -> range:Indent_type.range option
   -> filename:string
   -> contents:string
-  -> string
+  -> Indent_type.indent_record list

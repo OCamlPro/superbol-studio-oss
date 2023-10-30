@@ -13,65 +13,6 @@
 
 open Indent_type
 
-(*
-  source_format: source format
-  str: the string representation of the source Cobol code
-  rdl: the indentation error information of the source code
-  range: range of file to indent
-  result: the Cobol code correctly indented (string)
-*)
-let indenter (str:string) (rdl:indent_record list) range =
-  let do_one_record (strl:string array) (rd:indent_record) =
-    let lnum = rd.lnum in
-    let offset = rd.offset_modif - rd.offset_orig in
-    let str = strl.(lnum - 1) in
-    let newstr =
-      match rd.src_format with
-      | Cobol_preproc.Src_format.SF (NoIndic, FreePaging) ->
-        if offset > 0 then
-          let space = String.make offset ' ' in
-          space^str
-        else
-          String.sub str (-offset) (String.length str + offset)
-      | SF (FixedIndic, FixedWidth _) ->
-        (* Indenting temporarily disabled in fixed format
-           https://github.com/OCamlPro/superbol-studio-oss/issues/52
-
-           Support must be improved before enabling again, in particular to
-           avoid pushing content into the margin.
-           https://github.com/OCamlPro/superbol-studio-oss/issues/45
-          *)
-        if true then str else
-        let len = String.length str in
-        let str1 = String.sub str 0 7 in
-        let str = String.sub str 7 (len-7) in
-        let str =
-          if offset > 0 then
-            let space = String.make offset ' ' in
-            space^str
-          else
-            String.sub str (-offset) (String.length str + offset)
-          in
-        str1^str
-      (* TODO *)
-      | SF (XOpenIndic, FixedWidth _) -> str
-      | SF (CRTIndic, FixedWidth _) -> str
-      | SF (TrmIndic, FixedWidth _) -> str
-      | SF (CBLXIndic, FixedWidth _) -> str
-    in
-    strl.(lnum - 1) <- newstr
-  in
-  let strl = String.split_on_char '\n' str |> Array.of_list in
-  List.iter (fun rd -> do_one_record strl rd) rdl;
-  let strl = Array.to_list strl in
-  let strl =
-    match range with
-    | None -> strl
-    | Some {start_line; end_line} ->
-      EzList.drop (start_line - 1) @@ EzList.take end_line strl
-  in
-  String.concat "\n" strl
-
 (*indent a range of file, with the default indent_config*)
 let indent_range ~dialect ~source_format ~range ~filename ~contents =
   let src_format =
@@ -94,7 +35,7 @@ let indent_range ~dialect ~source_format ~range ~filename ~contents =
       { src_format; scope = BEGIN; context  = []; acc = []; range }
   in
   (* NB: note here we ignore diagnostics *)
-  indenter contents state.result.acc state.result.range
+  state.result.acc
 
 (*indent a range of file, with the user-defined indent_config*)
 let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =

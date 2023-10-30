@@ -16,10 +16,9 @@ module Type = Indent_type
 (*return the result of indentation. use user-defined indent_config*)
 let indent_range = Indenter.indent_range
 
-(*indent the whole file and print*)
-let indent_file ~dialect ~source_format ~file ~indent_config =
-  let contents = Ez_file.V1.EzFile.read_file file in
-  indent_range
-    ~dialect ~source_format ~range:None ~indent_config
-    ~filename:file ~contents
-  |> Fmt.pr "%s"
+let indent_range_str
+  ~dialect ~source_format ~indent_config ~range ~filename ~contents
+=
+indent_range
+  ~dialect ~source_format ~indent_config ~range ~filename ~contents
+|> Indent_util.apply contents
