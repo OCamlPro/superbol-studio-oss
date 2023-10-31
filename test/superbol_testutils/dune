@@ -1,0 +1,6 @@
+(library
+  (name superbol_testutils)
+  (wrapped true)
+  (libraries autofonce_lib)
+  (flags (:standard)))
+

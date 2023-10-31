@@ -60,7 +60,6 @@ cobol_ptree = "version"
 # package tools dependencies
 [tools]
 ppx_deriving = ">=5.2.1"
-alcotest = { version = "1", for-test = true }
 
 # package fields (depends on package skeleton)
 #Examples:

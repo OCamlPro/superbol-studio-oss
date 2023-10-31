@@ -53,9 +53,6 @@ depends: [
   "cobol_data" {= version}
   "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
-  "ppx_inline_test" {>= "v0.16.1" with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

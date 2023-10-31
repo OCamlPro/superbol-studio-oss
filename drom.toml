@@ -37,18 +37,13 @@ skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "sphinx/about.rst",
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
+# NB: now we'd need a way to avoid putting that dependency in `libraries` in `dune` files.
+# superbol_testutils = { version = "version", for-test = true }
 
 # project-wide tools dependencies (not for package-specific deps)
 [tools]
-[tools.ocamlformat]
-for-test = true
 [tools.odoc]
 for-doc = true
-[tools.ppx_expect]
-for-test = true
-[tools.ppx_inline_test]
-version = "v0.16.1"
-for-test = true
 
 [project]
 
@@ -197,10 +192,6 @@ dir = "src/lsp/cobol_data"
 [[package]]
 dir = "src/lsp/cobol_typeck"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
-
-[[package]]
-dir = "src/testing/superbol_testutils"
-# edit 'src/testing/superbol_testutils/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/ez_toml"

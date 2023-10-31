@@ -56,9 +56,6 @@ depends: [
   "interop-js-stubs" {= version}
   "gen_js_api" {>= "1.1.1" & < "2.0.0"}
   "js_of_ocaml-ppx" {>= "3.0"}
-  "ppx_inline_test" {>= "v0.16.1" with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

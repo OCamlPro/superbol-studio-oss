@@ -69,7 +69,7 @@ uninstall:
 	opam uninstall .
 
 dev-deps:
-	opam install ./opam/*.opam --deps-only --with-doc --with-test
+	opam install ./opam/*.opam ./test/opam/*.opam --deps-only --with-doc --with-test
 
 test:
 	./scripts/before.sh test

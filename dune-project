@@ -24,10 +24,7 @@
    (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -44,10 +41,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -60,10 +54,7 @@
    (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -79,10 +70,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -98,10 +86,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -118,10 +103,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -135,10 +117,7 @@
    ezjsonm
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -156,10 +135,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -175,10 +151,7 @@
    (interop-js-stubs (= version))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -189,10 +162,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (superbol_free_lib (= version))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -212,10 +182,7 @@
    (cobol_lsp (= version))
    (cobol_indent (= version))
    (cobol_common (= version))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -231,10 +198,7 @@
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (cobol_config (= version))
    (cobol_common (= version))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -247,10 +211,7 @@
    (pretty (= version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ppx_deriving ( >= 5.2.1 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -268,10 +229,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( = 20230415 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -283,10 +241,7 @@
    (ocaml (>= 4.14.0))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -296,10 +251,7 @@
  (description "This is the description\nof the superbol-studio-oss OCaml project\n")
  (depends
    (ocaml (>= 4.14.0))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -320,11 +272,7 @@
    (cobol_data (= version))
    (cobol_config (= version))
    (cobol_common (= version))
-   (ppx_expect ( >= v0.16 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -335,10 +283,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (ppxlib ( >= 0.15 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -350,10 +295,7 @@
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
    (ez_file ( >= 0.3 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -367,10 +309,7 @@
    (menhir ( >= 1.2 ))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -383,10 +322,7 @@
    (fmt ( >= 0.9 ))
    (cobol_preproc (= version))
    (cobol_common (= version))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -401,10 +337,7 @@
    (menhir ( >= 1.2 ))
    (cobol_config (= version))
    (cobol_common (= version))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -418,11 +351,7 @@
    (cobol_config (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (alcotest ( >= 1 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -437,24 +366,7 @@
    (cobol_data (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
-  )
- )
-
-(package
- (name superbol_testutils)
- (synopsis "The superbol-studio-oss project")
- (description "This is the description\nof the superbol-studio-oss OCaml project\n")
- (depends
-   (ocaml (>= 4.14.0))
-   (autofonce_lib ( >= 0.8 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
-   odoc
-   ocamlformat
   )
  )
 
@@ -468,10 +380,7 @@
    (menhirLib ( > 2019 ))
    (ez_file ( >= 0.3 ))
    (ISO8601 ( >= 0.2 ))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
@@ -485,10 +394,7 @@
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ez_toml (= version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
-   (ppx_inline_test ( >= v0.16.1 ))
-   ppx_expect
    odoc
-   ocamlformat
   )
  )
 
