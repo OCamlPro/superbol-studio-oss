@@ -56,8 +56,8 @@ let rec check_ident_div (text:text) (state:indent_state) (ifcheck:bool) =
     :: {payload = TextWord "."; _} :: wordlist ->
       let context = pop_until_division context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context COMPILATION_UNIT context in
-      let context = push_context IDENT_DIV context in
+      let context = push_context state COMPILATION_UNIT context in
+      let context = push_context state IDENT_DIV context in
       check_ident_div wordlist {state with context; acc} false
 
   (*TODO:Careful check for method/interface/factory/function....
@@ -72,8 +72,8 @@ let rec check_ident_div (text:text) (state:indent_state) (ifcheck:bool) =
           check_ident_div wordlist {state with context; acc} false
       | _ ->
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
-          let context = push_context COMPILATION_UNIT context in
-          let context = push_context IDENT_DIV context in
+          let context = push_context state COMPILATION_UNIT context in
+          let context = push_context state IDENT_DIV context in
           check_ident_div wordlist {state with context; acc} false
       end
 
@@ -81,7 +81,7 @@ let rec check_ident_div (text:text) (state:indent_state) (ifcheck:bool) =
     :: {payload = TextWord "."; _} :: wordlist ->
       let context = pop_until COMPILATION_UNIT context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context PARAGRAPH context in
+      let context = push_context state PARAGRAPH context in
       check_ident_div wordlist {state with context; acc} false
 
   (*jump to ENVIRONMENT DIVISION*)
@@ -126,7 +126,7 @@ and check_env_div (text:text)  (state:indent_state) (ifcheck:bool)  =
   | {payload = TextWord "ENVIRONMENT"; loc} :: {payload = TextWord "DIVISION"; _} :: wordlist ->
       let context = pop_until_compilation_unit context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context ENV_DIV context in
+      let context = push_context state ENV_DIV context in
       check_env_div wordlist {state with context; acc} false
   | {payload = TextWord _; loc} :: {payload = TextWord "SECTION"; _}
     :: {payload = TextWord "."; _} :: wordlist ->
@@ -137,14 +137,14 @@ and check_env_div (text:text)  (state:indent_state) (ifcheck:bool)  =
         | context -> context
       in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context SECTION context in
+      let context = push_context state SECTION context in
       check_env_div wordlist {state with context; acc} false
   | {payload = TextWord ("SOURCE-COMPUTER"|"OBJECT-COMPUTER"|"SPECIAL-NAMES"|"REPOSITORY"
                         |"FILE-CONTROL"|"I-O-CONTROL"); loc}
     :: {payload = TextWord "."; _} :: wordlist ->
       let context = pop_until SECTION context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context PARAGRAPH context in
+      let context = push_context state PARAGRAPH context in
       check_env_div wordlist {state with context; acc} false
   (*jump to other division*)
   | {payload = TextWord "IDENTIFICATION"; _} :: {payload = TextWord "DIVISION"; _} :: _
@@ -172,7 +172,7 @@ and check_env_div (text:text)  (state:indent_state) (ifcheck:bool)  =
         check_copy_replace text {state with scope = COPY_REPLACE} ifcheck
     | TextWord "SELECT" ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context SELECT context in
+        let context = push_context state SELECT context in
         check_env_div wordlist {state with context; acc} false
     | TextWord "." ->
         let context = handle_period context in
@@ -194,7 +194,7 @@ and check_data_div (text:text) (state:indent_state) ifcheck  =
     :: wordlist ->
       let context = pop_until_compilation_unit context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context DATA_DIV context in
+      let context = push_context state DATA_DIV context in
       check_data_div wordlist {state with context; acc} false
   | {payload = TextWord _; loc} :: {payload = TextWord "SECTION"; _} :: wordlist ->
       let context = pop_until SECTION context in
@@ -204,7 +204,7 @@ and check_data_div (text:text) (state:indent_state) ifcheck  =
         | context -> context
       in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context SECTION context in
+      let context = push_context state SECTION context in
       check_data_div wordlist {state with context; acc} false
   | {payload = TextWord "IDENTIFICATION"; _} :: {payload = TextWord "DIVISION"; _} :: _
   | {payload = TextWord ("PROGRAM-ID"|"CLASS-ID"|"FACTORY"|"FUCNTION-ID"
@@ -232,26 +232,26 @@ and check_data_div (text:text) (state:indent_state) ifcheck  =
       | Entry (FD|RD|SD as key) ->
           let context = pop_until SECTION context in
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
-          let context = push_context key context in
+          let context = push_context state key context in
           check_fun key wordlist {state with scope = key; context; acc} false
       (*Data declaration*)
       (*77-level data description entry*)
       | Entry (LEVEL 77) ->
           let context = pop_until SECTION context in
-          let context = push_context DATA_DESC context in
+          let context = push_context state DATA_DESC context in
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
           check_data_desc wordlist {state with scope = DATA_DESC; context; acc} false
       (*rename clause*)
       | Entry (LEVEL 66) ->
           let context = pop_until (LEVEL 1) context in
-          let context = push_context DATA_DESC context in
+          let context = push_context state DATA_DESC context in
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
           check_data_desc wordlist {state with scope = DATA_DESC; context; acc} false
       | Entry (LEVEL level as key) ->
           let context = reduce_level level context in
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
-          let context = push_context key context in
-          let context = push_context DATA_DESC context in
+          let context = push_context state key context in
+          let context = push_context state DATA_DESC context in
           check_data_desc wordlist {state with scope = DATA_DESC; context; acc} false
       | PERIOD ->
           let context = handle_period context in
@@ -280,7 +280,7 @@ and check_data_div_entry clauses key (text:text) state ifcheck =
     | TextWord str when StringSet.mem str clauses ->
         let context = pop_until key context in
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context DATA_DIV_CLAUSE context in
+        let context = push_context state DATA_DIV_CLAUSE context in
         check_data_div_entry clauses key wordlist {state with context; acc} false
     | TextWord "." ->
         let context = handle_period context in
@@ -331,8 +331,8 @@ and check_proc_div_header (text:text) (state:indent_state) ifcheck =
     ->
     let context = pop_until_compilation_unit context in
     let acc = check_pos loc (offset_of_context context) acc ifcheck in
-    let context = push_context PROC_DIV context in
-    let context = push_context PROC_DIV_HEADER context in
+    let context = push_context state PROC_DIV context in
+    let context = push_context state PROC_DIV_HEADER context in
     check_proc_div_header wordlist {state with context; acc} false
   | {payload; loc} :: wordlist ->
     match payload with
@@ -355,7 +355,7 @@ and check_proc_div_header (text:text) (state:indent_state) ifcheck =
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
           (*for better indentation, we suppose that when procedure division begins,
             there is an implicit paragraph just after the procedure division. *)
-          let context = push_context PARAGRAPH context in
+          let context = push_context state PARAGRAPH context in
           check_proc_div wordlist {state with scope = PROC_DIV; context; acc} false
       | _ ->
           failwith @@ failure_msg loc
@@ -378,8 +378,8 @@ and check_proc_div (text:text) (state:indent_state) ifcheck   =
   | {payload = TextWord "DECLARATIVES"; loc} :: {payload = TextWord "."; _} :: wordlist ->
       let context = pop_until PROC_DIV context in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context DECLARATIVES context in
-      let context = push_context PARAGRAPH context in
+      let context = push_context state DECLARATIVES context in
+      let context = push_context state PARAGRAPH context in
       check_proc_div wordlist {state with context; acc} false
   | {payload = TextWord "END"; loc} :: {payload = TextWord "DECLARATIVES"; _}
     :: {payload = TextWord "."; _}:: wordlist ->
@@ -389,7 +389,7 @@ and check_proc_div (text:text) (state:indent_state) ifcheck   =
           let acc = check_pos loc (offset_of_context context) acc ifcheck in
           (*for better indentation, we suppose that when procedure division begins,
             there is an implicit paragraph just after the procedure division. *)
-          let context = push_context PARAGRAPH context in
+          let context = push_context state PARAGRAPH context in
           check_proc_div wordlist {state with context; acc} false
       | _ -> failwith @@ failure_msg loc end
 
@@ -402,8 +402,8 @@ and check_proc_div (text:text) (state:indent_state) ifcheck   =
         | context -> context
       in
       let acc = check_pos loc (offset_of_context context) acc ifcheck in
-      let context = push_context SECTION context in
-      let context = push_context PARAGRAPH context in
+      let context = push_context state SECTION context in
+      let context = push_context state PARAGRAPH context in
       check_proc_div wordlist {state with context; acc} false
   | {payload = TextWord name; loc} :: {payload = TextWord "."; _} :: wordlist
     when not @@ is_statement name ->
@@ -414,7 +414,7 @@ and check_proc_div (text:text) (state:indent_state) ifcheck   =
       in
       let offset = offset_of_context context in
       let acc = check_pos loc offset acc ifcheck in
-      let context = push_context PARAGRAPH context in
+      let context = push_context state PARAGRAPH context in
       check_proc_div wordlist {state with context; acc} false
   (*end compilation_unit*)
   | {payload = TextWord "END"; loc }
@@ -678,7 +678,7 @@ and check_raise_stmt (text:text) state ifcheck =
         check_raise_stmt wordlist state ifcheck
     | TextWord _ when context = [] || fst @@ List.hd context <> DUMMY_EXCEPTION ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context DUMMY_EXCEPTION context in
+        let context = push_context state DUMMY_EXCEPTION context in
         check_raise_stmt wordlist {state with acc; context} false
     | _ ->
         check_statement text state ifcheck
@@ -703,7 +703,7 @@ and check_goback_stmt (text:text) state ifcheck =
         check_proc_div wordlist {state with scope; context; acc} false
     | TextWord "RAISING" ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context RAISING context in
+        let context = push_context state RAISING context in
         check_goback_stmt wordlist {state with context; acc} false
     | TextWord "LAST"
       (*"GOBACK [RAISING LAST EXCEPTION]"*)
@@ -713,7 +713,7 @@ and check_goback_stmt (text:text) state ifcheck =
     | TextWord _
       when context <> [] && fst @@ List.hd context = RAISING ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context DUMMY_EXCEPTION context in
+        let context = push_context state DUMMY_EXCEPTION context in
         check_goback_stmt wordlist {state with context; acc} false
     | _ ->
         check_statement text state ifcheck
@@ -733,7 +733,7 @@ and check_use_stmt (text:text) state ifcheck =
         check_use_stmt wordlist {state with acc} false
     | TextWord _ when context = [] || fst @@ List.hd context <> DUMMY_EXCEPTION ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context DUMMY_EXCEPTION context in
+        let context = push_context state DUMMY_EXCEPTION context in
         check_use_stmt wordlist {state with acc; context} false
     | _ ->
         check_statement text state ifcheck
@@ -792,7 +792,7 @@ and check_add_stmt (text:text) state ifcheck =
       | TextWord word ->
         begin match proc_context_of_str word with
         | No_keyword ->
-            let context = push_context ARGUMENT state.context in
+            let context = push_context state ARGUMENT state.context in
             check_arguments text {state with scope = ARGUMENT; context} ifcheck ~fst_arg:true
 	      | Phrase keyword -> handle_phrase keyword loc wordlist state ifcheck
 	      | _ -> check_statement text state ifcheck
@@ -814,12 +814,12 @@ and handle_open_scope keyword loc wordlist state ifcheck =
   let context = imp_scope_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
-  let context = push_context keyword context in
+  let context = push_context state keyword context in
   match keyword with
   (*TODO: find a better way to handle the nested IF statement.
           If need to indent the condition expression, must change this*)
   | IF ->
-      let context = push_context THEN context in
+      let context = push_context state THEN context in
       check_fun keyword wordlist {state with scope = keyword; context; acc} false
   | _ ->
       check_fun keyword wordlist {state with scope = keyword; context; acc} false
@@ -857,7 +857,7 @@ and handle_else loc wordlist state ifcheck =
   match context with
   | (THEN, _) :: ((IF, _) :: context' as context) ->
       let acc = check_pos loc (offset_of_context context') state.acc ifcheck in
-      let context = push_context ELSE context in
+      let context = push_context state ELSE context in
       check_fun state.scope wordlist {state with scope = ELSE; context; acc} false
   |_ ->
     failwith @@ failure_msg loc
@@ -868,8 +868,8 @@ and handle_operator keyword loc wordlist state ifcheck =
   let context = phrase_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
-  let context = push_context keyword context in
-  let context = push_context ARGUMENT context in
+  let context = push_context state keyword context in
+  let context = push_context state ARGUMENT context in
   check_arguments wordlist {state with acc; context; scope = ARGUMENT} false ~fst_arg:true
 
 and handle_to loc wordlist state ifcheck =
@@ -889,8 +889,8 @@ and handle_by loc wordlist state ifcheck =
   let context = phrase_termination_until USING state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
-  let context = push_context BY context in
-  let context = push_context ARGUMENT context in
+  let context = push_context state BY context in
+  let context = push_context state ARGUMENT context in
   check_arguments wordlist {state with acc; context; scope = ARGUMENT} false ~fst_arg:true
 
 (*using-phrase is the only phrase that we treat more carefully
@@ -900,7 +900,7 @@ and handle_using loc text state ifcheck =
   let context = phrase_termination state.context in
   let offset = offset_of_context context in
   let acc = check_pos loc offset state.acc ifcheck in
-  let context = push_context USING context in
+  let context = push_context state USING context in
   check_using text {state with acc; context; scope = USING} false
 
 and check_using (text:text) state ifcheck =
@@ -912,7 +912,7 @@ and check_using (text:text) state ifcheck =
   | {payload = TextWord word; _} :: _  ->
       begin match proc_context_of_str word with
       | No_keyword ->
-          let context = push_context ARGUMENT state.context in
+          let context = push_context state ARGUMENT state.context in
           check_arguments text {state with context; scope = ARGUMENT} ifcheck ~fst_arg:true
       | _ -> check_statement text state ifcheck
       (*Since using-phrase alse appears in the procedure division header,
@@ -940,7 +940,7 @@ and handle_phrase keyword loc wordlist state ifcheck =
       let acc = check_pos loc offset state.acc ifcheck in
       match context with
       | (prev, _) :: _ ->
-          let context = push_context keyword context in
+          let context = push_context state keyword context in
           check_fun prev wordlist {state with scope = prev; context; acc} false
       | _ -> failwith @@ failure_msg loc
 
@@ -964,13 +964,13 @@ and handle_conditional_statement loc keyword wordlist state ifcheck =
     (*special case, SEARCH statement contains only `AT_END` but not `NOT_AT_END`*)
     | (SEARCH, offset) :: _ when keyword = AT_END ->
         let acc = check_pos loc offset acc ifcheck in
-        let context = push_context SEARCH_AT_END context in
+        let context = push_context state SEARCH_AT_END context in
         check_fun keyword wordlist {state with scope = keyword; context; acc} false
     (* take `ON_SIZE_ERROR` for an example*)
     (* when the `ON_SIZE_ERROR` is just after an `ADD`, it must match this `ADD`*)
     | (key, offset) :: _ when List.mem key keyword_associated ->
         let acc = check_pos loc offset acc ifcheck in
-        let context = push_context keyword context in
+        let context = push_context state keyword context in
         check_fun keyword wordlist {state with scope = keyword; context; acc} false
     (* when the `ON_SIZE_ERROR` is not just after `ADD`,
       there must be a `NOT_ON_SIZE_ERROR` in the `context`, match them*)
@@ -979,7 +979,7 @@ and handle_conditional_statement loc keyword wordlist state ifcheck =
         match context with
         | (key, _) :: context when key = rev_keyword ->
             let acc = check_pos loc (offset_of_context context) acc ifcheck in
-            let context = push_context HELPTOKEN context in
+            let context = push_context state HELPTOKEN context in
             check_fun keyword wordlist {state with scope = keyword; context; acc} false
         | _ -> failwith @@ failure_msg loc
   in
@@ -1017,7 +1017,7 @@ and handle_when loc wordlist state ifcheck =
   match context with
   | (key, offset) :: _ when key = EVALUATE || key = SEARCH ->
       let acc = check_pos loc offset state.acc ifcheck in
-      let context = push_context WHEN context in
+      let context = push_context state WHEN context in
       check_fun state.scope wordlist {state with scope = WHEN; context; acc} false
   | _ ->
       let rec pop_until_ context =
@@ -1033,7 +1033,7 @@ and handle_when loc wordlist state ifcheck =
           check_fun state.scope wordlist {state with scope = WHEN; context; acc} false
       | (SEARCH_AT_END, _) :: context ->
           let acc = check_pos loc (offset_of_context context) state.acc ifcheck in
-          let context = push_context WHEN context in
+          let context = push_context state WHEN context in
           check_fun state.scope wordlist {state with scope = WHEN; context; acc} false
       | _ ->
           failwith @@ failure_msg loc
@@ -1064,18 +1064,18 @@ and check_copy_replace (text:text) (state:indent_state) (ifcheck:bool)  =
     | TextWord "COPY" ->
         let offset_orig = pos.pos_cnum - pos.pos_bol in
         (*no check*)
-        let offset =  offset_orig + offset_of_keyword COPY in
+        let offset =  offset_orig + offset_of_keyword state.indent_config COPY in
         let context = (COPY, offset) :: context in
         check_copy_replace wordlist  {state with context} false
     | TextWord "REPLACE" ->
         let offset_orig = pos.pos_cnum - pos.pos_bol in
         (*no check*)
-        let offset = offset_orig + offset_of_keyword REPLACE in
+        let offset = offset_orig + offset_of_keyword state.indent_config REPLACE in
         let context = (REPLACE, offset) :: context in
         check_copy_replace wordlist  {state with context} false
     | TextWord "REPLACING" ->
         let acc = check_pos loc (offset_of_context context) acc ifcheck in
-        let context = push_context REPLACING_COPY context in
+        let context = push_context state REPLACING_COPY context in
         check_copy_replace wordlist {state with context; acc} false
     | TextWord "." ->
         let rec help context =

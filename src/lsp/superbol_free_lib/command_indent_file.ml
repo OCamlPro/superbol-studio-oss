@@ -17,9 +17,10 @@ open Cobol_indent
 
 open Common_args
 
-let action { preproc_options = { source_format; config; _ } ; _ }
-    ~indent_config files =
+let action { preproc_options = { source_format; config; _ } ; _ } files =
   let module Config = (val config) in
+  let project = Project_config.load_project () in
+  let indent_config = Some (Cobol_indent.config project.config.indent_config) in
   List.to_seq files
   |> Seq.map (fun file ->
     let contents = Ez_file.V1.EzFile.read_file file in
@@ -30,24 +31,12 @@ let action { preproc_options = { source_format; config; _ } ; _ }
 let cmd =
   let files = ref [] in
   let common, common_args = Common_args.get () in
-  let indent_config, indent_config_arg =
-    let indent_config = ref "./src/cobol_indent/user_def" in
-    let indent_config_arg =
-      ["indent_config"],
-      Arg.Set_string indent_config,
-      EZCMD.info ~docv:"FILE" "User defined configuration of indentation"
-    in
-    indent_config, indent_config_arg
-  in
-  let args =
-    common_args @ [indent_config_arg]
-  in
+  let args = common_args  in
   EZCMD.sub
     "indent file"
     (fun () ->
        let common = common () in
-       Seq.iter ignore @@ action common !files
-         ~indent_config:(Some !indent_config))
+       Seq.iter ignore @@ action common !files)
     ~args:(args @ [
         [],
       Arg.Anons (fun list -> files := list),

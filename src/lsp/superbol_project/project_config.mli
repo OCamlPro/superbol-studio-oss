@@ -23,6 +23,7 @@ module TYPES: sig
     mutable libpath: path list;
     mutable copybook_extensions: string list;
     mutable copybook_if_no_extension: bool;
+    mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;
   }
 

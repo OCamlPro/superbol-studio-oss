@@ -69,8 +69,10 @@ let offset_of_context context =
   | [] -> failwith "empty context"
   | _ -> snd @@ List.hd context
 
-let push_context key context =
-  (key, offset_of_keyword key + offset_of_context context) :: context
+let push_context state key context =
+  (key,
+   offset_of_keyword state.indent_config key + offset_of_context context)
+  :: context
 
 
 (*for DATA DECLARATION*)

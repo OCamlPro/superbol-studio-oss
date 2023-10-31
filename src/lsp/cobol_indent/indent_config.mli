@@ -11,7 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*set the indentation configuration*)
-val set_config : indent_config:string -> unit
+type t = Indent_type.indent_config
 
-val offset_of_keyword: Indent_type.context_kind -> int
+val default : t
+
+(** Merge two configs. Offsets in the second config take precedence. *)
+val merge : t -> t -> t
+
+val of_list : (string * int) list -> t
+
+val offset_of_keyword: t -> Indent_type.context_kind -> int
