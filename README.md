@@ -28,7 +28,7 @@ be available to use the extension.
 
 You can download both the `superbol-fee` executable and the VSIX file
 from the releases page[^releases].  Save the former in a directory
-that is in already `PATH` so the extension works out of the box.
+that is already in the `PATH` so the extension works out of the box.
 
 [^releases]: Available soon.
 
