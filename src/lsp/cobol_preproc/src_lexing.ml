@@ -131,6 +131,11 @@ let raw_loc ~start_pos ~end_pos { newline; config = { source_format; _ }; _ } =
 let ignore_lexloc ~start_pos ~end_pos state =
   { state with ignored = (start_pos, end_pos) :: state.ignored }
 
+let skip state lexbuf =
+  ignore_lexloc state
+    ~start_pos:(Lexing.lexeme_start_p lexbuf)
+    ~end_pos:(Lexing.lexeme_end_p lexbuf)
+
 let emit prod ({ pseudotext; cdir_seen; _ } as state) =
   match pseudotext with
   | None ->

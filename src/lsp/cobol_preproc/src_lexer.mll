@@ -515,11 +515,15 @@ and free_nominal state
 
 and gobble_line state
   = parse
-  | (nnl* newline)
+  | (nnl+)
+      {
+        gobble_line (Src_lexing.skip state lexbuf) lexbuf
+      }
+  | newline
       {
         Src_lexing.new_line state lexbuf
       }
-  | (nnl* eof)
+  | eof
       {
         Src_lexing.(flush @@ eof state lexbuf)
       }
