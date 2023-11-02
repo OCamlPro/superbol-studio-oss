@@ -17,7 +17,7 @@ open EZCMD.TYPES
 let config_cmd =
   let dirname = ref None in
   let action () =
-    let project = Project_config.load_project ?dirname:!dirname () in
+    let project = Project.load ?dirname:!dirname () in
     Pretty.out "%s@."
       (Ez_toml.V1.TOML.string_of_node
          (Ezr_toml.toml project.config.toml_handle))
@@ -44,7 +44,7 @@ let init_cmd =
     "project init"
     (fun () ->
       Superbol_project.save_config @@
-      Project_config.load_project ?dirname:!dirname ())
+      Project.load ?dirname:!dirname ())
     ~args:[
       [], Arg.Anon (0, fun s -> dirname := Some s),
       EZCMD.info ~docv:"DIR" "Project directory";

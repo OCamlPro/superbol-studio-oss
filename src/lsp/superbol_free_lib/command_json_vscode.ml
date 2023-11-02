@@ -78,7 +78,7 @@ let cmd =
          List.iter parse files
        | Some file, [] ->
          Vscode_json.Main.write_file file
-           Vscode_json.Manifest.vscode_enc Project.manifest
+           Vscode_json.Manifest.vscode_enc VSCode_extension.manifest
        | Some _, _ ->
          Printf.eprintf
            "Actions --gen TARGET and parse files are exclusive\n%!";

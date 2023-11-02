@@ -19,14 +19,14 @@ open Common_args
 
 let action { preproc_options = { source_format; config; _ } ; _ } files =
   let module Config = (val config) in
-  let project = Project_config.load_project () in
-  let indent_config = Some (Cobol_indent.config project.config.indent_config) in
   List.to_seq files
-  |> Seq.map (fun file ->
-    let contents = Ez_file.V1.EzFile.read_file file in
-    indent_range_str
-      ~source_format ~filename:file ~contents ~indent_config ~range:None
-      ~dialect:Config.dialect |> Fmt.pr "%s")
+  |> Seq.map (fun filename ->
+      let project = Project.for_ ~filename in
+      let contents = Ez_file.V1.EzFile.read_file filename in
+      indent_range_str
+        ~source_format ~filename ~contents ~range:None
+        ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
+        ~dialect:Config.dialect |> Fmt.pr "%s")
 
 let cmd =
   let files = ref [] in

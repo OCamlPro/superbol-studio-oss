@@ -18,13 +18,13 @@ open Cobol_indent
 open Common_args
 
 let action
-  { preproc_options = { source_format; config; _ }; _ } ~file ~range
+  { preproc_options = { source_format; config; _ }; _ } ~filename ~range
 =
   let module Config = (val config) in
-  let project = Project_config.load_project () in
+  let project = Project.for_ ~filename in
   let indent_config = Some (Cobol_indent.config project.config.indent_config) in
-  let contents = Ez_file.V1.EzFile.read_file file in
-  indent_range_str ~source_format ~filename:file ~contents ~range ~indent_config
+  let contents = Ez_file.V1.EzFile.read_file filename in
+  indent_range_str ~source_format ~filename ~contents ~range ~indent_config
     ~dialect:Config.dialect |> Fmt.pr "%s"
 
 let cmd =
@@ -50,7 +50,7 @@ let cmd =
        let common = common () in
        action
          common
-         ~file:!file
+         ~filename:!file
          ~range:(range start_line end_line)
          )
     ~args
