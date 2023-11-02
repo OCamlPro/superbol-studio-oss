@@ -94,6 +94,13 @@ github-workflow-before-build = """
 
 """
 
+# NB: a `before-tests` field would make more sense here.
+github-workflow-after-build = """
+      - name: install test dependencies
+        if: matrix.skip_test  != 'true'
+        run: opam install -y test/opam/*.opam --deps-only --with-test
+"""
+
 
 [[package]]
 dir = "src/vscode/superbol-vscode-platform"
