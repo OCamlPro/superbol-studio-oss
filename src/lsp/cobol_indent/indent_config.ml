@@ -39,7 +39,7 @@ let default = of_list
       "SELECT", 7;
       "PARAGRAPH", 4;
       (*if need to indent the nested-program, set "PROC_DIV" to no zero*)
-      "PROC_DIV", 1;
+      "PROC_DIV", 0;
       (*if need to show more information about the different hierarchy of code,
         these offsets can be set *)
       "IDENT_DIV", 0;

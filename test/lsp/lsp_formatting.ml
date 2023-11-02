@@ -52,9 +52,9 @@ let%expect_test "simple-formatting-request" =
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROGRAM-ID. HELLO.
            PROCEDURE DIVISION.
-            para-1.
-                DISPLAY "HELLO"
-                STOP RUN. |}]
+           para-1.
+               DISPLAY "HELLO"
+               STOP RUN. |}]
 
 let doc = {cobol|
        PROGRAM-ID. HELLO.
@@ -75,9 +75,9 @@ let%expect_test "unindent-formatting-request" =
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROGRAM-ID. HELLO.
            PROCEDURE DIVISION.
-            para-1.
-                DISPLAY "HELLO"
-                STOP RUN. |}]
+           para-1.
+               DISPLAY "HELLO"
+               STOP RUN. |}]
 
 
 let doc = {cobol|
@@ -205,36 +205,36 @@ let%expect_test "formatting-request-nested-program" =
             IDENTIFICATION DIVISION.
             PROGRAM-ID. X.
             PROCEDURE DIVISION.
-                 DISPLAY "I'm in X"
-                 CALL "X1"
-                 CALL "X2"
-                 STOP RUN.
-             IDENTIFICATION DIVISION.
-             PROGRAM-ID. X1.
-             PROCEDURE DIVISION.
-                  DISPLAY "I'm in X1"
-                  CALL "X11"
-                  CALL "X12"
-                  EXIT Program.
-              IDENTIFICATION DIVISION.
-              PROGRAM-ID. X11.
-              PROCEDURE DIVISION.
-                   DISPLAY "I'm in X11"
-                   EXIT Program.
-              END PROGRAM X11.
-              IDENTIFICATION DIVISION.
-              PROGRAM-ID. X12.
-              PROCEDURE DIVISION.
-                   DISPLAY "I'm in X12"
-                   EXIT Program.
-              END PROGRAM X12.
-             END PROGRAM X1.
-             IDENTIFICATION DIVISION.
-             PROGRAM-ID. X2.
-             PROCEDURE DIVISION.
-                  DISPLAY "I'm in X2"
-                  EXIT Program.
-             END PROGRAM X2.
+                DISPLAY "I'm in X"
+                CALL "X1"
+                CALL "X2"
+                STOP RUN.
+            IDENTIFICATION DIVISION.
+            PROGRAM-ID. X1.
+            PROCEDURE DIVISION.
+                DISPLAY "I'm in X1"
+                CALL "X11"
+                CALL "X12"
+                EXIT Program.
+            IDENTIFICATION DIVISION.
+            PROGRAM-ID. X11.
+            PROCEDURE DIVISION.
+                DISPLAY "I'm in X11"
+                EXIT Program.
+            END PROGRAM X11.
+            IDENTIFICATION DIVISION.
+            PROGRAM-ID. X12.
+            PROCEDURE DIVISION.
+                DISPLAY "I'm in X12"
+                EXIT Program.
+            END PROGRAM X12.
+            END PROGRAM X1.
+            IDENTIFICATION DIVISION.
+            PROGRAM-ID. X2.
+            PROCEDURE DIVISION.
+                DISPLAY "I'm in X2"
+                EXIT Program.
+            END PROGRAM X2.
             END PROGRAM X. |}]
 
 
@@ -423,70 +423,70 @@ let%expect_test "formatting-request-whole-program" =
                 05 INAME PIC X(10).
             01 RK PIC 9(02) VALUE 01.
             PROCEDURE DIVISION.
-             0001.
-                 DISPLAY "ENTER 1.SEAR/2.WRITE/3.REWR/4.DEL/5.DELALL/6.DISP".
-                 ACCEPT A.
-                 IF A = 1 GO 1SEARCH
-                 ELSE IF A = 2 GO 2WRITE
-                 ELSE IF A = 3 GO 3REWRITE
-                 ELSE IF A = 4 GO 4DELETE
-                 ELSE IF A = 5 GO 5DELALL
-                 ELSE IF A = 6 GO 6DISPLAY
-                 ELSE DISPLAY "INVALID INPUT"
-                     GO 0001.
-                 STOP RUN.
-             1SEARCH.
-                 OPEN INPUT MACC.
-                 ACCEPT B.
-             0002.
-                 READ MACC NEXT AT END DISPLAY B "NOT FOUND", GO 000X.
-                 IF B = MNO DISPLAY "FOUND " MNO ":" ,
-                     DISPLAY " AT POS:" A " FOR NAME: " MNAME,
-                     GO 000X.
-                 ADD 1 TO A.
-                 GO TO 0002.
-             2WRITE.
-                 OPEN I-O MACC.
-                 IF FS = 00 PERFORM RKKEY UNTIL FS = 10
-                 ELSE OPEN OUTPUT MACC.
-                 DISPLAY RK.
-                 ACCEPT MNO.
-                 ACCEPT MNAME.
-                 WRITE MREC INVALID KEY DISPLAY "DUPLICATE KEY!".
-                 GO 000X.
-             3REWRITE.
-                 OPEN I-O MACC.
-                 ACCEPT RK.
-                 ACCEPT MNO.
-                 ACCEPT MNAME.
-                 REWRITE MREC INVALID KEY DISPLAY "NOT FOUND".
-                 GO 000X.
-             4DELETE.
-                 OPEN I-O MACC.
-                 ACCEPT RK.
-                 DELETE MACC INVALID KEY DISPLAY "NOT FOUND".
-                 GO 000X.
-             5DELALL.
-                 OPEN I-O MACC.
-                 MOVE 01 TO RK.
-             0003.
-                 DELETE MACC INVALID KEY GO 000X.
-                 ADD 01 TO RK.
-                 GO 0003.
-             6DISPLAY.
-                 OPEN INPUT MACC.
-             0005.
-                 READ MACC NEXT INTO IREC AT END GO 000X.
-                 DISPLAY INO, " ", INAME.
-                 GO 0005.
-             000X.
-                 CLOSE MACC.
-                 DISPLAY "CONTINUE?1/0".
-                 ACCEPT A.
-                 IF A = 0 STOP RUN ELSE GO 0001.
-             RKKEY.
-                 READ MACC NEXT.
-                 ADD 1 TO RK. |}]
+            0001.
+                DISPLAY "ENTER 1.SEAR/2.WRITE/3.REWR/4.DEL/5.DELALL/6.DISP".
+                ACCEPT A.
+                IF A = 1 GO 1SEARCH
+                ELSE IF A = 2 GO 2WRITE
+                ELSE IF A = 3 GO 3REWRITE
+                ELSE IF A = 4 GO 4DELETE
+                ELSE IF A = 5 GO 5DELALL
+                ELSE IF A = 6 GO 6DISPLAY
+                ELSE DISPLAY "INVALID INPUT"
+                    GO 0001.
+                STOP RUN.
+            1SEARCH.
+                OPEN INPUT MACC.
+                ACCEPT B.
+            0002.
+                READ MACC NEXT AT END DISPLAY B "NOT FOUND", GO 000X.
+                IF B = MNO DISPLAY "FOUND " MNO ":" ,
+                    DISPLAY " AT POS:" A " FOR NAME: " MNAME,
+                    GO 000X.
+                ADD 1 TO A.
+                GO TO 0002.
+            2WRITE.
+                OPEN I-O MACC.
+                IF FS = 00 PERFORM RKKEY UNTIL FS = 10
+                ELSE OPEN OUTPUT MACC.
+                DISPLAY RK.
+                ACCEPT MNO.
+                ACCEPT MNAME.
+                WRITE MREC INVALID KEY DISPLAY "DUPLICATE KEY!".
+                GO 000X.
+            3REWRITE.
+                OPEN I-O MACC.
+                ACCEPT RK.
+                ACCEPT MNO.
+                ACCEPT MNAME.
+                REWRITE MREC INVALID KEY DISPLAY "NOT FOUND".
+                GO 000X.
+            4DELETE.
+                OPEN I-O MACC.
+                ACCEPT RK.
+                DELETE MACC INVALID KEY DISPLAY "NOT FOUND".
+                GO 000X.
+            5DELALL.
+                OPEN I-O MACC.
+                MOVE 01 TO RK.
+            0003.
+                DELETE MACC INVALID KEY GO 000X.
+                ADD 01 TO RK.
+                GO 0003.
+            6DISPLAY.
+                OPEN INPUT MACC.
+            0005.
+                READ MACC NEXT INTO IREC AT END GO 000X.
+                DISPLAY INO, " ", INAME.
+                GO 0005.
+            000X.
+                CLOSE MACC.
+                DISPLAY "CONTINUE?1/0".
+                ACCEPT A.
+                IF A = 0 STOP RUN ELSE GO 0001.
+            RKKEY.
+                READ MACC NEXT.
+                ADD 1 TO RK. |}]
 
 
 
@@ -537,10 +537,10 @@ let%expect_test "formatting-request-perform" =
   [%expect {|
     {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
            PROCEDURE DIVISION.
-            para-1.
-                PERFORM 3 TIMES
-                    PERFORM PARA-2
-                END-PERFORM
-                STOP RUN.
-            PARA-2.
-                DISPLAY "HELLO". |}]
+           para-1.
+               PERFORM 3 TIMES
+                   PERFORM PARA-2
+               END-PERFORM
+               STOP RUN.
+           PARA-2.
+               DISPLAY "HELLO". |}]
