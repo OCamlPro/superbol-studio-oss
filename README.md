@@ -5,7 +5,7 @@
 
 ## Features
 
-* LSP (`superbol-free`) with the following capabilities:
+* LSP server (`superbol-free`), with the following capabilities:
     * Syntax diagnostics
     * Go to definitions
     * Find references
@@ -20,60 +20,70 @@
 
 ## VSCode Extension
 
-### From binary and VSIX
+The VSCode extension is bundled in a VSIX file, and makes use of the
+LSP server `superbol-fee`.  The latter is an executable that needs to
+be available to use the extension.
 
-Get the `superbol` executable and install it in `/usr/local/bin`.
+### Downloading binary releases
 
-Get the `superbol-vscode-platform.vsix` file from the releases.
+You can download both the `superbol-fee` executable and the VSIX file
+from the releases page[^releases].  Save the former in a directory
+that is in already `PATH` so the extension works out of the box.
 
-In VSCode open the `extension` view and select the three dots on the top right of the sidebar.
+[^releases]: Available soon.
 
-Select `Install from VSIX ...` and select the `superbol-vscode-platform.vsix` file.
+### Adding the extension to VSCode
 
-### Build
+Open VSCode and open the extensions view.
 
-Get the `superbol` executable and install it in `/usr/local/bin`.
+In the sidebar, click on the three dots (`⋅⋅⋅`) on the top right-hand
+side (just above "`search`").
 
-Clone the source code of this extension:
-```bash
-git clone https://github.com/OCamlPro/superbol-vscode-platform.git
-```
+Select "`Install from VSIX…`" and pick
+`superbol-vscode-platform.vsix`.
 
-Go to the created folder and install the dependencies with
-```bash
-cd superbol-vscode-platform
-yarn install
-```
+### Configuring the extension
 
-Finally build the extension with:
-```bash
-make vsix-debug
-```
-
-### Add the extension to VSCode
-
-Open VSCode and go to the extension view.
-
-In the sidebar click on the three dots on the top right (just above `search`) and select
-`install from VSIX ...` and select the `superbol-vscode-platform.vsix` generated from
-this extension.
-
-### Configure the extension
-
-If you have installed the `superbol` executable in `/usr/local/bin` then you have nothing to do,
-the extension will work out of the box.
+If you have installed the `superbol-free` executable in a directory
+that is already in `PATH`, then you have nothing to do, the extension
+will work out of the box.
 
 Otherwise get the path to the `superbol` executable and copy it.
 
-Go to your VSCode settings and in the extension submenu select `Superbol COBOL`.
+Go to your VSCode settings and in the extension submenu select
+`Superbol COBOL`.
 
-In the `superbol` field past the path to the `superbol` executable.
+In the `superbol` field, past the path to the `superbol-free`
+executable.
 
-You can check the documentation on using the extension on [this page](https://ocamlpro.github.io/superbol-vscode-platform/sphinx).
+You can check the documentation on using the extension on [this
+page](https://ocamlpro.github.io/superbol-studio-oss/sphinx).
 
 ## GNU/Emacs mode
 
-You can check the documentation on using the Superbol LSP with GNU/Emacs on [this page](https://ocamlpro.github.io/superbol-vscode-platform/sphinx/emacs.html).
+You can check the documentation on using the Superbol LSP with
+GNU/Emacs on [this
+page](https://ocamlpro.github.io/superbol-studio-oss/sphinx/emacs).
+
+## Building from Sources
+
+You first need to install a few external dependencies to build the LSP server and the VSCode extension from sources.
+
+1. First, you need to install and initialize [opam](https://opam.ocaml.org/);
+
+1. Then you need a decent version of our build tool [drom](https://ocamlpro.github.io/drom/).  The easiest way to have it running is via the following command:
+
+   ```bash
+   opam pin add https://github.com/OCamlPro/drom.git
+   ```
+
+1. To build the VSCode extension, you also need to have [node.js](https://nodejs.org/), and install `yarn` via:
+
+   ```bash
+   npm install yarn
+   ```
+
+1. After that, running `make` in the package's root directory should compile the LSP server, along with the VSCode extension.
 
 ## Resources
 

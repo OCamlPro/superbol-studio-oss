@@ -15,10 +15,7 @@ Welcome to superbol-vscode-platform
    install
    install-vscode
    lsp
-   features
    platform
-   tasks
-   settings
    emacs
    debug
    commands

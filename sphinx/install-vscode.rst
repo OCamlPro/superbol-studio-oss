@@ -9,30 +9,21 @@ TODO
 From :code:`.vsix` files
 ------------------------
 
-You can build the vsix files from source. For :code:`superbol-vscode-platform`, run the following
+You can build the VSIX files from source.  For :code:`superbol-studio-oss`, run the following
 commands:
 
 .. code-block:: shell
 
-    yarn install #if not already done
+    yarn install #if not already done; note you need yarn version < 2
     drom build
     make compile
     yarn package
 
-For :code:`superbol-vscode-debug`, run the follwing command:
+With those commands you should obtain a file
+:code:`superbol-vscode-platform.vsix` in the project's root directory.
 
-.. code-block:: shell
+To install it, open VSCode and go the the :code:`Extensions` view.
 
-    yarn compile
-    vsce package
+Click on the :code:`⋅⋅⋅` at the top right of the left pane and select :code:`Install from VSIX…`.
 
-With those commands you should have respectively :code:`superbol-vscode-platform.vsix` and
-:code:`superbol-vscode-debug.vsix` in the project root directory.
-
-To install them open VSCode and go the the :code:`Extensions` view.
-
-Click on the :code:`...` at the top right of the left pane and select :code:`Install from VSIX ...`.
-
-Select the :code:`superbol-vscode-debug.vsix` file first to install it.
-
-Finally select the :code:`superbol-vscode-platform.vsix` file to install it.
+Select the :code:`superbol-vscode-platform.vsix` file to install it.
