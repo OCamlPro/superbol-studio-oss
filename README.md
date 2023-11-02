@@ -67,28 +67,39 @@ page](https://ocamlpro.github.io/superbol-studio-oss/sphinx/emacs).
 
 ## Building from Sources
 
-You first need to install a few external dependencies to build the LSP server and the VSCode extension from sources.
+You first need to install a few external dependencies to build the LSP
+server and the VSCode extension from sources.
 
-1. First, you need to install and initialize [opam](https://opam.ocaml.org/);
+1. First, you need to install and initialize
+   [opam](https://opam.ocaml.org/);
 
-1. Then you need a decent version of our build tool [drom](https://ocamlpro.github.io/drom/).  The easiest way to have it running is via the following command:
+1. Then you need a recent version[^drom-version] of our build tool
+   [drom](https://ocamlpro.github.io/drom/).  The
+   easiest way to have it running is via the following command:
 
    ```bash
    opam pin add https://github.com/OCamlPro/drom.git
    ```
 
-1. To build the VSCode extension, you also need to have [node.js](https://nodejs.org/), and install `yarn` via:
+   [^drom-version]: Current version is 0.9.2~dev3 (commit 63a5770).
+
+1. To build the VSCode extension, you also need to have
+   [node.js](https://nodejs.org/), and install `yarn` via:
 
    ```bash
    npm install yarn
+   yarn install
    ```
 
-1. After that, running `make` in the package's root directory should compile the LSP server, along with the VSCode extension.
+1. You can then install all remaining dependencies, and compile the
+   LSP server along with the VSCode extension:
+
+   ```bash
+   make build-deps vsix-release
+   ```
 
 ## Resources
 
 * Website: https://ocamlpro.github.io/superbol-vscode-platform
 * General Documentation: https://ocamlpro.github.io/superbol-vscode-platform/sphinx
 * Sources: https://github.com/ocamlpro/superbol-vscode-platform
-
-
