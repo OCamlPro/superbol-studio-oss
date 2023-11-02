@@ -1,11 +1,11 @@
 # NOTE: Currently ignored by `drom` as under `test`.
 # 
 # If you want to add test dependencies for libraries of the project,
-# then you need to edit `test/opam/superbol_testutils.opam` directly.
+# then you need to edit `test/opam/superbol-testdeps.opam` directly.
 # 
 
 # name of package
-name = "superbol_testutils"
+name = "superbol-testdeps"
 skeleton = "library"
 
 # version if different from project version
