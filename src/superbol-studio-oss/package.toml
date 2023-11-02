@@ -1,0 +1,10 @@
+# name of package
+name = "superbol-studio-oss"
+skeleton = "virtual"
+kind = "program"
+skip = []
+description = "Virtual package that depends on both the VSCode extension and the LSP server."
+
+[dependencies]
+superbol-vscode-platform = "version"
+superbol-free = "version"

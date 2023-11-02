@@ -1,5 +1,5 @@
-GNU/Emacs modes
-===============
+SuperBOL modes for GNU/Emacs
+============================
 
 We document two means that are available for editing COBOL files using
 GNU/Emacs.  One makes use of a modified version of

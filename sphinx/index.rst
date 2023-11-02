@@ -3,26 +3,26 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to superbol-vscode-platform
-================
+Welcome to SuperBOL Studio OSS
+==============================
 
 .. toctree::
    :maxdepth: 2
    :caption: Documentation
 
-   Home <https://ocamlpro.github.io/superbol-vscode-platform>
+   Home <https://ocamlpro.github.io/superbol-studio-oss/sphinx>
    about
-   install
-   install-vscode
+   installing-superbol-vsix
+   building-superbol
    lsp
-   platform
-   emacs
+   vscode-extension
    debug
+   emacs
    commands
-   API doc <https://ocamlpro.github.io/superbol-vscode-platform/doc>
+   API doc <https://ocamlpro.github.io/superbol-studio-oss/doc>
    license
 
-   Devel and Issues on Github <https://github.com/ocamlpro/superbol-vscode-platform>
+   Sources and Issues on Github <https://github.com/ocamlpro/superbol-studio-oss>
 
 
 Indices and tables

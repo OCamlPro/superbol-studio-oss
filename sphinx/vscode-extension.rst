@@ -1,10 +1,12 @@
-Superbol VSCode Platform
-========================
+.. _superbol-vscode-extension:
 
-This VSCode extension is used to interface VSCode with the Superbol LSP Server and provides building
+SuperBOL VSCode Extension
+=========================
+
+This VSCode extension is used to interface VSCode with the SuperBOL LSP Server and provides building
 tasks for your COBOL projects.
 
-The extension can be used as a standalone, but is required for the `Superbol VSCode Extension` to
+The extension can be used as a standalone, but is required for the `SuperBOL VSCode Extension` to
 work.
 
 Tasks
@@ -46,14 +48,16 @@ Settings
 The settings for the extension are to be modified by going to :code:`File` > :code:`Preferences` >
 :code:`Settings`.
 
-Then select the :code:`Extension` submenu and select :code:`Superbol COBOL`.
+Then select the :code:`Extension` submenu and select :code:`SuperBOL COBOL`.
 
 :code:`Path`
 ^^^^^^^^^^^^
 
 This is the path to the :code:`superbol` executable.
 
-Superbol extension features
+.. _superbol-vscode-features:
+
+SuperBOL extension features
 ---------------------------
 
 Go to definition
@@ -71,8 +75,8 @@ Go to references
 You can have a list of references of every variables in your code. Push :code:`Shift + F12` on a variable
 name to find all the places it is referenced.
 
-Semantic highlight
-^^^^^^^^^^^^^^^^^^
+Semantic highlighting
+^^^^^^^^^^^^^^^^^^^^^
 
 The extension understands your code on a semantic level, giving you better highlighting to make
 reading your code easier and focus on the important information of the source code.
@@ -98,7 +102,7 @@ Keyboard shortcuts
 Shortcut                                  Action
 ========================================= ===============================================================================================================
 :code:`F12`                               Go to the defintion of the item under cursor
-:code:`Shift + F12`                       | List all references of the item under cursor.
+:code:`Shift + F12`                       List all references of the item under cursor.
                                           If there is only one other reference then navigate directly to it
 :code:`Ctrl + Shift + I` (no selection)   Format the whole file
 :code:`Ctrl + Shift + I` (with selection) Format the selection

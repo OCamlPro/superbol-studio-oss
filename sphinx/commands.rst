@@ -168,8 +168,6 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
-* :code:`--indent_config FILE`   User defined configuration of indentation
-
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
 * :code:`--silence STRING`   Silence specific messages
@@ -211,8 +209,6 @@ Where options are:
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
-
-* :code:`--indent_config FILE`   User defined offset table file
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 

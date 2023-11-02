@@ -1,7 +1,7 @@
 [![Actions Status](https://github.com/ocamlpro/superbol-studio-oss/workflows/Main%20Workflow/badge.svg)](https://github.com/ocamlpro/superbol-studio-oss/actions)
 [![Release](https://img.shields.io/github/release/ocamlpro/superbol-studio-oss.svg)](https://github.com/ocamlpro/superbol-studio-oss/releases)
 
-# Superbol Studio OSS: A New Platform for COBOL
+# SuperBOL Studio OSS: A New Platform for COBOL
 
 ## Features
 

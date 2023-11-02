@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>SuperBOL Studio OSS</title>
+    <link rel="stylesheet" href="style.css?v=!{docs/style.css:>:read:md5}"/>
+    <link rel="icon" type="image/png" sizes="804x804"  href="favicon.png" />
+  </head>
+  <body>
+    <div class="content">
+      <div class="header">
+        <h1>SuperBOL Studio OSS</h1>
+        <p>!{description:html}</p>
+      </div>
+      <div class="section">
+        <ul>
+<li><a href="https://get-superbol.com">Official Project</a></li>
+!{li-github}
+![if:gen:docs]!{li-doc-gen}![fi]
+<!-- ![if:gen:sphinx]!{li-doc-api}![fi] -->
+!{li-bug-reports}
+        </ul>
+        <p>Authors:</p>
+        <ul>!{li-authors}</ul>
+      </div>
+      <div class="section">
+	!(readme-trailer:md-to-html)
+      </div>
+      <div class="trailer">
+        <hr/>
+        <p>Copyright © !{copyright}</p>
+      </div>
+    </div>
+  </body>
+</html>
