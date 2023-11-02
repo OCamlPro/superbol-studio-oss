@@ -51,17 +51,15 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
   "vscode-json-windows" {= version}
+  "ez_toml-windows" {= version}
   "ez_file-windows" {>= "0.3"}
   "ez_cmdliner-windows" {>= "0.3.0" & < "1.0.0"}
+  "ez_api-windows" {>= "2.0"}
   "cobol_typeck-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_lsp-windows" {= version}
   "cobol_indent-windows" {= version}
   "cobol_common-windows" {= version}
-  "cobol_ast-windows" {= version}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

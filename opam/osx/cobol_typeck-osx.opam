@@ -50,14 +50,11 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "cobol_ptree-osx" {= version}
   "cobol_parser-osx" {= version}
   "cobol_data-osx" {= version}
   "cobol_common-osx" {= version}
-  "cobol_ast-osx" {= version}
   "ppx_deriving" {>= "5.2.1"}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

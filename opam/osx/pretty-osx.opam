@@ -52,9 +52,6 @@ depends: [
   "dune" {>= "2.8.0"}
   "fmt-osx" {>= "0.9"}
   "ez_file-osx" {>= "0.3"}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

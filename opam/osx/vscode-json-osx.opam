@@ -54,9 +54,6 @@ depends: [
   "ezjsonm-osx" {}
   "ez_file-osx" {>= "0.3.0" & < "1.0.0"}
   "ppx_deriving_encoding" {>= "0.3.0" & < "1.0.0"}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

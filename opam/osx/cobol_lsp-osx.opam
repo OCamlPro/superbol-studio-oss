@@ -51,6 +51,7 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
   "toml-osx" {>= "7.1.0" & < "8.0.0"}
+  "superbol_project-osx" {= version}
   "pretty-osx" {= version}
   "lsp-osx" {>= "1.15" & < "1.16"}
   "jsonrpc-osx" {>= "1.15"}
@@ -60,10 +61,6 @@ depends: [
   "cobol_data-osx" {= version}
   "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
-  "ppx_expect" {>= "v0.16" with-test}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

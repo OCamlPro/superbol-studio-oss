@@ -53,9 +53,6 @@ depends: [
   "fmt-osx" {>= "0.9"}
   "cobol_preproc-osx" {= version}
   "cobol_common-osx" {= version}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:

@@ -53,9 +53,6 @@ depends: [
   "fmt-windows" {>= "0.9"}
   "cobol_preproc-windows" {= version}
   "cobol_common-windows" {= version}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
 ]
 # Content of `opam-trailer` field:
