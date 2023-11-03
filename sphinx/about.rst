@@ -1,8 +1,9 @@
-About
-=====
+About SuperBOL
+==============
 
-Superbol is a set of utilities for COBOL developers,
-that can be selected by sub-commands.
+SuperBOL is a set of utilities for COBOL developers, that come in the
+form of an LSP server and associated extensions for VSCode and
+GNU/Emacs.
 
 
 Authors

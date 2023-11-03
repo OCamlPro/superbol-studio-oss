@@ -67,7 +67,6 @@ toml = "7.1.0"
 
 # package tools dependencies
 [tools]
-ppx_expect = { version = ">=v0.16", for-test = true }
 
 # package fields (depends on package skeleton)
 #Examples:

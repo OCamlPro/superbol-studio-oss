@@ -4,11 +4,9 @@ opam-version: "2.0"
 name: "superbol-studio-oss"
 version: "0.1.0"
 license: "MIT"
-synopsis: "The superbol-studio-oss project"
-description: """\
-This is the description
-of the superbol-studio-oss OCaml project
-"""
+synopsis: "SuperBOL Studio OSS Project"
+description:
+  "Virtual package that depends on both the VSCode extension and the LSP server."
 authors: [
   "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
   "David Declerck <david.declerck@ocamlpro.com>"
@@ -47,12 +45,9 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.7.0"}
-  "ppx_inline_test" {with-test}
-  "ppx_expect" {with-test}
+  "dune" {>= "2.8.0"}
+  "superbol-vscode-platform" {= version}
+  "superbol-free" {= version}
   "odoc" {with-doc}
-  "ocamlformat" {with-test}
-  "menhir" {< "20230608"}
-  "alcotest" {with-test}
 ]
 # Content of `opam-trailer` field:

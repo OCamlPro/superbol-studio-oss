@@ -1,9 +1,0 @@
-{1 Library superbol_testutils}
-
-This is the description
-of the superbol-studio-oss OCaml project
-
-
-
-The entry point of this library is the module: {!Superbol_testutils}.
-

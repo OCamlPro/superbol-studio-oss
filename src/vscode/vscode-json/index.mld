@@ -1,8 +1,6 @@
 {1 Library vscode-json}
 
-This is the description
-of the superbol-studio-oss OCaml project
-
+SuperBOL Studio OSS is a new platform for COBOL
 
 
 The entry point of this library is the module: {!Vscode_json}.

@@ -11,44 +11,36 @@ edition = "4.14.1"
 github-organization = "ocamlpro"
 license = "MIT"
 min-edition = "4.14.0"
-name = "superbol-vscode-platform"
+name = "superbol-studio-oss"
 skeleton = "program"
-synopsis = "The superbol-studio-oss project"
+synopsis = "SuperBOL Studio OSS Project"
 version = "0.1.0"
+dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
+bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 
 # keys that you could also define:
 # odoc-target = "...odoc-target..."
 # sphinx-target = "...sphinx-target..."
 # archive = "...archive..."
-# dev-repo = "...dev-repo..."
-# bug-reports = "...bug-reports..."
 # doc-api = "...doc-api..."
 # doc-gen = "...doc-gen..."
 # homepage = "...homepage..."
 
 [project]
-description = """
-This is the description
-of the superbol-studio-oss OCaml project
-"""
+description = """SuperBOL Studio OSS is a new platform for COBOL"""
 
 [project]
-skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "sphinx/about.rst", "LICENSE.md", "sphinx/index.rst"]
+skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "sphinx/about.rst", "LICENSE.md", "sphinx/index.rst", "sphinx/install.rst"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
+# NB: now we'd need a way to avoid putting that dependency in `libraries` in `dune` files.
+# superbol_testutils = { version = "version", for-test = true }
 
 # project-wide tools dependencies (not for package-specific deps)
 [tools]
-[tools.ocamlformat]
-for-test = true
 [tools.odoc]
 for-doc = true
-[tools.ppx_expect]
-for-test = true
-[tools.ppx_inline_test]
-version = "v0.16.1"
-for-test = true
 
 [project]
 
@@ -98,6 +90,18 @@ github-workflow-before-build = """
       - run: git submodule update
 
 """
+
+# NB: a `before-tests` field would make more sense here.
+github-workflow-after-build = """
+      - name: install test dependencies
+        if: matrix.skip_test  != 'true'
+        run: opam install -y test/opam/*.opam --deps-only --with-test
+"""
+
+
+[[package]]
+dir = "src/superbol-studio-oss"
+# edit 'src/superbol-studio-oss/package.toml' for package-specific options
 
 
 [[package]]
@@ -197,10 +201,6 @@ dir = "src/lsp/cobol_data"
 [[package]]
 dir = "src/lsp/cobol_typeck"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
-
-[[package]]
-dir = "src/testing/superbol_testutils"
-# edit 'src/testing/superbol_testutils/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/ez_toml"

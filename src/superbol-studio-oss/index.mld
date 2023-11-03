@@ -1,0 +1,7 @@
+{1 Library superbol-studio-oss}
+
+SuperBOL Studio OSS is a new platform for COBOL
+
+
+The entry point of this library is the module: {!Superbol_studio_oss}.
+

@@ -1,6 +1,11 @@
+# NOTE: Currently ignored by `drom` as under `test`.
+# 
+# If you want to add test dependencies for libraries of the project,
+# then you need to edit `test/opam/superbol-testdeps.opam` directly.
+# 
 
 # name of package
-name = "superbol_testutils"
+name = "superbol-testdeps"
 skeleton = "library"
 
 # version if different from project version
@@ -54,9 +59,13 @@ gen-version = "version.ml"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 autofonce_lib = { version = ">=0.8", for-test = true }
+alcotest = { version = "1", for-test = true }
 
 # package tools dependencies
 [tools]
+ppx_expect = { version = ">=v0.16", for-test = true }
+ppx_inline_test = { version = "v0.16.1", for-test = true }
+
 # ...
 
 # package fields (depends on package skeleton)

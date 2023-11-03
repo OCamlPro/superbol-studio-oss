@@ -1,8 +1,9 @@
-Superbol VSCode Debug
+SuperBOL VSCode Debug
 =====================
 
-This extension is used debug and check coverage of your COBOL code. It must be used with :code:`Superbol VSCode Platform`
-to recognize the :code:`COBOL` files.
+This extension can be used to debug and check the coverage of your
+COBOL code. It must be used in combination with the `SuperBOL VSCode
+Extension` to recognize the COBOL files.
 
 Usage
 -----
@@ -24,7 +25,7 @@ Extension settings
 
 These settings are to be modified by going to :code:`File` > :code:`Preferences` > :code:`Settings`
 
-Then select the :code:`Extensions` submenu and select :code:`Superbol Debugger`.
+Then select the :code:`Extensions` submenu and select :code:`SuperBOL Debugger`.
 
 :code:`cobcpath` [1]_
 ^^^^^^^^^^^^^^^^^^^^^
@@ -85,7 +86,7 @@ has the following defaults:
 .. code-block:: json
 
    {
-      "name": "Superbol debugger",
+      "name": "SuperBOL debugger",
       "type": "gdb",
       "request": "launch",
       "target": "${file}",
@@ -109,7 +110,7 @@ settings value if they exists or the default value given just above):
 .. code-block:: json
 
    {
-      "name": "Superbol debugger",
+      "name": "SuperBOL debugger",
       "type": "gdb",
       "request": "launch",
    }
@@ -135,7 +136,7 @@ The default configuration is as follow:
 .. code-block:: json
 
    {
-      "name": "Superbol debugger",
+      "name": "SuperBOL debugger",
       "type": "gdb",
       "request": "launch",
       "target": "${file}",
@@ -174,4 +175,4 @@ A green line signifies that the line is runned.
 
 ----
 
-.. [1] These options are to be removed to use the :code:`Superbol VSCode Platform` build tasks.
+.. [1] These options are to be removed to use the :code:`SuperBOL VSCode Platform` build tasks.

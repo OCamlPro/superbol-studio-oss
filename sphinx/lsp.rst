@@ -1,7 +1,7 @@
-LSP Server
-==========
+SuperBOL LSP Server
+===================
 
-*Superbol* provides an LSP server for COBOL. Every dialect supported by superbol is supported by the LSP server.
+*SuperBOL* provides an LSP server for COBOL. Every dialect supported by superbol is supported by the LSP server.
 
 The server operates on the notion of *projects*, that bundle COBOL source files within a *root directory*, along with a configuration.
 
@@ -121,8 +121,8 @@ Furthermore, a :code:`COPY "local.cpy"` in :file:`prog1.cob` will include the co
 Server capabilities
 -------------------
 
-This is a list of all the capabilities the server has, to see how they are used in VSCode, you
-can check the :code:`Superbol` extension documentation `here <https://ocamlpro.github.io/superbol-vscode-extension/sphinx/features.html>`_.
+This is a list the LSP server's capabilities.  To see how they are used in VSCode, you
+can check :ref:`superbol-vscode-features`.
 
 Go to definition
 ^^^^^^^^^^^^^^^^
