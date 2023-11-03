@@ -23,7 +23,7 @@
 (defgroup lsp-superbol nil
   "Settings for the Superbol Language Server for COBOL (lsp-mode)."
   :group 'lsp-mode
-  :link '(url-link "https://github.com/OCamlPro/superbol-vscode-extension")
+  :link '(url-link "https://github.com/OCamlPro/superbol-studio-oss")
   :package-version '(lsp-mode . "8.0.1"))
 
 (load (expand-file-name "lsp-superbol-customs.el"
