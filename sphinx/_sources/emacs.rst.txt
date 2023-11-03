@@ -56,7 +56,7 @@ complete).
 Superbol-mode
 -------------
 
-The new Superbol mode provides an IDE that makes use of the Superbol
+The new Superbol-mode provides an IDE that makes use of the SuperBOL
 LSP to provide advanced navigation and editing facilities for COBOL
 projects.  It can be used in combination with any of the two main LSP
 clients that exist within the GNU/Emacs ecosystem to interact with LSP
@@ -105,14 +105,14 @@ extension:
 .. code-block:: shell
 
    export SUPERBOL_DIR="<directory where superbol-free can be found>";
-   export SUPERBOL_VSCODE_PLATFORM_DIR="$PWD";
+   export SUPERBOL_STUDIO_OSS_DIR="$PWD";
 
 After this, the following command launches a GNU/Emacs instance with
 an `lsp-mode`-based client configured for COBOL files:
 
 .. code-block:: shell
 
-   emacs -L "$SUPERBOL_VSCODE_PLATFORM_DIR/emacs" \
+   emacs -L "$SUPERBOL_STUDIO_OSS_DIR/emacs" \
          --load lsp-superbol \
          --eval "(custom-set-variables '(lsp-superbol-path \"$SUPERBOL_DIR\"))" \
          --funcall superbol-mode-enable-for-default-extensions
@@ -121,7 +121,7 @@ To use `eglot`, type the following instead:
 
 .. code-block:: shell
 
-   emacs -L "$SUPERBOL_VSCODE_PLATFORM_DIR/emacs" \
+   emacs -L "$SUPERBOL_STUDIO_OSS_DIR/emacs" \
          --load eglot-superbol \
          --eval "(add-to-list 'exec-path \"$SUPERBOL_DIR\")" \
          --funcall superbol-mode-enable-for-default-extensions

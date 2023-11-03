@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL modes for GNU/Emacs &mdash; superbol master
- (15572bf
-) (2023/11/03 10:30) documentation</title>
+ (b703f74
+) (2023/11/03 14:37) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (15572bf
+ (b703f74
 )
               </div>
 <div role="search">
@@ -151,7 +151,7 @@ complete).</p>
 </section>
 <section id="superbol-mode">
 <h2>Superbol-mode<a class="headerlink" href="#superbol-mode" title="Permalink to this headline"></a></h2>
-<p>The new Superbol mode provides an IDE that makes use of the Superbol
+<p>The new Superbol-mode provides an IDE that makes use of the SuperBOL
 LSP to provide advanced navigation and editing facilities for COBOL
 projects.  It can be used in combination with any of the two main LSP
 clients that exist within the GNU/Emacs ecosystem to interact with LSP
@@ -185,19 +185,19 @@ highlighting.</p>
 variable that points to the root of the source directory for the
 extension:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">SUPERBOL_DIR</span><span class="o">=</span><span class="s2">&quot;&lt;directory where superbol-free can be found&gt;&quot;</span><span class="p">;</span>
-<span class="nb">export</span> <span class="nv">SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="nb">export</span> <span class="nv">SUPERBOL_STUDIO_OSS_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>After this, the following command launches a GNU/Emacs instance with
 an <cite>lsp-mode</cite>-based client configured for COBOL files:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
       --load lsp-superbol <span class="se">\</span>
       --eval <span class="s2">&quot;(custom-set-variables &#39;(lsp-superbol-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;))&quot;</span> <span class="se">\</span>
       --funcall superbol-mode-enable-for-default-extensions
 </pre></div>
 </div>
 <p>To use <cite>eglot</cite>, type the following instead:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_VSCODE_PLATFORM_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
       --load eglot-superbol <span class="se">\</span>
       --eval <span class="s2">&quot;(add-to-list &#39;exec-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;)&quot;</span> <span class="se">\</span>
       --funcall superbol-mode-enable-for-default-extensions
