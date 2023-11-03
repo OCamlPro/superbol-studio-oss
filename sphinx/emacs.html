@@ -4,9 +4,9 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GNU/Emacs modes &mdash; superbol master
- (6027e91
-) (2023/11/02 13:56) documentation</title>
+  <title>SuperBOL modes for GNU/Emacs &mdash; superbol master
+ (15572bf
+) (2023/11/03 10:30) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -19,8 +19,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Superbol VSCode Debug" href="debug.html" />
-    <link rel="prev" title="VSCode settings" href="settings.html" /> 
+    <link rel="next" title="Sub-commands and Arguments" href="commands.html" />
+    <link rel="prev" title="SuperBOL VSCode Debug" href="debug.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (6027e91
+ (15572bf
 )
               </div>
 <div role="search">
@@ -45,17 +45,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform">Home</a></li>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install.html">How to install</a></li>
-<li class="toctree-l1"><a class="reference internal" href="install-vscode.html">Install VSCode extensions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lsp.html">LSP Server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="features.html">Superbol extension features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="platform.html">Superbol VSCode Platform</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tasks.html">Superbol VSCode tasks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="settings.html">VSCode settings</a></li>
-<li class="toctree-l1"><a class="reference internal" href="settings.html#lsp-settings">LSP Settings</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">GNU/Emacs modes</a><ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/sphinx">Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About SuperBOL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing-superbol-vsix.html">Installing the SuperBOL VSCode extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-superbol.html">Building SuperBOL from Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lsp.html">SuperBOL LSP Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode-extension.html">SuperBOL VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SuperBOL modes for GNU/Emacs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#standard-file-cobol-mode-el">Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
@@ -71,11 +68,10 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="debug.html">Superbol VSCode Debug</a></li>
 <li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-vscode-platform/doc">API doc</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/doc">API doc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
-<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-vscode-platform">Devel and Issues on Github</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-studio-oss">Sources and Issues on Github</a></li>
 </ul>
 
         </div>
@@ -92,7 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>GNU/Emacs modes</li>
+      <li>SuperBOL modes for GNU/Emacs</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/emacs.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -102,8 +98,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="gnu-emacs-modes">
-<h1>GNU/Emacs modes<a class="headerlink" href="#gnu-emacs-modes" title="Permalink to this headline"></a></h1>
+  <section id="superbol-modes-for-gnu-emacs">
+<h1>SuperBOL modes for GNU/Emacs<a class="headerlink" href="#superbol-modes-for-gnu-emacs" title="Permalink to this headline"></a></h1>
 <p>We document two means that are available for editing COBOL files using
 GNU/Emacs.  One makes use of a modified version of
 <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> that can be found on ELPA.  The other is a new
@@ -227,8 +223,8 @@ at <a class="reference external" href="https://github.com/joaotavora/eglot/issue
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="settings.html" class="btn btn-neutral float-left" title="VSCode settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="debug.html" class="btn btn-neutral float-right" title="Superbol VSCode Debug" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="debug.html" class="btn btn-neutral float-left" title="SuperBOL VSCode Debug" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commands.html" class="btn btn-neutral float-right" title="Sub-commands and Arguments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

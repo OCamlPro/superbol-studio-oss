@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; superbol master
+  <title>Building SuperBOL from Sources &mdash; superbol master
  (15572bf
 ) (2023/11/03 10:30) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,8 +17,10 @@
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
-    <link rel="index" title="Index" href="#" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SuperBOL LSP Server" href="lsp.html" />
+    <link rel="prev" title="Installing the SuperBOL VSCode extension" href="installing-superbol-vsix.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,11 +44,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/sphinx">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About SuperBOL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing-superbol-vsix.html">Installing the SuperBOL VSCode extension</a></li>
-<li class="toctree-l1"><a class="reference internal" href="building-superbol.html">Building SuperBOL from Sources</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building SuperBOL from Sources</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lsp.html">SuperBOL LSP Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode-extension.html">SuperBOL VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
@@ -70,8 +73,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Index</li>
+      <li>Building SuperBOL from Sources</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/building-superbol.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -79,17 +83,53 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <section id="building-superbol-from-sources">
+<h1>Building SuperBOL from Sources<a class="headerlink" href="#building-superbol-from-sources" title="Permalink to this headline"></a></h1>
+<p>To build the LSP server and the VSCode extension from source, you need
+to install a few external dependencies.</p>
+<ol class="arabic">
+<li><p>First, you need to install and initialize <a class="reference external" href="https://opam.ocaml.org/">opam</a>, the package
+manager for OCaml;</p></li>
+<li><p>Then you need a recent version <a class="footnote-reference brackets" href="#drom-version" id="id1">1</a> of our build tool
+<a class="reference external" href="https://github.com/OCamlPro/drom/">drom</a>.  The easiest way to have it running is via the following
+command:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>opam pin add https://github.com/OCamlPro/drom.git
+</pre></div>
 </div>
+</li>
+<li><p>To build the VSCode extension, you also need to have <a class="reference external" href="https://nodejs.org/">node.js</a>,
+and install and initialize <cite>yarn</cite> via:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>npm install yarn
+yarn install
+</pre></div>
+</div>
+</li>
+<li><p>You can then install all remaining dependencies, and compile the
+LSP server along with the VSCode extension:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make build-deps vsix-release
+</pre></div>
+</div>
+</li>
+</ol>
+<p>You should obtain a file <code class="code docutils literal notranslate"><span class="pre">superbol-vscode-platform.vsix</span></code> in the
+project’s root directory.  Follow the instructions at
+<a class="reference internal" href="installing-superbol-vsix.html#install-superbol-vsix"><span class="std std-ref">Installing the SuperBOL VSCode extension</span></a> to install it in VSCode.</p>
+<p class="rubric">Footnotes</p>
+<dl class="footnote brackets">
+<dt class="label" id="drom-version"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>The version needed to build the first α release of
+SuperBOL is 0.9.2~dev3 (commit 63a5770).</p>
+</dd>
+</dl>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installing-superbol-vsix.html" class="btn btn-neutral float-left" title="Installing the SuperBOL VSCode extension" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lsp.html" class="btn btn-neutral float-right" title="SuperBOL LSP Server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
