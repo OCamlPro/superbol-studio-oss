@@ -18,11 +18,18 @@ open Ez_file.V1.EzFile.OP
 module DIAGS = Cobol_common.Diagnostics
 
 module TYPES = struct
+
+  type storage =
+    | No_storage
+    | Store_in_file of { relative_filename: string }
+    | Store_in_shared_dir of { dirname: string }
+
   type config =
     {
-      cache_relative_filename: string;
+      cache_storage: storage;
       cache_verbose: bool;
     }
+
 end
 include TYPES
 
@@ -45,7 +52,14 @@ type cached_project_record =
 (* Code: *)
 
 let cache_filename ~config ~rootdir =
-  Lsp_project.string_of_rootdir rootdir // config.cache_relative_filename
+  match config.cache_storage with
+  | No_storage ->
+      None
+  | Store_in_file { relative_filename } ->
+      Some (Lsp_project.string_of_rootdir rootdir // relative_filename)
+  | Store_in_shared_dir { dirname } ->
+      Some (dirname // Digest.(to_hex @@
+                               string @@ Lsp_project.string_of_rootdir rootdir))
 
 let version_tag_length = 40            (* use full commit hash when available *)
 let version_tag =
@@ -77,14 +91,17 @@ let save_project_cache ~config
       cached_docs;
     }
   in
-  let cache_file = cache_filename ~config ~rootdir in
-  EzFile.(make_dir ~p:true (dirname cache_file));
-  (* NB: don't really care if we rewrite the same cache again *)
-  (* if Lsp_utils.is_file cache_file *)
-  (* then (* read, write if commit hash or document changed *) *)
-  (* else *)
-  Lsp_utils.write_to cache_file (write_project_cache cached_project_record);
-  Lsp_io.pretty_notification "Wrote cache at: %s" cache_file ~type_:Info
+  match cache_filename ~config ~rootdir with
+  | Some cache_file ->
+      EzFile.(make_dir ~p:true (dirname cache_file));
+      (* NB: don't really care if we rewrite the same cache again *)
+      (* if Lsp_utils.is_file cache_file *)
+      (* then (* read, write if commit hash or document changed *) *)
+      (* else *)
+      Lsp_utils.write_to cache_file (write_project_cache cached_project_record);
+      Lsp_io.pretty_notification "Wrote cache at: %s" cache_file ~type_:Info
+  | None ->
+      ()
 
 let save ~config docs =
   (* Pivot all active projects: associate projects with all their documents, and
@@ -122,20 +139,24 @@ let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
 
 let load ~rootdir ~layout ~config =
   let fallback = URIMap.empty in
-  let cache_file = cache_filename ~config ~rootdir in
-  try
+  let load_cache cache_file =
     let cached_project = Lsp_utils.read_from cache_file read_project_cache in
     let project = load_project ~rootdir ~layout ~config cached_project in
     Lsp_io.pretty_notification "Successfully read cache for %s"
       (Lsp_project.string_of_rootdir rootdir) ~log:true ~type_:Info;
     project
-  with
-  | Failure msg | Sys_error msg ->
-      if config.cache_verbose then
-        Lsp_io.pretty_notification "Failed to read cache: %s"
-          msg ~log:true ~type_:Info;
+  in
+  match cache_filename ~config ~rootdir with
+  | None ->
       fallback
-  | e ->
-      Lsp_io.pretty_notification "Failed to read cache: %a"
-        Fmt.exn e ~log:true ~type_:Warning;
-      fallback
+  | Some cache_file ->
+      try load_cache cache_file with
+      | Failure msg | Sys_error msg ->
+          if config.cache_verbose then
+            Lsp_io.pretty_notification "Failed to read cache: %s"
+              msg ~log:true ~type_:Info;
+          fallback
+      | e ->
+          Lsp_io.pretty_notification "Failed to read cache: %a"
+            Fmt.exn e ~log:true ~type_:Warning;
+          fallback

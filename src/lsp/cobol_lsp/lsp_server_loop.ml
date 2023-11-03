@@ -16,27 +16,50 @@
 open Ez_file.V1
 open Ez_file.V1.EzFile.OP
 
-(** [config ~project_config_filename ~relative_work_dirname] creates an LSP
-    configuration structure for identifying and managing projects.
+(** [config ~project_layout ~enable_caching ~fallback_storage_directory ()]
+    creates an LSP configuration structure for identifying and managing
+    projects.
 
-    - [project_config_filename] is the names of the TOML file that is to be
-    found at the root of each project's directory tree;
+    - [project_layout] describes the layout of projects to be managed by the
+      LSP;
 
-    - [relative_work_dirname] is the name of the directory where the LSP should
-    put its working files (caches, etc). *)
-let config ~(project_layout: Lsp_project.layout) =
-  let relative_work_dirname = project_layout.relative_work_dirname in
-  let invalid_dir reason =
-    Fmt.invalid_arg
-      ("relative_work_dirname: "^^reason^^" (got `%s')") relative_work_dirname
+    - [enable_caching] (defaulting to [true]) permits the storage of
+      pre-computed data, to allow faster LSP restarts and re-opening documents;
+
+    - [fallback_storage_directory], when provided (and if [enable_caching]
+      holds), is the name of a directory that is used to store a cache whenever
+      [project_layout] does not provide a per-project storage directory ({i i.e,}
+      [project_layout.relative_work_dirname = None]). *)
+let config
+    ~(project_layout: Lsp_project.layout)
+    ?(enable_caching = true)
+    ?(fallback_storage_directory: string option)
+    () =
+  let cache_storage: Lsp_project_cache.storage =
+    match project_layout.relative_work_dirname, fallback_storage_directory with
+    | _ when not enable_caching ->
+        No_storage
+    | None, None ->
+        No_storage
+    | None, Some dirname ->
+        Store_in_shared_dir { dirname }
+    | Some relative_work_dirname, _ ->
+        let invalid_dir reason =
+          Fmt.invalid_arg
+            ("relative_work_dirname: "^^reason^^" (got `%s')")
+            relative_work_dirname
+        in
+        if relative_work_dirname = ""
+        then invalid_dir "invalid directory name";
+        if EzFile.is_absolute relative_work_dirname
+        then invalid_dir "relative directory name expected";
+        Store_in_file {
+          relative_filename = relative_work_dirname // "lsp-cache";
+        }
   in
-  if relative_work_dirname = ""
-  then invalid_dir "invalid direcory name";
-  if EzFile.is_absolute relative_work_dirname
-  then invalid_dir "relative direcory name expected";
   Lsp_server.{
     cache_config = {
-      cache_relative_filename = relative_work_dirname // "lsp-cache";
+      cache_storage;
       cache_verbose = true;
     };
     project_layout;

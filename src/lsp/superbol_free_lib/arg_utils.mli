@@ -11,13 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_server.config
-
-val run
-  : config: Lsp_server.config
-  -> Lsp_server.exit_status
+val en'dis'able_switch
+  : name: string
+  -> default: bool
+  -> bool ref * Ezcmd.V2.EZCMD.TYPES.arg_list

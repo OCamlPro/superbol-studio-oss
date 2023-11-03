@@ -14,15 +14,27 @@
 open Lsp_imports
 
 module TYPES: sig
+  type storage =
+    | No_storage
+    | Store_in_file of
+        {
+          (** Name of cache file, relative to project root directory. *)
+          relative_filename: string;
+        }
+    | Store_in_shared_dir of
+        {
+          dirname: string;
+        }
+
   type config =
     {
-      (** Name of cache file, relative to project root directory. *)
-      cache_relative_filename: string;
+      cache_storage: storage;
       cache_verbose: bool;
     }
 end
 include module type of TYPES
-  with type config = TYPES.config
+  with type storage = TYPES.storage
+   and type config = TYPES.config
 
 (** [save ~config docs] saves the caches of all the given document's
     projects.

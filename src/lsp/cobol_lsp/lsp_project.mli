@@ -44,8 +44,8 @@ val in_existing_dir: string -> layout:layout -> t
 
 (** [rootdir_for ~uri ~layout] locates the project directory (that contains a
     file with given name [layout.project_config_filename]) for a file at the
-    given URI.  Returns the name of the directory that contains the file at URI
-    if no project file is found. *)
+    given URI.  The behavior when no such file is found is that of
+    {!Superbol_project.rootdir_for}. *)
 val rootdir_for: uri:Lsp.Uri.t -> layout:layout -> rootdir
 
 (** [libpath_for ~uri project] constructs a list of directory names where

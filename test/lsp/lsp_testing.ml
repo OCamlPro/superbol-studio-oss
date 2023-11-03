@@ -35,7 +35,7 @@ let layout =
   Superbol_free_lib.Project.layout;
 and cache_config =
   LSP.Project_cache.{
-    cache_relative_filename = "lsp-cache";
+    cache_storage = No_storage;
     cache_verbose = false;
   }
 

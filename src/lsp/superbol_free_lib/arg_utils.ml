@@ -11,13 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_server.config
+open Ezcmd.V2
+open EZCMD.TYPES
 
-val run
-  : config: Lsp_server.config
-  -> Lsp_server.exit_status
+let en'dis'able_switch ~name ~default =
+  let switch = ref default in
+  let default = if default then "enabled" else "disabled" in
+  switch,
+  [
+    [name], Arg.Set switch,
+    Pretty.string_to EZCMD.info "Enable %s (%s by default)" name default;
+
+    ["no-"^name], Arg.Clear switch,
+    Pretty.string_to EZCMD.info "Disable %s (%s by default)" name default;
+  ]
