@@ -3,6 +3,8 @@
 SuperBOL VSCode Extension
 =========================
 
+**TODO:** Update this Section if still relevant; remove it otherwise.
+
 This VSCode extension is used to interface VSCode with the SuperBOL LSP Server and provides building
 tasks for your COBOL projects.
 

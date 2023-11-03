@@ -16,11 +16,11 @@
       {
         "command": "superbol.server.restart",
         "title": "Restart Language Server",
-        "category": "Superbol"
+        "category": "superbol"
       }
     ],
     "configuration": {
-      "title": "Superbol COBOL",
+      "title": "SuperBOL COBOL",
       "properties": {
         "superbol.globalFormatTakesSelection": {
           "type": "boolean",
@@ -30,7 +30,7 @@
         "superbol.path": {
           "type": "string",
           "default": "superbol-free",
-          "description": "Name of the `superbol` executable if available in PATH; otherwise may be an absolute path."
+          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise."
         }
       }
     },
@@ -204,8 +204,8 @@
     ]
   },
   "name": "superbol",
-  "displayName": "Superbol Studio OSS",
-  "description": "Provides a COBOL mode in VSCode, based on SuperBOL Language Server Protocol for COBOL",
+  "displayName": "SuperBOL Studio OSS",
+  "description": "Provides a COBOL mode in VSCode, based on the SuperBOL LSP server for COBOL",
   "license": "MIT",
   "version": "0.1.0",
   "repository": {
