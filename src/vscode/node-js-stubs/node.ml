@@ -181,7 +181,9 @@ module Fs = struct
     val readFile : string -> encoding:string -> string Promise.t
       [@@js.global "fs.readFile"]
 
-    val exists : string -> bool Promise.t [@@js.global "fs.exists"]]
+    val exists : string -> bool Promise.t [@@js.global "fs.exists"]
+
+    val existsSync : string -> bool [@@js.global "fs.existsSync"]]
 
   let readDir path =
     readDir path

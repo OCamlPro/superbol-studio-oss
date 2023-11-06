@@ -10,7 +10,8 @@ LSP_MODE_SRCDIR ?= ../lsp-mode
 all: superbol-free
 superbol-free: build
 	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
-	cp -f package.json package.json.prev
+	$(CP) _build/default/src/lsp/superbol-free/main.exe _dist/superbol-free
+	$(CP) package.json package.json.prev
 	./superbol-free json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
 

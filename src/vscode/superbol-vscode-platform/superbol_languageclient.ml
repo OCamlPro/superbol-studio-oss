@@ -12,13 +12,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let serverOptions () =
+let serverOptions superbol_path =
   let config = Vscode.Workspace.getConfiguration () in
-  let command =
+  let cmd_opt =
     match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
-    | Some o -> Ojs.string_of_js o
-    | None -> "superbol-free"
+    | None -> None
+    | Some o when Ojs.is_null o -> None
+    | Some o ->
+      match Ojs.string_of_js o with
+      | "" -> None
+      | s -> Some s
   in
+  let command = Option.value ~default:superbol_path cmd_opt in
   Vscode_languageclient.ServerOptions.create ()
     ~command
     ~args:["lsp"]

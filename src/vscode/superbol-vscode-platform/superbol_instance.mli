@@ -19,3 +19,5 @@ val make : unit -> t
 val stop_language_server : t -> unit Promise.t
 
 val start_language_server : t -> unit Promise.t
+
+val set_bundled_superbol : t -> string -> unit

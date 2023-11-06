@@ -160,6 +160,37 @@ let indentRange
 *)
   `Value promise
 
+(* Helpers to find the bundled superbol executable *)
+let rec find_existing = function
+  | [] -> raise Not_found
+  | uri :: uris ->
+    if Node.Fs.existsSync (Vscode.Uri.fsPath uri) then uri
+    else find_existing uris
+
+(* Look for the most specific `superbol-free` executable amongst (in order):
+
+  - `superbol-free-${platform}-${arch}${suffix}`
+  - `superbol-free-${platform}${suffix}`
+  - `superbol-free${suffix}`
+
+  The `platform` and `arch` used are from the corresponding `process`
+  attributes in node.js. The `suffix` is `".exe"` on Windows, and empty
+  otherwise.
+
+  https://nodejs.org/api/process.html#processplatform
+  https://nodejs.org/api/process.html#processarch
+*)
+let find_superbol root =
+  let open Node.Process in
+  let prefix = "superbol-free" in
+  let suffix = if platform == "win32" then ".exe" else "" in
+  Vscode.Uri.fsPath @@ find_existing @@ List.map (fun name ->
+    Vscode.Uri.joinPath root ~pathSegments:[name]) @@ [
+    Format.asprintf "%s-%s-%s%s" prefix platform arch suffix;
+    Format.asprintf "%s-%s%s" prefix platform suffix;
+    Format.asprintf "%s%s" prefix suffix
+  ]
+
 let instance = Superbol_instance.make ()
 
 let activate (extension : Vscode.ExtensionContext.t) =
@@ -187,6 +218,20 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
 
   Vscode.ExtensionContext.subscribe extension ~disposable:task;
+
+  let bundled_superbol =
+    try
+      find_superbol
+          (Vscode.Uri.joinPath ~pathSegments:["_dist"]
+            (Vscode.ExtensionContext.extensionUri extension));
+    with Not_found ->
+      (* If there is no bundled executable for the current platform, fall back
+         to looking for superbol-free in the PATH *)
+      "superbol-free"
+  in
+
+  Superbol_instance.set_bundled_superbol instance
+    bundled_superbol;
 
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance
