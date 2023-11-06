@@ -12,7 +12,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let serverOptions superbol_path =
+let serverOptions ~bundled_superbol =
   let config = Vscode.Workspace.getConfiguration () in
   let cmd_opt =
     match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
@@ -23,7 +23,7 @@ let serverOptions superbol_path =
       | "" -> None
       | s -> Some s
   in
-  let command = Option.value ~default:superbol_path cmd_opt in
+  let command = Option.value ~default:bundled_superbol cmd_opt in
   Vscode_languageclient.ServerOptions.create ()
     ~command
     ~args:["lsp"]

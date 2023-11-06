@@ -13,5 +13,6 @@
 (**************************************************************************)
 
 val serverOptions:
-  string -> Vscode_languageclient.ServerOptions.t
+  bundled_superbol:string ->
+  Vscode_languageclient.ServerOptions.t
 val clientOptions: unit -> Vscode_languageclient.ClientOptions.t

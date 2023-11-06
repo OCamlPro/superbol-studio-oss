@@ -20,6 +20,8 @@ type t = {
 }
 
 let make () = {
+  (* If no bundled superbol is found, try superbol-free from PATH as
+     last-resort. *)
   bundled_superbol = "superbol-free";
   language_client = None
 }
@@ -38,7 +40,8 @@ let start_language_server t =
   let open Promise.Syntax in
   let* () = stop_language_server t in
   let serverOptions =
-    Superbol_languageclient.serverOptions t.bundled_superbol
+    Superbol_languageclient.serverOptions
+      ~bundled_superbol:t.bundled_superbol
   in
   let clientOptions = Superbol_languageclient.clientOptions () in
   let client = LanguageClient.make
