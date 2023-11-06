@@ -31,8 +31,9 @@ let marketplace = Manifest.marketplace
 let package =
   Manifest.package
     "superbol"
-    ~displayName: "Superbol Studio OSS"
-    ~description: "Provides a COBOL mode in VSCode, based on SuperBOL Language Server Protocol for COBOL"
+    ~displayName: "SuperBOL Studio OSS"
+    ~description: "Provides a COBOL mode in VSCode, based on the SuperBOL LSP \
+                   server for COBOL"
     ~license: "MIT"
     ~version: "0.1.0"
     ~repository: {
@@ -135,7 +136,7 @@ let contributes =
     ]
     ~breakpoints: [ Manifest.breakpoint "COBOL" ]
     ~configuration:
-      ( Manifest.configuration ~title:"Superbol COBOL"
+      ( Manifest.configuration ~title:"SuperBOL COBOL"
           [
             Manifest.PROPERTY.bool
               "superbol.globalFormatTakesSelection"
@@ -146,8 +147,8 @@ let contributes =
             Manifest.PROPERTY.string "superbol.path"
               ~default:"superbol-free"
               ~description:
-              "Name of the `superbol` executable if available in PATH; \
-               otherwise may be an absolute path."
+                "Name of the `superbol-free` executable if available in PATH; \
+                 may be an absolute path otherwise."
           ] )
     ~taskDefinitions: [
       Manifest.taskDefinition
@@ -235,7 +236,7 @@ let contributes =
       Manifest.command ()
         ~command:"superbol.server.restart"
         ~title:"Restart Language Server"
-        ~category:"Superbol"
+        ~category:"superbol"
     ]
 
 let manifest =

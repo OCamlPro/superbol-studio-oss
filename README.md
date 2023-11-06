@@ -21,12 +21,13 @@
 ## VSCode Extension
 
 The VSCode extension is bundled in a VSIX file, and makes use of the
-LSP server `superbol-fee`.  The latter is an executable that needs to
-be available to use the extension.
+LSP server `superbol-free`.  The latter is an executable file that
+needs to be downloaded separately and made available on the system to
+use the extension.
 
 ### Downloading binary releases
 
-You can download both the `superbol-fee` executable and the VSIX file
+You can download both the `superbol-free` executable and the VSIX file
 from the releases page[^releases].  Save the former in a directory
 that is already in the `PATH` so the extension works out of the box.
 
@@ -34,13 +35,12 @@ that is already in the `PATH` so the extension works out of the box.
 
 ### Adding the extension to VSCode
 
-Open VSCode and open the extensions view.
+To install the extension from its VSIX file, open VSCode and go to the
+the "`Extensions`" view.
 
 In the sidebar, click on the three dots (`⋅⋅⋅`) on the top right-hand
-side (just above "`search`").
-
-Select "`Install from VSIX…`" and pick
-`superbol-vscode-platform.vsix`.
+side (just above "`search`"), select "`Install from VSIX…`".  Pick the
+`superbol-vscode-platform.vsix` file to install it.
 
 ### Configuring the extension
 
@@ -48,13 +48,9 @@ If you have installed the `superbol-free` executable in a directory
 that is already in `PATH`, then you have nothing to do, the extension
 will work out of the box.
 
-Otherwise get the path to the `superbol` executable and copy it.
-
-Go to your VSCode settings and in the extension submenu select
-`Superbol COBOL`.
-
-In the `superbol` field, past the path to the `superbol-free`
-executable.
+Go to your VSCode settings and in the extensions submenu, select
+`SuperBOL Studio OSS`, and then `Extension Settings`.  Fill in the
+`superbol` field with the path to the `superbol-free` executable.
 
 You can check the documentation on using the extension on [this
 page](https://ocamlpro.github.io/superbol-studio-oss/sphinx).
@@ -73,7 +69,7 @@ server and the VSCode extension from sources.
 1. First, you need to install and initialize
    [opam](https://opam.ocaml.org/);
 
-1. Then you need a recent version[^drom-version] of our build tool
+2. Then you need a recent version[^drom-version] of our build tool
    [drom](https://ocamlpro.github.io/drom/).  The
    easiest way to have it running is via the following command:
 
@@ -83,7 +79,7 @@ server and the VSCode extension from sources.
 
    [^drom-version]: Current version is 0.9.2~dev3 (commit 63a5770).
 
-1. To build the VSCode extension, you also need to have
+3. To build the VSCode extension, you also need to have
    [node.js](https://nodejs.org/), and install `yarn` via:
 
    ```bash
@@ -91,7 +87,7 @@ server and the VSCode extension from sources.
    yarn install
    ```
 
-1. You can then install all remaining dependencies, and compile the
+4. You can then install all remaining dependencies, and compile the
    LSP server along with the VSCode extension:
 
    ```bash
