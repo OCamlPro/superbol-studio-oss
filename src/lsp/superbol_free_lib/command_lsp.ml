@@ -14,7 +14,7 @@
 open Ezcmd.V2
 
 let lsp_config =
-  Cobol_lsp.config ~project_layout:Project_config.layout
+  Cobol_lsp.config ~project_layout:Project.layout
 
 let run_lsp () =
   match Cobol_lsp.run ~config:lsp_config with
