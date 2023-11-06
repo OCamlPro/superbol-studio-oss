@@ -19,10 +19,8 @@ type t = {
   mutable language_client: LanguageClient.t option
 }
 
-let make () = {
-  (* If no bundled superbol is found, try superbol-free from PATH as
-     last-resort. *)
-  bundled_superbol = "superbol-free";
+let make ~bundled_superbol () = {
+  bundled_superbol;
   language_client = None
 }
 
@@ -50,6 +48,3 @@ let start_language_server t =
     ~serverOptions ~clientOptions () in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
-
-let set_bundled_superbol t bundled_superbol =
-  t.bundled_superbol <- bundled_superbol

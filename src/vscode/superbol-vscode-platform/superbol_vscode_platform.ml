@@ -191,7 +191,7 @@ let find_superbol root =
     Format.asprintf "%s%s" prefix suffix
   ]
 
-let instance = Superbol_instance.make ()
+let current_instance = ref None
 
 let activate (extension : Vscode.ExtensionContext.t) =
   let providerFull = Vscode.DocumentFormattingEditProvider.create
@@ -230,14 +230,17 @@ let activate (extension : Vscode.ExtensionContext.t) =
       "superbol-free"
   in
 
-  Superbol_instance.set_bundled_superbol instance
-    bundled_superbol;
+  let instance = Superbol_instance.make ~bundled_superbol () in
+  current_instance := Some instance;
 
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance
 
 let deactivate () =
+  match !current_instance with
+  | Some instance ->
     Superbol_instance.stop_language_server instance
+  | None -> Promise.return ()
 
 (* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
    activate() *)
