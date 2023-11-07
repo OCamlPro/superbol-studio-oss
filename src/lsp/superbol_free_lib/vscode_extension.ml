@@ -145,10 +145,11 @@ let contributes =
                 "If something is selected, only format the selection" ;
 
             Manifest.PROPERTY.string "superbol.path"
-              ~default:"superbol-free"
+              ~default:""
               ~description:
                 "Name of the `superbol-free` executable if available in PATH; \
-                 may be an absolute path otherwise."
+                 may be an absolute path otherwise. Leave empty to use the \
+                 bundled `superbol-free`, if available."
           ] )
     ~taskDefinitions: [
       Manifest.taskDefinition

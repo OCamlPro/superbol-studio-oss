@@ -29,8 +29,8 @@
         },
         "superbol.path": {
           "type": "string",
-          "default": "superbol-free",
-          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise."
+          "default": "",
+          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available."
         }
       }
     },

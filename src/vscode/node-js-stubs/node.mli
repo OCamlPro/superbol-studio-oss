@@ -147,6 +147,8 @@ module Fs : sig
   val readFile : string -> string Promise.t
 
   val exists : string -> bool Promise.t
+
+  val existsSync : string -> bool
 end
 
 module Net : sig

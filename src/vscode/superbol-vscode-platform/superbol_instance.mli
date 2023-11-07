@@ -14,7 +14,7 @@
 
 type t
 
-val make : unit -> t
+val make : bundled_superbol:string -> unit -> t
 
 val stop_language_server : t -> unit Promise.t
 

@@ -15,10 +15,12 @@
 open Vscode_languageclient
 
 type t = {
+  mutable bundled_superbol : string;
   mutable language_client: LanguageClient.t option
 }
 
-let make () = {
+let make ~bundled_superbol () = {
+  bundled_superbol;
   language_client = None
 }
 
@@ -35,7 +37,10 @@ let stop_language_server t =
 let start_language_server t =
   let open Promise.Syntax in
   let* () = stop_language_server t in
-  let serverOptions = Superbol_languageclient.serverOptions () in
+  let serverOptions =
+    Superbol_languageclient.serverOptions
+      ~bundled_superbol:t.bundled_superbol
+  in
   let clientOptions = Superbol_languageclient.clientOptions () in
   let client = LanguageClient.make
     ~id:"cobolServer"
