@@ -14,14 +14,30 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
-let en'dis'able_switch ~name ~default =
+let switch (kind: [`enable_disable | `with_without | `boolean]) ~name ~default =
   let switch = ref default in
-  let default = if default then "enabled" else "disabled" in
+  let set, unset = match kind with
+    | `enable_disable -> "Enable", "Disable"
+    | `with_without   -> "With", "Without"
+    | `boolean        -> "Set", "Clear"
+  in
+  let arg_set, arg_unset = match kind with
+    | `enable_disable | `boolean -> name, "no-"^name
+    | `with_without -> "with-"^name, "without-"^name
+  in
+  let default = match kind with
+    | `enable_disable when default -> "enabled"
+    | `enable_disable              -> "disabled"
+    | `with_without when default   -> "with"
+    | `with_without                -> "without"
+    | `boolean when default        -> "true"
+    | `boolean                     -> "false"
+  in
   switch,
   [
-    [name], Arg.Set switch,
-    Pretty.string_to EZCMD.info "Enable %s (%s by default)" name default;
+    [arg_set], Arg.Set switch,
+    Pretty.string_to EZCMD.info "%s %s (%s by default)" set name default;
 
-    ["no-"^name], Arg.Clear switch,
-    Pretty.string_to EZCMD.info "Disable %s (%s by default)" name default;
+    [arg_unset], Arg.Clear switch,
+    Pretty.string_to EZCMD.info "%s %s (%s by default)" unset name default;
   ]

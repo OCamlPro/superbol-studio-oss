@@ -34,7 +34,7 @@ let run_lsp ~enable_caching ~storage =
 
 let cmd =
   let caching, caching_args =
-    Arg_utils.en'dis'able_switch ~name:"caching" ~default:true
+    Arg_utils.switch `enable_disable ~name:"caching" ~default:true
   in
   let storage = ref None in
   EZCMD.sub "lsp"
