@@ -11,13 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_server.config
-
-val run
-  : config: Lsp_server.config
-  -> Lsp_server.exit_status
+(** [switch kind ~name ~default] returns a Boolean flag [flg] and specifications
+    of arguments for setting/unsetting [flg].  The flag has default value
+    [default], and the phrasing of the documentation for arguments depends on
+    the [kind] of switch: [`enable_disable] and [`with_without] are
+    self-explanatory; [`boolean] uses "Set" and "Clear" verbs. *)
+val switch
+  : [ `enable_disable | `with_without | `boolean ]
+  -> name: string
+  -> default: bool
+  -> bool ref * Ezcmd.V2.EZCMD.TYPES.arg_list

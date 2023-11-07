@@ -18,7 +18,8 @@ module DIAGS = Cobol_common.Diagnostics
 let layout =
   Superbol_project.{
     project_config_filename = "superbol.toml";
-    relative_work_dirname = "_superbol";
+    relative_work_dirname = Some "_superbol";
+    rootdir_fallback_policy = Same_as_file_directory;
   }
 
 let try_load ~f arg =

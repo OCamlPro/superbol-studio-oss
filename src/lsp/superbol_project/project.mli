@@ -27,13 +27,27 @@ module TYPES: sig
 
   type layout = {
     project_config_filename: string;
-    relative_work_dirname: string;
+    (** Name of the TOML file that is to be found at the root of each project's
+        directory tree. *)
+
+    relative_work_dirname: string option;
+    (** Relative name of a directory where the LSP should put its working files
+        (caches, etc).  No such storage is allowed when [None]. *)
+
+    rootdir_fallback_policy: rootdir_fallback_policy;
+    (** Policy to determine the root directory of projects based on individual
+        filenames. *)
   }
+
+  and rootdir_fallback_policy =
+    | Same_as_file_directory
+    | Given_directory of string
 
 end
 include module type of TYPES
   with type rootdir = TYPES.rootdir
    and type project = TYPES.project
+   and type rootdir_fallback_policy = TYPES.rootdir_fallback_policy
    and type layout = TYPES.layout
 
 type t = project
@@ -49,8 +63,13 @@ val rootdir_at: dirname:string -> rootdir
 (** [rootdir_for ~filename ~layout] locates the project directory for a given
     file name.  This project directory is the closest parent directory of
     [filename] that contains a file with the name
-    [layout.project_config_filename].  Returns the name of the directory that
-    contains [filename] if no such file is found. *)
+    [layout.project_config_filename].
+
+    When no such file is found, the behavior depends on the given fallback
+    policy: if [layout.rootdir_fallback_policy = Same_as_file_directory], the
+    name of the directory that contains [filename] is chosen as root for the
+    project; alternatively, if the fallback is [Given_directory dirname],
+    directory [dirname] is used instead. *)
 val rootdir_for: filename:string -> layout:layout -> rootdir
 
 (** [for_ ~rootdir ~layout] retrieves a project based on its root directory.

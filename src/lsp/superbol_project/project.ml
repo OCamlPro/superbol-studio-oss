@@ -28,8 +28,13 @@ module TYPES = struct
 
   type layout = {
     project_config_filename: string;
-    relative_work_dirname: string;
+    relative_work_dirname: string option;
+    rootdir_fallback_policy: rootdir_fallback_policy;
   }
+
+  and rootdir_fallback_policy =
+    | Same_as_file_directory
+    | Given_directory of string
 
 end
 include TYPES
@@ -52,22 +57,22 @@ let rootdir_at ~dirname : rootdir =
   then dirname
   else Fmt.invalid_arg "Expected existing directory: %s" dirname
 
-let rootdir_for ~filename ~layout:{ project_config_filename; _ } =
+let rootdir_for ~filename
+    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
   let rec try_dir dir =
     if EzFile.exists (dir // project_config_filename)
-    then Some dir
+    then dir
     else
       let new_dir = EzFile.dirname dir in
       if new_dir = dir
-      then None                                             (* we are at root *)
+      then raise Not_found                                  (* we are at root *)
       else try_dir new_dir
   in
-  let dir = match try_dir (EzFile.dirname filename) with
-    | Some dir -> dir
-    | None -> EzFile.dirname filename
-  in
-  (* Pretty.error "Project directory: %s@." dir; *)
-  dir
+  let dirname = EzFile.dirname filename in
+  try try_dir dirname
+  with Not_found -> match rootdir_fallback_policy with
+    | Same_as_file_directory -> dirname
+    | Given_directory dirname -> dirname
 
 let with_default_config ~rootdir ~layout:{ project_config_filename; _ } =
   {
