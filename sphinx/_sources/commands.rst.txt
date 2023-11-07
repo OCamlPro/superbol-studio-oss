@@ -273,6 +273,12 @@ Start a COBOL LSP server
 Where options are:
 
 
+* :code:`--caching`   Enable caching (enabled by default)
+
+* :code:`--no-caching`   Disable caching (enabled by default)
+
+* :code:`--storage-directory DIR`   Directory under which to store cache data --- prevents the creation of a "_superbol" storage directory at the root of project trees.
+
 
 main.exe pp
 ~~~~~~~~~~~~~
