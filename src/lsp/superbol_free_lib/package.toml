@@ -64,6 +64,11 @@ vscode-json = "version"
 ez_api = "2.0"
 ez_toml = "version"
 
+# We only depend on `lwt` via `ez_api` (and we don't even use any bit
+# of `lwt` at all).  But we still need to add the following constraint
+# on `lwt` so it installs properly on windows:
+lwt = ">=5"
+
 # package tools dependencies
 [tools]
 # ...
