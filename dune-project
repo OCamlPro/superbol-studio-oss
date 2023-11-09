@@ -185,6 +185,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (vscode-json (= version))
+   (lwt ( >= 5 ))
    (ez_toml (= version))
    (ez_file ( >= 0.3 ))
    (ez_cmdliner (and (>= 0.3.0) (< 1.0.0)))
