@@ -61,7 +61,7 @@ cobol_typeck = "version"
 ez_file = ">=0.3"
 ez_cmdliner = "0.3.0"
 vscode-json = "version"
-ez_api = "2.0"
+ez_api = { version = "2.0", libname = "ez_api.encoding" }
 ez_toml = "version"
 
 # We only depend on `lwt` via `ez_api` (and we don't even use any bit
