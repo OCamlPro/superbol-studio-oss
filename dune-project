@@ -384,6 +384,20 @@
  )
 
 (package
+ (name cobol_unit)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (cobol_ptree (= version))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   odoc
+  )
+ )
+
+(package
  (name ez_toml)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")

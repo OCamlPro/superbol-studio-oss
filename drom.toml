@@ -203,6 +203,10 @@ dir = "src/lsp/cobol_typeck"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/cobol_unit"
+# edit 'src/lsp/cobol_unit/package.toml' for package-specific options
+
+[[package]]
 dir = "src/vendor/ez_toml"
 # edit 'src/testing/superbol_testutils/package.toml' for package-specific options
 

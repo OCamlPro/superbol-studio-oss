@@ -11,27 +11,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.INFIX
+module TYPES: sig
 
-module type TAGS = sig
-  val loc: Cobol_common.Srcloc.srcloc
-end
+  type +'a qualmap
 
-module Make (Tags: TAGS) = struct
-  open Cobol_ptree
+  type 'a binding =
+    {
+      value: 'a;
+      full_qn: Cobol_ptree.qualname;
+    }
 
-  module Term = struct
-    let name n : qualname = Name (n &@ Tags.loc)
-    let qual n qn: qualname = Qual (n &@ Tags.loc, qn)
-    let qualident x : qualident =
-      { ident_name = name x; ident_subscripts = [] }
-    let ident x : ident_or_literal = QualIdent (qualident x)
-    let strlit l : ident_or_literal = Alphanum (l, Dquote)
-  end
-
-  module Cond = struct
-    open Term
-    let ident x : condition = Expr (Atom (ident x))
-  end
+  exception Ambiguous of Cobol_ptree.qualname list Lazy.t
 
 end
+include module type of TYPES
+  with type 'a qualmap = 'a TYPES.qualmap
+
+type +'a t = 'a qualmap
+
+val pp_qualmap: 'a Pretty.printer -> 'a qualmap Pretty.printer
+val pp_qualmap_struct: 'a Pretty.printer -> 'a qualmap Pretty.printer
+
+val empty: 'a qualmap
+val add: Cobol_ptree.qualname -> 'a -> 'a qualmap -> 'a qualmap
+
+val fold: f:('a binding -> 'b -> 'b) -> 'a qualmap -> 'b -> 'b
+val find: Cobol_ptree.qualname -> 'a qualmap -> 'a
+
+val bindings: 'a qualmap -> 'a binding list
+val find_binding: Cobol_ptree.qualname -> 'a qualmap -> 'a binding
