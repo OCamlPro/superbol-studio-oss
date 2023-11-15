@@ -20,6 +20,11 @@ type t = {
 }
 type client = LanguageClient.t
 
+
+let id = "superbol-free-lsp"
+
+let name = "SuperBOL Language Server"
+
 let make ~bundled_superbol () = {
   bundled_superbol;
   language_client = None
@@ -47,9 +52,9 @@ let start_language_server t =
   let client =
     let cmd = Executable.command serverOptions in
     if String.starts_with ~prefix:"ws://" cmd then
-      LanguageClient.make_
-        ~id:"cobolServer"
-        ~name:"Cobol Server"
+      LanguageClient.make_stream
+        ~id
+        ~name
         (fun () ->
           let njs_stream =
             Vscode_languageclient.StreamInfo.njs_stream_of_string cmd
@@ -64,14 +69,13 @@ let start_language_server t =
     else
       let clientOptions = Superbol_languageclient.clientOptions () in
       LanguageClient.make ()
-        ~id: "superbol-free-lsp"
-        ~name: "SuperBOL Language Server"
+        ~id
+        ~name
         ~serverOptions
         ~clientOptions
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
-
 
 let current_document_uri ?text_editor () =
   match

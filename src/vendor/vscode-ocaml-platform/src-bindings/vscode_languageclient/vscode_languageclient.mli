@@ -201,7 +201,7 @@ module LanguageClient : sig
     -> unit
     -> t
 
-  val make_ :
+  val make_stream :
     id:string
     -> name:string
     -> (unit -> StreamInfo.t Promise.t)
