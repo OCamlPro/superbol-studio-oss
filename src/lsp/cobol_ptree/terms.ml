@@ -633,6 +633,7 @@ module FMT = struct
     then fmt "@[<1>(%a)@]" ppf (list ~sep:comma pp_subscript) ident_subscripts
 
   and pp_qualname ppf = pp_term ppf
+  and pp_qualname' ppf = pp_with_loc pp_qualname ppf
 
   and pp_address ppf = function
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
@@ -804,6 +805,7 @@ module FMT = struct
     | LOr -> string ppf "OR"
 
   and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
+  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
   and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
 
   (** Pretty-printing for named unions of term types (some are yet to be

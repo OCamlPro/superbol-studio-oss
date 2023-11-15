@@ -5,7 +5,7 @@
   (public_name cobol_unit)
   (wrapped true)
   ; use field 'dune-libraries' to add libraries without opam deps
-  (libraries cobol_ptree cobol_config cobol_common )
+  (libraries cobol_ptree cobol_data cobol_config cobol_common )
   ; use field 'dune-flags' to set this value
   (flags (:standard))
   ; use field 'dune-stanzas' to add more stanzas here

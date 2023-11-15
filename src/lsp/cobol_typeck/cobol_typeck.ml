@@ -11,8 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Typeck_engine
+module OLD = struct
+  include Old_typeck_engine
 
-module Env_builder = Env_builder
-module Group_builder = Group_builder
-module Prog_builder = Prog_builder
+  module Env_builder = Old_env_builder
+  module Group_builder = Old_group_builder
+  module Prog_builder = Old_prog_builder
+end
+
+include Typeck_engine
+(* module Units = Typeck_units *)
+(* module Config = Typeck_config *)
+(* module Proc_div = Typeck_proc_div *)

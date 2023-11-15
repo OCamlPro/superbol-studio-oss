@@ -374,6 +374,7 @@
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
    (ocaml (>= 4.14.0))
+   (cobol_unit (= version))
    (cobol_ptree (= version))
    (cobol_parser (= version))
    (cobol_data (= version))
@@ -390,6 +391,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (cobol_ptree (= version))
+   (cobol_data (= version))
    (cobol_config (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))

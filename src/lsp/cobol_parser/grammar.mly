@@ -1136,8 +1136,8 @@ let constant_or_data_descr_entry :=
     { Constant e }
   | e = data_descr_entry;
     { Data e }                                  (* including level 77 entries *)
-  | l = loc(elementary_level); dn = name; RENAMES; ri = qualname;
-    to_ = o(THROUGH; ~ = qualname; < >); ".";
+  | l = loc(elementary_level); dn = name; RENAMES; ri = loc(qualname);
+    to_ = o(THROUGH; ~ = loc(qualname); < >); ".";
     { Renames { rename_level = l;
                 rename_to = dn;
                 rename_renamed = ri;
@@ -1532,19 +1532,19 @@ let data_occurs_clause :=
   | ~ = occurs_dynamic_clause;   < >
 
 let occurs_fixed_clause [@context occurs_clause] :=
-  | OCCURS; i = integer; TIMES?; kl = rl(key_is); ib = lo(indexed_by);
+  | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
     { OccursFixed { times = i; key_is = kl; indexed_by = ib; } }
 
 let occurs_depending_clause [@context occurs_clause] :=
-  | OCCURS; i1 = integer; TO; i2 = integer; TIMES?;
+  | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
     { OccursDepending { from = i1; to_ = i2; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=
   | OCCURS; DYNAMIC; co = ro(capacity_phrase);
-    i1o = ro(pf(FROM,integer)); i2o = ro(pf(TO,integer));
-    i = bo(INITIALIZED); kl = rl(key_is); il = lo(indexed_by);
+    i1o = ro(pf(FROM,loc(integer))); i2o = ro(pf(TO,loc(integer)));
+    i = loc(bo(INITIALIZED)); kl = rl(key_is); il = lo(indexed_by);
     { OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
                       initialized = i; key_is = kl; indexed_by = il; } }
 
@@ -1693,8 +1693,9 @@ let validation_stage :=
 
 let data_value_clause_prefix == VALUE; IS? | VALUES; ARE?
 let data_value_clause :=
-  | data_value_clause_prefix; ~ = literal; <ValueData>
-  | data_value_clause_prefix; ~ = nel(ll = rnel(literal); FROM; fl = subscripts;
+  | data_value_clause_prefix; ~ = loc(literal); <ValueData>
+  | data_value_clause_prefix; ~ = nel(ll = rnel(loc(literal));
+                                      FROM; fl = subscripts;
                                       tl = lo(TO; ~ = subscripts; < >);
                                       { { table_data_values = ll;
                                           table_data_from = fl;

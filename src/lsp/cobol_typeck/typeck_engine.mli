@@ -16,5 +16,5 @@ open Cobol_common.Diagnostics.TYPES
 val analyze_compilation_group
   : ?config: Cobol_config.t
   -> _ Cobol_parser.Outputs.parsed_compilation_group
-  -> (Cobol_data.Compilation_unit.SET.t *
+  -> (Cobol_unit.Types.group *
       Cobol_ptree.compilation_group option) with_diags

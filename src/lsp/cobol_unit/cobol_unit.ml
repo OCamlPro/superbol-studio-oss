@@ -11,4 +11,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Qualmap = Qualmap
+module Qual = Unit_qual
+module Qualmap = Unit_qualmap
+
+module Types = struct
+  include Unit_types
+  include Unit_group.TYPES
+end
+
+module Group = Unit_group
+module Collections = Unit_collections
+module Printer = Unit_printer

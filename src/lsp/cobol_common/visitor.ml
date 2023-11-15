@@ -110,8 +110,7 @@ module Fold = struct
     | DoChildrenAndThen (x, f) -> continue n x >> f
 
   (** [leaf fold node acc] calls [fold node acc] and returns immediately (after
-      executing the post action, if [fold] returns
-      {!val:DoChildrenAndThen}). *)
+      executing the post action, if [fold] returns {!DoChildrenAndThen}). *)
   let leaf (fold: 'x -> 'a -> 'a action) =
     handle fold ~continue:(fun _ -> Fun.id)
 

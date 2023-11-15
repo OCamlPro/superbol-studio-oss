@@ -1542,7 +1542,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf___anonymous_100_ident__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_VARYING_ident__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_USING_name__ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_TO_integer__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_TO_loc_integer___ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_string_or_int_literal__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_qualified_procedure_name__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_procedure_name__ -> None
@@ -1552,7 +1552,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_INTO_loc_ident___ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_INTO_ident__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_IN_name__ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_FROM_integer__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_FROM_loc_integer___ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_FROM_ident_or_literal__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_FROM_expression__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_BY_ident_or_numeric__ -> None
@@ -1622,10 +1622,10 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_loc_section_paragraph__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_loc_replacing_phrase__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_loc_options_clause__ -> []
+    | MenhirInterpreter.N MenhirInterpreter.N_rnel_loc_literal__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_loc_decl_section_paragraph__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_literal_through_literal_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_literal_phrase_ -> []
-    | MenhirInterpreter.N MenhirInterpreter.N_rnel_literal_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_line_position_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_integer_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_rnel_ident_or_string_ -> []
@@ -1775,7 +1775,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf___anonymous_100_ident__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_VARYING_ident__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_USING_name__ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_pf_TO_integer__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_pf_TO_loc_integer___ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_string_or_int_literal__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_qualified_procedure_name__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_procedure_name__ -> raise Not_found
@@ -1785,7 +1785,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_INTO_loc_ident___ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_INTO_ident__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_IN_name__ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_pf_FROM_integer__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_pf_FROM_loc_integer___ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_FROM_ident_or_literal__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_FROM_expression__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_pf_BY_ident_or_numeric__ -> raise Not_found
@@ -1961,11 +1961,11 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_nel_loc_screen_attribute_clause__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_loc_replacing_phrase__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_loc_options_clause__ -> []
+    | MenhirInterpreter.N MenhirInterpreter.N_nel_loc_literal__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_loc_decl_section_paragraph__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_loc___anonymous_72__ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_literal_through_literal_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_literal_phrase_ -> []
-    | MenhirInterpreter.N MenhirInterpreter.N_nel_literal_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_line_position_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_integer_ -> []
     | MenhirInterpreter.N MenhirInterpreter.N_nel_ident_or_string_ -> []
@@ -4446,8 +4446,8 @@ let recover =
   let r710 = R 912 :: r709 in
   let r711 = S (N N_rl_key_is_) :: r710 in
   let r712 = R 122 :: r711 in
-  let r713 = S (N N_ro_pf_TO_integer__) :: r712 in
-  let r714 = S (N N_ro_pf_FROM_integer__) :: r713 in
+  let r713 = S (N N_ro_pf_TO_loc_integer___) :: r712 in
+  let r714 = S (N N_ro_pf_FROM_loc_integer___) :: r713 in
   let r715 = [R 199] in
   let r716 = S (N N_name) :: r715 in
   let r717 = [R 1453] in
@@ -4850,7 +4850,7 @@ let recover =
   let r1114 = S (N N_ident) :: r1113 in
   let r1115 = [R 1632] in
   let r1116 = [R 171] in
-  let r1117 = [R 1070] in
+  let r1117 = [R 1068] in
   let r1118 = [R 394] in
   let r1119 = S (T T_PERIOD) :: r1118 in
   let r1120 = S (T T_DECLARATIVES) :: r1119 in
@@ -6323,15 +6323,15 @@ let recover =
   | 335 -> One ([R 1061])
   | 2052 -> One ([R 1062])
   | 2053 -> One ([R 1063])
-  | 1086 -> One ([R 1064])
-  | 1087 -> One ([R 1065])
-  | 427 -> One ([R 1066])
-  | 428 -> One ([R 1067])
-  | 1594 -> One ([R 1068])
-  | 1595 -> One ([R 1069])
-  | 2237 -> One ([R 1071])
-  | 3852 -> One ([R 1072])
-  | 3853 -> One ([R 1073])
+  | 427 -> One ([R 1064])
+  | 428 -> One ([R 1065])
+  | 1594 -> One ([R 1066])
+  | 1595 -> One ([R 1067])
+  | 2237 -> One ([R 1069])
+  | 3852 -> One ([R 1070])
+  | 3853 -> One ([R 1071])
+  | 1086 -> One ([R 1072])
+  | 1087 -> One ([R 1073])
   | 204 -> One ([R 1074])
   | 205 -> One ([R 1075])
   | 2903 -> One ([R 1076])
@@ -6878,10 +6878,10 @@ let recover =
   | 3158 -> One ([R 1825])
   | 331 -> One ([R 1826])
   | 2051 -> One ([R 1827])
-  | 1084 -> One ([R 1828])
-  | 426 -> One ([R 1829])
-  | 1593 -> One ([R 1830])
-  | 3851 -> One ([R 1831])
+  | 426 -> One ([R 1828])
+  | 1593 -> One ([R 1829])
+  | 3851 -> One ([R 1830])
+  | 1084 -> One ([R 1831])
   | 211 -> One ([R 1832])
   | 2905 -> One ([R 1833])
   | 3940 -> One ([R 1834])

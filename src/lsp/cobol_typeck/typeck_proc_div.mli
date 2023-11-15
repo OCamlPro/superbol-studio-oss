@@ -11,10 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree
-open Cobol_common.Diagnostics.TYPES
+open Cobol_common.Srcloc.TYPES
 
-val for_compilation_unit
-  : parents: Cobol_data.PROG_ENV.t list
-  -> compilation_unit with_loc
-  -> Cobol_data.PROG_ENV.t option with_diags
+val of_compilation_unit
+  : Cobol_ptree.compilation_unit with_loc
+  -> Cobol_unit.Types.procedure_paragraphs

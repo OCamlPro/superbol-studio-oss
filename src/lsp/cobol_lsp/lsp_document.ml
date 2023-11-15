@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_typeck = Cobol_typeck.OLD
+
 open Lsp_imports
 open Lsp_lookup.TYPES
 open Lsp_project.TYPES

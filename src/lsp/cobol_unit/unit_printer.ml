@@ -11,19 +11,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Type-checking and validation of COBOL compilation groups *)
+open Unit_types
 
-module DIAGS = Cobol_common.Diagnostics
+open Cobol_common.Srcloc.INFIX
 
-let analyze_compilation_group
-    (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
-  function
-  | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_unit.Group.empty, None)
-  | Only Some cg | WithArtifacts (Some cg, _) ->
-      match Typeck_units.of_compilation_group config cg with
-      (* | { diags; _ } when DIAGS.Set.has_errors diags -> *)
-      (*     DIAGS.result ~diags (Cobol_unit.Group.empty, Some cg) *)
-      | { diags; result } ->
-          DIAGS.result ~diags (result, Some cg)
+let pp_cobol_unit ?(show_items = false) =
+  let open Cobol_data.Printer in
+  pp_braced_record_with_conditional_fields [
+    T Fmt.(field "name" (fun x -> ~&(x.unit_name)) string);
+    T (vfield "records" (fun x -> x.unit_data.data_records)
+         (Fmt.(list ~sep:nop) pp_record));
+    C (show_items,
+       vfield "items" (fun x -> x.unit_data.data_items.named)
+         (Unit_qualmap.pp_qualmap pp_item));
+  ]
+
+let pp_group ppf group =
+  Unit_collections.SET.iter
+    (Fmt.(vbox @@ (styled `Yellow @@ any "unit") ++
+                  any ": " ++ pp_cobol_unit ++ any "@\n") ppf) group

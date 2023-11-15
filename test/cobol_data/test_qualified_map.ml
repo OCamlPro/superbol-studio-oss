@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+
 open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 

@@ -2,3 +2,13 @@
   (names test_qualified_map)
   (modules test_qualified_map)
   (libraries alcotest cobol_data))
+
+(library
+ (name test_cobol_data)
+ (modules test_memory)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_data cobol_parser testing_helpers)
+ )

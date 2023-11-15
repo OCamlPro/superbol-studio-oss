@@ -9,8 +9,7 @@ This library contains utility modules that are used in all other {b Superbol} pa
      helper functions for pairs and lists.}
   {- {!Cobol_common.Diagnostics} which contains all the logic to create and print diagnostics.}
   {- {!Cobol_common.Srcloc} which contains all the logic to handle locations.}
-  {- {!Cobol_common.Visitors} which contains all the basic definitions for our visitors.}}
+  {- {!Cobol_common.Visitor} which contains all the basic definitions for our visitors.}}
 
 
 The entry point of this library is the module: {!Cobol_common}.
-

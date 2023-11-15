@@ -47,6 +47,9 @@ val list
   -> 'a printer -> 'a list printer
 val stack: 'a printer -> 'a list printer
 val path: string list printer
+val vfield
+  : ?label: string printer -> ?sep: unit printer
+  -> string -> ('a -> 'b) -> 'b printer -> 'a printer
 
 module Simple: sig
   val int: int -> simple

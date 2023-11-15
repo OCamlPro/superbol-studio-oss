@@ -129,8 +129,8 @@ let fold_rename_item (v: _ #folder) =
                           rename_renamed; rename_through } x -> x
       >> fold_data_level' v rename_level
       >> fold_name' v rename_to
-      >> fold_qualname v rename_renamed
-      >> fold_qualname_opt v rename_through
+      >> fold_qualname' v rename_renamed
+      >> fold_qualname'_opt v rename_through
     end
 
 let fold_rename_item' (v: _ #folder) =
@@ -190,22 +190,22 @@ let fold_data_occurs_clause (v: _ #folder) =
   handle v#fold_data_occurs_clause
     ~continue:begin fun c x -> match c with
       | OccursFixed { times; key_is; indexed_by } -> x
-          >> fold_integer v times
+          >> fold_integer' v times
           >> fold_list ~fold:fold_sort_spec v key_is
           >> fold_name'_list v indexed_by
       | OccursDepending { from; to_; depending;
                           key_is; indexed_by } -> x
-          >> fold_integer v from
-          >> fold_integer v to_
+          >> fold_integer' v from
+          >> fold_integer' v to_
           >> fold_qualname' v depending
           >> fold_list ~fold:fold_sort_spec v key_is
           >> fold_name'_list v indexed_by
       | OccursDynamic { capacity_in; from; to_;
                         initialized; key_is; indexed_by } -> x
           >> fold_name'_opt v capacity_in
-          >> fold_integer_opt v from
-          >> fold_integer_opt v to_
-          >> fold_bool v initialized
+          >> fold_integer'_opt v from
+          >> fold_integer'_opt v to_
+          >> fold' v ~fold:fold_bool initialized
           >> fold_list ~fold:fold_sort_spec v key_is
           >> fold_name'_list v indexed_by
     end

@@ -11,6 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+module Env_builder = Old_env_builder
+module Group_builder = Old_group_builder
+
 open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
@@ -36,7 +40,7 @@ let lookup_cus config = object
 
   method! fold_compilation_unit' cu acc =
     let parents, _ = acc.result in
-    match Env_builder.for_compilation_unit ~parents cu with
+    match Env_builder.for_compilation_unit_old ~parents cu with
     | { result = None; diags } ->
         Visitor.skip (DIAGS.with_more_diags ~diags acc)
 

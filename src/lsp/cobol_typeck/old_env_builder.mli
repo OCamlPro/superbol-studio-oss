@@ -11,19 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Type-checking and validation of COBOL compilation groups *)
+open Cobol_ptree
+open Cobol_common.Diagnostics.TYPES
 
-module DIAGS = Cobol_common.Diagnostics
-
-let analyze_compilation_group
-    (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
-  function
-  | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_unit.Group.empty, None)
-  | Only Some cg | WithArtifacts (Some cg, _) ->
-      match Typeck_units.of_compilation_group config cg with
-      (* | { diags; _ } when DIAGS.Set.has_errors diags -> *)
-      (*     DIAGS.result ~diags (Cobol_unit.Group.empty, Some cg) *)
-      | { diags; result } ->
-          DIAGS.result ~diags (result, Some cg)
+val for_compilation_unit_old
+  : parents: Cobol_data.OLD.PROG_ENV.t list
+  -> compilation_unit with_loc
+  -> Cobol_data.OLD.PROG_ENV.t option with_diags

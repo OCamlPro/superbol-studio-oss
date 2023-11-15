@@ -13,19 +13,27 @@
 
 (** This module implements functions to type the COBOL data.*)
 
-module Types = struct
-  include Types
-  type picture = Picture.t
-  type group = Group.t
+module OLD = struct
 
-  include Compilation_unit.TYPES
-  type compilation_units = Compilation_unit.SET.t
-  type +'a compilation_units_map = 'a Compilation_unit.MAP.t
+  module Types = struct
+    include Types
+    type group = Group.t
+
+    include Compilation_unit.TYPES
+    type compilation_units = Compilation_unit.SET.t
+    type +'a compilation_units_map = 'a Compilation_unit.MAP.t
+  end
+
+  include Env
+  module Group = Group
+  module Mangling = Mangling
+  module Picture = Data_picture
+  module Qualmap = Qualmap
+  module Compilation_unit = Compilation_unit
 end
 
-include Env
-module Group = Group
-module Mangling = Mangling
-module Picture = Picture
-module Qualmap = Qualmap
-module Compilation_unit = Compilation_unit
+module Memory = Data_memory
+module Types = Data_types
+module Item = Data_item
+module Picture = Data_picture
+module Printer = Data_printer

@@ -220,8 +220,8 @@ let semtoks_from_ptree ~filename ?range ptree =
       (* We can remove the code below and return do_children directly*)
       |> fold_data_level' self rename_level
       |> add_name' rename_to DataDecl
-      |> Cobol_ptree.Visitor.fold_qualname self rename_renamed
-      |> Cobol_ptree.Visitor.fold_qualname_opt self rename_through
+      |> Cobol_ptree.Visitor.fold_qualname' self rename_renamed
+      |> Cobol_ptree.Visitor.fold_qualname'_opt self rename_through
       |> Visitor.skip_children
 
     method! fold_condition_name_item { condition_name_level;

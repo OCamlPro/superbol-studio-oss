@@ -11,19 +11,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Type-checking and validation of COBOL compilation groups *)
+module TYPES = struct
+  type group = Unit_collections.SET.t
+  type +'a group_map = 'a Unit_collections.MAP.t
+end
 
-module DIAGS = Cobol_common.Diagnostics
+(* (\** Alias for {!Collections.SET.empty} *\) *)
+(* let empty = Unit_collections.SET.empty *)
 
-let analyze_compilation_group
-    (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
-  function
-  | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_unit.Group.empty, None)
-  | Only Some cg | WithArtifacts (Some cg, _) ->
-      match Typeck_units.of_compilation_group config cg with
-      (* | { diags; _ } when DIAGS.Set.has_errors diags -> *)
-      (*     DIAGS.result ~diags (Cobol_unit.Group.empty, Some cg) *)
-      | { diags; result } ->
-          DIAGS.result ~diags (result, Some cg)
+(* (\** Alias for {!Collections.SET.add} *\) *)
+(* let add = Unit_collections.SET.add *)
+
+(* (\** Alias for {!Collections.SET.iter} *\) *)
+(* let iter = Unit_collections.SET.iter *)
+
+include Unit_collections.SET

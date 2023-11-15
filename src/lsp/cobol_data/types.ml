@@ -74,7 +74,7 @@ and 'a leveled = {                             (* TODO: no need to keep levels *
   level: int;
 } [@@deriving show]
 
-and 'a pictured = 'a * Picture.t option [@@deriving show]
+and 'a pictured = 'a * Data_picture.t option [@@deriving show]
 
 and table_type = {                          (* TODO: inline in `Table/OCcurs` *)
   elements_type: data_type Cobol_ptree.with_loc;

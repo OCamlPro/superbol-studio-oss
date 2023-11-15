@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+
 open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
 open Cobol_data.Types
@@ -104,10 +106,10 @@ let name_of_compunit (cu: Cobol_ptree.compilation_unit with_loc) =
   | ClassDefinition {class_name = name; _}
   | InterfaceDefinition {interface_name = name; _} -> ~&name
 
-let compilation_unit_by_name (cu_name: Cobol_ptree.name)
-    (ptree: Cobol_ptree.compilation_group) =
-  List.find_opt (fun cu -> cu_name = name_of_compunit cu)
-    ptree.compilation_units
+(* let compilation_unit_by_name (cu_name: Cobol_ptree.name) *)
+(*     (ptree: Cobol_ptree.compilation_group) = *)
+(*   List.find_opt (fun cu -> cu_name = name_of_compunit cu) *)
+(*     ptree.compilation_units *)
 
 (* --- *)
 
@@ -157,6 +159,8 @@ let names_at_position ~uri pos ptree : names_at_position =
 
   let srcloc_contains pos loc =
     Lsp_position.is_in_srcloc ~filename pos loc
+  and lexloc_contains pos lexloc =
+    Lsp_position.is_in_lexloc pos lexloc
   in
 
   let on_name n loc ({ names; qualifiers; _ } as acc) =
@@ -202,7 +206,7 @@ let names_at_position ~uri pos ptree : names_at_position =
     inherit! [acc] Lsp_position.sieve ~filename ~pos
 
     method! fold_compilation_unit' cu ({ names; _ } as acc) =
-      if Lsp_position.is_in_srcloc ~filename pos ~@cu then
+      if srcloc_contains pos ~@cu then
         let cu_name = name_of_compunit cu in
         let names = { names with
                       enclosing_compilation_unit_name = Some cu_name } in
@@ -211,7 +215,7 @@ let names_at_position ~uri pos ptree : names_at_position =
         Visitor.skip_children acc
 
     method! fold_qualname qn ({ names; _ } as acc) =
-      if Lsp_position.is_in_lexloc pos (lexloc_of_qualname_in ~filename qn) then
+      if lexloc_contains pos (lexloc_of_qualname_in ~filename qn) then
         let qn = qualname_at_pos ~filename qn pos in
         let names = { names with qualname_at_position = Some qn } in
         Visitor.skip_children { acc with names }

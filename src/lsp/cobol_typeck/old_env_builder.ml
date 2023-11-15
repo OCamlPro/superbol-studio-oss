@@ -15,6 +15,8 @@ open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
+module Cobol_data = Cobol_data.OLD
+
 module Visitor = Cobol_common.Visitor
 module CharSet = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
@@ -81,7 +83,7 @@ let initialize_prog_env =
     DIAGS.result base_env
 
 (* TODO: avoid returning `options with_diags` *)
-let for_compilation_unit =
+let for_compilation_unit_old =
   let build_env ?parent_env name env =
     let prog_env = Cobol_data.PROG_ENV.make ?parent:parent_env ~&name in
     Visitor.skip @@

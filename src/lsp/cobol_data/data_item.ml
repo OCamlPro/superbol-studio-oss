@@ -11,19 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Type-checking and validation of COBOL compilation groups *)
+open Data_types
+open Cobol_common.Srcloc.INFIX
 
-module DIAGS = Cobol_common.Diagnostics
+(* ignores redefs *)
+let fold_definitions ~f def acc =
+  let rec aux acc def =
+    structure ~&(def.item_layout) (f def acc)
+  and structure = function
+    | Elementary _ ->
+        Fun.id
+    | Struct { fields = items }
+    | FixedTable { items; _ }
+    | DependingTable { items; _ }
+    | DynamicTable { items; _ } ->
+        fun acc -> NEL.fold_left ~f:aux acc items
+  in
+  aux acc def
 
-let analyze_compilation_group
-    (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
-  function
-  | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_unit.Group.empty, None)
-  | Only Some cg | WithArtifacts (Some cg, _) ->
-      match Typeck_units.of_compilation_group config cg with
-      (* | { diags; _ } when DIAGS.Set.has_errors diags -> *)
-      (*     DIAGS.result ~diags (Cobol_unit.Group.empty, Some cg) *)
-      | { diags; result } ->
-          DIAGS.result ~diags (result, Some cg)
+let offset: item_definition -> Data_memory.offset = fun def -> def.item_offset
+let size: item_definition -> Data_memory.size = fun def -> def.item_size

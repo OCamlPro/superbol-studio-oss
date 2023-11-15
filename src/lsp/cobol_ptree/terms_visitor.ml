@@ -57,6 +57,7 @@ class ['a] folder = object
   method fold_floating: (floating, 'a) fold = default
   method fold_fixed: (fixed, 'a) fold = default
   method fold_integer: (integer, 'a) fold = default
+  method fold_integer': (integer with_loc, 'a) fold = default
   method fold_binop: (binop, 'a) fold = default
   method fold_unop: (unop, 'a) fold = default
   method fold_expr: (expression, 'a) fold = default
@@ -96,6 +97,9 @@ let fold_fixed (v: _ #folder) = leaf v#fold_fixed
 let fold_floating (v: _ #folder) = leaf v#fold_floating
 let fold_integer (v: _ #folder) = leaf v#fold_integer
 let fold_integer_opt (v: _ #folder) = fold_option ~fold:fold_integer v
+let fold_integer' (v: _ #folder) =
+  handle' v#fold_integer' v ~fold:fold_integer
+let fold_integer'_opt (v: _ #folder) = fold_option ~fold:fold_integer' v
 
 let fold_boolean (v: _ #folder) = leaf v#fold_boolean
 

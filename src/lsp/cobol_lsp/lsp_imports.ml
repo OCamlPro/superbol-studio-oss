@@ -13,6 +13,8 @@
 
 (** Definitions of module aliases and helper functors *)
 
+module Cobol_data = Cobol_data.OLD
+
 module CUs = Cobol_data.Compilation_unit.SET
 module CUMap = Cobol_data.Compilation_unit.MAP
 module URIMap = Map.Make (Lsp.Uri)

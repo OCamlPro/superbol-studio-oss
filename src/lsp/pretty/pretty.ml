@@ -164,6 +164,10 @@ let path =
   list string ~fopen:"" ~fclose:"" ~fempty:""
     ~fsep:(Simple.char Ez_file.V1.FileOS.path_separator)
 
+let vfield ?(label = Fmt.(styled `Yellow string)) ?(sep = Fmt.any ":@ ")
+    l prj pp_v ppf =
+  Fmt.pf ppf "@[<v>%a%a%a@]" label l sep () (Fmt.using prj pp_v)
+
 (* --- *)
 
 (** {2 Initialization} *)

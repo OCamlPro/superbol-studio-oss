@@ -8,6 +8,8 @@
 (*                                                                            *)
 (******************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+
 open Lsp.Types
 
 open Cobol_common                                                  (* Visitor *)

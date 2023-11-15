@@ -11,12 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open EzCompat                                                    (* StringMap *)
+open EzCompat                                              (* String{Map,Set} *)
 module StrMap = StringMap
 module StrSet = StringSet
-
-(* open Cobol_common.Srcloc.TYPES *)
-open Cobol_common.Srcloc.INFIX
 
 (* --- *)
 
@@ -41,7 +38,7 @@ module TYPES = struct
   and 'a binding =
     {
       value: 'a;
-      full_qn: Cobol_ptree.qualname;      (* kept so we have distinct locations *)
+      full_qn: Cobol_ptree.qualname;    (* kept so we have distinct locations *)
     }
 
   exception Ambiguous of Cobol_ptree.qualname list Lazy.t
@@ -53,30 +50,31 @@ type +'a t = 'a qualmap
 
 (* --- *)
 
-let name_of : Cobol_ptree.qualname -> string = function
-  | Qual (n, _) | Name n -> ~&n
+open Unit_qual
+(* let name_of : Cobol_ptree.qualname -> string = function *)
+(*   | Qual (n, _) | Name n -> ~&n *)
 
-let qual_of : Cobol_ptree.qualname -> _ option = function
-  | Qual (_, qn) -> Some qn | Name _ -> None
+(* let qual_of : Cobol_ptree.qualname -> _ option = function *)
+(*   | Qual (_, qn) -> Some qn | Name _ -> None *)
 
-let names_of : Cobol_ptree.qualname -> StrSet.t =
-  let rec aux acc : Cobol_ptree.qualname -> StrSet.t = function
-    | Name n -> StrSet.add ~&n acc
-    | Qual (n, qn) -> aux (StrSet.add ~&n acc) qn
-  in
-  aux StrSet.empty
+(* let names_of : Cobol_ptree.qualname -> StrSet.t = *)
+(*   let rec aux acc : Cobol_ptree.qualname -> StrSet.t = function *)
+(*     | Name n -> StrSet.add ~&n acc *)
+(*     | Qual (n, qn) -> aux (StrSet.add ~&n acc) qn *)
+(*   in *)
+(*   aux StrSet.empty *)
 
-let indirect_quals_of : Cobol_ptree.qualname -> StrSet.t = function
-  | Name _ -> StrSet.empty
-  | Qual (_, qn) -> names_of qn
+(* let indirect_quals_of : Cobol_ptree.qualname -> StrSet.t = function *)
+(*   | Name _ -> StrSet.empty *)
+(*   | Qual (_, qn) -> names_of qn *)
 
-let rec qualname_match
-    (qn: Cobol_ptree.qualname) (full_qn: Cobol_ptree.qualname) =
-  match qn, full_qn with
-  | Name n, Name n' -> ~&n = ~&n'
-  | Qual _, Name _ -> false
-  | Qual (n, qn), Qual (n', qn') when ~&n = ~&n' -> qualname_match qn qn'
-  | qn, Qual (_, qn') -> qualname_match qn qn'
+(* let rec qualname_match *)
+(*     (qn: Cobol_ptree.qualname) (full_qn: Cobol_ptree.qualname) = *)
+(*   match qn, full_qn with *)
+(*   | Name n, Name n' -> ~&n = ~&n' *)
+(*   | Qual _, Name _ -> false *)
+(*   | Qual (n, qn), Qual (n', qn') when ~&n = ~&n' -> qualname_match qn qn' *)
+(*   | qn, Qual (_, qn') -> qualname_match qn qn' *)
 
 (* let rev_qn: Cobol_ptree.qualname -> Cobol_ptree.qualname = *)
 (*   let rec aux acc : Cobol_ptree.qualname -> _ = function *)
@@ -169,7 +167,7 @@ let rec find_binding qn { map; _ } =
   | Exact { binding = None; refined; _ }, None ->
       find_unique_binding qn refined
   | Cut { binding; qn_suffix }, Some qn'
-    when qualname_match qn' qn_suffix ->
+    when Unit_qual.matches qn' ~full:qn_suffix ->
       binding
   | Cut _, Some _ ->
       raise Not_found
@@ -214,7 +212,7 @@ and find_all_bindings qn qmap : _ binding list =
     (* Skip keys at toplevel of map: *)
     StrMap.fold begin fun _ node acc -> match node with
       | Cut { binding; qn_suffix }
-        when qualname_match qn qn_suffix ->
+        when Unit_qual.matches qn ~full:qn_suffix ->
           binding :: acc
       | Cut _ ->
           acc

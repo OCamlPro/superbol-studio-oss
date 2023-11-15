@@ -316,8 +316,8 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
     match rename_through with
     | Some through_name ->
         (* TODO: avoid reliance on a list representation. *)
-        let first = list_of_qualname rename_renamed in
-        let last = list_of_qualname through_name in
+        let first = list_of_qualname ~&rename_renamed in
+        let last = list_of_qualname ~&through_name in
         let groups =
           group_range
             (module Diags: Cobol_common.Diagnostics.STATEFUL)
@@ -328,7 +328,7 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
         Ok (Renames {name = rename_to;
                      targets = List.rev groups} &@<- rename_to) :: acc
     | None ->
-        let name_list = list_of_qualname rename_renamed in
+        let name_list = list_of_qualname ~&rename_renamed in
         let sub_groups = groups_of_list name_list group in
         if List.length sub_groups <> 1 then
           begin
