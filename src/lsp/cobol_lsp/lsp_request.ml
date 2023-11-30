@@ -12,32 +12,13 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
+open Cobol_common.Srcloc.INFIX
 open Lsp_imports
 open Lsp_project.TYPES
 open Lsp_server.TYPES
 open Lsp_lookup.TYPES
 open Lsp.Types
 open Ez_file.V1
-
-
-(** {2 Some preliminary utilities for manipulating source locations} *)
-
-type loc_translator =
-  {
-    location_of_srcloc: srcloc -> Location.t;
-    location_of: 'x. 'x with_loc -> Location.t;
-  }
-
-let loc_translator TextDocumentIdentifier.{ uri } =
-  let filename = Lsp.Uri.to_path uri in
-  let location_of_srcloc loc =
-    let range = Lsp_position.range_of_srcloc_in ~filename loc in
-    Location.create ~uri ~range
-  in
-  {
-    location_of_srcloc;
-    location_of = fun { loc; _ } -> location_of_srcloc loc;
-  }
 
 (** {2 Error handling} *)
 
@@ -69,79 +50,159 @@ let try_doc ~f registry doc_id =
 
 (** Same as [try_doc], with some additional document data *)
 let try_with_document_data ~f =
-  try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.retrieve_parsed_data doc)
+  try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
 
 (** {2 Handling requests} *)
+
+(** {3 Initialization} *)
 
 let handle_initialize (params: InitializeParams.t) =
   InitializeResult.create ()
     ~capabilities:(Lsp_capabilities.reply params.capabilities)
 
-let find_definitions { location_of; _ } cu_name qn defs =
-  let location_of_item { item_definition; _ } =
-    match item_definition.payload with
-    | CondName {condition_name = name; _}
-    | Renames {rename_to = name; _}
-    | Constant {constant_name = name; _} ->
-        location_of name
-    | Data {data_name = Some name; _}
-    | Screen {screen_data_name = Some name; _}
-    | ReportGroup {report_data_name = Some name; _} ->
-        location_of name
-    | _ ->
-        raise Not_found
-  in
+(** {3 Shutdown} *)
+
+let handle_shutdown registry =
+  try Lsp_server.save_project_caches registry
+  with e ->
+    internal_error
+      "Exception caught while saving project caches: %a@." Fmt.exn e
+
+(** {3 Definitions} *)
+
+let focus_on_name_in_defintions = true
+
+let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
+    ?(allow_notifications = true)
+    (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+  match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
+  | Data_item { def = { loc; _ }; _ }
+  | Data_renaming { def = { loc; _ }; _ }
+    when not focus_on_name_in_defintions ->
+      [location_of_srcloc loc]
+  | Data_item { def; _ } ->
+      Option.(to_list @@ map location_of ~&def.item_qualname)
+  | Data_renaming { def; _ } ->
+      [location_of ~&def.renaming_name]
+  | exception Not_found
+  | exception Cobol_unit.Qualmap.Ambiguous _
+    when not allow_notifications ->
+      []
+  | exception Not_found ->
+      (* Note: we keep that for ourselves for now as not all of the DATA DIV. is
+         analyzed. *)
+      (* Lsp_notify.unknown "data-name" qn; *)
+      []
+  | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+      Lsp_notify.ambiguous "data-name" qn ~matching_qualnames;
+      []
+
+let find_proc_definition Lsp_position.{ location_of; _ }
+    ?(allow_notifications = true)
+    (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+  match Cobol_unit.Qualmap.find qn cu.unit_procedure.named with
+  | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
+    when focus_on_name_in_defintions ->
+      [location_of qn]
+  | Section p
+    when focus_on_name_in_defintions ->
+      [location_of ~&p.section_name]
+  | Paragraph p ->
+      [location_of p]
+  | Section p ->
+      [location_of p]
+  | exception Not_found
+  | exception Cobol_unit.Qualmap.Ambiguous _
+    when not allow_notifications ->
+      []
+  | exception Not_found ->
+      Lsp_notify.unknown "procedure-name" qn;
+      []
+  | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+      Lsp_notify.ambiguous "procedure-name" qn ~matching_qualnames;
+      []
+
+let find_definitions ?allow_notifications loc_translator
+    cu_name element_at_pos group =
   try
-    let _cu, cu_defs = CUMap.find_by_name cu_name defs in
-    let { as_item; as_paragraph } = Cobol_data.Qualmap.find qn cu_defs in
-    Option.((to_list @@ map location_of_item as_item) @
-            (to_list @@ map location_of as_paragraph))
+    let { payload = cu; _ } = CUs.find_by_name cu_name group in
+    match element_at_pos with
+    | Data_item { full_qn = Some qn; _ } | Data_full_name qn | Data_name qn ->
+        find_data_definition loc_translator ?allow_notifications qn cu
+    | Data_item { full_qn = None; def_loc } ->
+        [loc_translator.location_of_srcloc def_loc]
+    | Proc_name qn ->
+        find_proc_definition loc_translator ?allow_notifications qn cu
   with Not_found -> []
 
 let lookup_definition_in_doc
     DefinitionParams.{ textDocument = doc; position; _ }
-    Lsp_document.{ ptree; definitions = defs; _ }
+    Cobol_typeck.Outputs.{ group; _ }
   =
-  match Lsp_lookup.names_at_position ~uri:doc.uri position ptree with
-  | { qualname_at_position = None; _ }
+  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+  | { element_at_position = None; _ }
   | { enclosing_compilation_unit_name = None; _ } ->
       None
-  | { qualname_at_position = Some qn;
+  | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
-      let defs = Lazy.force defs in
-      let loc_translator = loc_translator doc in
-      Some (`Location (find_definitions loc_translator cu_name qn defs))
+      let loc_translator = Lsp_position.loc_translator doc in
+      Some (`Location (find_definitions loc_translator cu_name qn group))
 
 let handle_definition registry (params: DefinitionParams.t) =
   try_with_document_data registry params.textDocument
     ~f:(fun ~doc:_ -> lookup_definition_in_doc params)
 
+(** {3 References} *)
+
+let find_full_qn ~kind qn qmap =
+  try Some (Cobol_unit.Qualmap.find_binding qn qmap).full_qn with
+  | Not_found ->
+      Lsp_notify.unknown kind qn;
+      None
+  | Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+      Lsp_notify.ambiguous kind qn ~matching_qualnames;
+      None
+
 let lookup_references_in_doc
     ReferenceParams.{ textDocument = doc; position; context; _ }
-    Lsp_document.{ ptree; definitions = defs; references = refs; _ }
+    Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
-  match Lsp_lookup.names_at_position ~uri:doc.uri position ptree with
+  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+  | { element_at_position = None; _ }
   | { enclosing_compilation_unit_name = None; _ } ->
       None
-  | { qualname_at_position = qn;
+  | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
-      let { location_of_srcloc; _ } as loc_translator = loc_translator doc in
+      let Lsp_position.{ location_of_srcloc; _ } as loc_translator
+        = Lsp_position.loc_translator doc in
       let def_locs =
-        match qn with
-        | Some qn when context.includeDeclaration ->
-            find_definitions loc_translator cu_name qn (Lazy.force defs)
-        | Some _ | None ->
-            []
+        if context.includeDeclaration then
+          find_definitions ~allow_notifications:false loc_translator
+            cu_name qn group
+        else []
       in
       let ref_locs =
         try
+          let cu, cu_refs = CUMap.find_by_name cu_name references in
+          let data_refs qn =
+            List.rev_map location_of_srcloc
+              (Cobol_unit.Qual.MAP.find qn cu_refs.data_refs)
+          and proc_refs qn =
+            List.rev_map location_of_srcloc
+              (Cobol_unit.Qual.MAP.find qn cu_refs.proc_refs)
+          in
           match qn with
-          | None -> []
-          | Some qn ->
-              let refs = Lazy.force refs in
-              let _cu, cu_refs = CUMap.find_by_name cu_name refs in
-              List.map location_of_srcloc
-                (Cobol_data.Qualmap.find qn cu_refs)
+          | Data_full_name qn
+          | Data_item { full_qn = Some qn; _ } ->
+              data_refs qn
+          | Data_item { full_qn = None; _ } ->
+              []
+          | Data_name qn ->
+              Option.fold ~none:[] ~some:data_refs @@
+              find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
+          | Proc_name qn ->
+              Option.fold ~none:[] ~some:proc_refs @@
+              find_full_qn qn ~&cu.unit_procedure.named ~kind:"procedure-name"
         with Not_found -> []
       in
       Some (def_locs @ ref_locs)
@@ -150,8 +211,9 @@ let handle_references state (params: ReferenceParams.t) =
   try_with_document_data state params.textDocument
     ~f:(fun ~doc:_ -> lookup_references_in_doc params)
 
-let lsp_text_edit (ir : Cobol_indent.Type.indent_record) =
-  match ir with { lnum; offset_orig; offset_modif } ->
+(** {3 Formatting} *)
+
+let lsp_text_edit Cobol_indent.Type.{ lnum; offset_orig; offset_modif } =
   let delta = offset_modif - offset_orig in
   let position = Position.create ~line:(lnum - 1) ~character:offset_orig in
   let range = Range.create ~start:position ~end_:position in
@@ -211,13 +273,15 @@ let handle_formatting registry params =
   with Failure msg ->
     internal_error "Formatting error: %s" msg
 
+(** {3 Semantic tokens} *)
+
 let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
     try_with_document_data registry doc
       ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
                                         rev_comments; rev_ignored; _ };
-                          _ } Lsp_document.{ ptree; _ } ->
+                          _ } Cobol_typeck.Outputs.{ ptree; _ } ->
         let data =
           Lsp_semtoks.data ~filename:(Lsp.Uri.to_path doc.uri) ~range
             ~pplog ~rev_comments ~rev_ignored
@@ -230,6 +294,8 @@ let handle_semtoks_full,
      handle registry textDocument),
   (fun registry (SemanticTokensRangeParams.{ textDocument; range; _ }) ->
      handle registry ~range textDocument)
+
+(** {3 Hover} *)
 
 let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
@@ -273,6 +339,8 @@ let handle_hover registry (params: HoverParams.t) =
           None
     end
 
+(** {3 Completion} *)
+
 let handle_completion registry (params: CompletionParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
@@ -282,6 +350,8 @@ let handle_completion registry (params: CompletionParams.t) =
                                ~isIncomplete:false ~items))
     end
 
+(** {3 Folding} *)
+
 (*TODO(if necessary):
     Now, the request folding has the default perfomance (in VS Code)
     It only supports folding complete lines, and does
@@ -289,16 +359,12 @@ let handle_completion registry (params: CompletionParams.t) =
     (To support these features, need to change the client capability) *)
 let handle_folding_range registry (params: FoldingRangeParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:begin fun ~doc:_ { ptree; cus; _ } ->
+    ~f:begin fun ~doc:_ { ptree; group; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
-      Some (Lsp_folding.ranges_in ~filename ptree cus)
+      Some (Lsp_folding.ranges_in ~filename ptree group)
     end
 
-let handle_shutdown registry =
-  try Lsp_server.save_project_caches registry
-  with e ->
-    internal_error
-      "Exception caught while saving project caches: %a@." Fmt.exn e
+(** {3 Generic handling} *)
 
 let on_request
   : type r. state -> r Lsp.Client_request.t ->
@@ -391,6 +457,8 @@ let handle (Jsonrpc.Request.{ id; _ } as req) state =
           state, Jsonrpc.Response.error id e
       | exception e ->
           state, Jsonrpc.Response.(error id @@ Error.of_exn e)
+
+(** {2 Access to internal stuff} *)
 
 module INTERNAL = struct
   let lookup_definition = handle_definition

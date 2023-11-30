@@ -122,6 +122,7 @@ module Fold = struct
     method fold_string: string -> 'a -> 'a action = default
     method fold_option: 'x. 'x option -> 'a -> 'a action = default
     method fold_list: 'x. 'x list -> 'a -> 'a action = default
+    method fold_nel: 'x. 'x Basics.NEL.t -> 'a -> 'a action = default
     method fold': 'x. 'x with_loc -> 'a -> 'a action = default
   end
 
@@ -142,8 +143,15 @@ module Fold = struct
     handle v#fold_list
       ~continue:(fun l x -> List.fold_left (fun x a -> fold v a x) x l)
 
+  let fold_nel ~fold (v: _ #folder) =
+    handle v#fold_nel
+      ~continue:(fun l x -> Basics.NEL.fold_left ~f:(fun x a -> fold v a x) x l)
+
   let fold' ~fold (v: _ #folder) =
     handle v#fold' ~continue:(fun { payload; _ } -> fold v payload)
+
+  let fold_int' (v: _#folder) =
+    fold' ~fold:fold_int v
 
   let fold_string' (v: _ #folder) =
     fold' ~fold:fold_string v
@@ -156,11 +164,15 @@ module Fold = struct
 
   (** Helper to shorten definitions for traversal of nodes with source
       locations *)
-  (* NOTE: we consider the traversal of `t with_loc` as a whole before the
-     generic traversal of `_ with_loc` via [fold'].  Maybe doing it the other
-     way round would be more intuitive? *)
-  let handle' vfold ~fold (v: _ #folder) =
-    handle vfold ~continue:(fold' ~fold v)
+  let handle'
+      (vfold: 'a with_loc -> 'x -> 'x action) ~(fold: 'c -> 'a -> 'x -> 'x)
+      (v: 'x #folder as 'c) : 'a with_loc -> 'x -> 'x =
+    (* NOTE: The commented line below "visits" `t with_loc` as a whole before
+       the generic traversal of `_ with_loc` via [fold'].  The actual code does
+       it the other way round so the behavior is more intuitive. *)
+    (* handle vfold ~continue:(fold' ~fold v) *)
+    handle v#fold'
+      ~continue:(handle vfold ~continue:(fun { payload; _ } -> fold v payload))
 
   let leaf' vfold =
     handle' vfold ~fold:(fun _ _ -> Fun.id)

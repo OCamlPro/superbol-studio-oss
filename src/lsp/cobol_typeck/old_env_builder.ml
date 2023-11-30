@@ -83,7 +83,7 @@ let initialize_prog_env =
     DIAGS.result base_env
 
 (* TODO: avoid returning `options with_diags` *)
-let for_compilation_unit_old =
+let for_compilation_unit =
   let build_env ?parent_env name env =
     let prog_env = Cobol_data.PROG_ENV.make ?parent:parent_env ~&name in
     Visitor.skip @@

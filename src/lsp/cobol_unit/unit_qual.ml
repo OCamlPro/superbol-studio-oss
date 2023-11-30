@@ -14,8 +14,11 @@
 open EzCompat                                                    (* StringSet *)
 module StrSet = StringSet
 
-(* open Cobol_common.Srcloc.TYPES *)
 open Cobol_common.Srcloc.INFIX
+
+(* --- *)
+
+let pp = Cobol_ptree.pp_qualname
 
 let name n : Cobol_ptree.qualname = Name n
 
@@ -53,3 +56,15 @@ let rec matches (qn: Cobol_ptree.qualname) ~(full: Cobol_ptree.qualname) =
   | Qual _, Name _ -> false
   | Qual (n, qn), Qual (n', qn') when ~&n = ~&n' -> matches qn ~full:qn'
   | qn, Qual (_, qn') -> matches qn ~full:qn'
+
+(** {1 Collections} *)
+
+(** Collections to be used over fully qualified names. *)
+
+module M = struct
+  type t = Cobol_ptree.qualname
+  let compare = Cobol_ptree.compare_qualname
+end
+
+module SET = Stdlib.Set.Make (M)
+module MAP = Stdlib.Map.Make (M)

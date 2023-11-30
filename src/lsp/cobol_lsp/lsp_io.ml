@@ -25,12 +25,6 @@ let initialize_channels () =
   Stdlib.set_binary_mode_in stdin true;
   Stdlib.set_binary_mode_out stdout true
 
-(** [send_out msg] returns {!type:unit} and is used to send out a message. This
-    function can be edited later to use other channels than stdin or stdout as
-    IO. *)
-let send_out msg =
-  print_string msg
-
 (** [read_message ()] tries to read a json RPC message from the standard input
     stream.  Returns a proper [packet] upon success, or raises {!Parse_error} if
     the message is in a wrong format. *)
@@ -86,8 +80,8 @@ let read_message () : Jsonrpc.Packet.t =
 (** [send_json json] sends out a json rpc package. *)
 let send_json json =
   let str = Yojson.Safe.to_string json in
-  let len = String.length str in
-  Pretty.string_to send_out "Content-Length: %d\r\n\r\n%s%!" len str
+  Pretty.out "Content-Length: %d\r\n\r\n" (String.length str + 1); (* with \n *)
+  Pretty.out "%s@." str
 
 (** [send_response response] sends out a json RPC response on standard
     output. *)
@@ -112,7 +106,7 @@ let send_diagnostics ~uri diagnostics =
     by default).  Also prints the result on stderr (for now). *)
 let pretty_notification ?(log = false) ~type_ fmt =
   Pretty.string_to begin fun message ->
-    Pretty.error "Notif: %s@." message;
+    (* Pretty.error "Notif: %s@." message; *)
     let notif =
       if log
       then Lsp.(Server_notification.LogMessage

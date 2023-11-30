@@ -1,0 +1,23 @@
+(library
+ (name test_cobol_typeck)
+ (modules
+    ok_basic      ko_basic
+    ok_77         ko_77
+    ok_pic        ko_pic
+    ok_renames    ko_renames
+    ok_redefines  ko_redefines
+    ok_conditions
+                  ko_proc_names
+    prog_printer)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_typeck typeck_testing)
+ )
+
+(library
+ (name typeck_testing)
+ (modules Typeck_testing)
+ (libraries parser_testing cobol_typeck)
+ )

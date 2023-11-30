@@ -394,9 +394,6 @@ let%expect_test "formatting-request-whole-program" =
     data_sections_visitor.ml:0:
       (Cobol_ptree__Data_sections_visitor.fold_file_section): missing visitor
       implementation
-    data_sections_visitor.ml:0:
-      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
-      implementation
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
             IDENTIFICATION DIVISION.
             PROGRAM-ID. MACESDS.

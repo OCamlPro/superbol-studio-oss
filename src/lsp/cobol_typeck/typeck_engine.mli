@@ -11,10 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Diagnostics.TYPES
-
-val analyze_compilation_group
+val compilation_group
   : ?config: Cobol_config.t
   -> _ Cobol_parser.Outputs.parsed_compilation_group
-  -> (Cobol_unit.Types.group *
-      Cobol_ptree.compilation_group option) with_diags
+  -> Typeck_outputs.t * Typeck_diagnostics.t
+
+val translate_diagnostics
+  : ?config: Cobol_config.t
+  -> Typeck_outputs.t * Typeck_diagnostics.t
+  -> Typeck_outputs.t Cobol_common.Diagnostics.with_diags

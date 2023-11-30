@@ -14,17 +14,20 @@
 open Data_types
 open Cobol_common.Srcloc.INFIX
 
-(* ignores redefs *)
-let fold_definitions ~f def acc =
+(* ignores redefs by default *)
+let fold_definitions ?(fold_redefinitions = false) ~f def acc =
   let rec aux acc def =
-    structure ~&(def.item_layout) (f def acc)
+    structure ~&def.item_layout (f def acc) |>
+    if fold_redefinitions
+    then fun acc -> List.fold_left aux acc ~&def.item_redefinitions
+    else Fun.id
   and structure = function
-    | Elementary _ ->
+    | Elementary_item _ ->
         Fun.id
-    | Struct { fields = items }
-    | FixedTable { items; _ }
-    | DependingTable { items; _ }
-    | DynamicTable { items; _ } ->
+    | Struct_item { fields = items }
+    | Fixed_table { items; _ }
+    | Depending_table { items; _ }
+    | Dynamic_table { items; _ } ->
         fun acc -> NEL.fold_left ~f:aux acc items
   in
   aux acc def

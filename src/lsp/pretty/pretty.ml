@@ -164,9 +164,32 @@ let path =
   list string ~fopen:"" ~fclose:"" ~fempty:""
     ~fsep:(Simple.char Ez_file.V1.FileOS.path_separator)
 
-let vfield ?(label = Fmt.(styled `Yellow string)) ?(sep = Fmt.any ":@ ")
+(** {3 Pretty-printing records} *)
+
+(** Field with a vertical layout *)
+let vfield ?(label = Fmt.(styled `Yellow string)) ?(sep = Fmt.any ": ")
     l prj pp_v ppf =
   Fmt.pf ppf "@[<v>%a%a%a@]" label l sep () (Fmt.using prj pp_v)
+
+let record ?(opening = Fmt.any "{@;<1 2>") ?(closing = Fmt.any "@;}") fields =
+  Fmt.(opening ++ record fields ++ closing)
+
+type 'a conditional_field =
+  | T of 'a printer
+  | C of ('a -> bool) * 'a printer
+  | I of ('a -> bool) * 'a printer * 'a printer
+  | C' of bool * 'a printer
+  | I' of bool * 'a printer * 'a printer
+
+let record_with_conditional_fields ?opening ?closing fields ppf x =
+  record ?opening ?closing
+    (List.filter_map begin function
+        | T pp | C'(true, pp) | I'(true, pp, _) | I'(false, _, pp) -> Some pp
+        | C (p, pp) | I (p, pp, _) when p x -> Some pp
+        | I (p, _, pp) when not (p x) -> Some pp
+        | _ -> None
+      end fields)
+    ppf x
 
 (* --- *)
 

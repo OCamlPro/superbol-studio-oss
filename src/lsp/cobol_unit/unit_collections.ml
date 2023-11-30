@@ -14,25 +14,25 @@
 open EzCompat
 
 open Unit_types
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 let compare_with_name u name =
-  String.compare ~&(u.unit_name) name
+  String.compare ~&(~&u.unit_name) name
 let compare_by_name u1 u2 =
-  String.compare ~&(u1.unit_name) ~&(u2.unit_name)
+  String.compare ~&(~&u1.unit_name) ~&(~&u2.unit_name)
 
 module M = struct
-  type t = cobol_unit
+  type t = cobol_unit with_loc
   let compare = compare_by_name
 end
 
 module SET: sig
-  include Set.S with type elt = cobol_unit
+  include Set.S with type elt = cobol_unit with_loc
                  and type t = Set.Make (M).t
-  val find_by_name: string -> t -> cobol_unit
-  val find_at_loc: Cobol_common.Srcloc.srcloc -> t -> cobol_unit
-  val assoc: (cobol_unit -> 'a) -> t -> 'a Map.Make (M).t
-  type register = private cobol_unit StringMap.t
+  val find_by_name: string -> t -> cobol_unit with_loc
+  val assoc: (cobol_unit with_loc -> 'a) -> t -> 'a Map.Make (M).t
+  type register = private cobol_unit with_loc StringMap.t
   val register: t -> register
 end = struct
   include Set.Make (M)
@@ -40,30 +40,27 @@ end = struct
 
   let find_by_name name us =
     let u = find_first (fun u -> compare_with_name u name >= 0) us in
-    if ~&(u.unit_name) = name then u else raise Not_found
-  let find_at_loc loc us =
-    let u = find_first (fun u -> Stdlib.compare u.unit_loc loc >= 0) us in
-    if u.unit_loc = loc then u else raise Not_found
+    if ~&(~&u.unit_name) = name then u else raise Not_found
   let assoc f us =
     to_seq us |> Seq.map (fun u -> u, f u) |> MAP.of_seq
 
-  type register = cobol_unit StringMap.t
+  type register = cobol_unit with_loc StringMap.t
   let register us : register =
-    to_seq us |> Seq.map (fun u -> ~&(u.unit_name), u) |>
+    to_seq us |> Seq.map (fun u -> ~&(~&u.unit_name), u) |>
     StringMap.of_seq
 
 end
 
 module MAP: sig
-  include Map.S with type key = cobol_unit
+  include Map.S with type key = cobol_unit with_loc
                  and type +'a t = 'a Map.Make (M).t
   val units: 'a t -> SET.t
-  val find_by_name: string -> 'a t -> cobol_unit * 'a
+  val find_by_name: string -> 'a t -> cobol_unit with_loc * 'a
 end = struct
   include Map.Make (M)
   let units map =
     to_seq map |> Seq.map fst |> SET.of_seq
   let find_by_name name map =
     let u, v = find_first (fun u -> compare_with_name u name >= 0) map in
-    if ~&(u.unit_name) = name then u, v else raise Not_found
+    if ~&(~&u.unit_name) = name then u, v else raise Not_found
 end

@@ -312,11 +312,11 @@ let list_of_qualname qualname =
     are all of the form [Renames _] and correspond to renaming items from the group [group]. *)
 let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames =
   (* TODO: take `rename with_loc` entries, with more "general" locations *)
-  List.fold_left begin fun acc { rename_to; rename_renamed; rename_through; _ } ->
-    match rename_through with
+  List.fold_left begin fun acc { rename_to; rename_from; rename_thru; _ } ->
+    match rename_thru with
     | Some through_name ->
         (* TODO: avoid reliance on a list representation. *)
-        let first = list_of_qualname ~&rename_renamed in
+        let first = list_of_qualname ~&rename_from in
         let last = list_of_qualname ~&through_name in
         let groups =
           group_range
@@ -328,7 +328,7 @@ let make_renames (module Diags: Cobol_common.Diagnostics.STATEFUL) group renames
         Ok (Renames {name = rename_to;
                      targets = List.rev groups} &@<- rename_to) :: acc
     | None ->
-        let name_list = list_of_qualname ~&rename_renamed in
+        let name_list = list_of_qualname ~&rename_from in
         let sub_groups = groups_of_list name_list group in
         if List.length sub_groups <> 1 then
           begin

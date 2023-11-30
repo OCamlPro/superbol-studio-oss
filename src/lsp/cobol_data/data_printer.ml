@@ -13,149 +13,148 @@
 
 open Data_types
 
+open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 let pp_offset = Data_memory.pp_offset
 let pp_size = Data_memory.pp_size
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
+let pp_int'_opt = Fmt.option pp_int'
+let pp_qualname'_opt = Fmt.option Cobol_ptree.pp_qualname'
+let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
 
-let vfield ?label field =
-  Pretty.vfield ~sep:(Fmt.any ": ") ?label field
-
-let pp_braced_record fields =
-  Fmt.(any "{@;<1 2>" ++ record fields ++ any "@;}")
-
-type 'a conditional_field =
-  | T of 'a Fmt.t
-  | C of bool * 'a Fmt.t
-  | I of bool * 'a Fmt.t * 'a Fmt.t
-
-let pp_braced_record_with_conditional_fields fields =
-  pp_braced_record @@ List.filter_map begin function
-    | C (true, pp) | I (true, pp, _) | I (false, _, pp) | T pp -> Some pp
-    | C (false, _) -> None
-  end fields
+let pp_usage: usage Pretty.printer = fun ppf -> function
+  | Usage picture ->
+      Pretty.record [
+        Fmt.((styled `Yellow @@ any "display") ++ any " (dev: temporary)");
+        Fmt.field "category" (fun () -> picture.category) Data_picture.pp_category;
+      ] ppf ()
 
 let rec pp_item_definition: item_definition Pretty.printer = fun ppf x ->
   let item_qualname x = x.item_qualname
-  and item_layout x = ~&(x.item_layout)
+  and item_redefines x = x.item_redefines
+  and item_layout x = x.item_layout
   and item_offset x = x.item_offset
   and item_size x = x.item_size
   and item_redefinitions x = x.item_redefinitions in
-  pp_braced_record_with_conditional_fields [
-    I (x.item_qualname <> None,
-       Fmt.field "qualname" item_qualname (Fmt.option Cobol_ptree.pp_qualname),
+  Pretty.record_with_conditional_fields [
+    I ((fun x -> x.item_qualname <> None),
+       Fmt.field "qualname" item_qualname pp_qualname'_opt,
        Fmt.(styled `Yellow @@ any "filler"));
+    C ((fun x -> x.item_redefines <> None),
+       Fmt.field "redefines" item_redefines pp_qualname'_opt);
     T (Fmt.field "offset" item_offset pp_offset);
     T (Fmt.field "size" item_size pp_size);
-    T (vfield "layout" item_layout pp_item_layout);
-    C (x.item_redefinitions <> [],
-       vfield "redefs" item_redefinitions pp_item_definition_list);
+    T (Pretty.vfield "layout" item_layout pp_item_layout);
+    C ((fun x -> x.item_redefinitions <> []),
+       Pretty.vfield "redefs" item_redefinitions pp_item_redefinitions);
   ] ppf x
 
-and pp_item_definition_list: item_definition list Pretty.printer = fun ppf ->
-  Fmt.(list ~sep:nop) pp_item_definition ppf
+and pp_item_definition': item_definition with_loc Pretty.printer = fun ppf ->
+  Cobol_ptree.pp_with_loc pp_item_definition ppf
 
 and pp_item_definitions: item_definitions Pretty.printer = fun ppf defs ->
-  NEL.pp ~fopen:"" ~fsep:"" ~fclose:"" pp_item_definition ppf defs
+  NEL.pp ~fopen:"" ~fsep:"" ~fclose:"" pp_item_definition' ppf defs
+
+and pp_item_redefinitions: item_redefinitions Pretty.printer = fun ppf ->
+  Fmt.(list ~sep:nop) pp_item_definition' ppf
 
 and pp_item_layout: item_layout Pretty.printer = fun ppf -> function
-  | Elementary { picture; value } ->
-      pp_braced_record_with_conditional_fields [
+  | Elementary_item { usage; value } ->
+      Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "elementary");
-        T (Fmt.field "category" (fun () -> picture.category)
-             Data_picture.pp_category);
-        C (value <> None,
-           Fmt.field "value" (fun () -> value)
-             (Fmt.option Cobol_ptree.pp_literal'));
+        T (Pretty.vfield "usage" (fun () -> usage) pp_usage);
+        C'(value <> None,
+           Fmt.field "value" (fun () -> value) pp_literal'_opt);
       ] ppf ()
-  | Struct { fields } ->
-      pp_braced_record_with_conditional_fields [
+  | Struct_item { fields } ->
+      Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ const string "structure");
-        T (vfield "fields" Fun.id pp_item_definitions);
+        T (Pretty.vfield "fields" Fun.id pp_item_definitions);
       ] ppf fields
-  | FixedTable { items; length; value } ->
-      pp_braced_record_with_conditional_fields [
+  | Fixed_table { items; length; value } ->
+      Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "fixed-length table");
-        T Fmt.(field "length" (fun () -> length) pp_int');
-        T (vfield "items" (fun () -> items) pp_item_definitions);
-        C (value <> None,
-           vfield "value" (fun () -> value) Fmt.(option Cobol_ptree.pp_literal'));
+        T (Fmt.field "length" (fun () -> length) pp_int');
+        T (Pretty.vfield "items" (fun () -> items) pp_item_definitions);
+        C'(value <> None,
+           Pretty.vfield "value" (fun () -> value) pp_literal'_opt);
       ] ppf ()
-  | DependingTable { items; min_occurs; max_occurs; depending; value } ->
-      pp_braced_record_with_conditional_fields [
+  | Depending_table { items; min_occurs; max_occurs; depending; value } ->
+      Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "variable-length table");
-        T Fmt.(field "min_occurs" (fun () -> min_occurs) pp_int');
-        T Fmt.(field "max_occurs" (fun () -> max_occurs) pp_int');
-        T Fmt.(field "depending" (fun () -> depending) Cobol_ptree.pp_qualname');
-        T (vfield "items" (fun () -> items) pp_item_definitions);
-        C (value <> None,
-           vfield "value" (fun () -> value) Fmt.(option Cobol_ptree.pp_literal'));
+        T (Fmt.field "min_occurs" (fun () -> min_occurs) pp_int');
+        T (Fmt.field "max_occurs" (fun () -> max_occurs) pp_int');
+        T (Fmt.field "depending" (fun () -> depending) Cobol_ptree.pp_qualname');
+        T (Pretty.vfield "items" (fun () -> items) pp_item_definitions);
+        C'(value <> None,
+           Pretty.vfield "value" (fun () -> value) pp_literal'_opt);
       ] ppf ()
-  | DynamicTable { items; capacity; min_capacity; max_capacity; initialized;
-                   value } ->
-      pp_braced_record_with_conditional_fields [
+  | Dynamic_table { items; capacity; min_capacity; max_capacity; initialized;
+                    value } ->
+      Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "dynamic-length table");
-        C (capacity <> None,
-           Fmt.(field "capacity" (fun () -> capacity)
-                  (option Cobol_ptree.pp_qualname')));
-        C (min_capacity <> None,
-           Fmt.(field "min_capacity" (fun () -> min_capacity) (option pp_int')));
-        C (max_capacity <> None,
-           Fmt.(field "max_capacity" (fun () -> max_capacity) (option pp_int')));
-        C (~&initialized, Fmt.any "initialized");
-        T (vfield "items" (fun () -> items) pp_item_definitions);
-        C (value <> None,
-           vfield "value" (fun () -> value) Fmt.(option Cobol_ptree.pp_literal'));
+        C'(capacity <> None,
+           Fmt.field "capacity" (fun () -> capacity) pp_qualname'_opt);
+        C'(min_capacity <> None,
+           Fmt.field "min_capacity" (fun () -> min_capacity) pp_int'_opt);
+        C'(max_capacity <> None,
+           Fmt.field "max_capacity" (fun () -> max_capacity) pp_int'_opt);
+        C'(~&initialized, Fmt.any "initialized");
+        T (Pretty.vfield "items" (fun () -> items) pp_item_definitions);
+        C'(value <> None,
+           Pretty.vfield "value" (fun () -> value) pp_literal'_opt);
       ] ppf ()
 
 let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf -> function
-  | RenamedElementary { picture } ->
-      pp_braced_record [
+  | Renamed_elementary { usage } ->
+      Pretty.record [
         Fmt.(styled `Yellow @@ any "elementary");
-        Fmt.field "category" (fun () -> picture.category) Data_picture.pp_category;
+        Pretty.vfield "usage" (fun () -> usage) pp_usage;
       ] ppf ()
-  | RenamedStruct { fields } ->
-      pp_braced_record [
+  | Renamed_struct { fields } ->
+      Pretty.record [
         Fmt.(styled `Yellow @@ const string "structure");
-        (vfield "fields" Fun.id pp_item_definitions);
+        Pretty.vfield "fields" Fun.id pp_item_definitions;
       ] ppf fields
 
-let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
-  pp_braced_record_with_conditional_fields [
-    T (Fmt.field "qualname" (fun _ -> r.renaming_name) Cobol_ptree.pp_qualname);
-    T (Fmt.field "from" (fun _ -> r.renaming_from) Cobol_ptree.pp_qualname');
-    C (r.renaming_thru <> None,
-       Fmt.(field "thru" (fun _ -> r.renaming_thru)
-              (option Cobol_ptree.pp_qualname')));
-    T (Fmt.field "offset" (fun _ -> r.renaming_offset) Data_memory.pp_offset);
-    T (Fmt.field "size" (fun _ -> r.renaming_size) Data_memory.pp_size);
-    T (vfield "layout" (fun _ -> r.renaming_layout) pp_renamed_item_layout);
-  ] ppf ()
+let pp_record_renaming: record_renaming Pretty.printer =
+  Pretty.record_with_conditional_fields [
+    T (Fmt.field "qualname" (fun r -> r.renaming_name) Cobol_ptree.pp_qualname');
+    T (Fmt.field "from" (fun r -> r.renaming_from) Cobol_ptree.pp_qualname');
+    C ((fun r -> r.renaming_thru <> None),
+       Fmt.field "thru" (fun r -> r.renaming_thru) pp_qualname'_opt);
+    T (Fmt.field "offset" (fun r -> r.renaming_offset) Data_memory.pp_offset);
+    T (Fmt.field "size" (fun r -> r.renaming_size) Data_memory.pp_size);
+    T (Pretty.vfield "layout" (fun r -> r.renaming_layout) pp_renamed_item_layout);
+  ]
 
-let pp_record_renaming_list: record_renaming list Pretty.printer = fun ppf ->
-  Fmt.(list ~sep:nop) pp_record_renaming ppf
+let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
+  Cobol_ptree.pp_with_loc pp_record_renaming ppf
 
-let pp_record: record Pretty.printer = fun ppf r ->
-  pp_braced_record_with_conditional_fields [
+let pp_record_renamings: record_renamings Pretty.printer = fun ppf ->
+  Fmt.(list ~sep:nop) pp_record_renaming' ppf
+
+let pp_record: record Pretty.printer =
+  Pretty.record_with_conditional_fields [
     T (Fmt.field "record" (fun x -> x.record_name) Fmt.string);
     T (Fmt.field "storage" (fun x -> x.record_storage) pp_data_storage);
-    T (vfield "item" (fun x -> x.record_item) pp_item_definition);
-    C (r.record_renamings <> [],
-       vfield "renamings" (fun x -> x.record_renamings) pp_record_renaming_list);
-  ] ppf r
+    T (Pretty.vfield "item" (fun x -> x.record_item) pp_item_definition');
+    C ((fun x -> x.record_renamings <> []),
+       Pretty.vfield "renamings" (fun x -> x.record_renamings) pp_record_renamings);
+  ]
 
 let pp_item ppf = function
   | Data_item { def; record = { record_name; _ } } ->
-      pp_braced_record [
+      Pretty.record [
         Fmt.(styled `Yellow @@ any "data item");
         Fmt.field "record" (fun () -> record_name) Fmt.string;
-        vfield "def" (fun () -> def) pp_item_definition;
+        Pretty.vfield "def" (fun () -> def) pp_item_definition';
       ] ppf ()
   | Data_renaming { def; record = { record_name; _ } } ->
-      pp_braced_record [
+      Pretty.record [
         Fmt.(styled `Yellow @@ any "data item renaming");
         Fmt.field "record" (fun () -> record_name) Fmt.string;
-        vfield "def" (fun () -> def) pp_record_renaming;
+        Pretty.vfield "def" (fun () -> def) pp_record_renaming';
       ] ppf ()

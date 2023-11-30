@@ -44,7 +44,7 @@ class ['a] folder = object
   method fold_stage                    : (stage                     , 'a) fold = default
   method fold_advancing_phrase         : (advancing_phrase          , 'a) fold = default
   method fold_write_target             : (write_target              , 'a) fold = default
-  method fold_procedure_range: 'x. ('x procedure_range, 'a) fold = default
+  method fold_procedure_range          : 'x. ('x procedure_range      , 'a) fold = default
   (* SET *)
   method fold_set_attribute_switch     : (set_attribute_switch      , 'a) fold = default
   method fold_screen_attribute         : (screen_attribute          , 'a) fold = default

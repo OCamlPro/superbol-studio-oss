@@ -20,7 +20,7 @@ module INTERNAL: sig
     -> [> `Location of Lsp.Types.Location.t list ] option
   val lookup_definition_in_doc
     : Lsp.Types.DefinitionParams.t
-    -> Lsp_document.parsed_data
+    -> Lsp_document.checked_doc
     -> [> `Location of Lsp.Types.Location.t list ] option
   val lookup_references
     : Lsp_server.t
@@ -28,7 +28,7 @@ module INTERNAL: sig
     -> Lsp.Types.Location.t list option
   val lookup_references_in_doc
     : Lsp.Types.ReferenceParams.t
-    -> Lsp_document.parsed_data
+    -> Lsp_document.checked_doc
     -> Lsp.Types.Location.t list option
   val hover
     : Lsp_server.t

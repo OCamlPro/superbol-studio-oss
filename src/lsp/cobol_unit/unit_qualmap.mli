@@ -21,7 +21,7 @@ module TYPES: sig
       full_qn: Cobol_ptree.qualname;
     }
 
-  exception Ambiguous of Cobol_ptree.qualname list Lazy.t
+  exception Ambiguous of Cobol_ptree.qualname Cobol_common.Basics.NEL.t Lazy.t
 
 end
 include module type of TYPES

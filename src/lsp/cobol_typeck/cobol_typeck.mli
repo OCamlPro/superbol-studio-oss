@@ -23,4 +23,6 @@ module OLD: sig
   module Prog_builder = Old_prog_builder
 end
 
+module Outputs = Typeck_outputs
+module Diagnostics = Typeck_diagnostics
 include module type of Typeck_engine

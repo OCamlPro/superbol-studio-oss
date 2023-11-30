@@ -22,3 +22,4 @@ end
 module Group = Unit_group
 module Collections = Unit_collections
 module Printer = Unit_printer
+module Visitor = Unit_visitor

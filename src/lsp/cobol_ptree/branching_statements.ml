@@ -19,21 +19,45 @@ open Terms
 open Operands
 open Simple_statements
 
+(* --- *)
+
+(* GOTO <target> *)
+type goto_stmt =
+  {
+    goto_target: procedure_name with_loc;
+  }
+[@@deriving ord]
+
+let pp_goto_stmt ppf { goto_target } =
+  Fmt.pf ppf "@[GO TO @[%a@]" pp_procedure_name' goto_target
 
 (* GOTO DEPENDING *)
 type goto_depending_stmt =
   {
-    goto_depending_targets: qualname list;                      (* procedures *)
+    goto_depending_targets: procedure_name with_loc nel;
     goto_depending_on: ident;
   }
 [@@deriving ord]
 
 let pp_goto_depending_stmt ppf { goto_depending_targets; goto_depending_on } =
-  Fmt.(
-    pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a"
-      (list ~sep:sp pp_qualname) goto_depending_targets
-      pp_ident goto_depending_on
-  )
+  Fmt.pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a"
+    (NEL.pp ~fsep:"@ " pp_procedure_name') goto_depending_targets
+    pp_ident goto_depending_on
+
+(* RESUME *)
+
+type resume_stmt =
+  | ResumeNextStatement
+  | ResumeTarget of procedure_name with_loc
+[@@deriving ord]
+
+let pp_resume_stmt ppf = function
+  | ResumeNextStatement ->
+      Fmt.pf ppf "RESUME AT NEXT STATEMENT"
+  | ResumeTarget p ->
+      Fmt.pf ppf "RESUME AT %a" pp_procedure_name' p
+
+(* --- *)
 
 (* Error/exception handlers *)
 type handler =
@@ -64,7 +88,7 @@ and evaluate_branch =
 (* PERFORM *)
 and perform_target_stmt =
   {
-    perform_target: qualname procedure_range;
+    perform_target: procedure_name with_loc procedure_range;
     perform_mode: perform_mode option;
   }
 
@@ -385,7 +409,7 @@ and statement =
   | Exit of exit_stmt
   | Free of name with_loc list
   | Generate of name with_loc
-  | GoTo of qualname
+  | GoTo of goto_stmt
   | GoToDepending of goto_depending_stmt
   | GoBack of raising option
   | If of if_stmt
@@ -405,8 +429,7 @@ and statement =
   | Read of read_stmt
   | Receive of receive_stmt
   | Release of release_stmt
-  | Resume of qualname
-  | ResumeNextStatement
+  | Resume of resume_stmt
   | Return of return_stmt
   | Rewrite of rewrite_stmt
   | Search of search_stmt
@@ -531,7 +554,7 @@ and pp_evaluate_branch ppf { eval_selection; eval_actions } =
 
 and pp_perform_target_stmt ppf { perform_target; perform_mode } =
   Fmt.pf ppf "@[<hv>PERFORM@;<1 2>%a%a@]"
-    (pp_procedure_range pp_qualname) perform_target
+    (pp_procedure_range pp_procedure_name') perform_target
     Fmt.(option (sp ++ pp_perform_mode)) perform_mode
 
 and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
@@ -860,16 +883,16 @@ and pp_statement ppf = function
   | Evaluate s -> pp_evaluate_stmt ppf s
   | Exit s -> pp_exit_stmt ppf s
   | Free names ->
-    Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp (pp_with_loc pp_name)) names
+      Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp (pp_with_loc pp_name)) names
   | Generate name ->
-    Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
-  | GoTo n -> Fmt.pf ppf "GO TO %a" pp_qualname n
+      Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
+  | GoTo s -> pp_goto_stmt ppf s
   | GoToDepending s -> pp_goto_depending_stmt ppf s
   | GoBack oro -> Fmt.pf ppf "GOBACK%a" Fmt.(option (sp ++ pp_raising)) oro
   | If s -> pp_if_stmt ppf s
   | Initialize s -> pp_initialize_stmt ppf s
   | Initiate ns ->
-    Fmt.pf ppf "INITIATE@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
+      Fmt.pf ppf "INITIATE@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
   | Inspect s -> pp_inspect_stmt ppf s
   | Invoke s -> pp_invoke_stmt ppf s
   | LoneGoTo -> Fmt.pf ppf "GO TO"
@@ -884,8 +907,7 @@ and pp_statement ppf = function
   | Read s -> pp_read_stmt ppf s
   | Receive s -> pp_receive_stmt ppf s
   | Release s -> pp_release_stmt ppf s
-  | Resume n -> Fmt.pf ppf "RESUME AT %a" pp_qualname n
-  | ResumeNextStatement -> Fmt.pf ppf "RESUME AT NEXT STATEMENT"
+  | Resume s -> pp_resume_stmt ppf s
   | Return s -> pp_return_stmt ppf s
   | Rewrite s -> pp_rewrite_stmt ppf s
   | Search s -> pp_search_stmt ppf s

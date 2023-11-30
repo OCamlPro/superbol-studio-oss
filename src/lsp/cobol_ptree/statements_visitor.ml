@@ -95,7 +95,7 @@ class virtual ['a] folder = object
   method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
   method fold_goback'        : (raising option with_loc       , 'a) fold = default
-  method fold_goto'          : (qualname with_loc             , 'a) fold = default
+  method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
   method fold_goto_depending': (goto_depending_stmt with_loc  , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
   method fold_initialize'    : (initialize_stmt with_loc      , 'a) fold = default
@@ -110,7 +110,7 @@ class virtual ['a] folder = object
   method fold_raise'         : (raise_operand with_loc        , 'a) fold = default
   method fold_read'          : (read_stmt with_loc            , 'a) fold = default
   method fold_release'       : (release_stmt with_loc         , 'a) fold = default
-  method fold_resume'        : (qualname with_loc             , 'a) fold = default
+  method fold_resume'        : (resume_stmt with_loc          , 'a) fold = default
   method fold_return'        : (return_stmt with_loc          , 'a) fold = default
   method fold_rewrite'       : (rewrite_stmt with_loc         , 'a) fold = default
   method fold_search'        : (search_stmt with_loc          , 'a) fold = default
@@ -169,8 +169,8 @@ let fold_allocate_kind (v: _ #folder) =
 let fold_alter_operands' (v: _ #folder) =
   handle' v#fold_alter_operands' v
     ~fold:begin fun v { alter_source; alter_target } x -> x
-      >> fold_qualname v alter_source
-      >> fold_qualname v alter_target
+      >> fold_procedure_name' v alter_source
+      >> fold_procedure_name' v alter_target
     end
 
 let fold_call_proto (v: _ #folder) =
@@ -300,7 +300,8 @@ let fold_merge_or_sort_target (v : _ #folder) =
   handle v#fold_merge_or_sort_target
     ~continue:begin function
       | OutputProcedure name_procedure_range ->
-          fold_procedure_range ~fold:fold_name' v name_procedure_range
+          fold_procedure_range v name_procedure_range
+            ~fold:fold_procedure_name'
       | Giving names ->
           fold_list ~fold:fold_name' v names
     end
@@ -434,12 +435,15 @@ let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v ~fold:(fold_option ~fold:fold_raising)
 
 let fold_goto' (v: _ #folder) =
-  handle' v#fold_goto' ~fold:fold_qualname v
+  handle' v#fold_goto' v
+    ~fold:begin fun v { goto_target } x -> x
+      >> fold_procedure_name' v goto_target
+    end
 
 let fold_goto_depending' (v: _ #folder) =
   handle' v#fold_goto_depending' v
     ~fold:begin fun v { goto_depending_targets; goto_depending_on } x -> x
-      >> fold_list ~fold:fold_qualname v goto_depending_targets
+      >> fold_nel ~fold:fold_procedure_name' v goto_depending_targets
       >> fold_ident v goto_depending_on
     end
 
@@ -503,7 +507,11 @@ let fold_release' (v: _ #folder) =
     end
 
 let fold_resume' (v: _ #folder) =
-  handle' v#fold_resume' v ~fold:(fold_qualname)
+  handle' v#fold_resume' v
+    ~fold:begin fun v stmt x -> match stmt with
+      | ResumeNextStatement -> x
+      | ResumeTarget t -> fold_procedure_name' v t x
+    end
 
 let fold_set' (v: _ #folder) =
   handle' v#fold_set' v
@@ -646,7 +654,6 @@ let rec fold_statement' (v: _ #folder) =
       | Unstring      s -> fold_unstring'       v (s &@ loc)
       | Validate      s -> fold_validate'       v (s &@ loc)
       | Write         s -> fold_write'          v (s &@ loc)
-      | ResumeNextStatement
       | Continue
       | LoneGoTo
       | Suppress -> Fun.id
@@ -813,7 +820,7 @@ and fold_perform_inline' (v: _ #folder) : perform_inline_stmt with_loc -> 'a -> 
 and fold_perform_target' (v: _ #folder) : perform_target_stmt with_loc -> 'a -> 'a =
   handle' v#fold_perform_target' v
     ~fold:begin fun v { perform_target = proc_range; perform_mode } x -> x
-      >> fold_procedure_range ~fold:fold_qualname v proc_range
+      >> fold_procedure_range ~fold:fold_procedure_name' v proc_range
       >> fold_option ~fold:fold_perform_mode v perform_mode
     end
 

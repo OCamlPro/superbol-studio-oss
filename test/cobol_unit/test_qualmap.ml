@@ -11,9 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_unit.Qualmap
 open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
 
-open Cobol_unit.Qualmap
+module NEL = Cobol_common.Basics.NEL
 
 let of_list lst =
   List.fold_left (fun map (qn, value) -> add qn value map) empty lst
@@ -33,7 +34,7 @@ let show_item qn map =
       Pretty.out "Find %a: not found@." pp_qualname qn
   | Ambiguous qn' ->
       Pretty.out "Find %a: ambiguous %a@." pp_qualname qn
-        (Pretty.list pp_qualname) (Lazy.force qn')
+        (NEL.pp pp_qualname) (Lazy.force qn')
 
 let%expect_test "empty" =
   let map = empty in

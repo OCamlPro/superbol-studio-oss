@@ -290,7 +290,7 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
 
 (** {2 Pretty-printing} *)
 
-let retrieve_file_lines =
+let retrieve_file_lines, register_file_contents =
   let module Cache =
     Ephemeron.K1.Make (struct
       include String
@@ -298,13 +298,19 @@ let retrieve_file_lines =
     end)
   in
   let file_cache = lazy (Cache.create 3) in
-  fun file ->
+  begin fun file ->
     let file_cache = Lazy.force file_cache in
     try Cache.find file_cache file
     with Not_found ->
       let lines = EzFile.read_lines file in
       Cache.add file_cache file lines;
       lines
+  end,
+  begin fun ~filename contents ->
+    let file_cache = Lazy.force file_cache in
+    let lines = Array.of_list @@ String.split_on_char '\n' contents in
+    Cache.replace file_cache filename lines
+  end
 
 type raw_loc = string * (int * int) * (int * int)
 
@@ -680,6 +686,12 @@ let concat_strings_with_loc v w = (~&v ^ ~&w) &@ (concat ~@v ~@w)
 
 let copy_from ~filename ~copyloc { payload; loc } =
   { payload; loc = copy ~filename ~copyloc loc }
+
+(* --- *)
+
+module TESTING = struct
+  let register_file_contents = register_file_contents
+end
 
 (* --- *)
 

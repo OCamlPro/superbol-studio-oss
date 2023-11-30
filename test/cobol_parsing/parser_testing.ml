@@ -19,6 +19,7 @@ let preproc
     ?(source_format = Cobol_config.(SF SFFixed))
     contents
   =
+  Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
   String { filename; contents } |>
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
@@ -39,9 +40,6 @@ let show_parsed_tokens ?(verbose = false) ?source_format ?filename contents =
   in
   Cobol_parser.INTERNAL.pp_tokens Fmt.stdout (Lazy.force tokens)
 
-(** Note: won't show detailed source locations as the openned file is not
-    actually on disk (that may be fixed later with a custom internal file
-    store). *)
 let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
   Cobol_parser.parse_simple
@@ -138,6 +136,8 @@ let triplewise positions =
 
 (* --- *)
 
+(** Note: won't show detailed source locations as the openned file is neither
+    actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
     ?(verbose = false)
     ?(source_format = Cobol_config.(SF SFFixed))
@@ -160,6 +160,8 @@ let rewindable_parse
   in
   ptree, diags, rewinder
 
+(** Note: won't show detailed source locations as the openned file is neither
+    actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
   let DIAGS.{ result = Only ptree, rewinder; diags } =
     Cobol_parser.rewind_and_parse rewinder preproc_rewind
@@ -174,7 +176,10 @@ let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
     [positions.pos_anonymous]), and then iteralively appends the remaining
     chunks (from one position to the next).  [f] is called after each successive
     chunk has been parsed, with chunk number and total number of chunks as first
-    and second arguments, respectively. *)
+    and second arguments, respectively.
+
+    Note: won't show detailed source locations as the openned file is neither
+    actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let iteratively_append_chunks ?config ~f (prog, positions) =
   let _, _, rewinder =
     rewindable_parse ?config @@            (* start with first chunk of input *)
@@ -201,7 +206,10 @@ let iteratively_append_chunks ?config ~f (prog, positions) =
     (but the last) is added in three steps: first the entire pair is appended,
     and then the second chunk of the pair is cut back.  [f] is called after each
     successive chunk has been parsed, with chunk-pair number and total number of
-    chunks-pairs as first and second arguments, respectively. *)
+    chunks-pairs as first and second arguments, respectively.
+
+    Note: won't show detailed source locations as the openned file is neither
+    actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let iteratively_append_chunks_stuttering ?config ~f
     (prog, positions) =
   let _, _, rewinder =
@@ -242,7 +250,10 @@ let iteratively_append_chunks_stuttering ?config ~f
     one position to the next in [positions.pos_anonymous]), try to parse, and
     paste [c] back in its original place.  [f0] is called once at the very
     beginning with the results obtained by parsing the original program [prog].
-    [f] is called after a chunk has been cut and pasted back. *)
+    [f] is called after a chunk has been cut and pasted back.
+
+    Note: won't show detailed source locations as the openned file is neither
+    actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let simulate_cut_n_paste ?config ~f0 ~f ?verbose ?(repeat = 1)
     (prog, positions) =
   Random.init 42;

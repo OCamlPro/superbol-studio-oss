@@ -11,8 +11,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
+open Prog_printer
 
-val of_compilation_unit
-  : Cobol_ptree.compilation_unit with_loc
-  -> Cobol_unit.Types.procedure_paragraphs
+let dotest = Typeck_testing.show_diagnostics
+
+let%expect_test "ambiguous-proc-names" =
+  dotest @@ prog "ambiguous-proc-names"
+    ~procedure:{|
+       MAIN-1 SECTION.
+       SUB-1.
+          DISPLAY 1.
+       MAIN-2 SECTION.
+       SUB-1.
+          PERFORM SUB-1.
+    |};
+  [%expect {|
+    prog.cob:9.18-9.23:
+       6             DISPLAY 1.
+       7          MAIN-2 SECTION.
+       8          SUB-1.
+       9 >           PERFORM SUB-1.
+    ----                     ^^^^^
+      10
+    >> Error: Ambiguous procedure-name 'SUB-1'; known matching names are 'SUB-1
+              IN MAIN-2', 'SUB-1 IN MAIN-1' |}];;

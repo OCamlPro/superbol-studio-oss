@@ -55,9 +55,6 @@ let%expect_test "simple-references-requests" =
   print_references ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    data_sections_visitor.ml:0:
-      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
-      implementation
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-def (line 5, character 16):
     __rootdir__/prog.cob:6.11-6.20:
@@ -111,6 +108,7 @@ let%expect_test "simple-references-requests" =
        9             DISPLAY X.
       10             STOP RUN.
     4-data-name-in-display (line 8, character 18):
+    {"params":{"message":"Unknown data-name 'X'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
     No reference found |}]
 
 

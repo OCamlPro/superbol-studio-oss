@@ -111,20 +111,18 @@ type rename_item =
   {
     rename_level: data_level with_loc;
     rename_to: name with_loc;
-    rename_renamed: qualname with_loc;
-    rename_through: qualname with_loc option;
+    rename_from: qualname with_loc;
+    rename_thru: qualname with_loc option;
   }
 [@@deriving ord]
 
-let pp_rename_item ppf
-  { rename_level = rl; rename_to = rto;
-    rename_renamed = rr; rename_through = rt }
-=
-Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
-  (pp_with_loc pp_data_level) rl
-  pp_name' rto
-  pp_qualname' rr
-  Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname')) rt
+let pp_rename_item ppf { rename_level = rl; rename_to = rto;
+                         rename_from = from; rename_thru = thru } =
+  Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
+    (pp_with_loc pp_data_level) rl
+    pp_name' rto
+    pp_qualname' from
+    Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname')) thru
 
 
 type condition_name_item =
@@ -139,8 +137,8 @@ type condition_name_item =
 
 and condition_name_value =
   {
-    condition_name_value: literal;
-    condition_name_through: literal option;
+    condition_name_value: literal with_loc;
+    condition_name_through: literal with_loc option;
   }
 [@@deriving ord]
 
@@ -148,8 +146,8 @@ let pp_condition_name_value ppf
   { condition_name_value = cnv; condition_name_through = cnt }
 =
   match cnt with
-  | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal cnv pp_literal cnt
-  | None -> pp_literal ppf cnv
+  | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal' cnv pp_literal' cnt
+  | None -> pp_literal' ppf cnv
 
 let pp_condition_name_item ppf
   { condition_name_level = cnl; condition_name = cn;

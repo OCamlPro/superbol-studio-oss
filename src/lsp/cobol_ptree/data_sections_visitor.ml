@@ -126,11 +126,11 @@ let fold_constant_item' (v: _ #folder) =
 let fold_rename_item (v: _ #folder) =
   handle v#fold_rename_item
     ~continue:begin fun { rename_level; rename_to;
-                          rename_renamed; rename_through } x -> x
+                          rename_from; rename_thru } x -> x
       >> fold_data_level' v rename_level
       >> fold_name' v rename_to
-      >> fold_qualname' v rename_renamed
-      >> fold_qualname'_opt v rename_through
+      >> fold_qualname' v rename_from
+      >> fold_qualname'_opt v rename_thru
     end
 
 let fold_rename_item' (v: _ #folder) =
@@ -139,8 +139,8 @@ let fold_rename_item' (v: _ #folder) =
 let fold_condition_name_value (v: _ #folder) =
   handle v#fold_condition_name_value
     ~continue:begin fun { condition_name_value; condition_name_through } x -> x
-      >> fold_literal v condition_name_value
-      >> fold_literal_opt v condition_name_through
+      >> fold_literal' v condition_name_value
+      >> fold_literal'_opt v condition_name_through
     end
 
 let fold_condition_name_item (v: _ #folder) =

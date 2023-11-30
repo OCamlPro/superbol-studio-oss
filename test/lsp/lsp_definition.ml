@@ -54,9 +54,6 @@ let%expect_test "simple-definition-requests" =
   print_definitions ~projdir server doc;
   end_with_postproc [%expect.output];
   [%expect {|
-    data_sections_visitor.ml:0:
-      (Cobol_ptree__Data_sections_visitor.fold_data_clause): partial visitor
-      implementation
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-data-name-in-def (line 5, character 16):
     __rootdir__/prog.cob:6.11-6.20:
@@ -175,7 +172,7 @@ let doc =
         WORKING-STORAGE SECTION.
         01 X.
             05 Y PIC 9.
-            66 Z RENAMES _|1-data-name-renamed|_Y.
+            66 Z R_|3-in-renames-item|_ENAMES _|1-data-name-renamed|_Y.
         PROCEDURE DIVISION.
             DISPLAY _|2-data-name-in-display|_Z.
             STOP RUN.
@@ -205,6 +202,15 @@ let%expect_test "definition-requests-renames" =
        8 >             66 Z RENAMES Y.
     ----                  ^
        9           PROCEDURE DIVISION.
+      10               DISPLAY Z.
+    3-in-renames-item (line 7, character 18):
+    __rootdir__/prog.cob:8.15-8.16:
+       5           WORKING-STORAGE SECTION.
+       6           01 X.
+       7               05 Y PIC 9.
+       8 >             66 Z RENAMES Y.
+    ----                  ^
+       9           PROCEDURE DIVISION.
       10               DISPLAY Z. |}]
 
 
@@ -222,10 +228,10 @@ let doc =
                 10 A PIC 9 OCCURS 6 TIMES.
             05 STH REDEFINES _|2-data-name-redefined|_Y.
                 10 B PIC 99 OCCURS 3 TIMES.
-            05 FILLER REDEFINES _|3-data-name-redefined|_Y.
+            05 FIL_|4-data-name-redefined|_LER REDEFINES _|3-data-name-redefined|_Y.
                 10 C PIC 999 OCCURS 2 TIMES.
         PROCEDURE DIVISION.
-            DISPLAY _|4-data-name-in-display|_A.
+            DISPLAY _|5-data-name-in-display|_A.
   |cobol}
 ;;
 
@@ -262,7 +268,18 @@ let%expect_test "definition-requests-redefines" =
     ----                  ^
        9                   10 Z PIC 999999.
       10               05 FILLER REDEFINES Y.
-    4-data-name-in-display (line 16, character 20):
+    4-data-name-redefined (line 13, character 18):
+    __rootdir__/prog.cob:14.12-15.44:
+      11                   10 A PIC 9 OCCURS 6 TIMES.
+      12               05 STH REDEFINES Y.
+      13                   10 B PIC 99 OCCURS 3 TIMES.
+      14 >             05 FILLER REDEFINES Y.
+    ----               ^^^^^^^^^^^^^^^^^^^^^^
+      15 >                 10 C PIC 999 OCCURS 2 TIMES.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      16           PROCEDURE DIVISION.
+      17               DISPLAY A.
+    5-data-name-in-display (line 16, character 20):
     __rootdir__/prog.cob:11.19-11.20:
        8               05 Y.
        9                   10 Z PIC 999999.
@@ -338,3 +355,98 @@ let%expect_test "definition-requests-filler" =
     ----                  ^
       15           01.
       16             05 T PIC 999. |}]
+
+
+let%expect_test "definition-requests-goto-section" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISI_|1-nowhere|_ON.
+       MAIN SECTION.
+           GO TO SUB-SE_|1-sub-section|_CTION.
+       SUB-S_|2-sub-section|_ECTION SECTION.
+           STOP R_|3-nowhere|_UN.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-nowhere (line 2, character 23):
+    No definition found
+    1-sub-section (line 4, character 23):
+    __rootdir__/prog.cob:6.7-6.18:
+       3          PROCEDURE DIVISION.
+       4          MAIN SECTION.
+       5              GO TO SUB-SECTION.
+       6 >        SUB-SECTION SECTION.
+    ----          ^^^^^^^^^^^
+       7              STOP RUN.
+       8
+    2-sub-section (line 5, character 12):
+    __rootdir__/prog.cob:6.7-6.18:
+       3          PROCEDURE DIVISION.
+       4          MAIN SECTION.
+       5              GO TO SUB-SECTION.
+       6 >        SUB-SECTION SECTION.
+    ----          ^^^^^^^^^^^
+       7              STOP RUN.
+       8
+    3-nowhere (line 6, character 17):
+    No definition found |}];;
+
+
+let%expect_test "definition-requests-goto-qualified-section/paragraphs" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+       MAIN SECTION.
+           GO TO SUB-SE_|1-sub-section|_CTION IN _|2-main|_MAIN.
+       SUB-SECTION_|3-sub-section|_.
+           STOP RUN.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-sub-section (line 4, character 23):
+    __rootdir__/prog.cob:6.7-6.18:
+       3          PROCEDURE DIVISION.
+       4          MAIN SECTION.
+       5              GO TO SUB-SECTION IN MAIN.
+       6 >        SUB-SECTION.
+    ----          ^^^^^^^^^^^
+       7              STOP RUN.
+       8
+    2-main (line 4, character 32):
+    __rootdir__/prog.cob:4.7-4.11:
+       1
+       2          PROGRAM-ID. prog.
+       3          PROCEDURE DIVISION.
+       4 >        MAIN SECTION.
+    ----          ^^^^
+       5              GO TO SUB-SECTION IN MAIN.
+       6          SUB-SECTION.
+    3-sub-section (line 5, character 18):
+    __rootdir__/prog.cob:6.7-6.18:
+       3          PROCEDURE DIVISION.
+       4          MAIN SECTION.
+       5              GO TO SUB-SECTION IN MAIN.
+       6 >        SUB-SECTION.
+    ----          ^^^^^^^^^^^
+       7              STOP RUN.
+       8 |}];;
+
+let%expect_test "definition-ambiguous-section/paragraphs" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+       MAIN SECTION.
+       SUB-1.
+          STOP RUN.
+       MISC SECTION.
+       SUB-1.
+          PERFORM SU_|_B-1.
+          STOP RUN.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {| {"params":{"diagnostics":[{"message":"Ambiguous procedure-name 'SUB-1'; known matching names are 'SUB-1 IN MISC', 'SUB-1 IN MAIN'","range":{"end":{"character":23,"line":8},"start":{"character":18,"line":8}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;

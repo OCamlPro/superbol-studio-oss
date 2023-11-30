@@ -14,7 +14,7 @@
 open Cobol_ptree
 open Cobol_common.Diagnostics.TYPES
 
-val for_compilation_unit_old
+val for_compilation_unit
   : parents: Cobol_data.OLD.PROG_ENV.t list
   -> compilation_unit with_loc
   -> Cobol_data.OLD.PROG_ENV.t option with_diags

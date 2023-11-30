@@ -21,17 +21,20 @@ type 'a nel = 'a NEL.t
 type picture_config = Data_picture.TYPES.config
 type picture = Data_picture.t
 
+type usage =
+  | Usage of picture                                               (* for now *)
+
 type data_storage =
   | File
-  | LocalStorage
-  | WorkingStorage
+  | Local_storage
+  | Working_storage
   | Linkage                                                          (* file? *)
 
 let pp_data_storage ppf s =
   Fmt.string ppf @@ match s with
   | File -> "FILE"
-  | LocalStorage -> "LOCAL-STORAGE"
-  | WorkingStorage -> "WORKING-STORAGE"
+  | Local_storage -> "LOCAL-STORAGE"
+  | Working_storage -> "WORKING-STORAGE"
   | Linkage -> "LINKAGE"
 
 type (* 'length *) length =
@@ -46,26 +49,30 @@ type record =
   {
     record_name: string;
     record_storage: data_storage;
-    record_item: item_definition;
-    record_renamings: record_renaming list;
+    record_item: item_definition with_loc;
+    record_renamings: record_renamings;
   }
-and item_definitions = item_definition nel
+and item_definitions = item_definition with_loc nel
+and item_redefinitions = item_definition with_loc list
 and item_definition =
   {
-    item_qualname: Cobol_ptree.qualname option;
-    item_layout: item_layout with_loc;
+    (* Note: location of qualname corresponds to the *unqualified* name, with
+       implicit qualification based on item groups. *)
+    item_qualname: Cobol_ptree.qualname with_loc option;
+    item_redefines: Cobol_ptree.qualname with_loc option;       (* redef only *)
+    item_layout: item_layout;
     item_offset: Data_memory.offset;          (** offset w.r.t record address *)
     item_size: Data_memory.size;
     item_length: length;
-    item_redefinitions: item_definition list;
+    item_redefinitions: item_redefinitions;
   }
 and item_layout =
-  | Elementary of
+  | Elementary_item of
       {
-        picture: picture;                            (* TODO: `usage` instead *)
+        usage: usage;
         value: Cobol_ptree.literal with_loc option;
       }
-  | Struct of
+  | Struct_item of
       {
         fields: item_definitions;
       }
@@ -77,7 +84,7 @@ and item_layout =
   (*                ] item_definitions, 'a item_definitions) nel'; *)
   (*     } *)
   (*     -> ([>`simple], [>`fixed_length | `variable_length] as 'a) item_layout *)
-  | FixedTable of                                           (* OCCURS _ TIMES *)
+  | Fixed_table of                                          (* OCCURS _ TIMES *)
       {
         items: item_definitions;
         length: int with_loc;                                  (* int for now *)
@@ -85,7 +92,7 @@ and item_layout =
         (* TODO: keys, indexing; *)
       }
   (* -> ([>`table], [>`fixed_length]) item_layout *)
-  | DependingTable of                   (* OCCURS _ TO _ TIMES DEPENDING ON _ *)
+  | Depending_table of                  (* OCCURS _ TO _ TIMES DEPENDING ON _ *)
       {
         (* no subordinate OCCURS DEPENDING: *)
         items: item_definitions;
@@ -96,7 +103,7 @@ and item_layout =
         (* TODO: keys, indexing; *)
       }
   (* -> ([>`table], [>`variable_length]) item_layout *)
-  | DynamicTable of                  (* OCCURS DYNAMIC CAPACITY _ FROM _ TO _ *)
+  | Dynamic_table of                 (* OCCURS DYNAMIC CAPACITY _ FROM _ TO _ *)
       {
         items: item_definitions;
         capacity: Cobol_ptree.qualname with_loc option;
@@ -119,22 +126,22 @@ and item_layout =
     However, we keep the distinction between RENAMES and REDEFINES to better
     match said typical COBOL, and possibly allow more detailed error
     reporting. *)
+and record_renamings = record_renaming with_loc list
 and record_renaming =
   {
-    renaming_name: Cobol_ptree.qualname;
+    renaming_name: Cobol_ptree.qualname with_loc;
+    renaming_layout: renamed_item_layout;
     renaming_offset: Data_memory.offset;
     renaming_size: Data_memory.size;
-    renaming_layout: renamed_item_layout;
     renaming_from: Cobol_ptree.qualname with_loc;
     renaming_thru: Cobol_ptree.qualname with_loc option;
-    renaming_loc: srcloc;
   }
 and renamed_item_layout =
-  | RenamedElementary of
+  | Renamed_elementary of
       {
-        picture: picture;                                          (* for now *)
+        usage: usage;
       }
-  | RenamedStruct of
+  | Renamed_struct of
       {
         fields: item_definitions;
       }
@@ -166,12 +173,12 @@ type item =
   | Data_item of
       {
         record: record;
-        def: item_definition;
+        def: item_definition with_loc;
       }
   | Data_renaming of                                              (* not sure *)
       {
         record: record;
-        def: record_renaming;
+        def: record_renaming with_loc;
       }
   (* | Const_record: data_const_record -> definition *)
 

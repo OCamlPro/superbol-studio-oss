@@ -11,10 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Cobol_typeck = Cobol_typeck.OLD
-
-open Lsp_imports
-open Lsp_lookup.TYPES
 open Lsp_project.TYPES
 open Ez_file.V1
 
@@ -28,27 +24,19 @@ module TYPES = struct
       textdoc: Lsp.Text_document.t;
       copybook: bool;
       artifacts: Cobol_parser.Outputs.artifacts;
-      parsed: parsed_data option;
+      checked: checked_doc option;
       rewinder: rewinder option;
-      (* Used for caching, when loading a cache file as the file is not reparsed,
-         then diagnostics are not sent. *)
+      (* Used for caching, when loading a cache file as the file is not
+         reparsed, then diagnostics are not sent. *)
       diags: DIAGS.Set.t;
     }
-  and parsed_data =
-    {
-      ptree: Cobol_ptree.compilation_group;
-      cus: CUs.t;
-      (* Extracted info: lazy to only ever retrieve what's relevant upon a first
-         request. *)
-      definitions: name_definitions_in_compilation_unit CUMap.t Lazy.t;
-      references: name_references_in_compilation_unit CUMap.t Lazy.t;
-    }
+  and checked_doc = Cobol_typeck.Outputs.t
   and rewinder =
     (Cobol_ptree.compilation_group option,
      Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
       Cobol_parser.rewinder
 
-  (** Raised by {!val:Document.retrieve_parsed_data}. *)
+  (** Raised by {!val:Document.checked}. *)
   exception Unparseable of Lsp.Types.DocumentUri.t
   exception Copybook of Lsp.Types.DocumentUri.t
 
@@ -56,7 +44,8 @@ module TYPES = struct
       consistent document contents. *)
   exception Internal_error of document * exn * Printexc.raw_backtrace
 
-  type cached =                   (** Persistent representation (for caching) *)
+  (** Persistent representation (for caching) *)
+  type cached =
     {
       doc_cache_filename: string;   (* relative to project rootdir *)
       doc_cache_checksum: Digest.t; (* checked against file on disk on reload *)
@@ -66,7 +55,7 @@ module TYPES = struct
       doc_cache_tokens: Cobol_parser.Outputs.tokens_with_locs;
       doc_cache_comments: Cobol_preproc.Text.comments;
       doc_cache_ignored: Cobol_common.Srcloc.lexloc list;
-      doc_cache_parsed: (Cobol_ptree.compilation_group * CUs.t) option;
+      doc_cache_checked: checked_doc option;
       doc_cache_diags: DIAGS.Set.serializable;
     }
 
@@ -93,71 +82,39 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }
 
-let lazy_definitions ptree cus =
-  lazy begin cus |>
-    CUs.assoc Lsp_lookup.definitions |>
-    (*this piece for handling renames is temporary*)
-    Lsp_lookup.add_rename_item_definitions ptree |>
-    Lsp_lookup.add_paragraph_definitions ptree |>
-    Lsp_lookup.add_redefine_definitions ptree
-  end
-
-let lazy_references ptree cus defs =
-  lazy begin
-    let defs = Lazy.force defs in
-    List.fold_left begin fun map cu ->
-        let cu_name = Lsp_lookup.name_of_compunit cu in
-        try
-          let _, cu_defs = CUMap.find_by_name cu_name defs in
-          CUMap.add
-            (CUs.find_by_name cu_name cus)
-          (Lsp_lookup.references cu_defs cu) map
-        with Not_found -> map
-    end CUMap.empty ptree.Cobol_ptree.compilation_units
-  end
-
 let no_artifacts =
   Cobol_parser.Outputs.{ tokens = lazy [];
                          pplog = Cobol_preproc.Trace.empty;
                          rev_comments = [];
                          rev_ignored = [] }
 
-let gather_parsed_data ptree =
-  Cobol_typeck.analyze_compilation_group ptree |>
-  DIAGS.map_result ~f:begin function
-    | cus, Some ptree ->
-        let definitions = lazy_definitions ptree cus in
-        let references = lazy_references ptree cus definitions in
-        Some { ptree; cus; definitions; references}
-    | _, None ->
-        None
-  end
-
-let extract_parsed_infos doc ptree =
-  let DIAGS.{ result = artifacts, rewinder, parsed; diags} =
+let check doc ptree =
+  let DIAGS.{ result = artifacts, rewinder, checked; diags} =
     DIAGS.more_result ~f:begin fun (ptree, rewinder) ->
-      gather_parsed_data ptree |>
-      DIAGS.map_result ~f:begin fun parsed ->
-        Cobol_parser.artifacts ptree, Some rewinder, parsed
+      let config = doc.project.config.cobol_config in
+      Cobol_typeck.compilation_group ~config ptree |>
+      Cobol_typeck.translate_diagnostics ~config |>
+      DIAGS.map_result ~f:begin fun checked ->
+        Cobol_parser.artifacts ptree, Some rewinder, Some checked
       end
     end ptree
   in
-  { doc with artifacts; rewinder; diags; parsed }
+  { doc with artifacts; rewinder; diags; checked }
 
 let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
-    { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
+    { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   else
-    extract_parsed_infos doc @@ rewindable_parse doc
+    check doc @@ rewindable_parse doc
 
 let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   match position, rewinder with
   | None, _ | _, None ->
       parse_and_analyze doc
   | _, Some _ when copybook ->                                         (* skip *)
-      { doc with artifacts = no_artifacts; rewinder = None; parsed = None }
+      { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   | Some position, Some rewinder ->
-      extract_parsed_infos doc @@
+      check doc @@
       Cobol_parser.rewind_and_parse rewinder ~position @@
       Cobol_preproc.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
@@ -175,7 +132,7 @@ let blank ~project ?copybook textdoc =
     artifacts = no_artifacts;
     rewinder = None;
     diags = DIAGS.Set.none;
-    parsed = None;
+    checked = None;
     copybook;
   }
 
@@ -212,14 +169,14 @@ let update ({ textdoc; _ } as doc) changes =
 
 (** Raises {!Unparseable} in case the document cannot be parsed entierely, or
     {!Copybook} in case the document is not a main program. *)
-let retrieve_parsed_data: document -> parsed_data = function
-  | { parsed = Some p; _ } -> p
+let checked: document -> checked_doc = function
+  | { checked = Some p; _ } -> p
   | { copybook = false; _ } as doc -> raise @@ Unparseable (uri doc)
   | { copybook = true;  _ } as doc -> raise @@ Copybook (uri doc)
 
 (** Caching utilities *)
 
-let to_cache ({ project; textdoc; parsed; diags;
+let to_cache ({ project; textdoc; checked; diags;
                 artifacts = { pplog; tokens;
                               rev_comments; rev_ignored; _ }; _ } as doc) =
   {
@@ -231,7 +188,7 @@ let to_cache ({ project; textdoc; parsed; diags;
     doc_cache_tokens = Lazy.force tokens;
     doc_cache_comments = rev_comments;
     doc_cache_ignored = rev_ignored;
-    doc_cache_parsed = Option.map (fun { ptree; cus; _ } -> ptree, cus) parsed;
+    doc_cache_checked = checked;
     doc_cache_diags = DIAGS.Set.apply_delayed_formatting diags;
   }
 
@@ -247,7 +204,7 @@ let of_cache ~project
       doc_cache_tokens = tokens;
       doc_cache_comments = rev_comments;
       doc_cache_ignored = rev_ignored;
-      doc_cache_parsed = parsed;
+      doc_cache_checked = checked;
       doc_cache_diags = diags } =
   let absolute_filename = Lsp_project.absolute_path_for ~filename project in
   if checksum <> Digest.file absolute_filename then
@@ -259,18 +216,10 @@ let of_cache ~project
         ~textDocument:(Lsp.Types.TextDocumentItem.create
                          ~languageId ~text ~uri ~version) in
     let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
-    let parsed =
-      Option.map
-        (fun (ptree, cus) ->
-           let definitions = lazy_definitions ptree cus in
-           let references = lazy_references ptree cus definitions in
-           { ptree; cus; definitions; references })
-        parsed
-    in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
                diags = DIAGS.Set.of_serializable diags;
-               parsed }
+               checked }
 
 (* --- *)
 

@@ -42,17 +42,23 @@ type data_definitions =
 
 (* proc *)
 
-type procedure_section =
+type procedure_paragraph =
   {
-    section_name: Cobol_ptree.name with_loc;
-    section_paragraphs: Cobol_ptree.paragraph with_loc list;          (* nel? *)
+    paragraph_name: Cobol_ptree.procedure_name with_loc option;
+    paragraph: Cobol_ptree.paragraph with_loc;
   }
 
-type procedure_paragraph =
-  | Paragraph of Cobol_ptree.paragraph with_loc
-  | Section of procedure_section
+type procedure_section =
+  {
+    section_name: Cobol_ptree.procedure_name with_loc;
+    section_paragraphs: procedure_paragraph with_loc list;            (* nel? *)
+  }
 
-type procedure_paragraphs = procedure_paragraph named_n_ordered
+type procedure_block =
+  | Paragraph of procedure_paragraph with_loc
+  | Section of procedure_section with_loc
+
+type procedure = procedure_block named_n_ordered
 
 (* main *)
 
@@ -61,16 +67,15 @@ type cobol_unit =
   {
     unit_name: string with_loc;
     unit_parent_name: string with_loc option;
-    unit_loc: srcloc;
     unit_config: unit_config;
     unit_data: data_definitions;
-    unit_proc_paragraphs: procedure_paragraphs;
+    unit_procedure: procedure;
   }
 
-type t = cobol_unit
+type t = cobol_unit with_loc
 
 (* --- *)
 
-let paragraph_name: _ -> Cobol_ptree.name with_loc option = function
+let block_name: _ -> Cobol_ptree.qualname with_loc option = function
   | Paragraph { payload = p; _ } -> p.paragraph_name
-  | Section s -> Some s.section_name
+  | Section { payload = s; _ } -> Some s.section_name

@@ -16,17 +16,19 @@ open Unit_types
 open Cobol_common.Srcloc.INFIX
 
 let pp_cobol_unit ?(show_items = false) =
-  let open Cobol_data.Printer in
-  pp_braced_record_with_conditional_fields [
+  Pretty.record_with_conditional_fields [
     T Fmt.(field "name" (fun x -> ~&(x.unit_name)) string);
-    T (vfield "records" (fun x -> x.unit_data.data_records)
-         (Fmt.(list ~sep:nop) pp_record));
-    C (show_items,
-       vfield "items" (fun x -> x.unit_data.data_items.named)
-         (Unit_qualmap.pp_qualmap pp_item));
+    T (Pretty.vfield "records" (fun x -> x.unit_data.data_records)
+         (Fmt.(list ~sep:nop) Cobol_data.Printer.pp_record));
+    C'(show_items,
+       Pretty.vfield "items" (fun x -> x.unit_data.data_items.named)
+         (Unit_qualmap.pp_qualmap Cobol_data.Printer.pp_item));
   ]
 
+let pp_cobol_unit' ppf u = pp_cobol_unit ppf ~&u
+
 let pp_group ppf group =
-  Unit_collections.SET.iter
-    (Fmt.(vbox @@ (styled `Yellow @@ any "unit") ++
-                  any ": " ++ pp_cobol_unit ++ any "@\n") ppf) group
+  Unit_collections.SET.iter begin fun u ->
+    Fmt.(vbox @@ (styled `Yellow @@ any "unit") ++ any ": " ++
+                 pp_cobol_unit' ++ any "@\n") ppf u
+  end group

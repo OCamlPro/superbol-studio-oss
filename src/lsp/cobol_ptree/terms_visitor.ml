@@ -26,6 +26,9 @@ class ['a] folder = object
   method fold_name': (name with_loc, 'a) fold = default
   method fold_ident: (ident, 'a) fold = default
   method fold_qualname: (qualname, 'a) fold = default
+  method fold_qualname': (qualname with_loc, 'a) fold = default
+  method fold_procedure_name: (procedure_name, 'a) fold = default
+  method fold_procedure_name': (procedure_name with_loc, 'a) fold = default
   method fold_qualident: (qualident, 'a) fold = default
   method fold_address: (address, 'a) fold = default
   method fold_counter: (counter, 'a) fold = default
@@ -447,13 +450,28 @@ let fold_qualname_or_intlit (v: _ #folder) : qualname_or_intlit -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
-let fold_qualname' (v: _ #folder) = fold' ~fold:fold_qualname v
+let fold_qualname' (v: _ #folder) =
+  handle' v#fold_qualname' ~fold:fold_qualname v
+
 let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
 let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v
 let fold_strlit_opt (v: _ #folder) = fold_option ~fold:fold_strlit v
+let fold_literal' (v: _ #folder) = fold' ~fold:fold_literal v
 let fold_literal_opt (v: _ #folder) = fold_option ~fold:fold_literal v
+let fold_literal'_opt (v: _ #folder) = fold_option ~fold:fold_literal' v
 let fold_ident' (v: _ #folder) = fold' ~fold:fold_ident v
 let fold_ident'_opt (v: _ #folder) = fold_option ~fold:fold_ident' v
+
+(* --- *)
+
+let fold_procedure_name (v: _ #folder) =
+  handle v#fold_procedure_name ~continue:(fold_qualname v)
+
+let fold_procedure_name' (v: _ #folder) =
+  handle' v#fold_procedure_name' v ~fold:fold_procedure_name
+
+let fold_procedure_name'_opt (v: _ #folder) =
+  fold_option v ~fold:fold_procedure_name'
 
 let fold_rounding_mode (v: _ #folder) =
   leaf v#fold_rounding_mode

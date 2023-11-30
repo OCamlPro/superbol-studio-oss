@@ -8,12 +8,9 @@
 (*                                                                            *)
 (******************************************************************************)
 
-module Cobol_data = Cobol_data.OLD
-
 open Lsp.Types
 
 open Cobol_common                                                  (* Visitor *)
-open Cobol_common.Srcloc.INFIX
 
 type range = FoldingRange.t
 
@@ -35,27 +32,19 @@ let acc_range = function
   | None -> Fun.id
   | Some r -> List.cons r
 
-let extend_range (range: range option as 's) (new_range: 's) =
-  match range, new_range with
-  | None, _ | _, None ->
-      None
-  | Some range, Some new_range ->
-      Some { range with
-             endLine = new_range.endLine;
-             endCharacter = new_range.endCharacter }
+(* let extend_range (range: range option as 's) (new_range: 's) = *)
+(*   match range, new_range with *)
+(*   | None, _ | _, None -> *)
+(*       None *)
+(*   | Some range, Some new_range -> *)
+(*       Some { range with *)
+(*              endLine = new_range.endLine; *)
+(*              endCharacter = new_range.endCharacter } *)
 
-let acc_ranges_in ~filename ptree acc =
-  let open struct
-    type acc =
-      {
-        section_range: range option;
-        ranges: range list;
-      }
-  end in
+let ranges_in ~filename ptree group =
 
   let register_range ?kind { loc; _ } acc =
-    let range = range_of_loc_in ~filename ?kind loc in
-    { acc with ranges = acc_range range acc.ranges }
+    acc_range (range_of_loc_in ~filename ?kind loc) acc
   in
 
   let with_subranges ?kind n acc =
@@ -67,21 +56,21 @@ let acc_ranges_in ~filename ptree acc =
   let wide_region n = with_subranges ~kind:FoldingRangeKind.Region n
   and leaf_region n = leaf_range     ~kind:FoldingRangeKind.Region n in
 
-  let { section_range; ranges } =
-    Cobol_ptree.Visitor.fold_compilation_group (object
-      inherit [acc] Cobol_ptree.Visitor.folder
+  let ptree_ranges =
+    Cobol_ptree.Visitor.fold_compilation_group object
+      inherit [range list] Cobol_ptree.Visitor.folder
 
       method! fold_compilation_unit' = wide_region
       method! fold_options_paragraph' = leaf_region
 
       method! fold_data_division' = wide_region
-      method! fold_file_section' = wide_region
-      method! fold_working_storage_section' = wide_region
-      method! fold_linkage_section' = wide_region
-      method! fold_communication_section' = wide_region
-      method! fold_local_storage_section' = wide_region
-      method! fold_report_section' = wide_region
-      method! fold_screen_section' = wide_region
+      method! fold_file_section' = leaf_region
+      method! fold_working_storage_section' = leaf_region
+      method! fold_linkage_section' = leaf_region
+      method! fold_communication_section' = wide_region               (* TODO *)
+      method! fold_local_storage_section' = leaf_region
+      method! fold_report_section' = wide_region                      (* TODO *)
+      method! fold_screen_section' = wide_region                      (* TODO *)
 
       method! fold_environment_division' = wide_region
       method! fold_configuration_section' = wide_region
@@ -93,72 +82,32 @@ let acc_ranges_in ~filename ptree acc =
       method! fold_file_control_paragraph' = leaf_region
       method! fold_io_control_paragraph' = leaf_region
 
-      method! fold_procedure_division' = wide_region
+      (* Stop at the procedure division, as we fold over the unit group
+         representaton below to grab ranges of sections and paragraphs. *)
+      method! fold_procedure_division' = leaf_region
+      (* method! fold_statement' = wide_region *)
+
+      (* method! fold_paragraph' {payload = { paragraph_is_section; _ }; loc} acc = *)
+      (*   let range = range_of_loc_in ~filename loc in *)
+      (*   Visitor.do_children @@ *)
+      (*   if paragraph_is_section *)
+      (*   then { section_range = range; *)
+      (*          ranges = acc_range acc.section_range acc.ranges } *)
+      (*   else { section_range = extend_range acc.section_range range; *)
+      (*          ranges = acc_range range acc.ranges } *)
+
+    end ptree []
+  in
+
+  let all_ranges =
+    Cobol_unit.Visitor.fold_unit_group object
+      inherit [range list] Cobol_unit.Visitor.folder
+      method! fold_unit_config _ = Visitor.skip
+      method! fold_item_definition' = wide_region
+      method! fold_procedure_section' = wide_region
+      method! fold_procedure_paragraph' = wide_region
       method! fold_statement' = wide_region
-
-      (*TODO:
-        - add location for some nodes in the ast
-          so that we can define folding_range for
-          environment division, file section... (predefined section)
-
-        - it is possible to add folding_range for
-        - branch of statement(else_branch, evaluate_branch...)
-        - handler(on_size_error)
-        - inline_call
-
-        - add folding_range for other type of compilation_unit (not program) *)
-
-      method! fold_paragraph' {payload = { paragraph_is_section; _ }; loc} acc =
-        let range = range_of_loc_in ~filename loc in
-        Visitor.do_children @@
-        if paragraph_is_section
-        then { section_range = range;
-               ranges = acc_range acc.section_range acc.ranges }
-        else { section_range = extend_range acc.section_range range;
-               ranges = acc_range range acc.ranges }
-
-    end) ptree { section_range = None; ranges = acc }
+    end group ptree_ranges
   in
 
-  acc_range section_range ranges
-
-
-(*TODO:
-  Now we use the type Group.t (need to be rewritten),
-  which does not work for renames-item, condition-item ... *)
-let folding_range_data_in ~filename ({ cu_wss; _ }: Cobol_data.Types.compilation_unit) =
-  (*add the folding_range of grouped item *)
-  let rec add group l =
-    let r = range_of_loc_in ~filename ~@group in
-    match ~&group with
-    | Cobol_data.Group.Elementary _
-    | Constant _ | Renames _ | ConditionName _ -> None, l
-    | Group {elements; _} ->
-        let r, l =
-          List.fold_left
-            (fun (r, l) group -> aux group (r, l))
-            (r, l) elements
-        in
-        match r with
-        | None -> None, l
-        | Some r -> Some r, r :: l
-  (*traverse the elements, update the folding_range of grouped item*)
-  and aux group (r, l) =
-    match ~&group with
-    | Cobol_data.Group.Elementary _
-    | Constant _ | Renames _ | ConditionName _ ->
-        extend_range r (range_of_loc_in ~filename ~@group), l
-    | Group _ ->
-        let r', l = add group l in
-        extend_range r r', l
-  in
-  List.fold_left
-    (fun acc group -> snd @@ add group acc) [] cu_wss
-
-
-let ranges_in ~filename ptree cus =
-  Cobol_data.Compilation_unit.SET.to_seq cus
-  |> Seq.map (fun cu -> folding_range_data_in ~filename cu)
-  |> List.of_seq
-  |> List.flatten
-  |> acc_ranges_in ~filename ptree
+  all_ranges

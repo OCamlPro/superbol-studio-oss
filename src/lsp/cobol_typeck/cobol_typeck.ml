@@ -19,7 +19,6 @@ module OLD = struct
   module Prog_builder = Old_prog_builder
 end
 
+module Outputs = Typeck_outputs
+module Diagnostics = Typeck_diagnostics
 include Typeck_engine
-(* module Units = Typeck_units *)
-(* module Config = Typeck_config *)
-(* module Proc_div = Typeck_proc_div *)

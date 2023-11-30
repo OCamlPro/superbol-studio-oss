@@ -47,9 +47,30 @@ val list
   -> 'a printer -> 'a list printer
 val stack: 'a printer -> 'a list printer
 val path: string list printer
+
+val record
+  : ?opening:'a printer
+  -> ?closing:'a printer
+  -> 'a printer list
+  -> 'a printer
 val vfield
-  : ?label: string printer -> ?sep: unit printer
-  -> string -> ('a -> 'b) -> 'b printer -> 'a printer
+  : ?label: string printer
+  -> ?sep: unit printer
+  -> string
+  -> ('a -> 'b)
+  -> 'b printer
+  -> 'a printer
+type 'a conditional_field =
+  | T of 'a printer
+  | C of ('a -> bool) * 'a printer
+  | I of ('a -> bool) * 'a printer * 'a printer
+  | C' of bool * 'a printer
+  | I' of bool * 'a printer * 'a printer
+val record_with_conditional_fields
+  : ?opening:'a printer
+  -> ?closing:'a printer
+  -> 'a conditional_field list
+  -> 'a printer
 
 module Simple: sig
   val int: int -> simple

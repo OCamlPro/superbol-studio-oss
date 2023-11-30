@@ -305,6 +305,8 @@ and counter_kind =
   | PageCounter
   | LineCounter
 
+(* --- *)
+
 module COMPARE = struct
   type 'a compare_fun = 'a -> 'a -> int
   (*manual compare for term*)
@@ -1019,3 +1021,11 @@ let pp_rounded_ident ppf { rounded_ident = i; rounded_rounding = r } =
   | _ -> Fmt.pf ppf "%a %a" pp_ident i pp_rounding r
 
 let pp_rounded_idents = Fmt.(list ~sep:sp pp_rounded_ident)
+
+(* --- *)
+
+type procedure_name = qualname
+[@@deriving ord]
+
+let pp_procedure_name = pp_qualname
+let pp_procedure_name' = pp_with_loc pp_qualname
