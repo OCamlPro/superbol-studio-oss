@@ -330,14 +330,18 @@ let pp_raw_loc: raw_loc Pretty.printer =
       Printf.bprintf b "%4d %c %s\n" l
         (if l>=line1 && l<=line2 then '>' else ' ')
         line;
-      if l = line1 then
+      if l = line1 && l = line2 then
         let str =
-          let len' = len + 1 + if l = line2 then pad2 else 0 in
           String.mapi
-            (if l = line2
-             then fun idx c -> if idx > col1 && idx <= col2 then '^' else c
-             else fun idx c -> if idx > col1 then '^' else c)
-            (String.make (min len' (col2 + 1)) ' ')
+            (fun idx c -> if idx > col1 && idx <= col2 then '^' else c)
+            (String.make (min (len + 1 + pad2) (col2 + 1)) ' ')
+        in
+        Printf.bprintf b "----  %s\n" str;
+      else if l = line1 then
+        let str =
+          String.mapi
+            (fun idx c -> if idx > col1 then '^' else c)
+            (String.make (len + 1) ' ')
         in
         Printf.bprintf b "----  %s\n" str;
       else if l > line1 && l < line2 then

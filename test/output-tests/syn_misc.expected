@@ -2498,7 +2498,7 @@ syn_misc.at-3436-prog.cob:7.11-9.12:
    5          DATA DIVISION.
    6          WORKING-STORAGE SECTION.
    7 >            COPY "ok.inc" REPLACING == 01 REPLACE-ME == BY ==
-----              ^
+----              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    8 >        01  OK PIC XX VALUE "OK". ==
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9 >            .

@@ -1180,7 +1180,7 @@ run_file.at-4183-fexists_signed.c:22.9-31.0:
   20   	if (f != NULL) {
   21   		 bfr = (char *) cob_malloc (signature_size);
   22 > 		 if (1 == fread (bfr, signature_size, 1, f)) {
-----   
+----            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   23 > 				if (!memcmp (signature, bfr, signature_size)) {
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   24 > 					 res = 0;
@@ -2972,7 +2972,7 @@ run_file.at-8028-cmod.c:16.16-21.22:
   14      unsigned int   opCode;
   15   
   16 >    if (*opCodep == 0xfa)
-----                   ^^^^^^
+----                   ^^^^^^^^
   17 >       opCode = 0xfa00 + opCodep[1];
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   18 >    else
@@ -2992,7 +2992,7 @@ run_file.at-8028-cmod.c:22.20-23.22:
   20   
   21      if (fcd->fileOrg == ORG_LINE_SEQ
   22 >     || fcd->fileOrg == ORG_SEQ
-----                       ^^
+----                       ^^^^^^^^^^
   23 >     || fcd->fileOrg == ORG_INDEXED
 ----  ^^^^^^^^^^^^^^^^^^^^^^^
   24       || fcd->fileOrg == ORG_RELATIVE) {
@@ -3004,7 +3004,7 @@ run_file.at-8028-cmod.c:24.20-45.16:
   22       || fcd->fileOrg == ORG_SEQ
   23       || fcd->fileOrg == ORG_INDEXED
   24 >     || fcd->fileOrg == ORG_RELATIVE) {
-----                   
+----                       ^^^^^^^^^^^^^^^^^^
   25 >       switch (opCode) {
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^
   26 >       case OP_OPEN_OUTPUT:
@@ -4999,7 +4999,7 @@ run_file.at-9007-cmod.c:32.16-37.22:
   30      int      sts;
   31   
   32 >    if (*opCodep == 0xfa)
-----                   ^^^^^^
+----                   ^^^^^^^^
   33 >       opCode = 0xfa00 + opCodep[1];
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   34 >    else
@@ -5019,7 +5019,7 @@ run_file.at-9007-cmod.c:38.20-39.22:
   36   
   37      if (fcd->fileOrg == ORG_LINE_SEQ
   38 >     || fcd->fileOrg == ORG_SEQ
-----                       ^^
+----                       ^^^^^^^^^^
   39 >     || fcd->fileOrg == ORG_INDEXED
 ----  ^^^^^^^^^^^^^^^^^^^^^^^
   40       || fcd->fileOrg == ORG_RELATIVE) {
@@ -5031,7 +5031,7 @@ run_file.at-9007-cmod.c:40.20-65.16:
   38       || fcd->fileOrg == ORG_SEQ
   39       || fcd->fileOrg == ORG_INDEXED
   40 >     || fcd->fileOrg == ORG_RELATIVE) {
-----                   
+----                       ^^^^^^^^^^^^^^^^^^
   41 >       switch (opCode) {
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^
   42 >       case OP_OPEN_OUTPUT:
