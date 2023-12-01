@@ -2714,7 +2714,7 @@ run_misc.at-5072-callee.c:7.13-14.0:
    5   callee (char *p1, char *p2)
    6   {
    7 >    if (p1[0] == 'A') {
-----   
+----                ^^^^^^^^^
    8 >       p1[0] = 'B';
 ----  ^^^^^^^^^^^^^^^^^^^
    9 >    }
@@ -5766,7 +5766,7 @@ run_misc.at-11928-cmod.c:84.22-115.0:
   82            memcpy (wrk,"Bye-Bye Birdie!",15);
   83            cob_put_grp_param (k, wrk, sizeof(wrk));
   84 >       } else if (type == COB_TYPE_NUMERIC_EDITED) {
-----   
+----                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   85 >          if (scale > 0) {
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
   86 >             sprintf (pic,"%s9(%d)V9(%d)",sign?"S":"",digits-scale,scale);
@@ -5834,7 +5834,7 @@ run_misc.at-11928-cmod.c:29.23-67.17:
   27      case COB_TYPE_GROUP:           return "Group";
   28      case COB_TYPE_NUMERIC_COMP5:
   29 >         return byvalue == 2 ? "COMP-4" : "COMP-5";
-----                    
+----                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   30 >    case COB_TYPE_NUMERIC_BINARY:  return "COMP-4";
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   31 >    case COB_TYPE_NUMERIC_PACKED:  return "COMP-3";
@@ -5930,7 +5930,7 @@ run_misc.at-11928-cmod.c:73.22-76.24:
   71            cob_free ((void*)str);
   72            cob_put_picx_param (k, "Bye!");
   73 >       } else if (type == COB_TYPE_NATIONAL) {
-----                         ^^
+----                         ^^^^^^^^^^^^^^^^^^^^^^^
   74 >          sprintf (pic, "N(%d)", size); /* FIXME */
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   75 >          printf ("exchange of national data is not supported yet");
@@ -6507,7 +6507,7 @@ run_misc.at-12158-cmod.c:80.22-109.0:
   78            printf ("%-11s '%.*s'",pic,size,str);
   79            cob_put_field_str (fld, "Bye-Bye Birdie!");
   80 >       } else if (type == COB_TYPE_NUMERIC_EDITED) {
-----   
+----                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   81 >          if (scale > 0) {
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
   82 >             sprintf (pic,"%s9(%d)V9(%d)",sign?"S":"",digits-scale,scale);
@@ -6571,7 +6571,7 @@ run_misc.at-12158-cmod.c:29.23-69.17:
   27      case COB_TYPE_GROUP:           return "Group";
   28      case COB_TYPE_NUMERIC_COMP5:
   29 >         return byvalue == 2 ? "COMP-4" : "COMP-5";
-----                    
+----                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   30 >    case COB_TYPE_NUMERIC_BINARY:  return "COMP-4";
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   31 >    case COB_TYPE_NUMERIC_PACKED:  return "COMP-3";
@@ -6671,7 +6671,7 @@ run_misc.at-12158-cmod.c:73.22-76.24:
   71            printf ("%-11s '%s'", pic, str);
   72            cob_put_field_str (fld, "Bye!");
   73 >       } else if (type == COB_TYPE_NATIONAL) {
-----                         ^^
+----                         ^^^^^^^^^^^^^^^^^^^^^^^
   74 >          sprintf (pic,"N(%d)",size); /* FIXME */
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   75 >          printf ("exchange of national data is not supported yet");
