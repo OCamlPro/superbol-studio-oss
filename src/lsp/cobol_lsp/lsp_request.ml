@@ -78,12 +78,15 @@ let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
   match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
   | Data_item { def = { loc; _ }; _ }
   | Data_renaming { def = { loc; _ }; _ }
+  | Data_condition { def = { loc; _ }; _ }
     when not focus_on_name_in_defintions ->
       [location_of_srcloc loc]
   | Data_item { def; _ } ->
       Option.(to_list @@ map location_of ~&def.item_qualname)
   | Data_renaming { def; _ } ->
       [location_of ~&def.renaming_name]
+  | Data_condition { def; _ } ->
+      [location_of ~&def.condition_name_qualname]
   | exception Not_found
   | exception Cobol_unit.Qualmap.Ambiguous _
     when not allow_notifications ->

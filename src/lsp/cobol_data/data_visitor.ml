@@ -30,6 +30,9 @@ class ['a] folder = object
   method fold_item_definition': (item_definition with_loc, 'a) fold = default
   method fold_item_definition: (item_definition, 'a) fold = default
   method fold_item_redefinitions: (item_redefinitions, 'a) fold = default
+  method fold_condition_names: (condition_names, 'a) fold = default
+  method fold_condition_name': (condition_name with_loc, 'a) fold = default
+  method fold_condition_name: (condition_name, 'a) fold = default
   method fold_renamed_item_layout: (renamed_item_layout, 'a) fold = default
   method fold_record_renamings: (record_renamings, 'a) fold = default
   method fold_record_renaming': (record_renaming with_loc, 'a) fold = default
@@ -63,12 +66,13 @@ and fold_item_definition (v: _ #folder) =
   handle v#fold_item_definition
     ~continue:begin fun { item_qualname; item_layout; item_offset;
                           item_size; item_redefinitions; item_redefines;
-                          item_length = _; } x -> x
+                          item_conditions; item_length = _ } x -> x
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v item_qualname
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v item_redefines
       >> fold_item_layout v item_layout
       >> fold_memory_offset v item_offset
       >> fold_memory_size v item_size
+      >> fold_condition_names v item_conditions
       >> fold_item_redefinitions v item_redefinitions
     end
 
@@ -79,29 +83,50 @@ and fold_item_redefinitions (v: _ #folder) =
 and fold_item_layout (v: _ #folder) =
   handle v#fold_item_layout
     ~continue:begin fun l x -> match l with
-      | Elementary_item { usage; value } -> x
+      | Elementary_item { usage; init_value } -> x
           >> fold_usage v usage
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v value
+          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v init_value
       | Struct_item { fields } -> x
           >> fold_item_definitions v fields
-      | Fixed_table { items; length; value } -> x
+      | Fixed_table { items; length; init_values } -> x
           >> fold_item_definitions v items
           >> fold_int' v length
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v value
-      | Depending_table { items; min_occurs; max_occurs; depending; value } -> x
+          >> fold_list v init_values
+            ~fold:Cobol_ptree.Terms_visitor.fold_literal'
+      | Depending_table { items; min_occurs; max_occurs; depending;
+                          init_values } -> x
           >> fold_item_definitions v items
           >> fold_int' v min_occurs
           >> fold_int' v max_occurs
           >> Cobol_ptree.Terms_visitor.fold_qualname' v depending
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v value
+          >> fold_list v init_values
+            ~fold:Cobol_ptree.Terms_visitor.fold_literal'
       | Dynamic_table { items; capacity; min_capacity; max_capacity;
-                        value; initialized } -> x
+                        init_values; initialized } -> x
           >> fold_item_definitions v items
           >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v capacity
           >> fold_option v ~fold:fold_int' min_capacity
           >> fold_option v ~fold:fold_int' max_capacity
-          >> Cobol_ptree.Terms_visitor.fold_literal'_opt v value
+          >> fold_list v init_values
+            ~fold:Cobol_ptree.Terms_visitor.fold_literal'
           >> fold' v ~fold:fold_bool initialized
+    end
+
+and fold_condition_names (v: _ #folder) =
+  handle v#fold_condition_names
+    ~continue:(fold_list v ~fold:fold_condition_name')
+
+and fold_condition_name' (v: _ #folder) =
+  handle' v#fold_condition_name' v ~fold:fold_condition_name
+
+and fold_condition_name (v: _ #folder) =
+  handle v#fold_condition_name
+    ~continue:begin fun { condition_name_qualname;
+                          condition_name_item = _ } x -> x
+      >> Cobol_ptree.Terms_visitor.fold_qualname' v condition_name_qualname
+      (* NB: we skip the item def for now as its representation is temporary *)
+      (* >> Cobol_ptree.Data_sections_visitor.fold_condition_name_item v *)
+      (*   condition_name_item *)
     end
 
 let fold_renamed_item_layout (v: _ #folder) =

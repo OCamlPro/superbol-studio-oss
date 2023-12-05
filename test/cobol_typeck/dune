@@ -6,7 +6,7 @@
     ok_pic        ko_pic
     ok_renames    ko_renames
     ok_redefines  ko_redefines
-    ok_conditions
+    ok_conditions ko_conditions
                   ko_proc_names
     prog_printer)
  (preprocess

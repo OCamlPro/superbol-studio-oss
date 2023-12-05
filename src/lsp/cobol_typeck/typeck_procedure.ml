@@ -169,7 +169,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
   let visitor = object
     inherit [acc] Cobol_unit.Visitor.folder
 
-    method! fold_qualname qn acc =                         (* TODO: qualname' *)
+    method! fold_qualname qn acc =                (* TODO: data_name' instead *)
       let loc = baseloc_of_qualname qn in
       Visitor.skip_children @@
       match Cobol_unit.Qualmap.find qn data_definitions.data_items.named with
@@ -179,6 +179,9 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       | Data_renaming { def; _ } ->
           { acc with
             refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs }
+      | Data_condition { def; _ } ->
+          { acc with
+            refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs }
       | exception Not_found ->
           acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
       | exception Cobol_unit.Qualmap.Ambiguous matching_qns ->

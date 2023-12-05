@@ -17,6 +17,17 @@ open Cobol_common.Srcloc.INFIX
 module DIAGS = Cobol_common.Diagnostics
 module NEL = Cobol_data.Types.NEL
 
+type entry =
+  | Redefines_entry
+  | Renames_entry
+  | Condition_name_entry
+
+let pp_entry ppf e =
+  Pretty.string ppf @@ match e with
+  | Redefines_entry -> "REDEFINES"
+  | Renames_entry -> "RENAMES"
+  | Condition_name_entry -> "condition-name entry"
+
 type error =
   | Item_not_allowed_in_section of
       {
@@ -31,11 +42,6 @@ type error =
       {
         level: int with_loc;
         expected: int list;
-      }
-  | Misplaced_redefinition of
-      {
-        loc: srcloc;
-        expl: misplacement_explanation;
       }
   | Unexpected_redefinition_level of
       {
@@ -65,11 +71,6 @@ type error =
         redef_name: Cobol_ptree.data_name with_loc option;
         redef_redefines: Cobol_ptree.name with_loc;
         table_item: (* ([>`table], _)  *)Cobol_data.Types.item_definition with_loc;
-      }
-  | Misplaced_renaming of
-      {
-        loc: srcloc;
-        expl: misplacement_explanation;
       }
   | Missing_picture_clause_for_elementary_item of
       {
@@ -112,6 +113,12 @@ type error =
       {
         qualname: Cobol_ptree.qualname with_loc;
       }
+  | Misplaced of
+      {
+        entry: entry;
+        loc: srcloc;
+        expl: misplacement_explanation;
+      }
   | Pending_feature of
       {
         name: string;
@@ -141,8 +148,7 @@ let error_loc = function
   | Invalid_renaming_of_variable_length_range { loc; _ }
   | Item_not_allowed_in_section { level = { loc; _ }; _ }
   | Item_not_found { qualname = { loc; _ } }
-  | Misplaced_redefinition { loc; _ }
-  | Misplaced_renaming { loc; _ }
+  | Misplaced { loc; _ }
   | Missing_picture_clause_for_elementary_item { item_loc = loc; _ }
   | Occurs_in_rename_operand { operand = { loc; _ }; _ }
   | Pending_feature { loc; _ }
@@ -181,9 +187,6 @@ let pp_error ppf = function
   | Unexpected_level_number { level; expected } ->
       Pretty.print ppf "Unexpected level number %02d: expected %a" ~&level
         (pp_one_of Fmt.(fmt "%02d")) expected
-  | Misplaced_redefinition { expl; _ } ->
-      Pretty.print ppf "Misplaced REDEFINES %a"
-        pp_misplacement_explanation expl
   | Unexpected_redefinition_level { expected_level; redef_level;
                                     redef_name; _ } ->
       Pretty.print ppf "Invalid level %02d for %a with REDEFINES clause; \
@@ -201,9 +204,6 @@ let pp_error ppf = function
   | Redefinition_of_table_item { table_item; _ } ->
       Pretty.print ppf "Invalid redefinition of item with OCCURS clause%a"
         Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) ~&table_item.item_qualname
-  | Misplaced_renaming { expl; _ } ->
-      Pretty.print ppf "Misplaced@ RENAMES@ %a\
-                       " pp_misplacement_explanation expl
   | Missing_picture_clause_for_elementary_item { item_name; _ } ->
       Pretty.print ppf "Missing PICTURE clause for %a"
         pp_data_name'_opt item_name
@@ -225,6 +225,9 @@ let pp_error ppf = function
       Cobol_data.Picture.pp_error ppf ~&error
   | Item_not_found { qualname; _ } ->
       Pretty.print ppf "Item '%a' not found" Cobol_ptree.pp_qualname' qualname
+  | Misplaced { entry; expl; _ } ->
+      Pretty.print ppf "Misplaced@ %a@ %a\
+                       " pp_entry entry pp_misplacement_explanation expl
   | Pending_feature { name; _ } ->
       Pretty.print ppf "%s is not supported yet" name
 

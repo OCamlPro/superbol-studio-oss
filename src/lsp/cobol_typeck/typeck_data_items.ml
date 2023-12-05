@@ -36,6 +36,7 @@ type acc =
     current_qualification: Cobol_ptree.qualname option;
     item_stack: item_stack;
     current_qualmap: Cobol_data.Types.item_definition with_loc Qualmap.t;
+    pending_conditions: condition_name_under_construction list;
     filler_count: int;
     definitions: Cobol_unit.Types.data_definitions;
     references: srcloc list Cobol_unit.Qual.MAP.t;
@@ -56,8 +57,12 @@ and item_under_construction =               (* item currently being assembled *)
     item_redefines: Cobol_ptree.qualname with_loc option; (* REDEFINES iff <> None *)
     item_rev_fields: Cobol_data.Types.item_definition with_loc list;
     item_rev_renames: Cobol_data.Types.record_renaming with_loc list;
+    item_rev_conditions: Cobol_data.Types.condition_names;
     (* TODO: subscripting info? + others? *)
   }
+and condition_name_under_construction =
+  Cobol_data.Types.condition_name with_loc *
+  Cobol_data.Types.item_definition with_loc
 
 (* --- *)
 
@@ -73,6 +78,7 @@ let init (config: unit_config) =
     current_qualification = None;
     current_qualmap = Qualmap.empty;
     item_stack = [];
+    pending_conditions = [];
     filler_count = 0;
     definitions =
       {
@@ -146,8 +152,17 @@ let define_record acc ~renamings (record_item: item_definition with_loc) =
         (Data_renaming { record; def }) data_items
     end data_items renamings
   in
+  let data_items =                                     (* add condition names *)
+    List.fold_left begin fun data_items (def, item) ->
+      (* TODO: [validation] entries have no name.  (The current parse-tree does
+         not allow those). *)
+      add_named_def ~&def.condition_name_qualname
+        (Data_condition { record; def; item }) data_items
+    end data_items acc.pending_conditions
+  in
   { acc with
     current_qualmap = Qualmap.empty;
+    pending_conditions = [];
     definitions = { data_items;
                     data_records = record :: acc.definitions.data_records } }
 
@@ -266,15 +281,21 @@ let register_def acc (def: item_definition with_loc) =
 
 
 let item_definition acc
-    ({ item_name; item_loc; item_qualname; item_qualifier;
+    ({ item_name;
+       item_loc;
+       item_qualname;
+       item_qualifier;
        item_redefines;
-       item_offset; item_size;
+       item_offset;
+       item_size;
        item_clauses = { occurs; picture; values; clause_diags; _ };
-       item_rev_fields; _ } as item)
+       item_rev_fields;
+       item_rev_conditions; _ } as item)
   : (acc * Cobol_data.Types.item_definition with_loc, acc) result =
   let open Cobol_data.Types in
   let acc =
     { acc with diags = Typeck_diagnostics.union acc.diags clause_diags } in
+  let item_conditions = List.rev item_rev_conditions in
   let item_definitions_length item_definitions =
     NEL.fold_left Fixed_length item_definitions ~f:begin fun l item_def ->
       if ~&item_def.item_length = Variable_length
@@ -296,11 +317,13 @@ let item_definition acc
           item_qualname = None;                            (* implicit FILLER *)
           item_redefines;
           item_layout = Fixed_table { items = NEL.One item';
-                                      length; value = None };
+                                      length;
+                                      init_values = [] };
           item_offset = item.item_offset;
           item_size = Cobol_data.Memory.mult_int item.item_size ~&length;
           item_length = Fixed_length;
           item_redefinitions = [];
+          item_conditions = [];
         } &@ loc
     | OccursDepending { min_occurs; max_occurs; depending; loc = _ } ->
         let dep_size = Cobol_data.Memory.valof ~&depending in
@@ -311,11 +334,12 @@ let item_definition acc
                                           min_occurs = int min_occurs;
                                           max_occurs = int max_occurs;
                                           depending;
-                                          value = None };
+                                          init_values = [] };
           item_offset = item.item_offset;
           item_size = Cobol_data.Memory.repeat item.item_size ~by:dep_size;
           item_length = Variable_length;
           item_redefinitions = [];
+          item_conditions = [];
         } &@ loc
     | OccursDynamic { capacity; min_capacity; max_capacity;
                       initialized; loc = _ } ->
@@ -327,11 +351,12 @@ let item_definition acc
                                         min_capacity = opt int min_capacity;
                                         max_capacity = opt int max_capacity;
                                         initialized;
-                                        value = None };
+                                        init_values = [] };
           item_offset = item.item_offset;
           item_size = Cobol_data.Memory.size_of_dynamic_table;
           item_length = Fixed_length;
           item_redefinitions = [];
+          item_conditions = [];
         } &@ loc
   in
   let group items =
@@ -343,13 +368,14 @@ let item_definition acc
       | FixedOccurs { length; loc = _ } ->
           Fixed_table { items;
                         length = int length;
-                        value = None },
+                        init_values = [] },
           item_definitions_length items
       | OccursDepending { min_occurs; max_occurs; depending; loc = _ } ->
           Depending_table { items;
                             min_occurs = int min_occurs;
                             max_occurs = int max_occurs;
-                            depending; value = None },
+                            depending;
+                            init_values = [] },
           Variable_length
       | OccursDynamic { capacity; min_capacity; max_capacity;
                         initialized; loc = _ } ->
@@ -357,7 +383,8 @@ let item_definition acc
                           capacity = opt qualify capacity;
                           min_capacity = opt int min_capacity;
                           max_capacity = opt int max_capacity;
-                          initialized; value = None },
+                          initialized;
+                          init_values = [] },
           Fixed_length
     in
     {
@@ -367,21 +394,23 @@ let item_definition acc
       item_offset = ~&(NEL.hd items).item_offset;
       item_size;
       item_length;
-      item_redefinitions = []
+      item_redefinitions = [];
+      item_conditions;
     } &@ item_loc
   in
   if item_rev_fields = [] then         (* elementary (or table of elementary) *)
     match elementary_usage_n_value acc item with
-    | Ok (acc, (Usage picture as usage), value) ->
+    | Ok (acc, (Usage picture as usage), init_value) ->
         let data_size = Cobol_data.Picture.data_size picture.category in
         Ok (elementary acc
               ({ item_qualname;
                  item_redefines = None;
-                 item_layout = Elementary_item { usage; value };
+                 item_layout = Elementary_item { usage; init_value };
                  item_offset;
                  item_size = Cobol_data.Memory.const_size data_size;
                  item_length = Fixed_length;
-                 item_redefinitions = [] } &@ item_loc))
+                 item_redefinitions = [];
+                 item_conditions } &@ item_loc))
     | Error acc ->
         Error acc                                               (* just skip *)
   else                                                          (* group item *)
@@ -397,11 +426,22 @@ let item_definition acc
         Ok (register_def acc def, def)
 
 
+let commit_conditions acc def { item_rev_conditions; _ } =
+  let pending_conditions =
+    List.fold_left begin fun pcs cond_name ->
+      (cond_name, def) :: pcs
+    end acc.pending_conditions item_rev_conditions
+  in
+  { acc with pending_conditions }
+
+
 let item_definitions acc items =
   List.fold_left begin fun (acc, rev_defs, renamings) item ->
     match item_definition acc item with
     | Ok (acc, def) ->
-        acc, def :: rev_defs, List.rev_append item.item_rev_renames renamings
+        commit_conditions acc def item,
+        def :: rev_defs,
+        List.rev_append item.item_rev_renames renamings
     | Error acc ->
         acc, rev_defs, renamings
   end (acc, [], []) items
@@ -535,8 +575,8 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
   let acc = flush_item_stack ~down_to_level:(~&level + 1) acc in
   match def_n_redef_items acc.item_stack with
   | [], _ ->                                            (* no redefinable item *)
-      error acc @@
-      Misplaced_redefinition { loc; expl = Following "no definition" }
+      error acc @@ Misplaced { entry = Redefines_entry; loc;
+                               expl = Following "no definition" }
   | { item_level = expected_level;
       item_loc = expected_redefined_loc; _ } as redefined_item :: _, base_stack ->
       let acc =
@@ -594,7 +634,8 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
                        item_redefines;
                        item_clauses;
                        item_rev_fields = [];
-                       item_rev_renames = [] } :: acc.item_stack }
+                       item_rev_renames = [];
+                       item_rev_conditions = [] } :: acc.item_stack }
 
 
 let on_item ~at_level { payload = Cobol_ptree.{ data_level; data_name;
@@ -629,7 +670,8 @@ let on_item ~at_level { payload = Cobol_ptree.{ data_level; data_name;
                        item_redefines = None;
                        item_clauses;
                        item_rev_fields = [];
-                       item_rev_renames = [] } :: acc.item_stack }
+                       item_rev_renames = [];
+                       item_rev_conditions = [] } :: acc.item_stack }
 
 
 let dummy_renamed_elementary =
@@ -712,13 +754,15 @@ let on_rename ({ loc; _ } as rename_item) acc =
   let acc = flush_item_stack ~down_to_level:02 acc in
   match acc.item_stack with
   | [] ->
-      error acc @@ Misplaced_renaming { loc; expl = Following "no definition" }
+      error acc @@ Misplaced { entry = Renames_entry; loc;
+                               expl = Following "no definition" }
   | { item_level; item_qualifier; _ } as top_item :: item_stack ->
       let acc = match item_level with
         | 01 ->                                      (* For later: or FD or SD *)
             acc
         | l ->                  (* report misplacement, but keep going anyways *)
-            error acc @@ Misplaced_renaming { loc; expl = Following_level l }
+            error acc @@ Misplaced { entry = Renames_entry; loc;
+                                     expl = Following_level l }
       in
       match renaming acc ?renaming_qualifier:item_qualifier rename_item with
       | Ok (acc, renaming) ->
@@ -728,11 +772,26 @@ let on_rename ({ loc; _ } as rename_item) acc =
       | Error acc ->
           acc
 
-(* let on_condition ({ loc; _ } as condition_item) acc = *)
-(*   match acc.item_stack with *)
-(*   | [] -> *)
-(*       error acc @@ Misplaced_condition { loc; expl = Following "no definition" } *)
-(*   | top_item *)
+let on_condition_name (cond_name: Cobol_ptree.condition_name_item with_loc) acc =
+  match acc.item_stack with
+  | [] ->
+      error acc @@ Misplaced { entry = Condition_name_entry;
+                               loc = ~@cond_name;
+                               expl = Following "no definition" }
+  | top_item :: item_stack ->
+      let condition_name_qualname
+        = qualify ~&cond_name.condition_name acc.item_stack in
+      let condition_name
+        = { condition_name_qualname;
+            condition_name_item = ~&cond_name } &@<- cond_name in
+      let top_item =
+        { top_item with
+          item_rev_conditions = condition_name :: top_item.item_rev_conditions }
+      in
+      { acc with item_stack = top_item :: item_stack }
+
+
+(* --- *)
 
 
 let enter_section section acc =
@@ -753,6 +812,11 @@ let data_definitions = object
     Visitor.do_children @@ enter_section Local_storage acc
   method! fold_linkage_section _ acc =
     Visitor.do_children @@ enter_section Linkage acc
+
+  (* TODO *)
+  method! fold_communication_section _  = Visitor.skip
+  method! fold_report_section _  = Visitor.skip
+  method! fold_screen_section _  = Visitor.skip
 
   method! fold_data_item' ({ payload = { data_level; _ };
                              loc } as item) acc =
@@ -776,16 +840,17 @@ let data_definitions = object
         error acc (Invalid_level_number { level = rename_level }) |>
         on_rename item                                      (* rename anyways *)
 
-  (* TODO: fold_constant_item' *)
+  (* TODO: fold_constant_item';
+     see https://github.com/OCamlPro/superbol-studio-oss/issues/53 *)
 
-  (* method! fold_condition_name_item' ({ payload = { condition_level; *)
-  (*                                                  _ }; _ } as item) acc = *)
-  (*   Visitor.skip_children @@ match ~&condition_level with    (\* check in case *\) *)
-  (*   | 88 -> *)
-  (*       on_condition item acc *)
-  (*   | _ -> *)
-  (*       error acc (Invalid_level_number { level = condition_level }) |> *)
-  (*       on_condition item                                     (\* emit anyways *\) *)
+  method! fold_condition_name_item' ({ payload = { condition_name_level;
+                                                   _ }; _ } as item) acc =
+    Visitor.skip_children @@ match ~&condition_name_level with (* check in case *)
+    | 88 ->
+        on_condition_name item acc
+    | _ ->
+        error acc (Invalid_level_number { level = condition_name_level }) |>
+        on_condition_name item                                (* emit anyways *)
 
   (* TODO: fold_screen_item' *)
   (* TODO: fold_report_group_item' *)

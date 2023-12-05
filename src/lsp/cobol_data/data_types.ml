@@ -61,16 +61,19 @@ and item_definition =
     item_qualname: Cobol_ptree.qualname with_loc option;
     item_redefines: Cobol_ptree.qualname with_loc option;       (* redef only *)
     item_layout: item_layout;
-    item_offset: Data_memory.offset;          (** offset w.r.t record address *)
+    item_offset: Data_memory.offset; (** offset w.r.t record address, not taking
+                                         subscripts/dimensions/refmords into
+                                         account. *)
     item_size: Data_memory.size;
     item_length: length;
+    item_conditions: condition_names;
     item_redefinitions: item_redefinitions;
   }
 and item_layout =
   | Elementary_item of
       {
         usage: usage;
-        value: Cobol_ptree.literal with_loc option;
+        init_value: Cobol_ptree.literal with_loc option;
       }
   | Struct_item of
       {
@@ -88,7 +91,7 @@ and item_layout =
       {
         items: item_definitions;
         length: int with_loc;                                  (* int for now *)
-        value: Cobol_ptree.literal with_loc option;
+        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
         (* TODO: keys, indexing; *)
       }
   (* -> ([>`table], [>`fixed_length]) item_layout *)
@@ -99,7 +102,7 @@ and item_layout =
         min_occurs: int with_loc;                              (* int for now *)
         max_occurs: int with_loc;                              (* ditto *)
         depending: Cobol_ptree.qualname with_loc;
-        value: Cobol_ptree.literal with_loc option;
+        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
         (* TODO: keys, indexing; *)
       }
   (* -> ([>`table], [>`variable_length]) item_layout *)
@@ -109,11 +112,18 @@ and item_layout =
         capacity: Cobol_ptree.qualname with_loc option;
         min_capacity: int with_loc option;
         max_capacity: int with_loc option;
-        value: Cobol_ptree.literal with_loc option;
+        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
         initialized: bool with_loc;
         (* TODO: keys, indexing *)
       } (* NOTE: considered fixed-length in ISO/IEC *)
 (* -> ([>`table], [>`fixed_length]) item_layout *)
+
+and condition_names = condition_name with_loc list
+and condition_name =
+  {
+    condition_name_qualname: Cobol_ptree.qualname with_loc;
+    condition_name_item: Cobol_ptree.condition_name_item;          (* for now *)
+  }
 
 (** Note: RENAMES could be represented by simply adding an (optional,
     non-constant) offset to redefinitions (and use group layouts with FILLERs
@@ -179,6 +189,12 @@ type item =
       {
         record: record;
         def: record_renaming with_loc;
+      }
+  | Data_condition of
+      {
+        record: record;
+        item: item_definition with_loc;
+        def: condition_name with_loc;
       }
   (* | Const_record: data_const_record -> definition *)
 

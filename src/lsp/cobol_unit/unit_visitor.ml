@@ -40,10 +40,10 @@ end
 let fold_unit_config (v: _ #folder) = leaf v#fold_unit_config
 
 let fold_data_definitions (v: _ #folder) =
-  handle v#fold_data_definitions                           (* skip items view *)
+  handle v#fold_data_definitions
     ~continue:begin fun { data_records; data_items = _ } x -> x
-      >> fold_list v data_records
-      ~fold:Cobol_data.Visitor.fold_record
+      (* traverse via full records, skip individual items view *)
+      >> fold_list ~fold:Cobol_data.Visitor.fold_record v data_records
     end
 
 let fold_procedure_paragraph (v: _ #folder) =

@@ -76,7 +76,12 @@ let register_data_item_ref ~loc item refs =
   | Some qn -> register_data_qualref ~&qn ~loc refs
 
 let register_data_renaming_ref ~loc renaming refs =
-  register_data_qualref ~&(~&renaming.Cobol_data.Types.renaming_name) ~loc refs
+  register_data_qualref
+    ~&(~&renaming.Cobol_data.Types.renaming_name) ~loc refs
+
+let register_condition_name_ref ~loc cond_name refs =
+  register_data_qualref
+    ~&(~&cond_name.Cobol_data.Types.condition_name_qualname) ~loc refs
 
 let register_procedure_ref ~loc block refs =
   match Cobol_unit.Types.block_name block with
