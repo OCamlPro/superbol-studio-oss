@@ -54,6 +54,10 @@ let make_args attributes =
            "-ext"::ext::acc)
          args
          exts) |>
+  (fun args -> match List.assoc_opt "forDebugging" attributes with
+     | Some fd when ([%js.to: bool] fd) ->
+       "-g"::"-fsource-location"::"-ftraceall"::"-Q"::"--coverage"::"-A"::"--coverage"::"-v"::args
+     | _ -> args) |>
   List.map (fun elt -> `String elt)
 
 let provide_tasks ~token:_ =
@@ -81,7 +85,7 @@ let provide_tasks ~token:_ =
       ~scope
       ~name:"Build file for debug"
       ~source:"superbol"
-      ~execution:(execution "cobcd")
+      ~execution:(execution "cobc")
       ~problemMatchers:[
         "$gnucobol";
         "$gnucobol-warning";
@@ -126,14 +130,14 @@ let resolve_task ~task ~token:_ =
        | exception _ -> attributes) |>
     (fun attributes ->
        match [%js.to: bool or_undefined] (TaskDefinition.get_attribute definition "forDebugging") with
-       | Some b -> attributes, b
+       | Some b -> ("forDebugging", [%js.of: bool] b)::attributes, b
        | None | exception _ -> attributes, false)
   in
   OutputChannel.appendLine oc ~value:"Got attributes";
   let args = make_args attributes in
   let execution =
     if debug then
-      let shell_execution = ShellExecution.makeCommandArgs ~command:(`String "cobcd") ~args () in
+      let shell_execution = ShellExecution.makeCommandArgs ~command:(`String "cobc") ~args () in
       `ShellExecution shell_execution
     else
       let shell_execution = ShellExecution.makeCommandArgs ~command:(`String "cobc") ~args () in
