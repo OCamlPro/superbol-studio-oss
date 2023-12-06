@@ -783,7 +783,6 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGHEST_VALUE) -> "HIGHEST_VALUE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIGH) -> "HIGH"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HIDDEN_DATA) -> "HIDDEN_DATA"
-  | MenhirInterpreter.X (MenhirInterpreter.T T_HEXLIT) -> "HEXLIT"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEX) -> "HEX"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HELP_ID) -> "HELP_ID"
   | MenhirInterpreter.X (MenhirInterpreter.T T_HEIGHT_IN_CELLS) -> "HEIGHT_IN_CELLS"
@@ -2318,6 +2317,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_and_clause) -> "and_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_alternate_record_key_clause) -> "alternate_record_key_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_alter_statement) -> "alter_statement"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_alphanum) -> "<alphanumeric literal>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_alphabet_specification) -> "alphabet_specification"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_alphabet_name_clause) -> "alphabet_name_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_allocate_statement) -> "allocate_statement"
@@ -3114,7 +3114,6 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_HIGHEST_VALUE -> (fun _ -> "HIGHEST_VALUE")
   | MenhirInterpreter.T T_HIGH -> (fun _ -> "HIGH")
   | MenhirInterpreter.T T_HIDDEN_DATA -> (fun _ -> "HIDDEN_DATA")
-  | MenhirInterpreter.T T_HEXLIT -> (fun _ -> "HEXLIT")
   | MenhirInterpreter.T T_HEX -> (fun _ -> "HEX")
   | MenhirInterpreter.T T_HELP_ID -> (fun _ -> "HELP_ID")
   | MenhirInterpreter.T T_HEIGHT_IN_CELLS -> (fun _ -> "HEIGHT_IN_CELLS")
@@ -4649,6 +4648,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_and_clause -> (fun _ -> "and_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_alternate_record_key_clause -> (fun _ -> "alternate_record_key_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_alter_statement -> (fun _ -> "alter_statement")
+  | MenhirInterpreter.N MenhirInterpreter.N_alphanum -> (fun _ -> "<alphanumeric literal>")
   | MenhirInterpreter.N MenhirInterpreter.N_alphabet_specification -> (fun _ -> "alphabet_specification")
   | MenhirInterpreter.N MenhirInterpreter.N_alphabet_name_clause -> (fun _ -> "alphabet_name_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_allocate_statement -> (fun _ -> "allocate_statement")
@@ -5444,7 +5444,6 @@ let print_token = function
   | HIGHEST_VALUE -> print_value (MenhirInterpreter.T T_HIGHEST_VALUE) ()
   | HIGH -> print_value (MenhirInterpreter.T T_HIGH) ()
   | HIDDEN_DATA -> print_value (MenhirInterpreter.T T_HIDDEN_DATA) ()
-  | HEXLIT v -> print_value (MenhirInterpreter.T T_HEXLIT) v
   | HEX -> print_value (MenhirInterpreter.T T_HEX) ()
   | HELP_ID -> print_value (MenhirInterpreter.T T_HELP_ID) ()
   | HEIGHT_IN_CELLS -> print_value (MenhirInterpreter.T T_HEIGHT_IN_CELLS) ()
@@ -6803,7 +6802,6 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_HIGHEST_VALUE -> HIGHEST_VALUE
   | T_HIGH -> HIGH
   | T_HIDDEN_DATA -> HIDDEN_DATA
-  | T_HEXLIT -> HEXLIT v
   | T_HEX -> HEX
   | T_HELP_ID -> HELP_ID
   | T_HEIGHT_IN_CELLS -> HEIGHT_IN_CELLS

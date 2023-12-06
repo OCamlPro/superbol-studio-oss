@@ -262,7 +262,7 @@ let decode_symbolic_ebcdics' ~quotation w =
             acc_error ~loc:~@t "Unexpected@ character:@ `%c'" c
       end
   in
-  Grammar_tokens.ALPHANUM (str, quotation) &@<- w, diags
+  Grammar_tokens.ALPHANUM { str; quotation; hexadecimal = false } &@<- w, diags
 
 (* include Make (Text_keywords) *)
 

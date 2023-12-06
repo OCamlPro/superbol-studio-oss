@@ -895,9 +895,9 @@ let of_string config str =
     | Some set ->
         let violations = Symbols.inter set acc.seen in
         if Symbols.is_empty violations then Ok acc else
-          Result.error @@ Symbols.fold (fun s acc ->
-              with_error acc loc (Symbols_are_mutually_exclusive (symbols.symbol, s))
-            ) violations acc
+          Result.error @@ Symbols.fold begin fun s acc ->
+            with_error acc loc (Symbols_are_mutually_exclusive (symbols.symbol, s))
+          end violations acc
 
   and check acc ~loc category' pic idx suff =
     match category' with
@@ -920,12 +920,13 @@ let of_string config str =
   let loc = (0, len) in
   (* Last remaining checks; global checks should come here. *)
   let acc = match pic with
-    | [] ->
+    | [] when acc.errors = [] ->
         with_error acc loc Empty_picture_string
     | _ when len > config.max_pic_length ->
-        with_error acc loc
-          (Picture_length_exceeds_limit (len, config.max_pic_length))
-    | _ -> acc
+        with_error acc loc @@
+        Picture_length_exceeds_limit (len, config.max_pic_length)
+    | _ ->
+        acc
   in
 
   let acc = match acc.exp_sequence with                       (* (E+ check) *)

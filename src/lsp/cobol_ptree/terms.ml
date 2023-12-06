@@ -55,20 +55,24 @@ type complex_ = [ `Complex ]
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
 
-type alphanum_kind =
-  | Squote (* '...' *)
-  | Dquote (* "..." *)
-  | Hex (* X"..." *)
+type alphanum_quote =
+  | Simple_quote (* '...' *)
+  | Double_quote (* "..." *)
 [@@deriving ord]
 
-type alphanum_string = string * alphanum_kind
+type alphanum_string =
+  {
+    str: string;
+    quotation: alphanum_quote;
+    hexadecimal: bool;
+  }
 [@@deriving ord]
 
-let pp_alphanum_string ppf (s, k) =
-  match k with
-  | Squote -> Fmt.pf ppf "'%s'" s
-  | Dquote -> Fmt.pf ppf "\"%s\"" s
-  | Hex -> Fmt.pf ppf "X\"%s\"" s
+let pp_alphanum_string ppf { hexadecimal; quotation; str } =
+  if hexadecimal then Fmt.char ppf 'X';
+  match quotation with
+  | Simple_quote -> Fmt.pf ppf "'%s'" str
+  | Double_quote -> Fmt.pf ppf "\"%s\"" str
 
 (** Now comes the type of all/most terms *)
 type _ term =

@@ -44,7 +44,6 @@ class ['a] folder = object
   method fold_sign: (sign, 'a) fold = default
   method fold_signz: (signz, 'a) fold = default
   method fold_boolean: (boolean, 'a) fold = default
-  method fold_alphanum_string: (alphanum_string, 'a) fold = default
   method fold_alphanum: (alphanum, 'a) fold = default
   method fold_national: (national, 'a) fold = default
   (* method fold_strlit_figurative: (strlit_ figurative, 'a) fold = default *)
@@ -105,14 +104,8 @@ let fold_integer' (v: _ #folder) =
 let fold_integer'_opt (v: _ #folder) = fold_option ~fold:fold_integer' v
 
 let fold_boolean (v: _ #folder) = leaf v#fold_boolean
-
-let fold_alphanum (v: _ #folder) =
-  handle v#fold_alphanum ~continue:(fun (Alphanum s) ->
-    handle v#fold_alphanum_string ~continue:(fun (s, _) ->
-      fold_string v s) s)
-
-let fold_national (v: _ #folder) =
-  handle v#fold_national ~continue:(fun (National s) -> fold_string v s)
+let fold_alphanum (v: _ #folder) = leaf v#fold_alphanum
+let fold_national (v: _ #folder) = leaf v#fold_national
 
 let fold_counter (v: _ #folder) =
   handle v#fold_counter

@@ -39,6 +39,13 @@ let dummy_qualident =
 let dummy_ident =
   QualIdent dummy_qualident
 
+let dummy_alphanum_string =
+  {
+    str = "_";
+    quotation = Double_quote;
+    hexadecimal = false;
+  }
+
 let dummy_expr =
   Atom (Fig Zero)
 

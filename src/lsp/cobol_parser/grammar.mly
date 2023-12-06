@@ -2210,9 +2210,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
   | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
 
-let alphanum ==             (* TODO: attach interpretation (hex, etc) into AST *)
- | a = ALPHANUM; { fst a, (match snd a with Apostrophe -> Squote | Quote -> Dquote ) }
- | h = HEXLIT;   { h, Hex }
+let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
+  | ~ = ALPHANUM; < >
 
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}

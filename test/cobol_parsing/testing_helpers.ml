@@ -26,7 +26,9 @@ module Make (Tags: TAGS) = struct
     let qualident x : qualident =
       { ident_name = name x; ident_subscripts = [] }
     let ident x : ident_or_literal = QualIdent (qualident x)
-    let strlit l : ident_or_literal = Alphanum (l, Dquote)
+    let strlit str : ident_or_literal =
+      Alphanum { str; quotation = Double_quote; hexadecimal = false }
+
   end
 
   module Cond = struct

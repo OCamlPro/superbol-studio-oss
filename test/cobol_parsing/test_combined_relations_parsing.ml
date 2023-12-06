@@ -31,13 +31,16 @@ and fail_condition toks =
 ;;
 
 let test_conditions =
+  let alphanum str =
+    ALPHANUM { str; quotation = Double_quote; hexadecimal = false }
+  in
   let chk descr toks cond =
     test_case descr `Quick (fun () -> check_condition toks cond)
   and fail descr toks =
     test_case (descr^" {fail}") `Quick (fun () -> fail_condition toks)
   in
   let a = WORD "A" and b = WORD "B" and c = WORD "C" and d = WORD "D"
-  and a_ = ALPHANUM ("a", Quote) and b_ = ALPHANUM ("b", Quote)
+  and a_ = alphanum "a" and b_ = alphanum "b"
   and ac = Cond.ident "A" and bc = Cond.ident "B"
   and cc = Cond.ident "C"
   and ae = Term.ident "A" and be = Term.ident "B"

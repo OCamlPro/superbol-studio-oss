@@ -587,7 +587,7 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
       | ALPHANUM _ | ALPHANUM_PREFIX _ ->
           Some (TOKTYP.string, TOKMOD.none)
       | BOOLIT _
-      | HEXLIT _ | NULLIT _
+      | NULLIT _
       | NATLIT _ | SINTLIT _
       | FIXEDLIT _ | FLOATLIT _
       | DIGITS _

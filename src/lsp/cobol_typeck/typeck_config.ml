@@ -66,22 +66,26 @@ let special_names_clause_folder = object
     | DecimalPointIsComma ->
         new_config acc
           { config with unit_decimal_point = ',' }
-    | CurrencySign { sign = (Alphanum (s, _) | National s);
+    (* CHECKME: are hexadecimal-alphanums allowed? *)
+    | CurrencySign { sign = (Alphanum { str; _ } | National str);
                      picture_symbol = None }
-    | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
-      when String.length s != 1 ->
-        error acc (Invalid_picture_symbol (s &@ loc))
-    | CurrencySign { sign = Alphanum (s, _) | National s;
+    | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                            National str); _ }
+      when String.length str != 1 ->
+        error acc (Invalid_picture_symbol (str &@ loc))
+    | CurrencySign { sign = Alphanum { str; _ } | National str;
                      picture_symbol = None }
-    | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
-      when not (valid_picture_symbol s.[0]) ->
-        error acc (Invalid_picture_symbol (String.sub s 0 1 &@ loc))
-    | CurrencySign { sign = Alphanum (s, _) | National s;
+    | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                            National str); _ }
+      when not (valid_picture_symbol str.[0]) ->
+        error acc (Invalid_picture_symbol (String.sub str 0 1 &@ loc))
+    | CurrencySign { sign = Alphanum { str; _ } | National str;
                      picture_symbol = None }
-    | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ } ->
+    | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                            National str); _ } ->
         new_config acc
-          { config with
-            unit_currency_signs = CharSet.add s.[0] config.unit_currency_signs }
+          { config with unit_currency_signs =
+                          CharSet.add str.[0] config.unit_currency_signs }
     | _ ->                                             (* TODO: other clauses? *)
         acc
 end
