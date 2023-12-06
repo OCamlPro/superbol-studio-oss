@@ -184,10 +184,9 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
             refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs }
       | exception Not_found ->
           acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
-      | exception Cobol_unit.Qualmap.Ambiguous matching_qns ->
-          error acc @@
-          Ambiguous_data_name { given_qualname = qn &@ loc;
-                                matching_qualnames = Lazy.force matching_qns }
+      | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+          error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
+                                             matching_qualnames }
 
     method! fold_procedure_name' ({ loc; _ } as qn) acc =
       Visitor.skip_children @@
@@ -197,10 +196,9 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
             refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
       | exception Not_found ->
           error acc @@ Unknown_proc_name qn
-      | exception Cobol_unit.Qualmap.Ambiguous matching_qns ->
-          error acc @@
-          Ambiguous_proc_name { given_qualname = qn;
-                                matching_qualnames = Lazy.force matching_qns }
+      | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+          error acc @@ Ambiguous_proc_name { given_qualname = qn;
+                                             matching_qualnames }
 
   end in
 

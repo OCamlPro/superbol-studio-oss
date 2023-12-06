@@ -1,13 +1,14 @@
 %{
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (c) 2021-2023 OCamlPro SAS                                  *)
+(*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  All rights reserved.                                                  *)
-(*  This file is distributed under the terms of the GNU Lesser General    *)
-(*  Public License version 2.1, with the special exception on linking     *)
-(*  described in the LICENSE.md file in the root directory.               *)
+(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
 (*                                                                        *)
+(* All rights reserved.                                                   *)
+(* This source code is licensed under the GNU Affero General Public       *)
+(* License version 3 found in the LICENSE.md file in the root directory   *)
+(* of this source tree.                                                   *)
 (*                                                                        *)
 (**************************************************************************)
 
@@ -68,31 +69,7 @@ let dual_handler_none =
 (* --- Recovery helpers --- *)
 
 %[@recovery.header
-  open Cobol_common.Srcloc.INFIX
-
-  let dummy_loc =
-    Grammar_utils.Overlay_manager.(join_limits (dummy_limit, dummy_limit))
-
-  let dummy_string = "_" &@ dummy_loc
-  let dummy_name = dummy_string
-
-  let dummy_qualname: Cobol_ptree.qualname =
-    Cobol_ptree.Name dummy_name
-
-  let dummy_qualident =
-    Cobol_ptree.{ ident_name = dummy_qualname;
-                  ident_subscripts = [] }
-
-  let dummy_ident =
-    Cobol_ptree.QualIdent dummy_qualident
-
-  let dummy_expr =
-    Cobol_ptree.Atom (Fig Zero)
-
-  let dummy_picture =
-    Cobol_ptree.{ picture = "X" &@ dummy_loc;
-                  picture_locale = None;
-                  picture_depending = None }
+  open Cobol_ptree.Dummies
 ]
 
 %nonassoc lowest
@@ -2070,9 +2047,11 @@ let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
- | n = name; %prec lowest           {Name n: qualname}
- | n = name; in_of; qdn = qualname; {Qual (n, qdn)}
+let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
+ | n = name; %prec lowest            {Name n: qualname}
+ | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
+let qualname ==
+ | qn = qualname_; { Cobol_ptree.Dummies.strip_dummies_from_qualname qn }
 let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
@@ -2087,11 +2066,11 @@ let literal_int_ident :=
 
 let procedure_name_decl :=
  | ~ = loc(WORD_IN_AREA_A); < >
- | ~ = procedure_name;      < >
+ | ~ = name;                < >
+ | ~ = literal_int_ident;   < >
 
-let procedure_name := (* Can be present in paragraph or section name and level number *)
- | ~ = name;              < >
- | ~ = literal_int_ident; < >
+let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] :=
+ | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=
  | qdn = qualname;                 { qdn }
@@ -2727,8 +2706,8 @@ let cs_alphanumeric := FOR; ALPHANUMERIC; IS?; ~ = name; < >
 let cs_national := FOR; NATIONAL; IS?; ~ = name; < >
 
 let output_or_giving :=
-  | OUTPUT; PROCEDURE; IS?; i = loc(qualified_procedure_name);
-    io = ro(pf(THROUGH, loc(qualified_procedure_name)));
+  | OUTPUT; PROCEDURE; IS?; i = procedure_name;
+    io = ro(pf(THROUGH, procedure_name));
    { OutputProcedure { procedure_start = i; procedure_end = io } }
  | GIVING; ~ = names; <Giving>
 
@@ -2854,8 +2833,8 @@ let allocate_statement [@context allocate_stmt] :=
 
 %public let unconditional_action := ~ = alter_statement; < >
 let alter_statement :=
-  | ALTER; ~ = l(loc(i1 = loc(qualified_procedure_name); TO; o(PROCEED; TO);
-                     i2 = loc(qualified_procedure_name);
+  | ALTER; ~ = l(loc(i1 = procedure_name; TO; o(PROCEED; TO);
+                     i2 = procedure_name;
                      { { alter_source = i1; alter_target = i2 } })); <Alter>
 
 
@@ -3163,9 +3142,9 @@ let generate_statement :=
 
 %public let unconditional_action := ~ = go_to_statement; < >
 let go_to_statement :=
- | GO; TO?; i = loc(qualified_procedure_name);
+ | GO; TO?; i = procedure_name;
    { GoTo { goto_target = i } }
- | GO; TO?; il = nel_(loc(qualified_procedure_name));
+ | GO; TO?; il = nel_(procedure_name);
    DEPENDING; ON?; i = ident;
    { GoToDepending { goto_depending_targets = il;
                      goto_depending_on = i; } }
@@ -3404,8 +3383,8 @@ let reversed_or_no_rewind_opt :=
 
 %public let unconditional_action := ~ = perform_statement; < >
 let perform_statement :=
- | PERFORM; i = loc(qualified_procedure_name);
-   io = ro(pf(THROUGH, loc(qualified_procedure_name)));
+ | PERFORM; i = procedure_name;
+   io = ro(pf(THROUGH, procedure_name));
    po = io(perform_phrase);
    { PerformTarget { perform_target = { procedure_start = i;
                                         procedure_end = io };
@@ -3510,8 +3489,8 @@ let release_statement :=
 
 %public let unconditional_action := ~ = resume_statement; <Resume>
 let resume_statement [@context resume_stmt] :=
- | RESUME; AT?; NEXT; STATEMENT;                   { ResumeNextStatement }
- | RESUME; AT?; i = loc(qualified_procedure_name); { ResumeTarget i }
+ | RESUME; AT?; NEXT; STATEMENT;              { ResumeNextStatement }
+ | RESUME; AT?; i = procedure_name; { ResumeTarget i }
 
 
 
@@ -3761,8 +3740,8 @@ let sort_statement :=
 (* COB2002 also has an alternate more restricted form for tables *)
 
 let input_or_using :=
- | INPUT; PROCEDURE; IS?; i = loc(qualified_procedure_name);
-   io = ro(pf(THROUGH, loc(qualified_procedure_name)));
+ | INPUT; PROCEDURE; IS?; i = procedure_name;
+   io = ro(pf(THROUGH, procedure_name));
    { SortInputProcedure { procedure_start = i; procedure_end = io } }
  | USING; names = names;
    { SortUsing names }
@@ -3968,7 +3947,7 @@ let use_after_exception :=
 
 let debug_target :=
   | all = bo(ALL; REFERENCES?; OF?);
-    procedure = loc(qualified_procedure_name);
+    procedure = procedure_name;
    { UseForDebuggingProcedure { all; procedure } }
  | ALL; PROCEDURES;
    { UseForDebuggingAllProcedures }

@@ -445,6 +445,9 @@ let copy ~filename ~copyloc copied : srcloc =
 let replacement ~old ~new_ ~in_area_a ~replloc : srcloc =
   Rpl { old; new_; in_area_a; replloc }
 
+let dummy =
+  raw Lexing.(dummy_pos, dummy_pos)
+
 (** {2 Composition & truncation} *)
 
 (** [may_join_as_single_raw a b] checks whether a lexloc {i l{_ a}} with a a

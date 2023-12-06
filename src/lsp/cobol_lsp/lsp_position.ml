@@ -85,6 +85,7 @@ let range_of_srcloc_in ~filename srcloc =
 (** [is_in_srcloc ~filename pos srcloc] is a shorthand for [is_in_lexloc pos
     (Srcloc.lexloc_in ~filename srcloc)] *)
 let is_in_srcloc ~filename pos srcloc =
+  srcloc != Srcloc.dummy &&
   is_in_lexloc pos (Srcloc.lexloc_in ~filename srcloc)
 
 (* --- *)

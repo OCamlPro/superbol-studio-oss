@@ -49,7 +49,7 @@ module INTERNAL = struct
       list of tokens *)
   module Dummy = struct
     module Tags = struct
-      let loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)
+      let loc = Cobol_common.Srcloc.dummy
     end
 
     let parse_as item toks =

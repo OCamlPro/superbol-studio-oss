@@ -450,3 +450,52 @@ let%expect_test "definition-ambiguous-section/paragraphs" =
   |cobol};
   end_with_postproc [%expect.output];
   [%expect {| {"params":{"diagnostics":[{"message":"Ambiguous procedure-name 'SUB-1'; known matching names are 'SUB-1 IN MISC', 'SUB-1 IN MAIN'","range":{"end":{"character":23,"line":8},"start":{"character":18,"line":8}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;
+
+
+
+let%expect_test "definition-malformed-qualifiers" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+       MAIN SECTION.
+           GO TO _|1-a|_A IN
+           PERFORM _|1-s|_S IN
+           PERFORM _|2-s|_S IN_|3-s|_ IN M_|4-main|_AIN
+           PERFORM _|5-s|_IN S_|6-s|_.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Unknown procedure-name 'S'","range":{"end":{"character":23,"line":7},"start":{"character":22,"line":7}},"severity":1},{"message":"Unknown procedure-name 'S IN MAIN'","range":{"end":{"character":31,"line":6},"start":{"character":19,"line":6}},"severity":1},{"message":"Unknown procedure-name 'S'","range":{"end":{"character":23,"line":5},"start":{"character":19,"line":5}},"severity":1},{"message":"Unknown procedure-name 'A'","range":{"end":{"character":21,"line":4},"start":{"character":17,"line":4}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":21,"line":7},"start":{"character":19,"line":7}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":26,"line":6},"start":{"character":24,"line":6}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":18,"line":6},"start":{"character":11,"line":6}},"severity":1},{"message":"Missing <qualified name>","range":{"end":{"character":23,"line":5},"start":{"character":23,"line":5}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":5},"start":{"character":11,"line":5}},"severity":1},{"message":"Missing <qualified name>","range":{"end":{"character":21,"line":4},"start":{"character":21,"line":4}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-a (line 4, character 17):
+    {"params":{"message":"Unknown procedure-name 'A'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    No definition found
+    1-s (line 5, character 19):
+    {"params":{"message":"Unknown procedure-name 'S'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    No definition found
+    2-s (line 6, character 19):
+    {"params":{"message":"Unknown procedure-name 'S IN MAIN'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    No definition found
+    3-s (line 6, character 23):
+    __rootdir__/prog.cob:4.7-4.11:
+       1
+       2          PROGRAM-ID. prog.
+       3          PROCEDURE DIVISION.
+       4 >        MAIN SECTION.
+    ----          ^^^^
+       5              GO TO A IN
+       6              PERFORM S IN
+    4-main (line 6, character 28):
+    __rootdir__/prog.cob:4.7-4.11:
+       1
+       2          PROGRAM-ID. prog.
+       3          PROCEDURE DIVISION.
+       4 >        MAIN SECTION.
+    ----          ^^^^
+       5              GO TO A IN
+       6              PERFORM S IN
+    5-s (line 7, character 19):
+    No definition found
+    6-s (line 7, character 23):
+    {"params":{"message":"Unknown procedure-name 'S'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    No definition found |}];;

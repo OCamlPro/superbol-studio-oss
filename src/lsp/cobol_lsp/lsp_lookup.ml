@@ -86,11 +86,13 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
   | Name _ ->
       qn
   | Qual (name, qn') ->
-      let lexloc = lexloc_of_qualname_in ~filename qn in
-      if not (Lsp_position.is_after_lexloc pos lexloc) &&
-         not (Lsp_position.is_in_srcloc ~filename pos ~@name)
-      then qualname_at_pos ~filename qn' pos
-      else qn
+      try
+        let lexloc = lexloc_of_qualname_in ~filename qn in
+        if not (Lsp_position.is_after_lexloc pos lexloc) &&
+           not (Lsp_position.is_in_srcloc ~filename pos ~@name)
+        then qualname_at_pos ~filename qn' pos
+        else qn
+      with Invalid_argument _ -> qn                               (* dummy loc *)
 
 (* --- *)
 

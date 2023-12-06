@@ -57,6 +57,7 @@ val replacement
   -> in_area_a: bool
   -> replloc: srcloc
   -> srcloc
+val dummy: srcloc
 
 val forget_preproc
   : favor_direction:[`Left | `Right]

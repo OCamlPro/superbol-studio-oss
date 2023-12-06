@@ -8,6 +8,7 @@
     ok_redefines  ko_redefines
     ok_conditions ko_conditions
                   ko_proc_names
+                  ko_syntax
     prog_printer)
  (preprocess
   (pps ppx_expect))

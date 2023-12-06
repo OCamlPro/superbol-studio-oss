@@ -1507,7 +1507,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_USING_name__) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_TO_loc_integer___) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_string_or_int_literal__) -> ""
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_loc_qualified_procedure_name___) -> ""
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_procedure_name__) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_REMAINDER_ident__) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_POSITION_integer__) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_ro_pf_ON_name__) -> ""
@@ -1670,7 +1670,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname_or_literal) -> "qualname_or_literal"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname_or_integer) -> "qualname_or_integer"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname_or_alphanum) -> "qualname_or_alphanum"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname) -> "<qualified name>"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualname_) -> "<qualified name>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_qualified_procedure_name) -> "qualified_procedure_name"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_purge_statement) -> "purge_statement"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_property_clause) -> "property_clause"
@@ -1684,7 +1684,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_program_definition) -> "program_definition"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_program_collating_sequence_clause) -> "program_collating_sequence_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_procedure_name_decl) -> "procedure_name_decl"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_procedure_name) -> "procedure_name"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_procedure_name) -> "<procedure name>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_procedure_division) -> "procedure_division"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_present_when_clause) -> "present_when_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_position) -> "position"
@@ -1738,7 +1738,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_USING_name__) -> "option_pf_USING_name__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_TO_loc_integer___) -> "option_pf_TO_loc_integer___"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_string_or_int_literal__) -> "option_pf_THROUGH_string_or_int_literal__"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_loc_qualified_procedure_name___) -> "option_pf_THROUGH_loc_qualified_procedure_name___"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_procedure_name__) -> "option_pf_THROUGH_procedure_name__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_REMAINDER_ident__) -> "option_pf_REMAINDER_ident__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_POSITION_integer__) -> "option_pf_POSITION_integer__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_option_pf_ON_name__) -> "option_pf_ON_name__"
@@ -1894,7 +1894,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nell_rev_loc_result_imperative_statement__) -> "nell_rev_loc_result_imperative_statement__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nell_rev_loc_when_clause__) -> "nell_rev_loc_when_clause__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nell_rev___anonymous_70_) -> "nell_rev___anonymous_70_"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nel__loc_qualified_procedure_name__) -> "nel__loc_qualified_procedure_name__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nel__procedure_name_) -> "nel__procedure_name_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nel_when_selection_objects_) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nel_validation_stage_) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_nel_use_after_exception_) -> ""
@@ -3838,7 +3838,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_USING_name__ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_TO_loc_integer___ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_string_or_int_literal__ -> (fun _ -> "")
-  | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_loc_qualified_procedure_name___ -> (fun _ -> "")
+  | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_THROUGH_procedure_name__ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_REMAINDER_ident__ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_POSITION_integer__ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_ro_pf_ON_name__ -> (fun _ -> "")
@@ -4001,7 +4001,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_qualname_or_literal -> (fun _ -> "qualname_or_literal")
   | MenhirInterpreter.N MenhirInterpreter.N_qualname_or_integer -> (fun _ -> "qualname_or_integer")
   | MenhirInterpreter.N MenhirInterpreter.N_qualname_or_alphanum -> (fun _ -> "qualname_or_alphanum")
-  | MenhirInterpreter.N MenhirInterpreter.N_qualname -> (fun _ -> "<qualified name>")
+  | MenhirInterpreter.N MenhirInterpreter.N_qualname_ -> (fun _ -> "<qualified name>")
   | MenhirInterpreter.N MenhirInterpreter.N_qualified_procedure_name -> (fun _ -> "qualified_procedure_name")
   | MenhirInterpreter.N MenhirInterpreter.N_purge_statement -> (fun _ -> "purge_statement")
   | MenhirInterpreter.N MenhirInterpreter.N_property_clause -> (fun _ -> "property_clause")
@@ -4015,7 +4015,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_program_definition -> (fun _ -> "program_definition")
   | MenhirInterpreter.N MenhirInterpreter.N_program_collating_sequence_clause -> (fun _ -> "program_collating_sequence_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_procedure_name_decl -> (fun _ -> "procedure_name_decl")
-  | MenhirInterpreter.N MenhirInterpreter.N_procedure_name -> (fun _ -> "procedure_name")
+  | MenhirInterpreter.N MenhirInterpreter.N_procedure_name -> (fun _ -> "<procedure name>")
   | MenhirInterpreter.N MenhirInterpreter.N_procedure_division -> (fun _ -> "procedure_division")
   | MenhirInterpreter.N MenhirInterpreter.N_present_when_clause -> (fun _ -> "present_when_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_position -> (fun _ -> "position")
@@ -4069,7 +4069,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_USING_name__ -> (fun _ -> "option_pf_USING_name__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_TO_loc_integer___ -> (fun _ -> "option_pf_TO_loc_integer___")
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_string_or_int_literal__ -> (fun _ -> "option_pf_THROUGH_string_or_int_literal__")
-  | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_loc_qualified_procedure_name___ -> (fun _ -> "option_pf_THROUGH_loc_qualified_procedure_name___")
+  | MenhirInterpreter.N MenhirInterpreter.N_option_pf_THROUGH_procedure_name__ -> (fun _ -> "option_pf_THROUGH_procedure_name__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_REMAINDER_ident__ -> (fun _ -> "option_pf_REMAINDER_ident__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_POSITION_integer__ -> (fun _ -> "option_pf_POSITION_integer__")
   | MenhirInterpreter.N MenhirInterpreter.N_option_pf_ON_name__ -> (fun _ -> "option_pf_ON_name__")
@@ -4225,7 +4225,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_nell_rev_loc_result_imperative_statement__ -> (fun _ -> "nell_rev_loc_result_imperative_statement__")
   | MenhirInterpreter.N MenhirInterpreter.N_nell_rev_loc_when_clause__ -> (fun _ -> "nell_rev_loc_when_clause__")
   | MenhirInterpreter.N MenhirInterpreter.N_nell_rev___anonymous_70_ -> (fun _ -> "nell_rev___anonymous_70_")
-  | MenhirInterpreter.N MenhirInterpreter.N_nel__loc_qualified_procedure_name__ -> (fun _ -> "nel__loc_qualified_procedure_name__")
+  | MenhirInterpreter.N MenhirInterpreter.N_nel__procedure_name_ -> (fun _ -> "nel__procedure_name_")
   | MenhirInterpreter.N MenhirInterpreter.N_nel_when_selection_objects_ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_nel_validation_stage_ -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_nel_use_after_exception_ -> (fun _ -> "")

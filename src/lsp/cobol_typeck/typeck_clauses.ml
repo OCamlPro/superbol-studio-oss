@@ -106,15 +106,16 @@ let on_value_clause acc clause =
 
 let on_redefines_clause acc =
   on_unique_clause ~clause_name:"REDEFINES" acc.redefines acc
-    ~f:(fun acc clause ->
-        let acc =
-          if acc != init_clauses then (* note: hackish use of physical equality *)
-            register_used_feature acc
-              ~feature:Cobol_config.Options.free_redefines_position
-              ~loc:~@clause
-          else acc
-        in
-        { acc with redefines = Some ~&clause })
+    ~f:begin fun acc clause ->
+      let acc =
+        if acc != init_clauses then  (* note: hackish use of physical equality *)
+          register_used_feature acc
+            ~feature:Cobol_config.Options.free_redefines_position
+            ~loc:~@clause
+        else acc
+      in
+      { acc with redefines = Some ~&clause }
+    end
 
 
 let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
