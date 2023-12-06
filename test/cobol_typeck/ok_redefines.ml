@@ -294,3 +294,100 @@ let%expect_test "occurs-n-redefines-2" =
         }
       }
     } |}];;
+
+
+let%expect_test "redefines-index" =
+  (* Note: GnuCOBOL accepts this.  But should it really?  *)
+  dotest @@ prog "redefines-index"
+    ~working_storage:{|
+       01 XX INDEX.
+         02 X.
+         02 Y REDEFINES X.
+       01 YY REDEFINES XX PIC 9(4).
+    |}
+    ~procedure:{|
+       MAIN.
+           DISPLAY X
+           DISPLAY YY.
+    |};
+  [%expect {|
+    prog.cob:5.9-5.14:
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4          01 XX INDEX.
+       5 >          02 X.
+    ----            ^^^^^
+       6            02 Y REDEFINES X.
+       7          01 YY REDEFINES XX PIC 9(4).
+    >> Error: Missing PICTURE clause for item 'X'
+
+    prog.cob:6.9-6.26:
+       3          WORKING-STORAGE SECTION.
+       4          01 XX INDEX.
+       5            02 X.
+       6 >          02 Y REDEFINES X.
+    ----            ^^^^^^^^^^^^^^^^^
+       7          01 YY REDEFINES XX PIC 9(4).
+       8          PROCEDURE DIVISION.
+    >> Error: Missing PICTURE clause for item 'Y'
+
+    prog.cob:4.7-7.35:
+       1          PROGRAM-ID. redefines-index.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        01 XX INDEX.
+    ----          ^^^^^^^^^^^^
+       5 >          02 X.
+    ----  ^^^^^^^^^^^^^^^
+       6 >          02 Y REDEFINES X.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       7 >        01 YY REDEFINES XX PIC 9(4).
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9          MAIN.
+    Item definition: {
+      qualname: XX
+      offset: 0
+      size: 1
+      layout: {
+        structure
+        fields: {
+          qualname: X IN XX
+          offset: 0
+          size: 1
+          layout: {
+            elementary
+            usage: {
+              display (dev: temporary)
+              category: ALPHANUMERIC(1)
+            }
+          }
+          redefs: {
+            qualname: Y IN XX
+            redefines: X IN XX
+            offset: 0
+            size: 1
+            layout: {
+              elementary
+              usage: {
+                display (dev: temporary)
+                category: ALPHANUMERIC(1)
+              }
+            }
+          }
+        }
+      }
+      redefs: {
+        qualname: YY
+        redefines: XX
+        offset: 0
+        size: 4
+        layout: {
+          elementary
+          usage: {
+            display (dev: temporary)
+            category: NUMERIC(digits = 4, scale = 0, with_sign = false)
+          }
+        }
+      }
+    } |}];;

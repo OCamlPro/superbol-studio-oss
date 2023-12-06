@@ -32,10 +32,16 @@ let qual name : Cobol_ptree.qualname option -> Cobol_ptree.qualname = function
   | None -> Cobol_ptree.Name name
   | Some qn -> Cobol_ptree.Qual (name, qn)
 
-let rec requal: Cobol_ptree.qualname -> Cobol_ptree.qualname option ->
-  Cobol_ptree.qualname = fun qn qn' -> match qn with
-  | Name name -> qual name qn'
-  | Qual (name, qn) -> Qual (name, requal qn qn')
+(** [requal qn qn'] qualifies [qn] with [qn'] iff [qn] is not already
+    qualified. *)
+let requal: (Cobol_ptree.qualname as 'a) -> 'a option -> 'a = fun qn qn' ->
+  let rec aux (qn: Cobol_ptree.qualname) = match qn with
+    | Name name -> qual name qn'
+    | Qual (name, qn) -> Qual (name, aux qn)
+  in
+  match qn with
+  | Name _ -> aux qn
+  | Qual _ -> qn
 
 let names_of : Cobol_ptree.qualname -> StrSet.t =
   let rec aux acc : Cobol_ptree.qualname -> StrSet.t = function
