@@ -64,13 +64,7 @@ type error =
         redef_name: Cobol_ptree.data_name with_loc option;
         redef_redefines: Cobol_ptree.name with_loc;
         odo_item: (* (_, [>`variable_length])  *)Cobol_data.Types.item_definition with_loc;
-      }
-  | Redefinition_of_table_item of
-      {
-        redef_loc: srcloc;
-        redef_name: Cobol_ptree.data_name with_loc option;
-        redef_redefines: Cobol_ptree.name with_loc;
-        table_item: (* ([>`table], _)  *)Cobol_data.Types.item_definition with_loc;
+        (* odo_item_name: Cobol_ptree.qualname with_loc option; *)
       }
   | Missing_picture_clause_for_elementary_item of
       {
@@ -126,6 +120,14 @@ type error =
       }
 
 and warning =
+  | Redefinition_of_table_item of     (* in GnuCOBOL that's a warning as well *)
+      {
+        redef_loc: srcloc;
+        redef_name: Cobol_ptree.data_name with_loc option;
+        redef_redefines: Cobol_ptree.name with_loc;
+        table_item_name: Cobol_ptree.qualname with_loc option;
+        (* table_item: (\* ([>`table], _)  *\)Cobol_data.Types.item_definition with_loc; *)
+      }
   | Extraneous_clause of
       {
         clause_name: string;
@@ -154,7 +156,6 @@ let error_loc = function
   | Pending_feature { loc; _ }
   | Picture_error { error = { loc; _ }; _ }
   | Redefinition_of_ODO_item { redef_loc = loc; _ }
-  | Redefinition_of_table_item { redef_loc = loc; _ }
   | Unexpected_level_number { level = { loc; _ }; _ }
   | Unexpected_picture_clause_for_group_item { picture = { loc; _ }; _ }
   | Unexpected_redefinition_level { redef_level = { loc; _ }; _ }
@@ -163,6 +164,7 @@ let error_loc = function
       Some loc
 
 let warning_loc = function
+  | Redefinition_of_table_item { redef_loc = loc; _ }
   | Extraneous_clause { clause_loc = loc; _ } ->
       Some loc
 
@@ -201,9 +203,6 @@ let pp_error ppf = function
       Pretty.print ppf "Invalid redefinition of record with subordinate OCCURS \
                         DEPENDING%a"
         Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) ~&odo_item.item_qualname
-  | Redefinition_of_table_item { table_item; _ } ->
-      Pretty.print ppf "Invalid redefinition of item with OCCURS clause%a"
-        Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) ~&table_item.item_qualname
   | Missing_picture_clause_for_elementary_item { item_name; _ } ->
       Pretty.print ppf "Missing PICTURE clause for %a"
         pp_data_name'_opt item_name
@@ -232,5 +231,8 @@ let pp_error ppf = function
       Pretty.print ppf "%s is not supported yet" name
 
 let pp_warning ppf = function
+  | Redefinition_of_table_item { table_item_name; _ } ->
+      Pretty.print ppf "Redefinition of item with OCCURS clause%a"
+        Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) table_item_name
   | Extraneous_clause { clause_name; _ } ->
       Pretty.print ppf "Extraneous %s clause" clause_name

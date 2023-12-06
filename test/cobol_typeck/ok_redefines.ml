@@ -130,8 +130,8 @@ let%expect_test "qualified-redefines-occurs" =
       }
     } |}];;
 
-let%expect_test "occurs-n-redefines" =
-  dotest @@ prog "occurs-n-redefines"
+let%expect_test "occurs-n-redefines-1" =
+  dotest @@ prog "occurs-n-redefines-1"
     ~working_storage:{|
        01 W.
          02 A OCCURS 5 TIMES PIC X VALUE "A".
@@ -142,8 +142,18 @@ let%expect_test "occurs-n-redefines" =
            DISPLAY A (1) "/" B.
     |};
   [%expect {|
+    prog.cob:6.9-6.35:
+       3          WORKING-STORAGE SECTION.
+       4          01 W.
+       5            02 A OCCURS 5 TIMES PIC X VALUE "A".
+       6 >          02 B REDEFINES A PIC X(5).
+    ----            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+       7          PROCEDURE DIVISION.
+       8          MOVE "BCDEF" TO B
+    >> Warning: Redefinition of item with OCCURS clause A IN W
+
     prog.cob:4.7-6.35:
-       1          PROGRAM-ID. occurs-n-redefines.
+       1          PROGRAM-ID. occurs-n-redefines-1.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
        4 >        01 W.
@@ -190,6 +200,94 @@ let%expect_test "occurs-n-redefines" =
               usage: {
                 display (dev: temporary)
                 category: ALPHANUMERIC(5)
+              }
+            }
+          }
+        }
+      }
+    } |}];;
+
+let%expect_test "occurs-n-redefines-2" =
+  dotest @@ prog "occurs-n-redefines-2"
+    ~working_storage:{|
+       01 W.
+         02 A PIC X OCCURS 2 TIMES.
+       01 X REDEFINES W.
+         02 B PIC X.
+         02 C PIC X.
+    |};
+  [%expect {|
+    prog.cob:4.7-8.20:
+       1          PROGRAM-ID. occurs-n-redefines-2.
+       2          DATA DIVISION.
+       3          WORKING-STORAGE SECTION.
+       4 >        01 W.
+    ----          ^^^^^
+       5 >          02 A PIC X OCCURS 2 TIMES.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+       6 >        01 X REDEFINES W.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^^^
+       7 >          02 B PIC X.
+    ----  ^^^^^^^^^^^^^^^^^^^^^
+       8 >          02 C PIC X.
+    ----  ^^^^^^^^^^^^^^^^^^^^^
+       9          PROCEDURE DIVISION.
+      10
+    Item definition: {
+      qualname: W
+      offset: 0
+      size: 2
+      layout: {
+        structure
+        fields: {
+          filler
+          offset: 0
+          size: 2
+          layout: {
+            fixed-length table
+            length: 2
+            items: {
+              qualname: A IN W
+              offset: 0
+              size: 1
+              layout: {
+                elementary
+                usage: {
+                  display (dev: temporary)
+                  category: ALPHANUMERIC(1)
+                }
+              }
+            }
+          }
+        }
+      }
+      redefs: {
+        qualname: X
+        redefines: W
+        offset: 0
+        size: 2
+        layout: {
+          structure
+          fields: {
+            qualname: B IN X
+            offset: 0
+            size: 1
+            layout: {
+              elementary
+              usage: {
+                display (dev: temporary)
+                category: ALPHANUMERIC(1)
+              }
+            }
+          }{
+            qualname: C IN X
+            offset: 1
+            size: 1
+            layout: {
+              elementary
+              usage: {
+                display (dev: temporary)
+                category: ALPHANUMERIC(1)
               }
             }
           }

@@ -579,6 +579,7 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
                                expl = Following "no definition" }
   | { item_level = expected_level;
       item_loc = expected_redefined_loc; _ } as redefined_item :: _, base_stack ->
+      let redefined_qualname = redefined_item.item_qualname in
       let acc =
         if ~&level = expected_level then acc else
           error acc @@
@@ -588,8 +589,7 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
                                           expected_level;
                                           expected_redefined_loc }
       in
-      let acc =
-        match redefined_item.item_qualname with
+      let acc = match redefined_qualname with
         | Some qn
           when ~&redefined_name <> name_of ~&qn ->
             error acc @@
@@ -601,25 +601,30 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
             acc
       in
       let acc =
-        register_ref ~from:redefined_name ~to_:redefined_item.item_qualname acc
+        register_ref ~from:redefined_name ~to_:redefined_qualname acc
+      in
+      let acc =
+        match redefined_item.item_clauses.occurs with
+        | OccursOnce ->                                                  (* ok *)
+            acc
+        | _ ->
+            warn acc @@
+            Redefinition_of_table_item { redef_loc = loc;
+                                         redef_name = name;
+                                         redef_redefines = redefined_name;
+                                         table_item_name = redefined_qualname }
       in
       let acc =
         List.fold_left begin fun acc field_def ->
-          match ~&field_def.item_length, item_def_variant field_def with
-          | Fixed_length, Simple ->
+          match ~&field_def.item_length with
+          | Fixed_length ->
               acc                                                       (* ok *)
-          | Variable_length, Simple ->
+          | Variable_length ->
               error acc @@
               Redefinition_of_ODO_item { redef_loc = loc;
                                          redef_name = name;
                                          redef_redefines = redefined_name;
                                          odo_item = field_def }
-          | _, Table ->                         (* TODO: may just be a warning *)
-              error acc @@
-              Redefinition_of_table_item { redef_loc = loc;
-                                           redef_name = name;
-                                           redef_redefines = redefined_name;
-                                           table_item = field_def }
         end acc redefined_item.item_rev_fields
       in
       let item_redefines = Some (qualify redefined_name base_stack) in
