@@ -29,10 +29,20 @@ module TYPES = struct
       enclosing_compilation_unit_name: string option;
     }
   and element_in_context =
-    | Data_name of Cobol_ptree.qualname
-    | Data_full_name of Cobol_ptree.qualname
-    | Data_item of { full_qn: Cobol_ptree.qualname option; def_loc: srcloc }
-    | Proc_name of Cobol_ptree.qualname
+    | Data_name of
+        Cobol_ptree.qualname
+    | Data_full_name of
+        Cobol_ptree.qualname
+    | Data_item of
+        {
+          full_qn: Cobol_ptree.qualname option;
+          def_loc: srcloc;
+        }
+    | Proc_name of
+        {
+          qn: Cobol_ptree.qualname;
+          in_section: Cobol_unit.Types.procedure_section option;
+        }
 
   type name_definition =
     {
@@ -109,7 +119,7 @@ let element_at_position ~uri pos group : element_at_position =
       }
     and context =
       | Data_decls
-      | Procedure
+      | Procedure of Cobol_unit.Types.procedure_section option
 
     let init =
       {
@@ -137,9 +147,12 @@ let element_at_position ~uri pos group : element_at_position =
     { acc with
       elt = { elt with element_at_position = Some (Data_item { full_qn;
                                                                def_loc }) } }
-  and on_proc_name qn ({ elt; _ } as acc) =
-    { acc with
-      elt = { elt with element_at_position = Some (Proc_name qn) } }
+  and on_proc_name qn ({ elt; context } as acc) =
+    let element_at_position = match context with
+      | Data_decls -> Some (Proc_name { qn; in_section = None })   (* unlikely *)
+      | Procedure in_section -> Some (Proc_name { qn; in_section })
+    in
+    { acc with elt = { elt with element_at_position } }
   in
 
   Cobol_unit.Visitor.fold_unit_group object
@@ -153,8 +166,8 @@ let element_at_position ~uri pos group : element_at_position =
         elt = { elt with enclosing_compilation_unit_name = Some name } }
 
     method! fold_data_definitions _ = enter_context Data_decls
-
-    method! fold_procedure _ = enter_context Procedure
+    method! fold_procedure _ = enter_context (Procedure None)
+    method! fold_procedure_section s = enter_context (Procedure (Some s))
 
     method! fold_item_definition' def acc =
       Visitor.do_children @@ match ~&def.item_qualname with
@@ -180,7 +193,7 @@ let element_at_position ~uri pos group : element_at_position =
       Visitor.skip_children @@ match acc.context with
       | Data_decls ->            (* always fully qualified in data definitions *)
           on_data_full_name qn acc
-      | Procedure ->              (* for now, no more info, data-name expected *)
+      | Procedure _ ->            (* for now, no more info, data-name expected *)
           on_data_name qn acc
 
     method! fold_procedure_name qn acc =

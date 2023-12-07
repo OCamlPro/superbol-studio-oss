@@ -17,6 +17,8 @@ open Cobol_common.Srcloc.TYPES
 
 (* utils *)
 
+(** A type to manage sets of items in both named and ordered form.  Note that in
+    many cases anonymous elements of [list] many not belong to [named]. *)
 type 'a named_n_ordered =
   {
     named: 'a Unit_qualmap.t;
@@ -51,7 +53,7 @@ type procedure_paragraph =
 type procedure_section =
   {
     section_name: Cobol_ptree.procedure_name with_loc;
-    section_paragraphs: procedure_paragraph with_loc list;            (* nel? *)
+    section_paragraphs: procedure_paragraph with_loc named_n_ordered;
   }
 
 type procedure_block =

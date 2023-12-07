@@ -100,10 +100,12 @@ let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
       Lsp_notify.ambiguous "data-name" qn ~matching_qualnames;
       []
 
-let find_proc_definition Lsp_position.{ location_of; _ }
+let find_proc_definition
+    Lsp_position.{ location_of; _ }
     ?(allow_notifications = true)
+    ?(in_section: Cobol_unit.Types.procedure_section option)
     (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
-  match Cobol_unit.Qualmap.find qn cu.unit_procedure.named with
+  match Cobol_unit.Procedure.find ?in_section qn cu.unit_procedure with
   | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
     when focus_on_name_in_defintions ->
       [location_of qn]
@@ -134,8 +136,9 @@ let find_definitions ?allow_notifications loc_translator
         find_data_definition loc_translator ?allow_notifications qn cu
     | Data_item { full_qn = None; def_loc } ->
         [loc_translator.location_of_srcloc def_loc]
-    | Proc_name qn ->
-        find_proc_definition loc_translator ?allow_notifications qn cu
+    | Proc_name { qn; in_section } ->
+        find_proc_definition loc_translator ?allow_notifications ?in_section
+          qn cu
   with Not_found -> []
 
 let lookup_definition_in_doc
@@ -157,14 +160,25 @@ let handle_definition registry (params: DefinitionParams.t) =
 
 (** {3 References} *)
 
-let find_full_qn ~kind qn qmap =
-  try Some (Cobol_unit.Qualmap.find_binding qn qmap).full_qn with
+let lookup_qn ~kind ~lookup qn =
+  try Some (lookup qn) with
   | Not_found ->
       Lsp_notify.unknown kind qn;
       None
   | Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
       Lsp_notify.ambiguous kind qn ~matching_qualnames;
       None
+
+let find_full_qn ~kind qn qmap =
+  lookup_qn ~kind qn
+    ~lookup:(fun qn -> (Cobol_unit.Qualmap.find_binding qn qmap).full_qn)
+
+let find_proc_qn ~kind qn ?in_section cu =
+  lookup_qn ~kind qn
+    ~lookup:begin fun qn ->
+      Cobol_unit.Procedure.full_qn ?in_section qn
+        cu.Cobol_unit.Types.unit_procedure
+    end
 
 let lookup_references_in_doc
     ReferenceParams.{ textDocument = doc; position; context; _ }
@@ -203,9 +217,9 @@ let lookup_references_in_doc
           | Data_name qn ->
               Option.fold ~none:[] ~some:data_refs @@
               find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
-          | Proc_name qn ->
+          | Proc_name { qn; in_section } ->
               Option.fold ~none:[] ~some:proc_refs @@
-              find_full_qn qn ~&cu.unit_procedure.named ~kind:"procedure-name"
+              find_proc_qn qn ?in_section ~&cu ~kind:"procedure-name"
         with Not_found -> []
       in
       Some (def_locs @ ref_locs)

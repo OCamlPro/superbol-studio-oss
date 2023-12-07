@@ -31,9 +31,13 @@ let procedure_of_compilation_unit cu' =
       {
         blocks: procedure_block Qualmap.t;
         block_list: procedure_block list;
-        current_section: section_under_construction option;
+        current_section: section_under_construction with_loc option;
       }
-    and section_under_construction = procedure_section with_loc
+    and section_under_construction =
+      {
+        sec_name: Cobol_ptree.procedure_name with_loc;
+        sec_paragraphs: procedure_paragraph with_loc list;
+      }
 
     let init =
       {
@@ -51,16 +55,26 @@ let procedure_of_compilation_unit cu' =
     let name n : Cobol_ptree.qualname = Name n
     let qual n q : Cobol_ptree.qualname = Qual (n, q)
 
-    let section_block ({ payload = suc; loc }: section_under_construction) =
-      Section ({ suc with
-                 section_paragraphs = List.rev suc.section_paragraphs } &@ loc)
+    let section_block
+        ({ payload = suc; loc }: section_under_construction with_loc) =
+      let section_paragraphs =
+        List.fold_left begin fun ({ named; list } as paragraphs) paragraph ->
+          match ~&paragraph.paragraph_name with
+          | None ->
+              { paragraphs with list = paragraph :: list }
+          | Some qn ->
+              { named = Cobol_unit.Qualmap.add ~&qn paragraph named;
+                list = paragraph :: list }
+        end { named = Cobol_unit.Qualmap.empty; list = [] } suc.sec_paragraphs
+      in
+      Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
 
     let simple_paragraph (p: Cobol_ptree.paragraph with_loc) acc =
       match acc.current_section, ~&p.paragraph_name with
       | None, Some n ->
           { paragraph_name = Some (name n &@<- n);
             paragraph = p } &@<- p
-      | Some { payload = { section_name = qn; _ }; _ }, Some n ->
+      | Some { payload = { sec_name = qn; _ }; _ }, Some n ->
           { paragraph_name = Some (qual n ~&qn &@<- n);
             paragraph = p } &@<- p
       | _, None ->
@@ -72,7 +86,7 @@ let procedure_of_compilation_unit cu' =
 
     let commit_section acc =
       match acc.current_section with
-      | Some ({ payload = { section_name = qn; _ }; _ } as section) ->
+      | Some ({ payload = { sec_name = qn; _ }; _ } as section) ->
           let section = section_block section in
           { blocks = Qualmap.add ~&qn section acc.blocks;
             block_list = section :: acc.block_list;
@@ -82,10 +96,10 @@ let procedure_of_compilation_unit cu' =
 
     let start_new_section n s acc =
       let acc = commit_section acc in
-      let section_paragraphs = [simple_paragraph s acc] in
+      let sec_paragraphs = [simple_paragraph s acc] in
       { acc with
-        current_section = Some ({ section_name = name n &@<- n;
-                                  section_paragraphs } &@<- s) }
+        current_section = Some ({ sec_name = name n &@<- n;
+                                  sec_paragraphs } &@<- s) }
 
     let named_paragraph n p acc =
       let p = simple_paragraph p acc in
@@ -97,10 +111,10 @@ let procedure_of_compilation_unit cu' =
             None
         | Some s ->
             let loc = Cobol_common.Srcloc.concat ~@s ~@p in
-            let section_paragraphs = p :: ~&s.section_paragraphs in
-            qual n ~&(~&s.section_name),
+            let sec_paragraphs = p :: ~&s.sec_paragraphs in
+            qual n ~&(~&s.sec_name),
             acc.block_list,
-            Some ({ ~&s with section_paragraphs } &@ loc)
+            Some ({ ~&s with sec_paragraphs } &@ loc)
       in
       { blocks = Qualmap.add qn (paragraph_block p) acc.blocks;
         block_list;
@@ -146,15 +160,17 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     (* TODO: add a context, and gather references to procedures, etc. *)
     type acc =
       {
+        current_section: Cobol_unit.Types.procedure_section option;
         refs: Typeck_outputs.references_in_unit;
         diags: Typeck_diagnostics.t;
       }
     let init =
       {
+        current_section = None;
         refs = Typeck_outputs.no_refs;
         diags = Typeck_diagnostics.none;
       }
-    let references { refs; diags } = refs, diags
+    let references { refs; diags; _ } = refs, diags
   end in
 
   let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
@@ -188,9 +204,15 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
           error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
                                              matching_qualnames }
 
-    method! fold_procedure_name' ({ loc; _ } as qn) acc =
+    method! fold_procedure_section s ({ current_section; _ } as acc) =
+      Visitor.do_children_and_then
+        { acc with current_section = Some s }
+        (fun acc -> { acc with current_section })
+
+    method! fold_procedure_name' ({ loc; _ } as qn)
+        ({ current_section = in_section; _ } as acc) =
       Visitor.skip_children @@
-      match Cobol_unit.Qualmap.find ~&qn procedure.named with
+      match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
       | block ->
           { acc with
             refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }

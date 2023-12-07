@@ -441,15 +441,16 @@ let%expect_test "definition-ambiguous-section/paragraphs" =
        PROGRAM-ID. prog.
        PROCEDURE DIVISION.
        MAIN SECTION.
-       SUB-1.
-          STOP RUN.
-       MISC SECTION.
-       SUB-1.
           PERFORM SU_|_B-1.
-          STOP RUN.
+       MAIN-1 SECTION.
+       SUB-1.
+          DISPLAY 1.
+       MAIN-2 SECTION.
+       SUB-1.
+          DISPLAY 2.
   |cobol};
   end_with_postproc [%expect.output];
-  [%expect {| {"params":{"diagnostics":[{"message":"Ambiguous procedure-name 'SUB-1'; known matching names are 'SUB-1 IN MISC', 'SUB-1 IN MAIN'","range":{"end":{"character":23,"line":8},"start":{"character":18,"line":8}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;
+  [%expect {| {"params":{"diagnostics":[{"message":"Ambiguous procedure-name 'SUB-1'; known matching names are 'SUB-1 IN MAIN-2', 'SUB-1 IN MAIN-1'","range":{"end":{"character":23,"line":4},"start":{"character":18,"line":4}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} |}];;
 
 
 

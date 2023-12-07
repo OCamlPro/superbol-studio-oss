@@ -20,6 +20,7 @@ module Types = struct
 end
 
 module Group = Unit_group
+module Procedure = Unit_procedure
 module Collections = Unit_collections
 module Printer = Unit_printer
 module Visitor = Unit_visitor

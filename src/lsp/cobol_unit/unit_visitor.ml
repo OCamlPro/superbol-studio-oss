@@ -60,7 +60,7 @@ let fold_procedure_section (v: _ #folder) =
   handle v#fold_procedure_section
     ~continue:begin fun { section_name; section_paragraphs } x -> x
       >> Cobol_ptree.Terms_visitor.fold_procedure_name' v section_name
-      >> fold_list v section_paragraphs ~fold:fold_procedure_paragraph'
+      >> fold_list v section_paragraphs.list ~fold:fold_procedure_paragraph'
     end
 
 let fold_procedure_section' (v: _ #folder) =
