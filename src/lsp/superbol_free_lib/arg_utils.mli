@@ -15,9 +15,11 @@
     of arguments for setting/unsetting [flg].  The flag has default value
     [default], and the phrasing of the documentation for arguments depends on
     the [kind] of switch: [`enable_disable] and [`with_without] are
-    self-explanatory; [`boolean] uses "Set" and "Clear" verbs. *)
+    self-explanatory; [`boolean] uses "Set" and "Clear" verbs.  [`use] generates
+    a single argument selected based on the value of [default]. *)
 val switch
-  : [ `enable_disable | `with_without | `boolean ]
+  : ?descr: string
+  -> [ `enable_disable | `with_without | `boolean | `use ]
   -> name: string
   -> default: bool
   -> bool ref * Ezcmd.V2.EZCMD.TYPES.arg_list
