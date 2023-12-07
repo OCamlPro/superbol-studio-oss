@@ -158,12 +158,11 @@ let contributes =
           Manifest.PROPERTY.array "copybooks"
             ~description:"The list of copybooks paths" ;
 
-          Manifest.PROPERTY.enum "sourceFormat"
-            ~cases:Cobol_config.DIALECT.all_canonical_names
-            ~description: "The source format of the code"
-          ;
+          Manifest.PROPERTY.string "sourceFormat"
+            ~description: "The source format of the code" ;
 
-          Manifest.PROPERTY.string "dialect"
+          Manifest.PROPERTY.enum "dialect"
+            ~cases:Cobol_config.DIALECT.all_canonical_names
             ~description: "The COBOL dialect used" ;
 
           Manifest.PROPERTY.bool "forDebugging"
