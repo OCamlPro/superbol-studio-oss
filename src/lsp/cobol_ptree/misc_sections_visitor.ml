@@ -35,6 +35,7 @@ class virtual ['a] folder = object
   method fold_configuration_section: (configuration_section, 'a) fold = default
   method fold_configuration_section': (configuration_section with_loc, 'a) fold = default
   method fold_special_names_paragraph: (special_names_paragraph, 'a) fold = default
+  method fold_special_names_paragraph': (special_names_paragraph with_loc, 'a) fold = default
   method fold_special_names_clause: (special_names_clause, 'a) fold = default
   method fold_special_names_clause': (special_names_clause with_loc, 'a) fold = default
   method fold_repository_paragraph: (repository_paragraph, 'a) fold = default
@@ -227,6 +228,9 @@ let fold_special_names_paragraph (v: _ #folder) =
   handle v#fold_special_names_paragraph
     ~continue:(fold_list ~fold:fold_special_names_clause' v)
 
+let fold_special_names_paragraph' (v: _ #folder) =
+  handle' v#fold_special_names_paragraph' ~fold:fold_special_names_paragraph v
+
 let fold_configuration_section (v: _ #folder) =
   handle v#fold_configuration_section
     ~continue:begin fun { source_computer_paragraph;
@@ -235,9 +239,9 @@ let fold_configuration_section (v: _ #folder) =
                           repository_paragraph } x ->
       ignore source_computer_paragraph;
       ignore object_computer_paragraph;
-      ignore special_names_paragraph;
       x
       >> partial __LINE__ "fold_configuration_section"
+      >> fold_option ~fold:fold_special_names_paragraph' v special_names_paragraph
       >> fold_option ~fold:fold_repository_paragraph' v repository_paragraph
     end
 
