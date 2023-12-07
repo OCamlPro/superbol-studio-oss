@@ -709,14 +709,13 @@ let char_order_checker_for_pic_string config =
   in
   check_char_order, reset
 
-(* Maybe not in ISO/IEC 2014: Z/CS, B/* *)
+(* Maybe not in ISO/IEC 2014: Z/CS *)
 let mutual_exclusions =
   SymbolsMap.of_seq @@ List.to_seq [
-    B, Symbols.singleton Star;
     CS, Symbols.singleton Z;
     DecimalSep, Symbols.of_list [P; V];
     P, Symbols.singleton DecimalSep;
-    Star, Symbols.of_list [Z; B];
+    Star, Symbols.singleton Z;
     V, Symbols.singleton DecimalSep;
     Z, Symbols.of_list [Star; CS];
   ]
