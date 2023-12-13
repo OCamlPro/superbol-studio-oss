@@ -120,7 +120,10 @@ let update_section
 let add_section_update toml_handle section_name create_section =
   add_update_hook toml_handle
     (Printf.sprintf "[%s]" section_name)
-    (update_section (create_section ~name:section_name))
+    (fun toml ->
+       (* create_section must be called everytime to compute the new
+          section, so that it can be compared with the last one. *)
+       update_section (create_section ~name:section_name) toml)
 
 (* --- *)
 
