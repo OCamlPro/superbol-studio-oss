@@ -27,7 +27,10 @@ module TOML = struct
 
   let of_string ?file ?(config = default_config) string =
     Internal_lexing.init ();
-    let lexbuf = Lexing.from_string string in
+    let lexbuf = Lexing.from_string
+        (string
+         ^ "\n" (* fix the case of a missing newline at the end of the file *)
+        ) in
     begin
       match file with
       | None -> ()
