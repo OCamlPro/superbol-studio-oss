@@ -160,7 +160,11 @@
           },
           "sourceFormat": {
             "type": "string",
-            "description": "The source format of the code",
+            "description": "The source format of the code"
+          },
+          "dialect": {
+            "type": "string",
+            "description": "The COBOL dialect used",
             "items": "string",
             "enum": [
               "default",
@@ -186,10 +190,6 @@
               "rm-strict",
               "xopen"
             ]
-          },
-          "dialect": {
-            "type": "string",
-            "description": "The COBOL dialect used"
           },
           "forDebugging": {
             "type": "boolean",
