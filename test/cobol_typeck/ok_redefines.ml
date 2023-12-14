@@ -35,32 +35,32 @@ let%expect_test "redefines-occurs" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 5
+      size: 40
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: ALPHANUMERIC(5)
         }
       }
       redefs: {
-        filler
+        table
         redefines: A
         offset: 0
-        size: 5
-        layout: {
-          fixed-length table
-          length: 5
-          items: {
-            qualname: B
-            offset: 0
-            size: 1
-            layout: {
-              elementary
-              usage: {
-                display (dev: temporary)
-                category: ALPHANUMERIC(1)
-              }
+        size: 40
+        range: {
+          span: fixed-length: 5
+        }
+        field: {
+          qualname: B
+          leading ranges: 1
+          offset: 0
+          size: 8
+          layout: {
+            elementary
+            usage: {
+              display
+              category: ALPHANUMERIC(1)
             }
           }
         }
@@ -90,38 +90,38 @@ let%expect_test "qualified-redefines-occurs" =
     Item definition: {
       qualname: X
       offset: 0
-      size: 5
+      size: 40
       layout: {
         structure
         fields: {
           qualname: A IN X
           offset: 0
-          size: 5
+          size: 40
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: ALPHANUMERIC(5)
             }
           }
           redefs: {
-            filler
+            table
             redefines: A IN X
             offset: 0
-            size: 5
-            layout: {
-              fixed-length table
-              length: 5
-              items: {
-                qualname: B IN X
-                offset: 0
-                size: 1
-                layout: {
-                  elementary
-                  usage: {
-                    display (dev: temporary)
-                    category: ALPHANUMERIC(1)
-                  }
+            size: 40
+            range: {
+              span: fixed-length: 5
+            }
+            field: {
+              qualname: B IN X
+              leading ranges: 1
+              offset: 0
+              size: 8
+              layout: {
+                elementary
+                usage: {
+                  display
+                  category: ALPHANUMERIC(1)
                 }
               }
             }
@@ -167,38 +167,39 @@ let%expect_test "occurs-n-redefines-1" =
     Item definition: {
       qualname: W
       offset: 0
-      size: 5
+      size: 40
       layout: {
         structure
         fields: {
-          filler
+          table
           offset: 0
-          size: 5
-          layout: {
-            fixed-length table
-            length: 5
-            items: {
-              qualname: A IN W
-              offset: 0
-              size: 1
-              layout: {
-                elementary
-                usage: {
-                  display (dev: temporary)
-                  category: ALPHANUMERIC(1)
-                }
+          size: 40
+          range: {
+            span: fixed-length: 5
+          }
+          field: {
+            qualname: A IN W
+            leading ranges: 1
+            offset: 0
+            size: 8
+            layout: {
+              elementary
+              usage: {
+                display
+                category: ALPHANUMERIC(1)
               }
+              value: "A"
             }
           }
           redefs: {
             qualname: B IN W
             redefines: A IN W
             offset: 0
-            size: 5
+            size: 40
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: ALPHANUMERIC(5)
               }
             }
@@ -236,26 +237,26 @@ let%expect_test "occurs-n-redefines-2" =
     Item definition: {
       qualname: W
       offset: 0
-      size: 2
+      size: 16
       layout: {
         structure
         fields: {
-          filler
+          table
           offset: 0
-          size: 2
-          layout: {
-            fixed-length table
-            length: 2
-            items: {
-              qualname: A IN W
-              offset: 0
-              size: 1
-              layout: {
-                elementary
-                usage: {
-                  display (dev: temporary)
-                  category: ALPHANUMERIC(1)
-                }
+          size: 16
+          range: {
+            span: fixed-length: 2
+          }
+          field: {
+            qualname: A IN W
+            leading ranges: 1
+            offset: 0
+            size: 8
+            layout: {
+              elementary
+              usage: {
+                display
+                category: ALPHANUMERIC(1)
               }
             }
           }
@@ -265,28 +266,28 @@ let%expect_test "occurs-n-redefines-2" =
         qualname: X
         redefines: W
         offset: 0
-        size: 2
+        size: 16
         layout: {
           structure
           fields: {
             qualname: B IN X
             offset: 0
-            size: 1
+            size: 8
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: ALPHANUMERIC(1)
               }
             }
           }{
             qualname: C IN X
-            offset: 1
-            size: 1
+            offset: 8
+            size: 8
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: ALPHANUMERIC(1)
               }
             }
@@ -300,7 +301,7 @@ let%expect_test "redefines-index" =
   (* Note: GnuCOBOL accepts this.  But should it really?  *)
   dotest @@ prog "redefines-index"
     ~working_storage:{|
-       01 XX INDEX.
+       01 XX USAGE IS INDEX.
          02 X.
          02 Y REDEFINES X.
        01 YY REDEFINES XX PIC 9(4).
@@ -311,32 +312,12 @@ let%expect_test "redefines-index" =
            DISPLAY YY.
     |};
   [%expect {|
-    prog.cob:5.9-5.14:
-       2          DATA DIVISION.
-       3          WORKING-STORAGE SECTION.
-       4          01 XX INDEX.
-       5 >          02 X.
-    ----            ^^^^^
-       6            02 Y REDEFINES X.
-       7          01 YY REDEFINES XX PIC 9(4).
-    >> Error: Missing PICTURE clause for item 'X'
-
-    prog.cob:6.9-6.26:
-       3          WORKING-STORAGE SECTION.
-       4          01 XX INDEX.
-       5            02 X.
-       6 >          02 Y REDEFINES X.
-    ----            ^^^^^^^^^^^^^^^^^
-       7          01 YY REDEFINES XX PIC 9(4).
-       8          PROCEDURE DIVISION.
-    >> Error: Missing PICTURE clause for item 'Y'
-
     prog.cob:4.7-7.35:
        1          PROGRAM-ID. redefines-index.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4 >        01 XX INDEX.
-    ----          ^^^^^^^^^^^^
+       4 >        01 XX USAGE IS INDEX.
+    ----          ^^^^^^^^^^^^^^^^^^^^^
        5 >          02 X.
     ----  ^^^^^^^^^^^^^^^
        6 >          02 Y REDEFINES X.
@@ -348,31 +329,25 @@ let%expect_test "redefines-index" =
     Item definition: {
       qualname: XX
       offset: 0
-      size: 1
+      size: size-of-index
       layout: {
         structure
         fields: {
           qualname: X IN XX
           offset: 0
-          size: 1
+          size: size-of-index
           layout: {
             elementary
-            usage: {
-              display (dev: temporary)
-              category: ALPHANUMERIC(1)
-            }
+            usage: index
           }
           redefs: {
             qualname: Y IN XX
             redefines: X IN XX
             offset: 0
-            size: 1
+            size: size-of-index
             layout: {
               elementary
-              usage: {
-                display (dev: temporary)
-                category: ALPHANUMERIC(1)
-              }
+              usage: index
             }
           }
         }
@@ -381,11 +356,11 @@ let%expect_test "redefines-index" =
         qualname: YY
         redefines: XX
         offset: 0
-        size: 4
+        size: 32
         layout: {
           elementary
           usage: {
-            display (dev: temporary)
+            display
             category: NUMERIC(digits = 4, scale = 0, with_sign = false)
           }
         }

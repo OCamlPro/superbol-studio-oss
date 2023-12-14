@@ -52,5 +52,6 @@ let%expect_test "unexpected-redefines-target" =
     ----                              ^^^
        8          PROCEDURE DIVISION.
        9
-    >> Error: Unexpected target name 'A-3' in REDEFINES clause for item 'A-24'; expected 'A-2'
+    >> Error: Unexpected target name 'A-3' in REDEFINES clause for item 'A-24';
+              expected 'A-2'
   |}];;

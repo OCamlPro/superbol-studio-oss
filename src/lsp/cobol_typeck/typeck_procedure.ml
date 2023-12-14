@@ -63,9 +63,9 @@ let procedure_of_compilation_unit cu' =
           | None ->
               { paragraphs with list = paragraph :: list }
           | Some qn ->
-              { named = Cobol_unit.Qualmap.add ~&qn paragraph named;
+              { named = Qualmap.add ~&qn paragraph named;
                 list = paragraph :: list }
-        end { named = Cobol_unit.Qualmap.empty; list = [] } suc.sec_paragraphs
+        end { named = Qualmap.empty; list = [] } suc.sec_paragraphs
       in
       Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
 
@@ -188,19 +188,27 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
       let loc = baseloc_of_qualname qn in
       Visitor.skip_children @@
-      match Cobol_unit.Qualmap.find qn data_definitions.data_items.named with
-      | Data_item { def; _ } ->
-          { acc with
-            refs = Typeck_outputs.register_data_item_ref ~loc def acc.refs }
-      | Data_renaming { def; _ } ->
-          { acc with
-            refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs }
-      | Data_condition { def; _ } ->
-          { acc with
-            refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs }
-      | exception Not_found ->
+      (* match Qualmap.find qn data_definitions.data_items.named with *)
+      (* | Data_field { def; _ } -> *)
+      (*     { acc with *)
+      (*       refs = Typeck_outputs.register_data_field_ref ~loc def acc.refs } *)
+      (* | Data_renaming { def; _ } -> *)
+      (*     { acc with *)
+      (*       refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs } *)
+      (* | Data_condition { def; _ } -> *)
+      (*     { acc with *)
+      (*       refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs } *)
+      (* | Table_index { qualname = qn; _ } -> *)
+      (*     { acc with *)
+      (*       refs = Typeck_outputs.register_data_qualref ~loc ~&qn acc.refs } *)
+      try
+        let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
+        { acc with
+          refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
+      with
+      | Not_found ->
           acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
-      | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+      | Qualmap.Ambiguous (lazy matching_qualnames) ->
           error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
                                              matching_qualnames }
 
@@ -218,7 +226,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
             refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
       | exception Not_found ->
           error acc @@ Unknown_proc_name qn
-      | exception Cobol_unit.Qualmap.Ambiguous (lazy matching_qualnames) ->
+      | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
           error acc @@ Ambiguous_proc_name { given_qualname = qn;
                                              matching_qualnames }
 

@@ -169,8 +169,8 @@ let element_at_position ~uri pos group : element_at_position =
     method! fold_procedure _ = enter_context (Procedure None)
     method! fold_procedure_section s = enter_context (Procedure (Some s))
 
-    method! fold_item_definition' def acc =
-      Visitor.do_children @@ match ~&def.item_qualname with
+    method! fold_field_definition' def acc =
+      Visitor.do_children @@ match ~&def.field_qualname with
       | None -> on_data_item ~@def acc                               (* FILLER *)
       | Some qn -> on_data_item ~full_qn:~&qn ~@def acc
 

@@ -33,11 +33,11 @@ let%expect_test "simple-conditions" =
     Item definition: {
       qualname: X
       offset: 0
-      size: 1
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: ALPHANUMERIC(1)
         }
       }
@@ -49,7 +49,7 @@ let%expect_test "simple-conditions" =
 
 
 let%expect_test "qualified-conditions" =
-  dotest @@ prog "simple-conditions"
+  dotest @@ prog "qualified-conditions"
     ~working_storage:{|
        01 W.
          02 X PIC X VALUE "X".
@@ -65,7 +65,7 @@ let%expect_test "qualified-conditions" =
     |};
   [%expect {|
     prog.cob:4.7-5.30:
-       1          PROGRAM-ID. simple-conditions.
+       1          PROGRAM-ID. qualified-conditions.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
        4 >        01 W.
@@ -77,19 +77,20 @@ let%expect_test "qualified-conditions" =
     Item definition: {
       qualname: W
       offset: 0
-      size: 1
+      size: 8
       layout: {
         structure
         fields: {
           qualname: X IN W
           offset: 0
-          size: 1
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: ALPHANUMERIC(1)
             }
+            value: "X"
           }
           conditions: {
             qualname: X-IS-A IN X IN W
@@ -137,19 +138,20 @@ let%expect_test "group-conditions" =
     Item definition: {
       qualname: X
       offset: 0
-      size: 3
+      size: 24
       layout: {
         structure
         fields: {
           filler
           offset: 0
-          size: 3
+          size: 24
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: ALPHANUMERIC(3)
             }
+            value: "0"
           }
         }
       }
@@ -175,25 +177,35 @@ let%expect_test "group-conditions" =
     Item definition: {
       qualname: W
       offset: 0
-      size: 1
+      size: 24
       layout: {
         structure
         fields: {
-          qualname: Y IN W
+          table
           offset: 0
-          size: 1
-          layout: {
-            fixed-length table
-            length: 3
-            items: {
-              filler
-              offset: 0
-              size: 1
-              layout: {
-                elementary
-                usage: {
-                  display (dev: temporary)
-                  category: ALPHANUMERIC(1)
+          size: 24
+          range: {
+            span: fixed-length: 3
+          }
+          field: {
+            qualname: Y IN W
+            leading ranges: 1
+            offset: 0
+            size: 8
+            layout: {
+              structure
+              fields: {
+                filler
+                leading ranges: 1
+                offset: 0
+                size: 8
+                layout: {
+                  elementary
+                  usage: {
+                    display
+                    category: ALPHANUMERIC(1)
+                  }
+                  value: "0"
                 }
               }
             }

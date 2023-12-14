@@ -247,11 +247,33 @@ module Symbol = struct type t = symbol let compare = Stdlib.compare end
 module Symbols = Set.Make (Symbol)
 module SymbolsMap = Map.Make (Symbol)
 
-let pp_category = pp_category
+let pp_category = TYPES.pp_category
+
+let pp_category_name ppf category =
+  Pretty.string ppf @@ match category with
+  | Alphabetic _ ->
+      "alphabetic"
+  | Alphanumeric { insertions = []; _ } ->
+      "alphanumeric"
+  | Alphanumeric _ ->
+      "alphanumeric-edited"
+  | Boolean _ ->
+      "boolean"
+  | National { insertions = []; _ } ->
+      "national"
+  | National _ ->
+      "national-edited"
+  | FixedNum { editions = { basics = []; floating = None;
+                            zerorepl = None }; _ }
+  | FloatNum { editions = []; _ } ->
+      "numeric"
+  | FixedNum _
+  | FloatNum _ ->
+      "numeric-edited"
 
 (* --- *)
 
-let is_edited = function
+let is_edited: category -> bool = function
   | Alphabetic _
   | Boolean _
   | Alphanumeric { insertions = []; _ }
@@ -998,13 +1020,6 @@ let of_string config str =
   | errors -> Error (errors, pic)
 
 
-let alphanumeric ~size =
-  {
-    category = Alphanumeric { length = size; insertions = [] };
-    pic = [{ symbol = X; symbol_occurences = size }];
-  }
-
-
 let pp_meaning_of_precedence_index ~decimal_char ppf = function
   | 0 -> Fmt.pf ppf "B, 0 or /"
   | 1 -> Fmt.pf ppf "grouping@ separator ('%c')"
@@ -1142,6 +1157,77 @@ module Make (Config: Cobol_config.T) (Env: ENV) = struct
         raise @@ InvalidPicture (str, error_diagnostics ~loc errors, pic)
 
 end
+
+(* --- *)
+
+(* Some easy-to-used constructors *)
+
+let symb s n = { symbol = s; symbol_occurences = n }
+
+let alphanumeric ~size:n =
+  {
+    category = Alphanumeric { length = n; insertions = [] };
+    pic = [symb X n];
+  }
+
+let national ~size:n =
+  {
+    category = National { length = n; insertions = [] };
+    pic = [symb N n]
+  }
+
+let boolean n =
+  {
+    category = Boolean { length = n };
+    pic = [symb One n];
+  }
+
+(* --- *)
+
+let fixednum ?(with_sign = false) ?(basics = []) ?floating ?zerorepl
+    digits scale =
+  FixedNum { digits; scale; with_sign;
+             editions = { basics; floating; zerorepl } }
+
+let digits n =
+  {
+    category = fixednum n 0;
+    pic = [symb Nine n];
+  }
+
+let fixed_numeric ?basics ?floating ?(with_sign = false)
+    i d = (* |int_part| |dec_part| *)
+  let pic_s = if with_sign then [symb S 1] else []
+  and pic_i = if i = 0 then [] else [symb Nine i]
+  and pic_d = if d = 0 then [] else [symb Nine d] in
+  {
+    category = fixednum ?basics ?floating (i + d) d;
+    pic = pic_s @ pic_i @ [symb V 1] @ pic_d;
+  }
+
+(* let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits = *)
+(*   FloatNum { digits; scale; with_sign; exponent_digits = exp_digits; *)
+(*              editions = basics; } *)
+
+(* --- *)
+
+let is_edited pic = is_edited pic.category
+let is_boolean pic = match pic.category with
+  | Boolean _ -> true
+  | _ -> false
+let is_national pic = match pic.category with
+  | National _ -> true
+  | _ -> false
+let is_numeric pic = match pic.category with
+  | FixedNum _ | FloatNum _ -> true
+  | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ -> false
+let is_signed_numeric pic = match pic.category with
+  | FixedNum { with_sign; _ } | FloatNum { with_sign; _ } -> with_sign
+  | _ -> false
+let data_size pic = data_size pic.category
+let size pic = size pic.category
+
+(* --- *)
 
 let config = { max_pic_length = 100; decimal_char = '.';
                currency_signs = CHARS.add '$' CHARS.empty }

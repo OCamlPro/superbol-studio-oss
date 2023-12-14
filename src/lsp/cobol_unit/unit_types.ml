@@ -38,7 +38,7 @@ type unit_config =
 
 type data_definitions =
   {
-    data_items: Cobol_data.Types.item named_n_ordered;
+    data_items: Cobol_data.Types.data_definition named_n_ordered;
     data_records: Cobol_data.Types.record list;
   }
 

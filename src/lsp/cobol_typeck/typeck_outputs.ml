@@ -70,8 +70,9 @@ let register_data_qualref qn ~loc refs =
 let register_proc_qualref qn ~loc refs =
   { refs with proc_refs = register_qualref qn ~loc refs.proc_refs }
 
-let register_data_item_ref ~loc item refs =
-  match ~&item.Cobol_data.Types.item_qualname with
+let register_data_field_ref ~loc field refs =
+  (* match Cobol_data.Item.qualname ~&item with *)
+  match ~&field.Cobol_data.Types.field_qualname with
   | None -> refs
   | Some qn -> register_data_qualref ~&qn ~loc refs
 
@@ -82,6 +83,12 @@ let register_data_renaming_ref ~loc renaming refs =
 let register_condition_name_ref ~loc cond_name refs =
   register_data_qualref
     ~&(~&cond_name.Cobol_data.Types.condition_name_qualname) ~loc refs
+
+(* let register_table_index_ref ~loc qn refs = *)
+(*   (\* match Cobol_data.Item.qualname ~&item with *\) *)
+(*   match ~&table.Cobol_data.Types.table_index with *)
+(*   | None -> refs *)
+(*   | Some qn -> register_data_qualref qn ~loc refs *)
 
 let register_procedure_ref ~loc block refs =
   match Cobol_unit.Types.block_name block with

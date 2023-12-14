@@ -32,13 +32,14 @@ let%expect_test "one-77" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 1
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: ALPHABETIC(1)
         }
+        value: "A"
       }
     } |}];;
 
@@ -57,23 +58,24 @@ let%expect_test "77-occurs-fixed" =
        5          PROCEDURE DIVISION.
        6
     Item definition: {
-      filler
+      table
       offset: 0
-      size: 5
-      layout: {
-        fixed-length table
-        length: 5
-        items: {
-          qualname: X
-          offset: 0
-          size: 1
-          layout: {
-            elementary
-            usage: {
-              display (dev: temporary)
-              category: ALPHANUMERIC(1)
-            }
+      size: 40
+      range: {
+        span: fixed-length: 5
+      }
+      field: {
+        qualname: X
+        leading ranges: 1
+        offset: 0
+        size: 8
+        layout: {
+          elementary
+          usage: {
+            display
+            category: ALPHANUMERIC(1)
           }
+          value: "X"
         }
       }
     } |}];;
@@ -102,23 +104,24 @@ let%expect_test "redefines-77" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 1
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: ALPHABETIC(1)
         }
+        value: "A"
       }
       redefs: {
         qualname: B
         redefines: A
         offset: 0
-        size: 1
+        size: 8
         layout: {
           elementary
           usage: {
-            display (dev: temporary)
+            display
             category: ALPHANUMERIC(1)
           }
         }
@@ -137,23 +140,24 @@ let%expect_test "redefines-77" =
     Item definition: {
       qualname: T-LEN
       offset: 0
-      size: 2
+      size: 16
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: NUMERIC(digits = 2, scale = 0, with_sign = false)
         }
+        value: 5
       }
       redefs: {
         qualname: T-LEN-2
         redefines: T-LEN
         offset: 0
-        size: 2
+        size: 16
         layout: {
           elementary
           usage: {
-            display (dev: temporary)
+            display
             category: NUMERIC(digits = 2, scale = 0, with_sign = false)
           }
         }

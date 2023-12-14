@@ -85,27 +85,27 @@ let%expect_test "size-3" =
     3 |}];;
 
 let%expect_test "byte-size" =
-  show_size Memory.(size_of_byte);
-  show_size Memory.(repeat size_of_byte ~by:(int 1));
-  show_size Memory.(repeat size_of_byte ~by:(int 2));
-  show_size Memory.(repeat size_of_byte ~by:(int 3));
-  show_size Memory.(increase size_of_byte ~by:size_of_byte);
-  show_size Memory.(increase size_of_byte ~by:(const_size 42));
-  show_size Memory.(increase size_of_byte ~by:size_of_byte |>
+  show_size Memory.(byte_size);
+  show_size Memory.(repeat byte_size ~by:(int 1));
+  show_size Memory.(repeat byte_size ~by:(int 2));
+  show_size Memory.(repeat byte_size ~by:(int 3));
+  show_size Memory.(increase byte_size ~by:byte_size);
+  show_size Memory.(increase byte_size ~by:(const_size 42));
+  show_size Memory.(increase byte_size ~by:byte_size |>
                     increase ~by:(const_size 41) |>
                     increase ~by:(const_size 1));
-  show_size Memory.(increase size_of_byte ~by:size_of_byte |>
+  show_size Memory.(increase byte_size ~by:byte_size |>
                     increase ~by:(const_size 42) |>
                     increase ~by:(const_size 0));
   [%expect  {|
-    size-of-byte
-    size-of-byte
-    (* 2 size-of-byte)
-    (* 3 size-of-byte)
-    (* 2 size-of-byte)
-    (+ 42 size-of-byte)
-    (+ 42 (* 2 size-of-byte))
-    (+ 42 (* 2 size-of-byte)) |}];;
+    8
+    8
+    16
+    24
+    16
+    50
+    58
+    58 |}];;
 
 let%expect_test "valof-size" =
   show_factor Memory.(valof Term.(name "A"));
@@ -143,12 +143,12 @@ let%expect_test "hybrid-size" =
   show_size Memory.(repeat (const_size 3) ~by:(valof a) |>
                     increase ~by:(valof_size a));
   show_size Memory.(increase point_size ~by:(valof_size a));
-  show_size Memory.(increase size_of_byte ~by:(valof_size a));
+  show_size Memory.(increase byte_size ~by:(valof_size a));
   show_size Memory.(increase point_size ~by:(valof_size a) |>
-                    increase ~by:size_of_byte);
-  show_size Memory.(increase size_of_byte ~by:(valof_size a) |>
+                    increase ~by:byte_size);
+  show_size Memory.(increase byte_size ~by:(valof_size a) |>
                     repeat ~by:(int 2));
-  show_size Memory.(increase size_of_byte ~by:(valof_size a) |>
+  show_size Memory.(increase byte_size ~by:(valof_size a) |>
                     repeat ~by:(int 2) |>
                     repeat ~by:(int 2) |>
                     increase ~by:(valof_size b));
@@ -164,15 +164,15 @@ let%expect_test "hybrid-size" =
     (* 3 (valof A))
     (* 4 (valof A))
     (valof A)
-    (+ (valof A) size-of-byte)
-    (+ (valof A) size-of-byte)
-    (+ (* 2 (valof A)) (* 2 size-of-byte))
-    (+ (* 4 (valof A)) (valof B) (* 4 size-of-byte)) |}];;
+    (+ 8 (valof A))
+    (+ 8 (valof A))
+    (+ 16 (* 2 (valof A)))
+    (+ 32 (* 4 (valof A)) (valof B)) |}];;
 
 let%expect_test "non-linear-size" =
   let a = Term.name "A" and b = Term.name "B" in
   check_nonlinear @@
-  lazy Memory.(increase size_of_byte ~by:(valof_size a) |>
+  lazy Memory.(increase byte_size ~by:(valof_size a) |>
                repeat ~by:(valof a));
   check_nonlinear @@
   lazy Memory.(increase point_size ~by:(const_size 5) |>

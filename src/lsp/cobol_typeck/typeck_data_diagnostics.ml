@@ -71,9 +71,11 @@ type error =
         item_name: Cobol_ptree.data_name with_loc option;
         item_loc: srcloc;
       }
-  | Unexpected_picture_clause_for_group_item of
+  | Unexpected_picture_clause of
       {
         picture: Cobol_ptree.picture_clause with_loc;
+        reason: [`Group_item |
+                 `Item_with_usage of Cobol_ptree.usage_clause ];
         item_name: Cobol_ptree.data_name with_loc option;
         item_loc: srcloc;
       }
@@ -85,23 +87,23 @@ type error =
   | Occurs_in_rename_operand of
       {
         operand: Cobol_ptree.qualname with_loc;
-        item: Cobol_data.Types.item_definition with_loc;
+        field: Cobol_data.Types.field_definition with_loc;
       }
   | Invalid_renaming_of_variable_length_range of
       {
         loc: srcloc;
         depending_vars: Cobol_ptree.qualname NEL.t;
       }
-  | Duplicate_clause of
-      {
-        first_loc: srcloc;
-        second_loc: srcloc;
-        clause_name: string;
-      }
   | Picture_error of
       {
         picture_loc: srcloc;
         error: Cobol_data.Picture.TYPES.error with_loc;
+      }
+  | Incompatible_picture of
+      {
+        picture: Cobol_data.Picture.t with_loc;
+        usage_clause: Cobol_ptree.usage_clause;
+        expected: [`Numeric_category | `Boolean_class | `Nonalpha_class];
       }
   | Item_not_found of
       {
@@ -128,11 +130,23 @@ and warning =
         table_item_name: Cobol_ptree.qualname with_loc option;
         (* table_item: (\* ([>`table], _)  *\)Cobol_data.Types.item_definition with_loc; *)
       }
-  | Extraneous_clause of
+  | Mismatching_usage_in_group of                 (* not enforced by GnuCOBOL *)
       {
-        clause_name: string;
-        clause_loc: srcloc;
+        item_name: Cobol_ptree.data_name with_loc option;
+        item_usage: Cobol_ptree.usage_clause with_loc;
+        group_usage: Cobol_ptree.usage_clause with_loc;
       }
+  | Duplicate_clause of
+      {
+        first_loc: srcloc;
+        second_loc: srcloc;
+        clause_name: string;
+      }
+  (* | Extraneous_clause of *)
+  (*     { *)
+  (*       clause_name: string; *)
+  (*       clause_loc: srcloc; *)
+  (*     } *)
 
 and misplacement_explanation =
   | Following of string
@@ -145,7 +159,7 @@ let pp_misplacement_explanation ppf = function
       Pretty.print ppf "following@ item@ at@ level@ %02d" l
 
 let error_loc = function
-  | Duplicate_clause { second_loc = loc; _ }
+  | Incompatible_picture { picture = { loc; _ }; _ }
   | Invalid_level_number { level = { loc; _ }; _ }
   | Invalid_renaming_of_variable_length_range { loc; _ }
   | Item_not_allowed_in_section { level = { loc; _ }; _ }
@@ -157,15 +171,16 @@ let error_loc = function
   | Picture_error { error = { loc; _ }; _ }
   | Redefinition_of_ODO_item { redef_loc = loc; _ }
   | Unexpected_level_number { level = { loc; _ }; _ }
-  | Unexpected_picture_clause_for_group_item { picture = { loc; _ }; _ }
+  | Unexpected_picture_clause { picture = { loc; _ }; _ }
   | Unexpected_redefinition_level { redef_level = { loc; _ }; _ }
   | Unexpected_redefinition_name { redef_redefines = { loc; _ }; _ }
   | Unexpected_table_value_clause { value_loc = loc; _ } ->
       Some loc
 
 let warning_loc = function
-  | Redefinition_of_table_item { redef_loc = loc; _ }
-  | Extraneous_clause { clause_loc = loc; _ } ->
+  | Duplicate_clause { second_loc = loc; _ }
+  | Mismatching_usage_in_group { item_usage = { loc; _ }; _ }
+  | Redefinition_of_table_item { redef_loc = loc; _ } ->
       Some loc
 
 let pp_data_name'_opt
@@ -181,58 +196,79 @@ let pp_one_of pp_e ppf = function                   (* assumes non-empty list *)
   | lst -> Fmt.(hbox @@ any "one of: " ++ list ~sep:comma pp_e) ppf lst
 
 let pp_error ppf = function
+  | Incompatible_picture { picture; usage_clause; expected } ->
+      Pretty.print ppf "PICTURE@ of@ category@ %a@ is@ incompatible@ with@ \
+                        USAGE@ %a; expected@ a@ PICTURE@ for@ %(%)@ data@ item"
+        Cobol_data.Picture.pp_category_name ~&picture.category
+        Cobol_ptree.pp_usage_clause usage_clause
+        (match expected with
+         | `Numeric_category -> "numeric"
+         | `Boolean_class -> "boolean"
+         | `Nonalpha_class -> "boolean,@ national,@ national-edited,@ numeric,@ \
+                              or@ numeric-edited")
   | Item_not_allowed_in_section { level; section } ->
-      Pretty.print ppf "%d-level item not allowed in %a section." ~&level
+      Pretty.print ppf "%d-level@ item@ not@ allowed@ in@ %a@ section" ~&level
         Cobol_data.Types.pp_data_storage section
   | Invalid_level_number { level } ->
-      Pretty.print ppf "Invalid level number: %02d" ~&level
+      Pretty.print ppf "Invalid@ level@ number:@ %02d" ~&level
   | Unexpected_level_number { level; expected } ->
-      Pretty.print ppf "Unexpected level number %02d: expected %a" ~&level
+      Pretty.print ppf "Unexpected@ level@ number@ %02d:@ expected@ %a" ~&level
         (pp_one_of Fmt.(fmt "%02d")) expected
   | Unexpected_redefinition_level { expected_level; redef_level;
                                     redef_name; _ } ->
-      Pretty.print ppf "Invalid level %02d for %a with REDEFINES clause; \
-                        expected level %02d"
+      Pretty.print ppf "Invalid@ level@ %02d@ for@ %a@ with@ REDEFINES@ clause;@ \
+                        expected@ level@ %02d"
         ~&redef_level pp_data_name'_opt redef_name expected_level
   | Unexpected_redefinition_name { expected_name; redef_redefines;
                                    redef_name; _ } ->
-      Pretty.print ppf "Unexpected target name '%s' in REDEFINES clause for %a; \
-                        expected '%s'"
+      Pretty.print ppf "Unexpected@ target@ name@ '%s'@ in@ REDEFINES@ clause@ \
+                        for@ %a;@ expected@ '%s'"
         ~&redef_redefines pp_data_name'_opt redef_name expected_name
   | Redefinition_of_ODO_item { odo_item; _ } ->
-      Pretty.print ppf "Invalid redefinition of record with subordinate OCCURS \
-                        DEPENDING%a"
-        Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) ~&odo_item.item_qualname
+      Pretty.print ppf "Invalid@ redefinition@ of@ record@ with@ subordinate@ \
+                        OCCURS@ DEPENDING%a"
+        (Cobol_data.Item.pp_item_qualname ~leading:Fmt.sp) ~&odo_item
   | Missing_picture_clause_for_elementary_item { item_name; _ } ->
-      Pretty.print ppf "Missing PICTURE clause for %a"
+      Pretty.print ppf "Missing@ PICTURE@ clause@ for@ %a"
         pp_data_name'_opt item_name
-  | Unexpected_picture_clause_for_group_item { item_name; _ } ->
-      Pretty.print ppf "Unexpected PICTURE clause for group %a"
+  | Unexpected_picture_clause { item_name; reason = `Group_item; _ } ->
+      Pretty.print ppf "Unexpected@ PICTURE@ clause@ for@ group@ %a"
         pp_data_name'_opt item_name
+  | Unexpected_picture_clause { item_name; reason = `Item_with_usage u; _ } ->
+      Pretty.print ppf "Unexpected@ PICTURE@ clause@ for@ %a@ with@ USAGE@ %a"
+        pp_data_name'_opt item_name Cobol_ptree.pp_usage_clause u
   | Unexpected_table_value_clause { item_name; _ } ->
-      Pretty.print ppf "Unexpected table VALUE clause for %a"
+      Pretty.print ppf "Unexpected@ table@ VALUE@ clause@ for@ %a"
         pp_data_name'_opt item_name
   | Occurs_in_rename_operand { operand; _ } ->
-      Pretty.print ppf "RENAMES operand '%a' has an OCCURS clause"
+      Pretty.print ppf "RENAMES@ operand@ '%a'@ has@ or@ is@ subordinate@ to@ \
+                        an@ OCCURS@ clause"
         Cobol_ptree.pp_qualname' operand
   | Invalid_renaming_of_variable_length_range { depending_vars = vars; _ } ->
-      Pretty.print ppf "Renaming of variable-length range (length depends on: %a)"
+      Pretty.print ppf "Renaming@ of@ variable-length@ range@ (length@ depends@ \
+                        on:@ %a)"
         Fmt.(list ~sep:comma Cobol_ptree.pp_qualname) (NEL.to_list vars)
-  | Duplicate_clause { clause_name; _ } ->   (* TODO: addendum with second loc *)
-      Pretty.print ppf "Duplicate '%s' clause" clause_name
   | Picture_error { error; _ } ->
       Cobol_data.Picture.pp_error ppf ~&error
   | Item_not_found { qualname; _ } ->
-      Pretty.print ppf "Item '%a' not found" Cobol_ptree.pp_qualname' qualname
+      Pretty.print ppf "Item@ '%a'@ not@ found" Cobol_ptree.pp_qualname' qualname
   | Misplaced { entry; expl; _ } ->
       Pretty.print ppf "Misplaced@ %a@ %a\
                        " pp_entry entry pp_misplacement_explanation expl
   | Pending_feature { name; _ } ->
-      Pretty.print ppf "%s is not supported yet" name
+      Pretty.print ppf "%s@ is@ not@ supported@ yet" name
 
 let pp_warning ppf = function
   | Redefinition_of_table_item { table_item_name; _ } ->
-      Pretty.print ppf "Redefinition of item with OCCURS clause%a"
+      Pretty.print ppf "Redefinition@ of@ item@ with@ OCCURS@ clause%a"
         Fmt.(option (sp ++ Cobol_ptree.pp_qualname')) table_item_name
-  | Extraneous_clause { clause_name; _ } ->
-      Pretty.print ppf "Extraneous %s clause" clause_name
+  | Mismatching_usage_in_group { item_usage; item_name; group_usage } ->
+      Pretty.print ppf "Mismatching@ USAGE@ %a@ for@ %a,@ subordinate@ to@ a@ \
+                        group@ with@ USAGE@ %a"
+        Cobol_ptree.pp_usage_clause ~&item_usage
+        pp_data_name'_opt item_name
+        Cobol_ptree.pp_usage_clause ~&group_usage
+  | Duplicate_clause { clause_name; _ } ->   (* TODO: addendum with second loc *)
+      Pretty.print ppf "Duplicate %s clause" clause_name
+  (* | Extraneous_clause { clause_name; _ } -> *)
+  (*     Pretty.print ppf "Extraneous %s clause" clause_name *)

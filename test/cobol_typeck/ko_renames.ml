@@ -29,6 +29,28 @@ let%expect_test "renames-errors-1" =
        66 B-R3 RENAMES B-4 THRU B-5. *> should error
     |};
   [%expect {|
+    prog.cob:10.23-10.26:
+       7            02 B-4 PIC 9.
+       8            02 B-5 OCCURS 5 TIMES.
+       9              03 FILLER PIC X.
+      10 >        66 B-R1 RENAMES B-1. *> should error
+    ----                          ^^^
+      11          66 B-R2 RENAMES B-1 THRU B-2. *> should error
+      12          66 B-R3 RENAMES B-4 THRU B-5. *> should error
+    >> Error: RENAMES operand 'B-1 IN B' has or is subordinate to an OCCURS
+              clause
+
+    prog.cob:11.23-11.26:
+       8            02 B-5 OCCURS 5 TIMES.
+       9              03 FILLER PIC X.
+      10          66 B-R1 RENAMES B-1. *> should error
+      11 >        66 B-R2 RENAMES B-1 THRU B-2. *> should error
+    ----                          ^^^
+      12          66 B-R3 RENAMES B-4 THRU B-5. *> should error
+      13          PROCEDURE DIVISION.
+    >> Error: RENAMES operand 'B-1 IN B' has or is subordinate to an OCCURS
+              clause
+
     prog.cob:12.32-12.35:
        9              03 FILLER PIC X.
       10          66 B-R1 RENAMES B-1. *> should error
@@ -37,7 +59,8 @@ let%expect_test "renames-errors-1" =
     ----                                   ^^^
       13          PROCEDURE DIVISION.
       14
-    >> Error: RENAMES operand 'B-5 IN B' has an OCCURS clause
+    >> Error: RENAMES operand 'B-5 IN B' has or is subordinate to an OCCURS
+              clause
   |}];;
 
 let%expect_test "renames-missing-target" =

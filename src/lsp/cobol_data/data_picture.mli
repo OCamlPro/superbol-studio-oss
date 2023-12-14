@@ -179,24 +179,43 @@ type t = TYPES.picture
 open TYPES
 
 val pp_category: category Pretty.printer
+val pp_category_name: category Pretty.printer
 
-(** [is_edited c] indicates whether the given category represents an edited
-    item *)
-val is_edited: category -> bool
+(** [is_edited pic] indicates whether the given picture string represents an
+    edited item *)
+val is_edited: picture -> bool
 
-(** data size (in "characters" --- probably with implemententor specific
-    semantics) *)
-val data_size: category -> int
+val is_boolean: picture -> bool
+val is_national: picture -> bool
+
+(** [is_numeric pic] indicates whether the given picture string is of class
+    numeric *)
+val is_numeric: picture -> bool
+val is_signed_numeric: picture -> bool
+
+(** Size of the underlying data; corresponds to the number of "characters" for
+    usage DISPLAY *)
+val data_size: picture -> int
 
 (** display size, after editions; corresponds to "size" in standards *)
-val size: category -> int
+val size: picture -> int
 
 val of_string: config -> string ->
-  (TYPES.picture,
-   (TYPES.error * (int * int))                        (* = (error, (pos, len)) *)
-     list * TYPES.picture) result
+  (picture,
+   (error * (int * int))                        (* = (error, (pos, len)) *)
+     list * picture) result
 
-val alphanumeric: size:int -> TYPES.picture
+val alphanumeric: size: int -> picture
+val national: size: int -> picture
+val boolean: int -> picture
+val digits: int -> picture
+val fixed_numeric
+  : ?basics: basic_edition list
+  -> ?floating: floating_insertion
+  -> ?with_sign: bool
+  -> (* integral_digits: *)int
+  -> (* decimal_digits: *)int
+  -> picture
 
 module Make (Config: Cobol_config.T) (Env: ENV) : sig
 

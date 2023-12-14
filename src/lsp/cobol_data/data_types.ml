@@ -13,6 +13,9 @@
 
 (** Representation of COBOL data items *)
 
+(* Note: location of qualnames often correspond to the *unqualified* name, with
+   implicit qualification based on item groups. *)
+
 open Cobol_common.Srcloc.TYPES
 
 module NEL = Cobol_common.Basics.NEL
@@ -22,7 +25,30 @@ type picture_config = Data_picture.TYPES.config
 type picture = Data_picture.t
 
 type usage =
-  | Usage of picture                                               (* for now *)
+  | Binary of (* [`numeric] *) picture
+  | Binary_C_long of signedness                         (* GnuCOBOL *)
+  | Binary_char of signedness                           (* +COB2002 *)
+  | Binary_double of signedness                         (* +COB2002 *)
+  | Binary_long of signedness                           (* +COB2002 *)
+  | Binary_short of signedness                          (* +COB2002 *)
+  | Bit of (* [`boolean] *) picture
+  | Display of (* [any] *) picture
+  | Float_binary of { width: [`W32|`W64|`W128];                   (* +COB2002 *)
+                      endian: Cobol_ptree.endianness_mode }
+  | Float_decimal of { width: [`W16 | `W34];                      (* +COB2002 *)
+                       endian: Cobol_ptree.endianness_mode;
+                       encoding: Cobol_ptree.encoding_mode }
+  | Float_extended                                                (* +COB2002 *)
+  | Float_long                                                    (* +COB2002 *)
+  | Float_short                                                   (* +COB2002 *)
+  | Function_pointer of Cobol_ptree.name with_loc                 (* tmp *)
+  | Index
+  | National of (* [any] *) picture
+  | Object_reference of Cobol_ptree.object_reference_kind option       (* tmp *)
+  | Packed_decimal of (* [`numeric] *) picture
+  | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
+  | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
+and signedness = { signed: bool }
 
 type data_storage =
   | File
@@ -37,13 +63,10 @@ let pp_data_storage ppf s =
   | Working_storage -> "WORKING-STORAGE"
   | Linkage -> "LINKAGE"
 
-type (* 'length *) length =
-  | Fixed_length(* : [>`fixed_length] length *)
-  | Variable_length(* : [>`variable_length] length *)
-
-(* type item_offset = *)
-(*   (\* To be completed *\) *)
-(*   | Offset of Cobol_ptree.qualname *)
+type length =
+  | Fixed_length
+  | Variable_length
+  (* Note: OCCURS DYNAMIC is considered fixed-length in ISO/IEC *)
 
 type record =
   {
@@ -54,69 +77,72 @@ type record =
   }
 and item_definitions = item_definition with_loc nel
 and item_redefinitions = item_definition with_loc list
+
 and item_definition =
+  | Field of field_definition
+  | Table of table_definition
+
+and field_definition =
   {
-    (* Note: location of qualname corresponds to the *unqualified* name, with
-       implicit qualification based on item groups. *)
-    item_qualname: Cobol_ptree.qualname with_loc option;
-    item_redefines: Cobol_ptree.qualname with_loc option;       (* redef only *)
-    item_layout: item_layout;
-    item_offset: Data_memory.offset; (** offset w.r.t record address, not taking
-                                         subscripts/dimensions/refmords into
-                                         account. *)
-    item_size: Data_memory.size;
-    item_length: length;
-    item_conditions: condition_names;
-    item_redefinitions: item_redefinitions;
+    field_qualname: Cobol_ptree.qualname with_loc option;
+    field_redefines: Cobol_ptree.qualname with_loc option;      (* redef only *)
+    field_leading_ranges: table_range list;
+    field_offset: Data_memory.offset;         (** offset w.r.t record address *)
+    field_size: Data_memory.size;
+    field_layout: field_layout;
+    field_length: length;
+    field_conditions: condition_names;
+    field_redefinitions: item_redefinitions;
   }
-and item_layout =
-  | Elementary_item of
+
+and field_layout =
+  | Elementary_field of
       {
         usage: usage;
         init_value: Cobol_ptree.literal with_loc option;
       }
-  | Struct_item of
+  | Struct_field of
       {
-        fields: item_definitions;
+        subfields: item_definitions;
       }
-  (* | FlexibleStruct: *)
-  (*     { *)
-  (*       (\* only last may be of variable length, unless ODOSLIDE is on *\) *)
-  (*       fields: ([>`fixed_length *)
-  (*                | `variable_length                 (\* <- to allow ODOSLIDE *\) *)
-  (*                ] item_definitions, 'a item_definitions) nel'; *)
-  (*     } *)
-  (*     -> ([>`simple], [>`fixed_length | `variable_length] as 'a) item_layout *)
-  | Fixed_table of                                          (* OCCURS _ TIMES *)
-      {
-        items: item_definitions;
-        length: int with_loc;                                  (* int for now *)
-        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
-        (* TODO: keys, indexing; *)
-      }
-  (* -> ([>`table], [>`fixed_length]) item_layout *)
-  | Depending_table of                  (* OCCURS _ TO _ TIMES DEPENDING ON _ *)
-      {
-        (* no subordinate OCCURS DEPENDING: *)
-        items: item_definitions;
-        min_occurs: int with_loc;                              (* int for now *)
-        max_occurs: int with_loc;                              (* ditto *)
-        depending: Cobol_ptree.qualname with_loc;
-        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
-        (* TODO: keys, indexing; *)
-      }
-  (* -> ([>`table], [>`variable_length]) item_layout *)
-  | Dynamic_table of                 (* OCCURS DYNAMIC CAPACITY _ FROM _ TO _ *)
-      {
-        items: item_definitions;
-        capacity: Cobol_ptree.qualname with_loc option;
-        min_capacity: int with_loc option;
-        max_capacity: int with_loc option;
-        init_values: Cobol_ptree.literal with_loc list;       (* list for now *)
-        initialized: bool with_loc;
-        (* TODO: keys, indexing *)
-      } (* NOTE: considered fixed-length in ISO/IEC *)
-(* -> ([>`table], [>`fixed_length]) item_layout *)
+
+and table_definition =
+  {
+    table_field: field_definition with_loc;
+    table_offset: Data_memory.offset;
+    table_size: Data_memory.size;
+    table_range: table_range;
+    table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
+    table_redefines: Cobol_ptree.qualname with_loc option;    (* redef only *)
+    table_redefinitions: item_redefinitions;
+  }
+and table_range =
+  {
+    range_span: span;
+    range_indexes: Cobol_ptree.qualname with_loc list;
+  }
+and span =
+  | Fixed_span of fixed_span         (* OCCURS _ TIMES *)
+  | Depending_span of depending_span (* OCCURS _ TO _ TIMES DEPENDING ON _ *)
+  | Dynamic_span of dynamic_span     (* OCCURS DYNAMIC CAPACITY _ FROM _ TO _ *)
+
+and fixed_span =
+  {
+    occurs_times: int with_loc;                                (* int for now *)
+  }
+and depending_span =
+  {
+    occurs_depending_min: int with_loc;                        (* int for now *)
+    occurs_depending_max: int with_loc;                        (* ditto *)
+    occurs_depending: Cobol_ptree.qualname with_loc;
+  }
+and dynamic_span =
+  {
+    occurs_dynamic_capacity: Cobol_ptree.qualname with_loc option;
+    occurs_dynamic_capacity_min: int with_loc option;
+    occurs_dynamic_capacity_max: int with_loc option;
+    occurs_dynamic_initialized: bool with_loc;
+  }
 
 and condition_names = condition_name with_loc list
 and condition_name =
@@ -153,13 +179,8 @@ and renamed_item_layout =
       }
   | Renamed_struct of
       {
-        fields: item_definitions;
+        subfields: item_definitions;    (* CHECKME: items rather than fields? *)
       }
-(*   | RenamedFixedTable of *)
-(*       { *)
-(*         items: renamed_item_layout nel; *)
-(*         length: int with_loc; *)
-(*       } *)
 
 (* type data_const_record = *)
 (*   { *)
@@ -167,23 +188,12 @@ and renamed_item_layout =
 (*     const_descr: Cobol_ptree.constant_item_descr; *)
 (*     const_layout: const_layout; *)
 (*   } *)
-(* and const_layout = *)
-(*   | ElementaryConstant of *)
-(*       { *)
-(*         (\* value: ?; *\) *)
-(*         class_: unit;                                           (\* -- for now *\) *)
-(*       } *)
-(*   | ConstantRecord of *)
-(*       { *)
-(*         (\* value: ?; *\) *)
-(*         class_: unit option;                                    (\* -- for now *\) *)
-(*       } *)
 
-type item =
-  | Data_item of
+type data_definition =
+  | Data_field of
       {
         record: record;
-        def: item_definition with_loc;
+        def: field_definition with_loc;
       }
   | Data_renaming of                                              (* not sure *)
       {
@@ -193,9 +203,14 @@ type item =
   | Data_condition of
       {
         record: record;
-        item: item_definition with_loc;
+        field: field_definition with_loc;
         def: condition_name with_loc;
       }
-  (* | Const_record: data_const_record -> definition *)
+  | Table_index of
+      {
+        record: record;                    (* record where [table] is defined *)
+        table: table_definition with_loc;          (* table whose index it is *)
+        qualname: Cobol_ptree.qualname with_loc;   (* fully qualified name *)
+      }
 
 (* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)

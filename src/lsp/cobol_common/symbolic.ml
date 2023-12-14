@@ -32,8 +32,8 @@ module type LINEXPR = sig
   val const: const -> linexpr
   val factor: factor -> linexpr
   val zero: linexpr
-  val add: linexpr -> by:linexpr -> linexpr
-  val sub: linexpr -> by:linexpr -> linexpr
+  val add: linexpr -> linexpr -> linexpr
+  val sub: linexpr -> linexpr -> linexpr
   val mult: linexpr -> by:factor -> linexpr
   val as_int: linexpr -> int
 end
@@ -177,13 +177,13 @@ struct
 
   let add_factors: factors -> factors -> factors =
     Factors.union (fun _ a b -> elim_zero (a + b))
-  let add_terms: linexpr -> by:linexpr -> linexpr = fun s ~by ->
-    Terms.union (fun _ a b -> elim_empty (add_factors a b)) s by
+  let add_terms: linexpr -> linexpr -> linexpr = fun s t ->
+    Terms.union (fun _ a b -> elim_empty (add_factors a b)) s t
 
   let sub_factors: factors -> factors -> factors =
     Factors.union (fun _ a b -> elim_zero (a - b))
-  let sub_terms: linexpr -> by:linexpr -> linexpr = fun s ~by ->
-    Terms.union (fun _ a b -> elim_empty (sub_factors a b)) s by
+  let sub_terms: linexpr -> linexpr -> linexpr = fun s t ->
+    Terms.union (fun _ a b -> elim_empty (sub_factors a b)) s t
 
   let mult_factors_with_scalar: factors -> int -> factors = fun a n ->
     Factors.filter_map (fun _ a -> elim_zero (a * n)) a

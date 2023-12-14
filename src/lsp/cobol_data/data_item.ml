@@ -12,25 +12,44 @@
 (**************************************************************************)
 
 open Data_types
-open Cobol_common.Srcloc.INFIX
+
+module Visitor = Cobol_common.Visitor
 
 (* ignores redefs by default *)
-let fold_definitions ?(fold_redefinitions = false) ~f def acc =
-  let rec aux acc def =
-    structure ~&def.item_layout (f def acc) |>
-    if fold_redefinitions
-    then fun acc -> List.fold_left aux acc ~&def.item_redefinitions
-    else Fun.id
-  and structure = function
-    | Elementary_item _ ->
-        Fun.id
-    | Struct_item { fields = items }
-    | Fixed_table { items; _ }
-    | Depending_table { items; _ }
-    | Dynamic_table { items; _ } ->
-        fun acc -> NEL.fold_left ~f:aux acc items
-  in
-  aux acc def
+let fold_definitions ?(fold_redefinitions = false) ~field ~table def acc =
+  Data_visitor.fold_item_definition' object
+    inherit [_] Data_visitor.folder
+    method! fold_field_definition' def acc =
+      Visitor.do_children (field def acc)
+    method! fold_table_definition' def acc =
+      Visitor.do_children (table def acc)
+    method! fold_usage _ = Visitor.skip
+    method! fold_item_redefinitions _ acc =
+      if fold_redefinitions
+      then Visitor.do_children acc
+      else Visitor.skip_children acc
+    method! fold_table_range _ = Visitor.skip
+    method! fold_fixed_span _ = Visitor.skip
+    method! fold_depending_span _ = Visitor.skip
+    method! fold_dynamic_span _ = Visitor.skip
+    method! fold_condition_names _ = Visitor.skip
+    method! fold_memory_offset _ = Visitor.skip
+    method! fold_memory_size _ = Visitor.skip
+    method! fold_qualname' _ = Visitor.skip
+  end def acc
 
-let offset: item_definition -> Data_memory.offset = fun def -> def.item_offset
-let size: item_definition -> Data_memory.size = fun def -> def.item_size
+let offset: item_definition -> Data_memory.offset = function
+  | Field f -> f.field_offset
+  | Table t -> t.table_offset
+
+let size: item_definition -> Data_memory.size = function
+  | Field f -> f.field_size
+  | Table t -> t.table_size
+
+let qualname = function
+  | Field { field_qualname; _ } -> field_qualname
+  | Table _ -> None
+
+(** Note: may be a no-op *)
+let pp_item_qualname ?(leading = Fmt.nop) ppf item =
+  Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)

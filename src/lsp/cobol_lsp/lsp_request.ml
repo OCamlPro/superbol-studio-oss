@@ -76,17 +76,20 @@ let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
     ?(allow_notifications = true)
     (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
-  | Data_item { def = { loc; _ }; _ }
+  | Data_field { def = { loc; _ }; _ }
   | Data_renaming { def = { loc; _ }; _ }
   | Data_condition { def = { loc; _ }; _ }
+  | Table_index { table = { loc; _ }; _ }
     when not focus_on_name_in_defintions ->
       [location_of_srcloc loc]
-  | Data_item { def; _ } ->
-      Option.(to_list @@ map location_of ~&def.item_qualname)
+  | Data_field { def; _ } ->
+      Option.(to_list @@ map location_of ~&def.field_qualname)
   | Data_renaming { def; _ } ->
       [location_of ~&def.renaming_name]
   | Data_condition { def; _ } ->
       [location_of ~&def.condition_name_qualname]
+  | Table_index { qualname; _ } ->
+      [location_of qualname]
   | exception Not_found
   | exception Cobol_unit.Qualmap.Ambiguous _
     when not allow_notifications ->

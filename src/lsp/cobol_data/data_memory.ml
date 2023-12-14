@@ -11,23 +11,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* (\** Named address in memory *\) *)
-(* type address = string *)
-(* [@@deriving show, ord] *)
-
 (** Size and offsets are affine expressions on symbolic (assumed constant)
     elementary sizes with symbolic variables. *)
 
 type elementary_size =
+  | Size_of_C_double
+  | Size_of_C_float
+  | Size_of_C_long
+  | Size_of_C_long_double
   | Size_of_dynamic_table
-  | Size_of_byte
+  | Size_of_index
+  | Size_of_pointer
 [@@deriving ord]
 
-let pp_elementary_size ppf = function
-  | Size_of_dynamic_table ->
-      Pretty.string ppf "size-of-dynamic-table"
-  | Size_of_byte ->
-      Pretty.string ppf "size-of-byte"
+let pp_elementary_size ppf s =
+  Pretty.string ppf @@ match s with
+  | Size_of_C_double      -> "size-of-C-double"
+  | Size_of_C_float       -> "size-of-C-float"
+  | Size_of_C_long        -> "size-of-C-long"
+  | Size_of_C_long_double -> "size-of-C-long-double"
+  | Size_of_dynamic_table -> "size-of-dynamic-table"
+  | Size_of_index         -> "size-of-index"
+  | Size_of_pointer       -> "size-of-pointer"
 let show_elementary_size = Pretty.to_string "%a" pp_elementary_size
 
 (* --- *)
@@ -46,21 +51,15 @@ module AE =
     (struct type t = symbolic_var    [@@deriving show, ord] end)
     (struct type t = elementary_size [@@deriving show, ord] end)
 
-open AE
-
-(* higher level operations *)
-
-(* let address: string -> address = Fun.id                             (\* for now *\) *)
-
-(* --- *)
-
 exception NON_LINEAR = AE.NON_LINEAR
 exception NOT_SCALAR = AE.NOT_SCALAR
+
+(* higher level operations *)
 
 type factor = AE.factor
 [@@deriving show]
 
-type size = linexpr
+type size = AE.linexpr
 [@@deriving show]
 
 type offset = size
@@ -75,19 +74,29 @@ let const_size: int -> size = function
   | i -> AE.factor (int i)
 let valof_size s = AE.factor @@ valof s
 let elementary_size: elementary_size -> size = AE.const
-let size_of_dynamic_table: size = elementary_size Size_of_dynamic_table
-let size_of_byte: size = elementary_size Size_of_byte
 
 let as_int = AE.as_int
 
-let increase: size -> by:size -> size = AE.add
-let diff: size -> size -> size = fun a b -> AE.sub a ~by:b
+let add: size -> size -> size = AE.add
+let diff: size -> size -> size = fun a b -> AE.sub a b
+let increase: size -> by:size -> size = fun s ~by -> add s by
 let repeat: size -> by:factor -> size = AE.mult
 let mult_int: size -> int -> size = fun s by -> repeat s ~by:(int by)
+
+let bit_size: size = const_size 1
+let byte_size: size = mult_int bit_size 8
+
+let size_of_C_double      = elementary_size Size_of_C_double
+let size_of_C_float       = elementary_size Size_of_C_float
+let size_of_C_long        = elementary_size Size_of_C_long
+let size_of_C_long_double = elementary_size Size_of_C_long_double
+let size_of_dynamic_table = elementary_size Size_of_dynamic_table
+let size_of_index         = elementary_size Size_of_index
+let size_of_pointer       = elementary_size Size_of_pointer
 
 (* --- *)
 
 let no_offset: offset = point_size
 
-let shift = increase                                      (* alias for offset *)
+let shift o ~by = add o by                                (* alias for offset *)
 let size ~from ~to_ = diff to_ from

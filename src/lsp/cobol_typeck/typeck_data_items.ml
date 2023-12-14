@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* [@@@warning "-32"] *)
+
 open Cobol_unit.Types
 open Cobol_data.Types
 open Cobol_common.Srcloc.TYPES
@@ -19,6 +21,7 @@ open Cobol_common.Srcloc.INFIX
 module Visitor = Cobol_common.Visitor
 module Qualmap = Cobol_unit.Qualmap
 module NEL = Cobol_common.Basics.NEL
+module PIC = Cobol_data.Picture
 
 (* --- *)
 
@@ -35,7 +38,7 @@ type acc =
     current_storage: Cobol_data.Types.data_storage;
     current_qualification: Cobol_ptree.qualname option;
     item_stack: item_stack;
-    current_qualmap: Cobol_data.Types.item_definition with_loc Qualmap.t;
+    current_qualmap: Cobol_data.Types.field_definition with_loc Qualmap.t;
     pending_conditions: condition_name_under_construction list;
     filler_count: int;
     definitions: Cobol_unit.Types.data_definitions;
@@ -46,23 +49,25 @@ type acc =
 and item_stack = item_under_construction list
 and item_under_construction =               (* item currently being assembled *)
   {
-    item_level: int;                                         (* 01 <= _ <= 49 *)
-    item_name: Cobol_ptree.data_name with_loc option;
+    item_level: int;                                       (* 01 <= _ <= 49 *)
+    item_name: Cobol_ptree.data_name with_loc option;      (* given item name *)
     item_loc: srcloc;
-    item_qualname: Cobol_ptree.qualname with_loc option;    (* full qual name *)
-    item_qualifier: Cobol_ptree.qualname option;
+    item_qualname: Cobol_ptree.qualname with_loc option;     (* full qualname *)
+    item_qualifier: Cobol_ptree.qualname option;  (* qualifier for sub. items *)
+    item_redefines: Cobol_ptree.qualname with_loc option;     (* if REDEFINES *)
     item_offset: Cobol_data.Memory.offset;
-    item_size: Cobol_data.Memory.size;                   (* if non-elementary *)
+    item_size: Cobol_data.Memory.size;
     item_clauses: Typeck_clauses.data_clauses;
-    item_redefines: Cobol_ptree.qualname with_loc option; (* REDEFINES iff <> None *)
+    item_range: table_range option;
+    item_rev_leading_ranges: table_range list;       (* ~> leading subscripts *)
     item_rev_fields: Cobol_data.Types.item_definition with_loc list;
     item_rev_renames: Cobol_data.Types.record_renaming with_loc list;
     item_rev_conditions: Cobol_data.Types.condition_names;
-    (* TODO: subscripting info? + others? *)
   }
+
 and condition_name_under_construction =
   Cobol_data.Types.condition_name with_loc *
-  Cobol_data.Types.item_definition with_loc
+  Cobol_data.Types.field_definition with_loc
 
 (* --- *)
 
@@ -112,350 +117,7 @@ let result { definitions = { data_items; data_records };
 (*   List.rev_map (fun { item_name; _ } -> item_name) acc.item_stack *)
 
 
-(* --- *)
-
-let record_name: acc -> Cobol_ptree.qualname with_loc option -> acc * string =
-  fun acc -> function
-    | None ->
-        { acc with filler_count = succ acc.filler_count },
-        Pretty.to_string "FILLER %u" (succ acc.filler_count)
-    | Some qn ->
-        acc, name_of ~&qn
-
-(* --- *)
-
-
-let define_record acc ~renamings (record_item: item_definition with_loc) =
-  let acc, record_name = record_name acc ~&record_item.item_qualname in
-  let record = { record_name; record_storage = acc.current_storage;
-                 record_item; record_renamings = renamings } in
-  let add_named_def qn def { named; list } =
-    { named = Qualmap.add ~&qn def named;
-      list = def :: list }
-  and add_anonymous_def def { named; list } =
-    { named;
-      list = def :: list }
-  in
-  let data_items =
-    Cobol_data.Item.fold_definitions record_item acc.definitions.data_items
-      ~fold_redefinitions:true
-      ~f:begin function
-        | { payload = { item_qualname = Some qn; _ }; _ } as def ->
-            add_named_def qn (Data_item { record; def })
-        | { payload = { item_qualname = None; _ }; _ } as def ->
-            add_anonymous_def (Data_item { record; def })
-      end
-  in
-  let data_items =                                      (* add renaming items *)
-    List.fold_left begin fun data_items def ->
-      add_named_def ~&def.renaming_name
-        (Data_renaming { record; def }) data_items
-    end data_items renamings
-  in
-  let data_items =                                     (* add condition names *)
-    List.fold_left begin fun data_items (def, item) ->
-      (* TODO: [validation] entries have no name.  (The current parse-tree does
-         not allow those). *)
-      add_named_def ~&def.condition_name_qualname
-        (Data_condition { record; def; item }) data_items
-    end data_items acc.pending_conditions
-  in
-  { acc with
-    current_qualmap = Qualmap.empty;
-    pending_conditions = [];
-    definitions = { data_items;
-                    data_records = record :: acc.definitions.data_records } }
-
-
-let commit_def ~renamings def acc =
-  match acc.item_stack with
-  | [] ->
-      define_record acc ~renamings def
-  | { item_loc; item_size; _ } as top_item :: item_stack ->
-      let field_size = ~&def.item_size in
-      let top_item =
-        { top_item with
-          item_loc = Cobol_common.Srcloc.concat item_loc ~@def;
-          item_size = Cobol_data.Memory.increase item_size ~by:field_size;
-          item_rev_fields = def :: top_item.item_rev_fields } in
-      { acc with item_stack = top_item :: item_stack }
-
-
-let dummy_picture_clause acc pic =
-  match Cobol_data.Picture.(of_string acc.picture_config pic) with
-  | Ok picture -> Ok (acc, picture)
-  | Error _ -> Error acc
-
-
-let translate_picture_clause acc
-    { payload = Cobol_ptree.{ picture;
-                              picture_locale = _;
-                              picture_depending = _ }; loc = _ } =
-  match Cobol_data.Picture.(of_string acc.picture_config ~&picture) with
-  | Ok picture ->
-      Ok (acc, picture)
-  | Error (errors, _) ->                    (* note: errors are still reversed *)
-      Cobol_data.Picture.rev_errors_with_loc ~loc:~@picture errors |>
-      List.fold_left begin fun acc err ->
-        error acc (Picture_error { picture_loc = ~@picture; error = err })
-      end acc |>
-      Result.error
-
-
-let warn_about_extraneous_clauses ~clause_name acc clauses =
-  List.fold_left begin fun acc { loc; _ } ->
-    warn acc (Extraneous_clause { clause_name; clause_loc = loc })
-  end acc clauses
-
-
-let elementary_usage_n_value acc
-    { item_name; item_loc; item_clauses = { picture; values; _ };_ } =
-  let acc, value, extra_clauses = match List.rev values with
-    | { payload = ValueTable _; loc } :: extra_clauses ->
-        error acc @@
-        Unexpected_table_value_clause { item_name; value_loc = loc },
-        None, extra_clauses
-    | { payload = ValueData literal; _ } :: extra_clauses ->
-        acc, Some literal, extra_clauses
-    | [] ->
-        acc, None, []
-  in
-  let acc =
-    warn_about_extraneous_clauses acc extra_clauses ~clause_name:"VALUE"
-  in
-  match picture, value with
-  | Some picture, _ ->
-      (match translate_picture_clause acc picture with
-       | Error acc -> Error acc
-       | Ok (acc, picture) -> Ok (acc, Usage picture, None))
-  | None, Some _ ->
-      (match dummy_picture_clause acc "X" with             (* XXX: temporary! *)
-       | Error acc -> Error acc
-       | Ok (acc, picture) -> Ok (acc, Usage picture, value))
-  | None, _ ->
-      let acc =
-        error acc (Missing_picture_clause_for_elementary_item { item_name;
-                                                                item_loc })
-      in
-      (match dummy_picture_clause acc "X" with
-       | Error acc -> Error acc
-       | Ok (acc, picture) -> Ok (acc, Usage picture, None))
-
-
-(* let group_picture_n_value acc *)
-(*     { item_name; item_loc; item_clauses = { picture; values; _ };_ } = *)
-(*   let acc, value = match value with *)
-(*     | Some { payload = ValueTable _; loc } -> *)
-(*         error acc (Unexpected_table_value_clause { item_name; *)
-(*                                                    value_loc = loc }), None *)
-(*     | Some { payload = ValueData literal; _ } -> *)
-(*         acc, Some literal *)
-(*     | None -> *)
-(*         acc, None *)
-(*   in *)
-(*   match picture, value with *)
-(*   | Some picture, _ -> *)
-(*       (match translate_picture_clause acc picture with *)
-(*        | Error acc -> Error acc *)
-(*        | Ok (acc, picture) -> Ok (acc, picture, None)) *)
-(*   | None, Some _ -> *)
-(*       (match dummy_picture_clause acc "X" with             (\* XXX: temporary! *\) *)
-(*        | Error acc -> Error acc *)
-(*        | Ok (acc, picture) -> Ok (acc, picture, value)) *)
-(*   | None, _ -> *)
-(*       let acc = *)
-(*         error acc (Missing_picture_clause_for_elementary_item { item_name; *)
-(*                                                                 item_loc }) *)
-(*       in *)
-(*       (match dummy_picture_clause acc "X" with *)
-(*        | Error acc -> Error acc *)
-(*        | Ok (acc, picture) -> Ok (acc, picture, None)) *)
-
-
-let register_def acc (def: item_definition with_loc) =
-  match ~&def.item_qualname with
-  | Some qn ->
-      { acc with
-        current_qualmap = Qualmap.add ~&qn def acc.current_qualmap }
-  | None -> acc
-
-
-let item_definition acc
-    ({ item_name;
-       item_loc;
-       item_qualname;
-       item_qualifier;
-       item_redefines;
-       item_offset;
-       item_size;
-       item_clauses = { occurs; picture; values; clause_diags; _ };
-       item_rev_fields;
-       item_rev_conditions; _ } as item)
-  : (acc * Cobol_data.Types.item_definition with_loc, acc) result =
-  let open Cobol_data.Types in
-  let acc =
-    { acc with diags = Typeck_diagnostics.union acc.diags clause_diags } in
-  let item_conditions = List.rev item_rev_conditions in
-  let item_definitions_length item_definitions =
-    NEL.fold_left Fixed_length item_definitions ~f:begin fun l item_def ->
-      if ~&item_def.item_length = Variable_length
-      then Variable_length
-      else l
-    end
-  in
-  let qualify n = qual n item_qualifier &@<- n in
-  let opt = Option.map in
-  let int = Cobol_common.Srcloc.locmap int_of_string in
-  let elementary acc ({ loc; payload = item } as item') =
-    match occurs with
-    | OccursOnce ->
-        let item' = { ~&item' with item_redefines } &@<- item' in
-        register_def acc item', item'
-    | FixedOccurs { length; loc = _ } ->
-        let length = int length in
-        register_def acc item', {
-          item_qualname = None;                            (* implicit FILLER *)
-          item_redefines;
-          item_layout = Fixed_table { items = NEL.One item';
-                                      length;
-                                      init_values = [] };
-          item_offset = item.item_offset;
-          item_size = Cobol_data.Memory.mult_int item.item_size ~&length;
-          item_length = Fixed_length;
-          item_redefinitions = [];
-          item_conditions = [];
-        } &@ loc
-    | OccursDepending { min_occurs; max_occurs; depending; loc = _ } ->
-        let dep_size = Cobol_data.Memory.valof ~&depending in
-        register_def acc item', {
-          item_qualname = None;                            (* implicit FILLER *)
-          item_redefines;
-          item_layout = Depending_table { items = NEL.One item';
-                                          min_occurs = int min_occurs;
-                                          max_occurs = int max_occurs;
-                                          depending;
-                                          init_values = [] };
-          item_offset = item.item_offset;
-          item_size = Cobol_data.Memory.repeat item.item_size ~by:dep_size;
-          item_length = Variable_length;
-          item_redefinitions = [];
-          item_conditions = [];
-        } &@ loc
-    | OccursDynamic { capacity; min_capacity; max_capacity;
-                      initialized; loc = _ } ->
-        register_def acc item', {
-          item_qualname = None;                            (* implicit FILLER *)
-          item_redefines;
-          item_layout = Dynamic_table { items = NEL.One item';
-                                        capacity = opt qualify capacity;
-                                        min_capacity = opt int min_capacity;
-                                        max_capacity = opt int max_capacity;
-                                        initialized;
-                                        init_values = [] };
-          item_offset = item.item_offset;
-          item_size = Cobol_data.Memory.size_of_dynamic_table;
-          item_length = Fixed_length;
-          item_redefinitions = [];
-          item_conditions = [];
-        } &@ loc
-  in
-  let group items =
-    let item_layout, item_length =
-      match occurs with
-      | OccursOnce ->
-          Struct_item { fields = items },
-          item_definitions_length items
-      | FixedOccurs { length; loc = _ } ->
-          Fixed_table { items;
-                        length = int length;
-                        init_values = [] },
-          item_definitions_length items
-      | OccursDepending { min_occurs; max_occurs; depending; loc = _ } ->
-          Depending_table { items;
-                            min_occurs = int min_occurs;
-                            max_occurs = int max_occurs;
-                            depending;
-                            init_values = [] },
-          Variable_length
-      | OccursDynamic { capacity; min_capacity; max_capacity;
-                        initialized; loc = _ } ->
-          Dynamic_table { items;
-                          capacity = opt qualify capacity;
-                          min_capacity = opt int min_capacity;
-                          max_capacity = opt int max_capacity;
-                          initialized;
-                          init_values = [] },
-          Fixed_length
-    in
-    {
-      item_qualname;
-      item_redefines;
-      item_layout = item_layout;
-      item_offset = ~&(NEL.hd items).item_offset;
-      item_size;
-      item_length;
-      item_redefinitions = [];
-      item_conditions;
-    } &@ item_loc
-  in
-  if item_rev_fields = [] then         (* elementary (or table of elementary) *)
-    match elementary_usage_n_value acc item with
-    | Ok (acc, (Usage picture as usage), init_value) ->
-        let data_size = Cobol_data.Picture.data_size picture.category in
-        Ok (elementary acc
-              ({ item_qualname;
-                 item_redefines = None;
-                 item_layout = Elementary_item { usage; init_value };
-                 item_offset;
-                 item_size = Cobol_data.Memory.const_size data_size;
-                 item_length = Fixed_length;
-                 item_redefinitions = [];
-                 item_conditions } &@ item_loc))
-    | Error acc ->
-        Error acc                                               (* just skip *)
-  else                                                          (* group item *)
-    let items = NEL.of_rev_list item_rev_fields in
-    match picture, values with
-    | Some picture, _ ->                   (* TODO: recover to proceed anyways *)
-        Error (error acc @@
-               Unexpected_picture_clause_for_group_item { picture;
-                                                          item_name;
-                                                          item_loc })
-    | _ ->
-        let def = group items in
-        Ok (register_def acc def, def)
-
-
-let commit_conditions acc def { item_rev_conditions; _ } =
-  let pending_conditions =
-    List.fold_left begin fun pcs cond_name ->
-      (cond_name, def) :: pcs
-    end acc.pending_conditions item_rev_conditions
-  in
-  { acc with pending_conditions }
-
-
-let item_definitions acc items =
-  List.fold_left begin fun (acc, rev_defs, renamings) item ->
-    match item_definition acc item with
-    | Ok (acc, def) ->
-        commit_conditions acc def item,
-        def :: rev_defs,
-        List.rev_append item.item_rev_renames renamings
-    | Error acc ->
-        acc, rev_defs, renamings
-  end (acc, [], []) items
-
-
-let extend_item_def_with_redefs def redefs =
-  let item_redefinitions = NEL.to_list redefs in
-  let item_loc =
-    Option.get @@           (* cannot fail as the list of locs is never empty *)
-    Cobol_common.Srcloc.concat_locs @@ def :: item_redefinitions
-  in
-  { ~&def with
-    item_layout = ~&def.item_layout;
-    item_redefinitions } &@ item_loc
+(* Managing and scanning the stack of items under construction ([item_stack]) *)
 
 
 let def_n_redef_items (item_stack: item_stack) =
@@ -465,9 +127,6 @@ let def_n_redef_items (item_stack: item_stack) =
     | tl -> redefs, tl              (* [redefs] should always be empty here *)
   in
   aux [] item_stack
-
-
-(* --- data items --- *)
 
 
 (** [qualify name item_stack] returns the qualified name of a new item with name
@@ -514,6 +173,297 @@ let current_item_offset: item_stack -> Cobol_data.Memory.offset = function
       Cobol_data.Memory.shift item_offset ~by:item_size
 
 
+(* --- *)
+
+
+let record_name: acc -> Cobol_ptree.qualname with_loc option -> acc * string =
+  fun acc -> function
+    | None ->
+        { acc with filler_count = succ acc.filler_count },
+        Pretty.to_string "FILLER %u" (succ acc.filler_count)
+    | Some qn ->
+        acc, name_of ~&qn
+
+
+(* --- *)
+
+
+let commit_record acc ~renamings (record_item: item_definition with_loc) =
+  let record_item_name = Cobol_data.Item.qualname ~&record_item in
+  let acc, record_name = record_name acc record_item_name in
+  let record = { record_name; record_storage = acc.current_storage;
+                 record_item; record_renamings = renamings } in
+  let add_named_def qn def { named; list } =
+    { named = Qualmap.add ~&qn def named;
+      list = def :: list }
+  and add_anonymous_def def { named; list } =
+    { named;
+      list = def :: list }
+  in
+  let data_items =
+    Cobol_data.Item.fold_definitions ~fold_redefinitions:true record_item
+      acc.definitions.data_items
+      ~field:begin fun def -> match ~&def.field_qualname with  (* regular fields *)
+        | Some qn ->
+            add_named_def qn (Data_field { record; def })
+        | None ->
+            add_anonymous_def (Data_field { record; def })
+      end
+      ~table:begin fun table acc ->                             (* table indexes *)
+        List.fold_left begin fun acc qualname ->
+          add_named_def qualname (Table_index { record; table; qualname }) acc
+        end acc ~&table.table_range.range_indexes
+      end
+  in
+  let data_items =                                      (* add renaming items *)
+    List.fold_left begin fun data_items def ->
+      add_named_def ~&def.renaming_name
+        (Data_renaming { record; def }) data_items
+    end data_items renamings
+  in
+  let data_items =                                     (* add condition names *)
+    List.fold_left begin fun data_items (def, field) ->
+      (* TODO: [validation] entries have no name.  (The current parse-tree does
+         not allow those). *)
+      add_named_def ~&def.condition_name_qualname
+        (Data_condition { record; def; field }) data_items
+    end data_items acc.pending_conditions
+  in
+  { acc with
+    current_qualmap = Qualmap.empty;
+    pending_conditions = [];
+    definitions = { data_items;
+                    data_records = record :: acc.definitions.data_records } }
+
+
+let commit_item_definition ~renamings def acc =
+  match acc.item_stack with
+  | [] ->
+      commit_record acc ~renamings def
+  | { item_loc; item_size; _ } as top_item :: item_stack ->
+      let field_size = Cobol_data.Item.size ~&def in
+      let top_item =
+        { top_item with
+          item_loc = Cobol_common.Srcloc.concat item_loc ~@def;
+          item_size = Cobol_data.Memory.add item_size field_size;
+          item_rev_fields = def :: top_item.item_rev_fields } in
+      { acc with item_stack = top_item :: item_stack }
+
+
+
+let check_inherited_usage acc ~item_name item_clauses item_stack =
+  let top_item_usage =
+    match item_stack with
+    | [] -> None
+    | { item_clauses; _ } :: _ -> item_clauses.usage
+  in
+  match item_clauses.Typeck_clauses.usage, top_item_usage with
+  | _, None ->
+      acc, item_clauses
+  | None, (Some _ as usage) ->
+      acc, { item_clauses with usage }
+  | Some u, Some p ->
+      let acc =         (* check matching usage (according to the standard) *)
+        if Cobol_ptree.compare_usage_clause ~&u ~&p <> 0 then
+          warn acc @@ Mismatching_usage_in_group { item_name;
+                                                   item_usage = u;
+                                                   group_usage = p }
+        else acc
+      in
+      acc, item_clauses
+
+
+let item_range acc ~item_qualifier
+    (item_clauses: Typeck_clauses.data_clauses) (item_stack: item_stack) =
+  let qualify_as_subordinate n = qual n item_qualifier &@<- n in
+  let qualify n = qualify n item_stack in                         (* CHECKME! *)
+  let opt = Option.map in
+  let int = Cobol_common.Srcloc.locmap int_of_string in
+  let range = match Option.map (~&) item_clauses.occurs with
+    | None ->
+        None
+    | Some OccursFixed { times; indexed_by; _ } ->
+        Some { range_span = Fixed_span { occurs_times = int times };
+               range_indexes = List.map qualify_as_subordinate indexed_by }
+    | Some OccursDepending { from; to_; depending; indexed_by; _ } ->
+        Some { range_span = Depending_span { occurs_depending_min = int from;
+                                             occurs_depending_max = int to_;
+                                             occurs_depending = depending };
+               range_indexes = List.map qualify_as_subordinate indexed_by }
+    | Some OccursDynamic { capacity_in; from; to_;
+                           initialized; indexed_by; _ } ->
+        let range_span
+          = Dynamic_span { occurs_dynamic_capacity = opt qualify capacity_in;
+                           occurs_dynamic_capacity_min = opt int from;
+                           occurs_dynamic_capacity_max = opt int to_;
+                           occurs_dynamic_initialized = initialized } in
+        Some { range_span;
+               range_indexes = List.map qualify_as_subordinate indexed_by }
+  in
+  let leading_ranges = match range, item_stack with
+    | Some r, { item_rev_leading_ranges = l; _ } :: _ -> r :: l
+    | Some r, [] -> [r]
+    | None, { item_rev_leading_ranges = l; _ } :: _ -> l
+    | None, [] -> []
+  in
+  acc, range, leading_ranges
+
+
+let register_field_def acc (def: field_definition with_loc) =
+  match ~&def.field_qualname with
+  | Some qn ->
+      { acc with
+        current_qualmap = Qualmap.add ~&qn def acc.current_qualmap }
+  | None -> acc
+
+
+let error_if_picture ~item_name ~item_loc ~reason acc = function
+  | None ->
+      acc
+  | Some picture ->
+      error acc @@ Unexpected_picture_clause { picture; reason;
+                                               item_name; item_loc }
+
+
+let field_usage_n_value acc { item_name; item_loc; item_clauses; _ } =
+  let diags, usage, value =
+    Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
+      ~picture_config:acc.picture_config
+  in
+  let acc = { acc with diags = Typeck_diagnostics.union acc.diags diags } in
+  acc, usage, value
+
+
+let field_layout_n_size acc ~usage ~init_value { item_name;
+                                                 item_loc;
+                                                 item_size;
+                                                 item_clauses;
+                                                 item_rev_fields; _ } =
+  match item_rev_fields, usage with
+  | [], Some usage ->
+      acc,
+      Elementary_field { usage; init_value },
+      Typeck_utils.size_of ~usage
+  | [], None ->          (* missing usage (reported as missing pic string) *)
+      error acc @@
+      Missing_picture_clause_for_elementary_item { item_name; item_loc },
+      Elementary_field { usage = Display (PIC.alphanumeric ~size:1);
+                         init_value = None },
+      Cobol_data.Memory.byte_size
+  | flds, _ ->
+      error_if_picture ~item_name ~item_loc ~reason:`Group_item acc
+        item_clauses.picture,
+      Struct_field { subfields = NEL.of_rev_list flds },
+      item_size                (* accumulated during commits of subfields *)
+
+
+let item_definition acc ({ item_loc;
+                           item_qualname;
+                           item_redefines;
+                           item_offset;
+                           item_range;
+                           item_rev_leading_ranges;
+                           item_rev_conditions; _ } as item) =
+  let item_conditions = List.rev item_rev_conditions in
+  let field acc =
+    let acc, usage, init_value =
+      field_usage_n_value acc item
+    in
+    let acc, field_layout, field_size =
+      field_layout_n_size acc item ~usage ~init_value
+    in
+    acc,
+    { field_qualname = item_qualname;
+      field_redefines = None;
+      field_leading_ranges = List.rev item_rev_leading_ranges;
+      field_layout;
+      field_offset = item_offset;
+      field_size;
+      field_length = Fixed_length;
+      field_conditions = item_conditions;
+      field_redefinitions = [] } &@ item_loc
+  in
+  let acc, field = field acc in
+  match item_range with
+  | None ->
+      let field
+        = { ~&field with field_redefines = item_redefines } &@<- field in
+      register_field_def acc field,
+      Field ~&field &@<- field
+  | Some ({ range_span = Fixed_span { occurs_times }; _ } as range) ->
+      let table_size
+        = Cobol_data.Memory.mult_int ~&field.field_size ~&occurs_times in
+      register_field_def acc field,
+      Table { table_field = field;
+              table_offset = ~&field.field_offset;
+              table_size;
+              table_range = range;
+              table_init_values = [];
+              table_redefines = item_redefines;
+              table_redefinitions = [] } &@<- field
+  | Some ({ range_span = Depending_span { occurs_depending; _ }; _ } as range) ->
+      let dep_size = Cobol_data.Memory.valof ~&occurs_depending in
+      let table_size
+        = Cobol_data.Memory.repeat ~&field.field_size ~by:dep_size in
+      register_field_def acc field,
+      Table { table_field = field;
+              table_offset = ~&field.field_offset;
+              table_size;
+              table_range = range;
+              table_init_values = [];
+              table_redefines = item_redefines;
+              table_redefinitions = [] } &@<- field
+  | Some ({ range_span = Dynamic_span _; _ } as range) ->
+      register_field_def acc field,
+      Table { table_field = field;
+              table_offset = ~&field.field_offset;
+              table_size = Cobol_data.Memory.size_of_dynamic_table;
+              table_range = range;
+              table_init_values = [];
+              table_redefines = item_redefines;
+              table_redefinitions = [] } &@<- field
+
+
+let commit_conditions acc def { item_rev_conditions; _ } =
+  match ~&def with
+  | Field field ->
+      let pending_conditions =
+        List.fold_left begin fun pcs cond_name ->
+          (cond_name, field &@<- def) :: pcs
+        end acc.pending_conditions item_rev_conditions
+      in
+      { acc with pending_conditions }
+  | Table _ ->                                                (* no conditions *)
+      acc
+
+
+let item_definitions acc items =
+  List.fold_left begin fun (acc, rev_defs, renamings) item ->
+    let acc, def = item_definition acc item in
+    commit_conditions acc def item,
+    def :: rev_defs,
+    List.rev_append item.item_rev_renames renamings
+  end (acc, [], []) items
+
+
+let extend_item_def_with_redefs def redefs =
+  let item_redefinitions = NEL.to_list redefs in
+  let item_loc =
+    Option.get @@           (* cannot fail as the list of locs is never empty *)
+    Cobol_common.Srcloc.concat_locs @@ def :: item_redefinitions
+  in
+  match ~&def with
+  | Field field ->
+      Field { field with
+              field_redefinitions = item_redefinitions } &@ item_loc
+  | Table table ->
+      Table { table with
+              table_redefinitions = item_redefinitions } &@ item_loc
+
+
+(* --- data items --- *)
+
+
 let commit_item acc =
   match def_n_redef_items acc.item_stack with
   | [], _ ->                                                (* stack was empty *)
@@ -523,9 +473,10 @@ let commit_item acc =
         item_definitions { acc with item_stack } items in
       match NEL.of_rev_list rev_defs with
       | One def ->
-          commit_def def ~renamings acc
+          commit_item_definition def ~renamings acc
       | def :: redefs ->
-          commit_def (extend_item_def_with_redefs def redefs) ~renamings acc
+          commit_item_definition (extend_item_def_with_redefs def redefs) acc
+            ~renamings
       | exception Invalid_argument _ ->      (* error in every item definition *)
           acc
 
@@ -549,29 +500,17 @@ let register_ref ~from:{ loc; _ } ~to_:qualname_opt acc =
 let find_in_current_record qualname acc =
   try
     let res = Qualmap.find ~&qualname acc.current_qualmap in
-    Ok (register_ref ~from:qualname ~to_:~&res.item_qualname acc, res)
+    Ok (register_ref ~from:qualname ~to_:~&res.field_qualname acc, res)
   with Not_found ->
     Error (error acc @@ Item_not_found { qualname })
-
-
-(* TODO: just rely on dimensions *)
-type item_variant =                                          (* coarse layout *)
-  | Simple
-  | Table
-
-let item_def_variant: item_definition with_loc -> item_variant = fun item_def ->
-  match ~&item_def.item_layout with
-  | Elementary_item _ -> Simple
-  | Struct_item _ -> Simple
-  | Fixed_table _ -> Table
-  | Depending_table _ -> Table
-  | Dynamic_table _ -> Table
 
 
 (* --- *)
 
 
-let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
+let on_redefinition_item acc item_clauses
+    ~level ~item_name ~redefined_name ~loc
+  =
   let acc = flush_item_stack ~down_to_level:(~&level + 1) acc in
   match def_n_redef_items acc.item_stack with
   | [], _ ->                                            (* no redefinable item *)
@@ -584,7 +523,7 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
         if ~&level = expected_level then acc else
           error acc @@
           Unexpected_redefinition_level { redef_loc = loc;
-                                          redef_name = name;
+                                          redef_name = item_name;
                                           redef_level = level;
                                           expected_level;
                                           expected_redefined_loc }
@@ -594,7 +533,7 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
           when ~&redefined_name <> name_of ~&qn ->
             error acc @@
             Unexpected_redefinition_name { redef_loc = loc;
-                                           redef_name = name;
+                                           redef_name = item_name;
                                            redef_redefines = redefined_name;
                                            expected_name = name_of ~&qn }
         | _ ->
@@ -604,56 +543,75 @@ let on_redefinition_item acc item_clauses ~level ~name ~redefined_name ~loc =
         register_ref ~from:redefined_name ~to_:redefined_qualname acc
       in
       let acc =
-        match redefined_item.item_clauses.occurs with
-        | OccursOnce ->                                                  (* ok *)
+        match redefined_item.item_range with
+        | None ->                                                        (* ok *)
             acc
-        | _ ->
+        | Some _ ->
             warn acc @@
             Redefinition_of_table_item { redef_loc = loc;
-                                         redef_name = name;
+                                         redef_name = item_name;
                                          redef_redefines = redefined_name;
                                          table_item_name = redefined_qualname }
       in
       let acc =
         List.fold_left begin fun acc field_def ->
-          match ~&field_def.item_length with
-          | Fixed_length ->
-              acc                                                       (* ok *)
-          | Variable_length ->
+          match ~&field_def with
+          | Field { field_length = Variable_length; _ }
+          | Table { table_range = { range_span = Depending_span _;
+                                    _ }; _ }
+          | Table { table_field = { payload = { field_length = Variable_length;
+                                                _ }; _ }; _ } ->
               error acc @@
               Redefinition_of_ODO_item { redef_loc = loc;
-                                         redef_name = name;
+                                         redef_name = item_name;
                                          redef_redefines = redefined_name;
                                          odo_item = field_def }
+          | Field { field_length = Fixed_length; _ }
+          | Table _ ->
+              acc                                                       (* ok *)
         end acc redefined_item.item_rev_fields
       in
-      let item_redefines = Some (qualify redefined_name base_stack) in
+      let acc, item_clauses =
+        check_inherited_usage acc ~item_name item_clauses base_stack
+      and item_qualname = qualname item_name base_stack
+      and item_qualifier = qualifier item_name base_stack
+      and item_redefines = Some (qualify redefined_name base_stack) in
+      let acc, item_range, item_rev_leading_ranges =
+        item_range acc ~item_qualifier item_clauses base_stack in
       { acc with                            (* push on stack, with same level *)
         item_stack = { item_level = expected_level;
-                       item_name = name;
-                       item_qualname = qualname name base_stack;
-                       item_qualifier = qualifier name base_stack;
+                       item_name;
                        item_loc = loc;
+                       item_qualname;
+                       item_qualifier;
+                       item_redefines;
                        item_offset = current_item_offset base_stack;
                        item_size = Cobol_data.Memory.point_size;
-                       item_redefines;
                        item_clauses;
+                       item_range;
+                       item_rev_leading_ranges;
                        item_rev_fields = [];
                        item_rev_renames = [];
                        item_rev_conditions = [] } :: acc.item_stack }
 
 
-let on_item ~at_level { payload = Cobol_ptree.{ data_level; data_name;
-                                                data_clauses };
-                        loc } acc =
+let on_item acc ~at_level
+    { payload = Cobol_ptree.{ data_level;
+                              data_name = item_name;
+                              data_clauses }; loc }
+  =
   let item_clauses = Typeck_clauses.of_data_item data_clauses in
+  let acc =
+    { acc with
+      diags = Typeck_diagnostics.union acc.diags item_clauses.clause_diags } in
   match item_clauses.redefines with
   | Some redefined_name ->
       on_redefinition_item acc item_clauses
-        ~level:data_level ~name:data_name ~redefined_name ~loc
+        ~level:data_level ~item_name ~redefined_name ~loc
   | None ->
       let acc = flush_item_stack ~down_to_level:at_level acc in
-      let acc = match acc.item_stack with
+      let base_stack = acc.item_stack in
+      let acc = match base_stack with
         | { item_rev_renames = _ :: _; _ } :: _ ->
             (* non-01/77 item that follows a RENAMES *)
             let expected = [01; 66; 77; 78; 88] in                 (* CHECKME *)
@@ -662,34 +620,38 @@ let on_item ~at_level { payload = Cobol_ptree.{ data_level; data_name;
         | _ ->
             acc
       in
-      let item_qualname = qualname data_name acc.item_stack
-      and item_qualifier = qualifier data_name acc.item_stack in
+      let acc, item_clauses =
+        check_inherited_usage ~item_name acc item_clauses base_stack
+      and item_qualname = qualname item_name base_stack
+      and item_qualifier = qualifier item_name base_stack in
+      let acc, item_range, item_rev_leading_ranges =
+        item_range acc ~item_qualifier item_clauses base_stack in
       { acc with
         item_stack = { item_level = ~&data_level;
-                       item_name = data_name;
+                       item_name;
                        item_loc = loc;
                        item_qualname;
                        item_qualifier;
+                       item_redefines = None;
                        item_offset = current_item_offset acc.item_stack;
                        item_size = Cobol_data.Memory.point_size;
-                       item_redefines = None;
                        item_clauses;
+                       item_range;
+                       item_rev_leading_ranges;
                        item_rev_fields = [];
                        item_rev_renames = [];
-                       item_rev_conditions = [] } :: acc.item_stack }
+                       item_rev_conditions = [] } :: base_stack }
 
 
 let dummy_renamed_elementary =
-  let picture = Cobol_data.Picture.alphanumeric ~size:0 in
-  Renamed_elementary { usage = Usage picture }
+  Renamed_elementary { usage = Display (PIC.alphanumeric ~size:0) }
 
 
-let report_occurs acc operand item =
-  (* TODO: Check required subscripting to avoid case of subordination to an
-     OCCURS. *)
-  match item_def_variant item with
-  | Simple -> acc
-  | Table -> error acc @@ Occurs_in_rename_operand { operand; item }
+let report_occurs acc operand field =
+  (* Check required subscripting to avoid case of subordination to an OCCURS. *)
+  if ~&field.field_leading_ranges = []
+  then acc
+  else error acc @@ Occurs_in_rename_operand { operand; field }
 
 
 let renaming acc
@@ -715,31 +677,29 @@ let renaming acc
   match from_item, thru_item with
   | None, _ ->
       Error acc
-  | Some from_item, None ->
+  | Some from_field, None ->
       (* TODO: check not subordinate to an OCCURS (via subscripting info
          maybe). *)
-      let renaming_layout = match ~&from_item.item_layout with
-        | Elementary_item { usage; _ } -> Renamed_elementary { usage }
-        | Struct_item { fields } -> Renamed_struct { fields }
-        | _ -> dummy_renamed_elementary           (* OCCURS (already reported) *)
+      let renaming_layout = match ~&from_field.field_layout with
+        | Elementary_field { usage; _ } -> Renamed_elementary { usage }
+        | Struct_field { subfields } -> Renamed_struct { subfields }
       in
       Ok (acc, { renaming_name;
                  renaming_layout;
-                 renaming_offset = ~&from_item.item_offset;
-                 renaming_size = ~&from_item.item_size;
+                 renaming_offset = ~&from_field.field_offset;
+                 renaming_size = ~&from_field.field_size;
                  renaming_from = from;
                  renaming_thru = None } &@ loc)
-  | Some from_item, Some thru_item ->
-      let from_offset = ~&from_item.item_offset
-      and thru_offset = ~&thru_item.item_offset
-      and thru_size = ~&thru_item.item_size in
-      let end_ = Cobol_data.Memory.increase thru_offset ~by:thru_size in
+  | Some from_field, Some thru_field ->
+      let from_offset = ~&from_field.field_offset
+      and thru_offset = ~&thru_field.field_offset
+      and thru_size = ~&thru_field.field_size in
+      let end_ = Cobol_data.Memory.shift thru_offset ~by:thru_size in
       let size_ = Cobol_data.Memory.size ~from:from_offset ~to_:end_ in
       let acc, renaming_layout =
         try
           let size = Cobol_data.Memory.as_int size_ in
-          let picture = Cobol_data.Picture.alphanumeric ~size in
-          acc, Renamed_elementary { usage = Usage picture }
+          acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
         with Cobol_data.Memory.NOT_SCALAR (`Vars vars) ->
           let depending_vars =
             NEL.map vars ~f:(fun (Cobol_data.Memory.Valof qn) -> qn) in
@@ -753,6 +713,7 @@ let renaming acc
                  renaming_size = size_;
                  renaming_from = from;
                  renaming_thru = thru_name } &@ loc)
+
 
 let on_rename ({ loc; _ } as rename_item) acc =
   (* Flush everything but any 01 item in stack *)
@@ -776,6 +737,7 @@ let on_rename ({ loc; _ } as rename_item) acc =
             item_stack = { top_item with item_rev_renames } :: item_stack }
       | Error acc ->
           acc
+
 
 let on_condition_name (cond_name: Cobol_ptree.condition_name_item with_loc) acc =
   match acc.item_stack with
@@ -827,9 +789,9 @@ let data_definitions = object
                              loc } as item) acc =
     Visitor.skip_children @@ match ~&data_level, acc.current_storage with
     | l, _ when 1 <= l && l <= 49 ->
-        on_item ~at_level:~&data_level item acc                    (* regular *)
+        on_item ~at_level:~&data_level acc item                    (* regular *)
     | 77, (Linkage | Local_storage | Working_storage) ->
-        on_item ~at_level:01 item acc            (* non-contiguous elementary *)
+        on_item ~at_level:01 acc item            (* non-contiguous elementary *)
     | 77, section ->
         error acc (Item_not_allowed_in_section { level = data_level; section })
     | 78, _ ->

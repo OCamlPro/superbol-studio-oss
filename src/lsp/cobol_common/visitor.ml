@@ -153,6 +153,9 @@ module Fold = struct
   let fold_int' (v: _#folder) =
     fold' ~fold:fold_int v
 
+  let fold_int'_opt (v: _ #folder) =
+    fold_option ~fold:fold_int' v
+
   let fold_string' (v: _ #folder) =
     fold' ~fold:fold_string v
 

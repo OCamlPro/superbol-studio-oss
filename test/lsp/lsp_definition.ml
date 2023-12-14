@@ -500,3 +500,71 @@ let%expect_test "definition-malformed-qualifiers" =
     6-s (line 7, character 23):
     {"params":{"message":"Unknown procedure-name 'S'","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
     No definition found |}];;
+
+
+
+let%expect_test "definition-index" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       77 V-TAB PIC X OCCURS 5 INDEXED I _|1-j|_J.
+       01 W.
+         02 W-TAB PIC 9 OCCURS 42 INDEXED J_|2-j|_ K.
+       PROCEDURE DIVISION.
+           SET _|3-i|_I IN V-TAB TO 0
+           SET _|4-j|_J IN W TO 0
+           SET _|5-k|_K IN W-TAB IN W TO 0
+           SET _|6-missing|_L IN W-TAB IN W TO 0
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":35,"line":11},"start":{"character":35,"line":11}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-j (line 4, character 41):
+    __rootdir__/prog.cob:5.41-5.42:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        77 V-TAB PIC X OCCURS 5 INDEXED I J.
+    ----                                            ^
+       6          01 W.
+       7            02 W-TAB PIC 9 OCCURS 42 INDEXED J K.
+    2-j (line 6, character 43):
+    __rootdir__/prog.cob:7.42-7.43:
+       4          WORKING-STORAGE SECTION.
+       5          77 V-TAB PIC X OCCURS 5 INDEXED I J.
+       6          01 W.
+       7 >          02 W-TAB PIC 9 OCCURS 42 INDEXED J K.
+    ----                                             ^
+       8          PROCEDURE DIVISION.
+       9              SET I IN V-TAB TO 0
+    3-i (line 8, character 15):
+    __rootdir__/prog.cob:5.39-5.40:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        77 V-TAB PIC X OCCURS 5 INDEXED I J.
+    ----                                          ^
+       6          01 W.
+       7            02 W-TAB PIC 9 OCCURS 42 INDEXED J K.
+    4-j (line 9, character 15):
+    __rootdir__/prog.cob:7.42-7.43:
+       4          WORKING-STORAGE SECTION.
+       5          77 V-TAB PIC X OCCURS 5 INDEXED I J.
+       6          01 W.
+       7 >          02 W-TAB PIC 9 OCCURS 42 INDEXED J K.
+    ----                                             ^
+       8          PROCEDURE DIVISION.
+       9              SET I IN V-TAB TO 0
+    5-k (line 10, character 15):
+    __rootdir__/prog.cob:7.44-7.45:
+       4          WORKING-STORAGE SECTION.
+       5          77 V-TAB PIC X OCCURS 5 INDEXED I J.
+       6          01 W.
+       7 >          02 W-TAB PIC 9 OCCURS 42 INDEXED J K.
+    ----                                               ^
+       8          PROCEDURE DIVISION.
+       9              SET I IN V-TAB TO 0
+    6-missing (line 11, character 15):
+    No definition found |}];;

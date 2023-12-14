@@ -34,11 +34,11 @@ let%expect_test "numeric-pic-for-bin-usage" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 2
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          binary
           category: NUMERIC(digits = 2, scale = 0, with_sign = false)
         }
       }
@@ -54,11 +54,11 @@ let%expect_test "numeric-pic-for-bin-usage" =
     Item definition: {
       qualname: B
       offset: 0
-      size: 6
+      size: 32
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          binary
           category: NUMERIC(digits = 6, scale = 0, with_sign = true)
         }
       }
@@ -74,11 +74,11 @@ let%expect_test "numeric-pic-for-bin-usage" =
     Item definition: {
       qualname: C
       offset: 0
-      size: 7
+      size: 32
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          packed-decimal
           category: NUMERIC(digits = 7, scale = 2, with_sign = true)
         }
       }

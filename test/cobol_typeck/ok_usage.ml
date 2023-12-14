@@ -15,52 +15,67 @@ open Prog_printer
 
 let dotest = Typeck_testing.show_data
 
-let%expect_test "basics" =
-  dotest @@ prog "prog"
+let%expect_test "usage-index" =
+  dotest @@ prog "usage-index"
     ~working_storage:{|
-       01 X PIC X.
-    |}
-    ~local_storage:{|
-       01 Y PIC X.
+       77 A INDEX.
+       01 FILLER INDEX.
+         02 C.
+         02 D VALUE 0.
     |};
   [%expect {|
     prog.cob:4.7-4.18:
-       1          PROGRAM-ID. prog.
+       1          PROGRAM-ID. usage-index.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4 >        01 X PIC X.
+       4 >        77 A INDEX.
     ----          ^^^^^^^^^^^
-       5          LOCAL-STORAGE SECTION.
-       6          01 Y PIC X.
+       5          01 FILLER INDEX.
+       6            02 C.
     Item definition: {
-      qualname: X
+      qualname: A
       offset: 0
-      size: 8
+      size: size-of-index
       layout: {
         elementary
-        usage: {
-          display
-          category: ALPHANUMERIC(1)
-        }
+        usage: index
       }
     }
-    prog.cob:6.7-6.18:
+    prog.cob:5.7-7.22:
+       2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4          01 X PIC X.
-       5          LOCAL-STORAGE SECTION.
-       6 >        01 Y PIC X.
-    ----          ^^^^^^^^^^^
-       7          PROCEDURE DIVISION.
-       8
+       4          77 A INDEX.
+       5 >        01 FILLER INDEX.
+    ----          ^^^^^^^^^^^^^^^^
+       6 >          02 C.
+    ----  ^^^^^^^^^^^^^^^
+       7 >          02 D VALUE 0.
+    ----  ^^^^^^^^^^^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
     Item definition: {
-      qualname: Y
+      filler
       offset: 0
-      size: 8
+      size: (* 2 size-of-index)
       layout: {
-        elementary
-        usage: {
-          display
-          category: ALPHANUMERIC(1)
+        structure
+        fields: {
+          qualname: C
+          offset: 0
+          size: size-of-index
+          layout: {
+            elementary
+            usage: index
+          }
+        }{
+          qualname: D
+          offset: size-of-index
+          size: size-of-index
+          layout: {
+            elementary
+            usage: index
+            value: 0
+          }
         }
       }
     } |}];;

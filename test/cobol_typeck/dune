@@ -3,7 +3,9 @@
  (modules
     ok_basic      ko_basic
     ok_77         ko_77
+    ok_occurs
     ok_pic        ko_pic
+    ok_usage      ko_usage
     ok_renames    ko_renames
     ok_redefines  ko_redefines
     ok_conditions ko_conditions

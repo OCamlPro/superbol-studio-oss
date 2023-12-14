@@ -53,74 +53,75 @@ let%expect_test "renames-with-redefines" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 4
+      size: 32
       layout: {
         structure
         fields: {
           qualname: A-1 IN A
           offset: 0
-          size: 1
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: ALPHANUMERIC(1)
             }
           }
         }{
           qualname: A-A IN A
-          offset: 1
-          size: 1
+          offset: 8
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: NUMERIC(digits = 1, scale = 0, with_sign = false)
             }
           }
         }{
           qualname: A-B IN A
-          offset: 2
-          size: 1
+          offset: 16
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: NUMERIC(digits = 1, scale = 0, with_sign = false)
             }
           }
         }{
           qualname: A-2 IN A
-          offset: 3
-          size: 1
+          offset: 24
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: NUMERIC(digits = 1, scale = 0, with_sign = false)
             }
+            value: 5
           }
           redefs: {
             qualname: A-21 IN A
             redefines: A-2 IN A
-            offset: 3
-            size: 1
+            offset: 24
+            size: 8
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: NUMERIC(digits = 1, scale = 0, with_sign = false)
               }
             }
           }{
             qualname: A-22 IN A
             redefines: A-2 IN A
-            offset: 3
-            size: 1
+            offset: 24
+            size: 8
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: NUMERIC(digits = 1, scale = 0, with_sign = false)
               }
             }
@@ -141,12 +142,12 @@ let%expect_test "renames-with-redefines" =
       from: A-1 IN A
       thru: A-B IN A
       offset: 0
-      size: 3
+      size: 24
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
-          category: ALPHANUMERIC(3)
+          display
+          category: ALPHANUMERIC(24)
         }
       }
     }
@@ -161,12 +162,12 @@ let%expect_test "renames-with-redefines" =
     Record renaming: {
       qualname: A-R2 IN A
       from: A-A IN A
-      offset: 1
-      size: 1
+      offset: 8
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: NUMERIC(digits = 1, scale = 0, with_sign = false)
         }
       }
@@ -180,22 +181,22 @@ let%expect_test "renames-with-redefines" =
       14          PROCEDURE DIVISION.
       15
     Item definition: {
-      filler
+      table
       offset: 0
-      size: 5
-      layout: {
-        fixed-length table
-        length: 5
-        items: {
-          qualname: B
-          offset: 0
-          size: 1
-          layout: {
-            elementary
-            usage: {
-              display (dev: temporary)
-              category: ALPHANUMERIC(1)
-            }
+      size: 40
+      range: {
+        span: fixed-length: 5
+      }
+      field: {
+        qualname: B
+        leading ranges: 1
+        offset: 0
+        size: 8
+        layout: {
+          elementary
+          usage: {
+            display
+            category: ALPHANUMERIC(1)
           }
         }
       }
@@ -244,71 +245,72 @@ let%expect_test "renames-qualif" =
     Item definition: {
       qualname: A
       offset: 0
-      size: 9
+      size: 72
       layout: {
         structure
         fields: {
           qualname: A-T-LEN IN A
           offset: 0
-          size: 2
+          size: 16
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: NUMERIC(digits = 2, scale = 0, with_sign = false)
             }
           }
         }{
           qualname: A-1 IN A
-          offset: 2
-          size: 1
+          offset: 16
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: ALPHANUMERIC(1)
             }
           }
         }{
-          filler
-          offset: 3
-          size: 5
-          layout: {
-            fixed-length table
-            length: 5
-            items: {
-              qualname: A-T IN A
-              offset: 3
-              size: 1
-              layout: {
-                elementary
-                usage: {
-                  display (dev: temporary)
-                  category: NUMERIC(digits = 1, scale = 0, with_sign = false)
-                }
+          table
+          offset: 24
+          size: 40
+          range: {
+            span: fixed-length: 5
+          }
+          field: {
+            qualname: A-T IN A
+            leading ranges: 1
+            offset: 24
+            size: 8
+            layout: {
+              elementary
+              usage: {
+                display
+                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
               }
             }
           }
         }{
           qualname: A-2 IN A
-          offset: 8
-          size: 1
+          offset: 64
+          size: 8
           layout: {
             elementary
             usage: {
-              display (dev: temporary)
+              display
               category: NUMERIC(digits = 1, scale = 0, with_sign = false)
             }
+            value: 5
           }
           redefs: {
             qualname: A-22 IN A
             redefines: A-2 IN A
-            offset: 8
-            size: 1
+            offset: 64
+            size: 8
             layout: {
               elementary
               usage: {
-                display (dev: temporary)
+                display
                 category: NUMERIC(digits = 1, scale = 0, with_sign = false)
               }
             }
@@ -328,13 +330,13 @@ let%expect_test "renames-qualif" =
       qualname: A-R1 IN A
       from: A-1 IN A
       thru: A-22 IN A
-      offset: 2
-      size: 7
+      offset: 16
+      size: 56
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
-          category: ALPHANUMERIC(7)
+          display
+          category: ALPHANUMERIC(56)
         }
       }
     }
@@ -349,12 +351,12 @@ let%expect_test "renames-qualif" =
     Record renaming: {
       qualname: A-R2 IN A
       from: A-22 IN A
-      offset: 8
-      size: 1
+      offset: 64
+      size: 8
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: NUMERIC(digits = 1, scale = 0, with_sign = false)
         }
       }
@@ -384,11 +386,11 @@ let%expect_test "renames-qualif" =
     Item definition: {
       qualname: YYY
       offset: 0
-      size: 3
+      size: 24
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
+          display
           category: NUMERIC(digits = 3, scale = 0, with_sign = false)
         }
       }
@@ -396,59 +398,59 @@ let%expect_test "renames-qualif" =
         qualname: XXX
         redefines: YYY
         offset: 0
-        size: 3
+        size: 24
         layout: {
           structure
           fields: {
             filler
             offset: 0
-            size: 3
+            size: 24
             layout: {
               structure
               fields: {
                 qualname: ZZZ IN XXX
                 offset: 0
-                size: 3
+                size: 24
                 layout: {
                   structure
                   fields: {
                     filler
                     offset: 0
-                    size: 3
+                    size: 24
                     layout: {
                       structure
                       fields: {
                         qualname: DDD IN ZZZ IN XXX
                         offset: 0
-                        size: 1
+                        size: 8
                         layout: {
                           elementary
                           usage: {
-                            display (dev: temporary)
+                            display
                             category:
                              NUMERIC(digits = 1, scale = 0, with_sign = false)
                           }
                         }
                       }{
                         qualname: FFF IN ZZZ IN XXX
-                        offset: 1
-                        size: 1
+                        offset: 8
+                        size: 8
                         layout: {
                           elementary
                           usage: {
-                            display (dev: temporary)
+                            display
                             category:
                              NUMERIC(digits = 1, scale = 0, with_sign = false)
                           }
                         }
                       }{
                         qualname: EEE IN ZZZ IN XXX
-                        offset: 2
-                        size: 1
+                        offset: 16
+                        size: 8
                         layout: {
                           elementary
                           usage: {
-                            display (dev: temporary)
+                            display
                             category:
                              NUMERIC(digits = 1, scale = 0, with_sign = false)
                           }
@@ -475,13 +477,13 @@ let%expect_test "renames-qualif" =
       qualname: FFF-2 IN XXX
       from: FFF IN XXX
       thru: EEE IN XXX
-      offset: 1
-      size: 2
+      offset: 8
+      size: 16
       layout: {
         elementary
         usage: {
-          display (dev: temporary)
-          category: ALPHANUMERIC(2)
+          display
+          category: ALPHANUMERIC(16)
         }
       }
     }

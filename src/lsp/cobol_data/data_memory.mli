@@ -11,16 +11,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* type address *)
-(* [@@deriving show, ord] *)
-
-(* type reference = *)
-(*   | Address of address *)
-(* [@@deriving show, ord] *)
-
 type elementary_size =
+  | Size_of_C_double
+  | Size_of_C_float
+  | Size_of_C_long
+  | Size_of_C_long_double
   | Size_of_dynamic_table
-  | Size_of_byte
+  | Size_of_index
+  | Size_of_pointer
 [@@deriving show, ord]
 
 type symbolic_var = private
@@ -30,11 +28,6 @@ type symbolic_var = private
 type factor
 [@@deriving show]
 
-(** Note: for now, it is possible to represent sizes in an arbitrary unit by
-    using {!const_size}, so {!as_int} is usable directly.  Instead, we may want
-    to compute every sizes as factors of elementary sizes, and not use the
-    implicit arbitrary unit: then some substitutions/(partial-)evaluations would
-    be enough to get ints when relevant. *)
 type size
 [@@deriving show]
 
@@ -45,8 +38,6 @@ exception NON_LINEAR of symbolic_var Cobol_common.Basics.NEL.t
 exception NOT_SCALAR of [ `Vars of symbolic_var Cobol_common.Basics.NEL.t
                         | `Consts of elementary_size Cobol_common.Basics.NEL.t ]
 
-(* val address: string -> address *)
-
 (* --- *)
 
 val int: int -> factor
@@ -56,14 +47,22 @@ val point_size: size                                             (* null-size *)
 val const_size: int -> size
 val valof_size: Cobol_ptree.qualname -> size
 val elementary_size: elementary_size -> size
+val bit_size: size
+val byte_size: size
+val size_of_C_double: size
+val size_of_C_float: size
+val size_of_C_long: size
+val size_of_C_long_double: size
 val size_of_dynamic_table: size
-val size_of_byte: size
+val size_of_index: size
+val size_of_pointer: size
 
 (** Raises {!NOT_SCALAR} in case of failure. *)
 val as_int: size -> int
 
-val increase: size -> by:size -> size
+val add: size -> size -> size
 val diff: size -> size -> size
+val increase: size -> by:size -> size
 
 (** May raise {!NON_CONST}. *)
 val repeat: size -> by:factor -> size
