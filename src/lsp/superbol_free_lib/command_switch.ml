@@ -95,7 +95,7 @@ let create_section config ~name =
 let user_config_file = Misc.config_dir // "config.toml"
 
 let save_user_config config =
-  Ezr_toml.save user_config_file config.user_config
+  Ezr_toml.save ~verbose:true user_config_file config.user_config
 
 let get_config () =
   let user_config = Ezr_toml.load user_config_file in
@@ -141,35 +141,40 @@ let get_config () =
     Printf.eprintf "Try to edit your configuration to fix this error.\n%!";
     exit 2
 
-let add_switch ~dir ?switch_name ~file ~set config =
+let find_switch_name ?switch_name ?(add=false) ~dir ~file config =
   let exception Found of string in
-  let switch_name =
-    let dirname = dir // file in
-    match
-      StringMap.iter (fun s x ->
-          if x = dirname then raise (Found s)) config.switch_list with
-    | exception Found s -> s (* already exists *)
-    | () ->
+  let dirname = dir // file in
+  match
+    StringMap.iter (fun s x ->
+        if x = dirname then raise (Found s)) config.switch_list with
+  | exception Found s -> s (* already exists *)
+  | () ->
+    let switch_name =
       let switch_name =
-        let switch_name =
-          match switch_name with
+        match switch_name with
+        | Some s -> s
+        | None ->
+          match EzString.chop_prefix file ~prefix:"gnucobol-" with
           | Some s -> s
           | None ->
-            match EzString.chop_prefix file ~prefix:"gnucobol-" with
+            match EzString.chop_prefix file ~prefix:"gnucobol" with
             | Some s -> s
-            | None ->
-              match EzString.chop_prefix file ~prefix:"gnucobol" with
-              | Some s -> s
-              | None -> file
-        in
-        let name = Printf.sprintf "S%02d-%s" config.switch_num switch_name in
-        config.switch_num <- config.switch_num + 1;
-        name
+            | None -> file
       in
+      let name = Printf.sprintf "S%02d-%s" config.switch_num switch_name in
+      if add then
+        config.switch_num <- config.switch_num + 1;
+      name
+    in
+    if add then begin
       Printf.eprintf "Adding %S at\n   %s\n%!" switch_name dirname;
       config.switch_list <- StringMap.add switch_name dirname config.switch_list;
-      switch_name
-  in
+    end;
+    switch_name
+
+let add_switch ~dir ?switch_name ~file ~set config =
+  let switch_name =
+    find_switch_name ?switch_name ~add:true ~dir ~file config in
   if set then
     config.switch_current <- Some switch_name;
   ()
@@ -220,9 +225,9 @@ let find_switch ?switch ~last ~current config =
       | [switch] ->
         Printf.eprintf "Selecting switch %S\n%!" switch;
         switch
-      | (switch :: _ ) as switches ->
+      | (found_switch :: _ ) as switches ->
         if last then
-          switch
+          found_switch
         else
           Misc.error "Multiple switches matching %S in current list ( %s )"
             switch ( String.concat ", " ( List.rev switches ))
@@ -554,31 +559,38 @@ let add_cmd =
 
 (*** switch build ***)
 
-let switch_build ?dir ?switch_name ~set ~sudo () =
+let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
 
   let config = get_config () in
 
-  let branch = Call.call_stdout_string [ "git" ; "branch" ; "--show-current" ] in
-  let branch = String.trim branch in
-  Printf.eprintf "Current branch: %S\n%!" branch;
-  let branch =
-    if branch = "gnucobol-3.x" then
-      let commit = Call.call_stdout_string [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ] in
-      let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ] in
-      Printf.sprintf "3.x-%s-%s" date commit
-    else
-    if branch = "master" then
-      let commit = Call.call_stdout_string [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ] in
-      let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ] in
-      Printf.sprintf "4.x-%s-%s" date commit
-    else
-      branch
+  let branch = match branch with
+    | None ->
+      let branch = Call.call_stdout_string [ "git" ; "branch" ; "--show-current" ] in
+      let branch = String.trim branch in
+      Printf.eprintf "Current branch: %S\n%!" branch;
+      if branch = "gnucobol-3.x" then
+        let commit = Call.call_stdout_string [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ] in
+        let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ] in
+        Printf.sprintf "3.x-%s-%s" date commit
+      else
+      if branch = "master" then
+        let commit = Call.call_stdout_string [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ] in
+        let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ] in
+        Printf.sprintf "4.x-%s-%s" date commit
+      else
+        branch
+    | Some branch -> branch
   in
   let file = "gnucobol-" ^ branch in
   let dir = match dir with
     | None -> config.switch_dir
     | Some dir -> dir
   in
+
+  let computed_switch_name = find_switch_name config ?switch_name ~file ~dir in
+  Printf.eprintf "Switch name with be: %S\n and installed in: %s/%s\n%!"
+    computed_switch_name dir file;
+
   if not ( Sys.file_exists dir ) then
     Misc.error "Directory %s should exist (%s will be created inside)" dir file;
   let destdir = dir // file in
@@ -601,15 +613,15 @@ let switch_build ?dir ?switch_name ~set ~sudo () =
     Call.call ~echo:true [ "../build_aux/bootstrap" ];
 
   Call.call ~echo:true [ "../configure" ;
-              "--enable-cobc-internal-checks";
-              "--enable-debug";
-              "--prefix" ; destdir ;
-              "--exec-prefix" ; destdir ];
+                         "--enable-cobc-internal-checks";
+                         "--enable-debug";
+                         "--prefix" ; destdir ;
+                         "--exec-prefix" ; destdir ];
 
   Call.call ~echo:true [ "make" ];
 
   Call.call ~echo:true (let cmd = [ "make" ; "install" ] in
-             if sudo then  "sudo" :: cmd else cmd );
+                        if sudo then  "sudo" :: cmd else cmd );
 
   let current = config.switch_current in
   add_switch config ?switch_name ~file ~dir ~set ;
@@ -622,10 +634,12 @@ let build_cmd =
   let switch_name = ref None in
   let set = ref true in
   let sudo = ref false in
+  let branch = ref None in
   EZCMD.sub
     "switch build"
     (fun () ->
-       switch_build ?dir:!dir ?switch_name:!switch_name ~set:!set ~sudo:!sudo ()
+       switch_build ?dir:!dir ?switch_name:!switch_name ?branch:!branch
+         ~set:!set ~sudo:!sudo ()
     )
     ~args:[
 
@@ -634,6 +648,9 @@ let build_cmd =
 
       [ "switch" ], Arg.String (fun s -> switch_name := Some s),
       EZCMD.info ~docv:"SWITCH" "Name of switch to add";
+
+      [ "branch" ], Arg.String (fun s -> branch := Some s),
+      EZCMD.info ~docv:"BRANCH" "Branch name to use instead of git branch (the auto-detected name from git will be 3.x-$DATE-$COMMIT)";
 
       [ "no-set" ], Arg.Clear set,
       EZCMD.info "Do not set this directory as the current one";
