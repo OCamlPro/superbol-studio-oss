@@ -653,6 +653,8 @@ Where options are:
 
 * :code:`DIR`   Directory where GnuCOBOL should be installed
 
+* :code:`--branch BRANCH`   Branch name to use instead of git branch (the auto-detected name from git will be 3.x-$DATE-$COMMIT)
+
 * :code:`--no-set`   Do not set this directory as the current one
 
 * :code:`--sudo`   Use sudo for 'make install'
