@@ -364,15 +364,10 @@ let item_definition acc ({ item_loc;
                            item_range;
                            item_rev_leading_ranges;
                            item_rev_conditions; _ } as item) =
-  let item_conditions = List.rev item_rev_conditions in
-  let field acc =
-    let acc, usage, init_value =
-      field_usage_n_value acc item
-    in
-    let acc, field_layout, field_size =
-      field_layout_n_size acc item ~usage ~init_value
-    in
-    acc,
+  let acc, usage, init_value = field_usage_n_value acc item in
+  let acc, field_layout, field_size =
+    field_layout_n_size acc item ~usage ~init_value in
+  let field =
     { field_qualname = item_qualname;
       field_redefines = None;
       field_leading_ranges = List.rev item_rev_leading_ranges;
@@ -380,10 +375,9 @@ let item_definition acc ({ item_loc;
       field_offset = item_offset;
       field_size;
       field_length = Fixed_length;
-      field_conditions = item_conditions;
+      field_conditions = List.rev item_rev_conditions;
       field_redefinitions = [] } &@ item_loc
   in
-  let acc, field = field acc in
   match item_range with
   | None ->
       let field
@@ -648,7 +642,8 @@ let dummy_renamed_elementary =
 
 
 let report_occurs acc operand field =
-  (* Check required subscripting to avoid case of subordination to an OCCURS. *)
+  (* Check required subscripting to avoid case of OCCURS or subordination to an
+     OCCURS. *)
   if ~&field.field_leading_ranges = []
   then acc
   else error acc @@ Occurs_in_rename_operand { operand; field }
@@ -683,8 +678,6 @@ let renaming acc
   | None, _ ->
       Error acc
   | Some from_field, None ->
-      (* TODO: check not subordinate to an OCCURS (via subscripting info
-         maybe). *)
       let renaming_layout = match ~&from_field.field_layout with
         | Elementary_field { usage; _ } -> Renamed_elementary { usage }
         | Struct_field { subfields } -> Renamed_struct { subfields }
