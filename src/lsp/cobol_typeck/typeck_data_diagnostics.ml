@@ -89,6 +89,12 @@ type error =
         operand: Cobol_ptree.qualname with_loc;
         field: Cobol_data.Types.field_definition with_loc;
       }
+  | Invalid_renaming_range of
+      {
+        loc: srcloc;
+        from_field: Cobol_data.Types.field_definition with_loc;
+        thru_field: Cobol_data.Types.field_definition with_loc;
+      }
   | Invalid_renaming_of_variable_length_range of
       {
         loc: srcloc;
@@ -162,6 +168,7 @@ let error_loc = function
   | Incompatible_picture { picture = { loc; _ }; _ }
   | Invalid_level_number { level = { loc; _ }; _ }
   | Invalid_renaming_of_variable_length_range { loc; _ }
+  | Invalid_renaming_range { loc; _ }
   | Item_not_allowed_in_section { level = { loc; _ }; _ }
   | Item_not_found { qualname = { loc; _ } }
   | Misplaced { loc; _ }
@@ -244,6 +251,11 @@ let pp_error ppf = function
       Pretty.print ppf "RENAMES@ operand@ '%a'@ has@ or@ is@ subordinate@ to@ \
                         an@ OCCURS@ clause"
         Cobol_ptree.pp_qualname' operand
+  | Invalid_renaming_range { from_field; thru_field; _ } ->
+      Pretty.print ppf "Invalid@ pair@ of@ RENAMES@ operands: first@ field@ %a@ \
+                        should@ precede@ second@ field@ %a"
+        (Fmt.option Cobol_ptree.pp_qualname') ~&from_field.field_qualname
+        (Fmt.option Cobol_ptree.pp_qualname') ~&thru_field.field_qualname
   | Invalid_renaming_of_variable_length_range { depending_vars = vars; _ } ->
       Pretty.print ppf "Renaming@ of@ variable-length@ range@ (length@ depends@ \
                         on:@ %a)"

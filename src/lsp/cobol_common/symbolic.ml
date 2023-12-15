@@ -140,7 +140,9 @@ struct
     raise @@ NOT_SCALAR (`Vars vars)
 
   let as_int_factor: factors -> int = fun c ->
-    if Factors.cardinal c = 1
+    if Factors.is_empty c
+    then 0
+    else if Factors.cardinal c = 1
     then match Factors.choose c with
       | N, n -> n
       | S s, _ -> not_scalar_vars (NEL.One s)
@@ -153,7 +155,9 @@ struct
     raise @@ NOT_SCALAR (`Consts consts)
 
   let as_int: linexpr -> int = fun l ->
-    if Terms.cardinal l = 1
+    if Terms.is_empty l
+    then 0
+    else if Terms.cardinal l = 1
     then match Terms.choose l with
       | Unit, factors -> as_int_factor factors
       | E d, _ -> not_scalar_consts (NEL.One d)

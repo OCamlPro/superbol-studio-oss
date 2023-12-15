@@ -663,18 +663,23 @@ let renaming acc
   let renaming_name = qual name renaming_qualifier &@<- name in
   let from = requal ~&from renaming_qualifier &@<- from in
   let acc, from_item = match find_in_current_record from acc with
-    | Ok (acc, def) -> report_occurs acc from def, Some def
-    | Error acc -> acc, None
+    | Ok (acc, def) ->
+        report_occurs acc from def, Some def
+    | Error acc ->
+        acc, None
   in
-  let acc, thru_name, thru_item = match thru with
-    | None -> acc, None, None
+  let acc, thru_item_n_name = match thru with
+    | None ->
+        acc, None
     | Some thru ->
         let thru = requal ~&thru renaming_qualifier &@<- thru in
         match find_in_current_record thru acc with
-        | Ok (acc, def) -> report_occurs acc thru def, Some thru, Some def
-        | Error acc -> acc, Some thru, None
+        | Ok (acc, def) ->
+            report_occurs acc thru def, Some (def, thru)
+        | Error acc ->
+            acc, None
   in
-  match from_item, thru_item with
+  match from_item, thru_item_n_name with
   | None, _ ->
       Error acc
   | Some from_field, None ->
@@ -690,7 +695,7 @@ let renaming acc
                  renaming_size = ~&from_field.field_size;
                  renaming_from = from;
                  renaming_thru = None } &@ loc)
-  | Some from_field, Some thru_field ->
+  | Some from_field, Some (thru_field, thru_name) ->
       let from_offset = ~&from_field.field_offset
       and thru_offset = ~&thru_field.field_offset
       and thru_size = ~&thru_field.field_size in
@@ -699,7 +704,11 @@ let renaming acc
       let acc, renaming_layout =
         try
           let size = Cobol_data.Memory.as_int size_ in
-          acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+          if size > 0 then
+            acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+          else
+            error acc @@ Invalid_renaming_range { loc; from_field; thru_field },
+            dummy_renamed_elementary
         with Cobol_data.Memory.NOT_SCALAR (`Vars vars) ->
           let depending_vars =
             NEL.map vars ~f:(fun (Cobol_data.Memory.Valof qn) -> qn) in
@@ -712,7 +721,7 @@ let renaming acc
                  renaming_offset = from_offset;
                  renaming_size = size_;
                  renaming_from = from;
-                 renaming_thru = thru_name } &@ loc)
+                 renaming_thru = Some thru_name } &@ loc)
 
 
 let on_rename ({ loc; _ } as rename_item) acc =
