@@ -12,16 +12,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let serverOptions ~bundled_superbol =
-  Vscode_languageclient.ServerOptions.create ()
-    ~command:(match Superbol_workspace.superbol_exe () with
-        | None -> bundled_superbol
-        | Some cmd -> cmd)
-    ~args:["lsp"]
+module WS = Vscode.Workspace
+module WS_CONF = Vscode.WorkspaceConfiguration
 
-let clientOptions () =
-  Vscode_languageclient.ClientOptions.create ()
-    ~documentSelector:[|
-      `Filter (Vscode_languageclient.DocumentFilter.createLanguage ()
-                 ~language:"cobol");
-    |]
+let non_empy s = if s = "" then None else Some s
+
+let cobc_exe ?scope () =
+  let config = WS.getConfiguration ?scope () in
+  match WS_CONF.get ~section:"cobc.exe" config with
+  | None -> None
+  | Some o when Ojs.is_null o -> None
+  | Some s -> non_empy (Ojs.string_of_js s)
+
+let superbol_exe ?scope () =
+  let config = WS.getConfiguration ?scope () in
+  match WS_CONF.get ~section:"superbol.exe" config with
+  | None -> None
+  | Some o when Ojs.is_null o -> None
+  | Some s -> non_empy (Ojs.string_of_js s)

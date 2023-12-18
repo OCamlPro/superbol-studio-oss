@@ -7,16 +7,11 @@
     "onDebug"
   ],
   "contributes": {
-    "breakpoints": [
-      {
-        "language": "COBOL"
-      }
-    ],
     "commands": [
       {
         "command": "superbol.server.restart",
         "title": "Restart Language Server",
-        "category": "superbol"
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -27,49 +22,18 @@
           "default": false,
           "description": "If something is selected, only format the selection"
         },
-        "superbol.path": {
+        "superbol.exe": {
           "type": "string",
           "default": "",
           "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available."
+        },
+        "cobc.exe": {
+          "type": "string",
+          "default": "cobc",
+          "description": "Path to the GnuCOBOL compiler executable."
         }
       }
     },
-    "debuggers": [
-      {
-        "type": "cobol",
-        "label": "GnuCOBOL Debugger",
-        "program": "gdb",
-        "languages": [
-          "cobol"
-        ],
-        "configurationAttributes": {
-          "launch": {
-            "type": "cobol",
-            "required": [
-              "program"
-            ],
-            "properties": {
-              "program": {
-                "type": "string",
-                "default": "${workspaceFolder}/a.out"
-              }
-            }
-          }
-        },
-        "configurationSnippets": [
-          {
-            "label": "Debug COBOL",
-            "description": "New COBOL debugging configuration",
-            "body": {
-              "type": "cobol",
-              "request": "launch",
-              "name": "${2:Launch Program}",
-              "program": "${workspaceFolder}/${1:Program}"
-            }
-          }
-        ]
-      }
-    ],
     "languages": [
       {
         "id": "cobol",
@@ -86,14 +50,14 @@
       {
         "name": "gnucobol",
         "owner": "cobol",
-        "fileLocation": "absolute",
+        "fileLocation": "autodetect",
         "pattern": "$gnucobol",
         "source": "GnuCOBOL"
       },
       {
         "name": "gnucobol-warning",
         "owner": "cobol",
-        "fileLocation": "absolute",
+        "fileLocation": "autodetect",
         "pattern": "$gnucobol-warning",
         "source": "GnuCOBOL",
         "severity": "warning"
@@ -101,7 +65,7 @@
       {
         "name": "gnucobol-error",
         "owner": "cobol",
-        "fileLocation": "absolute",
+        "fileLocation": "autodetect",
         "pattern": "$gnucobol-error",
         "source": "GnuCOBOL",
         "severity": "error"
@@ -109,7 +73,7 @@
       {
         "name": "gnucobol-note",
         "owner": "cobol",
-        "fileLocation": "absolute",
+        "fileLocation": "autodetect",
         "pattern": "$gnucobol-note",
         "source": "GnuCOBOL",
         "severity": "info"
@@ -158,10 +122,6 @@
             "type": "array",
             "description": "The list of copybooks paths"
           },
-          "sourceFormat": {
-            "type": "string",
-            "description": "The source format of the code"
-          },
           "dialect": {
             "type": "string",
             "description": "The COBOL dialect used",
@@ -191,19 +151,30 @@
               "xopen"
             ]
           },
-          "forDebugging": {
+          "source-format": {
+            "type": "string",
+            "description": "The source format of the code"
+          },
+          "for-debug": {
             "type": "boolean",
             "description": "Build for debugging"
           },
-          "extensions": {
+          "cobc.exe": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Path to the GnuCOBOL compiler executable; if `null`, defaults to \"cobc.exe\" from the workspace configuration, if defined, to \"cobc\" otherwise."
+          },
+          "extra-args": {
             "type": "array",
-            "description": "Add cobol file extensions"
+            "description": "Additional arguments passed to `cobc`"
           }
         }
       }
     ]
   },
-  "name": "superbol",
+  "name": "SuperBOL",
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in VSCode, based on the SuperBOL LSP server for COBOL",
   "license": "MIT",
@@ -224,17 +195,16 @@
   "main": "./_dist/superbol_vscode_platform.bc.js",
   "scripts": {
     "compile": "make compile",
-    "release": "make release",
-    "package": "vsce package --out superbol-vscode-platform.vsix --yarn",
-    "deploy:vsce": "vsce publish --packagePath superbol-vscode-platform.vsix --yarn",
-    "deploy:ovsx": "ovsx publish --yarn"
+    "package": "make vsix-package",
+    "deploy:vsce": "make deploy-vsce",
+    "deploy:ovsx": "make deploy-ovsx"
   },
   "dependencies": {
     "@vscode/debugadapter": "^1.61.0",
     "@vscode/debugprotocol": "^1.61.0",
+    "vscode-languageclient": "8.0.2",
     "polka": "^1.0.0-next.22",
-    "sirv": "^2.0.2",
-    "vscode-languageclient": "8.0.2"
+    "sirv": "^2.0.2"
   },
   "devDependencies": {
     "@types/vscode": "1.64.0",
@@ -247,7 +217,7 @@
     "vsce": "^2.15.0",
     "vscode-test": "1.6.1"
   },
-  "publisher": "ocamlpro",
+  "publisher": "OCamlPro",
   "categories": [
     "Formatters",
     "Programming Languages",

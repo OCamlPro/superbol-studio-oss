@@ -19,18 +19,18 @@ let vscode_engine = "1.64.0"
 
 
 let marketplace = Manifest.marketplace
-    "ocamlpro"
-  ~categories: [
-    "Formatters" ;
-    "Programming Languages" ;
-    "Linters" ;
-    "Snippets" ;
-    "Other"
-  ]
+    "OCamlPro"
+    ~categories: [
+      "Formatters" ;
+      "Programming Languages" ;
+      "Linters" ;
+      "Snippets" ;
+      "Other"
+    ]
 
 let package =
   Manifest.package
-    "superbol"
+    "SuperBOL"
     ~displayName: "SuperBOL Studio OSS"
     ~description: "Provides a COBOL mode in VSCode, based on the SuperBOL LSP \
                    server for COBOL"
@@ -49,37 +49,34 @@ let package =
     ~main: "./_dist/superbol_vscode_platform.bc.js"
     ~scripts: [
       "compile",
-      "make compile" ;
+      "make compile";
 
-      "release",
-      "make release" ;
+      "package",
+      "make vsix-package";
 
-      "package" ,
-      "vsce package --out superbol-vscode-platform.vsix --yarn" ;
+      "deploy:vsce",
+      "make deploy-vsce";
 
-      "deploy:vsce" ,
-      "vsce publish --packagePath superbol-vscode-platform.vsix --yarn" ;
-
-      "deploy:ovsx" ,
-      "ovsx publish --yarn"
+      "deploy:ovsx",
+      "make deploy-ovsx";
     ]
     ~dependencies: [
-      "@vscode/debugadapter", "^1.61.0" ;
-      "@vscode/debugprotocol", "^1.61.0" ;
-      "polka" , "^1.0.0-next.22" ;
-      "sirv" , "^2.0.2" ;
-      "vscode-languageclient" , "8.0.2"
+      "@vscode/debugadapter", "^1.61.0";
+      "@vscode/debugprotocol", "^1.61.0";
+      "vscode-languageclient", "8.0.2";
+      "polka", "^1.0.0-next.22";
+      "sirv", "^2.0.2";
     ]
     ~devDependencies: [
-      "@types/vscode" , vscode_engine ;
-      "esbuild" , "0.15.16" ;
-      "fs-extra" , "10.0.1" ;
-      "mocha" , "9.2.2" ;
-      "npm-run-all" , "4.1.5" ;
-      "ovsx" , "0.1.0-next.97d460c" ;
-      "prettier" , "^2.5.1" ;
-      "vsce" , "^2.15.0" ;
-      "vscode-test" , "1.6.1"
+      "@types/vscode", vscode_engine;
+      "esbuild", "0.15.16";
+      "fs-extra", "10.0.1";
+      "mocha", "9.2.2";
+      "npm-run-all", "4.1.5";
+      "ovsx", "0.1.0-next.97d460c";
+      "prettier", "^2.5.1";
+      "vsce", "^2.15.0";
+      "vscode-test", "1.6.1"
     ]
 
 let contributes =
@@ -89,90 +86,101 @@ let contributes =
         ~aliases: [ "COBOL" ]
         ~filenamePatterns: [ "*.cbl"; "*.cob" ]
     ]
-    ~debuggers: [
-      Manifest.debugger "cobol"
-        ~label:"GnuCOBOL Debugger"
-        ~languages: [ "cobol" ]
-        ~program: "gdb"
-        (* TODO unsupported ???
-           "args": [
-           "--init-eval-command=\"source /usr/local/bin/cobcd.py\""
-           ],
-        *)
-        ~configurationAttributes:
-          (Manifest.any
-             {| {
-          "launch": {
-            "type": "cobol",
-            "required": [
-              "program"
-            ],
-            "properties": {
-              "program": {
-                "type": "string",
-                "default": "${workspaceFolder}/a.out"
-              }
-            }
-          }
-}
-         |}
-          )
-        ~configurationSnippets:
-          [
-            Manifest.any
-              {|
-{
- "label": "Debug COBOL",
- "description": "New COBOL debugging configuration",
- "body": {
-   "type": "cobol",
-   "request": "launch",
-   "name": "${2:Launch Program}",
-   "program": "${workspaceFolder}/${1:Program}"
-  }
-}
-          |}
-          ]
-    ]
-    ~breakpoints: [ Manifest.breakpoint "COBOL" ]
+    (*     ~debuggers: [ *)
+    (*       Manifest.debugger "cobol" *)
+    (*         ~label:"GnuCOBOL Debugger" *)
+    (*         ~languages: [ "cobol" ] *)
+    (*         ~program: "gdb" *)
+    (*         (\* TODO unsupported ??? *)
+    (*            "args": [ *)
+    (*            "--init-eval-command=\"source /usr/local/bin/cobcd.py\"" *)
+    (*            ], *)
+    (*         *\) *)
+    (*         ~configurationAttributes: *)
+    (*           (Manifest.any *)
+    (*              {| { *)
+                    (*           "launch": { *)
+                    (*             "type": "cobol", *)
+                    (*             "required": [ *)
+                    (*               "program" *)
+                    (*             ], *)
+                    (*             "properties": { *)
+                    (*               "program": { *)
+                    (*                 "type": "string", *)
+                    (*                 "default": "${workspaceFolder}/a.out" *)
+                    (*               } *)
+                    (*             } *)
+                    (*           } *)
+                    (* } *)
+                    (*          |} *)
+    (*           ) *)
+    (*         ~configurationSnippets: *)
+    (*           [ *)
+    (*             Manifest.any *)
+    (*               {| *)
+                     (* { *)
+                     (*  "label": "Debug COBOL", *)
+                     (*  "description": "New COBOL debugging configuration", *)
+                     (*  "body": { *)
+                     (*    "type": "cobol", *)
+                     (*    "request": "launch", *)
+                     (*    "name": "${2:Launch Program}", *)
+                     (*    "program": "${workspaceFolder}/${1:Program}" *)
+                     (*   } *)
+                     (* } *)
+                     (*           |} *)
+    (*           ] *)
+    (*     ] *)
+    (*     ~breakpoints: [ *)
+    (*       Manifest.breakpoint "COBOL" *)
+    (*     ] *)
     ~configuration:
-      ( Manifest.configuration ~title:"SuperBOL COBOL"
-          [
-            Manifest.PROPERTY.bool
-              "superbol.globalFormatTakesSelection"
-              ~default:false
-              ~description:
-                "If something is selected, only format the selection" ;
+      (Manifest.configuration ~title:"SuperBOL COBOL"
+         [
+           Manifest.PROPERTY.bool
+             "superbol.globalFormatTakesSelection"
+             ~default:false
+             ~description:
+               "If something is selected, only format the selection";
 
-            Manifest.PROPERTY.string "superbol.path"
-              ~default:""
-              ~description:
-                "Name of the `superbol-free` executable if available in PATH; \
-                 may be an absolute path otherwise. Leave empty to use the \
-                 bundled `superbol-free`, if available."
-          ] )
+           Manifest.PROPERTY.string "superbol.exe"
+             ~default:""
+             ~description:
+               "Name of the `superbol-free` executable if available in PATH; \
+                may be an absolute path otherwise. Leave empty to use the \
+                bundled `superbol-free`, if available.";
+
+           Manifest.PROPERTY.string "cobc.exe"
+             ~default:"cobc"
+             ~description:"Path to the GnuCOBOL compiler executable."
+         ])
     ~taskDefinitions: [
       Manifest.taskDefinition
         "superbol"
         ~properties: [
           Manifest.PROPERTY.array "copybooks"
-            ~description:"The list of copybooks paths" ;
-
-          Manifest.PROPERTY.string "sourceFormat"
-            ~description: "The source format of the code" ;
+            ~description:"The list of copybooks paths";
 
           Manifest.PROPERTY.enum "dialect"
             ~cases:Cobol_config.DIALECT.all_canonical_names
-            ~description: "The COBOL dialect used" ;
+            ~description: "The COBOL dialect used";
 
-          Manifest.PROPERTY.bool "forDebugging"
-            ~description: "Build for debugging" ;
+          Manifest.PROPERTY.string "source-format"
+            ~description: "The source format of the code";
 
-          Manifest.PROPERTY.array "extensions"
-            ~description: "Add cobol file extensions"
+          Manifest.PROPERTY.bool "for-debug"
+            ~description: "Build for debugging";
+
+          Manifest.PROPERTY.null_string "cobc.exe"
+            ~description:"Path to the GnuCOBOL compiler executable; if `null`, \
+                          defaults to \"cobc.exe\" from the workspace \
+                          configuration, if defined, to \"cobc\" otherwise.";
+
+          Manifest.PROPERTY.array "extra-args"
+            ~description:"Additional arguments passed to `cobc`";
         ]
     ]
-    ~problemPatterns:[
+    ~problemPatterns: [
       Manifest.problemPattern
         (Some "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$")
         ~name:"gnucobol"
@@ -207,45 +215,45 @@ let contributes =
       Manifest.problemMatcher ()
         ~name:"gnucobol"
         ~owner:"cobol"
-        ~fileLocation:["absolute"]
+        ~fileLocation:["autodetect"]
         ~pattern:[Manifest.ProblemName "$gnucobol"]
         ~source:"GnuCOBOL";
       Manifest.problemMatcher ()
         ~name:"gnucobol-warning"
         ~owner:"cobol"
-        ~fileLocation:["absolute"]
+        ~fileLocation:["autodetect"]
         ~pattern:[Manifest.ProblemName "$gnucobol-warning"]
         ~severity:"warning"
         ~source:"GnuCOBOL";
       Manifest.problemMatcher ()
         ~name:"gnucobol-error"
         ~owner:"cobol"
-        ~fileLocation:["absolute"]
+        ~fileLocation:["autodetect"]
         ~pattern:[Manifest.ProblemName "$gnucobol-error"]
         ~severity:"error"
         ~source:"GnuCOBOL";
       Manifest.problemMatcher ()
         ~name:"gnucobol-note"
         ~owner:"cobol"
-        ~fileLocation:["absolute"]
+        ~fileLocation:["autodetect"]
         ~pattern:[Manifest.ProblemName "$gnucobol-note"]
         ~severity:"info"
         ~source:"GnuCOBOL";
     ]
-    ~commands:[
+    ~commands: [
       Manifest.command ()
         ~command:"superbol.server.restart"
         ~title:"Restart Language Server"
-        ~category:"superbol"
+        ~category:"SuperBOL"
     ]
 
 let manifest =
   Manifest.vscode
     package
     ~marketplace
-    ~engines: ( "^" ^ vscode_engine )
+    ~engines: ("^" ^ vscode_engine)
     ~activationEvents: [
-      "onLanguage:cobol" ;
-      "onDebug"
+      "onLanguage:cobol";
+      "onDebug";
     ]
     ~contributes
