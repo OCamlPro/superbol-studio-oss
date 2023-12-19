@@ -15,18 +15,19 @@
 module WS = Vscode.Workspace
 module WS_CONF = Vscode.WorkspaceConfiguration
 
+let section = "superbol"
 let non_empy s = if s = "" then None else Some s
 
-let cobc_exe ?scope () =
-  let config = WS.getConfiguration ?scope () in
-  match WS_CONF.get ~section:"cobc.exe" config with
+let superbol_exe ?scope () =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:"lsp-path" config with
   | None -> None
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)
 
-let superbol_exe ?scope () =
-  let config = WS.getConfiguration ?scope () in
-  match WS_CONF.get ~section:"superbol.exe" config with
+let cobc_exe ?scope () =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:"cobc-path" config with
   | None -> None
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)

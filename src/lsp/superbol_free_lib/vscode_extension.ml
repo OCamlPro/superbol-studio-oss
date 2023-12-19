@@ -25,7 +25,8 @@ let marketplace = Manifest.marketplace
       "Programming Languages" ;
       "Linters" ;
       "Snippets" ;
-      "Other"
+      "Debuggers";
+      "Other";
     ]
 
 let package =
@@ -46,7 +47,7 @@ let package =
       author_email = Some "contact@ocamlpro.com"
     }
     ~keywords: [ "cobol" ; "gnucobol" ]
-    ~main: "./_dist/superbol_vscode_platform.bc.js"
+    ~main: "./_dist/superbol-vscode-platform-bundle"
     ~scripts: [
       "compile",
       "make compile";
@@ -66,17 +67,24 @@ let package =
       "vscode-languageclient", "8.0.2";
       "polka", "^1.0.0-next.22";
       "sirv", "^2.0.2";
+
+      (* for the debug extension: *)
+      "n-readlines", "^1.0.0";
     ]
     ~devDependencies: [
-      "@types/vscode", vscode_engine;
-      "esbuild", "0.15.16";
-      "fs-extra", "10.0.1";
-      "mocha", "9.2.2";
-      "npm-run-all", "4.1.5";
-      "ovsx", "0.1.0-next.97d460c";
+      "@types/vscode", "^" ^ vscode_engine;
+      "esbuild", "^0.15.16";
+      "fs-extra", "^10.0.1";
+      "mocha", "^9.2.2";
+      "npm-run-all", "^4.1.5";
+      "ovsx", "^0.1.0";
       "prettier", "^2.5.1";
-      "vsce", "^2.15.0";
-      "vscode-test", "1.6.1"
+      "@vscode/vsce", "^2.15.0";
+      "@vscode/test-electron", "^1.6.1";
+
+      (* for the debug extension: *)
+      "typescript", "^5.1.6";
+      "@types/node", "^20.3.2";
     ]
 
 let contributes =
@@ -86,54 +94,172 @@ let contributes =
         ~aliases: [ "COBOL" ]
         ~filenamePatterns: [ "*.cbl"; "*.cob" ]
     ]
-    (*     ~debuggers: [ *)
-    (*       Manifest.debugger "cobol" *)
-    (*         ~label:"GnuCOBOL Debugger" *)
-    (*         ~languages: [ "cobol" ] *)
-    (*         ~program: "gdb" *)
-    (*         (\* TODO unsupported ??? *)
-    (*            "args": [ *)
-    (*            "--init-eval-command=\"source /usr/local/bin/cobcd.py\"" *)
-    (*            ], *)
-    (*         *\) *)
-    (*         ~configurationAttributes: *)
-    (*           (Manifest.any *)
-    (*              {| { *)
-                    (*           "launch": { *)
-                    (*             "type": "cobol", *)
-                    (*             "required": [ *)
-                    (*               "program" *)
-                    (*             ], *)
-                    (*             "properties": { *)
-                    (*               "program": { *)
-                    (*                 "type": "string", *)
-                    (*                 "default": "${workspaceFolder}/a.out" *)
-                    (*               } *)
-                    (*             } *)
-                    (*           } *)
-                    (* } *)
-                    (*          |} *)
-    (*           ) *)
-    (*         ~configurationSnippets: *)
-    (*           [ *)
-    (*             Manifest.any *)
-    (*               {| *)
-                     (* { *)
-                     (*  "label": "Debug COBOL", *)
-                     (*  "description": "New COBOL debugging configuration", *)
-                     (*  "body": { *)
-                     (*    "type": "cobol", *)
-                     (*    "request": "launch", *)
-                     (*    "name": "${2:Launch Program}", *)
-                     (*    "program": "${workspaceFolder}/${1:Program}" *)
-                     (*   } *)
-                     (* } *)
-                     (*           |} *)
-    (*           ] *)
-    (*     ] *)
-    (*     ~breakpoints: [ *)
-    (*       Manifest.breakpoint "COBOL" *)
-    (*     ] *)
+    ~debuggers: [
+      Manifest.debugger "gdb"
+        ~label: "SuperBOL Debugger for GnuCOBOL"
+        ~languages: ["cobol"; "COBOL"]
+        ~program: "./_dist/superbol-vscode-gdb.js"
+        ~runtime: "node"
+        ~configurationAttributes:
+          (Manifest.any {| {
+                "launch": {
+                        "required": [],
+                        "properties": {
+                                "target": {
+                                        "type": "string",
+                                        "description": "Path to debugged executable",
+                                        "default": "${file}"
+                                },
+                                "arguments": {
+                                        "type": "string",
+                                        "description": "Extra arguments for executable",
+                                        "default": null
+                                },
+                                "cwd": {
+                                        "type": "string",
+                                        "description": "Path to project",
+                                        "default": "${workspaceFolder}"
+                                },
+                                "gdb-path": {
+                                        "type": "string",
+                                        "description": "Path to gdb",
+                                        "default": "gdb"
+                                },
+                                "libcob-path": {
+                                        "type": "string",
+                                        "description": "Path to libcob",
+                                        "default": null
+                                },
+                                "group": {
+                                        "type": "array",
+                                        "description": "Compilation groups of executable",
+                                        "default": []
+                                },
+                                "env": {
+                                        "type": "object",
+                                        "description": "Environment variables",
+                                        "default": null
+                                },
+                                "coverage": {
+                                        "type": "boolean",
+                                        "description": "Enable code coverage",
+                                        "default": true
+                                },
+                                "verbose": {
+                                        "type": "boolean",
+                                        "description": "Debug GDB",
+                                        "default": false
+                                }
+                        }
+                },
+                "attach": {
+                        "required": [],
+                        "properties": {
+                                "target": {
+                                        "type": "string",
+                                        "description": "Path to executable",
+                                        "default": "${file}"
+                                },
+                                "arguments": {
+                                        "type": "string",
+                                        "description": "Extra arguments for executable",
+                                        "default": null
+                                },
+                                "cwd": {
+                                        "type": "string",
+                                        "description": "Path to project",
+                                        "default": "${workspaceFolder}"
+                                },
+                                "gdb-path": {
+                                        "type": "string",
+                                        "description": "Path to gdb",
+                                        "default": "gdb"
+                                },
+                                "libcob-path": {
+                                        "type": "string",
+                                        "description": "Path to libcob",
+                                        "default": null
+                                },
+                                "group": {
+                                        "type": "array",
+                                        "description": "Compilation groups of executable",
+                                        "default": []
+                                },
+                                "env": {
+                                        "type": "object",
+                                        "description": "Environment variables",
+                                        "default": null
+                                },
+                                "verbose": {
+                                        "type": "boolean",
+                                        "description": "Debug GDB",
+                                        "default": false
+                                },
+                                "pid": {
+                                        "type": "string",
+                                        "description": "PID of the executable",
+                                        "default": null
+                                },
+                                "remote-debugger": {
+                                        "type": "string",
+                                        "description": "GDB Server host:port",
+                                        "default": null
+                                }
+                        }
+                }
+        } |})
+        ~configurationSnippets: [
+          Manifest.any {| {
+                                "label": "SuperBOL: debug (launch)",
+                                "description": "New SuperBOL launch request",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (launch)}",
+                                        "type": "gdb",
+                                        "request": "launch",
+                                        "preLaunchTask": "SuperBOL: build (debug)",
+                                        "target": "$${_:{file}}",
+                                        "arguments": "",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "group": [],
+                                        "coverage": true,
+                                        "verbose": false
+                                }
+                        } |};
+          Manifest.any {| {
+                                "label": "SuperBOL: debug (attach local)",
+                                "description": "Attach to a local debug session",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (attach local)}",
+                                        "type": "gdb",
+                                        "request": "attach",
+                                        "pid": "${3:0}",
+                                        "target": "$${_:{file}}",
+                                        "arguments": "",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "group": [],
+                                        "verbose": false
+                                }
+                        } |};
+          Manifest.any {| {
+                                "label": "SuperBOL: debug (attach remote)",
+                                "description": "Attach to a remote debug session",
+                                "body": {
+                                        "name": "${2:SuperBOL: debug (attach remote)}",
+                                        "type": "gdb",
+                                        "request": "attach",
+                                        "remote-debugger": "${3:host:port}",
+                                        "target": "$${_:{file}}",
+                                        "arguments": "",
+                                        "cwd": "$${_:{workspaceFolder}}",
+                                        "group": [],
+                                        "verbose": false
+                                }
+                        } |};
+        ]
+    ]
+    ~breakpoints: [
+      Manifest.breakpoint "cobol";
+    ]
     ~configuration:
       (Manifest.configuration ~title:"SuperBOL COBOL"
          [
@@ -143,16 +269,39 @@ let contributes =
              ~description:
                "If something is selected, only format the selection";
 
-           Manifest.PROPERTY.string "superbol.exe"
+           Manifest.PROPERTY.string "superbol.lsp-path"
+             ~title:"SuperBOL executable"
              ~default:""
              ~description:
-               "Name of the `superbol-free` executable if available in PATH; \
-                may be an absolute path otherwise. Leave empty to use the \
-                bundled `superbol-free`, if available.";
+               "Name of the `superbol-free` executable if available in PATH; may \
+                be an absolute path otherwise. Leave empty to use the bundled \
+                `superbol-free`, if available.";
 
-           Manifest.PROPERTY.string "cobc.exe"
+           Manifest.PROPERTY.string "superbol.cobc-path"
+             ~title:"GnuCOBOL compiler executable"
              ~default:"cobc"
-             ~description:"Path to the GnuCOBOL compiler executable."
+             ~description:"Path to the GnuCOBOL compiler executable.";
+
+           (* Debugger-specific: *)
+
+           Manifest.PROPERTY.bool
+             "superbol.debugger.display-variable-attributes"
+             ~default:false
+             ~scope:"resource"
+             ~description:"Display storage property and field attributes \
+                           (e.g. size of alphanumerics, digits and scale of \
+                           numerics).";
+
+           Manifest.PROPERTY.string "superbol.debugger.gdb-path"
+             ~title:"GNU debugger executable"
+             ~default:"gdb"
+             ~description:"Path to the GNU debugger executable.";
+
+           Manifest.PROPERTY.string "superbol.debugger.libcob-path"
+             ~title:"GnuCOBOL runtime library"
+             ~default:"cobc"
+             ~description:"Path to the GnuCOBOL runtime library file.";
+
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition
@@ -172,6 +321,7 @@ let contributes =
             ~description: "Build for debugging";
 
           Manifest.PROPERTY.null_string "cobc.exe"
+            ~title:"GnuCOBOL compiler executable"
             ~description:"Path to the GnuCOBOL compiler executable; if `null`, \
                           defaults to \"cobc.exe\" from the workspace \
                           configuration, if defined, to \"cobc\" otherwise.";

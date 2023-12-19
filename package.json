@@ -7,6 +7,11 @@
     "onDebug"
   ],
   "contributes": {
+    "breakpoints": [
+      {
+        "language": "cobol"
+      }
+    ],
     "commands": [
       {
         "command": "superbol.server.restart",
@@ -22,18 +27,205 @@
           "default": false,
           "description": "If something is selected, only format the selection"
         },
-        "superbol.exe": {
+        "superbol.lsp-path": {
+          "title": "SuperBOL executable",
           "type": "string",
           "default": "",
           "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available."
         },
-        "cobc.exe": {
+        "superbol.cobc-path": {
+          "title": "GnuCOBOL compiler executable",
           "type": "string",
           "default": "cobc",
           "description": "Path to the GnuCOBOL compiler executable."
+        },
+        "superbol.debugger.display-variable-attributes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Display storage property and field attributes (e.g. size of alphanumerics, digits and scale of numerics).",
+          "scope": "resource"
+        },
+        "superbol.debugger.gdb-path": {
+          "title": "GNU debugger executable",
+          "type": "string",
+          "default": "gdb",
+          "description": "Path to the GNU debugger executable."
+        },
+        "superbol.debugger.libcob-path": {
+          "title": "GnuCOBOL runtime library",
+          "type": "string",
+          "default": "cobc",
+          "description": "Path to the GnuCOBOL runtime library file."
         }
       }
     },
+    "debuggers": [
+      {
+        "type": "gdb",
+        "label": "SuperBOL Debugger for GnuCOBOL",
+        "program": "./_dist/superbol-vscode-gdb.js",
+        "runtime": "node",
+        "languages": [
+          "cobol",
+          "COBOL"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [],
+            "properties": {
+              "target": {
+                "type": "string",
+                "description": "Path to debugged executable",
+                "default": "${file}"
+              },
+              "arguments": {
+                "type": "string",
+                "description": "Extra arguments for executable",
+                "default": null
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Path to project",
+                "default": "${workspaceFolder}"
+              },
+              "gdb-path": {
+                "type": "string",
+                "description": "Path to gdb",
+                "default": "gdb"
+              },
+              "libcob-path": {
+                "type": "string",
+                "description": "Path to libcob",
+                "default": null
+              },
+              "group": {
+                "type": "array",
+                "description": "Compilation groups of executable",
+                "default": []
+              },
+              "env": {
+                "type": "object",
+                "description": "Environment variables",
+                "default": null
+              },
+              "coverage": {
+                "type": "boolean",
+                "description": "Enable code coverage",
+                "default": true
+              },
+              "verbose": {
+                "type": "boolean",
+                "description": "Debug GDB",
+                "default": false
+              }
+            }
+          },
+          "attach": {
+            "required": [],
+            "properties": {
+              "target": {
+                "type": "string",
+                "description": "Path to executable",
+                "default": "${file}"
+              },
+              "arguments": {
+                "type": "string",
+                "description": "Extra arguments for executable",
+                "default": null
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Path to project",
+                "default": "${workspaceFolder}"
+              },
+              "gdb-path": {
+                "type": "string",
+                "description": "Path to gdb",
+                "default": "gdb"
+              },
+              "libcob-path": {
+                "type": "string",
+                "description": "Path to libcob",
+                "default": null
+              },
+              "group": {
+                "type": "array",
+                "description": "Compilation groups of executable",
+                "default": []
+              },
+              "env": {
+                "type": "object",
+                "description": "Environment variables",
+                "default": null
+              },
+              "verbose": {
+                "type": "boolean",
+                "description": "Debug GDB",
+                "default": false
+              },
+              "pid": {
+                "type": "string",
+                "description": "PID of the executable",
+                "default": null
+              },
+              "remote-debugger": {
+                "type": "string",
+                "description": "GDB Server host:port",
+                "default": null
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "SuperBOL: debug (launch)",
+            "description": "New SuperBOL launch request",
+            "body": {
+              "name": "${2:SuperBOL: debug (launch)}",
+              "type": "gdb",
+              "request": "launch",
+              "preLaunchTask": "SuperBOL: build (debug)",
+              "target": "$${_:{file}}",
+              "arguments": "",
+              "cwd": "$${_:{workspaceFolder}}",
+              "group": [],
+              "coverage": true,
+              "verbose": false
+            }
+          },
+          {
+            "label": "SuperBOL: debug (attach local)",
+            "description": "Attach to a local debug session",
+            "body": {
+              "name": "${2:SuperBOL: debug (attach local)}",
+              "type": "gdb",
+              "request": "attach",
+              "pid": "${3:0}",
+              "target": "$${_:{file}}",
+              "arguments": "",
+              "cwd": "$${_:{workspaceFolder}}",
+              "group": [],
+              "verbose": false
+            }
+          },
+          {
+            "label": "SuperBOL: debug (attach remote)",
+            "description": "Attach to a remote debug session",
+            "body": {
+              "name": "${2:SuperBOL: debug (attach remote)}",
+              "type": "gdb",
+              "request": "attach",
+              "remote-debugger": "${3:host:port}",
+              "target": "$${_:{file}}",
+              "arguments": "",
+              "cwd": "$${_:{workspaceFolder}}",
+              "group": [],
+              "verbose": false
+            }
+          }
+        ]
+      }
+    ],
     "languages": [
       {
         "id": "cobol",
@@ -160,6 +352,7 @@
             "description": "Build for debugging"
           },
           "cobc.exe": {
+            "title": "GnuCOBOL compiler executable",
             "type": [
               "string",
               "null"
@@ -192,7 +385,7 @@
     "cobol",
     "gnucobol"
   ],
-  "main": "./_dist/superbol_vscode_platform.bc.js",
+  "main": "./_dist/superbol-vscode-platform-bundle",
   "scripts": {
     "compile": "make compile",
     "package": "make vsix-package",
@@ -204,18 +397,21 @@
     "@vscode/debugprotocol": "^1.61.0",
     "vscode-languageclient": "8.0.2",
     "polka": "^1.0.0-next.22",
-    "sirv": "^2.0.2"
+    "sirv": "^2.0.2",
+    "n-readlines": "^1.0.0"
   },
   "devDependencies": {
-    "@types/vscode": "1.64.0",
-    "esbuild": "0.15.16",
-    "fs-extra": "10.0.1",
-    "mocha": "9.2.2",
-    "npm-run-all": "4.1.5",
-    "ovsx": "0.1.0-next.97d460c",
+    "@types/vscode": "^1.64.0",
+    "esbuild": "^0.15.16",
+    "fs-extra": "^10.0.1",
+    "mocha": "^9.2.2",
+    "npm-run-all": "^4.1.5",
+    "ovsx": "^0.1.0",
     "prettier": "^2.5.1",
-    "vsce": "^2.15.0",
-    "vscode-test": "1.6.1"
+    "@vscode/vsce": "^2.15.0",
+    "@vscode/test-electron": "^1.6.1",
+    "typescript": "^5.1.6",
+    "@types/node": "^20.3.2"
   },
   "publisher": "OCamlPro",
   "categories": [
@@ -223,6 +419,7 @@
     "Programming Languages",
     "Linters",
     "Snippets",
+    "Debuggers",
     "Other"
   ]
 }

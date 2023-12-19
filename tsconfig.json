@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+	"module": "commonjs",
+	"target": "es2020",
+	"outDir": "_out",
+	"sourceMap": true,
+	"rootDir": ".",
+    },
+    "include": [
+	"import/superbol-vscode-debug/src",
+    ],
+    "exclude": [
+	"node_modules",
+	".vscode-test",
+    ]
+}
