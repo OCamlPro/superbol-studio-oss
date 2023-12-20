@@ -32,8 +32,8 @@ let attributes_spec ~debug =
                         [%js.of: string], "auto");
     "for-debug", C ([%js.to: bool or_undefined],
                     [%js.of: bool], debug);
-    "cobc.exe", C ([%js.to: string or_undefined],
-                   [%js.of: string], "cobc");
+    "cobc-path", C ([%js.to: string or_undefined],
+                    [%js.of: string], "cobc");
     "extra-args", C ([%js.to: string list or_undefined],
                      [%js.of: string list], ["-ffold-copy=LOWER"]);
   ]
@@ -74,7 +74,7 @@ let make_args ~attributes =
 
 let cobc_execution ~attributes =
   let cobc =
-    match List.assoc_opt "cobc.exe" attributes with
+    match List.assoc_opt "cobc-path" attributes with
     | Some exe ->
         [%js.to: string] exe
     | None ->

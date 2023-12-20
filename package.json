@@ -351,13 +351,13 @@
             "type": "boolean",
             "description": "Build for debugging"
           },
-          "cobc.exe": {
+          "cobc-path": {
             "title": "GnuCOBOL compiler executable",
             "type": [
               "string",
               "null"
             ],
-            "description": "Path to the GnuCOBOL compiler executable; if `null`, defaults to \"cobc.exe\" from the workspace configuration, if defined, to \"cobc\" otherwise."
+            "description": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise."
           },
           "extra-args": {
             "type": "array",

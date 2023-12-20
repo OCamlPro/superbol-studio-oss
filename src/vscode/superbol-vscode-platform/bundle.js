@@ -18,7 +18,7 @@
 // `import/superbol-vscode-debug`.
 // 
 import * as main from "./superbol_vscode_platform.bc";
-import * as debug from "./import/superbol-vscode-debug/src/extension";
+import * as debug from "../import/superbol-vscode-debug/src/extension";
 export function activate (context) {
   main.activate (context);
   debug.activate (context);

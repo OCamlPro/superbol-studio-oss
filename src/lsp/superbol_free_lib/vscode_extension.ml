@@ -320,11 +320,12 @@ let contributes =
           Manifest.PROPERTY.bool "for-debug"
             ~description: "Build for debugging";
 
-          Manifest.PROPERTY.null_string "cobc.exe"
+          Manifest.PROPERTY.null_string "cobc-path"
             ~title:"GnuCOBOL compiler executable"
-            ~description:"Path to the GnuCOBOL compiler executable; if `null`, \
-                          defaults to \"cobc.exe\" from the workspace \
-                          configuration, if defined, to \"cobc\" otherwise.";
+            ~description:"Path to the GnuCOBOL compiler executable; when `null`, \
+                          defaults to the value of \"superbol.cobc-path\" from \
+                          the workspace configuration, if defined, to \"cobc\" \
+                          otherwise.";
 
           Manifest.PROPERTY.array "extra-args"
             ~description:"Additional arguments passed to `cobc`";

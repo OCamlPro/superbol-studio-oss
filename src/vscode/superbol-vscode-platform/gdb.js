@@ -12,7 +12,7 @@
 // -----------------------------------------------------------------------
 //
 // This file is copied as `_out/superbol-vscode-gdb.js` before
-// bundling the VS Code extension.  Its sole purpose is to expose
-// `gdb` debugger program as an simpler entry-point.
+// bundling the VS Code extension.  Its purpose is to expose the `gdb`
+// debugger program as a single entry-point.
 // 
-export * from "./import/superbol-vscode-debug/src/gdb";
+export * from "../import/superbol-vscode-debug/src/gdb";

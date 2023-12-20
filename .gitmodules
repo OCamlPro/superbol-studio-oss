@@ -6,5 +6,5 @@
 	url = https://github.com/OCamlPro/merlin.git
 [submodule "import/superbol-vscode-debug"]
 	path = import/superbol-vscode-debug
-	url = https://github.com/nberth/superbol-vscode-debug.git
-	branch = adapt2superbol
+	url = https://github.com/OCamlPro/superbol-vscode-debug.git
+	branch = superbol-vscode-debug
