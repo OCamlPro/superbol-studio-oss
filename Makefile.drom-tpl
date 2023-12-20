@@ -3,6 +3,10 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
+TARGET_PLAT ?= linux
+DUNE_CROSS_ARGS = $(if $(filter win32,${TARGET_PLAT}),-x windows)
+
+VERSION = !{version}
 DEV_DEPS := merlin ocamlformat odoc![if:gen:test] ppx_expect ppx_inline_test![fi]
 
 ![if:gen:docs]![if:gen:sphinx]
@@ -20,7 +24,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build!{build-profile} @install
+	opam exec -- dune build!{build-profile} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh !{packages}
 	./scripts/after.sh build
 
@@ -74,7 +78,7 @@ dev-deps:
 
 test:
 	./scripts/before.sh test
-	opam exec -- dune build @runtest
+	opam exec -- dune build ${DUNE_CROSS_ARGS} @runtest
 	./scripts/after.sh test
 
 clean:

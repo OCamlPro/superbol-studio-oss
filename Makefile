@@ -3,6 +3,10 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
+TARGET_PLAT ?= linux
+DUNE_CROSS_ARGS = $(if $(filter win32,${TARGET_PLAT}),-x windows)
+
+VERSION = 0.1.0
 DEV_DEPS := merlin ocamlformat odoc
 
 
@@ -20,7 +24,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build @install
+	opam exec -- dune build ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_preproc cobol_data cobol_typeck ez_toml ezr_toml
 	./scripts/after.sh build
 
@@ -74,7 +78,7 @@ dev-deps:
 
 test:
 	./scripts/before.sh test
-	opam exec -- dune build @runtest
+	opam exec -- dune build ${DUNE_CROSS_ARGS} @runtest
 	./scripts/after.sh test
 
 clean:

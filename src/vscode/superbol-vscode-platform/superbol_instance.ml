@@ -42,9 +42,12 @@ let start_language_server t =
       ~bundled_superbol:t.bundled_superbol
   in
   let clientOptions = Superbol_languageclient.clientOptions () in
-  let client = LanguageClient.make
-    ~id:"cobolServer"
-    ~name:"Cobol Server"
-    ~serverOptions ~clientOptions () in
+  let client =
+    LanguageClient.make ()
+      ~id: "superbol-free-lsp"
+      ~name: "SuperBOL Language Server"
+      ~serverOptions
+      ~clientOptions
+  in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
