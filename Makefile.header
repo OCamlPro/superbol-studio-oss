@@ -1,37 +1,63 @@
 # -*- Makefile -*-
 PROJECT=superbol_vscode_platform
 SRCDIR=src/vscode/superbol-vscode-platform
-DUNE_BUILD_DIR ?= _build
+
 CP ?= cp -f
+
+DUNE_BUILD_DIR ?= _build
+DUNE_BUILD_ARGS = $(DUNE_CROSS_ARGS) --profile=release
+DUNE_BUILD_SRCDIR =							\
+	$(DUNE_BUILD_DIR)/default$(if 					\
+		$(filter win32,$(TARGET_PLAT)),.windows)/src
+
+# TARGET_PLAT is defined in Makefile
+TARGET_ARCH ?= x64
+TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
+TARGET_VSIX = superbol-vscode-platform-$(VERSION)-$(TARGET_SPEC).vsix
+
+DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
+SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
+SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
+SUPERBOL_LSP_BUILT = $(DUNE_BUILD_SRCDIR)/lsp/superbol-free/main.exe
+
+VSCE_ARGS = --yarn -t $(TARGET_SPEC)
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
+# --- leading rules ---
+
 .PHONY: compile package
 
-all: superbol-free
-compile: superbol-free build-release
+all: superbol-lsp-server
+compile: superbol-lsp-server build-release
 package: vsix-package
 
-superbol-free: build vsix-dist-setup
-	$(CP) $(DUNE_BUILD_DIR)/default/src/lsp/superbol-free/main.exe _dist/superbol-free
-	$(CP) _dist/superbol-free superbol-free
+superbol-lsp-server $(SUPERBOL_LSP): build vsix-dist-setup
+# Assume we do everything on Linux (who wouldn't?):
+ifeq ($(TARGET_PLAT),linux)
+	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
+
+package.json: $(SUPERBOL_LSP)
 	cp -f package.json package.json.prev
-	./superbol-free json vscode --gen package.json
+	./$(SUPERBOL_LSP) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
+endif
 
 .PHONY: build-debug yarn-debug
 
 build-debug:
-	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
+	opam exec -- dune build $(DUNE_BUILD_ARGS) $(SRCDIR)/$(PROJECT).bc.js
 	@mkdir -p _out
 	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
 	$(MAKE) yarn-debug
 
 # Use 'make build-debug' before to copy the JS file in _out/
-yarn-debug: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.js
-	yarn esbuild $+ \
+yarn-debug: package.json
+yarn-debug: _out/superbol-vscode-platform-bundle.js	\
+	    _out/superbol-vscode-gdb.js
+	yarn esbuild  $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -43,14 +69,16 @@ yarn-debug: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.js
 .PHONY: build-release yarn-release
 
 build-release:
-	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
+	opam exec -- dune build $(DUNE_BUILD_ARGS) $(SRCDIR)/$(PROJECT).bc.js
 	@mkdir -p _out
 	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
 	$(MAKE) yarn-release
 
 # Use 'make build-release' before to copy the JS file in _out/
-yarn-release: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.js
-	yarn esbuild $+ \
+yarn-release: package.json
+yarn-release: _out/superbol-vscode-platform-bundle.js	\
+	      _out/superbol-vscode-gdb.js
+	yarn esbuild $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -63,17 +91,20 @@ yarn-release: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.j
 
 # ---
 
-_out/superbol-vscode-platform-bundle.js: src/vscode/superbol-vscode-platform/bundle.js
+_out/superbol-vscode-platform-bundle.js:			\
+		src/vscode/superbol-vscode-platform/bundle.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 
-_out/superbol-vscode-gdb.js: src/vscode/superbol-vscode-platform/gdb.js
+_out/superbol-vscode-gdb.js:					\
+		src/vscode/superbol-vscode-platform/gdb.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 
 # ---
 
-.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release deploy-vsce deploy-ovsx vsix-step
+.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
+	deploy-vsce deploy-ovsx vsix-step
 
 vsix-dist-setup:
 	@mkdir -p _dist
@@ -87,20 +118,36 @@ vsix-release: build-release
 vsix-clean: clean
 	rm -rf _out _dist *.vsix
 
+# packaging
+
 # need 'make build-debug' or 'make build-release' before
 vsix-package:
-	yarn vsce package --out superbol-vscode-platform.vsix --yarn
+	rm -f _dist/superbol-free-*-*
+	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
+	yarn vsce package $(VSCE_ARGS)		\
+		--no-git-tag-version		\
+		--no-update-package-json	\
+		--out $(TARGET_VSIX) $(VERSION)
+
+all-vsix-packages: build-release
+	for plat in linux win32; do						\
+		$(MAKE) superbol-lsp-server vsix-package TARGET_PLAT=$${plat};	\
+	done
+
+# publishing (requires vsce/ovsx login)
 
 deploy-vsce:
-	yarn vsce publish --packagePath superbol-vscode-platform.vsix --yarn
+	yarn vsce publish $(VSCE_ARGS) --packagePath $(TARGET_VSIX)
 
 deploy-ovsx:
 	yarn ovsx publish --yarn
 
 .PHONY: clean-execs
-distclean: clean-execs
+distclean: clean-execs vsix-clean
 clean-execs:
-	rm -f superbol-free vscode-package-json
+	rm -f $(SUPERBOL_LSPs)
+
+# ---
 
 .PHONY: opam-cross
 

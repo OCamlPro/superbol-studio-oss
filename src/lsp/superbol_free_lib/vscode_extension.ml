@@ -38,7 +38,7 @@ let package =
     ~description: "Provides a COBOL mode in VSCode, based on the SuperBOL LSP \
                    server for COBOL"
     ~license: "MIT"
-    ~version: "0.1.0"
+    ~version: Version.version
     ~repository: {
       type_ = Some "git" ;
       url = "https://github.com/OCamlPro/superbol-studio-oss"
