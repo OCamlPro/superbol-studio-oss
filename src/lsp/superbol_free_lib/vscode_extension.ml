@@ -18,8 +18,10 @@ open Manifest
 let vscode_engine = "1.64.0"
 
 
-let marketplace = Manifest.marketplace
+let marketplace =
+  Manifest.marketplace
     "OCamlPro"
+    ~icon:"images/superbol-128.png"
     ~categories: [
       "Formatters" ;
       "Programming Languages" ;

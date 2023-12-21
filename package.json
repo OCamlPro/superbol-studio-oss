@@ -421,5 +421,6 @@
     "Snippets",
     "Debuggers",
     "Other"
-  ]
+  ],
+  "icon": "images/superbol-128.png"
 }

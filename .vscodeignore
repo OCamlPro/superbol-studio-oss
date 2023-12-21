@@ -1,6 +1,7 @@
 **
 !assets/
 !_dist/
+!images/
 !languages/
 !snippets/
 !syntaxes/
