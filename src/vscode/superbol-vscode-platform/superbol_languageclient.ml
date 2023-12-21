@@ -13,19 +13,10 @@
 (**************************************************************************)
 
 let serverOptions ~bundled_superbol =
-  let config = Vscode.Workspace.getConfiguration () in
-  let cmd_opt =
-    match Vscode.WorkspaceConfiguration.get ~section:"superbol.path" config with
-    | None -> None
-    | Some o when Ojs.is_null o -> None
-    | Some o ->
-      match Ojs.string_of_js o with
-      | "" -> None
-      | s -> Some s
-  in
-  let command = Option.value ~default:bundled_superbol cmd_opt in
   Vscode_languageclient.ServerOptions.create ()
-    ~command
+    ~command:(match Superbol_workspace.superbol_exe () with
+        | None -> bundled_superbol
+        | Some cmd -> cmd)
     ~args:["lsp"]
 
 let clientOptions () =

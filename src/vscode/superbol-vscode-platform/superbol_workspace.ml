@@ -12,42 +12,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Vscode_languageclient
+module WS = Vscode.Workspace
+module WS_CONF = Vscode.WorkspaceConfiguration
 
-type t = {
-  mutable bundled_superbol : string;
-  mutable language_client: LanguageClient.t option
-}
+let section = "superbol"
+let non_empy s = if s = "" then None else Some s
 
-let make ~bundled_superbol () = {
-  bundled_superbol;
-  language_client = None
-}
+let superbol_exe ?scope () =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:"lsp-path" config with
+  | None -> None
+  | Some o when Ojs.is_null o -> None
+  | Some s -> non_empy (Ojs.string_of_js s)
 
-let stop_language_server t =
-  match t.language_client with
-  | None -> Promise.return ()
-  | Some client ->
-    t.language_client <- None;
-    if LanguageClient.isRunning client then
-      LanguageClient.stop client
-    else
-      Promise.return ()
-
-let start_language_server t =
-  let open Promise.Syntax in
-  let* () = stop_language_server t in
-  let serverOptions =
-    Superbol_languageclient.serverOptions
-      ~bundled_superbol:t.bundled_superbol
-  in
-  let clientOptions = Superbol_languageclient.clientOptions () in
-  let client =
-    LanguageClient.make ()
-      ~id: "superbol-free-lsp"
-      ~name: "SuperBOL Language Server"
-      ~serverOptions
-      ~clientOptions
-  in
-  let+ () = LanguageClient.start client in
-  t.language_client <- Some client
+let cobc_exe ?scope () =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:"cobc-path" config with
+  | None -> None
+  | Some o when Ojs.is_null o -> None
+  | Some s -> non_empy (Ojs.string_of_js s)
