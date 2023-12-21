@@ -1,17 +1,23 @@
 # -*- Makefile -*-
 PROJECT=superbol_vscode_platform
 SRCDIR=src/vscode/superbol-vscode-platform
+DUNE_BUILD_DIR ?= _build
 CP ?= cp -f
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
+.PHONY: compile package
+
 all: superbol-free
-superbol-free: build
-	$(CP) _build/default/src/lsp/superbol-free/main.exe superbol-free
-	$(CP) _build/default/src/lsp/superbol-free/main.exe _dist/superbol-free
-	$(CP) package.json package.json.prev
+compile: superbol-free build-release
+package: vsix-package
+
+superbol-free: build vsix-dist-setup
+	$(CP) $(DUNE_BUILD_DIR)/default/src/lsp/superbol-free/main.exe _dist/superbol-free
+	$(CP) _dist/superbol-free superbol-free
+	cp -f package.json package.json.prev
 	./superbol-free json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
 
@@ -19,13 +25,13 @@ superbol-free: build
 
 build-debug:
 	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
-	mkdir -p _out
-	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	@mkdir -p _out
+	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
 	$(MAKE) yarn-debug
 
 # Use 'make build-debug' before to copy the JS file in _out/
-yarn-debug:
-	yarn esbuild _out/$(PROJECT).bc.js \
+yarn-debug: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.js
+	yarn esbuild $+ \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -38,13 +44,13 @@ yarn-debug:
 
 build-release:
 	opam exec -- dune build $(SRCDIR)/$(PROJECT).bc.js --profile=release
-	mkdir -p _out
-	$(CP) _build/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	@mkdir -p _out
+	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
 	$(MAKE) yarn-release
 
 # Use 'make build-release' before to copy the JS file in _out/
-yarn-release:
-	yarn esbuild _out/$(PROJECT).bc.js \
+yarn-release: _out/superbol-vscode-platform-bundle.js _out/superbol-vscode-gdb.js
+	yarn esbuild $+ \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -55,7 +61,22 @@ yarn-release:
                 --sourcemap \
                 --sources-content=false
 
-.PHONY: vsix-package vsix-debug vsix-release deploy-vsce deploy-ovsx vsix-step
+# ---
+
+_out/superbol-vscode-platform-bundle.js: src/vscode/superbol-vscode-platform/bundle.js
+	@mkdir -p $(dir $@);
+	cp -f $< $@
+
+_out/superbol-vscode-gdb.js: src/vscode/superbol-vscode-platform/gdb.js
+	@mkdir -p $(dir $@);
+	cp -f $< $@
+
+# ---
+
+.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release deploy-vsce deploy-ovsx vsix-step
+
+vsix-dist-setup:
+	@mkdir -p _dist
 
 vsix-debug: build-debug
 	$(MAKE) vsix-package

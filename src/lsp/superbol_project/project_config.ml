@@ -56,7 +56,7 @@ let default_indent_config = []
 
 let default = {
   cobol_config = Cobol_config.default;
-  source_format = Cobol_config.(SF SFFixed);
+  source_format = Cobol_config.Auto;
   libpath = default_libpath;
   copybook_extensions = default_copybook_extensions;
   indent_config = default_indent_config;
