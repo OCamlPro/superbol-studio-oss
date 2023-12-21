@@ -15,6 +15,8 @@ open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
+module Cobol_data = Cobol_data.OLD
+
 module DIAGS = Cobol_common.Diagnostics
 module Visitor = Cobol_common.Visitor
 
@@ -103,13 +105,13 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
       | Some element, Some OccursFixed occurs_fixed ->
           DIAGS.some_result @@
           (Cobol_data.Types.Table { typ = { elements_type = element;
-                                            length = Fixed occurs_fixed.times };
+                                            length = Fixed ~&(occurs_fixed.times) };
                                     level } &@ loc)
       | Some element, Some OccursDepending { from; to_; depending; _ } ->
           DIAGS.some_result @@
           (Cobol_data.Types.Table { typ = { elements_type = element;
-                                            length = OccursDepending { min_size = from;
-                                                                       max_size = to_;
+                                            length = OccursDepending { min_size = ~&from;
+                                                                       max_size = ~&to_;
                                                                        depending } };
                    level } &@ loc)
       | Some _, Some OccursDynamic _ ->

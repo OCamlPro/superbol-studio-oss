@@ -12,5 +12,11 @@
 (**************************************************************************)
 
 include PTree_types
+
 module Visitor = Visitor
+module Terms_visitor = Terms_visitor
+module Proc_division_visitor = Proc_division_visitor
+
 module Terms_helpers = Terms_helpers
+
+module Dummies = PTree_dummies

@@ -61,13 +61,15 @@ type alter_stmt =
 
 and alter_operands =
   {
-    alter_source: qualname;
-    alter_target: qualname;
+    alter_source: procedure_name with_loc;
+    alter_target: procedure_name with_loc;
   }
 [@@deriving ord]
 
 let pp_alter_operands ppf { alter_source; alter_target } =
-  Fmt.pf ppf "%a@ TO@ %a" pp_qualname alter_source  pp_qualname alter_target
+  Fmt.pf ppf "%a@ TO@ %a"
+    pp_procedure_name' alter_source
+    pp_procedure_name' alter_target
 
 let pp_alter_stmt ppf aos =
   Fmt.(pf ppf "ALTER@ %a" (list ~sep:sp (pp_with_loc pp_alter_operands)) aos)
@@ -410,24 +412,23 @@ type merge_stmt =
 [@@deriving ord]
 
 and merge_or_sort_target =
-  | OutputProcedure of name with_loc procedure_range
+  | OutputProcedure of procedure_name with_loc procedure_range
   | Giving of name with_loc list
 [@@deriving ord]
 
 let pp_merge_or_sort_target ppf = function
   | OutputProcedure pr ->
     Fmt.pf ppf "OUTPUT@ PROCEDURE@ IS@ %a"
-      (pp_procedure_range (pp_with_loc pp_name)) pr
+      (pp_procedure_range pp_procedure_name') pr
   | Giving ns ->
     Fmt.pf ppf "GIVING@ %a" Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns
 
-let pp_merge_stmt ppf {
-  merge_file = mf;
-  merge_keys = mk;
-  merge_collating = mc;
-  merge_using = mu;
-  merge_target = mt;
-} =
+let pp_merge_stmt ppf { merge_file = mf;
+                        merge_keys = mk;
+                        merge_collating = mc;
+                        merge_using = mu;
+                        merge_target = mt;
+                      } =
   Fmt.pf ppf "MERGE@ %a%a%a%a@ %a"
     (pp_with_loc pp_name) mf
     Fmt.(
@@ -437,9 +438,9 @@ let pp_merge_stmt ppf {
         sp ++ list ~sep:sp (const string "ON" ++ sp ++ Data_descr.pp_sort_spec )
     ) mk
     Fmt.(option (
-      sp ++ const words "COLLATING SEQUENCE" ++ sp ++
-      Misc_sections.pp_alphabet_specification)
-    ) mc
+        sp ++ const words "COLLATING SEQUENCE" ++ sp ++
+        Misc_sections.pp_alphabet_specification)
+      ) mc
     Fmt.(
       if mu == [] then
         any ""
@@ -496,8 +497,8 @@ let pp_named_file_option ppf { named_file_name = nfn; named_file_option = nfo } 
   pp_with_loc pp_name ppf nfn;
   Fmt.(option (sp ++ pp_file_option)) ppf nfo
 
-let pp_open_phrase ppf {
-  open_mode = om; open_sharing = oso; open_retry = oro; open_files = ofl } =
+let pp_open_phrase ppf { open_mode = om; open_sharing = oso;
+                         open_retry = oro; open_files = ofl } =
   pp_open_mode ppf om;
   Fmt.(option (sp ++ pp_sharing_mode)) ppf oso;
   Fmt.(option (sp ++ pp_retry_clause)) ppf oro;
@@ -697,14 +698,14 @@ type sort_stmt =
 [@@deriving ord]
 
 and sort_source =                                                (* SORT only *)
-  | SortInputProcedure of name with_loc procedure_range
+  | SortInputProcedure of procedure_name with_loc procedure_range
   | SortUsing of name with_loc list
 [@@deriving ord]
 
 let pp_sort_source ppf = function
   | SortInputProcedure pr ->
     Fmt.pf ppf "INPUT@ PROCEDURE@ %a"
-      (pp_procedure_range (pp_with_loc pp_name)) pr
+      (pp_procedure_range pp_procedure_name') pr
   | SortUsing ns ->
     Fmt.pf ppf "USING@ %a"
       Fmt.(list ~sep:sp (pp_with_loc pp_name)) ns

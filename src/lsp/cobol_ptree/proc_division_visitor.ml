@@ -55,7 +55,7 @@ let fold_use_for_debugging_target (v: _ #folder) =
     ~continue:begin fun t x -> match t with
       | UseForDebuggingProcedure { all; procedure } -> x
           >> fold_bool v all
-          >> fold_qualname v procedure
+          >> fold_procedure_name' v procedure
       | UseForDebuggingAllProcedures -> x
     end
 

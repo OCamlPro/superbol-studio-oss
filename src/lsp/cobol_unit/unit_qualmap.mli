@@ -11,10 +11,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree
-open Cobol_common.Diagnostics.TYPES
+module TYPES: sig
 
-val for_compilation_unit
-  : parents: Cobol_data.PROG_ENV.t list
-  -> compilation_unit with_loc
-  -> Cobol_data.PROG_ENV.t option with_diags
+  type +'a qualmap
+
+  type 'a binding =
+    {
+      value: 'a;
+      full_qn: Cobol_ptree.qualname;
+    }
+
+  exception Ambiguous of Cobol_ptree.qualname Cobol_common.Basics.NEL.t Lazy.t
+
+end
+include module type of TYPES
+  with type 'a qualmap = 'a TYPES.qualmap
+
+type +'a t = 'a qualmap
+
+val pp_qualmap: 'a Pretty.printer -> 'a qualmap Pretty.printer
+val pp_qualmap_struct: 'a Pretty.printer -> 'a qualmap Pretty.printer
+
+val empty: 'a qualmap
+val add: Cobol_ptree.qualname -> 'a -> 'a qualmap -> 'a qualmap
+
+val fold: f:('a binding -> 'b -> 'b) -> 'a qualmap -> 'b -> 'b
+val find: Cobol_ptree.qualname -> 'a qualmap -> 'a
+
+val bindings: 'a qualmap -> 'a binding list
+val find_binding: Cobol_ptree.qualname -> 'a qualmap -> 'a binding

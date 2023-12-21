@@ -129,8 +129,6 @@ module TYPES: sig
       floating_range_length: int;
     }
 
-  val pp_category: category Pretty.printer
-
   type picture =
     {
       category: category;
@@ -138,15 +136,18 @@ module TYPES: sig
     }
   [@@deriving show, ord]
 
-  type picture_config = {
-    max_pic_length : int ;
-    decimal_char: char ;
-    currency_signs: Cobol_common.Basics.CharSet.t ;
+  type config = {
+    max_pic_length : int;
+    decimal_char: char;
+    currency_signs: Cobol_common.Basics.CharSet.t;
   }
 
   type error =
-    | May_only_appear_once of int
-    | May_not_follow of int * int
+    | May_only_appear_once of { symbol_precedence: int;
+                                decimal_char: char }
+    | May_not_follow of { symbol_precedence: int;
+                          prev_precedence: int;
+                          decimal_char: char }
     | Parenthesis_must_be_preceded_by_picture_symbol
     | Unexpected_char of char
     | Extraneous_symbol_in_exponent
@@ -177,23 +178,44 @@ type t = TYPES.picture
 
 open TYPES
 
-(** [is_edited c] indicates whether the given category represents an edited
-    item *)
-val is_edited: category -> bool
+val pp_category: category Pretty.printer
+val pp_category_name: category Pretty.printer
 
-(** data size (in "characters" --- probably with implemententor specific
-    semantics) *)
-val data_size: category -> int
+(** [is_edited pic] indicates whether the given picture string represents an
+    edited item *)
+val is_edited: picture -> bool
+
+val is_boolean: picture -> bool
+val is_national: picture -> bool
+
+(** [is_numeric pic] indicates whether the given picture string is of class
+    numeric *)
+val is_numeric: picture -> bool
+val is_signed_numeric: picture -> bool
+
+(** Size of the underlying data; corresponds to the number of "characters" for
+    usage DISPLAY *)
+val data_size: picture -> int
 
 (** display size, after editions; corresponds to "size" in standards *)
-val size: category -> int
+val size: picture -> int
 
-val of_string: picture_config -> string ->
-  ( TYPES.picture,
-    ( TYPES.error * (int*int))  (* = (error, (pos,len)) *)
-      list
-    * TYPES.picture
-  ) result
+val of_string: config -> string ->
+  (picture,
+   (error * (int * int))                        (* = (error, (pos, len)) *)
+     list * picture) result
+
+val alphanumeric: size: int -> picture
+val national: size: int -> picture
+val boolean: int -> picture
+val digits: int -> picture
+val fixed_numeric
+  : ?basics: basic_edition list
+  -> ?floating: floating_insertion
+  -> ?with_sign: bool
+  -> (* integral_digits: *)int
+  -> (* decimal_digits: *)int
+  -> picture
 
 module Make (Config: Cobol_config.T) (Env: ENV) : sig
 
@@ -203,11 +225,19 @@ module Make (Config: Cobol_config.T) (Env: ENV) : sig
   val of_string: string with_loc -> t with_loc
 end
 
-val pp_meaning_of_precedence_index :
-  TYPES.picture_config -> Format.formatter -> int -> unit
+val pp_error: error Pretty.printer
+
+val rev_errors_with_loc: loc:srcloc -> (error * (int * int)) list ->
+  error with_loc list
+
+val error_diagnostics: loc:srcloc -> (error * (int * int)) list ->
+  Cobol_common.Diagnostics.diagnostics
+
+val pp_meaning_of_precedence_index
+  : decimal_char: char -> Format.formatter -> int -> unit
 
 (** Verifies that the picture string is interpreted as `expect`,
    i.e. the result of `pp_picture`. If not, displays the difference on
    stderr and returns `false` *)
-val unit_test :
-  ?config:TYPES.picture_config -> expect:string -> string -> bool
+val unit_test
+  : ?config:TYPES.config -> expect:string -> string -> bool

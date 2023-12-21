@@ -69,6 +69,7 @@ module Pictures = struct
   let nine  = symb Nine
   let p     = symb P
   let plus  = symb Plus
+  let minus = symb Minus
   let s     = symb S
   let slant = symb Slant
   let star  = symb Star
@@ -198,6 +199,18 @@ module Pictures = struct
     in
     { category = fixednum 2 0 ~basics ~floating;
       pic = [plus 1; cs 2; nine 1] }
+
+  let pic_mdd9 =
+    let basics =
+      [ FixedInsertion { fixed_insertion_symbol = Minus;
+                         fixed_insertion_offset = 0 } ]
+    and floating =
+      { floating_insertion_symbol = CS;
+        floating_insertion_ranges = [{ floating_range_offset = 1;
+                                       floating_range_length = 2 }] }
+    in
+    { category = fixednum 2 0 ~basics ~floating;
+      pic = [minus 1; cs 2; nine 1] }
 
   let pic_dd9p =
     let basics =
@@ -364,6 +377,21 @@ module Pictures = struct
     { category = fixednum 9 3 ~basics ~zerorepl;
       pic = [star 3; comma 1; star 3; v 1; star 3] }
 
+  let pic_msBs99 =
+    let zerorepl = { zero_replacement_symbol = Star;
+                     zero_replacement_ranges = [{ floating_range_offset = 1;
+                                                  floating_range_length = 1 };
+                                                { floating_range_offset = 3;
+                                                  floating_range_length = 1 }] }
+    and basics =
+      [ FixedInsertion { fixed_insertion_symbol = Minus;
+                         fixed_insertion_offset = 0 };
+        SimpleInsertion { simple_insertion_symbols = b 1;
+                          simple_insertion_offset = 2 } ]
+    in
+    { category = fixednum 4 0 ~basics ~zerorepl;
+      pic = [minus 1; star 1; b 1; star 1; nine 2] }
+
   let pic_9Ep9 =
     { category = floatnum 1 0 1;
       pic = [nine 1; e 1; plus 1; nine 1] }
@@ -477,6 +505,7 @@ let () =
       parse_ok "+$99"                    pic_pd99;
       parse_ok "99$+"                    pic_99dp;
       parse_ok "+$$9"                    pic_pdd9;
+      parse_ok "-$$9"                    pic_mdd9;
       parse_ok "$$9+"                    pic_dd9p;
       parse_ko "Invalid floating edit."  "+$99++";
       parse_ko "Trailing + sign"         "+$99+";
@@ -502,6 +531,7 @@ let () =
       parse_ok "ZZZ999V99"               pic_ZZZ999V99;
       parse_ok "ZZZ,ZZZ.ZZZ"             pic_ZZZcZZZvZZZ;
       parse_ok "***,***V***"             pic_ssscsssvsss;
+      parse_ok "-*B*99"                  pic_msBs99;
       parse_ok "9E+9"                    pic_9Ep9;
       parse_ko "Duplicated E"            "9EE+9";
       parse_ko "Missing + after E"       "9E9";

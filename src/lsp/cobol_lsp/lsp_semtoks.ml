@@ -215,13 +215,13 @@ let semtoks_from_ptree ~filename ?range ptree =
           Visitor.do_children acc
 
     method! fold_rename_item {rename_level; rename_to;
-                              rename_renamed; rename_through } acc = acc
+                              rename_from; rename_thru } acc = acc
       (*|> Visitor.do_children*)
       (* We can remove the code below and return do_children directly*)
       |> fold_data_level' self rename_level
       |> add_name' rename_to DataDecl
-      |> Cobol_ptree.Visitor.fold_qualname self rename_renamed
-      |> Cobol_ptree.Visitor.fold_qualname_opt self rename_through
+      |> Cobol_ptree.Visitor.fold_qualname' self rename_from
+      |> Cobol_ptree.Visitor.fold_qualname'_opt self rename_thru
       |> Visitor.skip_children
 
     method! fold_condition_name_item { condition_name_level;
@@ -311,8 +311,6 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_ident' allocate_returning VarModif
       |> Visitor.skip_children
 
-    (*TODO: Alter *)
-
     method! fold_call' {payload = { call_prefix; call_using;
                                     call_returning;
                                     call_error_handler }; _} acc = acc
@@ -361,14 +359,8 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_name' ~&name VarModif
       |> Visitor.skip_children
 
-    method! fold_goto' {payload = goto_target; _} acc = acc
-      |> add_qualname goto_target ProcName
-      |> Visitor.skip_children
-
-    method! fold_goto_depending' {payload = { goto_depending_targets;
-                                              goto_depending_on }; _} acc = acc
-      |> add_list add_qualname goto_depending_targets ProcName
-      |> fold_ident self goto_depending_on
+    method! fold_procedure_name name acc = acc
+      |> add_qualname name ProcName
       |> Visitor.skip_children
 
     method! fold_initialize' {payload = { init_items; init_filler; init_category;
@@ -443,10 +435,6 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> Visitor.skip_children
 
     (* TODO: RELEASE *)
-
-    method! fold_resume' {payload = qn; _} acc = acc
-      |> add_qualname qn ProcName
-      |> Visitor.skip_children
 
     method! fold_return' {payload = {return_file; return_into;
                                      return_at_end}; _} acc = acc
@@ -599,7 +587,7 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
       | ALPHANUM _ | ALPHANUM_PREFIX _ ->
           Some (TOKTYP.string, TOKMOD.none)
       | BOOLIT _
-      | HEXLIT _ | NULLIT _
+      | NULLIT _
       | NATLIT _ | SINTLIT _
       | FIXEDLIT _ | FLOATLIT _
       | DIGITS _

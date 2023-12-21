@@ -28,10 +28,9 @@
 %token <string> WORD_IN_AREA_A [@recovery "_"] (* [@symbol "<word in area A>"] *)
 %token <string> INFO_WORD [@recovery "_"]
 %token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
-%token <string * Cobol_preproc.Text.quotation> ALPHANUM [@recovery ("_", Quote)]
-%token <string * Cobol_preproc.Text.quotation> ALPHANUM_PREFIX [@recovery ("_", Quote)]
+%token <Cobol_ptree.alphanum_string> ALPHANUM
+%token <Cobol_ptree.alphanum_string> ALPHANUM_PREFIX
 %token <Cobol_ptree.boolean> BOOLIT [@recovery boolean_zero]
-%token <string> HEXLIT [@recovery "_"]
 %token <string> NULLIT [@recovery "_"]
 %token <string> NATLIT [@recovery "_"]
 %token <string> SINTLIT [@recovery "0"]

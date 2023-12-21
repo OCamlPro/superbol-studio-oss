@@ -54,6 +54,12 @@ let combined_tokens =
     NEXT_PAGE, "NEXT_PAGE";
   ]
 
+let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str } =
+  if hexadecimal then Fmt.char ppf 'X';
+  match quotation with
+  | Simple_quote -> Fmt.pf ppf "'%s" str
+  | Double_quote -> Fmt.pf ppf "\"%s" str
+
 let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   let string s = Pretty.string ppf s
   and print format = Pretty.print ppf format in
@@ -67,11 +73,10 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | EIGHTY_EIGHT -> string "88"
   | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
   | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
-  | ALPHANUM (s, q) -> print "%a%s%a" TEXT.pp_quote q s TEXT.pp_quote q
-  | ALPHANUM_PREFIX (s, q) -> print "%a%s" TEXT.pp_quote q s
+  | ALPHANUM a -> Cobol_ptree.pp_alphanum_string ppf a
+  | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
   | NATLIT s -> print "N\"%s\"" s
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
-  | HEXLIT s -> print "X\"%s\"" s
   | NULLIT s -> print "Z\"%s\"" s
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | INTERVENING_ c -> print "%c" c
@@ -231,7 +236,7 @@ let preproc_n_combine_tokens ~source_format =
        DATE_COMPILED | REMARKS |
        SECURITY) :: PERIOD :: _        -> comment_entry_after 2
 
-    | ALPHANUM_PREFIX (s, _) :: _     -> lex_err "Missing continuation of `%s'" s
+    | ALPHANUM_PREFIX { str; _ } :: _ -> lex_err "Missing continuation of `%s'" str
 
     | tok :: _                        -> subst_n tok 1
 
@@ -356,6 +361,15 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   : text_word with_loc -> tokens * DIAGS.Set.t =
   fun { payload = c; loc } ->
   let tok t = [t &@ loc], DIAGS.Set.none in
+  let alphanum ~hexadecimal str qte =
+    Cobol_ptree.{
+      str;
+      hexadecimal;
+      quotation = match qte with
+        | Apostrophe -> Simple_quote
+        | Quote -> Double_quote
+    }
+  in
   match c with
   | TextWord w
   | CDirWord w
@@ -368,19 +382,21 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   (*        Text_lexer.decode_symbolic_ebcdics' ~quotation (str &@ loc) in *)
   (*     [token], diags *)
   | Alphanum { knd = Basic; str; qte; _ }
-    -> tok @@ ALPHANUM (str, qte)
+    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte)
   | Alphanum { knd = Bool; str; _ }
     -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Bool str)
   | Alphanum { knd = BoolX; str; _ }
     -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Hex str)
-  | Alphanum { knd = Hex; str; _ }
-    -> tok @@ HEXLIT str                 (* TODO: decide on a representation *)
+  | Alphanum { knd = Hex; str; qte }
+    -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
   | Alphanum { knd = NullTerm; str; _ }
     -> tok @@ NULLIT str
   | Alphanum { knd = National | NationalX; str; _ }  (* TODO: differentiate *)
     -> tok @@ NATLIT str
-  | AlphanumPrefix { str; qte; _ }
-    -> tok @@ ALPHANUM_PREFIX (str, qte)
+  | AlphanumPrefix { knd = Hex; str; qte }
+    -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:true str qte)
+  | AlphanumPrefix { knd = _; str; qte }
+    -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
   | Eof
     -> tok EOF
   | Pseudo _

@@ -26,6 +26,9 @@ class ['a] folder = object
   method fold_name': (name with_loc, 'a) fold = default
   method fold_ident: (ident, 'a) fold = default
   method fold_qualname: (qualname, 'a) fold = default
+  method fold_qualname': (qualname with_loc, 'a) fold = default
+  method fold_procedure_name: (procedure_name, 'a) fold = default
+  method fold_procedure_name': (procedure_name with_loc, 'a) fold = default
   method fold_qualident: (qualident, 'a) fold = default
   method fold_address: (address, 'a) fold = default
   method fold_counter: (counter, 'a) fold = default
@@ -41,7 +44,6 @@ class ['a] folder = object
   method fold_sign: (sign, 'a) fold = default
   method fold_signz: (signz, 'a) fold = default
   method fold_boolean: (boolean, 'a) fold = default
-  method fold_alphanum_string: (alphanum_string, 'a) fold = default
   method fold_alphanum: (alphanum, 'a) fold = default
   method fold_national: (national, 'a) fold = default
   (* method fold_strlit_figurative: (strlit_ figurative, 'a) fold = default *)
@@ -57,6 +59,7 @@ class ['a] folder = object
   method fold_floating: (floating, 'a) fold = default
   method fold_fixed: (fixed, 'a) fold = default
   method fold_integer: (integer, 'a) fold = default
+  method fold_integer': (integer with_loc, 'a) fold = default
   method fold_binop: (binop, 'a) fold = default
   method fold_unop: (unop, 'a) fold = default
   method fold_expr: (expression, 'a) fold = default
@@ -96,16 +99,13 @@ let fold_fixed (v: _ #folder) = leaf v#fold_fixed
 let fold_floating (v: _ #folder) = leaf v#fold_floating
 let fold_integer (v: _ #folder) = leaf v#fold_integer
 let fold_integer_opt (v: _ #folder) = fold_option ~fold:fold_integer v
+let fold_integer' (v: _ #folder) =
+  handle' v#fold_integer' v ~fold:fold_integer
+let fold_integer'_opt (v: _ #folder) = fold_option ~fold:fold_integer' v
 
 let fold_boolean (v: _ #folder) = leaf v#fold_boolean
-
-let fold_alphanum (v: _ #folder) =
-  handle v#fold_alphanum ~continue:(fun (Alphanum s) ->
-    handle v#fold_alphanum_string ~continue:(fun (s, _) ->
-      fold_string v s) s)
-
-let fold_national (v: _ #folder) =
-  handle v#fold_national ~continue:(fun (National s) -> fold_string v s)
+let fold_alphanum (v: _ #folder) = leaf v#fold_alphanum
+let fold_national (v: _ #folder) = leaf v#fold_national
 
 let fold_counter (v: _ #folder) =
   handle v#fold_counter
@@ -443,13 +443,28 @@ let fold_qualname_or_intlit (v: _ #folder) : qualname_or_intlit -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
-let fold_qualname' (v: _ #folder) = fold' ~fold:fold_qualname v
+let fold_qualname' (v: _ #folder) =
+  handle' v#fold_qualname' ~fold:fold_qualname v
+
 let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
 let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v
 let fold_strlit_opt (v: _ #folder) = fold_option ~fold:fold_strlit v
+let fold_literal' (v: _ #folder) = fold' ~fold:fold_literal v
 let fold_literal_opt (v: _ #folder) = fold_option ~fold:fold_literal v
+let fold_literal'_opt (v: _ #folder) = fold_option ~fold:fold_literal' v
 let fold_ident' (v: _ #folder) = fold' ~fold:fold_ident v
 let fold_ident'_opt (v: _ #folder) = fold_option ~fold:fold_ident' v
+
+(* --- *)
+
+let fold_procedure_name (v: _ #folder) =
+  handle v#fold_procedure_name ~continue:(fold_qualname v)
+
+let fold_procedure_name' (v: _ #folder) =
+  handle' v#fold_procedure_name' v ~fold:fold_procedure_name
+
+let fold_procedure_name'_opt (v: _ #folder) =
+  fold_option v ~fold:fold_procedure_name'
 
 let fold_rounding_mode (v: _ #folder) =
   leaf v#fold_rounding_mode

@@ -11,6 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+module Env_builder = Old_env_builder
+module Group_builder = Old_group_builder
+
 open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES

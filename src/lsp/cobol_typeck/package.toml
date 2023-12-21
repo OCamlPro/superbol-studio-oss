@@ -57,6 +57,7 @@ cobol_ptree = "version"
 cobol_common = "version"
 cobol_data = "version"
 cobol_parser = "version"
+cobol_unit = "version"
 
 # package tools dependencies
 [tools]

@@ -69,7 +69,7 @@ and use_for_debugging_target =
   | UseForDebuggingProcedure of
       {
         all: bool;
-        procedure: qualname;
+        procedure: procedure_name with_loc;
       }
   | UseForDebuggingAllProcedures
 
@@ -121,7 +121,7 @@ let pp_use_file_exception_on ppf = function
 let pp_use_for_debugging_target ppf = function
   | UseForDebuggingProcedure { all; procedure } ->
       if all then Fmt.pf ppf "ALL ";
-      pp_qualname ppf procedure
+      pp_procedure_name' ppf procedure
   | UseForDebuggingAllProcedures ->
       Fmt.pf ppf "ALL PROCEDURES"
 

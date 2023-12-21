@@ -15,6 +15,8 @@ open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
+module Cobol_data = Cobol_data.OLD
+
 module Visitor = Cobol_common.Visitor
 module CharSet = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
@@ -45,25 +47,28 @@ let initialize_prog_env =
       | DecimalPointIsComma ->
           Visitor.skip @@
           DIAGS.result Cobol_data.PROG_ENV.{ env with decimal_point = ',' }
-      | CurrencySign { sign = (Alphanum (s, _) | National s);
+      | CurrencySign { sign = (Alphanum { str; _ } | National str);
                        picture_symbol = None }
-      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
-        when String.length s != 1 ->
+      | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                              National str); _ }
+        when String.length str != 1 ->
           Visitor.skip @@
-          DIAGS.error_result env ~loc "%s@ is@ not@ a@ valid@ PICTURE@ symbol." s
-      | CurrencySign { sign = Alphanum (s, _) | National s;
+          DIAGS.error_result env ~loc "%s@ is@ not@ a@ valid@ PICTURE@ symbol." str
+      | CurrencySign { sign = Alphanum { str; _ } | National str;
                        picture_symbol = None }
-      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ }
-        when not (valid_picture_symbol s.[0]) ->
+      | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                              National str); _ }
+        when not (valid_picture_symbol str.[0]) ->
           Visitor.skip @@
           DIAGS.error_result env ~loc "%c@ is@ not@ a@ valid@ PICTURE@ symbol."
-            s.[0]
-      | CurrencySign { sign = Alphanum (s, _) | National s;
+            str.[0]
+      | CurrencySign { sign = Alphanum { str; _ } | National str;
                        picture_symbol = None }
-      | CurrencySign { picture_symbol = Some (Alphanum (s, _) | National s); _ } ->
+      | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
+                                              National str); _ } ->
           Visitor.skip @@
-          DIAGS.result { env with
-                         currency_signs = CharSet.add s.[0] env.currency_signs }
+          DIAGS.result { env with currency_signs =
+                                    CharSet.add str.[0] env.currency_signs }
       | _ ->                       (* TODO: other clauses? *)
           Visitor.proceed @@      (* may report unfinished visitor warnings *)
           DIAGS.result env

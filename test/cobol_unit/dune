@@ -1,0 +1,9 @@
+(library
+ (name test_cobol_unit)
+ (modules test_qualmap)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests
+  (modes best)) ; add js for testing with nodejs
+ (libraries cobol_unit cobol_ptree cobol_parser testing_helpers)
+ )

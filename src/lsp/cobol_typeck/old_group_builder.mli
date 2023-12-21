@@ -15,6 +15,6 @@ open Cobol_common.Diagnostics.TYPES
 
 val working_data_of_compilation_unit'
   : Cobol_config.t
-  -> Cobol_data.PROG_ENV.t
+  -> Cobol_data.OLD.PROG_ENV.t
   -> Cobol_ptree.compilation_unit Cobol_ptree.with_loc
-  -> Cobol_data.Group.t' Cobol_ptree.with_loc list with_diags
+  -> Cobol_data.OLD.Group.t' Cobol_ptree.with_loc list with_diags

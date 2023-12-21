@@ -86,7 +86,7 @@ val tokens_of_string'
     errors, the alphanumeric token returned may represent part of the encoded
     input. *)
 val decode_symbolic_ebcdics'
-  : quotation: Cobol_preproc.Text.quotation
+  : quotation: Cobol_ptree.alphanum_quote
   -> string Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc *
      Cobol_common.Diagnostics.Set.t

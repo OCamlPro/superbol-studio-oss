@@ -14,8 +14,6 @@
 open EzCompat
 open Types
 
-(* module FATAL = Cobol_common.Diagnostics.Fatal *)
-
 (*FIXME: Quite a bit of rework for c translation and analysis alike *)
 
 (* For data item:

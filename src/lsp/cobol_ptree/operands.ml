@@ -648,7 +648,6 @@ let pp_unstring_target ppf
     Fmt.(option (sp ++ const string "DELIMITER" ++ sp ++ pp_ident)) d
     Fmt.(option (sp ++ const string "COUNT" ++ sp ++ pp_ident)) c
 
-
 (* --- generics --- *)
 
 type 'a procedure_range =

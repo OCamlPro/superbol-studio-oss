@@ -11,7 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* module IntMap = Map.Make (Int) *)
 module CharSet = Set.Make (Char)
 
 (* Fabrice: we should upstream such functions in ocplib-stuff, within
@@ -46,3 +45,68 @@ module LIST = struct
     aux acc l
 
 end
+
+(** Representation for non-empty lists *)
+module NEL = struct
+  type 'a t =
+    | One of 'a
+    | (::) of 'a * 'a t
+  let compare cmp a b =
+    let rec aux a b = match a, b with
+      | One a, One b -> cmp a b
+      | One _, _ -> -1
+      | _, One _ -> 1
+      | a :: a', b :: b' ->
+          let c = cmp a b in
+          if c = 0 then aux a' b' else c
+    in
+    aux a b
+  let hd = function
+    | One x
+    | x :: _ -> x
+  let rec last = function
+    | One x -> x
+    | _ :: tl -> last tl
+  let fold_left ~f acc l =
+    let rec aux acc = function
+      | One x -> f acc x
+      | x :: tl -> aux (f acc x) tl
+    in
+    aux acc l
+  let rec of_list = function
+    | [] -> Pretty.invalid_arg "of_list"
+    | [x] -> One x
+    | [x; y] -> x :: One y
+    | x :: tl -> x :: of_list tl
+  let to_list l =
+    let rec aux acc = function
+      | One x -> List.rev_append acc [x]
+      | x :: tl -> aux (List.cons x acc) tl
+    in
+    aux [] l
+  let rev_to_list l =
+    let rec aux acc = function
+      | One x -> List.cons x acc
+      | x :: tl -> aux (List.cons x acc) tl
+    in
+    aux [] l
+  let of_rev_list =
+    let rec aux acc = function
+      | [] -> acc
+      | x :: tl -> aux (x :: acc) tl
+    in
+    function
+    | [] -> Pretty.invalid_arg "of_rev_list"
+    | last :: tl -> aux (One last) tl
+  let map ~f l =
+    let rec aux acc = function
+      | One x -> of_rev_list (List.cons (f x) acc)
+      | x :: tl -> aux (List.cons (f x) acc) tl
+    in
+    aux [] l
+  let pp ?fsep ?fopen ?fclose pp_e ppf list =
+    Pretty.list ?fopen ?fsep ?fclose pp_e ppf (to_list list)
+end
+type 'a nel = 'a NEL.t
+let pp_nel pp = NEL.pp pp
+let compare_nel = NEL.compare

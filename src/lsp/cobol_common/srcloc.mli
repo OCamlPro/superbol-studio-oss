@@ -57,6 +57,7 @@ val replacement
   -> in_area_a: bool
   -> replloc: srcloc
   -> srcloc
+val dummy: srcloc
 
 val forget_preproc
   : favor_direction:[`Left | `Right]
@@ -119,6 +120,10 @@ val lift_result: ('a, 'e) result with_loc -> ('a with_loc, 'e with_loc) result
 val concat_locs: _ with_loc list -> srcloc option
 val concat_strings_with_loc: string with_loc -> string with_loc -> string with_loc
 val copy_from: filename:string -> copyloc:srcloc -> 'a with_loc -> 'a with_loc
+
+module TESTING: sig
+  val register_file_contents: filename:string -> string -> unit
+end
 
 val no_copy: copylocs
 val new_copy: copyloc:srcloc -> string -> copylocs -> copylocs

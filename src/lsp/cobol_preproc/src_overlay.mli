@@ -43,7 +43,7 @@ module type MANAGER = sig
   val join_limits: limit * limit -> Cobol_common.Srcloc.srcloc
 
   (** [dummy_limit] is a limit that may be fed to a parser or {!join_limits},
-      but not given to {!link_limits} below. *)
+      but not given to {!link_limits}. *)
   val dummy_limit: limit
 
   (** [restart_at limit] instructs the manager that limits on the right of (but

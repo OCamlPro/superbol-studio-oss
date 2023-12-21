@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Cobol_data = Cobol_data.OLD
+
 open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 
@@ -22,13 +24,14 @@ let wss =
   [Group ("Level 1", 0, [
       Group ("Level 3", 1, [
           Elementary ("Level 2", 2)]);
-      Group ("Level 4", 3,[
-          Elementary ("Level 2", 4)])
+      Group ("Level 4", 3, [
+          Elementary ("Level 2", 4)]);
     ]);
    Group ("X", 0, [
        Group ("Y", 5, [
            Elementary ("Z", 10)
-         ])
+         ]);
+       Elementary ("Z", 11);
      ])
   ]
 
@@ -111,9 +114,10 @@ let access_elt_x_y_z () =
     (Cobol_data.Qualmap.find qualname wss) 10
 
 let access_elt_x_z () =
+  (* /!\ this should be considered ambiguous! /!\ *)
   let qualname: qualname = qual "Z" (name "X") in
   Alcotest.(check elt) "can access partial qualified elt"
-    (Cobol_data.Qualmap.find qualname wss) 10
+    (Cobol_data.Qualmap.find qualname wss) 11
 
 let bad_order () =
   let qualname: qualname = qual "Z" (qual "X" (name "Y")) in

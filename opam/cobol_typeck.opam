@@ -45,6 +45,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "cobol_unit" {= version}
   "cobol_ptree" {= version}
   "cobol_parser" {= version}
   "cobol_data" {= version}

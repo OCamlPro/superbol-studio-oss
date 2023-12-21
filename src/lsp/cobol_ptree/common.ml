@@ -22,3 +22,9 @@ type 'a with_loc = 'a Cobol_common.Srcloc.with_loc =
 [@@deriving ord]
 
 let pp_with_loc = Cobol_common.Srcloc.pp_with_loc
+
+(* A type for non-empty lists *)
+
+module NEL = Cobol_common.Basics.NEL
+type 'a nel = 'a NEL.t
+[@@deriving ord]

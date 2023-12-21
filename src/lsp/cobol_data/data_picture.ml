@@ -203,15 +203,18 @@ module TYPES = struct
     }
   [@@deriving show, ord]
 
-  type picture_config = {
-    max_pic_length : int ;
-    decimal_char: char ;
-    currency_signs: Cobol_common.Basics.CharSet.t ;
+  type config = {
+    max_pic_length : int;
+    decimal_char: char;
+    currency_signs: Cobol_common.Basics.CharSet.t;
   }
 
   type error =
-    | May_only_appear_once of int
-    | May_not_follow of int * int
+    | May_only_appear_once of { symbol_precedence: int;
+                                decimal_char: char }
+    | May_not_follow of { symbol_precedence: int;
+                          prev_precedence: int;
+                          decimal_char: char }
     | Parenthesis_must_be_preceded_by_picture_symbol
     | Unexpected_char of char
     | Extraneous_symbol_in_exponent
@@ -244,9 +247,33 @@ module Symbol = struct type t = symbol let compare = Stdlib.compare end
 module Symbols = Set.Make (Symbol)
 module SymbolsMap = Map.Make (Symbol)
 
+let pp_category = TYPES.pp_category
+
+let pp_category_name ppf category =
+  Pretty.string ppf @@ match category with
+  | Alphabetic _ ->
+      "alphabetic"
+  | Alphanumeric { insertions = []; _ } ->
+      "alphanumeric"
+  | Alphanumeric _ ->
+      "alphanumeric-edited"
+  | Boolean _ ->
+      "boolean"
+  | National { insertions = []; _ } ->
+      "national"
+  | National _ ->
+      "national-edited"
+  | FixedNum { editions = { basics = []; floating = None;
+                            zerorepl = None }; _ }
+  | FloatNum { editions = []; _ } ->
+      "numeric"
+  | FixedNum _
+  | FloatNum _ ->
+      "numeric-edited"
+
 (* --- *)
 
-let is_edited = function
+let is_edited: category -> bool = function
   | Alphabetic _
   | Boolean _
   | Alphanumeric { insertions = []; _ }
@@ -374,7 +401,7 @@ let append_insertion ({ basics; floating; _ } as editions) symbols offset =
       Ok (editions, symbols.symbol_occurences) (* all symbols count as digits *)
   | _
     when symbols.symbol_occurences = 1 ->        (* fixed insertion with a priori
-                                                   non-floating symbol *)
+                                                    non-floating symbol *)
       let editions =                   (* (further checked in check_editions) *)
         { editions with
           basics = FixedInsertion { fixed_insertion_symbol = symbols.symbol;
@@ -610,34 +637,34 @@ let symbol_of_char config c =
   | 'Z' -> Z
   | c -> raise @@ INVALIDCHAR c
 
-  let symbol_precedence_index
-      ~max_idx ~after_v ~after_e ~idx ~zero_suppress_or_floating_insert
-    : symbol -> int = function
-    | B | Zero | Slant -> 0
-    | GroupingSep -> 1
-    | DecimalSep -> 2
-    | Plus when after_e -> 3
-    | Plus | Minus when not zero_suppress_or_floating_insert && idx < max_idx -> 4
-    | Plus | Minus when not zero_suppress_or_floating_insert -> 5
-    | CR | DB -> 6
-    | CS when not zero_suppress_or_floating_insert && idx < 2 -> 7
-    | CS when not zero_suppress_or_floating_insert -> 8
-    | Z | Star when not after_v -> 9
-    | Z | Star -> 10
-    | Plus | Minus when not after_v -> 11
-    | Plus | Minus -> 12
-    | CS when not after_v -> 13
-    | CS -> 14
-    | Nine -> 15
-    | A | X -> 16
-    | L -> 17
-    | S -> 18
-    | V -> 19
-    | P when not after_v -> 20
-    | P -> 21
-    | One -> 22
-    | N -> 23
-    | E -> 24
+let symbol_precedence_index
+    ~max_idx ~after_v ~after_e ~idx ~zero_suppress_or_floating_insert
+  : symbol -> int = function
+  | B | Zero | Slant -> 0
+  | GroupingSep -> 1
+  | DecimalSep -> 2
+  | Plus when after_e -> 3
+  | Plus | Minus when not zero_suppress_or_floating_insert && idx < max_idx -> 4
+  | Plus | Minus when not zero_suppress_or_floating_insert -> 5
+  | CR | DB -> 6
+  | CS when not zero_suppress_or_floating_insert && idx < 2 -> 7
+  | CS when not zero_suppress_or_floating_insert -> 8
+  | Z | Star when not after_v -> 9
+  | Z | Star -> 10
+  | Plus | Minus when not after_v -> 11
+  | Plus | Minus -> 12
+  | CS when not after_v -> 13
+  | CS -> 14
+  | Nine -> 15
+  | A | X -> 16
+  | L -> 17
+  | S -> 18
+  | V -> 19
+  | P when not after_v -> 20
+  | P -> 21
+  | One -> 22
+  | N -> 23
+  | E -> 24
 
 let precedence_table =
   (* An 'x' indicates that the symbol in the colon may precede the symbol of the
@@ -676,7 +703,7 @@ let precedence_table =
 exception BREAK of int (* Internal exception *)
 
 
-let char_order_checker_for_pic_string () =
+let char_order_checker_for_pic_string config =
   (* From GnuCOBOL, itself inspired by the standard's way of specifying
      precedence. *)
   let seen = Array.make 25 false in
@@ -691,10 +718,11 @@ let char_order_checker_for_pic_string () =
     with BREAK prev_precedence ->
       seen.(symbol_precedence) <- true;
       let diag =
+        let decimal_char = config.decimal_char in
         if symbol_precedence = prev_precedence then
-          May_only_appear_once symbol_precedence
+          May_only_appear_once { symbol_precedence; decimal_char }
         else
-          May_not_follow ( symbol_precedence, prev_precedence )
+          May_not_follow { symbol_precedence; prev_precedence; decimal_char }
       in
       Error diag
   in
@@ -703,89 +731,88 @@ let char_order_checker_for_pic_string () =
   in
   check_char_order, reset
 
-  (* Maybe not in ISO/IEC 2014: Z/CS, B/* *)
+(* Maybe not in ISO/IEC 2014: Z/CS *)
 let mutual_exclusions =
   SymbolsMap.of_seq @@ List.to_seq [
-    B, Symbols.singleton Star;
     CS, Symbols.singleton Z;
     DecimalSep, Symbols.of_list [P; V];
     P, Symbols.singleton DecimalSep;
-    Star, Symbols.of_list [Z; B];
+    Star, Symbols.singleton Z;
     V, Symbols.singleton DecimalSep;
     Z, Symbols.of_list [Star; CS];
   ]
 
-  type exp_sequence_state =
-    | ExpNone
-    | ExpWaitingPlus
-    | ExpWaitingDigits
+type exp_sequence_state =
+  | ExpNone
+  | ExpWaitingPlus
+  | ExpWaitingDigits
 
-  type acc =
-    {
-      v_idx: int option;            (* Some _ => V, P, or DecimalSep \in seen *)
-      e_idx: int option;
-      seen: Symbols.t;                           (* Records only some symbols *)
-      exp_sequence: exp_sequence_state;
-      errors: ( error * (int*int)) list ;
-    }
+type acc =
+  {
+    v_idx: int option;            (* Some _ => V, P, or DecimalSep \in seen *)
+    e_idx: int option;
+    seen: Symbols.t;                           (* Records only some symbols *)
+    exp_sequence: exp_sequence_state;
+    errors: (error * (int*int)) list;
+  }
 
-  let with_error acc loc error = { acc with errors = (error, loc) :: acc.errors }
+let with_error acc loc error = { acc with errors = (error, loc) :: acc.errors }
 
-  module SCANNING = struct
-    type 'a string_parser = string -> 'a
+module SCANNING = struct
+  type 'a string_parser = string -> 'a
 
-    let mk_parser spec cstr : _ string_parser = fun str ->
-      Scanf.sscanf str spec cstr
+  let mk_parser spec cstr : _ string_parser = fun str ->
+    Scanf.sscanf str spec cstr
 
-    let try_parse (specs: 'a string_parser list) str pos len =
-      let str = String.sub str pos (len-pos) in
-      let rec try_parse = function
-        | [] -> None
-        | f :: tl -> try Some (f str) with
-          | End_of_file | Scanf.Scan_failure _ -> try_parse tl
-      in
-      try_parse specs
-
-
-    let single symbol =
-      { symbol; symbol_occurences = 1 }
-
-    let rec pic_symbol ?expect ~config s pos len =
-
-      let lookahead c n l suff =
-        let pos = len - String.length suff in
-        let c = Char.uppercase_ascii c in
-        let symbol = symbol_of_char config c in
-        match expect with
-        | Some cc when cc <> c ->
-            { symbol; symbol_occurences = n }, l
-        | _ ->
-            (* look ahead for further occurences *)
-            match pic_symbol ~expect:c ~config s pos len with
-            | Some ({ symbol = s'; symbol_occurences = n' }, l')
-              when s' = symbol ->
-                { symbol; symbol_occurences = n + n' }, l' + l
-            | _ ->
-                { symbol; symbol_occurences = n }, l
-            | exception INVALIDCHAR _ ->            (* delay for better location *)
-                { symbol; symbol_occurences = n }, l
-      in
-      if pos = len then
-        None
-      else
-        try_parse [
-          (* NOTE: those scanners allow spaces to be inserted in PICTURE
-               strings; this should be ok as parsed tokens should contain no
-               space characters; plus this may allow more readable string
-               internally. *)
-          mk_parser "CR%s%!" (fun _suff -> single CR, 2);
-          mk_parser "DB%s%!" (fun _suff -> single DB, 2);
-          mk_parser "%c(%u)%n%s%!" lookahead;
-          mk_parser "%c%s%!" (fun c -> lookahead c 1 1)
-        ] s pos len
+  let try_parse (specs: 'a string_parser list) str pos len =
+    let str = String.sub str pos (len-pos) in
+    let rec try_parse = function
+      | [] -> None
+      | f :: tl -> try Some (f str) with
+        | End_of_file | Scanf.Scan_failure _ -> try_parse tl
+    in
+    try_parse specs
 
 
-  end
+  let single symbol =
+    { symbol; symbol_occurences = 1 }
+
+  let rec pic_symbol ?expect ~config s pos len =
+
+    let lookahead c n l suff =
+      let pos = len - String.length suff in
+      let c = Char.uppercase_ascii c in
+      let symbol = symbol_of_char config c in
+      match expect with
+      | Some cc when cc <> c ->
+          { symbol; symbol_occurences = n }, l
+      | _ ->
+          (* look ahead for further occurences *)
+          match pic_symbol ~expect:c ~config s pos len with
+          | Some ({ symbol = s'; symbol_occurences = n' }, l')
+            when s' = symbol ->
+              { symbol; symbol_occurences = n + n' }, l' + l
+          | _ ->
+              { symbol; symbol_occurences = n }, l
+          | exception INVALIDCHAR _ ->            (* delay for better location *)
+              { symbol; symbol_occurences = n }, l
+    in
+    if pos = len then
+      None
+    else
+      try_parse [
+        (* NOTE: those scanners allow spaces to be inserted in PICTURE
+             strings; this should be ok as parsed tokens should contain no
+             space characters; plus this may allow more readable string
+             internally. *)
+        mk_parser "CR%s%!" (fun _suff -> single CR, 2);
+        mk_parser "DB%s%!" (fun _suff -> single DB, 2);
+        mk_parser "%c(%u)%n%s%!" lookahead;
+        mk_parser "%c%s%!" (fun c -> lookahead c 1 1)
+      ] s pos len
+
+
+end
 
 
 let of_string config str =
@@ -802,20 +829,20 @@ let of_string config str =
         if c = '('
         then with_error acc (pos,1)
             Parenthesis_must_be_preceded_by_picture_symbol
-        else with_error acc (pos,1) ( Unexpected_char c )
+        else with_error acc (pos,1) (Unexpected_char c)
     | Some (symbols, span) ->
         let pos' = pos + span in
         Some (symbols, (pos,span), pos'), acc
     | exception INVALIDCHAR c ->
         None,
-        with_error acc (pos, 1) ( Unexpected_char c )
+        with_error acc (pos, 1) (Unexpected_char c)
   in
 
   let rec of_string_rec acc category pic idx pos =
     match next_symbols pos acc with
     | None, acc ->
         category, pic, acc, idx - 1                             (* all done *)
-    | Some ( symbols, (_, span as loc), pos' ), acc ->
+    | Some (symbols, (_, span as loc), pos'), acc ->
         let after_v = acc.v_idx <> None in
         let acc, ok = match check_occurences acc symbols loc with
           | Ok acc -> acc, true
@@ -859,7 +886,7 @@ let of_string config str =
     match symbols.symbol with                           (* check occurences *)
     | CR | DB | E | S | V | L | DecimalSep as s ->
         if Symbols.mem s acc.seen || symbols.symbol_occurences > 1
-        then Error ( with_error acc loc ( Symbol_may_only_appear_once s ) )
+        then Error (with_error acc loc (Symbol_may_only_appear_once s))
         else Ok { acc with seen = Symbols.add s acc.seen }
     | P | Z | Star |CS | B as s ->           (* record for mutual exclutions *)
         Ok { acc with seen = Symbols.add s acc.seen }
@@ -869,16 +896,16 @@ let of_string config str =
   and check_positions acc symbols loc idx pos =
     match symbols.symbol with    (* check for some positions (quite ad hoc) *)
     | L | S as s when idx <> 0 ->
-        Error ( with_error acc loc ( Symbol_must_be_at_start s ) )
+        Error (with_error acc loc (Symbol_must_be_at_start s))
     | CR | DB as s when pos < len ->
-        Error ( with_error acc loc ( Symbol_must_be_at_end s ) )
+        Error (with_error acc loc (Symbol_must_be_at_end s))
     | P when idx = 0 ||
              idx = 1 && Symbols.(mem S acc.seen || mem V acc.seen) ||
              idx = 2 && Symbols.(mem S acc.seen && mem V acc.seen) ||
              pos = len || String.sub str pos (len-pos) = "V" ->
         Ok acc
     | P as s ->
-        Error ( with_error acc loc ( Symbol_must_be_at_start_or_end s ))
+        Error (with_error acc loc (Symbol_must_be_at_start_or_end s))
     | _ ->
         Ok acc
 
@@ -889,9 +916,9 @@ let of_string config str =
     | Some set ->
         let violations = Symbols.inter set acc.seen in
         if Symbols.is_empty violations then Ok acc else
-          Result.error @@ Symbols.fold ( fun s acc ->
-              with_error acc loc ( Symbols_are_mutually_exclusive ( symbols.symbol, s ))
-            ) violations acc
+          Result.error @@ Symbols.fold begin fun s acc ->
+            with_error acc loc (Symbols_are_mutually_exclusive (symbols.symbol, s))
+          end violations acc
 
   and check acc ~loc category' pic idx suff =
     match category' with
@@ -899,7 +926,7 @@ let of_string config str =
         of_string_rec acc (Some category) pic idx suff
     | Error (c, s) ->
         c, pic,
-        with_error acc loc ( Unexpected_symbol (s, c)),
+        with_error acc loc (Unexpected_symbol (s, c)),
         idx - 1
   in
   let category, pic, acc, max_idx =
@@ -914,12 +941,13 @@ let of_string config str =
   let loc = (0, len) in
   (* Last remaining checks; global checks should come here. *)
   let acc = match pic with
-    | [] ->
+    | [] when acc.errors = [] ->
         with_error acc loc Empty_picture_string
     | _ when len > config.max_pic_length ->
-        with_error acc loc
-          ( Picture_length_exceeds_limit ( len, config.max_pic_length ))
-    | _ -> acc
+        with_error acc loc @@
+        Picture_length_exceeds_limit (len, config.max_pic_length)
+    | _ ->
+        acc
   in
 
   let acc = match acc.exp_sequence with                       (* (E+ check) *)
@@ -942,7 +970,7 @@ let of_string config str =
            set +, - and the currency symbol" *)
         with_error acc loc Picture_describes_empty_data_item
     | Some ((FixedNum _ | FloatNum _), data_size) when data_size > 38 ->
-        with_error acc loc ( Numeric_item_cannot_exceed_38_digits data_size )
+        with_error acc loc (Numeric_item_cannot_exceed_38_digits data_size)
     | _ -> acc
   in
 
@@ -952,7 +980,7 @@ let of_string config str =
     (* Check precedence rules w.r.t the standards.  This also ensures some
        form of well-formedness of the editions. *)
     let symbol_precedence_index = symbol_precedence_index ~max_idx in
-    let check_char_order, reset = char_order_checker_for_pic_string () in
+    let check_char_order, reset = char_order_checker_for_pic_string config in
     let floating_symbolp = match category with
       | Some (FixedNum { editions = { floating = Some f; _ }; _ }) ->
           fun p -> p = f.floating_insertion_symbol
@@ -989,14 +1017,14 @@ let of_string config str =
   in
   match acc.errors with
   | [] -> Ok pic
-  | errors -> Error ( errors, pic )
+  | errors -> Error (errors, pic)
 
 
-let pp_meaning_of_precedence_index config ppf = function
+let pp_meaning_of_precedence_index ~decimal_char ppf = function
   | 0 -> Fmt.pf ppf "B, 0 or /"
   | 1 -> Fmt.pf ppf "grouping@ separator ('%c')"
-           (if config.decimal_char = '.' then ',' else '.')
-  | 2 -> Fmt.pf ppf "decimal@ point ('%c')" config.decimal_char
+           (if decimal_char = '.' then ',' else '.')
+  | 2 -> Fmt.pf ppf "decimal@ point ('%c')" decimal_char
   | 3 -> Fmt.pf ppf "the sign of floating exponent"
   | 4 -> Fmt.pf ppf "a leading +/- sign"
   | 5 -> Fmt.pf ppf "a trailing +/- sign"
@@ -1023,17 +1051,17 @@ let pp_meaning_of_precedence_index config ppf = function
   | 24 -> Fmt.pf ppf "E"
   | _ as d -> Fmt.pf ppf "an unkown character of value: %d" d
 
-let pp_error ~config ppf error =
+let pp_error ppf error =
   match error with
-  | May_only_appear_once symbol_precedence ->
+  | May_only_appear_once { symbol_precedence; decimal_char } ->
       Format.fprintf ppf
         "%a@ may@ only@ appear@ once@ in@ a@ PICTURE@ string"
-        (pp_meaning_of_precedence_index config) symbol_precedence
-  | May_not_follow ( symbol_precedence, prev_precedence ) ->
+        (pp_meaning_of_precedence_index ~decimal_char) symbol_precedence
+  | May_not_follow { symbol_precedence; prev_precedence; decimal_char } ->
       Format.fprintf ppf
         "%a@ may@ not@ follow@ %a"
-        (pp_meaning_of_precedence_index config) symbol_precedence
-        (pp_meaning_of_precedence_index config) prev_precedence
+        (pp_meaning_of_precedence_index ~decimal_char) symbol_precedence
+        (pp_meaning_of_precedence_index ~decimal_char) prev_precedence
   | Parenthesis_must_be_preceded_by_picture_symbol ->
       Format.fprintf ppf
         "Parenthesis@ must@ be@ preceded@ by@ a@ picture@ symbol"
@@ -1055,7 +1083,7 @@ let pp_error ~config ppf error =
       Format.fprintf ppf
         "%a@ must@ be@ at@ start@ or@ end@ of@ PICTURE@ string"
         pp_symbol s
-  | Symbols_are_mutually_exclusive ( s1, s2 ) ->
+  | Symbols_are_mutually_exclusive (s1, s2) ->
       Format.fprintf ppf "%a@ and@ %a@ are@ mutually@ exclusive@ in@ a@ \
                           PICTURE@ string"
         pp_symbol s1 pp_symbol s2
@@ -1066,7 +1094,7 @@ let pp_error ~config ppf error =
         (Option.map reverse_editions c)
   | Empty_picture_string ->
       Format.fprintf ppf "Empty@ PICTURE@ string"
-  | Picture_length_exceeds_limit ( len, max_length ) ->
+  | Picture_length_exceeds_limit (len, max_length) ->
       Format.fprintf ppf
         "length@ of@ PICTURE@ string@ exeeds@ allowed@ size@ (max@ length:@ \
          %d,@ given@ length:%d)" max_length len
@@ -1081,50 +1109,127 @@ let pp_error ~config ppf error =
       Format.fprintf ppf
         "Numeric@ item@ cannot@ be@ longer@ than@ 38@ digits, %d found" len
 
+module DIAGS = Cobol_common.Diagnostics
+
+let add_diag acc ~loc fmt =
+  DIAGS.kerror ~loc (fun diag -> DIAGS.Set.cons diag acc) fmt
+
+let add_hint acc ~loc fmt =
+  DIAGS.khint ~loc (fun diag -> DIAGS.Set.cons diag acc) fmt
+
+let add_diags acc ~loc error =
+  let acc = add_diag acc ~loc "%a" pp_error error in
+  match error with
+  | Picture_describes_empty_data_item ->
+      add_hint acc ~loc
+        "PICTURE@ string@ must@ contain@ at@ least@ one@ of@ the@ set@ A,@ N,@ \
+         X,@ Z,@ 1,@ 9@ and@ *;@ or@ at@ least@ two@ of@ the@ set@ +,@ -@ and@ \
+         the@ currency@ symbol"
+  | _ -> acc
+
+let rev_errors_with_loc ~loc errors =
+  List.rev_map begin fun (error, (pos, len)) ->
+    { payload = error; loc = Srcloc.sub loc ~pos ~len }
+  end errors
+
+let error_diagnostics ~loc errors =
+  (* reverse [errors] first to emit in proper order *)
+  List.fold_left begin fun acc (error, (pos, len)) ->
+    add_diags acc ~loc:(Srcloc.sub loc ~pos ~len) error
+  end DIAGS.Set.none (List.rev errors)
+
 module Make (Config: Cobol_config.T) (Env: ENV) = struct
-
-  module DIAGS = Cobol_common.Diagnostics
-
-  let add_diag acc ~loc fmt =
-    DIAGS.kerror ~loc (fun diag -> DIAGS.Set.cons diag acc ) fmt
-
-  let add_hint acc ~loc fmt =
-    DIAGS.khint ~loc (fun diag -> DIAGS.Set.cons diag acc ) fmt
-
-  let add_diags acc ~loc ~config error =
-   let acc = add_diag acc ~loc "%a" (pp_error ~config) error in
-    match error with
-    | Picture_describes_empty_data_item ->
-        add_hint acc ~loc
-          "PICTURE@ string@ must@ contain@ at@ least@ one@ of@ \
-           the@ set@ A,@ N,@ X,@ Z,@ 1,@ 9@ and@ *;@ or@ at@ \
-           least@ two@ of@ the@ set@ +,@ -@ and@ the@ currency@ \
-           symbol"
-    | _ -> acc
 
   exception InvalidPicture of
       string with_loc * Cobol_common.Diagnostics.diagnostics * picture
 
-  let of_string ( { payload ; loc } as str ) =
+  let of_string ({ payload; loc } as str) =
 
     let config = {
-      max_pic_length = Config.pic_length#value ;
-      decimal_char = Env.decimal_char ;
-      currency_signs = Env.currency_signs ;
+      max_pic_length = Config.pic_length#value;
+      decimal_char = Env.decimal_char;
+      currency_signs = Env.currency_signs;
     } in
     match of_string config payload with
-    | Error ( errors, pic ) ->
-        let diags = List.fold_left (fun acc ( error, (pos,len) ) ->
-            let loc = Srcloc.sub loc ~pos ~len in
-            add_diags acc ~loc ~config error) DIAGS.Set.none errors
-        in
-        raise @@ InvalidPicture (str, diags, pic)
-    | Ok pic -> { payload = pic ; loc }
+    | Ok pic ->
+        { payload = pic; loc }
+    | Error (errors, pic) ->
+        raise @@ InvalidPicture (str, error_diagnostics ~loc errors, pic)
 
 end
 
+(* --- *)
 
-let config = { max_pic_length = 100; decimal_char = '.' ;
+(* Some easy-to-used constructors *)
+
+let symb s n = { symbol = s; symbol_occurences = n }
+
+let alphanumeric ~size:n =
+  {
+    category = Alphanumeric { length = n; insertions = [] };
+    pic = [symb X n];
+  }
+
+let national ~size:n =
+  {
+    category = National { length = n; insertions = [] };
+    pic = [symb N n]
+  }
+
+let boolean n =
+  {
+    category = Boolean { length = n };
+    pic = [symb One n];
+  }
+
+(* --- *)
+
+let fixednum ?(with_sign = false) ?(basics = []) ?floating ?zerorepl
+    digits scale =
+  FixedNum { digits; scale; with_sign;
+             editions = { basics; floating; zerorepl } }
+
+let digits n =
+  {
+    category = fixednum n 0;
+    pic = [symb Nine n];
+  }
+
+let fixed_numeric ?basics ?floating ?(with_sign = false)
+    i d = (* |int_part| |dec_part| *)
+  let pic_s = if with_sign then [symb S 1] else []
+  and pic_i = if i = 0 then [] else [symb Nine i]
+  and pic_d = if d = 0 then [] else [symb Nine d] in
+  {
+    category = fixednum ?basics ?floating (i + d) d;
+    pic = pic_s @ pic_i @ [symb V 1] @ pic_d;
+  }
+
+(* let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits = *)
+(*   FloatNum { digits; scale; with_sign; exponent_digits = exp_digits; *)
+(*              editions = basics; } *)
+
+(* --- *)
+
+let is_edited pic = is_edited pic.category
+let is_boolean pic = match pic.category with
+  | Boolean _ -> true
+  | _ -> false
+let is_national pic = match pic.category with
+  | National _ -> true
+  | _ -> false
+let is_numeric pic = match pic.category with
+  | FixedNum _ | FloatNum _ -> true
+  | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ -> false
+let is_signed_numeric pic = match pic.category with
+  | FixedNum { with_sign; _ } | FloatNum { with_sign; _ } -> with_sign
+  | _ -> false
+let data_size pic = data_size pic.category
+let size pic = size pic.category
+
+(* --- *)
+
+let config = { max_pic_length = 100; decimal_char = '.';
                currency_signs = CHARS.add '$' CHARS.empty }
 
 let unit_test ?(config=config) ~expect picture =
@@ -1132,11 +1237,11 @@ let unit_test ?(config=config) ~expect picture =
   begin
     match of_string config picture with
     | Ok pic ->
-        pp_picture ppf pic ;
-    | Error ( errors, _ ) ->
-        List.iter (fun ( error, (pos,len) )->
+        pp_picture ppf pic;
+    | Error (errors, _) ->
+        List.iter (fun (error, (pos, len))->
             Format.fprintf ppf "Loc: %d (%d)@." pos len;
-            pp_error ~config ppf error;
+            pp_error ppf error;
             Format.fprintf ppf "@.";
           ) errors
   end;

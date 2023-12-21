@@ -46,6 +46,7 @@ class virtual ['a] folder = object
   method fold_compilation_unit'        : (compilation_unit with_loc    , 'a) fold = default
   (* Additonal methods: *)
   method fold_method_kind              : (method_kind                  , 'a) fold = default
+  method fold_nested_programs          : (program_unit with_loc list   , 'a) fold = default
 end
 
 let todo    x = todo    __MODULE__ x
@@ -88,11 +89,20 @@ let rec fold_program_unit (v: _ #folder) =
       >> fold_environment_division'_opt v program_env
       >> fold_data_division'_opt v program_data
       >> fold_procedure_division'_opt v program_proc
-      >> (fun x -> match program_level with
-          | ProgramPrototype -> x
-          | ProgramDefinition { nested_programs; _ } -> x
-              >> fold_with_loc_list v ~fold:fold_program_unit nested_programs)
+      >> fold_program_level v program_level
       >> fold_name'_opt v program_end_name                  (* XXX: useful? *)
+    end
+
+and fold_nested_programs (v: _ #folder) =
+  handle v#fold_nested_programs
+    ~continue:(fold_with_loc_list v ~fold:fold_program_unit)
+
+and fold_program_level (v: _ #folder) =
+  (* handle v#fold_program_level *)
+  (*   ~continue: *)begin function
+      | ProgramPrototype -> Fun.id
+      | ProgramDefinition { nested_programs; _ } ->
+          fold_nested_programs v nested_programs
     end
 
 let fold_program_unit' (v: _#folder) =

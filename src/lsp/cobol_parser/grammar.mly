@@ -1,13 +1,14 @@
 %{
 (**************************************************************************)
 (*                                                                        *)
-(*  Copyright (c) 2021-2023 OCamlPro SAS                                  *)
+(*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  All rights reserved.                                                  *)
-(*  This file is distributed under the terms of the GNU Lesser General    *)
-(*  Public License version 2.1, with the special exception on linking     *)
-(*  described in the LICENSE.md file in the root directory.               *)
+(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
 (*                                                                        *)
+(* All rights reserved.                                                   *)
+(* This source code is licensed under the GNU Affero General Public       *)
+(* License version 3 found in the LICENSE.md file in the root directory   *)
+(* of this source tree.                                                   *)
 (*                                                                        *)
 (**************************************************************************)
 
@@ -15,6 +16,11 @@ open Grammar_utils
 open Cobol_ptree
 open Cobol_ptree.Terms_helpers
 open Cobol_common.Srcloc.INFIX
+
+open struct
+  (* open a module alias, but don't use it in inferred signatures *)
+  module NEL = Cobol_common.Basics.NEL
+end
 
 let split_last l =
   List.(let rl = rev l in hd rl, rev (tl rl))
@@ -63,31 +69,7 @@ let dual_handler_none =
 (* --- Recovery helpers --- *)
 
 %[@recovery.header
-  open Cobol_common.Srcloc.INFIX
-
-  let dummy_loc =
-    Grammar_utils.Overlay_manager.(join_limits (dummy_limit, dummy_limit))
-
-  let dummy_string = "_" &@ dummy_loc
-  let dummy_name = dummy_string
-
-  let dummy_qualname: Cobol_ptree.qualname =
-    Cobol_ptree.Name dummy_name
-
-  let dummy_qualident =
-    Cobol_ptree.{ ident_name = dummy_qualname;
-                  ident_subscripts = [] }
-
-  let dummy_ident =
-    Cobol_ptree.QualIdent dummy_qualident
-
-  let dummy_expr =
-    Cobol_ptree.Atom (Fig Zero)
-
-  let dummy_picture =
-    Cobol_ptree.{ picture = "X" &@ dummy_loc;
-                  picture_locale = None;
-                  picture_depending = None }
+  open Cobol_ptree.Dummies
 ]
 
 %nonassoc lowest
@@ -212,8 +194,11 @@ let dual_handler_none =
 let nel [@recovery []] [@symbol ""] (X) :=
  | x = X;             { [ x ] } %prec lowest
  | x = X; l = nel(X); { x :: l }
-
 let rnel [@recovery []] [@symbol ""] (X) := ~ = nel (X); < >          (* alias *)
+
+let nel_ (X) :=
+ | x = X;              { NEL.One x }
+ | x = X; l = nel_(X); { NEL.(x :: l) }
 
 let loc_result (X) ==
   | res = loc (X); { Cobol_common.Srcloc.lift_result res }
@@ -1082,7 +1067,7 @@ let screen_section :=                                              (* +COB2002 *
 
 let elementary_level == ~ = DIGITS; <int_of_string>
 
-let constant_level :=
+let condition_level :=
   | EIGHTY_EIGHT;   { with_loc 88 $sloc }
 
 
@@ -1136,13 +1121,13 @@ let constant_or_data_descr_entry :=
     { Constant e }
   | e = data_descr_entry;
     { Data e }                                  (* including level 77 entries *)
-  | l = loc(elementary_level); dn = name; RENAMES; ri = qualname;
-    to_ = o(THROUGH; ~ = qualname; < >); ".";
+  | l = loc(elementary_level); dn = name; RENAMES; ri = loc(qualname);
+    to_ = o(THROUGH; ~ = loc(qualname); < >); ".";
     { Renames { rename_level = l;
                 rename_to = dn;
-                rename_renamed = ri;
-                rename_through = to_ } }
-  | l = constant_level; cn = name;
+                rename_from = ri;
+                rename_thru = to_ } }
+  | l = condition_level; cn = name;
     er(VALUE; IS? | VALUES; ARE?); vl = rnel(literal_through_literal);
     ao = o(IN; ~ = name; < >);
     wfo = o(WHEN?; SET?; TO?; FALSE; IS?; ~ = literal; < >); ".";
@@ -1154,9 +1139,9 @@ let constant_or_data_descr_entry :=
 (* integer ident? cond_value_clause            (level 88 entries) *)
 
 literal_through_literal:
- | l1 = literal
+ | l1 = loc(literal)
    { { condition_name_value = l1; condition_name_through = None } }
- | l1 = literal THROUGH l2 = literal
+ | l1 = loc(literal) THROUGH l2 = loc(literal)
    { { condition_name_value = l1; condition_name_through = Some l2 } }
 
 constant_or_report_group_descr_entry:
@@ -1320,9 +1305,7 @@ let constant :=
   (* BYTE-LENGTH is sensitive throughout "constant entry" w.r.t ISO/IEC 2014.
      However, like in GnuCOBOL we restrict the scope to the only places where
      the keyword is relevant. *)
-  | l = loc(elementary_level);
-    n = ro(entry_name_clause);              (* FIXME: should NOT be optional! *)
-    spec = constant_spec; ".";
+  | l = loc(elementary_level); n = name; spec = constant_spec; ".";
     { let go, cv = spec in
       { constant_level = l;
         constant_name = n;
@@ -1534,19 +1517,19 @@ let data_occurs_clause :=
   | ~ = occurs_dynamic_clause;   < >
 
 let occurs_fixed_clause [@context occurs_clause] :=
-  | OCCURS; i = integer; TIMES?; kl = rl(key_is); ib = lo(indexed_by);
+  | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
     { OccursFixed { times = i; key_is = kl; indexed_by = ib; } }
 
 let occurs_depending_clause [@context occurs_clause] :=
-  | OCCURS; i1 = integer; TO; i2 = integer; TIMES?;
+  | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
     { OccursDepending { from = i1; to_ = i2; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=
   | OCCURS; DYNAMIC; co = ro(capacity_phrase);
-    i1o = ro(pf(FROM,integer)); i2o = ro(pf(TO,integer));
-    i = bo(INITIALIZED); kl = rl(key_is); il = lo(indexed_by);
+    i1o = ro(pf(FROM,loc(integer))); i2o = ro(pf(TO,loc(integer)));
+    i = loc(bo(INITIALIZED)); kl = rl(key_is); il = lo(indexed_by);
     { OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
                       initialized = i; key_is = kl; indexed_by = il; } }
 
@@ -1695,8 +1678,9 @@ let validation_stage :=
 
 let data_value_clause_prefix == VALUE; IS? | VALUES; ARE?
 let data_value_clause :=
-  | data_value_clause_prefix; ~ = literal; <ValueData>
-  | data_value_clause_prefix; ~ = nel(ll = rnel(literal); FROM; fl = subscripts;
+  | data_value_clause_prefix; ~ = loc(literal); <ValueData>
+  | data_value_clause_prefix; ~ = nel(ll = rnel(loc(literal));
+                                      FROM; fl = subscripts;
                                       tl = lo(TO; ~ = subscripts; < >);
                                       { { table_data_values = ll;
                                           table_data_from = fl;
@@ -2063,9 +2047,11 @@ let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
- | n = name; %prec lowest           {Name n: qualname}
- | n = name; in_of; qdn = qualname; {Qual (n, qdn)}
+let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
+ | n = name; %prec lowest            {Name n: qualname}
+ | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
+let qualname ==
+ | qn = qualname_; { Cobol_ptree.Dummies.strip_dummies_from_qualname qn }
 let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
@@ -2080,11 +2066,11 @@ let literal_int_ident :=
 
 let procedure_name_decl :=
  | ~ = loc(WORD_IN_AREA_A); < >
- | ~ = procedure_name;      < >
+ | ~ = name;                < >
+ | ~ = literal_int_ident;   < >
 
-let procedure_name := (* Can be present in paragraph or section name and level number *)
- | ~ = name;              < >
- | ~ = literal_int_ident; < >
+let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] :=
+ | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=
  | qdn = qualname;                 { qdn }
@@ -2224,9 +2210,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
   | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
 
-let alphanum ==             (* TODO: attach interpretation (hex, etc) into AST *)
- | a = ALPHANUM; { fst a, (match snd a with Apostrophe -> Squote | Quote -> Dquote ) }
- | h = HEXLIT;   { h, Hex }
+let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
+  | ~ = ALPHANUM; < >
 
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
@@ -2720,7 +2705,8 @@ let cs_alphanumeric := FOR; ALPHANUMERIC; IS?; ~ = name; < >
 let cs_national := FOR; NATIONAL; IS?; ~ = name; < >
 
 let output_or_giving :=
- | OUTPUT; PROCEDURE; IS?; i = procedure_name; io = ro(pf(THROUGH,procedure_name));
+  | OUTPUT; PROCEDURE; IS?; i = procedure_name;
+    io = ro(pf(THROUGH, procedure_name));
    { OutputProcedure { procedure_start = i; procedure_end = io } }
  | GIVING; ~ = names; <Giving>
 
@@ -2846,8 +2832,8 @@ let allocate_statement [@context allocate_stmt] :=
 
 %public let unconditional_action := ~ = alter_statement; < >
 let alter_statement :=
-  | ALTER; ~ = l(loc(i1 = qualified_procedure_name; TO; o(PROCEED; TO);
-                     i2 = qualified_procedure_name;
+  | ALTER; ~ = l(loc(i1 = procedure_name; TO; o(PROCEED; TO);
+                     i2 = procedure_name;
                      { { alter_source = i1; alter_target = i2 } })); <Alter>
 
 
@@ -3155,11 +3141,12 @@ let generate_statement :=
 
 %public let unconditional_action := ~ = go_to_statement; < >
 let go_to_statement :=
- | GO; TO?; i = qualified_procedure_name;
-   { GoTo i }
- | GO; TO?; il = rnel(qualified_procedure_name);
+ | GO; TO?; i = procedure_name;
+   { GoTo { goto_target = i } }
+ | GO; TO?; il = nel_(procedure_name);
    DEPENDING; ON?; i = ident;
-   { GoToDepending { goto_depending_targets = il; goto_depending_on = i; } }
+   { GoToDepending { goto_depending_targets = il;
+                     goto_depending_on = i; } }
  | GO; TO?;         (* COB85; obsolete; should be sole statement of paragraph *)
    { LoneGoTo }
 
@@ -3395,8 +3382,8 @@ let reversed_or_no_rewind_opt :=
 
 %public let unconditional_action := ~ = perform_statement; < >
 let perform_statement :=
- | PERFORM; i = qualified_procedure_name;
-   io = ro(pf(THROUGH,qualified_procedure_name));
+ | PERFORM; i = procedure_name;
+   io = ro(pf(THROUGH, procedure_name));
    po = io(perform_phrase);
    { PerformTarget { perform_target = { procedure_start = i;
                                         procedure_end = io };
@@ -3499,10 +3486,10 @@ let release_statement :=
 
 (* RESUME STATEMENT (+COB2002) *)
 
-%public let unconditional_action := ~ = resume_statement; < >
+%public let unconditional_action := ~ = resume_statement; <Resume>
 let resume_statement [@context resume_stmt] :=
- | RESUME; AT?; NEXT; STATEMENT;    { ResumeNextStatement }
- | RESUME; AT?; i = qualified_procedure_name; { Resume i }
+ | RESUME; AT?; NEXT; STATEMENT;              { ResumeNextStatement }
+ | RESUME; AT?; i = procedure_name; { ResumeTarget i }
 
 
 
@@ -3753,7 +3740,7 @@ let sort_statement :=
 
 let input_or_using :=
  | INPUT; PROCEDURE; IS?; i = procedure_name;
-   io = ro(pf(THROUGH,procedure_name));
+   io = ro(pf(THROUGH, procedure_name));
    { SortInputProcedure { procedure_start = i; procedure_end = io } }
  | USING; names = names;
    { SortUsing names }
@@ -3958,7 +3945,8 @@ let use_after_exception :=
    { { use_after_exception = i; use_after_exception_on_files = fl } }
 
 let debug_target :=
- | all = bo(ALL; REFERENCES?; OF?); procedure = qualified_procedure_name;
+  | all = bo(ALL; REFERENCES?; OF?);
+    procedure = procedure_name;
    { UseForDebuggingProcedure { all; procedure } }
  | ALL; PROCEDURES;
    { UseForDebuggingAllProcedures }

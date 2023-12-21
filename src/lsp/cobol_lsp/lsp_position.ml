@@ -85,7 +85,28 @@ let range_of_srcloc_in ~filename srcloc =
 (** [is_in_srcloc ~filename pos srcloc] is a shorthand for [is_in_lexloc pos
     (Srcloc.lexloc_in ~filename srcloc)] *)
 let is_in_srcloc ~filename pos srcloc =
+  srcloc != Srcloc.dummy &&
   is_in_lexloc pos (Srcloc.lexloc_in ~filename srcloc)
+
+(* --- *)
+
+(** {1 Translation of generalized source locations} *)
+
+type translator =
+  {
+    location_of_srcloc: srcloc -> Location.t;
+    location_of: 'x. 'x with_loc -> Location.t;
+  }
+
+let loc_translator TextDocumentIdentifier.{ uri } =
+  let filename = Lsp.Uri.to_path uri in
+  let location_of_srcloc loc =
+    Location.create ~uri ~range:(range_of_srcloc_in ~filename loc)
+  in
+  {
+    location_of_srcloc;
+    location_of = fun { loc; _ } -> location_of_srcloc loc;
+  }
 
 (* --- *)
 

@@ -55,20 +55,24 @@ type complex_ = [ `Complex ]
 type strict_ = [ `Strict ]
 type loose_ = [ `Loose ]
 
-type alphanum_kind =
-  | Squote (* '...' *)
-  | Dquote (* "..." *)
-  | Hex (* X"..." *)
+type alphanum_quote =
+  | Simple_quote (* '...' *)
+  | Double_quote (* "..." *)
 [@@deriving ord]
 
-type alphanum_string = string * alphanum_kind
+type alphanum_string =
+  {
+    str: string;
+    quotation: alphanum_quote;
+    hexadecimal: bool;
+  }
 [@@deriving ord]
 
-let pp_alphanum_string ppf (s, k) =
-  match k with
-  | Squote -> Fmt.pf ppf "'%s'" s
-  | Dquote -> Fmt.pf ppf "\"%s\"" s
-  | Hex -> Fmt.pf ppf "X\"%s\"" s
+let pp_alphanum_string ppf { hexadecimal; quotation; str } =
+  if hexadecimal then Fmt.char ppf 'X';
+  match quotation with
+  | Simple_quote -> Fmt.pf ppf "'%s'" str
+  | Double_quote -> Fmt.pf ppf "\"%s\"" str
 
 (** Now comes the type of all/most terms *)
 type _ term =
@@ -304,6 +308,8 @@ and counter_kind =
   | LineageCounter
   | PageCounter
   | LineCounter
+
+(* --- *)
 
 module COMPARE = struct
   type 'a compare_fun = 'a -> 'a -> int
@@ -633,6 +639,7 @@ module FMT = struct
     then fmt "@[<1>(%a)@]" ppf (list ~sep:comma pp_subscript) ident_subscripts
 
   and pp_qualname ppf = pp_term ppf
+  and pp_qualname' ppf = pp_with_loc pp_qualname ppf
 
   and pp_address ppf = function
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
@@ -804,6 +811,7 @@ module FMT = struct
     | LOr -> string ppf "OR"
 
   and pp_literal: literal Pretty.printer = fun ppf -> pp_term ppf
+  and pp_literal' = fun ppf -> pp_with_loc pp_literal ppf
   and pp_ident: ident Pretty.printer = fun ppf -> pp_term ppf
 
   (** Pretty-printing for named unions of term types (some are yet to be
@@ -1017,3 +1025,11 @@ let pp_rounded_ident ppf { rounded_ident = i; rounded_rounding = r } =
   | _ -> Fmt.pf ppf "%a %a" pp_ident i pp_rounding r
 
 let pp_rounded_idents = Fmt.(list ~sep:sp pp_rounded_ident)
+
+(* --- *)
+
+type procedure_name = qualname
+[@@deriving ord]
+
+let pp_procedure_name = pp_qualname
+let pp_procedure_name' = pp_with_loc pp_qualname

@@ -50,6 +50,18 @@ val is_in_srcloc
 
 (* --- *)
 
+type translator =
+  {
+    location_of_srcloc: Cobol_common.Srcloc.srcloc -> Lsp.Types.Location.t;
+    location_of: 'x. 'x Cobol_common.Srcloc.with_loc -> Lsp.Types.Location.t;
+  }
+
+val loc_translator
+  : Lsp.Types.TextDocumentIdentifier.t
+  -> translator
+
+(* --- *)
+
 (** [sieve ~filename ~pos] is a folder visitor that skips any localized AST node
     whose source location does not include the given position. To be used as a
     mixin component so it overrides [fold'] last. *)

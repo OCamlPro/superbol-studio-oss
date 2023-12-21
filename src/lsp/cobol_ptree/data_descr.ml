@@ -111,20 +111,18 @@ type rename_item =
   {
     rename_level: data_level with_loc;
     rename_to: name with_loc;
-    rename_renamed: qualname;
-    rename_through: qualname option;
+    rename_from: qualname with_loc;
+    rename_thru: qualname with_loc option;
   }
 [@@deriving ord]
 
-let pp_rename_item ppf
-  { rename_level = rl; rename_to = rto;
-    rename_renamed = rr; rename_through = rt }
-=
-Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
-  (pp_with_loc pp_data_level) rl
-  pp_name' rto
-  pp_qualname rr
-  Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname)) rt
+let pp_rename_item ppf { rename_level = rl; rename_to = rto;
+                         rename_from = from; rename_thru = thru } =
+  Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
+    (pp_with_loc pp_data_level) rl
+    pp_name' rto
+    pp_qualname' from
+    Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname')) thru
 
 
 type condition_name_item =
@@ -139,8 +137,8 @@ type condition_name_item =
 
 and condition_name_value =
   {
-    condition_name_value: literal;
-    condition_name_through: literal option;
+    condition_name_value: literal with_loc;
+    condition_name_through: literal with_loc option;
   }
 [@@deriving ord]
 
@@ -148,8 +146,8 @@ let pp_condition_name_value ppf
   { condition_name_value = cnv; condition_name_through = cnt }
 =
   match cnt with
-  | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal cnv pp_literal cnt
-  | None -> pp_literal ppf cnv
+  | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal' cnv pp_literal' cnt
+  | None -> pp_literal' ppf cnv
 
 let pp_condition_name_item ppf
   { condition_name_level = cnl; condition_name = cn;
@@ -231,14 +229,14 @@ let pp_group_usage_clause ppf = function
 type data_occurs_clause =
   | OccursFixed of
       {
-        times: integer;
+        times: integer with_loc;
         key_is: sort_spec list;
         indexed_by: name with_loc list;
       }
   | OccursDepending of
       {
-        from: integer;
-        to_: integer;
+        from: integer with_loc;
+        to_: integer with_loc;
         depending: qualname with_loc;
         key_is: sort_spec list;
         indexed_by: name with_loc list;
@@ -246,9 +244,9 @@ type data_occurs_clause =
   | OccursDynamic of
       {
         capacity_in: name with_loc option;
-        from: integer option;
-        to_: integer option;
-        initialized: bool;
+        from: integer with_loc option;
+        to_: integer with_loc option;
+        initialized: bool with_loc;
         key_is: sort_spec list;
         indexed_by: name with_loc list;
       }
@@ -278,24 +276,26 @@ let pp_indexed_by_opt ppf = function
   | [] -> ()
   | iby -> Fmt.sp ppf (); pp_indexed_by ppf iby
 
+let pp_integer' = pp_with_loc pp_integer
+
 let pp_data_occurs_clause ppf = function
   | OccursFixed { times; key_is; indexed_by } ->
     Fmt.pf ppf "OCCURS %a%a%a"
-      pp_integer times
+      pp_integer' times
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
   | OccursDepending { from; to_; depending; key_is; indexed_by } ->
     Fmt.pf ppf "OCCURS %a TO %a %a %a%a"
-      pp_integer from pp_integer to_
+      pp_integer' from pp_integer' to_
       pp_depending_phrase depending
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
   | OccursDynamic { capacity_in; from; to_; initialized; key_is; indexed_by } ->
     Fmt.pf ppf "OCCURS DYNAMIC%a%a%a%a%a%a"
       Fmt.(option (any " CAPACITY " ++ pp_name')) capacity_in
-      Fmt.(option (any " FROM " ++ pp_integer)) from
-      Fmt.(option (any " TO " ++ pp_integer)) to_
-      Fmt.(if initialized then any " INITIALIZED" else nop) ()
+      Fmt.(option (any " FROM " ++ pp_integer')) from
+      Fmt.(option (any " TO " ++ pp_integer')) to_
+      Fmt.(if initialized.payload then any " INITIALIZED" else nop) ()
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
 
@@ -586,39 +586,35 @@ let pp_validation_clause ppf = function
       Fmt.(list ~sep:sp pp_ident) for_
 
 type data_value_clause =
-  | ValueData of literal
+  | ValueData of literal with_loc
   | ValueTable of table_data_value list
 
 and table_data_value =
   {
-    table_data_values: literal list; (* non-empty *)
-    table_data_from: subscript list; (* non-empty *)
+    table_data_values: literal with_loc list;                    (* non-empty *)
+    table_data_from: subscript list;                             (* non-empty *)
     table_data_to: subscript list;
   }
 [@@deriving ord]
 
 let pp_table_data_value ppf
-  { table_data_values = tdv; table_data_from = tdf; table_data_to = tdt }
-=
+    { table_data_values = tdv; table_data_from = tdf; table_data_to = tdt } =
   Fmt.pf ppf "%a@ FROM@ %a%a"
-    Fmt.(list ~sep:sp pp_literal) tdv
+    Fmt.(list ~sep:sp pp_literal') tdv
     Fmt.(list ~sep:sp pp_subscript) tdf
-    (
-      if tdt == [] then
-        Fmt.nop
-      else
-        Fmt.(any "@ TO@ " ++ list ~sep:sp pp_subscript)
-    ) tdt
+    Fmt.(if tdt == []
+         then nop
+         else any "@ TO@ " ++ list ~sep:sp pp_subscript) tdt
 
 let pp_data_value_clause ppf = function
-  | ValueData lit -> Fmt.pf ppf "VALUE %a" pp_literal lit
+  | ValueData lit ->
+      Fmt.pf ppf "VALUE %a" pp_literal' lit
   | ValueTable tdv ->
-    Fmt.pf ppf "VALUES %a"
-      Fmt.(list ~sep:sp pp_table_data_value) tdv
+      Fmt.pf ppf "VALUES %a" Fmt.(list ~sep:sp pp_table_data_value) tdv
 
 type report_data_name_or_final =
- | ReportDataName of qualident
- | ReportFinal
+  | ReportDataName of qualident
+  | ReportFinal
 [@@deriving ord]
 
 let pp_report_data_name_or_final ppf = function
@@ -835,7 +831,7 @@ let pp_report_clause ppf = function
 type constant_item =
   {
     constant_level: data_level with_loc;      (* is a constant *)     (* TODO: check \in {"1", "01"} *)
-    constant_name: data_name with_loc option; (* ident only (NB:refine the type???) *)
+    constant_name: name with_loc;
     constant_global: bool;
     constant_value: constant_value with_loc;
   }
@@ -857,9 +853,9 @@ let pp_constant_value ppf = function
 let pp_constant_item ppf {
   constant_level; constant_name; constant_global; constant_value
 } =
-  Fmt.pf ppf "%a%a@ CONSTANT%a@ %a."
+  Fmt.pf ppf "%a%a@ CONSTANT@ %a@ %a."
     (pp_with_loc pp_data_level) constant_level
-    Fmt.(option (sp ++ pp_with_loc pp_data_name)) constant_name
+    (pp_with_loc pp_name) constant_name
     Fmt.(if constant_global then any "@ IS GLOBAL" else nop) ()
     (pp_with_loc pp_constant_value) constant_value
 
