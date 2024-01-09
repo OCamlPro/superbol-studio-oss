@@ -149,6 +149,11 @@ module Pictures = struct
                                  fixed_insertion_offset = 0 } ]
       ~pic_prefix:[cs 1]
 
+  let pic_999d = fixed_numeric 3 0
+      ~basics:[ FixedInsertion { fixed_insertion_symbol = CS;
+                                 fixed_insertion_offset = 3 } ]
+      ~pic_suffix:[cs 1]
+
   let pic_d99p = fixed_numeric 2 0
       ~basics:[ FixedInsertion { fixed_insertion_symbol = CS;
                                  fixed_insertion_offset = 0 };
@@ -500,6 +505,7 @@ let () =
       parse_ko "Floating cs after S"     "S$(10)";
       parse_ko "Floating + after S"      "S+(10)";
       parse_ok "$999"                    pic_d999;
+      parse_ok "999$"                    pic_999d;
       parse_ok "$99+"                    pic_d99p;
       parse_ok "+99$"                    pic_p99d;
       parse_ok "+$99"                    pic_pd99;
