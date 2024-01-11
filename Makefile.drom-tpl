@@ -4,9 +4,10 @@
 .PHONY: clean distclean
 
 TARGET_PLAT ?= linux
-DUNE_CROSS_ARGS =						\
-	$(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
-	$(if $(filter darwin,${TARGET_PLAT}),-x osx)
+DUNE = opam exec -- dune
+DUNE_ARGS ?=
+DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
+			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 
 VERSION = !{version}
 DEV_DEPS := merlin ocamlformat odoc![if:gen:test] ppx_expect ppx_inline_test![fi]
@@ -26,7 +27,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build!{build-profile} ${DUNE_CROSS_ARGS} @install
+	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh !{packages}
 	./scripts/after.sh build
 
@@ -50,7 +51,7 @@ sphinx: doc-common
 odoc: doc-common
 	mkdir -p ${ODOC_TARGET}
 	./scripts/before.sh odoc ${ODOC_TARGET}
-	opam exec -- dune build @doc
+	${DUNE} build ${DUNE_ARGS} @doc
 	rsync -auv --delete _build/default/_doc/_html/. ${ODOC_TARGET}
 	./scripts/after.sh odoc ${ODOC_TARGET}
 
@@ -60,10 +61,10 @@ view:
 	xdg-open file://$$(pwd)/_drom/docs/index.html
 ![fi]
 fmt:
-	opam exec -- dune build @fmt --auto-promote
+	${DUNE} build ${DUNE_ARGS} @fmt --auto-promote
 
 fmt-check:
-	opam exec -- dune build @fmt
+	${DUNE} build ${DUNE_ARGS} @fmt
 
 install:
 	opam pin -y --no-action -k path .
@@ -80,7 +81,7 @@ dev-deps:
 
 test:
 	./scripts/before.sh test
-	opam exec -- dune build ${DUNE_CROSS_ARGS} @runtest
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @runtest
 	./scripts/after.sh test
 
 clean:
