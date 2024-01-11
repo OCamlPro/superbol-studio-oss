@@ -1,21 +1,22 @@
 # -*- Makefile -*-
-PROJECT=superbol_vscode_platform
-SRCDIR=src/vscode/superbol-vscode-platform
-
+STUDIO = superbol_vscode_platform
 TARGET_PLATFORMS ?= linux # win32 darwin
+TARGET_NAME = superbol-vscode-platform
 
-CP ?= cp -f
+SRCDIR ?= src
+STUDIO_SRCDIR = $(SRCDIR)/vscode/superbol-vscode-platform
+
+CP ?= cp -f # ln -srf
 
 DUNE_BUILD_DIR ?= _build
-DUNE_BUILD_ARGS = $(DUNE_CROSS_ARGS)
+DUNE_BUILD_ARGS = ${DUNE_CROSS_ARGS}
 DUNE_BUILD_SRCDIR =							\
-	$(DUNE_BUILD_DIR)/default$(strip				\
+	${DUNE_BUILD_DIR}/default$(strip				\
 		$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
 		$(if $(filter darwin,$(TARGET_PLAT)),.osx)		\
-							  )/src
+							  )/$(SRCDIR)
 
 # TARGET_PLAT is defined in Makefile
-TARGET_NAME = superbol-vscode-platform
 TARGET_ARCH ?= x64
 TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
 TARGET_PROFILE ?= release
@@ -24,7 +25,7 @@ TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
 SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
-SUPERBOL_LSP_BUILT = $(DUNE_BUILD_SRCDIR)/lsp/superbol-free/main.exe
+SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
 
 VSCE_ARGS = --yarn -t $(TARGET_SPEC)
 
@@ -41,22 +42,26 @@ compile: superbol-lsp-server build-release
 package: vsix-package
 
 superbol-lsp-server $(SUPERBOL_LSP): build vsix-dist-setup
-# Assume we do everything on Linux (who wouldn't?):
+# Only rebuild `package.json` when on Linux
+# TODO: maybe just check build platform matches target platform
 ifeq ($(TARGET_PLAT),linux)
 	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
 
-package.json: $(SUPERBOL_LSP)
+  ifeq ($(shell uname),Linux)
+  package.json: $(SUPERBOL_LSP)
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
+  endif
 endif
 
 .PHONY: build-debug yarn-debug
 
 build-debug:
-	opam exec -- dune build $(DUNE_BUILD_ARGS) $(SRCDIR)/$(PROJECT).bc.js
+	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS}	\
+	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
 	@mkdir -p _out
-	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js _out/
 	$(MAKE) yarn-debug
 
 # Use 'make build-debug' before to copy the JS file in _out/
@@ -70,15 +75,15 @@ yarn-debug: _out/superbol-vscode-platform-bundle.js	\
                 --platform=node \
                 --target=es6 \
                 --sourcemap
-# the last command generated _dist/$(PROJECT).bs.js
+# the last command generated _dist/$(STUDIO).bs.js
 
 .PHONY: build-release yarn-release
 
 build-release:
-	opam exec -- dune build $(DUNE_BUILD_ARGS) $(SRCDIR)/$(PROJECT).bc.js \
-	                  --profile=release
+	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release	\
+	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
 	@mkdir -p _out
-	$(CP) $(DUNE_BUILD_DIR)/default/$(SRCDIR)/$(PROJECT).bc.js _out/
+	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js _out/
 	$(MAKE) yarn-release
 
 # Use 'make build-release' before to copy the JS file in _out/
@@ -160,9 +165,11 @@ deploy-ovsx:
 	yarn ovsx publish --yarn
 
 .PHONY: clean-execs
-distclean: clean-execs vsix-clean
 clean-execs:
 	rm -f $(SUPERBOL_LSPs)
+
+distclean: clean-execs vsix-clean
+clean: clean-execs
 
 # ---
 

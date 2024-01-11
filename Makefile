@@ -4,7 +4,10 @@
 .PHONY: clean distclean
 
 TARGET_PLAT ?= linux
-DUNE_CROSS_ARGS = $(if $(filter win32,${TARGET_PLAT}),-x windows)
+DUNE = opam exec -- dune
+DUNE_ARGS ?=
+DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
+			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 
 VERSION = 0.1.0
 DEV_DEPS := merlin ocamlformat odoc
@@ -24,7 +27,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-	opam exec -- dune build ${DUNE_CROSS_ARGS} @install
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml
 	./scripts/after.sh build
 
@@ -48,7 +51,7 @@ sphinx: doc-common
 odoc: doc-common
 	mkdir -p ${ODOC_TARGET}
 	./scripts/before.sh odoc ${ODOC_TARGET}
-	opam exec -- dune build @doc
+	${DUNE} build ${DUNE_ARGS} @doc
 	rsync -auv --delete _build/default/_doc/_html/. ${ODOC_TARGET}
 	./scripts/after.sh odoc ${ODOC_TARGET}
 
@@ -58,10 +61,10 @@ view:
 	xdg-open file://$$(pwd)/_drom/docs/index.html
 
 fmt:
-	opam exec -- dune build @fmt --auto-promote
+	${DUNE} build ${DUNE_ARGS} @fmt --auto-promote
 
 fmt-check:
-	opam exec -- dune build @fmt
+	${DUNE} build ${DUNE_ARGS} @fmt
 
 install:
 	opam pin -y --no-action -k path .
@@ -78,7 +81,7 @@ dev-deps:
 
 test:
 	./scripts/before.sh test
-	opam exec -- dune build ${DUNE_CROSS_ARGS} @runtest
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @runtest
 	./scripts/after.sh test
 
 clean:
