@@ -2692,14 +2692,15 @@ arguments at all.")
 (defun cobol--current-indentation ()
   "Return the indentation of the current line or -1 if the line is within the
 sequence area."
-  (if (< (- (line-end-position) (line-beginning-position)) (cobol--code-start))
-     -1
-    (save-excursion
-      (goto-char (+ (line-beginning-position) (cobol--code-start)))
-      (let ((code-start-position (point)))
-        (skip-syntax-forward " " (line-end-position))
-        (backward-prefix-chars)
-        (- (point) code-start-position)))))
+  (let ((indent 
+	(save-excursion
+	  (goto-char (line-beginning-position))
+	  (skip-syntax-forward " " (line-end-position))
+	  (message "cobol--code-start %d" (cobol--code-start))
+	  (- (point) (+ (line-beginning-position) (cobol--code-start)))
+	  )))
+    indent
+    ))
 
 (defun cobol--indent-current ()
   "Return the current indent level indented once."
@@ -3063,23 +3064,12 @@ start of area A, if fixed-format)."
 (defun cobol-indent-line ()
   "Indent current line as COBOL code."
   (interactive "*")
-  (let ((indent (cobol--find-indent-of-line)))
-    (if (not (eq indent (cobol--current-indentation)))
-        (progn
-          (cobol--set-line-indent indent)
-          ;; If in leading whitespace/sequence area, move to first char of code.
-          (when (< (point) (+ (line-beginning-position) (cobol--code-start) indent))
-            (skip-syntax-forward " " (line-end-position))
-            (backward-prefix-chars)))
-      ;; Move to first non-whitespace char
-      (skip-syntax-forward " " (line-end-position))
-      (backward-prefix-chars)
-      ;; SuperBOL/OCamlPro: the following loop was commented to prevent
-      ;; inserting spaces at point
-      ;; Indent stuff at point if not the first word.
-;      (when (< (cobol--current-indentation) (- (current-column) (cobol--code-start)))
-;        (cobol--indent-point))
-      )))
+  (let
+      ((expected-indent (cobol--find-indent-of-line))
+       (current-indent (cobol--current-indentation))
+       )
+    (indent-line-to (+ expected-indent (cobol--code-start)))
+    ))
 
 (defvar cobol-mode-map
   (let ((map (make-sparse-keymap)))
@@ -3090,7 +3080,27 @@ start of area A, if fixed-format)."
 (easy-menu-define cobol-mode-menu cobol-mode-map "Menu used for `cobol-mode'."
   '("COBOL"
     ("Insert" :filter cobol-skeleton--menu)
-    ;; FIXME: This menu should likely grow a few more entries.
+    ("Source Format"
+     ["Fixed" cobol-fixed-format-mode]
+     ["Fixed 2002" cobol-fixed-2002-format-mode]
+     ["Free" cobol-free-format-mode]
+     )
+    ("GnuCOBOL Docs"
+     ["GnuCOBOL Manual"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/manual"))]
+     ["GnuCOBOL Programmer's Guide"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobpg"))]
+     ["GnuCOBOL Quick Reference"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobqr"))]
+     ["GnuCOBOL Sample Programs"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobsp"))]
+     )
+    ["SuperBOL by OCamlPro"
+     (lambda () (interactive) (browse-url "https://get-superbol.com"))]
     ))
 
 (defvar cobol-mode-syntax-table
@@ -3133,6 +3143,54 @@ start of area A, if fixed-format)."
   ;; Auto complete mode
   (set (make-local-variable 'ac-ignore-case) t)
   )
+
+(define-minor-mode cobol-fixed-format-mode
+  "Set fixed-85 COBOL Source Format"
+  :init-value nil
+  :lighter " Fixed"
+  :predicate (cobol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-fixed-format-mode
+      (progn
+	(cobol-free-format-mode -1)
+	(cobol-fixed-2002-format-mode -1)
+	(setq cobol-source-format 'fixed-85)
+	)
+    ))
+
+(define-minor-mode cobol-fixed-2002-format-mode
+  "Set Fixed 2002 COBOL Source Format"
+  :init-value nil
+  :lighter " Fixed-2002"
+  :predicate (cobol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-fixed-2002-format-mode
+      (progn
+	(cobol-free-format-mode -1)
+	(cobol-fixed-format-mode -1)
+	(setq cobol-source-format 'fixed-2002)
+	)
+    ))
+
+(define-minor-mode cobol-free-format-mode "Toggle Free Format"
+  :init-value nil
+  :lighter " Free"
+  :predicate (cobol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-free-format-mode
+      (progn
+	(cobol-fixed-format-mode -1)
+	(cobol-fixed-2002-format-mode -1)
+	(setq cobol-source-format 'free)
+	)
+  ))
+
+(add-to-list 'minor-mode-alist
+	     '(cobol-free-format-mode " Free"))
+(add-to-list 'minor-mode-alist
+	     '(cobol-fixed-format-mode " Fixed"))
+(add-to-list 'minor-mode-alist
+	     '(cobol-fixed-2002-format-mode " Fixed-2002"))
 
 (provide 'cobol-mode)
 

@@ -16,9 +16,21 @@ on the indentation function preventing insertion of spaces at point.
 Installation
 ~~~~~~~~~~~~
 
-Copy the file :code:`cobol-mode.el` to your :code:`$HOME/.emacs.d/`
-directory, and add the following lines to your :code:`$HOME/.emacs` file::
+If you are already using the Cobol mode by ELPA, you need to
+desinstall it. For that, use `M-x list-packages`, go to `cobol-mode`,
+type `D` to select it for deletion, and then `x` to execute the
+removal.
 
+Copy the file :code:`cobol-mode.el` to your
+:code:`$HOME/.emacs.d/lisp/` directory::
+
+  wget https://github.com/OCamlPro/superbol-studio-oss/raw/master/emacs/cobol-mode.el
+  mkdir -p $HOME/.emacs.d/lisp/
+  mv cobol-mode.el  $HOME/.emacs.d/lisp/
+
+and add the following lines to your :code:`$HOME/.emacs` file::
+
+  (add-to-list 'load-path "~/.emacs.d/lisp/")
   (autoload 'cobol-mode "cobol-mode")
   (setq cobol-tab-width 3)
   (setq auto-mode-alist
@@ -27,7 +39,11 @@ directory, and add the following lines to your :code:`$HOME/.emacs` file::
        ("\\.cbl\\'" . cobol-mode)
        ("\\.cpy\\'" . cobol-mode))
      auto-mode-alist))
-  (setq cobol-source-format 'free)
+  (add-hook 'cobol-mode-hook 'cobol-free-format-mode)
+
+Start a new Emacs process and open a COBOL file: verify that the
+`COBOL` menu is available and contains a `SuperBOL by OCamlPro`
+entry. You are done!
 
 This configuration will set tabulations to be 3 spaces and free source
 format. If you want to change the source format, you will need to
@@ -42,7 +58,12 @@ The :code:`cobol-mode.el` provides the following features:
 * indentation
 * comments
 * rulers
-* a COBOL menu with an item "Insert" with a few constructions
+* minor-modes for source formats
+* a COBOL menu with:
+
+  * an "Insert" item with a few constructions
+  * a sub-menu with links to GnuCOBOL documentation
+  * a sub-menu to switch between source formats
 
 Customization
 ~~~~~~~~~~~~~
