@@ -2696,7 +2696,6 @@ sequence area."
 	(save-excursion
 	  (goto-char (line-beginning-position))
 	  (skip-syntax-forward " " (line-end-position))
-	  (message "cobol--code-start %d" (cobol--code-start))
 	  (- (point) (+ (line-beginning-position) (cobol--code-start)))
 	  )))
     indent
