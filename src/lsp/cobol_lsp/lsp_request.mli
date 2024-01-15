@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 val handle: Jsonrpc.Request.t -> (Lsp_server.state as 's) -> 's * Jsonrpc.Response.t
+val shutdown: Lsp_server.state -> unit
 
 module INTERNAL: sig
   val lookup_definition

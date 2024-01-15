@@ -82,6 +82,9 @@ let run ~config =
     | Jsonrpc.Packet.Response _ | Batch_response _ ->
         Pretty.error "Response@ recieved@ unexpectedly@.";
         continue state
+    | exception End_of_file ->
+        Lsp_request.shutdown state;
+        Error "Premature end of input stream"                    (* exit loop *)
     | exception Lsp_io.Parse_error msg ->
         Lsp_io.pretty_notification ~type_:Error "%s" msg;
         Error msg                                                (* exit loop *)

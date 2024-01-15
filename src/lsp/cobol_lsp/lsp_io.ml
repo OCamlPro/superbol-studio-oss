@@ -74,8 +74,6 @@ let read_message () : Jsonrpc.Packet.t =
       parse_error "content-type must be 'utf-8'"
   | _, None ->
       parse_error "missing content-length header"
-  | exception End_of_file ->
-      parse_error "premature end of input stream"
 
 (** [send_json json] sends out a json rpc package. *)
 let send_json json =

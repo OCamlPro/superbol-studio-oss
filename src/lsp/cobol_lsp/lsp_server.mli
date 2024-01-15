@@ -78,5 +78,6 @@ val find_document
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t
 
+(** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches
   : t -> unit

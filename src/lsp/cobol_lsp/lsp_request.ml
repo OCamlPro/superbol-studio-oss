@@ -20,25 +20,14 @@ open Lsp_lookup.TYPES
 open Lsp.Types
 open Ez_file.V1
 
-(** {2 Error handling} *)
-
-(** Raises {!Jsonrpc.Response.Error.E} *)
-let error ~code fmt =
-  Pretty.string_to begin fun message ->
-    Jsonrpc.Response.Error.(raise @@ make ~code ~message ())
-  end fmt
-
-let request_failed fmt =
-  error ~code:Jsonrpc.Response.Error.Code.RequestFailed fmt
-let internal_error fmt =
-  error ~code:Jsonrpc.Response.Error.Code.InternalError fmt
+(** {2 Handling requests} *)
 
 (** Catch generic exception cases, and report errors using {!error} above *)
 let try_doc ~f registry doc_id =
   let doc =
     try Lsp_server.find_document doc_id registry
     with Not_found ->
-      request_failed
+      Lsp_error.request_failed
         "Received a request about a document that has not been opened yet (uri = \
          %s) --- possible cause is the client did not manage to send the didOpen \
          notification; this may happen due to unhandled character encodings.\
@@ -46,13 +35,11 @@ let try_doc ~f registry doc_id =
   in
   try f ~doc
   with e ->
-    internal_error "Caught exception: %a" Fmt.exn e
+    Lsp_error.internal "Caught exception: %a" Fmt.exn e
 
 (** Same as [try_doc], with some additional document data *)
 let try_with_document_data ~f =
   try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
-
-(** {2 Handling requests} *)
 
 (** {3 Initialization} *)
 
@@ -63,10 +50,7 @@ let handle_initialize (params: InitializeParams.t) =
 (** {3 Shutdown} *)
 
 let handle_shutdown registry =
-  try Lsp_server.save_project_caches registry
-  with e ->
-    internal_error
-      "Exception caught while saving project caches: %a@." Fmt.exn e
+  Lsp_server.save_project_caches registry
 
 (** {3 Definitions} *)
 
@@ -291,7 +275,7 @@ let handle_formatting registry params =
     in
     Some (List.map lsp_text_edit editList)
   with Failure msg ->
-    internal_error "Formatting error: %s" msg
+    Lsp_error.internal "Formatting error: %s" msg
 
 (** {3 Semantic tokens} *)
 
@@ -385,6 +369,15 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
     end
 
 (** {3 Generic handling} *)
+
+let shutdown: state -> unit = function
+  | NotInitialized _
+  | ShuttingDown
+  | Initialized _
+  | Exit _ ->
+      ()                                                             (* no-op *)
+  | Running registry ->
+      handle_shutdown registry
 
 let on_request
   : type r. state -> r Lsp.Client_request.t ->

@@ -99,7 +99,8 @@ let save_project_cache ~config
       (* then (* read, write if commit hash or document changed *) *)
       (* else *)
       Lsp_utils.write_to cache_file (write_project_cache cached_project_record);
-      Lsp_io.pretty_notification "Wrote cache at: %s" cache_file ~type_:Info
+      Lsp_io.pretty_notification "Wrote cache at: %s" cache_file
+        ~log:true ~type_:Info
   | None ->
       ()
 
