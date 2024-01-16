@@ -37,3 +37,16 @@ let%expect_test "tokens-after-syntax-errors" =
     IDENTIFICATION, PROGRAM-ID, ., INFO_WORD[PROCEDURE], DIVISION, MOVE, WORD[X],
     WORD[Y], STOP, RUN, ., EOF
 |}];;
+
+let%expect_test "token-locations" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
+    ~verbose:true
+    {|(TMP:1)|};
+  [%expect {|
+    Tks: (, WORD[TMP], :, DIGITS[1], ), EOF, EOF
+    (@<prog.cob:1-0|1-1>
+    WORD[TMP]@<prog.cob:1-1|1-4>
+    :@<prog.cob:1-4|1-5>
+    DIGITS[1]@<prog.cob:1-5|1-6>
+    )@<prog.cob:1-6|1-7>
+    EOF@<prog.cob:1-7|1-7> |}];;

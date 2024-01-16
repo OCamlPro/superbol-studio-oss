@@ -1049,12 +1049,12 @@ syn_definition.at-2617-prog.cob:16.25-16.29:
   18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
 >> Error: Invalid syntax
 
-syn_definition.at-2617-prog.cob:16.40-16.44:
+syn_definition.at-2617-prog.cob:16.40-16.41:
   13            02 FILLER LIKE AUSGABE-FILE-NAME.
   14         
   15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
   16 >        77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
-----                                           ^^^^
+----                                           ^
   17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
   18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
 >> Error: Invalid syntax
@@ -1089,12 +1089,12 @@ syn_definition.at-2617-prog.cob:17.39:
   19   
 >> Hint: Missing .
 
-syn_definition.at-2617-prog.cob:17.40-17.43:
+syn_definition.at-2617-prog.cob:17.40-17.41:
   14         
   15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
   16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
   17 >        77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
-----                                           ^^^
+----                                           ^
   18          77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
   19   
 >> Warning: Invalid syntax
@@ -1129,12 +1129,12 @@ syn_definition.at-2617-prog.cob:18.25-18.29:
   20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
 >> Error: Invalid syntax
 
-syn_definition.at-2617-prog.cob:18.40-18.44:
+syn_definition.at-2617-prog.cob:18.40-18.41:
   15          77 OUTPUT-VAL     LIKE DETAIL-NO GLOBAL.
   16          77 OUTPUT-VAL-P1  LIKE DETAIL-NO (+1).
   17          77 OUTPUT-VAL-P1b LIKE DETAIL-NO (1).
   18 >        77 OUTPUT-VAL-M2  LIKE DETAIL-NO (-2).
-----                                           ^^^^
+----                                           ^
   19   
   20          01 Z-MESSAGE-T2 LIKE AUSGABE-FILE-NAME-2.
 >> Error: Invalid syntax

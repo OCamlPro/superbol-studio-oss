@@ -32,7 +32,7 @@ let dummy_qualname': qualname with_loc =
 
 let dummy_qualident =
   {
-    ident_name = dummy_qualname;
+    ident_name = dummy_qualname';
     ident_subscripts = [];
   }
 

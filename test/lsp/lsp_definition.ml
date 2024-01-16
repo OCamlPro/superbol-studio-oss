@@ -124,8 +124,9 @@ let%expect_test "simple-definition-requests-2" =
 
 
 
-let doc =
-  extract_position_markers {cobol|
+let%expect_test "simple-definition-requests-3" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
@@ -135,12 +136,7 @@ let doc =
         PROCEDURE DIVISION.
             DISPLAY _|1-data-name-in-display|_Y of _|2-data-name-in-display|_X.
             STOP RUN.
-  |cobol}
-;;
-
-let%expect_test "simple-definition-requests-2" =
-  let { end_with_postproc; projdir }, server = make_lsp_project () in
-  print_definitions ~projdir server doc;
+  |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -355,6 +351,91 @@ let%expect_test "definition-requests-filler" =
     ----                  ^
       15           01.
       16             05 T PIC 999. |}]
+
+
+let%expect_test "definition-requests-subscripted-1" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 AA OCCURS 5.
+         02 BB PIC X.
+       77 TMP PIC X.
+       PROCEDURE DIVISION.
+           DISPLAY B_|1-bb|_B (TMP).
+           MOVE _|2-bb|_BB (T_|3-tmp|_MP _|4-nowhere|_)_|5-nowhere|_ TO TMP.
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-bb (line 8, character 20):
+    __rootdir__/prog.cob:6.12-6.14:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          01 AA OCCURS 5.
+       6 >          02 BB PIC X.
+    ----               ^^
+       7          77 TMP PIC X.
+       8          PROCEDURE DIVISION.
+    2-bb (line 9, character 16):
+    __rootdir__/prog.cob:6.12-6.14:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          01 AA OCCURS 5.
+       6 >          02 BB PIC X.
+    ----               ^^
+       7          77 TMP PIC X.
+       8          PROCEDURE DIVISION.
+    3-tmp (line 9, character 21):
+    __rootdir__/prog.cob:7.10-7.13:
+       4          WORKING-STORAGE SECTION.
+       5          01 AA OCCURS 5.
+       6            02 BB PIC X.
+       7 >        77 TMP PIC X.
+    ----             ^^^
+       8          PROCEDURE DIVISION.
+       9              DISPLAY BB (TMP).
+    4-nowhere (line 9, character 24):
+    No definition found
+    5-nowhere (line 9, character 25):
+    No definition found |}]
+
+
+let%expect_test "definition-requests-refmod" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_definitions ~projdir server @@ extract_position_markers {cobol|
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 BB OCCURS 5 PIC 9.
+       77 TMP PIC X.
+       PROCEDURE DIVISION.
+           DISPLAY B_|1-bb|_B (TMP_|2-tmp|_:_|3-nowhere|_).
+  |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-bb (line 7, character 20):
+    __rootdir__/prog.cob:5.10-5.12:
+       2          PROGRAM-ID. prog.
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5 >        01 BB OCCURS 5 PIC 9.
+    ----             ^^
+       6          77 TMP PIC X.
+       7          PROCEDURE DIVISION.
+    2-tmp (line 7, character 26):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          DATA DIVISION.
+       4          WORKING-STORAGE SECTION.
+       5          01 BB OCCURS 5 PIC 9.
+       6 >        77 TMP PIC X.
+    ----             ^^^
+       7          PROCEDURE DIVISION.
+       8              DISPLAY BB (TMP:).
+    3-nowhere (line 7, character 27):
+    No definition found |}]
 
 
 let%expect_test "definition-requests-goto-section" =

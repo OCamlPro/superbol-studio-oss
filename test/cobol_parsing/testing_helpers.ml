@@ -24,7 +24,7 @@ module Make (Tags: TAGS) = struct
     let name n : qualname = Name (n &@ Tags.loc)
     let qual n qn: qualname = Qual (n &@ Tags.loc, qn)
     let qualident x : qualident =
-      { ident_name = name x; ident_subscripts = [] }
+      { ident_name = name x &@ Tags.loc; ident_subscripts = [] }
     let ident x : ident_or_literal = QualIdent (qualident x)
     let strlit str : ident_or_literal =
       Alphanum { str; quotation = Double_quote; hexadecimal = false }

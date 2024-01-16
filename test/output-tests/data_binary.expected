@@ -58,12 +58,12 @@ data_binary.at-41-dump.c:12.6-12.7:
   13   }
 >> Error: Unexpected indicator: `r'
 
-data_binary.at-41-dump.c:5.7-5.14:
+data_binary.at-41-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax
@@ -128,12 +128,12 @@ data_binary.at-411-dump.c:12.6-12.7:
   13   }
 >> Error: Unexpected indicator: `r'
 
-data_binary.at-411-dump.c:5.7-5.14:
+data_binary.at-411-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax
@@ -198,12 +198,12 @@ data_binary.at-781-dump.c:12.6-12.7:
   13   }
 >> Error: Unexpected indicator: `r'
 
-data_binary.at-781-dump.c:5.7-5.14:
+data_binary.at-781-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax

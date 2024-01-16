@@ -178,16 +178,6 @@ let element_at_position ~uri pos group : element_at_position =
       Visitor.do_children @@
       on_data_item ~full_qn:~&(~&ren.renaming_name) ~@ren acc
 
-    method! fold_qualname' qn acc =
-      (* For now, we know those are found in Cobol_data.Types only (or
-         procedure_name but we skip those thanks to [fold_procedure_name]
-         below).
-
-         TODO: use a new type named data_reference or dataref in Cobol_data, and
-         override [fold_dataref'] instead *)
-      Visitor.skip_children @@
-      on_data_full_name ~&qn acc
-
     method! fold_qualname qn acc =
       let qn = qualname_at_pos ~filename qn pos in
       Visitor.skip_children @@ match acc.context with

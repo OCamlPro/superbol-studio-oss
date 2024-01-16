@@ -183,12 +183,12 @@ run_misc.at-739-dump.c:9.6-9.7:
   10   }
 >> Error: Unexpected indicator: `r'
 
-run_misc.at-739-dump.c:5.7-5.14:
+run_misc.at-739-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax
@@ -518,12 +518,12 @@ run_misc.at-1659-dump.c:9.6-9.7:
   10   }
 >> Error: Unexpected indicator: `r'
 
-run_misc.at-1659-dump.c:5.7-5.14:
+run_misc.at-1659-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (int *p)
    7   {
 >> Error: Invalid syntax
@@ -2128,12 +2128,12 @@ run_misc.at-4808-cprog.c:14.6-14.7:
   15   }
 >> Error: Unexpected indicator: `u'
 
-run_misc.at-4808-cprog.c:5.7-5.14:
+run_misc.at-4808-cprog.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   cprog (void *cb)
    7   {
 >> Error: Invalid syntax
@@ -2319,12 +2319,12 @@ run_misc.at-4884-cprog.c:14.6-14.7:
   15   }
 >> Error: Unexpected indicator: `u'
 
-run_misc.at-4884-cprog.c:5.7-5.14:
+run_misc.at-4884-cprog.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   cprog (void *cb)
    7   {
 >> Error: Invalid syntax
@@ -2729,12 +2729,12 @@ run_misc.at-5072-callee.c:7.13-14.0:
 ----  ^^
 >> Error: Unterminated pseudotext
 
-run_misc.at-5072-callee.c:5.7-5.12:
+run_misc.at-5072-callee.c:5.7-5.8:
    2   #include <string.h>
    3   
    4   int
    5 > callee (char *p1, char *p2)
-----          ^^^^^
+----          ^
    6   {
    7      if (p1[0] == 'A') {
 >> Error: Invalid syntax
@@ -3852,12 +3852,12 @@ run_misc.at-7487-cmod.c:12.6-12.7:
   13   }
 >> Error: Unexpected indicator: `r'
 
-run_misc.at-7487-cmod.c:5.7-5.14:
+run_misc.at-7487-cmod.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax
@@ -6741,10 +6741,10 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12574:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12666:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12742:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12832:0
-run_misc.at-12832-prog.cob:2.7-2.11:
+run_misc.at-12832-prog.cob:2.7-2.8:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^^^^
+----          ^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Error: Invalid syntax
@@ -6789,12 +6789,12 @@ run_misc.at-12832-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-run_misc.at-12832-prog.cob:10.7-10.11:
+run_misc.at-12832-prog.cob:10.7-10.8:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^^^^
+----          ^
   11         *
   12          PROCEDURE DIVISION.
 >> Error: Invalid syntax
@@ -7980,12 +7980,12 @@ run_misc.at-13228-reference:1.8-1.12:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13389:0
-run_misc.at-13389-prog.cob:15.34:
+run_misc.at-13389-prog.cob:15.32:
   12          PROCEDURE DIVISION.
   13          CND-000.
   14              DISPLAY "--- FLOAT-DECIMAL-34 ---"
   15 >            COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   16              DISPLAY "A: " FD34
   17   
 >> Hint: Missing ) ) ) .
@@ -8020,12 +8020,12 @@ run_misc.at-13389-prog.cob:15.35-15.36:
   17   
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:15.43:
+run_misc.at-13389-prog.cob:15.42:
   12          PROCEDURE DIVISION.
   13          CND-000.
   14              DISPLAY "--- FLOAT-DECIMAL-34 ---"
   15 >            COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   16              DISPLAY "A: " FD34
   17   
 >> Hint: Missing .
@@ -8040,12 +8040,12 @@ run_misc.at-13389-prog.cob:15.42-15.43:
   17   
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:15.52:
+run_misc.at-13389-prog.cob:15.51:
   12          PROCEDURE DIVISION.
   13          CND-000.
   14              DISPLAY "--- FLOAT-DECIMAL-34 ---"
   15 >            COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   16              DISPLAY "A: " FD34
   17   
 >> Hint: Missing .
@@ -8080,12 +8080,12 @@ run_misc.at-13389-prog.cob:16.11-16.18:
   18              COMPUTE FD34 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:18.34:
+run_misc.at-13389-prog.cob:18.32:
   15              COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   16              DISPLAY "A: " FD34
   17   
   18 >            COMPUTE FD34 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   19              DISPLAY "B: " FD34
   20              MOVE ZERO TO FD34.
 >> Hint: Missing ) ) ) .
@@ -8120,12 +8120,12 @@ run_misc.at-13389-prog.cob:18.35-18.36:
   20              MOVE ZERO TO FD34.
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:18.43:
+run_misc.at-13389-prog.cob:18.42:
   15              COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   16              DISPLAY "A: " FD34
   17   
   18 >            COMPUTE FD34 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   19              DISPLAY "B: " FD34
   20              MOVE ZERO TO FD34.
 >> Hint: Missing .
@@ -8140,12 +8140,12 @@ run_misc.at-13389-prog.cob:18.42-18.43:
   20              MOVE ZERO TO FD34.
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:18.52:
+run_misc.at-13389-prog.cob:18.51:
   15              COMPUTE FD34 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   16              DISPLAY "A: " FD34
   17   
   18 >            COMPUTE FD34 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   19              DISPLAY "B: " FD34
   20              MOVE ZERO TO FD34.
 >> Hint: Missing .
@@ -8180,12 +8180,12 @@ run_misc.at-13389-prog.cob:19.11-19.18:
   21              COMPUTE FD34 = 1.0E3 / 2.1E0
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:21.31:
+run_misc.at-13389-prog.cob:21.29:
   18              COMPUTE FD34 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
   19              DISPLAY "B: " FD34
   20              MOVE ZERO TO FD34.
   21 >            COMPUTE FD34 = 1.0E3 / 2.1E0
-----                                  ^
+----                                ^
   22                      ON SIZE ERROR DISPLAY "Z: " FD34 " SIZE ERROR"
   23                  NOT ON SIZE ERROR DISPLAY "Z: " FD34 " IS OK"
 >> Hint: Missing .
@@ -8260,12 +8260,12 @@ run_misc.at-13389-prog.cob:24.11-24.22:
   26              DISPLAY "    ..."
 >> Error: Invalid syntax
 
-run_misc.at-13389-prog.cob:28.34:
+run_misc.at-13389-prog.cob:28.32:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- FLOAT-DECIMAL-16 ---"
   28 >            COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   29              DISPLAY "A: " FD16
   30   
 >> Hint: Missing ) ) ) .
@@ -8300,12 +8300,12 @@ run_misc.at-13389-prog.cob:28.35-28.36:
   30   
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:28.43:
+run_misc.at-13389-prog.cob:28.42:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- FLOAT-DECIMAL-16 ---"
   28 >            COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   29              DISPLAY "A: " FD16
   30   
 >> Hint: Missing .
@@ -8320,12 +8320,12 @@ run_misc.at-13389-prog.cob:28.42-28.43:
   30   
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:28.52:
+run_misc.at-13389-prog.cob:28.51:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- FLOAT-DECIMAL-16 ---"
   28 >            COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   29              DISPLAY "A: " FD16
   30   
 >> Hint: Missing .
@@ -8360,12 +8360,12 @@ run_misc.at-13389-prog.cob:29.11-29.18:
   31              COMPUTE FD16 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:31.34:
+run_misc.at-13389-prog.cob:31.32:
   28              COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   29              DISPLAY "A: " FD16
   30   
   31 >            COMPUTE FD16 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   32              DISPLAY "B: " FD16
   33              MOVE ZERO TO FD16.
 >> Hint: Missing ) ) ) .
@@ -8400,12 +8400,12 @@ run_misc.at-13389-prog.cob:31.35-31.36:
   33              MOVE ZERO TO FD16.
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:31.43:
+run_misc.at-13389-prog.cob:31.42:
   28              COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   29              DISPLAY "A: " FD16
   30   
   31 >            COMPUTE FD16 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   32              DISPLAY "B: " FD16
   33              MOVE ZERO TO FD16.
 >> Hint: Missing .
@@ -8420,12 +8420,12 @@ run_misc.at-13389-prog.cob:31.42-31.43:
   33              MOVE ZERO TO FD16.
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:31.52:
+run_misc.at-13389-prog.cob:31.51:
   28              COMPUTE FD16 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   29              DISPLAY "A: " FD16
   30   
   31 >            COMPUTE FD16 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   32              DISPLAY "B: " FD16
   33              MOVE ZERO TO FD16.
 >> Hint: Missing .
@@ -8460,12 +8460,12 @@ run_misc.at-13389-prog.cob:32.11-32.18:
   34              COMPUTE FD16 = 1.0E3 / 2.1E0
 >> Warning: Invalid syntax
 
-run_misc.at-13389-prog.cob:34.31:
+run_misc.at-13389-prog.cob:34.29:
   31              COMPUTE FD16 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
   32              DISPLAY "B: " FD16
   33              MOVE ZERO TO FD16.
   34 >            COMPUTE FD16 = 1.0E3 / 2.1E0
-----                                  ^
+----                                ^
   35                      ON SIZE ERROR DISPLAY "Z: " FD16 " SIZE ERROR"
   36                  NOT ON SIZE ERROR DISPLAY "Z: " FD16 " IS OK"
 >> Hint: Missing .
@@ -8541,12 +8541,12 @@ run_misc.at-13389-prog.cob:37.11-37.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13590:0
-run_misc.at-13590-prog.cob:16.34:
+run_misc.at-13590-prog.cob:16.32:
   13          CND-000.
   14   
   15              DISPLAY "--- COMP-1 ---"
   16 >            COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   17              DISPLAY "A: " CMP1
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Hint: Missing ) ) ) .
@@ -8581,12 +8581,12 @@ run_misc.at-13590-prog.cob:16.35-16.36:
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:16.43:
+run_misc.at-13590-prog.cob:16.42:
   13          CND-000.
   14   
   15              DISPLAY "--- COMP-1 ---"
   16 >            COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   17              DISPLAY "A: " CMP1
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Hint: Missing .
@@ -8601,12 +8601,12 @@ run_misc.at-13590-prog.cob:16.42-16.43:
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:16.52:
+run_misc.at-13590-prog.cob:16.51:
   13          CND-000.
   14   
   15              DISPLAY "--- COMP-1 ---"
   16 >            COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   17              DISPLAY "A: " CMP1
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
 >> Hint: Missing .
@@ -8641,12 +8641,12 @@ run_misc.at-13590-prog.cob:17.11-17.18:
   19              DISPLAY "B: " CMP1
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:18.34:
+run_misc.at-13590-prog.cob:18.32:
   15              DISPLAY "--- COMP-1 ---"
   16              COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   17              DISPLAY "A: " CMP1
   18 >            COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   19              DISPLAY "B: " CMP1
   20              MOVE ZERO TO CMP1.
 >> Hint: Missing ) ) ) .
@@ -8681,12 +8681,12 @@ run_misc.at-13590-prog.cob:18.35-18.36:
   20              MOVE ZERO TO CMP1.
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:18.43:
+run_misc.at-13590-prog.cob:18.42:
   15              DISPLAY "--- COMP-1 ---"
   16              COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   17              DISPLAY "A: " CMP1
   18 >            COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   19              DISPLAY "B: " CMP1
   20              MOVE ZERO TO CMP1.
 >> Hint: Missing .
@@ -8701,12 +8701,12 @@ run_misc.at-13590-prog.cob:18.42-18.43:
   20              MOVE ZERO TO CMP1.
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:18.52:
+run_misc.at-13590-prog.cob:18.51:
   15              DISPLAY "--- COMP-1 ---"
   16              COMPUTE CMP1 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
   17              DISPLAY "A: " CMP1
   18 >            COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   19              DISPLAY "B: " CMP1
   20              MOVE ZERO TO CMP1.
 >> Hint: Missing .
@@ -8741,12 +8741,12 @@ run_misc.at-13590-prog.cob:19.11-19.18:
   21              COMPUTE CMP1 = 1.0E3 / 2.1E0
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:21.31:
+run_misc.at-13590-prog.cob:21.29:
   18              COMPUTE CMP1 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
   19              DISPLAY "B: " CMP1
   20              MOVE ZERO TO CMP1.
   21 >            COMPUTE CMP1 = 1.0E3 / 2.1E0
-----                                  ^
+----                                ^
   22                      ON SIZE ERROR DISPLAY "Z: " CMP1 " SIZE ERROR"
   23                  NOT ON SIZE ERROR DISPLAY "Z: " CMP1 " IS OK"
 >> Hint: Missing .
@@ -8821,12 +8821,12 @@ run_misc.at-13590-prog.cob:24.11-24.22:
   26              DISPLAY "    ..."
 >> Error: Invalid syntax
 
-run_misc.at-13590-prog.cob:28.34:
+run_misc.at-13590-prog.cob:28.32:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- COMP-2 ---"
   28 >            COMPUTE CMP2 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   29         *>   because of possible rounding of intermediates and different
   30         *>   precision depending on math library / version: plain DISPLAY
 >> Hint: Missing ) ) ) .
@@ -8861,12 +8861,12 @@ run_misc.at-13590-prog.cob:28.35-28.36:
   30         *>   precision depending on math library / version: plain DISPLAY
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:28.43:
+run_misc.at-13590-prog.cob:28.42:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- COMP-2 ---"
   28 >            COMPUTE CMP2 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   29         *>   because of possible rounding of intermediates and different
   30         *>   precision depending on math library / version: plain DISPLAY
 >> Hint: Missing .
@@ -8881,12 +8881,12 @@ run_misc.at-13590-prog.cob:28.42-28.43:
   30         *>   precision depending on math library / version: plain DISPLAY
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:28.52:
+run_misc.at-13590-prog.cob:28.51:
   25   
   26              DISPLAY "    ..."
   27              DISPLAY "--- COMP-2 ---"
   28 >            COMPUTE CMP2 = (((1.0E7 / 2.1E0) / 3.1E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   29         *>   because of possible rounding of intermediates and different
   30         *>   precision depending on math library / version: plain DISPLAY
 >> Hint: Missing .
@@ -8921,12 +8921,12 @@ run_misc.at-13590-prog.cob:31.11-31.13:
   33              ELSE
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:36.34:
+run_misc.at-13590-prog.cob:36.32:
   33              ELSE
   34                DISPLAY "A: " CMP2
   35              END-IF
   36 >            COMPUTE CMP2 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                     ^
+----                                   ^
   37              IF CMP2 >= 5305036.7877983 AND <= 5305036.7877985
   38                DISPLAY "B ~ 5305036.787798408"
 >> Hint: Missing ) ) ) .
@@ -8961,12 +8961,12 @@ run_misc.at-13590-prog.cob:36.35-36.36:
   38                DISPLAY "B ~ 5305036.787798408"
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:36.43:
+run_misc.at-13590-prog.cob:36.42:
   33              ELSE
   34                DISPLAY "A: " CMP2
   35              END-IF
   36 >            COMPUTE CMP2 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                              ^
+----                                             ^
   37              IF CMP2 >= 5305036.7877983 AND <= 5305036.7877985
   38                DISPLAY "B ~ 5305036.787798408"
 >> Hint: Missing .
@@ -8981,12 +8981,12 @@ run_misc.at-13590-prog.cob:36.42-36.43:
   38                DISPLAY "B ~ 5305036.787798408"
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:36.52:
+run_misc.at-13590-prog.cob:36.51:
   33              ELSE
   34                DISPLAY "A: " CMP2
   35              END-IF
   36 >            COMPUTE CMP2 = (((1.0E7 / 2.9E0) / 3.9E0) - 5.0E-1) * 6.0E0
-----                                                       ^
+----                                                      ^
   37              IF CMP2 >= 5305036.7877983 AND <= 5305036.7877985
   38                DISPLAY "B ~ 5305036.787798408"
 >> Hint: Missing .
@@ -9021,12 +9021,12 @@ run_misc.at-13590-prog.cob:37.11-37.13:
   39              ELSE
 >> Warning: Invalid syntax
 
-run_misc.at-13590-prog.cob:43.31:
+run_misc.at-13590-prog.cob:43.29:
   40                DISPLAY "B: " CMP2
   41              END-IF
   42              MOVE ZERO TO CMP2.
   43 >            COMPUTE CMP2 = 1.0E3 / 2.1E0
-----                                  ^
+----                                ^
   44                      ON SIZE ERROR DISPLAY "Z: " CMP2 " SIZE ERROR"
   45                  NOT ON SIZE ERROR
 >> Hint: Missing .
@@ -9383,12 +9383,12 @@ run_misc.at-14347-prog.c:21.6-21.7:
   22   }
 >> Error: Unexpected indicator: `r'
 
-run_misc.at-14347-prog.c:5.8-5.19:
+run_misc.at-14347-prog.c:5.8-5.16:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > #define COUNT_OF(x) (sizeof(x)/sizeof(x[0]))
-----           ^^^^^^^^^^^
+----           ^^^^^^^^
    6   
    7   struct verify_t {
 >> Error: Invalid syntax

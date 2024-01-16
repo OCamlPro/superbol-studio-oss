@@ -158,67 +158,64 @@ let token_of_keyword { token_of_keyword; _ } s =
   | { token; enabled = true; reserved = true } -> token
   | _ -> raise Not_found
 
-exception MultiToks of
-    (Grammar_tokens.token * int) list         (* with length, except for last *)
-
-let token lexer =
-  let open Grammar_tokens in
-  let unexpected_decimal_sep w c d e =
-    let head =
-      if w = ""
-      then []
-      else [(if w.[0] <> '-' then DIGITS w else SINTLIT w), String.length w]
-    and tail = [
-      INTERVENING_ c, 1;
-      match e with
-      | None -> DIGITS d, 0
-      | Some e -> FLOATLIT (w, c, d, e), 0
-    ] in
-    raise @@ MultiToks (head @ tail)
+let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
+  let split_loc loc len =
+    Cobol_common.Srcloc.prefix len loc,
+    Cobol_common.Srcloc.trunc_prefix len loc
   in
-  fun lexbuf : token ->
+  let rec aux ~loc acc =
+    let open Grammar_tokens in
+    let start_pos = lexbuf.Lexing.lex_curr_pos in
+    let append x =
+      let xloc, loc = split_loc loc @@ lexbuf.Lexing.lex_curr_pos - start_pos in
+      aux ~loc ((x &@ xloc) :: acc)
+    in
+    let decimal_sep w c d e =
+      let head, head_len, loc =
+        if w = "" then [], 0, loc else
+          let wlen = String.length w in
+          let wloc, loc = split_loc loc wlen in
+          [(if w.[0] <> '-' then DIGITS w else SINTLIT w) &@ wloc], wlen, loc
+      and tail =
+        match e with
+        | None -> DIGITS d
+        | Some e -> FLOATLIT (w, c, d, e)
+      in
+      let sloc, loc = split_loc loc 1 in
+      let tail_len = lexbuf.Lexing.lex_curr_pos - start_pos - 1 - head_len in
+      let tail_loc, loc = split_loc loc tail_len in
+      aux ~loc ([tail &@ tail_loc; INTERVENING_ c &@ sloc] @ head @ acc)
+    in
     match Text_categorizer.token lexbuf with
+    | End ->
+        List.rev acc
     | Digits "88" ->
-        EIGHTY_EIGHT
+        append EIGHTY_EIGHT
     | Digits w ->
-        DIGITS w
+        append (DIGITS w)
     | Numeric (w, None) ->
-        SINTLIT w
+        append (SINTLIT w)
     | Numeric (n, Some (sep, d, None))
       when sep = if lexer.decimal_point_is_comma then ',' else '.' ->
-        FIXEDLIT (n, sep, d)
+        append (FIXEDLIT (n, sep, d))
     | Numeric (n, Some (sep, d, Some e))
       when sep = if lexer.decimal_point_is_comma then ',' else '.' ->
-        FLOATLIT (n, sep, d, e)
+        append (FLOATLIT (n, sep, d, e))
     | Word s ->
-        (try token_of_keyword lexer s with Not_found -> WORD s)
+        append (try token_of_keyword lexer s with Not_found -> WORD s)
     | Punctuation s ->
-        Hashtbl.find token_of_punct s
-    | End ->
-        EOF
+        append (Hashtbl.find token_of_punct s)
     | Numeric (w, Some (c, d, e)) ->
-        unexpected_decimal_sep w c d e
+        decimal_sep w c d e
     | Unexpected c -> (* likely to be a comma; will produce syntax errors
                          otherwise *)
-        INTERVENING_ c
-
-let token_of_string' lexer
-  : string with_loc -> Grammar_tokens.token with_loc =
-  fun t -> token lexer (Lexing.from_string ~&t) &@<- t
+        append (INTERVENING_ c)
+  in
+  aux ~loc []
 
 let tokens lexer
   : Lexing.lexbuf with_loc -> Grammar_tokens.token with_loc list = fun t ->
-  try [ token lexer ~&t &@<- t ]
-  with MultiToks toks ->
-    let rec aux acc loc = function
-      | [] -> acc
-      | [t, _] -> (t &@ loc) :: acc
-      | (t, len) :: (_ :: _ as tl) ->
-          let tloc = Cobol_common.Srcloc.prefix len loc
-          and loc = Cobol_common.Srcloc.trunc_prefix len loc in
-          aux ((t &@ tloc) :: acc) loc tl
-    in
-    List.rev @@ aux [] ~@t toks
+  tokens lexer ~loc:~@t ~&t
 
 let tokens_of_string' lexer
   : string with_loc -> Grammar_tokens.token with_loc list =

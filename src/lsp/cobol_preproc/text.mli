@@ -53,6 +53,7 @@ val alphanum_as_pseudotext :
 
 
 val pp_text: text Pretty.printer
+val pp_text': ?fsep:Pretty.simple -> text Pretty.printer
 val pp_quote: quotation Pretty.printer
 val pp_word: text_word with_loc Pretty.printer
 val pp_pseudotext: pseudotext Pretty.printer

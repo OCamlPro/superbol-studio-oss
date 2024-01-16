@@ -1550,6 +1550,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_io_control_paragraph__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_input_output_section__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_file_control_paragraph__ -> None
+    | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_expression_no_all__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_environment_division__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_data_division__ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_loc_configuration_section__ -> None
@@ -1557,7 +1558,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ro_integer_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_instance_definition_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_file_section_ -> None
-    | MenhirInterpreter.N MenhirInterpreter.N_ro_expression_no_all_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_expands_phrase_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_entry_name_clause_ -> None
     | MenhirInterpreter.N MenhirInterpreter.N_ro_endianness_mode_ -> None
@@ -1787,6 +1787,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_io_control_paragraph__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_input_output_section__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_file_control_paragraph__ -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_option_loc_expression_no_all__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_environment_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_data_division__ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_loc_control_division__ -> raise Not_found
@@ -1797,7 +1798,6 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_option_integer_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_instance_definition_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_file_section_ -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_option_expression_no_all_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_expands_phrase_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_entry_name_clause_ -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_option_endianness_mode_ -> raise Not_found
@@ -4080,7 +4080,7 @@ let recover =
   let r371 = [R 1158] in
   let r372 = [R 845] in
   let r373 = [R 760] in
-  let r374 = R 1369 :: r373 in
+  let r374 = R 1367 :: r373 in
   let r375 = [R 1757] in
   let r376 = S (N N_name) :: r375 in
   let r377 = [R 1752] in
@@ -4173,7 +4173,7 @@ let recover =
   let r464 = [R 627] in
   let r465 = [R 637] in
   let r466 = S (T T_RPAR) :: r465 in
-  let r467 = S (N N_ro_expression_no_all_) :: r466 in
+  let r467 = S (N N_ro_loc_expression_no_all__) :: r466 in
   let r468 = S (T T_COLON) :: r467 in
   let r469 = [R 503] in
   let r470 = [R 100] in
@@ -4187,16 +4187,16 @@ let recover =
   let r478 = [R 505] in
   let r479 = [R 641] in
   let r480 = S (T T_RPAR) :: r479 in
-  let r481 = S (N N_ro_expression_no_all_) :: r480 in
+  let r481 = S (N N_ro_loc_expression_no_all__) :: r480 in
   let r482 = S (T T_COLON) :: r481 in
   let r483 = [R 642] in
   let r484 = S (T T_RPAR) :: r483 in
-  let r485 = S (N N_ro_expression_no_all_) :: r484 in
+  let r485 = S (N N_ro_loc_expression_no_all__) :: r484 in
   let r486 = S (T T_COLON) :: r485 in
   let r487 = [R 1175] in
   let r488 = [R 640] in
   let r489 = S (T T_RPAR) :: r488 in
-  let r490 = S (N N_ro_expression_no_all_) :: r489 in
+  let r490 = S (N N_ro_loc_expression_no_all__) :: r489 in
   let r491 = S (T T_COLON) :: r490 in
   let r492 = [R 728] in
   let r493 = R 1532 :: r492 in
@@ -4212,14 +4212,14 @@ let recover =
   let r503 = [R 515] in
   let r504 = [R 644] in
   let r505 = S (T T_RPAR) :: r504 in
-  let r506 = S (N N_ro_expression_no_all_) :: r505 in
+  let r506 = S (N N_ro_loc_expression_no_all__) :: r505 in
   let r507 = S (T T_COLON) :: r506 in
   let r508 = [R 534] in
   let r509 = [R 518] in
   let r510 = [R 498] in
   let r511 = [R 643] in
   let r512 = S (T T_RPAR) :: r511 in
-  let r513 = S (N N_ro_expression_no_all_) :: r512 in
+  let r513 = S (N N_ro_loc_expression_no_all__) :: r512 in
   let r514 = S (T T_COLON) :: r513 in
   let r515 = [R 517] in
   let r516 = [R 516] in
@@ -4261,18 +4261,18 @@ let recover =
   let r552 = S (T T_RPAR) :: r551 in
   let r553 = [R 636] in
   let r554 = S (T T_RPAR) :: r553 in
-  let r555 = S (N N_ro_expression_no_all_) :: r554 in
+  let r555 = S (N N_ro_loc_expression_no_all__) :: r554 in
   let r556 = S (T T_COLON) :: r555 in
   let r557 = [R 500] in
   let r558 = [R 499] in
   let r559 = [R 628] in
   let r560 = [R 638] in
   let r561 = S (T T_RPAR) :: r560 in
-  let r562 = S (N N_ro_expression_no_all_) :: r561 in
+  let r562 = S (N N_ro_loc_expression_no_all__) :: r561 in
   let r563 = S (T T_COLON) :: r562 in
   let r564 = [R 639] in
   let r565 = S (T T_RPAR) :: r564 in
-  let r566 = S (N N_ro_expression_no_all_) :: r565 in
+  let r566 = S (N N_ro_loc_expression_no_all__) :: r565 in
   let r567 = [R 530] in
   let r568 = [R 531] in
   let r569 = [R 1439] in
@@ -4647,8 +4647,8 @@ let recover =
   let r938 = S (N N_ro_pf___anonymous_34_integer__) :: r937 in
   let r939 = S (N N_ro_pf___anonymous_33_integer__) :: r938 in
   let r940 = Sub (r934) :: r939 in
-  let r941 = [R 1373] in
-  let r942 = [R 1372] in
+  let r941 = [R 1371] in
+  let r942 = [R 1370] in
   let r943 = [R 1481] in
   let r944 = S (N N_integer) :: r943 in
   let r945 = [R 1483] in
@@ -6634,17 +6634,17 @@ let recover =
   | 1150 -> One ([R 1356])
   | 1562 -> One ([R 1358])
   | 487 -> One ([R 1360])
-  | 906 -> One ([R 1362])
-  | 2198 -> One ([R 1364])
-  | 4060 -> One ([R 1366])
-  | 2373 -> One ([R 1368])
-  | 728 -> One ([R 1370])
-  | 1814 -> One (R 1371 :: r940)
-  | 2193 -> One ([R 1375])
-  | 738 -> One ([R 1377])
-  | 4082 -> One ([R 1379])
-  | 3874 -> One ([R 1381])
-  | 3876 -> One ([R 1383])
+  | 2198 -> One ([R 1362])
+  | 4060 -> One ([R 1364])
+  | 2373 -> One ([R 1366])
+  | 728 -> One ([R 1368])
+  | 1814 -> One (R 1369 :: r940)
+  | 2193 -> One ([R 1373])
+  | 738 -> One ([R 1375])
+  | 4082 -> One ([R 1377])
+  | 3874 -> One ([R 1379])
+  | 3876 -> One ([R 1381])
+  | 906 -> One ([R 1383])
   | 733 -> One ([R 1385])
   | 736 -> One ([R 1387])
   | 731 -> One ([R 1389])
@@ -6883,14 +6883,14 @@ let recover =
   | 1148 -> One ([R 1862])
   | 1534 -> One ([R 1863])
   | 486 -> One ([R 1864])
-  | 905 -> One ([R 1865])
-  | 2197 -> One ([R 1866])
-  | 4050 -> One ([R 1867])
-  | 2372 -> One ([R 1868])
-  | 2192 -> One ([R 1869])
-  | 737 -> One ([R 1870])
-  | 3873 -> One ([R 1871])
-  | 3875 -> One ([R 1872])
+  | 2197 -> One ([R 1865])
+  | 4050 -> One ([R 1866])
+  | 2372 -> One ([R 1867])
+  | 2192 -> One ([R 1868])
+  | 737 -> One ([R 1869])
+  | 3873 -> One ([R 1870])
+  | 3875 -> One ([R 1871])
+  | 905 -> One ([R 1872])
   | 732 -> One ([R 1873])
   | 735 -> One ([R 1874])
   | 730 -> One ([R 1875])
@@ -7478,10 +7478,10 @@ let recover =
   | 4024 -> One (S (N N_ro_loc_options_paragraph__) :: r2055)
   | 4052 -> One (S (N N_ro_loc_options_paragraph__) :: r2078)
   | 4062 -> One (S (N N_ro_loc_options_paragraph__) :: r2085)
+  | 1014 -> One (S (N N_ro_loc_expression_no_all__) :: r552)
   | 2241 -> One (S (N N_ro_integer_) :: r1133)
   | 3844 -> One (S (N N_ro_integer_) :: r1957)
   | 4070 -> One (S (N N_ro_instance_definition_) :: r2090)
-  | 1014 -> One (S (N N_ro_expression_no_all_) :: r552)
   | 795 -> One (S (N N_ro_entry_name_clause_) :: r451)
   | 1876 -> One (S (N N_ro_entry_name_clause_) :: r970)
   | 2087 -> One (S (N N_ro_entry_name_clause_) :: r1061)

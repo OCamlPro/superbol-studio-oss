@@ -103,7 +103,15 @@ let pp_token: token Pretty.printer = fun ppf ->
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 
-let pp_tokens = Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
+let pp_tokens =
+  Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
+
+let pp_tokens' ?fsep =
+  Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf t ->
+    Pretty.print ppf "%a@@%a"
+      pp_token t
+      Cobol_common.Srcloc.pp_srcloc_struct ~@t
+  end
 
 (* --- *)
 
@@ -422,7 +430,7 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
     in
     fun w ->
       Cobol_common.Tokenizing.fold_tokens ~tokenizer ~f:prod_tokens w
-        ~until:(function [{ payload = EOF; _ }] -> true | _ -> false)
+        ~until:(function [] | [{ payload = EOF; _ }] -> true | _ -> false)
   and prod_word (acc, ({ diags; _ } as state)) word =
     let t, diags' = tokens_of_word state word in
     let state = { state with diags = DIAGS.Set.union diags diags' } in
@@ -496,9 +504,6 @@ type lexer_update =
   | Disabled of Text_lexer.TokenHandles.t
   | CommaBecomesDecimalPoint
 
-let token_of_string { persist = { lexer; _ }; _ } =
-  Text_lexer.token_of_string' lexer
-
 let tokens_of_string' { persist = { lexer; _ }; _ } =
   Text_lexer.tokens_of_string' lexer
 
@@ -512,10 +517,12 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
     when Text_lexer.TokenHandles.is_empty tokens ->
       Fun.id
   | Enabled _ ->
-      List.map begin fun token -> match ~&token with
+      List.concat_map begin fun token -> match ~&token with
         | WORD_IN_AREA_A w
-        | WORD w -> distinguish_words @@ token_of_string s (w &@<- token)
-        | _ -> token
+        | WORD w ->
+            List.map distinguish_words @@ tokens_of_string' s (w &@<- token)
+        | _ ->
+            [token]
       end
   | Disabled tokens ->
       let keyword_of_token = Hashtbl.find Text_lexer.keyword_of_token in

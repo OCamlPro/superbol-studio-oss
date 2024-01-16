@@ -69,8 +69,15 @@ module FMT = struct
     | Eof ->
         Pretty.string ppf "EOF"
 
-  let pp_text fmt =
-    Pretty.list ~fopen:"@[" ~fsep:"@;" ~fclose:"@]" pp_word fmt
+  let pp_text =
+    Pretty.list ~fopen:"@[" ~fsep:"@;" ~fclose:"@]" pp_word
+
+  let pp_text' ?fsep  =
+    Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf word ->
+      Pretty.print ppf "%a@@%a"
+        pp_word word
+        Cobol_common.Srcloc.pp_srcloc_struct ~@word
+    end
 
 end
 include FMT

@@ -50,12 +50,12 @@ listings.at-80-expected.lst:22.9:
   24   0 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-80-expected.lst:22.10-22.15:
+listings.at-80-expected.lst:22.10-22.11:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----             ^^^^^
+----             ^
   23   
   24   0 warnings in compilation group
 >> Warning: Invalid syntax
@@ -70,12 +70,12 @@ listings.at-80-expected.lst:22.15:
   24   0 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-80-expected.lst:22.25-22.33:
+listings.at-80-expected.lst:22.25-22.29:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                            ^^^^^^^^
+----                            ^^^^
   23   
   24   0 warnings in compilation group
 >> Warning: Invalid syntax
@@ -150,52 +150,52 @@ listings.at-80-expected.lst:22.56:
   24   0 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-80-expected.lst:22.57-22.65:
+listings.at-80-expected.lst:22.57-22.59:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                                                            ^^^^^^^^
+----                                                            ^^
   23   
   24   0 warnings in compilation group
 >> Warning: Invalid syntax
 
-listings.at-80-expected.lst:22.65:
+listings.at-80-expected.lst:22.59:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                                                                    ^
+----                                                              ^
   23   
   24   0 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-80-expected.lst:22.59-22.65:
+listings.at-80-expected.lst:22.59-22.60:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                                                              ^^^^^^
+----                                                              ^
   23   
   24   0 warnings in compilation group
 >> Warning: Invalid syntax
 
-listings.at-80-expected.lst:22.65:
+listings.at-80-expected.lst:22.62:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                                                                    ^
+----                                                                 ^
   23   
   24   0 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-80-expected.lst:22.62-22.65:
+listings.at-80-expected.lst:22.62-22.63:
   19   000015             END-DISPLAY.
   20   000016             STOP RUN.
   21   
   22 > GnuCOBOL V.R.P          prog.cob             DDD MMM dd HH:MM:SS YYYY  Page 0002
-----                                                                 ^^^
+----                                                                 ^
   23   
   24   0 warnings in compilation group
 >> Warning: Invalid syntax
@@ -1130,12 +1130,12 @@ listings.at-2030-expected.lst:22.9:
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:22.10-22.15:
+listings.at-2030-expected.lst:22.10-22.11:
   19   warning: unreachable statement 'DISPLAY'
   20   000015
   21   000016         EX. STOP RUN.
   22 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
-----             ^^^^^
+----             ^
   23   
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
@@ -1160,12 +1160,12 @@ listings.at-2030-expected.lst:22.15:
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:22.25-22.35:
+listings.at-2030-expected.lst:22.25-22.31:
   19   warning: unreachable statement 'DISPLAY'
   20   000015
   21   000016         EX. STOP RUN.
   22 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0002
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   23   
   24   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
@@ -1380,12 +1380,12 @@ listings.at-2030-expected.lst:30.9:
   32   NAME                           DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:30.10-30.15:
+listings.at-2030-expected.lst:30.10-30.11:
   27   
   28   00001 ALPHANUMERIC   01   blah                           X
   29   
   30 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
-----             ^^^^^
+----             ^
   31   
   32   NAME                           DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -1400,12 +1400,12 @@ listings.at-2030-expected.lst:30.15:
   32   NAME                           DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:30.25-30.35:
+listings.at-2030-expected.lst:30.25-30.31:
   27   
   28   00001 ALPHANUMERIC   01   blah                           X
   29   
   30 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0003
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   31   
   32   NAME                           DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -1460,12 +1460,12 @@ listings.at-2030-expected.lst:34.32:
   36   GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:34.39-34.42:
+listings.at-2030-expected.lst:34.39-34.40:
   31   
   32   NAME                           DEFINED                REFERENCES
   33   
   34 > blah                           7       *10      11      14             x3
-----                                          ^^^
+----                                          ^
   35   
   36   GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
 >> Warning: Invalid syntax
@@ -1570,12 +1570,12 @@ listings.at-2030-expected.lst:36.9:
   38   LABEL                          DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:36.10-36.15:
+listings.at-2030-expected.lst:36.10-36.11:
   33   
   34   blah                           7       *10      11      14             x3
   35   
   36 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
-----             ^^^^^
+----             ^
   37   
   38   LABEL                          DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -1590,12 +1590,12 @@ listings.at-2030-expected.lst:36.15:
   38   LABEL                          DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:36.25-36.35:
+listings.at-2030-expected.lst:36.25-36.31:
   33   
   34   blah                           7       *10      11      14             x3
   35   
   36 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0004
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   37   
   38   LABEL                          DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -1770,12 +1770,12 @@ listings.at-2030-expected.lst:42.9:
   44   FUNCTION                       TYPE                   REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:42.10-42.15:
+listings.at-2030-expected.lst:42.10-42.11:
   39   
   40   E prog__1                      10
   41   P EX                           16       12                             x1
   42 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
-----             ^^^^^
+----             ^
   43   
   44   FUNCTION                       TYPE                   REFERENCES
 >> Warning: Invalid syntax
@@ -1800,12 +1800,12 @@ listings.at-2030-expected.lst:42.15:
   44   FUNCTION                       TYPE                   REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:42.25-42.35:
+listings.at-2030-expected.lst:42.25-42.31:
   39   
   40   E prog__1                      10
   41   P EX                           16       12                             x1
   42 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0005
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   43   
   44   FUNCTION                       TYPE                   REFERENCES
 >> Warning: Invalid syntax
@@ -1940,12 +1940,12 @@ listings.at-2030-expected.lst:48.9:
   50   Error/Warning summary:
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:48.10-48.15:
+listings.at-2030-expected.lst:48.10-48.11:
   45   
   46   L prog-2                       EXTERN   11                             x1
   47   
   48 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
-----             ^^^^^
+----             ^
   49   
   50   Error/Warning summary:
 >> Warning: Invalid syntax
@@ -1970,12 +1970,12 @@ listings.at-2030-expected.lst:48.15:
   50   Error/Warning summary:
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:48.25-48.35:
+listings.at-2030-expected.lst:48.25-48.31:
   45   
   46   L prog-2                       EXTERN   11                             x1
   47   
   48 > GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   49   
   50   Error/Warning summary:
 >> Warning: Invalid syntax
@@ -2020,22 +2020,22 @@ listings.at-2030-expected.lst:50.13:
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:50.14-50.22:
+listings.at-2030-expected.lst:50.14-50.21:
   47   
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
   49   
   50 > Error/Warning summary:
-----                 ^^^^^^^^
+----                 ^^^^^^^
   51   
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:50.22:
+listings.at-2030-expected.lst:50.21:
   47   
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
   49   
   50 > Error/Warning summary:
-----                         ^
+----                        ^
   51   
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Hint: Missing .
@@ -2050,32 +2050,32 @@ listings.at-2030-expected.lst:50.21-50.22:
   52   prog-1.cob:14: warning: unreachable statement 'DISPLAY'
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:52.14:
+listings.at-2030-expected.lst:52.10:
   49   
   50   Error/Warning summary:
   51   
   52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
-----                 ^
+----             ^
   53   
   54   1 warning in compilation group
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:52.10-52.14:
+listings.at-2030-expected.lst:52.10-52.11:
   49   
   50   Error/Warning summary:
   51   
   52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
-----             ^^^^
+----             ^
   53   
   54   1 warning in compilation group
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:52.14:
+listings.at-2030-expected.lst:52.13:
   49   
   50   Error/Warning summary:
   51   
   52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
-----                 ^
+----                ^
   53   
   54   1 warning in compilation group
 >> Hint: Missing .
@@ -2090,12 +2090,12 @@ listings.at-2030-expected.lst:52.13-52.14:
   54   1 warning in compilation group
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:52.23:
+listings.at-2030-expected.lst:52.22:
   49   
   50   Error/Warning summary:
   51   
   52 > prog-1.cob:14: warning: unreachable statement 'DISPLAY'
-----                          ^
+----                         ^
   53   
   54   1 warning in compilation group
 >> Hint: Missing .
@@ -2270,12 +2270,12 @@ listings.at-2030-expected.lst:56.9:
   58   LINE    PG/LN  A...B............................................................
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:56.10-56.15:
+listings.at-2030-expected.lst:56.10-56.11:
   53   
   54   1 warning in compilation group
   55   0 errors in compilation group
   56 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
-----             ^^^^^
+----             ^
   57   
   58   LINE    PG/LN  A...B............................................................
 >> Warning: Invalid syntax
@@ -2290,12 +2290,12 @@ listings.at-2030-expected.lst:56.15:
   58   LINE    PG/LN  A...B............................................................
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:56.25-56.35:
+listings.at-2030-expected.lst:56.25-56.31:
   53   
   54   1 warning in compilation group
   55   0 errors in compilation group
   56 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   57   
   58   LINE    PG/LN  A...B............................................................
 >> Warning: Invalid syntax
@@ -2310,12 +2310,32 @@ listings.at-2030-expected.lst:56.35:
   58   LINE    PG/LN  A...B............................................................
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:58.8-58.13:
+listings.at-2030-expected.lst:58.8-58.10:
   55   0 errors in compilation group
   56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
   57   
   58 > LINE    PG/LN  A...B............................................................
-----           ^^^^^
+----           ^^
+  59   
+  60   000001
+>> Warning: Invalid syntax
+
+listings.at-2030-expected.lst:58.10:
+  55   0 errors in compilation group
+  56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
+  57   
+  58 > LINE    PG/LN  A...B............................................................
+----             ^
+  59   
+  60   000001
+>> Hint: Missing .
+
+listings.at-2030-expected.lst:58.10-58.11:
+  55   0 errors in compilation group
+  56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
+  57   
+  58 > LINE    PG/LN  A...B............................................................
+----             ^
   59   
   60   000001
 >> Warning: Invalid syntax
@@ -2330,32 +2350,12 @@ listings.at-2030-expected.lst:58.13:
   60   000001
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:58.10-58.13:
+listings.at-2030-expected.lst:58.15-58.16:
   55   0 errors in compilation group
   56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
   57   
   58 > LINE    PG/LN  A...B............................................................
-----             ^^^
-  59   
-  60   000001
->> Warning: Invalid syntax
-
-listings.at-2030-expected.lst:58.13:
-  55   0 errors in compilation group
-  56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
-  57   
-  58 > LINE    PG/LN  A...B............................................................
-----                ^
-  59   
-  60   000001
->> Hint: Missing .
-
-listings.at-2030-expected.lst:58.15-58.71:
-  55   0 errors in compilation group
-  56   GnuCOBOL V.R.P          prog-2.cob                                      Page 0001
-  57   
-  58 > LINE    PG/LN  A...B............................................................
-----                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                  ^
   59   
   60   000001
 >> Warning: Invalid syntax
@@ -2440,12 +2440,12 @@ listings.at-2030-expected.lst:80.9:
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:80.10-80.15:
+listings.at-2030-expected.lst:80.10-80.11:
   77   000017
   78   000018         EX. STOP RUN.
   79   000019
   80 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
-----             ^^^^^
+----             ^
   81   
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
@@ -2470,12 +2470,12 @@ listings.at-2030-expected.lst:80.15:
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:80.25-80.35:
+listings.at-2030-expected.lst:80.25-80.31:
   77   000017
   78   000018         EX. STOP RUN.
   79   000019
   80 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0002
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   81   
   82   SIZE  TYPE           LVL  NAME                           PICTURE
 >> Warning: Invalid syntax
@@ -2810,12 +2810,12 @@ listings.at-2030-expected.lst:92.9:
   94   NAME                           DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:92.10-92.15:
+listings.at-2030-expected.lst:92.10-92.11:
   89   
   90   00001 ALPHANUMERIC   01   stuff                          X
   91   
   92 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
-----             ^^^^^
+----             ^
   93   
   94   NAME                           DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -2830,12 +2830,12 @@ listings.at-2030-expected.lst:92.15:
   94   NAME                           DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:92.25-92.35:
+listings.at-2030-expected.lst:92.25-92.31:
   89   
   90   00001 ALPHANUMERIC   01   stuff                          X
   91   
   92 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0003
-----                            ^^^^^^^^^^
+----                            ^^^^^^
   93   
   94   NAME                           DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -2890,12 +2890,12 @@ listings.at-2030-expected.lst:96.32:
   98   stuff                          9       *10      12     *16             x3
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:96.39-96.42:
+listings.at-2030-expected.lst:96.39-96.40:
   93   
   94   NAME                           DEFINED                REFERENCES
   95   
   96 > data-b                         7       *12      13                     x2
-----                                          ^^^
+----                                          ^
   97   
   98   stuff                          9       *10      12     *16             x3
 >> Warning: Invalid syntax
@@ -2970,12 +2970,12 @@ listings.at-2030-expected.lst:98.32:
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:98.39-98.42:
+listings.at-2030-expected.lst:98.39-98.40:
   95   
   96   data-b                         7       *12      13                     x2
   97   
   98 > stuff                          9       *10      12     *16             x3
-----                                          ^^^
+----                                          ^
   99   
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Warning: Invalid syntax
@@ -3010,12 +3010,12 @@ listings.at-2030-expected.lst:98.50:
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:98.55-98.58:
+listings.at-2030-expected.lst:98.55-98.56:
   95   
   96   data-b                         7       *12      13                     x2
   97   
   98 > stuff                          9       *10      12     *16             x3
-----                                                          ^^^
+----                                                          ^
   99   
  100   GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
 >> Warning: Invalid syntax
@@ -3080,12 +3080,12 @@ listings.at-2030-expected.lst:100.9:
  102   LABEL                          DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:100.10-100.15:
+listings.at-2030-expected.lst:100.10-100.11:
   97   
   98   stuff                          9       *10      12     *16             x3
   99   
  100 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
-----             ^^^^^
+----             ^
  101   
  102   LABEL                          DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -3100,12 +3100,12 @@ listings.at-2030-expected.lst:100.15:
  102   LABEL                          DEFINED                REFERENCES
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:100.25-100.35:
+listings.at-2030-expected.lst:100.25-100.31:
   97   
   98   stuff                          9       *10      12     *16             x3
   99   
  100 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0004
-----                            ^^^^^^^^^^
+----                            ^^^^^^
  101   
  102   LABEL                          DEFINED                REFERENCES
 >> Warning: Invalid syntax
@@ -3320,12 +3320,12 @@ listings.at-2030-expected.lst:108.9:
  110   Error/Warning summary:
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:108.10-108.15:
+listings.at-2030-expected.lst:108.10-108.11:
  105   P MAIN                         11     not referenced
  106   P EX                           18       14                             x1
  107   
  108 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
-----             ^^^^^
+----             ^
  109   
  110   Error/Warning summary:
 >> Warning: Invalid syntax
@@ -3350,12 +3350,12 @@ listings.at-2030-expected.lst:108.15:
  110   Error/Warning summary:
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:108.25-108.35:
+listings.at-2030-expected.lst:108.25-108.31:
  105   P MAIN                         11     not referenced
  106   P EX                           18       14                             x1
  107   
  108 > GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
-----                            ^^^^^^^^^^
+----                            ^^^^^^
  109   
  110   Error/Warning summary:
 >> Warning: Invalid syntax
@@ -3400,22 +3400,22 @@ listings.at-2030-expected.lst:110.13:
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:110.14-110.22:
+listings.at-2030-expected.lst:110.14-110.21:
  107   
  108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
  109   
  110 > Error/Warning summary:
-----                 ^^^^^^^^
+----                 ^^^^^^^
  111   
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:110.22:
+listings.at-2030-expected.lst:110.21:
  107   
  108   GnuCOBOL V.R.P          prog-2.cob                                      Page 0005
  109   
  110 > Error/Warning summary:
-----                         ^
+----                        ^
  111   
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Hint: Missing .
@@ -3430,32 +3430,32 @@ listings.at-2030-expected.lst:110.21-110.22:
  112   prog-2.cob:16: warning: unreachable statement 'ACCEPT'
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:112.14:
+listings.at-2030-expected.lst:112.10:
  109   
  110   Error/Warning summary:
  111   
  112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
-----                 ^
+----             ^
  113   
  114   2 warnings in compilation group
 >> Hint: Missing .
 
-listings.at-2030-expected.lst:112.10-112.14:
+listings.at-2030-expected.lst:112.10-112.11:
  109   
  110   Error/Warning summary:
  111   
  112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
-----             ^^^^
+----             ^
  113   
  114   2 warnings in compilation group
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:112.14:
+listings.at-2030-expected.lst:112.13:
  109   
  110   Error/Warning summary:
  111   
  112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
-----                 ^
+----                ^
  113   
  114   2 warnings in compilation group
 >> Hint: Missing .
@@ -3470,12 +3470,12 @@ listings.at-2030-expected.lst:112.13-112.14:
  114   2 warnings in compilation group
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:112.23:
+listings.at-2030-expected.lst:112.22:
  109   
  110   Error/Warning summary:
  111   
  112 > prog-2.cob:16: warning: unreachable statement 'ACCEPT'
-----                          ^
+----                         ^
  113   
  114   2 warnings in compilation group
 >> Hint: Missing .
@@ -4115,12 +4115,12 @@ listings.at-3684-expected.lst:13.15-13.17:
   15   000010         01  too-long-pic2 PIC XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:14.14-14.48:
+listings.at-3684-expected.lst:14.14-14.15:
   11   000007         01  empty-pic PIC.
   12   error: missing PICTURE string
   13   000008         01  too-long-pic PIC XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   14 > 000009        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.
-----                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                 ^
   15   000010         01  too-long-pic2 PIC XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   16   error: PICTURE string may not contain more than 255 characters; contains 301
 >> Error: Invalid syntax
@@ -4165,12 +4165,12 @@ listings.at-3684-expected.lst:18.72:
   20   000013        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 >> Hint: Missing RENAMES
 
-listings.at-3684-expected.lst:19.14-19.72:
+listings.at-3684-expected.lst:19.14-19.15:
   16   error: PICTURE string may not contain more than 255 characters; contains 301
   17        + characters
   18   000011        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   19 > 000012        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-----                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                 ^
   20   000013        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   21   000014        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.
 >> Error: Invalid syntax
@@ -4185,12 +4185,12 @@ listings.at-3684-expected.lst:19.72:
   21   000014        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.
 >> Hint: Missing .
 
-listings.at-3684-expected.lst:20.14-20.72:
+listings.at-3684-expected.lst:20.14-20.15:
   17        + characters
   18   000011        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   19   000012        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   20 > 000013        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-----                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                 ^
   21   000014        -XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.
   22   000015         01  multiple-symbols.
 >> Warning: Invalid syntax
@@ -4545,12 +4545,12 @@ listings.at-3684-expected.lst:87.45-87.47:
   89        + which is before the decimal point
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:88.17-88.20:
+listings.at-3684-expected.lst:88.17-88.18:
   85   error: A or X cannot follow S
   86   000045             03  PIC $$$B+++B---.
   87   error: a leading +/- sign cannot follow B, 0 or /
   88 > error: a leading +/- sign cannot follow a floating currency symbol string
-----                    ^^^
+----                    ^
   89        + which is before the decimal point
   90   error: a leading +/- sign may only occur once in a PICTURE string
 >> Error: Invalid syntax
@@ -4575,12 +4575,12 @@ listings.at-3684-expected.lst:89.16-89.22:
   91   error: a trailing +/- sign cannot follow a leading +/- sign
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:90.17-90.20:
+listings.at-3684-expected.lst:90.17-90.18:
   87   error: a leading +/- sign cannot follow B, 0 or /
   88   error: a leading +/- sign cannot follow a floating currency symbol string
   89        + which is before the decimal point
   90 > error: a leading +/- sign may only occur once in a PICTURE string
-----                    ^^^
+----                    ^
   91   error: a trailing +/- sign cannot follow a leading +/- sign
   92   error: a trailing +/- sign may only occur once in a PICTURE string
 >> Error: Invalid syntax
@@ -4615,12 +4615,12 @@ listings.at-3684-expected.lst:91.7-91.8:
   93   000046             03  PIC +++9+.
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:91.18-91.21:
+listings.at-3684-expected.lst:91.18-91.19:
   88   error: a leading +/- sign cannot follow a floating currency symbol string
   89        + which is before the decimal point
   90   error: a leading +/- sign may only occur once in a PICTURE string
   91 > error: a trailing +/- sign cannot follow a leading +/- sign
-----                     ^^^
+----                     ^
   92   error: a trailing +/- sign may only occur once in a PICTURE string
   93   000046             03  PIC +++9+.
 >> Error: Invalid syntax
@@ -4635,12 +4635,12 @@ listings.at-3684-expected.lst:91.27-91.33:
   93   000046             03  PIC +++9+.
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:91.51-91.54:
+listings.at-3684-expected.lst:91.51-91.52:
   88   error: a leading +/- sign cannot follow a floating currency symbol string
   89        + which is before the decimal point
   90   error: a leading +/- sign may only occur once in a PICTURE string
   91 > error: a trailing +/- sign cannot follow a leading +/- sign
-----                                                      ^^^
+----                                                      ^
   92   error: a trailing +/- sign may only occur once in a PICTURE string
   93   000046             03  PIC +++9+.
 >> Error: Invalid syntax
@@ -4655,12 +4655,12 @@ listings.at-3684-expected.lst:92.7-92.8:
   94   error: a trailing +/- sign cannot follow a floating +/- string which is before
 >> Error: Invalid syntax
 
-listings.at-3684-expected.lst:92.18-92.21:
+listings.at-3684-expected.lst:92.18-92.19:
   89        + which is before the decimal point
   90   error: a leading +/- sign may only occur once in a PICTURE string
   91   error: a trailing +/- sign cannot follow a leading +/- sign
   92 > error: a trailing +/- sign may only occur once in a PICTURE string
-----                     ^^^
+----                     ^
   93   000046             03  PIC +++9+.
   94   error: a trailing +/- sign cannot follow a floating +/- string which is before
 >> Error: Invalid syntax
@@ -6503,9 +6503,9 @@ listings.at-3684-expected.lst:120.19-120.21:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3703:0
-listings.at-3703-prog.cob:1.7-1.11:
+listings.at-3703-prog.cob:1.7-1.8:
    1 > 000001 $SET SOURCEFORMAT "VARIABLE"
-----          ^^^^
+----          ^
    2   000010 IDENTIFICATION DIVISION.
    3   000020 PROGRAM-ID. prog.
 >> Error: Invalid syntax

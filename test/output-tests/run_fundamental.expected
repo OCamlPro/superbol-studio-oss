@@ -60,12 +60,12 @@ run_fundamental.at-137-dump.c:11.6-11.7:
   12   }
 >> Error: Unexpected indicator: `r'
 
-run_fundamental.at-137-dump.c:5.7-5.14:
+run_fundamental.at-137-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (unsigned char *data)
    7   {
 >> Error: Invalid syntax
@@ -124,12 +124,12 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1129:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1174:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1223:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1306:0
-run_fundamental.at-1306-prog.cob:64.47-64.56:
+run_fundamental.at-1306-prog.cob:64.47-64.55:
   61              DISPLAY 'in prog3'
   62              END-DISPLAY
   63              IF GLOB-PATH NOT = SPACES
   64 >               DISPLAY FUNCTION TRIM (GLOB-PATH TRAILING)
-----                                                  ^^^^^^^^^
+----                                                  ^^^^^^^^
   65                 END-DISPLAY
   66              END-IF
 >> Error: Invalid syntax
@@ -265,12 +265,12 @@ run_fundamental.at-1390-prog.cob:29.7-29.20:
   31              DECIMAL-POINT IS COMMA.
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:45.20:
+run_fundamental.at-1390-prog.cob:45.19:
   42          77  curr  PIC 9.9999,99Y.
   43   
   44          PROCEDURE DIVISION.
   45 >            MOVE f1()   TO n1
-----                       ^
+----                      ^
   46              IF n1 NOT = 1
   47                DISPLAY "ERROR 1" GOBACK
 >> Hint: Missing <subscript>
@@ -285,12 +285,12 @@ run_fundamental.at-1390-prog.cob:45.19-45.20:
   47                DISPLAY "ERROR 1" GOBACK
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:53.20:
+run_fundamental.at-1390-prog.cob:53.19:
   50              IF n1 NOT = 2
   51                DISPLAY "ERROR 2" GOBACK
   52              END-IF
   53 >            MOVE f1()   TO n1
-----                       ^
+----                      ^
   54              IF n1 NOT = 1
   55                DISPLAY "ERROR 1 2nd" GOBACK
 >> Hint: Missing <subscript>
@@ -409,12 +409,12 @@ run_fundamental.at-1558-module.c:8.6-8.7:
    9   }
 >> Error: Unexpected indicator: `r'
 
-run_fundamental.at-1558-module.c:5.7-5.14:
+run_fundamental.at-1558-module.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   some (void)
    7   {
 >> Error: Invalid syntax
@@ -676,12 +676,12 @@ run_fundamental.at-4171-dump.c:9.6-9.7:
   10   }
 >> Error: Unexpected indicator: `r'
 
-run_fundamental.at-4171-dump.c:5.7-5.14:
+run_fundamental.at-4171-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
    5 > COB_EXT_EXPORT int
-----          ^^^^^^^
+----          ^
    6   dump (char *p)
    7   {
 >> Error: Invalid syntax

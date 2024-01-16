@@ -28,7 +28,8 @@ let preproc
         source_format
       }
 
-let show_parsed_tokens ?(verbose = false) ?source_format ?filename contents =
+let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
+    ?source_format ?filename contents =
   let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
     Cobol_parser.parse_with_artifacts
@@ -38,7 +39,9 @@ let show_parsed_tokens ?(verbose = false) ?source_format ?filename contents =
           recovery = EnableRecovery { silence_benign_recoveries = true };
         }
   in
-  Cobol_parser.INTERNAL.pp_tokens Fmt.stdout (Lazy.force tokens)
+  (if with_locations
+   then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
+   else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
 
 let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>

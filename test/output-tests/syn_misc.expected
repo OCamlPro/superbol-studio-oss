@@ -2928,10 +2928,10 @@ syn_misc.at-5830-prog.cob:6.26-6.29:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5857:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5874:0
-syn_misc.at-5874-valid.cob:2.7-2.15:
+syn_misc.at-5874-valid.cob:2.7-2.8:
    1   
    2 > 000100 @OPTIONS NOMAIN,APOST
-----          ^^^^^^^^
+----          ^
    3   000200 @OPTIONS APOST
    4   000300 IDENTIFICATION  DIVISION.
 >> Error: Invalid syntax
@@ -2946,11 +2946,11 @@ syn_misc.at-5963-valid.cob:2.7-2.14:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5999:0
-syn_misc.at-5999-valid.cob:3.8-3.16:
+syn_misc.at-5999-valid.cob:3.8-3.9:
    1   
    2         *CONTROL LIST
    3 >         *CONTROL SOURCE
-----           ^^^^^^^^
+----           ^
    4         *CBL MAP LIST
    5   000100 *CBL NOMAP NOSOURCE NOLIST
 >> Error: Invalid syntax
@@ -3066,10 +3066,10 @@ syn_misc.at-6845-prog.cob:5.6-5.17:
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6924:0
-syn_misc.at-6924-prog.cob:2.7-2.11:
+syn_misc.at-6924-prog.cob:2.7-2.8:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^^^^
+----          ^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Error: Invalid syntax
@@ -3114,12 +3114,12 @@ syn_misc.at-6924-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-syn_misc.at-6924-prog.cob:10.7-10.11:
+syn_misc.at-6924-prog.cob:10.7-10.8:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^^^^
+----          ^
   11         *
   12         * ensure to test a numeric, too (not actually used):
 >> Error: Invalid syntax
@@ -3874,12 +3874,12 @@ syn_misc.at-7417-prog.cob:46.27:
   48      *>or zero for any one that failed the format (PICTURE) test.
 >> Hint: Missing RENAMES
 
-syn_misc.at-7417-prog.cob:46.28-46.40:
+syn_misc.at-7417-prog.cob:46.28-46.29:
   43               05  IN-WEEK       PIC 99  OCCURS 5
   44                   VARYING IN-WEEK-NO FROM 1, IN-NEXT-WEEK-NO FROM 2
   45                   INVALID WHEN IN-WEEK-NO < 5
   46 >                 AND IN-WEEK (IN-WEEK-NO) > IN-WEEK (IN-NEXT-WEEK-NO)
-----                               ^^^^^^^^^^^^
+----                               ^
   47      *>OUT-WEEK (1) to (5) will hold the values of IN-WEEK (1) to (5),
   48      *>or zero for any one that failed the format (PICTURE) test.
 >> Error: Invalid syntax
@@ -4086,20 +4086,20 @@ syn_misc.at-7918-prog.cob:9.17-9.26:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8018:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8056:0
-syn_misc.at-8056-prog.cob:2.7-2.11:
+syn_misc.at-8056-prog.cob:2.7-2.8:
    1   
    2 >        $SET NO-AREA-CHECK
-----          ^^^^
+----          ^
    3          IDENTIFICATION  DIVISION.
    4          PROGRAM-ID.     prog.
 >> Error: Invalid syntax
 
-syn_misc.at-8056-prog.cob:10.7-10.11:
+syn_misc.at-8056-prog.cob:10.7-10.8:
    7          PROCEDURE       DIVISION.
    8          MAIN-1 SECTION.
    9          DISPLAY "SOMETHING".
   10 >        $SET AREA-CHECK
-----          ^^^^
+----          ^
   11          MAIN-2 SECTION.
   12              CONTINUE.
 >> Error: Invalid syntax
