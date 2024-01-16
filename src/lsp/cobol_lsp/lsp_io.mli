@@ -21,7 +21,7 @@ exception Parse_error of string
 val initialize_channels: unit -> unit
 
 (** [read_message ()] tries to read a json RPC message from the standard input
-    stream. *)
+    stream.  Raises {!End_of_file} upon end of input stream. *)
 val read_message: unit -> Jsonrpc.Packet.t
 
 (** [send_response response] sends out a json RPC response on standard

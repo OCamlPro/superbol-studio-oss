@@ -101,7 +101,10 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
 (** {2 Management of per-project caches} *)
 
 let save_project_caches { config = { cache_config = config; _ }; docs; _ } =
-  Lsp_project_cache.save ~config docs
+  try Lsp_project_cache.save ~config docs
+  with e ->
+    Lsp_error.internal
+      "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
 
 let load_project_cache ~rootdir ({ config = { project_layout = layout;
                                               cache_config = config; _ };

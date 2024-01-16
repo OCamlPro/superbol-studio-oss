@@ -30,6 +30,7 @@ let on_notification state notif =
   | Running registry, TextDocumentDidClose params ->
       Running (Lsp_server.did_close params registry)
   | Running _, Exit ->
+      Lsp_request.shutdown state;
       Exit (Error "Received premature 'exit' notification")
   | _ ->
       state
