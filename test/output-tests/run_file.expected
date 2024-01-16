@@ -1073,12 +1073,12 @@ run_file.at-4000-prog.cob:14.27-14.35:
   16           CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
 >> Error: Invalid syntax
 
-run_file.at-4000-prog.cob:15.49-15.58:
+run_file.at-4000-prog.cob:15.49-15.57:
   12           01 READ-BUFFER  PIC X(10).
   13   
   14           PROCEDURE DIVISION CHAINING FNAME.
   15 >         DISPLAY 'RUN WITH ' FUNCTION TRIM (FNAME TRAILING).
-----                                                    ^^^^^^^^^
+----                                                    ^^^^^^^^
   16           CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
   17           IF RETURN-CODE NOT = 0
 >> Error: Invalid syntax
@@ -1296,9 +1296,9 @@ run_file.at-4390-prog.cob:15.25-15.29:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4429:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4556:0
-run_file.at-4556-inp_data:1.7-1.47:
+run_file.at-4556-inp_data:1.7-1.8:
    1 > Record 1................................X.......
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----          ^
    2   Record 2.....................X
    3   Record 3................................X...
 >> Error: Invalid syntax
@@ -1332,9 +1332,9 @@ run_file.at-4569-reference:1.7-1.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4685:0
-run_file.at-4685-inp_data:1.7-1.47:
+run_file.at-4685-inp_data:1.7-1.8:
    1 > Record 1................................X.......
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----          ^
    2   Record 2.....................X
    3   Record 3................................X...
 >> Error: Invalid syntax
@@ -1399,12 +1399,12 @@ run_file.at-5011-reference-report:42.6-42.7:
   44   000002     88 endofdata        value high-values.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:42.38:
+run_file.at-5011-reference-report:42.37:
   39   
   40   
   41   
   42 > PAGE: 0002                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
   43   000001 01  data-record.
   44   000002     88 endofdata        value high-values.
 >> Hint: Missing RENAMES <qualified name> .
@@ -1449,12 +1449,12 @@ run_file.at-5011-reference-report:62.6-62.7:
   64   000002 01  report-line-blank.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:62.38:
+run_file.at-5011-reference-report:62.37:
   59   
   60   
   61   
   62 > PAGE: 0003                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
   63   000001 01  lc                  pic 99.
   64   000002 01  report-line-blank.
 >> Hint: Missing RENAMES <qualified name> .
@@ -1499,12 +1499,12 @@ run_file.at-5011-reference-report:82.6-82.7:
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:82.38:
+run_file.at-5011-reference-report:82.37:
   79   
   80   
   81   
   82 > PAGE: 0004                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
   83   000001     02 filler           pic x(24).
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Hint: Missing RENAMES <qualified name> .
@@ -1579,22 +1579,22 @@ run_file.at-5011-reference-report:102.10:
  104   000002             stop run
 >> Hint: Missing .
 
-run_file.at-5011-reference-report:102.35-102.38:
+run_file.at-5011-reference-report:102.35-102.37:
   99   
  100   
  101   
  102 > PAGE: 0005                         LC: 000015                       DATE: 150206
-----                                      ^^^
+----                                      ^^
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:102.38:
+run_file.at-5011-reference-report:102.37:
   99   
  100   
  101   
  102 > PAGE: 0005                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Hint: Missing .
@@ -1679,22 +1679,22 @@ run_file.at-5011-reference-report:122.10:
  124   000002         after advancing page
 >> Hint: Missing .
 
-run_file.at-5011-reference-report:122.35-122.38:
+run_file.at-5011-reference-report:122.35-122.37:
  119   
  120   
  121   
  122 > PAGE: 0006                         LC: 000015                       DATE: 150206
-----                                      ^^^
+----                                      ^^
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:122.38:
+run_file.at-5011-reference-report:122.37:
  119   
  120   
  121   
  122 > PAGE: 0006                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Hint: Missing .
@@ -1759,22 +1759,22 @@ run_file.at-5011-reference-report:142.10:
  144   000002 readwrite-loop.
 >> Hint: Missing .
 
-run_file.at-5011-reference-report:142.35-142.38:
+run_file.at-5011-reference-report:142.35-142.37:
  139   
  140   
  141   
  142 > PAGE: 0007                         LC: 000015                       DATE: 150206
-----                                      ^^^
+----                                      ^^
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:142.38:
+run_file.at-5011-reference-report:142.37:
  139   
  140   
  141   
  142 > PAGE: 0007                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Hint: Missing .
@@ -1849,22 +1849,22 @@ run_file.at-5011-reference-report:162.10:
  164   000002     end-read
 >> Hint: Missing .
 
-run_file.at-5011-reference-report:162.35-162.38:
+run_file.at-5011-reference-report:162.35-162.37:
  159   
  160   
  161   
  162 > PAGE: 0008                         LC: 000015                       DATE: 150206
-----                                      ^^^
+----                                      ^^
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:162.38:
+run_file.at-5011-reference-report:162.37:
  159   
  160   
  161   
  162 > PAGE: 0008                         LC: 000015                       DATE: 150206
-----                                         ^
+----                                        ^
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Hint: Missing .
@@ -1940,12 +1940,12 @@ run_file.at-5301-reference-report:42.6-42.7:
   44   000002     88 endofdata        value high-values.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:42.38:
+run_file.at-5301-reference-report:42.37:
   39   
   40   
   41   
   42 > PAGE: 0002                         LC: 000015
-----                                         ^
+----                                        ^
   43   000001 01  data-record.
   44   000002     88 endofdata        value high-values.
 >> Hint: Missing RENAMES <qualified name> .
@@ -1990,12 +1990,12 @@ run_file.at-5301-reference-report:62.6-62.7:
   64   000002 01  report-line-blank.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:62.38:
+run_file.at-5301-reference-report:62.37:
   59   
   60   
   61   
   62 > PAGE: 0003                         LC: 000015
-----                                         ^
+----                                        ^
   63   000001 01  lc                  pic 99.
   64   000002 01  report-line-blank.
 >> Hint: Missing RENAMES <qualified name> .
@@ -2040,12 +2040,12 @@ run_file.at-5301-reference-report:82.6-82.7:
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:82.38:
+run_file.at-5301-reference-report:82.37:
   79   
   80   
   81   
   82 > PAGE: 0004                         LC: 000015
-----                                         ^
+----                                        ^
   83   000001     02 filler           pic x(24).
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Hint: Missing RENAMES <qualified name> .
@@ -2120,22 +2120,22 @@ run_file.at-5301-reference-report:102.10:
  104   000002             stop run
 >> Hint: Missing .
 
-run_file.at-5301-reference-report:102.35-102.38:
+run_file.at-5301-reference-report:102.35-102.37:
   99   
  100   
  101   
  102 > PAGE: 0005                         LC: 000015
-----                                      ^^^
+----                                      ^^
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:102.38:
+run_file.at-5301-reference-report:102.37:
   99   
  100   
  101   
  102 > PAGE: 0005                         LC: 000015
-----                                         ^
+----                                        ^
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Hint: Missing .
@@ -2220,22 +2220,22 @@ run_file.at-5301-reference-report:122.10:
  124   000002         after advancing page
 >> Hint: Missing .
 
-run_file.at-5301-reference-report:122.35-122.38:
+run_file.at-5301-reference-report:122.35-122.37:
  119   
  120   
  121   
  122 > PAGE: 0006                         LC: 000015
-----                                      ^^^
+----                                      ^^
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:122.38:
+run_file.at-5301-reference-report:122.37:
  119   
  120   
  121   
  122 > PAGE: 0006                         LC: 000015
-----                                         ^
+----                                        ^
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Hint: Missing .
@@ -2300,22 +2300,22 @@ run_file.at-5301-reference-report:142.10:
  144   000002 readwrite-loop.
 >> Hint: Missing .
 
-run_file.at-5301-reference-report:142.35-142.38:
+run_file.at-5301-reference-report:142.35-142.37:
  139   
  140   
  141   
  142 > PAGE: 0007                         LC: 000015
-----                                      ^^^
+----                                      ^^
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:142.38:
+run_file.at-5301-reference-report:142.37:
  139   
  140   
  141   
  142 > PAGE: 0007                         LC: 000015
-----                                         ^
+----                                        ^
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Hint: Missing .
@@ -2390,22 +2390,22 @@ run_file.at-5301-reference-report:162.10:
  164   000002     end-read
 >> Hint: Missing .
 
-run_file.at-5301-reference-report:162.35-162.38:
+run_file.at-5301-reference-report:162.35-162.37:
  159   
  160   
  161   
  162 > PAGE: 0008                         LC: 000015
-----                                      ^^^
+----                                      ^^
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:162.38:
+run_file.at-5301-reference-report:162.37:
  159   
  160   
  161   
  162 > PAGE: 0008                         LC: 000015
-----                                         ^
+----                                        ^
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Hint: Missing .

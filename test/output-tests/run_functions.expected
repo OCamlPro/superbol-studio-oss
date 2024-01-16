@@ -450,22 +450,22 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4264:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4288:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4358:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4407:0
-run_functions.at-4407-prog.cob:11.54-11.68:
+run_functions.at-4407-prog.cob:11.54-11.67:
    8   
    9          PROCEDURE DIVISION.
   10              MOVE FUNCTION FORMATTED-DATETIME
   11 >                     ("YYYYDDDThhmmss+hhmm", 1, 45296, SYSTEM-OFFSET)
-----                                                         ^^^^^^^^^^^^^^
+----                                                         ^^^^^^^^^^^^^
   12                  TO str
   13              MOVE FUNCTION TEST-FORMATTED-DATETIME
 >> Error: Invalid syntax
 
-run_functions.at-4407-prog.cob:20.42-20.56:
+run_functions.at-4407-prog.cob:20.42-20.55:
   17              END-IF
   18   
   19              MOVE FUNCTION FORMATTED-TIME
   20 >                     ("hhmmss.ssZ", 45296, SYSTEM-OFFSET)
-----                                             ^^^^^^^^^^^^^^
+----                                             ^^^^^^^^^^^^^
   21                  TO str
   22              MOVE FUNCTION TEST-FORMATTED-DATETIME
 >> Error: Invalid syntax

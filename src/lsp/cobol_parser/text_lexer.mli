@@ -43,25 +43,6 @@ val decimal_point_is_comma: lexer -> lexer
 
 (* --- *)
 
-exception MultiToks of
-    (Grammar_tokens.token * int) list         (* with length, except for last *)
-
-(** [token ~options lexbuf] tokenizes a lexing buffer [lexbuf] into a simple
-    token; may raise {!MultiToks} is the contents of the buffer is tokenized
-    into more than one token. *)
-val token
-  : lexer
-  -> Lexing.lexbuf
-  -> Grammar_tokens.token
-
-(** [token_of_string'] is similar to {!token}, except that it operates on a
-    localized string and returns a token with its location.  May also raise
-    {!MultiToks}. *)
-val token_of_string'
-  : lexer
-  -> string Cobol_common.Srcloc.with_loc
-  -> Grammar_tokens.token Cobol_common.Srcloc.with_loc
-
 (** [tokens ~options lexbuf'] tokenizes a lexing buffer with location [lexbuf']
     into a list of localized tokens. *)
 val tokens

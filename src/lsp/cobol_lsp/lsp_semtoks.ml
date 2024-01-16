@@ -168,7 +168,7 @@ let semtoks_from_ptree ~filename ?range ptree =
   in
   let add_ident (id: Cobol_ptree.ident) toktyp acc =
     match id with
-    | QualIdent {ident_name; _} -> add_qualname ident_name toktyp acc
+    | QualIdent {ident_name; _} -> add_qualname ~&ident_name toktyp acc
     | _ -> acc (* TODO *)
   in
   let add_ident' id = add_ident ~&id in
@@ -377,7 +377,7 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> Visitor.skip_children
 
     method! fold_tallying { tallying_target; tallying_clauses } acc = acc
-      |> add_qualname tallying_target.ident_name VarModif
+      |> add_qualname ~&(tallying_target.ident_name) VarModif
       |> fold_list ~fold:fold_tallying_clause' self tallying_clauses
       |> Visitor.skip_children
 

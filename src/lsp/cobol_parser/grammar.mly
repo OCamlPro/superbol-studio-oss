@@ -2056,8 +2056,8 @@ let qualnames := ~ = rnel(qualname); < >
 let reference == qualname
 
 let refmod ==
- | "("; refmod_left = expression_no_all;
-   ":"; refmod_length = ro(expression_no_all); ")";
+ | "("; refmod_left = loc(expression_no_all);
+   ":"; refmod_length = ro(loc(expression_no_all)); ")";
    { { refmod_left; refmod_length } }
 
 let literal_int_ident :=
@@ -2152,8 +2152,8 @@ let counter_kind ==
  | LINE_COUNTER;   {LineCounter}
 
 let qualident ==
- | qdn = qualname;                  { { ident_name = qdn; ident_subscripts = [] } }
- | qdn = qualname; sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
+ | qdn = loc(qualname);                  { { ident_name = qdn; ident_subscripts = [] } }
+ | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
 
 let function_ident ==
  | FUNCTION; n = function_name; al = arguments; { { call_fun = n; call_args = al } }
@@ -2377,6 +2377,9 @@ let ident_or_integer :=
  | i = integer; { Integer i : ident_or_intlit }
 
 (* ---------- Expressions ---------- *)
+
+(* TODO: rename `expression` into `subscript_expression`, and
+   `expression_no_all` into `expression`. *)
 
 let expression [@recovery Atom (Fig Zero)] [@symbol "<expression>"] [@cost 0] :=
  | e1 = expression; "+"; e2 = expr_term; { Binop (e1, BPlus, e2) }

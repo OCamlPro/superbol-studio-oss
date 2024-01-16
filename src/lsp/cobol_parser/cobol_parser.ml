@@ -38,6 +38,7 @@ module INTERNAL = struct
 
   let pp_token = Text_tokenizer.pp_token
   let pp_tokens = Text_tokenizer.pp_tokens
+  let pp_tokens' = Text_tokenizer.pp_tokens'
 
   (** {2 COBOL grammar} *)
 

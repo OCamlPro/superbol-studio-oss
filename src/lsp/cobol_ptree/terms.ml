@@ -246,7 +246,7 @@ and effective_arg =                  (* TODO: could be an [expression option] *)
 
 and qualident =
   {
-    ident_name: qualname;
+    ident_name: qualname with_loc;
     ident_subscripts: subscript list;
   }
 
@@ -264,8 +264,8 @@ and signz = loose_ sign_cond
 
 and refmod =
   {
-    refmod_left: expression;
-    refmod_length: expression option;
+    refmod_left: expression with_loc;
+    refmod_length: expression with_loc option;
   }
 
 and inline_invocation =
@@ -377,6 +377,7 @@ module COMPARE = struct
           compare_struct (compare_term a b) @@ lazy (compare_term c d)
       | a , b ->
           Stdlib.compare a b
+
   and compare_expression x y = match x, y with
     | Atom a ,Atom b ->
         compare_term a b
@@ -395,6 +396,9 @@ module COMPARE = struct
         -1
     | _, Unop _ ->
         1
+
+  and compare_expression' x y = compare_with_loc compare_expression x y
+
   and compare_binary_relation (x1, r1, y1) (x2, r2, y2) =
     compare_struct (compare_expression x1 x2) @@
     lazy (compare_struct (compare r1 r2) @@ lazy (compare_expression y1 y2))
@@ -474,7 +478,7 @@ module COMPARE = struct
   and compare_qualident
       { ident_name = a; ident_subscripts = c }
       { ident_name = b; ident_subscripts = d } =
-    compare_struct (compare_term a b) @@
+    compare_struct (compare_with_loc compare_term a b) @@
     lazy (List.compare compare_subscript c d)
   and compare_subscript x y = match x,y with
     | SubSExpr a ,SubSExpr b ->
@@ -488,8 +492,8 @@ module COMPARE = struct
   and compare_refmod
       { refmod_left = a; refmod_length = c }
       { refmod_left = b; refmod_length = d } =
-    compare_struct (compare_expression a b) @@
-    lazy (Option.compare compare_expression c d)
+    compare_struct (compare_expression' a b) @@
+    lazy (Option.compare compare_expression' c d)
   and compare_sign : strict_ sign_cond compare_fun = compare
   and compare_signz : loose_ sign_cond compare_fun = compare
   and compare_object_ref x y = match x, y with
@@ -630,11 +634,11 @@ module FMT = struct
 
   and pp_refmod ppf { refmod_left; refmod_length } =
     fmt "@[<1>(%a:%a)@]" ppf
-      pp_expression refmod_left
-      (option pp_expression) refmod_length
+      pp_expression' refmod_left
+      (option pp_expression') refmod_length
 
   and pp_qualident ppf { ident_name = n; ident_subscripts } =
-    pp_qualname ppf n;
+    pp_qualname' ppf n;
     if ident_subscripts <> []
     then fmt "@[<1>(%a)@]" ppf (list ~sep:comma pp_subscript) ident_subscripts
 
@@ -689,6 +693,7 @@ module FMT = struct
     Option.iter (fmt "@ OF@ %a" ppf pp_name') counter_name
 
   and pp_expression ppf e = Unparse.Expression.pp ppf (pretty_expression e)
+  and pp_expression' ppf = pp_with_loc pp_expression ppf
 
   and pretty_expression = function
     | Atom a -> Unparse.Expression.atom pp_term a

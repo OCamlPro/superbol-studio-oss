@@ -63,6 +63,7 @@ class ['a] folder = object
   method fold_binop: (binop, 'a) fold = default
   method fold_unop: (unop, 'a) fold = default
   method fold_expr: (expression, 'a) fold = default
+  method fold_expr': (expression with_loc, 'a) fold = default
   method fold_class: (class_, 'a) fold = default
   method fold_cond: 'k. ('k cond, 'a) fold = default
   method fold_simple_cond: (simple_condition, 'a) fold = default
@@ -185,7 +186,7 @@ and fold_ident (v: _ #folder) =
 and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
     ~continue:begin fun { ident_name; ident_subscripts } x -> x
-      >> fold_qualname v ident_name
+      >> fold_qualname' v ident_name
       >> fold_list ~fold:fold_subscript v ident_subscripts
     end
 
@@ -195,6 +196,9 @@ and fold_qualname (v: _ #folder) =
       | Name n -> fold_name' v n
       | Qual (n, qn) -> fun x -> x >> fold_name' v n >> fold_qualname v qn
     end
+
+and fold_qualname' (v: _ #folder) =
+  handle' v#fold_qualname' ~fold:fold_qualname v
 
 and fold_subscript (v: _ #folder) =
   handle v#fold_subscript
@@ -210,8 +214,8 @@ and fold_subscript (v: _ #folder) =
 and fold_refmod (v: _ #folder) =
   handle v#fold_refmod
     ~continue:begin fun { refmod_left; refmod_length } x -> x
-      >> fold_expr v refmod_left
-      >> fold_option ~fold:fold_expr v refmod_length
+      >> fold_expr' v refmod_left
+      >> fold_option ~fold:fold_expr' v refmod_length
     end
 
 and fold_address (v: _ #folder) =
@@ -272,6 +276,9 @@ and fold_expr (v: _ #folder) =
           >> fold_binop v o
           >> fold_expr v e'
     end
+
+and fold_expr' (v: _ #folder) =
+  handle' v#fold_expr' ~fold:fold_expr v
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = function
   | Address _
@@ -442,9 +449,6 @@ let fold_qualname_or_alphanum (v: _ #folder) : qualname_or_alphanum -> _ = funct
 let fold_qualname_or_intlit (v: _ #folder) : qualname_or_intlit -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
   | Integer _ | NumFig _ as i -> fold_intlit v i
-
-let fold_qualname' (v: _ #folder) =
-  handle' v#fold_qualname' ~fold:fold_qualname v
 
 let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
 let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v

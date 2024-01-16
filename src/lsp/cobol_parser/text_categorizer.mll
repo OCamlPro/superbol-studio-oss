@@ -37,7 +37,7 @@ let opers = sign | ['*' '/' '>' '<' '=' '&'] | "**" | "::" | ">=" | "<=" | "<>"
 let punct = opers | ['.' ':' '(' ')']
 
 let integer = (sign? digit+)
-let exponent = (sign digit+)
+let exponent = (sign? digit+)
 
 let identchar = [ 'a'-'z' 'A'-'Z' '0'-'9' '-' '_' ]  (* + extended characters *)
 let firstidentchar = [ 'a'-'z' 'A'-'Z' '0'-'9' ]

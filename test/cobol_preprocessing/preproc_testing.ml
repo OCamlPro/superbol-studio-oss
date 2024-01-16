@@ -29,6 +29,20 @@ let preprocess
                                                   source_format } @@
   Cobol_preproc.String { filename; contents }
 
+let show_text
+    ?(verbose = false)
+    ?(filename = "prog.cob")
+    ?(source_format = Cobol_config.(SF SFFixed))
+    contents =
+  let text =
+    DIAGS.show_n_forget ~ppf:Fmt.stdout @@
+    Cobol_preproc.text_of_input
+      ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
+                                                    source_format } @@
+    Cobol_preproc.String { filename; contents }
+  in
+  Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text
+
 let show_source_lines
     ?(with_line_numbers = false)
     ?(with_source_cdir_markers = false)
