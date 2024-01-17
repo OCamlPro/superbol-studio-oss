@@ -265,11 +265,22 @@ let contributes =
     ~configuration:
       (Manifest.configuration ~title:"SuperBOL COBOL"
          [
-           Manifest.PROPERTY.bool
-             "superbol.globalFormatTakesSelection"
-             ~default:false
-             ~description:
-               "If something is selected, only format the selection";
+           Manifest.PROPERTY.array "superbol.cobol.copybooks"
+             ~title:"Copybook paths"
+             ~description:"List of copybooks paths";
+
+           Manifest.PROPERTY.enum "superbol.cobol.dialect"
+             ~cases:Cobol_config.DIALECT.all_canonical_names
+             ~description: "Default COBOL dialect; \"default\" is equivalent to \
+                            \"gnucobol\""
+             ~default:(`String Cobol_config.(DIALECT.to_string Default));
+
+           Manifest.PROPERTY.enum "superbol.cobol.source-format"
+             ~description: "Default source reference-format"
+             ~cases:Cobol_config.Options.all_format_names
+             ~default:(`String "auto");
+
+           (* Paths *)
 
            Manifest.PROPERTY.string "superbol.lsp-path"
              ~title:"SuperBOL executable"
@@ -303,22 +314,11 @@ let contributes =
              ~title:"GnuCOBOL runtime library"
              ~default:"cobc"
              ~description:"Path to the GnuCOBOL runtime library file.";
-
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition
         "superbol"
         ~properties: [
-          Manifest.PROPERTY.array "copybooks"
-            ~description:"The list of copybooks paths";
-
-          Manifest.PROPERTY.enum "dialect"
-            ~cases:Cobol_config.DIALECT.all_canonical_names
-            ~description: "The COBOL dialect used";
-
-          Manifest.PROPERTY.string "source-format"
-            ~description: "The source format of the code";
-
           Manifest.PROPERTY.bool "for-debug"
             ~description: "Build for debugging";
 

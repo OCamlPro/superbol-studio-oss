@@ -31,3 +31,24 @@ let cobc_exe ?scope () =
   | None -> None
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)
+
+let bool ?scope key =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> false
+  | Some o when Ojs.is_null o -> false
+  | Some s -> Ojs.bool_of_js s
+
+let string ?scope key =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> ""
+  | Some o when Ojs.is_null o -> ""
+  | Some s -> Ojs.string_of_js s
+
+let string_list ?scope key =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> []
+  | Some o when Ojs.is_null o -> []
+  | Some s -> Ojs.(list_of_js string_of_js) s      (* TODO: how may this fail? *)
