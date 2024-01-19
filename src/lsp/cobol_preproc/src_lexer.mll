@@ -95,7 +95,8 @@ let alphanum_lit =
   (('\'' alphanum_lit_content_spl* alphanum_lit_suffix_spl) |
    ('"'  alphanum_lit_content_dbl* alphanum_lit_suffix_dbl))
 let alphanum_lit_new =                               (* may lack G & GX still *)
-  ((['B' 'X' 'Z' 'N'] | "BX" | "NX")? alphanum_lit)
+  ((['B' 'b' 'X' 'x' 'Z' 'z' 'N' 'n']
+   |['B' 'b' 'N' 'n'] ['X' 'x'])? alphanum_lit)
 let alphanum_lit_cont_double_apostrophes =
   ("''"    alphanum_lit_content_spl* alphanum_lit_suffix_spl)
 let alphanum_lit_cont_double_quotes =

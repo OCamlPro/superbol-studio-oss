@@ -4,6 +4,16 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:96:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:135:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:159:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:213:0
+run_functions.at-213-prog.cob:32.39-32.44:
+  29                TO TEST-FLD
+  30              IF TEST-FLD NOT = 1
+  31                 DISPLAY 'BYTE-LENGTH x"a0" wrong: ' TEST-FLD.
+  32 >            MOVE FUNCTION BYTE-LENGTH ( z'a0' )
+----                                          ^^^^^
+  33                TO TEST-FLD
+  34              IF TEST-FLD NOT = 3
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:253:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:278:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:325:0
@@ -79,24 +89,24 @@ run_functions.at-410-prog.cob:34.7-34.15:
   36              IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-410-prog.cob:36.55-36.59:
+run_functions.at-410-prog.cob:36.53:
   33              IF BITX NOT = "111100001111000100000000----------"
   34          >>END-IF
   35   
   36 >            IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
-----                                                          ^^^^
+----                                                        ^
   37                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
   38                         BITX (1:24).
->> Error: Invalid syntax
+>> Hint: Missing <expression>
 
-run_functions.at-410-prog.cob:42.33-42.39:
-  39              SET  BITX-FILLER TO TRUE
-  40              STRING FUNCTION BIT-TO-CHAR ("0011000100110010")
-  41                     DELIMITED BY SIZE INTO BITX.
-  42 >            IF NOT (BITX (1:2) = x"3132" AND
-----                                    ^^^^^^
-  43                      BITX (3: ) = "--------------------------------")
-  44                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " BITX.
+run_functions.at-410-prog.cob:36.54-36.59:
+  33              IF BITX NOT = "111100001111000100000000----------"
+  34          >>END-IF
+  35   
+  36 >            IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
+----                                                         ^^^^^
+  37                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
+  38                         BITX (1:24).
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:541:0
@@ -250,33 +260,24 @@ run_functions.at-541-prog.cob:79.7-79.16:
   81   
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-541-prog.cob:107.54-107.58:
+run_functions.at-541-prog.cob:107.52:
  104              SET  HEXX-FILLER TO TRUE
  105              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
  106   
  107 >            IF FUNCTION HEX-TO-CHAR (HEXX(1:6)) NOT = z"01"
-----                                                         ^^^^
+----                                                       ^
  108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
  109                         HEXX (1:6).
->> Error: Invalid syntax
+>> Hint: Missing <expression>
 
-run_functions.at-541-prog.cob:113.33-113.39:
- 110              SET  HEXX-FILLER TO TRUE
- 111              STRING FUNCTION HEX-TO-CHAR ("3132")
- 112                     DELIMITED BY SIZE INTO HEXX.
- 113 >            IF NOT (HEXX (1:2) = x"3132" AND HEXX (3:) = "--------")
-----                                    ^^^^^^
- 114                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " HEXX.
- 115   
->> Error: Invalid syntax
-
-run_functions.at-541-prog.cob:119.33-119.39:
- 116              SET  HEXX-FILLER TO TRUE
- 117              STRING FUNCTION HEX-TO-CHAR ("3132")
- 118                     DELIMITED BY SIZE INTO HEXX.
- 119 >            IF NOT (HEXX (1:2) = x"3132" AND HEXX (3:) = "--------")
-----                                    ^^^^^^
- 120                 DISPLAY "UNEXPECTED CHAR VALUE, expected 12-* got: " HEXX.
+run_functions.at-541-prog.cob:107.53-107.58:
+ 104              SET  HEXX-FILLER TO TRUE
+ 105              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
+ 106   
+ 107 >            IF FUNCTION HEX-TO-CHAR (HEXX(1:6)) NOT = z"01"
+----                                                        ^^^^^
+ 108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
+ 109                         HEXX (1:6).
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:575:0
@@ -355,6 +356,26 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1719:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1769:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1795:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1877:0
+run_functions.at-1877-prog.cob:45.34-45.39:
+  42                 DISPLAY 'LENGTH x"a0" wrong: ' TEST-FLD
+  43                 END-DISPLAY
+  44              END-IF
+  45 >            MOVE FUNCTION LENGTH ( z'a0' )
+----                                     ^^^^^
+  46                TO TEST-FLD
+  47              IF TEST-FLD NOT = 3
+>> Error: Invalid syntax
+
+run_functions.at-1877-prog.cob:51.34-51.39:
+  48                 DISPLAY 'LENGTH z"a0" wrong: ' TEST-FLD
+  49                 END-DISPLAY
+  50              END-IF
+  51 >            MOVE FUNCTION LENGTH ( n'a0' )
+----                                     ^^^^^
+  52                TO TEST-FLD
+  53              IF TEST-FLD NOT = 2
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1907:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1931:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1957:0
