@@ -87,13 +87,13 @@ let save ?(verbose = false) filename toml =
                   hook.@]@.";
 
   let modified =
-    List.fold_left begin fun modified (name, f) ->
-      try f toml || modified
-      with e ->
-        Pretty.error "@[<2>Exception@ raised@ in@ update@ hook@ %s:@ %a@]@.\
-                     " name Fmt.exn e;
-        raise e
-    end false toml.update_hooks
+    List.fold_left (fun modified (name, f) ->
+        try f toml || modified
+        with e ->
+          Pretty.error "@[<2>Exception@ raised@ in@ update@ hook@ %s:@ %a@]@.\
+                       " name Fmt.exn e;
+          raise e
+      ) false toml.update_hooks
   in
 
   if modified then
@@ -111,11 +111,12 @@ let update_section
   let modified =
     TOML.maybe_add_section section_name toml ~before:("" :: section_comments)
   in
-  List.fold_left begin fun modified { option_name; option_comments;
-                                      option_value } ->
-    TOML.maybe_set_value [section_name; option_name] toml option_value
-      ~before: ("" :: option_comments) || modified
-  end modified section_options
+  List.fold_left
+    (fun modified { option_name; option_comments;
+                    option_value } ->
+      TOML.maybe_set_value toml [section_name; option_name] option_value
+        ~before: ("" :: option_comments) || modified
+    ) modified section_options
 
 let add_section_update toml_handle section_name create_section =
   add_update_hook toml_handle

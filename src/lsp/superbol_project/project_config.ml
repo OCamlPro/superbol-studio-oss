@@ -93,8 +93,8 @@ let libpath_repr libpath =
 let indent_repr indent =
   TOML.value_of_table @@
   List.fold_left
-    (fun acc (n, v) -> TOML.StringMap.add n (TOML.int v) acc)
-    TOML.StringMap.empty indent
+    (fun acc (n, v) -> EzCompat.StringMap.add n (TOML.int v) acc)
+    EzCompat.StringMap.empty indent
 
 let config_repr config ~name =
   Ezr_toml.section
@@ -133,30 +133,30 @@ let config_from_dialect_name dialect_name =
       raise @@ ERROR (Cobol_config_error e)
 
 let get_source_format toml =
-  try (Cobol_config.Options.format_of_string @@
-       TOML.get_string ["source-format"] toml)
+  try Cobol_config.Options.format_of_string @@
+       TOML.get_string toml ["source-format"]
   with Not_found -> default.source_format
 
 let get_dialect toml =
-  TOML.get_string ["dialect"] ~default:"default" toml
+  TOML.get_string toml ["dialect"] ~default:"default"
 
 let get_path_entry toml =
-  let dir = TOML.get_string ["dir"] toml in
-  if TOML.get_bool ["file-relative"] toml ~default:false
+  let dir = TOML.get_string toml ["dir"] in
+  if TOML.get_bool toml ["file-relative"] ~default:false
   then RelativeToFileDir dir
   else RelativeToProjectRoot dir
 
 let get_libpath toml =
   try
     List.map get_path_entry @@
-    Array.to_list @@ TOML.get_array ["copybooks"] toml
+    Array.to_list @@ TOML.get_array toml ["copybooks"]
   with Not_found -> default_libpath
 
 let get_indent_config toml =
   try
-    TOML.StringMap.fold (fun name node v ->
+    EzCompat.StringMap.fold (fun name node v ->
       (name, TOML.extract_int node) :: v
-    ) (TOML.get_table ["indent"] toml) []
+    ) (TOML.get_table toml ["indent"]) []
   with Not_found -> default_indent_config
 
 let load_file ?verbose config_filename =
@@ -176,13 +176,13 @@ let load_file ?verbose config_filename =
   try
     let DIAGS.{ result; _ } as config =
       let toml = Ezr_toml.toml toml_handle in
-      try load_section [config_section_name] toml
+      try load_section toml [config_section_name]
       with Not_found -> DIAGS.result { default with toml_handle }
     in
     Ezr_toml.add_section_update toml_handle
       config_section_name (config_repr result);
     config
-  with TOML.TYPES.Error (loc, _code, error) ->
+  with TOML.Types.Error (loc, _code, error) ->
     raise @@ ERROR (Invalid_toml { loc; error })
 
 let save ?verbose ~config_filename config =

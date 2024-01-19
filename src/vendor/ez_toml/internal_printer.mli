@@ -20,5 +20,3 @@ val string_of_key_path : Types.key_path -> string
 val string_of_location : Types.location -> string
 
 val string_of_error : Types.error -> string
-
-val edump : Types.node -> unit

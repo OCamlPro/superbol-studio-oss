@@ -15,17 +15,26 @@ open EzCompat (* for StringMap *)
 open Ezcmd.V2
 open EZCMD.TYPES
 open Ez_file.V1
-open Ez_toml.V1
 open EzFile.OP
+
+open Ez_toml.V1
+open EZTOML.TYPES
 
 module TYPES = struct
 
   type config = {
+    (* Where all switches are installed. "/opt/gnucobol" for example *)
     mutable switch_dir : string ;
+    (* The list of existing switches names *)
     mutable switch_list : string StringMap.t ;
+    (* The number for the next switch. Every switch is called
+       "S<number>-*" *)
     mutable switch_num : int ;
+    (* The current activated switch *)
     mutable switch_current : string option ;
-    user_config : Ezr_toml.toml_handle ;
+    (* Whether compiler coverage should be activated *)
+    mutable with_compiler_coverage : bool ;
+    user_config : toml_file ;
   }
 
 end
@@ -62,79 +71,75 @@ let about : block list = [
 let about man =
   man @ about
 
-let create_section config ~name =
-  Ezr_toml.section
-    ~name
-    ~after_comments:[ "Management of GnuCOBOL installations" ]
-    Ezr_toml.[
-      option
-        ~name: "dir"
-        ~after_comments: [ "The directory where GnuCOBOL versions should be \
-                            installed by default." ]
-        ( TOML.value_of_string config.switch_dir ) ;
-
-      option
-        ~name: "list"
-        ~after_comments: [ "The table of known switches" ]
-        ( TOML.TYPES.Table ( StringMap.map TOML.string config.switch_list )) ;
-
-      option
-        ~name: "num"
-        ~after_comments: [ "Next ID to be used for switch prefix" ]
-        ( TOML.value_of_int config.switch_num ) ;
-
-      option
-        ~name: "current"
-        ~after_comments: [ "Current switch" ]
-        ( TOML.value_of_string (match config.switch_current with
-              | None -> ""
-              | Some s -> s)) ;
-    ]
-
 
 let user_config_file = Misc.config_dir // "config.toml"
 
 let save_user_config config =
-  Ezr_toml.save ~verbose:true user_config_file config.user_config
+  EZTOML.save ~verbose:true user_config_file config.user_config
 
 let get_config () =
-  let user_config = Ezr_toml.load user_config_file in
-  let default = {
+  let user_config = EZTOML.load user_config_file in
+  let config = {
     switch_dir = Misc.config_dir // "switches" ;
     switch_list = StringMap.empty ;
     switch_num = 1 ;
     switch_current = None ;
+    with_compiler_coverage = false ;
     user_config ;
   } in
-  let config =
-    match TOML.get [ section_name ] (Ezr_toml.toml user_config) with
-    | exception Not_found -> default
-    | toml ->
-        let switch_dir = TOML.get_string [ "dir" ] toml ~default:default.switch_dir in
-        let switch_list =
-          TOML.get_table [ "list" ] toml ~default:StringMap.empty in
-        let switch_list = StringMap.map TOML.extract_string switch_list in
-        let switch_num =
-          TOML.get_int [ "num" ] toml ~default:default.switch_num in
-        let switch_current =
-          TOML.get_string [ "current" ] toml ~default:"" in
-        { default with
-          switch_dir ;
-          switch_num ;
-          switch_list ;
-          switch_current = if switch_current = "" then
-              None else Some switch_current ;
-        }
+
+
+  let section =
+    EZTOML.section
+      ~name: section_name
+      ~comments:[ "Management of GnuCOBOL installations" ]
+      EZTOML.[
+        option_string
+          "dir"
+          ~comments: [ "The directory where GnuCOBOL versions should be \
+                              installed by default." ]
+          ~getter:(fun config -> config.switch_dir )
+          ~setter:(fun config value -> config.switch_dir <- value)
+        ;
+
+        option_string_map
+          "list"
+          ~comments: [ "The table of known switches" ]
+          ~getter: (fun config -> config.switch_list )
+          ~setter: (fun config value -> config.switch_list <- value)
+        ;
+
+        option_int
+          "num"
+          ~comments: [ "Next ID to be used for switch prefix" ]
+          ~getter:(fun config -> config.switch_num )
+          ~setter:(fun config v -> config.switch_num <- v )
+        ;
+
+        option_string_option
+          "current"
+          ~comments: [ "Current switch" ]
+          ~getter:(fun config -> config.switch_current)
+          ~setter:(fun config v -> config.switch_current <- v)
+        ;
+
+        option_bool
+          "compiler-coverage"
+          ~comments: [ "Whether compiler coverage should be activated" ]
+          ~getter:(fun config -> config.with_compiler_coverage)
+          ~setter:(fun config v -> config.with_compiler_coverage <- v)
+
+      ]
   in
-  Ezr_toml.add_section_update user_config section_name
-    (create_section config);
+
+  EZTOML.add_section user_config config section ;
   config
 
 let get_config () =
   try
     get_config ()
   with
-  | TOML.TYPES.Error (loc, _code, error) ->
+  | TOML.Types.Error (loc, _code, error) ->
     Printf.eprintf "%s: %s\n%!"
       ( TOML.string_of_location loc )
       ( TOML.string_of_error error );
@@ -517,7 +522,7 @@ let switch_add ~dirname ?switch_name ~set () =
   add_switch config ?switch_name ~file ~dir ~set ;
   if config.switch_current <> current then
     set_switch_link config ;
-  Ezr_toml.save user_config_file config.user_config
+  EZTOML.save user_config_file config.user_config
 
 let add_cmd =
   let dirname = ref None in
@@ -612,12 +617,21 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
   if not ( Sys.file_exists "../configure" ) then
     Call.call ~echo:true [ "../build_aux/bootstrap" ];
 
-  Call.call ~echo:true [ "../configure" ;
-                         "--enable-cobc-internal-checks";
-                         "--enable-debug";
-                         "--prefix" ; destdir ;
-                         "--exec-prefix" ; destdir ];
-
+  let cmd =
+    [ "../configure" ;
+      "--enable-cobc-internal-checks";
+      "--enable-debug";
+      "--prefix" ; destdir ;
+      "--exec-prefix" ; destdir ;
+    ] in
+  let cmd = if config.with_compiler_coverage then
+      cmd @ [
+        "--enable-code-coverage";
+      ]
+    else
+      cmd
+  in
+  Call.call ~echo:true cmd ;
   Call.call ~echo:true [ "make" ];
 
   Call.call ~echo:true (let cmd = [ "make" ; "install" ] in

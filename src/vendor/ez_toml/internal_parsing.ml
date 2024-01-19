@@ -53,6 +53,9 @@ let rec set_key_path ~loc ~config ?(op=OpEqual) table_node key_path ~value:v =
   match key_path with
   | [] -> assert false
   | [ key ] ->
+      (* TODO: we should probably dealt with the case where the node
+         is not a table. We could have a specific error for trying to
+         set a value to a table, and not error if silent_errors *)
       let table_node, table = get_node_table ~loc table_node in
       let continue =
         match op with
@@ -94,6 +97,83 @@ let rec unset_key_path ~loc ~config table_node key_path =
       | exception Not_found -> ()
       | new_table_node ->
           unset_key_path ~loc ~config new_table_node key_path
+
+let rec update_key_path ~loc ~config table_node key_path (v_opt : node option) =
+  match key_path with
+  | [] -> assert false
+  | [ key ] ->
+      (* TODO: we should probably dealt with the case where the node
+         is not a table. We could have a specific error for trying to
+         set a value to a table, and not error if silent_errors *)
+      begin match table_node.node_value with
+        | Table table ->
+            begin
+              match v_opt with
+              | Some new_node ->
+                  { table_node with
+                    node_value = Table (StringMap.add key
+                                          new_node table)
+                  }
+              | None ->
+                  match StringMap.find key table with
+                  | exception Not_found -> table_node
+                  | _old_v ->
+                      { table_node with
+                        node_value = Table (StringMap.remove key table)
+                      }
+            end
+        | Array array ->
+            let len = Array.length array in
+            if len = 0 then
+              Internal_misc.error ~loc 19 Invalid_lookup_in_empty_array ;
+            if table_node.node_format = Inline then
+              Internal_misc.error ~loc 3 Invalid_lookup_in_inline_array ;
+            let old_node = array.(len-1) in
+            let new_node = update_key_path
+                ~loc ~config old_node key_path v_opt in
+            if old_node == new_node then
+              table_node
+            else
+              let new_array = Array.copy array in
+              new_array.(len-1) <- new_node;
+              { table_node with node_value = Array new_array }
+
+        | _ -> Internal_misc.error ~loc 2 Invalid_lookup
+      end
+
+  | key :: internal_key_path ->
+
+      begin match table_node.node_value with
+        | Table table ->
+            let old_node =
+              match StringMap.find key table with
+              | exception Not_found ->
+                  Internal_misc.node ~loc @@ Table StringMap.empty
+              | node -> node
+            in
+            let new_node = update_key_path
+                ~loc ~config old_node internal_key_path v_opt in
+            { table_node with
+              node_value = Table (StringMap.add key new_node table)
+            }
+        | Array array ->
+            let len = Array.length array in
+            if len = 0 then
+              Internal_misc.error ~loc 19 Invalid_lookup_in_empty_array ;
+            if table_node.node_format = Inline then
+              Internal_misc.error ~loc 3 Invalid_lookup_in_inline_array ;
+            let old_node = array.(len-1) in
+            let new_node = update_key_path
+                ~loc ~config old_node key_path v_opt in
+            if old_node == new_node then
+              table_node
+            else
+              let new_array = Array.copy array in
+              new_array.(len-1) <- new_node;
+              { table_node with node_value = Array new_array }
+
+        | _ -> Internal_misc.error ~loc 2 Invalid_lookup
+      end
 
 let rec table_mem_key_path ~loc table key_path =
   match key_path with

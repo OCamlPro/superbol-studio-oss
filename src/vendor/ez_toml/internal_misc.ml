@@ -29,8 +29,7 @@ let default_config = {
 
 let node_counter = ref 0
 let node ?(format=Any) ?(loc=noloc)
-    ?(before=[]) ?(name=["???"])
-    ?after ?pos
+    ?(before=[]) ?(name=["???"]) ?after ?pos
     value =
   let node_pos = match pos with
     | None ->

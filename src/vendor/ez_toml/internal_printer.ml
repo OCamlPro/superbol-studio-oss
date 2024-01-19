@@ -281,15 +281,6 @@ let string_of_node
   end;
   Buffer.contents b
 
-let string_of_value
-    ?(config = Internal_misc.default_config)
-    ?(format = Any)
-    ?(context = InsideTable)
-    value =
-  let b = Buffer.create 10000 in
-  bprint_value b config format context value;
-  Buffer.contents b
-
 let string_of_location loc =
   Printf.sprintf "File %S, line %s, characters %s"
     loc.file
@@ -344,12 +335,12 @@ let rec string_of_error error =
   | Duplicate_table_item key_path ->
       Printf.sprintf "Duplicate table declaration %S"
         ( string_of_key_path key_path )
-  | Type_mismatch (value, expected) ->
+  | Type_mismatch (node, expected) ->
       Printf.sprintf "Type mismatch, expecting %s, found %s"
-        expected ( string_of_value value )
-  | Bad_convertion (value, expected) ->
+        expected ( string_of_node node )
+  | Bad_convertion (node, expected) ->
       Printf.sprintf "Bad convertion %s, found %s"
-        expected ( string_of_value value )
+        expected ( string_of_node node )
   | Invalid_lookup_in_empty_array ->
       "Invalid lookup in empty array"
   | Key_already_exists_in_inline_table key_path ->
@@ -357,56 +348,3 @@ let rec string_of_error error =
         (string_of_key_path key_path )
   | Invalid_use_of_extension extension ->
       Printf.sprintf "Invalid use of extension %S" extension
-
-let edump toml =
-  let rec dump_table indent toml =
-    let indent2 = indent ^ "  " in
-    Printf.eprintf "{\n";
-    StringMap.iter (fun s node ->
-        Printf.eprintf "%s%S -> " indent s;
-        dump_node indent2 node;
-        Printf.eprintf ";\n") toml;
-    Printf.eprintf "%s}" indent;
-
-  and dump_array indent toml =
-    let indent2 = indent ^ "  " in
-    Printf.eprintf "[\n";
-    Array.iter (fun node ->
-        dump_node indent2 node;
-        Printf.eprintf ";\n") toml;
-    Printf.eprintf "%s]" indent;
-
-  and dump_node indent node =
-    let indent2 = indent ^ "  " in
-    Printf.eprintf "{\n";
-    Printf.eprintf "%slocation = %s;\n" indent2
-      ( string_of_location node.node_loc );
-    Printf.eprintf "%svalue = " indent2;
-    begin
-      match node.node_value with
-      | Table table ->
-        Printf.eprintf "Table ";
-        dump_table indent2 table
-      | String b -> Printf.eprintf "String %S" b
-      | Bool b -> Printf.eprintf "Bool %b" b
-      | Int b -> Printf.eprintf "Int %S" b
-      | Float b -> Printf.eprintf "Float %S" b
-      | Date b -> Printf.eprintf "Date %S" b
-      | Array t ->
-        Printf.eprintf "Array ";
-        dump_array indent t
-    end;
-    Printf.eprintf ";\n";
-    Printf.eprintf "%s}" indent;
-  in
-  dump_node "" toml
-
-let () =
-  Printexc.register_printer (function
-      | Types.Error (loc, _code, error) ->
-        Some (
-          Printf.sprintf "Error in TOML file %s: %s"
-            ( string_of_location loc )
-            ( string_of_error error )
-        )
-      | _ -> None )

@@ -1,6 +1,10 @@
 {1 Library ez_toml}
 
-SuperBOL Studio OSS is a new platform for COBOL
+This ez_toml library is a small library to read and write files in TOML
+format. Compared to the toml library, it supports more features (mixed
+arrays for example), fixes a few bugs in the printer, and keeps better
+track of options order and comments in file.
+
 
 
 The entry point of this library is the module: {!Ez_toml}.

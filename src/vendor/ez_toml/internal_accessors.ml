@@ -13,15 +13,29 @@
 open EzCompat
 open Types
 
-let get key_path node  =
+let get node key_path =
   Internal_parsing.get_key_path ~loc:Internal_misc.noloc node key_path
 
-let set ?(config = Internal_misc.default_config) key_path node
+let set ?(config = Internal_misc.default_config) node key_path
     ~value:internal_node =
   Internal_parsing.set_key_path
     ~config
     ~loc:Internal_misc.noloc
     node key_path ~value:internal_node
+
+let remove ?(config = Internal_misc.default_config) node key_path =
+  Internal_parsing.unset_key_path
+    ~config
+    ~loc:Internal_misc.noloc
+    node key_path
+
+
+let update ?(config = Internal_misc.default_config) node key_path
+    v_opt =
+  Internal_parsing.update_key_path
+    ~config
+    ~loc:Internal_misc.noloc
+    node key_path v_opt
 
 let value ?before ?pos v =
   Internal_misc.node ?before ?pos @@ v
@@ -74,15 +88,10 @@ let type_of_value value = match value with
 let type_of_node node = type_of_value node.node_value
 
 let error_mismatch node expected =
-  Internal_misc.error ~loc:node.node_loc 17
-    ( Type_mismatch (node.node_value, expected) )
+  Internal_misc.error 17 ( Type_mismatch (node, expected) )
 
 let error_convertion node expected =
-  Internal_misc.error ~loc:node.node_loc 18
-    ( Bad_convertion (node.node_value, expected) )
-
-let extract_value node = node.node_value
-
+  Internal_misc.error 18 ( Bad_convertion (node, expected) )
 
 let extract_bool node =
   match node.node_value with
@@ -130,6 +139,8 @@ let extract_strings node =
 let extract_ints node =
   Array.map extract_int @@ extract_array node
 
+let extract_value node = node.node_value
+
 let extract_with_default extract ?default k node =
   match get k node with
   | v ->
@@ -167,6 +178,9 @@ let set_strings ?before ?pos k node v = set k node
 let set_ints ?before ?pos k node v = set k node
     ~value:(ints ?before ?pos v)
 
+let get_node_value node = node.node_value
+let set_node_value node v = node.node_value <- v
+
 
 let table_iter node f = StringMap.iter f ( extract_table node )
 let array_iteri node f = Array.iteri f ( extract_array node )
@@ -177,8 +191,6 @@ let add_comments node comments =
 
 let add_eol_comment node comment =
   node.node_comment_after <- Some comment
-
-let set_node_value node v = node.node_value <- v
 
 let next_section_pos node =
   let table = extract_table node in
@@ -192,11 +204,11 @@ let next_section_pos node =
   !next_section_pos
 
 let maybe_add_section ?before section toml =
-  match get [ section ] toml with
+  match get toml [ section ] with
   | _node -> false
   | exception Not_found ->
     let node = empty_table ?before ~pos:(next_section_pos toml) () in
-    set [ section ] toml ~value:node;
+    set toml [ section ] ~value:node;
     true
 
 let array_compare compare t1 t2 =
