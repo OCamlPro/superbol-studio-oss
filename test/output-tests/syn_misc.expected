@@ -3985,16 +3985,6 @@ syn_misc.at-7417-prog.cob:63.44-63.51:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7524:0
-syn_misc.at-7524-prog.cob:48.49-48.50:
-  45          77 x36            pic x(36) is typedef.
-  46         * In the following block, "sync" prevents SIGBUS errors on SOLARIS systems.
-  47          01  special-data.
-  48 >            05 r2d2       usage bit pic 111 value b'110'.
-----                                                    ^
-  49         *>   disabled for now because of varying size
-  50         *>   05 point      usage pointer         sync.
->> Error: Invalid syntax
-
 syn_misc.at-7524-prog.cob:55.30:
   52         *>   05 idx        usage index           sync.
   53         *>   05 hnd        usage handle          sync.

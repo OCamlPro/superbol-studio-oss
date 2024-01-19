@@ -70,16 +70,6 @@ data_packed.at-47-dump.c:5.7-5.8:
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:203:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:432:0
-data_packed.at-432-prog.cob:6.30-6.31:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.
-   8            05 FENCE-1     PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-432-prog.cob:8.37:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
@@ -265,16 +255,6 @@ data_packed.at-1020-prog.cob:53.7-53.16:
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1052:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1181:0
-data_packed.at-1181-prog.cob:6.30-6.31:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.
-   8            05 FENCE-A     PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-1181-prog.cob:8.37:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
@@ -441,16 +421,6 @@ Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1393:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1421:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1462:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:1557:0
-data_packed.at-1557-prog.cob:6.30-6.31:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.
-   8            05 FENCE-1     PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-1557-prog.cob:8.37:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
@@ -595,16 +565,6 @@ data_packed.at-1959-prog.cob:112.7-112.16:
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:2063:0
-data_packed.at-2063-prog.cob:6.30-6.31:
-   3          PROGRAM-ID. prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.
-   8            05 FENCE-A          PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-2063-prog.cob:8.42:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
@@ -736,16 +696,6 @@ data_packed.at-2063-prog.cob:36.22-36.28:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:2156:0
-data_packed.at-2156-prog.cob:6.30-6.31:
-   3          PROGRAM-ID. prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.
-   8            05 FENCE-A          PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-2156-prog.cob:8.42:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
@@ -867,16 +817,6 @@ data_packed.at-2156-prog.cob:18.43-18.48:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:2230:0
-data_packed.at-2230-prog.cob:6.30-6.31:
-   3          PROGRAM-ID. prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        78 FENCE         VALUE x'ABBAAB'.
-----                                 ^
-   7          01 FILLER.      
-   8            05 FENCE-A     PIC XXX VALUE FENCE.
->> Error: Invalid syntax
-
 data_packed.at-2230-prog.cob:8.37:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.

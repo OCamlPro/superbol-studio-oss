@@ -206,16 +206,6 @@ run_extensions.at-180-prog.cob:36.16-36.17:
   38                 DISPLAY "%101 is not x""4100"" = Anull (ASCII) but "
 >> Error: Invalid syntax
 
-run_extensions.at-180-prog.cob:37.32-37.38:
-  34              END-IF
-  35         *>   Sets the data to x'4100' (octal 101 -> ASCII A + right-pad NULL)
-  36              MOVE %101 TO ITEM-ALPHA
-  37 >            IF ITEM-ALPHA NOT = x"4100"
-----                                   ^^^^^^
-  38                 DISPLAY "%101 is not x""4100"" = Anull (ASCII) but "
-  39                         ITEM-ALPHA
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:206:0
 run_extensions.at-206-prog.cob:6.39-6.40:
    3          PROGRAM-ID.      prog.
@@ -349,6 +339,16 @@ run_extensions.at-445-prog.cob:28.34-28.40:
   29          78 var-length-z      value length of z'a0'.
   30         *78 var-length-n      value length of n'001'.
 >> Error: Invalid syntax
+
+run_extensions.at-445-prog.cob:29.33:
+  26              10 T2        PIC X(22).
+  27          78 var-length-l      value length of '00128'.
+  28          78 var-length-x      value length of x'a0'.
+  29 >        78 var-length-z      value length of z'a0'.
+----                                    ^
+  30         *78 var-length-n      value length of n'001'.
+  31          PROCEDURE        DIVISION.
+>> Hint: Missing <literal>
 
 run_extensions.at-445-prog.cob:29.34-29.40:
   26              10 T2        PIC X(22).
@@ -3117,16 +3117,6 @@ run_extensions.at-4672-prog.cob:29.7-29.12:
   31              DISPLAY '                  ' FUNCTION EXCEPTION-STATEMENT '-'
 >> Error: Invalid syntax
 
-run_extensions.at-4672-prog.cob:36.62-36.66:
-  33              *> NOTE: the error message is *EXPLICIT* specified to end with x'00'
-  34              MOVE 0 TO Err-Message-Len
-  35              INSPECT Err-Message-From-Runtime
-  36 >               TALLYING Err-Message-Len FOR CHARACTERS BEFORE x'00'
-----                                                                 ^^^^
-  37              DISPLAY 'Error-Message:    ' Err-Message-From-Runtime
-  38                                          (1:Err-Message-Len)
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4767:0
 run_extensions.at-4767-prog.cob:15.35-15.40:
   12          PROCEDURE DIVISION.
@@ -3156,16 +3146,6 @@ run_extensions.at-4767-prog.cob:24.7-24.12:
 ----          ^^^^^
   25              DISPLAY 'Error (interal): ' FUNCTION EXCEPTION-LOCATION  '-'
   26              DISPLAY '                 ' FUNCTION EXCEPTION-STATEMENT '-'
->> Error: Invalid syntax
-
-run_extensions.at-4767-prog.cob:31.62-31.66:
-  28              *> NOTE: the error message is *EXPLICIT* specified to end with x'00'
-  29              MOVE 0 TO Err-Message-Len
-  30              INSPECT Err-Message-From-Runtime
-  31 >               TALLYING Err-Message-Len FOR CHARACTERS BEFORE x'00'
-----                                                                 ^^^^
-  32              DISPLAY 'Error-Message:   ' Err-Message-From-Runtime
-  33                                          (1:Err-Message-Len)
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4796:0

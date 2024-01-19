@@ -468,16 +468,16 @@ let extract_knd str state lexbuf =
     (* TODO: use start_pos & end_pos instead (see below) *)
     let s, knd = match str.[0] with
       | '"' | '\'' -> str, Basic
-      | 'B' -> Str.string_after str 1, Bool
-      | 'X' -> Str.string_after str 1, Hex
-      | 'Z' -> Str.string_after str 1, NullTerm
-      | 'N' -> Str.string_after str 1, National
+      | 'B' | 'b' -> Str.string_after str 1, Bool
+      | 'X' | 'x' -> Str.string_after str 1, Hex
+      | 'Z' | 'z' -> Str.string_after str 1, NullTerm
+      | 'N' | 'n' -> Str.string_after str 1, National
       | c -> raise @@ UnexpectedChar c
     in
     let s, knd = match s.[0], knd with
       |('"' | '\''), knd -> s, knd
-      | 'X', Bool -> Str.string_after s 1, BoolX
-      | 'X', National -> Str.string_after s 1, NationalX
+      |('X' | 'x'), Bool -> Str.string_after s 1, BoolX
+      |('X' | 'x'), National -> Str.string_after s 1, NationalX
       | _ -> raise @@ UnexpectedStr
     in
     s, knd, state

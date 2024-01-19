@@ -275,37 +275,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1054:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1076:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1100:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1150:0
-run_misc.at-1150-prog.cob:10.17-10.23:
-   7             03 X-NUM      PIC 9(06) VALUE 123.
-   8          77 NUM           PIC 9(06).
-   9          PROCEDURE        DIVISION.
-  10 >            MOVE x"0000" TO X (2:2)
-----                    ^^^^^^
-  11              IF X-NUM NUMERIC
-  12                 DISPLAY "low-value is numeric" UPON SYSERR.
->> Error: Invalid syntax
-
-run_misc.at-1150-prog.cob:13.17-13.21:
-  10              MOVE x"0000" TO X (2:2)
-  11              IF X-NUM NUMERIC
-  12                 DISPLAY "low-value is numeric" UPON SYSERR.
-  13 >            MOVE x"01" TO X (3:1)
-----                    ^^^^
-  14              IF X-NUM NUMERIC
-  15                 DISPLAY "SOH is numeric" UPON SYSERR.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1158:0
-run_misc.at-1158-prog2.cob:10.17-10.21:
-   7             03 X-NUM      PIC 9(06) PACKED-DECIMAL VALUE 123.
-   8          77 NUM           PIC 9(06).
-   9          PROCEDURE        DIVISION.
-  10 >            MOVE x"0A" TO X (2:1)
-----                    ^^^^
-  11              IF X-NUM NUMERIC
-  12                 DISPLAY "bad prog".
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1191:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1192:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1220:0
@@ -3084,16 +3054,6 @@ run_misc.at-6982-callee.cob:71.47-71.48:
   73                 (do                          NOT = "R") OR
 >> Error: Invalid syntax
 
-run_misc.at-6982-callee.cob:79.17-79.21:
-  76                 (union                       NOT = "U") OR
-  77                 (while                       NOT = "V")
-  78                 DISPLAY "At least one var has wrong content!".
-  79 >            MOVE x'FF' TO         const
-----                    ^^^^
-  80                                    double
-  81                                    float
->> Error: Invalid syntax
-
 run_misc.at-6982-callee.cob:80.33-80.39:
   77                 (while                       NOT = "V")
   78                 DISPLAY "At least one var has wrong content!".
@@ -3215,16 +3175,6 @@ run_misc.at-6983-callee2.cob:113.47-113.48:
  115              MOVE x'FF' TO         asm
 >> Error: Invalid syntax
 
-run_misc.at-6983-callee2.cob:115.17-115.21:
- 112                 (bitor                       NOT = "1") OR
- 113                 (xor                         NOT = "2")
- 114                 DISPLAY "At least one var has wrong content!".
- 115 >            MOVE x'FF' TO         asm
-----                    ^^^^
- 116                                    dynamic_cast
- 117                                    namespace
->> Error: Invalid syntax
-
 run_misc.at-6983-callee2.cob:122.33-122.36:
  119                                    try
  120                                    bool
@@ -3334,16 +3284,6 @@ run_misc.at-6984-caller.cob:130.33-130.36:
 ----                                    ^^^
  131              END-CALL.
  132              MOVE x'00' TO         const
->> Error: Invalid syntax
-
-run_misc.at-6984-caller.cob:132.17-132.21:
- 129                                    bitor
- 130                                    xor
- 131              END-CALL.
- 132 >            MOVE x'00' TO         const
-----                    ^^^^
- 133                                    double
- 134                                    float
 >> Error: Invalid syntax
 
 run_misc.at-6984-caller.cob:133.33-133.39:
@@ -5105,16 +5045,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11467:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11532:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11595:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11647:0
-run_misc.at-11647-prog.cob:11.17-11.21:
-   8   
-   9          PROCEDURE DIVISION.
-  10              CALL " SUB " USING 'X'.
-  11 >            MOVE x'00' TO MYRTN (6:1).
-----                    ^^^^
-  12              CALL MYRTN   USING 'Y'.
-  13              CALL "SUB"   USING 'Z'.
->> Error: Invalid syntax
-
 run_misc.at-11647-prog.cob:21.18:
   18          END PROGRAM prog.
   19   
