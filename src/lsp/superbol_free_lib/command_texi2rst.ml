@@ -171,6 +171,44 @@ let read ~path filename =
   let authors = ref [] in
   let map = ref StringMap.empty in
 
+  let current_section = ref [ 0 ] in
+  let current_section_is_appendix = ref false in
+
+  let new_section_number ?(appendix=false) level =
+    if appendix && not !current_section_is_appendix then begin
+      current_section_is_appendix := true;
+      current_section := [ 0 ];
+    end;
+    current_section := (
+      match level, !current_section with
+      | 0, chapter :: _ -> [ chapter + 1 ]
+      | 1, chapter :: section :: _ -> [ chapter ; section+1 ]
+      | 1, chapter :: [] -> [ chapter ; 1 ]
+      | 2, chapter :: section :: subsec :: _ ->
+        [ chapter ; section ; subsec+1 ]
+      | 2, chapter :: section :: [] ->
+        [ chapter ; section ; 1 ]
+      | 3, chapter :: section :: subsec :: subsub :: _ ->
+        [ chapter ; section ; subsec ; subsub +1 ]
+      | 3, chapter :: section :: subsec :: [] ->
+        [ chapter ; section ; subsec ; 1 ]
+      | _ -> assert false
+    )
+  in
+  let get_section_number () =
+    let s =
+    if !current_section_is_appendix then
+      match !current_section with
+      | [] -> assert false
+      | num :: tail ->
+        String.concat "."
+          ( String.make 1 (char_of_int (65 + num))
+            :: List.map string_of_int tail )
+    else
+      String.concat "." ( List.map string_of_int ( !current_section ))
+    in
+    Some s
+  in
   let maybe b =
     let s = Buffer.contents b in
     Buffer.clear b;
@@ -288,11 +326,15 @@ let read ~path filename =
       None, parse_line ic arg
     else
       let arg = String.sub arg 1 (len-2) in
-      let number, title = EzString.cut_at arg ',' in
-      if number = "" || title = "" then
-        INPUT.error ~ic "Wrong argument %S for section" arg;
-      let title = parse_line ic title in
-      Some number, title
+      if String.contains arg ',' then
+        let number, title = EzString.cut_at arg ',' in
+        if number = "" || title = "" then
+          INPUT.error ~ic "Wrong argument %S for section (with comma)" arg;
+        let title = parse_line ic title in
+        Some number, title
+      else
+        let title = parse_line ic arg in
+        get_section_number (), title
   in
 
   let find_file ?ic file =
@@ -455,18 +497,25 @@ let read ~path filename =
 
       | "@chapter"
       | "@newchapter" ->
+        new_section_number 0;
         iter_section ic rev stack 1 arg
       | "@appendix"
       | "@newappendix" ->
+        new_section_number ~appendix:true 0;
         iter_section ic rev stack 1 arg
       | "@newsection"
       | "@section" ->
+        new_section_number 1;
         iter_section ic rev stack 2 arg
       | "@subsection"
       | "@newsubsection" ->
+        new_section_number 2;
         iter_section ic rev stack 3 arg
       | "@newunit"
-      | "@subsubsection" ->
+      | "@subsubsection"
+      | "@newsubsubsection"
+        ->
+        new_section_number 3;
         iter_section ic rev stack 4 arg
 
       | "@diagram" ->
@@ -987,13 +1036,26 @@ let rec rst_of_line ctx line =
           | "intrinsic" ->
               rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " intrinsic function" ]
           | "intrinsicref" ->
-              with_pxref ctx loc "intrinsic" arg
-          (* newappendix *)
-          (* newappsec *)
-          (* newchapter *)
-          (* newsection *)
-          (* newsubsection *)
-          (* newunit *)
+            with_pxref ctx loc "intrinsic" arg
+          | "newchapter" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "chapter", arg) ]
+          | "newsection" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "section", arg) ]
+          | "newsubsection" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "subsection", arg) ]
+          | "newunit"
+          | "newsubsubsection" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "subsubsection", arg) ]
+          | "newappendix" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "appendix", arg) ]
+          | "newappsec" ->
+            rst_of_line ctx [ MACRO (loc, "idx", arg);
+                              MACRO (loc, "section", arg) ]
           | "registertext" ->
               rst_of_line ctx [ MACRO (loc, "code", arg) ; STRING " special register" ]
           | "register" ->
@@ -1116,10 +1178,10 @@ let output_level ctx oc level ?number title =
   OUTPUT.fprintf oc "\n";
   if match number with
     | None -> false
-    | Some s ->
-        match s.[0] with
+    | Some _s -> true
+(*        match s.[0] with
         | '0'..'9' -> true
-        | _ -> false
+          | _ -> false *)
   then begin
     let label = label_of_title title in
     ctx.refs_created <- StringSet.add label ctx.refs_created;
