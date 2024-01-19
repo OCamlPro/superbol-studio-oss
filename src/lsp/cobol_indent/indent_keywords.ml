@@ -11,6 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Mappings to/from tokens and keyword strings are very redundant with what's
+   (auto-generated!) in `cobol_parser/text_keywords.ml` (and a little bit of
+   manual mapping from `combined_tokens` in `cobol_parser/text_tokenizer.ml`.
+
+   TODO: use the aforementioned associations instead of redefining them
+   below. *)
+
 open Indent_type
 
 (*data division *)
@@ -42,12 +49,11 @@ let keyword_stmt =
     "TERMINATE"; "UNLOCK"; "UNSTRING"; "USE"; "VALIDATE"; "WRITE";
     (*standard 1985*)
     "ALTER"; "DISABLE"; "ENABLE"; "PURGE"; "RECEIVE"; "SEND";]
-let keyword_stmt_tbl = Hashtbl.create 16
-let () =
-  List.iter (fun x ->
-    Hashtbl.add keyword_stmt_tbl x ())
-    keyword_stmt
-let is_statement = Hashtbl.mem keyword_stmt_tbl
+let is_statement =
+  let keyword_stmt_tbl = Hashtbl.create 16 in
+  List.iter (fun x -> Hashtbl.add keyword_stmt_tbl x ()) keyword_stmt;
+  fun word ->
+    Hashtbl.mem keyword_stmt_tbl word
 
 
 let str_proc_keyword_tbl = Hashtbl.create 16

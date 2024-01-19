@@ -48,7 +48,7 @@ $   SOURCE IS FREE
     >>SET SOURCEFORMAT "COBOLX"
 
 
-    $SOURCE FORMAT FREE
+    $Source format free
 
     >>SET SOURCEFORMAT "FIXED"
 
@@ -92,7 +92,7 @@ $   SOURCE IS FREE
     4: |new source format|
     5:
     6:
-    7: $SOURCE FORMAT FREE
+    7: $Source format free
     7: |new source format|
     8:
     9: >>SET SOURCEFORMAT "FIXED"

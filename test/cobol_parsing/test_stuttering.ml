@@ -41,7 +41,7 @@ _|_            STOP RUN.
     Appending chunk 2/4 @ 1:0-3:0 ("        IDENTIFICATION DIV...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 2/4 back @ 1:0-2:0 ("        IDENTIFICATION DIV...)
@@ -51,7 +51,7 @@ _|_            STOP RUN.
     Appending chunk 3/4 @ 2:0-4:0 ("        PROGRAM-ID. prog.\...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -59,13 +59,13 @@ _|_            STOP RUN.
     Cutting chunk 3/4 back @ 2:0-3:0 ("        PROGRAM-ID. prog.\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 4/4 @ 3:0-5:2 ("        PROCEDURE DIVISION...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -91,7 +91,7 @@ let%expect_test "line-by-line-incremental-small-2" =
     Appending chunk 2/4 @ 1:7-3:7 (" IDENTIFICATION DIVISION.\...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 2/4 back @ 1:7-2:7 (" IDENTIFICATION DIVISION.\...)
@@ -101,7 +101,7 @@ let%expect_test "line-by-line-incremental-small-2" =
     Appending chunk 3/4 @ 2:7-4:7 (" PROGRAM-ID. prog.\n      ...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -109,13 +109,13 @@ let%expect_test "line-by-line-incremental-small-2" =
     Cutting chunk 3/4 back @ 2:7-3:7 (" PROGRAM-ID. prog.\n       ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 4/4 @ 3:7-5:2 (" PROCEDURE DIVISION.\n    ...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -149,7 +149,7 @@ _|_            STOP RUN._|_
     Appending chunk 3/8 @ 1:32-2:25 ("\n        PROGRAM-ID. prog.")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 3/8 back @ 1:32-2:0 ("\n")
@@ -159,19 +159,19 @@ _|_            STOP RUN._|_
     Appending chunk 4/8 @ 2:0-3:0 ("        PROGRAM-ID. prog.\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 4/8 back @ 2:0-2:25 ("        PROGRAM-ID. prog.")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 5/8 @ 2:25-3:27 ("\n        PROCEDURE DIVISI...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -179,13 +179,13 @@ _|_            STOP RUN._|_
     Cutting chunk 5/8 back @ 2:25-3:0 ("\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 6/8 @ 3:0-4:0 ("        PROCEDURE DIVISION...)
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -193,7 +193,7 @@ _|_            STOP RUN._|_
     Cutting chunk 6/8 back @ 3:0-3:27 ("        PROCEDURE DIVISION.")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -201,7 +201,7 @@ _|_            STOP RUN._|_
     Appending chunk 7/8 @ 3:27-4:21 ("\n            STOP RUN.")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -209,7 +209,7 @@ _|_            STOP RUN._|_
     Cutting chunk 7/8 back @ 3:27-4:0 ("\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -217,7 +217,7 @@ _|_            STOP RUN._|_
     Appending chunk 8/8 @ 4:0-5:2 ("            STOP RUN.\n  ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -316,7 +316,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 11/22 @ 2:16-3:0 ("ID. prog.\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 11/22 back @ 2:16-2:21 ("ID. p")
@@ -326,13 +326,13 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 12/22 @ 2:21-3:5 ("rog.\n     ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 12/22 back @ 2:21-3:0 ("rog.\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 13/22 @ 3:0-3:10 ("        PR")
@@ -342,7 +342,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Cutting chunk 13/22 back @ 3:0-3:5 ("     ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 14/22 @ 3:5-3:15 ("   PROCEDU")
@@ -372,7 +372,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 17/22 @ 3:20-4:2 ("VISION.\n  ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -384,7 +384,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 18/22 @ 3:25-4:7 ("N.\n       ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -392,7 +392,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Cutting chunk 18/22 back @ 3:25-4:2 ("N.\n  ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -400,7 +400,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 19/22 @ 4:2-4:12 ("          ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -408,7 +408,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Cutting chunk 19/22 back @ 4:2-4:7 ("     ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -420,7 +420,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Cutting chunk 20/22 back @ 4:7-4:12 ("     ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -428,7 +428,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 21/22 @ 4:12-5:0 ("STOP RUN.\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -440,7 +440,7 @@ let%expect_test "line-by-line-incremental-small-4" =
     Appending chunk 22/22 @ 4:17-5:2 ("RUN.\n  ")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN.
@@ -899,7 +899,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 56/103 @ 3:22-3:24 ("g.")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 56/103 back @ 3:22-3:23 ("g")
@@ -908,7 +908,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 57/103 @ 3:23-4:0 (".\n")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 57/103 back @ 3:23-3:24 (".")
@@ -917,17 +917,17 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 58/103 @ 3:24-4:1 ("\n ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 58/103 back @ 3:24-4:0 ("\n")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 59/103 @ 4:0-4:2 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 59/103 back @ 4:0-4:1 (" ")
@@ -936,12 +936,12 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 60/103 @ 4:1-4:3 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 60/103 back @ 4:1-4:2 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 61/103 @ 4:2-4:4 ("  ")
@@ -950,12 +950,12 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Cutting chunk 61/103 back @ 4:2-4:3 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 62/103 @ 4:3-4:5 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 62/103 back @ 4:3-4:4 (" ")
@@ -964,12 +964,12 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 63/103 @ 4:4-4:6 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Cutting chunk 63/103 back @ 4:4-4:5 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 64/103 @ 4:5-4:7 ("  ")
@@ -978,7 +978,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Cutting chunk 64/103 back @ 4:5-4:6 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
 
     Appending chunk 65/103 @ 4:6-4:8 (" P")
@@ -1127,7 +1127,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 83/103 @ 4:24-4:26 ("N.")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1138,14 +1138,14 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 84/103 @ 4:25-5:0 (".\n")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 84/103 back @ 4:25-4:26 (".")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1156,28 +1156,28 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Cutting chunk 85/103 back @ 4:26-5:0 ("\n")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 86/103 @ 5:0-5:2 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 86/103 back @ 5:0-5:1 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 87/103 @ 5:1-5:3 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1188,28 +1188,28 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 88/103 @ 5:2-5:4 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 88/103 back @ 5:2-5:3 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 89/103 @ 5:3-5:5 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 89/103 back @ 5:3-5:4 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1220,28 +1220,28 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Cutting chunk 90/103 back @ 5:4-5:5 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 91/103 @ 5:5-5:7 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 91/103 back @ 5:5-5:6 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 92/103 @ 5:6-5:8 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1252,28 +1252,28 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 93/103 @ 5:7-5:9 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 93/103 back @ 5:7-5:8 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Appending chunk 94/103 @ 5:8-5:10 ("  ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
 
     Cutting chunk 94/103 back @ 5:8-5:9 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1284,7 +1284,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Cutting chunk 95/103 back @ 5:9-5:10 (" ")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
 
@@ -1347,7 +1347,7 @@ let%expect_test "chunk-by-chunk-incremental-small-5" =
 
     Appending chunk 103/103 @ 5:17-5:19 ("N.")
     Parse-tree:
-      PROGRAM-ID. PROG.
+      PROGRAM-ID. prog.
 
       PROCEDURE DIVISION.
         STOP RUN. |}];;

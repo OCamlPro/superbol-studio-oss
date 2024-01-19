@@ -548,12 +548,14 @@ and check_statement (text:text) state ifcheck  =
 
   (*TODO: find a better way to distinguish PERFORM(inline) and PERFORM_CLOSED(out-of-line)*)
   (*A bug here, TODO.md for details*)
-  | {payload = TextWord "PERFORM"; loc } :: _ :: {payload = TextWord "TIMES"; _} :: wordlist
-  | {payload = TextWord "PERFORM"; loc } :: {payload = TextWord ("UNTIL"|"VARYING"|"WITH"|"TEST"); _}
-    :: wordlist ->
+  | { payload = TextWord "PERFORM"; loc } :: _ ::
+    { payload = TextWord "TIMES"; _} :: wordlist
+  | { payload = TextWord "PERFORM"; loc } ::
+    { payload = TextWord ("UNTIL"|"VARYING"|"WITH"|"TEST"); _} :: wordlist ->
       handle_open_scope PERFORM loc wordlist state ifcheck
 
-  | {payload = TextWord "ELSE"; loc} :: {payload = TextWord "IF"; _} :: wordlist ->
+  | { payload = TextWord "ELSE"; loc } ::
+    { payload = TextWord "IF"; _ } :: wordlist ->
       let context = exp_scope_termination THEN context in
       begin match context with
       | (THEN, _) :: (IF, _) :: context' ->
@@ -1228,6 +1230,17 @@ and check_fun = function
 
 
 let check_indentation (text:text) (state:indent_state) =
+  let text =
+    (* Note: the above code assumes upper-cased text words, so that's what we
+       need to feed it. *)
+    let open Cobol_common.Srcloc.INFIX in
+    let open Cobol_preproc.Text.TYPES in
+    EzList.tail_map begin fun tw -> match ~&tw with
+      | TextWord w -> TextWord (String.uppercase_ascii w) &@<- tw
+      | CDirWord w -> CDirWord (String.uppercase_ascii w) &@<- tw
+      | _ -> tw
+    end text
+  in
   match state.range with
   | None ->
     check_fun state.scope text state true

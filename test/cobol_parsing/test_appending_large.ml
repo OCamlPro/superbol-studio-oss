@@ -203,34 +203,34 @@ let%expect_test "line-by-line-incremental-mf" =
     Appending chunk 157/157 @ 210:1-211:0 ("\r\n")
     Parse-tree:
       IDENTIFICATION DIVISION.
-      PROGRAM-ID. REPORTEXAMPLESUMMARY.
-      AUTHOR. MICHAEL COUGHLAN .
+      PROGRAM-ID. ReportExampleSummary.
+      AUTHOR. Michael Coughlan .
       ENVIRONMENT DIVISION.
       INPUT-OUTPUT SECTION.
       FILE-CONTROL.
-      SELECT SALESFILE ASSIGN "GBSALES.DAT" SEQUENTIAL.
-      SELECT PRINTFILE ASSIGN "SUMMARYSALESREPORT.LPT".
+      SELECT SalesFile ASSIGN "GBSALES.DAT" SEQUENTIAL.
+      SELECT PrintFile ASSIGN "SUMMARYSALESREPORT.LPT".
       DATA DIVISION.
         FILE SECTION.
-        FD SALESFILE.
-        01 SALESRECORD.
-          88 ENDOFFILE VALUE HIGH-VALUES.
-          02 CITYCODE PIC 9.
-          02 SALESPERSONNUM PIC 9.
-          02 VALUEOFSALE PIC 9(4)V99.
-        FD PRINTFILE
-          REPORT IS SALESREPORT.
+        FD SalesFile.
+        01 SalesRecord.
+          88 EndOfFile VALUE HIGH-VALUES.
+          02 CityCode PIC 9.
+          02 SalesPersonNum PIC 9.
+          02 ValueOfSale PIC 9(4)V99.
+        FD PrintFile
+          REPORT IS SalesReport.
         WORKING-STORAGE SECTION.
-        01 NAMETABLE.
-          02 TABLEVALUES.
+        01 NameTable.
+          02 TableValues.
             03 FILLER PIC X(18) VALUE "Dublin   Belfast  ".
             03 FILLER PIC X(18) VALUE "Cork     Galway   ".
             03 FILLER PIC X(18) VALUE "Sligo    Waterford".
             03 FILLER PIC X(9) VALUE "Limerick".
-          02 FILLER REDEFINES TABLEVALUES.
-            03 CITYNAME PIC X(9) OCCURS 7.
-        01 RATETABLE.
-          02 TABLEVALUES.
+          02 FILLER REDEFINES TableValues.
+            03 CityName PIC X(9) OCCURS 7.
+        01 RateTable.
+          02 TableValues.
             03 FILLER PIC X(35) VALUE "12300321004350056700123002340034500".
             03 FILLER PIC X(35) VALUE "12300543001230034200111001220013300".
             03 FILLER PIC X(35) VALUE "12000321001760018700133001440015500".
@@ -240,19 +240,19 @@ let%expect_test "line-by-line-incremental-mf" =
             03 FILLER PIC X(35) VALUE "16700156001450014600222001110021200".
             03 FILLER PIC X(35) VALUE "12000132001230014300121003210043200".
             03 FILLER PIC X(35) VALUE "15400165001640017600111007770033300".
-          02 FILLER REDEFINES TABLEVALUES.
-            03 CITY OCCURS 7.
-              04 FIXEDRATE PIC 9(3)V99 OCCURS 9.
-        01 MISCVARIABLES.
-          02 COMMISSION PIC 9(4)V99.
-          02 PERCENTAGE PIC V99 VALUE .05.
-          02 SALARY PIC 9(6)V99.
-          02 SALESPERSONNOW PIC 9.
-          02 CITYNOW PIC 9.
+          02 FILLER REDEFINES TableValues.
+            03 City OCCURS 7.
+              04 FixedRate PIC 9(3)V99 OCCURS 9.
+        01 MiscVariables.
+          02 Commission PIC 9(4)V99.
+          02 Percentage PIC V99 VALUE .05.
+          02 Salary PIC 9(6)V99.
+          02 SalesPersonNow PIC 9.
+          02 CityNow PIC 9.
         REPORT SECTION.
-        RD SALESREPORT
-          CONTROL FINAL CITYCODE
-          SALESPERSONNUM
+        RD SalesReport
+          CONTROL FINAL CityCode
+          SalesPersonNum
           PAGE LIMIT IS 66 LINES
           HEADING 1
           FIRST DETAIL 6
@@ -272,46 +272,46 @@ let%expect_test "line-by-line-incremental-mf" =
             03 COLUMN LEFT 2 PIC X(4) VALUE "Name".
             03 COLUMN LEFT 13 PIC X(6) VALUE "Number".
             03 COLUMN LEFT 28 PIC X(5) VALUE "Value".
-        01 DETAILLINE TYPE DETAIL.
+        01 DetailLine TYPE DETAIL.
           02 LINE NUMBER PLUS 1.
-            03 COLUMN LEFT 1 PIC X(9) SOURCE CITYNAME(CITYCODE)  GROUP.
-            03 COLUMN LEFT 15 PIC 9 SOURCE SALESPERSONNUM  GROUP.
-            03 COLUMN LEFT 25 PIC $$,$$$.99 SOURCE VALUEOFSALE .
-        01 SALESPERSONGRP TYPE CF FOR SALESPERSONNUM NEXT GROUP IS PLUS 2.
+            03 COLUMN LEFT 1 PIC X(9) SOURCE CityName(CityCode)  GROUP.
+            03 COLUMN LEFT 15 PIC 9 SOURCE SalesPersonNum  GROUP.
+            03 COLUMN LEFT 25 PIC $$,$$$.99 SOURCE ValueOfSale .
+        01 SalesPersonGrp TYPE CF FOR SalesPersonNum NEXT GROUP IS PLUS 2.
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(21) VALUE "Sales for salesperson".
-            03 COLUMN LEFT 37 PIC 9 SOURCE SALESPERSONNUM .
+            03 COLUMN LEFT 37 PIC 9 SOURCE SalesPersonNum .
             03 COLUMN LEFT 43 PIC X VALUE "=".
-            03 SMS COLUMN LEFT 45 PIC $$$$$,$$$.99 SUM VALUEOFSALE .
+            03 SMS COLUMN LEFT 45 PIC $$$$$,$$$.99 SUM ValueOfSale .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(19) VALUE "Sales commission is".
             03 COLUMN LEFT 43 PIC X VALUE "=".
-            03 COLUMN LEFT 45 PIC $$$$$,$$$.99 SOURCE COMMISSION .
+            03 COLUMN LEFT 45 PIC $$$$$,$$$.99 SOURCE Commission .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(22) VALUE "Salesperson salary is".
             03 COLUMN LEFT 43 PIC X VALUE "=".
-            03 COLUMN LEFT 45 PIC $$$$$,$$$.99 SOURCE SALARY .
+            03 COLUMN LEFT 45 PIC $$$$$,$$$.99 SOURCE Salary .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(30) VALUE "Current  salesperson number = ".
-            03 COLUMN LEFT 45 PIC 9 SOURCE SALESPERSONNOW .
+            03 COLUMN LEFT 45 PIC 9 SOURCE SalesPersonNow .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(30) VALUE "Previous salesperson number = ".
-            03 COLUMN LEFT 45 PIC 9 SOURCE SALESPERSONNUM .
-        01 CITYGRP TYPE CF FOR CITYCODE NEXT GROUP IS PLUS 2.
+            03 COLUMN LEFT 45 PIC 9 SOURCE SalesPersonNum .
+        01 CityGrp TYPE CF FOR CityCode NEXT GROUP IS PLUS 2.
           02 LINE NUMBER PLUS 2.
             03 COLUMN LEFT 15 PIC X(9) VALUE "Sales for".
-            03 COLUMN LEFT 25 PIC X(9) SOURCE CITYNAME(CITYCODE) .
+            03 COLUMN LEFT 25 PIC X(9) SOURCE CityName(CityCode) .
             03 COLUMN LEFT 43 PIC X VALUE "=".
             03 CS COLUMN LEFT 45 PIC $$$$$,$$$.99 SUM SMS .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(12) VALUE "Current city".
             03 COLUMN LEFT 43 PIC X VALUE "=".
-            03 COLUMN LEFT 45 PIC 9 SOURCE CITYNOW .
+            03 COLUMN LEFT 45 PIC 9 SOURCE CityNow .
           02 LINE NUMBER PLUS 1.
             03 COLUMN LEFT 15 PIC X(13) VALUE "Previous city".
             03 COLUMN LEFT 43 PIC X VALUE "=".
-            03 COLUMN LEFT 45 PIC 9 SOURCE CITYCODE .
-        01 TOTALSALESGRP TYPE CF FOR FINAL.
+            03 COLUMN LEFT 45 PIC 9 SOURCE CityCode .
+        01 TotalSalesGrp TYPE CF FOR FINAL.
           02 LINE NUMBER PLUS 4.
             03 COLUMN LEFT 15 PIC X(11) VALUE "Total sales".
             03 COLUMN LEFT 43 PIC X VALUE "=".
@@ -323,36 +323,36 @@ let%expect_test "line-by-line-incremental-mf" =
             03 COLUMN LEFT 52 PIC Z9 SOURCE PAGE-COUNTER .
       PROCEDURE DIVISION.
       DECLARATIVES.
-      CALC SECTION.
-        USE BEFORE REPORTING SALESPERSONGRP.
-      CALCULATE-SALARY.
-      MULTIPLY SMS BY PERCENTAGE GIVING COMMISSION ROUNDED END-MULTIPLY.
-      ADD COMMISSION TO FIXEDRATE(CITYCODE, SALESPERSONNUM) GIVING SALARY END-ADD.
+      Calc SECTION.
+        USE BEFORE REPORTING SalesPersonGrp.
+      Calculate-Salary.
+      MULTIPLY SMS BY Percentage GIVING Commission ROUNDED END-MULTIPLY.
+      ADD Commission TO FixedRate(CityCode, SalesPersonNum) GIVING Salary END-ADD.
       END DECLARATIVES.
-        MAIN SECTION.
+        Main SECTION.
 
-        BEGIN.
-        OPEN INPUT SALESFILE.
+        Begin.
+        OPEN INPUT SalesFile.
 
-        OPEN OUTPUT PRINTFILE.
+        OPEN OUTPUT PrintFile.
 
-        READ SALESFILE AT END SET ENDOFFILE TO TRUE END-READ.
+        READ SalesFile AT END SET EndOfFile TO TRUE END-READ.
 
-        INITIATE SALESREPORT.
+        INITIATE SalesReport.
 
-        PERFORM PRINTSALARYREPORT UNTIL ENDOFFILE.
+        PERFORM PrintSalaryReport UNTIL EndOfFile.
 
-        TERMINATE SALESREPORT.
+        TERMINATE SalesReport.
 
-        CLOSE SALESFILE PRINTFILE.
+        CLOSE SalesFile PrintFile.
 
         STOP RUN.
-        PRINTSALARYREPORT.
-        MOVE CITYCODE TO CITYNOW.
+        PrintSalaryReport.
+        MOVE CityCode TO CityNow.
 
-        MOVE SALESPERSONNUM TO SALESPERSONNOW.
+        MOVE SalesPersonNum TO SalesPersonNow.
 
-        GENERATE SALESREPORT.
+        GENERATE SalesReport.
 
-        READ SALESFILE AT END SET ENDOFFILE TO TRUE END-READ.
+        READ SalesFile AT END SET EndOfFile TO TRUE END-READ.
 |}];;

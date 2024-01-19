@@ -59,7 +59,7 @@ let find_phrase first_word ?(prefix = `Same) text : _ result =
           Ok { prefix; phrase; suffix }
 
 (** [find_full_phrase words ~search_deep ~try_hard ~prefix text] looks for a
-    pharse comprised of all words in [words] and termiates with a period in
+    phrase comprised of all words in [words] that termiates with a period in
     [text].  If [prefix = `Rev] and upon success, the prefix is reveresed in the
     returned structure.
 

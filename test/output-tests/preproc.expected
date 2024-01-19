@@ -4,12 +4,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  .
  PROGRAM-ID
  .
- ACCEPTANDDISPLAY
+ AcceptAndDisplay
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -18,56 +18,56 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  SECTION
  .
  01
- STUDENTDETAILS
+ StudentDetails
  .
  02
- STUDENTID
+ StudentId
  PIC
  9(7)
  .
  02
- STUDENTNAME
+ StudentName
  .
  03
- SURNAME
+ Surname
  PIC
  X(8)
  .
  03
- INITIALS
+ Initials
  PIC
  XX
  .
  02
- COURSECODE
+ CourseCode
  PIC
  X(4)
  .
  02
- GENDER
+ Gender
  PIC
  X
  .
  01
- CURRENTDATE
+ CurrentDate
  .
  02
- CURRENTYEAR
+ CurrentYear
  PIC
  9(4)
  .
  02
- CURRENTMONTH
+ CurrentMonth
  PIC
  99
  .
  02
- CURRENTDAY
+ CurrentDay
  PIC
  99
  .
  01
- DAYOFYEAR
+ DayOfYear
  .
  02
  FILLER
@@ -75,20 +75,20 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  9(4)
  .
  02
- YEARDAY
+ YearDay
  PIC
  9(3)
  .
  01
- CURRENTTIME
+ CurrentTime
  .
  02
- CURRENTHOUR
+ CurrentHour
  PIC
  99
  .
  02
- CURRENTMINUTE
+ CurrentMinute
  PIC
  99
  .
@@ -100,7 +100,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Enter student details using template below"
@@ -111,49 +111,49 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  "SSSSSSSNNNNNNNNIICCCCG"
  .
  ACCEPT
- STUDENTDETAILS
+ StudentDetails
  .
  ACCEPT
- CURRENTDATE
+ CurrentDate
  FROM
  DATE
  YYYYMMDD
  .
  ACCEPT
- DAYOFYEAR
+ DayOfYear
  FROM
  DAY
  YYYYDDD
  .
  ACCEPT
- CURRENTTIME
+ CurrentTime
  FROM
  TIME
  .
  DISPLAY
  "Name is "
- INITIALS
+ Initials
  SPACE
- SURNAME
+ Surname
  .
  DISPLAY
  "Date is "
- CURRENTDAY
+ CurrentDay
  SPACE
- CURRENTMONTH
+ CurrentMonth
  SPACE
- CURRENTYEAR
+ CurrentYear
  .
  DISPLAY
  "Today is day "
- YEARDAY
+ YearDay
  " of the year"
  .
  DISPLAY
  "The time is "
- CURRENTHOUR
+ CurrentHour
  ":"
- CURRENTMINUTE
+ CurrentMinute
  .
  STOP
  RUN
@@ -166,12 +166,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
  .
  PROGRAM-ID
  .
- MULTIPLIER
+ Multiplier
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -180,21 +180,21 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
  SECTION
  .
  01
- NUM1
+ Num1
  PIC
  9
  VALUE
  ZEROS
  .
  01
- NUM2
+ Num2
  PIC
  9
  VALUE
  ZEROS
  .
  01
- RESULT
+ Result
  PIC
  99
  VALUE
@@ -210,7 +210,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
  ADVANCING
  .
  ACCEPT
- NUM1
+ Num1
  .
  DISPLAY
  "Enter second number (1 digit) : "
@@ -219,18 +219,18 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
  ADVANCING
  .
  ACCEPT
- NUM2
+ Num2
  .
  MULTIPLY
- NUM1
+ Num1
  BY
- NUM2
+ Num2
  GIVING
- RESULT
+ Result
  .
  DISPLAY
  "Result is = "
- RESULT
+ Result
  .
  STOP
  RUN
@@ -243,12 +243,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/Shortest.CBL':
  .
  PROGRAM-ID
  .
- SHORTESTPROGRAM
+ ShortestProgram
  .
  PROCEDURE
  DIVISION
  .
- DISPLAYPROMPT
+ DisplayPrompt
  .
  DISPLAY
  "I did it"
@@ -264,12 +264,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  .
  PROGRAM-ID
  .
- CONDITIONS
+ Conditions
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -278,12 +278,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  SECTION
  .
  01
- CHAR
+ Char
  PIC
  X
  .
  88
- VOWEL
+ Vowel
  VALUE
  "a"
  "e"
@@ -292,7 +292,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  "u"
  .
  88
- CONSONANT
+ Consonant
  VALUE
  "b"
  "c"
@@ -311,14 +311,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  "z"
  .
  88
- DIGIT
+ Digit
  VALUE
  "0"
  THRU
  "9"
  .
  88
- VALIDCHARACTER
+ ValidCharacter
  VALUE
  "a"
  THRU
@@ -330,36 +330,36 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Enter lower case character or digit. No data ends."
  .
  ACCEPT
- CHAR
+ Char
  .
  PERFORM
  UNTIL
  NOT
- VALIDCHARACTER
+ ValidCharacter
  EVALUATE
  TRUE
  WHEN
- VOWEL
+ Vowel
  DISPLAY
  "The letter "
- CHAR
+ Char
  " is a vowel."
  WHEN
- CONSONANT
+ Consonant
  DISPLAY
  "The letter "
- CHAR
+ Char
  " is a consonant."
  WHEN
- DIGIT
+ Digit
  DISPLAY
- CHAR
+ Char
  " is a digit."
  WHEN
  OTHER
@@ -378,12 +378,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  .
  PROGRAM-ID
  .
- ITERATION-IF
+ Iteration-If
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -392,28 +392,28 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  SECTION
  .
  01
- NUM1
+ Num1
  PIC
  9
  VALUE
  ZEROS
  .
  01
- NUM2
+ Num2
  PIC
  9
  VALUE
  ZEROS
  .
  01
- RESULT
+ Result
  PIC
  99
  VALUE
  ZEROS
  .
  01
- OPERATOR
+ Operator
  PIC
  X
  VALUE
@@ -422,7 +422,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  PROCEDURE
  DIVISION
  .
- CALCULATOR
+ Calculator
  .
  PERFORM
  3
@@ -433,47 +433,47 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  NO
  ADVANCING
  ACCEPT
- NUM1
+ Num1
  DISPLAY
  "Enter Second Number     : "
  WITH
  NO
  ADVANCING
  ACCEPT
- NUM2
+ Num2
  DISPLAY
  "Enter operator (+ or *) : "
  WITH
  NO
  ADVANCING
  ACCEPT
- OPERATOR
+ Operator
  IF
- OPERATOR
+ Operator
  =
  "+"
  THEN
  ADD
- NUM1
- NUM2
+ Num1
+ Num2
  GIVING
- RESULT
+ Result
  END-IF
  IF
- OPERATOR
+ Operator
  =
  "*"
  THEN
  MULTIPLY
- NUM1
+ Num1
  BY
- NUM2
+ Num2
  GIVING
- RESULT
+ Result
  END-IF
  DISPLAY
  "Result is = "
- RESULT
+ Result
  END-PERFORM
  .
  STOP
@@ -487,12 +487,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  .
  PROGRAM-ID
  .
- DIRECTREADIDX
+ DirectReadIdx
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -503,7 +503,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  FILE-CONTROL
  .
  SELECT
- VIDEOFILE
+ VideoFile
  ASSIGN
  TO
  "IDXVIDEO.DAT"
@@ -517,18 +517,18 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  RECORD
  KEY
  IS
- VIDEOCODE
+ VideoCode
  ALTERNATE
  RECORD
  KEY
  IS
- VIDEOTITLE
+ VideoTitle
  WITH
  DUPLICATES
  FILE
  STATUS
  IS
- VIDEOSTATUS
+ VideoStatus
  .
  DATA
  DIVISION
@@ -537,23 +537,23 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  SECTION
  .
  FD
- VIDEOFILE
+ VideoFile
  .
  01
- VIDEORECORD
+ VideoRecord
  .
  02
- VIDEOCODE
+ VideoCode
  PIC
  9(5)
  .
  02
- VIDEOTITLE
+ VideoTitle
  PIC
  X(40)
  .
  02
- SUPPLIERCODE
+ SupplierCode
  PIC
  99
  .
@@ -561,56 +561,56 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  SECTION
  .
  01
- VIDEOSTATUS
+ VideoStatus
  PIC
  X(2)
  .
  88
- RECORDFOUND
+ RecordFound
  VALUE
  "00"
  .
  01
- REQUIREDKEY
+ RequiredKey
  PIC
  9
  .
  88
- VIDEOCODEKEY
+ VideoCodeKey
  VALUE
  1
  .
  88
- VIDEOTITLEKEY
+ VideoTitleKey
  VALUE
  2
  .
  01
- PRNVIDEORECORD
+ PrnVideoRecord
  .
  02
- PRNVIDEOCODE
+ PrnVideoCode
  PIC
  9(5)
  .
  02
- PRNVIDEOTITLE
+ PrnVideoTitle
  PIC
  BBBBX(40)
  .
  02
- PRNSUPPLIERCODE
+ PrnSupplierCode
  PIC
  BBBB99
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- VIDEOFILE
+ VideoFile
  .
  DISPLAY
  "Chose key VideoCode = 1,  VideoTitle = 2 ->  "
@@ -619,70 +619,70 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  ADVANCING
  .
  ACCEPT
- REQUIREDKEY
+ RequiredKey
  .
  IF
- VIDEOCODEKEY
+ VideoCodeKey
  DISPLAY
  "Enter Video Code (5 digits) -> "
  WITH
  NO
  ADVANCING
  ACCEPT
- VIDEOCODE
+ VideoCode
  READ
- VIDEOFILE
+ VideoFile
  KEY
  IS
- VIDEOCODE
+ VideoCode
  INVALID
  KEY
  DISPLAY
  "VIDEO STATUS :- "
- VIDEOSTATUS
+ VideoStatus
  END-READ
  END-IF
  IF
- VIDEOTITLEKEY
+ VideoTitleKey
  DISPLAY
  "Enter Video Title (40 chars) -> "
  WITH
  NO
  ADVANCING
  ACCEPT
- VIDEOTITLE
+ VideoTitle
  READ
- VIDEOFILE
+ VideoFile
  KEY
  IS
- VIDEOTITLE
+ VideoTitle
  INVALID
  KEY
  DISPLAY
  "VIDEO STATUS :- "
- VIDEOSTATUS
+ VideoStatus
  END-READ
  END-IF
  IF
- RECORDFOUND
+ RecordFound
  MOVE
- VIDEOCODE
+ VideoCode
  TO
- PRNVIDEOCODE
+ PrnVideoCode
  MOVE
- VIDEOTITLE
+ VideoTitle
  TO
- PRNVIDEOTITLE
+ PrnVideoTitle
  MOVE
- SUPPLIERCODE
+ SupplierCode
  TO
- PRNSUPPLIERCODE
+ PrnSupplierCode
  DISPLAY
- PRNVIDEORECORD
+ PrnVideoRecord
  END-IF
  .
  CLOSE
- VIDEOFILE
+ VideoFile
  .
  STOP
  RUN
@@ -695,12 +695,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  .
  PROGRAM-ID
  .
- SEQ2INDEX
+ Seq2Index
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -711,7 +711,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  FILE-CONTROL
  .
  SELECT
- VIDEOFILE
+ VideoFile
  ASSIGN
  TO
  "IDXVIDEO.DAT"
@@ -725,21 +725,21 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  RECORD
  KEY
  IS
- VIDEOCODE
+ VideoCode
  ALTERNATE
  RECORD
  KEY
  IS
- VIDEOTITLE
+ VideoTitle
  WITH
  DUPLICATES
  FILE
  STATUS
  IS
- VIDEOSTATUS
+ VideoStatus
  .
  SELECT
- SEQVIDEOFILE
+ SeqVideoFile
  ASSIGN
  TO
  "SEQVIDEO.DAT"
@@ -755,49 +755,49 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  SECTION
  .
  FD
- VIDEOFILE
+ VideoFile
  .
  01
- VIDEORECORD
+ VideoRecord
  .
  02
- VIDEOCODE
+ VideoCode
  PIC
  9(5)
  .
  02
- VIDEOTITLE
+ VideoTitle
  PIC
  X(40)
  .
  02
- VIDEOSUPPLIERCODE
+ VideoSupplierCode
  PIC
  99
  .
  FD
- SEQVIDEOFILE
+ SeqVideoFile
  .
  01
- SEQVIDEORECORD
+ SeqVideoRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- SEQVIDEOCODE
+ SeqVideoCode
  PIC
  9(5)
  .
  02
- SEQVIDEOTITLE
+ SeqVideoTitle
  PIC
  X(40)
  .
  02
- SEQVIDEOSUPPLIERCODE
+ SeqVideoSupplierCode
  PIC
  99
  .
@@ -805,60 +805,60 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  SECTION
  .
  01
- VIDEOSTATUS
+ VideoStatus
  PIC
  X(2)
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- SEQVIDEOFILE
+ SeqVideoFile
  .
  OPEN
  OUTPUT
- VIDEOFILE
+ VideoFile
  .
  READ
- SEQVIDEOFILE
+ SeqVideoFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  WRITE
- VIDEORECORD
+ VideoRecord
  FROM
- SEQVIDEORECORD
+ SeqVideoRecord
  INVALID
  KEY
  DISPLAY
  "VIDEO STATUS :- "
- VIDEOSTATUS
+ VideoStatus
  END-WRITE
  READ
- SEQVIDEOFILE
+ SeqVideoFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  .
  CLOSE
- VIDEOFILE
- SEQVIDEOFILE
+ VideoFile
+ SeqVideoFile
  .
  STOP
  RUN
@@ -871,12 +871,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  .
  PROGRAM-ID
  .
- SEQREADIDX
+ SeqReadIdx
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -887,7 +887,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  FILE-CONTROL
  .
  SELECT
- VIDEOFILE
+ VideoFile
  ASSIGN
  TO
  "IDXVIDEO.DAT"
@@ -901,18 +901,18 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  RECORD
  KEY
  IS
- VIDEOCODE
+ VideoCode
  ALTERNATE
  RECORD
  KEY
  IS
- VIDEOTITLE
+ VideoTitle
  WITH
  DUPLICATES
  FILE
  STATUS
  IS
- VIDEOSTATUS
+ VideoStatus
  .
  DATA
  DIVISION
@@ -921,28 +921,28 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  SECTION
  .
  FD
- VIDEOFILE
+ VideoFile
  .
  01
- VIDEORECORD
+ VideoRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUE
  .
  02
- VIDEOCODE
+ VideoCode
  PIC
  9(5)
  .
  02
- VIDEOTITLE
+ VideoTitle
  PIC
  X(40)
  .
  02
- SUPPLIERCODE
+ SupplierCode
  PIC
  99
  .
@@ -950,51 +950,51 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  SECTION
  .
  01
- VIDEOSTATUS
+ VideoStatus
  PIC
  X(2)
  .
  01
- REQUIREDSEQUENCE
+ RequiredSequence
  PIC
  9
  .
  88
- VIDEOCODESEQUENCE
+ VideoCodeSequence
  VALUE
  1
  .
  88
- VIDEOTITLESEQUENCE
+ VideoTitleSequence
  VALUE
  2
  .
  01
- PRNVIDEORECORD
+ PrnVideoRecord
  .
  02
- PRNVIDEOCODE
+ PrnVideoCode
  PIC
  9(5)
  .
  02
- PRNVIDEOTITLE
+ PrnVideoTitle
  PIC
  BBBBX(40)
  .
  02
- PRNSUPPLIERCODE
+ PrnSupplierCode
  PIC
  BBBB99
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- VIDEOFILE
+ VideoFile
  .
  DISPLAY
  "Enter key : 1=VideoCode, 2=VideoTitle ->"
@@ -1003,72 +1003,72 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  ADVANCING
  .
  ACCEPT
- REQUIREDSEQUENCE
+ RequiredSequence
  .
  IF
- VIDEOTITLESEQUENCE
+ VideoTitleSequence
  MOVE
  SPACES
  TO
- VIDEOTITLE
+ VideoTitle
  START
- VIDEOFILE
+ VideoFile
  KEY
  IS
  GREATER
  THAN
- VIDEOTITLE
+ VideoTitle
  INVALID
  KEY
  DISPLAY
  "VIDEO STATUS :- "
- VIDEOSTATUS
+ VideoStatus
  END-START
  END-IF
  READ
- VIDEOFILE
+ VideoFile
  NEXT
  RECORD
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  MOVE
- VIDEOCODE
+ VideoCode
  TO
- PRNVIDEOCODE
+ PrnVideoCode
  MOVE
- VIDEOTITLE
+ VideoTitle
  TO
- PRNVIDEOTITLE
+ PrnVideoTitle
  MOVE
- SUPPLIERCODE
+ SupplierCode
  TO
- PRNSUPPLIERCODE
+ PrnSupplierCode
  DISPLAY
- PRNVIDEORECORD
+ PrnVideoRecord
  READ
- VIDEOFILE
+ VideoFile
  NEXT
  RECORD
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  .
  CLOSE
- VIDEOFILE
+ VideoFile
  .
  STOP
  RUN
@@ -1081,7 +1081,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  .
  PROGRAM-ID
  .
- MERGEFILES
+ MergeFiles
  .
  AUTHOR
  .
@@ -1097,7 +1097,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -1107,7 +1107,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  SEQUENTIAL
  .
  SELECT
- INSERTIONSFILE
+ InsertionsFile
  ASSIGN
  TO
  "TRANSINS.DAT"
@@ -1117,7 +1117,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  SEQUENTIAL
  .
  SELECT
- NEWSTUDENTFILE
+ NewStudentFile
  ASSIGN
  TO
  "STUDENTS.NEW"
@@ -1127,7 +1127,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  SEQUENTIAL
  .
  SELECT
- WORKFILE
+ WorkFile
  ASSIGN
  TO
  "WORK.TMP"
@@ -1139,37 +1139,37 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTREC
+ StudentRec
  PIC
  X(30)
  .
  FD
- INSERTIONSFILE
+ InsertionsFile
  .
  01
- INSERTIONREC
+ InsertionRec
  PIC
  X(30)
  .
  FD
- NEWSTUDENTFILE
+ NewStudentFile
  .
  01
- NEWSTUDENTREC
+ NewStudentRec
  PIC
  X(30)
  .
  SD
- WORKFILE
+ WorkFile
  .
  01
- WORKREC
+ WorkRec
  .
  02
- WSTUDENTID
+ WStudentId
  PIC
  9(7)
  .
@@ -1181,19 +1181,19 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  MERGE
- WORKFILE
+ WorkFile
  ON
  ASCENDING
  KEY
- WSTUDENTID
+ WStudentId
  USING
- INSERTIONSFILE
- STUDENTFILE
+ InsertionsFile
+ StudentFile
  GIVING
- NEWSTUDENTFILE
+ NewStudentFile
  .
  STOP
  RUN
@@ -1206,12 +1206,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CB
  .
  PROGRAM-ID
  .
- MILEAGECOUNTER
+ MileageCounter
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -1220,51 +1220,51 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CB
  SECTION
  .
  01
- COUNTERS
+ Counters
  .
  02
- HUNDREDSCOUNT
+ HundredsCount
  PIC
  99
  VALUE
  ZEROS
  .
  02
- TENSCOUNT
+ TensCount
  PIC
  99
  VALUE
  ZEROS
  .
  02
- UNITSCOUNT
+ UnitsCount
  PIC
  99
  VALUE
  ZEROS
  .
  01
- DISPLAYITEMS
+ DisplayItems
  .
  02
- PRNHUNDS
+ PrnHunds
  PIC
  9
  .
  02
- PRNTENS
+ PrnTens
  PIC
  9
  .
  02
- PRNUNITS
+ PrnUnits
  PIC
  9
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Using an out-of-line Perform"
@@ -1273,35 +1273,35 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CB
  "About to start mileage counter simulation"
  .
  PERFORM
- COUNTMILAGE
+ CountMilage
  VARYING
- HUNDREDSCOUNT
+ HundredsCount
  FROM
  0
  BY
  1
  UNTIL
- HUNDREDSCOUNT
+ HundredsCount
  >
  9
  AFTER
- TENSCOUNT
+ TensCount
  FROM
  0
  BY
  1
  UNTIL
- TENSCOUNT
+ TensCount
  >
  9
  AFTER
- UNITSCOUNT
+ UnitsCount
  FROM
  0
  BY
  1
  UNTIL
- UNITSCOUNT
+ UnitsCount
  >
  9
  DISPLAY
@@ -1313,55 +1313,55 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CB
  .
  PERFORM
  VARYING
- HUNDREDSCOUNT
+ HundredsCount
  FROM
  0
  BY
  1
  UNTIL
- HUNDREDSCOUNT
+ HundredsCount
  >
  9
  PERFORM
  VARYING
- TENSCOUNT
+ TensCount
  FROM
  0
  BY
  1
  UNTIL
- TENSCOUNT
+ TensCount
  >
  9
  PERFORM
  VARYING
- UNITSCOUNT
+ UnitsCount
  FROM
  0
  BY
  1
  UNTIL
- UNITSCOUNT
+ UnitsCount
  >
  9
  MOVE
- HUNDREDSCOUNT
+ HundredsCount
  TO
- PRNHUNDS
+ PrnHunds
  MOVE
- TENSCOUNT
+ TensCount
  TO
- PRNTENS
+ PrnTens
  MOVE
- UNITSCOUNT
+ UnitsCount
  TO
- PRNUNITS
+ PrnUnits
  DISPLAY
- PRNHUNDS
+ PrnHunds
  "-"
- PRNTENS
+ PrnTens
  "-"
- PRNUNITS
+ PrnUnits
  END-PERFORM
  END-PERFORM
  END-PERFORM
@@ -1371,26 +1371,26 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/MileageCount.CB
  STOP
  RUN
  .
- COUNTMILAGE
+ CountMilage
  .
  MOVE
- HUNDREDSCOUNT
+ HundredsCount
  TO
- PRNHUNDS
+ PrnHunds
  MOVE
- TENSCOUNT
+ TensCount
  TO
- PRNTENS
+ PrnTens
  MOVE
- UNITSCOUNT
+ UnitsCount
  TO
- PRNUNITS
+ PrnUnits
  DISPLAY
- PRNHUNDS
+ PrnHunds
  "-"
- PRNTENS
+ PrnTens
  "-"
- PRNUNITS
+ PrnUnits
  .
 
 Done.
@@ -1400,48 +1400,48 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM1.CBL':
  .
  PROGRAM-ID
  .
- PERFORMFORMAT1
+ PerformFormat1
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  PROCEDURE
  DIVISION
  .
- TOPLEVEL
+ TopLevel
  .
  DISPLAY
  "In TopLevel. Starting to run program"
  PERFORM
- ONELEVELDOWN
+ OneLevelDown
  DISPLAY
  "Back in TopLevel."
  .
  STOP
  RUN
  .
- TWOLEVELSDOWN
+ TwoLevelsDown
  .
  DISPLAY
  ">>>>>>>> Now in TwoLevelsDown."
  PERFORM
- THREELEVELSDOWN
+ ThreeLevelsDown
  .
  DISPLAY
  ">>>>>>>> Back in TwoLevelsDown."
  .
- ONELEVELDOWN
+ OneLevelDown
  .
  DISPLAY
  ">>>> Now in OneLevelDown"
  PERFORM
- TWOLEVELSDOWN
+ TwoLevelsDown
  DISPLAY
  ">>>> Back in OneLevelDown"
  .
- THREELEVELSDOWN
+ ThreeLevelsDown
  .
  DISPLAY
  ">>>>>>>>>>>> Now in ThreeLevelsDown"
@@ -1454,12 +1454,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
  .
  PROGRAM-ID
  .
- PERFORMFORMAT3
+ PerformFormat3
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -1468,38 +1468,38 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
  SECTION
  .
  01
- ITERCOUNT
+ IterCount
  PIC
  99
  VALUE
  ZEROS
  .
  88
- MAXCOUNTREACHED
+ MaxCountReached
  VALUE
  99
  .
  01
- USERINPUT
+ UserInput
  PIC
  99
  VALUE
  ZEROS
  .
  88
- ENDOFUSERINPUT
+ EndOfUserInput
  VALUE
  ZEROS
  .
  01
- RUNNINGTOTAL
+ RunningTotal
  PIC
  999
  VALUE
  ZEROS
  .
  01
- AVERAGEVALUE
+ AverageValue
  PIC
  99
  VALUES
@@ -1508,25 +1508,25 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  PERFORM
  UNTIL
- ITERCOUNT
+ IterCount
  =
  5
  DISPLAY
  "IterCount = "
- ITERCOUNT
+ IterCount
  ADD
  1
  TO
- ITERCOUNT
+ IterCount
  END-PERFORM
  DISPLAY
  "Finished in line Perform."
  INITIALIZE
- ITERCOUNT
+ Itercount
  DISPLAY
  "Enter a stream of up to 99 numbers."
  DISPLAY
@@ -1537,37 +1537,37 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
  NO
  ADVANCING
  ACCEPT
- USERINPUT
+ UserInput
  PERFORM
- GETUSERINPUT
+ GetUserInput
  UNTIL
- ENDOFUSERINPUT
+ EndOfUserInput
  OR
- MAXCOUNTREACHED
+ MaxCountReached
  DISPLAY
  "The final total is - "
- RUNNINGTOTAL
+ RunningTotal
  DISPLAY
  "The final count is - "
- ITERCOUNT
+ IterCount
  COMPUTE
- AVERAGEVALUE
+ AverageValue
  =
- RUNNINGTOTAL
+ RunningTotal
  /
- ITERCOUNT
+ IterCount
  DISPLAY
  "The average value entered is - "
- AVERAGEVALUE
+ AverageValue
  STOP
  RUN
  .
- GETUSERINPUT
+ GetUserInput
  .
  ADD
- USERINPUT
+ UserInput
  TO
- RUNNINGTOTAL
+ RunningTotal
  ON
  SIZE
  ERROR
@@ -1580,22 +1580,22 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM3.CBL':
  ADD
  1
  TO
- ITERCOUNT
+ IterCount
  END-ADD
  END-ADD
  DISPLAY
  "Total so far is - "
- RUNNINGTOTAL
+ RunningTotal
  DISPLAY
  "Count so far is - "
- ITERCOUNT
+ IterCount
  DISPLAY
  "Enter number :- "
  WITH
  NO
  ADVANCING
  ACCEPT
- USERINPUT
+ UserInput
  .
 
 Done.
@@ -1605,12 +1605,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  .
  PROGRAM-ID
  .
- PERFORMFORMAT4
+ PerformFormat4
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -1619,14 +1619,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  SECTION
  .
  01
- LOOPCOUNT
+ LoopCount
  PIC
  9
  VALUE
  ZEROS
  .
  01
- LOOPCOUNT2
+ LoopCount2
  PIC
  S9
  VALUE
@@ -1635,77 +1635,77 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Start WHILE Iteration of LoopBody"
  PERFORM
- LOOPBODY
+ LoopBody
  WITH
  TEST
  BEFORE
  VARYING
- LOOPCOUNT
+ LoopCount
  FROM
  1
  BY
  2
  UNTIL
- LOOPCOUNT
+ LoopCount
  GREATER
  THAN
  5
  .
  DISPLAY
  "Finished WHILE iteration.  LoopCount = "
- LOOPCOUNT
+ LoopCount
  .
  DISPLAY
  "Start REPEAT Iteration of LoopBody"
  PERFORM
- LOOPBODY
+ LoopBody
  WITH
  TEST
  AFTER
  VARYING
- LOOPCOUNT
+ LoopCount
  FROM
  1
  BY
  2
  UNTIL
- LOOPCOUNT
+ LoopCount
  GREATER
  THAN
  5
  .
  DISPLAY
  "Finished REPEAT iteration. LoopCount = "
- LOOPCOUNT
+ LoopCount
  .
  DISPLAY
  "Start inline loops"
  PERFORM
  VARYING
- LOOPCOUNT
+ LoopCount
  FROM
  1
  BY
  1
  UNTIL
- LOOPCOUNT
+ LoopCount
  GREATER
  THAN
  4
  PERFORM
  VARYING
- LOOPCOUNT2
+ LoopCount2
  FROM
  5
  BY
  -2
  UNTIL
- LOOPCOUNT2
+ LoopCount2
  LESS
  THAN
  ZERO
@@ -1716,9 +1716,9 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  ADVANCING
  DISPLAY
  "LoopCount = "
- LOOPCOUNT
+ LoopCount
  " LoopCount2 = "
- LOOPCOUNT2
+ LoopCount2
  END-PERFORM
  END-PERFORM
  .
@@ -1729,26 +1729,26 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  "Start PERFORM VARYING..AFTER"
  .
  PERFORM
- LOOPBODY
+ LoopBody
  VARYING
- LOOPCOUNT
+ LoopCount
  FROM
  1
  BY
  1
  UNTIL
- LOOPCOUNT
+ LoopCount
  GREATER
  THAN
  4
  AFTER
- LOOPCOUNT2
+ LoopCount2
  FROM
  5
  BY
  -2
  UNTIL
- LOOPCOUNT2
+ LoopCount2
  LESS
  THAN
  ZERO
@@ -1759,7 +1759,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  STOP
  RUN
  .
- LOOPBODY
+ LoopBody
  .
  DISPLAY
  "LoopBody "
@@ -1768,9 +1768,9 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Perform/PERFORM4.CBL':
  ADVANCING
  DISPLAY
  "LoopCount = "
- LOOPCOUNT
+ LoopCount
  " LoopCount2 = "
- LOOPCOUNT2
+ LoopCount2
  .
 
 Done.
@@ -1780,7 +1780,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  .
  PROGRAM-ID
  .
- READRELATIVE
+ ReadRelative
  .
  AUTHOR
  .
@@ -1796,7 +1796,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  FILE-CONTROL
  .
  SELECT
- SUPPLIERFILE
+ SupplierFile
  ASSIGN
  TO
  "RELSUPP.DAT"
@@ -1810,11 +1810,11 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  RELATIVE
  KEY
  IS
- SUPPLIERKEY
+ SupplierKey
  FILE
  STATUS
  IS
- SUPPLIERSTATUS
+ Supplierstatus
  .
  DATA
  DIVISION
@@ -1823,28 +1823,28 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  SECTION
  .
  FD
- SUPPLIERFILE
+ SupplierFile
  .
  01
- SUPPLIERRECORD
+ SupplierRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- SUPPLIERCODE
+ SupplierCode
  PIC
  99
  .
  02
- SUPPLIERNAME
+ SupplierName
  PIC
  X(20)
  .
  02
- SUPPLIERADDRESS
+ SupplierAddress
  PIC
  X(50)
  .
@@ -1852,50 +1852,50 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  SECTION
  .
  01
- SUPPLIERSTATUS
+ SupplierStatus
  PIC
  X(2)
  .
  88
- RECORDFOUND
+ RecordFound
  VALUE
  "00"
  .
  01
- SUPPLIERKEY
+ SupplierKey
  PIC
  99
  .
  01
- PRNSUPPLIERRECORD
+ PrnSupplierRecord
  .
  02
- PRNSUPPLIERCODE
+ PrnSupplierCode
  PIC
  BB99
  .
  02
- PRNSUPPLIERNAME
+ PrnSupplierName
  PIC
  BBX(20)
  .
  02
- PRNSUPPLIERADDRESS
+ PrnSupplierAddress
  PIC
  BBX(50)
  .
  01
- READTYPE
+ ReadType
  PIC
  9
  .
  88
- DIRECTREAD
+ DirectRead
  VALUE
  1
  .
  88
- SEQUENTIALREAD
+ SequentialRead
  VALUE
  2
  .
@@ -1906,7 +1906,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  .
  OPEN
  INPUT
- SUPPLIERFILE
+ SupplierFile
  .
  DISPLAY
  "Read type : Direct read = 1, Sequential read = 2 --> "
@@ -1915,83 +1915,83 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  ADVANCING
  .
  ACCEPT
- READTYPE
+ ReadType
  .
  IF
- DIRECTREAD
+ DirectRead
  DISPLAY
  "Enter supplier code key (2 digits) --> "
  WITH
  NO
  ADVANCING
  ACCEPT
- SUPPLIERKEY
+ SupplierKey
  READ
- SUPPLIERFILE
+ SupplierFile
  INVALID
  KEY
  DISPLAY
  "SUPP STATUS :-"
- SUPPLIERSTATUS
+ SupplierStatus
  END-READ
  PERFORM
- DISPLAYRECORD
+ DisplayRecord
  END-IF
  IF
- SEQUENTIALREAD
+ SequentialRead
  READ
- SUPPLIERFILE
+ SupplierFile
  NEXT
  RECORD
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  PERFORM
- DISPLAYRECORD
+ DisplayRecord
  READ
- SUPPLIERFILE
+ SupplierFile
  NEXT
  RECORD
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  END-IF
  CLOSE
- SUPPLIERFILE
+ SupplierFile
  .
  STOP
  RUN
  .
- DISPLAYRECORD
+ DisplayRecord
  .
  IF
- RECORDFOUND
+ RecordFound
  MOVE
- SUPPLIERCODE
+ SupplierCode
  TO
- PRNSUPPLIERCODE
+ PrnSupplierCode
  MOVE
- SUPPLIERNAME
+ SupplierName
  TO
- PRNSUPPLIERNAME
+ PrnSupplierName
  MOVE
- SUPPLIERADDRESS
+ SupplierAddress
  TO
- PRNSUPPLIERADDRESS
+ PrnSupplierAddress
  DISPLAY
- PRNSUPPLIERRECORD
+ PrnSupplierRecord
  END-IF
  .
 
@@ -2002,7 +2002,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  .
  PROGRAM-ID
  .
- SEQ2REL
+ Seq2Rel
  .
  AUTHOR
  .
@@ -2018,7 +2018,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  FILE-CONTROL
  .
  SELECT
- SUPPLIERFILE
+ SupplierFile
  ASSIGN
  TO
  "RELSUPP.DAT"
@@ -2032,14 +2032,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  RELATIVE
  KEY
  IS
- SUPPLIERKEY
+ SupplierKey
  FILE
  STATUS
  IS
- SUPPLIERSTATUS
+ Supplierstatus
  .
  SELECT
- SUPPLIERFILESEQ
+ SupplierFileSeq
  ASSIGN
  TO
  "SEQSUPP.DAT"
@@ -2055,49 +2055,49 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  SECTION
  .
  FD
- SUPPLIERFILE
+ SupplierFile
  .
  01
- SUPPLIERRECORD
+ SupplierRecord
  .
  02
- SUPPLIERCODE
+ SupplierCode
  PIC
  99
  .
  02
- SUPPLIERNAME
+ SupplierName
  PIC
  X(20)
  .
  02
- SUPPLIERADDRESS
+ SupplierAddress
  PIC
  X(50)
  .
  FD
- SUPPLIERFILESEQ
+ SupplierFileSeq
  .
  01
- SUPPLIERRECORDSEQ
+ SupplierRecordSeq
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- SUPPLIERCODESEQ
+ SupplierCodeSeq
  PIC
  99
  .
  02
- SUPPLIERNAMESEQ
+ SupplierNameSeq
  PIC
  X(20)
  .
  02
- SUPPLIERADDRESSSEQ
+ SupplierAddressSeq
  PIC
  X(50)
  .
@@ -2105,70 +2105,70 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  SECTION
  .
  01
- SUPPLIERSTATUS
+ SupplierStatus
  PIC
  X(2)
  .
  01
- SUPPLIERKEY
+ SupplierKey
  PIC
  99
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  OUTPUT
- SUPPLIERFILE
+ SupplierFile
  .
  OPEN
  INPUT
- SUPPLIERFILESEQ
+ SupplierFileSeq
  .
  READ
- SUPPLIERFILESEQ
+ SupplierFileSeq
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  MOVE
- SUPPLIERCODESEQ
+ SupplierCodeSeq
  TO
- SUPPLIERKEY
+ SupplierKey
  MOVE
- SUPPLIERRECORDSEQ
+ SupplierRecordSeq
  TO
- SUPPLIERRECORD
+ SupplierRecord
  WRITE
- SUPPLIERRECORD
+ SupplierRecord
  INVALID
  KEY
  DISPLAY
  "Supplier status = "
- SUPPLIERSTATUS
+ SupplierStatus
  END-WRITE
  READ
- SUPPLIERFILESEQ
+ SupplierFileSeq
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  .
  CLOSE
- SUPPLIERFILE
- SUPPLIERFILESEQ
+ SupplierFile
+ SupplierFileSeq
  .
  STOP
  RUN
@@ -2181,12 +2181,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  .
  PROGRAM-ID
  .
- REPORTEXAMPLEA
+ ReportExampleA
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -2197,7 +2197,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  FILE-CONTROL
  .
  SELECT
- SALESFILE
+ SalesFile
  ASSIGN
  TO
  "GBSALES.DAT"
@@ -2207,7 +2207,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  SEQUENTIAL
  .
  SELECT
- PRINTFILE
+ PrintFile
  ASSIGN
  TO
  "SALESREPORTA.LPT"
@@ -2219,45 +2219,45 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  SECTION
  .
  FD
- SALESFILE
+ SalesFile
  .
  01
- SALESRECORD
+ SalesRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- CITYCODE
+ CityCode
  PIC
  9
  .
  02
- SALESPERSONNUM
+ SalesPersonNum
  PIC
  9
  .
  02
- VALUEOFSALE
+ ValueOfSale
  PIC
  9(4)V99
  .
  FD
- PRINTFILE
+ PrintFile
  REPORT
  IS
- SALESREPORT
+ SalesReport
  .
  WORKING-STORAGE
  SECTION
  .
  01
- NAMETABLE
+ NameTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -2290,10 +2290,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITYNAME
+ CityName
  PIC
  X(9)
  OCCURS
@@ -2304,10 +2304,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  SECTION
  .
  RD
- SALESREPORT
+ SalesReport
  CONTROLS
  ARE
- SALESPERSONNUM
+ SalesPersonNum
  PAGE
  LIMIT
  IS
@@ -2418,7 +2418,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  "Value"
  .
  01
- DETAILLINE
+ DetailLine
  TYPE
  IS
  DETAIL
@@ -2435,7 +2435,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  .
  03
  COLUMN
@@ -2443,7 +2443,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  03
  COLUMN
@@ -2451,15 +2451,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PIC
  $$,$$$.99
  SOURCE
- VALUEOFSALE
+ ValueOfSale
  .
  01
- SALESPERSONGRP
+ SalesPersonGrp
  TYPE
  IS
  CONTROL
  FOOTING
- SALESPERSONNUM
+ SalesPersonNum
  NEXT
  GROUP
  PLUS
@@ -2485,7 +2485,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  03
  COLUMN
@@ -2502,7 +2502,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PIC
  $$$$$,$$$.99
  SUM
- VALUEOFSALE
+ ValueOfSale
  .
  01
  TYPE
@@ -2542,55 +2542,55 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- SALESFILE
+ SalesFile
  .
  OPEN
  OUTPUT
- PRINTFILE
+ PrintFile
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  INITIATE
- SALESREPORT
+ SalesReport
  .
  PERFORM
- PRINTSALARYREPORT
+ PrintSalaryReport
  UNTIL
- ENDOFFILE
+ EndOfFile
  .
  TERMINATE
- SALESREPORT
+ SalesReport
  .
  CLOSE
- SALESFILE
- PRINTFILE
+ SalesFile
+ PrintFile
  .
  STOP
  RUN
  .
- PRINTSALARYREPORT
+ PrintSalaryReport
  .
  GENERATE
- DETAILLINE
+ DetailLine
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
@@ -2603,12 +2603,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  .
  PROGRAM-ID
  .
- REPORTEXAMPLEB
+ ReportExampleB
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -2619,7 +2619,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  FILE-CONTROL
  .
  SELECT
- SALESFILE
+ SalesFile
  ASSIGN
  TO
  "GBSALES.DAT"
@@ -2629,7 +2629,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  SEQUENTIAL
  .
  SELECT
- PRINTFILE
+ PrintFile
  ASSIGN
  TO
  "SALESREPORTB.LPT"
@@ -2641,45 +2641,45 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  SECTION
  .
  FD
- SALESFILE
+ SalesFile
  .
  01
- SALESRECORD
+ SalesRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- CITYCODE
+ CityCode
  PIC
  9
  .
  02
- SALESPERSONNUM
+ SalesPersonNum
  PIC
  9
  .
  02
- VALUEOFSALE
+ ValueOfSale
  PIC
  9(4)V99
  .
  FD
- PRINTFILE
+ PrintFile
  REPORT
  IS
- SALESREPORT
+ SalesReport
  .
  WORKING-STORAGE
  SECTION
  .
  01
- NAMETABLE
+ NameTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -2712,10 +2712,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITYNAME
+ CityName
  PIC
  X(9)
  OCCURS
@@ -2726,12 +2726,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  SECTION
  .
  RD
- SALESREPORT
+ SalesReport
  CONTROLS
  ARE
  FINAL
- CITYCODE
- SALESPERSONNUM
+ CityCode
+ SalesPersonNum
  PAGE
  LIMIT
  IS
@@ -2842,7 +2842,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  "Value"
  .
  01
- DETAILLINE
+ DetailLine
  TYPE
  IS
  DETAIL
@@ -2859,7 +2859,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  GROUP
  INDICATE
  .
@@ -2869,7 +2869,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  GROUP
  INDICATE
  .
@@ -2879,15 +2879,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  $$,$$$.99
  SOURCE
- VALUEOFSALE
+ ValueOfSale
  .
  01
- SALESPERSONGRP
+ SalesPersonGrp
  TYPE
  IS
  CONTROL
  FOOTING
- SALESPERSONNUM
+ SalesPersonNum
  NEXT
  GROUP
  PLUS
@@ -2913,7 +2913,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  03
  COLUMN
@@ -2930,15 +2930,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  $$$$$,$$$.99
  SUM
- VALUEOFSALE
+ ValueOfSale
  .
  01
- CITYGRP
+ CityGrp
  TYPE
  IS
  CONTROL
  FOOTING
- CITYCODE
+ CityCode
  NEXT
  GROUP
  PLUS
@@ -2964,7 +2964,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  .
  03
  COLUMN
@@ -2984,7 +2984,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  SMS
  .
  01
- TOTALSALESGRP
+ TotalSalesGrp
  TYPE
  IS
  CONTROL
@@ -3059,55 +3059,55 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- SALESFILE
+ SalesFile
  .
  OPEN
  OUTPUT
- PRINTFILE
+ PrintFile
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  INITIATE
- SALESREPORT
+ SalesReport
  .
  PERFORM
- PRINTSALARYREPORT
+ PrintSalaryReport
  UNTIL
- ENDOFFILE
+ EndOfFile
  .
  TERMINATE
- SALESREPORT
+ SalesReport
  .
  CLOSE
- SALESFILE
- PRINTFILE
+ SalesFile
+ PrintFile
  .
  STOP
  RUN
  .
- PRINTSALARYREPORT
+ PrintSalaryReport
  .
  GENERATE
- DETAILLINE
+ DetailLine
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
@@ -3120,12 +3120,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  .
  PROGRAM-ID
  .
- REPORTEXAMPLEFULL
+ ReportExampleFull
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -3136,7 +3136,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  FILE-CONTROL
  .
  SELECT
- SALESFILE
+ SalesFile
  ASSIGN
  TO
  "GBSALES.DAT"
@@ -3146,7 +3146,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  SEQUENTIAL
  .
  SELECT
- PRINTFILE
+ PrintFile
  ASSIGN
  TO
  "SALESREPORT.LPT"
@@ -3158,45 +3158,45 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  SECTION
  .
  FD
- SALESFILE
+ SalesFile
  .
  01
- SALESRECORD
+ SalesRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- CITYCODE
+ CityCode
  PIC
  9
  .
  02
- SALESPERSONNUM
+ SalesPersonNum
  PIC
  9
  .
  02
- VALUEOFSALE
+ ValueOfSale
  PIC
  9(4)V99
  .
  FD
- PRINTFILE
+ PrintFile
  REPORT
  IS
- SALESREPORT
+ SalesReport
  .
  WORKING-STORAGE
  SECTION
  .
  01
- NAMETABLE
+ NameTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -3229,10 +3229,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITYNAME
+ CityName
  PIC
  X(9)
  OCCURS
@@ -3240,10 +3240,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  TIMES
  .
  01
- RATETABLE
+ RateTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -3311,16 +3311,16 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITY
+ City
  OCCURS
  7
  TIMES
  .
  04
- FIXEDRATE
+ FixedRate
  PIC
  9(3)V99
  OCCURS
@@ -3328,32 +3328,32 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  TIMES
  .
  01
- MISCVARIABLES
+ MiscVariables
  .
  02
- COMMISSION
+ Commission
  PIC
  9(4)V99
  .
  02
- PERCENTAGE
+ Percentage
  PIC
  V99
  VALUE
  .05
  .
  02
- SALARY
+ Salary
  PIC
  9(6)V99
  .
  02
- SALESPERSONNOW
+ SalesPersonNow
  PIC
  9
  .
  02
- CITYNOW
+ CityNow
  PIC
  9
  .
@@ -3361,12 +3361,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  SECTION
  .
  RD
- SALESREPORT
+ SalesReport
  CONTROLS
  ARE
  FINAL
- CITYCODE
- SALESPERSONNUM
+ CityCode
+ SalesPersonNum
  PAGE
  LIMIT
  IS
@@ -3477,7 +3477,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  "Value"
  .
  01
- DETAILLINE
+ DetailLine
  TYPE
  IS
  DETAIL
@@ -3494,7 +3494,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  GROUP
  INDICATE
  .
@@ -3504,7 +3504,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  GROUP
  INDICATE
  .
@@ -3514,15 +3514,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  $$,$$$.99
  SOURCE
- VALUEOFSALE
+ ValueOfSale
  .
  01
- SALESPERSONGRP
+ SalesPersonGrp
  TYPE
  IS
  CONTROL
  FOOTING
- SALESPERSONNUM
+ SalesPersonNum
  NEXT
  GROUP
  PLUS
@@ -3548,7 +3548,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  03
  COLUMN
@@ -3565,7 +3565,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  $$$$$,$$$.99
  SUM
- VALUEOFSALE
+ ValueOfSale
  .
  02
  LINE
@@ -3595,7 +3595,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  $$$$$,$$$.99
  SOURCE
- COMMISSION
+ Commission
  .
  02
  LINE
@@ -3625,7 +3625,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  $$$$$,$$$.99
  SOURCE
- SALARY
+ Salary
  .
  02
  LINE
@@ -3647,7 +3647,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- SALESPERSONNOW
+ SalesPersonNow
  .
  02
  LINE
@@ -3669,15 +3669,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  01
- CITYGRP
+ CityGrp
  TYPE
  IS
  CONTROL
  FOOTING
- CITYCODE
+ CityCode
  NEXT
  GROUP
  PLUS
@@ -3703,7 +3703,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  .
  03
  COLUMN
@@ -3750,7 +3750,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- CITYNOW
+ CityNow
  .
  02
  LINE
@@ -3780,10 +3780,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  PIC
  9
  SOURCE
- CITYCODE
+ CityCode
  .
  01
- TOTALSALESGRP
+ TotalSalesGrp
  TYPE
  IS
  CONTROL
@@ -3860,96 +3860,96 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  .
  DECLARATIVES
  .
- CALC
+ Calc
  SECTION
  .
  USE
  BEFORE
  REPORTING
- SALESPERSONGRP
+ SalesPersonGrp
  .
- CALCULATE-SALARY
+ Calculate-Salary
  .
  MULTIPLY
  SMS
  BY
- PERCENTAGE
+ Percentage
  GIVING
- COMMISSION
+ Commission
  ROUNDED
  .
  ADD
- COMMISSION
- FIXEDRATE(CITYCODE,SALESPERSONNUM
+ Commission
+ FixedRate(CityCode,SalesPersonNum
  )
  GIVING
- SALARY
+ Salary
  .
  END
  DECLARATIVES
  .
- MAIN
+ Main
  SECTION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- SALESFILE
+ SalesFile
  .
  OPEN
  OUTPUT
- PRINTFILE
+ PrintFile
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  INITIATE
- SALESREPORT
+ SalesReport
  .
  PERFORM
- PRINTSALARYREPORT
+ PrintSalaryReport
  UNTIL
- ENDOFFILE
+ EndOfFile
  .
  TERMINATE
- SALESREPORT
+ SalesReport
  .
  CLOSE
- SALESFILE
- PRINTFILE
+ SalesFile
+ PrintFile
  .
  STOP
  RUN
  .
- PRINTSALARYREPORT
+ PrintSalaryReport
  .
  MOVE
- CITYCODE
+ CityCode
  TO
- CITYNOW
+ CityNow
  .
  MOVE
- SALESPERSONNUM
+ SalesPersonNum
  TO
- SALESPERSONNOW
+ SalesPersonNow
  .
  GENERATE
- DETAILLINE
+ DetailLine
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
@@ -3962,12 +3962,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  .
  PROGRAM-ID
  .
- REPORTEXAMPLESUMMARY
+ ReportExampleSummary
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -3978,7 +3978,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  FILE-CONTROL
  .
  SELECT
- SALESFILE
+ SalesFile
  ASSIGN
  TO
  "GBSALES.DAT"
@@ -3988,7 +3988,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  SEQUENTIAL
  .
  SELECT
- PRINTFILE
+ PrintFile
  ASSIGN
  TO
  "SUMMARYSALESREPORT.LPT"
@@ -4000,45 +4000,45 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  SECTION
  .
  FD
- SALESFILE
+ SalesFile
  .
  01
- SALESRECORD
+ SalesRecord
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- CITYCODE
+ CityCode
  PIC
  9
  .
  02
- SALESPERSONNUM
+ SalesPersonNum
  PIC
  9
  .
  02
- VALUEOFSALE
+ ValueOfSale
  PIC
  9(4)V99
  .
  FD
- PRINTFILE
+ PrintFile
  REPORT
  IS
- SALESREPORT
+ SalesReport
  .
  WORKING-STORAGE
  SECTION
  .
  01
- NAMETABLE
+ NameTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -4071,10 +4071,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITYNAME
+ CityName
  PIC
  X(9)
  OCCURS
@@ -4082,10 +4082,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  TIMES
  .
  01
- RATETABLE
+ RateTable
  .
  02
- TABLEVALUES
+ TableValues
  .
  03
  FILLER
@@ -4153,16 +4153,16 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- CITY
+ City
  OCCURS
  7
  TIMES
  .
  04
- FIXEDRATE
+ FixedRate
  PIC
  9(3)V99
  OCCURS
@@ -4170,32 +4170,32 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  TIMES
  .
  01
- MISCVARIABLES
+ MiscVariables
  .
  02
- COMMISSION
+ Commission
  PIC
  9(4)V99
  .
  02
- PERCENTAGE
+ Percentage
  PIC
  V99
  VALUE
  .05
  .
  02
- SALARY
+ Salary
  PIC
  9(6)V99
  .
  02
- SALESPERSONNOW
+ SalesPersonNow
  PIC
  9
  .
  02
- CITYNOW
+ CityNow
  PIC
  9
  .
@@ -4203,12 +4203,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  SECTION
  .
  RD
- SALESREPORT
+ SalesReport
  CONTROLS
  ARE
  FINAL
- CITYCODE
- SALESPERSONNUM
+ CityCode
+ SalesPersonNum
  PAGE
  LIMIT
  IS
@@ -4319,7 +4319,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  "Value"
  .
  01
- DETAILLINE
+ DetailLine
  TYPE
  IS
  DETAIL
@@ -4336,7 +4336,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  GROUP
  INDICATE
  .
@@ -4346,7 +4346,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  GROUP
  INDICATE
  .
@@ -4356,15 +4356,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  $$,$$$.99
  SOURCE
- VALUEOFSALE
+ ValueOfSale
  .
  01
- SALESPERSONGRP
+ SalesPersonGrp
  TYPE
  IS
  CONTROL
  FOOTING
- SALESPERSONNUM
+ SalesPersonNum
  NEXT
  GROUP
  PLUS
@@ -4390,7 +4390,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  03
  COLUMN
@@ -4407,7 +4407,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  $$$$$,$$$.99
  SUM
- VALUEOFSALE
+ ValueOfSale
  .
  02
  LINE
@@ -4437,7 +4437,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  $$$$$,$$$.99
  SOURCE
- COMMISSION
+ Commission
  .
  02
  LINE
@@ -4467,7 +4467,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  $$$$$,$$$.99
  SOURCE
- SALARY
+ Salary
  .
  02
  LINE
@@ -4489,7 +4489,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- SALESPERSONNOW
+ SalesPersonNow
  .
  02
  LINE
@@ -4511,15 +4511,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- SALESPERSONNUM
+ SalesPersonNum
  .
  01
- CITYGRP
+ CityGrp
  TYPE
  IS
  CONTROL
  FOOTING
- CITYCODE
+ CityCode
  NEXT
  GROUP
  PLUS
@@ -4545,7 +4545,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  X(9)
  SOURCE
- CITYNAME(CITYCODE)
+ CityName(CityCode)
  .
  03
  COLUMN
@@ -4592,7 +4592,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- CITYNOW
+ CityNow
  .
  02
  LINE
@@ -4622,10 +4622,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  PIC
  9
  SOURCE
- CITYCODE
+ CityCode
  .
  01
- TOTALSALESGRP
+ TotalSalesGrp
  TYPE
  IS
  CONTROL
@@ -4702,96 +4702,96 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  .
  DECLARATIVES
  .
- CALC
+ Calc
  SECTION
  .
  USE
  BEFORE
  REPORTING
- SALESPERSONGRP
+ SalesPersonGrp
  .
- CALCULATE-SALARY
+ Calculate-Salary
  .
  MULTIPLY
  SMS
  BY
- PERCENTAGE
+ Percentage
  GIVING
- COMMISSION
+ Commission
  ROUNDED
  .
  ADD
- COMMISSION
- FIXEDRATE(CITYCODE,SALESPERSONNUM
+ Commission
+ FixedRate(CityCode,SalesPersonNum
  )
  GIVING
- SALARY
+ Salary
  .
  END
  DECLARATIVES
  .
- MAIN
+ Main
  SECTION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- SALESFILE
+ SalesFile
  .
  OPEN
  OUTPUT
- PRINTFILE
+ PrintFile
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  .
  INITIATE
- SALESREPORT
+ SalesReport
  .
  PERFORM
- PRINTSALARYREPORT
+ PrintSalaryReport
  UNTIL
- ENDOFFILE
+ EndOfFile
  .
  TERMINATE
- SALESREPORT
+ SalesReport
  .
  CLOSE
- SALESFILE
- PRINTFILE
+ SalesFile
+ PrintFile
  .
  STOP
  RUN
  .
- PRINTSALARYREPORT
+ PrintSalaryReport
  .
  MOVE
- CITYCODE
+ CityCode
  TO
- CITYNOW
+ CityNow
  .
  MOVE
- SALESPERSONNUM
+ SalesPersonNum
  TO
- SALESPERSONNOW
+ SalesPersonNow
  .
  GENERATE
- SALESREPORT
+ SalesReport
  .
  READ
- SALESFILE
+ SalesFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
@@ -4804,12 +4804,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  .
  PROGRAM-ID
  .
- INSERTRECORDS
+ InsertRecords
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -4820,7 +4820,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  FILE-CONTROL
  .
  SELECT
- STUDENTRECORDS
+ StudentRecords
  ASSIGN
  "STUDENTS.DAT"
  ORGANIZATION
@@ -4833,7 +4833,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  SEQUENTIAL
  .
  SELECT
- TRANSRECORDS
+ TransRecords
  ASSIGN
  "TRANSINS.DAT"
  ORGANIZATION
@@ -4846,7 +4846,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  SEQUENTIAL
  .
  SELECT
- NEWSTUDENTRECORDS
+ NewStudentRecords
  ASSIGN
  "STUDENTS.NEW"
  ORGANIZATION
@@ -4865,18 +4865,18 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  SECTION
  .
  FD
- STUDENTRECORDS
+ StudentRecords
  .
  01
- STUDENTRECORD
+ StudentRecord
  .
  88
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  VALUE
  HIGH-VALUES
  .
  02
- STUDENTID
+ StudentID
  PIC
  X(7)
  .
@@ -4886,18 +4886,18 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  X(23)
  .
  FD
- TRANSRECORDS
+ TransRecords
  .
  01
- TRANSRECORD
+ TransRecord
  .
  88
- ENDOFTRANSFILE
+ EndOfTransFile
  VALUE
  HIGH-VALUES
  .
  02
- TRANSSTUDENTID
+ TransStudentID
  PIC
  X(7)
  .
@@ -4907,10 +4907,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  X(23)
  .
  FD
- NEWSTUDENTRECORDS
+ NewStudentRecords
  .
  01
- NEWSTUDENTRECORD
+ NewStudentRecord
  PIC
  X(30)
  .
@@ -4921,97 +4921,97 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqIns/seqinsert.CBL':
  .
  OPEN
  INPUT
- STUDENTRECORDS
+ StudentRecords
  OPEN
  INPUT
- TRANSRECORDS
+ TransRecords
  OPEN
  OUTPUT
- NEWSTUDENTRECORDS
+ NewStudentRecords
  READ
- STUDENTRECORDS
+ StudentRecords
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  READ
- TRANSRECORDS
+ TransRecords
  AT
  END
  SET
- ENDOFTRANSFILE
+ EndOfTransFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- (ENDOFSTUDENTFILE)
+ (EndOfStudentFile)
  AND
- (ENDOFTRANSFILE)
+ (EndOfTransFile)
  EVALUATE
  TRUE
  WHEN
- (STUDENTID
+ (StudentID
  <
- TRANSSTUDENTID)
+ TransStudentID)
  WRITE
- NEWSTUDENTRECORD
+ NewStudentRecord
  FROM
- STUDENTRECORD
+ StudentRecord
  READ
- STUDENTRECORDS
+ StudentRecords
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  WHEN
- (STUDENTID
+ (StudentID
  >
- TRANSSTUDENTID)
+ TransStudentID)
  WRITE
- NEWSTUDENTRECORD
+ NewStudentRecord
  FROM
- TRANSRECORD
+ TransRecord
  READ
- TRANSRECORDS
+ TransRecords
  AT
  END
  SET
- ENDOFTRANSFILE
+ EndOfTransFile
  TO
  TRUE
  END-READ
  WHEN
- (STUDENTID
+ (StudentID
  =
- TRANSSTUDENTID)
+ TransStudentID)
  DISPLAY
  "Error - "
- TRANSSTUDENTID
+ TransStudentId
  " already exists in file"
  READ
- TRANSRECORDS
+ TransRecords
  AT
  END
  SET
- ENDOFTRANSFILE
+ EndOfTransFile
  TO
  TRUE
  END-READ
  END-EVALUATE
  END-PERFORM
  CLOSE
- STUDENTRECORDS
+ StudentRecords
  CLOSE
- TRANSRECORDS
+ TransRecords
  CLOSE
- NEWSTUDENTRECORDS
+ NewStudentRecords
  STOP
  RUN
  .
@@ -5023,12 +5023,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/Seqread.cbl':
  .
  PROGRAM-ID
  .
- SEQREAD
+ SeqRead
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5039,7 +5039,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/Seqread.cbl':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -5055,102 +5055,102 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/Seqread.cbl':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTDETAILS
+ StudentDetails
  .
  88
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  VALUE
  HIGH-VALUES
  .
  02
- STUDENTID
+ StudentId
  PIC
  9(7)
  .
  02
- STUDENTNAME
+ StudentName
  .
  03
- SURNAME
+ Surname
  PIC
  X(8)
  .
  03
- INITIALS
+ Initials
  PIC
  XX
  .
  02
- DATEOFBIRTH
+ DateOfBirth
  .
  03
- YOBIRTH
+ YOBirth
  PIC
  9(4)
  .
  03
- MOBIRTH
+ MOBirth
  PIC
  9(2)
  .
  03
- DOBIRTH
+ DOBirth
  PIC
  9(2)
  .
  02
- COURSECODE
+ CourseCode
  PIC
  X(4)
  .
  02
- GENDER
+ Gender
  PIC
  X
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- STUDENTFILE
+ StudentFile
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  DISPLAY
- STUDENTID
+ StudentId
  SPACE
- STUDENTNAME
+ StudentName
  SPACE
- COURSECODE
+ CourseCode
  SPACE
- YOBIRTH
+ YOBirth
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  END-PERFORM
  CLOSE
- STUDENTFILE
+ StudentFile
  STOP
  RUN
  .
@@ -5162,12 +5162,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/SeqreadNo88.cbl
  .
  PROGRAM-ID
  .
- SEQREADNO88
+ SeqReadNo88
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5178,7 +5178,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/SeqreadNo88.cbl
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -5194,99 +5194,99 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRead/SeqreadNo88.cbl
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTDETAILS
+ StudentDetails
  .
  02
- STUDENTID
+ StudentId
  PIC
  9(7)
  .
  02
- STUDENTNAME
+ StudentName
  .
  03
- SURNAME
+ Surname
  PIC
  X(8)
  .
  03
- INITIALS
+ Initials
  PIC
  XX
  .
  02
- DATEOFBIRTH
+ DateOfBirth
  .
  03
- YOBIRTH
+ YOBirth
  PIC
  9(4)
  .
  03
- MOBIRTH
+ MOBirth
  PIC
  9(2)
  .
  03
- DOBIRTH
+ DOBirth
  PIC
  9(2)
  .
  02
- COURSECODE
+ CourseCode
  PIC
  X(4)
  .
  02
- GENDER
+ Gender
  PIC
  X
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- STUDENTFILE
+ StudentFile
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  MOVE
  HIGH-VALUES
  TO
- STUDENTDETAILS
+ StudentDetails
  END-READ
  PERFORM
  UNTIL
- STUDENTDETAILS
+ StudentDetails
  =
  HIGH-VALUES
  DISPLAY
- STUDENTID
+ StudentId
  SPACE
- STUDENTNAME
+ StudentName
  SPACE
- COURSECODE
+ CourseCode
  SPACE
- YOBIRTH
+ YOBirth
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  MOVE
  HIGH-VALUES
  TO
- STUDENTDETAILS
+ StudentDetails
  END-READ
  END-PERFORM
  CLOSE
- STUDENTFILE
+ StudentFile
  STOP
  RUN
  .
@@ -5298,12 +5298,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  .
  PROGRAM-ID
  .
- STUDENTNUMBERSREPORT
+ StudentNumbersReport
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5314,7 +5314,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -5324,7 +5324,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  SEQUENTIAL
  .
  SELECT
- REPORTFILE
+ ReportFile
  ASSIGN
  TO
  "STUDENTS.RPT"
@@ -5340,73 +5340,73 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTDETAILS
+ StudentDetails
  .
  88
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  VALUE
  HIGH-VALUES
  .
  02
- STUDENTID
+ StudentId
  PIC
  9(7)
  .
  02
- STUDENTNAME
+ StudentName
  .
  03
- SURNAME
+ Surname
  PIC
  X(8)
  .
  03
- INITIALS
+ Initials
  PIC
  XX
  .
  02
- DATEOFBIRTH
+ DateOfBirth
  .
  03
- YOBIRTH
+ YOBirth
  PIC
  9(4)
  .
  03
- MOBIRTH
+ MOBirth
  PIC
  9(2)
  .
  03
- DOBIRTH
+ DOBirth
  PIC
  9(2)
  .
  02
- COURSECODE
+ CourseCode
  PIC
  X(4)
  .
  02
- GENDER
+ Gender
  PIC
  X
  .
  88
- MALE
+ Male
  VALUE
  "M"
  "m"
  .
  FD
- REPORTFILE
+ ReportFile
  .
  01
- PRINTLINE
+ PrintLine
  PIC
  X(40)
  .
@@ -5414,14 +5414,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  SECTION
  .
  01
- HEADINGLINE
+ HeadingLine
  PIC
  X(21)
  VALUE
  "  Record Count Report"
  .
  01
- STUDENTTOTALLINE
+ StudentTotalLine
  .
  02
  FILLER
@@ -5431,12 +5431,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  "Total Students = "
  .
  02
- PRNSTUDENTCOUNT
+ PrnStudentCount
  PIC
  Z,ZZ9
  .
  01
- MALETOTALLINE
+ MaleTotalLine
  .
  02
  FILLER
@@ -5446,12 +5446,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  "Total Males    = "
  .
  02
- PRNMALECOUNT
+ PrnMaleCount
  PIC
  Z,ZZ9
  .
  01
- FEMALETOTALLINE
+ FemaleTotalLine
  .
  02
  FILLER
@@ -5461,29 +5461,29 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  "Total Females  = "
  .
  02
- PRNFEMALECOUNT
+ PrnFemaleCount
  PIC
  Z,ZZ9
  .
  01
- WORKTOTALS
+ WorkTotals
  .
  02
- STUDENTCOUNT
+ StudentCount
  PIC
  9(4)
  VALUE
  ZERO
  .
  02
- MALECOUNT
+ MaleCount
  PIC
  9(4)
  VALUE
  ZERO
  .
  02
- FEMALECOUNT
+ FemaleCount
  PIC
  9(4)
  VALUE
@@ -5492,101 +5492,101 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- STUDENTFILE
+ StudentFile
  OPEN
  OUTPUT
- REPORTFILE
+ ReportFile
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  ADD
  1
  TO
- STUDENTCOUNT
+ StudentCount
  IF
- MALE
+ Male
  ADD
  1
  TO
- MALECOUNT
+ MaleCount
  ELSE
  ADD
  1
  TO
- FEMALECOUNT
+ FemaleCount
  END-IF
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFSTUDENTFILE
+ EndOfStudentFile
  TO
  TRUE
  END-READ
  END-PERFORM
  PERFORM
- PRINTREPORTLINES
+ PrintReportLines
  CLOSE
- STUDENTFILE
- REPORTFILE
+ StudentFile
+ ReportFile
  STOP
  RUN
  .
- PRINTREPORTLINES
+ PrintReportLines
  .
  MOVE
- STUDENTCOUNT
+ StudentCount
  TO
- PRNSTUDENTCOUNT
+ PrnStudentCount
  MOVE
- MALECOUNT
+ MaleCount
  TO
- PRNMALECOUNT
+ PrnMaleCount
  MOVE
- FEMALECOUNT
+ FemaleCount
  TO
- PRNFEMALECOUNT
+ PrnFemaleCount
  WRITE
- PRINTLINE
+ PrintLine
  FROM
- HEADINGLINE
+ HeadingLine
  AFTER
  ADVANCING
  PAGE
  WRITE
- PRINTLINE
+ PrintLine
  FROM
- STUDENTTOTALLINE
+ StudentTotalLine
  AFTER
  ADVANCING
  2
  LINES
  WRITE
- PRINTLINE
+ PrintLine
  FROM
- MALETOTALLINE
+ MaleTotalLine
  AFTER
  ADVANCING
  2
  LINES
  WRITE
- PRINTLINE
+ PrintLine
  FROM
- FEMALETOTALLINE
+ FemaleTotalLine
  AFTER
  ADVANCING
  2
@@ -5600,12 +5600,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqWrite/SEQWRITE.CBL':
  .
  PROGRAM-ID
  .
- SEQWRITE
+ SeqWrite
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5616,7 +5616,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqWrite/SEQWRITE.CBL':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -5632,92 +5632,92 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqWrite/SEQWRITE.CBL':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTDETAILS
+ StudentDetails
  .
  02
- STUDENTID
+ StudentId
  PIC
  9(7)
  .
  02
- STUDENTNAME
+ StudentName
  .
  03
- SURNAME
+ Surname
  PIC
  X(8)
  .
  03
- INITIALS
+ Initials
  PIC
  XX
  .
  02
- DATEOFBIRTH
+ DateOfBirth
  .
  03
- YOBIRTH
+ YOBirth
  PIC
  9(4)
  .
  03
- MOBIRTH
+ MOBirth
  PIC
  9(2)
  .
  03
- DOBIRTH
+ DOBirth
  PIC
  9(2)
  .
  02
- COURSECODE
+ CourseCode
  PIC
  X(4)
  .
  02
- GENDER
+ Gender
  PIC
  X
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  OUTPUT
- STUDENTFILE
+ StudentFile
  DISPLAY
  "Enter student details using template below.  Enter no data to end."
  PERFORM
- GETSTUDENTDETAILS
+ GetStudentDetails
  PERFORM
  UNTIL
- STUDENTDETAILS
+ StudentDetails
  =
  SPACES
  WRITE
- STUDENTDETAILS
+ StudentDetails
  PERFORM
- GETSTUDENTDETAILS
+ GetStudentDetails
  END-PERFORM
  CLOSE
- STUDENTFILE
+ StudentFile
  STOP
  RUN
  .
- GETSTUDENTDETAILS
+ GetStudentDetails
  .
  DISPLAY
  "Enter - StudId, Surname, Initials, YOB, MOB, DOB, Course, Gender"
  DISPLAY
  "NNNNNNNSSSSSSSSIIYYYYMMDDCCCCG"
  ACCEPT
- STUDENTDETAILS
+ StudentDetails
  .
 
 Done.
@@ -5727,12 +5727,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  .
  PROGRAM-ID
  .
- INPUTSORT
+ InputSort
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5743,7 +5743,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "SORTSTUD.DAT"
@@ -5753,7 +5753,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  SEQUENTIAL
  .
  SELECT
- WORKFILE
+ WorkFile
  ASSIGN
  TO
  "WORK.TMP"
@@ -5765,21 +5765,21 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTDETAILS
+ StudentDetails
  PIC
  X(30)
  .
  SD
- WORKFILE
+ WorkFile
  .
  01
- WORKREC
+ WorkRec
  .
  02
- WSTUDENTID
+ WStudentId
  PIC
  9(7)
  .
@@ -5791,25 +5791,25 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  SORT
- WORKFILE
+ WorkFile
  ON
  ASCENDING
  KEY
- WSTUDENTID
+ WStudentId
  INPUT
  PROCEDURE
  IS
- GETSTUDENTDETAILS
+ GetStudentDetails
  GIVING
- STUDENTFILE
+ StudentFile
  .
  STOP
  RUN
  .
- GETSTUDENTDETAILS
+ GetStudentDetails
  .
  DISPLAY
  "Enter student details using template below."
@@ -5821,17 +5821,17 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
  DISPLAY
  "NNNNNNNSSSSSSSSIIYYYYMMDDCCCCG"
  ACCEPT
- WORKREC
+ WorkRec
  .
  PERFORM
  UNTIL
- WORKREC
+ WorkRec
  =
  SPACES
  RELEASE
- WORKREC
+ WorkRec
  ACCEPT
- WORKREC
+ WorkRec
  END-PERFORM
  .
 
@@ -5842,12 +5842,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  .
  PROGRAM-ID
  .
- MALESORT
+ MaleSort
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -5858,7 +5858,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  FILE-CONTROL
  .
  SELECT
- STUDENTFILE
+ StudentFile
  ASSIGN
  TO
  "STUDENTS.DAT"
@@ -5868,7 +5868,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  SEQUENTIAL
  .
  SELECT
- MALESTUDENTFILE
+ MaleStudentFile
  ASSIGN
  TO
  "MALESTUDS.DAT"
@@ -5878,7 +5878,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  SEQUENTIAL
  .
  SELECT
- WORKFILE
+ WorkFile
  ASSIGN
  TO
  "WORK.TMP"
@@ -5890,31 +5890,31 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  SECTION
  .
  FD
- STUDENTFILE
+ StudentFile
  .
  01
- STUDENTREC
+ StudentRec
  PIC
  X(30)
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  FD
- MALESTUDENTFILE
+ MaleStudentFile
  .
  01
- MALESTUDENTREC
+ MaleStudentRec
  PIC
  X(30)
  .
  SD
- WORKFILE
+ WorkFile
  .
  01
- WORKREC
+ WorkRec
  .
  02
  FILLER
@@ -5922,7 +5922,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  9(7)
  .
  02
- WSTUDENTNAME
+ WStudentName
  PIC
  X(10)
  .
@@ -5932,74 +5932,74 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  X(12)
  .
  02
- WGENDER
+ WGender
  PIC
  X
  .
  88
- MALESTUDENT
+ MaleStudent
  VALUE
  "M"
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  SORT
- WORKFILE
+ WorkFile
  ON
  ASCENDING
  KEY
- WSTUDENTNAME
+ WStudentName
  INPUT
  PROCEDURE
  IS
- GETMALESTUDENTS
+ GetMaleStudents
  GIVING
- MALESTUDENTFILE
+ MaleStudentFile
  .
  STOP
  RUN
  .
- GETMALESTUDENTS
+ GetMaleStudents
  .
  OPEN
  INPUT
- STUDENTFILE
+ StudentFile
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  MOVE
- STUDENTREC
+ StudentRec
  TO
- WORKREC
+ WorkRec
  IF
- MALESTUDENT
+ MaleStudent
  RELEASE
- WORKREC
+ WorkRec
  END-IF
  READ
- STUDENTFILE
+ StudentFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  CLOSE
- STUDENTFILE
+ StudentFile
  .
 
 Done.
@@ -6009,12 +6009,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
  .
  PROGRAM-ID
  .
- REFMODIFICATION
+ RefModification
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -6023,56 +6023,56 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
  SECTION
  .
  01
- XSTR
+ xStr
  PIC
  X(50)
  VALUE
  "   This is the first source string"
  .
  01
- XSTR2
+ xStr2
  PIC
  X(32)
  VALUE
  "This is the second source string"
  .
  01
- STRSIZE
+ StrSize
  PIC
  99
  VALUE
  32
  .
  01
- CHARCOUNT
+ CharCount
  PIC
  99
  VALUE
  ZEROS
  .
  01
- ENDCOUNT
+ EndCount
  PIC
  99
  VALUE
  ZEROS
  .
  01
- YSTR
+ yStr
  PIC
  X(4)
  VALUE
  SPACES
  .
  01
- CHARPOS
+ CharPos
  PIC
  99
  VALUE
  ZEROS
  .
  01
- STRLENGTH
+ StrLength
  PIC
  99
  VALUE
@@ -6081,93 +6081,93 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Task1 = "
- XSTR(9:3)
+ xStr(9:3)
  DISPLAY
  "Task2 = "
- XSTR(1:7)
+ xStr(1:7)
  MOVE
  13
  TO
- STRLENGTH
+ StrLength
  DISPLAY
  "Task3 = "
- XSTR2((STRSIZE
+ xStr2((StrSize
  -
- STRLENGTH)
+ StrLength)
  +
- 1:STRLENGTH)
+ 1:StrLength)
  DISPLAY
  "Task4 Before = "
- XSTR
+ xStr
  "<<<<<<"
  MOVE
  0
  TO
- CHARCOUNT
+ CharCount
  INSPECT
  FUNCTION
- REVERSE(XSTR)
+ REVERSE(xStr)
  TALLYING
- CHARCOUNT
+ CharCount
  FOR
  LEADING
  SPACES
  DISPLAY
  "Task4 After = "
- XSTR(1:50
+ xStr(1:50
  -
- CHARCOUNT)
+ CharCount)
  "<<<<<<<"
  .
  PERFORM
  VARYING
- CHARCOUNT
+ CharCount
  FROM
  50
  BY
  -1
  UNTIL
- XSTR(CHARCOUNT:1)
+ xStr(CharCount:1)
  NOT
  =
  SPACE
  END-PERFORM
  DISPLAY
  "Task4 After = "
- XSTR(1:CHARCOUNT)
+ xStr(1:CharCount)
  "<<<<<<<"
  .
  MOVE
  1
  TO
- CHARCOUNT
+ CharCount
  .
  INSPECT
- XSTR
+ xStr
  TALLYING
- CHARCOUNT
+ CharCount
  FOR
  LEADING
  SPACES
  DISPLAY
  "Task5 ="
- XSTR(CHARCOUNT:
+ xStr(CharCount:
  50
  -
- CHARCOUNT)
+ CharCount)
  MOVE
  1
  TO
- CHARCOUNT
+ CharCount
  INSPECT
- XSTR
+ xStr
  TALLYING
- CHARCOUNT
- FOR
+ CharCount
+ for
  CHARACTERS
  BEFORE
  INITIAL
@@ -6175,55 +6175,55 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
  .
  DISPLAY
  "Task6 First occurrence is in char position "
- CHARCOUNT
+ CharCount
  MOVE
  "fred"
  TO
- YSTR
+ yStr
  MOVE
  51
  TO
- ENDCOUNT
+ EndCount
  PERFORM
  VARYING
- CHARPOS
+ CharPos
  FROM
  1
  BY
  1
  UNTIL
- CHARPOS
+ CharPos
  >
  4
  MOVE
  1
  TO
- CHARCOUNT
+ CharCount
  INSPECT
- XSTR
+ xStr
  TALLYING
- CHARCOUNT
+ CharCount
  FOR
  CHARACTERS
  BEFORE
  INITIAL
- YSTR(CHARPOS:1)
+ yStr(CharPos:1)
  IF
- CHARCOUNT
+ CharCount
  <
- ENDCOUNT
+ EndCount
  MOVE
- CHARCOUNT
+ CharCount
  TO
- ENDCOUNT
+ EndCount
  END-IF
  END-PERFORM
  DISPLAY
  "Task7 First occurrence is in char position "
- ENDCOUNT
+ EndCount
  DISPLAY
  "The character is "
- XSTR(ENDCOUNT:1)
+ xStr(EndCount:1)
  STOP
  RUN
  .
@@ -6235,12 +6235,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  .
  PROGRAM-ID
  .
- UNSTRINGFILEEG
+ UnstringFileEg
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -6251,7 +6251,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  FILE-CONTROL
  .
  SELECT
- VARLENGTHRECFILE
+ VarLengthRecFile
  ASSIGN
  TO
  "VarLen.DAT"
@@ -6267,43 +6267,43 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  SECTION
  .
  FD
- VARLENGTHRECFILE
+ VarLengthRecFile
  .
  01
- VARLENREC
+ VarLenRec
  .
  88
- ENDOFFILE
+ EndOfFile
  VALUE
  HIGH-VALUES
  .
  02
- TYPECODE
+ TypeCode
  PIC
  XX
  .
  88
- DELETESUPPLIER
+ DeleteSupplier
  VALUE
  "1,"
  .
  88
- DELETEVIDEO
+ DeleteVideo
  VALUE
  "2,"
  .
  88
- INSERTVIDEO
+ InsertVideo
  VALUE
  "3,"
  .
  88
- INSERTSUPPLIER
+ InsertSupplier
  VALUE
  "4,"
  .
  88
- VALIDTYPECODE
+ ValidTypeCode
  VALUE
  "1,"
  "2,"
@@ -6311,7 +6311,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  "4,"
  .
  02
- REMAININGREC
+ RemainingRec
  PIC
  X(78)
  .
@@ -6319,207 +6319,207 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  SECTION
  .
  01
- INSERTSUPPLIERREC
+ InsertSupplierRec
  .
  02
- TRANSTYPE
+ TransType
  PIC
  9
  .
  02
- TRANSDATE
+ TransDate
  PIC
  X(8)
  .
  02
- SUPPLIER-CODE
+ Supplier-Code
  PIC
  XX
  .
  02
- SUPPLIER-NAME
+ Supplier-Name
  PIC
  X(20)
  .
  02
- SUPPLIER-ADDRESS
+ Supplier-Address
  PIC
  X(50)
  .
  01
- INSERTSUPPLIERCOUNTS
+ InsertSupplierCounts
  .
  02
- DATECOUNT
+ DateCount
  PIC
  99
  .
  88
- VALIDDATE
+ ValidDate
  VALUE
  8
  .
  02
- SUPPCODECOUNT
+ SuppCodeCount
  PIC
  99
  .
  88
- VALIDSUPPCODE
+ ValidSuppCode
  VALUE
  1
  THRU
  2
  .
  02
- SUPPNAMECOUNT
+ SuppNameCount
  PIC
  99
  .
  88
- VALIDSUPPNAME
+ ValidSuppName
  VALUE
  1
  THRU
  20
  .
  02
- SUPPADRCOUNT
+ SuppAdrCount
  PIC
  99
  .
  88
- VALIDSUPPADR
+ ValidSuppAdr
  VALUE
  1
  THRU
  50
  .
  01
- STRINGEND
+ StringEnd
  PIC
  99
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  OPEN
  INPUT
- VARLENGTHRECFILE
+ VarLengthRecFile
  READ
- VARLENGTHRECFILE
+ VarLengthRecFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  PERFORM
  UNTIL
- ENDOFFILE
+ EndOfFile
  MOVE
  ZEROS
  TO
- INSERTSUPPLIERCOUNTS
+ InsertSupplierCounts
  PERFORM
  VARYING
- STRINGEND
+ StringEnd
  FROM
  78
  BY
  -1
  UNTIL
- REMAININGREC(STRINGEND:1)
+ RemainingRec(StringEnd:1)
  NOT
  =
  SPACE
  END-PERFORM
  IF
- INSERTSUPPLIER
+ InsertSupplier
  UNSTRING
- REMAININGREC(1:STRINGEND)
+ RemainingRec(1:StringEnd)
  DELIMITED
  BY
  ","
  INTO
- TRANSDATE
+ TransDate
  COUNT
  IN
- DATECOUNT
- SUPPLIER-CODE
+ DateCount
+ Supplier-Code
  COUNT
  IN
- SUPPCODECOUNT
- SUPPLIER-NAME
+ SuppCodeCount
+ Supplier-Name
  COUNT
  IN
- SUPPNAMECOUNT
- SUPPLIER-ADDRESS
+ SuppNameCount
+ Supplier-Address
  COUNT
  IN
- SUPPADRCOUNT
+ SuppAdrCount
  END-UNSTRING
  PERFORM
- CHECKFORERRORS
+ CheckForErrors
  ELSE
  IF
  NOT
- VALIDTYPECODE
+ ValidTypeCode
  DISPLAY
  SPACE
  DISPLAY
  "Record = "
- VARLENREC(1:70)
+ VarLenRec(1:70)
  DISPLAY
  "Type code is not valid"
  END-IF
  END-IF
  READ
- VARLENGTHRECFILE
+ VarLengthRecFile
  AT
  END
  SET
- ENDOFFILE
+ EndOfFile
  TO
  TRUE
  END-READ
  END-PERFORM
  CLOSE
- VARLENGTHRECFILE
+ VarLengthRecFile
  STOP
  RUN
  .
- CHECKFORERRORS
+ CheckForErrors
  .
  DISPLAY
  SPACE
  DISPLAY
  "Record = "
- VARLENREC(1:70)
+ VarLenRec(1:70)
  IF
  NOT
- VALIDDATE
+ ValidDate
  DISPLAY
  "Date Size Error"
  END-IF
  IF
  NOT
- VALIDSUPPCODE
+ ValidSuppCode
  DISPLAY
  "Supplier Code Error"
  END-IF
  IF
  NOT
- VALIDSUPPNAME
+ ValidSuppName
  DISPLAY
  "Supplier name Error"
  END-IF
  IF
  NOT
- VALIDSUPPADR
+ ValidSuppAdr
  DISPLAY
  "Supplier address Error"
  END-IF
@@ -6532,12 +6532,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateD
  .
  PROGRAM-ID
  .
- DATEDRIVER
+ DateDriver
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -6553,59 +6553,59 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateD
  0
  .
  88
- ENDOFINPUT
+ EndOfInput
  VALUE
  1
  .
  01
- INPUTDATEIN
+ InputDateIn
  PIC
  9(8)
  .
  01
- VALIDATIONRESULT
+ ValidationResult
  PIC
  9
  .
  88
- DATEISVALID
+ DateIsValid
  VALUE
  0
  .
  88
- DATENOTNUMERIC
+ DateNotNumeric
  VALUE
  1
  .
  88
- YEARCONTAINSZEROS
+ YearContainsZeros
  VALUE
  2
  .
  88
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  VALUE
  3
  .
  88
- DAYCONTAINSZEROS
+ DayContainsZeros
  VALUE
  4
  .
  88
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  VALUE
  5
  .
  88
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  VALUE
  6
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  DISPLAY
  "Input Date as DDMMYYYY > "
@@ -6613,47 +6613,47 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateD
  NO
  ADVANCING
  ACCEPT
- INPUTDATEIN
+ InputDateIn
  CALL
  "Validate"
  USING
- INPUTDATEIN
- VALIDATIONRESULT
+ InputDateIn
+ ValidationResult
  .
  DISPLAY
  "RESULT = "
- VALIDATIONRESULT
+ ValidationResult
  DISPLAY
  "DATE IS NOW = "
- INPUTDATEIN
+ InputDateIn
  EVALUATE
  TRUE
  WHEN
- DATEISVALID
+ DateIsValid
  DISPLAY
  "Date is valid."
  WHEN
- DATENOTNUMERIC
+ DateNotNumeric
  DISPLAY
  "Date is not numeric."
  WHEN
- YEARCONTAINSZEROS
+ YearContainsZeros
  DISPLAY
  "Year contains all zeros."
  WHEN
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  DISPLAY
  "Month contains all zeros."
  WHEN
- DAYCONTAINSZEROS
+ DayContainsZeros
  DISPLAY
  "Day contains all zeros."
  WHEN
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  DISPLAY
  "Month too great."
  WHEN
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  DISPLAY
  "Day too great for month."
  END-EVALUATE
@@ -6669,14 +6669,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  .
  PROGRAM-ID
  .
- VALIDATE
+ Validate
  IS
  INITIAL
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  DATA
  DIVISION
@@ -6685,10 +6685,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  SECTION
  .
  01
- MONTHDAYTABLE
+ MonthDayTable
  .
  02
- TABLEVALUES
+ TableValues
  PIC
  X(24)
  VALUE
@@ -6697,10 +6697,10 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  02
  FILLER
  REDEFINES
- TABLEVALUES
+ TableValues
  .
  03
- DAYSINMONTH
+ DaysInMonth
  OCCURS
  12
  TIMES
@@ -6708,17 +6708,17 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  99
  .
  01
- CURRUPTDATE
+ CurruptDate
  PIC
  9(8)
  .
  01
- LEAPQUOT
+ LeapQuot
  PIC
  9(4)
  .
  01
- LEAPREMAIN
+ LeapRemain
  PIC
  9(4)
  .
@@ -6730,7 +6730,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  ZERO
  .
  88
- LEAPYEAR
+ LeapYear
  VALUE
  1
  .
@@ -6738,207 +6738,207 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  SECTION
  .
  01
- INPUTDATELA
+ InputDateLA
  .
  02
- DAYLA
+ DayLA
  PIC
  99
  .
  02
- MONTHLA
+ MonthLA
  PIC
  99
  .
  88
- MONTHINVALID
+ MonthInvalid
  VALUE
  13
  THRU
  99
  .
  88
- MONTHISFEBRUARY
+ MonthIsFebruary
  VALUE
  2
  .
  02
- YEARLA
+ YearLA
  PIC
  9(4)
  .
  01
- VALIDATIONRESULTLB
+ ValidationResultLB
  PIC
  9
  .
  88
- DATEISVALID
+ DateIsValid
  VALUE
  0
  .
  88
- DATENOTNUMERIC
+ DateNotNumeric
  VALUE
  1
  .
  88
- YEARCONTAINSZEROS
+ YearContainsZeros
  VALUE
  2
  .
  88
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  VALUE
  3
  .
  88
- DAYCONTAINSZEROS
+ DayContainsZeros
  VALUE
  4
  .
  88
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  VALUE
  5
  .
  88
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  VALUE
  6
  .
  PROCEDURE
  DIVISION
  USING
- INPUTDATELA
- VALIDATIONRESULTLB
+ InputDateLA
+ ValidationResultLB
  .
- BEGIN
+ Begin
  .
  EVALUATE
  TRUE
  WHEN
- INPUTDATELA
+ InputDateLA
  NOT
  NUMERIC
  SET
- DATENOTNUMERIC
+ DateNotNumeric
  TO
  TRUE
  WHEN
- YEARLA
+ YearLA
  EQUAL
  TO
  ZEROS
  SET
- YEARCONTAINSZEROS
+ YearContainsZeros
  TO
  TRUE
  WHEN
- MONTHLA
+ MonthLA
  EQUAL
  TO
  ZEROS
  SET
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  TO
  TRUE
  WHEN
- DAYLA
+ DayLA
  EQUAL
  TO
  ZEROS
  SET
- DAYCONTAINSZEROS
+ DayContainsZeros
  TO
  TRUE
  WHEN
- MONTHINVALID
+ MonthInvalid
  SET
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  TO
  TRUE
  WHEN
  OTHER
  PERFORM
- CHECKFORVALIDDAY
+ CheckForValidDay
  END-EVALUATE
  EXIT
  PROGRAM
  .
- CHECKFORVALIDDAY
+ CheckForValidDay
  .
  DIVIDE
- YEARLA
+ YearLA
  BY
  400
  GIVING
- LEAPQUOT
+ LeapQuot
  REMAINDER
- LEAPREMAIN
+ LeapRemain
  .
  IF
- LEAPREMAIN
+ LeapRemain
  =
  0
  SET
- LEAPYEAR
+ LeapYear
  TO
  TRUE
  ELSE
  DIVIDE
- YEARLA
+ YearLA
  BY
  100
  GIVING
- LEAPQUOT
+ LeapQuot
  REMAINDER
- LEAPREMAIN
+ LeapRemain
  IF
- LEAPREMAIN
+ LeapRemain
  NOT
  =
  0
  DIVIDE
- YEARLA
+ YearLA
  BY
  4
  GIVING
- LEAPQUOT
+ LeapQuot
  REMAINDER
- LEAPREMAIN
+ LeapRemain
  IF
- LEAPREMAIN
+ LeapRemain
  =
  0
  SET
- LEAPYEAR
+ LeapYear
  TO
  TRUE
  END-IF
  END-IF
  END-IF
  IF
- LEAPYEAR
+ LeapYear
  AND
- MONTHISFEBRUARY
+ MonthIsFebruary
  MOVE
  29
  TO
- DAYSINMONTH(2)
+ DaysInMonth(2)
  END-IF
  IF
- DAYLA
+ DayLA
  GREATER
  THAN
- DAYSINMONTH(MONTHLA)
+ DaysInMonth(MonthLA)
  SET
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  TO
  TRUE
  ELSE
  SET
- DATEISVALID
+ DateIsValid
  TO
  TRUE
  END-IF
@@ -6951,12 +6951,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  .
  PROGRAM-ID
  .
- DAYDIFFDRIVER
+ DayDiffDriver
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -6968,179 +6968,179 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- DATES
+ Dates
  .
  02
- FIRSTDATE
+ FirstDate
  PIC
  X(8)
  .
  02
- SECONDDATE
+ SecondDate
  PIC
  X(8)
  .
  02
- FIRSTDATEPRN
+ FirstDatePrn
  PIC
  XX/XX/XXXX
  .
  02
- SECONDDATEPRN
+ SecondDatePrn
  PIC
  XX/XX/XXXX
  .
  01
- DAYDIFFS
+ DayDiffs
  .
  02
- DAYDIFFERENCE
+ DayDifference
  PIC
  S9(7)
  .
  02
- DAYDIFFERENCEPRN
+ DayDifferencePrn
  PIC
  ----,--9
  .
  01
- VALIDATIONRESULT
+ ValidationResult
  PIC
  9
  .
  88
- DATEISVALID
+ DateIsValid
  VALUE
  0
  .
  88
- DATEISNOTVALID
+ DateIsNotValid
  VALUE
  1
  THRU
  6
  .
  88
- DATENOTNUMERIC
+ DateNotNumeric
  VALUE
  1
  .
  88
- YEARCONTAINSZEROS
+ YearContainsZeros
  VALUE
  2
  .
  88
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  VALUE
  3
  .
  88
- DAYCONTAINSZEROS
+ DayContainsZeros
  VALUE
  4
  .
  88
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  VALUE
  5
  .
  88
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  VALUE
  6
  .
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  SET
- DATEISNOTVALID
+ DateIsNotValid
  TO
  TRUE
  .
  PERFORM
- GETVALIDFIRSTDATE
+ GetValidFirstDate
  UNTIL
- DATEISVALID
+ DateIsValid
  .
  SET
- DATEISNOTVALID
+ DateIsNotValid
  TO
  TRUE
  .
  PERFORM
- GETVALIDSECONDDATE
+ GetValidSecondDate
  UNTIL
- DATEISVALID
+ DateIsValid
  .
  CALL
  "EuroDateToSortDate"
  USING
- FIRSTDATE
- FIRSTDATE
+ FirstDate
+ FirstDate
  .
  CALL
  "EuroDateToSortDate"
  USING
- SECONDDATE
- SECONDDATE
+ SecondDate
+ SecondDate
  .
  CALL
  "GetDayDiff"
  USING
  BY
  CONTENT
- FIRSTDATE
- SECONDDATE
+ FirstDate
+ SecondDate
  BY
  REFERENCE
- DAYDIFFERENCE
+ DayDifference
  .
  CALL
  "SortDateToEuroDate"
  USING
- FIRSTDATE
- FIRSTDATE
+ FirstDate
+ FirstDate
  .
  CALL
  "SortDateToEuroDate"
  USING
- SECONDDATE
- SECONDDATE
+ SecondDate
+ SecondDate
  .
  MOVE
- DAYDIFFERENCE
+ DayDifference
  TO
- DAYDIFFERENCEPRN
+ DayDifferencePrn
  .
  MOVE
- FIRSTDATE
+ FirstDate
  TO
- FIRSTDATEPRN
+ FirstDatePrn
  .
  MOVE
- SECONDDATE
+ SecondDate
  TO
- SECONDDATEPRN
+ SecondDatePrn
  .
  DISPLAY
  SPACES
  .
  DISPLAY
  "The difference between "
- FIRSTDATEPRN
+ FirstDatePrn
  " and "
- SECONDDATEPRN
+ SecondDatePrn
  " is "
- DAYDIFFERENCEPRN
+ DayDifferencePrn
  " days."
  .
  STOP
  RUN
  .
- GETVALIDFIRSTDATE
+ GetValidFirstDate
  .
  DISPLAY
  SPACES
@@ -7151,25 +7151,25 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  ADVANCING
  .
  ACCEPT
- FIRSTDATE
+ FirstDate
  .
  CALL
  "Validate"
  USING
  BY
  CONTENT
- FIRSTDATE
+ FirstDate
  BY
  REFERENCE
- VALIDATIONRESULT
+ ValidationResult
  .
  IF
- DATEISNOTVALID
+ DateIsNotValid
  PERFORM
- DISPLAYERRORMESSAGE
+ DisplayErrorMessage
  END-IF
  .
- GETVALIDSECONDDATE
+ GetValidSecondDate
  .
  DISPLAY
  SPACES
@@ -7180,53 +7180,53 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  ADVANCING
  .
  ACCEPT
- SECONDDATE
+ SecondDate
  .
  CALL
  "Validate"
  USING
  BY
  CONTENT
- SECONDDATE
+ SecondDate
  BY
  REFERENCE
- VALIDATIONRESULT
+ ValidationResult
  .
  IF
- DATEISNOTVALID
+ DateIsNotValid
  PERFORM
- DISPLAYERRORMESSAGE
+ DisplayErrorMessage
  END-IF
  .
- DISPLAYERRORMESSAGE
+ DisplayErrorMessage
  .
  DISPLAY
  "Invalid date . Return code  = "
- VALIDATIONRESULT
+ ValidationResult
  EVALUATE
  TRUE
  WHEN
- DATENOTNUMERIC
+ DateNotNumeric
  DISPLAY
  "Date is not numeric."
  WHEN
- YEARCONTAINSZEROS
+ YearContainsZeros
  DISPLAY
  "Year contains all zeros."
  WHEN
- MONTHCONTAINSZEROS
+ MonthContainsZeros
  DISPLAY
  "Month contains all zeros."
  WHEN
- DAYCONTAINSZEROS
+ DayContainsZeros
  DISPLAY
  "Day contains all zeros."
  WHEN
- MONTHGREATERTHAN12
+ MonthGreaterThan12
  DISPLAY
  "Month to great."
  WHEN
- DAYTOOGREATFORMONTH
+ DayTooGreatForMonth
  DISPLAY
  "Day to great for month."
  END-EVALUATE
@@ -7236,12 +7236,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  .
  PROGRAM-ID
  .
- EURODATETOSORTDATE
+ EuroDateToSortDate
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7253,20 +7253,20 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- YYYYDDMMTEMP
+ YYYYDDMMTemp
  .
  02
- YYYYYEAR
+ YYYYYear
  PIC
  XXXX
  .
  02
- YYYYMONTH
+ YYYYMonth
  PIC
  XX
  .
  02
- YYYYDAY
+ YYYYDay
  PIC
  XX
  .
@@ -7274,74 +7274,74 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- DDMMYYYYDATE
+ DDMMYYYYDate
  .
  02
- DDMMDAY
+ DDMMDay
  PIC
  XX
  .
  02
- DDMMMONTH
+ DDMMMonth
  PIC
  XX
  .
  02
- DDMMYEAR
+ DDMMYear
  PIC
  XXXX
  .
  01
- YYYYDDMMDATE
+ YYYYDDMMDate
  PIC
  X(8)
  .
  PROCEDURE
  DIVISION
  USING
- DDMMYYYYDATE
- YYYYDDMMDATE
+ DDMMYYYYDate
+ YYYYDDMMDate
  .
- BEGIN
- .
- MOVE
- DDMMDAY
- TO
- YYYYDAY
+ Begin
  .
  MOVE
- DDMMMONTH
+ DDMMDay
  TO
- YYYYMONTH
+ YYYYDay
  .
  MOVE
- DDMMYEAR
+ DDMMMonth
  TO
- YYYYYEAR
+ YYYYMonth
+ .
+ MOVE
+ DDMMYear
+ TO
+ YYYYYear
  .
  MOVE
  YYYYDDMMTEMP
  TO
- YYYYDDMMDATE
+ YYYYDDMMDate
  .
  EXIT
  PROGRAM
  .
  END
  PROGRAM
- EURODATETOSORTDATE
+ EuroDateToSortDate
  .
  IDENTIFICATION
  DIVISION
  .
  PROGRAM-ID
  .
- SORTDATETOEURODATE
+ SortDateToEuroDate
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7353,20 +7353,20 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- DDMMYYYYTEMP
+ DDMMYYYYTemp
  .
  02
- DDMMDAY
+ DDMMDay
  PIC
  XX
  .
  02
- DDMMMONTH
+ DDMMMonth
  PIC
  XX
  .
  02
- DDMMYEAR
+ DDMMYear
  PIC
  XXXX
  .
@@ -7374,74 +7374,74 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- YYYYDDMMDATE
+ YYYYDDMMDate
  .
  02
- YYYYYEAR
+ YYYYYear
  PIC
  XXXX
  .
  02
- YYYYMONTH
+ YYYYMonth
  PIC
  XX
  .
  02
- YYYYDAY
+ YYYYDay
  PIC
  XX
  .
  01
- DDMMYYYYDATE
+ DDMMYYYYDate
  PIC
  X(8)
  .
  PROCEDURE
  DIVISION
  USING
- YYYYDDMMDATE
- DDMMYYYYDATE
+ YYYYDDMMDate
+ DDMMYYYYDate
  .
- BEGIN
- .
- MOVE
- YYYYDAY
- TO
- DDMMDAY
+ Begin
  .
  MOVE
- YYYYMONTH
+ YYYYDay
  TO
- DDMMMONTH
+ DDMMDay
  .
  MOVE
- YYYYYEAR
+ YYYYMonth
  TO
- DDMMYEAR
+ DDMMMonth
+ .
+ MOVE
+ YYYYYear
+ TO
+ DDMMYear
  .
  MOVE
  DDMMYYYYTEMP
  TO
- DDMMYYYYDATE
+ DDMMYYYYDate
  .
  EXIT
  PROGRAM
  .
  END
  PROGRAM
- SORTDATETOEURODATE
+ SortDateToEuroDate
  .
  IDENTIFICATION
  DIVISION
  .
  PROGRAM-ID
  .
- GETDAYDIFF
+ GetDayDiff
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7453,46 +7453,46 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  SECTION
  .
  01
- DATE1
+ Date1
  PIC
  9(8)
  .
  01
- DATE2
+ Date2
  PIC
  9(8)
  .
  01
- DIFFERENCE
+ Difference
  PIC
  S9(7)
  .
  PROCEDURE
  DIVISION
  USING
- DATE1
- DATE2
- DIFFERENCE
+ Date1
+ Date2
+ Difference
  .
- BEGIN
+ Begin
  .
  COMPUTE
- DIFFERENCE
+ Difference
  =
  FUNCTION
- INTEGER-OF-DATE(DATE2)-
+ INTEGER-OF-DATE(Date2)-
  FUNCTION
- INTEGER-OF-DATE(DATE1)
+ INTEGER-OF-DATE(Date1)
  EXIT
  PROGRAM
  .
  END
  PROGRAM
- GETDAYDIFF
+ GetDayDiff
  .
  END
  PROGRAM
- DAYDRIVER
+ DayDriver
  .
 
 Done.
@@ -7502,12 +7502,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  .
  PROGRAM-ID
  .
- DRIVERPROG
+ DriverProg
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7519,44 +7519,44 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  SECTION
  .
  01
- USERNUMBER
+ UserNumber
  PIC
  99
  .
  01
- PRNRESULT
+ PrnResult
  PIC
  9(6)
  .
  01
- PARAMETERS
+ Parameters
  .
  02
- NUMBER1
+ Number1
  PIC
  9(3)
  .
  02
- NUMBER2
+ Number2
  PIC
  9(3)
  .
  02
- FIRSTSTRING
+ FirstString
  PIC
  X(19)
  VALUE
  "First parameter  = "
  .
  02
- SECONDSTRING
+ SecondString
  PIC
  X(19)
  VALUE
  "Second parameter = "
  .
  02
- RESULT
+ Result
  PIC
  9(6)
  COMP
@@ -7564,22 +7564,22 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  PROCEDURE
  DIVISION
  .
- BEGIN
+ Begin
  .
  PERFORM
- CALLMULTIPLYNUMS
+ CallMultiplyNums
  .
  PERFORM
- CALLFICKLE
+ CallFickle
  PERFORM
- CALLSTEADFAST
+ CallSteadfast
  PERFORM
- MAKEFICKLESTEADFAST
+ MakeFickleSteadfast
  .
  STOP
  RUN
  .
- CALLMULTIPLYNUMS
+ CallMultiplyNums
  .
  DISPLAY
  "Input 2 numbers (3 digits each)  to be multiplied"
@@ -7589,22 +7589,22 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  NO
  ADVANCING
  ACCEPT
- NUMBER1
+ Number1
  DISPLAY
  "Second number - "
  WITH
  NO
  ADVANCING
  ACCEPT
- NUMBER2
+ Number2
  .
  DISPLAY
  "The first string  is "
- FIRSTSTRING
+ FirstString
  .
  DISPLAY
  "The second string is "
- SECONDSTRING
+ SecondString
  .
  DISPLAY
  ">>>>>>>>> Calling the sub-program now"
@@ -7614,38 +7614,38 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  USING
  BY
  CONTENT
- NUMBER1
- NUMBER2
- FIRSTSTRING
+ Number1
+ Number2
+ FirstString
  BY
  REFERENCE
- SECONDSTRING
- RESULT
+ SecondString
+ Result
  .
  DISPLAY
  "Back in the main program now <<<<<<<<<<<"
  .
  MOVE
- RESULT
- TO
- PRNRESULT
+ Result
+ to
+ PrnResult
  .
  DISPLAY
- NUMBER1
+ Number1
  " multiplied by "
- NUMBER2
+ Number2
  " is = "
- PRNRESULT
+ PrnResult
  .
  DISPLAY
  "The first string is  "
- FIRSTSTRING
+ FirstString
  .
  DISPLAY
  "The second string is "
- SECONDSTRING
+ SecondString
  .
- CALLFICKLE
+ CallFickle
  .
  DISPLAY
  SPACE
@@ -7654,35 +7654,35 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  .
- CALLSTEADFAST
+ CallSteadFast
  .
  DISPLAY
  SPACE
@@ -7691,35 +7691,35 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Steadfast"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Steadfast"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Steadfast"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  .
- MAKEFICKLESTEADFAST
+ MakeFickleSteadfast
  .
  DISPLAY
  SPACE
@@ -7730,37 +7730,37 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  CANCEL
  "Fickle"
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  CANCEL
  "Fickle"
  MOVE
  10
  TO
- USERNUMBER
+ UserNumber
  CALL
  "Fickle"
  USING
  BY
  CONTENT
- USERNUMBER
+ UserNumber
  .
 
 Done.
@@ -7770,12 +7770,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Fickle
  .
  PROGRAM-ID
  .
- FICKLE
+ Fickle
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7787,7 +7787,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Fickle
  SECTION
  .
  01
- RUNNINGTOTAL
+ RunningTotal
  PIC
  9(4)
  VALUE
@@ -7797,25 +7797,25 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Fickle
  SECTION
  .
  01
- PARAM1
+ Param1
  PIC
  99
  .
  PROCEDURE
  DIVISION
  USING
- PARAM1
+ Param1
  .
- BEGIN
+ Begin
  .
  ADD
- PARAM1
+ Param1
  TO
- RUNNINGTOTAL
+ RunningTotal
  .
  DISPLAY
  "The total so far is "
- RUNNINGTOTAL
+ RunningTotal
  EXIT
  PROGRAM
  .
@@ -7827,12 +7827,12 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Multip
  .
  PROGRAM-ID
  .
- MULTIPLYNUMS
+ MultiplyNums
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7844,65 +7844,65 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Multip
  SECTION
  .
  01
- PARAM1
+ Param1
  PIC
  9(3)
  .
  01
- PARAM2
+ Param2
  PIC
  9(3)
  .
  01
- ANSWER
+ Answer
  PIC
  9(6)
  COMP
  .
  01
- STRA
+ StrA
  PIC
  X(20)
  .
  01
- STRB
+ StrB
  PIC
  X(20)
  .
  PROCEDURE
  DIVISION
  USING
- PARAM1
- PARAM2
- STRA
- STRB
- ANSWER
+ Param1
+ Param2
+ StrA
+ StrB
+ Answer
  .
- BEGIN
+ Begin
  .
  DISPLAY
  ">>>>>>>>>>>>>>>>> In the sub-program"
  DISPLAY
- STRA
- PARAM1
+ StrA
+ Param1
  DISPLAY
- STRB
- PARAM2
+ StrB
+ Param2
  MULTIPLY
- PARAM1
+ Param1
  BY
- PARAM2
+ Param2
  GIVING
- ANSWER
+ Answer
  .
  MOVE
  "VALUE OVERWRITTEN"
  TO
- STRA
+ StrA
  MOVE
  "VALUE OVERWRITTEN"
  TO
- STRB
+ StrB
  DISPLAY
  "<<<<<<<<<<<<<< Leaving sub-program now"
  .
@@ -7917,14 +7917,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Steadf
  .
  PROGRAM-ID
  .
- STEADFAST
+ Steadfast
  IS
  INITIAL
  .
  AUTHOR
  .
- MICHAEL
- COUGHLAN
+ Michael
+ Coughlan
  .
  ENVIRONMENT
  DIVISION
@@ -7936,7 +7936,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Steadf
  SECTION
  .
  01
- RUNNINGTOTAL
+ RunningTotal
  PIC
  9(4)
  VALUE
@@ -7946,25 +7946,25 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Steadf
  SECTION
  .
  01
- PARAM1
+ Param1
  PIC
  99
  .
  PROCEDURE
  DIVISION
  USING
- PARAM1
+ Param1
  .
- BEGIN
+ Begin
  .
  ADD
- PARAM1
+ Param1
  TO
- RUNNINGTOTAL
+ RunningTotal
  .
  DISPLAY
  "The total so far is "
- RUNNINGTOTAL
+ RunningTotal
  EXIT
  PROGRAM
  .

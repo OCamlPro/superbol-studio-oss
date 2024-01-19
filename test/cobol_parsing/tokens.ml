@@ -20,7 +20,7 @@ let%expect_test "tokens" =
            STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., PROCEDURE,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
     DIVISION, ., STOP, RUN, ., EOF
 |}];;
 

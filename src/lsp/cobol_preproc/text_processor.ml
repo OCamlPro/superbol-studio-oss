@@ -57,7 +57,7 @@ let partial_word (type k) (req: k partial_word_request) words : (k, _) result =
 let partial_subst (k: partial_replacing) ({ payload = pat; _ } as repl_from) =
   { partial_subst_dir = k.repl_dir;
     partial_subst_len = String.length pat;
-    partial_subst_regexp = Str.regexp @@ match k.repl_dir with
+    partial_subst_regexp = Str.regexp_case_fold @@ match k.repl_dir with
       | Leading  when k.repl_strict -> "^" ^ Str.quote pat ^ "\\(.+\\)$"
       | Leading                     -> "^" ^ Str.quote pat ^ "\\(.*\\)$"
       | Trailing when k.repl_strict -> "^\\(.+\\)" ^ Str.quote pat ^ "$"
