@@ -5,7 +5,7 @@
 
 TARGET_PLAT ?= linux
 DUNE = opam exec -- dune
-DUNE_ARGS ?=
+DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 

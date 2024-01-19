@@ -251,8 +251,9 @@ let from_file ?search_path file =
 
 let from_dialect ?search_path d =
   let search_path = retrieve_search_path ?search_path () in
-  let config_filename dialect =
-    Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
+  let config_filename = function
+    | DIALECT.GnuCOBOL -> "default.conf"
+    | dialect -> Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
   in
   let load_gnucobol_conf conf =
     from_file ~search_path @@

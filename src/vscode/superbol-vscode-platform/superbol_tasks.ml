@@ -24,12 +24,6 @@ type attribute_spec =
 
 let attributes_spec ~debug =
   [
-    "copybooks", C ([%js.to: string list or_undefined],
-                    [%js.of: string list], []);
-    "dialect", C ([%js.to: string or_undefined],
-                  [%js.of: string], "default");
-    "source-format", C ([%js.to: string or_undefined],
-                        [%js.of: string], "auto");
     "for-debug", C ([%js.to: bool or_undefined],
                     [%js.of: bool], debug);
     "cobc-path", C ([%js.to: string or_undefined],
@@ -40,35 +34,45 @@ let attributes_spec ~debug =
 
 (* --- *)
 
-let bool_flag_arg key ~ok ?(ko = Fun.id) ~attributes args =
+let attr_bool_flag key ~ok ?(ko = Fun.id) ~attributes args =
   match List.assoc_opt key attributes with
   | Some flag when [%js.to: bool] flag -> ok args
+  | None when Superbol_workspace.bool key -> ok args
   | _ -> ko args
 
-let string_arg key ~mk ~attributes args =
-  match List.assoc_opt key attributes with
-  | Some s -> mk ([%js.to: string] s) :: args
-  | None -> args
+let string_arg ?(allow_empty = false) ~mk s args =
+  if s = "" && not allow_empty then args else mk s :: args
 
-let string_args key ~append ~attributes args =
+(* let attr_string ?allow_empty key ~mk ~attributes args = *)
+(*   match List.assoc_opt key attributes with *)
+(*   | Some s -> string_arg ([%js.to: string] s) ?allow_empty ~mk args *)
+(*   | None -> args *)
+
+let config_string key =
+  string_arg (Superbol_workspace.string key)
+
+let attr_strings key ~append ~attributes args =
   match List.assoc_opt key attributes with
   | Some l -> append ([%js.to: string list] l) args
   | None -> args
 
+let config_strings key ~append args =
+  append (Superbol_workspace.string_list key) args
+
 let make_args ~attributes =
   ["-x"; "${relativeFile}"] |>
-  string_args "copybooks" ~attributes
+  config_strings "cobol.copybooks"
     ~append:(fun l args -> List.flatten (List.map (fun l -> ["-I"; l]) l) @ args) |>
-  string_arg "dialect" ~attributes
-    ~mk:((^) "-std=")|>
-  string_arg "source-format" ~attributes
+  config_string "cobol.dialect"
+    ~mk:(function "gnucobol" -> "-std=default" | s -> "-std=" ^ s) |>
+  config_string "cobol.source-format"
     ~mk:((^) "-fformat=") |>
-  bool_flag_arg "for-debug" ~attributes
+  attr_bool_flag "for-debug" ~attributes
     ~ok:(fun args -> "-fsource-location" :: "-ftraceall" ::
                      "-g" ::
                      "-Q" :: "--coverage" ::
                      "-A" :: "--coverage" :: args) |>
-  string_args "extra-args" ~attributes
+  attr_strings "extra-args" ~attributes
     ~append:(fun args' args -> args @ args') |>
   List.map (fun elt -> `String elt)
 

@@ -100,6 +100,20 @@ let format_of_string s =
   | "auto" -> Auto
   | _ -> invalid_arg s
 
+let all_format_names =
+  [
+    "auto";
+    "fixed";
+    "free";
+    "cobol85";
+    "variable";
+    "xopen";
+    "xcard";
+    "crt";
+    "terminal";
+    "cobolx";
+  ]
+
 let string_of_format = function
   | SF SFFixed -> "fixed"
   | SF SFFree -> "free"

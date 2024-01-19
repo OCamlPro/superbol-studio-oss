@@ -150,7 +150,7 @@ and fold_nonnumlit (v: _ #folder) : nonnumlit -> 'a -> 'a = function
   | National _ as n -> fold_national v n
   | Fig f -> fold_any_figurative v f
   | StrConcat _ as s -> fold_strlit v s
-  | Concat _ as n -> fold_nonnumlit v n
+  | Concat (n, n') -> fun x -> x >> fold_nonnumlit v n >> fold_nonnumlit v n'
 
 and fold_int_figurative (v: _ #folder) =
   leaf v#fold_int_figurative

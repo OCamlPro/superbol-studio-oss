@@ -22,10 +22,58 @@
     "configuration": {
       "title": "SuperBOL COBOL",
       "properties": {
-        "superbol.globalFormatTakesSelection": {
-          "type": "boolean",
-          "default": false,
-          "description": "If something is selected, only format the selection"
+        "superbol.cobol.copybooks": {
+          "title": "Copybook paths",
+          "type": "array",
+          "description": "List of copybooks paths"
+        },
+        "superbol.cobol.dialect": {
+          "type": "string",
+          "default": "default",
+          "description": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\"",
+          "items": "string",
+          "enum": [
+            "default",
+            "gnucobol",
+            "cobol85",
+            "cobol2002",
+            "cobol2014",
+            "acu",
+            "acu-strict",
+            "bs2000",
+            "bs2000-strict",
+            "gcos",
+            "gcos-strict",
+            "ibm",
+            "ibm-strict",
+            "mf",
+            "mf-strict",
+            "mvs",
+            "mvs-strict",
+            "realia",
+            "realia-strict",
+            "rm",
+            "rm-strict",
+            "xopen"
+          ]
+        },
+        "superbol.cobol.source-format": {
+          "type": "string",
+          "default": "auto",
+          "description": "Default source reference-format",
+          "items": "string",
+          "enum": [
+            "auto",
+            "fixed",
+            "free",
+            "cobol85",
+            "variable",
+            "xopen",
+            "xcard",
+            "crt",
+            "terminal",
+            "cobolx"
+          ]
         },
         "superbol.lsp-path": {
           "title": "SuperBOL executable",
@@ -310,43 +358,6 @@
       {
         "type": "superbol",
         "properties": {
-          "copybooks": {
-            "type": "array",
-            "description": "The list of copybooks paths"
-          },
-          "dialect": {
-            "type": "string",
-            "description": "The COBOL dialect used",
-            "items": "string",
-            "enum": [
-              "default",
-              "gnucobol",
-              "cobol85",
-              "cobol2002",
-              "cobol2014",
-              "acu",
-              "acu-strict",
-              "bs2000",
-              "bs2000-strict",
-              "gcos",
-              "gcos-strict",
-              "ibm",
-              "ibm-strict",
-              "mf",
-              "mf-strict",
-              "mvs",
-              "mvs-strict",
-              "realia",
-              "realia-strict",
-              "rm",
-              "rm-strict",
-              "xopen"
-            ]
-          },
-          "source-format": {
-            "type": "string",
-            "description": "The source format of the code"
-          },
           "for-debug": {
             "type": "boolean",
             "description": "Build for debugging"
