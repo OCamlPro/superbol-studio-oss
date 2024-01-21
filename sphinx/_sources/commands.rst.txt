@@ -46,6 +46,9 @@ Overview of sub-commands::
   switch build
     Configure, build, install GnuCOBOL and add a switch
   
+  switch config
+    Change the current config
+  
   switch env
     Generate commands to set environment variables to use the specified switch
   
@@ -660,6 +663,71 @@ Where options are:
 * :code:`--sudo`   Use sudo for 'make install'
 
 * :code:`--switch SWITCH`   Name of switch to add
+
+
+main.exe switch config
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Change the current config
+
+
+
+**DESCRIPTION**
+
+
+This command sets the current default switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch config [OPTIONS]
+
+Where options are:
+
+
+* :code:`--compiler-coverage BOOL`   Set compiler coverage
+
+* :code:`--set-last`   Use the latest imported switch
+
+* :code:`--set-switch SWITCH`   Switch to use
 
 
 main.exe switch env
