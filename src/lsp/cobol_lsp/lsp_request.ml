@@ -172,8 +172,11 @@ let lookup_references_in_doc
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
   match Lsp_lookup.element_at_position ~uri:doc.uri position group with
-  | { element_at_position = None; _ }
+  | { element_at_position = None; _ } ->
+    Lsp_debug.message "Lsp_request.lookup_references_in_doc: element_at_position = None";
+    None
   | { enclosing_compilation_unit_name = None; _ } ->
+    Lsp_debug.message "Lsp_request.lookup_references_in_doc: enclosing_compilation_unit_name = None";
       None
   | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
@@ -198,13 +201,17 @@ let lookup_references_in_doc
           match qn with
           | Data_full_name qn
           | Data_item { full_qn = Some qn; _ } ->
+            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_full_name...";
               data_refs qn
           | Data_item { full_qn = None; _ } ->
+            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_item...";
               []
           | Data_name qn ->
+            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_name...";
               Option.fold ~none:[] ~some:data_refs @@
               find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
           | Proc_name { qn; in_section } ->
+            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Proc_name...";
               Option.fold ~none:[] ~some:proc_refs @@
               find_proc_qn qn ?in_section ~&cu ~kind:"procedure-name"
         with Not_found -> []
@@ -447,9 +454,11 @@ let on_request
     | WillDeleteFiles  (* DeleteFilesParams.t.t *) _
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
       ->
-        Error (UnhandledRequest client_req)
+      Lsp_debug.message "Lsp_request: unhandled request";
+      Error (UnhandledRequest client_req)
     | UnknownRequest { meth; _ } ->
-        Error (UnknownRequest meth)
+      Lsp_debug.message "Lsp_request. unknown request";
+      Error (UnknownRequest meth)
 
 let handle (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
