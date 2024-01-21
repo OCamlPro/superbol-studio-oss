@@ -46,21 +46,30 @@ let section_name = "switches"
 let about : block list = [
   `S "ABOUT SWITCHES" ;
   `Blocks [
-    `P "Switches are used to easily handle multiple GnuCOBOL installations. The section $(b,[switches]) in the user configuration file $(b,\\$HOME/.config/superbol/config.toml) contains several variables:";
-    `I ("* 'dir'", "The directory where installations should be performed, and switches imported from.");
+    `P "Switches are used to easily handle multiple GnuCOBOL \
+        installations. The section $(b,[switches]) in the user \
+        configuration file $(b,\\$HOME/.config/superbol/config.toml) \
+        contains several variables:";
+    `I ("* 'dir'", "The directory where installations should be \
+                    performed, and switches imported from.");
     `I ("* 'current'", "The current switch name to use by default");
-    `I ("* 'list'", "The list of known switches, with the corresponding installation directory");
+    `I ("* 'list'", "The list of known switches, with the \
+                     corresponding installation directory");
     `I ("* 'num'", "A counter used to name switches");
 
-    `P "Switches can be created, imported and used using the following commands:";
+    `P "Switches can be created, imported and used using the following \
+        commands:";
     `I ("$(b,superbol env [SWITCH] [--last] [--global])",
-        "Output a list of shell commands to set the environment variables to use a specific switch");
+        "Output a list of shell commands to set the environment \
+         variables to use a specific switch");
     `I ("$(b,superbol import [DIRS] [--clear] [--no-set])",
-        "Scan directories to detect GnuCOBOL installations, and created associated switches");
+        "Scan directories to detect GnuCOBOL installations, and \
+         created associated switches");
     `I ("$(b,superbol add DIR [--switch SWITCH] [--no-set])",
         "Add a specific GnuCOBOL installation directory as a switch");
     `I ("$(b,superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set])",
-        "From inside GnuCOBOL sources, configure, build and install and add the corresponding switch");
+        "From inside GnuCOBOL sources, configure, build and install \
+         and add the corresponding switch");
     `I ("$(b,superbol list)",
         "List known switches");
     `I ("$(b,superbol set [SWITCH] [--last])",
@@ -298,7 +307,7 @@ let switch_import ~dirs ~clear ~set () =
     set_switch_link config ;
   save_user_config config
 
-let import_cmd =
+let switch_import_cmd =
   let dirs = ref [] in
   let clear = ref false in
   let set = ref true in
@@ -343,7 +352,7 @@ let switch_list () =
        dir;
     ) config.switch_list
 
-let list_cmd =
+let switch_list_cmd =
   EZCMD.sub
     "switch list"
     (fun () ->
@@ -486,7 +495,7 @@ let switch_set ?switch ~last () =
   Printf.eprintf "Current switch set to %S\n%!" switch;
   save_user_config config
 
-let set_cmd =
+let switch_set_cmd =
   let switch = ref None in
   let last = ref false in
   EZCMD.sub
@@ -509,6 +518,69 @@ let set_cmd =
       ];
     ])
 
+(*** switch config ***)
+
+let switch_config ?setswitch ?setlast ?setcoverage () =
+
+  let config = get_config () in
+
+  match setswitch, setlast, setcoverage with
+  | None, None, None ->
+    Printf.printf "Config from %S\n%!" user_config_file;
+    Printf.printf "  Current switch: %s\n%!" (match config.switch_current with
+        | None -> ""
+        | Some s -> s);
+    Printf.printf "  Compiler coverage: %b\n%!" config.with_compiler_coverage;
+  | _ ->
+    begin
+      match setswitch, setlast with
+      | None, None -> ()
+      | switch, last ->
+        let last = match last with
+          | None -> false
+          | Some last -> last
+        in
+        let switch = find_switch config ?switch ~last ~current:true in
+        config.switch_current <- Some switch ;
+        set_switch_link config ;
+        Printf.eprintf "Current switch set to %S\n%!" switch;
+    end;
+    begin
+      match setcoverage with
+      | None -> ()
+      | Some coverage ->
+        config.with_compiler_coverage <- coverage
+    end;
+    save_user_config config
+
+let switch_config_cmd =
+  let setswitch = ref None in
+  let setlast = ref None in
+  let setcoverage = ref None in
+  EZCMD.sub
+    "switch config"
+    (fun () ->
+       switch_config ?setswitch:!setswitch ?setlast:!setlast
+         ?setcoverage:!setcoverage ()
+    )
+    ~args:[
+      [ "set-switch" ], Arg.String (fun s -> setswitch := Some s),
+      EZCMD.info ~docv:"SWITCH" "Switch to use";
+
+      [ "set-last" ], Arg.Unit (fun () -> setlast := Some true),
+      EZCMD.info "Use the latest imported switch";
+
+      [ "compiler-coverage" ], Arg.Bool (fun b ->
+          setcoverage := Some b),
+      EZCMD.info "Set compiler coverage";
+    ]
+    ~doc: "Change the current config"
+    ~man:(about [
+      `S "DESCRIPTION";
+      `Blocks [
+        `P "This command sets the current default switch.";
+      ];
+    ])
 
 
 (*** switch add ***)
@@ -524,7 +596,7 @@ let switch_add ~dirname ?switch_name ~set () =
     set_switch_link config ;
   EZTOML.save user_config_file config.user_config
 
-let add_cmd =
+let switch_add_cmd =
   let dirname = ref None in
   let switch_name = ref None in
   let set = ref true in
@@ -643,7 +715,7 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
     set_switch_link config;
   save_user_config config
 
-let build_cmd =
+let switch_build_cmd =
   let dir = ref None in
   let switch_name = ref None in
   let set = ref true in
@@ -682,7 +754,7 @@ let build_cmd =
     ])
 
 
-let cmd =
+let switch_cmd =
   EZCMD.sub
     "switch"
     (fun () ->

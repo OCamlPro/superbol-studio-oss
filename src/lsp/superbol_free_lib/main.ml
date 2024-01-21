@@ -28,14 +28,15 @@ let public_subcommands = [
   Command_json_vscode.cmd;
   Command_snapshot.cmd;
 
-  Command_switch.cmd;
   Command_switch.env_cmd; (* env *)
+  Command_switch.switch_cmd;
   Command_switch.switch_env_cmd;
-  Command_switch.import_cmd;
-  Command_switch.list_cmd;
-  Command_switch.set_cmd;
-  Command_switch.add_cmd;
-  Command_switch.build_cmd;
+  Command_switch.switch_import_cmd;
+  Command_switch.switch_list_cmd;
+  Command_switch.switch_set_cmd;
+  Command_switch.switch_add_cmd;
+  Command_switch.switch_build_cmd;
+  Command_switch.switch_config_cmd;
 
   Command_project.init_cmd;
   Command_project.config_cmd;
