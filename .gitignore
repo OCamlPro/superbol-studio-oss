@@ -17,6 +17,8 @@ _build
 /_opam
 /_build
 .drom.config
+# Edit drom.toml to change the following lines
+/superbol-free-*
 /dist
 /_*
 /node_modules
