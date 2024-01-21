@@ -16,6 +16,26 @@
 
 exception Parse_error of string
 
+module IO = struct
+
+  let read_line () =
+    let line = read_line () in
+    Lsp_debug.LSP_IO.read_line line;
+    line
+
+  let read_bytes buf i len =
+    let n = input stdin buf i len in
+    Lsp_debug.LSP_IO.read_bytes buf i n;
+    n
+
+  let printf fmt =
+    Printf.ksprintf (fun s ->
+        Lsp_debug.LSP_IO.write s;
+        Printf.fprintf stdout "%s%!" s) fmt
+
+end
+
+
 let parse_error fmt =
   Pretty.string_to (fun msg -> raise (Parse_error msg)) fmt
 
@@ -30,7 +50,7 @@ let initialize_channels () =
     the message is in a wrong format. *)
 let read_message () : Jsonrpc.Packet.t =
   let rec read_headers acc =
-    let line = read_line () in
+    let line = IO.read_line () in
     match String.trim line with
     | "" -> acc (* an empty line after the headers *)
     | line ->
@@ -48,7 +68,7 @@ let read_message () : Jsonrpc.Packet.t =
   in
   let rec read_len buf i len =
     if len > 0 then
-      let n = input stdin buf i len in
+      let n = IO.read_bytes buf i len in
       read_len buf (i + n) (len - n)
   in
   match
@@ -78,8 +98,8 @@ let read_message () : Jsonrpc.Packet.t =
 (** [send_json json] sends out a json rpc package. *)
 let send_json json =
   let str = Yojson.Safe.to_string json in
-  Pretty.out "Content-Length: %d\r\n\r\n" (String.length str + 1); (* with \n *)
-  Pretty.out "%s@." str
+  IO.printf "Content-Length: %d\r\n\r\n%s\n" (String.length str + 1) str; (* with \n *)
+  ()
 
 (** [send_response response] sends out a json RPC response on standard
     output. *)
