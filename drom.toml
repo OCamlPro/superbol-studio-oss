@@ -69,6 +69,8 @@ share-dirs = ["share"]
 [fields]
 dune = "2.8.0"
 dot-gitignore-trailer = """
+# Edit drom.toml to change the following lines
+/superbol-free-*
 /dist
 /_*
 /node_modules
