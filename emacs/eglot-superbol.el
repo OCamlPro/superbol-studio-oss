@@ -16,7 +16,7 @@
   (load "eglot-autoloads"))
 
 (require 'eglot)
-(require 'superbol-mode)
+(require 'cobol-superbol-mode)
 
 (defun eglot-superbol--start ()
   "Superbol LSP startup function for Eglot"
@@ -27,15 +27,11 @@
   ;; Turn on fontification (even if minimal)
   (funcall font-lock-fontify-buffer-function))
 
-(add-to-list 'eglot-server-programs '(superbol-mode . ("superbol-free" "lsp")))
-(add-to-list 'eglot-server-programs '(cobol-mode    . ("superbol-free" "lsp")))
+(add-to-list 'eglot-server-programs
+	     '(cobol-superbol-mode    . ("superbol-free" "lsp")))
 
 ;; Autostart the LSP when entering superbol-mode
-(add-hook 'superbol-mode-hook #'eglot-superbol--start)
-
-;; Also load on cobol-mode
-(with-eval-after-load 'cobol-mode
-  (add-hook 'cobol-mode-hook #'eglot-superbol--start))
+(add-hook 'cobol-superbol-mode-hook #'eglot-superbol--start)
 
 (provide 'eglot-superbol)
 
