@@ -4,7 +4,8 @@
   },
   "activationEvents": [
     "onLanguage:cobol",
-    "onDebug"
+    "workspaceContains:**/*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}",
+    "workspaceContains:{_superbol,superbol.toml}"
   ],
   "contributes": {
     "breakpoints": [
@@ -281,8 +282,7 @@
           "COBOL"
         ],
         "filenamePatterns": [
-          "*.cbl",
-          "*.cob"
+          "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
         ]
       }
     ],

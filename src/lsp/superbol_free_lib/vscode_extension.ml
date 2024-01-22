@@ -89,12 +89,13 @@ let package =
       "@types/node", "^20.3.2";
     ]
 
+let cob_extensions_pattern = "[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
 let contributes =
   Manifest.contributes ()
     ~languages: [
       Manifest.language "cobol"
         ~aliases: [ "COBOL" ]
-        ~filenamePatterns: [ "*.cbl"; "*.cob" ]
+        ~filenamePatterns: [ "*." ^ cob_extensions_pattern ]
     ]
     ~debuggers: [
       Manifest.debugger "gdb"
@@ -406,7 +407,12 @@ let manifest =
     ~marketplace
     ~engines: ("^" ^ vscode_engine)
     ~activationEvents: [
-      "onLanguage:cobol";
-      "onDebug";
+      "onLanguage:cobol"; (* Note: optional since VS Code 1.74, as in
+                             `contributes`) *)
+      (* XXX: should we really expect mixed-case file extensions like
+         `prog.coB`? *)
+      "workspaceContains:**/*." ^ cob_extensions_pattern;
+      "workspaceContains:{_superbol,superbol.toml}";
+      (* "onDebug"; *) (* <- not relevant yet *)
     ]
     ~contributes
