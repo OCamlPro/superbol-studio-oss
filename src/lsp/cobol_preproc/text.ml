@@ -85,9 +85,13 @@ include FMT
 (* Various predicates on source-flagged character strings *)
 
 let textwordp t = match ~&t with TextWord _ -> true | _ -> false
-let textword_eqp ~eq:w t = match ~&t with TextWord t -> t = w | _ -> false
+let textword_eqp ~eq:w t = match ~&t with
+  | TextWord t -> String.uppercase_ascii t = String.uppercase_ascii w
+  | _ -> false
 let cdirp t = match ~&t with CDirWord _ -> true | _ -> false
-let cdir_eqp ~eq:w t = match ~&t with CDirWord t -> t = w | _ -> false
+let cdir_eqp ~eq:w t = match ~&t with
+  | CDirWord t -> String.uppercase_ascii t = String.uppercase_ascii w
+  | _ -> false
 
 (* Manipulating pseudo-words and text *)
 
@@ -108,7 +112,7 @@ let split_pseudo_string w =
           (PwText t &@ tloc) :: acc, wloc
       | Str.Delim d ->
           let dloc, wloc = split_loc wloc d in
-          (PwDelim (d, Str.regexp (Str.quote d)) &@ dloc) :: acc, wloc
+          (PwDelim (d, Str.regexp_case_fold (Str.quote d)) &@ dloc) :: acc, wloc
     end ([], ~@w)
   in
   List.rev pseudoword_items

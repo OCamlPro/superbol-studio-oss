@@ -61,12 +61,6 @@ open TYPES
 
 (* --- *)
 
-let bare name : Cobol_ptree.qualname = Cobol_ptree.Name name
-let qual name : Cobol_ptree.qualname option -> Cobol_ptree.qualname = function
-  | None -> Cobol_ptree.Name name
-  | Some qn -> Cobol_ptree.Qual (name, qn)
-let simple_name : Cobol_ptree.qualname -> string = function
-  | Qual (n, _) | Name n -> ~&n
 let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
   | Name name
   | Qual (name, _) -> ~@name

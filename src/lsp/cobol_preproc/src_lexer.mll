@@ -582,7 +582,7 @@ and cdtoken = parse
       { cdtoken lexbuf }
 
   | (nonblank+ as s)
-      { CDTok (try Hashtbl.find cdtoken_of_keyword s
+      { CDTok (try Hashtbl.find cdtoken_of_keyword (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
   | eof
@@ -599,7 +599,7 @@ and pptoken = parse
   | '.' { PPTok PERIOD }
 
   | (([^ '(' ')']+) as s)
-      { PPTok (try Hashtbl.find pptoken_of_keyword s
+      { PPTok (try Hashtbl.find pptoken_of_keyword (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
   | eof

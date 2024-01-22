@@ -2409,7 +2409,7 @@ syn_misc.at-3227-prog.cob:10.7-10.15:
 ----          ^^^^^^^^
   11   
   12          78  var VALUE "hello".
->> Error: Library `A.' not found in search path (search path: )
+>> Error: Library `a.' not found in search path (search path: )
 
 syn_misc.at-3227-prog.cob:7.30-7.31:
    4   

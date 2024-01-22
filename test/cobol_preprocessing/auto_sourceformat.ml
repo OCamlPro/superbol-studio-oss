@@ -27,7 +27,7 @@ let%expect_test "auto-fixed-1" =
   Preproc_testing.preprocess ~source_format:Auto "\
 \       IDENTIFICATION   DIVISION.
 \       PROGRAM-ID.      prog.";
-  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . PROG . |}];;
+  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . prog . |}];;
 
 
 let%expect_test "auto-fixed-2" =
@@ -38,14 +38,14 @@ let%expect_test "auto-fixed-2" =
 \
 \       IDENTIFICATION   DIVISION.
 \       PROGRAM-ID.      prog.";
-  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . PROG . |}];;
+  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . prog . |}];;
 
 
 let%expect_test "auto-free-1" =
   Preproc_testing.preprocess ~source_format:Auto "\
 IDENTIFICATION   DIVISION.
 PROGRAM-ID.      prog.";
-  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . PROG . |}];;
+  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . prog . |}];;
 
 
 let%expect_test "auto-free-2" =
@@ -53,7 +53,7 @@ let%expect_test "auto-free-2" =
 *> comment
 IDENTIFICATION   DIVISION.
 PROGRAM-ID.      prog.";
-  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . PROG . |}];;
+  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . prog . |}];;
 
 
 let%expect_test "auto-free-3" =
@@ -62,7 +62,7 @@ let%expect_test "auto-free-3" =
 *> comment
 IDENTIFICATION   DIVISION.
 PROGRAM-ID.      prog.";
-  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . PROG . |}];;
+  [%expect {| IDENTIFICATION DIVISION . PROGRAM-ID . prog . |}];;
 
 
 let%expect_test "auto-free-tab-only" =

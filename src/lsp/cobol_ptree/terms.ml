@@ -14,7 +14,7 @@
 open Common
 open Numericals
 
-type name = string                                              [@@deriving ord]
+type name = string
 let pp_name = Pretty.string
 
 let pp_name' ppf { payload; _ } = pp_name ppf payload
@@ -318,12 +318,14 @@ module COMPARE = struct
     if first <> 0
     then first
     else Lazy.force lazy_cmp
-  let compare_with_loc_name =
-    compare_with_loc compare_name
+
+  let compare_name a b =
+    String.compare (String.uppercase_ascii a) (String.uppercase_ascii b)
 
   let rec compare_term: type a. a term compare_fun =
     fun x y -> match x , y with
-      | Alphanum a, Alphanum b -> compare_alphanum_string a b
+      | Alphanum a, Alphanum b ->
+          compare_alphanum_string a b
       | Alphanum _, Fig HighValue ->
           -1
       | Alphanum _, Fig _ -> 1
@@ -349,9 +351,9 @@ module COMPARE = struct
       | Fig _, Fig _ ->
           0                                            (* TODO: `compare_fig` *)
       | Name a, Name b ->
-          compare_with_loc_name a b
+          compare_with_loc compare_name a b
       | Qual (a, c), Qual (b, d) ->
-          let first = compare_with_loc_name a b in
+          let first = compare_with_loc compare_name a b in
           if first <> 0
           then first
           else compare_term c d
@@ -382,7 +384,8 @@ module COMPARE = struct
     | Atom a ,Atom b ->
         compare_term a b
     | Unop(a, c), Unop(b, d) ->
-        compare_struct (Stdlib.compare a b) @@ lazy (compare_expression c d)
+        compare_struct (Stdlib.compare a b) @@
+        lazy (compare_expression c d)
     | Binop(a, c ,e), Binop(b, d, f) ->
         compare_struct (Stdlib.compare c d) @@
         lazy (compare_struct (compare_expression a b) @@
@@ -401,78 +404,76 @@ module COMPARE = struct
 
   and compare_binary_relation (x1, r1, y1) (x2, r2, y2) =
     compare_struct (compare_expression x1 x2) @@
-    lazy (compare_struct (compare r1 r2) @@ lazy (compare_expression y1 y2))
+    lazy (compare_struct (compare r1 r2) @@
+          lazy (compare_expression y1 y2))
   and compare_abbrev_combined_relation (b1, r1, x1, y1) (b2, r2, x2, y2) =
-    compare_struct (Bool.compare b1 b2) @@ lazy (
-      compare_struct (compare_binary_relation r1 r2) @@ lazy (
-        compare_struct (compare_logop x1 x2) @@
-        lazy (compare_flat_combined_relation y1 y2)
-      )
-    )
+    compare_struct (Bool.compare b1 b2) @@
+    lazy (compare_struct (compare_binary_relation r1 r2) @@
+          lazy (compare_struct (compare_logop x1 x2) @@
+                lazy (compare_flat_combined_relation y1 y2)))
   and compare_flat_combined_relation a b = match a, b with
     | FlatAmbiguous (ro1, e1), FlatAmbiguous (ro2, e2) ->
-      compare_struct (Option.compare compare_relop ro1 ro2) @@
-      lazy (compare_expression e1 e2)
+        compare_struct (Option.compare compare_relop ro1 ro2) @@
+        lazy (compare_expression e1 e2)
     | FlatAmbiguous _, _ -> -1
     | _, FlatAmbiguous _ -> 1
     | FlatNotExpr e1, FlatNotExpr e2 -> compare_expression e1 e2
     | FlatNotExpr _, _ -> -1
     | _, FlatNotExpr _ -> 1
     | FlatRel (b1, r1), FlatRel (b2, r2) ->
-      compare_struct (Bool.compare b1 b2) @@
-      lazy (compare_binary_relation r1 r2)
+        compare_struct (Bool.compare b1 b2) @@
+        lazy (compare_binary_relation r1 r2)
     | FlatRel _, _ -> -1
     | _, FlatRel _ -> 1
     | FlatOther c1, FlatOther c2 -> compare_cond c1 c2
     | FlatOther _, _ -> -1
     | _, FlatOther _ -> 1
     | FlatComb (x1, o1, y1), FlatComb (x2, o2, y2) ->
-      compare_struct (compare_flat_combined_relation x1 x2) @@ lazy (
-        compare_struct (compare_logop o1 o2) @@
-        lazy (compare_flat_combined_relation y1 y2)
-      )
+        compare_struct (compare_flat_combined_relation x1 x2) @@
+        lazy (compare_struct (compare_logop o1 o2) @@
+              lazy (compare_flat_combined_relation y1 y2))
 
   and compare_cond : type a b. a cond -> b cond -> int =
     fun a b -> match a, b with
-    | Expr x, Expr y ->
-        compare_expression x y
-    | Expr _, _ -> -1
-    | _, Expr _ -> 1
-    | Relation x, Relation y -> compare_binary_relation x y
-    | Relation _, _ -> -1
-    | _, Relation _ -> 1
-    | Abbrev x, Abbrev y -> compare_abbrev_combined_relation x y
-    | Abbrev _, _ -> -1
-    | _, Abbrev _ -> 1
-    | ClassCond (x1, c1), ClassCond (x2, c2) ->
-        compare_struct (compare_expression x1 x2) @@ lazy (compare_class_ c1 c2)
-    | ClassCond _, _ -> -1
-    | _, ClassCond _ -> 1
-    | SignCond (x1, s1), SignCond(x2, s2) ->
-        compare_struct (compare_expression x1 x2) @@ lazy (compare_signz s1 s2)
-    | SignCond _, _ -> -1
-    | _, SignCond _ -> 1
-    | Omitted x, Omitted y ->
-        compare_expression x y
-    | Omitted _, _ -> -1
-    | _, Omitted _ -> 1
-    | Not x, Not y ->
-        compare_cond x y
-    | Not _, _ -> -1
-    | _, Not _ -> 1
-    | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
-        compare_struct (compare_logop o1 o2) @@ lazy (
-          compare_struct (compare_cond x1 x2) @@ lazy (
-            compare_cond y1 y2
-          )
-        )
+      | Expr x, Expr y ->
+          compare_expression x y
+      | Expr _, _ -> -1
+      | _, Expr _ -> 1
+      | Relation x, Relation y -> compare_binary_relation x y
+      | Relation _, _ -> -1
+      | _, Relation _ -> 1
+      | Abbrev x, Abbrev y -> compare_abbrev_combined_relation x y
+      | Abbrev _, _ -> -1
+      | _, Abbrev _ -> 1
+      | ClassCond (x1, c1), ClassCond (x2, c2) ->
+          compare_struct (compare_expression x1 x2) @@
+          lazy (compare_class_ c1 c2)
+      | ClassCond _, _ -> -1
+      | _, ClassCond _ -> 1
+      | SignCond (x1, s1), SignCond(x2, s2) ->
+          compare_struct (compare_expression x1 x2) @@
+          lazy (compare_signz s1 s2)
+      | SignCond _, _ -> -1
+      | _, SignCond _ -> 1
+      | Omitted x, Omitted y ->
+          compare_expression x y
+      | Omitted _, _ -> -1
+      | _, Omitted _ -> 1
+      | Not x, Not y ->
+          compare_cond x y
+      | Not _, _ -> -1
+      | _, Not _ -> 1
+      | Logop (x1, o1, y1), Logop (x2, o2, y2) ->
+          compare_struct (compare_logop o1 o2) @@
+          lazy (compare_struct (compare_cond x1 x2) @@
+                lazy (compare_cond y1 y2))
   and compare_relop =
     Stdlib.compare
   and compare_logop =
     Stdlib.compare
   and compare_class_ a b = match a, b with
     | AlphabetOrClass n1, AlphabetOrClass n2 ->
-        compare_with_loc_name n1 n2
+        compare_with_loc compare_name n1 n2
     | a, b ->
         Stdlib.compare a b
   and compare_qualident
@@ -485,8 +486,9 @@ module COMPARE = struct
         compare_expression a b
     | SubSIdx(n1, s1, i1),
       SubSIdx(n2, s2, i2) ->
-        compare_struct (compare_with_loc_name n1 n2) @@
-        lazy (compare_struct (compare_sign s1 s2) @@ lazy (compare i1 i2))
+        compare_struct (compare_with_loc compare_name n1 n2) @@
+        lazy (compare_struct (compare_sign s1 s2) @@
+              lazy (compare i1 i2))
     | a, b ->
         Stdlib.compare a b
   and compare_refmod
@@ -498,19 +500,20 @@ module COMPARE = struct
   and compare_signz : loose_ sign_cond compare_fun = compare
   and compare_object_ref x y = match x, y with
     | Super a, Super b ->
-        Option.compare compare_with_loc_name a b
+        Option.compare (compare_with_loc compare_name) a b
     | a, b ->
         Stdlib.compare a b
   and compare_object_view
       { object_view_ident = a; object_view_spec = c }
       { object_view_ident = b; object_view_spec = d } =
-    compare_struct (compare_ident a b) @@ lazy (compare_object_view_spec c d)
+    compare_struct (compare_ident a b) @@
+    lazy (compare_object_view_spec c d)
   and compare_object_view_spec x y = match x, y with
     | ObjViewAmbiguous a , ObjViewAmbiguous b
     | ObjViewFactory a, ObjViewFactory b
     | ObjViewOnly a, ObjViewOnly b
     | ObjViewFactoryOnly a, ObjViewFactoryOnly b ->
-        compare_with_loc_name a b
+        compare_with_loc compare_name a b
     | a, b ->
         compare a b
   and compare_inline_invoke
@@ -522,7 +525,7 @@ module COMPARE = struct
   and compare_inline_call
       { call_fun = a; call_args = c }
       { call_fun = b; call_args = d } =
-    compare_struct (compare_with_loc_name a b) @@
+    compare_struct (compare_with_loc compare_name a b) @@
     lazy (List.compare compare_effective_arg c d)
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
@@ -544,7 +547,7 @@ module COMPARE = struct
       { counter_kind = a; counter_name = c }
       { counter_kind = b; counter_name = d } =
     compare_struct (Stdlib.compare a b) @@
-    lazy (Option.compare (compare_with_loc_name) c d)
+    lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
 

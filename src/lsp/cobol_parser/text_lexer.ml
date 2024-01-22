@@ -154,7 +154,7 @@ let reserve_words lexer : Cobol_config.words_spec -> unit =
 (* --- *)
 
 let token_of_keyword { token_of_keyword; _ } s =
-  match Hashtbl.find token_of_keyword s with
+  match Hashtbl.find token_of_keyword (String.uppercase_ascii s) with
   | { token; enabled = true; reserved = true } -> token
   | _ -> raise Not_found
 

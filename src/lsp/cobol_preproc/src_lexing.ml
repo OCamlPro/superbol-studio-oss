@@ -224,9 +224,8 @@ let unexpected (type k) (kind: k c)
 
 (* --- *)
 
-(* Switch to upper-cased representation already: *)
 let textword s =
-  TextWord (String.uppercase_ascii ~&s) &@<- s
+  TextWord ~&s &@<- s
 
 let cdirword ?marker ~start_pos ~end_pos s state =
   let s = remove_blanks s in
@@ -238,7 +237,7 @@ let cdirword ?marker ~start_pos ~end_pos s state =
         s, start_pos
   in
   let loc = raw_loc ~start_pos ~end_pos state in
-  emit (CDirWord (String.uppercase_ascii s) &@ loc) state
+  emit (CDirWord s &@ loc) state
 
 
 let rev_pseudotext: text -> _ state -> pseudotext * _ state = fun text state ->
@@ -392,7 +391,7 @@ let unclosed_ebcdics =
   let symc = "[0-9][0-9, ]*" in                            (* symbolic EBCDIC *)
   let dblq = "\\([^\"]\\|\"" ^ symc ^ "\"\\|\"\"\\)*\"" ^ symc in
   let splq = "\\([^']\\|'" ^ symc ^ "\"\\|''\\)*'" ^ symc in
-  let re = Str.regexp ("^\\(" ^ dblq ^ "\\|" ^ splq ^ "\\)$") in
+  let re = Str.regexp_case_fold ("^\\(" ^ dblq ^ "\\|" ^ splq ^ "\\)$") in
   fun str -> Str.string_match re str 0
 
 let quoted_alphanum ?(fitting = Nominal) ~knd

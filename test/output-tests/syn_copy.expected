@@ -29,7 +29,7 @@ syn_copy.at-114-prog3.cob:6.7-6.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: SUB2)
+>> Error: Library `copy.inc' not found in search path (search path: sub2)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:115:0
 syn_copy.at-115-prog4.cob:6.7-6.23:

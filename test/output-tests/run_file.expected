@@ -5258,7 +5258,7 @@ run_file.at-9434-prog.cob:17.11-17.24:
 ----              ^^^^^^^^^^^^^
   18          01  LSEQ-FILENAME PIC X(44)
   19               VALUE 'FCDLS'.
->> Error: Library `XFHFCD3' not found in search path (search path: )
+>> Error: Library `xfhfcd3' not found in search path (search path: )
 
 run_file.at-9434-prog.cob:46.16-46.22:
   43              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5341,7 +5341,7 @@ run_file.at-9643-prog.cob:19.11-19.24:
 ----              ^^^^^^^^^^^^^
   20          01  FIX-FILENAME PIC X(44)
   21               VALUE 'FCDFB'.
->> Error: Library `XFHFCD3' not found in search path (search path: )
+>> Error: Library `xfhfcd3' not found in search path (search path: )
 
 run_file.at-9643-prog.cob:48.16-48.22:
   45              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5473,7 +5473,7 @@ run_file.at-10153-prog.cob:86.11-86.23:
 ----              ^^^^^^^^^^^^
   87   
   88          01  FILE-NAME                       PIC X(64).
->> Error: Library `XFHFCD' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path (search path: )
 
 run_file.at-10153-prog.cob:155.16-155.22:
  152              SET  FCD-FILENAME-ADDRESS   TO ADDRESS OF FILE-NAME
@@ -5505,7 +5505,7 @@ run_file.at-10488-prog.cob:97.11-97.23:
 ----              ^^^^^^^^^^^^
   98   
   99          01  RECORD-AREA.
->> Error: Library `XFHFCD' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path (search path: )
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10488:0
 run_file.at-10488-progs.cob:2.6-2.19:
@@ -5525,7 +5525,7 @@ run_file.at-10676-prog.cob:86.12-86.24:
 ----               ^^^^^^^^^^^^
   87   
   88          01  RECORD-AREA.
->> Error: Library `XFHFCD' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path (search path: )
 
 run_file.at-10676-prog.cob:134.16-134.22:
  131         **   FIXED(0) OR VARIABLE(1)

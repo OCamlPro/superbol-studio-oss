@@ -59,7 +59,8 @@ rule token = parse
   | (sign? digit* as n) (['.' ','] as sep) (digit+ as d)
       { Numeric (n, Some (sep, d, None)) }
 
-  | (sign? digit* as n) (['.' ','] as sep) (digit+ as d) 'E' (exponent as e)
+  | (sign? digit* as n) (['.' ','] as sep) (digit+ as d) ['E' 'e']
+      (exponent as e)
       { Numeric (n, Some (sep, d, Some e)) }
 
   | ident as s                                           (* 31 characters max *)

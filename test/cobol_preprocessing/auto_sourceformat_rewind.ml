@@ -39,11 +39,11 @@ let%expect_test "auto-fixed-1" =
      free: "IDENTIFICATION   DIVISION."
            "PROGRAM-ID.      prog."
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF
+    PROGRAM-ID . prog . EOF
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF
+    PROGRAM-ID . prog . EOF
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF |}];;
+    PROGRAM-ID . prog . EOF |}];;
 
 
 let%expect_test "auto-fixed-2" =
@@ -62,8 +62,8 @@ let%expect_test "auto-fixed-2" =
            "IDENTIFICATION   DIVISION."
            "PROGRAM-ID.      prog."
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF
+    PROGRAM-ID . prog . EOF
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF
+    PROGRAM-ID . prog . EOF
     IDENTIFICATION DIVISION .
-    PROGRAM-ID . PROG . EOF |}];;
+    PROGRAM-ID . prog . EOF |}];;

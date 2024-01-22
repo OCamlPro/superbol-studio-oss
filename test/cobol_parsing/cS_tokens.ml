@@ -30,7 +30,7 @@ let%expect_test "context-sensitive-tokens" =
            STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., DATA,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
     DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[AWAY-FROM-ZERO],
     PICTURE, PICTURE_STRING[9], VALUE, DIGITS[0], ., DIGITS[01],
     WORD[BYTE-LENGTH], PICTURE, PICTURE_STRING[9], ., DIGITS[01], WORD[X],
@@ -55,7 +55,7 @@ let%expect_test "context-sensitive-tokens-bis" =
            STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., DATA,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
     DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[AWAY-FROM-ZERO],
     PICTURE, PICTURE_STRING[9], VALUE, DIGITS[0], ., DIGITS[01],
     WORD[BYTE-LENGTH], PICTURE, PICTURE_STRING[9], ., DIGITS[01], WORD[X],
@@ -77,7 +77,7 @@ let%expect_test "context-sensitive-tokens-ter" =
            STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., DATA,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
     DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[AWAY-FROM-ZERO],
     PICTURE, PICTURE_STRING[9], VALUE, DIGITS[0], ., DIGITS[01],
     WORD[BYTE-LENGTH], PICTURE, PICTURE_STRING[9], ., DIGITS[01], WORD[X],
@@ -105,7 +105,7 @@ let%expect_test "context-sensitive-tokens-with-syntax-errors" =
            STOP RUN.
   |};
   [%expect {|
-    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[PROG], ., DATA,
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., DATA,
     DIVISION, ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[AWAY-FROM-ZERO],
     PICTURE, PICTURE_STRING[9], VALUE, DIGITS[0], ., DIGITS[01],
     WORD[BYTE-LENGTH], PICTURE, PICTURE_STRING[9], ., DIGITS[01], WORD[X],
@@ -114,4 +114,22 @@ let%expect_test "context-sensitive-tokens-with-syntax-errors" =
     WORD[X], ROUNDED, AWAY-FROM-ZERO, AWAY-FROM-ZERO, =, FIXED[1.1], END-COMPUTE,
     DISPLAY, WORD[X], WORD[AWAY-FROM-ZERO], NO, ADVANCING, END-DISPLAY, ., STOP,
     RUN, ., EOF
+|}];;
+
+let%expect_test "context-sensitive-tokens-lower-case" =
+  Parser_testing.show_parsed_tokens {|
+       program-id.        prog.
+       data               division.
+       working-storage    section.
+       01  byte-length    pic 9.
+       01  X              constant byte-length byte-length.
+       procedure division.
+  |};
+  (* Note the `WORD[BYTE-LENGTH]` below, that was originally lower-case.  TODO:
+     find a *clean* way to fix that. *)
+  [%expect {|
+    PROGRAM-ID, ., INFO_WORD[prog], ., DATA, DIVISION, ., WORKING-STORAGE,
+    SECTION, ., DIGITS[01], WORD[byte-length], PICTURE, PICTURE_STRING[9], .,
+    DIGITS[01], WORD[X], CONSTANT, BYTE-LENGTH, WORD[BYTE-LENGTH], ., PROCEDURE,
+    DIVISION, ., EOF
 |}];;
