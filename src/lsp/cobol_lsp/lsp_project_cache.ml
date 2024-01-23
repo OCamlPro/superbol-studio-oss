@@ -152,12 +152,17 @@ let load ~rootdir ~layout ~config =
       fallback
   | Some cache_file ->
       try load_cache cache_file with
-      | Failure msg | Sys_error msg ->
+      | Sys_error msg ->
           if config.cache_verbose then
             Lsp_io.pretty_notification "Failed to read cache: %s"
               msg ~log:true ~type_:Info;
           fallback
+      | Failure msg ->
+          if config.cache_verbose then
+            Lsp_io.pretty_notification "Failed to read cache %s: %s"
+              cache_file msg ~log:true ~type_:Info;
+          fallback
       | e ->
-          Lsp_io.pretty_notification "Failed to read cache: %a"
-            Fmt.exn e ~log:true ~type_:Warning;
+          Lsp_io.pretty_notification "Failed to read cache %s: %a"
+            cache_file Fmt.exn e ~log:true ~type_:Warning;
           fallback

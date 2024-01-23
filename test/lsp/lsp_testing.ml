@@ -46,7 +46,9 @@ let init_temp_project ?(toml = "") () =
   projdir
 
 let make_server () =
-  LSP.Server.init ~config:{ project_layout = layout; cache_config }
+  LSP.Server.init ~params:{ config = { project_layout = layout; cache_config };
+                            root_uri = None;
+                            workspace_folders = [] }
 
 let add_cobol_doc server ?copybook ~projdir filename text =
   let path = projdir // filename in

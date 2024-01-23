@@ -20,21 +20,25 @@ module TYPES: sig
     cache_config: Lsp_project_cache.config;
   }
 
+  type params = {
+    config: config;
+    root_uri: Lsp.Types.DocumentUri.t option;
+    workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
+  }
+
   type registry = private {
     projects: Lsp_project.SET.t;
     docs: Lsp_document.t URIMap.t;
-    indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
-                                                   mentioned by docs in
-                                                   `docs` *)
-    config: config;
+    indirect_diags: Lsp_diagnostics.t URIMap.t;
+    params: params;
   }
 
   type state =
-    | NotInitialized of config   (* At startup and until "initialize" request *)
-    | Initialized of config (* After "initialize" and before "initialized" notif *)
-    | Running of registry   (* After "initialized" and before "shutdown" *)
-    | ShuttingDown          (* From "shuntdown" until "exit" notif *)
-    | Exit of exit_status   (* After "exit" notif *)
+    | NotInitialized of config
+    | Initialized of params
+    | Running of registry
+    | ShuttingDown
+    | Exit of exit_status
 
   and exit_status = (unit, string) result
 
@@ -48,6 +52,7 @@ module TYPES: sig
 end
 include module type of TYPES
   with type config = TYPES.config
+   and type params = TYPES.params
    and type registry = TYPES.registry
    and type state = TYPES.state
    and type exit_status = TYPES.exit_status
@@ -56,7 +61,7 @@ include module type of TYPES
 type t = registry                                                    (* alias *)
 
 val init
-  : config:config
+  : params: params
   -> t
 
 (** When given, [copybook] indicates whether the document is a copybook (in

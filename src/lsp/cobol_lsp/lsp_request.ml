@@ -43,9 +43,26 @@ let try_with_document_data ~f =
 
 (** {3 Initialization} *)
 
-let handle_initialize (params: InitializeParams.t) =
-  InitializeResult.create ()
-    ~capabilities:(Lsp_capabilities.reply params.capabilities)
+let initialize ~config (params: InitializeParams.t) =
+  let root_uri = match params.rootUri with
+    | None -> None
+    | Some uri -> Some uri
+  in
+  let workspace_folders = match params.workspaceFolders with
+    | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
+    | _ -> Option.to_list root_uri
+  in
+  Pretty.error "Initializing for workspace folders: %a@."
+    Pretty.(list string)
+    (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
+  let result =
+    InitializeResult.create ()
+      ~serverInfo:(InitializeResult.create_serverInfo ()
+                     ~name:"SuperBOL LSP Server"
+                     ~version:Version.version)
+      ~capabilities:(Lsp_capabilities.reply params.capabilities)
+  in
+  Ok (result, Initialized { root_uri; workspace_folders; config })
 
 (** {3 Shutdown} *)
 
@@ -405,8 +422,8 @@ let on_request
     id:Jsonrpc.Id.t -> (r * state, r error) result =
   fun state client_req ~id:_ ->
   match state, client_req with
-  | NotInitialized config, Lsp.Client_request.Initialize init_params ->
-      Ok (handle_initialize init_params, Initialized config)
+  | NotInitialized config, Initialize init_params ->
+      initialize ~config init_params
   | NotInitialized _, _ ->
       Error (InvalidStatus state)
   | (ShuttingDown | Initialized _ | Exit _) as state, _ ->

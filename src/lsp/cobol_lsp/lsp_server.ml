@@ -23,21 +23,28 @@ module TYPES = struct
     cache_config: Lsp_project_cache.config;
   }
 
+  type params = {
+    config: config;
+    root_uri: Lsp.Types.DocumentUri.t option;
+    workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
+  }
+
   type registry = {                                                (* private *)
     projects: Lsp_project.SET.t;
     docs: Lsp_document.t URIMap.t;
     indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
                                                    mentioned by docs in
                                                    `docs` *)
-    config: config;
+    params: params;
   }
 
   type state =
     | NotInitialized of config   (* At startup and until "initialize" request *)
-    | Initialized of config (* After "initialize" and before "initialized" notif *)
-    | Running of registry   (* After "initialized" and before "shutdown" *)
-    | ShuttingDown          (* From "shuntdown" until "exit" notif *)
-    | Exit of exit_status   (* After "exit" notif *)
+    | Initialized of params      (* After "initialize" and before "initialized"
+                                    notif *)
+    | Running of registry        (* After "initialized" and before "shutdown" *)
+    | ShuttingDown               (* From "shuntdown" until "exit" notif *)
+    | Exit of exit_status        (* After "exit" notif *)
 
   and exit_status = (unit, string) result
 
@@ -101,15 +108,17 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
 
 (** {2 Management of per-project caches} *)
 
-let save_project_caches { config = { cache_config = config; _ }; docs; _ } =
+let save_project_caches { params = { config = { cache_config = config; _ }; _ };
+                          docs; _ } =
   try Lsp_project_cache.save ~config docs
   with e ->
     Lsp_error.internal
       "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
 
-let load_project_cache ~rootdir ({ config = { project_layout = layout;
-                                              cache_config = config; _ };
-                                   projects; docs = old_docs; _ } as registry) =
+let load_project_cache ~rootdir
+    ({ params = { config = { project_layout = layout;
+                             cache_config = config; _ }; _ };
+       projects; docs = old_docs; _ } as registry) =
   let new_docs = Lsp_project_cache.load ~config ~layout ~rootdir in
   let projects = match URIMap.choose_opt new_docs with
     | Some (_, Lsp_document.{ project = p; _ }) -> Lsp_project.SET.add p projects
@@ -120,16 +129,25 @@ let load_project_cache ~rootdir ({ config = { project_layout = layout;
 
 (** {2 Registry management} *)
 
-let init ~config : registry =
-  {
-    config;
-    projects = Lsp_project.SET.empty;
-    docs = URIMap.empty;
-    indirect_diags = URIMap.empty;
-  }
+let load_project_in ~dir registry =
+  let layout = registry.params.config.project_layout in
+  let project = Lsp_project.in_existing_dir dir ~layout in
+  load_project_cache ~rootdir:(Lsp_project.rootdir project) registry |>
+  add_project project
+
+let init ~params : registry =
+  let registry =
+    { params;
+      projects = Lsp_project.SET.empty;
+      docs = URIMap.empty;
+      indirect_diags = URIMap.empty }
+  in
+  List.fold_left begin fun registry workspace_folder_uri ->
+    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
+  end registry params.workspace_folders
 
 let create_or_retrieve_project ~uri registry =
-  let layout = registry.config.project_layout in
+  let layout = registry.params.config.project_layout in
   let rootdir = Lsp_project.rootdir_for ~uri ~layout in
   try Lsp_project.SET.for_rootdir ~rootdir registry.projects, registry
   with Not_found ->
@@ -165,7 +183,7 @@ let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
         dispatch_diagnostics doc registry
     | None | Some _ when try_cache ->
         let registry =
-          let layout = registry.config.project_layout in
+          let layout = registry.params.config.project_layout in
           let rootdir = Lsp_project.rootdir_for ~uri ~layout in
           if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
           then registry

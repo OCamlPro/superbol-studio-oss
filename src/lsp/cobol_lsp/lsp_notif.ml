@@ -21,8 +21,8 @@ let on_notification state notif =
       ShuttingDown
   | NotInitialized _ | Exit _ as state, _ ->
       state                   (* spec indicate notif should just be discarded *)
-  | Initialized config, Initialized ->
-      Running (Lsp_server.init ~config)
+  | Initialized params, Initialized ->
+      Running (Lsp_server.init ~params)
   | Running registry, TextDocumentDidOpen params ->
       Running (Lsp_server.did_open params registry)
   | Running registry, TextDocumentDidChange params ->
