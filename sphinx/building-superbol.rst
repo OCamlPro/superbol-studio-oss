@@ -1,6 +1,12 @@
 Building SuperBOL from Sources
 ==============================
 
+Make sure you are authenticated and update submodules:
+
+   .. code-block:: shell
+
+     git submodule update --init --recursive
+
 To build the LSP server and the VSCode extension from source, you need
 to install a few external dependencies.
 

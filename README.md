@@ -61,7 +61,12 @@ You can check the documentation on using the Superbol LSP with
 GNU/Emacs on [this
 page](https://ocamlpro.github.io/superbol-studio-oss/sphinx/emacs).
 
-## Building from Sources
+## Building from sources
+
+Make sure you are authenticated and update submodules:
+```bash
+git submodule update --init --recursive
+```
 
 You first need to install a few external dependencies to build the LSP
 server and the VSCode extension from sources.
