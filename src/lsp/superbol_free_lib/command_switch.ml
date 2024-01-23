@@ -22,16 +22,22 @@ open EZTOML.TYPES
 
 module TYPES = struct
 
+  type switch = {
+    switch_name : string ;
+    switch_dir : string ;
+    switch_args : string list ;
+  }
+
   type config = {
     (* Where all switches are installed. "/opt/gnucobol" for example *)
-    mutable switch_dir : string ;
+    mutable config_switch_dir : string ;
     (* The list of existing switches names *)
-    mutable switch_list : string StringMap.t ;
+    mutable config_switch_list : switch StringMap.t ;
     (* The number for the next switch. Every switch is called
        "S<number>-*" *)
-    mutable switch_num : int ;
+    mutable config_next_switch : int ;
     (* The current activated switch *)
-    mutable switch_current : string option ;
+    mutable config_current_switch : string option ;
     (* Whether compiler coverage should be activated *)
     mutable with_compiler_coverage : bool ;
     user_config : toml_file ;
@@ -86,13 +92,29 @@ let user_config_file = Misc.config_dir // "config.toml"
 let save_user_config config =
   EZTOML.save ~verbose:true user_config_file config.user_config
 
+open TOML.Types
+
+let value_of_switch s =
+  match s.switch_args with
+  | [] -> TOML.string s.switch_dir
+  | _ ->
+    TOML.table_of_list [
+        "dir", TOML.string s.switch_dir ;
+        "args", TOML.array_of_list (List.map TOML.string s.switch_args)
+      ]
+
+let switch_of_value switch_name value =
+  match TOML.get_node_value value with
+  | String switch_dir -> { switch_dir ; switch_name ; switch_args = [] }
+  | _ -> assert false
+
 let get_config () =
   let user_config = EZTOML.load user_config_file in
   let config = {
-    switch_dir = Misc.config_dir // "switches" ;
-    switch_list = StringMap.empty ;
-    switch_num = 1 ;
-    switch_current = None ;
+    config_switch_dir = Misc.config_dir // "switches" ;
+    config_switch_list = StringMap.empty ;
+    config_next_switch = 1 ;
+    config_current_switch = None ;
     with_compiler_coverage = false ;
     user_config ;
   } in
@@ -107,29 +129,32 @@ let get_config () =
           "dir"
           ~comments: [ "The directory where GnuCOBOL versions should be \
                               installed by default." ]
-          ~getter:(fun config -> config.switch_dir )
-          ~setter:(fun config value -> config.switch_dir <- value)
+          ~getter:(fun config -> config.config_switch_dir )
+          ~setter:(fun config value -> config.config_switch_dir <- value)
         ;
 
-        option_string_map
+        option
           "list"
           ~comments: [ "The table of known switches" ]
-          ~getter: (fun config -> config.switch_list )
-          ~setter: (fun config value -> config.switch_list <- value)
+          ~getter: (fun config ->
+              Table ( StringMap.map value_of_switch config.config_switch_list ))
+          ~setter: (fun config value ->
+              config.config_switch_list <-
+                TOML.extract_table value |> StringMap.mapi switch_of_value )
         ;
 
         option_int
           "num"
           ~comments: [ "Next ID to be used for switch prefix" ]
-          ~getter:(fun config -> config.switch_num )
-          ~setter:(fun config v -> config.switch_num <- v )
+          ~getter:(fun config -> config.config_next_switch )
+          ~setter:(fun config v -> config.config_next_switch <- v )
         ;
 
         option_string_option
           "current"
           ~comments: [ "Current switch" ]
-          ~getter:(fun config -> config.switch_current)
-          ~setter:(fun config v -> config.switch_current <- v)
+          ~getter:(fun config -> config.config_current_switch)
+          ~setter:(fun config v -> config.config_current_switch <- v)
         ;
 
         option_bool
@@ -157,10 +182,10 @@ let get_config () =
 
 let find_switch_name ?switch_name ?(add=false) ~dir ~file config =
   let exception Found of string in
-  let dirname = dir // file in
+  let switch_dir = dir // file in
   match
     StringMap.iter (fun s x ->
-        if x = dirname then raise (Found s)) config.switch_list with
+        if x.switch_dir = switch_dir then raise (Found s)) config.config_switch_list with
   | exception Found s -> s (* already exists *)
   | () ->
     let switch_name =
@@ -175,14 +200,15 @@ let find_switch_name ?switch_name ?(add=false) ~dir ~file config =
             | Some s -> s
             | None -> file
       in
-      let name = Printf.sprintf "S%02d-%s" config.switch_num switch_name in
+      let name = Printf.sprintf "S%02d-%s" config.config_next_switch switch_name in
       if add then
-        config.switch_num <- config.switch_num + 1;
+        config.config_next_switch <- config.config_next_switch + 1;
       name
     in
     if add then begin
-      Printf.eprintf "Adding %S at\n   %s\n%!" switch_name dirname;
-      config.switch_list <- StringMap.add switch_name dirname config.switch_list;
+      Printf.eprintf "Adding %S at\n   %s\n%!" switch_name switch_dir;
+      let switch = { switch_name ; switch_dir ; switch_args = [] } in
+      config.config_switch_list <- StringMap.add switch_name switch config.config_switch_list;
     end;
     switch_name
 
@@ -190,7 +216,7 @@ let add_switch ~dir ?switch_name ~file ~set config =
   let switch_name =
     find_switch_name ?switch_name ~add:true ~dir ~file config in
   if set then
-    config.switch_current <- Some switch_name;
+    config.config_current_switch <- Some switch_name;
   ()
 
 
@@ -200,63 +226,63 @@ let find_switch ?switch ~last ~current config =
   | None, false ->
     begin
       if current then
-        match config.switch_current with
+        match config.config_current_switch with
         | None ->
           Misc.error
             "No current switch, you must specify the switch to use"
         | Some switch ->
-          if StringMap.mem switch config.switch_list then
-            switch
-          else
+          match StringMap.find switch config.config_switch_list with
+          | switch -> switch
+          | exception Not_found ->
             Misc.error "Current switch %S does not exist anymore" switch
       else
         Misc.error "No switch selected, select one"
     end
   | None, true ->
-    begin match StringMap.max_binding config.switch_list with
+    begin match StringMap.max_binding config.config_switch_list with
       | exception _ ->
         Misc.error "Current list of switches is empty"
-      | (s, _) -> s
+      | ( _, s) -> s
     end
   | Some switch, _ ->
-    if StringMap.mem switch config.switch_list then
-      switch
-    else
+    match StringMap.find switch config.config_switch_list with
+    | switch -> switch
+    | exception Not_found ->
       let found = ref [] in
       let regexp = Str.regexp switch in
-      StringMap.iter (fun s dir ->
+      StringMap.iter (fun s switch ->
           match Str.search_forward regexp s 0 with
           | _ ->
-            found := s :: !found
+            found := switch :: !found
           | exception _ ->
-            match Str.search_forward regexp dir 0 with
-            | _ -> found := s :: !found
+            match Str.search_forward regexp switch.switch_dir 0 with
+            | _ -> found := switch :: !found
             | exception _ -> ()
-        ) config.switch_list ;
+        ) config.config_switch_list ;
       match !found with
       | [] ->
         Misc.error "Can not find switch %S in current list" switch
       | [switch] ->
-        Printf.eprintf "Selecting switch %S\n%!" switch;
+        Printf.eprintf "Selecting switch %S\n%!" switch.switch_name;
         switch
       | (found_switch :: _ ) as switches ->
         if last then
           found_switch
         else
           Misc.error "Multiple switches matching %S in current list ( %s )"
-            switch ( String.concat ", " ( List.rev switches ))
+            switch ( String.concat ", " ( List.rev (List.map (fun s -> s.switch_name) switches )))
 
 let set_switch_link config =
-  match config.switch_current with
+  match config.config_current_switch with
   | None -> assert false
   | Some switch ->
     Printf.eprintf "Current switch modified\n%!";
-    let dir = StringMap.find switch config.switch_list in
+    let switch = StringMap.find switch config.config_switch_list in
     Misc.mkdir_rec Misc.config_dir;
     let switch_link = Misc.config_dir // "switch" in
     if Sys.file_exists switch_link then
       Sys.remove switch_link ;
-    Unix.symlink ~to_dir:true dir switch_link
+    Unix.symlink ~to_dir:true switch.switch_dir switch_link
 
 (*** switch import ***)
 
@@ -264,25 +290,25 @@ let switch_import ~dirs ~clear ~set () =
 
   let config = get_config () in
   let dirs = match dirs with
-      [] -> [ config.switch_dir ]
+      [] -> [ config.config_switch_dir ]
     | dirs -> dirs
   in
   if clear then begin
     Printf.eprintf "Clearing all switches (--clear)\n%!";
-    config.switch_list <- StringMap.empty;
-    config.switch_num <- 1;
-    config.switch_current <- None;
+    config.config_switch_list <- StringMap.empty;
+    config.config_next_switch <- 1;
+    config.config_current_switch <- None;
   end else begin
-    StringMap.iter (fun s dir ->
-        if not ( Sys.file_exists dir ) then begin
+    StringMap.iter (fun s switch ->
+        if not ( Sys.file_exists switch.switch_dir ) then begin
           Printf.eprintf "Clearing removed switch %S\n%!" s;
-          config.switch_list <- StringMap.remove s config.switch_list;
-          if config.switch_current = Some s then
-            config.switch_current <- None
+          config.config_switch_list <- StringMap.remove s config.config_switch_list;
+          if config.config_current_switch = Some s then
+            config.config_current_switch <- None
         end;
-      ) config.switch_list;
+      ) config.config_switch_list;
   end;
-  let current = config.switch_current in
+  let current = config.config_current_switch in
   List.iter (fun dir ->
       let dir = if Filename.is_relative dir then
           Misc.current_dir // dir
@@ -303,7 +329,7 @@ let switch_import ~dirs ~clear ~set () =
             add_switch ~dir ~file ~set config
         ) subdirs
     ) dirs;
-  if config.switch_current <> current then
+  if config.config_current_switch <> current then
     set_switch_link config ;
   save_user_config config
 
@@ -345,12 +371,12 @@ let switch_import_cmd =
 let switch_list () =
 
   let config = get_config () in
-  StringMap.iter (fun name dir ->
+  StringMap.iter (fun name switch ->
       Printf.printf "* %S%s\n     %s\n%!" name
-        (if Some name = config.switch_current then
+        (if Some name = config.config_current_switch then
            " [CURRENT]" else "")
-       dir;
-    ) config.switch_list
+       switch.switch_dir;
+    ) config.config_switch_list
 
 let switch_list_cmd =
   EZCMD.sub
@@ -411,7 +437,7 @@ to your $HOME/.profile file.|};
     let config = get_config () in
     let switch = find_switch config ?switch ~last ~current:true in
 
-    let switch_dir = StringMap.find switch config.switch_list in
+    let switch_dir = switch.switch_dir in
 
     let set_path name subdir =
       let switch_dir = switch_dir // subdir in
@@ -420,9 +446,9 @@ to your $HOME/.profile file.|};
         | exception Not_found -> switch_dir
         | path ->
           let set = ref StringSet.empty in
-          StringMap.iter (fun _ dir ->
-              set := StringSet.add ( dir // subdir ) !set
-            ) config.switch_list ;
+          StringMap.iter (fun _ switch ->
+              set := StringSet.add ( switch.switch_dir // subdir ) !set
+            ) config.config_switch_list ;
           let path = EzString.split path ':' in
           let path = List.filter (fun s ->
               not ( StringSet.mem s !set )) path
@@ -490,9 +516,9 @@ let switch_set ?switch ~last () =
 
   let config = get_config () in
   let switch = find_switch config ?switch ~last ~current:true in
-  config.switch_current <- Some switch ;
+  config.config_current_switch <- Some switch.switch_name ;
   set_switch_link config ;
-  Printf.eprintf "Current switch set to %S\n%!" switch;
+  Printf.eprintf "Current switch set to %S\n%!" switch.switch_name;
   save_user_config config
 
 let switch_set_cmd =
@@ -527,9 +553,10 @@ let switch_config ?setswitch ?setlast ?setcoverage () =
   match setswitch, setlast, setcoverage with
   | None, None, None ->
     Printf.printf "Config from %S\n%!" user_config_file;
-    Printf.printf "  Current switch: %s\n%!" (match config.switch_current with
-        | None -> ""
-        | Some s -> s);
+    Printf.printf "  Current switch: %s\n%!"
+      (match config.config_current_switch with
+       | None -> ""
+       | Some s -> s);
     Printf.printf "  Compiler coverage: %b\n%!" config.with_compiler_coverage;
   | _ ->
     begin
@@ -541,9 +568,9 @@ let switch_config ?setswitch ?setlast ?setcoverage () =
           | Some last -> last
         in
         let switch = find_switch config ?switch ~last ~current:true in
-        config.switch_current <- Some switch ;
+        config.config_current_switch <- Some switch.switch_name ;
         set_switch_link config ;
-        Printf.eprintf "Current switch set to %S\n%!" switch;
+        Printf.eprintf "Current switch set to %S\n%!" switch.switch_name;
     end;
     begin
       match setcoverage with
@@ -590,9 +617,9 @@ let switch_add ~dirname ?switch_name ~set () =
   let config = get_config () in
   let file = Filename.basename dirname in
   let dir = Filename.dirname dirname in
-  let current = config.switch_current in
+  let current = config.config_current_switch in
   add_switch config ?switch_name ~file ~dir ~set ;
-  if config.switch_current <> current then
+  if config.config_current_switch <> current then
     set_switch_link config ;
   EZTOML.save user_config_file config.user_config
 
@@ -660,7 +687,7 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
   in
   let file = "gnucobol-" ^ branch in
   let dir = match dir with
-    | None -> config.switch_dir
+    | None -> config.config_switch_dir
     | Some dir -> dir
   in
 
@@ -686,6 +713,25 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
   in
   iter ( Sys.getcwd () );
 
+  let switch = match StringMap.find computed_switch_name config.config_switch_list with
+    | exception Not_found ->
+      let switch_args = if config.with_compiler_coverage then
+          [
+            "--enable-code-coverage";
+          ]
+        else
+          []
+      in
+      (* Beware: this switch is created temporarily, but will be
+         recreated later in `add_switch`, creation should be kept
+         consistent or simplified in the future. *)
+
+      { switch_name = computed_switch_name ;
+        switch_dir = destdir ;
+        switch_args }
+    | switch -> switch
+  in
+
   if not ( Sys.file_exists "../configure" ) then
     Call.call ~echo:true [ "../build_aux/bootstrap" ];
 
@@ -695,13 +741,7 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
       "--enable-debug";
       "--prefix" ; destdir ;
       "--exec-prefix" ; destdir ;
-    ] in
-  let cmd = if config.with_compiler_coverage then
-      cmd @ [
-        "--enable-code-coverage";
-      ]
-    else
-      cmd
+    ] @ switch.switch_args
   in
   Call.call ~echo:true cmd ;
   Call.call ~echo:true [ "make" ];
@@ -709,9 +749,9 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
   Call.call ~echo:true (let cmd = [ "make" ; "install" ] in
                         if sudo then  "sudo" :: cmd else cmd );
 
-  let current = config.switch_current in
+  let current = config.config_current_switch in
   add_switch config ?switch_name ~file ~dir ~set ;
-  if config.switch_current <> current then
+  if config.config_current_switch <> current then
     set_switch_link config;
   save_user_config config
 
@@ -759,12 +799,12 @@ let switch_cmd =
     "switch"
     (fun () ->
        let config = get_config () in
-       match config.switch_current with
+       match config.config_current_switch with
        | None -> Printf.printf "No current switch\n%!"
        | Some switch ->
-         match StringMap.find switch config.switch_list with
-         | dir ->
-           Printf.eprintf "%S %s\n%!" switch dir
+         match StringMap.find switch config.config_switch_list with
+         | switch ->
+           Printf.eprintf "%S %s\n%!" switch.switch_name switch.switch_dir
          | exception _ ->
            Printf.eprintf "Current switch %S does not exist\n%!" switch
     )

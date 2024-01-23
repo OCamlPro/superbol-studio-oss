@@ -255,3 +255,7 @@ let maybe_set_value ?before key_path toml value =
   | exception Not_found ->
     set_value ?before key_path toml value;
     true
+
+
+
+let array_of_list ?before ?pos list = array ?before ?pos (Array.of_list list)
