@@ -21,7 +21,7 @@ let vscode_engine = "1.64.0"
 let marketplace =
   Manifest.marketplace
     "OCamlPro"
-    ~icon:"images/superbol-128.png"
+    ~icon:"assets/superbol-128.png"
     ~categories: [
       "Formatters" ;
       "Programming Languages" ;
@@ -275,16 +275,19 @@ let contributes =
                (with_superbol_toml_note
                   "Default COBOL dialect; \"default\" is equivalent to \
                    \"gnucobol\".")
-             ~default:(`String Cobol_config.(DIALECT.to_string Default));
+             ~default:(`String Cobol_config.(DIALECT.to_string Default))
+             ~order:1;
 
            Manifest.PROPERTY.enum "superbol.cobol.source-format"
+             ~title:"Source Reference-format"
              ~markdownDescription:
                (with_superbol_toml_note "Default source reference-format.")
              ~cases:Cobol_config.Options.all_format_names
-             ~default:(`String "auto");
+             ~default:(`String "auto")
+             ~order:2;
 
            Manifest.PROPERTY.array "superbol.cobol.copybooks"
-             ~title:"Copybook paths"
+             ~title:"Copybook Paths"
              ~items:(`O [
                  "type", `String "object";
                  "required", `A [`String "dir"];
@@ -305,56 +308,63 @@ let contributes =
                  ];
                ])
              ~markdownDescription:
-               (with_superbol_toml_note "List of copybooks paths.");
+               (with_superbol_toml_note "List of copybooks paths.")
+             ~order:3;
 
            (* Paths *)
 
+           Manifest.PROPERTY.string "superbol.cobc-path"
+             ~title:"GnuCOBOL Compiler Executable"
+             ~default:"cobc"
+             ~scope:"machine-overridable"
+             ~description:"Path to the GnuCOBOL compiler executable."
+             ~order:11;
+
            Manifest.PROPERTY.string "superbol.lsp-path"
-             ~title:"SuperBOL executable"
+             ~title:"SuperBOL Executable"
              ~default:""
              ~scope:"machine"
              ~description:
                "Name of the `superbol-free` executable if available in PATH; may \
                 be an absolute path otherwise. Leave empty to use the bundled \
-                `superbol-free`, if available.";
-
-           Manifest.PROPERTY.string "superbol.cobc-path"
-             ~title:"GnuCOBOL compiler executable"
-             ~default:"cobc"
-             ~scope:"machine-overridable"
-             ~description:"Path to the GnuCOBOL compiler executable.";
+                `superbol-free`, if available."
+             ~order:12;
 
            (* Debugger-specific: *)
 
            Manifest.PROPERTY.bool
              "superbol.debugger.display-variable-attributes"
+             ~title:"Display Variable Attributes"
              ~default:false
              ~scope:"resource"
              ~description:"Display storage property and field attributes \
                            (e.g. size of alphanumerics, digits and scale of \
-                           numerics).";
-
-           Manifest.PROPERTY.string "superbol.debugger.gdb-path"
-             ~title:"GNU debugger executable"
-             ~default:"gdb"
-             ~scope:"machine-overridable"
-             ~description:"Path to the GNU debugger executable.";
+                           numerics)."
+             ~order:21;
 
            Manifest.PROPERTY.string "superbol.debugger.libcob-path"
-             ~title:"GnuCOBOL runtime library"
+             ~title:"GnuCOBOL Runtime Library"
              ~default:"cobc"
              ~scope:"machine-overridable"
-             ~description:"Path to the GnuCOBOL runtime library file.";
+             ~description:"Path to the GnuCOBOL runtime library file."
+             ~order:22;
+
+           Manifest.PROPERTY.string "superbol.debugger.gdb-path"
+             ~title:"GNU Debugger Executable"
+             ~default:"gdb"
+             ~scope:"machine-overridable"
+             ~description:"Path to the GNU debugger executable."
+             ~order:23;
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition
         "superbol"
         ~properties: [
           Manifest.PROPERTY.bool "for-debug"
-            ~description: "Build for debugging";
+            ~description:"Build for debugging";
 
           Manifest.PROPERTY.null_string "cobc-path"
-            ~title:"GnuCOBOL compiler executable"
+            ~title:"GnuCOBOL Compiler Executable"
             ~description:"Path to the GnuCOBOL compiler executable; when `null`, \
                           defaults to the value of \"superbol.cobc-path\" from \
                           the workspace configuration, if defined, to \"cobc\" \
