@@ -99,7 +99,6 @@ and perform_inline_stmt =
   }
 
 and perform_mode =
-  | PerformForever
   | PerformNTimes of ident_or_intlit
   | PerformUntil of
       {
@@ -112,6 +111,7 @@ and perform_mode =
         varying: varying_phrase with_loc;
         after: varying_phrase with_loc list;
       }
+  | PerformForever (* GC/COBOL-IT extension *)
 
 and varying_phrase =
   {

@@ -5171,7 +5171,7 @@ let recover =
   let r1462 = [R 1619] in
   let r1463 = [R 1618] in
   let r1464 = [R 1605] in
-  let r1465 = [R 1569] in
+  let r1465 = [R 1568] in
   let r1466 = S (N N_ro_pf_THROUGH_procedure_name__) :: r1465 in
   let r1467 = [R 1566] in
   let r1468 = Sub (r637) :: r1467 in
@@ -5189,7 +5189,7 @@ let recover =
   let r1480 = [R 769] in
   let r1481 = S (N N_l_pf_AFTER_loc_varying_phrase___) :: r1480 in
   let r1482 = [R 1441] in
-  let r1483 = [R 1568] in
+  let r1483 = [R 1570] in
   let r1484 = S (T T_END_PERFORM) :: r1483 in
   let r1485 = [R 1200] in
   let r1486 = [R 1199] in
@@ -6710,7 +6710,7 @@ let recover =
   | 3081 -> One ([R 1561])
   | 3080 -> One ([R 1562])
   | 2759 -> One ([R 1564])
-  | 3530 -> One ([R 1570])
+  | 3530 -> One ([R 1569])
   | 2119 -> One ([R 1573])
   | 2118 -> One ([R 1574])
   | 3276 -> One ([R 1575])
