@@ -71,7 +71,7 @@ let%expect_test "qualified-redefines-occurs" =
   dotest @@ prog "qualified-redefines-occurs"
     ~working_storage:{|
        01 X.
-         02 A             PIC X(5).
+         02 a             PIC X(5).
          02 B REDEFINES A PIC X OCCURS 5.
     |};
   [%expect {|
@@ -81,7 +81,7 @@ let%expect_test "qualified-redefines-occurs" =
        3          WORKING-STORAGE SECTION.
        4 >        01 X.
     ----          ^^^^^
-       5 >          02 A             PIC X(5).
+       5 >          02 a             PIC X(5).
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        6 >          02 B REDEFINES A PIC X OCCURS 5.
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -94,7 +94,7 @@ let%expect_test "qualified-redefines-occurs" =
       layout: {
         structure
         fields: {
-          qualname: A IN X
+          qualname: a IN X
           offset: 0
           size: 40
           layout: {
@@ -135,10 +135,10 @@ let%expect_test "occurs-n-redefines-1" =
     ~working_storage:{|
        01 W.
          02 A OCCURS 5 TIMES PIC X VALUE "A".
-         02 B REDEFINES A PIC X(5).
+         02 B REDEFINES a PIC X(5).
     |}
     ~procedure:{|
-           MOVE "BCDEF" TO B
+           MOVE "BCDEF" TO b
            DISPLAY A (1) "/" B.
     |};
   [%expect {|
@@ -146,10 +146,10 @@ let%expect_test "occurs-n-redefines-1" =
        3          WORKING-STORAGE SECTION.
        4          01 W.
        5            02 A OCCURS 5 TIMES PIC X VALUE "A".
-       6 >          02 B REDEFINES A PIC X(5).
+       6 >          02 B REDEFINES a PIC X(5).
     ----            ^^^^^^^^^^^^^^^^^^^^^^^^^^
        7          PROCEDURE DIVISION.
-       8          MOVE "BCDEF" TO B
+       8          MOVE "BCDEF" TO b
     >> Warning: Redefinition of item with OCCURS clause A IN W
 
     prog.cob:4.7-6.35:
@@ -160,10 +160,10 @@ let%expect_test "occurs-n-redefines-1" =
     ----          ^^^^^
        5 >          02 A OCCURS 5 TIMES PIC X VALUE "A".
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       6 >          02 B REDEFINES A PIC X(5).
+       6 >          02 B REDEFINES a PIC X(5).
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        7          PROCEDURE DIVISION.
-       8          MOVE "BCDEF" TO B
+       8          MOVE "BCDEF" TO b
     Item definition: {
       qualname: W
       offset: 0
@@ -193,7 +193,7 @@ let%expect_test "occurs-n-redefines-1" =
           }
           redefs: {
             qualname: B IN W
-            redefines: A IN W
+            redefines: a IN W
             offset: 0
             size: 40
             layout: {
@@ -301,39 +301,39 @@ let%expect_test "redefines-index" =
   (* Note: GnuCOBOL accepts this.  But should it really?  *)
   dotest @@ prog "redefines-index"
     ~working_storage:{|
-       01 XX USAGE IS INDEX.
-         02 X.
-         02 Y REDEFINES X.
-       01 YY REDEFINES XX PIC 9(4).
+       01 xx USAGE IS INDEX.
+         02 x.
+         02 y REDEFINES x.
+       01 yy REDEFINES xx PIC 9(4).
     |}
     ~procedure:{|
        MAIN.
-           DISPLAY X
-           DISPLAY YY.
+           DISPLAY x
+           DISPLAY yy.
     |};
   [%expect {|
     prog.cob:4.7-7.35:
        1          PROGRAM-ID. redefines-index.
        2          DATA DIVISION.
        3          WORKING-STORAGE SECTION.
-       4 >        01 XX USAGE IS INDEX.
+       4 >        01 xx USAGE IS INDEX.
     ----          ^^^^^^^^^^^^^^^^^^^^^
-       5 >          02 X.
+       5 >          02 x.
     ----  ^^^^^^^^^^^^^^^
-       6 >          02 Y REDEFINES X.
+       6 >          02 y REDEFINES x.
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-       7 >        01 YY REDEFINES XX PIC 9(4).
+       7 >        01 yy REDEFINES xx PIC 9(4).
     ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        8          PROCEDURE DIVISION.
        9          MAIN.
     Item definition: {
-      qualname: XX
+      qualname: xx
       offset: 0
       size: size-of-index
       layout: {
         structure
         fields: {
-          qualname: X IN XX
+          qualname: x IN xx
           offset: 0
           size: size-of-index
           layout: {
@@ -341,8 +341,8 @@ let%expect_test "redefines-index" =
             usage: index
           }
           redefs: {
-            qualname: Y IN XX
-            redefines: X IN XX
+            qualname: y IN xx
+            redefines: x IN xx
             offset: 0
             size: size-of-index
             layout: {
@@ -353,8 +353,8 @@ let%expect_test "redefines-index" =
         }
       }
       redefs: {
-        qualname: YY
-        redefines: XX
+        qualname: yy
+        redefines: xx
         offset: 0
         size: 32
         layout: {

@@ -524,7 +524,7 @@ let on_redefinition_item acc item_clauses
       in
       let acc = match redefined_qualname with
         | Some qn
-          when ~&redefined_name <> name_of ~&qn ->
+          when Cobol_ptree.compare_name ~&redefined_name (name_of ~&qn) <> 0 ->
             error acc @@
             Unexpected_redefinition_name { redef_loc = loc;
                                            redef_name = item_name;
