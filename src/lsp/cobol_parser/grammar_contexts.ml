@@ -28,6 +28,7 @@ type context =
   | Options_paragrahp
   | Options_paragraph
   | Options_pragraph
+  | Perform_stmt
   | Program_id_paragraph
   | Read_statement
   | Read_stmt
@@ -75,6 +76,7 @@ type context_tokens =
     options_paragrahp: TH.t;
     options_paragraph: TH.t;
     options_pragraph: TH.t;
+    perform_stmt: TH.t;
     program_id_paragraph: TH.t;
     read_statement: TH.t;
     read_stmt: TH.t;
@@ -131,6 +133,7 @@ let init ~handle_of_token =
       options_paragrahp = empty;
       options_paragraph = empty;
       options_pragraph = empty;
+      perform_stmt = empty;
       program_id_paragraph = empty;
       read_statement = empty;
       read_stmt = empty;
@@ -176,6 +179,7 @@ let init ~handle_of_token =
   let options_paragrahp t c = { c with options_paragrahp = add t c.options_paragrahp } in
   let options_paragraph t c = { c with options_paragraph = add t c.options_paragraph } in
   let options_pragraph t c = { c with options_pragraph = add t c.options_pragraph } in
+  let perform_stmt t c = { c with perform_stmt = add t c.perform_stmt } in
   let program_id_paragraph t c = { c with program_id_paragraph = add t c.program_id_paragraph } in
   let read_statement t c = { c with read_statement = add t c.read_statement } in
   let read_stmt t c = { c with read_stmt = add t c.read_stmt } in
@@ -337,7 +341,7 @@ let init ~handle_of_token =
     FLOAT_DECIMAL, [options_paragrahp];
     FLOAT_NOT_A_NUMBER, [];
     FOREGROUND_COLOR, [screen_descr_entry];
-    FOREVER, [retry_phrase];
+    FOREVER, [retry_phrase; perform_stmt];
     FRAME, [];
     FRAMED, [];
     FULL, [screnn_descr_entry];
@@ -664,6 +668,7 @@ let tokens_of_context context_tokens : t -> TH.t = function
   | Options_paragrahp -> context_tokens.options_paragrahp
   | Options_paragraph -> context_tokens.options_paragraph
   | Options_pragraph -> context_tokens.options_pragraph
+  | Perform_stmt -> context_tokens.perform_stmt
   | Program_id_paragraph -> context_tokens.program_id_paragraph
   | Read_statement -> context_tokens.read_statement
   | Read_stmt -> context_tokens.read_stmt

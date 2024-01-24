@@ -663,16 +663,6 @@ run_misc.at-2586-prog.cob:10.25-10.29:
   12               IF INDVAL > 2
 >> Error: Invalid syntax
 
-run_misc.at-2586-prog.cob:25.11-25.22:
-  22               IF INDVAL > 4
-  23                  EXIT PERFORM
-  24               END-IF
-  25 >            END-PERFORM
-----              ^^^^^^^^^^^
-  26              IF INDVAL NOT = 5
-  27                 DISPLAY "2: " INDVAL
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2612:0
 run_misc.at-2612-prog.cob:10.11-10.22:
    7          PROCEDURE        DIVISION.

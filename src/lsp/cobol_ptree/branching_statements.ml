@@ -99,6 +99,7 @@ and perform_inline_stmt =
   }
 
 and perform_mode =
+  | PerformForever
   | PerformNTimes of ident_or_intlit
   | PerformUntil of
       {
@@ -563,6 +564,7 @@ and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
     pp_statements perform_statements
 
 and pp_perform_mode ppf = function
+  | PerformForever -> Fmt.pf ppf "FOREVER"
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
   | PerformUntil { with_test; until } ->
     Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;

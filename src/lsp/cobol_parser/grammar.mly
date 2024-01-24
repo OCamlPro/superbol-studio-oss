@@ -3384,18 +3384,19 @@ let reversed_or_no_rewind_opt :=
 (* TODO: COB85 first format also takes instructions... *)
 
 %public let unconditional_action := ~ = perform_statement; < >
-let perform_statement :=
+let perform_statement [@context perform_stmt] :=
+  | PERFORM; po = ro(perform_phrase); isl = imp_stmts; END_PERFORM;
+   { PerformInline { perform_inline_mode = po;
+                     perform_statements = isl } }
  | PERFORM; i = procedure_name;
    io = ro(pf(THROUGH, procedure_name));
    po = io(perform_phrase);
    { PerformTarget { perform_target = { procedure_start = i;
                                         procedure_end = io };
                      perform_mode = po } }
- | PERFORM; po = ro(perform_phrase); isl = imp_stmts; END_PERFORM;
-   { PerformInline { perform_inline_mode = po;
-                     perform_statements = isl } }
 
 let perform_phrase :=
+ | FOREVER; { PerformForever } (* +COB2022 C/S *) 
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
  | wt = ro(with_test); UNTIL; until = condition;
    { PerformUntil { with_test = wt; until } }
