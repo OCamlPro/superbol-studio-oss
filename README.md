@@ -63,7 +63,7 @@ page](https://ocamlpro.github.io/superbol-studio-oss/sphinx/emacs).
 
 ## Building from sources
 
-Make sure you are authenticated and update submodules:
+If you build from a clone of the git repository, make sure to update submodules:
 ```bash
 git submodule update --init --recursive
 ```

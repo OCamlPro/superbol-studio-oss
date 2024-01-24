@@ -1,7 +1,7 @@
 Building SuperBOL from Sources
 ==============================
 
-Make sure you are authenticated and update submodules:
+If you build from a clone of the git repository, make sure to update submodules:
 
    .. code-block:: shell
 
