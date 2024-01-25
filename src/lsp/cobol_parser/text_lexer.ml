@@ -225,7 +225,7 @@ let tokens_of_string' lexer
 
 let ebcdic_char i =
   (* TODO: (fixed/configurable tables) *)
-  String.make 1 (Char.chr @@ Ebcdic.to_ascii.(i))
+  String.make 1 (Char.chr @@ Ebcdic.default.to_ascii.(i))
 
 let decode_symbolic_ebcdics' ~quotation w =
   let open Text_categorizer in

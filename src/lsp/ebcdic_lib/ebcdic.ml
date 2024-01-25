@@ -21,7 +21,14 @@
 // except according to those terms.
 *)
 
-let to_ascii = [|
+type translation = {
+  to_ascii : int array ;
+  of_ascii : int array ;
+}
+
+module DEFAULT = struct
+
+  let to_ascii = [|
     0x00 ;
     0x01 ;
     0x02 ;
@@ -278,10 +285,10 @@ let to_ascii = [|
     0xd9 ;
     0xda ;
     0x9f (* 0123456789...... *) ;
-              |]
+  |]
 
 
-let of_ascii = [|
+  let of_ascii = [|
     0x00 ;
     0x01 ;
     0x02 ;
@@ -538,7 +545,9 @@ let of_ascii = [|
     0x8d ;
     0x8e ;
     0xdf (* ................ *) ;
-              |]
+  |]
+
+end
 
 let non_printable = [|
     0x00 ;
@@ -609,6 +618,9 @@ let non_printable = [|
     0xA0 ;
               |]
 
+let default = { to_ascii = DEFAULT.to_ascii ;
+                of_ascii = DEFAULT.of_ascii }
+
 let non_printable =
   let t = Array.make 256 false in
   Array.iter (fun c ->
@@ -621,6 +633,7 @@ let ebcdic_NEL = 0x15
 let ebcdic_to_ascii
     ?(non_printable_to_space=false)
     ?(nel_to_lf=false)
+    ?(translation = default)
     src =
   let len = String.length src in
   let dst = Bytes.create len in
@@ -635,13 +648,13 @@ let ebcdic_to_ascii
         if non_printable_to_space && non_printable.( c ) then
           ' '
         else
-          char_of_int to_ascii.( c )
+          char_of_int translation.to_ascii.( c )
     in
     Bytes.set dst i b
   done;
   dst
 
-let ascii_to_ebcdic ?(lf_to_nel=false) src =
+let ascii_to_ebcdic ?(lf_to_nel=false) ?(translation = default) src =
   let len = String.length src in
   let dst = Bytes.create len in
   for i = 0 to len-1 do
@@ -651,8 +664,44 @@ let ascii_to_ebcdic ?(lf_to_nel=false) src =
       if lf_to_nel && c == '\n' then
         ebcdic_NEL
       else
-        of_ascii.( int_of_char c )
+        translation.of_ascii.( int_of_char c )
     in
     Bytes.set dst i ( char_of_int b )
   done;
   dst
+
+let read_gnucobol_collation_file filename =
+  let ic = open_in filename in
+  let rec iter lines =
+    match input_line ic with
+    | exception End_of_file -> List.rev lines
+    | line ->
+      let len = String.length line in
+      if len > 0 && line.[0] <> '#' then
+        let items = String.split_on_char ' ' line in
+        if List.length items <> 16 then
+          Printf.kprintf failwith "Wrong number of items on line %S" line;
+        let items = List.map (fun hh ->
+            int_of_string ( "0x" ^ hh )
+          ) items in
+        iter (items :: lines)
+      else
+        iter lines
+  in
+  let lines = iter [] in
+  close_in ic;
+  let to_ascii = List.flatten lines in
+  let to_ascii = Array.of_list to_ascii in
+  if Array.length to_ascii = 256 then
+    let of_ascii = Array.make 256 0 in
+    Array.iteri (fun i n ->
+        of_ascii.(n) <- i
+      ) to_ascii ;
+    { to_ascii ; of_ascii }
+  else
+  if Array.length to_ascii = 512 then
+    let of_ascii = Array.sub to_ascii 256 256 in
+    let to_ascii = Array.sub to_ascii 0 256 in
+    { to_ascii ; of_ascii }
+  else
+    failwith "Wrong number of items in tables"

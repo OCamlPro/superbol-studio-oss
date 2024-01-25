@@ -28,6 +28,8 @@ let public_subcommands = [
   Command_json_vscode.cmd;
   Command_snapshot.cmd;
 
+  Command_ebcdic.ebcdic_translate_cmd ;
+
   Command_switch.env_cmd; (* env *)
   Command_switch.switch_cmd;
   Command_switch.switch_env_cmd;
