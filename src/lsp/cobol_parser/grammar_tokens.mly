@@ -436,7 +436,7 @@
 %token FOOTING                      [@keyword]
 %token FOR                          [@keyword]
 %token FOREGROUND_COLOR             [@keyword]                [@contexts screen_descr_entry]
-%token FOREVER                      [@keyword]                [@contexts retry_phrase]
+%token FOREVER                      [@keyword]                [@contexts retry_phrase, perform_stmt]
 %token FORMAT                       [@keyword]
 %token FRAME                        [@keyword]                [@contexts ]
 %token FRAMED                       [@keyword]                [@contexts ]

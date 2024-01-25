@@ -111,6 +111,7 @@ and perform_mode =
         varying: varying_phrase with_loc;
         after: varying_phrase with_loc list;
       }
+  | PerformForever (* GC/COBOL-IT extension *)
 
 and varying_phrase =
   {
@@ -563,6 +564,7 @@ and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
     pp_statements perform_statements
 
 and pp_perform_mode ppf = function
+  | PerformForever -> Fmt.pf ppf "FOREVER"
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
   | PerformUntil { with_test; until } ->
     Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;

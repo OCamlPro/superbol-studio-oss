@@ -148,6 +148,7 @@ let fold_varying_phrase' (v: _ #folder) =
 let fold_perform_mode (v: _ #folder) =
   handle v#fold_perform_mode
     ~continue:begin fun m x -> match m with
+      | PerformForever -> x
       | PerformNTimes i -> x
           >> fold_ident_or_intlit v i
       | PerformUntil { with_test; until } -> x

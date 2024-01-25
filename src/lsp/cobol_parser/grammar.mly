@@ -3384,7 +3384,7 @@ let reversed_or_no_rewind_opt :=
 (* TODO: COB85 first format also takes instructions... *)
 
 %public let unconditional_action := ~ = perform_statement; < >
-let perform_statement :=
+let perform_statement [@context perform_stmt] :=
  | PERFORM; i = procedure_name;
    io = ro(pf(THROUGH, procedure_name));
    po = io(perform_phrase);
@@ -3396,6 +3396,7 @@ let perform_statement :=
                      perform_statements = isl } }
 
 let perform_phrase :=
+ | FOREVER; { PerformForever } (* GC/COBOL-IT extension *) 
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
  | wt = ro(with_test); UNTIL; until = condition;
    { PerformUntil { with_test = wt; until } }

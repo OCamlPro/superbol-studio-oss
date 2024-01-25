@@ -20,6 +20,7 @@ let nonterminal_context: type k. k nonterminal -> _ option = function
   | N_report_occurs_clause -> Some Occurs_clause
   | N_read_statement -> Some Read_stmt
   | N_program_definition_id_paragraph -> Some Program_id_paragraph
+  | N_perform_statement -> Some Perform_stmt
   | N_options_paragraph -> Some Options_paragraph
   | N_occurs_fixed_clause -> Some Occurs_clause
   | N_occurs_dynamic_clause -> Some Occurs_clause
@@ -124,13 +125,14 @@ let contexts_for_state_num: int -> _ list = function
   | 2625 -> [Set_attribute_stmt]
   | 2713 -> [Resume_stmt]
   | 2731 -> [Read_stmt]
-  | 2790 -> [Sharing_phrase]
-  | 3034 -> [Exit_stmt]
-  | 3170 -> [Allocate_stmt]
-  | 3184 -> [Accept_stmt]
-  | 3897 -> [Program_id_paragraph]
-  | 4027 -> [Object_paragraph]
-  | 4037 -> [Factory_paragraph]
+  | 2758 -> [Perform_stmt]
+  | 2791 -> [Sharing_phrase]
+  | 3035 -> [Exit_stmt]
+  | 3171 -> [Allocate_stmt]
+  | 3185 -> [Accept_stmt]
+  | 3898 -> [Program_id_paragraph]
+  | 4028 -> [Object_paragraph]
+  | 4038 -> [Factory_paragraph]
   | _ -> []
 
 let contexts: type k. k lr1state -> _ list = fun s ->
