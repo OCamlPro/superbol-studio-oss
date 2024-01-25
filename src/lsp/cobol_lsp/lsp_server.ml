@@ -70,6 +70,7 @@ let add_or_replace_doc doc r =
   let docs = URIMap.add (Lsp_document.uri doc) doc r.docs in
   if docs == r.docs then r else { r with docs }
 
+
 (** {2 Handling of diagnostics for non-opened documents} *)
 
 let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
@@ -106,10 +107,12 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
     registry
   end
 
+
 (** {2 Management of per-project caches} *)
 
-let save_project_caches { params = { config = { cache_config = config; _ }; _ };
-                          docs; _ } =
+let save_project_caches
+    { params = { config = { cache_config = config; _ }; _ };
+      docs; _ } =
   try Lsp_project_cache.save ~config docs
   with e ->
     Lsp_error.internal
@@ -128,6 +131,17 @@ let load_project_cache ~rootdir
 
 
 (** {2 Registry management} *)
+
+(** {3 Error reporting} *)
+
+let document_error_while_ operation doc e backtrace registry =
+  let backtrace = Printexc.raw_backtrace_to_string backtrace in
+  Lsp_io.log_error
+    "Internal error while %(%) document: %a%s" operation Fmt.exn e
+    (if backtrace = "" then "" else "\n" ^ backtrace);
+  add_or_replace_doc doc registry
+
+(** {3 Initialization} *)
 
 let load_project_in ~dir registry =
   let layout = registry.params.config.project_layout in
@@ -153,13 +167,6 @@ let create_or_retrieve_project ~uri registry =
   with Not_found ->
     let project = Lsp_project.for_ ~rootdir ~layout in
     project, add_project project registry
-
-let document_error_while_ operation doc e backtrace registry =
-  let backtrace = Printexc.raw_backtrace_to_string backtrace in
-  Lsp_io.pretty_notification ~log:true ~type_:Error
-    "Internal error while %(%) document: %a%s" operation Fmt.exn e
-    (if backtrace = "" then "" else "\n" ^ backtrace);
-  add_or_replace_doc doc registry
 
 let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ?copybook registry =

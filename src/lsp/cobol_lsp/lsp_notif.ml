@@ -38,7 +38,7 @@ let on_notification state notif =
 let handle notif state =
   match Lsp.Client_notification.of_jsonrpc notif with
   | Error str ->
-      Lsp_io.pretty_notification ~type_:Error "Invalid@ notification:@ %s" str;
+      Lsp_io.log_error "Invalid@ notification:@ %s" str;
       state
   | Ok notif ->
       try on_notification state notif with
