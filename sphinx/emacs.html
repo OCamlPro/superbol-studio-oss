@@ -4,9 +4,9 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SuperBOL mode for GNU/Emacs &mdash; superbol master
- (f9aa3ba
-) (2024/01/25 11:06) documentation</title>
+  <title>SuperBOL modes for GNU/Emacs &mdash; superbol master
+ (57dd2fb
+) (2024/01/25 11:07) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (f9aa3ba
+ (57dd2fb
 )
               </div>
 <div role="search">
@@ -52,19 +52,18 @@
 <li class="toctree-l1"><a class="reference internal" href="lsp.html">SuperBOL LSP Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="vscode-extension.html">SuperBOL VSCode Extension</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">SuperBOL mode for GNU/Emacs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#standard-file-cobol-superbol-mode-el">Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code></a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SuperBOL modes for GNU/Emacs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#standard-file-cobol-mode-el">Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#features">Features</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#customization">Customization</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#superbol-mode-with-lsp">Superbol-mode with LSP</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#superbol-mode">Superbol-mode</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#superbol-mode-with-lsp-mode">Superbol-mode with <cite>lsp-mode</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#superbol-mode-with-eglot">Superbol-mode with <cite>eglot</cite></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#setup">Setup</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#further-configuration-for-auto-indentation">Further configuration for auto-indentation:</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#known-issues">Known Issues</a></li>
 </ul>
 </li>
 </ul>
@@ -89,7 +88,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>SuperBOL mode for GNU/Emacs</li>
+      <li>SuperBOL modes for GNU/Emacs</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/emacs.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,68 +98,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="superbol-mode-for-gnu-emacs">
-<h1>SuperBOL mode for GNU/Emacs<a class="headerlink" href="#superbol-mode-for-gnu-emacs" title="Permalink to this headline"></a></h1>
-<p>We provide an extension of the <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> of ELPA under the
-name <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> that provides some fixes and run
-with our LSP server for COBOL.</p>
-<section id="standard-file-cobol-superbol-mode-el">
-<h2>Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code><a class="headerlink" href="#standard-file-cobol-superbol-mode-el" title="Permalink to this headline"></a></h2>
-<p>We provide <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> as a fork of
-<code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> from ELPA, with a few fixes:</p>
-<ul class="simple">
-<li><p>Better indentation</p></li>
-<li><p>Minor modes to switch between formats</p></li>
-<li><p>Documentation accessible from the COBOL menu</p></li>
-</ul>
+  <section id="superbol-modes-for-gnu-emacs">
+<h1>SuperBOL modes for GNU/Emacs<a class="headerlink" href="#superbol-modes-for-gnu-emacs" title="Permalink to this headline"></a></h1>
+<p>We document two means that are available for editing COBOL files using
+GNU/Emacs.  One makes use of a modified version of
+<code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> that can be found on ELPA.  The other is a new
+mode, <code class="code docutils literal notranslate"><span class="pre">superbol-mode</span></code>, that simply makes use of the LSP to
+provide a powerful COBOL IDE.</p>
+<section id="standard-file-cobol-mode-el">
+<h2>Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code><a class="headerlink" href="#standard-file-cobol-mode-el" title="Permalink to this headline"></a></h2>
+<p>We provide our own fork of <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> from ELPA, with a fix
+on the indentation function preventing insertion of spaces at point.</p>
 <section id="installation">
 <h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h3>
-<p>If you are already using the Cobol mode by ELPA, you need to
-desinstall it. For that, use <cite>M-x list-packages</cite>, go to <cite>cobol-mode</cite>,
-type <cite>D</cite> to select it for deletion, and then <cite>x</cite> to execute the
-removal.</p>
-<p>Copy the file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> to your
-<code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs.d/lisp/</span></code> directory:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="o">://</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="nc">OCamlPro</span><span class="o">/</span><span class="n">superbol</span><span class="o">-</span><span class="n">studio</span><span class="o">-</span><span class="n">oss</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">emacs</span><span class="o">/</span><span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">.</span><span class="n">el</span>
-<span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">emacs</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">lisp</span><span class="o">/</span>
-<span class="n">mv</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">.</span><span class="n">el</span>  <span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">emacs</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">lisp</span><span class="o">/</span>
-</pre></div>
-</div>
-<p>and add the following lines to your <code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs</span></code> file:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">(</span><span class="n">add</span><span class="o">-</span><span class="k">to</span><span class="o">-</span><span class="kt">list</span> <span class="k">&#39;</span><span class="n">load</span><span class="o">-</span><span class="n">path</span> <span class="s2">&quot;~/.emacs.d/lisp/&quot;</span><span class="o">)</span>
-<span class="o">(</span><span class="n">autoload</span> <span class="k">&#39;</span><span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span> <span class="s2">&quot;cobol-superbol-mode&quot;</span><span class="o">)</span>
+<p>Copy the file <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> to your <code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs.d/</span></code>
+directory, and add the following lines to your <code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs</span></code> file:</p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="o">(</span><span class="n">autoload</span> <span class="k">&#39;</span><span class="n">cobol</span><span class="o">-</span><span class="n">mode</span> <span class="s2">&quot;cobol-mode&quot;</span><span class="o">)</span>
 <span class="o">(</span><span class="n">setq</span> <span class="n">cobol</span><span class="o">-</span><span class="n">tab</span><span class="o">-</span><span class="n">width</span> <span class="mi">3</span><span class="o">)</span>
 <span class="o">(</span><span class="n">setq</span> <span class="n">auto</span><span class="o">-</span><span class="n">mode</span><span class="o">-</span><span class="n">alist</span>
-  <span class="o">(</span><span class="n">append</span>
-   <span class="k">&#39;</span><span class="o">((</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cob</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">)</span>
-     <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cbl</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">)</span>
-     <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cpy</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">))</span>
+<span class="o">(</span><span class="n">append</span>
+   <span class="k">&#39;</span><span class="o">((</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cob</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">mode</span><span class="o">)</span>
+     <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cbl</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">mode</span><span class="o">)</span>
+     <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cpy</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">mode</span><span class="o">))</span>
    <span class="n">auto</span><span class="o">-</span><span class="n">mode</span><span class="o">-</span><span class="n">alist</span><span class="o">))</span>
+<span class="o">(</span><span class="n">setq</span> <span class="n">cobol</span><span class="o">-</span><span class="n">source</span><span class="o">-</span><span class="n">format</span> <span class="k">&#39;</span><span class="n">free</span><span class="o">)</span>
 </pre></div>
 </div>
-<p>Start a new Emacs process and open a COBOL file: verify that the
-<cite>COBOL</cite> menu is available and contains a <cite>SuperBOL by OCamlPro</cite>
-entry. You are done!</p>
 <p>This configuration will set tabulations to be 3 spaces and free source
 format. If you want to change the source format, you will need to
 change this option using <code class="code docutils literal notranslate"><span class="pre">M-x</span> <span class="pre">customize</span></code>, save and then restart emacs.</p>
 </section>
 <section id="features">
 <h3>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h3>
-<p>The <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> provides the following features:</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> provides the following features:</p>
 <ul class="simple">
 <li><p>colorization</p></li>
 <li><p>indentation</p></li>
 <li><p>comments</p></li>
 <li><p>rulers</p></li>
-<li><p>minor-modes for source formats</p></li>
-<li><p>a COBOL menu with:</p>
-<ul>
-<li><p>an “Insert” item with a few constructions</p></li>
-<li><p>a sub-menu with links to GnuCOBOL documentation</p></li>
-<li><p>a sub-menu to switch between source formats</p></li>
-</ul>
-</li>
+<li><p>a COBOL menu with an item “Insert” with a few constructions</p></li>
 </ul>
 </section>
 <section id="customization">
@@ -173,8 +149,8 @@ will propose completions while typing keywords (use TAB or RET to
 complete).</p>
 </section>
 </section>
-<section id="superbol-mode-with-lsp">
-<h2>Superbol-mode with LSP<a class="headerlink" href="#superbol-mode-with-lsp" title="Permalink to this headline"></a></h2>
+<section id="superbol-mode">
+<h2>Superbol-mode<a class="headerlink" href="#superbol-mode" title="Permalink to this headline"></a></h2>
 <p>The new Superbol-mode provides an IDE that makes use of the SuperBOL
 LSP to provide advanced navigation and editing facilities for COBOL
 projects.  It can be used in combination with any of the two main LSP
@@ -239,13 +215,6 @@ functionality is provided by <code class="docutils literal notranslate"><span cl
 at <a class="reference external" href="https://github.com/joaotavora/eglot/issues/615">https://github.com/joaotavora/eglot/issues/615</a> .</p>
 </dd>
 </dl>
-</section>
-<section id="known-issues">
-<h3>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline"></a></h3>
-<ul class="simple">
-<li><p><cite>void-function -compose</cite>: install the <cite>dash</cite> package on ELPA</p></li>
-<li><p>Install <cite>yasnippet</cite> ?</p></li>
-</ul>
 </section>
 </section>
 </section>
