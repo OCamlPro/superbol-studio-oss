@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (2fb2fb8
-) (2024/01/25 11:07) documentation</title>
+ (d865524
+) (2024/01/25 20:58) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (2fb2fb8
+ (d865524
 )
               </div>
 <div role="search">
@@ -54,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emacs.html">SuperBOL mode for GNU/Emacs</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-ebcdic-translate">main.exe ebcdic translate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-env">main.exe env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-range">main.exe indent range</a></li>
@@ -111,7 +112,10 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">-v</span></code> or <code class="code docutils literal notranslate"><span class="pre">--verbose</span></code>   Increase verbosity level</p></li>
 </ul>
 <p>Overview of sub-commands:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">env</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ebcdic</span> <span class="n">translate</span>
+  <span class="nc">Convert</span> <span class="k">to</span> <span class="ow">or</span> <span class="n">from</span> <span class="nc">EBCDIC</span>
+
+<span class="n">env</span>
   <span class="nc">Generate</span> <span class="n">commands</span> <span class="k">to</span> <span class="n">set</span> <span class="n">environment</span> <span class="n">variables</span> <span class="k">to</span> <span class="n">use</span> <span class="n">the</span> <span class="n">specified</span> <span class="n">switch</span>
 
 <span class="n">indent</span> <span class="n">file</span>
@@ -166,6 +170,23 @@
   <span class="n">build</span> <span class="o">.</span><span class="n">texi</span> <span class="n">documentation</span> <span class="n">from</span> <span class="n">gnucobol</span><span class="o">-</span><span class="n">docs</span>
 </pre></div>
 </div>
+<section id="main-exe-ebcdic-translate">
+<h2>main.exe ebcdic translate<a class="headerlink" href="#main-exe-ebcdic-translate" title="Permalink to this headline"></a></h2>
+<p>Convert to or from EBCDIC</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command translates to or from EBCDIC and ASCII.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">ebcdic</span> <span class="n">translate</span> <span class="nc">EBCDIC</span><span class="o">-</span><span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">EBCDIC-FILE</span></code>   File in EBCDIC format (source or target)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--colseq</span> <span class="pre">FILE</span></code>   Collating sequence file to read from GnuCOBOL</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--from-ascii</span> <span class="pre">ASCII-FILE</span></code>   File in ASCII format to translate</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--to-ascii</span> <span class="pre">ASCII-FILE</span></code>   File in ASCII format to generate</p></li>
+</ul>
+</section>
 <section id="main-exe-env">
 <h2>main.exe env<a class="headerlink" href="#main-exe-env" title="Permalink to this headline"></a></h2>
 <p>Generate commands to set environment variables to use the specified switch</p>

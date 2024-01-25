@@ -10,6 +10,9 @@ Common arguments to all sub-commands:
 
 Overview of sub-commands::
   
+  ebcdic translate
+    Convert to or from EBCDIC
+  
   env
     Generate commands to set environment variables to use the specified switch
   
@@ -63,6 +66,35 @@ Overview of sub-commands::
   
   texi2rst
     build .texi documentation from gnucobol-docs
+
+
+main.exe ebcdic translate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Convert to or from EBCDIC
+
+
+
+**DESCRIPTION**
+
+
+This command translates to or from EBCDIC and ASCII.
+
+**USAGE**
+::
+  
+  main.exe ebcdic translate EBCDIC-FILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`EBCDIC-FILE`   File in EBCDIC format (source or target)
+
+* :code:`--colseq FILE`   Collating sequence file to read from GnuCOBOL
+
+* :code:`--from-ascii ASCII-FILE`   File in ASCII format to translate
+
+* :code:`--to-ascii ASCII-FILE`   File in ASCII format to generate
 
 
 main.exe env
