@@ -128,3 +128,5 @@ val value_of_table : node EzCompat.StringMap.t -> value
 
 val value_of_strings : string array -> value
 val value_of_ints : int array -> value
+
+val array_of_list : ?before:string list -> ?pos:int -> node list -> node
