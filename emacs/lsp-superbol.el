@@ -16,7 +16,7 @@
   (load "lsp-mode-autoloads"))
 
 (require 'lsp-mode)
-(require 'superbol-mode)
+(require 'cobol-superbol-mode)
 
 ;; ---
 
@@ -26,15 +26,18 @@
   :link '(url-link "https://github.com/OCamlPro/superbol-studio-oss")
   :package-version '(lsp-mode . "8.0.1"))
 
-(load (expand-file-name "lsp-superbol-customs.el"
-			(file-name-directory load-file-name)))
+; This line should be conditioned to the existence of such a file
+;(load (expand-file-name "lsp-superbol-customs.el"
+;			(file-name-directory load-file-name)))
 
 ;; ---
 
 (defun lsp-superbol--server-command ()
   "Startup command for the Superbol LSP language server."
-  ;; (list (lsp-package-path 'superbol-language-server) "lsp"))
-  (list (expand-file-name "superbol-free" lsp-superbol-path) "lsp"))
+
+  ;; instead of looking into a variable path, just expect the lsp server to
+  ;; be in the PATH
+  (list "superbol-free" "lsp"))
 
 ;; (lsp-dependency 'superbol-language-server
 ;; 		`(:system ,(executable-find (lsp-package-path 'superbol-language-server))))
@@ -45,14 +48,12 @@
   :new-connection (lsp-stdio-connection #'lsp-superbol--server-command)
   :priority 0
   :activation-fn (lsp-activate-on "superbol" "cobol" "COBOL")
-  :server-id 'superbol-ls
+  :server-id 'superbol-lsp
   ))
 
 ;; ---
 
-;; (with-eval-after-load 'superbol-mode
-(add-to-list 'lsp-language-id-configuration '(superbol-mode . "cobol"))
-(add-to-list 'lsp-language-id-configuration '(cobol-mode    . "cobol"))
+(add-to-list 'lsp-language-id-configuration '(cobol-superbol-mode . "cobol"))
 
 (defun lsp-superbol--start ()
   "Superbol LSP startup function for lsp-mode"
@@ -64,14 +65,10 @@
   (lsp)
 
   ;; Turn on fontification
-  (funcall font-lock-fontify-buffer-function))
+  (funcall font-lock-fontify-buffer-function)
+  )
 
-;; Autostart the LSP when entering superbol-mode
-(add-hook 'superbol-mode-hook #'lsp-superbol--start)
-
-;; Also load on cobol-mode
-(with-eval-after-load 'cobol-mode
-  (add-hook 'cobol-mode-hook #'lsp-superbol--start))
+(add-hook 'cobol-superbol-mode-hook #'lsp-superbol--start)
 
 ;; ---
 

@@ -1,33 +1,50 @@
-SuperBOL modes for GNU/Emacs
-============================
+SuperBOL mode for GNU/Emacs
+===========================
 
-We document two means that are available for editing COBOL files using
-GNU/Emacs.  One makes use of a modified version of
-:code:`cobol-mode.el` that can be found on ELPA.  The other is a new
-mode, :code:`superbol-mode`, that simply makes use of the LSP to
-provide a powerful COBOL IDE.
+We provide an extension of the :code:`cobol-mode.el` of ELPA under the
+name :code:`cobol-superbol-mode.el` that provides some fixes and run
+with our LSP server for COBOL.
 
-Standard file :code:`cobol-mode.el`
------------------------------------
+Standard file :code:`cobol-superbol-mode.el`
+--------------------------------------------
 
-We provide our own fork of :code:`cobol-mode.el` from ELPA, with a fix
-on the indentation function preventing insertion of spaces at point.
+We provide :code:`cobol-superbol-mode.el` as a fork of
+:code:`cobol-mode.el` from ELPA, with a few fixes:
+
+* Better indentation
+* Minor modes to switch between formats
+* Documentation accessible from the COBOL menu
 
 Installation
 ~~~~~~~~~~~~
 
-Copy the file :code:`cobol-mode.el` to your :code:`$HOME/.emacs.d/`
-directory, and add the following lines to your :code:`$HOME/.emacs` file::
+If you are already using the Cobol mode by ELPA, you need to
+desinstall it. For that, use `M-x list-packages`, go to `cobol-mode`,
+type `D` to select it for deletion, and then `x` to execute the
+removal.
 
-  (autoload 'cobol-mode "cobol-mode")
+Copy the file :code:`cobol-superbol-mode.el` to your
+:code:`$HOME/.emacs.d/lisp/` directory::
+
+  wget https://github.com/OCamlPro/superbol-studio-oss/raw/master/emacs/cobol-superbol-mode.el
+  mkdir -p $HOME/.emacs.d/lisp/
+  mv cobol-superbol-mode.el  $HOME/.emacs.d/lisp/
+
+and add the following lines to your :code:`$HOME/.emacs` file::
+
+  (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (autoload 'cobol-superbol-mode "cobol-superbol-mode")
   (setq cobol-tab-width 3)
   (setq auto-mode-alist
-  (append
-     '(("\\.cob\\'" . cobol-mode)
-       ("\\.cbl\\'" . cobol-mode)
-       ("\\.cpy\\'" . cobol-mode))
+    (append
+     '(("\\.cob\\'" . cobol-superbol-mode)
+       ("\\.cbl\\'" . cobol-superbol-mode)
+       ("\\.cpy\\'" . cobol-superbol-mode))
      auto-mode-alist))
-  (setq cobol-source-format 'free)
+
+Start a new Emacs process and open a COBOL file: verify that the
+`COBOL` menu is available and contains a `SuperBOL by OCamlPro`
+entry. You are done!
 
 This configuration will set tabulations to be 3 spaces and free source
 format. If you want to change the source format, you will need to
@@ -36,13 +53,18 @@ change this option using :code:`M-x customize`, save and then restart emacs.
 Features
 ~~~~~~~~
 
-The :code:`cobol-mode.el` provides the following features:
+The :code:`cobol-superbol-mode.el` provides the following features:
 
 * colorization
 * indentation
 * comments
 * rulers
-* a COBOL menu with an item "Insert" with a few constructions
+* minor-modes for source formats
+* a COBOL menu with:
+
+  * an "Insert" item with a few constructions
+  * a sub-menu with links to GnuCOBOL documentation
+  * a sub-menu to switch between source formats
 
 Customization
 ~~~~~~~~~~~~~
@@ -53,8 +75,8 @@ We advise to also use the :code:`auto-complete` mode also. This mode
 will propose completions while typing keywords (use TAB or RET to
 complete).
 
-Superbol-mode
--------------
+Superbol-mode with LSP
+----------------------
 
 The new Superbol-mode provides an IDE that makes use of the SuperBOL
 LSP to provide advanced navigation and editing facilities for COBOL
@@ -135,3 +157,9 @@ functionality is provided by ``eglot-format``.
 
 .. [#eglot-semtok-issue] Note there is a pending issue on this point
    at https://github.com/joaotavora/eglot/issues/615 .
+
+Known Issues
+~~~~~~~~~~~~
+
+* `void-function -compose`: install the `dash` package on ELPA
+* Install `yasnippet` ?

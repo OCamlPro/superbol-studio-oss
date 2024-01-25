@@ -1,13 +1,9 @@
-;;; cobol-mode.el --- Mode for editing COBOL code -*- lexical-binding: t; -*-
+;;; cobol-superbol-mode.el --- Mode for editing COBOL code -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2013-2022  Free Software Foundation, Inc.
-
-;; Author: Edward Hart <edward.dan.hart@gmail.com>
-;; Maintainer: Edward Hart <edward.dan.hart@gmail.com>
-;; Version: 1.1
-;; Created: 9 November 2013
-;; Keywords: languages
-;; Package-Requires: ((cl-lib "0.5"))
+;; Copyright (C) 2023-2024  OCamlPro SAS
+;; Original Author: Edward Hart <edward.dan.hart@gmail.com>
+;; Maintainer: OCamlPro SAS
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -35,16 +31,16 @@
 
 ;;;; Installation:
 
-;; To install cobol-mode.el, save it to your .emacs.d/ directory and add the
+;; To install cobol-superbol-mode.el, save it to your .emacs.d/ directory and add the
 ;; following to your .emacs:
-;; (autoload 'cobol-mode "cobol-mode" "Major mode for highlighting COBOL files." t nil)
+;; (autoload 'cobol-superbol-mode "cobol-superbol-mode" "Major mode for highlighting COBOL files." t nil)
 
-;; To automatically load cobol-mode.el upon opening COBOL files, add this:
+;; To automatically load cobol-superbol-mode.el upon opening COBOL files, add this:
 ;; (setq auto-mode-alist
 ;;       (append
-;;        '(("\\.cob\\'" . cobol-mode)
-;;          ("\\.cbl\\'" . cobol-mode)
-;;          ("\\.cpy\\'" . cobol-mode))
+;;        '(("\\.cob\\'" . cobol-superbol-mode)
+;;          ("\\.cbl\\'" . cobol-superbol-mode)
+;;          ("\\.cpy\\'" . cobol-superbol-mode))
 ;;        auto-mode-alist))
 
 ;; Finally, I strongly suggest installing auto-complete-mode, which makes typing
@@ -54,7 +50,7 @@
 ;;;; Known bugs:
 
 ;; * Switching source formats requires M-x customize settings to be changed,
-;;   saved and cobol-mode to be unloaded then reloaded.
+;;   saved and cobol-superbol-mode to be unloaded then reloaded.
 ;; * Copying-and-pasting content in fixed-format sometimes results in content
 ;;   being pasted in column 1 and spaces inserted in the middle of it.
 ;; * The indentation code leaves a lot of trailing whitespace.
@@ -64,7 +60,7 @@
 ;;;; Missing features:
 
 ;; * Switch between dialect's reserved word lists via M-x customize (without
-;;   unloading cobol-mode).
+;;   unloading cobol-superbol-mode).
 ;; * Allow users to modify easily reserved word lists.
 ;; * Expand copybooks within a buffer.
 ;; * String continuation (see above).
@@ -73,7 +69,7 @@
 ;;; News:
 
 ;; - A new submenu for skeletons.
-;; - cobol-mode is now orphaned :-(
+;; - cobol-superbol-mode is now orphaned :-(
 ;;   We're looking for a generous soul willing to give it loving care.
 
 ;;; Code:
@@ -102,7 +98,7 @@
 
 (eval-and-compile
 (defconst cobol-formats
-  '(fixed-85 fixed-2002 free)
+  '(fixed-85 variable free)
   "The accepted values for `cobol-source-format'.")
 
 (defcustom cobol-source-format 'fixed-85
@@ -119,9 +115,9 @@
   :type  'string
   :safe  #'stringp)
 
-(defcustom cobol-fixed-2002-ruler
+(defcustom cobol-variable-ruler
   "----+-*--1----+----2----+----3----+----4----+----5----+----6----+----7----+----\n"
-  "Ruler for COBOL-2002-style fixed format code."
+  "Ruler for Variable format code."
   :type  'string
   :safe  #'stringp)
 
@@ -138,8 +134,8 @@ The next key typed is executed unless it is SPC."
   (momentary-string-display
    (cond ((eq cobol-source-format 'fixed-85)
           cobol-fixed-85-ruler)
-         ((eq cobol-source-format 'fixed-2002)
-          cobol-fixed-2002-ruler)
+         ((eq cobol-source-format 'variable)
+          cobol-variable-ruler)
          ((eq cobol-source-format 'free)
           cobol-free-ruler))
    (save-excursion
@@ -150,8 +146,8 @@ The next key typed is executed unless it is SPC."
        (point)))
    nil "Type SPC or any command to erase the ruler."))
 
-(defcustom cobol-mode-hook nil
-  "Hook run by `cobol-mode'."
+(defcustom cobol-superbol-mode-hook nil
+  "Hook run by `cobol-superbol-mode'."
   :type 'hook)
 
 (defun cobol--remove-strings (l1 l2)
@@ -2269,7 +2265,7 @@ Note that this matches DECLARATIVES.")
 
 (defun cobol--fixed-format-p ()
   "Return whether the current source format is fixed."
-  (memq cobol-source-format '(fixed-85 'fixed-2002)))
+  (memq cobol-source-format '(fixed-85 'variable)))
 
 ;; This is required for indentation to function, because the initial sequence
 ;; area is marked as a comment, not whitespace.
@@ -2343,7 +2339,7 @@ and ignored areas) between points BEG and END."
                  cobol--syntax-propertize-program-name-area
                  cobol--syntax-propertize-page-directive
                  cobol--syntax-propertize-adjacent-quotes))
-     (`fixed-2002 (syntax-propertize-rules
+     (`variable (syntax-propertize-rules
                    cobol--syntax-propertize-indicator-area
                    cobol--syntax-propertize-page-directive
                    cobol--syntax-propertize-adjacent-quotes))
@@ -2683,7 +2679,7 @@ arguments at all.")
     7))
 
 ;;; Misc
-(defvar cobol-tab-width 4 "Width of a tab for `cobol-mode'.")
+(defvar cobol-tab-width 4 "Width of a tab for `cobol-superbol-mode'.")
 
 (cl-defun cobol--indent (indent &optional (times 1))
   "Increment INDENT."
@@ -2692,14 +2688,14 @@ arguments at all.")
 (defun cobol--current-indentation ()
   "Return the indentation of the current line or -1 if the line is within the
 sequence area."
-  (if (< (- (line-end-position) (line-beginning-position)) (cobol--code-start))
-     -1
-    (save-excursion
-      (goto-char (+ (line-beginning-position) (cobol--code-start)))
-      (let ((code-start-position (point)))
-        (skip-syntax-forward " " (line-end-position))
-        (backward-prefix-chars)
-        (- (point) code-start-position)))))
+  (let ((indent 
+	(save-excursion
+	  (goto-char (line-beginning-position))
+	  (skip-syntax-forward " " (line-end-position))
+	  (- (point) (+ (line-beginning-position) (cobol--code-start)))
+	  )))
+    indent
+    ))
 
 (defun cobol--indent-current ()
   "Return the current indent level indented once."
@@ -3063,37 +3059,46 @@ start of area A, if fixed-format)."
 (defun cobol-indent-line ()
   "Indent current line as COBOL code."
   (interactive "*")
-  (let ((indent (cobol--find-indent-of-line)))
-    (if (not (eq indent (cobol--current-indentation)))
-        (progn
-          (cobol--set-line-indent indent)
-          ;; If in leading whitespace/sequence area, move to first char of code.
-          (when (< (point) (+ (line-beginning-position) (cobol--code-start) indent))
-            (skip-syntax-forward " " (line-end-position))
-            (backward-prefix-chars)))
-      ;; Move to first non-whitespace char
-      (skip-syntax-forward " " (line-end-position))
-      (backward-prefix-chars)
-      ;; SuperBOL/OCamlPro: the following loop was commented to prevent
-      ;; inserting spaces at point
-      ;; Indent stuff at point if not the first word.
-;      (when (< (cobol--current-indentation) (- (current-column) (cobol--code-start)))
-;        (cobol--indent-point))
-      )))
+  (let
+      ((expected-indent (cobol--find-indent-of-line))
+       (current-indent (cobol--current-indentation))
+       )
+    (indent-line-to (+ expected-indent (cobol--code-start)))
+    ))
 
-(defvar cobol-mode-map
+(defvar cobol-superbol-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [remap back-to-indentation] #'cobol-back-to-indentation)
     ;;(define-key map (kbd "RET") #'newline-and-indent)
     map))
 
-(easy-menu-define cobol-mode-menu cobol-mode-map "Menu used for `cobol-mode'."
+(easy-menu-define cobol-superbol-mode-menu cobol-superbol-mode-map "Menu used for `cobol-superbol-mode'."
   '("COBOL"
     ("Insert" :filter cobol-skeleton--menu)
-    ;; FIXME: This menu should likely grow a few more entries.
+    ("Source Format"
+     ["Fixed" cobol-fixed-format-mode]
+     ["Fixed 2002" cobol-variable-format-mode]
+     ["Free" cobol-free-format-mode]
+     )
+    ("GnuCOBOL Docs"
+     ["GnuCOBOL Manual"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/manual"))]
+     ["GnuCOBOL Programmer's Guide"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobpg"))]
+     ["GnuCOBOL Quick Reference"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobqr"))]
+     ["GnuCOBOL Sample Programs"
+      (lambda () (interactive)
+	(browse-url "https://get-superbol.com/gnucobol/gnucobsp"))]
+     )
+    ["SuperBOL by OCamlPro"
+     (lambda () (interactive) (browse-url "https://get-superbol.com"))]
     ))
 
-(defvar cobol-mode-syntax-table
+(defvar cobol-superbol-mode-syntax-table
   (let ((st (make-syntax-table)))
     (modify-syntax-entry ?-  "w"   st)
     (modify-syntax-entry ?_  "w"   st)
@@ -3108,8 +3113,8 @@ start of area A, if fixed-format)."
 (defvar ac-ignore-case)
 
 ;;;###autoload
-(define-derived-mode cobol-mode prog-mode "COBOL"
-  "COBOL mode is a major mode for handling COBOL files."
+(define-derived-mode cobol-superbol-mode prog-mode "COBOL"
+  "COBOL SuperBOL mode is a major mode for handling COBOL files."
 
   (set (make-local-variable 'font-lock-defaults) cobol-font-lock-defaults)
 
@@ -3132,8 +3137,63 @@ start of area A, if fixed-format)."
 
   ;; Auto complete mode
   (set (make-local-variable 'ac-ignore-case) t)
+
+   (cond ((eq cobol-source-format 'fixed-85)
+          (cobol-fixed-format-mode))
+         ((eq cobol-source-format 'variable)
+          (cobol-variable-format-mode))
+         ((eq cobol-source-format 'free)
+          (cobol-free-format-mode)))
   )
 
-(provide 'cobol-mode)
+(define-minor-mode cobol-fixed-format-mode
+  "Set fixed-85 COBOL Source Format"
+  :init-value nil
+  :lighter " Fixed"
+  :predicate (cobol-superbol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-fixed-format-mode
+      (progn
+	(cobol-free-format-mode -1)
+	(cobol-variable-format-mode -1)
+	(setq cobol-source-format 'fixed-85)
+	)
+    ))
 
-;;; cobol-mode.el ends here
+(define-minor-mode cobol-variable-format-mode
+  "Set Fixed 2002 COBOL Source Format"
+  :init-value nil
+  :lighter " variable"
+  :predicate (cobol-superbol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-variable-format-mode
+      (progn
+	(cobol-free-format-mode -1)
+	(cobol-fixed-format-mode -1)
+	(setq cobol-source-format 'variable)
+	)
+    ))
+
+(define-minor-mode cobol-free-format-mode "Toggle Free Format"
+  :init-value nil
+  :lighter " Free"
+  :predicate (cobol-superbol-mode)
+  (make-local-variable 'cobol-source-format)
+  (if cobol-free-format-mode
+      (progn
+	(cobol-fixed-format-mode -1)
+	(cobol-variable-format-mode -1)
+	(setq cobol-source-format 'free)
+	)
+  ))
+
+(add-to-list 'minor-mode-alist
+	     '(cobol-free-format-mode " Free"))
+(add-to-list 'minor-mode-alist
+	     '(cobol-fixed-format-mode " Fixed"))
+(add-to-list 'minor-mode-alist
+	     '(cobol-variable-format-mode " Variable"))
+
+(provide 'cobol-superbol-mode)
+
+;;; cobol-superbol-mode.el ends here
