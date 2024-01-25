@@ -15,7 +15,7 @@
 type t
 
 val make : bundled_superbol:string -> unit -> t
+val client: t -> Vscode_languageclient.LanguageClient.t option
 
 val stop_language_server : t -> unit Promise.t
-
 val start_language_server : t -> unit Promise.t

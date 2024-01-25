@@ -15,18 +15,21 @@ open Lsp_imports
 open Lsp.Types
 
 module DIAGS = Cobol_common.Diagnostics
+module IMap = Map.Make (Int)
 
 module TYPES = struct
 
   type config = {
     project_layout: Lsp_project.layout;
     cache_config: Lsp_project_cache.config;
+    enable_client_configs: bool;
   }
 
   type params = {
     config: config;
     root_uri: Lsp.Types.DocumentUri.t option;
     workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
+    with_semantic_tokens: bool;
   }
 
   type registry = {                                                (* private *)
@@ -35,7 +38,21 @@ module TYPES = struct
     indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
                                                    mentioned by docs in
                                                    `docs` *)
+    pending_tasks: delayed_continuations;
     params: params;
+  }
+
+  and delayed_continuations = {
+    delayed_id: int;
+    delayed: sink_continuation IMap.t;
+  }
+
+  and sink_continuation =
+    | Sink: (registry, _) continuation -> sink_continuation
+
+  and ('a, 'b) continuation = {
+    request: 'b Lsp.Server_request.t;
+    f: 'b -> registry -> 'a;
   }
 
   type state =
@@ -59,6 +76,79 @@ end
 include TYPES
 
 type t = registry
+
+
+(** {2 Management of client responses}
+
+    Implements scheduling of promises that await on responses for requests to
+    the client.} *)
+
+(** Promises, internal to this module. *)
+type 'a promise =
+  | Now: 'a -> 'a promise
+  | Wait: ('a promise * registry, _) continuation -> 'a promise
+
+let now x registry: _ promise * t =
+  Now x, registry
+
+let await_response ~request ~f registry: _ promise * t =
+  Wait { request; f }, registry
+
+let delay
+    ({ pending_tasks = { delayed; delayed_id }; _ } as registry)
+    ~(request: 'a Lsp.Server_request.t)
+    ~(f: 'a -> t -> t)
+  : t =
+  (* Lsp_io.log_info "Sending@ server@ request@ with@ ID@ %d" delayed_id; *)
+  Lsp_io.send_request @@
+  Lsp.Server_request.to_jsonrpc_request ~id:(`Int delayed_id) request;
+  { registry with
+    pending_tasks =
+      { delayed = IMap.add delayed_id (Sink { request; f }) delayed;
+        delayed_id = succ delayed_id } }
+
+let delay_unit: t -> request: unit Lsp.Server_request.t -> t =
+  delay ~f:(fun () registry -> registry)
+
+let rec perform (f: 'a -> t -> t) ~(after: 'a promise * t) : t =
+  match after with
+  | Now y, registry ->
+      f y registry
+  | Wait { request; f = f' }, registry ->
+      delay registry ~request
+        ~f:(fun x registry -> perform f ~after:(f' x registry))
+
+let ignore_promise_result: 'a promise * t -> t = fun after ->
+  perform (fun _ registry -> registry) ~after
+
+let on_response id response
+    ({ pending_tasks = { delayed; _ }; _ } as registry) =
+  try                                      (* TODO: handle malformed response *)
+    let Sink { request; f } = IMap.find id delayed in
+    let registry =
+      { registry with
+        pending_tasks = { registry.pending_tasks with
+                          delayed = IMap.remove id delayed } }
+    in            (* TODO: dedicated handling of errors in `response_of_json` *)
+    try
+      f (Lsp.Server_request.response_of_json request response) registry
+    with
+    | Jsonrpc.Json.Of_json (error, json) ->
+        Lsp_io.log_error
+          "Recieved@ a@ response@ with@ invalid@ format@ (%s):@ %a"
+          error Yojson.Safe.pp json;
+        Lsp_io.log_info "request: %a" Yojson.Safe.pp
+          (Jsonrpc.Request.yojson_of_t @@
+           Lsp.Server_request.to_jsonrpc_request ~id:(`Int id) request);
+        Lsp_io.log_info "response: %a" Yojson.Safe.pp response;
+        registry
+    | e ->
+        Lsp_io.log_error "Exception@ raised@ in@ delayed@ computation:@ %a"
+          Fmt.exn e;
+        registry
+  with Not_found ->
+    Lsp_io.log_error "Response@ with@ unkown@ ID@ %d@ received" id;
+    registry
 
 (* Code: *)
 
@@ -154,29 +244,95 @@ let init ~params : registry =
     { params;
       projects = Lsp_project.SET.empty;
       docs = URIMap.empty;
-      indirect_diags = URIMap.empty }
+      indirect_diags = URIMap.empty;
+      pending_tasks = { delayed_id = 0; delayed = IMap.empty } }
   in
-  List.fold_left begin fun registry workspace_folder_uri ->
-    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
-  end registry params.workspace_folders
+  let registry =
+    List.fold_left begin fun registry workspace_folder_uri ->
+      load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
+    end registry params.workspace_folders
+  in
+  URIMap.fold (fun _ -> dispatch_diagnostics) registry.docs registry
 
-let create_or_retrieve_project ~uri registry =
+let extract_docs_of ~project registry =
+  let out_of_date_docs, docs =
+    URIMap.partition begin fun _ doc ->
+      Superbol_project.have_same_rootdirs doc.Lsp_document.project project
+    end registry.docs
+  in
+  { registry with docs }, out_of_date_docs
+
+let update_project_config project json_configs registry =
+  let registry, out_of_date_docs = match json_configs with
+    | [`Assoc assoc] ->
+        if Lsp_project.update_project_config assoc project
+        then begin                                  (* configuration changed: *)
+          Superbol_project.save_config ~verbose:true project;
+          extract_docs_of ~project registry
+        end else begin
+          registry, URIMap.empty
+        end
+    | _ ->
+        Lsp_io.log_error "Unknown@ type@ of@ configutation@ items";
+        registry, URIMap.empty
+  in
+  (* FIXME: may there be out-of-date diagnostics in
+     `registry.indirect_diags`? *)
+  URIMap.fold begin fun _ doc registry ->
+    (* TODO: send relevant "refresh" server requests. *)
+    let doc = Lsp_document.reload { doc with project } in
+    let registry = dispatch_diagnostics doc registry in
+    let registry = add_or_replace_doc doc registry in
+    if registry.params.with_semantic_tokens
+    then delay_unit ~request:SemanticTokensRefresh registry
+    else registry
+  end out_of_date_docs registry
+
+let update_project_config_promise project json_configs registry =
+  now project (update_project_config project json_configs registry)
+
+let configure_project_promise project registry =
+  if registry.params.config.enable_client_configs then
+    let uri = Lsp_project.rooturi project in
+    await_response registry
+      ~request:(WorkspaceConfiguration
+                { items = [ ConfigurationItem.create ()
+                              ~scopeUri:(Lsp.Uri.to_string uri)
+                              ~section:"superbol.cobol" ] })
+      ~f:(update_project_config_promise project)
+  else
+    now project registry
+
+let on_client_config_change registry =
+  if registry.params.config.enable_client_configs then
+    Lsp_project.SET.fold begin fun project registry ->
+      ignore_promise_result @@ configure_project_promise project registry
+    end registry.projects registry
+  else
+    registry
+
+let create_or_retrieve_project_promise ~uri registry =
   let layout = registry.params.config.project_layout in
   let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-  try Lsp_project.SET.for_rootdir ~rootdir registry.projects, registry
+  try
+    now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
   with Not_found ->
     let project = Lsp_project.for_ ~rootdir ~layout in
-    project, add_project project registry
+    let registry = add_project project registry in
+    configure_project_promise project registry
 
 let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ?copybook registry =
-  let project, registry = create_or_retrieve_project ~uri registry in
-  try
-    let doc = Lsp_document.load ~project ?copybook doc in
-    let registry = dispatch_diagnostics doc registry in
-    add_or_replace_doc doc registry
-  with Lsp_document.Internal_error (doc, e, backtrace) ->
-    document_error_while_"opening" doc e backtrace registry
+  let add_in_project project registry =
+    try
+      let doc = Lsp_document.load ~project ?copybook doc in
+      let registry = dispatch_diagnostics doc registry in
+      add_or_replace_doc doc registry
+    with Lsp_document.Internal_error (doc, e, backtrace) ->
+      document_error_while_"opening" doc e backtrace registry
+  in
+  perform add_in_project
+    ~after:(create_or_retrieve_project_promise ~uri registry)
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
                                           _ } as doc) ?copybook registry =

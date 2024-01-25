@@ -44,6 +44,46 @@ let indentRange
 *)
   `Value promise
 
+let with_seconds_countdown ?timeout ~f seconds =
+  let timeout = match timeout with Some t -> t | None -> ref None in
+  let rec step seconds () =
+    f seconds;
+    if seconds > 0
+    then timeout := Option.some @@ Node.setTimeout (step @@ seconds - 1) 1000
+  in
+  step seconds ()
+
+let register_config_listener extension instance =
+  let timeout = ref None in
+  Vscode.Workspace.onDidChangeConfiguration ()
+    ~listener:begin fun event ->
+      match Superbol_instance.client instance with
+      | Some client
+        when Vscode.ConfigurationChangeEvent.affectsConfiguration event ()
+            ~section:"superbol" ->
+          Option.iter Node.clearTimeout !timeout;
+          with_seconds_countdown 3 ~timeout
+            ~f:(fun s ->
+                if s > 0 then
+                  let text = Printf.sprintf "SuperBOL: applying changes in %us…" s in
+                  Vscode.ExtensionContext.subscribe extension
+                    ~disposable:(Vscode.Window.setStatusBarMessage ()
+                                   ~text
+                                   ~hide:(`AfterTimeout 1200))
+                else begin
+                  timeout := None;
+                  let n =
+                    Vscode_languageclient.DidChangeConfiguration.t_to_js @@
+                    Vscode_languageclient.DidChangeConfiguration.create ()
+                      ~settings:Ojs.null
+                  in
+                  Vscode_languageclient.LanguageClient.sendNotification client
+                    "workspace/didChangeConfiguration" n
+                end)
+      | Some _ | None ->
+          ()
+    end
+
 (* Helpers to find the bundled superbol executable *)
 let rec find_existing = function
   | [] -> raise Not_found
@@ -116,6 +156,9 @@ let activate (extension : Vscode.ExtensionContext.t) =
 
   let instance = Superbol_instance.make ~bundled_superbol () in
   current_instance := Some instance;
+
+  Vscode.ExtensionContext.subscribe extension
+    ~disposable:(register_config_listener extension instance);
 
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance

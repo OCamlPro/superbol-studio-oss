@@ -976,6 +976,7 @@ module Event = struct
     -> ?disposables:Disposable.t list
     -> unit
     -> Disposable.t
+  [@@js]
 
   module Make (T : Js.T) = struct
     type t =
@@ -2241,6 +2242,19 @@ module FileSystemWatcher = struct
   include [%js: val onDidChange : t -> OnDidChange.t [@@js.get]]
 end
 
+module ConfigurationChangeEvent = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+      val affectsConfiguration
+        : t
+        -> section:string
+        -> ?scope:ConfigurationScope.t
+        -> unit
+        -> bool [@@js.call]]
+end
+
 module Workspace = struct
   module OnDidChangeWorkspaceFolders = Event.Make (WorkspaceFolder)
   module OnDidOpenTextDocument = Event.Make (TextDocument)
@@ -2284,6 +2298,9 @@ module Workspace = struct
 
     val textDocuments : unit -> TextDocument.t list
       [@@js.get "vscode.workspace.textDocuments"]
+
+    val onDidChangeConfiguration : ConfigurationChangeEvent.t Event.t
+      [@@js.global "vscode.workspace.onDidChangeConfiguration"]
 
     val onDidChangeWorkspaceFolders : OnDidChangeWorkspaceFolders.t
       [@@js.global "vscode.workspace.onDidChangeWorkspaceFolders"]

@@ -106,6 +106,10 @@ let send_json json =
 let send_response response =
   send_json @@ Jsonrpc.Response.yojson_of_t response
 
+(** [send_request request] sends out a json RPC request on standard output. *)
+let send_request request =
+  send_json @@ Jsonrpc.Request.yojson_of_t request
+
 (** [send_notification notif] sends out a json RPC notification on standard
     output. *)
 let send_notification notif =

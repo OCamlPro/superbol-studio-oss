@@ -30,6 +30,7 @@ module MAP = Superbol_project.MAP
 let rootdir = Superbol_project.rootdir
 let config = Superbol_project.config
 let string_of_rootdir = Superbol_project.string_of_rootdir
+let rooturi project = Lsp.Uri.of_path @@ string_of_rootdir @@ rootdir project
 
 let rootdir_for ~uri ~layout =
   Superbol_project.rootdir_for ~filename:(Lsp.Uri.to_path uri) ~layout
@@ -72,6 +73,58 @@ let relative_path_for ~uri project =
 
 let absolute_path_for =
   Superbol_project.absolute_path_for
+
+(** Config *)
+
+let update_from_string project (s: Yojson.Safe.t) ~f : bool =
+  match s with
+  | `String "" -> false
+  | `String s -> f project s
+  | _ -> Pretty.invalid_arg "%s" (Yojson.Safe.to_string s)
+
+let update_source_format: t -> Yojson.Safe.t -> bool =
+  update_from_string ~f:begin fun { config; _ } s ->
+    let source_format = Cobol_config.Options.format_of_string s in
+    if source_format = config.source_format
+    then false
+    else begin
+      config.source_format <- source_format;
+      true
+    end
+  end
+
+let update_dialect: t -> Yojson.Safe.t -> bool =
+  update_from_string ~f:begin fun ({ config; _ } as project) s ->
+    let { result; diags } =
+      Superbol_project.Config.cobol_config_from_dialect_name s in
+    if result = config.cobol_config            (* note: structural comparison *)
+    then false
+    else begin
+      config.cobol_config <- result;
+      ignore @@ show_n_forget_diagnostics { result = project; diags };
+      true
+    end
+  end
+
+(** [update_project_config assoc project] updates the configuration of [project]
+    according to key/value paires in [assoc]; returns [true] whenever the
+    configuration upon termination differs from the configuration upon call. *)
+let update_project_config assoc project =
+  let update_config assoc key update project =
+    try match List.assoc_opt key assoc with
+      | None -> false
+      | Some v -> update project v
+    with Invalid_argument msg ->
+      Lsp_io.log_error "Invalid@ value@ for@ configuration@ item@ %s:@ %s"
+        key msg;
+      false
+  in
+  List.fold_left begin fun u (key, update) ->
+    update_config assoc key update project || u
+  end false [
+    "dialect", update_dialect;
+    "source-format", update_source_format;
+  ]
 
 (** Caching *)
 

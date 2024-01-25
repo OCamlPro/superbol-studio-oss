@@ -102,6 +102,8 @@ let save ?(verbose = false) filename toml =
     if verbose then
       Pretty.error "Updated file `%s'@." filename;
     toml.checksum <- Digest.string s
+  else if verbose then
+    Pretty.error "Leaving `%s' as is@." filename
 
 (* --- *)
 

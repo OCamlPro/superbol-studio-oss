@@ -28,6 +28,9 @@ val read_message: unit -> Jsonrpc.Packet.t
     output. *)
 val send_response: Jsonrpc.Response.t -> unit
 
+(** [send_request required] sends out a json RPC request on standard output. *)
+val send_request: Jsonrpc.Request.t -> unit
+
 (** [send_notification notif] sends out a json RPC notification on standard
     output. *)
 val send_notification: Jsonrpc.Notification.t -> unit

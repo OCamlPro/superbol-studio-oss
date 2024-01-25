@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2024 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,14 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?enable_client_configs: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_server.config
+open Lsp_server.TYPES
 
-val run
-  : config: Lsp_server.config
-  -> Lsp_server.exit_status
+let handle (Jsonrpc.Response.{ id; result } as response) state =
+  match id, result, state with
+  | `Int id, Ok json, Running registry ->
+      Running (Lsp_server.on_response id json registry)
+  | `Int _, Error e, Running _ ->
+      Jsonrpc.Response.Error.raise e
+  | _ ->
+      Pretty.error "Unexpected@ response:@ %S@."
+        (Yojson.Safe.to_string @@ Jsonrpc.Response.yojson_of_t response);
+      state

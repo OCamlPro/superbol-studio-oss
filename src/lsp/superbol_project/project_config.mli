@@ -38,6 +38,10 @@ type t = config
 
 val new_default: unit -> t
 
+val cobol_config_from_dialect_name
+  : string
+  -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
 val load_file

@@ -16,15 +16,18 @@
 open Ez_file.V1
 open Ez_file.V1.EzFile.OP
 
-(** [config ~project_layout ~enable_caching ~fallback_storage_directory ()]
-    creates an LSP configuration structure for identifying and managing
-    projects.
+(** [config ~project_layout ~enable_caching ~enable_client_configs
+    ~fallback_storage_directory ()] creates an LSP configuration structure for
+    identifying and managing projects.
 
     - [project_layout] describes the layout of projects to be managed by the
       LSP;
 
     - [enable_caching] (defaulting to [true]) permits the storage of
-      pre-computed data, to allow faster LSP restarts and re-opening documents;
+      pre-computed data, to allow faster LSP restarts;
+
+    - [enable_client_configs] (defaulting to [false]) enables requests for
+      configuration settings to the client;
 
     - [fallback_storage_directory], when provided (and if [enable_caching]
       holds), is the name of a directory that is used to store a cache whenever
@@ -33,6 +36,7 @@ open Ez_file.V1.EzFile.OP
 let config
     ~(project_layout: Lsp_project.layout)
     ?(enable_caching = true)
+    ?(enable_client_configs = false)
     ?(fallback_storage_directory: string option)
     () =
   let cache_storage: Lsp_project_cache.storage =
@@ -63,6 +67,7 @@ let config
       cache_verbose = true;
     };
     project_layout;
+    enable_client_configs;
   }
 
 (** Start the lsp server, listening and responding on stdin and stdout.  This is
@@ -78,24 +83,31 @@ let run ~config =
     | Jsonrpc.Packet.Request r ->
         continue @@ reply @@ Lsp_request.handle r state
     | Jsonrpc.Packet.Batch_call calls ->
-        batch calls state
-    | Jsonrpc.Packet.Response _ | Batch_response _ ->
-        Pretty.error "Response@ recieved@ unexpectedly@.";
-        continue state
+        batch_calls calls state
+    | Jsonrpc.Packet.Response r ->
+        continue @@ Lsp_response.handle r state
+    | Jsonrpc.Packet.Batch_response resps ->
+        batch_responses resps state
     | exception End_of_file ->
         Lsp_request.shutdown state;
         Error "Premature end of input stream"                    (* exit loop *)
     | exception Lsp_io.Parse_error msg ->
         Lsp_io.pretty_notification ~type_:Error "%s" msg;
         Error msg                                                (* exit loop *)
-  and batch calls state =
+  and batch_calls calls state =
     match calls with
     | [] ->
         continue state
     | `Notification n :: calls' ->
-        batch calls' @@ Lsp_notif.handle n state
+        batch_calls calls' @@ Lsp_notif.handle n state
     | `Request n :: calls' ->
-        batch calls' @@ reply @@ Lsp_request.handle n state
+        batch_calls calls' @@ reply @@ Lsp_request.handle n state
+  and batch_responses resps state =
+    match resps with
+    | [] ->
+        continue state
+    | resp :: resps ->
+        batch_responses resps @@ Lsp_response.handle resp state
   and reply (state, response) =
     Lsp_io.send_response response;
     state

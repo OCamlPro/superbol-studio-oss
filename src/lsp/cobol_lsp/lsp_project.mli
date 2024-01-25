@@ -78,9 +78,14 @@ module SET: sig
 end
 module MAP: Map.S with type key = t
 
+(** Config *)
+
+val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
+
 (** Miscellaneous *)
 
 val rootdir: t -> rootdir
+val rooturi: t -> Lsp.Uri.t
 val config: t -> Superbol_project.Config.t
 val string_of_rootdir: rootdir -> string
 val relative_path_for: uri:Lsp.Uri.t -> t -> string

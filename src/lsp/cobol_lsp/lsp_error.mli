@@ -15,4 +15,5 @@
     messages. *)
 
 val request_failed: _ Pretty.func
+val invalid_params: _ Pretty.func
 val internal: _ Pretty.func

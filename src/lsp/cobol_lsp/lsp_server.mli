@@ -18,20 +18,25 @@ module TYPES: sig
   type config = {
     project_layout: Lsp_project.layout;
     cache_config: Lsp_project_cache.config;
+    enable_client_configs: bool;
   }
 
   type params = {
     config: config;
     root_uri: Lsp.Types.DocumentUri.t option;
     workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
+    with_semantic_tokens: bool;
   }
 
   type registry = private {
     projects: Lsp_project.SET.t;
     docs: Lsp_document.t URIMap.t;
     indirect_diags: Lsp_diagnostics.t URIMap.t;
+    pending_tasks: delayed_continuations;
     params: params;
   }
+
+  and delayed_continuations
 
   type state =
     | NotInitialized of config
@@ -53,6 +58,7 @@ end
 include module type of TYPES
   with type config = TYPES.config
    and type params = TYPES.params
+   and type delayed_continuations = TYPES.delayed_continuations
    and type registry = TYPES.registry
    and type state = TYPES.state
    and type exit_status = TYPES.exit_status
@@ -82,6 +88,12 @@ val find_document
 
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t
+
+val on_response
+  : int -> Lsp.Import.Json.t -> t -> t
+
+val on_client_config_change
+  : t -> t
 
 (** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches

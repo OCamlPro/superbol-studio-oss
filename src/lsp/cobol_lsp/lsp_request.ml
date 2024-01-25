@@ -52,17 +52,20 @@ let initialize ~config (params: InitializeParams.t) =
     | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
     | _ -> Option.to_list root_uri
   in
-  Pretty.error "Initializing for workspace folders: %a@."
-    Pretty.(list string)
+  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a@."
+    Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
     (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
+  let capabilities = Lsp_capabilities.reply params.capabilities in
   let result =
     InitializeResult.create ()
       ~serverInfo:(InitializeResult.create_serverInfo ()
                      ~name:"SuperBOL LSP Server"
                      ~version:Version.version)
-      ~capabilities:(Lsp_capabilities.reply params.capabilities)
+      ~capabilities
   in
-  Ok (result, Initialized { root_uri; workspace_folders; config })
+  let with_semantic_tokens = capabilities.semanticTokensProvider <> None in
+  Ok (result, Initialized { root_uri; workspace_folders; config;
+                            with_semantic_tokens })
 
 (** {3 Shutdown} *)
 

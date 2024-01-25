@@ -24,6 +24,8 @@ let make ~bundled_superbol () = {
   language_client = None
 }
 
+let client { language_client; _ } = language_client
+
 let stop_language_server t =
   match t.language_client with
   | None -> Promise.return ()

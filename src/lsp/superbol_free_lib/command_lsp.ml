@@ -29,7 +29,10 @@ let run_lsp ~enable_caching ~storage =
   in
   let lsp_config =
     Cobol_lsp.config ()
-      ~enable_caching ~project_layout ?fallback_storage_directory
+      ~enable_caching
+      ~enable_client_configs:true
+      ~project_layout
+      ?fallback_storage_directory
   in
   match Cobol_lsp.run ~config:lsp_config with
   | Ok () -> ()

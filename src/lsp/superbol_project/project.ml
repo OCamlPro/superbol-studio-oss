@@ -108,8 +108,8 @@ let absolute_path_for ~filename { rootdir; _ } =
   then filename       (* in case the file is not within its project directory *)
   else rootdir // filename
 
-let save_config { config_filename; config; _ } =
-  Project_config.save ~config_filename config
+let save_config ?verbose { config_filename; config; _ } =
+  Project_config.save ?verbose ~config_filename config
 
 (* Caching *)
 
@@ -134,7 +134,9 @@ let of_cache ~rootdir ~layout cached =
 module M = struct
   type nonrec t = t
   let compare { rootdir = d1; _ } { rootdir = d2; _ } = String.compare d1 d2
+  let equal { rootdir = d1; _ } { rootdir = d2; _ } = String.equal d1 d2
 end
+let have_same_rootdirs = M.equal
 
 module SET = struct
   include Set.Make (M)

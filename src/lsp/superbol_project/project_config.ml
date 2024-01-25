@@ -125,7 +125,7 @@ let config_repr config ~name =
 
 let config_section_name = "cobol"
 
-let config_from_dialect_name dialect_name =
+let cobol_config_from_dialect_name dialect_name =
   try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
@@ -164,7 +164,7 @@ let load_file ?verbose config_filename =
   let load_section keys toml =
     let section = TOML.get keys toml in
     DIAGS.map_result
-      (config_from_dialect_name @@ get_dialect section)
+      (cobol_config_from_dialect_name @@ get_dialect section)
       ~f:(fun cobol_config ->
           { default with
             cobol_config;

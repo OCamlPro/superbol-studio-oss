@@ -22,5 +22,8 @@ let error ~code fmt =
 let request_failed fmt =
   error ~code:Jsonrpc.Response.Error.Code.RequestFailed fmt
 
+let invalid_params fmt =
+  error ~code:Jsonrpc.Response.Error.Code.InvalidParams fmt
+
 let internal fmt =
   error ~code:Jsonrpc.Response.Error.Code.InternalError fmt

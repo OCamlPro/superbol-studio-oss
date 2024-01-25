@@ -160,6 +160,12 @@ module StaticFeature : sig
     -> t
 end
 
+module DidChangeConfiguration : sig
+  include Ojs.T
+
+  val create : settings:Ojs.t -> unit -> t
+end
+
 module LanguageClient : sig
   include Js.T
 
@@ -190,4 +196,6 @@ module LanguageClient : sig
     -> Jsonoo.t Promise.t
 
   val registerFeature : t -> feature:StaticFeature.t -> unit
+
+  val sendNotification : t -> string -> Ojs.t -> unit
 end
