@@ -93,12 +93,31 @@ let initialize ~config (params: InitializeParams.t) =
                             with_client_config_watcher;
                             with_client_file_watcher })
 
+
 (** {3 Shutdown} *)
 
 let handle_shutdown registry =
   Lsp_server.save_project_caches registry
 
+
+(** {3 Custom commands for configuration management} *)
+
+
+let handle_write_project_config_command param registry =
+  match
+    match (param: Jsonrpc.Structured.t) with
+    | `Assoc assoc ->
+        let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+        Ok (Lsp_server.on_write_project_config_command uri registry)
+    | _ ->
+        Error ()
+  with
+  | Ok registry -> Ok (`Bool true, Running registry)
+  | Error () | exception _ -> Ok (`Bool false, Running registry)
+
+
 (** {3 Definitions} *)
+
 
 let focus_on_name_in_defintions = true
 
@@ -514,11 +533,14 @@ let on_request
     | WillDeleteFiles  (* DeleteFilesParams.t.t *) _
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
       ->
-      Lsp_debug.message "Lsp_request: unhandled request";
-      Error (UnhandledRequest client_req)
+        Lsp_debug.message "Lsp_request: unhandled request";
+        Error (UnhandledRequest client_req)
+    | UnknownRequest { meth = "superbol/writeProjectConfiguration";
+                       params = Some param } ->
+        handle_write_project_config_command param registry
     | UnknownRequest { meth; _ } ->
-      Lsp_debug.message "Lsp_request. unknown request";
-      Error (UnknownRequest meth)
+        Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
+        Error (UnknownRequest meth)
 
 let handle (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with

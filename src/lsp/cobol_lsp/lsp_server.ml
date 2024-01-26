@@ -348,6 +348,9 @@ let init ~params : registry =
   maybe_start_watching_client_config
 
 
+(** {3 Configuration} *)
+
+
 let extract_docs_of ~project registry =
   let out_of_date_docs, docs =
     URIMap.partition begin fun _ doc ->
@@ -446,6 +449,20 @@ let create_or_retrieve_project_promise ~uri registry =
     if registry.params.config.enable_client_configs
     then request_n_use_client_config_for ~project
     else now project
+
+
+let on_write_project_config_command uri registry =
+  let write_project_config project registry =
+    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ document@ at@ %s"
+      (Lsp.Uri.to_string uri);
+    Superbol_project.save_config ~verbose:true project;
+    registry
+  in
+  perform write_project_config
+    ~after:(create_or_retrieve_project_promise ~uri registry)
+
+
+(** {2 Handling of document notifications} *)
 
 
 let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)

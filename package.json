@@ -17,6 +17,11 @@
         "command": "superbol.server.restart",
         "title": "Restart Language Server",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.write.project.config",
+        "title": "Write Project Configuration",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {

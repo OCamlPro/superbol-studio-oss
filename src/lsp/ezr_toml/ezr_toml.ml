@@ -113,7 +113,9 @@ let save ?(verbose = false) filename toml =
       ) false toml.update_hooks
   in
 
-  if modified then
+  if modified || (* force if file does not exist anymore (removed since load): *)
+     not (Sys.file_exists filename)
+  then
     let s = TOML.to_string toml.toml in
     File_utils.write_file ~mkdir:true filename s;
     if verbose then

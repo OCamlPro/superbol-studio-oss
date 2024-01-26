@@ -397,7 +397,12 @@ let contributes =
       Manifest.command ()
         ~command:"superbol.server.restart"
         ~title:"Restart Language Server"
+        ~category:"SuperBOL";
+      Manifest.command ()
+        ~command:"superbol.write.project.config"
+        ~title:"Write Project Configuration"
         ~category:"SuperBOL"
+        (* ~enablement:"!inDebugMode" *);
     ]
 
 let manifest =

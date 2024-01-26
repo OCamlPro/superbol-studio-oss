@@ -100,6 +100,9 @@ val on_client_config_change
 val on_watched_file_changes
   : Lsp.Types.FileEvent.t list -> t -> t
 
+val on_write_project_config_command
+  : Lsp.Uri.t -> t -> t
+
 (** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches
   : t -> unit
