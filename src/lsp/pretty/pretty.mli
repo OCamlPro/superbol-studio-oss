@@ -53,6 +53,11 @@ val record
   -> ?closing:'a printer
   -> 'a printer list
   -> 'a printer
+val delayed_record
+  : ?opening:unit printer
+  -> ?closing:unit printer
+  -> unit printer list
+  -> delayed
 val vfield
   : ?label: string printer
   -> ?sep: unit printer

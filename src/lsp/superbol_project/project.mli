@@ -121,6 +121,8 @@ val config: t -> Project_config.t
     directory. *)
 val save_config: ?verbose:bool -> t -> unit
 
+val reload_config: ?verbose:bool -> t -> diagnostics
+
 (** {1 Collections} *)
 
 val have_same_rootdirs: t -> t -> bool

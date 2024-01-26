@@ -26,6 +26,8 @@ module TYPES: sig
     root_uri: Lsp.Types.DocumentUri.t option;
     workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
     with_semantic_tokens: bool;
+    with_client_config_watcher: bool;
+    with_client_file_watcher: bool;
   }
 
   type registry = private {
@@ -94,6 +96,9 @@ val on_response
 
 val on_client_config_change
   : t -> t
+
+val on_watched_file_changes
+  : Lsp.Types.FileEvent.t list -> t -> t
 
 (** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches

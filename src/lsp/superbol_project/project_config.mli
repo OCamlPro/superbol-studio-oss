@@ -55,6 +55,12 @@ val save
   -> t
   -> unit
 
+val reload
+  : ?verbose:bool
+  -> config_filename:string
+  -> t
+  -> Cobol_common.Diagnostics.diagnostics
+
 (** [libpath_for ~filename project] constructs a list of directory names where
     copybooks are looked up, for a given source file name, in a project with the
     given configuration. *)

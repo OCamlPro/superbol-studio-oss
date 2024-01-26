@@ -76,6 +76,11 @@ val add_section_update: toml_handle -> string -> (name: string -> section) -> un
     [Sys_error] if the file exists but is not readable. *)
 val load: ?verbose: bool -> string -> toml_handle
 
+(** [reload ~verbose filename handle] reloads the TOML file [filename].  Resets
+    the handle to an empty TOML if [filename] does not exit.  Raises [Sys_error]
+    if the file exists but is not readable. *)
+val reload: ?verbose: bool -> string -> toml_handle -> unit
+
 (** [save ~verbose filename handle] triggers update hooks (that update the TOML
     representation), and save it in [filename] if the representation has been
     modified. *)

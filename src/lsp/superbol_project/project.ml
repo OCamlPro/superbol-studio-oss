@@ -111,6 +111,9 @@ let absolute_path_for ~filename { rootdir; _ } =
 let save_config ?verbose { config_filename; config; _ } =
   Project_config.save ?verbose ~config_filename config
 
+let reload_config ?verbose { config_filename; config; _ } =
+  Project_config.reload ?verbose ~config_filename config
+
 (* Caching *)
 
 (** Persistent representation (for caching) *)

@@ -45,9 +45,9 @@ let show_n_forget_diagnostics ?(force = false) { result = project; diags } =
   project
 
 let on_project_config_error e ~rootdir ~layout =
-  Lsp_io.pretty_notification ~type_:Error
-    "Error@ in@ project@ configuration@ (%a):@ resorting@ to@ system@ defaults.\
-    " Superbol_project.Diagnostics.pp_error e;
+  Lsp_io.log_error "Error@ in@ project@ configuration:@ resorting@ to@ system@ \
+                    defaults.";
+  Lsp_io.log_info "Cause:@ %a" Superbol_project.Diagnostics.pp_error e;
   let diags = DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e in
   show_n_forget_diagnostics ~force:true @@
   DIAGS.result ~diags @@ Superbol_project.with_default_config ~rootdir ~layout
@@ -125,6 +125,20 @@ let update_project_config assoc project =
     "dialect", update_dialect;
     "source-format", update_source_format;
   ]
+
+let reload_project_config project =
+  (* TODO: only return [true] whenever a the configuration has changed. *)
+  begin
+    ignore @@
+    show_n_forget_diagnostics ~force:true @@
+    try
+      DIAGS.result project ~diags:(Superbol_project.reload_config project)
+    with Superbol_project.Config.ERROR e ->
+      DIAGS.result project
+        ~diags:(DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e)
+  end;
+  true
+
 
 (** Caching *)
 

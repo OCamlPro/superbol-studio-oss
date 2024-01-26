@@ -173,6 +173,8 @@ let vfield ?(label = Fmt.(styled `Yellow string)) ?(sep = Fmt.any ": ")
 
 let record ?(opening = Fmt.any "{@;<1 2>") ?(closing = Fmt.any "@;}") fields =
   Fmt.(opening ++ record fields ++ closing)
+let delayed_record ?opening ?closing fields ppf =
+  record ?opening ?closing fields ppf ()
 
 type 'a conditional_field =
   | T of 'a printer

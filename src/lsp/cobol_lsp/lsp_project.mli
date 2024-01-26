@@ -80,6 +80,7 @@ module MAP: Map.S with type key = t
 
 (** Config *)
 
+val reload_project_config: t -> bool
 val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
 
 (** Miscellaneous *)

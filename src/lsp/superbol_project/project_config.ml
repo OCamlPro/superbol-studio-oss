@@ -160,8 +160,7 @@ let get_indent_config toml =
   with Not_found -> default_indent_config
 
 let load_file ?verbose config_filename =
-  let toml_handle = Ezr_toml.load ?verbose config_filename in
-  let load_section keys toml =
+  let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
     DIAGS.map_result
       (cobol_config_from_dialect_name @@ get_dialect section)
@@ -170,13 +169,14 @@ let load_file ?verbose config_filename =
             cobol_config;
             source_format = get_source_format section;
             libpath = get_libpath section;
-            toml_handle = toml_handle ;
+            toml_handle = toml_handle;
             indent_config = get_indent_config section})
   in
   try
+    let toml_handle = Ezr_toml.load ?verbose config_filename in
     let DIAGS.{ result; _ } as config =
       let toml = Ezr_toml.toml toml_handle in
-      try load_section toml [config_section_name]
+      try load_section toml_handle toml [config_section_name]
       with Not_found -> DIAGS.result { default with toml_handle }
     in
     Ezr_toml.add_section_update toml_handle
@@ -187,6 +187,26 @@ let load_file ?verbose config_filename =
 
 let save ?verbose ~config_filename config =
   Ezr_toml.save ?verbose config_filename config.toml_handle
+
+let reload ?verbose ~config_filename config =
+  let reload_section keys toml =
+    let section = TOML.get keys toml in
+    DIAGS.forget_result @@
+    DIAGS.map_result                               (* TODO: handle exceptions *)
+      (cobol_config_from_dialect_name @@ get_dialect section)
+      ~f:(fun cobol_config ->
+          config.cobol_config <- cobol_config;
+          config.source_format <- get_source_format section;
+          config.libpath <- get_libpath section;
+          config.indent_config <- get_indent_config section)
+  in
+  try
+    Ezr_toml.reload ?verbose config_filename config.toml_handle;
+    let toml = Ezr_toml.toml config.toml_handle in
+    try reload_section toml [config_section_name]
+    with Not_found -> DIAGS.Set.none                                     (* ? *)
+  with TOML.Types.Error (loc, _code, error) ->
+    raise @@ ERROR (Invalid_toml { loc; error })
 
 (* --- *)
 

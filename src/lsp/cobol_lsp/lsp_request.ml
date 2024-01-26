@@ -52,10 +52,35 @@ let initialize ~config (params: InitializeParams.t) =
     | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
     | _ -> Option.to_list root_uri
   in
-  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a@."
+  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a"
     Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
     (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
   let capabilities = Lsp_capabilities.reply params.capabilities in
+  let with_semantic_tokens =
+    capabilities.semanticTokensProvider <> None
+  in
+  let with_client_config_watcher = match params.capabilities.workspace with
+    | Some { didChangeConfiguration = Some { dynamicRegistration }; _ } ->
+        (* Note: for now we rely on the client's dynamic registration ability;
+           for clients that do not support that it could just be simpler to
+           trigger server restarts when relevant changes happen. *)
+        Option.value ~default:false dynamicRegistration
+    | _ ->
+        false
+  and with_client_file_watcher = match params.capabilities.workspace with
+    | Some { didChangeWatchedFiles = Some { dynamicRegistration; _ }; _ } ->
+        (* Note: for now we rely on the client's dynamic registration ability;
+           for clients that do not support that it could just be simpler to
+           trigger server restarts when relevant changes happen. *)
+        Option.value ~default:false dynamicRegistration
+    | _ ->
+        false
+  in
+  Lsp_io.log_info "Negociated@ server@ parameters:@\n@[%t@]" @@
+  Pretty.delayed_record [
+    Fmt.(field "client_config_watcher" (fun _ -> with_client_config_watcher) bool);
+    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) bool);
+  ];
   let result =
     InitializeResult.create ()
       ~serverInfo:(InitializeResult.create_serverInfo ()
@@ -63,9 +88,10 @@ let initialize ~config (params: InitializeParams.t) =
                      ~version:Version.version)
       ~capabilities
   in
-  let with_semantic_tokens = capabilities.semanticTokensProvider <> None in
   Ok (result, Initialized { root_uri; workspace_folders; config;
-                            with_semantic_tokens })
+                            with_semantic_tokens;
+                            with_client_config_watcher;
+                            with_client_file_watcher })
 
 (** {3 Shutdown} *)
 
