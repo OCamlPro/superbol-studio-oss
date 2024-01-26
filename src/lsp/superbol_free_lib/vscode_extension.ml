@@ -286,6 +286,7 @@ let contributes =
            Manifest.PROPERTY.string "superbol.lsp-path"
              ~title:"SuperBOL executable"
              ~default:""
+             ~scope:"machine"
              ~description:
                "Name of the `superbol-free` executable if available in PATH; may \
                 be an absolute path otherwise. Leave empty to use the bundled \
@@ -294,6 +295,7 @@ let contributes =
            Manifest.PROPERTY.string "superbol.cobc-path"
              ~title:"GnuCOBOL compiler executable"
              ~default:"cobc"
+             ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL compiler executable.";
 
            (* Debugger-specific: *)
@@ -309,11 +311,13 @@ let contributes =
            Manifest.PROPERTY.string "superbol.debugger.gdb-path"
              ~title:"GNU debugger executable"
              ~default:"gdb"
+             ~scope:"machine-overridable"
              ~description:"Path to the GNU debugger executable.";
 
            Manifest.PROPERTY.string "superbol.debugger.libcob-path"
              ~title:"GnuCOBOL runtime library"
              ~default:"cobc"
+             ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL runtime library file.";
          ])
     ~taskDefinitions: [

@@ -80,13 +80,15 @@
           "title": "SuperBOL executable",
           "type": "string",
           "default": "",
-          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available."
+          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
+          "scope": "machine"
         },
         "superbol.cobc-path": {
           "title": "GnuCOBOL compiler executable",
           "type": "string",
           "default": "cobc",
-          "description": "Path to the GnuCOBOL compiler executable."
+          "description": "Path to the GnuCOBOL compiler executable.",
+          "scope": "machine-overridable"
         },
         "superbol.debugger.display-variable-attributes": {
           "type": "boolean",
@@ -98,13 +100,15 @@
           "title": "GNU debugger executable",
           "type": "string",
           "default": "gdb",
-          "description": "Path to the GNU debugger executable."
+          "description": "Path to the GNU debugger executable.",
+          "scope": "machine-overridable"
         },
         "superbol.debugger.libcob-path": {
           "title": "GnuCOBOL runtime library",
           "type": "string",
           "default": "cobc",
-          "description": "Path to the GnuCOBOL runtime library file."
+          "description": "Path to the GnuCOBOL runtime library file.",
+          "scope": "machine-overridable"
         }
       }
     },
