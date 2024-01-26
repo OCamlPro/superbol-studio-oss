@@ -14,7 +14,7 @@
 
 type t
 
-val make : bundled_superbol:string -> unit -> t
+val make : bundled_superbol:string -> ?storage_uri: Vscode.Uri.t -> unit -> t
 
 val stop_language_server : t -> unit Promise.t
 

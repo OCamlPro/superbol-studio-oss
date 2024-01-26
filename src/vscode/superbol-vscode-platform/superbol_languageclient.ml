@@ -12,12 +12,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let serverOptions ~bundled_superbol =
+let serverOptions ~bundled_superbol ~storage_uri =
+  let storage_options = match storage_uri with
+    | None ->
+        []
+    | Some uri ->
+        [ "--storage-directory"; Vscode.Uri.fsPath uri ] (* CHECKME: or .path? *)
+  in
   Vscode_languageclient.ServerOptions.create ()
     ~command:(match Superbol_workspace.superbol_exe () with
         | None -> bundled_superbol
         | Some cmd -> cmd)
-    ~args:["lsp"]
+    ~args: ("lsp" :: storage_options)
 
 let clientOptions () =
   Vscode_languageclient.ClientOptions.create ()
