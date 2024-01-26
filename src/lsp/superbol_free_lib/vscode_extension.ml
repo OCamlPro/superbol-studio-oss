@@ -343,7 +343,7 @@ let contributes =
                (with_superbol_toml_note
                   "File extensions for copybook resolution")
              ~default:Cobol_common.Copybook.copybook_extensions
-             ~order:1;
+             ~order:4;
 
            (* Paths *)
 
@@ -372,6 +372,16 @@ let contributes =
                "Force reporting of syntax diagnostics for dialects other than \
                 ``COBOL85``."
              ~order:21;
+
+           Manifest.PROPERTY.bool "superbol.cacheInGlobalStorage"
+             ~default:false
+             ~markdownDescription:
+               "Use storage provided by Visual Studio Code for caching.  When \
+                this setting is set to *false*, the cache related to the \
+                contents of a given workspace folder *f* is stored in a file \
+                named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
+                removed automatically, whatever their location."
+             ~order:22;
 
            (* Debugger-specific: *)
 

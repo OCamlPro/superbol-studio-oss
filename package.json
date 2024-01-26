@@ -128,7 +128,7 @@
             "cbx"
           ],
           "items": "string",
-          "order": 1
+          "order": 4
         },
         "superbol.cobc-path": {
           "title": "GnuCOBOL Compiler Executable",
@@ -151,6 +151,12 @@
           "type": "boolean",
           "default": false,
           "order": 21
+        },
+        "superbol.cacheInGlobalStorage": {
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching.  When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.",
+          "type": "boolean",
+          "default": false,
+          "order": 22
         },
         "superbol.debugger.display-variable-attributes": {
           "title": "Display Variable Attributes",
