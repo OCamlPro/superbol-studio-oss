@@ -29,7 +29,12 @@ module type MANAGER = sig
   val id: string
 
   (** [limits loc] creates and returns the left- and right-limit to the given
-      location. *)
+      location.
+
+      Note: if [loc] overlaps with locations that have already been fed to this
+      function, then {!restart_at} must first be called with a limit that is
+      strictly at the left of [loc] ({i i.e,} that comes earlier in the stream
+      of tokens). *)
   val limits: Cobol_common.Srcloc.srcloc -> limit * limit
 
   (** [link_limits left right] links the right limit of a token [t] to the left
