@@ -544,7 +544,7 @@ let rec rewind_n_parse
       let pp = ps.preproc.pp in
       let pp = pp_rewind ~new_position:event.preproc_position pp in
       let ps = { ps with preproc = { ps.preproc with pp } } in
-      Option.iter Overlay_manager.restart_at ps.prev_limit;
+      Option.iter (fun at -> Overlay_manager.restart ~at ()) ps.prev_limit;
       let ps, tokens = produce_tokens ps in
       { rwps with stage = Trans (ps, tokens, env); store }
     with Not_found ->                     (* rewinding before first checkpoint *)

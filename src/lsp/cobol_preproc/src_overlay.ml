@@ -25,7 +25,7 @@ module type MANAGER = sig
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
   val dummy_limit: limit
-  val restart_at: limit -> unit
+  val restart: ?at:limit -> unit -> unit
 end
 
 (** Overlay limits (internal) *)
@@ -162,7 +162,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   with Not_found ->
     join_failure (s, e)
 
-let restart_at ctx _limit =
+let restart ?at:_ ctx =
   Links.clear ctx.cache
 
 module New_manager (Id: sig val name: string end) () : MANAGER = struct
@@ -172,5 +172,5 @@ module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
   let dummy_limit = Lexing.dummy_pos
-  let restart_at = restart_at ctx
+  let restart ?at () = restart ?at ctx
 end

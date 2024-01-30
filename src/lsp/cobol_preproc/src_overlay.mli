@@ -32,7 +32,7 @@ module type MANAGER = sig
       location.
 
       Note: if [loc] overlaps with locations that have already been fed to this
-      function, then {!restart_at} must first be called with a limit that is
+      function, then {!restart} must first be called with a limit that is
       strictly at the left of [loc] ({i i.e,} that comes earlier in the stream
       of tokens). *)
   val limits: Cobol_common.Srcloc.srcloc -> limit * limit
@@ -51,10 +51,11 @@ module type MANAGER = sig
       but not given to {!link_limits}. *)
   val dummy_limit: limit
 
-  (** [restart_at limit] instructs the manager that limits on the right of (but
-      not including) [limit] are now outdated and should not be relied upon.  At
+  (** [restart ~at ()] instructs the manager that limits on the right of (but
+      not including) [at] are now outdated and should not be relied upon.  If
+      [at] is not provided, a restart from the left-most limit is assumed.  At
       the moment this just clears an internal cache. *)
-  val restart_at: limit -> unit
+  val restart: ?at:limit -> unit -> unit
 
 end
 
