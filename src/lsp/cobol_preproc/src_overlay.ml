@@ -91,8 +91,9 @@ let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
     | Some lexloc -> lexloc
     | _ -> Limit.make_virtual (), Limit.make_virtual ()
   in
-  Links.replace ctx.right_of s (loc, e);  (* Replace to deal with duplicates. *)
-  Links.remove ctx.cache s;               (* Manually remove from cache. *)
+  Links.replace ctx.right_of s (loc, e); (* Replace to deal with duplicates. *)
+  Links.remove ctx.over_right_gap s;     (* `s' could have been a right-limit *)
+  Links.remove ctx.cache s;              (* Manually remove from cache. *)
   s, e
 
 (** Links token limits *)
