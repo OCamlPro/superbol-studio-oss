@@ -16,6 +16,10 @@ open EZCMD.TYPES
 
 
 let run_lsp ~enable_caching ~storage =
+  Cobol_lsp.INTERNAL.Debug.message "LSP Started with pid %d\n%!"
+    (Unix.getpid ());
+  Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.INTERNAL.Debug.debug_oc;
+
   let project_layout, fallback_storage_directory =
     match storage with
     | None ->

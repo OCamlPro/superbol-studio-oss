@@ -42,6 +42,8 @@ let public_subcommands = [
 
   Command_project.init_cmd;
   Command_project.config_cmd;
+
+  Command_util.util_detect_cycle_cmd;
 ]
 
 let () =
