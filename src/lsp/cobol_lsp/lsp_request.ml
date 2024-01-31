@@ -406,7 +406,7 @@ let handle_hover registry (params: HoverParams.t) =
     Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
   try_doc registry params.textDocument
-    ~f:begin fun ~doc:{ project; artifacts = { pplog; _ }; _ } ->
+    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
       match find_hovered_pplog_event pplog with
       | Some Replacement { matched_loc = loc;
                            replacement_text; _ } ->
@@ -415,13 +415,7 @@ let handle_hover registry (params: HoverParams.t) =
       | Some FileCopy { copyloc = loc;
                         status = CopyDone lib | CyclicCopy lib } ->
           let text = EzFile.read_file lib in
-          (* TODO: grab source-format from preprocessor state? *)
-          let module Config = (val project.config.cobol_config) in
-          let mdlang = match Config.format#value with
-            | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
-            | SF _ | Auto -> "cobol"
-          in
-          Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
+          Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```" text
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
       | Some CompilerDirective _
