@@ -117,3 +117,47 @@ let util_detect_cycle_cmd =
               in the lines, and simplify them."
         ];
       ] )
+
+let wc file =
+  let st = Unix.lstat file in
+  let file_size = st.Unix.st_size in
+
+  let ic = open_in file in
+  let rec iter nlines maxline minline =
+    match input_line ic with
+    | exception End_of_file ->
+      close_in ic;
+      Printf.eprintf "%s:\n" file;
+      Printf.eprintf "   file size: %d\n" file_size;
+      Printf.eprintf "   nbr lines: %d\n" nlines;
+      Printf.eprintf "   min line : %d\n" minline;
+      Printf.eprintf "   max line : %d\n" maxline;
+    | line ->
+      let len = String.length line in
+      let maxline = max maxline len in
+      let minline = min minline len in
+      iter (nlines+1) maxline minline
+  in
+  iter 0 0 file_size
+
+let util_wc_cmd =
+  let files = ref [] in
+  EZCMD.sub
+    "util wc"
+    (fun () ->
+       List.iter wc !files
+    )
+    ~args:[
+
+      [], Arg.Anons (fun list -> files := list),
+      EZCMD.info ~docv:"FILES" "Files to wc";
+    ]
+    ~doc: "Stats on file of lines (without taking UTF8 chars into account)"
+    ~man: ( about @@ [
+        `S "DESCRIPTION";
+        `Blocks [
+          `P "This command will print different statistics on a file \
+              of lines. Contrarily to wc, it will not take into \
+              account UTF8 chars for the max line length."
+        ];
+      ] )
