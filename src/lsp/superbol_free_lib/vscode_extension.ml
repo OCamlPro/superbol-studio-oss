@@ -263,22 +263,48 @@ let contributes =
       Manifest.breakpoint "cobol";
     ]
     ~configuration:
-      (Manifest.configuration ~title:"SuperBOL COBOL"
+      (let with_superbol_toml_note md =
+         md ^ "\n\n*(May be overriden in project-specific `superbol.toml` files)*."
+       in
+       Manifest.configuration ~title:"SuperBOL COBOL"
          [
-           Manifest.PROPERTY.array "superbol.cobol.copybooks"
-             ~title:"Copybook paths"
-             ~description:"List of copybooks paths";
-
            Manifest.PROPERTY.enum "superbol.cobol.dialect"
              ~cases:Cobol_config.DIALECT.all_canonical_names
-             ~description: "Default COBOL dialect; \"default\" is equivalent to \
-                            \"gnucobol\""
+             ~markdownDescription:
+               (with_superbol_toml_note
+                  "Default COBOL dialect; \"default\" is equivalent to \
+                   \"gnucobol\".")
              ~default:(`String Cobol_config.(DIALECT.to_string Default));
 
            Manifest.PROPERTY.enum "superbol.cobol.source-format"
-             ~description: "Default source reference-format"
+             ~markdownDescription:
+               (with_superbol_toml_note "Default source reference-format.")
              ~cases:Cobol_config.Options.all_format_names
              ~default:(`String "auto");
+
+           Manifest.PROPERTY.array "superbol.cobol.copybooks"
+             ~title:"Copybook paths"
+             ~items:(`O [
+                 "type", `String "object";
+                 "required", `A [`String "dir"];
+                 "properties", `O [
+                   "dir", `O [
+                     "type", `String "string";
+                     "description", `String "Path to copybooks";
+                   ];
+                   "file-relative", `O [
+                     "type", `String "boolean";
+                   ];
+                 ];
+               ])
+             ~default:(`A [                 (* Should match `default_libpath` in
+                                               `superbol_project/project_config.ml` *)
+                 `O [
+                   "dir", `String ".";
+                 ];
+               ])
+             ~markdownDescription:
+               (with_superbol_toml_note "List of copybooks paths.");
 
            (* Paths *)
 

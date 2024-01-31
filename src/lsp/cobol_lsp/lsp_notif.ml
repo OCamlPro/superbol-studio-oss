@@ -23,8 +23,8 @@ let on_notification state notif =
       state                   (* spec indicate notif should just be discarded *)
   | Initialized params, Initialized ->
       Running (Lsp_server.init ~params)
-  | Running registry, ChangeConfiguration _ ->
-      Running (Lsp_server.on_client_config_change registry)
+  | Running registry, ChangeConfiguration { settings = changes } ->
+      Running (Lsp_server.on_client_config_changes ~changes registry)
   | Running registry, DidChangeWatchedFiles { changes } ->
       Running (Lsp_server.on_watched_file_changes changes registry)
   | Running registry, TextDocumentDidOpen params ->

@@ -16,6 +16,7 @@ open Ez_toml.V1
 type error =
   | Invalid_toml of { loc: TOML.Types.location; error: TOML.Types.error }
   | Unknown_dialect of string
+  | Unknown_source_format of string
   | Cobol_config_error of Cobol_config.Diagnostics.error
 
 let pp_error ppf = function
@@ -24,5 +25,7 @@ let pp_error ppf = function
         (TOML.string_of_location loc) (TOML.string_of_error error)
   | Unknown_dialect name ->
       Pretty.print ppf "Unknown@ dialect: `%s'" name
+  | Unknown_source_format name ->
+      Pretty.print ppf "Unknown@ reference@ source-format: `%s'" name
   | Cobol_config_error e ->
       Cobol_config.Diagnostics.pp_error ppf e

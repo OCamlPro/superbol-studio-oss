@@ -40,11 +40,24 @@ module TYPES = struct
     indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
                                                    mentioned by docs in
                                                    `docs` *)
-    pending_tasks: delayed_continuations;
+    pending_tasks: pending_tasks;
+    sub_state: sub_state;
     params: params;
   }
 
-  and delayed_continuations = {
+  and sub_state =
+    {
+      (* Internal flag used to prevent emitting a warning when loading existing
+         projects during server initialization.
+
+         During this phase, we register for "workspace/didChangeConfiguration"
+         notifications, but VSCode seems to send one global configuration change
+         directly afterwards.  We want to ignore that one, as client
+         configurations are pulled on an on-demand and per-project basis.  *)
+      ignore_next_client_config_changes: bool;
+    }
+
+  and pending_tasks = {
     delayed_id: int;
     delayed: sink_continuation IMap.t;
   }
@@ -243,9 +256,13 @@ let maybe_start_watching_config_of ~project registry =
 let start_watching_client_config registry =
   let registration =
     RegistrationParams.create ~registrations:[
+      let section = `String "superbol.cobol" in
       Registration.create ()
         ~id:"watch-client-settings"
         ~method_:"workspace/didChangeConfiguration"
+        ~registerOptions:
+          DidChangeConfigurationRegistrationOptions.(yojson_of_t @@
+                                                     create () ~section)
     ]
   in
   delay_unit registry
@@ -291,16 +308,12 @@ let load_project_cache ~rootdir
                              cache_config = config; _ }; _ };
        docs = old_docs; _ } as registry) =
   let new_docs = Lsp_project_cache.load ~config ~layout ~rootdir in
-  let new_project = match URIMap.choose_opt new_docs with
-    | Some (_, Lsp_document.{ project = p; _ }) -> Some p
-    | None -> None
-  in
   let registry =
     { registry with
       docs = URIMap.union (fun _ _old new_ -> Some new_) old_docs new_docs }
   in
-  match new_project with
-  | Some project -> add_project project registry
+  match URIMap.choose_opt new_docs with
+  | Some (_, Lsp_document.{ project; _ }) -> add_project project registry
   | None -> registry
 
 
@@ -322,30 +335,6 @@ let document_error_while_ operation doc e backtrace registry =
     (if backtrace = "" then "" else "\n" ^ backtrace);
   add_or_replace_doc doc registry
 
-
-(** {3 Initialization} *)
-
-
-let load_project_in ~dir registry =
-  let layout = registry.params.config.project_layout in
-  let project = Lsp_project.in_existing_dir dir ~layout in
-  load_project_cache ~rootdir:(Lsp_project.rootdir project) registry |>
-  add_project project
-
-
-let init ~params : registry =
-  let registry =
-    { params;
-      projects = Lsp_project.SET.empty;
-      docs = URIMap.empty;
-      indirect_diags = URIMap.empty;
-      pending_tasks = { delayed_id = 0; delayed = IMap.empty } }
-  in
-  List.fold_left begin fun registry workspace_folder_uri ->
-    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
-  end registry params.workspace_folders |>
-  URIMap.fold (fun _ -> dispatch_diagnostics) registry.docs |>
-  maybe_start_watching_client_config
 
 
 (** {3 Configuration} *)
@@ -374,38 +363,71 @@ let reload_docs_of ~project out_of_date_docs registry =
   end out_of_date_docs registry
 
 
-let request_n_use_client_config_for ~project registry =
-  (* Every call to this function should be guarded with this flag *)
+let use_client_config_for ~project (configs: Yojson.Safe.t list) registry =
+  (* Every call to this function should be guarded with this flag: *)
   assert registry.params.config.enable_client_configs;
-  let uri = Lsp_project.rooturi project in
-  await_response registry
-    ~request:(WorkspaceConfiguration
-                { items = [ ConfigurationItem.create ()
-                              ~scopeUri:(Lsp.Uri.to_string uri)
-                              ~section:"superbol.cobol" ] })
-    ~f:begin fun json_configs registry ->
-      let registry, out_of_date_docs = match json_configs with
-        | [`Assoc assoc] ->
-            if Lsp_project.update_project_config assoc project
-            then extract_docs_of ~project registry   (* configuration changed *)
-            else registry, URIMap.empty              (* no doc is outdated *)
-        | _ ->
-            Lsp_io.log_error "Invalid@ configutation@ item: %s"
-              (Yojson.Safe.to_string @@ `List json_configs);
-            registry, URIMap.empty
-      in
-      now project @@ reload_docs_of ~project out_of_date_docs registry
-    end
+  if Sys.file_exists project.Lsp_project.config_filename
+  then now project registry
+  else begin
+    let registry, out_of_date_docs = match configs with
+      | [`Assoc assoc] ->
+          if Lsp_project.update_project_config assoc project
+          then extract_docs_of ~project registry (* configuration changed *)
+          else registry, URIMap.empty            (* no doc is outdated *)
+      | _ ->
+          Lsp_io.log_error "Invalid@ configuration@ item: %s"
+            (Yojson.Safe.to_string @@ `List configs);
+          registry, URIMap.empty
+    in
+    now project @@ reload_docs_of ~project out_of_date_docs registry
+  end
 
 
-let on_client_config_change registry =
-  if registry.params.config.enable_client_configs then
+let request_n_use_client_config_for ~project
+    ?(silence_ignored_settings_warning = false) registry =
+  (* Every call to this function should be guarded with this flag: *)
+  assert registry.params.config.enable_client_configs;
+  if Sys.file_exists project.Lsp_project.config_filename
+  then begin
+    (* TODO (maybe): always carry on with the subsequent
+       "workspace/configuration" request, and check whether some of the client
+       settings don't not match with the project settings afterwards before
+       emiting the warning (in `use_client_config_for`)? *)
+    if not silence_ignored_settings_warning then
+      Lsp_io.notify_warn "New@ settings@ overriden@ by@ existing@ project@ \
+                          configuration@ file@ at@ %s.@\n@\nPlease@ edit@ this@ \
+                          file@ instead." project.config_filename;
+    now project registry
+  end else begin
+    let uri = Lsp_project.rooturi project in
+    await_response registry
+      ~request:(WorkspaceConfiguration
+                  { items = [ ConfigurationItem.create ()
+                                ~scopeUri:(Lsp.Uri.to_string uri)
+                                ~section:"superbol.cobol" ] })
+      ~f:(use_client_config_for ~project)
+  end
+
+
+let on_client_config_changes ?changes registry =
+  if not registry.params.config.enable_client_configs
+  then registry
+  else if registry.sub_state.ignore_next_client_config_changes
+  then begin
+    (* Skip the first notification that is automatically sent after registration
+       to "workspace/didChangeConfiguration" *)
+    { registry with
+      sub_state = { ignore_next_client_config_changes = false } }
+  end
+  else begin
+    (* Note we ignore the provided changes as they are not project-specific.
+       Instead, we re-request them manually on a per-project basis. *)
+    ignore changes;
     Lsp_project.SET.fold begin fun project registry ->
       ignore_promise_result @@
       request_n_use_client_config_for ~project registry
     end registry.projects registry
-  else
-    registry
+  end
 
 
 let on_project_config_file_changes changes registry =
@@ -440,26 +462,79 @@ let on_watched_file_changes changes registry =
 
 let create_or_retrieve_project_promise ~uri registry =
   let layout = registry.params.config.project_layout in
-  let rootdir = Lsp_project.rootdir_for ~uri ~layout in
   try
-    now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
+    now (Lsp_project.SET.for_ ~uri registry.projects) registry
   with Not_found ->
-    let project = Lsp_project.for_ ~rootdir ~layout in
-    add_project project registry |>
-    if registry.params.config.enable_client_configs
-    then request_n_use_client_config_for ~project
-    else now project
+    let rootdir = Lsp_project.rootdir_for ~uri ~layout in
+    try
+      now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
+    with Not_found ->
+      let project = Lsp_project.for_ ~rootdir ~layout in
+      add_project project registry |>
+      if registry.params.config.enable_client_configs
+      then
+        request_n_use_client_config_for ~project
+          ~silence_ignored_settings_warning:true
+      else
+        now project
 
 
 let on_write_project_config_command uri registry =
   let write_project_config project registry =
-    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ document@ at@ %s"
+    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ URI@ %s"
       (Lsp.Uri.to_string uri);
     Superbol_project.save_config ~verbose:true project;
     registry
   in
   perform write_project_config
     ~after:(create_or_retrieve_project_promise ~uri registry)
+
+
+let get_project_config_command uri registry =
+  Lsp_io.log_info "Getting@ configuration@ for@ project@ of@ URI@ %s"
+    (Lsp.Uri.to_string uri);
+  let layout = registry.params.config.project_layout in
+  let rootdir = Lsp_project.rootdir_for ~uri ~layout in
+  try
+    Lsp_project.get_project_config @@
+    Lsp_project.SET.for_rootdir ~rootdir registry.projects
+  with Not_found ->
+    (* NOTE: for this we need to be able to delay replies to server requests. *)
+    Lsp_error.request_failed "%s is not part of any project from the\
+                              workspace"
+      (Lsp.Uri.to_string uri)
+
+
+(** {3 Initialization} *)
+
+
+let load_project_in ~dir registry =
+  let layout = registry.params.config.project_layout in
+  let project = Lsp_project.in_existing_dir dir ~layout in
+  let registry =
+    add_project project @@
+    load_project_cache ~rootdir:(Lsp_project.rootdir project) registry
+  in
+  ignore_promise_result @@                   (* retrieve client configuration *)
+  request_n_use_client_config_for ~project registry
+    ~silence_ignored_settings_warning:true
+
+
+let init ~params : registry =
+  let registry =
+    { params;
+      projects = Lsp_project.SET.empty;
+      docs = URIMap.empty;
+      indirect_diags = URIMap.empty;
+      pending_tasks = { delayed_id = 0; delayed = IMap.empty };
+      sub_state = { ignore_next_client_config_changes = true } }
+  in
+  List.fold_left begin fun registry workspace_folder_uri ->
+    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
+  end registry params.workspace_folders |>
+  URIMap.fold (fun _ -> dispatch_diagnostics) registry.docs |>
+  maybe_start_watching_client_config
+
 
 
 (** {2 Handling of document notifications} *)

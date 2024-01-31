@@ -129,6 +129,7 @@ val have_same_rootdirs: t -> t -> bool
 
 module SET: sig
   include Set.S with type elt = t
+  val for_: filename:string -> t -> elt
   val for_rootdir: rootdir:rootdir -> t -> elt
   val mem_rootdir: rootdir:rootdir -> t -> bool
 end

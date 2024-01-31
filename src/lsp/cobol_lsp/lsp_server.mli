@@ -34,11 +34,13 @@ module TYPES: sig
     projects: Lsp_project.SET.t;
     docs: Lsp_document.t URIMap.t;
     indirect_diags: Lsp_diagnostics.t URIMap.t;
-    pending_tasks: delayed_continuations;
+    pending_tasks: pending_tasks;
+    sub_state: sub_state;
     params: params;
   }
 
-  and delayed_continuations
+  and sub_state
+  and pending_tasks
 
   type state =
     | NotInitialized of config
@@ -60,7 +62,8 @@ end
 include module type of TYPES
   with type config = TYPES.config
    and type params = TYPES.params
-   and type delayed_continuations = TYPES.delayed_continuations
+   and type sub_state = TYPES.sub_state
+   and type pending_tasks = TYPES.pending_tasks
    and type registry = TYPES.registry
    and type state = TYPES.state
    and type exit_status = TYPES.exit_status
@@ -94,14 +97,17 @@ val jsonrpc_of_error
 val on_response
   : int -> Lsp.Import.Json.t -> t -> t
 
-val on_client_config_change
-  : t -> t
+val on_client_config_changes
+  : ?changes:Yojson.Safe.t -> t -> t
 
 val on_watched_file_changes
   : Lsp.Types.FileEvent.t list -> t -> t
 
 val on_write_project_config_command
   : Lsp.Uri.t -> t -> t
+
+val get_project_config_command
+  : Lsp.Uri.t -> t -> Yojson.Safe.t
 
 (** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches

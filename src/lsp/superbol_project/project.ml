@@ -57,19 +57,26 @@ let rootdir_at ~dirname : rootdir =
   then dirname
   else Fmt.invalid_arg "Expected existing directory: %s" dirname
 
-let rootdir_for ~filename
-    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
+let find_first_in_parent_dirs ~f dir =
   let rec try_dir dir =
-    if EzFile.exists (dir // project_config_filename)
-    then dir
-    else
+    try f dir with Not_found ->
       let new_dir = EzFile.dirname dir in
       if new_dir = dir
       then raise Not_found                                  (* we are at root *)
       else try_dir new_dir
   in
+  try_dir dir
+
+let rootdir_for ~filename
+    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
   let dirname = EzFile.dirname filename in
-  try try_dir dirname
+  try
+    find_first_in_parent_dirs dirname
+      ~f:begin fun dir ->
+        if EzFile.exists (dir // project_config_filename)
+        then dir
+        else raise Not_found
+      end
   with Not_found -> match rootdir_fallback_policy with
     | Same_as_file_directory -> dirname
     | Given_directory dirname -> dirname
@@ -148,6 +155,9 @@ module SET = struct
     if p.rootdir = rootdir then p else raise Not_found
   let mem_rootdir ~rootdir s =
     try ignore (for_rootdir ~rootdir s); true with Not_found -> false
+  let for_ ~filename s =
+    find_first_in_parent_dirs (Filename.dirname filename)
+      ~f:(fun rootdir -> for_rootdir ~rootdir s)
 end
 
 module MAP = Map.Make (M)

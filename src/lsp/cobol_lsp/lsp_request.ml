@@ -103,18 +103,31 @@ let handle_shutdown registry =
 (** {3 Custom commands for configuration management} *)
 
 
-let handle_write_project_config_command param registry =
-  match
-    match (param: Jsonrpc.Structured.t) with
-    | `Assoc assoc ->
-        let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
-        Ok (Lsp_server.on_write_project_config_command uri registry)
-    | _ ->
-        Error ()
-  with
-  | Ok registry -> Ok (`Bool true, Running registry)
-  | Error () | exception _ -> Ok (`Bool false, Running registry)
+let assoc_of_jsonrpc_struct params =
+  Yojson.Safe.Util.to_assoc @@ Jsonrpc.Structured.yojson_of_t params
 
+
+let handle_write_project_config_command param registry =
+  try
+    let assoc = assoc_of_jsonrpc_struct param in
+    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+    Ok (`Null,
+        Running (Lsp_server.on_write_project_config_command uri registry))
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
+                              expected)" Yojson.Safe.(to_string (param :> t))
+
+
+let handle_get_project_config_command param registry =
+  try
+    let assoc = assoc_of_jsonrpc_struct param in
+    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+    let reply = Lsp_server.get_project_config_command uri registry in
+    Lsp_io.log_debug "Reply: %a" (Yojson.Safe.pretty_print ~std:false) reply;
+    Ok (reply, Running registry)
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
+                              expected)" Yojson.Safe.(to_string (param :> t))
 
 (** {3 Definitions} *)
 
@@ -532,6 +545,9 @@ let on_request
     | UnknownRequest { meth = "superbol/writeProjectConfiguration";
                        params = Some param } ->
         handle_write_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getProjectConfiguration";
+                       params = Some param } ->
+        handle_get_project_config_command param registry
     | UnknownRequest { meth; _ } ->
         Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
         Error (UnknownRequest meth)
@@ -539,8 +555,7 @@ let on_request
 let handle (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
   | Error message ->
-      let code = Jsonrpc.Response.Error.Code.InvalidRequest in
-      let err = Jsonrpc.Response.Error.make ~message ~code () in
+      let err = Jsonrpc.Response.Error.make ~message ~code:InvalidRequest () in
       state, Jsonrpc.Response.(error id err)
   | Ok (E r) ->
       match on_request state r ~id with

@@ -14,4 +14,4 @@
 
 val type_: string
 
-val provider: Vscode.Task.t Vscode.TaskProvider.t
+val provider: Superbol_instance.t -> Vscode.Task.t Vscode.TaskProvider.t

@@ -73,6 +73,7 @@ val of_cache: rootdir:rootdir -> layout:layout -> cached -> t
 
 module SET: sig
   include Set.S with type elt = t
+  val for_: uri:Lsp.Uri.t -> t -> elt
   val for_rootdir: rootdir:rootdir -> t -> elt
   val mem_rootdir: rootdir:rootdir -> t -> bool
 end
@@ -82,6 +83,7 @@ module MAP: Map.S with type key = t
 
 val reload_project_config: t -> bool
 val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
+val get_project_config: ?flat:bool -> t -> Yojson.Safe.t
 
 (** Miscellaneous *)
 
