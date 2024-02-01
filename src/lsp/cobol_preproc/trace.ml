@@ -8,26 +8,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module TYPES: sig
+(** Some utilities to log preprocessing events.  `Preproc_journal` may be a
+    better name. *)
+
+open Cobol_common.Srcloc.TYPES
+
+module TYPES = struct
   type log_entry =
     | FileCopy of
         {
-          copyloc: Cobol_common.Srcloc.t;
+          copyloc: srcloc;
           status: copy_event_status;
         }
     | Replace of
         {
-          replloc: Cobol_common.Srcloc.t;
+          replloc: srcloc;
         }
     | Replacement of
         {
-          matched_loc: Cobol_common.Srcloc.t;
+          matched_loc: srcloc;
           replacement_text: Text.text;
         }
     | CompilerDirective of
         {
-          compdir: Preproc_directives.compiler_directive;
-          loc: Cobol_common.Srcloc.t;
+          compdir: Directives.compiler_directive;
+          loc: srcloc;
         }
 
   and copy_event_status =
@@ -35,38 +40,26 @@ module TYPES: sig
     | CyclicCopy of string
     | MissingCopy of Cobol_common.Copybook.lookup_info
 
-  type log
+  type log = log_entry list
 end
-
-include module type of TYPES
-  with type copy_event_status = TYPES.copy_event_status
-   and type log_entry = TYPES.log_entry
-   and type log = TYPES.log
-
-val empty: log
-val append
-  : log_entry
-  -> log -> log
-val new_compdir
-  : loc: Cobol_common.Srcloc.t
-  -> compdir:Preproc_directives.compiler_directive
-  -> log -> log
-val copy_done
-  : loc: Cobol_common.Srcloc.t
-  -> filename: string
-  -> log -> log
-val cyclic_copy
-  : loc: Cobol_common.Srcloc.t
-  -> filename: string
-  -> log -> log
-val missing_copy
-  : loc: Cobol_common.Srcloc.t
-  -> info: Cobol_common.Copybook.lookup_info
-  -> log -> log
-val new_replace
-  : loc: Cobol_common.Srcloc.t
-  -> log -> log
+include TYPES
 
 (* --- *)
 
-val events: log -> log_entry list
+let empty = []
+let append =
+  List.cons
+let new_compdir ~loc ~compdir : log -> log =
+  List.cons @@ CompilerDirective { compdir; loc }
+let copy_done ~loc ~filename : log -> log =
+  List.cons @@ FileCopy { copyloc = loc; status = CopyDone filename }
+let cyclic_copy ~loc ~filename : log -> log =
+  List.cons @@ FileCopy { copyloc = loc; status = CyclicCopy filename }
+let missing_copy ~loc ~info : log -> log =
+  List.cons @@ FileCopy { copyloc = loc; status = MissingCopy info }
+let new_replace ~loc : log -> log =
+  List.cons @@ Replace { replloc = loc }
+
+(* --- *)
+
+let events: log -> log_entry list = List.rev

@@ -23,7 +23,7 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
     Cobol_preproc.Src_format.from_config SFFixed
   in
   let state =
-    Cobol_preproc.fold_source_lines ~dialect ~source_format
+    Cobol_preproc.Preprocess.fold_source_lines ~dialect ~source_format
       ~on_initial_source_format:(fun src_format st -> { st with src_format })
       ~on_compiler_directive:(fun _ { payload = cd;  _} st ->
         match cd with

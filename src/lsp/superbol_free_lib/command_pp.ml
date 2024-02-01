@@ -63,10 +63,10 @@ let cmd =
                          ~default:  common.preproc_options.source_format }
                    in
                    input |>
-                   Cobol_preproc.preprocessor ~options:preproc_options |>
+                   Cobol_preproc.Preprocess.preprocessor ~options:preproc_options |>
                    Cobol_parser.parse_simple ~options:common.parser_options
                  in
-                 let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
+                 let my_text = Cobol_preproc.Src_input.from ~filename:file ~f:parse in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (
@@ -96,7 +96,7 @@ let cmd =
                  let text =
                    let common = common_get () in
                    Cobol_common.Diagnostics.show_n_forget @@
-                   Cobol_preproc.text_of_file file
+                   Cobol_preproc.Preprocess.text_of_file file
                      ~options:common.preproc_options
                  in
                  let s =

@@ -38,19 +38,19 @@ type 'x rewinder =
       ('x * ('x rewinder)) with_diags;
   }
 and preprocessor_rewind =
-  ?new_position: Lexing.position -> (Cobol_preproc.preprocessor as 'r) -> 'r
+  ?new_position: Lexing.position -> (Cobol_preproc.Preprocess.preprocessor as 'r) -> 'r
 and position =
   | Lexing of Lexing.position
   | Indexed of { line: int; char: int }                  (* all starting at 0 *)
 
 type 'm simple_parsing
   = ?options:parser_options
-  -> Cobol_preproc.preprocessor
+  -> Cobol_preproc.Preprocess.preprocessor
   -> (Cobol_ptree.compilation_group option, 'm) output DIAGS.with_diags
 
 type 'm rewindable_parsing
   = ?options:parser_options
-  -> Cobol_preproc.preprocessor
+  -> Cobol_preproc.Preprocess.preprocessor
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) *
       'x rewinder) DIAGS.with_diags
 
@@ -78,7 +78,7 @@ type 'm state =
     basis (mostly the pre-processor and tokenizer's states). *)
 and 'm preproc =
   {
-    pp: Cobol_preproc.preprocessor;               (* also holds diagnostics *)
+    pp: Cobol_preproc.Preprocess.t;               (* also holds diagnostics *)
     tokzr: 'm Tokzr.state;
     persist: 'm persist;
   }
@@ -130,21 +130,21 @@ and update_tokzr ps tokzr =
   else { ps with preproc = { ps.preproc with tokzr } }
 
 let add_diag diag ({ preproc = { pp; _ }; _ } as ps) =
-  update_pp ps (Cobol_preproc.add_diag pp diag)
+  update_pp ps (Cobol_preproc.Preprocess.add_diag pp diag)
 let add_diags diags ({ preproc = { pp; _ }; _ } as ps) =
-  update_pp ps (Cobol_preproc.add_diags pp diags)
+  update_pp ps (Cobol_preproc.Preprocess.add_diags pp diags)
 
 let all_diags { preproc = { pp; tokzr; _ }; _ } =
-  DIAGS.Set.union (Cobol_preproc.diags pp) @@ Tokzr.diagnostics tokzr
+  DIAGS.Set.union (Cobol_preproc.Preprocess.diags pp) @@ Tokzr.diagnostics tokzr
 
 (* --- *)
 
 let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
-  let text, pp = Cobol_preproc.next_chunk ps.preproc.pp in
+  let text, pp = Cobol_preproc.Preprocess.next_chunk ps.preproc.pp in
   let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
   assert (text <> []);
   (* Note: this is the source format in use at the end of the sentence. *)
-  let source_format = Cobol_preproc.source_format pp in
+  let source_format = Cobol_preproc.Preprocess.source_format pp in
   match Tokzr.tokenize_text ~source_format tokzr text with
   | Error `MissingInputs, tokzr ->
       produce_tokens (update_tokzr ps tokzr)
@@ -396,7 +396,7 @@ let on_exn ps e =
 let first_stage (ps: 'm state) ~make_checkpoint : ('a, 'm) stage =
   let ps, tokens = produce_tokens ps in
   let first_pos = match tokens with
-    | [] -> Cobol_preproc.position ps.preproc.pp
+    | [] -> Cobol_preproc.Preprocess.position ps.preproc.pp
     | t :: _ -> Cobol_common.Srcloc.start_pos ~@t
   in
   normal ps tokens (make_checkpoint first_pos)
@@ -419,9 +419,9 @@ let aggregate_output (type m) (ps: m state) res
   | Eidetic ->
       let artifacts =
         { tokens = Tokzr.parsed_tokens ps.preproc.tokzr;
-          pplog = Cobol_preproc.rev_log ps.preproc.pp;
-          rev_comments = Cobol_preproc.rev_comments ps.preproc.pp;
-          rev_ignored = Cobol_preproc.rev_ignored ps.preproc.pp } in
+          pplog = Cobol_preproc.Preprocess.rev_log ps.preproc.pp;
+          rev_comments = Cobol_preproc.Preprocess.rev_comments ps.preproc.pp;
+          rev_ignored = Cobol_preproc.Preprocess.rev_ignored ps.preproc.pp } in
       WithArtifacts (res, artifacts)
 
 (** Simple parsing *)
@@ -469,7 +469,7 @@ let init_rewindable_parse ps ~make_checkpoint =
 
 (** Stores a stage as part of the memorized rewindable history events. *)
 let save_interim_stage (ps, _, env) (store: _ rewindable_history) =
-  let preproc_position = Cobol_preproc.position ps.preproc.pp in
+  let preproc_position = Cobol_preproc.Preprocess.position ps.preproc.pp in
   match store with
   | store'
     when preproc_position.pos_cnum <> preproc_position.pos_bol ->
@@ -516,7 +516,7 @@ let find_history_event_preceding ~position ({ store; _ } as rwps) =
         pos
     | Indexed { line; char } ->
         let ps = rewindable_parser_state rwps in
-        Cobol_preproc.position_at ~line ~char ps.preproc.pp
+        Cobol_preproc.Preprocess.position_at ~line ~char ps.preproc.pp
   in
   let rec aux = function
     | [] ->
@@ -560,7 +560,7 @@ let rec rewind_n_parse
 
 let rewindable_parse
   : options:_ -> memory:'m memory -> make_checkpoint:_
-    -> Cobol_preproc.preprocessor
+    -> Cobol_preproc.Preprocess.preprocessor
     -> ((('a option, 'm) output as 'x) * 'x rewinder) with_diags =
   fun ~options ~memory ~make_checkpoint pp ->
   let res, rwps =
@@ -581,7 +581,7 @@ let parse
     (type m)
     ~(memory: m memory)
     ?(options = Parser_options.default)
-  : Cobol_preproc.preprocessor ->
+  : Cobol_preproc.Preprocess.t ->
     (Cobol_ptree.compilation_group option, m) output with_diags =
   parse_once ~options ~memory
     ~make_checkpoint:Grammar.Incremental.compilation_group
@@ -593,7 +593,7 @@ let rewindable_parse
     (type m)
     ~(memory: m memory)
     ?(options = Parser_options.default)
-  : Cobol_preproc.preprocessor ->
+  : Cobol_preproc.Preprocess.t ->
     (((Cobol_ptree.compilation_group option, m) output as 'x) * 'x rewinder)
       with_diags =
   rewindable_parse ~options ~memory

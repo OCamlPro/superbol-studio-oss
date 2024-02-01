@@ -72,7 +72,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
         recovery = EnableRecovery { silence_benign_recoveries = true };
         config = project.config.cobol_config;
       } @@
-  Cobol_preproc.preprocessor
+  Cobol_preproc.Preprocess.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
         libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
@@ -116,7 +116,7 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   | Some position, Some rewinder ->
       check doc @@
       Cobol_parser.rewind_and_parse rewinder ~position @@
-      Cobol_preproc.reset_preprocessor_for_string @@
+      Cobol_preproc.Preprocess.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)

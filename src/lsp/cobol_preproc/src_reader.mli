@@ -36,7 +36,7 @@ val fold_lines
   : dialect: Cobol_config.Types.dialect
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive
-     : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)
+     : (int -> Directives.compiler_directive with_loc -> 'a -> 'a)
   -> f:(int -> Text.t -> 'a -> 'a)
   -> t -> 'a -> 'a
 
@@ -47,7 +47,7 @@ val print_lines
 
 val try_compiler_directive
   : dialect: Cobol_config.Types.dialect -> Text.t
-  -> ((Text.t * Preproc_directives.compiler_directive with_loc * Text.t) option,
+  -> ((Text.t * Directives.compiler_directive with_loc * Text.t) option,
       Text.t * Preproc_diagnostics.error * Text.t) result
 
 (** {1 Change of source format} *)

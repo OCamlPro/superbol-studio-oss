@@ -14,7 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
-open Preproc_options
+open Options
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -25,7 +25,7 @@ type preprocessor =
     buff: Text.t;
     reader: Src_reader.t;
     ppstate: Preproc_state.t;
-    pplog: Preproc_trace.log;
+    pplog: Trace.log;
     diags: DIAGS.diagnostics;
     persist: preprocessor_persist;
   }
@@ -35,7 +35,7 @@ and preprocessor_persist =
   {
     pparser: (module Text_processor.PPPARSER);
     overlay_manager: (module Src_overlay.MANAGER);
-    replacing: Preproc_directives.replacing with_loc list list;
+    replacing: Directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     dialect: Cobol_config.Types.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
@@ -43,6 +43,8 @@ and preprocessor_persist =
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
   }
+
+type t = preprocessor
 
 let diags { diags; reader; _ } = DIAGS.Set.union diags @@ Src_reader.diags reader
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
@@ -110,7 +112,7 @@ let preprocessor input = function
         buff = [];
         reader = Src_reader.from input ?source_format;
         ppstate = Preproc_state.initial;
-        pplog = Preproc_trace.empty;
+        pplog = Trace.empty;
         diags = DIAGS.Set.none;
         persist =
           {
@@ -182,8 +184,8 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
 
 and apply_compiler_directive
     ({ reader; pplog; _ } as lp) { payload = compdir; loc } =
-  let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
-  match (compdir : Preproc_directives.compiler_directive) with
+  let lp = with_pplog lp @@ Trace.new_compdir ~loc ~compdir pplog in
+  match (compdir : Directives.compiler_directive) with
   | CDirSource sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
@@ -285,7 +287,7 @@ and do_replace lp rev_prefix repl suffix =
        replacing phrase. *)
     apply_active_replacing_full lp @@ List.rev rev_prefix
   in
-  let lp = with_pplog lp @@ Preproc_trace.new_replace ~loc pplog in
+  let lp = with_pplog lp @@ Trace.new_replace ~loc pplog in
   let lp = match repl, lp.persist.replacing with
     | CDirReplace { replacing = repl; _ }, ([] as replacing)
     | CDirReplace { replacing = repl; also = false }, replacing ->
@@ -310,7 +312,7 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         (* TODO: `note addendum *)
         [],
         DIAGS.Acc.error lp.diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename,
-        Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
+        Trace.cyclic_copy ~loc ~filename lp.pplog
     | Ok filename ->
         if verbose then
           Pretty.error "Reading library `%s'@." filename;
@@ -321,12 +323,12 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
               ~postproc:(Cobol_common.Srcloc.copy_from ~filename ~copyloc:loc)
           end
         in
-        text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
+        text, lp.diags, Trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
         [],
         DIAGS.Acc.error lp.diags ~loc "%a"
           Cobol_common.Copybook.pp_lookup_error lnf,
-        Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
+        Trace.missing_copy ~loc ~info:lnf lp.pplog
   in
   text, with_diags_n_pplog lp diags pplog
 
@@ -401,7 +403,7 @@ let reset_preprocessor_for_string string ?new_position pp =
 
 (* --- *)
 
-let preprocessor ?(options = Preproc_options.default) input =
+let preprocessor ?(options = Options.default) input =
   preprocessor input (`WithOptions options)
 
 (** Default pretty-printing formatter for {!lex_file}, {!lex_lib}, and

@@ -15,8 +15,8 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 open Text.TYPES
-open Preproc_directives                         (* import types of directives *)
-open Preproc_trace                              (* import types of log events *)
+open Directives                         (* import types of directives *)
+open Trace                              (* import types of log events *)
 
 module DIAGS = Cobol_common.Diagnostics
 
@@ -378,11 +378,11 @@ let apply_replacing k repl log =
     fun k done_text log text ->
       match k, try_replacing_phrase k repl text, text with
       | OnPartText, Ok (done_text', le, []), _ ->
-          Ok (done_text @ done_text', Preproc_trace.append le log)
+          Ok (done_text @ done_text', Trace.append le log)
       | OnFullText, Ok (done_text', le, []), _ ->
-          done_text @ done_text', Preproc_trace.append le log
+          done_text @ done_text', Trace.append le log
       | _, Ok (done_text', le, text), _ ->
-          aux k (done_text @ done_text') (Preproc_trace.append le log) text
+          aux k (done_text @ done_text') (Trace.append le log) text
       | OnPartText, Error `MissingText, _ ->
           Error (`MissingText (done_text, log, text))
       | OnPartText, Error `NoReplacement, [] ->

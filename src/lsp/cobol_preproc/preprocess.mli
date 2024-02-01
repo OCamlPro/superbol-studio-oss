@@ -14,9 +14,10 @@
 open Cobol_common.Srcloc.TYPES
 
 type preprocessor
+type t = preprocessor
 
 val preprocessor
-  : ?options: Preproc_options.preproc_options
+  : ?options: Options.preproc_options
   -> Src_input.t
   -> preprocessor
 val reset_preprocessor_for_string
@@ -33,7 +34,7 @@ val add_diags: preprocessor -> Cobol_common.Diagnostics.Set.t -> preprocessor
 val position: preprocessor -> Lexing.position
 val position_at: line:int -> char: int -> preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
-val rev_log: preprocessor -> Preproc_trace.log
+val rev_log: preprocessor -> Trace.log
 val rev_comments: preprocessor -> Text.comments
 val rev_ignored: preprocessor -> lexloc list
 
@@ -88,30 +89,30 @@ val fold_source_lines
   -> ?on_initial_source_format: (Src_format.any -> 'a -> 'a)
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive
-     : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)
+     : (int -> Directives.compiler_directive with_loc -> 'a -> 'a)
   -> f:(int -> Text.text -> 'a -> 'a)
   -> Src_input.t
   -> 'a
   -> 'a Cobol_common.Diagnostics.with_diags
 
 val preprocess_input
-  : ?options: Preproc_options.preproc_options
+  : ?options: Options.preproc_options
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Cobol_common.Diagnostics.with_diags
 
 val preprocess_file
-  : ?options: Preproc_options.preproc_options
+  : ?options: Options.preproc_options
   -> ?ppf:Format.formatter
   -> string
   -> unit Cobol_common.Diagnostics.with_diags
 
 val text_of_file
-  : ?options: Preproc_options.preproc_options
+  : ?options: Options.preproc_options
   -> string
   -> Text.t Cobol_common.Diagnostics.with_diags
 
 val text_of_input
-  : ?options: Preproc_options.preproc_options
+  : ?options: Options.preproc_options
   -> Src_input.t
   -> Text.t Cobol_common.Diagnostics.with_diags
