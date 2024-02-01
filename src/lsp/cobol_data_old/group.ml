@@ -14,7 +14,7 @@
 (* NB: needs quite a bit of rework and cleanup; validation should also be moved
    to `Cobol_typeck`. *)
 
-open Cobol_ptree
+open Cobol_ptree.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 (* open Pictured_ast.Data_sections *)
@@ -303,8 +303,8 @@ let group_range (module Diags: Cobol_common.Diagnostics.STATEFUL) first last gro
     (note that the major qualifier is first and the minor is last). *)
 let list_of_qualname qualname =
   let rec aux acc = function
-    | Cobol_ptree.Qual(n, qn) -> aux (n::acc) qn
-    | Cobol_ptree.Name n -> n::acc
+    | Cobol_ptree.Types.Qual(n, qn) -> aux (n::acc) qn
+    | Cobol_ptree.Types.Name n -> n::acc
   in
   aux [] qualname
 

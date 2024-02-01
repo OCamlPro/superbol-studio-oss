@@ -36,7 +36,7 @@ type output =
 type acc =
   {
     current_storage: Cobol_data.Types.data_storage;
-    current_qualification: Cobol_ptree.qualname option;
+    current_qualification: Cobol_ptree.Types.qualname option;
     item_stack: item_stack;
     current_qualmap: Cobol_data.Types.field_definition with_loc Qualmap.t;
     pending_conditions: condition_name_under_construction list;
@@ -50,11 +50,11 @@ and item_stack = item_under_construction list
 and item_under_construction =               (* item currently being assembled *)
   {
     item_level: int;                                       (* 01 <= _ <= 49 *)
-    item_name: Cobol_ptree.data_name with_loc option;      (* given item name *)
+    item_name: Cobol_ptree.Types.data_name with_loc option;      (* given item name *)
     item_loc: srcloc;
-    item_qualname: Cobol_ptree.qualname with_loc option;     (* full qualname *)
-    item_qualifier: Cobol_ptree.qualname option;  (* qualifier for sub. items *)
-    item_redefines: Cobol_ptree.qualname with_loc option;     (* if REDEFINES *)
+    item_qualname: Cobol_ptree.Types.qualname with_loc option;     (* full qualname *)
+    item_qualifier: Cobol_ptree.Types.qualname option;  (* qualifier for sub. items *)
+    item_redefines: Cobol_ptree.Types.qualname with_loc option;     (* if REDEFINES *)
     item_offset: Cobol_data.Memory.offset;
     item_size: Cobol_data.Memory.size;
     item_clauses: Typeck_clauses.data_clauses;
@@ -131,7 +131,7 @@ let def_n_redef_items (item_stack: item_stack) =
 
 (** [qualify name item_stack] returns the qualified name of a new item with name
     [name] that would be pushed onto [item_stack]. *)
-let qualify: string with_loc -> item_stack -> Cobol_ptree.qualname with_loc =
+let qualify: string with_loc -> item_stack -> Cobol_ptree.Types.qualname with_loc =
   fun n -> function
     | { item_qualifier = qn; _ } :: _ -> qual n qn &@<- n
     | [] -> name n &@<- n
@@ -140,7 +140,7 @@ let qualify: string with_loc -> item_stack -> Cobol_ptree.qualname with_loc =
 (** [qualname data_name item_stack] returns the qualified name of a new item
     with base name [data_name] that would be pushed onto [item_stack]. *)
 let qualname
-    (data_name: Cobol_ptree.data_name with_loc option)
+    (data_name: Cobol_ptree.Types.data_name with_loc option)
     (item_stack: item_stack) =
   match data_name, item_stack with
   | Some { payload = DataName n; loc }, { item_qualifier = qn; _ } :: _ ->
@@ -154,7 +154,7 @@ let qualname
 (** [qualifier data_name item_stack] returns the qualification of a new item
     with base name [data_name] that would be pushed onto [item_stack]. *)
 let qualifier
-    (data_name: Cobol_ptree.data_name with_loc option)
+    (data_name: Cobol_ptree.Types.data_name with_loc option)
     (item_stack: item_stack) =
   match data_name, item_stack with
   | Some { payload = DataName n; _ }, { item_qualifier = qn; _ } :: _ ->
@@ -176,7 +176,7 @@ let current_item_offset: item_stack -> Cobol_data.Memory.offset = function
 (* --- *)
 
 
-let record_name: acc -> Cobol_ptree.qualname with_loc option -> acc * string =
+let record_name: acc -> Cobol_ptree.Types.qualname with_loc option -> acc * string =
   fun acc -> function
     | None ->
         { acc with filler_count = succ acc.filler_count },
@@ -264,7 +264,7 @@ let check_inherited_usage acc ~item_name item_clauses item_stack =
       acc, { item_clauses with usage }
   | Some u, Some p ->
       let acc =         (* check matching usage (according to the standard) *)
-        if Cobol_ptree.compare_usage_clause ~&u ~&p <> 0 then
+        if Cobol_ptree.Types.compare_usage_clause ~&u ~&p <> 0 then
           warn acc @@ Mismatching_usage_in_group { item_name;
                                                    item_usage = u;
                                                    group_usage = p }
@@ -524,7 +524,7 @@ let on_redefinition_item acc item_clauses
       in
       let acc = match redefined_qualname with
         | Some qn
-          when Cobol_ptree.compare_name ~&redefined_name (name_of ~&qn) <> 0 ->
+          when Cobol_ptree.Types.compare_name ~&redefined_name (name_of ~&qn) <> 0 ->
             error acc @@
             Unexpected_redefinition_name { redef_loc = loc;
                                            redef_name = item_name;
@@ -590,7 +590,7 @@ let on_redefinition_item acc item_clauses
 
 
 let on_item acc ~at_level
-    { payload = Cobol_ptree.{ data_level;
+    { payload = Cobol_ptree.Types.{ data_level;
                               data_name = item_name;
                               data_clauses }; loc }
   =
@@ -650,8 +650,8 @@ let report_occurs acc operand field =
 
 
 let renaming acc
-    ?(renaming_qualifier: Cobol_ptree.qualname option)
-    { payload = Cobol_ptree.{ rename_to = name;
+    ?(renaming_qualifier: Cobol_ptree.Types.qualname option)
+    { payload = Cobol_ptree.Types.{ rename_to = name;
                               rename_from = from;
                               rename_thru = thru; _ };
       loc } =
@@ -741,7 +741,7 @@ let on_rename ({ loc; _ } as rename_item) acc =
           acc
 
 
-let on_condition_name (cond_name: Cobol_ptree.condition_name_item with_loc) acc =
+let on_condition_name (cond_name: Cobol_ptree.Types.condition_name_item with_loc) acc =
   match acc.item_stack with
   | [] ->
       error acc @@ Misplaced { entry = Condition_name_entry;

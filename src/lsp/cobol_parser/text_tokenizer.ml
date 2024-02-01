@@ -54,7 +54,7 @@ let combined_tokens =
     NEXT_PAGE, "NEXT_PAGE";
   ]
 
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str } =
+let pp_alphanum_string_prefix ppf Cobol_ptree.Types.{ hexadecimal; quotation; str } =
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
   | Simple_quote -> Fmt.pf ppf "'%s" str
@@ -73,10 +73,10 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | EIGHTY_EIGHT -> string "88"
   | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
   | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
-  | ALPHANUM a -> Cobol_ptree.pp_alphanum_string ppf a
+  | ALPHANUM a -> Cobol_ptree.Types.pp_alphanum_string ppf a
   | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
   | NATLIT s -> print "N\"%s\"" s
-  | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
+  | BOOLIT b -> print "B\"%a\"" Cobol_ptree.Types.pp_boolean b
   | NULLIT s -> print "Z\"%s\"" s
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | INTERVENING_ c -> print "%c" c
@@ -370,7 +370,7 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   fun { payload = c; loc } ->
   let tok t = [t &@ loc], DIAGS.Set.none in
   let alphanum ~hexadecimal str qte =
-    Cobol_ptree.{
+    Cobol_ptree.Types.{
       str;
       hexadecimal;
       quotation = match qte with
@@ -392,9 +392,9 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | Alphanum { knd = Basic; str; qte; _ }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte)
   | Alphanum { knd = Bool; str; _ }
-    -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Bool str)
+    -> tok @@ BOOLIT (Cobol_ptree.Types.boolean_of_string ~base:`Bool str)
   | Alphanum { knd = BoolX; str; _ }
-    -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Hex str)
+    -> tok @@ BOOLIT (Cobol_ptree.Types.boolean_of_string ~base:`Hex str)
   | Alphanum { knd = Hex; str; qte }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
   | Alphanum { knd = NullTerm; str; _ }

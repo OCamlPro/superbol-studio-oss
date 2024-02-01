@@ -58,7 +58,7 @@ let focus_on_name_in_defintions = true
 
 let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
     ?(allow_notifications = true)
-    (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+    (qn: Cobol_ptree.Types.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
   | Data_field { def = { loc; _ }; _ }
   | Data_renaming { def = { loc; _ }; _ }
@@ -91,7 +91,7 @@ let find_proc_definition
     Lsp_position.{ location_of; _ }
     ?(allow_notifications = true)
     ?(in_section: Cobol_unit.Types.procedure_section option)
-    (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+    (qn: Cobol_ptree.Types.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Procedure.find ?in_section qn cu.unit_procedure with
   | Paragraph { payload = { paragraph_name = Some qn; _ }; _ }
     when focus_on_name_in_defintions ->

@@ -50,4 +50,4 @@ let qualname = function
 
 (** Note: may be a no-op *)
 let pp_item_qualname ?(leading = Fmt.nop) ppf item =
-  Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)
+  Fmt.(option (leading ++ Cobol_ptree.Types.pp_qualname')) ppf (qualname item)

@@ -24,7 +24,7 @@ let show_map map =
   Pretty.out "@[<v>Rep: %a@]@." (pp_qualmap_struct Fmt.text) map
 
 let pp_qualname ppf qn =
-  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.pp_qualname qn
+  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.Types.pp_qualname qn
 
 let show_item qn map =
   try

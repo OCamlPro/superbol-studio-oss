@@ -23,7 +23,7 @@ let check_initial_ptree ~ptree0 diags =
 
 let check_new_ptree i n ~ptree0 ptree' diags =
   if Option.compare
-      Cobol_ptree.compare_compilation_group ptree0 ptree' = 0
+      Cobol_ptree.Types.compare_compilation_group ptree0 ptree' = 0
   then Pretty.out "Ok@."
   else Test_appending.show_ptree i n ptree' diags
 

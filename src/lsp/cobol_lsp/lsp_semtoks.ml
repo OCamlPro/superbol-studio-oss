@@ -159,7 +159,7 @@ let semtoks_from_ptree ~filename ?range ptree =
   let add_name' name category acc =
     acc_semtoks category ~@name acc
   in
-  let rec add_qualname (qn: Cobol_ptree.qualname) toktyp acc =
+  let rec add_qualname (qn: Cobol_ptree.Types.qualname) toktyp acc =
     match qn with
     | Name name ->
         add_name' name toktyp acc
@@ -167,7 +167,7 @@ let semtoks_from_ptree ~filename ?range ptree =
         add_name' name toktyp acc |>
         add_qualname qn toktyp
   in
-  let add_ident (id: Cobol_ptree.ident) toktyp acc =
+  let add_ident (id: Cobol_ptree.Types.ident) toktyp acc =
     match id with
     | QualIdent {ident_name; _} -> add_qualname ~&ident_name toktyp acc
     | _ -> acc (* TODO *)

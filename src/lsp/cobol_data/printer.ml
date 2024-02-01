@@ -19,13 +19,13 @@ open Cobol_common.Srcloc.INFIX
 let pp_offset = Memory.pp_offset
 let pp_size = Memory.pp_size
 
-let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
+let pp_int' = Cobol_ptree.Types.pp_with_loc Fmt.int
 let pp_int'_opt = Fmt.option pp_int'
-let pp_qualname'_opt = Fmt.option Cobol_ptree.pp_qualname'
-let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.pp_qualname'))
-  (* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.pp_qualname' *)
-let pp_literal'_opt = Fmt.option Cobol_ptree.pp_literal'
-let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
+let pp_qualname'_opt = Fmt.option Cobol_ptree.Types.pp_qualname'
+let pp_qualname'_list = Fmt.(hbox (list ~sep:comma Cobol_ptree.Types.pp_qualname'))
+  (* Pretty.list ~fopen:"@[<h>" ~fsep:",@;" ~fclose:"@]" Cobol_ptree.Types.pp_qualname' *)
+let pp_literal'_opt = Fmt.option Cobol_ptree.Types.pp_literal'
+let pp_literal'_list = Fmt.list Cobol_ptree.Types.pp_literal'
 
 (* usage *)
 
@@ -100,7 +100,7 @@ and pp_depending_span: depending_span Pretty.printer =
     T Fmt.(styled `Yellow @@ any "depending-span");
     T (Fmt.field "min_occurs" (fun x -> x.occurs_depending_min) pp_int');
     T (Fmt.field "max_occurs" (fun x -> x.occurs_depending_max) pp_int');
-    T (Fmt.field "depending" (fun x -> x.occurs_depending) Cobol_ptree.pp_qualname');
+    T (Fmt.field "depending" (fun x -> x.occurs_depending) Cobol_ptree.Types.pp_qualname');
   ]
 
 and pp_dynamic_span: dynamic_span Pretty.printer =
@@ -137,7 +137,7 @@ let rec pp_item_definition: item_definition Pretty.printer = fun ppf -> function
   | Table def -> pp_table_definition ppf def
 
 and pp_item_definition': item_definition with_loc Pretty.printer = fun ppf ->
-  Cobol_ptree.pp_with_loc pp_item_definition ppf
+  Cobol_ptree.Types.pp_with_loc pp_item_definition ppf
 
 and pp_item_definitions: item_definitions Pretty.printer = fun ppf defs ->
   NEL.pp ~fopen:"" ~fsep:"" ~fclose:"" pp_item_definition' ppf defs
@@ -169,7 +169,7 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
   ] ppf x
 
 and pp_field_definition': field_definition with_loc Pretty.printer = fun ppf ->
-  Cobol_ptree.pp_with_loc pp_field_definition ppf
+  Cobol_ptree.Types.pp_with_loc pp_field_definition ppf
 
 (* and pp_field_definitions: field_definitions Pretty.printer = fun ppf defs -> *)
 (*   NEL.pp ~fopen:"" ~fsep:"" ~fclose:"" pp_field_definition' ppf defs *)
@@ -208,7 +208,7 @@ and pp_table_definition: table_definition Pretty.printer = fun ppf x ->
   ] ppf x
 
 and pp_table_definition': table_definition with_loc Pretty.printer = fun ppf ->
-  Cobol_ptree.pp_with_loc pp_table_definition ppf
+  Cobol_ptree.Types.pp_with_loc pp_table_definition ppf
 
 
 (* condition-names *)
@@ -216,12 +216,12 @@ and pp_table_definition': table_definition with_loc Pretty.printer = fun ppf ->
 and pp_condition_name: condition_name Pretty.printer =
   Pretty.record_with_conditional_fields [
     T (Fmt.field "qualname" (fun r -> r.condition_name_qualname)
-         Cobol_ptree.pp_qualname');
+         Cobol_ptree.Types.pp_qualname');
     T (Fmt.field "values" (fun _ -> "...") Fmt.string);
   ]
 
 and pp_condition_name': condition_name with_loc Pretty.printer = fun ppf ->
-  Cobol_ptree.pp_with_loc pp_condition_name ppf
+  Cobol_ptree.Types.pp_with_loc pp_condition_name ppf
 
 and pp_condition_names: condition_names Pretty.printer = fun ppf ->
   Fmt.(list ~sep:nop) pp_condition_name' ppf
@@ -240,8 +240,8 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf -> func
 
 let pp_record_renaming: record_renaming Pretty.printer =
   Pretty.record_with_conditional_fields [
-    T (Fmt.field "qualname" (fun r -> r.renaming_name) Cobol_ptree.pp_qualname');
-    T (Fmt.field "from" (fun r -> r.renaming_from) Cobol_ptree.pp_qualname');
+    T (Fmt.field "qualname" (fun r -> r.renaming_name) Cobol_ptree.Types.pp_qualname');
+    T (Fmt.field "from" (fun r -> r.renaming_from) Cobol_ptree.Types.pp_qualname');
     C ((fun r -> r.renaming_thru <> None),
        Fmt.field "thru" (fun r -> r.renaming_thru) pp_qualname'_opt);
     T (Fmt.field "offset" (fun r -> r.renaming_offset) Memory.pp_offset);
@@ -250,7 +250,7 @@ let pp_record_renaming: record_renaming Pretty.printer =
   ]
 
 let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
-  Cobol_ptree.pp_with_loc pp_record_renaming ppf
+  Cobol_ptree.Types.pp_with_loc pp_record_renaming ppf
 
 let pp_record_renamings: record_renamings Pretty.printer = fun ppf ->
   Fmt.(list ~sep:nop) pp_record_renaming' ppf

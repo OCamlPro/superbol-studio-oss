@@ -14,14 +14,14 @@
 (* open Cobol_common.Srcloc.TYPES *)
 (* open Cobol_data.Pictured_ast.Data_sections *)
 module DIAGS = Cobol_common.Diagnostics
-open Cobol_ptree
+open Cobol_ptree.Types
 
 (* exception SemanticError of string * srcloc *)
 
 (* This follows the 85 standard and IBM dialect specification. *)
 let validate_data_clauses
     ?(is_elementary = false)
-    Cobol_ptree.{ payload = Cobol_ptree.{ data_clauses; _ }; loc }
+    Cobol_ptree.Types.{ payload = Cobol_ptree.Types.{ data_clauses; _ }; loc }
   =
   (* This does not generalize well to other mutual exclusion constraints.
 

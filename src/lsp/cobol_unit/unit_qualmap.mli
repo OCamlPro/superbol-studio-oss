@@ -18,10 +18,10 @@ module TYPES: sig
   type 'a binding =
     {
       value: 'a;
-      full_qn: Cobol_ptree.qualname;
+      full_qn: Cobol_ptree.Types.qualname;
     }
 
-  exception Ambiguous of Cobol_ptree.qualname Cobol_common.Basics.NEL.t Lazy.t
+  exception Ambiguous of Cobol_ptree.Types.qualname Cobol_common.Basics.NEL.t Lazy.t
 
 end
 include module type of TYPES
@@ -33,10 +33,10 @@ val pp_qualmap: 'a Pretty.printer -> 'a qualmap Pretty.printer
 val pp_qualmap_struct: 'a Pretty.printer -> 'a qualmap Pretty.printer
 
 val empty: 'a qualmap
-val add: Cobol_ptree.qualname -> 'a -> 'a qualmap -> 'a qualmap
+val add: Cobol_ptree.Types.qualname -> 'a -> 'a qualmap -> 'a qualmap
 
 val fold: f:('a binding -> 'b -> 'b) -> 'a qualmap -> 'b -> 'b
-val find: Cobol_ptree.qualname -> 'a qualmap -> 'a
+val find: Cobol_ptree.Types.qualname -> 'a qualmap -> 'a
 
 val bindings: 'a qualmap -> 'a binding list
-val find_binding: Cobol_ptree.qualname -> 'a qualmap -> 'a binding
+val find_binding: Cobol_ptree.Types.qualname -> 'a qualmap -> 'a binding

@@ -46,12 +46,12 @@ and position =
 type 'm simple_parsing
   = ?options:parser_options
   -> Cobol_preproc.Preprocess.preprocessor
-  -> (Cobol_ptree.compilation_group option, 'm) output DIAGS.with_diags
+  -> (Cobol_ptree.Types.compilation_group option, 'm) output DIAGS.with_diags
 
 type 'm rewindable_parsing
   = ?options:parser_options
   -> Cobol_preproc.Preprocess.preprocessor
-  -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) *
+  -> (((Cobol_ptree.Types.compilation_group option, 'm) output as 'x) *
       'x rewinder) DIAGS.with_diags
 
 (* --- *)
@@ -582,7 +582,7 @@ let parse
     ~(memory: m memory)
     ?(options = Parser_options.default)
   : Cobol_preproc.Preprocess.t ->
-    (Cobol_ptree.compilation_group option, m) output with_diags =
+    (Cobol_ptree.Types.compilation_group option, m) output with_diags =
   parse_once ~options ~memory
     ~make_checkpoint:Grammar.Incremental.compilation_group
 
@@ -594,7 +594,7 @@ let rewindable_parse
     ~(memory: m memory)
     ?(options = Parser_options.default)
   : Cobol_preproc.Preprocess.t ->
-    (((Cobol_ptree.compilation_group option, m) output as 'x) * 'x rewinder)
+    (((Cobol_ptree.Types.compilation_group option, m) output as 'x) * 'x rewinder)
       with_diags =
   rewindable_parse ~options ~memory
     ~make_checkpoint:Grammar.Incremental.compilation_group

@@ -38,12 +38,12 @@ let show_elementary_size = Pretty.to_string "%a" pp_elementary_size
 (* --- *)
 
 type symbolic_var =
-  | Valof of Cobol_ptree.qualname
+  | Valof of Cobol_ptree.Types.qualname
 [@@deriving ord]
 
 let pp_symbolic_var ppf = function
   | Valof qn ->
-      Pretty.print ppf "@[(valof@;<1 2>%a)@]" Cobol_ptree.pp_qualname qn
+      Pretty.print ppf "@[(valof@;<1 2>%a)@]" Cobol_ptree.Types.pp_qualname qn
 let show_symbolic_var = Pretty.to_string "%a" pp_symbolic_var
 
 module AE =

@@ -20,7 +20,7 @@ module DIAGS = Cobol_common.Diagnostics
 module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
 
-let name_of_compilation_unit: Cobol_ptree.compilation_unit -> _ = function
+let name_of_compilation_unit: Cobol_ptree.Types.compilation_unit -> _ = function
   | Program { program_name = name; _ }
   | Function { function_name = name; _ }
   | ClassDefinition { class_name = name; _ }
@@ -119,7 +119,7 @@ end
 (** This function builds the internal representation of full compilation
     groups. *)
 let of_compilation_group
-  : Cobol_config.Types.t -> Cobol_ptree.compilation_group ->
+  : Cobol_config.Types.t -> Cobol_ptree.Types.compilation_group ->
     Typeck_outputs.t * Typeck_diagnostics.t =
   fun config compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group

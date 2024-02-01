@@ -30,7 +30,7 @@ type artifacts =
 
 type outputs =
   {
-    ptree: Cobol_ptree.compilation_group;
+    ptree: Cobol_ptree.Types.compilation_group;
     group: Cobol_unit.Types.group;
     artifacts: artifacts;
   }
@@ -51,7 +51,7 @@ let no_artifacts: artifacts =
 
 let none: t =
   {
-    ptree = Cobol_ptree.{ control_division = None;
+    ptree = Cobol_ptree.Types.{ control_division = None;
                           compilation_units = [] };
     group = Cobol_unit.Group.empty;
     artifacts = no_artifacts;

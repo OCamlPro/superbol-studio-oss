@@ -71,7 +71,7 @@ let cmd =
                  match my_text.result with
                  | Only (Some cg) -> (
                      let print =
-                       Format.asprintf "@[%a@]@." Cobol_ptree.pp_compilation_group
+                       Format.asprintf "@[%a@]@." Cobol_ptree.Types.pp_compilation_group
                      in
                      let contents = print cg in
                      output_file filename contents;
@@ -80,7 +80,7 @@ let cmd =
                          parse ~source_format:(SF SFFree) (String { filename; contents })
                        with
                        | { result = Only (Some cg'); _ } ->
-                           if Cobol_ptree.compare_compilation_group cg' cg <> 0 then (
+                           if Cobol_ptree.Types.compare_compilation_group cg' cg <> 0 then (
                              Format.eprintf "Reparse: different@.";
                              exit 1
                            )

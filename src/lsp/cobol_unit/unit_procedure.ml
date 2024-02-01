@@ -17,7 +17,7 @@ open Unit_types
 
 let rec find
     ?(in_section: procedure_section option)
-    (procedure_name: Cobol_ptree.procedure_name)
+    (procedure_name: Cobol_ptree.Types.procedure_name)
     (procedure: procedure)
   : procedure_block =
   match in_section with
@@ -30,7 +30,7 @@ let rec find
 
 let rec full_qn
     ?(in_section: procedure_section option)
-    (procedure_name: Cobol_ptree.procedure_name)
+    (procedure_name: Cobol_ptree.Types.procedure_name)
     (procedure: procedure)
   =
   match in_section with

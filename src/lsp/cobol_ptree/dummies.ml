@@ -14,7 +14,7 @@
 (** Defines some dummy nodes that can be used to fill in missing parts of the
     parse tree. *)
 
-open PTree_types
+open Types
 open Cobol_common.Srcloc.INFIX
 
 let dummy_loc =

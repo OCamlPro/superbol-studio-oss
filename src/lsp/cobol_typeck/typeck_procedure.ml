@@ -35,7 +35,7 @@ let procedure_of_compilation_unit cu' =
       }
     and section_under_construction =
       {
-        sec_name: Cobol_ptree.procedure_name with_loc;
+        sec_name: Cobol_ptree.Types.procedure_name with_loc;
         sec_paragraphs: procedure_paragraph with_loc list;
       }
 
@@ -52,8 +52,8 @@ let procedure_of_compilation_unit cu' =
         list = List.rev acc.block_list;
       }
 
-    let name n : Cobol_ptree.qualname = Name n
-    let qual n q : Cobol_ptree.qualname = Qual (n, q)
+    let name n : Cobol_ptree.Types.qualname = Name n
+    let qual n q : Cobol_ptree.Types.qualname = Qual (n, q)
 
     let section_block
         ({ payload = suc; loc }: section_under_construction with_loc) =
@@ -69,7 +69,7 @@ let procedure_of_compilation_unit cu' =
       in
       Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
 
-    let simple_paragraph (p: Cobol_ptree.paragraph with_loc) acc =
+    let simple_paragraph (p: Cobol_ptree.Types.paragraph with_loc) acc =
       match acc.current_section, ~&p.paragraph_name with
       | None, Some n ->
           { paragraph_name = Some (name n &@<- n);
@@ -173,7 +173,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     let references { refs; diags; _ } = refs, diags
   end in
 
-  let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
+  let baseloc_of_qualname: Cobol_ptree.Types.qualname -> srcloc = function
     | Name name
     | Qual (name, _) -> ~@name
   in

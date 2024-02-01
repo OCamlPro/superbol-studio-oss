@@ -46,13 +46,13 @@ type data_definitions =
 
 type procedure_paragraph =
   {
-    paragraph_name: Cobol_ptree.procedure_name with_loc option;
-    paragraph: Cobol_ptree.paragraph with_loc;
+    paragraph_name: Cobol_ptree.Types.procedure_name with_loc option;
+    paragraph: Cobol_ptree.Types.paragraph with_loc;
   }
 
 type procedure_section =
   {
-    section_name: Cobol_ptree.procedure_name with_loc;
+    section_name: Cobol_ptree.Types.procedure_name with_loc;
     section_paragraphs: procedure_paragraph with_loc named_n_ordered;
   }
 
@@ -78,6 +78,6 @@ type t = cobol_unit with_loc
 
 (* --- *)
 
-let block_name: _ -> Cobol_ptree.qualname with_loc option = function
+let block_name: _ -> Cobol_ptree.Types.qualname with_loc option = function
   | Paragraph { payload = p; _ } -> p.paragraph_name
   | Section { payload = s; _ } -> Some s.section_name

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.INFIX
-open Cobol_ptree
+open Cobol_ptree.Types
 
 (* TODO: Don't require naming of fillers to avoid this kind of exceptions. *)
 exception Not_mangled

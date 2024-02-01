@@ -30,17 +30,17 @@ module TYPES = struct
     }
   and element_in_context =
     | Data_name of
-        Cobol_ptree.qualname
+        Cobol_ptree.Types.qualname
     | Data_full_name of
-        Cobol_ptree.qualname
+        Cobol_ptree.Types.qualname
     | Data_item of
         {
-          full_qn: Cobol_ptree.qualname option;
+          full_qn: Cobol_ptree.Types.qualname option;
           def_loc: srcloc;
         }
     | Proc_name of
         {
-          qn: Cobol_ptree.qualname;
+          qn: Cobol_ptree.Types.qualname;
           in_section: Cobol_unit.Types.procedure_section option;
         }
 
@@ -50,7 +50,7 @@ module TYPES = struct
       as_item: item_definition option;
     }
   and paragraph_definition =
-    Cobol_ptree.paragraph with_loc
+    Cobol_ptree.Types.paragraph with_loc
   and item_definition =
     Cobol_data.Types.item_definition with_loc
 
@@ -61,7 +61,7 @@ open TYPES
 
 (* --- *)
 
-let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
+let baseloc_of_qualname: Cobol_ptree.Types.qualname -> srcloc = function
   | Name name
   | Qual (name, _) -> ~@name
 
@@ -72,8 +72,8 @@ let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
     [qualname], from the first qualifier to the last.  This function is
     temporary and is expected to be replaced once a better way of getting this
     location is found. *)
-let lexloc_of_qualname_in ~filename (qn: Cobol_ptree.qualname) =
-  let rec end_pos: Cobol_ptree.qualname -> Lexing.position = function
+let lexloc_of_qualname_in ~filename (qn: Cobol_ptree.Types.qualname) =
+  let rec end_pos: Cobol_ptree.Types.qualname -> Lexing.position = function
     | Name n -> Cobol_common.Srcloc.end_pos_in ~filename ~@n
     | Qual (_, qn) -> end_pos qn
   in
@@ -85,7 +85,7 @@ let lexloc_of_qualname_in ~filename (qn: Cobol_ptree.qualname) =
     the qualifiers of [qualname] that are after or at position [pos] ion
     [filename].  This function is temporary and is expected to be replaced once
     a better way of finding the qualname is implemented. *)
-let rec qualname_at_pos ~filename (qn: Cobol_ptree.qualname) pos =
+let rec qualname_at_pos ~filename (qn: Cobol_ptree.Types.qualname) pos =
   match qn with
   | Name _ ->
       qn

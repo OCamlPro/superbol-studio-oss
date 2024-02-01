@@ -13,5 +13,5 @@
 
 val of_compilation_group
   : Cobol_config.Types.t
-  -> Cobol_ptree.compilation_group
+  -> Cobol_ptree.Types.compilation_group
   -> Typeck_outputs.t * Typeck_diagnostics.t

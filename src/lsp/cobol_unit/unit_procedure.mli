@@ -15,12 +15,12 @@
 
 val find
   : ?in_section: Unit_types.procedure_section
-  -> Cobol_ptree.qualname
+  -> Cobol_ptree.Types.qualname
   -> Unit_types.procedure
   -> Unit_types.procedure_block
 
 val full_qn
   : ?in_section: Unit_types.procedure_section
-  -> Cobol_ptree.qualname
+  -> Cobol_ptree.Types.qualname
   -> Unit_types.procedure
-  -> Cobol_ptree.qualname
+  -> Cobol_ptree.Types.qualname

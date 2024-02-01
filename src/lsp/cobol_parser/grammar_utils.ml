@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree
+open Cobol_ptree.Types
 
 (* Note: we can share the same source overlay manager across several parsers as
    long as we don't parse localized tokens using multiple instances of the

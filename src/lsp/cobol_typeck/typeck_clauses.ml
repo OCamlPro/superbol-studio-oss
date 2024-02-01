@@ -20,11 +20,11 @@ module PIC = Cobol_data.Picture
 
 type data_clauses =
   {
-    occurs: Cobol_ptree.data_occurs_clause with_loc option;
-    usage: Cobol_ptree.usage_clause with_loc option;
-    picture: Cobol_ptree.picture_clause with_loc option;
-    value: Cobol_ptree.data_value_clause with_loc option;
-    redefines: Cobol_ptree.name with_loc option;
+    occurs: Cobol_ptree.Types.data_occurs_clause with_loc option;
+    usage: Cobol_ptree.Types.usage_clause with_loc option;
+    picture: Cobol_ptree.Types.picture_clause with_loc option;
+    value: Cobol_ptree.Types.data_value_clause with_loc option;
+    redefines: Cobol_ptree.Types.name with_loc option;
     clause_diags: diagnostics;
   }
 
@@ -97,9 +97,9 @@ let on_redefines_clause acc =
     end
 
 
-let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
+let of_data_item (data_clauses: Cobol_ptree.Types.data_clause with_loc list) =
   List.fold_left begin fun acc { payload = clause; loc } ->
-    match (clause: Cobol_ptree.data_clause) with
+    match (clause: Cobol_ptree.Types.data_clause) with
     | DataOccurs    o -> on_occurs_clause acc (o &@ loc)
     | DataRedefines r -> on_redefines_clause acc (r &@ loc)
     | DataUsage     u -> on_usage_clause acc (u &@ loc)
@@ -113,7 +113,7 @@ let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
 
 let translate_picture_clause
     ~picture_config
-    { payload = Cobol_ptree.{ picture;
+    { payload = Cobol_ptree.Types.{ picture;
                               picture_locale = _;
                               picture_depending = _ }; loc = _ } =
   match PIC.(of_string picture_config ~&picture) with
@@ -128,7 +128,7 @@ let translate_picture_clause
       Result.error
 
 
-let display_usage_from_literal: Cobol_ptree.literal -> usage =
+let display_usage_from_literal: Cobol_ptree.Types.literal -> usage =
   (* TODO: `Display|`National *)
   let detect_sign i =
     if EzString.starts_with ~prefix:"-" i
@@ -163,12 +163,12 @@ let ensure_picture diags
              `Boolean_class |
              `Nonalpha_class |
              `Any_class] = `Any_class)
-    ~(usage_clause: Cobol_ptree.usage_clause) picture =
+    ~(usage_clause: Cobol_ptree.Types.usage_clause) picture =
   let pic = match picture with
     | Some Ok pic ->
         Ok pic
     | Some Error pic ->                         (* grab the raw length for now *)
-        Error (`Length (String.length ~&(~&pic.Cobol_ptree.picture)))
+        Error (`Length (String.length ~&(~&pic.Cobol_ptree.Types.picture)))
     | None ->
         Error `None
   in
@@ -213,7 +213,7 @@ let ensure_picture diags
 
 
 let auto_usage diags ~usage_clause picture =
-  match (usage_clause: Cobol_ptree.usage_clause) with
+  match (usage_clause: Cobol_ptree.Types.usage_clause) with
   | Binary ->
       let diags, picture
         = ensure_picture diags ~only:`Numeric_category ~usage_clause picture in
@@ -269,11 +269,11 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         Display                   (* TODO: NATIONAL in case value is a natlit *)
   in
   let signedness s =
-    Cobol_data.Types.{ signed = s <> Some Cobol_ptree.Unsigned }
+    Cobol_data.Types.{ signed = s <> Some Cobol_ptree.Types.Unsigned }
   and endian =     (* TODO: set default via FLOAT-BINARY in OPTIONS paragraph *)
-    Option.value ~default:Cobol_ptree.HighOrderLeft
+    Option.value ~default:Cobol_ptree.Types.HighOrderLeft
   and encoding =  (* TODO: set default via FLOAT-DECIMAL in OPTIONS paragraph *)
-    Option.value ~default:Cobol_ptree.DecimalEncoding
+    Option.value ~default:Cobol_ptree.Types.DecimalEncoding
   in
   let diags, usage = match usage_clause with
 

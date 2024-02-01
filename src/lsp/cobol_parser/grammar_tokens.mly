@@ -11,13 +11,13 @@
 %}
 
 %[@recovery.header
-  let fixed_zero = Cobol_ptree.{ fixed_integer = "0";
+  let fixed_zero = Cobol_ptree.Types.{ fixed_integer = "0";
                                  fixed_fractional = "0" }
 
-  let floating_zero = Cobol_ptree.{ float_significand = fixed_zero;
+  let floating_zero = Cobol_ptree.Types.{ float_significand = fixed_zero;
                                     float_exponent = "1" }
 
-  let boolean_zero = Cobol_ptree.{ bool_base = `Bool;
+  let boolean_zero = Cobol_ptree.Types.{ bool_base = `Bool;
                                    bool_value = "0" }
 ]
 
@@ -27,10 +27,10 @@
 %token <string> WORD [@recovery "_"] (* [@symbol "<word>"] *)
 %token <string> WORD_IN_AREA_A [@recovery "_"] (* [@symbol "<word in area A>"] *)
 %token <string> INFO_WORD [@recovery "_"]
-%token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
-%token <Cobol_ptree.alphanum_string> ALPHANUM
-%token <Cobol_ptree.alphanum_string> ALPHANUM_PREFIX
-%token <Cobol_ptree.boolean> BOOLIT [@recovery boolean_zero]
+%token <Cobol_ptree.Types.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
+%token <Cobol_ptree.Types.alphanum_string> ALPHANUM
+%token <Cobol_ptree.Types.alphanum_string> ALPHANUM_PREFIX
+%token <Cobol_ptree.Types.boolean> BOOLIT [@recovery boolean_zero]
 %token <string> NULLIT [@recovery "_"]
 %token <string> NATLIT [@recovery "_"]
 %token <string> SINTLIT [@recovery "0"]

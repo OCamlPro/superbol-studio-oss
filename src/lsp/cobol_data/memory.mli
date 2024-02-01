@@ -22,7 +22,7 @@ type elementary_size =
 [@@deriving show, ord]
 
 type symbolic_var = private
-  | Valof of Cobol_ptree.qualname
+  | Valof of Cobol_ptree.Types.qualname
 [@@deriving show, ord]
 
 type factor
@@ -41,11 +41,11 @@ exception NOT_SCALAR of [ `Vars of symbolic_var Cobol_common.Basics.NEL.t
 (* --- *)
 
 val int: int -> factor
-val valof: Cobol_ptree.qualname -> factor
+val valof: Cobol_ptree.Types.qualname -> factor
 
 val point_size: size                                             (* null-size *)
 val const_size: int -> size
-val valof_size: Cobol_ptree.qualname -> size
+val valof_size: Cobol_ptree.Types.qualname -> size
 val elementary_size: elementary_size -> size
 val bit_size: size
 val byte_size: size

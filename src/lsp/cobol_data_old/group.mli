@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 (** This module implements a hierarchical version of cobol data items.*)
-open Cobol_ptree
+open Cobol_ptree.Types
 (* open Pictured_ast.Data_sections *)
 open Cobol_common.Srcloc.TYPES
 
@@ -35,5 +35,5 @@ val pp_data_group_list: Format.formatter -> t list -> unit
 (** Convert a list of located {!t working_item_descr_entry} to a list of {!t
     t}*)
 val of_working_item_descrs
-  : Cobol_ptree.working_item_descr with_loc list
+  : Cobol_ptree.Types.working_item_descr with_loc list
   -> t list Cobol_common.Diagnostics.with_diags

@@ -35,26 +35,26 @@ open Types
     * entry arguments *)
 
 module Names = Set.Make (struct
-    type t = Cobol_ptree.name
+    type t = Cobol_ptree.Types.name
     let compare = String.compare
   end)
 
 module DATA_ITEM = struct
   type condition = {
-    target: Cobol_ptree.qualname;
-    values: Cobol_ptree.condition_name_value list;
+    target: Cobol_ptree.Types.qualname;
+    values: Cobol_ptree.Types.condition_name_value list;
   } [@@deriving show]
 
   type t =
-    { name: Cobol_ptree.name;
+    { name: Cobol_ptree.Types.name;
       typ: data_type option;
       size: int;
       global: bool;
-      value: Cobol_ptree.data_value_clause option;
-      renames: Cobol_ptree.qualname list;
+      value: Cobol_ptree.Types.data_value_clause option;
+      renames: Cobol_ptree.Types.qualname list;
       condition: condition option;
-      redefines: Cobol_ptree.qualname option;
-      constant: Cobol_ptree.constant_value option; }
+      redefines: Cobol_ptree.Types.qualname option;
+      constant: Cobol_ptree.Types.constant_value option; }
   [@@deriving show]
 
   let make name =
@@ -71,7 +71,7 @@ end
 
 module PROG_ENV = struct
   type t =
-    { name: Cobol_ptree.name;
+    { name: Cobol_ptree.Types.name;
       parent_prog: t option;
       data_items: DATA_ITEM.t Qualmap.t;
       currency_signs: Cobol_common.Basics.CharSet.t;

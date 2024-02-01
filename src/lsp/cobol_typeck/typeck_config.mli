@@ -17,5 +17,5 @@ type output = Cobol_unit.Types.unit_config
 
 val of_compilation_unit
   : ?parent_config:Cobol_unit.Types.unit_config
-  -> Cobol_ptree.compilation_unit with_loc
+  -> Cobol_ptree.Types.compilation_unit with_loc
   -> output * Typeck_diagnostics.t

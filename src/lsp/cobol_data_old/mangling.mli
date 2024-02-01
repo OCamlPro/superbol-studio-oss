@@ -14,7 +14,7 @@
 (** This module aims to implement mangling functions for the COBOL AST.*)
 
 
-open Cobol_ptree
+open Cobol_ptree.Types
 
 (** This exception is raised when a not mangled name is given in a context where it is expected for
     the name to be mangled *)

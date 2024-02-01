@@ -35,16 +35,16 @@ module TYPES = struct
       }
     | Cut of {
         binding: 'a binding;
-        qn_suffix: Cobol_ptree.qualname;
+        qn_suffix: Cobol_ptree.Types.qualname;
       }
 
   and 'a binding =
     {
       value: 'a;
-      full_qn: Cobol_ptree.qualname;    (* kept so we have distinct locations *)
+      full_qn: Cobol_ptree.Types.qualname;    (* kept so we have distinct locations *)
     }
 
-  exception Ambiguous of Cobol_ptree.qualname NEL.t Lazy.t
+  exception Ambiguous of Cobol_ptree.Types.qualname NEL.t Lazy.t
 
 end
 include TYPES
@@ -77,7 +77,7 @@ let binding_qualifiers bindings =
   List.map (fun b -> b.full_qn) bindings
 
 let pp_qualname ppf qn =
-  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.pp_qualname qn
+  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.Types.pp_qualname qn
 
 let pp_binding pp_value ppf { value; full_qn; _ } =
   Pretty.print ppf "@[<h 2>%a@ =>@ %a@]"

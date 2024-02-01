@@ -66,7 +66,7 @@ type elementary_data_class =
 type data_type =
   | Elementary of elementary_data_class leveled pictured
   | Table of table_type leveled
-  | Group of data_type Cobol_ptree.with_loc list leveled
+  | Group of data_type Cobol_ptree.Types.with_loc list leveled
 [@@deriving show]
 
 and 'a leveled = {                             (* TODO: no need to keep levels *)
@@ -77,17 +77,17 @@ and 'a leveled = {                             (* TODO: no need to keep levels *
 and 'a pictured = 'a * Cobol_data.Picture.t option [@@deriving show]
 
 and table_type = {                          (* TODO: inline in `Table/OCcurs` *)
-  elements_type: data_type Cobol_ptree.with_loc;
+  elements_type: data_type Cobol_ptree.Types.with_loc;
   length: table_length;
 }
 
 and table_length =
-  | Fixed of Cobol_ptree.integer
+  | Fixed of Cobol_ptree.Types.integer
   | OccursDepending of      (* TODO: get rid of that (duplicate of AST nodes) *)
       {      (* TODO: resolve depending before building the final type repr.  *)
-        min_size: Cobol_ptree.integer;
-        max_size: Cobol_ptree.integer;
-        depending: Cobol_ptree.qualname Cobol_ptree.with_loc;
+        min_size: Cobol_ptree.Types.integer;
+        max_size: Cobol_ptree.Types.integer;
+        depending: Cobol_ptree.Types.qualname Cobol_ptree.Types.with_loc;
       } [@@deriving show]
 
 (* let loc_of = function *)

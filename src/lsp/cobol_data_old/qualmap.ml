@@ -11,13 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree
+open Cobol_ptree.Types
 open Cobol_common.Srcloc.INFIX
 
 module QUAL_NAME = struct
   type t = qualname [@@deriving show]
 
-  let compare = Cobol_ptree.compare_qualname
+  let compare = Cobol_ptree.Types.compare_qualname
 
 end
 

@@ -20,12 +20,12 @@ module NEL = Cobol_common.Basics.NEL
 
 type qualname_ambiguity =
   {
-    given_qualname: Cobol_ptree.qualname with_loc;
-    matching_qualnames: Cobol_ptree.qualname NEL.t;
+    given_qualname: Cobol_ptree.Types.qualname with_loc;
+    matching_qualnames: Cobol_ptree.Types.qualname NEL.t;
   }
 
 type error =
-  | Unknown_proc_name of Cobol_ptree.qualname with_loc
+  | Unknown_proc_name of Cobol_ptree.Types.qualname with_loc
   | Ambiguous_data_name of qualname_ambiguity
   | Ambiguous_proc_name of qualname_ambiguity
 

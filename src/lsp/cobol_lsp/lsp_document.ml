@@ -32,7 +32,7 @@ module TYPES = struct
     }
   and checked_doc = Cobol_typeck.Outputs.t
   and rewinder =
-    (Cobol_ptree.compilation_group option,
+    (Cobol_ptree.Types.compilation_group option,
      Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
       Cobol_parser.rewinder
 
