@@ -13,7 +13,7 @@
 
 module DIAGS = Cobol_common.Diagnostics
 
-open Cobol_common.Types
+open Cobol_common.Diagnostics.TYPES
 open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)

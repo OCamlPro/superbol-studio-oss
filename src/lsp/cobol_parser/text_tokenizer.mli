@@ -48,7 +48,7 @@ val init
   : ?verbose:bool
   -> ?show_if_verbose:[> `Tks | `Ctx] list
   -> memory:'a memory
-  -> Cobol_config.words_spec
+  -> Cobol_config.Types.words_spec
   -> 'a state
 
 val diagnostics

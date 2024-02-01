@@ -68,7 +68,7 @@ let equal
 (*   |  CBLXIndic, FixedWidth _ (\* when p == cobolx_paging *\) -> SFCOBOLX *)
 
 let from_config
-  : Cobol_config.source_format -> any = function
+  : Cobol_config.Types.source_format -> any = function
   | SFFree     -> SF (   NoIndic, FreePaging)
   | SFFixed    -> SF (FixedIndic, FixedWidth    fixed_paging)
   | SFVariable -> SF (FixedIndic, FixedWidth variable_paging)
@@ -84,7 +84,7 @@ let decypher ~dialect format =
   (* SOURCEFORMAT"FREE" on MF means: X/Open free format *)
   (* cf https://www.microfocus.com/documentation/visual-\
        cobol/vc50pu7/VS2019/HRLHLHINTR01U008.html *)
-  | "FREE", Cobol_config.DIALECT.MicroFocus _ -> Ok Cobol_config.SFXOpen
+  | "FREE", Cobol_config.Types.MicroFocus _ -> Ok Cobol_config.Types.SFXOpen
   | "FREE",                      _            -> Ok SFFree
   | "FIXED",                     _            -> Ok SFFixed
   | "VARIABLE",                  _            -> Ok SFVariable

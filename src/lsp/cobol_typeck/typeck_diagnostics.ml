@@ -23,7 +23,7 @@ type diagnostic =
   | Proc_error of Typeck_procedure_diagnostics.error
   | Dialect_feature_used of
       {
-        feature: unit Cobol_config.feature;
+        feature: unit Cobol_config.Types.feature;
         usage_loc: srcloc;
       }
 

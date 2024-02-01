@@ -15,15 +15,9 @@ open EzCompat
 open Ez_file.V1
 open EzFile.OP
 
-include Types
-
-module Options = Options
-module Default = Default
-module Diagnostics = Config_diagnostics
+open Types
 
 module DIAGS = Cobol_common.Diagnostics
-
-exception ERROR of Config_diagnostics.error
 
 let __init_default_exn_printers =
   Printexc.register_printer begin function
@@ -237,7 +231,7 @@ let from_file ?search_path file =
               | Conf_ast.String s -> s
               | v -> raise @@ ERROR (Invalid_key_value_pair ("name", v)) }
       let dialect =
-        try DIALECT.of_gnucobol_config_name config.name
+        try Dialect.of_gnucobol_config_name config.name
         with Invalid_argument _ ->
           raise @@ ERROR (Unknown_dialect config.name)
       let options = options
@@ -252,15 +246,15 @@ let from_file ?search_path file =
 let from_dialect ?search_path d =
   let search_path = retrieve_search_path ?search_path () in
   let config_filename = function
-    | DIALECT.GnuCOBOL -> "default.conf"
-    | dialect -> Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
+    | Types.GnuCOBOL -> "default.conf"
+    | dialect -> Pretty.to_string "%s.conf" (Dialect.to_string dialect)
   in
   let load_gnucobol_conf conf =
     from_file ~search_path @@
     find_file ~search_path (config_filename conf)
   in
   match d with
-  | DIALECT.Default -> DIAGS.result (module Default: T)
+  | Types.Default -> DIAGS.result (module Default: T)
   | d               -> load_gnucobol_conf d
 
 let dialect (module C: T) = C.dialect

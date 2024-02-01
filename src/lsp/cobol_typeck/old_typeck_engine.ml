@@ -22,7 +22,7 @@ module CUs = CU.SET
 
 let analyze_compilation_group
     (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
+  fun ?(config = Cobol_config.Config.default) ->
   function
   | Only None | WithArtifacts (None, _) ->
       DIAGS.result (Cobol_data.Compilation_unit.SET.empty, None)

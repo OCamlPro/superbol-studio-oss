@@ -11,10 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Diagnostics.TYPES
+type t =
+  | String of { contents: string; filename: string }
+  | Channel of { ic: in_channel; filename: string }
 
-val working_data_of_compilation_unit'
-  : Cobol_config.Types.t
-  -> Cobol_data.OLD.PROG_ENV.t
-  -> Cobol_ptree.compilation_unit Cobol_ptree.with_loc
-  -> Cobol_data.OLD.Group.t' Cobol_ptree.with_loc list with_diags
+(* [string ~filename content] *)
+val string : filename:string -> string -> t
+
+val channel : filename:string -> in_channel -> t
+
+val from : filename:string -> f:(t -> 'a) -> 'a

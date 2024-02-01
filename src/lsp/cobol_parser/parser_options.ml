@@ -33,7 +33,7 @@ type parser_options =
     verbose: bool;
     show: [`Pending] list;
     recovery: recovery;
-    config: Cobol_config.t;
+    config: Cobol_config.Types.t;
   }
 
 let default_recovery =
@@ -44,5 +44,5 @@ let default =
     verbose = false;
     show = [`Pending];
     recovery = default_recovery;
-    config = Cobol_config.default;
+    config = Cobol_config.Config.default;
   }

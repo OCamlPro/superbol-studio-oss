@@ -257,7 +257,7 @@ let handle_range_formatting registry params =
   in
   let edit_list =
     Cobol_indent.indent_range
-      ~dialect:(Cobol_config.dialect project.config.cobol_config)
+      ~dialect:(Cobol_config.Config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
       ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
       ~filename:(Lsp.Uri.to_path doc.uri)
@@ -273,7 +273,7 @@ let handle_formatting registry params =
   try
     let editList =
       Cobol_indent.indent_range
-        ~dialect:(Cobol_config.dialect project.config.cobol_config)
+        ~dialect:(Cobol_config.Config.dialect project.config.cobol_config)
         ~source_format:project.config.source_format
         ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
         ~filename:(Lsp.Uri.to_path doc.uri)

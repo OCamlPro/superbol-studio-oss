@@ -81,7 +81,7 @@ let cobol_class_of_picture
 
 let rec from_item_descrs config prog_env data_group : _ with_diags =
 
-  let module Config = (val config: Cobol_config.T) in
+  let module Config = (val config: Cobol_config.Types.T) in
 
   let picture_of_string Cobol_data.PROG_ENV.{ decimal_point;
                                               currency_signs; _ } s =

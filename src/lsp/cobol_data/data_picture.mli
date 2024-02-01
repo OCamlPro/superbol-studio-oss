@@ -217,7 +217,7 @@ val fixed_numeric
   -> (* decimal_digits: *)int
   -> picture
 
-module Make (Config: Cobol_config.T) (Env: ENV) : sig
+module Make (Config: Cobol_config.Types.T) (Env: ENV) : sig
 
   exception InvalidPicture of
       string with_loc * Cobol_common.Diagnostics.diagnostics * picture

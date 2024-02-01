@@ -11,15 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Basics = Basics
-module Srcloc = Srcloc
-module Copybook = Copybook
-module Diagnostics = Diagnostics
-module Visitor = Visitor
-module Behaviors = Behaviors
-module Tokenizing = Tokenizing
-module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
-
 exception FatalError of string
 let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt
 
@@ -38,12 +29,6 @@ let init_default_exn_printers () =
 
 (* --- *)
 
-module Types = struct
-  include Diagnostics.TYPES
-  include Srcloc.TYPES
-end
-include Types
-
 (* TODO: move the ['a result] type related functions somewhere else *)
 let join_all l =
   List.fold_left
@@ -54,18 +39,3 @@ let join_all l =
     (Ok [])
     l
   |> Result.map List.rev
-
-(* --- *)
-
-(* let tmp_files = ref [] *)
-(* let remove_temporary_files = ref true *)
-
-(* let add_temporary_file file = tmp_files := file :: !tmp_files *)
-(* let keep_temporary_files () = remove_temporary_files := false *)
-
-(* ;; *)
-
-(* at_exit begin fun () -> *)
-(*   if !remove_temporary_files then *)
-(*     List.iter (fun file -> Sys.remove file) !tmp_files *)
-(* end *)

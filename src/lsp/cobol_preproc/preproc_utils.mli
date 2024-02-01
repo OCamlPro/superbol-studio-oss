@@ -14,7 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Diagnostics.TYPES
 
-module Make (Config: Cobol_config.T) : sig
+module Make (Config: Cobol_config.Types.T) : sig
 
   val replacing'
     : ?repl_dir:Preproc_directives.replacing_direction

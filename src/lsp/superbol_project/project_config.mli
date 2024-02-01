@@ -18,8 +18,8 @@ module TYPES: sig
     | RelativeToFileDir of string
 
   type config = (* private *) {
-    mutable cobol_config: Cobol_config.t;
-    mutable source_format: Cobol_config.source_format_spec;
+    mutable cobol_config: Cobol_config.Types.t;
+    mutable source_format: Cobol_config.Types.source_format_spec;
     mutable libpath: path list;
     mutable copybook_extensions: string list;
     mutable copybook_if_no_extension: bool;

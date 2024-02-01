@@ -16,13 +16,7 @@
     or use the default value of any options that is badly typed in the
     configuration file or not set in the configuration file.*)
 
-include module type of Types
-
-module Options = Options
-module Default = Default
-module Diagnostics = Config_diagnostics
-
-exception ERROR of Diagnostics.error
+open Types
 
 val print_options: Format.formatter -> unit
 
@@ -50,7 +44,7 @@ val from_file
     given for {!from_file} applies here as well. *)
 val from_dialect
   : ?search_path: string list
-  -> Types.DIALECT.t
+  -> Types.dialect
   -> (module T) Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> dialect

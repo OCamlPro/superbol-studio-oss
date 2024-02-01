@@ -53,7 +53,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 let get () =
   let conf = ref "" in
   let dialect = ref None in
-  let format = ref Cobol_config.Auto in
+  let format = ref Cobol_config.Types.Auto in
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
                  "cobol85"; "COBOL85";
@@ -78,8 +78,8 @@ let get () =
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
 
     ["dialect"; "std"], Arg.Symbol
-      (Cobol_config.DIALECT.all_canonical_names,
-       fun d -> dialect := Some (Cobol_config.DIALECT.of_string d)),
+      (Cobol_config.Dialect.all_canonical_names,
+       fun d -> dialect := Some (Cobol_config.Dialect.of_string d)),
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
 
@@ -115,11 +115,11 @@ let get () =
       DIAGS.show_n_forget @@
       match !conf, !dialect with
       | "", None ->
-          DIAGS.result Cobol_config.default
+          DIAGS.result Cobol_config.Config.default
       | "", Some d ->
-          Cobol_config.from_dialect d
+          Cobol_config.Config.from_dialect d
       | s, None ->
-          Cobol_config.from_file s
+          Cobol_config.Config.from_file s
       | _ ->
           Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
                            used together"
@@ -127,7 +127,7 @@ let get () =
     let source_format =
       match !format with
       | Auto ->
-          let module Config = (val config: Cobol_config.T) in
+          let module Config = (val config: Cobol_config.Types.T) in
           Config.format#value
       | SF _ -> !format
     in

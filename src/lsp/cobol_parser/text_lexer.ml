@@ -125,7 +125,7 @@ let reserve_insensitive_token { token_of_keyword; _ } kwd token_handle =
 let reserve_sensitive_alias { token_of_keyword; _ } kwd token_handle =
   Hashtbl.add token_of_keyword kwd token_handle
 
-let reserve_words lexer : Cobol_config.words_spec -> unit =
+let reserve_words lexer : Cobol_config.Types.words_spec -> unit =
   let on_token_handle_of kwd descr ~f =
     try f @@ handle_of_keyword lexer kwd with
     | Not_found when StringSet.mem kwd silenced_keywords ->
@@ -135,7 +135,7 @@ let reserve_words lexer : Cobol_config.words_spec -> unit =
   in
   List.iter begin fun (w, word_spec) ->
     match word_spec with
-    | Cobol_config.ReserveWord { preserve_context_sensitivity } ->
+    | Cobol_config.Types.ReserveWord { preserve_context_sensitivity } ->
         on_token_handle_of w "reserve" ~f:begin fun h ->
           if preserve_context_sensitivity
           then reserve_token h

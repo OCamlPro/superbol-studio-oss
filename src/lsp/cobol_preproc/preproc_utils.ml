@@ -16,7 +16,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 module DIAGS = Cobol_common.Diagnostics
 
-module Make (Config: Cobol_config.T) = struct
+module Make (Config: Cobol_config.Types.T) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
     Config.safe_partial_replacing_when_src_literal#verify' ~loc:(Some loc) |>

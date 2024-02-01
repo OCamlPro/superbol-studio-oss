@@ -1138,7 +1138,7 @@ let error_diagnostics ~loc errors =
     add_diags acc ~loc:(Srcloc.sub loc ~pos ~len) error
   end DIAGS.Set.none (List.rev errors)
 
-module Make (Config: Cobol_config.T) (Env: ENV) = struct
+module Make (Config: Cobol_config.Types.T) (Env: ENV) = struct
 
   exception InvalidPicture of
       string with_loc * Cobol_common.Diagnostics.diagnostics * picture

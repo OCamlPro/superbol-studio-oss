@@ -42,22 +42,22 @@ val next_chunk: preprocessor -> Text.text * preprocessor
 (** {2 High-level commands} *)
 
 val lex_input
-  : dialect: Cobol_config.dialect
-  -> source_format: Cobol_config.source_format_spec
+  : dialect: Cobol_config.Types.dialect
+  -> source_format: Cobol_config.Types.source_format_spec
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Cobol_common.Diagnostics.with_diags
 
 val lex_file
-  : dialect: Cobol_config.dialect
-  -> source_format: Cobol_config.source_format_spec
+  : dialect: Cobol_config.Types.dialect
+  -> source_format: Cobol_config.Types.source_format_spec
   -> ?ppf:Format.formatter
   -> string
   -> unit Cobol_common.Diagnostics.with_diags
 
 val lex_lib
-  : dialect: Cobol_config.dialect
-  -> source_format: Cobol_config.source_format_spec
+  : dialect: Cobol_config.Types.dialect
+  -> source_format: Cobol_config.Types.source_format_spec
   -> libpath:string list
   -> ?ppf:Format.formatter
   -> [< `Alphanum | `Word ] * string
@@ -83,8 +83,8 @@ val lex_lib
     Diagnostics resulting from lexing and parsing the input are attached to the
     returned accumulated value. *)
 val fold_source_lines
-  : dialect: Cobol_config.dialect
-  -> source_format: Cobol_config.source_format_spec
+  : dialect: Cobol_config.Types.dialect
+  -> source_format: Cobol_config.Types.source_format_spec
   -> ?on_initial_source_format: (Src_format.any -> 'a -> 'a)
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive

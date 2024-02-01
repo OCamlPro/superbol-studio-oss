@@ -15,14 +15,14 @@ type preproc_options =
   {
     verbose: bool;
     libpath: string list;
-    config: Cobol_config.t;
-    source_format: Cobol_config.source_format_spec;
+    config: Cobol_config.Types.t;
+    source_format: Cobol_config.Types.source_format_spec;
   }
 
 let default =
   {
     verbose = false;
     libpath = [];
-    config = Cobol_config.default;
-    source_format = Cobol_config.Auto;
+    config = Cobol_config.Config.default;
+    source_format = Cobol_config.Types.Auto;
   }

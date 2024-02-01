@@ -12,22 +12,22 @@ module TYPES: sig
   type log_entry =
     | FileCopy of
         {
-          copyloc: Cobol_common.srcloc;
+          copyloc: Cobol_common.Srcloc.t;
           status: copy_event_status;
         }
     | Replace of
         {
-          replloc: Cobol_common.srcloc;
+          replloc: Cobol_common.Srcloc.t;
         }
     | Replacement of
         {
-          matched_loc: Cobol_common.srcloc;
+          matched_loc: Cobol_common.Srcloc.t;
           replacement_text: Text.text;
         }
     | CompilerDirective of
         {
           compdir: Preproc_directives.compiler_directive;
-          loc: Cobol_common.srcloc;
+          loc: Cobol_common.Srcloc.t;
         }
 
   and copy_event_status =
@@ -48,23 +48,23 @@ val append
   : log_entry
   -> log -> log
 val new_compdir
-  : loc: Cobol_common.srcloc
+  : loc: Cobol_common.Srcloc.t
   -> compdir:Preproc_directives.compiler_directive
   -> log -> log
 val copy_done
-  : loc: Cobol_common.srcloc
+  : loc: Cobol_common.Srcloc.t
   -> filename: string
   -> log -> log
 val cyclic_copy
-  : loc: Cobol_common.srcloc
+  : loc: Cobol_common.Srcloc.t
   -> filename: string
   -> log -> log
 val missing_copy
-  : loc: Cobol_common.srcloc
+  : loc: Cobol_common.Srcloc.t
   -> info: Cobol_common.Copybook.lookup_info
   -> log -> log
 val new_replace
-  : loc: Cobol_common.srcloc
+  : loc: Cobol_common.Srcloc.t
   -> log -> log
 
 (* --- *)

@@ -86,7 +86,7 @@ let decode_compiler_directive ~dialect compdir_text =
   let open Preproc_directives in
   match Compdir_grammar.MenhirInterpreter.loop supplier parser with
   | Source_format_is_free lexloc ->
-      let sf = Src_format.from_config Cobol_config.SFFree in
+      let sf = Src_format.from_config Cobol_config.Types.SFFree in
       Ok (CDirSource (sf &@ raw_loc lexloc) &@ loc)
   | Source_format_is (format, lexloc)
   | Set_sourceformat (format, lexloc) ->

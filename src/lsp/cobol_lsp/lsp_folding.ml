@@ -11,6 +11,7 @@
 open Lsp.Types
 
 open Cobol_common                                                  (* Visitor *)
+open Cobol_common.Srcloc.TYPES
 
 type range = FoldingRange.t
 

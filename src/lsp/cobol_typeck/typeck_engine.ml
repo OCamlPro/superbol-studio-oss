@@ -17,12 +17,12 @@ module DIAGS = Cobol_common.Diagnostics
 
 let compilation_group
     (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
-  fun ?(config = Cobol_config.default) ->
+  fun ?(config = Cobol_config.Config.default) ->
   function
   | Only None | WithArtifacts (None, _) ->
       Typeck_outputs.none, Typeck_diagnostics.none
   | Only Some cg | WithArtifacts (Some cg, _) ->
       Typeck_units.of_compilation_group config cg
 
-let translate_diagnostics ?(config = Cobol_config.default) (output, diags) =
+let translate_diagnostics ?(config = Cobol_config.Config.default) (output, diags) =
   DIAGS.result output ~diags:(Typeck_diagnostics.translate ~config diags)

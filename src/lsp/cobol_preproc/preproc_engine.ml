@@ -37,7 +37,7 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
-    dialect: Cobol_config.dialect;
+    dialect: Cobol_config.Types.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     libpath: string list;
     verbose: bool;
@@ -96,7 +96,7 @@ let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
 let source_format_config = function
-  | Cobol_config.SF sf -> Some (Src_format.from_config sf)
+  | Cobol_config.Types.SF sf -> Some (Src_format.from_config sf)
   | Auto -> None
 
 let preprocessor input = function

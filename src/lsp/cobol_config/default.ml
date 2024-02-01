@@ -43,8 +43,8 @@ let default_aliases =
 
 module Default: Types.T = struct
   open Types
-  let dialect = DIALECT.Default
-  let config = { name = DIALECT.to_string dialect }
+  let dialect = Default
+  let config = { name = Dialect.to_string dialect }
 
   let words =
     let alias_for b = ReserveAlias { alias_for = b;

@@ -390,7 +390,7 @@ let of_working_item_descrs (wss: working_item_descr with_loc list) =
   in
   let res =
     Result.bind groups (fun groups ->
-        Cobol_common.join_all @@
+        Cobol_common.Errors.join_all @@
         List.map (fun (group, rename) ->
             let group = make_data_group (module Diags) group in
             Result.bind group (fun group ->
@@ -398,7 +398,7 @@ let of_working_item_descrs (wss: working_item_descr with_loc list) =
                   ~none:[]
                   ~some:(fun renames -> make_renames (module Diags) group renames)
                   rename
-                |> Cobol_common.join_all
+                |> Cobol_common.Errors.join_all
                 |> Result.map (fun renames ->
                     List.map (function
                         | { payload = Group {name; elements; data_item}; loc } ->

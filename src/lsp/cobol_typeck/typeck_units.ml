@@ -119,7 +119,7 @@ end
 (** This function builds the internal representation of full compilation
     groups. *)
 let of_compilation_group
-  : Cobol_config.t -> Cobol_ptree.compilation_group ->
+  : Cobol_config.Types.t -> Cobol_ptree.compilation_group ->
     Typeck_outputs.t * Typeck_diagnostics.t =
   fun config compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group

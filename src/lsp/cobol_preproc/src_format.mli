@@ -46,10 +46,10 @@ type comment_entry_termination =                  (* skip until... *)
 
 val equal: 'k source_format -> 'r source_format -> bool
 
-val from_config: Cobol_config.source_format -> any
+val from_config: Cobol_config.Types.source_format -> any
 (* val to_config: 'k source_format -> Cobol_config.source_format *)
 val decypher
-  : dialect: Cobol_config.dialect
+  : dialect: Cobol_config.Types.dialect
   -> string
   -> (any, [> `SFUnknown of string ]) result
 val guess_from: contents_prefix: string -> any

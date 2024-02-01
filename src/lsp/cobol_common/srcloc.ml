@@ -66,6 +66,7 @@ module TYPES = struct
 
 end
 include TYPES
+type t = srcloc
 
 (* For debugging: *)
 
