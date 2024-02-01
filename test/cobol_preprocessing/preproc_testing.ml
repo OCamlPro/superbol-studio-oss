@@ -21,7 +21,7 @@ module DIAGS = Cobol_common.Diagnostics
 let preprocess
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents =
   DIAGS.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
@@ -32,7 +32,7 @@ let preprocess
 let show_text
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents =
   let text =
     DIAGS.show_n_forget ~ppf:Fmt.stdout @@
@@ -48,8 +48,8 @@ let show_source_lines
     ?(with_source_cdir_markers = false)
     ?(with_compiler_directives_text = true)
     ?(filename = "prog.cob")
-    ?(dialect = Cobol_config.DIALECT.Default)
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(dialect = Cobol_config.Types.Default)
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents
   =
   DIAGS.show_n_forget ~ppf:Fmt.stdout @@
@@ -86,7 +86,7 @@ let show_lines ppf lines =
 let preprocess_n_then_cut_n_paste_right_of_indicator
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.Auto)
+    ?(source_format = Cobol_config.Types.Auto)
     fixed_format_contents =
   let fixed_lines = EzString.split fixed_format_contents '\n' in
   let free_lines =

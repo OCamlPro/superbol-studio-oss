@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_unit"
+name = "cobol_data_old"
 skeleton = "library"
 
 # version if different from project version
@@ -57,7 +57,6 @@ cobol_common = "version"
 cobol_config = "version"
 cobol_ptree = "version"
 cobol_data = "version"
-cobol_data_old = "version"
 
 # package tools dependencies
 [tools]

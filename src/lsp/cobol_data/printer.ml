@@ -11,13 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Data_types
+open Types
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-let pp_offset = Data_memory.pp_offset
-let pp_size = Data_memory.pp_size
+let pp_offset = Memory.pp_offset
+let pp_size = Memory.pp_size
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 let pp_int'_opt = Fmt.option pp_int'
@@ -30,10 +30,10 @@ let pp_literal'_list = Fmt.list Cobol_ptree.pp_literal'
 (* usage *)
 
 let pp_usage: usage Pretty.printer =
-  let pp_usage_with_picture ppf name (picture: Data_picture.t) =
+  let pp_usage_with_picture ppf name (picture: Picture.t) =
     Pretty.record [
       Fmt.(styled `Yellow @@ any name);
-      Fmt.field "category" (fun () -> picture.category) Data_picture.pp_category;
+      Fmt.field "category" (fun () -> picture.category) Picture.pp_category;
     ] ppf ()
   and pp_usage_with_sign ppf name signed =
     Fmt.(styled `Yellow @@ (if signed then any "signed-" else nop) ++ any name)
@@ -244,8 +244,8 @@ let pp_record_renaming: record_renaming Pretty.printer =
     T (Fmt.field "from" (fun r -> r.renaming_from) Cobol_ptree.pp_qualname');
     C ((fun r -> r.renaming_thru <> None),
        Fmt.field "thru" (fun r -> r.renaming_thru) pp_qualname'_opt);
-    T (Fmt.field "offset" (fun r -> r.renaming_offset) Data_memory.pp_offset);
-    T (Fmt.field "size" (fun r -> r.renaming_size) Data_memory.pp_size);
+    T (Fmt.field "offset" (fun r -> r.renaming_offset) Memory.pp_offset);
+    T (Fmt.field "size" (fun r -> r.renaming_size) Memory.pp_size);
     T (Pretty.vfield "layout" (fun r -> r.renaming_layout) pp_renamed_item_layout);
   ]
 

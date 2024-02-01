@@ -11,7 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Cobol_data = Cobol_data.OLD
 module Env_builder = Old_env_builder
 module Group_builder = Old_group_builder
 
@@ -21,7 +20,7 @@ open Cobol_common.Diagnostics.TYPES
 
 module Visitor = Cobol_common.Visitor
 module DIAGS = Cobol_common.Diagnostics
-module CU = Cobol_data.Compilation_unit
+module CU = Cobol_data_old.Compilation_unit
 module CUs = CU.SET
 
 let name_of_compilation_unit = function
@@ -35,7 +34,7 @@ let register_cu ~cu_name ~cu_loc ~cu_env ~cu_wss (parents, progs) =
   DIAGS.result (cu_env :: parents, CUs.add prog progs)
 
 let lookup_cus config = object
-  inherit [(Cobol_data.PROG_ENV.t list * CUs.t)
+  inherit [(Cobol_data_old.Env.PROG_ENV.t list * CUs.t)
              with_diags] Cobol_ptree.Visitor.folder
 
   method! fold_compilation_unit' cu acc =

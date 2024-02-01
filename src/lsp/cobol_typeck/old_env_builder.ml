@@ -15,8 +15,6 @@ open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
-module Cobol_data = Cobol_data.OLD
-
 module Visitor = Cobol_common.Visitor
 module CharSet = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
@@ -40,13 +38,13 @@ let initialize_prog_env =
     | _ -> true
   in
   let special_names_clause_folder = object
-    inherit [Cobol_data.PROG_ENV.t with_diags] Cobol_ptree.Visitor.folder
+    inherit [Cobol_data_old.Env.PROG_ENV.t with_diags] Cobol_ptree.Visitor.folder
 
     method! fold_special_names_clause' { loc; payload = clause } =
       acc_result @@ fun env -> match clause with
       | DecimalPointIsComma ->
           Visitor.skip @@
-          DIAGS.result Cobol_data.PROG_ENV.{ env with decimal_point = ',' }
+          DIAGS.result Cobol_data_old.Env.PROG_ENV.{ env with decimal_point = ',' }
       | CurrencySign { sign = (Alphanum { str; _ } | National str);
                        picture_symbol = None }
       | CurrencySign { picture_symbol = Some (Alphanum { str; _ } |
@@ -75,8 +73,8 @@ let initialize_prog_env =
   end in
   let ensure_currency_sign_is_defined env =
     (* Currency sign defaults to '$' *)
-    if CharSet.is_empty env.Cobol_data.PROG_ENV.currency_signs
-    then Cobol_data.PROG_ENV.{ env with currency_signs = CharSet.singleton '$' }
+    if CharSet.is_empty env.Cobol_data_old.Env.PROG_ENV.currency_signs
+    then Cobol_data_old.Env.PROG_ENV.{ env with currency_signs = CharSet.singleton '$' }
     else env
   in
   fun env_div base_env ->
@@ -88,7 +86,7 @@ let initialize_prog_env =
 (* TODO: avoid returning `options with_diags` *)
 let for_compilation_unit =
   let build_env ?parent_env name env =
-    let prog_env = Cobol_data.PROG_ENV.make ?parent:parent_env ~&name in
+    let prog_env = Cobol_data_old.Env.PROG_ENV.make ?parent:parent_env ~&name in
     Visitor.skip @@
     DIAGS.map_result ~f:Option.some (initialize_prog_env env prog_env)
   in

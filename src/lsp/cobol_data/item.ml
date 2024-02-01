@@ -11,38 +11,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Data_types
-
-module Visitor = Cobol_common.Visitor
+open Types
 
 (* ignores redefs by default *)
 let fold_definitions ?(fold_redefinitions = false) ~field ~table def acc =
-  Data_visitor.fold_item_definition' object
-    inherit [_] Data_visitor.folder
+  Visitor.fold_item_definition' object
+    inherit [_] Visitor.folder
     method! fold_field_definition' def acc =
-      Visitor.do_children (field def acc)
+      Cobol_common.Visitor.do_children (field def acc)
     method! fold_table_definition' def acc =
-      Visitor.do_children (table def acc)
-    method! fold_usage _ = Visitor.skip
+      Cobol_common.Visitor.do_children (table def acc)
+    method! fold_usage _ = Cobol_common.Visitor.skip
     method! fold_item_redefinitions _ acc =
       if fold_redefinitions
-      then Visitor.do_children acc
-      else Visitor.skip_children acc
-    method! fold_table_range _ = Visitor.skip
-    method! fold_fixed_span _ = Visitor.skip
-    method! fold_depending_span _ = Visitor.skip
-    method! fold_dynamic_span _ = Visitor.skip
-    method! fold_condition_names _ = Visitor.skip
-    method! fold_memory_offset _ = Visitor.skip
-    method! fold_memory_size _ = Visitor.skip
-    method! fold_qualname' _ = Visitor.skip
+      then Cobol_common.Visitor.do_children acc
+      else Cobol_common.Visitor.skip_children acc
+    method! fold_table_range _ = Cobol_common.Visitor.skip
+    method! fold_fixed_span _ = Cobol_common.Visitor.skip
+    method! fold_depending_span _ = Cobol_common.Visitor.skip
+    method! fold_dynamic_span _ = Cobol_common.Visitor.skip
+    method! fold_condition_names _ = Cobol_common.Visitor.skip
+    method! fold_memory_offset _ = Cobol_common.Visitor.skip
+    method! fold_memory_size _ = Cobol_common.Visitor.skip
+    method! fold_qualname' _ = Cobol_common.Visitor.skip
   end def acc
 
-let offset: item_definition -> Data_memory.offset = function
+let offset: item_definition -> Memory.offset = function
   | Field f -> f.field_offset
   | Table t -> t.table_offset
 
-let size: item_definition -> Data_memory.size = function
+let size: item_definition -> Memory.size = function
   | Field f -> f.field_size
   | Table t -> t.table_size
 

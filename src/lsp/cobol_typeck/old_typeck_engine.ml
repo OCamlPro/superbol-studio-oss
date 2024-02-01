@@ -13,11 +13,10 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
-module Cobol_data = Cobol_data.OLD
 module Prog_builder = Old_prog_builder
 
 module DIAGS = Cobol_common.Diagnostics
-module CU = Cobol_data.Compilation_unit
+module CU = Cobol_data_old.Compilation_unit
 module CUs = CU.SET
 
 let analyze_compilation_group
@@ -25,7 +24,7 @@ let analyze_compilation_group
   fun ?(config = Cobol_config.Config.default) ->
   function
   | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_data.Compilation_unit.SET.empty, None)
+      DIAGS.result (Cobol_data_old.Compilation_unit.SET.empty, None)
   | Only Some cg | WithArtifacts (Some cg, _) ->
       match Prog_builder.compilation_group config cg with
       | { diags; _ } when DIAGS.Set.has_errors diags ->

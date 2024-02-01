@@ -16,7 +16,7 @@ module StrMap = EzCompat.StringMap
 
 let preproc
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents
   =
   Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
@@ -143,7 +143,7 @@ let triplewise positions =
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
     ?(verbose = false)
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     ?config
     prog
   =

@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Data_types
+open Types
 
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
@@ -50,8 +50,8 @@ class ['a] folder = object
   method fold_record_renamings: (record_renamings, 'a) fold = default
   method fold_record_renaming': (record_renaming with_loc, 'a) fold = default
   method fold_record_renaming: (record_renaming, 'a) fold = default
-  method fold_memory_offset: (Data_memory.offset, 'a) fold = default
-  method fold_memory_size: (Data_memory.size, 'a) fold = default
+  method fold_memory_offset: (Memory.offset, 'a) fold = default
+  method fold_memory_size: (Memory.size, 'a) fold = default
 end
 
 (* --- *)

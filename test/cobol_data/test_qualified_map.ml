@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Cobol_data = Cobol_data.OLD
-
 open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 
@@ -50,21 +48,21 @@ let transform wss map =
     | Group (name, elt, elts) ->
         let str_list = name::str_list in
         List.fold_left (aux str_list)
-          (Cobol_data.Qualmap.add (qualname_of_str_list str_list) elt map)
+          (Cobol_data_old.Qualmap.add (qualname_of_str_list str_list) elt map)
           elts
     | Elementary (name, elt) ->
-        Cobol_data.Qualmap.add (qualname_of_str_list (name::str_list)) elt map
+        Cobol_data_old.Qualmap.add (qualname_of_str_list (name::str_list)) elt map
   in
   aux [] map wss
 
 let wss = List.fold_left
     (fun map grp ->
        transform grp map)
-    Cobol_data.Qualmap.empty
+    Cobol_data_old.Qualmap.empty
     wss
 
 let wss =
-  Cobol_data.Qualmap.add
+  Cobol_data_old.Qualmap.add
     (Qual ("Level 5" &@ dummy_loc,
            Qual ("Level 3" &@ dummy_loc,
                  Name ("Level 1" &@ dummy_loc))))
@@ -84,56 +82,56 @@ let name n: qualname =
 
 let access_elt_1 () =
   Alcotest.(check elt) "can access simple elt"
-    (Cobol_data.Qualmap.find (name "Level 1") wss) 0
+    (Cobol_data_old.Qualmap.find (name "Level 1") wss) 0
 
 let access_elt_3 () =
   Alcotest.(check elt) "can access simple sub element"
-    (Cobol_data.Qualmap.find (name "Level 3") wss) 1
+    (Cobol_data_old.Qualmap.find (name "Level 3") wss) 1
 
 let access_elt_3_2 () =
   Alcotest.(check elt) "can access qualified elt"
-    (Cobol_data.Qualmap.find (qual "Level 2" (name "Level 3")) wss) 2
+    (Cobol_data_old.Qualmap.find (qual "Level 2" (name "Level 3")) wss) 2
 
 let access_elt_4_2 () =
   Alcotest.(check elt) "can access qualified elt"
-    (Cobol_data.Qualmap.find (qual "Level 2" (name "Level 4")) wss) 4
+    (Cobol_data_old.Qualmap.find (qual "Level 2" (name "Level 4")) wss) 4
 
 let duplicate_2 () =
   let qualname: qualname = name "Level 2" in
   Alcotest.check_raises "Not_found on ambiguous"
-    Not_found (fun () -> ignore @@ Cobol_data.Qualmap.find qualname wss)
+    Not_found (fun () -> ignore @@ Cobol_data_old.Qualmap.find qualname wss)
 
 let bad_name () =
   let qualname: qualname = qual "Y" (name "Z") in
   Alcotest.check_raises "Not_found on bad name"
-    Not_found (fun () -> ignore @@ Cobol_data.Qualmap.find qualname wss)
+    Not_found (fun () -> ignore @@ Cobol_data_old.Qualmap.find qualname wss)
 
 let access_elt_x_y_z () =
   let qualname: qualname = qual "Z" (qual "Y" (name "X")) in
   Alcotest.(check elt) "can access qualified elt"
-    (Cobol_data.Qualmap.find qualname wss) 10
+    (Cobol_data_old.Qualmap.find qualname wss) 10
 
 let access_elt_x_z () =
   (* /!\ this should be considered ambiguous! /!\ *)
   let qualname: qualname = qual "Z" (name "X") in
   Alcotest.(check elt) "can access partial qualified elt"
-    (Cobol_data.Qualmap.find qualname wss) 11
+    (Cobol_data_old.Qualmap.find qualname wss) 11
 
 let bad_order () =
   let qualname: qualname = qual "Z" (qual "X" (name "Y")) in
   Alcotest.check_raises "Not_found on invalid name order"
-    Not_found (fun () -> ignore @@ Cobol_data.Qualmap.find qualname wss)
+    Not_found (fun () -> ignore @@ Cobol_data_old.Qualmap.find qualname wss)
 
 (* let pp_print_str_list =
   Format.(pp_print_list ~pp_sep:pp_print_space pp_print_string)
 
 let pp_print_set fmt =
-  Cobol_data.Qualmap.(fun elt ->
+  Cobol_data_old.Qualmap.(fun elt ->
     pp_qualname fmt elt;
     Format.pp_print_break fmt 2 0)
 
 let pp_print_map f fmt =
-  Cobol_data.Qualmap.iter (fun l elt ->
+  Cobol_data_old.Qualmap.iter (fun l elt ->
     Format.fprintf fmt
       "Key: %a; Value: %a;\n"
       pp_qualname l

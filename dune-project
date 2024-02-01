@@ -369,6 +369,21 @@
  )
 
 (package
+ (name cobol_data_old)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (cobol_ptree (= version))
+   (cobol_data (= version))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   odoc
+  )
+ )
+
+(package
  (name cobol_typeck)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -391,6 +406,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (cobol_ptree (= version))
+   (cobol_data_old (= version))
    (cobol_data (= version))
    (cobol_config (= version))
    (cobol_common (= version))

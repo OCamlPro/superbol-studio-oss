@@ -11,94 +11,206 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* open Cobol_common.Srcloc.TYPES *)
-(* open Cobol_common.Srcloc.INFIX *)
-(* open Cobol_ast *)
+(** Representation of COBOL data items *)
 
-(* TODO: those properties should be re-introduced later when relevant; they are
-   commented for now as they do not appear necessary to the classicfication of
-   data items. *)
+(* Note: location of qualnames often correspond to the *unqualified* name, with
+   implicit qualification based on item groups. *)
 
-(* type bit_length = *)
-(*   | L16 *)
-(*   | L32 *)
-(*   | L62 [@@deriving show] *)
+open Cobol_common.Srcloc.TYPES
 
-(* type pointer_length = *)
-(*   | L4 *)
-(*   | L8 [@@deriving show] *)
+module NEL = Cobol_common.Basics.NEL
+type 'a nel = 'a NEL.t
 
-(* type numeric_format = { *)
-(*   signed: bool; *)
-(*   integer_length: int; *)
-(*   decimal_length: int; *)
-(* } [@@deriving show] *)
+type picture_config = Picture.TYPES.config
+type picture = Picture.t
 
-(* type numeric_encoding = *)
-(*   | Ascii *)
-(*   | Bcd *)
-(*   | Int of bit_length *)
-(*   | Float of bit_length [@@deriving show] *)
-
-(* (\* NOTE: The numeric does not support yet the floating point format of the 2014 standard *\) *)
-(* type numeric = *)
-(*   (numeric_format * numeric_encoding) [@@deriving show] *)
-
-(* type alphanumeric_category = *)
-(*   | Alphanumeric of int *)
-(*   | AlphanumericEdited of int [@@deriving show] *)
-
-(* type national_category = (\* UTF-16 *\) *)
-(*   | National of int *)
-(*   | NationalEdited of int [@@deriving show] *)
-
-type elementary_data_class =
-  | Alphabetic
-  | Alphanumeric
-  | Boolean
+type usage =
+  | Binary of (* [`numeric] *) picture
+  | Binary_C_long of signedness                         (* GnuCOBOL *)
+  | Binary_char of signedness                           (* +COB2002 *)
+  | Binary_double of signedness                         (* +COB2002 *)
+  | Binary_long of signedness                           (* +COB2002 *)
+  | Binary_short of signedness                          (* +COB2002 *)
+  | Bit of (* [`boolean] *) picture
+  | Display of (* [any] *) picture
+  | Float_binary of { width: [`W32|`W64|`W128];                   (* +COB2002 *)
+                      endian: Cobol_ptree.endianness_mode }
+  | Float_decimal of { width: [`W16 | `W34];                      (* +COB2002 *)
+                       endian: Cobol_ptree.endianness_mode;
+                       encoding: Cobol_ptree.encoding_mode }
+  | Float_extended                                                (* +COB2002 *)
+  | Float_long                                                    (* +COB2002 *)
+  | Float_short                                                   (* +COB2002 *)
+  | Function_pointer of Cobol_ptree.name with_loc                 (* tmp *)
   | Index
-  | National
-  | Numeric
-  | Object
-  | Pointer
-[@@deriving show]
+  | National of (* [any] *) picture
+  | Object_reference of Cobol_ptree.object_reference_kind option       (* tmp *)
+  | Packed_decimal of (* [`numeric] *) picture
+  | Pointer of Cobol_ptree.name with_loc option                        (* tmp *)
+  | Program_pointer of Cobol_ptree.name with_loc option                (* tmp *)
+and signedness = { signed: bool }
 
-type data_type =
-  | Elementary of elementary_data_class leveled pictured
-  | Table of table_type leveled
-  | Group of data_type Cobol_ptree.with_loc list leveled
-[@@deriving show]
+type data_storage =
+  | File
+  | Local_storage
+  | Working_storage
+  | Linkage                                                          (* file? *)
 
-and 'a leveled = {                             (* TODO: no need to keep levels *)
-  typ: 'a;
-  level: int;
-} [@@deriving show]
+let pp_data_storage ppf s =
+  Fmt.string ppf @@ match s with
+  | File -> "FILE"
+  | Local_storage -> "LOCAL-STORAGE"
+  | Working_storage -> "WORKING-STORAGE"
+  | Linkage -> "LINKAGE"
 
-and 'a pictured = 'a * Data_picture.t option [@@deriving show]
+type length =
+  | Fixed_length
+  | Variable_length
+  (* Note: OCCURS DYNAMIC is considered fixed-length in ISO/IEC *)
 
-and table_type = {                          (* TODO: inline in `Table/OCcurs` *)
-  elements_type: data_type Cobol_ptree.with_loc;
-  length: table_length;
-}
+type record =
+  {
+    record_name: string;
+    record_storage: data_storage;
+    record_item: item_definition with_loc;
+    record_renamings: record_renamings;
+  }
+and item_definitions = item_definition with_loc nel
+and item_redefinitions = item_definition with_loc list
 
-and table_length =
-  | Fixed of Cobol_ptree.integer
-  | OccursDepending of      (* TODO: get rid of that (duplicate of AST nodes) *)
-      {      (* TODO: resolve depending before building the final type repr.  *)
-        min_size: Cobol_ptree.integer;
-        max_size: Cobol_ptree.integer;
-        depending: Cobol_ptree.qualname Cobol_ptree.with_loc;
-      } [@@deriving show]
+and item_definition =
+  | Field of field_definition
+  | Table of table_definition
 
-(* let loc_of = function *)
-(*   | Elementary typ_loc -> ~@typ_loc *)
-(*   | Group fields_loc -> ~@fields_loc *)
-(*   | Table elements_loc -> ~@elements_loc *)
+and field_definition =
+  {
+    field_qualname: Cobol_ptree.qualname with_loc option;
+    field_redefines: Cobol_ptree.qualname with_loc option;      (* redef only *)
+    field_leading_ranges: table_range list;
+    field_offset: Memory.offset;         (** offset w.r.t record address *)
+    field_size: Memory.size;
+    field_layout: field_layout;
+    field_length: length;
+    field_conditions: condition_names;
+    field_redefinitions: item_redefinitions;
+  }
 
-(* let level_of = function *)
-(*   | Elementary { payload = {level; _}, _; _ } *)
-(*   | Group { payload = {level; _}; _ } *)
-(*   | Table { payload = {level; _}; _ } -> level *)
+and field_layout =
+  | Elementary_field of
+      {
+        usage: usage;
+        init_value: Cobol_ptree.literal with_loc option;
+      }
+  | Struct_field of
+      {
+        subfields: item_definitions;
+      }
 
-(* let pp_cob_data_type_loc fmt data_type = *)
-(*   pp_cob_data_type fmt data_type *)
+and table_definition =
+  {
+    table_field: field_definition with_loc;
+    table_offset: Memory.offset;
+    table_size: Memory.size;
+    table_range: table_range;
+    table_init_values: Cobol_ptree.literal with_loc list;     (* list for now *)
+    table_redefines: Cobol_ptree.qualname with_loc option;    (* redef only *)
+    table_redefinitions: item_redefinitions;
+  }
+and table_range =
+  {
+    range_span: span;
+    range_indexes: Cobol_ptree.qualname with_loc list;
+  }
+and span =
+  | Fixed_span of fixed_span         (* OCCURS _ TIMES *)
+  | Depending_span of depending_span (* OCCURS _ TO _ TIMES DEPENDING ON _ *)
+  | Dynamic_span of dynamic_span     (* OCCURS DYNAMIC CAPACITY _ FROM _ TO _ *)
+
+and fixed_span =
+  {
+    occurs_times: int with_loc;                                (* int for now *)
+  }
+and depending_span =
+  {
+    occurs_depending_min: int with_loc;                        (* int for now *)
+    occurs_depending_max: int with_loc;                        (* ditto *)
+    occurs_depending: Cobol_ptree.qualname with_loc;
+  }
+and dynamic_span =
+  {
+    occurs_dynamic_capacity: Cobol_ptree.qualname with_loc option;
+    occurs_dynamic_capacity_min: int with_loc option;
+    occurs_dynamic_capacity_max: int with_loc option;
+    occurs_dynamic_initialized: bool with_loc;
+  }
+
+and condition_names = condition_name with_loc list
+and condition_name =
+  {
+    condition_name_qualname: Cobol_ptree.qualname with_loc;
+    condition_name_item: Cobol_ptree.condition_name_item;          (* for now *)
+  }
+
+(** Note: RENAMES could be represented by simply adding an (optional,
+    non-constant) offset to redefinitions (and use group layouts with FILLERs
+    throughout to forbid using the new name as a qualifier).
+
+    Such a representation would be much more general than what typical COBOL
+    data definitions allow; in particular, one could have "shifted" redefintions
+    of any non-01 group item.
+
+    However, we keep the distinction between RENAMES and REDEFINES to better
+    match said typical COBOL, and possibly allow more detailed error
+    reporting. *)
+and record_renamings = record_renaming with_loc list
+and record_renaming =
+  {
+    renaming_name: Cobol_ptree.qualname with_loc;
+    renaming_layout: renamed_item_layout;
+    renaming_offset: Memory.offset;
+    renaming_size: Memory.size;
+    renaming_from: Cobol_ptree.qualname with_loc;
+    renaming_thru: Cobol_ptree.qualname with_loc option;
+  }
+and renamed_item_layout =
+  | Renamed_elementary of
+      {
+        usage: usage;
+      }
+  | Renamed_struct of
+      {
+        subfields: item_definitions;    (* CHECKME: items rather than fields? *)
+      }
+
+(* type data_const_record = *)
+(*   { *)
+(*     const_name: Cobol_ptree.name with_loc; *)
+(*     const_descr: Cobol_ptree.constant_item_descr; *)
+(*     const_layout: const_layout; *)
+(*   } *)
+
+type data_definition =
+  | Data_field of
+      {
+        record: record;
+        def: field_definition with_loc;
+      }
+  | Data_renaming of                                              (* not sure *)
+      {
+        record: record;
+        def: record_renaming with_loc;
+      }
+  | Data_condition of
+      {
+        record: record;
+        field: field_definition with_loc;
+        def: condition_name with_loc;
+      }
+  | Table_index of
+      {
+        record: record;                    (* record where [table] is defined *)
+        table: table_definition with_loc;          (* table whose index it is *)
+        qualname: Cobol_ptree.qualname with_loc;   (* fully qualified name *)
+      }
+
+(* screen: "_ OCCURS n TIMES" only. Max 2 dimensions. *)

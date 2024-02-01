@@ -52,19 +52,19 @@ let reparse_file ~source_format ~config filename =
 let () =
   (* Print one token per line so we can diff outputs more easily. *)
   Pretty.pp_set_margin std_formatter 3;
-  let config = from_dialect Cobol_config.DIALECT.mf_strict in
+  let config = from_dialect Cobol_config.Dialect.mf_strict in
   deep_iter mf_root ~glob:"*.[cC][bB][lL]"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ mf_testsuite // path;
-      reparse_file ~source_format:(Cobol_config.SF SFFixed) ~config
+      reparse_file ~source_format:(Cobol_config.Types.SF SFFixed) ~config
         (mf_root // path);
       printf "@]@."
     end;
-  let config = Cobol_config.default in
+  let config = Cobol_config.Config.default in
   deep_iter ibm_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ ibm_testsuite // path;
-      reparse_file ~config ~source_format:(Cobol_config.SF SFFree)
+      reparse_file ~config ~source_format:(Cobol_config.Types.SF SFFree)
         (ibm_root // path);
       printf "@]@."
     end;

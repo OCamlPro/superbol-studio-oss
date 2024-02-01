@@ -15,8 +15,6 @@ open Cobol_ptree
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES
 
-module Cobol_data = Cobol_data.OLD
-
 module DIAGS = Cobol_common.Diagnostics
 module Visitor = Cobol_common.Visitor
 
@@ -70,7 +68,7 @@ let rev_and_validate_data_item_descrs
   DIAGS.result res ~diags
 
 let cobol_class_of_picture
-  : Cobol_data.Picture.t with_loc -> Cobol_data.Types.elementary_data_class =
+  : Cobol_data_old.Picture.t with_loc -> Cobol_data_old.Types.elementary_data_class =
   fun { payload = pic; _ } ->
   match pic.category with
   | Alphabetic _ -> Alphabetic
@@ -83,13 +81,13 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
 
   let module Config = (val config: Cobol_config.Types.T) in
 
-  let picture_of_string Cobol_data.PROG_ENV.{ decimal_point;
+  let picture_of_string Cobol_data_old.Env.PROG_ENV.{ decimal_point;
                                               currency_signs; _ } s =
     let module E = struct
       let decimal_char = decimal_point
       let currency_signs = currency_signs
     end in
-    let module PIC = Cobol_data.Picture.Make (val config) (E) in
+    let module PIC = Cobol_data_old.Picture.Make (val config) (E) in
     try DIAGS.result @@ PIC.of_string s with
       PIC.InvalidPicture (str, diags, dummy) ->
         DIAGS.result ~diags (dummy &@<- str)
@@ -104,12 +102,12 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
           DIAGS.some_result element
       | Some element, Some OccursFixed occurs_fixed ->
           DIAGS.some_result @@
-          (Cobol_data.Types.Table { typ = { elements_type = element;
+          (Cobol_data_old.Types.Table { typ = { elements_type = element;
                                             length = Fixed ~&(occurs_fixed.times) };
                                     level } &@ loc)
       | Some element, Some OccursDepending { from; to_; depending; _ } ->
           DIAGS.some_result @@
-          (Cobol_data.Types.Table { typ = { elements_type = element;
+          (Cobol_data_old.Types.Table { typ = { elements_type = element;
                                             length = OccursDepending { min_size = ~&from;
                                                                        max_size = ~&to_;
                                                                        depending } };
@@ -121,7 +119,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
   in
 
   match ~&data_group with
-  | Cobol_data.Group.Elementary {data_item = Data dde; name = _} ->
+  | Cobol_data_old.Group.Elementary {data_item = Data dde; name = _} ->
       let level = ~&(dde.data_level) and loc = ~@data_group in
       let picture, usage, occurs =
         List.fold_left begin fun (pic, usage, occurs) { payload = clause; loc } ->
@@ -141,24 +139,24 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
         | Some pic, None ->
             let pic = picture_of_string prog_env pic in
             DIAGS.map_result ~f:begin fun pic ->
-              Some (Cobol_data.Types.Elementary ({ typ = cobol_class_of_picture pic; level },
+              Some (Cobol_data_old.Types.Elementary ({ typ = cobol_class_of_picture pic; level },
                                                  Some ~&pic) &@ loc)
             end pic
         | None, Some usage ->
             begin match usage with
               | Index ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({typ = Index; level}, None) &@ loc)
+                    (Cobol_data_old.Types.Elementary ({typ = Index; level}, None) &@ loc)
               | Pointer _
               | FunctionPointer _
               | ProgramPointer _ ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({typ = Pointer; level}, None) &@ loc)
+                    (Cobol_data_old.Types.Elementary ({typ = Pointer; level}, None) &@ loc)
               (* | ProgramPointer _ -> *)
               (*     Result.ok @@ Elementary (({typ = Types.Pointer (\* L8 *\); level}, None) &@ loc) *)
               | ObjectReference _ ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({typ = Object; level}, None) &@ loc)
+                    (Cobol_data_old.Types.Elementary ({typ = Object; level}, None) &@ loc)
               | BinaryChar _
               | BinaryShort _
               | BinaryLong _
@@ -173,23 +171,23 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
               | FloatExtended ->
                   (* As per ISO/IEC 1989:2014, 8.5.2.10 Numeric category *)
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({typ = Numeric; level}, None) &@ loc)
+                    (Cobol_data_old.Types.Elementary ({typ = Numeric; level}, None) &@ loc)
               | UsagePending (`Comp1 | `Comp2 | `BinaryCLong _) ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({typ = Numeric; level}, None) &@ loc)
+                    (Cobol_data_old.Types.Elementary ({typ = Numeric; level}, None) &@ loc)
               | _ ->
                   DIAGS.error_result None ~loc "Missing@ PICTURE@ clause"
             end
         | Some picture, Some usage ->
             let pic = picture_of_string prog_env picture in
             let cls = DIAGS.map_result ~f:cobol_class_of_picture pic in
-            DIAGS.map2_results ~f:begin fun pic (cls: Cobol_data.Types.elementary_data_class) ->
+            DIAGS.map2_results ~f:begin fun pic (cls: Cobol_data_old.Types.elementary_data_class) ->
               match usage, cls with
               | (Binary | PackedDecimal |
                  UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)),
                 (Numeric as cls) ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({ typ = cls; level },
+                    (Cobol_data_old.Types.Elementary ({ typ = cls; level },
                                                   Some ~&pic) &@ loc)
               | (Binary | PackedDecimal |
                  UsagePending (`Comp3 | `Comp5 | `Comp6 | `CompX)), _ ->
@@ -198,7 +196,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
                      (COMP) or PACKED-DECIMAL must be a numeric picture"
               | _ ->
                   DIAGS.some_result
-                    (Cobol_data.Types.Elementary ({ typ = cls; level },
+                    (Cobol_data_old.Types.Elementary ({ typ = cls; level },
                                                   Some ~&pic) &@ loc)
             end pic cls
         | None, None ->
@@ -219,15 +217,15 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
           in
           let rec prepend_usage usage ({ payload; loc } as dg) =
             match payload with
-            | Cobol_data.Group.Elementary ({data_item = Data ({ data_clauses;
+            | Cobol_data_old.Group.Elementary ({data_item = Data ({ data_clauses;
                                                                 _} as data_item);
                                             _ } as element) ->
                 let data_item = Data { data_item with
                                        data_clauses = usage :: data_clauses } in
-                Cobol_data.Group.Elementary { element with data_item } &@ loc
+                Cobol_data_old.Group.Elementary { element with data_item } &@ loc
             | Group ({ elements; _ } as group) ->
                 let elements = List.map (prepend_usage usage) elements in
-                Cobol_data.Group.Group { group with elements } &@ loc
+                Cobol_data_old.Group.Group { group with elements } &@ loc
             | _  ->
                 dg
           in
@@ -243,7 +241,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
       in
       acc_occurs ~occurs_clause:occurs ~level ~loc @@
       DIAGS.map_some_result ~f:begin fun elements ->
-        Cobol_data.Types.Group { typ = elements; level } &@ loc
+        Cobol_data_old.Types.Group { typ = elements; level } &@ loc
       end elements
 
   | Renames { targets; _ } ->
@@ -259,7 +257,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
                                   OccursDynamic _); _ } -> true
         | _ -> false
       in
-      let rec check_data_group ~is_first_or_last (data_group: Cobol_data.Group.t) =
+      let rec check_data_group ~is_first_or_last (data_group: Cobol_data_old.Group.t) =
         match ~&data_group with
         | Renames _ | Constant _ ->
             DIAGS.Set.none
@@ -321,7 +319,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
               let elements = of_data_elements config prog_env targets in
               DIAGS.with_more_diags ~diags @@
               DIAGS.map_some_result ~f:begin fun elements ->
-                Cobol_data.Types.Group { typ = elements; level = 66 } &@ loc
+                Cobol_data_old.Types.Group { typ = elements; level = 66 } &@ loc
               end elements
         | [] ->
             DIAGS.error_result None ~loc
@@ -368,7 +366,7 @@ let lookup_working_data_item_descrs = object
   method! fold_data_item'
       { loc; payload = { data_level; data_name; data_clauses } }
       { diags; result = acc } =
-    let mangle = Cobol_data.Mangling.mangle_data_name ~default_loc:loc in
+    let mangle = Cobol_data_old.Mangling.mangle_data_name ~default_loc:loc in
     let data_item =              (* TODO: no need to mangle at this point *)
       { data_level; data_name = mangle data_name;
         data_clauses (* = convert_data_clauses data_clauses *) } in
@@ -394,5 +392,5 @@ let check_data_groups config env working_groups =
 let working_data_of_compilation_unit' config env root =
   Cobol_ptree.Visitor.fold_compilation_unit'
     lookup_working_data_item_descrs root @@ DIAGS.result [] |>
-  DIAGS.more_result ~f:Cobol_data.Group.of_working_item_descrs |>
+  DIAGS.more_result ~f:Cobol_data_old.Group.of_working_item_descrs |>
   DIAGS.more_result ~f:(check_data_groups config env)
