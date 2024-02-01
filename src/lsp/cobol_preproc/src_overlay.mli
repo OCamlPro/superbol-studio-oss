@@ -57,3 +57,5 @@ end
 
 (** Nanager module instantiation *)
 module New_manager: functor (Id: sig val name: string end) () -> MANAGER
+
+val debug_oc : out_channel option ref

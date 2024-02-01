@@ -13,6 +13,17 @@
 
 open Cobol_common.Srcloc.TYPES
 
+let debug_oc = ref None
+
+(*
+let message fmt =
+  Printf.kprintf (fun s ->
+      match !debug_oc with
+      | None -> ()
+      | Some oc ->
+        Printf.fprintf oc "OVERLAY: %s\n%!" s) fmt
+*)
+
 module TYPES = struct
   type limit = Lexing.position
 end

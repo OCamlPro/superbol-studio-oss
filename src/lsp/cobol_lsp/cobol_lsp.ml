@@ -38,4 +38,5 @@ module INTERNAL = struct
   module Loop = Lsp_server_loop
   module Request = Lsp_request.INTERNAL
   module Utils = Lsp_utils
+  module Debug = Lsp_debug
 end
