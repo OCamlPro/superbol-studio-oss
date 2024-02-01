@@ -18,7 +18,7 @@
    TODO: use the aforementioned associations instead of redefining them
    below. *)
 
-open Indent_type
+open Types
 
 (*data division *)
 let data_context_of_str : string -> data_context = function

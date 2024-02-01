@@ -13,7 +13,6 @@
 
 open Ezcmd.V2
 open EZCMD.TYPES
-open Cobol_indent
 
 open Common_args
 
@@ -22,9 +21,9 @@ let action
 =
   let module Config = (val config) in
   let project = Project.for_ ~filename in
-  let indent_config = Some (Cobol_indent.config project.config.indent_config) in
+  let indent_config = Some (Cobol_indent.Indent_main.config project.config.indent_config) in
   let contents = Ez_file.V1.EzFile.read_file filename in
-  indent_range_str ~source_format ~filename ~contents ~range ~indent_config
+  Cobol_indent.Indent_main.indent_range_str ~source_format ~filename ~contents ~range ~indent_config
     ~dialect:Config.dialect |> Fmt.pr "%s"
 
 let cmd =
@@ -39,7 +38,7 @@ let cmd =
   let common, common_args = Common_args.get () in
   let args = direct_args @ common_args in
   let range start_line end_line =
-    let open Cobol_indent.Type in
+    let open Cobol_indent.Types in
     let start_line = !start_line |> Int32.of_string |> Int32.to_int in
     let end_line = !end_line |> Int32.of_string |> Int32.to_int in
     Some {start_line; end_line}

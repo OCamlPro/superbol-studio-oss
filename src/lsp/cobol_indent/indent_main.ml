@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Indent_type
+open Types
 
 (*indent a range of file, with the default indent_config*)
 let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~contents =
@@ -42,3 +42,12 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
   in
   (* NB: note here we ignore diagnostics *)
   state.result.acc
+
+let indent_range_str
+  ~dialect ~source_format ~indent_config ~range ~filename ~contents
+=
+  indent_range
+    ~dialect ~source_format ~indent_config ~range ~filename ~contents
+  |> Indent_util.apply contents
+
+let config l = Indent_config.(merge default (of_list l))

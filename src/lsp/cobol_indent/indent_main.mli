@@ -16,7 +16,17 @@ val indent_range
   : dialect: Cobol_config.Types.dialect
   -> source_format:Cobol_config.Types.source_format_spec
   -> indent_config:Indent_config.t option
-  -> range:Indent_type.range option
+  -> range:Types.range option
   -> filename:string
   -> contents:string
-  -> Indent_type.indent_record list
+  -> Types.indent_record list
+
+
+val indent_range_str :
+  dialect:Cobol_config.Types.dialect ->
+  source_format:Cobol_config.Types.source_format_spec ->
+  indent_config:Types.indent_config option ->
+  range:Types.range option ->
+  filename:string -> contents:string -> string
+
+val config : (string * int) list -> Types.indent_config

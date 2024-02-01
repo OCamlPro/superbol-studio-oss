@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t = Indent_type.indent_config
+type t = Types.indent_config
 
 val default : t
 
@@ -20,4 +20,4 @@ val merge : t -> t -> t
 
 val of_list : (string * int) list -> t
 
-val offset_of_keyword: t -> Indent_type.context_kind -> int
+val offset_of_keyword: t -> Types.context_kind -> int

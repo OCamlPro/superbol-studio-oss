@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Indent_type
+open Types
 
 val check_pos:
   Cobol_preproc.Src_format.any ->

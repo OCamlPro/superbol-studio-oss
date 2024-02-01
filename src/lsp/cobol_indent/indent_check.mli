@@ -13,5 +13,5 @@
 
 val check_indentation
     :Cobol_preproc.Text.t
-    -> Indent_type.indent_state
-    -> Indent_type.indent_state
+    -> Types.indent_state
+    -> Types.indent_state

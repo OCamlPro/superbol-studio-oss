@@ -13,7 +13,6 @@
 
 open Ezcmd.V2
 open EZCMD.TYPES
-open Cobol_indent
 
 open Common_args
 
@@ -23,9 +22,9 @@ let action { preproc_options = { source_format; config; _ } ; _ } files =
   |> Seq.map (fun filename ->
       let project = Project.for_ ~filename in
       let contents = Ez_file.V1.EzFile.read_file filename in
-      indent_range_str
+      Cobol_indent.Indent_main.indent_range_str
         ~source_format ~filename ~contents ~range:None
-        ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
+        ~indent_config:(Some (Cobol_indent.Indent_main.config project.config.indent_config))
         ~dialect:Config.dialect |> Fmt.pr "%s")
 
 let cmd =
