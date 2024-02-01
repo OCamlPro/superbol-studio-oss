@@ -25,7 +25,7 @@ module type MANAGER = sig
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
   val dummy_limit: limit
-  val restart_at: limit -> unit
+  val restart: unit -> unit
 end
 
 (** Overlay limits (internal) *)
@@ -87,13 +87,16 @@ let new_manager: string -> manager =
     location; for any given file, must be called with the leftmost location
     first. *)
 let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
-  let s, e = match Cobol_common.Srcloc.as_unique_lexloc loc with
+  let left, right = match Cobol_common.Srcloc.as_unique_lexloc loc with
     | Some lexloc -> lexloc
     | _ -> Limit.make_virtual (), Limit.make_virtual ()
   in
-  Links.replace ctx.right_of s (loc, e);  (* Replace to deal with duplicates. *)
-  Links.remove ctx.cache s;               (* Manually remove from cache. *)
-  s, e
+  Links.replace ctx.right_of left (loc, right);          (* Replace to deal with
+                                                            duplicates. *)
+  Links.remove ctx.over_right_gap left;  (* `left' could have been a right-limit
+                                            before the previous `restart` *)
+  Links.remove ctx.cache left;                 (* Manually remove from cache. *)
+  left, right
 
 (** Links token limits *)
 let link_limits ctx left right =
@@ -162,7 +165,10 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   with Not_found ->
     join_failure (s, e)
 
-let restart_at ctx _limit =
+let restart ctx =
+  (* CHECKME: recursively traversing and emptying `right_of` and
+     `over_right_gap` from a given limit may allow us to remove one or two calls
+     ito `Links.remove` in `limits` above. *)
   Links.clear ctx.cache
 
 module New_manager (Id: sig val name: string end) () : MANAGER = struct
@@ -172,5 +178,5 @@ module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
   let dummy_limit = Lexing.dummy_pos
-  let restart_at = restart_at ctx
+  let restart () = restart ctx
 end

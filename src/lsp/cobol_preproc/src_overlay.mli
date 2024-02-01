@@ -29,7 +29,10 @@ module type MANAGER = sig
   val id: string
 
   (** [limits loc] creates and returns the left- and right-limit to the given
-      location. *)
+      location.
+
+      Note: if [loc] overlaps with locations that have already been fed to this
+      function, then {!restart} must first be called. *)
   val limits: Cobol_common.Srcloc.srcloc -> limit * limit
 
   (** [link_limits left right] links the right limit of a token [t] to the left
@@ -46,10 +49,9 @@ module type MANAGER = sig
       but not given to {!link_limits}. *)
   val dummy_limit: limit
 
-  (** [restart_at limit] instructs the manager that limits on the right of (but
-      not including) [limit] are now outdated and should not be relied upon.  At
-      the moment this just clears an internal cache. *)
-  val restart_at: limit -> unit
+  (** [restart ()] instructs the manager that (a subset of) the limits
+      previously created are now outdated and should not be relied upon. *)
+  val restart: unit -> unit
 
 end
 

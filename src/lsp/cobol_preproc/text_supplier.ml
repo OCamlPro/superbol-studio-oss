@@ -99,6 +99,7 @@ let cdtoks_of_text_supplier text =
     ~endlimit:(fun () -> Lexing.dummy_pos)
 
 let pptoks_of_text_supplier (module Om: Src_overlay.MANAGER) text =
+  Om.restart ();
   let prev_limit = ref None in
   ondemand_list_supplier ~eoi:Preproc_tokens.EOL ~pp:pptoks_of_chstr text
     ~decompose:begin fun y ->
