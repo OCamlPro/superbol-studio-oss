@@ -13,7 +13,7 @@
 
 open EzCompat
 
-open Unit_types
+open Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 

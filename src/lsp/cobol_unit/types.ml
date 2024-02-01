@@ -21,7 +21,7 @@ open Cobol_common.Srcloc.TYPES
     many cases anonymous elements of [list] many not belong to [named]. *)
 type 'a named_n_ordered =
   {
-    named: 'a Unit_qualmap.t;
+    named: 'a Qualmap.t;
     list: 'a list;
   }
 

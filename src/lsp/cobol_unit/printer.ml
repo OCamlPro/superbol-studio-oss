@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Unit_types
+open Types
 
 open Cobol_common.Srcloc.INFIX
 
@@ -22,13 +22,13 @@ let pp_cobol_unit ?(show_items = false) =
          (Fmt.(list ~sep:nop) Cobol_data.Printer.pp_record));
     C'(show_items,
        Pretty.vfield "items" (fun x -> x.unit_data.data_items.named)
-         (Unit_qualmap.pp_qualmap Cobol_data.Printer.pp_data_definition));
+         (Qualmap.pp_qualmap Cobol_data.Printer.pp_data_definition));
   ]
 
 let pp_cobol_unit' ppf u = pp_cobol_unit ppf ~&u
 
 let pp_group ppf group =
-  Unit_collections.SET.iter begin fun u ->
+  Collections.SET.iter begin fun u ->
     Fmt.(vbox @@ (styled `Yellow @@ any "unit") ++ any ": " ++
                  pp_cobol_unit' ++ any "@\n") ppf u
   end group

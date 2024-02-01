@@ -15,7 +15,7 @@ open EzCompat                                              (* String{Map,Set} *)
 module StrMap = StringMap
 module StrSet = StringSet
 
-open Unit_qual
+open Qual
 module NEL = Cobol_common.Basics.NEL
 
 (* --- *)
@@ -113,7 +113,7 @@ let rec find_binding qn { map; _ } =
   | Exact { binding = None; refined; _ }, None ->
       find_unique_binding qn refined
   | Cut { binding; qn_suffix }, Some qn'
-    when Unit_qual.matches qn' ~full:qn_suffix ->
+    when Qual.matches qn' ~full:qn_suffix ->
       binding
   | Cut _, Some _ ->
       raise Not_found
@@ -157,7 +157,7 @@ and find_all_bindings qn qmap : _ binding list =
     (* Skip keys at toplevel of map: *)
     StrMap.fold begin fun _key node acc -> match node with
       | Cut { binding; qn_suffix }
-        when Unit_qual.matches qn ~full:qn_suffix ->
+        when Qual.matches qn ~full:qn_suffix ->
           binding :: acc
       | Cut _ ->
           acc

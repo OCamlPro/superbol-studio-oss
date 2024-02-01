@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Unit_types
+open Types
 
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
@@ -22,7 +22,7 @@ open Cobol_common.Srcloc.TYPES
 class ['a] folder = object
   inherit ['a] Cobol_data.Visitor.folder
   inherit!['a] Cobol_ptree.Proc_division_visitor.folder
-  method fold_unit_group: (Unit_group.t, 'a) fold = default
+  method fold_unit_group: (Group.t, 'a) fold = default
   method fold_cobol_unit: (cobol_unit, 'a) fold = default
   method fold_cobol_unit': (cobol_unit with_loc, 'a) fold = default
   method fold_unit_config: (unit_config, 'a) fold = default
@@ -93,4 +93,4 @@ let fold_cobol_unit' (v: _ #folder) =
 
 let fold_unit_group (v: _ #folder) =
   handle v#fold_unit_group
-    ~continue:(Unit_group.fold (fold_cobol_unit' v))
+    ~continue:(Group.fold (fold_cobol_unit' v))

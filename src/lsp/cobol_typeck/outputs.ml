@@ -31,7 +31,7 @@ type artifacts =
 type outputs =
   {
     ptree: Cobol_ptree.Types.compilation_group;
-    group: Cobol_unit.Types.group;
+    group: Cobol_unit.Group.TYPES.group;
     artifacts: artifacts;
   }
 type t = outputs

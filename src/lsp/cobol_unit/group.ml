@@ -11,16 +11,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Utilities to deal with sections/paragraphs of PROCEDURE DIVISIONs *)
+module TYPES = struct
+  type group = Collections.SET.t
+  type +'a group_map = 'a Collections.MAP.t
+end
 
-val find
-  : ?in_section: Unit_types.procedure_section
-  -> Cobol_ptree.Types.qualname
-  -> Unit_types.procedure
-  -> Unit_types.procedure_block
+(* (\** Alias for {!Collections.SET.empty} *\) *)
+(* let empty = Unit_collections.SET.empty *)
 
-val full_qn
-  : ?in_section: Unit_types.procedure_section
-  -> Cobol_ptree.Types.qualname
-  -> Unit_types.procedure
-  -> Cobol_ptree.Types.qualname
+(* (\** Alias for {!Collections.SET.add} *\) *)
+(* let add = Unit_collections.SET.add *)
+
+(* (\** Alias for {!Collections.SET.iter} *\) *)
+(* let iter = Unit_collections.SET.iter *)
+
+include Collections.SET

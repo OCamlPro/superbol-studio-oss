@@ -11,16 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Qual = Unit_qual
-module Qualmap = Unit_qualmap
+(** Utilities to deal with sections/paragraphs of PROCEDURE DIVISIONs *)
 
-module Types = struct
-  include Unit_types
-  include Unit_group.TYPES
-end
+val find
+  : ?in_section: Types.procedure_section
+  -> Cobol_ptree.Types.qualname
+  -> Types.procedure
+  -> Types.procedure_block
 
-module Group = Unit_group
-module Procedure = Unit_procedure
-module Collections = Unit_collections
-module Printer = Unit_printer
-module Visitor = Unit_visitor
+val full_qn
+  : ?in_section: Types.procedure_section
+  -> Cobol_ptree.Types.qualname
+  -> Types.procedure
+  -> Cobol_ptree.Types.qualname
