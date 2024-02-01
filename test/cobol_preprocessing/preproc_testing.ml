@@ -24,7 +24,7 @@ let preprocess
     ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents =
   DIAGS.show_n_forget ~ppf:Fmt.stdout @@
-  Cobol_preproc.Preprocess.preprocess_input
+  Cobol_preproc.Main.preprocess_input
     ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
                                                   source_format } @@
   Cobol_preproc.Src_input.String { filename; contents }
@@ -36,7 +36,7 @@ let show_text
     contents =
   let text =
     DIAGS.show_n_forget ~ppf:Fmt.stdout @@
-    Cobol_preproc.Preprocess.text_of_input
+    Cobol_preproc.Main.text_of_input
       ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
                                                     source_format } @@
     Cobol_preproc.Src_input.String { filename; contents }
@@ -53,7 +53,7 @@ let show_source_lines
     contents
   =
   DIAGS.show_n_forget ~ppf:Fmt.stdout @@
-  Cobol_preproc.Preprocess.fold_source_lines ~dialect ~source_format
+  Cobol_preproc.Main.fold_source_lines ~dialect ~source_format
     ~f:begin fun lnum line () ->
       if with_line_numbers then Pretty.out "@\n%u: " lnum else Pretty.out "@\n";
       Pretty.out "%a" Cobol_preproc.Text.pp_text line;
@@ -71,10 +71,10 @@ let show_source_lines
     end
 
 let rec show_all_text pp =
-  match Cobol_preproc.Preprocess.next_chunk pp with
+  match Cobol_preproc.Main.next_chunk pp with
   | { payload = Cobol_preproc.Text.Eof; _ } :: _, _ ->
     Cobol_common.Diagnostics.Set.pp Fmt.stdout
-      (Cobol_preproc.Preprocess.diags pp);
+      (Cobol_preproc.Main.diags pp);
     pp
   | text, pp ->
     Pretty.out "%a@\n" Cobol_preproc.Text.pp_text text;
@@ -98,12 +98,12 @@ let preprocess_n_then_cut_n_paste_right_of_indicator
   Pretty.out "fixed: %a@." show_lines fixed_lines;
   Pretty.out " free: %a@." show_lines free_lines;
   Cobol_preproc.Src_input.string ~filename fixed_format_contents |>
-  Cobol_preproc.Preprocess.preprocessor
+  Cobol_preproc.Main.preprocessor
     ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
                                                   source_format } |>
   show_all_text |>
-  Cobol_preproc.Preprocess.reset_preprocessor_for_string free_format_contents |>
+  Cobol_preproc.Main.reset_preprocessor_for_string free_format_contents |>
   show_all_text |>
-  Cobol_preproc.Preprocess.reset_preprocessor_for_string fixed_format_contents |>
+  Cobol_preproc.Main.reset_preprocessor_for_string fixed_format_contents |>
   show_all_text |>
   ignore

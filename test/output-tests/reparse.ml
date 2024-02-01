@@ -23,7 +23,7 @@ let reparse_file ~source_format ~config filename =
           default with
           recovery = DisableRecovery
         } @@
-    Cobol_preproc.Preprocess.preprocessor
+    Cobol_preproc.Main.preprocessor
       ~options:Cobol_preproc.Options.{
           default with
           libpath = [];

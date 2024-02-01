@@ -18,7 +18,7 @@ open Testsuite_utils
 
 let preprocess_file ~source_format ~config filename =
   Cobol_common.Diagnostics.show_n_forget ~min_level:Error @@
-  Cobol_preproc.Preprocess.preprocess_file filename
+  Cobol_preproc.Main.preprocess_file filename
     ~options:Cobol_preproc.Options.{ source_format; config;
                                      verbose = false; libpath = [] }
     ~ppf:std_formatter

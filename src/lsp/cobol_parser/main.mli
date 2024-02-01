@@ -37,7 +37,7 @@ open Outputs
 (** Simple parsing functions traverse the inputs once to produce a result. *)
 type 'm simple_parsing
   = ?options:Options.parser_options
-  -> Cobol_preproc.Preprocess.t
+  -> Cobol_preproc.Main.preprocessor
   -> (Cobol_ptree.Types.compilation_group option, 'm) output
     Cobol_common.Diagnostics.with_diags
 
@@ -60,7 +60,7 @@ val parse_with_artifacts
     {!rewinder} that may then be given to {!rewind_and_parse}. *)
 type 'm rewindable_parsing
   = ?options:parser_options
-  -> Cobol_preproc.Preprocess.preprocessor
+  -> Cobol_preproc.Main.preprocessor
   -> (((Cobol_ptree.Types.compilation_group option, 'm) output as 'x) * 'x rewinder)
     Cobol_common.Diagnostics.with_diags
 
@@ -74,7 +74,7 @@ and 'x rewinder
     of the input. *)
 and preprocessor_rewind =
   ?new_position:Lexing.position ->
-  (Cobol_preproc.Preprocess.t as 'r) -> 'r
+  (Cobol_preproc.Main.t as 'r) -> 'r
 
 (* val rewindable_parse *)
 (*   : memory:'m memory -> 'm rewindable_parsing *)
