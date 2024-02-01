@@ -37,7 +37,7 @@ include TYPES
     opened document pertaining to a given project. *)
 module CACHED_DOCS =
   Set.Make (struct
-    open Lsp_document.TYPES
+    open Document.TYPES
     type t = cached
     let compare { doc_cache_filename = f1; _ } { doc_cache_filename = f2; _ } =
       String.compare f1 f2
@@ -45,7 +45,7 @@ module CACHED_DOCS =
 
 type cached_project_record =
   {
-    cached_project: Lsp_project.cached;
+    cached_project: Project.cached;
     cached_docs: CACHED_DOCS.t;
   }
 
@@ -56,10 +56,10 @@ let cache_filename ~config ~rootdir =
   | No_storage ->
       None
   | Store_in_file { relative_filename } ->
-      Some (Lsp_project.string_of_rootdir rootdir // relative_filename)
+      Some (Project.string_of_rootdir rootdir // relative_filename)
   | Store_in_shared_dir { dirname } ->
       Some (dirname // Digest.(to_hex @@
-                               string @@ Lsp_project.string_of_rootdir rootdir))
+                               string @@ Project.string_of_rootdir rootdir))
 
 let version_tag_length = 40            (* use full commit hash when available *)
 let version_tag =
@@ -84,10 +84,10 @@ let read_project_cache ic =
 
 (** (Internal) May raise {!Failure} or {!Sys_error}. *)
 let save_project_cache ~config
-    (Lsp_project.{ rootdir; _ } as project) cached_docs =
+    (Project.{ rootdir; _ } as project) cached_docs =
   let cached_project_record =
     {
-      cached_project = Lsp_project.to_cache project;
+      cached_project = Project.to_cache project;
       cached_docs;
     }
   in
@@ -98,7 +98,7 @@ let save_project_cache ~config
       (* if Lsp_utils.is_file cache_file *)
       (* then (* read, write if commit hash or document changed *) *)
       (* else *)
-      Lsp_utils.write_to cache_file (write_project_cache cached_project_record);
+      Utils.write_to cache_file (write_project_cache cached_project_record);
       Lsp_io.pretty_notification "Wrote cache at: %s" cache_file
         ~log:true ~type_:Info
   | None ->
@@ -107,24 +107,24 @@ let save_project_cache ~config
 let save ~config docs =
   (* Pivot all active projects: associate projects with all their documents, and
      ignore any project that has none. *)
-  URIMap.fold begin fun _ (Lsp_document.{ project; _ } as doc) ->
-    Lsp_project.MAP.update project begin function
-      | None -> Some (CACHED_DOCS.singleton (Lsp_document.to_cache doc))
-      | Some s -> Some (CACHED_DOCS.add (Lsp_document.to_cache doc) s)
+  URIMap.fold begin fun _ (Document.{ project; _ } as doc) ->
+    Project.MAP.update project begin function
+      | None -> Some (CACHED_DOCS.singleton (Document.to_cache doc))
+      | Some s -> Some (CACHED_DOCS.add (Document.to_cache doc) s)
     end
-  end docs Lsp_project.MAP.empty |>
-  Lsp_project.MAP.iter (save_project_cache ~config)
+  end docs Project.MAP.empty |>
+  Project.MAP.iter (save_project_cache ~config)
 
 (** (Internal) *)
 let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
-  let project = Lsp_project.of_cache ~rootdir ~layout cached_project in
-  let add_doc doc docs = URIMap.add (Lsp_document.uri doc) doc docs in
+  let project = Project.of_cache ~rootdir ~layout cached_project in
+  let add_doc doc docs = URIMap.add (Document.uri doc) doc docs in
   CACHED_DOCS.fold begin fun cached_doc docs ->
     try
-      let doc = Lsp_document.of_cache ~project cached_doc in
+      let doc = Document.of_cache ~project cached_doc in
       if config.cache_verbose then
         Lsp_io.pretty_notification "Successfully read cache for %s"
-          (Lsp.Uri.to_string @@ Lsp_document.uri doc) ~log:true ~type_:Info;
+          (Lsp.Uri.to_string @@ Document.uri doc) ~log:true ~type_:Info;
       add_doc doc docs
     with
     | Failure msg | Sys_error msg ->
@@ -141,10 +141,10 @@ let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
 let load ~rootdir ~layout ~config =
   let fallback = URIMap.empty in
   let load_cache cache_file =
-    let cached_project = Lsp_utils.read_from cache_file read_project_cache in
+    let cached_project = Utils.read_from cache_file read_project_cache in
     let project = load_project ~rootdir ~layout ~config cached_project in
     Lsp_io.pretty_notification "Successfully read cache for %s"
-      (Lsp_project.string_of_rootdir rootdir) ~log:true ~type_:Info;
+      (Project.string_of_rootdir rootdir) ~log:true ~type_:Info;
     project
   in
   match cache_filename ~config ~rootdir with

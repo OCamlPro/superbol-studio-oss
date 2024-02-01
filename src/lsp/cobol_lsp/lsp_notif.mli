@@ -11,4 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Notification.t -> (Lsp_server.state as 's) -> 's
+val handle: Jsonrpc.Notification.t -> (Server.state as 's) -> 's

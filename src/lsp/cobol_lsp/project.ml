@@ -36,8 +36,8 @@ let rootdir_for ~uri ~layout =
 
 let show_n_forget_diagnostics ?(force = false) { result = project; diags } =
   if force || diags <> DIAGS.Set.none then
-    Lsp_diagnostics.publish @@
-    Lsp_diagnostics.translate diags
+    Diagnostics.publish @@
+    Diagnostics.translate diags
       ~rootdir:(Superbol_project.string_of_rootdir project.rootdir)
       ~uri:(`Main (Lsp.Uri.of_path project.config_filename));
   project

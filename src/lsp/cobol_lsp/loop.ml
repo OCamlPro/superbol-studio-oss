@@ -31,11 +31,11 @@ open Ez_file.V1.EzFile.OP
       [project_layout] does not provide a per-project storage directory ({i i.e,}
       [project_layout.relative_work_dirname = None]). *)
 let config
-    ~(project_layout: Lsp_project.layout)
+    ~(project_layout: Project.layout)
     ?(enable_caching = true)
     ?(fallback_storage_directory: string option)
     () =
-  let cache_storage: Lsp_project_cache.storage =
+  let cache_storage: Project_cache.storage =
     match project_layout.relative_work_dirname, fallback_storage_directory with
     | _ when not enable_caching ->
         No_storage
@@ -57,7 +57,7 @@ let config
           relative_filename = relative_work_dirname // "lsp-cache";
         }
   in
-  Lsp_server.{
+  Server.{
     cache_config = {
       cache_storage;
       cache_verbose = true;
@@ -76,14 +76,14 @@ let run ~config =
     | Jsonrpc.Packet.Notification n ->
         continue @@ Lsp_notif.handle n state
     | Jsonrpc.Packet.Request r ->
-        continue @@ reply @@ Lsp_request.handle r state
+        continue @@ reply @@ Request.handle r state
     | Jsonrpc.Packet.Batch_call calls ->
         batch calls state
     | Jsonrpc.Packet.Response _ | Batch_response _ ->
         Pretty.error "Response@ recieved@ unexpectedly@.";
         continue state
     | exception End_of_file ->
-        Lsp_request.shutdown state;
+        Request.shutdown state;
         Error "Premature end of input stream"                    (* exit loop *)
     | exception Lsp_io.Parse_error msg ->
         Lsp_io.pretty_notification ~type_:Error "%s" msg;
@@ -95,12 +95,12 @@ let run ~config =
     | `Notification n :: calls' ->
         batch calls' @@ Lsp_notif.handle n state
     | `Request n :: calls' ->
-        batch calls' @@ reply @@ Lsp_request.handle n state
+        batch calls' @@ reply @@ Request.handle n state
   and reply (state, response) =
     Lsp_io.send_response response;
     state
   and continue = function
-    | Lsp_server.Exit code -> code                                (* exit loop *)
+    | Server.Exit code -> code                                (* exit loop *)
     | state -> loop state
   in
   loop (NotInitialized config)

@@ -44,9 +44,9 @@ let translate_one ~rootdir ~uri (diag: DIAG.t) =
   let uri, range =
     match Option.map project_srcloc (DIAG.location diag) with
     | Some (Lexing.{ pos_fname = f; _ }, _ as lexloc) ->
-        pseudo_normalized_uri ~rootdir f, Lsp_position.range_of_lexloc lexloc
+        pseudo_normalized_uri ~rootdir f, Position.range_of_lexloc lexloc
     | None ->
-        uri, Lsp_position.pointwise_range_at_start
+        uri, Position.pointwise_range_at_start
   in
   let diag =
     Lsp.Types.Diagnostic.create ()

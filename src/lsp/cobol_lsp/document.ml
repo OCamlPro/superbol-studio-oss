@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lsp_project.TYPES
+open Project.TYPES
 open Ez_file.V1
 
 module DIAGS = Cobol_common.Diagnostics
@@ -20,7 +20,7 @@ module TYPES = struct
 
   type document =
     {
-      project: Lsp_project.t;
+      project: Project.t;
       textdoc: Lsp.Text_document.t;
       copybook: bool;
       artifacts: Cobol_parser.Outputs.artifacts;
@@ -75,7 +75,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_preproc.Preprocess.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
+        libpath = Project.libpath_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
         source_format = project.config.source_format
       } @@
@@ -123,7 +123,7 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
 let blank ~project ?copybook textdoc =
   let copybook = match copybook with
     | Some p -> p
-    | None -> Lsp_project.detect_copybook project
+    | None -> Project.detect_copybook project
                 ~uri:(Lsp.Text_document.documentUri textdoc)
   in
   {
@@ -180,7 +180,7 @@ let to_cache ({ project; textdoc; checked; diags;
                 artifacts = { pplog; tokens;
                               rev_comments; rev_ignored; _ }; _ } as doc) =
   {
-    doc_cache_filename = Lsp_project.relative_path_for ~uri:(uri doc) project;
+    doc_cache_filename = Project.relative_path_for ~uri:(uri doc) project;
     doc_cache_checksum = Digest.string (Lsp.Text_document.text textdoc);
     doc_cache_langid = Lsp.Text_document.languageId textdoc;
     doc_cache_version = Lsp.Text_document.version textdoc;
@@ -206,7 +206,7 @@ let of_cache ~project
       doc_cache_ignored = rev_ignored;
       doc_cache_checked = checked;
       doc_cache_diags = diags } =
-  let absolute_filename = Lsp_project.absolute_path_for ~filename project in
+  let absolute_filename = Project.absolute_path_for ~filename project in
   if checksum <> Digest.file absolute_filename then
     failwith "Bad checksum"
   else

@@ -23,7 +23,6 @@ open Ez_file.V1
 open Ez_file.FileString.OP
 
 module StrMap = EzCompat.StringMap
-module LSP = Cobol_lsp.INTERNAL
 
 (* Used to remove full-path and lines in the test files *)
 let () =
@@ -34,7 +33,7 @@ let () =
 let layout =
   Superbol_free_lib.Project.layout;
 and cache_config =
-  LSP.Project_cache.{
+  Cobol_lsp.Project_cache.{
     cache_storage = No_storage;
     cache_verbose = false;
   }
@@ -46,14 +45,14 @@ let init_temp_project ?(toml = "") () =
   projdir
 
 let make_server () =
-  LSP.Server.init ~config:{ project_layout = layout; cache_config }
+  Cobol_lsp.Server.init ~config:{ project_layout = layout; cache_config }
 
 let add_cobol_doc server ?copybook ~projdir filename text =
   let path = projdir // filename in
   let uri = Lsp.Uri.of_path path in
   EzFile.write_file path text;
   let server =
-    LSP.Server.did_open ?copybook
+    Cobol_lsp.Server.did_open ?copybook
       DidOpenTextDocumentParams.{
         textDocument = TextDocumentItem.{
             languageId = "cobol"; version = 0; text; uri;
@@ -106,7 +105,7 @@ let make_lsp_project ?toml () =
     print_endline
   in
   (* Force project initialization (so we can flush before the next RPC) *)
-  ignore @@ LSP.Project.in_existing_dir projdir ~layout;
+  ignore @@ Cobol_lsp.Project.in_existing_dir projdir ~layout;
   print_newline ();
   { projdir; end_with_postproc }, make_server ()
 
@@ -228,7 +227,7 @@ end
 (* --- *)
 
 (* let%expect_test "initialize-server" = *)
-(*   ignore @@ LSP.Project.in_existing_dir projdir ~layout; *)
+(*   ignore @@ Cobol_lsp.Project.in_existing_dir projdir ~layout; *)
 (*   print_postproc [%expect.output]; *)
 (*   [%expect {| *)
 (*     {"params":{"diagnostics":[],"uri":"file://__rootdir__/superbol.toml"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"} *)

@@ -98,7 +98,7 @@ type semtok = {
 }
 
 let semtok ?(tokmods = TOKMOD.none) toktyp lexloc =
-  let range = Lsp_position.range_of_lexloc lexloc in
+  let range = Position.range_of_lexloc lexloc in
   let line = range.start.line in
   let start = range.start.character in
   let length = range.end_.character - start in
@@ -109,7 +109,7 @@ let single_line_lexlocs_in ~filename =
 
 let acc_semtoks ~filename ?range ?tokmods toktyp loc acc =
   List.fold_left begin fun acc lexloc -> match range with
-    | Some r when not (Lsp_position.intersects_lexloc r lexloc) -> acc
+    | Some r when not (Position.intersects_lexloc r lexloc) -> acc
     | _ -> semtok toktyp ?tokmods lexloc :: acc
   end acc @@ single_line_lexlocs_in ~filename loc
 
@@ -548,7 +548,7 @@ let semtoks_of_comments ~filename ?range rev_comments =
     | Cobol_preproc.Text.{ comment_loc = s, _ as lexloc; _ }
       when s.Lexing.pos_fname = filename &&
            Option.fold range
-             ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+             ~some:(fun r -> Position.intersects_lexloc r lexloc)
              ~none:true ->
         semtok TOKTYP.comment lexloc :: acc
     | _ ->
@@ -563,7 +563,7 @@ let semtoks_of_ignored ~filename ?range rev_ignored =
   List.fold_left begin fun acc ((s, _ ) as lexloc) ->
     if s.Lexing.pos_fname = filename &&
        Option.fold range
-         ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+         ~some:(fun r -> Position.intersects_lexloc r lexloc)
          ~none:true
     then semtok TOKTYP.comment lexloc :: acc
     else acc

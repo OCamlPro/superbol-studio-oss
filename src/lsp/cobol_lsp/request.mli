@@ -11,13 +11,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val config
-  : project_layout: Superbol_project.layout
-  -> ?enable_caching: bool
-  -> ?fallback_storage_directory: string
-  -> unit
-  -> Lsp_server.config
+val handle: Jsonrpc.Request.t -> (Server.state as 's) -> 's * Jsonrpc.Response.t
+val shutdown: Server.state -> unit
 
-val run
-  : config: Lsp_server.config
-  -> Lsp_server.exit_status
+module INTERNAL: sig
+  val lookup_definition
+    : Server.t
+    -> Lsp.Types.DefinitionParams.t
+    -> [> `Location of Lsp.Types.Location.t list ] option
+  val lookup_definition_in_doc
+    : Lsp.Types.DefinitionParams.t
+    -> Document.checked_doc
+    -> [> `Location of Lsp.Types.Location.t list ] option
+  val lookup_references
+    : Server.t
+    -> Lsp.Types.ReferenceParams.t
+    -> Lsp.Types.Location.t list option
+  val lookup_references_in_doc
+    : Lsp.Types.ReferenceParams.t
+    -> Document.checked_doc
+    -> Lsp.Types.Location.t list option
+  val hover
+    : Server.t
+    -> Lsp.Types.HoverParams.t
+    -> Lsp.Types.Hover.t option
+  val formatting
+    : Server.t
+    -> Lsp.Types.DocumentFormattingParams.t
+    -> Lsp.Types.TextEdit.t list option
+end

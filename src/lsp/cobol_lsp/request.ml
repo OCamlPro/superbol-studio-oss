@@ -14,10 +14,9 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Lsp_imports
-open Lsp_project.TYPES
-open Lsp_server.TYPES
-open Lsp_lookup.TYPES
-open Lsp.Types
+open Project.TYPES
+open Server.TYPES
+open Lookup.TYPES
 open Ez_file.V1
 
 (** {2 Handling requests} *)
@@ -25,13 +24,14 @@ open Ez_file.V1
 (** Catch generic exception cases, and report errors using {!error} above *)
 let try_doc ~f registry doc_id =
   let doc =
-    try Lsp_server.find_document doc_id registry
+    try Server.find_document doc_id registry
     with Not_found ->
       Lsp_error.request_failed
         "Received a request about a document that has not been opened yet (uri = \
          %s) --- possible cause is the client did not manage to send the didOpen \
          notification; this may happen due to unhandled character encodings.\
-        " (DocumentUri.to_string doc_id.TextDocumentIdentifier.uri)
+        " (Lsp.Types.DocumentUri.to_string
+             doc_id.Lsp.Types.TextDocumentIdentifier.uri)
   in
   try f ~doc
   with e ->
@@ -39,24 +39,24 @@ let try_doc ~f registry doc_id =
 
 (** Same as [try_doc], with some additional document data *)
 let try_with_document_data ~f =
-  try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
+  try_doc ~f:(fun ~doc -> f ~doc @@ Document.checked doc)
 
 (** {3 Initialization} *)
 
-let handle_initialize (params: InitializeParams.t) =
-  InitializeResult.create ()
+let handle_initialize (params: Lsp.Types.InitializeParams.t) =
+  Lsp.Types.InitializeResult.create ()
     ~capabilities:(Lsp_capabilities.reply params.capabilities)
 
 (** {3 Shutdown} *)
 
 let handle_shutdown registry =
-  Lsp_server.save_project_caches registry
+  Server.save_project_caches registry
 
 (** {3 Definitions} *)
 
 let focus_on_name_in_defintions = true
 
-let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
+let find_data_definition Position.{ location_of; location_of_srcloc }
     ?(allow_notifications = true)
     (qn: Cobol_ptree.Types.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
@@ -88,7 +88,7 @@ let find_data_definition Lsp_position.{ location_of; location_of_srcloc }
       []
 
 let find_proc_definition
-    Lsp_position.{ location_of; _ }
+    Position.{ location_of; _ }
     ?(allow_notifications = true)
     ?(in_section: Cobol_unit.Types.procedure_section option)
     (qn: Cobol_ptree.Types.qualname) (cu: Cobol_unit.Types.cobol_unit) =
@@ -129,19 +129,19 @@ let find_definitions ?allow_notifications loc_translator
   with Not_found -> []
 
 let lookup_definition_in_doc
-    DefinitionParams.{ textDocument = doc; position; _ }
+    Lsp.Types.DefinitionParams.{ textDocument = doc; position; _ }
     Cobol_typeck.Outputs.{ group; _ }
   =
-  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+  match Lookup.element_at_position ~uri:doc.uri position group with
   | { element_at_position = None; _ }
   | { enclosing_compilation_unit_name = None; _ } ->
       None
   | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
-      let loc_translator = Lsp_position.loc_translator doc in
+      let loc_translator = Position.loc_translator doc in
       Some (`Location (find_definitions loc_translator cu_name qn group))
 
-let handle_definition registry (params: DefinitionParams.t) =
+let handle_definition registry (params: Lsp.Types.DefinitionParams.t) =
   try_with_document_data registry params.textDocument
     ~f:(fun ~doc:_ -> lookup_definition_in_doc params)
 
@@ -168,10 +168,10 @@ let find_proc_qn ~kind qn ?in_section cu =
     end
 
 let lookup_references_in_doc
-    ReferenceParams.{ textDocument = doc; position; context; _ }
+    Lsp.Types.ReferenceParams.{ textDocument = doc; position; context; _ }
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
-  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+  match Lookup.element_at_position ~uri:doc.uri position group with
   | { element_at_position = None; _ } ->
     Lsp_debug.message "Lsp_request.lookup_references_in_doc: element_at_position = None";
     None
@@ -180,8 +180,8 @@ let lookup_references_in_doc
       None
   | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
-      let Lsp_position.{ location_of_srcloc; _ } as loc_translator
-        = Lsp_position.loc_translator doc in
+      let Position.{ location_of_srcloc; _ } as loc_translator
+        = Position.loc_translator doc in
       let def_locs =
         if context.includeDeclaration then
           find_definitions ~allow_notifications:false loc_translator
@@ -218,7 +218,7 @@ let lookup_references_in_doc
       in
       Some (def_locs @ ref_locs)
 
-let handle_references state (params: ReferenceParams.t) =
+let handle_references state (params: Lsp.Types.ReferenceParams.t) =
   try_with_document_data state params.textDocument
     ~f:(fun ~doc:_ -> lookup_references_in_doc params)
 
@@ -226,16 +226,16 @@ let handle_references state (params: ReferenceParams.t) =
 
 let lsp_text_edit Cobol_indent.Types.{ lnum; offset_orig; offset_modif } =
   let delta = offset_modif - offset_orig in
-  let position = Position.create ~line:(lnum - 1) ~character:offset_orig in
-  let range = Range.create ~start:position ~end_:position in
+  let position = Lsp.Types.Position.create ~line:(lnum - 1) ~character:offset_orig in
+  let range = Lsp.Types.Range.create ~start:position ~end_:position in
   if delta > 0 then
-    TextEdit.create ~newText:(String.make delta ' ') ~range
+    Lsp.Types.TextEdit.create ~newText:(String.make delta ' ') ~range
   else
     let start =
-      Position.create ~line:(lnum - 1) ~character:(offset_orig + delta)
+      Lsp.Types.Position.create ~line:(lnum - 1) ~character:(offset_orig + delta)
     in
-    let range = Range.create ~start ~end_:position in
-    TextEdit.create ~newText:"" ~range
+    let range = Lsp.Types.Range.create ~start ~end_:position in
+    Lsp.Types.TextEdit.create ~newText:"" ~range
 
 (*Remark:
     The first line of the text selected to RangeFormatting must be
@@ -244,10 +244,10 @@ let lsp_text_edit Cobol_indent.Types.{ lnum; offset_orig; offset_modif } =
     Otherwise, unexpected result.
 *)
 let handle_range_formatting registry params =
-  let open DocumentRangeFormattingParams in
+  let open Lsp.Types.DocumentRangeFormattingParams in
   let { textDocument = doc; range = {start; end_}; _ } = params in
-  let Lsp_document.{ project; textdoc; _ } =
-    Lsp_server.find_document doc registry
+  let Document.{ project; textdoc; _ } =
+    Server.find_document doc registry
   in
   let range_to_indent =
     Cobol_indent.Types.{
@@ -267,9 +267,9 @@ let handle_range_formatting registry params =
   Some (List.map lsp_text_edit edit_list)
 
 let handle_formatting registry params =
-  let DocumentFormattingParams.{ textDocument = doc; _ } = params in
-  let Lsp_document.{ project; textdoc; _ } =
-    Lsp_server.find_document doc registry in
+  let Lsp.Types.DocumentFormattingParams.{ textDocument = doc; _ } = params in
+  let Document.{ project; textdoc; _ } =
+    Server.find_document doc registry in
   try
     let editList =
       Cobol_indent.Indent_main.indent_range
@@ -288,7 +288,7 @@ let handle_formatting registry params =
 
 let handle_semtoks_full,
     handle_semtoks_range =
-  let handle registry ?range (doc: TextDocumentIdentifier.t) =
+  let handle registry ?range (doc: Lsp.Types.TextDocumentIdentifier.t) =
     try_with_document_data registry doc
       ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
                                         rev_comments; rev_ignored; _ };
@@ -298,17 +298,17 @@ let handle_semtoks_full,
             ~pplog ~rev_comments ~rev_ignored
             ~tokens:(Lazy.force tokens) ~ptree
         in
-        Some (SemanticTokens.create ~data ())
+        Some (Lsp.Types.SemanticTokens.create ~data ())
       end
   in
-  (fun registry (SemanticTokensParams.{ textDocument; _ }) ->
+  (fun registry (Lsp.Types.SemanticTokensParams.{ textDocument; _ }) ->
      handle registry textDocument),
-  (fun registry (SemanticTokensRangeParams.{ textDocument; range; _ }) ->
+  (fun registry (Lsp.Types.SemanticTokensRangeParams.{ textDocument; range; _ }) ->
      handle registry ~range textDocument)
 
 (** {3 Hover} *)
 
-let handle_hover registry (params: HoverParams.t) =
+let handle_hover registry (params: Lsp.Types.HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
   let find_hovered_pplog_event pplog =
     List.find_opt begin function
@@ -317,14 +317,14 @@ let handle_hover registry (params: HoverParams.t) =
           false
       | Replacement { matched_loc = loc; _ }
       | FileCopy { copyloc = loc; _ } ->
-          Lsp_position.is_in_lexloc params.position
+          Position.is_in_lexloc params.position
             (Cobol_common.Srcloc.lexloc_in ~filename loc)
     end (Cobol_preproc.Trace.events pplog)
   in
   let hover_markdown ~loc value =
-    let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
-    let range = Lsp_position.range_of_srcloc_in ~filename loc in
-    Some (Hover.create () ~contents:(`MarkupContent content) ~range)
+    let content = Lsp.Types.MarkupContent.create ~kind:Lsp.Types.MarkupKind.Markdown ~value in
+    let range = Position.range_of_srcloc_in ~filename loc in
+    Some (Lsp.Types.Hover.create () ~contents:(`MarkupContent content) ~range)
   in
   try_doc registry params.textDocument
     ~f:begin fun ~doc:{ project; artifacts = { pplog; _ }; _ } ->
@@ -352,12 +352,12 @@ let handle_hover registry (params: HoverParams.t) =
 
 (** {3 Completion} *)
 
-let handle_completion registry (params: CompletionParams.t) =
+let handle_completion registry (params: Lsp.Types.CompletionParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
       let items =
         Lsp_completion.completion_items textdoc params.position ptree in
-      Some (`CompletionList (CompletionList.create ()
+      Some (`CompletionList (Lsp.Types.CompletionList.create ()
                                ~isIncomplete:false ~items))
     end
 
@@ -368,7 +368,7 @@ let handle_completion registry (params: CompletionParams.t) =
     It only supports folding complete lines, and does
     not support FoldingRangeKind or CollapsedText
     (To support these features, need to change the client capability) *)
-let handle_folding_range registry (params: FoldingRangeParams.t) =
+let handle_folding_range registry (params: Lsp.Types.FoldingRangeParams.t) =
   try_with_document_data registry params.textDocument
     ~f:begin fun ~doc:_ { ptree; group; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
@@ -474,7 +474,7 @@ let handle (Jsonrpc.Request.{ id; _ } as req) state =
       | Error server_error ->
           state,
           Jsonrpc.Response.error id @@
-          Lsp_server.jsonrpc_of_error server_error req.method_
+          Server.jsonrpc_of_error server_error req.method_
       | exception Jsonrpc.Response.Error.E e ->
           state, Jsonrpc.Response.error id e
       | exception e ->

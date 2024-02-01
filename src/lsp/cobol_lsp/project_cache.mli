@@ -48,7 +48,7 @@ include module type of TYPES
     ([Sys_error], [Failure]). *)
 val save
   : config: TYPES.config
-  -> Lsp_document.t URIMap.t
+  -> Document.t URIMap.t
   -> unit
 
 (** [load ~rootdir ~config ~layout] pre-loads cached documents pertaining to a
@@ -62,7 +62,7 @@ val save
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
     ([Sys_error], [Failure]). *)
 val load
-  : rootdir:Lsp_project.rootdir
-  -> layout: Lsp_project.layout
+  : rootdir:Project.rootdir
+  -> layout: Project.layout
   -> config: TYPES.config
-  -> Lsp_document.t URIMap.t
+  -> Document.t URIMap.t

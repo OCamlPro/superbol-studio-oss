@@ -16,14 +16,14 @@ open Lsp_imports
 module TYPES: sig
 
   type config = {
-    project_layout: Lsp_project.layout;
-    cache_config: Lsp_project_cache.config;
+    project_layout: Project.layout;
+    cache_config: Project_cache.config;
   }
 
   type registry = private {
-    projects: Lsp_project.SET.t;
-    docs: Lsp_document.t URIMap.t;
-    indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
+    projects: Project.SET.t;
+    docs: Document.t URIMap.t;
+    indirect_diags: Diagnostics.t URIMap.t; (* diagnostics for other URIs
                                                    mentioned by docs in
                                                    `docs` *)
     config: config;
@@ -73,7 +73,7 @@ val did_close
   : Lsp.Types.DidCloseTextDocumentParams.t -> t -> t
 
 val find_document
-  : Lsp.Types.TextDocumentIdentifier.t -> t -> Lsp_document.t
+  : Lsp.Types.TextDocumentIdentifier.t -> t -> Document.t
 
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t

@@ -19,14 +19,14 @@ module DIAGS = Cobol_common.Diagnostics
 module TYPES = struct
 
   type config = {
-    project_layout: Lsp_project.layout;
-    cache_config: Lsp_project_cache.config;
+    project_layout: Project.layout;
+    cache_config: Project_cache.config;
   }
 
   type registry = {                                                (* private *)
-    projects: Lsp_project.SET.t;
-    docs: Lsp_document.t URIMap.t;
-    indirect_diags: Lsp_diagnostics.t URIMap.t; (* diagnostics for other URIs
+    projects: Project.SET.t;
+    docs: Document.t URIMap.t;
+    indirect_diags: Diagnostics.t URIMap.t; (* diagnostics for other URIs
                                                    mentioned by docs in
                                                    `docs` *)
     config: config;
@@ -56,18 +56,18 @@ type t = registry
 (* Code: *)
 
 let add_project proj r =
-  let projects = Lsp_project.SET.add proj r.projects in
+  let projects = Project.SET.add proj r.projects in
   if projects == r.projects then r else { r with projects }
 
 let add_or_replace_doc doc r =
-  let docs = URIMap.add (Lsp_document.uri doc) doc r.docs in
+  let docs = URIMap.add (Document.uri doc) doc r.docs in
   if docs == r.docs then r else { r with docs }
 
 (** {2 Handling of diagnostics for non-opened documents} *)
 
-let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
-  let uri = Lsp_document.uri doc in
-  let rootdir = Lsp_project.rootdir project in
+let dispatch_diagnostics (Document.{ project; diags; _ } as doc) registry =
+  let uri = Document.uri doc in
+  let rootdir = Project.rootdir project in
   let indirect4uri =
     if diags <> DIAGS.Set.none
     then URIMap.empty                         (* stick to the new diagnostics *)
@@ -75,13 +75,13 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
   in
   if URIMap.is_empty indirect4uri then begin
     let all_diags =
-      Lsp_diagnostics.translate diags ~uri:(`Main uri)
-        ~rootdir:(Lsp_project.string_of_rootdir rootdir)
+      Diagnostics.translate diags ~uri:(`Main uri)
+        ~rootdir:(Project.string_of_rootdir rootdir)
     in
     (* Note here we may publish diagnostics for non-opened documents.  LSP
        protocol does not seem to forbid that (but some editors just ignore
        those).  *)
-    Lsp_diagnostics.publish all_diags;
+    Diagnostics.publish all_diags;
     { registry with
       indirect_diags =
         (* Register published diagnostics for the other documents in case they
@@ -94,14 +94,14 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
         URIMap.union (fun _ a b -> Some (List.rev_append a b))
       end indirect4uri URIMap.empty
     in
-    Lsp_diagnostics.publish all_diags;
+    Diagnostics.publish all_diags;
     registry
   end
 
 (** {2 Management of per-project caches} *)
 
 let save_project_caches { config = { cache_config = config; _ }; docs; _ } =
-  try Lsp_project_cache.save ~config docs
+  try Project_cache.save ~config docs
   with e ->
     Lsp_error.internal
       "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
@@ -109,9 +109,9 @@ let save_project_caches { config = { cache_config = config; _ }; docs; _ } =
 let load_project_cache ~rootdir ({ config = { project_layout = layout;
                                               cache_config = config; _ };
                                    projects; docs = old_docs; _ } as registry) =
-  let new_docs = Lsp_project_cache.load ~config ~layout ~rootdir in
+  let new_docs = Project_cache.load ~config ~layout ~rootdir in
   let projects = match URIMap.choose_opt new_docs with
-    | Some (_, Lsp_document.{ project = p; _ }) -> Lsp_project.SET.add p projects
+    | Some (_, Document.{ project = p; _ }) -> Project.SET.add p projects
     | None -> projects
   and docs = URIMap.union (fun _ _old new_ -> Some new_) old_docs new_docs in
   { registry with projects; docs }
@@ -122,17 +122,17 @@ let load_project_cache ~rootdir ({ config = { project_layout = layout;
 let init ~config : registry =
   {
     config;
-    projects = Lsp_project.SET.empty;
+    projects = Project.SET.empty;
     docs = URIMap.empty;
     indirect_diags = URIMap.empty;
   }
 
 let create_or_retrieve_project ~uri registry =
   let layout = registry.config.project_layout in
-  let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-  try Lsp_project.SET.for_rootdir ~rootdir registry.projects, registry
+  let rootdir = Project.rootdir_for ~uri ~layout in
+  try Project.SET.for_rootdir ~rootdir registry.projects, registry
   with Not_found ->
-    let project = Lsp_project.for_ ~rootdir ~layout in
+    let project = Project.for_ ~rootdir ~layout in
     project, add_project project registry
 
 let document_error_while_ operation doc e backtrace registry =
@@ -146,10 +146,10 @@ let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ?copybook registry =
   let project, registry = create_or_retrieve_project ~uri registry in
   try
-    let doc = Lsp_document.load ~project ?copybook doc in
+    let doc = Document.load ~project ?copybook doc in
     let registry = dispatch_diagnostics doc registry in
     add_or_replace_doc doc registry
-  with Lsp_document.Internal_error (doc, e, backtrace) ->
+  with Document.Internal_error (doc, e, backtrace) ->
     document_error_while_"opening" doc e backtrace registry
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
@@ -165,8 +165,8 @@ let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
     | None | Some _ when try_cache ->
         let registry =
           let layout = registry.config.project_layout in
-          let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-          if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
+          let rootdir = Project.rootdir_for ~uri ~layout in
+          if Project.SET.mem_rootdir ~rootdir registry.projects
           then registry
           else load_project_cache ~rootdir registry
         in
@@ -185,10 +185,10 @@ let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
                                              contentChanges; _ } registry =
   try
     let doc = find_document TextDocumentIdentifier.{ uri } registry in
-    let doc = Lsp_document.update doc contentChanges in
+    let doc = Document.update doc contentChanges in
     let registry = dispatch_diagnostics doc registry in
     add_or_replace_doc doc registry
-  with Lsp_document.Internal_error (doc, e, backtrace) ->
+  with Document.Internal_error (doc, e, backtrace) ->
     document_error_while_"updating" doc e backtrace registry
 
 let did_close DidCloseTextDocumentParams.{ textDocument = { uri } } registry =

@@ -92,8 +92,8 @@ let rec qualname_at_pos ~filename (qn: Cobol_ptree.Types.qualname) pos =
   | Qual (name, qn') ->
       try
         let lexloc = lexloc_of_qualname_in ~filename qn in
-        if not (Lsp_position.is_after_lexloc pos lexloc) &&
-           not (Lsp_position.is_in_srcloc ~filename pos ~@name)
+        if not (Position.is_after_lexloc pos lexloc) &&
+           not (Position.is_in_srcloc ~filename pos ~@name)
         then qualname_at_pos ~filename qn' pos
         else qn
       with Invalid_argument _ -> qn                               (* dummy loc *)
@@ -151,7 +151,7 @@ let element_at_position ~uri pos group : element_at_position =
 
   Cobol_unit.Visitor.fold_unit_group object
     inherit [acc] Cobol_unit.Visitor.folder
-    inherit! [acc] Lsp_position.sieve ~filename ~pos
+    inherit! [acc] Position.sieve ~filename ~pos
 
     method! fold_cobol_unit' cu ({ elt; _ } as acc) =
       let name = ~&(~&cu.unit_name) in
@@ -197,7 +197,7 @@ let copy_at_pos ~filename pos ptree =
       | None ->
           match Cobol_common.Srcloc.as_copy loc with
           | Some { loc; _ } as copy
-            when Lsp_position.is_in_srcloc ~filename pos loc ->
+            when Position.is_in_srcloc ~filename pos loc ->
               Visitor.skip_children copy
           | _ ->
               Visitor.do_children None
