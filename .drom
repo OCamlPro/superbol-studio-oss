@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-cc894e743bb85460e00abcdaf8d9fae5:.
+93d2e460909a3ddf6a2ed971ff2e8639:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-5429d9f0846180852fae7d2e49e767e8:.github/workflows/workflow.yml
+a123dfeb615e907fa895b378cd52ee3c:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-f77bb2a3fc45e32226c8cad8171cd91c:Makefile
+7fd4812f5873242aaa1d65a344f7e4c3:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-972a09725c93d6b9991e532be3dc6c8a:dune-project
+22badd64255c88417b1d5ed3a0d03754:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -137,6 +137,11 @@ b8d28175ca0061bb86a8c097940bfe34:opam/cobol_indent.opam
 # file opam/cobol_typeck.opam
 fc02e4984b73153fecd9d70c4ccab428:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
+
+# begin context for opam/cobol_typeck_old.opam
+# file opam/cobol_typeck_old.opam
+a69b0b9f93c6bac105da84b6072b3355:opam/cobol_typeck_old.opam
+# end context for opam/cobol_typeck_old.opam
 
 # begin context for opam/cobol_unit.opam
 # file opam/cobol_unit.opam
@@ -377,6 +382,16 @@ ef30db283bff57bd7bfea9b29e9178fd:src/lsp/cobol_typeck/dune
 # file src/lsp/cobol_typeck/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_typeck/version.mlt
 # end context for src/lsp/cobol_typeck/version.mlt
+
+# begin context for src/lsp/cobol_typeck_old/dune
+# file src/lsp/cobol_typeck_old/dune
+f806267d9749a4f405ed7b6e4e0ebffe:src/lsp/cobol_typeck_old/dune
+# end context for src/lsp/cobol_typeck_old/dune
+
+# begin context for src/lsp/cobol_typeck_old/version.mlt
+# file src/lsp/cobol_typeck_old/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/lsp/cobol_typeck_old/version.mlt
+# end context for src/lsp/cobol_typeck_old/version.mlt
 
 # begin context for src/lsp/cobol_unit/dune
 # file src/lsp/cobol_unit/dune

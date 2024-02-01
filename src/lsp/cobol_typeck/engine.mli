@@ -11,14 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module OLD = struct
-  include Old_typeck_engine
+val compilation_group
+  : ?config: Cobol_config.Types.t
+  -> _ Cobol_parser.Outputs.parsed_compilation_group
+  -> Outputs.t * Diagnostics.t
 
-  module Env_builder = Old_env_builder
-  module Group_builder = Old_group_builder
-  module Prog_builder = Old_prog_builder
-end
-
-module Outputs = Typeck_outputs
-module Diagnostics = Typeck_diagnostics
-include Typeck_engine
+val translate_diagnostics
+  : ?config: Cobol_config.Types.t
+  -> Outputs.t * Diagnostics.t
+  -> Outputs.t Cobol_common.Diagnostics.with_diags

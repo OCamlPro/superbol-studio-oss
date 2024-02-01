@@ -11,9 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Env_builder = Old_env_builder
-module Group_builder = Old_group_builder
-
 open Cobol_ptree.Types
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Diagnostics.TYPES

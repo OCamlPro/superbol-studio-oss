@@ -16,10 +16,10 @@ open Cobol_common.Srcloc.TYPES
 type output =
   {
     definitions: Cobol_unit.Types.data_definitions;
-    references: Typeck_outputs.qualrefmap;
+    references: Outputs.qualrefmap;
   }
 
 val of_compilation_unit
   : Cobol_unit.Types.unit_config
   -> Cobol_ptree.Types.compilation_unit with_loc
-  -> output * Typeck_diagnostics.t
+  -> output * Diagnostics.t

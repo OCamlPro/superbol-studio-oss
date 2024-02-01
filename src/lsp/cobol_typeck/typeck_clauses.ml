@@ -14,7 +14,7 @@
 open Cobol_data.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Typeck_diagnostics
+open Diagnostics
 
 module PIC = Cobol_data.Picture
 

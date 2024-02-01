@@ -28,7 +28,7 @@ module PIC = Cobol_data.Picture
 type output =
   {
     definitions: Cobol_unit.Types.data_definitions;
-    references: Typeck_outputs.qualrefmap;
+    references: Outputs.qualrefmap;
   }
 
 (* --- *)
@@ -44,7 +44,7 @@ type acc =
     definitions: Cobol_unit.Types.data_definitions;
     references: srcloc list Cobol_unit.Qual.MAP.t;
     picture_config: Cobol_data.Types.picture_config;
-    diags: Typeck_diagnostics.t;
+    diags: Diagnostics.t;
   }
 and item_stack = item_under_construction list
 and item_under_construction =               (* item currently being assembled *)
@@ -104,7 +104,7 @@ let error acc error = { acc with diags = Data_error error :: acc.diags }
 let warn acc d = { acc with diags = Data_warning d :: acc.diags }
 
 let result { definitions = { data_items; data_records };
-             references; diags; _ } : output * Typeck_diagnostics.t =
+             references; diags; _ } : output * Diagnostics.t =
   { definitions =
       { data_items = { data_items with list = List.rev data_items.list };
         data_records = List.rev data_records };
@@ -330,7 +330,7 @@ let field_usage_n_value acc { item_name; item_loc; item_clauses; _ } =
     Typeck_clauses.to_usage_n_value item_clauses ~item_name ~item_loc
       ~picture_config:acc.picture_config
   in
-  let acc = { acc with diags = Typeck_diagnostics.union acc.diags diags } in
+  let acc = { acc with diags = Diagnostics.union acc.diags diags } in
   acc, usage, value
 
 
@@ -488,7 +488,7 @@ let register_ref ~from:{ loc; _ } ~to_:qualname_opt acc =
       acc
   | Some qn ->
       { acc with
-        references = Typeck_outputs.register_qualref ~&qn ~loc acc.references }
+        references = Outputs.register_qualref ~&qn ~loc acc.references }
 
 
 let find_in_current_record qualname acc =
@@ -597,7 +597,7 @@ let on_item acc ~at_level
   let item_clauses = Typeck_clauses.of_data_item data_clauses in
   let acc =
     { acc with
-      diags = Typeck_diagnostics.union acc.diags item_clauses.clause_diags } in
+      diags = Diagnostics.union acc.diags item_clauses.clause_diags } in
   match item_clauses.redefines with
   | Some redefined_name ->
       on_redefinition_item acc item_clauses

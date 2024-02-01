@@ -16,10 +16,10 @@ open Cobol_common.Srcloc.TYPES
 type output =
   {
     procedure: Cobol_unit.Types.procedure;
-    references: Typeck_outputs.references_in_unit;
+    references: Outputs.references_in_unit;
   }
 
 val of_compilation_unit
   : data_definitions: Cobol_unit.Types.data_definitions
   -> Cobol_ptree.Types.compilation_unit with_loc
-  -> output * Typeck_diagnostics.t
+  -> output * Diagnostics.t

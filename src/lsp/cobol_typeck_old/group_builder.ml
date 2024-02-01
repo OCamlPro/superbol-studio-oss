@@ -57,7 +57,7 @@ let rev_and_validate_data_item_descrs
           descr
       | Data item ->
           DIAGS.Set.union diags @@
-          Cobol_validation.validate_data_clauses ~is_elementary
+          Cobol_typeck.Cobol_validation.validate_data_clauses ~is_elementary
             (item &@<- descr),
           descr
       | _ ->                                                         (* TODO *)

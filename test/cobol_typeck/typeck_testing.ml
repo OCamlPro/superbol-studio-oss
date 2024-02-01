@@ -24,8 +24,8 @@ let show_diagnostics ?(show_data = false) ?(verbose = false)
         verbose;
         recovery = EnableRecovery { silence_benign_recoveries = true };
       } |>
-  DIAGS.map_result ~f:Cobol_typeck.compilation_group |>
-  DIAGS.more_result ~f:Cobol_typeck.translate_diagnostics |>
+  DIAGS.map_result ~f:Cobol_typeck.Engine.compilation_group |>
+  DIAGS.more_result ~f:Cobol_typeck.Engine.translate_diagnostics |>
   DIAGS.show_n_forget ~set_status:false ~ppf:Fmt.stdout |>
   begin fun Cobol_typeck.Outputs.{ group; _ } ->
     if show_data then

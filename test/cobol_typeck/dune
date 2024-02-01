@@ -16,7 +16,7 @@
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries cobol_typeck typeck_testing)
+ (libraries cobol_typeck cobol_typeck_old typeck_testing)
  )
 
 (library

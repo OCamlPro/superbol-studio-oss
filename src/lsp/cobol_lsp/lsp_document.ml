@@ -92,8 +92,8 @@ let check doc ptree =
   let DIAGS.{ result = artifacts, rewinder, checked; diags} =
     DIAGS.more_result ~f:begin fun (ptree, rewinder) ->
       let config = doc.project.config.cobol_config in
-      Cobol_typeck.compilation_group ~config ptree |>
-      Cobol_typeck.translate_diagnostics ~config |>
+      Cobol_typeck.Engine.compilation_group ~config ptree |>
+      Cobol_typeck.Engine.translate_diagnostics ~config |>
       DIAGS.map_result ~f:begin fun checked ->
         Cobol_parser.artifacts ptree, Some rewinder, Some checked
       end

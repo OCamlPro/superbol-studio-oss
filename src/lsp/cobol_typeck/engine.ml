@@ -13,21 +13,16 @@
 
 (** Type-checking and validation of COBOL compilation groups *)
 
-module Prog_builder = Old_prog_builder
-
 module DIAGS = Cobol_common.Diagnostics
-module CU = Cobol_data_old.Compilation_unit
-module CUs = CU.SET
 
-let analyze_compilation_group
+let compilation_group
     (type m) : ?config: _ -> m Cobol_parser.Outputs.parsed_compilation_group -> _ =
   fun ?(config = Cobol_config.Config.default) ->
   function
   | Only None | WithArtifacts (None, _) ->
-      DIAGS.result (Cobol_data_old.Compilation_unit.SET.empty, None)
+      Outputs.none, Diagnostics.none
   | Only Some cg | WithArtifacts (Some cg, _) ->
-      match Prog_builder.compilation_group config cg with
-      | { diags; _ } when DIAGS.Set.has_errors diags ->
-          DIAGS.result ~diags (CUs.empty, Some cg)
-      | { diags; result } ->
-          DIAGS.result ~diags (result, Some cg)
+      Typeck_units.of_compilation_group config cg
+
+let translate_diagnostics ?(config = Cobol_config.Config.default) (output, diags) =
+  DIAGS.result output ~diags:(Diagnostics.translate ~config diags)
