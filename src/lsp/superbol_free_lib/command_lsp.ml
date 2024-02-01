@@ -16,9 +16,9 @@ open EZCMD.TYPES
 
 
 let run_lsp ~enable_caching ~storage =
-  Cobol_lsp.INTERNAL.Debug.message "LSP Started with pid %d\n%!"
+  Cobol_lsp.Lsp_debug.message "LSP Started with pid %d\n%!"
     (Unix.getpid ());
-  Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.INTERNAL.Debug.debug_oc;
+  Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.Lsp_debug.debug_oc;
 
   let project_layout, fallback_storage_directory =
     match storage with
@@ -28,10 +28,10 @@ let run_lsp ~enable_caching ~storage =
         Project.{ layout with relative_work_dirname = None }, Some dir
   in
   let lsp_config =
-    Cobol_lsp.config ()
+    Cobol_lsp.Loop.config ()
       ~enable_caching ~project_layout ?fallback_storage_directory
   in
-  match Cobol_lsp.run ~config:lsp_config with
+  match Cobol_lsp.Loop.run ~config:lsp_config with
   | Ok () -> ()
   | Error exit_msg -> Pretty.error "%s@." exit_msg; exit 1
 

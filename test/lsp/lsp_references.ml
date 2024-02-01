@@ -27,7 +27,7 @@ let print_references ~projdir server (doc, positions) : unit =
     in
     Pretty.out "%s (line %d, character %d):@."
       position_name position.line position.character;
-    match LSP.Request.lookup_references server params with
+    match Cobol_lsp.Request.INTERNAL.lookup_references server params with
     | None | Some [] ->
         Pretty.out "No reference found@."
     | Some locs ->

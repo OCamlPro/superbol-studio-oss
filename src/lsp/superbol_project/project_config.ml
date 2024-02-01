@@ -24,8 +24,8 @@ module TYPES = struct
     | RelativeToFileDir of string
 
   type config = {
-    mutable cobol_config: Cobol_config.t;
-    mutable source_format: Cobol_config.source_format_spec;
+    mutable cobol_config: Cobol_config.Types.t;
+    mutable source_format: Cobol_config.Types.source_format_spec;
     mutable libpath: path list;
     mutable copybook_extensions: string list;
     mutable copybook_if_no_extension: bool;
@@ -55,8 +55,8 @@ let default_copybook_if_no_extension = true
 let default_indent_config = []
 
 let default = {
-  cobol_config = Cobol_config.default;
-  source_format = Cobol_config.Auto;
+  cobol_config = Cobol_config.Config.default;
+  source_format = Cobol_config.Types.Auto;
   libpath = default_libpath;
   copybook_extensions = default_copybook_extensions;
   indent_config = default_indent_config;
@@ -70,7 +70,7 @@ let new_default () =
 (* Translation to TOML *)
 
 let dialect_repr dialect =
-  TOML.value_of_string @@ Cobol_config.DIALECT.to_string dialect
+  TOML.value_of_string @@ Cobol_config.Dialect.to_string dialect
 
 let format_repr format =
   TOML.value_of_string @@ Cobol_config.Options.string_of_format format
@@ -104,7 +104,7 @@ let config_repr config ~name =
       option
         ~name: "dialect"
         ~after_comments: ["Default dialect for COBOL source files"]
-        (dialect_repr @@ Cobol_config.dialect config.cobol_config);
+        (dialect_repr @@ Cobol_config.Config.dialect config.cobol_config);
 
       option
         ~name: "source-format"
@@ -126,10 +126,11 @@ let config_repr config ~name =
 let config_section_name = "cobol"
 
 let config_from_dialect_name dialect_name =
-  try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
+  try Cobol_config.Config.(from_dialect @@
+                           Cobol_config.Dialect.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
-  | Cobol_config.ERROR e ->
+  | Cobol_config.Types.ERROR e ->
       raise @@ ERROR (Cobol_config_error e)
 
 let get_source_format toml =

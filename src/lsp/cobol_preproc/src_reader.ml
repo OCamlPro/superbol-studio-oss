@@ -83,20 +83,20 @@ let decode_compiler_directive ~dialect compdir_text =
   let start_pos = Cobol_common.Srcloc.start_pos loc in
   let parser = Compdir_grammar.Incremental.compiler_directive start_pos in
   let raw_loc = Cobol_common.Srcloc.raw in
-  let open Preproc_directives in
+  let open Directives in
   match Compdir_grammar.MenhirInterpreter.loop supplier parser with
   | Source_format_is_free lexloc ->
-      let sf = Src_format.from_config Cobol_config.SFFree in
+      let sf = Src_format.from_config Cobol_config.Types.SFFree in
       Ok (CDirSource (sf &@ raw_loc lexloc) &@ loc)
   | Source_format_is (format, lexloc)
   | Set_sourceformat (format, lexloc) ->
       (match Src_format.decypher ~dialect format with
        | Ok sf ->
-           Ok (Preproc_directives.CDirSource (sf &@ raw_loc lexloc) &@ loc)
+           Ok (Directives.CDirSource (sf &@ raw_loc lexloc) &@ loc)
        | Error (`SFUnknown f) ->
            Error (Unknown_source_format (f, raw_loc lexloc)))
   | Set (string, lexloc) ->
-      Ok (Preproc_directives.CDirSet (string &@ raw_loc lexloc) &@ loc)
+      Ok (Directives.CDirSet (string &@ raw_loc lexloc) &@ loc)
   | exception Compdir_grammar.Error ->
       Error (Malformed_or_unknown_compiler_directive loc)
 

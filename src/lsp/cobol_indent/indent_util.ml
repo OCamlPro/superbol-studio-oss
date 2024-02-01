@@ -13,7 +13,7 @@
 
 open Cobol_common.Srcloc
 
-open Indent_type
+open Types
 open Indent_keywords
 
 let check_pos

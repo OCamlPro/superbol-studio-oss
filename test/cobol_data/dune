@@ -1,7 +1,7 @@
 (tests
   (names test_qualified_map)
   (modules test_qualified_map)
-  (libraries alcotest cobol_data))
+  (libraries alcotest cobol_data_old))
 
 (library
  (name test_cobol_data)

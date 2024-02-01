@@ -19,7 +19,7 @@ open Autofonce_core.Types
 module DIAGS = Cobol_common.Diagnostics
 
 let () =
-  Cobol_common.init_default_exn_printers ();
+  Cobol_common.Errors.init_default_exn_printers ();
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
      output of tests that fail expectedly. *)
   Stdlib.Printexc.record_backtrace false
@@ -133,7 +133,7 @@ let setup_input ~filename contents =
   let oc = open_out filename in
   output_string oc contents;
   close_out oc;
-  Cobol_preproc.String { contents; filename }
+  Cobol_preproc.Src_input.String { contents; filename }
 
 let delete_file ~filename =
   Ez_file.FileString.remove filename
@@ -159,20 +159,21 @@ let guess_source_format ~filename ~command =   (* hackish detection of format *)
     try ignore (Str.search_forward regexp command 0); true
     with Not_found -> false
   in
-  Option.value ~default:Cobol_config.(SF SFFixed) @@
-  List.find_map (fun (p, f) -> if Lazy.force p then Some f else None) [
-    lazy (filename_suffixp "free.cob"),       Cobol_config.(SF SFFree);
-    lazy (command_matchp free_flag_regexp),   Cobol_config.(SF SFFree);
-    lazy (command_matchp fixd_format_regexp), Cobol_config.(SF SFFixed);
-    lazy (command_matchp free_format_regexp), Cobol_config.(SF SFFree);
-    lazy (command_matchp cb85_format_regexp), Cobol_config.(SF SFFixed);
-    lazy (command_matchp vrbl_format_regexp), Cobol_config.(SF SFVariable);
-    lazy (command_matchp xopn_format_regexp), Cobol_config.(SF SFXOpen);
-    lazy (command_matchp xcrd_format_regexp), Cobol_config.(SF SFxCard);
-    lazy (command_matchp term_format_regexp), Cobol_config.(SF SFTrm);
-    lazy (command_matchp cblx_format_regexp), Cobol_config.(SF SFCOBOLX);
-    lazy (command_matchp auto_format_regexp), Cobol_config.Auto;
-  ]
+  Option.value ~default:Cobol_config.Types.(SF SFFixed) @@
+  List.find_map (fun (p, f) -> if Lazy.force p then Some f else None)
+    Cobol_config.Types.[
+      lazy (filename_suffixp "free.cob"),       (SF SFFree);
+      lazy (command_matchp free_flag_regexp),   (SF SFFree);
+      lazy (command_matchp fixd_format_regexp), (SF SFFixed);
+      lazy (command_matchp free_format_regexp), (SF SFFree);
+      lazy (command_matchp cb85_format_regexp), (SF SFFixed);
+      lazy (command_matchp vrbl_format_regexp), (SF SFVariable);
+      lazy (command_matchp xopn_format_regexp), (SF SFXOpen);
+      lazy (command_matchp xcrd_format_regexp), (SF SFxCard);
+      lazy (command_matchp term_format_regexp), (SF SFTrm);
+      lazy (command_matchp cblx_format_regexp), (SF SFCOBOLX);
+      lazy (command_matchp auto_format_regexp), Auto;
+    ]
 
 let do_check_parse (test_filename, contents, _, { check_loc;
                                                   check_command; _ }) =
@@ -189,9 +190,9 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   let source_format = guess_source_format ~filename ~command:check_command in
   let parse_simple input =
     input |>
-    Cobol_preproc.preprocessor
+    Cobol_preproc.Main.preprocessor
       ~options:Cobol_preproc.Options.{ default with source_format } |>
-    Cobol_parser.parse_simple
+    Cobol_parser.Main.parse_simple
   in
   try
     let input = setup_input ~filename contents in

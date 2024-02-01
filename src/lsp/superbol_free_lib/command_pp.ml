@@ -63,15 +63,15 @@ let cmd =
                          ~default:  common.preproc_options.source_format }
                    in
                    input |>
-                   Cobol_preproc.preprocessor ~options:preproc_options |>
-                   Cobol_parser.parse_simple ~options:common.parser_options
+                   Cobol_preproc.Main.preprocessor ~options:preproc_options |>
+                   Cobol_parser.Main.parse_simple ~options:common.parser_options
                  in
-                 let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
+                 let my_text = Cobol_preproc.Src_input.from ~filename:file ~f:parse in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (
                      let print =
-                       Format.asprintf "@[%a@]@." Cobol_ptree.pp_compilation_group
+                       Format.asprintf "@[%a@]@." Cobol_ptree.Types.pp_compilation_group
                      in
                      let contents = print cg in
                      output_file filename contents;
@@ -80,7 +80,7 @@ let cmd =
                          parse ~source_format:(SF SFFree) (String { filename; contents })
                        with
                        | { result = Only (Some cg'); _ } ->
-                           if Cobol_ptree.compare_compilation_group cg' cg <> 0 then (
+                           if Cobol_ptree.Types.compare_compilation_group cg' cg <> 0 then (
                              Format.eprintf "Reparse: different@.";
                              exit 1
                            )
@@ -96,7 +96,7 @@ let cmd =
                  let text =
                    let common = common_get () in
                    Cobol_common.Diagnostics.show_n_forget @@
-                   Cobol_preproc.text_of_file file
+                   Cobol_preproc.Main.text_of_file file
                      ~options:common.preproc_options
                  in
                  let s =

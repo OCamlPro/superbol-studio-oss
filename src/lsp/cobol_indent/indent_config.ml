@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Indent_type
+open Types
 open Indent_keywords
 
 type t = indent_config

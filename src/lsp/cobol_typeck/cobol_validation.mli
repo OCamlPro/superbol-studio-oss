@@ -15,5 +15,5 @@
 
 val validate_data_clauses
   : ?is_elementary: bool
-  -> Cobol_ptree.data_item Cobol_ptree.with_loc
+  -> Cobol_ptree.Types.data_item Cobol_ptree.Types.with_loc
   -> Cobol_common.Diagnostics.Set.t

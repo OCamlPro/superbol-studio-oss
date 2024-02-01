@@ -2,13 +2,13 @@ open Grammar
 
 module Default = struct
 
-  let fixed_zero = Cobol_ptree.{ fixed_integer = "0";
+  let fixed_zero = Cobol_ptree.Types.{ fixed_integer = "0";
                                  fixed_fractional = "0" }
 
-  let floating_zero = Cobol_ptree.{ float_significand = fixed_zero;
+  let floating_zero = Cobol_ptree.Types.{ float_significand = fixed_zero;
                                     float_exponent = "1" }
 
-  let boolean_zero = Cobol_ptree.{ bool_base = `Bool;
+  let boolean_zero = Cobol_ptree.Types.{ bool_base = `Bool;
                                    bool_value = "0" }
 
 
@@ -2118,7 +2118,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nonnumeric_no_all -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nonnumeric -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_nested -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_ident_or_literal -> Cobol_ptree.UPCAST.ident_with_literal dummy_ident
+    | MenhirInterpreter.N MenhirInterpreter.N_ident_or_literal -> Cobol_ptree.Types.UPCAST.ident_with_literal dummy_ident
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_integer -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_or_alphanum -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_ident_by_after_before -> raise Not_found

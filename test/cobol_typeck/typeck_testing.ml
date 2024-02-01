@@ -18,14 +18,14 @@ module DIAGS = Cobol_common.Diagnostics
 let show_diagnostics ?(show_data = false) ?(verbose = false)
     ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
+  Cobol_parser.Main.parse_simple
     ~options:Cobol_parser.Options.{
         default with
         verbose;
         recovery = EnableRecovery { silence_benign_recoveries = true };
       } |>
-  DIAGS.map_result ~f:Cobol_typeck.compilation_group |>
-  DIAGS.more_result ~f:Cobol_typeck.translate_diagnostics |>
+  DIAGS.map_result ~f:Cobol_typeck.Engine.compilation_group |>
+  DIAGS.more_result ~f:Cobol_typeck.Engine.translate_diagnostics |>
   DIAGS.show_n_forget ~set_status:false ~ppf:Fmt.stdout |>
   begin fun Cobol_typeck.Outputs.{ group; _ } ->
     if show_data then

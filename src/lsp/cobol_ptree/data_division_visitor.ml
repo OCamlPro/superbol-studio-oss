@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open PTree_types
+open Types
 
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)

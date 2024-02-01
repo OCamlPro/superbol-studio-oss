@@ -10,7 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-%parameter <CONFIG: Cobol_config.T>
+%parameter <CONFIG: Cobol_config.Types.T>
 %parameter <Overlay_manager: Src_overlay.MANAGER>
 %{
   open Cobol_common.Srcloc.INFIX
@@ -22,10 +22,10 @@
 
 (* Entry points *)
 
-%start <Preproc_directives.copy_statement
+%start <Directives.copy_statement
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> copy_statement
-%start <Preproc_directives.replace_statement
+%start <Directives.replace_statement
           Cobol_common.Diagnostics.with_diags
           Cobol_common.Srcloc.with_loc> replace_statement
 
@@ -104,8 +104,8 @@ let copy_replacing_text_identifier :=
       c @ [lpar] @ cl @ [rpar] }
 
 let leading_or_trailing ==
-  | LEADING;  { Preproc_directives.Leading }
-  | TRAILING; { Preproc_directives.Trailing }
+  | LEADING;  { Directives.Leading }
+  | TRAILING; { Directives.Trailing }
 
 (* --- REPLACE -------------------------------------------------------------- *)
 
@@ -117,7 +117,7 @@ let replace_statement_ :=
       { result = CDirReplace { also; replacing }; diags } }
   | REPLACE; last = ibo(LAST); OFF; ".";
     { Cobol_common.Diagnostics.simple_result @@
-        Preproc_directives.CDirReplaceOff { last } }
+        Directives.CDirReplaceOff { last } }
 
 (* ISO/IEC 1989:2014 only allows the following clauses in "REPLACE"; however we
    allow the same clauses as GnuCOBOL. *)

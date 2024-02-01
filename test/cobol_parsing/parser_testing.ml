@@ -16,12 +16,12 @@ module StrMap = EzCompat.StringMap
 
 let preproc
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     contents
   =
   Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
   String { filename; contents } |>
-  Cobol_preproc.preprocessor
+  Cobol_preproc.Main.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
         libpath = [];
@@ -32,7 +32,7 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
     ?source_format ?filename contents =
   let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
-    Cobol_parser.parse_with_artifacts
+    Cobol_parser.Main.parse_with_artifacts
       ~options:Cobol_parser.Options.{
           default with
           verbose;
@@ -40,12 +40,12 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
         }
   in
   (if with_locations
-   then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
-   else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
+   then Cobol_parser.Main.INTERNAL.pp_tokens' ~fsep:"@\n"
+   else Cobol_parser.Main.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
 
 let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
+  Cobol_parser.Main.parse_simple
     ~options:Cobol_parser.Options.{
         default with
         verbose;
@@ -143,18 +143,18 @@ let triplewise positions =
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
     ?(verbose = false)
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Cobol_config.Types.(SF SFFixed))
     ?config
     prog
   =
   let DIAGS.{ result = Only ptree, rewinder; diags } =
     String { filename = "prog.cob"; contents = prog } |>
-    Cobol_preproc.preprocessor
+    Cobol_preproc.Main.preprocessor
       ~options:Cobol_preproc.Options.{
           verbose; libpath = []; source_format;
           config = Option.value config ~default:default.config;
         } |>
-    Cobol_parser.rewindable_parse_simple
+    Cobol_parser.Main.rewindable_parse_simple
       ~options:Cobol_parser.Options.{
           default with
           verbose; recovery = DisableRecovery;
@@ -166,8 +166,8 @@ let rewindable_parse
 (** Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
-  let DIAGS.{ result = Only ptree, rewinder; diags } =
-    Cobol_parser.rewind_and_parse rewinder preproc_rewind
+  let DIAGS.{ result = Cobol_parser.Outputs.Only ptree, rewinder; diags } =
+    Cobol_parser.Main.rewind_and_parse rewinder preproc_rewind
       ~position:(Indexed { line; char })
   in
   f ptree diags;
@@ -198,7 +198,7 @@ let iteratively_append_chunks ?config ~f (prog, positions) =
       Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
     succ i,
     rewind_n_parse ~f:(f i num_chunks) rewinder pos
-      (Cobol_preproc.reset_preprocessor_for_string prog)
+      (Cobol_preproc.Main.reset_preprocessor_for_string prog)
   end (1, rewinder) (pairwise positions.pos_anonymous)
 
 
@@ -230,7 +230,7 @@ let iteratively_append_chunks_stuttering ?config ~f
       Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
     let rewinder =
       rewind_n_parse ~f:(f i num_chunks) rewinder pos
-        (Cobol_preproc.reset_preprocessor_for_string prog)
+        (Cobol_preproc.Main.reset_preprocessor_for_string prog)
     in
     let rewinder =
       if i < num_chunks then begin
@@ -241,7 +241,7 @@ let iteratively_append_chunks_stuttering ?config ~f
           Fmt.(truncated ~max:30)
           Pretty.(to_string "%S" @@ EzString.after prog' (pos.cnum - 1));
         rewind_n_parse ~f:(f i num_chunks) rewinder next_pos_1
-          (Cobol_preproc.reset_preprocessor_for_string prog')
+          (Cobol_preproc.Main.reset_preprocessor_for_string prog')
       end else rewinder
     in
     succ i, rewinder
@@ -280,13 +280,13 @@ let simulate_cut_n_paste ?config ~f0 ~f ?verbose ?(repeat = 1)
       and prog_suffix = EzString.after prog (next_pos.cnum - 1) in
       let rewinder =
         rewind_n_parse ~f:(fun _ _ -> ()) rewinder pos @@
-        Cobol_preproc.reset_preprocessor_for_string @@
+        Cobol_preproc.Main.reset_preprocessor_for_string @@
         prog_prefix ^ prog_suffix
       in
       Pretty.out "Putting it back@.";
       let rewinder =
         rewind_n_parse ~f:(f chunk_num num_chunks ~ptree0) rewinder pos @@
-        Cobol_preproc.reset_preprocessor_for_string prog
+        Cobol_preproc.Main.reset_preprocessor_for_string prog
       in
       loop (succ i) rewinder
     end

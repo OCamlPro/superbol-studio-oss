@@ -13,7 +13,7 @@
 (**************************************************************************)
 
 open Grammar_utils
-open Cobol_ptree
+open Cobol_ptree.Types
 open Cobol_ptree.Terms_helpers
 open Cobol_common.Srcloc.INFIX
 
@@ -62,7 +62,7 @@ let dual_handler_none =
 (* %[@post.tag diagnostic loc:Cobol_common.Srcloc.srcloc option -> *)
 (*                            unit Cobol_common.Diagnostics.in_result] *)
 
-%[@post.tag special_names Cobol_ptree.special_names_clause]
+%[@post.tag special_names Cobol_ptree.Types.special_names_clause]
 
 %[@post.tag pending string]
 
@@ -184,7 +184,7 @@ let dual_handler_none =
 
 (* Entry points *)
 
-%start <Cobol_ptree.compilation_group> compilation_group
+%start <Cobol_ptree.Types.compilation_group> compilation_group
 %start <condition> standalone_condition
 
 %%
@@ -2177,7 +2177,7 @@ let idents [@symbol "<identifiers>"] [@recovery []] :=
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
-      [@recovery Cobol_ptree.UPCAST.ident_with_literal dummy_ident] :=
+      [@recovery Cobol_ptree.Types.UPCAST.ident_with_literal dummy_ident] :=
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 
@@ -2204,11 +2204,11 @@ let integer [@recovery "0"]
 
 let fixedlit [@recovery fixed_zero] [@cost 10]
       [@symbol "<fixed-point literal>"] :=
-  | (i, _, d) = FIXEDLIT; { Cobol_ptree.fixed_of_strings i d }
+  | (i, _, d) = FIXEDLIT; { Cobol_ptree.Types.fixed_of_strings i d }
 
 let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
-  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
+  | (i, _, d, e) = FLOATLIT; { Cobol_ptree.Types.floating_of_strings i d e }
 
 let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
@@ -3396,7 +3396,7 @@ let perform_statement [@context perform_stmt] :=
                      perform_statements = isl } }
 
 let perform_phrase :=
- | FOREVER; { PerformForever } (* GC/COBOL-IT extension *) 
+ | FOREVER; { PerformForever } (* GC/COBOL-IT extension *)
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
  | wt = ro(with_test); UNTIL; until = condition;
    { PerformUntil { with_test = wt; until } }

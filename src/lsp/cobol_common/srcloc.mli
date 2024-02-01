@@ -22,6 +22,7 @@ type srcloc = TYPES.srcloc
 type copylocs = TYPES.copylocs
 type 'a with_loc = 'a TYPES.with_loc =
   { payload: 'a; loc: srcloc; }                                  [@@deriving ord]
+type t= srcloc
 
 module INFIX: sig
   (* Meaning of letters:

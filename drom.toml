@@ -201,7 +201,15 @@ dir = "src/lsp/cobol_data"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/cobol_data_old"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/cobol_typeck"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_typeck_old"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]

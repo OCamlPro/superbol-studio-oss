@@ -29,6 +29,6 @@ swiss-knife for the COBOL language by OCamlPro"
 |}
     let version = Version.version
 
-    exception Error = Cobol_common.FatalError
+    exception Error = Cobol_common.Errors.FatalError
 
   end)

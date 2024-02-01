@@ -12,7 +12,6 @@
 (**************************************************************************)
 
 module StrMap = EzCompat.StringMap
-module LSP = Cobol_lsp.INTERNAL
 
 type test_project =
   {
@@ -23,10 +22,10 @@ type test_project =
 val make_lsp_project
   : ?toml:string
   -> unit
-  -> test_project * LSP.Types.registry
+  -> test_project * Cobol_lsp.Alltypes.registry
 val add_cobol_doc
-  : LSP.Types.registry -> ?copybook:bool -> projdir:string -> string -> string
-  -> LSP.Types.registry * Lsp.Types.TextDocumentIdentifier.t
+  : Cobol_lsp.Alltypes.registry -> ?copybook:bool -> projdir:string -> string -> string
+  -> Cobol_lsp.Alltypes.registry * Lsp.Types.TextDocumentIdentifier.t
 
 type positions =
   {

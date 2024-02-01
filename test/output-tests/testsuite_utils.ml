@@ -48,4 +48,4 @@ let mf_root = srcdir // mf_testsuite
 
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget @@
-  Cobol_config.from_dialect dialect
+  Cobol_config.Config.from_dialect dialect

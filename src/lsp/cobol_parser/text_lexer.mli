@@ -36,7 +36,7 @@ val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
 
 val create: ?decimal_point_is_comma:bool -> unit -> lexer
 val handle_of_token: lexer -> Grammar_tokens.token -> token_handle
-val reserve_words: lexer -> Cobol_config.words_spec -> unit
+val reserve_words: lexer -> Cobol_config.Types.words_spec -> unit
 val enable_tokens: TokenHandles.t -> unit
 val disable_tokens: TokenHandles.t -> unit
 val decimal_point_is_comma: lexer -> lexer
@@ -67,7 +67,7 @@ val tokens_of_string'
     errors, the alphanumeric token returned may represent part of the encoded
     input. *)
 val decode_symbolic_ebcdics'
-  : quotation: Cobol_ptree.alphanum_quote
+  : quotation: Cobol_ptree.Types.alphanum_quote
   -> string Cobol_common.Srcloc.with_loc
   -> Grammar_tokens.token Cobol_common.Srcloc.with_loc *
      Cobol_common.Diagnostics.Set.t

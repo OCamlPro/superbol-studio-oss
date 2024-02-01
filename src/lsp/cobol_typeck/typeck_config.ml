@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_ptree
+open Cobol_ptree.Types
 open Cobol_common.Srcloc.INFIX
 
 module Visitor = Cobol_common.Visitor
@@ -23,7 +23,7 @@ type output = Cobol_unit.Types.unit_config
 type acc =
   {
     config: output;
-    diags: Typeck_diagnostics.t;
+    diags: Diagnostics.t;
   }
 
 let default_config =
@@ -35,7 +35,7 @@ let default_config =
 let init config =
   {
     config;
-    diags = Typeck_diagnostics.none;
+    diags = Diagnostics.none;
   }
 
 let error acc e = { acc with diags = Config_error e :: acc.diags }

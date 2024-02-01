@@ -14,12 +14,12 @@
 (** [unknown kind given_qualname] ... *)
 val unknown
   : string
-  -> Cobol_ptree.qualname
+  -> Cobol_ptree.Types.qualname
   -> unit
 
 (** [ambiguous kind given_qualname ~matching_qualnames] ... *)
 val ambiguous
   : string
-  -> Cobol_ptree.qualname
-  -> matching_qualnames: Cobol_ptree.qualname Cobol_common.Basics.NEL.t
+  -> Cobol_ptree.Types.qualname
+  -> matching_qualnames: Cobol_ptree.Types.qualname Cobol_common.Basics.NEL.t
   -> unit

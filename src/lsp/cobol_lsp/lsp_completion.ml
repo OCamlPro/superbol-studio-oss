@@ -17,14 +17,15 @@ open Cobol_common                                                  (* Visitor *)
 open Cobol_common.Srcloc.INFIX
 
 open Lsp_completion_keywords
-open Lsp.Types
+
+module POSITION = Lsp.Types.Position
 
 let name_proposals ast ~filename pos =
   let visitor = object
     inherit [StringSet.t] Cobol_ptree.Visitor.folder
 
     method! fold_compilation_unit' cu =
-      if Lsp_position.is_in_srcloc ~filename pos ~@cu
+      if Position.is_in_srcloc ~filename pos ~@cu
       then Visitor.do_children
       else Visitor.skip_children
 
@@ -56,13 +57,13 @@ let keyword_proposals ast pos =
 
     method! fold_data_division' {loc; _} _ =
       Visitor.skip_children @@
-        if Lsp_position.is_in_srcloc pos loc
+        if Position.is_in_srcloc pos loc
         then Some Data_div
         else None
 
     method! fold_procedure_division' {loc; _} _ =
       Visitor.skip_children @@
-        if Lsp_position.is_in_srcloc pos loc
+        if Position.is_in_srcloc pos loc
         then Some Proc_div
         else None
 
@@ -75,7 +76,7 @@ let keyword_proposals ast pos =
 
 let keyword_proposals _ast _pos = keywords_all
 
-let completion_items text (pos:Position.t) ast =
+let completion_items text (pos:POSITION.t) ast =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri text) in
   let range =
     let line = pos.line in
@@ -83,8 +84,8 @@ let completion_items text (pos:Position.t) ast =
     let texts = String.split_on_char '\n' @@ Lsp.Text_document.text text in
     let text_line = List.nth texts line in
     let index = 1 + String.rindex_from text_line (character - 1) ' ' in
-    let position_start = Position.create ~character:index ~line in
-    Range.create ~start:position_start ~end_:pos
+    let position_start = POSITION.create ~character:index ~line in
+    Lsp.Types.Range.create ~start:position_start ~end_:pos
   in
 
   let names = name_proposals ast ~filename pos in
@@ -92,9 +93,9 @@ let completion_items text (pos:Position.t) ast =
   let words = names @ keywords in
 
   List.map (fun x ->
-    let textedit = TextEdit.create ~newText:x ~range in
+    let textedit = Lsp.Types.TextEdit.create ~newText:x ~range in
     (*we may change the ~sortText/preselect for reason of priority *)
-    CompletionItem.create
+    Lsp.Types.CompletionItem.create
       ~label:x
       ~sortText:x
       ~preselect:false

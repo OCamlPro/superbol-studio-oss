@@ -270,10 +270,10 @@ let contributes =
              ~description:"List of copybooks paths";
 
            Manifest.PROPERTY.enum "superbol.cobol.dialect"
-             ~cases:Cobol_config.DIALECT.all_canonical_names
+             ~cases:Cobol_config.Dialect.all_canonical_names
              ~description: "Default COBOL dialect; \"default\" is equivalent to \
                             \"gnucobol\""
-             ~default:(`String Cobol_config.(DIALECT.to_string Default));
+             ~default:(`String Cobol_config.(Dialect.to_string Default));
 
            Manifest.PROPERTY.enum "superbol.cobol.source-format"
              ~description: "Default source reference-format"

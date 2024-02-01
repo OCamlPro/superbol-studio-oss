@@ -20,7 +20,7 @@ module DIAGS = Cobol_common.Diagnostics
 module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
 
-let name_of_compilation_unit: Cobol_ptree.compilation_unit -> _ = function
+let name_of_compilation_unit: Cobol_ptree.Types.compilation_unit -> _ = function
   | Program { program_name = name; _ }
   | Function { function_name = name; _ }
   | ClassDefinition { class_name = name; _ }
@@ -31,8 +31,8 @@ type acc =
     parent_name: string with_loc option;
     parent_config: unit_config option;
     cus: CUs.t;                                                    (* = group *)
-    artifacts: Typeck_outputs.artifacts;
-    diags: Typeck_diagnostics.diagnostics;
+    artifacts: Outputs.artifacts;
+    diags: Diagnostics.diagnostics;
   }
 
 let init =
@@ -40,8 +40,8 @@ let init =
     parent_name = None;
     parent_config = None;
     cus = CUs.empty;
-    artifacts = Typeck_outputs.no_artifacts;
-    diags = Typeck_diagnostics.none;
+    artifacts = Outputs.no_artifacts;
+    diags = Diagnostics.none;
     (* unit_config = *)
     (*   { *)
     (*     unit_currency_signs = Cobol_common.Basics.CharSet.singleton '$'; *)
@@ -50,7 +50,7 @@ let init =
   }
 
 let result ptree acc =
-  Typeck_outputs.{
+  Outputs.{
     ptree;
     group = acc.cus;
     artifacts = acc.artifacts;
@@ -84,7 +84,7 @@ let build_units _config = object
 
     let references =
       CUMap.add unit { unit_procedure.references with
-                       data_refs = Typeck_outputs.merge_qualrefmaps
+                       data_refs = Outputs.merge_qualrefmaps
                            unit_data.references
                            unit_procedure.references.data_refs }
         acc.artifacts.references
@@ -97,7 +97,7 @@ let build_units _config = object
         cus = CUs.add unit acc.cus;
         artifacts = { references };
         diags =
-          Typeck_diagnostics.(union unit_config_diags @@
+          Diagnostics.(union unit_config_diags @@
                               union unit_data_diags   @@ unit_procedure_diags);
       }
     in
@@ -119,8 +119,8 @@ end
 (** This function builds the internal representation of full compilation
     groups. *)
 let of_compilation_group
-  : Cobol_config.t -> Cobol_ptree.compilation_group ->
-    Typeck_outputs.t * Typeck_diagnostics.t =
+  : Cobol_config.Types.t -> Cobol_ptree.Types.compilation_group ->
+    Outputs.t * Diagnostics.t =
   fun config compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group
     (build_units config) compilation_group_ptree init |>

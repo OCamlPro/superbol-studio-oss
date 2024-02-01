@@ -11,9 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.TYPES
 open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
-open Cobol_parser.Tokens
+open Cobol_parser.Grammar_tokens
 
 module TOKTYP = struct
   type t = { index: int; name: string }
@@ -97,7 +98,7 @@ type semtok = {
 }
 
 let semtok ?(tokmods = TOKMOD.none) toktyp lexloc =
-  let range = Lsp_position.range_of_lexloc lexloc in
+  let range = Position.range_of_lexloc lexloc in
   let line = range.start.line in
   let start = range.start.character in
   let length = range.end_.character - start in
@@ -108,7 +109,7 @@ let single_line_lexlocs_in ~filename =
 
 let acc_semtoks ~filename ?range ?tokmods toktyp loc acc =
   List.fold_left begin fun acc lexloc -> match range with
-    | Some r when not (Lsp_position.intersects_lexloc r lexloc) -> acc
+    | Some r when not (Position.intersects_lexloc r lexloc) -> acc
     | _ -> semtok toktyp ?tokmods lexloc :: acc
   end acc @@ single_line_lexlocs_in ~filename loc
 
@@ -158,7 +159,7 @@ let semtoks_from_ptree ~filename ?range ptree =
   let add_name' name category acc =
     acc_semtoks category ~@name acc
   in
-  let rec add_qualname (qn: Cobol_ptree.qualname) toktyp acc =
+  let rec add_qualname (qn: Cobol_ptree.Types.qualname) toktyp acc =
     match qn with
     | Name name ->
         add_name' name toktyp acc
@@ -166,7 +167,7 @@ let semtoks_from_ptree ~filename ?range ptree =
         add_name' name toktyp acc |>
         add_qualname qn toktyp
   in
-  let add_ident (id: Cobol_ptree.ident) toktyp acc =
+  let add_ident (id: Cobol_ptree.Types.ident) toktyp acc =
     match id with
     | QualIdent {ident_name; _} -> add_qualname ~&ident_name toktyp acc
     | _ -> acc (* TODO *)
@@ -547,7 +548,7 @@ let semtoks_of_comments ~filename ?range rev_comments =
     | Cobol_preproc.Text.{ comment_loc = s, _ as lexloc; _ }
       when s.Lexing.pos_fname = filename &&
            Option.fold range
-             ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+             ~some:(fun r -> Position.intersects_lexloc r lexloc)
              ~none:true ->
         semtok TOKTYP.comment lexloc :: acc
     | _ ->
@@ -562,7 +563,7 @@ let semtoks_of_ignored ~filename ?range rev_ignored =
   List.fold_left begin fun acc ((s, _ ) as lexloc) ->
     if s.Lexing.pos_fname = filename &&
        Option.fold range
-         ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
+         ~some:(fun r -> Position.intersects_lexloc r lexloc)
          ~none:true
     then semtok TOKTYP.comment lexloc :: acc
     else acc

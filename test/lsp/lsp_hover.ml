@@ -22,7 +22,7 @@ let print_hovered server ~projdir (prog, prog_positions) =
     Pretty.out "%a(line %d, character %d):@."
       Fmt.(option ~none:nop @@ fmt "%s ") key
       position.line position.character;
-    match LSP.Request.hover server params with
+    match Cobol_lsp.Request.INTERNAL.hover server params with
     | None ->
         Pretty.out "Hovering nothing worthy@."
     | Some { contents = `List strings; range } ->

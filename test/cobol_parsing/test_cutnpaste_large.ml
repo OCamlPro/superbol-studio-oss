@@ -23,12 +23,12 @@ let check_initial_ptree ~ptree0 diags =
 
 let check_new_ptree i n ~ptree0 ptree' diags =
   if Option.compare
-      Cobol_ptree.compare_compilation_group ptree0 ptree' = 0
+      Cobol_ptree.Types.compare_compilation_group ptree0 ptree' = 0
   then Pretty.out "Ok@."
   else Test_appending.show_ptree i n ptree' diags
 
 let%expect_test "cut-n-paste-mf" =
-  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
+  let config = Testsuite_utils.from_dialect Cobol_config.Dialect.mf_strict in
   deep_iter mf_root ~glob:"DayDiffDriver.[cC][bB][lL]" (* <- pick large-ish file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in

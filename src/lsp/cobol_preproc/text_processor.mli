@@ -20,23 +20,23 @@ open Text.TYPES
 (** {1 Compiler directives} *)
 
 val replacing
-  : ?partial: Preproc_directives.partial_replacing
+  : ?partial: Directives.partial_replacing
   -> pseudotext with_loc
   -> pseudotext with_loc
-  -> Preproc_directives.replacing option with_diags
+  -> Directives.replacing option with_diags
 
 type (_, _) repl_attempt =
   | OnPartText: ([`NoReplacement | `MissingText],
                  partial_text_repl_result) repl_attempt
   | OnFullText: ([`NoReplacement],
-                 text * Preproc_trace.log) repl_attempt
+                 text * Trace.log) repl_attempt
 and partial_text_repl_result =
-  (text * Preproc_trace.log,
-   [`MissingText of text * Preproc_trace.log * text]) result
+  (text * Trace.log,
+   [`MissingText of text * Trace.log * text]) result
 val apply_replacing
   : (_, 'a) repl_attempt
-  -> Preproc_directives.replacing with_loc list
-  -> Preproc_trace.log
+  -> Directives.replacing with_loc list
+  -> Trace.log
   -> text
   -> 'a
 
@@ -45,9 +45,9 @@ val apply_replacing
 module type ENTRY_POINTS = sig
   type 'x entry
   val replace_statement
-    : Preproc_directives.replace_statement with_diags with_loc entry
+    : Directives.replace_statement with_diags with_loc entry
   val copy_statement
-    : Preproc_directives.copy_statement with_diags with_loc entry
+    : Directives.copy_statement with_diags with_loc entry
 end
 
 module type PPPARSER = sig

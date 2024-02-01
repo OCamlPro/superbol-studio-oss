@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lsp_server.TYPES
+open Server.TYPES
 
 let on_notification state notif =
   match state, notif with
@@ -22,15 +22,15 @@ let on_notification state notif =
   | NotInitialized _ | Exit _ as state, _ ->
       state                   (* spec indicate notif should just be discarded *)
   | Initialized config, Initialized ->
-      Running (Lsp_server.init ~config)
+      Running (Server.init ~config)
   | Running registry, TextDocumentDidOpen params ->
-      Running (Lsp_server.did_open params registry)
+      Running (Server.did_open params registry)
   | Running registry, TextDocumentDidChange params ->
-      Running (Lsp_server.did_change params registry)
+      Running (Server.did_change params registry)
   | Running registry, TextDocumentDidClose params ->
-      Running (Lsp_server.did_close params registry)
+      Running (Server.did_close params registry)
   | Running _, Exit ->
-      Lsp_request.shutdown state;
+      Request.shutdown state;
       Exit (Error "Received premature 'exit' notification")
   | _ ->
       state
@@ -42,7 +42,7 @@ let handle notif state =
       state
   | Ok notif ->
       try on_notification state notif with
-      | Lsp_server.Document_not_found { uri } ->
+      | Server.Document_not_found { uri } ->
           Lsp_io.pretty_notification ~type_:Error
             "Document@ %s@ is@ not@ opened@ yet"
             (Lsp.Types.DocumentUri.to_string uri);

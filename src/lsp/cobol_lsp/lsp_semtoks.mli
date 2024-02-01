@@ -23,5 +23,5 @@ val data
   -> pplog: Cobol_preproc.Trace.log
   -> rev_comments: Cobol_preproc.Text.comments
   -> rev_ignored: Cobol_common.Srcloc.lexloc list
-  -> ptree: Cobol_ptree.compilation_group
+  -> ptree: Cobol_ptree.Types.compilation_group
   -> int array

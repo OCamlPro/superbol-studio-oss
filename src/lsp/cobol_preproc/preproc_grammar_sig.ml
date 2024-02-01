@@ -17,7 +17,7 @@ module type S = sig
   (* From _build/default/src/cobol_preproc/preproc_grammar.mli *)
 
   module Make
-      (CONFIG: Cobol_config.T)
+      (CONFIG: Cobol_config.Types.T)
       (Overlay_manager: Src_overlay.MANAGER)
     : sig
 
@@ -31,9 +31,9 @@ module type S = sig
 
       (* The monolithic API. *)
 
-      val replace_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc_directives.replace_statement Cobol_common.Srcloc.with_loc)
+      val replace_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Directives.replace_statement Cobol_common.Srcloc.with_loc)
 
-      val copy_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Preproc_directives.copy_statement Cobol_common.Srcloc.with_loc)
+      val copy_statement: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Directives.copy_statement Cobol_common.Srcloc.with_loc)
 
       val _unused_symbols: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (unit)
 
@@ -50,9 +50,9 @@ module type S = sig
 
       module Incremental : sig
 
-        val replace_statement: Lexing.position -> (Preproc_directives.replace_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
+        val replace_statement: Lexing.position -> (Directives.replace_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
 
-        val copy_statement: Lexing.position -> (Preproc_directives.copy_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
+        val copy_statement: Lexing.position -> (Directives.copy_statement Cobol_common.Srcloc.with_loc) MenhirInterpreter.checkpoint
 
         val _unused_symbols: Lexing.position -> (unit) MenhirInterpreter.checkpoint
 

@@ -36,7 +36,7 @@
         (flags --inspection --table --only-tokens))
 
 (rule
-  (targets text_keywords.ml)
+  (targets keywords.ml)
   (enabled_if (<> %{profile} "release"))
   (deps    grammar.cmly)
   (mode    promote)

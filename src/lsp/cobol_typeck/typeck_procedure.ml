@@ -21,7 +21,7 @@ module Visitor = Cobol_common.Visitor
 type output =
   {
     procedure: Cobol_unit.Types.procedure;
-    references: Typeck_outputs.references_in_unit;
+    references: Outputs.references_in_unit;
   }
 
 let procedure_of_compilation_unit cu' =
@@ -35,7 +35,7 @@ let procedure_of_compilation_unit cu' =
       }
     and section_under_construction =
       {
-        sec_name: Cobol_ptree.procedure_name with_loc;
+        sec_name: Cobol_ptree.Types.procedure_name with_loc;
         sec_paragraphs: procedure_paragraph with_loc list;
       }
 
@@ -52,8 +52,8 @@ let procedure_of_compilation_unit cu' =
         list = List.rev acc.block_list;
       }
 
-    let name n : Cobol_ptree.qualname = Name n
-    let qual n q : Cobol_ptree.qualname = Qual (n, q)
+    let name n : Cobol_ptree.Types.qualname = Name n
+    let qual n q : Cobol_ptree.Types.qualname = Qual (n, q)
 
     let section_block
         ({ payload = suc; loc }: section_under_construction with_loc) =
@@ -69,7 +69,7 @@ let procedure_of_compilation_unit cu' =
       in
       Section ({ section_name = suc.sec_name; section_paragraphs } &@ loc)
 
-    let simple_paragraph (p: Cobol_ptree.paragraph with_loc) acc =
+    let simple_paragraph (p: Cobol_ptree.Types.paragraph with_loc) acc =
       match acc.current_section, ~&p.paragraph_name with
       | None, Some n ->
           { paragraph_name = Some (name n &@<- n);
@@ -161,19 +161,19 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     type acc =
       {
         current_section: Cobol_unit.Types.procedure_section option;
-        refs: Typeck_outputs.references_in_unit;
-        diags: Typeck_diagnostics.t;
+        refs: Outputs.references_in_unit;
+        diags: Diagnostics.t;
       }
     let init =
       {
         current_section = None;
-        refs = Typeck_outputs.no_refs;
-        diags = Typeck_diagnostics.none;
+        refs = Outputs.no_refs;
+        diags = Diagnostics.none;
       }
     let references { refs; diags; _ } = refs, diags
   end in
 
-  let baseloc_of_qualname: Cobol_ptree.qualname -> srcloc = function
+  let baseloc_of_qualname: Cobol_ptree.Types.qualname -> srcloc = function
     | Name name
     | Qual (name, _) -> ~@name
   in
@@ -191,20 +191,20 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       (* match Qualmap.find qn data_definitions.data_items.named with *)
       (* | Data_field { def; _ } -> *)
       (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_field_ref ~loc def acc.refs } *)
+      (*       refs = Outputs.register_data_field_ref ~loc def acc.refs } *)
       (* | Data_renaming { def; _ } -> *)
       (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_renaming_ref ~loc def acc.refs } *)
+      (*       refs = Outputs.register_data_renaming_ref ~loc def acc.refs } *)
       (* | Data_condition { def; _ } -> *)
       (*     { acc with *)
-      (*       refs = Typeck_outputs.register_condition_name_ref ~loc def acc.refs } *)
+      (*       refs = Outputs.register_condition_name_ref ~loc def acc.refs } *)
       (* | Table_index { qualname = qn; _ } -> *)
       (*     { acc with *)
-      (*       refs = Typeck_outputs.register_data_qualref ~loc ~&qn acc.refs } *)
+      (*       refs = Outputs.register_data_qualref ~loc ~&qn acc.refs } *)
       try
         let bnd = Qualmap.find_binding qn data_definitions.data_items.named in
         { acc with
-          refs = Typeck_outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
+          refs = Outputs.register_data_qualref ~loc bnd.full_qn acc.refs }
       with
       | Not_found ->
           acc  (* ignored for now, as we don't process all the DATA DIV. yet. *)
@@ -223,7 +223,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
       | block ->
           { acc with
-            refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
+            refs = Outputs.register_procedure_ref ~loc block acc.refs }
       | exception Not_found ->
           error acc @@ Unknown_proc_name qn
       | exception Qualmap.Ambiguous (lazy matching_qualnames) ->

@@ -18,7 +18,7 @@ module type TAGS = sig
 end
 
 module Make (Tags: TAGS) = struct
-  open Cobol_ptree
+  open Cobol_ptree.Types
 
   module Term = struct
     let name n : qualname = Name (n &@ Tags.loc)

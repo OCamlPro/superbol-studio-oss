@@ -23,7 +23,7 @@ let print_definitions ~projdir server (doc, positions) : unit =
     let params = DefinitionParams.create ~position ~textDocument:prog () in
     Pretty.out "%s (line %d, character %d):@."
       position_name position.line position.character;
-    match LSP.Request.lookup_definition server params with
+    match Cobol_lsp.Request.INTERNAL.lookup_definition server params with
     | None | Some (`Location []) ->
         Pretty.out "No definition found@."
     | Some (`Location locs) ->
@@ -31,7 +31,7 @@ let print_definitions ~projdir server (doc, positions) : unit =
     (* Yojson.Safe.to_channel Stdlib.stdout @@ *)
     (* Lsp.Client_request.yojson_of_result *)
     (*   (Lsp.Client_request.TextDocumentDefinition params) *)
-    (*   (LSP.Request.lookup_definition server params); *)
+    (*   (Cobol_lsp.Request.lookup_definition server params); *)
   end positions.pos_map
 ;;
 

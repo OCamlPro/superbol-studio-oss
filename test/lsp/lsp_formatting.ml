@@ -27,8 +27,8 @@ let format_doc doc =
     let options = FormattingOptions.create ~insertSpaces:true ~tabSize:2 () in
     DocumentFormattingParams.create ~options ~textDocument:prog ()
   in
-  let doc = (LSP.Types.URIMap.find prog.uri server.docs).textdoc in
-  let formatted = LSP.Request.formatting server params in
+  let doc = (Cobol_lsp.Alltypes.URIMap.find prog.uri server.docs).textdoc in
+  let formatted = Cobol_lsp.Request.INTERNAL.formatting server params in
   Option.map (fun edits ->
     Lsp.Text_document.apply_text_document_edits doc edits |> Lsp.Text_document.text
   ) formatted, end_with_postproc

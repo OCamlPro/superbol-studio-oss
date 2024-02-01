@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_unit.Qualmap
-open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
+open Testing_helpers.Make (Cobol_parser.Main.INTERNAL.Dummy.Tags)
 
 module NEL = Cobol_common.Basics.NEL
 
@@ -24,7 +24,7 @@ let show_map map =
   Pretty.out "@[<v>Rep: %a@]@." (pp_qualmap_struct Fmt.text) map
 
 let pp_qualname ppf qn =
-  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.pp_qualname qn
+  Pretty.print ppf "@[<h>%a@]" Cobol_ptree.Types.pp_qualname qn
 
 let show_item qn map =
   try

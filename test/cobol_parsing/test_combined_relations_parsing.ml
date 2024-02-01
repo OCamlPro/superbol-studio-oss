@@ -13,11 +13,11 @@
 
 open Alcotest
 
-open Cobol_ptree
-open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
-open Cobol_parser.INTERNAL.Tokens
-open Cobol_parser.INTERNAL.Grammar
-open Cobol_parser.INTERNAL.Dummy
+open Cobol_ptree.Types
+open Testing_helpers.Make (Cobol_parser.Main.INTERNAL.Dummy.Tags)
+open Cobol_parser.Grammar_tokens
+open Cobol_parser.Grammar
+open Cobol_parser.Main.INTERNAL.Dummy
 
 let condition: condition testable = testable pp_condition (=)
 let parse_condition = parse_list_as standalone_condition

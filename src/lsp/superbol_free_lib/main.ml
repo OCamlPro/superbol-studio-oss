@@ -48,7 +48,7 @@ let public_subcommands = [
 ]
 
 let () =
-  Cobol_common.init_default_exn_printers ()
+  Cobol_common.Errors.init_default_exn_printers ()
 
 let main ?style_renderer ?utf_8 () =
 
@@ -59,7 +59,7 @@ let main ?style_renderer ?utf_8 () =
   Pretty.init_formatters ?style_renderer ?utf_8 ();
   Globals.MAIN.main
     (* ~on_error:Cobol_common.keep_temporary_files *)
-    ~on_exit:Cobol_common.exit
+    ~on_exit:Cobol_common.Errors.exit
     ~print_config:Config.print
     ~common_args:[]
     public_subcommands
