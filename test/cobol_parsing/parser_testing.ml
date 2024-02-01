@@ -32,7 +32,7 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
     ?source_format ?filename contents =
   let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
-    Cobol_parser.parse_with_artifacts
+    Cobol_parser.Main.parse_with_artifacts
       ~options:Cobol_parser.Options.{
           default with
           verbose;
@@ -40,12 +40,12 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
         }
   in
   (if with_locations
-   then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
-   else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
+   then Cobol_parser.Main.INTERNAL.pp_tokens' ~fsep:"@\n"
+   else Cobol_parser.Main.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
 
 let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
+  Cobol_parser.Main.parse_simple
     ~options:Cobol_parser.Options.{
         default with
         verbose;
@@ -154,7 +154,7 @@ let rewindable_parse
           verbose; libpath = []; source_format;
           config = Option.value config ~default:default.config;
         } |>
-    Cobol_parser.rewindable_parse_simple
+    Cobol_parser.Main.rewindable_parse_simple
       ~options:Cobol_parser.Options.{
           default with
           verbose; recovery = DisableRecovery;
@@ -166,8 +166,8 @@ let rewindable_parse
 (** Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
-  let DIAGS.{ result = Only ptree, rewinder; diags } =
-    Cobol_parser.rewind_and_parse rewinder preproc_rewind
+  let DIAGS.{ result = Cobol_parser.Outputs.Only ptree, rewinder; diags } =
+    Cobol_parser.Main.rewind_and_parse rewinder preproc_rewind
       ~position:(Indexed { line; char })
   in
   f ptree diags;

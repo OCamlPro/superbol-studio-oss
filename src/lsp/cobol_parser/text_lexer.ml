@@ -86,7 +86,7 @@ let __init_puncts =
   List.iter begin fun (punct, token) ->
     Hashtbl.add punct_of_token token punct;
     Hashtbl.add token_of_punct punct token
-  end Text_keywords.puncts
+  end Keywords.puncts
 
 let __init_default_keywords =
   List.iter begin fun (kwd, token) ->
@@ -94,10 +94,10 @@ let __init_default_keywords =
     (* Every default token needs to be reserved explicitly *)
     Hashtbl.add __token_of_keyword kwd
       { token; enabled = true; reserved = false }
-  end Text_keywords.keywords
+  end Keywords.keywords
 
 let silenced_keywords =
-  StringSet.of_list Text_keywords.silenced_keywords
+  StringSet.of_list Keywords.silenced_keywords
 
 (* --- *)
 

@@ -18,7 +18,7 @@ open Testsuite_utils
 
 let reparse_file ~source_format ~config filename =
   let parse ~source_format input =
-    Cobol_parser.parse_simple
+    Cobol_parser.Main.parse_simple
       ~options:Cobol_parser.Options.{
           default with
           recovery = DisableRecovery

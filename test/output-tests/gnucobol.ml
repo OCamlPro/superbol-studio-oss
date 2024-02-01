@@ -192,7 +192,7 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     input |>
     Cobol_preproc.Preprocess.preprocessor
       ~options:Cobol_preproc.Options.{ default with source_format } |>
-    Cobol_parser.parse_simple
+    Cobol_parser.Main.parse_simple
   in
   try
     let input = setup_input ~filename contents in

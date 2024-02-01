@@ -64,7 +64,7 @@ let cmd =
                    in
                    input |>
                    Cobol_preproc.Preprocess.preprocessor ~options:preproc_options |>
-                   Cobol_parser.parse_simple ~options:common.parser_options
+                   Cobol_parser.Main.parse_simple ~options:common.parser_options
                  in
                  let my_text = Cobol_preproc.Src_input.from ~filename:file ~f:parse in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;

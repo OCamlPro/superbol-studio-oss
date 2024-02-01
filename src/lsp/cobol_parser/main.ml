@@ -15,8 +15,8 @@ module DIAGS = Cobol_common.Diagnostics
 
 open Cobol_common.Diagnostics.TYPES
 open Cobol_common.Srcloc.INFIX
-open Parser_options                               (* import types for options *)
-open Parser_outputs                               (* import types for outputs *)
+open Options                               (* import types for options *)
+open Outputs                               (* import types for outputs *)
 
 module Tokzr = Text_tokenizer
 module Overlay_manager = Grammar_utils.Overlay_manager
@@ -94,12 +94,12 @@ and 'm persist =
 
 (** Initializes a parser state, given a preprocessor. *)
 let make_parser
-    (type m) Parser_options.{ verbose; show; recovery; config }
+    (type m) Options.{ verbose; show; recovery; config }
     ?show_if_verbose ~(tokenizer_memory: m memory) pp =
   let tokzr: m Tokzr.state =
     let memory: m Tokzr.memory = match tokenizer_memory with
-      | Parser_options.Amnesic -> Tokzr.amnesic
-      | Parser_options.Eidetic -> Tokzr.eidetic
+      | Options.Amnesic -> Tokzr.amnesic
+      | Options.Eidetic -> Tokzr.eidetic
     in
     let module Config = (val config) in
     Tokzr.init ~verbose ?show_if_verbose ~memory Config.words
@@ -580,7 +580,7 @@ let rewindable_parse
 let parse
     (type m)
     ~(memory: m memory)
-    ?(options = Parser_options.default)
+    ?(options = Options.default)
   : Cobol_preproc.Preprocess.t ->
     (Cobol_ptree.Types.compilation_group option, m) output with_diags =
   parse_once ~options ~memory
@@ -592,7 +592,7 @@ let parse_with_artifacts = parse ~memory:Eidetic
 let rewindable_parse
     (type m)
     ~(memory: m memory)
-    ?(options = Parser_options.default)
+    ?(options = Options.default)
   : Cobol_preproc.Preprocess.t ->
     (((Cobol_ptree.Types.compilation_group option, m) output as 'x) * 'x rewinder)
       with_diags =
@@ -608,3 +608,38 @@ let rewind_and_parse { rewind_n_parse } rewind_preproc ~position =
 let artifacts
   : (_, Cobol_common.Behaviors.eidetic) output -> _ = function
   | WithArtifacts (_, artifacts) -> artifacts
+
+module INTERNAL = struct
+
+  (** {2 COBOL tokens} *)
+
+  module Tokens = Grammar_tokens
+
+  let pp_token = Text_tokenizer.pp_token
+  let pp_tokens = Text_tokenizer.pp_tokens
+  let pp_tokens' = Text_tokenizer.pp_tokens'
+
+  (** {2 COBOL grammar} *)
+
+  module Grammar (* : Grammar_sig.S *) = Grammar
+
+  (** {2 Dummy parser} *)
+
+  (** Parser with dummy source locations, that can be fed directly with a
+      list of tokens *)
+  module Dummy = struct
+    module Tags = struct
+      let loc = Cobol_common.Srcloc.dummy
+    end
+
+    let parse_as item toks =
+      let toks = ref toks
+      and dummy_lexer = Lexing.from_string ~with_positions:false "" in
+      item begin fun _ -> match !toks () with
+        | Seq.Nil -> Grammar_tokens.EOF
+        | Cons (x, tl) -> toks := tl; x
+      end dummy_lexer
+
+    let parse_list_as parse lx = parse_as parse (List.to_seq lx)
+  end
+end

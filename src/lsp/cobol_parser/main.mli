@@ -11,8 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Parser_options
-open Parser_outputs
+open Options
+open Outputs
 
 (** Parsing functions essentially parse a stream of tokens that is produced by a
     given preprocessor (typically returned by
@@ -36,7 +36,7 @@ open Parser_outputs
 
 (** Simple parsing functions traverse the inputs once to produce a result. *)
 type 'm simple_parsing
-  = ?options:Parser_options.parser_options
+  = ?options:Options.parser_options
   -> Cobol_preproc.Preprocess.t
   -> (Cobol_ptree.Types.compilation_group option, 'm) output
     Cobol_common.Diagnostics.with_diags
@@ -113,3 +113,20 @@ val rewind_and_parse
 
 val artifacts
   : (_, Cobol_common.Behaviors.eidetic) output -> artifacts
+
+module INTERNAL : sig
+
+  val pp_token : Text_tokenizer.token Pretty.printer
+  val pp_tokens : Text_tokenizer.tokens Pretty.printer
+  val pp_tokens' : ?fsep:Pretty.simple -> Text_tokenizer.tokens Pretty.printer
+
+  module Dummy : sig
+    module Tags : sig
+      val loc : Cobol_common.Srcloc.t
+    end
+    val parse_list_as : (('a -> Grammar.token) -> Lexing.lexbuf -> 'b) ->
+      Grammar.token list -> 'b
+end
+
+
+end

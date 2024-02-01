@@ -34,7 +34,7 @@ module TYPES = struct
   and rewinder =
     (Cobol_ptree.Types.compilation_group option,
      Cobol_common.Behaviors.eidetic) Cobol_parser.Outputs.output
-      Cobol_parser.rewinder
+      Cobol_parser.Main.rewinder
 
   (** Raised by {!val:Document.checked}. *)
   exception Unparseable of Lsp.Types.DocumentUri.t
@@ -66,7 +66,7 @@ type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 
 let rewindable_parse ({ project; textdoc; _ } as doc) =
-  Cobol_parser.rewindable_parse_with_artifacts
+  Cobol_parser.Main.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
         default with
         recovery = EnableRecovery { silence_benign_recoveries = true };
@@ -95,7 +95,7 @@ let check doc ptree =
       Cobol_typeck.Engine.compilation_group ~config ptree |>
       Cobol_typeck.Engine.translate_diagnostics ~config |>
       DIAGS.map_result ~f:begin fun checked ->
-        Cobol_parser.artifacts ptree, Some rewinder, Some checked
+        Cobol_parser.Main.artifacts ptree, Some rewinder, Some checked
       end
     end ptree
   in
@@ -115,7 +115,7 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
       { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   | Some position, Some rewinder ->
       check doc @@
-      Cobol_parser.rewind_and_parse rewinder ~position @@
+      Cobol_parser.Main.rewind_and_parse rewinder ~position @@
       Cobol_preproc.Preprocess.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
 
@@ -156,7 +156,7 @@ let first_change_pos changes =
           acc
     end Int.(max_int, max_int) changes      (* can |changes|=0 really happen? *)
   in
-  Cobol_parser.Indexed { line; char }
+  Cobol_parser.Main.Indexed { line; char }
 
 let update ({ textdoc; _ } as doc) changes =
   let position = first_change_pos changes in

@@ -14,7 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common                                          (* Srcloc, Visitor *)
 open Cobol_common.Srcloc.INFIX
-open Cobol_parser.Tokens
+open Cobol_parser.Grammar_tokens
 
 module TOKTYP = struct
   type t = { index: int; name: string }

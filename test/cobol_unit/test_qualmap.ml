@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_unit.Qualmap
-open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
+open Testing_helpers.Make (Cobol_parser.Main.INTERNAL.Dummy.Tags)
 
 module NEL = Cobol_common.Basics.NEL
 

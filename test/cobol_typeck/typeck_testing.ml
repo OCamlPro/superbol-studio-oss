@@ -18,7 +18,7 @@ module DIAGS = Cobol_common.Diagnostics
 let show_diagnostics ?(show_data = false) ?(verbose = false)
     ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
+  Cobol_parser.Main.parse_simple
     ~options:Cobol_parser.Options.{
         default with
         verbose;
