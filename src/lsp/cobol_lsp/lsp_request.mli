@@ -19,17 +19,9 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.DefinitionParams.t
     -> [> `Location of Lsp.Types.Location.t list ] option
-  val lookup_definition_in_doc
-    : Lsp.Types.DefinitionParams.t
-    -> Lsp_document.checked_doc
-    -> [> `Location of Lsp.Types.Location.t list ] option
   val lookup_references
     : Lsp_server.t
     -> Lsp.Types.ReferenceParams.t
-    -> Lsp.Types.Location.t list option
-  val lookup_references_in_doc
-    : Lsp.Types.ReferenceParams.t
-    -> Lsp_document.checked_doc
     -> Lsp.Types.Location.t list option
   val hover
     : Lsp_server.t

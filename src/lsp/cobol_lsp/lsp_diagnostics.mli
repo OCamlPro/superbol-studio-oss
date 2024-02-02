@@ -23,13 +23,15 @@ include module type of TYPES
 type t = diagnostics
 
 val translate_one
-  : rootdir:string
-  -> uri:[< `Force of Lsp.Uri.t | `Main of Lsp.Uri.t ]
+  : ?focus_on_main_doc: bool
+  -> rootdir: string
+  -> uri: Lsp.Uri.t
   -> Cobol_common.Diagnostics.t -> diagnostics
 
 val translate
-  : rootdir:string
-  -> uri:[< `Force of Lsp.Uri.t | `Main of Lsp.Uri.t ]
+  : ?focus_on_main_doc: bool
+  -> rootdir: string
+  -> uri: Lsp.Uri.t
   -> Cobol_common.Diagnostics.Set.t -> diagnostics
 
 val publish

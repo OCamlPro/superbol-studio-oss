@@ -128,7 +128,7 @@ let find_definitions ?allow_notifications loc_translator
           qn cu
   with Not_found -> []
 
-let lookup_definition_in_doc
+let lookup_definition_in_doc ~rootdir
     DefinitionParams.{ textDocument = doc; position; _ }
     Cobol_typeck.Outputs.{ group; _ }
   =
@@ -138,12 +138,14 @@ let lookup_definition_in_doc
       None
   | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
-      let loc_translator = Lsp_position.loc_translator doc in
+      let loc_translator = Lsp_position.loc_translator ~rootdir doc in
       Some (`Location (find_definitions loc_translator cu_name qn group))
 
 let handle_definition registry (params: DefinitionParams.t) =
   try_with_document_data registry params.textDocument
-    ~f:(fun ~doc:_ -> lookup_definition_in_doc params)
+    ~f:(fun ~doc:{ project; _ } ->
+        let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+        lookup_definition_in_doc ~rootdir params)
 
 (** {3 References} *)
 
@@ -168,20 +170,23 @@ let find_proc_qn ~kind qn ?in_section cu =
     end
 
 let lookup_references_in_doc
+    ~rootdir
     ReferenceParams.{ textDocument = doc; position; context; _ }
     Cobol_typeck.Outputs.{ group; artifacts = { references }; _ }
   =
   match Lsp_lookup.element_at_position ~uri:doc.uri position group with
   | { element_at_position = None; _ } ->
-    Lsp_debug.message "Lsp_request.lookup_references_in_doc: element_at_position = None";
+      Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                         element_at_position = None";
     None
   | { enclosing_compilation_unit_name = None; _ } ->
-    Lsp_debug.message "Lsp_request.lookup_references_in_doc: enclosing_compilation_unit_name = None";
+      Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                         enclosing_compilation_unit_name = None";
       None
   | { element_at_position = Some qn;
       enclosing_compilation_unit_name = Some cu_name } ->
       let Lsp_position.{ location_of_srcloc; _ } as loc_translator
-        = Lsp_position.loc_translator doc in
+        = Lsp_position.loc_translator ~rootdir doc in
       let def_locs =
         if context.includeDeclaration then
           find_definitions ~allow_notifications:false loc_translator
@@ -201,17 +206,21 @@ let lookup_references_in_doc
           match qn with
           | Data_full_name qn
           | Data_item { full_qn = Some qn; _ } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_full_name...";
+              Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                                 Data_full_name...";
               data_refs qn
           | Data_item { full_qn = None; _ } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_item...";
+              Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                                 Data_item...";
               []
           | Data_name qn ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Data_name...";
+              Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                                 Data_name...";
               Option.fold ~none:[] ~some:data_refs @@
               find_full_qn qn ~&cu.unit_data.data_items.named ~kind:"data-name"
           | Proc_name { qn; in_section } ->
-            Lsp_debug.message "Lsp_request.lookup_references_in_doc: Proc_name...";
+              Lsp_debug.message "Lsp_request.lookup_references_in_doc: \
+                                 Proc_name...";
               Option.fold ~none:[] ~some:proc_refs @@
               find_proc_qn qn ?in_section ~&cu ~kind:"procedure-name"
         with Not_found -> []
@@ -220,7 +229,9 @@ let lookup_references_in_doc
 
 let handle_references state (params: ReferenceParams.t) =
   try_with_document_data state params.textDocument
-    ~f:(fun ~doc:_ -> lookup_references_in_doc params)
+    ~f:(fun ~doc:{ project; _ } ->
+        let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+        lookup_references_in_doc ~rootdir params)
 
 (** {3 Formatting} *)
 
@@ -484,9 +495,7 @@ let handle (Jsonrpc.Request.{ id; _ } as req) state =
 
 module INTERNAL = struct
   let lookup_definition = handle_definition
-  let lookup_definition_in_doc = lookup_definition_in_doc
   let lookup_references = handle_references
-  let lookup_references_in_doc = lookup_references_in_doc
   let hover = handle_hover
   let formatting = handle_formatting
 end

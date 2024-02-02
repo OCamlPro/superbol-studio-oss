@@ -75,8 +75,9 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
   in
   if URIMap.is_empty indirect4uri then begin
     let all_diags =
-      Lsp_diagnostics.translate diags ~uri:(`Main uri)
+      Lsp_diagnostics.translate diags ~uri
         ~rootdir:(Lsp_project.string_of_rootdir rootdir)
+        ~focus_on_main_doc: false
     in
     (* Note here we may publish diagnostics for non-opened documents.  LSP
        protocol does not seem to forbid that (but some editors just ignore

@@ -38,8 +38,9 @@ let show_n_forget_diagnostics ?(force = false) { result = project; diags } =
   if force || diags <> DIAGS.Set.none then
     Lsp_diagnostics.publish @@
     Lsp_diagnostics.translate diags
+      ~focus_on_main_doc: false
       ~rootdir:(Superbol_project.string_of_rootdir project.rootdir)
-      ~uri:(`Main (Lsp.Uri.of_path project.config_filename));
+      ~uri:(Lsp.Uri.of_path project.config_filename);
   project
 
 let on_project_config_error e ~rootdir ~layout =

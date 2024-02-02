@@ -12,8 +12,6 @@
 (**************************************************************************)
 
 open Lsp_imports
-open Ez_file.V1
-open EzFile.OP
 
 module DIAG = Cobol_common.Diagnostics
 
@@ -23,28 +21,13 @@ end
 include TYPES
 type t = diagnostics
 
-let pseudo_normalized_uri ~rootdir filename =
-  let filename =
-    let prefix = EzFile.current_dir_name // "" in
-    if EzFile.is_absolute filename
-    then filename
-    else rootdir // match EzString.chop_prefix ~prefix filename with
-      | None -> filename
-      | Some x -> x
-  in
-  Lsp.Uri.of_path filename
-
-let translate_one ~rootdir ~uri (diag: DIAG.t) =
-  let uri, project_srcloc = match uri with
-    | `Force uri ->
-        uri, Cobol_common.Srcloc.lexloc_in ~filename:(Lsp.Uri.to_path uri)
-    | `Main uri ->
-        uri, Cobol_common.Srcloc.as_lexloc      (* rely on default projection *)
-  in
-  let uri, range =
-    match Option.map project_srcloc (DIAG.location diag) with
-    | Some (Lexing.{ pos_fname = f; _ }, _ as lexloc) ->
-        pseudo_normalized_uri ~rootdir f, Lsp_position.range_of_lexloc lexloc
+let translate_one ?focus_on_main_doc ~rootdir ~uri (diag: DIAG.t) =
+  let uri, range = match DIAG.location diag with
+    | Some loc ->
+        let Lsp.Types.Location.{ range; uri } =
+          Lsp_position.location_of_srcloc ?focus_on_main_doc ~rootdir ~uri loc
+        in
+        uri, range
     | None ->
         uri, Lsp_position.pointwise_range_at_start
   in
@@ -60,12 +43,11 @@ let translate_one ~rootdir ~uri (diag: DIAG.t) =
   in
   URIMap.singleton uri [diag]
 
-let translate ~rootdir ~uri diagnostics =
-  let init = match uri with `Force uri | `Main uri -> URIMap.singleton uri [] in
+let translate ?focus_on_main_doc ~rootdir ~uri diagnostics =
   DIAG.Set.fold begin fun diagnostic ->
-    translate_one ~rootdir ~uri diagnostic |>
+    translate_one ~rootdir ?focus_on_main_doc ~uri diagnostic |>
     URIMap.union (fun _uri a b -> Some (List.rev_append a b))
-  end diagnostics init
+  end diagnostics (URIMap.singleton uri [])
 
 let publish diagnostics : unit =
   URIMap.iter (fun uri diags -> Lsp_io.send_diagnostics ~uri diags) diagnostics
