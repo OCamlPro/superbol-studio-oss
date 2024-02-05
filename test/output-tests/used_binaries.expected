@@ -19,7 +19,7 @@ used_binaries.at-254-prog.cob:12.8-12.28:
 ----           ^^^^^^^^^^^^^^^^^^^^
   13           EX.
   14               STOP RUN.
->> Error: Library `PROCE' not found in search path (search path: sub)
+>> Error: Library `PROCE' not found in search path (search path: ./sub)
 
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:277:0
 Fatal: used_binaries.at-277-sub/copy/PROC.cpy: No such file or directory

@@ -48,6 +48,7 @@ let diags { diags; reader; _ } = DIAGS.Set.union diags @@ Src_reader.diags reade
 let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
 let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
 let position { reader; _ } = Src_reader.position reader
+let input_file { reader; _ } = Src_reader.input_file reader
 let source_format { reader; _ } = Src_reader.source_format reader
 let rev_log { pplog; _ } = pplog
 let rev_comments { reader; _ } = Src_reader.rev_comments reader
@@ -302,10 +303,12 @@ and do_replace lp rev_prefix repl suffix =
 
 
 and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
-    loc { libname; cbkname } =
-  let libpath = match ~&?cbkname with None -> libpath | Some (_, d) -> [d] in
+    loc { txtname; libname } =
   let text, diags, pplog =
-    match Cobol_common.Copybook.find_lib ~libpath ~&libname with
+    match
+      Cobol_common.Copybook.find_lib ~&txtname ?libname:~&?libname
+        ?fromfile:(input_file lp) ~libpath
+    with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         (* TODO: `note addendum *)
         [],
@@ -330,6 +333,7 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
   in
   text, with_diags_n_pplog lp diags pplog
 
+
 and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   let eofp p = ~&p = Text.Eof in
   let rec aux acc lp =
@@ -348,13 +352,16 @@ and full_text ?(item = "library") ?postproc lp : Text.text * preprocessor =
   in
   aux [] lp
 
+
 let next_chunk lp =
   let text, lp = next_chunk lp in
   if show `Txt lp then
     Pretty.error "Txt: %a@." Text.pp_text text;
   text, lp
 
+
 (* Pre-processing *)
+
 
 (** For now, pre-processor tokens are essentially the same tokens as the general
     compilation group tokens since we reuse the same parser module. *)
@@ -416,8 +423,8 @@ let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
 let lex_file ~dialect ~source_format ?ppf filename =
   Src_input.from ~filename ~f:(lex_input ~dialect ~source_format ?ppf)
 
-let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) libname =
-  match Cobol_common.Copybook.find_lib ~libpath libname with
+let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) lib =
+  match Cobol_common.Copybook.find_lib ~libpath lib with
   | Ok filename ->
       Src_input.from ~filename ~f:begin fun input ->
         DIAGS.result @@

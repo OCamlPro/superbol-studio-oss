@@ -37,10 +37,10 @@ and replace_statement =
       }
 and library =
   {
-    libname: fileloc with_loc;
-    cbkname: fileloc with_loc option;
+    txtname: fileloc with_loc;
+    libname: fileloc with_loc option;
   }
-and fileloc = [`Word | `Alphanum] * string
+and fileloc = Cobol_common.Copybook.fileloc
 and replacing =
   | ReplaceExact of
       {

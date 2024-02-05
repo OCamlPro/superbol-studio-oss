@@ -60,7 +60,7 @@ val lex_lib
   -> source_format: Cobol_config.source_format_spec
   -> libpath:string list
   -> ?ppf:Format.formatter
-  -> [< `Alphanum | `Word ] * string
+  -> Cobol_common.Copybook.fileloc
   -> unit Cobol_common.Diagnostics.with_diags
 
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
