@@ -317,8 +317,11 @@ let handle_hover registry (params: HoverParams.t) =
           false
       | Replacement { matched_loc = loc; _ }
       | FileCopy { copyloc = loc; _ } ->
-          Lsp_position.is_in_lexloc params.position
-            (Cobol_common.Srcloc.lexloc_in ~filename loc)
+          try         (* Some locations in the pre-processor log may not involve
+                         [filename], so we need to catch those cases. *)
+            Lsp_position.is_in_lexloc params.position
+              (Cobol_common.Srcloc.lexloc_in ~filename loc)
+          with Invalid_argument _ -> false
     end (Cobol_preproc.Trace.events pplog)
   in
   let hover_markdown ~loc value =
