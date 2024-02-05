@@ -16,6 +16,7 @@
     or use the default value of any options that is badly typed in the
     configuration file or not set in the configuration file.*)
 
+module Types = Types
 include module type of Types
 
 module Options = Options

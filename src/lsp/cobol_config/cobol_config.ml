@@ -15,6 +15,7 @@ open EzCompat
 open Ez_file.V1
 open EzFile.OP
 
+module Types = Types
 include Types
 
 module Options = Options
