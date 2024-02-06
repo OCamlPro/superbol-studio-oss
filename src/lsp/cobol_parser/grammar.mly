@@ -1041,7 +1041,9 @@ let data_division :=
 
 
 let section(K, L) ==
-  | K; SECTION; "."; ~ = loc(rl(loc(L))); < >
+  | ~ = loc(section_header_n_items(K,L)); < >
+let section_header_n_items(K, L) ==
+  | K; SECTION; "."; ~ = rl(loc(L)); < >
 
 let file_section :=
   | ~ = section (FILE, file_or_sort_merge_descr_entry); < >
@@ -3396,7 +3398,7 @@ let perform_statement [@context perform_stmt] :=
                      perform_statements = isl } }
 
 let perform_phrase :=
- | FOREVER; { PerformForever } (* GC/COBOL-IT extension *) 
+ | FOREVER; { PerformForever } (* GC/COBOL-IT extension *)
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
  | wt = ro(with_test); UNTIL; until = condition;
    { PerformUntil { with_test = wt; until } }
