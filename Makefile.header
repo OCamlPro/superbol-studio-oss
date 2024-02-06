@@ -27,6 +27,8 @@ SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
 SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
 SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
 
+YARN = npx --yes yarn 
+
 VSCE_ARGS = --yarn -t $(TARGET_SPEC)
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
@@ -68,7 +70,7 @@ build-debug:
 yarn-debug: package.json
 yarn-debug: _out/superbol-vscode-platform-bundle.js	\
 	    _out/superbol-vscode-gdb.js
-	yarn esbuild $(filter %.js, $+) \
+	$(YARN) esbuild $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -90,7 +92,7 @@ build-release:
 yarn-release: package.json
 yarn-release: _out/superbol-vscode-platform-bundle.js	\
 	      _out/superbol-vscode-gdb.js
-	yarn esbuild $(filter %.js, $+) \
+	$(YARN) esbuild $(filter %.js, $+) \
                 --bundle \
                 --external:vscode \
                 --outdir=_dist \
@@ -130,7 +132,7 @@ vsix-package:
 #	needs 'make build-debug' or 'make build-release' before
 	rm -f _dist/superbol-free-*-*
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
-	yarn vsce package $(VSCE_ARGS)		\
+	$(YARN) vsce package $(VSCE_ARGS)		\
 		--no-git-tag-version		\
 		--no-update-package-json	\
 		--out $(TARGET_VSIX) $(VERSION)
@@ -159,10 +161,10 @@ vsix-clean: clean
 # publishing (requires vsce/ovsx login)
 
 deploy-vsce:
-	yarn vsce publish $(VSCE_ARGS) --packagePath $(TARGET_VSIX)
+	$(YARN) vsce publish $(VSCE_ARGS) --packagePath $(TARGET_VSIX)
 
 deploy-ovsx:
-	yarn ovsx publish --yarn
+	$(YARN) ovsx publish --yarn
 
 .PHONY: clean-execs
 clean-execs:
@@ -170,6 +172,11 @@ clean-execs:
 
 distclean: clean-execs vsix-clean
 clean: clean-execs
+
+.PHONY: node-setup
+node-setup:
+	$(YARN) install
+build-deps: node-setup
 
 # ---
 

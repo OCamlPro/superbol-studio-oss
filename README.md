@@ -84,13 +84,8 @@ server and the VSCode extension from sources.
 
    [^drom-version]: Current version is 0.9.2~dev3 (commit 63a5770).
 
-3. To build the VSCode extension, you also need to have
-   [node.js](https://nodejs.org/), and install `yarn` via:
-
-   ```bash
-   npm install yarn
-   yarn install
-   ```
+3. Install [node.js](https://nodejs.org/) (version >=5.2.0) if it
+   is not already installed.
 
 4. You can then install all remaining dependencies, and compile the
    LSP server along with the VSCode extension:
