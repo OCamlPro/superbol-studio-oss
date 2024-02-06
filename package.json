@@ -388,6 +388,9 @@
       }
     ]
   },
+  "extensionKind": [
+    "workspace"
+  ],
   "name": "SuperBOL",
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in VSCode, based on the SuperBOL LSP server for COBOL",

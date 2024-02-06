@@ -425,4 +425,7 @@ let manifest =
       "workspaceContains:{_superbol,superbol.toml}";
       (* "onDebug"; *) (* <- not relevant yet *)
     ]
+    ~extensionKind: [
+      "workspace";                                 (* <- run on the workspace *)
+    ]
     ~contributes
