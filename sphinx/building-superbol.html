@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Building SuperBOL from Sources &mdash; superbol master
- (642a6ff
-) (2024/02/06 11:51) documentation</title>
+ (77ed381
+) (2024/02/06 13:54) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (642a6ff
+ (77ed381
 )
               </div>
 <div role="search">
@@ -103,13 +103,7 @@ command:</p>
 </pre></div>
 </div>
 </li>
-<li><p>To build the VSCode extension, you also need to have <a class="reference external" href="https://nodejs.org/">node.js</a>,
-and install and initialize <cite>yarn</cite> via:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>npm install yarn
-yarn install
-</pre></div>
-</div>
-</li>
+<li><p>Install <a class="reference external" href="https://nodejs.org/">node.js</a> (version &gt;=5.2.0) if it is not already installed.</p></li>
 <li><p>You can then install all remaining dependencies, and compile the
 LSP server along with the VSCode extension:</p>
 <div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>make build-deps vsix-release
