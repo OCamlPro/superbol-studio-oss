@@ -21,13 +21,7 @@ to install a few external dependencies.
    
       opam pin add https://github.com/OCamlPro/drom.git
 
-3. To build the VSCode extension, you also need to have `node.js`_,
-   and install and initialize `yarn` via:
-
-   .. code-block:: shell
-   
-      npm install -g yarn
-      yarn install
+3. Install `node.js`_ (version >=5.2.0) if it is not already installed.
 
 4. You can then install all remaining dependencies, and compile the
    LSP server along with the VSCode extension:
