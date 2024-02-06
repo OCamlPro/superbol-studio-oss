@@ -66,6 +66,12 @@ Overview of sub-commands::
   
   texi2rst
     build .texi documentation from gnucobol-docs
+  
+  util detect cycle
+    Detect a cycle of lines in a file
+  
+  util wc
+    Stats on file of lines (without taking UTF8 chars into account)
 
 
 main.exe ebcdic translate
@@ -1050,3 +1056,61 @@ Where options are:
 * :code:`-I DIR`   Add to lookup path for files
 
 * :code:`-o DIR`   Target directory for RST generation
+
+
+main.exe util detect cycle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Detect a cycle of lines in a file
+
+
+
+**DESCRIPTION**
+
+
+This command will take a file of lines and detect cycles in the lines, and simplify them.
+
+
+**ABOUT UTILS**
+
+
+This is a list of small sub-commands that may be useful from time to time.
+
+**USAGE**
+::
+  
+  main.exe util detect cycle FILES [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILES`   Files to unrec
+
+
+main.exe util wc
+~~~~~~~~~~~~~~~~~~
+
+Stats on file of lines (without taking UTF8 chars into account)
+
+
+
+**DESCRIPTION**
+
+
+This command will print different statistics on a file of lines. Contrarily to wc, it will not take into account UTF8 chars for the max line length.
+
+
+**ABOUT UTILS**
+
+
+This is a list of small sub-commands that may be useful from time to time.
+
+**USAGE**
+::
+  
+  main.exe util wc FILES [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILES`   Files to wc

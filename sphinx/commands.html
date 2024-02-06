@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (d865524
-) (2024/01/25 20:58) documentation</title>
+ (d493d56
+) (2024/02/06 10:33) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (d865524
+ (d493d56
 )
               </div>
 <div role="search">
@@ -73,6 +73,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-list">main.exe switch list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-set">main.exe switch set</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-texi2rst">main.exe texi2rst</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-util-detect-cycle">main.exe util detect cycle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-util-wc">main.exe util wc</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/doc">API doc</a></li>
@@ -168,6 +170,12 @@
 
 <span class="n">texi2rst</span>
   <span class="n">build</span> <span class="o">.</span><span class="n">texi</span> <span class="n">documentation</span> <span class="n">from</span> <span class="n">gnucobol</span><span class="o">-</span><span class="n">docs</span>
+
+<span class="n">util</span> <span class="n">detect</span> <span class="n">cycle</span>
+  <span class="nc">Detect</span> <span class="n">a</span> <span class="n">cycle</span> <span class="k">of</span> <span class="n">lines</span> <span class="k">in</span> <span class="n">a</span> <span class="n">file</span>
+
+<span class="n">util</span> <span class="n">wc</span>
+  <span class="nc">Stats</span> <span class="n">on</span> <span class="n">file</span> <span class="k">of</span> <span class="n">lines</span> <span class="o">(</span><span class="n">without</span> <span class="n">taking</span> <span class="nc">UTF8</span> <span class="n">chars</span> <span class="n">into</span> <span class="n">account</span><span class="o">)</span>
 </pre></div>
 </div>
 <section id="main-exe-ebcdic-translate">
@@ -910,6 +918,38 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   .texi file</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add to lookup path for files</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">DIR</span></code>   Target directory for RST generation</p></li>
+</ul>
+</section>
+<section id="main-exe-util-detect-cycle">
+<h2>main.exe util detect cycle<a class="headerlink" href="#main-exe-util-detect-cycle" title="Permalink to this headline"></a></h2>
+<p>Detect a cycle of lines in a file</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command will take a file of lines and detect cycles in the lines, and simplify them.</p>
+<p><strong>ABOUT UTILS</strong></p>
+<p>This is a list of small sub-commands that may be useful from time to time.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">util</span> <span class="n">detect</span> <span class="n">cycle</span> <span class="nc">FILES</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">FILES</span></code>   Files to unrec</p></li>
+</ul>
+</section>
+<section id="main-exe-util-wc">
+<h2>main.exe util wc<a class="headerlink" href="#main-exe-util-wc" title="Permalink to this headline"></a></h2>
+<p>Stats on file of lines (without taking UTF8 chars into account)</p>
+<p><strong>DESCRIPTION</strong></p>
+<p>This command will print different statistics on a file of lines. Contrarily to wc, it will not take into account UTF8 chars for the max line length.</p>
+<p><strong>ABOUT UTILS</strong></p>
+<p>This is a list of small sub-commands that may be useful from time to time.</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">util</span> <span class="n">wc</span> <span class="nc">FILES</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">FILES</span></code>   Files to wc</p></li>
 </ul>
 </section>
 </section>
