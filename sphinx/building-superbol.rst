@@ -26,7 +26,7 @@ to install a few external dependencies.
 
    .. code-block:: shell
    
-      npm install yarn
+      npm install -g yarn
       yarn install
 
 4. You can then install all remaining dependencies, and compile the

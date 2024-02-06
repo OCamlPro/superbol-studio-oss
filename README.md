@@ -88,7 +88,7 @@ server and the VSCode extension from sources.
    [node.js](https://nodejs.org/), and install `yarn` via:
 
    ```bash
-   npm install yarn
+   npm install -g yarn
    yarn install
    ```
 
