@@ -56,8 +56,17 @@ type translator =
     location_of: 'x. 'x Cobol_common.Srcloc.with_loc -> Lsp.Types.Location.t;
   }
 
+val location_of_srcloc
+  : ?focus_on_main_doc:bool
+  -> rootdir:string
+  -> uri:Lsp.Types.DocumentUri.t
+  -> Cobol_common.Srcloc.srcloc
+  -> Lsp.Types.Location.t
+
 val loc_translator
-  : Lsp.Types.TextDocumentIdentifier.t
+  : ?focus_on_main_doc:bool
+  -> rootdir:string
+  -> Lsp.Types.TextDocumentIdentifier.t
   -> translator
 
 (* --- *)

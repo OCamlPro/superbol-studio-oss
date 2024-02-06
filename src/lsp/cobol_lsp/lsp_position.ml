@@ -16,6 +16,8 @@
 
 open Cobol_common
 open Srcloc.TYPES
+open Ez_file.V1
+open EzFile.OP
 open Lsp.Types
 
 (** Range of length [0], at position [0, 0] *)
@@ -98,11 +100,32 @@ type translator =
     location_of: 'x. 'x with_loc -> Location.t;
   }
 
-let loc_translator TextDocumentIdentifier.{ uri } =
-  let filename = Lsp.Uri.to_path uri in
-  let location_of_srcloc loc =
-    Location.create ~uri ~range:(range_of_srcloc_in ~filename loc)
+let pseudo_normalized_uri ~rootdir filename =
+  let filename =
+    let prefix = EzFile.current_dir_name // "" in
+    if EzFile.is_absolute filename
+    then filename
+    else rootdir // match EzString.chop_prefix ~prefix filename with
+      | None -> filename
+      | Some x -> x
   in
+  Lsp.Uri.of_path filename
+
+let location_of_srcloc ?(focus_on_main_doc = false) ~rootdir ~uri loc =
+  let project_srcloc =
+    if focus_on_main_doc
+    then Srcloc.lexloc_in ~filename:(Lsp.Uri.to_path uri)
+    else Srcloc.as_lexloc                       (* rely on default projection *)
+  in
+  let uri, range =
+    let Lexing.{ pos_fname = f; _ }, _ as lexloc = project_srcloc loc in
+    pseudo_normalized_uri ~rootdir f, range_of_lexloc lexloc
+  in
+  Location.create ~uri ~range
+
+let loc_translator ?focus_on_main_doc ~rootdir TextDocumentIdentifier.{ uri } =
+  let location_of_srcloc
+    = location_of_srcloc ~rootdir ?focus_on_main_doc ~uri in
   {
     location_of_srcloc;
     location_of = fun { loc; _ } -> location_of_srcloc loc;
