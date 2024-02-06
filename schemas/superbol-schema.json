@@ -1,0 +1,74 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://get-superbol.com/superbol-schema.json",
+    "title": "Schema for superbol.toml files",
+    "description": "Configuration file for SuperBOL Studio",
+    "type": "object",
+    "properties": {
+	"cobol": {
+	    "type": "object",
+	    "required": ["dialect", "source-format"],
+	    "properties": {
+		"dialect": {
+		    "description": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\"",
+		    "enum": [
+			"default",
+			"gnucobol",
+			"cobol85",
+			"cobol2002",
+			"cobol2014",
+			"acu",
+			"acu-strict",
+			"bs2000",
+			"bs2000-strict",
+			"gcos",
+			"gcos-strict",
+			"ibm",
+			"ibm-strict",
+			"mf",
+			"mf-strict",
+			"mvs",
+			"mvs-strict",
+			"realia",
+			"realia-strict",
+			"rm",
+			"rm-strict",
+			"xopen"
+		    ]
+		},
+		"source-format": {
+		    "description": "Source reference format.",
+		    "enum": [
+			"auto",
+			"fixed",
+			"free",
+			"cobol85",
+			"variable",
+			"xopen",
+			"xcard",
+			"crt",
+			"terminal",
+			"cobolx"
+		    ]
+		},
+		"copybooks": {
+		    "type": "array",
+		    "description": "List of copybooks paths",
+		    "items": {
+			"type": "object",
+			"required": ["dir"],
+			"properties": {
+			    "dir": {
+				"description": "Path to copybooks",
+				"type": "string"
+			    },
+			    "file-relative": {
+				"type": "boolean"
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+}

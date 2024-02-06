@@ -10,4 +10,4 @@ _out/
 !CHANGELOG.md
 !LICENSE.md
 !package.json
-!astexplorer/dist/index.html
+!schemas/

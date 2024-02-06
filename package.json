@@ -279,6 +279,12 @@
         ]
       }
     ],
+    "tomlValidation": [
+      {
+        "fileMatch": "superbol.toml",
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json"
+      }
+    ],
     "languages": [
       {
         "id": "cobol",
