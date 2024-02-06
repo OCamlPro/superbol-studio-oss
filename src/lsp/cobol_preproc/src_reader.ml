@@ -26,6 +26,7 @@ type t = Plx: 'k reader -> t                                           [@@unboxe
 
 let diags (Plx (pl, _)) = Src_lexing.diagnostics pl
 let position (Plx (_, lexbuf)) = lexbuf.Lexing.lex_curr_p
+let input_file r = match (position r).pos_fname with "" -> None | s -> Some s
 let source_format (Plx (pl, _)) = Src_format.SF (Src_lexing.source_format pl)
 let rev_comments (Plx (pl, _)) = Src_lexing.rev_comments pl
 let rev_ignored (Plx (pl, _)) = Src_lexing.rev_ignored pl

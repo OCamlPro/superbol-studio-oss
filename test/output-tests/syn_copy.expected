@@ -7,7 +7,7 @@ syn_copy.at-112-prog.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: SUB)
+>> Error: Library `copy.inc' not found in search path (search path: ./SUB)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:113:0
 syn_copy.at-113-prog2.cob:6.7-6.30:
@@ -18,7 +18,7 @@ syn_copy.at-113-prog2.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: SUB)
+>> Error: Library `copy.inc' not found in search path (search path: ./SUB)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:114:0
 syn_copy.at-114-prog3.cob:6.7-6.31:
@@ -29,7 +29,7 @@ syn_copy.at-114-prog3.cob:6.7-6.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: sub2)
+>> Error: Library `copy.inc' not found in search path (search path: ./sub2)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:115:0
 syn_copy.at-115-prog4.cob:6.7-6.23:
@@ -51,7 +51,7 @@ syn_copy.at-116-prog5.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: CBD)
+>> Error: Library `copy.inc' not found in search path (search path: ./CBD)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:163:0
 Fatal: syn_copy.at-163-SUB/prog.cob: No such file or directory
@@ -86,7 +86,7 @@ syn_copy.at-249-prog3.cob:6.7-6.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub.inc' not found in search path (search path: SUB)
+>> Error: Library `sub.inc' not found in search path (search path: ./SUB)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:250:0
 syn_copy.at-250-prog4.cob:6.7-6.25:
@@ -97,7 +97,7 @@ syn_copy.at-250-prog4.cob:6.7-6.25:
 ----          ^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub' not found in search path (search path: SUB)
+>> Error: Library `sub' not found in search path (search path: ./SUB)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:251:0
 syn_copy.at-251-prog5.cob:6.7-6.26:
@@ -108,7 +108,7 @@ syn_copy.at-251-prog5.cob:6.7-6.26:
 ----          ^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub' not found in search path (search path: ..)
+>> Error: Library `sub' not found in search path (search path: ./..)
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:252:0
 syn_copy.at-252-prog6.cob:6.7-6.18:

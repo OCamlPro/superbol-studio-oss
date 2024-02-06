@@ -55,7 +55,7 @@ let copy_statement_ :=
         diags } }
 
 let copy_lib :=
-  | l = fileloc; c = pf(or_(OF, IN),fileloc)?; { { libname = l; cbkname = c } }
+  | l = fileloc; c = pf(or_(OF, IN),fileloc)?; { { txtname = l; libname = c } }
 
 let copy_suppress_printing :=
   | { false }
@@ -131,8 +131,8 @@ let text_word ==                                    (* text-word with position *
   | ~ = loc(TEXT_WORD); < >
 
 let fileloc :=
-  | t = text_word; { (`Word, ~&t) &@<- t }
-  | a = loc(ALPHANUM); { (`Alphanum, fst ~&a) &@<- a }
+  | t = text_word; { (`Word ~&t) &@<- t }
+  | a = loc(ALPHANUM); { (`Alphanum (fst ~&a)) &@<- a }
 
 (* --- Misc ----------------------------------------------------------------- *)
 

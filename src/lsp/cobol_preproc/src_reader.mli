@@ -26,6 +26,7 @@ val from
 
 val diags: t -> Cobol_common.Diagnostics.Set.t
 val position: t -> Lexing.position
+val input_file: t -> string option
 val source_format: t -> Src_format.any
 val rev_comments: t -> Text.comments
 val rev_ignored: t -> lexloc list
