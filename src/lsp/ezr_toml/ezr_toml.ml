@@ -19,7 +19,7 @@ open TOML.Types
 module TYPES = struct
 
   type toml_handle = {
-    toml: node;                     (* warning: hides even more mutable stuff *)
+    mutable toml: node;             (* warning: hides even more mutable stuff *)
     mutable checksum: Digest.t;
     mutable update_hooks: (string * (toml_handle -> bool)) list;
   }
@@ -80,6 +80,23 @@ let load ?(verbose = false) filename =
     if verbose then Pretty.error " not found@.";
     make_empty ()
 
+let reload ?(verbose = false) filename toml =
+  if verbose then
+    Pretty.error "Trying to reload `%s'...@?" filename;
+
+  try
+    (* Use exception to check file existence while attempting to read. *)
+    let string = EzFile.read_file filename in
+    if verbose then Pretty.error " done@.";
+    toml.toml <- TOML.of_string ~file:filename string;
+    toml.checksum <- Digest.string string
+  with Sys_error _ when not (EzFile.exists filename) ->
+    (* Only intercept and return empty if the file does not exist, and let every
+       other case escape. *)
+    if verbose then Pretty.error " not found@.";
+    toml.toml <- TOML.node (Table StringMap.empty);
+    toml.checksum <- Digest.string ""
+
 let save ?(verbose = false) filename toml =
   if toml.update_hooks = [] then
     Pretty.error "@[<2>** Internal warning:@ asked@ to@ save@ using a@ TOML@ \
@@ -96,12 +113,16 @@ let save ?(verbose = false) filename toml =
       ) false toml.update_hooks
   in
 
-  if modified then
+  if modified || (* force if file does not exist anymore (removed since load): *)
+     not (Sys.file_exists filename)
+  then
     let s = TOML.to_string toml.toml in
     File_utils.write_file ~mkdir:true filename s;
     if verbose then
       Pretty.error "Updated file `%s'@." filename;
     toml.checksum <- Digest.string s
+  else if verbose then
+    Pretty.error "Leaving `%s' as is@." filename
 
 (* --- *)
 

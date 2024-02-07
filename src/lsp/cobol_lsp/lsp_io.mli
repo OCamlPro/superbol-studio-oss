@@ -28,6 +28,9 @@ val read_message: unit -> Jsonrpc.Packet.t
     output. *)
 val send_response: Jsonrpc.Response.t -> unit
 
+(** [send_request required] sends out a json RPC request on standard output. *)
+val send_request: Jsonrpc.Request.t -> unit
+
 (** [send_notification notif] sends out a json RPC notification on standard
     output. *)
 val send_notification: Jsonrpc.Notification.t -> unit
@@ -36,10 +39,29 @@ val send_notification: Jsonrpc.Notification.t -> unit
     pertain to the given URI. *)
 val send_diagnostics: uri:Lsp.Uri.t -> Lsp.Types.Diagnostic.t list -> unit
 
-(** [pretty_notification ~log ~type_ fmt ...] formats any number of arguments
+(** [pretty_message ~log ~type_ fmt ...] formats any number of arguments
     according to the format string [fmt], and sends the result via a json RPC
-    notification.  Also prints the result on stderr (for now). *)
-val pretty_notification
+    notification. *)
+val pretty_message
   : ?log:bool
   -> type_:Lsp.Types.MessageType.t
   -> ('a, Format.formatter, unit) format -> 'a
+
+(** [pretty_log ~type_ fmt ...] formats any number of arguments according to the
+    format string [fmt], and sends the result as a log message via a json RPC
+    notification. *)
+val pretty_log: type_:Lsp.Types.MessageType.t -> _ Pretty.proc
+val log: type_:Lsp.Types.MessageType.t -> _ Pretty.proc
+val log_error: _ Pretty.proc
+val log_warn: _ Pretty.proc
+val log_info: _ Pretty.proc
+val log_debug: _ Pretty.proc
+
+(** [pretty_notification ~type_ fmt ...] formats any number of arguments
+    according to the format string [fmt], and sends the result as a user
+    notification message via a json RPC notification. *)
+val pretty_notification: type_:Lsp.Types.MessageType.t -> _ Pretty.proc
+val notification: type_:Lsp.Types.MessageType.t -> _ Pretty.proc
+val notify_error: _ Pretty.proc
+val notify_warn: _ Pretty.proc
+val notify_info: _ Pretty.proc

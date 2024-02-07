@@ -43,16 +43,94 @@ let try_with_document_data ~f =
 
 (** {3 Initialization} *)
 
-let handle_initialize (params: InitializeParams.t) =
-  InitializeResult.create ()
-    ~capabilities:(Lsp_capabilities.reply params.capabilities)
+let initialize ~config (params: InitializeParams.t) =
+  let root_uri = match params.rootUri with
+    | None -> None
+    | Some uri -> Some uri
+  in
+  let workspace_folders = match params.workspaceFolders with
+    | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
+    | _ -> Option.to_list root_uri
+  in
+  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a"
+    Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
+    (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
+  let capabilities = Lsp_capabilities.reply params.capabilities in
+  let with_semantic_tokens =
+    capabilities.semanticTokensProvider <> None
+  in
+  let with_client_config_watcher = match params.capabilities.workspace with
+    | Some { didChangeConfiguration = Some { dynamicRegistration }; _ } ->
+        (* Note: for now we rely on the client's dynamic registration ability;
+           for clients that do not support that it could just be simpler to
+           trigger server restarts when relevant changes happen. *)
+        Option.value ~default:false dynamicRegistration
+    | _ ->
+        false
+  and with_client_file_watcher = match params.capabilities.workspace with
+    | Some { didChangeWatchedFiles = Some { dynamicRegistration; _ }; _ } ->
+        (* Note: for now we rely on the client's dynamic registration ability;
+           for clients that do not support that it could just be simpler to
+           trigger server restarts when relevant changes happen. *)
+        Option.value ~default:false dynamicRegistration
+    | _ ->
+        false
+  in
+  Lsp_io.log_info "Negociated@ server@ parameters:@\n@[%t@]" @@
+  Pretty.delayed_record [
+    Fmt.(field "client_config_watcher" (fun _ -> with_client_config_watcher) bool);
+    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) bool);
+  ];
+  let result =
+    InitializeResult.create ()
+      ~serverInfo:(InitializeResult.create_serverInfo ()
+                     ~name:"SuperBOL LSP Server"
+                     ~version:Version.version)
+      ~capabilities
+  in
+  Ok (result, Initialized { root_uri; workspace_folders; config;
+                            with_semantic_tokens;
+                            with_client_config_watcher;
+                            with_client_file_watcher })
+
 
 (** {3 Shutdown} *)
 
 let handle_shutdown registry =
   Lsp_server.save_project_caches registry
 
+
+(** {3 Custom commands for configuration management} *)
+
+
+let assoc_of_jsonrpc_struct params =
+  Yojson.Safe.Util.to_assoc @@ Jsonrpc.Structured.yojson_of_t params
+
+
+let handle_write_project_config_command param registry =
+  try
+    let assoc = assoc_of_jsonrpc_struct param in
+    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+    Ok (`Null,
+        Running (Lsp_server.on_write_project_config_command uri registry))
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
+                              expected)" Yojson.Safe.(to_string (param :> t))
+
+
+let handle_get_project_config_command param registry =
+  try
+    let assoc = assoc_of_jsonrpc_struct param in
+    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
+    let reply = Lsp_server.get_project_config_command uri registry in
+    Lsp_io.log_debug "Reply: %a" (Yojson.Safe.pretty_print ~std:false) reply;
+    Ok (reply, Running registry)
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
+                              expected)" Yojson.Safe.(to_string (param :> t))
+
 (** {3 Definitions} *)
+
 
 let focus_on_name_in_defintions = true
 
@@ -341,7 +419,7 @@ let handle_hover registry (params: HoverParams.t) =
     Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
   try_doc registry params.textDocument
-    ~f:begin fun ~doc:{ project; artifacts = { pplog; _ }; _ } ->
+    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
       match find_hovered_pplog_event pplog with
       | Some Replacement { matched_loc = loc;
                            replacement_text; _ } ->
@@ -350,13 +428,7 @@ let handle_hover registry (params: HoverParams.t) =
       | Some FileCopy { copyloc = loc;
                         status = CopyDone lib | CyclicCopy lib } ->
           let text = EzFile.read_file lib in
-          (* TODO: grab source-format from preprocessor state? *)
-          let module Config = (val project.config.cobol_config) in
-          let mdlang = match Config.format#value with
-            | SF (SFFree | SFVariable | SFCOBOLX) -> "cobolfree"
-            | SF _ | Auto -> "cobol"
-          in
-          Pretty.string_to (hover_markdown ~loc) "```%s\n%s\n```" mdlang text
+          Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```" text
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
       | Some CompilerDirective _
@@ -405,8 +477,8 @@ let on_request
     id:Jsonrpc.Id.t -> (r * state, r error) result =
   fun state client_req ~id:_ ->
   match state, client_req with
-  | NotInitialized config, Lsp.Client_request.Initialize init_params ->
-      Ok (handle_initialize init_params, Initialized config)
+  | NotInitialized config, Initialize init_params ->
+      initialize ~config init_params
   | NotInitialized _, _ ->
       Error (InvalidStatus state)
   | (ShuttingDown | Initialized _ | Exit _) as state, _ ->
@@ -468,17 +540,22 @@ let on_request
     | WillDeleteFiles  (* DeleteFilesParams.t.t *) _
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
       ->
-      Lsp_debug.message "Lsp_request: unhandled request";
-      Error (UnhandledRequest client_req)
+        Lsp_debug.message "Lsp_request: unhandled request";
+        Error (UnhandledRequest client_req)
+    | UnknownRequest { meth = "superbol/writeProjectConfiguration";
+                       params = Some param } ->
+        handle_write_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getProjectConfiguration";
+                       params = Some param } ->
+        handle_get_project_config_command param registry
     | UnknownRequest { meth; _ } ->
-      Lsp_debug.message "Lsp_request. unknown request";
-      Error (UnknownRequest meth)
+        Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
+        Error (UnknownRequest meth)
 
 let handle (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
   | Error message ->
-      let code = Jsonrpc.Response.Error.Code.InvalidRequest in
-      let err = Jsonrpc.Response.Error.make ~message ~code () in
+      let err = Jsonrpc.Response.Error.make ~message ~code:InvalidRequest () in
       state, Jsonrpc.Response.(error id err)
   | Ok (E r) ->
       match on_request state r ~id with

@@ -125,7 +125,7 @@ let config_repr config ~name =
 
 let config_section_name = "cobol"
 
-let config_from_dialect_name dialect_name =
+let cobol_config_from_dialect_name dialect_name =
   try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
@@ -135,7 +135,11 @@ let config_from_dialect_name dialect_name =
 let get_source_format toml =
   try Cobol_config.Options.format_of_string @@
        TOML.get_string toml ["source-format"]
-  with Not_found -> default.source_format
+  with
+  | Not_found ->
+      default.source_format
+  | Invalid_argument e ->
+      raise @@ ERROR (Unknown_source_format e)
 
 let get_dialect toml =
   TOML.get_string toml ["dialect"] ~default:"default"
@@ -159,24 +163,29 @@ let get_indent_config toml =
     ) (TOML.get_table toml ["indent"]) []
   with Not_found -> default_indent_config
 
+
+(* TODO: the functions below show return a list of [Project_diagnostics.error].
+   This shall be easier to achieve after symbolization of diagnostics in
+   [Cobol_config]. *)
+
 let load_file ?verbose config_filename =
-  let toml_handle = Ezr_toml.load ?verbose config_filename in
-  let load_section keys toml =
+  let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
     DIAGS.map_result
-      (config_from_dialect_name @@ get_dialect section)
+      (cobol_config_from_dialect_name @@ get_dialect section)
       ~f:(fun cobol_config ->
           { default with
             cobol_config;
             source_format = get_source_format section;
             libpath = get_libpath section;
-            toml_handle = toml_handle ;
+            toml_handle = toml_handle;
             indent_config = get_indent_config section})
   in
   try
+    let toml_handle = Ezr_toml.load ?verbose config_filename in
     let DIAGS.{ result; _ } as config =
       let toml = Ezr_toml.toml toml_handle in
-      try load_section toml [config_section_name]
+      try load_section toml_handle toml [config_section_name]
       with Not_found -> DIAGS.result { default with toml_handle }
     in
     Ezr_toml.add_section_update toml_handle
@@ -185,16 +194,40 @@ let load_file ?verbose config_filename =
   with TOML.Types.Error (loc, _code, error) ->
     raise @@ ERROR (Invalid_toml { loc; error })
 
+
 let save ?verbose ~config_filename config =
   Ezr_toml.save ?verbose config_filename config.toml_handle
 
+
+let reload ?verbose ~config_filename config =
+  let reload_section keys toml =
+    let section = TOML.get keys toml in
+    let DIAGS.{ result = cobol_config; diags } =
+      cobol_config_from_dialect_name @@ get_dialect section in
+    config.cobol_config <- cobol_config;
+    config.source_format <- get_source_format section;
+    config.libpath <- get_libpath section;
+    config.indent_config <- get_indent_config section;
+    diags
+  in
+  try
+    Ezr_toml.reload ?verbose config_filename config.toml_handle;
+    let toml = Ezr_toml.toml config.toml_handle in
+    try reload_section toml [config_section_name]
+    with Not_found -> DIAGS.Set.none                                      (* ? *)
+  with TOML.Types.Error (loc, _code, error) ->
+    raise @@ ERROR (Invalid_toml { loc; error })
+
+
 (* --- *)
+
 
 let libpath_for ~filename { libpath; _ } =
   List.map begin function
     | RelativeToProjectRoot str -> str
     | RelativeToFileDir str -> Filename.dirname filename // str
   end libpath
+
 
 (* TODO: add config flags to libpath where some directories may only include
    copybooks. *)
@@ -203,7 +236,9 @@ let detect_copybook ~filename { copybook_extensions;
   List.exists (Filename.check_suffix filename) copybook_extensions ||
   (copybook_if_no_extension && Filename.extension filename = "")
 
+
 (** Persistent representation (for caching) *)
+
 
 exception BAD_CHECKSUM
 

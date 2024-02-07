@@ -106,6 +106,10 @@ let send_json json =
 let send_response response =
   send_json @@ Jsonrpc.Response.yojson_of_t response
 
+(** [send_request request] sends out a json RPC request on standard output. *)
+let send_request request =
+  send_json @@ Jsonrpc.Request.yojson_of_t request
+
 (** [send_notification notif] sends out a json RPC notification on standard
     output. *)
 let send_notification notif =
@@ -118,13 +122,12 @@ let send_diagnostics ~uri diagnostics =
   let notif = Lsp.Server_notification.PublishDiagnostics params in
   send_notification @@ Lsp.Server_notification.to_jsonrpc notif
 
-(** [pretty_notification ~log ~type_ fmt ...] formats any number of arguments
+(** [pretty_message ~log ~type_ fmt ...] formats any number of arguments
     according to the format string [fmt], and sends the result via a json RPC
     notification for log or direct display (depending on the flag [log], false
-    by default).  Also prints the result on stderr (for now). *)
-let pretty_notification ?(log = false) ~type_ fmt =
+    by default). *)
+let pretty_message ?(log = false) ~type_ fmt =
   Pretty.string_to begin fun message ->
-    (* Pretty.error "Notif: %s@." message; *)
     let notif =
       if log
       then Lsp.(Server_notification.LogMessage
@@ -134,3 +137,17 @@ let pretty_notification ?(log = false) ~type_ fmt =
     in
     send_notification (Lsp.Server_notification.to_jsonrpc notif)
   end ("%t@[<h>"^^fmt^^"@]") Pretty.blast_margin
+
+let pretty_log ~type_ fmt = pretty_message ~log:true ~type_ fmt
+let log = pretty_log
+let log_error fmt = log ~type_:Error fmt
+let log_warn fmt = log ~type_:Warning fmt
+let log_info fmt = log ~type_:Info fmt
+let log_debug fmt = log ~type_:Log fmt
+
+let pretty_notification ~type_ fmt =
+  pretty_message ~log:false ~type_ fmt
+let notification = pretty_notification
+let notify_error fmt = pretty_notification ~type_:Error fmt
+let notify_warn fmt = pretty_notification ~type_:Warning fmt
+let notify_info fmt = pretty_notification ~type_:Info fmt

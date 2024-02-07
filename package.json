@@ -17,20 +17,20 @@
         "command": "superbol.server.restart",
         "title": "Restart Language Server",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.write.project.config",
+        "title": "Write Project Configuration",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
       "title": "SuperBOL COBOL",
       "properties": {
-        "superbol.cobol.copybooks": {
-          "title": "Copybook paths",
-          "type": "array",
-          "description": "List of copybooks paths"
-        },
         "superbol.cobol.dialect": {
+          "markdownDescription": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\".\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "string",
           "default": "default",
-          "description": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\"",
           "items": "string",
           "enum": [
             "default",
@@ -58,9 +58,9 @@
           ]
         },
         "superbol.cobol.source-format": {
+          "markdownDescription": "Default source reference-format.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "string",
           "default": "auto",
-          "description": "Default source reference-format",
           "items": "string",
           "enum": [
             "auto",
@@ -74,6 +74,31 @@
             "terminal",
             "cobolx"
           ]
+        },
+        "superbol.cobol.copybooks": {
+          "title": "Copybook paths",
+          "markdownDescription": "List of copybooks paths.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "array",
+          "default": [
+            {
+              "dir": "."
+            }
+          ],
+          "items": {
+            "type": "object",
+            "required": [
+              "dir"
+            ],
+            "properties": {
+              "dir": {
+                "type": "string",
+                "description": "Path to copybooks"
+              },
+              "file-relative": {
+                "type": "boolean"
+              }
+            }
+          }
         },
         "superbol.lsp-path": {
           "title": "SuperBOL executable",

@@ -112,18 +112,24 @@ val of_cache: rootdir:rootdir -> layout:layout -> cached -> t with_diags
 
 val config: t -> Project_config.t
 
-(** [save_config project] dumps the current configuration of [project] into a
-    TOML file.
+(** [save_config ~verbose project] dumps the current configuration of [project]
+    into a TOML file.  Prints some informative message on [stderr] if [verbose]
+    is set.
 
     The name of the configuration file is determined via the [layout] argument
     given to (the first call to) {!for_} or {!of_cache} with [project]'s root
     directory. *)
-val save_config: t -> unit
+val save_config: ?verbose:bool -> t -> unit
+
+val reload_config: ?verbose:bool -> t -> diagnostics
 
 (** {1 Collections} *)
 
+val have_same_rootdirs: t -> t -> bool
+
 module SET: sig
   include Set.S with type elt = t
+  val for_: filename:string -> t -> elt
   val for_rootdir: rootdir:rootdir -> t -> elt
   val mem_rootdir: rootdir:rootdir -> t -> bool
 end

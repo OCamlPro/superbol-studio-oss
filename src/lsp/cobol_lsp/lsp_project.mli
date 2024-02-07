@@ -73,14 +73,22 @@ val of_cache: rootdir:rootdir -> layout:layout -> cached -> t
 
 module SET: sig
   include Set.S with type elt = t
+  val for_: uri:Lsp.Uri.t -> t -> elt
   val for_rootdir: rootdir:rootdir -> t -> elt
   val mem_rootdir: rootdir:rootdir -> t -> bool
 end
 module MAP: Map.S with type key = t
 
+(** Config *)
+
+val reload_project_config: t -> bool
+val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
+val get_project_config: ?flat:bool -> t -> Yojson.Safe.t
+
 (** Miscellaneous *)
 
 val rootdir: t -> rootdir
+val rooturi: t -> Lsp.Uri.t
 val config: t -> Superbol_project.Config.t
 val string_of_rootdir: rootdir -> string
 val relative_path_for: uri:Lsp.Uri.t -> t -> string

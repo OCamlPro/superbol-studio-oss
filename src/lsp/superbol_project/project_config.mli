@@ -38,6 +38,10 @@ type t = config
 
 val new_default: unit -> t
 
+val cobol_config_from_dialect_name
+  : string
+  -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
 val load_file
@@ -50,6 +54,12 @@ val save
   -> config_filename:string
   -> t
   -> unit
+
+val reload
+  : ?verbose:bool
+  -> config_filename:string
+  -> t
+  -> Cobol_common.Diagnostics.diagnostics
 
 (** [libpath_for ~filename project] constructs a list of directory names where
     copybooks are looked up, for a given source file name, in a project with the

@@ -95,14 +95,6 @@ let activate (extension : Vscode.ExtensionContext.t) =
 
   Vscode.ExtensionContext.subscribe extension ~disposable:debug;
 
-  let task =
-    Vscode.Tasks.registerTaskProvider
-      ~type_:Superbol_tasks.type_
-      ~provider:Superbol_tasks.provider
-  in
-
-  Vscode.ExtensionContext.subscribe extension ~disposable:task;
-
   let bundled_superbol =
     try
       find_superbol
@@ -116,6 +108,13 @@ let activate (extension : Vscode.ExtensionContext.t) =
 
   let instance = Superbol_instance.make ~bundled_superbol () in
   current_instance := Some instance;
+
+  let task =
+    Vscode.Tasks.registerTaskProvider
+      ~type_:Superbol_tasks.type_
+      ~provider:(Superbol_tasks.provider instance)
+  in
+  Vscode.ExtensionContext.subscribe extension ~disposable:task;
 
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance

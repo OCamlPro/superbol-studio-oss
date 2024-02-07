@@ -57,19 +57,26 @@ let rootdir_at ~dirname : rootdir =
   then dirname
   else Fmt.invalid_arg "Expected existing directory: %s" dirname
 
-let rootdir_for ~filename
-    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
+let find_first_in_parent_dirs ~f dir =
   let rec try_dir dir =
-    if EzFile.exists (dir // project_config_filename)
-    then dir
-    else
+    try f dir with Not_found ->
       let new_dir = EzFile.dirname dir in
       if new_dir = dir
       then raise Not_found                                  (* we are at root *)
       else try_dir new_dir
   in
+  try_dir dir
+
+let rootdir_for ~filename
+    ~layout:{ project_config_filename; rootdir_fallback_policy; _ } =
   let dirname = EzFile.dirname filename in
-  try try_dir dirname
+  try
+    find_first_in_parent_dirs dirname
+      ~f:begin fun dir ->
+        if EzFile.exists (dir // project_config_filename)
+        then dir
+        else raise Not_found
+      end
   with Not_found -> match rootdir_fallback_policy with
     | Same_as_file_directory -> dirname
     | Given_directory dirname -> dirname
@@ -108,8 +115,11 @@ let absolute_path_for ~filename { rootdir; _ } =
   then filename       (* in case the file is not within its project directory *)
   else rootdir // filename
 
-let save_config { config_filename; config; _ } =
-  Project_config.save ~config_filename config
+let save_config ?verbose { config_filename; config; _ } =
+  Project_config.save ?verbose ~config_filename config
+
+let reload_config ?verbose { config_filename; config; _ } =
+  Project_config.reload ?verbose ~config_filename config
 
 (* Caching *)
 
@@ -134,7 +144,9 @@ let of_cache ~rootdir ~layout cached =
 module M = struct
   type nonrec t = t
   let compare { rootdir = d1; _ } { rootdir = d2; _ } = String.compare d1 d2
+  let equal { rootdir = d1; _ } { rootdir = d2; _ } = String.equal d1 d2
 end
+let have_same_rootdirs = M.equal
 
 module SET = struct
   include Set.Make (M)
@@ -143,6 +155,9 @@ module SET = struct
     if p.rootdir = rootdir then p else raise Not_found
   let mem_rootdir ~rootdir s =
     try ignore (for_rootdir ~rootdir s); true with Not_found -> false
+  let for_ ~filename s =
+    find_first_in_parent_dirs (Filename.dirname filename)
+      ~f:(fun rootdir -> for_rootdir ~rootdir s)
 end
 
 module MAP = Map.Make (M)

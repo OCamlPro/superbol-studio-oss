@@ -21,8 +21,12 @@ let on_notification state notif =
       ShuttingDown
   | NotInitialized _ | Exit _ as state, _ ->
       state                   (* spec indicate notif should just be discarded *)
-  | Initialized config, Initialized ->
-      Running (Lsp_server.init ~config)
+  | Initialized params, Initialized ->
+      Running (Lsp_server.init ~params)
+  | Running registry, ChangeConfiguration { settings = changes } ->
+      Running (Lsp_server.on_client_config_changes ~changes registry)
+  | Running registry, DidChangeWatchedFiles { changes } ->
+      Running (Lsp_server.on_watched_file_changes changes registry)
   | Running registry, TextDocumentDidOpen params ->
       Running (Lsp_server.did_open params registry)
   | Running registry, TextDocumentDidChange params ->
@@ -35,18 +39,21 @@ let on_notification state notif =
   | _ ->
       state
 
-let handle notif state =
-  match Lsp.Client_notification.of_jsonrpc notif with
+
+let handle json_notif state =
+  match Lsp.Client_notification.of_jsonrpc json_notif with
   | Error str ->
-      Lsp_io.pretty_notification ~type_:Error "Invalid@ notification:@ %s" str;
+      Lsp_io.log_error "Invalid@ notification:@ %s" str;
       state
   | Ok notif ->
       try on_notification state notif with
       | Lsp_server.Document_not_found { uri } ->
-          Lsp_io.pretty_notification ~type_:Error
-            "Document@ %s@ is@ not@ opened@ yet"
+          Lsp_io.log_error "Document@ %s@ is@ not@ opened@ yet"
             (Lsp.Types.DocumentUri.to_string uri);
           state
       | e ->
-          Lsp_io.pretty_notification ~type_:Error "%a" Fmt.exn e;
+          Lsp_io.log_error "While@ handling@ notification@ %s:@ %a"
+            (Yojson.Safe.to_string @@
+             Jsonrpc.Notification.yojson_of_t json_notif)
+            Fmt.exn e;
           state

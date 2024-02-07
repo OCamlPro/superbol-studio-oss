@@ -99,8 +99,7 @@ let save_project_cache ~config
       (* then (* read, write if commit hash or document changed *) *)
       (* else *)
       Lsp_utils.write_to cache_file (write_project_cache cached_project_record);
-      Lsp_io.pretty_notification "Wrote cache at: %s" cache_file
-        ~log:true ~type_:Info
+      Lsp_io.log_info "Wrote cache at: %s" cache_file
   | None ->
       ()
 
@@ -118,23 +117,25 @@ let save ~config docs =
 (** (Internal) *)
 let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
   let project = Lsp_project.of_cache ~rootdir ~layout cached_project in
+  Lsp_io.log_info "Successfully@ read@ project@ cache@ for@ %s"
+    Lsp.Uri.(to_string @@ Lsp_project.rooturi project);
   let add_doc doc docs = URIMap.add (Lsp_document.uri doc) doc docs in
   CACHED_DOCS.fold begin fun cached_doc docs ->
     try
       let doc = Lsp_document.of_cache ~project cached_doc in
       if config.cache_verbose then
-        Lsp_io.pretty_notification "Successfully read cache for %s"
-          (Lsp.Uri.to_string @@ Lsp_document.uri doc) ~log:true ~type_:Info;
+        Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
+          (Lsp.Uri.to_string @@ Lsp_document.uri doc);
       add_doc doc docs
     with
     | Failure msg | Sys_error msg ->
         if config.cache_verbose then
-          Lsp_io.pretty_notification "Failed to read cache for %s: %s"
-            cached_doc.doc_cache_filename msg ~log:true ~type_:Info;
+          Lsp_io.log_info "Failed@ to@ read@ document@ cache@ for@ %s:@ %s"
+            cached_doc.doc_cache_filename msg;
         docs
     | e ->
-        Lsp_io.pretty_notification "Failed to read cache for %s: %a"
-          cached_doc.doc_cache_filename Fmt.exn e ~log:true ~type_:Warning;
+        Lsp_io.log_warn "Failed@ to@ read@ document@ cache@ for@ %s:@ %a"
+          cached_doc.doc_cache_filename Fmt.exn e;
         docs
   end cached_docs URIMap.empty
 
@@ -142,22 +143,22 @@ let load ~rootdir ~layout ~config =
   let fallback = URIMap.empty in
   let load_cache cache_file =
     let cached_project = Lsp_utils.read_from cache_file read_project_cache in
-    let project = load_project ~rootdir ~layout ~config cached_project in
-    Lsp_io.pretty_notification "Successfully read cache for %s"
-      (Lsp_project.string_of_rootdir rootdir) ~log:true ~type_:Info;
-    project
+    load_project ~rootdir ~layout ~config cached_project
   in
   match cache_filename ~config ~rootdir with
   | None ->
       fallback
   | Some cache_file ->
       try load_cache cache_file with
-      | Failure msg | Sys_error msg ->
+      | Sys_error msg ->
           if config.cache_verbose then
-            Lsp_io.pretty_notification "Failed to read cache: %s"
-              msg ~log:true ~type_:Info;
+            Lsp_io.log_info "Failed@ to@ read@ cache:@ %s" msg;
+          fallback
+      | Failure msg ->
+          if config.cache_verbose then
+            Lsp_io.log_info "Failed@ to@ read@ cache@ %s:@ %s" cache_file msg;
           fallback
       | e ->
-          Lsp_io.pretty_notification "Failed to read cache: %a"
-            Fmt.exn e ~log:true ~type_:Warning;
+          Lsp_io.log_warn "Failed@ to@ read@ cache@ %s:@ %a\
+                          " cache_file Fmt.exn e;
           fallback

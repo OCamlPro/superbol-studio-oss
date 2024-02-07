@@ -52,3 +52,16 @@ let string_list ?scope key =
   | None -> []
   | Some o when Ojs.is_null o -> []
   | Some s -> Ojs.(list_of_js string_of_js) s      (* TODO: how may this fail? *)
+
+let any ?scope key =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> Ojs.null
+  | Some s -> s
+
+let any_list ?scope key =
+  let config = WS.getConfiguration ?scope ~section () in
+  match WS_CONF.get ~section:key config with
+  | None -> []
+  | Some o when Ojs.is_null o -> []                               (* required? *)
+  | Some s -> [%js.to: Ojs.t list] s

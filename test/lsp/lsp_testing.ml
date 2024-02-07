@@ -45,8 +45,15 @@ let init_temp_project ?(toml = "") () =
   EzFile.write_file toml_file toml;
   projdir
 
-let make_server () =
-  LSP.Server.init ~config:{ project_layout = layout; cache_config }
+let make_server ?(with_semantic_tokens = false) () =
+  LSP.Server.init ~params:{ config = { project_layout = layout;
+                                       cache_config;
+                                       enable_client_configs = false };
+                            root_uri = None;
+                            workspace_folders = [];
+                            with_semantic_tokens;
+                            with_client_file_watcher = false;
+                            with_client_config_watcher = false }
 
 let add_cobol_doc server ?copybook ~projdir filename text =
   let path = projdir // filename in

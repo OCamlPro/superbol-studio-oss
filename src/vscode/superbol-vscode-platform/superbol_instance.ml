@@ -18,11 +18,14 @@ type t = {
   mutable bundled_superbol : string;
   mutable language_client: LanguageClient.t option
 }
+type client = LanguageClient.t
 
 let make ~bundled_superbol () = {
   bundled_superbol;
   language_client = None
 }
+
+let client { language_client; _ } = language_client
 
 let stop_language_server t =
   match t.language_client with
@@ -51,3 +54,44 @@ let start_language_server t =
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
+
+
+let current_document_uri ?text_editor () =
+  match
+    match text_editor with None -> Vscode.Window.activeTextEditor () | e -> e
+  with
+  | None -> None
+  | Some e -> Some (Vscode.TextDocument.uri @@ Vscode.TextEditor.document e)
+
+
+let write_project_config ?text_editor instance =
+  match client instance, current_document_uri ?text_editor () with
+  | None, _ | _, None ->                             (* ignore; TODO; message? *)
+      Promise.return ()
+  | Some client, Some uri ->
+      Vscode_languageclient.LanguageClient.sendRequest client ()
+        ~meth:"superbol/writeProjectConfiguration"
+        ~data:(Jsonoo.Encode.(object_ [
+            "uri", string @@ Vscode.Uri.toString uri ();
+          ])) |>
+      Promise.(then_ ~fulfilled:(fun _ -> return ()))
+
+
+let get_project_config instance =
+  let open Promise.Syntax in
+  match client instance, Vscode.Window.activeTextEditor () with
+  | None, _ ->
+      Promise.return @@ Error "SuperBOL client is not running"
+  | _, None ->
+      Promise.return @@ Error "Found no active text editor"
+  | Some client, Some textEditor ->
+      let document = Vscode.TextEditor.document textEditor in
+      let uri = Vscode.TextDocument.uri document in
+      let* assoc =
+        Vscode_languageclient.LanguageClient.sendRequest client ()
+          ~meth:"superbol/getProjectConfiguration"
+          ~data:(Jsonoo.Encode.(object_ [
+              "uri", string @@ Vscode.Uri.toString uri ();
+            ]))
+      in
+      Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc

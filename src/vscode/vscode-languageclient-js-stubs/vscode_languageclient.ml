@@ -189,6 +189,12 @@ module StaticFeature = struct
       [@@js.builder]]
 end
 
+module DidChangeConfiguration = struct
+  include Interface.Make ()
+
+  include [%js: val create : settings:Ojs.t -> unit -> t [@@js.builder]]
+end
+
 module LanguageClient = struct
   include Class.Make ()
 
@@ -221,5 +227,7 @@ module LanguageClient = struct
       -> Jsonoo.t Promise.t
       [@@js.call]
 
-    val registerFeature : t -> feature:StaticFeature.t -> unit [@@js.call]]
+    val registerFeature : t -> feature:StaticFeature.t -> unit [@@js.call]
+
+    val sendNotification : t -> string -> Ojs.t -> unit [@@js.call]]
 end

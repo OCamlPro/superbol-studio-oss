@@ -158,6 +158,10 @@ let first_change_pos changes =
   in
   Cobol_parser.Indexed { line; char }
 
+let reload doc =
+  try reparse_and_analyze doc
+  with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
+
 let update ({ textdoc; _ } as doc) changes =
   let position = first_change_pos changes in
   let doc =
