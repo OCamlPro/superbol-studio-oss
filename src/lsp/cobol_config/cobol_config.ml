@@ -46,10 +46,14 @@ let default_search_path =
       | Some d -> [ d ]
       | None -> []
     and xdg_conf_dir = match Sys.getenv_opt "XDG_CONFIG_HOME" with
-      | Some p -> p
-      | None -> Sys.getenv "HOME" // ".config"
+      | Some p -> Some p
+      | None -> try Some (Sys.getenv "HOME" // ".config") with Not_found -> None
     in
-    cwd :: xdg_conf_dir // "superbol" :: cob_conf_dir
+    let xdg_superbol_dir = match xdg_conf_dir with
+      | None -> []
+      | Some d -> [d // "superbol"]
+    in
+    cwd :: xdg_superbol_dir @ cob_conf_dir
   end
 
 let retrieve_search_path ?search_path () =
