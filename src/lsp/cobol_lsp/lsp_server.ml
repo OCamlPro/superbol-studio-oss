@@ -431,11 +431,9 @@ let on_client_config_changes ?changes registry =
 
 
 let on_project_config_file_changes changes registry =
-  let layout = registry.params.config.project_layout in
   List.fold_left begin fun registry FileEvent.{ type_; uri } ->
-    let rootdir = Lsp_project.rootdir_for ~uri ~layout in
     try
-      let project = Lsp_project.SET.for_rootdir ~rootdir registry.projects in
+      let project = Lsp_project.SET.for_ ~uri registry.projects in
       match type_ with
       | Created | Changed ->
           let registry, out_of_date_docs =
@@ -460,15 +458,33 @@ let on_watched_file_changes changes registry =
 
 
 
+(** [retrieve_project_for ~uri registry] tries to load the project where a
+    document at the given URI belongs.  Does nothing if the project is already
+    loaded. *)
+let retrieve_project_for ~uri registry =
+  try
+    ignore @@ Lsp_project.SET.for_ ~uri registry.projects;
+    (* CHECKME: at this point, we have overlooked any `superbol.toml` that lies
+       between the root of the (assumed) project for [uri] and the file at
+       [uri].  Not sure it is desirable to support nested projects, though. *)
+    registry
+  with Not_found ->
+    let layout = registry.params.config.project_layout in
+    let rootdir = Lsp_project.rootdir_for ~uri ~layout in
+    if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
+    then registry
+    else load_project_cache ~rootdir registry
+
+
 let create_or_retrieve_project_promise ~uri registry =
-  let layout = registry.params.config.project_layout in
   try
     now (Lsp_project.SET.for_ ~uri registry.projects) registry
   with Not_found ->
+    let layout = registry.params.config.project_layout in
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
     try
       now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
-    with Not_found ->
+    with Not_found ->                              (* load or init new project *)
       let project = Lsp_project.for_ ~rootdir ~layout in
       add_project project registry |>
       if registry.params.config.enable_client_configs
@@ -481,7 +497,7 @@ let create_or_retrieve_project_promise ~uri registry =
 
 let on_write_project_config_command uri registry =
   let write_project_config project registry =
-    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ URI@ %s"
+    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ %s"
       (Lsp.Uri.to_string uri);
     Superbol_project.save_config ~verbose:true project;
     registry
@@ -491,13 +507,12 @@ let on_write_project_config_command uri registry =
 
 
 let get_project_config_command uri registry =
-  Lsp_io.log_info "Getting@ configuration@ for@ project@ of@ URI@ %s"
+  Lsp_io.log_info "Getting@ configuration@ for@ project@ of@ %s"
     (Lsp.Uri.to_string uri);
-  let layout = registry.params.config.project_layout in
-  let rootdir = Lsp_project.rootdir_for ~uri ~layout in
+  let registry = retrieve_project_for ~uri registry in
   try
     Lsp_project.get_project_config @@
-    Lsp_project.SET.for_rootdir ~rootdir registry.projects
+    Lsp_project.SET.for_ ~uri registry.projects
   with Not_found ->
     (* NOTE: for this we need to be able to delay replies to server requests. *)
     Lsp_error.request_failed "%s is not part of any project from the\
@@ -540,7 +555,7 @@ let init ~params : registry =
 (** {2 Handling of document notifications} *)
 
 
-let add (DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
+let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     ?copybook registry =
   let add_in_project project registry =
     try
@@ -565,16 +580,10 @@ let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
     | Some doc when String.equal (Lsp.Text_document.text doc.textdoc) text ->
         dispatch_diagnostics doc registry
     | None | Some _ when try_cache ->
-        let registry =
-          let layout = registry.params.config.project_layout in
-          let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-          if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
-          then registry
-          else load_project_cache ~rootdir registry
-        in
-        aux ~try_cache:false registry          (* try again without the cache *)
+        retrieve_project_for ~uri registry |>
+        aux ~try_cache:false                   (* try again without the cache *)
     | None | Some _ ->
-        add doc ?copybook registry
+        add ~doc ?copybook registry
   in
   aux ~try_cache:true registry
 
