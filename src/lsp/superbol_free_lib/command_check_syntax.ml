@@ -8,7 +8,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** `parse` command *)
+(** `check syntax` command *)
 
 open Ezcmd.V2
 open EZCMD.TYPES
@@ -21,27 +21,27 @@ let action { preproc_options; parser_options } files =
     Cobol_preproc.preprocessor ~options:preproc_options |>
     Cobol_parser.parse_simple ~options:parser_options
   in
-  List.to_seq files |>
-  Seq.map begin fun filename ->
-    Pretty.out "@[Considering@ `%s'@]@." filename;
-    Cobol_preproc.Input.from ~filename ~f:parse
+  files |>
+  List.iter begin fun filename ->
+    Pretty.out "@[Checking@ `%s'@]@." filename;
+    Cobol_common.Diagnostics.sink_result ~ppf:Fmt.stdout @@
+    Cobol_preproc.Input.from ~filename ~f:parse;
   end
 
 let cmd =
   let files = ref [] in
-    let common, common_args = Common_args.get () in
+  let common, common_args = Common_args.get () in
 
   EZCMD.sub
     "check syntax"            (* add the corresponding line in Main.subcommands *)
     begin fun () ->
-      action (common ()) !files |>
-      Seq.iter Cobol_common.Diagnostics.sink_result
+      action (common ()) !files
     end
     ~args:(common_args @ [
-        [],
-        Arg.Anons (fun list -> files := list),
-        EZCMD.info ~docv:"FILE" "Cobol file to check";
-      ])
+      [],
+      Arg.Anons (fun list -> files := list),
+      EZCMD.info ~docv:"FILE" "Cobol file to check";
+    ])
     ~doc: "Check the syntax of a Cobol file"
     ~man:[
       `S "DESCRIPTION";
