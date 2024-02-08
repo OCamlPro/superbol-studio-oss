@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (3bf2ffb
-) (2024/02/08 13:56) documentation</title>
+ (6b2c64e
+) (2024/02/08 17:21) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (3bf2ffb
+ (6b2c64e
 )
               </div>
 <div role="search">
@@ -54,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
 <li class="toctree-l1"><a class="reference internal" href="emacs.html">SuperBOL mode for GNU/Emacs</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Sub-commands and Arguments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-check-syntax">main.exe check syntax</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-ebcdic-translate">main.exe ebcdic translate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-env">main.exe env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
@@ -114,7 +115,10 @@
 <li><p><code class="code docutils literal notranslate"><span class="pre">-v</span></code> or <code class="code docutils literal notranslate"><span class="pre">--verbose</span></code>   Increase verbosity level</p></li>
 </ul>
 <p>Overview of sub-commands:</p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">ebcdic</span> <span class="n">translate</span>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">check</span> <span class="n">syntax</span>
+  <span class="nc">Check</span> <span class="n">the</span> <span class="n">syntax</span> <span class="k">of</span> <span class="n">a</span> <span class="nc">Cobol</span> <span class="n">file</span>
+
+<span class="n">ebcdic</span> <span class="n">translate</span>
   <span class="nc">Convert</span> <span class="k">to</span> <span class="ow">or</span> <span class="n">from</span> <span class="nc">EBCDIC</span>
 
 <span class="n">env</span>
@@ -178,6 +182,27 @@
   <span class="nc">Stats</span> <span class="n">on</span> <span class="n">file</span> <span class="k">of</span> <span class="n">lines</span> <span class="o">(</span><span class="n">without</span> <span class="n">taking</span> <span class="nc">UTF8</span> <span class="n">chars</span> <span class="n">into</span> <span class="n">account</span><span class="o">)</span>
 </pre></div>
 </div>
+<section id="main-exe-check-syntax">
+<h2>main.exe check syntax<a class="headerlink" href="#main-exe-check-syntax" title="Permalink to this headline"></a></h2>
+<p>Check the syntax of a Cobol file</p>
+<p><strong>DESCRIPTION</strong></p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">check</span> <span class="n">syntax</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   Cobol file to check</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIRECTORY</span></code>   Add DIRECTORY to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
+</ul>
+<p>Overrides <cite>format</cite> from configuration file if present.</p>
+</section>
 <section id="main-exe-ebcdic-translate">
 <h2>main.exe ebcdic translate<a class="headerlink" href="#main-exe-ebcdic-translate" title="Permalink to this headline"></a></h2>
 <p>Convert to or from EBCDIC</p>

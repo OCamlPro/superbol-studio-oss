@@ -10,6 +10,9 @@ Common arguments to all sub-commands:
 
 Overview of sub-commands::
   
+  check syntax
+    Check the syntax of a Cobol file
+  
   ebcdic translate
     Convert to or from EBCDIC
   
@@ -72,6 +75,44 @@ Overview of sub-commands::
   
   util wc
     Stats on file of lines (without taking UTF8 chars into account)
+
+
+main.exe check syntax
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the syntax of a Cobol file
+
+
+
+**DESCRIPTION**
+
+
+
+
+**USAGE**
+::
+  
+  main.exe check syntax FILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILE`   Cobol file to check
+
+* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
+
+* :code:`--conf CONF_FILE`   Set the configuration file to be used
+
+* :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
+
+* :code:`--silence STRING`   Silence specific messages
+
+* :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
+Overrides `format` from configuration file if present.
 
 
 main.exe ebcdic translate
