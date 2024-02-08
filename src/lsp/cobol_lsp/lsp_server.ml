@@ -478,34 +478,54 @@ let retrieve_project_for ~uri registry =
     else load_project_cache ~rootdir registry
 
 
-let create_or_retrieve_project_promise ~uri registry =
+let create_or_retrieve_project_promise ~rootdir registry =    (* from rootdir *)
+  try
+    now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
+  with Not_found ->                                (* load or init new project *)
+    let layout = registry.params.config.project_layout in
+    let project = Lsp_project.for_ ~rootdir ~layout in
+    add_project project registry |>
+    if registry.params.config.enable_client_configs
+    then
+      request_n_use_client_config_for ~project
+        ~silence_ignored_settings_warning:true
+    else
+      now project
+
+
+let create_or_retrieve_doc_project_promise ~uri registry =    (* from doc uri *)
   try
     now (Lsp_project.SET.for_ ~uri registry.projects) registry
   with Not_found ->
     let layout = registry.params.config.project_layout in
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-    try
-      now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
-    with Not_found ->                              (* load or init new project *)
-      let project = Lsp_project.for_ ~rootdir ~layout in
-      add_project project registry |>
-      if registry.params.config.enable_client_configs
-      then
-        request_n_use_client_config_for ~project
-          ~silence_ignored_settings_warning:true
-      else
-        now project
+    create_or_retrieve_project_promise ~rootdir registry
 
 
-let on_write_project_config_command uri registry =
+let on_write_project_config_command ?uri registry =
   let write_project_config project registry =
-    Lsp_io.log_info "Saving@ configuration@ for@ project@ of@ %s"
-      (Lsp.Uri.to_string uri);
+    Lsp_io.log_info "Saving@ configuration@ for@ project@ at@ %s"
+      Lsp_project.(string_of_rootdir @@ rootdir project);
     Superbol_project.save_config ~verbose:true project;
     registry
   in
-  perform write_project_config
-    ~after:(create_or_retrieve_project_promise ~uri registry)
+  match uri with
+  | None ->
+      Lsp_project.SET.fold write_project_config registry.projects registry
+  | Some uri
+    when not (Sys.is_directory (Lsp.Uri.to_path uri)) ->
+      perform write_project_config
+        ~after:(create_or_retrieve_doc_project_promise ~uri registry)
+  | Some uri ->
+      try
+        let dirname = Lsp.Uri.to_path uri in
+        let rootdir = Superbol_project.rootdir_at ~dirname in   (* may invalid. *)
+        let project = Lsp_project.SET.for_rootdir ~rootdir registry.projects in
+        write_project_config project registry
+      with Not_found | Invalid_argument _ ->
+        Lsp_error.request_failed "%s@ is@ not@ the@ root@ directory@ of@ any@ \
+                                  project@ from@ the@ workspace"
+          (Lsp.Uri.to_string uri)
 
 
 let get_project_config_command uri registry =
@@ -517,7 +537,7 @@ let get_project_config_command uri registry =
     Lsp_project.SET.for_ ~uri registry.projects
   with Not_found ->
     (* NOTE: for this we need to be able to delay replies to server requests. *)
-    Lsp_error.request_failed "%s is not part of any project from the\
+    Lsp_error.request_failed "%s@ is@ not@ part@ of@ any@ project@ from@ the@ \
                               workspace"
       (Lsp.Uri.to_string uri)
 
@@ -568,7 +588,7 @@ let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
       document_error_while_"opening" doc e backtrace registry
   in
   perform add_in_project
-    ~after:(create_or_retrieve_project_promise ~uri registry)
+    ~after:(create_or_retrieve_doc_project_promise ~uri registry)
 
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
