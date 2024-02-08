@@ -369,6 +369,8 @@ let use_client_config_for ~project (configs: Yojson.Safe.t list) registry =
   if Sys.file_exists project.Lsp_project.config_filename
   then now project registry
   else begin
+    Lsp_io.log_info "Received@ client@ configuration:@ @[%a@]"
+      (Yojson.Safe.pretty_print ~std:false) (`List configs);
     let registry, out_of_date_docs = match configs with
       | [`Assoc assoc] ->
           if Lsp_project.update_project_config assoc project
