@@ -40,16 +40,26 @@ let print_options: Pretty.delayed = fun ppf ->
     ppf !all_configs
 
 let default_search_path =
+  let append root ~sub = match root with
+    | Some d -> [d // sub]
+    | None -> []
+  in
   lazy begin
     let cwd = EzFile.getcwd () in
-    let cob_conf_dir = match Sys.getenv_opt "COB_CONFIG_DIR" with
-      | Some d -> [ d ]
-      | None -> []
-    and xdg_conf_dir = match Sys.getenv_opt "XDG_CONFIG_HOME" with
-      | Some p -> p
-      | None -> Sys.getenv "HOME" // ".config"
+    let cob_config_dir = Option.to_list (Sys.getenv_opt "COB_CONFIG_DIR") in
+    let xdg_superbol_dir =  (* can is this available on win32/cygwin as well? *)
+      append ~sub:"superbol" @@
+      match Sys.getenv_opt "XDG_CONFIG_HOME" with
+      | Some p -> Some p
+      | None -> Option.map (fun d -> d // ".config") (Sys.getenv_opt "HOME")
     in
-    cwd :: xdg_conf_dir // "superbol" :: cob_conf_dir
+    let system_specific =
+      if Sys.(win32 || cygwin)
+      then append ~sub:"SuperBOL" (Sys.getenv_opt "APPDATA") @
+           append ~sub:"SuperBOL" (Sys.getenv_opt "LOCALAPPDATA")
+      else []
+    in
+    cwd ::  cob_config_dir @ xdg_superbol_dir @ system_specific
   end
 
 let retrieve_search_path ?search_path () =
