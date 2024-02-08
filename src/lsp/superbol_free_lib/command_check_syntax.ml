@@ -32,7 +32,7 @@ let cmd =
     let common, common_args = Common_args.get () in
 
   EZCMD.sub
-    "parse file"            (* add the corresponding line in Main.subcommands *)
+    "check syntax"            (* add the corresponding line in Main.subcommands *)
     begin fun () ->
       action (common ()) !files |>
       Seq.iter Cobol_common.Diagnostics.sink_result
@@ -40,9 +40,9 @@ let cmd =
     ~args:(common_args @ [
         [],
         Arg.Anons (fun list -> files := list),
-        EZCMD.info ~docv:"FILE" "Cobol file to parse";
+        EZCMD.info ~docv:"FILE" "Cobol file to check";
       ])
-    ~doc: "Parse a Cobol file"
+    ~doc: "Check the syntax of a Cobol file"
     ~man:[
       `S "DESCRIPTION";
       `Blocks [
