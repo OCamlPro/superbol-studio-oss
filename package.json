@@ -56,9 +56,11 @@
             "rm",
             "rm-strict",
             "xopen"
-          ]
+          ],
+          "order": 1
         },
         "superbol.cobol.source-format": {
+          "title": "Source Reference-format",
           "markdownDescription": "Default source reference-format.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "string",
           "default": "auto",
@@ -74,10 +76,11 @@
             "crt",
             "terminal",
             "cobolx"
-          ]
+          ],
+          "order": 2
         },
         "superbol.cobol.copybooks": {
-          "title": "Copybook paths",
+          "title": "Copybook Paths",
           "markdownDescription": "List of copybooks paths.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "array",
           "default": [
@@ -99,41 +102,48 @@
                 "type": "boolean"
               }
             }
-          }
-        },
-        "superbol.lsp-path": {
-          "title": "SuperBOL executable",
-          "type": "string",
-          "default": "",
-          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
-          "scope": "machine"
+          },
+          "order": 3
         },
         "superbol.cobc-path": {
-          "title": "GnuCOBOL compiler executable",
+          "title": "GnuCOBOL Compiler Executable",
           "type": "string",
           "default": "cobc",
           "description": "Path to the GnuCOBOL compiler executable.",
-          "scope": "machine-overridable"
+          "scope": "machine-overridable",
+          "order": 11
+        },
+        "superbol.lsp-path": {
+          "title": "SuperBOL Executable",
+          "type": "string",
+          "default": "",
+          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
+          "scope": "machine",
+          "order": 12
         },
         "superbol.debugger.display-variable-attributes": {
+          "title": "Display Variable Attributes",
           "type": "boolean",
           "default": false,
           "description": "Display storage property and field attributes (e.g. size of alphanumerics, digits and scale of numerics).",
-          "scope": "resource"
-        },
-        "superbol.debugger.gdb-path": {
-          "title": "GNU debugger executable",
-          "type": "string",
-          "default": "gdb",
-          "description": "Path to the GNU debugger executable.",
-          "scope": "machine-overridable"
+          "scope": "resource",
+          "order": 21
         },
         "superbol.debugger.libcob-path": {
-          "title": "GnuCOBOL runtime library",
+          "title": "GnuCOBOL Runtime Library",
           "type": "string",
           "default": "cobc",
           "description": "Path to the GnuCOBOL runtime library file.",
-          "scope": "machine-overridable"
+          "scope": "machine-overridable",
+          "order": 22
+        },
+        "superbol.debugger.gdb-path": {
+          "title": "GNU Debugger Executable",
+          "type": "string",
+          "default": "gdb",
+          "description": "Path to the GNU debugger executable.",
+          "scope": "machine-overridable",
+          "order": 23
         }
       }
     },
@@ -398,7 +408,7 @@
             "description": "Build for debugging"
           },
           "cobc-path": {
-            "title": "GnuCOBOL compiler executable",
+            "title": "GnuCOBOL Compiler Executable",
             "type": [
               "string",
               "null"
@@ -474,5 +484,5 @@
     "Debuggers",
     "Other"
   ],
-  "icon": "images/superbol-128.png"
+  "icon": "assets/superbol-128.png"
 }
