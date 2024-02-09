@@ -358,7 +358,8 @@ let reload_docs_of ~project out_of_date_docs registry =
     let registry = dispatch_diagnostics doc registry in
     let registry = add_or_replace_doc doc registry in
     if registry.params.with_semantic_tokens
-    then delay_unit ~request:SemanticTokensRefresh registry
+    then (delay_unit ~request:SemanticTokensRefresh registry |>
+          delay_unit ~request:WorkspaceDiagnosticRefresh)
     else registry
   end out_of_date_docs registry
 
