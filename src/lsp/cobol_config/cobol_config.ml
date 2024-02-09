@@ -52,14 +52,18 @@ let default_search_path =
       match Sys.getenv_opt "XDG_CONFIG_HOME" with
       | Some p -> Some p
       | None -> Option.map (fun d -> d // ".config") (Sys.getenv_opt "HOME")
-    in
-    let system_specific =
+    and windose_specific =
       if Sys.(win32 || cygwin)
       then append ~sub:"SuperBOL" (Sys.getenv_opt "APPDATA") @
            append ~sub:"SuperBOL" (Sys.getenv_opt "LOCALAPPDATA")
       else []
+    and unix_specific =
+      if Sys.(unix || cygwin)
+      then ["/usr/local/share/gnucobol/config";
+            "/usr/share/gnucobol/config"]
+      else []
     in
-    cwd ::  cob_config_dir @ xdg_superbol_dir @ system_specific
+    cwd ::  cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific
   end
 
 let retrieve_search_path ?search_path () =
