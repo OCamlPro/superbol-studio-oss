@@ -476,6 +476,20 @@ type jsonValidation = {
 }
 [@@deriving json_encoding,show]
 
+let jsonValidation ~fileMatch ~url =
+  { jsonValidation_fileMatch = fileMatch;
+    jsonValidation_url = url }
+
+type tomlValidation = {
+  tomlValidation_fileMatch : string ; (* ".toml" *)
+  tomlValidation_url : string ; (* schema URL *)
+}
+[@@deriving json_encoding,show]
+
+let tomlValidation ~fileMatch ~url =
+  { tomlValidation_fileMatch = fileMatch;
+    tomlValidation_url = url }
+
 type keybinding = {
   key_command : string ;
   key_key : string ; (* "ctrl+f1" *)
@@ -756,6 +770,7 @@ type contributes = {
     icons : icon list [@assoc] ; [@dft []]
     iconThemes : iconTheme list ; [@dft []]
     jsonValidation : jsonValidation list ; [@dft []]
+    tomlValidation : tomlValidation list ; [@dft []]
     keybindings : keybinding list ; [@dft []]
     languages : language list ; [@dft []]
     menus : ( string * menu list ) list [@assoc] ; [@dft []]
@@ -794,6 +809,7 @@ let contributes
   ?( icons = [] )
   ?( iconThemes = [] )
   ?( jsonValidation = [] )
+  ?( tomlValidation = [] )
   ?( keybindings = [] )
   ?( languages = [] )
   ?( menus = [] )
@@ -819,6 +835,7 @@ let contributes
     icons ;
     iconThemes ;
     jsonValidation ;
+    tomlValidation ;
     keybindings ;
     languages ;
     menus ;

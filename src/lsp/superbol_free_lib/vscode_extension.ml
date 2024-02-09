@@ -89,12 +89,13 @@ let package =
       "@types/node", "^20.3.2";
     ]
 
+let cob_extensions_pattern = "[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
 let contributes =
   Manifest.contributes ()
     ~languages: [
       Manifest.language "cobol"
         ~aliases: [ "COBOL" ]
-        ~filenamePatterns: [ "*.cbl"; "*.cob" ]
+        ~filenamePatterns: [ "*." ^ cob_extensions_pattern ]
     ]
     ~debuggers: [
       Manifest.debugger "gdb"
@@ -311,6 +312,7 @@ let contributes =
            Manifest.PROPERTY.string "superbol.lsp-path"
              ~title:"SuperBOL executable"
              ~default:""
+             ~scope:"machine"
              ~description:
                "Name of the `superbol-free` executable if available in PATH; may \
                 be an absolute path otherwise. Leave empty to use the bundled \
@@ -319,6 +321,7 @@ let contributes =
            Manifest.PROPERTY.string "superbol.cobc-path"
              ~title:"GnuCOBOL compiler executable"
              ~default:"cobc"
+             ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL compiler executable.";
 
            (* Debugger-specific: *)
@@ -334,11 +337,13 @@ let contributes =
            Manifest.PROPERTY.string "superbol.debugger.gdb-path"
              ~title:"GNU debugger executable"
              ~default:"gdb"
+             ~scope:"machine-overridable"
              ~description:"Path to the GNU debugger executable.";
 
            Manifest.PROPERTY.string "superbol.debugger.libcob-path"
              ~title:"GnuCOBOL runtime library"
              ~default:"cobc"
+             ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL runtime library file.";
          ])
     ~taskDefinitions: [
@@ -430,6 +435,12 @@ let contributes =
         ~category:"SuperBOL"
         (* ~enablement:"!inDebugMode" *);
     ]
+    ~tomlValidation: [
+      Manifest.tomlValidation
+        ~fileMatch:"superbol.toml"
+        (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json";
+    ]
 
 let manifest =
   Manifest.vscode
@@ -437,7 +448,19 @@ let manifest =
     ~marketplace
     ~engines: ("^" ^ vscode_engine)
     ~activationEvents: [
-      "onLanguage:cobol";
-      "onDebug";
+      "onLanguage:cobol"; (* Note: optional since VS Code 1.74, as in
+                             `contributes`) *)
+      (* XXX: should we really expect mixed-case file extensions like
+         `prog.coB`? *)
+      "workspaceContains:**/*." ^ cob_extensions_pattern;
+      "workspaceContains:{_superbol,superbol.toml}";
+      (* "onDebug"; *) (* <- not relevant yet *)
+    ]
+    ~extensionKind: [
+      "workspace";                                 (* <- run on the workspace *)
+    ]
+    ~extensionDependencies: [
+      "tamasfe.even-better-toml"; (* <- to edit `superbol.toml`; actually just a
+                                     suggestion *)
     ]
     ~contributes
