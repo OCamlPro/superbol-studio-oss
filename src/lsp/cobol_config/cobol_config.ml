@@ -57,7 +57,8 @@ let default_search_path =
       if Sys.(win32 || cygwin)
       then append ~sub:"SuperBOL" (Sys.getenv_opt "APPDATA") @
            append ~sub:"SuperBOL" (Sys.getenv_opt "LOCALAPPDATA")
-      else []
+      else ["/usr/local/share/gnucobol/config";
+            "/usr/share/gnucobol/config"]
     in
     cwd ::  cob_config_dir @ xdg_superbol_dir @ system_specific
   end
