@@ -109,11 +109,13 @@ let assoc_of_jsonrpc_struct params =
 
 let handle_write_project_config_command param registry =
   try
-    let assoc = assoc_of_jsonrpc_struct param in
-    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
-    Ok (`Null,
-        Running (Lsp_server.on_write_project_config_command uri registry))
-  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    let uri = match List.assoc_opt "uri" @@ assoc_of_jsonrpc_struct param with
+      | Some uri -> Some (Lsp.Uri.t_of_yojson uri)
+      | None -> None
+    in
+    let registry = Lsp_server.on_write_project_config_command ?uri registry in
+    Ok (`Null, Running registry)
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) ->
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 

@@ -104,7 +104,7 @@ val on_watched_file_changes
   : Lsp.Types.FileEvent.t list -> t -> t
 
 val on_write_project_config_command
-  : Lsp.Uri.t -> t -> t
+  : ?uri:Lsp.Uri.t -> t -> t
 
 val get_project_config_command
   : Lsp.Uri.t -> t -> Yojson.Safe.t

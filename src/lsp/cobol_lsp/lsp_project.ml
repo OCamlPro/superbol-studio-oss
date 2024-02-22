@@ -38,18 +38,20 @@ let rooturi project = Lsp.Uri.of_path @@ string_of_rootdir @@ rootdir project
 let rootdir_for ~uri ~layout =
   Superbol_project.rootdir_for ~filename:(Lsp.Uri.to_path uri) ~layout
 
-let show_n_forget_diagnostics ?(force = false) { result = project; diags } =
+let show_diagnostics ?(force = false) project diags : unit =
   if force || diags <> DIAGS.Set.none then
     Lsp_diagnostics.publish @@
     Lsp_diagnostics.translate diags
       ~focus_on_main_doc: false
       ~rootdir:(Superbol_project.string_of_rootdir project.rootdir)
-      ~uri:(Lsp.Uri.of_path project.config_filename);
+      ~uri:(Lsp.Uri.of_path project.config_filename)
+
+let show_n_forget_diagnostics ?force { result = project; diags } =
+  show_diagnostics ?force project diags;
   project
 
 let on_project_config_error e ~rootdir ~layout =
-  Lsp_io.log_error "Error@ in@ project@ configuration:@ resorting@ to@ system@ \
-                    defaults.";
+  Lsp_io.log_error "Error@ in@ project@ configuration:@ resorting@ to@ defaults.";
   Lsp_io.log_info "Cause:@ %a" Superbol_project.Diagnostics.pp_error e;
   let diags = DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e in
   show_n_forget_diagnostics ~force:true @@
@@ -77,36 +79,39 @@ let relative_path_for ~uri project =
 let absolute_path_for =
   Superbol_project.absolute_path_for
 
-(** Config *)
+(** Configuration management
 
-let update_from_string project (s: Yojson.Safe.t) ~f : bool =
-  match s with
-  | `String "" -> false
-  | `String s -> f project s
-  | _ -> Pretty.invalid_arg "%s" (Yojson.Safe.to_string s)
+    {e Warning}: functions below that return a Boolean actually perform some
+    mutations on project's configurations. They return [true] if the
+    configuration of the given project has changed. *)
 
-let update_source_format: t -> Yojson.Safe.t -> bool =
-  update_from_string ~f:begin fun { config; _ } s ->
-    let source_format = Cobol_config.Options.format_of_string s in
+let update_source_format { config; _ } str : bool =
+  try
+    let source_format = Cobol_config.Options.format_of_string str in
     if source_format = config.source_format
     then false
     else (config.source_format <- source_format; true)
-  end
+  with Invalid_argument e ->
+    Lsp_io.notify_error "%a"
+      Superbol_project.Diagnostics.pp_error (Unknown_source_format e);
+    false
 
-let update_dialect: t -> Yojson.Safe.t -> bool =
-  update_from_string ~f:begin fun ({ config; _ } as project) s ->
+let update_dialect ({ config; _ } as project) str : bool =
+  try
     let { result; diags } =
-      Superbol_project.Config.cobol_config_from_dialect_name s in
+      Superbol_project.Config.cobol_config_from_dialect_name str in
     if result = config.cobol_config            (* note: structural comparison *)
     then false
     else begin
       config.cobol_config <- result;
-      ignore @@ show_n_forget_diagnostics { result = project; diags };
+      show_diagnostics project diags;
       true
     end
-  end
+  with Superbol_project.Config.ERROR e ->
+    Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e;
+    false
 
-let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } s ->
+let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
   let open Yojson.Safe.Util in
   let to_libdir s =
     let dir = to_string @@ member "dir" s
@@ -116,19 +121,24 @@ let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } s ->
     else RelativeToProjectRoot dir
   in
   try
-    let libpath = convert_each to_libdir s in
+    let libpath = convert_each to_libdir json in
     if libpath = config.libpath              (* note: structural comparison *)
     then false
     else (config.libpath <- libpath; true)
   with
     Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
-      Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string s)
-        Fmt.exn e
+      Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
 
 (** [update_project_config assoc project] updates the configuration of [project]
     according to key/value paires in [assoc]; returns [true] whenever the
     configuration upon termination differs from the configuration upon call. *)
-let update_project_config assoc project =
+let update_project_config assoc project : bool =
+  let from_string project (s: Yojson.Safe.t) ~f : bool =
+    match s with
+    | `String "" -> false
+    | `String s -> f project s
+    | _ -> Pretty.invalid_arg "%s" (Yojson.Safe.to_string s)
+  in
   let update_config assoc key update project =
     try match List.assoc_opt key assoc with
       | None -> false
@@ -141,25 +151,32 @@ let update_project_config assoc project =
   List.fold_left begin fun u (key, update) ->
     update_config assoc key update project || u
   end false [
-    "dialect", update_dialect;
-    "source-format", update_source_format;
+    "dialect", from_string ~f:update_dialect;
+    "source-format", from_string ~f:update_source_format;
     "copybooks", update_copybooks;
   ]
 
-let reload_project_config project =
-  (* TODO: only return [true] whenever the configuration has changed. *)
-  begin
-    ignore @@
-    show_n_forget_diagnostics ~force:true @@
-    try
-      DIAGS.result project ~diags:(Superbol_project.reload_config project)
-    with Superbol_project.Config.ERROR e ->
-      DIAGS.result project
-        ~diags:(DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e)
-  end;
-  true
 
-let get_project_config ?(flat = true) project =
+(** Returns [true] whenever the configuration has changed. *)
+let reload_project_config project =
+  try
+    let { result = changed; diags } = Superbol_project.reload_config project in
+    show_diagnostics ~force:true project diags;
+    changed
+  with
+  | Superbol_project.Config.ERROR (Cobol_config_error _ as e) ->
+      Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e;
+      false
+  | Superbol_project.Config.ERROR e ->
+      show_diagnostics ~force:true project @@
+      DIAGS.Set.error "%a" Superbol_project.Diagnostics.pp_error e;
+      false
+
+
+(* --- *)
+
+
+let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let config = Superbol_project.config project in
   let module Config = (val config.cobol_config) in
   let copybooks =

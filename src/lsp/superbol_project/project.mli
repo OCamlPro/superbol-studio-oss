@@ -121,7 +121,11 @@ val config: t -> Project_config.t
     directory. *)
 val save_config: ?verbose:bool -> t -> unit
 
-val reload_config: ?verbose:bool -> t -> diagnostics
+(** [reload_config ~verbose project] reloads the configuration of [project] from
+    its associated TOML file.  Returns [true] when the reloaded configuration
+    does not match with the one before the call.  Prints some informative
+    message on [stderr] if [verbose] is set. *)
+val reload_config: ?verbose:bool -> t -> bool with_diags
 
 (** {1 Collections} *)
 
