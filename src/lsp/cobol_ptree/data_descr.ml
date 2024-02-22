@@ -777,17 +777,17 @@ let pp_source_destination_clause ppf = function
   | Using i -> Fmt.pf ppf "USING %a" pp_ident i
   | Value l -> Fmt.pf ppf "VALUE %a" pp_literal l
 
-type value_of_clause =
+type valueof_clause =
   {
-    value_of_valued: name with_loc;
-    value_of_value: qualname_or_literal;
+    valueof_valued: name with_loc;
+    valueof_value: qualname_or_literal;
   }
 [@@deriving ord]
 
-let pp_value_of_clause ppf { value_of_valued; value_of_value } =
+let pp_valueof_clause ppf { valueof_valued; valueof_value } =
   Fmt.(
     pair ~sep:sp pp_name' pp_qualname_or_literal ppf
-      (value_of_valued, value_of_value)
+      (valueof_valued, valueof_value)
   )
 
 type report_clause =

@@ -113,16 +113,17 @@ let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
 
 let translate_picture_clause
     ~picture_config
-    { payload = Cobol_ptree.{ picture;
+    { payload = Cobol_ptree.{ picture_string;
                               picture_locale = _;
                               picture_depending = _ }; loc = _ } =
-  match PIC.(of_string picture_config ~&picture) with
+  match PIC.(of_string picture_config ~&picture_string) with
   | Ok pic ->
-      Ok (pic &@<- picture)
+      Ok (pic &@<- picture_string)
   | Error (errors, _) ->                    (* note: errors are still reversed *)
-      PIC.rev_errors_with_loc ~loc:~@picture errors |>
+      PIC.rev_errors_with_loc ~loc:~@picture_string errors |>
       List.fold_left begin fun acc err ->
-        Data_error (Picture_error { picture_loc = ~@picture; error = err })
+        Data_error (Picture_error { picture_loc = ~@picture_string;
+                                    error = err })
         :: acc
       end [] |>
       Result.error
@@ -168,7 +169,7 @@ let ensure_picture diags
     | Some Ok pic ->
         Ok pic
     | Some Error pic ->                         (* grab the raw length for now *)
-        Error (`Length (String.length ~&(~&pic.Cobol_ptree.picture)))
+        Error (`Length (String.length ~&(~&pic.Cobol_ptree.picture_string)))
     | None ->
         Error `None
   in

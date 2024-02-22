@@ -1163,7 +1163,7 @@ let file_descr_clause :=
  | ~ = block_contains_clause; < >
  | ~ = record_clause;         <FileRecord>
  | ~ = label_clause;          <FileLabel>                         (* -COB2002 *)
- | ~ = value_of_clause;       <FileValueOf>                       (* -COB2002 *)
+ | ~ = valueof_clause;        <FileValueOf>                       (* -COB2002 *)
  | ~ = data_clause;           <FileData>                          (* -COB2002 *)
  | ~ = linage_clause;         <FileLinage>
  | ~ = code_set_clause;       <FileCodeSet>
@@ -1240,9 +1240,9 @@ label_clause:
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) STANDARD { LabelStandard }
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) OMITTED  { LabelOmitted }
 
-value_of_clause:
+valueof_clause:
  | VALUE OF iil = nel(i = name IS? il = qualname_or_literal
-                        { { value_of_valued = i; value_of_value = il; } })
+                        { { valueof_valued = i; valueof_value = il; } })
   { iil }
 
 data_clause:
@@ -1435,13 +1435,13 @@ let justified_clause := JUSTIFIED; RIGHT?
 let picture_clause
       [@recovery dummy_picture]
       [@symbol "<picture clause>"] :=
-  | PICTURE; IS?; picture = loc(PICTURE_STRING);
+  | PICTURE; IS?; picture_string = loc(PICTURE_STRING);
     picture_locale = ro(picture_locale_phrase);
     picture_depending = ro(depending_phrase);
-    { { picture; picture_locale; picture_depending } }
+    { { picture_string; picture_locale; picture_depending } }
 
 let picture_locale_phrase
-      [@recovery { locale_name = None; locale_size = "0" }]
+      [@recovery dummy_picture_locale]
       [@symbol "<locale phrase>"] :=
   | LOCALE; io = pf(IS?, name)?; SIZE; IS?; i = integer;
     { {locale_name = io; locale_size = i} }

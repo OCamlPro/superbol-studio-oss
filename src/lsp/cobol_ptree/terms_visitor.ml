@@ -450,6 +450,19 @@ let fold_qualname_or_intlit (v: _ #folder) : qualname_or_intlit -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
+let fold_qualname_or_literal (v: _ #folder) : qualname_or_literal -> _ = function
+  | Name _ | Qual _ as qn -> fold_qualname v qn
+  | Boolean _
+  | Fixed _
+  | Floating _
+  | Integer _
+  | National _
+  | NumFig _
+  | Fig _
+  | Alphanum _
+  | StrConcat _
+  | Concat _ as s -> fold_literal v s
+
 let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
 let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v
 let fold_strlit_opt (v: _ #folder) = fold_option ~fold:fold_strlit v

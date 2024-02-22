@@ -16,23 +16,24 @@ open Numericals
 open Terms
 open Data_descr
 
-type picture = string with_loc
+type picture_string = string with_loc
 
-let pp_picture fmt { payload; _ } = Pretty.string fmt payload
-let show_picture = Pretty.to_string "%a" pp_picture
-let compare_picture = Cobol_common.Srcloc.compare_with_loc String.compare
+let pp_picture_string fmt { payload; _ } = Pretty.string fmt payload
+let show_picture_string = Pretty.to_string "%a" pp_picture_string
+let compare_picture_string = Cobol_common.Srcloc.compare_with_loc String.compare
 
 type picture_clause =
   {
-    picture: picture;
+    picture_string: picture_string;
     picture_locale: locale_phrase option;
     picture_depending: qualname with_loc option;
   }
 [@@deriving ord]
 
-let pp_picture_clause ppf { picture; picture_locale; picture_depending } =
+let pp_picture_clause ppf { picture_string; picture_locale;
+                            picture_depending } =
   Fmt.pf ppf "PIC %a%a%a"
-    pp_picture picture
+    pp_picture_string picture_string
     Fmt.(option (sp ++ pp_locale_phrase)) picture_locale
     Fmt.(option (any "@ DEPENDING ON@ " ++
                  pp_with_loc pp_qualname)) picture_depending
@@ -373,7 +374,7 @@ and file_fd_clause =
       }
   | FileRecord of record_clause
   | FileLabel of label_clause
-  | FileValueOf of value_of_clause list
+  | FileValueOf of valueof_clause list
   | FileData of file_data_clause
   | FileLinage of file_linage_clause
   | FileCodeSet of Misc_sections.alphabet_specification
@@ -398,7 +399,7 @@ let pp_file_fd_clause ppf = function
   | FileLabel lc -> pp_label_clause ppf lc
   | FileValueOf vcl ->
       Fmt.pf ppf "VALUE OF %a"
-        Fmt.(list ~sep:sp pp_value_of_clause) vcl
+        Fmt.(list ~sep:sp pp_valueof_clause) vcl
   | FileData fdc -> pp_file_data_clause ppf fdc
   | FileLinage flc -> pp_file_linage_clause ppf flc
   | FileCodeSet als ->

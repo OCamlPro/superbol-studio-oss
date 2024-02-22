@@ -1387,7 +1387,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_when_clause -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_varying_phrase -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_varying_clause -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_value_of_clause -> raise Not_found
+    | MenhirInterpreter.N MenhirInterpreter.N_valueof_clause -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_validation_stage -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_validation_clause -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_validate_status_clause -> raise Not_found
@@ -1701,7 +1701,7 @@ module Default = struct
     | MenhirInterpreter.N MenhirInterpreter.N_present_when_clause -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_position -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_plus_or_minus -> raise Not_found
-    | MenhirInterpreter.N MenhirInterpreter.N_picture_locale_phrase -> { locale_name = None; locale_size = "0" }
+    | MenhirInterpreter.N MenhirInterpreter.N_picture_locale_phrase -> dummy_picture_locale
     | MenhirInterpreter.N MenhirInterpreter.N_picture_clause -> dummy_picture
     | MenhirInterpreter.N MenhirInterpreter.N_perform_statement -> raise Not_found
     | MenhirInterpreter.N MenhirInterpreter.N_perform_phrase -> raise Not_found

@@ -51,9 +51,15 @@ let dummy_expr =
 
 let dummy_picture =
   {
-    picture = "X" &@ dummy_loc;
+    picture_string = "X" &@ dummy_loc;
     picture_locale = None;
     picture_depending = None;
+  }
+
+let dummy_picture_locale =
+  {
+    locale_name = None;
+    locale_size = "0";
   }
 
 (* --- *)

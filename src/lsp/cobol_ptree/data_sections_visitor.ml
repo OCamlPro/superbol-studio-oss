@@ -46,8 +46,8 @@ class virtual ['a] folder = object
   method fold_condition_name_value: (condition_name_value        , 'a) fold = default
   method fold_condition_name_item : (condition_name_item         , 'a) fold = default
   method fold_condition_name_item': (condition_name_item with_loc, 'a) fold = default
-  method fold_picture             : (picture                     , 'a) fold = default
-  method fold_picture'            : (picture with_loc            , 'a) fold = default
+  method fold_picture_string      : (picture_string              , 'a) fold = default
+  method fold_picture_string'     : (picture_string with_loc     , 'a) fold = default
   method fold_picture_clause      : (picture_clause              , 'a) fold = default
   method fold_picture_clause'     : (picture_clause with_loc     , 'a) fold = default
   method fold_data_clause         : (data_clause                 , 'a) fold = default
@@ -72,9 +72,11 @@ class virtual ['a] folder = object
   method fold_screen_clause'      : (screen_clause with_loc      , 'a) fold = default
   method fold_screen_item         : (screen_item                 , 'a) fold = default
   method fold_screen_item'        : (screen_item with_loc        , 'a) fold = default
-  method fold_data_occurs_clause  : (data_occurs_clause          , 'a) fold = default
-  method fold_sort_spec           : (sort_spec                   , 'a) fold = default
-  method fold_sort_direction      : (sort_direction              , 'a) fold = default
+  method fold_file_fd_clause      : (file_fd_clause              , 'a) fold = default
+  method fold_file_fd_clause'     : (file_fd_clause with_loc     , 'a) fold = default
+  method fold_file_clauses        : (file_clauses                , 'a) fold = default
+  method fold_file_descr          : (file_descr                  , 'a) fold = default
+  method fold_file_descr'         : (file_descr with_loc         , 'a) fold = default
 end
 
 let todo    l f = todo    __MODULE__ l f
@@ -159,56 +161,23 @@ let fold_condition_name_item (v: _ #folder) =
 let fold_condition_name_item' (v: _ #folder) =
   handle' v#fold_condition_name_item' ~fold:fold_condition_name_item v
 
-let fold_picture (v: _ #folder) =
-  leaf v#fold_picture
+let fold_picture_string (v: _ #folder) =
+  leaf v#fold_picture_string
 
-let fold_picture' (v: _ #folder) =
-  handle' v#fold_picture' ~fold:fold_picture v
+let fold_picture_string' (v: _ #folder) =
+  handle' v#fold_picture_string' ~fold:fold_picture_string v
 
 let fold_picture_clause (v: _ #folder) =
   handle v#fold_picture_clause
-    ~continue:begin fun { picture; picture_locale; picture_depending } x -> x
-      >> fold_picture v picture
+    ~continue:begin fun { picture_string; picture_locale;
+                          picture_depending } x -> x
+      >> fold_picture_string v picture_string
       >> fold_locale_phrase_opt v picture_locale
       >> fold_qualname'_opt v picture_depending
     end
 
 let fold_picture_clause' (v: _ #folder) =
   handle' v#fold_picture_clause' ~fold:fold_picture_clause v
-
-let fold_sort_direction (v: _ #folder) =
-  leaf v#fold_sort_direction
-
-let fold_sort_spec (v: _ #folder) =
-  handle v#fold_sort_spec
-    ~continue:begin fun { sort_key_direction; sort_key_names } x -> x
-      >> fold_sort_direction v sort_key_direction
-      >> fold_list ~fold:fold_qualname v sort_key_names
-    end
-
-let fold_data_occurs_clause (v: _ #folder) =
-  handle v#fold_data_occurs_clause
-    ~continue:begin fun c x -> match c with
-      | OccursFixed { times; key_is; indexed_by } -> x
-          >> fold_integer' v times
-          >> fold_list ~fold:fold_sort_spec v key_is
-          >> fold_name'_list v indexed_by
-      | OccursDepending { from; to_; depending;
-                          key_is; indexed_by } -> x
-          >> fold_integer' v from
-          >> fold_integer' v to_
-          >> fold_qualname' v depending
-          >> fold_list ~fold:fold_sort_spec v key_is
-          >> fold_name'_list v indexed_by
-      | OccursDynamic { capacity_in; from; to_;
-                        initialized; key_is; indexed_by } -> x
-          >> fold_name'_opt v capacity_in
-          >> fold_integer'_opt v from
-          >> fold_integer'_opt v to_
-          >> fold' v ~fold:fold_bool initialized
-          >> fold_list ~fold:fold_sort_spec v key_is
-          >> fold_name'_list v indexed_by
-    end
 
 let fold_data_clause (v: _ #folder) =
   handle v#fold_data_clause
@@ -220,7 +189,7 @@ let fold_data_clause (v: _ #folder) =
       | DataConstantRecord
       | DataGlobal
       | DataJustified -> Fun.id
-      | DataOccurs c -> fold_data_occurs_clause v c
+      | DataOccurs c -> Data_descr_visitor.fold_data_occurs_clause v c
       | DataRedefines n
       | DataType n
       | DataSameAs n -> fold_name' v n
@@ -271,9 +240,58 @@ let fold_linkage_section (v: _ #folder) =
 
 let fold_file_item_descr  = fold_working_item_descr
 let fold_file_item_descr' = fold_working_item_descr'
+
+let fold_file_fd_clause (v: _ #folder) =
+  handle v#fold_file_fd_clause
+    ~continue:begin function
+      | FileGlobal ->
+          Fun.id
+      | FileFormat c ->
+          Data_descr_visitor.fold_format_clause v c
+      | FileExternal c ->
+          Data_descr_visitor.fold_external_clause v c
+      (* | FileBlockContains of { from : name; to_ : name option; *)
+      (*                          characters_or_records : file_block_contents; *)
+      (*                        } *)
+      | FileRecord c ->
+          Data_descr_visitor.fold_record_clause v c
+      | FileLabel c ->
+          Data_descr_visitor.fold_label_clause v c
+      | FileValueOf c ->
+          fold_list ~fold:Data_descr_visitor.fold_valueof_clause v c
+      (* | FileData of Data_descr.file_data_clause *)
+      (* | FileLinage of file_linage_clause *)
+      (* | FileCodeSet of alphabet_specification *)
+      | FileReport c ->
+          fold_name'_list v c
+      | _ ->
+          Fun.id
+    end
+let fold_file_fd_clause' (v: _ #folder) =
+  handle' v#fold_file_fd_clause' ~fold:fold_file_fd_clause v
+
+let fold_file_clauses (v: _ #folder) =
+  handle v#fold_file_clauses
+    ~continue:begin function
+      | FileFD clauses ->
+          fold_list ~fold:fold_file_fd_clause' v clauses
+      | FileSD _ ->
+          Fun.id
+    end
+
+let fold_file_descr (v: _ #folder) =
+  handle v#fold_file_descr
+    ~continue:begin fun { file_name; file_clauses; file_items } x -> x
+      >> fold_name' v file_name
+      >> fold_file_clauses v file_clauses
+      >> fold_list ~fold:fold_file_item_descr' v file_items
+    end
+let fold_file_descr' (v: _ #folder) =
+  handle' v#fold_file_descr' ~fold:fold_file_descr v
+
 let fold_file_section (v: _ #folder) =
   handle v#fold_file_section
-    ~continue:(todo __LINE__ "fold_file_section")
+    ~continue:(fold_list ~fold:fold_file_descr' v)
 
 let fold_comm_channel (v: _ #folder) =
   leaf v#fold_comm_channel

@@ -1374,7 +1374,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_when_clause) -> "when_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_varying_phrase) -> "varying_phrase"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_varying_clause) -> "varying_clause"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_value_of_clause) -> "value_of_clause"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_valueof_clause) -> "valueof_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_validation_stage) -> "validation_stage"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_validation_clause) -> "validation_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_validate_status_clause) -> "validate_status_clause"
@@ -3705,7 +3705,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_when_clause -> (fun _ -> "when_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_varying_phrase -> (fun _ -> "varying_phrase")
   | MenhirInterpreter.N MenhirInterpreter.N_varying_clause -> (fun _ -> "varying_clause")
-  | MenhirInterpreter.N MenhirInterpreter.N_value_of_clause -> (fun _ -> "value_of_clause")
+  | MenhirInterpreter.N MenhirInterpreter.N_valueof_clause -> (fun _ -> "valueof_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_validation_stage -> (fun _ -> "validation_stage")
   | MenhirInterpreter.N MenhirInterpreter.N_validation_clause -> (fun _ -> "validation_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_validate_status_clause -> (fun _ -> "validate_status_clause")
