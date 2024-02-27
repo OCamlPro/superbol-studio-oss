@@ -152,6 +152,20 @@ let contributes =
                                         "type": "boolean",
                                         "description": "Debug GDB",
                                         "default": false
+                                },
+                                "gdbtty": {
+                                        "type": [
+                                                "boolean",
+                                                "string"
+                                        ],
+                                        "description": "Enable external display for debug",
+                                        "default": false,
+                                        "enum": [
+                                                true,
+                                                false,
+                                                "vscode",
+                                                "external"
+                                        ]
                                 }
                         }
                 },
@@ -225,7 +239,8 @@ let contributes =
                                         "cwd": "$${_:{workspaceFolder}}",
                                         "group": [],
                                         "coverage": true,
-                                        "verbose": false
+                                        "verbose": false,
+                                        "gdbtty": true
                                 }
                         } |};
           Manifest.any {| {
