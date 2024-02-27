@@ -27,8 +27,9 @@ Copy the file :code:`cobol-superbol-mode.el` to your
 :code:`$HOME/.emacs.d/lisp/` directory::
 
   wget https://github.com/OCamlPro/superbol-studio-oss/raw/master/emacs/cobol-superbol-mode.el
+  wget https://github.com/OCamlPro/superbol-studio-oss/raw/master/emacs/cobol-superbol-indent.el
   mkdir -p $HOME/.emacs.d/lisp/
-  mv cobol-superbol-mode.el  $HOME/.emacs.d/lisp/
+  mv cobol-superbol-*.el $HOME/.emacs.d/lisp/
 
 and add the following lines to your :code:`$HOME/.emacs` file::
 
@@ -41,6 +42,7 @@ and add the following lines to your :code:`$HOME/.emacs` file::
        ("\\.cbl\\'" . cobol-superbol-mode)
        ("\\.cpy\\'" . cobol-superbol-mode))
      auto-mode-alist))
+  (require 'cobol-superbol-indent.el)
 
 Start a new Emacs process and open a COBOL file: verify that the
 `COBOL` menu is available and contains a `SuperBOL by OCamlPro`
