@@ -21,4 +21,4 @@ val indent :
   ?contents:string ->
   ?range:Types.range ->
   unit ->
-  Types.indent_record list
+  Types.indent_record list * Types.edit_space_operation list

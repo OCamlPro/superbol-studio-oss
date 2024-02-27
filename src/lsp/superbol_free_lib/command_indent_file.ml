@@ -20,7 +20,7 @@ open EZCMD.TYPES
 open Cobol_indent.Types
 open Common_args
 
-let action ~numeric ~inplace ?suffix ?range
+let action ~numeric ~intext ~inplace ?suffix ?range
     { preproc_options = { source_format; config; _ } ; _ } files =
   let module Config = (val config) in
 
@@ -38,7 +38,7 @@ let action ~numeric ~inplace ?suffix ?range
           None
     in
 
-    let edits = Cobol_indent.Main.indent
+    let edits, _ops = Cobol_indent.Main.indent
         ~source_format
         ~config:project.config.indent_config
         ~dialect:Config.dialect
@@ -51,7 +51,7 @@ let action ~numeric ~inplace ?suffix ?range
 
     match output with
     | Some _ ->
-      assert (edits = [])
+      ()
     | None ->
 
       if numeric then
@@ -72,7 +72,7 @@ let action ~numeric ~inplace ?suffix ?range
               iter_edit (line+1) edit edits
             end else begin
               let indent =
-                if source_format.free then
+                if intext || source_format.free then
                   edit.offset_modif
                 else
                   source_format.skip_before + 1 + edit.offset_modif
@@ -87,16 +87,7 @@ let action ~numeric ~inplace ?suffix ?range
           in
           iter start_line edits
         in
-        output_numeric stdout ;
-        let oc = open_out "/tmp/cobol-indent.test" in
-        output_numeric oc ;
-        begin match range with
-          | None -> ()
-          | Some range ->
-            Printf.fprintf oc "Range: %d-%d\n%!"
-              range.start_line range.end_line
-        end;
-        close_out oc
+        output_numeric stdout
       else
       if edits = [] then
         Printf.eprintf "File %S: good indentation\n%!" filename
@@ -128,6 +119,7 @@ let generate_config () =
 let cmd =
   let files = ref [] in
   let inplace = ref false in
+  let intext = ref false in
   let suffix = ref None in
   let numeric = ref false in
   let range = ref None in
@@ -138,6 +130,7 @@ let cmd =
     (fun () ->
        let common = common () in
        action
+         ~intext:!intext
          ~numeric:!numeric
          ~inplace:!inplace
          ?suffix:!suffix
@@ -162,6 +155,9 @@ let cmd =
         [ "numeric" ], Arg.Set numeric,
         EZCMD.info "Output indentation size at the beginning of each line";
 
+        [ "intext" ], Arg.Set intext,
+        EZCMD.info "For numeric, indentation size is relative to area A";
+
         [ "lines" ], Arg.String (fun s ->
             let start_line, end_line = EzString.cut_at s '-' in
             let start_line = int_of_string start_line in
@@ -169,7 +165,6 @@ let cmd =
             range := Some { start_line ; end_line }
           ),
         EZCMD.info ~docv:"LINE-LINE" "Indent only lines between these lines";
-
 
       ]
       )
