@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL mode for GNU/Emacs &mdash; superbol master
- (5f9bb7d
-) (2024/02/22 09:57) documentation</title>
+ (35862d5
+) (2024/02/27 13:39) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (5f9bb7d
+ (35862d5
 )
               </div>
 <div role="search">
@@ -122,8 +122,9 @@ removal.</p>
 <p>Copy the file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> to your
 <code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs.d/lisp/</span></code> directory:</p>
 <div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="o">://</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="nc">OCamlPro</span><span class="o">/</span><span class="n">superbol</span><span class="o">-</span><span class="n">studio</span><span class="o">-</span><span class="n">oss</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">emacs</span><span class="o">/</span><span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">.</span><span class="n">el</span>
+<span class="n">wget</span> <span class="n">https</span><span class="o">://</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="nc">OCamlPro</span><span class="o">/</span><span class="n">superbol</span><span class="o">-</span><span class="n">studio</span><span class="o">-</span><span class="n">oss</span><span class="o">/</span><span class="n">raw</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">emacs</span><span class="o">/</span><span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">indent</span><span class="o">.</span><span class="n">el</span>
 <span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">emacs</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">lisp</span><span class="o">/</span>
-<span class="n">mv</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">.</span><span class="n">el</span>  <span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">emacs</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">lisp</span><span class="o">/</span>
+<span class="n">mv</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-*.</span><span class="n">el</span> <span class="o">$</span><span class="nc">HOME</span><span class="o">/.</span><span class="n">emacs</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">lisp</span><span class="o">/</span>
 </pre></div>
 </div>
 <p>and add the following lines to your <code class="code docutils literal notranslate"><span class="pre">$HOME/.emacs</span></code> file:</p>
@@ -136,6 +137,7 @@ removal.</p>
      <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cbl</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">)</span>
      <span class="o">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.cpy</span><span class="se">\\</span><span class="s2">&#39;&quot;</span> <span class="o">.</span> <span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">mode</span><span class="o">))</span>
    <span class="n">auto</span><span class="o">-</span><span class="n">mode</span><span class="o">-</span><span class="n">alist</span><span class="o">))</span>
+<span class="o">(</span><span class="n">require</span> <span class="k">&#39;</span><span class="n">cobol</span><span class="o">-</span><span class="n">superbol</span><span class="o">-</span><span class="n">indent</span><span class="o">.</span><span class="n">el</span><span class="o">)</span>
 </pre></div>
 </div>
 <p>Start a new Emacs process and open a COBOL file: verify that the

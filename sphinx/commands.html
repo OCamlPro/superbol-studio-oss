@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol master
- (5f9bb7d
-) (2024/02/22 09:57) documentation</title>
+ (35862d5
+) (2024/02/27 13:39) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (5f9bb7d
+ (35862d5
 )
               </div>
 <div role="search">
@@ -58,7 +58,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-ebcdic-translate">main.exe ebcdic translate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-env">main.exe env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-file">main.exe indent file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#main-exe-indent-range">main.exe indent range</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-json-vscode">main.exe json vscode</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-lsp">main.exe lsp</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-pp">main.exe pp</a></li>
@@ -126,9 +125,6 @@
 
 <span class="n">indent</span> <span class="n">file</span>
   <span class="nc">Indentation</span>
-
-<span class="n">indent</span> <span class="n">range</span>
-  <span class="nc">Indentation</span> <span class="n">range</span>
 
 <span class="n">json</span> <span class="n">vscode</span>
   <span class="n">parse</span> <span class="nc">VSODE</span> <span class="nc">JSON</span> <span class="n">files</span> <span class="ow">or</span> <span class="n">generate</span> <span class="n">package</span><span class="o">.</span><span class="n">json</span>
@@ -297,34 +293,18 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--gen-config</span></code>   Generate a config file .superbol-indent in this directory</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--inplace</span></code>   Modify files in place</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--lines</span> <span class="pre">LINE-LINE</span></code>   Indent only lines between these lines</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--numeric</span></code>   Output indentation size at the beginning of each line</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
 </ul>
 <p>Overrides <cite>format</cite> from configuration file if present.</p>
-</section>
-<section id="main-exe-indent-range">
-<h2>main.exe indent range<a class="headerlink" href="#main-exe-indent-range" title="Permalink to this headline"></a></h2>
-<p>Indentation range</p>
-<p><strong>DESCRIPTION</strong></p>
-<p><strong>USAGE</strong></p>
-<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">indent</span> <span class="n">range</span> <span class="nc">FILE</span> <span class="nc">RANGE_START</span> <span class="nc">RANGE_END</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
-</pre></div>
-</div>
-<p>Where options are:</p>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   file to check the indentation</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">RANGE_START</span></code>   start line of range</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">RANGE_END</span></code>   end line of range</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIRECTORY</span></code>   Add DIRECTORY to library search path</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--suffix</span> <span class="pre">EXT</span></code>   Set an extension for the file being generated</p></li>
 </ul>
-<p>Overrides <cite>format</cite> from configuration file if present.</p>
 </section>
 <section id="main-exe-json-vscode">
 <h2>main.exe json vscode<a class="headerlink" href="#main-exe-json-vscode" title="Permalink to this headline"></a></h2>

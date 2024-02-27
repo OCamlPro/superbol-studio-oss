@@ -22,9 +22,6 @@ Overview of sub-commands::
   indent file
     Indentation
   
-  indent range
-    Indentation range
-  
   json vscode
     parse VSODE JSON files or generate package.json
   
@@ -250,47 +247,13 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
-* :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
+* :code:`--gen-config`   Generate a config file .superbol-indent in this directory
 
-* :code:`--silence STRING`   Silence specific messages
+* :code:`--inplace`   Modify files in place
 
-* :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
-Overrides `format` from configuration file if present.
+* :code:`--lines LINE-LINE`   Indent only lines between these lines
 
-
-main.exe indent range
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Indentation range
-
-
-
-**DESCRIPTION**
-
-
-
-
-**USAGE**
-::
-  
-  main.exe indent range FILE RANGE_START RANGE_END [OPTIONS]
-
-Where options are:
-
-
-* :code:`FILE`   file to check the indentation
-
-* :code:`RANGE_START`   start line of range
-
-* :code:`RANGE_END`   end line of range
-
-* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
-
-* :code:`--conf CONF_FILE`   Set the configuration file to be used
-
-* :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
-
-* :code:`--free`   Shorthand for `--source-format FREE`
+* :code:`--numeric`   Output indentation size at the beginning of each line
 
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
@@ -298,6 +261,8 @@ Where options are:
 
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
+
+* :code:`--suffix EXT`   Set an extension for the file being generated
 
 
 main.exe json vscode
