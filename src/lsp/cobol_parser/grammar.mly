@@ -1871,7 +1871,7 @@ let screen_occurs_clause := OCCURS; ~ = integer; TIMES?; < >
 
 procedure_division:
  | PROCEDURE DIVISION
-   ul = ilo(pf(USING,rnel(loc(using_clause))))
+   ul = ilo(pf(or_(USING, CHAINING),rnel(loc(using_clause))))
    ro = ro(returning)                                             (* +COB2002 *)
    rl = ilo(raising_phrase) "."                                   (* +COB2002 *)
    dl = lo(declaratives)
@@ -1884,7 +1884,7 @@ procedure_division:
 
 program_procedure_division:
  | PROCEDURE DIVISION
-   ul = ilo(pf(USING,rnel(loc(using_clause))))
+   ul = ilo(pf(or_(USING, CHAINING),rnel(loc(using_clause))))
    ro = ro(returning)                                             (* +COB2002 *)
    rl = ilo(raising_phrase) "."                                   (* +COB2002 *)
    dl = lo(declaratives)
