@@ -29,7 +29,7 @@ let attributes_spec ~debug =
     "cobc-path", C ([%js.to: string or_undefined],
                     [%js.of: string], "cobc");
     "extra-args", C ([%js.to: string list or_undefined],
-                     [%js.of: string list], ["-ffold-copy=LOWER"]);
+                     [%js.of: string list], []);
   ]
 
 (* --- *)
