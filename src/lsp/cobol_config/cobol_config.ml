@@ -48,7 +48,7 @@ let default_search_path =
   lazy begin
     let cwd = EzFile.getcwd () in
     let cob_config_dir = Option.to_list (Sys.getenv_opt "COB_CONFIG_DIR") in
-    let xdg_superbol_dir =  (* can is this available on win32/cygwin as well? *)
+    let xdg_superbol_dir =      (* is this available on win32/cygwin as well? *)
       append ~sub:"superbol" @@
       match Sys.getenv_opt "XDG_CONFIG_HOME" with
       | Some p -> Some p
@@ -61,7 +61,8 @@ let default_search_path =
     and unix_specific =
       if Sys.(unix || cygwin)
       then ["/usr/local/share/gnucobol/config";
-            "/usr/share/gnucobol/config"]
+            "/usr/share/gnucobol/config";
+            "/etc/gnucobol"]
       else []
     in
     cwd ::  cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific
