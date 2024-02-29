@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {1 Type definitions} *)
+
 module TYPES: sig
   include module type of Superbol_project.Config.TYPES
   include module type of Superbol_project.TYPES
@@ -22,6 +24,8 @@ include module type of TYPES
    and type layout = TYPES.layout
 
 type t = project
+
+(** {1 Constructors & accessors} *)
 
 (** [for_ ~rootdir ~layout] retrieves a project based on its root directory.
     This may trigger reading project configuration files if the project was not
@@ -57,7 +61,7 @@ val libpath_for: uri:Lsp.Uri.t -> t -> string list
     for [project] should be treated as a copybook. *)
 val detect_copybook: uri:Lsp.Uri.t -> t -> bool
 
-(** Cached representation *)
+(** {1 Cached representation} *)
 
 type cached
 
@@ -69,7 +73,7 @@ val to_cache: t -> cached
     (outdated or missing configuration file). *)
 val of_cache: rootdir:rootdir -> layout:layout -> cached -> t
 
-(** Collections *)
+(** {1 Collections} *)
 
 module SET: sig
   include Set.S with type elt = t
@@ -79,13 +83,17 @@ module SET: sig
 end
 module MAP: Map.S with type key = t
 
-(** Config *)
+(** {1 Configuration management}
+
+    {e Warning}: functions below that return a Boolean actually perform some
+    mutations on project's configurations. They return [true] if the
+    configuration of the given project has changed. *)
 
 val reload_project_config: t -> bool
 val update_project_config: (string * Yojson.Safe.t) list -> t -> bool
 val get_project_config: ?flat:bool -> t -> Yojson.Safe.t
 
-(** Miscellaneous *)
+(** {1 Miscellaneous} *)
 
 val rootdir: t -> rootdir
 val rooturi: t -> Lsp.Uri.t

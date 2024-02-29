@@ -333,6 +333,18 @@
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
+   (cobol_config (= version))
+   odoc
+  )
+ )
+
+(package
+ (name cobol_indent_old)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (fmt ( >= 0.9 ))
    (cobol_preproc (= version))
    (cobol_common (= version))
    odoc

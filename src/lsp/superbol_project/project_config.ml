@@ -39,6 +39,7 @@ end
 include TYPES
 type t = config
 
+(* --- *)
 
 let __init_default_exn_printers =
   Printexc.register_printer begin function
@@ -48,6 +49,23 @@ let __init_default_exn_printers =
         None
   end
 
+(* --- *)
+
+(* Intermediate converters *)
+
+let cobol_config_from_dialect_name dialect_name =
+  try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
+  | Invalid_argument e ->
+      raise @@ ERROR (Unknown_dialect e)
+  | Cobol_config.ERROR e ->
+      raise @@ ERROR (Cobol_config_error e)
+
+let cobol_source_format source_format_name =
+  try Cobol_config.Options.format_of_string source_format_name
+  with Invalid_argument e ->
+    raise @@ ERROR (Unknown_source_format e)
+
+(* --- *)
 
 let default_libpath = [RelativeToProjectRoot "."]
 let default_copybook_extensions = Cobol_common.Copybook.copybook_extensions
@@ -125,21 +143,12 @@ let config_repr config ~name =
 
 let config_section_name = "cobol"
 
-let cobol_config_from_dialect_name dialect_name =
-  try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
-  | Invalid_argument e ->
-      raise @@ ERROR (Unknown_dialect e)
-  | Cobol_config.ERROR e ->
-      raise @@ ERROR (Cobol_config_error e)
+(*  *)
 
 let get_source_format toml =
-  try Cobol_config.Options.format_of_string @@
-       TOML.get_string toml ["source-format"]
-  with
-  | Not_found ->
-      default.source_format
-  | Invalid_argument e ->
-      raise @@ ERROR (Unknown_source_format e)
+  try cobol_source_format @@ TOML.get_string toml ["source-format"]
+  with Not_found ->
+    default.source_format
 
 let get_dialect toml =
   TOML.get_string toml ["dialect"] ~default:"default"
@@ -166,20 +175,22 @@ let get_indent_config toml =
 
 (* TODO: the functions below show return a list of [Project_diagnostics.error].
    This shall be easier to achieve after symbolization of diagnostics in
-   [Cobol_config]. *)
+   [Cobol_config].
+
+   For now, many of the `get_*` functions just raise {!ERROR}. *)
 
 let load_file ?verbose config_filename =
   let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
-    DIAGS.map_result
-      (cobol_config_from_dialect_name @@ get_dialect section)
-      ~f:(fun cobol_config ->
-          { default with
-            cobol_config;
-            source_format = get_source_format section;
-            libpath = get_libpath section;
-            toml_handle = toml_handle;
-            indent_config = get_indent_config section})
+    let DIAGS.{ result = cobol_config; diags } =
+      cobol_config_from_dialect_name @@ get_dialect section in
+    DIAGS.result ~diags
+      { default with
+        cobol_config;
+        toml_handle;
+        source_format = get_source_format section;
+        libpath = get_libpath section;
+        indent_config = get_indent_config section }
   in
   try
     let toml_handle = Ezr_toml.load ?verbose config_filename in
@@ -201,20 +212,38 @@ let save ?verbose ~config_filename config =
 
 let reload ?verbose ~config_filename config =
   let reload_section keys toml =
+    (* Note: we only mutate [config] when items have been properly
+       parsed/checked, so that [config] remains unchanged in case an exception
+       is thrown. *)
     let section = TOML.get keys toml in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name @@ get_dialect section in
+      cobol_config_from_dialect_name @@ get_dialect section
+    and source_format = get_source_format section
+    and libpath = get_libpath section
+    and indent_config = get_indent_config section in
+    let changed =
+      config.source_format <> source_format ||
+      config.libpath <> libpath ||
+      config.indent_config <> indent_config ||
+      config.cobol_config <> cobol_config
+    in
     config.cobol_config <- cobol_config;
-    config.source_format <- get_source_format section;
-    config.libpath <- get_libpath section;
-    config.indent_config <- get_indent_config section;
-    diags
+    config.source_format <- source_format;
+    config.libpath <- libpath;
+    config.indent_config <- indent_config;
+    DIAGS.result changed ~diags
   in
   try
     Ezr_toml.reload ?verbose config_filename config.toml_handle;
     let toml = Ezr_toml.toml config.toml_handle in
-    try reload_section toml [config_section_name]
-    with Not_found -> DIAGS.Set.none                                      (* ? *)
+    try
+      reload_section toml [config_section_name]
+    with Not_found ->                         (* missing section: use defaults *)
+      config.cobol_config <- default.cobol_config;
+      config.source_format <- default.source_format;
+      config.libpath <- default.libpath;
+      config.indent_config <- default.indent_config;
+      DIAGS.result true
   with TOML.Types.Error (loc, _code, error) ->
     raise @@ ERROR (Invalid_toml { loc; error })
 

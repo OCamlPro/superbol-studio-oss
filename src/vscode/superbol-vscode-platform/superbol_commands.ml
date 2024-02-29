@@ -17,9 +17,9 @@ open Vscode
 type handler =
   | Instance of     (* Intended for partial application of [handler instance] *)
       (Superbol_instance.t -> args:Ojs.t list -> unit)
-  | Text of
-      (Superbol_instance.t -> textEditor:TextEditor.t ->
-       edit:TextEditorEdit.t -> args:Ojs.t list -> unit)
+  (* | Text of *)
+  (*     (Superbol_instance.t -> textEditor:TextEditor.t -> *)
+  (*      edit:TextEditorEdit.t -> args:Ojs.t list -> unit) *)
 
 type t =
   {
@@ -44,10 +44,10 @@ let _restart_language_server =
     end
 
 let _write_project_config =
-  command "superbol.write.project.config" @@ Text
-    begin fun instance ~textEditor ~edit:_ ~args:_ ->
+  command "superbol.write.project.config" @@ Instance
+    begin fun instance ~args:_ ->
       let _: unit Promise.t =
-        Superbol_instance.write_project_config ~text_editor:textEditor instance
+        Superbol_instance.write_project_config instance
       in ()
     end
 
@@ -57,10 +57,10 @@ let register extension instance { id; handler } =
       let callback = callback instance in
       ExtensionContext.subscribe extension
         ~disposable:(Commands.registerCommand ~command:id ~callback)
-  | Text callback ->
-      let callback = callback instance in
-      ExtensionContext.subscribe extension
-        ~disposable:(Commands.registerTextEditorCommand ~command:id ~callback)
+  (* | Text callback -> *)
+  (*     let callback = callback instance in *)
+  (*     ExtensionContext.subscribe extension *)
+  (*       ~disposable:(Commands.registerTextEditorCommand ~command:id ~callback) *)
 
 let register_all extension instance =
   List.iter (register extension instance) !commands

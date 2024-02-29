@@ -193,6 +193,10 @@ dir = "src/lsp/cobol_indent"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/cobol_indent_old"
+# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/cobol_preproc"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 

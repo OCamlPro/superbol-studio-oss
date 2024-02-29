@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** {1 Type definitions} *)
+
 module TYPES: sig
 
   type path =
@@ -36,11 +38,9 @@ include module type of TYPES
 
 type t = config
 
-val new_default: unit -> t
+(** {1 TOML file management} *)
 
-val cobol_config_from_dialect_name
-  : string
-  -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+val new_default: unit -> t
 
 (** [load_file ~verbose config_filename] loads the given project configuration
     file.  Raises {!ERROR} or [Sys_error] in case of failure. *)
@@ -55,11 +55,15 @@ val save
   -> t
   -> unit
 
+(** [reload ~verbose ~config_filename config] returns [true], possibly along
+    diagnostics, if the reloaded configuration has changed. *)
 val reload
   : ?verbose:bool
   -> config_filename:string
   -> t
-  -> Cobol_common.Diagnostics.diagnostics
+  -> bool Cobol_common.Diagnostics.with_diags
+
+(** {1 Accessors} *)
 
 (** [libpath_for ~filename project] constructs a list of directory names where
     copybooks are looked up, for a given source file name, in a project with the
@@ -71,7 +75,19 @@ val libpath_for: filename:string -> t -> string list
     configuration [config]. *)
 val detect_copybook: filename:string -> t -> bool
 
-(** Cached representation *)
+(** {1 Intermediate conversion utilities}
+
+    Those may also raise {!ERROR}*)
+
+val cobol_config_from_dialect_name
+  : string
+  -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+
+val cobol_source_format
+  : string
+  -> Cobol_config.source_format_spec
+
+(** {1 Cached representation} *)
 
 exception BAD_CHECKSUM
 

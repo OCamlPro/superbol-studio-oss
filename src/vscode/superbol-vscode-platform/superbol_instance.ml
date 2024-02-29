@@ -65,16 +65,33 @@ let current_document_uri ?text_editor () =
 
 
 let write_project_config ?text_editor instance =
+  let write_project_config_for ?uri client =
+    let assoc = match uri with
+      | Some uri ->
+          ["uri", Jsonoo.Encode.string @@ Vscode.Uri.toString uri ()]
+      | None ->
+          [] (* send without URI: the server will consider every known folder *)
+    in
+    Vscode_languageclient.LanguageClient.sendRequest client ()
+      ~meth:"superbol/writeProjectConfiguration"
+      ~data:(Jsonoo.Encode.object_ assoc) |>
+    Promise.(then_ ~fulfilled:(fun _ -> return ()))
+  in
   match client instance, current_document_uri ?text_editor () with
-  | None, _ | _, None ->                             (* ignore; TODO; message? *)
-      Promise.return ()
-  | Some client, Some uri ->
-      Vscode_languageclient.LanguageClient.sendRequest client ()
-        ~meth:"superbol/writeProjectConfiguration"
-        ~data:(Jsonoo.Encode.(object_ [
-            "uri", string @@ Vscode.Uri.toString uri ();
-          ])) |>
-      Promise.(then_ ~fulfilled:(fun _ -> return ()))
+  | Some client, uri ->
+      write_project_config_for ?uri client
+  (* | Some client, None -> *)
+  (*     Promise.race_list @@ List.map begin fun workspace_folder -> *)
+  (*       let uri = Vscode.WorkspaceFolder.uri workspace_folder in *)
+  (*       write_project_config_for ~uri ~client *)
+  (*     end @@ Vscode.Workspace.workspaceFolders () *)
+  | None, _ ->
+      (* TODO: is there a way to activate the extension from here?  Starting the
+         client/instance seems to launch two distinct LSP server processes. *)
+      Promise.(then_ ~fulfilled:(fun _ -> return ())) @@
+      Vscode.Window.showErrorMessage ()
+        ~message:"The SuperBOL LSP client is not running; please retry after a \
+                  COBOL file has been opened"
 
 
 let get_project_config instance =

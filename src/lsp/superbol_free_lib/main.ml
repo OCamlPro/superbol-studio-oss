@@ -23,7 +23,6 @@ let public_subcommands = [
   Command_pp.cmd ;
   Command_lsp.cmd;
   Command_texi2rst.cmd ;
-  Command_indent_range.cmd;
   Command_indent_file.cmd;
   Command_check_syntax.cmd;
   Command_json_vscode.cmd;

@@ -109,11 +109,13 @@ let assoc_of_jsonrpc_struct params =
 
 let handle_write_project_config_command param registry =
   try
-    let assoc = assoc_of_jsonrpc_struct param in
-    let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
-    Ok (`Null,
-        Running (Lsp_server.on_write_project_config_command uri registry))
-  with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
+    let uri = match List.assoc_opt "uri" @@ assoc_of_jsonrpc_struct param with
+      | Some uri -> Some (Lsp.Uri.t_of_yojson uri)
+      | None -> None
+    in
+    let registry = Lsp_server.on_write_project_config_command ?uri registry in
+    Ok (`Null, Running registry)
+  with Yojson.Safe.Util.(Type_error _ | Undefined _) ->
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
@@ -313,7 +315,7 @@ let handle_references state (params: ReferenceParams.t) =
 
 (** {3 Formatting} *)
 
-let lsp_text_edit Cobol_indent.Type.{ lnum; offset_orig; offset_modif } =
+let lsp_text_edit Cobol_indent.Types.{ lnum; offset_orig; offset_modif } =
   let delta = offset_modif - offset_orig in
   let position = Position.create ~line:(lnum - 1) ~character:offset_orig in
   let range = Range.create ~start:position ~end_:position in
@@ -339,19 +341,20 @@ let handle_range_formatting registry params =
     Lsp_server.find_document doc registry
   in
   let range_to_indent =
-    Cobol_indent.Type.{
+    Cobol_indent.Types.{
       start_line = start.line + 1;
       end_line = end_.line + 1
     }
   in
   let edit_list =
-    Cobol_indent.indent_range
+    Cobol_indent.Main.indent
       ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
-      ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
+      ~config:project.config.indent_config
       ~filename:(Lsp.Uri.to_path doc.uri)
       ~contents:(Lsp.Text_document.text textdoc)
-      ~range:(Some range_to_indent)
+      ~range:range_to_indent
+      ()
   in
   Some (List.map lsp_text_edit edit_list)
 
@@ -361,13 +364,13 @@ let handle_formatting registry params =
     Lsp_server.find_document doc registry in
   try
     let editList =
-      Cobol_indent.indent_range
+      Cobol_indent.Main.indent
         ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~source_format:project.config.source_format
-        ~indent_config:(Some (Cobol_indent.config project.config.indent_config))
+        ~config:project.config.indent_config
         ~filename:(Lsp.Uri.to_path doc.uri)
         ~contents:(Lsp.Text_document.text textdoc)
-        ~range:None
+        ()
     in
     Some (List.map lsp_text_edit editList)
   with Failure msg ->
