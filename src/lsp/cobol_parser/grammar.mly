@@ -761,7 +761,8 @@ let symbolic_characters_clause :=
     an = for_alphanumeric_or_national_opt;                        (* +COB2002 *)
     scl = nel(~ = names; or_(IS,ARE)?; ~ = integers; < >);
     io = ro(pf(IN,name));
-    { SymbolicChars { category = an; characters = scl; source_charset = io } }
+    { SymbolicChars { category = an; character_maps = scl;
+                      source_charset = io } }
 
 let order_table_clause :=                                          (* +COB2002 *)
   | ORDER; TABLE; i = name; IS?; l = string_literal;
@@ -1210,8 +1211,7 @@ let format_clause :=                                               (* +COB2002 *
 let block_contains_clause :=
  | BLOCK; CONTAINS?; i = integer; io = io(pf(TO,integer));
    cr = file_block_contents;
-   { FileBlockContains { from = i; to_ = io;
-                         characters_or_records = cr; } }
+   { FileBlockContains { from = i; to_ = io; contents = cr } }
 
 let file_block_contents ==
   |             {FileBlockContainsCharacters}
@@ -1504,7 +1504,7 @@ let constant_record_clause := CONSTANT_RECORD
 
 let dynamic_length_clause :=
   | DYNAMIC; LENGTH?; ido = ro(name); io = ro(pf(LIMIT; IS?,integer));
-    { DataDynamicLength { dynamic_length_structure_name = ido; limit_is = io } }
+    { DataDynamicLength { structure_name = ido; limit = io } }
 
 let external_clause :=
   | or_(EXTERNAL,IS_EXTERNAL); ~ = as__strlit_; < >
@@ -1617,18 +1617,18 @@ let encoding_mode :=
   | DECIMAL_ENCODING; { DecimalEncoding }
 
 let encoding_endianness_opt :=
-  | { { encoding_mode = None; encoding_endianness = None } }
+  | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
 let encoding_endianness :=
   | ecm = encoding_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = None } }
+    { { encoding_mode = Some ecm; endianness_mode = None } }
   | edm = endianness_mode;
-    { {encoding_mode = None; encoding_endianness = Some edm } }
+    { { encoding_mode = None; endianness_mode = Some edm } }
   | ecm = encoding_mode; edm = endianness_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = Some edm } }
+    { { encoding_mode = Some ecm; endianness_mode = Some edm } }
   | edm = endianness_mode; ecm = encoding_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = Some edm } }
+    { { encoding_mode = Some ecm; endianness_mode = Some edm } }
 
 let object_reference_kind :=
   | f = bo(FACTORY; OF?; {}); ACTIVE_CLASS;

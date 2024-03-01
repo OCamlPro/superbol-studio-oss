@@ -110,13 +110,13 @@ and special_names_clause =
   | AlphabetName of                                       (* Multiple allowed *)
       {
         alphabet_name: name with_loc;
-        category: alphanumeric_or_national;
+        category: character_category;
         characters: character_set;
       }
   | ClassName of                                          (* Multiple allowed *)
       {
         class_name: name with_loc;
-        category: alphanumeric_or_national;
+        category: character_category;
         characters: character_range list;
         source_charset: name with_loc option;
       }
@@ -146,8 +146,8 @@ and special_names_clause =
       }
   | SymbolicChars of                                      (* Multiple allowed *)
       {
-        category: alphanumeric_or_national;
-        characters: (name with_loc list * integer list) list; (* same lengths *)
+        category: character_category;
+        character_maps: symbolic_characters_map list;
         source_charset: name with_loc option;
       }
   | OrderTable of                                                 (* +COB2002 *)
@@ -156,7 +156,10 @@ and special_names_clause =
         cultural_ordering: strlit;
       }
 
-and alphanumeric_or_national =
+and symbolic_characters_map =
+  name with_loc list * integer list                   (* same lengths (NB: ?) *)
+
+and character_category =
   | Alphanumeric
   | National
 
@@ -515,11 +518,11 @@ let pp_repository_paragraph ppf rps =
   Fmt.pf ppf "REPOSITORY.";
   Fmt.(list ~sep:nop (sp ++ pp_specifier ++ any ".")) ppf rps
 
-let pp_alphanumeric_or_national ppf = function
+let pp_character_category ppf = function
   | Alphanumeric -> Fmt.pf ppf "ALPHANUMERIC"
   | National -> Fmt.pf ppf "NATIONAL"
 
-let pp_alphanumeric_or_national_opt ppf = function
+let pp_character_category_opt ppf = function
   | Alphanumeric -> ()
   | National -> Fmt.pf ppf " NATIONAL"
 
@@ -544,45 +547,48 @@ let pp_character_set ppf = function
   | CharSetUTF_16 -> Fmt.pf ppf "UTF-16"
   | CharSetCharacters crs -> Fmt.(list ~sep:sp pp_characters_range) ppf crs
 
+let pp_symbolic_characters_map ppf (names, ints) =
+  let pp_names = Fmt.(list ~sep:sp pp_name') in
+  let pp_integers = Fmt.(list ~sep:sp pp_integer) in
+  Fmt.(pair ~sep:(any " IS ") pp_names pp_integers) ppf (names, ints)
+
 let pp_special_names_clause ppf = function
   | AlphabetName { alphabet_name = an; category = c; characters = cs } ->
-    Fmt.pf ppf "ALPHABET %a%a IS %a"
-      pp_name' an
-      pp_alphanumeric_or_national_opt c
-      pp_character_set cs
-  | ClassName {
-    class_name = cn; category = c; characters = cs; source_charset = sc
-    } ->
+      Fmt.pf ppf "ALPHABET %a%a IS %a"
+        pp_name' an
+        pp_character_category_opt c
+        pp_character_set cs
+  | ClassName { class_name = cn; category = c; characters = cs;
+                source_charset = sc } ->
       Fmt.pf ppf "CLASS %a %a IS %a%a"
         pp_name' cn
-        pp_alphanumeric_or_national c
+        pp_character_category c
         Fmt.(list ~sep:nop (sp ++ pp_character_range)) cs
         Fmt.(option (any " IN " ++ pp_name')) sc
   | CRTStatus n ->
-    Fmt.pf ppf "CRT STATUS IS %a" pp_name' n
+      Fmt.pf ppf "CRT STATUS IS %a" pp_name' n
   | CurrencySign { sign; picture_symbol = ps } ->
-    Fmt.pf ppf "CURRENCY %a%a" pp_strlit sign
-      Fmt.(option (any " PICTURE " ++ pp_strlit ++ any " SYMBOL")) ps
+      Fmt.pf ppf "CURRENCY %a%a" pp_strlit sign
+        Fmt.(option (any " PICTURE " ++ pp_strlit ++ any " SYMBOL")) ps
   | Cursor n -> Fmt.pf ppf "CURSOR %a" pp_name' n
   | DecimalPointIsComma -> Fmt.pf ppf "DECIMAL-POINT IS COMMA"
   | DynLenStruct { name; kind } ->
-    Fmt.pf ppf "DYNAMIC LENGTH %a IS %a" pp_name' name pp_dyn_len_struct_kind kind
+      Fmt.pf ppf "DYNAMIC LENGTH %a IS %a"
+        pp_name' name pp_dyn_len_struct_kind kind
   | SpecialNameLocale { locale_name = ln; external_name = en } ->
-    Fmt.pf ppf "LOCALE %a IS %a" pp_name' ln pp_name_or_string en
-  | MnemonicName { implementor_name = n; mnemonic_name = mn; status = s} ->
-    Fmt.pf ppf "%a%a%a"
-      pp_name' n
-      Fmt.(option (any " IS " ++ pp_name')) mn
-      Fmt.(option (any " " ++ pp_status_switch)) s
-  | SymbolicChars { category = c; characters = cs; source_charset = sc} ->
-    let pp_names = Fmt.(list ~sep:sp pp_name') in
-    let pp_integers = Fmt.(list ~sep:sp pp_integer) in
-    Fmt.pf ppf "SYMBOLIC %a%a%a"
-      pp_alphanumeric_or_national_opt c
-      Fmt.(sp ++ list ~sep:sp (pair ~sep:(any " IS ") pp_names pp_integers)) cs
-      Fmt.(option (any " IN " ++ pp_name')) sc
+      Fmt.pf ppf "LOCALE %a IS %a" pp_name' ln pp_name_or_string en
+  | MnemonicName { implementor_name = n; mnemonic_name = mn; status = s } ->
+      Fmt.pf ppf "%a%a%a"
+        pp_name' n
+        Fmt.(option (any " IS " ++ pp_name')) mn
+        Fmt.(option (any " " ++ pp_status_switch)) s
+  | SymbolicChars { category = c; character_maps = cs; source_charset = sc } ->
+      Fmt.pf ppf "SYMBOLIC %a%a%a"
+        pp_character_category_opt c
+        Fmt.(sp ++ list ~sep:sp pp_symbolic_characters_map) cs
+        Fmt.(option (any " IN " ++ pp_name')) sc
   | OrderTable { ordering_name = on; cultural_ordering = co } ->
-    Fmt.pf ppf "ORDER TABLE %a IS %a" pp_name' on pp_strlit co
+      Fmt.pf ppf "ORDER TABLE %a IS %a" pp_name' on pp_strlit co
 
 let pp_special_names_paragraph ppf sncs =
   Fmt.pf ppf "SPECIAL-NAMES.";

@@ -394,12 +394,6 @@ let%expect_test "formatting-request-whole-program" =
   end;
   end_with_postproc [%expect.output];
   [%expect {|
-    misc_sections_visitor.ml:0:
-      (Cobol_ptree__Misc_sections_visitor.fold_select_clause): missing visitor
-      implementation
-    data_sections_visitor.ml:0:
-      (Cobol_ptree__Data_sections_visitor.fold_file_section): missing visitor
-      implementation
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     IDENTIFICATION DIVISION.
     PROGRAM-ID. MACESDS.

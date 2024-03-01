@@ -318,13 +318,13 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         diags, Some (Float_binary { width = `W128;
                                     endian = endian e })
 
-    | FloatDecimal16 { encoding_endianness = e;
+    | FloatDecimal16 { endianness_mode = e;
                        encoding_mode = c } ->
         diags, Some (Float_decimal { width = `W16;
                                      endian = endian e;
                                      encoding = encoding c })
 
-    | FloatDecimal34 { encoding_endianness = e;
+    | FloatDecimal34 { endianness_mode = e;
                        encoding_mode = c } ->
         diags, Some (Float_decimal { width = `W34;
                                      endian = endian e;

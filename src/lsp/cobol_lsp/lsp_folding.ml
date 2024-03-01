@@ -74,11 +74,12 @@ let ranges_in ~filename ptree group =
 
       method! fold_environment_division' = wide_region
       method! fold_configuration_section' = wide_region
-      (* method! fold_source_computer_paragraph' = region *)
-      (* method! fold_object_computer_paragraph' = region *)
-      (* method! fold_special_names_paragraph' = region *)
+      method! fold_input_output_section' = wide_region
+
+      method! fold_source_computer_paragraph' = leaf_region
+      method! fold_object_computer_paragraph' = leaf_region
+      method! fold_special_names_paragraph' = leaf_region
       method! fold_repository_paragraph' = leaf_region
-      method! fold_input_output_section' = leaf_region
       method! fold_file_control_paragraph' = leaf_region
       method! fold_io_control_paragraph' = leaf_region
 

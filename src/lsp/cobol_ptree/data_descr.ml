@@ -107,35 +107,7 @@ type data_level = int
 
 let pp_data_level = Fmt.fmt "%02d"
 
-type rename_item =
-  {
-    rename_level: data_level with_loc;
-    rename_to: name with_loc;
-    rename_from: qualname with_loc;
-    rename_thru: qualname with_loc option;
-  }
-[@@deriving ord]
-
-let pp_rename_item ppf { rename_level = rl; rename_to = rto;
-                         rename_from = from; rename_thru = thru } =
-  Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
-    (pp_with_loc pp_data_level) rl
-    pp_name' rto
-    pp_qualname' from
-    Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname')) thru
-
-
-type condition_name_item =
-  {
-    condition_name_level: data_level with_loc; (* is always 88 *)
-    condition_name: name with_loc;
-    condition_name_values: condition_name_value list;
-    condition_name_alphabet: name with_loc option;
-    condition_name_when_false: literal option;
-  }
-[@@deriving ord]
-
-and condition_name_value =
+type condition_name_value =
   {
     condition_name_value: literal with_loc;
     condition_name_through: literal with_loc option;
@@ -148,18 +120,6 @@ let pp_condition_name_value ppf
   match cnt with
   | Some cnt -> Fmt.pf ppf "%a THROUGH %a" pp_literal' cnv pp_literal' cnt
   | None -> pp_literal' ppf cnv
-
-let pp_condition_name_item ppf
-  { condition_name_level = cnl; condition_name = cn;
-    condition_name_values = cnvl; condition_name_alphabet = cna;
-    condition_name_when_false = cnwf }
-=
-  Fmt.pf ppf "%a %a@ VALUE %a%a%a."
-    (pp_with_loc pp_data_level) cnl
-    pp_name' cn
-    Fmt.(list ~sep:comma pp_condition_name_value) cnvl
-    Fmt.(option (any "@ IN " ++ pp_name')) cna
-    Fmt.(option (any "@ WHEN FALSE " ++ pp_literal)) cnwf
 
 
 type data_name =
@@ -404,7 +364,7 @@ and encoding_mode =
 and encoding_endianness =
   {
     encoding_mode: encoding_mode option;
-    encoding_endianness: endianness_mode option;
+    endianness_mode: endianness_mode option;
   }
 
 and object_reference_kind =
@@ -431,8 +391,8 @@ let pp_encoding_mode ppf = function
   | BinaryEncoding -> Fmt.pf ppf "BINARY-ENCODING"
   | DecimalEncoding -> Fmt.pf ppf "DECIMAL-ENCODING"
 
-let pp_encoding_endianness ppf { encoding_mode; encoding_endianness } =
-  match encoding_mode, encoding_endianness with
+let pp_encoding_endianness ppf { encoding_mode; endianness_mode } =
+  match encoding_mode, endianness_mode with
   | None, None -> ()
   | Some em, None -> pp_encoding_mode ppf em
   | None, Some ee -> pp_endianness_mode ppf ee
@@ -828,16 +788,7 @@ let pp_report_clause ppf = function
       Fmt.(option (any "@ FOOTING " ++ pp_integer)) footing
 
 
-type constant_item =
-  {
-    constant_level: data_level with_loc;      (* is a constant *)     (* TODO: check \in {"1", "01"} *)
-    constant_name: name with_loc;
-    constant_global: bool;
-    constant_value: constant_value with_loc;
-  }
-[@@deriving ord]
-
-and constant_value =
+type constant_value =
   | ConstExpr of expression                                 (* or plain ident *)
   | ConstByteLength of name with_loc
   | ConstLength of name with_loc
@@ -849,15 +800,6 @@ let pp_constant_value ppf = function
   | ConstByteLength n -> Fmt.pf ppf "AS BYTE LENGTH %a" pp_name' n
   | ConstLength n -> Fmt.pf ppf "AS LENGTH %a" pp_name' n
   | ConstFrom n -> Fmt.pf ppf "FROM %a" pp_name' n
-
-let pp_constant_item ppf {
-  constant_level; constant_name; constant_global; constant_value
-} =
-  Fmt.pf ppf "%a%a@ CONSTANT@ %a@ %a."
-    (pp_with_loc pp_data_level) constant_level
-    (pp_with_loc pp_name) constant_name
-    Fmt.(if constant_global then any "@ IS GLOBAL" else nop) ()
-    (pp_with_loc pp_constant_value) constant_value
 
 (* --- COMMUNICATION SECTION --- *)
 
@@ -906,3 +848,19 @@ let pp_comm_clause ppf = function
   | CommStatusKey n -> Fmt.pf ppf "STATUS KEY IS %a" pp_name' n
   | CommEndKey n -> Fmt.pf ppf "END KEY IS %a" pp_name' n
   | CommErrorKey n -> Fmt.pf ppf "ERROR KEY IS %a" pp_name' n
+
+type comm_direction =
+  | CommInput of { initial: bool; items: data_name with_loc list }
+  | CommOutput
+  | CommIO of { initial: bool; items: name with_loc list }
+[@@deriving ord]
+
+let pp_comm_direction ppf = function
+  | CommInput { initial; items = _ } ->
+      if initial then Fmt.pf ppf "INITIAL ";
+      Fmt.pf ppf "INPUT"
+  | CommOutput ->
+      Fmt.pf ppf "OUTPUT"
+  | CommIO { initial; items = _ } ->
+      if initial then Fmt.pf ppf "INITIAL ";
+      Fmt.pf ppf "I-O"

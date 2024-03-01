@@ -442,6 +442,17 @@ let fold_ident_or_strlit (v: _ #folder) : ident_or_strlit -> 'a -> 'a = function
   | Fig _
   | StrConcat _ as s -> fold_strlit v s
 
+let fold_name_or_string (v: _ #folder) : name_or_string -> _ = function
+  | Name n -> fold_name' v n
+  | Alphanum _
+  | National _
+  | Fig _
+  | StrConcat _ as s -> fold_strlit v s
+
+let fold_name_or_alphanum (v: _ #folder) : name_or_alphanum -> _ = function
+  | Name n -> fold_name' v n
+  | Alphanum _ as a -> fold_alphanum v a
+
 let fold_qualname_or_alphanum (v: _ #folder) : qualname_or_alphanum -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
   | Alphanum _ as a -> fold_alphanum v a
@@ -462,6 +473,13 @@ let fold_qualname_or_literal (v: _ #folder) : qualname_or_literal -> _ = functio
   | Alphanum _
   | StrConcat _
   | Concat _ as s -> fold_literal v s
+
+let fold_strlit_or_intlit (v: _ #folder) : strlit_or_intlit -> 'a -> 'a = function
+  | Alphanum _
+  | National _
+  | Fig _
+  | StrConcat _ as s -> fold_strlit v s
+  | Integer _ | NumFig _ as i -> fold_intlit v i
 
 let fold_qualname_opt (v: _ #folder) = fold_option ~fold:fold_qualname v
 let fold_qualname'_opt (v: _ #folder) = fold_option ~fold:fold_qualname' v

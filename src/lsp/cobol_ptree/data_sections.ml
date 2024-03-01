@@ -51,8 +51,8 @@ type data_clause =
   | DataValue of data_value_clause
   | DataDynamicLength of                                        (* +COB2002 *)
       {
-        dynamic_length_structure_name: name with_loc option;
-        limit_is: integer option;
+        structure_name: name with_loc option;
+        limit: integer option;
       }
   | DataExternal of external_clause
   | DataGlobal
@@ -82,7 +82,7 @@ let pp_data_clause ppf = function
   | DataOccurs doc -> pp_data_occurs_clause ppf doc
   | DataType n -> Fmt.pf ppf "TYPE %a" (pp_with_loc pp_name) n
   | DataValue dvc -> pp_data_value_clause ppf dvc
-  | DataDynamicLength { dynamic_length_structure_name = sn; limit_is = l } ->
+  | DataDynamicLength { structure_name = sn; limit = l } ->
       Fmt.pf ppf "DYNAMIC%a%a"
         Fmt.(option (sp ++ pp_with_loc pp_name)) sn
         Fmt.(option (any "@ LIMIT IS@ " ++ pp_integer)) l
@@ -241,6 +241,63 @@ let pp_data_item ppf { data_level = lvl; data_name = nc;
                        data_clauses = cls } =
   pp_item (pp_with_loc pp_data_clause) ppf lvl.payload nc cls
 
+type constant_item =
+  {
+    constant_level: data_level with_loc;      (* is a constant *)     (* TODO: check \in {"1", "01"} *)
+    constant_name: name with_loc;
+    constant_global: bool;
+    constant_value: constant_value with_loc;
+  }
+[@@deriving ord]
+
+let pp_constant_item ppf {
+  constant_level; constant_name; constant_global; constant_value
+} =
+  Fmt.pf ppf "%a%a@ CONSTANT@ %a@ %a."
+    (pp_with_loc pp_data_level) constant_level
+    (pp_with_loc pp_name) constant_name
+    Fmt.(if constant_global then any "@ IS GLOBAL" else nop) ()
+    (pp_with_loc pp_constant_value) constant_value
+
+type rename_item =
+  {
+    rename_level: data_level with_loc;
+    rename_to: name with_loc;
+    rename_from: qualname with_loc;
+    rename_thru: qualname with_loc option;
+  }
+[@@deriving ord]
+
+let pp_rename_item ppf { rename_level = rl; rename_to = rto;
+                         rename_from = from; rename_thru = thru } =
+  Fmt.pf ppf "%a %a@;<1 2>RENAMES %a%a."
+    (pp_with_loc pp_data_level) rl
+    pp_name' rto
+    pp_qualname' from
+    Fmt.(option (any "@;<1 2>THROUGH " ++ pp_qualname')) thru
+
+type condition_name_item =
+  {
+    condition_name_level: data_level with_loc; (* is always 88 *)
+    condition_name: name with_loc;
+    condition_name_values: condition_name_value list;
+    condition_name_alphabet: name with_loc option;
+    condition_name_when_false: literal option;
+  }
+[@@deriving ord]
+
+let pp_condition_name_item ppf
+  { condition_name_level = cnl; condition_name = cn;
+    condition_name_values = cnvl; condition_name_alphabet = cna;
+    condition_name_when_false = cnwf }
+=
+  Fmt.pf ppf "%a %a@ VALUE %a%a%a."
+    (pp_with_loc pp_data_level) cnl
+    pp_name' cn
+    Fmt.(list ~sep:comma pp_condition_name_value) cnvl
+    Fmt.(option (any "@ IN " ++ pp_name')) cna
+    Fmt.(option (any "@ WHEN FALSE " ++ pp_literal)) cnwf
+
 type screen_item =
   {
     screen_level: int;
@@ -370,7 +427,7 @@ and file_fd_clause =
       {
         from: integer;
         to_: integer option;
-        characters_or_records: file_block_contents;
+        contents: file_block_contents;
       }
   | FileRecord of record_clause
   | FileLabel of label_clause
@@ -390,11 +447,11 @@ let pp_file_fd_clause ppf = function
   | FileExternal ec -> pp_external_clause ppf ec
   | FileGlobal -> Fmt.pf ppf "GLOBAL"
   | FileFormat fc -> pp_format_clause ppf fc
-  | FileBlockContains { from; to_; characters_or_records } ->
+  | FileBlockContains { from; to_; contents } ->
       Fmt.pf ppf "BLOCK CONTAINS %a%a@ %a"
         pp_integer from
         Fmt.(option (any "@ TO " ++ pp_integer)) to_
-        pp_file_block_contents characters_or_records
+        pp_file_block_contents contents
   | FileRecord rc -> pp_record_clause ppf rc
   | FileLabel lc -> pp_label_clause ppf lc
   | FileValueOf vcl ->
@@ -465,22 +522,7 @@ type communication_descr =
     comm_items: communication_item_descr with_loc list;
     comm_direction: comm_direction;
   }
-
-and comm_direction =
-  | CommInput of { initial: bool; items: data_name with_loc list }
-  | CommOutput
-  | CommIO of { initial: bool; items: name with_loc list }
 [@@deriving ord]
-
-let pp_comm_direction ppf = function
-  | CommInput { initial; items = _ } ->
-      if initial then Fmt.pf ppf "INITIAL ";
-      Fmt.pf ppf "INPUT"
-  | CommOutput ->
-      Fmt.pf ppf "OUTPUT"
-  | CommIO { initial; items = _ } ->
-      if initial then Fmt.pf ppf "INITIAL ";
-      Fmt.pf ppf "I-O"
 
 let pp_comm_direction_items ppf = function
   | CommInput { initial = _; items } ->
