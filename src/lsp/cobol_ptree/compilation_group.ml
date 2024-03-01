@@ -14,6 +14,7 @@
 open Common
 open Terms
 open Misc_sections
+open Env_division
 open Data_descr
 open Data_division
 open Proc_division

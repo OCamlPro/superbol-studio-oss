@@ -28,7 +28,6 @@ class virtual ['a] folder = object
   inherit ['a] Operands_visitor.folder
   inherit! ['a] Data_descr_visitor.folder
   inherit! ['a] Data_sections_visitor.folder
-  inherit! ['a] Misc_sections_visitor.folder
 
   method fold_statement'          : (statement with_loc      , 'a) fold = default
   method fold_statements'         : (statements with_loc     , 'a) fold = default
@@ -526,7 +525,7 @@ let fold_merge' (v: _ #folder) =
       >> fold_list v merge_keys
         ~fold:Data_descr_visitor.fold_sort_spec
       >> fold_option v merge_collating
-        ~fold:Misc_sections_visitor.fold_alphabet_specification
+        ~fold:Operands_visitor.fold_alphabet_specification
       >> fold_name'_list v merge_using
       >> fold_merge_or_sort_target v merge_target
     end
@@ -613,7 +612,7 @@ let fold_sort' (v: _ #folder) =
             ~fold:Data_descr_visitor.fold_sort_spec
           >> fold_bool v duplicate_in_order
           >> fold_option v collating
-            ~fold:Misc_sections_visitor.fold_alphabet_specification
+            ~fold:Operands_visitor.fold_alphabet_specification
           >> fold_sort_source v source
           >> fold_merge_or_sort_target v target
       | SortTable { table; keys; duplicate_in_order; collating } -> x
@@ -622,7 +621,7 @@ let fold_sort' (v: _ #folder) =
             ~fold:Data_descr_visitor.fold_sort_spec
           >> fold_bool v duplicate_in_order
           >> fold_option v collating
-            ~fold:Misc_sections_visitor.fold_alphabet_specification
+            ~fold:Operands_visitor.fold_alphabet_specification
     end
 
 let fold_stop' (v: _ #folder) =

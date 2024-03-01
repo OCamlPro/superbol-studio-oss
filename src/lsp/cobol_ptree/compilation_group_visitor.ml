@@ -18,6 +18,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
+open Env_division_visitor
 open Data_descr_visitor
 open Misc_sections_visitor
 open Data_division_visitor
@@ -30,6 +31,7 @@ let partial x = Cobol_common.Visitor.partial __FILE__ x
 
 class virtual ['a] folder = object
   inherit ['a] Misc_sections_visitor.folder
+  inherit! ['a] Env_division_visitor.folder
   inherit! ['a] Data_division_visitor.folder
   inherit! ['a] Proc_division_visitor.folder
   method fold_compilation_group: (compilation_group, 'a) fold = default

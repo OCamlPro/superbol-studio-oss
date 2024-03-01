@@ -434,7 +434,7 @@ and file_fd_clause =
   | FileValueOf of valueof_clause list
   | FileData of file_data_clause
   | FileLinage of file_linage_clause
-  | FileCodeSet of Misc_sections.alphabet_specification
+  | FileCodeSet of Operands.alphabet_specification
   | FileReport of name with_loc list
 
 and file_sd_clause =
@@ -460,7 +460,7 @@ let pp_file_fd_clause ppf = function
   | FileData fdc -> pp_file_data_clause ppf fdc
   | FileLinage flc -> pp_file_linage_clause ppf flc
   | FileCodeSet als ->
-      Fmt.pf ppf "CODE-SET %a" Misc_sections.pp_alphabet_specification als
+      Fmt.pf ppf "CODE-SET %a" Operands.pp_alphabet_specification als
   | FileReport [ n ] ->
       Fmt.pf ppf "REPORT IS %a" (pp_with_loc pp_name) n
   | FileReport ns ->

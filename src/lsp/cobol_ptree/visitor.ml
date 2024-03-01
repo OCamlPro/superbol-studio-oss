@@ -14,6 +14,7 @@
 include Terms_visitor
 include Operands_visitor
 include Misc_sections_visitor
+include Env_division_visitor
 include Data_descr_visitor
 include Data_sections_visitor
 include Data_division_visitor

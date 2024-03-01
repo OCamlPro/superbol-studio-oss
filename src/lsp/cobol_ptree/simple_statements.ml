@@ -405,7 +405,7 @@ type merge_stmt =
   {
     merge_file: name with_loc;
     merge_keys: Data_descr.sort_spec list;
-    merge_collating: Misc_sections.alphabet_specification option;
+    merge_collating: alphabet_specification option;
     merge_using: name with_loc list;
     merge_target: merge_or_sort_target;
   }
@@ -439,7 +439,7 @@ let pp_merge_stmt ppf { merge_file = mf;
     ) mk
     Fmt.(option (
         sp ++ const words "COLLATING SEQUENCE" ++ sp ++
-        Misc_sections.pp_alphabet_specification)
+        pp_alphabet_specification)
       ) mc
     Fmt.(
       if mu == [] then
@@ -684,7 +684,7 @@ type sort_stmt =
         file: qualident;
         keys: Data_descr.sort_spec list;                         (* Not empty *)
         duplicate_in_order: bool;
-        collating: Misc_sections.alphabet_specification option;
+        collating: alphabet_specification option;
         source: sort_source;
         target: merge_or_sort_target;
       }
@@ -693,7 +693,7 @@ type sort_stmt =
         table: qualident;
         keys: Data_descr.sort_spec list;                      (* Can be empty *)
         duplicate_in_order: bool;
-        collating: Misc_sections.alphabet_specification option;
+        collating: alphabet_specification option;
       }
 [@@deriving ord]
 
@@ -717,7 +717,7 @@ let pp_sort_stmt ppf = function
       Fmt.(list ~sep:sp Data_descr.pp_sort_spec) keys
       Fmt.(if duplicate_in_order then any "@ DUPLICATES" else nop) ()
       Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
-                   Misc_sections.pp_alphabet_specification)) collating
+                   pp_alphabet_specification)) collating
       pp_sort_source source
       pp_merge_or_sort_target target
   | SortTable { table; keys; duplicate_in_order; collating } ->
@@ -725,7 +725,7 @@ let pp_sort_stmt ppf = function
     if keys != [] then Fmt.(sp ++ list ~sep:sp Data_descr.pp_sort_spec) ppf keys;
     if duplicate_in_order then Fmt.pf ppf "@ DUPLICATES";
     Fmt.(option (any "@ COLLATING SEQUENCE@ " ++
-                 Misc_sections.pp_alphabet_specification)) ppf collating
+                 pp_alphabet_specification)) ppf collating
 
 
 (* STOP *)

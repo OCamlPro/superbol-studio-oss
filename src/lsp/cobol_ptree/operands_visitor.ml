@@ -25,6 +25,7 @@ let partial x = Cobol_common.Visitor.partial __FILE__ __MODULE__ x
 
 class ['a] folder = object
   inherit ['a] Terms_visitor.folder
+  method fold_alphabet_specification   : (alphabet_specification    , 'a) fold = default
   method fold_basic_arithmetic_operands: (basic_arithmetic_operands , 'a) fold = default
   method fold_call_using_clause        : (call_using_clause         , 'a) fold = default
   method fold_call_using_clause'       : (call_using_clause with_loc, 'a) fold = default
@@ -61,6 +62,15 @@ class ['a] folder = object
   method fold_float_content            : (float_content             , 'a) fold = default
 
 end
+
+(* --- *)
+
+let fold_alphabet_specification (v: _ #folder) =
+  handle v#fold_alphabet_specification
+    ~continue:begin fun { alphanumeric; national } x -> x
+      >> fold_option ~fold:fold_name' v alphanumeric
+      >> fold_option ~fold:fold_name' v national
+    end
 
 let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
