@@ -359,7 +359,7 @@ function_unit [@cost 999]:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(procedure_division)
+   pdo = ro(loc(procedure_division))
    END FUNCTION ef = name "."
    { let _, (name, as_, is_proto) = fid in
      { function_name = name;
@@ -396,7 +396,7 @@ factory_definition:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END FACTORY "."
     { { factory_implements = snd fp;
         factory_options = opo;
@@ -409,7 +409,7 @@ instance_definition:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END OBJECT "."
     { { instance_implements = snd op;
         instance_options = opo;
@@ -421,7 +421,7 @@ interface_definition [@cost 999]:
  | iid = interface_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END INTERFACE ei = name "."
    { let _, (interface_name, interface_as,
              interface_inherits, interface_usings) = iid in
@@ -434,12 +434,12 @@ interface_definition [@cost 999]:
        interface_methods = pdo;
        interface_end_name = ei } }
 
-method_definition: (* Note: used in PROCEDURE DIVISION, see below *)
+method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below *)
  | mid = method_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(procedure_division)
+   pdo = ro(loc(procedure_division))
    END METHOD em = name "."
    { let _, (method_name, method_kind,
              method_override, method_final) = mid in

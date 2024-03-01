@@ -131,8 +131,8 @@ let contexts_for_state_num: int -> _ list = function
   | 3171 -> [Allocate_stmt]
   | 3185 -> [Accept_stmt]
   | 3898 -> [Program_id_paragraph]
-  | 4028 -> [Object_paragraph]
-  | 4038 -> [Factory_paragraph]
+  | 4026 -> [Object_paragraph]
+  | 4036 -> [Factory_paragraph]
   | _ -> []
 
 let contexts: type k. k lr1state -> _ list = fun s ->

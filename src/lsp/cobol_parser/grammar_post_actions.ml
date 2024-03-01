@@ -18,6 +18,9 @@ let post_production_num
       match incoming_symbol state, prod_num with
       | N N__assign_external_, 2 ->
            Post_pending ((fun () -> "EXTERNAL") value)
+      | N N_special_names_clause, 2095 -> Post_special_names value
+      | N N_special_names_clause, 2096 -> Post_special_names value
+      | N N_special_names_clause, 2097 -> Post_special_names value
       | N N_special_names_clause, 2098 -> Post_special_names value
       | N N_special_names_clause, 2099 -> Post_special_names value
       | N N_special_names_clause, 2100 -> Post_special_names value
@@ -26,9 +29,6 @@ let post_production_num
       | N N_special_names_clause, 2103 -> Post_special_names value
       | N N_special_names_clause, 2104 -> Post_special_names value
       | N N_special_names_clause, 2105 -> Post_special_names value
-      | N N_special_names_clause, 2106 -> Post_special_names value
-      | N N_special_names_clause, 2107 -> Post_special_names value
-      | N N_special_names_clause, 2108 -> Post_special_names value
       | _ -> NoPost
 
 let post_production
