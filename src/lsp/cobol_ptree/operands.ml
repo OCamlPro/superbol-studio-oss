@@ -14,6 +14,28 @@
 open Common
 open Terms
 
+(* Used in ENVIRONMENT, and SORT/MERGE statements *)
+
+type alphabet_specification =                      (* At least one is required *)
+  {
+    alphanumeric: name with_loc option;
+    national: name with_loc option;
+  }
+[@@deriving ord]
+
+let pp_character_classification pp ppf (alphanumeric, national) =
+  match alphanumeric, national with
+  | Some a, Some n ->
+    Fmt.pf ppf "FOR ALPHANUMERIC %a@ FOR NATIONAL %a" pp a pp n
+  | Some a, None ->
+    Fmt.pf ppf "FOR ALPHANUMERIC %a" pp a
+  | None, Some n ->
+    Fmt.pf ppf "FOR NATIONAL %a" pp n
+  | None, None -> (* Type invariant *) assert false
+
+let pp_alphabet_specification ppf { alphanumeric; national } =
+  pp_character_classification pp_name' ppf (alphanumeric, national)
+
 (* ACCEPT, DISPLAY *)
 type position =
   | LinePosition of ident_or_intlit

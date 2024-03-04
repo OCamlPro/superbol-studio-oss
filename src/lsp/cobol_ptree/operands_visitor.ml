@@ -25,6 +25,7 @@ let partial x = Cobol_common.Visitor.partial __FILE__ __MODULE__ x
 
 class ['a] folder = object
   inherit ['a] Terms_visitor.folder
+  method fold_alphabet_specification   : (alphabet_specification    , 'a) fold = default
   method fold_basic_arithmetic_operands: (basic_arithmetic_operands , 'a) fold = default
   method fold_call_using_clause        : (call_using_clause         , 'a) fold = default
   method fold_call_using_clause'       : (call_using_clause with_loc, 'a) fold = default
@@ -33,6 +34,9 @@ class ['a] folder = object
   method fold_divide_operands          : (divide_operands           , 'a) fold = default
   method fold_file_option              : (file_option               , 'a) fold = default
   method fold_multiply_operands        : (multiply_operands         , 'a) fold = default
+  method fold_mcs_awaiting_item        : (mcs_awaiting_item         , 'a) fold = default
+  method fold_mcs_kind                 : (mcs_kind                  , 'a) fold = default
+  method fold_mcs_command_operands     : (mcs_command_operands      , 'a) fold = default
   method fold_open_mode                : (open_mode                 , 'a) fold = default
   method fold_position                 : (position                  , 'a) fold = default
   method fold_raising                  : (raising                   , 'a) fold = default
@@ -58,6 +62,15 @@ class ['a] folder = object
   method fold_float_content            : (float_content             , 'a) fold = default
 
 end
+
+(* --- *)
+
+let fold_alphabet_specification (v: _ #folder) =
+  handle v#fold_alphabet_specification
+    ~continue:begin fun { alphanumeric; national } x -> x
+      >> fold_option ~fold:fold_name' v alphanumeric
+      >> fold_option ~fold:fold_name' v national
+    end
 
 let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
@@ -117,6 +130,21 @@ let fold_multiply_operands (v: _ #folder) =
           >> fold_ident_or_numlit v multiplier
           >> fold_ident_or_numlit v multiplicand
           >> fold_rounded_idents v targets
+    end
+
+let fold_mcs_awaiting_item (v: _ #folder) =
+  leaf v#fold_mcs_awaiting_item
+
+let fold_mcs_kind (v: _ #folder) =
+  leaf v#fold_mcs_kind
+
+let fold_mcs_command_operands (v: _ #folder) =
+  handle v#fold_mcs_command_operands
+    ~continue:begin fun { mcs_command_kind; mcs_command_target;
+                          mcs_command_key } x -> x
+      >> fold_mcs_kind v mcs_command_kind
+      >> fold_name' v mcs_command_target
+      >> fold_option v ~fold:fold_ident_or_alphanum mcs_command_key
     end
 
 let fold_open_mode (v: _ #folder) =

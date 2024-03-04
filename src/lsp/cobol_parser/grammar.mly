@@ -359,7 +359,7 @@ function_unit [@cost 999]:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(procedure_division)
+   pdo = ro(loc(procedure_division))
    END FUNCTION ef = name "."
    { let _, (name, as_, is_proto) = fid in
      { function_name = name;
@@ -396,7 +396,7 @@ factory_definition:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END FACTORY "."
     { { factory_implements = snd fp;
         factory_options = opo;
@@ -409,7 +409,7 @@ instance_definition:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END OBJECT "."
     { { instance_implements = snd op;
         instance_options = opo;
@@ -421,7 +421,7 @@ interface_definition [@cost 999]:
  | iid = interface_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   pdo = ro(object_procedure_division)
+   pdo = ro(loc(object_procedure_division))
    END INTERFACE ei = name "."
    { let _, (interface_name, interface_as,
              interface_inherits, interface_usings) = iid in
@@ -434,12 +434,12 @@ interface_definition [@cost 999]:
        interface_methods = pdo;
        interface_end_name = ei } }
 
-method_definition: (* Note: used in PROCEDURE DIVISION, see below *)
+method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below *)
  | mid = method_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
-   pdo = ro(procedure_division)
+   pdo = ro(loc(procedure_division))
    END METHOD em = name "."
    { let _, (method_name, method_kind,
              method_override, method_final) = mid in
@@ -761,7 +761,8 @@ let symbolic_characters_clause :=
     an = for_alphanumeric_or_national_opt;                        (* +COB2002 *)
     scl = nel(~ = names; or_(IS,ARE)?; ~ = integers; < >);
     io = ro(pf(IN,name));
-    { SymbolicChars { category = an; characters = scl; source_charset = io } }
+    { SymbolicChars { category = an; character_maps = scl;
+                      source_charset = io } }
 
 let order_table_clause :=                                          (* +COB2002 *)
   | ORDER; TABLE; i = name; IS?; l = string_literal;
@@ -1163,7 +1164,7 @@ let file_descr_clause :=
  | ~ = block_contains_clause; < >
  | ~ = record_clause;         <FileRecord>
  | ~ = label_clause;          <FileLabel>                         (* -COB2002 *)
- | ~ = value_of_clause;       <FileValueOf>                       (* -COB2002 *)
+ | ~ = valueof_clause;        <FileValueOf>                       (* -COB2002 *)
  | ~ = data_clause;           <FileData>                          (* -COB2002 *)
  | ~ = linage_clause;         <FileLinage>
  | ~ = code_set_clause;       <FileCodeSet>
@@ -1210,8 +1211,7 @@ let format_clause :=                                               (* +COB2002 *
 let block_contains_clause :=
  | BLOCK; CONTAINS?; i = integer; io = io(pf(TO,integer));
    cr = file_block_contents;
-   { FileBlockContains { from = i; to_ = io;
-                         characters_or_records = cr; } }
+   { FileBlockContains { from = i; to_ = io; contents = cr } }
 
 let file_block_contents ==
   |             {FileBlockContainsCharacters}
@@ -1240,9 +1240,9 @@ label_clause:
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) STANDARD { LabelStandard }
  | LABEL mr(RECORD IS? | RECORDS ARE? {}) OMITTED  { LabelOmitted }
 
-value_of_clause:
+valueof_clause:
  | VALUE OF iil = nel(i = name IS? il = qualname_or_literal
-                        { { value_of_valued = i; value_of_value = il; } })
+                        { { valueof_valued = i; valueof_value = il; } })
   { iil }
 
 data_clause:
@@ -1435,13 +1435,13 @@ let justified_clause := JUSTIFIED; RIGHT?
 let picture_clause
       [@recovery dummy_picture]
       [@symbol "<picture clause>"] :=
-  | PICTURE; IS?; picture = loc(PICTURE_STRING);
+  | PICTURE; IS?; picture_string = loc(PICTURE_STRING);
     picture_locale = ro(picture_locale_phrase);
     picture_depending = ro(depending_phrase);
-    { { picture; picture_locale; picture_depending } }
+    { { picture_string; picture_locale; picture_depending } }
 
 let picture_locale_phrase
-      [@recovery { locale_name = None; locale_size = "0" }]
+      [@recovery dummy_picture_locale]
       [@symbol "<locale phrase>"] :=
   | LOCALE; io = pf(IS?, name)?; SIZE; IS?; i = integer;
     { {locale_name = io; locale_size = i} }
@@ -1504,7 +1504,7 @@ let constant_record_clause := CONSTANT_RECORD
 
 let dynamic_length_clause :=
   | DYNAMIC; LENGTH?; ido = ro(name); io = ro(pf(LIMIT; IS?,integer));
-    { DataDynamicLength { dynamic_length_structure_name = ido; limit_is = io } }
+    { DataDynamicLength { structure_name = ido; limit = io } }
 
 let external_clause :=
   | or_(EXTERNAL,IS_EXTERNAL); ~ = as__strlit_; < >
@@ -1617,18 +1617,18 @@ let encoding_mode :=
   | DECIMAL_ENCODING; { DecimalEncoding }
 
 let encoding_endianness_opt :=
-  | { { encoding_mode = None; encoding_endianness = None } }
+  | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
 let encoding_endianness :=
   | ecm = encoding_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = None } }
+    { { encoding_mode = Some ecm; endianness_mode = None } }
   | edm = endianness_mode;
-    { {encoding_mode = None; encoding_endianness = Some edm } }
+    { { encoding_mode = None; endianness_mode = Some edm } }
   | ecm = encoding_mode; edm = endianness_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = Some edm } }
+    { { encoding_mode = Some ecm; endianness_mode = Some edm } }
   | edm = endianness_mode; ecm = encoding_mode;
-    { {encoding_mode = Some ecm; encoding_endianness = Some edm } }
+    { { encoding_mode = Some ecm; endianness_mode = Some edm } }
 
 let object_reference_kind :=
   | f = bo(FACTORY; OF?; {}); ACTIVE_CLASS;

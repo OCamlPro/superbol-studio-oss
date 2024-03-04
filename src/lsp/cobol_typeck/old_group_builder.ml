@@ -126,7 +126,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
       let picture, usage, occurs =
         List.fold_left begin fun (pic, usage, occurs) { payload = clause; loc } ->
           match clause with
-          | DataPicture { payload = { picture = pic; _ }; _ } ->
+          | DataPicture { payload = { picture_string = pic; _ }; _ } ->
               Some pic, usage, occurs
           | DataUsage usage_clause ->
               pic, Some usage_clause, occurs
