@@ -30,6 +30,9 @@ SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
 YARN = npx --yes yarn 
 
 VSCE_ARGS = --yarn -t $(TARGET_SPEC)
+VSCE_PACKAGE_ARGS ?= --pre-release
+VSCE_PUBLISH_ARGS ?= --pre-release
+OVSX_PUBLISH_ARGS ?= --pre-release
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
@@ -120,7 +123,6 @@ _out/superbol-vscode-gdb.js:					\
 # packaging
 
 .PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
-	deploy-vsce deploy-ovsx					\
 	all-vsix-release-packages				\
 	all-vsix-debug-packages					\
 	all-vsix-packages
@@ -132,9 +134,9 @@ vsix-package:
 #	needs 'make build-debug' or 'make build-release' before
 	rm -f _dist/superbol-free-*-*
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
-	$(YARN) vsce package $(VSCE_ARGS)		\
-		--no-git-tag-version		\
-		--no-update-package-json	\
+	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
+		--no-git-tag-version				\
+		--no-update-package-json			\
 		--out $(TARGET_VSIX) $(VERSION)
 
 vsix-release: superbol-lsp-server build-release
@@ -160,11 +162,24 @@ vsix-clean: clean
 
 # publishing (requires vsce/ovsx login)
 
-deploy-vsce:
-	$(YARN) vsce publish $(VSCE_ARGS) --packagePath $(TARGET_VSIX)
+.PHONY: ovsx-deploy vsce-deploy deploy-all
 
-deploy-ovsx:
-	$(YARN) ovsx publish --yarn
+vsce-deploy:
+	$(YARN) vsce publish $(VSCE_ARGS) $(VSCE_PUBLISH_ARGS)	\
+	        --packagePath $(TARGET_VSIX)
+
+ovsx-deploy:
+#	Note: should fail in case of duplicate version
+	$(YARN) ovsx publish $(VSCE_ARGS) $(OVSX_PUBLISH_ARGS)	\
+	        --packagePath $(TARGET_VSIX)
+
+deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
+#	$(MAKE) all-vsix-release-packages;
+	for plat in $(TARGET_PLATFORMS); do				\
+		$(MAKE) ovsx-deploy vsce-deploy TARGET_PROFILE=release;	\
+	done
+
+# vsix-specific cleanup
 
 .PHONY: clean-execs
 clean-execs:
