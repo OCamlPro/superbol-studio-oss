@@ -15,14 +15,16 @@
 open Vscode_languageclient
 
 type t = {
-  mutable bundled_superbol : string;
-  mutable language_client: LanguageClient.t option
+  mutable bundled_superbol: string;
+  mutable language_client: LanguageClient.t option;
+  storage_uri: Vscode.Uri.t option;
 }
 type client = LanguageClient.t
 
-let make ~bundled_superbol () = {
+let make ~bundled_superbol ?storage_uri () = {
   bundled_superbol;
-  language_client = None
+  language_client = None;
+  storage_uri;
 }
 
 let client { language_client; _ } = language_client
@@ -43,8 +45,11 @@ let start_language_server t =
   let serverOptions =
     Superbol_languageclient.serverOptions
       ~bundled_superbol:t.bundled_superbol
+      ~storage_uri:t.storage_uri
   in
-  let clientOptions = Superbol_languageclient.clientOptions () in
+  let clientOptions =
+    Superbol_languageclient.clientOptions ()
+  in
   let client =
     LanguageClient.make ()
       ~id: "superbol-free-lsp"

@@ -98,15 +98,23 @@ let activate (extension : Vscode.ExtensionContext.t) =
   let bundled_superbol =
     try
       find_superbol
-          (Vscode.Uri.joinPath ~pathSegments:["_dist"]
-            (Vscode.ExtensionContext.extensionUri extension));
+        (Vscode.Uri.joinPath ~pathSegments:["_dist"]
+           (Vscode.ExtensionContext.extensionUri extension));
     with Not_found ->
       (* If there is no bundled executable for the current platform, fall back
          to looking for superbol-free in the PATH *)
       "superbol-free"
   in
 
-  let instance = Superbol_instance.make ~bundled_superbol () in
+  let instance =
+    let storage_uri =
+      (* Use the global state URI as the server stores caches on a per-project
+         basis (ie. for each workspace directory), not on a per-workspace
+         basis. *)
+      Vscode.ExtensionContext.globalStorageUri extension
+    in
+    Superbol_instance.make ~bundled_superbol ~storage_uri ()
+  in
   current_instance := Some instance;
 
   let task =
