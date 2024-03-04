@@ -29,6 +29,10 @@ open Ez_file.V1.EzFile.OP
     - [enable_client_configs] (defaulting to [false]) enables requests for
       configuration settings to the client;
 
+    - [force_syntax_diagnostics] (defaulting to [false]) forces reporting of
+      syntax and pre-processor-related diagnostics (for dialects other that
+      COBOL85, for which they are always enabled);
+
     - [fallback_storage_directory], when provided (and if [enable_caching]
       holds), is the name of a directory that is used to store a cache whenever
       [project_layout] does not provide a per-project storage directory ({i i.e,}
@@ -37,6 +41,7 @@ let config
     ~(project_layout: Lsp_project.layout)
     ?(enable_caching = true)
     ?(enable_client_configs = false)
+    ?(force_syntax_diagnostics = false)
     ?(fallback_storage_directory: string option)
     () =
   let cache_storage: Lsp_project_cache.storage =
@@ -68,6 +73,7 @@ let config
     };
     project_layout;
     enable_client_configs;
+    force_syntax_diagnostics;
   }
 
 (** Start the lsp server, listening and responding on stdin and stdout.  This is

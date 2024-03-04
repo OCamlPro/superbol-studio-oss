@@ -23,6 +23,7 @@ module TYPES = struct
     project_layout: Lsp_project.layout;
     cache_config: Lsp_project_cache.config;
     enable_client_configs: bool;
+    force_syntax_diagnostics: bool;
   }
 
   type params = {
@@ -195,7 +196,9 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
     (* Note here we may publish diagnostics for non-opened documents.  LSP
        protocol does not seem to forbid that (but some editors just ignore
        those).  *)
-    Lsp_diagnostics.publish all_diags;
+    if registry.params.config.force_syntax_diagnostics ||
+       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+    then Lsp_diagnostics.publish all_diags;
     { registry with
       indirect_diags =
         (* Register published diagnostics for the other documents in case they
@@ -208,7 +211,9 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
         URIMap.union (fun _ a b -> Some (List.rev_append a b))
       end indirect4uri URIMap.empty
     in
-    Lsp_diagnostics.publish all_diags;
+    if registry.params.config.force_syntax_diagnostics ||
+       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+    then Lsp_diagnostics.publish all_diags;
     registry
   end
 

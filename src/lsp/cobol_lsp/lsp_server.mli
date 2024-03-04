@@ -19,6 +19,7 @@ module TYPES: sig
     project_layout: Lsp_project.layout;
     cache_config: Lsp_project_cache.config;
     enable_client_configs: bool;
+    force_syntax_diagnostics: bool;
   }
 
   type params = {

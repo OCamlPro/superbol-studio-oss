@@ -15,7 +15,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 
 type dual_switch = [`enable_disable | `with_without | `boolean]
-type single_switch = [`use]
+type single_switch = [`use | `force]
 
 let dual_switch ?descr (kind: dual_switch) ~name ~default =
   let switch = ref default in
@@ -51,10 +51,14 @@ let single_switch ?descr (kind: single_switch) ~name ~default =
   let set = match kind with
     | `use when not default -> "Use"
     | `use -> "Don't use"
+    | `force when not default -> "Force"
+    | `force -> "Don't force"
   in
   let arg_set = match kind with
     | `use when not default -> name
     | `use -> "no-"^name
+    | `force when not default -> "force-"^name
+    | `force -> "default-"^name
   in
   let descr = Option.value descr ~default:name in
   switch,

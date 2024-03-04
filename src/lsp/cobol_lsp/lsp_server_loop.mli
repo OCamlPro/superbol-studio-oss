@@ -15,6 +15,7 @@ val config
   : project_layout: Superbol_project.layout
   -> ?enable_caching: bool
   -> ?enable_client_configs: bool
+  -> ?force_syntax_diagnostics: bool
   -> ?fallback_storage_directory: string
   -> unit
   -> Lsp_server.config
