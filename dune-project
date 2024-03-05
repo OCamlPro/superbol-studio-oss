@@ -92,7 +92,7 @@
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
    (ocaml (>= 4.14.0))
-   (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
+   (promise_jsoo (and ( >= 0.3.1 )( < 0.4 )))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))
