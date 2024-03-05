@@ -17,9 +17,6 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Visitor
 open Terms_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
@@ -33,9 +30,6 @@ class virtual ['a] folder = object
   method fold_options_paragraph': (options_paragraph with_loc, 'a) fold = default
   method fold_options_paragraph: (options_paragraph, 'a) fold = default
 end
-
-let todo    x = todo    __MODULE__ x
-and partial x = partial __MODULE__ x
 
 let fold_arithmetic_mode (v: _ #folder) =
   leaf v#fold_arithmetic_mode

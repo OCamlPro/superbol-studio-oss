@@ -18,9 +18,6 @@ open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
@@ -79,9 +76,6 @@ class virtual ['a] folder = object
   method fold_environment_division': (environment_division with_loc, 'a) fold = default
   method fold_environment_division: (environment_division, 'a) fold = default
 end
-
-let todo    x = todo    __MODULE__ x
-and partial x = partial __MODULE__ x
 
 let fold_access_mode (v: _ #folder) =
   leaf v#fold_access_mode
