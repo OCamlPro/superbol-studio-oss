@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-1033601b12c5718073a52f82c476278b:.
+c39e0db23c0cef20d2cd8f4362cb37be:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-2e0fde9d369ce92193db6d5beee420b8:dune-project
+d7b6267a8ccaccf9dc19dbf1cb29e4f9:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -215,7 +215,7 @@ fe074e44aaa49966b8d069a904057f4a:opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-js-stubs.opam
 # file opam/vscode-js-stubs.opam
-8cabfe9c414ab6542ef57118f43b4e98:opam/vscode-js-stubs.opam
+24be49e5094cfed510851d50e99dc203:opam/vscode-js-stubs.opam
 # end context for opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
