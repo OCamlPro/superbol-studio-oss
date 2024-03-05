@@ -24,7 +24,7 @@ export function activate (context) {
   debug.activate (context);
 }
 export function deactivate (context) {
+  debug.deactivate (context);
   main.deactivate (context);
-  // debug.deactivate (context);
 }
 
