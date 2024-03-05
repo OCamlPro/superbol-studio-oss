@@ -122,8 +122,8 @@ From here, you can notably configure:
 > Syntax checks performed by SuperBOL Studio currently cover the
 > `COBOL85` dialect, and some constructions of more recent dialects
 > supported by GnuCOBOL.  Reporting of such diagnostics is currently
-> disabled to avoid misleading developers with false diagnostics about
-> syntax errors.
+> disabled for dialects other than `COBOL85` to avoid misleading
+> developers with false diagnostics about syntax errors.
 
 ## Navigation features
 

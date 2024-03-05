@@ -15,7 +15,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 
 
-let run_lsp ~enable_caching ~storage =
+let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage =
   Cobol_lsp.INTERNAL.Debug.message "LSP Started with pid %d\n%!"
     (Unix.getpid ());
   Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.INTERNAL.Debug.debug_oc;
@@ -31,6 +31,7 @@ let run_lsp ~enable_caching ~storage =
     Cobol_lsp.config ()
       ~enable_caching
       ~enable_client_configs:true
+      ~force_syntax_diagnostics
       ~project_layout
       ?fallback_storage_directory
   in
@@ -42,13 +43,19 @@ let run_lsp ~enable_caching ~storage =
 let cmd =
   let caching, caching_args =
     Arg_utils.switch `enable_disable ~name:"caching" ~default:true
+  and syntax_diagnostics, syntax_diagnostics_args =
+    Arg_utils.switch `force ~name:"syntax-diagnostics" ~default:false
+      ~descr:"reporting of syntax error and hint diagnostics for dialects other \
+              than COBOL85 (for which they are always enabled)"
   in
   let storage = ref None in
   EZCMD.sub "lsp"
     (fun () ->
-       run_lsp ~enable_caching:!caching ~storage:!storage)
+       run_lsp ~enable_caching:!caching
+         ~force_syntax_diagnostics:!syntax_diagnostics
+         ~storage:!storage)
     ~doc:"run LSP server"
-    ~args: (caching_args @ [
+    ~args: (caching_args @ syntax_diagnostics_args @ [
         ["storage-directory"], Arg.String (fun s -> storage := Some s),
         EZCMD.info ~docv:"DIR"
           "Directory under which to store cache data --- prevents the creation \
