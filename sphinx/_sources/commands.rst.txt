@@ -251,6 +251,8 @@ Where options are:
 
 * :code:`--inplace`   Modify files in place
 
+* :code:`--intext`   For numeric, indentation size is relative to area A
+
 * :code:`--lines LINE-LINE`   Indent only lines between these lines
 
 * :code:`--numeric`   Output indentation size at the beginning of each line
