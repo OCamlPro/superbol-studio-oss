@@ -38,7 +38,17 @@ module TOML = struct
           lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = file}
     end;
     try
-      let lines = Internal_parser.toml Internal_lexer.tomlex lexbuf in
+      let eof = ref false in
+      let tomlex lexbuf =
+        if !eof then Internal_parser.EOF else
+          let token = Internal_lexer.tomlex lexbuf in
+          if token = EOF then begin
+            eof := true ;
+            EOL
+          end else
+            token
+      in
+      let lines = Internal_parser.toml tomlex lexbuf in
       if config.debug then Internal_parsing.eprint_lines lines;
       let loc = Internal_lexing.loc_of_lexbuf lexbuf in
       let node = Internal_parsing.table_of_lines ~loc config lines in
