@@ -88,6 +88,15 @@ module TYPES = struct
 
   exception Document_not_found of TextDocumentIdentifier.t
 
+  let () =
+    Printexc.register_printer (function
+        | Document_not_found { uri } ->
+          let uri = DocumentUri.to_string uri in
+          let msg =
+            Printf.sprintf "Lsp_server.Document_not_found { uri = '%s' }" uri in
+          Some msg
+        | _ -> None)
+
 end
 include TYPES
 

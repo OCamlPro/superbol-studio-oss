@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-c39e0db23c0cef20d2cd8f4362cb37be:.
+043a83099fd1f9c8e993fbefda52c292:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -478,35 +478,55 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 940d29cde7f16cd0916ed1d5f9c41154:src/vendor/ez_toml/version.mlt
 # end context for src/vendor/ez_toml/version.mlt
 
-# begin context for src/vscode/interop-js-stubs/dune
-# file src/vscode/interop-js-stubs/dune
-16728fcdbeb298d01bad407ec5bb76eb:src/vscode/interop-js-stubs/dune
-# end context for src/vscode/interop-js-stubs/dune
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
+# file src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
+16728fcdbeb298d01bad407ec5bb76eb:src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 
-# begin context for src/vscode/interop-js-stubs/version.mlt
-# file src/vscode/interop-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/interop-js-stubs/version.mlt
-# end context for src/vscode/interop-js-stubs/version.mlt
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
+# file src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
 
-# begin context for src/vscode/node-js-stubs/dune
-# file src/vscode/node-js-stubs/dune
-38cc9d96ddb1981744e3ccc33a974d5a:src/vscode/node-js-stubs/dune
-# end context for src/vscode/node-js-stubs/dune
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
+# file src/vendor/vscode-ocaml-platform/src-bindings/node/dune
+38cc9d96ddb1981744e3ccc33a974d5a:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 
-# begin context for src/vscode/node-js-stubs/version.mlt
-# file src/vscode/node-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/node-js-stubs/version.mlt
-# end context for src/vscode/node-js-stubs/version.mlt
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
+# file src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 
-# begin context for src/vscode/polka-js-stubs/dune
-# file src/vscode/polka-js-stubs/dune
-35cfe02c249a09237f452bc126cfe703:src/vscode/polka-js-stubs/dune
-# end context for src/vscode/polka-js-stubs/dune
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
+# file src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
+35cfe02c249a09237f452bc126cfe703:src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
 
-# begin context for src/vscode/polka-js-stubs/version.mlt
-# file src/vscode/polka-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/polka-js-stubs/version.mlt
-# end context for src/vscode/polka-js-stubs/version.mlt
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
+# file src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+1abfa6d0707e3727987cd9e4f74d47f6:src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+995d796d5acbb0b17aef1bc888c34531:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+
+# begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
+# file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
+940d29cde7f16cd0916ed1d5f9c41154:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
+# end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
@@ -538,16 +558,6 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-debugprotocol/version.mlt
 # end context for src/vscode/vscode-debugprotocol/version.mlt
 
-# begin context for src/vscode/vscode-js-stubs/dune
-# file src/vscode/vscode-js-stubs/dune
-1abfa6d0707e3727987cd9e4f74d47f6:src/vscode/vscode-js-stubs/dune
-# end context for src/vscode/vscode-js-stubs/dune
-
-# begin context for src/vscode/vscode-js-stubs/version.mlt
-# file src/vscode/vscode-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-js-stubs/version.mlt
-# end context for src/vscode/vscode-js-stubs/version.mlt
-
 # begin context for src/vscode/vscode-json/dune
 # file src/vscode/vscode-json/dune
 c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
@@ -562,13 +572,3 @@ c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
 # file src/vscode/vscode-json/version.mlt
 940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
-
-# begin context for src/vscode/vscode-languageclient-js-stubs/dune
-# file src/vscode/vscode-languageclient-js-stubs/dune
-995d796d5acbb0b17aef1bc888c34531:src/vscode/vscode-languageclient-js-stubs/dune
-# end context for src/vscode/vscode-languageclient-js-stubs/dune
-
-# begin context for src/vscode/vscode-languageclient-js-stubs/version.mlt
-# file src/vscode/vscode-languageclient-js-stubs/version.mlt
-940d29cde7f16cd0916ed1d5f9c41154:src/vscode/vscode-languageclient-js-stubs/version.mlt
-# end context for src/vscode/vscode-languageclient-js-stubs/version.mlt
