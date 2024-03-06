@@ -9,7 +9,7 @@ DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 
-VERSION = 0.1.0
+VERSION = 0.1.1
 DEV_DEPS := merlin ocamlformat odoc
 
 
@@ -28,7 +28,6 @@ all: build
 build:
 	./scripts/before.sh build
 ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
-# note: build-profile is ignored here.
 	./scripts/static-build.sh
 else
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
