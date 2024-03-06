@@ -25,7 +25,11 @@ TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
 SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
-SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
+ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+  SUPERBOL_LSP_BUILT = superbol-free
+else
+  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
+endif
 
 YARN = npx --yes yarn 
 
@@ -53,12 +57,12 @@ ifeq ($(TARGET_PLAT),linux)
 	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
 
   ifeq ($(shell uname),Linux)
-  package.json: $(SUPERBOL_LSP)
+  package.json: $(SUPERBOL_LSP_BUILT)
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
   endif
-endif
+endif				#linux
 
 .PHONY: build-debug yarn-debug
 
@@ -183,7 +187,7 @@ deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
 
 .PHONY: clean-execs
 clean-execs:
-	rm -f $(SUPERBOL_LSPs)
+	rm -f superbol-free $(SUPERBOL_LSPs)
 
 distclean: clean-execs vsix-clean
 clean: clean-execs

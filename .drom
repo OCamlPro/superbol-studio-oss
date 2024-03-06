@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-96bf12f11a68f9bce9adc30db2cd4a7d:Makefile
+f1f3872e69172bdba79903e5931ebb7d:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -245,7 +245,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for scripts/static-build.sh
 # file scripts/static-build.sh
-b243cb6f630e2b0483b76eef1572ff95:scripts/static-build.sh
+a49b1a7726042e6f37ce09424b769fd8:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
 # begin context for sphinx/_static/css/fixes.css
