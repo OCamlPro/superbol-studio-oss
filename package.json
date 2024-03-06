@@ -147,6 +147,16 @@
         }
       }
     },
+    "configurationDefaults": {
+      "[cobol]": {
+        "files.autoGuessEncoding": false,
+        "editor.insertSpaces": true,
+        "editor.formatOnType": false,
+        "editor.autoIndent": "full",
+        "editor.detectIndentation": false,
+        "editor.semanticHighlighting.enabled": true
+      }
+    },
     "debuggers": [
       {
         "type": "gdb",
@@ -329,6 +339,13 @@
         ]
       }
     ],
+    "grammars": [
+      {
+        "language": "cobol",
+        "scopeName": "source.cobol",
+        "path": "./syntaxes/COBOL.tmLanguage.json"
+      }
+    ],
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
@@ -436,6 +453,19 @@
           }
         }
       }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "cobol",
+        "scopes": {
+          "keyword": [
+            "keyword.verb.cobol"
+          ],
+          "macro": [
+            "keyword.control.directive.cobol"
+          ]
+        }
+      }
     ]
   },
   "extensionKind": [
@@ -448,7 +478,7 @@
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in VSCode, based on the SuperBOL LSP server for COBOL",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-studio-oss"
