@@ -27,7 +27,11 @@ all: build
 
 build:
 	./scripts/before.sh build
+ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+	./scripts/static-build.sh
+else
 	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
+endif
 	./scripts/copy-bin.sh !{packages}
 	./scripts/after.sh build
 
