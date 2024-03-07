@@ -24,9 +24,6 @@ open Misc_sections_visitor
 open Data_division_visitor
 open Proc_division_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
@@ -50,9 +47,6 @@ class virtual ['a] folder = object
   method fold_method_kind          : (method_kind                  , 'a) fold = default
   method fold_nested_programs      : (program_unit with_loc list   , 'a) fold = default
 end
-
-let todo    x = todo    __MODULE__ x
-let partial x = partial __MODULE__ x
 
 let fold_options_paragraph'_opt (v: _ #folder) =
   fold_option ~fold:fold_options_paragraph' v

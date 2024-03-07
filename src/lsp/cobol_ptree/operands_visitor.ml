@@ -18,9 +18,6 @@ open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ __MODULE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ __MODULE__ x
-
 (* --- *)
 
 class ['a] folder = object

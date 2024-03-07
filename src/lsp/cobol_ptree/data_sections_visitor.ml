@@ -18,9 +18,6 @@ open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
@@ -67,9 +64,6 @@ class virtual ['a] folder = object
   method fold_file_descr             : (file_descr                  , 'a) fold = default
   method fold_file_descr'            : (file_descr with_loc         , 'a) fold = default
 end
-
-let todo    l f = todo    __MODULE__ l f
-and partial l f = partial __MODULE__ l f
 
 let fold_picture_string (v: _ #folder) =
   leaf v#fold_picture_string
@@ -384,7 +378,7 @@ let fold_report_section (v: _ #folder) =
 
 let fold_screen_clause (v: _ #folder) =
   handle v#fold_screen_clause
-    ~continue:(todo __LINE__ "fold_screen_clause")
+    ~continue:(todo __POS__ "fold_screen_clause")
 
 let fold_screen_clause' (v: _ #folder) =
   handle' v#fold_screen_clause' ~fold:fold_screen_clause v

@@ -59,7 +59,12 @@ open INFIX
 
 let in_testsuite = ref false
 
-let report =                        (* to be kept until visitors are complete *)
+let report :
+  string ->
+  pos: (string * int * int * int ) ->
+  func_name:string ->
+  unit =
+  (* to be kept until visitors are complete *)
   let module REPORTED =
     Hashtbl.Make (struct
       type t = string * string * int * string
@@ -68,7 +73,10 @@ let report =                        (* to be kept until visitors are complete *)
     end)
   in
   let reported_table = lazy (REPORTED.create 17) in
-  fun k file_name module_name line_num func_name ->
+  fun msg ~pos:(file_name,line_num, _begin_num, _end_num ) ~func_name ->
+    let module_name =
+      String.capitalize_ascii @@
+      Filename.remove_extension @@ Filename.basename file_name in
     let tbl = Lazy.force reported_table in
     let file_name =
       if !in_testsuite then Filename.basename file_name else file_name in
@@ -76,7 +84,7 @@ let report =                        (* to be kept until visitors are complete *)
     if not (REPORTED.mem tbl (file_name, module_name, line_num, func_name))
     then begin
       Pretty.error "@[<2>%s:%u:@ (%s.%s):@ %s@ visitor@ implementation@]@."
-        file_name line_num module_name func_name k;
+        file_name line_num module_name func_name msg;
       REPORTED.add tbl (file_name, module_name, line_num, func_name) ()
     end
 
@@ -103,7 +111,13 @@ module Fold = struct
 
   (** [handle fold continue node acc] first calls [fold node acc], and then
       behaves according to the action returned. *)
-  let handle (fold: 'x -> 'a -> 'a action) ~(continue: 'x -> 'a -> 'a) n x =
+  let handle :
+    ('a -> 'b -> 'b action) ->
+    continue:('a -> 'b -> 'b) ->
+    'a ->
+    'b ->
+    'b =
+    fun fold ~continue n x ->
     match fold n x with
     | SkipChildren x -> x
     | DoChildren x -> continue n x
@@ -182,11 +196,20 @@ module Fold = struct
 
   (* --- *)
 
-  (** Reports a missing folding visitor implementation {e once}. *)
-  let todo  a b c d _ x = report "missing" a b c d; x
+  (** Reports a missing folding visitor implementation {e once}. Use
+      __POS__ as first argument *)
+  let todo :
+    string * int * int * int ->
+    string ->
+    'b ->
+    'a ->
+    'a
+    =
+    fun pos func_name _ x -> report "missing" ~pos ~func_name; x
 
-  (** Reports a partial folding visitor implementation {e once}. *)
-  let partial a b c d x = report "partial" a b c d; x
+  (** Reports a partial folding visitor implementation {e once}. Use
+      __POS__ as first argument*)
+  let partial pos func_name x = report "partial" ~pos ~func_name; x
 
 end
 
