@@ -154,7 +154,8 @@
         "editor.formatOnType": false,
         "editor.autoIndent": "full",
         "editor.detectIndentation": false,
-        "editor.semanticHighlighting.enabled": true
+        "editor.semanticHighlighting.enabled": true,
+        "editor.wordSeparators": "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?"
       }
     },
     "debuggers": [

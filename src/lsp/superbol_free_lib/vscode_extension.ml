@@ -405,6 +405,7 @@ let contributes =
         (*   `Float 72.; *)
         (* ]; *)
         "editor.semanticHighlighting.enabled", `Bool true;
+        "editor.wordSeparators", `String "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?";
       ]
     ]
     ~semanticTokenScopes: [
