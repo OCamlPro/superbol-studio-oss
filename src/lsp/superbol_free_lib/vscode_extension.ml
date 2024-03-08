@@ -485,8 +485,4 @@ let manifest =
     ~extensionKind: [
       "workspace";                                 (* <- run on the workspace *)
     ]
-    ~extensionDependencies: [
-      "tamasfe.even-better-toml"; (* <- to edit `superbol.toml`; actually just a
-                                     suggestion *)
-    ]
     ~contributes

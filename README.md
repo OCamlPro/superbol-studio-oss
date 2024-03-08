@@ -252,6 +252,13 @@ control.  Extensions dedicated to the edition of TOML files, such as
 provide the same level of assistance as when you edit
 `.vscode/settings.json`.
 
+> [!TIP]
+>
+> Install the
+> [`OCamlPro.SuperBOL-studio-pack`](https://marketplace.visualstudio.com/items?itemName=OCamlPro.SuperBOL-studio-pack)
+> extension to get SuperBOL Studio OSS and `tamasfe.even-better-toml`
+> altogether.
+
 ![Editing `superbol.toml`](./assets/superbol-editing-superbol.toml.png)
 
 ### Further documentation
