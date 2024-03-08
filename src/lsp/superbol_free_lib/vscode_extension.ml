@@ -412,10 +412,10 @@ let contributes =
       `O [
         "language", `String "cobol";
         "scopes", `O [
-          (* Here, we map semantic tokens types to textmate scope names that are
-             defined in `COBOL.tmLanguage.json` to align the theming attributes
-             that are associated with the former types with the ones from
-             associated with the latter. *)
+          (* Here, we map semantic token types to textmate scope names that are
+             defined in `COBOL.tmLanguage.json`: this aligns the theming
+             attributes that are associated with the former types with the ones
+             that are associated with the latter. *)
           "keyword", `A [`String "keyword.verb.cobol"];
           "macro", `A [`String "keyword.control.directive.cobol"];
         ];

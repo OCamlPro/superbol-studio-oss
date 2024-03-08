@@ -140,4 +140,6 @@ let%expect_test "hover-replaced" =
     ----                     ^^^
        7             STOP RUN.
        8
-    ``"B" "C"`` |}];;
+    ```cobol
+    "B" "C"
+    ``` |}];;
