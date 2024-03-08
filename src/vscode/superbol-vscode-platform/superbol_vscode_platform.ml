@@ -12,37 +12,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* open Js_of_ocaml *)
-
-let indentRange
-    ~document
-    ~options:_
-    ~token:_
-    ~range
-  =
-  let range =
-    match range with
-    | Some range -> range
-    | None ->
-      let endLine = Vscode.TextDocument.lineCount document - 1 in
-      let endCharacter =
-        String.length @@ Vscode.TextLine.text @@ Vscode.TextDocument.lineAt document ~line:endLine
-      in
-      (* selects entire document range *)
-      Vscode.Range.makeCoordinates ~startLine:0 ~startCharacter:0 ~endLine ~endCharacter
-  in
-  let input_text = Vscode.TextDocument.getText document ~range () in
-
-  let output_text = "=---=" ^ input_text in
-  let promise = Some [ Vscode.TextEdit.replace ~range ~newText:output_text ] in
-  (*
-   match output with
-    | Ok newText -> Some [ TextEdit.replace ~range ~newText ]
-    | Error msg ->
-      show_message `Error "Dune formatting failed: %s" msg;
-      Some []
-*)
-  `Value promise
 
 (* Helpers to find the bundled superbol executable *)
 let rec find_existing = function
@@ -78,15 +47,6 @@ let find_superbol root =
 let current_instance = ref None
 
 let activate (extension : Vscode.ExtensionContext.t) =
-  let providerFull = Vscode.DocumentFormattingEditProvider.create
-      ~provideDocumentFormattingEdits:(indentRange ~range:None)
-  in
-  let disposable = Vscode.Languages.registerDocumentFormattingEditProvider
-      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"cobol" ()))
-      ~provider:providerFull
-  in
-  Vscode.ExtensionContext.subscribe extension ~disposable;
-
   let bundled_superbol =
     try
       find_superbol
