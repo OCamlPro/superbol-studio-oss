@@ -12,7 +12,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
 (* Helpers to find the bundled superbol executable *)
 let rec find_existing = function
   | [] -> raise Not_found
@@ -44,9 +43,28 @@ let find_superbol root =
     Format.asprintf "%s%s" prefix suffix
   ]
 
+(* --- *)
+
+let lsp_server_autorestarter instance : Vscode.Disposable.t =
+  Vscode.Workspace.onDidChangeConfiguration ()
+    ~listener:begin fun config_change ->
+      let affects ?scope section : bool =
+        Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
+          ~section ?scope
+      in
+      if affects "superbol.lsp-path"  (* machine setting: no need for a scope *)
+      then
+        let _: unit Promise.t =
+          Superbol_instance.start_language_server instance
+        in ()
+      else ()
+    end
+
+(* --- *)
+
 let current_instance = ref None
 
-let activate (extension : Vscode.ExtensionContext.t) =
+let activate (extension: Vscode.ExtensionContext.t) =
   let bundled_superbol =
     try
       find_superbol
@@ -68,14 +86,18 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
   Vscode.ExtensionContext.subscribe extension ~disposable:task;
 
+  Vscode.ExtensionContext.subscribe extension
+    ~disposable:(lsp_server_autorestarter instance);
+
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance
 
 let deactivate () =
   match !current_instance with
   | Some instance ->
-    Superbol_instance.stop_language_server instance
-  | None -> Promise.return ()
+      Superbol_instance.stop_language_server instance
+  | None ->
+      Promise.return ()
 
 (* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
    activate() *)
