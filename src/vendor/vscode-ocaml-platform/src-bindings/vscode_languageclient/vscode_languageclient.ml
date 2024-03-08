@@ -190,6 +190,38 @@ module StaticFeature = struct
       [@@js.builder]]
 end
 
+module StreamInfo = struct
+  include Interface.Make ()
+
+  type njs_stream
+
+  let njs_stream_of_string str : njs_stream =
+    Format.ksprintf
+      Js_of_ocaml.Js.Unsafe.eval_string
+      "new joo_global_object.webSocket (`%s`);"
+      str
+
+    let njs_stream_of_js = Obj.magic
+
+    let njs_stream_to_js = Obj.magic
+
+  include
+    [%js:
+    val writer : t -> njs_stream [@@js.get]
+
+    val reader : t -> njs_stream [@@js.get]
+
+    val detached : t -> bool option [@@js.get]
+
+    val create :
+         writer:njs_stream
+      -> reader:njs_stream
+      -> ?detached:bool
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
 module DidChangeConfiguration = struct
   include Interface.Make ()
 
@@ -208,6 +240,13 @@ module LanguageClient = struct
       -> clientOptions:ClientOptions.t
       -> ?forceDebug:bool
       -> unit
+      -> t
+      [@@js.new "vscode_languageclient.LanguageClient"]
+
+    val make_stream :
+         id:string
+      -> name:string
+      -> (unit -> StreamInfo.t Promise.t)
       -> t
       [@@js.new "vscode_languageclient.LanguageClient"]
 
