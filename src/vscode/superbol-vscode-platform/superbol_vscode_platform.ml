@@ -12,38 +12,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* open Js_of_ocaml *)
-
-let indentRange
-    ~document
-    ~options:_
-    ~token:_
-    ~range
-  =
-  let range =
-    match range with
-    | Some range -> range
-    | None ->
-      let endLine = Vscode.TextDocument.lineCount document - 1 in
-      let endCharacter =
-        String.length @@ Vscode.TextLine.text @@ Vscode.TextDocument.lineAt document ~line:endLine
-      in
-      (* selects entire document range *)
-      Vscode.Range.makeCoordinates ~startLine:0 ~startCharacter:0 ~endLine ~endCharacter
-  in
-  let input_text = Vscode.TextDocument.getText document ~range () in
-
-  let output_text = "=---=" ^ input_text in
-  let promise = Some [ Vscode.TextEdit.replace ~range ~newText:output_text ] in
-  (*
-   match output with
-    | Ok newText -> Some [ TextEdit.replace ~range ~newText ]
-    | Error msg ->
-      show_message `Error "Dune formatting failed: %s" msg;
-      Some []
-*)
-  `Value promise
-
 (* Helpers to find the bundled superbol executable *)
 let rec find_existing = function
   | [] -> raise Not_found
@@ -75,18 +43,28 @@ let find_superbol root =
     Format.asprintf "%s%s" prefix suffix
   ]
 
+(* --- *)
+
+let lsp_server_autorestarter instance : Vscode.Disposable.t =
+  Vscode.Workspace.onDidChangeConfiguration ()
+    ~listener:begin fun config_change ->
+      let affects ?scope section : bool =
+        Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
+          ~section ?scope
+      in
+      if affects "superbol.lsp-path"  (* machine setting: no need for a scope *)
+      then
+        let _: unit Promise.t =
+          Superbol_instance.start_language_server instance
+        in ()
+      else ()
+    end
+
+(* --- *)
+
 let current_instance = ref None
 
-let activate (extension : Vscode.ExtensionContext.t) =
-  let providerFull = Vscode.DocumentFormattingEditProvider.create
-      ~provideDocumentFormattingEdits:(indentRange ~range:None)
-  in
-  let disposable = Vscode.Languages.registerDocumentFormattingEditProvider
-      ~selector: ( `Filter (Vscode.DocumentFilter.create ~scheme:"file" ~language:"cobol" ()))
-      ~provider:providerFull
-  in
-  Vscode.ExtensionContext.subscribe extension ~disposable;
-
+let activate (extension: Vscode.ExtensionContext.t) =
   let bundled_superbol =
     try
       find_superbol
@@ -108,14 +86,18 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
   Vscode.ExtensionContext.subscribe extension ~disposable:task;
 
+  Vscode.ExtensionContext.subscribe extension
+    ~disposable:(lsp_server_autorestarter instance);
+
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance
 
 let deactivate () =
   match !current_instance with
   | Some instance ->
-    Superbol_instance.stop_language_server instance
-  | None -> Promise.return ()
+      Superbol_instance.stop_language_server instance
+  | None ->
+      Promise.return ()
 
 (* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
    activate() *)
