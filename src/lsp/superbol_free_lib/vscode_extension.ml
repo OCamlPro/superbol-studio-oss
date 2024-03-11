@@ -36,8 +36,8 @@ let package =
     "SuperBOL"
     ~displayName: "SuperBOL Studio OSS"
     ~description: "Provides a COBOL mode in Visual Studio Code, based on the \
-                   SuperBOL LSP server for COBOL, and optional source level \
-                   debugger and commands for GnuCOBOL 3.2+"
+                   SuperBOL LSP server for COBOL, a source level debugger, and \
+                   commands for GnuCOBOL 3.2+"
     ~license: "MIT"
     ~version: Version.version
     ~repository: {
