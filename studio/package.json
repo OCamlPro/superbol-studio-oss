@@ -1,0 +1,21 @@
+{
+    "name": "SuperBOL-studio-pack",
+    "version": "0.1.0",
+    "displayName": "SuperBOL Studio Pack",
+    "publisher": "OCamlPro",
+    "license": "MIT",
+    "icon": "icon.png",
+    "description": "Bundles the SuperBOL Studio for COBOL along with other useful extensions",
+    "categories": ["Extension Packs"],
+    "extensionPack": [
+        "OCamlPro.SuperBOL",
+        "tamasfe.even-better-toml"
+    ],
+    "engines": {
+        "vscode": "^1.76.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/OCamlPro/superbol-studio-oss"
+    }
+}

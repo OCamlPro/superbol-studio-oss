@@ -35,8 +35,9 @@ let package =
   Manifest.package
     "SuperBOL"
     ~displayName: "SuperBOL Studio OSS"
-    ~description: "Provides a COBOL mode in VSCode, based on the SuperBOL LSP \
-                   server for COBOL"
+    ~description: "Provides a COBOL mode in Visual Studio Code, based on the \
+                   SuperBOL LSP server for COBOL, and optional source level \
+                   debugger and commands for GnuCOBOL 3.2+"
     ~license: "MIT"
     ~version: Version.version
     ~repository: {
@@ -483,9 +484,5 @@ let manifest =
     ]
     ~extensionKind: [
       "workspace";                                 (* <- run on the workspace *)
-    ]
-    ~extensionDependencies: [
-      "tamasfe.even-better-toml"; (* <- to edit `superbol.toml`; actually just a
-                                     suggestion *)
     ]
     ~contributes
