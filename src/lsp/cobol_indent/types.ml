@@ -19,6 +19,12 @@ type indent_record = {
   mutable offset_modif : int;
 }
 
+type edit_space_operation = {
+  line : int ;
+  char : int ; (* relative to begin-of-line, before change application *)
+  spaces : int ; (* positive for addition, negative for deletion *)
+}
+
 type range = {
   start_line : int ;
   end_line   : int ;

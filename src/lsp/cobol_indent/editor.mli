@@ -17,4 +17,5 @@ val apply_edits :
   config:Types.config ->
   filename:string ->
   edits:Types.indent_record list ->
-  unit
+  symbolic:bool ->
+  Types.edit_space_operation list

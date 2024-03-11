@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "vscode-js-stubs"
-version: "0.1.0"
+version: "0.1.1"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -45,7 +45,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
-  "promise_jsoo" {>= "0.3.1" & < "1.0.0"}
+  "promise_jsoo" {>= "0.3.1" & < "0.4"}
   "jsonoo" {>= "0.2.1" & < "1.0.0"}
   "js_of_ocaml" {>= "4"}
   "interop-js-stubs" {= version}

@@ -16,9 +16,6 @@ open PTree_types
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object

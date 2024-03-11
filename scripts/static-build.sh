@@ -9,16 +9,18 @@ cd $(dirname "$0")/..
 
 set -o pipefail
 
+# Use `docker-alpine-image` field to replace ocamlpro/ocaml:4.14
+# and `docker-alpine-packages` to add more apk packages
 git ls-files -z | xargs -0 tar c | \
 docker run --rm -i \
-    # Use `docker-alpine-image` field to replace ocamlpro/ocaml:4.13
-    # and `docker-alpine-packages` to add more apk packages
-    ocamlpro/ocaml:4.13 \
+    ocamlpro/ocaml:4.14 \
     sh -uexc \
       'tar x >&2 &&
        sudo apk add g++ openssl-libs-static bash  >&2 &&
        opam update >&2 &&
-       opam switch create . ocaml-system --deps-only --locked >&2 &&
+       opam switch create . --empty >&2 &&
+       opam switch set-invariant ocaml-system >&2 &&
+       opam install opam/*.opam --deps-only --locked >&2 &&
        opam exec make LINKING_MODE=static >&2 &&
        tar c -hC _build/install/default/bin .' | \
   tar vx

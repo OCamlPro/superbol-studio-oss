@@ -87,14 +87,6 @@ let activate (extension : Vscode.ExtensionContext.t) =
   in
   Vscode.ExtensionContext.subscribe extension ~disposable;
 
-  let debug =
-    Vscode.Debug.registerDebugConfigurationProvider ()
-      ~debugType:"cobol"
-      ~provider:Debugger.debugConfigurationProvider
-  in
-
-  Vscode.ExtensionContext.subscribe extension ~disposable:debug;
-
   let bundled_superbol =
     try
       find_superbol

@@ -48,7 +48,8 @@ let init_temp_project ?(toml = "") () =
 let make_server ?(with_semantic_tokens = false) () =
   LSP.Server.init ~params:{ config = { project_layout = layout;
                                        cache_config;
-                                       enable_client_configs = false };
+                                       enable_client_configs = false;
+                                       force_syntax_diagnostics = true };
                             root_uri = None;
                             workspace_folders = [];
                             with_semantic_tokens;

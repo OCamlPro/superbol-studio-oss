@@ -19,9 +19,6 @@ open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 open Statements_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
@@ -42,9 +39,6 @@ class virtual ['a] folder = object
   method fold_raising_phrase          : (raising_phrase          , 'a) fold = default
   method fold_raising_phrase'         : (raising_phrase with_loc , 'a) fold = default
 end
-
-let todo    x = todo    __MODULE__ x
-and partial x = partial __MODULE__ x
 
 let fold_use_exception_on (v: _ #folder) = function
   | UseFileExceptionOnNames n -> fold_name'_list v n

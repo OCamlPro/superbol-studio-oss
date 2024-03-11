@@ -19,56 +19,59 @@ open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
 open Operands_visitor
 
-let todo    x = Cobol_common.Visitor.todo    __FILE__ x
-let partial x = Cobol_common.Visitor.partial __FILE__ x
-
 (* --- *)
 
 class virtual ['a] folder = object
   inherit ['a] Operands_visitor.folder
+  inherit! ['a] Data_descr_visitor.folder
+  inherit! ['a] Data_sections_visitor.folder
+
   method fold_statement'          : (statement with_loc      , 'a) fold = default
   method fold_statements'         : (statements with_loc     , 'a) fold = default
 
   (* Statement-specific operands; shared ones should be in
      Operands_visitor. *)
-  method fold_perform_mode        : (perform_mode            , 'a) fold = default
-  method fold_varying_phrase      : (varying_phrase          , 'a) fold = default
-  method fold_varying_phrase'     : (varying_phrase with_loc , 'a) fold = default
   method fold_allocate_kind       : (allocate_kind           , 'a) fold = default
   method fold_alter_operands'     : (alter_operands with_loc , 'a) fold = default
   method fold_call_prefix         : (call_prefix             , 'a) fold = default
   method fold_call_proto          : (call_proto              , 'a) fold = default
   method fold_close_format        : (close_format            , 'a) fold = default
   method fold_close_phrase        : (close_phrase            , 'a) fold = default
+  method fold_converting          : (converting              , 'a) fold = default
   (* method fold_display_target'     : (display_target with_loc , 'a) fold = default *)
+  method fold_evaluate_branch     : (evaluate_branch         , 'a) fold = default
   method fold_init_data_category  : (init_data_category      , 'a) fold = default
   method fold_init_replacing      : (init_replacing          , 'a) fold = default
-  method fold_named_file_option   : (named_file_option       , 'a) fold = default
-  (*for inspect*)
   method fold_inspect_spec        : (inspect_spec            , 'a) fold = default
-  method fold_tallying            : (tallying                , 'a) fold = default
-  method fold_tallying_clause'    : (tallying_clause with_loc, 'a) fold = default
-  method fold_tallying_spec       : (tallying_spec           , 'a) fold = default
+  method fold_inspect_where       : (inspect_where           , 'a) fold = default
+  method fold_merge_or_sort_target: (merge_or_sort_target    , 'a) fold = default
+  method fold_named_file_option   : (named_file_option       , 'a) fold = default
+  method fold_open_phrase         : (open_phrase             , 'a) fold = default
+  method fold_perform_mode        : (perform_mode            , 'a) fold = default
+  method fold_read_error          : (read_error              , 'a) fold = default
   method fold_replacing           : (replacing               , 'a) fold = default
   method fold_replacing_clause    : (replacing_clause        , 'a) fold = default
   method fold_replacing_range_spec: (replacing_range_spec    , 'a) fold = default
-  method fold_converting          : (converting              , 'a) fold = default
-  method fold_inspect_where       : (inspect_where           , 'a) fold = default
-  method fold_merge_or_sort_target: (merge_or_sort_target    , 'a) fold = default
-  method fold_open_phrase         : (open_phrase             , 'a) fold = default
-  method fold_read_error          : (read_error              , 'a) fold = default
-  method fold_stop_run            : (stop_run                , 'a) fold = default
-  method fold_stop_kind           : (stop_kind               , 'a) fold = default
-  method fold_string_source       : (string_source           , 'a) fold = default
-  method fold_string_delimiter    : (string_delimiter        , 'a) fold = default
-  method fold_evaluate_branch     : (evaluate_branch         , 'a) fold = default
-  method fold_selection_subject   : (selection_subject       , 'a) fold = default
   method fold_selection_object    : (selection_object        , 'a) fold = default
-  method fold_set_switch_spec     : (set_switch_spec         , 'a) fold = default
+  method fold_selection_subject   : (selection_subject       , 'a) fold = default
+  method fold_send_operands       : (send_operands           , 'a) fold = default
   method fold_set_condition_spec  : (set_condition_spec      , 'a) fold = default
+  method fold_set_switch_spec     : (set_switch_spec         , 'a) fold = default
+  method fold_stop_kind           : (stop_kind               , 'a) fold = default
+  method fold_stop_run            : (stop_run                , 'a) fold = default
+  method fold_string_delimiter    : (string_delimiter        , 'a) fold = default
+  method fold_string_source       : (string_source           , 'a) fold = default
+  method fold_tallying            : (tallying                , 'a) fold = default
+  method fold_tallying_clause'    : (tallying_clause with_loc, 'a) fold = default
+  method fold_tallying_spec       : (tallying_spec           , 'a) fold = default
   method fold_unstring_delimiter  : (unstring_delimiter      , 'a) fold = default
   method fold_unstring_target     : (unstring_target         , 'a) fold = default
+  method fold_varying_phrase      : (varying_phrase          , 'a) fold = default
+  method fold_varying_phrase'     : (varying_phrase with_loc , 'a) fold = default
   method fold_write_error         : (write_error             , 'a) fold = default
+  method fold_sort_source         : (sort_source             , 'a) fold = default
+
+  method fold_message_ending_indicator: (message_ending_indicator, 'a) fold = default
 
   (* high-level structures and branches *)
   method fold_handler'            : (handler with_loc           , 'a) fold = default
@@ -80,18 +83,21 @@ class virtual ['a] folder = object
 
   (* Individial statements with locations *)
   method fold_accept'        : (accept_stmt with_loc          , 'a) fold = default
+  method fold_add'           : (basic_arithmetic_stmt with_loc, 'a) fold = default
   method fold_allocate'      : (allocate_stmt with_loc        , 'a) fold = default
   method fold_alter'         : (alter_stmt with_loc           , 'a) fold = default
-  method fold_add'           : (basic_arithmetic_stmt with_loc, 'a) fold = default
   method fold_call'          : (call_stmt with_loc            , 'a) fold = default
   method fold_cancel'        : (ident_or_strlit list with_loc , 'a) fold = default
   method fold_close'         : (close_stmt with_loc           , 'a) fold = default
   method fold_compute'       : (compute_stmt with_loc         , 'a) fold = default
   method fold_delete'        : (delete_stmt with_loc          , 'a) fold = default
+  method fold_disable'       : (mcs_command_operands with_loc , 'a) fold = default
   method fold_display'       : (display_stmt with_loc         , 'a) fold = default
   method fold_divide'        : (divide_stmt with_loc          , 'a) fold = default
-  method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
+  method fold_enable'        : (mcs_command_operands with_loc , 'a) fold = default
+  method fold_enter'         : (enter_stmt with_loc           , 'a) fold = default
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
+  method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
   method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
   method fold_goback'        : (raising option with_loc       , 'a) fold = default
@@ -102,20 +108,25 @@ class virtual ['a] folder = object
   method fold_initiate'      : (name with_loc list with_loc   , 'a) fold = default
   method fold_inspect'       : (inspect_stmt with_loc         , 'a) fold = default
   method fold_invoke'        : (invoke_stmt with_loc          , 'a) fold = default
+  method fold_merge'         : (merge_stmt with_loc           , 'a) fold = default
   method fold_move'          : (move_stmt with_loc            , 'a) fold = default
   method fold_multiply'      : (multiply_stmt with_loc        , 'a) fold = default
   method fold_open'          : (open_stmt with_loc            , 'a) fold = default
-  method fold_perform_target': (perform_target_stmt with_loc  , 'a) fold = default
   method fold_perform_inline': (perform_inline_stmt with_loc  , 'a) fold = default
+  method fold_perform_target': (perform_target_stmt with_loc  , 'a) fold = default
+  method fold_purge'         : (name with_loc with_loc        , 'a) fold = default
   method fold_raise'         : (raise_operand with_loc        , 'a) fold = default
   method fold_read'          : (read_stmt with_loc            , 'a) fold = default
+  method fold_receive'       : (receive_stmt with_loc         , 'a) fold = default
   method fold_release'       : (release_stmt with_loc         , 'a) fold = default
   method fold_resume'        : (resume_stmt with_loc          , 'a) fold = default
   method fold_return'        : (return_stmt with_loc          , 'a) fold = default
   method fold_rewrite'       : (rewrite_stmt with_loc         , 'a) fold = default
   method fold_search'        : (search_stmt with_loc          , 'a) fold = default
   method fold_search_all'    : (search_all_stmt with_loc      , 'a) fold = default
+  method fold_send'          : (send_stmt with_loc            , 'a) fold = default
   method fold_set'           : (set_stmt with_loc             , 'a) fold = default
+  method fold_sort'          : (sort_stmt with_loc            , 'a) fold = default
   method fold_start'         : (start_stmt with_loc           , 'a) fold = default
   method fold_stop'          : (stop_stmt with_loc            , 'a) fold = default
   method fold_string_stmt'   : (string_stmt with_loc          , 'a) fold = default
@@ -127,10 +138,6 @@ class virtual ['a] folder = object
   method fold_validate'      : (ident list with_loc           , 'a) fold = default
   method fold_write'         : (write_stmt with_loc           , 'a) fold = default
 end
-
-let todo    x = todo    __MODULE__ x
-and partial x = partial __MODULE__ x
-
 
 let fold_varying_phrase (v: _ #folder) =
   handle v#fold_varying_phrase
@@ -391,6 +398,30 @@ let fold_unstring_target (v: _ #folder) =
 let fold_write_error (v: _ #folder) =
   leaf v#fold_write_error
 
+let fold_message_ending_indicator (v: _ #folder) =
+  leaf v#fold_message_ending_indicator
+
+let fold_send_operands (v: _ #folder) =
+  handle v#fold_send_operands
+    ~continue:begin fun o x -> match o with
+      | SendSimple { from } -> x
+          >> fold_ident v from
+      | SendWith { from; ending_indicator; advancing; replace } -> x
+          >> fold_option ~fold:fold_ident v from
+          >> fold_message_ending_indicator v ending_indicator
+          >> fold_option ~fold:fold_advancing_phrase v  advancing
+          >> fold_bool v replace
+    end
+
+let fold_sort_source (v: _ #folder) =
+  handle v#fold_sort_source
+    ~continue:begin fun s x -> match s with
+      | SortInputProcedure pr -> x
+          >> fold_procedure_range ~fold:fold_procedure_name' v pr
+      | SortUsing names -> x
+          >> fold_name'_list v names
+    end
+
 
 (* Statements that do not need recursion (not high-level control structure,
    and no inline handler) *)
@@ -479,6 +510,19 @@ let fold_invoke' (v: _ #folder) =
       >> fold_ident'_opt v invoke_returning
     end
 
+let fold_merge' (v: _ #folder) =
+  handle' v#fold_merge' v
+    ~fold:begin fun v { merge_file; merge_keys; merge_collating; merge_using;
+                        merge_target } x -> x
+      >> fold_name' v merge_file
+      >> fold_list v merge_keys
+        ~fold:Data_descr_visitor.fold_sort_spec
+      >> fold_option v merge_collating
+        ~fold:Operands_visitor.fold_alphabet_specification
+      >> fold_name'_list v merge_using
+      >> fold_merge_or_sort_target v merge_target
+    end
+
 let fold_move' (v: _ #folder) =
   handle' v#fold_move' v
     ~fold:begin fun v m x -> match m with
@@ -492,6 +536,9 @@ let fold_move' (v: _ #folder) =
 
 let fold_open' (v: _ #folder) =
   handle' v#fold_open' v ~fold:(fold_list ~fold:fold_open_phrase)
+
+let fold_purge' (v: _ #folder) =
+  handle' v#fold_purge' v ~fold:fold_name'
 
 let fold_raise' (v: _ #folder) =
   handle' v#fold_raise' v
@@ -512,6 +559,13 @@ let fold_resume' (v: _ #folder) =
     ~fold:begin fun v stmt x -> match stmt with
       | ResumeNextStatement -> x
       | ResumeTarget t -> fold_procedure_name' v t x
+    end
+
+let fold_send' (v: _ #folder) =
+  handle' v#fold_send' v
+    ~fold:begin fun v { send_name; send_operands } x -> x
+      >> fold_name' v send_name
+      >> fold_send_operands v send_operands
     end
 
 let fold_set' (v: _ #folder) =
@@ -541,6 +595,35 @@ let fold_set' (v: _ #folder) =
           >> fold_option ~fold:fold_sign v sign
     end
 
+let fold_sort' (v: _ #folder) =
+  handle' v#fold_sort' v
+    ~fold:begin fun v s x -> match s with
+      | SortFile { file; keys; duplicate_in_order; collating; source;
+                   target } -> x
+          >> fold_qualident v file
+          >> fold_list v keys
+            ~fold:Data_descr_visitor.fold_sort_spec
+          >> fold_bool v duplicate_in_order
+          >> fold_option v collating
+            ~fold:Operands_visitor.fold_alphabet_specification
+          >> fold_sort_source v source
+          >> fold_merge_or_sort_target v target
+      | SortTable { table; keys; duplicate_in_order; collating } -> x
+          >> fold_qualident v table
+          >> fold_list v keys
+            ~fold:Data_descr_visitor.fold_sort_spec
+          >> fold_bool v duplicate_in_order
+          >> fold_option v collating
+            ~fold:Operands_visitor.fold_alphabet_specification
+    end
+
+let fold_stop' (v: _ #folder) =
+  handle' v#fold_stop' v
+    ~fold:begin fun v -> function
+      | StopRun o -> fold_option ~fold:fold_stop_run v o
+      | StopLiteral l -> fold_literal v l
+    end
+
 let fold_terminate' (v: _ #folder) =
   handle' v#fold_terminate' v
     ~fold:(fold_list ~fold:fold_name')
@@ -558,16 +641,6 @@ let fold_unlock' (v: _ #folder) =
     ~fold:begin fun v { unlock_file; unlock_record } x -> x
       >> fold_name' v unlock_file
       >> fold_bool v unlock_record
-    end
-
-let fold_validate' (v: _ #folder) =
-  handle' v#fold_validate' v ~fold:(fold_list ~fold:fold_ident)
-
-let fold_stop' (v: _ #folder) =
-  handle' v#fold_stop' v
-    ~fold:begin fun v -> function
-      | StopRun o -> fold_option ~fold:fold_stop_run v o
-      | StopLiteral l -> fold_literal v l
     end
 
 let fold_selection_subject (v: _ #folder) =
@@ -604,6 +677,9 @@ let fold_selection_object (v: _ #folder) =
       | SelAny -> x
     end
 
+let fold_validate' (v: _ #folder) =
+  handle' v#fold_validate' v ~fold:(fold_list ~fold:fold_ident)
+
 (* Statements with high-level control structure and/or (inline) handlers *)
 let rec fold_statement' (v: _ #folder) =
   handle v#fold_statement'
@@ -617,8 +693,11 @@ let rec fold_statement' (v: _ #folder) =
       | Close         s -> fold_close'          v (s &@ loc)
       | Compute       s -> fold_compute'        v (s &@ loc)
       | Delete        s -> fold_delete'         v (s &@ loc)
+      | Disable       s -> fold_disable'        v (s &@ loc)
       | Display       s -> fold_display'        v (s &@ loc)
       | Divide        s -> fold_divide'         v (s &@ loc)
+      | Enable        s -> fold_enable'         v (s &@ loc)
+      | Enter         s -> fold_enter'          v (s &@ loc)
       | Evaluate      s -> fold_evaluate'       v (s &@ loc)
       | Exit          s -> fold_exit'           v (s &@ loc)
       | Free          s -> fold_free'           v (s &@ loc)
@@ -631,20 +710,25 @@ let rec fold_statement' (v: _ #folder) =
       | Initiate      s -> fold_initiate'       v (s &@ loc)
       | Inspect       s -> fold_inspect'        v (s &@ loc)
       | Invoke        s -> fold_invoke'         v (s &@ loc)
+      | Merge         s -> fold_merge'          v (s &@ loc)
       | Move          s -> fold_move'           v (s &@ loc)
       | Multiply      s -> fold_multiply'       v (s &@ loc)
       | Open          s -> fold_open'           v (s &@ loc)
       | PerformInline s -> fold_perform_inline' v (s &@ loc)
       | PerformTarget s -> fold_perform_target' v (s &@ loc)
+      | Purge         s -> fold_purge'          v (s &@ loc)
       | Raise         s -> fold_raise'          v (s &@ loc)
       | Read          s -> fold_read'           v (s &@ loc)
+      | Receive       s -> fold_receive'        v (s &@ loc)
       | Release       s -> fold_release'        v (s &@ loc)
       | Resume        s -> fold_resume'         v (s &@ loc)
       | Return        s -> fold_return'         v (s &@ loc)
       | Rewrite       s -> fold_rewrite'        v (s &@ loc)
       | Search        s -> fold_search'         v (s &@ loc)
       | SearchAll     s -> fold_search_all'     v (s &@ loc)
+      | Send          s -> fold_send'           v (s &@ loc)
       | Set           s -> fold_set'            v (s &@ loc)
+      | Sort          s -> fold_sort'           v (s &@ loc)
       | Start         s -> fold_start'          v (s &@ loc)
       | Stop          s -> fold_stop'           v (s &@ loc)
       | String        s -> fold_string_stmt'    v (s &@ loc)
@@ -658,15 +742,6 @@ let rec fold_statement' (v: _ #folder) =
       | Continue
       | LoneGoTo
       | Suppress -> Fun.id
-      | _ -> partial __LINE__ "fold_statement"
-      (* | Disable of mcs_command_operands *)
-      (* | Enable of mcs_command_operands *)
-      (* | Enter of enter_stmt *)
-      (* | Merge of merge_stmt *)
-      (* | Purge of name with_loc *)
-      (* | Receive of receive_stmt *)
-      (* | Send of send_stmt *)
-      (* | Sort of sort_stmt *)
     end
 
 and fold_statements (v: _ #folder) =
@@ -751,6 +826,10 @@ and fold_delete' (v: _ #folder) : delete_stmt with_loc -> 'a -> 'a =
       >> fold_dual_handler v delete_on_invalid_key
     end
 
+and fold_disable' (v: _ #folder) : mcs_command_operands with_loc -> 'a -> 'a =
+  handle' v#fold_disable' v
+    ~fold:fold_mcs_command_operands
+
 and fold_display' (v: _ #folder) : display_stmt with_loc -> 'a -> 'a =
   handle' v#fold_display' v
     ~fold:begin fun v d x -> match d with
@@ -778,6 +857,17 @@ and fold_divide' (v: _ #folder) : divide_stmt with_loc -> 'a -> 'a =
     ~fold:begin fun v { divide_operands; divide_on_size_error } x -> x
       >> fold_divide_operands v divide_operands
       >> fold_dual_handler v divide_on_size_error
+    end
+
+and fold_enable' (v: _ #folder) : mcs_command_operands with_loc -> 'a -> 'a =
+  handle' v#fold_enable' v
+    ~fold:fold_mcs_command_operands
+
+and fold_enter' (v: _ #folder) : enter_stmt with_loc -> 'a -> 'a =
+  handle' v#fold_enter' v
+    ~fold:begin fun v { enter_language; enter_routine } x -> x
+      >> fold_name' v enter_language
+      >> fold_name'_opt v enter_routine
     end
 
 and fold_evaluate' (v: _ #folder) : evaluate_stmt with_loc -> 'a -> 'a =
@@ -847,9 +937,19 @@ and fold_read' (v: _#folder) =
       >> fold_option ~fold:fold_read_error_handler v read_error_handler
     end
 
+and fold_receive' (v: _ #folder) =
+  handle' v#fold_receive' v
+    ~fold:begin fun v { receive_name; receive_kind; receive_into;
+                        receive_on_no_data } x -> x
+      >> fold_name' v receive_name
+      >> fold_mcs_awaiting_item v receive_kind
+      >> fold_ident v receive_into
+      >> fold_dual_handler v receive_on_no_data
+    end
+
 and fold_return' (v: _ #folder) =
   handle' v#fold_return' v
-    ~fold:begin fun v {return_file; return_into; return_at_end} x -> x
+    ~fold:begin fun v { return_file; return_into; return_at_end } x -> x
       >> fold_name' v return_file
       >> fold_ident'_opt v return_into
       >> fold_dual_handler v return_at_end
@@ -869,7 +969,7 @@ and fold_rewrite' (v: _ #folder) =
 
 and fold_search_when_clause' (v: _#folder) =
   handle' v#fold_search_when_clause' v
-    ~fold:begin fun v {search_when_cond; search_when_stmts} x -> x
+    ~fold:begin fun v { search_when_cond; search_when_stmts } x -> x
       >> fold_condition v search_when_cond
       >> fold_branch v search_when_stmts
     end

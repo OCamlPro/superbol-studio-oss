@@ -19,7 +19,7 @@
     a single argument selected based on the value of [default]. *)
 val switch
   : ?descr: string
-  -> [ `enable_disable | `with_without | `boolean | `use ]
+  -> [ `enable_disable | `with_without | `boolean | `use | `force ]
   -> name: string
   -> default: bool
   -> bool ref * Ezcmd.V2.EZCMD.TYPES.arg_list

@@ -14,6 +14,7 @@
 open Common
 open Terms
 open Misc_sections
+open Env_division
 open Data_descr
 open Data_division
 open Proc_division
@@ -103,7 +104,7 @@ type function_unit =
     function_options: options_paragraph with_loc option;
     function_env: environment_division with_loc option;
     function_data: data_division with_loc option;
-    function_proc: procedure_division option;
+    function_proc: procedure_division with_loc option;
     function_end_name: name with_loc;
   }
 [@@deriving ord]
@@ -135,9 +136,11 @@ let pp_function_unit ppf
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
           Option.map (const (pp_with_loc pp_data_division)) data;
-          Option.map (const pp_procedure_division) proc ]
+          Option.map (const (pp_with_loc pp_procedure_division)) proc ]
 
-type method_definition =
+type method_definitions = method_definition with_loc list
+
+and method_definition =
   {
     method_name: name with_loc;
     method_kind: method_kind;
@@ -146,7 +149,7 @@ type method_definition =
     method_options: options_paragraph with_loc option;
     method_env: environment_division with_loc option;
     method_data: data_division with_loc option;
-    method_proc: procedure_division option;
+    method_proc: procedure_division with_loc option;
     method_end_name: name with_loc;
   }
 
@@ -173,7 +176,7 @@ let pp_method_definition ppf
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
           Option.map (const (pp_with_loc pp_data_division)) data;
-          Option.map (const pp_procedure_division) proc ]
+          Option.map (const (pp_with_loc pp_procedure_division)) proc ]
 
 type factory_definition = (* Note: could be merged with instance_definition *)
   {
@@ -181,11 +184,11 @@ type factory_definition = (* Note: could be merged with instance_definition *)
     factory_options: options_paragraph with_loc option;
     factory_env: environment_division with_loc option;
     factory_data: data_division with_loc option;
-    factory_methods: method_definition with_loc list option;
+    factory_methods: method_definitions with_loc option;
   }
 [@@deriving ord]
 
-let pp_object_procedure_division =
+let pp_object_procedure_division: method_definitions Pretty.printer =
   Fmt.(any "PROCEDURE DIVISION." ++
        (list ~sep:nop (sp ++ pp_with_loc pp_method_definition)))
 
@@ -202,7 +205,7 @@ let pp_factory_definition ppf
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
           Option.map (const (pp_with_loc pp_data_division)) data;
-          Option.map (const pp_object_procedure_division) meths ]
+          Option.map (const (pp_with_loc pp_object_procedure_division)) meths ]
 
 type instance_definition =
   {
@@ -210,7 +213,7 @@ type instance_definition =
     instance_options: options_paragraph with_loc option;
     instance_env: environment_division with_loc option;
     instance_data: data_division with_loc option;
-    instance_methods: method_definition with_loc list option;
+    instance_methods: method_definitions with_loc option;
   }
 [@@deriving ord]
 
@@ -222,7 +225,7 @@ let pp_instance_definition ppf
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
           Option.map (const (pp_with_loc pp_data_division)) data;
-          Option.map (const pp_object_procedure_division) meths ]
+          Option.map (const (pp_with_loc pp_object_procedure_division)) meths ]
 
 
 type class_definition =
@@ -272,7 +275,7 @@ type interface_definition =
     interface_usings: name with_loc list;
     interface_options: options_paragraph with_loc option;
     interface_env: environment_division with_loc option;
-    interface_methods: method_definition with_loc list option;
+    interface_methods: method_definitions with_loc option;
     interface_end_name: name with_loc;
   }
 [@@deriving ord]
@@ -294,7 +297,7 @@ let pp_interface_definition ppf
     Fmt.(sp ++ pp_interface_id_paragraph ++ any ".") (n, a, inh, us)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
-          Option.map (const pp_object_procedure_division) meths ]
+          Option.map (const (pp_with_loc pp_object_procedure_division)) meths ]
 
 type compilation_unit =
   | Program of program_unit

@@ -38,7 +38,10 @@ let () =
   deep_iter ibm_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<1>Pre-processing `%s':@\n" @@ ibm_testsuite // path;
-      preprocess_file ~config ~source_format:(Cobol_config.SF SFFree)
+      (* Note: we (and GnuCOBOL) don't appear to provide IBM's "EXTENDED" format
+         that has lines of 252 bytes. Closest we have is xCard (with lines of
+         255 bytes). *)
+      preprocess_file ~config ~source_format:(Cobol_config.SF SFxCard)
         (ibm_root // path);
       printf "@]@\nDone.@."
     end;

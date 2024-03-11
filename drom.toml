@@ -14,7 +14,7 @@ min-edition = "4.14.0"
 name = "superbol-studio-oss"
 skeleton = "program"
 synopsis = "SuperBOL Studio OSS Project"
-version = "0.1.0"
+version = "0.1.1"
 dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
 bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 
@@ -111,23 +111,23 @@ dir = "src/vscode/superbol-vscode-platform"
 # edit 'src/vscode/superbol-vscode-platform/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/polka-js-stubs"
+dir = "src/vendor/vscode-ocaml-platform/src-bindings/polka"
 # edit 'src/vscode/polka-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/interop-js-stubs"
+dir = "src/vendor/vscode-ocaml-platform/src-bindings/interop"
 # edit 'src/vscode/interop-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/node-js-stubs"
+dir = "src/vendor/vscode-ocaml-platform/src-bindings/node"
 # edit 'src/vscode/node-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/vscode-js-stubs"
+dir = "src/vendor/vscode-ocaml-platform/src-bindings/vscode"
 # edit 'src/vscode/vscode-js-stubs/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vscode/vscode-languageclient-js-stubs"
+dir = "src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient"
 # edit 'src/vscode/vscode-languageclient-js-stubs/package.toml' for package-specific options
 
 [[package]]
