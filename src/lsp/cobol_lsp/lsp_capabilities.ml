@@ -38,6 +38,14 @@ let reply (_: ClientCapabilities.t) =
     HoverOptions.create ()
   (* and completion_option = *)
   (*   CompletionOptions.create () *)
+  and workspace =
+    let workspaceFolders =
+      WorkspaceFoldersServerCapabilities.create ()
+        ~supported:true     (* server supports multiple folders per workspace *)
+        ~changeNotifications:(`Bool true)
+    in
+    ServerCapabilities.create_workspace ()
+      ~workspaceFolders
   in
   ServerCapabilities.create ()
     ~textDocumentSync:(`TextDocumentSyncOptions sync)
@@ -49,3 +57,4 @@ let reply (_: ClientCapabilities.t) =
     ~hoverProvider:(`HoverOptions hover)
     ~foldingRangeProvider:(`Bool true)
     (* ~completionProvider:completion_option *)
+    ~workspace

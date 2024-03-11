@@ -23,6 +23,8 @@ let on_notification state notif =
       state                   (* spec indicate notif should just be discarded *)
   | Initialized params, Initialized ->
       Running (Lsp_server.init ~params)
+  | Running registry, ChangeWorkspaceFolders params ->
+      Running (Lsp_server.on_change_workspace_folders params registry)
   | Running registry, ChangeConfiguration { settings = changes } ->
       Running (Lsp_server.on_client_config_changes ~changes registry)
   | Running registry, DidChangeWatchedFiles { changes } ->
