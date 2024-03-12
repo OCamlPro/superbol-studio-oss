@@ -1869,42 +1869,51 @@ let screen_occurs_clause := OCCURS; ~ = integer; TIMES?; < >
 
 (* -------------------- PROCEDURE DIVISION -------------------- *)
 
-procedure_division:
- | PROCEDURE DIVISION
-   ul = ilo(pf(USING,rnel(loc(using_clause))))
-   ro = ro(returning)                                             (* +COB2002 *)
-   rl = ilo(raising_phrase) "."                                   (* +COB2002 *)
-   dl = lo(declaratives)
-   sl = rl(loc(section_paragraph))
-   { { procedure_using_clauses = ul;
+let procedure_division :=
+ | PROCEDURE; DIVISION;
+   procedure_args = ro(procedure_args);
+   ro = ro(returning);                                            (* +COB2002 *)
+   rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
+   dl = lo(declaratives);
+   sl = rl(loc(section_paragraph));
+   { { procedure_args;
        procedure_returning = ro;
        procedure_raising_phrases = rl;
        procedure_declaratives = dl;
        procedure_paragraphs = sl } }
 
-program_procedure_division:
- | PROCEDURE DIVISION
-   ul = ilo(pf(USING,rnel(loc(using_clause))))
-   ro = ro(returning)                                             (* +COB2002 *)
-   rl = ilo(raising_phrase) "."                                   (* +COB2002 *)
-   dl = lo(declaratives)
-   sl = section_paragraphs
-   { { procedure_using_clauses = ul;
+let program_procedure_division :=
+ | PROCEDURE; DIVISION;
+   procedure_args = ro(procedure_args);
+   ro = ro(returning);                                            (* +COB2002 *)
+   rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
+   dl = lo(declaratives);
+   sl = section_paragraphs;
+   { { procedure_args;
        procedure_returning = ro;
        procedure_raising_phrases = rl;
        procedure_declaratives = dl;
        procedure_paragraphs = sl } }
+
+let procedure_args :=
+ | style = loc(procedure_calling_style); args = rnel(loc(procedure_by_clause));
+  { { procedure_calling_style = style;
+      procedure_by_clause = args} }
+
+let procedure_calling_style ==
+ | USING; { ProcedureArgsUsed }
+ | CHAINING; { ProcedureArgsChained }
 
 let object_procedure_division :=                                   (* +COB2002 *)
  | PROCEDURE; DIVISION; "."; ~ = rl(loc(method_definition)); < >
 
 (* COB85: only USING ident+ (in the IPC module, P541) *)
-let using_clause :=
+let procedure_by_clause :=
  | io(BY?; REFERENCE);
-   ~ = nell(o = ibo(OPTIONAL); n = name; { { using_by_reference_optional = o;
-                                             using_by_reference = n } });
-   %prec lowest                             <UsingByReference>
- | BY?; VALUE; ~ = nell(name); %prec lowest <UsingByValue>
+   ~ = nell(o = ibo(OPTIONAL); n = name; { { by_reference_optional = o;
+                                             by_reference = n } });
+   %prec lowest                             <ByReference>
+ | BY?; VALUE; ~ = nell(name); %prec lowest <ByValue>
 
 (* Ambiguous, only class name may have factory *)
 let raising_phrase :=

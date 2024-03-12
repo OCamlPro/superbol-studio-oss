@@ -121,50 +121,10 @@ Considering: import/gnucobol/tests/testsuite.src/run_file.at:1019:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1067:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1107:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1181:0
-run_file.at-1181-prog.cob:16.32:
-  13          WORKING-STORAGE  SECTION.
-  14          01  path         BASED PIC X(10).
-  15          01  x            PIC X.
-  16 >        PROCEDURE        DIVISION CHAINING x.
-----                                   ^
-  17              IF x NOT = SPACES
-  18                 ALLOCATE path
->> Hint: Missing .
-
-run_file.at-1181-prog.cob:16.33-16.41:
-  13          WORKING-STORAGE  SECTION.
-  14          01  path         BASED PIC X(10).
-  15          01  x            PIC X.
-  16 >        PROCEDURE        DIVISION CHAINING x.
-----                                    ^^^^^^^^
-  17              IF x NOT = SPACES
-  18                 ALLOCATE path
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1193:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1350:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1362:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1400:0
-run_file.at-1400-prog.cob:16.32:
-  13          WORKING-STORAGE  SECTION.
-  14          01  path         PIC X(10).
-  15          01  x            PIC X.
-  16 >        PROCEDURE        DIVISION CHAINING x.
-----                                   ^
-  17              IF X = SPACE
-  18                 MOVE SPACES     TO path
->> Hint: Missing .
-
-run_file.at-1400-prog.cob:16.33-16.41:
-  13          WORKING-STORAGE  SECTION.
-  14          01  path         PIC X(10).
-  15          01  x            PIC X.
-  16 >        PROCEDURE        DIVISION CHAINING x.
-----                                    ^^^^^^^^
-  17              IF X = SPACE
-  18                 MOVE SPACES     TO path
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1432:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1479:0
 run_file.at-1479-prog.cob:3.18:
@@ -1053,26 +1013,6 @@ run_file.at-3960-prog2.cob:54.8-54.16:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4000:0
-run_file.at-4000-prog.cob:14.26:
-  11           01 NBYTES       PIC X(4)   USAGE COMP-X.
-  12           01 READ-BUFFER  PIC X(10).
-  13   
-  14 >         PROCEDURE DIVISION CHAINING FNAME.
-----                             ^
-  15           DISPLAY 'RUN WITH ' FUNCTION TRIM (FNAME TRAILING).
-  16           CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
->> Hint: Missing .
-
-run_file.at-4000-prog.cob:14.27-14.35:
-  11           01 NBYTES       PIC X(4)   USAGE COMP-X.
-  12           01 READ-BUFFER  PIC X(10).
-  13   
-  14 >         PROCEDURE DIVISION CHAINING FNAME.
-----                              ^^^^^^^^
-  15           DISPLAY 'RUN WITH ' FUNCTION TRIM (FNAME TRAILING).
-  16           CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
->> Error: Invalid syntax
-
 run_file.at-4000-prog.cob:15.49-15.57:
   12           01 READ-BUFFER  PIC X(10).
   13   

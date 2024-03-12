@@ -7795,26 +7795,6 @@ run_misc.at-13127-prog.cob:30.7-30.16:
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13174:0
-run_misc.at-13174-prog.cob:11.25:
-   8          DATA DIVISION.
-   9          WORKING-STORAGE SECTION.
-  10          77 note PIC X(05).
-  11 >        PROCEDURE DIVISION CHAINING note.
-----                            ^
-  12          DISPLAY "This is sent to CONSOLE " note UPON CONSOLE.
-  13          DISPLAY "This is sent to SYSERR  " note UPON SYSERR.
->> Hint: Missing .
-
-run_misc.at-13174-prog.cob:11.26-11.34:
-   8          DATA DIVISION.
-   9          WORKING-STORAGE SECTION.
-  10          77 note PIC X(05).
-  11 >        PROCEDURE DIVISION CHAINING note.
-----                             ^^^^^^^^
-  12          DISPLAY "This is sent to CONSOLE " note UPON CONSOLE.
-  13          DISPLAY "This is sent to SYSERR  " note UPON SYSERR.
->> Error: Invalid syntax
-
 run_misc.at-13174-prog.cob:19.12-19.24:
   16          DISPLAY "This is also sent to SYSERR  " note UPON SYSERR.
   17          DISPLAY "This is also sent to PRINTER " note UPON PRINTER.

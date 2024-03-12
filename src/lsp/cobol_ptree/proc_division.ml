@@ -19,21 +19,31 @@ open Statements
 
 type procedure_division =
   {
-    procedure_using_clauses: using_clause with_loc list;
+    procedure_args: procedure_args option;
     procedure_returning: ident with_loc option;
     procedure_raising_phrases: raising_phrase with_loc list;
     procedure_declaratives: declarative with_loc list;
     procedure_paragraphs: paragraph with_loc list;
   }
 
-and using_clause =
-  | UsingByReference of using_by_reference list
-  | UsingByValue of name with_loc list
+and procedure_by_clause =
+  | ByReference of by_reference list
+  | ByValue of name with_loc list
 
-and using_by_reference =
+and procedure_calling_style =
+  | ProcedureArgsUsed
+  | ProcedureArgsChained
+
+and procedure_args =
   {
-    using_by_reference: name with_loc;
-    using_by_reference_optional: bool;
+    procedure_calling_style: procedure_calling_style with_loc;
+    procedure_by_clause: procedure_by_clause with_loc list
+  }
+
+and by_reference =
+  {
+    by_reference: name with_loc;
+    by_reference_optional: bool;
   }
 
 and raising_phrase =
@@ -159,29 +169,38 @@ let pp_declaratives ppf = function
       Fmt.pf ppf "DECLARATIVES.%a@ END DECLARATIVES."
         Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_declarative)) pd
 
-let pp_using_by_reference ppf { using_by_reference = n;
-                                using_by_reference_optional = o } =
+let pp_by_reference ppf { by_reference = n;
+                          by_reference_optional = o } =
   if o then Fmt.pf ppf "OPTIONAL ";
   pp_name' ppf n
 
-let pp_using_clause ppf = function
-  | UsingByReference ubrs ->
-      Fmt.pf ppf "USING ";
-      Fmt.(list ~sep:sp pp_using_by_reference) ppf ubrs
-  | UsingByValue ns ->
-      Fmt.pf ppf "USING BY VALUE %a" Fmt.(list ~sep:sp pp_name') ns
+let pp_procedure_calling_style ppf = function
+  | ProcedureArgsUsed -> Fmt.pf ppf "USING"
+  | ProcedureArgsChained -> Fmt.pf ppf "CHAINING"
+
+let pp_procedure_by_clause ppf = function
+  | ByReference ubrs ->
+      Fmt.(list ~sep:sp pp_by_reference) ppf ubrs
+  | ByValue ns ->
+      Fmt.pf ppf "BY VALUE %a" Fmt.(list ~sep:sp pp_name') ns
+
+let pp_procedure_args ppf
+  {procedure_calling_style=style; procedure_by_clause=args} =
+  Fmt.pf ppf "%a%a"
+    Fmt.(sp ++ pp_with_loc pp_procedure_calling_style) style
+    Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_procedure_by_clause)) args
 
 let pp_raising_phrase ppf { raising; raising_factory } =
   if raising_factory then Fmt.pf ppf "FACTORY ";
   pp_name' ppf raising
 
-let pp_procedure_division ppf { procedure_using_clauses = puc;
+let pp_procedure_division ppf { procedure_args = pargs;
                                 procedure_returning = pur;
                                 procedure_raising_phrases = prp;
                                 procedure_declaratives = pd;
                                 procedure_paragraphs = pp } =
   Fmt.pf ppf "PROCEDURE DIVISION%a%a%a.%a@;<1 2>@[<hv>%a@]"
-    Fmt.(list ~sep:nop (sp ++ pp_with_loc pp_using_clause)) puc
+    Fmt.(option pp_procedure_args) pargs
     Fmt.(option (any "@ RETURNING " ++ pp_with_loc pp_ident)) pur
     Fmt.(if prp == [] then nop
          else any "RAISING " ++
