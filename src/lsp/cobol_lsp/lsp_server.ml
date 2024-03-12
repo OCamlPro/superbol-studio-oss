@@ -227,17 +227,26 @@ let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
   end
 
 
+let dispatch_all_diagnostics registry =
+  URIMap.fold (fun _ -> dispatch_diagnostics) registry.docs registry
+
+
 (** Registration for client notifications *)
+
+
+let config_watch_registration_id ~rooturi =
+  "watch-superbol.toml-" ^
+  Digest.(to_hex @@ string @@ DocumentUri.to_string rooturi)
 
 
 let start_watching_config_of ~project registry =
   let registration =
     RegistrationParams.create ~registrations:[
+      let rooturi = Lsp_project.rooturi project in
       let watchers =
         (* Note: basic glob patterns that try matching only in rootdir do not
            seem to work (in VS Code).  Watch in any sub-dir? *)
         let pattern = "**/superbol.toml" in
-        let rooturi = Lsp_project.rooturi project in
         let globPattern =
           (* `Pattern pattern *)
           `RelativePattern
@@ -250,7 +259,7 @@ let start_watching_config_of ~project registry =
         ]
       in
       Registration.create ()
-        ~id:"watch-superbol.toml"
+        ~id:(config_watch_registration_id ~rooturi)
         ~method_:"workspace/didChangeWatchedFiles"
         ~registerOptions:
           DidChangeWatchedFilesRegistrationOptions.(yojson_of_t @@
@@ -264,6 +273,25 @@ let start_watching_config_of ~project registry =
 let maybe_start_watching_config_of ~project registry =
   if registry.params.with_client_file_watcher
   then start_watching_config_of ~project registry
+  else registry
+
+
+let stop_watching_config_of ~project registry =
+  let unregistration =
+    UnregistrationParams.create ~unregisterations:[
+      let rooturi = Lsp_project.rooturi project in
+      Unregistration.create
+        ~id:(config_watch_registration_id ~rooturi)
+        ~method_:"workspace/didChangeWatchedFiles"
+    ]
+  in
+  delay_unit registry
+    ~request:(ClientUnregisterCapability unregistration)
+
+
+let maybe_stop_watching_config_of ~project registry =
+  if registry.params.with_client_file_watcher
+  then stop_watching_config_of ~project registry
   else registry
 
 
@@ -295,14 +323,19 @@ let maybe_start_watching_client_config registry =
 
 (** {2 Projects} *)
 
-(* TODO: add ability to remove projects from the registry? *)
-
 
 let add_project project r =
   let projects = Lsp_project.SET.add project r.projects in
   if projects == r.projects
   then r
   else maybe_start_watching_config_of ~project { r with projects }
+
+
+let remove_project project r =
+  let projects = Lsp_project.SET.remove project r.projects in
+  if projects == r.projects
+  then r
+  else maybe_stop_watching_config_of ~project { r with projects }
 
 
 (** {3 Per-project cache} *)
@@ -572,21 +605,54 @@ let load_project_in ~dir registry =
     ~silence_ignored_settings_warning:true
 
 
-let init ~params : registry =
-  let registry =
-    { params;
-      projects = Lsp_project.SET.empty;
-      docs = URIMap.empty;
-      indirect_diags = URIMap.empty;
-      pending_tasks = { delayed_id = 0; delayed = IMap.empty };
-      sub_state = { ignore_next_client_config_changes = true } }
-  in
+let add_workspace_folders folders registry =
   List.fold_left begin fun registry workspace_folder_uri ->
     load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
-  end registry params.workspace_folders |>
-  URIMap.fold (fun _ -> dispatch_diagnostics) registry.docs |>
+  end registry folders |>
+  dispatch_all_diagnostics
+
+
+
+let init ~params : registry =
+  { params;
+    projects = Lsp_project.SET.empty;
+    docs = URIMap.empty;
+    indirect_diags = URIMap.empty;
+    pending_tasks = { delayed_id = 0; delayed = IMap.empty };
+    sub_state = { ignore_next_client_config_changes = true } } |>
+  add_workspace_folders params.workspace_folders |>
   maybe_start_watching_client_config
 
+
+(** {2 Handling of workspace notifications} *)
+
+
+let unload_project project registry =
+  let registry, disposable_docs = extract_docs_of ~project registry in
+  save_project_caches { registry with docs = disposable_docs };
+  let registry = remove_project project registry in
+  registry
+
+
+let remove_workspace_folders folders registry =
+  List.fold_left begin fun registry workspace_folder_uri ->
+    try
+      let dirname = Lsp.Uri.to_path workspace_folder_uri in
+      let rootdir = Superbol_project.rootdir_at ~dirname in   (* may invalid. *)
+      let project = Lsp_project.SET.for_rootdir ~rootdir registry.projects in
+      unload_project project registry
+    with Not_found | Invalid_argument _ ->
+      Lsp_io.log_error "%s@ is@ not@ a@ known@ workspace@ directory"
+        (Lsp.Uri.to_string workspace_folder_uri);
+      registry
+  end registry folders
+
+
+let on_change_workspace_folders
+    DidChangeWorkspaceFoldersParams.{ event = { added; removed } } registry =
+  registry |>
+  remove_workspace_folders (List.map (fun x -> x.WorkspaceFolder.uri) removed) |>
+  add_workspace_folders (List.map (fun x -> x.WorkspaceFolder.uri) added)
 
 
 (** {2 Handling of document notifications} *)

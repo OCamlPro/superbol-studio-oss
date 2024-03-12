@@ -76,6 +76,9 @@ val init
   : params: params
   -> t
 
+val on_change_workspace_folders
+  : Lsp.Types.DidChangeWorkspaceFoldersParams.t -> t -> t
+
 (** When given, [copybook] indicates whether the document is a copybook (in
     which case it is not parsed directly as a normal program).  When absent,
     copybook detection is performed via project configuration (see
