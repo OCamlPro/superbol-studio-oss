@@ -406,6 +406,44 @@ let contributes =
             ~description:"Additional arguments passed to `cobc`";
         ]
     ]
+    ~configurationDefaults: [
+      "[cobol]",
+      Defaults [
+        "files.autoGuessEncoding", `Bool false;
+        "editor.insertSpaces", `Bool true;
+        "editor.formatOnType", `Bool false;
+        "editor.autoIndent", `String "full";
+        "editor.detectIndentation", `Bool false;
+        (* TODO: see if we can tune that directly from the client, checking the
+           configured format beforehand. *)
+        (* "editor.rulers", `A [ *)
+        (*   `Float 6.; *)
+        (*   `Float 7.; *)
+        (*   `Float 72.; *)
+        (* ]; *)
+        "editor.semanticHighlighting.enabled", `Bool true;
+        "editor.wordSeparators", `String "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?";
+      ]
+    ]
+    ~semanticTokenScopes: [
+      `O [
+        "language", `String "cobol";
+        "scopes", `O [
+          (* Here, we map semantic token types to textmate scope names that are
+             defined in `COBOL.tmLanguage.json`: this aligns the theming
+             attributes that are associated with the former types with the ones
+             that are associated with the latter. *)
+          "keyword", `A [`String "keyword.verb.cobol"];
+          "macro", `A [`String "keyword.control.directive.cobol"];
+        ];
+      ]
+    ]
+    ~grammars: [
+      Manifest.grammar ()
+        ~language: "cobol"
+        ~scopeName: "source.cobol"
+        ~path:"./syntaxes/COBOL.tmLanguage.json";
+    ]
     ~problemPatterns: [
       Manifest.problemPattern
         (Some "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$")

@@ -153,6 +153,17 @@
         }
       }
     },
+    "configurationDefaults": {
+      "[cobol]": {
+        "files.autoGuessEncoding": false,
+        "editor.insertSpaces": true,
+        "editor.formatOnType": false,
+        "editor.autoIndent": "full",
+        "editor.detectIndentation": false,
+        "editor.semanticHighlighting.enabled": true,
+        "editor.wordSeparators": "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?"
+      }
+    },
     "debuggers": [
       {
         "type": "gdb",
@@ -335,6 +346,13 @@
         ]
       }
     ],
+    "grammars": [
+      {
+        "language": "cobol",
+        "scopeName": "source.cobol",
+        "path": "./syntaxes/COBOL.tmLanguage.json"
+      }
+    ],
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
@@ -440,6 +458,19 @@
             "type": "array",
             "description": "Additional arguments passed to `cobc`"
           }
+        }
+      }
+    ],
+    "semanticTokenScopes": [
+      {
+        "language": "cobol",
+        "scopes": {
+          "keyword": [
+            "keyword.verb.cobol"
+          ],
+          "macro": [
+            "keyword.control.directive.cobol"
+          ]
         }
       }
     ]

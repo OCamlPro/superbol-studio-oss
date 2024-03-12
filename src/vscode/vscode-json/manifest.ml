@@ -460,6 +460,20 @@ type grammar = { (* TextMate grammar for syntax highlighting *)
 }
 [@@deriving json_encoding,show]
 
+let grammar
+    ?language
+    ~scopeName
+    ~path
+    ?(injectTo = [])
+    ?(embeddedLanguages = [])
+    ()
+  =
+  { grammar_language = language;
+    grammar_scopeName = scopeName;
+    grammar_path = path;
+    grammar_injectTo = injectTo;
+    grammar_embeddedLanguages = embeddedLanguages }
+
 type icon = {
   icon_description : string ;
   icon_default : (string * string) list [@assoc] ;
@@ -792,7 +806,7 @@ type contributes = {
     (* TODO *)
     resourceLabelFormatters : any option ;
     semanticTokenModifiers : any option ;
-    semanticTokenScopes : any option ;
+    semanticTokenScopes : any list;
     semanticTokenTypes : any option ;
     terminal : any option ;
     themes : any option ;
@@ -825,6 +839,7 @@ let contributes
   ?( views = [] )
   ?( viewsContainers = [] )
   ?( viewsWelcome = [] )
+  ?( semanticTokenScopes = [])
   () =
   {
     breakpoints ;
@@ -853,7 +868,7 @@ let contributes
     viewsWelcome ;
     resourceLabelFormatters = None ;
     semanticTokenModifiers = None ;
-    semanticTokenScopes  = None;
+    semanticTokenScopes;
     semanticTokenTypes = None ;
     terminal = None ;
     themes = None ;

@@ -475,13 +475,21 @@ let handle_hover registry (params: HoverParams.t) =
     ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
       match find_hovered_pplog_event pplog with
       | Some Replacement { matched_loc = loc;
+                           replacement_text = []; _ } ->
+          Pretty.string_to (hover_markdown ~loc) "empty text"
+      | Some Replacement { matched_loc = loc;
                            replacement_text; _ } ->
-          Pretty.string_to (hover_markdown ~loc) "``@[<h>%a@]``"
-            Cobol_preproc.Text.pp_text replacement_text
+          Pretty.string_to (hover_markdown ~loc) "```cobol\n%a\n```"
+            Cobol_preproc.Text.pp_text replacement_text (* TODO: ensure no ``` *)
       | Some FileCopy { copyloc = loc;
                         status = CopyDone lib | CyclicCopy lib } ->
-          let text = EzFile.read_file lib in
-          Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```" text
+          begin match EzFile.read_file lib with
+            | "" ->
+                Pretty.string_to (hover_markdown ~loc) ""
+            | text ->
+                Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```"
+                  text                                 (* TODO: ensure no ``` *)
+          end
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
       | Some CompilerDirective _
