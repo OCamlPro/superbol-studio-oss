@@ -22,8 +22,10 @@ open Ez_file.V1
 
 (** {2 Handling requests} *)
 
-(** Catch generic exception cases, and report errors using {!error} above *)
-let try_doc ~f registry doc_id =
+(** Catch generic exception cases, and report errors using {!Lsp_error}.
+    Returns [None] in case the document cannot be parsed (or is a copybook, for
+    now).  [f] has to return an optional value. *)
+let try_main_doc ~f registry doc_id =
   let doc =
     try Lsp_server.find_document doc_id registry
     with Not_found ->
@@ -34,12 +36,12 @@ let try_doc ~f registry doc_id =
         " (DocumentUri.to_string doc_id.TextDocumentIdentifier.uri)
   in
   try f ~doc
-  with e ->
-    Lsp_error.internal "Caught exception: %a" Fmt.exn e
+  with Lsp_document.(Unparseable _ | Copybook _) -> None
+     | e -> Lsp_error.internal "Caught exception: %a" Fmt.exn e
 
-(** Same as [try_doc], with some additional document data *)
-let try_with_document_data ~f =
-  try_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
+(** Same as {!try_main_doc}, with some additional document data. *)
+let try_with_main_document_data ~f =
+  try_main_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
 
 (** {3 Initialization} *)
 
@@ -222,10 +224,11 @@ let lookup_definition_in_doc ~rootdir
       Some (`Location (find_definitions loc_translator cu_name qn group))
 
 let handle_definition registry (params: DefinitionParams.t) =
-  try_with_document_data registry params.textDocument
-    ~f:(fun ~doc:{ project; _ } ->
-        let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
-        lookup_definition_in_doc ~rootdir params)
+  try_with_main_document_data registry params.textDocument
+    ~f:begin fun ~doc:{ project; _ } ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+      lookup_definition_in_doc ~rootdir params
+    end
 
 (** {3 References} *)
 
@@ -308,10 +311,11 @@ let lookup_references_in_doc
       Some (def_locs @ ref_locs)
 
 let handle_references state (params: ReferenceParams.t) =
-  try_with_document_data state params.textDocument
-    ~f:(fun ~doc:{ project; _ } ->
-        let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
-        lookup_references_in_doc ~rootdir params)
+  try_with_main_document_data state params.textDocument
+    ~f:begin fun ~doc:{ project; _ } ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+      lookup_references_in_doc ~rootdir params
+    end
 
 (** {3 Formatting} *)
 
@@ -431,7 +435,7 @@ let handle_formatting registry params =
 let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
-    try_with_document_data registry doc
+    try_with_main_document_data registry doc
       ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
                                         rev_comments; rev_ignored; _ };
                           _ } Cobol_typeck.Outputs.{ ptree; _ } ->
@@ -471,7 +475,7 @@ let handle_hover registry (params: HoverParams.t) =
     let range = Lsp_position.range_of_srcloc_in ~filename loc in
     Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
-  try_doc registry params.textDocument
+  try_main_doc registry params.textDocument
     ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
       match find_hovered_pplog_event pplog with
       | Some Replacement { matched_loc = loc;
@@ -500,7 +504,7 @@ let handle_hover registry (params: HoverParams.t) =
 (** {3 Completion} *)
 
 let handle_completion registry (params: CompletionParams.t) =
-  try_with_document_data registry params.textDocument
+  try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
       let items =
         Lsp_completion.completion_items textdoc params.position ptree in
@@ -516,7 +520,7 @@ let handle_completion registry (params: CompletionParams.t) =
     not support FoldingRangeKind or CollapsedText
     (To support these features, need to change the client capability) *)
 let handle_folding_range registry (params: FoldingRangeParams.t) =
-  try_with_document_data registry params.textDocument
+  try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc:_ { ptree; group; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
       Some (Lsp_folding.ranges_in ~filename ptree group)
