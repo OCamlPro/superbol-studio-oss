@@ -15,12 +15,13 @@
 let lsp_server_autorestarter instance : Vscode.Disposable.t =
   Vscode.Workspace.onDidChangeConfiguration ()
     ~listener:begin fun config_change ->
-      let affects ?scope section : bool =
-        Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
-          ~section ?scope
-      in
-      if affects "superbol.lsp-path"  (* machine setting: no need for a scope *)
+      if Superbol_languageclient.server_needs_restart_after ~config_change
       then
+        let _ =
+          Vscode.Window.setStatusBarMessage ()
+            ~text:"Restarting SuperBOL Language Server…"
+            ~hide:(`AfterTimeout 2000)
+        in
         let _: unit Promise.t =
           Superbol_instance.start_language_server instance
         in ()
