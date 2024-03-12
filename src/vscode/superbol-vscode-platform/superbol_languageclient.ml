@@ -49,21 +49,28 @@ let find_superbol root =
 
 
 let serverOptions ~context =
-  let bundled_superbol =
-    try
-      find_superbol
-        (Vscode.Uri.joinPath ~pathSegments:["_dist"]
-           (Vscode.ExtensionContext.extensionUri context));
-    with Not_found ->
-      (* If there is no bundled executable for the current platform, fall back
-         to looking for superbol-free in the PATH *)
-      "superbol-free"
+  let root_uri = Vscode.ExtensionContext.extensionUri context in
+  let command =
+    match Superbol_workspace.superbol_exe () with
+    | Some cmd ->
+        cmd
+    | None ->
+        try find_superbol (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
+        with Not_found ->
+          (* If there is no bundled executable for the current platform, fall
+             back to looking for superbol-free in the PATH *)
+          "superbol-free"
+  and fallback_config_dir =
+    Vscode.Uri.fsPath @@
+    Vscode.Uri.joinPath root_uri ~pathSegments:["gnucobol-config"]
+  in
+  let options =
+    LSP.ExecutableOptions.create ()
+      ~env:(Interop.Dict.add "COB_CONFIG_DIR_FALLBACK" fallback_config_dir
+              Node.Process.Env.env)
   in
   LSP.ServerOptions.create ()
-    ~command:(match Superbol_workspace.superbol_exe () with
-        | None -> bundled_superbol
-        | Some cmd -> cmd)
-    ~args:["lsp"]
+    ~options ~command ~args:["lsp"]
 
 
 let clientOptions () =
