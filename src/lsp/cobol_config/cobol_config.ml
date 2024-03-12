@@ -24,6 +24,8 @@ module Diagnostics = Config_diagnostics
 
 module DIAGS = Cobol_common.Diagnostics
 
+let fallback_config_dir_var = "COB_CONFIG_DIR_FALLBACK"
+
 exception ERROR of Config_diagnostics.error
 
 let __init_default_exn_printers =
@@ -47,7 +49,11 @@ let default_search_path =
   in
   lazy begin
     let cwd = EzFile.getcwd () in
-    let cob_config_dir = Option.to_list (Sys.getenv_opt "COB_CONFIG_DIR") in
+    let cob_config_dir =
+      Option.to_list (Sys.getenv_opt "COB_CONFIG_DIR")
+    and fallback_dir =
+      Option.to_list (Sys.getenv_opt fallback_config_dir_var)
+    in
     let xdg_superbol_dir =      (* is this available on win32/cygwin as well? *)
       append ~sub:"superbol" @@
       match Sys.getenv_opt "XDG_CONFIG_HOME" with
@@ -65,7 +71,8 @@ let default_search_path =
             "/etc/gnucobol"]
       else []
     in
-    cwd ::  cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific
+    cwd :: cob_config_dir @ xdg_superbol_dir @ windose_specific @ unix_specific @
+    fallback_dir
   end
 
 let retrieve_search_path ?search_path () =

@@ -5,6 +5,7 @@ TARGET_NAME = superbol-vscode-platform
 
 SRCDIR ?= src
 STUDIO_SRCDIR = $(SRCDIR)/vscode/superbol-vscode-platform
+GNUCOBOL_SRCDIR = import/gnucobol
 
 CP ?= cp -f # ln -srf
 
@@ -131,10 +132,17 @@ _out/superbol-vscode-gdb.js:					\
 	all-vsix-debug-packages					\
 	all-vsix-packages
 
+gnucobol-config: $(GNUCOBOL_SRCDIR)/config
+	@mkdir -p $@
+	rm -r -f $@/*.*
+	find $(GNUCOBOL_SRCDIR)/config -type f		\
+		-a -regex '.*.\(conf\|words\|ttbl\)' -print0 |	\
+		xargs -0 cp -f -t $@
+
 vsix-dist-setup:
 	@mkdir -p _dist
 
-vsix-package:
+vsix-package: gnucobol-config
 #	needs 'make build-debug' or 'make build-release' before
 	rm -f _dist/superbol-free-*-*
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
@@ -162,7 +170,7 @@ all-vsix-debug-packages: build-debug
 all-vsix-packages: all-vsix-debug-packages all-vsix-release-packages
 
 vsix-clean: clean
-	rm -rf _out _dist *.vsix
+	rm -rf _out gnucobol-config _dist *.vsix
 
 # publishing (requires vsce/ovsx login)
 

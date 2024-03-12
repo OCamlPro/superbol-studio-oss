@@ -15,42 +15,35 @@
 open Vscode_languageclient
 
 type t = {
-  mutable bundled_superbol : string;
+  context: Vscode.ExtensionContext.t;
   mutable language_client: LanguageClient.t option
 }
 type client = LanguageClient.t
 
-let make ~bundled_superbol () = {
-  bundled_superbol;
-  language_client = None
-}
+let make ~context = { context; language_client = None }
 
 let client { language_client; _ } = language_client
 
 let stop_language_server t =
   match t.language_client with
-  | None -> Promise.return ()
-  | Some client ->
-    t.language_client <- None;
-    if LanguageClient.isRunning client then
-      LanguageClient.stop client
-    else
+  | None ->
       Promise.return ()
+  | Some client ->
+      t.language_client <- None;
+      if LanguageClient.isRunning client then
+        LanguageClient.stop client
+      else
+        Promise.return ()
 
-let start_language_server t =
+let start_language_server ({ context; _ } as t) =
   let open Promise.Syntax in
   let* () = stop_language_server t in
-  let serverOptions =
-    Superbol_languageclient.serverOptions
-      ~bundled_superbol:t.bundled_superbol
-  in
-  let clientOptions = Superbol_languageclient.clientOptions () in
   let client =
     LanguageClient.make ()
       ~id: "superbol-free-lsp"
       ~name: "SuperBOL Language Server"
-      ~serverOptions
-      ~clientOptions
+      ~serverOptions:(Superbol_languageclient.serverOptions ~context)
+      ~clientOptions:(Superbol_languageclient.clientOptions ())
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client

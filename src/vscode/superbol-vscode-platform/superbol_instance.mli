@@ -15,10 +15,10 @@
 type t
 type client = Vscode_languageclient.LanguageClient.t
 
-val make : bundled_superbol:string -> unit -> t
+val make: context:Vscode.ExtensionContext.t -> t
 
-val stop_language_server : t -> unit Promise.t
-val start_language_server : t -> unit Promise.t
+val stop_language_server: t -> unit Promise.t
+val start_language_server: t -> unit Promise.t
 
 val write_project_config
   : ?text_editor: Vscode.TextEditor.t
