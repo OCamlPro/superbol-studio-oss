@@ -11,11 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
 val apply_edits :
   contents:string ->
   range:Types.range ->
   config:Types.config ->
-  filename:string ->
-  edits:Types.indent_record list ->
-  symbolic:bool ->
-  Types.edit_space_operation list
+  edits:Types.indent_record list -> 't Types.output -> 't

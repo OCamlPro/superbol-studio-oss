@@ -32,7 +32,8 @@ let action ~inplace ?suffix
       try
         Cobol_indent.Reformat.to_free
           ~source_format
-          contents
+          ~filename
+          ~contents
       with
       | Cobol_indent.Reformat.Error (pos, msg) ->
         Printf.eprintf "Error in %s at pos %d: %s\n%!"

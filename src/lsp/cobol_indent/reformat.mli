@@ -15,5 +15,6 @@ exception Error of int * string
 
 val to_free :
   source_format:Cobol_config.source_format_spec ->
-  (* contents *) string ->
+  filename:string ->
+  contents:string ->
   string

@@ -396,33 +396,37 @@ let handle_range_formatting registry params =
       end_line = end_.line + 1
     }
   in
-  let _edit_list, edit_ops =
+  let output =
     Cobol_indent.Main.indent
-      ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~source_format:project.config.source_format
+      (*
+      ~dialect:(Cobol_config.dialect project.config.cobol_config)
       ~config:project.config.indent_config
+*)
       ~filename:(Lsp.Uri.to_path doc.uri)
       ~contents:(Lsp.Text_document.text textdoc)
       ~range:range_to_indent
-      ()
+      Output_edits
   in
-  Some ( to_textedits edit_ops ) (* (List.map lsp_text_edit edit_list) *)
+  Some ( to_textedits output.operations )
 
 let handle_formatting registry params =
   let DocumentFormattingParams.{ textDocument = doc; _ } = params in
   let Lsp_document.{ project; textdoc; _ } =
     Lsp_server.find_document doc registry in
   try
-    let _editList, edit_ops =
+    let output =
       Cobol_indent.Main.indent
-        ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~source_format:project.config.source_format
+        (*
+        ~dialect:(Cobol_config.dialect project.config.cobol_config)
         ~config:project.config.indent_config
+*)
         ~filename:(Lsp.Uri.to_path doc.uri)
         ~contents:(Lsp.Text_document.text textdoc)
-        ()
+        Output_edits
     in
-    Some ( to_textedits edit_ops ) (* List.map lsp_text_edit editList) *)
+    Some ( to_textedits output.operations )
   with Failure msg ->
     Lsp_error.internal "Formatting error: %s" msg
 
