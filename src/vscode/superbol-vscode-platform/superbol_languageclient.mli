@@ -12,7 +12,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val serverOptions:
-  bundled_superbol:string ->
-  Vscode_languageclient.ServerOptions.t
-val clientOptions: unit -> Vscode_languageclient.ClientOptions.t
+val serverOptions
+  : context: Vscode.ExtensionContext.t
+  -> Vscode_languageclient.ServerOptions.t
+
+val clientOptions
+  : unit
+  -> Vscode_languageclient.ClientOptions.t
