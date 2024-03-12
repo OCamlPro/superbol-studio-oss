@@ -262,7 +262,7 @@ let semtoks_from_ptree ~filename ?range ptree =
 
     (* procedure using *)
     method! fold_by_reference { by_reference;
-                                      by_reference_optional } acc = acc
+                                by_reference_optional } acc = acc
       |> add_name' by_reference Parameter
       (*|> Visitor.do_children*)
       |> fold_bool self by_reference_optional

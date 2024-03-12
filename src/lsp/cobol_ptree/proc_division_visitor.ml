@@ -39,7 +39,6 @@ class virtual ['a] folder = object
   method fold_raising_phrase              : (raising_phrase                   , 'a) fold = default
   method fold_raising_phrase'             : (raising_phrase with_loc          , 'a) fold = default
   method fold_procedure_calling_style     : (procedure_calling_style          , 'a) fold = default
-  method fold_procedure_calling_style'    : (procedure_calling_style with_loc , 'a) fold = default
   method fold_procedure_args              : (procedure_args                   , 'a) fold = default
 end
 
@@ -138,13 +137,10 @@ let fold_raising_phrase' (v: _ #folder) =
 let fold_procedure_calling_style (v: _ #folder) =
   leaf v#fold_procedure_calling_style
 
-let fold_procedure_calling_style' (v: _ #folder) =
-  leaf' v#fold_procedure_calling_style'
-
 let fold_procedure_args (v: _ #folder) =
   handle v#fold_procedure_args
-    ~continue:begin fun
-      {procedure_calling_style=style; procedure_by_clause=args} x -> x 
+    ~continue:begin fun { procedure_calling_style = style;
+                          procedure_by_clause = args } x -> x 
       >> fold' ~fold:fold_procedure_calling_style v style
       >> fold_list ~fold:fold_procedure_by_clause' v args
     end
