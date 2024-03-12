@@ -48,7 +48,7 @@ let find_superbol root =
   ]
 
 
-let serverOptions ~context =
+let server_options ~context =
   let root_uri = Vscode.ExtensionContext.extensionUri context in
   let command =
     match Superbol_workspace.superbol_exe () with
@@ -69,13 +69,27 @@ let serverOptions ~context =
       ~env:(Interop.Dict.add "COB_CONFIG_DIR_FALLBACK" fallback_config_dir
               Node.Process.Env.env)
   in
+  let args =
+    let force_diagnostics = Superbol_workspace.bool "forceSyntaxDiagnostics" in
+    "lsp" ::
+    if force_diagnostics then ["--force-syntax-diagnostics"] else []
+  in
   LSP.ServerOptions.create ()
-    ~options ~command ~args:["lsp"]
+    ~options ~command ~args
 
 
-let clientOptions () =
+let client_options () =
   LSP.ClientOptions.create ()
     ~documentSelector:[|
       `Filter (LSP.DocumentFilter.createLanguage ()
                  ~language:"cobol");
     |]
+
+
+let server_needs_restart_after ~config_change =
+  let affects ?scope section : bool =
+    Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
+      ~section ?scope
+  in
+  affects "superbol.lsp-path"         (* machine setting: no need for a scope *)
+  || affects "superbol.forceSyntaxDiagnostics"                       (* scope? *)

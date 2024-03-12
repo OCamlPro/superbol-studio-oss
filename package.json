@@ -26,7 +26,7 @@
       }
     ],
     "configuration": {
-      "title": "SuperBOL COBOL",
+      "title": "SuperBOL",
       "properties": {
         "superbol.cobol.dialect": {
           "markdownDescription": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\".\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
@@ -115,11 +115,17 @@
         },
         "superbol.lsp-path": {
           "title": "SuperBOL Executable",
+          "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
           "type": "string",
           "default": "",
-          "description": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
           "scope": "machine",
           "order": 12
+        },
+        "superbol.forceSyntaxDiagnostics": {
+          "markdownDescription": "Force reporting of syntax diagnostics for dialects other than ``COBOL85``.",
+          "type": "boolean",
+          "default": false,
+          "order": 21
         },
         "superbol.debugger.display-variable-attributes": {
           "title": "Display Variable Attributes",
@@ -127,7 +133,7 @@
           "default": false,
           "description": "Display storage property and field attributes (e.g. size of alphanumerics, digits and scale of numerics).",
           "scope": "resource",
-          "order": 21
+          "order": 31
         },
         "superbol.debugger.libcob-path": {
           "title": "GnuCOBOL Runtime Library",
@@ -135,7 +141,7 @@
           "default": "cobc",
           "description": "Path to the GnuCOBOL runtime library file.",
           "scope": "machine-overridable",
-          "order": 22
+          "order": 32
         },
         "superbol.debugger.gdb-path": {
           "title": "GNU Debugger Executable",
@@ -143,7 +149,7 @@
           "default": "gdb",
           "description": "Path to the GNU debugger executable.",
           "scope": "machine-overridable",
-          "order": 23
+          "order": 33
         }
       }
     },

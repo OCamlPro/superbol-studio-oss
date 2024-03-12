@@ -124,6 +124,9 @@ From here, you can notably configure:
 > supported by GnuCOBOL.  Reporting of such diagnostics is currently
 > disabled for dialects other than `COBOL85` to avoid misleading
 > developers with false diagnostics about syntax errors.
+>
+> Reporting can be re-enabled for every dialect by setting the `Force
+> Syntax Diagnostics` flag in SuperBOL configuration setting.
 
 ## Navigation features
 

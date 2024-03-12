@@ -42,8 +42,8 @@ let start_language_server ({ context; _ } as t) =
     LanguageClient.make ()
       ~id: "superbol-free-lsp"
       ~name: "SuperBOL Language Server"
-      ~serverOptions:(Superbol_languageclient.serverOptions ~context)
-      ~clientOptions:(Superbol_languageclient.clientOptions ())
+      ~serverOptions:(Superbol_languageclient.server_options ~context)
+      ~clientOptions:(Superbol_languageclient.client_options ())
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client

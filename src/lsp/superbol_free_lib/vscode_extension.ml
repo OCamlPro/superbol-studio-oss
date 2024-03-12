@@ -283,8 +283,14 @@ let contributes =
       (let with_superbol_toml_note md =
          md ^ "\n\n*(May be overriden in project-specific `superbol.toml` files)*."
        in
-       Manifest.configuration ~title:"SuperBOL COBOL"
+       Manifest.configuration ~title:"SuperBOL"
          [
+
+           (* Note: entries that belong to the `superbol.cobol` section is
+              transmitted to the LSP server, and needs to exactly mirror the
+              `[cobol]` section in `superbol.toml`.  There, convention for keys
+              is to use dash-separated words in lowercase.  *)
+
            Manifest.PROPERTY.enum "superbol.cobol.dialect"
              ~cases:Cobol_config.DIALECT.all_canonical_names
              ~markdownDescription:
@@ -340,11 +346,20 @@ let contributes =
              ~title:"SuperBOL Executable"
              ~default:""
              ~scope:"machine"
-             ~description:
+             ~markdownDescription:
                "Name of the `superbol-free` executable if available in PATH; may \
                 be an absolute path otherwise. Leave empty to use the bundled \
                 `superbol-free`, if available."
              ~order:12;
+
+           (* Flags *)
+
+           Manifest.PROPERTY.bool "superbol.forceSyntaxDiagnostics"
+             ~default:false
+             ~markdownDescription:
+               "Force reporting of syntax diagnostics for dialects other than \
+                ``COBOL85``."
+             ~order:21;
 
            (* Debugger-specific: *)
 
@@ -356,21 +371,22 @@ let contributes =
              ~description:"Display storage property and field attributes \
                            (e.g. size of alphanumerics, digits and scale of \
                            numerics)."
-             ~order:21;
+             ~order:31;
 
            Manifest.PROPERTY.string "superbol.debugger.libcob-path"
              ~title:"GnuCOBOL Runtime Library"
              ~default:"cobc"
              ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL runtime library file."
-             ~order:22;
+             ~order:32;
 
            Manifest.PROPERTY.string "superbol.debugger.gdb-path"
              ~title:"GNU Debugger Executable"
              ~default:"gdb"
              ~scope:"machine-overridable"
              ~description:"Path to the GNU debugger executable."
-             ~order:23;
+             ~order:33;
+
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition
@@ -459,7 +475,7 @@ let contributes =
         ~command:"superbol.write.project.config"
         ~title:"Write Project Configuration"
         ~category:"SuperBOL"
-        (* ~enablement:"!inDebugMode" *);
+      (* ~enablement:"!inDebugMode" *);
     ]
     ~tomlValidation: [
       Manifest.tomlValidation

@@ -12,10 +12,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val serverOptions
+val server_options
   : context: Vscode.ExtensionContext.t
   -> Vscode_languageclient.ServerOptions.t
 
-val clientOptions
+val client_options
   : unit
   -> Vscode_languageclient.ClientOptions.t
+
+val server_needs_restart_after
+  : config_change: Vscode.ConfigurationChangeEvent.t
+  -> bool
