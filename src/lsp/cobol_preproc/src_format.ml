@@ -27,7 +27,7 @@ and fixed_paging_params =
 let fixed_paging    = { cut_at_col = 72; alphanum_padding = Some ' ' }
 let variable_paging = { fixed_paging with cut_at_col = 250 }
 let xcard_paging    = { fixed_paging with cut_at_col = 255 }
-let xopen_paging    = { fixed_paging with cut_at_col = 80 }
+let xopen_paging    = xcard_paging
 let crt_paging      = { fixed_paging with cut_at_col = 320 }
 let terminal_paging = crt_paging
 let cobolx_paging   = { cut_at_col = 255; alphanum_padding = None }
