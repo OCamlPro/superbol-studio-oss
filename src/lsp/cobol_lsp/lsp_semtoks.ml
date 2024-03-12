@@ -261,17 +261,17 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> Visitor.skip_children
 
     (* procedure using *)
-    method! fold_using_by_reference { using_by_reference;
-                                      using_by_reference_optional } acc = acc
-      |> add_name' using_by_reference Parameter
+    method! fold_by_reference { by_reference;
+                                      by_reference_optional } acc = acc
+      |> add_name' by_reference Parameter
       (*|> Visitor.do_children*)
-      |> fold_bool self using_by_reference_optional
+      |> fold_bool self by_reference_optional
       |> Visitor.skip_children
 
-    method! fold_using_clause = function
-      | UsingByReference _ ->
+    method! fold_procedure_by_clause = function
+      | ByReference _ ->
           Visitor.do_children
-      | UsingByValue l -> fun x -> x
+      | ByValue l -> fun x -> x
         |> add_list add_name' l Parameter
         |> Visitor.skip_children
 
