@@ -288,6 +288,23 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
   in
   aux
 
+let compare: srcloc -> srcloc -> int = fun a b -> match a, b with
+  | Raw (sa, ea, _), Raw (sb, eb, _)
+    when sa.pos_fname = sb.pos_fname ->
+      if sa.pos_cnum < sb.pos_cnum &&
+         ea.pos_cnum > eb.pos_cnum
+      then 1                                   (* a totally overlaps b: a > b *)
+      else if sa.pos_cnum > sb.pos_cnum &&
+              ea.pos_cnum < eb.pos_cnum
+      then -1                                              (* converse: a < b *)
+      else
+        let sc = Int.compare sa.pos_cnum sb.pos_cnum in
+        if sc <> 0
+        then sc
+        else Int.compare eb.pos_cnum ea.pos_cnum         (* larger is greater *)
+  | a, b ->
+      Stdlib.compare a b                                           (* for now *)
+
 (** {2 Pretty-printing} *)
 
 let retrieve_file_lines, register_file_contents =

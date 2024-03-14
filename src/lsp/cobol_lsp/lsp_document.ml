@@ -89,6 +89,8 @@ let no_artifacts =
                          rev_ignored = [] }
 
 let check doc ptree =
+  (* Note: temporary translation into the old pre-formatted diagnostics. *)
+  let ptree = Cobol_parser.Outputs.translate_diags ptree in
   let DIAGS.{ result = artifacts, rewinder, checked; diags } =
     DIAGS.more_result ~f:begin fun (ptree, rewinder) ->
       let config = doc.project.config.cobol_config in

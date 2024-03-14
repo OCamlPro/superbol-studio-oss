@@ -51,6 +51,7 @@ module Set: sig
   (** Persistent set of diagnostics *)
   type t = diagnostics
   val pp: t Pretty.printer
+  val pp_above: level:severity -> t Pretty.printer
   val none: t
   val one: diagnostic -> t
   val maybe: diagnostic option -> t
@@ -101,11 +102,11 @@ include module type of Cont
 (* --- *)
 
 val result: ?diags:diagnostics -> 'a -> 'a with_diags
-val result_only: 'a with_diags -> 'a
-val with_diag: 'a -> diagnostic -> 'a with_diags
-val with_diags: 'a -> diagnostics -> 'a with_diags
+(* val result_only: 'a with_diags -> 'a *)
+(* val with_diag: 'a -> diagnostic -> 'a with_diags *)
+(* val with_diags: 'a -> diagnostics -> 'a with_diags *)
 val with_more_diags: diags:diagnostics -> 'a with_diags -> 'a with_diags
-val simple_result: 'a -> 'a with_diags
+(* val simple_result: 'a -> 'a with_diags *)
 val some_result: ?diags:diagnostics -> 'a -> 'a option with_diags
 val no_result: diags:diagnostics -> _ option with_diags
 val map_result: f:('a -> 'b) -> 'a with_diags -> 'b with_diags
@@ -114,7 +115,7 @@ val map_some_result: f:('a -> 'b) -> 'a option with_diags -> 'b option with_diag
 val more_result: f:('a -> 'b with_diags) -> 'a with_diags -> 'b with_diags
 val cons_option_result: 'a option with_diags -> 'a list with_diags -> 'a list with_diags
 val forget_result: _ with_diags -> diagnostics
-val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags
+(* val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags *)
 val show_n_forget: ?set_status:bool -> ?min_level:severity ->
   ?ppf:Format.formatter -> 'a with_diags -> 'a
 val sink_result: ?set_status:bool -> ?ppf:Format.formatter -> _ with_diags -> unit
@@ -146,13 +147,6 @@ module InitStateful:
 (* --- *)
 
 module Fatal: Diagnostics_sigs.FATAL
-  with type ('a, 'b) with_location :=
-    ?addenda:Msgs.addenda
-    -> Srcloc.srcloc
+  with type ('a, 'b) with_optional_location :=
+    ?loc:(Srcloc.srcloc)
     -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-   and type ('a, 'b) with_optional_location :=
-     ?loc:(Srcloc.srcloc)
-     -> ('a, Format.formatter, unit, 'b) format4 -> 'a
-   (* and type set := Set.t *)
-
-val of_exn: exn -> diagnostic

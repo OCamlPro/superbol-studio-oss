@@ -42,6 +42,7 @@ end
 val pp_srcloc: srcloc Pretty.printer
 val pp_srcloc_struct: srcloc Pretty.printer
 val pp_file_loc: srcloc Pretty.printer
+val compare: srcloc -> srcloc -> int
 val raw
   : ?in_area_a:bool
   -> lexloc

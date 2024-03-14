@@ -19,16 +19,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:278:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:325:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:353:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:410:0
-run_functions.at-410-prog.cob:19.7-19.31:
-  16              SET  BITX-FILLER TO TRUE
-  17              STRING FUNCTION BIT-OF (TXT) DELIMITED BY SIZE INTO BITX.
-  18         *> Discover if running ASCII or EBCDIC
-  19 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  20              IF BITX NOT = "01001000010010010010111000100000--"
-  21          >>ELIF CHARSET = 'EBCDIC'
->> Error: Malformed or unknown compiler directive
-
 run_functions.at-410-prog.cob:21.7-21.32:
   18         *> Discover if running ASCII or EBCDIC
   19          >>IF   CHARSET = 'ASCII'
@@ -57,16 +47,6 @@ run_functions.at-410-prog.cob:25.7-25.15:
 ----          ^^^^^^^^
   26                 DISPLAY "UNEXPECTED BIT-VALUE OF 'HI. ': " BITX.
   27   
->> Error: Malformed or unknown compiler directive
-
-run_functions.at-410-prog.cob:30.7-30.31:
-  27   
-  28              SET  BITX-FILLER TO TRUE
-  29              STRING FUNCTION BIT-OF (z"01") DELIMITED BY SIZE INTO BITX.
-  30 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  31              IF BITX NOT = "001100000011000100000000----------"
-  32          >>ELSE
 >> Error: Malformed or unknown compiler directive
 
 run_functions.at-410-prog.cob:32.7-32.13:
@@ -109,6 +89,26 @@ run_functions.at-410-prog.cob:36.54-36.59:
   38                         BITX (1:24).
 >> Error: Invalid syntax
 
+run_functions.at-410-prog.cob:19.7-19.31:
+  16              SET  BITX-FILLER TO TRUE
+  17              STRING FUNCTION BIT-OF (TXT) DELIMITED BY SIZE INTO BITX.
+  18         *> Discover if running ASCII or EBCDIC
+  19 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  20              IF BITX NOT = "01001000010010010010111000100000--"
+  21          >>ELIF CHARSET = 'EBCDIC'
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-410-prog.cob:30.7-30.31:
+  27   
+  28              SET  BITX-FILLER TO TRUE
+  29              STRING FUNCTION BIT-OF (z"01") DELIMITED BY SIZE INTO BITX.
+  30 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  31              IF BITX NOT = "001100000011000100000000----------"
+  32          >>ELSE
+>> Error: Malformed or unknown compiler directive
+
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:541:0
 run_functions.at-541-prog.cob:25.7-25.34:
   22          MAIN.
@@ -128,16 +128,6 @@ run_functions.at-541-prog.cob:29.7-29.16:
 ----          ^^^^^^^^^
   30              GOBACK.
   31   
->> Error: Malformed or unknown compiler directive
-
-run_functions.at-541-prog.cob:36.7-36.31:
-  33              SET  HEXX-FILLER TO TRUE
-  34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
-  35         *> Discover if running ASCII or EBCDIC
-  36 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  37              IF HEXX NOT = "20303132--"
-  38          >>ELIF CHARSET = 'EBCDIC'
 >> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:38.7-38.32:
@@ -170,16 +160,6 @@ run_functions.at-541-prog.cob:42.7-42.15:
   44   
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-541-prog.cob:47.7-47.31:
-  44   
-  45              SET  HEXX-FILLER TO TRUE
-  46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
-  47 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  48              IF HEXX NOT = "48492E20--"
-  49          >> ELSE
->> Error: Malformed or unknown compiler directive
-
 run_functions.at-541-prog.cob:49.7-49.14:
   46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
   47          >>IF   CHARSET = 'ASCII'
@@ -200,16 +180,6 @@ run_functions.at-541-prog.cob:51.7-51.16:
   53   
 >> Error: Malformed or unknown compiler directive
 
-run_functions.at-541-prog.cob:66.7-66.31:
-  63   
-  64              SET  HEXX-FILLER TO TRUE
-  65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
-  66 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  67              IF HEXX NOT = "303100----"
-  68          >> ELSE
->> Error: Malformed or unknown compiler directive
-
 run_functions.at-541-prog.cob:68.7-68.14:
   65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
   66          >>IF   CHARSET = 'ASCII'
@@ -228,16 +198,6 @@ run_functions.at-541-prog.cob:70.7-70.16:
 ----          ^^^^^^^^^
   71                 DISPLAY "UNEXPECTED HEX-VALUE OF z'01': " HEXX.
   72   
->> Error: Malformed or unknown compiler directive
-
-run_functions.at-541-prog.cob:75.7-75.31:
-  72   
-  73              SET  HEXX-FILLER TO TRUE
-  74              STRING FUNCTION HEX-OF (' ') DELIMITED BY SIZE INTO HEXX.
-  75 >        >>IF   CHARSET = 'ASCII'
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  76              IF HEXX NOT = "20--------"
-  77          >> ELSE
 >> Error: Malformed or unknown compiler directive
 
 run_functions.at-541-prog.cob:77.7-77.14:
@@ -279,6 +239,46 @@ run_functions.at-541-prog.cob:107.53-107.58:
  108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
  109                         HEXX (1:6).
 >> Error: Invalid syntax
+
+run_functions.at-541-prog.cob:36.7-36.31:
+  33              SET  HEXX-FILLER TO TRUE
+  34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
+  35         *> Discover if running ASCII or EBCDIC
+  36 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  37              IF HEXX NOT = "20303132--"
+  38          >>ELIF CHARSET = 'EBCDIC'
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:47.7-47.31:
+  44   
+  45              SET  HEXX-FILLER TO TRUE
+  46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
+  47 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  48              IF HEXX NOT = "48492E20--"
+  49          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:66.7-66.31:
+  63   
+  64              SET  HEXX-FILLER TO TRUE
+  65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
+  66 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  67              IF HEXX NOT = "303100----"
+  68          >> ELSE
+>> Error: Malformed or unknown compiler directive
+
+run_functions.at-541-prog.cob:75.7-75.31:
+  72   
+  73              SET  HEXX-FILLER TO TRUE
+  74              STRING FUNCTION HEX-OF (' ') DELIMITED BY SIZE INTO HEXX.
+  75 >        >>IF   CHARSET = 'ASCII'
+----          ^^^^^^^^^^^^^^^^^^^^^^^^
+  76              IF HEXX NOT = "20--------"
+  77          >> ELSE
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:575:0
 run_functions.at-575-prog.cob:7.43:

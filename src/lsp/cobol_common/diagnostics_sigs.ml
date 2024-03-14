@@ -59,12 +59,6 @@ module type STATEFUL0 = sig
 end
 
 module type FATAL = sig
-  type ('a, 'b) with_location
   type ('a, 'b) with_optional_location
-  val localized_error: _ with_location [@@deprecated "Please try a proper \
-                                                      recovery"]
   val error: _ with_optional_location
-  (* type set *)
-  (* exception Sink of set *)
-  (* val sink: set -> _ *)
 end

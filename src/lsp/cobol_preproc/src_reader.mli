@@ -24,7 +24,7 @@ val from
 
 (** {1 Queries} *)
 
-val diags: t -> Cobol_common.Diagnostics.Set.t
+val diags: t -> Src_diagnostics.t
 val position: t -> Lexing.position
 val input_file: t -> string option
 val source_format: t -> Src_format.any

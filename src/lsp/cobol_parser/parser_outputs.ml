@@ -41,3 +41,33 @@ type ('result, 'memo) output =
 
 type 'm parsed_compilation_group =
   (Cobol_ptree.compilation_group option, 'm) output
+
+(* --- *)
+
+module Diagnostics = struct
+  type t =
+    {
+      preproc_diags: Cobol_preproc.Diagnostics.t;
+      parser_diags: Parser_diagnostics.t;
+    }
+  let none =
+    {
+      preproc_diags = Cobol_preproc.Diagnostics.none;
+      parser_diags = Parser_diagnostics.none;
+    }
+  let union d1 d2 =
+    {
+      preproc_diags =
+        Cobol_preproc.Diagnostics.union d1.preproc_diags d2.preproc_diags;
+      parser_diags =
+        Parser_diagnostics.union d1.parser_diags d2.parser_diags;
+    }
+  let translate { preproc_diags; parser_diags } =
+    let pp_diags = Cobol_preproc.Diagnostics.translate preproc_diags in
+    let pa_diags = Parser_diagnostics.translate parser_diags in
+    Cobol_common.Diagnostics.Set.union pp_diags pa_diags
+  let has_errors { preproc_diags; parser_diags } =
+    Cobol_preproc.Diagnostics.has_errors preproc_diags ||
+    Parser_diagnostics.has_errors parser_diags
+end
+include Cobol_common.Diagnostics_accumulator.MAKE (Diagnostics)

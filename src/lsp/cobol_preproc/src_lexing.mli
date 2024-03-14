@@ -14,7 +14,7 @@
 type 'k state
 
 val init_state: 'k Src_format.source_format -> 'k state
-val diagnostics: _ state -> Cobol_common.Diagnostics.Set.t
+val diagnostics: _ state -> Src_diagnostics.t
 val rev_comments: _ state -> Text.comments
 val rev_ignored: _ state -> Cobol_common.Srcloc.lexloc list
 val rev_newline_cnums: _ state -> int list
@@ -83,17 +83,8 @@ val alphanum_lit'
 
 (* --- *)
 
-val lex_diag
-  : severity:Cobol_common.Diagnostics.severity
-  -> 'a state
-  -> ?loc:Cobol_common.Srcloc.srcloc
-  -> (_, 'a state) Pretty.func
-
-type _ c = Char: char c | Str: string c | Integer: int c
 val unexpected
-  : 'a c
-  -> ?knd:Pretty.simple
-  -> ?c:'a
-  -> ?severity:Cobol_common.Diagnostics.severity
-  -> k:('k state -> Lexing.lexbuf -> 'b)
+  : Src_diagnostics.unexpected_stuff
+  -> ?severity: [`Error | `Warn]
+  -> k: ('k state -> Lexing.lexbuf -> 'b)
   -> 'k state -> Lexing.lexbuf -> 'b

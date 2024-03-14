@@ -12,7 +12,6 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.INFIX
-module DIAGS = Cobol_common.Diagnostics
 
 (** Note: won't show detailed source locations as the openned file is not
     actually on disk (that may be fixed later with a custom internal file
@@ -23,7 +22,7 @@ let preprocess
     ?(filename = "prog.cob")
     ?(source_format = Cobol_config.(SF SFFixed))
     contents =
-  DIAGS.show_n_forget ~ppf:Fmt.stdout @@
+  Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
     ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
                                                   source_format } @@
@@ -35,7 +34,7 @@ let show_text
     ?(source_format = Cobol_config.(SF SFFixed))
     contents =
   let text =
-    DIAGS.show_n_forget ~ppf:Fmt.stdout @@
+    Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input
       ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
                                                     source_format } @@
@@ -52,7 +51,7 @@ let show_source_lines
     ?(source_format = Cobol_config.(SF SFFixed))
     contents
   =
-  DIAGS.show_n_forget ~ppf:Fmt.stdout @@
+  Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.fold_source_lines ~dialect ~source_format
     ~f:begin fun lnum line () ->
       if with_line_numbers then Pretty.out "@\n%u: " lnum else Pretty.out "@\n";
@@ -73,7 +72,9 @@ let show_source_lines
 let rec show_all_text pp =
   match Cobol_preproc.next_chunk pp with
   | { payload = Cobol_preproc.Text.Eof; _ } :: _, _ ->
-      Cobol_common.Diagnostics.Set.pp Fmt.stdout (Cobol_preproc.diags pp);
+      Cobol_common.Diagnostics.Set.pp Fmt.stdout @@
+      Cobol_preproc.Diagnostics.translate @@
+      Cobol_preproc.diags pp;
       pp
   | text, pp ->
       Pretty.out "%a@\n" Cobol_preproc.Text.pp_text text;

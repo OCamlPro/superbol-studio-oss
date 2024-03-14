@@ -7,6 +7,13 @@ run_file.at-145-TEST1:1.6-1.7:
    3       <ListeAccuse>
 >> Error: Unexpected indicator: `v'
 
+run_file.at-145-TEST1:1.7-1.13:
+   1 > <?xml version="1.0" encoding="ISO-8859-1"?>
+----          ^^^^^^
+   2   <SampleTag Test="v0.1" Date="2022-02-16" Heure="10:56:11">
+   3       <ListeAccuse>
+>> Error: Invalid syntax
+
 run_file.at-145-TEST1:2.6-2.7:
    1   <?xml version="1.0" encoding="ISO-8859-1"?>
    2 > <SampleTag Test="v0.1" Date="2022-02-16" Heure="10:56:11">
@@ -40,13 +47,6 @@ run_file.at-145-TEST1:13.6-13.7:
   13 > </SampleTag>
 ----         ^
 >> Error: Unexpected indicator: `l'
-
-run_file.at-145-TEST1:1.7-1.13:
-   1 > <?xml version="1.0" encoding="ISO-8859-1"?>
-----          ^^^^^^
-   2   <SampleTag Test="v0.1" Date="2022-02-16" Heure="10:56:11">
-   3       <ListeAccuse>
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:144:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:218:0
@@ -1095,6 +1095,16 @@ run_file.at-4183-fexists_signed.c:9.6-9.7:
   11    */
 >> Error: Unexpected indicator: `c'
 
+run_file.at-4183-fexists_signed.c:9.7-9.8:
+   6   #include <libcob.h>
+   7   
+   8   /*
+   9 >  * Check file is present and correct by comparing
+----          ^
+  10    * its content to a given signature.
+  11    */
+>> Error: Invalid syntax
+
 run_file.at-4183-fexists_signed.c:12.6-12.7:
    9    * Check file is present and correct by comparing
   10    * its content to a given signature.
@@ -1138,16 +1148,6 @@ run_file.at-4183-fexists_signed.c:22.9-31.0:
   30 > }
 ----  ^^
 >> Error: Unterminated pseudotext
-
-run_file.at-4183-fexists_signed.c:9.7-9.8:
-   6   #include <libcob.h>
-   7   
-   8   /*
-   9 >  * Check file is present and correct by comparing
-----          ^
-  10    * its content to a given signature.
-  11    */
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4184:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4230:0
@@ -1339,16 +1339,6 @@ run_file.at-5011-reference-report:42.6-42.7:
   44   000002     88 endofdata        value high-values.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:42.37:
-  39   
-  40   
-  41   
-  42 > PAGE: 0002                         LC: 000015                       DATE: 150206
-----                                        ^
-  43   000001 01  data-record.
-  44   000002     88 endofdata        value high-values.
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5011-reference-report:42.37-42.38:
   39   
   40   
@@ -1358,6 +1348,16 @@ run_file.at-5011-reference-report:42.37-42.38:
   43   000001 01  data-record.
   44   000002     88 endofdata        value high-values.
 >> Error: Invalid syntax
+
+run_file.at-5011-reference-report:42.37:
+  39   
+  40   
+  41   
+  42 > PAGE: 0002                         LC: 000015                       DATE: 150206
+----                                        ^
+  43   000001 01  data-record.
+  44   000002     88 endofdata        value high-values.
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5011-reference-report:42.45:
   39   
@@ -1389,16 +1389,6 @@ run_file.at-5011-reference-report:62.6-62.7:
   64   000002 01  report-line-blank.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:62.37:
-  59   
-  60   
-  61   
-  62 > PAGE: 0003                         LC: 000015                       DATE: 150206
-----                                        ^
-  63   000001 01  lc                  pic 99.
-  64   000002 01  report-line-blank.
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5011-reference-report:62.37-62.38:
   59   
   60   
@@ -1408,6 +1398,16 @@ run_file.at-5011-reference-report:62.37-62.38:
   63   000001 01  lc                  pic 99.
   64   000002 01  report-line-blank.
 >> Error: Invalid syntax
+
+run_file.at-5011-reference-report:62.37:
+  59   
+  60   
+  61   
+  62 > PAGE: 0003                         LC: 000015                       DATE: 150206
+----                                        ^
+  63   000001 01  lc                  pic 99.
+  64   000002 01  report-line-blank.
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5011-reference-report:62.45:
   59   
@@ -1439,16 +1439,6 @@ run_file.at-5011-reference-report:82.6-82.7:
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5011-reference-report:82.37:
-  79   
-  80   
-  81   
-  82 > PAGE: 0004                         LC: 000015                       DATE: 150206
-----                                        ^
-  83   000001     02 filler           pic x(24).
-  84   000002     02 filler           pic x(5) VALUE " LC: ".
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5011-reference-report:82.37-82.38:
   79   
   80   
@@ -1458,6 +1448,16 @@ run_file.at-5011-reference-report:82.37-82.38:
   83   000001     02 filler           pic x(24).
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Invalid syntax
+
+run_file.at-5011-reference-report:82.37:
+  79   
+  80   
+  81   
+  82 > PAGE: 0004                         LC: 000015                       DATE: 150206
+----                                        ^
+  83   000001     02 filler           pic x(24).
+  84   000002     02 filler           pic x(5) VALUE " LC: ".
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5011-reference-report:82.45:
   79   
@@ -1479,16 +1479,6 @@ run_file.at-5011-reference-report:82.68-82.72:
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Invalid syntax
 
-run_file.at-5011-reference-report:102.6-102.7:
-  99   
- 100   
- 101   
- 102 > PAGE: 0005                         LC: 000015                       DATE: 150206
-----         ^
- 103   000001             display "File open error: " data-file-status
- 104   000002             stop run
->> Error: Unexpected indicator: `0'
-
 run_file.at-5011-reference-report:96.21:
   93   000011 main.
   94   000012     open input data-file.
@@ -1498,6 +1488,16 @@ run_file.at-5011-reference-report:96.21:
   97   
   98   
 >> Hint: Missing .
+
+run_file.at-5011-reference-report:102.6-102.7:
+  99   
+ 100   
+ 101   
+ 102 > PAGE: 0005                         LC: 000015                       DATE: 150206
+----         ^
+ 103   000001             display "File open error: " data-file-status
+ 104   000002             stop run
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5011-reference-report:102.7-102.10:
   99   
@@ -1529,16 +1529,6 @@ run_file.at-5011-reference-report:102.35-102.37:
  104   000002             stop run
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:102.37:
-  99   
- 100   
- 101   
- 102 > PAGE: 0005                         LC: 000015                       DATE: 150206
-----                                        ^
- 103   000001             display "File open error: " data-file-status
- 104   000002             stop run
->> Hint: Missing .
-
 run_file.at-5011-reference-report:102.37-102.38:
   99   
  100   
@@ -1548,6 +1538,16 @@ run_file.at-5011-reference-report:102.37-102.38:
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Warning: Invalid syntax
+
+run_file.at-5011-reference-report:102.37:
+  99   
+ 100   
+ 101   
+ 102 > PAGE: 0005                         LC: 000015                       DATE: 150206
+----                                        ^
+ 103   000001             display "File open error: " data-file-status
+ 104   000002             stop run
+>> Hint: Missing .
 
 run_file.at-5011-reference-report:102.45:
   99   
@@ -1579,16 +1579,6 @@ run_file.at-5011-reference-report:105.11-105.19:
  107   000005     open output mini-report.
 >> Error: Invalid syntax
 
-run_file.at-5011-reference-report:122.6-122.7:
- 119   
- 120   
- 121   
- 122 > PAGE: 0006                         LC: 000015                       DATE: 150206
-----         ^
- 123   000001         from report-line-header
- 124   000002         after advancing page
->> Error: Unexpected indicator: `0'
-
 run_file.at-5011-reference-report:116.28:
  113   000011     move 1 to page-count.
  114   000012     accept page-date from date end-accept.
@@ -1598,6 +1588,16 @@ run_file.at-5011-reference-report:116.28:
  117   
  118   
 >> Hint: Missing .
+
+run_file.at-5011-reference-report:122.6-122.7:
+ 119   
+ 120   
+ 121   
+ 122 > PAGE: 0006                         LC: 000015                       DATE: 150206
+----         ^
+ 123   000001         from report-line-header
+ 124   000002         after advancing page
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5011-reference-report:122.7-122.10:
  119   
@@ -1629,16 +1629,6 @@ run_file.at-5011-reference-report:122.35-122.37:
  124   000002         after advancing page
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:122.37:
- 119   
- 120   
- 121   
- 122 > PAGE: 0006                         LC: 000015                       DATE: 150206
-----                                        ^
- 123   000001         from report-line-header
- 124   000002         after advancing page
->> Hint: Missing .
-
 run_file.at-5011-reference-report:122.37-122.38:
  119   
  120   
@@ -1648,6 +1638,16 @@ run_file.at-5011-reference-report:122.37-122.38:
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Warning: Invalid syntax
+
+run_file.at-5011-reference-report:122.37:
+ 119   
+ 120   
+ 121   
+ 122 > PAGE: 0006                         LC: 000015                       DATE: 150206
+----                                        ^
+ 123   000001         from report-line-header
+ 124   000002         after advancing page
+>> Hint: Missing .
 
 run_file.at-5011-reference-report:122.45:
  119   
@@ -1709,16 +1709,6 @@ run_file.at-5011-reference-report:142.35-142.37:
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:142.37:
- 139   
- 140   
- 141   
- 142 > PAGE: 0007                         LC: 000015                       DATE: 150206
-----                                        ^
- 143   000001****************************************************************
- 144   000002 readwrite-loop.
->> Hint: Missing .
-
 run_file.at-5011-reference-report:142.37-142.38:
  139   
  140   
@@ -1728,6 +1718,16 @@ run_file.at-5011-reference-report:142.37-142.38:
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
+
+run_file.at-5011-reference-report:142.37:
+ 139   
+ 140   
+ 141   
+ 142 > PAGE: 0007                         LC: 000015                       DATE: 150206
+----                                        ^
+ 143   000001****************************************************************
+ 144   000002 readwrite-loop.
+>> Hint: Missing .
 
 run_file.at-5011-reference-report:142.45:
  139   
@@ -1749,16 +1749,6 @@ run_file.at-5011-reference-report:142.68-142.72:
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:162.6-162.7:
- 159   
- 160   
- 161   
- 162 > PAGE: 0008                         LC: 000015                       DATE: 150206
-----         ^
- 163   000001         at end set endofdata to true
- 164   000002     end-read
->> Error: Unexpected indicator: `0'
-
 run_file.at-5011-reference-report:156.25:
  153   000011                 after advancing page
  154   000012             end-write
@@ -1768,6 +1758,16 @@ run_file.at-5011-reference-report:156.25:
  157   
  158   
 >> Hint: Missing .
+
+run_file.at-5011-reference-report:162.6-162.7:
+ 159   
+ 160   
+ 161   
+ 162 > PAGE: 0008                         LC: 000015                       DATE: 150206
+----         ^
+ 163   000001         at end set endofdata to true
+ 164   000002     end-read
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5011-reference-report:162.7-162.10:
  159   
@@ -1799,16 +1799,6 @@ run_file.at-5011-reference-report:162.35-162.37:
  164   000002     end-read
 >> Warning: Invalid syntax
 
-run_file.at-5011-reference-report:162.37:
- 159   
- 160   
- 161   
- 162 > PAGE: 0008                         LC: 000015                       DATE: 150206
-----                                        ^
- 163   000001         at end set endofdata to true
- 164   000002     end-read
->> Hint: Missing .
-
 run_file.at-5011-reference-report:162.37-162.38:
  159   
  160   
@@ -1818,6 +1808,16 @@ run_file.at-5011-reference-report:162.37-162.38:
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Warning: Invalid syntax
+
+run_file.at-5011-reference-report:162.37:
+ 159   
+ 160   
+ 161   
+ 162 > PAGE: 0008                         LC: 000015                       DATE: 150206
+----                                        ^
+ 163   000001         at end set endofdata to true
+ 164   000002     end-read
+>> Hint: Missing .
 
 run_file.at-5011-reference-report:162.45:
  159   
@@ -1880,16 +1880,6 @@ run_file.at-5301-reference-report:42.6-42.7:
   44   000002     88 endofdata        value high-values.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:42.37:
-  39   
-  40   
-  41   
-  42 > PAGE: 0002                         LC: 000015
-----                                        ^
-  43   000001 01  data-record.
-  44   000002     88 endofdata        value high-values.
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5301-reference-report:42.37-42.38:
   39   
   40   
@@ -1899,6 +1889,16 @@ run_file.at-5301-reference-report:42.37-42.38:
   43   000001 01  data-record.
   44   000002     88 endofdata        value high-values.
 >> Error: Invalid syntax
+
+run_file.at-5301-reference-report:42.37:
+  39   
+  40   
+  41   
+  42 > PAGE: 0002                         LC: 000015
+----                                        ^
+  43   000001 01  data-record.
+  44   000002     88 endofdata        value high-values.
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5301-reference-report:42.45:
   39   
@@ -1930,16 +1930,6 @@ run_file.at-5301-reference-report:62.6-62.7:
   64   000002 01  report-line-blank.
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:62.37:
-  59   
-  60   
-  61   
-  62 > PAGE: 0003                         LC: 000015
-----                                        ^
-  63   000001 01  lc                  pic 99.
-  64   000002 01  report-line-blank.
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5301-reference-report:62.37-62.38:
   59   
   60   
@@ -1949,6 +1939,16 @@ run_file.at-5301-reference-report:62.37-62.38:
   63   000001 01  lc                  pic 99.
   64   000002 01  report-line-blank.
 >> Error: Invalid syntax
+
+run_file.at-5301-reference-report:62.37:
+  59   
+  60   
+  61   
+  62 > PAGE: 0003                         LC: 000015
+----                                        ^
+  63   000001 01  lc                  pic 99.
+  64   000002 01  report-line-blank.
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5301-reference-report:62.45:
   59   
@@ -1980,16 +1980,6 @@ run_file.at-5301-reference-report:82.6-82.7:
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Unexpected indicator: `0'
 
-run_file.at-5301-reference-report:82.37:
-  79   
-  80   
-  81   
-  82 > PAGE: 0004                         LC: 000015
-----                                        ^
-  83   000001     02 filler           pic x(24).
-  84   000002     02 filler           pic x(5) VALUE " LC: ".
->> Hint: Missing RENAMES <qualified name> .
-
 run_file.at-5301-reference-report:82.37-82.38:
   79   
   80   
@@ -1999,6 +1989,16 @@ run_file.at-5301-reference-report:82.37-82.38:
   83   000001     02 filler           pic x(24).
   84   000002     02 filler           pic x(5) VALUE " LC: ".
 >> Error: Invalid syntax
+
+run_file.at-5301-reference-report:82.37:
+  79   
+  80   
+  81   
+  82 > PAGE: 0004                         LC: 000015
+----                                        ^
+  83   000001     02 filler           pic x(24).
+  84   000002     02 filler           pic x(5) VALUE " LC: ".
+>> Hint: Missing RENAMES <qualified name> .
 
 run_file.at-5301-reference-report:82.45:
   79   
@@ -2020,16 +2020,6 @@ run_file.at-5301-reference-report:83.11-83.13:
   85   000003     02 header-tag       pic 9(6).
 >> Error: Invalid syntax
 
-run_file.at-5301-reference-report:102.6-102.7:
-  99   
- 100   
- 101   
- 102 > PAGE: 0005                         LC: 000015
-----         ^
- 103   000001             display "File open error: " data-file-status
- 104   000002             stop run
->> Error: Unexpected indicator: `0'
-
 run_file.at-5301-reference-report:96.21:
   93   000011 main.
   94   000012     open input data-file.
@@ -2039,6 +2029,16 @@ run_file.at-5301-reference-report:96.21:
   97   
   98   
 >> Hint: Missing .
+
+run_file.at-5301-reference-report:102.6-102.7:
+  99   
+ 100   
+ 101   
+ 102 > PAGE: 0005                         LC: 000015
+----         ^
+ 103   000001             display "File open error: " data-file-status
+ 104   000002             stop run
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5301-reference-report:102.7-102.10:
   99   
@@ -2070,16 +2070,6 @@ run_file.at-5301-reference-report:102.35-102.37:
  104   000002             stop run
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:102.37:
-  99   
- 100   
- 101   
- 102 > PAGE: 0005                         LC: 000015
-----                                        ^
- 103   000001             display "File open error: " data-file-status
- 104   000002             stop run
->> Hint: Missing .
-
 run_file.at-5301-reference-report:102.37-102.38:
   99   
  100   
@@ -2089,6 +2079,16 @@ run_file.at-5301-reference-report:102.37-102.38:
  103   000001             display "File open error: " data-file-status
  104   000002             stop run
 >> Warning: Invalid syntax
+
+run_file.at-5301-reference-report:102.37:
+  99   
+ 100   
+ 101   
+ 102 > PAGE: 0005                         LC: 000015
+----                                        ^
+ 103   000001             display "File open error: " data-file-status
+ 104   000002             stop run
+>> Hint: Missing .
 
 run_file.at-5301-reference-report:102.45:
   99   
@@ -2120,16 +2120,6 @@ run_file.at-5301-reference-report:105.11-105.19:
  107   000005     open output mini-report.
 >> Error: Invalid syntax
 
-run_file.at-5301-reference-report:122.6-122.7:
- 119   
- 120   
- 121   
- 122 > PAGE: 0006                         LC: 000015
-----         ^
- 123   000001         from report-line-header
- 124   000002         after advancing page
->> Error: Unexpected indicator: `0'
-
 run_file.at-5301-reference-report:116.28:
  113   000011     move 1 to page-count.
  114   000012     accept page-date from date end-accept.
@@ -2139,6 +2129,16 @@ run_file.at-5301-reference-report:116.28:
  117   
  118   
 >> Hint: Missing .
+
+run_file.at-5301-reference-report:122.6-122.7:
+ 119   
+ 120   
+ 121   
+ 122 > PAGE: 0006                         LC: 000015
+----         ^
+ 123   000001         from report-line-header
+ 124   000002         after advancing page
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5301-reference-report:122.7-122.10:
  119   
@@ -2170,16 +2170,6 @@ run_file.at-5301-reference-report:122.35-122.37:
  124   000002         after advancing page
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:122.37:
- 119   
- 120   
- 121   
- 122 > PAGE: 0006                         LC: 000015
-----                                        ^
- 123   000001         from report-line-header
- 124   000002         after advancing page
->> Hint: Missing .
-
 run_file.at-5301-reference-report:122.37-122.38:
  119   
  120   
@@ -2189,6 +2179,16 @@ run_file.at-5301-reference-report:122.37-122.38:
  123   000001         from report-line-header
  124   000002         after advancing page
 >> Warning: Invalid syntax
+
+run_file.at-5301-reference-report:122.37:
+ 119   
+ 120   
+ 121   
+ 122 > PAGE: 0006                         LC: 000015
+----                                        ^
+ 123   000001         from report-line-header
+ 124   000002         after advancing page
+>> Hint: Missing .
 
 run_file.at-5301-reference-report:122.45:
  119   
@@ -2250,16 +2250,6 @@ run_file.at-5301-reference-report:142.35-142.37:
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:142.37:
- 139   
- 140   
- 141   
- 142 > PAGE: 0007                         LC: 000015
-----                                        ^
- 143   000001****************************************************************
- 144   000002 readwrite-loop.
->> Hint: Missing .
-
 run_file.at-5301-reference-report:142.37-142.38:
  139   
  140   
@@ -2269,6 +2259,16 @@ run_file.at-5301-reference-report:142.37-142.38:
  143   000001****************************************************************
  144   000002 readwrite-loop.
 >> Warning: Invalid syntax
+
+run_file.at-5301-reference-report:142.37:
+ 139   
+ 140   
+ 141   
+ 142 > PAGE: 0007                         LC: 000015
+----                                        ^
+ 143   000001****************************************************************
+ 144   000002 readwrite-loop.
+>> Hint: Missing .
 
 run_file.at-5301-reference-report:142.45:
  139   
@@ -2290,16 +2290,6 @@ run_file.at-5301-reference-report:144.7-144.21:
  146   000004     move linage-counter to body-tag
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:162.6-162.7:
- 159   
- 160   
- 161   
- 162 > PAGE: 0008                         LC: 000015
-----         ^
- 163   000001         at end set endofdata to true
- 164   000002     end-read
->> Error: Unexpected indicator: `0'
-
 run_file.at-5301-reference-report:156.25:
  153   000011                 after advancing page
  154   000012             end-write
@@ -2309,6 +2299,16 @@ run_file.at-5301-reference-report:156.25:
  157   
  158   
 >> Hint: Missing .
+
+run_file.at-5301-reference-report:162.6-162.7:
+ 159   
+ 160   
+ 161   
+ 162 > PAGE: 0008                         LC: 000015
+----         ^
+ 163   000001         at end set endofdata to true
+ 164   000002     end-read
+>> Error: Unexpected indicator: `0'
 
 run_file.at-5301-reference-report:162.7-162.10:
  159   
@@ -2340,16 +2340,6 @@ run_file.at-5301-reference-report:162.35-162.37:
  164   000002     end-read
 >> Warning: Invalid syntax
 
-run_file.at-5301-reference-report:162.37:
- 159   
- 160   
- 161   
- 162 > PAGE: 0008                         LC: 000015
-----                                        ^
- 163   000001         at end set endofdata to true
- 164   000002     end-read
->> Hint: Missing .
-
 run_file.at-5301-reference-report:162.37-162.38:
  159   
  160   
@@ -2359,6 +2349,16 @@ run_file.at-5301-reference-report:162.37-162.38:
  163   000001         at end set endofdata to true
  164   000002     end-read
 >> Warning: Invalid syntax
+
+run_file.at-5301-reference-report:162.37:
+ 159   
+ 160   
+ 161   
+ 162 > PAGE: 0008                         LC: 000015
+----                                        ^
+ 163   000001         at end set endofdata to true
+ 164   000002     end-read
+>> Hint: Missing .
 
 run_file.at-5301-reference-report:162.45:
  159   
@@ -2698,6 +2698,16 @@ run_file.at-7095-prog.cob:36.18-36.22:
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:7266:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:7361:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8028:0
+run_file.at-8028-cmod.c:5.7-5.11:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > static char *txtOpCode(int opCode);
+----          ^^^^
+   6   
+   7   /*********************************************************
+>> Error: Invalid syntax
+
 run_file.at-8028-cmod.c:8.6-8.7:
    5   static char *txtOpCode(int opCode);
    6   
@@ -2787,6 +2797,38 @@ run_file.at-8028-cmod.c:21.6-21.7:
   22       || fcd->fileOrg == ORG_SEQ
   23       || fcd->fileOrg == ORG_INDEXED
 >> Error: Unexpected indicator: `('
+
+run_file.at-8028-cmod.c:16.16-21.22:
+  13   {
+  14      unsigned int   opCode;
+  15   
+  16 >    if (*opCodep == 0xfa)
+----                   ^^^^^^^^
+  17 >       opCode = 0xfa00 + opCodep[1];
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  18 >    else
+----  ^^^^^^^^
+  19 >       opCode = opCodep[1];
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  20 > 
+----  ^
+  21 >    if (fcd->fileOrg == ORG_LINE_SEQ
+----  ^^^^^^^^^^^^^^^^^^^^^^^
+  22       || fcd->fileOrg == ORG_SEQ
+  23       || fcd->fileOrg == ORG_INDEXED
+>> Error: Unexpected pseudotext
+
+run_file.at-8028-cmod.c:22.20-23.22:
+  19         opCode = opCodep[1];
+  20   
+  21      if (fcd->fileOrg == ORG_LINE_SEQ
+  22 >     || fcd->fileOrg == ORG_SEQ
+----                       ^^^^^^^^^^
+  23 >     || fcd->fileOrg == ORG_INDEXED
+----  ^^^^^^^^^^^^^^^^^^^^^^^
+  24       || fcd->fileOrg == ORG_RELATIVE) {
+  25         switch (opCode) {
+>> Error: Unexpected pseudotext
 
 run_file.at-8028-cmod.c:25.6-25.7:
   22       || fcd->fileOrg == ORG_SEQ
@@ -2888,57 +2930,6 @@ run_file.at-8028-cmod.c:45.6-45.7:
   47         return 0;
 >> Error: Unexpected indicator: `('
 
-run_file.at-8028-cmod.c:47.6-47.7:
-  44   
-  45      if (opCode == OP_CLOSE
-  46       && (fcd->openMode & OPEN_NOT_OPEN) ) {
-  47 >       return 0;
-----         ^
-  48      }
-  49   
->> Error: Unexpected indicator: `r'
-
-run_file.at-8028-cmod.c:50.6-50.7:
-  47         return 0;
-  48      }
-  49   
-  50 >    return EXTFH(opCodep, fcd);
-----         ^
-  51   }
->> Error: Unexpected indicator: `u'
-
-run_file.at-8028-cmod.c:16.16-21.22:
-  13   {
-  14      unsigned int   opCode;
-  15   
-  16 >    if (*opCodep == 0xfa)
-----                   ^^^^^^^^
-  17 >       opCode = 0xfa00 + opCodep[1];
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  18 >    else
-----  ^^^^^^^^
-  19 >       opCode = opCodep[1];
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  20 > 
-----  ^
-  21 >    if (fcd->fileOrg == ORG_LINE_SEQ
-----  ^^^^^^^^^^^^^^^^^^^^^^^
-  22       || fcd->fileOrg == ORG_SEQ
-  23       || fcd->fileOrg == ORG_INDEXED
->> Error: Unexpected pseudotext
-
-run_file.at-8028-cmod.c:22.20-23.22:
-  19         opCode = opCodep[1];
-  20   
-  21      if (fcd->fileOrg == ORG_LINE_SEQ
-  22 >     || fcd->fileOrg == ORG_SEQ
-----                       ^^^^^^^^^^
-  23 >     || fcd->fileOrg == ORG_INDEXED
-----  ^^^^^^^^^^^^^^^^^^^^^^^
-  24       || fcd->fileOrg == ORG_RELATIVE) {
-  25         switch (opCode) {
->> Error: Unexpected pseudotext
-
 run_file.at-8028-cmod.c:24.20-45.16:
   21      if (fcd->fileOrg == ORG_LINE_SEQ
   22       || fcd->fileOrg == ORG_SEQ
@@ -2991,15 +2982,24 @@ run_file.at-8028-cmod.c:24.20-45.16:
   47         return 0;
 >> Error: Unexpected pseudotext
 
-run_file.at-8028-cmod.c:5.7-5.11:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > static char *txtOpCode(int opCode);
-----          ^^^^
-   6   
-   7   /*********************************************************
->> Error: Invalid syntax
+run_file.at-8028-cmod.c:47.6-47.7:
+  44   
+  45      if (opCode == OP_CLOSE
+  46       && (fcd->openMode & OPEN_NOT_OPEN) ) {
+  47 >       return 0;
+----         ^
+  48      }
+  49   
+>> Error: Unexpected indicator: `r'
+
+run_file.at-8028-cmod.c:50.6-50.7:
+  47         return 0;
+  48      }
+  49   
+  50 >    return EXTFH(opCodep, fcd);
+----         ^
+  51   }
+>> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8028:0
 run_file.at-8028-prog.cob:26.34-26.42:
@@ -3420,6 +3420,13 @@ run_file.at-8672-reference:1.6-1.7:
    2   File has 0003 keys.
    3   Key def  0112 bytes.
 >> Error: Unexpected indicator: `F'
+
+run_file.at-8672-reference:1.7-1.11:
+   1 > Other Flags 32.
+----          ^^^^
+   2   File has 0003 keys.
+   3   Key def  0112 bytes.
+>> Error: Invalid syntax
 
 run_file.at-8672-reference:2.6-2.7:
    1   Other Flags 32.
@@ -4097,14 +4104,17 @@ run_file.at-8672-reference:72.6-72.7:
   73   Hit End of File after 11
 >> Error: Unexpected indicator: `R'
 
-run_file.at-8672-reference:1.7-1.11:
-   1 > Other Flags 32.
+Considering: import/gnucobol/tests/testsuite.src/run_file.at:9007:0
+run_file.at-9007-cmod.c:5.7-5.11:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > static char *txtOpCode(int opCode);
 ----          ^^^^
-   2   File has 0003 keys.
-   3   Key def  0112 bytes.
+   6   
+   7   static int
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_file.at:9007:0
 run_file.at-9007-cmod.c:8.6-8.7:
    5   static char *txtOpCode(int opCode);
    6   
@@ -4255,6 +4265,38 @@ run_file.at-9007-cmod.c:37.6-37.7:
   39       || fcd->fileOrg == ORG_INDEXED
 >> Error: Unexpected indicator: `('
 
+run_file.at-9007-cmod.c:32.16-37.22:
+  29      unsigned int   opCode;
+  30      int      sts;
+  31   
+  32 >    if (*opCodep == 0xfa)
+----                   ^^^^^^^^
+  33 >       opCode = 0xfa00 + opCodep[1];
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  34 >    else
+----  ^^^^^^^^
+  35 >       opCode = opCodep[1];
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  36 > 
+----  ^
+  37 >    if (fcd->fileOrg == ORG_LINE_SEQ
+----  ^^^^^^^^^^^^^^^^^^^^^^^
+  38       || fcd->fileOrg == ORG_SEQ
+  39       || fcd->fileOrg == ORG_INDEXED
+>> Error: Unexpected pseudotext
+
+run_file.at-9007-cmod.c:38.20-39.22:
+  35         opCode = opCodep[1];
+  36   
+  37      if (fcd->fileOrg == ORG_LINE_SEQ
+  38 >     || fcd->fileOrg == ORG_SEQ
+----                       ^^^^^^^^^^
+  39 >     || fcd->fileOrg == ORG_INDEXED
+----  ^^^^^^^^^^^^^^^^^^^^^^^
+  40       || fcd->fileOrg == ORG_RELATIVE) {
+  41         switch (opCode) {
+>> Error: Unexpected pseudotext
+
 run_file.at-9007-cmod.c:41.6-41.7:
   38       || fcd->fileOrg == ORG_SEQ
   39       || fcd->fileOrg == ORG_INDEXED
@@ -4364,6 +4406,66 @@ run_file.at-9007-cmod.c:65.6-65.7:
   66       && (fcd->openMode & OPEN_NOT_OPEN) ) {
   67         return 0;
 >> Error: Unexpected indicator: `('
+
+run_file.at-9007-cmod.c:40.20-65.16:
+  37      if (fcd->fileOrg == ORG_LINE_SEQ
+  38       || fcd->fileOrg == ORG_SEQ
+  39       || fcd->fileOrg == ORG_INDEXED
+  40 >     || fcd->fileOrg == ORG_RELATIVE) {
+----                       ^^^^^^^^^^^^^^^^^^
+  41 >       switch (opCode) {
+----  ^^^^^^^^^^^^^^^^^^^^^^^^
+  42 >       case OP_OPEN_OUTPUT:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  43 >       case OP_OPEN_IO:
+----  ^^^^^^^^^^^^^^^^^^^^^^^
+  44 >       case OP_OPEN_EXTEND:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  45 >       case OP_OPEN_OUTPUT_NOREWIND:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  46 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  47 >          break;
+----  ^^^^^^^^^^^^^^^^
+  48 > 
+----  ^
+  49 >       case OP_OPEN_INPUT:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  50 >       case OP_OPEN_INPUT_NOREWIND:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  51 >       case OP_OPEN_INPUT_REVERSED:
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  52 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  53 >          break;
+----  ^^^^^^^^^^^^^^^^
+  54 > 
+----  ^
+  55 >       case OP_CLOSE:
+----  ^^^^^^^^^^^^^^^^^^^^^
+  56 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  57 >          break;
+----  ^^^^^^^^^^^^^^^^
+  58 > 
+----  ^
+  59 >       default:
+----  ^^^^^^^^^^^^^^^
+  60 >          break;
+----  ^^^^^^^^^^^^^^^^
+  61 >       }
+----  ^^^^^^^^
+  62 > 
+----  ^
+  63 >    }
+----  ^^^^^
+  64 > 
+----  ^
+  65 >    if (opCode == OP_CLOSE
+----  ^^^^^^^^^^^^^^^^^
+  66       && (fcd->openMode & OPEN_NOT_OPEN) ) {
+  67         return 0;
+>> Error: Unexpected pseudotext
 
 run_file.at-9007-cmod.c:67.6-67.7:
   64   
@@ -4934,108 +5036,6 @@ run_file.at-9007-cmod.c:132.6-132.7:
  133   }
 >> Error: Unexpected indicator: `u'
 
-run_file.at-9007-cmod.c:32.16-37.22:
-  29      unsigned int   opCode;
-  30      int      sts;
-  31   
-  32 >    if (*opCodep == 0xfa)
-----                   ^^^^^^^^
-  33 >       opCode = 0xfa00 + opCodep[1];
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  34 >    else
-----  ^^^^^^^^
-  35 >       opCode = opCodep[1];
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  36 > 
-----  ^
-  37 >    if (fcd->fileOrg == ORG_LINE_SEQ
-----  ^^^^^^^^^^^^^^^^^^^^^^^
-  38       || fcd->fileOrg == ORG_SEQ
-  39       || fcd->fileOrg == ORG_INDEXED
->> Error: Unexpected pseudotext
-
-run_file.at-9007-cmod.c:38.20-39.22:
-  35         opCode = opCodep[1];
-  36   
-  37      if (fcd->fileOrg == ORG_LINE_SEQ
-  38 >     || fcd->fileOrg == ORG_SEQ
-----                       ^^^^^^^^^^
-  39 >     || fcd->fileOrg == ORG_INDEXED
-----  ^^^^^^^^^^^^^^^^^^^^^^^
-  40       || fcd->fileOrg == ORG_RELATIVE) {
-  41         switch (opCode) {
->> Error: Unexpected pseudotext
-
-run_file.at-9007-cmod.c:40.20-65.16:
-  37      if (fcd->fileOrg == ORG_LINE_SEQ
-  38       || fcd->fileOrg == ORG_SEQ
-  39       || fcd->fileOrg == ORG_INDEXED
-  40 >     || fcd->fileOrg == ORG_RELATIVE) {
-----                       ^^^^^^^^^^^^^^^^^^
-  41 >       switch (opCode) {
-----  ^^^^^^^^^^^^^^^^^^^^^^^^
-  42 >       case OP_OPEN_OUTPUT:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  43 >       case OP_OPEN_IO:
-----  ^^^^^^^^^^^^^^^^^^^^^^^
-  44 >       case OP_OPEN_EXTEND:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  45 >       case OP_OPEN_OUTPUT_NOREWIND:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  46 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  47 >          break;
-----  ^^^^^^^^^^^^^^^^
-  48 > 
-----  ^
-  49 >       case OP_OPEN_INPUT:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  50 >       case OP_OPEN_INPUT_NOREWIND:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  51 >       case OP_OPEN_INPUT_REVERSED:
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  52 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  53 >          break;
-----  ^^^^^^^^^^^^^^^^
-  54 > 
-----  ^
-  55 >       case OP_CLOSE:
-----  ^^^^^^^^^^^^^^^^^^^^^
-  56 >          return doOpenFile( opCodep, fcd, txtOpCode(opCode));
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  57 >          break;
-----  ^^^^^^^^^^^^^^^^
-  58 > 
-----  ^
-  59 >       default:
-----  ^^^^^^^^^^^^^^^
-  60 >          break;
-----  ^^^^^^^^^^^^^^^^
-  61 >       }
-----  ^^^^^^^^
-  62 > 
-----  ^
-  63 >    }
-----  ^^^^^
-  64 > 
-----  ^
-  65 >    if (opCode == OP_CLOSE
-----  ^^^^^^^^^^^^^^^^^
-  66       && (fcd->openMode & OPEN_NOT_OPEN) ) {
-  67         return 0;
->> Error: Unexpected pseudotext
-
-run_file.at-9007-cmod.c:5.7-5.11:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > static char *txtOpCode(int opCode);
-----          ^^^^
-   6   
-   7   static int
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9007:0
 run_file.at-9007-prog.cob:10.34-10.42:
    7   
@@ -5258,19 +5258,19 @@ run_file.at-9463-reference:1.6-1.7:
    3   THE OLD EWE CHORTLED
 >> Error: Unexpected indicator: `I'
 
-run_file.at-9463-reference:2.6-2.7:
-   1   THERE IS LITTLE LAMB
-   2 > THE LAMB WAS GRAND AND A GRANDMA
-----         ^
-   3   THE OLD EWE CHORTLED
->> Error: Unexpected indicator: `M'
-
 run_file.at-9463-reference:1.7-1.8:
    1 > THERE IS LITTLE LAMB
 ----          ^
    2   THE LAMB WAS GRAND AND A GRANDMA
    3   THE OLD EWE CHORTLED
 >> Error: Invalid syntax
+
+run_file.at-9463-reference:2.6-2.7:
+   1   THERE IS LITTLE LAMB
+   2 > THE LAMB WAS GRAND AND A GRANDMA
+----         ^
+   3   THE OLD EWE CHORTLED
+>> Error: Unexpected indicator: `M'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9643:0
 run_file.at-9643-prog.cob:19.11-19.24:
@@ -5839,6 +5839,15 @@ run_file.at-11230-reference:3.6-3.7:
    5     5 Have a great day
 >> Error: Unexpected indicator: `v'
 
+run_file.at-11230-reference:3.7-3.8:
+   1     1
+   2     2
+   3 >   3 Have a great day
+----          ^
+   4     4
+   5     5 Have a great day
+>> Error: Invalid syntax
+
 run_file.at-11230-reference:5.6-5.7:
    2     2
    3     3 Have a great day
@@ -5858,15 +5867,6 @@ run_file.at-11230-reference:8.6-8.7:
    9     9
   10    10
 >> Error: Unexpected indicator: `j'
-
-run_file.at-11230-reference:3.7-3.8:
-   1     1
-   2     2
-   3 >   3 Have a great day
-----          ^
-   4     4
-   5     5 Have a great day
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11443:0
 run_file.at-11443-prog.cob:9.34-9.42:
@@ -6197,6 +6197,13 @@ run_file.at-12281-reference:1.6-1.7:
    2   Sample data file load complete.
    3   List sample data file
 >> Error: Unexpected indicator: `g'
+
+run_file.at-12281-reference:1.8-1.14:
+   1 > Loading sample data file.
+----           ^^^^^^
+   2   Sample data file load complete.
+   3   List sample data file
+>> Error: Invalid syntax
 
 run_file.at-12281-reference:3.6-3.7:
    1   Loading sample data file.
@@ -7236,13 +7243,6 @@ run_file.at-12281-reference:111.6-111.7:
  112   Hit End of File
 >> Error: Unexpected indicator: `7'
 
-run_file.at-12281-reference:1.8-1.14:
-   1 > Loading sample data file.
-----           ^^^^^^
-   2   Sample data file load complete.
-   3   List sample data file
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12369:0
 run_file.at-12369-prog.cob:32.11-32.36:
   29              CLOSE f
@@ -7618,6 +7618,13 @@ run_file.at-13896-expected.txt:1.6-1.7:
    3     STAT-FILE2: 35
 >> Error: Unexpected indicator: `O'
 
+run_file.at-13896-expected.txt:1.7-1.8:
+   1 > ERROR ON FILE2
+----          ^
+   2     STAT-FILE1: 00
+   3     STAT-FILE2: 35
+>> Error: Invalid syntax
+
 run_file.at-13896-expected.txt:2.7-2.11:
    1   ERROR ON FILE2
    2 >   STAT-FILE1: 00
@@ -7753,13 +7760,6 @@ run_file.at-13896-expected.txt:15.7-15.11:
 ----          ^^^^
   16   DELETE FILES
 >> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:1.7-1.8:
-   1 > ERROR ON FILE2
-----          ^
-   2     STAT-FILE1: 00
-   3     STAT-FILE2: 35
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13893:0
 run_file.at-13893-prog1.cob:45.17-45.21:

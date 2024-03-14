@@ -16,8 +16,6 @@ open Cobol_common.Srcloc.INFIX
 open Text.TYPES
 open Preproc_diagnostics
 
-module DIAGS = Cobol_common.Diagnostics
-
 type 'k reader = 'k Src_lexing.state * Lexing.lexbuf
 type 'k line = Line: 'k reader * text -> 'k line
 type t = Plx: 'k reader -> t                                           [@@unboxed]
@@ -56,7 +54,7 @@ let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
   then Ok pl
   else match Src_lexing.change_source_format s format with
     | Ok s -> Ok (Plx (s, lexbuf))
-    | Error () -> Error (Forbidden_change_of_source_format loc)
+    | Error () -> Error (Forbidden { loc; stuff = Change_of_source_format })
 
 (* --- *)
 

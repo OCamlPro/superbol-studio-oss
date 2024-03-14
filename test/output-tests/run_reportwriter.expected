@@ -98,19 +98,19 @@ run_reportwriter.at-371-prog.cob:8.33-8.41:
 >> Warning: Ignored EXTERNAL (implementation pending)
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:383:0
-run_reportwriter.at-383-reference:2.6-2.7:
-   1   hello                          <--->
-   2 > goodbye                        <--->
-----         ^
-   3   
->> Error: Unexpected indicator: `e'
-
 run_reportwriter.at-383-reference:1.31-1.32:
    1 > hello                          <--->
 ----                                  ^
    2   goodbye                        <--->
    3   
 >> Error: Invalid syntax
+
+run_reportwriter.at-383-reference:2.6-2.7:
+   1   hello                          <--->
+   2 > goodbye                        <--->
+----         ^
+   3   
+>> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:440:0
 run_reportwriter.at-440-prog.cob:7.33-7.41:
@@ -124,6 +124,13 @@ run_reportwriter.at-440-prog.cob:7.33-7.41:
 >> Warning: Ignored EXTERNAL (implementation pending)
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:455:0
+run_reportwriter.at-455-reference:1.31-1.32:
+   1 > hello                          <--->
+----                                  ^
+   2   world                          <--->
+   3   from                           <--->
+>> Error: Invalid syntax
+
 run_reportwriter.at-455-reference:5.6-5.7:
    2   world                          <--->
    3   from                           <--->
@@ -133,13 +140,6 @@ run_reportwriter.at-455-reference:5.6-5.7:
    6   
 >> Error: Unexpected indicator: `e'
 
-run_reportwriter.at-455-reference:1.31-1.32:
-   1 > hello                          <--->
-----                                  ^
-   2   world                          <--->
-   3   from                           <--->
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:632:0
 run_reportwriter.at-632-inp_data:1.6-1.7:
    1 > 0152 J. LANGDON       87653 02475
@@ -147,6 +147,13 @@ run_reportwriter.at-632-inp_data:1.6-1.7:
    2   0152 J. LANGDON       64025 00945
    3   0152 J. LANGDON       41915 01370
 >> Error: Unexpected indicator: `.'
+
+run_reportwriter.at-632-inp_data:1.8-1.15:
+   1 > 0152 J. LANGDON       87653 02475
+----           ^^^^^^^
+   2   0152 J. LANGDON       64025 00945
+   3   0152 J. LANGDON       41915 01370
+>> Error: Invalid syntax
 
 run_reportwriter.at-632-inp_data:2.6-2.7:
    1   0152 J. LANGDON       87653 02475
@@ -682,13 +689,6 @@ run_reportwriter.at-632-inp_data:55.6-55.7:
 ----         ^
 >> Error: Unexpected indicator: `.'
 
-run_reportwriter.at-632-inp_data:1.8-1.15:
-   1 > 0152 J. LANGDON       87653 02475
-----           ^^^^^^^
-   2   0152 J. LANGDON       64025 00945
-   3   0152 J. LANGDON       41915 01370
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:630:0
 run_reportwriter.at-630-prog.cob:16.25-16.33:
   13          FILE-CONTROL.
@@ -741,6 +741,13 @@ run_reportwriter.at-630-prog.cob:20.39-20.48:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:770:0
+run_reportwriter.at-770-reference:1.26-1.27:
+   1 >                           C U S T O M E R  C H A R G E  R E P O R T
+----                             ^
+   2   
+   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST
+>> Error: Invalid syntax
+
 run_reportwriter.at-770-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T
    2   
@@ -760,13 +767,6 @@ run_reportwriter.at-770-reference:68.6-68.7:
   70     7545   M. LARSON             9       93715       $40.15
 >> Error: Unexpected indicator: `N'
 
-run_reportwriter.at-770-reference:1.26-1.27:
-   1 >                           C U S T O M E R  C H A R G E  R E P O R T
-----                             ^
-   2   
-   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:985:0
 run_reportwriter.at-985-inp_data:1.6-1.7:
    1 > 0152 J. LANGDON       87653 02475
@@ -774,6 +774,13 @@ run_reportwriter.at-985-inp_data:1.6-1.7:
    2   0152 J. LANGDON       64025 00945
    3   0152 J. LANGDON       41915 01370
 >> Error: Unexpected indicator: `.'
+
+run_reportwriter.at-985-inp_data:1.8-1.15:
+   1 > 0152 J. LANGDON       87653 02475
+----           ^^^^^^^
+   2   0152 J. LANGDON       64025 00945
+   3   0152 J. LANGDON       41915 01370
+>> Error: Invalid syntax
 
 run_reportwriter.at-985-inp_data:2.6-2.7:
    1   0152 J. LANGDON       87653 02475
@@ -1309,13 +1316,6 @@ run_reportwriter.at-985-inp_data:55.6-55.7:
 ----         ^
 >> Error: Unexpected indicator: `.'
 
-run_reportwriter.at-985-inp_data:1.8-1.15:
-   1 > 0152 J. LANGDON       87653 02475
-----           ^^^^^^^
-   2   0152 J. LANGDON       64025 00945
-   3   0152 J. LANGDON       41915 01370
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:983:0
 run_reportwriter.at-983-prog.cob:15.25-15.33:
   12          FILE-CONTROL.
@@ -1368,6 +1368,13 @@ run_reportwriter.at-983-prog.cob:19.39-19.48:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1123:0
+run_reportwriter.at-1123-reference:1.26-1.27:
+   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
+----                             ^
+   2   
+   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT. AMT.    CHARGE
+>> Error: Invalid syntax
+
 run_reportwriter.at-1123-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
    2   
@@ -1387,13 +1394,6 @@ run_reportwriter.at-1123-reference:68.6-68.7:
   70     6213   Z. HAMPTON            3       34576       $51.15         10%          $5.12         $46.03
 >> Error: Unexpected indicator: `N'
 
-run_reportwriter.at-1123-reference:1.26-1.27:
-   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
-----                             ^
-   2   
-   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT. AMT.    CHARGE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1355:0
 run_reportwriter.at-1355-inp_data:1.6-1.7:
    1 > 0152 J. LANGDON       87653 02475
@@ -1401,6 +1401,13 @@ run_reportwriter.at-1355-inp_data:1.6-1.7:
    2   0152 J. LANGDON       64025 00945
    3   0152 J. LANGDON       41915 01370
 >> Error: Unexpected indicator: `.'
+
+run_reportwriter.at-1355-inp_data:1.8-1.15:
+   1 > 0152 J. LANGDON       87653 02475
+----           ^^^^^^^
+   2   0152 J. LANGDON       64025 00945
+   3   0152 J. LANGDON       41915 01370
+>> Error: Invalid syntax
 
 run_reportwriter.at-1355-inp_data:2.6-2.7:
    1   0152 J. LANGDON       87653 02475
@@ -1936,13 +1943,6 @@ run_reportwriter.at-1355-inp_data:55.6-55.7:
 ----         ^
 >> Error: Unexpected indicator: `.'
 
-run_reportwriter.at-1355-inp_data:1.8-1.15:
-   1 > 0152 J. LANGDON       87653 02475
-----           ^^^^^^^
-   2   0152 J. LANGDON       64025 00945
-   3   0152 J. LANGDON       41915 01370
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1353:0
 run_reportwriter.at-1353-prog.cob:15.25-15.33:
   12          FILE-CONTROL.
@@ -1995,6 +1995,13 @@ run_reportwriter.at-1353-prog.cob:19.39-19.48:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1493:0
+run_reportwriter.at-1493-reference:1.26-1.27:
+   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
+----                             ^
+   2   
+   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT. AMT.    CHARGE
+>> Error: Invalid syntax
+
 run_reportwriter.at-1493-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
    2   
@@ -2014,13 +2021,6 @@ run_reportwriter.at-1493-reference:68.6-68.7:
   70     6213   Z. HAMPTON            3       34576       $51.15         10%          $5.12         $46.03
 >> Error: Unexpected indicator: `N'
 
-run_reportwriter.at-1493-reference:1.26-1.27:
-   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
-----                             ^
-   2   
-   3   CUST. NO.     CUST. NAME     DEPT.    ITEM NO.    ITEM COST    DISCT. %    DISCT. AMT.    CHARGE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1720:0
 run_reportwriter.at-1720-inp_data:1.6-1.7:
    1 > 0152 J. LANGDON       87653 02475
@@ -2028,6 +2028,13 @@ run_reportwriter.at-1720-inp_data:1.6-1.7:
    2   0152 J. LANGDON       64025 00945
    3   0152 J. LANGDON       41915 01370
 >> Error: Unexpected indicator: `.'
+
+run_reportwriter.at-1720-inp_data:1.8-1.15:
+   1 > 0152 J. LANGDON       87653 02475
+----           ^^^^^^^
+   2   0152 J. LANGDON       64025 00945
+   3   0152 J. LANGDON       41915 01370
+>> Error: Invalid syntax
 
 run_reportwriter.at-1720-inp_data:2.6-2.7:
    1   0152 J. LANGDON       87653 02475
@@ -2563,13 +2570,6 @@ run_reportwriter.at-1720-inp_data:55.6-55.7:
 ----         ^
 >> Error: Unexpected indicator: `.'
 
-run_reportwriter.at-1720-inp_data:1.8-1.15:
-   1 > 0152 J. LANGDON       87653 02475
-----           ^^^^^^^
-   2   0152 J. LANGDON       64025 00945
-   3   0152 J. LANGDON       41915 01370
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1718:0
 run_reportwriter.at-1718-prog.cob:22.25-22.33:
   19          FILE-CONTROL.
@@ -2622,6 +2622,13 @@ run_reportwriter.at-1718-prog.cob:26.39-26.48:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1793:0
+run_reportwriter.at-1793-reference:1.26-1.27:
+   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
+----                             ^
+   2   
+   3   CUST. NO.     CUST. NAME                          ITEM COST                DISCT. AMT.    CHARGE
+>> Error: Invalid syntax
+
 run_reportwriter.at-1793-reference:3.6-3.7:
    1                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
    2   
@@ -2631,13 +2638,6 @@ run_reportwriter.at-1793-reference:3.6-3.7:
    5      152   J. LANGDON                                $50.41                      $6.50         $43.91
 >> Error: Unexpected indicator: `N'
 
-run_reportwriter.at-1793-reference:1.26-1.27:
-   1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
-----                             ^
-   2   
-   3   CUST. NO.     CUST. NAME                          ITEM COST                DISCT. AMT.    CHARGE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2071:0
 run_reportwriter.at-2071-inp_data:1.6-1.7:
    1 > 05 A 007328
@@ -2645,6 +2645,13 @@ run_reportwriter.at-2071-inp_data:1.6-1.7:
    2   05 A 090620
    3   05 A 034602
 >> Error: Unexpected indicator: `0'
+
+run_reportwriter.at-2071-inp_data:1.7-1.11:
+   1 > 05 A 007328
+----          ^^^^
+   2   05 A 090620
+   3   05 A 034602
+>> Error: Invalid syntax
 
 run_reportwriter.at-2071-inp_data:2.6-2.7:
    1   05 A 007328
@@ -3630,13 +3637,6 @@ run_reportwriter.at-2071-inp_data:100.6-100.7:
 ----         ^
 >> Error: Unexpected indicator: `9'
 
-run_reportwriter.at-2071-inp_data:1.7-1.11:
-   1 > 05 A 007328
-----          ^^^^
-   2   05 A 090620
-   3   05 A 034602
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2069:0
 run_reportwriter.at-2069-prog.cob:16.25-16.33:
   13          FILE-CONTROL.
@@ -3703,6 +3703,13 @@ run_reportwriter.at-2796-inp_data:1.6-1.7:
    2   01 6622 M GAVIN SHAFER         19740215 026000 01521 03362 00175 020942
    3   01 6622 M GAVIN SHAFER         19740301 026000 01521 03362 00175 020942
 >> Error: Unexpected indicator: `2'
+
+run_reportwriter.at-2796-inp_data:1.8-1.9:
+   1 > 01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 00075 021042
+----           ^
+   2   01 6622 M GAVIN SHAFER         19740215 026000 01521 03362 00175 020942
+   3   01 6622 M GAVIN SHAFER         19740301 026000 01521 03362 00175 020942
+>> Error: Invalid syntax
 
 run_reportwriter.at-2796-inp_data:2.6-2.7:
    1   01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 00075 021042
@@ -4648,13 +4655,6 @@ run_reportwriter.at-2796-inp_data:96.6-96.7:
 ----         ^
 >> Error: Unexpected indicator: `1'
 
-run_reportwriter.at-2796-inp_data:1.8-1.9:
-   1 > 01 6622 M GAVIN SHAFER         19740201 026000 01521 03362 00075 021042
-----           ^
-   2   01 6622 M GAVIN SHAFER         19740215 026000 01521 03362 00175 020942
-   3   01 6622 M GAVIN SHAFER         19740301 026000 01521 03362 00175 020942
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2794:0
 run_reportwriter.at-2794-prog.cob:20.25-20.33:
   17          FILE-CONTROL.
@@ -4757,6 +4757,13 @@ run_reportwriter.at-2794-prog.cob:157.31-157.37:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2890:0
+run_reportwriter.at-2890-reference:1.38-1.39:
+   1 >                                       C E N T U R Y   M E D I C A L   C E N T E R
+----                                         ^
+   2                                     Q U A R T E R L Y   P A Y R O L L   R E G I S T E R                         PAGE     1
+   3   
+>> Error: Invalid syntax
+
 run_reportwriter.at-2890-reference:4.7-4.11:
    1                                         C E N T U R Y   M E D I C A L   C E N T E R
    2                                     Q U A R T E R L Y   P A Y R O L L   R E G I S T E R                         PAGE     1
@@ -4957,13 +4964,6 @@ run_reportwriter.at-2890-reference:50.6-50.7:
   52                DEPARTMENT TOTALS       $1,744.00 *    $102.04 *    $210.54 *     $13.25 *    $1,418.17 *
 >> Error: Unexpected indicator: `0'
 
-run_reportwriter.at-2890-reference:1.38-1.39:
-   1 >                                       C E N T U R Y   M E D I C A L   C E N T E R
-----                                         ^
-   2                                     Q U A R T E R L Y   P A Y R O L L   R E G I S T E R                         PAGE     1
-   3   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3019:0
 run_reportwriter.at-3019-inp_data:1.6-1.7:
    1 > 00099Dorken, Keith       CS 000008
@@ -4971,6 +4971,13 @@ run_reportwriter.at-3019-inp_data:1.6-1.7:
    2   00007Allinson, Sandy     MA 000118
    3   00125Allinson, Nina      MA 012308
 >> Error: Unexpected indicator: `o'
+
+run_reportwriter.at-3019-inp_data:1.7-1.11:
+   1 > 00099Dorken, Keith       CS 000008
+----          ^^^^
+   2   00007Allinson, Sandy     MA 000118
+   3   00125Allinson, Nina      MA 012308
+>> Error: Invalid syntax
 
 run_reportwriter.at-3019-inp_data:2.6-2.7:
    1   00099Dorken, Keith       CS 000008
@@ -5056,13 +5063,6 @@ run_reportwriter.at-3019-inp_data:10.6-10.7:
 ----         ^
 >> Error: Unexpected indicator: `o'
 
-run_reportwriter.at-3019-inp_data:1.7-1.11:
-   1 > 00099Dorken, Keith       CS 000008
-----          ^^^^
-   2   00007Allinson, Sandy     MA 000118
-   3   00125Allinson, Nina      MA 012308
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3014:0
 run_reportwriter.at-3014-prog.cob:9.43-9.51:
    6          INPUT-OUTPUT SECTION.
@@ -5145,6 +5145,13 @@ run_reportwriter.at-3014-prog.cob:40.11-40.15:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3058:0
+run_reportwriter.at-3058-reference:1.9-1.10:
+   1 >          1         2         3         4         5         6         7
+----            ^
+   2   1234567890123456789012345678901234567890123456789012345678901234567890
+   3   Ln  --ID--     --------Name--------   Major *-*      +Odd+  +Even+
+>> Error: Invalid syntax
+
 run_reportwriter.at-3058-reference:2.6-2.7:
    1            1         2         3         4         5         6         7
    2 > 1234567890123456789012345678901234567890123456789012345678901234567890
@@ -5242,13 +5249,6 @@ run_reportwriter.at-3058-reference:14.6-14.7:
   16   
 >> Error: Unexpected indicator: `3'
 
-run_reportwriter.at-3058-reference:1.9-1.10:
-   1 >          1         2         3         4         5         6         7
-----            ^
-   2   1234567890123456789012345678901234567890123456789012345678901234567890
-   3   Ln  --ID--     --------Name--------   Major *-*      +Odd+  +Even+
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3173:0
 run_reportwriter.at-3173-inp_data:1.6-1.7:
    1 > 00123Dorken, Keith       CS 08
@@ -5256,6 +5256,13 @@ run_reportwriter.at-3173-inp_data:1.6-1.7:
    2   00124Allinson, Sandy     MA 08
    3   00125Allinson, Nina      MA 08
 >> Error: Unexpected indicator: `o'
+
+run_reportwriter.at-3173-inp_data:1.7-1.11:
+   1 > 00123Dorken, Keith       CS 08
+----          ^^^^
+   2   00124Allinson, Sandy     MA 08
+   3   00125Allinson, Nina      MA 08
+>> Error: Invalid syntax
 
 run_reportwriter.at-3173-inp_data:2.6-2.7:
    1   00123Dorken, Keith       CS 08
@@ -5341,13 +5348,6 @@ run_reportwriter.at-3173-inp_data:10.6-10.7:
 ----         ^
 >> Error: Unexpected indicator: `o'
 
-run_reportwriter.at-3173-inp_data:1.7-1.11:
-   1 > 00123Dorken, Keith       CS 08
-----          ^^^^
-   2   00124Allinson, Sandy     MA 08
-   3   00125Allinson, Nina      MA 08
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3171:0
 run_reportwriter.at-3171-prog.cob:8.43-8.51:
    5          CONFIGURATION SECTION.
@@ -5408,6 +5408,15 @@ run_reportwriter.at-3210-reference:3.6-3.7:
    4   04 000124     Allinson, Sandy          MA   -*-    08
    5   05 000125     Allinson, Nina           MA   -*-    08
 >> Error: Unexpected indicator: `1'
+
+run_reportwriter.at-3210-reference:3.7-3.9:
+   1   
+   2   
+   3 > 03 000123     Dorken, Keith            CS   -*-    08
+----          ^^
+   4   04 000124     Allinson, Sandy          MA   -*-    08
+   5   05 000125     Allinson, Nina           MA   -*-    08
+>> Error: Invalid syntax
 
 run_reportwriter.at-3210-reference:4.6-4.7:
    1   
@@ -5499,15 +5508,6 @@ run_reportwriter.at-3210-reference:12.6-12.7:
   14   
 >> Error: Unexpected indicator: `3'
 
-run_reportwriter.at-3210-reference:3.7-3.9:
-   1   
-   2   
-   3 > 03 000123     Dorken, Keith            CS   -*-    08
-----          ^^
-   4   04 000124     Allinson, Sandy          MA   -*-    08
-   5   05 000125     Allinson, Nina           MA   -*-    08
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3441:0
 run_reportwriter.at-3441-inp_data:1.6-1.7:
    1 > 10001090001012010590416      $
@@ -5515,6 +5515,13 @@ run_reportwriter.at-3441-inp_data:1.6-1.7:
    2   10001090002013016950416      $
    3   10002090002023016950416      $
 >> Error: Unexpected indicator: `9'
+
+run_reportwriter.at-3441-inp_data:1.7-1.23:
+   1 > 10001090001012010590416      $
+----          ^^^^^^^^^^^^^^^^
+   2   10001090002013016950416      $
+   3   10002090002023016950416      $
+>> Error: Invalid syntax
 
 run_reportwriter.at-3441-inp_data:2.6-2.7:
    1   10001090001012010590416      $
@@ -6410,13 +6417,6 @@ run_reportwriter.at-3441-inp_data:91.6-91.7:
 ----         ^
 >> Error: Unexpected indicator: `9'
 
-run_reportwriter.at-3441-inp_data:1.7-1.23:
-   1 > 10001090001012010590416      $
-----          ^^^^^^^^^^^^^^^^
-   2   10001090002013016950416      $
-   3   10002090002023016950416      $
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3439:0
 run_reportwriter.at-3439-prog.cob:8.44-8.52:
    5          CONFIGURATION SECTION.
@@ -6483,6 +6483,13 @@ run_reportwriter.at-3706-inp_data:1.6-1.7:
    2   Dorken, Keith A     35CS Malcolm, Mike        Waterloo
    3   Norman, James J     25CS Manning, Eric        Waterloo
 >> Error: Unexpected indicator: `,'
+
+run_reportwriter.at-3706-inp_data:1.8-1.14:
+   1 > Norman, Ronald J    25CS Malcolm, Mike        Waterloo
+----           ^^^^^^
+   2   Dorken, Keith A     35CS Malcolm, Mike        Waterloo
+   3   Norman, James J     25CS Manning, Eric        Waterloo
+>> Error: Invalid syntax
 
 run_reportwriter.at-3706-inp_data:2.6-2.7:
    1   Norman, Ronald J    25CS Malcolm, Mike        Waterloo
@@ -6638,13 +6645,6 @@ run_reportwriter.at-3706-inp_data:17.6-17.7:
 ----         ^
 >> Error: Unexpected indicator: `a'
 
-run_reportwriter.at-3706-inp_data:1.8-1.14:
-   1 > Norman, Ronald J    25CS Malcolm, Mike        Waterloo
-----           ^^^^^^
-   2   Dorken, Keith A     35CS Malcolm, Mike        Waterloo
-   3   Norman, James J     25CS Manning, Eric        Waterloo
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3704:0
 run_reportwriter.at-3704-prog.cob:8.41-8.49:
    5          CONFIGURATION SECTION.
@@ -6727,6 +6727,13 @@ run_reportwriter.at-3704-prog.cob:72.30-72.36:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3787:0
+run_reportwriter.at-3787-reference:1.60-1.64:
+   1 >                                                             PAGE    1
+----                                                               ^^^^
+   2   
+   3                            STUDENT ADVISEMENT LIST
+>> Error: Invalid syntax
+
 run_reportwriter.at-3787-reference:8.7-8.11:
    5                                       MAJOR  CS
    6   
@@ -6767,6 +6774,16 @@ run_reportwriter.at-3787-reference:12.6-12.7:
   14     Norman, James J        25       Waterloo        Hello    Manning, Eric
 >> Error: Unexpected indicator: `V'
 
+run_reportwriter.at-3787-reference:10.52-10.72:
+   7      STUDENT NAME         PTS      CAMPUS                    ADVISOR
+   8      --------------------------------------------------------------------
+   9     Norman, Ronald J       25       Waterloo        Hello    Malcolm, Mike
+  10 >   Dorken, Keith A        35       Waterloo          "
+----                                                       ^
+  11   
+  12       ADVISOR Malcolm, Mike        TOTAL   2
+>> Error: Missing continuation of `                   '
+
 run_reportwriter.at-3787-reference:14.6-14.7:
   11   
   12       ADVISOR Malcolm, Mike        TOTAL   2
@@ -6796,6 +6813,16 @@ run_reportwriter.at-3787-reference:17.6-17.7:
   18   
   19   
 >> Error: Unexpected indicator: `V'
+
+run_reportwriter.at-3787-reference:15.52-15.72:
+  12       ADVISOR Malcolm, Mike        TOTAL   2
+  13   
+  14     Norman, James J        25       Waterloo        Hello    Manning, Eric
+  15 >   Dorken, Kevin          35       Waterloo          "
+----                                                       ^
+  16   
+  17       ADVISOR Manning, Eric        TOTAL   2
+>> Error: Missing continuation of `                   '
 
 run_reportwriter.at-3787-reference:20.6-20.7:
   17       ADVISOR Manning, Eric        TOTAL   2
@@ -6867,6 +6894,16 @@ run_reportwriter.at-3787-reference:41.6-41.7:
   43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
 >> Error: Unexpected indicator: `V'
 
+run_reportwriter.at-3787-reference:39.52-39.72:
+  36       ADVISOR Manning, Eric        TOTAL   1
+  37   
+  38     Norman, Michelle       27       Toronto         Hello    Manning, Donna
+  39 >   Dorken, Melissa        37       Toronto           "
+----                                                       ^
+  40   
+  41       ADVISOR Manning, Donna       TOTAL   2
+>> Error: Missing continuation of `                   '
+
 run_reportwriter.at-3787-reference:43.6-43.7:
   40   
   41       ADVISOR Manning, Donna       TOTAL   2
@@ -6897,6 +6934,16 @@ run_reportwriter.at-3787-reference:45.6-45.7:
   47     Norseman, Ben05        27       Toronto           "
 >> Error: Unexpected indicator: `e'
 
+run_reportwriter.at-3787-reference:44.52-44.72:
+  41       ADVISOR Manning, Donna       TOTAL   2
+  42   
+  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
+  44 >   Norseman, Ben02        27       Toronto           "
+----                                                       ^
+  45     Norseman, Ben03        27       Toronto           "
+  46     Norseman, Ben04        27       Toronto           "
+>> Error: Missing continuation of `                   '
+
 run_reportwriter.at-3787-reference:46.6-46.7:
   43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
   44     Norseman, Ben02        27       Toronto           "
@@ -6906,6 +6953,16 @@ run_reportwriter.at-3787-reference:46.6-46.7:
   47     Norseman, Ben05        27       Toronto           "
   48     Norseman, Ben06        27       Toronto           "
 >> Error: Unexpected indicator: `e'
+
+run_reportwriter.at-3787-reference:45.52-45.72:
+  42   
+  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
+  44     Norseman, Ben02        27       Toronto           "
+  45 >   Norseman, Ben03        27       Toronto           "
+----                                                       ^
+  46     Norseman, Ben04        27       Toronto           "
+  47     Norseman, Ben05        27       Toronto           "
+>> Error: Missing continuation of `                   '
 
 run_reportwriter.at-3787-reference:47.6-47.7:
   44     Norseman, Ben02        27       Toronto           "
@@ -6917,6 +6974,16 @@ run_reportwriter.at-3787-reference:47.6-47.7:
   49   
 >> Error: Unexpected indicator: `e'
 
+run_reportwriter.at-3787-reference:46.52-46.72:
+  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
+  44     Norseman, Ben02        27       Toronto           "
+  45     Norseman, Ben03        27       Toronto           "
+  46 >   Norseman, Ben04        27       Toronto           "
+----                                                       ^
+  47     Norseman, Ben05        27       Toronto           "
+  48     Norseman, Ben06        27       Toronto           "
+>> Error: Missing continuation of `                   '
+
 run_reportwriter.at-3787-reference:48.6-48.7:
   45     Norseman, Ben03        27       Toronto           "
   46     Norseman, Ben04        27       Toronto           "
@@ -6926,6 +6993,26 @@ run_reportwriter.at-3787-reference:48.6-48.7:
   49   
   50                                                               PAGE    3
 >> Error: Unexpected indicator: `e'
+
+run_reportwriter.at-3787-reference:47.52-47.72:
+  44     Norseman, Ben02        27       Toronto           "
+  45     Norseman, Ben03        27       Toronto           "
+  46     Norseman, Ben04        27       Toronto           "
+  47 >   Norseman, Ben05        27       Toronto           "
+----                                                       ^
+  48     Norseman, Ben06        27       Toronto           "
+  49   
+>> Error: Missing continuation of `                   '
+
+run_reportwriter.at-3787-reference:48.52-48.72:
+  45     Norseman, Ben03        27       Toronto           "
+  46     Norseman, Ben04        27       Toronto           "
+  47     Norseman, Ben05        27       Toronto           "
+  48 >   Norseman, Ben06        27       Toronto           "
+----                                                       ^
+  49   
+  50                                                               PAGE    3
+>> Error: Missing continuation of `                   '
 
 run_reportwriter.at-3787-reference:54.6-54.7:
   51   
@@ -6957,116 +7044,6 @@ run_reportwriter.at-3787-reference:56.6-56.7:
   58   
 >> Error: Unexpected indicator: `e'
 
-run_reportwriter.at-3787-reference:57.6-57.7:
-  54     Norseman, Ben07        27       Toronto         Hello    DiMetri, Gary
-  55     Norseman, Ben08        27       Toronto           "
-  56     Norseman, Ben09        27       Toronto           "
-  57 >   Norseman, Ben10        27       Toronto           "
-----         ^
-  58   
-  59       ADVISOR DiMetri, Gary        TOTAL  10
->> Error: Unexpected indicator: `e'
-
-run_reportwriter.at-3787-reference:59.6-59.7:
-  56     Norseman, Ben09        27       Toronto           "
-  57     Norseman, Ben10        27       Toronto           "
-  58   
-  59 >     ADVISOR DiMetri, Gary        TOTAL  10
-----         ^
-  60   
-  61   
->> Error: Unexpected indicator: `V'
-
-run_reportwriter.at-3787-reference:62.6-62.7:
-  59       ADVISOR DiMetri, Gary        TOTAL  10
-  60   
-  61   
-  62 >     MAJOR TOTAL       13
-----         ^
-  63   
-  64   
->> Error: Unexpected indicator: `J'
-
-run_reportwriter.at-3787-reference:10.52-10.72:
-   7      STUDENT NAME         PTS      CAMPUS                    ADVISOR
-   8      --------------------------------------------------------------------
-   9     Norman, Ronald J       25       Waterloo        Hello    Malcolm, Mike
-  10 >   Dorken, Keith A        35       Waterloo          "
-----                                                       ^
-  11   
-  12       ADVISOR Malcolm, Mike        TOTAL   2
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:15.52-15.72:
-  12       ADVISOR Malcolm, Mike        TOTAL   2
-  13   
-  14     Norman, James J        25       Waterloo        Hello    Manning, Eric
-  15 >   Dorken, Kevin          35       Waterloo          "
-----                                                       ^
-  16   
-  17       ADVISOR Manning, Eric        TOTAL   2
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:39.52-39.72:
-  36       ADVISOR Manning, Eric        TOTAL   1
-  37   
-  38     Norman, Michelle       27       Toronto         Hello    Manning, Donna
-  39 >   Dorken, Melissa        37       Toronto           "
-----                                                       ^
-  40   
-  41       ADVISOR Manning, Donna       TOTAL   2
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:44.52-44.72:
-  41       ADVISOR Manning, Donna       TOTAL   2
-  42   
-  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
-  44 >   Norseman, Ben02        27       Toronto           "
-----                                                       ^
-  45     Norseman, Ben03        27       Toronto           "
-  46     Norseman, Ben04        27       Toronto           "
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:45.52-45.72:
-  42   
-  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
-  44     Norseman, Ben02        27       Toronto           "
-  45 >   Norseman, Ben03        27       Toronto           "
-----                                                       ^
-  46     Norseman, Ben04        27       Toronto           "
-  47     Norseman, Ben05        27       Toronto           "
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:46.52-46.72:
-  43     Norseman, Ben01        27       Toronto         Hello    DiMetri, Gary
-  44     Norseman, Ben02        27       Toronto           "
-  45     Norseman, Ben03        27       Toronto           "
-  46 >   Norseman, Ben04        27       Toronto           "
-----                                                       ^
-  47     Norseman, Ben05        27       Toronto           "
-  48     Norseman, Ben06        27       Toronto           "
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:47.52-47.72:
-  44     Norseman, Ben02        27       Toronto           "
-  45     Norseman, Ben03        27       Toronto           "
-  46     Norseman, Ben04        27       Toronto           "
-  47 >   Norseman, Ben05        27       Toronto           "
-----                                                       ^
-  48     Norseman, Ben06        27       Toronto           "
-  49   
->> Error: Missing continuation of `                   '
-
-run_reportwriter.at-3787-reference:48.52-48.72:
-  45     Norseman, Ben03        27       Toronto           "
-  46     Norseman, Ben04        27       Toronto           "
-  47     Norseman, Ben05        27       Toronto           "
-  48 >   Norseman, Ben06        27       Toronto           "
-----                                                       ^
-  49   
-  50                                                               PAGE    3
->> Error: Missing continuation of `                   '
-
 run_reportwriter.at-3787-reference:55.52-55.72:
   52                            STUDENT ADVISEMENT LIST
   53   
@@ -7076,6 +7053,16 @@ run_reportwriter.at-3787-reference:55.52-55.72:
   56     Norseman, Ben09        27       Toronto           "
   57     Norseman, Ben10        27       Toronto           "
 >> Error: Missing continuation of `                   '
+
+run_reportwriter.at-3787-reference:57.6-57.7:
+  54     Norseman, Ben07        27       Toronto         Hello    DiMetri, Gary
+  55     Norseman, Ben08        27       Toronto           "
+  56     Norseman, Ben09        27       Toronto           "
+  57 >   Norseman, Ben10        27       Toronto           "
+----         ^
+  58   
+  59       ADVISOR DiMetri, Gary        TOTAL  10
+>> Error: Unexpected indicator: `e'
 
 run_reportwriter.at-3787-reference:56.52-56.72:
   53   
@@ -7087,6 +7074,16 @@ run_reportwriter.at-3787-reference:56.52-56.72:
   58   
 >> Error: Missing continuation of `                   '
 
+run_reportwriter.at-3787-reference:59.6-59.7:
+  56     Norseman, Ben09        27       Toronto           "
+  57     Norseman, Ben10        27       Toronto           "
+  58   
+  59 >     ADVISOR DiMetri, Gary        TOTAL  10
+----         ^
+  60   
+  61   
+>> Error: Unexpected indicator: `V'
+
 run_reportwriter.at-3787-reference:57.52-57.72:
   54     Norseman, Ben07        27       Toronto         Hello    DiMetri, Gary
   55     Norseman, Ben08        27       Toronto           "
@@ -7097,14 +7094,24 @@ run_reportwriter.at-3787-reference:57.52-57.72:
   59       ADVISOR DiMetri, Gary        TOTAL  10
 >> Error: Missing continuation of `                   '
 
-run_reportwriter.at-3787-reference:1.60-1.64:
-   1 >                                                             PAGE    1
-----                                                               ^^^^
-   2   
-   3                            STUDENT ADVISEMENT LIST
->> Error: Invalid syntax
+run_reportwriter.at-3787-reference:62.6-62.7:
+  59       ADVISOR DiMetri, Gary        TOTAL  10
+  60   
+  61   
+  62 >     MAJOR TOTAL       13
+----         ^
+  63   
+  64   
+>> Error: Unexpected indicator: `J'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3900:0
+run_reportwriter.at-3900-inp_data:1.7-1.17:
+   1 > 01Data Processing   02000500012388
+----          ^^^^^^^^^^
+   2   02Cow Milking       02000600054398
+   3   03Grass Cutting     03000600054397
+>> Error: Invalid syntax
+
 run_reportwriter.at-3900-inp_data:2.6-2.7:
    1   01Data Processing   02000500012388
    2 > 02Cow Milking       02000600054398
@@ -7120,13 +7127,6 @@ run_reportwriter.at-3900-inp_data:3.6-3.7:
 ----         ^
    4   03Lawn mowing       03000600054397
 >> Error: Unexpected indicator: `s'
-
-run_reportwriter.at-3900-inp_data:1.7-1.17:
-   1 > 01Data Processing   02000500012388
-----          ^^^^^^^^^^
-   2   02Cow Milking       02000600054398
-   3   03Grass Cutting     03000600054397
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3896:0
 run_reportwriter.at-3896-prog.cob:8.37-8.45:
@@ -7180,6 +7180,14 @@ run_reportwriter.at-3896-prog.cob:11.35-11.44:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3980:0
+run_reportwriter.at-3980-reference:2.49-2.58:
+   1   
+   2 >                                                  INVENTORY REPORT
+----                                                    ^^^^^^^^^
+   3   
+   4   
+>> Error: Invalid syntax
+
 run_reportwriter.at-3980-reference:5.6-5.7:
    2                                                    INVENTORY REPORT
    3   
@@ -7210,14 +7218,6 @@ run_reportwriter.at-3980-reference:35.6-35.7:
   37   
 >> Error: Unexpected indicator: `T'
 
-run_reportwriter.at-3980-reference:2.49-2.58:
-   1   
-   2 >                                                  INVENTORY REPORT
-----                                                    ^^^^^^^^^
-   3   
-   4   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4054:0
 run_reportwriter.at-4054-prog.cob:10.21-10.29:
    7          FILE-CONTROL.
@@ -7236,6 +7236,13 @@ run_reportwriter.at-4108-reference:1.6-1.7:
    2   A        1st Detail
    3         FOOTING SAVE-ITEM
 >> Error: Unexpected indicator: `G'
+
+run_reportwriter.at-4108-reference:1.8-1.17:
+   1 > HEADING SAVE-ITEM
+----           ^^^^^^^^^
+   2   A        1st Detail
+   3         FOOTING SAVE-ITEM
+>> Error: Invalid syntax
 
 run_reportwriter.at-4108-reference:3.6-3.7:
    1   HEADING SAVE-ITEM
@@ -7286,13 +7293,6 @@ run_reportwriter.at-4108-reference:34.6-34.7:
   36   
 >> Error: Unexpected indicator: `F'
 
-run_reportwriter.at-4108-reference:1.8-1.17:
-   1 > HEADING SAVE-ITEM
-----           ^^^^^^^^^
-   2   A        1st Detail
-   3         FOOTING SAVE-ITEM
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4193:0
 run_reportwriter.at-4193-prog.cob:8.34-8.42:
    5          ENVIRONMENT DIVISION.
@@ -7305,6 +7305,13 @@ run_reportwriter.at-4193-prog.cob:8.34-8.42:
 >> Warning: Ignored EXTERNAL (implementation pending)
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4212:0
+run_reportwriter.at-4212-reference:1.9-1.10:
+   1 >          1         2         3         4         5
+----            ^
+   2   12345678901234567890123456789012345678901234567890
+   3   
+>> Error: Invalid syntax
+
 run_reportwriter.at-4212-reference:2.6-2.7:
    1            1         2         3         4         5
    2 > 12345678901234567890123456789012345678901234567890
@@ -7322,13 +7329,6 @@ run_reportwriter.at-4212-reference:5.6-5.7:
    6   200       200       200   200   <3>
    7   400       401       402       403         <4>
 >> Error: Unexpected indicator: `T'
-
-run_reportwriter.at-4212-reference:1.9-1.10:
-   1 >          1         2         3         4         5
-----            ^
-   2   12345678901234567890123456789012345678901234567890
-   3   
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4405:0
 run_reportwriter.at-4405-progl.cob:8.34-8.42:
@@ -7383,6 +7383,13 @@ run_reportwriter.at-4310-progv.cob:27.22-27.28:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4429:0
+run_reportwriter.at-4429-reference:1.15-1.16:
+   1 > Hi-Q:          1         2         3         4         5
+----                  ^
+   2   Hi-Q:          1         2         3         4         5
+   3   Hi-Q:
+>> Error: Invalid syntax
+
 run_reportwriter.at-4429-reference:4.6-4.7:
    1   Hi-Q:          1         2         3         4         5
    2   Hi-Q:          1         2         3         4         5
@@ -7423,13 +7430,6 @@ run_reportwriter.at-4429-reference:7.6-7.7:
    9   Hi-Q:
 >> Error: Unexpected indicator: `4'
 
-run_reportwriter.at-4429-reference:1.15-1.16:
-   1 > Hi-Q:          1         2         3         4         5
-----                  ^
-   2   Hi-Q:          1         2         3         4         5
-   3   Hi-Q:
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4553:0
 run_reportwriter.at-4553-prog.cob:8.34-8.42:
    5          ENVIRONMENT DIVISION.
@@ -7462,6 +7462,13 @@ run_reportwriter.at-4553-prog.cob:35.19-35.27:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4575:0
+run_reportwriter.at-4575-reference:1.15-1.16:
+   1 > Hi-Q:          1         2         3         4         5
+----                  ^
+   2   Hi-Q: 12345678901234567890123456789012345678901234567890
+   3   Hi-Q:
+>> Error: Invalid syntax
+
 run_reportwriter.at-4575-reference:2.6-2.7:
    1   Hi-Q:          1         2         3         4         5
    2 > Hi-Q: 12345678901234567890123456789012345678901234567890
@@ -7510,13 +7517,6 @@ run_reportwriter.at-4575-reference:7.6-7.7:
    9   Hi-Q:
 >> Error: Unexpected indicator: `4'
 
-run_reportwriter.at-4575-reference:1.15-1.16:
-   1 > Hi-Q:          1         2         3         4         5
-----                  ^
-   2   Hi-Q: 12345678901234567890123456789012345678901234567890
-   3   Hi-Q:
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4626:0
 run_reportwriter.at-4626-prog.cob:8.33-8.41:
    5          ENVIRONMENT DIVISION.
@@ -7529,19 +7529,19 @@ run_reportwriter.at-4626-prog.cob:8.33-8.41:
 >> Warning: Ignored EXTERNAL (implementation pending)
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4641:0
-run_reportwriter.at-4641-reference:2.6-2.7:
-   1   hello                         <--->
-   2 > goodbye                       <--->
-----         ^
-   3   
->> Error: Unexpected indicator: `e'
-
 run_reportwriter.at-4641-reference:1.30-1.31:
    1 > hello                         <--->
 ----                                 ^
    2   goodbye                       <--->
    3   
 >> Error: Invalid syntax
+
+run_reportwriter.at-4641-reference:2.6-2.7:
+   1   hello                         <--->
+   2 > goodbye                       <--->
+----         ^
+   3   
+>> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4689:0
 run_reportwriter.at-4689-prog.cob:8.33-8.41:
@@ -7574,6 +7574,13 @@ run_reportwriter.at-5051-inp_data:1.6-1.7:
    2   MW1000051IN15022220150222OR150226020ITEM_NUMBER_06      0000004300000999
    3   MW1000071IN15021420150214OR150212057ITEM_NUMBER_51      0000007000005999
 >> Error: Unexpected indicator: `0'
+
+run_reportwriter.at-5051-inp_data:1.7-1.50:
+   1 > MW1000051IN15021220150212OR150212043ITEM_NUMBER_22      0000002800002999
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   2   MW1000051IN15022220150222OR150226020ITEM_NUMBER_06      0000004300000999
+   3   MW1000071IN15021420150214OR150212057ITEM_NUMBER_51      0000007000005999
+>> Error: Invalid syntax
 
 run_reportwriter.at-5051-inp_data:2.6-2.7:
    1   MW1000051IN15021220150212OR150212043ITEM_NUMBER_22      0000002800002999
@@ -8559,13 +8566,6 @@ run_reportwriter.at-5051-inp_data:100.6-100.7:
 ----         ^
 >> Error: Unexpected indicator: `8'
 
-run_reportwriter.at-5051-inp_data:1.7-1.50:
-   1 > MW1000051IN15021220150212OR150212043ITEM_NUMBER_22      0000002800002999
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   2   MW1000051IN15022220150222OR150226020ITEM_NUMBER_06      0000004300000999
-   3   MW1000071IN15021420150214OR150212057ITEM_NUMBER_51      0000007000005999
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:5049:0
 run_reportwriter.at-5049-prog.cob:14.24-14.32:
   11          FILE-CONTROL.
@@ -8635,6 +8635,14 @@ run_reportwriter.at-9078-reference:2.6-2.7:
    3   Location:            1000051
    4   Invoice#   Date                              Order#          Line#  Item#                            TX Qty      Cost
 >> Error: Unexpected indicator: `:'
+
+run_reportwriter.at-9078-reference:2.11-2.13:
+   1   Run:02/25/2015 153000                  NEXT PAGE ISSUE      Page    1
+   2 > Region:    MW
+----              ^^
+   3   Location:            1000051
+   4   Invoice#   Date                              Order#          Line#  Item#                            TX Qty      Cost
+>> Error: Invalid syntax
 
 run_reportwriter.at-9078-reference:3.6-3.7:
    1   Run:02/25/2015 153000                  NEXT PAGE ISSUE      Page    1
@@ -12285,14 +12293,6 @@ run_reportwriter.at-9078-reference:3968.6-3968.7:
 3970   
 >> Error: Unexpected indicator: `0'
 
-run_reportwriter.at-9078-reference:2.11-2.13:
-   1   Run:02/25/2015 153000                  NEXT PAGE ISSUE      Page    1
-   2 > Region:    MW
-----              ^^
-   3   Location:            1000051
-   4   Invoice#   Date                              Order#          Line#  Item#                            TX Qty      Cost
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9267:0
 run_reportwriter.at-9267-inp_data:1.6-1.7:
    1 > SAINATH KOTGIRE          30/03/201611029473  20 00100000                          00000100
@@ -12300,6 +12300,13 @@ run_reportwriter.at-9267-inp_data:1.6-1.7:
    2   UDAY PRATIVADI           30/03/201604547552  20 00100000                          00000200
    3   MILIND PARDESHI          30/03/201611256856  20 00100000                          00000300
 >> Error: Unexpected indicator: `H'
+
+run_reportwriter.at-9267-inp_data:1.8-1.15:
+   1 > SAINATH KOTGIRE          30/03/201611029473  20 00100000                          00000100
+----           ^^^^^^^
+   2   UDAY PRATIVADI           30/03/201604547552  20 00100000                          00000200
+   3   MILIND PARDESHI          30/03/201611256856  20 00100000                          00000300
+>> Error: Invalid syntax
 
 run_reportwriter.at-9267-inp_data:2.6-2.7:
    1   SAINATH KOTGIRE          30/03/201611029473  20 00100000                          00000100
@@ -12327,13 +12334,6 @@ run_reportwriter.at-9267-inp_data:5.6-5.7:
 ----         ^
    6   SACHIN TENDUNLKAR        30/03/201614645425  20 00500000                          00000600
 >> Error: Unexpected indicator: `K'
-
-run_reportwriter.at-9267-inp_data:1.8-1.15:
-   1 > SAINATH KOTGIRE          30/03/201611029473  20 00100000                          00000100
-----           ^^^^^^^
-   2   UDAY PRATIVADI           30/03/201604547552  20 00100000                          00000200
-   3   MILIND PARDESHI          30/03/201611256856  20 00100000                          00000300
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9265:0
 run_reportwriter.at-9265-prog.cob:8.38-8.46:
@@ -12457,6 +12457,13 @@ run_reportwriter.at-9265-prog.cob:94.34-94.39:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9340:0
+run_reportwriter.at-9340-reference:1.27-1.32:
+   1 >                            STARK TECHNOLOGIES MONTHLY REPORT
+----                              ^^^^^
+   2                       --------------------------------------------------
+   3    REPORT PERIOD:    2016/04/22  10:55
+>> Error: Invalid syntax
+
 run_reportwriter.at-9340-reference:3.6-3.7:
    1                              STARK TECHNOLOGIES MONTHLY REPORT
    2                       --------------------------------------------------
@@ -12596,13 +12603,6 @@ run_reportwriter.at-9340-reference:21.6-21.7:
   23    ****************************************************************************************************
 >> Error: Unexpected indicator: `A'
 
-run_reportwriter.at-9340-reference:1.27-1.32:
-   1 >                            STARK TECHNOLOGIES MONTHLY REPORT
-----                              ^^^^^
-   2                       --------------------------------------------------
-   3    REPORT PERIOD:    2016/04/22  10:55
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9469:0
 run_reportwriter.at-9469-prog.cob:32.18:
   29   
@@ -12631,6 +12631,13 @@ run_reportwriter.at-9514-reference:1.6-1.7:
    2   VarQ: 123456789b123456789c123456789d123456789e123456789f
    3   VarQ:
 >> Error: Unexpected indicator: `H'
+
+run_reportwriter.at-9514-reference:1.15-1.16:
+   1 > VarQ: H        1         2         3         4         5  Page   1
+----                  ^
+   2   VarQ: 123456789b123456789c123456789d123456789e123456789f
+   3   VarQ:
+>> Error: Invalid syntax
 
 run_reportwriter.at-9514-reference:2.6-2.7:
    1   VarQ: H        1         2         3         4         5  Page   1
@@ -12809,13 +12816,6 @@ run_reportwriter.at-9514-reference:27.6-27.7:
   28   VarQ:
   29   VarQ:
 >> Error: Unexpected indicator: `4'
-
-run_reportwriter.at-9514-reference:1.15-1.16:
-   1 > VarQ: H        1         2         3         4         5  Page   1
-----                  ^
-   2   VarQ: 123456789b123456789c123456789d123456789e123456789f
-   3   VarQ:
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9617:0
 run_reportwriter.at-9617-prog.cob:33.24-33.29:

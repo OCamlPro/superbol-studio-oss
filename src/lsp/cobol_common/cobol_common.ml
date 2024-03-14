@@ -15,6 +15,7 @@ module Basics = Basics
 module Srcloc = Srcloc
 module Copybook = Copybook
 module Diagnostics = Diagnostics
+module Diagnostics_accumulator = Diagnostics_accumulator
 module Visitor = Visitor
 module Behaviors = Behaviors
 module Tokenizing = Tokenizing

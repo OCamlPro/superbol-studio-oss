@@ -18,8 +18,6 @@ open Cobol_common.Srcloc.INFIX
 open Text.TYPES
 open Src_format
 
-module DIAGS =  Cobol_common.Diagnostics
-
 (* --- *)
 
 let remove_blanks = Str.global_replace (Str.regexp " ") ""           (* '\t'? *)
@@ -37,7 +35,7 @@ type 'k state =
     newline: bool;
     newline_cnums: int list;    (** index of all newline characters encountered
                                     so far (in reverse order) *)
-    diags: DIAGS.Set.t;
+    diags: Src_diagnostics.diagnostics;
     config: 'k config;
   }
 and continued =
@@ -70,7 +68,7 @@ let init_state : 'k source_format -> 'k state = fun source_format ->
     cdir_seen = false;
     newline = true;
     newline_cnums = [];
-    diags = DIAGS.Set.none;
+    diags = Src_diagnostics.none;
     config =
       {
         debug = false;
@@ -101,11 +99,10 @@ let flush ({ lex_prods; _ } as state) : _ state * text =
 let reset_cont state =
   { state with continued = CNone }
 
-let lex_diag ~severity state =
-  DIAGS.Cont.kdiag severity
-    (fun d -> { state with diags = DIAGS.Set.cons d state.diags })
-
-let lex_error state = lex_diag ~severity:DIAGS.Error state
+let lex_warn state w =
+  { state with diags = Src_diagnostics.add_warning w state.diags }
+let lex_error state e =
+  { state with diags = Src_diagnostics.add_error e state.diags }
 
 let change_source_format ({ config; _ } as state) sf =
   (* Just check there is no text that requires continuation. *)
@@ -161,8 +158,8 @@ let append t state =
       let prod = TextWord (w ^ s) &@ (Cobol_common.Srcloc.concat wloc tloc) in
       { state with pseudotext = Some (start_loc, prod :: prods);
                    newline = false }
-  | _, { loc; _ } ->
-      lex_error state ~loc "Unexpected@ `%a'@ in@ continuation" Text.pp_word t
+  | _, { loc; payload = word } ->
+      lex_error state @@ Unexpected { loc; item = Word_in_continuation word }
 
 let sna ({ config = { source_format; _ }; _ } as state) lexbuf =
   let indicator_pos, FixedWidth _ = source_format in
@@ -193,32 +190,18 @@ let new_line state lexbuf =
 
 (* --- *)
 
-type _ c = Char: char c | Str: string c | Integer: int c
-
-let format_for (type k) : k c -> (k -> 'a, _, _, 'a) format4 = function
-  | Char    -> "%c"
-  | Str     -> "%s"
-  | Integer -> "%d"
-
-let unexpected (type k) (kind: k c)
-    ?(knd: Pretty.simple = "character")
-    ?(c: k option)
-    ?(severity = DIAGS.Error)
+let unexpected
+    (item: Src_diagnostics.unexpected_stuff)
+    ?(severity : [`Error | `Warn] = `Error)
     ~k state lexbuf =
   let loc =
     let end_pos = Lexing.lexeme_end_p lexbuf in
-    let start_pos = match kind with
-      | Str | Integer -> Lexing.lexeme_start_p lexbuf
-      | Char -> { end_pos with pos_cnum = end_pos.pos_cnum - 1 }  (* last char *)
-    in
+    let start_pos = Lexing.lexeme_start_p lexbuf in
     raw_loc ~start_pos ~end_pos state
   in
-  let state = match c with
-    | None ->
-        lex_diag state "Unexpected@ %(%)" knd ~severity ~loc
-    | Some c ->
-        lex_diag state ("Unexpected@ %(%):@ `"^^format_for kind^^"'") knd c
-          ~severity ~loc
+  let state = match severity with
+    | `Error -> lex_error state @@ Unexpected { loc; item }
+    | `Warn -> lex_warn state @@ Ignoring_unexpected { loc; item }
   in
   k state lexbuf
 
@@ -246,9 +229,9 @@ let rev_pseudotext: text -> _ state -> pseudotext * _ state = fun text state ->
         (Text.pseudo_string (w &@<- pt)) :: acc, state
     | Alphanum a ->
         (PseudoAlphanum a &@<- pt) :: acc, state
-    | _ ->
-        acc, lex_error state ~loc:~@pt "Unexpected@ `%a'@ in@ pseudotext"
-          Text.pp_word pt
+    | word ->
+        acc, lex_error state @@ Unexpected { loc = ~@pt;
+                                             item = Word_in_pseudotext word }
   end ([], state) text
 
 let pseudotext_delimiter ~loc = function
@@ -305,10 +288,10 @@ let flush_continued ?(force = false) state = match state.continued with
   | CText { str = { payload = str; loc };
             txt = CAlphanum { qte; knd; cld = true; tbc = false; _ } } ->
       emit (Alphanum { knd; qte; str } &@ loc) (reset_cont state)
-  | CText { str = { payload = str; loc };
+  | CText { str = { payload = prefix; loc };
             txt = CAlphanum { qte; knd; _ } } when force ->
-      lex_error (reset_cont state) ~loc "Missing@ continuation@ of@ `%s'" str |>
-      emit (Alphanum { knd; qte; str } &@ loc)
+      lex_error (reset_cont state) (Missing_continuation { loc; prefix }) |>
+      emit (Alphanum { knd; qte; str = prefix } &@ loc)
   | CText { str = { payload = str; loc };
             txt = CAlphanum { qte; knd; _ } } ->
       (* Missing continuation error is delayed until the final tokenization
@@ -330,7 +313,7 @@ let eof state lexbuf =
       let start_pos = Cobol_common.Srcloc.start_pos start_loc
       and _, end_pos = Cobol_common.Srcloc.as_lexloc loc in
       let loc = raw_loc ~start_pos ~end_pos state in
-      lex_error state ~loc "Unterminated@ pseudotext" |>
+      lex_error state @@ Unterminated_pseudotext { loc } |>
       emit (Eof &@ loc)
 
 (* --- *)
@@ -348,7 +331,7 @@ let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
       emit (textword w) state
   | CText _ ->
       let state = flush_continued ~force:true state in
-      let state = lex_error state ~loc:wloc "Unexpected@ text@ word" in
+      let state = lex_error state @@ Unexpected { loc = wloc; item = Word } in
       emit (textword w) state
 
 
@@ -415,12 +398,10 @@ let quoted_alphanum ?(fitting = Nominal) ~knd
   | CText { str = s0;
             txt = CAlphanum { qte = q0; knd = k0; _ }; _ } ->
       let state =
-        if q0 <> qte
-        then lex_error state ~loc:~@str' "Mismatch@ in@ continuation@ of@ \
-                                          alphanumeric@ literal@ (expected@ \
-                                          `%a'@ quotation@ character)\
-                                         " Text.pp_quote q0
-        else state
+        if q0 = qte then state else
+          lex_error state @@
+          Mismatch_in_alphanum_continuation { continued_alphanum_loc = ~@str';
+                                              expected_quotation =q0 }
       in
       let str = ~&s0 ^ strip_left_quote str
       and strloc = Cobol_common.Srcloc.concat ~@s0 ~@str' in
@@ -461,8 +442,6 @@ let extract_knd str state lexbuf =
     exception UnexpectedChar of char
     exception UnexpectedStr
   end in
-  let unexpected =
-    unexpected ~knd:"opening delimiter for alphanumeric literal" in
   try
     (* TODO: use start_pos & end_pos instead (see below) *)
     let s, knd = match str.[0] with
@@ -482,10 +461,12 @@ let extract_knd str state lexbuf =
     s, knd, state
   with
   | UnexpectedChar c ->
-      unexpected Char ~c state lexbuf
+      unexpected (Opening_alphanumeric_literal_delimiter (String.make 1 c))
+        state lexbuf
         ~k:(fun state _lexbuf -> Str.string_after str 1, Basic, state)
   | UnexpectedStr ->
-      unexpected Str state lexbuf
+      unexpected (Opening_alphanumeric_literal_delimiter str)
+        state lexbuf
         ~k:(fun state _lexbuf -> Str.string_after str 2, Basic, state)
 
 

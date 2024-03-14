@@ -11,19 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Srcloc.TYPES
-open Preproc_outputs.TYPES
+open Preproc_diagnostics
 
-module Make (Config: Cobol_config.T) : sig
+include Cobol_common.Diagnostics_accumulator.MAKE
+    (struct
+      type t = diagnostics
+      let none = none
+      let union = union
+      let translate = translate
+    end)
 
-  val replacing'
-    : ?repl_dir:Preproc_directives.replacing_direction
-    -> [< `Alphanum of Text.pseudotext
-       | `PseudoText of Text.pseudotext ] Cobol_common.Srcloc.with_loc
-    -> Text.pseudotext Cobol_common.Srcloc.with_loc
-    -> Preproc_directives.replacing option with_diags
+let of_config_verif (c: 'a Cobol_config.FEATURE.verification_result) =
+  match Cobol_config.DIAG.decompose_verification_result c with
+  | result, Some Error e ->
+      { result; diags = add_error (Feature_error e) none }
+  | result, Some Warning w ->
+      { result; diags = add_warning (Feature_warning w) none }
+  | result, None ->
+      { result; diags = none }
 
-  val filter_map_4_list_with_diags'
-    : 'a option with_diags with_loc list -> 'a with_loc list with_diags
-
-end
+let error_result result e = { result; diags = add_error e none }

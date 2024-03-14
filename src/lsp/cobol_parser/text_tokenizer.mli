@@ -53,7 +53,7 @@ val init
 
 val diagnostics
   : 'a state
-  -> Cobol_common.Diagnostics.Set.t
+  -> Parser_diagnostics.t
 
 val parsed_tokens
   : Cobol_common.Behaviors.eidetic state

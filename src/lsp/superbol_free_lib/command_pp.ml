@@ -60,13 +60,14 @@ let cmd =
                      { common.preproc_options with
                        source_format =
                          Option.value source_format
-                         ~default:  common.preproc_options.source_format }
+                         ~default: common.preproc_options.source_format }
                    in
                    input |>
                    Cobol_preproc.preprocessor ~options:preproc_options |>
                    Cobol_parser.parse_simple ~options:common.parser_options
                  in
                  let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
+                 let my_text = Cobol_parser.Outputs.translate_diags my_text in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (
@@ -85,6 +86,7 @@ let cmd =
                              exit 1
                            )
                        | { diags; _ } ->
+                           let diags = Cobol_parser.Outputs.Diagnostics.translate diags in
                            Format.eprintf "Reparse: %a@." Cobol_common.Diagnostics.Set.pp diags;
                            exit 1
                        | exception _ ->
@@ -95,7 +97,7 @@ let cmd =
                else
                  let text =
                    let common = common_get () in
-                   Cobol_common.Diagnostics.show_n_forget @@
+                   Cobol_preproc.Outputs.show_n_forget @@
                    Cobol_preproc.text_of_file file
                      ~options:common.preproc_options
                  in

@@ -13,10 +13,10 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Cobol_common.Diagnostics.TYPES
+open Preproc_outputs.TYPES
 open Preproc_options
 
-module DIAGS = Cobol_common.Diagnostics
+module OUT = Preproc_outputs
 
 (* --- *)
 
@@ -26,7 +26,7 @@ type preprocessor =
     reader: Src_reader.t;
     ppstate: Preproc_state.t;
     pplog: Preproc_trace.log;
-    diags: DIAGS.diagnostics;
+    diags: Preproc_diagnostics.t;
     persist: preprocessor_persist;
   }
 
@@ -44,9 +44,16 @@ and preprocessor_persist =
     show_if_verbose: [`Txt | `Src] list;
   }
 
-let diags { diags; reader; _ } = DIAGS.Set.union diags @@ Src_reader.diags reader
-let add_diag lp d = { lp with diags = DIAGS.Set.cons d lp.diags }
-let add_diags lp d = { lp with diags = DIAGS.Set.union d lp.diags }
+let diags { diags; reader; _ } =
+  Preproc_diagnostics.add_src_diagnostics (Src_reader.diags reader) diags
+
+let add_diags lp d =
+  { lp with diags = Preproc_diagnostics.union d lp.diags }
+let add_error lp e =
+  { lp with diags = Preproc_diagnostics.add_error e lp.diags }
+let add_warn lp w =
+  { lp with diags = Preproc_diagnostics.add_warning w lp.diags }
+
 let position { reader; _ } = Src_reader.position reader
 let input_file { reader; _ } = Src_reader.input_file reader
 let source_format { reader; _ } = Src_reader.source_format reader
@@ -112,7 +119,7 @@ let preprocessor input = function
         reader = Src_reader.from input ?source_format;
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
-        diags = DIAGS.Set.none;
+        diags = Preproc_diagnostics.none;
         persist =
           {
             pparser = (module Pp);
@@ -177,8 +184,7 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           let lp = { lp with reader; buff = [] } in
           preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
       | Error (text, e, _) ->
-          let diag = Preproc_diagnostics.error e in
-          let lp = add_diag { lp with reader; buff = [] } diag in
+          let lp = add_error { lp with reader; buff = [] } e in
           preprocess_line lp (buff @ text)
 
 and apply_compiler_directive
@@ -188,9 +194,9 @@ and apply_compiler_directive
   | CDirSource sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
-       | Error e -> add_diag lp (Preproc_diagnostics.error e))
+       | Error e -> add_error lp e)
   | CDirSet _ ->
-      DIAGS.Cont.kwarn (add_diag lp) ~loc "Ignored@ compiler@ directive"
+      add_warn lp @@ Ignored { loc; item = Compiler_directive }
 
 and preprocess_line lp srctext =
   match try_preproc lp srctext with
@@ -201,7 +207,7 @@ and preprocess_line lp srctext =
   | Ok (`CopyDone (lp, srctext))
   | Ok (`ReplaceDone (lp, [], srctext))
   | Ok (`CDirDone (lp, srctext)) ->  (* Continue with next phrase, which may also
-                                        be a compiler directive. *)
+                                       be a compiler directive. *)
       preprocess_line lp srctext
   | Ok (`ReplaceDone (lp, text, srctext)) ->
       text, with_buff lp @@ Text.strip_eof srctext
@@ -232,25 +238,25 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       (function
         | HandlingError env ->
             let loc = Om.join_limits @@ Pp.MenhirInterpreter.positions env in
-            Error DIAGS.(Set.one @@
-                         One.error ~loc "Malformed@ %s@ statement" stmt)
+            Error (Preproc_diagnostics.Malformed_statement { loc; stmt })
         | _ ->
             Pretty.failwith
-              "Unexpected@ state@ of@ parser@ for@ %s@ statement" stmt)
+              "Unexpected@ state@ of@ parser@ for@ %a@ statement"
+              Preproc_diagnostics.pp_statement stmt)
       (Text_supplier.pptoks_of_text_supplier (module Om) phrase)
       (parser @@ position lp)
   in
   function
   | Copy { prefix = rev_prefix; phrase; suffix } ->
-      Result.fold (parse ~stmt:"COPY" Pp.Incremental.copy_statement phrase)
+      Result.fold (parse ~stmt:`COPY Pp.Incremental.copy_statement phrase)
         ~ok:(fun copy -> do_copy lp rev_prefix copy suffix)
-        ~error:(fun diags -> `CopyDone (add_diags lp diags,
-                                        List.rev_append rev_prefix suffix))
+        ~error:(fun e -> `CopyDone (add_error lp e,
+                                    List.rev_append rev_prefix suffix))
   | Replace { prefix = rev_prefix; phrase; suffix } ->
-      Result.fold (parse ~stmt:"REPLACE" Pp.Incremental.replace_statement phrase)
+      Result.fold (parse ~stmt:`REPLACE Pp.Incremental.replace_statement phrase)
         ~ok:(fun repl -> do_replace lp rev_prefix repl suffix)
-        ~error:(fun diags -> `ReplaceDone (add_diags lp diags,
-                                           List.rev rev_prefix, suffix))
+        ~error:(fun e -> `ReplaceDone (add_error lp e,
+                                       List.rev rev_prefix, suffix))
   | Header (header, { prefix = rev_prefix; phrase; suffix }) ->
       let prefix = match header with
         | ControlDivision
@@ -312,7 +318,8 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
         (* TODO: `note addendum *)
         [],
-        DIAGS.Acc.error lp.diags ~loc "@[Cyclic@ COPY@ of@ `%s'@]" filename,
+        Preproc_diagnostics.add_error
+          (Cyclic_copy { copyloc = loc; filename }) lp.diags,
         Preproc_trace.cyclic_copy ~loc ~filename lp.pplog
     | Ok filename ->
         if verbose then
@@ -327,8 +334,8 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         text, lp.diags, Preproc_trace.copy_done ~loc ~filename lp.pplog
     | Error lnf ->
         [],
-        DIAGS.Acc.error lp.diags ~loc "%a"
-          Cobol_common.Copybook.pp_lookup_error lnf,
+        Preproc_diagnostics.add_error
+          (Copybook_lookup_error { copyloc = Some loc; lnf }) lp.diags,
         Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
   in
   text, with_diags_n_pplog lp diags pplog
@@ -416,7 +423,7 @@ let preprocessor ?(options = Preproc_options.default) input =
 let default_oppf = Fmt.stdout
 
 let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
-  DIAGS.result @@
+  OUT.result @@
   Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
   Src_reader.from input ?source_format:(source_format_config source_format)
 
@@ -427,12 +434,12 @@ let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) lib =
   match Cobol_common.Copybook.find_lib ~libpath lib with
   | Ok filename ->
       Src_input.from ~filename ~f:begin fun input ->
-        DIAGS.result @@
+        OUT.result @@
         Src_reader.print_lines ~dialect ~skip_compiler_directives_text:true ppf @@
         Src_reader.from input ?source_format:(source_format_config source_format)
       end
   | Error lnf ->
-      DIAGS.error_result () "%a" Cobol_common.Copybook.pp_lookup_error lnf
+      OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
 let fold_source_lines ~dialect ~source_format ?on_initial_source_format
     ?skip_compiler_directives_text ?on_compiler_directive
@@ -444,20 +451,20 @@ let fold_source_lines ~dialect ~source_format ?on_initial_source_format
     | Some f -> f (Src_reader.source_format reader) acc
     | None -> acc
   in
-  DIAGS.result @@
+  OUT.result @@
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
 
 let text_of_input ?options input =
   let text, pp = full_text ~item:"file" @@ preprocessor ?options input in
-  DIAGS.result text ~diags:(diags pp)
+  OUT.result text ~diags:(diags pp)
 
 let text_of_file ?options filename =
   Src_input.from ~filename ~f:(text_of_input ?options)
 
 let preprocess_input ?options ?(ppf = default_oppf) input =
   text_of_input ?options input |>
-  DIAGS.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
+  OUT.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
 let preprocess_file ?options ?ppf filename =
   Src_input.from ~filename ~f:(preprocess_input ?options ?ppf)

@@ -127,7 +127,12 @@ module Set = struct
   type t = diagnostics                                            (* reversed *)
 
   let sort diags =
-    List.sort (fun { stamp = s1; _ } { stamp = s2; _ } -> Int.compare s1 s2) diags
+    List.sort begin fun d1 d2 -> match d1.location, d2.location with
+      | Some l1, Some l2 -> Srcloc.compare l1 l2
+      | None, Some _ -> -1
+      | Some _, None -> 1
+      | None, None -> Int.compare d1.stamp d2.stamp                (* fallback *)
+    end diags
 
   (* TODO: order via locs and/or a global timestamp? something more
      intricate? *)
@@ -202,12 +207,12 @@ include Cont
 (* --- *)
 
 let result ?(diags = Set.none) result = { result; diags }
-let result_only { result; _ } = result
+(* let result_only { result; _ } = result *)
 let with_diag r d = result ~diags:(Set.one d) r
-let with_diags r diags = result ~diags r
+(* let with_diags r diags = result ~diags r *)
 let with_more_diags ~diags { result; diags = diags' } =
   { result; diags = Set.union diags' diags }
-let simple_result r = result r
+(* let simple_result r = result r *)
 let some_result ?diags r = result ?diags (Some r)
 let no_result ~diags = { result = None; diags }
 let map_result ~f { result; diags } = { result = f result; diags }
@@ -220,8 +225,8 @@ let cons_option_result = function
   | { result = None; diags } -> with_more_diags ~diags
   | { result = Some r; diags } -> more_result ~f:(fun tl -> result ~diags @@ r :: tl)
 let forget_result { diags; _ } = diags
-let merge_results ~f r1 r2 =
-  result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags)
+(* let merge_results ~f r1 r2 = *)
+(*   result (f r1.result r2.result) ~diags:(Set.union r1.diags r2.diags) *)
 let show_n_forget ?(set_status = true) ?(min_level = Hint)
     ?(ppf = Fmt.stderr) { result; diags } =
   Set.pp_above ~level:min_level ppf diags;
@@ -280,21 +285,5 @@ module InitStateful () = MakeStateful (struct let history = Set.none end)
 
 module Fatal = struct
   (** Fatal errors from which we cannot recover. *)
-  let localized_error = Msgs.localized_error
   let error           = Msgs.error
-  (* exception Sink of Set.t *)
-
-  (* (\** Fail with a set of diagnostics *\) *)
-  (* let sink s = raise @@ Sink s *)
 end
-
-let of_exn: exn -> diagnostic = function
-  | Msgs.LocalizedError (s, loc, _) ->                        (* TODO: addenda *)
-      One.error ~loc "%t" s
-  | Msgs.Error msg ->
-      One.error "%t" msg
-  | Failure msg
-  | Sys_error msg ->
-      One.error "%s" msg
-  | e ->
-      raise e

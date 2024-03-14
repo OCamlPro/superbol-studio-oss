@@ -14,7 +14,7 @@
 (** Text manipulation *)
 
 open Cobol_common.Srcloc.TYPES
-open Cobol_common.Diagnostics.TYPES
+open Preproc_outputs.TYPES
 open Text.TYPES
 
 (** {1 Compiler directives} *)
