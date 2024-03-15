@@ -11,13 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module type S = Diagnostics_accumulator_sig.S
+
 module MAKE
     (Set: sig
        type t
        val none: t
        val union: t -> t -> t
        val translate: t -> Diagnostics.diagnostics                (* temporary *)
-     end) =
+     end)
+  : S with type t := Set.t =
 struct
 
   module TYPES = struct

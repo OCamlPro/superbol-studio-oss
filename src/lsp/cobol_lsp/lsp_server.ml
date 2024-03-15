@@ -188,8 +188,9 @@ let on_response id response
 (** {2 Handling of diagnostics for non-opened documents} *)
 
 
-let dispatch_diagnostics (Lsp_document.{ project; diags; _ } as doc) registry =
+let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
   let uri = Lsp_document.uri doc in
+  let diags = Lsp_document.diagnostics doc in
   let rootdir = Lsp_project.rootdir project in
   let indirect4uri =
     if diags <> DIAGS.Set.none

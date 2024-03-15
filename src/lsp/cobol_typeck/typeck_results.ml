@@ -11,13 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type S = Diagnostics_accumulator_sig.S
+(** {1 Results with diagnostics} *)
 
-module MAKE
-    (Set: sig
-       type t
-       val none: t
-       val union: t -> t -> t
-       val translate: t -> Diagnostics.diagnostics                (* temporary *)
-     end)
-  : S with type t := Set.t
+include Cobol_common.Diagnostics_accumulator.MAKE (Typeck_diagnostics)

@@ -154,3 +154,30 @@ module Accumulator = struct
         let translate = translate
       end)
 end
+
+module ALL = struct                 (* combines preproc & parsing diagnostics *)
+  type t =
+    {
+      preproc_diags: Cobol_preproc.Diagnostics.t;
+      parser_diags: diagnostics;
+    }
+  let none =
+    {
+      preproc_diags = Cobol_preproc.Diagnostics.none;
+      parser_diags = none;
+    }
+  let union d1 d2 =
+    {
+      preproc_diags =
+        Cobol_preproc.Diagnostics.union d1.preproc_diags d2.preproc_diags;
+      parser_diags =
+        union d1.parser_diags d2.parser_diags;
+    }
+  let translate { preproc_diags; parser_diags } =
+    let pp_diags = Cobol_preproc.Diagnostics.translate preproc_diags in
+    let pa_diags = translate parser_diags in
+    Cobol_common.Diagnostics.Set.union pp_diags pa_diags
+  let has_errors { preproc_diags; parser_diags } =
+    Cobol_preproc.Diagnostics.has_errors preproc_diags ||
+    has_errors parser_diags
+end

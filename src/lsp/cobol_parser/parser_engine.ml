@@ -15,7 +15,6 @@ open Cobol_common.Types
 open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)
-open Parser_diagnostics
 
 module OUT = Parser_outputs
 
@@ -140,7 +139,7 @@ let add_exn ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
   { ps with preproc = { pp with diags = Parser_diagnostics.add_exn e diags } }
 
 let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
-  Parser_outputs.Diagnostics.{
+  Parser_diagnostics.ALL.{
     parser_diags = Parser_diagnostics.union diags @@ Tokzr.diagnostics tokzr;
     preproc_diags = Cobol_preproc.diags pp;
   }
@@ -434,7 +433,7 @@ let parse_once
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
-  OUT.result (aggregate_output ps res) ~diags:(all_diags ps)
+  OUT.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
 

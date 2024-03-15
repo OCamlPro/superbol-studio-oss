@@ -50,12 +50,13 @@ let init =
   }
 
 let result ptree acc =
-  Typeck_outputs.{
-    ptree;
-    group = acc.cus;
-    artifacts = acc.artifacts;
-  },
-  acc.diags
+  Typeck_results.with_diags
+    Typeck_outputs.{
+      ptree;
+      group = acc.cus;
+      artifacts = acc.artifacts;
+    }
+    acc.diags
 
 let build_units _config = object
   inherit [acc] Cobol_ptree.Visitor.folder
@@ -120,7 +121,7 @@ end
     groups. *)
 let of_compilation_group
   : Cobol_config.t -> Cobol_ptree.compilation_group ->
-    Typeck_outputs.t * Typeck_diagnostics.t =
+    Typeck_outputs.t Typeck_results.with_diags =
   fun config compilation_group_ptree ->
   Cobol_ptree.Visitor.fold_compilation_group
     (build_units config) compilation_group_ptree init |>

@@ -28,7 +28,8 @@ module TYPES = struct
       rewinder: rewinder option;
       (* Used for caching, when loading a cache file as the file is not
          reparsed, then diagnostics are not sent. *)
-      diags: DIAGS.Set.t;
+      parsing_diags: Cobol_parser.Diagnostics.ALL.t;
+      typecking_diags: Cobol_typeck.Diagnostics.t;
     }
   and checked_doc = Cobol_typeck.Outputs.t
   and rewinder =
@@ -56,7 +57,8 @@ module TYPES = struct
       doc_cache_comments: Cobol_preproc.Text.comments;
       doc_cache_ignored: Cobol_common.Srcloc.lexloc list;
       doc_cache_checked: checked_doc option;
-      doc_cache_diags: DIAGS.Set.serializable;
+      doc_cache_parsing_diags: Cobol_parser.Diagnostics.ALL.t;
+      doc_cache_typecking_diags: Cobol_typeck.Diagnostics.t;
     }
 
 end
@@ -89,24 +91,25 @@ let no_artifacts =
                          rev_ignored = [] }
 
 let check doc ptree =
-  (* Note: temporary translation into the old pre-formatted diagnostics. *)
-  let ptree = Cobol_parser.Outputs.translate_diags ptree in
-  let DIAGS.{ result = artifacts, rewinder, checked; diags } =
-    DIAGS.more_result ~f:begin fun (ptree, rewinder) ->
-      let config = doc.project.config.cobol_config in
-      Cobol_typeck.compilation_group ~config ptree |>
-      Cobol_typeck.translate_diagnostics ~config |>
-      DIAGS.map_result ~f:begin fun checked ->
-        Cobol_parser.artifacts ptree, Some rewinder, Some checked
-      end
-    end ptree |>
+  let config = doc.project.config.cobol_config in
+  let Cobol_parser.Outputs.{ result = ptree, rewinder;
+                             diags = parsing_diags } = ptree in
+  let Cobol_typeck.Results.{ result = checked;
+                             diags = typecking_diags }
+    = Cobol_typeck.compilation_group ~config ptree in
+  let artifacts = Cobol_parser.artifacts ptree in
+  let typecking_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing
        errors: *)
-    if DIAGS.Set.has_errors ptree.diags
-    then fun res -> { res with diags = ptree.diags }
-    else Fun.id
+    if Cobol_parser.Diagnostics.ALL.has_errors parsing_diags
+    then Cobol_typeck.Diagnostics.none
+    else typecking_diags
   in
-  { doc with artifacts; rewinder; diags; checked }
+  { doc with artifacts;
+             parsing_diags;
+             typecking_diags;
+             rewinder = Some rewinder;
+             checked = Some checked; }
 
 let parse_and_analyze ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
@@ -138,7 +141,8 @@ let blank ~project ?copybook textdoc =
     textdoc;
     artifacts = no_artifacts;
     rewinder = None;
-    diags = DIAGS.Set.none;
+    parsing_diags = Cobol_parser.Diagnostics.ALL.none;
+    typecking_diags = Cobol_typeck.Diagnostics.none;
     checked = None;
     copybook;
   }
@@ -185,9 +189,14 @@ let checked: document -> checked_doc = function
   | { copybook = false; _ } as doc -> raise @@ Unparseable (uri doc)
   | { copybook = true;  _ } as doc -> raise @@ Copybook (uri doc)
 
+let diagnostics { parsing_diags; typecking_diags; _ } =
+  DIAGS.Set.union
+    (Cobol_parser.Diagnostics.ALL.translate parsing_diags)
+    (Cobol_typeck.Diagnostics.translate typecking_diags)
+
 (** Caching utilities *)
 
-let to_cache ({ project; textdoc; checked; diags;
+let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
                 artifacts = { pplog; tokens;
                               rev_comments; rev_ignored; _ }; _ } as doc) =
   {
@@ -200,7 +209,8 @@ let to_cache ({ project; textdoc; checked; diags;
     doc_cache_comments = rev_comments;
     doc_cache_ignored = rev_ignored;
     doc_cache_checked = checked;
-    doc_cache_diags = DIAGS.Set.apply_delayed_formatting diags;
+    doc_cache_parsing_diags = parsing_diags;
+    doc_cache_typecking_diags = typecking_diags;
   }
 
 (* NB: Note this checks against the actual file on disk, which may be different
@@ -216,7 +226,8 @@ let of_cache ~project
       doc_cache_comments = rev_comments;
       doc_cache_ignored = rev_ignored;
       doc_cache_checked = checked;
-      doc_cache_diags = diags } =
+      doc_cache_parsing_diags = parsing_diags;
+      doc_cache_typecking_diags = typecking_diags } =
   let absolute_filename = Lsp_project.absolute_path_for ~filename project in
   if checksum <> Digest.file absolute_filename then
     failwith "Bad checksum"
@@ -229,7 +240,8 @@ let of_cache ~project
     let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
-               diags = DIAGS.Set.of_serializable diags;
+               parsing_diags;
+               typecking_diags;
                checked }
 
 (* --- *)

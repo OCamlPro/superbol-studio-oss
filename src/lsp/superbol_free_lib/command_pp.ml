@@ -86,8 +86,9 @@ let cmd =
                              exit 1
                            )
                        | { diags; _ } ->
-                           let diags = Cobol_parser.Outputs.Diagnostics.translate diags in
-                           Format.eprintf "Reparse: %a@." Cobol_common.Diagnostics.Set.pp diags;
+                           let diags = Cobol_parser.Diagnostics.ALL.translate diags in
+                           Format.eprintf "Reparse: %a@."
+                             Cobol_common.Diagnostics.Set.pp diags;
                            exit 1
                        | exception _ ->
                            Format.eprintf "Reparse: ERROR!!!@.";
