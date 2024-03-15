@@ -2493,16 +2493,6 @@ syn_misc.at-3321-prog.cob:19.0:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3386:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3436:0
-syn_misc.at-3436-prog.cob:11.11-11.18:
-   8          01  OK PIC XX VALUE "OK". ==
-   9              .
-  10   
-  11 >            PERFORM SEC-2
-----              ^^^^^^^
-  12              STOP RUN
-  13              CONTINUE
->> Error: Invalid syntax
-
 syn_misc.at-3436-prog.cob:7.11-9.12:
    4   
    5          DATA DIVISION.
@@ -2516,6 +2506,16 @@ syn_misc.at-3436-prog.cob:7.11-9.12:
   10   
   11              PERFORM SEC-2
 >> Error: Library `ok.inc' not found in search path (search path: )
+
+syn_misc.at-3436-prog.cob:11.11-11.18:
+   8          01  OK PIC XX VALUE "OK". ==
+   9              .
+  10   
+  11 >            PERFORM SEC-2
+----              ^^^^^^^
+  12              STOP RUN
+  13              CONTINUE
+>> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3969:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4209:0
@@ -3560,6 +3560,16 @@ syn_misc.at-7109-prog.cob:10.6-10.21:
   12         $ELSE
 >> Error: Malformed or unknown compiler directive
 
+syn_misc.at-7109-prog.cob:11.6-11.46:
+   8         $IF X DEFINED
+   9         $DISPLAY X defined
+  10         $ELIF Y DEFINED
+  11 >       $DISPLAY X not defined, but Y via lvl 78
+----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12         $ELSE
+  13         $DISPLAY X not defined
+>> Error: Malformed or unknown compiler directive
+
 syn_misc.at-7109-prog.cob:12.6-12.11:
    9         $DISPLAY X defined
   10         $ELIF Y DEFINED
@@ -3588,16 +3598,6 @@ syn_misc.at-7109-prog.cob:14.6-14.10:
 ----         ^^^^
   15              CONTINUE
   16              .
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7109-prog.cob:11.6-11.46:
-   8         $IF X DEFINED
-   9         $DISPLAY X defined
-  10         $ELIF Y DEFINED
-  11 >       $DISPLAY X not defined, but Y via lvl 78
-----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  12         $ELSE
-  13         $DISPLAY X not defined
 >> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7160:0

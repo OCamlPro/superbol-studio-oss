@@ -288,8 +288,17 @@ let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
   in
   aux
 
-let compare: srcloc -> srcloc -> int = fun a b -> match a, b with
-  | Raw (sa, ea, _), Raw (sb, eb, _)
+let compare: srcloc -> srcloc -> int = fun a b ->
+  (* TODO: change API to suggest doing the projections beforehand.  Maybe
+     parameterize with an ordered list of copybook files. *)
+  let project loc =
+    forget_preproc ~favor_direction:`Left
+      ~traverse_copies:false ~traverse_replaces:false loc
+  in
+  let a' = project a
+  and b' = project b in
+  match a', b' with
+  | (sa, ea), (sb, eb)
     when sa.pos_fname = sb.pos_fname ->
       if sa.pos_cnum < sb.pos_cnum &&
          ea.pos_cnum > eb.pos_cnum
@@ -304,6 +313,7 @@ let compare: srcloc -> srcloc -> int = fun a b -> match a, b with
         else Int.compare eb.pos_cnum ea.pos_cnum         (* larger is greater *)
   | a, b ->
       Stdlib.compare a b                                           (* for now *)
+
 
 (** {2 Pretty-printing} *)
 

@@ -213,16 +213,6 @@ syn_copy.at-569-prog.cob:9.37-9.39:
   11               REPLACING TRAILING "FIRST" BY "VAR1"
 >> Warning: partial replacing with literal source operands is obsolete in default
 
-syn_copy.at-569-prog.cob:13.38-13.40:
-  10          COPY "copy2.inc"
-  11               REPLACING TRAILING "FIRST" BY "VAR1"
-  12                         TRAILING "SECND" BY "VAR2"
-  13 >                       TRAILING "Y" BY "".
-----                                         ^^
-  14          PROCEDURE        DIVISION.
-  15              DISPLAY FIRST-VAR  NO ADVANCING END-DISPLAY.
->> Warning: partial replacing with literal source operands is obsolete in default
-
 syn_copy.at-569-prog.cob:6.7-9.40:
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
@@ -238,6 +228,16 @@ syn_copy.at-569-prog.cob:6.7-9.40:
   10          COPY "copy2.inc"
   11               REPLACING TRAILING "FIRST" BY "VAR1"
 >> Error: Library `copy.inc' not found in search path (search path: )
+
+syn_copy.at-569-prog.cob:13.38-13.40:
+  10          COPY "copy2.inc"
+  11               REPLACING TRAILING "FIRST" BY "VAR1"
+  12                         TRAILING "SECND" BY "VAR2"
+  13 >                       TRAILING "Y" BY "".
+----                                         ^^
+  14          PROCEDURE        DIVISION.
+  15              DISPLAY FIRST-VAR  NO ADVANCING END-DISPLAY.
+>> Warning: partial replacing with literal source operands is obsolete in default
 
 syn_copy.at-569-prog.cob:10.7-13.41:
    7               REPLACING LEADING "TEST" BY "FIRST"
@@ -399,15 +399,6 @@ syn_copy.at-1072-prog.cob:8.30-8.32:
   10              DISPLAY WS-IN IN-A IN-WS NO ADVANCING.
 >> Error: Malformed COPY statement
 
-syn_copy.at-1072-prog.cob:15.11-15.17:
-  12          COPY "proc.inc"
-  13             REPLACING VAR       BY IN-A IN INPUT-REC
-  14                       ==VAR-2== BY ==IN-WS (1:1)==.
-  15 >            END-IF.
-----              ^^^^^^
-  16              STOP RUN.
->> Error: Invalid syntax
-
 syn_copy.at-1072-prog.cob:12.7-14.49:
    9          PROCEDURE        DIVISION.
   10              DISPLAY WS-IN IN-A IN-WS NO ADVANCING.
@@ -421,4 +412,13 @@ syn_copy.at-1072-prog.cob:12.7-14.49:
   15              END-IF.
   16              STOP RUN.
 >> Error: Library `proc.inc' not found in search path (search path: )
+
+syn_copy.at-1072-prog.cob:15.11-15.17:
+  12          COPY "proc.inc"
+  13             REPLACING VAR       BY IN-A IN INPUT-REC
+  14                       ==VAR-2== BY ==IN-WS (1:1)==.
+  15 >            END-IF.
+----              ^^^^^^
+  16              STOP RUN.
+>> Error: Invalid syntax
 

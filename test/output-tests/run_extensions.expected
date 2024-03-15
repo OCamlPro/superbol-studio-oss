@@ -2961,14 +2961,15 @@ run_extensions.at-4892-prog.cob:9.7-9.32:
   11          PROCEDURE        DIVISION.
 >> Error: Malformed or unknown compiler directive
 
-run_extensions.at-4892-prog.cob:14.7-14.8:
+run_extensions.at-4892-prog.cob:12.7-12.34:
+   9          >> DISPLAY some.text-here
+  10          01 var3          pic x.
   11          PROCEDURE        DIVISION.
-  12          >> DISPLAY   other  text #2  *> comment
+  12 >        >> DISPLAY   other  text #2  *> comment
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13          >> DISPLAY  "literal text...  *> no comment"
-  14 >        $DISPLAY  "MF compile time text"
-----          ^
-  15              GOBACK.
->> Error: Invalid syntax
+  14          $DISPLAY  "MF compile time text"
+>> Error: Malformed or unknown compiler directive
 
 run_extensions.at-4892-prog.cob:13.7-13.51:
   10          01 var3          pic x.
@@ -2980,15 +2981,14 @@ run_extensions.at-4892-prog.cob:13.7-13.51:
   15              GOBACK.
 >> Error: Malformed or unknown compiler directive
 
-run_extensions.at-4892-prog.cob:12.7-12.34:
-   9          >> DISPLAY some.text-here
-  10          01 var3          pic x.
+run_extensions.at-4892-prog.cob:14.7-14.8:
   11          PROCEDURE        DIVISION.
-  12 >        >> DISPLAY   other  text #2  *> comment
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  12          >> DISPLAY   other  text #2  *> comment
   13          >> DISPLAY  "literal text...  *> no comment"
-  14          $DISPLAY  "MF compile time text"
->> Error: Malformed or unknown compiler directive
+  14 >        $DISPLAY  "MF compile time text"
+----          ^
+  15              GOBACK.
+>> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4921:0
 run_extensions.at-4921-prog.cob:7.7-7.32:
