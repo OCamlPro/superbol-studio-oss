@@ -3291,16 +3291,6 @@ syn_misc.at-6969-prog.cob:8.7-8.24:
   10          >>DISPLAY "OK"
 >> Error: Invalid >>DISPLAY compiler directive
 
-syn_misc.at-6969-prog.cob:9.7-9.31:
-   6          PROCEDURE        DIVISION.
-   7          >>IF ACTIVATE DEFINED
-   8          >>DISPLAY "NOTOK"
-   9 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  10          >>DISPLAY "OK"
-  11          >>ELSE
->> Error: Malformed compiler directive
-
 syn_misc.at-6969-prog.cob:10.7-10.21:
    7          >>IF ACTIVATE DEFINED
    8          >>DISPLAY "NOTOK"
