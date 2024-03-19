@@ -50,6 +50,7 @@ depends: [
   "ppx_import-windows" {>= "1"}
   "ppx_deriving-windows" {>= "5.2.1"}
   "menhir-windows" {>= "1.2"}
+  "cobol_data-windows" {= version}
   "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}
   "odoc" {with-doc}

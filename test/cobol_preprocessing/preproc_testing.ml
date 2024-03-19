@@ -63,7 +63,7 @@ let show_source_lines
       else Option.some @@ fun lnum cdir () ->
         if with_line_numbers then Pretty.out "@\n%u: " lnum;
         match ~&cdir with
-        | Cobol_preproc.Directives.CDirSource _ ->
+        | Cobol_preproc.Directives.CDir_source _ ->
             Pretty.out "|new source format|"
         | _ ->                        (* ignore every other kind of directives *)
             ()

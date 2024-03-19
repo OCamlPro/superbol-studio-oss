@@ -26,10 +26,10 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
     Cobol_preproc.fold_source_lines ~dialect ~source_format
       ~on_initial_source_format:(fun src_format st -> { st with src_format })
       ~on_compiler_directive:(fun _ { payload = cd;  _} st ->
-        match cd with
-        | CDirSource { payload = src_format; _ } -> { st with src_format }
-        | _ -> st
-      )
+          match cd with
+          | CDir_source { payload = src_format; _ } -> { st with src_format }
+          | _ -> st
+        )
       ~skip_compiler_directives_text:true
       ~f:(fun _lnum line acc -> Indent_check.check_indentation line acc)
       (String { filename; contents })

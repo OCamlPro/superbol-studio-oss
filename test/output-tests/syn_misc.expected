@@ -1216,7 +1216,7 @@ syn_misc.at-2045-prog2.cob:11.6-11.46:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
   13    *         DISPLAY 'NOMFCOMMENT'   END-DISPLAY
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-2045-prog2.cob:15.8-15.9:
   12   *          DISPLAY 'MFCOMMENT'     END-DISPLAY
@@ -2377,7 +2377,7 @@ syn_misc.at-3109-prog3.cob:2.7-2.32:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID.    prog3.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>CALL-CONVENTION compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3175:0
 syn_misc.at-3175-prog.cob:39.15-39.27:
@@ -3043,7 +3043,7 @@ syn_misc.at-6806-prog.cob:5.7-5.21:
    5 >        >>DISPLAY "OK"
 ----          ^^^^^^^^^^^^^^
    6              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6826:0
 syn_misc.at-6826-prog.cob:5.7-5.19:
@@ -3053,7 +3053,7 @@ syn_misc.at-6826-prog.cob:5.7-5.19:
    5 >        >>DISPLAY OK
 ----          ^^^^^^^^^^^^
    6              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6845:0
 syn_misc.at-6845-prog.cob:5.6-5.17:
@@ -3063,7 +3063,7 @@ syn_misc.at-6845-prog.cob:5.6-5.17:
    5 >       $DISPLAY OK
 ----         ^^^^^^^^^^^
    6              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6924:0
 syn_misc.at-6924-prog.cob:2.7-2.8:
@@ -3151,7 +3151,7 @@ syn_misc.at-6930-prog2.cob:2.7-2.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          >>SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 syn_misc.at-6930-prog2.cob:3.7-3.35:
    1   
@@ -3160,7 +3160,7 @@ syn_misc.at-6930-prog2.cob:3.7-3.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog2.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 syn_misc.at-6930-prog2.cob:8.35:
    5          PROGRAM-ID. prog2.
@@ -3210,7 +3210,7 @@ syn_misc.at-6930-prog2.cob:10.7-10.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6934:0
 syn_misc.at-6934-prog3.cob:2.7-2.38:
@@ -3219,7 +3219,7 @@ syn_misc.at-6934-prog3.cob:2.7-2.38:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          >>DEFINE CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 syn_misc.at-6934-prog3.cob:3.7-3.38:
    1   
@@ -3228,7 +3228,7 @@ syn_misc.at-6934-prog3.cob:3.7-3.38:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog3.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 syn_misc.at-6934-prog3.cob:8.35:
    5          PROGRAM-ID. prog3.
@@ -3278,19 +3278,9 @@ syn_misc.at-6934-prog3.cob:10.7-10.46:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6969:0
-syn_misc.at-6969-prog.cob:7.7-7.28:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-   8          >>DISPLAY "NOTOK"
-   9          >>ELIF ACTIVATE2 DEFINED
->> Error: Malformed or unknown compiler directive
-
 syn_misc.at-6969-prog.cob:8.7-8.24:
    5          WORKING-STORAGE  SECTION.
    6          PROCEDURE        DIVISION.
@@ -3299,7 +3289,7 @@ syn_misc.at-6969-prog.cob:8.7-8.24:
 ----          ^^^^^^^^^^^^^^^^^
    9          >>ELIF ACTIVATE2 DEFINED
   10          >>DISPLAY "OK"
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-6969-prog.cob:9.7-9.31:
    6          PROCEDURE        DIVISION.
@@ -3309,7 +3299,7 @@ syn_misc.at-6969-prog.cob:9.7-9.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   10          >>DISPLAY "OK"
   11          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 syn_misc.at-6969-prog.cob:10.7-10.21:
    7          >>IF ACTIVATE DEFINED
@@ -3319,17 +3309,7 @@ syn_misc.at-6969-prog.cob:10.7-10.21:
 ----          ^^^^^^^^^^^^^^
   11          >>ELSE
   12          >>DISPLAY "NOTOK"
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-6969-prog.cob:11.7-11.13:
-   8          >>DISPLAY "NOTOK"
-   9          >>ELIF ACTIVATE2 DEFINED
-  10          >>DISPLAY "OK"
-  11 >        >>ELSE
-----          ^^^^^^
-  12          >>DISPLAY "NOTOK"
-  13          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-6969-prog.cob:12.7-12.24:
    9          >>ELIF ACTIVATE2 DEFINED
@@ -3339,28 +3319,9 @@ syn_misc.at-6969-prog.cob:12.7-12.24:
 ----          ^^^^^^^^^^^^^^^^^
   13          >>END-IF
   14              STOP RUN.
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-6969-prog.cob:13.7-13.15:
-  10          >>DISPLAY "OK"
-  11          >>ELSE
-  12          >>DISPLAY "NOTOK"
-  13 >        >>END-IF
-----          ^^^^^^^^
-  14              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6994:0
-syn_misc.at-6994-prog.cob:5.7-5.22:
-   2          IDENTIFICATION DIVISION.
-   3          PROGRAM-ID.    prog.
-   4          PROCEDURE      DIVISION.
-   5 >        >> IF X DEFINED
-----          ^^^^^^^^^^^^^^^
-   6            >>DISPLAY "X defined"
-   7          >> ELSE
->> Error: Malformed or unknown compiler directive
-
 syn_misc.at-6994-prog.cob:6.9-6.30:
    3          PROGRAM-ID.    prog.
    4          PROCEDURE      DIVISION.
@@ -3369,17 +3330,7 @@ syn_misc.at-6994-prog.cob:6.9-6.30:
 ----            ^^^^^^^^^^^^^^^^^^^^^
    7          >> ELSE
    8            >> DISPLAY "X not defined"
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-6994-prog.cob:7.7-7.14:
-   4          PROCEDURE      DIVISION.
-   5          >> IF X DEFINED
-   6            >>DISPLAY "X defined"
-   7 >        >> ELSE
-----          ^^^^^^^
-   8            >> DISPLAY "X not defined"
-   9            >> DEFINE X 1
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-6994-prog.cob:8.9-8.35:
    5          >> IF X DEFINED
@@ -3389,7 +3340,7 @@ syn_misc.at-6994-prog.cob:8.9-8.35:
 ----            ^^^^^^^^^^^^^^^^^^^^^^^^^^
    9            >> DEFINE X 1
   10          >> END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-6994-prog.cob:9.9-9.22:
    6            >>DISPLAY "X defined"
@@ -3399,39 +3350,9 @@ syn_misc.at-6994-prog.cob:9.9-9.22:
 ----            ^^^^^^^^^^^^^
   10          >> END-IF
   11              CONTINUE
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-6994-prog.cob:10.7-10.16:
-   7          >> ELSE
-   8            >> DISPLAY "X not defined"
-   9            >> DEFINE X 1
-  10 >        >> END-IF
-----          ^^^^^^^^^
-  11              CONTINUE
-  12              .
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7027:0
-syn_misc.at-7027-prog.cob:5.7-5.24:
-   2          IDENTIFICATION DIVISION.
-   3          PROGRAM-ID.    prog.
-   4          PROCEDURE      DIVISION.
-   5 >        >>IF A IS DEFINED
-----          ^^^^^^^^^^^^^^^^^
-   6          >>IF B IS DEFINED
-   7              CONTINUE
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7027-prog.cob:6.7-6.24:
-   3          PROGRAM-ID.    prog.
-   4          PROCEDURE      DIVISION.
-   5          >>IF A IS DEFINED
-   6 >        >>IF B IS DEFINED
-----          ^^^^^^^^^^^^^^^^^
-   7              CONTINUE
-   8          >> DISPLAY "NOT OK (not both definitions)"
->> Error: Malformed or unknown compiler directive
-
 syn_misc.at-7027-prog.cob:8.7-8.49:
    5          >>IF A IS DEFINED
    6          >>IF B IS DEFINED
@@ -3440,17 +3361,7 @@ syn_misc.at-7027-prog.cob:8.7-8.49:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9              .
   10          >>ELSE
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7027-prog.cob:10.7-10.13:
-   7              CONTINUE
-   8          >> DISPLAY "NOT OK (not both definitions)"
-   9              .
-  10 >        >>ELSE
-----          ^^^^^^
-  11              CONTINUE
-  12          >> DISPLAY "NOT OK (no definitions)"
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-7027-prog.cob:12.7-12.43:
    9              .
@@ -3460,27 +3371,7 @@ syn_misc.at-7027-prog.cob:12.7-12.43:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13              .
   14          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7027-prog.cob:14.7-14.15:
-  11              CONTINUE
-  12          >> DISPLAY "NOT OK (no definitions)"
-  13              .
-  14 >        >>END-IF
-----          ^^^^^^^^
-  15          >>ELSE
-  16              CONTINUE
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7027-prog.cob:15.7-15.13:
-  12          >> DISPLAY "NOT OK (no definitions)"
-  13              .
-  14          >>END-IF
-  15 >        >>ELSE
-----          ^^^^^^
-  16              CONTINUE
-  17          >> DISPLAY "OK"
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 syn_misc.at-7027-prog.cob:17.7-17.22:
   14          >>END-IF
@@ -3490,45 +3381,9 @@ syn_misc.at-7027-prog.cob:17.7-17.22:
 ----          ^^^^^^^^^^^^^^^
   18              .
   19          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7027-prog.cob:19.7-19.15:
-  16              CONTINUE
-  17          >> DISPLAY "OK"
-  18              .
-  19 >        >>END-IF
-----          ^^^^^^^^
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7051:0
-syn_misc.at-7051-prog.cob:5.7-5.24:
-   2          IDENTIFICATION DIVISION.
-   3          PROGRAM-ID.    prog.
-   4          PROCEDURE      DIVISION.
-   5 >        >>IF A IS DEFINED
-----          ^^^^^^^^^^^^^^^^^
-   6              CONTINUE
-   7              .
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7051-prog.cob:8.7-8.13:
-   5          >>IF A IS DEFINED
-   6              CONTINUE
-   7              .
-   8 >        >>else
-----          ^^^^^^
-   9              CONTINUE
-  10              .
->> Error: Malformed or unknown compiler directive
-
-syn_misc.at-7051-prog.cob:11.7-11.15:
-   8          >>else
-   9              CONTINUE
-  10              .
-  11 >        >>eNd-If
-----          ^^^^^^^^
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7109:0
 syn_misc.at-7109-prog.cob:8.6-8.19:
    5          WORKING-STORAGE SECTION.
@@ -3538,7 +3393,7 @@ syn_misc.at-7109-prog.cob:8.6-8.19:
 ----         ^^^^^^^^^^^^^
    9         $DISPLAY X defined
   10         $ELIF Y DEFINED
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 syn_misc.at-7109-prog.cob:9.6-9.24:
    6          78 Y            VALUE 'a'.
@@ -3548,7 +3403,7 @@ syn_misc.at-7109-prog.cob:9.6-9.24:
 ----         ^^^^^^^^^^^^^^^^^^
   10         $ELIF Y DEFINED
   11         $DISPLAY X not defined, but Y via lvl 78
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7109-prog.cob:10.6-10.21:
    7          PROCEDURE       DIVISION.
@@ -3558,7 +3413,7 @@ syn_misc.at-7109-prog.cob:10.6-10.21:
 ----         ^^^^^^^^^^^^^^^
   11         $DISPLAY X not defined, but Y via lvl 78
   12         $ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELIF compiler directive
 
 syn_misc.at-7109-prog.cob:11.6-11.46:
    8         $IF X DEFINED
@@ -3568,7 +3423,7 @@ syn_misc.at-7109-prog.cob:11.6-11.46:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   12         $ELSE
   13         $DISPLAY X not defined
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7109-prog.cob:12.6-12.11:
    9         $DISPLAY X defined
@@ -3578,7 +3433,7 @@ syn_misc.at-7109-prog.cob:12.6-12.11:
 ----         ^^^^^
   13         $DISPLAY X not defined
   14         $END
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELSE compiler directive
 
 syn_misc.at-7109-prog.cob:13.6-13.28:
   10         $ELIF Y DEFINED
@@ -3588,7 +3443,7 @@ syn_misc.at-7109-prog.cob:13.6-13.28:
 ----         ^^^^^^^^^^^^^^^^^^^^^^
   14         $END
   15              CONTINUE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7109-prog.cob:14.6-14.10:
   11         $DISPLAY X not defined, but Y via lvl 78
@@ -3598,7 +3453,7 @@ syn_misc.at-7109-prog.cob:14.6-14.10:
 ----         ^^^^
   15              CONTINUE
   16              .
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7160:0
 syn_misc.at-7160-prog.cob:11.6-11.17:
@@ -3609,7 +3464,7 @@ syn_misc.at-7160-prog.cob:11.6-11.17:
 ----         ^^^^^^^^^^^
   12         $DISPLAY correct Y = Y2
   13         $ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 syn_misc.at-7160-prog.cob:12.6-12.29:
    9          78 Z            VALUE 354.
@@ -3619,7 +3474,7 @@ syn_misc.at-7160-prog.cob:12.6-12.29:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^
   13         $ELSE
   14         $DISPLAY bad: Y should be = Y2
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:13.6-13.11:
   10          PROCEDURE       DIVISION.
@@ -3629,7 +3484,7 @@ syn_misc.at-7160-prog.cob:13.6-13.11:
 ----         ^^^^^
   14         $DISPLAY bad: Y should be = Y2
   15         $END
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELSE compiler directive
 
 syn_misc.at-7160-prog.cob:14.6-14.36:
   11         $IF Y = Y2X
@@ -3639,7 +3494,7 @@ syn_misc.at-7160-prog.cob:14.6-14.36:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15         $END
   16         $IF Y > X
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:15.6-15.10:
   12         $DISPLAY correct Y = Y2
@@ -3649,7 +3504,7 @@ syn_misc.at-7160-prog.cob:15.6-15.10:
 ----         ^^^^
   16         $IF Y > X
   17         $DISPLAY BAD - Y is not > X
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 syn_misc.at-7160-prog.cob:16.6-16.15:
   13         $ELSE
@@ -3659,7 +3514,7 @@ syn_misc.at-7160-prog.cob:16.6-16.15:
 ----         ^^^^^^^^^
   17         $DISPLAY BAD - Y is not > X
   18         $ELIF Y < X
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 syn_misc.at-7160-prog.cob:17.6-17.33:
   14         $DISPLAY bad: Y should be = Y2
@@ -3669,7 +3524,7 @@ syn_misc.at-7160-prog.cob:17.6-17.33:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   18         $ELIF Y < X
   19         $DISPLAY correct Y < X
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:18.6-18.17:
   15         $END
@@ -3679,7 +3534,7 @@ syn_misc.at-7160-prog.cob:18.6-18.17:
 ----         ^^^^^^^^^^^
   19         $DISPLAY correct Y < X
   20         $ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELIF compiler directive
 
 syn_misc.at-7160-prog.cob:19.6-19.28:
   16         $IF Y > X
@@ -3689,7 +3544,7 @@ syn_misc.at-7160-prog.cob:19.6-19.28:
 ----         ^^^^^^^^^^^^^^^^^^^^^^
   20         $ELSE
   21         $DISPLAY BROKEN
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:20.6-20.11:
   17         $DISPLAY BAD - Y is not > X
@@ -3699,7 +3554,7 @@ syn_misc.at-7160-prog.cob:20.6-20.11:
 ----         ^^^^^
   21         $DISPLAY BROKEN
   22         $END
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELSE compiler directive
 
 syn_misc.at-7160-prog.cob:21.6-21.21:
   18         $ELIF Y < X
@@ -3709,7 +3564,7 @@ syn_misc.at-7160-prog.cob:21.6-21.21:
 ----         ^^^^^^^^^^^^^^^
   22         $END
   23         
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:22.6-22.10:
   19         $DISPLAY correct Y < X
@@ -3719,7 +3574,7 @@ syn_misc.at-7160-prog.cob:22.6-22.10:
 ----         ^^^^
   23         
   24         $IF X > Y
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 syn_misc.at-7160-prog.cob:24.6-24.15:
   21         $DISPLAY BROKEN
@@ -3729,7 +3584,7 @@ syn_misc.at-7160-prog.cob:24.6-24.15:
 ----         ^^^^^^^^^
   25         $DISPLAY correct X > Y
   26         $ELIF X < Y
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 syn_misc.at-7160-prog.cob:25.6-25.28:
   22         $END
@@ -3739,7 +3594,7 @@ syn_misc.at-7160-prog.cob:25.6-25.28:
 ----         ^^^^^^^^^^^^^^^^^^^^^^
   26         $ELIF X < Y
   27         $DISPLAY BAD - X is not < Y
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:26.6-26.17:
   23         
@@ -3749,7 +3604,7 @@ syn_misc.at-7160-prog.cob:26.6-26.17:
 ----         ^^^^^^^^^^^
   27         $DISPLAY BAD - X is not < Y
   28         $ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELIF compiler directive
 
 syn_misc.at-7160-prog.cob:27.6-27.33:
   24         $IF X > Y
@@ -3759,7 +3614,7 @@ syn_misc.at-7160-prog.cob:27.6-27.33:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   28         $ELSE
   29         $DISPLAY BROKEN
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:28.6-28.11:
   25         $DISPLAY correct X > Y
@@ -3769,7 +3624,7 @@ syn_misc.at-7160-prog.cob:28.6-28.11:
 ----         ^^^^^
   29         $DISPLAY BROKEN
   30         $END
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELSE compiler directive
 
 syn_misc.at-7160-prog.cob:29.6-29.21:
   26         $ELIF X < Y
@@ -3779,7 +3634,7 @@ syn_misc.at-7160-prog.cob:29.6-29.21:
 ----         ^^^^^^^^^^^^^^^
   30         $END
   31              CONTINUE
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7160-prog.cob:30.6-30.10:
   27         $DISPLAY BAD - X is not < Y
@@ -3789,7 +3644,7 @@ syn_misc.at-7160-prog.cob:30.6-30.10:
 ----         ^^^^
   31              CONTINUE
   32              .
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7193:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7264:0

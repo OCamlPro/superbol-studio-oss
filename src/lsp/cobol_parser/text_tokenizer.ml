@@ -376,6 +376,8 @@ let tokens_of_word { persist = { lexer; _ }; _ }
         | Apostrophe -> Simple_quote
         | Quote -> Double_quote
     }
+  and boollit ~base str =
+    tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base str)
   in
   match c with
   | TextWord w
@@ -391,9 +393,9 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | Alphanum { knd = Basic; str; qte; _ }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte)
   | Alphanum { knd = Bool; str; _ }
-    -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Bool str)
+    -> boollit ~base:`Bool str
   | Alphanum { knd = BoolX; str; _ }
-    -> tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base:`Hex str)
+    -> boollit ~base:`Hex str
   | Alphanum { knd = Hex; str; qte }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
   | Alphanum { knd = NullTerm; str; _ }

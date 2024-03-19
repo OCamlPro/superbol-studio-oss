@@ -1666,36 +1666,6 @@ run_extensions.at-2086-callee64.c:9.6-9.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2060:0
-run_extensions.at-2060-caller.cob:14.6-14.23:
-  11          77 BIG-BUFF      USAGE COMP-5 PIC S9(18) VALUE 99999999999999.
-  12          PROCEDURE        DIVISION  CHAINING CALL-NAME.
-  13   
-  14 >       >> IF P64 DEFINED
-----         ^^^^^^^^^^^^^^^^^
-  15              MOVE "callee64" TO CALL-NAME
-  16         >> ELSE
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-2060-caller.cob:16.6-16.13:
-  13   
-  14         >> IF P64 DEFINED
-  15              MOVE "callee64" TO CALL-NAME
-  16 >       >> ELSE
-----         ^^^^^^^
-  17              MOVE "callee32" TO CALL-NAME
-  18         >> END-IF
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-2060-caller.cob:18.6-18.15:
-  15              MOVE "callee64" TO CALL-NAME
-  16         >> ELSE
-  17              MOVE "callee32" TO CALL-NAME
-  18 >       >> END-IF
-----         ^^^^^^^^^
-  19   
-  20              MOVE 12345678 TO ADR-BUFFER
->> Error: Malformed or unknown compiler directive
-
 run_extensions.at-2060-caller.cob:25.41-25.47:
   22   
   23              CALL CALL-NAME USING BY VALUE ADR-BUFFER
@@ -1706,36 +1676,6 @@ run_extensions.at-2060-caller.cob:25.41-25.47:
   27              MOVE -42 TO ADR-BUFFER
 >> Error: Invalid syntax
 
-run_extensions.at-2060-caller.cob:28.6-28.23:
-  25              CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
-  26   
-  27              MOVE -42 TO ADR-BUFFER
-  28 >       >> IF P64 DEFINED
-----         ^^^^^^^^^^^^^^^^^
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-2060-caller.cob:29.42-29.46:
-  26   
-  27              MOVE -42 TO ADR-BUFFER
-  28         >> IF P64 DEFINED
-  29 >            CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-----                                             ^^^^
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
-  31         >> ELSE
->> Error: Invalid syntax
-
-run_extensions.at-2060-caller.cob:31.6-31.13:
-  28         >> IF P64 DEFINED
-  29              CALL "callee32" USING BY VALUE SIZE 4 ADR-BUFFER
-  30              CALL "callee64" USING BY VALUE BIG-BUFF
-  31 >       >> ELSE
-----         ^^^^^^^
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
->> Error: Malformed or unknown compiler directive
-
 run_extensions.at-2060-caller.cob:33.42-33.46:
   30              CALL "callee64" USING BY VALUE BIG-BUFF
   31         >> ELSE
@@ -1745,16 +1685,6 @@ run_extensions.at-2060-caller.cob:33.42-33.46:
   34         >> END-IF
   35   
 >> Error: Invalid syntax
-
-run_extensions.at-2060-caller.cob:34.6-34.15:
-  31         >> ELSE
-  32              CALL "callee32" USING BY VALUE ADR-BUFFER
-  33              CALL "callee64" USING BY VALUE SIZE 8 BIG-BUFF
-  34 >       >> END-IF
-----         ^^^^^^^^^
-  35   
-  36              GOBACK.
->> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2118:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2143:0
@@ -2959,7 +2889,7 @@ run_extensions.at-4892-prog.cob:9.7-9.32:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^
   10          01 var3          pic x.
   11          PROCEDURE        DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 run_extensions.at-4892-prog.cob:12.7-12.34:
    9          >> DISPLAY some.text-here
@@ -2969,7 +2899,7 @@ run_extensions.at-4892-prog.cob:12.7-12.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13          >> DISPLAY  "literal text...  *> no comment"
   14          $DISPLAY  "MF compile time text"
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 run_extensions.at-4892-prog.cob:13.7-13.51:
   10          01 var3          pic x.
@@ -2979,7 +2909,7 @@ run_extensions.at-4892-prog.cob:13.7-13.51:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   14          $DISPLAY  "MF compile time text"
   15              GOBACK.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>DISPLAY compiler directive
 
 run_extensions.at-4892-prog.cob:14.7-14.8:
   11          PROCEDURE        DIVISION.
@@ -2991,76 +2921,8 @@ run_extensions.at-4892-prog.cob:14.7-14.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4921:0
-run_extensions.at-4921-prog.cob:7.7-7.32:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE NOT DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "OK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4921-prog.cob:10.7-10.13:
-   7          >>IF ACTIVATE NOT DEFINED
-   8              DISPLAY "OK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELSE
-----          ^^^^^^
-  11              DISPLAY "NOTOK" NO ADVANCING
-  12              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4921-prog.cob:13.7-13.15:
-  10          >>ELSE
-  11              DISPLAY "NOTOK" NO ADVANCING
-  12              END-DISPLAY
-  13 >        >>END-IF
-----          ^^^^^^^^
-  14              STOP RUN.
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4946:0
-run_extensions.at-4946-prog.cob:7.7-7.28:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "OK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4946-prog.cob:10.7-10.13:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "OK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELSE
-----          ^^^^^^
-  11              DISPLAY "NOTOK" NO ADVANCING
-  12              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4946-prog.cob:13.7-13.15:
-  10          >>ELSE
-  11              DISPLAY "NOTOK" NO ADVANCING
-  12              END-DISPLAY
-  13 >        >>END-IF
-----          ^^^^^^^^
-  14              STOP RUN.
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4974:0
-run_extensions.at-4974-prog.cob:7.7-7.28:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
 run_extensions.at-4974-prog.cob:10.7-10.31:
    7          >>IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
@@ -3069,38 +2931,9 @@ run_extensions.at-4974-prog.cob:10.7-10.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4974-prog.cob:13.7-13.13:
-  10          >>ELIF ACTIVATE2 DEFINED
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
-  13 >        >>ELSE
-----          ^^^^^^
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-4974-prog.cob:16.7-16.15:
-  13          >>ELSE
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
-  16 >        >>END-IF
-----          ^^^^^^^^
-  17              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5000:0
-run_extensions.at-5000-prog.cob:7.7-7.28:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
 run_extensions.at-5000-prog.cob:10.7-10.31:
    7          >>IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
@@ -3109,26 +2942,7 @@ run_extensions.at-5000-prog.cob:10.7-10.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   11          >>ELSE
   12              DISPLAY "NOTOK" NO ADVANCING
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-5000-prog.cob:11.7-11.13:
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10          >>ELIF ACTIVATE2 DEFINED
-  11 >        >>ELSE
-----          ^^^^^^
-  12              DISPLAY "NOTOK" NO ADVANCING
-  13              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-5000-prog.cob:14.7-14.15:
-  11          >>ELSE
-  12              DISPLAY "NOTOK" NO ADVANCING
-  13              END-DISPLAY
-  14 >        >>END-IF
-----          ^^^^^^^^
-  15              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5065:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5049:0
@@ -3141,42 +2955,15 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5266:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5290:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5315:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5351:0
-run_extensions.at-5351-prog.cob:2.7-2.36:
-   1   
-   2 >        >>IF BINARY-COMP-1 IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+run_extensions.at-5351-prog.cob:5.11-5.12:
+   2          >>IF BINARY-COMP-1 IS DEFINED
    3              $SET COMP-1(BINARY)
    4          >>ELSE
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-5351-prog.cob:3.11-3.12:
-   1   
-   2          >>IF BINARY-COMP-1 IS DEFINED
-   3 >            $SET COMP-1(BINARY)
+   5 >            $SET COMP1 "float"
 ----              ^
-   4          >>ELSE
-   5              $SET COMP1 "float"
->> Error: Invalid syntax
-
-run_extensions.at-5351-prog.cob:4.7-4.13:
-   1   
-   2          >>IF BINARY-COMP-1 IS DEFINED
-   3              $SET COMP-1(BINARY)
-   4 >        >>ELSE
-----          ^^^^^^
-   5              $SET COMP1 "float"
    6          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_extensions.at-5351-prog.cob:6.7-6.15:
-   3              $SET COMP-1(BINARY)
-   4          >>ELSE
-   5              $SET COMP1 "float"
-   6 >        >>END-IF
-----          ^^^^^^^^
    7          IDENTIFICATION  DIVISION.
-   8          PROGRAM-ID.     prog.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5383:0
 run_extensions.at-5383-prog.cob:9.11-9.18:

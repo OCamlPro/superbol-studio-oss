@@ -42,16 +42,18 @@ type comment_entry_termination =                  (* skip until... *)
   | Period                                        (* ... next period (unused) *)
   | AreaB of { first_area_b_column: int }         (* ... next word in area A *)
 
+exception INVALID of string
+
 (* --- *)
 
 val equal: 'k source_format -> 'r source_format -> bool
 
 val from_config: Cobol_config.source_format -> any
 (* val to_config: 'k source_format -> Cobol_config.source_format *)
-val decypher
-  : dialect: Cobol_config.dialect
-  -> string
-  -> (any, [> `SFUnknown of string ]) result
+
+(** May raise {!INVALID_SOURCE_FORMAT}. *)
+val decypher: dialect: Cobol_config.dialect -> string -> any
+
 val guess_from: contents_prefix: string -> any
 
 val comment_entry_termination: _ source_format -> comment_entry_termination

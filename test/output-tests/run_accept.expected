@@ -18,26 +18,6 @@ run_accept.at-42-prog.cob:5.18-5.25:
 
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:112:0
 Considering: import/gnucobol/tests/testsuite.src/run_accept.at:260:0
-run_accept.at-260-prog.cob:43.7-43.34:
-  40          PROCEDURE DIVISION.
-  41              PERFORM RUN-TEST.
-  42              PERFORM RUN-VALIDATION.
-  43 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  44         *>   included performance check
-  45              PERFORM RUN-TEST 50000 TIMES
->> Error: Malformed or unknown compiler directive
-
-run_accept.at-260-prog.cob:46.7-46.16:
-  43          >> IF CHECK-PERF IS DEFINED
-  44         *>   included performance check
-  45              PERFORM RUN-TEST 50000 TIMES
-  46 >        >> END-IF
-----          ^^^^^^^^^
-  47              GOBACK.
-  48   
->> Error: Malformed or unknown compiler directive
-
 run_accept.at-260-prog.cob:63.36:
   60              MOVE WS-NOW-MM    TO WS-TIME-MM
   61              MOVE WS-NOW-SS    TO WS-TIME-SS

@@ -17,6 +17,7 @@ open Preproc_outputs.TYPES
 open Preproc_options
 
 module OUT = Preproc_outputs
+module ENV = Preproc_env
 
 (* --- *)
 
@@ -27,6 +28,9 @@ type preprocessor =
     ppstate: Preproc_state.t;
     pplog: Preproc_trace.log;
     diags: Preproc_diagnostics.t;
+    env: Preproc_env.t;
+    context: Preproc_logic.context;
+    rev_ignored: Text.t;     (* text accumulated when not emitting (reversed) *)
     persist: preprocessor_persist;
   }
 
@@ -108,7 +112,7 @@ let source_format_config = function
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { libpath; verbose; source_format;
+  | `WithOptions { libpath; verbose; source_format; env;
                    config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
@@ -120,6 +124,9 @@ let preprocessor input = function
         ppstate = Preproc_state.initial;
         pplog = Preproc_trace.empty;
         diags = Preproc_diagnostics.none;
+        env;
+        context = Preproc_logic.empty_context;
+        rev_ignored = [];
         persist =
           {
             pparser = (module Pp);
@@ -139,6 +146,8 @@ let preprocessor input = function
         from with
         buff = [];
         reader = Src_reader.from input ~source_format;
+        rev_ignored = [];
+        (* CHECKME: context and ignored? *)
         persist =
           {
             persist with
@@ -169,33 +178,88 @@ let apply_active_replacing_full { pplog; persist; _ } = match persist with
     output text always containts at least {!Eof}. *)
 let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
   match Src_reader.next_chunk reader with
-  | reader, ([{ payload = Eof; _}] as eof) ->
+  | reader, ([{ payload = Eof; loc }] as eof) ->
+      let context, diags = Preproc_logic.flush_contexts ~loc lp.context in
+      let lp = add_diags { lp with context } diags in
       let text, pplog = apply_active_replacing_full lp (buff @ eof) in
       text, { lp with reader; pplog; buff = [] }
   | reader, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
+      let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
+      | Ok None when not emitting ->                              (* ignore text *)
+          let rev_ignored = List.rev_append text lp.rev_ignored in
+          next_chunk { lp with reader; rev_ignored }
       | Ok None ->
           preprocess_line { lp with reader; buff = [] } (buff @ text)
-      | Ok Some ([], compdir, _) ->
-          next_chunk (apply_compiler_directive { lp with reader } compdir)
-      | Ok Some (text, compdir, _) ->
-          let lp = { lp with reader; buff = [] } in
-          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
-      | Error (text, e, _) ->
-          let lp = add_error { lp with reader; buff = [] } e in
-          preprocess_line lp (buff @ text)
+      | Ok Some ([], compdir, _compdir_text, diags) ->
+          let lp = add_diags { lp with reader } diags in
+          next_chunk (apply_compiler_directive lp compdir)
+      | Ok Some (text, compdir, _compdir_text, diags) when not emitting ->
+          let rev_ignored = List.rev_append text lp.rev_ignored in
+          let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
+          next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
+      | Ok Some (text, compdir, _compdir_text, diags) ->
+          let lp = add_diags { lp with reader; buff = [] } diags in
+          preprocess_line (apply_compiler_directive lp compdir)
+            ((* if emitting then *) buff @ text (* else buff *))
+      | Error (text, _compdir_text, diags) when not emitting ->
+          let rev_ignored = List.rev_append text lp.rev_ignored in
+          let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
+          next_chunk lp
+      | Error (text, _compdir_text, diags) ->
+          let lp = add_diags { lp with reader; buff = [] } diags in
+          preprocess_line lp ((* if emitting then *) buff @ text (* else buff *))
 
-and apply_compiler_directive
-    ({ reader; pplog; _ } as lp) { payload = compdir; loc } =
+and apply_compiler_directive ({ reader; pplog; _ } as lp)
+    { payload = compdir; loc } =
   let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
-  match (compdir : Preproc_directives.compiler_directive) with
-  | CDirSource sf ->
+  match compdir with
+  | Preproc_directives.CDir_source sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
-  | CDirSet _ ->
+  | CDir_preproc preproc_directive ->
+      apply_preproc_directive lp (preproc_directive &@ loc)
+
+and apply_preproc_directive ({ env; context; _ } as lp)
+    { payload = ppdir; loc } =
+  match ppdir with
+  | Define_off var ->
+      (match Preproc_logic.on_define_off ~loc var ~env with
+       | Ok env -> { lp with env }
+       | Error diag -> add_warn lp diag)
+  | Define def ->
+      (match Preproc_logic.on_define ~loc def ~env with
+       | Ok env -> { lp with env }
+       | Error diag -> add_warn lp diag)
+  | If condition ->
+      (match Preproc_logic.on_if ~loc ~condition ~env context with
+       | Ok context -> { lp with context }
+       | Error diags -> add_diags lp diags)
+  | Elif condition ->
+      (match Preproc_logic.on_elif ~loc ~condition ~env context with
+       | Ok context -> { lp with context }
+       | Error diag -> add_error lp diag)
+  | Else ->
+      (match Preproc_logic.on_else ~loc context with
+       | Ok context -> { lp with context }
+       | Error diag -> add_error lp diag)
+  | End_if ->            (* TODO: entry in pplog so we can grab discarded text *)
+      let lp = match Preproc_logic.on_endif ~loc context with
+        | Ok context -> { lp with context }
+        | Error diag -> add_error lp diag
+      in
+      if Preproc_logic.emitting lp.context
+      then match lp.rev_ignored with
+        | [] ->
+            lp
+        | text ->
+            with_pplog { lp with rev_ignored = [] }
+              (Preproc_trace.ignored (List.rev text) lp.pplog)
+      else lp
+  | Set _ ->
       add_warn lp @@ Ignored { loc; item = Compiler_directive }
 
 and preprocess_line lp srctext =
@@ -238,12 +302,13 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       (function
         | HandlingError env ->
             let loc = Om.join_limits @@ Pp.MenhirInterpreter.positions env in
-            Error (Preproc_diagnostics.Malformed_statement { loc; stmt })
+            Error (Preproc_diagnostics.Malformed
+                     { loc; stuff = Preproc_statement stmt })
         | _ ->
             Pretty.failwith
               "Unexpected@ state@ of@ parser@ for@ %a@ statement"
-              Preproc_diagnostics.pp_statement stmt)
-      (Text_supplier.pptoks_of_text_supplier (module Om) phrase)
+              Preproc_diagnostics.pp_preproc_statement stmt)
+      (Src_tokenizer.pptoks_of_text_supplier (module Om) phrase)
       (parser @@ position lp)
   in
   function

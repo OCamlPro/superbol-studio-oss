@@ -42,6 +42,104 @@
     | CDTok of Compdir_grammar.token
     | CDEnd
 
+  exception INVALID_DIRECTIVE_WORD of string
+  let distinguish_directive w : Compdir_tree.directive_kind =
+    match Hashtbl.find cdtoken_of_keyword (String.uppercase_ascii w) with
+    | CDIR_DEFINE -> Define_directive
+    | CDIR_ELIF -> Elif_directive
+    | CDIR_ELSE -> Else_directive
+    | CDIR_END_IF -> EndIf_directive
+    | CDIR_IF -> If_directive
+    | CDIR_SET -> Set_directive
+    | CDIR_SOURCE -> Source_directive
+    | _ | exception Not_found -> raise @@ INVALID_DIRECTIVE_WORD w
+
+  let cdtokens_subset tokens =
+    Hashtbl.of_seq @@ List.to_seq @@ List.concat_map begin fun tok ->
+      List.rev_map (fun kwd -> kwd, tok) @@
+      Hashtbl.find_all keyword_of_cdtoken tok
+    end tokens
+
+  let define_keywords =
+    cdtokens_subset [
+      CDIR_DEFINE;
+      AS;
+      CONSTANT;
+      OFF;
+      OVERRIDE;
+      PARAMETER;
+    ]
+
+  let conditional_keywords =
+    cdtokens_subset [
+      CDIR_ELIF;
+      CDIR_IF;
+      DEFINED;
+      EQUAL;
+      GREATER;
+      IS;
+      LESS;
+      NOT;
+      OR;
+      SET;
+      THAN;
+      TO;
+    ]
+
+  let set_keywords =
+    cdtokens_subset [
+      CDIR_SET;
+      ADDRSV;
+      ADDSYN;
+      AREACHECK;
+      ASSIGN;
+      BOUND;
+      CALLFH;
+      CHECKNUM;
+      COMP1;
+      CONSTANT;
+      DPCINDATA;
+      FOLDCOPYNAME;
+      MAKESYN;
+      NESTCALL;
+      NOAREACHECK;
+      NOBOUND;
+      NOCHECKNUM;
+      NODPC_IN_DATA;
+      NOFOLDCOPYNAME;
+      NOODOSLIDE;
+      NOSPZERO;
+      NOSSRANGE;
+      ODOSLIDE;
+      OVERRIDE;
+      REMOVE;
+      SOURCEFORMAT;
+      SPZERO;
+      SSRANGE;
+    ]
+
+  let source_keywords =
+    cdtokens_subset [
+      CDIR_SOURCE;
+      FORMAT;
+      IS;
+    ]
+
+  let else_endif_keywords =
+    cdtokens_subset [
+      CDIR_ELSE;
+      CDIR_END_IF;
+    ]
+
+  let keywords_for_directive: Compdir_tree.directive_kind -> _ = function
+    | Define_directive -> define_keywords
+    | If_directive
+    | Elif_directive -> conditional_keywords
+    | Else_directive
+    | EndIf_directive -> else_endif_keywords
+    | Set_directive -> set_keywords
+    | Source_directive -> source_keywords
+
   let update_loc lexbuf file line absolute chars =
     let open Lexing in
     let pos = lexbuf.lex_curr_p in
@@ -462,7 +560,7 @@ and free_line state
       {
         free_line state lexbuf
       }
-  | separators                 (* Allow separators , & ; at begining of line? *)
+  | separators                 (* Allow separators , &; at begining of line? *)
       {
         free_line (Src_lexing.flush_continued ~force:true state) lexbuf
       }
@@ -576,13 +674,14 @@ and free_newline_or_eof state
       }
 
 (* Text-word tokenizer (compiler directives) *)
-and cdtoken = parse
+and cdtoken directive = parse
 
   | blanks
-      { cdtoken lexbuf }
+      { cdtoken directive lexbuf }
 
   | (nonblank+ as s)
-      { CDTok (try Hashtbl.find cdtoken_of_keyword (String.uppercase_ascii s)
+      { let cdtoken_of_keyword = keywords_for_directive directive in
+        CDTok (try Hashtbl.find cdtoken_of_keyword (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
   | eof

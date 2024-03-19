@@ -78,22 +78,26 @@ let from_config
   | SFTrm      -> SF (  TrmIndic, FixedWidth terminal_paging)
   | SFCOBOLX   -> SF ( CBLXIndic, FixedWidth   cobolx_paging)
 
+(* --- *)
+
+exception INVALID of string
+
 let decypher ~dialect format =
-  Result.map from_config @@
+  from_config @@
   match String.uppercase_ascii @@format, dialect with
   (* SOURCEFORMAT"FREE" on MF means: X/Open free format *)
   (* cf https://www.microfocus.com/documentation/visual-\
        cobol/vc50pu7/VS2019/HRLHLHINTR01U008.html *)
-  | "FREE", Cobol_config.DIALECT.MicroFocus _ -> Ok Cobol_config.SFXOpen
-  | "FREE",                      _            -> Ok SFFree
-  | "FIXED",                     _            -> Ok SFFixed
-  | "VARIABLE",                  _            -> Ok SFVariable
-  | "XOPEN",                     _            -> Ok SFXOpen
-  | "XCARD",                     _            -> Ok SFxCard
-  | "CRT",                       _            -> Ok SFCRT
-  | "TERMINAL",                  _            -> Ok SFTrm
-  | "COBOLX",                    _            -> Ok SFCOBOLX
-  | _                                         -> Error (`SFUnknown format)
+  | "FREE", Cobol_config.DIALECT.MicroFocus _ -> Cobol_config.SFXOpen
+  | "FREE",                      _            -> SFFree
+  | "FIXED",                     _            -> SFFixed
+  | "VARIABLE",                  _            -> SFVariable
+  | "XOPEN",                     _            -> SFXOpen
+  | "XCARD",                     _            -> SFxCard
+  | "CRT",                       _            -> SFCRT
+  | "TERMINAL",                  _            -> SFTrm
+  | "COBOLX",                    _            -> SFCOBOLX
+  | _                                         -> raise (INVALID format)
 
 (* --- *)
 

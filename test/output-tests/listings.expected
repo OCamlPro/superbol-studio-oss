@@ -3688,7 +3688,7 @@ listings.at-2150-prog2.cob:6.2-6.30:
 ----     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    7     PROCEDURE        DIVISION.
    8    DISPLAY
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>PAGE compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2199:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2310:0
@@ -3991,16 +3991,6 @@ listings.at-2762-prog.cob:34.32-34.41:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2848:0
-listings.at-2848-prog.cob:7.7-7.28:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >        >>IF ACTIVATE DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
 listings.at-2848-prog.cob:10.7-10.31:
    7          >>IF ACTIVATE DEFINED
    8              DISPLAY "NOTOK" NO ADVANCING
@@ -4009,26 +3999,7 @@ listings.at-2848-prog.cob:10.7-10.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-listings.at-2848-prog.cob:13.7-13.13:
-  10          >>ELIF ACTIVATE2 DEFINED
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
-  13 >        >>ELSE
-----          ^^^^^^
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
->> Error: Malformed or unknown compiler directive
-
-listings.at-2848-prog.cob:16.7-16.15:
-  13          >>ELSE
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
-  16 >        >>END-IF
-----          ^^^^^^^^
-  17              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2876:0
 listings.at-2876-prog2.cob:7.6-7.26:
@@ -4039,7 +4010,7 @@ listings.at-2876-prog2.cob:7.6-7.26:
 ----         ^^^^^^^^^^^^^^^^^^^^
    8              DISPLAY "NOTOK" NO ADVANCING
    9              END-DISPLAY
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 listings.at-2876-prog2.cob:10.6-10.29:
    7         $IF ACTIVATE DEFINED
@@ -4049,7 +4020,7 @@ listings.at-2876-prog2.cob:10.6-10.29:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^
   11              DISPLAY "OK" NO ADVANCING
   12              END-DISPLAY
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELIF compiler directive
 
 listings.at-2876-prog2.cob:13.6-13.11:
   10         $ELIF ACTIVATE2 DEFINED
@@ -4059,7 +4030,7 @@ listings.at-2876-prog2.cob:13.6-13.11:
 ----         ^^^^^
   14              DISPLAY "NOTOK" NO ADVANCING
   15              END-DISPLAY
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $ELSE compiler directive
 
 listings.at-2876-prog2.cob:16.6-16.10:
   13         $ELSE
@@ -4068,7 +4039,7 @@ listings.at-2876-prog2.cob:16.6-16.10:
   16 >       $END
 ----         ^^^^
   17              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3684:0
 listings.at-3684-expected.lst:1.6-1.7:
@@ -6540,7 +6511,7 @@ listings.at-3825-prog.cob:9.7-9.20:
 ----          ^^^^^^^^^^^^^
   10              DISPLAY TEST1-VAR NO ADVANCING
   11              END-DISPLAY.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>LISTING compiler directive
 
 listings.at-3825-prog.cob:12.7-12.20:
    9          >>LISTING OFF
@@ -6549,7 +6520,7 @@ listings.at-3825-prog.cob:12.7-12.20:
   12 >        >> LISTING ON
 ----          ^^^^^^^^^^^^^
   13              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>LISTING compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3921:0
 listings.at-3921-prog.cob:6.7-6.23:
@@ -6580,7 +6551,7 @@ listings.at-3921-prog.cob:9.0-9.13:
 ----   ^^^^^^^^^^^^^
   10              DISPLAY TEST1-VAR NO ADVANCING
   11              END-DISPLAY.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>LISTING compiler directive
 
 listings.at-3921-prog.cob:12.0-12.13:
    9   >>LISTING OFF
@@ -6589,7 +6560,7 @@ listings.at-3921-prog.cob:12.0-12.13:
   12 > >> LISTING ON
 ----   ^^^^^^^^^^^^^
   13              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>LISTING compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:4001:0
 listings.at-4001-prog.cob:1.11-1.16:
@@ -6668,7 +6639,7 @@ listings.at-4091-prog2.cob:6.0-6.6:
 ----   ^^^^^^
    7     PROCEDURE        DIVISION.
    8     STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>PAGE compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:4177:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:5827:0

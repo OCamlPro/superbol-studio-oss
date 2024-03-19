@@ -29,6 +29,11 @@ module TYPES: sig
           compdir: Preproc_directives.compiler_directive;
           loc: Cobol_common.srcloc;
         }
+    | Ignored of
+        {
+          text: Text.text;
+          ignored_loc: Cobol_common.srcloc;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -65,6 +70,9 @@ val missing_copy
   -> log -> log
 val new_replace
   : loc: Cobol_common.srcloc
+  -> log -> log
+val ignored
+  : Text.text                                                    (* non-empty *)
   -> log -> log
 
 (* --- *)

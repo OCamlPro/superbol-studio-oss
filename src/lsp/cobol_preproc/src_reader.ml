@@ -68,47 +68,63 @@ let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
 (* Note: {!next_chunk} never outputs compiler-directive text-words in positions
    other than the first two.  Such a chunk also terminates at the end of the
    source line as it cannot be continued (contrary to normal source lines). *)
-let lookup_compiler_directive: Text.text -> _ = function
-  |      t :: _ as text  when Text.cdirp t -> Ok ([ ], text)
-  | p :: (t :: _ as text) when Text.cdirp t -> Ok ([p], text)
-  | _ -> Error `NotCDir
+let lookup_compiler_directive: Text.text -> _ =
+  let compdir prefix w text =
+    try Ok (prefix, Src_lexer.distinguish_directive w, text)
+    with Src_lexer.INVALID_DIRECTIVE_WORD w ->
+      Error (`InvalidCDir (prefix, w, text))
+  in
+  function
+  |      { payload = CDirWord w; _ } :: _ as text ->
+      compdir [ ] w text
+  | p :: ({ payload = CDirWord w; _ } :: _ as text) ->
+      compdir [p] w text
+  | _ ->
+      Error `NotCDir
 
-let decode_compiler_directive ~dialect compdir_text =
+let decode_compiler_directive ~compdir_kind ~dialect compdir_text =
   (* Here, [compdir_text] is never empty as it's known to start with a compiler
      directive marker `>>` (or `$` for MF-style directives), so we should always
      have a loc: *)
-  let supplier = Text_supplier.cdtoks_of_text_supplier compdir_text in
+  let supplier, grab_diagnostics =
+    Src_tokenizer.cdtoks_of_text_supplier compdir_kind compdir_text
+  in
   let loc = Option.get @@ Cobol_common.Srcloc.concat_locs compdir_text in
   let start_pos = Cobol_common.Srcloc.start_pos loc in
   let parser = Compdir_grammar.Incremental.compiler_directive start_pos in
-  let raw_loc = Cobol_common.Srcloc.raw in
-  let open Preproc_directives in
-  match Compdir_grammar.MenhirInterpreter.loop supplier parser with
-  | Source_format_is_free lexloc ->
-      let sf = Src_format.from_config Cobol_config.SFFree in
-      Ok (CDirSource (sf &@ raw_loc lexloc) &@ loc)
-  | Source_format_is (format, lexloc)
-  | Set_sourceformat (format, lexloc) ->
-      (match Src_format.decypher ~dialect format with
-       | Ok sf ->
-           Ok (Preproc_directives.CDirSource (sf &@ raw_loc lexloc) &@ loc)
-       | Error (`SFUnknown f) ->
-           Error (Unknown_source_format (f, raw_loc lexloc)))
-  | Set (string, lexloc) ->
-      Ok (Preproc_directives.CDirSet (string &@ raw_loc lexloc) &@ loc)
-  | exception Compdir_grammar.Error ->
-      Error (Malformed_or_unknown_compiler_directive loc)
+  let cdir =
+    let open Preproc_directives in
+    match Compdir_grammar.MenhirInterpreter.loop supplier parser with
+    | Lexing Source_format_is_free loc ->
+        Ok (CDir_source (Src_format.from_config SFFree &@ loc))
+    | Lexing Source_format_is { payload = format; loc }
+    | Lexing Set_sourceformat { payload = format; loc } ->
+        (try Ok (CDir_source (Src_format.decypher ~dialect format &@ loc))
+         with Src_format.INVALID _ ->
+           Error (Invalid { loc; stuff = Source_format format }))
+    | Preproc directive ->
+        Ok (CDir_preproc directive)
+    | exception Compdir_grammar.Error ->
+        Error (Malformed { stuff = Compiler_directive; loc })
+  in
+  match cdir with
+  | Ok cdir -> Ok (cdir &@ loc, grab_diagnostics ())
+  | Error e -> Error (add_error e (grab_diagnostics ()))
 
 let try_compiler_directive ~dialect text =
   match lookup_compiler_directive text with
   | Error `NotCDir ->
       Ok None
-  | Ok (prefix, compdir_text) ->
-      match decode_compiler_directive ~dialect compdir_text with
-      | Error e ->
-          Error (prefix, e, compdir_text)
-      | Ok compdir ->
-          Ok (Some (prefix, compdir, compdir_text))
+  | Error `InvalidCDir (prefix, w, compdir_text) ->
+      let loc = Option.get @@ Cobol_common.Srcloc.concat_locs compdir_text in
+      let error = Invalid { stuff = Compiler_directive_word w; loc } in
+      Error (prefix, compdir_text, add_error error none)
+  | Ok (prefix, compdir_kind, compdir_text) ->
+      match decode_compiler_directive ~compdir_kind ~dialect compdir_text with
+      | Error diags ->
+          Error (prefix, compdir_text, diags)
+      | Ok (compdir, diags) ->
+          Ok (Some (prefix, compdir, compdir_text, diags))
 
 let fold_chunks
     ~dialect
@@ -122,7 +138,7 @@ let fold_chunks
         match try_compiler_directive ~dialect text with
         | Ok None ->
             aux pl (f text acc)
-        | Ok Some (prefix, compdir, text) ->
+        | Ok Some (prefix, compdir, text, _diags) ->
             let acc = f prefix acc in
             let acc =
               if skip_compiler_directives_text
@@ -134,17 +150,17 @@ let fold_chunks
               | Some f -> f compdir acc
             in
             aux (apply_compdir compdir pl) acc
-        | Error (prefix, _error, text) ->                     (* ignore error? *)
+        | Error (prefix, text, _diags) ->                    (* ignore errors? *)
             let acc = f prefix acc in
             if skip_compiler_directives_text
             then aux pl acc
             else aux pl (f text acc)
   and apply_compdir { payload = compdir; _ } pl = match compdir with
-    | CDirSet _ -> pl                                                (* ignore *)
-    | CDirSource sf ->
+    | CDir_source sf ->
         (match with_source_format sf pl with
          | Ok pl -> pl
          | Error _error -> pl)                                       (* ignore *)
+    | CDir_preproc _ -> pl                                           (* ignore *)
   in
   aux pl acc
 
