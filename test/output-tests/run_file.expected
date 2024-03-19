@@ -110,7 +110,7 @@ run_file.at-790-prog.cob:10.6-10.28:
 ----         ^^^^^^^^^^^^^^^^^^^^^^
   11              SELECT g ASSIGN whatever
   12                  ORGANIZATION LINE SEQUENTIAL.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:816:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:860:0
@@ -3201,7 +3201,7 @@ run_file.at-8591-prog.cob:9.6-9.17:
 ----         ^^^^^^^^^^^
   10          INPUT-OUTPUT SECTION.
   11          FILE-CONTROL.
->> Warning: Ignored compiler directive
+>> Error: Malformed compiler directive
 
 run_file.at-8591-prog.cob:88.54:
   85              05  FILLER PIC X(8) VALUE "PRE00000".
@@ -7252,7 +7252,7 @@ run_file.at-12369-prog.cob:32.11-32.36:
 ----              ^^^^^^^^^^^^^^^^^^^^^^^^^
   33              *> Read f too many times without libcob error
   34              OPEN INPUT f
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 run_file.at-12369-prog.cob:46.11-46.38:
   43   
@@ -7262,7 +7262,7 @@ run_file.at-12369-prog.cob:46.11-46.38:
 ----              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   47   
   48              *> Read f too many times without libcob error
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12582:0
 run_file.at-12582-prog.cob:10.34-10.42:

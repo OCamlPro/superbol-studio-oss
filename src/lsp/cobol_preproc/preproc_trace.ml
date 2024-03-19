@@ -34,6 +34,12 @@ module TYPES = struct
           compdir: Preproc_directives.compiler_directive;
           loc: srcloc;
         }
+    | Ignored of
+        {
+          (* TODO: explanation (compdir) *)
+          text: Text.text;
+          ignored_loc: srcloc;
+        }
 
   and copy_event_status =
     | CopyDone of string
@@ -59,6 +65,9 @@ let missing_copy ~loc ~info : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = MissingCopy info }
 let new_replace ~loc : log -> log =
   List.cons @@ Replace { replloc = loc }
+let ignored text : log -> log =
+  let ignored_loc = Option.get @@ Cobol_common.Srcloc.concat_locs text in
+  List.cons @@ Ignored { text; ignored_loc }
 
 (* --- *)
 

@@ -79,7 +79,7 @@ run_fundamental.at-138-prog.cob:5.7-5.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    6              DISPLAY X"F1F2F3"
    7          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_fundamental.at-138-prog.cob:7.7-7.13:
    4          PROCEDURE        DIVISION.
@@ -89,7 +89,7 @@ run_fundamental.at-138-prog.cob:7.7-7.13:
 ----          ^^^^^^
    8              DISPLAY X"313233"
    9          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_fundamental.at-138-prog.cob:9.7-9.15:
    6              DISPLAY X"F1F2F3"
@@ -99,7 +99,7 @@ run_fundamental.at-138-prog.cob:9.7-9.15:
 ----          ^^^^^^^^
   10              END-DISPLAY.
   11              CALL "dump" USING X"000102"
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
@@ -435,47 +435,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1670:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1723:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1777:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1856:0
-run_fundamental.at-1856-prog.cob:21.7-21.34:
-  18   
-  19              MOVE "dummy-call" TO prgm
-  20              CALL prgm
-  21 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  22              PERFORM 500000 TIMES
-  23                 CALL prgm
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-1856-prog.cob:25.7-25.16:
-  22              PERFORM 500000 TIMES
-  23                 CALL prgm
-  24              END-PERFORM
-  25 >        >> END-IF
-----          ^^^^^^^^^
-  26              .
-  27          END PROGRAM     prog.
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1956:0
-run_fundamental.at-1956-prog.cob:29.7-29.34:
-  26   
-  27              SET  prog-ptr TO ADDRESS OF PROGRAM "dummy-call"
-  28              CALL prog-ptr
-  29 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  30              PERFORM 500000 TIMES
-  31                 CALL prog-ptr
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-1956-prog.cob:33.7-33.16:
-  30              PERFORM 500000 TIMES
-  31                 CALL prog-ptr
-  32              END-PERFORM
-  33 >        >> END-IF
-----          ^^^^^^^^^
-  34              .
-  35          END PROGRAM     prog.
->> Error: Malformed or unknown compiler directive
-
 run_fundamental.at-1956-prog.cob:60.50:
   57   
   58          DATA            DIVISION.
@@ -563,89 +523,9 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3003:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3066:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3102:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3338:0
-run_fundamental.at-3338-prog.cob:19.7-19.34:
-  16          MAIN.
-  17         *    Test with DISPLAY on error
-  18              PERFORM DO-CHECK.
-  19 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  20              SET  NO-DISP    TO TRUE
-  21         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-3338-prog.cob:23.7-23.16:
-  20              SET  NO-DISP    TO TRUE
-  21         *    some performance checks on the way...
-  22              PERFORM DO-CHECK 20000 TIMES.
-  23 >        >> END-IF
-----          ^^^^^^^^^
-  24              GOBACK.
-  25   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3642:0
-run_fundamental.at-3642-prog.cob:23.7-23.34:
-  20          PROCEDURE        DIVISION.
-  21         *    Test with DISPLAY on error
-  22              PERFORM DO-CHECK.
-  23 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  24              SET  NO-DISP    TO TRUE
-  25         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-3642-prog.cob:27.7-27.16:
-  24              SET  NO-DISP    TO TRUE
-  25         *    some performance checks on the way...
-  26              PERFORM DO-CHECK 20000 TIMES.
-  27 >        >> END-IF
-----          ^^^^^^^^^
-  28              GOBACK.
-  29   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3877:0
-run_fundamental.at-3877-prog.cob:18.7-18.34:
-  15          PROCEDURE        DIVISION.
-  16         *    Test with DISPLAY on error
-  17              PERFORM DO-CHECK.
-  18 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  19              SET  NO-DISP    TO TRUE
-  20         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-3877-prog.cob:22.7-22.16:
-  19              SET  NO-DISP    TO TRUE
-  20         *    some performance checks on the way...
-  21              PERFORM DO-CHECK 20000 TIMES.
-  22 >        >> END-IF
-----          ^^^^^^^^^
-  23              GOBACK.
-  24   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4112:0
-run_fundamental.at-4112-prog.cob:18.7-18.34:
-  15          PROCEDURE        DIVISION.
-  16         *    Test with DISPLAY on error
-  17              PERFORM DO-CHECK.
-  18 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  19              SET  NO-DISP    TO TRUE
-  20         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-4112-prog.cob:22.7-22.16:
-  19              SET  NO-DISP    TO TRUE
-  20         *    some performance checks on the way...
-  21              PERFORM DO-CHECK 20000 TIMES.
-  22 >        >> END-IF
-----          ^^^^^^^^^
-  23              GOBACK.
-  24   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4171:0
 run_fundamental.at-4171-dump.c:5.6-5.7:
    2   #include <stdio.h>
@@ -710,7 +590,7 @@ run_fundamental.at-4648-prog.cob:12.7-12.19:
 ----          ^^^^^^^^^^^^
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_fundamental.at-4648-prog.cob:14.7-14.13:
   11                  05  ptr-num              REDEFINES ptr,
@@ -720,7 +600,7 @@ run_fundamental.at-4648-prog.cob:14.7-14.13:
 ----          ^^^^^^
   15                                           USAGE BINARY-LONG UNSIGNED.
   16          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_fundamental.at-4648-prog.cob:15.40-15.45:
   12          >>IF P64 SET
@@ -740,7 +620,7 @@ run_fundamental.at-4648-prog.cob:16.7-16.15:
 ----          ^^^^^^^^
   17                  05  misalign-2           PIC X.
   18   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4745:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4774:0
@@ -790,7 +670,7 @@ run_fundamental.at-5112-prog.cob:9.6-9.38:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   10         >>D    END-DISPLAY.
   11                STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>D compiler directive
 
 run_fundamental.at-5112-prog.cob:10.6-10.25:
    7                DISPLAY "OK" NO ADVANCING
@@ -799,7 +679,7 @@ run_fundamental.at-5112-prog.cob:10.6-10.25:
   10 >       >>D    END-DISPLAY.
 ----         ^^^^^^^^^^^^^^^^^^^
   11                STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>D compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5135:0
 run_fundamental.at-5135-prog.cob:9.6-9.38:
@@ -810,7 +690,7 @@ run_fundamental.at-5135-prog.cob:9.6-9.38:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   10         >>D    END-DISPLAY.
   11                STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>D compiler directive
 
 run_fundamental.at-5135-prog.cob:10.6-10.25:
    7                DISPLAY "OK" NO ADVANCING
@@ -819,7 +699,7 @@ run_fundamental.at-5135-prog.cob:10.6-10.25:
   10 >       >>D    END-DISPLAY.
 ----         ^^^^^^^^^^^^^^^^^^^
   11                STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>D compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5172:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5217:0
@@ -903,47 +783,7 @@ run_fundamental.at-5623-prog.cob:10.44-10.48:
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5670:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6013:0
-run_fundamental.at-6013-prog.cob:24.7-24.34:
-  21   
-  22         *>   Test with DISPLAY on error
-  23              PERFORM DO-CHECK
-  24 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  25              SET  NO-DISP    TO TRUE
-  26         *>   minimal side-test for performance comparisons
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-6013-prog.cob:28.7-28.16:
-  25              SET  NO-DISP    TO TRUE
-  26         *>   minimal side-test for performance comparisons
-  27              PERFORM DO-CHECK 20000 TIMES
-  28 >        >> END-IF
-----          ^^^^^^^^^
-  29              GOBACK.
-  30   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6072:0
-run_fundamental.at-6072-prog.cob:22.7-22.34:
-  19   
-  20         *>   Test with DISPLAY on error
-  21              PERFORM DO-CHECK
-  22 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  23              SET  NO-DISP    TO TRUE
-  24         *>   minimal side-test for performance comparisons
->> Error: Malformed or unknown compiler directive
-
-run_fundamental.at-6072-prog.cob:26.7-26.16:
-  23              SET  NO-DISP    TO TRUE
-  24         *>   minimal side-test for performance comparisons
-  25              PERFORM DO-CHECK 20000 TIMES
-  26 >        >> END-IF
-----          ^^^^^^^^^
-  27              GOBACK.
-  28   
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6161:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6229:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6281:0

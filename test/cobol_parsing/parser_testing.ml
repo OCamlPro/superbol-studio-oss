@@ -150,6 +150,7 @@ let rewindable_parse
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
           verbose; libpath = []; source_format;
+          env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:default.config;
         } |>
     Cobol_parser.rewindable_parse_simple

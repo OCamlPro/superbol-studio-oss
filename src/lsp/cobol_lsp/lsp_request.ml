@@ -459,7 +459,8 @@ let handle_hover registry (params: HoverParams.t) =
   let find_hovered_pplog_event pplog =
     List.find_opt begin function
       | Cobol_preproc.Trace.Replace _
-      | CompilerDirective _ ->
+      | CompilerDirective _
+      | Ignored _ ->
           false
       | Replacement { matched_loc = loc; _ }
       | FileCopy { copyloc = loc; _ } ->
@@ -497,6 +498,7 @@ let handle_hover registry (params: HoverParams.t) =
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
       | Some CompilerDirective _
+      | Some Ignored _
       | None ->
           None
     end

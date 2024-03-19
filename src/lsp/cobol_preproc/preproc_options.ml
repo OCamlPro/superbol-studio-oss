@@ -17,6 +17,7 @@ type preproc_options =
     libpath: string list;
     config: Cobol_config.t;
     source_format: Cobol_config.source_format_spec;
+    env: Preproc_env.t;
   }
 
 let default =
@@ -25,4 +26,5 @@ let default =
     libpath = [];
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;
+    env = Preproc_env.empty;
   }

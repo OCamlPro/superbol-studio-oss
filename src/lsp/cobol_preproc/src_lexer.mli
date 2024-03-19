@@ -17,12 +17,16 @@ val line: ('k Src_lexing.state as 's) -> Lexing.lexbuf -> 's * Text.text
 
 (* Second lexer *)
 
+exception INVALID_DIRECTIVE_WORD of string
+
+val distinguish_directive: string -> Compdir_tree.directive_kind
+
 val keyword_of_cdtoken: (Compdir_grammar.token, string) Hashtbl.t
 
 type cdtoken_component =
   | CDTok of Compdir_grammar.token
   | CDEnd
-val cdtoken: Lexing.lexbuf -> cdtoken_component
+val cdtoken: Compdir_tree.directive_kind -> Lexing.lexbuf -> cdtoken_component
 
 (* Third lexer *)
 

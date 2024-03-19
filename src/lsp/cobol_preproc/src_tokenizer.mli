@@ -16,8 +16,9 @@
 type 'b supplier = unit -> 'b * Lexing.position * Lexing.position
 
 val cdtoks_of_text_supplier
-  : Text.t
-  -> Compdir_grammar.token supplier
+  : Compdir_tree.directive_kind
+  -> Text.t
+  -> Compdir_grammar.token supplier * (unit -> Preproc_diagnostics.t)
 
 val pptoks_of_text_supplier
   : (module Src_overlay.MANAGER)

@@ -65,6 +65,7 @@ let get () =
                  "cobolx"; "Cobolx"; "CobolX"; "COBOLX";
                  "auto"; "AUTO"] in
   let libpath = ref ["."] in
+  let definitions = ref [] in
   let recovery = ref true in
   let show = ref [`Pending] in                                     (* default *)
   let silence spec =
@@ -93,6 +94,11 @@ let get () =
     EZCMD.info ~docv:"SOURCE_FORMAT"
       "Set the format of source code; allowed values are: { FIXED (the default), \
        FREE}\nOverrides `format` from configuration file if present.";
+
+    ["D"],
+    Arg.String (fun s -> definitions := s :: !definitions),
+    EZCMD.info ~docv:"VAR=VAL"
+      "Define a pre-processor variable VAR, with value VAL";
 
     ["free"], Arg.Unit (fun () -> format := SF SFFree),
     EZCMD.info "Shorthand for `--source-format FREE`";
@@ -137,7 +143,26 @@ let get () =
       else DisableRecovery
     in
     let verbose = !Globals.verbosity > 0 in
-    { preproc_options = { config; verbose; source_format; libpath = !libpath };
+    let env =
+      List.fold_right begin fun definition env ->
+        try
+          let eqsign = String.index definition '=' in
+          let var = String.sub definition 0 eqsign
+          and def = String.(sub definition (eqsign + 1)
+                              (length definition - eqsign - 1)) in
+          let var = Cobol_preproc.Env.var var in
+          (* TODO: Check numerics: i.e, no quotes & proper format. *)
+          Cobol_preproc.Env.define var (Alphanum { pp_payload = def;
+                                                   pp_loc = Process_parameter })
+            env ~override:true ~def_loc:Process_parameter
+        with Not_found ->
+          Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
+      end !definitions Cobol_preproc.Env.empty
+    in
+    (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
+    (*   Cobol_preproc.Env.pp env; *)
+    { preproc_options = { config; verbose; source_format;
+                          libpath = !libpath; env };
       parser_options = { config; recovery; verbose; show = !show } }
 
   in

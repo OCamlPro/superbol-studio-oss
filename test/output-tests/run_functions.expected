@@ -27,7 +27,7 @@ run_functions.at-410-prog.cob:19.7-19.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   20              IF BITX NOT = "01001000010010010010111000100000--"
   21          >>ELIF CHARSET = 'EBCDIC'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-410-prog.cob:21.7-21.32:
   18         *> Discover if running ASCII or EBCDIC
@@ -37,7 +37,7 @@ run_functions.at-410-prog.cob:21.7-21.32:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^
   22              IF BITX NOT = "11001000110010010100101101000000--"
   23          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-410-prog.cob:23.7-23.13:
   20              IF BITX NOT = "01001000010010010010111000100000--"
@@ -47,7 +47,7 @@ run_functions.at-410-prog.cob:23.7-23.13:
 ----          ^^^^^^
   24              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
   25          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-410-prog.cob:25.7-25.15:
   22              IF BITX NOT = "11001000110010010100101101000000--"
@@ -57,7 +57,7 @@ run_functions.at-410-prog.cob:25.7-25.15:
 ----          ^^^^^^^^
   26                 DISPLAY "UNEXPECTED BIT-VALUE OF 'HI. ': " BITX.
   27   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-410-prog.cob:30.7-30.31:
   27   
@@ -67,7 +67,7 @@ run_functions.at-410-prog.cob:30.7-30.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   31              IF BITX NOT = "001100000011000100000000----------"
   32          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-410-prog.cob:32.7-32.13:
   29              STRING FUNCTION BIT-OF (z"01") DELIMITED BY SIZE INTO BITX.
@@ -77,7 +77,7 @@ run_functions.at-410-prog.cob:32.7-32.13:
 ----          ^^^^^^
   33              IF BITX NOT = "111100001111000100000000----------"
   34          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-410-prog.cob:34.7-34.15:
   31              IF BITX NOT = "001100000011000100000000----------"
@@ -87,7 +87,7 @@ run_functions.at-410-prog.cob:34.7-34.15:
 ----          ^^^^^^^^
   35   
   36              IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-410-prog.cob:36.53:
   33              IF BITX NOT = "111100001111000100000000----------"
@@ -110,26 +110,6 @@ run_functions.at-410-prog.cob:36.54-36.59:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:541:0
-run_functions.at-541-prog.cob:25.7-25.34:
-  22          MAIN.
-  23         *    Test with DISPLAY on error
-  24              PERFORM DO-CHECK.
-  25 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  26              SET  NO-DISP    TO TRUE
-  27         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_functions.at-541-prog.cob:29.7-29.16:
-  26              SET  NO-DISP    TO TRUE
-  27         *    some performance checks on the way...
-  28              PERFORM DO-CHECK 300000 TIMES.
-  29 >        >> END-IF
-----          ^^^^^^^^^
-  30              GOBACK.
-  31   
->> Error: Malformed or unknown compiler directive
-
 run_functions.at-541-prog.cob:36.7-36.31:
   33              SET  HEXX-FILLER TO TRUE
   34              STRING FUNCTION HEX-OF (X) DELIMITED BY SIZE INTO HEXX.
@@ -138,7 +118,7 @@ run_functions.at-541-prog.cob:36.7-36.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   37              IF HEXX NOT = "20303132--"
   38          >>ELIF CHARSET = 'EBCDIC'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-541-prog.cob:38.7-38.32:
   35         *> Discover if running ASCII or EBCDIC
@@ -148,7 +128,7 @@ run_functions.at-541-prog.cob:38.7-38.32:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^
   39              IF HEXX NOT = "40F0F1F2--"
   40          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-541-prog.cob:40.7-40.13:
   37              IF HEXX NOT = "20303132--"
@@ -158,7 +138,7 @@ run_functions.at-541-prog.cob:40.7-40.13:
 ----          ^^^^^^
   41              IF 1 = 1 DISPLAY 'CHARSET UNKNOWN! PLEASE REPORT!'
   42          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-541-prog.cob:42.7-42.15:
   39              IF HEXX NOT = "40F0F1F2--"
@@ -168,7 +148,7 @@ run_functions.at-541-prog.cob:42.7-42.15:
 ----          ^^^^^^^^
   43                 DISPLAY "UNEXPECTED HEX-VALUE OF '0012': " HEXX.
   44   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-541-prog.cob:47.7-47.31:
   44   
@@ -178,7 +158,7 @@ run_functions.at-541-prog.cob:47.7-47.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   48              IF HEXX NOT = "48492E20--"
   49          >> ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-541-prog.cob:49.7-49.14:
   46              STRING FUNCTION HEX-OF (Y) DELIMITED BY SIZE INTO HEXX.
@@ -188,7 +168,7 @@ run_functions.at-541-prog.cob:49.7-49.14:
 ----          ^^^^^^^
   50              IF HEXX NOT = "C8C94B40--"
   51          >> END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-541-prog.cob:51.7-51.16:
   48              IF HEXX NOT = "48492E20--"
@@ -198,7 +178,7 @@ run_functions.at-541-prog.cob:51.7-51.16:
 ----          ^^^^^^^^^
   52                 DISPLAY "UNEXPECTED HEX-VALUE OF 'HI! ': " HEXX.
   53   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-541-prog.cob:66.7-66.31:
   63   
@@ -208,7 +188,7 @@ run_functions.at-541-prog.cob:66.7-66.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   67              IF HEXX NOT = "303100----"
   68          >> ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-541-prog.cob:68.7-68.14:
   65              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
@@ -218,7 +198,7 @@ run_functions.at-541-prog.cob:68.7-68.14:
 ----          ^^^^^^^
   69              IF HEXX NOT = "F0F100----"
   70          >> END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-541-prog.cob:70.7-70.16:
   67              IF HEXX NOT = "303100----"
@@ -228,7 +208,7 @@ run_functions.at-541-prog.cob:70.7-70.16:
 ----          ^^^^^^^^^
   71                 DISPLAY "UNEXPECTED HEX-VALUE OF z'01': " HEXX.
   72   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-541-prog.cob:75.7-75.31:
   72   
@@ -238,7 +218,7 @@ run_functions.at-541-prog.cob:75.7-75.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
   76              IF HEXX NOT = "20--------"
   77          >> ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_functions.at-541-prog.cob:77.7-77.14:
   74              STRING FUNCTION HEX-OF (' ') DELIMITED BY SIZE INTO HEXX.
@@ -248,7 +228,7 @@ run_functions.at-541-prog.cob:77.7-77.14:
 ----          ^^^^^^^
   78              IF HEXX NOT = "40--------"
   79          >> END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_functions.at-541-prog.cob:79.7-79.16:
   76              IF HEXX NOT = "20--------"
@@ -258,7 +238,7 @@ run_functions.at-541-prog.cob:79.7-79.16:
 ----          ^^^^^^^^^
   80                 DISPLAY "UNEXPECTED HEX-VALUE OF ' ': " HEXX.
   81   
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 run_functions.at-541-prog.cob:107.52:
  104              SET  HEXX-FILLER TO TRUE

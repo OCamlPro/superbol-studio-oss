@@ -12,7 +12,7 @@ run_refmod.at-181-prog2.cob:9.7-9.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
   10              DISPLAY X(1:I) NO ADVANCING.
   11          >> REF-MOD-ZERO-LENGTH OFF
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>REF-MOD-ZERO-LENGTH compiler directive
 
 run_refmod.at-181-prog2.cob:11.7-11.33:
    8          PROCEDURE        DIVISION.
@@ -22,7 +22,7 @@ run_refmod.at-181-prog2.cob:11.7-11.33:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   12              DISPLAY X(1:I) NO ADVANCING.
   13              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>REF-MOD-ZERO-LENGTH compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:205:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:223:0
@@ -47,7 +47,7 @@ run_refmod.at-435-prog1.cob:2.6-2.21:
 ----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. progb.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:466:0
 run_refmod.at-466-prog2.cob:2.6-2.21:
@@ -56,7 +56,7 @@ run_refmod.at-466-prog2.cob:2.6-2.21:
 ----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog2.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_refmod.at-466-prog2.cob:15.6-15.39:
   12          01  m           PIC 9 VALUE 2.
@@ -66,7 +66,7 @@ run_refmod.at-466-prog2.cob:15.6-15.39:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   16              DISPLAY y (1:n)
   17         $END
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $IF compiler directive
 
 run_refmod.at-466-prog2.cob:17.6-17.10:
   14          PROCEDURE DIVISION.
@@ -76,7 +76,7 @@ run_refmod.at-466-prog2.cob:17.6-17.10:
 ----         ^^^^
   18              DISPLAY y (1:m)
   19              GOBACK.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid $END compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:490:0
 run_refmod.at-490-prog3.cob:2.6-2.21:
@@ -85,5 +85,5 @@ run_refmod.at-490-prog3.cob:2.6-2.21:
 ----         ^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog3.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 

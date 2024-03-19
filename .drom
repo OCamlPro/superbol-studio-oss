@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-21d54811d97e56bf8f1651f3d23a69f4:.
+87807e3ccdc00368d2544ff79e08e27f:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-a3fa08334a98ace426bd6c8064349725:dune-project
+6537f64f4579a404162a8b2ad54fa16f:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -120,7 +120,7 @@ e39184f019d16de3bd84d1b9b77a6300:opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-9fb37f4dcc871521cc93921d9381ff2c:opam/cobol_preproc.opam
+1ebbace1a970f29b2c947d0ef09bf239:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
@@ -295,7 +295,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_config/version.mlt
 
 # begin context for src/lsp/cobol_data/dune
 # file src/lsp/cobol_data/dune
-c830729656f586961a44188b55cb4ac6:src/lsp/cobol_data/dune
+8ec63aca217d7bb803c7538833d3f36a:src/lsp/cobol_data/dune
 # end context for src/lsp/cobol_data/dune
 
 # begin context for src/lsp/cobol_data/version.mlt
@@ -345,7 +345,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_parser/version.mlt
 
 # begin context for src/lsp/cobol_preproc/dune
 # file src/lsp/cobol_preproc/dune
-6959ec99a7299e1be2b6bd025568bb21:src/lsp/cobol_preproc/dune
+e31b22f1d241d75db90f170f9c6fd95d:src/lsp/cobol_preproc/dune
 # end context for src/lsp/cobol_preproc/dune
 
 # begin context for src/lsp/cobol_preproc/version.mlt

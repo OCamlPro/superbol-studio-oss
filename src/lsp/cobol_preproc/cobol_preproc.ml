@@ -29,6 +29,7 @@ module Trace = Preproc_trace
 module Directives = Preproc_directives
 module Diagnostics = Preproc_diagnostics
 module Outputs = Preproc_outputs
+module Env = Preproc_env
 
 (** {1 Main entry points for the processor itself} *)
 

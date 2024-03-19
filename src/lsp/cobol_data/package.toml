@@ -23,7 +23,7 @@ gen-version = "version.ml"
 
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
-# generators = [ "ocamllex", "menhir" ]
+generators = ["ocamllex"]
 
 # menhir options for the package
 #Example:

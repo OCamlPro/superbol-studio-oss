@@ -226,7 +226,7 @@ run_misc.at-942-prog.cob:2.7-2.44:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 run_misc.at-942-prog.cob:14.7-14.45:
   11          01  idx PIC 99 VALUE 6.
@@ -236,7 +236,7 @@ run_misc.at-942-prog.cob:14.7-14.45:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15              DISPLAY y (idx) WITH NO ADVANCING
   16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 run_misc.at-942-prog.cob:16.7-16.58:
   13          PROCEDURE DIVISION.
@@ -246,7 +246,7 @@ run_misc.at-942-prog.cob:16.7-16.58:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   17          >>TURN EC-BOUND, EC-PROGRAM CHECKING OFF
   18              DISPLAY y (idx) WITH NO ADVANCING
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 run_misc.at-942-prog.cob:17.7-17.47:
   14          >>TURN EC-BOUND-SUBSCRIPT CHECKING OFF
@@ -256,7 +256,7 @@ run_misc.at-942-prog.cob:17.7-17.47:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   18              DISPLAY y (idx) WITH NO ADVANCING
   19          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 run_misc.at-942-prog.cob:19.7-19.44:
   16          >>TURN EC-BOUND-SUBSCRIPT CHECKING ON WITH LOCATION
@@ -266,7 +266,7 @@ run_misc.at-942-prog.cob:19.7-19.44:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   20              DISPLAY y (idx) WITH NO ADVANCING
   21              .
->> Error: Malformed or unknown compiler directive
+>> Error: Invalid >>TURN compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:974:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:996:0
@@ -881,7 +881,7 @@ run_misc.at-3626-prog.cob:5.6-5.37:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6              IF "1" NOT < "a"
    7         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3626-prog.cob:7.6-7.38:
    4          PROCEDURE        DIVISION.
@@ -891,7 +891,7 @@ run_misc.at-3626-prog.cob:7.6-7.38:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    8              IF "a" NOT < "1"
    9         >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3626-prog.cob:9.6-9.14:
    6              IF "1" NOT < "a"
@@ -901,7 +901,7 @@ run_misc.at-3626-prog.cob:9.6-9.14:
 ----         ^^^^^^^^
   10                 DISPLAY "ERROR" END-DISPLAY
   11              END-IF.
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3663:0
 run_misc.at-3663-prog.cob:12.6-12.37:
@@ -912,7 +912,7 @@ run_misc.at-3663-prog.cob:12.6-12.37:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13              IF G NOT = "12345abcde"
   14         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3663-prog.cob:14.6-14.38:
   11              SORT TBL ASCENDING KEY X.
@@ -922,7 +922,7 @@ run_misc.at-3663-prog.cob:14.6-14.38:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15              IF G NOT = "abcde12345"
   16         >>ELSE           *>  =  'NATIVE'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3663-prog.cob:16.6-16.12:
   13              IF G NOT = "12345abcde"
@@ -932,7 +932,7 @@ run_misc.at-3663-prog.cob:16.6-16.12:
 ----         ^^^^^^
   17              IF NOT G = "12345abcde" OR "abcde12345"
   18         >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_misc.at-3663-prog.cob:18.6-18.14:
   15              IF G NOT = "abcde12345"
@@ -942,7 +942,7 @@ run_misc.at-3663-prog.cob:18.6-18.14:
 ----         ^^^^^^^^
   19                 DISPLAY G END-DISPLAY
   20              END-IF.
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3919:0
 run_misc.at-3919-prog.cob:35.11-35.39:
@@ -953,7 +953,7 @@ run_misc.at-3919-prog.cob:35.11-35.39:
 ----              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   36                  PERFORM 1000-JUSTIFY-IS-RIGHT THRU 1000-EXIT.
   37              >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3919-prog.cob:37.11-37.17:
   34   
@@ -963,7 +963,7 @@ run_misc.at-3919-prog.cob:37.11-37.17:
 ----              ^^^^^^
   38                  PERFORM 2000-JUSTIFY-IS-OFF   THRU 2000-EXIT.
   39              >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_misc.at-3919-prog.cob:39.11-39.19:
   36                  PERFORM 1000-JUSTIFY-IS-RIGHT THRU 1000-EXIT.
@@ -973,7 +973,7 @@ run_misc.at-3919-prog.cob:39.11-39.19:
 ----              ^^^^^^^^
   40   
   41              IF ELE4 NOT EQUAL 'RRRRRRRRRR'
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:3961:0
 run_misc.at-3961-prog.cob:20.6-20.37:
@@ -984,7 +984,7 @@ run_misc.at-3961-prog.cob:20.6-20.37:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   21              IF I NOT = 3
   22         >>ELIF EXPECT-ORDER  =  'EBCDIC'
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3961-prog.cob:22.6-22.38:
   19              END-SEARCH
@@ -994,7 +994,7 @@ run_misc.at-3961-prog.cob:22.6-22.38:
 ----         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   23              IF I NOT = 8
   24         >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-3961-prog.cob:24.6-24.14:
   21              IF I NOT = 3
@@ -1004,7 +1004,7 @@ run_misc.at-3961-prog.cob:24.6-24.14:
 ----         ^^^^^^^^
   25                 DISPLAY "ERROR" END-DISPLAY
   26              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4002:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4037:0
@@ -2862,26 +2862,6 @@ run_misc.at-5990-prog.cob:3.19-3.25:
    4          ENVIRONMENT DIVISION.
    5          DATA DIVISION.
 >> Error: Invalid syntax
-
-run_misc.at-5990-prog.cob:93.7-93.34:
-  90          MAIN.
-  91         *    Test with DISPLAY on error
-  92              PERFORM DO-CHECK.
-  93 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  94              SET  NO-DISP    TO TRUE
-  95         *    some performance checks on the way...
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-5990-prog.cob:97.7-97.16:
-  94              SET  NO-DISP    TO TRUE
-  95         *    some performance checks on the way...
-  96              PERFORM DO-CHECK 20000 TIMES.
-  97 >        >> END-IF
-----          ^^^^^^^^^
-  98              GOBACK.
-  99   
->> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:6479:0
 run_misc.at-6479-prog.cob:3.18:
@@ -5008,26 +4988,6 @@ run_misc.at-11129-prog.cob:106.43-106.49:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11365:0
-run_misc.at-11365-caller.cob:9.7-9.34:
-   6          MAIN-LINE.
-   7   
-   8              PERFORM DO-CHECK
-   9 >        >> IF CHECK-PERF IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  10         *>   minimal side-test for performance comparisons
-  11              PERFORM DO-CHECK 10000 TIMES
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-11365-caller.cob:12.7-12.16:
-   9          >> IF CHECK-PERF IS DEFINED
-  10         *>   minimal side-test for performance comparisons
-  11              PERFORM DO-CHECK 10000 TIMES
-  12 >        >> END-IF
-----          ^^^^^^^^^
-  13              DISPLAY 'DONE' UPON SYSERR WITH NO ADVANCING
-  14              GOBACK.
->> Error: Malformed or unknown compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11339:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11409:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11445:0
@@ -6716,7 +6676,7 @@ run_misc.at-12843-prog2.cob:2.7-2.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          >>SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12843-prog2.cob:3.7-3.35:
    1   
@@ -6725,7 +6685,7 @@ run_misc.at-12843-prog2.cob:3.7-3.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog2.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12843-prog2.cob:8.35:
    5          PROGRAM-ID. prog2.
@@ -6775,7 +6735,7 @@ run_misc.at-12843-prog2.cob:10.7-10.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12854:0
 run_misc.at-12854-prog3.cob:2.7-2.38:
@@ -6784,7 +6744,7 @@ run_misc.at-12854-prog3.cob:2.7-2.38:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          >>DEFINE CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12854-prog3.cob:3.7-3.38:
    1   
@@ -6793,7 +6753,7 @@ run_misc.at-12854-prog3.cob:3.7-3.38:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog3.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12854-prog3.cob:8.35:
    5          PROGRAM-ID. prog3.
@@ -6843,7 +6803,7 @@ run_misc.at-12854-prog3.cob:10.7-10.46:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12917:0
 run_misc.at-12917-prog.cob:5.7-5.35:
@@ -6854,7 +6814,7 @@ run_misc.at-12917-prog.cob:5.7-5.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12917-prog.cob:6.7-6.34:
    3          PROGRAM-ID. prog.
@@ -6864,7 +6824,7 @@ run_misc.at-12917-prog.cob:6.7-6.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12917-prog.cob:8.35:
    5          >>SET CONSTANT DOGGY "Pluto"
@@ -6885,86 +6845,6 @@ run_misc.at-12917-prog.cob:8.36-8.41:
    9   
   10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
 >> Error: Invalid syntax
-
-run_misc.at-12917-prog.cob:10.7-10.44:
-   7          WORKING-STORAGE SECTION.
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9   
-  10 >        >>DEFINE DPONY  AS PARAMETER OVERRIDE
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11          >>IF DPONY IS NOT DEFINED
-  12          >>DEFINE DPONY AS "No Dpony"
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:11.7-11.32:
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9   
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11 >        >>IF DPONY IS NOT DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^
-  12          >>DEFINE DPONY AS "No Dpony"
-  13          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:12.7-12.35:
-   9   
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11          >>IF DPONY IS NOT DEFINED
-  12 >        >>DEFINE DPONY AS "No Dpony"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  13          >>END-IF
-  14          01  CNSPONY     CONSTANT FROM DPONY.
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:13.7-13.15:
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11          >>IF DPONY IS NOT DEFINED
-  12          >>DEFINE DPONY AS "No Dpony"
-  13 >        >>END-IF
-----          ^^^^^^^^
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:16.7-16.45:
-  13          >>END-IF
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
-  16 >        >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  17          >>IF ENVPONY IS NOT DEFINED
-  18          >>DEFINE ENVPONY AS "No EnvPony"
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:17.7-17.34:
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17 >        >>IF ENVPONY IS NOT DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  18          >>DEFINE ENVPONY AS "No EnvPony"
-  19          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:18.7-18.39:
-  15   
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17          >>IF ENVPONY IS NOT DEFINED
-  18 >        >>DEFINE ENVPONY AS "No EnvPony"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  19          >>END-IF
-  20          01  HORSE       CONSTANT FROM ENVPONY.
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:19.7-19.15:
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17          >>IF ENVPONY IS NOT DEFINED
-  18          >>DEFINE ENVPONY AS "No EnvPony"
-  19 >        >>END-IF
-----          ^^^^^^^^
-  20          01  HORSE       CONSTANT FROM ENVPONY.
-  21          77  MYHORSE    PIC X(12) VALUE HORSE  .
->> Error: Malformed or unknown compiler directive
 
 run_misc.at-12917-prog.cob:21.37:
   18          >>DEFINE ENVPONY AS "No EnvPony"
@@ -7006,36 +6886,6 @@ run_misc.at-12917-prog.cob:27.34-27.51:
   29              DISPLAY "1st Dog's name is " DOGGY ";".
 >> Error: Invalid syntax
 
-run_misc.at-12917-prog.cob:31.7-31.30:
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
-  30              DISPLAY "2nd Dog's name is " PONY ";".
-  31 >        >>IF ENVPONY IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33          >>ELSE
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:33.7-33.13:
-  30              DISPLAY "2nd Dog's name is " PONY ";".
-  31          >>IF ENVPONY IS DEFINED
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33 >        >>ELSE
-----          ^^^^^^
-  34              DISPLAY "ENVPONY was NOT DEFINED;".
-  35          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:35.7-35.15:
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33          >>ELSE
-  34              DISPLAY "ENVPONY was NOT DEFINED;".
-  35 >        >>END-IF
-----          ^^^^^^^^
-  36              DISPLAY "DPONY set to " CNSPONY ";".
-  37          >>IF ENVPONY = "WHITE"
->> Error: Malformed or unknown compiler directive
-
 run_misc.at-12917-prog.cob:37.7-37.29:
   34              DISPLAY "ENVPONY was NOT DEFINED;".
   35          >>END-IF
@@ -7044,7 +6894,7 @@ run_misc.at-12917-prog.cob:37.7-37.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
   38          >>DEFINE CONSTANT PONY AS "White Horse" OVERRIDE
   39          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12917-prog.cob:38.7-38.55:
   35          >>END-IF
@@ -7054,7 +6904,7 @@ run_misc.at-12917-prog.cob:38.7-38.55:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   39          >>ELSE
   40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12917-prog.cob:39.7-39.13:
   36              DISPLAY "DPONY set to " CNSPONY ";".
@@ -7064,7 +6914,7 @@ run_misc.at-12917-prog.cob:39.7-39.13:
 ----          ^^^^^^
   40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
   41          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_misc.at-12917-prog.cob:40.7-40.57:
   37          >>IF ENVPONY = "WHITE"
@@ -7074,7 +6924,7 @@ run_misc.at-12917-prog.cob:40.7-40.57:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   41          >>END-IF
   42              DISPLAY "My pony is " PONY ";".
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12917-prog.cob:41.7-41.15:
   38          >>DEFINE CONSTANT PONY AS "White Horse" OVERRIDE
@@ -7084,26 +6934,7 @@ run_misc.at-12917-prog.cob:41.7-41.15:
 ----          ^^^^^^^^
   42              DISPLAY "My pony is " PONY ";".
   43          >>IF DPONY IS DEFINED
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:43.7-43.28:
-  40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
-  41          >>END-IF
-  42              DISPLAY "My pony is " PONY ";".
-  43 >        >>IF DPONY IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-  44              DISPLAY "DPONY is DEFINED as " CNSPONY ";".
-  45          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12917-prog.cob:45.7-45.15:
-  42              DISPLAY "My pony is " PONY ";".
-  43          >>IF DPONY IS DEFINED
-  44              DISPLAY "DPONY is DEFINED as " CNSPONY ";".
-  45 >        >>END-IF
-----          ^^^^^^^^
-  46              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12983:0
 run_misc.at-12983-prog.cob:5.7-5.35:
@@ -7114,7 +6945,7 @@ run_misc.at-12983-prog.cob:5.7-5.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12983-prog.cob:6.7-6.34:
    3          PROGRAM-ID. prog.
@@ -7124,7 +6955,7 @@ run_misc.at-12983-prog.cob:6.7-6.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12983-prog.cob:8.35:
    5          >>SET CONSTANT DOGGY "Pluto"
@@ -7145,86 +6976,6 @@ run_misc.at-12983-prog.cob:8.36-8.41:
    9   
   10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
 >> Error: Invalid syntax
-
-run_misc.at-12983-prog.cob:10.7-10.44:
-   7          WORKING-STORAGE SECTION.
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9   
-  10 >        >>DEFINE DPONY  AS PARAMETER OVERRIDE
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11          >>IF DPONY IS NOT DEFINED
-  12          >>DEFINE DPONY AS "No Dpony"
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:11.7-11.32:
-   8          01  THEDOG    PIC X(6) VALUE DOGGY.
-   9   
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11 >        >>IF DPONY IS NOT DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^
-  12          >>DEFINE DPONY AS "No Dpony"
-  13          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:12.7-12.35:
-   9   
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11          >>IF DPONY IS NOT DEFINED
-  12 >        >>DEFINE DPONY AS "No Dpony"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  13          >>END-IF
-  14          01  CNSPONY     CONSTANT FROM DPONY.
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:13.7-13.15:
-  10          >>DEFINE DPONY  AS PARAMETER OVERRIDE
-  11          >>IF DPONY IS NOT DEFINED
-  12          >>DEFINE DPONY AS "No Dpony"
-  13 >        >>END-IF
-----          ^^^^^^^^
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:16.7-16.45:
-  13          >>END-IF
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
-  16 >        >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  17          >>IF ENVPONY IS NOT DEFINED
-  18          >>DEFINE ENVPONY AS "No EnvPony"
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:17.7-17.34:
-  14          01  CNSPONY     CONSTANT FROM DPONY.
-  15   
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17 >        >>IF ENVPONY IS NOT DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  18          >>DEFINE ENVPONY AS "No EnvPony"
-  19          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:18.7-18.39:
-  15   
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17          >>IF ENVPONY IS NOT DEFINED
-  18 >        >>DEFINE ENVPONY AS "No EnvPony"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  19          >>END-IF
-  20          01  HORSE       CONSTANT FROM ENVPONY.
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:19.7-19.15:
-  16          >>DEFINE ENVPONY AS PARAMETER OVERRIDE
-  17          >>IF ENVPONY IS NOT DEFINED
-  18          >>DEFINE ENVPONY AS "No EnvPony"
-  19 >        >>END-IF
-----          ^^^^^^^^
-  20          01  HORSE       CONSTANT FROM ENVPONY.
-  21          77  MYHORSE    PIC X(12) VALUE HORSE  .
->> Error: Malformed or unknown compiler directive
 
 run_misc.at-12983-prog.cob:21.37:
   18          >>DEFINE ENVPONY AS "No EnvPony"
@@ -7266,36 +7017,6 @@ run_misc.at-12983-prog.cob:27.34-27.51:
   29              DISPLAY "1st Dog's name is " DOGGY ";".
 >> Error: Invalid syntax
 
-run_misc.at-12983-prog.cob:31.7-31.30:
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
-  30              DISPLAY "2nd Dog's name is " PONY ";".
-  31 >        >>IF ENVPONY IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33          >>ELSE
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:33.7-33.13:
-  30              DISPLAY "2nd Dog's name is " PONY ";".
-  31          >>IF ENVPONY IS DEFINED
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33 >        >>ELSE
-----          ^^^^^^
-  34              DISPLAY "ENVPONY was NOT DEFINED;".
-  35          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:35.7-35.15:
-  32              DISPLAY "ENVPONY is DEFINED as " HORSE ";".
-  33          >>ELSE
-  34              DISPLAY "ENVPONY was NOT DEFINED;".
-  35 >        >>END-IF
-----          ^^^^^^^^
-  36              DISPLAY "DPONY set to " CNSPONY ";".
-  37          >>IF ENVPONY = "WHITE"
->> Error: Malformed or unknown compiler directive
-
 run_misc.at-12983-prog.cob:37.7-37.29:
   34              DISPLAY "ENVPONY was NOT DEFINED;".
   35          >>END-IF
@@ -7304,7 +7025,7 @@ run_misc.at-12983-prog.cob:37.7-37.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
   38          >>DEFINE CONSTANT PONY AS "White Horse" OVERRIDE
   39          >>ELSE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12983-prog.cob:38.7-38.55:
   35          >>END-IF
@@ -7314,7 +7035,7 @@ run_misc.at-12983-prog.cob:38.7-38.55:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   39          >>ELSE
   40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12983-prog.cob:39.7-39.13:
   36              DISPLAY "DPONY set to " CNSPONY ";".
@@ -7324,7 +7045,7 @@ run_misc.at-12983-prog.cob:39.7-39.13:
 ----          ^^^^^^
   40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
   41          >>END-IF
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>ELSE compiler directive
 
 run_misc.at-12983-prog.cob:40.7-40.57:
   37          >>IF ENVPONY = "WHITE"
@@ -7334,7 +7055,7 @@ run_misc.at-12983-prog.cob:40.7-40.57:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   41          >>END-IF
   42              DISPLAY "My pony is " PONY ";".
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-12983-prog.cob:41.7-41.15:
   38          >>DEFINE CONSTANT PONY AS "White Horse" OVERRIDE
@@ -7344,26 +7065,7 @@ run_misc.at-12983-prog.cob:41.7-41.15:
 ----          ^^^^^^^^
   42              DISPLAY "My pony is " PONY ";".
   43          >>IF DPONY IS DEFINED
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:43.7-43.28:
-  40          >>DEFINE CONSTANT PONY AS "default Dirty" OVERRIDE
-  41          >>END-IF
-  42              DISPLAY "My pony is " PONY ";".
-  43 >        >>IF DPONY IS DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^
-  44              DISPLAY "DPONY is DEFINED as " CNSPONY ";".
-  45          >>END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-12983-prog.cob:45.7-45.15:
-  42              DISPLAY "My pony is " PONY ";".
-  43          >>IF DPONY IS DEFINED
-  44              DISPLAY "DPONY is DEFINED as " CNSPONY ";".
-  45 >        >>END-IF
-----          ^^^^^^^^
-  46              STOP RUN.
->> Error: Malformed or unknown compiler directive
+>> Error: Unexpected >>END-IF compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13049:0
 run_misc.at-13049-prog.cob:14.30-14.31:
@@ -7597,14 +7299,6 @@ run_misc.at-13049-prog.cob:28.28-28.33:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13127:0
-run_misc.at-13127-prog.cob:2.7-2.32:
-   1   
-   2 >        >>DEFINE MYDOG AS "Piper"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^
-   3          >>DEFINE MYNUM1 AS 11
-   4          IDENTIFICATION DIVISION.
->> Error: Malformed or unknown compiler directive
-
 run_misc.at-13127-prog.cob:3.7-3.28:
    1   
    2          >>DEFINE MYDOG AS "Piper"
@@ -7612,7 +7306,7 @@ run_misc.at-13127-prog.cob:3.7-3.28:
 ----          ^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog.
->> Error: Malformed or unknown compiler directive
+>> Error: Malformed compiler directive
 
 run_misc.at-13127-prog.cob:17.35-17.36:
   14          01  PICX      PIC XXX VALUE 'Abc'.
@@ -7773,26 +7467,6 @@ run_misc.at-13127-prog.cob:21.36:
   22          01  CON3      CONSTANT (((1 + 2) * NUM2) - 4).
   23          01  CON4      CONSTANT AS 3.1416 + CON3.
 >> Hint: Missing FROM <subscripts>
-
-run_misc.at-13127-prog.cob:28.7-28.25:
-  25          01  DOGNAME   CONSTANT FROM MYDOG.
-  26          01  NUM1      CONSTANT FROM MYNUM1.
-  27          01  CON6      CONSTANT AS CON5 + NUM1.
-  28 >        >> IF NUM2 DEFINED  *> optional passed from command line
-----          ^^^^^^^^^^^^^^^^^^
-  29          01  NUM2      CONSTANT FROM MYNUM2.
-  30          >> END-IF
->> Error: Malformed or unknown compiler directive
-
-run_misc.at-13127-prog.cob:30.7-30.16:
-  27          01  CON6      CONSTANT AS CON5 + NUM1.
-  28          >> IF NUM2 DEFINED  *> optional passed from command line
-  29          01  NUM2      CONSTANT FROM MYNUM2.
-  30 >        >> END-IF
-----          ^^^^^^^^^
-  31         *
-  32          PROCEDURE DIVISION.
->> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13174:0
 run_misc.at-13174-prog.cob:19.12-19.24:

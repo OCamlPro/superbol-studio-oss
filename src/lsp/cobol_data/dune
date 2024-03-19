@@ -13,6 +13,7 @@
   
   )
 
+(ocamllex data_literal_lexer)
 
 (rule
     (targets version.ml)

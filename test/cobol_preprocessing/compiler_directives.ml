@@ -19,13 +19,13 @@ let%expect_test "fixed-format-cdirs" =
   |};
   [%expect {|
     prog.cob:2.7-2.14:
-    >> Warning: Ignored compiler directive
+    >> Error: Malformed compiler directive
 
     prog.cob:3.6-3.13:
-    >> Warning: Ignored compiler directive
+    >> Error: Malformed compiler directive
 
     prog.cob:4.6-4.13:
-    >> Warning: Ignored compiler directive |}];;
+    >> Error: Malformed compiler directive |}];;
 
 let%expect_test "hybrid-format-cdirs" =
   Preproc_testing.preprocess {|
@@ -60,20 +60,20 @@ $
   |};
   [%expect {|
     prog.cob:2.6-2.11:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid >>foo compiler directive
 
     prog.cob:3.6-3.8:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid >> compiler directive
 
     prog.cob:4.6-4.8:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid >> compiler directive
 
     prog.cob:5.6-5.7:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid $ compiler directive
 
     prog.cob:7.0-7.4:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid >> compiler directive
 
     prog.cob:8.0-8.1:
-    >> Error: Malformed or unknown compiler directive
+    >> Error: Invalid $ compiler directive
 |}];;
