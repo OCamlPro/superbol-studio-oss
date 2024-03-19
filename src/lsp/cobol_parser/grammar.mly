@@ -1318,7 +1318,7 @@ let constant_spec_prefix ==
   | CONSTANT; ~ = ibo(global_clause); < >
 
 let constant_spec :=
-  | go = constant_spec_prefix; AS?; e = loc(expression);
+  | go = constant_spec_prefix; AS?; e = loc(expression_no_leftmost_length);
     { go, ConstExpr ~&e &@<- e } (* or plain ident *)
   | p = constant_value_length; OF?; n = name;
     { fst p, match snd p with
@@ -2392,104 +2392,121 @@ let ident_or_integer :=
 (* TODO: rename `expression` into `subscript_expression`, and
    `expression_no_all` into `expression`. *)
 
-let expression [@recovery Atom (Fig Zero)] [@symbol "<expression>"] [@cost 0] :=
- | e1 = expression; "+"; e2 = expr_term; { Binop (e1, BPlus, e2) }
- | e1 = expression; "-"; e2 = expr_term; { Binop (e1, BMinus, e2) }
- | e = expr_term;                        { e }
+let expr_(leftmost_term,term) :=
+  | ~ = expr_(leftmost_term,term); ~ = expr_binop; ~ = term; <Binop>
+  | ~ = leftmost_term;                                       <     >
 
-let expression_no_all [@recovery dummy_expr] [@symbol "<expression>"] (* [@cost 0]  *):=
- | e1 = expression_no_all; "+"; e2 = expr_term_no_all; { Binop (e1, BPlus, e2) }
- | e1 = expression_no_all; "-"; e2 = expr_term_no_all; { Binop (e1, BMinus, e2) }
- | e = expr_term_no_all;                               { e }
+let expr_binop ==
+  | "+"; {BPlus}
+  | "-"; {BMinus}
 
-let expression_par_unop  [@recovery dummy_expr] [@symbol "<expression>"] (* [@cost 0]  *) :=
- | e1 = expression_par_unop; "+"; e2 = expr_term; { Binop (e1, BPlus, e2) }
- | e1 = expression_par_unop; "-"; e2 = expr_term; { Binop (e1, BMinus, e2) }
- | e = expr_term_par_unop;                        { e }
+let expression [@recovery dummy_expr] [@symbol "<expression>"] [@cost 0] :=
+      expr_(term(atomic),
+            term(atomic))
 
-(* --- *)
+let expression_no_all ==
+      expr_(term(atomic_no_all),
+            term(atomic_no_all))
 
-expr_term:
- | e1 = expr_term o = binop e2 = expr_factor { Binop (e1, o, e2) }
- | e = expr_factor                           { e }
+let expression_par_unop ==
+      expr_(term_(factor_(atomic_no_all),
+                  factor(atomic,atomic)),
+            term(atomic))
 
-expr_term_no_all:
- | e1 = expr_term_no_all o = binop e2 = expr_factor_no_all { Binop (e1, o, e2) }
- | e = expr_factor_no_all                           { e }
-
-expr_term_par_unop:
- | e1 = expr_term_par_unop o = binop e2 = expr_factor { Binop (e1, o, e2) }
- | e = expr_factor_par_unop                           { e }
+let expression_no_leftmost_length :=
+      expr_(term_(factor_(atomic_no_leftmost_length),
+                  factor(atomic,atomic)),
+            term(atomic))
 
 (* --- *)
 
-expr_factor:
- | e1 = expr_unary "**" e2 = expr_factor { Binop (e1, BPow, e2) }
- | e = expr_unary                       { e }
+let term(atomic) == term_with_leftmost(atomic,atomic)
 
-expr_factor_no_all:
- | e1 = expr_unary_no_all "**" e2 = expr_factor_no_all { Binop (e1, BPow, e2) }
- | e = expr_unary_no_all                       { e }
+let term_with_leftmost(leftmost_atomic,atomic) ==
+      term_(factor(leftmost_atomic,atomic),
+            factor(atomic,atomic))
 
-expr_factor_par_unop:
- | e1 = expr_unary_par "**" e2 = expr_factor { Binop (e1, BPow, e2) }
- | e = expr_unary_par                       { e }
+let term_(f1,f2) :=
+  | ~ = term_(f1,f2); ~ = binop; ~ = f2; <Binop>
+  | ~ = f1;                              <     >
 
-(* --- *)
-
-expr_unary:
- | e = atomic_expression          { e }
- | o = unop e = atomic_expression { Unop (o, e) }
-
-let expr_unary_no_all ==
- | e = atomic_expression_no_all;           { e }
- | o = unop; e = atomic_expression_no_all; { Unop (o, e) }
-
-let expr_unary_par == atomic_expression_no_all
+let binop ==
+  | "*";   { BMul }
+  | "/";   { BDiv }
+  | B_AND; { BAnd }
+  | B_OR;  { BOr }
+  | B_XOR; { BXor }
 
 (* --- *)
 
-let atomic_expression [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
- | e = arithmetic_term;      { e }
- | "("; e = expression; ")"; { e } (* arith or boolean *)
+let factor(leftmost_atomic,atomic) == factor_(unary_(leftmost_atomic,atomic))
 
-let atomic_expression_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
- | e = arithmetic_term_no_all;      { e }
- | "("; e = expression_no_all; ")"; { e } (* arith or boolean *)
+let factor_(e) :=
+  | ~ = e; ~ = powop; ~ = factor_(e); <Binop>
+  | ~ = e;                            <     >
 
-(* --- *)
-
-arithmetic_term:
- | i = ident               { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
- | i = integer             { Atom (Integer i) }
- | f = fixedlit            { Atom (Fixed f) }
- | f = floatlit            { Atom (Floating f) }
- | b = BOOLIT              { Atom (Boolean b) } (* boolean *)
- | f = figurative_constant { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
- | a = alphanum            { Atom (Alphanum a) } (* NB: quick relaxation for now *)
-
-arithmetic_term_no_all:
- | i = ident    { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
- | i = integer  { Atom (Integer i) }
- | f = fixedlit { Atom (Fixed f) }
- | f = floatlit { Atom (Floating f) }
- | b = BOOLIT   { Atom (Boolean b) } (* boolean *)
- | a = alphanum { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
- | f = figurative_constant_no_all { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
+let powop ==
+  | "**"; {BPow}
 
 (* --- *)
 
-%inline binop:
- | "*"   { BMul }
- | "/"   { BDiv }
- | B_AND { BAnd }
- | B_OR  { BOr }
- | B_XOR { BXor }
+let unary_(l,e) :=
+  | ~ = l;           <    >
+  | ~ = unop; ~ = e; <Unop>
 
-%inline unop:
- | "+"   { UPlus }
- | "-"   { UMinus }
- | B_NOT { UNot }
+let unop ==
+  | "+";   { UPlus }
+  | "-";   { UMinus }
+  | B_NOT; { UNot }
+
+(* --- *)
+
+let atomic_(term,expr_in_paren) :=
+  | ~ = term;                    < >
+  | "("; ~ = expr_in_paren; ")"; < >                      (* arith or boolean *)
+
+let atomic [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
+  | atomic_(arithmetic_term, expression)
+
+let atomic_no_all [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
+  | atomic_(arithmetic_term_no_all, expression_no_all)
+
+let atomic_no_leftmost_length [@recovery dummy_expr] [@symbol "<atomic expression>"] :=
+  | atomic_(arithmetic_term_no_length, expression)
+
+(* --- *)
+
+let arithmetic_term :=
+ | i = ident;                { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
+ | i = integer;              { Atom (Integer i) }
+ | f = fixedlit;             { Atom (Fixed f) }
+ | f = floatlit;             { Atom (Floating f) }
+ | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
+ | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
+ | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
+ | l = length_of_expression; { Atom l }
+
+let arithmetic_term_no_all :=
+ | i = ident;    { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
+ | i = integer;  { Atom (Integer i) }
+ | f = fixedlit; { Atom (Fixed f) }
+ | f = floatlit; { Atom (Floating f) }
+ | b = BOOLIT;   { Atom (Boolean b) } (* boolean *)
+ | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
+ | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
+ | l = length_of_expression; { Atom l }
+
+let arithmetic_term_no_length :=
+ | i = ident;                { Atom (UPCAST.ident_with_literal i) }
+ | i = integer;              { Atom (Integer i) }
+ | f = fixedlit;             { Atom (Fixed f) }
+ | f = floatlit;             { Atom (Floating f) }
+ | b = BOOLIT;               { Atom (Boolean b) }
+ | f = figurative_constant;  { Atom (Fig f) }
+ | a = alphanum;             { Atom (Alphanum a) }
+
+let length_of_expression :=
+  | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
 
 (* ---------- Conditions ---------- *)
 

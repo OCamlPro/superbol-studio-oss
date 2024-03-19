@@ -1391,10 +1391,16 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_unstring_delimiters) -> ""
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_unlock_statement) -> "unlock_statement"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_unconditional_action) -> "unconditional_action"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_unary__atomic_no_all_atomic_no_all_) -> "unary__atomic_no_all_atomic_no_all_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_unary__atomic_atomic_) -> "unary__atomic_atomic_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_typedef_clause) -> "typedef_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_transform_statement) -> "transform_statement"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_then_replacing) -> "then_replacing"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_terminate_statement) -> "terminate_statement"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_term__factor__atomic_no_leftmost_length__factor_atomic_atomic__) -> "term__factor__atomic_no_leftmost_length__factor_atomic_atomic__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_term__factor__atomic_no_all__factor_atomic_atomic__) -> "term__factor__atomic_no_all__factor_atomic_atomic__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_term__factor_atomic_no_all_atomic_no_all__factor_atomic_no_all_atomic_no_all__) -> "term__factor_atomic_no_all_atomic_no_all__factor_atomic_no_all_atomic_no_all__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_term__factor_atomic_atomic__factor_atomic_atomic__) -> "term__factor_atomic_atomic__factor_atomic_atomic__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_tallying_for) -> "tallying_for"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_tallying) -> "tallying"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_synchronized_clause) -> "synchronized_clause"
@@ -2059,6 +2065,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_line_header) -> "line_header"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_linage_header) -> "linage_header"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_linage_clause) -> "linage_clause"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_length_of_expression) -> "length_of_expression"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_lc_all_or_default) -> "lc_all_or_default"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_label_clause) -> "label_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_l_pf_AFTER_loc_varying_phrase___) -> ""
@@ -2144,18 +2151,18 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factory_paragraph) -> "factory_paragraph"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factory_identification) -> "factory_identification"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factory_definition) -> "factory_definition"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factor__unary__atomic_no_all_atomic_no_all__) -> "factor__unary__atomic_no_all_atomic_no_all__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factor__unary__atomic_atomic__) -> "factor__unary__atomic_atomic__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factor__atomic_no_leftmost_length_) -> "factor__atomic_no_leftmost_length_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_factor__atomic_no_all_) -> "factor__atomic_no_all_"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_external_clause) -> "external_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_extended_condition) -> "extended_condition"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop) -> "<expression>"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_no_all) -> "<expression>"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression_no_leftmost_length) -> "expression_no_leftmost_length"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expression) -> "<expression>"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_unary) -> "expr_unary"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_term_par_unop) -> "expr_term_par_unop"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_term_no_all) -> "expr_term_no_all"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_term) -> "expr_term"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_factor_par_unop) -> "expr_factor_par_unop"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_factor_no_all) -> "expr_factor_no_all"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr_factor) -> "expr_factor"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr__term__factor__atomic_no_leftmost_length__factor_atomic_atomic___term_atomic__) -> "expr__term__factor__atomic_no_leftmost_length__factor_atomic_atomic___term_atomic__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr__term__factor__atomic_no_all__factor_atomic_atomic___term_atomic__) -> "expr__term__factor__atomic_no_all__factor_atomic_atomic___term_atomic__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr__term_atomic_no_all__term_atomic_no_all__) -> "expr__term_atomic_no_all__term_atomic_no_all__"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expr__term_atomic__term_atomic__) -> "expr__term_atomic__term_atomic__"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_expands_phrase) -> "expands_phrase"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_exit_statement) -> "exit_statement"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_exit_spec) -> "exit_spec"
@@ -2302,12 +2309,17 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_blank_when_zero_clause) -> "blank_when_zero_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_blank_clause) -> "blank_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_based_clause) -> "based_clause"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic_expression_no_all) -> "<atomic expression>"
-  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic_expression) -> "<atomic expression>"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic_no_leftmost_length) -> "<atomic expression>"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic_no_all) -> "<atomic expression>"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_no_length_expression_) -> "atomic__arithmetic_term_no_length_expression_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_no_all_expression_no_all_) -> "atomic__arithmetic_term_no_all_expression_no_all_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_expression_) -> "atomic__arithmetic_term_expression_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_atomic) -> "<atomic expression>"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_at_eop) -> "at_eop"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_at_end) -> "at_end"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_assign_clause) -> "assign_clause"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_as__strlit_) -> "as__strlit_"
+  | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term_no_length) -> "arithmetic_term_no_length"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term_no_all) -> "arithmetic_term_no_all"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term) -> "arithmetic_term"
   | MenhirInterpreter.X (MenhirInterpreter.N MenhirInterpreter.N_arithmetic_mode) -> "arithmetic_mode"
@@ -3723,10 +3735,16 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_unstring_delimiters -> (fun _ -> "")
   | MenhirInterpreter.N MenhirInterpreter.N_unlock_statement -> (fun _ -> "unlock_statement")
   | MenhirInterpreter.N MenhirInterpreter.N_unconditional_action -> (fun _ -> "unconditional_action")
+  | MenhirInterpreter.N MenhirInterpreter.N_unary__atomic_no_all_atomic_no_all_ -> (fun _ -> "unary__atomic_no_all_atomic_no_all_")
+  | MenhirInterpreter.N MenhirInterpreter.N_unary__atomic_atomic_ -> (fun _ -> "unary__atomic_atomic_")
   | MenhirInterpreter.N MenhirInterpreter.N_typedef_clause -> (fun _ -> "typedef_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_transform_statement -> (fun _ -> "transform_statement")
   | MenhirInterpreter.N MenhirInterpreter.N_then_replacing -> (fun _ -> "then_replacing")
   | MenhirInterpreter.N MenhirInterpreter.N_terminate_statement -> (fun _ -> "terminate_statement")
+  | MenhirInterpreter.N MenhirInterpreter.N_term__factor__atomic_no_leftmost_length__factor_atomic_atomic__ -> (fun _ -> "term__factor__atomic_no_leftmost_length__factor_atomic_atomic__")
+  | MenhirInterpreter.N MenhirInterpreter.N_term__factor__atomic_no_all__factor_atomic_atomic__ -> (fun _ -> "term__factor__atomic_no_all__factor_atomic_atomic__")
+  | MenhirInterpreter.N MenhirInterpreter.N_term__factor_atomic_no_all_atomic_no_all__factor_atomic_no_all_atomic_no_all__ -> (fun _ -> "term__factor_atomic_no_all_atomic_no_all__factor_atomic_no_all_atomic_no_all__")
+  | MenhirInterpreter.N MenhirInterpreter.N_term__factor_atomic_atomic__factor_atomic_atomic__ -> (fun _ -> "term__factor_atomic_atomic__factor_atomic_atomic__")
   | MenhirInterpreter.N MenhirInterpreter.N_tallying_for -> (fun _ -> "tallying_for")
   | MenhirInterpreter.N MenhirInterpreter.N_tallying -> (fun _ -> "tallying")
   | MenhirInterpreter.N MenhirInterpreter.N_synchronized_clause -> (fun _ -> "synchronized_clause")
@@ -4391,6 +4409,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_line_header -> (fun _ -> "line_header")
   | MenhirInterpreter.N MenhirInterpreter.N_linage_header -> (fun _ -> "linage_header")
   | MenhirInterpreter.N MenhirInterpreter.N_linage_clause -> (fun _ -> "linage_clause")
+  | MenhirInterpreter.N MenhirInterpreter.N_length_of_expression -> (fun _ -> "length_of_expression")
   | MenhirInterpreter.N MenhirInterpreter.N_lc_all_or_default -> (fun _ -> "lc_all_or_default")
   | MenhirInterpreter.N MenhirInterpreter.N_label_clause -> (fun _ -> "label_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_l_pf_AFTER_loc_varying_phrase___ -> (fun _ -> "")
@@ -4476,18 +4495,18 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_factory_paragraph -> (fun _ -> "factory_paragraph")
   | MenhirInterpreter.N MenhirInterpreter.N_factory_identification -> (fun _ -> "factory_identification")
   | MenhirInterpreter.N MenhirInterpreter.N_factory_definition -> (fun _ -> "factory_definition")
+  | MenhirInterpreter.N MenhirInterpreter.N_factor__unary__atomic_no_all_atomic_no_all__ -> (fun _ -> "factor__unary__atomic_no_all_atomic_no_all__")
+  | MenhirInterpreter.N MenhirInterpreter.N_factor__unary__atomic_atomic__ -> (fun _ -> "factor__unary__atomic_atomic__")
+  | MenhirInterpreter.N MenhirInterpreter.N_factor__atomic_no_leftmost_length_ -> (fun _ -> "factor__atomic_no_leftmost_length_")
+  | MenhirInterpreter.N MenhirInterpreter.N_factor__atomic_no_all_ -> (fun _ -> "factor__atomic_no_all_")
   | MenhirInterpreter.N MenhirInterpreter.N_external_clause -> (fun _ -> "external_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_extended_condition -> (fun _ -> "extended_condition")
-  | MenhirInterpreter.N MenhirInterpreter.N_expression_par_unop -> (fun _ -> "<expression>")
-  | MenhirInterpreter.N MenhirInterpreter.N_expression_no_all -> (fun _ -> "<expression>")
+  | MenhirInterpreter.N MenhirInterpreter.N_expression_no_leftmost_length -> (fun _ -> "expression_no_leftmost_length")
   | MenhirInterpreter.N MenhirInterpreter.N_expression -> (fun _ -> "<expression>")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_unary -> (fun _ -> "expr_unary")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_term_par_unop -> (fun _ -> "expr_term_par_unop")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_term_no_all -> (fun _ -> "expr_term_no_all")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_term -> (fun _ -> "expr_term")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_factor_par_unop -> (fun _ -> "expr_factor_par_unop")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_factor_no_all -> (fun _ -> "expr_factor_no_all")
-  | MenhirInterpreter.N MenhirInterpreter.N_expr_factor -> (fun _ -> "expr_factor")
+  | MenhirInterpreter.N MenhirInterpreter.N_expr__term__factor__atomic_no_leftmost_length__factor_atomic_atomic___term_atomic__ -> (fun _ -> "expr__term__factor__atomic_no_leftmost_length__factor_atomic_atomic___term_atomic__")
+  | MenhirInterpreter.N MenhirInterpreter.N_expr__term__factor__atomic_no_all__factor_atomic_atomic___term_atomic__ -> (fun _ -> "expr__term__factor__atomic_no_all__factor_atomic_atomic___term_atomic__")
+  | MenhirInterpreter.N MenhirInterpreter.N_expr__term_atomic_no_all__term_atomic_no_all__ -> (fun _ -> "expr__term_atomic_no_all__term_atomic_no_all__")
+  | MenhirInterpreter.N MenhirInterpreter.N_expr__term_atomic__term_atomic__ -> (fun _ -> "expr__term_atomic__term_atomic__")
   | MenhirInterpreter.N MenhirInterpreter.N_expands_phrase -> (fun _ -> "expands_phrase")
   | MenhirInterpreter.N MenhirInterpreter.N_exit_statement -> (fun _ -> "exit_statement")
   | MenhirInterpreter.N MenhirInterpreter.N_exit_spec -> (fun _ -> "exit_spec")
@@ -4634,12 +4653,17 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.N MenhirInterpreter.N_blank_when_zero_clause -> (fun _ -> "blank_when_zero_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_blank_clause -> (fun _ -> "blank_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_based_clause -> (fun _ -> "based_clause")
-  | MenhirInterpreter.N MenhirInterpreter.N_atomic_expression_no_all -> (fun _ -> "<atomic expression>")
-  | MenhirInterpreter.N MenhirInterpreter.N_atomic_expression -> (fun _ -> "<atomic expression>")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic_no_leftmost_length -> (fun _ -> "<atomic expression>")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic_no_all -> (fun _ -> "<atomic expression>")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_no_length_expression_ -> (fun _ -> "atomic__arithmetic_term_no_length_expression_")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_no_all_expression_no_all_ -> (fun _ -> "atomic__arithmetic_term_no_all_expression_no_all_")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic__arithmetic_term_expression_ -> (fun _ -> "atomic__arithmetic_term_expression_")
+  | MenhirInterpreter.N MenhirInterpreter.N_atomic -> (fun _ -> "<atomic expression>")
   | MenhirInterpreter.N MenhirInterpreter.N_at_eop -> (fun _ -> "at_eop")
   | MenhirInterpreter.N MenhirInterpreter.N_at_end -> (fun _ -> "at_end")
   | MenhirInterpreter.N MenhirInterpreter.N_assign_clause -> (fun _ -> "assign_clause")
   | MenhirInterpreter.N MenhirInterpreter.N_as__strlit_ -> (fun _ -> "as__strlit_")
+  | MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term_no_length -> (fun _ -> "arithmetic_term_no_length")
   | MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term_no_all -> (fun _ -> "arithmetic_term_no_all")
   | MenhirInterpreter.N MenhirInterpreter.N_arithmetic_term -> (fun _ -> "arithmetic_term")
   | MenhirInterpreter.N MenhirInterpreter.N_arithmetic_mode -> (fun _ -> "arithmetic_mode")

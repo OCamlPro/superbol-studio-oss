@@ -440,16 +440,6 @@ run_extensions.at-445-prog.cob:79.37-79.43:
   81              END-IF
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:86.14-86.20:
-  83                 DISPLAY "Length 4 " I-LEN
-  84                 END-DISPLAY
-  85              END-IF
-  86 >            IF LENGTH OF L + 2 NOT = 8
-----                 ^^^^^^
-  87                 ADD 2 TO LENGTH OF L GIVING L
-  88                 DISPLAY "Length 5 + 2" L
->> Error: Invalid syntax
-
 run_extensions.at-445-prog.cob:87.23-87.29:
   84                 END-DISPLAY
   85              END-IF
@@ -458,16 +448,6 @@ run_extensions.at-445-prog.cob:87.23-87.29:
 ----                          ^^^^^^
   88                 DISPLAY "Length 5 + 2" L
   89                 END-DISPLAY
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:91.14-91.20:
-  88                 DISPLAY "Length 5 + 2" L
-  89                 END-DISPLAY
-  90              END-IF
-  91 >            IF LENGTH L + 2 NOT = 8
-----                 ^^^^^^
-  92                 ADD 2 TO LENGTH L GIVING L
-  93                 DISPLAY "Length 5a + 2 " L
 >> Error: Invalid syntax
 
 run_extensions.at-445-prog.cob:92.23-92.29:
@@ -500,6 +480,16 @@ run_extensions.at-445-prog.cob:100.19-100.25:
  102              END-PERFORM
 >> Error: Invalid syntax
 
+run_extensions.at-445-prog.cob:109.33:
+ 106              END-IF
+ 107              MOVE 0 TO L
+ 108              PERFORM VARME
+ 109 >                    VARYING I FROM LENGTH OF I
+----                                    ^
+ 110                                BY   LENGTH OF X
+ 111                      UNTIL   I > LENGTH OF L
+>> Hint: Missing <identifier> UNTIL
+
 run_extensions.at-445-prog.cob:109.34-109.40:
  106              END-IF
  107              MOVE 0 TO L
@@ -510,25 +500,85 @@ run_extensions.at-445-prog.cob:109.34-109.40:
  111                      UNTIL   I > LENGTH OF L
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:110.34-110.40:
+run_extensions.at-445-prog.cob:110.29-110.31:
  107              MOVE 0 TO L
  108              PERFORM VARME
  109                      VARYING I FROM LENGTH OF I
  110 >                              BY   LENGTH OF X
-----                                     ^^^^^^
+----                                ^^
  111                      UNTIL   I > LENGTH OF L
  112              IF ((L NOT = 3) OR
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:111.31-111.37:
+run_extensions.at-445-prog.cob:110.45:
+ 107              MOVE 0 TO L
+ 108              PERFORM VARME
+ 109                      VARYING I FROM LENGTH OF I
+ 110 >                              BY   LENGTH OF X
+----                                                ^
+ 111                      UNTIL   I > LENGTH OF L
+ 112              IF ((L NOT = 3) OR
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:111.19-111.24:
  108              PERFORM VARME
  109                      VARYING I FROM LENGTH OF I
  110                                BY   LENGTH OF X
  111 >                    UNTIL   I > LENGTH OF L
-----                                  ^^^^^^
+----                      ^^^^^
  112              IF ((L NOT = 3) OR
  113                  (I NOT = 8)    )
 >> Error: Invalid syntax
+
+run_extensions.at-445-prog.cob:111.28:
+ 108              PERFORM VARME
+ 109                      VARYING I FROM LENGTH OF I
+ 110                                BY   LENGTH OF X
+ 111 >                    UNTIL   I > LENGTH OF L
+----                               ^
+ 112              IF ((L NOT = 3) OR
+ 113                  (I NOT = 8)    )
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:111.29-111.30:
+ 108              PERFORM VARME
+ 109                      VARYING I FROM LENGTH OF I
+ 110                                BY   LENGTH OF X
+ 111 >                    UNTIL   I > LENGTH OF L
+----                                ^
+ 112              IF ((L NOT = 3) OR
+ 113                  (I NOT = 8)    )
+>> Warning: Invalid syntax
+
+run_extensions.at-445-prog.cob:111.42:
+ 108              PERFORM VARME
+ 109                      VARYING I FROM LENGTH OF I
+ 110                                BY   LENGTH OF X
+ 111 >                    UNTIL   I > LENGTH OF L
+----                                             ^
+ 112              IF ((L NOT = 3) OR
+ 113                  (I NOT = 8)    )
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:112.11-112.13:
+ 109                      VARYING I FROM LENGTH OF I
+ 110                                BY   LENGTH OF X
+ 111                      UNTIL   I > LENGTH OF L
+ 112 >            IF ((L NOT = 3) OR
+----              ^^
+ 113                  (I NOT = 8)    )
+ 114                 DISPLAY "Length 7 " L " - " I
+>> Warning: Invalid syntax
+
+run_extensions.at-445-prog.cob:119.33:
+ 116              END-IF
+ 117              MOVE 0 TO L
+ 118              PERFORM VARME
+ 119 >                    VARYING I FROM LENGTH I
+----                                    ^
+ 120                                BY   LENGTH X
+ 121                      UNTIL   I > LENGTH L
+>> Hint: Missing <identifier> UNTIL
 
 run_extensions.at-445-prog.cob:119.34-119.40:
  116              END-IF
@@ -540,25 +590,75 @@ run_extensions.at-445-prog.cob:119.34-119.40:
  121                      UNTIL   I > LENGTH L
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:120.34-120.40:
+run_extensions.at-445-prog.cob:120.29-120.31:
  117              MOVE 0 TO L
  118              PERFORM VARME
  119                      VARYING I FROM LENGTH I
  120 >                              BY   LENGTH X
-----                                     ^^^^^^
+----                                ^^
  121                      UNTIL   I > LENGTH L
  122              IF ((L NOT = 3) OR
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:121.31-121.37:
+run_extensions.at-445-prog.cob:120.42:
+ 117              MOVE 0 TO L
+ 118              PERFORM VARME
+ 119                      VARYING I FROM LENGTH I
+ 120 >                              BY   LENGTH X
+----                                             ^
+ 121                      UNTIL   I > LENGTH L
+ 122              IF ((L NOT = 3) OR
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:121.19-121.24:
  118              PERFORM VARME
  119                      VARYING I FROM LENGTH I
  120                                BY   LENGTH X
  121 >                    UNTIL   I > LENGTH L
-----                                  ^^^^^^
+----                      ^^^^^
  122              IF ((L NOT = 3) OR
  123                  (I NOT = 8)    )
 >> Error: Invalid syntax
+
+run_extensions.at-445-prog.cob:121.28:
+ 118              PERFORM VARME
+ 119                      VARYING I FROM LENGTH I
+ 120                                BY   LENGTH X
+ 121 >                    UNTIL   I > LENGTH L
+----                               ^
+ 122              IF ((L NOT = 3) OR
+ 123                  (I NOT = 8)    )
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:121.29-121.30:
+ 118              PERFORM VARME
+ 119                      VARYING I FROM LENGTH I
+ 120                                BY   LENGTH X
+ 121 >                    UNTIL   I > LENGTH L
+----                                ^
+ 122              IF ((L NOT = 3) OR
+ 123                  (I NOT = 8)    )
+>> Warning: Invalid syntax
+
+run_extensions.at-445-prog.cob:121.39:
+ 118              PERFORM VARME
+ 119                      VARYING I FROM LENGTH I
+ 120                                BY   LENGTH X
+ 121 >                    UNTIL   I > LENGTH L
+----                                          ^
+ 122              IF ((L NOT = 3) OR
+ 123                  (I NOT = 8)    )
+>> Hint: Missing .
+
+run_extensions.at-445-prog.cob:122.11-122.13:
+ 119                      VARYING I FROM LENGTH I
+ 120                                BY   LENGTH X
+ 121                      UNTIL   I > LENGTH L
+ 122 >            IF ((L NOT = 3) OR
+----              ^^
+ 123                  (I NOT = 8)    )
+ 124                 DISPLAY "Length 7a " L " - " I
+>> Warning: Invalid syntax
 
 run_extensions.at-445-prog.cob:127.16-127.22:
  124                 DISPLAY "Length 7a " L " - " I
@@ -778,46 +878,6 @@ run_extensions.at-1034-ALLOC.cob:18.35-18.44:
   20                 04  T2      PIC X(8).
 >> Error: Invalid syntax
 
-run_extensions.at-1034-ALLOC.cob:69.35-69.41:
-  66           ALLOC-VARGRP.
-  67   
-  68              If VPTR = NULL Then      *> If first time, allocate the table
-  69 >              COMPUTE SIZE-NEEDED = LENGTH OF OBJ +
-----                                      ^^^^^^
-  70                                    LENGTH OF VARTAB * NUM-ELEMENTS
-  71                display 'First allocation, using ' size-needed ' bytes.'
->> Error: Invalid syntax
-
-run_extensions.at-1034-ALLOC.cob:70.33-70.39:
-  67   
-  68              If VPTR = NULL Then      *> If first time, allocate the table
-  69                COMPUTE SIZE-NEEDED = LENGTH OF OBJ +
-  70 >                                  LENGTH OF VARTAB * NUM-ELEMENTS
-----                                    ^^^^^^
-  71                display 'First allocation, using ' size-needed ' bytes.'
-  72                ALLOCATE SIZE-NEEDED CHARACTERS INITIALIZED RETURNING VPTR
->> Error: Invalid syntax
-
-run_extensions.at-1034-ALLOC.cob:89.35-89.41:
-  86         *********************************************************************
-  87         * Calculate new size from NUM-ElEMENTS
-  88         *********************************************************************
-  89 >              COMPUTE SIZE-NEEDED = LENGTH OF OBJ +
-----                                      ^^^^^^
-  90                                      LENGTH OF VARTAB * NUM-ELEMENTS
-  91   
->> Error: Invalid syntax
-
-run_extensions.at-1034-ALLOC.cob:90.35-90.41:
-  87         * Calculate new size from NUM-ElEMENTS
-  88         *********************************************************************
-  89                COMPUTE SIZE-NEEDED = LENGTH OF OBJ +
-  90 >                                    LENGTH OF VARTAB * NUM-ELEMENTS
-----                                      ^^^^^^
-  91   
-  92                display 'Re-allocation, using ' size-needed ' bytes.'
->> Error: Invalid syntax
-
 run_extensions.at-1034-ALLOC.cob:95.59:
   92                display 'Re-allocation, using ' size-needed ' bytes.'
   93         *>     ALLOCATE SIZE-NEEDED CHARACTERS INITIALIZED RETURNING VPTR
@@ -999,36 +1059,6 @@ run_extensions.at-1142-prog.cob:15.36-15.45:
   17                  05 col1  PIC X.
 >> Error: Invalid syntax
 
-run_extensions.at-1142-prog.cob:21.19:
-  18                  05 col2  PIC X(02).
-  19   
-  20          PROCEDURE DIVISION.
-  21 >            ALLOCATE LENGTH OF prefix CHARACTERS
-----                      ^
-  22                       RETURNING p
-  23              SET ADDRESS OF a-table TO p
->> Hint: Missing <word>
-
-run_extensions.at-1142-prog.cob:21.20-21.26:
-  18                  05 col2  PIC X(02).
-  19   
-  20          PROCEDURE DIVISION.
-  21 >            ALLOCATE LENGTH OF prefix CHARACTERS
-----                       ^^^^^^
-  22                       RETURNING p
-  23              SET ADDRESS OF a-table TO p
->> Error: Invalid syntax
-
-run_extensions.at-1142-prog.cob:34.14-34.20:
-  31   
-  32              INITIALIZE prefix ALL TO VALUE
-  33   
-  34 >            IF LENGTH OF a-table NOT = 372
-----                 ^^^^^^
-  35                 MOVE LENGTH OF a-table TO dlen
-  36                 DISPLAY "BAD SIZE: " dlen.
->> Error: Invalid syntax
-
 run_extensions.at-1142-prog.cob:35.19-35.25:
   32              INITIALIZE prefix ALL TO VALUE
   33   
@@ -1037,16 +1067,6 @@ run_extensions.at-1142-prog.cob:35.19-35.25:
 ----                      ^^^^^^
   36                 DISPLAY "BAD SIZE: " dlen.
   37   
->> Error: Invalid syntax
-
-run_extensions.at-1142-prog.cob:47.43-47.49:
-  44   
-  45         *> check if ref-mod also works as expected
-  46              MOVE 2 TO n
-  47 >            MOVE ALL ZEROES TO a-table (1: (LENGTH OF a-table))
-----                                              ^^^^^^
-  48              MOVE 7 TO n
-  49              IF rows(2) NOT = "000"
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1235:0
@@ -1666,16 +1686,6 @@ run_extensions.at-2086-callee64.c:9.6-9.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2060:0
-run_extensions.at-2060-caller.cob:25.41-25.47:
-  22   
-  23              CALL CALL-NAME USING BY VALUE ADR-BUFFER
-  24   
-  25 >            CALL CALL-NAME USING BY VALUE LENGTH OF SOME-FILL
-----                                            ^^^^^^
-  26   
-  27              MOVE -42 TO ADR-BUFFER
->> Error: Invalid syntax
-
 run_extensions.at-2060-caller.cob:33.42-33.46:
   30              CALL "callee64" USING BY VALUE BIG-BUFF
   31         >> ELSE
@@ -2085,16 +2095,6 @@ run_extensions.at-3066-prog.cob:48.19-48.25:
   50                 DISPLAY "Test 5 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:51.14-51.20:
-  48              MOVE    LENGTH OF XMAIN0502   TO Z.
-  49              IF Z NOT = 5
-  50                 DISPLAY "Test 5 " Z.
-  51 >            IF LENGTH OF USE-FIRST  NOT = 33211
-----                 ^^^^^^
-  52                 DISPLAY LENGTH OF USE-FIRST   END-DISPLAY.
-  53              IF LENGTH OF USE-SECOND NOT = 27241
->> Error: Invalid syntax
-
 run_extensions.at-3066-prog.cob:52.22-52.28:
   49              IF Z NOT = 5
   50                 DISPLAY "Test 5 " Z.
@@ -2103,16 +2103,6 @@ run_extensions.at-3066-prog.cob:52.22-52.28:
 ----                         ^^^^^^
   53              IF LENGTH OF USE-SECOND NOT = 27241
   54                 DISPLAY LENGTH OF USE-SECOND  END-DISPLAY.
->> Error: Invalid syntax
-
-run_extensions.at-3066-prog.cob:53.14-53.20:
-  50                 DISPLAY "Test 5 " Z.
-  51              IF LENGTH OF USE-FIRST  NOT = 33211
-  52                 DISPLAY LENGTH OF USE-FIRST   END-DISPLAY.
-  53 >            IF LENGTH OF USE-SECOND NOT = 27241
-----                 ^^^^^^
-  54                 DISPLAY LENGTH OF USE-SECOND  END-DISPLAY.
-  55              STOP RUN.
 >> Error: Invalid syntax
 
 run_extensions.at-3066-prog.cob:54.22-54.28:
@@ -2169,93 +2159,13 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3429:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3454:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3479:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3506:0
-run_extensions.at-3506-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE X"01010101".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_OR" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3533:0
-run_extensions.at-3533-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE X"05050505".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_NOR" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = X"F8F8F8F8"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3560:0
-run_extensions.at-3560-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE "5555".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_AND" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3587:0
-run_extensions.at-3587-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE X"02020202".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_XOR" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3614:0
-run_extensions.at-3614-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE "1111".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_IMP" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3641:0
-run_extensions.at-3641-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE LOW-VALUE.
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_NIMP" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3667:0
-run_extensions.at-3667-prog.cob:9.25-9.31:
-   6          01  X            PIC X(4) VALUE HIGH-VALUE.
-   7          PROCEDURE        DIVISION.
-   8              CALL "CBL_NOT" USING X
-   9 >                 BY VALUE LENGTH OF X
-----                            ^^^^^^
-  10              END-CALL.
-  11              IF X NOT = LOW-VALUE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3694:0
-run_extensions.at-3694-prog.cob:10.25-10.31:
-   7          01  Z            PIC X(4) VALUE "1111".
-   8          PROCEDURE        DIVISION.
-   9              CALL "CBL_EQ" USING X Z
-  10 >                 BY VALUE LENGTH OF Z
-----                            ^^^^^^
-  11              END-CALL.
-  12              IF Z NOT = "1111"
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4117:0
 run_extensions.at-4117-prog.cob:11.53:
    8                   05 OPTIONRECORD OCCURS 2 TIMES.
@@ -4634,16 +4544,6 @@ run_extensions.at-5599-prog.cob:18.19-18.34:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5732:0
-run_extensions.at-5732-prog.cob:77.27-77.33:
-  74                 PERFORM SHOW-VARS
-  75              END-IF
-  76              MOVE 1 TO LGX
-  77 >            COMPUTE W-LEN = LENGTH OF X-DAT
-----                              ^^^^^^
-  78              IF W-LEN NOT EQUAL 10
-  79                 DISPLAY "UNEXPECTED RESULT FOR 'LENGTH OF X-DAT': "
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5786:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5757:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5865:0

@@ -175,6 +175,7 @@ and fold_ident (v: _ #folder) =
       | Counter c -> fold_counter v c
       | InlineCall fi -> fold_inline_call v fi
       | InlineInvoke ii -> fold_inline_invocation v ii
+      | LengthOf ii -> fold_ident_or_literal v ii
       | ObjectView ov -> fold_object_view v ov
       | ObjectRef po -> fold_object_ref v po
       | QualIdent qi -> fold_qualident v qi
@@ -285,6 +286,7 @@ and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = functi
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
@@ -384,6 +386,7 @@ let fold_ident_or_alphanum (v: _ #folder) : ident_or_alphanum -> 'a -> 'a = func
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
@@ -394,6 +397,7 @@ let fold_ident_or_intlit (v: _ #folder) : ident_or_intlit -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
@@ -405,6 +409,7 @@ let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
@@ -417,6 +422,7 @@ let fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
@@ -433,6 +439,7 @@ let fold_ident_or_strlit (v: _ #folder) : ident_or_strlit -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
+  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
