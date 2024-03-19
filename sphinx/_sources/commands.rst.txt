@@ -96,6 +96,8 @@ Where options are:
 
 * :code:`FILE`   Cobol file to check
 
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
+
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
@@ -239,6 +241,8 @@ Where options are:
 
 * :code:`FILES`   Cobol files to indent
 
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
+
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
@@ -352,6 +356,8 @@ Where options are:
 
 
 * :code:`FILE`   Cobol file to preprocess
+
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
