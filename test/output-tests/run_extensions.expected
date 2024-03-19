@@ -2923,27 +2923,7 @@ run_extensions.at-4892-prog.cob:14.7-14.8:
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4921:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4946:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4974:0
-run_extensions.at-4974-prog.cob:10.7-10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Error: Malformed compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5000:0
-run_extensions.at-5000-prog.cob:10.7-10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  11          >>ELSE
-  12              DISPLAY "NOTOK" NO ADVANCING
->> Error: Malformed compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5065:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5049:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5101:0

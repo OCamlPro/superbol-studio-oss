@@ -135,8 +135,8 @@ _out/superbol-vscode-gdb.js:					\
 gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 	@mkdir -p $@
 	rm -r -f $@/*.*
-	find $(GNUCOBOL_SRCDIR)/config -type f		\
-		-a -regex '.*.\(conf\|words\|ttbl\)' -print0 |	\
+	find $(GNUCOBOL_SRCDIR)/config -type f					\
+		-a -regex '.*.\(conf\|conf-inc\|words\|ttbl\)' -print0 |	\
 		xargs -0 cp -f -t $@
 
 vsix-dist-setup:

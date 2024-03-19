@@ -178,7 +178,7 @@ let if_ :=
     { If c }
 
 let elif_directive :=
-  | CDIR_ELIF; ~ = elif; EOL; < >
+  | ~ = elif; EOL; < >
 
 let elif :=
   | c = loc(boolexpr);

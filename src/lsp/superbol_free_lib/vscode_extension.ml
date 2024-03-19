@@ -373,9 +373,8 @@ let contributes =
                            numerics)."
              ~order:31;
 
-           Manifest.PROPERTY.string "superbol.debugger.libcob-path"
+           Manifest.PROPERTY.null_string "superbol.debugger.libcob-path"
              ~title:"GnuCOBOL Runtime Library"
-             ~default:"cobc"
              ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL runtime library file."
              ~order:32;

@@ -3991,16 +3991,6 @@ listings.at-2762-prog.cob:34.32-34.41:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2848:0
-listings.at-2848-prog.cob:10.7-10.31:
-   7          >>IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >        >>ELIF ACTIVATE2 DEFINED
-----          ^^^^^^^^^^^^^^^^^^^^^^^^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Error: Malformed compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2876:0
 listings.at-2876-prog2.cob:7.6-7.26:
    4          DATA             DIVISION.

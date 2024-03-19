@@ -137,8 +137,10 @@
         },
         "superbol.debugger.libcob-path": {
           "title": "GnuCOBOL Runtime Library",
-          "type": "string",
-          "default": "cobc",
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "Path to the GnuCOBOL runtime library file.",
           "scope": "machine-overridable",
           "order": 32
