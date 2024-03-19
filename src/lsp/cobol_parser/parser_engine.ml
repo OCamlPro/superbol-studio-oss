@@ -11,12 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module DIAGS = Cobol_common.Diagnostics
-
 open Cobol_common.Types
 open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)
+
+module OUT = Parser_outputs
 
 module Tokzr = Text_tokenizer
 module Overlay_manager = Grammar_utils.Overlay_manager
@@ -46,13 +46,13 @@ and position =
 type 'm simple_parsing
   = ?options:parser_options
   -> Cobol_preproc.preprocessor
-  -> (Cobol_ptree.compilation_group option, 'm) output DIAGS.with_diags
+  -> (Cobol_ptree.compilation_group option, 'm) output with_diags
 
 type 'm rewindable_parsing
   = ?options:parser_options
   -> Cobol_preproc.preprocessor
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) *
-      'x rewinder) DIAGS.with_diags
+      'x rewinder) with_diags
 
 (* --- *)
 
@@ -78,7 +78,8 @@ type 'm state =
     basis (mostly the pre-processor and tokenizer's states). *)
 and 'm preproc =
   {
-    pp: Cobol_preproc.preprocessor;               (* also holds diagnostics *)
+    pp: Cobol_preproc.preprocessor;
+    diags: Parser_diagnostics.t;
     tokzr: 'm Tokzr.state;
     persist: 'm persist;
   }
@@ -110,6 +111,7 @@ let make_parser
     preproc =
       {
         pp;
+        diags = Parser_diagnostics.none;
         tokzr;
         persist =
           {
@@ -129,13 +131,18 @@ and update_tokzr ps tokzr =
   if tokzr == ps.preproc.tokzr then ps
   else { ps with preproc = { ps.preproc with tokzr } }
 
-let add_diag diag ({ preproc = { pp; _ }; _ } as ps) =
-  update_pp ps (Cobol_preproc.add_diag pp diag)
-let add_diags diags ({ preproc = { pp; _ }; _ } as ps) =
-  update_pp ps (Cobol_preproc.add_diags pp diags)
+let add_diag ({ preproc = ({ diags; _ } as pp); _ } as ps) severity ?loc diag =
+  let diags = Parser_diagnostics.add_diag ~severity ?loc diag diags in
+  { ps with preproc = { pp with diags } }
 
-let all_diags { preproc = { pp; tokzr; _ }; _ } =
-  DIAGS.Set.union (Cobol_preproc.diags pp) @@ Tokzr.diagnostics tokzr
+let add_exn ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
+  { ps with preproc = { pp with diags = Parser_diagnostics.add_exn e diags } }
+
+let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
+  Parser_diagnostics.ALL.{
+    parser_diags = Parser_diagnostics.union diags @@ Tokzr.diagnostics tokzr;
+    preproc_diags = Cobol_preproc.diags pp;
+  }
 
 (* --- *)
 
@@ -179,7 +186,8 @@ let put_token_back ({ preproc; _ } as ps) token tokens =
     and report on an invalid syntax error. *)
 let report_syntax_hints_n_error ps
     (assumed: Grammar_recovery.assumption list)
-    ~(report_invalid_syntax: DIAGS.severity -> (_ state as 's) -> 's)
+    ~(report_invalid_syntax:
+        Cobol_common.Diagnostics.severity -> (_ state as 's) -> 's)
     ~recovery_options
   =
   (* Gather one hint per source position of recovery assumptions, and determine
@@ -204,22 +212,21 @@ let report_syntax_hints_n_error ps
                                                       assumption was involved *)
   in
   (* Accumulate hints about missing tokens *)
-  let diags =
-    List.fold_left begin fun diags -> function
+  let ps =
+    List.fold_left begin fun ps -> function
       | None, _ ->                               (* nothing relevant to report *)
-          diags
+          ps
       | Some pp_assumed, raw_pos ->
           let loc = Overlay_manager.join_limits (raw_pos, raw_pos) in
-          DIAGS.Acc.hint diags ~loc "Missing@ %t" pp_assumed
-    end Cobol_common.Diagnostics.Set.none (List.rev hints)
+          add_diag ps Hint ~loc (Missing_tokens pp_assumed)
+    end ps (List.rev hints)
   in
-  let ps = add_diags diags ps in
   (* Generate a global error or warning if necessary *)
   if globally_benign && recovery_options.silence_benign_recoveries
   then ps
   else if globally_benign
-  then report_invalid_syntax DIAGS.Warn ps
-  else report_invalid_syntax DIAGS.Error ps
+  then report_invalid_syntax Warn ps
+  else report_invalid_syntax Error ps
 
 (* --- *)
 
@@ -265,13 +272,9 @@ let env_loc env =
   | None -> None
   | Some (Element (_, _, s, e)) -> Some (Overlay_manager.join_limits (s, e))
 
-let pending ?(severity = DIAGS.Warn) descr ps env =
-  if List.mem `Pending ps.preproc.persist.show then
-    let diag =
-      DIAGS.One.diag severity "Ignored@ %a@ (implementation@ pending)"
-        Pretty.text descr ?loc:(env_loc env)
-    in
-    add_diag diag ps
+let pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
+  if List.mem `Pending ps.preproc.persist.show
+  then add_diag ps severity ?loc:(env_loc env) (Implementation_pending descr)
   else ps
 
 let post_production ({ preproc = { tokzr; _ }; _ } as ps)
@@ -353,7 +356,7 @@ and error ps token tokens env =
   let report_invalid_syntax =
     let loc_limits = Grammar_interpr.positions env in
     let loc = Overlay_manager.join_limits loc_limits in
-    fun severity -> add_diag (DIAGS.One.diag severity ~loc "Invalid@ syntax")
+    fun severity ps -> add_diag ps severity ~loc Invalid_syntax
   in
   match ps.preproc.persist.recovery with
   | EnableRecovery recovery_options ->
@@ -387,7 +390,7 @@ and accept ps v =
   Final (Some v, ps)
 
 let on_exn ps e =
-  Final (None, add_diag (DIAGS.of_exn e) ps)
+  Final (None, add_exn ps e)
 
 (* --- *)
 
@@ -430,7 +433,7 @@ let parse_once
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
-  DIAGS.with_diags (aggregate_output ps res) (all_diags ps)
+  OUT.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
 
@@ -556,7 +559,7 @@ let rec rewind_n_parse
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
-  DIAGS.with_diags (output, { rewind_n_parse }) (all_diags ps)
+  OUT.with_diags (output, { rewind_n_parse }) (all_diags ps)
 
 let rewindable_parse
   : options:_ -> memory:'m memory -> make_checkpoint:_
@@ -571,7 +574,7 @@ let rewindable_parse
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
-  DIAGS.with_diags (output, { rewind_n_parse }) (all_diags ps)
+  OUT.with_diags (output, { rewind_n_parse }) (all_diags ps)
 
 (* --- *)
 

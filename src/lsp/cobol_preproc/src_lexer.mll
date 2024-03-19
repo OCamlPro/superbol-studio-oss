@@ -176,7 +176,7 @@ and fixed_indicator state
       }
   | (_#['\n' '\r'] as c)                                 (* unknown indicator *)
       {
-        Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
+        Src_lexing.unexpected (Indicator_char c) state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
       }
   | epsilon
@@ -263,7 +263,7 @@ and cobolx_line state                                 (* COBOLX format (GCOS) *)
       }
   | (_#['\n' '\r'] as c)                                 (* unknown indicator *)
       {
-        Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
+        Src_lexing.unexpected (Indicator_char c) state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
       }
   | cdir_word
@@ -356,7 +356,7 @@ and maybe_fixed_cdir_line c state (* we just read [c='>'] in indicator column *)
       }
   | epsilon                                              (* report error on c *)
       {
-        Src_lexing.unexpected Char ~c ~knd:"indicator" state lexbuf
+        Src_lexing.unexpected (Indicator_char c) state lexbuf
           ~k:(fun state -> fixed_nominal_line (Src_lexing.flush_continued state))
       }
 and fixed_continue_line state
@@ -378,9 +378,9 @@ and fixed_continue_line state
       }
   | nonblank_area_A
       {
-        Src_lexing.unexpected Str state lexbuf
-          ~severity:Cobol_common.Diagnostics.Warn
-          ~knd:"@[non-blank@ area@ A@ on@ continuation@ line@]"
+        Src_lexing.unexpected Non_blank_area_A_on_continuation_line
+          state lexbuf
+          ~severity:`Warn
           ~k:begin match Src_lexing.continue_quoted_alphanum state with
             | Nominal -> fixed_continue_open
             | Closed Quote -> fixed_continue_quoted
@@ -557,7 +557,7 @@ and newline_or_eof state
       }
   | nnl+
       {
-        Src_lexing.unexpected Str ~knd:"characters" state lexbuf
+        Src_lexing.unexpected Characters state lexbuf
           ~k:gobble_line
       }
 and free_newline_or_eof state
@@ -572,7 +572,7 @@ and free_newline_or_eof state
       }
   | _
       {
-        Src_lexing.unexpected Char state lexbuf ~k:free_gobble_line
+        Src_lexing.unexpected Character state lexbuf ~k:free_gobble_line
       }
 
 (* Text-word tokenizer (compiler directives) *)

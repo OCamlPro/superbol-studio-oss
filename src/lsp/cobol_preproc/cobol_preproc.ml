@@ -27,6 +27,8 @@ module Text_printer = Text_printer
 module Src_overlay = Src_overlay
 module Trace = Preproc_trace
 module Directives = Preproc_directives
+module Diagnostics = Preproc_diagnostics
+module Outputs = Preproc_outputs
 
 (** {1 Main entry points for the processor itself} *)
 

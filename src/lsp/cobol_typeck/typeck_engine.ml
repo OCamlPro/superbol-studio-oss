@@ -20,9 +20,6 @@ let compilation_group
   fun ?(config = Cobol_config.default) ->
   function
   | Only None | WithArtifacts (None, _) ->
-      Typeck_outputs.none, Typeck_diagnostics.none
+      Typeck_results.simple_result Typeck_outputs.none
   | Only Some cg | WithArtifacts (Some cg, _) ->
       Typeck_units.of_compilation_group config cg
-
-let translate_diagnostics ?(config = Cobol_config.default) (output, diags) =
-  DIAGS.result output ~diags:(Typeck_diagnostics.translate ~config diags)

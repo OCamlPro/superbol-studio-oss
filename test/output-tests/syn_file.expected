@@ -186,16 +186,6 @@ syn_file.at-1829-prog.cob:10.26-10.33:
   12          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
-syn_file.at-1829-prog.cob:10.43:
-   7              SELECT file1 ASSIGN DISK.
-   8          DATA DIVISION.
-   9          FILE SECTION.
-  10 >        FD  file1 VALUE OF FILE-ID fid-file1.
-----                                              ^
-  11          01  file1-rec PIC X.
-  12          PROCEDURE DIVISION.
->> Hint: Missing <literal>
-
 syn_file.at-1829-prog.cob:10.43-10.44:
    7              SELECT file1 ASSIGN DISK.
    8          DATA DIVISION.
@@ -205,6 +195,16 @@ syn_file.at-1829-prog.cob:10.43-10.44:
   11          01  file1-rec PIC X.
   12          PROCEDURE DIVISION.
 >> Error: Invalid syntax
+
+syn_file.at-1829-prog.cob:10.43:
+   7              SELECT file1 ASSIGN DISK.
+   8          DATA DIVISION.
+   9          FILE SECTION.
+  10 >        FD  file1 VALUE OF FILE-ID fid-file1.
+----                                              ^
+  11          01  file1-rec PIC X.
+  12          PROCEDURE DIVISION.
+>> Hint: Missing <literal>
 
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1856:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1937:0

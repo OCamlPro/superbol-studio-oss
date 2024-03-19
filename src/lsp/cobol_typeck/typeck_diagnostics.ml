@@ -32,7 +32,7 @@ type t = diagnostics
 let none: diagnostics = []
 let union d1 d2 = d2 @ d1
 
-let diagnostic_severity ~config:_ = function
+let diagnostic_severity = function
   | Config_error _
   | Data_error _
   | Proc_error _ ->
@@ -67,11 +67,11 @@ let pp_diagnostic ppf = function
   | Dialect_feature_used { feature; _ } ->
       Pretty.print ppf "%(%)@ used" feature#short
 
-let translate ~config diagnostics =
+let translate diagnostics =
   (* Temporary hack: reverse errors list so order of generated diagnostics
      corresponds to order of emission in the code below. *)
   List.fold_left begin fun diags d ->
-    match diagnostic_severity ~config d with
+    match diagnostic_severity d with
     | `Ignore ->
         diags
     | `Print s ->

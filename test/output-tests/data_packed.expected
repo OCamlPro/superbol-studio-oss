@@ -9,6 +9,16 @@ data_packed.at-47-dump.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
+data_packed.at-47-dump.c:5.7-5.8:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^
+   6   dump (unsigned char *data)
+   7   {
+>> Error: Invalid syntax
+
 data_packed.at-47-dump.c:6.6-6.7:
    3   #include <libcob.h>
    4   
@@ -57,16 +67,6 @@ data_packed.at-47-dump.c:12.6-12.7:
 ----         ^
   13   }
 >> Error: Unexpected indicator: `r'
-
-data_packed.at-47-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:203:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:432:0

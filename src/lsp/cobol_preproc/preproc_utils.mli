@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
-open Cobol_common.Diagnostics.TYPES
+open Preproc_outputs.TYPES
 
 module Make (Config: Cobol_config.T) : sig
 
@@ -21,7 +21,7 @@ module Make (Config: Cobol_config.T) : sig
     -> [< `Alphanum of Text.pseudotext
        | `PseudoText of Text.pseudotext ] Cobol_common.Srcloc.with_loc
     -> Text.pseudotext Cobol_common.Srcloc.with_loc
-    -> Preproc_directives.replacing option Cobol_common.Diagnostics.with_diags
+    -> Preproc_directives.replacing option with_diags
 
   val filter_map_4_list_with_diags'
     : 'a option with_diags with_loc list -> 'a with_loc list with_diags

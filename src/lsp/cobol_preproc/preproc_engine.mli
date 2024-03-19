@@ -27,9 +27,7 @@ val reset_preprocessor_for_string
 
 (* --- *)
 
-val diags: preprocessor -> Cobol_common.Diagnostics.Set.t
-val add_diag: preprocessor -> Cobol_common.Diagnostics.t -> preprocessor
-val add_diags: preprocessor -> Cobol_common.Diagnostics.Set.t -> preprocessor
+val diags: preprocessor -> Preproc_diagnostics.t
 val position: preprocessor -> Lexing.position
 val position_at: line:int -> char: int -> preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
@@ -46,14 +44,14 @@ val lex_input
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> Src_input.t
-  -> unit Cobol_common.Diagnostics.with_diags
+  -> unit Preproc_outputs.with_diags
 
 val lex_file
   : dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> string
-  -> unit Cobol_common.Diagnostics.with_diags
+  -> unit Preproc_outputs.with_diags
 
 val lex_lib
   : dialect: Cobol_config.dialect
@@ -61,7 +59,7 @@ val lex_lib
   -> libpath:string list
   -> ?ppf:Format.formatter
   -> Cobol_common.Copybook.fileloc
-  -> unit Cobol_common.Diagnostics.with_diags
+  -> unit Preproc_outputs.with_diags
 
 (** [fold_source_lines ~dialect ~source_format ~skip_compiler_directives_text
     ~on_compiler_directive ~on_initial_source_format ~f input acc] applies [f
@@ -92,26 +90,26 @@ val fold_source_lines
   -> f:(int -> Text.text -> 'a -> 'a)
   -> Src_input.t
   -> 'a
-  -> 'a Cobol_common.Diagnostics.with_diags
+  -> 'a Preproc_outputs.with_diags
 
 val preprocess_input
   : ?options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> Src_input.t
-  -> unit Cobol_common.Diagnostics.with_diags
+  -> unit Preproc_outputs.with_diags
 
 val preprocess_file
   : ?options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> string
-  -> unit Cobol_common.Diagnostics.with_diags
+  -> unit Preproc_outputs.with_diags
 
 val text_of_file
   : ?options: Preproc_options.preproc_options
   -> string
-  -> Text.t Cobol_common.Diagnostics.with_diags
+  -> Text.t Preproc_outputs.with_diags
 
 val text_of_input
   : ?options: Preproc_options.preproc_options
   -> Src_input.t
-  -> Text.t Cobol_common.Diagnostics.with_diags
+  -> Text.t Preproc_outputs.with_diags

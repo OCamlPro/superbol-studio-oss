@@ -26,7 +26,7 @@ open Parser_outputs
 
     The set of diagnostics attached to the result of parsing functions
     ([result.diags]) should {e always} be checked for errors upon return ({i
-    i.e,} {!Cobol_common.Diagnostics.Set.has_errors} holds).  This is in
+    i.e,} {!Parser_outputs.Diagnostics.has_errors} holds).  This is in
     particular the case when the resulting parse-tree is provided and recovery
     is enabled ([options.recovery <> DisableRecovery]), as in such a case, the
     parse-tree returned may contain dummy nodes and source locations produced by
@@ -38,8 +38,7 @@ open Parser_outputs
 type 'm simple_parsing
   = ?options:Parser_options.parser_options
   -> Cobol_preproc.preprocessor
-  -> (Cobol_ptree.compilation_group option, 'm) output
-    Cobol_common.Diagnostics.with_diags
+  -> (Cobol_ptree.compilation_group option, 'm) output with_diags
 
 (* val parse *)
 (*   : memory: 'm memory -> 'm simple_parsing *)
@@ -62,7 +61,7 @@ type 'm rewindable_parsing
   = ?options:parser_options
   -> Cobol_preproc.preprocessor
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) * 'x rewinder)
-    Cobol_common.Diagnostics.with_diags
+    with_diags
 
 (** Rewinder for parsing functions that produce results of type ['x] *)
 and 'x rewinder
@@ -106,7 +105,7 @@ val rewind_and_parse
   -> preprocessor_rewind
   -> position: position
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) * 'x rewinder)
-    Cobol_common.Diagnostics.with_diags
+    with_diags
 
 (** {1 Accessing artifacts} *)
 

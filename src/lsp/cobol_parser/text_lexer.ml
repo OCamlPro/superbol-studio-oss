@@ -16,8 +16,6 @@ open EzCompat
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-module DIAGS = Cobol_common.Diagnostics
-
 module TYPES = struct
 
   type optional_token =
@@ -208,7 +206,7 @@ let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
     | Numeric (w, Some (c, d, e)) ->
         decimal_sep w c d e
     | Unexpected c -> (* likely to be a comma; will produce syntax errors
-                         otherwise *)
+                        otherwise *)
         append (INTERVENING_ c)
   in
   aux ~loc []
@@ -229,14 +227,12 @@ let ebcdic_char i =
 
 let decode_symbolic_ebcdics' ~quotation w =
   let open Text_categorizer in
-  let acc_error ?loc fmt =
-    DIAGS.kerror
-      (fun diag (acc, diags) -> acc, DIAGS.Set.cons diag diags) ?loc fmt
-  in
+  let module ACC = Parser_diagnostics.Accumulator in
+  let acc_error e (acc, diags) = acc, Parser_diagnostics.add_error e diags in
   let symbolic_ebcdic ~loc:_ = symbolic_ebcdic
   and alphanum_string ~loc:_ = alphanum_string in
   let str, diags =
-    Cobol_common.Tokenizing.fold_tokens w ("", DIAGS.Set.none)
+    Cobol_common.Tokenizing.fold_tokens w ("", Parser_diagnostics.none)
       ~tokenizer:alphanum_string
       ~until:(function AEnd _ -> true | _ -> false)
       ~next_tokenizer:(function
@@ -247,19 +243,21 @@ let decode_symbolic_ebcdics' ~quotation w =
         | AStr (s, _) ->
             fun (acc, diags) -> acc ^ s, diags
         | AEBCDIC i when i < 1 || i > 256 ->
-            acc_error ~loc:~@t "Invalid@ symbolic@ character@ ordinal@ \
-                                (expected@ range@ is@ {1, ..., 256})"
+            acc_error @@ Unexpected { loc = ~@t;
+                                      stuff = Symbolic_EBCDIC_orginal i }
         | AEBCDIC i ->
             fun (acc, diags) -> acc ^ ebcdic_char i, diags
         | AEnd { wellformed = true } ->
             Fun.id
         | AEnd { wellformed = false } ->
-            acc_error ~loc:~@w "Malformed@ alphanumeric@ literal"
+            acc_error @@ Malformed { loc = ~@w; stuff = Alphanumeric_literal }
         | AUnexpected (c, _) ->
-            acc_error ~loc:~@t "Unexpected@ character:@ `%c'" c
+            acc_error @@ Unexpected { loc = ~@t;
+                                      stuff = Character_in_symbolic_EBCDIC c }
       end
   in
-  Grammar_tokens.ALPHANUM { str; quotation; hexadecimal = false } &@<- w, diags
+  ACC.result ~diags
+    (Grammar_tokens.ALPHANUM { str; quotation; hexadecimal = false } &@<- w)
 
 (* include Make (Text_keywords) *)
 

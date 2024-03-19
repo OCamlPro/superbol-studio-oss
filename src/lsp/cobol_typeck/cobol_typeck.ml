@@ -21,4 +21,5 @@ end
 
 module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics
+module Results = Typeck_results
 include Typeck_engine

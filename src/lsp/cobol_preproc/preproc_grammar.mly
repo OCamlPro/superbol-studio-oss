@@ -14,7 +14,6 @@
 %parameter <Overlay_manager: Src_overlay.MANAGER>
 %{
   open Cobol_common.Srcloc.INFIX
-  open Cobol_common.Diagnostics.TYPES
   module PP_UTILS = Preproc_utils.Make (CONFIG)
 %}
 
@@ -23,10 +22,10 @@
 (* Entry points *)
 
 %start <Preproc_directives.copy_statement
-          Cobol_common.Diagnostics.with_diags
+          Preproc_outputs.with_diags
           Cobol_common.Srcloc.with_loc> copy_statement
 %start <Preproc_directives.replace_statement
-          Cobol_common.Diagnostics.with_diags
+          Preproc_outputs.with_diags
           Cobol_common.Srcloc.with_loc> replace_statement
 
 %start <unit> _unused_symbols             (* <- used to supress some warnings *)
@@ -49,10 +48,11 @@ let copy_statement_ :=
     sp = copy_suppress_printing;
     replacing = copy_replacings;
     ".";
-    { let { result = replacing; diags }
+    { let Preproc_outputs.{ result = replacing; diags }
         = PP_UTILS.filter_map_4_list_with_diags' replacing in
-      { result = CDirCopy { library = l; suppress_printing = sp; replacing };
-        diags } }
+      Preproc_outputs.result ~diags @@
+        Preproc_directives.CDirCopy { library = l; suppress_printing = sp;
+                                      replacing } }
 
 let copy_lib :=
   | l = fileloc; c = pf(or_(OF, IN),fileloc)?; { { txtname = l; libname = c } }
@@ -112,11 +112,12 @@ let leading_or_trailing ==
 let replace_statement := ~ = loc(replace_statement_); EOL; < >
 let replace_statement_ :=
   | REPLACE; also = ibo(ALSO); replacing = nell(loc(copy_replacing_clause)); ".";
-    { let { result = replacing; diags }
+    { let Preproc_outputs.{ result = replacing; diags }
         = PP_UTILS.filter_map_4_list_with_diags' replacing in
-      { result = CDirReplace { also; replacing }; diags } }
+      Preproc_outputs.result ~diags @@
+        Preproc_directives.CDirReplace { also; replacing } }
   | REPLACE; last = ibo(LAST); OFF; ".";
-    { Cobol_common.Diagnostics.simple_result @@
+    { Preproc_outputs.simple_result @@
         Preproc_directives.CDirReplaceOff { last } }
 
 (* ISO/IEC 1989:2014 only allows the following clauses in "REPLACE"; however we

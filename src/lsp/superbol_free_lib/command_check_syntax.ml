@@ -24,7 +24,7 @@ let action { preproc_options; parser_options } files =
   files |>
   List.iter begin fun filename ->
     Pretty.out "@[Checking@ `%s'@]@." filename;
-    Cobol_common.Diagnostics.sink_result ~ppf:Fmt.stdout @@
+    Cobol_parser.Outputs.sink_result ~ppf:Fmt.stdout @@
     Cobol_preproc.Input.from ~filename ~f:parse;
   end
 

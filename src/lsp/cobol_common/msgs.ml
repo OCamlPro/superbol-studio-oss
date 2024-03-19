@@ -15,9 +15,6 @@ type addenda = (Pretty.delayed * Srcloc.srcloc option) list
 exception LocalizedError of Pretty.delayed * Srcloc.srcloc * addenda
 exception Error of Pretty.delayed
 
-let localized_error ?(addenda = []) (loc: Srcloc.srcloc) =
-  Pretty.delayed_to (fun s -> raise @@ LocalizedError (s, loc, addenda))
-
 let error ?loc =
   Pretty.delayed_to (fun s -> match loc with
     | None -> raise @@ Error s

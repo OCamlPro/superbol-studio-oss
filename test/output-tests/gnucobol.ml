@@ -16,8 +16,6 @@ open Autofonce_lib
 open Autofonce_config
 open Autofonce_core.Types
 
-module DIAGS = Cobol_common.Diagnostics
-
 let () =
   Cobol_common.init_default_exn_printers ();
   (* Disable backtrace recording so `OCAMLRUNPARAM=b` has no effect on the
@@ -196,11 +194,11 @@ let do_check_parse (test_filename, contents, _, { check_loc;
   try
     let input = setup_input ~filename contents in
     match parse_simple input with
-    | DIAGS.{ diags; result = Only Some _ } ->
-        DIAGS.Set.pp Fmt.stdout diags;
+    | { result = Only Some _; _ } as res ->
+        Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout res;
         terminate "ok"
-    | DIAGS.{ diags; _ } ->
-        DIAGS.Set.pp Fmt.stdout diags;
+    | res ->
+        Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout res;
         terminate "ok (with errors)"
     | exception e ->
         Pretty.out "Failure (%s)@\n%s@\n" (Printexc.to_string e) contents;

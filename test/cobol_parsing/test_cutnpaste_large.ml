@@ -17,6 +17,7 @@ open Testsuite_utils                      (* implemented in `../output-tests' *)
 
 let check_initial_ptree ~ptree0 diags =
   if ptree0 = None then begin
+    let diags = Cobol_parser.Diagnostics.ALL.translate diags in
     Pretty.out "%a@." Cobol_common.Diagnostics.Set.pp diags;
     Pretty.failwith "Unable to parse the original program.";
   end (* else Test_appending.show_ptree 0 0 ptree0 diags *)

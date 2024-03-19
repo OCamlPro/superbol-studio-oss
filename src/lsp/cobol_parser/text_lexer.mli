@@ -69,5 +69,6 @@ val tokens_of_string'
 val decode_symbolic_ebcdics'
   : quotation: Cobol_ptree.alphanum_quote
   -> string Cobol_common.Srcloc.with_loc
-  -> Grammar_tokens.token Cobol_common.Srcloc.with_loc *
-     Cobol_common.Diagnostics.Set.t
+  -> Grammar_tokens.token
+    Cobol_common.Srcloc.with_loc
+    Parser_diagnostics.Accumulator.with_diags

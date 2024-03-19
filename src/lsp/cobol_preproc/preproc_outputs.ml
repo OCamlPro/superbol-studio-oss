@@ -11,7 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val of_compilation_group
-  : Cobol_config.t
-  -> Cobol_ptree.compilation_group
-  -> Typeck_outputs.t Typeck_results.with_diags
+open Preproc_diagnostics
+
+include Cobol_common.Diagnostics_accumulator.MAKE
+    (struct
+      type t = diagnostics
+      let none = none
+      let union = union
+      let translate = translate
+    end)
+
+let of_config_verif (c: 'a Cobol_config.FEATURE.verification_result) =
+  match Cobol_config.DIAG.decompose_verification_result c with
+  | result, Some Error e ->
+      { result; diags = add_error (Feature_error e) none }
+  | result, Some Warning w ->
+      { result; diags = add_warning (Feature_warning w) none }
+  | result, None ->
+      { result; diags = none }
+
+let error_result result e = { result; diags = add_error e none }

@@ -14,9 +14,6 @@
 (** Module containing most of the types definitions used in {!Cobol_config}. *)
 
 open EzCompat
-open Cobol_common.Diagnostics.TYPES
-
-module DIAGS = Cobol_common.Diagnostics
 
 type doc = Pretty.simple
 
@@ -123,39 +120,69 @@ module FEATURE = struct
         | Unconformable -> Unconformable
     end
 
+  type 'a verification_result =
+    ('a *
+     (Cobol_common.srcloc * 'a support_level configurable *
+      ([`Archaic of configuration | `Obsolete of configuration | `Used ]))
+       option,
+     (Cobol_common.srcloc * 'a support_level configurable *
+      ([`Ignored | `Unconformable of configuration | `Used ])) option)
+      result
+
   (** Internal representation of a binding from a feature and a support
       level. *)
   class ['a] support feature ~config level =
-    object (self)
+    object (* (self) *)
       val feature: 'a support_level configurable = feature
       val level: 'a support_level = level
-      method verify ~loc : _ result =
-        let open Cobol_common.Diagnostics.One in
-        let short = feature#short and config = config.name in
+      (* method verify ~loc : _ result = *)
+      (*   let open Cobol_common.Diagnostics.One in *)
+      (*   let short = feature#short and config = config.name in *)
+      (*   match level with *)
+      (*   | Ok s -> *)
+      (*       Ok (s, None) *)
+      (*   | Warning s -> *)
+      (*       Ok (s, Some (warn ?loc "%(%)@ used" short)) *)
+      (*   | Archaic s -> *)
+      (*       Ok (s, Some (warn ?loc "%(%)@ is@ archaic@ in@ %s" short config)) *)
+      (*   | Obsolete s -> *)
+      (*       Ok (s, Some (warn ?loc "%(%)@ is@ obsolete@ in@ %s" short config)) *)
+      (*   | Skip -> *)
+      (*       Error None *)
+      (*   | Ignore -> *)
+      (*       Error (Some (warn ?loc "%(%)@ ignored" short)) *)
+      (*   | Error -> *)
+      (*       Error (Some (error ?loc "%(%)@ used" short)) *)
+      (*   | Unconformable -> *)
+      (*       Error (Some (error ?loc "%(%)@ does@ not@ conform@ to@ \ *)
+      (*                                %s" short config)) *)
+      (* method verify' ~loc : _ option with_diags =             (\* transitional *\) *)
+      (*   match self#verify ~loc with *)
+      (*   | Ok (s, diag) -> DIAGS.some_result s ~diags:(DIAGS.Set.maybe diag) *)
+      (*   | Error diag -> DIAGS.no_result ~diags:(DIAGS.Set.maybe diag) *)
+      method verify ~loc : _ verification_result =
         match level with
         | Ok s ->
             Ok (s, None)
         | Warning s ->
-            Ok (s, Some (warn ?loc "%(%)@ used" short))
+            Ok (s, Some (loc, feature, `Used))
         | Archaic s ->
-            Ok (s, Some (warn ?loc "%(%)@ is@ archaic@ in@ %s" short config))
+            Ok (s, Some (loc, feature, `Archaic config))
         | Obsolete s ->
-            Ok (s, Some (warn ?loc "%(%)@ is@ obsolete@ in@ %s" short config))
+            Ok (s, Some (loc, feature, `Obsolete config))
         | Skip ->
             Error None
         | Ignore ->
-            Error (Some (warn ?loc "%(%)@ ignored" short))
+            Error (Some (loc, feature, `Ignored))
         | Error ->
-            Error (Some (error ?loc "%(%)@ used" short))
+            Error (Some (loc, feature, `Used))
         | Unconformable ->
-            Error (Some (error ?loc "%(%)@ does@ not@ conform@ to@ \
-                                     %s" short config))
-      method verify' ~loc : _ option with_diags =             (* transitional *)
-        match self#verify ~loc with
-        | Ok (s, diag) -> DIAGS.some_result s ~diags:(DIAGS.Set.maybe diag)
-        | Error diag -> DIAGS.no_result ~diags:(DIAGS.Set.maybe diag)
+            Error (Some (loc, feature, `Unconformable config))
       method level = level
     end
+
+  let verify (v: _ #support) ~loc =
+    v#verify ~loc
 
   (** Type of optional COBOL dialect features. *)
   class ['a] feature ~(feature_kind: 'a feature_kind) ~name ?short doc =
@@ -179,6 +206,80 @@ module FEATURE = struct
 end
 type 'a feature = 'a FEATURE.t                                         (* alias *)
 type 'a feature_support = 'a FEATURE.support
+
+module DIAG = struct
+  type 'a used_feature =
+      {
+        loc: Cobol_common.srcloc;
+        feature: feature_spec;
+        reason: 'a;
+      }
+  and feature_spec = F: _ FEATURE.support_level configurable -> feature_spec
+
+  type error =
+    | Invalid_use_of_feature of error_reason used_feature
+  and error_reason =
+    [ `Unconformable of configuration
+    | `Used ]
+
+  let error_loc = function
+    | Invalid_use_of_feature { loc; _ } ->
+        loc
+
+  let pp_error ppf = function
+    | Invalid_use_of_feature { feature = F f; reason = `Used; _ } ->
+        Pretty.print ppf "%(%)@ used" f#short
+    | Invalid_use_of_feature { feature = F f; reason = `Unconformable c; _ } ->
+        Pretty.print ppf "%(%)@ does@ not@ conform@ to@ %s" f#short c.name
+
+  type warning =
+    | Feature_used of warning_reason used_feature
+  and warning_reason =
+    [ `Archaic of configuration
+    | `Obsolete of configuration
+    | `Ignored
+    | `Used ]
+
+  let warning_loc = function
+    | Feature_used { loc; _ } ->
+        loc
+
+  let pp_warning ppf = function
+    | Feature_used { feature = F f; reason = `Used; _ } ->
+        Pretty.print ppf "%(%)@ used" f#short
+    | Feature_used { feature = F f; reason = `Archaic c; _ } ->
+        Pretty.print ppf "%(%)@ is@ archaic@ in@ %s" f#short c.name
+    | Feature_used { feature = F f; reason = `Obsolete c; _ } ->
+        Pretty.print ppf "%(%)@ is@ obsolete@ in@ %s" f#short c.name
+    | Feature_used { feature = F f; reason = `Ignored; _ } ->
+        Pretty.print ppf "%(%)@ used" f#short
+
+  type diagnostic =
+    | Error of error
+    | Warning of warning
+
+  let decompose_verification_result
+    : 'a FEATURE.verification_result -> _ = function
+    | Ok (result, None) ->
+        Some result,
+        None
+    | Ok (result, Some (loc, feature, reason)) ->
+        Some result,
+        Some (Warning (Feature_used { loc; feature = F feature;
+                                      reason = (reason :> warning_reason) }))
+    | Error (Some (loc, feature, `Ignored)) ->
+        None,
+        Some (Warning (Feature_used { loc; feature = F feature;
+                                      reason = `Ignored }))
+    | Error None ->
+        None,
+        None
+    | Error (Some (loc, feature, (`Used | `Unconformable _ as reason))) ->
+        None,
+        Some (Error (Invalid_use_of_feature { loc; feature = F feature;
+                                              reason }))
+
+end
 
 (* TODO: add min/max for int values. *)
 module Value = struct

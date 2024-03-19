@@ -13,14 +13,16 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Cobol_common.Diagnostics.TYPES
-module DIAGS = Cobol_common.Diagnostics
+open Preproc_outputs.TYPES
+
+module OUT = Preproc_outputs
 
 module Make (Config: Cobol_config.T) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
-    Config.safe_partial_replacing_when_src_literal#verify' ~loc:(Some loc) |>
-    DIAGS.map_result ~f:(function Some s -> s = `Safe | None -> false)
+    Config.safe_partial_replacing_when_src_literal#verify ~loc |>
+    OUT.of_config_verif |>
+    OUT.map_result ~f:(function Some s -> s = `Safe | None -> false)
 
   let replacing' ?repl_dir repl_from repl_to =
     match repl_dir, ~&repl_from with
@@ -39,13 +41,15 @@ module Make (Config: Cobol_config.T) = struct
           | [{ payload = PseudoWord [{ payload = PwText str; _ }]; _ }]
             when String.contains str ' ' ||     (* TODO: properly check spaces *)
                  String.contains str '\t' ->                         (* reject *)
-              DIAGS.error_result false ~loc "Forbidden@ operand@ with@ spaces"
+              OUT.error_result false @@
+              Forbidden { loc; stuff = Operand_with_spaces }
           | [{ payload = PseudoWord (_::_::_); _ }] | _::_::_ ->
-              DIAGS.error_result false ~loc "Forbidden@ multi-word@ operand"
+              OUT.error_result false @@
+              Forbidden { loc; stuff = Multiword_operand }
           | _ ->
-              DIAGS.result false
+              OUT.result false
         in
-        DIAGS.with_more_diags ~diags @@
+        OUT.with_more_diags ~diags @@
         Text_processor.replacing ~partial:{ repl_dir; repl_strict }
           (src &@<- repl_from) repl_to
 
@@ -54,8 +58,8 @@ module Make (Config: Cobol_config.T) = struct
     List.fold_left
       begin fun (result, diags) { payload = { result = r; diags = d }; loc } ->
         (match r with None -> result | Some r -> (r &@ loc) :: result),
-        DIAGS.Set.union diags d
-      end ([], DIAGS.Set.none) l |>
+        Preproc_diagnostics.union diags d
+      end ([], Preproc_diagnostics.none) l |>
     fun (result, diags) -> { result = List.rev result; diags }
 
 end

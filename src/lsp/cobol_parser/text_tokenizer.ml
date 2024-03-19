@@ -12,12 +12,12 @@
 (**************************************************************************)
 
 module TEXT = Cobol_preproc.Text
-module DIAGS = Cobol_common.Diagnostics
 
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_preproc.Text.TYPES
 open Grammar_tokens                              (* import token constructors *)
+open Parser_diagnostics
 
 (* --- *)
 
@@ -158,11 +158,10 @@ let preproc_n_combine_tokens ~source_format =
       match p with
       | [] -> Result.Error `MissingInputs
       | t :: _ -> aux (info_word t :: p', hd l :: l', dgs) (tl p, tl l)
-    and lex_err msg =
-      Pretty.delayed_to begin fun dmsg ->
-        let (p', l', diags), pl = skip acc (p, l) 1 in
-        aux (p', l', DIAGS.Acc.error diags ~loc:(hd l) "%t" dmsg) pl
-      end msg
+    and missing_continuation_of str =
+      let (p', l', diags), pl = skip acc (p, l) 1 in
+      let error = Missing { loc = hd l; stuff = Continuation_of str } in
+      aux (p', l', Parser_diagnostics.add_error error diags) pl
     and comment_entry_after n =
       let acc, ((p, _) as suff) = skip acc (p, l) n in
       if p = [] then Result.Error `MissingInputs else
@@ -178,7 +177,7 @@ let preproc_n_combine_tokens ~source_format =
           p', l', diags
         in
         consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
-          ("comment@ entry": Pretty.simple) acc suff
+          Comment_entry acc suff
     in
     match p with
 
@@ -244,7 +243,7 @@ let preproc_n_combine_tokens ~source_format =
        DATE_COMPILED | REMARKS |
        SECURITY) :: PERIOD :: _        -> comment_entry_after 2
 
-    | ALPHANUM_PREFIX { str; _ } :: _ -> lex_err "Missing continuation of `%s'" str
+    | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
     | tok :: _                        -> subst_n tok 1
 
@@ -284,7 +283,7 @@ let preproc_n_combine_tokens ~source_format =
   in
   fun tokens ->
     let p, srclocs = split @@ map (~&@) tokens in
-    match aux ([], [], DIAGS.Set.none) (p, srclocs) with
+    match aux ([], [], Parser_diagnostics.none) (p, srclocs) with
     | Ok (p, l, dgs) ->
         Ok (rev_map2 (&@) p l, dgs)
     | Error (`ReachedEOF (loc, descr, dgs, p, l)) ->
@@ -305,7 +304,7 @@ type 'm state =
                                 errors out for lack of input tokens. *)
     memory: 'm memory;
     context_stack: Context.stack;
-    diags: DIAGS.Set.t;
+    diags: Parser_diagnostics.t;
     persist: persist;
   }
 
@@ -340,7 +339,7 @@ let init
     leftover_tokens = [];
     memory;
     context_stack = Context.empty_stack;
-    diags = DIAGS.Set.none;
+    diags = Parser_diagnostics.none;
     persist =
       {
         lexer;
@@ -366,9 +365,9 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
   | t -> t
 
 let tokens_of_word { persist = { lexer; _ }; _ }
-  : text_word with_loc -> tokens * DIAGS.Set.t =
+  : text_word with_loc -> tokens * Parser_diagnostics.t =
   fun { payload = c; loc } ->
-  let tok t = [t &@ loc], DIAGS.Set.none in
+  let tok t = [t &@ loc], Parser_diagnostics.none in
   let alphanum ~hexadecimal str qte =
     Cobol_ptree.{
       str;
@@ -382,7 +381,7 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | TextWord w
   | CDirWord w
     -> let tokens = Text_lexer.tokens_of_string' lexer (w &@ loc) in
-      List.map distinguish_words tokens, DIAGS.Set.none
+      List.map distinguish_words tokens, Parser_diagnostics.none
   (* | Alphanum { knd = Basic; str; qte = quotation; _ } *)
   (*   (\* TODO: Leave those as is in the parse-tree, and decode later *\) *)
   (*   when Config.ebcdic_symbolic_characters#value *)
@@ -408,7 +407,7 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | Eof
     -> tok EOF
   | Pseudo _
-    -> [], DIAGS.(Acc.error Set.none) ~loc "Unexpected@ pseudotext"
+    -> [], Parser_diagnostics.error @@ Unexpected { loc; stuff = Pseudotext }
 
 let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
   (* After text manipulation. We need special handling of `PICTURE [IS]` to
@@ -433,7 +432,7 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
         ~until:(function [] | [{ payload = EOF; _ }] -> true | _ -> false)
   and prod_word (acc, ({ diags; _ } as state)) word =
     let t, diags' = tokens_of_word state word in
-    let state = { state with diags = DIAGS.Set.union diags diags' } in
+    let state = { state with diags = Parser_diagnostics.union diags diags' } in
     List.fold_left prod (acc, state) t
   in
   let rec acc_text ((_, ({ expect_picture_string; _ })) as acc) word =
@@ -446,10 +445,10 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
       | TextWord w -> tokenize_text_word (w &@<- word) acc
       | _ -> prod_word acc word
   and missing_picstr (acc, ({ diags; _ } as state)) ({ loc; _ } as word) =
+    let error = Missing { loc; stuff = Picture_string { instead = ~&word } } in
     let state =
       { state with
-        diags = DIAGS.Acc.error diags ~loc "Missing@ PICTURE@ string@ (got@ \
-                                            `%a'@ instead)" TEXT.pp_word word;
+        diags = add_error error diags;
         expect_picture_string = false }
     in
     acc_text (acc, state) word
@@ -466,14 +465,15 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   | Ok (tokens, diags) ->
       if show `Tks state then
         Pretty.error "Tks: %a@." pp_tokens tokens;
-      Ok tokens, { state with diags = DIAGS.Set.union diags state.diags }
+      let diags = Parser_diagnostics.union diags state.diags in
+      Ok tokens, { state with diags }
   | Error `MissingInputs ->
       Error `MissingInputs, { state with leftover_tokens = tokens }
-  | Error (`ReachedEOF (loc, extected_item, diags, tokens)) ->
+  | Error (`ReachedEOF (loc, unterminated_item, diags, tokens)) ->
       Error (`ReachedEOF tokens),
-      let diags = DIAGS.Set.union diags state.diags in
-      { state with
-        diags = DIAGS.Acc.error diags ~loc "Unterminated %(%)" extected_item }
+      let error = Unterminated { loc; stuff = unterminated_item } in
+      let diags = Parser_diagnostics.union diags state.diags in
+      { state with diags = add_error error diags }
 
 let emit_token (type m) (s: m state) tok : m state =
   match s.memory with

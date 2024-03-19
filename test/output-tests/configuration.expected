@@ -10,6 +10,14 @@ configuration.at-167-test.conf:2.6-2.7:
    4   comment-paragraphs:                       ok
 >> Error: Unexpected indicator: `e'
 
+configuration.at-167-test.conf:2.8-2.22:
+   1   
+   2 > include "default.conf"
+----           ^^^^^^^^^^^^^^
+   3   name: "Sample Conf"
+   4   comment-paragraphs:                       ok
+>> Error: Invalid syntax
+
 configuration.at-167-test.conf:3.6-3.7:
    1   
    2   include "default.conf"
@@ -34,14 +42,6 @@ configuration.at-167-test.conf:3.18-3.72:
    4   comment-paragraphs:                       ok
 >> Error: Missing continuation of `                                                     '
 
-configuration.at-167-test.conf:2.8-2.22:
-   1   
-   2 > include "default.conf"
-----           ^^^^^^^^^^^^^^
-   3   name: "Sample Conf"
-   4   comment-paragraphs:                       ok
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:234:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:234:0
 configuration.at-234-test.conf:2.6-2.7:
@@ -51,6 +51,14 @@ configuration.at-234-test.conf:2.6-2.7:
    3   name: "Sample Conf"
    4   comment-paragraphs:                       ok
 >> Error: Unexpected indicator: `e'
+
+configuration.at-234-test.conf:2.8-2.17:
+   1   
+   2 > include "mf.conf"
+----           ^^^^^^^^^
+   3   name: "Sample Conf"
+   4   comment-paragraphs:                       ok
+>> Error: Invalid syntax
 
 configuration.at-234-test.conf:3.6-3.7:
    1   
@@ -76,14 +84,6 @@ configuration.at-234-test.conf:3.18-3.72:
    4   comment-paragraphs:                       ok
 >> Error: Missing continuation of `                                                     '
 
-configuration.at-234-test.conf:2.8-2.17:
-   1   
-   2 > include "mf.conf"
-----           ^^^^^^^^^
-   3   name: "Sample Conf"
-   4   comment-paragraphs:                       ok
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:254:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:280:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:284:0
@@ -94,6 +94,14 @@ configuration.at-284-test.conf:2.6-2.7:
    3   name: "Sample Conf"
    4   comment-paragraphs:   unconformable
 >> Error: Unexpected indicator: `e'
+
+configuration.at-284-test.conf:2.8-2.22:
+   1   
+   2 > include "default.conf"
+----           ^^^^^^^^^^^^^^
+   3   name: "Sample Conf"
+   4   comment-paragraphs:   unconformable
+>> Error: Invalid syntax
 
 configuration.at-284-test.conf:3.6-3.7:
    1   
@@ -119,14 +127,6 @@ configuration.at-284-test.conf:3.18-3.72:
    4   comment-paragraphs:   unconformable
 >> Error: Missing continuation of `                                                     '
 
-configuration.at-284-test.conf:2.8-2.22:
-   1   
-   2 > include "default.conf"
-----           ^^^^^^^^^^^^^^
-   3   name: "Sample Conf"
-   4   comment-paragraphs:   unconformable
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:316:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:396:0
 configuration.at-396-defunc.conf:2.6-2.7:
@@ -136,19 +136,19 @@ configuration.at-396-defunc.conf:2.6-2.7:
    3   includeif "notthere.conf"
 >> Error: Unexpected indicator: `e'
 
-configuration.at-396-defunc.conf:3.6-3.7:
-   1   
-   2   include "default.conf"
-   3 > includeif "notthere.conf"
-----         ^
->> Error: Unexpected indicator: `e'
-
 configuration.at-396-defunc.conf:2.8-2.22:
    1   
    2 > include "default.conf"
 ----           ^^^^^^^^^^^^^^
    3   includeif "notthere.conf"
 >> Error: Invalid syntax
+
+configuration.at-396-defunc.conf:3.6-3.7:
+   1   
+   2   include "default.conf"
+   3 > includeif "notthere.conf"
+----         ^
+>> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:396:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:399:0
@@ -159,19 +159,19 @@ configuration.at-399-test.conf:2.6-2.7:
    3   include "test2.conf"
 >> Error: Unexpected indicator: `e'
 
-configuration.at-399-test.conf:3.6-3.7:
-   1   
-   2   include "default.conf"
-   3 > include "test2.conf"
-----         ^
->> Error: Unexpected indicator: `e'
-
 configuration.at-399-test.conf:2.8-2.22:
    1   
    2 > include "default.conf"
 ----           ^^^^^^^^^^^^^^
    3   include "test2.conf"
 >> Error: Invalid syntax
+
+configuration.at-399-test.conf:3.6-3.7:
+   1   
+   2   include "default.conf"
+   3 > include "test2.conf"
+----         ^
+>> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:588:0
 configuration.at-588-test.cfg:2.6-2.7:
@@ -227,13 +227,6 @@ configuration.at-768-defunc.cfg:2.6-2.7:
    3   includeif "notthere.cfg"
 >> Error: Unexpected indicator: `e'
 
-configuration.at-768-defunc.cfg:3.6-3.7:
-   1   
-   2   include "runtime_empty.cfg"
-   3 > includeif "notthere.cfg"
-----         ^
->> Error: Unexpected indicator: `e'
-
 configuration.at-768-defunc.cfg:2.8-2.27:
    1   
    2 > include "runtime_empty.cfg"
@@ -241,18 +234,15 @@ configuration.at-768-defunc.cfg:2.8-2.27:
    3   includeif "notthere.cfg"
 >> Error: Invalid syntax
 
+configuration.at-768-defunc.cfg:3.6-3.7:
+   1   
+   2   include "runtime_empty.cfg"
+   3 > includeif "notthere.cfg"
+----         ^
+>> Error: Unexpected indicator: `e'
+
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:851:0
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:880:0
-configuration.at-880-wide.cob:9.19-9.72:
-   6          WORKING-STORAGE  SECTION.
-   7         /
-   8          PROCEDURE        DIVISION.
-   9 >            DISPLAY '     20        30        40         50       60         70 '
-----                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  10              DISPLAY '     20        30        40         50       60         70
-  11         -            '        80'
->> Error: Missing continuation of `     20        30        40         50       60     '
-
 configuration.at-880-wide.cob:9.18:
    6          WORKING-STORAGE  SECTION.
    7         /
@@ -272,6 +262,16 @@ configuration.at-880-wide.cob:9.19-9.72:
   10              DISPLAY '     20        30        40         50       60         70
   11         -            '        80'
 >> Error: Invalid syntax
+
+configuration.at-880-wide.cob:9.19-9.72:
+   6          WORKING-STORAGE  SECTION.
+   7         /
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY '     20        30        40         50       60         70 '
+----                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  10              DISPLAY '     20        30        40         50       60         70
+  11         -            '        80'
+>> Error: Missing continuation of `     20        30        40         50       60     '
 
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:903:0
 configuration.at-903-prog.cob:7.13-7.20:
@@ -294,16 +294,6 @@ configuration.at-903-prog.cob:9.33-9.39:
   11              STOP RUN.
 >> Error: Invalid syntax
 
-configuration.at-903-prog.cob:9.39:
-   6              OBJECT-COMPUTER.
-   7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
-   8          SPECIAL-NAMES.
-   9 >            ALPHABET an-ebcdic IS EBCDIC.
-----                                          ^
-  10          PROCEDURE        DIVISION.
-  11              STOP RUN.
->> Hint: Missing IS <word>
-
 configuration.at-903-prog.cob:9.39-9.40:
    6              OBJECT-COMPUTER.
    7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
@@ -314,6 +304,16 @@ configuration.at-903-prog.cob:9.39-9.40:
   11              STOP RUN.
 >> Error: Invalid syntax
 
+configuration.at-903-prog.cob:9.39:
+   6              OBJECT-COMPUTER.
+   7                PROGRAM COLLATING SEQUENCE IS an-ebcdic.
+   8          SPECIAL-NAMES.
+   9 >            ALPHABET an-ebcdic IS EBCDIC.
+----                                          ^
+  10          PROCEDURE        DIVISION.
+  11              STOP RUN.
+>> Hint: Missing IS <word>
+
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:940:0
 configuration.at-940-valid.ttbl:2.6-2.7:
    1   
@@ -322,6 +322,14 @@ configuration.at-940-valid.ttbl:2.6-2.7:
    3   88898A8B8C050607909116939495960498999A9B14159E1A20A0E2E4E0E1E3E5E7F15B2E3C282B21
    4   26E9EAEBE8EDEEEFECDF5D242A293B5E2D2FC2C4C0C1C3C5C7D1A62C255F3E3FF8C9CACBC8CDCECF
 >> Error: Unexpected indicator: `0'
+
+configuration.at-940-valid.ttbl:2.7-2.72:
+   1   
+   2 > 000102039C09867F978D8E0B0C0D0E0F101112139D8508871819928F1C1D1E1F80818283840A171B
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   3   88898A8B8C050607909116939495960498999A9B14159E1A20A0E2E4E0E1E3E5E7F15B2E3C282B21
+   4   26E9EAEBE8EDEEEFECDF5D242A293B5E2D2FC2C4C0C1C3C5C7D1A62C255F3E3FF8C9CACBC8CDCECF
+>> Error: Invalid syntax
 
 configuration.at-940-valid.ttbl:3.6-3.7:
    1   
@@ -379,14 +387,6 @@ configuration.at-940-valid.ttbl:8.6-8.7:
 ----         ^
 >> Error: Unexpected indicator: `3'
 
-configuration.at-940-valid.ttbl:2.7-2.72:
-   1   
-   2 > 000102039C09867F978D8E0B0C0D0E0F101112139D8508871819928F1C1D1E1F80818283840A171B
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   3   88898A8B8C050607909116939495960498999A9B14159E1A20A0E2E4E0E1E3E5E7F15B2E3C282B21
-   4   26E9EAEBE8EDEEEFECDF5D242A293B5E2D2FC2C4C0C1C3C5C7D1A62C255F3E3FF8C9CACBC8CDCECF
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/configuration.at:941:0
 configuration.at-941-valid2.ttbl:2.6-2.7:
    1   
@@ -395,6 +395,14 @@ configuration.at-941-valid2.ttbl:2.6-2.7:
    3   00 01 02 03 9C 09 86 7F 97 8D 8E 0B 0C 0D 0E 0F 10 11 12 13 9D 85 08 87 18 19 92
    4   8F 1C 1D 1E 1F 80 81 82 83 84 0A 17 1B 88 89 8A 8B 8C 05 06 07 90 91 16 93 94 95
 >> Error: Unexpected indicator: `a'
+
+configuration.at-941-valid2.ttbl:2.7-2.8:
+   1   
+   2 > # we may have any comments in here
+----          ^
+   3   00 01 02 03 9C 09 86 7F 97 8D 8E 0B 0C 0D 0E 0F 10 11 12 13 9D 85 08 87 18 19 92
+   4   8F 1C 1D 1E 1F 80 81 82 83 84 0A 17 1B 88 89 8A 8B 8C 05 06 07 90 91 16 93 94 95
+>> Error: Invalid syntax
 
 configuration.at-941-valid2.ttbl:3.6-3.7:
    1   
@@ -481,12 +489,4 @@ configuration.at-941-valid2.ttbl:15.6-15.7:
   15 > 33 34 35 36 37 38 39 B3 DB DC D9 DA 9F 
 ----         ^
 >> Error: Unexpected indicator: `3'
-
-configuration.at-941-valid2.ttbl:2.7-2.8:
-   1   
-   2 > # we may have any comments in here
-----          ^
-   3   00 01 02 03 9C 09 86 7F 97 8D 8E 0B 0C 0D 0E 0F 10 11 12 13 9D 85 08 87 18 19 92
-   4   8F 1C 1D 1E 1F 80 81 82 83 84 0A 17 1B 88 89 8A 8B 8C 05 06 07 90 91 16 93 94 95
->> Error: Invalid syntax
 

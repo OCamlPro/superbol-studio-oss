@@ -11,6 +11,16 @@ run_fundamental.at-137-dump.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
+run_fundamental.at-137-dump.c:5.7-5.8:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^
+   6   dump (unsigned char *data)
+   7   {
+>> Error: Invalid syntax
+
 run_fundamental.at-137-dump.c:6.6-6.7:
    3   #include <libcob.h>
    4   
@@ -59,16 +69,6 @@ run_fundamental.at-137-dump.c:11.6-11.7:
 ----         ^
   12   }
 >> Error: Unexpected indicator: `r'
-
-run_fundamental.at-137-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:138:0
 run_fundamental.at-138-prog.cob:5.7-5.30:
@@ -265,16 +265,6 @@ run_fundamental.at-1390-prog.cob:29.7-29.20:
   31              DECIMAL-POINT IS COMMA.
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:45.19:
-  42          77  curr  PIC 9.9999,99Y.
-  43   
-  44          PROCEDURE DIVISION.
-  45 >            MOVE f1()   TO n1
-----                      ^
-  46              IF n1 NOT = 1
-  47                DISPLAY "ERROR 1" GOBACK
->> Hint: Missing <subscript>
-
 run_fundamental.at-1390-prog.cob:45.19-45.20:
   42          77  curr  PIC 9.9999,99Y.
   43   
@@ -285,14 +275,14 @@ run_fundamental.at-1390-prog.cob:45.19-45.20:
   47                DISPLAY "ERROR 1" GOBACK
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:53.19:
-  50              IF n1 NOT = 2
-  51                DISPLAY "ERROR 2" GOBACK
-  52              END-IF
-  53 >            MOVE f1()   TO n1
+run_fundamental.at-1390-prog.cob:45.19:
+  42          77  curr  PIC 9.9999,99Y.
+  43   
+  44          PROCEDURE DIVISION.
+  45 >            MOVE f1()   TO n1
 ----                      ^
-  54              IF n1 NOT = 1
-  55                DISPLAY "ERROR 1 2nd" GOBACK
+  46              IF n1 NOT = 1
+  47                DISPLAY "ERROR 1" GOBACK
 >> Hint: Missing <subscript>
 
 run_fundamental.at-1390-prog.cob:53.19-53.20:
@@ -304,6 +294,16 @@ run_fundamental.at-1390-prog.cob:53.19-53.20:
   54              IF n1 NOT = 1
   55                DISPLAY "ERROR 1 2nd" GOBACK
 >> Error: Invalid syntax
+
+run_fundamental.at-1390-prog.cob:53.19:
+  50              IF n1 NOT = 2
+  51                DISPLAY "ERROR 2" GOBACK
+  52              END-IF
+  53 >            MOVE f1()   TO n1
+----                      ^
+  54              IF n1 NOT = 1
+  55                DISPLAY "ERROR 1 2nd" GOBACK
+>> Hint: Missing <subscript>
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1412:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1494:0
@@ -400,6 +400,16 @@ run_fundamental.at-1558-module.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
+run_fundamental.at-1558-module.c:5.7-5.8:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^
+   6   some (void)
+   7   {
+>> Error: Invalid syntax
+
 run_fundamental.at-1558-module.c:6.6-6.7:
    3   #include <libcob.h>
    4   
@@ -418,16 +428,6 @@ run_fundamental.at-1558-module.c:8.6-8.7:
 ----         ^
    9   }
 >> Error: Unexpected indicator: `r'
-
-run_fundamental.at-1558-module.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   some (void)
-   7   {
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1557:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1617:0
@@ -657,6 +657,16 @@ run_fundamental.at-4171-dump.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
+run_fundamental.at-4171-dump.c:5.7-5.8:
+   2   #include <stdio.h>
+   3   #include <libcob.h>
+   4   
+   5 > COB_EXT_EXPORT int
+----          ^
+   6   dump (char *p)
+   7   {
+>> Error: Invalid syntax
+
 run_fundamental.at-4171-dump.c:6.6-6.7:
    3   #include <libcob.h>
    4   
@@ -686,16 +696,6 @@ run_fundamental.at-4171-dump.c:9.6-9.7:
   10   }
 >> Error: Unexpected indicator: `r'
 
-run_fundamental.at-4171-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (char *p)
-   7   {
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4172:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4462:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4508:0
@@ -722,16 +722,6 @@ run_fundamental.at-4648-prog.cob:14.7-14.13:
   16          >>END-IF
 >> Error: Malformed or unknown compiler directive
 
-run_fundamental.at-4648-prog.cob:16.7-16.15:
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14          >>ELSE
-  15                                           USAGE BINARY-LONG UNSIGNED.
-  16 >        >>END-IF
-----          ^^^^^^^^
-  17                  05  misalign-2           PIC X.
-  18   
->> Error: Malformed or unknown compiler directive
-
 run_fundamental.at-4648-prog.cob:15.40-15.45:
   12          >>IF P64 SET
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
@@ -741,6 +731,16 @@ run_fundamental.at-4648-prog.cob:15.40-15.45:
   16          >>END-IF
   17                  05  misalign-2           PIC X.
 >> Error: Invalid syntax
+
+run_fundamental.at-4648-prog.cob:16.7-16.15:
+  13                                           USAGE BINARY-DOUBLE UNSIGNED.
+  14          >>ELSE
+  15                                           USAGE BINARY-LONG UNSIGNED.
+  16 >        >>END-IF
+----          ^^^^^^^^
+  17                  05  misalign-2           PIC X.
+  18   
+>> Error: Malformed or unknown compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4745:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4774:0

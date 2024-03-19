@@ -11,7 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module DIAGS = Cobol_common.Diagnostics
 module StrMap = EzCompat.StringMap
 
 let preproc
@@ -30,7 +29,7 @@ let preproc
 
 let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
     ?source_format ?filename contents =
-  let DIAGS.{ result = WithArtifacts (_, { tokens; _ }); _ } =
+  let { result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
     Cobol_parser.parse_with_artifacts
       ~options:Cobol_parser.Options.{
@@ -51,8 +50,7 @@ let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
         verbose;
         recovery = EnableRecovery { silence_benign_recoveries = true };
       } |>
-  DIAGS.forget_result |>
-  DIAGS.Set.pp Fmt.stdout
+  Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
 
 (* --- *)
 
@@ -147,7 +145,7 @@ let rewindable_parse
     ?config
     prog
   =
-  let DIAGS.{ result = Only ptree, rewinder; diags } =
+  let { result = Only ptree, rewinder; diags } =
     String { filename = "prog.cob"; contents = prog } |>
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
@@ -166,7 +164,7 @@ let rewindable_parse
 (** Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
-  let DIAGS.{ result = Only ptree, rewinder; diags } =
+  let { result = Only ptree, rewinder; diags } =
     Cobol_parser.rewind_and_parse rewinder preproc_rewind
       ~position:(Indexed { line; char })
   in

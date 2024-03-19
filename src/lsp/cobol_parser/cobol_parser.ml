@@ -18,6 +18,7 @@ module Options = Parser_options
 
 (** Output types for the engine *)
 module Outputs = Parser_outputs
+module Diagnostics = Parser_diagnostics
 
 module Tokens = Grammar_tokens
 module Keywords = Text_keywords

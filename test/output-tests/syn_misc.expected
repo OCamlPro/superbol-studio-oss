@@ -2401,16 +2401,6 @@ syn_misc.at-3175-prog.cob:46.15-46.31:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3227:0
-syn_misc.at-3227-prog.cob:10.7-10.15:
-   7          REPLACE ==a== BY ==b==.. *> blah blah
-   8          .
-   9   
-  10 >        COPY a..
-----          ^^^^^^^^
-  11   
-  12          78  var VALUE "hello".
->> Error: Library `a.' not found in search path (search path: )
-
 syn_misc.at-3227-prog.cob:7.30-7.31:
    4   
    5          DATA DIVISION.
@@ -2420,6 +2410,16 @@ syn_misc.at-3227-prog.cob:7.30-7.31:
    8          .
    9   
 >> Error: Invalid syntax
+
+syn_misc.at-3227-prog.cob:10.7-10.15:
+   7          REPLACE ==a== BY ==b==.. *> blah blah
+   8          .
+   9   
+  10 >        COPY a..
+----          ^^^^^^^^
+  11   
+  12          78  var VALUE "hello".
+>> Error: Library `a.' not found in search path (search path: )
 
 syn_misc.at-3227-prog.cob:14.10-14.11:
   11   

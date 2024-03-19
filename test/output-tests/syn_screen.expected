@@ -222,16 +222,6 @@ syn_screen.at-817-prog.cob:13.19-13.20:
   15              ACCEPT  (   , 08) A WITH NO-ECHO.
 >> Error: Invalid syntax
 
-syn_screen.at-817-prog.cob:13.27:
-  10              MOVE 10 TO LIN. MOVE 15 TO COL.
-  11              DISPLAY (LIN , COL - 3) FIELD-A.
-  12              DISPLAY (LIN + 1 , COL) FIELD-A.
-  13 >            ACCEPT  (   , 10) A.
-----                              ^
-  14              DISPLAY (08 , 12) FIELD-A.
-  15              ACCEPT  (   , 08) A WITH NO-ECHO.
->> Hint: Missing .
-
 syn_screen.at-817-prog.cob:13.27-13.28:
   10              MOVE 10 TO LIN. MOVE 15 TO COL.
   11              DISPLAY (LIN , COL - 3) FIELD-A.
@@ -241,6 +231,16 @@ syn_screen.at-817-prog.cob:13.27-13.28:
   14              DISPLAY (08 , 12) FIELD-A.
   15              ACCEPT  (   , 08) A WITH NO-ECHO.
 >> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:13.27:
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13 >            ACCEPT  (   , 10) A.
+----                              ^
+  14              DISPLAY (08 , 12) FIELD-A.
+  15              ACCEPT  (   , 08) A WITH NO-ECHO.
+>> Hint: Missing .
 
 syn_screen.at-817-prog.cob:14.19-14.20:
   11              DISPLAY (LIN , COL - 3) FIELD-A.
@@ -282,16 +282,6 @@ syn_screen.at-817-prog.cob:15.19-15.20:
   17              ACCEPT  A       AT COLUMN 8.
 >> Error: Invalid syntax
 
-syn_screen.at-817-prog.cob:15.27:
-  12              DISPLAY (LIN + 1 , COL) FIELD-A.
-  13              ACCEPT  (   , 10) A.
-  14              DISPLAY (08 , 12) FIELD-A.
-  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
-----                              ^
-  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
-  17              ACCEPT  A       AT COLUMN 8.
->> Hint: Missing .
-
 syn_screen.at-817-prog.cob:15.27-15.28:
   12              DISPLAY (LIN + 1 , COL) FIELD-A.
   13              ACCEPT  (   , 10) A.
@@ -301,6 +291,16 @@ syn_screen.at-817-prog.cob:15.27-15.28:
   16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
   17              ACCEPT  A       AT COLUMN 8.
 >> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:15.27:
+  12              DISPLAY (LIN + 1 , COL) FIELD-A.
+  13              ACCEPT  (   , 10) A.
+  14              DISPLAY (08 , 12) FIELD-A.
+  15 >            ACCEPT  (   , 08) A WITH NO-ECHO.
+----                              ^
+  16              DISPLAY FIELD-A AT LINE 06  COLUMN 12.
+  17              ACCEPT  A       AT COLUMN 8.
+>> Hint: Missing .
 
 syn_screen.at-817-prog.cob:15.31-15.35:
   12              DISPLAY (LIN + 1 , COL) FIELD-A.
@@ -362,16 +362,6 @@ syn_screen.at-817-prog.cob:21.19-21.20:
   23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
 >> Error: Invalid syntax
 
-syn_screen.at-817-prog.cob:21.27:
-  18              SUBTRACT 2 FROM LIN.
-  19              SUBTRACT 3 FROM COL.
-  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
-  21 >            ACCEPT  (   , 10) A.
-----                              ^
-  22              DISPLAY ( 1 , 1 ) ERASE.
-  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
->> Hint: Missing .
-
 syn_screen.at-817-prog.cob:21.27-21.28:
   18              SUBTRACT 2 FROM LIN.
   19              SUBTRACT 3 FROM COL.
@@ -381,6 +371,16 @@ syn_screen.at-817-prog.cob:21.27-21.28:
   22              DISPLAY ( 1 , 1 ) ERASE.
   23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
 >> Warning: Invalid syntax
+
+syn_screen.at-817-prog.cob:21.27:
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21 >            ACCEPT  (   , 10) A.
+----                              ^
+  22              DISPLAY ( 1 , 1 ) ERASE.
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+>> Hint: Missing .
 
 syn_screen.at-817-prog.cob:22.19-22.20:
   19              SUBTRACT 3 FROM COL.

@@ -50,15 +50,15 @@ let%expect_test "bad-qualifiers" =
       10              PERFORM IN S.
     >> Error: Invalid syntax
 
-    prog.cob:8.23:
+    prog.cob:8.19-8.23:
        5          PROCEDURE DIVISION.
        6          MAIN.
        7              DISPLAY A IN
        8 >            PERFORM S IN.
-    ----                          ^
+    ----                      ^^^^
        9              PERFORM S IN IN MAIN
       10              PERFORM IN S.
-    >> Hint: Missing <qualified name>
+    >> Error: Unknown procedure-name 'S'
 
     prog.cob:8.23-8.24:
        5          PROCEDURE DIVISION.
@@ -70,6 +70,16 @@ let%expect_test "bad-qualifiers" =
       10              PERFORM IN S.
     >> Error: Invalid syntax
 
+    prog.cob:8.23:
+       5          PROCEDURE DIVISION.
+       6          MAIN.
+       7              DISPLAY A IN
+       8 >            PERFORM S IN.
+    ----                          ^
+       9              PERFORM S IN IN MAIN
+      10              PERFORM IN S.
+    >> Hint: Missing <qualified name>
+
     prog.cob:9.24-9.26:
        6          MAIN.
        7              DISPLAY A IN
@@ -80,25 +90,6 @@ let%expect_test "bad-qualifiers" =
       11
     >> Error: Invalid syntax
 
-    prog.cob:10.19-10.21:
-       7              DISPLAY A IN
-       8              PERFORM S IN.
-       9              PERFORM S IN IN MAIN
-      10 >            PERFORM IN S.
-    ----                      ^^
-      11
-    >> Error: Invalid syntax
-
-    prog.cob:8.19-8.23:
-       5          PROCEDURE DIVISION.
-       6          MAIN.
-       7              DISPLAY A IN
-       8 >            PERFORM S IN.
-    ----                      ^^^^
-       9              PERFORM S IN IN MAIN
-      10              PERFORM IN S.
-    >> Error: Unknown procedure-name 'S'
-
     prog.cob:9.19-9.31:
        6          MAIN.
        7              DISPLAY A IN
@@ -108,6 +99,15 @@ let%expect_test "bad-qualifiers" =
       10              PERFORM IN S.
       11
     >> Error: Unknown procedure-name 'S IN MAIN'
+
+    prog.cob:10.19-10.21:
+       7              DISPLAY A IN
+       8              PERFORM S IN.
+       9              PERFORM S IN IN MAIN
+      10 >            PERFORM IN S.
+    ----                      ^^
+      11
+    >> Error: Invalid syntax
 
     prog.cob:10.22-10.23:
        7              DISPLAY A IN

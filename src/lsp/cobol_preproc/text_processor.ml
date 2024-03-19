@@ -13,12 +13,13 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
-open Cobol_common.Diagnostics.TYPES
 open Text.TYPES
+open Preproc_outputs.TYPES
+open Preproc_diagnostics
 open Preproc_directives                         (* import types of directives *)
 open Preproc_trace                              (* import types of log events *)
 
-module DIAGS = Cobol_common.Diagnostics
+module OUT = Preproc_outputs
 
 (* --- Compiler Directives -------------------------------------------------- *)
 
@@ -29,7 +30,7 @@ let lift_textword w = TextWord ~&w &@<- w
 
 let nonempty_words words : _ result = match ~&words with
   | [] ->
-      Error (DIAGS.One.error ~loc:~@words "Expected@ at@ least@ one@ text-word")
+      Error (Missing { loc = ~@words; stuff = At_least_one_text_word })
   | _ ->
       Ok words
 
@@ -48,11 +49,11 @@ let partial_word (type k) (req: k partial_word_request) words : (k, _) result =
        loc }], ExactlyOne ->
       Ok (w &@ loc)
   | [{ payload = PseudoAlphanum _; _ }], _ ->
-      Error (DIAGS.One.error ~loc:~@words "Unexpected@ alphanumeric@ literal")
+      Error (Unexpected { loc = ~@words; stuff = Alphanumeric_literal })
   | _, AtMostOne ->
-      Error (DIAGS.One.error ~loc:~@words "Expected@ at@ most@ one@ text-word")
+      Error (Missing { loc = ~@words; stuff = At_most_one_text_word })
   | _, _ ->
-      Error (DIAGS.One.error ~loc:~@words "Expected@ one@ text-word")
+      Error (Missing { loc = ~@words; stuff = One_text_word })
 
 let partial_subst (k: partial_replacing) ({ payload = pat; _ } as repl_from) =
   { partial_subst_dir = k.repl_dir;
@@ -67,9 +68,9 @@ let partial_subst (k: partial_replacing) ({ payload = pat; _ } as repl_from) =
 let exact_replacing repl_from repl_to =
   match nonempty_words repl_from with
   | Ok repl_from ->
-      DIAGS.some_result @@ ReplaceExact { repl_from; repl_to }
+      OUT.some_result @@ ReplaceExact { repl_from; repl_to }
   | Error diag ->
-      DIAGS.no_result ~diags:(DIAGS.Set.one diag)
+      OUT.no_result ~diags:(add_error diag none)
 
 let partial_replacing partial_replacing repl_from repl_to =
   match partial_word ExactlyOne repl_from,
@@ -77,13 +78,13 @@ let partial_replacing partial_replacing repl_from repl_to =
   | Ok repl_from,
     Ok repl_to ->
       let repl_subst = partial_subst partial_replacing repl_from in
-      DIAGS.some_result @@ ReplacePartial { repl_subst; repl_to }
+      OUT.some_result @@ ReplacePartial { repl_subst; repl_to }
   | Error diag, Ok _
   | Ok _, Error diag ->
-      DIAGS.no_result ~diags:(DIAGS.Set.one diag)
+      OUT.no_result ~diags:(add_error diag none)
   | Error diag,
     Error diag' ->
-      DIAGS.no_result ~diags:(DIAGS.Set.two diag diag')
+      OUT.no_result ~diags:(add_error diag @@ add_error diag' none)
 
 let replacing ?partial repl_from repl_to = match partial with
   | None -> exact_replacing repl_from repl_to

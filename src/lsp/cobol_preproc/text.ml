@@ -56,7 +56,7 @@ module FMT = struct
   let pp_pseudotext =
     Pretty.list ~fopen:"==" ~fsep:" "~fclose:"=="  pp_pseudoword
 
-  let pp_word ppf word = match ~&word with
+  let pp_word ppf word = match word with
     | TextWord str
     | CDirWord str ->
         Pretty.string ppf str
@@ -70,12 +70,12 @@ module FMT = struct
         Pretty.string ppf "EOF"
 
   let pp_text =
-    Pretty.list ~fopen:"@[" ~fsep:"@;" ~fclose:"@]" pp_word
+    Pretty.list ~fopen:"@[" ~fsep:"@;" ~fclose:"@]" (fun ppf w -> pp_word ppf ~&w)
 
   let pp_text' ?fsep  =
     Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf word ->
       Pretty.print ppf "%a@@%a"
-        pp_word word
+        pp_word ~&word
         Cobol_common.Srcloc.pp_srcloc_struct ~@word
     end
 

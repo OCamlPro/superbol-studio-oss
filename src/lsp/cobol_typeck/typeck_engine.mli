@@ -14,9 +14,4 @@
 val compilation_group
   : ?config: Cobol_config.t
   -> _ Cobol_parser.Outputs.parsed_compilation_group
-  -> Typeck_outputs.t * Typeck_diagnostics.t
-
-val translate_diagnostics
-  : ?config: Cobol_config.t
-  -> Typeck_outputs.t * Typeck_diagnostics.t
-  -> Typeck_outputs.t Cobol_common.Diagnostics.with_diags
+  -> Typeck_outputs.t Typeck_results.with_diags
