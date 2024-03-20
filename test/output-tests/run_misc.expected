@@ -623,26 +623,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2479:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2517:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2543:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2586:0
-run_misc.at-2586-prog.cob:10.24:
-   7          PROCEDURE        DIVISION.
-   8          A01.
-   9              MOVE 0 TO INDVAL
-  10 >            PERFORM UNTIL EXIT
-----                           ^
-  11               ADD 1 TO INDVAL
-  12               IF INDVAL > 2
->> Hint: Missing <expression>
-
-run_misc.at-2586-prog.cob:10.25-10.29:
-   7          PROCEDURE        DIVISION.
-   8          A01.
-   9              MOVE 0 TO INDVAL
-  10 >            PERFORM UNTIL EXIT
-----                            ^^^^
-  11               ADD 1 TO INDVAL
-  12               IF INDVAL > 2
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2612:0
 run_misc.at-2612-prog.cob:10.11-10.22:
    7          PROCEDURE        DIVISION.
@@ -1036,16 +1016,6 @@ run_misc.at-4171-prog1.cob:17.8-17.13:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4217:0
-run_misc.at-4217-prog.cob:10.27-10.32:
-   7          01 PROGRAM-LINK         USAGE PROGRAM-POINTER.
-   8   
-   9          PROCEDURE DIVISION.
-  10 >        SET PROGRAM-LINK TO ENTRY "subprogram"
-----                              ^^^^^
-  11          IF PROGRAM-LINK EQUAL NULL THEN
-  12              DISPLAY "error: no subprogram linkage" UPON SYSERR
->> Error: Invalid syntax
-
 run_misc.at-4217-prog.cob:26.7-26.12:
   23          END-IF
   24          GOBACK.
@@ -2079,16 +2049,6 @@ run_misc.at-4808-cprog.c:14.6-14.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4808:0
-run_misc.at-4808-prog.cob:8.21-8.26:
-   5          WORKING-STORAGE  SECTION.
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8 >            SET CB TO ENTRY "callback"
-----                        ^^^^^
-   9              CALL STATIC "cprog" USING BY VALUE CB
-  10              END-CALL
->> Error: Invalid syntax
-
 run_misc.at-4808-prog.cob:9.23-9.30:
    6          01 CB            USAGE PROGRAM-POINTER.
    7          PROCEDURE        DIVISION.
@@ -2270,16 +2230,6 @@ run_misc.at-4884-cprog.c:14.6-14.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4884:0
-run_misc.at-4884-prog.cob:10.21-10.26:
-   7          WORKING-STORAGE  SECTION.
-   8          01 CB            USAGE PROGRAM-POINTER.
-   9          PROCEDURE        DIVISION.
-  10 >            SET CB TO ENTRY "callback"
-----                        ^^^^^
-  11              CALL STATIC "cprog" USING BY VALUE CB
-  12              END-CALL
->> Error: Invalid syntax
-
 run_misc.at-4884-prog.cob:11.23-11.30:
    8          01 CB            USAGE PROGRAM-POINTER.
    9          PROCEDURE        DIVISION.
@@ -2311,16 +2261,6 @@ run_misc.at-4884-prog.cob:19.28-19.34:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4965:0
-run_misc.at-4965-prog2.cob:8.21-8.26:
-   5          WORKING-STORAGE  SECTION.
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8 >            SET CB TO ENTRY "callback"
-----                        ^^^^^
-   9              CALL STATIC "cprog" USING BY VALUE CB
-  10              END-CALL
->> Error: Invalid syntax
-
 run_misc.at-4965-prog2.cob:9.23-9.30:
    6          01 CB            USAGE PROGRAM-POINTER.
    7          PROCEDURE        DIVISION.
@@ -2412,16 +2352,6 @@ run_misc.at-4965-prog2.cob:22.45-22.47:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4968:0
-run_misc.at-4968-prog3.cob:8.21-8.26:
-   5          WORKING-STORAGE  SECTION.
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8 >            SET CB TO ENTRY "callback"
-----                        ^^^^^
-   9              CALL STATIC "cprog" USING BY VALUE CB
-  10              END-CALL
->> Error: Invalid syntax
-
 run_misc.at-4968-prog3.cob:9.23-9.30:
    6          01 CB            USAGE PROGRAM-POINTER.
    7          PROCEDURE        DIVISION.

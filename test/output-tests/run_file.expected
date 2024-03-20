@@ -1214,26 +1214,6 @@ run_file.at-4301-prog.cob:17.11-17.15:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4340:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4390:0
-run_file.at-4390-prog.cob:15.24:
-  12          01 TEST-REC      PIC X(4).
-  13          PROCEDURE        DIVISION.
-  14              OPEN INPUT TEST-FILE
-  15 >            PERFORM UNTIL EXIT
-----                           ^
-  16                 READ TEST-FILE
-  17                     AT END EXIT PERFORM
->> Hint: Missing <expression>
-
-run_file.at-4390-prog.cob:15.25-15.29:
-  12          01 TEST-REC      PIC X(4).
-  13          PROCEDURE        DIVISION.
-  14              OPEN INPUT TEST-FILE
-  15 >            PERFORM UNTIL EXIT
-----                            ^^^^
-  16                 READ TEST-FILE
-  17                     AT END EXIT PERFORM
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4429:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4556:0
 run_file.at-4556-inp_data:1.7-1.8:

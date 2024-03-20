@@ -160,7 +160,7 @@ let fold_perform_mode (v: _ #folder) =
           >> fold_ident_or_intlit v i
       | PerformUntil { with_test; until } -> x
           >> fold_option ~fold:fold_stage v with_test
-          >> fold_condition v until
+          >> fold_option ~fold:fold_condition v until
       | PerformVarying { with_test; varying; after } -> x
           >> fold_option ~fold:fold_stage v with_test
           >> fold_varying_phrase' v varying

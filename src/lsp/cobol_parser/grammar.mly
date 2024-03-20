@@ -3427,8 +3427,10 @@ let perform_statement [@context perform_stmt] :=
 let perform_phrase :=
  | FOREVER; { PerformForever } (* GC/COBOL-IT extension *)
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
+ | wt = ro(with_test); UNTIL; EXIT;
+   { PerformUntil { with_test = wt; until = None } }
  | wt = ro(with_test); UNTIL; until = condition;
-   { PerformUntil { with_test = wt; until } }
+   { PerformUntil { with_test = wt; until = Some until } }
  | wt = ro(with_test); VARYING; v = loc(varying_phrase);
    vl = l(pf(AFTER,loc(varying_phrase)));
    { PerformVarying { with_test = wt; varying = v; after = vl } }

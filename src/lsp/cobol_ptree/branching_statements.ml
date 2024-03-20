@@ -103,7 +103,7 @@ and perform_mode =
   | PerformUntil of
       {
         with_test: stage option;
-        until: condition;
+        until: condition option; (* None = UNTIL EXIT *)
       }
   | PerformVarying of
       {
@@ -566,7 +566,9 @@ and pp_perform_inline_stmt ppf { perform_inline_mode; perform_statements } =
 and pp_perform_mode ppf = function
   | PerformForever -> Fmt.pf ppf "FOREVER"
   | PerformNTimes i -> Fmt.pf ppf "%a TIMES" pp_ident_or_intlit i
-  | PerformUntil { with_test; until } ->
+  | PerformUntil { with_test = _; until = None } ->
+    Fmt.pf ppf "UNTIL EXIT"
+  | PerformUntil { with_test; until = Some until } ->
     Fmt.(option (any " TEST " ++ pp_stage ++ sp)) ppf with_test;
     Fmt.pf ppf "UNTIL %a" pp_condition until
   | PerformVarying { with_test; varying; after } ->
