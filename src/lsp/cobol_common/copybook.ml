@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 open Ez_file.V1
 
 type fileloc = [ `Word of string | `Alphanum of string ]
@@ -31,7 +32,12 @@ let libfile_extensions =
   [".CPY"; ".CBL"; ".COB"; ".CBX";
    ".cpy"; ".cbl"; ".cob"; ".cbx"; ""]
 
-let find_lib ~libpath ?fromfile ?libname textname : _ result =
+type directory = {
+  dir : string ;
+  files : string StringMap.t ; (* key is basename in lowercase *)
+}
+
+let find_lib ~libpath ?(exts=libfile_extensions) ?fromfile ?libname textname : _ result =
   let libpath = match libname, fromfile with
     | None, _ ->
         libpath
@@ -41,23 +47,46 @@ let find_lib ~libpath ?fromfile ?libname textname : _ result =
     | Some (`Word d | `Alphanum d), _ ->
         [d]
   in
-  let rec try_file base = function
-    | [] ->
-        Error { libname = base; libpath }
-    | suff :: tl ->
-        try Ok (EzFile.find_in_path libpath (base ^ suff))
-        with Not_found -> try_file base tl
+  let libpath_files = List.map (fun dir ->
+      { dir ;
+        files =
+          let files = try Sys.readdir dir with _ -> [||] in
+          let map = ref StringMap.empty in
+          Array.iter (fun file ->
+              let base = String.lowercase_ascii file in
+              map := StringMap.add base file !map
+            ) files ;
+          !map
+      }
+    ) libpath
+  in
+  let exts = List.map String.lowercase_ascii exts in
+  let try_file libname exts =
+    let base = String.lowercase_ascii libname in
+    let rec iter_path path =
+      match path with
+      | [] -> Error { libname; libpath }
+      | d :: path ->
+        iter_exts d path exts
+
+    and iter_exts d path exts =
+      match exts with
+      | [] -> iter_path path
+      | ext :: exts ->
+        let file = base ^ ext in
+        match StringMap.find file d.files with
+        | exception Not_found -> iter_exts d path exts
+        | file -> Ok ( Filename.concat d.dir file )
+    in
+    iter_path libpath_files
   in
   match textname with
   | `Alphanum w ->                       (* assume no more filename extension  *)
       try_file w [""]
   | `Word w ->
-      match try_file w libfile_extensions with
+      match try_file w exts with
       | Ok lib -> Ok lib
-      | Error _ ->
-          match try_file (String.lowercase_ascii w) libfile_extensions with
-          | Ok lib -> Ok lib
-          | Error err -> Error { err with libname = w }
+      | Error err -> Error { err with libname = w }
 
 let pp_lookup_error ppf { libname; libpath } =
   (* TODO: `note addendum about search path *)
