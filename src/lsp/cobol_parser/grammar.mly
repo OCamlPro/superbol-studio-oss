@@ -3287,7 +3287,7 @@ let tallying :=
     { { tallying_target = i; tallying_clauses = tfl } }
 
 let tallying_for :=
- | CHARACTERS; l = rl(inspect_where); {TallyingCharacters l}
+ | ALL?; CHARACTERS; l = rl(inspect_where); {TallyingCharacters l}
  | ALL; l = ident_after_before_list;        {TallyingRange (TallyAll, l)}
  | LEADING; l = ident_after_before_list;    {TallyingRange (TallyLeading, l)}
 
