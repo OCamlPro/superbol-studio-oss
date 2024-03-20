@@ -406,30 +406,32 @@ let fold_usage_clause (v: _ #folder) =
           fold_name' v n
       | Pointer n
       | ProgramPointer n ->
-          fold_name'_opt v n
-      | _ ->
-         Fun.id
-          (* | Binary *)
-          (* | BinaryChar of signedness option *)
-          (* | BinaryShort of signedness option *)
-          (* | BinaryLong of signedness option *)
-          (* | BinaryDouble of signedness option *)
-          (* | Bit *)
-          (* | Display *)
-          (* | FloatBinary32 of endianness_mode option *)
-          (* | FloatBinary64 of endianness_mode option *)
-          (* | FloatBinary128 of endianness_mode option *)
-          (* | FloatDecimal16 of encoding_endianness *)
-          (* | FloatDecimal34 of encoding_endianness *)
-          (* | FloatExtended *)
-          (* | FloatLong *)
-          (* | FloatShort *)
-          (* | Index *)
-          (* | National *)
-          (* | PackedDecimal *)
-          (* | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 | *)
-          (*                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 | *)
-          (*                    `BinaryCLong of signedness option] *)
+        fold_name'_opt v n
+      | Binary
+      | Bit
+      | Display
+      | FloatExtended
+      | FloatLong
+      |  FloatShort
+      | Index
+      | National
+      | PackedDecimal
+      | ProcedurePointer
+      | BinaryChar _  (* signedness option *)
+      | BinaryShort _
+      | BinaryLong _
+      | BinaryDouble _
+      | FloatBinary32 _  (* endianness_mode option *)
+      | FloatBinary64 _
+      | FloatBinary128 _
+      | FloatDecimal16 _  (* encoding_endianness *)
+      | FloatDecimal34 _
+      | UsagePending _
+        (* |  [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 | *)
+        (*                    `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 | *)
+        (*                    `BinaryCLong of signedness option] *)
+          ->
+          Fun.id
     end
 
 let fold_class_clause (v: _ #folder) =

@@ -475,7 +475,7 @@ let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
 let program_id_header_prefix ==
-  | PROGRAM_ID; "."; ~ = loc(info_word); ~ = as__strlit_; < >
+  | PROGRAM_ID; "."?; ~ = loc(info_word); ~ = as__strlit_; < >
 
 let program_definition_id_paragraph [@context program_id_paragraph] :=
   | ids = program_id_header_prefix;
@@ -1067,7 +1067,6 @@ let report_section :=
 let screen_section :=                                              (* +COB2002 *)
   | ~ = section (SCREEN, constant_or_screen_descr_entry); < >
 
-
 let elementary_level == ~ = DIGITS; <int_of_string>
 
 let condition_level :=
@@ -1584,6 +1583,7 @@ usage [@context usage_clause   (* ok as none of leftmost terminals are C/S *)]:
   | NATIONAL                                      { National }
   | OBJECT REFERENCE rk = ro(object_reference_kind) { ObjectReference rk }
   | FUNCTION_POINTER TO? i = name                 { FunctionPointer i }
+  | PROCEDURE_POINTER                             { ProcedurePointer }
   | POINTER io = ro(pf(TO?,name))                 { Pointer io }
   | PROGRAM_POINTER io = ro(pf(TO?,name))         { ProgramPointer io }
 
@@ -3243,6 +3243,7 @@ let init_data_category :=
  | BOOLEAN;             {InitCategoryBoolean}                     (* +COB2002 *)
  | DATA_POINTER;        {InitCategoryDataPointer}                 (* +COB2002 *)
  | FUNCTION_POINTER;    {InitCategoryFunctionPointer}
+ | PROCEDURE_POINTER;   {InitCategoryProcedurePointer}            (* MF *)
  | NATIONAL;            {InitCategoryNational}                    (* +COB2002 *)
  | NATIONAL_EDITED;     {InitCategoryNationalEdited}              (* +COB2002 *)
  | NUMERIC;             {InitCategoryNumeric}
@@ -3426,8 +3427,10 @@ let perform_statement [@context perform_stmt] :=
 let perform_phrase :=
  | FOREVER; { PerformForever } (* GC/COBOL-IT extension *)
  | ~ = ident_or_integer; TIMES; <PerformNTimes>
+ | wt = ro(with_test); UNTIL; EXIT;
+   { PerformUntil { with_test = wt; until = None } }
  | wt = ro(with_test); UNTIL; until = condition;
-   { PerformUntil { with_test = wt; until } }
+   { PerformUntil { with_test = wt; until = Some until } }
  | wt = ro(with_test); VARYING; v = loc(varying_phrase);
    vl = l(pf(AFTER,loc(varying_phrase)));
    { PerformVarying { with_test = wt; varying = v; after = vl } }
@@ -3637,7 +3640,7 @@ let advancing_phrase :=
 
 %public let unconditional_action := ~ = set_statement; <Set>
 let set_statement [@context set_stmt] :=
-  (* Ambiguous cases (formats 1, 2, 5, 7, 8, 9, 10 and 14) *)
+  (* Ambiguous cases (formats 1, 2, 5, 7, 8, 9, 10 and 14 of ISO 2014) *)
   | SET; i = ident; TO; la = locale_or_ambiguous;
     { match la with
         | `Locale ld ->
@@ -3645,6 +3648,10 @@ let set_statement [@context set_stmt] :=
         | `Expr e ->
             SetAmbiguous { targets = [i]; value = e;
                            set_method = SetMethodTo } }
+ | SET; i = ident; TO; ENTRY; e = ident_or_nonnumeric;
+   { SetEntry { targets = [i]; value = e } }
+ | SET; i = ident; il = idents; TO; ENTRY; e = ident_or_nonnumeric;
+   { SetEntry { targets = i :: il; value = e } }
  | SET; i = ident; il = idents; TO; e = expression;
    { SetAmbiguous { targets = i :: il; set_method = SetMethodTo; value = e } }
  | SET; il = idents; ud = up_down; e = expression;
@@ -3672,6 +3679,7 @@ let set_statement [@context set_stmt] :=
    { SetSavedException }
  | SET; CONTENT; OF?; il = idents; TO; fc = float_content; so = ro(sign);
    { SetFloatContent { targets = il; content = fc; sign = so } }
+
 
 let locale_or_ambiguous :=
   | LOCALE; ld = lc_all_or_default; { `Locale ld }

@@ -77,6 +77,8 @@ let pp_usage: usage Pretty.printer =
         Pretty.print ppf "float-short (float)"
     | Function_pointer _ ->
         Pretty.print ppf "function pointer"
+    | Procedure_pointer ->
+        Pretty.print ppf "procedure-pointer"
     | Index ->
         Pretty.print ppf "index"
     | National picture ->

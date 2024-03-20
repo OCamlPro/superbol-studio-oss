@@ -1214,26 +1214,6 @@ run_file.at-4301-prog.cob:17.11-17.15:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4340:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4390:0
-run_file.at-4390-prog.cob:15.24:
-  12          01 TEST-REC      PIC X(4).
-  13          PROCEDURE        DIVISION.
-  14              OPEN INPUT TEST-FILE
-  15 >            PERFORM UNTIL EXIT
-----                           ^
-  16                 READ TEST-FILE
-  17                     AT END EXIT PERFORM
->> Hint: Missing <expression>
-
-run_file.at-4390-prog.cob:15.25-15.29:
-  12          01 TEST-REC      PIC X(4).
-  13          PROCEDURE        DIVISION.
-  14              OPEN INPUT TEST-FILE
-  15 >            PERFORM UNTIL EXIT
-----                            ^^^^
-  16                 READ TEST-FILE
-  17                     AT END EXIT PERFORM
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4429:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4556:0
 run_file.at-4556-inp_data:1.7-1.8:
@@ -7605,23 +7585,6 @@ run_file.at-13896-expected.txt:1.7-1.8:
    3     STAT-FILE2: 35
 >> Error: Invalid syntax
 
-run_file.at-13896-expected.txt:2.7-2.11:
-   1   ERROR ON FILE2
-   2 >   STAT-FILE1: 00
-----          ^^^^
-   3     STAT-FILE2: 35
-   4   READ FILE1
->> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:3.7-3.11:
-   1   ERROR ON FILE2
-   2     STAT-FILE1: 00
-   3 >   STAT-FILE2: 35
-----          ^^^^
-   4   READ FILE1
-   5   ERROR ON FILE1
->> Warning: Unexpected non-blank area A on continuation line
-
 run_file.at-13896-expected.txt:4.6-4.7:
    1   ERROR ON FILE2
    2     STAT-FILE1: 00
@@ -7641,26 +7604,6 @@ run_file.at-13896-expected.txt:5.6-5.7:
    6     STAT-FILE1: 10
    7     STAT-FILE2: 35
 >> Error: Unexpected indicator: `O'
-
-run_file.at-13896-expected.txt:6.7-6.11:
-   3     STAT-FILE2: 35
-   4   READ FILE1
-   5   ERROR ON FILE1
-   6 >   STAT-FILE1: 10
-----          ^^^^
-   7     STAT-FILE2: 35
-   8   READ FILE2
->> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:7.7-7.11:
-   4   READ FILE1
-   5   ERROR ON FILE1
-   6     STAT-FILE1: 10
-   7 >   STAT-FILE2: 35
-----          ^^^^
-   8   READ FILE2
-   9   ERROR ON FILE2
->> Warning: Unexpected non-blank area A on continuation line
 
 run_file.at-13896-expected.txt:8.6-8.7:
    5   ERROR ON FILE1
@@ -7682,26 +7625,6 @@ run_file.at-13896-expected.txt:9.6-9.7:
   11     STAT-FILE2: 47
 >> Error: Unexpected indicator: `O'
 
-run_file.at-13896-expected.txt:10.7-10.11:
-   7     STAT-FILE2: 35
-   8   READ FILE2
-   9   ERROR ON FILE2
-  10 >   STAT-FILE1: 10
-----          ^^^^
-  11     STAT-FILE2: 47
-  12   CLOSE FILES
->> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:11.7-11.11:
-   8   READ FILE2
-   9   ERROR ON FILE2
-  10     STAT-FILE1: 10
-  11 >   STAT-FILE2: 47
-----          ^^^^
-  12   CLOSE FILES
-  13   ERROR ON FILE2
->> Warning: Unexpected non-blank area A on continuation line
-
 run_file.at-13896-expected.txt:12.6-12.7:
    9   ERROR ON FILE2
   10     STAT-FILE1: 10
@@ -7721,25 +7644,6 @@ run_file.at-13896-expected.txt:13.6-13.7:
   14     STAT-FILE1: 00
   15     STAT-FILE2: 42
 >> Error: Unexpected indicator: `O'
-
-run_file.at-13896-expected.txt:14.7-14.11:
-  11     STAT-FILE2: 47
-  12   CLOSE FILES
-  13   ERROR ON FILE2
-  14 >   STAT-FILE1: 00
-----          ^^^^
-  15     STAT-FILE2: 42
-  16   DELETE FILES
->> Warning: Unexpected non-blank area A on continuation line
-
-run_file.at-13896-expected.txt:15.7-15.11:
-  12   CLOSE FILES
-  13   ERROR ON FILE2
-  14     STAT-FILE1: 00
-  15 >   STAT-FILE2: 42
-----          ^^^^
-  16   DELETE FILES
->> Warning: Unexpected non-blank area A on continuation line
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13893:0
 run_file.at-13893-prog1.cob:45.17-45.21:

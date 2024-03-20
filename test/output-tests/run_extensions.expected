@@ -2576,86 +2576,6 @@ run_extensions.at-4380-test_stdio.c:12.6-12.7:
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4454:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4597:0
-run_extensions.at-4597-prog.cob:7.44:
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7 >        77  Ext-Proc-Address            USAGE PROCEDURE-POINTER.
-----                                               ^
-   8          77  install-flag                USAGE BINARY-CHAR.
-   9              88  install-default         VALUE 0.
->> Hint: Missing BINARY
-
-run_extensions.at-4597-prog.cob:7.45-7.62:
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7 >        77  Ext-Proc-Address            USAGE PROCEDURE-POINTER.
-----                                                ^^^^^^^^^^^^^^^^^
-   8          77  install-flag                USAGE BINARY-CHAR.
-   9              88  install-default         VALUE 0.
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:14.44:
-  11              88  query-priority          VALUE 2.
-  12              88  install-priority        VALUE 3.
-  13          01  exit-params.
-  14 >            02  proc-addrs              USAGE PROCEDURE-POINTER.
-----                                               ^
-  15              02  ppriority               USAGE BINARY-CHAR.
-  16          PROCEDURE DIVISION.
->> Hint: Missing BINARY
-
-run_extensions.at-4597-prog.cob:14.45-14.62:
-  11              88  query-priority          VALUE 2.
-  12              88  install-priority        VALUE 3.
-  13          01  exit-params.
-  14 >            02  proc-addrs              USAGE PROCEDURE-POINTER.
-----                                                ^^^^^^^^^^^^^^^^^
-  15              02  ppriority               USAGE BINARY-CHAR.
-  16          PROCEDURE DIVISION.
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:21.35-21.40:
-  18              DISPLAY 'Program is starting'
-  19         *>   Do this for the ACU test later
-  20         *>   CALL 'CBL_EXIT_PROC' USING 0, "ExtProc-internal"
-  21 >            SET Ext-Proc-Address TO ENTRY 'ExtProc'
-----                                      ^^^^^
-  22         *>   GC "simple variant"
-  23              CALL 'CBL_EXIT_PROC' USING 0, Ext-Proc-Address
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:27.35-27.40:
-  24         *>   Support for MF variant,
-  25         *>   storing but otherwise ignoring the priority for now
-  26              SET install-default  TO TRUE
-  27 >            SET proc-addrs       TO ENTRY 'ExtProc-internal'
-----                                      ^^^^^
-  28              CALL 'CBL_EXIT_PROC' USING install-flag, exit-params
-  29         *>   Ensure subsequent CALLs with the same one are seen as error (MF!)
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:30.35-30.40:
-  27              SET proc-addrs       TO ENTRY 'ExtProc-internal'
-  28              CALL 'CBL_EXIT_PROC' USING install-flag, exit-params
-  29         *>   Ensure subsequent CALLs with the same one are seen as error (MF!)
-  30 >            SET proc-addrs       TO ENTRY 'ExtProc'
-----                                      ^^^^^
-  31              CALL 'CBL_EXIT_PROC' USING install-flag, exit-params
-  32              IF RETURN-CODE = 0
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:41.35-41.40:
-  38              IF RETURN-CODE NOT = 0
-  39                 DISPLAY 'Unexpected RETURN-CODE with subsequent call, '
-  40                         'different priority ' RETURN-CODE.
-  41 >            SET proc-addrs       TO ENTRY 'ExtProc-internal2'
-----                                      ^^^^^
-  42              CALL 'CBL_EXIT_PROC' USING install-flag, exit-params
-  43              IF RETURN-CODE NOT = 0
->> Error: Invalid syntax
-
 run_extensions.at-4597-prog.cob:50.7-50.12:
   47              DISPLAY 'Program is stopping'
   48              STOP RUN
@@ -2664,26 +2584,6 @@ run_extensions.at-4597-prog.cob:50.7-50.12:
 ----          ^^^^^
   51              DISPLAY 'Exit procedure from ' FUNCTION MODULE-ID ()
   52              SET Ext-Proc-Address TO ENTRY 'ExtProc'
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:52.35-52.40:
-  49              .
-  50          ENTRY 'ExtProc-internal2'.
-  51              DISPLAY 'Exit procedure from ' FUNCTION MODULE-ID ()
-  52 >            SET Ext-Proc-Address TO ENTRY 'ExtProc'
-----                                      ^^^^^
-  53              SET query-priority TO TRUE
-  54              MOVE 0             TO ppriority
->> Error: Invalid syntax
-
-run_extensions.at-4597-prog.cob:61.35-61.40:
-  58                          RETURN-CODE
-  59              ELSE IF ppriority NOT = 127
-  60                 DISPLAY 'Unexpected priority external ' ppriority.
-  61 >            SET proc-addrs       TO ENTRY 'ExtProc-internal'
-----                                      ^^^^^
-  62              CALL 'CBL_EXIT_PROC' USING install-flag, exit-params
-  63              IF RETURN-CODE NOT = ZERO
 >> Error: Invalid syntax
 
 run_extensions.at-4597-prog.cob:80.7-80.12:
@@ -2697,36 +2597,6 @@ run_extensions.at-4597-prog.cob:80.7-80.12:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4672:0
-run_extensions.at-4672-prog.cob:17.35-17.40:
-  14         *>   Do this for the ACU test, where second call moves top front
-  15         *>   SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
-  16         *>   CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  17 >            SET Err-Proc-Address TO ENTRY 'ErrProc'
-----                                      ^^^^^
-  18              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  19              SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
->> Error: Invalid syntax
-
-run_extensions.at-4672-prog.cob:19.35-19.40:
-  16         *>   CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  17              SET Err-Proc-Address TO ENTRY 'ErrProc'
-  18              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  19 >            SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
-----                                      ^^^^^
-  20              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  21         *>   Ensure subsequent CALLs with the same one are ignored (MF!)
->> Error: Invalid syntax
-
-run_extensions.at-4672-prog.cob:22.35-22.40:
-  19              SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
-  20              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  21         *>   Ensure subsequent CALLs with the same one are ignored (MF!)
-  22 >            SET Err-Proc-Address TO ENTRY 'ErrProc'
-----                                      ^^^^^
-  23              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  24              SET Err-Proc-Address TO NULL
->> Error: Invalid syntax
-
 run_extensions.at-4672-prog.cob:29.7-29.12:
   26              DISPLAY 'Program is stopping'
   27              STOP RUN
@@ -2738,26 +2608,6 @@ run_extensions.at-4672-prog.cob:29.7-29.12:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4767:0
-run_extensions.at-4767-prog.cob:15.35-15.40:
-  12          PROCEDURE DIVISION.
-  13          S1.
-  14              DISPLAY 'Program is starting'
-  15 >            SET Err-Proc-Address TO ENTRY 'ErrProc'
-----                                      ^^^^^
-  16              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  17              SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
->> Error: Invalid syntax
-
-run_extensions.at-4767-prog.cob:17.35-17.40:
-  14              DISPLAY 'Program is starting'
-  15              SET Err-Proc-Address TO ENTRY 'ErrProc'
-  16              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  17 >            SET Err-Proc-Address TO ENTRY 'ErrProc-internal'
-----                                      ^^^^^
-  18              CALL 'CBL_ERROR_PROC' USING 0, Err-Proc-Address
-  19              SET Err-Proc-Address TO NULL
->> Error: Invalid syntax
-
 run_extensions.at-4767-prog.cob:24.7-24.12:
   21              DISPLAY 'Program is stopping'
   22              STOP RUN

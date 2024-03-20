@@ -171,6 +171,7 @@ and init_data_category =
   | InitCategoryBoolean
   | InitCategoryDataPointer
   | InitCategoryFunctionPointer
+  | InitCategoryProcedurePointer
   | InitCategoryNational
   | InitCategoryNationalEdited
   | InitCategoryNumeric
@@ -186,6 +187,7 @@ let pp_init_data_category ppf = function
   | InitCategoryBoolean -> Fmt.pf ppf "BOOLEAN"
   | InitCategoryDataPointer -> Fmt.pf ppf "DATA-POINTER"
   | InitCategoryFunctionPointer -> Fmt.pf ppf "FUNCTION-POINTER"
+  | InitCategoryProcedurePointer -> Fmt.pf ppf "PROCEDURE-POINTER"
   | InitCategoryNational -> Fmt.pf ppf "NATIONAL"
   | InitCategoryNationalEdited -> Fmt.pf ppf "NATIONAL-EDITED"
   | InitCategoryNumeric -> Fmt.pf ppf "NUMERIC"
@@ -597,6 +599,10 @@ type set_stmt =
       set_switch_spec list
   | SetCondition of
       set_condition_spec list
+  | SetEntry of {
+      targets : ident list ;
+      value : ident_or_nonnum ;
+    }
   | SetAttribute of
       {
         name: name with_loc;
@@ -675,7 +681,10 @@ let pp_set_stmt ppf ss =
       Fmt.(list ~sep:sp pp_ident) targets
       pp_float_content content
       Fmt.(option (sp ++ pp_sign)) sign
-
+  | SetEntry { targets ; value } ->
+    Fmt.pf ppf "%a@ TO@ ENTRY@ %a"
+      Fmt.(list ~sep:sp pp_ident) targets
+      pp_ident_or_nonnum value
 
 (* SORT *)
 type sort_stmt =

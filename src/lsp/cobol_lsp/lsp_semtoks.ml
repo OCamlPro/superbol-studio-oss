@@ -481,6 +481,7 @@ let semtoks_from_ptree ~filename ?range ptree =
           |> Visitor.skip_children
       | SetSwitch _ (*TODO*)
       | SetCondition _
+      | SetEntry _
       | SetAttribute _
       | SetLocale _
       | SetSavedException ->

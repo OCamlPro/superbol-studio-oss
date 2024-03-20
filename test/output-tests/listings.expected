@@ -1850,15 +1850,25 @@ listings.at-2030-expected.lst:44.31-44.35:
   46   L prog-2                       EXTERN   11                             x1
 >> Warning: Invalid syntax
 
-listings.at-2030-expected.lst:46.7-46.11:
+listings.at-2030-expected.lst:46.31-46.37:
   43   
   44   FUNCTION                       TYPE                   REFERENCES
   45   
   46 > L prog-2                       EXTERN   11                             x1
-----          ^^^^
+----                                  ^^^^^^
   47   
   48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
->> Warning: Unexpected non-blank area A on continuation line
+>> Warning: Invalid syntax
+
+listings.at-2030-expected.lst:46.31:
+  43   
+  44   FUNCTION                       TYPE                   REFERENCES
+  45   
+  46 > L prog-2                       EXTERN   11                             x1
+----                                  ^
+  47   
+  48   GnuCOBOL V.R.P          prog-1.cob                                      Page 0006
+>> Hint: Missing .
 
 listings.at-2030-expected.lst:46.37:
   43   

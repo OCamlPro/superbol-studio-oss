@@ -160,7 +160,7 @@ let fold_perform_mode (v: _ #folder) =
           >> fold_ident_or_intlit v i
       | PerformUntil { with_test; until } -> x
           >> fold_option ~fold:fold_stage v with_test
-          >> fold_condition v until
+          >> fold_option ~fold:fold_condition v until
       | PerformVarying { with_test; varying; after } -> x
           >> fold_option ~fold:fold_stage v with_test
           >> fold_varying_phrase' v varying
@@ -593,6 +593,10 @@ let fold_set' (v: _ #folder) =
           >> fold_list ~fold:fold_ident v targets
           >> fold_float_content v content
           >> fold_option ~fold:fold_sign v sign
+      | SetEntry { targets ; value } -> x
+          >> fold_list ~fold:fold_ident v targets
+          >> fold_ident_or_nonnum v value
+
     end
 
 let fold_sort' (v: _ #folder) =

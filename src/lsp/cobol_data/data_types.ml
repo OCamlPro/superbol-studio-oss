@@ -41,6 +41,7 @@ type usage =
   | Float_extended                                                (* +COB2002 *)
   | Float_long                                                    (* +COB2002 *)
   | Float_short                                                   (* +COB2002 *)
+  | Procedure_pointer                                             (* MF *)
   | Function_pointer of Cobol_ptree.name with_loc                 (* tmp *)
   | Index
   | National of (* [any] *) picture

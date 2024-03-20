@@ -456,16 +456,6 @@ run_fundamental.at-1956-prog.cob:60.51-60.55:
   62   
 >> Error: Invalid syntax
 
-run_fundamental.at-1956-prog.cob:64.27-64.32:
-  61          01  x           PIC 9 VALUE 1.
-  62   
-  63          PROCEDURE       DIVISION.
-  64 >            SET self-ptr TO ENTRY "cancel-test"
-----                              ^^^^^
-  65              IF  self-ptr = NULL
-  66                  DISPLAY 'self-address not set' UPON SYSERR.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2060:0
 run_fundamental.at-2060-prog.cob:28.50:
   25              .

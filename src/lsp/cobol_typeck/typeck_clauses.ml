@@ -342,6 +342,9 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | FunctionPointer f ->
         diags, Some (Function_pointer f)
 
+    | ProcedurePointer ->
+        diags, Some Procedure_pointer
+
     | Index ->                                 (* TODO: check value \in Z (N?) *)
         diags, Some Index
 
@@ -393,6 +396,7 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
             Float_long |
             Float_short |
             Function_pointer _ |
+            Procedure_pointer |
             Index |
             Object_reference _ |
             Pointer _ |

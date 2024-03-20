@@ -459,7 +459,7 @@ and maybe_fixed_cdir_line c state (* we just read [c='>'] in indicator column *)
       }
 and fixed_continue_line state
   = parse
-  | blank_area_A
+  | blank*
       {
         (* Special rule for double-quoted alphanum continuation and continuation
            of literals with unclosed sequences of symbolic EBCDIC characters.
@@ -474,6 +474,7 @@ and fixed_continue_line state
         in
         cont state lexbuf
       }
+      (* FIXME Nicolas
   | nonblank_area_A
       {
         Src_lexing.unexpected Non_blank_area_A_on_continuation_line
@@ -491,6 +492,7 @@ and fixed_continue_line state
       {
         newline_or_eof state lexbuf
       }
+*)
 and fixed_continue_open state
   = parse
   | alphanum_lit

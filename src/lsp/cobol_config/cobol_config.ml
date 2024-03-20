@@ -55,7 +55,7 @@ let default_search_path =
       Option.to_list (Sys.getenv_opt fallback_config_dir_var)
     in
     let xdg_superbol_dir =      (* is this available on win32/cygwin as well? *)
-      append ~sub:"superbol" @@
+      append ~sub:"superbol/gnucobol-config" @@
       match Sys.getenv_opt "XDG_CONFIG_HOME" with
       | Some p -> Some p
       | None -> Option.map (fun d -> d // ".config") (Sys.getenv_opt "HOME")
