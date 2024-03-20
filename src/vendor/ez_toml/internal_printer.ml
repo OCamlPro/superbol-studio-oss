@@ -147,6 +147,7 @@ and bprint_table b config prefix (simple_values, sections) =
           bprint_table b config key_path (simple_values, sections);
       | Array array ->
           let key_path = prefix @ [ key ] in
+          bprint_comment_before b config node ;
           Array.iter (fun node ->
               bprint_comment_before b config node ;
               Buffer.add_string b "[[";
@@ -158,7 +159,8 @@ and bprint_table b config prefix (simple_values, sections) =
                 | _ -> assert false
               in
               bprint_table b config key_path ( split_table table )
-            ) array
+            ) array;
+          bprint_comment_after b config node ;
       | _ -> assert false
     ) sections ;
   ()
