@@ -499,26 +499,6 @@ run_misc.at-1659-dump.c:9.6-9.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1660:0
-run_misc.at-1660-prog.cob:14.40-14.46:
-  11              MOVE 9 TO MYOCC.
-  12              CALL "dump" USING BY CONTENT 1
-  13              END-CALL.
-  14 >            CALL "dump" USING BY CONTENT LENGTH OF MYTAB
-----                                           ^^^^^^
-  15              END-CALL.
-  16              CALL "dump" USING BY CONTENT LENGTH OF MYOCC
->> Error: Invalid syntax
-
-run_misc.at-1660-prog.cob:16.40-16.46:
-  13              END-CALL.
-  14              CALL "dump" USING BY CONTENT LENGTH OF MYTAB
-  15              END-CALL.
-  16 >            CALL "dump" USING BY CONTENT LENGTH OF MYOCC
-----                                           ^^^^^^
-  17              END-CALL.
-  18              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1694:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1720:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1753:0
@@ -4977,16 +4957,6 @@ run_misc.at-11129-prog.cob:69.36-69.45:
   71                  05 col1  PIC X.
 >> Error: Invalid syntax
 
-run_misc.at-11129-prog.cob:106.43-106.49:
- 103         *
- 104              SET P2 TO NULL
- 105              SET ADDRESS OF A-TABLE TO NULL
- 106 >            MOVE ALL ZEROES TO A-TABLE (1: (LENGTH OF A-TABLE)).
-----                                              ^^^^^^
- 107         *
- 108              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11365:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11339:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11409:0
@@ -5832,26 +5802,6 @@ run_misc.at-11928-cmod.c:84.22-115.0:
 >> Error: Unterminated pseudotext
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11928:0
-run_misc.at-11928-prog.cob:33.29-33.35:
-  30              MOVE "Hello!" TO CHRX.
-  31              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  32              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  33 >            CALL "CAPI" USING LENGTH OF GRPX.
-----                                ^^^^^^
-  34              CALL "CAPI" USING BY VALUE GRPX LENGTH OF GRPX.
-  35              CALL "CAPI" USING "Fred Fish", COMP3.
->> Error: Invalid syntax
-
-run_misc.at-11928-prog.cob:34.43-34.49:
-  31              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  32              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  33              CALL "CAPI" USING LENGTH OF GRPX.
-  34 >            CALL "CAPI" USING BY VALUE GRPX LENGTH OF GRPX.
-----                                              ^^^^^^
-  35              CALL "CAPI" USING "Fred Fish", COMP3.
-  36              CALL "CAPI" USING COMP3V99.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12158:0
 run_misc.at-12158-cmod.c:6.7-6.11:
    3   #include <string.h>
@@ -6573,26 +6523,6 @@ run_misc.at-12158-cmod.c:80.22-109.0:
 >> Error: Unterminated pseudotext
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12158:0
-run_misc.at-12158-prog.cob:33.29-33.35:
-  30              MOVE "Hello!" TO CHRX.
-  31              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  32              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  33 >            CALL "CAPI" USING LENGTH OF GRPX.
-----                                ^^^^^^
-  34              CALL "CAPI" USING BY VALUE GRPX LENGTH OF GRPX.
-  35              CALL "CAPI" USING "Fred Fish", COMP3.
->> Error: Invalid syntax
-
-run_misc.at-12158-prog.cob:34.43-34.49:
-  31              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  32              CALL "CAPI" USING BY VALUE BINFLD5, CHRX.
-  33              CALL "CAPI" USING LENGTH OF GRPX.
-  34 >            CALL "CAPI" USING BY VALUE GRPX LENGTH OF GRPX.
-----                                              ^^^^^^
-  35              CALL "CAPI" USING "Fred Fish", COMP3.
-  36              CALL "CAPI" USING COMP3V99.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12247:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12343:0
 run_misc.at-12343-prog.cob:26.18-26.27:

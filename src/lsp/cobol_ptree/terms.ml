@@ -93,6 +93,7 @@ type _ term =
   | Counter: counter -> [>base_ident_] term
   | InlineCall: inline_call -> [>base_ident_] term
   | InlineInvoke: inline_invocation -> [>base_ident_] term
+  | LengthOf: [ident_|lit_] term -> [>base_ident_] term
   | ObjectView: object_view -> [>base_ident_] term
   | ObjectRef: object_ref -> [>base_ident_] term (* Includes predefined address (NULL) *)
   | QualIdent: qualident -> [>base_ident_] term  (* Includes subscripts *)
@@ -614,6 +615,7 @@ module FMT = struct
     | Counter c -> pp_counter ppf c
     | InlineCall i -> pp_inline_call ppf i
     | InlineInvoke i -> pp_inline_invocation ppf i
+    | LengthOf i -> fmt "@[LENGTH OF@ %a@]" ppf pp_term i
     | ObjectView o -> pp_object_view ppf o
     | ObjectRef o -> pp_object_ref ppf o
     | QualIdent i -> pp_qualident ppf i
@@ -849,6 +851,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -859,6 +862,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -869,6 +873,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -879,6 +884,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -889,6 +895,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -899,6 +906,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
@@ -971,6 +979,7 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
+    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v

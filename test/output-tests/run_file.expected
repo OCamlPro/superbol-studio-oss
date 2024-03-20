@@ -3403,16 +3403,6 @@ run_file.at-8591-prog.cob:304.16-304.22:
  306              PERFORM DUMP-FCD.
 >> Error: Invalid syntax
 
-run_file.at-8591-prog.cob:333.32-333.38:
- 330                        UNTIL IDX2 > key-count (idx)
- 331                  SET ADDRESS OF KEY-COMP TO KC-PTR
- 332                  DISPLAY "      Pos " kc-pos " Len " kc-len
- 333 >                SET KC-PTR UP BY LENGTH OF KEY-COMP
-----                                   ^^^^^^
- 334                END-PERFORM
- 335              END-PERFORM.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8672:0
 run_file.at-8672-reference:1.6-1.7:
    1 > Other Flags 32.
@@ -5392,16 +5382,6 @@ run_file.at-9824-prog.cob:101.15-101.21:
 ----                  ^^^^^^
  102             SET FCD-RECORD-ADDRESS   TO ADDRESS OF FCD-RECORD.
  103             MOVE 512 TO FCD-CURRENT-REC-LEN
->> Error: Invalid syntax
-
-run_file.at-9824-prog.cob:130.37-130.43:
- 127                           "   Len: " key-len
- 128                           "   Desc: " key-desc
- 129                           " Type: " key-type
- 130 >                 SET WS-FCD-PTR UP BY LENGTH OF key-inf
-----                                        ^^^^^^
- 131                   SET ADDRESS OF key-inf TO WS-FCD-PTR
- 132                END-PERFORM
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10153:0

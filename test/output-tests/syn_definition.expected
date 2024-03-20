@@ -887,23 +887,3 @@ syn_definition.at-2617-prog.cob:22.22-22.26:
   24          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
-syn_definition.at-2617-prog.cob:26.36-26.42:
-  23   
-  24          PROCEDURE DIVISION.
-  25              DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
-  26 >            DISPLAY Z-MESSAGE-T2 (55:LENGTH OF DETAIL-NO)
-----                                       ^^^^^^
-  27              DISPLAY MT3 (1:LENGTH OF AUSGABE-FILE-NAME)
-  28              ADD OUTPUT-VAL TO DETAIL-NO
->> Error: Invalid syntax
-
-syn_definition.at-2617-prog.cob:27.26-27.32:
-  24          PROCEDURE DIVISION.
-  25              DISPLAY AUSGABE-FILE-NAME OF MESSAGE-TEXT-2
-  26              DISPLAY Z-MESSAGE-T2 (55:LENGTH OF DETAIL-NO)
-  27 >            DISPLAY MT3 (1:LENGTH OF AUSGABE-FILE-NAME)
-----                             ^^^^^^
-  28              ADD OUTPUT-VAL TO DETAIL-NO
-  29              GOBACK.
->> Error: Invalid syntax
-
