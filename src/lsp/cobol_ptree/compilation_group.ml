@@ -34,7 +34,7 @@ type program_unit =
 and program_level =
   | ProgramDefinition of
       {       (* Note: more general than before (allows nested prototypes): *)
-        kind: program_kind option;
+        mode: program_mode option;
         has_identification_division_header: bool;
         preliminary_informational_paragraphs:
           informational_paragraphs         (* GC extension (before PROGRAM-ID) *)
@@ -46,16 +46,30 @@ and program_level =
       }
   | ProgramPrototype
 
+and program_mode =
+  {
+    prog_is_common : bool;    (* only within a nested program *)
+    prog_kind : program_kind with_loc option
+  }
+
 and program_kind =
-  | Common
   | Initial
   | Recursive
 [@@deriving ord]
 
 let pp_program_kind ppf = function
-  | Common -> Fmt.pf ppf "COMMON"
-  | Initial -> Fmt.pf ppf "INITIAL"
-  | Recursive -> Fmt.pf ppf "RECURSIVE"
+  | Initial ->
+      Fmt.pf ppf "INITIAL"
+  | Recursive ->
+      Fmt.pf ppf "RECURSIVE"
+
+let pp_program_mode ppf { prog_is_common;
+                          prog_kind } = 
+  match prog_kind with
+  | None when prog_is_common   -> Fmt.pf ppf "COMMON"
+  | None                       -> ()
+  | Some k when prog_is_common -> Fmt.pf ppf "%a COMMON" (pp_with_loc pp_program_kind) k; 
+  | Some k                     -> (pp_with_loc pp_program_kind) ppf k
 
 let rec pp_program_unit ppf { program_name;
                               program_as;
@@ -68,14 +82,14 @@ let rec pp_program_unit ppf { program_name;
   let has_identification_division_header,
       preliminary_info, supplementary_info,
       nested_programs,
-      kind =
+      mode =
     match program_level with
     | ProgramDefinition { has_identification_division_header = p;
                           preliminary_informational_paragraphs = ip0;
                           supplementary_informational_paragraphs = ip1;
                           nested_programs;
-                          kind } ->
-        p, Some ip0, Some ip1, nested_programs, Some kind
+                          mode } ->
+        p, Some ip0, Some ip1, nested_programs, Some mode
     | ProgramPrototype ->
         false, None, None, [], None
   in
@@ -84,8 +98,8 @@ let rec pp_program_unit ppf { program_name;
   Fmt.(option pp_informational_paragraphs) ppf preliminary_info;
   Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_name) program_name;
   Fmt.(option (any "@ AS " ++ pp_strlit)) ppf program_as;
-  Fmt.(option (option (sp ++ pp_program_kind))
-         ~none:(any "@ PROTOTYPE")) ppf kind;
+  Fmt.(option (option (sp ++ pp_program_mode))
+         ~none:(any "@ PROTOTYPE")) ppf mode;
   Fmt.pf ppf ".@]@\n";
   Fmt.(option pp_informational_paragraphs) ppf supplementary_info;
   Fmt.(option (sp ++ pp_with_loc pp_options_paragraph)) ppf program_options;
