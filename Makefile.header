@@ -240,3 +240,6 @@ emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json
 # 8.0.1
 # --eval "(princ (lsp-generate-settings \"package.json\" 'lsp-superbol))" \
 # --eval '(princ "\n")' \
+
+test-promote:
+	opam exec -- dune runtest --auto-promote
