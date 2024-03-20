@@ -173,7 +173,6 @@ let epsilon = ""
 let letter = [ 'a'-'z' 'A'-'Z' ]                      (* TODO: '\128'-'\255'? *)
 let digit = [ '0'-'9' ]
 let sign = [ '+' '-' ]
-let opers = sign | ['*' '/' '>' '<' '=' '&'] | "**" | "::" | ">=" | "<=" | "<>"
 
 let line_directive_prefix = '#' blanks* "line" spaces
 let line_directive_filename = ("\"" ([^ '\r' '\n' '\"' ] * as name) "\"")
@@ -212,12 +211,12 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # [';' '\'' '"' '=']
-let text_word_prefix =
-  ((text_char # ['*' '>'])  text_char       ?)  |
-  (             ['*' '>']  (text_char # ['>']))
+let text_char = nonblank # [';' '\'' '"']
+let neq = text_char # ['=']
 let text_word =
-  (text_word_prefix (text_char # ['*' '>'] | '*' (text_char # ['>']))*) | opers
+  (* Note: accepts words that include floating comment markers `*>'; these are
+     processed in `Src_lexing.text_word`. *)
+  (neq* '='? neq+)+ | '=' | ">=" | "<="
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
