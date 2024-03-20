@@ -32,7 +32,7 @@ let nonempty_words words : _ result = match ~&words with
   | [] ->
       Error (Missing { loc = ~@words; stuff = At_least_one_text_word })
   | _ ->
-      Ok words
+      Ok (Text.map_pseudowords ~f:String.uppercase_ascii ~&words &@<- words)
 
 type _ partial_word_request =
   | ExactlyOne: string with_loc partial_word_request
@@ -158,6 +158,7 @@ let pseudotext_exact_match
   : pseudotext -> text ->
     ('s option * 's option * srcloc * text, [> `Mismatch | `MissingText]) result =
   let starts_with ~prefix s =
+    let s = String.uppercase_ascii s in
     s = prefix ||
     let pl = String.length prefix in
     String.length s >= pl && Str.first_chars s pl = prefix
@@ -194,7 +195,7 @@ let pseudotext_exact_match
         match ~&t, ~&p with
         | TextWord w,
           PseudoWord [{ payload = PwText pw; _ }]
-          when w <> pw ->
+          when String.uppercase_ascii w <> pw ->
             (* Pseudotext ends with a text-word [pw] that does not match [w]. *)
             Error `Mismatch
 
