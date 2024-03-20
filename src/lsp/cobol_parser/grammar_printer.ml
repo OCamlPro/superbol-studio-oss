@@ -104,6 +104,7 @@ let print_symbol = function
   | MenhirInterpreter.X (MenhirInterpreter.T T_TYPE) -> "TYPE"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRUNCATION) -> "TRUNCATION"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRUE) -> "TRUE"
+  | MenhirInterpreter.X (MenhirInterpreter.T T_TRIM_FUNC) -> "TRIM_FUNC"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRIMMED) -> "TRIMMED"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TREE_VIEW) -> "TREE_VIEW"
   | MenhirInterpreter.X (MenhirInterpreter.T T_TRANSPARENT_COLOR) -> "TRANSPARENT_COLOR"
@@ -2436,6 +2437,7 @@ let print_value (type a) : a MenhirInterpreter.symbol -> a -> string = function
   | MenhirInterpreter.T T_TYPE -> (fun _ -> "TYPE")
   | MenhirInterpreter.T T_TRUNCATION -> (fun _ -> "TRUNCATION")
   | MenhirInterpreter.T T_TRUE -> (fun _ -> "TRUE")
+  | MenhirInterpreter.T T_TRIM_FUNC -> (fun _ -> "TRIM_FUNC")
   | MenhirInterpreter.T T_TRIMMED -> (fun _ -> "TRIMMED")
   | MenhirInterpreter.T T_TREE_VIEW -> (fun _ -> "TREE_VIEW")
   | MenhirInterpreter.T T_TRANSPARENT_COLOR -> (fun _ -> "TRANSPARENT_COLOR")
@@ -4767,6 +4769,7 @@ let print_token = function
   | TYPE -> print_value (MenhirInterpreter.T T_TYPE) ()
   | TRUNCATION -> print_value (MenhirInterpreter.T T_TRUNCATION) ()
   | TRUE -> print_value (MenhirInterpreter.T T_TRUE) ()
+  | TRIM_FUNC -> print_value (MenhirInterpreter.T T_TRIM_FUNC) ()
   | TRIMMED -> print_value (MenhirInterpreter.T T_TRIMMED) ()
   | TREE_VIEW -> print_value (MenhirInterpreter.T T_TREE_VIEW) ()
   | TRANSPARENT_COLOR -> print_value (MenhirInterpreter.T T_TRANSPARENT_COLOR) ()
@@ -6125,6 +6128,7 @@ let token_of_terminal (type a) (t : a MenhirInterpreter.terminal) (v : a) : toke
   | T_TYPE -> TYPE
   | T_TRUNCATION -> TRUNCATION
   | T_TRUE -> TRUE
+  | T_TRIM_FUNC -> TRIM_FUNC
   | T_TRIMMED -> TRIMMED
   | T_TREE_VIEW -> TREE_VIEW
   | T_TRANSPARENT_COLOR -> TRANSPARENT_COLOR
