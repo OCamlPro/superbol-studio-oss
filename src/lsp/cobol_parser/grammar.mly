@@ -297,7 +297,7 @@ let identification_division_header ==
 program_definition [@cost 0]:
  | pd = program_definition_no_end
    pdl = loc(program_definition)* (* COB2002: PROCEDURE DIVISION must be present *)
-   END PROGRAM ep = name "."
+   END PROGRAM ep = loc(infoword_or_literal)? "."
    { match pd.program_level with
        | ProgramDefinition { mode;
                              has_identification_division_header;
@@ -311,7 +311,7 @@ program_definition [@cost 0]:
                                    preliminary_informational_paragraphs;
                                    supplementary_informational_paragraphs;
                                    nested_programs = pdl };
-             program_end_name = Some ep }
+             program_end_name = ep }
        | _ -> failwith "Cannot happen as per the grammar." }
 
 program_definition_no_end:
@@ -343,7 +343,7 @@ program_prototype [@cost 999]:
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(procedure_division))
-   END PROGRAM ep = name "."
+   END PROGRAM ep = loc(infoword_or_literal)? "."
    { let _, (program_name, program_as) = pid in
      { program_name;
        program_as;
@@ -352,7 +352,7 @@ program_prototype [@cost 999]:
        program_env = edo;
        program_data = ddo;
        program_proc = pdo;
-       program_end_name = Some ep } }
+       program_end_name = ep } }
 
 function_unit [@cost 999]:
  | fid = function_identification
@@ -469,13 +469,19 @@ let informational_paragraph_header ==
   | REMARKS;       {Remarks}
   | SECURITY;      {Security}
 
+(* To be able to use INFO_WORD, you must modify
+   Text_tokenizer.preproc_n_combine_tokens *)
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
 let program_id_header_prefix ==
-  | PROGRAM_ID; "."?; ~ = loc(info_word); ~ = as__strlit_; < >
+  | PROGRAM_ID; "."?; i = loc(infoword_or_literal); x = as__strlit_; { i, x }
+
+let infoword_or_literal :=
+ | i = loc(info_word); { Name i }
+ | i = literal;        { UPCAST.literal_with_name i }
 
 let program_definition_id_paragraph [@context program_id_paragraph] :=
   | ids = program_id_header_prefix;

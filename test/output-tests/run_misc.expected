@@ -2755,43 +2755,7 @@ run_misc.at-5433-prog.cob:9.11-9.19:
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5474:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5990:0
-run_misc.at-5990-prog.cob:3.18:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. 'prog'.
-----                     ^
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-5990-prog.cob:3.19-3.25:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. 'prog'.
-----                      ^^^^^^
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:6479:0
-run_misc.at-6479-prog.cob:3.18:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. 'prog'.
-----                     ^
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-6479-prog.cob:3.19-3.25:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. 'prog'.
-----                      ^^^^^^
-   4          ENVIRONMENT DIVISION.
-   5          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:6528:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:6982:0
 run_misc.at-6982-callee.cob:11.11-11.17:
@@ -4895,122 +4859,10 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11467:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11532:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11595:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11647:0
-run_misc.at-11647-prog.cob:21.18:
-  18          END PROGRAM prog.
-  19   
-  20          IDENTIFICATION DIVISION.
-  21 >        PROGRAM-ID. "SUB ".
-----                     ^
-  22   
-  23          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-11647-prog.cob:21.19-21.25:
-  18          END PROGRAM prog.
-  19   
-  20          IDENTIFICATION DIVISION.
-  21 >        PROGRAM-ID. "SUB ".
-----                      ^^^^^^
-  22   
-  23          DATA DIVISION.
->> Error: Invalid syntax
-
-run_misc.at-11647-prog.cob:30.18:
-  27          PROCEDURE DIVISION USING x.
-  28               DISPLAY "SUB GOT " X
-  29               END-DISPLAY.
-  30 >        END PROGRAM " SUB".
-----                     ^
-  31   
-  32          IDENTIFICATION DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-11647-prog.cob:30.19-30.25:
-  27          PROCEDURE DIVISION USING x.
-  28               DISPLAY "SUB GOT " X
-  29               END-DISPLAY.
-  30 >        END PROGRAM " SUB".
-----                      ^^^^^^
-  31   
-  32          IDENTIFICATION DIVISION.
->> Error: Invalid syntax
-
-run_misc.at-11647-prog.cob:33.18:
-  30          END PROGRAM " SUB".
-  31   
-  32          IDENTIFICATION DIVISION.
-  33 >        PROGRAM-ID. "S U B".
-----                     ^
-  34   
-  35          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-11647-prog.cob:33.19-33.26:
-  30          END PROGRAM " SUB".
-  31   
-  32          IDENTIFICATION DIVISION.
-  33 >        PROGRAM-ID. "S U B".
-----                      ^^^^^^^
-  34   
-  35          DATA DIVISION.
->> Error: Invalid syntax
-
-run_misc.at-11647-prog.cob:42.18:
-  39          PROCEDURE DIVISION USING x.
-  40               DISPLAY "S U B  GOT " X
-  41               END-DISPLAY.
-  42 >        END PROGRAM "S U B".
-----                     ^
->> Hint: Missing <word>
-
-run_misc.at-11647-prog.cob:42.19-42.26:
-  39          PROCEDURE DIVISION USING x.
-  40               DISPLAY "S U B  GOT " X
-  41               END-DISPLAY.
-  42 >        END PROGRAM "S U B".
-----                      ^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11696:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11695:0
-run_misc.at-11695-sub.cob:3.18:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "_SUB-PROG_NOW".
-----                     ^
-   4   
-   5          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-11695-sub.cob:3.19-3.34:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "_SUB-PROG_NOW".
-----                      ^^^^^^^^^^^^^^^
-   4   
-   5          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11745:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11747:0
-run_misc.at-11747-sub.cob:3.18:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "SUB".
-----                     ^
-   4   
-   5          DATA DIVISION.
->> Hint: Missing <word>
-
-run_misc.at-11747-sub.cob:3.19-3.24:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "SUB".
-----                      ^^^^^
-   4   
-   5          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11928:0
 run_misc.at-11928-cmod.c:6.7-6.11:
    3   #include <string.h>

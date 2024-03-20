@@ -1,22 +1,4 @@
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:60:0
-syn_definition.at-60-SHORT2.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "_short".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              STOP RUN.
->> Hint: Missing <word>
-
-syn_definition.at-60-SHORT2.cob:3.24-3.32:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "_short".
-----                           ^^^^^^^^
-   4          PROCEDURE        DIVISION.
-   5              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:145:0
 syn_definition.at-145-containing-prog.cob:17.31:
   14          PROGRAM-ID.      prog-2 IS RECURSIVE COMMON.
@@ -24,7 +6,7 @@ syn_definition.at-145-containing-prog.cob:17.31:
   16              STOP RUN.
   17 >        END PROGRAM      prog-2.
 ----                                  ^
->> Hint: Missing END PROGRAM <word> .
+>> Hint: Missing END PROGRAM .
 
 syn_definition.at-145-containing-prog.cob:18.0:
   15          PROCEDURE        DIVISION.
@@ -222,7 +204,7 @@ syn_definition.at-1462-prog.cob:13.24:
   12   
   13 >        END PROGRAM prog.
 ----                           ^
->> Hint: Missing END PROGRAM <word> . END PROGRAM <word> .
+>> Hint: Missing END PROGRAM . END PROGRAM .
 
 syn_definition.at-1462-prog.cob:14.0:
   11          PROGRAM-ID. prog-3.

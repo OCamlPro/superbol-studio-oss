@@ -67,7 +67,7 @@ let rec fold_program_unit (v: _ #folder) =
                           program_proc; program_end_name } x -> x
       >> (fun x -> match program_level with
           | ProgramPrototype -> x
-              >> fold_name' v program_name
+              >> fold_name_or_literal' v program_name
               >> fold_strlit_opt v program_as
           | ProgramDefinition { (* has_identification_division_header; *)
               preliminary_informational_paragraphs = infos0;
@@ -75,7 +75,7 @@ let rec fold_program_unit (v: _ #folder) =
               mode; _ } -> ignore mode; x
               (* >> fold_bool v has_identification_division_header *)
               >> fold_informational_paragraphs v infos0
-              >> fold_name' v program_name
+              >> fold_name_or_literal' v program_name
               >> fold_strlit_opt v program_as
               >> fold_informational_paragraphs v infos1)
       >> fold_options_paragraph'_opt v program_options
@@ -86,7 +86,8 @@ let rec fold_program_unit (v: _ #folder) =
           | ProgramPrototype -> x
           | ProgramDefinition { nested_programs; _ } ->
               fold_nested_programs v nested_programs x)
-      >> fold_name'_opt v program_end_name                  (* XXX: useful? *)
+      >> fold_name_or_literal'opt v program_end_name
+      (* XXX: useful? *)
     end
 
 and fold_nested_programs (v: _ #folder) =

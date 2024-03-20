@@ -133,6 +133,7 @@ and ident_or_numlit = [ident_|num_] term
 and ident_or_strlit = [ident_|strlit_] term
 and name_or_alphanum = [name_|alnum_] term
 and name_or_string = [name_|strlit_] term
+and name_or_literal = [name_|lit_] term
 and nonnumlit = nonnum_ term
 and qualname_or_alphanum = [qualname_|alnum_] term
 and qualname_or_intlit = [qualname_|int_] term
@@ -562,6 +563,7 @@ module COMPARE = struct
   let compare_ident_or_strlit: ident_or_strlit compare_fun = compare_term
   let compare_name_or_alphanum: name_or_alphanum compare_fun = compare_term
   let compare_name_or_string: name_or_string compare_fun = compare_term
+  let compare_name_or_literal: name_or_literal compare_fun = compare_term
   let compare_qualname_or_alphanum: qualname_or_alphanum compare_fun = compare_term
   let compare_qualname_or_intlit: qualname_or_intlit compare_fun = compare_term
   let compare_qualname_or_literal: qualname_or_literal compare_fun = compare_term
@@ -835,6 +837,7 @@ module FMT = struct
   let pp_ident_or_strlit: ident_or_strlit Pretty.printer = pp_term
   let pp_strlit: strlit Pretty.printer = pp_term
   let pp_name_or_string: name_or_string Pretty.printer = pp_term
+  let pp_name_or_literal: name_or_literal Pretty.printer = pp_term
   let pp_name_or_alphanum: name_or_alphanum Pretty.printer = pp_term
   let pp_strlit_or_intlit: strlit_or_intlit Pretty.printer = pp_term
   let pp_qualname_or_literal: qualname_or_literal Pretty.printer = pp_term
@@ -951,6 +954,18 @@ module UPCAST = struct
     | StrConcat _ as v -> v
     | Concat _ as v -> v
 
+  let literal_with_name: literal -> name_or_literal = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Boolean _ as v -> v
+    | Integer _ as v -> v
+    | Fixed _ as v -> v
+    | Floating _ as v -> v
+    | NumFig _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+    | Concat _ as v -> v
+
   let literal_with_qualdatname: literal -> qualname_or_literal = function
     | Alphanum _ as v -> v
     | National _ as v -> v
@@ -974,6 +989,9 @@ module UPCAST = struct
   let qualname_with_integer: qualname -> qualname_or_intlit = function
     | Name _ as v -> v
     | Qual _ as v -> v
+
+  let name_with_literal: name_ term -> name_or_literal = function
+    | Name _ as v -> v
 
   let base_ident_with_refmod: base_ident_ term -> ident = function
     | QualIdent _ as v -> v
