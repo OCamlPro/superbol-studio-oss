@@ -3638,7 +3638,7 @@ let advancing_phrase :=
 
 %public let unconditional_action := ~ = set_statement; <Set>
 let set_statement [@context set_stmt] :=
-  (* Ambiguous cases (formats 1, 2, 5, 7, 8, 9, 10 and 14) *)
+  (* Ambiguous cases (formats 1, 2, 5, 7, 8, 9, 10 and 14 of ISO 2014) *)
   | SET; i = ident; TO; la = locale_or_ambiguous;
     { match la with
         | `Locale ld ->
@@ -3646,6 +3646,10 @@ let set_statement [@context set_stmt] :=
         | `Expr e ->
             SetAmbiguous { targets = [i]; value = e;
                            set_method = SetMethodTo } }
+ | SET; i = ident; TO; ENTRY; e = ident_or_nonnumeric;
+   { SetEntry { targets = [i]; value = e } }
+ | SET; i = ident; il = idents; TO; ENTRY; e = ident_or_nonnumeric;
+   { SetEntry { targets = i :: il; value = e } }
  | SET; i = ident; il = idents; TO; e = expression;
    { SetAmbiguous { targets = i :: il; set_method = SetMethodTo; value = e } }
  | SET; il = idents; ud = up_down; e = expression;
@@ -3673,6 +3677,7 @@ let set_statement [@context set_stmt] :=
    { SetSavedException }
  | SET; CONTENT; OF?; il = idents; TO; fc = float_content; so = ro(sign);
    { SetFloatContent { targets = il; content = fc; sign = so } }
+
 
 let locale_or_ambiguous :=
   | LOCALE; ld = lc_all_or_default; { `Locale ld }

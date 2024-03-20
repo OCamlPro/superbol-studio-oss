@@ -593,6 +593,10 @@ let fold_set' (v: _ #folder) =
           >> fold_list ~fold:fold_ident v targets
           >> fold_float_content v content
           >> fold_option ~fold:fold_sign v sign
+      | SetEntry { targets ; value } -> x
+          >> fold_list ~fold:fold_ident v targets
+          >> fold_ident_or_nonnum v value
+
     end
 
 let fold_sort' (v: _ #folder) =
