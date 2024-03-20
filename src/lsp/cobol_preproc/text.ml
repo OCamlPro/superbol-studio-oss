@@ -148,3 +148,16 @@ let alphanum_as_pseudotext a = pseudotext_ alphanum_as_pseudo a
 let rec strip_eof = function
   | { payload = Eof; _ } :: text -> strip_eof text
   | text -> text
+
+let map_pseudowords ~f : pseudotext -> pseudotext =
+  let map_pseudoword_items: (pseudoword_item with_loc list as 'a) -> 'a =
+    EzList.tail_map begin function
+      | { payload = PwText w; loc } -> PwText (f w) &@ loc
+      | x -> x
+    end
+  in
+  EzList.tail_map begin function
+    | { payload = PseudoWord w; loc } ->
+        PseudoWord (map_pseudoword_items w) &@ loc
+    | x -> x
+  end
