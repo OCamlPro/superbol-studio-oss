@@ -475,7 +475,7 @@ let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
 let program_id_header_prefix ==
-  | PROGRAM_ID; "."; ~ = loc(info_word); ~ = as__strlit_; < >
+  | PROGRAM_ID; "."?; ~ = loc(info_word); ~ = as__strlit_; < >
 
 let program_definition_id_paragraph [@context program_id_paragraph] :=
   | ids = program_id_header_prefix;
@@ -1066,7 +1066,6 @@ let report_section :=
 
 let screen_section :=                                              (* +COB2002 *)
   | ~ = section (SCREEN, constant_or_screen_descr_entry); < >
-
 
 let elementary_level == ~ = DIGITS; <int_of_string>
 

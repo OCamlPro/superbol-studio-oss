@@ -233,6 +233,7 @@ let preproc_n_combine_tokens ~source_format =
 
     | [PROGRAM_ID]                   -> Error `MissingInputs
     | PROGRAM_ID :: PERIOD :: _        -> info_word_after 2
+    | PROGRAM_ID :: _                  -> info_word_after 1
 
     | [AUTHOR | INSTALLATION |
        DATE_WRITTEN | DATE_MODIFIED |
