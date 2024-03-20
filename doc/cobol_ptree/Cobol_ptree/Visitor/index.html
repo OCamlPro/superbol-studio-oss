@@ -140,7 +140,14 @@
   <span><span class="type-var">'a0</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="type-var">'a0</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_ident_or_literal"><a href="#val-fold_ident_or_literal" class="anchor"></a><code><span><span class="keyword">val</span> fold_ident_or_literal : 
   <span><span><span class="type-var">'a</span> <a href="class-{folder}1/index.html">{folder}1</a></span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span> ]</span>
+  <span><span><span>[ `AlphaNum
+  <span>| `Bool</span>
+  <span>| `DirectIdent</span>
+  <span>| `Fixed</span>
+  <span>| `Float</span>
+  <span>| `Int</span>
+  <span>| `National</span>
+  <span>| `RefmodIdent</span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'a0</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="type-var">'a1</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_class"><a href="#val-fold_class" class="anchor"></a><code><span><span class="keyword">val</span> fold_class : <span><span><span class="type-var">'a</span> <a href="class-{folder}1/index.html">{folder}1</a></span> <span class="arrow">&#45;&gt;</span></span> <span><span class="xref-unresolved">Cobol_ptree__.Terms.class_</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_cond"><a href="#val-fold_cond" class="anchor"></a><code><span><span class="keyword">val</span> fold_cond : 'k. <span><span><span class="type-var">'a</span> <a href="class-{folder}1/index.html">{folder}1</a></span> <span class="arrow">&#45;&gt;</span></span> <span><span><span class="type-var">'k</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span> <span class="type-var">'c</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_simple_cond"><a href="#val-fold_simple_cond" class="anchor"></a><code><span><span class="keyword">val</span> fold_simple_cond : 
