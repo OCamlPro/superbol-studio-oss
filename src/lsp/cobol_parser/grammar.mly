@@ -1583,6 +1583,7 @@ usage [@context usage_clause   (* ok as none of leftmost terminals are C/S *)]:
   | NATIONAL                                      { National }
   | OBJECT REFERENCE rk = ro(object_reference_kind) { ObjectReference rk }
   | FUNCTION_POINTER TO? i = name                 { FunctionPointer i }
+  | PROCEDURE_POINTER                             { ProcedurePointer }
   | POINTER io = ro(pf(TO?,name))                 { Pointer io }
   | PROGRAM_POINTER io = ro(pf(TO?,name))         { ProgramPointer io }
 
@@ -3242,6 +3243,7 @@ let init_data_category :=
  | BOOLEAN;             {InitCategoryBoolean}                     (* +COB2002 *)
  | DATA_POINTER;        {InitCategoryDataPointer}                 (* +COB2002 *)
  | FUNCTION_POINTER;    {InitCategoryFunctionPointer}
+ | PROCEDURE_POINTER;   {InitCategoryProcedurePointer}            (* MF *)
  | NATIONAL;            {InitCategoryNational}                    (* +COB2002 *)
  | NATIONAL_EDITED;     {InitCategoryNationalEdited}              (* +COB2002 *)
  | NUMERIC;             {InitCategoryNumeric}

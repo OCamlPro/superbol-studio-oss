@@ -60,6 +60,8 @@ let size_of ~usage =
       MEM.size_of_C_float
   | Function_pointer _ ->
       MEM.size_of_pointer
+  | Procedure_pointer ->
+      MEM.size_of_pointer
   | Index ->
       MEM.size_of_index
   | National picture ->

@@ -32,6 +32,7 @@ let validate_data_clauses
   let has_usage_pointer           = ref false in
   let has_usage_function_pointer  = ref false in
   let has_usage_procedure_pointer = ref false in
+  let has_usage_program_pointer   = ref false in
   let has_usage_object_reference  = ref false in
   let has_picture_clause          = ref false in
   let error_if bool_ref diags ~loc fmt =
@@ -63,6 +64,9 @@ let validate_data_clauses
           fun diags -> error_if !has_usage_procedure_pointer diags ~loc
             "PICTURE clause is forbidden when USAGE PROCEDURE-POINTER is \
              specified" |>
+          fun diags -> error_if !has_usage_program_pointer diags ~loc
+            "PICTURE clause is forbidden when USAGE PROGRAM-POINTER is \
+             specified" |>
           fun diags -> error_if !has_usage_object_reference diags ~loc
             "PICTURE clause is forbidden when USAGE OBJECT REFERENCE is \
              specified"
@@ -84,8 +88,11 @@ let validate_data_clauses
            | FunctionPointer _ when !has_picture_clause ->
                DIAGS.Set.error ~loc "USAGE FUNCTION-POINTER clause is forbidden \
                                      when PICTURE is specified"
-           | ProgramPointer _ when !has_picture_clause ->
+           | ProcedurePointer when !has_picture_clause ->
                DIAGS.Set.error ~loc "USAGE PROCEDURE-POINTER clause is forbidden \
+                                     when PICTURE is specified"
+           | ProgramPointer _ when !has_picture_clause ->
+               DIAGS.Set.error ~loc "USAGE PROGRAM-POINTER clause is forbidden \
                                      when PICTURE is specified"
            | ObjectReference _ when !has_picture_clause ->
                DIAGS.Set.error ~loc "USAGE OBJECT REFERENCE clause is forbidden \
@@ -98,6 +105,9 @@ let validate_data_clauses
                DIAGS.Set.none
            | FunctionPointer _ ->
                has_usage_function_pointer := true;
+               DIAGS.Set.none
+           | ProcedurePointer ->
+               has_usage_procedure_pointer := true;
                DIAGS.Set.none
            | ProgramPointer _ ->
                has_usage_procedure_pointer := true;

@@ -171,6 +171,7 @@ and init_data_category =
   | InitCategoryBoolean
   | InitCategoryDataPointer
   | InitCategoryFunctionPointer
+  | InitCategoryProcedurePointer
   | InitCategoryNational
   | InitCategoryNationalEdited
   | InitCategoryNumeric
@@ -186,6 +187,7 @@ let pp_init_data_category ppf = function
   | InitCategoryBoolean -> Fmt.pf ppf "BOOLEAN"
   | InitCategoryDataPointer -> Fmt.pf ppf "DATA-POINTER"
   | InitCategoryFunctionPointer -> Fmt.pf ppf "FUNCTION-POINTER"
+  | InitCategoryProcedurePointer -> Fmt.pf ppf "PROCEDURE-POINTER"
   | InitCategoryNational -> Fmt.pf ppf "NATIONAL"
   | InitCategoryNationalEdited -> Fmt.pf ppf "NATIONAL-EDITED"
   | InitCategoryNumeric -> Fmt.pf ppf "NUMERIC"

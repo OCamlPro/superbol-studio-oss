@@ -87,6 +87,7 @@ let fold_usage (v: _ #folder) =
       | Float_short
       | Index
       | Object_reference _
+      | Procedure_pointer
       | Pointer _
       | Program_pointer _ ->
           Fun.id

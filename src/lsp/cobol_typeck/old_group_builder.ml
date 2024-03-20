@@ -151,6 +151,7 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
                     (Cobol_data.Types.Elementary ({typ = Index; level}, None) &@ loc)
               | Pointer _
               | FunctionPointer _
+              | ProcedurePointer
               | ProgramPointer _ ->
                   DIAGS.some_result
                     (Cobol_data.Types.Elementary ({typ = Pointer; level}, None) &@ loc)

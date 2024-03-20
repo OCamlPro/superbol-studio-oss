@@ -342,6 +342,7 @@ type usage_clause =
  | ObjectReference of object_reference_kind option                (* +COB2002 *)
  | PackedDecimal
  | Pointer of name with_loc option                                (* +COB2002 *)
+ | ProcedurePointer                                               (* MF *)
  | FunctionPointer of name with_loc                               (* +COB2002 *)
  | ProgramPointer of name with_loc option                         (* +COB2002 *)
  | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
@@ -448,6 +449,7 @@ let pp_usage_clause ppf = function
   | PackedDecimal -> Fmt.pf ppf "PACKED-DECIMAL"
   | Pointer no ->
       Fmt.pf ppf "POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
+  | ProcedurePointer -> Fmt.pf ppf "PROCEDURE-POINTER"
   | FunctionPointer n -> Fmt.pf ppf "FUNCTION-POINTER TO %a" pp_name' n
   | ProgramPointer no ->
       Fmt.pf ppf "PROGRAM-POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
