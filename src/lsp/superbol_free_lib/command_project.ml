@@ -43,8 +43,14 @@ let init_cmd =
   EZCMD.sub
     "project init"
     (fun () ->
-      Superbol_project.save_config @@
-      Project.load ?dirname:!dirname ())
+       let project = Project.load ?dirname:!dirname () in
+       if Sys.file_exists project.config_filename then
+         Printf.eprintf "Config already exists. Exiting\n%!"
+       else begin
+         Superbol_project.save_config project;
+         Printf.eprintf "Config file %S created\n%!" project.config_filename
+       end
+    )
     ~args:[
       [], Arg.Anon (0, fun s -> dirname := Some s),
       EZCMD.info ~docv:"DIR" "Project directory";
