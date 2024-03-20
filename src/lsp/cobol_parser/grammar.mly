@@ -2184,6 +2184,10 @@ let arguments ==
  | "("; ")";                      { [] }
  | "("; al = rnel(argument); ")"; { al }
 
+let leading_trailing_arg ==
+ | LEADING; {ArgLeading}
+ | TRAILING; {ArgTrailing}
+
 let optional_arguments_list :=
  | (* Empty *) %prec lowest       { [] }
  | ~ = arguments;                 < >
@@ -2254,8 +2258,10 @@ let qualident ==
  | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
 
 let function_ident ==
- | FUNCTION; n = function_name; al = arguments; { { call_fun = n; call_args = al } }
- | FUNCTION; n = function_name;                 { { call_fun = n; call_args = [] } }
+ | FUNCTION; n = function_name; al = arguments; { FunCall { fun_name = n; args = al } }
+ | FUNCTION; n = function_name;                 { FunCall { fun_name = n; args = [] } }
+ | FUNCTION; loc(TRIM_FUNC); arg1 = argument; arg2 = leading_trailing_arg;  
+  { TrimCall (arg1, arg2) }
 
 let base_ident ==                 (* identifier without reference modification *)
  | q = qualident;                {QualIdent q} (* Works for object property too *)

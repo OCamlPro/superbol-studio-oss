@@ -272,14 +272,20 @@ and class_ =
 
 
 and inline_call =                               (* in ancient terms: funident *)
+  | FunCall of
   {
-    call_fun: name with_loc;
-    call_args: effective_arg list;
+    fun_name: name with_loc;
+    args: effective_arg list;
   }
+  | TrimCall of (effective_arg * leading_trailing_arg)
 
 and effective_arg =                  (* TODO: could be an [expression option] *)
   | ArgExpr of expression (* Regroup identifiers, literals and arithmetic expressions *)
   | ArgOmitted
+
+and leading_trailing_arg =
+  | ArgLeading
+  | ArgTrailing
 
 and qualident =
   {
@@ -563,11 +569,18 @@ module COMPARE = struct
     compare_struct (compare_term a b) @@
     lazy (compare_struct (compare_term c d) @@
           lazy (List.compare compare_effective_arg e f))
-  and compare_inline_call
-      { call_fun = a; call_args = c }
-      { call_fun = b; call_args = d } =
-    compare_struct (compare_with_loc compare_name a b) @@
-    lazy (List.compare compare_effective_arg c d)
+  and compare_inline_call ic1 ic2 = match ic1, ic2 with
+    | FunCall { fun_name = a; args = c },
+      FunCall { fun_name = b; args = d } ->
+      compare_struct (compare_with_loc compare_name a b) @@
+      lazy (List.compare compare_effective_arg c d)
+    | TrimCall (a1, a2), TrimCall (a1', a2') ->
+      if compare_effective_arg a1 a1' == 0 &&
+         compare_leading_trailing_arg a2 a2' == 0 then
+        0
+      else
+        -1
+    | _, _ -> -1
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
         compare_expression a b
@@ -577,6 +590,10 @@ module COMPARE = struct
         0
     | ArgOmitted, ArgExpr _ ->
         -1
+  and compare_leading_trailing_arg x y = match x, y with
+    | ArgLeading, ArgLeading
+    | ArgTrailing, ArgTrailing -> 0
+    | _, _ -> -1
   and compare_address x y = match x, y with
     | DataAddress a, DataAddress b ->
         compare_term a b
@@ -700,9 +717,14 @@ module FMT = struct
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
     | ProgAddress i -> fmt "ADDRESS@ OF@ PROGRAM@ %a" ppf pp_term i
 
-  and pp_inline_call ppf { call_fun; call_args } =
-    fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
-      (list ~sep:comma pp_effective_arg) call_args
+  and pp_inline_call ppf = function
+    | FunCall { fun_name; args } ->
+      fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' fun_name
+        (list ~sep:comma pp_effective_arg) args
+    | TrimCall (arg1, arg2) ->
+      fmt "FUNCTION@ %a@ (%a, %a)" ppf pp_name "TRIM"
+        (pp_effective_arg) arg1
+        (pp_leading_trailing_arg) arg2
 
   and pp_inline_invocation ppf { invoke_class; invoke_meth; invoke_args } =
     fmt "%a::%a@ @[<1>(%a)@]" ppf pp_ident invoke_class pp_literal invoke_meth
@@ -717,6 +739,10 @@ module FMT = struct
        a pity, given that we do work in pp_expression to avoid unnecessary
        parentheses). *)
     | ArgExpr e -> Fmt.parens pp_expression ppf e
+
+  and pp_leading_trailing_arg ppf = function
+    | ArgTrailing -> string ppf "TRAILING"
+    | ArgLeading -> string ppf "LEADING"
 
   and pp_object_view ppf { object_view_ident; object_view_spec } =
     fmt "%a@ AS@ " ppf pp_ident object_view_ident;

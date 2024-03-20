@@ -942,6 +942,7 @@
 %token TRANSFORM                    [@keyword]
 %token TRANSPARENT                  [@keyword]                [@contexts ]
 %token TREE_VIEW                    [@keyword]                [@contexts ]
+%token TRIM_FUNC                    [@keyword   "TRIM"]
 %token TRUE                         [@keyword]
 %token TRUNCATION                   [@keyword]                [@contexts intermediate_rounding_clause, rounded_phrase]
 %token TYPE                         [@keyword]

@@ -276,9 +276,14 @@ let semtoks_from_ptree ~filename ?range ptree =
         |> Visitor.skip_children
 
     (* inline call of function *)
-    method! fold_inline_call { call_fun; call_args } acc = acc
-      |> add_name' call_fun ProcName
-      |> fold_list ~fold:fold_effective_arg self call_args
+    method! fold_inline_call ic acc = match ic with
+    | FunCall { fun_name; args } -> acc
+      |> add_name' fun_name ProcName
+      |> fold_list ~fold:fold_effective_arg self args
+      |> Visitor.skip_children
+    | TrimCall (arg1, arg2) -> acc
+      |> fold_effective_arg self arg1
+      |> fold_leading_trailing_arg self arg2
       |> Visitor.skip_children
 
     (* Statement *)

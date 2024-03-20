@@ -37,6 +37,7 @@ class ['a] folder = object
   method fold_inline_call: (inline_call, 'a) fold = default
   method fold_inline_invocation: (inline_invocation, 'a) fold = default
   method fold_effective_arg: (effective_arg, 'a) fold = default
+  method fold_leading_trailing_arg: (leading_trailing_arg, 'a) fold = default
   method fold_object_view: (object_view, 'a) fold = default
   method fold_object_view_spec: (object_view_spec, 'a) fold = default
   method fold_object_ref: (object_ref, 'a) fold = default
@@ -232,9 +233,13 @@ and fold_address (v: _ #folder) =
 
 and fold_inline_call (v: _ #folder) =
   handle v#fold_inline_call
-    ~continue:begin fun { call_fun; call_args } x -> x
-      >> fold_name' v call_fun
-      >> fold_list ~fold:fold_effective_arg v call_args
+    ~continue:begin fun ic x -> match ic with
+      | FunCall { fun_name; args } -> x
+        >> fold_name' v fun_name
+        >> fold_list ~fold:fold_effective_arg v args
+      | TrimCall (arg1, arg2) -> x
+        >> fold_effective_arg v arg1
+        >> fold_leading_trailing_arg v arg2
     end
 
 and fold_inline_invocation (v: _ #folder) =
@@ -250,6 +255,12 @@ and fold_effective_arg (v: _ #folder) =
     ~continue:begin function
       | ArgExpr e -> fold_expr v e
       | ArgOmitted -> Fun.id
+    end
+
+and fold_leading_trailing_arg (v: _ #folder) =
+  handle v#fold_leading_trailing_arg
+    ~continue:begin function
+      | ArgTrailing | ArgLeading -> Fun.id
     end
 
 and fold_object_view (v: _ #folder) =
