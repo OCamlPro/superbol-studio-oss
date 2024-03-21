@@ -2414,26 +2414,6 @@ run_extensions.at-4247-prog.cob:35.11-35.17:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4381:0
-run_extensions.at-4381-prog.cob:67.14:
-  64                 DISPLAY "UNK CELL " CELL
-  65              END-IF
-  66   
-  67 >            SET ENVIRONMENT "TZ" TO "PST8PDT"
-----                 ^
-  68              CALL "tzset" RETURNING OMITTED
-  69                 ON EXCEPTION CONTINUE
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_extensions.at-4381-prog.cob:67.15-67.26:
-  64                 DISPLAY "UNK CELL " CELL
-  65              END-IF
-  66   
-  67 >            SET ENVIRONMENT "TZ" TO "PST8PDT"
-----                  ^^^^^^^^^^^
-  68              CALL "tzset" RETURNING OMITTED
-  69                 ON EXCEPTION CONTINUE
->> Error: Invalid syntax
-
 run_extensions.at-4381-prog.cob:68.33:
   65              END-IF
   66   

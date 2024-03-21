@@ -7416,86 +7416,6 @@ run_file.at-12798-prog.cob:63.55-63.62:
   65              05  SUB                             BINARY-SHORT UNSIGNED.
 >> Error: Invalid syntax
 
-run_file.at-12798-prog.cob:70.14:
-  67   
-  68          PROCEDURE DIVISION.
-  69         * Load file using MF rules
-  70 >            SET ENVIRONMENT "COB_LS_VALIDATE" TO "FALSE"
-----                 ^
-  71              SET ENVIRONMENT "COB_LS_NULLS"    TO "TRUE"
-  72              DISPLAY "MF Load data"
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_file.at-12798-prog.cob:70.15-70.26:
-  67   
-  68          PROCEDURE DIVISION.
-  69         * Load file using MF rules
-  70 >            SET ENVIRONMENT "COB_LS_VALIDATE" TO "FALSE"
-----                  ^^^^^^^^^^^
-  71              SET ENVIRONMENT "COB_LS_NULLS"    TO "TRUE"
-  72              DISPLAY "MF Load data"
->> Error: Invalid syntax
-
-run_file.at-12798-prog.cob:71.14:
-  68          PROCEDURE DIVISION.
-  69         * Load file using MF rules
-  70              SET ENVIRONMENT "COB_LS_VALIDATE" TO "FALSE"
-  71 >            SET ENVIRONMENT "COB_LS_NULLS"    TO "TRUE"
-----                 ^
-  72              DISPLAY "MF Load data"
-  73              PERFORM LOADFILE.
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_file.at-12798-prog.cob:71.15-71.26:
-  68          PROCEDURE DIVISION.
-  69         * Load file using MF rules
-  70              SET ENVIRONMENT "COB_LS_VALIDATE" TO "FALSE"
-  71 >            SET ENVIRONMENT "COB_LS_NULLS"    TO "TRUE"
-----                  ^^^^^^^^^^^
-  72              DISPLAY "MF Load data"
-  73              PERFORM LOADFILE.
->> Error: Invalid syntax
-
-run_file.at-12798-prog.cob:84.14:
-  81              CLOSE FLATFILE.
-  82   
-  83         * Read file using Std rules
-  84 >            SET ENVIRONMENT "COB_LS_VALIDATE" TO "true"
-----                 ^
-  85              SET ENVIRONMENT "COB_LS_NULLS"    TO "false"
-  86              OPEN INPUT FLATFILE.
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_file.at-12798-prog.cob:84.15-84.26:
-  81              CLOSE FLATFILE.
-  82   
-  83         * Read file using Std rules
-  84 >            SET ENVIRONMENT "COB_LS_VALIDATE" TO "true"
-----                  ^^^^^^^^^^^
-  85              SET ENVIRONMENT "COB_LS_NULLS"    TO "false"
-  86              OPEN INPUT FLATFILE.
->> Error: Invalid syntax
-
-run_file.at-12798-prog.cob:85.14:
-  82   
-  83         * Read file using Std rules
-  84              SET ENVIRONMENT "COB_LS_VALIDATE" TO "true"
-  85 >            SET ENVIRONMENT "COB_LS_NULLS"    TO "false"
-----                 ^
-  86              OPEN INPUT FLATFILE.
-  87              DISPLAY "Std Open Sts: " CUST-STAT
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_file.at-12798-prog.cob:85.15-85.26:
-  82   
-  83         * Read file using Std rules
-  84              SET ENVIRONMENT "COB_LS_VALIDATE" TO "true"
-  85 >            SET ENVIRONMENT "COB_LS_NULLS"    TO "false"
-----                  ^^^^^^^^^^^
-  86              OPEN INPUT FLATFILE.
-  87              DISPLAY "Std Open Sts: " CUST-STAT
->> Error: Invalid syntax
-
 run_file.at-12798-prog.cob:97.19:
   94              DISPLAY "Std Load data"
   95              PERFORM LOADFILE.
@@ -7517,26 +7437,6 @@ run_file.at-12798-prog.cob:97.20-97.29:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12935:0
-run_file.at-12935-prog.cob:42.14:
-  39              MOVE "file1+file2+file3" TO THE-FILE-NAME
-  40              PERFORM UPDTFILE.
-  41   
-  42 >            SET ENVIRONMENT "COB_SEQ_CONCAT_SEP" TO "&"
-----                 ^
-  43              MOVE "file1&file2&file3" TO THE-FILE-NAME
-  44              PERFORM LISTFILE.
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_file.at-12935-prog.cob:42.15-42.26:
-  39              MOVE "file1+file2+file3" TO THE-FILE-NAME
-  40              PERFORM UPDTFILE.
-  41   
-  42 >            SET ENVIRONMENT "COB_SEQ_CONCAT_SEP" TO "&"
-----                  ^^^^^^^^^^^
-  43              MOVE "file1&file2&file3" TO THE-FILE-NAME
-  44              PERFORM LISTFILE.
->> Error: Invalid syntax
-
 run_file.at-12935-prog.cob:45.19:
   42              SET ENVIRONMENT "COB_SEQ_CONCAT_SEP" TO "&"
   43              MOVE "file1&file2&file3" TO THE-FILE-NAME

@@ -495,6 +495,10 @@ let semtoks_from_ptree ~filename ?range ptree =
           |> fold_float_content self content
           |> fold_option ~fold:fold_sign self sign
           |> Visitor.skip_children
+      | SetEnvironment { variable; value } -> acc
+          |> fold_ident_or_literal self variable
+          |> fold_ident_or_literal self value
+          |> Visitor.skip_children
 
     method! fold_start' {payload = {start_file; start_position;
                                     start_on_invalid_key }; _} acc = acc

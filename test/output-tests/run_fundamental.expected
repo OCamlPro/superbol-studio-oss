@@ -696,46 +696,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5217:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5262:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5313:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5363:0
-run_fundamental.at-5363-prog.cob:15.14:
-  12              DISPLAY DEBUG-ITEM "|" END-DISPLAY.
-  13          END DECLARATIVES.
-  14          FIRST-PAR.
-  15 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "false"
-----                 ^
-  16              DISPLAY "OK1" END-DISPLAY.
-  17              GO TO SECOND-PAR.
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_fundamental.at-5363-prog.cob:15.15-15.26:
-  12              DISPLAY DEBUG-ITEM "|" END-DISPLAY.
-  13          END DECLARATIVES.
-  14          FIRST-PAR.
-  15 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "false"
-----                  ^^^^^^^^^^^
-  16              DISPLAY "OK1" END-DISPLAY.
-  17              GO TO SECOND-PAR.
->> Error: Invalid syntax
-
-run_fundamental.at-5363-prog.cob:24.14:
-  21              DISPLAY "OK3" END-DISPLAY.
-  22              PERFORM FIRST-PAR THRU SECOND-PAR.
-  23              DISPLAY "OK4" END-DISPLAY.
-  24 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "Y"
-----                 ^
-  25              PERFORM SECOND-PAR.
-  26              DISPLAY "OK5" END-DISPLAY.
->> Hint: Missing rnell_rev___anonymous_88_
-
-run_fundamental.at-5363-prog.cob:24.15-24.26:
-  21              DISPLAY "OK3" END-DISPLAY.
-  22              PERFORM FIRST-PAR THRU SECOND-PAR.
-  23              DISPLAY "OK4" END-DISPLAY.
-  24 >            SET ENVIRONMENT "COB_SET_DEBUG" TO "Y"
-----                  ^^^^^^^^^^^
-  25              PERFORM SECOND-PAR.
-  26              DISPLAY "OK5" END-DISPLAY.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5426:0
 run_fundamental.at-5426-prog.cob:30.11-30.22:
   27              PERFORM VARYING MY-DATA-FIELD-1 FROM 1 BY 1
