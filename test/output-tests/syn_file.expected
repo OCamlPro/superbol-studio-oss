@@ -119,46 +119,6 @@ syn_file.at-575-prog.cob:20.38-20.42:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:628:0
-syn_file.at-628-prog.cob:11.33:
-   8                           ORGANIZATION  IS INDEXED
-   9                           ACCESS MODE   IS DYNAMIC
-  10                           RECORD    KEY IS TEST-P2 IN TEST-SOME
-  11 >                         ALTERNATE KEY IS TEST-P3 IN TEST-SOME.
-----                                    ^
-  12          SELECT TEST-FILE ASSIGN TO 'FILE-TEST2'
-  13                           ORGANIZATION  IS INDEXED
->> Hint: Missing RECORD
-
-syn_file.at-628-prog.cob:11.34-11.37:
-   8                           ORGANIZATION  IS INDEXED
-   9                           ACCESS MODE   IS DYNAMIC
-  10                           RECORD    KEY IS TEST-P2 IN TEST-SOME
-  11 >                         ALTERNATE KEY IS TEST-P3 IN TEST-SOME.
-----                                     ^^^
-  12          SELECT TEST-FILE ASSIGN TO 'FILE-TEST2'
-  13                           ORGANIZATION  IS INDEXED
->> Error: Invalid syntax
-
-syn_file.at-628-prog.cob:16.33:
-  13                           ORGANIZATION  IS INDEXED
-  14                           ACCESS MODE   IS DYNAMIC
-  15                           RECORD    KEY IS TEST-P1
-  16 >                         ALTERNATE KEY IS TEST-P4.
-----                                    ^
-  17          DATA             DIVISION.
-  18          FILE             SECTION.
->> Hint: Missing RECORD
-
-syn_file.at-628-prog.cob:16.34-16.37:
-  13                           ORGANIZATION  IS INDEXED
-  14                           ACCESS MODE   IS DYNAMIC
-  15                           RECORD    KEY IS TEST-P1
-  16 >                         ALTERNATE KEY IS TEST-P4.
-----                                     ^^^
-  17          DATA             DIVISION.
-  18          FILE             SECTION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:783:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:798:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:962:0
@@ -282,26 +242,6 @@ syn_file.at-2062-prog.cob:24.48-24.50:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2092:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2121:0
-syn_file.at-2121-prog.cob:12.23:
-   9                 ACCESS        DYNAMIC
-  10                 ORGANIZATION  INDEXED
-  11                 RECORD     KEY  TESTKEY1
-  12 >               ALTERNATE  KEY  TESTKEY2
-----                          ^
-  13                 .
-  14          PROCEDURE DIVISION.
->> Hint: Missing RECORD
-
-syn_file.at-2121-prog.cob:12.25-12.28:
-   9                 ACCESS        DYNAMIC
-  10                 ORGANIZATION  INDEXED
-  11                 RECORD     KEY  TESTKEY1
-  12 >               ALTERNATE  KEY  TESTKEY2
-----                            ^^^
-  13                 .
-  14          PROCEDURE DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2203:0
 syn_file.at-2203-prog.cob:16.18:
   13                    WITH DUPLICATES

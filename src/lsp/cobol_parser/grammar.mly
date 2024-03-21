@@ -896,7 +896,7 @@ let access_mode :=
  | SEQUENTIAL; {AccessModeSequential}
 
 let alternate_record_key_clause :=
- | ALTERNATE; RECORD; KEY?; IS?; i = qualname;
+ | ALTERNATE; RECORD?; KEY?; IS?; i = qualname;
    il = lo(pf(SOURCE; IS?; {}, names));
    wd = with_duplicates;
    { SelectAlternateRecordKey { key = i; source = il;
