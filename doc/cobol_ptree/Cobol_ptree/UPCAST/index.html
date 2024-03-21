@@ -49,6 +49,12 @@
   <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.num_</span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-literal_with_name"><a href="#val-literal_with_name" class="anchor"></a><code><span><span class="keyword">val</span> literal_with_name : 
+  <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.nonnum_</span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.bool_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.num_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-literal_with_qualdatname"><a href="#val-literal_with_qualdatname" class="anchor"></a><code><span><span class="keyword">val</span> literal_with_qualdatname : 
   <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.nonnum_</span>
   <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.bool_</span></span>
@@ -70,6 +76,9 @@
   <span>| <span><span class="xref-unresolved">Cobol_ptree__.Terms.name</span> <span class="xref-unresolved">Cobol_ptree__.Terms.qual_</span></span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.qualname_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.int_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-name_with_literal"><a href="#val-name_with_literal" class="anchor"></a><code><span><span class="keyword">val</span> name_with_literal : 
+  <span><span><span>[ `Name ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-base_ident_with_refmod"><a href="#val-base_ident_with_refmod" class="anchor"></a><code><span><span class="keyword">val</span> base_ident_with_refmod : 
   <span><span><span>[ `DirectIdent ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.base_ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span> ]</span>
