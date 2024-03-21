@@ -127,24 +127,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_file.at:1362:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1400:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1432:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:1479:0
-run_file.at-1479-prog.cob:3.18:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "test".
-----                     ^
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
->> Hint: Missing <word>
-
-run_file.at-1479-prog.cob:3.19-3.25:
-   1   
-   2          IDENTIFICATION DIVISION.
-   3 >        PROGRAM-ID. "test".
-----                      ^^^^^^
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
->> Error: Invalid syntax
-
 run_file.at-1479-prog.cob:10.35-10.36:
    7              SELECT TEST-FILE ASSIGN "FILE"
    8                  ORGANIZATION IS INDEXED

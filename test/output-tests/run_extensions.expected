@@ -1235,81 +1235,9 @@ run_extensions.at-1753-setfilename.c:10.6-10.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1816:0
-run_extensions.at-1816-A#B.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A#B".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P2" NO ADVANCING
->> Hint: Missing <word>
-
-run_extensions.at-1816-A#B.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A#B".
-----                           ^^^^^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P2" NO ADVANCING
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1817:0
-run_extensions.at-1817-A-B.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A-B".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P3" NO ADVANCING
->> Hint: Missing <word>
-
-run_extensions.at-1817-A-B.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A-B".
-----                           ^^^^^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P3" NO ADVANCING
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1815:0
-run_extensions.at-1815-A@B.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A@B".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P1" NO ADVANCING
->> Hint: Missing <word>
-
-run_extensions.at-1815-A@B.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A@B".
-----                           ^^^^^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P1" NO ADVANCING
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1818:0
-run_extensions.at-1818-A_B.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A_B".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P4" NO ADVANCING
->> Hint: Missing <word>
-
-run_extensions.at-1818-A_B.cob:3.24-3.29:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "A_B".
-----                           ^^^^^
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "P4" NO ADVANCING
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1819:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1866:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1867:0
@@ -1698,71 +1626,17 @@ run_extensions.at-2060-caller.cob:33.42-33.46:
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2118:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2143:0
-run_extensions.at-2143-prog.cob:3.18:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "caller".
-----                     ^
-   4          PROCEDURE        DIVISION.
-   5              CALL "callee"
->> Hint: Missing <word>
-
-run_extensions.at-2143-prog.cob:3.24-3.32:
-   1   
-   2          IDENTIFICATION   DIVISION.
-   3 >        PROGRAM-ID.      "caller".
-----                           ^^^^^^^^
-   4          PROCEDURE        DIVISION.
-   5              CALL "callee"
->> Error: Invalid syntax
-
-run_extensions.at-2143-prog.cob:8.18:
-   5              CALL "callee"
-   6              END-CALL.
-   7              STOP RUN.
-   8 >        PROGRAM-ID.      "callee".
-----                     ^
-   9          PROCEDURE        DIVISION.
-  10              EXIT PROGRAM.
->> Hint: Missing <word>
-
-run_extensions.at-2143-prog.cob:8.24-8.32:
-   5              CALL "callee"
-   6              END-CALL.
-   7              STOP RUN.
-   8 >        PROGRAM-ID.      "callee".
-----                           ^^^^^^^^
-   9          PROCEDURE        DIVISION.
-  10              EXIT PROGRAM.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2166:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2213:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2210:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2279:0
-run_extensions.at-2279-prog.cob:14.18:
-  11          PROCEDURE        DIVISION.
-  12              DISPLAY tally WITH NO ADVANCING.
-  13              GOBACK.
-  14 >        END PROGRAM      nested.
-----                     ^
->> Hint: Missing <word>
-
-run_extensions.at-2279-prog.cob:14.24-14.30:
-  11          PROCEDURE        DIVISION.
-  12              DISPLAY tally WITH NO ADVANCING.
-  13              GOBACK.
-  14 >        END PROGRAM      nested.
-----                           ^^^^^^
->> Error: Invalid syntax
-
 run_extensions.at-2279-prog.cob:14.31:
   11          PROCEDURE        DIVISION.
   12              DISPLAY tally WITH NO ADVANCING.
   13              GOBACK.
   14 >        END PROGRAM      nested.
 ----                                  ^
->> Hint: Missing END PROGRAM <word> .
+>> Hint: Missing END PROGRAM .
 
 run_extensions.at-2279-prog.cob:15.0:
   12              DISPLAY tally WITH NO ADVANCING.

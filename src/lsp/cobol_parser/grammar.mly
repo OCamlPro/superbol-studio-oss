@@ -297,7 +297,7 @@ let identification_division_header ==
 program_definition [@cost 0]:
  | pd = program_definition_no_end
    pdl = loc(program_definition)* (* COB2002: PROCEDURE DIVISION must be present *)
-   END PROGRAM ep = name "."
+   END PROGRAM ep = loc(infoword_or_literal)? "."
    { match pd.program_level with
        | ProgramDefinition { mode;
                              has_identification_division_header;
@@ -311,7 +311,7 @@ program_definition [@cost 0]:
                                    preliminary_informational_paragraphs;
                                    supplementary_informational_paragraphs;
                                    nested_programs = pdl };
-             program_end_name = Some ep }
+             program_end_name = ep }
        | _ -> failwith "Cannot happen as per the grammar." }
 
 program_definition_no_end:
@@ -343,7 +343,7 @@ program_prototype [@cost 999]:
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(procedure_division))
-   END PROGRAM ep = name "."
+   END PROGRAM ep = loc(infoword_or_literal)? "."
    { let _, (program_name, program_as) = pid in
      { program_name;
        program_as;
@@ -352,7 +352,7 @@ program_prototype [@cost 999]:
        program_env = edo;
        program_data = ddo;
        program_proc = pdo;
-       program_end_name = Some ep } }
+       program_end_name = ep } }
 
 function_unit [@cost 999]:
  | fid = function_identification
@@ -469,13 +469,19 @@ let informational_paragraph_header ==
   | REMARKS;       {Remarks}
   | SECURITY;      {Security}
 
+(* To be able to use INFO_WORD, you must modify
+   Text_tokenizer.preproc_n_combine_tokens *)
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
 let program_id_header_prefix ==
-  | PROGRAM_ID; "."?; ~ = loc(info_word); ~ = as__strlit_; < >
+  | PROGRAM_ID; "."?; i = loc(infoword_or_literal); x = as__strlit_; { i, x }
+
+let infoword_or_literal :=
+ | i = loc(info_word); { Name i }
+ | i = literal;        { UPCAST.literal_with_name i }
 
 let program_definition_id_paragraph [@context program_id_paragraph] :=
   | ids = program_id_header_prefix;
@@ -581,7 +587,14 @@ let environment_division :=
    env_configuration = ro(loc(configuration_section));
    env_input_output  = ro(loc(input_output_section));
    { { env_configuration; env_input_output } }
-
+ (* Allows skipping ENVIRONMENT DIVISION on MF *)
+ | env_configuration = loc(configuration_section);
+   env_input_output  = ro(loc(input_output_section));
+   { { env_configuration = Some env_configuration;
+       env_input_output } }
+ | env_input_output  = loc(input_output_section);
+   { { env_configuration = None;
+       env_input_output = Some env_input_output } }
 
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
@@ -826,14 +839,21 @@ let input_output_section :=
  | INPUT_OUTPUT; SECTION; ".";
    file_control_paragraph = ro(loc(file_control_paragraph)); (* COB85: mandatory *)
    io_control_paragraph = ro(loc(io_control_paragraph));
-    { { file_control_paragraph; io_control_paragraph } }
-
+   { { file_control_paragraph; io_control_paragraph } }
+  | file_control_paragraph = loc(file_control_paragraph);
+    io_control_paragraph = ro(loc(io_control_paragraph));
+    { { file_control_paragraph = Some file_control_paragraph;
+        io_control_paragraph } }
+  | io_control_paragraph = loc(io_control_paragraph);
+    { { file_control_paragraph = None;
+        io_control_paragraph = Some io_control_paragraph } }
 
 
 (* - ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL PARAGRAPH -- *)
 
 let file_control_paragraph :=
- | FILE_CONTROL; "."; ~ = rl(select); < > (* COB85: non-empty list *)
+ | FILE_CONTROL; "." ; ~ = rl(select); < > (* COB85: non-empty list *)
+ | ~ = rnel(select); < >
 
 let select :=
  | SELECT; o = bo(OPTIONAL); i = name;
@@ -878,9 +898,15 @@ let access_mode :=
 let alternate_record_key_clause :=
  | ALTERNATE; RECORD; KEY?; IS?; i = qualname;
    il = lo(pf(SOURCE; IS?; {}, names));
-   wd = bo(WITH?; DUPLICATES; {});
+   wd = with_duplicates;
    { SelectAlternateRecordKey { key = i; source = il;
                                 with_duplicates = wd } }
+
+let with_duplicates :=
+  | { false }
+  | DUPLICATES; { true }
+  | WITH; DUPLICATES; { true }
+  | WITH; NO; DUPLICATES; { false }
 
 let collating_sequence_clause :=                                   (* +COB2002 *)
  | COLLATING?; SEQUENCE; ~ = alphabet_specification;
@@ -928,8 +954,9 @@ let record_delimiter :=
 
 let record_key_clause :=
  | RECORD; KEY?; IS?; i = qualname;
-   il = lo(pf(SOURCE; IS?,names));
-   { SelectRecordKey { key = i; source = il } }
+    il = lo(pf(SOURCE; IS?,names));
+    wd = with_duplicates ;
+   { SelectRecordKey { key = i; source = il ; with_duplicates = wd } }
 
 let relative_key_clause :=
  | RELATIVE; KEY?; IS?; ~ = name; <SelectRelativeKey>
@@ -1059,8 +1086,15 @@ let section(K, L) ==
 let section_header_n_items(K, L) ==
   | K; SECTION; "."; ~ = rl(loc(L)); < >
 
+(* Section with optional header, especially on MF *)
+let section_opt_header(K, L) ==
+  | ~ = loc(section_opt_header_n_items(K,L)); < >
+let section_opt_header_n_items(K, L) ==
+  | K; SECTION; "."; ~ = rl(loc(L)); < >
+  | ~ = rnel(loc(L));   < >
+
 let file_section :=
-  | ~ = section (FILE, file_or_sort_merge_descr_entry); < >
+  | ~ = section_opt_header (FILE, file_or_sort_merge_descr_entry); < >
 
 let working_storage_section :=
   | ~ = section (WORKING_STORAGE, constant_or_data_descr_entry); < >

@@ -481,6 +481,19 @@ let fold_qualname_or_literal (v: _ #folder) : qualname_or_literal -> _ = functio
   | StrConcat _
   | Concat _ as s -> fold_literal v s
 
+let fold_name_or_literal (v: _ #folder) : name_or_literal -> _ = function
+  | Name n -> fold_name' v n
+  | Boolean _
+  | Fixed _
+  | Floating _
+  | Integer _
+  | National _
+  | NumFig _
+  | Fig _
+  | Alphanum _
+  | StrConcat _
+  | Concat _ as s -> fold_literal v s
+
 let fold_strlit_or_intlit (v: _ #folder) : strlit_or_intlit -> 'a -> 'a = function
   | Alphanum _
   | National _
@@ -496,6 +509,18 @@ let fold_literal_opt (v: _ #folder) = fold_option ~fold:fold_literal v
 let fold_literal'_opt (v: _ #folder) = fold_option ~fold:fold_literal' v
 let fold_ident' (v: _ #folder) = fold' ~fold:fold_ident v
 let fold_ident'_opt (v: _ #folder) = fold_option ~fold:fold_ident' v
+let fold_ident_or_nonnum' (v: _ #folder) =
+  fold' ~fold:fold_ident_or_nonnum v
+let fold_ident_or_nonnum'opt (v: _ #folder) =
+  fold_option ~fold:fold_ident_or_nonnum' v
+let fold_name_or_alphanum' (v: _ #folder) =
+  fold' ~fold:fold_name_or_alphanum v
+let fold_name_or_alphanum'opt (v: _ #folder) =
+  fold_option ~fold:fold_name_or_alphanum' v
+let fold_name_or_literal' (v: _ #folder) =
+  fold' ~fold:fold_name_or_literal v
+let fold_name_or_literal'opt (v: _ #folder) =
+  fold_option ~fold:fold_name_or_literal' v
 
 (* --- *)
 

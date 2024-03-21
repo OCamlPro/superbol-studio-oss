@@ -95,6 +95,7 @@ let for_compilation_unit =
   let env_builder = object
     inherit [_] Cobol_ptree.Visitor.folder
     method! fold_program_unit { program_name = name; program_env = env; _ } =
+      let name = Cobol_ptree.program_name' name in
       acc_result @@ fun parent_env -> build_env name env ?parent_env
     method! fold_function_unit f =
       acc_result @@ fun _ -> build_env f.function_name f.function_env

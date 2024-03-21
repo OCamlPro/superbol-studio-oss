@@ -21,14 +21,14 @@ open Proc_division
 
 type program_unit =
   {
-    program_name: name with_loc;
+    program_name: name_or_literal with_loc;
     program_as: strlit option;
     program_level: program_level;
     program_options: options_paragraph with_loc option;
     program_env: environment_division with_loc option;
     program_data: data_division with_loc option;
     program_proc: procedure_division with_loc option;
-    program_end_name: name with_loc option
+    program_end_name: name_or_literal with_loc option
   }
 
 and program_level =
@@ -96,7 +96,7 @@ let rec pp_program_unit ppf { program_name;
   if has_identification_division_header then
     Fmt.pf ppf "@[IDENTIFICATION@ DIVISION@].@\n";
   Fmt.(option pp_informational_paragraphs) ppf preliminary_info;
-  Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_name) program_name;
+  Fmt.pf ppf "@[PROGRAM-ID.@ %a" (pp_with_loc pp_name_or_literal) program_name;
   Fmt.(option (any "@ AS " ++ pp_strlit)) ppf program_as;
   Fmt.(option (option (sp ++ pp_program_mode))
          ~none:(any "@ PROTOTYPE")) ppf mode;
@@ -107,7 +107,7 @@ let rec pp_program_unit ppf { program_name;
   Fmt.(option (sp ++ pp_with_loc pp_data_division)) ppf program_data;
   Fmt.(option (sp ++ pp_with_loc pp_procedure_division)) ppf program_proc;
   Fmt.(list ~sep:sp (pp_with_loc pp_program_unit)) ppf nested_programs;
-  Fmt.(option (any "@ @[END PROGRAM@ " ++ pp_with_loc pp_name ++ any ".@]"))
+  Fmt.(option (any "@ @[END PROGRAM@ " ++ pp_with_loc pp_name_or_literal ++ any ".@]"))
     ppf program_end_name
 
 type function_unit =
@@ -343,3 +343,17 @@ let pp_compilation_group ppf { control_division; compilation_units } =
     ppf compilation_units
 
 let show_compilation_group = Fmt.to_to_string pp_compilation_group
+
+(* TODO: this will work with references, but not for literals. We
+   should make it work also for them, though we should probably wait
+   to get an example from real life. This function should be moved
+   somewhere else. *)
+let program_name : name_or_literal -> string =
+  function name_or_literal ->
+  Pretty.to_string "%a" pp_name_or_literal name_or_literal
+
+let program_name' : name_or_literal with_loc -> string with_loc =
+  function name_or_literal ->
+  let loc = name_or_literal.loc in
+  let payload = program_name name_or_literal.payload in
+  { loc ; payload }
