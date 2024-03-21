@@ -625,6 +625,11 @@ type set_stmt =
         content: float_content;
         sign: sign option;
       }
+  | SetEnvironment of
+      {
+        variable: ident_or_literal;
+        value: ident_or_literal;
+      }
 [@@deriving ord]
 
 and set_switch_spec =
@@ -681,6 +686,10 @@ let pp_set_stmt ppf ss =
       Fmt.(list ~sep:sp pp_ident) targets
       pp_float_content content
       Fmt.(option (sp ++ pp_sign)) sign
+  | SetEnvironment { variable; value } ->                         (* GnuCOBOL *)
+    Fmt.pf ppf "ENVIRONMENT@ %a@ TO@ %a"
+      pp_ident_or_literal variable
+      pp_ident_or_literal value
   | SetEntry { targets ; value } ->
     Fmt.pf ppf "%a@ TO@ ENTRY@ %a"
       Fmt.(list ~sep:sp pp_ident) targets

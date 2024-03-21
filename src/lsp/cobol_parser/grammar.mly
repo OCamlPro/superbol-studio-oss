@@ -3693,6 +3693,8 @@ let set_statement [@context set_stmt] :=
  | SET; CONTENT; OF?; il = idents; TO; fc = float_content; so = ro(sign);
    { SetFloatContent { targets = il; content = fc; sign = so } }
 
+ | SET; ENVIRONMENT; il1 = ident_or_literal; TO; il2 = ident_or_literal;
+   { SetEnvironment { variable = il1; value = il2 } } (* GnuCOBOL *)
 
 let locale_or_ambiguous :=
   | LOCALE; ld = lc_all_or_default; { `Locale ld }
