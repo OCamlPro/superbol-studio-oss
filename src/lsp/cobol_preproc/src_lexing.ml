@@ -318,10 +318,37 @@ let eof state lexbuf =
 
 (* --- *)
 
+
+let remove_floating_comment ~start_pos ~end_pos w state =
+  let w_len = String.length w in
+  let rec floating_comment idx =
+    if idx >= w_len - 1 then None else match w.[idx] with
+      | '*' when w.[idx + 1] = '>' -> Some idx
+      | _ -> floating_comment (succ idx)
+  in
+  match floating_comment 0 with
+  | None ->
+      w, end_pos, state
+  | Some comment_idx ->
+      let comment_len = String.length w - comment_idx in
+      let start_cnum = start_pos.Lexing.pos_cnum + comment_idx + 1 in
+      let comment =
+        {
+          comment_loc = { start_pos with pos_cnum = start_cnum }, end_pos;
+          comment_kind = `Floating;
+          comment_contents = String.sub w comment_idx comment_len;
+        }
+      in
+      String.sub w 0 comment_idx,
+      Lexing.{ end_pos with pos_cnum = start_pos.pos_cnum + comment_idx },
+      { state with comments = comment :: state.comments }
+
+
 type line_fitting = Nominal | Tacked
 
 let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
   ignore fitting;
+  let w, end_pos, state = remove_floating_comment ~start_pos ~end_pos w state in
   let wloc = raw_loc ~start_pos ~end_pos state in
   let w = w &@ wloc in
   match state.continued with
