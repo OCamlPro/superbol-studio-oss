@@ -299,14 +299,14 @@ program_definition [@cost 0]:
    pdl = loc(program_definition)* (* COB2002: PROCEDURE DIVISION must be present *)
    END PROGRAM ep = name "."
    { match pd.program_level with
-       | ProgramDefinition { kind;
+       | ProgramDefinition { mode;
                              has_identification_division_header;
                              preliminary_informational_paragraphs;
                              supplementary_informational_paragraphs;
                              nested_programs = [] } ->
            { pd with
              program_level =
-               ProgramDefinition { kind;
+               ProgramDefinition { mode;
                                    has_identification_division_header;
                                    preliminary_informational_paragraphs;
                                    supplementary_informational_paragraphs;
@@ -320,7 +320,7 @@ program_definition_no_end:
    edo = ro(loc(environment_division))
    ddo = ro(loc(data_division))
    pdo = ro(loc(program_procedure_division))
-   { let h, ((program_name, program_as), kind), ip1 = pid in
+   { let h, ((program_name, program_as), mode), ip1 = pid in
      let ip0 = match h with None -> [] | Some h -> h in
      { program_name;
        program_as;
@@ -328,7 +328,7 @@ program_definition_no_end:
          ProgramDefinition { has_identification_division_header = h <> None;
                              preliminary_informational_paragraphs = ip0;
                              supplementary_informational_paragraphs = ip1;
-                             nested_programs = []; kind };
+                             nested_programs = []; mode };
        program_options = opo;
        program_env = edo;
        program_data = ddo;
@@ -479,11 +479,24 @@ let program_id_header_prefix ==
 
 let program_definition_id_paragraph [@context program_id_paragraph] :=
   | ids = program_id_header_prefix;
-    pko = o(IS?; pk = program_kind; PROGRAM?; { pk }); ".";
+    pko = io(IS?; pm = program_mode; PROGRAM?; { pm }); ".";
     { ids, pko }
 
+let program_mode :=
+  | COMMON;
+    { { prog_is_common = true;
+        prog_kind = None } }
+  | COMMON; pk = loc(program_kind);
+    { { prog_is_common = true;
+        prog_kind = Some pk } }
+  | pk = loc(program_kind); COMMON;
+    { { prog_is_common = true;
+        prog_kind = Some pk } } 
+  | pk = loc(program_kind);
+    { { prog_is_common = true;
+        prog_kind = Some pk } }
+
 let program_kind :=
-  | COMMON;     {Common}                      (* Only within a nested program *)
   | INITIAL;    {Initial}
   | RECURSIVE;  {Recursive}
 

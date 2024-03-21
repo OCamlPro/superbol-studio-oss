@@ -18,26 +18,6 @@ syn_definition.at-60-SHORT2.cob:3.24-3.32:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:145:0
-syn_definition.at-145-containing-prog.cob:8.42-8.48:
-   5          PROCEDURE        DIVISION.
-   6   
-   7          IDENTIFICATION   DIVISION.
-   8 >        PROGRAM-ID.      prog-1 IS INITIAL COMMON.
-----                                             ^^^^^^
-   9          PROCEDURE        DIVISION.
-  10              STOP RUN.
->> Error: Invalid syntax
-
-syn_definition.at-145-containing-prog.cob:14.44-14.50:
-  11          END PROGRAM      prog-1.
-  12   
-  13          IDENTIFICATION   DIVISION.
-  14 >        PROGRAM-ID.      prog-2 IS RECURSIVE COMMON.
-----                                               ^^^^^^
-  15          PROCEDURE        DIVISION.
-  16              STOP RUN.
->> Error: Invalid syntax
-
 syn_definition.at-145-containing-prog.cob:17.31:
   14          PROGRAM-ID.      prog-2 IS RECURSIVE COMMON.
   15          PROCEDURE        DIVISION.

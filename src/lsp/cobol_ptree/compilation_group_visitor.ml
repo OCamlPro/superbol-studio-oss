@@ -72,7 +72,7 @@ let rec fold_program_unit (v: _ #folder) =
           | ProgramDefinition { (* has_identification_division_header; *)
               preliminary_informational_paragraphs = infos0;
               supplementary_informational_paragraphs = infos1;
-              kind; _ } -> ignore kind; x
+              mode; _ } -> ignore mode; x
               (* >> fold_bool v has_identification_division_header *)
               >> fold_informational_paragraphs v infos0
               >> fold_name' v program_name
