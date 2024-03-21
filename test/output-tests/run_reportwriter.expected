@@ -5104,16 +5104,6 @@ run_reportwriter.at-3014-prog.cob:12.35-12.44:
   14          DATA DIVISION.
 >> Error: Invalid syntax
 
-run_reportwriter.at-3014-prog.cob:25.13-25.22:
-  22   
-  23          FD   PRINT-FILE
-  24                BLOCK CONTAINS 0 RECORDS
-  25 >              RECORDING MODE IS F
-----                ^^^^^^^^^
-  26                RECORD CONTAINS 132 CHARACTERS
-  27               REPORT IS STUDENT-REPORT.
->> Error: Invalid syntax
-
 run_reportwriter.at-3014-prog.cob:39.21:
   36              HEADING 1
   37              FIRST DETAIL  5
@@ -11655,26 +11645,6 @@ run_reportwriter.at-9265-prog.cob:12.38-12.46:
   13                     LINE SEQUENTIAL
   14                     FILE STATUS IS WS-OUTPUT-STATUS.
 >> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-9265-prog.cob:21.11-21.20:
-  18          FILE SECTION.
-  19   
-  20          FD  IN-FILE
-  21 >            RECORDING MODE IS F
-----              ^^^^^^^^^
-  22              BLOCK 0.
-  23   
->> Error: Invalid syntax
-
-run_reportwriter.at-9265-prog.cob:33.11-33.20:
-  30              05 FILLER                       PIC X(34).
-  31   
-  32          FD  OUT-FILE
-  33 >            RECORDING MODE IS F
-----              ^^^^^^^^^
-  34              REPORT IS REPORT1.
-  35   
->> Error: Invalid syntax
 
 run_reportwriter.at-9265-prog.cob:68.10-68.14:
   65   

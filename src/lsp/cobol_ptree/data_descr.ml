@@ -66,6 +66,27 @@ let pp_record_clause ppf = function
   | FixedOrVariableLength { min_length; max_length } ->
     Fmt.pf ppf "RECORD %a TO %a" pp_integer min_length pp_integer max_length
 
+type recording_mode =
+  | ModeFixedOrVariable
+  | ModeSpanned
+  | ModeFixed
+  | ModeVariable
+[@@deriving ord]
+
+type recording_mode_clause =
+  | RecordingMode of recording_mode
+[@@deriving ord]
+
+let pp_recording_mode ppf = function
+  | ModeFixedOrVariable -> Fmt.pf ppf "U"
+  | ModeSpanned         -> Fmt.pf ppf "S"
+  | ModeFixed           -> Fmt.pf ppf "FIXED"
+  | ModeVariable        -> Fmt.pf ppf "VARIABLE"
+
+let pp_recording_mode_clause ppf = function
+  | RecordingMode mode ->
+    Fmt.pf ppf "RECORDING MODE IS %a" pp_recording_mode mode
+
 type label_clause =
   | LabelStandard
   | LabelOmitted

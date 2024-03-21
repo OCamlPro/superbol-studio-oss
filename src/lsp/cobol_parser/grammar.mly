@@ -1209,6 +1209,7 @@ let file_descr_clause :=
  | ~ = format_clause;         < >                                 (* +COB2002 *)
  | ~ = block_contains_clause; < >
  | ~ = record_clause;         <FileRecord>
+ | ~ = recording_mode_clause; <FileRecordingMode>
  | ~ = label_clause;          <FileLabel>                         (* -COB2002 *)
  | ~ = valueof_clause;        <FileValueOf>                       (* -COB2002 *)
  | ~ = data_clause;           <FileData>                          (* -COB2002 *)
@@ -1275,6 +1276,17 @@ record_clause:
    depending = ro(depending_phrase)
    { let min_length, max_length = lengths in
      VariableLength { min_length; max_length; depending } }
+
+let recording_mode_clause [@context recording_mode_clause] :=
+ | RECORDING; MODE; IS; ~ = recording_mode; <RecordingMode>
+
+let recording_mode :=
+ | F;        { ModeFixed }
+ | V;        { ModeVariable }
+ | U;        { ModeFixedOrVariable }
+ | S;        { ModeSpanned }
+ | FIXED;    { ModeFixed }
+ | VARIABLE; { ModeVariable }
 
 from_to_characters_opt:
  | CHARACTERS?                                    { None,    None }
