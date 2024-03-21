@@ -258,7 +258,7 @@
 %token CURSOR_X                     [@keyword]                [@contexts ]
 %token CURSOR_Y                     [@keyword]                [@contexts ]
 %token CUSTOM_PRINT_TEMPLATE        [@keyword]                [@contexts ]
-%token CYCLE                        [@keyword]                [@contexts ]
+%token CYCLE                        [@keyword]                [@contexts exit_stmt]
 %token CYL_INDEX                    [@keyword]                [@contexts ]
 %token CYL_OVERFLOW                 [@keyword]                [@contexts ]
 %token DASHED                       [@keyword]                [@contexts ]
