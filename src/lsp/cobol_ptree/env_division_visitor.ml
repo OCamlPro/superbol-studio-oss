@@ -357,9 +357,10 @@ let fold_select_clause (v: _ #folder) =
           >> fold_qualname_or_alphanum v c
       | SelectRecordDelimiter d -> x
           >> fold_record_delimiter v d
-      | SelectRecordKey { key; source } -> x
+      | SelectRecordKey { key; source ; with_duplicates } -> x
           >> fold_qualname v key
           >> fold_name'_list v source
+          >> fold_bool v with_duplicates
       | SelectRelativeKey n -> x
           >> fold_name' v n
       | SelectReserve i -> x

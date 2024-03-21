@@ -281,15 +281,6 @@ syn_file.at-2062-prog.cob:24.48-24.50:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2092:0
-syn_file.at-2092-prog.cob:15.36-15.38:
-  12                 ALTERNATE RECORD KEY TESTKEY2
-  13                                  WITH DUPLICATES
-  14                 ALTERNATE RECORD KEY TESTKEY3
-  15 >                                WITH NO DUPLICATES
-----                                       ^^
-  16                 .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2121:0
 syn_file.at-2121-prog.cob:12.23:
    9                 ACCESS        DYNAMIC
@@ -312,26 +303,6 @@ syn_file.at-2121-prog.cob:12.25-12.28:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2203:0
-syn_file.at-2203-prog.cob:13.17-13.21:
-  10                 ORGANIZATION  INDEXED
-  11                 ACCESS        DYNAMIC
-  12                 RECORD KEY    TESTKEY-1P1
-  13 >                  WITH DUPLICATES
-----                    ^^^^
-  14                 ALTERNATE RECORD KEY TESTKEY-1P2
-  15                    WITH NO DUPLICATES
->> Error: Invalid syntax
-
-syn_file.at-2203-prog.cob:15.22-15.24:
-  12                 RECORD KEY    TESTKEY-1P1
-  13                    WITH DUPLICATES
-  14                 ALTERNATE RECORD KEY TESTKEY-1P2
-  15 >                  WITH NO DUPLICATES
-----                         ^^
-  16                 LOCK EXCLUSIVE MASS-UPDATE
-  17                 .
->> Error: Invalid syntax
-
 syn_file.at-2203-prog.cob:16.18:
   13                    WITH DUPLICATES
   14                 ALTERNATE RECORD KEY TESTKEY-1P2
@@ -350,16 +321,6 @@ syn_file.at-2203-prog.cob:16.19-16.28:
 ----                      ^^^^^^^^^
   17                 .
   18          SELECT TEST-FILE2
->> Error: Invalid syntax
-
-syn_file.at-2203-prog.cob:24.17-24.21:
-  21                 ORGANIZATION  INDEXED
-  22                 ACCESS        DYNAMIC
-  23                 RECORD KEY    TESTKEY-2P1
-  24 >                  WITH NO DUPLICATES
-----                    ^^^^
-  25                 ALTERNATE RECORD KEY TESTKEY-2P2
-  26                    WITH DUPLICATES
 >> Error: Invalid syntax
 
 syn_file.at-2203-prog.cob:41.16-41.25:

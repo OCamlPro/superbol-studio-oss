@@ -587,7 +587,14 @@ let environment_division :=
    env_configuration = ro(loc(configuration_section));
    env_input_output  = ro(loc(input_output_section));
    { { env_configuration; env_input_output } }
-
+ (* Allows skipping ENVIRONMENT DIVISION on MF *)
+ | env_configuration = loc(configuration_section);
+   env_input_output  = ro(loc(input_output_section));
+   { { env_configuration = Some env_configuration;
+       env_input_output } }
+ | env_input_output  = loc(input_output_section);
+   { { env_configuration = None;
+       env_input_output = Some env_input_output } }
 
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
@@ -832,14 +839,21 @@ let input_output_section :=
  | INPUT_OUTPUT; SECTION; ".";
    file_control_paragraph = ro(loc(file_control_paragraph)); (* COB85: mandatory *)
    io_control_paragraph = ro(loc(io_control_paragraph));
-    { { file_control_paragraph; io_control_paragraph } }
-
+   { { file_control_paragraph; io_control_paragraph } }
+  | file_control_paragraph = loc(file_control_paragraph);
+    io_control_paragraph = ro(loc(io_control_paragraph));
+    { { file_control_paragraph = Some file_control_paragraph;
+        io_control_paragraph } }
+  | io_control_paragraph = loc(io_control_paragraph);
+    { { file_control_paragraph = None;
+        io_control_paragraph = Some io_control_paragraph } }
 
 
 (* - ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION / FILE-CONTROL PARAGRAPH -- *)
 
 let file_control_paragraph :=
- | FILE_CONTROL; "."; ~ = rl(select); < > (* COB85: non-empty list *)
+ | FILE_CONTROL; "." ; ~ = rl(select); < > (* COB85: non-empty list *)
+ | ~ = rnel(select); < >
 
 let select :=
  | SELECT; o = bo(OPTIONAL); i = name;
@@ -884,9 +898,15 @@ let access_mode :=
 let alternate_record_key_clause :=
  | ALTERNATE; RECORD; KEY?; IS?; i = qualname;
    il = lo(pf(SOURCE; IS?; {}, names));
-   wd = bo(WITH?; DUPLICATES; {});
+   wd = with_duplicates;
    { SelectAlternateRecordKey { key = i; source = il;
                                 with_duplicates = wd } }
+
+let with_duplicates :=
+  | { false }
+  | DUPLICATES; { true }
+  | WITH; DUPLICATES; { true }
+  | WITH; NO; DUPLICATES; { false }
 
 let collating_sequence_clause :=                                   (* +COB2002 *)
  | COLLATING?; SEQUENCE; ~ = alphabet_specification;
@@ -934,8 +954,9 @@ let record_delimiter :=
 
 let record_key_clause :=
  | RECORD; KEY?; IS?; i = qualname;
-   il = lo(pf(SOURCE; IS?,names));
-   { SelectRecordKey { key = i; source = il } }
+    il = lo(pf(SOURCE; IS?,names));
+    wd = with_duplicates ;
+   { SelectRecordKey { key = i; source = il ; with_duplicates = wd } }
 
 let relative_key_clause :=
  | RELATIVE; KEY?; IS?; ~ = name; <SelectRelativeKey>
@@ -1065,8 +1086,15 @@ let section(K, L) ==
 let section_header_n_items(K, L) ==
   | K; SECTION; "."; ~ = rl(loc(L)); < >
 
+(* Section with optional header, especially on MF *)
+let section_opt_header(K, L) ==
+  | ~ = loc(section_opt_header_n_items(K,L)); < >
+let section_opt_header_n_items(K, L) ==
+  | K; SECTION; "."; ~ = rl(loc(L)); < >
+  | ~ = rnel(loc(L));   < >
+
 let file_section :=
-  | ~ = section (FILE, file_or_sort_merge_descr_entry); < >
+  | ~ = section_opt_header (FILE, file_or_sort_merge_descr_entry); < >
 
 let working_storage_section :=
   | ~ = section (WORKING_STORAGE, constant_or_data_descr_entry); < >

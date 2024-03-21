@@ -265,6 +265,7 @@ and select_clause =
       {
         key: qualname;
         source: name with_loc list;
+        with_duplicates: bool;
       }
   | SelectRelativeKey of name with_loc
   | SelectReserve of integer
@@ -623,11 +624,12 @@ let pp_select_clause ppf = function
     Fmt.pf ppf "PADDING %a" pp_qualname_or_alphanum qoa
   | SelectRecordDelimiter rd ->
     Fmt.pf ppf "RECORD DELIMITER %a" pp_record_delimiter rd
-  | SelectRecordKey { key; source } ->
-    Fmt.pf ppf "RECORD %a%a"
+  | SelectRecordKey { key; source ; with_duplicates} ->
+    Fmt.pf ppf "RECORD %a%a%t"
       pp_qualname key
       (Pretty.list ~fopen:"SOURCE " ~fsep:"@ " ~fclose:"" ~fempty:""
          pp_name') source
+      (if with_duplicates then Fmt.fmt " WITH DUPLICATES" else Fmt.fmt "")
   | SelectRelativeKey n ->
     Fmt.pf ppf "RELATIVE %a" pp_name' n
   | SelectReserve n -> Fmt.pf ppf "RESERVE %a" pp_integer n
