@@ -2921,7 +2921,7 @@ let alter_statement :=
 %public let unconditional_action := ~ = call_statement; < >
 let call_statement :=
   | CALL; cp = call_prefix; ul = lo(pf(USING,rnel(loc(using_by))));
-    ro = ro(returning); oeho = io(overflow_or_exception_handler);
+    ro = ro(returning_or_giving); oeho = io(overflow_or_exception_handler);
     oterm_(END_CALL);
     { Call { call_prefix = cp;
              call_using = ul;
@@ -2938,6 +2938,12 @@ let call_prefix :=
 let ident_or_nested :=
   | ~ = ident; <CallProtoIdent>
   | NESTED;    {CallProtoNested}
+
+let returning_or_giving :=
+  | ~ = returning; < >
+  | GIVING; ~ = loc(ident); < > (* MF equivalent for RETURNING *)
+
+
 
 (* CANCEL STATEMENT (+COB85) *)
 

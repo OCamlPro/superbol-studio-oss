@@ -437,16 +437,6 @@ run_misc.at-1559-callee2.cob:10.11-10.19:
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1557:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1607:0
-run_misc.at-1607-callee.cob:13.38-13.44:
-  10          01  PARAM2       PIC 9999 COMP.
-  11          PROCEDURE        DIVISION USING PARAM1 PARAM2.
-  12              ADD 1 TO COUNTER END-ADD
-  13 >            CALL 'C$PARAMSIZE' USING 1 GIVING LPARAM END-CALL
-----                                         ^^^^^^
-  14              DISPLAY 'COUNTER = ' COUNTER ' LPARAM1 = ' LPARAM
-  15                      ' PARAM1 = ' PARAM1
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1606:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1659:0
 run_misc.at-1659-dump.c:5.6-5.7:
