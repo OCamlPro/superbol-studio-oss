@@ -792,6 +792,9 @@ and fold_accept' (v: _ #folder) : accept_stmt with_loc -> 'a -> 'a =
           >> fold_ident' v item
           >> fold_option ~fold:fold_ident_or_nonnum' v env_item
           >> fold_dual_handler v on_exception
+      | AcceptFromArg { item; on_exception } -> x
+          >> fold_ident' v item
+          >> fold_dual_handler v on_exception
     end
 
 and fold_add' (v: _ #folder) : basic_arithmetic_stmt with_loc -> 'a -> 'a =

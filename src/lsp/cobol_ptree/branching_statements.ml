@@ -182,6 +182,11 @@ and accept_stmt =
         env_item: ident_or_nonnum with_loc option;
         on_exception: dual_handler;
       }
+  | AcceptFromArg of                                                    (* MF *)
+      {
+        item: ident with_loc;
+        on_exception: dual_handler;
+      }
 
 
 (*
@@ -654,6 +659,12 @@ and pp_accept_stmt ppf = function
       | None ->
         Fmt.pf ppf "ENVIRONMENT-VALUE"
     end;
+    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+      ppf on_exception;
+    Fmt.pf ppf "@]"
+  | AcceptFromArg { item; on_exception } ->
+    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ARGUMENT-VALUE"
+      Fmt.(box (pp_with_loc pp_ident)) item;
     pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
       ppf on_exception;
     Fmt.pf ppf "@]"

@@ -2849,6 +2849,10 @@ accept_statement [@context accept_stmt]:
    FROM ENVIRONMENT_VALUE
    on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
    { AcceptFromEnv { item; env_item = None; on_exception } }
+ | ACCEPT item = loc(ident)                                             (* MF *)
+   FROM ARGUMENT_VALUE
+   on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
+   { AcceptFromArg { item; on_exception } }
 
 let end_accept := oterm_(END_ACCEPT)
 

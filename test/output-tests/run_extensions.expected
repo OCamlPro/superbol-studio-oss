@@ -1824,26 +1824,6 @@ run_extensions.at-2760-prog.cob:11.23-11.24:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2809:0
-run_extensions.at-2809-prog.cob:22.24:
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
-  21              END-DISPLAY.
-  22 >            ACCEPT Y FROM ARGUMENT-VALUE
-----                           ^
-  23              END-ACCEPT.
-  24              DISPLAY "(" Y ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:22.25-22.39:
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
-  21              END-DISPLAY.
-  22 >            ACCEPT Y FROM ARGUMENT-VALUE
-----                            ^^^^^^^^^^^^^^
-  23              END-ACCEPT.
-  24              DISPLAY "(" Y ")"
->> Error: Invalid syntax
-
 run_extensions.at-2809-prog.cob:26.24:
   23              END-ACCEPT.
   24              DISPLAY "(" Y ")"
