@@ -66,19 +66,19 @@ let fold_data_division (v: _#folder) =
                           linkage_section; communication_section;
                           local_storage_section; report_section;
                           screen_section } x -> x
-      >> fold_option v file_section
+      >> fold_list v file_section
         ~fold:fold_file_section'
-      >> fold_option v working_storage_section
+      >> fold_list v working_storage_section
         ~fold:fold_working_storage_section'
-      >> fold_option v linkage_section
+      >> fold_list v linkage_section
         ~fold:fold_linkage_section'
-      >> fold_option v communication_section
+      >> fold_list v communication_section
         ~fold:fold_communication_section'
-      >> fold_option v local_storage_section
+      >> fold_list v local_storage_section
         ~fold:fold_local_storage_section'
-      >> fold_option v report_section
+      >> fold_list v report_section
         ~fold:fold_report_section'
-      >> fold_option v screen_section
+      >> fold_list v screen_section
         ~fold:fold_screen_section'
     end
 

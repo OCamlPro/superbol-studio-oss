@@ -30,6 +30,7 @@ let with_loc token location_limits =
 
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
+
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)
@@ -74,6 +75,8 @@ let dual_handler_none =
 
 %nonassoc lowest
 %nonassoc ELSE
+
+%nonassoc FD SD
 
 (* Set precedence of statements to be higher than imperative statement *)
 (* This helps resolve conflicts in lists of statements, by prefering shift *)
@@ -318,7 +321,7 @@ program_definition_no_end:
  | pid = program_definition_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(program_procedure_division))
    { let h, ((program_name, program_as), mode), ip1 = pid in
      let ip0 = match h with None -> [] | Some h -> h in
@@ -331,7 +334,7 @@ program_definition_no_end:
                              nested_programs = []; mode };
        program_options = opo;
        program_env = edo;
-       program_data = ddo;
+       program_data = build_data_division ddo;
        program_proc = pdo;
        program_end_name = None } }
 (* Note: END PROGRAM is not mandatory on last top-level program
@@ -341,7 +344,7 @@ program_prototype [@cost 999]:
  | pid = program_prototype_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END PROGRAM ep = loc(infoword_or_literal)? "."
    { let _, (program_name, program_as) = pid in
@@ -350,7 +353,7 @@ program_prototype [@cost 999]:
        program_level = ProgramPrototype;
        program_options = opo;
        program_env = edo;
-       program_data = ddo;
+       program_data = build_data_division ddo;
        program_proc = pdo;
        program_end_name = ep } }
 
@@ -358,7 +361,7 @@ function_unit [@cost 999]:
  | fid = function_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END FUNCTION ef = name "."
    { let _, (name, as_, is_proto) = fid in
@@ -367,7 +370,7 @@ function_unit [@cost 999]:
        function_is_proto = is_proto;
        function_options = opo;
        function_env = edo;
-       function_data = ddo;
+       function_data = build_data_division ddo;
        function_proc = pdo;
        function_end_name = ef } } (* TODO: shoudn't we just check ef == name? *)
 
@@ -395,26 +398,26 @@ factory_definition:
  | fp = factory_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(object_procedure_division))
    END FACTORY "."
     { { factory_implements = snd fp;
         factory_options = opo;
         factory_env = edo;
-        factory_data = ddo;
+        factory_data = build_data_division ddo;
         factory_methods = pdo } }
 
 instance_definition:
  | op = instance_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(object_procedure_division))
    END OBJECT "."
     { { instance_implements = snd op;
         instance_options = opo;
         instance_env = edo;
-        instance_data = ddo;
+        instance_data = build_data_division ddo;
         instance_methods = pdo } }
 
 interface_definition [@cost 999]:
@@ -438,7 +441,7 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
  | mid = method_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END METHOD em = name "."
    { let _, (method_name, method_kind,
@@ -449,7 +452,7 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_final;
        method_options = opo;
        method_env = edo;
-       method_data = ddo;
+       method_data = build_data_division ddo;
        method_proc = pdo;
        method_end_name = em } }
 
@@ -1064,37 +1067,28 @@ type declaration entry =
 *)
 
 let data_division :=
- | DATA; DIVISION; ".";
-   fso  = ro(file_section);
-   wsso = ro(working_storage_section);
-   lsso = ro(local_storage_section);                              (* +COB2002 *)
-   lso  = ro(linkage_section);
-   cso  = ro(communication_section);                              (* -COB2002 *)
-   rso  = ro(report_section);
-   sso  = ro(screen_section);                                     (* +COB2002 *)
-   { { file_section = fso;
-       working_storage_section = wsso;
-       local_storage_section = lsso;
-       linkage_section = lso;
-       communication_section = cso;
-       report_section = rso;
-       screen_section = sso; } }
+  | l1 = rl(data_division_sentence_1);
+    l2 = rl(data_division_sentence_2);
+    { l1 @ l2 }
 
+let data_division_sentence_1 :=
+  | DATA; DIVISION; ".";         { S_DATA_DIVISION }
+  | FILE ; SECTION ; ".";        { S_FILE_SECTION }
+  | s = loc(rnel(loc(file_or_sort_merge_descr_entry)));
+    { S_FILE_SECTION_PART s }
+
+let data_division_sentence_2 :=
+  | s = working_storage_section; { S_WORKING_STORAGE_SECTION s }
+  | s = local_storage_section;   { S_LOCAL_STORAGE_SECTION s }
+  | s = linkage_section;         { S_LINKAGE_SECTION s }
+  | s = communication_section;   { S_COMMUNICATION_SECTION s }
+  | s = report_section;          { S_REPORT_SECTION s }
+  | s = screen_section;          { S_SCREEN_SECTION s }
 
 let section(K, L) ==
   | ~ = loc(section_header_n_items(K,L)); < >
 let section_header_n_items(K, L) ==
   | K; SECTION; "."; ~ = rl(loc(L)); < >
-
-(* Section with optional header, especially on MF *)
-let section_opt_header(K, L) ==
-  | ~ = loc(section_opt_header_n_items(K,L)); < >
-let section_opt_header_n_items(K, L) ==
-  | K; SECTION; "."; ~ = rl(loc(L)); < >
-  | ~ = rnel(loc(L));   < >
-
-let file_section :=
-  | ~ = section_opt_header (FILE, file_or_sort_merge_descr_entry); < >
 
 let working_storage_section :=
   | ~ = section (WORKING_STORAGE, constant_or_data_descr_entry); < >

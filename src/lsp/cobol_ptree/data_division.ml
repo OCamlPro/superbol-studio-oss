@@ -16,13 +16,13 @@ open Data_sections
 
 type data_division =
   {
-    file_section: file_section with_loc option;
-    working_storage_section: working_storage_section with_loc option;
-    linkage_section: linkage_section with_loc option;
-    communication_section: communication_section with_loc option;
-    local_storage_section: local_storage_section with_loc option;
-    report_section: report_section with_loc option;
-    screen_section: screen_section with_loc option;
+    file_section: file_section with_loc list;
+    working_storage_section: working_storage_section with_loc list;
+    linkage_section: linkage_section with_loc list;
+    communication_section: communication_section with_loc list;
+    local_storage_section: local_storage_section with_loc list;
+    report_section: report_section with_loc list;
+    screen_section: screen_section with_loc list;
   }
 [@@deriving ord]
 
@@ -31,7 +31,7 @@ let pp_data_division ppf { file_section;
                            communication_section; local_storage_section;
                            report_section; screen_section } =
   let pp_section pp ppf section =
-    Fmt.(option (sp ++ vbox (pp_with_loc pp))) ppf section
+    Fmt.(list (sp ++ vbox (pp_with_loc pp))) ppf section
   in
   Fmt.pf ppf "@[<v 2>DATA DIVISION.";
   pp_section pp_file_section ppf file_section;
