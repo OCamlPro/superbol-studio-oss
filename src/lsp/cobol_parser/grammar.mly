@@ -106,6 +106,7 @@ let dual_handler_none =
 %nonassoc MERGE
 %nonassoc MOVE
 %nonassoc MULTIPLY
+%nonassoc NEXT_SENTENCE
 %nonassoc OPEN
 %nonassoc PERFORM
 %nonassoc PURGE
@@ -3197,17 +3198,12 @@ let if_statement :=
  | IF; c = condition; THEN?; ib = if_body; oterm_(END_IF);
    { let sn, sno = ib in
      If {condition = c; then_branch = sn; else_branch = sno} }
-(* COB2002: END IF mandatory on ELSE, NEXT STATEMENT archaic *)
+(* COB2002: END IF mandatory on ELSE, NEXT SENTENCE archaic *)
 
 let if_body :=
- | isl = imp_stmts; %prec lowest      { Statements isl, None }
- | isl = imp_stmts; ep = else_phrase; { Statements isl, Some ep }
- | NEXT; SENTENCE; %prec lowest       { NextSentence, None }
- | NEXT; SENTENCE; ep = else_phrase;  { NextSentence, Some ep }
+ | isl = imp_stmts; %prec lowest             { isl, [] }
+ | isl1 = imp_stmts; ELSE; isl2 = imp_stmts; { isl1, isl2 }
 
-let else_phrase :=
- | ELSE; NEXT; SENTENCE;  { NextSentence }
- | ELSE; isl = imp_stmts; { Statements isl }
 
 
 (* INITIALIZE STATEMENT (+COB85) *)
@@ -3374,6 +3370,17 @@ let multiply_statement :=
        multiply_on_size_error = h; } }
 
 let end_multiply := oterm_(END_MULTIPLY)
+
+
+
+(* NEXT SENTENCE *)
+(* Technically NOT a statement, but MF allows
+   NEXT SENTENCE anywhere in IF branches  *)
+
+%public let unconditional_action := ~ = next_sentence; < >
+let next_sentence := NEXT_SENTENCE; { NextSentence }
+
+
 
 (* OPEN STATEMENT (+COB85) *)
 (* COB85 has may restrictions over COB2002 as to accepted syntax *)
@@ -3577,18 +3584,18 @@ let search_statement :=
  | SEARCH; ALL; i = qualname;
    ae = ilo(pf(at_end,imp_stmts));
    WHEN; sc = search_condition; scl = ll(and_clause);
-   sn = statements_or_next;
+   isl = imp_stmts;
    end_search;
    { SearchAll { search_all_item = i;
                  search_all_at_end = ae;
                  search_all_conditions = sc :: scl;
-                 search_all_action = sn } }
+                 search_all_action = isl } }
 
 let end_search := oterm_(END_SEARCH)
 
 let when_clause :=
- | WHEN; c = condition; s = statements_or_next;
-   { { search_when_cond = c; search_when_stmts = s } }
+ | WHEN; c = condition; isl = imp_stmts;
+   { { search_when_cond = c; search_when_stmts = isl } }
 
 let and_clause :=
  | AND; ~ = search_condition; < >
@@ -3597,10 +3604,6 @@ let search_condition :=
  | i = qualident; IS?; or_(EQUAL, "="); TO?; e = expression;
    { IsEqual { data_item = i; condition = e } }
  | i = qualident; {Cond i}
-
-let statements_or_next ==
- | isl = imp_stmts; {Statements isl}
- | NEXT; SENTENCE;  {NextSentence}
 
 
 

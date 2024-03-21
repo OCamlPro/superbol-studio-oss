@@ -745,6 +745,7 @@ let rec fold_statement' (v: _ #folder) =
       | Write         s -> fold_write'          v (s &@ loc)
       | Continue
       | LoneGoTo
+      | NextSentence
       | Suppress -> Fun.id
     end
 
@@ -759,10 +760,6 @@ and fold_dual_handler (v: _ #folder) { dual_handler_pos;
                                        dual_handler_neg } x = x
   >> fold_handler v dual_handler_pos
   >> fold_handler v dual_handler_neg
-
-and fold_branch (v: _ #folder) : branch -> 'a -> 'a = function
-  | Statements stmts -> fold_statements v stmts
-  | NextSentence -> Fun.id
 
 and fold_basic_arith_stmt (v: _ #folder) : basic_arithmetic_stmt -> 'a -> 'a =
   fun { basic_arith_operands; basic_arith_on_size_error } x -> x
@@ -894,8 +891,8 @@ and fold_if' (v: _ #folder) : if_stmt with_loc -> 'a -> 'a =
   handle' v#fold_if' v
     ~fold:begin fun v { condition; then_branch; else_branch } x -> x
       >> fold_condition v condition
-      >> fold_branch v then_branch
-      >> fold_option ~fold:fold_branch v else_branch
+      >> fold_statements v then_branch
+      >> fold_statements v else_branch
     end
 
 and fold_multiply' (v: _ #folder) : multiply_stmt with_loc -> 'a -> 'a =
@@ -975,7 +972,7 @@ and fold_search_when_clause' (v: _#folder) =
   handle' v#fold_search_when_clause' v
     ~fold:begin fun v { search_when_cond; search_when_stmts } x -> x
       >> fold_condition v search_when_cond
-      >> fold_branch v search_when_stmts
+      >> fold_statements v search_when_stmts
     end
 
 and fold_search' (v: _ #folder) =
@@ -995,7 +992,7 @@ and fold_search_all' (v: _ #folder) =
       >> fold_qualname v search_all_item
       >> fold_handler v search_all_at_end
       >> fold_list ~fold:fold_search_condition v search_all_conditions
-      >> fold_branch v search_all_action
+      >> fold_statements v search_all_action
     end
 
 and fold_start' (v: _ #folder) =

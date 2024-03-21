@@ -134,7 +134,7 @@ and search_stmt =
 and search_when_clause =
   {
     search_when_cond: condition;
-    search_when_stmts: branch;
+    search_when_stmts: statements;
   }
 
 (* SEARCH ALL *)
@@ -143,7 +143,7 @@ and search_all_stmt =
     search_all_item: qualname;
     search_all_at_end: handler;
     search_all_conditions: search_condition list;
-    search_all_action: branch;
+    search_all_action: statements;
   }
 
 
@@ -151,8 +151,8 @@ and search_all_stmt =
 and if_stmt =
   {
     condition: condition;
-    then_branch: branch;
-    else_branch: branch option;
+    then_branch: statements;
+    else_branch: statements;
   }
 
 
@@ -422,6 +422,7 @@ and statement =
   | Merge of merge_stmt
   | Move of move_stmt
   | Multiply of multiply_stmt
+  | NextSentence
   | Open of open_stmt
   | PerformTarget of perform_target_stmt
   | PerformInline of perform_inline_stmt
@@ -451,13 +452,7 @@ and statement =
   | Write of write_stmt
 
 and statements = statement with_loc list
-
-and branch =
-  | Statements of statements
-  | NextSentence
 [@@deriving ord, show]
-
-let pp_dump_statements = pp_statements
 
 let pp_display_device_mnemonic ppf = function
   | DisplayDeviceEnvName -> Fmt.pf ppf "ENVIRONMENT-NAME"
@@ -605,11 +600,11 @@ and pp_search_all_stmt ppf { search_all_item = si;
   List.iter (fun pf -> pf ppf ()) @@
   list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
   Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition) ppf c;
-  Fmt.(sp ++ pp_branch) ppf a;
+  Fmt.(sp ++ pp_statements) ppf a;
   Fmt.pf ppf "@ END-SEARCH"
 
 and pp_search_when_clause ppf { search_when_cond = c; search_when_stmts = w } =
-  Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_branch w
+  Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_statements w
 
 (* IF *)
 
@@ -619,10 +614,11 @@ and pp_if_stmt ppf { condition = c; then_branch = t; else_branch = e } =
       ~fits:("", 0, "")
       ~breaks:("", -2, "THEN")
   in
+  let e = match e with [] -> None | _ -> Some e in
   Fmt.pf ppf "@[<v>IF@[<hv>@ %a%t@]@;<1 2>%a%a@ END-IF@]"
     (Fmt.box pp_condition) c pp_then
-    (Fmt.vbox pp_branch) t
-    Fmt.(option (any "@ ELSE@;<1 2>" ++ vbox pp_branch)) e
+    (Fmt.vbox pp_statements) t
+    Fmt.(option (any "@ ELSE@;<1 2>" ++ vbox pp_statements)) e
 
 (* ACCEPT *)
 
@@ -903,6 +899,7 @@ and pp_statement ppf = function
   | Merge s -> pp_merge_stmt ppf s
   | Move s -> pp_move_stmt ppf s
   | Multiply s -> pp_multiply_stmt ppf s
+  | NextSentence -> Fmt.pf ppf "NEXT SENTENCE"
   | Open s -> pp_open_stmt ppf s
   | PerformInline s -> pp_perform_inline_stmt ppf s
   | PerformTarget s -> pp_perform_target_stmt ppf s
@@ -934,6 +931,4 @@ and pp_statement ppf = function
 and pp_statements ppf =
   Fmt.(vbox @@ list ~sep:sp (box (pp_with_loc pp_statement))) ppf
 
-and pp_branch ppf = function
-  | Statements ss -> pp_statements ppf ss
-  | NextSentence -> Fmt.pf ppf "@[NEXT@ SENTENCE@]"
+let pp_dump_statements = pp_statements
