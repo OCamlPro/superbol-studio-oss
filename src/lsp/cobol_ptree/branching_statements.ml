@@ -179,7 +179,7 @@ and accept_stmt =
   | AcceptFromEnv of                                                    (* MF *)
       {
         item: ident with_loc;
-        env_item: ident_or_nonnum with_loc;
+        env_item: ident_or_nonnum with_loc option;
         on_exception: dual_handler;
       }
 
@@ -643,10 +643,17 @@ and pp_accept_stmt ppf = function
     Fmt.(option (any "@ AT@ " ++ pp_position)) ppf p;
     pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
       ppf on_exception
-  | AcceptFromEnv { item; env_item = ei; on_exception } ->
-    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ENVIRONMENT@;<1 2>%a"
-      Fmt.(box (pp_with_loc pp_ident)) item
-      Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei;
+  | AcceptFromEnv { item; env_item; on_exception } ->
+    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM "
+      Fmt.(box (pp_with_loc pp_ident)) item;
+    begin
+      match env_item with
+      | Some ei ->
+        Fmt.pf ppf "ENVIRONMENT@;<1 2>%a"
+          Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei
+      | None ->
+        Fmt.pf ppf "ENVIRONMENT-VALUE"
+    end;
     pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
       ppf on_exception;
     Fmt.pf ppf "@]"

@@ -6529,26 +6529,6 @@ run_misc.at-12917-prog.cob:21.38-21.43:
   23         *
 >> Error: Invalid syntax
 
-run_misc.at-12917-prog.cob:27.33:
-  24          PROCEDURE DIVISION.
-  25          MAIN.
-  26              DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-  27 >            ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
-----                                    ^
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
->> Hint: Missing <word>
-
-run_misc.at-12917-prog.cob:27.34-27.51:
-  24          PROCEDURE DIVISION.
-  25          MAIN.
-  26              DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-  27 >            ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
-----                                     ^^^^^^^^^^^^^^^^^
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
->> Error: Invalid syntax
-
 run_misc.at-12917-prog.cob:37.7-37.29:
   34              DISPLAY "ENVPONY was NOT DEFINED;".
   35          >>END-IF
@@ -6658,26 +6638,6 @@ run_misc.at-12983-prog.cob:21.38-21.43:
 ----                                         ^^^^^
   22          77  MYPONYENV  PIC X(12).
   23         *
->> Error: Invalid syntax
-
-run_misc.at-12983-prog.cob:27.33:
-  24          PROCEDURE DIVISION.
-  25          MAIN.
-  26              DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-  27 >            ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
-----                                    ^
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
->> Hint: Missing <word>
-
-run_misc.at-12983-prog.cob:27.34-27.51:
-  24          PROCEDURE DIVISION.
-  25          MAIN.
-  26              DISPLAY "ENVPONY" UPON ENVIRONMENT-NAME
-  27 >            ACCEPT  MYPONYENV FROM ENVIRONMENT-VALUE.
-----                                     ^^^^^^^^^^^^^^^^^
-  28              DISPLAY "ENVPONY env var set to " MYPONYENV ";".
-  29              DISPLAY "1st Dog's name is " DOGGY ";".
 >> Error: Invalid syntax
 
 run_misc.at-12983-prog.cob:37.7-37.29:

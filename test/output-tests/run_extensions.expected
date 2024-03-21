@@ -1824,46 +1824,6 @@ run_extensions.at-2760-prog.cob:11.23-11.24:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2809:0
-run_extensions.at-2809-prog.cob:12.24:
-   9          PROCEDURE        DIVISION.
-  10              DISPLAY "TEST_ENV" UPON ENVIRONMENT-NAME
-  11              END-DISPLAY.
-  12 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                           ^
-  13              END-ACCEPT.
-  14              DISPLAY "(" X ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:12.25-12.42:
-   9          PROCEDURE        DIVISION.
-  10              DISPLAY "TEST_ENV" UPON ENVIRONMENT-NAME
-  11              END-DISPLAY.
-  12 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                            ^^^^^^^^^^^^^^^^^
-  13              END-ACCEPT.
-  14              DISPLAY "(" X ")"
->> Error: Invalid syntax
-
-run_extensions.at-2809-prog.cob:18.24:
-  15              END-DISPLAY.
-  16              DISPLAY "RXW" UPON ENVIRONMENT-VALUE
-  17              END-DISPLAY.
-  18 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                           ^
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:18.25-18.42:
-  15              END-DISPLAY.
-  16              DISPLAY "RXW" UPON ENVIRONMENT-VALUE
-  17              END-DISPLAY.
-  18 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                            ^^^^^^^^^^^^^^^^^
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
->> Error: Invalid syntax
-
 run_extensions.at-2809-prog.cob:22.24:
   19              END-ACCEPT.
   20              DISPLAY "(" X ")"

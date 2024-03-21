@@ -497,7 +497,7 @@ let program_mode :=
         prog_kind = Some pk } }
   | pk = loc(program_kind); COMMON;
     { { prog_is_common = true;
-        prog_kind = Some pk } } 
+        prog_kind = Some pk } }
   | pk = loc(program_kind);
     { { prog_is_common = true;
         prog_kind = Some pk } }
@@ -2844,7 +2844,11 @@ accept_statement [@context accept_stmt]:
  | ACCEPT item = loc(ident)                                             (* MF *)
    FROM ENVIRONMENT env_item = loc(ident_or_nonnumeric_no_all)
    on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
-   { AcceptFromEnv { item; env_item; on_exception } }
+   { AcceptFromEnv { item; env_item = Some env_item; on_exception } }
+ | ACCEPT item = loc(ident)                                             (* MF *)
+   FROM ENVIRONMENT_VALUE
+   on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
+   { AcceptFromEnv { item; env_item = None; on_exception } }
 
 let end_accept := oterm_(END_ACCEPT)
 
