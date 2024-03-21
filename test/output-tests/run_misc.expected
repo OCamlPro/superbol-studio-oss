@@ -570,55 +570,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2365:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2399:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2422:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2445:0
-run_misc.at-2445-prog.cob:7.25:
-   4          PROCEDURE        DIVISION.
-   5              PERFORM 2 TIMES
-   6                DISPLAY "OK" NO ADVANCING
-   7 >              EXIT PERFORM CYCLE
-----                            ^
-   8                DISPLAY "NOT OK"
-   9              END-PERFORM
->> Hint: Missing END_PERFORM .
-
-run_misc.at-2445-prog.cob:7.26-7.31:
-   4          PROCEDURE        DIVISION.
-   5              PERFORM 2 TIMES
-   6                DISPLAY "OK" NO ADVANCING
-   7 >              EXIT PERFORM CYCLE
-----                             ^^^^^
-   8                DISPLAY "NOT OK"
-   9              END-PERFORM
->> Error: Invalid syntax
-
-run_misc.at-2445-prog.cob:7.31:
-   4          PROCEDURE        DIVISION.
-   5              PERFORM 2 TIMES
-   6                DISPLAY "OK" NO ADVANCING
-   7 >              EXIT PERFORM CYCLE
-----                                  ^
-   8                DISPLAY "NOT OK"
-   9              END-PERFORM
->> Hint: Missing .
-
-run_misc.at-2445-prog.cob:8.13-8.20:
-   5              PERFORM 2 TIMES
-   6                DISPLAY "OK" NO ADVANCING
-   7                EXIT PERFORM CYCLE
-   8 >              DISPLAY "NOT OK"
-----                ^^^^^^^
-   9              END-PERFORM
-  10              STOP RUN.
->> Warning: Invalid syntax
-
-run_misc.at-2445-prog.cob:9.11-9.22:
-   6                DISPLAY "OK" NO ADVANCING
-   7                EXIT PERFORM CYCLE
-   8                DISPLAY "NOT OK"
-   9 >            END-PERFORM
-----              ^^^^^^^^^^^
-  10              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2479:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2517:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2543:0
