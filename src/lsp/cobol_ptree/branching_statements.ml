@@ -169,11 +169,16 @@ and accept_stmt =
         item: ident with_loc;
         date_time: date_time;
       }
-  | AcceptMsgCount of name with_loc
-  | AcceptAtScreen of
+  | AcceptMisc of                                                       (* MF *)
       {
-        item: name with_loc;
-        position: position option;
+        item: ident with_loc;
+        misc: accept_misc;
+      }
+  | AcceptMsgCount of name with_loc
+  | AcceptScreen of
+      {
+        item: ident with_loc;
+        clauses: accept_clause with_loc list;
         on_exception: dual_handler;
       }
   | AcceptFromEnv of                                                    (* MF *)
@@ -183,6 +188,25 @@ and accept_stmt =
         on_exception: dual_handler;
       }
 
+and accept_misc =
+  | AcceptLineNumber
+  | AcceptLines
+  | AcceptColumns
+  | AcceptUserName
+  | AcceptEscapeKey
+  | AcceptExceptionStatus
+
+and accept_clause =
+  | AcceptAt of position
+  | AcceptFromCRT                                                       (* MF *)
+  | AcceptModeBlock                                                     (* MF *)
+  | AcceptWith of accept_with_clause with_loc list                      (* MF *)
+
+and accept_with_clause =
+  | AcceptUpdate
+  | AcceptAttribute of Data_descr.screen_attribute_clause
+
+
 
 (*
 DISPLAY id/lit+ UPON...? WITH...? END_DISP
@@ -190,20 +214,23 @@ DISPLAY id AT...? ON EXCEPT?
 *)
 
 and display_stmt =
-  | DisplayDefault of ident_or_literal
-  | DisplayDevice of
-      {
-        displayed_items: ident_or_literal list; (* non-empty *)
-        upon: display_target with_loc option;
-        advancing: bool;
-    }
-  | DisplayScreen of
-      {
-        screen_item: name with_loc;
-        position: position option;
-        on_exception: dual_handler;
-      }
+  {
+    display_items_clauses: display_items_clauses list; (* non-empty *)
+    no_advancing: bool;
+    on_exception: dual_handler;
+  }
 
+and display_items_clauses =
+  {
+    display_items: ident_or_literal list; (* non-empty *)
+    display_clauses: display_clause with_loc list;
+  }
+
+and display_clause =
+  | DisplayAt of position
+  | DisplayUpon of display_target with_loc
+  | DisplayModeIsBlock
+  | DisplayWith of display_with_clause with_loc list
 
 and display_target =
   | DisplayUponName of name with_loc
@@ -214,6 +241,12 @@ and display_device_mnemonic =
  | DisplayDeviceEnvValue
  | DisplayDeviceArgNumber
  | DisplayDeviceCommandLine
+
+and display_with_clause =
+  | DisplayBlank of Data_descr.blank_clause
+  | DisplayErase of Data_descr.erase_clause
+  | DisplayAttribute of Data_descr.screen_attribute_clause
+
 
 
 (* ADD & SUBTRACT *)
@@ -632,13 +665,19 @@ and pp_accept_stmt ppf = function
     Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
       (pp_with_loc pp_ident) item
       pp_date_time dt
+  | AcceptMisc { item; misc = m } ->
+    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+      (pp_with_loc pp_ident) item
+      pp_accept_misc m
   | AcceptMsgCount cnt ->
     Fmt.pf ppf "ACCEPT@ %a@ MESSAGE@ COUNT" (pp_with_loc pp_integer) cnt
-  | AcceptAtScreen { item; position = p; on_exception } ->
-    Fmt.pf ppf "ACCEPT@ %a" (pp_with_loc pp_integer) item;
-    Fmt.(option (any "@ AT@ " ++ pp_position)) ppf p;
+  | AcceptScreen { item; clauses; on_exception } ->
+    Fmt.pf ppf "@[ACCEPT@ %a" (pp_with_loc pp_ident) item;
+    Fmt.pf ppf "@ %a"
+      Fmt.(list (pp_with_loc pp_accept_clause)) clauses;
     pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception
+      ppf on_exception;
+    Fmt.pf ppf "@]"
   | AcceptFromEnv { item; env_item = ei; on_exception } ->
     Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ENVIRONMENT@;<1 2>%a"
       Fmt.(box (pp_with_loc pp_ident)) item
@@ -647,22 +686,64 @@ and pp_accept_stmt ppf = function
       ppf on_exception;
     Fmt.pf ppf "@]"
 
+and pp_accept_misc ppf = function
+  | AcceptLineNumber -> Fmt.pf ppf "LINE NUMBER"
+  | AcceptLines -> Fmt.pf ppf "LINES"
+  | AcceptColumns -> Fmt.pf ppf "COLUMNS"
+  | AcceptUserName -> Fmt.pf ppf "USER NAME"
+  | AcceptEscapeKey -> Fmt.pf ppf "ESCAPE KEY"
+  | AcceptExceptionStatus -> Fmt.pf ppf "EXCEPTION STATUS"
+
+and pp_accept_clause ppf = function
+  | AcceptAt position ->
+    Fmt.pf ppf "AT@ %a" pp_position position
+  | AcceptFromCRT ->
+    Fmt.pf ppf "FROM@ CRT@"
+  | AcceptModeBlock ->
+    Fmt.pf ppf "MODE@ IS@ BLOCK@"
+  | AcceptWith with_ ->
+    Fmt.pf ppf "WITH@ %a"
+      Fmt.(list ~sep:sp (pp_with_loc pp_accept_with_clause)) with_
+
+and pp_accept_with_clause ppf = function
+  | AcceptUpdate -> Fmt.pf ppf "UPDATE"
+  | AcceptAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
+
+
+
 (* DISPLAY *)
 
-and pp_display_stmt ppf = function
-  | DisplayDefault i -> Fmt.pf ppf "DISPLAY@ %a" pp_ident_or_literal i
-  | DisplayDevice { displayed_items = di ; upon; advancing } ->
-    Fmt.pf ppf "DISPLAY@ %a%a"
-      Fmt.(list ~sep:sp pp_ident_or_literal) di
-      Fmt.(option (any "@ " ++ pp_with_loc pp_display_target)) upon;
-    if advancing then Fmt.pf ppf "@ NO@ ADVANCING"
-  | DisplayScreen { screen_item = si; position = po; on_exception = dh } ->
-    Fmt.pf ppf "@[DISPLAY@;<1 2>%a%a"
-      Fmt.(box (pp_with_loc pp_name)) si
-      Fmt.(option (any "@ @[AT " ++ pp_position ++ any "@]")) po;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-DISPLAY")
-      ppf dh;
-    Fmt.pf ppf "@]"
+and pp_display_stmt ppf
+  { display_items_clauses; no_advancing; on_exception }
+=
+  Fmt.pf ppf "DISPLAY@ %a"
+    Fmt.(list ~sep:sp pp_display_items_clauses) display_items_clauses;
+  if no_advancing then Fmt.pf ppf "@ NO@ ADVANCING";
+  pp_dual_handler pp_statement ~close:Fmt.(any "END-DISPLAY") ppf on_exception
+
+and pp_display_items_clauses ppf
+  { display_items; display_clauses }
+=
+  Fmt.pf ppf "%a%a"
+    Fmt.(list ~sep:sp pp_ident_or_literal) display_items
+    Fmt.(list ~sep:sp (pp_with_loc pp_display_clause)) display_clauses
+
+and pp_display_clause ppf = function
+ | DisplayAt p ->
+   Fmt.pf ppf "AT@ %a" pp_position p
+ | DisplayUpon dt ->
+   Fmt.pf ppf "%a" (pp_with_loc pp_display_target) dt
+ | DisplayModeIsBlock ->
+   Fmt.pf ppf "MODE@ BLOCK@"
+ | DisplayWith sc ->
+   Fmt.(list ~sep:sp (pp_with_loc pp_display_with_clause)) ppf sc
+
+and pp_display_with_clause ppf = function
+  | DisplayBlank bc -> Data_descr.pp_blank_clause ppf bc
+  | DisplayErase ec -> Data_descr.pp_erase_clause ppf ec
+  | DisplayAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
+
+
 
 (* ADD & SUBTRACT *)
 

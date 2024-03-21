@@ -31,6 +31,9 @@ class virtual ['a] folder = object
 
   (* Statement-specific operands; shared ones should be in
      Operands_visitor. *)
+  method fold_accept_misc         : (accept_misc             , 'a) fold = default
+  method fold_accept_clause'      : (accept_clause with_loc  , 'a) fold = default
+  method fold_accept_with_clause' : (accept_with_clause with_loc, 'a) fold = default
   method fold_allocate_kind       : (allocate_kind           , 'a) fold = default
   method fold_alter_operands'     : (alter_operands with_loc , 'a) fold = default
   method fold_call_prefix         : (call_prefix             , 'a) fold = default
@@ -38,7 +41,10 @@ class virtual ['a] folder = object
   method fold_close_format        : (close_format            , 'a) fold = default
   method fold_close_phrase        : (close_phrase            , 'a) fold = default
   method fold_converting          : (converting              , 'a) fold = default
-  (* method fold_display_target'     : (display_target with_loc , 'a) fold = default *)
+  method fold_display_items_clauses : (display_items_clauses , 'a) fold = default
+  method fold_display_clause'     : (display_clause with_loc , 'a) fold = default
+  method fold_display_target'     : (display_target with_loc , 'a) fold = default
+  method fold_display_with_clause': (display_with_clause with_loc, 'a) fold = default
   method fold_evaluate_branch     : (evaluate_branch         , 'a) fold = default
   method fold_init_data_category  : (init_data_category      , 'a) fold = default
   method fold_init_replacing      : (init_replacing          , 'a) fold = default
@@ -779,16 +785,42 @@ and fold_accept' (v: _ #folder) : accept_stmt with_loc -> 'a -> 'a =
       | AcceptTemporal { item; date_time } -> x
           >> fold_ident' v item
           >> fold_date_time v date_time
+      | AcceptMisc { item; misc } -> x
+          >> fold_ident' v item
+          >> fold_accept_misc v misc
       | AcceptMsgCount name' -> x
           >> fold_name' v name'
-      | AcceptAtScreen { item; position; on_exception } -> x
-          >> fold_name' v item
-          >> fold_option ~fold:fold_position v position
+      | AcceptScreen { item ; clauses; on_exception } -> x
+          >> fold_ident' v item
+          >> fold_list ~fold:fold_accept_clause' v clauses
           >> fold_dual_handler v on_exception
       | AcceptFromEnv { item; env_item; on_exception } -> x
           >> fold_ident' v item
           >> fold' ~fold:fold_ident_or_nonnum v env_item
           >> fold_dual_handler v on_exception
+    end
+
+and fold_accept_misc (v: _ #folder) : accept_misc -> 'a -> 'a =
+  leaf v#fold_accept_misc
+
+and fold_accept_clause' (v: _ #folder) : accept_clause with_loc -> 'a -> 'a =
+  handle' v#fold_accept_clause' v
+    ~fold:begin fun v clause x -> match clause with
+      | AcceptAt position -> x
+          >> fold_position v position
+      | AcceptFromCRT ->
+          x
+      | AcceptModeBlock ->
+          x
+      | AcceptWith clauses ->x
+          >> fold_list ~fold:fold_accept_with_clause' v clauses
+    end
+
+and fold_accept_with_clause' (v: _ #folder) : accept_with_clause with_loc -> 'a -> 'a =
+  handle' v#fold_accept_with_clause' v
+    ~fold:begin fun _v clause x -> match clause with
+      | AcceptUpdate -> x
+      | AcceptAttribute _ -> x
     end
 
 and fold_add' (v: _ #folder) : basic_arithmetic_stmt with_loc -> 'a -> 'a =
@@ -835,24 +867,42 @@ and fold_disable' (v: _ #folder) : mcs_command_operands with_loc -> 'a -> 'a =
 
 and fold_display' (v: _ #folder) : display_stmt with_loc -> 'a -> 'a =
   handle' v#fold_display' v
-    ~fold:begin fun v d x -> match d with
-      | DisplayDefault i -> x
-          >> fold_ident_or_literal v i
-      | DisplayDevice { displayed_items; upon; advancing } -> x
-          >> fold_list ~fold:fold_ident_or_literal v displayed_items
-          >> fold_option ~fold:fold_display_target' v upon
-          >> fold_bool v advancing
-      | DisplayScreen { screen_item; position; on_exception } -> x
-          >> fold_name' v screen_item
-          >> fold_option ~fold:fold_position v position
-          >> fold_dual_handler v on_exception
+    ~fold:begin fun v { display_items_clauses; no_advancing; on_exception } x -> x
+      >> fold_list ~fold:fold_display_items_clauses v display_items_clauses
+      >> fold_bool v no_advancing
+      >> fold_dual_handler v on_exception
     end
 
+and fold_display_items_clauses (v: _ #folder) : display_items_clauses -> 'a -> 'a =
+  fun { display_items; display_clauses } x -> x
+    >> fold_list ~fold:fold_ident_or_literal v display_items
+    >> fold_list ~fold:fold_display_clause' v display_clauses
+
+and fold_display_clause' (v: _ #folder) : display_clause with_loc -> 'a -> 'a =
+  handle' v#fold_display_clause' v
+    ~fold:begin fun v clause x -> match clause with
+      | DisplayAt p -> x
+          >> fold_position v p
+      | DisplayUpon dt -> x
+          >> fold_display_target' v dt
+      | DisplayModeIsBlock ->
+          x
+      | DisplayWith clauses -> x
+          >> fold_list ~fold:fold_display_with_clause' v clauses
+    end
 and fold_display_target' (v: _ #folder) : display_target with_loc -> 'a -> 'a =
   (* handle' v#fold_display_target' *)fold' v
     ~fold:begin fun v -> function
       | DisplayUponName n -> fold_name' v n
       | DisplayUponDeviceViaMnemonic _ -> Fun.id
+    end
+
+and fold_display_with_clause' (v: _ #folder) : display_with_clause with_loc -> 'a -> 'a =
+  handle' v#fold_display_with_clause' v
+    ~fold:begin fun _v clause x -> match clause with
+      | DisplayBlank _ -> x
+      | DisplayErase _ -> x
+      | DisplayAttribute _ -> x
     end
 
 and fold_divide' (v: _ #folder) : divide_stmt with_loc -> 'a -> 'a =

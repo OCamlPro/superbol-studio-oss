@@ -156,6 +156,8 @@ let fold_position (v: _ #folder) =
       | LineColumnPosition (i, j) -> x
           >> fold_ident_or_intlit v i
           >> fold_ident_or_intlit v j
+      | CompoundPosition i -> x
+          >> fold_ident_or_intlit v i
     end
 
 let fold_raising (v: _ #folder) =

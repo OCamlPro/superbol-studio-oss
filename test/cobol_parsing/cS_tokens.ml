@@ -37,8 +37,8 @@ let%expect_test "context-sensitive-tokens" =
     CONSTANT, AS, BYTE-LENGTH, OF, WORD[BYTE-LENGTH], ., DIGITS[01], WORD[Y],
     CONSTANT, AS, LENGTH, OF, WORD[BYTE-LENGTH], ., PROCEDURE, DIVISION, .,
     COMPUTE, WORD[X], ROUNDED, MODE, AWAY-FROM-ZERO, WORD[AWAY-FROM-ZERO], =,
-    FIXED[1.1], END-COMPUTE, DISPLAY, WORD[X], WORD[AWAY-FROM-ZERO], NO,
-    ADVANCING, END-DISPLAY, ., STOP, RUN, ., EOF
+    FIXED[1.1], END-COMPUTE, DISPLAY, WORD[X], WORD[AWAY-FROM-ZERO],
+    WITH_NO_ADVANCING, END-DISPLAY, ., STOP, RUN, ., EOF
 |}];;
 
 let%expect_test "context-sensitive-tokens-bis" =
@@ -112,8 +112,8 @@ let%expect_test "context-sensitive-tokens-with-syntax-errors" =
     CONSTANT, AS, BYTE-LENGTH, WORD[BYTE-LENGTH], ., DIGITS[01], WORD[Y],
     CONSTANT, LENGTH, OF, WORD[BYTE-LENGTH], ., PROCEDURE, DIVISION, ., COMPUTE,
     WORD[X], ROUNDED, AWAY-FROM-ZERO, AWAY-FROM-ZERO, =, FIXED[1.1], END-COMPUTE,
-    DISPLAY, WORD[X], WORD[AWAY-FROM-ZERO], NO, ADVANCING, END-DISPLAY, ., STOP,
-    RUN, ., EOF
+    DISPLAY, WORD[X], WORD[AWAY-FROM-ZERO], WITH_NO_ADVANCING, END-DISPLAY, .,
+    STOP, RUN, ., EOF
 |}];;
 
 let%expect_test "context-sensitive-tokens-lower-case" =
