@@ -378,16 +378,6 @@ run_fundamental.at-1494-prog.cob:55.16-55.28:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1526:0
-run_fundamental.at-1526-module.cob:8.7-8.12:
-   5          PROCEDURE        DIVISION.
-   6              DISPLAY 'A' WITH NO ADVANCING
-   7              GOBACK.
-   8 >        ENTRY 'modulepart'.
-----          ^^^^^
-   9              DISPLAY 'B' WITH NO ADVANCING
-  10              GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1525:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1558:0
 run_fundamental.at-1558-module.c:5.6-5.7:

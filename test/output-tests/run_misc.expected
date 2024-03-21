@@ -895,58 +895,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4104:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4105:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4172:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4170:0
-run_misc.at-4170-prog.cob:13.8-13.13:
-  10   
-  11           PROCEDURE DIVISION.
-  12   
-  13 >         ENTRY 'ent1'.
-----           ^^^^^
-  14           DISPLAY VAR1 END-DISPLAY
-  15           GOBACK.
->> Error: Invalid syntax
-
-run_misc.at-4170-prog.cob:17.8-17.13:
-  14           DISPLAY VAR1 END-DISPLAY
-  15           GOBACK.
-  16   
-  17 >         ENTRY 'ent2'.
-----           ^^^^^
-  18           DISPLAY VAR2 END-DISPLAY
-  19           GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4171:0
-run_misc.at-4171-prog1.cob:13.8-13.13:
-  10   
-  11           PROCEDURE DIVISION.
-  12   
-  13 >         ENTRY 'ent2'.
-----           ^^^^^
-  14           DISPLAY VAR2 END-DISPLAY
-  15           GOBACK.
->> Error: Invalid syntax
-
-run_misc.at-4171-prog1.cob:17.8-17.13:
-  14           DISPLAY VAR2 END-DISPLAY
-  15           GOBACK.
-  16   
-  17 >         ENTRY 'ent3'.
-----           ^^^^^
-  18           DISPLAY VAR3 END-DISPLAY
-  19           GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4217:0
-run_misc.at-4217-prog.cob:26.7-26.12:
-  23          END-IF
-  24          GOBACK.
-  25   
-  26 >        ENTRY "subprogram".
-----          ^^^^^
-  27              DISPLAY "subprogram" WITH NO ADVANCING
-  28              END-DISPLAY
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4242:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4243:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4269:0
@@ -3366,16 +3316,6 @@ run_misc.at-7800-caller.cob:20.11-20.15:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7794:0
-run_misc.at-7794-preload.cob:13.7-13.12:
-  10          SOME-PAR.
-  11              PERFORM OTHER-SEC
-  12              MOVE 0 TO RETURN-CODE.
-  13 >        ENTRY "LEAVE-ME".
-----          ^^^^^
-  14          END-PAR.
-  15              EXIT PROGRAM.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7796:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:8103:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:8708:0
@@ -6824,125 +6764,45 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13768:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13799:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13880:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13943:0
-run_misc.at-13943-prog.cob:10.17-10.22:
-   7             88 EXT-MODUS  VALUES 3, 4.
-   8          LINKAGE SECTION.
-   9          PROCEDURE DIVISION.
-  10 >            GO TO ENTRY 'STMT05'.
-----                    ^^^^^
-  11          MAIN.
-  12              GO TO ENTRY 'STMT01'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:12.17-12.22:
+run_misc.at-13943-prog.cob:12.31:
    9          PROCEDURE DIVISION.
   10              GO TO ENTRY 'STMT05'.
   11          MAIN.
   12 >            GO TO ENTRY 'STMT01'
-----                    ^^^^^
+----                                  ^
   13                          'STMT02'
   14                          'STMT03'
->> Error: Invalid syntax
+>> Hint: Missing .
 
-run_misc.at-13943-prog.cob:20.7-20.12:
-  17              DEPENDING ON JUMP-ENTRY
+run_misc.at-13943-prog.cob:13.23-13.31:
+  10              GO TO ENTRY 'STMT05'.
+  11          MAIN.
+  12              GO TO ENTRY 'STMT01'
+  13 >                        'STMT02'
+----                          ^^^^^^^^
+  14                          'STMT03'
+  15                          'STMT04'
+>> Warning: Invalid syntax
+
+run_misc.at-13943-prog.cob:17.34:
+  14                          'STMT03'
+  15                          'STMT04'
+  16                          'STMT05'
+  17 >            DEPENDING ON JUMP-ENTRY
+----                                     ^
   18              DISPLAY 'NOT JUMPED'
   19              GOBACK.
-  20 >        ENTRY FOR GO TO 'STMT01'
-----          ^^^^^
-  21              DISPLAY 'STMT01'
-  22          ENTRY FOR GO TO 'STMT02'
->> Error: Invalid syntax
+>> Hint: Missing .
 
-run_misc.at-13943-prog.cob:20.23-20.31:
+run_misc.at-13943-prog.cob:18.11-18.18:
+  15                          'STMT04'
+  16                          'STMT05'
   17              DEPENDING ON JUMP-ENTRY
-  18              DISPLAY 'NOT JUMPED'
-  19              GOBACK.
-  20 >        ENTRY FOR GO TO 'STMT01'
-----                          ^^^^^^^^
-  21              DISPLAY 'STMT01'
-  22          ENTRY FOR GO TO 'STMT02'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:22.7-22.12:
+  18 >            DISPLAY 'NOT JUMPED'
+----              ^^^^^^^
   19              GOBACK.
   20          ENTRY FOR GO TO 'STMT01'
-  21              DISPLAY 'STMT01'
-  22 >        ENTRY FOR GO TO 'STMT02'
-----          ^^^^^
-  23              PERFORM 3 TIMES
-  24          ENTRY FOR GO TO 'STMT03'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:22.23-22.31:
-  19              GOBACK.
-  20          ENTRY FOR GO TO 'STMT01'
-  21              DISPLAY 'STMT01'
-  22 >        ENTRY FOR GO TO 'STMT02'
-----                          ^^^^^^^^
-  23              PERFORM 3 TIMES
-  24          ENTRY FOR GO TO 'STMT03'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:24.7-24.12:
-  21              DISPLAY 'STMT01'
-  22          ENTRY FOR GO TO 'STMT02'
-  23              PERFORM 3 TIMES
-  24 >        ENTRY FOR GO TO 'STMT03'
-----          ^^^^^
-  25                 DISPLAY 'STMT03'
-  26          ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:24.23-24.31:
-  21              DISPLAY 'STMT01'
-  22          ENTRY FOR GO TO 'STMT02'
-  23              PERFORM 3 TIMES
-  24 >        ENTRY FOR GO TO 'STMT03'
-----                          ^^^^^^^^
-  25                 DISPLAY 'STMT03'
-  26          ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:26.7-26.12:
-  23              PERFORM 3 TIMES
-  24          ENTRY FOR GO TO 'STMT03'
-  25                 DISPLAY 'STMT03'
-  26 >        ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
-----          ^^^^^
-  27                 IF EXT-MODUS EXIT PERFORM END-IF
-  28              END-PERFORM
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:26.23-26.31:
-  23              PERFORM 3 TIMES
-  24          ENTRY FOR GO TO 'STMT03'
-  25                 DISPLAY 'STMT03'
-  26 >        ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
-----                          ^^^^^^^^
-  27                 IF EXT-MODUS EXIT PERFORM END-IF
-  28              END-PERFORM
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:29.7-29.12:
-  26          ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
-  27                 IF EXT-MODUS EXIT PERFORM END-IF
-  28              END-PERFORM
-  29 >        ENTRY FOR GO TO 'STMT05'
-----          ^^^^^
-  30              DISPLAY 'STMT05'
-  31              SUBTRACT 1 FROM JUMP-ENTRY
->> Error: Invalid syntax
-
-run_misc.at-13943-prog.cob:29.23-29.31:
-  26          ENTRY FOR GO TO 'STMT04'  DISPLAY 'STMT04'
-  27                 IF EXT-MODUS EXIT PERFORM END-IF
-  28              END-PERFORM
-  29 >        ENTRY FOR GO TO 'STMT05'
-----                          ^^^^^^^^
-  30              DISPLAY 'STMT05'
-  31              SUBTRACT 1 FROM JUMP-ENTRY
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14022:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14053:0

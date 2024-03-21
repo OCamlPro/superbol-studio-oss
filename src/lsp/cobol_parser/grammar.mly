@@ -98,6 +98,7 @@ let dual_handler_none =
 %nonassoc DIVIDE
 %nonassoc ENABLE
 %nonassoc ENTER
+%nonassoc ENTRY
 %nonassoc EVALUATE
 %nonassoc EXIT
 %nonassoc FREE
@@ -550,7 +551,6 @@ let method_id_paragraph :=                                         (* +COB2002 *
   | METHOD_ID; "."; pk = property_kind; PROPERTY; i = name;
     o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
     { i, PropertyMethod { kind = pk }, o, f }
-
 
 let options_paragraph [@context options_paragraph] :=              (* +COB2002 *)
   | OPTIONS; "."; ~ = lo(sf(rnel(loc(options_clause)),".")); < >
@@ -4138,6 +4138,21 @@ write_statement:
 let write_target :=
  | n = qualname;   {WriteTargetName n}
  | FILE; n = name; {WriteTargetFile n}
+
+(* ENTRY STATEMENT *)
+let entry_by_clauses :=
+ | io(BY?; REFERENCE); ~ = nell(name); %prec lowest <EntryByReference>
+ | BY?; VALUE; ~ = nell(name); %prec lowest         <EntryByValue>
+
+%public let unconditional_action := ~ = entry_statement; < >
+let entry_statement :=
+ | ENTRY; ~ = entry_body; <Entry>
+let entry_body :=
+ | ~ = loc(alphanum); <EntrySimple>
+ | n = loc(alphanum); USING; clauses = rnel(entry_by_clauses);
+   { EntryUsing { entry_name = n;
+                  entry_by_clauses = clauses } }
+ | FOR; GO; TO; ~ = loc(alphanum); <EntryForGoTo>
 
 (* --- Standalone (for testing) --------------------------------------------- *)
 
