@@ -504,8 +504,8 @@ let next_token (s: _ state) =
   let rec aux = function
     | { payload = INTERVENING_ ','; _ } :: tokens ->
         aux tokens
-    | { payload = INTERVENING_ '.'; loc } :: tokens ->
-        Some (s, PERIOD &@ loc, tokens)
+    | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
+        Some (emit_token s (PERIOD &@ loc), token, tokens)
     | token :: tokens ->
         Some (emit_token s token, token, tokens)
     | [] ->

@@ -44,8 +44,8 @@ let%expect_test "decimal-point-is-comma" =
   [%expect {|
     IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., ENVIRONMENT,
     DIVISION, ., CONFIGURATION, SECTION, ., SPECIAL-NAMES, ., DECIMAL-POINT, IS,
-    COMMA, ., PROCEDURE, DIVISION, ., DISPLAY, DIGITS[1], DIGITS[1], DISPLAY,
-    FIXED[1,1], DISPLAY, SINT[-1], DIGITS[1], DISPLAY, FIXED[-1,1], ., EOF
+    COMMA, ., PROCEDURE, DIVISION, ., DISPLAY, DIGITS[1], ., DIGITS[1], DISPLAY,
+    FIXED[1,1], DISPLAY, SINT[-1], ., DIGITS[1], DISPLAY, FIXED[-1,1], ., EOF
 |}];;
 
 let%expect_test "decimal-point-is-comma-with-missing-period" =
@@ -68,6 +68,6 @@ let%expect_test "decimal-point-is-comma-with-missing-period" =
   [%expect {|
     IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., ENVIRONMENT,
     DIVISION, ., CONFIGURATION, SECTION, ., SPECIAL-NAMES, ., DECIMAL-POINT, IS,
-    COMMA, PROCEDURE, DIVISION, DISPLAY, DIGITS[1], DIGITS[1], DISPLAY,
-    FIXED[1,1], DISPLAY, SINT[-1], DIGITS[1], DISPLAY, FIXED[-1,1], ., EOF
+    COMMA, PROCEDURE, DIVISION, DISPLAY, DIGITS[1], ., DIGITS[1], DISPLAY,
+    FIXED[1,1], DISPLAY, SINT[-1], ., DIGITS[1], DISPLAY, FIXED[-1,1], ., EOF
 |}];;
