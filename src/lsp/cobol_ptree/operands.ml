@@ -392,7 +392,7 @@ let pp_raise_operand ppf = function
     Fmt.pf ppf "RAISE@ EXCEPTION@ %a" (pp_with_loc pp_name) nwl
 
 
-(* EXIT & GO BACK *)
+(* EXIT & GOBACK *)
 type raising =
   | RaisingIdent of ident                (* CHECKME: Can ident be a subscript?*)
   | RaisingException of name with_loc

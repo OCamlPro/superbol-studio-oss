@@ -521,6 +521,10 @@ let fold_name_or_literal' (v: _ #folder) =
   fold' ~fold:fold_name_or_literal v
 let fold_name_or_literal'opt (v: _ #folder) =
   fold_option ~fold:fold_name_or_literal' v
+let fold_ident_or_intlit' (v: _ #folder) =
+  fold' ~fold:fold_ident_or_intlit v
+let fold_ident_or_intlit'opt (v: _ #folder) =
+  fold_option ~fold:fold_ident_or_intlit' v
 
 (* --- *)
 

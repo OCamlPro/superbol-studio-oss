@@ -3242,9 +3242,13 @@ let go_to_statement :=
 
 %public let unconditional_action := ~ = goback_statement; < >
 let goback_statement :=
- | GOBACK; ~ = ro(raising_exception); <GoBack>
+  | GOBACK;
+    goback_raising = ro(raising_exception);
+    goback_returning = ro(goback_returning);
+    { GoBack { goback_raising ; goback_returning } }
 
-
+let goback_returning :=
+  | or_(RETURNING,GIVING); ~ = loc(ident_or_integer); < >
 
 (* IF STATEMENT *)
 

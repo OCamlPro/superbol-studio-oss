@@ -390,7 +390,11 @@ and read_error =
   | ReadAtEnd
   | ReadInvalidKey
 
-
+and goback_stmt =
+  {
+    goback_raising : raising option;
+    goback_returning: ident_or_intlit with_loc option;
+  }
 
 and statement =
   (* TODO: split composed high-level (that depend on statement), and basic
@@ -417,7 +421,7 @@ and statement =
   | Generate of name with_loc
   | GoTo of goto_stmt
   | GoToDepending of goto_depending_stmt
-  | GoBack of raising option
+  | GoBack of goback_stmt
   | If of if_stmt
   | Initialize of initialize_stmt
   | Initiate of name with_loc list
@@ -910,7 +914,11 @@ and pp_statement ppf = function
       Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
   | GoTo s -> pp_goto_stmt ppf s
   | GoToDepending s -> pp_goto_depending_stmt ppf s
-  | GoBack oro -> Fmt.pf ppf "GOBACK%a" Fmt.(option (sp ++ pp_raising)) oro
+  | GoBack s ->
+    Fmt.pf ppf "GOBACK%a"
+      Fmt.(option (sp ++ pp_raising)) s.goback_raising;
+    Option.iter (Fmt.pf ppf "@ %a" (pp_with_loc pp_ident_or_intlit))
+      s.goback_returning
   | If s -> pp_if_stmt ppf s
   | Initialize s -> pp_initialize_stmt ppf s
   | Initiate ns ->
