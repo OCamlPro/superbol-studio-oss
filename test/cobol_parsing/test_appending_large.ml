@@ -42,7 +42,6 @@ let%expect_test "line-by-line-incremental-mf" =
     end;
   end_with_postproc [%expect.output];
   [%expect {|
-    Loading: `__srcdir__/import/gnucobol/config/mf-strict.conf'
     Considering `__srcdir__/test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSumm.cbl'.
     Appending chunk 1/157 @ 0:0-1:10 ("      $ SET SOURCEFORMAT\"...)
     Appending chunk 2/157 @ 1:10-2:26 ("TION DIVISION.\r\nPROGRAM-...)
