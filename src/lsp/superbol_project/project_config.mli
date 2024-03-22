@@ -80,7 +80,7 @@ val detect_copybook: filename:string -> t -> bool
     Those may also raise {!ERROR}*)
 
 val cobol_config_from_dialect_name
-  : string
+  : verbose:bool -> string
   -> Cobol_config.t Cobol_common.Diagnostics.with_diags
 
 val cobol_source_format

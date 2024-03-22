@@ -246,8 +246,9 @@ let load_file (module Words: Words.S) ?search_path file =
   in
   List.rev @@ load [] file
 
-let from_file ?search_path file =
-  Pretty.error "Loading: `%s'@." file;
+let from_file ?search_path ?(verbose=false) file =
+  if verbose then
+    Pretty.error "Loading: `%s'@." file;
   let module Words = Words.Make () in
   let options = load_file (module Words) ?search_path file in
   let options, words, intrinsic, system_names, registers
@@ -272,14 +273,14 @@ let from_file ?search_path file =
   in
   DIAGS.result (module Config: T) ~diags:(Diags.inspect ~reset:true)
 
-let from_dialect ?search_path d =
+let from_dialect ?search_path ?verbose d =
   let search_path = retrieve_search_path ?search_path () in
   let config_filename = function
     | DIALECT.GnuCOBOL -> "default.conf"
     | dialect -> Pretty.to_string "%s.conf" (DIALECT.to_string dialect)
   in
   let load_gnucobol_conf conf =
-    from_file ~search_path @@
+    from_file ~search_path ?verbose @@
     find_file ~search_path (config_filename conf)
   in
   match d with
