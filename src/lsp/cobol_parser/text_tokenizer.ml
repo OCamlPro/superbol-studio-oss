@@ -46,6 +46,7 @@ let combined_tokens =
     NOT_AT_EOP, "NOT_AT_EOP";
     WITH_DATA, "WITH_DATA";
     NO_DATA, "NO_DATA";
+    WITH_NO_ADVANCING, "WITH_NO_ADVANCING";
     IS_GLOBAL, "IS_GLOBAL";
     IS_EXTERNAL, "IS_EXTERNAL";
     IS_TYPEDEF, "IS_TYPEDEF";
@@ -216,6 +217,10 @@ let preproc_n_combine_tokens ~source_format =
     | [WITH] | [NO]                  -> Error `MissingInputs
     | WITH :: DATA :: _                -> subst_n WITH_DATA 2
     | NO :: DATA :: _                  -> subst_n NO_DATA 2
+
+    | [WITH; NO]                     -> Error `MissingInputs
+    | WITH :: NO :: ADVANCING :: _     -> subst_n WITH_NO_ADVANCING 3
+    | NO :: ADVANCING :: _             -> subst_n WITH_NO_ADVANCING 2
 
     | [IS]                           -> Error `MissingInputs
     | IS :: GLOBAL :: _                -> subst_n IS_GLOBAL 2
@@ -499,8 +504,8 @@ let next_token (s: _ state) =
   let rec aux = function
     | { payload = INTERVENING_ ','; _ } :: tokens ->
         aux tokens
-    | { payload = INTERVENING_ '.'; loc } :: tokens ->
-        Some (s, PERIOD &@ loc, tokens)
+    | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
+        Some (emit_token s (PERIOD &@ loc), token, tokens)
     | token :: tokens ->
         Some (emit_token s token, token, tokens)
     | [] ->

@@ -161,8 +161,12 @@ let dual_handler_none =
 %nonassoc END_SUBTRACT
 %nonassoc END_UNSTRING
 %nonassoc END_WRITE
+
 %nonassoc below_LINES
 %nonassoc LINES
+
+%nonassoc LINE COLUMN COL POSITION
+
 %nonassoc WORD TO FROM WHEN USING VALUE OPTIONAL SUM INVALID
 %nonassoc BELL BLINK HIGHLIGHT LOWLIGHT REVERSE_VIDEO UNDERLINE
 %nonassoc FOREGROUND_COLOR BACKGROUND_COLOR
@@ -2662,10 +2666,18 @@ sign_condition_no_zero [@recovery SgnPositive]:
 (* ACCEPT, DISPLAY *)
 
 let position :=
- | l = line_number;                    { LinePosition l }
- | c = column_number;                  { ColumnPosition c }
+ | l = line_number; %prec lowest       { LinePosition l }
+ | c = column_number; %prec lowest     { ColumnPosition c }
  | l = line_number; c = column_number; { LineColumnPosition (l, c) }
  | c = column_number; l = line_number; { LineColumnPosition (l, c) }
+
+let at_position :=
+ | io(AT); ~ = position;               < >
+ | AT; ~ = ident_or_integer;           <CompoundPosition>
+(* AT ident/int is a MF/GnuCOBOL extenstion,
+   controllable through the accept-display-extensions *)
+(* Note: the keyword AT is optional for the standard clauses,
+   but mandatory for the MF extension *)
 
 let line_number :=
  | LINE; NUMBER?; ~ = ident_or_integer; < >
@@ -2673,6 +2685,7 @@ let line_number :=
 
 let column_number :=
  | or_(COL,COLUMN); NUMBER?; ~ = ident_or_integer; < >
+ | POSITION; NUMBER?; ~ = ident_or_integer; < > (* MF *)
 (* integer must be unsigned *)
 
 
@@ -2842,19 +2855,20 @@ accept_statement [@context accept_stmt]:
    { AcceptFromDevice { item = i1; device_item = i2 } }
  | ACCEPT i = loc(ident) FROM ddt = date_day_time end_accept
    { AcceptTemporal { item = i; date_time = ddt } }
- | ACCEPT i = name MESSAGE? COUNT end_accept            (* -COB2002 *)
+ | ACCEPT i = loc(ident) FROM m = accept_misc end_accept (* MF *)
+   { AcceptMisc { item = i; misc = m } }
+ | ACCEPT i = name MESSAGE? COUNT end_accept             (* -COB2002 *)
    { AcceptMsgCount i }
- | ACCEPT i = name AT p = position                      (* +COB2002 *)
-   h = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
-   { AcceptAtScreen { item = i;
-                    position = Some p;
-                    on_exception = h; } }
- | ACCEPT i = name
+ | ACCEPT i = loc(ident)
    h = handler(on_exception,NOT_ON_EXCEPTION) end_accept (* +COB2002 *)
-   { AcceptAtScreen { item = i;
-                      position = None;
-                      on_exception = h; } }
- | ACCEPT item = loc(ident)                                             (* MF *)
+   { AcceptScreen { item = i; clauses = []; on_exception = h } }
+ | ACCEPT i = loc(ident) acl = loc(accept_clause)+       (* +COB2002 *)
+   h = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
+   { AcceptScreen { item = i; clauses = acl; on_exception = h } }
+   (* Note 1: MF allows arbitrary identifier while std requires screen name *)
+   (* Note 2: MF allows clauses and exceptions to be in any order, but
+              this is significantly harder to parse (conflicts-prone) *)
+ | ACCEPT item = loc(ident)                              (* MF *)
    FROM ENVIRONMENT env_item = loc(ident_or_nonnumeric_no_all)
    on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
    { AcceptFromEnv { item; env_item; on_exception } }
@@ -2866,6 +2880,25 @@ let date_day_time :=
  | DAY; y = bo(YYYYDDD);   {Day y}                       (* YYYYDDD +COB2002 *)
  | DAY_OF_WEEK;            {DayOfWeek}
  | TIME;                   {Time}
+
+let accept_misc :=
+ | LINE; NUMBER;           {AcceptLineNumber}      (* MF *)
+ | or_(LINES,LINE_NUMBER); {AcceptLines}           (* GnuCOBOL *)
+ | COLUMNS;                {AcceptColumns}         (* GnuCOBOL *)
+ | USER; NAME;             {AcceptUserName}        (* MF *)
+ | ESCAPE; KEY?;           {AcceptEscapeKey}       (* MF; GnuCOBOL allows KEY to be optional *)
+ | EXCEPTION; STATUS;      {AcceptExceptionStatus} (* MF *)
+
+let accept_clause :=
+ | ~ = at_position;                    <AcceptAt>
+ | FROM; CRT;                          {AcceptFromCRT}   (* MF *)
+ | MODE; IS?; BLOCK;                   {AcceptModeBlock} (* MF *)
+ | WITH; ~ = loc(accept_with_clause)+; <AcceptWith>      (* MF *)
+
+let accept_with_clause :=
+ | UPDATE;                      {AcceptUpdate}
+ | ~ = screen_attribute_clause; <AcceptAttribute>
+(* TODO: MF allows many clauses *)
 
 
 
@@ -3024,44 +3057,46 @@ let disable_statement :=
 
 (* TODO: FROM and USING clauses *)
 %public let unconditional_action := ~ = display_statement; <Display>
-let display_statement :=
-  (* Ambiguous case *)
-  | DISPLAY; i = ident_or_literal; end_display;
-    { DisplayDefault i }
-
-  (* Device case (disambiguated) *)
-  | DISPLAY; i = ident_or_literal; d = display_device_disambiguated; end_display;
-    { let ill, io, wna = d in
-      DisplayDevice { displayed_items = i :: ill;
-                      upon = io;
-                      advancing = wna } }
-
-  (* Screen case (disambiguated) *) (* +COB2002 *)
-  | DISPLAY; i = name; dsd = display_screen_disambiguated; end_display;
-    { DisplayScreen { screen_item = i;
-                      position = fst dsd;
-                      on_exception = snd dsd; } }
+let display_statement [@context display_stmt] :=
+ | DISPLAY; dicl = display_items_clauses_list; na = bo(WITH_NO_ADVANCING);
+   h = handler_opt(on_exception,NOT_ON_EXCEPTION); end_display;
+   { { display_items_clauses = dicl; no_advancing = na; on_exception = h } }
 
 let end_display := oterm_(END_DISPLAY)
 
-let display_device_disambiguated ==
- | ~ = rnel(ident_or_literal); ~ = ro(loc(upon)); ~ = ibo(with_no_advancing); < >
- | i = loc(upon); wna = ibo(with_no_advancing); { [], Some i, wna }
- | with_no_advancing;                      { [], None, true }
+let display_items_clauses_list :=
+ | ill = ident_or_literal+;
+   { [ { display_items = ill; display_clauses = []; } ] }
+ | dicl = nell(display_items_clauses);
+   { dicl }
+ | dicl = nell(display_items_clauses); ill = ident_or_literal+;
+   { dicl @ [ { display_items = ill; display_clauses = []; } ] }
+
+let display_items_clauses :=
+ | ill = ident_or_literal+; dcl = loc(display_clause)+;
+   { { display_items = ill; display_clauses = dcl; } }
+
+let display_clause :=
+ | ~ = at_position;                     <DisplayAt>
+ | ~ = loc(upon);                       <DisplayUpon>
+ | MODE; IS?; BLOCK;                    {DisplayModeIsBlock} (* MF *)
+ | WITH; ~ = loc(display_with_clause)+; <DisplayWith>       (* MF *)
 
 let upon :=
- | UPON; ~ = name; <DisplayUponName>
+ | UPON; ~ = name;                         <DisplayUponName>
  | UPON; ~ = loc(display_device_mnemonic); <DisplayUponDeviceViaMnemonic>
-let display_device_mnemonic ==
+
+let display_device_mnemonic :=
  | ENVIRONMENT_NAME;  {DisplayDeviceEnvName}
  | ENVIRONMENT_VALUE; {DisplayDeviceEnvValue}
  | ARGUMENT_NUMBER;   {DisplayDeviceArgNumber}
  | COMMAND_LINE;      {DisplayDeviceCommandLine}
-let with_no_advancing := io(WITH); NO; ADVANCING
 
-let display_screen_disambiguated ==
- | AT; p = position; h = handler_opt(on_exception,NOT_ON_EXCEPTION); { Some p, h }
- | h = handler(on_exception,NOT_ON_EXCEPTION); { None, h }
+let display_with_clause :=
+ | c = blank_clause;            { DisplayBlank c }
+ | c = erase_clause;            { DisplayErase c }
+ | c = screen_attribute_clause; { DisplayAttribute c }
+(* TODO: MF allows many clauses *)
 
 
 (* DIVIDE STATEMENT *)

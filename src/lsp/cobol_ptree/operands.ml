@@ -41,6 +41,7 @@ type position =
   | LinePosition of ident_or_intlit
   | ColumnPosition of ident_or_intlit
   | LineColumnPosition of ident_or_intlit * ident_or_intlit
+  | CompoundPosition of ident_or_intlit                                 (* MF *)
 [@@deriving ord]
 
 let pp_position ppf = function
@@ -48,6 +49,7 @@ let pp_position ppf = function
   | ColumnPosition i -> Fmt.pf ppf "COL %a" pp_ident_or_intlit i
   | LineColumnPosition (l, c) ->
     Fmt.pf ppf "LINE %a@ COL %a" pp_ident_or_intlit l pp_ident_or_intlit c
+  | CompoundPosition i -> Fmt.pf ppf "%a" pp_ident_or_intlit i
 
 (* CALL, INVOKE *)
 
@@ -164,6 +166,7 @@ let pp_date_time ppf = function
   | Day b -> Fmt.pf ppf "DAY"; if b then Fmt.pf ppf " YYYYDDD"
   | DayOfWeek -> Fmt.pf ppf "DAY-OF-WEEK"
   | Time -> Fmt.pf ppf "TIME"
+
 
 
 (* ADD, SUBTRACT *)

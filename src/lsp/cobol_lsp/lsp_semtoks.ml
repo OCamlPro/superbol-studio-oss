@@ -298,8 +298,9 @@ let semtoks_from_ptree ~filename ?range ptree =
           |> Visitor.skip_children
       | AcceptGeneric _
       | AcceptTemporal _
+      | AcceptMisc _
       | AcceptMsgCount _
-      | AcceptAtScreen _
+      | AcceptScreen _
       | AcceptFromEnv _ ->
           Visitor.do_children acc
 
@@ -341,14 +342,14 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> fold_option ~fold:fold_retry_clause self delete_retry
       |> fold_dual_handler self delete_on_invalid_key
       |> Visitor.skip_children
-
+(*
     method! fold_display' { payload; _ } acc =
       Visitor.do_children_and_then acc @@ match payload with
       | DisplayDevice { upon = Some { payload = DisplayUponName n; _ }; _ } ->
           add_name' n MnemonicName
       | _ ->
           Fun.id
-
+*)
     (*TODO: Exit *)
 
     method! fold_free' names acc = acc
