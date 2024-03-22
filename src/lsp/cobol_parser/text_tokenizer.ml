@@ -52,6 +52,7 @@ let combined_tokens =
     DATA_RECORD, "DATA_RECORD";
     DATA_RECORDS, "DATA_RECORDS";
     NEXT_PAGE, "NEXT_PAGE";
+    NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str } =
@@ -227,6 +228,7 @@ let preproc_n_combine_tokens ~source_format =
 
     | [NEXT]                         -> Error `MissingInputs
     | NEXT :: PAGE :: _                -> subst_n NEXT_PAGE 2
+    | NEXT :: SENTENCE :: _            -> subst_n NEXT_SENTENCE 2
 
     | [CONSTANT]                     -> Error `MissingInputs
     | CONSTANT :: RECORD :: _          -> subst_n CONSTANT_RECORD 2

@@ -1049,6 +1049,7 @@
 
 (* Combined NEXT tokens *)
 %token NEXT_PAGE
+%token NEXT_SENTENCE
 
 (* Combined DATA tokens *)
 %token DATA_RECORD
