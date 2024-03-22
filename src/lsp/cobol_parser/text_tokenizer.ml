@@ -21,6 +21,27 @@ open Parser_diagnostics
 
 (* --- *)
 
+type Cobol_common.Exec_block.TYPES.exec_block +=   (* TEMPORARY, for testing. *)
+  | Generic_exec_block of Cobol_preproc.Text.t
+
+let () =
+  Cobol_common.Exec_block.register_exec_block_type
+    ~name:"GENERIC-EXEC-BLOCK"
+    ~compare:begin fun a b -> match a, b with
+      | Generic_exec_block a, Generic_exec_block b ->
+          Some ((* FIXME: text comparison *)Stdlib.compare a b)
+      | _ ->
+          None
+    end
+    ~pp:begin function
+      | Generic_exec_block a ->
+          Some (Pretty.delayed "%a" Cobol_preproc.Text.pp_text a)
+      | _ ->
+          None
+    end
+
+(* --- *)
+
 type token = Grammar_tokens.token with_loc
 type tokens = token list
 
@@ -81,6 +102,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
   | NULLIT s -> print "Z\"%s\"" s
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
+  | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
       try Text_lexer.show_token t
@@ -97,6 +119,7 @@ let pp_token: token Pretty.printer = fun ppf ->
     | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
     | INFO_WORD s -> print "INFO_WORD[%s]" s
     | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
+    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string ~&t
     | DIGITS i -> print "DIGITS[%s]" i
     | SINTLIT i -> print "SINT[%s]" i
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
@@ -420,6 +443,8 @@ let tokens_of_word { persist = { lexer; _ }; _ }
     -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
   | Eof
     -> tok EOF
+  | ExecBlock text
+    -> tok @@ EXEC_BLOCK (Generic_exec_block text)
   | Pseudo _
     -> [], Parser_diagnostics.error @@ Unexpected { loc; stuff = Pseudotext }
 

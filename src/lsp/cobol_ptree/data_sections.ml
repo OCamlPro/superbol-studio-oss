@@ -338,12 +338,22 @@ let pp_report_group_item ppf { report_level; report_data_name;
   pp_item (pp_with_loc pp_report_group_clause) ppf
     report_level report_data_name report_group_clauses
 
+type exec_declarations =
+  Cobol_common.Exec_block.t
+[@@deriving ord]
+
+let pp_exec_declarations =
+  Cobol_common.Exec_block.pp
+
+(* --- *)
+
 type data_ = [`data]
 type constant_ = [`const]
 type rename_ = [`rename]
 type condition_name_ = [`condition_name]
 type screen_ = [`screen]
 type report_group_ = [`report_group]
+type exec_ = [`exec]
 type _ item_descr =
   | Constant: constant_item -> [>constant_] item_descr
   | Data: data_item -> [>data_] item_descr
@@ -351,6 +361,7 @@ type _ item_descr =
   | CondName: condition_name_item -> [>condition_name_] item_descr
   | Screen: screen_item -> [>screen_] item_descr
   | ReportGroup: report_group_item -> [>report_group_] item_descr
+  | Exec: exec_declarations -> [>exec_] item_descr
 
 let pp_item_descr (type k) : k item_descr Pretty.printer = fun ppf -> function
   | Constant c -> pp_constant_item ppf c
@@ -359,6 +370,7 @@ let pp_item_descr (type k) : k item_descr Pretty.printer = fun ppf -> function
   | CondName c -> pp_condition_name_item ppf c
   | Screen s -> pp_screen_item ppf s
   | ReportGroup r -> pp_report_group_item ppf r
+  | Exec e -> pp_exec_declarations ppf e
 
 let compare_item_descr (type a b) : a item_descr -> b item_descr -> int =
   fun a b ->
@@ -379,15 +391,18 @@ let compare_item_descr (type a b) : a item_descr -> b item_descr -> int =
   | Screen _, _ -> -1
   | _, Screen _ -> 1
   | ReportGroup a, ReportGroup b -> compare_report_group_item a b
+  | ReportGroup _, _ -> -1
+  | _, ReportGroup _ -> 1
+  | Exec a, Exec b -> compare_exec_declarations a b
 
 type data_item_descr    = data_ item_descr
 and constant_item_descr = constant_ item_descr
 and working_item_descr  = [constant_|data_|
-                           rename_|condition_name_] item_descr
+                           rename_|condition_name_|exec_] item_descr
 and report_item_descr   = [constant_|report_group_] item_descr
 and screen_item_descr   = [constant_|screen_]       item_descr
 and any_item_descr      = [constant_|data_|rename_|condition_name_|
-                           report_group_|screen_] item_descr
+                           report_group_|screen_|exec_] item_descr
 
 let pp_data_item_descr     = pp_item_descr
 let pp_constant_item_descr = pp_item_descr
@@ -403,13 +418,14 @@ let compare_report_item_descr = compare_item_descr
 let compare_screen_item_descr = compare_item_descr
 let compare_any_item_descr = compare_item_descr
 
-let item_descr_level (type k) : k item_descr -> data_level = function
-  | Constant { constant_level = l ; _ } -> l.payload
-  | Data { data_level = l; _ } -> l.payload
-  | Renames { rename_level = l; _ } -> l.payload
-  | CondName { condition_name_level = l; _ } -> l.payload
-  | Screen { screen_level = l; _ } -> l
-  | ReportGroup { report_level = l; _ } -> l
+let item_descr_level (type k) : k item_descr -> data_level option = function
+  | Constant { constant_level = l ; _ }
+  | Data { data_level = l; _ }
+  | Renames { rename_level = l; _ }
+  | CondName { condition_name_level = l; _ } -> Some l.payload
+  | Screen { screen_level = l; _ }
+  | ReportGroup { report_level = l; _ } -> Some l
+  | Exec _ -> None
 
 type working_storage_item_descr = working_item_descr
 type linkage_item_descr         = working_item_descr
@@ -504,8 +520,10 @@ let rec pp_item_descr_list boxes ppf = function
   | [] ->
       pp_close_boxes ppf boxes
   | id :: ids ->
-      let idl = item_descr_level id.payload in
-      let boxes = pp_close_boxes_until idl ppf boxes in
+      let boxes = match item_descr_level id.payload with
+        | Some idl -> pp_close_boxes_until idl ppf boxes
+        | None -> boxes                                       (* EXEC block... *)
+      in
       Fmt.box (pp_with_loc pp_item_descr) ppf id;
       pp_item_descr_list boxes ppf ids
 

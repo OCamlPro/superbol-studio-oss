@@ -104,6 +104,7 @@ let dual_handler_none =
 %nonassoc ENTER
 %nonassoc ENTRY
 %nonassoc EVALUATE
+%nonassoc EXEC_BLOCK
 %nonassoc EXIT
 %nonassoc FREE
 %nonassoc GENERATE
@@ -1190,6 +1191,7 @@ let constant_or_data_descr_entry :=
                  condition_name_values = vl;
                  condition_name_alphabet = ao;
                  condition_name_when_false = wfo; } }
+  | ~ = EXEC_BLOCK; "."; <Exec>
 (* integer ident? cond_value_clause            (level 88 entries) *)
 
 literal_through_literal:
@@ -4206,7 +4208,10 @@ let write_target :=
  | n = qualname;   {WriteTargetName n}
  | FILE; n = name; {WriteTargetFile n}
 
+
+
 (* ENTRY STATEMENT *)
+
 let entry_by_clauses :=
  | io(BY?; REFERENCE); ~ = nell(name); %prec lowest <EntryByReference>
  | BY?; VALUE; ~ = nell(name); %prec lowest         <EntryByValue>
@@ -4220,6 +4225,14 @@ let entry_body :=
    { EntryUsing { entry_name = n;
                   entry_by_clauses = clauses } }
  | FOR; GO; TO; ~ = loc(alphanum); <EntryForGoTo>
+
+
+(* EXEC / END-EXEC block (unexpanded) *)
+
+%public let unconditional_action := ~ = exec_block; < >
+let exec_block :=
+  | ~ = EXEC_BLOCK; <ExecBlock>
+
 
 (* --- Standalone (for testing) --------------------------------------------- *)
 

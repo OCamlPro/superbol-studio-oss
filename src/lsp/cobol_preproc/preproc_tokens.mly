@@ -21,6 +21,7 @@
 %token <string> HEXLIT
 %token <string> NULLIT
 %token <Text.pseudotext> PSEUDO_TEXT
+%token <Text.text> EXEC_BLOCK                                       (* unused *)
 
 %token LPAR   "("
 %token PERIOD "."

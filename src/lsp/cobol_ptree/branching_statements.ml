@@ -472,6 +472,7 @@ and statement =
   | Enter of enter_stmt
   | Entry of entry_stmt
   | Evaluate of evaluate_stmt
+  | ExecBlock of Cobol_common.Exec_block.t
   | Exit of exit_stmt
   | Free of name with_loc list
   | Generate of name with_loc
@@ -1032,6 +1033,7 @@ and pp_statement ppf = function
   | Enter s -> pp_enter_stmt ppf s
   | Entry s -> pp_entry_stmt ppf s
   | Evaluate s -> pp_evaluate_stmt ppf s
+  | ExecBlock b -> Cobol_common.Exec_block.pp ppf b
   | Exit s -> pp_exit_stmt ppf s
   | Free names ->
       Fmt.pf ppf "FREE@ @[%a@]" Fmt.(list ~sep:sp (pp_with_loc pp_name)) names

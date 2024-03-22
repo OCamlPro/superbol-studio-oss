@@ -11,36 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Text.TYPES
+module TYPES: sig
+  type exec_block = ..
+end
+include module type of TYPES
+  with type exec_block = TYPES.exec_block
 
-(** {1 Preprocessor state}
+type t = exec_block
 
-    This state is used to track some preprocessing-related divisions, like the
-    `CONTROL DIVISION` in the GCOS dialect. *)
+val register_exec_block_type
+  : name: string
+  -> compare: (t -> t -> int option)
+  -> pp: (t -> Pretty.delayed option)
+  -> unit
 
-type state
-type t = state
-
-type preproc_phrase =
-  | Copy of phrase
-  | Replace of phrase
-  | Header of tracked_header * phrase
-  | ExecBlock of phrase
-and phrase =
-  {
-    prefix: text;
-    phrase: text;
-    suffix: text;
-  }
-and tracked_header =
-  | ControlDivision
-  | SubstitutionSection
-  | IdentificationDivision
-
-val initial: state
-val find_preproc_phrase
-  : ?prefix:[ `Rev | `Same ]
-  -> state
-  -> text
-  -> (preproc_phrase * state,
-      [> `MissingPeriod | `MissingText | `NoneFound ]) result
+val compare: t -> t -> int
+val pp: t Pretty.printer

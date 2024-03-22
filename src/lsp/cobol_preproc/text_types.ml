@@ -24,6 +24,7 @@ and text_word =
   | Alphanum of alphanum
   | AlphanumPrefix of alphanum
   | Pseudo of pseudotext
+  | ExecBlock of text
   | Eof
 and alphanum =
   {

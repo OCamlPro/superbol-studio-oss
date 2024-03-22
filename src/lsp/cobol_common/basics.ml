@@ -104,6 +104,12 @@ module NEL = struct
       | x :: tl -> aux (List.cons (f x) acc) tl
     in
     aux [] l
+  let exists ~f l =
+    let rec aux = function
+      | One x -> f x
+      | x :: tl -> f x || (aux[@tailcall]) tl
+    in
+    aux l
   let pp ?fsep ?fopen ?fclose pp_e ppf list =
     Pretty.list ?fopen ?fsep ?fclose pp_e ppf (to_list list)
 end

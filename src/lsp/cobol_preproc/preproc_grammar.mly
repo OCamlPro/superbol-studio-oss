@@ -143,6 +143,7 @@ _unused_symbols:
   | HEXLIT
   | NULLIT
   | ALPHANUM_PREFIX
+  | EXEC_BLOCK
 { () }
 
 %%

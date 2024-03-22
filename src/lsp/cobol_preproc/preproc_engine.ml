@@ -202,15 +202,14 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
       | Ok Some (text, compdir, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir)
-            ((* if emitting then *) buff @ text (* else buff *))
+          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
       | Error (text, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
-          next_chunk lp
+          next_chunk lp                                        (* ignore text *)
       | Error (text, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp ((* if emitting then *) buff @ text (* else buff *))
+          preprocess_line lp (buff @ text)
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
@@ -271,7 +270,7 @@ and preprocess_line lp srctext =
   | Ok (`CopyDone (lp, srctext))
   | Ok (`ReplaceDone (lp, [], srctext))
   | Ok (`CDirDone (lp, srctext)) ->  (* Continue with next phrase, which may also
-                                       be a compiler directive. *)
+                                        be a compiler directive. *)
       preprocess_line lp srctext
   | Ok (`ReplaceDone (lp, text, srctext)) ->
       text, with_buff lp @@ Text.strip_eof srctext
@@ -334,6 +333,11 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
             List.rev rev_prefix
       in
       `ReplaceDone (lp, prefix, suffix)
+  | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
+      (* CHECKME: Assumes EXEC blocks are NOT subject to replacement... *)
+      let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
+      let block = Text.ExecBlock phrase &@ loc in
+      `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
 
 and do_copy lp rev_prefix copy suffix =
   let { result = CDirCopy { library; replacing; _ }; diags } = ~&copy in

@@ -56,7 +56,7 @@ module FMT = struct
   let pp_pseudotext =
     Pretty.list ~fopen:"==" ~fsep:" "~fclose:"=="  pp_pseudoword
 
-  let pp_word ppf word = match word with
+  let rec pp_word ppf word = match word with
     | TextWord str
     | CDirWord str ->
         Pretty.string ppf str
@@ -66,11 +66,14 @@ module FMT = struct
         Pretty.print ppf "%a%a%s" pp_literal_kind knd pp_quote qte str
     | Pseudo pl ->
         pp_pseudotext ppf pl
+    | ExecBlock text ->
+        Pretty.print ppf "EXEC[%a]" pp_text text
     | Eof ->
         Pretty.string ppf "EOF"
 
-  let pp_text =
+  and pp_text ppf text =
     Pretty.list ~fopen:"@[" ~fsep:"@;" ~fclose:"@]" (fun ppf w -> pp_word ppf ~&w)
+      ppf text
 
   let pp_text' ?fsep  =
     Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf word ->

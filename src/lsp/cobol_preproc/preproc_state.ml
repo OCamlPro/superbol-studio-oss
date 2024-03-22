@@ -13,6 +13,8 @@
 
 open Text.TYPES
 
+module NEL = Cobol_common.Basics.NEL
+
 type state =
   | AllowAll
   | AfterControlDivisionHeader
@@ -27,6 +29,7 @@ type preproc_phrase =
   | Copy of phrase
   | Replace of phrase
   | Header of tracked_header * phrase
+  | ExecBlock of phrase
 and phrase =
   {
     prefix: text;
@@ -38,15 +41,18 @@ and tracked_header =
   | SubstitutionSection
   | IdentificationDivision
 
-(** [find_phrase first_word ~prefix text] looks for a phrase start starts with
-    [first_word] and terminates with a period in [text].  If [prefix = `Rev] and
-    upon success, the prefix is reveresed in the result. *)
-let find_phrase first_word ?(prefix = `Same) text : _ result =
+(** [find_subtext first_words last_word ~prefix text] looks for a subsection of
+    text that starts with a word from [first_words] and terminates with a word
+    from [last_words] in [text].  If [prefix = `Rev] and upon success, the
+    prefix is reversed in the result. *)
+let find_subtext first_words last_words ?(prefix = `Same) text : _ result =
   let split_at_first = Cobol_common.Basics.LIST.split_at_first in
   let split_before_word =
-    split_at_first ~prefix ~where:`Before (Text.textword_eqp ~eq:first_word)
+    split_at_first ~prefix ~where:`Before
+      (fun word -> NEL.exists first_words ~f:(fun eq -> Text.textword_eqp ~eq word))
   and split_after_period =
-    split_at_first ~prefix:`Same ~where:`After (Text.textword_eqp ~eq:".")
+    split_at_first ~prefix:`Same ~where:`After
+      (fun word -> NEL.exists last_words ~f:(fun eq -> Text.textword_eqp ~eq word))
   in
   match split_before_word text with
   | Error () ->
@@ -54,9 +60,18 @@ let find_phrase first_word ?(prefix = `Same) text : _ result =
   | Ok (prefix, phrase) ->
       match split_after_period phrase with
       | Error () ->
-          Error `MissingPeriod
+          Error `MissingLastWord
       | Ok (phrase, suffix) ->
           Ok { prefix; phrase; suffix }
+
+(** [find_phrase first_word ~prefix text] looks for a phrase that starts with
+    [first_word] and terminates with a period in [text].  If [prefix = `Rev] and
+    upon success, the prefix is reversed in the result. *)
+let find_phrase first_word ?(prefix = `Same) text : _ result =
+  match find_subtext first_word (One ".") ~prefix text with
+  | Error `NoneFound -> Error `NoneFound
+  | Error `MissingLastWord -> Error `MissingPeriod
+  | Ok _ as ok -> ok
 
 (** [find_full_phrase words ~search_deep ~try_hard ~prefix text] looks for a
     phrase comprised of all words in [words] that termiates with a period in
@@ -126,25 +141,41 @@ let find_full_phrase all_words
     [prefix] text that is reversed when [prefix = `Rev]. *)
 let find_preproc_phrase ?prefix =
   (* NB: This is a somewhat hackish and manual encoding of a state machine, used
-     to only allow a single REPLACE wihtin the SUBSTITUTION SECTION of the
+     to only allow a single REPLACE within the SUBSTITUTION SECTION of the
      CONTROL DIVISION; if such a REPLACE is present, then it must be the only
      one in the compilation group.
 
-     NOTE: for now the aforementiones division and section headers are detected
+     NOTE: for now the aforementioned division and section headers are detected
      only when they start at the very begining of the given text.  This seems to
      be ok as long as they are preceded with a period (.), since we perform the
      search on a sentence-by-sentence basis.
 
      CHECKME: the SUBSTITUTION SECTION may only be allowed after or before the
-     DEFAULT SECTION. *)
-  let find_phrase = find_phrase ?prefix
+     DEFAULT SECTION.
+
+     When neither a REPLACE, a COPY, nor a program header is found in [text],
+     this function searches for an EXEC(UTE)/END-EXEC block.
+
+     CHECKME: this behavior may need to be reversed: any EXEC(UTE) word should
+     take precedence over the other preprocessing sentences. *)
+  let find_phrase w = find_phrase ?prefix (One w)
   and find_full_phrase = find_full_phrase ?prefix in
   let find_cntrl_div_header = find_full_phrase ["CONTROL"; "DIVISION"]
   and find_ident_div_header = find_full_phrase ["IDENTIFICATION"; "DIVISION"]
-  and find_subst_sec_header = find_full_phrase ["SUBSTITUTION"; "SECTION"] in
+  and find_subst_sec_header = find_full_phrase ["SUBSTITUTION"; "SECTION"]
+  and find_exec_block
+    = find_subtext ?prefix ("EXEC" :: One "EXECUTE") (One "END-EXEC")
+  in
+  let try_exec ~next src =
+    match find_exec_block src with
+    | Error `MissingLastWord -> Error `MissingText
+    | Error `NoneFound -> Error `NoneFound
+    | Ok x -> Ok (ExecBlock x, next)
+  in
   let try_replace ~next src =
     match find_phrase "REPLACE" src with
     | Ok repl -> Ok (Replace repl, next)
+    | Error `NoneFound -> try_exec ~next src
     | Error _ as e -> e
   in
   let try_identification_division_header ?(next = AllowReplace) src =
@@ -178,7 +209,7 @@ let find_preproc_phrase ?prefix =
     | Error `NoneFound, AllowReplace ->
         try_replace ~next:AllowReplace src
     | Error `NoneFound, ForbidReplace ->
-        Error `NoneFound
+        try_exec ~next:state src
     | Error `NoneFound, AfterControlDivisionHeader ->
         try_substitution_section_header src
     | Error `NoneFound, AfterSubstitSectionHeader ->

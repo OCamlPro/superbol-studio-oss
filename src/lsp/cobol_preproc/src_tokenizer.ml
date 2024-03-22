@@ -45,6 +45,7 @@ let cdtoks_of_chstr directive_kind
   | Eof ->
       [EOL, ~@@chstr], acc
   | Pseudo _
+  | ExecBlock _
   | Alphanum _
   | AlphanumPrefix _ ->
       [INVALID_ ~&chstr, ~@@chstr], acc
@@ -78,6 +79,8 @@ let pptoks_of_chstr (chstr: text_word Cobol_common.Srcloc.with_loc) acc =
       -> [ALPHANUM_PREFIX (str, qte) &@<- chstr]
     | Pseudo p
       -> [PSEUDO_TEXT p &@<- chstr]
+    | ExecBlock text
+      -> [EXEC_BLOCK text &@<- chstr]
     | Eof
       -> [EOL &@<- chstr]
   in

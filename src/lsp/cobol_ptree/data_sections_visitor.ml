@@ -63,6 +63,8 @@ class virtual ['a] folder = object
   method fold_file_clauses           : (file_clauses                , 'a) fold = default
   method fold_file_descr             : (file_descr                  , 'a) fold = default
   method fold_file_descr'            : (file_descr with_loc         , 'a) fold = default
+  method fold_exec_declarations      : (exec_declarations           , 'a) fold = default
+  method fold_exec_declarations'     : (exec_declarations with_loc  , 'a) fold = default
 end
 
 let fold_picture_string (v: _ #folder) =
@@ -173,11 +175,18 @@ let fold_condition_name_item (v: _ #folder) =
 let fold_condition_name_item' (v: _ #folder) =
   handle' v#fold_condition_name_item' ~fold:fold_condition_name_item v
 
+let fold_exec_declarations (v: _ #folder) =
+  leaf v#fold_exec_declarations
+
+let fold_exec_declarations' (v: _ #folder) =
+  handle' v#fold_exec_declarations' ~fold:fold_exec_declarations v
+
 let fold_working_item_descr (v: _ #folder) : working_item_descr -> _ = function
   | Constant c -> fold_constant_item v c
   | Renames r -> fold_rename_item v r
   | CondName c -> fold_condition_name_item v c
   | Data e -> fold_data_item v e
+  | Exec e -> fold_exec_declarations v e
 
 let fold_working_item_descr' (v: _ #folder)
   : working_item_descr with_loc -> _ = fun d -> match ~&d with
@@ -185,6 +194,7 @@ let fold_working_item_descr' (v: _ #folder)
   | Renames r -> fold_rename_item' v (r &@<- d)
   | CondName c -> fold_condition_name_item' v (c &@<- d)
   | Data e -> fold_data_item' v (e &@<- d)
+  | Exec e -> fold_exec_declarations' v (e &@<- d)
 
 let fold_working_storage_item_descr  = fold_working_item_descr
 let fold_working_storage_item_descr' = fold_working_item_descr'
