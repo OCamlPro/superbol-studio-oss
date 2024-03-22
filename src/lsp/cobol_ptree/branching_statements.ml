@@ -346,6 +346,7 @@ CALL (id/lit AS)? NESTED/id USING...? RETURNING...? (program-prototype)
 (* CALL *)
 and call_stmt =
   {
+    call_static: bool;                                            (* GnuCOBOL *)
     call_prefix: call_prefix;
     call_using: call_using_clause with_loc list;
     call_returning: ident with_loc option;
@@ -675,7 +676,8 @@ and pp_basic_arithmetic_stmt ~sep op ppf
 (* CALL *)
 
 and pp_call_stmt ppf
-  { call_prefix = cp
+  { call_static = cs
+  ; call_prefix = cp
   ; call_using = cu
   ; call_returning = returning
   ; call_error_handler = cho }
@@ -689,7 +691,9 @@ and pp_call_stmt ppf
     | None ->
       None, { dual_handler_pos = []; dual_handler_neg  = [] }
   in
-  Fmt.pf ppf "@[CALL %a" pp_call_prefix cp;
+  Fmt.pf ppf "@[CALL %s"
+    (if cs then "STATIC " else "");
+  pp_call_prefix ppf cp;
   if cu != [] then
     Fmt.pf ppf "@ USING@ %a"
       Fmt.(list ~sep:sp (pp_with_loc pp_call_using_clause)) cu;

@@ -872,7 +872,7 @@
 %token START_X                      [@keyword]                [@contexts ]
 %token START_Y                      [@keyword]                [@contexts ]
 %token STATEMENT                    [@keyword]                [@contexts resume_stmt]
-%token STATIC                       [@keyword]                [@contexts ]
+%token STATIC                       [@keyword]                [@contexts call_stmt]
 %token STATIC_LIST                  [@keyword]                [@contexts ]
 %token STATUS                       [@keyword]
 %token STATUS_BAR                   [@keyword]                [@contexts ]

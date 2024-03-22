@@ -2932,11 +2932,13 @@ let alter_statement :=
 (* CALL STATEMENT *)
 
 %public let unconditional_action := ~ = call_statement; < >
-let call_statement :=
-  | CALL; cp = call_prefix; ul = lo(pf(USING,rnel(loc(using_by))));
+let call_statement [@context call_stmt] :=
+  | CALL; so = bo(STATIC); cp = call_prefix;
+    ul = lo(pf(USING,rnel(loc(using_by))));
     ro = ro(returning_or_giving); oeho = io(overflow_or_exception_handler);
     oterm_(END_CALL);
-    { Call { call_prefix = cp;
+    { Call { call_static = so; (* STATIC is GnuCOBOL extension *)
+             call_prefix = cp;
              call_using = ul;
              call_returning = ro;
              call_error_handler = oeho } }

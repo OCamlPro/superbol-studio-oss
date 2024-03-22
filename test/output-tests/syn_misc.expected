@@ -2359,16 +2359,6 @@ syn_misc.at-3048-prog.cob:43.7-43.20:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3104:0
-syn_misc.at-3104-prog.cob:5.23-5.30:
-   2          IDENTIFICATION DIVISION.
-   3          PROGRAM-ID.    prog.
-   4          PROCEDURE      DIVISION.
-   5 >            CALL STATIC "stuff"
-----                          ^^^^^^^
-   6                 ON EXCEPTION
-   7                    CONTINUE
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3107:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3109:0
 syn_misc.at-3109-prog3.cob:2.7-2.32:
