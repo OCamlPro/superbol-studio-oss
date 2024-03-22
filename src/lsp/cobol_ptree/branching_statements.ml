@@ -134,7 +134,7 @@ and search_stmt =
 and search_when_clause =
   {
     search_when_cond: condition;
-    search_when_stmts: branch;
+    search_when_stmts: statements;
   }
 
 (* SEARCH ALL *)
@@ -143,7 +143,7 @@ and search_all_stmt =
     search_all_item: qualname;
     search_all_at_end: handler;
     search_all_conditions: search_condition list;
-    search_all_action: branch;
+    search_all_action: statements;
   }
 
 
@@ -151,8 +151,8 @@ and search_all_stmt =
 and if_stmt =
   {
     condition: condition;
-    then_branch: branch;
-    else_branch: branch option;
+    then_branch: statements;
+    else_branch: statements;
   }
 
 
@@ -169,11 +169,16 @@ and accept_stmt =
         item: ident with_loc;
         date_time: date_time;
       }
-  | AcceptMsgCount of name with_loc
-  | AcceptAtScreen of
+  | AcceptMisc of                                                       (* MF *)
       {
-        item: name with_loc;
-        position: position option;
+        item: ident with_loc;
+        misc: accept_misc;
+      }
+  | AcceptMsgCount of name with_loc
+  | AcceptScreen of
+      {
+        item: ident with_loc;
+        clauses: accept_clause with_loc list;
         on_exception: dual_handler;
       }
   | AcceptFromEnv of                                                    (* MF *)
@@ -188,6 +193,25 @@ and accept_stmt =
         on_exception: dual_handler;
       }
 
+and accept_misc =
+  | AcceptLineNumber
+  | AcceptLines
+  | AcceptColumns
+  | AcceptUserName
+  | AcceptEscapeKey
+  | AcceptExceptionStatus
+
+and accept_clause =
+  | AcceptAt of position
+  | AcceptFromCRT                                                       (* MF *)
+  | AcceptModeBlock                                                     (* MF *)
+  | AcceptWith of accept_with_clause with_loc list                      (* MF *)
+
+and accept_with_clause =
+  | AcceptUpdate
+  | AcceptAttribute of Data_descr.screen_attribute_clause
+
+
 
 (*
 DISPLAY id/lit+ UPON...? WITH...? END_DISP
@@ -195,20 +219,23 @@ DISPLAY id AT...? ON EXCEPT?
 *)
 
 and display_stmt =
-  | DisplayDefault of ident_or_literal
-  | DisplayDevice of
-      {
-        displayed_items: ident_or_literal list; (* non-empty *)
-        upon: display_target with_loc option;
-        advancing: bool;
-    }
-  | DisplayScreen of
-      {
-        screen_item: name with_loc;
-        position: position option;
-        on_exception: dual_handler;
-      }
+  {
+    display_items_clauses: display_items_clauses list; (* non-empty *)
+    no_advancing: bool;
+    on_exception: dual_handler;
+  }
 
+and display_items_clauses =
+  {
+    display_items: ident_or_literal list; (* non-empty *)
+    display_clauses: display_clause with_loc list;
+  }
+
+and display_clause =
+  | DisplayAt of position
+  | DisplayUpon of display_target with_loc
+  | DisplayModeIsBlock
+  | DisplayWith of display_with_clause with_loc list
 
 and display_target =
   | DisplayUponName of name with_loc
@@ -219,6 +246,12 @@ and display_device_mnemonic =
  | DisplayDeviceEnvValue
  | DisplayDeviceArgNumber
  | DisplayDeviceCommandLine
+
+and display_with_clause =
+  | DisplayBlank of Data_descr.blank_clause
+  | DisplayErase of Data_descr.erase_clause
+  | DisplayAttribute of Data_descr.screen_attribute_clause
+
 
 
 (* ADD & SUBTRACT *)
@@ -431,6 +464,7 @@ and statement =
   | Merge of merge_stmt
   | Move of move_stmt
   | Multiply of multiply_stmt
+  | NextSentence
   | Open of open_stmt
   | PerformTarget of perform_target_stmt
   | PerformInline of perform_inline_stmt
@@ -460,13 +494,7 @@ and statement =
   | Write of write_stmt
 
 and statements = statement with_loc list
-
-and branch =
-  | Statements of statements
-  | NextSentence
 [@@deriving ord, show]
-
-let pp_dump_statements = pp_statements
 
 let pp_display_device_mnemonic ppf = function
   | DisplayDeviceEnvName -> Fmt.pf ppf "ENVIRONMENT-NAME"
@@ -614,11 +642,11 @@ and pp_search_all_stmt ppf { search_all_item = si;
   List.iter (fun pf -> pf ppf ()) @@
   list_clause Fmt.(any "@ AT END " ++ box pp_handler) h;
   Fmt.(any "@ WHEN " ++ list ~sep:(any " AND@ ") pp_search_condition) ppf c;
-  Fmt.(sp ++ pp_branch) ppf a;
+  Fmt.(sp ++ pp_statements) ppf a;
   Fmt.pf ppf "@ END-SEARCH"
 
 and pp_search_when_clause ppf { search_when_cond = c; search_when_stmts = w } =
-  Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_branch w
+  Fmt.pf ppf "WHEN %a@ %a" pp_condition c pp_statements w
 
 (* IF *)
 
@@ -628,67 +656,116 @@ and pp_if_stmt ppf { condition = c; then_branch = t; else_branch = e } =
       ~fits:("", 0, "")
       ~breaks:("", -2, "THEN")
   in
+  let e = match e with [] -> None | _ -> Some e in
   Fmt.pf ppf "@[<v>IF@[<hv>@ %a%t@]@;<1 2>%a%a@ END-IF@]"
     (Fmt.box pp_condition) c pp_then
-    (Fmt.vbox pp_branch) t
-    Fmt.(option (any "@ ELSE@;<1 2>" ++ vbox pp_branch)) e
+    (Fmt.vbox pp_statements) t
+    Fmt.(option (any "@ ELSE@;<1 2>" ++ vbox pp_statements)) e
 
 (* ACCEPT *)
 
 and pp_accept_stmt ppf = function
   | AcceptGeneric item -> Fmt.pf ppf "ACCEPT@ %a" (pp_with_loc pp_ident) item
   | AcceptFromDevice { item; device_item = di } ->
-    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
-      (pp_with_loc pp_ident) item
-      (pp_with_loc pp_integer) di
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        (pp_with_loc pp_integer) di
   | AcceptTemporal { item; date_time = dt } ->
-    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
-      (pp_with_loc pp_ident) item
-      pp_date_time dt
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        pp_date_time dt
+  | AcceptMisc { item; misc = m } ->
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        pp_accept_misc m
   | AcceptMsgCount cnt ->
-    Fmt.pf ppf "ACCEPT@ %a@ MESSAGE@ COUNT" (pp_with_loc pp_integer) cnt
-  | AcceptAtScreen { item; position = p; on_exception } ->
-    Fmt.pf ppf "ACCEPT@ %a" (pp_with_loc pp_integer) item;
-    Fmt.(option (any "@ AT@ " ++ pp_position)) ppf p;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception
+      Fmt.pf ppf "ACCEPT@ %a@ MESSAGE@ COUNT" (pp_with_loc pp_integer) cnt
+  | AcceptScreen { item; clauses; on_exception } ->
+      Fmt.pf ppf "@[ACCEPT@ %a" (pp_with_loc pp_ident) item;
+      Fmt.pf ppf "@ %a"
+        Fmt.(list (pp_with_loc pp_accept_clause)) clauses;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]";
   | AcceptFromEnv { item; env_item; on_exception } ->
-    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM "
-      Fmt.(box (pp_with_loc pp_ident)) item;
-    begin
-      match env_item with
-      | Some ei ->
-        Fmt.pf ppf "ENVIRONMENT@;<1 2>%a"
-          Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei
-      | None ->
-        Fmt.pf ppf "ENVIRONMENT-VALUE"
-    end;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception;
-    Fmt.pf ppf "@]"
+      Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM "
+        Fmt.(box (pp_with_loc pp_ident)) item;
+      begin
+        match env_item with
+        | Some ei ->
+            Fmt.pf ppf "ENVIRONMENT@;<1 2>%a"
+              Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei
+        | None ->
+            Fmt.pf ppf "ENVIRONMENT-VALUE"
+      end;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]"
   | AcceptFromArg { item; on_exception } ->
-    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ARGUMENT-VALUE"
-      Fmt.(box (pp_with_loc pp_ident)) item;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception;
-    Fmt.pf ppf "@]"
+      Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ARGUMENT-VALUE"
+        Fmt.(box (pp_with_loc pp_ident)) item;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]"
+
+and pp_accept_misc ppf = function
+  | AcceptLineNumber -> Fmt.pf ppf "LINE NUMBER"
+  | AcceptLines -> Fmt.pf ppf "LINES"
+  | AcceptColumns -> Fmt.pf ppf "COLUMNS"
+  | AcceptUserName -> Fmt.pf ppf "USER NAME"
+  | AcceptEscapeKey -> Fmt.pf ppf "ESCAPE KEY"
+  | AcceptExceptionStatus -> Fmt.pf ppf "EXCEPTION STATUS"
+
+and pp_accept_clause ppf = function
+  | AcceptAt position ->
+    Fmt.pf ppf "AT@ %a" pp_position position
+  | AcceptFromCRT ->
+    Fmt.pf ppf "FROM@ CRT@"
+  | AcceptModeBlock ->
+    Fmt.pf ppf "MODE@ IS@ BLOCK@"
+  | AcceptWith with_ ->
+    Fmt.pf ppf "WITH@ %a"
+      Fmt.(list ~sep:sp (pp_with_loc pp_accept_with_clause)) with_
+
+and pp_accept_with_clause ppf = function
+  | AcceptUpdate -> Fmt.pf ppf "UPDATE"
+  | AcceptAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
+
+
 
 (* DISPLAY *)
 
-and pp_display_stmt ppf = function
-  | DisplayDefault i -> Fmt.pf ppf "DISPLAY@ %a" pp_ident_or_literal i
-  | DisplayDevice { displayed_items = di ; upon; advancing } ->
-    Fmt.pf ppf "DISPLAY@ %a%a"
-      Fmt.(list ~sep:sp pp_ident_or_literal) di
-      Fmt.(option (any "@ " ++ pp_with_loc pp_display_target)) upon;
-    if advancing then Fmt.pf ppf "@ NO@ ADVANCING"
-  | DisplayScreen { screen_item = si; position = po; on_exception = dh } ->
-    Fmt.pf ppf "@[DISPLAY@;<1 2>%a%a"
-      Fmt.(box (pp_with_loc pp_name)) si
-      Fmt.(option (any "@ @[AT " ++ pp_position ++ any "@]")) po;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-DISPLAY")
-      ppf dh;
-    Fmt.pf ppf "@]"
+and pp_display_stmt ppf
+  { display_items_clauses; no_advancing; on_exception }
+=
+  Fmt.pf ppf "DISPLAY@ %a"
+    Fmt.(list ~sep:sp pp_display_items_clauses) display_items_clauses;
+  if no_advancing then Fmt.pf ppf "@ NO@ ADVANCING";
+  pp_dual_handler pp_statement ~close:Fmt.(any "END-DISPLAY") ppf on_exception
+
+and pp_display_items_clauses ppf
+  { display_items; display_clauses }
+=
+  Fmt.pf ppf "%a%a"
+    Fmt.(list ~sep:sp pp_ident_or_literal) display_items
+    Fmt.(list ~sep:sp (pp_with_loc pp_display_clause)) display_clauses
+
+and pp_display_clause ppf = function
+ | DisplayAt p ->
+   Fmt.pf ppf "AT@ %a" pp_position p
+ | DisplayUpon dt ->
+   Fmt.pf ppf "%a" (pp_with_loc pp_display_target) dt
+ | DisplayModeIsBlock ->
+   Fmt.pf ppf "MODE@ BLOCK@"
+ | DisplayWith sc ->
+   Fmt.(list ~sep:sp (pp_with_loc pp_display_with_clause)) ppf sc
+
+and pp_display_with_clause ppf = function
+  | DisplayBlank bc -> Data_descr.pp_blank_clause ppf bc
+  | DisplayErase ec -> Data_descr.pp_erase_clause ppf ec
+  | DisplayAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
+
+
 
 (* ADD & SUBTRACT *)
 
@@ -929,6 +1006,7 @@ and pp_statement ppf = function
   | Merge s -> pp_merge_stmt ppf s
   | Move s -> pp_move_stmt ppf s
   | Multiply s -> pp_multiply_stmt ppf s
+  | NextSentence -> Fmt.pf ppf "NEXT SENTENCE"
   | Open s -> pp_open_stmt ppf s
   | PerformInline s -> pp_perform_inline_stmt ppf s
   | PerformTarget s -> pp_perform_target_stmt ppf s
@@ -960,6 +1038,4 @@ and pp_statement ppf = function
 and pp_statements ppf =
   Fmt.(vbox @@ list ~sep:sp (box (pp_with_loc pp_statement))) ppf
 
-and pp_branch ppf = function
-  | Statements ss -> pp_statements ppf ss
-  | NextSentence -> Fmt.pf ppf "@[NEXT@ SENTENCE@]"
+let pp_dump_statements = pp_statements

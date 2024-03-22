@@ -216,6 +216,8 @@ let fold_file_fd_clause (v: _ #folder) =
           >> Data_descr_visitor.fold_file_block_contents v contents
       | FileRecord c -> x
           >> Data_descr_visitor.fold_record_clause v c
+      | FileRecordingMode m -> x
+          >> Data_descr_visitor.fold_recording_mode_clause v m
       | FileLabel c -> x
           >> Data_descr_visitor.fold_label_clause v c
       | FileValueOf c -> x

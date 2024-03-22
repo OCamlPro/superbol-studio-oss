@@ -178,7 +178,7 @@ let put_token_back ({ preproc; _ } as ps) token tokens =
      `token_n_srcloc_limits`, so `prev_limit` needs to be re-adjusted to the
      second-to-last right-limit. *)
   { ps with prev_limit = ps.prev_limit';
-            preproc = { ps.preproc with tokzr } }, tokens
+            preproc = { preproc with tokzr } }, tokens
 
 (* --- *)
 
@@ -330,7 +330,9 @@ and on_interim_stage ({ prev_limit; _ } as ps, tokens, env) =
   let ps, token, tokens = next_token ps tokens in
   let _t, _, e as tok = token_n_srcloc_limits ?prev_limit token in
   let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
-  check ps token tokens env @@ Grammar_interpr.offer c tok
+  check ps token tokens env @@ Grammar_interpr.offer c @@ match tok with
+    | Grammar_tokens.INTERVENING_ '.', l, r -> Grammar_tokens.PERIOD, l, r
+    | tok -> tok
 
 and check ps token tokens env = function
   | Grammar_interpr.HandlingError env ->

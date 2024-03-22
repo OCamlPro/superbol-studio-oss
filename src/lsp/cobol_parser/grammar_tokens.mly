@@ -111,7 +111,7 @@
 %token AUTO_DECIMAL                 [@keyword]                [@contexts ]
 %token AUTO_SPIN                    [@keyword]                [@contexts ]
 %token AWAY_FROM_ZERO               [@keyword]                [@contexts rounded_phrase]
-%token BACKGROUND_COLOR             [@keyword]                [@contexts screen_descr_entry]
+%token BACKGROUND_COLOR             [@keyword]                [@contexts screen_descr_entry, display_stmt, accept_stmt]
 %token BACKGROUND_HIGH              [@keyword]
 %token BACKGROUND_LOW               [@keyword]
 %token BACKGROUND_STANDARD          [@keyword]
@@ -119,7 +119,7 @@
 %token BAR                          [@keyword]                [@contexts ]
 %token BASED                        [@keyword]
 %token BEFORE                       [@keyword]
-%token BELL                         [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt]
+%token BELL                         [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt, display_stmt, accept_stmt]
 %token BINARY                       [@keyword]
 %token BINARY_CHAR                  [@keyword]
 %token BINARY_C_LONG                [@keyword]
@@ -139,7 +139,7 @@
 %token BITMAP_TRANSPARENT_COLOR     [@keyword]                [@contexts ]
 %token BITMAP_WIDTH                 [@keyword]                [@contexts ]
 %token BLANK                        [@keyword]
-%token BLINK                        [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt]
+%token BLINK                        [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt, display_stmt, accept_stmt]
 %token BLOCK                        [@keyword]
 %token BOOLEAN                      [@keyword]
 %token BOTTOM                       [@keyword]
@@ -365,7 +365,7 @@
 %token EOP                          [@keyword]
 %token EOS                          [@keyword]                [@contexts erase_clause]
 %token EQUAL                        [@keyword]
-%token ERASE                        [@keyword]                [@contexts screen_descr_entry]
+%token ERASE                        [@keyword]                [@contexts screen_descr_entry, display_stmt, accept_stmt]
 %token ERROR                        [@keyword]
 %token ESCAPE                       [@keyword]
 %token ESCAPE_BUTTON                [@keyword]                [@contexts ]
@@ -389,7 +389,7 @@
 %token EXTERN                       [@keyword]                [@contexts ]
 %token EXTERNAL                     [@keyword]
 %token EXTERNAL_FORM                [@keyword]
-%token F                            [@keyword]                [@contexts ]
+%token F                            [@keyword]                [@contexts recording_mode_clause]
 %token FACTORY                      [@keyword]
 %token FALSE                        [@keyword]
 %token FARTHEST_FROM_ZERO           [@keyword]
@@ -435,7 +435,7 @@
 %token FONT                         [@keyword]
 %token FOOTING                      [@keyword]
 %token FOR                          [@keyword]
-%token FOREGROUND_COLOR             [@keyword]                [@contexts screen_descr_entry]
+%token FOREGROUND_COLOR             [@keyword]                [@contexts screen_descr_entry, display_stmt, accept_stmt]
 %token FOREVER                      [@keyword]                [@contexts retry_phrase, perform_stmt]
 %token FORMAT                       [@keyword]
 %token FRAME                        [@keyword]                [@contexts ]
@@ -473,7 +473,7 @@
 %token HEIGHT_IN_CELLS              [@keyword]                [@contexts ]
 %token HEX                          [@keyword]                [@contexts ]
 %token HIDDEN_DATA                  [@keyword]
-%token HIGHLIGHT                    [@keyword]                [@contexts screen_descr_entry]
+%token HIGHLIGHT                    [@keyword]                [@contexts screen_descr_entry, display_stmt, accept_stmt]
 %token HIGH_COLOR                   [@keyword]                [@contexts ]
 %token HIGH_ORDER_LEFT              [@keyword]                [@contexts float_binary_clause, float_decimal_clause]
 %token HIGH_ORDER_RIGHT             [@keyword]                [@contexts float_binary_clause, float_decimal_clause]
@@ -562,6 +562,7 @@
 %token LINES                        [@keyword]
 %token LINES_AT_ROOT                [@keyword]                [@contexts ]
 %token LINE_COUNTER                 [@keyword]
+%token LINE_NUMBER                  [@keyword]
 %token LINE_SEQUENTIAL              [@keyword]                [@contexts ]
 %token LINKAGE                      [@keyword]
 %token LIST_BOX                     [@keyword]                [@contexts ]
@@ -575,7 +576,7 @@
 %token LONG_DATE                    [@keyword]                [@contexts ]
 %token LOWER                        [@keyword]                [@contexts ]
 %token LOWERED                      [@keyword]                [@contexts ]
-%token LOWLIGHT                     [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt]
+%token LOWLIGHT                     [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt, display_stmt, accept_stmt]
 %token LOW_COLOR                    [@keyword]                [@contexts ]
 %token LOW_VALUE                    [@keyword  "LOW-VALUE", "LOW-VALUES"]
 %token MAGNETIC_TAPE                [@keyword]                [@contexts ]
@@ -787,7 +788,7 @@
 %token RETURNING                    [@keyword]
 %token REVERSE                      [@keyword]
 %token REVERSED                     [@keyword]
-%token REVERSE_VIDEO                [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt]
+%token REVERSE_VIDEO                [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt, display_stmt, accept_stmt]
 %token REWIND                       [@keyword]
 %token REWRITE                      [@keyword]
 %token RF                           [@keyword]
@@ -806,7 +807,7 @@
 %token ROW_HEADINGS                 [@keyword]                [@contexts ]
 %token ROW_PROTECTION               [@keyword]                [@contexts ]
 %token RUN                          [@keyword]
-%token S                            [@keyword]                [@contexts ]
+%token S                            [@keyword]                [@contexts recording_mode_clause]
 %token SAME                         [@keyword]
 %token SAVE_AS                      [@keyword]                [@contexts ]
 %token SAVE_AS_NO_PROMPT            [@keyword]                [@contexts ]
@@ -945,10 +946,10 @@
 %token TRUNCATION                   [@keyword]                [@contexts intermediate_rounding_clause, rounded_phrase]
 %token TYPE                         [@keyword]
 %token TYPEDEF                      [@keyword]
-%token U                            [@keyword]                [@contexts ]
+%token U                            [@keyword]                [@contexts recording_mode_clause]
 %token UCS_4                        [@keyword]                [@contexts alphabet_clause]
 %token UNBOUNDED                    [@keyword]                [@contexts ]
-%token UNDERLINE                    [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt]
+%token UNDERLINE                    [@keyword]                [@contexts screen_descr_entry, set_attribute_stmt, display_stmt, accept_stmt]
 %token UNFRAMED                     [@keyword]                [@contexts ]
 %token UNIT                         [@keyword]
 %token UNIVERSAL                    [@keyword]
@@ -975,7 +976,7 @@
 %token USING                        [@keyword]
 %token UTF_16                       [@keyword]                [@contexts alphabet_clause]
 %token UTF_8                        [@keyword]                [@contexts alphabet_clause]
-%token V                            [@keyword]                [@contexts ]
+%token V                            [@keyword]                [@contexts recording_mode_clause]
 %token VALID                        [@keyword]
 %token VALIDATE                     [@keyword]
 %token VALIDATE_STATUS              [@keyword  "VALIDATE-STATUS", "VAL-STATUS"]
@@ -983,7 +984,7 @@
 %token VALUE                        [@keyword]
 %token VALUES                       [@keyword]
 %token VALUE_FORMAT                 [@keyword]                [@contexts ]
-%token VARIABLE                     [@keyword]                [@contexts ]
+%token VARIABLE                     [@keyword]                [@contexts recording_mode_clause]
 %token VARIANT                      [@keyword]
 %token VARYING                      [@keyword]
 %token VERTICAL                     [@keyword]                [@contexts ]
@@ -1038,6 +1039,7 @@
 %token NOT_AT_EOP
 %token WITH_DATA
 %token NO_DATA
+%token WITH_NO_ADVANCING
 
 (* Combined WITH tokens *)
 (* %token WITH_LOCK_ON *)
@@ -1049,6 +1051,7 @@
 
 (* Combined NEXT tokens *)
 %token NEXT_PAGE
+%token NEXT_SENTENCE
 
 (* Combined DATA tokens *)
 %token DATA_RECORD

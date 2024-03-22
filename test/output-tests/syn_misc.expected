@@ -215,65 +215,74 @@ syn_misc.at-1671-prog.cob:8.28-8.40:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1706:0
-syn_misc.at-1706-prog.cob:11.20-11.24:
-   8          01 X             PIC X.
-   9          PROCEDURE        DIVISION.
-  10              ACCEPT X                 END-ACCEPT.
-  11 >            ACCEPT X WITH    UPDATE  END-ACCEPT.
-----                       ^^^^
-  12              ACCEPT X WITH    DEFAULT END-ACCEPT.
-  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
->> Error: Invalid syntax
-
-syn_misc.at-1706-prog.cob:12.20-12.24:
+syn_misc.at-1706-prog.cob:12.24:
    9          PROCEDURE        DIVISION.
   10              ACCEPT X                 END-ACCEPT.
   11              ACCEPT X WITH    UPDATE  END-ACCEPT.
   12 >            ACCEPT X WITH    DEFAULT END-ACCEPT.
-----                       ^^^^
+----                           ^
+  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
+  14              ACCEPT X WITH NO DEFAULT END-ACCEPT.
+>> Hint: Missing UPDATE
+
+syn_misc.at-1706-prog.cob:12.28-12.35:
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                 END-ACCEPT.
+  11              ACCEPT X WITH    UPDATE  END-ACCEPT.
+  12 >            ACCEPT X WITH    DEFAULT END-ACCEPT.
+----                               ^^^^^^^
   13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
   14              ACCEPT X WITH NO DEFAULT END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1706-prog.cob:13.20-13.24:
+syn_misc.at-1706-prog.cob:13.25-13.27:
   10              ACCEPT X                 END-ACCEPT.
   11              ACCEPT X WITH    UPDATE  END-ACCEPT.
   12              ACCEPT X WITH    DEFAULT END-ACCEPT.
   13 >            ACCEPT X WITH NO UPDATE  END-ACCEPT.
-----                       ^^^^
+----                            ^^
   14              ACCEPT X WITH NO DEFAULT END-ACCEPT.
   15              STOP RUN.
 >> Error: Invalid syntax
 
-syn_misc.at-1706-prog.cob:14.20-14.24:
+syn_misc.at-1706-prog.cob:14.24:
   11              ACCEPT X WITH    UPDATE  END-ACCEPT.
   12              ACCEPT X WITH    DEFAULT END-ACCEPT.
   13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
   14 >            ACCEPT X WITH NO DEFAULT END-ACCEPT.
-----                       ^^^^
+----                           ^
+  15              STOP RUN.
+>> Hint: Missing UPDATE
+
+syn_misc.at-1706-prog.cob:14.25-14.27:
+  11              ACCEPT X WITH    UPDATE  END-ACCEPT.
+  12              ACCEPT X WITH    DEFAULT END-ACCEPT.
+  13              ACCEPT X WITH NO UPDATE  END-ACCEPT.
+  14 >            ACCEPT X WITH NO DEFAULT END-ACCEPT.
+----                            ^^
   15              STOP RUN.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1731:0
-syn_misc.at-1731-prog.cob:11.19:
+syn_misc.at-1731-prog.cob:11.24:
    8          01 X             PIC X.
    9          PROCEDURE        DIVISION.
   10              ACCEPT X                       END-ACCEPT.
   11 >            ACCEPT X WITH    AUTO          END-ACCEPT.
-----                      ^
+----                           ^
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1731-prog.cob:11.20-11.24:
+syn_misc.at-1731-prog.cob:11.28-11.32:
    8          01 X             PIC X.
    9          PROCEDURE        DIVISION.
   10              ACCEPT X                       END-ACCEPT.
   11 >            ACCEPT X WITH    AUTO          END-ACCEPT.
-----                       ^^^^
+----                               ^^^^
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1731-prog.cob:11.42-11.52:
    8          01 X             PIC X.
@@ -285,43 +294,63 @@ syn_misc.at-1731-prog.cob:11.42-11.52:
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1731-prog.cob:12.20-12.24:
+syn_misc.at-1731-prog.cob:12.24:
    9          PROCEDURE        DIVISION.
   10              ACCEPT X                       END-ACCEPT.
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
   12 >            ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
-----                       ^^^^
+----                           ^
+  13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+  14              ACCEPT X WITH    TAB           END-ACCEPT.
+>> Hint: Missing UPDATE
+
+syn_misc.at-1731-prog.cob:12.28-12.37:
+   9          PROCEDURE        DIVISION.
+  10              ACCEPT X                       END-ACCEPT.
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12 >            ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+----                               ^^^^^^^^^
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
   14              ACCEPT X WITH    TAB           END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1731-prog.cob:13.20-13.24:
+syn_misc.at-1731-prog.cob:13.24:
   10              ACCEPT X                       END-ACCEPT.
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13 >            ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
-----                       ^^^^
+----                           ^
+  14              ACCEPT X WITH    TAB           END-ACCEPT.
+  15              STOP RUN.
+>> Hint: Missing UPDATE
+
+syn_misc.at-1731-prog.cob:13.28-13.41:
+  10              ACCEPT X                       END-ACCEPT.
+  11              ACCEPT X WITH    AUTO          END-ACCEPT.
+  12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
+  13 >            ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
+----                               ^^^^^^^^^^^^^
   14              ACCEPT X WITH    TAB           END-ACCEPT.
   15              STOP RUN.
 >> Error: Invalid syntax
 
-syn_misc.at-1731-prog.cob:14.19:
+syn_misc.at-1731-prog.cob:14.24:
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
   14 >            ACCEPT X WITH    TAB           END-ACCEPT.
-----                      ^
+----                           ^
   15              STOP RUN.
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1731-prog.cob:14.20-14.24:
+syn_misc.at-1731-prog.cob:14.28-14.31:
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
   12              ACCEPT X WITH    AUTO-SKIP     END-ACCEPT.
   13              ACCEPT X WITH    AUTOTERMINATE END-ACCEPT.
   14 >            ACCEPT X WITH    TAB           END-ACCEPT.
-----                       ^^^^
+----                               ^^^
   15              STOP RUN.
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1731-prog.cob:14.42-14.52:
   11              ACCEPT X WITH    AUTO          END-ACCEPT.
@@ -333,25 +362,25 @@ syn_misc.at-1731-prog.cob:14.42-14.52:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1753:0
-syn_misc.at-1753-prog.cob:8.19:
+syn_misc.at-1753-prog.cob:8.24:
    5          WORKING-STORAGE  SECTION.
    6          01 X             PIC X(05).
    7          PROCEDURE        DIVISION.
    8 >            ACCEPT X WITH LOWER     END-ACCEPT.
-----                      ^
+----                           ^
    9              ACCEPT X WITH UPPER     END-ACCEPT.
   10              ACCEPT X      LOWER
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1753-prog.cob:8.20-8.24:
+syn_misc.at-1753-prog.cob:8.25-8.30:
    5          WORKING-STORAGE  SECTION.
    6          01 X             PIC X(05).
    7          PROCEDURE        DIVISION.
    8 >            ACCEPT X WITH LOWER     END-ACCEPT.
-----                       ^^^^
+----                            ^^^^^
    9              ACCEPT X WITH UPPER     END-ACCEPT.
   10              ACCEPT X      LOWER
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1753-prog.cob:8.35-8.45:
    5          WORKING-STORAGE  SECTION.
@@ -363,25 +392,25 @@ syn_misc.at-1753-prog.cob:8.35-8.45:
   10              ACCEPT X      LOWER
 >> Error: Invalid syntax
 
-syn_misc.at-1753-prog.cob:9.19:
+syn_misc.at-1753-prog.cob:9.24:
    6          01 X             PIC X(05).
    7          PROCEDURE        DIVISION.
    8              ACCEPT X WITH LOWER     END-ACCEPT.
    9 >            ACCEPT X WITH UPPER     END-ACCEPT.
-----                      ^
+----                           ^
   10              ACCEPT X      LOWER
   11              ACCEPT X      UPPER
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1753-prog.cob:9.20-9.24:
+syn_misc.at-1753-prog.cob:9.25-9.30:
    6          01 X             PIC X(05).
    7          PROCEDURE        DIVISION.
    8              ACCEPT X WITH LOWER     END-ACCEPT.
    9 >            ACCEPT X WITH UPPER     END-ACCEPT.
-----                       ^^^^
+----                            ^^^^^
   10              ACCEPT X      LOWER
   11              ACCEPT X      UPPER
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1753-prog.cob:9.35-9.45:
    6          01 X             PIC X(05).
@@ -468,25 +497,25 @@ syn_misc.at-1753-prog.cob:12.11-12.15:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1782:0
-syn_misc.at-1782-prog.cob:9.19:
+syn_misc.at-1782-prog.cob:9.24:
    6          01 X             PIC X(05).
    7          01 Y             PIC 9(04) BINARY VALUE 4.
    8          PROCEDURE        DIVISION.
    9 >            ACCEPT X WITH           SIZE    0 END-ACCEPT.
-----                      ^
+----                           ^
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1782-prog.cob:9.20-9.24:
+syn_misc.at-1782-prog.cob:9.35-9.39:
    6          01 X             PIC X(05).
    7          01 Y             PIC 9(04) BINARY VALUE 4.
    8          PROCEDURE        DIVISION.
    9 >            ACCEPT X WITH           SIZE    0 END-ACCEPT.
-----                       ^^^^
+----                                      ^^^^
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1782-prog.cob:9.45-9.55:
    6          01 X             PIC X(05).
@@ -498,25 +527,25 @@ syn_misc.at-1782-prog.cob:9.45-9.55:
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1782-prog.cob:10.19:
+syn_misc.at-1782-prog.cob:10.24:
    7          01 Y             PIC 9(04) BINARY VALUE 4.
    8          PROCEDURE        DIVISION.
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10 >            ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
-----                      ^
+----                           ^
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1782-prog.cob:10.20-10.24:
+syn_misc.at-1782-prog.cob:10.35-10.39:
    7          01 Y             PIC 9(04) BINARY VALUE 4.
    8          PROCEDURE        DIVISION.
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10 >            ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
-----                       ^^^^
+----                                      ^^^^
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1782-prog.cob:10.45-10.55:
    7          01 Y             PIC 9(04) BINARY VALUE 4.
@@ -528,25 +557,25 @@ syn_misc.at-1782-prog.cob:10.45-10.55:
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1782-prog.cob:11.19:
+syn_misc.at-1782-prog.cob:11.24:
    8          PROCEDURE        DIVISION.
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
-----                      ^
+----                           ^
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
   13              ACCEPT X                SIZE    Y END-ACCEPT.
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1782-prog.cob:11.20-11.24:
+syn_misc.at-1782-prog.cob:11.25-11.34:
    8          PROCEDURE        DIVISION.
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11 >            ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
-----                       ^^^^
+----                            ^^^^^^^^^
   12              ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
   13              ACCEPT X                SIZE    Y END-ACCEPT.
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1782-prog.cob:11.34:
    8          PROCEDURE        DIVISION.
@@ -578,25 +607,25 @@ syn_misc.at-1782-prog.cob:11.45-11.55:
   13              ACCEPT X                SIZE    Y END-ACCEPT.
 >> Error: Invalid syntax
 
-syn_misc.at-1782-prog.cob:12.19:
+syn_misc.at-1782-prog.cob:12.24:
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
-----                      ^
+----                           ^
   13              ACCEPT X                SIZE    Y END-ACCEPT.
   14              ACCEPT X                SIZE    0
->> Hint: Missing .
+>> Hint: Missing UPDATE .
 
-syn_misc.at-1782-prog.cob:12.20-12.24:
+syn_misc.at-1782-prog.cob:12.25-12.34:
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
   10              ACCEPT X WITH           SIZE IS 1 END-ACCEPT.
   11              ACCEPT X WITH PROTECTED SIZE    2 END-ACCEPT.
   12 >            ACCEPT X WITH PROTECTED SIZE IS 3 END-ACCEPT.
-----                       ^^^^
+----                            ^^^^^^^^^
   13              ACCEPT X                SIZE    Y END-ACCEPT.
   14              ACCEPT X                SIZE    0
->> Warning: Invalid syntax
+>> Error: Invalid syntax
 
 syn_misc.at-1782-prog.cob:12.34:
    9              ACCEPT X WITH           SIZE    0 END-ACCEPT.
@@ -893,185 +922,65 @@ syn_misc.at-1782-prog.cob:19.11-19.15:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1807:0
-syn_misc.at-1807-prog.cob:9.23:
+syn_misc.at-1807-prog.cob:9.33:
    6          01 X             PIC X(05).
    7          01 Y             PIC 9(04) BINARY VALUE 7.
    8          PROCEDURE        DIVISION.
    9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-----                          ^
+----                                    ^
   10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
   11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
->> Hint: Missing COL <identifier> .
+>> Hint: Missing BELL
 
-syn_misc.at-1807-prog.cob:9.24-9.28:
+syn_misc.at-1807-prog.cob:9.34-9.38:
    6          01 X             PIC X(05).
    7          01 Y             PIC 9(04) BINARY VALUE 7.
    8          PROCEDURE        DIVISION.
    9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-----                           ^^^^
+----                                     ^^^^
   10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
   11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
 >> Error: Invalid syntax
 
-syn_misc.at-1807-prog.cob:9.28:
-   6          01 X             PIC X(05).
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-----                               ^
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
->> Hint: Missing .
-
-syn_misc.at-1807-prog.cob:9.29-9.33:
-   6          01 X             PIC X(05).
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-----                                ^^^^
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:9.44-9.55:
-   6          01 X             PIC X(05).
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9 >            DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-----                                               ^^^^^^^^^^^
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:10.23:
+syn_misc.at-1807-prog.cob:10.33:
    7          01 Y             PIC 9(04) BINARY VALUE 7.
    8          PROCEDURE        DIVISION.
    9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
   10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-----                          ^
+----                                    ^
   11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
   12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
->> Hint: Missing COL <identifier> .
+>> Hint: Missing BELL
 
-syn_misc.at-1807-prog.cob:10.24-10.28:
+syn_misc.at-1807-prog.cob:10.34-10.38:
    7          01 Y             PIC 9(04) BINARY VALUE 7.
    8          PROCEDURE        DIVISION.
    9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
   10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-----                           ^^^^
+----                                     ^^^^
   11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
   12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
 >> Error: Invalid syntax
 
-syn_misc.at-1807-prog.cob:10.28:
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-----                               ^
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
->> Hint: Missing .
-
-syn_misc.at-1807-prog.cob:10.29-10.33:
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-----                                ^^^^
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:10.44-10.55:
-   7          01 Y             PIC 9(04) BINARY VALUE 7.
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10 >            DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-----                                               ^^^^^^^^^^^
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:11.23:
+syn_misc.at-1807-prog.cob:11.33:
    8          PROCEDURE        DIVISION.
    9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
   10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
   11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-----                          ^
+----                                    ^
   12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
   13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
->> Hint: Missing COL <identifier> .
+>> Hint: Missing BELL
 
-syn_misc.at-1807-prog.cob:11.24-11.28:
+syn_misc.at-1807-prog.cob:11.34-11.38:
    8          PROCEDURE        DIVISION.
    9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
   10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
   11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-----                           ^^^^
+----                                     ^^^^
   12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
   13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
 >> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:11.28:
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-----                               ^
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
->> Hint: Missing .
-
-syn_misc.at-1807-prog.cob:11.29-11.33:
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-----                                ^^^^
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:11.44-11.55:
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11 >            DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-----                                               ^^^^^^^^^^^
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:12.23:
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-----                          ^
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
->> Hint: Missing COL <identifier> .
-
-syn_misc.at-1807-prog.cob:12.24-12.28:
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-----                           ^^^^
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:12.28:
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-----                               ^
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
->> Hint: Missing .
 
 syn_misc.at-1807-prog.cob:12.34-12.38:
    9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
@@ -1081,47 +990,7 @@ syn_misc.at-1807-prog.cob:12.34-12.38:
 ----                                     ^^^^
   13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
   14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:12.44-12.55:
-   9              DISPLAY X AT 0101 WITH SIZE    5 END-DISPLAY.
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12 >            DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-----                                               ^^^^^^^^^^^
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
 >> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:13.23:
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-----                          ^
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-  15              STOP RUN.
->> Hint: Missing COL <identifier> .
-
-syn_misc.at-1807-prog.cob:13.24-13.28:
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-----                           ^^^^
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-  15              STOP RUN.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:13.28:
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-----                               ^
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-  15              STOP RUN.
->> Hint: Missing .
 
 syn_misc.at-1807-prog.cob:13.34-13.38:
   10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
@@ -1131,44 +1000,7 @@ syn_misc.at-1807-prog.cob:13.34-13.38:
 ----                                     ^^^^
   14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
   15              STOP RUN.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:13.44-13.55:
-  10              DISPLAY X AT 0101 WITH SIZE IS 6 END-DISPLAY.
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13 >            DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-----                                               ^^^^^^^^^^^
-  14              DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-  15              STOP RUN.
 >> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:14.23:
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-----                          ^
-  15              STOP RUN.
->> Hint: Missing COL <identifier> .
-
-syn_misc.at-1807-prog.cob:14.24-14.28:
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-----                           ^^^^
-  15              STOP RUN.
->> Error: Invalid syntax
-
-syn_misc.at-1807-prog.cob:14.28:
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-----                               ^
-  15              STOP RUN.
->> Hint: Missing .
 
 syn_misc.at-1807-prog.cob:14.34-14.38:
   11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
@@ -1176,15 +1008,6 @@ syn_misc.at-1807-prog.cob:14.34-14.38:
   13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
   14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
 ----                                     ^^^^
-  15              STOP RUN.
->> Warning: Invalid syntax
-
-syn_misc.at-1807-prog.cob:14.44-14.55:
-  11              DISPLAY X AT 0101 WITH SIZE IS Y END-DISPLAY.
-  12              DISPLAY X AT 0101      SIZE    5 END-DISPLAY.
-  13              DISPLAY X AT 0101      SIZE IS 6 END-DISPLAY.
-  14 >            DISPLAY X AT 0101      SIZE IS Y END-DISPLAY.
-----                                               ^^^^^^^^^^^
   15              STOP RUN.
 >> Error: Invalid syntax
 
@@ -1230,46 +1053,6 @@ syn_misc.at-2045-prog2.cob:15.8-15.9:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2232:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2377:0
-syn_misc.at-2377-prog.cob:9.29:
-   6          77 KEYNUM        PIC 9(04).
-   7          PROCEDURE        DIVISION.
-   8   
-   9 >            ACCEPT KEYNUM FROM ESCAPE KEY
-----                                ^
-  10              DISPLAY "Key pressed: " KEYNUM
-  11              ACCEPT KEYNUM FROM ESCAPE
->> Hint: Missing <word>
-
-syn_misc.at-2377-prog.cob:9.30-9.36:
-   6          77 KEYNUM        PIC 9(04).
-   7          PROCEDURE        DIVISION.
-   8   
-   9 >            ACCEPT KEYNUM FROM ESCAPE KEY
-----                                 ^^^^^^
-  10              DISPLAY "Key pressed: " KEYNUM
-  11              ACCEPT KEYNUM FROM ESCAPE
->> Error: Invalid syntax
-
-syn_misc.at-2377-prog.cob:11.29:
-   8   
-   9              ACCEPT KEYNUM FROM ESCAPE KEY
-  10              DISPLAY "Key pressed: " KEYNUM
-  11 >            ACCEPT KEYNUM FROM ESCAPE
-----                                ^
-  12              DISPLAY "Key pressed: " KEYNUM
-  13              ACCEPT OMITTED
->> Hint: Missing <word>
-
-syn_misc.at-2377-prog.cob:11.30-11.36:
-   8   
-   9              ACCEPT KEYNUM FROM ESCAPE KEY
-  10              DISPLAY "Key pressed: " KEYNUM
-  11 >            ACCEPT KEYNUM FROM ESCAPE
-----                                 ^^^^^^
-  12              DISPLAY "Key pressed: " KEYNUM
-  13              ACCEPT OMITTED
->> Error: Invalid syntax
-
 syn_misc.at-2377-prog.cob:13.17:
   10              DISPLAY "Key pressed: " KEYNUM
   11              ACCEPT KEYNUM FROM ESCAPE
@@ -1742,16 +1525,6 @@ syn_misc.at-2668-prog.cob:36.19-36.27:
   38                  LINES window-lines
 >> Error: Invalid syntax
 
-syn_misc.at-2668-prog.cob:37.22-37.25:
-  34              MODIFY lb-frm ITEM-TO-ADD = 'Row 6'
-  35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
-  36              DISPLAY FLOATING WINDOW
-  37 >                LINE 5 COL 5
-----                         ^^^
-  38                  LINES window-lines
-  39                  SIZE  window-rows
->> Error: Invalid syntax
-
 syn_misc.at-2668-prog.cob:38.15-38.20:
   35              MODIFY lb-frm ITEM-TO-ADD = 'Row 7'
   36              DISPLAY FLOATING WINDOW
@@ -2154,46 +1927,6 @@ syn_misc.at-2737-prog.cob:5.19-5.26:
    7         *
 >> Error: Invalid syntax
 
-syn_misc.at-2737-prog.cob:5.31:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE DIVISION.
-   5 >            DISPLAY OMITTED WITH BELL
-----                                  ^
-   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
-   7         *
->> Hint: Missing NO ADVANCING .
-
-syn_misc.at-2737-prog.cob:5.32-5.36:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE DIVISION.
-   5 >            DISPLAY OMITTED WITH BELL
-----                                   ^^^^
-   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
-   7         *
->> Error: Invalid syntax
-
-syn_misc.at-2737-prog.cob:5.36:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE DIVISION.
-   5 >            DISPLAY OMITTED WITH BELL
-----                                       ^
-   6              DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
-   7         *
->> Hint: Missing .
-
-syn_misc.at-2737-prog.cob:6.11-6.18:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE DIVISION.
-   5              DISPLAY OMITTED WITH BELL
-   6 >            DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
-----              ^^^^^^^
-   7         *
-   8              STOP RUN.
->> Warning: Invalid syntax
-
 syn_misc.at-2737-prog.cob:6.19-6.26:
    3          PROGRAM-ID.      prog.
    4          PROCEDURE DIVISION.
@@ -2204,12 +1937,12 @@ syn_misc.at-2737-prog.cob:6.19-6.26:
    8              STOP RUN.
 >> Error: Invalid syntax
 
-syn_misc.at-2737-prog.cob:6.35-6.38:
+syn_misc.at-2737-prog.cob:6.42-6.47:
    3          PROGRAM-ID.      prog.
    4          PROCEDURE DIVISION.
    5              DISPLAY OMITTED WITH BELL
    6 >            DISPLAY OMITTED LINE 10 COL 15 ERASE EOL
-----                                      ^^^
+----                                             ^^^^^
    7         *
    8              STOP RUN.
 >> Error: Invalid syntax
@@ -2380,26 +2113,6 @@ syn_misc.at-3109-prog3.cob:2.7-2.32:
 >> Error: Invalid >>CALL-CONVENTION compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3175:0
-syn_misc.at-3175-prog.cob:39.15-39.27:
-  36              END-WRITE
-  37   
-  38              DISPLAY "blah"
-  39 >                ON EXCEPTION
-----                  ^^^^^^^^^^^^
-  40                      CALL "err"
-  41                          NOT ON EXCEPTION
->> Error: Invalid syntax
-
-syn_misc.at-3175-prog.cob:46.15-46.31:
-  43                          ON EXCEPTION
-  44                              CONTINUE.
-  45              DISPLAY "blah"
-  46 >                NOT ON EXCEPTION
-----                  ^^^^^^^^^^^^^^^^
-  47                      CALL "err"
-  48                          ON EXCEPTION
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3227:0
 syn_misc.at-3227-prog.cob:7.30-7.31:
    4   

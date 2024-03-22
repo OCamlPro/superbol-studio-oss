@@ -122,6 +122,26 @@ syn_screen.at-758-prog.cob:33.39-33.43:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:817:0
+syn_screen.at-817-prog.cob:9.18:
+   6          01 FIELD-A  PIC X(06) VALUE "ms-cob".
+   7          01 A        PIC X.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY ERASE
+----                     ^
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+>> Hint: Missing <identifier or literal>
+
+syn_screen.at-817-prog.cob:9.19-9.24:
+   6          01 FIELD-A  PIC X(06) VALUE "ms-cob".
+   7          01 A        PIC X.
+   8          PROCEDURE        DIVISION.
+   9 >            DISPLAY ERASE
+----                      ^^^^^
+  10              MOVE 10 TO LIN. MOVE 15 TO COL.
+  11              DISPLAY (LIN , COL - 3) FIELD-A.
+>> Error: Invalid syntax
+
 syn_screen.at-817-prog.cob:10.37:
    7          01 A        PIC X.
    8          PROCEDURE        DIVISION.
@@ -152,12 +172,12 @@ syn_screen.at-817-prog.cob:11.19-11.20:
   13              ACCEPT  (   , 10) A.
 >> Error: Invalid syntax
 
-syn_screen.at-817-prog.cob:11.26-11.29:
+syn_screen.at-817-prog.cob:11.30-11.31:
    8          PROCEDURE        DIVISION.
    9              DISPLAY ERASE
   10              MOVE 10 TO LIN. MOVE 15 TO COL.
   11 >            DISPLAY (LIN , COL - 3) FIELD-A.
-----                             ^^^
+----                                 ^
   12              DISPLAY (LIN + 1 , COL) FIELD-A.
   13              ACCEPT  (   , 10) A.
 >> Error: Invalid syntax
@@ -192,12 +212,12 @@ syn_screen.at-817-prog.cob:12.24-12.25:
   14              DISPLAY (08 , 12) FIELD-A.
 >> Error: Invalid syntax
 
-syn_screen.at-817-prog.cob:12.30-12.33:
+syn_screen.at-817-prog.cob:12.33-12.34:
    9              DISPLAY ERASE
   10              MOVE 10 TO LIN. MOVE 15 TO COL.
   11              DISPLAY (LIN , COL - 3) FIELD-A.
   12 >            DISPLAY (LIN + 1 , COL) FIELD-A.
-----                                 ^^^
+----                                    ^
   13              ACCEPT  (   , 10) A.
   14              DISPLAY (08 , 12) FIELD-A.
 >> Error: Invalid syntax
@@ -341,6 +361,26 @@ syn_screen.at-817-prog.cob:20.46-20.49:
   21              ACCEPT  (   , 10) A.
   22              DISPLAY ( 1 , 1 ) ERASE.
 >> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:20.49-20.50:
+  17              ACCEPT  A       AT COLUMN 8.
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20 >            DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+----                                                    ^
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:20.49:
+  17              ACCEPT  A       AT COLUMN 8.
+  18              SUBTRACT 2 FROM LIN.
+  19              SUBTRACT 3 FROM COL.
+  20 >            DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+----                                                    ^
+  21              ACCEPT  (   , 10) A.
+  22              DISPLAY ( 1 , 1 ) ERASE.
+>> Hint: Missing <identifier>
 
 syn_screen.at-817-prog.cob:21.17:
   18              SUBTRACT 2 FROM LIN.
@@ -517,48 +557,12 @@ syn_screen.at-817-prog.cob:26.26-26.27:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:880:0
-syn_screen.at-880-prog.cob:7.18:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            DISPLAY WITH CONVERSION "Whatever".
-----                     ^
-   8              STOP RUN.
->> Hint: Missing <identifier or literal>
-
 syn_screen.at-880-prog.cob:7.19-7.23:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          PROCEDURE        DIVISION.
    7 >            DISPLAY WITH CONVERSION "Whatever".
 ----                      ^^^^
-   8              STOP RUN.
->> Error: Invalid syntax
-
-syn_screen.at-880-prog.cob:7.23:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            DISPLAY WITH CONVERSION "Whatever".
-----                          ^
-   8              STOP RUN.
->> Hint: Missing NO ADVANCING .
-
-syn_screen.at-880-prog.cob:7.24-7.34:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            DISPLAY WITH CONVERSION "Whatever".
-----                           ^^^^^^^^^^
-   8              STOP RUN.
->> Error: Invalid syntax
-
-syn_screen.at-880-prog.cob:7.35-7.45:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            DISPLAY WITH CONVERSION "Whatever".
-----                                      ^^^^^^^^^^
    8              STOP RUN.
 >> Error: Invalid syntax
 

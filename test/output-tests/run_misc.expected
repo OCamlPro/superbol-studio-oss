@@ -437,16 +437,6 @@ run_misc.at-1559-callee2.cob:10.11-10.19:
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1557:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1607:0
-run_misc.at-1607-callee.cob:13.38-13.44:
-  10          01  PARAM2       PIC 9999 COMP.
-  11          PROCEDURE        DIVISION USING PARAM1 PARAM2.
-  12              ADD 1 TO COUNTER END-ADD
-  13 >            CALL 'C$PARAMSIZE' USING 1 GIVING LPARAM END-CALL
-----                                         ^^^^^^
-  14              DISPLAY 'COUNTER = ' COUNTER ' LPARAM1 = ' LPARAM
-  15                      ' PARAM1 = ' PARAM1
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1606:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1659:0
 run_misc.at-1659-dump.c:5.6-5.7:
@@ -3180,45 +3170,6 @@ run_misc.at-7160-prog.cob:12.23-12.35:
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7163:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7188:0
-run_misc.at-7188-prog.cob:6.27-6.29:
-   3          PROGRAM-ID.      prog.
-   4   
-   5          PROCEDURE DIVISION.
-   6 >            DISPLAY "hello" AT COLUMN 500
-----                              ^^
-   7                  ON EXCEPTION
-   8                      GOBACK RETURNING 0
->> Error: Invalid syntax
-
-run_misc.at-7188-prog.cob:7.15-7.27:
-   4   
-   5          PROCEDURE DIVISION.
-   6              DISPLAY "hello" AT COLUMN 500
-   7 >                ON EXCEPTION
-----                  ^^^^^^^^^^^^
-   8                      GOBACK RETURNING 0
-   9                  NOT ON EXCEPTION
->> Error: Invalid syntax
-
-run_misc.at-7188-prog.cob:9.15-9.31:
-   6              DISPLAY "hello" AT COLUMN 500
-   7                  ON EXCEPTION
-   8                      GOBACK RETURNING 0
-   9 >                NOT ON EXCEPTION
-----                  ^^^^^^^^^^^^^^^^
-  10                      GOBACK RETURNING 1
-  11              END-DISPLAY
->> Error: Invalid syntax
-
-run_misc.at-7188-prog.cob:11.11-11.22:
-   8                      GOBACK RETURNING 0
-   9                  NOT ON EXCEPTION
-  10                      GOBACK RETURNING 1
-  11 >            END-DISPLAY
-----              ^^^^^^^^^^^
-  12              .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7229:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7267:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7296:0
@@ -6830,25 +6781,6 @@ run_misc.at-13127-prog.cob:21.36:
 >> Hint: Missing FROM <subscripts>
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13174:0
-run_misc.at-13174-prog.cob:19.12-19.24:
-  16          DISPLAY "This is also sent to SYSERR  " note UPON SYSERR.
-  17          DISPLAY "This is also sent to PRINTER " note UPON PRINTER.
-  18          DISPLAY "This is sent to SYSPUNCH " note UPON SYSPUNCH
-  19 >             ON EXCEPTION DISPLAY 'NO ...'        UPON SYSERR.
-----               ^^^^^^^^^^^^
-  20          DISPLAY "This is also sent to SYSPUNCH " note UPON SYSPCH
-  21               ON EXCEPTION DISPLAY ' ... SYSPUNCH' UPON SYSERR.
->> Error: Invalid syntax
-
-run_misc.at-13174-prog.cob:21.12-21.24:
-  18          DISPLAY "This is sent to SYSPUNCH " note UPON SYSPUNCH
-  19               ON EXCEPTION DISPLAY 'NO ...'        UPON SYSERR.
-  20          DISPLAY "This is also sent to SYSPUNCH " note UPON SYSPCH
-  21 >             ON EXCEPTION DISPLAY ' ... SYSPUNCH' UPON SYSERR.
-----               ^^^^^^^^^^^^
-  22          STOP RUN RETURNING 0.
->> Error: Invalid syntax
-
 run_misc.at-13174-prog.cob:22.15:
   19               ON EXCEPTION DISPLAY 'NO ...'        UPON SYSERR.
   20          DISPLAY "This is also sent to SYSPUNCH " note UPON SYSPCH

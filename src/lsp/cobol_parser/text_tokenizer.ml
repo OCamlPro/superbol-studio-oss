@@ -46,12 +46,14 @@ let combined_tokens =
     NOT_AT_EOP, "NOT_AT_EOP";
     WITH_DATA, "WITH_DATA";
     NO_DATA, "NO_DATA";
+    WITH_NO_ADVANCING, "WITH_NO_ADVANCING";
     IS_GLOBAL, "IS_GLOBAL";
     IS_EXTERNAL, "IS_EXTERNAL";
     IS_TYPEDEF, "IS_TYPEDEF";
     DATA_RECORD, "DATA_RECORD";
     DATA_RECORDS, "DATA_RECORDS";
     NEXT_PAGE, "NEXT_PAGE";
+    NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str } =
@@ -216,6 +218,10 @@ let preproc_n_combine_tokens ~source_format =
     | WITH :: DATA :: _                -> subst_n WITH_DATA 2
     | NO :: DATA :: _                  -> subst_n NO_DATA 2
 
+    | [WITH; NO]                     -> Error `MissingInputs
+    | WITH :: NO :: ADVANCING :: _     -> subst_n WITH_NO_ADVANCING 3
+    | NO :: ADVANCING :: _             -> subst_n WITH_NO_ADVANCING 2
+
     | [IS]                           -> Error `MissingInputs
     | IS :: GLOBAL :: _                -> subst_n IS_GLOBAL 2
     | IS :: EXTERNAL :: _              -> subst_n IS_EXTERNAL 2
@@ -227,6 +233,7 @@ let preproc_n_combine_tokens ~source_format =
 
     | [NEXT]                         -> Error `MissingInputs
     | NEXT :: PAGE :: _                -> subst_n NEXT_PAGE 2
+    | NEXT :: SENTENCE :: _            -> subst_n NEXT_SENTENCE 2
 
     | [CONSTANT]                     -> Error `MissingInputs
     | CONSTANT :: RECORD :: _          -> subst_n CONSTANT_RECORD 2
@@ -497,8 +504,8 @@ let next_token (s: _ state) =
   let rec aux = function
     | { payload = INTERVENING_ ','; _ } :: tokens ->
         aux tokens
-    | { payload = INTERVENING_ '.'; loc } :: tokens ->
-        Some (s, PERIOD &@ loc, tokens)
+    | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
+        Some (emit_token s (PERIOD &@ loc), token, tokens)
     | token :: tokens ->
         Some (emit_token s token, token, tokens)
     | [] ->
