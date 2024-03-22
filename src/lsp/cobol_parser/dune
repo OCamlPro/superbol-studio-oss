@@ -26,7 +26,7 @@
 ; use field 'dune-trailer' to add more stuff here
 (menhir (modules grammar_tokens grammar_common grammar)
         (merge_into grammar)
-        (flags --inspection --cmly --table --strict --explain
+        (flags --inspection --cmly --table --strict
 
                --external-tokens Grammar_tokens
                --unused-tokens))
