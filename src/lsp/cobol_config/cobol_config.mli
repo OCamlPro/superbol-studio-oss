@@ -43,6 +43,7 @@ val default_search_path: string list Lazy.t
     case [search_path] is not provided. *)
 val from_file
   : ?search_path: string list
+  -> ?verbose:bool
   -> string
   -> (module T) Cobol_common.Diagnostics.with_diags
 
@@ -51,6 +52,7 @@ val from_file
     given for {!from_file} applies here as well. *)
 val from_dialect
   : ?search_path: string list
+  -> ?verbose:bool
   -> Types.DIALECT.t
   -> (module T) Cobol_common.Diagnostics.with_diags
 

@@ -62,23 +62,23 @@ let fold_screen_section' (v: _ #folder) =
 
 let fold_data_division (v: _#folder) =
   handle v#fold_data_division
-    ~continue:begin fun { file_section; working_storage_section;
-                          linkage_section; communication_section;
-                          local_storage_section; report_section;
-                          screen_section } x -> x
-      >> fold_option v file_section
+    ~continue:begin fun { file_sections; working_storage_sections;
+                          linkage_sections; communication_sections;
+                          local_storage_sections; report_sections;
+                          screen_sections } x -> x
+      >> fold_list v file_sections
         ~fold:fold_file_section'
-      >> fold_option v working_storage_section
+      >> fold_list v working_storage_sections
         ~fold:fold_working_storage_section'
-      >> fold_option v linkage_section
+      >> fold_list v linkage_sections
         ~fold:fold_linkage_section'
-      >> fold_option v communication_section
+      >> fold_list v communication_sections
         ~fold:fold_communication_section'
-      >> fold_option v local_storage_section
+      >> fold_list v local_storage_sections
         ~fold:fold_local_storage_section'
-      >> fold_option v report_section
+      >> fold_list v report_sections
         ~fold:fold_report_section'
-      >> fold_option v screen_section
+      >> fold_list v screen_sections
         ~fold:fold_screen_section'
     end
 

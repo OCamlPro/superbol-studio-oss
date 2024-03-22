@@ -106,7 +106,7 @@ class virtual ['a] folder = object
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
   method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
-  method fold_goback'        : (raising option with_loc       , 'a) fold = default
+  method fold_goback'        : (goback_stmt    with_loc       , 'a) fold = default
   method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
   method fold_goto_depending': (goto_depending_stmt with_loc  , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
@@ -470,7 +470,11 @@ let fold_generate' (v: _ #folder) =
   handle' v#fold_generate' v ~fold:fold_name'
 
 let fold_goback' (v: _ #folder) =
-  handle' v#fold_goback' v ~fold:(fold_option ~fold:fold_raising)
+  handle' v#fold_goback' v
+    ~fold:(fun v { goback_raising ; goback_returning } x -> x
+            >> fold_option ~fold:fold_raising v goback_raising
+            >> fold_ident_or_intlit'opt v goback_returning
+      )
 
 let fold_goto' (v: _ #folder) =
   handle' v#fold_goto' v
@@ -796,7 +800,10 @@ and fold_accept' (v: _ #folder) : accept_stmt with_loc -> 'a -> 'a =
           >> fold_dual_handler v on_exception
       | AcceptFromEnv { item; env_item; on_exception } -> x
           >> fold_ident' v item
-          >> fold' ~fold:fold_ident_or_nonnum v env_item
+          >> fold_option ~fold:fold_ident_or_nonnum' v env_item
+          >> fold_dual_handler v on_exception
+      | AcceptFromArg { item; on_exception } -> x
+          >> fold_ident' v item
           >> fold_dual_handler v on_exception
     end
 

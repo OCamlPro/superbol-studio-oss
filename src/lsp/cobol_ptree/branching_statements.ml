@@ -184,7 +184,12 @@ and accept_stmt =
   | AcceptFromEnv of                                                    (* MF *)
       {
         item: ident with_loc;
-        env_item: ident_or_nonnum with_loc;
+        env_item: ident_or_nonnum with_loc option;
+        on_exception: dual_handler;
+      }
+  | AcceptFromArg of                                                    (* MF *)
+      {
+        item: ident with_loc;
         on_exception: dual_handler;
       }
 
@@ -418,7 +423,11 @@ and read_error =
   | ReadAtEnd
   | ReadInvalidKey
 
-
+and goback_stmt =
+  {
+    goback_raising : raising option;
+    goback_returning: ident_or_intlit with_loc option;
+  }
 
 and statement =
   (* TODO: split composed high-level (that depend on statement), and basic
@@ -445,7 +454,7 @@ and statement =
   | Generate of name with_loc
   | GoTo of goto_stmt
   | GoToDepending of goto_depending_stmt
-  | GoBack of raising option
+  | GoBack of goback_stmt
   | If of if_stmt
   | Initialize of initialize_stmt
   | Initiate of name with_loc list
@@ -658,33 +667,46 @@ and pp_if_stmt ppf { condition = c; then_branch = t; else_branch = e } =
 and pp_accept_stmt ppf = function
   | AcceptGeneric item -> Fmt.pf ppf "ACCEPT@ %a" (pp_with_loc pp_ident) item
   | AcceptFromDevice { item; device_item = di } ->
-    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
-      (pp_with_loc pp_ident) item
-      (pp_with_loc pp_integer) di
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        (pp_with_loc pp_integer) di
   | AcceptTemporal { item; date_time = dt } ->
-    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
-      (pp_with_loc pp_ident) item
-      pp_date_time dt
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        pp_date_time dt
   | AcceptMisc { item; misc = m } ->
-    Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
-      (pp_with_loc pp_ident) item
-      pp_accept_misc m
+      Fmt.pf ppf "ACCEPT@ %a@ FROM@ %a"
+        (pp_with_loc pp_ident) item
+        pp_accept_misc m
   | AcceptMsgCount cnt ->
-    Fmt.pf ppf "ACCEPT@ %a@ MESSAGE@ COUNT" (pp_with_loc pp_integer) cnt
+      Fmt.pf ppf "ACCEPT@ %a@ MESSAGE@ COUNT" (pp_with_loc pp_integer) cnt
   | AcceptScreen { item; clauses; on_exception } ->
-    Fmt.pf ppf "@[ACCEPT@ %a" (pp_with_loc pp_ident) item;
-    Fmt.pf ppf "@ %a"
-      Fmt.(list (pp_with_loc pp_accept_clause)) clauses;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception;
-    Fmt.pf ppf "@]"
-  | AcceptFromEnv { item; env_item = ei; on_exception } ->
-    Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ENVIRONMENT@;<1 2>%a"
-      Fmt.(box (pp_with_loc pp_ident)) item
-      Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei;
-    pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
-      ppf on_exception;
-    Fmt.pf ppf "@]"
+      Fmt.pf ppf "@[ACCEPT@ %a" (pp_with_loc pp_ident) item;
+      Fmt.pf ppf "@ %a"
+        Fmt.(list (pp_with_loc pp_accept_clause)) clauses;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]";
+  | AcceptFromEnv { item; env_item; on_exception } ->
+      Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM "
+        Fmt.(box (pp_with_loc pp_ident)) item;
+      begin
+        match env_item with
+        | Some ei ->
+            Fmt.pf ppf "ENVIRONMENT@;<1 2>%a"
+              Fmt.(box (pp_with_loc pp_ident_or_nonnum)) ei
+        | None ->
+            Fmt.pf ppf "ENVIRONMENT-VALUE"
+      end;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]"
+  | AcceptFromArg { item; on_exception } ->
+      Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ARGUMENT-VALUE"
+        Fmt.(box (pp_with_loc pp_ident)) item;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]"
 
 and pp_accept_misc ppf = function
   | AcceptLineNumber -> Fmt.pf ppf "LINE NUMBER"
@@ -969,7 +991,11 @@ and pp_statement ppf = function
       Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
   | GoTo s -> pp_goto_stmt ppf s
   | GoToDepending s -> pp_goto_depending_stmt ppf s
-  | GoBack oro -> Fmt.pf ppf "GOBACK%a" Fmt.(option (sp ++ pp_raising)) oro
+  | GoBack s ->
+    Fmt.pf ppf "GOBACK%a"
+      Fmt.(option (sp ++ pp_raising)) s.goback_raising;
+    Option.iter (Fmt.pf ppf "@ %a" (pp_with_loc pp_ident_or_intlit))
+      s.goback_returning
   | If s -> pp_if_stmt ppf s
   | Initialize s -> pp_initialize_stmt ppf s
   | Initiate ns ->

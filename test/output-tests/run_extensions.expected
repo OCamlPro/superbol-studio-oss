@@ -1731,22 +1731,6 @@ run_extensions.at-2595-prog1.cob:5.24-5.33:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2595:0
-run_extensions.at-2595-prog2.cob:5.17:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog2.
-   4          PROCEDURE        DIVISION.
-   5 >            GOBACK GIVING 2.
-----                    ^
->> Hint: Missing .
-
-run_extensions.at-2595-prog2.cob:5.18-5.24:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog2.
-   4          PROCEDURE        DIVISION.
-   5 >            GOBACK GIVING 2.
-----                     ^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2638:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2639:0
 run_extensions.at-2639-hello.cob:14.7-14.12:
@@ -1824,66 +1808,6 @@ run_extensions.at-2760-prog.cob:11.23-11.24:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2809:0
-run_extensions.at-2809-prog.cob:12.24:
-   9          PROCEDURE        DIVISION.
-  10              DISPLAY "TEST_ENV" UPON ENVIRONMENT-NAME
-  11              END-DISPLAY.
-  12 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                           ^
-  13              END-ACCEPT.
-  14              DISPLAY "(" X ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:12.25-12.42:
-   9          PROCEDURE        DIVISION.
-  10              DISPLAY "TEST_ENV" UPON ENVIRONMENT-NAME
-  11              END-DISPLAY.
-  12 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                            ^^^^^^^^^^^^^^^^^
-  13              END-ACCEPT.
-  14              DISPLAY "(" X ")"
->> Error: Invalid syntax
-
-run_extensions.at-2809-prog.cob:18.24:
-  15              END-DISPLAY.
-  16              DISPLAY "RXW" UPON ENVIRONMENT-VALUE
-  17              END-DISPLAY.
-  18 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                           ^
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:18.25-18.42:
-  15              END-DISPLAY.
-  16              DISPLAY "RXW" UPON ENVIRONMENT-VALUE
-  17              END-DISPLAY.
-  18 >            ACCEPT X FROM ENVIRONMENT-VALUE
-----                            ^^^^^^^^^^^^^^^^^
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
->> Error: Invalid syntax
-
-run_extensions.at-2809-prog.cob:22.24:
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
-  21              END-DISPLAY.
-  22 >            ACCEPT Y FROM ARGUMENT-VALUE
-----                           ^
-  23              END-ACCEPT.
-  24              DISPLAY "(" Y ")"
->> Hint: Missing <word>
-
-run_extensions.at-2809-prog.cob:22.25-22.39:
-  19              END-ACCEPT.
-  20              DISPLAY "(" X ")"
-  21              END-DISPLAY.
-  22 >            ACCEPT Y FROM ARGUMENT-VALUE
-----                            ^^^^^^^^^^^^^^
-  23              END-ACCEPT.
-  24              DISPLAY "(" Y ")"
->> Error: Invalid syntax
-
 run_extensions.at-2809-prog.cob:26.24:
   23              END-ACCEPT.
   24              DISPLAY "(" Y ")"

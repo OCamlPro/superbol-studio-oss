@@ -301,7 +301,8 @@ let semtoks_from_ptree ~filename ?range ptree =
       | AcceptMisc _
       | AcceptMsgCount _
       | AcceptScreen _
-      | AcceptFromEnv _ ->
+      | AcceptFromEnv _
+      | AcceptFromArg _ ->
           Visitor.do_children acc
 
     method! fold_allocate' {payload = { allocate_kind;

@@ -2308,16 +2308,6 @@ syn_misc.at-4771-prog.cob:17.11-17.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4859:0
-syn_misc.at-4859-prog1.cob:30.7-30.22:
-  27         DDATA
-  28         D   DIVISION
-  29         D   .
-  30 >        WORKING-STORAGE
-----          ^^^^^^^^^^^^^^^
-  31             SECTION
-  32             .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4860:0
 syn_misc.at-4860-prog2.cob:2.7-2.9:
    1   

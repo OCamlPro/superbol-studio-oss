@@ -115,7 +115,7 @@ let get () =
     EZCMD.info ~docv:"DIRECTORY" "Add DIRECTORY to library search path";
   ] in
 
-
+  let verbose = !Globals.verbosity > 0 in
   let get () =
     let config =
       DIAGS.show_n_forget @@
@@ -123,9 +123,9 @@ let get () =
       | "", None ->
           DIAGS.result Cobol_config.default
       | "", Some d ->
-          Cobol_config.from_dialect d
+          Cobol_config.from_dialect ~verbose d
       | s, None ->
-          Cobol_config.from_file s
+          Cobol_config.from_file ~verbose s
       | _ ->
           Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
                            used together"
@@ -142,7 +142,6 @@ let get () =
       then EnableRecovery { silence_benign_recoveries = false }
       else DisableRecovery
     in
-    let verbose = !Globals.verbosity > 0 in
     let env =
       List.fold_right begin fun definition env ->
         try

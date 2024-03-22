@@ -53,8 +53,8 @@ let __init_default_exn_printers =
 
 (* Intermediate converters *)
 
-let cobol_config_from_dialect_name dialect_name =
-  try Cobol_config.(from_dialect @@ DIALECT.of_string dialect_name) with
+let cobol_config_from_dialect_name ~verbose dialect_name =
+  try Cobol_config.(from_dialect ~verbose @@ DIALECT.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
   | Cobol_config.ERROR e ->
@@ -179,11 +179,11 @@ let get_indent_config toml =
 
    For now, many of the `get_*` functions just raise {!ERROR}. *)
 
-let load_file ?verbose config_filename =
+let load_file ?(verbose=false) config_filename =
   let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name @@ get_dialect section in
+      cobol_config_from_dialect_name ~verbose @@ get_dialect section in
     DIAGS.result ~diags
       { default with
         cobol_config;
@@ -193,7 +193,7 @@ let load_file ?verbose config_filename =
         indent_config = get_indent_config section }
   in
   try
-    let toml_handle = Ezr_toml.load ?verbose config_filename in
+    let toml_handle = Ezr_toml.load ~verbose config_filename in
     let DIAGS.{ result; _ } as config =
       let toml = Ezr_toml.toml toml_handle in
       try load_section toml_handle toml [config_section_name]
@@ -210,14 +210,14 @@ let save ?verbose ~config_filename config =
   Ezr_toml.save ?verbose config_filename config.toml_handle
 
 
-let reload ?verbose ~config_filename config =
+let reload ?(verbose=false) ~config_filename config =
   let reload_section keys toml =
     (* Note: we only mutate [config] when items have been properly
        parsed/checked, so that [config] remains unchanged in case an exception
        is thrown. *)
     let section = TOML.get keys toml in
     let DIAGS.{ result = cobol_config; diags } =
-      cobol_config_from_dialect_name @@ get_dialect section
+      cobol_config_from_dialect_name ~verbose @@ get_dialect section
     and source_format = get_source_format section
     and libpath = get_libpath section
     and indent_config = get_indent_config section in
@@ -234,7 +234,7 @@ let reload ?verbose ~config_filename config =
     DIAGS.result changed ~diags
   in
   try
-    Ezr_toml.reload ?verbose config_filename config.toml_handle;
+    Ezr_toml.reload ~verbose config_filename config.toml_handle;
     let toml = Ezr_toml.toml config.toml_handle in
     try
       reload_section toml [config_section_name]

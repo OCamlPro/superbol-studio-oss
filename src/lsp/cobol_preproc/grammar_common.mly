@@ -32,6 +32,9 @@
 %public %inline ll(X):
  | l = ll_rev(X) { List.rev l }
 
+%public rll_rev [@recovery []] [@symbol ""] (X):             (* auto-recovery *)
+ | x = ll_rev(X) { x }
+
 ll_rev(X):
  | /* empty */         { [] }
  | l = ll_rev(X) x = X { x :: l }

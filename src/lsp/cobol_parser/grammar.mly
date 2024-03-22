@@ -25,11 +25,15 @@ end
 let split_last l =
   List.(let rl = rev l in hd rl, rev (tl rl))
 
+let srcloc location_limits =
+  Grammar_utils.Overlay_manager.join_limits location_limits
+
 let with_loc token location_limits =
   token &@ Grammar_utils.Overlay_manager.join_limits location_limits
 
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
+
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)
@@ -74,6 +78,8 @@ let dual_handler_none =
 
 %nonassoc lowest
 %nonassoc ELSE
+
+%nonassoc FD SD
 
 (* Set precedence of statements to be higher than imperative statement *)
 (* This helps resolve conflicts in lists of statements, by prefering shift *)
@@ -323,7 +329,7 @@ program_definition_no_end:
  | pid = program_definition_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(program_procedure_division))
    { let h, ((program_name, program_as), mode), ip1 = pid in
      let ip0 = match h with None -> [] | Some h -> h in
@@ -336,7 +342,7 @@ program_definition_no_end:
                              nested_programs = []; mode };
        program_options = opo;
        program_env = edo;
-       program_data = ddo;
+       program_data = build_data_division ddo;
        program_proc = pdo;
        program_end_name = None } }
 (* Note: END PROGRAM is not mandatory on last top-level program
@@ -346,7 +352,7 @@ program_prototype [@cost 999]:
  | pid = program_prototype_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END PROGRAM ep = loc(infoword_or_literal)? "."
    { let _, (program_name, program_as) = pid in
@@ -355,7 +361,7 @@ program_prototype [@cost 999]:
        program_level = ProgramPrototype;
        program_options = opo;
        program_env = edo;
-       program_data = ddo;
+       program_data = build_data_division ddo;
        program_proc = pdo;
        program_end_name = ep } }
 
@@ -363,7 +369,7 @@ function_unit [@cost 999]:
  | fid = function_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END FUNCTION ef = name "."
    { let _, (name, as_, is_proto) = fid in
@@ -372,7 +378,7 @@ function_unit [@cost 999]:
        function_is_proto = is_proto;
        function_options = opo;
        function_env = edo;
-       function_data = ddo;
+       function_data = build_data_division ddo;
        function_proc = pdo;
        function_end_name = ef } } (* TODO: shoudn't we just check ef == name? *)
 
@@ -400,26 +406,26 @@ factory_definition:
  | fp = factory_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(object_procedure_division))
    END FACTORY "."
     { { factory_implements = snd fp;
         factory_options = opo;
         factory_env = edo;
-        factory_data = ddo;
+        factory_data = build_data_division ddo;
         factory_methods = pdo } }
 
 instance_definition:
  | op = instance_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(object_procedure_division))
    END OBJECT "."
     { { instance_implements = snd op;
         instance_options = opo;
         instance_env = edo;
-        instance_data = ddo;
+        instance_data = build_data_division ddo;
         instance_methods = pdo } }
 
 interface_definition [@cost 999]:
@@ -443,7 +449,7 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
  | mid = method_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   ddo = ro(loc(data_division))
+   ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
    END METHOD em = name "."
    { let _, (method_name, method_kind,
@@ -454,7 +460,7 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_final;
        method_options = opo;
        method_env = edo;
-       method_data = ddo;
+       method_data = build_data_division ddo;
        method_proc = pdo;
        method_end_name = em } }
 
@@ -502,7 +508,7 @@ let program_mode :=
         prog_kind = Some pk } }
   | pk = loc(program_kind); COMMON;
     { { prog_is_common = true;
-        prog_kind = Some pk } } 
+        prog_kind = Some pk } }
   | pk = loc(program_kind);
     { { prog_is_common = true;
         prog_kind = Some pk } }
@@ -1069,37 +1075,27 @@ type declaration entry =
 *)
 
 let data_division :=
- | DATA; DIVISION; ".";
-   fso  = ro(file_section);
-   wsso = ro(working_storage_section);
-   lsso = ro(local_storage_section);                              (* +COB2002 *)
-   lso  = ro(linkage_section);
-   cso  = ro(communication_section);                              (* -COB2002 *)
-   rso  = ro(report_section);
-   sso  = ro(screen_section);                                     (* +COB2002 *)
-   { { file_section = fso;
-       working_storage_section = wsso;
-       local_storage_section = lsso;
-       linkage_section = lso;
-       communication_section = cso;
-       report_section = rso;
-       screen_section = sso; } }
+  | l1 = rl(data_division_sentence_1);
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
+let data_division_sentence_1 :=
+  | DATA; DIVISION; ".";         { S_DATA_DIVISION_HEADER (srcloc $sloc) }
+  | FILE ; SECTION ; ".";        { S_FILE_SECTION_HEADER (srcloc $sloc) }
+  | ~ = loc(rnel(loc(file_or_sort_merge_descr_entry))); <S_FILE_SECTION>
+
+let data_division_sentence_2 :=
+  | s = working_storage_section; { S_WORKING_STORAGE_SECTION s }
+  | s = local_storage_section;   { S_LOCAL_STORAGE_SECTION s }
+  | s = linkage_section;         { S_LINKAGE_SECTION s }
+  | s = communication_section;   { S_COMMUNICATION_SECTION s }
+  | s = report_section;          { S_REPORT_SECTION s }
+  | s = screen_section;          { S_SCREEN_SECTION s }
 
 let section(K, L) ==
   | ~ = loc(section_header_n_items(K,L)); < >
 let section_header_n_items(K, L) ==
   | K; SECTION; "."; ~ = rl(loc(L)); < >
-
-(* Section with optional header, especially on MF *)
-let section_opt_header(K, L) ==
-  | ~ = loc(section_opt_header_n_items(K,L)); < >
-let section_opt_header_n_items(K, L) ==
-  | K; SECTION; "."; ~ = rl(loc(L)); < >
-  | ~ = rnel(loc(L));   < >
-
-let file_section :=
-  | ~ = section_opt_header (FILE, file_or_sort_merge_descr_entry); < >
 
 let working_storage_section :=
   | ~ = section (WORKING_STORAGE, constant_or_data_descr_entry); < >
@@ -2871,7 +2867,15 @@ accept_statement [@context accept_stmt]:
  | ACCEPT item = loc(ident)                              (* MF *)
    FROM ENVIRONMENT env_item = loc(ident_or_nonnumeric_no_all)
    on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
-   { AcceptFromEnv { item; env_item; on_exception } }
+   { AcceptFromEnv { item; env_item = Some env_item; on_exception } }
+ | ACCEPT item = loc(ident)                                             (* MF *)
+   FROM ENVIRONMENT_VALUE
+   on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
+   { AcceptFromEnv { item; env_item = None; on_exception } }
+ | ACCEPT item = loc(ident)                                             (* MF *)
+   FROM ARGUMENT_VALUE
+   on_exception = handler_opt(on_exception,NOT_ON_EXCEPTION) end_accept
+   { AcceptFromArg { item; on_exception } }
 
 let end_accept := oterm_(END_ACCEPT)
 
@@ -3288,9 +3292,13 @@ let go_to_statement :=
 
 %public let unconditional_action := ~ = goback_statement; < >
 let goback_statement :=
- | GOBACK; ~ = ro(raising_exception); <GoBack>
+  | GOBACK;
+    goback_raising = ro(raising_exception);
+    goback_returning = ro(goback_returning);
+    { GoBack { goback_raising ; goback_returning } }
 
-
+let goback_returning :=
+  | or_(RETURNING,GIVING); ~ = loc(ident_or_integer); < >
 
 (* IF STATEMENT *)
 

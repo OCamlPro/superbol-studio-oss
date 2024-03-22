@@ -78,26 +78,6 @@ used_binaries.at-743-called.cob:9.32-9.44:
   11              ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
 >> Error: Invalid syntax
 
-used_binaries.at-743-called.cob:11.30:
-   8          PROCEDURE        DIVISION.
-   9              ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
-  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
-  11 >            ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
-----                                 ^
-  12              DISPLAY CLI-ARGS ":" ARG-TWO END-DISPLAY.
-  13              EXIT PROGRAM.
->> Hint: Missing <word>
-
-used_binaries.at-743-called.cob:11.31-11.45:
-   8          PROCEDURE        DIVISION.
-   9              ACCEPT CLI-ARGS FROM COMMAND-LINE END-ACCEPT.
-  10              DISPLAY 2 UPON ARGUMENT-NUMBER END-DISPLAY.
-  11 >            ACCEPT ARG-TWO FROM ARGUMENT-VALUE END-ACCEPT.
-----                                  ^^^^^^^^^^^^^^
-  12              DISPLAY CLI-ARGS ":" ARG-TWO END-DISPLAY.
-  13              EXIT PROGRAM.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:826:0
 used_binaries.at-826-prog.cob:6.38-6.39:

@@ -99,7 +99,8 @@ let update_source_format { config; _ } str : bool =
 let update_dialect ({ config; _ } as project) str : bool =
   try
     let { result; diags } =
-      Superbol_project.Config.cobol_config_from_dialect_name str in
+      Superbol_project.Config.cobol_config_from_dialect_name
+        ~verbose:false str in
     if result = config.cobol_config            (* note: structural comparison *)
     then false
     else begin

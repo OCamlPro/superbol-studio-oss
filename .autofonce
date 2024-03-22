@@ -30,11 +30,22 @@ file = "import/gnucobol/tests/testsuite.at"
 path = [ "import/gnucobol/tests/testsuite.src"]
 env = "testsuite"
 
+[testsuites]
+# alias = "path-from-topdir"
+[testsuites.syntax]
+file = "test/syntax-todo/syntax.at"
+path = [ "test/syntax-todo"]
+env = "syntax"
+
 [envs]
 # env_name = """..."""
 # env_name = "<local-path-to-env-file"
 testsuite = """
 export COB_CONFIG_DIR="$AUTOFONCE_SOURCE_DIR/import/gnucobol/config"
+"""
+
+syntax = """
+export SUPERBOL=$AUTOFONCE_SOURCE_DIR/superbol-free-linux-x64
 """
 
 [project]
