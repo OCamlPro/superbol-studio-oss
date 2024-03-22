@@ -23,9 +23,9 @@ val relation_condition
 
 
 type data_division_sentence =
-  | S_DATA_DIVISION
-  | S_FILE_SECTION
-  | S_FILE_SECTION_PART of file_descr with_loc list with_loc
+  | S_DATA_DIVISION_HEADER
+  | S_FILE_SECTION_HEADER
+  | S_FILE_SECTION of file_descr with_loc list with_loc
   | S_WORKING_STORAGE_SECTION of working_storage_section with_loc
   | S_LOCAL_STORAGE_SECTION of local_storage_section with_loc
   | S_LINKAGE_SECTION of linkage_section with_loc

@@ -1072,10 +1072,9 @@ let data_division :=
     { l1 @ l2 }
 
 let data_division_sentence_1 :=
-  | DATA; DIVISION; ".";         { S_DATA_DIVISION }
-  | FILE ; SECTION ; ".";        { S_FILE_SECTION }
-  | s = loc(rnel(loc(file_or_sort_merge_descr_entry)));
-    { S_FILE_SECTION_PART s }
+  | DATA; DIVISION; ".";         { S_DATA_DIVISION_HEADER }
+  | FILE ; SECTION ; ".";        { S_FILE_SECTION_HEADER }
+  | ~ = loc(rnel(loc(file_or_sort_merge_descr_entry))); <S_FILE_SECTION>
 
 let data_division_sentence_2 :=
   | s = working_storage_section; { S_WORKING_STORAGE_SECTION s }
