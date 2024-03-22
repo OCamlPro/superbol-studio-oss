@@ -3492,9 +3492,10 @@ let perform_statement [@context perform_stmt] :=
    { PerformTarget { perform_target = { procedure_start = i;
                                         procedure_end = io };
                      perform_mode = po } }
- | PERFORM; po = ro(perform_phrase); isl = imp_stmts; END_PERFORM;
+ | PERFORM; po = ro(perform_phrase); islo = imp_stmts?; END_PERFORM;
    { PerformInline { perform_inline_mode = po;
-                     perform_statements = isl } }
+                     perform_statements =
+                       match islo with Some isl -> isl | None -> [] } }
 
 let perform_phrase :=
  | FOREVER; { PerformForever } (* GC/COBOL-IT extension *)

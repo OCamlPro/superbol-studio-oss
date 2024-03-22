@@ -51,9 +51,9 @@ Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Sort/InputSORT.CBL':
 Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Sort/MaleSORT.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Strings/RefMod.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateDriver.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiDate.cbl':

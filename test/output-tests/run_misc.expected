@@ -565,16 +565,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2517:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2543:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2586:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2612:0
-run_misc.at-2612-prog.cob:10.11-10.22:
-   7          PROCEDURE        DIVISION.
-   8              PERFORM VARYING INDVAL FROM 1
-   9               BY 1 UNTIL INDVAL > 2
-  10 >            END-PERFORM
-----              ^^^^^^^^^^^
-  11              IF INDVAL NOT = 3
-  12                 DISPLAY INDVAL
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:2636:0
 run_misc.at-2636-prog.cob:9.33-9.34:
    6          01  INDVAL       PIC 9(4).
