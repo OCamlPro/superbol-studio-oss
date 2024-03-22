@@ -25,6 +25,9 @@ end
 let split_last l =
   List.(let rl = rev l in hd rl, rev (tl rl))
 
+let srcloc location_limits =
+  Grammar_utils.Overlay_manager.join_limits location_limits
+
 let with_loc token location_limits =
   token &@ Grammar_utils.Overlay_manager.join_limits location_limits
 
@@ -1068,12 +1071,12 @@ type declaration entry =
 
 let data_division :=
   | l1 = rl(data_division_sentence_1);
-    l2 = rl(data_division_sentence_2);
-    { l1 @ l2 }
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
 let data_division_sentence_1 :=
-  | DATA; DIVISION; ".";         { S_DATA_DIVISION_HEADER }
-  | FILE ; SECTION ; ".";        { S_FILE_SECTION_HEADER }
+  | DATA; DIVISION; ".";         { S_DATA_DIVISION_HEADER (srcloc $sloc) }
+  | FILE ; SECTION ; ".";        { S_FILE_SECTION_HEADER (srcloc $sloc) }
   | ~ = loc(rnel(loc(file_or_sort_merge_descr_entry))); <S_FILE_SECTION>
 
 let data_division_sentence_2 :=

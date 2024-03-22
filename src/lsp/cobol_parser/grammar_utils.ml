@@ -34,9 +34,9 @@ let relation_condition ~neg (binrel: binary_relation) = function
 
 
 type data_division_sentence =
-  | S_DATA_DIVISION_HEADER
-  | S_FILE_SECTION_HEADER
-  | S_FILE_SECTION of file_descr with_loc list with_loc
+  | S_DATA_DIVISION_HEADER of srcloc
+  | S_FILE_SECTION_HEADER of srcloc
+  | S_FILE_SECTION of file_section with_loc
   | S_WORKING_STORAGE_SECTION of working_storage_section with_loc
   | S_LOCAL_STORAGE_SECTION of local_storage_section with_loc    (* +COB2002 *)
   | S_LINKAGE_SECTION of linkage_section with_loc
@@ -57,31 +57,40 @@ let empty_data_division = {
 let build_data_division = function
   | { payload = []; _ } -> None            (* no `DATA DIVISION` header at all *)
   | { payload = list; loc }  ->
-      let d =
-        List.fold_left begin fun d -> function
-          | S_DATA_DIVISION_HEADER
-          | S_FILE_SECTION_HEADER -> d
-          | S_FILE_SECTION ss ->
+      let ( +@+ ) = Cobol_common.Srcloc.concat in
+      let rec rebuild_sections list d =    (* sentences are in reversed order *)
+        match list with
+        | [] ->
+            d
+        | S_DATA_DIVISION_HEADER _loc :: tl
+        | S_FILE_SECTION_HEADER _loc :: tl ->
+            rebuild_sections tl d                   (* ignore lonesome header *)
+        | S_FILE_SECTION ss ::
+          S_FILE_SECTION_HEADER loc :: tl ->
+            let ss = ~&ss &@ (loc +@+ ~@ss) in
+            rebuild_sections tl
               { d with file_section = ss :: d.file_section }
-          | S_WORKING_STORAGE_SECTION ss ->
+        | S_FILE_SECTION ss :: tl ->
+            rebuild_sections tl
+              { d with file_section = ss :: d.file_section }
+        | S_WORKING_STORAGE_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with working_storage_section =
                          ss :: d.working_storage_section }
-          | S_LOCAL_STORAGE_SECTION ss ->
+        | S_LOCAL_STORAGE_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with local_storage_section = ss :: d.local_storage_section }
-          | S_LINKAGE_SECTION ss ->
+        | S_LINKAGE_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with linkage_section = ss :: d.linkage_section }
-          | S_COMMUNICATION_SECTION ss ->
+        | S_COMMUNICATION_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with communication_section = ss :: d.communication_section }
-          | S_REPORT_SECTION ss ->
+        | S_REPORT_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with report_section = ss :: d.report_section }
-          | S_SCREEN_SECTION ss ->
+        | S_SCREEN_SECTION ss :: tl ->
+            rebuild_sections tl
               { d with screen_section = ss :: d.screen_section }
-        end empty_data_division list
       in
-      Some ({ file_section = List.rev d.file_section;
-              working_storage_section = List.rev d.working_storage_section;
-              local_storage_section = List.rev d.local_storage_section;
-              linkage_section = List.rev d.linkage_section;
-              communication_section = List.rev d.communication_section;
-              report_section = List.rev d.report_section;
-              screen_section = List.rev d.screen_section } &@ loc)
+      Some (rebuild_sections list empty_data_division &@ loc)

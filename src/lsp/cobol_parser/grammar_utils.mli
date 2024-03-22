@@ -23,8 +23,8 @@ val relation_condition
 
 
 type data_division_sentence =
-  | S_DATA_DIVISION_HEADER
-  | S_FILE_SECTION_HEADER
+  | S_DATA_DIVISION_HEADER of srcloc
+  | S_FILE_SECTION_HEADER of srcloc
   | S_FILE_SECTION of file_descr with_loc list with_loc
   | S_WORKING_STORAGE_SECTION of working_storage_section with_loc
   | S_LOCAL_STORAGE_SECTION of local_storage_section with_loc
@@ -33,5 +33,6 @@ type data_division_sentence =
   | S_REPORT_SECTION of report_section with_loc
   | S_SCREEN_SECTION of screen_section with_loc
 
-val build_data_division : data_division_sentence list with_loc ->
+(* Takes a *reversed* list of sentences. *)
+val build_data_division: data_division_sentence list with_loc ->
   data_division with_loc option
