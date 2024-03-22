@@ -45,13 +45,13 @@ type data_division_sentence =
   | S_SCREEN_SECTION of screen_section with_loc                  (* +COB2002 *)
 
 let empty_data_division = {
-  file_section = [];
-  working_storage_section = [];
-  local_storage_section = [];
-  linkage_section = [];
-  communication_section = [];
-  report_section = [];
-  screen_section = [];
+  file_sections = [];
+  working_storage_sections = [];
+  local_storage_sections = [];
+  linkage_sections = [];
+  communication_sections = [];
+  report_sections = [];
+  screen_sections = [];
 }
 
 let build_data_division = function
@@ -69,28 +69,28 @@ let build_data_division = function
           S_FILE_SECTION_HEADER loc :: tl ->
             let ss = ~&ss &@ (loc +@+ ~@ss) in
             rebuild_sections tl
-              { d with file_section = ss :: d.file_section }
+              { d with file_sections = ss :: d.file_sections }
         | S_FILE_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with file_section = ss :: d.file_section }
+              { d with file_sections = ss :: d.file_sections }
         | S_WORKING_STORAGE_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with working_storage_section =
-                         ss :: d.working_storage_section }
+              { d with working_storage_sections =
+                         ss :: d.working_storage_sections }
         | S_LOCAL_STORAGE_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with local_storage_section = ss :: d.local_storage_section }
+              { d with local_storage_sections = ss :: d.local_storage_sections }
         | S_LINKAGE_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with linkage_section = ss :: d.linkage_section }
+              { d with linkage_sections = ss :: d.linkage_sections }
         | S_COMMUNICATION_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with communication_section = ss :: d.communication_section }
+              { d with communication_sections = ss :: d.communication_sections }
         | S_REPORT_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with report_section = ss :: d.report_section }
+              { d with report_sections = ss :: d.report_sections }
         | S_SCREEN_SECTION ss :: tl ->
             rebuild_sections tl
-              { d with screen_section = ss :: d.screen_section }
+              { d with screen_sections = ss :: d.screen_sections }
       in
       Some (rebuild_sections list empty_data_division &@ loc)
