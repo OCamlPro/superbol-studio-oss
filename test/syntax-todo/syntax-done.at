@@ -1,0 +1,31 @@
+
+# All of these tests have been tested as parsable by superbol-free
+
+
+AT_SETUP([Check run])
+AT_DATA([prog.cob], [
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       DATA             DIVISION.
+       WORKING-STORAGE  SECTION.
+       01 ONE   PIC 9 VALUE 1.
+       01 TWO   PIC 9 VALUE 2.
+       01 THREE PIC 9 VALUE 3.
+       PROCEDURE        DIVISION.
+           IF THREE = ONE AND TWO OR THREE
+               DISPLAY "OK"
+               END-DISPLAY
+           END-IF.
+           IF 3 = 1 OR 2 AND 3
+               DISPLAY "NO"
+               END-DISPLAY
+           END-IF.
+           STOP RUN.
+])
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
+])
+
+AT_CLEANUP
+
+
