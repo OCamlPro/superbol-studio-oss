@@ -835,8 +835,9 @@ and fold_add' (v: _ #folder) : basic_arithmetic_stmt with_loc -> 'a -> 'a =
 
 and fold_call' (v: _ #folder) : call_stmt with_loc -> 'a -> 'a =
   handle' v#fold_call' v
-    ~fold:begin fun v { call_prefix; call_using; call_returning;
-                        call_error_handler } x -> x
+    ~fold:begin fun v { call_static; call_prefix; call_using;
+                        call_returning; call_error_handler } x -> x
+      >> fold_bool v call_static
       >> fold_call_prefix v call_prefix
       >> fold_list ~fold:fold_call_using_clause' v call_using
       >> fold_ident'_opt v call_returning

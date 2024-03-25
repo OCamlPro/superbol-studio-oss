@@ -280,16 +280,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1191:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1192:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1220:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1221:0
-run_misc.at-1221-caller.cob:5.23-5.31:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      caller.
-   4          PROCEDURE        DIVISION.
-   5 >            CALL STATIC "callee"
-----                          ^^^^^^^^
-   6              END-CALL.
-   7              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1257:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1256:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1289:0
@@ -1964,16 +1954,6 @@ run_misc.at-4808-cprog.c:14.6-14.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4808:0
-run_misc.at-4808-prog.cob:9.23-9.30:
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8              SET CB TO ENTRY "callback"
-   9 >            CALL STATIC "cprog" USING BY VALUE CB
-----                          ^^^^^^^
-  10              END-CALL
-  11              EXIT PROGRAM.
->> Error: Invalid syntax
-
 run_misc.at-4808-prog.cob:19.27-19.28:
   16          ENVIRONMENT DIVISION.
   17          CONFIGURATION SECTION.
@@ -2145,16 +2125,6 @@ run_misc.at-4884-cprog.c:14.6-14.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4884:0
-run_misc.at-4884-prog.cob:11.23-11.30:
-   8          01 CB            USAGE PROGRAM-POINTER.
-   9          PROCEDURE        DIVISION.
-  10              SET CB TO ENTRY "callback"
-  11 >            CALL STATIC "cprog" USING BY VALUE CB
-----                          ^^^^^^^
-  12              END-CALL
-  13              EXIT PROGRAM.
->> Error: Invalid syntax
-
 run_misc.at-4884-prog.cob:19.27:
   16          IDENTIFICATION   DIVISION.
   17          PROGRAM-ID.      callback.
@@ -2176,16 +2146,6 @@ run_misc.at-4884-prog.cob:19.28-19.34:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4965:0
-run_misc.at-4965-prog2.cob:9.23-9.30:
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8              SET CB TO ENTRY "callback"
-   9 >            CALL STATIC "cprog" USING BY VALUE CB
-----                          ^^^^^^^
-  10              END-CALL
-  11              EXIT PROGRAM.
->> Error: Invalid syntax
-
 run_misc.at-4965-prog2.cob:21.32:
   18          01 P1            USAGE POINTER.
   19          01 P2            USAGE BINARY-LONG.
@@ -2267,16 +2227,6 @@ run_misc.at-4965-prog2.cob:22.45-22.47:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4968:0
-run_misc.at-4968-prog3.cob:9.23-9.30:
-   6          01 CB            USAGE PROGRAM-POINTER.
-   7          PROCEDURE        DIVISION.
-   8              SET CB TO ENTRY "callback"
-   9 >            CALL STATIC "cprog" USING BY VALUE CB
-----                          ^^^^^^^
-  10              END-CALL
-  11              EXIT PROGRAM.
->> Error: Invalid syntax
-
 run_misc.at-4968-prog3.cob:19.27-19.28:
   16          ENVIRONMENT DIVISION.
   17          CONFIGURATION SECTION.
@@ -2525,16 +2475,6 @@ run_misc.at-5072-callee.c:7.13-14.0:
 >> Error: Unterminated pseudotext
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5072:0
-run_misc.at-5072-caller.cob:10.23-10.31:
-   7          01 P2            PIC X(7).
-   8          77 P2-COB        PIC X(7).
-   9          PROCEDURE        DIVISION.
-  10 >            CALL STATIC 'callee' USING P1 P2
-----                          ^^^^^^^^
-  11              IF P1 NOT EQUAL "B"
-  12                 DISPLAY 'NOT A: ' P1
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5110:0
 run_misc.at-5110-callee.cob:10.16-10.22:
    7          LINKAGE          SECTION.
@@ -3148,16 +3088,6 @@ run_misc.at-7162-calldyn.c:9.6-9.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7160:0
-run_misc.at-7160-prog.cob:12.23-12.35:
-   9   
-  10          procedure division.
-  11   
-  12 >            call static "cob_getenv"
-----                          ^^^^^^^^^^^^
-  13                          using "COB_UNIX_LF"
-  14                          returning c-text-pointer
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7163:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7188:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7229:0
@@ -7020,26 +6950,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14089:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14174:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14173:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14278:0
-run_misc.at-14278-prog.cob:16.23-16.30:
-  13   
-  14         *    We use a simple wrapper to make it _less_ likely that the
-  15         *    following "real test" SIGSEGVs during MOVE
-  16 >            CALL STATIC "progt".
-----                          ^^^^^^^
-  17   
-  18         *    we don't expect to ever get here - but this creates more
->> Error: Invalid syntax
-
-run_misc.at-14278-prog.cob:20.23-20.30:
-  17   
-  18         *    we don't expect to ever get here - but this creates more
-  19         *    memory space to decrease the likelyness of a SIGSEGV more
-  20 >            CALL STATIC "dummy".
-----                          ^^^^^^^
-  21   
-  22              GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14347:0
 run_misc.at-14347-prog.c:5.6-5.7:
    2   #include <stdio.h>

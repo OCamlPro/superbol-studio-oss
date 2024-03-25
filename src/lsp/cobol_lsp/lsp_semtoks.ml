@@ -313,9 +313,10 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> add_option add_ident' allocate_returning VarModif
       |> Visitor.skip_children
 
-    method! fold_call' {payload = { call_prefix; call_using;
-                                    call_returning;
+    method! fold_call' {payload = { call_static; call_prefix;
+                                    call_using; call_returning;
                                     call_error_handler }; _} acc = acc
+      |> fold_bool self call_static
       |> fold_call_prefix self call_prefix
       |> fold_list ~fold:fold_call_using_clause' self call_using
       |> add_option add_ident' call_returning VarModif
