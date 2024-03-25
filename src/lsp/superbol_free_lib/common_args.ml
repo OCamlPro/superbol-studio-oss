@@ -115,8 +115,8 @@ let get () =
     EZCMD.info ~docv:"DIRECTORY" "Add DIRECTORY to library search path";
   ] in
 
-  let verbose = !Globals.verbosity > 0 in
   let get () =
+    let verbose = !Globals.verbosity > 0 in
     let config =
       DIAGS.show_n_forget @@
       match !conf, !dialect with
