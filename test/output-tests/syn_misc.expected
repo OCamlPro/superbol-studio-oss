@@ -2298,15 +2298,6 @@ Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4385:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4578:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4614:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4771:0
-syn_misc.at-4771-prog.cob:17.11-17.22:
-  14          PROCEDURE DIVISION.
-  15              PERFORM VARYING i FROM 1 BY 1
-  16                      UNTIL i = 5
-  17 >            END-PERFORM
-----              ^^^^^^^^^^^
-  18              .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4859:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4860:0
 syn_misc.at-4860-prog2.cob:2.7-2.9:
@@ -2488,16 +2479,6 @@ syn_misc.at-5576-prog.cob:39.11-39.23:
 ----              ^^^^^^^^^^^^
   40   
   41              PERFORM WITH TEST BEFORE UNTIL 1 <> 3
->> Error: Invalid syntax
-
-syn_misc.at-5576-prog.cob:42.11-42.22:
-  39              END-EVALUATE
-  40   
-  41              PERFORM WITH TEST BEFORE UNTIL 1 <> 3
-  42 >            END-PERFORM
-----              ^^^^^^^^^^^
-  43   
-  44              EVALUATE FALSE
 >> Error: Invalid syntax
 
 syn_misc.at-5576-prog.cob:47.11-47.23:

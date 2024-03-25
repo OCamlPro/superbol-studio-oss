@@ -697,16 +697,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5262:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5313:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5363:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5426:0
-run_fundamental.at-5426-prog.cob:30.11-30.22:
-  27              PERFORM VARYING MY-DATA-FIELD-1 FROM 1 BY 1
-  28                      UNTIL   MY-DATA-FIELD-1 > MY-DATA-FIELD-2
-  29                 *> empty by design
-  30 >            END-PERFORM.
-----              ^^^^^^^^^^^
-  31          END-PAR.
-  32              MOVE "99" TO MY-DATA-FIELD-B.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5486:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5538:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5576:0
