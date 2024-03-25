@@ -25,9 +25,9 @@ let action ~numeric ~intext ~inplace ?suffix ?range
   let module Config = (val config) in
 
   let f ?contents filename =
-    let project = Project.for_ ~filename in
+    (* let project = Project.for_ ~filename in *)
 
-    let output =
+    let output_file =
       match suffix with
       | Some ext ->
         Some ( filename ^ "." ^ ext )
@@ -38,21 +38,35 @@ let action ~numeric ~intext ~inplace ?suffix ?range
           None
     in
 
-    let edits, _ops = Cobol_indent.Main.indent
-        ~source_format
-        ~config:project.config.indent_config
-        ~dialect:Config.dialect
-        ~filename
-        ?output
-        ?range
-        ?contents
-        ()
-    in
-
-    match output with
-    | Some _ ->
-      ()
+    match output_file with
+    | Some file ->
+      let new_contents = Cobol_indent.Main.indent
+          ~source_format
+          ~filename
+          ?range
+          ?contents
+          Output_contents
+      in
+      begin
+        match file with
+        | "-" ->
+          Printf.printf "%s\n%!" new_contents
+        | _ ->
+          EzFile.write_file file new_contents;
+          Printf.eprintf "File %S generated\n%!" file
+      end
     | None ->
+      let output = Cobol_indent.Main.indent
+          ~source_format
+          (*
+          ~config:project.config.indent_config
+          ~dialect:Config.dialect
+*)
+          ~filename
+          ?range
+          ?contents
+          Output_edits
+      in
 
       if numeric then
         let source_format = Cobol_indent.Config.source_format source_format in
@@ -72,7 +86,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
               iter_edit (line+1) edit edits
             end else begin
               let indent =
-                if intext || source_format.free then
+                if intext || source_format.format = SFFree then
                   edit.offset_modif
                 else
                   source_format.skip_before + 1 + edit.offset_modif
@@ -85,19 +99,19 @@ let action ~numeric ~intext ~inplace ?suffix ?range
             | None -> 1
             | Some { start_line ; _ } -> start_line
           in
-          iter start_line edits
+          iter start_line output.edits
         in
         output_numeric stdout
       else
-      if edits = [] then
+      if output.edits = [] then
         Printf.eprintf "File %S: good indentation\n%!" filename
       else begin
         Printf.eprintf "File %S: %d lines to modify\n%!" filename
-          ( List.length edits );
+          ( List.length output.edits );
         List.iter (fun edit ->
             Printf.printf "  Line %d: move from %d to %d\n%!"
               edit.lnum edit.offset_orig edit.offset_modif
-          ) edits;
+          ) output.edits;
       end;
 
   in

@@ -20,7 +20,7 @@ let verbose = false
 
 let fixed_format = {
   name = "fixed" ;
-  free = false ;    (* whether there is an indicator or inline
+  format = SFFixed ;    (* whether there is an indicator or inline
                        comments *)
   skip_before = 6 ; (* skip 6 columns, 1..6 *)
   max_text_length = 65; (* skip columns 8..72 *)
@@ -28,7 +28,7 @@ let fixed_format = {
 
 let free_format = {
   name = "free" ;
-  free = true ;
+  format = SFFree ;
   skip_before = 0 ;
   max_text_length = 65536;
 }

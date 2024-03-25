@@ -34,3 +34,10 @@ val load :
 val to_string : Types.config -> string
 
 val generate : ?config:Types.config -> ?only_comment:bool -> string -> unit
+
+
+val free_format : Types.source_format
+val fixed_format : Types.source_format
+val variable_format : Types.source_format
+val xcard_format : Types.source_format
+val cobolx_format : Types.source_format

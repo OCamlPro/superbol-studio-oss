@@ -25,6 +25,15 @@ type edit_space_operation = {
   spaces : int ; (* positive for addition, negative for deletion *)
 }
 
+type edits = {
+  edits : indent_record list ;
+  operations : edit_space_operation list ;
+}
+
+type _ output =
+  | Output_edits : edits output
+  | Output_contents : string output
+
 type range = {
   start_line : int ;
   end_line   : int ;
@@ -32,7 +41,7 @@ type range = {
 
 type source_format = {
   name : string ;
-  free : bool  ;      (* has column identifier *)
+  format : Cobol_config.Types.source_format  ;
   skip_before : int ;      (* fixed = 6 *)
   max_text_length : int ;  (* fixed = 8..72 = 65 chars *)
 }

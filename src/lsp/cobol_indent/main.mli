@@ -12,13 +12,7 @@
 (**************************************************************************)
 
 val indent :
-  source_format:Cobol_config.source_format_spec ->
-  config: Types.unparsed_config ->
-  dialect:'c ->
+  source_format:Cobol_config.Types.source_format_spec ->
   filename:string ->
   ?verbose:bool ->
-  ?output:string ->
-  ?contents:string ->
-  ?range:Types.range ->
-  unit ->
-  Types.indent_record list * Types.edit_space_operation list
+  ?contents:string -> ?range:Types.range -> 'c Types.output -> 'c

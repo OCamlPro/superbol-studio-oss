@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2024 OCamlPro SAS                                       *)
+(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,9 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+exception Error of int * string
 
-val apply_edits :
+val to_free :
+  source_format:Cobol_config.source_format_spec ->
+  filename:string ->
   contents:string ->
-  range:Types.range ->
-  config:Types.config ->
-  edits:Types.indent_record list -> 't Types.output -> 't
+  string

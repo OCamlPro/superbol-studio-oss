@@ -96,7 +96,7 @@ let tokens_of_lines ~filename ~config ~contents lines =
         let edit =  { bol = not dont_indent_line ; edit } in
         let revtokens = revtokens_of_line ~edit ~filename ~config s in
         let maybe_comment_entry =
-          not config.source_format.free &&
+          config.source_format.format <> SFFree &&
           match revtokens with
           | (INFORMATION _, _) :: _ -> true
           | (DOT, _) :: (PROGRAM_ID, _) :: _ -> true
@@ -128,7 +128,7 @@ let tokenize ~config ~filename ~contents =
   let lines = ref [] in
 
   let max_text_len =
-    if source_format.free then
+    if source_format.format = SFFree then
       65536
     else
       source_format.max_text_length
@@ -155,7 +155,7 @@ let tokenize ~config ~filename ~contents =
           c skip source_format.skip_before ;
 *)
         if c = '\t'
-        && not source_format.free
+        && source_format.format <> SFFree
         && skip = 6
         && source_format.skip_before = 6 then
           iter_in_line false pos (pos+1) line
@@ -172,7 +172,7 @@ let tokenize ~config ~filename ~contents =
     if c = '\n' then
       iter (pos+1) (line+1)
     else
-    if source_format.free then
+    if source_format.format = SFFree then
       iter_in_line false pos (pos+1) line
     else
       match c with
