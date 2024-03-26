@@ -45,6 +45,7 @@ class virtual ['a] folder = object
   method fold_display_clause'     : (display_clause with_loc , 'a) fold = default
   method fold_display_target'     : (display_target with_loc , 'a) fold = default
   method fold_display_with_clause': (display_with_clause with_loc, 'a) fold = default
+  method fold_entry_by_clause     : (entry_by_clause         , 'a) fold = default
   method fold_evaluate_branch     : (evaluate_branch         , 'a) fold = default
   method fold_init_data_category  : (init_data_category      , 'a) fold = default
   method fold_init_replacing      : (init_replacing          , 'a) fold = default
@@ -102,6 +103,7 @@ class virtual ['a] folder = object
   method fold_divide'        : (divide_stmt with_loc          , 'a) fold = default
   method fold_enable'        : (mcs_command_operands with_loc , 'a) fold = default
   method fold_enter'         : (enter_stmt with_loc           , 'a) fold = default
+  method fold_entry'         : (entry_stmt with_loc           , 'a) fold = default
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
   method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
@@ -714,6 +716,7 @@ let rec fold_statement' (v: _ #folder) =
       | Divide        s -> fold_divide'         v (s &@ loc)
       | Enable        s -> fold_enable'         v (s &@ loc)
       | Enter         s -> fold_enter'          v (s &@ loc)
+      | Entry         s -> fold_entry'          v (s &@ loc)
       | Evaluate      s -> fold_evaluate'       v (s &@ loc)
       | Exit          s -> fold_exit'           v (s &@ loc)
       | Free          s -> fold_free'           v (s &@ loc)
@@ -929,6 +932,22 @@ and fold_enter' (v: _ #folder) : enter_stmt with_loc -> 'a -> 'a =
     ~fold:begin fun v { enter_language; enter_routine } x -> x
       >> fold_name' v enter_language
       >> fold_name'_opt v enter_routine
+    end
+
+and fold_entry_by_clause (v: _ #folder) : entry_by_clause -> 'a -> 'a =
+  handle v#fold_entry_by_clause
+    ~continue:begin fun clause x -> match clause with
+      | EntryByReference l -> x >> fold_name'_list v l
+      | EntryByValue l -> x >> fold_name'_list v l
+    end
+
+and fold_entry' (v: _ #folder) : entry_stmt with_loc -> 'a -> 'a =
+  handle' v#fold_entry' v
+    ~fold:begin fun v stmt x -> match stmt with
+      | EntrySimple _name -> x
+      | EntryUsing { entry_name = _; entry_by_clauses } -> x
+        >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses
+      | EntryForGoTo _entry_name -> x
     end
 
 and fold_evaluate' (v: _ #folder) : evaluate_stmt with_loc -> 'a -> 'a =

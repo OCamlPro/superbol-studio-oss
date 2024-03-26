@@ -116,6 +116,39 @@ let pp_enter_stmt ppf { enter_language = lang; enter_routine = rout } =
     (pp_with_loc pp_name) lang
     Fmt.(option (sp ++ pp_with_loc pp_name)) rout
 
+(* ENTRY *)
+type entry_by_clause =
+  | EntryByReference of name with_loc list
+  | EntryByValue of name with_loc list
+[@@deriving ord]
+
+type entry_stmt =
+  | EntrySimple of alphanum_string with_loc
+  | EntryUsing of
+    {
+      entry_name: alphanum_string with_loc;
+      entry_by_clauses: entry_by_clause list;
+    }
+  | EntryForGoTo of alphanum_string with_loc
+[@@deriving ord]
+
+let pp_entry_by_clause ppf = function
+  | EntryByReference ns ->
+      Fmt.pf ppf "BY REFERENCE %a" Fmt.(list ~sep:sp pp_name') ns
+  | EntryByValue ns ->
+      Fmt.pf ppf "BY VALUE %a" Fmt.(list ~sep:sp pp_name') ns
+
+let pp_entry_stmt ppf = function
+  | EntrySimple name ->
+    Fmt.pf ppf "ENTRY@ %a" (pp_with_loc pp_alphanum_string) name
+  | EntryUsing { entry_name; entry_by_clauses } ->
+    Fmt.pf ppf "ENTRY@ %a%a"
+      (pp_with_loc pp_alphanum_string) entry_name
+      Fmt.(list ~sep:nop (sp ++ pp_entry_by_clause)) entry_by_clauses
+  | EntryForGoTo entry_name ->
+    Fmt.pf ppf "ENTRY@ FOR GO TO %a"
+      (pp_with_loc pp_alphanum_string) entry_name
+
 (* EXIT *)
 type exit_stmt =
   | ExitSimple

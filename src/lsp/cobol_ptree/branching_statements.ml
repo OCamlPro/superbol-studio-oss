@@ -449,6 +449,7 @@ and statement =
   | Divide of divide_stmt
   | Enable of mcs_command_operands
   | Enter of enter_stmt
+  | Entry of entry_stmt
   | Evaluate of evaluate_stmt
   | Exit of exit_stmt
   | Free of name with_loc list
@@ -987,6 +988,7 @@ and pp_statement ppf = function
   | Divide s -> pp_divide_stmt ppf s
   | Enable ops -> Fmt.pf ppf "ENABLE %a" pp_mcs_command_operands ops
   | Enter s -> pp_enter_stmt ppf s
+  | Entry s -> pp_entry_stmt ppf s
   | Evaluate s -> pp_evaluate_stmt ppf s
   | Exit s -> pp_exit_stmt ppf s
   | Free names ->
