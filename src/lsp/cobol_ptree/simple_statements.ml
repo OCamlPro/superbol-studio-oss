@@ -781,36 +781,70 @@ let pp_sort_stmt ppf = function
 
 (* STOP *)
 type stop_stmt =
-  | StopRun of stop_run option
-  | StopLiteral of literal
+  | StopArg of stop_arg option
+  | StopRun of stop_run_body option
+  | StopError
 [@@deriving ord]
 
-and stop_run =
+and stop_arg =
+  | StopWithQualIdent of qualident
+  | StopWithLiteral of literal
+
+and stop_run_body =
+  | StopReturnScalar of scalar
+  | StopReturnAddress of qualident
+  | StopReturnInt of
+    {
+      value : literal;
+      size : literal option;
+    }
+  | StopReturnStatus of stop_run_status
+[@@deriving ord]
+
+and stop_run_status =
   {
-    stop_kind: stop_kind;
-    stop_status: ident_or_literal;
+    status_kind: status_kind;
+    status_value: scalar option;
   }
 [@@deriving ord]
 
-and stop_kind =
-  | StopRunError
-  | StopRunNormal
+and status_kind =
+  | StatusError
+  | StatusNormal
 [@@deriving ord]
 
-let pp_stop_kind ppf = function
-  | StopRunError -> Fmt.pf ppf "ERROR"
-  | StopRunNormal -> Fmt.pf ppf "NORMAL"
+let pp_status_kind ppf = function
+  | StatusError -> Fmt.pf ppf "ERROR"
+  | StatusNormal -> Fmt.pf ppf "NORMAL"
 
-let pp_stop_run ppf { stop_kind; stop_status } =
+let pp_stop_run_status ppf { status_kind; status_value } =
   Fmt.pf ppf "WITH@ %a@ STATUS@ %a"
-    pp_stop_kind stop_kind
-    pp_ident_or_literal stop_status
+    pp_status_kind status_kind
+    Fmt.(option pp_scalar) status_value
 
 let pp_stop_stmt ppf = function
-  | StopRun sro ->
-    Fmt.pf ppf "STOP@ RUN%a"
-      Fmt.(option (sp ++ pp_stop_run)) sro
-  | StopLiteral lit -> Fmt.pf ppf "STOP@ %a" pp_literal lit
+  | StopArg None -> Fmt.pf ppf "STOP"
+  | StopArg (Some a) -> begin match a with
+    | StopWithQualIdent i -> Fmt.pf ppf "STOP %a" pp_qualident i
+    | StopWithLiteral l -> Fmt.pf ppf "STOP %a" pp_literal l
+    end
+  | StopRun None -> Fmt.pf ppf "STOP RUN"
+  | StopRun (Some r) -> begin match r with
+    | StopReturnScalar s ->
+      Fmt.pf ppf "STOP@ RUN@ %a" pp_scalar s
+    | StopReturnAddress n ->
+      Fmt.pf ppf "STOP@ RUN@ RETURNING@ ADDRESS@ OF@ %a"
+      pp_qualident n
+    | StopReturnInt { value = v; size = None } ->
+      Fmt.pf ppf "STOP@ RUN@ RETURNING@ %a" pp_literal v
+    | StopReturnInt { value = v; size = Some v' } ->
+      Fmt.pf ppf "STOP@ RUN@ RETURNING@ %a WITH SIZE %a"
+      pp_literal v pp_literal v'
+    | StopReturnStatus s ->
+      Fmt.pf ppf "STOP@ RUN%a"
+        Fmt.(sp ++ pp_stop_run_status) s
+    end
+  | StopError -> Fmt.pf ppf "STOP ERROR"
 
 type terminate_stmt =
   name with_loc list

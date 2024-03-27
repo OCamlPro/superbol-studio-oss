@@ -127,26 +127,6 @@ syn_definition.at-847-prog.cob:10.7-10.10:
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:950:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:975:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1101:0
-syn_definition.at-1101-prog.cob:15.19:
-  12              move 0 to word
-  13              perform word
-  14         *
-  15 >            stop run returning word.
-----                      ^
-  16         *-----------------------------------------------------------------
-  17          word section.
->> Hint: Missing .
-
-syn_definition.at-1101-prog.cob:15.20-15.29:
-  12              move 0 to word
-  13              perform word
-  14         *
-  15 >            stop run returning word.
-----                       ^^^^^^^^^
-  16         *-----------------------------------------------------------------
-  17          word section.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1118:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1180:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1205:0
@@ -163,22 +143,6 @@ syn_definition.at-1323-prog1.cob:5.24-5.33:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
-syn_definition.at-1323-prog3.cob:5.19:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog3.
-   4          PROCEDURE        DIVISION.
-   5 >            STOP RUN GIVING 0.
-----                      ^
->> Hint: Missing .
-
-syn_definition.at-1323-prog3.cob:5.20-5.26:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog3.
-   4          PROCEDURE        DIVISION.
-   5 >            STOP RUN GIVING 0.
-----                       ^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1323:0
 Considering: import/gnucobol/tests/testsuite.src/syn_definition.at:1462:0
