@@ -3285,9 +3285,13 @@ let go_to_statement :=
    DEPENDING; ON?; i = ident;
    { GoToDepending { goto_depending_targets = il;
                      goto_depending_on = i; } }
- | GO; TO?;         (* COB85; obsolete; should be sole statement of paragraph *)
-   { LoneGoTo }
-
+ | GO; TO?; %prec lowest
+   { LoneGoTo }	    (* COB85; obsolete; should be sole statement of paragraph *)
+ | GO; TO; ENTRY; ~ = alphanum; <GoToEntry>
+ | GO; TO; ENTRY; il = nel_(alphanum);
+   DEPENDING; ON?; i = ident;
+   { GoToEntryDepending { goto_entry_depending_targets = il;
+                          goto_entry_depending_on = i } }
 
 
 (* GOBACK STATEMENT (+COB2002) *)
