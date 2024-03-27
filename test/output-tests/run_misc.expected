@@ -6744,46 +6744,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13768:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13799:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13880:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13943:0
-run_misc.at-13943-prog.cob:12.31:
-   9          PROCEDURE DIVISION.
-  10              GO TO ENTRY 'STMT05'.
-  11          MAIN.
-  12 >            GO TO ENTRY 'STMT01'
-----                                  ^
-  13                          'STMT02'
-  14                          'STMT03'
->> Hint: Missing .
-
-run_misc.at-13943-prog.cob:13.23-13.31:
-  10              GO TO ENTRY 'STMT05'.
-  11          MAIN.
-  12              GO TO ENTRY 'STMT01'
-  13 >                        'STMT02'
-----                          ^^^^^^^^
-  14                          'STMT03'
-  15                          'STMT04'
->> Warning: Invalid syntax
-
-run_misc.at-13943-prog.cob:17.34:
-  14                          'STMT03'
-  15                          'STMT04'
-  16                          'STMT05'
-  17 >            DEPENDING ON JUMP-ENTRY
-----                                     ^
-  18              DISPLAY 'NOT JUMPED'
-  19              GOBACK.
->> Hint: Missing .
-
-run_misc.at-13943-prog.cob:18.11-18.18:
-  15                          'STMT04'
-  16                          'STMT05'
-  17              DEPENDING ON JUMP-ENTRY
-  18 >            DISPLAY 'NOT JUMPED'
-----              ^^^^^^^
-  19              GOBACK.
-  20          ENTRY FOR GO TO 'STMT01'
->> Warning: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14022:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14053:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14089:0

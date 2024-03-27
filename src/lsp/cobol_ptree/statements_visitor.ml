@@ -112,7 +112,11 @@ class virtual ['a] folder = object
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
   method fold_goback'        : (goback_stmt    with_loc       , 'a) fold = default
   method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
+  method fold_goto_entry'    : (goto_entry with_loc           , 'a) fold = default
   method fold_goto_depending': (goto_depending_stmt with_loc  , 'a) fold = default
+  method fold_goto_entry_depending'
+                             : (goto_entry_depending_stmt with_loc
+                                                              , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
   method fold_initialize'    : (initialize_stmt with_loc      , 'a) fold = default
   method fold_initiate'      : (name with_loc list with_loc   , 'a) fold = default
@@ -496,6 +500,18 @@ let fold_goto_depending' (v: _ #folder) =
       >> fold_ident v goto_depending_on
     end
 
+let fold_goto_entry' (v: _ #folder) =
+  handle' v#fold_goto_entry' v
+    ~fold:begin fun _v _s x -> x
+    end
+
+let fold_goto_entry_depending' (v: _ #folder) =
+  handle' v#fold_goto_entry_depending' v
+    ~fold:begin fun v { goto_entry_depending_targets = _targets;
+                        goto_entry_depending_on } x -> x
+      >> fold_ident v goto_entry_depending_on
+    end
+
 let fold_initialize' (v: _ #folder) =
   handle' v#fold_initialize' v
     ~fold:begin fun v { init_items; init_filler; init_category;
@@ -707,63 +723,65 @@ let fold_validate' (v: _ #folder) =
 let rec fold_statement' (v: _ #folder) =
   handle v#fold_statement'
     ~continue:begin fun { payload; loc } -> match payload with
-      | Accept        s -> fold_accept'         v (s &@ loc)
-      | Allocate      s -> fold_allocate'       v (s &@ loc)
-      | Add           s -> fold_add'            v (s &@ loc)
-      | Alter         s -> fold_alter'          v (s &@ loc)
-      | Call          s -> fold_call'           v (s &@ loc)
-      | Cancel        s -> fold_cancel'         v (s &@ loc)
-      | Close         s -> fold_close'          v (s &@ loc)
-      | Compute       s -> fold_compute'        v (s &@ loc)
-      | Delete        s -> fold_delete'         v (s &@ loc)
-      | Disable       s -> fold_disable'        v (s &@ loc)
-      | Display       s -> fold_display'        v (s &@ loc)
-      | Divide        s -> fold_divide'         v (s &@ loc)
-      | Enable        s -> fold_enable'         v (s &@ loc)
-      | Enter         s -> fold_enter'          v (s &@ loc)
-      | Entry         s -> fold_entry'          v (s &@ loc)
-      | Evaluate      s -> fold_evaluate'       v (s &@ loc)
-      | ExecBlock     s -> fold_exec_block'     v (s &@ loc)
-      | Exit          s -> fold_exit'           v (s &@ loc)
-      | Free          s -> fold_free'           v (s &@ loc)
-      | Generate      s -> fold_generate'       v (s &@ loc)
-      | GoBack        s -> fold_goback'         v (s &@ loc)
-      | GoTo          s -> fold_goto'           v (s &@ loc)
-      | GoToDepending s -> fold_goto_depending' v (s &@ loc)
-      | If            s -> fold_if'             v (s &@ loc)
-      | Initialize    s -> fold_initialize'     v (s &@ loc)
-      | Initiate      s -> fold_initiate'       v (s &@ loc)
-      | Inspect       s -> fold_inspect'        v (s &@ loc)
-      | Invoke        s -> fold_invoke'         v (s &@ loc)
-      | Merge         s -> fold_merge'          v (s &@ loc)
-      | Move          s -> fold_move'           v (s &@ loc)
-      | Multiply      s -> fold_multiply'       v (s &@ loc)
-      | Open          s -> fold_open'           v (s &@ loc)
-      | PerformInline s -> fold_perform_inline' v (s &@ loc)
-      | PerformTarget s -> fold_perform_target' v (s &@ loc)
-      | Purge         s -> fold_purge'          v (s &@ loc)
-      | Raise         s -> fold_raise'          v (s &@ loc)
-      | Read          s -> fold_read'           v (s &@ loc)
-      | Receive       s -> fold_receive'        v (s &@ loc)
-      | Release       s -> fold_release'        v (s &@ loc)
-      | Resume        s -> fold_resume'         v (s &@ loc)
-      | Return        s -> fold_return'         v (s &@ loc)
-      | Rewrite       s -> fold_rewrite'        v (s &@ loc)
-      | Search        s -> fold_search'         v (s &@ loc)
-      | SearchAll     s -> fold_search_all'     v (s &@ loc)
-      | Send          s -> fold_send'           v (s &@ loc)
-      | Set           s -> fold_set'            v (s &@ loc)
-      | Sort          s -> fold_sort'           v (s &@ loc)
-      | Start         s -> fold_start'          v (s &@ loc)
-      | Stop          s -> fold_stop'           v (s &@ loc)
-      | String        s -> fold_string_stmt'    v (s &@ loc)
-      | Subtract      s -> fold_subtract'       v (s &@ loc)
-      | Terminate     s -> fold_terminate'      v (s &@ loc)
-      | Transform     s -> fold_transform'      v (s &@ loc)
-      | Unlock        s -> fold_unlock'         v (s &@ loc)
-      | Unstring      s -> fold_unstring'       v (s &@ loc)
-      | Validate      s -> fold_validate'       v (s &@ loc)
-      | Write         s -> fold_write'          v (s &@ loc)
+      | Accept             s -> fold_accept'               v (s &@ loc)
+      | Allocate           s -> fold_allocate'             v (s &@ loc)
+      | Add                s -> fold_add'                  v (s &@ loc)
+      | Alter              s -> fold_alter'                v (s &@ loc)
+      | Call               s -> fold_call'                 v (s &@ loc)
+      | Cancel             s -> fold_cancel'               v (s &@ loc)
+      | Close              s -> fold_close'                v (s &@ loc)
+      | Compute            s -> fold_compute'              v (s &@ loc)
+      | Delete             s -> fold_delete'               v (s &@ loc)
+      | Disable            s -> fold_disable'              v (s &@ loc)
+      | Display            s -> fold_display'              v (s &@ loc)
+      | Divide             s -> fold_divide'               v (s &@ loc)
+      | Enable             s -> fold_enable'               v (s &@ loc)
+      | Enter              s -> fold_enter'                v (s &@ loc)
+      | Entry              s -> fold_entry'                v (s &@ loc)
+      | Evaluate           s -> fold_evaluate'             v (s &@ loc)
+      | ExecBlock          s -> fold_exec_block'           v (s &@ loc)
+      | Exit               s -> fold_exit'                 v (s &@ loc)
+      | Free               s -> fold_free'                 v (s &@ loc)
+      | Generate           s -> fold_generate'             v (s &@ loc)
+      | GoBack             s -> fold_goback'               v (s &@ loc)
+      | GoTo               s -> fold_goto'                 v (s &@ loc)
+      | GoToDepending      s -> fold_goto_depending'       v (s &@ loc)
+      | GoToEntry          s -> fold_goto_entry'           v (s &@ loc)
+      | GoToEntryDepending s -> fold_goto_entry_depending' v (s &@ loc)
+      | If                 s -> fold_if'                   v (s &@ loc)
+      | Initialize         s -> fold_initialize'           v (s &@ loc)
+      | Initiate           s -> fold_initiate'             v (s &@ loc)
+      | Inspect            s -> fold_inspect'              v (s &@ loc)
+      | Invoke             s -> fold_invoke'               v (s &@ loc)
+      | Merge              s -> fold_merge'                v (s &@ loc)
+      | Move               s -> fold_move'                 v (s &@ loc)
+      | Multiply           s -> fold_multiply'             v (s &@ loc)
+      | Open               s -> fold_open'                 v (s &@ loc)
+      | PerformInline      s -> fold_perform_inline'       v (s &@ loc)
+      | PerformTarget      s -> fold_perform_target'       v (s &@ loc)
+      | Purge              s -> fold_purge'                v (s &@ loc)
+      | Raise              s -> fold_raise'                v (s &@ loc)
+      | Read               s -> fold_read'                 v (s &@ loc)
+      | Receive            s -> fold_receive'              v (s &@ loc)
+      | Release            s -> fold_release'              v (s &@ loc)
+      | Resume             s -> fold_resume'               v (s &@ loc)
+      | Return             s -> fold_return'               v (s &@ loc)
+      | Rewrite            s -> fold_rewrite'              v (s &@ loc)
+      | Search             s -> fold_search'               v (s &@ loc)
+      | SearchAll          s -> fold_search_all'           v (s &@ loc)
+      | Send               s -> fold_send'                 v (s &@ loc)
+      | Set                s -> fold_set'                  v (s &@ loc)
+      | Sort               s -> fold_sort'                 v (s &@ loc)
+      | Start              s -> fold_start'                v (s &@ loc)
+      | Stop               s -> fold_stop'                 v (s &@ loc)
+      | String             s -> fold_string_stmt'          v (s &@ loc)
+      | Subtract           s -> fold_subtract'             v (s &@ loc)
+      | Terminate          s -> fold_terminate'            v (s &@ loc)
+      | Transform          s -> fold_transform'            v (s &@ loc)
+      | Unlock             s -> fold_unlock'               v (s &@ loc)
+      | Unstring           s -> fold_unstring'             v (s &@ loc)
+      | Validate           s -> fold_validate'             v (s &@ loc)
+      | Write              s -> fold_write'                v (s &@ loc)
       | Continue
       | LoneGoTo
       | NextSentence
