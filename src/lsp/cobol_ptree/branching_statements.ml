@@ -116,8 +116,8 @@ and perform_mode =
 and varying_phrase =
   {
     varying_ident: ident;
-    varying_from: ident_or_numlit;
-    varying_by: ident_or_numlit option;
+    varying_from: scalar;
+    varying_by: scalar option;                  (* XXX: more specialized type *)
     varying_until: condition;
   }
 
@@ -638,12 +638,12 @@ and pp_perform_mode ppf = function
       (varying :: after);
 
 and pp_varying_phrase ppf
-  { varying_ident = vi; varying_from = vf; varying_by = vb; varying_until = vu}
+  { varying_ident = vi; varying_from = vf; varying_by = vb; varying_until = vu }
 =
   Fmt.pf ppf "%a FROM %a%a UNTIL %a"
     pp_ident vi
-    pp_ident_or_numlit vf
-    Fmt.(option (any " BY " ++ pp_ident_or_numlit)) vb
+    pp_scalar vf
+    Fmt.(option (any " BY " ++ pp_scalar)) vb
     pp_condition vu
 
 (* SEARCH *)

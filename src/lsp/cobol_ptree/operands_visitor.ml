@@ -23,6 +23,8 @@ open Terms_visitor
 class ['a] folder = object
   inherit ['a] Terms_visitor.folder
   method fold_alphabet_specification   : (alphabet_specification    , 'a) fold = default
+  (* method fold_rounded                  : 'x. ('x rounded              , 'a) fold = default *)
+  method fold_rounded_ident            : (rounded_ident             , 'a) fold = default
   method fold_basic_arithmetic_operands: (basic_arithmetic_operands , 'a) fold = default
   method fold_call_using_clause        : (call_using_clause         , 'a) fold = default
   method fold_call_using_clause'       : (call_using_clause with_loc, 'a) fold = default
@@ -69,6 +71,20 @@ let fold_alphabet_specification (v: _ #folder) =
       >> fold_option ~fold:fold_name' v national
     end
 
+let fold_rounded ~fold (v: _ #folder) =
+  (* handle v#fold_rounded *)
+  (*   ~continue: *) begin fun { rounded; rounded_rounding } x -> x
+      >> fold v rounded
+      >> fold_rounding v rounded_rounding
+    end
+
+let fold_rounded_ident (v: _ #folder) =
+  handle v#fold_rounded_ident
+    ~continue:(fold_rounded ~fold:fold_ident v)
+
+let fold_rounded_idents (v: _ #folder) =
+  fold_list ~fold:fold_rounded_ident v
+
 let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
     ~continue:begin fun o x -> match o with
@@ -104,11 +120,11 @@ let fold_divide_operands (v: _ #folder) =
   handle v#fold_divide_operands
     ~continue:begin fun o x -> match o with
       | DivideInto { divisor; dividends } -> x
-          >> fold_ident_or_numlit v divisor
+          >> fold_scalar v divisor
           >> fold_rounded_idents v dividends
       | DivideGiving { divisor; dividend; giving; into; remainder } -> x
-          >> fold_ident_or_numlit v divisor
-          >> fold_ident_or_numlit v dividend
+          >> fold_scalar v divisor
+          >> fold_scalar v dividend
           >> fold_rounded_idents v giving
           >> fold_bool v into
           >> fold_option ~fold:fold_ident v remainder
@@ -121,11 +137,11 @@ let fold_multiply_operands (v: _ #folder) =
   handle v#fold_multiply_operands
     ~continue:begin fun o x -> match o with
       | MultiplyBy { multiplier; multiplicand } -> x
-          >> fold_ident_or_numlit v multiplier
+          >> fold_scalar v multiplier
           >> fold_rounded_idents v multiplicand
       | MultiplyGiving { multiplier; multiplicand; targets } -> x
-          >> fold_ident_or_numlit v multiplier
-          >> fold_ident_or_numlit v multiplicand
+          >> fold_scalar v multiplier
+          >> fold_scalar v multiplicand
           >> fold_rounded_idents v targets
     end
 

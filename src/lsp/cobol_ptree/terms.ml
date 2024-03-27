@@ -37,7 +37,19 @@ type int_ = [ `Int ]
 type name_ = [ `Name ]
 type national_ = [ `National ]
 type 'a qual_ = [ `Qual of 'a ]
-type base_ident_ = [ `DirectIdent ]
+type object_view_ = [ `ObjectView ]
+type object_ref_ = [ `ObjectRef ]
+type qualident_ = [`Ident] qual_
+type address_ = [ `Address ]
+type counter_ = [ `Counter ]
+type inline_call_ = [ `InlineCall ]
+type inline_invoke_ = [ `InlineInvoke ]
+type length_of_ = [ `LengthOf ]
+type arith_value_ = length_of_                             (* may be expanded *)
+type refmod_scalar_ident_ = [ `RefmodScalarIdent ]
+type scalar_ident_ = [qualident_|address_|counter_|inline_call_|inline_invoke_|
+                      object_ref_|refmod_scalar_ident_]
+type base_ident_ = [scalar_ident_|object_view_]
 type refmod_ident_ = [ `RefmodIdent ]
 type ident_ = [base_ident_|refmod_ident_]
 type qualname_ = [name_|name qual_]
@@ -89,15 +101,16 @@ type _ term =
   | Name: name with_loc -> [>name_] term
   | Qual: name with_loc * qualname_ term -> [>name qual_] term
 
-  | Address: address -> [>base_ident_] term
-  | Counter: counter -> [>base_ident_] term
-  | InlineCall: inline_call -> [>base_ident_] term
-  | InlineInvoke: inline_invocation -> [>base_ident_] term
-  | LengthOf: [ident_|lit_] term -> [>base_ident_] term
-  | ObjectView: object_view -> [>base_ident_] term
-  | ObjectRef: object_ref -> [>base_ident_] term (* Includes predefined address (NULL) *)
-  | QualIdent: qualident -> [>base_ident_] term  (* Includes subscripts *)
-  | RefMod: base_ident_ term * refmod -> [>ident_] term (* Reference modification *)
+  | Address: address -> [>address_] term
+  | Counter: counter -> [>counter_] term
+  | InlineCall: inline_call -> [>inline_call_] term
+  | InlineInvoke: inline_invocation -> [>inline_invoke_] term
+  | LengthOf: [ident_|lit_] term -> [>length_of_] term
+  | ObjectView: object_view -> [>object_view_] term
+  | ObjectRef: object_ref -> [>object_ref_] term (* Includes predefined address (NULL) *)
+  | QualIdent: qualident -> [>qualident_] term  (* Includes subscripts *)
+  | RefMod: base_ident_ term * refmod -> [>refmod_ident_] term (* Reference modification *)
+  | ScalarRefMod: scalar_ident_ term * refmod -> [>refmod_scalar_ident_] term
 
   | StrConcat: strlit_ term * strlit_ term -> [>strlit_] term
   | Concat: nonnum_ term * nonnum_ term -> [>nonnum_] term
@@ -113,9 +126,14 @@ and _ figurative =
 
 (** and then particular instantiations. *)
 
+(** As per ISO/IEC 2014: reference to a data item. *)
 and ident = ident_ term
+
+(** (Qualified) name (should be `qualref` for "qualified reference" instead). *)
 and qualname = qualname_ term
 
+(** Any sort of literal (Boolean, alphanumeric, national, numeric,
+    figurative) *)
 and literal = lit_ term
 (*  | LitConcat of nonnumlit * nonnumlit (\* no ALL *\) *)
 
@@ -141,6 +159,12 @@ and qualname_or_literal = [qualname_|lit_] term
 and strlit = strlit_ term
 and strlit_or_intlit = [strlit_|int_] term
 
+(* TODO: this is quite general to accomodate any kind of scalar.  However,
+   renaming this one to `scalar_or_address` and having a more specific `scalar`
+   for numerics (that does not allow `ADDRESS OF`, or later, mnemonics), and
+   corresponds to the `arith_x` rule, may make more sense.  *)
+and scalar = [scalar_ident_|refmod_ident_|lit_|arith_value_] term
+
 and binop =
   | BPlus
   | BMinus
@@ -157,7 +181,7 @@ and unop =
   | UNot
 
 and expression =
-  | Atom of ident_or_literal
+  | Atom of scalar
   | Unop of unop * expression
   | Binop of expression * binop * expression (* split arith/bool ? *)
 
@@ -367,6 +391,8 @@ module COMPARE = struct
           compare_inline_call a b
       | InlineInvoke a, InlineInvoke b ->
           compare_inline_invoke a b
+      | LengthOf a, LengthOf b ->
+          compare_term a b
       | ObjectView a, ObjectView b ->
           compare_object_view a b
       | ObjectRef a, ObjectRef b ->
@@ -374,6 +400,8 @@ module COMPARE = struct
       | QualIdent a, QualIdent b ->
           compare_qualident a b
       | RefMod (b1, r1), RefMod (b2, r2) ->
+          compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
+      | ScalarRefMod (b1, r1), ScalarRefMod (b2, r2) ->
           compare_struct (compare_term b1 b2) @@ lazy (compare_refmod r1 r2)
       | StrConcat (a, c), StrConcat (b, d) ->
           compare_struct (compare_term a b) @@ lazy (compare_term c d)
@@ -569,6 +597,7 @@ module COMPARE = struct
   let compare_qualname_or_literal: qualname_or_literal compare_fun = compare_term
   let compare_strlit: strlit compare_fun = compare_term
   let compare_strlit_or_intlit: strlit_or_intlit compare_fun = compare_term
+  let compare_scalar: scalar compare_fun = compare_term
 
   let compare_condition = compare_cond
 end
@@ -622,6 +651,7 @@ module FMT = struct
     | ObjectRef o -> pp_object_ref ppf o
     | QualIdent i -> pp_qualident ppf i
     | RefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
+    | ScalarRefMod (i, r) -> fmt "@[%a@ %a@]" ppf pp_term i pp_refmod r
 
     | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
     | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
@@ -698,6 +728,8 @@ module FMT = struct
     in
     string ppf k;
     Option.iter (fmt "@ OF@ %a" ppf pp_name') counter_name
+
+  and pp_scalar: scalar Pretty.printer = fun ppf -> pp_term ppf
 
   and pp_expression ppf e = Unparse.Expression.pp ppf (pretty_expression e)
   and pp_expression' ppf = pp_with_loc pp_expression ppf
@@ -854,67 +886,67 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let ident_with_nonnum: ident -> ident_or_nonnum = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let ident_with_numeric: ident -> ident_or_numlit = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let ident_with_string: ident -> ident_or_strlit = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let ident_with_literal: ident -> ident_or_literal = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let ident_with_integer: ident -> ident_or_intlit = function
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
     | RefMod _ as v -> v
+    | ScalarRefMod _ as v -> v
 
   let string_with_name: strlit -> name_or_string = function
     | Alphanum _ as v -> v
@@ -997,11 +1029,26 @@ module UPCAST = struct
     | QualIdent _ as v -> v
     | InlineCall _ as v -> v
     | InlineInvoke _ as v -> v
-    | LengthOf _ as v -> v
     | ObjectView _ as v -> v
     | ObjectRef _ as v -> v
     | Address _ as v -> v
     | Counter _ as v -> v
+    | ScalarRefMod _ as v -> v
+
+  let scalar_ident_as_scalar: scalar_ident_ term -> scalar = function
+    | QualIdent _ as v -> v
+    | InlineCall _ as v -> v
+    | InlineInvoke _ as v -> v
+    | ObjectRef _ as v -> v
+    | Address _ as v -> v
+    | Counter _ as v -> v
+    | ScalarRefMod _ as v -> v
+
+  let numeric_as_scalar: numlit -> scalar = function
+    | Integer _ as v -> v
+    | Fixed _ as v -> v
+    | Floating _ as v -> v
+    | NumFig _ as v -> v
 
   let simple_cond: simple_condition -> condition = function
     | Expr _ as c -> c
@@ -1012,14 +1059,9 @@ module UPCAST = struct
     | Omitted _ as c -> c
 end
 
-type rounded_ident =
-  {
-    rounded_ident: ident;
-    rounded_rounding: rounding;
-  }
-[@@deriving ord]
+(* --- *)
 
-and rounding =
+type rounding =
   | RoundingNotAny
   | RoundingDefault
   | RoundingMode of rounding_mode
@@ -1036,9 +1078,6 @@ and rounding_mode =
   | Prohibited
 [@@deriving ord]
 
-and rounded_idents = rounded_ident list
-[@@deriving ord]
-
 let pp_rounding_mode ppf = function
   | AwayFromZero -> Fmt.pf ppf "AWAY-FROM-ZERO"
   | NearestAwayFromZero -> Fmt.pf ppf "NEAREST-AWAY-FROM-ZERO"
@@ -1053,13 +1092,6 @@ let pp_rounding ppf = function
   | RoundingNotAny -> ()
   | RoundingDefault -> Fmt.pf ppf "ROUNDED"
   | RoundingMode rm -> Fmt.pf ppf "ROUNDED MODE IS %a" pp_rounding_mode rm
-
-let pp_rounded_ident ppf { rounded_ident = i; rounded_rounding = r } =
-  match r with
-  | RoundingNotAny | RoundingMode Truncation -> pp_ident ppf i
-  | _ -> Fmt.pf ppf "%a %a" pp_ident i pp_rounding r
-
-let pp_rounded_idents = Fmt.(list ~sep:sp pp_rounded_ident)
 
 (* --- *)
 

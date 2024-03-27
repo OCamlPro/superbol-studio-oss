@@ -36,6 +36,35 @@ let pp_character_classification pp ppf (alphanumeric, national) =
 let pp_alphabet_specification ppf { alphanumeric; national } =
   pp_character_classification pp_name' ppf (alphanumeric, national)
 
+
+(* Many (ADD/DIVIDE...) *)
+
+
+type 'a rounded =
+  {
+    rounded: 'a;
+    rounded_rounding: rounding;
+  }
+
+and 'a rounded_list = 'a rounded list
+[@@deriving ord]
+
+let pp_rounded ppe ppf { rounded = i; rounded_rounding = r } =
+  match r with
+  | RoundingNotAny | RoundingMode Truncation -> ppe ppf i
+  | _ -> Fmt.pf ppf "%a %a" ppe i pp_rounding r
+
+let pp_rounded_list ppe = Fmt.(list ~sep:sp (pp_rounded ppe))
+
+type rounded_ident = ident rounded
+type rounded_idents = ident rounded_list
+let pp_rounded_ident = pp_rounded pp_ident
+let pp_rounded_idents = pp_rounded_list pp_ident
+let compare_rounded_ident = compare_rounded compare_ident
+let compare_rounded_idents = compare_rounded_list compare_ident
+
+
+
 (* ACCEPT, DISPLAY *)
 type position =
   | LinePosition of ident_or_intlit
@@ -228,15 +257,15 @@ DIVIDE id/lit BY id/lit GIVING... REMAINDER... ON_SIZE...? END_DIV
 type divide_operands =
   | DivideInto of
       {
-        divisor: ident_or_numlit;
-        dividends: rounded_idents;                          (* non-empty *)
+        divisor: scalar;
+        dividends: rounded_idents;    (* non-empty/ TODO: target scalar list! *)
       }
   | DivideGiving of
       {
-        divisor: ident_or_numlit;
-        dividend: ident_or_numlit;
+        divisor: scalar;
+        dividend: scalar;
         giving: rounded_idents;
-        into: bool;                         (* "INTO" if true, "by" otherwise *)
+        into: bool;                         (* "INTO" if true, "BY" otherwise *)
         remainder: ident option;
       }
 [@@deriving ord]
@@ -247,12 +276,12 @@ let pp_remainder_opt = function
 
 let pp_divide_operands ppf = function
   | DivideInto { divisor; dividends } ->
-    pp_arithmetic_operands ~sep:"INTO" pp_ident_or_numlit pp_rounded_idents
+    pp_arithmetic_operands ~sep:"INTO" pp_scalar pp_rounded_idents
       ppf ((divisor, dividends), [])
   | DivideGiving { divisor; dividend; giving; into; remainder } ->
     let pair = if into then divisor, dividend else dividend, divisor in
     pp_arithmetic_operands ~sep:(if into then "INTO" else "BY")
-      pp_ident_or_numlit pp_ident_or_numlit
+      pp_scalar pp_scalar
       ppf (pair, pp_giving giving @ pp_remainder_opt remainder)
 
 
@@ -325,13 +354,13 @@ let pp_selection_object ppf = function
 type multiply_operands =
   | MultiplyBy of
       {
-        multiplier: ident_or_numlit;
+        multiplier: scalar;
         multiplicand: rounded_idents;
       }
   | MultiplyGiving of
       {
-        multiplier: ident_or_numlit;
-        multiplicand: ident_or_numlit;
+        multiplier: scalar;
+        multiplicand: scalar;
         targets: rounded_idents;
       }
 [@@deriving ord]
@@ -339,11 +368,11 @@ type multiply_operands =
 let pp_multiply_operands ppf = function
   | MultiplyBy { multiplier; multiplicand = mc } ->
     pp_arithmetic_operands ~sep:"BY"
-      pp_ident_or_numlit pp_rounded_idents
+      pp_scalar pp_rounded_idents
       ppf ((multiplier, mc), [])
   | MultiplyGiving { multiplier = a; multiplicand = b; targets = c } ->
     pp_arithmetic_operands ~sep:"BY"
-      pp_ident_or_numlit pp_ident_or_numlit
+      pp_scalar pp_scalar
       ppf ((a, b), pp_giving c)
 
 
