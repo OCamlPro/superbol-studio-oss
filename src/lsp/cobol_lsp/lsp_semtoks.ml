@@ -332,8 +332,8 @@ let semtoks_from_ptree ~filename ?range ptree =
       |> Visitor.skip_children
 
     (* Add Compute Divide Multiply Subtract *)
-    method! fold_rounded_ident { rounded_ident; rounded_rounding } acc = acc
-      |> add_ident rounded_ident VarModif
+    method! fold_rounded_ident { rounded; rounded_rounding } acc = acc
+      |> add_ident rounded VarModif
       |> fold_rounding self rounded_rounding
       |> Visitor.skip_children
 
@@ -412,8 +412,8 @@ let semtoks_from_ptree ~filename ?range ptree =
     method! fold_varying_phrase { varying_ident; varying_from;
                                   varying_by; varying_until } acc = acc
       |> add_ident varying_ident VarModif
-      |> fold_ident_or_numlit self varying_from
-      |> fold_option ~fold:fold_ident_or_numlit self varying_by
+      |> fold_scalar self varying_from
+      |> fold_option ~fold:fold_scalar self varying_by
       |> fold_condition self varying_until
       |> Visitor.skip_children
 

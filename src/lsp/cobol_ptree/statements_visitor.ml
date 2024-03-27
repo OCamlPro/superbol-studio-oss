@@ -152,8 +152,8 @@ let fold_varying_phrase (v: _ #folder) =
     ~continue:begin fun { varying_ident; varying_from;
                           varying_by; varying_until } x -> x
       >> fold_ident v varying_ident
-      >> fold_ident_or_numlit v varying_from
-      >> fold_option ~fold:fold_ident_or_numlit v varying_by
+      >> fold_scalar v varying_from
+      >> fold_option ~fold:fold_scalar v varying_by
       >> fold_condition v varying_until
     end
 
@@ -473,10 +473,10 @@ let fold_generate' (v: _ #folder) =
 
 let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v
-    ~fold:(fun v { goback_raising ; goback_returning } x -> x
-            >> fold_option ~fold:fold_raising v goback_raising
-            >> fold_ident_or_intlit'opt v goback_returning
-      )
+    ~fold:begin fun v { goback_raising ; goback_returning } x -> x
+      >> fold_option ~fold:fold_raising v goback_raising
+      >> fold_ident_or_intlit'_opt v goback_returning
+    end
 
 let fold_goto' (v: _ #folder) =
   handle' v#fold_goto' v

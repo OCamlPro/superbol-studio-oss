@@ -150,4 +150,3 @@ dune-trailer = """
     (with-stdout-to %{targets}
        (run %{exe:./printer/gen_printer.exe} %{deps}))))
 """
-menhir-flags = "--table --strict"

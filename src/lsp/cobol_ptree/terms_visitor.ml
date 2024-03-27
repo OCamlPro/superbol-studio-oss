@@ -33,6 +33,7 @@ class ['a] folder = object
   method fold_address: (address, 'a) fold = default
   method fold_counter: (counter, 'a) fold = default
   method fold_counter_kind: (counter_kind, 'a) fold = default
+  method fold_length_of: (length_of_ term, 'a) fold = default
   method fold_inline_call: (inline_call, 'a) fold = default
   method fold_inline_invocation: (inline_invocation, 'a) fold = default
   method fold_effective_arg: (effective_arg, 'a) fold = default
@@ -46,16 +47,8 @@ class ['a] folder = object
   method fold_boolean: (boolean, 'a) fold = default
   method fold_alphanum: (alphanum, 'a) fold = default
   method fold_national: (national, 'a) fold = default
-  (* method fold_strlit_figurative: (strlit_ figurative, 'a) fold = default *)
-  (* method fold_intlit: (int_ term, 'a) fold = default *)
   method fold_int_figurative: (int_ figurative, 'a) fold = default
   method fold_any_figurative: 'k. ('k figurative, 'a) fold = default
-  (* method fold_figurative: 'k. ('k figurative, 'a) fold = default *)
-  (* method fold_numlit: (numlit, 'a) fold = default *)
-  (* method fold_strlit: (strlit, 'a) fold = default *)
-  (* method fold_literal: (literal, 'a) fold = default *)
-  (* method fold_ident_or_alphanum: (ident_or_alphanum, 'a) fold = default *)
-  (* method fold_ident_or_literal: (ident_or_literal, 'a) fold = default *)
   method fold_floating: (floating, 'a) fold = default
   method fold_fixed: (fixed, 'a) fold = default
   method fold_integer: (integer, 'a) fold = default
@@ -72,10 +65,6 @@ class ['a] folder = object
   method fold_relop: (relop, 'a) fold = default
   method fold_rounding_mode: (rounding_mode, 'a) fold = default
   method fold_rounding: (rounding, 'a) fold = default
-  method fold_rounded_ident: (rounded_ident, 'a) fold = default
-  (* method fold_constant_value: (constant_value, 'a) fold = default *)
-  (* method fold_constant: (constant, 'a) fold = default *)
-  (* method fold_constant': (constant with_loc, 'a) fold = default *)
 
 end
 
@@ -168,6 +157,15 @@ and fold_strlit (v: _ #folder) : strlit -> 'a -> 'a = function
   | Fig f -> fold_any_figurative v f
   | StrConcat (s, s') -> fun x -> x >> fold_strlit v s >> fold_strlit v s'
 
+and fold_scalar_ident (v: _ #folder) : scalar_ident_ term -> 'a -> 'a = function
+  | Address ai -> fold_address v ai
+  | Counter c -> fold_counter v c
+  | InlineCall fi -> fold_inline_call v fi
+  | InlineInvoke ii -> fold_inline_invocation v ii
+  | ObjectRef po -> fold_object_ref v po
+  | QualIdent qi -> fold_qualident v qi
+  | ScalarRefMod (i, r) -> fun x -> x >> fold_scalar_ident v i >> fold_refmod v r
+
 and fold_ident (v: _ #folder) =
   handle v#fold_ident
     ~continue:begin function
@@ -175,12 +173,15 @@ and fold_ident (v: _ #folder) =
       | Counter c -> fold_counter v c
       | InlineCall fi -> fold_inline_call v fi
       | InlineInvoke ii -> fold_inline_invocation v ii
-      | LengthOf ii -> fold_ident_or_literal v ii
+      (* | LengthOf ii -> fold_ident_or_literal v ii *)
       | ObjectView ov -> fold_object_view v ov
       | ObjectRef po -> fold_object_ref v po
       | QualIdent qi -> fold_qualident v qi
       | RefMod (i, r) -> fun x -> x
         >> fold_ident v (UPCAST.base_ident_with_refmod i)
+        >> fold_refmod v r
+      | ScalarRefMod (i, r) -> fun x -> x
+        >> fold_scalar_ident v i
         >> fold_refmod v r
     end
 
@@ -268,7 +269,8 @@ and fold_object_view_spec (v: _ #folder) =
 and fold_expr (v: _ #folder) =
   handle v#fold_expr
     ~continue:begin fun e x -> match e with
-      | Atom a -> x >> fold_ident_or_literal v a
+      | Atom a -> x
+          >> fold_scalar v a
       | Unop (o, e) -> x
           >> fold_unop v o
           >> fold_expr v e
@@ -286,11 +288,11 @@ and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = functi
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
   | Alphanum _
   | Boolean _
   | Fixed _
@@ -301,6 +303,31 @@ and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = functi
   | Fig _
   | StrConcat _
   | Concat _ as l -> fold_literal v l
+
+and fold_scalar (v: _ #folder) : scalar -> 'a -> 'a = function
+  | Address _
+  | Counter _
+  | InlineCall _
+  | InlineInvoke _
+  | ObjectRef _
+  | QualIdent _
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
+  | Boolean _
+  | Fixed _
+  | Floating _
+  | Integer _
+  | National _
+  | NumFig _
+  | Fig _
+  | Alphanum _
+  | StrConcat _
+  | Concat _ as s -> fold_literal v s
+  | LengthOf _ as l -> fold_length_of v l
+
+and fold_length_of (v: _ #folder): length_of_ term -> 'a -> 'a =
+  handle v#fold_length_of
+    ~continue:(function LengthOf i -> fold_ident_or_literal v i)
 
 let fold_class (v: _ #folder) =
   handle v#fold_class
@@ -386,22 +413,22 @@ let fold_ident_or_alphanum (v: _ #folder) : ident_or_alphanum -> 'a -> 'a = func
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
 
 let fold_ident_or_intlit (v: _ #folder) : ident_or_intlit -> 'a -> 'a = function
   | Address _
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
   | Integer _ | NumFig _ as i -> fold_intlit v i
 
 let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
@@ -409,11 +436,11 @@ let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
   | Fixed _ | Floating _
   | Integer _ | NumFig _ as i -> fold_numlit v i
 
@@ -422,11 +449,11 @@ let fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
   | Alphanum _
   | Boolean _
   | National _
@@ -439,11 +466,11 @@ let fold_ident_or_strlit (v: _ #folder) : ident_or_strlit -> 'a -> 'a = function
   | Counter _
   | InlineCall _
   | InlineInvoke _
-  | LengthOf _
   | ObjectView _
   | ObjectRef _
   | QualIdent _
-  | RefMod _ as i -> fold_ident v i
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
   | Alphanum _
   | National _
   | Fig _
@@ -511,31 +538,22 @@ let fold_ident' (v: _ #folder) = fold' ~fold:fold_ident v
 let fold_ident'_opt (v: _ #folder) = fold_option ~fold:fold_ident' v
 let fold_ident_or_nonnum' (v: _ #folder) =
   fold' ~fold:fold_ident_or_nonnum v
-let fold_ident_or_nonnum'opt (v: _ #folder) =
+let fold_ident_or_nonnum'_opt (v: _ #folder) =
   fold_option ~fold:fold_ident_or_nonnum' v
 let fold_name_or_alphanum' (v: _ #folder) =
   fold' ~fold:fold_name_or_alphanum v
-let fold_name_or_alphanum'opt (v: _ #folder) =
+let fold_name_or_alphanum'_opt (v: _ #folder) =
   fold_option ~fold:fold_name_or_alphanum' v
 let fold_name_or_literal' (v: _ #folder) =
   fold' ~fold:fold_name_or_literal v
-let fold_name_or_literal'opt (v: _ #folder) =
+let fold_name_or_literal'_opt (v: _ #folder) =
   fold_option ~fold:fold_name_or_literal' v
 let fold_ident_or_intlit' (v: _ #folder) =
   fold' ~fold:fold_ident_or_intlit v
-let fold_ident_or_intlit'opt (v: _ #folder) =
+let fold_ident_or_intlit'_opt (v: _ #folder) =
   fold_option ~fold:fold_ident_or_intlit' v
 
 (* --- *)
-
-let fold_procedure_name (v: _ #folder) =
-  handle v#fold_procedure_name ~continue:(fold_qualname v)
-
-let fold_procedure_name' (v: _ #folder) =
-  handle' v#fold_procedure_name' v ~fold:fold_procedure_name
-
-let fold_procedure_name'_opt (v: _ #folder) =
-  fold_option v ~fold:fold_procedure_name'
 
 let fold_rounding_mode (v: _ #folder) =
   leaf v#fold_rounding_mode
@@ -547,12 +565,13 @@ let fold_rounding (v: _ #folder) =
       | RoundingNotAny | RoundingDefault -> Fun.id
     end
 
-let fold_rounded_ident (v: _ #folder) =
-  handle v#fold_rounded_ident
-    ~continue: begin fun { rounded_ident; rounded_rounding } x -> x
-      >> fold_ident v rounded_ident
-      >> fold_rounding v rounded_rounding
-    end
+(* --- *)
 
-let fold_rounded_idents (v: _ #folder) =
-  fold_list ~fold:fold_rounded_ident v
+let fold_procedure_name (v: _ #folder) =
+  handle v#fold_procedure_name ~continue:(fold_qualname v)
+
+let fold_procedure_name' (v: _ #folder) =
+  handle' v#fold_procedure_name' v ~fold:fold_procedure_name
+
+let fold_procedure_name'_opt (v: _ #folder) =
+  fold_option v ~fold:fold_procedure_name'

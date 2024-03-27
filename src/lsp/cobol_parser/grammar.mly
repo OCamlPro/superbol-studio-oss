@@ -2217,7 +2217,7 @@ let counter :=
  | k = counter_kind; %prec lowest     { { counter_kind = k; counter_name = None   } }
  | k = counter_kind; in_of; n = name; { { counter_kind = k; counter_name = Some n } }
 
-let counter_kind ==
+let counter_kind :=
  | LINAGE_COUNTER; {LineageCounter}
  | PAGE_COUNTER;   {PageCounter}
  | LINE_COUNTER;   {LineCounter}
@@ -2245,6 +2245,24 @@ let ident [@symbol "<identifier>"] [@recovery dummy_ident] :=
 
 let idents [@symbol "<identifiers>"] [@recovery []] :=
   | ~ = rnel(ident); < >
+
+let scalar_ident_ ==        (* scalar identifier without reference modification *)
+ | q = qualident;                {QualIdent q : scalar_ident_ term} (* Works for object property too *)
+ | f = function_ident;           {InlineCall f}
+ | i = inline_invocation;        {InlineInvoke i}
+ | r = object_ref;               {ObjectRef r} (* Includes predefined address (NULL) *)
+ | a = address;                  {Address a}
+ | c = counter;                  {Counter c}
+
+let scalar_ident [@symbol "<scalar identifier>"] [@recovery dummy_ident] :=
+  | i = scalar_ident_; %prec below_RPAR { i }
+  | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
+
+(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] := *)
+(*   | ~ = rnel(scalar_ident); < > *)
+
+let length_of_expr :=
+  | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
@@ -2393,6 +2411,12 @@ let ident_or_numeric :=
  | l = numeric_literal; { UPCAST.numeric_with_ident l }
 let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
 
+let x == scalar                                       (* alias, as in GnuCOBOL *)
+let scalar :=
+ | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
+ | l = numeric_literal; { UPCAST.numeric_as_scalar l }
+ | l = length_of_expr;  { l }
+
 (* Used in CALL *)
 let name_or_string :=
  | i = name;           { Name i }
@@ -2536,8 +2560,8 @@ let atomic_no_leftmost_length [@recovery dummy_expr] [@symbol "<atomic expressio
 
 (* --- *)
 
-let arithmetic_term :=
- | i = ident;                { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
+let arithmetic_term :=                                            (* `arith_x` *)
+ | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
  | i = integer;              { Atom (Integer i) }
  | f = fixedlit;             { Atom (Fixed f) }
  | f = floatlit;             { Atom (Floating f) }
@@ -2547,7 +2571,7 @@ let arithmetic_term :=
  | l = length_of_expression; { Atom l }
 
 let arithmetic_term_no_all :=
- | i = ident;    { Atom (UPCAST.ident_with_literal i) } (* numeric or boolean *)
+ | i = scalar_ident;    { Atom (UPCAST.scalar_ident_as_scalar i) } (* numeric or boolean *)
  | i = integer;  { Atom (Integer i) }
  | f = fixedlit; { Atom (Fixed f) }
  | f = floatlit; { Atom (Floating f) }
@@ -2557,7 +2581,7 @@ let arithmetic_term_no_all :=
  | l = length_of_expression; { Atom l }
 
 let arithmetic_term_no_length :=
- | i = ident;                { Atom (UPCAST.ident_with_literal i) }
+ | i = scalar_ident;         { Atom (UPCAST.scalar_ident_as_scalar i) }
  | i = integer;              { Atom (Integer i) }
  | f = fixedlit;             { Atom (Fixed f) }
  | f = floatlit;             { Atom (Floating f) }
@@ -2565,8 +2589,8 @@ let arithmetic_term_no_length :=
  | f = figurative_constant;  { Atom (Fig f) }
  | a = alphanum;             { Atom (Alphanum a) }
 
-let length_of_expression :=
-  | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
+let length_of_expression ==
+  | ~ = length_of_expr; < >
 
 (* ---------- Conditions ---------- *)
 
@@ -2690,7 +2714,7 @@ let column_number :=
 
 let rounded_ident :=
   | i = ident; rm = rounded_phrase_opt;
-    { { rounded_ident = i; rounded_rounding = rm} }
+    { { rounded = i; rounded_rounding = rm } }
 let rounded_idents == ~ = rnel(rounded_ident); < >
 
 let rounded_phrase_opt :=
@@ -3111,11 +3135,11 @@ let display_with_clause :=
 
 %public let unconditional_action := ~ = divide_statement; <Divide>
 divide_statement:
- | DIVIDE in_ = ident_or_numeric INTO irl = rounded_idents
+ | DIVIDE in_ = x INTO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_divide
    { { divide_operands = DivideInto { divisor = in_; dividends = irl };
        divide_on_size_error = h } }
- | DIVIDE in1 = ident_or_numeric INTO in2 = ident_or_numeric
+ | DIVIDE in1 = x INTO in2 = x
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -3125,7 +3149,7 @@ divide_statement:
                                         into = true;
                                         remainder = ro };
        divide_on_size_error = h } }
- | DIVIDE in1 = ident_or_numeric BY in2 = ident_or_numeric
+ | DIVIDE in1 = x BY in2 = x
    GIVING irl = rounded_idents ro = ro(pf(REMAINDER,ident))
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); (* no remainder: single ir *)
    end_divide
@@ -3467,13 +3491,13 @@ let move_statement :=
 
 %public let unconditional_action := ~ = multiply_statement; <Multiply>
 let multiply_statement :=
- | MULTIPLY; in_ = ident_or_numeric; BY; irl = rounded_idents;
-   h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);end_multiply;
+ | MULTIPLY; in_ = scalar; BY; irl = rounded_idents;
+   h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_multiply;
    { { multiply_operands = MultiplyBy { multiplier = in_; multiplicand = irl };
        multiply_on_size_error = h; } }
- | MULTIPLY; in1 = ident_or_numeric; BY; in2 = ident_or_numeric;
+ | MULTIPLY; in1 = scalar; BY; in2 = scalar;
    GIVING; irl = rounded_idents;
-   h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);end_multiply;
+   h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_multiply;
    { { multiply_operands = MultiplyGiving { multiplier = in1;
                                             multiplicand = in2;
                                             targets = irl; };
@@ -3556,11 +3580,11 @@ let perform_phrase :=
 let with_test := WITH?; TEST; ~ = after_or_before; < >
 
 let varying_phrase :=
- | i = ident; FROM; in_ = ident_or_numeric;
-   ino = ro(pf(BY,ident_or_numeric));
-   UNTIL; c = condition;
-   { { varying_ident = i; varying_from = in_;
-       varying_by = ino; varying_until = c } }
+  | i = ident; FROM; in_ = scalar;
+    ino = ro(pf(BY,scalar));                   (* TODO: see `arith_nonzero_x` *)
+    UNTIL; c = condition;
+    { { varying_ident = i; varying_from = in_;
+        varying_by = ino; varying_until = c } }
 
 
 
