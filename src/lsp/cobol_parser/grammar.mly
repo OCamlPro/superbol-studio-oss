@@ -81,6 +81,10 @@ let dual_handler_none =
 
 %nonassoc FD SD
 
+(* Set precedence of ACCEPT/DISPLAY "WITH" clauses to resolve conflicts *)
+%nonassoc AUTO FULL GRID ERASE LEFTLINE OVERLINE PROMPT REQUIRED SECURE NO_ECHO SIZE CONTROL BLANK TIME_OUT LEFT_JUSTIFY RIGHT_JUSTIFY SPACE_FILL TRAILING_SIGN UPDATE UPPER LOWER ZERO_FILL
+
+
 (* Set precedence of statements to be higher than imperative statement *)
 (* This helps resolve conflicts in lists of statements, by prefering shift *)
 %nonassoc ACCEPT
@@ -1464,24 +1468,31 @@ report_group_descr_clause: (* P286 *)
  | c = report_occurs_clause       { c }                           (* +COB2002 *)
  | c = varying_clause             { ReportVarying c }             (* +COB2002 *)
 
-screen_descr_clause: (* P293 *) (* +COB2002 *)
- |     global_clause              { ScreenGlobal }
- | c = screen_line_clause         { ScreenLine c }
- | c = screen_column_clause       { ScreenColumn c }
- | c = blank_clause               { ScreenBlank c }
- | c = erase_clause               { ScreenErase c }
- | c = screen_attribute_clauses   { ScreenAttribute c }
- | c = loc(picture_clause)        { ScreenPicture c }
- | c = source_destination_clauses { ScreenSourceDestination c }
- |     blank_when_zero_clause     { ScreenBlankWhenZero }
- |     justified_clause           { ScreenJustified }
- | c = sign_clause                { ScreenSign c }
- |     full_clause                { ScreenFull }
- |     auto_clause                { ScreenAuto }
- |     secure_clause              { ScreenSecure }
- |     required_clause            { ScreenRequired }
- | c = screen_occurs_clause       { ScreenOccurs c }
- | c = report_screen_usage_clause { ScreenUsage c }
+let screen_descr_clause := (* P293 *) (* +COB2002 *)
+  |     global_clause;              {ScreenGlobal}
+  | ~ = screen_line_clause;         <ScreenLine>
+  | ~ = screen_column_clause;       <ScreenColumn>
+  | ~ = blank_clause;               <ScreenBlank>
+  | ~ = erase_clause;               <ScreenErase>
+  | ~ = screen_attribute_clauses;   <ScreenAttribute>
+  | ~ = loc(picture_clause);        <ScreenPicture>
+  | ~ = source_destination_clauses; <ScreenSourceDestination>
+  |     blank_when_zero_clause;     {ScreenBlankWhenZero}
+  |     justified_clause;           {ScreenJustified}
+  | ~ = sign_clause;                <ScreenSign>
+  |     full_clause;                {ScreenFull}
+  |     auto_clause;                {ScreenAuto}
+  |     secure_clause;              {ScreenSecure}
+  |     required_clause;            {ScreenRequired}
+  | ~ = screen_occurs_clause;       <ScreenOccurs>
+  | ~ = report_screen_usage_clause; <ScreenUsage>
+  |     grid_clause;                {ScreenGrid}             (* MF *)
+  |     leftline_clause;            {ScreenLeftLine}         (* MF *)
+  |     overline_clause;            {ScreenOverLine}         (* MF *)
+  | ~ = size_clause;                <ScreenSize>             (* MF *)
+  | ~ = screen_control_clause;      <ScreenControl>          (* MF *)
+  | ~ = prompt_character_clause;    <ScreenPromptCharacter>  (* MF *)
+  |     zero_fill_clause;           {ScreenZeroFill}         (* MF *)
 
 
 
@@ -1918,10 +1929,18 @@ source_destination_clause:
 
 let full_clause == FULL
 let auto_clause == AUTO
-let secure_clause == SECURE
+let secure_clause == SECURE | NO_ECHO (* NO_ECHO = SECURE only in some dialects *)
 let required_clause == REQUIRED
+let grid_clause == GRID
+let leftline_clause == LEFTLINE
+let overline_clause == OVERLINE
+let zero_fill_clause == ZERO_FILL
 let screen_occurs_clause := OCCURS; ~ = integer; TIMES?; < >
-
+let size_clause := SIZE; IS?; ~ = ident_or_integer; < >
+let screen_control_clause := CONTROL; IS?; ~ = ident; < >
+let prompt_character_clause :=
+  | PROMPT;                                          {None}
+  | PROMPT; CHARACTER; IS?; ~ = ident_or_nonnumeric; <Some>
 
 
 
@@ -2894,15 +2913,33 @@ let accept_misc :=
  | EXCEPTION; STATUS;      {AcceptExceptionStatus} (* MF *)
 
 let accept_clause :=
- | ~ = at_position;                    <AcceptAt>
- | FROM; CRT;                          {AcceptFromCRT}   (* MF *)
- | MODE; IS?; BLOCK;                   {AcceptModeBlock} (* MF *)
- | WITH; ~ = loc(accept_with_clause)+; <AcceptWith>      (* MF *)
+  | ~ = at_position;                                  <AcceptAt>
+  | FROM; CRT;                                        {AcceptFromCRT}   (* MF *)
+  | MODE; IS?; BLOCK;                                 {AcceptModeBlock} (* MF *)
+  | WITH?; ~ = nell(loc(accept_with_clause)); %prec lowest <AcceptWith> (* MF *)
+    (* Note: GnuCOBOL makes "WITH" optional *)
 
-let accept_with_clause :=
- | UPDATE;                      {AcceptUpdate}
- | ~ = screen_attribute_clause; <AcceptAttribute>
-(* TODO: MF allows many clauses *)
+let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-with-clause>"] := (* MF *)
+  | ~ = screen_attribute_clause; <AcceptAttribute>
+  | auto_clause;                 {AcceptAuto}
+  | full_clause;                 {AcceptFull}
+  | grid_clause;                 {AcceptGrid}
+  | leftline_clause;             {AcceptLeftLine}
+  | overline_clause;             {AcceptOverLine}
+  | ~ = prompt_character_clause; <AcceptPromptCharacter>
+  | required_clause;             {AcceptRequired}
+  | secure_clause;               {AcceptSecure}
+  | ~ = size_clause;             <AcceptSize>
+  | ~ = screen_control_clause;   <AcceptControl>
+  | TIME_OUT;                    {AcceptTimeout}
+  | LEFT_JUSTIFY;                {AcceptLeftJustify}
+  | RIGHT_JUSTIFY;               {AcceptRightJustify}
+  | SPACE_FILL;                  {AcceptSpaceFill}
+  | TRAILING_SIGN;               {AcceptTrailingSign}
+  | UPDATE;                      {AcceptUpdate}
+  | UPPER;                       {AcceptUpper}
+  | LOWER;                       {AcceptLower}
+  | zero_fill_clause;            {AcceptZeroFill}
 
 
 
@@ -3083,10 +3120,11 @@ let display_items_clauses :=
    { { display_items = ill; display_clauses = dcl; } }
 
 let display_clause :=
- | ~ = at_position;                     <DisplayAt>
- | ~ = loc(upon);                       <DisplayUpon>
- | MODE; IS?; BLOCK;                    {DisplayModeIsBlock} (* MF *)
- | WITH; ~ = loc(display_with_clause)+; <DisplayWith>       (* MF *)
+  | ~ = at_position;                                 <DisplayAt>
+  | ~ = loc(upon);                                   <DisplayUpon>
+  | MODE; IS?; BLOCK;                                {DisplayModeIsBlock} (* MF *)
+  | WITH?; ~ = nell(loc(display_with_clause)); %prec lowest <DisplayWith> (* MF *)
+    (* Note: GnuCOBOL makes "WITH" optional *)
 
 let upon :=
  | UPON; ~ = name;                         <DisplayUponName>
@@ -3098,11 +3136,16 @@ let display_device_mnemonic :=
  | ARGUMENT_NUMBER;   {DisplayDeviceArgNumber}
  | COMMAND_LINE;      {DisplayDeviceCommandLine}
 
-let display_with_clause :=
- | c = blank_clause;            { DisplayBlank c }
- | c = erase_clause;            { DisplayErase c }
- | c = screen_attribute_clause; { DisplayAttribute c }
-(* TODO: MF allows many clauses *)
+let display_with_clause [@recovery DisplayAttribute Highlight] [@symbol "<display-with-clause>"] := (* MF *)
+  | ~ = screen_attribute_clause; <DisplayAttribute>
+  | grid_clause;                 {DisplayGrid}
+  | ~ = erase_clause;            <DisplayErase>
+  | leftline_clause;             {DisplayLeftLine}
+  | overline_clause;             {DisplayOverLine}
+  | ~ = size_clause;             <DisplaySize>
+  | ~ = screen_control_clause;   <DisplayControl>
+  | ~ = blank_clause;            <DisplayBlank>
+
 
 
 (* DIVIDE STATEMENT *)

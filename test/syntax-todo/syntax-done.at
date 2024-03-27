@@ -29,3 +29,33 @@ AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.c
 AT_CLEANUP
 
 
+
+AT_SETUP([ACCEPT AT ... AUTO])
+AT_DATA([prog.cob], [
+identification division.
+program-id.             acas-get-params.
+ procedure division.
+     accept   menu-reply at 0644 with foreground-color 6 auto.
+])
+
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
+[Checking `prog.cob'
+])
+
+AT_CLEANUP
+
+
+
+AT_SETUP([DISPLAY ... BLINK])
+AT_DATA([prog.cob], [
+identification division.
+program-id.             acas-get-params.
+ procedure division.
+     display "Waiting < sec " at line ws-lines col 1 blink.
+])
+
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
+[Checking `prog.cob'
+])
+
+AT_CLEANUP

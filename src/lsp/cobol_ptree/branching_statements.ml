@@ -208,9 +208,26 @@ and accept_clause =
   | AcceptWith of accept_with_clause with_loc list                      (* MF *)
 
 and accept_with_clause =
-  | AcceptUpdate
   | AcceptAttribute of Data_descr.screen_attribute_clause
-
+  | AcceptAuto
+  | AcceptFull
+  | AcceptGrid
+  | AcceptLeftLine
+  | AcceptOverLine
+  | AcceptPromptCharacter of ident_or_nonnum option (* or figurative *)
+  | AcceptRequired
+  | AcceptSecure
+  | AcceptSize of ident_or_intlit
+  | AcceptControl of ident
+  | AcceptTimeout
+  | AcceptLeftJustify
+  | AcceptRightJustify
+  | AcceptSpaceFill
+  | AcceptTrailingSign
+  | AcceptUpdate
+  | AcceptUpper
+  | AcceptLower
+  | AcceptZeroFill
 
 
 (*
@@ -234,8 +251,8 @@ and display_items_clauses =
 and display_clause =
   | DisplayAt of position
   | DisplayUpon of display_target with_loc
-  | DisplayModeIsBlock
-  | DisplayWith of display_with_clause with_loc list
+  | DisplayModeIsBlock                                                   (* MF *)
+  | DisplayWith of display_with_clause with_loc list                     (* MF *)
 
 and display_target =
   | DisplayUponName of name with_loc
@@ -248,10 +265,14 @@ and display_device_mnemonic =
  | DisplayDeviceCommandLine
 
 and display_with_clause =
-  | DisplayBlank of Data_descr.blank_clause
-  | DisplayErase of Data_descr.erase_clause
   | DisplayAttribute of Data_descr.screen_attribute_clause
-
+  | DisplayGrid
+  | DisplayErase of Data_descr.erase_clause
+  | DisplayLeftLine
+  | DisplayOverLine
+  | DisplaySize of ident_or_intlit
+  | DisplayControl of ident
+  | DisplayBlank of Data_descr.blank_clause
 
 
 (* ADD & SUBTRACT *)
@@ -730,10 +751,28 @@ and pp_accept_clause ppf = function
       Fmt.(list ~sep:sp (pp_with_loc pp_accept_with_clause)) with_
 
 and pp_accept_with_clause ppf = function
-  | AcceptUpdate -> Fmt.pf ppf "UPDATE"
   | AcceptAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
-
-
+  | AcceptAuto -> Fmt.pf ppf "AUTO"
+  | AcceptFull -> Fmt.pf ppf "FULL"
+  | AcceptGrid -> Fmt.pf ppf "GRID"
+  | AcceptLeftLine -> Fmt.pf ppf "LEFTLINE"
+  | AcceptOverLine -> Fmt.pf ppf "OVERLINE"
+  | AcceptPromptCharacter (None) -> Fmt.pf ppf "PROMPT"
+  | AcceptPromptCharacter (Some inn) ->
+      Fmt.pf ppf "PROMPT CHARACTER IS %a" pp_ident_or_nonnum inn
+  | AcceptRequired -> Fmt.pf ppf "REQUIRED"
+  | AcceptSecure -> Fmt.pf ppf "SECURE" (* MF doc says "SELECT", likely a typo *)
+  | AcceptSize ii -> Fmt.pf ppf "SIZE IS %a" pp_ident_or_intlit ii
+  | AcceptControl i -> Fmt.pf ppf "CONTROL IS %a" pp_ident i
+  | AcceptTimeout -> Fmt.pf ppf "TIMEOUT"
+  | AcceptLeftJustify -> Fmt.pf ppf "LEFT-JUSTIFY"
+  | AcceptRightJustify -> Fmt.pf ppf "RIGHT-JUSTIFY"
+  | AcceptSpaceFill -> Fmt.pf ppf "SPACE-FILL"
+  | AcceptTrailingSign -> Fmt.pf ppf "TRAILING-SIGN"
+  | AcceptUpdate -> Fmt.pf ppf "UPDATE"
+  | AcceptUpper -> Fmt.pf ppf "UPPER"
+  | AcceptLower -> Fmt.pf ppf "LOWER"
+  | AcceptZeroFill -> Fmt.pf ppf "ZERO-FILL"
 
 (* DISPLAY *)
 
@@ -763,11 +802,14 @@ and pp_display_clause ppf = function
    Fmt.(list ~sep:sp (pp_with_loc pp_display_with_clause)) ppf sc
 
 and pp_display_with_clause ppf = function
-  | DisplayBlank bc -> Data_descr.pp_blank_clause ppf bc
-  | DisplayErase ec -> Data_descr.pp_erase_clause ppf ec
   | DisplayAttribute ac -> Data_descr.pp_screen_attribute_clause ppf ac
-
-
+  | DisplayGrid -> Fmt.pf ppf "GRID@"
+  | DisplayErase ec -> Data_descr.pp_erase_clause ppf ec
+  | DisplayLeftLine -> Fmt.pf ppf "LEFTLINE@"
+  | DisplayOverLine -> Fmt.pf ppf "OVERLINE@"
+  | DisplaySize ii -> Fmt.pf ppf "SIZE@ IS@ %a" pp_ident_or_intlit ii
+  | DisplayControl i -> Fmt.pf ppf "CONTROL@ IS@ %a" pp_ident i
+  | DisplayBlank bc -> Data_descr.pp_blank_clause ppf bc
 
 (* ADD & SUBTRACT *)
 
