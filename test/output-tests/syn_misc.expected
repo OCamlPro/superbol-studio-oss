@@ -1623,7 +1623,7 @@ syn_misc.at-3266-prog.cob:15.7-15.12:
 ----          ^^^^^
   16              MOVE 1 TO DONE
   17              GOBACK.
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3321:0
 syn_misc.at-3321-prog.cob:7.7-7.21:
@@ -1664,7 +1664,7 @@ syn_misc.at-3321-prog.cob:19.0:
   16              COPY "sec-1.inc".
   17         * Also purposefully in Area A
   18           COPY "sec-2.inc".
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3386:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3436:0
@@ -1781,63 +1781,6 @@ syn_misc.at-4860-prog2.cob:12.7-12.9:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4882:0
-syn_misc.at-4882-prog.cob:11.15:
-   8          01  y           CONSTANT "ab".
-   9   
-  10          PROCEDURE       DIVISION.
-  11 >            STOP x
-----                  ^
-  12              STOP y
-  13              .
->> Hint: Missing <literal> .
-
-syn_misc.at-4882-prog.cob:11.16-11.17:
-   8          01  y           CONSTANT "ab".
-   9   
-  10          PROCEDURE       DIVISION.
-  11 >            STOP x
-----                   ^
-  12              STOP y
-  13              .
->> Error: Invalid syntax
-
-syn_misc.at-4882-prog.cob:11.17:
-   8          01  y           CONSTANT "ab".
-   9   
-  10          PROCEDURE       DIVISION.
-  11 >            STOP x
-----                    ^
-  12              STOP y
-  13              .
->> Hint: Missing .
-
-syn_misc.at-4882-prog.cob:12.11-12.15:
-   9   
-  10          PROCEDURE       DIVISION.
-  11              STOP x
-  12 >            STOP y
-----              ^^^^
-  13              .
->> Warning: Invalid syntax
-
-syn_misc.at-4882-prog.cob:12.15:
-   9   
-  10          PROCEDURE       DIVISION.
-  11              STOP x
-  12 >            STOP y
-----                  ^
-  13              .
->> Hint: Missing <literal> .
-
-syn_misc.at-4882-prog.cob:12.16-12.17:
-   9   
-  10          PROCEDURE       DIVISION.
-  11              STOP x
-  12 >            STOP y
-----                   ^
-  13              .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5068:0
 syn_misc.at-5068-prog.cob:7.16-7.24:
    4          ENVIRONMENT DIVISION.
@@ -3180,7 +3123,7 @@ syn_misc.at-8158-cobol85.cob:12.7-12.8:
   12 >        P.
 ----          ^
   13              GOBACK
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-8158-cobol85.cob:13.17:
   10              PERFORM P

@@ -65,8 +65,9 @@ class virtual ['a] folder = object
   method fold_send_operands       : (send_operands           , 'a) fold = default
   method fold_set_condition_spec  : (set_condition_spec      , 'a) fold = default
   method fold_set_switch_spec     : (set_switch_spec         , 'a) fold = default
-  method fold_stop_kind           : (stop_kind               , 'a) fold = default
-  method fold_stop_run            : (stop_run                , 'a) fold = default
+  method fold_status_kind         : (status_kind             , 'a) fold = default
+  method fold_stop_run_return     : (stop_run_return         , 'a) fold = default
+  method fold_stop_arg            : (stop_arg                , 'a) fold = default
   method fold_string_delimiter    : (string_delimiter        , 'a) fold = default
   method fold_string_source       : (string_source           , 'a) fold = default
   method fold_tallying            : (tallying                , 'a) fold = default
@@ -362,14 +363,14 @@ let fold_set_condition_spec (v: _ #folder) =
       >> fold_bool v set_condition_value
     end
 
-let fold_stop_kind (v: _ #folder) =
-  leaf v#fold_stop_kind
+let fold_status_kind (v: _ #folder) =
+  leaf v#fold_status_kind
 
 let fold_stop_run (v: _ #folder) =
   handle v#fold_stop_run
-    ~continue:begin fun { stop_kind; stop_status } x -> x
-      >> fold_stop_kind v stop_kind
-      >> fold_ident_or_literal v stop_status
+    ~continue:begin fun { status_kind; status_value } x -> x
+      >> fold_status_kind v status_kind
+      >> fold_option ~fold:fold_scalar v status_value
     end
 
 let fold_string_delimiter (v: _ #folder) =
@@ -640,11 +641,36 @@ let fold_sort' (v: _ #folder) =
             ~fold:Operands_visitor.fold_alphabet_specification
     end
 
+let fold_stop_run_return (v: _ #folder) =
+  handle v#fold_stop_run_return
+    ~continue:begin fun r x -> match r with
+      | StopReturningScalar s -> x
+        >> fold_scalar v s
+      | StopReturningAddress a -> x
+        >> fold_qualident v a
+      | StopReturningInt { value; size } -> x
+        >> fold_literal v value
+        >> fold_option ~fold:fold_literal v size
+      | StopReturningStatus { status_kind = _st; status_value} -> x
+        >> fold_option ~fold:fold_scalar v status_value
+    end
+
+let fold_stop_arg (v: _ #folder) =
+  handle v#fold_stop_arg
+    ~continue:begin fun a x -> match a with
+      | StopWithQualIdent i -> x
+        >> fold_qualident v i
+      | StopWithLiteral l -> x
+        >> fold_literal v l
+    end
+
 let fold_stop' (v: _ #folder) =
   handle' v#fold_stop' v
     ~fold:begin fun v -> function
-      | StopRun o -> fold_option ~fold:fold_stop_run v o
-      | StopLiteral l -> fold_literal v l
+      | StopArg a -> fold_option ~fold:fold_stop_arg v a
+      | StopRun r -> fold_option ~fold:fold_stop_run_return v r
+      | StopError -> Fun.id
+      | StopThread i -> fold_option ~fold:fold_qualident v i
     end
 
 let fold_terminate' (v: _ #folder) =

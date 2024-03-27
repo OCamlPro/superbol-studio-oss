@@ -351,46 +351,6 @@ run_file.at-2398-prog.cob:206.18-206.22:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2774:0
-run_file.at-2774-prog.cob:79.21:
-  76              open i-o indexed-file
-  77              perform indexing-check
-  78              if not indexing-ok
-  79 >              stop run returning 1
-----                        ^
-  80              end-if
-  81   
->> Hint: Missing .
-
-run_file.at-2774-prog.cob:79.22-79.31:
-  76              open i-o indexed-file
-  77              perform indexing-check
-  78              if not indexing-ok
-  79 >              stop run returning 1
-----                         ^^^^^^^^^
-  80              end-if
-  81   
->> Error: Invalid syntax
-
-run_file.at-2774-prog.cob:79.33:
-  76              open i-o indexed-file
-  77              perform indexing-check
-  78              if not indexing-ok
-  79 >              stop run returning 1
-----                                    ^
-  80              end-if
-  81   
->> Hint: Missing .
-
-run_file.at-2774-prog.cob:80.11-80.17:
-  77              perform indexing-check
-  78              if not indexing-ok
-  79                stop run returning 1
-  80 >            end-if
-----              ^^^^^^
-  81   
-  82         *> read all the duplicate 00b02 keys
->> Warning: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:3089:0
 run_file.at-3089-prog.cob:9.34-9.42:
    6   
@@ -5079,26 +5039,6 @@ run_file.at-9007-prog.cob:77.62-77.69:
   79              05  SUB                             BINARY-SHORT UNSIGNED.
 >> Error: Invalid syntax
 
-run_file.at-9007-prog.cob:143.19:
- 140                  PERFORM READ-RECORD
- 141              END-PERFORM.
- 142              CLOSE FLATFILE.
- 143 >            STOP RUN RETURNING 0.
-----                      ^
- 144   
- 145          READ-RECORD.
->> Hint: Missing .
-
-run_file.at-9007-prog.cob:143.20-143.29:
- 140                  PERFORM READ-RECORD
- 141              END-PERFORM.
- 142              CLOSE FLATFILE.
- 143 >            STOP RUN RETURNING 0.
-----                       ^^^^^^^^^
- 144   
- 145          READ-RECORD.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9245:0
 run_file.at-9245-prog.cob:15.50:
   12          01  I                       PIC XX COMP-X.
@@ -5899,26 +5839,6 @@ run_file.at-11443-prog.cob:90.62-90.69:
 ----                                                                 ^^^^^^^
   91          01  WORK-AREA.
   92              05  SUB                             BINARY-SHORT UNSIGNED.
->> Error: Invalid syntax
-
-run_file.at-11443-prog.cob:150.19:
- 147                  PERFORM READ-RECORD
- 148              END-PERFORM.
- 149              CLOSE FLATFILE.
- 150 >            STOP RUN RETURNING 0.
-----                      ^
- 151   
- 152          LOADFILE.
->> Hint: Missing .
-
-run_file.at-11443-prog.cob:150.20-150.29:
- 147                  PERFORM READ-RECORD
- 148              END-PERFORM.
- 149              CLOSE FLATFILE.
- 150 >            STOP RUN RETURNING 0.
-----                       ^^^^^^^^^
- 151   
- 152          LOADFILE.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12161:0
@@ -7297,26 +7217,6 @@ run_file.at-12582-prog.cob:77.55-77.62:
   79              05  SUB                     USAGE BINARY-SHORT UNSIGNED.
 >> Error: Invalid syntax
 
-run_file.at-12582-prog.cob:145.19:
- 142                PERFORM READ-RECORD
- 143              END-PERFORM.
- 144              CLOSE FLATFILE.
- 145 >            STOP RUN RETURNING 0.
-----                      ^
- 146   
- 147          READ-RECORD.
->> Hint: Missing .
-
-run_file.at-12582-prog.cob:145.20-145.29:
- 142                PERFORM READ-RECORD
- 143              END-PERFORM.
- 144              CLOSE FLATFILE.
- 145 >            STOP RUN RETURNING 0.
-----                       ^^^^^^^^^
- 146   
- 147          READ-RECORD.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12798:0
 run_file.at-12798-prog.cob:41.54:
   38              05  FILLER PIC X(8) VALUE "DEL00000".
@@ -7398,47 +7298,7 @@ run_file.at-12798-prog.cob:63.55-63.62:
   65              05  SUB                             BINARY-SHORT UNSIGNED.
 >> Error: Invalid syntax
 
-run_file.at-12798-prog.cob:97.19:
-  94              DISPLAY "Std Load data"
-  95              PERFORM LOADFILE.
-  96   
-  97 >            STOP RUN RETURNING 0.
-----                      ^
-  98   
-  99          READ-RECORD.
->> Hint: Missing .
-
-run_file.at-12798-prog.cob:97.20-97.29:
-  94              DISPLAY "Std Load data"
-  95              PERFORM LOADFILE.
-  96   
-  97 >            STOP RUN RETURNING 0.
-----                       ^^^^^^^^^
-  98   
-  99          READ-RECORD.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12935:0
-run_file.at-12935-prog.cob:45.19:
-  42              SET ENVIRONMENT "COB_SEQ_CONCAT_SEP" TO "&"
-  43              MOVE "file1&file2&file3" TO THE-FILE-NAME
-  44              PERFORM LISTFILE.
-  45 >            STOP RUN RETURNING 0.
-----                      ^
-  46   
-  47          LISTFILE.
->> Hint: Missing .
-
-run_file.at-12935-prog.cob:45.20-45.29:
-  42              SET ENVIRONMENT "COB_SEQ_CONCAT_SEP" TO "&"
-  43              MOVE "file1&file2&file3" TO THE-FILE-NAME
-  44              PERFORM LISTFILE.
-  45 >            STOP RUN RETURNING 0.
-----                       ^^^^^^^^^
-  46   
-  47          LISTFILE.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13004:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13091:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13142:0

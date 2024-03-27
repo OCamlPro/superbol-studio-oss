@@ -80,39 +80,7 @@ used_binaries.at-743-called.cob:9.32-9.44:
 
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:826:0
-used_binaries.at-826-prog.cob:6.38-6.39:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-used_binaries.at-826-prog.cob:6.38:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:844:0
-used_binaries.at-844-prog.cob:6.38-6.39:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-used_binaries.at-844-prog.cob:6.38:
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:865:0
 used_binaries.at-865-prog.cob:8.26:
    5          WORKING-STORAGE  SECTION.
@@ -134,56 +102,8 @@ used_binaries.at-865-prog.cob:8.27-8.39:
   10              STOP RUN WITH NORMAL STATUS.
 >> Error: Invalid syntax
 
-used_binaries.at-865-prog.cob:10.38-10.39:
-   7          PROCEDURE        DIVISION.
-   8              ACCEPT CLI FROM COMMAND-LINE
-   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
-  10 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-used_binaries.at-865-prog.cob:10.38:
-   7          PROCEDURE        DIVISION.
-   8              ACCEPT CLI FROM COMMAND-LINE
-   9              DISPLAY CLI WITH NO ADVANCING END-DISPLAY
-  10 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:882:0
-used_binaries.at-882-prog.cob:5.38-5.39:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      a.
-   4          PROCEDURE        DIVISION.
-   5 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-used_binaries.at-882-prog.cob:5.38:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      a.
-   4          PROCEDURE        DIVISION.
-   5 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:911:0
-used_binaries.at-911-prog.cob:6.38-6.39:
-   3          PROGRAM-ID.      a.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-used_binaries.at-911-prog.cob:6.38:
-   3          PROGRAM-ID.      a.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY "job" WITH NO ADVANCING END-DISPLAY
-   6 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:944:0
 used_binaries.at-944-progprep.cob:5.36-5.37:
    2          IDENTIFICATION   DIVISION.
