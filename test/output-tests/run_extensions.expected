@@ -340,16 +340,6 @@ run_extensions.at-445-prog.cob:28.34-28.40:
   30         *78 var-length-n      value length of n'001'.
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:29.33:
-  26              10 T2        PIC X(22).
-  27          78 var-length-l      value length of '00128'.
-  28          78 var-length-x      value length of x'a0'.
-  29 >        78 var-length-z      value length of z'a0'.
-----                                    ^
-  30         *78 var-length-n      value length of n'001'.
-  31          PROCEDURE        DIVISION.
->> Hint: Missing <literal>
-
 run_extensions.at-445-prog.cob:29.34-29.40:
   26              10 T2        PIC X(22).
   27          78 var-length-l      value length of '00128'.

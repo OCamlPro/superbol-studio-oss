@@ -4,16 +4,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:96:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:135:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:159:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:213:0
-run_functions.at-213-prog.cob:32.39-32.44:
-  29                TO TEST-FLD
-  30              IF TEST-FLD NOT = 1
-  31                 DISPLAY 'BYTE-LENGTH x"a0" wrong: ' TEST-FLD.
-  32 >            MOVE FUNCTION BYTE-LENGTH ( z'a0' )
-----                                          ^^^^^
-  33                TO TEST-FLD
-  34              IF TEST-FLD NOT = 3
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:253:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:278:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:325:0
@@ -88,26 +78,6 @@ run_functions.at-410-prog.cob:34.7-34.15:
   35   
   36              IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
 >> Error: Unexpected >>END-IF compiler directive
-
-run_functions.at-410-prog.cob:36.53:
-  33              IF BITX NOT = "111100001111000100000000----------"
-  34          >>END-IF
-  35   
-  36 >            IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
-----                                                        ^
-  37                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
-  38                         BITX (1:24).
->> Hint: Missing <expression>
-
-run_functions.at-410-prog.cob:36.54-36.59:
-  33              IF BITX NOT = "111100001111000100000000----------"
-  34          >>END-IF
-  35   
-  36 >            IF FUNCTION BIT-TO-CHAR (BITX(1:24)) NOT = z"01"
-----                                                         ^^^^^
-  37                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
-  38                         BITX (1:24).
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:541:0
 run_functions.at-541-prog.cob:36.7-36.31:
@@ -240,68 +210,8 @@ run_functions.at-541-prog.cob:79.7-79.16:
   81   
 >> Error: Unexpected >>END-IF compiler directive
 
-run_functions.at-541-prog.cob:107.52:
- 104              SET  HEXX-FILLER TO TRUE
- 105              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
- 106   
- 107 >            IF FUNCTION HEX-TO-CHAR (HEXX(1:6)) NOT = z"01"
-----                                                       ^
- 108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
- 109                         HEXX (1:6).
->> Hint: Missing <expression>
-
-run_functions.at-541-prog.cob:107.53-107.58:
- 104              SET  HEXX-FILLER TO TRUE
- 105              STRING FUNCTION HEX-OF (z"01") DELIMITED BY SIZE INTO HEXX.
- 106   
- 107 >            IF FUNCTION HEX-TO-CHAR (HEXX(1:6)) NOT = z"01"
-----                                                        ^^^^^
- 108                 DISPLAY "UNEXPECTED CHAR VALUE, does not match z'01': "
- 109                         HEXX (1:6).
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:575:0
-run_functions.at-575-prog.cob:7.43:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01  P            USAGE    POINTER.
-   7 >        01  X            PIC      X(4) VALUE Z"ABC".
-----                                              ^
-   8          01  TEST-FLD     USAGE    BINARY-LONG.
-   9          PROCEDURE        DIVISION.
->> Hint: Missing <literal>
-
-run_functions.at-575-prog.cob:7.44-7.50:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01  P            USAGE    POINTER.
-   7 >        01  X            PIC      X(4) VALUE Z"ABC".
-----                                               ^^^^^^
-   8          01  TEST-FLD     USAGE    BINARY-LONG.
-   9          PROCEDURE        DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:650:0
-run_functions.at-650-prog.cob:7.34:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01  P   USAGE    POINTER.
-   7 >        01  X   PIC      X(4) VALUE Z"ABC".
-----                                     ^
-   8          01  B   PIC      X(10) BASED.
-   9          PROCEDURE        DIVISION.
->> Hint: Missing <literal>
-
-run_functions.at-650-prog.cob:7.35-7.41:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01  P   USAGE    POINTER.
-   7 >        01  X   PIC      X(4) VALUE Z"ABC".
-----                                      ^^^^^^
-   8          01  B   PIC      X(10) BASED.
-   9          PROCEDURE        DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:685:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:710:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:733:0
@@ -336,16 +246,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1719:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1769:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1795:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1877:0
-run_functions.at-1877-prog.cob:45.34-45.39:
-  42                 DISPLAY 'LENGTH x"a0" wrong: ' TEST-FLD
-  43                 END-DISPLAY
-  44              END-IF
-  45 >            MOVE FUNCTION LENGTH ( z'a0' )
-----                                     ^^^^^
-  46                TO TEST-FLD
-  47              IF TEST-FLD NOT = 3
->> Error: Invalid syntax
-
 run_functions.at-1877-prog.cob:51.34-51.39:
   48                 DISPLAY 'LENGTH z"a0" wrong: ' TEST-FLD
   49                 END-DISPLAY

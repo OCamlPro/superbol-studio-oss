@@ -357,26 +357,6 @@ run_fundamental.at-1494-prog.cob:14.7-14.10:
   16          IDENTIFICATION DIVISION.
 >> Error: Invalid syntax
 
-run_fundamental.at-1494-prog.cob:55.15:
-  52                        FUNCTION LENGTH (REPLY (arg)) " #"
-  53                        FUNCTION         REPLY (arg)  "#".
-  54         *>
-  55 >            MOVE z"echo this" to arg
-----                  ^
-  56              IF not (FUNCTION         REPLY (arg)  = arg
-  57                  and FUNCTION LENGTH (REPLY (arg)) = 100 )
->> Hint: Missing <identifier or literal>
-
-run_fundamental.at-1494-prog.cob:55.16-55.28:
-  52                        FUNCTION LENGTH (REPLY (arg)) " #"
-  53                        FUNCTION         REPLY (arg)  "#".
-  54         *>
-  55 >            MOVE z"echo this" to arg
-----                   ^^^^^^^^^^^^
-  56              IF not (FUNCTION         REPLY (arg)  = arg
-  57                  and FUNCTION LENGTH (REPLY (arg)) = 100 )
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1526:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1525:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1558:0

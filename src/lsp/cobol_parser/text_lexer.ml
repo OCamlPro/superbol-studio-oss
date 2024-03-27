@@ -257,7 +257,8 @@ let decode_symbolic_ebcdics' ~quotation w =
       end
   in
   ACC.result ~diags
-    (Grammar_tokens.ALPHANUM { str; quotation; hexadecimal = false } &@<- w)
+    (Grammar_tokens.ALPHANUM { str; quotation; hexadecimal = false;
+                               runtime_repr = Native_bytes } &@<- w)
 
 (* include Make (Text_keywords) *)
 

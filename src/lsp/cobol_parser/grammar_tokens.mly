@@ -31,7 +31,6 @@
 %token <Cobol_ptree.alphanum_string> ALPHANUM
 %token <Cobol_ptree.alphanum_string> ALPHANUM_PREFIX
 %token <Cobol_ptree.boolean> BOOLIT [@recovery boolean_zero]
-%token <string> NULLIT [@recovery "_"]
 %token <string> NATLIT [@recovery "_"]
 %token <string> SINTLIT [@recovery "0"]
 %token <string * char * string> FIXEDLIT [@recovery "0", '.', "0"]
