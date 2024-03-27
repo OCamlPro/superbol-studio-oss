@@ -80,8 +80,31 @@
   <span><span><span>[ `Name ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-base_ident_with_refmod"><a href="#val-base_ident_with_refmod" class="anchor"></a><code><span><span class="keyword">val</span> base_ident_with_refmod : 
-  <span><span><span>[ `DirectIdent ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.scalar_ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.object_view_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.base_ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-scalar_ident_as_scalar"><a href="#val-scalar_ident_as_scalar" class="anchor"></a><code><span><span class="keyword">val</span> scalar_ident_as_scalar : 
+  <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.qualident_</span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.address_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.counter_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.inline_call_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.inline_invoke_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.object_ref_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_scalar_ident_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.scalar_ident_</span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.arith_value_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-numeric_as_scalar"><a href="#val-numeric_as_scalar" class="anchor"></a><code><span><span class="keyword">val</span> numeric_as_scalar : 
+  <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.int_</span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.fixed_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.float_</span></span> ]</span>
+    <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.scalar_ident_</span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.lit_</span></span>
+  <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.arith_value_</span></span> ]</span>
     <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-simple_cond"><a href="#val-simple_cond" class="anchor"></a><code><span><span class="keyword">val</span> simple_cond : 
   <span><span><span>[ `Simple ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.simple_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.complex_</span></span> ]</span>
