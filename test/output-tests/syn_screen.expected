@@ -1,21 +1,11 @@
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:243:0
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:334:0
-syn_screen.at-334-prog.cob:9.37-9.41:
-   6          01  foo          PIC X.
-   7          SCREEN           SECTION.
-   8          01  scr.
-   9 >            03  a        PIC X TO foo FULL, REQUIRED,
-----                                        ^^^^
-  10                           LEFTLINE, RIGHTLINE, OVERLINE, UNDERLINE,
-  11                           GRID.
->> Error: Invalid syntax
-
-syn_screen.at-334-prog.cob:10.24-10.32:
+syn_screen.at-334-prog.cob:10.34-10.43:
    7          SCREEN           SECTION.
    8          01  scr.
    9              03  a        PIC X TO foo FULL, REQUIRED,
   10 >                         LEFTLINE, RIGHTLINE, OVERLINE, UNDERLINE,
-----                           ^^^^^^^^
+----                                     ^^^^^^^^^
   11                           GRID.
   12          PROCEDURE        DIVISION.
 >> Error: Invalid syntax
@@ -73,54 +63,7 @@ syn_screen.at-587-prog.cob:9.13-9.31:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:609:0
-syn_screen.at-609-prog.cob:11.45-11.49:
-   8   
-   9          SCREEN SECTION.
-  10          01  scr.
-  11 >            03  full-pointless PIC 999 TO num FULL.
-----                                                ^^^^
-  12              03  full-useful PIC ZZZ TO num FULL.
->> Error: Invalid syntax
-
-syn_screen.at-609-prog.cob:12.42-12.46:
-   9          SCREEN SECTION.
-  10          01  scr.
-  11              03  full-pointless PIC 999 TO num FULL.
-  12 >            03  full-useful PIC ZZZ TO num FULL.
-----                                             ^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:758:0
-syn_screen.at-758-prog.cob:19.50-19.54:
-  16              03  only-pic PIC 9.
-  17              03  from-to-using-without-pic FROM x.
-  18              03  auto-without-from-to-using PIC 9 AUTO.
-  19 >            03  full-without-to-using PIC X FROM x FULL.
-----                                                     ^^^^
-  20              03  full-and-justified PIC X USING x, FULL, JUST.
-  21              03  secure-with-from PIC X FROM x SECURE.
->> Error: Invalid syntax
-
-syn_screen.at-758-prog.cob:20.49-20.53:
-  17              03  from-to-using-without-pic FROM x.
-  18              03  auto-without-from-to-using PIC 9 AUTO.
-  19              03  full-without-to-using PIC X FROM x FULL.
-  20 >            03  full-and-justified PIC X USING x, FULL, JUST.
-----                                                    ^^^^
-  21              03  secure-with-from PIC X FROM x SECURE.
-  22              03  secure-justified-no-clauses VALUE "Hello" SECURE, JUST.
->> Error: Invalid syntax
-
-syn_screen.at-758-prog.cob:33.39-33.43:
-  30              03  numeric-value-no-pic VALUE 1.
-  31   
-  32          01 always-ok-scr.
-  33 >            03  my-group LINE 1, COL 1, FULL.
-----                                          ^^^^
-  34                  05  PIC X FROM "x" TO x.
-  35                  05  PIC Z USING num.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:817:0
 syn_screen.at-817-prog.cob:9.18:
    6          01 FIELD-A  PIC X(06) VALUE "ms-cob".
@@ -441,6 +384,26 @@ syn_screen.at-817-prog.cob:22.27-22.28:
   23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
   24              DISPLAY ( 3 , 1 ) A " --> A value"
 >> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:22.34-22.35:
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22 >            DISPLAY ( 1 , 1 ) ERASE.
+----                                     ^
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+>> Error: Invalid syntax
+
+syn_screen.at-817-prog.cob:22.34:
+  19              SUBTRACT 3 FROM COL.
+  20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.
+  21              ACCEPT  (   , 10) A.
+  22 >            DISPLAY ( 1 , 1 ) ERASE.
+----                                     ^
+  23              DISPLAY ( 2 , 1 ) "Field value : ", FIELD-A.
+  24              DISPLAY ( 3 , 1 ) A " --> A value"
+>> Hint: Missing EOL
 
 syn_screen.at-817-prog.cob:23.19-23.20:
   20              DISPLAY FIELD-A AT LINE LIN COLUMN COL.

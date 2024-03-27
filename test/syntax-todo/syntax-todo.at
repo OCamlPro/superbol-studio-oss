@@ -956,55 +956,6 @@ AT_CLEANUP
 
 
 
-AT_SETUP([ACCEPT AT ... AUTO])
-AT_DATA([prog.cob], [
-identification division.
-program-id.             acas-get-params.
- procedure division.
-     accept   menu-reply at 0644 with foreground-color 6 auto.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:5.57-5.61:
-   2   identification division.
-   3   program-id.             acas-get-params.
-   4    procedure division.
-   5 >      accept   menu-reply at 0644 with foreground-color 6 auto.
-----                                                            ^^^^
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
-
-AT_SETUP([DISPLAY ... BLINK])
-AT_DATA([prog.cob], [
-identification division.
-program-id.             acas-get-params.
- procedure division.
-     display "Waiting < sec " at line ws-lines col 1 blink.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:5.53-5.58:
-   2   identification division.
-   3   program-id.             acas-get-params.
-   4    procedure division.
-   5 >      display "Waiting < sec " at line ws-lines col 1 blink.
-----                                                        ^^^^^
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
 ### MF BankDemo
 
 

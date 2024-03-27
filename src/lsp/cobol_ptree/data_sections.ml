@@ -198,6 +198,13 @@ type screen_clause =
   | ScreenSecure
   | ScreenSign of sign_clause
   | ScreenSourceDestination of source_destination_clause with_loc list (* non-empty *)
+  | ScreenGrid                                                           (* MF *)
+  | ScreenLeftLine                                                       (* MF *)
+  | ScreenOverLine                                                       (* MF *)
+  | ScreenSize of ident_or_intlit                                        (* MF *)
+  | ScreenControl of ident                                               (* MF *)
+  | ScreenPromptCharacter of ident_or_nonnum option (* or figurative *)  (* MF *)
+  | ScreenZeroFill                                                       (* MF *)
 [@@deriving ord]
 
 let pp_screen_clause ppf = function
@@ -222,6 +229,14 @@ let pp_screen_clause ppf = function
   | ScreenSign sc -> pp_sign_clause ppf sc
   | ScreenSourceDestination sdcl ->
       Fmt.(list ~sep:sp (pp_with_loc pp_source_destination_clause)) ppf sdcl
+  | ScreenGrid -> Fmt.pf ppf "GRID"
+  | ScreenLeftLine -> Fmt.pf ppf "LEFTLINE"
+  | ScreenOverLine -> Fmt.pf ppf "OVERLINE"
+  | ScreenSize ii -> Fmt.pf ppf "SIZE IS %a" pp_ident_or_intlit ii
+  | ScreenControl i -> Fmt.pf ppf "CONTROL IS %a" pp_ident i
+  | ScreenPromptCharacter (None) -> Fmt.pf ppf "PROMPT"
+  | ScreenPromptCharacter (Some inn) -> Fmt.pf ppf "PROMPT CHARACTER IS %a" pp_ident_or_nonnum inn
+  | ScreenZeroFill -> Fmt.pf ppf ""
 
 let pp_item pp_clause ppf lvl name clauses =
   Fmt.pf ppf "%a%a%a."

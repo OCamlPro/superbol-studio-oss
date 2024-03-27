@@ -829,8 +829,27 @@ and fold_accept_clause' (v: _ #folder) : accept_clause with_loc -> 'a -> 'a =
 and fold_accept_with_clause' (v: _ #folder) : accept_with_clause with_loc -> 'a -> 'a =
   handle' v#fold_accept_with_clause' v
     ~fold:begin fun _v clause x -> match clause with
-      | AcceptUpdate -> x
       | AcceptAttribute _ -> x
+      | AcceptAuto -> x
+      | AcceptFull -> x
+      | AcceptRequired -> x
+      | AcceptSecure -> x
+      | AcceptGrid -> x
+      | AcceptLeftLine -> x
+      | AcceptOverLine -> x
+      | AcceptSize ii -> fold_ident_or_intlit v ii x
+      | AcceptControl i -> fold_ident v i x
+      | AcceptPromptCharacter inno ->
+          fold_option ~fold:fold_ident_or_nonnum v inno x
+      | AcceptZeroFill -> x
+      | AcceptTimeout -> x
+      | AcceptLeftJustify -> x
+      | AcceptRightJustify -> x
+      | AcceptSpaceFill -> x
+      | AcceptTrailingSign -> x
+      | AcceptUpdate -> x
+      | AcceptUpper -> x
+      | AcceptLower -> x
     end
 
 and fold_add' (v: _ #folder) : basic_arithmetic_stmt with_loc -> 'a -> 'a =
@@ -911,9 +930,14 @@ and fold_display_target' (v: _ #folder) : display_target with_loc -> 'a -> 'a =
 and fold_display_with_clause' (v: _ #folder) : display_with_clause with_loc -> 'a -> 'a =
   handle' v#fold_display_with_clause' v
     ~fold:begin fun _v clause x -> match clause with
+      | DisplayAttribute _ -> x
       | DisplayBlank _ -> x
       | DisplayErase _ -> x
-      | DisplayAttribute _ -> x
+      | DisplayGrid -> x
+      | DisplayLeftLine -> x
+      | DisplayOverLine -> x
+      | DisplaySize ii -> fold_ident_or_intlit v ii x
+      | DisplayControl i -> fold_ident v i x
     end
 
 and fold_divide' (v: _ #folder) : divide_stmt with_loc -> 'a -> 'a =
