@@ -192,6 +192,11 @@ and accept_stmt =
         item: ident with_loc;
         on_exception: dual_handler;
       }
+  | AcceptFromCmdLine of                                          (* GnuCOBOL *)
+      {
+        item: ident with_loc;
+        on_exception: dual_handler;
+      }
 
 and accept_misc =
   | AcceptLineNumber
@@ -727,6 +732,12 @@ and pp_accept_stmt ppf = function
       Fmt.pf ppf "@]"
   | AcceptFromArg { item; on_exception } ->
       Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM ARGUMENT-VALUE"
+        Fmt.(box (pp_with_loc pp_ident)) item;
+      pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
+        ppf on_exception;
+      Fmt.pf ppf "@]"
+  | AcceptFromCmdLine { item; on_exception } ->
+      Fmt.pf ppf "@[ACCEPT@;<1 2>%a@ @[FROM COMMAND-LINE"
         Fmt.(box (pp_with_loc pp_ident)) item;
       pp_dual_handler pp_statement ~close:Fmt.(any "END-ACCEPT")
         ppf on_exception;

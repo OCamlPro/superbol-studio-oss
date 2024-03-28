@@ -194,26 +194,6 @@ syn_misc.at-1435-prog3.cob:8.31-8.34:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1452:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1671:0
-syn_misc.at-1671-prog.cob:8.27:
-   5          WORKING-STORAGE SECTION.
-   6          77 var          PIC x.
-   7          PROCEDURE       DIVISION.
-   8 >            ACCEPT var  FROM COMMAND-LINE
-----                              ^
-   9              DISPLAY var UPON COMMAND-LINE
-  10              .
->> Hint: Missing <word>
-
-syn_misc.at-1671-prog.cob:8.28-8.40:
-   5          WORKING-STORAGE SECTION.
-   6          77 var          PIC x.
-   7          PROCEDURE       DIVISION.
-   8 >            ACCEPT var  FROM COMMAND-LINE
-----                               ^^^^^^^^^^^^
-   9              DISPLAY var UPON COMMAND-LINE
-  10              .
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:1706:0
 syn_misc.at-1706-prog.cob:12.24:
    9          PROCEDURE        DIVISION.

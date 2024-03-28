@@ -78,21 +78,19 @@ AT_CLEANUP
 
 
 
-AT_SETUP([MF ENTRY LITERAL USING])
+AT_SETUP([ACCEPT FROM COMMAND-LINE])
 AT_DATA([prog.cob], [
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. customer.
-       PROCEDURE DIVISION.
-       Initialise Section.
-       Entry "Initialise" Using Dsc-Control-Block Data-Block.
+identification division.
+program-id.             acas-get-params.
+ procedure division.
+     accept   Arg-Vals from command-line.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
+AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 [Checking `prog.cob'
 ])
 
 AT_CLEANUP
-
 
 
 
@@ -132,3 +130,20 @@ AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 ])
 
 AT_CLEANUP
+
+
+
+AT_SETUP([MF ENTRY LITERAL USING])
+AT_DATA([prog.cob], [
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. customer.
+       PROCEDURE DIVISION.
+       Initialise Section.
+       Entry "Initialise" Using Dsc-Control-Block Data-Block.
+])
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
+[Checking `prog.cob'
+])
+
+
