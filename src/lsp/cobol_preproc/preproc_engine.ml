@@ -43,6 +43,7 @@ and preprocessor_persist =
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
+    exec_preprocs: exec_preprocessor EXEC_MAP.t;
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -113,7 +114,7 @@ let source_format_config = function
 
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format; env;
-                   config = (module Config) } ->
+                   exec_preprocs; config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -135,6 +136,7 @@ let preprocessor input = function
             copybooks = Cobol_common.Srcloc.no_copy;
             dialect = Config.dialect;
             source_format;
+            exec_preprocs;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -334,10 +336,8 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       in
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
-      (* CHECKME: Assumes EXEC blocks are NOT subject to replacement... *)
-      let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
-      let block = Text.ExecBlock phrase &@ loc in
-      `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
+      do_exec lp rev_prefix phrase suffix
+
 
 and do_copy lp rev_prefix copy suffix =
   let { result = CDirCopy { library; replacing; _ }; diags } = ~&copy in
@@ -350,6 +350,7 @@ and do_copy lp rev_prefix copy suffix =
   (* eprintf "Library text: %a@." pp_text libtext; *)
   let text = List.rev_append rev_prefix libtext @ suffix in
   `CopyDone (lp, text)
+
 
 and do_replace lp rev_prefix repl suffix =
   let { payload = { result = repl; diags }; loc } = repl in
@@ -375,6 +376,37 @@ and do_replace lp rev_prefix repl suffix =
         with_replacing lp replacing
   in
   `ReplaceDone (lp, prefix, suffix)
+
+
+and do_exec lp rev_prefix exec_block suffix =
+  (* Note: `exec_block` must be non-empty *)
+  (* CHECKME: Assumes pre-processed EXEC blocks are NOT subject to
+     replacement... *)
+  let loc = Option.get @@ Cobol_common.Srcloc.concat_locs exec_block in
+  let emit lp exec_block =
+    let block = Text.ExecBlock exec_block &@ loc in
+    `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
+  in
+  let error e =
+    let lp = add_error lp e in
+    (* Emit anyways (maybe we'll need to add a vailidity flag in `ExecBlock`) *)
+    emit lp exec_block
+  in
+  match List.tl exec_block with                             (* skip EXEC(UTE) *)
+  | { payload = Text.TextWord lang; _ } :: _ :: _ ->         (* avoid empty tail *)
+      (match EXEC_MAP.find_opt lang lp.persist.exec_preprocs with
+       | Some Text_preprocessor f ->
+           (* TODO: check whether the relevant compiler directive/option has
+              been set? *)
+           emit lp (f exec_block)
+       | None ->
+           emit lp exec_block)           (* would a warning be relevant here? *)
+  | { payload = Alphanum _ | AlphanumPrefix _; loc } :: _ ->
+      error @@ Unexpected { loc; stuff = Alphanumeric_literal }
+  | { payload = Pseudo _; loc } :: _ ->
+      error @@ Unexpected { loc; stuff = Pseudotext }
+  | _ ->
+      error @@ Malformed { loc; stuff = Preproc_statement `EXEC_BLOCK }
 
 
 and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)

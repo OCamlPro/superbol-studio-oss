@@ -21,6 +21,7 @@ let preprocess_file ~source_format ~config filename =
   Cobol_preproc.preprocess_file filename
     ~options:Cobol_preproc.Options.{ source_format; config;
                                      verbose = false; libpath = [];
+                                     exec_preprocs = EXEC_MAP.empty;
                                      env = Cobol_preproc.Env.empty }
     ~ppf:std_formatter
 

@@ -35,19 +35,19 @@ and forbidden_stuff =
 
 and malformed_stuff =
   | Compiler_directive
-  | Preproc_statement of [`COPY | `REPLACE]
+  | Preproc_statement of [`COPY | `REPLACE | `EXEC_BLOCK]
 
 and missing_stuff =
   | At_least_one_text_word
   | At_most_one_text_word
   | One_text_word
-  (* | End_of_compiler_directive of { suggestion: suggested_missing } *)
 
 and unexpected_stuff =
   | Alphanumeric_literal
   | Elif_compiler_directive of { suggestion: suggested_missing option }
   | Else_compiler_directive of { suggestion: suggested_missing option }
   | EndIf_compiler_directive
+  | Pseudotext
 
 and invalid_stuff =
   | Compiler_directive_word of string
@@ -80,6 +80,7 @@ let error_loc = function
 let pp_preproc_statement ppf = function
   | `COPY -> Pretty.string ppf "COPY"
   | `REPLACE -> Pretty.string ppf "REPLACE"
+  | `EXEC_BLOCK -> Pretty.string ppf "EXEC/END-EXEC block"
 
 let pp_forbidden_stuff ppf = function
   | Change_of_source_format ->
@@ -121,6 +122,8 @@ let pp_unexpected_stuff ppf = function
       Fmt.(option (any ";@ " ++ pp_suggestion)) ppf suggestion
   | EndIf_compiler_directive ->
       Pretty.print ppf ">>END-IF@ compiler@ directive"
+  | Pseudotext ->
+      Pretty.print ppf "pseudotext"
 
 let pp_unterminated ppf = function
   | If_compiler_directive _ ->

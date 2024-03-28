@@ -161,6 +161,7 @@ let get () =
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
     { preproc_options = { config; verbose; source_format;
+                          exec_preprocs = EXEC_MAP.empty;
                           libpath = !libpath; env };
       parser_options = { config; recovery; verbose; show = !show } }
 
