@@ -905,30 +905,6 @@ AT_CLEANUP
 
 
 
-AT_SETUP([ACCEPT FROM COMMAND-LINE])
-AT_DATA([prog.cob], [
-identification division.
-program-id.             acas-get-params.
- procedure division.
-     accept   Arg-Vals from command-line.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:5.28-5.40:
-   2   identification division.
-   3   program-id.             acas-get-params.
-   4    procedure division.
-   5 >      accept   Arg-Vals from command-line.
-----                               ^^^^^^^^^^^^
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
 
 ### MF BankDemo
 
