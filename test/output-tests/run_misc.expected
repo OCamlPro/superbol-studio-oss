@@ -271,140 +271,13 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1406:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1407:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1405:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1455:0
-run_misc.at-1455-callee.cob:11.22:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                         ^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Hint: Missing .
-
-run_misc.at-1455-callee.cob:11.23-11.32:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                          ^^^^^^^^^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Error: Invalid syntax
-
-run_misc.at-1455-callee.cob:11.34:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                                     ^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Hint: Missing .
-
-run_misc.at-1455-callee.cob:12.11-12.15:
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11                 STOP RUN RETURNING 1
-  12 >            ELSE
-----              ^^^^
-  13                 MOVE 1 TO STOPPER
-  14                 CALL "callee2" END-CALL
->> Warning: Invalid syntax
-
-run_misc.at-1455-callee.cob:15.11-15.17:
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
-  14                 CALL "callee2" END-CALL
-  15 >            END-IF.
-----              ^^^^^^
-  16              GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1456:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1454:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1503:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1504:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1502:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1558:0
-run_misc.at-1558-callee.cob:11.22:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                         ^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Hint: Missing .
-
-run_misc.at-1558-callee.cob:11.23-11.32:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                          ^^^^^^^^^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Error: Invalid syntax
-
-run_misc.at-1558-callee.cob:11.34:
-   8              IF STOPPER = 1
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11 >               STOP RUN RETURNING 1
-----                                     ^
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
->> Hint: Missing .
-
-run_misc.at-1558-callee.cob:12.11-12.15:
-   9                 DISPLAY 'INITIAL prog was called RECURSIVE'
-  10                 END-DISPLAY
-  11                 STOP RUN RETURNING 1
-  12 >            ELSE
-----              ^^^^
-  13                 MOVE 1 TO STOPPER
-  14                 CALL "callee2" END-CALL
->> Warning: Invalid syntax
-
-run_misc.at-1558-callee.cob:15.11-15.17:
-  12              ELSE
-  13                 MOVE 1 TO STOPPER
-  14                 CALL "callee2" END-CALL
-  15 >            END-IF.
-----              ^^^^^^
-  16              GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1559:0
-run_misc.at-1559-callee2.cob:9.22:
-   6              ON EXCEPTION
-   7                 DISPLAY "Exception " FUNCTION EXCEPTION-STATUS ";"
-   8                    UPON SYSERR
-   9 >               STOP RUN RETURNING 1
-----                         ^
-  10              END-CALL.
-  11              GOBACK.
->> Hint: Missing .
-
-run_misc.at-1559-callee2.cob:9.23-9.32:
-   6              ON EXCEPTION
-   7                 DISPLAY "Exception " FUNCTION EXCEPTION-STATUS ";"
-   8                    UPON SYSERR
-   9 >               STOP RUN RETURNING 1
-----                          ^^^^^^^^^
-  10              END-CALL.
-  11              GOBACK.
->> Error: Invalid syntax
-
-run_misc.at-1559-callee2.cob:10.11-10.19:
-   7                 DISPLAY "Exception " FUNCTION EXCEPTION-STATUS ";"
-   8                    UPON SYSERR
-   9                 STOP RUN RETURNING 1
-  10 >            END-CALL.
-----              ^^^^^^^^
-  11              GOBACK.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1557:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1607:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:1606:0
@@ -926,22 +799,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4419:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4420:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4495:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4495:0
-run_misc.at-4495-callee2.cob:9.19:
-   6          01 P             PIC 99.
-   7          PROCEDURE        DIVISION USING P.
-   8              DISPLAY 'P: ' P WITH NO ADVANCING.
-   9 >            STOP RUN RETURNING P.
-----                      ^
->> Hint: Missing .
-
-run_misc.at-4495-callee2.cob:9.20-9.29:
-   6          01 P             PIC 99.
-   7          PROCEDURE        DIVISION USING P.
-   8              DISPLAY 'P: ' P WITH NO ADVANCING.
-   9 >            STOP RUN RETURNING P.
-----                       ^^^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4494:0
 run_misc.at-4494-caller.c:5.6-5.7:
    2   #include <stdio.h>
@@ -1095,22 +952,6 @@ run_misc.at-4494-caller.c:31.6-31.7:
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4619:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4619:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4619:0
-run_misc.at-4619-callee2.cob:6.19:
-   3          PROGRAM-ID.      callee2.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY 'STOP WITH 2' WITH NO ADVANCING
-   6 >            STOP RUN RETURNING 2.
-----                      ^
->> Hint: Missing .
-
-run_misc.at-4619-callee2.cob:6.20-6.29:
-   3          PROGRAM-ID.      callee2.
-   4          PROCEDURE        DIVISION.
-   5              DISPLAY 'STOP WITH 2' WITH NO ADVANCING
-   6 >            STOP RUN RETURNING 2.
-----                       ^^^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:4618:0
 run_misc.at-4618-caller.c:5.6-5.7:
    2   #include <stdio.h>
@@ -2427,56 +2268,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5295:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5336:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5335:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5357:0
-run_misc.at-5357-prog.cob:7.38-7.39:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Error: Invalid syntax
-
-run_misc.at-5357-prog.cob:7.38:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            STOP RUN WITH NORMAL STATUS.
-----                                         ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5375:0
-run_misc.at-5375-prog.cob:7.37-7.38:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            STOP RUN WITH ERROR STATUS.
-----                                        ^
->> Error: Invalid syntax
-
-run_misc.at-5375-prog.cob:7.37:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >            STOP RUN WITH ERROR STATUS.
-----                                        ^
->> Hint: Missing <identifier or literal>
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5398:0
-run_misc.at-5398-prog.cob:12.15:
-   9          IDENTIFICATION   DIVISION.
-  10          PROGRAM-ID.      prog2.
-  11          PROCEDURE        DIVISION.
-  12 >            STOP ERROR.
-----                  ^
->> Hint: Missing <literal>
-
-run_misc.at-5398-prog.cob:12.16-12.21:
-   9          IDENTIFICATION   DIVISION.
-  10          PROGRAM-ID.      prog2.
-  11          PROCEDURE        DIVISION.
-  12 >            STOP ERROR.
-----                   ^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5433:0
 run_misc.at-5433-prog.cob:7.29-7.35:
    4          ENVIRONMENT DIVISION.
@@ -6621,22 +6414,6 @@ run_misc.at-13127-prog.cob:21.36:
 >> Hint: Missing FROM <subscripts>
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13174:0
-run_misc.at-13174-prog.cob:22.15:
-  19               ON EXCEPTION DISPLAY 'NO ...'        UPON SYSERR.
-  20          DISPLAY "This is also sent to SYSPUNCH " note UPON SYSPCH
-  21               ON EXCEPTION DISPLAY ' ... SYSPUNCH' UPON SYSERR.
-  22 >        STOP RUN RETURNING 0.
-----                  ^
->> Hint: Missing .
-
-run_misc.at-13174-prog.cob:22.16-22.25:
-  19               ON EXCEPTION DISPLAY 'NO ...'        UPON SYSERR.
-  20          DISPLAY "This is also sent to SYSPUNCH " note UPON SYSPCH
-  21               ON EXCEPTION DISPLAY ' ... SYSPUNCH' UPON SYSERR.
-  22 >        STOP RUN RETURNING 0.
-----                   ^^^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13228:0
 run_misc.at-13228-reference:1.6-1.7:
    1 > This is sent to PRINTER PIPE.
