@@ -584,7 +584,7 @@ syn_misc.at-2400-prog.cob:6.30:
 ----                                 ^
    7                            value is 3.97E+24.
    8          77  mydouble      usage double
->> Hint: Missing BINARY
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2400-prog.cob:6.31-6.36:
    3          PROGRAM-ID.      prog.
@@ -604,7 +604,7 @@ syn_misc.at-2400-prog.cob:8.30:
 ----                                 ^
    9                            value is 3.97E+44.
   10          PROCEDURE DIVISION.
->> Hint: Missing BINARY
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2400-prog.cob:8.31-8.37:
    5          WORKING-STORAGE SECTION.
@@ -625,7 +625,7 @@ syn_misc.at-2668-prog.cob:6.30:
 ----                                 ^
    7          77  lb-row        PIC X(10).
    8          77  lb-color      PIC 9(05) VALUE 8192.
->> Hint: Missing BINARY
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2668-prog.cob:6.31-6.37:
    3          PROGRAM-ID.      prog.
@@ -2976,26 +2976,6 @@ syn_misc.at-7417-prog.cob:63.44-63.51:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7524:0
-syn_misc.at-7524-prog.cob:55.30:
-  52         *>   05 idx        usage index           sync.
-  53         *>   05 hnd        usage handle          sync.
-  54          01  alphanumeric-data.
-  55 >            05 alpnum     usage x36 value "some numb3rs 4 n00bs l1k3 m3".
-----                                 ^
-  56              05 alpha      pic a(36) value "thats some text".
-  57              05 edit-num1  pic --9.999.
->> Hint: Missing BINARY
-
-syn_misc.at-7524-prog.cob:55.31-55.34:
-  52         *>   05 idx        usage index           sync.
-  53         *>   05 hnd        usage handle          sync.
-  54          01  alphanumeric-data.
-  55 >            05 alpnum     usage x36 value "some numb3rs 4 n00bs l1k3 m3".
-----                                  ^^^
-  56              05 alpha      pic a(36) value "thats some text".
-  57              05 edit-num1  pic --9.999.
->> Error: Invalid syntax
-
 syn_misc.at-7524-prog.cob:79.45-79.47:
   76          01  x-rms.                  
   77              05  x-rms-a             pic x(01) value space.

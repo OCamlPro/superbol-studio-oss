@@ -6879,7 +6879,7 @@ run_misc.at-14426-prog.cob:8.24:
 ----                           ^
    9             88 a-one value 1.
   10             88 a-two value 2.
->> Hint: Missing BINARY
+>> Hint: Missing <usage-clause>
 
 run_misc.at-14426-prog.cob:8.25-8.35:
    5          WORKING-STORAGE SECTION.
