@@ -19,11 +19,11 @@ let show_diagnostics ?(show_data = false) ?(verbose = false)
     ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
   Cobol_parser.parse_simple
-    ~options:Cobol_parser.Options.{
-        default with
-        verbose;
-        recovery = EnableRecovery { silence_benign_recoveries = true };
-      } |>
+    ~options: {
+      default_parser_options with
+      verbose;
+      recovery = EnableRecovery { silence_benign_recoveries = true };
+    } |>
   Cobol_parser.Outputs.translate_diags |>
   DIAGS.map_result ~f:Cobol_typeck.compilation_group |>
   DIAGS.more_result ~f:Cobol_typeck.Results.translate_diags |>

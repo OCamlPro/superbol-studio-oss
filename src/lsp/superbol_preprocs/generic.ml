@@ -11,31 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module EXEC_LANG = struct
-  type t = string
-  let compare a b = String.(compare (uppercase_ascii a) (uppercase_ascii b))
-end
-module EXEC_MAP = Stdlib.Map.Make (EXEC_LANG)
+type Cobol_common.Exec_block.TYPES.exec_block +=   (* TEMPORARY, for testing. *)
+  | Generic_exec_block of Cobol_preproc.Text.t
 
-type preproc_options =
-  {
-    verbose: bool;
-    libpath: string list;
-    config: Cobol_config.t;
-    source_format: Cobol_config.source_format_spec;
-    exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    env: Preproc_env.t;
-  }
+let () =
+  Cobol_common.Exec_block.register_exec_block_type
+    ~name:"GENERIC-EXEC-BLOCK"
+    ~compare:begin fun a b -> match a, b with
+      | Generic_exec_block a, Generic_exec_block b ->
+          Some ((* FIXME: text comparison *)Stdlib.compare a b)
+      | _ ->
+          None
+    end
+    ~pp:begin function
+      | Generic_exec_block a ->
+          Some (Pretty.delayed "%a" Cobol_preproc.Text.pp_text a)
+      | _ ->
+          None
+    end
 
-and exec_preprocessor =
-  | Text_preprocessor of (Text.t -> Text.t)
-
-let default =
-  {
-    verbose = false;
-    libpath = [];
-    config = Cobol_config.default;
-    source_format = Cobol_config.Auto;
-    exec_preprocs = EXEC_MAP.empty;
-    env = Preproc_env.empty;
-  }
+let scanner text = Generic_exec_block text

@@ -47,6 +47,7 @@ type 'a state
 val init
   : ?verbose:bool
   -> ?show_if_verbose:[> `Tks | `Ctx] list
+  -> exec_scanner: Parser_options.exec_scanner
   -> memory:'a memory
   -> Cobol_config.words_spec
   -> 'a state

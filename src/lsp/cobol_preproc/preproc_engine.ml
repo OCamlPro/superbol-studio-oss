@@ -43,6 +43,7 @@ and preprocessor_persist =
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
+    exec_preprocs: exec_preprocessor EXEC_MAP.t;
     libpath: string list;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
@@ -113,7 +114,7 @@ let source_format_config = function
 
 let preprocessor input = function
   | `WithOptions { libpath; verbose; source_format; env;
-                   config = (module Config) } ->
+                   exec_preprocs; config = (module Config) } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -135,6 +136,7 @@ let preprocessor input = function
             copybooks = Cobol_common.Srcloc.no_copy;
             dialect = Config.dialect;
             source_format;
+            exec_preprocs;
             libpath;
             verbose;
             show_if_verbose = [`Src];
@@ -202,15 +204,14 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
       | Ok Some (text, compdir, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir)
-            ((* if emitting then *) buff @ text (* else buff *))
+          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
       | Error (text, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
-          next_chunk lp
+          next_chunk lp                                        (* ignore text *)
       | Error (text, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp ((* if emitting then *) buff @ text (* else buff *))
+          preprocess_line lp (buff @ text)
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
@@ -271,7 +272,7 @@ and preprocess_line lp srctext =
   | Ok (`CopyDone (lp, srctext))
   | Ok (`ReplaceDone (lp, [], srctext))
   | Ok (`CDirDone (lp, srctext)) ->  (* Continue with next phrase, which may also
-                                       be a compiler directive. *)
+                                        be a compiler directive. *)
       preprocess_line lp srctext
   | Ok (`ReplaceDone (lp, text, srctext)) ->
       text, with_buff lp @@ Text.strip_eof srctext
@@ -334,6 +335,11 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
             List.rev rev_prefix
       in
       `ReplaceDone (lp, prefix, suffix)
+  | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
+      do_exec lp rev_prefix phrase suffix
+  | ExecBlockPrefix { prefix = rev_prefix; phrase; suffix } ->
+      do_exec ~partial:true lp rev_prefix phrase suffix
+
 
 and do_copy lp rev_prefix copy suffix =
   let { result = CDirCopy { library; replacing; _ }; diags } = ~&copy in
@@ -346,6 +352,7 @@ and do_copy lp rev_prefix copy suffix =
   (* eprintf "Library text: %a@." pp_text libtext; *)
   let text = List.rev_append rev_prefix libtext @ suffix in
   `CopyDone (lp, text)
+
 
 and do_replace lp rev_prefix repl suffix =
   let { payload = { result = repl; diags }; loc } = repl in
@@ -371,6 +378,45 @@ and do_replace lp rev_prefix repl suffix =
         with_replacing lp replacing
   in
   `ReplaceDone (lp, prefix, suffix)
+
+
+and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
+  (* Note: `exec_block` must be non-empty; it should at least start with an
+     `EXEC(UTE)` text word (not checked here). *)
+  (* CHECKME: Assumes pre-processed EXEC blocks are NOT subject to
+     replacement... *)
+  let loc = Option.get @@ Cobol_common.Srcloc.concat_locs exec_block in
+  let lp =
+    if partial
+    then add_error lp @@ Unterminated { loc; stuff = Exec_block }
+    else lp
+  in
+  let emit lp exec_block =
+    let block = Text.ExecBlock exec_block &@ loc in
+    `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
+  in
+  let error e =
+    let lp = add_error lp e in
+    (* Emit anyways (maybe we'll need to add a vailidity flag in `ExecBlock`) *)
+    emit lp exec_block
+  in
+  match List.tl exec_block with                             (* skip EXEC(UTE) *)
+  | { payload = Text.TextWord lang; _ } :: _ :: _ ->         (* avoid empty tail *)
+      (match EXEC_MAP.find_opt lang lp.persist.exec_preprocs with
+       | Some Text_preprocessor f ->
+           (* TODO: check whether the relevant compiler directive/option has
+              been set? *)
+           emit lp (f exec_block)
+       | None ->
+           emit lp exec_block)           (* would a warning be relevant here? *)
+  | { payload = Alphanum _ | AlphanumPrefix _; loc } :: _ ->
+      error @@ Unexpected { loc; stuff = Alphanumeric_literal }
+  | { payload = Pseudo _; loc } :: _ ->
+      error @@ Unexpected { loc; stuff = Pseudotext }
+  | _ when not partial ->
+      error @@ Malformed { loc; stuff = Preproc_statement `EXEC_BLOCK }
+  | _ ->
+      emit lp exec_block                                  (* already reported *)
 
 
 and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)

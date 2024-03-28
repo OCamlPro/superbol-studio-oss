@@ -23,15 +23,15 @@ module Visitor = Cobol_common.Visitor
 let rev_and_validate_data_item_descrs
     (type k) : k item_descr with_loc list with_diags -> _ =
   fun { result = rev_data_item_descrs; diags } ->
-  (* Associate each item with an `is_elementary` flag during reversal, and
-     then map the result again to obtain messages in order of declarations. *)
+  (* Associate each item with an `is_elementary` flag during reversal, and then
+     map the result again to obtain messages in order of declarations. *)
 
   let _, flagged_data_item_descrs =
     List.fold_left begin fun (next_level, acc) descr ->
       let is_elementary curr_level = curr_level >= next_level in
       match (~&descr: k item_descr) with
       | Data { data_level; _ } when ~&data_level = 77 ->
-          0, (descr, true) :: acc              (* special noncontiguous item *)
+          0, (descr, true) :: acc                (* special noncontiguous item *)
       | Data { data_level = { payload = l; _ }; _ }
       | Renames { rename_level = {payload = 66 as l; _}; _ }
       | Screen { screen_level = l; _ }
@@ -39,10 +39,12 @@ let rev_and_validate_data_item_descrs
           l, (descr, is_elementary l) :: acc
       | Constant _ ->
           0, (descr, false) :: acc
-      | Renames _ ->                                       (* force level 66 *)
+      | Renames _ ->                                         (* force level 66 *)
           66, (descr, false) :: acc
       | CondName _ ->
           88, (descr, false (* CHECKME: ??? *)) :: acc
+      | Exec _ ->
+          (next_level, acc)                                         (* ignore *)
     end (0, []) rev_data_item_descrs
   in
 

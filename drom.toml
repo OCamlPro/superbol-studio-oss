@@ -154,6 +154,10 @@ dir = "src/lsp/superbol_free_lib"
 # edit 'src/lsp/superbol_lib/package.toml' for package-specific options
 
 [[package]]
+dir = "src/lsp/superbol_preprocs"
+# edit 'src/lsp/superbol_preprocs/package.toml' for package-specific options
+
+[[package]]
 dir = "src/lsp/superbol_project"
 # edit 'src/lsp/superbol_project/package.toml' for package-specific options
 

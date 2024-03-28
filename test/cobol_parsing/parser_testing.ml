@@ -27,16 +27,20 @@ let preproc
         source_format
       }
 
+let default_parser_options =
+  Cobol_parser.Options.default
+    ~exec_scanner:Superbol_preprocs.Generic.scanner
+
 let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
     ?source_format ?filename contents =
   let { result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
     Cobol_parser.parse_with_artifacts
-      ~options:Cobol_parser.Options.{
-          default with
-          verbose;
-          recovery = EnableRecovery { silence_benign_recoveries = true };
-        }
+      ~options: {
+        default_parser_options with
+        verbose;
+        recovery = EnableRecovery { silence_benign_recoveries = true };
+      }
   in
   (if with_locations
    then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
@@ -45,11 +49,11 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
 let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
   Cobol_parser.parse_simple
-    ~options:Cobol_parser.Options.{
-        default with
-        verbose;
-        recovery = EnableRecovery { silence_benign_recoveries = true };
-      } |>
+    ~options: {
+      default_parser_options with
+      verbose;
+      recovery = EnableRecovery { silence_benign_recoveries = true };
+    } |>
   Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
 
 (* --- *)
@@ -150,15 +154,16 @@ let rewindable_parse
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
           verbose; libpath = []; source_format;
+          exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:default.config;
         } |>
     Cobol_parser.rewindable_parse_simple
-      ~options:Cobol_parser.Options.{
-          default with
-          verbose; recovery = DisableRecovery;
-          config = Option.value config ~default:default.config;
-        }
+      ~options: {
+        default_parser_options with
+        verbose; recovery = DisableRecovery;
+        config = Option.value config ~default:default_parser_options.config;
+      }
   in
   ptree, diags, rewinder
 

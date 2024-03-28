@@ -14,6 +14,7 @@
 open PTree_types
 
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Exec_block.TYPES
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
 open Terms_visitor
@@ -105,6 +106,7 @@ class virtual ['a] folder = object
   method fold_enter'         : (enter_stmt with_loc           , 'a) fold = default
   method fold_entry'         : (entry_stmt with_loc           , 'a) fold = default
   method fold_evaluate'      : (evaluate_stmt with_loc        , 'a) fold = default
+  method fold_exec_block'    : (exec_block with_loc           , 'a) fold = default
   method fold_exit'          : (exit_stmt with_loc            , 'a) fold = default
   method fold_free'          : (name with_loc list with_loc   , 'a) fold = default
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
@@ -453,6 +455,9 @@ let fold_cancel' (v: _ #folder) =
 let fold_close' (v: _ #folder) =
   handle' v#fold_close' v ~fold:(fold_list ~fold:fold_close_phrase)
 
+let fold_exec_block' (v: _ #folder) =
+  leaf' v#fold_exec_block' v                                    (* Note: leaf *)
+
 let fold_exit' (v: _ #folder) =
   handle' v#fold_exit' v
     ~fold:begin fun v -> function
@@ -718,6 +723,7 @@ let rec fold_statement' (v: _ #folder) =
       | Enter         s -> fold_enter'          v (s &@ loc)
       | Entry         s -> fold_entry'          v (s &@ loc)
       | Evaluate      s -> fold_evaluate'       v (s &@ loc)
+      | ExecBlock     s -> fold_exec_block'     v (s &@ loc)
       | Exit          s -> fold_exit'           v (s &@ loc)
       | Free          s -> fold_free'           v (s &@ loc)
       | Generate      s -> fold_generate'       v (s &@ loc)

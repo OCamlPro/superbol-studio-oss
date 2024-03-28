@@ -200,6 +200,19 @@
  )
 
 (package
+ (name superbol_preprocs)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= version))
+   (cobol_preproc (= version))
+   (cobol_common (= version))
+   odoc
+  )
+ )
+
+(package
  (name superbol_project)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
@@ -276,6 +289,7 @@
    (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
    (superbol_project (= version))
+   (superbol_preprocs (= version))
    (pretty (= version))
    (lsp (and ( >= 1.15 )( < 1.16 )))
    (jsonrpc ( >= 1.15 ))

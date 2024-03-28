@@ -14,6 +14,7 @@
 module Basics = Basics
 module Srcloc = Srcloc
 module Copybook = Copybook
+module Exec_block = Exec_block
 module Diagnostics = Diagnostics
 module Diagnostics_accumulator = Diagnostics_accumulator
 module Visitor = Visitor

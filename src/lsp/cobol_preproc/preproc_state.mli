@@ -25,6 +25,8 @@ type preproc_phrase =
   | Copy of phrase
   | Replace of phrase
   | Header of tracked_header * phrase
+  | ExecBlock of phrase
+  | ExecBlockPrefix of phrase                            (* with empty suffix *)
 and phrase =
   {
     prefix: text;

@@ -1,6 +1,6 @@
 
 # name of package
-name = "superbol_free_lib"
+name = "superbol_preprocs"
 skeleton = "library"
 
 # version if different from project version
@@ -43,10 +43,10 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-preprocess = "pps ppx_cobcflags ppx_deriving_encoding"
+# preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = ["index.mld", "main.ml" ]
+skip = ["index.mld"]
 
 # package library dependencies
 #   [dependencies]
@@ -54,25 +54,11 @@ skip = ["index.mld", "main.ml" ]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-cobol_indent = "version"
-cobol_lsp = "version"
-cobol_parser = "version"
-cobol_typeck = "version"
-superbol_preprocs = "version"
-ez_file = ">=0.3"
-ez_cmdliner = "0.3.0"
-vscode-json = "version"
-ez_api = { version = "2.0", libname = "ez_api.encoding" }
-ez_toml = "version"
-
-# We only depend on `lwt` via `ez_api` (and we don't even use any bit
-# of `lwt` at all).  But we still need to add the following constraint
-# on `lwt` so it installs properly on windows:
-lwt = ">=5"
+cobol_preproc = "version"
+pretty = "version"
 
 # package tools dependencies
 [tools]
-# ...
 
 # package fields (depends on package skeleton)
 #Examples:

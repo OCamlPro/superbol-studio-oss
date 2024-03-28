@@ -609,6 +609,8 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
           Some (TOKTYP.operator, TOKMOD.none)
       | PARAGRAPH | STATEMENT | PROGRAM |SECTION | DIVISION ->
           Some (TOKTYP.namespace, TOKMOD.none)
+      | EXEC_BLOCK _ ->
+          Some (TOKTYP.macro, TOKMOD.none)
       | _ ->
           Some (TOKTYP.keyword, TOKMOD.none)
     in

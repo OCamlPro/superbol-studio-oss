@@ -11,31 +11,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module EXEC_LANG = struct
-  type t = string
-  let compare a b = String.(compare (uppercase_ascii a) (uppercase_ascii b))
+module TYPES: sig
+  type exec_block = ..
 end
-module EXEC_MAP = Stdlib.Map.Make (EXEC_LANG)
+include module type of TYPES
+  with type exec_block = TYPES.exec_block
 
-type preproc_options =
-  {
-    verbose: bool;
-    libpath: string list;
-    config: Cobol_config.t;
-    source_format: Cobol_config.source_format_spec;
-    exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    env: Preproc_env.t;
-  }
+type t = exec_block
 
-and exec_preprocessor =
-  | Text_preprocessor of (Text.t -> Text.t)
+val register_exec_block_type
+  : name: string
+  -> compare: (t -> t -> int option)
+  -> pp: (t -> Pretty.delayed option)
+  -> unit
 
-let default =
-  {
-    verbose = false;
-    libpath = [];
-    config = Cobol_config.default;
-    source_format = Cobol_config.Auto;
-    exec_preprocs = EXEC_MAP.empty;
-    env = Preproc_env.empty;
-  }
+val compare: t -> t -> int
+val pp: t Pretty.printer

@@ -85,6 +85,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | NATLIT s -> print "N\"%s\"" s
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
+  | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
       try Text_lexer.show_token t
@@ -101,6 +102,7 @@ let pp_token: token Pretty.printer = fun ppf ->
     | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
     | INFO_WORD s -> print "INFO_WORD[%s]" s
     | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
+    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string ~&t
     | DIGITS i -> print "DIGITS[%s]" i
     | SINTLIT i -> print "SINT[%s]" i
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
@@ -329,6 +331,7 @@ and persist =
   {
     lexer: Text_lexer.lexer;
     context_tokens: Grammar_contexts.context_tokens;
+    exec_scanner: Parser_options.exec_scanner;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
   }
@@ -338,6 +341,7 @@ let eidetic = Eidetic []
 let init
     ?(verbose = false)
     ?(show_if_verbose = [`Tks; `Ctx])
+    ~exec_scanner
     ~memory
     words
   =
@@ -360,6 +364,7 @@ let init
       {
         lexer;
         context_tokens;
+        exec_scanner;
         verbose;
         show_if_verbose =
           (if List.mem `Tks show_if_verbose then [`Tks] else []) @
@@ -380,7 +385,7 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
       WORD_IN_AREA_A w &@ loc
   | t -> t
 
-let tokens_of_word { persist = { lexer; _ }; _ }
+let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
   : text_word with_loc -> tokens * Parser_diagnostics.t =
   fun { payload = c; loc } ->
   let tok t = [t &@ loc], Parser_diagnostics.none in
@@ -425,6 +430,8 @@ let tokens_of_word { persist = { lexer; _ }; _ }
     -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
   | Eof
     -> tok EOF
+  | ExecBlock text
+    -> tok @@ EXEC_BLOCK (exec_scanner text)
   | Pseudo _
     -> [], Parser_diagnostics.error @@ Unexpected { loc; stuff = Pseudotext }
 

@@ -22,7 +22,6 @@
 ]
 
 %token EOF
-%token UNUSED__
 
 %token <string> WORD [@recovery "_"] (* [@symbol "<word>"] *)
 %token <string> WORD_IN_AREA_A [@recovery "_"] (* [@symbol "<word in area A>"] *)
@@ -37,6 +36,8 @@
 %token <string * char * string * string> FLOATLIT [@recovery "0", '.', "0", "1"]
 %token <string> DIGITS [@recovery "0"] (* keep as string until resolved as level/intlit *)
 %token <string> PICTURE_STRING [@recovery "X"]    (* picture character string *)
+%token <Cobol_common.Exec_block.t> EXEC_BLOCK
+
 %token EIGHTY_EIGHT
 
 %token AMPERSAND       "&"          [@symbol  "&"]

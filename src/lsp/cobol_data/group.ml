@@ -382,7 +382,10 @@ let of_working_item_descrs (wss: working_item_descr with_loc list) =
                   | [] ->
                       Diags.error ~loc "An@ 88@ level@ entry@ must@ follow@ another@ data@ entry.";
                       Result.Error ()
-                end))
+                end
+            | Exec _ ->
+                Diags.error ~loc "Unexpected EXEC";
+                Result.Error ()))
       (Result.Ok [])
       wss
     |> Result.map (List.map (fun (data, renames) -> List.rev data, Option.map List.rev renames))

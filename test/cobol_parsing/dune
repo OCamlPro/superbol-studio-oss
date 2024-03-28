@@ -12,7 +12,7 @@
 (library
  (name parser_testing)
  (modules Parser_testing)
- (libraries cobol_parser testing_helpers)
+ (libraries cobol_parser superbol_preprocs testing_helpers)
  )
 
 (library

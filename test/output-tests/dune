@@ -9,7 +9,7 @@
 (executable
  (name gnucobol)
  (modules Gnucobol)
- (libraries autofonce_lib superbol_testutils cobol_parser)
+ (libraries autofonce_lib superbol_testutils superbol_preprocs cobol_parser)
  )
 
 (executable
@@ -21,7 +21,7 @@
 (library
  (name testsuite_utils)
  (modules Testsuite_utils)
- (libraries ez_file cobol_common cobol_config)
+ (libraries ez_file cobol_common cobol_config superbol_preprocs)
  )
 
 (alias
