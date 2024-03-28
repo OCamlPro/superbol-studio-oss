@@ -786,32 +786,6 @@ AT_CLEANUP
 
 
 
-AT_SETUP([MF ENTRY LITERAL USING])
-AT_DATA([prog.cob], [
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID. customer.
-       PROCEDURE DIVISION.
-       Initialise Section.
-       Entry "Initialise" Using Dsc-Control-Block Data-Block.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:6.7-6.12:
-   3          PROGRAM-ID. customer.
-   4          PROCEDURE DIVISION.
-   5          Initialise Section.
-   6 >        Entry "Initialise" Using Dsc-Control-Block Data-Block.
-----          ^^^^^
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
-
 AT_SETUP([MF MISSING POINT BEFORE END PROGRAM])
 AT_DATA([prog.cob], [
        program-id. GetFlyerLevel.
@@ -957,69 +931,6 @@ AT_CLEANUP
 
 
 ### MF BankDemo
-
-
-
-
-AT_SETUP([MF LENGTH in DIVIDE])
-AT_DATA([prog.cob], [
-       program-id. GetFlyerLevel.
-       procedure division.
-           DIVIDE LENGTH BANK-SCREEN20-FIELD
-             INTO LENGTH OF BANK-SCREEN20-DATA-R
-               GIVING WS-SUB1-LIMIT.
-       end program.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:4.18-4.24:
-   1   @&t@
-   2          program-id. GetFlyerLevel.
-   3          procedure division.
-   4 >            DIVIDE LENGTH BANK-SCREEN20-FIELD
-----                     ^^^^^^
-   5                INTO LENGTH OF BANK-SCREEN20-DATA-R
-   6                  GIVING WS-SUB1-LIMIT.
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
-
-
-
-AT_SETUP([MF ALTERNATE KEY IS])
-AT_DATA([prog.cob], [
-       program-id. GetFlyerLevel.
-       SELECT BNKACC-NDX
-                  ASSIGN       TO NDXACC
-                  ORGANIZATION IS INDEXED
-                  ACCESS MODE  IS SEQUENTIAL
-                  RECORD KEY   IS BAC-REC-ACCNO
-                  ALTERNATE KEY IS BAC-REC-PID WITH DUPLICATES
-                  FILE STATUS  IS WS-BNKACC-NDX-STATUS.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:8.28-8.31:
-   5                     ORGANIZATION IS INDEXED
-   6                     ACCESS MODE  IS SEQUENTIAL
-   7                     RECORD KEY   IS BAC-REC-ACCNO
-   8 >                   ALTERNATE KEY IS BAC-REC-PID WITH DUPLICATES
-----                               ^^^
-   9                     FILE STATUS  IS WS-BNKACC-NDX-STATUS.
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
 
 
 
