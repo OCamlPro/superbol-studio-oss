@@ -416,7 +416,7 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | Alphanum { knd = Hex; str; qte }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
   | Alphanum { knd = NullTerm; str; qte }
-    -> tok @@ ALPHANUM (alphanum ~hexadecimal:true ~repr:Null_terminated_bytes str qte)
+    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false ~repr:Null_terminated_bytes str qte)
   | Alphanum { knd = National | NationalX; str; _ }  (* TODO: differentiate *)
     -> tok @@ NATLIT str
   | AlphanumPrefix { knd = Hex; str; qte }
