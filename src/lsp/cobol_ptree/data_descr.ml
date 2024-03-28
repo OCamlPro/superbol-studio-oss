@@ -369,6 +369,7 @@ type usage_clause =
  | UsagePending of [`Comp0 | `Comp1 | `Comp2 | `Comp3 | `Comp5 | `Comp6 |
                     `CompX | `CompN | `Comp9 | `Comp10 | `Comp15 |
                     `BinaryCLong of signedness option]
+ | Type of name with_loc                                          (* MF *)
 [@@deriving ord]
 
 and signedness =
@@ -475,20 +476,23 @@ let pp_usage_clause ppf = function
   | ProgramPointer no ->
       Fmt.pf ppf "PROGRAM-POINTER%a" Fmt.(option (any " TO " ++ pp_name')) no
   | UsagePending comp ->
-      match comp with
-      | `Comp0 -> Fmt.pf ppf "COMP-0"
-      | `Comp1 -> Fmt.pf ppf "COMP-1"
-      | `Comp2 -> Fmt.pf ppf "COMP-2"
-      | `Comp3 -> Fmt.pf ppf "COMP-3"
-      | `Comp5 -> Fmt.pf ppf "COMP-5"
-      | `Comp6 -> Fmt.pf ppf "COMP-6"
-      | `CompX -> Fmt.pf ppf "COMP-X"
-      | `CompN -> Fmt.pf ppf "COMP-N"
-      | `Comp9 -> Fmt.pf ppf "COMP-9"
-      | `Comp10-> Fmt.pf ppf "COMP-10"
-      | `Comp15 -> Fmt.pf ppf "COMP-15"
-      | `BinaryCLong so ->
-          Fmt.pf ppf "BINARY-C-LONG%a" Fmt.(option (sp ++ pp_signedness)) so
+      begin
+        match comp with
+        | `Comp0 -> Fmt.pf ppf "COMP-0"
+        | `Comp1 -> Fmt.pf ppf "COMP-1"
+        | `Comp2 -> Fmt.pf ppf "COMP-2"
+        | `Comp3 -> Fmt.pf ppf "COMP-3"
+        | `Comp5 -> Fmt.pf ppf "COMP-5"
+        | `Comp6 -> Fmt.pf ppf "COMP-6"
+        | `CompX -> Fmt.pf ppf "COMP-X"
+        | `CompN -> Fmt.pf ppf "COMP-N"
+        | `Comp9 -> Fmt.pf ppf "COMP-9"
+        | `Comp10-> Fmt.pf ppf "COMP-10"
+        | `Comp15 -> Fmt.pf ppf "COMP-15"
+        | `BinaryCLong so ->
+            Fmt.pf ppf "BINARY-C-LONG%a" Fmt.(option (sp ++ pp_signedness)) so
+      end
+  | Type n -> pp_name' ppf  n
 
 type validation_clause =
   | Class of class_clause

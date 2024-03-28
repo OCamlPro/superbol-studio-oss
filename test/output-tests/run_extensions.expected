@@ -3751,66 +3751,6 @@ run_extensions.at-5547-prog.cob:43.40-43.41:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5599:0
-run_extensions.at-5599-prog.cob:7.34:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01 FLOATS.
-   7 >          03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-----                                     ^
-   8            03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-   9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
->> Hint: Missing BINARY
-
-run_extensions.at-5599-prog.cob:7.35-7.50:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01 FLOATS.
-   7 >          03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-----                                      ^^^^^^^^^^^^^^^
-   8            03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-   9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
->> Error: Invalid syntax
-
-run_extensions.at-5599-prog.cob:8.34:
-   5          WORKING-STORAGE  SECTION.
-   6          01 FLOATS.
-   7            03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-   8 >          03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-----                                     ^
-   9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
-  10   
->> Hint: Missing BINARY
-
-run_extensions.at-5599-prog.cob:8.35-8.51:
-   5          WORKING-STORAGE  SECTION.
-   6          01 FLOATS.
-   7            03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-   8 >          03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-----                                      ^^^^^^^^^^^^^^^^
-   9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
-  10   
->> Error: Invalid syntax
-
-run_extensions.at-5599-prog.cob:9.34:
-   6          01 FLOATS.
-   7            03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-   8            03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-   9 >          03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
-----                                     ^
-  10   
-  11          PROCEDURE        DIVISION.
->> Hint: Missing BINARY
-
-run_extensions.at-5599-prog.cob:9.35-9.51:
-   6          01 FLOATS.
-   7            03 FLOAT-BINARY-32  USAGE COMPUTATIONAL-9  VALUE -4.2E+1.
-   8            03 FLOAT-BINARY-64  USAGE COMPUTATIONAL-10 VALUE 0.0.
-   9 >          03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
-----                                      ^^^^^^^^^^^^^^^^
-  10   
-  11          PROCEDURE        DIVISION.
->> Error: Invalid syntax
-
 run_extensions.at-5599-prog.cob:12.18:
    9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
   10   

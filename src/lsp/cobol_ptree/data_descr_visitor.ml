@@ -442,6 +442,8 @@ let fold_usage_clause (v: _ #folder) =
         (*                    `BinaryCLong of signedness option] *)
           ->
           Fun.id
+      | Type n ->
+          fold_name' v n
     end
 
 let fold_class_clause (v: _ #folder) =
