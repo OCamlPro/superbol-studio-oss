@@ -63,7 +63,7 @@ class ['a] folder = object
   method fold_property_clause           : (property_clause             , 'a) fold = default
   method fold_property_kind             : (property_kind               , 'a) fold = default
   method fold_record_clause             : (record_clause               , 'a) fold = default
-  method fold_recording_mode_clause     : (recording_mode_clause       , 'a) fold = default
+  method fold_recording_mode            : (recording_mode              , 'a) fold = default
   method fold_report_clause             : (report_clause               , 'a) fold = default
   method fold_report_clause'            : (report_clause with_loc      , 'a) fold = default
   method fold_report_data_name_or_final : (report_data_name_or_final   , 'a) fold = default
@@ -288,14 +288,8 @@ let fold_record_clause (v: _ #folder) =
           >> fold_integer v max_length
     end
 
-let fold_recording_mode_clause (v: _ #folder) =
-  handle v#fold_recording_mode_clause
-    ~continue:begin fun (RecordingMode mode) x -> match mode with
-      | ModeFixedOrVariable
-      | ModeSpanned
-      | ModeFixed
-      | ModeVariable -> x
-    end
+let fold_recording_mode (v: _ #folder) =
+  leaf v#fold_recording_mode
 
 let fold_report_clause (v: _ #folder) =
   handle v#fold_report_clause

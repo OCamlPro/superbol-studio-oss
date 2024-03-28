@@ -445,7 +445,7 @@ and file_fd_clause =
         contents: file_block_contents;
       }
   | FileRecord of record_clause
-  | FileRecordingMode of recording_mode_clause
+  | FileRecordingMode of recording_mode
   | FileLabel of label_clause
   | FileValueOf of valueof_clause list
   | FileData of file_data_clause
@@ -469,7 +469,9 @@ let pp_file_fd_clause ppf = function
         Fmt.(option (any "@ TO " ++ pp_integer)) to_
         pp_file_block_contents contents
   | FileRecord rc -> pp_record_clause ppf rc
-  | FileRecordingMode md -> pp_recording_mode_clause ppf md
+  | FileRecordingMode md ->
+      Fmt.pf ppf "RECORDING MODE IS %a"
+      pp_recording_mode md
   | FileLabel lc -> pp_label_clause ppf lc
   | FileValueOf vcl ->
       Fmt.pf ppf "VALUE OF %a"
