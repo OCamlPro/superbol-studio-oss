@@ -58,6 +58,7 @@ and suggested_missing =
 
 and unterminated_stuff =
   | If_compiler_directive of { suggested_endif_loc: srcloc }
+  | Exec_block
 
 let error_loc = function
   | Feature_error e ->
@@ -128,6 +129,8 @@ let pp_unexpected_stuff ppf = function
 let pp_unterminated ppf = function
   | If_compiler_directive _ ->
       Pretty.print ppf ">>IF@ compiler@ directive"
+  | Exec_block ->
+      Pretty.print ppf "EXEC/END-EXEC@ block"
 
 let pp_error ppf = function
   | Copybook_lookup_error { lnf; _ } ->

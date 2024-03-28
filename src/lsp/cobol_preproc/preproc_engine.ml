@@ -337,6 +337,8 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
       do_exec lp rev_prefix phrase suffix
+  | ExecBlockPrefix { prefix = rev_prefix; phrase; suffix } ->
+      do_exec ~partial:true lp rev_prefix phrase suffix
 
 
 and do_copy lp rev_prefix copy suffix =
@@ -378,11 +380,17 @@ and do_replace lp rev_prefix repl suffix =
   `ReplaceDone (lp, prefix, suffix)
 
 
-and do_exec lp rev_prefix exec_block suffix =
-  (* Note: `exec_block` must be non-empty *)
+and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
+  (* Note: `exec_block` must be non-empty; it should at least start with an
+     `EXEC(UTE)` text word (not checked here). *)
   (* CHECKME: Assumes pre-processed EXEC blocks are NOT subject to
      replacement... *)
   let loc = Option.get @@ Cobol_common.Srcloc.concat_locs exec_block in
+  let lp =
+    if partial
+    then add_error lp @@ Unterminated { loc; stuff = Exec_block }
+    else lp
+  in
   let emit lp exec_block =
     let block = Text.ExecBlock exec_block &@ loc in
     `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
@@ -405,8 +413,10 @@ and do_exec lp rev_prefix exec_block suffix =
       error @@ Unexpected { loc; stuff = Alphanumeric_literal }
   | { payload = Pseudo _; loc } :: _ ->
       error @@ Unexpected { loc; stuff = Pseudotext }
-  | _ ->
+  | _ when not partial ->
       error @@ Malformed { loc; stuff = Preproc_statement `EXEC_BLOCK }
+  | _ ->
+      emit lp exec_block                                  (* already reported *)
 
 
 and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)

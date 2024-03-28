@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cobol_common.Srcloc.TYPES
 open Text.TYPES
 
 module NEL = Cobol_common.Basics.NEL
@@ -30,6 +31,7 @@ type preproc_phrase =
   | Replace of phrase
   | Header of tracked_header * phrase
   | ExecBlock of phrase
+  | ExecBlockPrefix of phrase                            (* with empty suffix *)
 and phrase =
   {
     prefix: text;
@@ -47,22 +49,27 @@ and tracked_header =
     prefix is reversed in the result. *)
 let find_subtext first_words last_words ?(prefix = `Same) text : _ result =
   let split_at_first = Cobol_common.Basics.LIST.split_at_first in
+  let eof_or_one_of words = function
+    | { payload = Eof; _ } -> true
+    | word -> NEL.exists words ~f:(fun eq -> Text.textword_eqp ~eq word)
+  in
   let split_before_word =
-    split_at_first ~prefix ~where:`Before
-      (fun word -> NEL.exists first_words ~f:(fun eq -> Text.textword_eqp ~eq word))
+    split_at_first ~prefix ~where:`Before @@ eof_or_one_of first_words
   and split_after_period =
-    split_at_first ~prefix:`Same ~where:`After
-      (fun word -> NEL.exists last_words ~f:(fun eq -> Text.textword_eqp ~eq word))
+    split_at_first ~prefix:`Rev ~where:`After @@ eof_or_one_of last_words
   in
   match split_before_word text with
-  | Error () ->
+  | Error ()
+  | Ok (_, { payload = Eof; _ } :: _) ->
       Error `NoneFound
-  | Ok (prefix, phrase) ->
-      match split_after_period phrase with
+  | Ok (prefix, phrase_prefix) ->
+      match split_after_period phrase_prefix with
       | Error () ->
           Error `MissingLastWord
-      | Ok (phrase, suffix) ->
-          Ok { prefix; phrase; suffix }
+      | Ok ({ payload = Eof; _ } :: _, _) ->
+          Error (`ReachedEOF { prefix; phrase = phrase_prefix; suffix = [] })
+      | Ok (rev_phrase, suffix) ->
+          Ok { prefix; phrase = List.rev rev_phrase; suffix }
 
 (** [find_phrase first_word ~prefix text] looks for a phrase that starts with
     [first_word] and terminates with a period in [text].  If [prefix = `Rev] and
@@ -70,7 +77,8 @@ let find_subtext first_words last_words ?(prefix = `Same) text : _ result =
 let find_phrase first_word ?(prefix = `Same) text : _ result =
   match find_subtext first_word (One ".") ~prefix text with
   | Error `NoneFound -> Error `NoneFound
-  | Error `MissingLastWord -> Error `MissingPeriod
+  | Error `MissingLastWord
+  | Error `ReachedEOF _ -> Error `MissingPeriod                (* just discard *)
   | Ok _ as ok -> ok
 
 (** [find_full_phrase words ~search_deep ~try_hard ~prefix text] looks for a
@@ -170,6 +178,7 @@ let find_preproc_phrase ?prefix =
     match find_exec_block src with
     | Error `MissingLastWord -> Error `MissingText
     | Error `NoneFound -> Error `NoneFound
+    | Error `ReachedEOF x -> Ok (ExecBlockPrefix x, next)
     | Ok x -> Ok (ExecBlock x, next)
   in
   let try_replace ~next src =
