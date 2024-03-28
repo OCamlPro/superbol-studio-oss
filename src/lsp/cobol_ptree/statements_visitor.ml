@@ -858,6 +858,9 @@ and fold_accept' (v: _ #folder) : accept_stmt with_loc -> 'a -> 'a =
       | AcceptFromArg { item; on_exception } -> x
           >> fold_ident' v item
           >> fold_dual_handler v on_exception
+      | AcceptFromCmdLine { item; on_exception } -> x
+          >> fold_ident' v item
+          >> fold_dual_handler v on_exception
     end
 
 and fold_accept_misc (v: _ #folder) : accept_misc -> 'a -> 'a =
