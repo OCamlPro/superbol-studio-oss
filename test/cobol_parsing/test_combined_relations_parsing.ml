@@ -32,7 +32,7 @@ and fail_condition toks =
 
 let test_conditions =
   let alphanum str =
-    ALPHANUM { str; quotation = Double_quote; hexadecimal = false }
+    ALPHANUM { str; quotation = Double_quote; hexadecimal = false; runtime_repr = Native_bytes }
   in
   let chk descr toks cond =
     test_case descr `Quick (fun () -> check_condition toks cond)

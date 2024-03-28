@@ -44,6 +44,7 @@ let dummy_alphanum_string =
     str = "_";
     quotation = Double_quote;
     hexadecimal = false;
+    runtime_repr = Native_bytes;
   }
 
 let dummy_expr =

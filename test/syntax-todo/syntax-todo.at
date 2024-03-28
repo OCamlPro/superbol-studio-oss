@@ -992,33 +992,6 @@ AT_CLEANUP
 
 
 
-AT_SETUP([MF Z LITERAL])
-AT_DATA([prog.cob], [
-       program-id. GetFlyerLevel.
-       procedure division.
-             MOVE Z'regular mail' TO WS-PRINT-MSG-METHOD
-       end program.
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:4.18-4.33:
-   1   @&t@
-   2          program-id. GetFlyerLevel.
-   3          procedure division.
-   4 >              MOVE Z'regular mail' TO WS-PRINT-MSG-METHOD
-----                     ^^^^^^^^^^^^^^^
-   5          end program.
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
-
-
 AT_SETUP([MF ALTERNATE KEY IS])
 AT_DATA([prog.cob], [
        program-id. GetFlyerLevel.

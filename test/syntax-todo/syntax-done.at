@@ -59,3 +59,21 @@ AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 ])
 
 AT_CLEANUP
+
+
+
+AT_SETUP([MF Z LITERAL])
+AT_DATA([prog.cob], [
+       program-id. GetFlyerLevel.
+       procedure division.
+             MOVE Z'regular mail' TO WS-PRINT-MSG-METHOD.
+       end program.
+])
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
+[Checking `prog.cob'
+])
+
+AT_CLEANUP
+
+

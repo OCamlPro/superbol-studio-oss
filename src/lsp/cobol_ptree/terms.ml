@@ -72,15 +72,26 @@ type alphanum_quote =
   | Double_quote (* "..." *)
 [@@deriving ord]
 
+type alphanum_repr =
+  | Native_bytes
+  | Null_terminated_bytes
+[@@deriving ord]
+
 type alphanum_string =
   {
     str: string;
     quotation: alphanum_quote;
     hexadecimal: bool;
+    runtime_repr: alphanum_repr;
   }
 [@@deriving ord]
 
-let pp_alphanum_string ppf { hexadecimal; quotation; str } =
+let pp_alphanum_string ppf { hexadecimal; quotation; str; runtime_repr } =
+  begin
+    match runtime_repr with
+    | Native_bytes -> ()
+    | Null_terminated_bytes -> Fmt.char ppf 'Z'
+  end;
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
   | Simple_quote -> Fmt.pf ppf "'%s'" str

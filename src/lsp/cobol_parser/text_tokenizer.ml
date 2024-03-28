@@ -56,7 +56,12 @@ let combined_tokens =
     NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
 
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str } =
+let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str; runtime_repr } =
+  begin
+    match runtime_repr with
+    | Native_bytes -> ()
+    | Null_terminated_bytes -> Fmt.char ppf 'Z'
+  end;
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
   | Simple_quote -> Fmt.pf ppf "'%s" str
@@ -79,7 +84,6 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
   | NATLIT s -> print "N\"%s\"" s
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
-  | NULLIT s -> print "Z\"%s\"" s
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
@@ -380,13 +384,14 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   : text_word with_loc -> tokens * Parser_diagnostics.t =
   fun { payload = c; loc } ->
   let tok t = [t &@ loc], Parser_diagnostics.none in
-  let alphanum ~hexadecimal str qte =
+  let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str qte =
     Cobol_ptree.{
       str;
       hexadecimal;
-      quotation = match qte with
+      quotation = (match qte with
         | Apostrophe -> Simple_quote
-        | Quote -> Double_quote
+        | Quote -> Double_quote);
+      runtime_repr = repr;
     }
   and boollit ~base str =
     tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base str)
@@ -410,8 +415,8 @@ let tokens_of_word { persist = { lexer; _ }; _ }
     -> boollit ~base:`Hex str
   | Alphanum { knd = Hex; str; qte }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
-  | Alphanum { knd = NullTerm; str; _ }
-    -> tok @@ NULLIT str
+  | Alphanum { knd = NullTerm; str; qte }
+    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false ~repr:Null_terminated_bytes str qte)
   | Alphanum { knd = National | NationalX; str; _ }  (* TODO: differentiate *)
     -> tok @@ NATLIT str
   | AlphanumPrefix { knd = Hex; str; qte }
