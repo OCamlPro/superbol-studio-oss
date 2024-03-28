@@ -73,19 +73,11 @@ type recording_mode =
   | ModeVariable
 [@@deriving ord]
 
-type recording_mode_clause =
-  | RecordingMode of recording_mode
-[@@deriving ord]
-
 let pp_recording_mode ppf = function
   | ModeFixedOrVariable -> Fmt.pf ppf "U"
   | ModeSpanned         -> Fmt.pf ppf "S"
   | ModeFixed           -> Fmt.pf ppf "FIXED"
   | ModeVariable        -> Fmt.pf ppf "VARIABLE"
-
-let pp_recording_mode_clause ppf = function
-  | RecordingMode mode ->
-    Fmt.pf ppf "RECORDING MODE IS %a" pp_recording_mode mode
 
 type label_clause =
   | LabelStandard

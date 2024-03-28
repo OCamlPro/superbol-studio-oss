@@ -1283,7 +1283,7 @@ record_clause:
      VariableLength { min_length; max_length; depending } }
 
 let recording_mode_clause [@context recording_mode_clause] :=
- | RECORDING; MODE; IS; ~ = recording_mode; <RecordingMode>
+ | RECORDING; MODE; IS; ~ = recording_mode; < >
 
 let recording_mode :=
  | F;        { ModeFixed }
