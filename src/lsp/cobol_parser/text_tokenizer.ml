@@ -21,27 +21,6 @@ open Parser_diagnostics
 
 (* --- *)
 
-type Cobol_common.Exec_block.TYPES.exec_block +=   (* TEMPORARY, for testing. *)
-  | Generic_exec_block of Cobol_preproc.Text.t
-
-let () =
-  Cobol_common.Exec_block.register_exec_block_type
-    ~name:"GENERIC-EXEC-BLOCK"
-    ~compare:begin fun a b -> match a, b with
-      | Generic_exec_block a, Generic_exec_block b ->
-          Some ((* FIXME: text comparison *)Stdlib.compare a b)
-      | _ ->
-          None
-    end
-    ~pp:begin function
-      | Generic_exec_block a ->
-          Some (Pretty.delayed "%a" Cobol_preproc.Text.pp_text a)
-      | _ ->
-          None
-    end
-
-(* --- *)
-
 type token = Grammar_tokens.token with_loc
 type tokens = token list
 
@@ -348,6 +327,7 @@ and persist =
   {
     lexer: Text_lexer.lexer;
     context_tokens: Grammar_contexts.context_tokens;
+    exec_scanner: Parser_options.exec_scanner;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
   }
@@ -357,6 +337,7 @@ let eidetic = Eidetic []
 let init
     ?(verbose = false)
     ?(show_if_verbose = [`Tks; `Ctx])
+    ~exec_scanner
     ~memory
     words
   =
@@ -379,6 +360,7 @@ let init
       {
         lexer;
         context_tokens;
+        exec_scanner;
         verbose;
         show_if_verbose =
           (if List.mem `Tks show_if_verbose then [`Tks] else []) @
@@ -399,7 +381,7 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
       WORD_IN_AREA_A w &@ loc
   | t -> t
 
-let tokens_of_word { persist = { lexer; _ }; _ }
+let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
   : text_word with_loc -> tokens * Parser_diagnostics.t =
   fun { payload = c; loc } ->
   let tok t = [t &@ loc], Parser_diagnostics.none in
@@ -444,7 +426,7 @@ let tokens_of_word { persist = { lexer; _ }; _ }
   | Eof
     -> tok EOF
   | ExecBlock text
-    -> tok @@ EXEC_BLOCK (Generic_exec_block text)
+    -> tok @@ EXEC_BLOCK (exec_scanner text)
   | Pseudo _
     -> [], Parser_diagnostics.error @@ Unexpected { loc; stuff = Pseudotext }
 

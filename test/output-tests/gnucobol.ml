@@ -172,6 +172,12 @@ let guess_source_format ~filename ~command =   (* hackish detection of format *)
     lazy (command_matchp auto_format_regexp), Cobol_config.Auto;
   ]
 
+
+let default_parser_options =
+  Cobol_parser.Options.default
+    ~exec_scanner:Superbol_preprocs.Generic.scanner
+
+
 let do_check_parse (test_filename, contents, _, { check_loc;
                                                   check_command; _ }) =
   let filename = filename_for_loc test_filename check_loc in
@@ -190,6 +196,7 @@ let do_check_parse (test_filename, contents, _, { check_loc;
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{ default with source_format } |>
     Cobol_parser.parse_simple
+      ~options:default_parser_options
   in
   try
     let input = setup_input ~filename contents in

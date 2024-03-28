@@ -16,13 +16,16 @@ open Ez_file
 open FileString.OP
 open Testsuite_utils
 
+let default_parser_options =
+  Cobol_parser.Options.{
+    (default ~exec_scanner:Superbol_preprocs.Generic.scanner) with
+    recovery = DisableRecovery
+  }
+
 let reparse_file ~source_format ~config filename =
   let parse ~source_format input =
     Cobol_parser.parse_simple
-      ~options:Cobol_parser.Options.{
-          default with
-          recovery = DisableRecovery
-        } @@
+      ~options:default_parser_options @@
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
           default with

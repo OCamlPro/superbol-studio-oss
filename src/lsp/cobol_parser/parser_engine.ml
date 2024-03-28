@@ -44,12 +44,12 @@ and position =
   | Indexed of { line: int; char: int }                  (* all starting at 0 *)
 
 type 'm simple_parsing
-  = ?options:parser_options
+  = options: parser_options
   -> Cobol_preproc.preprocessor
   -> (Cobol_ptree.compilation_group option, 'm) output with_diags
 
 type 'm rewindable_parsing
-  = ?options:parser_options
+  = options: parser_options
   -> Cobol_preproc.preprocessor
   -> (((Cobol_ptree.compilation_group option, 'm) output as 'x) *
       'x rewinder) with_diags
@@ -95,7 +95,7 @@ and 'm persist =
 
 (** Initializes a parser state, given a preprocessor. *)
 let make_parser
-    (type m) Parser_options.{ verbose; show; recovery; config }
+    (type m) Parser_options.{ verbose; show; recovery; config; exec_scanner }
     ?show_if_verbose ~(tokenizer_memory: m memory) pp =
   let tokzr: m Tokzr.state =
     let memory: m Tokzr.memory = match tokenizer_memory with
@@ -103,7 +103,7 @@ let make_parser
       | Parser_options.Eidetic -> Tokzr.eidetic
     in
     let module Config = (val config) in
-    Tokzr.init ~verbose ?show_if_verbose ~memory Config.words
+    Tokzr.init ~verbose ?show_if_verbose ~exec_scanner ~memory Config.words
   in
   {
     prev_limit = None;
@@ -430,8 +430,7 @@ let aggregate_output (type m) (ps: m state) res
       WithArtifacts (res, artifacts)
 
 (** Simple parsing *)
-let parse_once
-    ~options (type m) ~(memory: m memory) ~make_checkpoint pp
+let parse_once ~options (type m) ~(memory: m memory) ~make_checkpoint pp
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
@@ -585,7 +584,7 @@ let rewindable_parse
 let parse
     (type m)
     ~(memory: m memory)
-    ?(options = Parser_options.default)
+    ~(options: parser_options)
   : Cobol_preproc.preprocessor ->
     (Cobol_ptree.compilation_group option, m) output with_diags =
   parse_once ~options ~memory
@@ -597,7 +596,7 @@ let parse_with_artifacts = parse ~memory:Eidetic
 let rewindable_parse
     (type m)
     ~(memory: m memory)
-    ?(options = Parser_options.default)
+    ~(options: parser_options)
   : Cobol_preproc.preprocessor ->
     (((Cobol_ptree.compilation_group option, m) output as 'x) * 'x rewinder)
       with_diags =

@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-bc652f64ea23cbc9b312759698f86be4:.
+b921a1d2cb1f38750cfbf30e17d2c4e0:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-6a8768b8bacbdffd81c7a639af6837da:.github/workflows/workflow.yml
+4de13652304fe85e3219fc76dbbf338f:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -30,7 +30,7 @@ d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
 
 # begin context for Makefile
 # file Makefile
-f8b844a7c4d85ef07c8b14a28618c1cc:Makefile
+6186964737dd0acb7c6ce2e99591a81d:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-6537f64f4579a404162a8b2ad54fa16f:dune-project
+4efc31f15183175c69415a2f21c700e6:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -110,7 +110,7 @@ f4f8f79bd215d13126947601f279fd0d:opam/cobol_indent.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-8e309a20ff09bd4767967165aee77aa5:opam/cobol_lsp.opam
+b304a6f04e9643a7995f26d40624727f:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
@@ -197,6 +197,11 @@ eaa52762ea6a03491c05ce8a833dbdf6:opam/superbol-free.opam
 # file opam/superbol_free_lib.opam
 11d9c49cadaf6087bc6da48353ff7df6:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
+
+# begin context for opam/superbol_preprocs.opam
+# file opam/superbol_preprocs.opam
+f066a097fba430a14086affb7b678c65:opam/superbol_preprocs.opam
+# end context for opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
 # file opam/superbol_project.opam
@@ -325,7 +330,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-4327949d1aed57b3e3aa5ee51a29c968:src/lsp/cobol_lsp/dune
+9d53073ccf454b19436ec96ace43b740:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/version.mlt
@@ -442,6 +447,16 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/pretty/version.mlt
 # file src/lsp/superbol_free_lib/version.mlt
 bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_free_lib/version.mlt
 # end context for src/lsp/superbol_free_lib/version.mlt
+
+# begin context for src/lsp/superbol_preprocs/dune
+# file src/lsp/superbol_preprocs/dune
+f695b1b5982172b95675d738fabd8cb0:src/lsp/superbol_preprocs/dune
+# end context for src/lsp/superbol_preprocs/dune
+
+# begin context for src/lsp/superbol_preprocs/version.mlt
+# file src/lsp/superbol_preprocs/version.mlt
+bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_preprocs/version.mlt
+# end context for src/lsp/superbol_preprocs/version.mlt
 
 # begin context for src/lsp/superbol_project/dune
 # file src/lsp/superbol_project/dune

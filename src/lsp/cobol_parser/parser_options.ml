@@ -24,6 +24,10 @@ and recovery_options =
                                          missing tokens (e.g, periods).  *)
   }
 
+(** Scanners for EXECs are functions fed with EXEC(UTE)/END-EXEC text blocks
+    (including the "EXEC" and "END-EXEC" text words). *)
+type exec_scanner = Cobol_preproc.Text.t -> Cobol_common.Exec_block.t
+
 type 'm memory =
   | Amnesic: Cobol_common.Behaviors.amnesic memory
   | Eidetic: Cobol_common.Behaviors.eidetic memory
@@ -34,15 +38,17 @@ type parser_options =
     show: [`Pending] list;
     recovery: recovery;
     config: Cobol_config.t;
+    exec_scanner: exec_scanner;
   }
 
 let default_recovery =
   EnableRecovery { silence_benign_recoveries = false }
 
-let default =
+let default ~exec_scanner =
   {
     verbose = false;
     show = [`Pending];
     recovery = default_recovery;
     config = Cobol_config.default;
+    exec_scanner;
   }
