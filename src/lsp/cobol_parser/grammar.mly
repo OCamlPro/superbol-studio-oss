@@ -1628,7 +1628,7 @@ let synchronized_clause :=
 
 let data_type_clause := TYPE; TO?; ~ = name; < >
 
-let usage_clause [@recovery Binary] [@symbol "<usage-clause>"] :=
+let usage_clause :=
   | USAGE; IS?; ~ = usage; < >
   | ~ = usage; < >                                                  (* COBOL85 *)
   | USAGE; IS?; ~ = name; <Type>                                    (* MF *)
@@ -1636,7 +1636,8 @@ let usage_clause [@recovery Binary] [@symbol "<usage-clause>"] :=
         but this leads to way too many conflicts... If only we
         could know in advance that "name" is a typedef... *)
 
-usage [@context usage_clause   (* ok as none of leftmost terminals are C/S *)]:
+usage [@recovery Binary] [@symbol "<usage-clause>"]
+  [@context usage_clause (* ok as none of leftmost terminals are C/S *)]:
   | BINARY                                        { Binary }
   | DISPLAY                                       { Display }
   | INDEX                                         { Index }

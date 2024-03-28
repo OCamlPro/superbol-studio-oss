@@ -584,7 +584,7 @@ syn_misc.at-2400-prog.cob:6.30:
 ----                                 ^
    7                            value is 3.97E+24.
    8          77  mydouble      usage double
->> Hint: Missing <word>
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2400-prog.cob:6.31-6.36:
    3          PROGRAM-ID.      prog.
@@ -604,7 +604,7 @@ syn_misc.at-2400-prog.cob:8.30:
 ----                                 ^
    9                            value is 3.97E+44.
   10          PROCEDURE DIVISION.
->> Hint: Missing <word>
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2400-prog.cob:8.31-8.37:
    5          WORKING-STORAGE SECTION.
@@ -625,7 +625,7 @@ syn_misc.at-2668-prog.cob:6.30:
 ----                                 ^
    7          77  lb-row        PIC X(10).
    8          77  lb-color      PIC 9(05) VALUE 8192.
->> Hint: Missing <word>
+>> Hint: Missing <usage-clause>
 
 syn_misc.at-2668-prog.cob:6.31-6.37:
    3          PROGRAM-ID.      prog.
