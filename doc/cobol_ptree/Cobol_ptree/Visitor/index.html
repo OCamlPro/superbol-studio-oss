@@ -2946,13 +2946,966 @@
   <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.set_condition_spec</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
-  <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_kind"><a href="#val-fold_stop_kind" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_kind : 
+  <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_status_kind"><a href="#val-fold_status_kind" class="anchor"></a><code><span><span class="keyword">val</span> fold_status_kind : 
   <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_kind</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.status_kind</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_run"><a href="#val-fold_stop_run" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_run : 
-  <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_run</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>&lt; fold' : 
+    'x. <span><span><span class="type-var">'x</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+    <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+    <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_accept' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.accept_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_accept_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.accept_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_accept_misc : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.accept_misc</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_accept_with_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.accept_with_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_add' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.basic_arithmetic_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_address : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.address</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_advancing_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.advancing_phrase</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_alignment : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.alignment</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_allocate' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.allocate_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_allocate_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.allocate_kind</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_alphabet_specification : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.alphabet_specification</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_alphanum : 
+      <span><span>(<span><span>[ `AlphaNum ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_alter' : 
+      <span><span>(<span><span><span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.alter_operands</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_alter_operands' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.alter_operands</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_any_figurative : 
+      'k. <span><span>(<span><span class="type-var">'k</span> <span class="xref-unresolved">Cobol_ptree__.Terms.figurative</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_basic_arithmetic_operands : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.basic_arithmetic_operands</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_binop : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.binop</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_blank_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.blank_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_bool : <span>bool <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_boolean : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Numericals.boolean</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.call_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_error_handler : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.call_error_handler</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_prefix : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.call_prefix</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_proto : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.call_proto</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_using_by : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.call_using_by</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_using_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.call_using_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_call_using_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Operands.call_using_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_cancel' : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> list</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_char : <span>char <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_class : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.class_</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_class_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.class_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_close' : 
+      <span><span>(<span><span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.close_phrase</span> list</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_close_format : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.close_format</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_close_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.close_phrase</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_column_position : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.column_position</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_comm_channel : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.comm_channel</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_comm_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.comm_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_comm_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_descr.comm_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_comm_direction : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.comm_direction</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_communication_descr : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.communication_descr</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_communication_descr' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.communication_descr</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_communication_section : 
+      <span><span>(<span><span><span class="xref-unresolved">Cobol_ptree__.Data_sections.communication_descr</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_compute' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.compute_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_cond : 
+      'k. <span><span>(<span><span class="type-var">'k</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_condition_name_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.condition_name_item</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_condition_name_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.condition_name_item</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_condition_name_value : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.condition_name_value</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_constant_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.constant_item</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_constant_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.constant_item</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_constant_value : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.constant_value</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_constant_value' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_descr.constant_value</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_converting : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.converting</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_counter : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.counter</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_counter_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.counter_kind</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.data_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.data_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.data_item</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.data_item</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_level : <span><span>(int, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_level' : 
+      <span><span>(<span>int <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_name : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.data_name</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_name' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_descr.data_name</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_occurs_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.data_occurs_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_value_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.data_value_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_data_varying : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.data_varying</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_date_time : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.date_time</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_delete' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.delete_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_disable' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Operands.mcs_command_operands</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_display' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.display_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_display_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.display_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_display_items_clauses : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.display_items_clauses</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_display_target' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.display_target</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_display_with_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.display_with_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_divide' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.divide_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_divide_operands : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.divide_operands</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_dual_handler : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.dual_handler</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_effective_arg : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.effective_arg</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_enable' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Operands.mcs_command_operands</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_encoding_endianness : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.encoding_endianness</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_encoding_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.encoding_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_endianness_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.endianness_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_enter' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.enter_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_entry' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.entry_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_entry_by_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.entry_by_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_erase_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.erase_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_evaluate' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.evaluate_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_evaluate_branch : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.evaluate_branch</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_exec_block' : 
+      <span><span>(<span><a href="../../../cobol_common/Cobol_common/Exec_block/TYPES/index.html#type-exec_block">Cobol_common.Exec_block.TYPES.exec_block</a> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_exec_declarations : 
+      <span><span>(<a href="../../../cobol_common/Cobol_common/Exec_block/index.html#type-t">Cobol_common.Exec_block.t</a>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_exec_declarations' : 
+      <span><span>(<span><a href="../../../cobol_common/Cobol_common/Exec_block/index.html#type-t">Cobol_common.Exec_block.t</a> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_exit' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.exit_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_expr : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.expression</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_expr' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Terms.expression</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_external_clause : 
+      <span><span>(<span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.alnum_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.national_</span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>
+         option</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_block_contents : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.file_block_contents</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_clauses : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.file_clauses</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_descr : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.file_descr</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_descr' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.file_descr</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_fd_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.file_fd_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_fd_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.file_fd_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_linage_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.file_linage_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_option : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.file_option</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_sd_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.file_sd_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_sd_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.file_sd_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_file_section : 
+      <span><span>(<span><span><span class="xref-unresolved">Cobol_ptree__.Data_sections.file_descr</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_fixed : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Numericals.fixed</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_flat_combined_relation : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.flat_combined_relation</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_float_content : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.float_content</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_floating : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Numericals.floating</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_format_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.format_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_free' : 
+      <span><span>(<span><span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> list</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_generate' : 
+      <span><span>(<span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_goback' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.goback_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_goto' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.goto_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_goto_depending' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.goto_depending_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_goto_entry' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.goto_entry</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_goto_entry_depending' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.goto_entry_depending_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_group_usage_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.group_usage_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_handler' : 
+      <span><span>(<span><span><span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.statement</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_ident : 
+      <span><span>(<span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.base_ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_if' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.if_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_init_data_category : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.init_data_category</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_init_replacing : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.init_replacing</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_initialize' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.initialize_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_initiate' : 
+      <span><span>(<span><span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> list</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_inline_call : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.inline_call</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_inline_invocation : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.inline_invocation</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_inspect' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.inspect_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_inspect_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.inspect_spec</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_inspect_where : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.inspect_direction</span>
+       * <span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.nonnum_</span></span> ]</span>
+           <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_int : <span>int <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_int_figurative : 
+      <span><span>(<span><span>[ `Int ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.figurative</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_integer : <span><span>(string, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_integer' : 
+      <span><span>(<span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_invoke' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.invoke_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_label_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.label_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_length_of : 
+      <span><span>(<span><span>[ `LengthOf ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_line_position : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.line_position</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_linkage_section : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Data_sections.item_descr</span></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_list : 'x. <span><span><span class="type-var">'x</span> list</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_local_storage_section : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Data_sections.item_descr</span></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_locale_category : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.locale_category</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_locale_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.locale_phrase</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_logop : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.logop</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_mcs_awaiting_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.mcs_awaiting_item</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_mcs_command_operands : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.mcs_command_operands</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_mcs_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.mcs_kind</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_merge' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.merge_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_merge_or_sort_target : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.merge_or_sort_target</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_message_ending_indicator : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.message_ending_indicator</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_move' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.move_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_multiply' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.multiply_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_multiply_operands : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.multiply_operands</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_name : <span><span>(string, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_name' : 
+      <span><span>(<span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_named_file_option : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.named_file_option</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_national : 
+      <span><span>(<span><span>[ `National ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_nel : 
+      'x. <span><span><span class="type-var">'x</span> <a href="../../../cobol_common/Cobol_common/Basics/NEL/index.html#type-t">Cobol_common.Basics.NEL.t</a></span> <span class="arrow">&#45;&gt;</span></span>
+      <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span>
+      <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_next_group_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.next_group_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_object_ref : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.object_ref</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_object_reference_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.object_reference_kind</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_object_view : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.object_view</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_object_view_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.object_view_spec</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_on_off : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.on_off</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_open' : 
+      <span><span>(<span><span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.open_phrase</span> list</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_open_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.open_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_open_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.open_phrase</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_option : 'x. <span><span><span class="type-var">'x</span> option</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_perform_inline' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.perform_inline_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_perform_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.perform_mode</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_perform_target' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.perform_target_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_picture_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.picture_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_picture_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.picture_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_picture_string : 
+      <span><span>(<span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_picture_string' : 
+      <span><span>(<span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_polarity : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.polarity</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_position : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.position</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_procedure_name : 
+      <span><span>(<span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span>
+       <span>| <span><span class="xref-unresolved">Cobol_ptree__.Terms.name</span> <span class="xref-unresolved">Cobol_ptree__.Terms.qual_</span></span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_procedure_name' : 
+      <span><span>(<span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span>
+       <span>| <span><span class="xref-unresolved">Cobol_ptree__.Terms.name</span> <span class="xref-unresolved">Cobol_ptree__.Terms.qual_</span></span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_procedure_range : 
+      'x. <span><span>(<span><span class="type-var">'x</span> <span class="xref-unresolved">Cobol_ptree__.Operands.procedure_range</span></span>, <span class="type-var">'a</span>)</span>
+            <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_property_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.property_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_property_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.property_kind</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_purge' : 
+      <span><span>(<span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_qualident : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.qualident</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_qualname : 
+      <span><span>(<span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span>
+       <span>| <span><span class="xref-unresolved">Cobol_ptree__.Terms.name</span> <span class="xref-unresolved">Cobol_ptree__.Terms.qual_</span></span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_qualname' : 
+      <span><span>(<span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.name_</span>
+       <span>| <span><span class="xref-unresolved">Cobol_ptree__.Terms.name</span> <span class="xref-unresolved">Cobol_ptree__.Terms.qual_</span></span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_raise' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Operands.raise_operand</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_raising : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.raising</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_read' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.read_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_read_direction : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.read_direction</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_read_error : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.read_error</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_read_error_handler : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.read_error</span>
+       * <span class="xref-unresolved">Cobol_ptree__.Branching_statements.dual_handler</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_read_lock_behavior : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.read_lock_behavior</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_receive' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.receive_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_record_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.record_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_recording_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.recording_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_refmod : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.refmod</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_release' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.release_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_relop : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.relop</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rename_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.rename_item</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rename_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.rename_item</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_replacing : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.replacing_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_replacing_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.replacing_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_replacing_range_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.replacing_range_spec</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.report_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_descr.report_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_data_name_or_final : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.report_data_name_or_final</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_descr : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.report_descr</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_descr' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.report_descr</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_group_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.report_group_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_group_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.report_group_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_group_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.report_group_item</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_group_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.report_group_item</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_screen_usage_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.report_screen_usage_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_section : 
+      <span><span>(<span><span><span class="xref-unresolved">Cobol_ptree__.Data_sections.report_descr</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_report_type_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.report_type_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_resume' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.resume_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_retry_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.retry_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_return' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.return_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rewrite' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.rewrite_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rounded_ident : 
+      <span><span>(<span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.base_ident_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.refmod_ident_</span></span> ]</span>
+         <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span>
+         <span class="xref-unresolved">Cobol_ptree__.Operands.rounded</span></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rounding : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.rounding</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_rounding_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.rounding_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_attribute : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.screen_attribute</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_attribute_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.screen_attribute_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.screen_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.screen_clause</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_item : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_sections.screen_item</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_item' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Data_sections.screen_item</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_line_column_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.screen_line_column_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_screen_section : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Data_sections.item_descr</span></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_search' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.search_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_search_all' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.search_all_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_search_condition : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.search_condition</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_search_when_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.search_when_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_select_when_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.select_when_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_selection_object : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.selection_object</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_selection_subject : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.selection_subject</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_send' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.send_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_send_operands : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.send_operands</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.set_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_ambiguous_method : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.set_ambiguous_method</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_attribute_switch : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.set_attribute_switch</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_condition_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.set_condition_spec</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_locale_source : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.set_locale_source</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_locale_target : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.set_locale_target</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_save_locale : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.set_save_locale</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_set_switch_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.set_switch_spec</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sharing_mode : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.sharing_mode</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sign : 
+      <span><span>(<span><span>[ `Strict ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.sign_cond</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sign_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.sign_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_signz : 
+      <span><span>(<span><span>[ `Loose ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.sign_cond</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_simple_cond : 
+      <span><span>(<span><span>[ `Simple ]</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sort' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.sort_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sort_direction : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.sort_direction</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sort_source : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.sort_source</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sort_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.sort_spec</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_source_destination_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.source_destination_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_stage : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.stage</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_start' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.start_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_start_position : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.start_position</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_statement' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.statement</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_statements' : 
+      <span><span>(<span><span><span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.statement</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_status_kind : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.status_kind</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_stop' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_stop_arg : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_arg</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_stop_run : 
+      <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_run_status</span> <span class="arrow">&#45;&gt;</span></span>
+      <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
+      <span><span class="type-var">'b</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-action">Cobol_common.Visitor.action</a></span>
+    ; fold_stop_run_return : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_run_return</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_string : <span>string <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <span class="arrow">&#45;&gt;</span></span> <span><span class="type-var">'a</span> <a href="../../../cobol_common/Cobol_common/Visitor/Fold/index.html#type-action">Cobol_common.Visitor.Fold.action</a></span>
+    ; fold_string_delimiter : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.string_delimiter</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_string_source : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.string_source</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_string_stmt' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.string_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_subscript : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.subscript</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_subtract' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.basic_arithmetic_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_sum_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.sum_phrase</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_synchronized_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.synchronized_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_table_data_value : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.table_data_value</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_tallying : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.tallying</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_tallying_clause' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.tallying_clause</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_tallying_spec : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Simple_statements.tallying_spec</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_terminate' : 
+      <span><span>(<span><span><span>string <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span> list</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_transform' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.transform_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_unlock' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.unlock_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_unop : <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.unop</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_unstring' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.unstring_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_unstring_delimiter : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.unstring_delimiter</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_unstring_target : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.unstring_target</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_usage_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.usage_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_validate' : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Terms.term</span></span> list</span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_validation_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.validation_clause</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_valueof_clause : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Data_descr.valueof_clause</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_varying_phrase : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.varying_phrase</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_varying_phrase' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.varying_phrase</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_working_storage_section : 
+      <span><span>(<span><span><span><span class="type-var">_</span> <span class="xref-unresolved">Cobol_ptree__.Data_sections.item_descr</span></span> <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>
+         list</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_write' : 
+      <span><span>(<span><span class="xref-unresolved">Cobol_ptree__.Branching_statements.write_stmt</span>
+         <a href="../../../cobol_common/Cobol_common/Srcloc/index.html#type-with_loc">Cobol_common.Srcloc.with_loc</a></span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_write_error : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.write_error</span>, <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_write_error_handler : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Branching_statements.write_error</span>
+       * <span class="xref-unresolved">Cobol_ptree__.Branching_statements.dual_handler</span>,
+        <span class="type-var">'a</span>)</span>
+        <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>
+    ; fold_write_target : 
+      <span><span>(<span class="xref-unresolved">Cobol_ptree__.Operands.write_target</span>, <span class="type-var">'a</span>)</span> <a href="../../../cobol_common/Cobol_common/Visitor/index.html#type-fold">Cobol_common.Visitor.fold</a></span>.. &gt;</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_run_status</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_string_delimiter"><a href="#val-fold_string_delimiter" class="anchor"></a><code><span><span class="keyword">val</span> fold_string_delimiter : 
   <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
@@ -3108,6 +4061,14 @@
   <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_sort'"><a href="#val-fold_sort'" class="anchor"></a><code><span><span class="keyword">val</span> fold_sort' : 
   <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
   <span><span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.sort_stmt</span> <a href="../../../cobol_common/Cobol_common/Srcloc/TYPES/index.html#type-with_loc">Cobol_common.Srcloc.TYPES.with_loc</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_run_return"><a href="#val-fold_stop_run_return" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_run_return : 
+  <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_run_return</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
+  <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop_arg"><a href="#val-fold_stop_arg" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop_arg : 
+  <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ptree__.Simple_statements.stop_arg</span> <span class="arrow">&#45;&gt;</span></span>
   <span><span class="type-var">'b</span> <span class="arrow">&#45;&gt;</span></span>
   <span class="type-var">'b</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-fold_stop'"><a href="#val-fold_stop'" class="anchor"></a><code><span><span class="keyword">val</span> fold_stop' : 
   <span><span><span class="type-var">'a</span> <a href="class-{folder}8/index.html">{folder}8</a></span> <span class="arrow">&#45;&gt;</span></span>
