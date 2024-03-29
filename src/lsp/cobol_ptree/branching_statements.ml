@@ -31,6 +31,16 @@ type goto_stmt =
 let pp_goto_stmt ppf { goto_target } =
   Fmt.pf ppf "@[GO TO @[%a@]" pp_procedure_name' goto_target
 
+(* GOTO ENTRY *)
+type goto_entry =
+  {
+    goto_entry_target: alphanum_string
+  }
+[@@deriving ord]
+
+let pp_goto_entry ppf { goto_entry_target } =
+  Fmt.pf ppf "@[GO TO @[%a@]" pp_alphanum_string goto_entry_target
+
 (* GOTO DEPENDING *)
 type goto_depending_stmt =
   {
@@ -43,6 +53,20 @@ let pp_goto_depending_stmt ppf { goto_depending_targets; goto_depending_on } =
   Fmt.pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a"
     (NEL.pp ~fsep:"@ " pp_procedure_name') goto_depending_targets
     pp_ident goto_depending_on
+
+(* GOTO ENTRY DEPENDING *)
+type goto_entry_depending_stmt =
+  {
+    goto_entry_depending_targets: alphanum_string nel;
+    goto_entry_depending_on: ident;
+  }
+[@@deriving ord]
+
+let pp_goto_entry_depending_stmt ppf
+  { goto_entry_depending_targets; goto_entry_depending_on } =
+  Fmt.pf ppf "@[GO TO ENTRY @[%a@]@ DEPENDING ON %a"
+    (NEL.pp ~fsep:"@ " pp_alphanum_string) goto_entry_depending_targets
+    pp_ident goto_entry_depending_on
 
 (* RESUME *)
 
@@ -478,6 +502,8 @@ and statement =
   | Generate of name with_loc
   | GoTo of goto_stmt
   | GoToDepending of goto_depending_stmt
+  | GoToEntry of goto_entry
+  | GoToEntryDepending of goto_entry_depending_stmt
   | GoBack of goback_stmt
   | If of if_stmt
   | Initialize of initialize_stmt
@@ -1041,6 +1067,8 @@ and pp_statement ppf = function
       Fmt.pf ppf "GENERATE@ %a" (pp_with_loc pp_name) name
   | GoTo s -> pp_goto_stmt ppf s
   | GoToDepending s -> pp_goto_depending_stmt ppf s
+  | GoToEntry s -> pp_goto_entry ppf s
+  | GoToEntryDepending s -> pp_goto_entry_depending_stmt ppf s 
   | GoBack s ->
     Fmt.pf ppf "GOBACK%a"
       Fmt.(option (sp ++ pp_raising)) s.goback_raising;
