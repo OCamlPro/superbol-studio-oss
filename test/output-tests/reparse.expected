@@ -79,7 +79,7 @@ Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob12.cbl':
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob13.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob14.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob15.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob16.cbl':
