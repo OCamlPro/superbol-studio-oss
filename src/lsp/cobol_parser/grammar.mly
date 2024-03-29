@@ -2329,6 +2329,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
 let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
 
+let alphanum_literal == ~ = alphanum; <Alphanum>
+
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
  | n = NATLIT;    {National n}
@@ -3354,18 +3356,15 @@ let generate_statement :=
 
 %public let unconditional_action := ~ = go_to_statement; < >
 let go_to_statement :=
- | GO; TO?; i = procedure_name;
-   { GoTo { goto_target = i } }
- | GO; TO?; il = nel_(procedure_name); DEPENDING; ON?; i = ident;
-   { GoToDepending { goto_depending_targets = il;
-                     goto_depending_on = i; } }
  | GO; TO?; %prec lowest
    { LoneGoTo }	   (* COB85; obsolete; should be sole statement of paragraph *)
- | GO; TO?; ENTRY; t = alphanum;
-   { GoToEntry { goto_entry_target = t } }
- | GO; TO?; ENTRY; il = nel_(alphanum); DEPENDING; ON?; i = ident;
-   { GoToEntryDepending { goto_entry_depending_targets = il;
-                          goto_entry_depending_on = i } }
+ | GO; TO?; il = nel_(procedure_name); i = o(DEPENDING; ON?; ident);
+   { GoTo (GoToSimple { goto_targets = il;
+                        goto_depending_on = i; } ) }
+ | GO; TO?; ENTRY; il = nel_(loc(alphanum_literal));
+   i = o(DEPENDING; ON?; ident);
+   { GoTo (GoToEntry { goto_entry_targets = il;
+                       goto_entry_depending_on = i } ) }
 
 
 (* GOBACK STATEMENT (+COB2002) *)
