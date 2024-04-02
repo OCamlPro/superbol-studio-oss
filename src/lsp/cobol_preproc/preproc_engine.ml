@@ -53,7 +53,9 @@ let diags { diags; reader; _ } =
   Preproc_diagnostics.add_src_diagnostics (Src_reader.diags reader) diags
 
 let add_diags lp d =
-  { lp with diags = Preproc_diagnostics.union d lp.diags }
+  if d == Preproc_diagnostics.none
+  then lp
+  else { lp with diags = Preproc_diagnostics.union d lp.diags }
 let add_error lp e =
   { lp with diags = Preproc_diagnostics.add_error e lp.diags }
 let add_warn lp w =
@@ -226,32 +228,28 @@ and apply_compiler_directive ({ reader; pplog; _ } as lp)
 
 and apply_preproc_directive ({ env; context; _ } as lp)
     { payload = ppdir; loc } =
+  let new_env lp { result = env; diags } =
+    if env != lp.env || diags != Preproc_diagnostics.none
+    then { lp with env; diags = Preproc_diagnostics.union diags lp.diags }
+    else lp
+  and new_context lp { result = context; diags } =
+    if context != lp.context || diags != Preproc_diagnostics.none
+    then { lp with context; diags = Preproc_diagnostics.union diags lp.diags }
+    else lp
+  in
   match ppdir with
   | Define_off var ->
-      (match Preproc_logic.on_define_off ~loc var ~env with
-       | Ok env -> { lp with env }
-       | Error diag -> add_warn lp diag)
+      new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
   | Define def ->
-      (match Preproc_logic.on_define ~loc def ~env with
-       | Ok env -> { lp with env }
-       | Error diag -> add_warn lp diag)
+      new_env lp @@ Preproc_logic.on_define ~loc def ~env
   | If condition ->
-      (match Preproc_logic.on_if ~loc ~condition ~env context with
-       | Ok context -> { lp with context }
-       | Error diags -> add_diags lp diags)
+      new_context lp @@ Preproc_logic.on_if ~loc ~condition ~env context
   | Elif condition ->
-      (match Preproc_logic.on_elif ~loc ~condition ~env context with
-       | Ok context -> { lp with context }
-       | Error diag -> add_error lp diag)
+      new_context lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
   | Else ->
-      (match Preproc_logic.on_else ~loc context with
-       | Ok context -> { lp with context }
-       | Error diag -> add_error lp diag)
-  | End_if ->            (* TODO: entry in pplog so we can grab discarded text *)
-      let lp = match Preproc_logic.on_endif ~loc context with
-        | Ok context -> { lp with context }
-        | Error diag -> add_error lp diag
-      in
+      new_context lp @@ Preproc_logic.on_else ~loc context
+  | End_if ->
+      let lp = new_context lp @@ Preproc_logic.on_endif ~loc context in
       if Preproc_logic.emitting lp.context
       then match lp.rev_ignored with
         | [] ->

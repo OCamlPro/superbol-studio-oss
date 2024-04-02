@@ -47,7 +47,7 @@ case "$1" in
     linux)
         case $(. /etc/os-release && echo $ID) in
             alpine)
-                COMMON_LIBS="bigstringaf_stubs cstruct_stubs camlstr unix c"
+                COMMON_LIBS="zarith gmp bigstringaf_stubs cstruct_stubs camlstr unix c"
                 # `m` and `pthread` are built-in musl
                 echo2 '(-noautolink'
                 echo2 ' -cclib -Wl,-Bstatic'
@@ -63,7 +63,7 @@ case "$1" in
         esac
         ;;
     macosx)
-        COMMON_LIBS="camlstr bigstringaf_stubs cstruct_stubs unix"
+        COMMON_LIBS="zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs unix"
         # `m` and `pthread` are built-in in libSystem
         echo2 '(-noautolink'
         for l in $COMMON_LIBS; do

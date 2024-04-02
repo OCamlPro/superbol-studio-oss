@@ -148,8 +148,8 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
   | Integer i ->
       let with_sign, digits = detect_sign i in
       Display (PIC.fixed_numeric ~with_sign digits 0)
-  | Fixed { fixed_integer; fixed_fractional } ->
-      let with_sign, int_digits = detect_sign fixed_integer
+  | Fixed { fixed_integral; fixed_fractional } ->
+      let with_sign, int_digits = detect_sign fixed_integral
       and frac_digits = String.length fixed_fractional in
       Display (PIC.fixed_numeric ~with_sign int_digits frac_digits)
   | _ ->                                                            (* TODO... *)

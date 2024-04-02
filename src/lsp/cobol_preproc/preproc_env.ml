@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
-(* open Cobol_common.Srcloc.INFIX *)
+open Cobol_common.Srcloc.INFIX
 
 (** Utility module that maps any string to a physically unique upper-cased
     internal representation. *)
@@ -20,6 +20,7 @@ module VAR: sig
   type t
   val pp: t Pretty.printer
   val of_string: string -> t
+  val to_uppercase_string: t -> string
   val compare: t -> t -> int
   val equal: t -> t -> bool
 end = struct
@@ -31,6 +32,7 @@ end = struct
     let s' = String.uppercase_ascii s in
     try TBL.find tbl s'
     with Not_found -> TBL.add tbl s' s'; s'
+  let to_uppercase_string = Fun.id
   let compare = String.compare
   let equal = (==)
 end
@@ -39,6 +41,7 @@ module MAP = Map.Make (VAR)
 
 module TYPES = struct
   type env = definition MAP.t
+  and var = VAR.t
   and definition =
     {
       def_loc: definition_loc;
@@ -53,9 +56,11 @@ module TYPES = struct
     | Process_environment
     (* | Computed *)
   and value =
-    | Boolean of Cobol_data.Literal.boolean with_preproc_loc
-    | Alphanum of Cobol_data.Literal.alphanum with_preproc_loc
+    | Alphanum of Cobol_data.Value.alphanum with_preproc_loc
+    | Boolean of Cobol_data.Value.boolean with_preproc_loc
+    | Numeric of Cobol_data.Value.fixed with_preproc_loc
 
+  exception UNDEFINED of var with_loc
   exception REDEFINITION of { prev_def_loc: definition_loc }
 end
 include TYPES
@@ -65,8 +70,9 @@ type t = env
 (* pretty-printing *)
 
 let pp_value ppf = function
-  | Boolean _ -> Pretty.print ppf "BOOL"
   | Alphanum s -> Pretty.print ppf "%s" s.pp_payload
+  | Boolean b -> Pretty.print ppf "%a" Cobol_data.Value.pp_boolean b.pp_payload
+  | Numeric f -> Pretty.print ppf "%a" Cobol_data.Value.pp_fixed f.pp_payload
 
 let pp_definition ppf { def_value; _ } =
   pp_value ppf def_value
@@ -81,23 +87,29 @@ let pp: t Pretty.printer = fun ppf map ->
 let empty = MAP.empty
 
 let var = VAR.of_string
+let var' = Cobol_common.Srcloc.locmap var
 
-let mem v = MAP.mem ((* var *) v)
+let mem v = MAP.mem v
+let mem' v = MAP.mem ~&v
 
 (* higher-level operations *)
 
-(* let define_expr: Compdir_tree.define_expr with_loc -> value = fun e -> *)
-(*   match ~&e with *)
-(*   | Alphanum_literal l -> *)
-(*       Alphanum { pp_payload = ~&l; *)
-(*                  pp_loc = Source_location ~@l } *)
+let definition_of ~var env : definition =
+  match MAP.find_opt ~&var env with
+  | None -> raise @@ UNDEFINED var
+  | Some value -> value
 
-let define ~def_loc var value ?(override = false) (env: t) : t =
-  match MAP.find_opt var env with
+let define ~loc var value ?(override = false) (env: t) : t =
+  match MAP.find_opt ~&var env with
   | Some { def_loc; _ } when not override ->
       raise @@ REDEFINITION { prev_def_loc = def_loc }
   | Some _ | None ->
-      MAP.add var { def_loc; def_value = value } env
+      MAP.add ~&var { def_loc = Source_location loc;
+                      def_value = value } env
+
+let define_process_parameter var value (env: t) : t =      (* always override *)
+  MAP.add var { def_loc = Process_parameter;
+                def_value = value } env
 
 let undefine var (env: t) : t =
-  MAP.remove var env
+  MAP.remove ~&var env

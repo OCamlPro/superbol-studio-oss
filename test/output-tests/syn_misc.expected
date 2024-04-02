@@ -2401,16 +2401,6 @@ syn_misc.at-6994-prog.cob:8.9-8.35:
   10          >> END-IF
 >> Error: Invalid >>DISPLAY compiler directive
 
-syn_misc.at-6994-prog.cob:9.9-9.22:
-   6            >>DISPLAY "X defined"
-   7          >> ELSE
-   8            >> DISPLAY "X not defined"
-   9 >          >> DEFINE X 1
-----            ^^^^^^^^^^^^^
-  10          >> END-IF
-  11              CONTINUE
->> Error: Malformed compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7027:0
 syn_misc.at-7027-prog.cob:8.7-8.49:
    5          >>IF A IS DEFINED

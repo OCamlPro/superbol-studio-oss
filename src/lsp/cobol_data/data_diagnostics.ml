@@ -21,7 +21,14 @@ type error =
                           max_length: int }       (* TODO: +kind *)
 
 and invalid_stuff =
-  | Character_in_boolean_literal of char
+  | Character_in_literal of { literal_class: literal_class; char: char }
+
+and literal_class =
+  | Boolean
+  | Fixed
+  | Floating
+  | Hexadecimal
+  | Integer
 
 and malformed_stuff =
   | Boolean_literal of string
@@ -32,9 +39,22 @@ let error_loc = function
   | Overlong_literal { loc; _ } ->
       loc
 
+let pp_literal_class ppf = function
+  | Boolean ->
+      Pretty.string ppf "Boolean"
+  | Fixed ->
+      Pretty.print ppf "fixed-point@ numeric"
+  | Floating ->
+      Pretty.print ppf "floating-point@ numeric"
+  | Hexadecimal ->
+      Pretty.string ppf "hexadecimal"
+  | Integer ->
+      Pretty.print ppf "Integer"
+
 let pp_invalid_stuff ppf = function
-  | Character_in_boolean_literal c ->
-      Pretty.print ppf "character@ `%c'@ in@ Boolean@ literal" c
+  | Character_in_literal { literal_class; char } ->
+      Pretty.print ppf "character@ `%c'@ in@ %a@ literal"
+        char pp_literal_class literal_class
 
 let pp_malformed_stuff ppf = function
   | Boolean_literal _ ->

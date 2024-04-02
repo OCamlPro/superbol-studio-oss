@@ -15,7 +15,7 @@ type integer = string                                           [@@deriving ord]
 
 type fixed =
   {
-    fixed_integer: string;                                (** Integer part *)
+    fixed_integral: string;                               (** Integer part *)
     fixed_fractional: string;                             (** Fractional part *)
   }                                                             [@@deriving ord]
 
@@ -37,12 +37,12 @@ let pp_integer = Pretty.string
 
 let fixed_of_strings i d =
   {
-    fixed_integer = i;
+    fixed_integral = i;
     fixed_fractional = d;
   }
 
-let pp_fixed ppf { fixed_integer; fixed_fractional } =
-  Pretty.print ppf "%s.%s" fixed_integer fixed_fractional
+let pp_fixed ppf { fixed_integral; fixed_fractional } =
+  Pretty.print ppf "%s.%s" fixed_integral fixed_fractional
 
 let floating_of_strings i d e =
   {

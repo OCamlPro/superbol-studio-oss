@@ -165,16 +165,19 @@ let pp_error ppf = function
 type warning =
   | Feature_warning of Cobol_config.DIAG.warning
   | Ignored of { loc: srcloc; item: ignored_item }
+  | Incompatible of { loc: srcloc; stuff: incompatible_warning_stuff }
   | Src_warning of Src_diagnostics.warning
+  | Undefined_warning of { loc: srcloc; stuff: undefined_warning_stuff }
+  | Unexpected_warning of { loc: srcloc; stuff: unexpected_warning_stuff }
   | Undefine_of_unknown_env_variable of
       {
         loc: srcloc;
-        var: string with_loc;
+        var: Preproc_env.var with_loc;
       }
   | Redefinition_of_env_variable of
       {
         loc: srcloc;
-        var: string with_loc;
+        var: Preproc_env.var with_loc;
         prev_def_loc: Preproc_env.definition_loc;
       }
   (* | Compdir_warning of *)
@@ -187,11 +190,33 @@ type warning =
 and ignored_item =
   | Compiler_directive
 
+and incompatible_warning_stuff =
+  | Types_in_compdir_condition of
+      {
+        left: Preproc_env.value;
+        right: Preproc_env.value;
+      }
+
+and undefined_warning_stuff =
+  | Variable_in_compdir_condition of
+      {
+        var: Preproc_env.var with_loc;
+      }
+
+and unexpected_warning_stuff =
+  | Variable_type_in_compdir_condition of
+      {
+        value: Preproc_env.value;
+      }
+
 let warning_loc = function
   | Feature_warning w ->
       Cobol_config.DIAG.warning_loc w
   | Ignored { loc; _ }
+  | Incompatible { loc; _ }
   | Undefine_of_unknown_env_variable { loc; _ }
+  | Undefined_warning { loc; _ }
+  | Unexpected_warning { loc; _ }
   | Redefinition_of_env_variable { loc; _ } ->
       loc
   | Src_warning e ->
@@ -201,19 +226,39 @@ let pp_ignored_item ppf = function
   | Compiler_directive ->
       Pretty.print ppf "compiler@ directive"
 
+let pp_incompatible_warning_stuff ppf = function
+  | Types_in_compdir_condition _ ->                     (* TODO: info on types *)
+      Pretty.print ppf "types@ in@ compiler@ directive@ condition"
+
+let pp_undefined_warning_stuff ppf = function
+  | Variable_in_compdir_condition { var; _ } ->
+      Pretty.print ppf "variable@ `%a'@ in@ compiler@ directive@ condition"
+        Preproc_env.VAR.pp ~&var
+
+let pp_unexpected_warning_stuff ppf = function
+  | Variable_type_in_compdir_condition _ ->
+      Pretty.print ppf "type@ of@ variable@ in@ compiler@ directive@ condition"
+
 let pp_warning ppf = function
   | Feature_warning w ->
       Cobol_config.DIAG.pp_warning ppf w
   | Ignored { item; _ } ->
       Pretty.print ppf "Ignored@ %a" pp_ignored_item item
+  | Incompatible { stuff; _ } ->
+      Pretty.print ppf "Incompatible@ %a" pp_incompatible_warning_stuff stuff
   | Src_warning e ->
       Src_diagnostics.pp_warning ppf e
   | Undefine_of_unknown_env_variable { var; _ } ->
-      Pretty.print ppf "DEFINE@ OFF@ of@ %s,@ which@ is@ not@ defined@ (yet)"
-        ~&var
+      Pretty.print ppf "DEFINE@ OFF@ of@ %a,@ which@ is@ not@ defined@ (yet)"
+        Preproc_env.VAR.pp ~&var
+  | Undefined_warning { stuff; _ } ->
+      Pretty.print ppf "Undefined@ %a" pp_undefined_warning_stuff stuff
+  | Unexpected_warning { stuff; _ } ->
+      Pretty.print ppf "Unexpected@ %a" pp_unexpected_warning_stuff stuff
   | Redefinition_of_env_variable { var; prev_def_loc; _ } ->
-      Pretty.print ppf "Redefinition@ of@ %s;@ previous@ definition@ was@ from@ \
-                        %t" ~&var
+      Pretty.print ppf "Redefinition@ of@ %a;@ previous@ definition@ was@ from@ \
+                        %t"
+        Preproc_env.VAR.pp ~&var
         (fun ppf -> match prev_def_loc with
            | Source_location l -> Cobol_common.Srcloc.pp_file_loc ppf l
            | Process_parameter -> Pretty.print ppf "process@ parameters"
