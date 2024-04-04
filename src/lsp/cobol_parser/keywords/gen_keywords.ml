@@ -59,6 +59,10 @@ let silenced attrs =
   List.find_opt (Attribute.has_label "keyword.silenced") attrs |>
   Option.map Attribute.payload
 
+let intrinsic attrs =
+  List.find_opt (Attribute.has_label "keyword.intrinsic") attrs |>
+  Option.map Attribute.payload
+
 let pp_terminal ppf t =
   Print.terminal ppf t;
   match Terminal.typ t with
@@ -102,6 +106,11 @@ let emit_silenced_keywords_list ppf =
   Terminal.iter (emit_entry silenced ~comment_token:true ppf);
   Fmt.pf ppf "@]@\n]@."
 
+let emit_intrinsic_functions_list ppf =
+  Fmt.pf ppf "@[<2>let intrinsic_functions = %s.[" tokens_module;
+  Terminal.iter (emit_entry intrinsic ppf);
+  Fmt.pf ppf "@]@\n]@."
+
 let emit ppf =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
@@ -110,10 +119,12 @@ let emit ppf =
      @\n%t\
      @\n%t\
      @\n%t\
+     @\n%t\
      @\n"
     cmlyname
     emit_prelude
     emit_keywords_list
+    emit_intrinsic_functions_list
     emit_puncts_list
     emit_silenced_keywords_list
 

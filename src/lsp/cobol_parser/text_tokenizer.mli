@@ -79,6 +79,13 @@ val put_token_back
 
 (* --- *)
 
+val intrinsic_functions_specifier
+  : ?intrinsics:string list
+  -> 'a state
+  -> token
+  -> tokens
+  -> 'a state * token * tokens
+
 val decimal_point_is_comma
   : 'a state
   -> token

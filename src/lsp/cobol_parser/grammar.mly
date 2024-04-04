@@ -67,6 +67,7 @@ let dual_handler_none =
 (*                            unit Cobol_common.Diagnostics.in_result] *)
 
 %[@post.tag special_names Cobol_ptree.special_names_clause]
+%[@post.tag function_specifier Cobol_ptree.specifier]
 
 %[@post.tag pending string]
 
@@ -843,7 +844,7 @@ let expands_phrase :=
   | EXPANDS; i = name; USING; il = names;
     { { expands_name = i; expands_using = il } }
 
-let function_specifier [@context function_specifier] :=
+let function_specifier [@context function_specifier] [@post.function_specifier]:=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
   | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>

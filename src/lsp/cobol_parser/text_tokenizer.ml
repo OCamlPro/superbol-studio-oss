@@ -561,6 +561,8 @@ type lexer_update =
   | Enabled of Text_lexer.TokenHandles.t
   | Disabled of Text_lexer.TokenHandles.t
   | CommaBecomesDecimalPoint
+  | IntrinsicFunctionsSpecifier of string list option
+  (* | FunctionSpecifier of string list (*TODO: maybe other type*) *)
 
 let tokens_of_string' { persist = { lexer; _ }; _ } =
   Text_lexer.tokens_of_string' lexer
@@ -632,6 +634,24 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
         aux (List.rev_append tks rev_prefix) suffix
       in
       aux []
+  | IntrinsicFunctionsSpecifier specs ->
+    begin match specs with
+      | Some specs ->
+        List.map (fun token ->
+            match ~&token with
+            | WORD w | WORD_IN_AREA_A w when List.mem w specs ->
+              List.assoc w Text_keywords.intrinsic_functions &@<- token
+            | _ -> token)
+      | None -> 
+        List.map (fun token ->
+          match ~&token with
+          | WORD w | WORD_IN_AREA_A w ->
+            begin try List.assoc w Text_keywords.intrinsic_functions &@<- token
+            with Not_found ->
+              token
+              end
+          | _ -> token)
+    end
 
 (** Enable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
@@ -644,6 +664,19 @@ let enable_tokens state tokens incoming_tokens =
 let disable_tokens state tokens outgoing_tokens =
   Text_lexer.disable_tokens outgoing_tokens;
   state, retokenize_after (Disabled outgoing_tokens) state tokens
+
+let intrinsic_functions_specifier (type m) ?intrinsics (state: m state) token tokens =
+  let state = put_token_back state in
+  let state =
+    let lexer = Text_lexer.intrinsic_functions_specifier ?intrinsics state.persist.lexer in
+    { state with persist = { state.persist with lexer } }
+  in
+  let tokens = token::tokens in
+  let tokens = retokenize_after (IntrinsicFunctionsSpecifier intrinsics) state tokens in
+  let token, tokens = List.hd tokens, List.tl tokens in
+  if show `Tks state then
+    Pretty.error "Tks': %a@." pp_tokens tokens;
+  emit_token state token, token, tokens
 
 let decimal_point_is_comma (type m) (state: m state) token tokens =
   let state = put_token_back state in
