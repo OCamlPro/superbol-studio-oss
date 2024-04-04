@@ -84,7 +84,7 @@ dev-deps:
 	opam install autofonce
 	opam install ./opam/*.opam ./test/opam/*.opam --deps-only --with-doc --with-test
 
-test:
+test: test-syntax
 	./scripts/before.sh test
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @runtest
 	./scripts/after.sh test

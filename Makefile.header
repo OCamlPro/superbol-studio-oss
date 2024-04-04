@@ -246,7 +246,6 @@ test-promote: test-syntax-promote
 	opam exec -- dune runtest --auto-promote
 
 .PHONY: test-syntax
-test: test-syntax
 test-syntax:
 	\! opam exec -- autofonce 2>/dev/null || opam exec -- autofonce run -t syntax
 
