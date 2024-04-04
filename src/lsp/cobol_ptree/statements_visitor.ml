@@ -999,8 +999,10 @@ and fold_entry_by_clause (v: _ #folder) : entry_by_clause -> 'a -> 'a =
 and fold_entry' (v: _ #folder) : entry_stmt with_loc -> 'a -> 'a =
   handle' v#fold_entry' v
     ~fold:begin fun v stmt x -> match stmt with
-      | EntrySimple _name -> x
-      | EntryUsing { entry_name = _; entry_by_clauses } -> x
+      | EntrySimple name -> x
+        >> fold_alphanum' v name 
+      | EntryUsing { entry_name; entry_by_clauses } -> x
+        >> fold_alphanum' v entry_name
         >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses
       | EntryForGoTo _entry_name -> x
     end
