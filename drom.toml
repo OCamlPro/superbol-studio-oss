@@ -98,7 +98,7 @@ github-workflow-before-build = """
 github-workflow-after-build = """
       - name: install test dependencies
         if: matrix.skip_test  != 'true'
-        run: opam install -y test/opam/*.opam --deps-only --with-test
+        run: make dev-deps
 """
 
 
