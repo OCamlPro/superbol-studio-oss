@@ -241,14 +241,15 @@ emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json
 # --eval "(princ (lsp-generate-settings \"package.json\" 'lsp-superbol))" \
 # --eval '(princ "\n")' \
 
+.PHONY: test-promote
 test-promote:
 	opam exec -- dune runtest --auto-promote
 
 .PHONY: test-syntax
 test: test-syntax
 test-syntax:
-	opam exec -- autofonce run -t syntax
+	\! opam exec -- autofonce 2>/dev/null || opam exec -- autofonce run -t syntax
 
 .PHONY: test-syntax-promote
 test-syntax-promote: test-syntax # To avoid promoting past tests
-	opam exec -- autofonce promote -t syntax --apply
+	\! opam exec -- autofonce 2>/dev/null || opam exec -- autofonce promote -t syntax --apply
