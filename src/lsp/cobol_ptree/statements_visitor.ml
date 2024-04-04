@@ -478,7 +478,7 @@ let fold_generate' (v: _ #folder) =
 
 let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v
-    ~fold:begin fun v { goback_raising ; goback_returning } x -> x
+    ~fold:begin fun v { goback_raising; goback_returning } x -> x
       >> fold_option ~fold:fold_raising v goback_raising
       >> fold_ident_or_intlit'_opt v goback_returning
     end
@@ -486,12 +486,12 @@ let fold_goback' (v: _ #folder) =
 let fold_goto' (v: _ #folder) =
   handle' v#fold_goto' v
     ~fold:begin fun v s x -> match s with
-      | GoToSimple { goto_targets; goto_depending_on } -> x
-        >> fold_nel ~fold:fold_procedure_name' v goto_targets
-        >> fold_option ~fold:fold_ident v goto_depending_on
-      | GoToEntry { goto_entry_targets; goto_entry_depending_on } -> x
-        >> fold_nel ~fold:fold_alphanum' v goto_entry_targets
-        >> fold_option ~fold:fold_ident v goto_entry_depending_on
+      | GoToSimple { targets; depending_on } -> x
+          >> fold_nel ~fold:fold_procedure_name' v targets
+          >> fold_option ~fold:fold_ident v depending_on
+      | GoToEntry { targets; depending_on } -> x
+          >> fold_nel ~fold:fold_alphanum' v targets
+          >> fold_option ~fold:fold_ident v depending_on
     end
 
 let fold_initialize' (v: _ #folder) =

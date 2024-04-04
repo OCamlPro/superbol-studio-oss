@@ -28,3 +28,5 @@ let pp_with_loc = Cobol_common.Srcloc.pp_with_loc
 module NEL = Cobol_common.Basics.NEL
 type 'a nel = 'a NEL.t
 [@@deriving ord]
+
+let pp_nel ppe = NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" ppe

@@ -3356,15 +3356,14 @@ let generate_statement :=
 
 %public let unconditional_action := ~ = go_to_statement; < >
 let go_to_statement :=
- | GO; TO?; %prec lowest
-   { LoneGoTo }	   (* COB85; obsolete; should be sole statement of paragraph *)
- | GO; TO?; il = nel_(procedure_name); i = o(DEPENDING; ON?; ident);
-   { GoTo (GoToSimple { goto_targets = il;
-                        goto_depending_on = i; } ) }
- | GO; TO?; ENTRY; il = nel_(loc(alphanum_literal));
-   i = o(DEPENDING; ON?; ident);
-   { GoTo (GoToEntry { goto_entry_targets = il;
-                       goto_entry_depending_on = i } ) }
+  | GO; TO?; %prec lowest
+    { LoneGoTo }    (* COB85; obsolete; should be sole statement of paragraph *)
+  | GO; TO?; targets = nel_(procedure_name);
+    depending_on = o(DEPENDING; ON?; ident);
+    { GoTo (GoToSimple { targets; depending_on }) }
+  | GO; TO?; ENTRY; targets = nel_(loc(alphanum_literal));
+    depending_on = o(DEPENDING; ON?; ident);
+    { GoTo (GoToEntry { targets; depending_on }) }
 
 
 (* GOBACK STATEMENT (+COB2002) *)
@@ -3374,7 +3373,7 @@ let goback_statement :=
   | GOBACK;
     goback_raising = ro(raising_exception);
     goback_returning = ro(goback_returning);
-    { GoBack { goback_raising ; goback_returning } }
+    { GoBack { goback_raising; goback_returning } }
 
 let goback_returning :=
   | or_(RETURNING,GIVING); ~ = loc(ident_or_integer); < >

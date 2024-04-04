@@ -24,34 +24,34 @@ open Simple_statements
 (* GOTO *)
 type goto_stmt =
   | GoToSimple of
-    {
-      goto_targets: procedure_name with_loc nel;
-      goto_depending_on: ident option;
-    }
+      {
+        targets: procedure_name with_loc nel;
+        depending_on: ident option;
+      }
   | GoToEntry of
-    {
-      goto_entry_targets: alphanum with_loc nel;
-      goto_entry_depending_on: ident option;
-    }
+      {
+        targets: alphanum with_loc nel;
+        depending_on: ident option;
+      }
 [@@deriving ord]
 
 let pp_goto_stmt ppf = function
-  | GoToSimple { goto_targets; goto_depending_on = None } ->
-    Fmt.pf ppf "@[GO TO @[%a@]@]"
-      (NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" pp_procedure_name') goto_targets
-  | GoToSimple { goto_targets; goto_depending_on = Some i } ->
-    Fmt.pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a@]"
-      (NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" pp_procedure_name') goto_targets
-      pp_ident i
-  | GoToEntry { goto_entry_targets; goto_entry_depending_on = None } ->
-    Fmt.pf ppf "@[GO TO ENTRY @[%a@]@]"
-      (NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" (pp_with_loc pp_alphanum))
-      goto_entry_targets
-  | GoToEntry { goto_entry_targets; goto_entry_depending_on = Some i } ->
-    Fmt.pf ppf "@[GO TO ENTRY @[%a@]@ DEPENDING ON %a@]"
-      (NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" (pp_with_loc pp_alphanum))
-      goto_entry_targets
-      pp_ident i 
+  | GoToSimple { targets; depending_on = None } ->
+      Fmt.pf ppf "@[GO TO @[%a@]@]"
+        (pp_nel pp_procedure_name') targets
+  | GoToSimple { targets; depending_on = Some i } ->
+      Fmt.pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a@]"
+        (pp_nel pp_procedure_name') targets
+        pp_ident i
+  | GoToEntry { targets; depending_on = None } ->
+      Fmt.pf ppf "@[GO TO ENTRY @[%a@]@]"
+        (pp_nel @@ pp_with_loc pp_alphanum)
+        targets
+  | GoToEntry { targets; depending_on = Some i } ->
+      Fmt.pf ppf "@[GO TO ENTRY @[%a@]@ DEPENDING ON %a@]"
+        (pp_nel @@ pp_with_loc pp_alphanum)
+        targets
+        pp_ident i
 
 
 (* RESUME *)
