@@ -2326,10 +2326,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
       [@symbol "<floating-point literal>"] :=
   | (i, _, d, e) = FLOATLIT; { Cobol_ptree.floating_of_strings i d e }
 
-let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
+let alphanum [@recovery dummy_alphanum] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
-
-let alphanum_literal == ~ = alphanum; <Alphanum>
 
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
@@ -3364,7 +3362,7 @@ let go_to_statement :=
   | GO; TO?; targets = nel_(procedure_name);
     depending_on = o(DEPENDING; ON?; ident);
     { GoTo (GoToSimple { targets; depending_on }) }
-  | GO; TO?; ENTRY; targets = nel_(loc(alphanum_literal));
+  | GO; TO?; ENTRY; targets = nel_(loc(alphanum));
     depending_on = o(DEPENDING; ON?; ident);
     { GoTo (GoToEntry { targets; depending_on }) }
 
@@ -4254,11 +4252,11 @@ let entry_by_clauses :=
 let entry_statement :=
  | ENTRY; ~ = entry_body; <Entry>
 let entry_body :=
- | ~ = loc(alphanum_literal); <EntrySimple>
- | n = loc(alphanum_literal); USING; clauses = rnel(entry_by_clauses);
+ | ~ = loc(alphanum); <EntrySimple>
+ | n = loc(alphanum); USING; clauses = rnel(entry_by_clauses);
    { EntryUsing { entry_name = n;
                   entry_by_clauses = clauses } }
- | FOR; GO; TO; ~ = loc(alphanum_literal); <EntryForGoTo>
+ | FOR; GO; TO; ~ = loc(alphanum); <EntryForGoTo>
 
 
 (* EXEC / END-EXEC block (unexpanded) *)

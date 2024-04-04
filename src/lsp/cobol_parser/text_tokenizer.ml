@@ -80,7 +80,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | EIGHTY_EIGHT -> string "88"
   | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
   | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
-  | ALPHANUM a -> Cobol_ptree.pp_alphanum_string ppf a
+  | ALPHANUM a -> Cobol_ptree.pp_alphanum ppf a
   | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
   | NATLIT s -> print "N\"%s\"" s
   | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b

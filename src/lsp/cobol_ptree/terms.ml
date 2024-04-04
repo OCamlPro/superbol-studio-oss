@@ -77,7 +77,7 @@ type alphanum_repr =
   | Null_terminated_bytes
 [@@deriving ord]
 
-type alphanum_string =
+type alphanum =
   {
     str: string;
     quotation: alphanum_quote;
@@ -86,25 +86,24 @@ type alphanum_string =
   }
 [@@deriving ord]
 
-let pp_alphanum_string ppf { hexadecimal; quotation; str; runtime_repr } =
-  begin
-    match runtime_repr with
-    | Native_bytes -> ()
-    | Null_terminated_bytes -> Fmt.char ppf 'Z'
-  end;
+let pp_alphanum ppf { hexadecimal; quotation; str; runtime_repr } =
+  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
   | Simple_quote -> Fmt.pf ppf "'%s'" str
   | Double_quote -> Fmt.pf ppf "\"%s\"" str
 
+type national = string                                             (* for now *)
+[@@deriving ord, show]
+
 (** Now comes the type of all/most terms *)
 type _ term =
-  | Alphanum: alphanum_string -> [>alnum_] term
+  | Alphanum: alphanum -> [>alnum_] term
   | Boolean: boolean -> [>bool_] term
   | Fixed: fixed -> [>fixed_] term
   | Floating: floating -> [>float_] term
   | Integer: integer -> [>int_] term
-  | National: string -> [>national_] term
+  | National: national -> [>national_] term
 
   | NumFig: int_ figurative -> [>int_] term
   | Fig: [nonnum_|strlit_] figurative -> [>strlit_] term
@@ -151,8 +150,6 @@ and literal = lit_ term
 and numlit = num_ term
 (*  | NumLitFigurative of figurative_constant (\* only ZERO, no ALL *\) *)
 
-and alphanum = alnum_ term
-and national = national_ term
 and ident_or_alphanum = [ident_|alnum_] term
 and ident_or_intlit = [ident_|int_] term
 
@@ -362,7 +359,7 @@ module COMPARE = struct
   let rec compare_term: type a. a term compare_fun =
     fun x y -> match x , y with
       | Alphanum a, Alphanum b ->
-          compare_alphanum_string a b
+          compare_alphanum a b
       | Alphanum _, Fig HighValue ->
           -1
       | Alphanum _, Fig _ -> 1
@@ -592,7 +589,6 @@ module COMPARE = struct
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
 
-  let compare_alphanum: alphanum compare_fun = compare_term
   let compare_qualname: qualname compare_fun = compare_term
   let compare_literal: literal compare_fun = compare_term
   let compare_ident_or_numlit: ident_or_numlit compare_fun = compare_term
@@ -642,7 +638,7 @@ module FMT = struct
         string ppf bool_value
 
   let rec pp_term: type k. k term Pretty.printer = fun ppf -> function
-    | Alphanum s -> pp_alphanum_string ppf s
+    | Alphanum s -> pp_alphanum ppf s
     | Boolean b -> pp_boolean ppf b
     | Fixed f -> pp_fixed ppf f
     | Floating f -> pp_floating ppf f
@@ -667,8 +663,6 @@ module FMT = struct
 
     | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
     | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
-
-  and pp_alphanum: alphanum Pretty.printer = fun ppf -> pp_term ppf
 
   and pp_figurative: type k. k figurative Pretty.printer = fun ppf -> function
     | Zero -> string ppf "ZERO"
