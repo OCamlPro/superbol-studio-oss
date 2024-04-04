@@ -906,6 +906,7 @@ let reserved_words =
     "TRANSFORM";
     "TRANSPARENT";
     "TREE-VIEW";
+    "TRIM";
     "TRUE";
     "TRUNCATION";
     "TYPE";
