@@ -123,13 +123,13 @@ type entry_by_clause =
 [@@deriving ord]
 
 type entry_stmt =
-  | EntrySimple of alphanum_string with_loc
+  | EntrySimple of alphanum with_loc
   | EntryUsing of
     {
-      entry_name: alphanum_string with_loc;
+      entry_name: alphanum with_loc;
       entry_by_clauses: entry_by_clause list;
     }
-  | EntryForGoTo of alphanum_string with_loc
+  | EntryForGoTo of alphanum with_loc
 [@@deriving ord]
 
 let pp_entry_by_clause ppf = function
@@ -140,14 +140,14 @@ let pp_entry_by_clause ppf = function
 
 let pp_entry_stmt ppf = function
   | EntrySimple name ->
-    Fmt.pf ppf "ENTRY@ %a" (pp_with_loc pp_alphanum_string) name
+    Fmt.pf ppf "ENTRY@ %a" (pp_with_loc pp_alphanum) name
   | EntryUsing { entry_name; entry_by_clauses } ->
     Fmt.pf ppf "ENTRY@ %a%a"
-      (pp_with_loc pp_alphanum_string) entry_name
+      (pp_with_loc pp_alphanum) entry_name
       Fmt.(list ~sep:nop (sp ++ pp_entry_by_clause)) entry_by_clauses
   | EntryForGoTo entry_name ->
     Fmt.pf ppf "ENTRY@ FOR GO TO %a"
-      (pp_with_loc pp_alphanum_string) entry_name
+      (pp_with_loc pp_alphanum) entry_name
 
 (* EXIT *)
 type exit_stmt =

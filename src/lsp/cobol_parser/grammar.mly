@@ -4254,11 +4254,11 @@ let entry_by_clauses :=
 let entry_statement :=
  | ENTRY; ~ = entry_body; <Entry>
 let entry_body :=
- | ~ = loc(alphanum); <EntrySimple>
- | n = loc(alphanum); USING; clauses = rnel(entry_by_clauses);
+ | ~ = loc(alphanum_literal); <EntrySimple>
+ | n = loc(alphanum_literal); USING; clauses = rnel(entry_by_clauses);
    { EntryUsing { entry_name = n;
                   entry_by_clauses = clauses } }
- | FOR; GO; TO; ~ = loc(alphanum); <EntryForGoTo>
+ | FOR; GO; TO; ~ = loc(alphanum_literal); <EntryForGoTo>
 
 
 (* EXEC / END-EXEC block (unexpanded) *)
