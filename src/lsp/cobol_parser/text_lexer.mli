@@ -40,6 +40,7 @@ val reserve_words: lexer -> Cobol_config.words_spec -> unit
 val enable_tokens: TokenHandles.t -> unit
 val disable_tokens: TokenHandles.t -> unit
 val decimal_point_is_comma: lexer -> lexer
+val intrinsic_functions_specifier: ?intrinsics:string list -> lexer -> lexer
 
 (* --- *)
 

@@ -299,6 +299,20 @@ let post_production ({ preproc = { tokzr; _ }; _ } as ps)
       let tokzr, token, tokens
         = Tokzr.decimal_point_is_comma tokzr token tokens in
       update_tokzr ps tokzr, token, tokens
+  | Post_function_specifier spec ->
+    begin match spec with
+    | IntrinsicFunctionSpecifier intrinsics ->
+        let intrinsics = List.map (~&) intrinsics in
+        let tokzr, token, tokens
+          = Tokzr.intrinsic_functions_specifier ~intrinsics tokzr token tokens in
+        update_tokzr ps tokzr, token, tokens
+    | IntrinsicFunctionAllSpecifier ->
+        let tokzr, token, tokens
+          = Tokzr.intrinsic_functions_specifier tokzr token tokens in
+        update_tokzr ps tokzr, token, tokens
+    | _ ->
+        ps, token, tokens
+    end
   | Post_pending descr ->
       pending descr ps env, token, tokens
   | Post_special_names _
