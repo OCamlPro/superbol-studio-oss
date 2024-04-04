@@ -119,7 +119,7 @@ let rec fold_literal (v: _ #folder) : literal -> 'a -> 'a = function
   | Fixed _
   | Floating _
   | Integer _ as n -> fold_numlit v n
-  | National _ as n -> fold_national v n
+  | National n -> fold_national v n
   | NumFig f  -> fold_int_figurative v f
   | Fig f -> fold_any_figurative v f
   | Alphanum _
@@ -137,9 +137,9 @@ and fold_numlit (v: _ #folder) : numlit -> 'a -> 'a = function
   | NumFig _ as i -> fold_intlit v i
 
 and fold_nonnumlit (v: _ #folder) : nonnumlit -> 'a -> 'a = function
-  | Alphanum _ as a -> fold_alphanum v a
+  | Alphanum a -> fold_alphanum v a
   | Boolean b -> fold_boolean v b
-  | National _ as n -> fold_national v n
+  | National n -> fold_national v n
   | Fig f -> fold_any_figurative v f
   | StrConcat _ as s -> fold_strlit v s
   | Concat (n, n') -> fun x -> x >> fold_nonnumlit v n >> fold_nonnumlit v n'
@@ -155,8 +155,8 @@ and fold_any_figurative (v: _ #folder) =
     end
 
 and fold_strlit (v: _ #folder) : strlit -> 'a -> 'a = function
-  | Alphanum _ as a -> fold_alphanum v a
-  | National _ as n -> fold_national v n
+  | Alphanum a -> fold_alphanum v a
+  | National n -> fold_national v n
   | Fig f -> fold_any_figurative v f
   | StrConcat (s, s') -> fun x -> x >> fold_strlit v s >> fold_strlit v s'
 
@@ -411,7 +411,7 @@ let fold_expression = fold_expr                                      (* alias *)
 let fold_condition = fold_cond                                       (* alias *)
 
 let fold_ident_or_alphanum (v: _ #folder) : ident_or_alphanum -> 'a -> 'a = function
-  | Alphanum _ as a -> fold_alphanum v a
+  | Alphanum a -> fold_alphanum v a
   | Address _
   | Counter _
   | InlineCall _
@@ -488,11 +488,11 @@ let fold_name_or_string (v: _ #folder) : name_or_string -> _ = function
 
 let fold_name_or_alphanum (v: _ #folder) : name_or_alphanum -> _ = function
   | Name n -> fold_name' v n
-  | Alphanum _ as a -> fold_alphanum v a
+  | Alphanum a -> fold_alphanum v a
 
 let fold_qualname_or_alphanum (v: _ #folder) : qualname_or_alphanum -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn
-  | Alphanum _ as a -> fold_alphanum v a
+  | Alphanum a -> fold_alphanum v a
 
 let fold_qualname_or_intlit (v: _ #folder) : qualname_or_intlit -> _ = function
   | Name _ | Qual _ as qn -> fold_qualname v qn

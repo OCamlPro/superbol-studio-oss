@@ -39,7 +39,7 @@ let dummy_qualident =
 let dummy_ident =
   QualIdent dummy_qualident
 
-let dummy_alphanum_string =
+let dummy_alphanum =
   {
     str = "_";
     quotation = Double_quote;
