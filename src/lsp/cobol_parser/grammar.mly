@@ -2329,6 +2329,8 @@ let floatlit [@recovery floating_zero] [@cost 10]
 let alphanum [@recovery dummy_alphanum_string] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
 
+let alphanum_literal == ~ = alphanum; <Alphanum>
+
 let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
  | n = NATLIT;    {National n}
@@ -3357,18 +3359,14 @@ let generate_statement :=
 
 %public let unconditional_action := ~ = go_to_statement; < >
 let go_to_statement :=
- | GO; TO?; i = procedure_name;
-   { GoTo { goto_target = i } }
- | GO; TO?; il = nel_(procedure_name); DEPENDING; ON?; i = ident;
-   { GoToDepending { goto_depending_targets = il;
-                     goto_depending_on = i; } }
- | GO; TO?; %prec lowest
-   { LoneGoTo }	   (* COB85; obsolete; should be sole statement of paragraph *)
- | GO; TO?; ENTRY; t = alphanum;
-   { GoToEntry { goto_entry_target = t } }
- | GO; TO?; ENTRY; il = nel_(alphanum); DEPENDING; ON?; i = ident;
-   { GoToEntryDepending { goto_entry_depending_targets = il;
-                          goto_entry_depending_on = i } }
+  | GO; TO?; %prec lowest
+    { LoneGoTo }    (* COB85; obsolete; should be sole statement of paragraph *)
+  | GO; TO?; targets = nel_(procedure_name);
+    depending_on = o(DEPENDING; ON?; ident);
+    { GoTo (GoToSimple { targets; depending_on }) }
+  | GO; TO?; ENTRY; targets = nel_(loc(alphanum_literal));
+    depending_on = o(DEPENDING; ON?; ident);
+    { GoTo (GoToEntry { targets; depending_on }) }
 
 
 (* GOBACK STATEMENT (+COB2002) *)
@@ -3378,7 +3376,7 @@ let goback_statement :=
   | GOBACK;
     goback_raising = ro(raising_exception);
     goback_returning = ro(goback_returning);
-    { GoBack { goback_raising ; goback_returning } }
+    { GoBack { goback_raising; goback_returning } }
 
 let goback_returning :=
   | or_(RETURNING,GIVING); ~ = loc(ident_or_integer); < >
@@ -4005,15 +4003,16 @@ let start_position ==
 
 %public let unconditional_action := ~ = stop_statement; <Stop>
 let stop_statement :=
- | STOP; ~ = stop_body; < >
-let stop_body [@context stop_stmt] :=
-  | ~ = o(stop_with_arg); <StopArg> (* RM/COBOL extension *)
+  | STOP; { StopArg None }                  (* so `stop_body` is not nullable *)
+  | STOP; ~ = stop_body; < >
+let stop_body [@context stop_stmt] := (* with context: should not accept empty *)
+  | a = stop_with_arg; { StopArg (Some a) }             (* RM/COBOL extension *)
   | RUN; ~ = o(stop_run_returning_body); <StopRun>
-  | ERROR; { StopError }                         (* GCOS *)
+  | ERROR; { StopError }                                              (* GCOS *)
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_run_returning_body :=
-  | ~ = scalar; <StopReturningScalar> 
+  | ~ = scalar; <StopReturningScalar>
   | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
     <StopReturningAddress>
   | or_(GIVING, RETURNING); v = integer;
@@ -4025,7 +4024,7 @@ let stop_run_returning_body :=
   | ~ = with_status; <StopReturningStatus>
 
 let stop_with_arg :=
-  | ~ = qualident; <StopWithQualIdent>      (* ~COB85, -COB2002 *)                  
+  | ~ = qualident; <StopWithQualIdent>      (* ~COB85, -COB2002 *)
   | ZERO; { StopWithLiteral (NumFig Zero) }
   | SPACE; { StopWithLiteral (Fig Space) }
   | QUOTE; { StopWithLiteral (Fig Quote) }

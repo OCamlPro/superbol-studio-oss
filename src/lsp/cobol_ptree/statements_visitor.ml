@@ -113,11 +113,6 @@ class virtual ['a] folder = object
   method fold_generate'      : (name with_loc with_loc        , 'a) fold = default
   method fold_goback'        : (goback_stmt    with_loc       , 'a) fold = default
   method fold_goto'          : (goto_stmt with_loc            , 'a) fold = default
-  method fold_goto_entry'    : (goto_entry with_loc           , 'a) fold = default
-  method fold_goto_depending': (goto_depending_stmt with_loc  , 'a) fold = default
-  method fold_goto_entry_depending'
-                             : (goto_entry_depending_stmt with_loc
-                                                              , 'a) fold = default
   method fold_if'            : (if_stmt with_loc              , 'a) fold = default
   method fold_initialize'    : (initialize_stmt with_loc      , 'a) fold = default
   method fold_initiate'      : (name with_loc list with_loc   , 'a) fold = default
@@ -483,34 +478,20 @@ let fold_generate' (v: _ #folder) =
 
 let fold_goback' (v: _ #folder) =
   handle' v#fold_goback' v
-    ~fold:begin fun v { goback_raising ; goback_returning } x -> x
+    ~fold:begin fun v { goback_raising; goback_returning } x -> x
       >> fold_option ~fold:fold_raising v goback_raising
       >> fold_ident_or_intlit'_opt v goback_returning
     end
 
 let fold_goto' (v: _ #folder) =
   handle' v#fold_goto' v
-    ~fold:begin fun v { goto_target } x -> x
-      >> fold_procedure_name' v goto_target
-    end
-
-let fold_goto_depending' (v: _ #folder) =
-  handle' v#fold_goto_depending' v
-    ~fold:begin fun v { goto_depending_targets; goto_depending_on } x -> x
-      >> fold_nel ~fold:fold_procedure_name' v goto_depending_targets
-      >> fold_ident v goto_depending_on
-    end
-
-let fold_goto_entry' (v: _ #folder) =
-  handle' v#fold_goto_entry' v
-    ~fold:begin fun _v _s x -> x
-    end
-
-let fold_goto_entry_depending' (v: _ #folder) =
-  handle' v#fold_goto_entry_depending' v
-    ~fold:begin fun v { goto_entry_depending_targets = _targets;
-                        goto_entry_depending_on } x -> x
-      >> fold_ident v goto_entry_depending_on
+    ~fold:begin fun v s x -> match s with
+      | GoToSimple { targets; depending_on } -> x
+          >> fold_nel ~fold:fold_procedure_name' v targets
+          >> fold_option ~fold:fold_ident v depending_on
+      | GoToEntry { targets; depending_on } -> x
+          >> fold_nel ~fold:fold_alphanum' v targets
+          >> fold_option ~fold:fold_ident v depending_on
     end
 
 let fold_initialize' (v: _ #folder) =
@@ -771,9 +752,6 @@ let rec fold_statement' (v: _ #folder) =
       | Generate           s -> fold_generate'             v (s &@ loc)
       | GoBack             s -> fold_goback'               v (s &@ loc)
       | GoTo               s -> fold_goto'                 v (s &@ loc)
-      | GoToDepending      s -> fold_goto_depending'       v (s &@ loc)
-      | GoToEntry          s -> fold_goto_entry'           v (s &@ loc)
-      | GoToEntryDepending s -> fold_goto_entry_depending' v (s &@ loc)
       | If                 s -> fold_if'                   v (s &@ loc)
       | Initialize         s -> fold_initialize'           v (s &@ loc)
       | Initiate           s -> fold_initiate'             v (s &@ loc)

@@ -592,6 +592,7 @@ module COMPARE = struct
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
 
+  let compare_alphanum: alphanum compare_fun = compare_term
   let compare_qualname: qualname compare_fun = compare_term
   let compare_literal: literal compare_fun = compare_term
   let compare_ident_or_numlit: ident_or_numlit compare_fun = compare_term
@@ -666,6 +667,8 @@ module FMT = struct
 
     | StrConcat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
     | Concat (a, b) -> fmt "%a@ &@ %a" ppf pp_term a pp_term b
+
+  and pp_alphanum: alphanum Pretty.printer = fun ppf -> pp_term ppf
 
   and pp_figurative: type k. k figurative Pretty.printer = fun ppf -> function
     | Zero -> string ppf "ZERO"

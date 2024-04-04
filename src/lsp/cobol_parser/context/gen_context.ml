@@ -28,6 +28,8 @@ let () =
 
 (* --- *)
 
+let status = ref 0
+
 include MenhirSdk.Cmly_read.Read (struct let filename = !name end)
 
 let pp_pos ppf r =
@@ -57,10 +59,12 @@ let emit_nonterminal_contexts ppf =
     let nonterminal_context: type k. k nonterminal -> _ option = function\n";
   Nonterminal.iter begin fun n -> match nonterminal_context n with
     | Some (s, pos) ->
-        if Nonterminal.nullable n then
+        if Nonterminal.nullable n then begin
           Fmt.epr "%a:@\n\
-                   @[<2>** Warning:@ context@ `%s'@ on@ nullable@ \
-                   non-terminal@]@." pp_pos pos s;
+                   @[<2>** Error:@ context@ `%s'@ on@ nullable@ non-terminal@]@.\
+                  " pp_pos pos s;
+          status := 1
+        end;
         Fmt.pf ppf "  | N_%s -> Some %s\n" (Nonterminal.name n) (String.capitalize_ascii s)
     | None -> ()
   end;
@@ -107,4 +111,5 @@ let emit ppf =
     emit_contexts_mapping
 
 let () =
-  emit Fmt.stdout
+  emit Fmt.stdout;
+  exit !status
