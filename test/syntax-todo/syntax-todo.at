@@ -847,39 +847,6 @@ AT_CLEANUP
 
 
 
-AT_SETUP([RECORDING MODE VARIABLE])
-AT_DATA([prog.cob], [
-identification division.
-program-id.             acas-get-params.
-environment division.
-input-output            section.
-file-control.
-     select OPTIONAL ACAS-Params  assign "acas.param"
-                                  organisation line sequential.
- data division.
- file section.
- FD  ACAS-Params
-     recording mode variable.
- 01  ACAS-Params-Record  pic x(80).
-])
-
-AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [1],
-[Checking `prog.cob'
-prog.cob:12.20-12.28:
-   9    data division.
-  10    file section.
-  11    FD  ACAS-Params
-  12 >      recording mode variable.
-----                       ^^^^^^^^
-  13    01  ACAS-Params-Record  pic x(80).
->> Error: Invalid syntax
-
-])
-
-AT_CLEANUP
-
-
-
 AT_SETUP([LENGTH])
 AT_DATA([prog.cob], [
 identification division.
