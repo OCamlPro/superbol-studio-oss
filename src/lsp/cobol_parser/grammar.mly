@@ -4000,15 +4000,16 @@ let start_position ==
 
 %public let unconditional_action := ~ = stop_statement; <Stop>
 let stop_statement :=
- | STOP; ~ = stop_body; < >
-let stop_body [@context stop_stmt] :=
-  | ~ = o(stop_with_arg); <StopArg> (* RM/COBOL extension *)
+  | STOP; { StopArg None }                  (* so `stop_body` is not nullable *)
+  | STOP; ~ = stop_body; < >
+let stop_body [@context stop_stmt] := (* with context: should not accept empty *)
+  | a = stop_with_arg; { StopArg (Some a) }             (* RM/COBOL extension *)
   | RUN; ~ = o(stop_run_returning_body); <StopRun>
-  | ERROR; { StopError }                         (* GCOS *)
+  | ERROR; { StopError }                                              (* GCOS *)
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_run_returning_body :=
-  | ~ = scalar; <StopReturningScalar> 
+  | ~ = scalar; <StopReturningScalar>
   | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
     <StopReturningAddress>
   | or_(GIVING, RETURNING); v = integer;
@@ -4020,7 +4021,7 @@ let stop_run_returning_body :=
   | ~ = with_status; <StopReturningStatus>
 
 let stop_with_arg :=
-  | ~ = qualident; <StopWithQualIdent>      (* ~COB85, -COB2002 *)                  
+  | ~ = qualident; <StopWithQualIdent>      (* ~COB85, -COB2002 *)
   | ZERO; { StopWithLiteral (NumFig Zero) }
   | SPACE; { StopWithLiteral (Fig Space) }
   | QUOTE; { StopWithLiteral (Fig Quote) }
