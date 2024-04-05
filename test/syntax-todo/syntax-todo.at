@@ -4,7 +4,8 @@
 
 
 AT_SETUP([TRIM TRAILING])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        IDENTIFICATION   DIVISION.
        PROGRAM-ID.      prog.
        PROCEDURE        DIVISION.
@@ -12,9 +13,7 @@ AT_DATA([prog.cob], [
                DISPLAY "OK"
            END-IF.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.53-5.61:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
@@ -25,13 +24,14 @@ prog.cob:5.53-5.61:
    7              END-IF.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 AT_SETUP([MF TYPEDEF])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        PROGRAM-ID      prog.
        WORKING-STORAGE SECTION.
        01  bool-t                  pic x comp-5 typedef.
@@ -39,9 +39,7 @@ AT_DATA([prog.cob], [
        01  ws-show-help            bool-t value 78-true.
        PROCEDURE DIVISION.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.35-5.41:
    2          PROGRAM-ID      prog.
    3          WORKING-STORAGE SECTION.
@@ -52,22 +50,21 @@ prog.cob:5.35-5.41:
    7          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 AT_SETUP([MF CONSTANT])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        PROGRAM-ID      prog.
        WORKING-STORAGE SECTION.
        01  ws-formatted-book-columns
            value "ID NAME AUTHOR PRICE STOCK SOLD" constant.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.51-5.59:
    2          PROGRAM-ID      prog.
    3          WORKING-STORAGE SECTION.
@@ -76,13 +73,14 @@ prog.cob:5.51-5.59:
 ----                                                      ^^^^^^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 AT_SETUP([ASSIGN TO EXTERNAL])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id BookLegacy.
        environment division.
        input-output section.
@@ -96,9 +94,7 @@ AT_DATA([prog.cob], [
                alternate record key is b-author with duplicates
 	       .
 	       ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
 prog.cob:6.37-6.45:
    3          environment division.
    4          input-output section.
@@ -109,54 +105,51 @@ prog.cob:6.37-6.45:
    8                  organization is indexed
 >> Warning: Ignored EXTERNAL (implementation pending)
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 AT_SETUP([MF NO PROGRAM-ID])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        display "Hello, COBOL World!"
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:2.7-2.14:
-   1   @&t@
+   1   
    2 >        display "Hello, COBOL World!"
 ----          ^^^^^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF NO PROGRAM-ID])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        display "Hello, COBOL World!"
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:2.7-2.14:
-   1   @&t@
+   1   
    2 >        display "Hello, COBOL World!"
 ----          ^^^^^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF SHARP in FIELD])
-
-# Sharp can be used in front of keywords to make refs of them
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        01  my-bird.
@@ -164,9 +157,7 @@ AT_DATA([prog.cob], [
                10  common-name         name-string.
        procedure division.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.15-5.16:
    2          program-id. toto.
    3          working-storage section.
@@ -177,23 +168,22 @@ prog.cob:5.15-5.16:
    7          procedure division.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 AT_SETUP([MF SHARP DECLARE IN PROCEDURE])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
            declare temp-name as pic X(30) = "European Robin"
            .
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.19-5.28:
    2          program-id. toto.
    3          working-storage section.
@@ -203,14 +193,15 @@ prog.cob:5.19-5.28:
    6              .
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 AT_SETUP([MF FIELD ACCESS])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        01  my-bird.
@@ -220,9 +211,7 @@ AT_DATA([prog.cob], [
        procedure division.
            move 12.0 to my-bird::length-field::min.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:9.33-9.45:
    6                  10  length-field.
    7                      15  min                     pic 9(3)V9.
@@ -231,15 +220,16 @@ prog.cob:9.33-9.45:
 ----                                    ^^^^^^^^^^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF parameterized-section])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
@@ -248,9 +238,7 @@ AT_DATA([prog.cob], [
                              returning return-parameter as binary-long.
            add 1 to value-parameter giving return-parameter.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.51-5.60:
    2          program-id. toto.
    3          working-storage section.
@@ -261,15 +249,16 @@ prog.cob:5.51-5.60:
    7                                returning return-parameter as binary-long.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF parameterized-section with no parameter])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
@@ -278,9 +267,7 @@ AT_DATA([prog.cob], [
                      returning return-parameter as binary-long.
            move 5 to return-parameter.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.33-5.42:
    2          program-id. toto.
    3          working-storage section.
@@ -291,15 +278,16 @@ prog.cob:5.33-5.42:
    7                        returning return-parameter as binary-long.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF parameterized-section with optional argument])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
@@ -308,9 +296,7 @@ AT_DATA([prog.cob], [
                           returning return-parameter as binary-long.
            add 1 to value-parameter giving return-parameter.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.38-5.39:
    2          program-id. toto.
    3          working-storage section.
@@ -321,15 +307,16 @@ prog.cob:5.38-5.39:
    7                             returning return-parameter as binary-long.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF parameterized-section with by-value argument])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
@@ -337,9 +324,7 @@ AT_DATA([prog.cob], [
        by-value section (value value-parameter as binary-long).
            add 1 to value-parameter.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.50-5.51:
    2          program-id. toto.
    3          working-storage section.
@@ -350,15 +335,16 @@ prog.cob:5.50-5.51:
    7              add 1 to value-parameter.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF parameterized-section with by-reference argument])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        procedure division.
@@ -366,9 +352,7 @@ AT_DATA([prog.cob], [
        by-reference section (reference ref-parameter as binary-long).
            add 1 to ref-parameter.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.45-5.46:
    2          program-id. toto.
    3          working-storage section.
@@ -379,15 +363,16 @@ prog.cob:5.45-5.46:
    7              add 1 to ref-parameter.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF LEVEL 78 CONSTANTS])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        78  GRID-SIZE           value 8.
@@ -395,9 +380,7 @@ AT_DATA([prog.cob], [
            05  x-positions     occurs GRID-SIZE.
                10  cell    x-cell-name.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:6.38-6.47:
    3          working-storage section.
    4          78  GRID-SIZE           value 8.
@@ -407,24 +390,23 @@ prog.cob:6.38-6.47:
    7                  10  cell    x-cell-name.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF VALUES with multiple values])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. toto.
        working-storage section.
        01  letters             pic X occurs 8
                                      values "a", "b", "c", "d",
                                             "e", "f", "g", "h".
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:6.62-6.63:
    3          working-storage section.
    4          01  letters             pic X occurs 8
@@ -433,15 +415,16 @@ prog.cob:6.62-6.63:
 ----                                                                 ^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF COMPUTE with parameterized-section])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. ParameterizedSections.
        procedure division.
            display fibonacci(10)
@@ -454,9 +437,7 @@ AT_DATA([prog.cob], [
            compute result = fibonacci(n - 1) + fibonacci(n - 2).
        end program.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:6.25-6.26:
    3          procedure division.
    4              display fibonacci(10)
@@ -467,13 +448,14 @@ prog.cob:6.25-6.26:
    8                  move n to result
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 AT_SETUP([MF OBJECT ORIENTED EXAMPLE])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
       *
       * Implements a calendar editor column for use in the data grid
       *
@@ -709,51 +691,49 @@ AT_DATA([prog.cob], [
 
        end class.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:6.16-6.33:
    3         * Implements a calendar editor column for use in the data grid
    4         *
    5         *
    6 >        class-id OrderFormsLibrary.CalendarColumn inherits type DataGridViewColumn.
 ----                   ^^^^^^^^^^^^^^^^^
-   7   @&t@
+   7   
    8          working-storage section.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 AT_SETUP([MF AND85 DIRECTIVE])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
       $SET ans85
        IDENTIFICATION DIVISION.
        PROGRAM-ID. customer.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:2.6-2.16:
-   1   @&t@
+   1   
    2 >       $SET ans85
 ----         ^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. customer.
 >> Error: Malformed compiler directive
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF LEVEL 78 CONSTANTS])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        IDENTIFICATION DIVISION.
        PROGRAM-ID. customer.
        DATA DIVISION.
@@ -766,9 +746,7 @@ AT_DATA([prog.cob], [
                    07  file-ord-date   PIC 9(8).
        PROCEDURE DIVISION.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:9.45-9.57:
    6          01  customer-record.
    7              03  file-c-order.
@@ -779,15 +757,16 @@ prog.cob:9.45-9.57:
   11                      07  file-ord-date   PIC 9(8).
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF MISSING POINT BEFORE END PROGRAM])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. GetFlyerLevel.
        procedure division.
            evaluate lnk-award-points
@@ -796,9 +775,7 @@ AT_DATA([prog.cob], [
            end-evaluate
        end program.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:8.7-8.10:
    5                   when < 300
    6                      move "Bronze" to lnk-award-level
@@ -807,15 +784,16 @@ prog.cob:8.7-8.10:
 ----          ^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF WHEN COND AND COND])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
        program-id. GetFlyerLevel.
        procedure division.
            evaluate lnk-award-points
@@ -824,9 +802,7 @@ AT_DATA([prog.cob], [
            end-evaluate.
        end program.
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.28-5.31:
    2          program-id. GetFlyerLevel.
    3          procedure division.
@@ -837,8 +813,8 @@ prog.cob:5.28-5.31:
    7              end-evaluate.
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
@@ -848,15 +824,14 @@ AT_CLEANUP
 
 
 AT_SETUP([LENGTH])
-AT_DATA([prog.cob], [
+# promoted on 2024-04-05T13:38
+AT_DATA([prog.cob],[
 identification division.
 program-id.             acas-get-params.
  procedure division.
               MOVE LENGTH(Buffer) TO Buffer-Length
 ])
-
-AT_CHECK([$SUPERBOL check --recovery=false --free prog.cob], [1],
-[Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --free prog.cob], [1], [Checking `prog.cob'
 prog.cob:5.19-5.25:
    2   identification division.
    3   program-id.             acas-get-params.
@@ -865,8 +840,8 @@ prog.cob:5.19-5.25:
 ----                      ^^^^^^
 >> Error: Invalid syntax
 
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
-
 AT_CLEANUP
 
 
