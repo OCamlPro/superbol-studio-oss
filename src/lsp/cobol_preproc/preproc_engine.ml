@@ -202,14 +202,14 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           next_chunk (apply_compiler_directive lp compdir)
       | Ok Some (text, compdir, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
-          let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
+          let lp = add_diags { lp with reader; rev_ignored } diags in
           next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
       | Ok Some (text, compdir, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
           preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
       | Error (text, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
-          let lp = add_diags { lp with reader; buff = []; rev_ignored } diags in
+          let lp = add_diags { lp with reader; rev_ignored } diags in
           next_chunk lp                                        (* ignore text *)
       | Error (text, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
