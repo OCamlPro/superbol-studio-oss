@@ -80,7 +80,7 @@ jobs:
 
       # Use fields.github-workflow-before-build to add something here
 !(github-workflow-before-build)
-      - run: make
+      - run: make build
 
       # Use fields.github-workflow-after-build to add something here
 !(github-workflow-after-build)

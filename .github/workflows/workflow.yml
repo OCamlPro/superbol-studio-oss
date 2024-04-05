@@ -81,7 +81,7 @@ jobs:
       - run: git submodule update
 
 
-      - run: make
+      - run: make build
 
       # Use fields.github-workflow-after-build to add something here
       - name: install test dependencies

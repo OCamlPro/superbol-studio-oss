@@ -246,7 +246,7 @@ test-promote: test-syntax-promote
 	opam exec -- dune runtest --auto-promote
 
 .PHONY: test-syntax
-test-syntax:
+test-syntax: superbol-lsp-server
 	\! opam exec -- autofonce 2>/dev/null || opam exec -- autofonce run -t syntax
 
 .PHONY: test-syntax-promote
