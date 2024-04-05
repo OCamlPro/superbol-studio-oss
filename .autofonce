@@ -45,7 +45,8 @@ export COB_CONFIG_DIR="$AUTOFONCE_SOURCE_DIR/import/gnucobol/config"
 """
 
 syntax = """
-export SUPERBOL=$AUTOFONCE_SOURCE_DIR/superbol-free-linux-x64
+export COB_CONFIG_DIR="$AUTOFONCE_SOURCE_DIR/import/gnucobol/config"
+export SUPERBOL="$AUTOFONCE_SOURCE_DIR/_build/default/src/lsp/superbol-free/main.exe"
 """
 
 [project]

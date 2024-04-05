@@ -185,6 +185,7 @@
  (depends
    (ocaml (>= 4.14.0))
    (vscode-json (= version))
+   (superbol_preprocs (= version))
    (lwt ( >= 5 ))
    (ez_toml (= version))
    (ez_file ( >= 0.3 ))

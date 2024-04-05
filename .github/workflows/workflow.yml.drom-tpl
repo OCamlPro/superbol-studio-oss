@@ -4,10 +4,10 @@ name: Main Workflow
 on:
   pull_request:
     branches:
-      - master
+      - !(git-main-branch:default:master)
   push:
     branches:
-      - master
+      - !(git-main-branch:default:master)
 
 jobs:
   build:
@@ -15,23 +15,22 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - macos-latest
+          - !{ci-systems}
         ocaml-compiler:
-          - 4.14.1
+          - !{edition}
         skip_test:
           - false
-
+![if:min-edition]
         include:
-          - os: ubuntu-latest
-            ocaml-compiler: 4.14.0
+          - os: !{ci-first-system}
+            ocaml-compiler: !{min-edition}
             skip_test: true
-
+![fi]
 
     runs-on: ${{ matrix.os }}
 
     # use fields.github-workflow-env to add something here
-
+!(github-worlflow-env)
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -41,7 +40,7 @@ jobs:
         id: cache-opam
         with:
           path: ~/.opam
-          key: v2-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
+          key: v2-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
 #          restore-keys: |
 #            v2-${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
 
@@ -58,10 +57,15 @@ jobs:
           git config --global user.email github-actions-bot@users.noreply.github.com
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
+![if:field:opam-repo]
+      - run: |
+         opam repo add extra !(opam-repo)
+         sudo apt-get update
 
+![fi]
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml
+      - run: opam depext -y !{packages}
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test
@@ -71,23 +75,15 @@ jobs:
 #        if: steps.cache-opam.outputs.cache-hit == 'true'
 
       # Use fields.build-scripts to add more scripts to convert here
-      - run: dos2unix scripts/*.sh 
+      - run: dos2unix scripts/*.sh !(build-scripts)
         if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
-
-      - run: git submodule init
-
-      - run: git submodule update
-
-
+!(github-workflow-before-build)
       - run: make build
 
       # Use fields.github-workflow-after-build to add something here
-      - name: install test dependencies
-        if: matrix.skip_test  != 'true'
-        run: make dev-deps
-
+!(github-workflow-after-build)
       - name: run test suite
         run: make test
         if: matrix.skip_test  != 'true'
@@ -97,25 +93,25 @@ jobs:
         run: cat _build/_autofonce/results.log
 
       # Use fields.github-workflow-after-test to add something here
-
+!(github-workflow-after-test)
       - name: test source is well formatted
         run: make fmt
         continue-on-error: true
-        if: matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
+        if: matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
 
       - name: build-doc
-        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
+        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
         run: |
              sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme
              opam install -y dune odoc
              make doc
              touch _drom/docs/.nojekyll
-             touch _drom/docs/sphinx/.nojekyll
-             touch _drom/docs/doc/.nojekyll
+             touch _drom/docs/!{sphinx-target}/.nojekyll
+             touch _drom/docs/!{odoc-target}/.nojekyll
 
       - name: deploy-doc
         uses: JamesIves/github-pages-deploy-action@3.6.2
-        if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
+        if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
@@ -123,4 +119,4 @@ jobs:
           CLEAN: true
 
 # Use fields.github-workflow-trailer to add a trailer here
-
+!(github-workflow-trailer)
