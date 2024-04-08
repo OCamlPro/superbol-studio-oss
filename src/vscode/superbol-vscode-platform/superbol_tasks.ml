@@ -121,20 +121,24 @@ let cobc_execution ?config attributes =
                      ~command:(`String cobc)
                      ~args:(List.map (fun elt -> `String elt) args))
 
-let make_default_cobc_task =
-  Task.make
-    ~source:"SuperBOL"
-    ~scope:Workspace
-    ~problemMatchers:[
-      "$gnucobol";
-      "$gnucobol-warning";
-      "$gnucobol-error";
-      "$gnucobol-note";
-    ]
+let make_default_cobc_task ~name ~definition ~execution =
+  let task =
+    Task.make ~name ~definition ~execution ()
+      ~source:"SuperBOL"
+      ~scope:Workspace
+      ~problemMatchers:[
+        "$gnucobol";
+        "$gnucobol-warning";
+        "$gnucobol-error";
+        "$gnucobol-note";
+      ]
+  in
+  Task.set_group task TaskGroup.build;
+  task
 
 let cobc_build_task ~task ?config attributes =
   Promise.Option.return @@
-  make_default_cobc_task ()
+  make_default_cobc_task
     ~name:(Task.name task)
     ~definition:(Task.definition task)
     ~execution:(cobc_execution ?config attributes)
@@ -142,7 +146,7 @@ let cobc_build_task ~task ?config attributes =
 let define_cobc_build_task ?config ~debug name =
   let map_attributes = List.map (fun (a, C (_, f, d)) -> a, f d) in
   let attributes = map_attributes @@ attributes_spec ~debug in
-  make_default_cobc_task ()
+  make_default_cobc_task
     ~name
     ~definition:(TaskDefinition.create () ~type_ ~attributes)
     ~execution:(cobc_execution ?config attributes)
