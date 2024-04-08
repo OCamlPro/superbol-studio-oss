@@ -847,7 +847,8 @@ let expands_phrase :=
 let function_specifier [@context function_specifier] [@post.function_specifier]:=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
-  | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>
+  | FUNCTION; ~ = rnel(~ = loc(intrinsic_function_name); < >); INTRINSIC;
+                                    <IntrinsicFunctionSpecifier>
   | FUNCTION; ALL; INTRINSIC;       {IntrinsicFunctionAllSpecifier}
 
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)
@@ -2204,13 +2205,15 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; ")";                                 { [s] }
 
 (* Only for functions which name is also a keyword in COBOL *)
-let intrinsic_function_name :=
- | LENGTH_FUNC;      { "LENGTH" }
+let intrinsic_function_name [@recover dummy_name] [@symbol "<intrinsic function name>"] :=
  | RANDOM_FUNC;      { "RANDOM" }
  | REVERSE_FUNC;     { "REVERSE" }
  | SIGN_FUNC;        { "SIGN" }
  | SUM_FUNC;         { "SUM" }
- | ~=INTRINSIC_FUNC;  < >
+ | ~=INTRINSIC_FUNC; < >
+
+let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
+ | ~ = name;                         < >
 
 let inline_invocation :=
  | i = ident; "::"; l = literal; al = optional_arguments_list;
@@ -2251,18 +2254,35 @@ let qualident ==
  | qdn = loc(qualname);                  { { ident_name = qdn; ident_subscripts = [] } }
  | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
 
+let arg_par(X) ==
+  "("; ~=X; ")"; < >
+
 let function_ident ==
- | FUNCTION; n = name; al = arguments; { CallFunc { call_fun = n; call_args = al } }
- | FUNCTION; n = name;                 { CallFunc { call_fun = n; call_args = [] } }
+ | FUNCTION; n = function_name; al = arguments; { CallFunc { call_fun = n; call_args = al } }
+ | FUNCTION; n = function_name;                 { CallFunc { call_fun = n; call_args = [] } }
  | n = loc(intrinsic_function_name); al = arguments;
-                                       { CallFunc { call_fun = n; call_args = al } }
- | n = loc(intrinsic_function_name);   { CallFunc { call_fun = n; call_args = [] } }
- | TRIM_FUNC; "("; a = argument; lto = leading_trailing?; ")";
-                                       { CallTrim { arg = a; position = lto } }
+                                                { CallFunc { call_fun = n; call_args = al } }
+ | n = loc(intrinsic_function_name); { CallFunc { call_fun = n; call_args = [] } }
+ | TRIM_FUNC; ~=arg_par(t = argument; lto=leading_trailing?; { { trimmed = t; position = lto} });
+                                                 <CallTrim>
+ | LENGTH_FUNC; ~=arg_par(of_ = ident_or_nonnumeric; physical=bo(PHYSICAL); { { of_; physical } });
+                                                 <CallLength>
+ | NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC> 
+ | LOCALE_DATE_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleDate>
+ | LOCALE_TIME_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTime>
+ | LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTimeFromSeconds>
+ | FORMATTED_DATETIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
+ | FORMATTED_TIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
+
+let formatted_datetime_args ==
+  dt = rnel(argument); so=bo(SYSTEM_OFFSET); { { args = dt; system_offset = so } }
+
+let locale_datetime_args ==
+ e = argument; l= reference?; { { datetime = e; locale = l} }
 
 let leading_trailing ==
-  | LEADING;  { Leading }
-  | TRAILING; { Trailing }
+ | LEADING;  { Leading }
+ | TRAILING; { Trailing }
 
 let base_ident ==                 (* identifier without reference modification *)
  | q = qualident;                {QualIdent q} (* Works for object property too *)
