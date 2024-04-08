@@ -238,10 +238,13 @@ and apply_preproc_directive ({ env; context; _ } as lp)
     else lp
   in
   match ppdir with
-  | Define_off var ->
-      new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
+  | Define _ | Define_off _ | Set _
+    when not (Preproc_logic.emitting lp.context) ->
+      lp                                                            (* ignore *)
   | Define def ->
       new_env lp @@ Preproc_logic.on_define ~loc def ~env
+  | Define_off var ->
+      new_env lp @@ Preproc_logic.on_define_off ~loc var ~env
   | If condition ->
       new_context lp @@ Preproc_logic.on_if ~loc ~condition ~env context
   | Elif condition ->
@@ -250,13 +253,10 @@ and apply_preproc_directive ({ env; context; _ } as lp)
       new_context lp @@ Preproc_logic.on_else ~loc context
   | End_if ->
       let lp = new_context lp @@ Preproc_logic.on_endif ~loc context in
-      if Preproc_logic.emitting lp.context
-      then match lp.rev_ignored with
-        | [] ->
-            lp
-        | text ->
-            with_pplog { lp with rev_ignored = [] }
-              (Preproc_trace.ignored (List.rev text) lp.pplog)
+      if Preproc_logic.emitting lp.context && lp.rev_ignored <> []
+      then { lp with
+             rev_ignored = [];
+             pplog = Preproc_trace.ignored (List.rev lp.rev_ignored) lp.pplog }
       else lp
   | Set _ ->
       add_warn lp @@ Ignored { loc; item = Compiler_directive }
