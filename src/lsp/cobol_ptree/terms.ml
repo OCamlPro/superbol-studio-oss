@@ -269,10 +269,18 @@ and class_ =
 
 
 and inline_call =                               (* in ancient terms: funident *)
-  {
-    call_fun: name with_loc;
-    call_args: effective_arg list;
-  }
+  | CallFunc of { (*name to avoid clash with call statement *)
+      call_fun: name with_loc;
+      call_args: effective_arg list;
+    }
+  | CallTrim of {
+      arg: effective_arg;
+      position: leading_trailing option;
+    }
+
+and leading_trailing =
+  | Leading
+  | Trailing
 
 and effective_arg =                  (* TODO: could be an [expression option] *)
   | ArgExpr of expression (* Regroup identifiers, literals and arithmetic expressions *)
@@ -560,11 +568,15 @@ module COMPARE = struct
     compare_struct (compare_term a b) @@
     lazy (compare_struct (compare_term c d) @@
           lazy (List.compare compare_effective_arg e f))
-  and compare_inline_call
-      { call_fun = a; call_args = c }
-      { call_fun = b; call_args = d } =
-    compare_struct (compare_with_loc compare_name a b) @@
-    lazy (List.compare compare_effective_arg c d)
+  and compare_inline_call x y = match x, y with
+    | CallFunc { call_fun = a; call_args = c }, CallFunc { call_fun = b; call_args = d } ->
+      compare_struct (compare_with_loc compare_name a b) @@
+        lazy (List.compare compare_effective_arg c d)
+    | CallTrim { arg = a; position = c }, CallTrim { arg = b; position = d } ->
+      compare_struct (compare_effective_arg a b) @@
+        lazy (Option.compare compare_leading_trailing c d)
+    | CallFunc _, CallTrim _ -> 1
+    | CallTrim _, CallFunc _ -> -1
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
         compare_expression a b
@@ -588,6 +600,11 @@ module COMPARE = struct
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
+  and compare_leading_trailing x y =
+    match x, y with
+    | Leading, Leading | Trailing, Trailing -> 0
+    | Trailing, Leading -> -1
+    | Leading, Trailing -> 1
 
   let compare_qualname: qualname compare_fun = compare_term
   let compare_literal: literal compare_fun = compare_term
@@ -694,9 +711,19 @@ module FMT = struct
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
     | ProgAddress i -> fmt "ADDRESS@ OF@ PROGRAM@ %a" ppf pp_term i
 
-  and pp_inline_call ppf { call_fun; call_args } =
-    fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
-      (list ~sep:comma pp_effective_arg) call_args
+  and pp_inline_call ppf f =
+    match f with
+    | CallFunc { call_fun; call_args } ->
+      fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
+        (list ~sep:comma pp_effective_arg) call_args
+    | CallTrim { arg; position } ->
+      fmt "FUNCTION TRIM@ @[<1>(%a, %a)@]" ppf
+        pp_effective_arg arg
+        (Fmt.option pp_leading_trailing) position
+
+  and pp_leading_trailing ppf = function
+    | Leading -> fmt "LEADING" ppf
+    | Trailing -> fmt "TRAILING" ppf
 
   and pp_inline_invocation ppf { invoke_class; invoke_meth; invoke_args } =
     fmt "%a::%a@ @[<1>(%a)@]" ppf pp_ident invoke_class pp_literal invoke_meth

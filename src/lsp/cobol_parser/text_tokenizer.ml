@@ -31,7 +31,7 @@ let combined_tokens =
      Rationale: this would considerably complicate retokenization (which is
      necessary with the current solution to handle context-sensitive
      keywords) *)
-  Hashtbl.of_seq @@ List.to_seq [
+  Hashtbl.of_seq @@ List.to_seq ([
     ON_EXCEPTION, "ON_EXCEPTION";
     NOT_ON_EXCEPTION, "NOT_ON_EXCEPTION";
     ON_OVERFLOW, "ON_OVERFLOW";
@@ -54,7 +54,7 @@ let combined_tokens =
     DATA_RECORDS, "DATA_RECORDS";
     NEXT_PAGE, "NEXT_PAGE";
     NEXT_SENTENCE, "NEXT_SENTENCE";
-  ]
+  ] @ List.map (fun (fst, snd) -> snd, "FUNCTION-"^fst) Text_keywords.intrinsic_functions)
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
                                                 runtime_repr } =
@@ -84,6 +84,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
+  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%s>" f 
   | t -> string @@
       try Text_lexer.show_token t
       with Not_found ->
@@ -266,7 +267,138 @@ let preproc_n_combine_tokens ~source_format =
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
+    | (FUNCTION as tok) :: name :: _ ->
+      begin match name with
+          | LENGTH -> subst_n LENGTH_FUNC 2
+          | RANDOM -> subst_n RANDOM_FUNC 2
+          | REVERSE -> subst_n REVERSE_FUNC 2
+          | SIGN -> subst_n SIGN_FUNC 2
+          | SUM -> subst_n SUM_FUNC 2
+          | WORD w -> begin
+            match String.uppercase_ascii w with
+            |"ABS"                          -> subst_n (INTRINSIC_FUNC "ABS") 2
+            |"ABSOLUTE-VALUE"               -> subst_n (INTRINSIC_FUNC "ABSOLUTE-VALUE") 2
+            |"ACOS"                         -> subst_n (INTRINSIC_FUNC "ACOS") 2
+            |"ANNUITY"                      -> subst_n (INTRINSIC_FUNC "ANNUITY") 2
+            |"ASIN"                         -> subst_n (INTRINSIC_FUNC "ASIN") 2
+            |"ATAN"                         -> subst_n (INTRINSIC_FUNC "ATAN") 2
+            |"BASECONVERT"                  -> subst_n (INTRINSIC_FUNC "BASECONVERT") 2
+            |"BIT-OF"                       -> subst_n (INTRINSIC_FUNC "BIT-OF") 2
+            |"BIT-TO-CHAR"                  -> subst_n (INTRINSIC_FUNC "BIT-TO-CHAR") 2
+            |"BOOLEAN-OF-INTEGER"           -> subst_n (INTRINSIC_FUNC "BOOLEAN-OF-INTEGER") 2
+            |"BYTE-LENGTH"                  -> subst_n (INTRINSIC_FUNC "BYTE-LENGTH") 2
+            |"CHAR"                         -> subst_n (INTRINSIC_FUNC "CHAR") 2
+            |"CHAR-NATIONAL"                -> subst_n (INTRINSIC_FUNC "CHAR-NATIONAL") 2
+            |"COMBINED-DATETIME"            -> subst_n (INTRINSIC_FUNC "COMBINED-DATETIME") 2
+            |"CONCAT"                       -> subst_n (INTRINSIC_FUNC "CONCAT") 2
+            |"CONCATENATE"                  -> subst_n (INTRINSIC_FUNC "CONCATENATE") 2
+            |"CONTENT-LENGTH"               -> subst_n (INTRINSIC_FUNC "CONTENT-LENGTH") 2
+            |"CONTENT-OF"                   -> subst_n (INTRINSIC_FUNC "CONTENT-OF") 2
+            |"CONVERT"                      -> subst_n (INTRINSIC_FUNC "CONVERT") 2
+            |"COS"                          -> subst_n (INTRINSIC_FUNC "COS") 2
+            |"CURRENCY-SYMBOL"              -> subst_n (INTRINSIC_FUNC "CURRENCY-SYMBOL") 2
+            |"CURRENT-DATE"                 -> subst_n (INTRINSIC_FUNC "CURRENT-DATE") 2
+            |"DATE-OF-INTEGER"              -> subst_n (INTRINSIC_FUNC "DATE-OF-INTEGER") 2
+            |"DATE-TO-YYYYMMDD"             -> subst_n (INTRINSIC_FUNC "DATE-TO-YYYYMMDD") 2
+            |"DAY-OF-INTEGER"               -> subst_n (INTRINSIC_FUNC "DAY-OF-INTEGER") 2
+            |"DAY-TO-YYYYDDD"               -> subst_n (INTRINSIC_FUNC "DAY-TO-YYYYDDD") 2
+            |"DISPLAY-OF"                   -> subst_n (INTRINSIC_FUNC "DISPLAY-OF") 2
+            |"E"                            -> subst_n (INTRINSIC_FUNC "E") 2
+            |"EXCEPTION-FILE"               -> subst_n (INTRINSIC_FUNC "EXCEPTION-FILE") 2
+            |"EXCEPTION-FILE-N"             -> subst_n (INTRINSIC_FUNC "EXCEPTION-FILE-N") 2
+            |"EXCEPTION-LOCATION"           -> subst_n (INTRINSIC_FUNC "EXCEPTION-LOCATION") 2
+            |"EXCEPTION-LOCATION-N"         -> subst_n (INTRINSIC_FUNC "EXCEPTION-LOCATION-N") 2
+            |"EXCEPTION-STATEMENT"          -> subst_n (INTRINSIC_FUNC "EXCEPTION-STATEMENT") 2
+            |"EXCEPTION-STATUS"             -> subst_n (INTRINSIC_FUNC "EXCEPTION-STATUS") 2
+            |"EXP"                          -> subst_n (INTRINSIC_FUNC "EXP") 2
+            |"EXP10"                        -> subst_n (INTRINSIC_FUNC "EXP10") 2
+            |"FACTORIAL"                    -> subst_n (INTRINSIC_FUNC "FACTORIAL") 2
+            |"FIND-STRING"                  -> subst_n (INTRINSIC_FUNC "FIND-STRING") 2
+            |"FORMATTED-CURRENT-DATE"       -> subst_n (INTRINSIC_FUNC "FORMATTED-CURRENT-DATE") 2
+            |"FORMATTED-DATE"               -> subst_n FORMATTED_TIME_FUNC 2
+            |"FORMATTED-DATETIME"           -> subst_n FORMATTED_DATETIME_FUNC 2
+            |"FORMATTED-TIME"               -> subst_n (INTRINSIC_FUNC "FORMATTED-TIME") 2
+            |"FRACTION-PART"                -> subst_n (INTRINSIC_FUNC "FRACTION-PART") 2
+            |"HEX-OF"                       -> subst_n (INTRINSIC_FUNC "HEX-OF") 2
+            |"HEX-TO-CHAR"                  -> subst_n (INTRINSIC_FUNC "HEX-TO-CHAR") 2
+            |"HIGHEST-ALGEBRAIC"            -> subst_n (INTRINSIC_FUNC "HIGHEST-ALGEBRAIC") 2
+            |"INTEGER"                      -> subst_n (INTRINSIC_FUNC "INTEGER") 2
+            |"INTEGER-OF-BOOLEAN"           -> subst_n (INTRINSIC_FUNC "INTEGER-OF-BOOLEAN") 2
+            |"INTEGER-OF-DATE"              -> subst_n (INTRINSIC_FUNC "INTEGER-OF-DATE") 2
+            |"INTEGER-OF-DAY"               -> subst_n (INTRINSIC_FUNC "INTEGER-OF-DAY") 2
+            |"INTEGER-OF-FORMATTED-DATE"    -> subst_n (INTRINSIC_FUNC "INTEGER-OF-FORMATTED-DATE") 2
+            |"INTEGER-PART"                 -> subst_n (INTRINSIC_FUNC "INTEGER-PART") 2
+            |"LENGTH"                       -> subst_n LENGTH_FUNC 2
+            |"LENGTH-AN"                    -> subst_n (INTRINSIC_FUNC "LENGTH-AN") 2
+            |"LOCALE-COMPARE"               -> subst_n (INTRINSIC_FUNC "LOCALE-COMPARE") 2
+            |"LOCALE-DATE"                  -> subst_n (INTRINSIC_FUNC "LOCALE-DATE") 2
+            |"LOCALE-TIME"                  -> subst_n LOCALE_TIME_FUNC 2
+            |"LOCALE-TIME-FROM-SECONDS"     -> subst_n LOCALE_TIME_FROM_SECONDS_FUNC 2
+            |"LOG"                          -> subst_n (INTRINSIC_FUNC "LOG") 2
+            |"LOG10"                        -> subst_n (INTRINSIC_FUNC "LOG10") 2
+            |"LOWER_CASE"                   -> subst_n (INTRINSIC_FUNC "LOWER_CASE") 2
+            |"LOWEST-ALGEBRAIC"             -> subst_n (INTRINSIC_FUNC "LOWEST-ALGEBRAIC") 2
+            |"MAX"                          -> subst_n (INTRINSIC_FUNC "MAX") 2
+            |"MEAN"                         -> subst_n (INTRINSIC_FUNC "MEAN") 2
+            |"MEDIAN"                       -> subst_n (INTRINSIC_FUNC "MEDIAN") 2
+            |"MIDRANGE"                     -> subst_n (INTRINSIC_FUNC "MIDRANGE") 2
+            |"MIN"                          -> subst_n (INTRINSIC_FUNC "MIN") 2
+            |"MOD"                          -> subst_n (INTRINSIC_FUNC "MOD") 2
+            |"MODULE-CALLER-ID"             -> subst_n (INTRINSIC_FUNC "MODULE-CALLER-ID") 2
+            |"MODULE-DATE"                  -> subst_n (INTRINSIC_FUNC "MODULE-DATE") 2
+            |"MODULE-FORMATTED-DATE"        -> subst_n (INTRINSIC_FUNC "MODULE-FORMATTED-DATE") 2
+            |"MODULE-ID"                    -> subst_n (INTRINSIC_FUNC "MODULE-ID") 2
+            |"MODULE-NAME"                  -> subst_n (INTRINSIC_FUNC "MODULE-NAME") 2
+            |"MODULE-PATH"                  -> subst_n (INTRINSIC_FUNC "MODULE-PATH") 2
+            |"MODULE-SOURCE"                -> subst_n (INTRINSIC_FUNC "MODULE-SOURCE") 2
+            |"MODULE-TIME"                  -> subst_n (INTRINSIC_FUNC "MODULE-TIME") 2
+            |"MONETARY-DECIMAL-POINT"       -> subst_n (INTRINSIC_FUNC "MONETARY-DECIMAL-POINT") 2
+            |"MONETARY-THOUSANDS-SEPARATOR" -> subst_n (INTRINSIC_FUNC "MONETARY-THOUSANDS-SEPARATOR") 2
+            |"NATIONAL-OF"                  -> subst_n (INTRINSIC_FUNC "NATIONAL-OF") 2
+            |"NUMERIC-DECIMAL-POINT"        -> subst_n (INTRINSIC_FUNC "NUMERIC-DECIMAL-POINT") 2
+            |"NUMERIC-THOUSANDS-SEPARATOR"  -> subst_n (INTRINSIC_FUNC "NUMERIC-THOUSANDS-SEPARATOR") 2
+            |"NUMVAL"                       -> subst_n (INTRINSIC_FUNC "NUMVAL") 2
+            |"NUMVAL-C"                     -> subst_n NUMVAL_C_FUNC 2
+            |"NUMVAL-F"                     -> subst_n (INTRINSIC_FUNC "NUMVAL-F") 2
+            |"ORD"                          -> subst_n (INTRINSIC_FUNC "ORD") 2
+            |"ORD-MAX"                      -> subst_n (INTRINSIC_FUNC "ORD-MAX") 2
+            |"ORD-MIN"                      -> subst_n (INTRINSIC_FUNC "ORD-MIN") 2
+            |"PI"                           -> subst_n (INTRINSIC_FUNC "PI") 2
+            |"PRESENT-VALUE"                -> subst_n (INTRINSIC_FUNC "PRESENT-VALUE") 2
+            |"RANDOM"                       -> subst_n RANDOM 2
+            |"RANGE"                        -> subst_n (INTRINSIC_FUNC "RANGE") 2
+            |"REM"                          -> subst_n (INTRINSIC_FUNC "REM") 2
+            |"REVERSE"                      -> subst_n REVERSE_FUNC 2
+            |"SECONDS-FROM-FORMATTED-TIME"  -> subst_n (INTRINSIC_FUNC "SECONDS-FROM-FORMATTED-TIME") 2
+            |"SECONDS-PAST-MIDNIGHT"        -> subst_n (INTRINSIC_FUNC "SECONDS-PAST-MIDNIGHT") 2
+            |"SIGN"                         -> subst_n SIGN_FUNC 2
+            |"SIN"                          -> subst_n (INTRINSIC_FUNC "SIN") 2
+            |"SQRT"                         -> subst_n (INTRINSIC_FUNC "SQRT") 2
+            |"STANDARD-COMPARE"             -> subst_n (INTRINSIC_FUNC "STANDARD-COMPARE") 2
+            |"STANDARD-DEVIATION"           -> subst_n (INTRINSIC_FUNC "STANDARD-DEVIATION") 2
+            |"STORED-CHAR-LENGTH"           -> subst_n (INTRINSIC_FUNC "STORED-CHAR-LENGTH") 2
+            |"SUBSTITUTE"                   -> subst_n (INTRINSIC_FUNC "SUBSTITUTE") 2
+            |"SUBSTITUTE-CASE"              -> subst_n (INTRINSIC_FUNC "SUBSTITUTE-CASE") 2
+            |"SUM"                          -> subst_n SUM_FUNC 2
+            |"TAN"                          -> subst_n (INTRINSIC_FUNC "TAN") 2
+            |"TEST-DATE-YYYYMMDD"           -> subst_n (INTRINSIC_FUNC "TEST-DATE-YYYYMMDD") 2
+            |"TEST-DAY-YYYYDDD"             -> subst_n (INTRINSIC_FUNC "TEST-DAY-YYYYDDD") 2
+            |"TEST-FORMATTED-DATETIME"      -> subst_n (INTRINSIC_FUNC "TEST-FORMATTED-DATETIME") 2
+            |"TEST-NUMVAL"                  -> subst_n (INTRINSIC_FUNC "TEST-NUMVAL") 2
+            |"TEST-NUMVAL-C"                -> subst_n (INTRINSIC_FUNC "TEST-NUMVAL-C") 2
+            |"TEST-NUMVAL-F"                -> subst_n (INTRINSIC_FUNC "TEST-NUMVAL-F") 2
+            |"TRIM"                         -> subst_n TRIM_FUNC 2
+            |"UPPER-CASE"                   -> subst_n (INTRINSIC_FUNC "UPPER-CASE") 2
+            |"VARIANCE"                     -> subst_n (INTRINSIC_FUNC "VARIANCE") 2
+            |"WHEN-COMPILED"                -> subst_n (INTRINSIC_FUNC "WHEN-COMPILED") 2
+            |"YEAR-TO-YYYY"                 -> subst_n (INTRINSIC_FUNC "YEAR-TO-YYYY") 2
+            |  _ -> subst_n tok 1
+          end
+        |  _ -> subst_n tok 1
+        end
+
     | tok :: _                        -> subst_n tok 1
+
 
     | []                             -> Ok acc
 
@@ -646,16 +778,27 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
         List.map (fun token ->
             match ~&token with
             | WORD w | WORD_IN_AREA_A w when List.mem w specs ->
-              List.assoc w Text_keywords.intrinsic_functions &@<- token
+            begin
+              try List.assoc w Text_keywords.intrinsic_functions &@<- token
+              with Not_found ->
+                if EzCompat.StringSet.mem w Cobol_config.Reserved.intrinsic_functions then
+                  INTRINSIC_FUNC w &@<- token
+                else
+                  token
+            end
             | _ -> token)
       | None -> 
         List.map (fun token ->
           match ~&token with
           | WORD w | WORD_IN_AREA_A w ->
-            begin try List.assoc w Text_keywords.intrinsic_functions &@<- token
-            with Not_found ->
-              token
-              end
+            begin
+              try List.assoc w Text_keywords.intrinsic_functions &@<- token
+              with Not_found ->
+                if EzCompat.StringSet.mem w Cobol_config.Reserved.intrinsic_functions then
+                  INTRINSIC_FUNC w &@<- token
+                else
+                  token
+            end
           | _ -> token)
     end
 
