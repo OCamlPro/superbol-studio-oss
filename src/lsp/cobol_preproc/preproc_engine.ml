@@ -251,6 +251,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
       new_context lp @@ Preproc_logic.on_elif ~loc ~condition ~env context
   | Else ->
       new_context lp @@ Preproc_logic.on_else ~loc context
+  | End
   | End_if ->
       let lp = new_context lp @@ Preproc_logic.on_endif ~loc context in
       if Preproc_logic.emitting lp.context && lp.rev_ignored <> []

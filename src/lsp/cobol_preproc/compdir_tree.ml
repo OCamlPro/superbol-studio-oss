@@ -18,6 +18,7 @@ type directive_kind =
   | Define_directive
   | Elif_directive
   | Else_directive
+  | End_directive
   | EndIf_directive
   | If_directive
   | Set_directive
@@ -39,6 +40,7 @@ and preproc_directive =
   | If of boolexpr with_loc
   | Elif of boolexpr with_loc
   | Else
+  | End
   | End_if
 
 and definition =

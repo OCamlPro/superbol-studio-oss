@@ -2984,45 +2984,6 @@ listings.at-2762-prog.cob:34.32-34.41:
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2848:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:2876:0
-listings.at-2876-prog2.cob:7.6-7.26:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          PROCEDURE        DIVISION.
-   7 >       $IF ACTIVATE DEFINED
-----         ^^^^^^^^^^^^^^^^^^^^
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
->> Error: Invalid $IF compiler directive
-
-listings.at-2876-prog2.cob:10.6-10.29:
-   7         $IF ACTIVATE DEFINED
-   8              DISPLAY "NOTOK" NO ADVANCING
-   9              END-DISPLAY
-  10 >       $ELIF ACTIVATE2 DEFINED
-----         ^^^^^^^^^^^^^^^^^^^^^^^
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
->> Error: Invalid $ELIF compiler directive
-
-listings.at-2876-prog2.cob:13.6-13.11:
-  10         $ELIF ACTIVATE2 DEFINED
-  11              DISPLAY "OK" NO ADVANCING
-  12              END-DISPLAY
-  13 >       $ELSE
-----         ^^^^^
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
->> Error: Invalid $ELSE compiler directive
-
-listings.at-2876-prog2.cob:16.6-16.10:
-  13         $ELSE
-  14              DISPLAY "NOTOK" NO ADVANCING
-  15              END-DISPLAY
-  16 >       $END
-----         ^^^^
-  17              STOP RUN.
->> Error: Invalid $END compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3684:0
 listings.at-3684-expected.lst:1.6-1.7:
    1 > GnuCOBOL V.R.P               prog.cob

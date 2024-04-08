@@ -50,6 +50,7 @@
     | CDIR_DEFINE -> Define_directive
     | CDIR_ELIF -> Elif_directive
     | CDIR_ELSE -> Else_directive
+    | CDIR_END -> End_directive
     | CDIR_END_IF -> EndIf_directive
     | CDIR_IF -> If_directive
     | CDIR_SET -> Set_directive
@@ -138,6 +139,7 @@
   let else_endif_keywords =
     cdtokens_subset [
       CDIR_ELSE;
+      CDIR_END;
       CDIR_END_IF;
     ]
 
@@ -146,6 +148,7 @@
     | If_directive
     | Elif_directive -> conditional_keywords
     | Else_directive
+    | End_directive
     | EndIf_directive -> else_endif_keywords
     | Set_directive -> set_keywords
     | Source_directive -> source_keywords

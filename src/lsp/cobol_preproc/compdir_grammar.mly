@@ -30,10 +30,11 @@
 %token NE              "<>"         [@keyword (* symbol *) "<>"]
 
 %token CDIR_DEFINE     [@keyword ">>DEFINE", "$DEFINE"]
-%token CDIR_ELIF       [@keyword ">>ELIF", ">>ELSE-IF"]
-%token CDIR_ELSE       [@keyword ">>ELSE"]
-%token CDIR_END_IF     [@keyword ">>END-IF"]
-%token CDIR_IF         [@keyword ">>IF"]
+%token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF", ">>ELSE-IF", "$ELSE-IF"]
+%token CDIR_ELSE       [@keyword ">>ELSE", "$ELSE"]
+%token CDIR_END        [@keyword "$END"]       (* Note: no `>>END` equivalent *)
+%token CDIR_END_IF     [@keyword ">>END-IF", "$END-IF"]
+%token CDIR_IF         [@keyword ">>IF", "$IF"]
 %token CDIR_SET        [@keyword ">>SET", "$SET"]
 %token CDIR_SOURCE     [@keyword ">>SOURCE", "$SOURCE"]
 
@@ -109,6 +110,7 @@ let compiler_directive :=
   | CDIR_IF; ~ = if_directive; <Preproc>
   | CDIR_ELIF; ~ = elif_directive; <Preproc>
   | CDIR_ELSE; EOL; { Preproc Else }
+  | CDIR_END; EOL; { Preproc End }
   | CDIR_END_IF; EOL; { Preproc End_if }
 
 (* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)

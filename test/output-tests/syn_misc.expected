@@ -2434,16 +2434,6 @@ syn_misc.at-7027-prog.cob:17.7-17.22:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7051:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7109:0
-syn_misc.at-7109-prog.cob:8.6-8.19:
-   5          WORKING-STORAGE SECTION.
-   6          78 Y            VALUE 'a'.
-   7          PROCEDURE       DIVISION.
-   8 >       $IF X DEFINED
-----         ^^^^^^^^^^^^^
-   9         $DISPLAY X defined
-  10         $ELIF Y DEFINED
->> Error: Invalid $IF compiler directive
-
 syn_misc.at-7109-prog.cob:9.6-9.24:
    6          78 Y            VALUE 'a'.
    7          PROCEDURE       DIVISION.
@@ -2453,16 +2443,6 @@ syn_misc.at-7109-prog.cob:9.6-9.24:
   10         $ELIF Y DEFINED
   11         $DISPLAY X not defined, but Y via lvl 78
 >> Error: Invalid $DISPLAY compiler directive
-
-syn_misc.at-7109-prog.cob:10.6-10.21:
-   7          PROCEDURE       DIVISION.
-   8         $IF X DEFINED
-   9         $DISPLAY X defined
-  10 >       $ELIF Y DEFINED
-----         ^^^^^^^^^^^^^^^
-  11         $DISPLAY X not defined, but Y via lvl 78
-  12         $ELSE
->> Error: Invalid $ELIF compiler directive
 
 syn_misc.at-7109-prog.cob:11.6-11.46:
    8         $IF X DEFINED
@@ -2474,16 +2454,6 @@ syn_misc.at-7109-prog.cob:11.6-11.46:
   13         $DISPLAY X not defined
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7109-prog.cob:12.6-12.11:
-   9         $DISPLAY X defined
-  10         $ELIF Y DEFINED
-  11         $DISPLAY X not defined, but Y via lvl 78
-  12 >       $ELSE
-----         ^^^^^
-  13         $DISPLAY X not defined
-  14         $END
->> Error: Invalid $ELSE compiler directive
-
 syn_misc.at-7109-prog.cob:13.6-13.28:
   10         $ELIF Y DEFINED
   11         $DISPLAY X not defined, but Y via lvl 78
@@ -2494,27 +2464,7 @@ syn_misc.at-7109-prog.cob:13.6-13.28:
   15              CONTINUE
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7109-prog.cob:14.6-14.10:
-  11         $DISPLAY X not defined, but Y via lvl 78
-  12         $ELSE
-  13         $DISPLAY X not defined
-  14 >       $END
-----         ^^^^
-  15              CONTINUE
-  16              .
->> Error: Invalid $END compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7160:0
-syn_misc.at-7160-prog.cob:11.6-11.17:
-   8          78 X            VALUE 2.
-   9          78 Z            VALUE 354.
-  10          PROCEDURE       DIVISION.
-  11 >       $IF Y = Y2X
-----         ^^^^^^^^^^^
-  12         $DISPLAY correct Y = Y2
-  13         $ELSE
->> Error: Invalid $IF compiler directive
-
 syn_misc.at-7160-prog.cob:12.6-12.29:
    9          78 Z            VALUE 354.
   10          PROCEDURE       DIVISION.
@@ -2524,16 +2474,6 @@ syn_misc.at-7160-prog.cob:12.6-12.29:
   13         $ELSE
   14         $DISPLAY bad: Y should be = Y2
 >> Error: Invalid $DISPLAY compiler directive
-
-syn_misc.at-7160-prog.cob:13.6-13.11:
-  10          PROCEDURE       DIVISION.
-  11         $IF Y = Y2X
-  12         $DISPLAY correct Y = Y2
-  13 >       $ELSE
-----         ^^^^^
-  14         $DISPLAY bad: Y should be = Y2
-  15         $END
->> Error: Invalid $ELSE compiler directive
 
 syn_misc.at-7160-prog.cob:14.6-14.36:
   11         $IF Y = Y2X
@@ -2545,26 +2485,6 @@ syn_misc.at-7160-prog.cob:14.6-14.36:
   16         $IF Y > X
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7160-prog.cob:15.6-15.10:
-  12         $DISPLAY correct Y = Y2
-  13         $ELSE
-  14         $DISPLAY bad: Y should be = Y2
-  15 >       $END
-----         ^^^^
-  16         $IF Y > X
-  17         $DISPLAY BAD - Y is not > X
->> Error: Invalid $END compiler directive
-
-syn_misc.at-7160-prog.cob:16.6-16.15:
-  13         $ELSE
-  14         $DISPLAY bad: Y should be = Y2
-  15         $END
-  16 >       $IF Y > X
-----         ^^^^^^^^^
-  17         $DISPLAY BAD - Y is not > X
-  18         $ELIF Y < X
->> Error: Invalid $IF compiler directive
-
 syn_misc.at-7160-prog.cob:17.6-17.33:
   14         $DISPLAY bad: Y should be = Y2
   15         $END
@@ -2574,16 +2494,6 @@ syn_misc.at-7160-prog.cob:17.6-17.33:
   18         $ELIF Y < X
   19         $DISPLAY correct Y < X
 >> Error: Invalid $DISPLAY compiler directive
-
-syn_misc.at-7160-prog.cob:18.6-18.17:
-  15         $END
-  16         $IF Y > X
-  17         $DISPLAY BAD - Y is not > X
-  18 >       $ELIF Y < X
-----         ^^^^^^^^^^^
-  19         $DISPLAY correct Y < X
-  20         $ELSE
->> Error: Invalid $ELIF compiler directive
 
 syn_misc.at-7160-prog.cob:19.6-19.28:
   16         $IF Y > X
@@ -2595,16 +2505,6 @@ syn_misc.at-7160-prog.cob:19.6-19.28:
   21         $DISPLAY BROKEN
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7160-prog.cob:20.6-20.11:
-  17         $DISPLAY BAD - Y is not > X
-  18         $ELIF Y < X
-  19         $DISPLAY correct Y < X
-  20 >       $ELSE
-----         ^^^^^
-  21         $DISPLAY BROKEN
-  22         $END
->> Error: Invalid $ELSE compiler directive
-
 syn_misc.at-7160-prog.cob:21.6-21.21:
   18         $ELIF Y < X
   19         $DISPLAY correct Y < X
@@ -2614,26 +2514,6 @@ syn_misc.at-7160-prog.cob:21.6-21.21:
   22         $END
   23         
 >> Error: Invalid $DISPLAY compiler directive
-
-syn_misc.at-7160-prog.cob:22.6-22.10:
-  19         $DISPLAY correct Y < X
-  20         $ELSE
-  21         $DISPLAY BROKEN
-  22 >       $END
-----         ^^^^
-  23         
-  24         $IF X > Y
->> Error: Invalid $END compiler directive
-
-syn_misc.at-7160-prog.cob:24.6-24.15:
-  21         $DISPLAY BROKEN
-  22         $END
-  23         
-  24 >       $IF X > Y
-----         ^^^^^^^^^
-  25         $DISPLAY correct X > Y
-  26         $ELIF X < Y
->> Error: Invalid $IF compiler directive
 
 syn_misc.at-7160-prog.cob:25.6-25.28:
   22         $END
@@ -2645,16 +2525,6 @@ syn_misc.at-7160-prog.cob:25.6-25.28:
   27         $DISPLAY BAD - X is not < Y
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7160-prog.cob:26.6-26.17:
-  23         
-  24         $IF X > Y
-  25         $DISPLAY correct X > Y
-  26 >       $ELIF X < Y
-----         ^^^^^^^^^^^
-  27         $DISPLAY BAD - X is not < Y
-  28         $ELSE
->> Error: Invalid $ELIF compiler directive
-
 syn_misc.at-7160-prog.cob:27.6-27.33:
   24         $IF X > Y
   25         $DISPLAY correct X > Y
@@ -2665,16 +2535,6 @@ syn_misc.at-7160-prog.cob:27.6-27.33:
   29         $DISPLAY BROKEN
 >> Error: Invalid $DISPLAY compiler directive
 
-syn_misc.at-7160-prog.cob:28.6-28.11:
-  25         $DISPLAY correct X > Y
-  26         $ELIF X < Y
-  27         $DISPLAY BAD - X is not < Y
-  28 >       $ELSE
-----         ^^^^^
-  29         $DISPLAY BROKEN
-  30         $END
->> Error: Invalid $ELSE compiler directive
-
 syn_misc.at-7160-prog.cob:29.6-29.21:
   26         $ELIF X < Y
   27         $DISPLAY BAD - X is not < Y
@@ -2684,16 +2544,6 @@ syn_misc.at-7160-prog.cob:29.6-29.21:
   30         $END
   31              CONTINUE
 >> Error: Invalid $DISPLAY compiler directive
-
-syn_misc.at-7160-prog.cob:30.6-30.10:
-  27         $DISPLAY BAD - X is not < Y
-  28         $ELSE
-  29         $DISPLAY BROKEN
-  30 >       $END
-----         ^^^^
-  31              CONTINUE
-  32              .
->> Error: Invalid $END compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7193:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7264:0
