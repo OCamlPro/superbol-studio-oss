@@ -189,6 +189,23 @@ and fold_ident (v: _ #folder) =
         >> fold_refmod v r
     end
 
+and fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
+  | Address _
+  | Counter _
+  | InlineCall _
+  | InlineInvoke _
+  | ObjectView _
+  | ObjectRef _
+  | QualIdent _
+  | RefMod _
+  | ScalarRefMod _ as i -> fold_ident v i
+  | Alphanum _
+  | Boolean _
+  | National _
+  | Concat _
+  | StrConcat _
+  | Fig _ as f -> fold_literal v f
+
 and fold_qualident (v: _ #folder) =
   handle v#fold_qualident
     ~continue:begin fun { ident_name; ident_subscripts } x -> x
@@ -238,10 +255,37 @@ and fold_inline_call (v: _ #folder) =
         fun x -> x
         >> fold_name' v call_fun
         >> fold_list ~fold:fold_effective_arg v call_args
-      | CallTrim { arg; position } ->
+      | CallTrim { trimmed; position } ->
         fun x -> x
-        >> fold_effective_arg v arg
+        >> fold_effective_arg v trimmed
         >> fold_option ~fold:fold_leading_trailing v position
+      | CallLength { of_; physical } ->
+        fun x -> x
+        >> fold_ident_or_nonnum v of_
+        >> fold_bool v physical
+      | CallNumvalC args->
+        fun x -> x
+        >> fold_list ~fold:fold_ident_or_nonnum v args
+      | CallLocaleDate { datetime; locale } ->
+        fun x -> x
+        >> fold_effective_arg v datetime
+        >> fold_option ~fold:fold_qualname v locale
+      | CallLocaleTime { datetime; locale } ->
+        fun x -> x
+        >> fold_effective_arg v datetime
+        >> fold_option ~fold:fold_qualname v locale
+      | CallLocaleTimeFromSeconds { datetime; locale } ->
+        fun x -> x
+        >> fold_effective_arg v datetime
+        >> fold_option ~fold:fold_qualname v locale
+      | CallFormattedDatetime { args; system_offset } ->
+        fun x -> x
+        >> fold_list ~fold:fold_effective_arg v args
+        >> fold_bool v system_offset
+      | CallFormattedTime { args; system_offset } ->
+        fun x -> x
+        >> fold_list ~fold:fold_effective_arg v args
+        >> fold_bool v system_offset
     end
 
 and fold_inline_invocation (v: _ #folder) =
@@ -457,23 +501,6 @@ let fold_ident_or_numlit (v: _ #folder) : ident_or_numlit -> 'a -> 'a = function
   | ScalarRefMod _ as i -> fold_ident v i
   | Fixed _ | Floating _
   | Integer _ | NumFig _ as i -> fold_numlit v i
-
-let fold_ident_or_nonnum (v: _ #folder) : ident_or_nonnum -> 'a -> 'a = function
-  | Address _
-  | Counter _
-  | InlineCall _
-  | InlineInvoke _
-  | ObjectView _
-  | ObjectRef _
-  | QualIdent _
-  | RefMod _
-  | ScalarRefMod _ as i -> fold_ident v i
-  | Alphanum _
-  | Boolean _
-  | National _
-  | Concat _
-  | StrConcat _
-  | Fig _ as f -> fold_literal v f
 
 let fold_ident_or_strlit (v: _ #folder) : ident_or_strlit -> 'a -> 'a = function
   | Address _
