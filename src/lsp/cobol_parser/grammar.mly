@@ -2205,15 +2205,12 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
 
 (* Only for functions which name is also a keyword in COBOL *)
 let intrinsic_function_name :=
- | LENGTH;      { "LENGTH" }
- | RANDOM;      { "RANDOM" }
- | REVERSE;     { "REVERSE" }
- | SIGN;        { "SIGN" }
- | SUM;         { "SUM" }
-
-let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
- | ~ = name;                         < >
- | ~ = loc(intrinsic_function_name); < >
+ | LENGTH_FUNC;      { "LENGTH" }
+ | RANDOM_FUNC;      { "RANDOM" }
+ | REVERSE_FUNC;     { "REVERSE" }
+ | SIGN_FUNC;        { "SIGN" }
+ | SUM_FUNC;         { "SUM" }
+ | ~=INTRINSIC_FUNC;  < >
 
 let inline_invocation :=
  | i = ident; "::"; l = literal; al = optional_arguments_list;
@@ -2255,8 +2252,17 @@ let qualident ==
  | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
 
 let function_ident ==
- | FUNCTION; n = function_name; al = arguments; { { call_fun = n; call_args = al } }
- | FUNCTION; n = function_name;                 { { call_fun = n; call_args = [] } }
+ | FUNCTION; n = name; al = arguments; { CallFunc { call_fun = n; call_args = al } }
+ | FUNCTION; n = name;                 { CallFunc { call_fun = n; call_args = [] } }
+ | n = loc(intrinsic_function_name); al = arguments;
+                                       { CallFunc { call_fun = n; call_args = al } }
+ | n = loc(intrinsic_function_name);   { CallFunc { call_fun = n; call_args = [] } }
+ | TRIM_FUNC; "("; a = argument; lto = leading_trailing?; ")";
+                                       { CallTrim { arg = a; position = lto } }
+
+let leading_trailing ==
+  | LEADING;  { Leading }
+  | TRAILING; { Trailing }
 
 let base_ident ==                 (* identifier without reference modification *)
  | q = qualident;                {QualIdent q} (* Works for object property too *)

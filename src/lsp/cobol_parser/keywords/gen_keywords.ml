@@ -60,7 +60,7 @@ let silenced attrs =
   Option.map Attribute.payload
 
 let intrinsic attrs =
-  List.find_opt (Attribute.has_label "keyword.intrinsic") attrs |>
+  List.find_opt (Attribute.has_label "intrinsic") attrs |>
   Option.map Attribute.payload
 
 let pp_terminal ppf t =

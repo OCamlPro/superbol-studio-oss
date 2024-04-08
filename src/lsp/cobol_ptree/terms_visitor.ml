@@ -35,6 +35,7 @@ class ['a] folder = object
   method fold_counter_kind: (counter_kind, 'a) fold = default
   method fold_length_of: (length_of_ term, 'a) fold = default
   method fold_inline_call: (inline_call, 'a) fold = default
+  method fold_leading_trailing: (leading_trailing, 'a) fold = default
   method fold_inline_invocation: (inline_invocation, 'a) fold = default
   method fold_effective_arg: (effective_arg, 'a) fold = default
   method fold_object_view: (object_view, 'a) fold = default
@@ -232,9 +233,15 @@ and fold_address (v: _ #folder) =
 
 and fold_inline_call (v: _ #folder) =
   handle v#fold_inline_call
-    ~continue:begin fun { call_fun; call_args } x -> x
-      >> fold_name' v call_fun
-      >> fold_list ~fold:fold_effective_arg v call_args
+    ~continue:begin function
+      | CallFunc { call_fun; call_args } ->
+        fun x -> x
+        >> fold_name' v call_fun
+        >> fold_list ~fold:fold_effective_arg v call_args
+      | CallTrim { arg; position } ->
+        fun x -> x
+        >> fold_effective_arg v arg
+        >> fold_option ~fold:fold_leading_trailing v position
     end
 
 and fold_inline_invocation (v: _ #folder) =
@@ -285,6 +292,10 @@ and fold_expr (v: _ #folder) =
 
 and fold_expr' (v: _ #folder) =
   handle' v#fold_expr' ~fold:fold_expr v
+
+and fold_leading_trailing (_: _ #folder) : leading_trailing -> 'a -> 'a = function
+  | Leading
+  | Trailing -> Fun.id
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = function
   | Address _
