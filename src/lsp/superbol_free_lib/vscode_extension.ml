@@ -165,6 +165,10 @@ let contributes =
                                                 true,
                                                 false,
                                                 "vscode",
+                                                "xterm",
+                                                "gnome-terminal",
+                                                "xfce4-terminal",
+                                                "konsole",
                                                 "external"
                                         ]
                                 }
