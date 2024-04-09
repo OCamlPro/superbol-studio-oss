@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2801d121072f91b4400509ce1e5f0b8c:.
+4f8f98b9b1774084269015155b53c175:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -81,6 +81,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 afda02ca8769d29e6d635902a5980764:dune-project
+ba662e430c51d699aff2a7eab529f3fa:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -95,7 +96,7 @@ e1fabc309f25556d63d746b1d7451f11:opam/cobol_common.opam
 
 # begin context for opam/cobol_data.opam
 # file opam/cobol_data.opam
-60f31e10a5be23cd7161dacee4c7f996:opam/cobol_data.opam
+2ac8a5cdac39784c91b3a73a33a5c396:opam/cobol_data.opam
 # end context for opam/cobol_data.opam
 
 # begin context for opam/cobol_indent.opam
@@ -300,7 +301,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_config/version.mlt
 
 # begin context for src/lsp/cobol_data/dune
 # file src/lsp/cobol_data/dune
-8ec63aca217d7bb803c7538833d3f36a:src/lsp/cobol_data/dune
+4c5f42c322869bf815a6afc8a9ebea98:src/lsp/cobol_data/dune
 # end context for src/lsp/cobol_data/dune
 
 # begin context for src/lsp/cobol_data/version.mlt
@@ -435,7 +436,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/pretty/version.mlt
 
 # begin context for src/lsp/superbol-free/linking_flags.sh
 # file src/lsp/superbol-free/linking_flags.sh
-4481ce2bc21d3553716a7914d2cc015a:src/lsp/superbol-free/linking_flags.sh
+19b3af846294c26b2c4019ee1ed7e7cf:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
 
 # begin context for src/lsp/superbol_free_lib/dune
@@ -480,7 +481,7 @@ b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-aad8ac8a26ae15e3501dd5ea3b49ec9a:src/vendor/ez_toml/dune
+87fe96c228b8cb51be7268c7e3cdd5b5:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld

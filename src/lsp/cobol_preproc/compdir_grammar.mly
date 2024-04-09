@@ -17,16 +17,28 @@
 
 %token EOL
 %token <string> TEXT_WORD
-%token <string> ALPHANUM
-%token <Cobol_data.Literal.boolean> BOOLIT
+%token <Cobol_data.Literal.alphanum> ALPHANUM
+%token <Cobol_data.Literal.boolean> BOOLLIT
+%token <Cobol_data.Literal.fixed> FIXEDLIT
 
-%token CDIR_DEFINE     [@keyword ">>DEFINE", "$DEFINE"]
-%token CDIR_ELIF       [@keyword ">>ELIF", ">>ELSE-IF"]
-%token CDIR_ELSE       [@keyword ">>ELSE"]
-%token CDIR_END_IF     [@keyword ">>END-IF"]
-%token CDIR_IF         [@keyword ">>IF"]
+(* Note: use the lexer to distinguish punctuation *)
+%token EQ              "="          [@keyword (* symbol *)  "="]
+%token GE              ">="         [@keyword (* symbol *) ">="]
+%token GT              ">"          [@keyword (* symbol *)  ">"]
+%token LE              "<="         [@keyword (* symbol *) "<="]
+%token LT              "<"          [@keyword (* symbol *)  "<"]
+%token NE              "<>"         [@keyword (* symbol *) "<>"]
+
+%token CDIR_DEFINE     [@keyword ">>DEFINE"]
+%token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF"           (* GC extensions *)
+                        , ">>ELSE-IF", "$ELSE-IF"]
+%token CDIR_ELSE       [@keyword ">>ELSE", "$ELSE"]
+%token CDIR_END        [@keyword "$END"]       (* Note: no `>>END` equivalent *)
+%token CDIR_END_IF     [@keyword ">>END-IF"
+                        ,         "$END-IF"]    (* <- undocumented, but found *)
+%token CDIR_IF         [@keyword ">>IF", "$IF"]
 %token CDIR_SET        [@keyword ">>SET", "$SET"]
-%token CDIR_SOURCE     [@keyword ">>SOURCE", "$SOURCE"]
+%token CDIR_SOURCE     [@keyword ">>SOURCE"]
 
 %token ADDRSV          [@keyword "ADDRSV", "ADD-RSV"]
 %token ADDSYN          [@keyword "ADDSYN", "ADD-SYN"]
@@ -65,7 +77,7 @@
 %token PARAMETER       [@keyword]
 %token REMOVE          [@keyword]
 %token SET             [@keyword]
-%token SOURCEFORMAT    [@keyword]
+%token SOURCEFORMAT    [@keyword "SOURCEFORMAT", "SOURCE-FORMAT"]
 %token SPZERO          [@keyword]
 %token SSRANGE         [@keyword]
 %token THAN            [@keyword]
@@ -100,6 +112,7 @@ let compiler_directive :=
   | CDIR_IF; ~ = if_directive; <Preproc>
   | CDIR_ELIF; ~ = elif_directive; <Preproc>
   | CDIR_ELSE; EOL; { Preproc Else }
+  | CDIR_END; EOL; { Preproc End }
   | CDIR_END_IF; EOL; { Preproc End_if }
 
 (* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
@@ -158,15 +171,16 @@ let define_directive :=
   | ~ = define; EOL; < >
 
 let define :=
-  | w = text_word; AS?; OFF;
-    { Define_off w }
+  | ~ = var; AS?; OFF; <Define_off>
 
-  | var = text_word; AS?; expr = loc(define_expr); o = bo(OVERRIDE);
-    { Define { var; expr; override = o } }
+  | var = var; AS?; value = loc(define_expr); o = bo(OVERRIDE);
+    { Define { var; value; override = o } }
 
 let define_expr :=
-  | ~ = loc(ALPHANUM); <Alphanum_literal>
-  | PARAMETER; {Parameter}
+  | x = loc(ALPHANUM); {Literal_definition (Alphanum x)}
+  | x = loc(BOOLLIT); {Literal_definition (Boolean x)}
+  | x = loc(FIXEDLIT); {Literal_definition (Numeric x)}
+  | PARAMETER; {Parameter_definition}
 
 (* --- >>IF ... ------------------------------------------------------------- *)
 
@@ -185,14 +199,46 @@ let elif :=
     { Elif c }
 
 let boolexpr :=
-  | ~ = loc(BOOLIT); <Boolean_literal>
-  | var = text_word; IS?; neg_polarity = ibo(NOT); DEFINED;
+  | var = var; IS?; neg_polarity = ibo(NOT); DEFINED;
     { Defined_condition { var; polarity = not neg_polarity } }
+  | neg_polarity = ibo(NOT); var = var;
+    { Value_condition { var; polarity = not neg_polarity } }
+  | var = var; IS?; neg_polarity = ibo(NOT); o = condition_operator; r = term;
+    { Constant_condition { left_operand = Variable var; right_operand = r;
+                           polarity = not neg_polarity; operator = o } }
+  | l = literal; IS?; neg_polarity = ibo(NOT); o = condition_operator; r = term;
+    { Constant_condition { left_operand = Literal l; right_operand = r;
+                           polarity = not neg_polarity; operator = o } }
+
+let term :=
+  | ~ = var; <Variable>
+  | ~ = literal; <Literal>
+
+let condition_operator :=
+  | GREATER; THAN?; OR; EQUAL; TO?; {Ge}
+  | GREATER; THAN?; {Gt}
+  | LESS; THAN?; OR; EQUAL; TO?; {Le}
+  | LESS; THAN?; {Lt}
+  | EQUAL; TO?; {Eq}
+  | "="; {Eq}
+  | ">"; {Gt}
+  | ">="; {Ge}
+  | "<="; {Le}
+  | "<"; {Lt}
+  | "<>"; {Ne}
 
 (* --- Misc ----------------------------------------------------------------- *)
 
 let text_word ==                                    (* text-word with position *)
   | ~ = loc(TEXT_WORD); < >
+
+let var :=
+  | v = text_word; { Preproc_env.var' v }
+
+let literal :=
+  | ~ = loc(ALPHANUM); <Alphanum>
+  | ~ = loc(BOOLLIT); <Boolean>
+  | ~ = loc(FIXEDLIT); <Numeric>
 
 _unused_symbols:
   | INVALID_

@@ -149,11 +149,11 @@ let get () =
           let var = String.sub definition 0 eqsign
           and def = String.(sub definition (eqsign + 1)
                               (length definition - eqsign - 1)) in
-          let var = Cobol_preproc.Env.var var in
           (* TODO: Check numerics: i.e, no quotes & proper format. *)
-          Cobol_preproc.Env.define var (Alphanum { pp_payload = def;
-                                                   pp_loc = Process_parameter })
-            env ~override:true ~def_loc:Process_parameter
+          Cobol_preproc.Env.define_process_parameter
+            (Cobol_preproc.Env.var var)
+            (Alphanum { pp_payload = def;
+                        pp_loc = Process_parameter }) env
         with Not_found ->
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty

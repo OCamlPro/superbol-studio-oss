@@ -10,31 +10,23 @@
 (**************************************************************************)
 %}
 
-%[@recovery.header
-  let fixed_zero = Cobol_ptree.{ fixed_integer = "0";
-                                 fixed_fractional = "0" }
-
-  let floating_zero = Cobol_ptree.{ float_significand = fixed_zero;
-                                    float_exponent = "1" }
-
-  let boolean_zero = Cobol_ptree.{ bool_base = `Bool;
-                                   bool_value = "0" }
-]
+(* Note: `grammar.mly` opens `Cobol_ptree.Dummies`, so it's be openned in
+   [@recovery] attributes below. *)
 
 %token EOF
 
-%token <string> WORD [@recovery "_"] (* [@symbol "<word>"] *)
-%token <string> WORD_IN_AREA_A [@recovery "_"] (* [@symbol "<word in area A>"] *)
-%token <string> INFO_WORD [@recovery "_"]
-%token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery ["_"]]
+%token <string> WORD [@recovery alphanum__] (* [@symbol "<word>"] *)
+%token <string> WORD_IN_AREA_A [@recovery alphanum__] (* [@symbol "<word in area A>"] *)
+%token <string> INFO_WORD [@recovery alphanum__]
+%token <Cobol_ptree.comment_entry> COMMENT_ENTRY [@recovery [alphanum__]]
 %token <Cobol_ptree.alphanum> ALPHANUM
 %token <Cobol_ptree.alphanum> ALPHANUM_PREFIX
 %token <Cobol_ptree.boolean> BOOLIT [@recovery boolean_zero]
-%token <string> NATLIT [@recovery "_"]
-%token <string> SINTLIT [@recovery "0"]
+%token <string> NATLIT [@recovery alphanum__]
+%token <string> SINTLIT [@recovery integer_zero]
 %token <string * char * string> FIXEDLIT [@recovery "0", '.', "0"]
 %token <string * char * string * string> FLOATLIT [@recovery "0", '.', "0", "1"]
-%token <string> DIGITS [@recovery "0"] (* keep as string until resolved as level/intlit *)
+%token <string> DIGITS [@recovery integer_zero]
 %token <string> PICTURE_STRING [@recovery "X"]    (* picture character string *)
 %token <Cobol_common.Exec_block.t> EXEC_BLOCK
 

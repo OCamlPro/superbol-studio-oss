@@ -71,36 +71,6 @@ run_fundamental.at-137-dump.c:11.6-11.7:
 >> Error: Unexpected indicator: `r'
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:138:0
-run_fundamental.at-138-prog.cob:5.7-5.30:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >        >>IF CHARSET = 'EBCDIC'
-----          ^^^^^^^^^^^^^^^^^^^^^^^
-   6              DISPLAY X"F1F2F3"
-   7          >>ELSE
->> Error: Malformed compiler directive
-
-run_fundamental.at-138-prog.cob:7.7-7.13:
-   4          PROCEDURE        DIVISION.
-   5          >>IF CHARSET = 'EBCDIC'
-   6              DISPLAY X"F1F2F3"
-   7 >        >>ELSE
-----          ^^^^^^
-   8              DISPLAY X"313233"
-   9          >>END-IF
->> Error: Unexpected >>ELSE compiler directive
-
-run_fundamental.at-138-prog.cob:9.7-9.15:
-   6              DISPLAY X"F1F2F3"
-   7          >>ELSE
-   8              DISPLAY X"313233"
-   9 >        >>END-IF
-----          ^^^^^^^^
-  10              END-DISPLAY.
-  11              CALL "dump" USING X"000102"
->> Error: Unexpected >>END-IF compiler directive
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:284:0

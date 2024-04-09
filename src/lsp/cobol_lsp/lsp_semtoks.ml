@@ -101,15 +101,28 @@ let semtok ?(tokmods = TOKMOD.none) toktyp lexloc =
   let line = range.start.line in
   let start = range.start.character in
   let length = range.end_.character - start in
-  { line; start; length; toktyp; tokmods }
+  if length > 0
+  then Some { line; start; length; toktyp; tokmods }
+  else None
+
+let compare_semtoks first second =
+  (* Assume lines / chars won't exceed ~ max_int / 2: *)
+  if first.line = second.line
+  then first.start - second.start
+  else first.line - second.line
+
+let acc_semtok ?(merge = false) s acc = match s with
+  | None -> acc
+  | Some s when merge -> List.merge (fun a b -> - compare_semtoks a b) [s] acc
+  | Some s -> s :: acc
 
 let single_line_lexlocs_in ~filename =
   Srcloc.shallow_single_line_lexlocs_in ~ignore_invalid_filename:true ~filename
 
-let acc_semtoks ~filename ?range ?tokmods toktyp loc acc =
+let acc_semtoks ?merge ~filename ?range ?tokmods toktyp loc acc =
   List.fold_left begin fun acc lexloc -> match range with
     | Some r when not (Lsp_position.intersects_lexloc r lexloc) -> acc
-    | _ -> semtok toktyp ?tokmods lexloc :: acc
+    | _ -> acc_semtok ?merge (semtok toktyp ?tokmods lexloc) acc
   end acc @@ single_line_lexlocs_in ~filename loc
 
 type token_category =
@@ -558,7 +571,7 @@ let semtoks_of_comments ~filename ?range rev_comments =
            Option.fold range
              ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
              ~none:true ->
-        semtok TOKTYP.comment lexloc :: acc
+        acc_semtok (semtok TOKTYP.comment lexloc) acc
     | _ ->
         acc
   end []
@@ -573,7 +586,7 @@ let semtoks_of_ignored ~filename ?range rev_ignored =
        Option.fold range
          ~some:(fun r -> Lsp_position.intersects_lexloc r lexloc)
          ~none:true
-    then semtok TOKTYP.comment lexloc :: acc
+    then acc_semtok (semtok TOKTYP.comment lexloc) acc
     else acc
   end []
 
@@ -582,9 +595,9 @@ let semtoks_of_preproc_statements ~filename ?range pplog =
     | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
     | Cobol_preproc.Trace.Replace { replloc = loc }
     | Cobol_preproc.Trace.CompilerDirective { loc; _ } ->
-        acc_semtoks ~filename ?range TOKTYP.macro loc acc
+        acc_semtoks ~merge:true ~filename ?range TOKTYP.macro loc acc
     | Cobol_preproc.Trace.Ignored { ignored_loc; _ } ->
-        acc_semtoks ~filename ?range TOKTYP.comment ignored_loc acc
+        acc_semtoks ~merge:true ~filename ?range TOKTYP.comment ignored_loc acc
     | Cobol_preproc.Trace.Replacement _ ->
         acc
   end [] (Cobol_preproc.Trace.events pplog)
@@ -595,12 +608,9 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
   List.rev @@ List.fold_left begin fun acc { payload = token; loc } ->
     let semtok_infos = match token with
       | WORD _ | WORD_IN_AREA_A _ -> None
-      | ALPHANUM _ | ALPHANUM_PREFIX _ ->
+      | ALPHANUM _ | ALPHANUM_PREFIX _ | NATLIT _ ->
           Some (TOKTYP.string, TOKMOD.none)
-      | BOOLIT _
-      | NATLIT _ | SINTLIT _
-      | FIXEDLIT _ | FLOATLIT _
-      | DIGITS _
+      | BOOLIT _ | SINTLIT _ | FIXEDLIT _ | FLOATLIT _ | DIGITS _
       | EIGHTY_EIGHT ->
           Some (TOKTYP.number, TOKMOD.none)
       | PICTURE_STRING _ ->
@@ -621,12 +631,6 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
     | Some (toktyp, tokmods) ->
         acc_semtoks ~filename ?range ~tokmods toktyp loc acc
   end [] tokens
-
-let compare_semtoks first second =
-  let cmp = Stdlib.compare first.line second.line in
-  if cmp = 0
-  then Stdlib.compare first.start second.start
-  else cmp
 
 let relative_semtoks semtoks =
   let data = Array.make (5 * List.length semtoks) 0 in

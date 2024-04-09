@@ -40,6 +40,8 @@
 
   type cdtoken_component =
     | CDTok of Compdir_grammar.token
+    | CDInt of string
+    | CDFxd of string * char * string
     | CDEnd
 
   exception INVALID_DIRECTIVE_WORD of string
@@ -48,6 +50,7 @@
     | CDIR_DEFINE -> Define_directive
     | CDIR_ELIF -> Elif_directive
     | CDIR_ELSE -> Else_directive
+    | CDIR_END -> End_directive
     | CDIR_END_IF -> EndIf_directive
     | CDIR_IF -> If_directive
     | CDIR_SET -> Set_directive
@@ -84,6 +87,14 @@
       SET;
       THAN;
       TO;
+
+      (* Note: operators are treated as keywords. *)
+      EQ;
+      GE;
+      GT;
+      LE;
+      LT;
+      NE;
     ]
 
   let set_keywords =
@@ -128,6 +139,7 @@
   let else_endif_keywords =
     cdtokens_subset [
       CDIR_ELSE;
+      CDIR_END;
       CDIR_END_IF;
     ]
 
@@ -136,6 +148,7 @@
     | If_directive
     | Elif_directive -> conditional_keywords
     | Else_directive
+    | End_directive
     | EndIf_directive -> else_endif_keywords
     | Set_directive -> set_keywords
     | Source_directive -> source_keywords
@@ -223,7 +236,7 @@ let cdir_char =
 let cdir_word_suffix =
   (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)? (* CHECKME: allow empty? *)
 let cdir_word =
-  (">>" ' '? cdir_word_suffix)
+  (">>" ' '* cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -425,7 +438,7 @@ and fixed_nominal state
       }
 and fixed_cdir_line marker state          (* `>>`-prefixed compiler directive *)
   = parse
-  | ' '? cdir_word_suffix
+  | ' '* cdir_word_suffix
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
           ~marker (Src_lexing.flush_continued state) lexbuf
@@ -675,14 +688,31 @@ and free_newline_or_eof state
       }
 
 (* Text-word tokenizer (compiler directives) *)
-and cdtoken directive = parse
+and cdtoken keywords = parse
 
   | blanks
-      { cdtoken directive lexbuf }
+      { cdtoken keywords lexbuf }
 
   | (nonblank+ as s)
-      { let cdtoken_of_keyword = keywords_for_directive directive in
-        CDTok (try Hashtbl.find cdtoken_of_keyword (String.uppercase_ascii s)
+      { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
+               with Not_found -> TEXT_WORD s) }
+
+  | eof
+      { CDEnd }
+
+and cdtoken_with_numerics keywords = parse
+
+  | blanks
+      { cdtoken_with_numerics keywords lexbuf }
+
+  | (sign? digit+ as s)
+      { CDInt s }
+
+  | (sign? digit* as n) (['.' ','] as sep) (digit+ as d)
+      { CDFxd (n, sep, d) }
+
+  | (nonblank+ as s)
+      { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
   | eof
@@ -717,4 +747,17 @@ and pptoken = parse
       |   TrmIndic, _            -> acutrm_line s
       |  CBLXIndic, _            -> cobolx_line s
       |          _, FixedWidth _ -> fixed_line s
+
+  let cdtoken: Compdir_tree.directive_kind -> _ = function
+    (* | Call_directive *)
+    | Define_directive
+    | Elif_directive
+    | Else_directive
+    | EndIf_directive
+    | If_directive
+    (* | On_off/Turn_directive *)
+    | Source_directive as d ->
+        cdtoken_with_numerics (keywords_for_directive d)
+    | d ->
+        cdtoken (keywords_for_directive d)
 }

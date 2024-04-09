@@ -25,6 +25,8 @@ val keyword_of_cdtoken: (Compdir_grammar.token, string) Hashtbl.t
 
 type cdtoken_component =
   | CDTok of Compdir_grammar.token
+  | CDInt of string
+  | CDFxd of string * char * string
   | CDEnd
 val cdtoken: Compdir_tree.directive_kind -> Lexing.lexbuf -> cdtoken_component
 

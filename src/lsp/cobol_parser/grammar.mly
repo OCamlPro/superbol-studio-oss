@@ -2297,8 +2297,7 @@ let ident_or_literal
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 
-let figurative_constant [@recovery Zero]
-      [@symbol "<figurative constant>"] :=
+let figurative_constant [@recovery Zero] [@symbol "<figurative constant>"] :=
   |      ~ = figurative_constant_no_all; < >
   | ALL; l = nonnumeric_literal_no_all;  { All l }
 (*ALL symbolic-character (alphanum, national) (defined in SPECIAL-NAMES)*)
@@ -2312,8 +2311,7 @@ let figurative_constant_no_all ==
 (* | i = ident  { Symbolic i } *) (*conflict in ident_or_xxx_literal*)
 
 let integers := ~ = rnel(integer); < >
-let integer [@recovery "0"]
-      [@symbol "<integer literal>"] :=
+let integer [@recovery integer_zero] [@symbol "<integer literal>"] :=
   | ~ = DIGITS;   < >
   | ~ = SINTLIT;  < >
   | EIGHTY_EIGHT; {"88"}
@@ -2329,7 +2327,7 @@ let floatlit [@recovery floating_zero] [@cost 10]
 let alphanum [@recovery dummy_alphanum] [@symbol "<alphanumeric literal>"] :=
   | ~ = ALPHANUM; < >
 
-let literal [@recovery Integer "0"] [@symbol "<literal>"] :=
+let literal [@recovery dummy_literal] [@symbol "<literal>"] :=
  | a = alphanum;  {Alphanum a}
  | n = NATLIT;    {National n}
  | b = BOOLIT;    {Boolean b}

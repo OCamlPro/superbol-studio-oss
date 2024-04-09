@@ -47,6 +47,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "zarith-windows" {>= "1"}
   "cobol_ptree-windows" {= version}
   "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}

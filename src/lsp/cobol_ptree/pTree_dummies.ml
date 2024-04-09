@@ -17,10 +17,14 @@
 open PTree_types
 open Cobol_common.Srcloc.INFIX
 
+let integer_zero = "0"
+and integer_one = "1"
+and alphanum__ = "_"
+
 let dummy_loc =
   Cobol_common.Srcloc.dummy
 
-let dummy_string = "_" &@ dummy_loc
+let dummy_string = alphanum__ &@ dummy_loc
 
 let dummy_name = dummy_string
 
@@ -39,9 +43,12 @@ let dummy_qualident =
 let dummy_ident =
   QualIdent dummy_qualident
 
+let dummy_literal =
+  Integer integer_zero
+
 let dummy_alphanum =
   {
-    str = "_";
+    str = alphanum__;
     quotation = Double_quote;
     hexadecimal = false;
     runtime_repr = Native_bytes;
@@ -60,7 +67,27 @@ let dummy_picture =
 let dummy_picture_locale =
   {
     locale_name = None;
-    locale_size = "0";
+    locale_size = integer_zero;
+  }
+
+(* --- *)
+
+let fixed_zero =
+  {
+    fixed_integral = integer_zero;
+    fixed_fractional = integer_one;
+  }
+
+let floating_zero =
+  {
+    float_significand = fixed_zero;
+    float_exponent = integer_one;
+  }
+
+let boolean_zero =
+  {
+    bool_base = `Bool;
+    bool_value = integer_zero;
   }
 
 (* --- *)
