@@ -34,7 +34,7 @@ let%expect_test "hybrid-format-cdirs" =
        >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
-$ Source format free
+>>  Source format free
   *> another floating comment
    >> SET                               SOURCEFORMAT                                     "FIXED"
       * fixed comment
@@ -42,7 +42,7 @@ $ Source format free
 / comment line
 >>SET SOURCEFORMAT "CRT"
 / still comment line
-$ SOURCE IS FREE
+>>  SOURCE IS FREE
                         *> ok let's terminate here
   |};
   [%expect {||}];;
@@ -54,7 +54,7 @@ let%expect_test "malformed-cdirs" =
       >>
       >>*> empty one?
       $*> another empty one?
-      $   SOURCE IS FREE
+      >>   SOURCE IS FREE
 >> ?
 $
   |};

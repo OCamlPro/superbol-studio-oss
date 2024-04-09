@@ -29,14 +29,16 @@
 %token LT              "<"          [@keyword (* symbol *)  "<"]
 %token NE              "<>"         [@keyword (* symbol *) "<>"]
 
-%token CDIR_DEFINE     [@keyword ">>DEFINE", "$DEFINE"]
-%token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF", ">>ELSE-IF", "$ELSE-IF"]
+%token CDIR_DEFINE     [@keyword ">>DEFINE"]
+%token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF"           (* GC extensions *)
+                        , ">>ELSE-IF", "$ELSE-IF"]
 %token CDIR_ELSE       [@keyword ">>ELSE", "$ELSE"]
 %token CDIR_END        [@keyword "$END"]       (* Note: no `>>END` equivalent *)
-%token CDIR_END_IF     [@keyword ">>END-IF", "$END-IF"]
+%token CDIR_END_IF     [@keyword ">>END-IF"
+                        ,         "$END-IF"]    (* <- undocumented, but found *)
 %token CDIR_IF         [@keyword ">>IF", "$IF"]
 %token CDIR_SET        [@keyword ">>SET", "$SET"]
-%token CDIR_SOURCE     [@keyword ">>SOURCE", "$SOURCE"]
+%token CDIR_SOURCE     [@keyword ">>SOURCE"]
 
 %token ADDRSV          [@keyword "ADDRSV", "ADD-RSV"]
 %token ADDSYN          [@keyword "ADDSYN", "ADD-SYN"]

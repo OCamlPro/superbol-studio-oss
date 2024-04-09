@@ -30,7 +30,7 @@ let%expect_test "hybrid-format-cdirs" =
        >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
-$    Source format free
+>>    Source format free
   *> another floating comment
    >> SET                               SOURCEFORMAT                                     "FIXED"
       * fixed comment
@@ -38,7 +38,7 @@ $    Source format free
 / comment line
 >>SET SOURCEFORMAT "CRT"
 / still comment line
-$   SOURCE IS FREE
+>>   SOURCE IS FREE
                         *> ok let's terminate here
   .
   |};
@@ -48,7 +48,7 @@ $   SOURCE IS FREE
     >>SET SOURCEFORMAT "COBOLX"
 
 
-    $Source format free
+    >>Source format free
 
     >>SET SOURCEFORMAT "FIXED"
 
@@ -56,7 +56,7 @@ $   SOURCE IS FREE
 
     >>SET SOURCEFORMAT "CRT"
 
-    $SOURCE IS FREE
+    >>SOURCE IS FREE
 
     .
 |}];;
@@ -70,7 +70,7 @@ let%expect_test "hybrid-format-cdirs-with-cdir-markers" =
        >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
-$    Source format free
+>>    Source format free
   *> another floating comment
    >> SET                               SOURCEFORMAT                                     "FIXED"
       * fixed comment
@@ -78,7 +78,7 @@ $    Source format free
 / comment line
 >>SET SOURCEFORMAT "CRT"
 / still comment line
-$   SOURCE IS FREE
+>>   SOURCE IS FREE
                         *> ok let's terminate here
   .
   |};
@@ -92,7 +92,7 @@ $   SOURCE IS FREE
     4: |new source format|
     5:
     6:
-    7: $Source format free
+    7: >>Source format free
     7: |new source format|
     8:
     9: >>SET SOURCEFORMAT "FIXED"
@@ -104,7 +104,7 @@ $   SOURCE IS FREE
     13: >>SET SOURCEFORMAT "CRT"
     13: |new source format|
     14:
-    15: $SOURCE IS FREE
+    15: >>SOURCE IS FREE
     15: |new source format|
     16:
     17: .
@@ -120,7 +120,7 @@ let%expect_test "hybrid-format-cdirs-with-cdir-markers-bis" =
        >> SET SOURCEFORMAT "COBOLX"
 * comment line
                 *> floating comment
-$    Source format free
+>>    Source format free
   *> another floating comment
    >> SET                               SOURCEFORMAT                                     "FIXED"
       * fixed comment
@@ -128,7 +128,7 @@ $    Source format free
 / comment line
 >>SET SOURCEFORMAT "CRT"
 / still comment line
-$   SOURCE IS FREE
+>>   SOURCE IS FREE
                         *> ok let's terminate here
   .
   |};

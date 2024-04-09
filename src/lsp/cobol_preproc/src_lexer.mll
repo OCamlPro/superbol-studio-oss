@@ -236,7 +236,7 @@ let cdir_char =
 let cdir_word_suffix =
   (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)? (* CHECKME: allow empty? *)
 let cdir_word =
-  (">>" ' '? cdir_word_suffix)
+  (">>" ' '* cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -438,7 +438,7 @@ and fixed_nominal state
       }
 and fixed_cdir_line marker state          (* `>>`-prefixed compiler directive *)
   = parse
-  | ' '? cdir_word_suffix
+  | ' '* cdir_word_suffix
       {
         Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal
           ~marker (Src_lexing.flush_continued state) lexbuf
