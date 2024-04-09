@@ -77,7 +77,7 @@
 %token PARAMETER       [@keyword]
 %token REMOVE          [@keyword]
 %token SET             [@keyword]
-%token SOURCEFORMAT    [@keyword]
+%token SOURCEFORMAT    [@keyword "SOURCEFORMAT", "SOURCE-FORMAT"]
 %token SPZERO          [@keyword]
 %token SSRANGE         [@keyword]
 %token THAN            [@keyword]
