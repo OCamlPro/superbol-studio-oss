@@ -29,7 +29,7 @@ let preproc
 
 let default_parser_options =
   Cobol_parser.Options.default
-    ~exec_scanner:Superbol_preprocs.Generic.scanner
+    ~exec_scanners: Superbol_preprocs.exec_scanners
 
 let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
     ?source_format ?filename contents =

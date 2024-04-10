@@ -70,7 +70,7 @@ let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
-        (default ~exec_scanner: Superbol_preprocs.Generic.scanner) with
+        (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
         recovery = EnableRecovery { silence_benign_recoveries = true };
         config = project.config.cobol_config;
       } @@

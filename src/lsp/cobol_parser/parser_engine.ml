@@ -95,7 +95,7 @@ and 'm persist =
 
 (** Initializes a parser state, given a preprocessor. *)
 let make_parser
-    (type m) Parser_options.{ verbose; show; recovery; config; exec_scanner }
+    (type m) Parser_options.{ verbose; show; recovery; config; exec_scanners }
     ?show_if_verbose ~(tokenizer_memory: m memory) pp =
   let tokzr: m Tokzr.state =
     let memory: m Tokzr.memory = match tokenizer_memory with
@@ -103,7 +103,7 @@ let make_parser
       | Parser_options.Eidetic -> Tokzr.eidetic
     in
     let module Config = (val config) in
-    Tokzr.init ~verbose ?show_if_verbose ~exec_scanner ~memory Config.words
+    Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
   in
   {
     prev_limit = None;

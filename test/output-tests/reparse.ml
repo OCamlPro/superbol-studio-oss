@@ -18,7 +18,7 @@ open Testsuite_utils
 
 let default_parser_options =
   Cobol_parser.Options.{
-    (default ~exec_scanner:Superbol_preprocs.Generic.scanner) with
+    (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
     recovery = DisableRecovery
   }
 

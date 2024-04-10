@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Generic = Generic
-
-include Main
+let exec_scanners =
+  Cobol_parser.Options.{
+    exec_scanner_fallback = Generic.scanner;  (* for now; TODO: Call.scanner? *)
+    exec_scanners = Cobol_preproc.Options.EXEC_MAP.empty;
+  }
