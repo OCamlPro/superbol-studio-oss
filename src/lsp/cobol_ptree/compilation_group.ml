@@ -112,14 +112,14 @@ let rec pp_program_unit ppf { program_name;
 
 type function_unit =
   {
-    function_name: name with_loc;
+    function_name: name_or_literal with_loc;
     function_as: strlit option;
     function_is_proto: bool;
     function_options: options_paragraph with_loc option;
     function_env: environment_division with_loc option;
     function_data: data_division with_loc option;
     function_proc: procedure_division with_loc option;
-    function_end_name: name with_loc;
+    function_end_name: name_or_literal with_loc;
   }
 [@@deriving ord]
 
@@ -131,12 +131,12 @@ let pp_id_paragraph
   List.iter (Fmt.(option (sp ++ fun ppf fp -> fp ppf ())) ppf) sections;
   if end_ && Option.is_none name
   then Fmt.pf ppf "@ @[END %s.@]" pclose
-  else Fmt.(option (any "@ @[END " ++ const string pclose ++
-                    any " " ++ pp_name' ++ any ".@]")) ppf name
+  else Fmt.(option (fun ppf (pp_name, name) -> (any "@ @[END " ++ const string pclose ++
+                    any " " ++ pp_name ++ any ".@]") ppf name) ppf name)
 
 let pp_function_id_paragraph ppf (n, fas, is_proto) =
   Fmt.pf ppf "%a%a%a"
-    pp_name' n
+    (pp_with_loc pp_name_or_literal) n
     Fmt.(option (any "@ AS " ++ pp_strlit)) fas
     (if is_proto then Fmt.any "@ PROTOTYPE" else Fmt.nop) ()
 
@@ -145,7 +145,7 @@ let pp_function_unit ppf
       function_options = opts; function_env = env; function_data = data;
       function_proc = proc; function_end_name = en }
   =
-  pp_id_paragraph ~name:en "FUNCTION-ID" "FUNCTION" ppf
+  pp_id_paragraph ~name:(pp_with_loc pp_name_or_literal, en) "FUNCTION-ID" "FUNCTION" ppf
     Fmt.(sp ++ pp_function_id_paragraph ++ any ".") (n, fas, is_proto)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
@@ -185,7 +185,7 @@ let pp_method_definition ppf
     { method_name = n; method_kind = k; method_override = o; method_final = f;
       method_options = opts; method_env = env; method_data = data;
       method_proc = proc; method_end_name = en } =
-  pp_id_paragraph ~name:en "METHOD-ID" "METHOD" ppf
+  pp_id_paragraph ~name:(pp_name', en) "METHOD-ID" "METHOD" ppf
     Fmt.(sp ++ pp_method_id_paragraph ++ any ".") (n, k, o, f)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
@@ -273,7 +273,7 @@ let pp_class_definition ppf
       class_usings = us; class_options = opts; class_env = env;
       class_factory = fac; class_instance = inst; class_end_name = en }
   =
-  pp_id_paragraph ~name:en "CLASS-ID" "CLASS" ppf
+  pp_id_paragraph ~name:(pp_name', en) "CLASS-ID" "CLASS" ppf
     Fmt.(sp ++ pp_class_id_paragraph) (cn, cas, f, inh, us)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
@@ -307,7 +307,7 @@ let pp_interface_definition ppf
     { interface_name = n; interface_as = a; interface_inherits = inh;
       interface_usings = us; interface_options = opts; interface_env = env;
       interface_methods = meths; interface_end_name = en } =
-  pp_id_paragraph ~name:en "INTERFACE-ID" "INTERFACE" ppf
+  pp_id_paragraph ~name:(pp_name', en) "INTERFACE-ID" "INTERFACE" ppf
     Fmt.(sp ++ pp_interface_id_paragraph ++ any ".") (n, a, inh, us)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;

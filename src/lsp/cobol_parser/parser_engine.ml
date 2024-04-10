@@ -104,6 +104,7 @@ let make_parser
     in
     let module Config = (val config) in
     Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
+      Config.intrinsic_functions
   in
   {
     prev_limit = None;

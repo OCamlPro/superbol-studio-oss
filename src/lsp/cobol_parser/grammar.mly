@@ -378,7 +378,7 @@ function_unit [@cost 999]:
    edo = ro(loc(environment_division))
    ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
-   END FUNCTION ef = name "."
+   END FUNCTION ef = loc(infoword_or_literal) "."
    { let _, (name, as_, is_proto) = fid in
      { function_name = name;
        function_as = as_;
@@ -528,7 +528,7 @@ let program_prototype_id_paragraph :=                              (* +COB2002 *
   | ~ = program_id_header_prefix; IS?; PROTOTYPE; "."; < >
 
 let function_id_paragraph :=
-  | FUNCTION_ID; "."; i = name; slo = as__strlit_;
+  | FUNCTION_ID; "."; i = loc(infoword_or_literal); slo = as__strlit_;
     proto = ibo(IS?; PROTOTYPE; {}); ".";                         (* +COB2002 *)
     { i, slo, proto }
 
@@ -847,8 +847,7 @@ let expands_phrase :=
 let function_specifier [@context function_specifier] [@post.function_specifier]:=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
-  | FUNCTION; ~ = rnel(~ = loc(intrinsic_function_name); < >); INTRINSIC;
-                                    <IntrinsicFunctionSpecifier>
+  | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>
   | FUNCTION; ALL; INTRINSIC;       {IntrinsicFunctionAllSpecifier}
 
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)

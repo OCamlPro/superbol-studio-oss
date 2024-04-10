@@ -25,8 +25,8 @@ module CU = Cobol_data.Compilation_unit
 module CUs = CU.SET
 
 let name_of_compilation_unit = function
-  | Program { program_name = name; _ } -> Cobol_ptree.program_name ~&name
   | Function { function_name = name; _ }
+  | Program { program_name = name; _ } -> Cobol_ptree.program_name ~&name
   | ClassDefinition { class_name = name; _ }
   | InterfaceDefinition { interface_name = name; _ } -> ~&name
 

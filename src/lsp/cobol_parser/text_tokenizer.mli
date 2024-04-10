@@ -50,6 +50,7 @@ val init
   -> exec_scanners: Parser_options.exec_scanners
   -> memory:'a memory
   -> Cobol_config.words_spec
+  -> EzCompat.StringSet.t
   -> 'a state
 
 val diagnostics

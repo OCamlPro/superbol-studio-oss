@@ -173,3 +173,19 @@ AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 AT_CLEANUP
 
 
+
+
+AT_SETUP([TRIM TRAILING])
+
+AT_DATA([prog.cob],[
+       IDENTIFICATION   DIVISION.
+       PROGRAM-ID.      prog.
+       PROCEDURE        DIVISION.
+           IF FUNCTION LENGTH (FUNCTION TRIM (WS-ARG TRAILING)) <> 4
+               DISPLAY "OK"
+           END-IF.
+])
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
+], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+])
+AT_CLEANUP
