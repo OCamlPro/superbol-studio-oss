@@ -46,16 +46,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1719:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1769:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1795:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1877:0
-run_functions.at-1877-prog.cob:51.34-51.39:
-  48                 DISPLAY 'LENGTH z"a0" wrong: ' TEST-FLD
-  49                 END-DISPLAY
-  50              END-IF
-  51 >            MOVE FUNCTION LENGTH ( n'a0' )
-----                                     ^^^^^
-  52                TO TEST-FLD
-  53              IF TEST-FLD NOT = 2
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1907:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1931:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:1957:0
@@ -122,27 +112,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3851:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:3951:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4051:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4074:0
-run_functions.at-4074-prog.cob:10.37-10.45:
-   7          PROCEDURE        DIVISION.
-   8              DISPLAY FUNCTION TRIM ( X )
-   9              END-DISPLAY.
-  10 >            DISPLAY FUNCTION TRIM ( X TRAILING )
-----                                        ^^^^^^^^
-  11              END-DISPLAY.
-  12              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4100:0
-run_functions.at-4100-prog.cob:10.37-10.45:
-   7          PROCEDURE        DIVISION.
-   8              DISPLAY FUNCTION TRIM ( X ) (2 : 3)
-   9              END-DISPLAY.
-  10 >            DISPLAY FUNCTION TRIM ( X TRAILING ) (2 : 3)
-----                                        ^^^^^^^^
-  11              END-DISPLAY.
-  12              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4127:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4155:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4180:0
@@ -151,26 +121,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4264:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4288:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4358:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4407:0
-run_functions.at-4407-prog.cob:11.54-11.67:
-   8   
-   9          PROCEDURE DIVISION.
-  10              MOVE FUNCTION FORMATTED-DATETIME
-  11 >                     ("YYYYDDDThhmmss+hhmm", 1, 45296, SYSTEM-OFFSET)
-----                                                         ^^^^^^^^^^^^^
-  12                  TO str
-  13              MOVE FUNCTION TEST-FORMATTED-DATETIME
->> Error: Invalid syntax
-
-run_functions.at-4407-prog.cob:20.42-20.55:
-  17              END-IF
-  18   
-  19              MOVE FUNCTION FORMATTED-TIME
-  20 >                     ("hhmmss.ssZ", 45296, SYSTEM-OFFSET)
-----                                             ^^^^^^^^^^^^^
-  21                  TO str
-  22              MOVE FUNCTION TEST-FORMATTED-DATETIME
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4428:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4449:0
 Considering: import/gnucobol/tests/testsuite.src/run_functions.at:4502:0

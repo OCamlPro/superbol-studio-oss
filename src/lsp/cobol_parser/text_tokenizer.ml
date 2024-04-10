@@ -84,7 +84,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
-  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%s>" f 
+  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%s>" f
   | t -> string @@
       try Text_lexer.show_token t
       with Not_found ->
@@ -201,7 +201,7 @@ let preproc_n_combine_tokens ~source_format =
                 | "FORMATTED-DATETIME" ->
                   subst_function ~in_repo:true
                     (FORMATTED_DATETIME_FUNC::p', hd l::l', dgs) (tl p, tl l)
-                | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
+                (* | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
                 | "BIT-OF" | "BIT-TO-CHAR" | "BOOLEAN-OF-INTEGER" | "BYTE-LENGTH" | "CHAR"
                 | "CHAR-NATIONAL" | "COMBINED-DATETIME" | "CONCAT" | "CONCATENATE"
                 | "CONTENT-LENGTH" | "CONTENT-OF" | "CONVERT" | "COS" | "CURRENCY-SYMBOL"
@@ -226,7 +226,7 @@ let preproc_n_combine_tokens ~source_format =
                 | "TEST-NUMVAL-F" | "UPPER-CASE" | "VARIANCE" | "WHEN-COMPILED"
                 | "YEAR-TO-YYYY" ->
                   subst_function ~in_repo:true
-                    ((INTRINSIC_FUNC (String.uppercase_ascii w))::p', hd l::l', dgs) (tl p, tl l)
+                    ((INTRINSIC_FUNC (String.uppercase_ascii w))::p', hd l::l', dgs) (tl p, tl l) *)
                 | _ ->
                     let acc, pl = skip acc pl 1 in
                     aux acc pl
@@ -264,33 +264,34 @@ let preproc_n_combine_tokens ~source_format =
                 | "SUM" ->
                   aux (SUM_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
                 | "TRIM" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (TRIM_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "NUMVAL-C" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (NUMVAL_C_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "LOCALE-DATE" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (LOCALE_DATE_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "LOCALE-TIME" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (LOCALE_TIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "LOCALE-TIME-FROM-SECONDS" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (LOCALE_TIME_FROM_SECONDS_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "FORMATTED-TIME" ->
-                  subst_function ~in_repo:true
+                  subst_function
                     (FORMATTED_TIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
                     (tl @@ tl p, tl @@ tl l)
                 | "FORMATTED-DATETIME" ->
-                  subst_function ~in_repo:true
-                    (FORMATTED_DATETIME_FUNC::p', hd l::l', dgs) (tl p, tl l)
-                | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
+                  subst_function
+                    (FORMATTED_DATETIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
+                    (tl @@ tl p, tl @@ tl l)
+                (* | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
                 | "BIT-OF" | "BIT-TO-CHAR" | "BOOLEAN-OF-INTEGER" | "BYTE-LENGTH" | "CHAR"
                 | "CHAR-NATIONAL" | "COMBINED-DATETIME" | "CONCAT" | "CONCATENATE"
                 | "CONTENT-LENGTH" | "CONTENT-OF" | "CONVERT" | "COS" | "CURRENCY-SYMBOL"
@@ -316,7 +317,7 @@ let preproc_n_combine_tokens ~source_format =
                   aux
                     (INTRINSIC_FUNC (String.uppercase_ascii w) :: p',
                       hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl (tl p), tl (tl l))
+                    (tl (tl p), tl (tl l)) *)
                 | _ ->
                   aux (FUNCTION :: p', hd l :: l', dgs) (tl p, tl l)
                 end
@@ -488,7 +489,8 @@ let preproc_n_combine_tokens ~source_format =
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
-    | (FUNCTION :: _) as tks -> function_specifier tks
+    | [FUNCTION]                    -> Error `MissingInputs
+    | (FUNCTION :: _) as tks          -> function_specifier tks
 
     | tok :: _                        -> subst_n tok 1
 
@@ -572,8 +574,9 @@ let init
     ~exec_scanners
     ~memory
     words
+    intrinsics
   =
-  let lexer = Text_lexer.create () in
+  let lexer = Text_lexer.create intrinsics in
   let Grammar_contexts.{ context_tokens;
                          context_sensitive_tokens;
                          context_sensitive_tokens_unimplemented = _ } =
@@ -874,20 +877,20 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
             begin
               try List.assoc w Text_keywords.intrinsic_functions &@<- token
               with Not_found ->
-                if EzCompat.StringSet.mem w Cobol_config.Reserved.intrinsic_functions then
+                if EzCompat.StringSet.mem w (Text_lexer.available_intrinsics s.persist.lexer) then
                   INTRINSIC_FUNC w &@<- token
                 else
                   token
             end
             | _ -> token)
-      | None -> 
+      | None ->
         List.map (fun token ->
           match ~&token with
           | WORD w | WORD_IN_AREA_A w ->
             begin
               try List.assoc w Text_keywords.intrinsic_functions &@<- token
               with Not_found ->
-                if EzCompat.StringSet.mem w Cobol_config.Reserved.intrinsic_functions then
+                if EzCompat.StringSet.mem w (Text_lexer.available_intrinsics s.persist.lexer) then
                   INTRINSIC_FUNC w &@<- token
                 else
                   token

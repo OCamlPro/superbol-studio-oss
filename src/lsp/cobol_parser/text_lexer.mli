@@ -34,13 +34,14 @@ val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
 
 (* --- *)
 
-val create: ?decimal_point_is_comma:bool -> unit -> lexer
+val create: ?decimal_point_is_comma:bool -> EzCompat.StringSet.t -> lexer
 val handle_of_token: lexer -> Grammar_tokens.token -> token_handle
 val reserve_words: lexer -> Cobol_config.words_spec -> unit
 val enable_tokens: TokenHandles.t -> unit
 val disable_tokens: TokenHandles.t -> unit
 val decimal_point_is_comma: lexer -> lexer
 val intrinsic_functions_specifier: ?intrinsics:string list -> lexer -> lexer
+val available_intrinsics: lexer -> EzCompat.StringSet.t
 
 (* --- *)
 

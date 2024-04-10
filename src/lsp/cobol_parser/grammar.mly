@@ -849,8 +849,7 @@ let expands_phrase :=
 let function_specifier [@context function_specifier] [@post.function_specifier]:=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
-  | FUNCTION; ~ = rnel(~ = loc(intrinsic_function_name); < >); INTRINSIC;
-                                    <IntrinsicFunctionSpecifier>
+  | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>
   | FUNCTION; ALL; INTRINSIC;       {IntrinsicFunctionAllSpecifier}
 
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)
@@ -2269,7 +2268,7 @@ let function_ident ==
                                                  <CallTrim>
  | LENGTH_FUNC; ~=arg_par(of_ = ident_or_nonnumeric; physical=bo(PHYSICAL); { { of_; physical } });
                                                  <CallLength>
- | NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC> 
+ | NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC>
  | LOCALE_DATE_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleDate>
  | LOCALE_TIME_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTime>
  | LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTimeFromSeconds>

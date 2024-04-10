@@ -30,6 +30,7 @@ module TYPES = struct
     {
       token_of_keyword: (string, token_handle) Hashtbl.t;
       decimal_point_is_comma: bool;
+      available_intrinsics: StringSet.t;
       intrinsic_functions_specifier: StringSet.t
     }
 
@@ -52,8 +53,6 @@ let token_of_punct = Hashtbl.create 15
 let punct_of_token = Hashtbl.create 15
 let keyword_of_token = Hashtbl.create 257
 let __token_of_keyword = Hashtbl.create 257         (* copied in `Make` below *)
-
-let intrinsics = Hashtbl.create 116                 (* max number of intrinsics *)
 
 
 (** Raises {!Not_found} if the token is neither a keyword nor a
@@ -98,21 +97,17 @@ let __init_default_keywords =
       { token; enabled = true; reserved = false }
   end Text_keywords.keywords
 
-let __init_intrinsics =
-  List.iter (fun (name, token) ->
-    Hashtbl.add intrinsics name token)
-    Text_keywords.intrinsic_functions
-
 let silenced_keywords =
   StringSet.of_list Text_keywords.silenced_keywords
 
 (* --- *)
 
 (*TODO: Add from config + cmd line*)
-let create ?(decimal_point_is_comma = false) () =
+let create ?(decimal_point_is_comma = false) intrinsics =
   {
     token_of_keyword = Hashtbl.copy __token_of_keyword;
     decimal_point_is_comma;
+    available_intrinsics = intrinsics;
     intrinsic_functions_specifier = StringSet.empty;
   }
 
@@ -126,13 +121,22 @@ let intrinsic_functions_specifier ?intrinsics lexer =
   | Some intrinsics ->
     {
       lexer with intrinsic_functions_specifier =
-        StringSet.union lexer.intrinsic_functions_specifier (StringSet.of_list intrinsics)
+        List.fold_left (fun acc intrinsic ->
+          if StringSet.mem intrinsic lexer.available_intrinsics then
+            StringSet.add intrinsic acc
+          else
+            acc)
+          lexer.intrinsic_functions_specifier
+          intrinsics
     }
   | _ ->
     {
       lexer with intrinsic_functions_specifier =
-        StringSet.of_list @@ List.map fst Text_keywords.intrinsic_functions
+        lexer.available_intrinsics
     }
+
+let available_intrinsics lexer =
+  lexer.available_intrinsics
 
 let handle_of_keyword { token_of_keyword; _ } kwd =
   Hashtbl.find token_of_keyword kwd
