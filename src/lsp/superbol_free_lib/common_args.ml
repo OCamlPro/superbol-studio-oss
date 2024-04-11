@@ -164,7 +164,7 @@ let get () =
                           exec_preprocs = EXEC_MAP.empty;
                           libpath = !libpath; env };
       parser_options = { config; recovery; verbose; show = !show;
-                         exec_scanner = Superbol_preprocs.Generic.scanner } }
+                         exec_scanners = Superbol_preprocs.exec_scanners } }
 
   in
   get, args

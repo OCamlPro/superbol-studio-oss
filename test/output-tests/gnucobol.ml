@@ -175,7 +175,7 @@ let guess_source_format ~filename ~command =   (* hackish detection of format *)
 
 let default_parser_options =
   Cobol_parser.Options.default
-    ~exec_scanner:Superbol_preprocs.Generic.scanner
+    ~exec_scanners: Superbol_preprocs.exec_scanners
 
 
 let do_check_parse (test_filename, contents, _, { check_loc;

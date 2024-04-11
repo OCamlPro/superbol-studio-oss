@@ -56,12 +56,9 @@ let combined_tokens =
     NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
 
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str; runtime_repr } =
-  begin
-    match runtime_repr with
-    | Native_bytes -> ()
-    | Null_terminated_bytes -> Fmt.char ppf 'Z'
-  end;
+let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
+                                                runtime_repr } =
+  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
   if hexadecimal then Fmt.char ppf 'X';
   match quotation with
   | Simple_quote -> Fmt.pf ppf "'%s" str
@@ -331,7 +328,7 @@ and persist =
   {
     lexer: Text_lexer.lexer;
     context_tokens: Grammar_contexts.context_tokens;
-    exec_scanner: Parser_options.exec_scanner;
+    exec_scanners: Parser_options.exec_scanners;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
   }
@@ -341,7 +338,7 @@ let eidetic = Eidetic []
 let init
     ?(verbose = false)
     ?(show_if_verbose = [`Tks; `Ctx])
-    ~exec_scanner
+    ~exec_scanners
     ~memory
     words
   =
@@ -364,7 +361,7 @@ let init
       {
         lexer;
         context_tokens;
-        exec_scanner;
+        exec_scanners;
         verbose;
         show_if_verbose =
           (if List.mem `Tks show_if_verbose then [`Tks] else []) @
@@ -385,10 +382,44 @@ let distinguish_words: (Grammar_tokens.token with_loc as 't) -> 't = function
       WORD_IN_AREA_A w &@ loc
   | t -> t
 
-let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
-  : text_word with_loc -> tokens * Parser_diagnostics.t =
+
+let scan_exec_block
+    ({ persist = { exec_scanners = { exec_scanners = scanners;
+                                     exec_scanner_fallback = fallback; _ }; _ };
+       _ } as state)
+    text =
+  let module EXEC_MAP = Parser_options.EXEC_MAP in
+  let exec_scanner, lang = match ~&text with
+    | { payload = TextWord _(* EXEC(UTE) *); _ } ::
+      { payload = TextWord lang; _ } :: _ ->
+        (try EXEC_MAP.find lang scanners, Some lang
+         with Not_found -> fallback, None)
+    | _ ->
+        fallback, None
+  in
+  match exec_scanner with
+  | Stateless_exec_scanner s ->
+      state,
+      [ EXEC_BLOCK (s ~&text) &@<- text ]
+  | Stateful_exec_scanner (s, s_acc) ->
+      let block, s_acc = s ~&text s_acc in
+      let scanner = Parser_options.Stateful_exec_scanner (s, s_acc) in
+      let exec_scanners = match lang with
+        | None ->
+            { state.persist.exec_scanners with
+              exec_scanner_fallback = scanner }
+        | Some lang ->
+            { state.persist.exec_scanners with
+              exec_scanners = EXEC_MAP.add lang scanner scanners }
+      in
+      { state with persist = { state.persist with exec_scanners } },
+      [ EXEC_BLOCK block &@<- text ]
+
+
+let tokens_of_word ({ persist = { lexer; _ }; _ } as state)
+  : text_word with_loc -> _ * tokens =
   fun { payload = c; loc } ->
-  let tok t = [t &@ loc], Parser_diagnostics.none in
+  let tok t = state, [t &@ loc] in
   let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str qte =
     Cobol_ptree.{
       str;
@@ -405,7 +436,7 @@ let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
   | TextWord w
   | CDirWord w
     -> let tokens = Text_lexer.tokens_of_string' lexer (w &@ loc) in
-      List.map distinguish_words tokens, Parser_diagnostics.none
+      state, List.map distinguish_words tokens
   (* | Alphanum { knd = Basic; str; qte = quotation; _ } *)
   (*   (\* TODO: Leave those as is in the parse-tree, and decode later *\) *)
   (*   when Config.ebcdic_symbolic_characters#value *)
@@ -421,7 +452,8 @@ let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
   | Alphanum { knd = Hex; str; qte }
     -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
   | Alphanum { knd = NullTerm; str; qte }
-    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false ~repr:Null_terminated_bytes str qte)
+    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false ~repr:Null_terminated_bytes
+                          str qte)
   | Alphanum { knd = National | NationalX; str; _ }  (* TODO: differentiate *)
     -> tok @@ NATLIT str
   | AlphanumPrefix { knd = Hex; str; qte }
@@ -431,9 +463,10 @@ let tokens_of_word { persist = { lexer; exec_scanner; _ }; _ }
   | Eof
     -> tok EOF
   | ExecBlock text
-    -> tok @@ EXEC_BLOCK (exec_scanner text)
+    -> scan_exec_block state (text &@ loc)
   | Pseudo _
-    -> [], Parser_diagnostics.error @@ Unexpected { loc; stuff = Pseudotext }
+    -> let error = Unexpected { loc; stuff = Pseudotext } in
+      { state with diags = Parser_diagnostics.add_error error state.diags }, []
 
 let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
   (* After text manipulation. We need special handling of `PICTURE [IS]` to
@@ -456,9 +489,8 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
     fun w ->
       Cobol_common.Tokenizing.fold_tokens ~tokenizer ~f:prod_tokens w
         ~until:(function [] | [{ payload = EOF; _ }] -> true | _ -> false)
-  and prod_word (acc, ({ diags; _ } as state)) word =
-    let t, diags' = tokens_of_word state word in
-    let state = { state with diags = Parser_diagnostics.union diags diags' } in
+  and prod_word (acc, state) word =
+    let state, t = tokens_of_word state word in
     List.fold_left prod (acc, state) t
   in
   let rec acc_text ((_, ({ expect_picture_string; _ })) as acc) word =

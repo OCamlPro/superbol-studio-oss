@@ -55,6 +55,7 @@ skip = ["index.mld"]
 [dependencies]
 cobol_common = "version"
 cobol_preproc = "version"
+cobol_parser = "version"
 pretty = "version"
 
 # package tools dependencies

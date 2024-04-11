@@ -208,6 +208,7 @@
    (ocaml (>= 4.14.0))
    (pretty (= version))
    (cobol_preproc (= version))
+   (cobol_parser (= version))
    (cobol_common (= version))
    odoc
   )
