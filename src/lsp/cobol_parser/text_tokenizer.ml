@@ -84,7 +84,7 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
-  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%s>" f
+  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%a>" Cobol_ptree.pp_generic_intrinsic_identifier f
   | t -> string @@
       try Text_lexer.show_token t
       with Not_found ->

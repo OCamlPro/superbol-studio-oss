@@ -255,6 +255,10 @@ and fold_inline_call (v: _ #folder) =
         x
         >> fold_name' v call_fun
         >> fold_list ~fold:fold_effective_arg v call_args
+      | CallGenericIntrinsic {  args; _ } ->
+        x
+        (*TODO: fold_generic_intrinsic_idenitifier *)
+        >> fold_list ~fold:fold_effective_arg v args
       | CallTrim { arg; tip } ->
         x
         >> fold_effective_arg v arg

@@ -59,6 +59,10 @@ let silenced attrs =
   List.find_opt (Attribute.has_label "keyword.silenced") attrs |>
   Option.map Attribute.payload
 
+let unique_intrinsic attrs =
+  List.find_opt (Attribute.has_label "intrinsic.unique") attrs |>
+  Option.map Attribute.payload
+
 let intrinsic attrs =
   List.find_opt (Attribute.has_label "intrinsic") attrs |>
   Option.map Attribute.payload
@@ -71,7 +75,7 @@ let pp_terminal ppf t =
   | Some "int" -> Fmt.string ppf " 0"
   | Some t -> Fmt.failwith "unsupported token type: %s" t
 
-let emit_entry attribute_payload ?(comment_token = false) ppf t =
+let emit_entry attribute_payload ?(comment_token = false) ?(intrinsic = false) ppf t =
   let start_token ppf = if comment_token then Fmt.string ppf "(*"
   and end_token   ppf = if comment_token then Fmt.string ppf "*)" in
   match Terminal.kind t with
@@ -86,6 +90,12 @@ let emit_entry attribute_payload ?(comment_token = false) ppf t =
             (String.map (function '_' -> '-' | c -> c) (Terminal.name t))
             start_token pp_terminal t end_token
       | Some payload ->
+        if intrinsic then
+          List.iter
+            (fun kwd -> Fmt.pf ppf "@\n%s%t, INTRINSIC_FUNC %a%t;" (String.trim kwd)
+                start_token pp_terminal t end_token)
+            (String.split_on_char ',' payload)
+        else
           List.iter
             (fun kwd -> Fmt.pf ppf "@\n%s%t, %a%t;" (String.trim kwd)
                 start_token pp_terminal t end_token)
@@ -108,7 +118,8 @@ let emit_silenced_keywords_list ppf =
 
 let emit_intrinsic_functions_list ppf =
   Fmt.pf ppf "@[<2>let intrinsic_functions = %s.[" tokens_module;
-  Terminal.iter (emit_entry intrinsic ppf);
+  Terminal.iter (emit_entry intrinsic ~intrinsic:true ppf);
+  Terminal.iter (emit_entry unique_intrinsic ppf);
   Fmt.pf ppf "@]@\n]@."
 
 let emit ppf =

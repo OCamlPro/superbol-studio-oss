@@ -152,7 +152,7 @@ let __init_intrinsics =
       let intrinsic = String.uppercase_ascii intrinsic in
       match Hashtbl.find_opt __token_of_intrinsic intrinsic with
       | None ->
-        let token = Grammar_tokens.INTRINSIC_FUNC intrinsic in
+        let token = List.assoc intrinsic Text_keywords.intrinsic_functions in
         Hashtbl.add intrinsic_of_token token intrinsic;
         Hashtbl.add word_of_token token intrinsic;
         Hashtbl.add __token_of_intrinsic intrinsic { token; specified = false }

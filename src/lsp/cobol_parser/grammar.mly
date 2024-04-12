@@ -2207,11 +2207,18 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
 
 (* Only for functions which name is also a keyword in COBOL *)
 let intrinsic_function_name [@recover dummy_name] [@symbol "<intrinsic function name>"] :=
- | RANDOM_FUNC;      { "RANDOM" }
- | REVERSE_FUNC;     { "REVERSE" }
- | SIGN_FUNC;        { "SIGN" }
- | SUM_FUNC;         { "SUM" }
- | ~=INTRINSIC_FUNC; < >
+ | BYTE_LENGTH_FUNC;   { BYTE_LENGTH }
+ | CHAR_FUNC;          { CHAR }
+ | CONTENT_OF_FUNC;    { CONTENT_OF }
+ | CONVERT_FUNC;       { CONVERT }
+ | CURRENT_DATE_FUNC;  { CURRENT_DATE }
+ | RANDOM_FUNC;        { RANDOM }
+ | RANGE_FUNC;         { RANGE }
+ | REVERSE_FUNC;       { REVERSE }
+ | SIGN_FUNC;          { SIGN }
+ | SUM_FUNC;           { SUM }
+ | WHEN_COMPILED_FUNC; { WHEN_COMPILED }
+ | ~=INTRINSIC_FUNC;   < >
 
 let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
  | ~ = name;                         < >
@@ -2262,18 +2269,19 @@ let function_ident ==
  | FUNCTION; n = function_name; al = arguments; { CallFunc { call_fun = n; call_args = al } }
  | FUNCTION; n = function_name;                 { CallFunc { call_fun = n; call_args = [] } }
  | FUNCTION?; n = loc(intrinsic_function_name); al = arguments;
-                                                { CallFunc { call_fun = n; call_args = al } }
- | FUNCTION?; n = loc(intrinsic_function_name); { CallFunc { call_fun = n; call_args = [] } }
+    { CallGenericIntrinsic { intrinsic = n; args = al } }
+ | FUNCTION?; n = loc(intrinsic_function_name);
+    { CallGenericIntrinsic { intrinsic = n; args = [] } }
  | FUNCTION?; TRIM_FUNC; args=arg_par(arg = argument; tip=trimming_tip?; { (arg, tip) });
-                                                { CallTrim { arg = fst args; tip = snd args} }
+    { CallTrim { arg = fst args; tip = snd args} }
  | FUNCTION?; LENGTH_FUNC; args=arg_par(arg = ident_or_nonnumeric; physical=bo(PHYSICAL);
                                                                         { (arg, physical) });
-                                                { CallLength
-                                                    { arg = fst args; physical = snd args} }
+    { CallLength { arg = fst args; physical = snd args} }
  | FUNCTION?; NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC>
  | FUNCTION?; LOCALE_DATE_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleDate>
  | FUNCTION?; LOCALE_TIME_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTime>
- | FUNCTION?; LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTimeFromSeconds>
+ | FUNCTION?; LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args);
+    <CallLocaleTimeFromSeconds>
  | FUNCTION?; FORMATTED_DATETIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
  | FUNCTION?; FORMATTED_TIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
 

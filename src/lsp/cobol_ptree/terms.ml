@@ -77,6 +77,125 @@ type alphanum_repr =
   | Null_terminated_bytes
 [@@deriving ord]
 
+type generic_intrinsic_identifier =
+  | ABS
+  | ABSOLUTE_VALUE
+  | ACOS
+  | ANNUITY
+  | ASIN
+  | ATAN
+  | BASECONVERT
+  | BIT_OF
+  | BIT_TO_CHAR
+  | BOOLEAN_OF_INTEGER
+  | BYTE_LENGTH
+  | CHAR
+  | CHAR_NATIONAL
+  | COMBINED_DATETIME
+  | CONCAT
+  | CONCATENATE
+  | CONTENT_LENGTH
+  | CONTENT_OF
+  | CONVERT
+  | COS
+  | CURRENCY_SYMBOL
+  | CURRENT_DATE
+  | DATE_OF_INTEGER
+  | DATE_TO_YYYYMMDD
+  | DAY_OF_INTEGER
+  | DAY_TO_YYYYDDD
+  | DISPLAY_OF
+  | E
+  | EXCEPTION_FILE
+  | EXCEPTION_FILE_N
+  | EXCEPTION_LOCATION
+  | EXCEPTION_LOCATION_N
+  | EXCEPTION_STATEMENT
+  | EXCEPTION_STATUS
+  | EXP
+  | EXP10
+  | FACTORIAL
+  | FIND_STRING
+  | FORMATTED_CURRENT_DATE
+  | FORMATTED_DATE
+  | FORMATTED_DATETIME
+  | FORMATTED_TIME
+  | FRACTION_PART
+  | HEX_OF
+  | HEX_TO_CHAR
+  | HIGHEST_ALGEBRAIC
+  | INTEGER
+  | INTEGER_OF_BOOLEAN
+  | INTEGER_OF_DATE
+  | INTEGER_OF_DAY
+  | INTEGER_OF_FORMATTED_DATE
+  | INTEGER_PART
+  | LENGTH
+  | LENGTH_AN
+  | LOCALE_COMPARE
+  | LOCALE_DATE
+  | LOCALE_TIME
+  | LOCALE_TIME_FROM_SECONDS
+  | LOG
+  | LOG10
+  | LOWER_CASE
+  | LOWEST_ALGEBRAIC
+  | MAX
+  | MEAN
+  | MEDIAN
+  | MIDRANGE
+  | MIN
+  | MOD
+  | MODULE_CALLER_ID
+  | MODULE_DATE
+  | MODULE_FORMATTED_DATE
+  | MODULE_ID
+  | MODULE_NAME
+  | MODULE_PATH
+  | MODULE_SOURCE
+  | MODULE_TIME
+  | MONETARY_DECIMAL_POINT
+  | MONETARY_THOUSANDS_SEPARATOR
+  | NATIONAL_OF
+  | NUMERIC_DECIMAL_POINT
+  | NUMERIC_THOUSANDS_SEPARATOR
+  | NUMVAL
+  | NUMVAL_C
+  | NUMVAL_F
+  | ORD
+  | ORD_MAX
+  | ORD_MIN
+  | PI
+  | PRESENT_VALUE
+  | RANDOM
+  | RANGE
+  | REM
+  | REVERSE
+  | SECONDS_FROM_FORMATTED_TIME
+  | SECONDS_PAST_MIDNIGHT
+  | SIGN
+  | SIN
+  | SQRT
+  | STANDARD_COMPARE
+  | STANDARD_DEVIATION
+  | STORED_CHAR_LENGTH
+  | SUBSTITUTE
+  | SUBSTITUTE_CASE
+  | SUM
+  | TAN
+  | TEST_DATE_YYYYMMDD
+  | TEST_DAY_YYYYDDD
+  | TEST_FORMATTED_DATETIME
+  | TEST_NUMVAL
+  | TEST_NUMVAL_C
+  | TEST_NUMVAL_F
+  | TRIM
+  | UPPER_CASE
+  | VARIANCE
+  | WHEN_COMPILED
+  | YEAR_TO_YYYY
+[@@deriving ord, show]
+
 type alphanum =
   {
     str: string;
@@ -272,6 +391,10 @@ and inline_call =                               (* in ancient terms: funident *)
   | CallFunc of { (*name to avoid clash with call statement *)
       call_fun: name with_loc;
       call_args: effective_arg list;
+    }
+  | CallGenericIntrinsic of {
+        intrinsic: generic_intrinsic_identifier with_loc;
+        args: effective_arg list;
     }
   | CallTrim of {
       arg: effective_arg;
@@ -592,6 +715,10 @@ module COMPARE = struct
     | CallFunc { call_fun = a; call_args = c }, CallFunc { call_fun = b; call_args = d } ->
       compare_struct (compare_with_loc compare_name a b) @@
         lazy (List.compare compare_effective_arg c d)
+    | CallGenericIntrinsic { intrinsic = a; args = c },
+            CallGenericIntrinsic { intrinsic = b; args = d } ->
+      compare_struct (compare_with_loc compare_generic_intrinsic_identifier a b) @@
+        lazy (List.compare compare_effective_arg c d)
     | CallTrim { arg = a; tip = c }, CallTrim { arg = b; tip = d } ->
       compare_struct (compare_effective_arg a b) @@
         lazy (Option.compare compare_trimming_tip c d)
@@ -609,6 +736,8 @@ module COMPARE = struct
       compare_formatted_datetime_args a b
     | CallFunc _, _                  -> -1
     | _, CallFunc _                  ->  1
+    | CallGenericIntrinsic _, _      -> -1
+    | _, CallGenericIntrinsic _      ->  1
     | CallTrim _, _                  -> -1
     | _, CallTrim _                  ->  1
     | CallLength _, _                -> -1
@@ -768,6 +897,9 @@ module FMT = struct
     | CallFunc { call_fun; call_args } ->
       fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
         (list ~sep:comma pp_effective_arg) call_args
+    | CallGenericIntrinsic { intrinsic; args } ->
+      fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf (pp_with_loc pp_generic_intrinsic_identifier) intrinsic
+        (list ~sep:comma pp_effective_arg) args
     | CallTrim { arg; tip } ->
       fmt "FUNCTION@ TRIM@ @[<1>(%a, %a)@]" ppf
         pp_effective_arg arg
