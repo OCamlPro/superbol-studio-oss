@@ -104,7 +104,6 @@ let make_parser
     in
     let module Config = (val config) in
     Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
-      Config.intrinsic_functions
   in
   {
     prev_limit = None;
@@ -311,7 +310,8 @@ let post_production ({ preproc = { tokzr; _ }; _ } as ps)
         let tokzr, token, tokens
           = Tokzr.intrinsic_functions_specifier tokzr token tokens in
         update_tokzr ps tokzr, token, tokens
-    | _ ->
+    | ClassSpecifier _ | InterfaceSpecifier  _ | UserFunctionSpecifier _
+      | ProgramSpecifier _ | PropertySpecifier _ ->
         ps, token, tokens
     end
   | Post_pending descr ->

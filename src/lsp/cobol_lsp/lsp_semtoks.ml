@@ -295,14 +295,14 @@ let semtoks_from_ptree ~filename ?range ptree =
           |> add_name' call_fun ProcName
           |> fold_list ~fold:fold_effective_arg self call_args
           |> Visitor.skip_children
-        | CallTrim { trimmed; position } ->
+        | CallTrim { arg; tip } ->
           fun acc -> acc
-          |> fold_effective_arg self trimmed
-          |> fold_option ~fold:fold_leading_trailing self position
+          |> fold_effective_arg self arg
+          |> fold_option ~fold:fold_trimming_tip self tip
           |> Visitor.skip_children
         | _ -> fun acc -> Visitor.skip_children acc
 
-    method! fold_leading_trailing = fun _ -> Visitor.skip_children
+    method! fold_trimming_tip = fun _ -> Visitor.skip_children
 
     (* Statement *)
     (* distinguish

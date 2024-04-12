@@ -2261,19 +2261,21 @@ let arg_par(X) ==
 let function_ident ==
  | FUNCTION; n = function_name; al = arguments; { CallFunc { call_fun = n; call_args = al } }
  | FUNCTION; n = function_name;                 { CallFunc { call_fun = n; call_args = [] } }
- | n = loc(intrinsic_function_name); al = arguments;
+ | FUNCTION?; n = loc(intrinsic_function_name); al = arguments;
                                                 { CallFunc { call_fun = n; call_args = al } }
- | n = loc(intrinsic_function_name); { CallFunc { call_fun = n; call_args = [] } }
- | TRIM_FUNC; ~=arg_par(t = argument; lto=leading_trailing?; { { trimmed = t; position = lto} });
-                                                 <CallTrim>
- | LENGTH_FUNC; ~=arg_par(of_ = ident_or_nonnumeric; physical=bo(PHYSICAL); { { of_; physical } });
-                                                 <CallLength>
- | NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC>
- | LOCALE_DATE_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleDate>
- | LOCALE_TIME_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTime>
- | LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTimeFromSeconds>
- | FORMATTED_DATETIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
- | FORMATTED_TIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
+ | FUNCTION?; n = loc(intrinsic_function_name); { CallFunc { call_fun = n; call_args = [] } }
+ | FUNCTION?; TRIM_FUNC; args=arg_par(arg = argument; tip=trimming_tip?; { (arg, tip) });
+                                                { CallTrim { arg = fst args; tip = snd args} }
+ | FUNCTION?; LENGTH_FUNC; args=arg_par(arg = ident_or_nonnumeric; physical=bo(PHYSICAL);
+                                                                        { (arg, physical) });
+                                                { CallLength
+                                                    { arg = fst args; physical = snd args} }
+ | FUNCTION?; NUMVAL_C_FUNC; ~=arg_par(~=rnel(ident_or_nonnumeric); < >); <CallNumvalC>
+ | FUNCTION?; LOCALE_DATE_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleDate>
+ | FUNCTION?; LOCALE_TIME_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTime>
+ | FUNCTION?; LOCALE_TIME_FROM_SECONDS_FUNC; ~=arg_par(locale_datetime_args); <CallLocaleTimeFromSeconds>
+ | FUNCTION?; FORMATTED_DATETIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
+ | FUNCTION?; FORMATTED_TIME_FUNC; ~=arg_par(formatted_datetime_args); <CallFormattedDatetime>
 
 let formatted_datetime_args ==
   dt = rnel(argument); so=bo(SYSTEM_OFFSET); { { args = dt; system_offset = so } }
@@ -2281,7 +2283,7 @@ let formatted_datetime_args ==
 let locale_datetime_args ==
  e = argument; l= reference?; { { datetime = e; locale = l} }
 
-let leading_trailing ==
+let trimming_tip ==
  | LEADING;  { Leading }
  | TRAILING; { Trailing }
 

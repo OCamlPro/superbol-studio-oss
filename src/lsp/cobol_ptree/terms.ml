@@ -273,24 +273,20 @@ and inline_call =                               (* in ancient terms: funident *)
       call_fun: name with_loc;
       call_args: effective_arg list;
     }
-  | CallTrim of call_trim_args
-  | CallLength of call_length_args
+  | CallTrim of {
+      arg: effective_arg;
+      tip: trimming_tip option;
+    }
+  | CallLength of {
+      arg: ident_or_nonnum;
+      physical: bool;
+    }
   | CallNumvalC of ident_or_nonnum list
   | CallLocaleDate of locale_datetime_args
   | CallLocaleTime of locale_datetime_args
   | CallLocaleTimeFromSeconds of locale_datetime_args
   | CallFormattedDatetime of formatted_datetime_args
   | CallFormattedTime of formatted_datetime_args
-
-and call_trim_args = {
-  trimmed: effective_arg;
-  position: leading_trailing option;
-}
-
-and call_length_args = {
-  of_: ident_or_nonnum;  (* reused label *)
-  physical: bool;
-}
 
 and formatted_datetime_args = {
   args: effective_arg list;
@@ -302,7 +298,7 @@ and locale_datetime_args = {
   locale: qualname option;
 }
 
-and leading_trailing =
+and trimming_tip =
   | Leading
   | Trailing
 
@@ -596,10 +592,10 @@ module COMPARE = struct
     | CallFunc { call_fun = a; call_args = c }, CallFunc { call_fun = b; call_args = d } ->
       compare_struct (compare_with_loc compare_name a b) @@
         lazy (List.compare compare_effective_arg c d)
-    | CallTrim { trimmed = a; position = c }, CallTrim { trimmed = b; position = d } ->
+    | CallTrim { arg = a; tip = c }, CallTrim { arg = b; tip = d } ->
       compare_struct (compare_effective_arg a b) @@
-        lazy (Option.compare compare_leading_trailing c d)
-    | CallLength { of_ = a; physical = c }, CallLength { of_ = b; physical = d } ->
+        lazy (Option.compare compare_trimming_tip c d)
+    | CallLength { arg = a; physical = c }, CallLength { arg = b; physical = d } ->
       compare_struct (compare_term a b) @@
         lazy (Bool.compare c d)
     | CallNumvalC a, CallNumvalC b ->
@@ -656,7 +652,7 @@ module COMPARE = struct
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
-  and compare_leading_trailing x y =
+  and compare_trimming_tip x y =
     match x, y with
     | Leading, Leading | Trailing, Trailing -> 0
     | Trailing, Leading -> -1
@@ -772,13 +768,13 @@ module FMT = struct
     | CallFunc { call_fun; call_args } ->
       fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
         (list ~sep:comma pp_effective_arg) call_args
-    | CallTrim { trimmed; position } ->
+    | CallTrim { arg; tip } ->
       fmt "FUNCTION@ TRIM@ @[<1>(%a, %a)@]" ppf
-        pp_effective_arg trimmed
-        (option pp_leading_trailing) position
-    | CallLength { of_; physical } ->
+        pp_effective_arg arg
+        (option pp_trimming_tip) tip
+    | CallLength { arg; physical } ->
       fmt "FUNCTION@ LENGTH@ @[<1>(%a%a)@]" ppf
-        pp_term of_
+        pp_term arg
         (fun ppf physical ->
           if physical then
             fmt ",@ PHYSICAL" ppf
@@ -819,7 +815,7 @@ module FMT = struct
             nop ppf so)
           so
 
-  and pp_leading_trailing ppf = function
+  and pp_trimming_tip ppf = function
     | Leading -> fmt "LEADING" ppf
     | Trailing -> fmt "TRAILING" ppf
 

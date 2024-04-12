@@ -12,6 +12,8 @@
 (**************************************************************************)
 
 module TYPES: sig
+  type keyword_handle
+  type intrinsic_handle
   type token_handle
   type lexer
 end
@@ -31,17 +33,20 @@ val pp_tokens_via_handles: TokenHandles.t Pretty.printer
 (** Only for debugging *)
 val keyword_of_token : (Grammar_tokens.token, string) Hashtbl.t
 val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
+val intrinsic_of_token : (Grammar_tokens.token, string) Hashtbl.t
+
+val as_intrinsic: token_handle -> intrinsic_handle
+val token_of_intrinsic_handle: intrinsic_handle -> Grammar_tokens.token
 
 (* --- *)
 
-val create: ?decimal_point_is_comma:bool -> EzCompat.StringSet.t -> lexer
+val create: ?decimal_point_is_comma:bool -> unit -> lexer
 val handle_of_token: lexer -> Grammar_tokens.token -> token_handle
 val reserve_words: lexer -> Cobol_config.words_spec -> unit
 val enable_tokens: TokenHandles.t -> unit
 val disable_tokens: TokenHandles.t -> unit
 val decimal_point_is_comma: lexer -> lexer
-val intrinsic_functions_specifier: ?intrinsics:string list -> lexer -> lexer
-val available_intrinsics: lexer -> EzCompat.StringSet.t
+val specify_intrinsic: lexer -> string -> unit
 
 (* --- *)
 

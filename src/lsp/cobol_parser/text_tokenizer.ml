@@ -31,7 +31,7 @@ let combined_tokens =
      Rationale: this would considerably complicate retokenization (which is
      necessary with the current solution to handle context-sensitive
      keywords) *)
-  Hashtbl.of_seq @@ List.to_seq ([
+  Hashtbl.of_seq @@ List.to_seq [
     ON_EXCEPTION, "ON_EXCEPTION";
     NOT_ON_EXCEPTION, "NOT_ON_EXCEPTION";
     ON_OVERFLOW, "ON_OVERFLOW";
@@ -54,7 +54,7 @@ let combined_tokens =
     DATA_RECORDS, "DATA_RECORDS";
     NEXT_PAGE, "NEXT_PAGE";
     NEXT_SENTENCE, "NEXT_SENTENCE";
-  ] @ List.map (fun (fst, snd) -> snd, fst^"_FUNC") Text_keywords.intrinsic_functions)
+  ]
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
                                                 runtime_repr } =
@@ -160,77 +160,59 @@ let preproc_n_combine_tokens ~source_format =
         | name :: _ ->
           begin match name with
             | LENGTH ->
-              subst_function ~in_repo:true (LENGTH_FUNC::p', hd l::l', dgs) (tl p, tl l)
+              subst_function ~in_repo:true
+                ((WORD "LENGTH")::p', hd l::l', dgs) (tl p, tl l)
             | RANDOM ->
-              subst_function ~in_repo:true (RANDOM_FUNC::p', hd l::l', dgs) (tl p, tl l)
+              subst_function ~in_repo:true
+                ((WORD "RANDOM")::p', hd l::l', dgs) (tl p, tl l)
             | REVERSE ->
-              subst_function ~in_repo:true (REVERSE_FUNC::p', hd l::l', dgs) (tl p, tl l)
+              subst_function ~in_repo:true
+                ((WORD "REVERSE")::p', hd l::l', dgs) (tl p, tl l)
             | SIGN ->
-              subst_function ~in_repo:true (SIGN_FUNC::p', hd l::l', dgs) (tl p, tl l)
+              subst_function ~in_repo:true
+                ((WORD "SIGN")::p', hd l::l', dgs) (tl p, tl l)
             | SUM ->
-              subst_function ~in_repo:true (SUM_FUNC::p', hd l::l', dgs) (tl p, tl l)
+              subst_function ~in_repo:true
+                ((WORD "SUM")::p', hd l::l', dgs) (tl p, tl l)
             | INTRINSIC ->
               aux (hd p :: p', hd l :: l', dgs) (tl p, tl l)
             | WORD w ->
               begin match String.uppercase_ascii w with
                 | "LENGTH" ->
-                  subst_function ~in_repo:true (LENGTH_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "LENGTH")::p', hd l::l', dgs) (tl p, tl l)
                 | "RANDOM" ->
-                  subst_function ~in_repo:true (RANDOM_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "RANDOM")::p', hd l::l', dgs) (tl p, tl l)
                 | "REVERSE" ->
-                  subst_function ~in_repo:true (REVERSE_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "REVERSE")::p', hd l::l', dgs) (tl p, tl l)
                 | "SIGN" ->
-                  subst_function ~in_repo:true (SIGN_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "SIGN")::p', hd l::l', dgs) (tl p, tl l)
                 | "SUM" ->
-                  subst_function ~in_repo:true (SUM_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "SUM")::p', hd l::l', dgs) (tl p, tl l)
                 | "INTRINSIC" ->
                   aux (hd p :: p', hd l :: l', dgs) (tl p, tl l)
                 | "TRIM" ->
-                  subst_function ~in_repo:true (TRIM_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "TRIM")::p', hd l::l', dgs) (tl p, tl l)
                 | "NUMVAL-C" ->
-                  subst_function ~in_repo:true (NUMVAL_C_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true ((WORD "NUMVAL_C")::p', hd l::l', dgs) (tl p, tl l)
                 | "LOCALE-DATE" ->
-                  subst_function ~in_repo:true (LOCALE_DATE_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true
+                    ((WORD "LOCALE_DATE")::p', hd l::l', dgs) (tl p, tl l)
                 | "LOCALE-TIME" ->
-                  subst_function ~in_repo:true (LOCALE_TIME_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true
+                    ((WORD "LOCALE_TIME")::p', hd l::l', dgs) (tl p, tl l)
                 | "LOCALE-TIME-FROM-SECONDS" ->
                   subst_function ~in_repo:true
-                    (LOCALE_TIME_FROM_SECONDS_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                    ((WORD "LOCALE_TIME_FROM_SECONDS")::p', hd l::l', dgs) (tl p, tl l)
                 | "FORMATTED-TIME" ->
-                  subst_function ~in_repo:true (FORMATTED_TIME_FUNC::p', hd l::l', dgs) (tl p, tl l)
+                  subst_function ~in_repo:true
+                    ((WORD "FORMATTED_TIME")::p', hd l::l', dgs) (tl p, tl l)
                 | "FORMATTED-DATETIME" ->
                   subst_function ~in_repo:true
-                    (FORMATTED_DATETIME_FUNC::p', hd l::l', dgs) (tl p, tl l)
-                (* | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
-                | "BIT-OF" | "BIT-TO-CHAR" | "BOOLEAN-OF-INTEGER" | "BYTE-LENGTH" | "CHAR"
-                | "CHAR-NATIONAL" | "COMBINED-DATETIME" | "CONCAT" | "CONCATENATE"
-                | "CONTENT-LENGTH" | "CONTENT-OF" | "CONVERT" | "COS" | "CURRENCY-SYMBOL"
-                | "CURRENT-DATE" | "DATE-OF-INTEGER" | "DATE-TO-YYYYMMDD" | "DAY-OF-INTEGER"
-                | "DAY-TO-YYYYDDD" | "DISPLAY-OF" | "E" | "EXCEPTION-FILE" | "EXCEPTION-FILE-N"
-                | "EXCEPTION-LOCATION" | "EXCEPTION-LOCATION-N" | "EXCEPTION-STATEMENT"
-                | "EXCEPTION-STATUS" | "EXP" | "EXP10" | "FACTORIAL" | "FIND-STRING"
-                | "FORMATTED-CURRENT-DATE" | "FORMATTED-DATE" | "FRACTION-PART" | "HEX-OF"
-                | "HEX-TO-CHAR" | "HIGHEST-ALGEBRAIC" | "INTEGER" | "INTEGER-OF-BOOLEAN"
-                | "INTEGER-OF-DATE" | "INTEGER-OF-DAY" | "INTEGER-OF-FORMATTED-DATE"
-                | "INTEGER-PART" | "LENGTH-AN" | "LOCALE-COMPARE" | "LOG" | "LOG10" | "LOWER_CASE"
-                | "LOWEST-ALGEBRAIC" | "MAX" | "MEAN" | "MEDIAN" | "MIDRANGE" | "MIN" | "MOD"
-                | "MODULE-CALLER-ID" | "MODULE-DATE" | "MODULE-FORMATTED-DATE" | "MODULE-ID"
-                | "MODULE-NAME" | "MODULE-PATH" | "MODULE-SOURCE" | "MODULE-TIME"
-                | "MONETARY-DECIMAL-POINT" | "MONETARY-THOUSANDS-SEPARATOR" | "NATIONAL-OF"
-                | "NUMERIC-DECIMAL-POINT" | "NUMERIC-THOUSANDS-SEPARATOR" | "NUMVAL" | "NUMVAL-F"
-                | "ORD" | "ORD-MAX" | "ORD-MIN" | "PI" | "PRESENT-VALUE" | "RANGE" | "REM"
-                | "SECONDS-FROM-FORMATTED-TIME" | "SECONDS-PAST-MIDNIGHT" | "SIN"
-                | "SQRT" | "STANDARD-COMPARE" | "STANDARD-DEVIATION" | "STORED-CHAR-LENGTH"
-                | "SUBSTITUTE" | "SUBSTITUTE-CASE" | "TAN" | "TEST-DATE-YYYYMMDD"
-                | "TEST-DAY-YYYYDDD" | "TEST-FORMATTED-DATETIME" | "TEST-NUMVAL" | "TEST-NUMVAL-C"
-                | "TEST-NUMVAL-F" | "UPPER-CASE" | "VARIANCE" | "WHEN-COMPILED"
-                | "YEAR-TO-YYYY" ->
-                  subst_function ~in_repo:true
-                    ((INTRINSIC_FUNC (String.uppercase_ascii w))::p', hd l::l', dgs) (tl p, tl l) *)
+                    ((WORD "FORMATTED_DATETIME")::p', hd l::l', dgs) (tl p, tl l)
                 | _ ->
                     let acc, pl = skip acc pl 1 in
                     aux acc pl
-                end
+              end
             | _ ->
               let acc, pl = skip acc pl 1 in
               aux acc pl
@@ -240,89 +222,57 @@ let preproc_n_combine_tokens ~source_format =
     else
       begin match p with
         | FUNCTION :: name :: _ ->
+          let p'_fun = FUNCTION :: p' in
+          let l'_fun = hd l :: l' in
+          let l_fun = tl l in
+          let p_fun = tl p in
           begin match name with
             | LENGTH ->
-              aux (LENGTH_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+              aux (LENGTH_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
             | RANDOM ->
-              aux (RANDOM_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+              aux (RANDOM_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
             | REVERSE ->
-              aux (REVERSE_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+              aux (REVERSE_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
             | SIGN ->
-              aux (SIGN_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+              aux (SIGN_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
             | SUM ->
-              aux (SUM_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+              aux (SUM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
             | WORD w ->
               begin match String.uppercase_ascii w with
                 | "LENGTH" ->
-                  aux (LENGTH_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+                  aux (LENGTH_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "RANDOM" ->
-                  aux (RANDOM_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+                  aux (RANDOM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "REVERSE" ->
-                  aux (REVERSE_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+                  aux (REVERSE_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "SIGN" ->
-                  aux (SIGN_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+                  aux (SIGN_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "SUM" ->
-                  aux (SUM_FUNC :: p', hd l +@+ (hd @@ tl l)::l', dgs) (tl (tl p), tl (tl l))
+                  aux (SUM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "TRIM" ->
-                  subst_function
-                    (TRIM_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (TRIM_FUNC::p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "NUMVAL-C" ->
-                  subst_function
-                    (NUMVAL_C_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (NUMVAL_C_FUNC::p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
                 | "LOCALE-DATE" ->
-                  subst_function
-                    (LOCALE_DATE_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (LOCALE_DATE_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
+                    (tl p_fun, tl l_fun)
                 | "LOCALE-TIME" ->
-                  subst_function
-                    (LOCALE_TIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (LOCALE_TIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
+                    (tl p_fun, tl l_fun)
                 | "LOCALE-TIME-FROM-SECONDS" ->
-                  subst_function
-                    (LOCALE_TIME_FROM_SECONDS_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (LOCALE_TIME_FROM_SECONDS_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
+                    (tl p_fun, tl l_fun)
                 | "FORMATTED-TIME" ->
-                  subst_function
-                    (FORMATTED_TIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
+                  subst_function (FORMATTED_TIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
+                    (tl p_fun, tl l_fun)
                 | "FORMATTED-DATETIME" ->
-                  subst_function
-                    (FORMATTED_DATETIME_FUNC::p', hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl @@ tl p, tl @@ tl l)
-                (* | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
-                | "BIT-OF" | "BIT-TO-CHAR" | "BOOLEAN-OF-INTEGER" | "BYTE-LENGTH" | "CHAR"
-                | "CHAR-NATIONAL" | "COMBINED-DATETIME" | "CONCAT" | "CONCATENATE"
-                | "CONTENT-LENGTH" | "CONTENT-OF" | "CONVERT" | "COS" | "CURRENCY-SYMBOL"
-                | "CURRENT-DATE" | "DATE-OF-INTEGER" | "DATE-TO-YYYYMMDD" | "DAY-OF-INTEGER"
-                | "DAY-TO-YYYYDDD" | "DISPLAY-OF" | "E" | "EXCEPTION-FILE" | "EXCEPTION-FILE-N"
-                | "EXCEPTION-LOCATION" | "EXCEPTION-LOCATION-N" | "EXCEPTION-STATEMENT"
-                | "EXCEPTION-STATUS" | "EXP" | "EXP10" | "FACTORIAL" | "FIND-STRING"
-                | "FORMATTED-CURRENT-DATE" | "FORMATTED-DATE" | "FRACTION-PART" | "HEX-OF"
-                | "HEX-TO-CHAR" | "HIGHEST-ALGEBRAIC" | "INTEGER" | "INTEGER-OF-BOOLEAN"
-                | "INTEGER-OF-DATE" | "INTEGER-OF-DAY" | "INTEGER-OF-FORMATTED-DATE"
-                | "INTEGER-PART" | "LENGTH-AN" | "LOCALE-COMPARE" | "LOG" | "LOG10" | "LOWER_CASE"
-                | "LOWEST-ALGEBRAIC" | "MAX" | "MEAN" | "MEDIAN" | "MIDRANGE" | "MIN" | "MOD"
-                | "MODULE-CALLER-ID" | "MODULE-DATE" | "MODULE-FORMATTED-DATE" | "MODULE-ID"
-                | "MODULE-NAME" | "MODULE-PATH" | "MODULE-SOURCE" | "MODULE-TIME"
-                | "MONETARY-DECIMAL-POINT" | "MONETARY-THOUSANDS-SEPARATOR" | "NATIONAL-OF"
-                | "NUMERIC-DECIMAL-POINT" | "NUMERIC-THOUSANDS-SEPARATOR" | "NUMVAL"
-                | "NUMVAL-F" | "ORD" | "ORD-MAX" | "ORD-MIN" | "PI" | "PRESENT-VALUE" | "RANGE"
-                | "REM" | "SECONDS-FROM-FORMATTED-TIME" | "SECONDS-PAST-MIDNIGHT" | "SIN" | "SQRT"
-                | "STANDARD-COMPARE" | "STANDARD-DEVIATION" | "STORED-CHAR-LENGTH" | "SUBSTITUTE"
-                | "SUBSTITUTE-CASE" | "TAN" | "TEST-DATE-YYYYMMDD" | "TEST-DAY-YYYYDDD"
-                | "TEST-FORMATTED-DATETIME" | "TEST-NUMVAL" | "TEST-NUMVAL-C" | "TEST-NUMVAL-F"
-                | "UPPER-CASE" | "VARIANCE" | "WHEN-COMPILED" | "YEAR-TO-YYYY" ->
-                  aux
-                    (INTRINSIC_FUNC (String.uppercase_ascii w) :: p',
-                      hd l +@+ (hd @@ tl l)::l', dgs)
-                    (tl (tl p), tl (tl l)) *)
+                  subst_function (FORMATTED_DATETIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
+                    (tl p_fun, tl l_fun)
                 | _ ->
-                  aux (FUNCTION :: p', hd l :: l', dgs) (tl p, tl l)
+                  aux (p'_fun, l'_fun, dgs) (p_fun, l_fun)
                 end
             | _ ->
-              aux (FUNCTION :: p', hd l :: l', dgs) (tl p, tl l)
+              aux (p'_fun, l'_fun, dgs) (p_fun, l_fun)
             end
         | tok :: _ ->
             aux (tok :: p', hd l :: l', dgs) (tl p, tl l)
@@ -574,9 +524,8 @@ let init
     ~exec_scanners
     ~memory
     words
-    intrinsics
   =
-  let lexer = Text_lexer.create intrinsics in
+  let lexer = Text_lexer.create () in
   let Grammar_contexts.{ context_tokens;
                          context_sensitive_tokens;
                          context_sensitive_tokens_unimplemented = _ } =
@@ -870,32 +819,24 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
       aux []
   | IntrinsicFunctionsSpecifier specs ->
     begin match specs with
-      | Some specs ->
+      | Some _ ->
         List.map (fun token ->
-            match ~&token with
-            | WORD w | WORD_IN_AREA_A w when List.mem w specs ->
-            begin
-              try List.assoc w Text_keywords.intrinsic_functions &@<- token
-              with Not_found ->
-                if EzCompat.StringSet.mem w (Text_lexer.available_intrinsics s.persist.lexer) then
-                  INTRINSIC_FUNC w &@<- token
-                else
-                  token
-            end
-            | _ -> token)
+              Fmt.epr "Trying with %a@." pp_token token;
+              try (Text_lexer.token_of_intrinsic_handle
+                @@ Text_lexer.as_intrinsic
+                @@ Text_lexer.handle_of_token s.persist.lexer ~&token) &@<- token
+              with _ ->
+                Fmt.epr "Not found;@.";
+                token)
       | None ->
         List.map (fun token ->
-          match ~&token with
-          | WORD w | WORD_IN_AREA_A w ->
-            begin
-              try List.assoc w Text_keywords.intrinsic_functions &@<- token
-              with Not_found ->
-                if EzCompat.StringSet.mem w (Text_lexer.available_intrinsics s.persist.lexer) then
-                  INTRINSIC_FUNC w &@<- token
-                else
-                  token
-            end
-          | _ -> token)
+              Fmt.epr "Trying with %a@." pp_token token;
+              try (Text_lexer.token_of_intrinsic_handle
+                @@ Text_lexer.as_intrinsic
+                @@ Text_lexer.handle_of_token s.persist.lexer ~&token) &@<- token
+              with _ ->
+                Fmt.epr "Not found;@.";
+                token)
     end
 
 (** Enable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
@@ -912,10 +853,14 @@ let disable_tokens state tokens outgoing_tokens =
 
 let intrinsic_functions_specifier (type m) ?intrinsics (state: m state) token tokens =
   let state = put_token_back state in
-  let state =
-    let lexer = Text_lexer.intrinsic_functions_specifier ?intrinsics state.persist.lexer in
-    { state with persist = { state.persist with lexer } }
-  in
+  List.iter
+    (fun intrinsic ->
+      let intrinsic = String.uppercase_ascii intrinsic in
+      Text_lexer.specify_intrinsic state.persist.lexer intrinsic)
+    begin match intrinsics with
+      | Some specs -> specs
+      | None -> List.of_seq @@ EzCompat.StringSet.to_seq Cobol_config.Reserved.intrinsic_functions
+      end;
   let tokens = token::tokens in
   let tokens = retokenize_after (IntrinsicFunctionsSpecifier intrinsics) state tokens in
   let token, tokens = List.hd tokens, List.tl tokens in

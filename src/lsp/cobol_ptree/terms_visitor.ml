@@ -35,7 +35,7 @@ class ['a] folder = object
   method fold_counter_kind: (counter_kind, 'a) fold = default
   method fold_length_of: (length_of_ term, 'a) fold = default
   method fold_inline_call: (inline_call, 'a) fold = default
-  method fold_leading_trailing: (leading_trailing, 'a) fold = default
+  method fold_trimming_tip: (trimming_tip, 'a) fold = default
   method fold_inline_invocation: (inline_invocation, 'a) fold = default
   method fold_effective_arg: (effective_arg, 'a) fold = default
   method fold_object_view: (object_view, 'a) fold = default
@@ -250,40 +250,40 @@ and fold_address (v: _ #folder) =
 
 and fold_inline_call (v: _ #folder) =
   handle v#fold_inline_call
-    ~continue:begin function
+    ~continue:begin fun c x -> match c with
       | CallFunc { call_fun; call_args } ->
-        fun x -> x
+        x
         >> fold_name' v call_fun
         >> fold_list ~fold:fold_effective_arg v call_args
-      | CallTrim { trimmed; position } ->
-        fun x -> x
-        >> fold_effective_arg v trimmed
-        >> fold_option ~fold:fold_leading_trailing v position
-      | CallLength { of_; physical } ->
-        fun x -> x
-        >> fold_ident_or_nonnum v of_
+      | CallTrim { arg; tip } ->
+        x
+        >> fold_effective_arg v arg
+        >> fold_option ~fold:fold_trimming_tip v tip
+      | CallLength { arg; physical } ->
+        x
+        >> fold_ident_or_nonnum v arg
         >> fold_bool v physical
       | CallNumvalC args->
-        fun x -> x
+        x
         >> fold_list ~fold:fold_ident_or_nonnum v args
       | CallLocaleDate { datetime; locale } ->
-        fun x -> x
+        x
         >> fold_effective_arg v datetime
         >> fold_option ~fold:fold_qualname v locale
       | CallLocaleTime { datetime; locale } ->
-        fun x -> x
+        x
         >> fold_effective_arg v datetime
         >> fold_option ~fold:fold_qualname v locale
       | CallLocaleTimeFromSeconds { datetime; locale } ->
-        fun x -> x
+        x
         >> fold_effective_arg v datetime
         >> fold_option ~fold:fold_qualname v locale
       | CallFormattedDatetime { args; system_offset } ->
-        fun x -> x
+        x
         >> fold_list ~fold:fold_effective_arg v args
         >> fold_bool v system_offset
       | CallFormattedTime { args; system_offset } ->
-        fun x -> x
+        x
         >> fold_list ~fold:fold_effective_arg v args
         >> fold_bool v system_offset
     end
@@ -337,9 +337,8 @@ and fold_expr (v: _ #folder) =
 and fold_expr' (v: _ #folder) =
   handle' v#fold_expr' ~fold:fold_expr v
 
-and fold_leading_trailing (_: _ #folder) : leading_trailing -> 'a -> 'a = function
-  | Leading
-  | Trailing -> Fun.id
+and fold_trimming_tip (v: _ #folder) : trimming_tip -> 'a -> 'a =
+  leaf v#fold_trimming_tip
 
 and fold_ident_or_literal (v: _ #folder) : ident_or_literal -> 'a -> 'a = function
   | Address _

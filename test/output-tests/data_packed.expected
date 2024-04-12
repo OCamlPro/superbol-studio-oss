@@ -740,6 +740,86 @@ data_packed.at-2230-prog.cob:10.38-10.43:
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:7277:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:12320:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:20531:0
+data_packed.at-20531-prog.cob:8.15:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                  ^
+   9   
+  10          DATA DIVISION.
+>> Hint: Missing ALL
+
+data_packed.at-20531-prog.cob:8.16-8.22:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                   ^^^^^^
+   9   
+  10          DATA DIVISION.
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:28740:0
+data_packed.at-28740-prog2.cob:8.15:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                  ^
+   9   
+  10          DATA DIVISION.
+>> Hint: Missing ALL
+
+data_packed.at-28740-prog2.cob:8.16-8.22:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                   ^^^^^^
+   9   
+  10          DATA DIVISION.
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:34793:0
+data_packed.at-34793-prog.cob:8.15:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                  ^
+   9   
+  10          DATA DIVISION.
+>> Hint: Missing ALL
+
+data_packed.at-34793-prog.cob:8.16-8.22:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                   ^^^^^^
+   9   
+  10          DATA DIVISION.
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:40840:0
+data_packed.at-40840-prog2.cob:8.15:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                  ^
+   9   
+  10          DATA DIVISION.
+>> Hint: Missing ALL
+
+data_packed.at-40840-prog2.cob:8.16-8.22:
+   5          ENVIRONMENT DIVISION.
+   6          CONFIGURATION SECTION.
+   7          REPOSITORY.
+   8 >        FUNCTION HEX-OF INTRINSIC.
+----                   ^^^^^^
+   9   
+  10          DATA DIVISION.
+>> Error: Invalid syntax
+
