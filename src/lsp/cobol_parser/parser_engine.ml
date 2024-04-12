@@ -230,7 +230,7 @@ let report_syntax_hints_n_error ps
 
 (* --- *)
 
-let leaving_context { preproc = { tokzr; _ }; _ } prod =
+let leaving_context_on_reduction { preproc = { tokzr; _ }; _ } prod =
   match Tokzr.top_context tokzr with
   | None -> false
   | Some top_ctx ->
@@ -240,19 +240,34 @@ let leaving_context { preproc = { tokzr; _ }; _ } prod =
         | Some ctx -> ctx = top_ctx
         | _ -> false
 
+let leaving_context_on_shift { preproc = { tokzr; _ }; _ } e1 e2 =
+  match Tokzr.top_context tokzr with
+  | None -> false
+  | Some top_ctx ->
+      Grammar_context.context_sinks_on_shift' top_ctx
+        (Grammar_interpr.current_state_number e1)
+        (Grammar_interpr.current_state_number e2)
+
 let pop_context ({ preproc = { tokzr; _ }; _ } as ps) tokens =
   let tokzr, tokens = Tokzr.pop_context tokzr tokens in
   update_tokzr ps tokzr, tokens
 
-let on_shift ({ preproc = { tokzr; _ }; _ } as ps) tokens env =
-  let tokzr, tokens = Tokzr.push_contexts tokzr tokens @@
+
+let on_shift ps tokens e1 e2 =
+  let ps, tokens =
+    if leaving_context_on_shift ps e1 e2
+    then pop_context ps tokens
+    else ps, tokens
+  in
+  let tokzr, tokens =
+    Tokzr.push_contexts ps.preproc.tokzr tokens @@
     Grammar_context.contexts_for_state_num @@
-    Grammar_interpr.current_state_number env
+    Grammar_interpr.current_state_number e2
   in
   update_tokzr ps tokzr, tokens
 
 let on_reduction ps tokens prod =
-  if leaving_context ps prod
+  if leaving_context_on_reduction ps prod
   then pop_context ps tokens
   else ps, tokens
 
@@ -261,8 +276,8 @@ let on_reduction ps tokens prod =
     changes to the context stack. *)
 let seesaw_context_stack ps tokens recovery_operations =
   List.fold_left begin fun (ps, tokens) -> function
-    | Grammar_recovery.Env e -> on_shift ps tokens e
-    | Grammar_recovery.Prod p -> on_reduction ps tokens p
+    | Grammar_recovery.Shift (e1, e2) -> on_shift ps tokens e1 e2
+    | Grammar_recovery.Reduce p -> on_reduction ps tokens p
   end (ps, tokens) recovery_operations
 
 (* --- *)
@@ -316,8 +331,8 @@ and ('a, 'm) interim_stage =
 let rec normal ps tokens = function
   | Grammar_interpr.InputNeeded env ->
       Trans (ps, tokens, env)
-  | Shifting (_e1, e2, _) as c ->
-      let ps, tokens = on_shift ps tokens e2 in
+  | Shifting (e1, e2, _) as c ->
+      let ps, tokens = on_shift ps tokens e1 e2 in
       normal ps tokens @@ Grammar_interpr.resume c
   | Accepted v ->
       accept ps v
@@ -337,19 +352,24 @@ and on_interim_stage ({ prev_limit; _ } as ps, tokens, env) =
 and check ps token tokens env = function
   | Grammar_interpr.HandlingError env ->
       error ps token tokens env
-  | AboutToReduce (_, prod) when leaving_context ps prod ->
+  | AboutToReduce (_, prod) when leaving_context_on_reduction ps prod ->
       (* Reoffer token *)
       let ps, tokens = put_token_back ps token tokens in
       let ps, tokens = pop_context ps tokens in
       normal ps tokens @@ Grammar_interpr.input_needed env
+  (* CHECKME: whether retokenizing is needed on shifts. *)
+  (* | Shifting (e1, e2, _) when leaving_context_on_shift ps e1 e2 -> *)
+  (*     let ps, tokens = put_token_back ps token tokens in *)
+  (*     let ps, tokens = pop_context ps tokens in *)
+  (*     normal ps tokens @@ Grammar_interpr.input_needed env *)
   | AboutToReduce (_, prod) as c ->
       (* NB: Here, we assume semantic actions do not raise any exception; maybe
          that's a tad too optimistic; if they did we may need to report that. *)
       let c = Grammar_interpr.resume c in
       let ps, token, tokens = after_reduction ps token tokens prod c in
       check ps token tokens env c
-  | Shifting (_e1, e2, _) as c ->
-      let ps, tokens = on_shift ps tokens e2 in
+  | Shifting (e1, e2, _) as c ->
+      let ps, tokens = on_shift ps tokens e1 e2 in
       check ps token tokens env @@ Grammar_interpr.resume c
   | c ->
       normal ps tokens c

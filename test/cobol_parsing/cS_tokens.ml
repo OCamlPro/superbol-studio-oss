@@ -133,3 +133,23 @@ let%expect_test "context-sensitive-tokens-lower-case" =
     DIGITS[01], WORD[X], CONSTANT, BYTE-LENGTH, WORD[BYTE-LENGTH], ., PROCEDURE,
     DIVISION, ., EOF
 |}];;
+
+let%expect_test "context-sensitive-tokens-weird-exit" =
+  Parser_testing.show_parsed_tokens {|
+       PROGRAM-ID.        prog.
+       DATA               DIVISION.
+       WORKING-STORAGE    SECTION.
+       01  X              CONSTANT IS GLOBAL 666.
+       01  Y              CONSTANT 999.
+       77  BYTE-LENGTH    PIC X VALUE "A".
+       PROCEDURE          DIVISION.
+           DISPLAY BYTE-LENGTH.
+           STOP RUN.
+  |};
+  [%expect {|
+    PROGRAM-ID, ., INFO_WORD[prog], ., DATA, DIVISION, ., WORKING-STORAGE,
+    SECTION, ., DIGITS[01], WORD[X], CONSTANT, IS_GLOBAL, DIGITS[666], .,
+    DIGITS[01], WORD[Y], CONSTANT, DIGITS[999], ., DIGITS[77], WORD[BYTE-LENGTH],
+    PICTURE, PICTURE_STRING[X], VALUE, "A", ., PROCEDURE, DIVISION, ., DISPLAY,
+    WORD[BYTE-LENGTH], ., STOP, RUN, ., EOF
+|}];;

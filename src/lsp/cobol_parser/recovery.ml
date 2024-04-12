@@ -69,8 +69,8 @@ struct
       assumed: assumption list;
     }
   and 'a operation =
-    | Env of 'a Parser.env
-    | Prod of Parser.production
+    | Shift of 'a Parser.env * 'a Parser.env
+    | Reduce of Parser.production
   and assumption =
     {
       show: Pretty.delayed option;
@@ -101,11 +101,16 @@ struct
 
   let feed_token token visited env =
     let rec aux visited = function
-      | Parser.HandlingError _ | Rejected -> `Fail
-      | Accepted v -> `Accept v
-      | Shifting (e, _, _) as c -> aux (Env e :: visited) (Parser.resume c)
-      | AboutToReduce (_, p) as c -> aux (Prod p :: visited) (Parser.resume c)
-      | InputNeeded env as c -> `Recovered (c, env, visited)
+      | Parser.HandlingError _ | Rejected ->
+          `Fail
+      | Accepted v ->
+          `Accept v
+      | Shifting (e1, e2, _) as c ->
+          aux (Shift (e1, e2) :: visited) (Parser.resume c)
+      | AboutToReduce (_, p) as c ->
+          aux (Reduce p :: visited) (Parser.resume c)
+      | InputNeeded env as c ->
+          `Recovered (c, env, visited)
     in
     aux visited (Parser.offer (T.inj (T.InputNeeded env)) token)
 
@@ -117,8 +122,8 @@ struct
       | x :: xs -> match feed_token token x.visited x.env with
         | `Fail ->
             aux xs
-        | `Recovered (c, e, visited) ->
-            `Ok (c, x.env, List.rev (Env e :: visited), List.rev x.assumed)
+        | `Recovered (c, _e, visited) ->
+            `Ok (c, x.env, List.rev visited, List.rev x.assumed)
         | `Accept v ->
             match aux xs with
             | `Fail -> `Accept (v, List.rev x.assumed)
@@ -154,11 +159,9 @@ struct
             List.fold_left aux path actions
         | R prod ->
             let prod = Parser.find_production prod in
-            Parser.force_reduction prod env,
-            Prod prod :: visited,
-            assumed
+            Parser.force_reduction prod env, Reduce prod :: visited, assumed
         | S (N _ as sym) ->
-            let env =
+            let env' =
               Parser.feed sym endp (Recovery.default_value sym) endp env
             and show = match Recovery.print_symbol @@ X sym with
               | "" -> None
@@ -168,7 +171,9 @@ struct
                denotes a non-terminal that may be empty and is therefore a
                benign assumption. *)
             let benign = show = None in
-            env, Env env :: visited, { show; pos = endp; benign } :: assumed
+            env',
+            Shift (env, env') :: visited,
+            { show; pos = endp; benign } :: assumed
         | S (T t as sym) ->
             let v = Recovery.default_value sym in
             let token = Recovery.token_of_terminal t v in
