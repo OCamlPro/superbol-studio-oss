@@ -57,6 +57,29 @@ let combined_tokens =
     NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
 
+let is_intrinsic_token = function
+  | BYTE_LENGTH_FUNC
+  | CHAR_FUNC
+  | CONTENT_OF_FUNC
+  | CONVERT_FUNC
+  | CURRENT_DATE_FUNC
+  | FORMATTED_DATETIME_FUNC
+  | FORMATTED_TIME_FUNC
+  | LENGTH_FUNC
+  | LOCALE_DATE_FUNC
+  | LOCALE_TIME_FROM_SECONDS_FUNC
+  | LOCALE_TIME_FUNC
+  | NUMVAL_C_FUNC
+  | RANDOM_FUNC
+  | RANGE_FUNC
+  | REVERSE_FUNC
+  | SIGN_FUNC
+  | SUM_FUNC
+  | TRIM_FUNC
+  | WHEN_COMPILED_FUNC
+  | INTRINSIC_FUNC _ -> true
+  | _ -> false
+
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
                                                 runtime_repr } =
   if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
@@ -106,26 +129,8 @@ let pp_token: token Pretty.printer = fun ppf ->
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
     | INTERVENING_ c -> print "<%c>" c
-    | BYTE_LENGTH_FUNC
-    | CHAR_FUNC
-    | CONTENT_OF_FUNC
-    | CONVERT_FUNC
-    | CURRENT_DATE_FUNC
-    | FORMATTED_DATETIME_FUNC
-    | FORMATTED_TIME_FUNC
-    | LENGTH_FUNC
-    | LOCALE_DATE_FUNC
-    | LOCALE_TIME_FROM_SECONDS_FUNC
-    | LOCALE_TIME_FUNC
-    | NUMVAL_C_FUNC
-    | RANDOM_FUNC
-    | RANGE_FUNC
-    | REVERSE_FUNC
-    | SIGN_FUNC
-    | SUM_FUNC
-    | TRIM_FUNC
-    | WHEN_COMPILED_FUNC
-    | INTRINSIC_FUNC _ -> print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
+    | tok when is_intrinsic_token tok ->
+        print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 
@@ -629,6 +634,26 @@ type lexer_update =
 let tokens_of_string' { persist = { lexer; _ }; _ } =
   Text_lexer.tokens_of_string' lexer
 
+let reword_intrinsics s : tokens -> tokens =
+  (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
+     [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
+     unlikely). *)
+  let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let rec aux rev_prefix suffix =
+    match suffix with
+    | [] ->
+        List.rev rev_prefix
+    | ({ payload = k1_token; _ } as k1) ::
+      ({ payload = k2_token; _ } as k2) :: tl
+      when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
+        aux (EzList.tail_map distinguish_words @@
+             tokens_of_string' s (keyword_of_token k2_token &@<- k2) @
+             k1 :: rev_prefix) tl
+    | k1 :: tl ->
+        aux (k1 :: rev_prefix) tl
+  in
+  aux []
+
 (** Retokenizes the tokens {e after} the given operation has been perfomed on
     {!module:Text_lexer}. *)
 (* TODO: Find whether everything related to Area A and comma-retokenization
@@ -639,11 +664,13 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
   | Disabled_keywords tokens
     when Text_lexer.TokenHandles.is_empty tokens ->
       Fun.id
-  | Enabled_keywords _ ->
+  | Enabled_keywords _
+  | Enabled_intrinsics ->          (* <- some words may have become intrinsics *)
       List.concat_map begin fun token -> match ~&token with
         | WORD_IN_AREA_A w
         | WORD w ->
-            List.map distinguish_words @@ tokens_of_string' s (w &@<- token)
+            EzList.tail_map distinguish_words @@
+            tokens_of_string' s (w &@<- token)
         | _ ->
             [token]
       end
@@ -656,10 +683,8 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
           | false, w -> WORD w &@<- token
         else token
       end
-  | Enabled_intrinsics ->
-      Fun.id                                                          (* TODO *)
   | Disabled_intrinsics ->
-      Fun.id                                                          (* TODO *)
+      reword_intrinsics s
   | CommaBecomesDecimalPoint ->
       (* This may only happen when the comma becomes a decimal separator in
          numerical literals, instead of periods.  Before this (irreversible)
