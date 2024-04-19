@@ -25,10 +25,11 @@ module CU = Cobol_data.Compilation_unit
 module CUs = CU.SET
 
 let name_of_compilation_unit = function
-  | Program { program_name = name; _ } -> Cobol_ptree.program_name ~&name
+  | Program { program_name = name; _ }
   | Function { function_name = name; _ }
   | ClassDefinition { class_name = name; _ }
-  | InterfaceDefinition { interface_name = name; _ } -> ~&name
+  | InterfaceDefinition { interface_name = name; _ } ->
+      Cobol_ptree.program_name ~&name
 
 let register_cu ~cu_name ~cu_loc ~cu_env ~cu_wss (parents, progs) =
   let prog = CU.{ cu_name; cu_loc; cu_env; cu_wss } in

@@ -21,13 +21,11 @@ module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
 
 let name_of_compilation_unit: Cobol_ptree.compilation_unit -> _ = function
-  | Program { program_name = name; _ } ->
-    let loc = ~@ name in
-    let name = Pretty.to_string "%a" Cobol_ptree.pp_name_or_literal ~&name in
-    name &@ loc
+  | Program { program_name = name; _ }
   | Function { function_name = name; _ }
   | ClassDefinition { class_name = name; _ }
-  | InterfaceDefinition { interface_name = name; _ } -> name
+  | InterfaceDefinition { interface_name = name; _ } ->
+      Pretty.to_string "%a" Cobol_ptree.pp_name_or_literal ~&name &@<- name
 
 type acc =
   {

@@ -314,7 +314,7 @@ let identification_division_header ==
 program_definition [@cost 0]:
  | pd = program_definition_no_end
    pdl = loc(program_definition)* (* COB2002: PROCEDURE DIVISION must be present *)
-   END PROGRAM ep = loc(infoword_or_literal)? "."
+   END PROGRAM ep = unit_name? "."
    { match pd.program_level with
        | ProgramDefinition { mode;
                              has_identification_division_header;
@@ -360,7 +360,7 @@ program_prototype [@cost 999]:
    edo = ro(loc(environment_division))
    ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
-   END PROGRAM ep = loc(infoword_or_literal)? "."
+   END PROGRAM ep = unit_name? "."
    { let _, (program_name, program_as) = pid in
      { program_name;
        program_as;
@@ -377,7 +377,7 @@ function_unit [@cost 999]:
    edo = ro(loc(environment_division))
    ddo = loc(data_division)
    pdo = ro(loc(procedure_division))
-   END FUNCTION ef = name "."
+   END FUNCTION ep = unit_name "."
    { let _, (name, as_, is_proto) = fid in
      { function_name = name;
        function_as = as_;
@@ -386,7 +386,7 @@ function_unit [@cost 999]:
        function_env = edo;
        function_data = build_data_division ddo;
        function_proc = pdo;
-       function_end_name = ef } } (* TODO: shoudn't we just check ef == name? *)
+       function_end_name = ep } }
 
 class_definition [@cost 999]:
  | cid = class_identification
@@ -394,7 +394,7 @@ class_definition [@cost 999]:
    edo = ro(loc(environment_division))
    fdo = io(factory_definition) (* Note: inline to avoid conflict *)
    ido = ro(instance_definition)
-   END CLASS ec = name "."
+   END CLASS ec = unit_name "."
    { let _, (class_name, class_as, class_final,
              class_inherits, class_usings) = cid in
      { class_name;
@@ -439,7 +439,7 @@ interface_definition [@cost 999]:
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
    pdo = ro(loc(object_procedure_division))
-   END INTERFACE ei = name "."
+   END INTERFACE ei = unit_name "."
    { let _, (interface_name, interface_as,
              interface_inherits, interface_usings) = iid in
      { interface_name;
@@ -493,8 +493,10 @@ let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
 let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
 
+let unit_name := loc(infoword_or_literal)
+
 let program_id_header_prefix ==
-  | PROGRAM_ID; "."?; i = loc(infoword_or_literal); x = as__strlit_; { i, x }
+  | PROGRAM_ID; "."?; i = unit_name; x = as__strlit_; { i, x }
 
 let infoword_or_literal :=
  | i = loc(info_word); { Name i }
@@ -527,12 +529,12 @@ let program_prototype_id_paragraph :=                              (* +COB2002 *
   | ~ = program_id_header_prefix; IS?; PROTOTYPE; "."; < >
 
 let function_id_paragraph :=
-  | FUNCTION_ID; "."; i = name; slo = as__strlit_;
+  | FUNCTION_ID; "."?; i = unit_name; slo = as__strlit_;
     proto = ibo(IS?; PROTOTYPE; {}); ".";                         (* +COB2002 *)
     { i, slo, proto }
 
 let class_id_paragraph :=                                          (* +COB2002 *)
-  | CLASS_ID; "."; i = name; slo = as__strlit_; f = bo(IS?; FINAL; {});
+  | CLASS_ID; "."; i = unit_name; slo = as__strlit_; f = bo(IS?; FINAL; {});
     il1 = lo(INHERITS; FROM?; il = names; { il });
     il2 = lo(USING; il = names; { il }); ".";
     { i, slo, f, il1, il2 }
@@ -544,7 +546,7 @@ let object_paragraph [@context object_paragraph] :=                (* +COB2002 *
   | OBJECT; "."; ~ = lo(IMPLEMENTS; ~ = names; "."; < >); < >
 
 let interface_id_paragraph :=                                      (* +COB2002 *)
-  | INTERFACE_ID; "."; i = name; slo = as__strlit_;
+  | INTERFACE_ID; "."; i = unit_name; slo = as__strlit_;
     il1 = lo(INHERITS; FROM?; il = names; { il });
     il2 = lo(USING; il = names; { il }); ".";
     { i, slo, il1, il2 }
@@ -1713,7 +1715,7 @@ let object_reference_kind :=
   | f = bo(FACTORY; OF?; {}); ACTIVE_CLASS;
     { ActiveClass { factory_of = f } }
   | f = bo(FACTORY; OF?; {}); i = name; o = bo(ONLY);
-    { Name { class_or_interface_name = i; factory_of = f; only = o; } }
+    { NamedClass { class_or_interface_name = i; factory_of = f; only = o; } }
 
 let validation_clause :=
   | ~ = class_clause;           <Class>

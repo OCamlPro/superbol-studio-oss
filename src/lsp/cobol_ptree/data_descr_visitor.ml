@@ -257,7 +257,7 @@ let fold_object_reference_kind (v: _ #folder) =
     ~continue:begin function
       | ActiveClass _ ->
           Fun.id                                             (* consider leaf *)
-      | Name { class_or_interface_name; _ } ->
+      | NamedClass { class_or_interface_name; _ } ->
           fold_name' v class_or_interface_name
     end
 

@@ -81,12 +81,22 @@ syn_functions.at-198-prog.cob:16.11-16.15:
   18              .
 >> Error: Invalid syntax
 
-syn_functions.at-198-prog.cob:16.27-16.29:
+syn_functions.at-198-prog.cob:16.24:
   13          01  ret PIC X.
   14              
   15          PROCEDURE DIVISION RETURNING ret.
   16 >            MOVE FUNCTION x TO ret
-----                              ^^
+----                           ^
+  17              MOVE FUNCTION x TO ret
+  18              .
+>> Hint: Missing <word>
+
+syn_functions.at-198-prog.cob:16.25-16.26:
+  13          01  ret PIC X.
+  14              
+  15          PROCEDURE DIVISION RETURNING ret.
+  16 >            MOVE FUNCTION x TO ret
+----                            ^
   17              MOVE FUNCTION x TO ret
   18              .
 >> Error: Invalid syntax

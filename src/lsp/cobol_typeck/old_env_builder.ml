@@ -88,6 +88,7 @@ let initialize_prog_env =
 (* TODO: avoid returning `options with_diags` *)
 let for_compilation_unit =
   let build_env ?parent_env name env =
+    let name = Cobol_ptree.program_name' name in
     let prog_env = Cobol_data.PROG_ENV.make ?parent:parent_env ~&name in
     Visitor.skip @@
     DIAGS.map_result ~f:Option.some (initialize_prog_env env prog_env)
@@ -95,12 +96,12 @@ let for_compilation_unit =
   let env_builder = object
     inherit [_] Cobol_ptree.Visitor.folder
     method! fold_program_unit { program_name = name; program_env = env; _ } =
-      let name = Cobol_ptree.program_name' name in
       acc_result @@ fun parent_env -> build_env name env ?parent_env
     method! fold_function_unit f =
       acc_result @@ fun _ -> build_env f.function_name f.function_env
     method! fold_method_definition m =
-      acc_result @@ fun _ -> build_env m.method_name m.method_env
+      acc_result @@ fun _ -> build_env (Name m.method_name &@<-
+                                        m.method_name) m.method_env
     method! fold_class_definition' { payload = c; _ } =
       acc_result @@ fun _ -> build_env c.class_name c.class_env
     method! fold_interface_definition' { payload = i; _ } =
