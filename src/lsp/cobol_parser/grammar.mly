@@ -4079,10 +4079,9 @@ let stop_run_returning_body :=
   | ~ = with_status; <StopReturningStatus>
 
 let stop_with_arg :=
-  | ~ = qualident; <StopWithQualIdent>      (* ~COB85, -COB2002 *)
-  | ZERO; { StopWithLiteral (NumFig Zero) }
-  | SPACE; { StopWithLiteral (Fig Space) }
-  | QUOTE; { StopWithLiteral (Fig Quote) }
+  | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
+  | ~ = literal; <StopWithLiteral> (* obsolete in COB85 (but MF allows ZERO,
+                                      SPACE & QUOTE) *)
 
 let with_status :=
   | WITH; status_kind = status_kind;
