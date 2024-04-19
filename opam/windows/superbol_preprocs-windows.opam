@@ -49,6 +49,7 @@ depends: [
   "dune" {>= "2.8.0"}
   "pretty-windows" {= version}
   "cobol_preproc-windows" {= version}
+  "cobol_parser-windows" {= version}
   "cobol_common-windows" {= version}
   "odoc" {with-doc}
 ]
