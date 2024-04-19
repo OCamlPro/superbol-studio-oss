@@ -362,7 +362,7 @@ let post_production ps token tokens prod env =
 let after_reduction ps token tokens prod = function
   | Grammar_interpr.HandlingError env
   | AboutToReduce (env, _)
-  | Shifting (_, env, _) ->
+  | Shifting (env, _, _) ->
       post_production ps token tokens prod env
   | _ ->
       ps, token, tokens
