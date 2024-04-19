@@ -2286,8 +2286,7 @@ let intrinsic_call ==
   | FORMATTED_TIME_FUNC; ~ = parens(formatted_func_args);
     <CallFormattedDatetime>
 
-let unhandled_custom_intrinsic
-      [@recover dummy_name] [@symbol "<intrinsic function name>"] :=
+let unhandled_custom_intrinsic :=
   | ~ = INTRINSIC_FUNC;     < >
   |     BYTE_LENGTH_FUNC;   { BYTE_LENGTH   }
   |     CHAR_FUNC;          { CHAR          }
