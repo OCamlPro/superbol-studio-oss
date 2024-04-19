@@ -77,6 +77,131 @@ type alphanum_repr =
   | Null_terminated_bytes
 [@@deriving ord]
 
+type intrinsic_name =
+  | ABS
+  | ABSOLUTE_VALUE
+  | ACOS
+  | ANNUITY
+  | ASIN
+  | ATAN
+  | BASECONVERT
+  | BIT_OF
+  | BIT_TO_CHAR
+  | BOOLEAN_OF_INTEGER
+  | BYTE_LENGTH
+  | CHAR
+  | CHAR_NATIONAL
+  | COMBINED_DATETIME
+  | CONCAT
+  | CONCATENATE
+  | CONTENT_LENGTH
+  | CONTENT_OF
+  | CONVERT
+  | COS
+  | CURRENCY_SYMBOL
+  | CURRENT_DATE
+  | DATE_OF_INTEGER
+  | DATE_TO_YYYYMMDD
+  | DAY_OF_INTEGER
+  | DAY_TO_YYYYDDD
+  | DISPLAY_OF
+  | E
+  | EXCEPTION_FILE
+  | EXCEPTION_FILE_N
+  | EXCEPTION_LOCATION
+  | EXCEPTION_LOCATION_N
+  | EXCEPTION_STATEMENT
+  | EXCEPTION_STATUS
+  | EXP
+  | EXP10
+  | FACTORIAL
+  | FIND_STRING
+  | FORMATTED_CURRENT_DATE
+  | FORMATTED_DATE
+  | FORMATTED_DATETIME
+  | FORMATTED_TIME
+  | FRACTION_PART
+  | HEX_OF
+  | HEX_TO_CHAR
+  | HIGHEST_ALGEBRAIC
+  | INTEGER
+  | INTEGER_OF_BOOLEAN
+  | INTEGER_OF_DATE
+  | INTEGER_OF_DAY
+  | INTEGER_OF_FORMATTED_DATE
+  | INTEGER_PART
+  | LENGTH
+  | LENGTH_AN
+  | LOCALE_COMPARE
+  | LOCALE_DATE
+  | LOCALE_TIME
+  | LOCALE_TIME_FROM_SECONDS
+  | LOG
+  | LOG10
+  | LOWER_CASE
+  | LOWEST_ALGEBRAIC
+  | MAX
+  | MEAN
+  | MEDIAN
+  | MIDRANGE
+  | MIN
+  | MOD
+  | MODULE_CALLER_ID
+  | MODULE_DATE
+  | MODULE_FORMATTED_DATE
+  | MODULE_ID
+  | MODULE_NAME
+  | MODULE_PATH
+  | MODULE_SOURCE
+  | MODULE_TIME
+  | MONETARY_DECIMAL_POINT
+  | MONETARY_THOUSANDS_SEPARATOR
+  | NATIONAL_OF
+  | NUMERIC_DECIMAL_POINT
+  | NUMERIC_THOUSANDS_SEPARATOR
+  | NUMVAL
+  | NUMVAL_C
+  | NUMVAL_F
+  | ORD
+  | ORD_MAX
+  | ORD_MIN
+  | PI
+  | PRESENT_VALUE
+  | RANDOM
+  | RANGE
+  | REM
+  | REVERSE
+  | SECONDS_FROM_FORMATTED_TIME
+  | SECONDS_PAST_MIDNIGHT
+  | SIGN
+  | SIN
+  | SQRT
+  | STANDARD_COMPARE
+  | STANDARD_DEVIATION
+  | STORED_CHAR_LENGTH
+  | SUBSTITUTE
+  | SUBSTITUTE_CASE
+  | SUM
+  | TAN
+  | TEST_DATE_YYYYMMDD
+  | TEST_DAY_YYYYDDD
+  | TEST_FORMATTED_DATETIME
+  | TEST_NUMVAL
+  | TEST_NUMVAL_C
+  | TEST_NUMVAL_F
+  | TRIM
+  | UPPER_CASE
+  | VARIANCE
+  | WHEN_COMPILED
+  | YEAR_TO_YYYY
+[@@deriving ord, show { with_path = false }]
+
+let show_intrinsic_name i =
+  String.map (function '_' -> '-' | c -> c) (show_intrinsic_name i)
+
+let pp_intrinsic_name ppf i =
+  Pretty.string ppf (show_intrinsic_name i)
+
 type alphanum =
   {
     str: string;
@@ -268,11 +393,51 @@ and class_ =
   | ClassNumeric
 
 
-and inline_call =                               (* in ancient terms: funident *)
+and inline_call =                   (* in ancient terms: funident *)
+  | CallFunc of
+      {                  (* name to avoid clash with call statement *)
+        func: name with_loc;
+        args: effective_arg list;
+      }
+  | CallGenericIntrinsic of
+      {
+        func: intrinsic_name with_loc;
+        args: effective_arg list;
+      }
+  (* TODO: for all the ones below: store the intrinsic name with location;
+     possibly a CallCustomIntrinsic is in order. *)
+  | CallTrim of
+      {
+        arg: effective_arg;
+        tip: trimming_tip option;
+      }
+  | CallLength of
+      {
+        arg: ident_or_nonnum;
+        physical: bool;
+      }
+  | CallNumvalC of ident_or_nonnum list
+  | CallLocaleDate of locale_func_args
+  | CallLocaleTime of locale_func_args
+  | CallLocaleTimeFromSeconds of locale_func_args
+  | CallFormattedDatetime of formatted_func_args
+  | CallFormattedTime of formatted_func_args
+
+and formatted_func_args =
   {
-    call_fun: name with_loc;
-    call_args: effective_arg list;
+    formatted_func_args: effective_arg list;
+    formatted_func_system_offset: bool;
   }
+
+and locale_func_args =
+  {
+    locale_func_args: effective_arg;
+    locale_func_locale: qualname option;
+  }
+
+and trimming_tip =
+  | Leading
+  | Trailing
 
 and effective_arg =                  (* TODO: could be an [expression option] *)
   | ArgExpr of expression (* Regroup identifiers, literals and arithmetic expressions *)
@@ -560,11 +725,57 @@ module COMPARE = struct
     compare_struct (compare_term a b) @@
     lazy (compare_struct (compare_term c d) @@
           lazy (List.compare compare_effective_arg e f))
-  and compare_inline_call
-      { call_fun = a; call_args = c }
-      { call_fun = b; call_args = d } =
-    compare_struct (compare_with_loc compare_name a b) @@
-    lazy (List.compare compare_effective_arg c d)
+  and compare_inline_call x y = match x, y with
+    | CallFunc { func = a; args = c }, CallFunc { func = b; args = d } ->
+        compare_struct (compare_with_loc compare_name a b) @@
+        lazy (List.compare compare_effective_arg c d)
+    | CallGenericIntrinsic { func = a; args = c },
+      CallGenericIntrinsic { func = b; args = d } ->
+        compare_struct (compare_with_loc compare_intrinsic_name a b) @@
+        lazy (List.compare compare_effective_arg c d)
+    | CallTrim { arg = a; tip = c }, CallTrim { arg = b; tip = d } ->
+        compare_struct (compare_effective_arg a b) @@
+        lazy (Option.compare compare_trimming_tip c d)
+    | CallLength { arg = a; physical = c }, CallLength { arg = b; physical = d } ->
+        compare_struct (compare_term a b) @@
+        lazy (Bool.compare c d)
+    | CallNumvalC a, CallNumvalC b ->
+        List.compare compare_term a b
+    | CallLocaleDate a, CallLocaleDate b
+    | CallLocaleTime a, CallLocaleTime b
+    | CallLocaleTimeFromSeconds a, CallLocaleTimeFromSeconds b ->
+        compare_locale_func_args a b
+    | CallFormattedDatetime a, CallFormattedDatetime b
+    | CallFormattedTime a, CallFormattedTime b ->
+        compare_formatted_func_args a b
+    | CallFunc _, _                  -> -1
+    | _, CallFunc _                  ->  1
+    | CallGenericIntrinsic _, _      -> -1
+    | _, CallGenericIntrinsic _      ->  1
+    | CallTrim _, _                  -> -1
+    | _, CallTrim _                  ->  1
+    | CallLength _, _                -> -1
+    | _, CallLength _                ->  1
+    | CallNumvalC _ , _              -> -1
+    | _ , CallNumvalC _              ->  1
+    | CallLocaleDate _, _            -> -1
+    | _, CallLocaleDate _            ->  1
+    | CallLocaleTime _, _            -> -1
+    | _, CallLocaleTime _            ->  1
+    | CallLocaleTimeFromSeconds _, _ -> -1
+    | _, CallLocaleTimeFromSeconds _ ->  1
+    | CallFormattedDatetime _, _     -> -1
+    | _, CallFormattedDatetime _     ->  1
+  and compare_locale_func_args
+      { locale_func_args = a; locale_func_locale = c }
+      { locale_func_args = b; locale_func_locale = d } =
+    compare_struct (compare_effective_arg a b) @@
+    lazy (Option.compare compare_term c d)
+  and compare_formatted_func_args
+      { formatted_func_args = a; formatted_func_system_offset = c }
+      { formatted_func_args = b; formatted_func_system_offset = d } =
+    compare_struct (List.compare compare_effective_arg a b) @@
+    lazy (Bool.compare c d)
   and compare_effective_arg x y = match x, y with
     | ArgExpr a, ArgExpr b ->
         compare_expression a b
@@ -588,6 +799,11 @@ module COMPARE = struct
     lazy (Option.compare (compare_with_loc compare_name) c d)
 
   and compare_ident: ident compare_fun = fun a b -> compare_term a b
+  and compare_trimming_tip x y =
+    match x, y with
+    | Leading, Leading | Trailing, Trailing -> 0
+    | Trailing, Leading -> -1
+    | Leading, Trailing -> 1
 
   let compare_qualname: qualname compare_fun = compare_term
   let compare_literal: literal compare_fun = compare_term
@@ -694,13 +910,58 @@ module FMT = struct
     | DataAddress i -> fmt "ADDRESS@ OF@ %a" ppf pp_ident i
     | ProgAddress i -> fmt "ADDRESS@ OF@ PROGRAM@ %a" ppf pp_term i
 
-  and pp_inline_call ppf { call_fun; call_args } =
-    fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' call_fun
-      (list ~sep:comma pp_effective_arg) call_args
+  and pp_inline_call ppf = function
+    | CallFunc { func; args } ->
+        fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf pp_name' func
+          (list ~sep:sp pp_effective_arg) args
+    | CallGenericIntrinsic { func; args } ->
+        fmt "FUNCTION@ %a@ @[<1>(%a)@]" ppf
+          (pp_with_loc pp_intrinsic_name) func
+          (list ~sep:sp pp_effective_arg) args
+    | CallTrim { arg; tip } ->
+        fmt "FUNCTION@ TRIM@ @[<1>(%a, %a)@]" ppf
+          pp_effective_arg arg
+          (option pp_trimming_tip) tip
+    | CallLength { arg; physical } ->
+        fmt "FUNCTION@ LENGTH@ @[<1>(%a%t)@]" ppf
+          pp_term arg
+          (if physical then fmt ",@ PHYSICAL" else ignore)
+    | CallNumvalC args ->
+        fmt "FUNCTION@ NUMVAL-C@ @[<1>(%a)@]" ppf
+          (list ~sep:sp pp_term) args
+    | CallLocaleDate { locale_func_args = dt;
+                       locale_func_locale = l } ->
+        fmt "FUNCTION@ LOCALE-DATE@ @[<1>(%a%a)@]" ppf
+          pp_effective_arg dt
+          (option ~none:nop (fun ppf -> fmt ",@ %a" ppf pp_term)) l
+    | CallLocaleTime { locale_func_args = dt;
+                       locale_func_locale = l } ->
+        fmt "FUNCTION@ LOCALE-TIME@ @[<1>(%a,@ %a)@]" ppf
+          pp_effective_arg dt
+          (option ~none:nop (fun ppf -> fmt ",@ %a" ppf pp_term)) l
+    | CallLocaleTimeFromSeconds { locale_func_args = dt;
+                                  locale_func_locale = l } ->
+        fmt "FUNCTION@ LOCALE-TIME-FROM-SECONDS@ @[<1>(%a, %a)@]" ppf
+          pp_effective_arg dt
+          (option ~none:nop (fun ppf -> fmt ",@ %a" ppf pp_term)) l
+    | CallFormattedDatetime { formatted_func_args = a;
+                              formatted_func_system_offset = so } ->
+        fmt "FUNCTION@ FORMATTED-DATETIME@ @[<1>(%a%t)@]" ppf
+          (list pp_effective_arg) a
+          (if so then fmt ",@ SYSTEM-OFFSET" else ignore)
+    | CallFormattedTime { formatted_func_args = a;
+                          formatted_func_system_offset = so } ->
+        fmt "FUNCTION@ FORMATTED-TIME@ @[<1>(%a%t)@]" ppf
+          (list pp_effective_arg) a
+          (if so then fmt ",@ SYSTEM-OFFSET" else ignore)
+
+  and pp_trimming_tip ppf = function
+    | Leading -> fmt "LEADING" ppf
+    | Trailing -> fmt "TRAILING" ppf
 
   and pp_inline_invocation ppf { invoke_class; invoke_meth; invoke_args } =
     fmt "%a::%a@ @[<1>(%a)@]" ppf pp_ident invoke_class pp_literal invoke_meth
-      (list ~sep:comma pp_effective_arg) invoke_args
+      (list ~sep:sp pp_effective_arg) invoke_args
 
   and pp_effective_arg ppf = function
     | ArgOmitted -> string ppf "OMITTED"

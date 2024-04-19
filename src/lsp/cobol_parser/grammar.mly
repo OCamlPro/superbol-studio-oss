@@ -57,16 +57,20 @@ let dual_handler_none =
 
 (* Tag declaration for post-actions.
 
-   For now we only define a single kind of post-actions, that receives an
-   optional source code location in addition to the semantic value (which is
-   implicit in the declaration below), and returns a diagnostics result.  With
-   this definition, grammar attributes "[@post.diagnostic ...]" may be used to
-   create diagnostics based on the result of configuration feature
-   verifications. *)
+   The following example (commented) defines a single kind of post-actions, that
+   receives an optional source code location in addition to the semantic value
+   (which is implicit in the declaration below), and returns a diagnostics
+   result.  With this definition, grammar attributes "[@post.diagnostic ...]"
+   may be used to create diagnostics based on the result of configuration
+   feature verifications. *)
 (* %[@post.tag diagnostic loc:Cobol_common.Srcloc.srcloc option -> *)
 (*                            unit Cobol_common.Diagnostics.in_result] *)
 
 %[@post.tag special_names Cobol_ptree.special_names_clause]
+%[@post.tag repository_paragraph Cobol_ptree.repository_paragraph]
+%[@post.tag procedure_division_header unit]
+%[@post.tag procedure_division Cobol_ptree.procedure_division]
+%[@post.tag method_definitions Cobol_ptree.method_definitions]
 
 %[@post.tag pending string]
 
@@ -821,7 +825,7 @@ let for_alphanumeric_or_national_opt :=
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / REPOSITORY PARAGRAPH *)
 
-let repository_paragraph :=                                        (* +COB2002 *)
+let repository_paragraph [@post.repository_paragraph] :=           (* +COB2002 *)
   | REPOSITORY; "."; ~ = ilo(sf(rnel(specifier),".")); < >
 
 let specifier :=
@@ -1958,8 +1962,11 @@ let prompt_character_clause :=
 
 (* -------------------- PROCEDURE DIVISION -------------------- *)
 
-let procedure_division :=
- | PROCEDURE; DIVISION;
+let procedure_division_header [@post.procedure_division_header] :=
+ | PROCEDURE; DIVISION; < >
+
+let procedure_division [@post.procedure_division] :=
+ | procedure_division_header;
    procedure_args = ro(procedure_args);
    ro = ro(returning);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
@@ -1971,8 +1978,8 @@ let procedure_division :=
        procedure_declaratives = dl;
        procedure_paragraphs = sl } }
 
-let program_procedure_division :=
- | PROCEDURE; DIVISION;
+let program_procedure_division [@post.procedure_division] :=
+ | procedure_division_header;
    procedure_args = ro(procedure_args);
    ro = ro(returning);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
@@ -1993,8 +2000,8 @@ let procedure_calling_style ==
  | USING; { ProcedureArgsUsed }
  | CHAINING; { ProcedureArgsChained }
 
-let object_procedure_division :=                                   (* +COB2002 *)
- | PROCEDURE; DIVISION; "."; ~ = rl(loc(method_definition)); < >
+let object_procedure_division [@post.method_definitions] := (* +COB2002 *)
+ | procedure_division_header; "."; ~ = rl(loc(method_definition)); < >
 
 (* COB85: only USING ident+ (in the IPC module, P541) *)
 let procedure_by_clause :=
@@ -2182,6 +2189,8 @@ let argument :=
  | e = expression_no_all; %prec lowest {ArgExpr e}
  | OMITTED;                            {ArgOmitted}
 
+let parens(X) := "("; ~ = X; ")"; < >
+
 let arguments ==
  | "("; ")";                      { [] }
  | "("; al = rnel(argument); ")"; { al }
@@ -2204,17 +2213,8 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
  | "("; s = subscript_first; ")";                                 { [s] }
 
-(* Only for functions which name is also a keyword in COBOL *)
-let intrinsic_function_name :=
- | LENGTH;      { "LENGTH" }
- | RANDOM;      { "RANDOM" }
- | REVERSE;     { "REVERSE" }
- | SIGN;        { "SIGN" }
- | SUM;         { "SUM" }
-
 let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
  | ~ = name;                         < >
- | ~ = loc(intrinsic_function_name); < >
 
 let inline_invocation :=
  | i = ident; "::"; l = literal; al = optional_arguments_list;
@@ -2252,12 +2252,69 @@ let counter_kind :=
  | LINE_COUNTER;   {LineCounter}
 
 let qualident ==
- | qdn = loc(qualname);                  { { ident_name = qdn; ident_subscripts = [] } }
- | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn; ident_subscripts = sl } }
+  | qdn = loc(qualname);                  { { ident_name = qdn;
+                                              ident_subscripts = [] } }
+  | qdn = loc(qualname); sl = subscripts; { { ident_name = qdn;
+                                              ident_subscripts = sl } }
 
 let function_ident ==
- | FUNCTION; n = function_name; al = arguments; { { call_fun = n; call_args = al } }
- | FUNCTION; n = function_name;                 { { call_fun = n; call_args = [] } }
+  | FUNCTION; func = function_name; args = arguments; { CallFunc { func; args } }
+  | FUNCTION; func = function_name;                   { CallFunc { func; args = [] } }
+  | FUNCTION?; ~ = intrinsic_call;                    < >
+
+let intrinsic_call ==
+  | n = loc(unhandled_custom_intrinsic); args = arguments;
+    { CallGenericIntrinsic { func = n; args } }
+  | n = loc(unhandled_custom_intrinsic);
+    { CallGenericIntrinsic { func = n; args = [] } }
+  | TRIM_FUNC; args = parens(~ = argument;
+                             ~ = trimming_tip?; < >);
+    { CallTrim { arg = fst args; tip = snd args } }
+  | LENGTH_FUNC; args = parens(~ = ident_or_nonnumeric;
+                               ~ = bo(PHYSICAL); < >);
+    { CallLength { arg = fst args; physical = snd args } }
+  | NUMVAL_C_FUNC; ~ = parens(rnel(ident_or_nonnumeric));
+    <CallNumvalC>
+  | LOCALE_DATE_FUNC; ~ = parens(locale_func_args);
+    <CallLocaleDate>
+  | LOCALE_TIME_FUNC; ~ = parens(locale_func_args);
+    <CallLocaleTime>
+  | LOCALE_TIME_FROM_SECONDS_FUNC; ~ = parens(locale_func_args);
+    <CallLocaleTimeFromSeconds>
+  | FORMATTED_DATETIME_FUNC; ~ = parens(formatted_func_args);
+    <CallFormattedDatetime>
+  | FORMATTED_TIME_FUNC; ~ = parens(formatted_func_args);
+    <CallFormattedDatetime>
+
+let unhandled_custom_intrinsic :=
+  | ~ = INTRINSIC_FUNC;     < >
+  |     BYTE_LENGTH_FUNC;   { BYTE_LENGTH   }
+  |     CHAR_FUNC;          { CHAR          }
+  |     CONTENT_OF_FUNC;    { CONTENT_OF    }
+  |     CONVERT_FUNC;       { CONVERT       }
+  |     CURRENT_DATE_FUNC;  { CURRENT_DATE  }
+  |     RANDOM_FUNC;        { RANDOM        }
+  |     RANGE_FUNC;         { RANGE         }
+  |     REVERSE_FUNC;       { REVERSE       }
+  |     SIGN_FUNC;          { SIGN          }
+  |     SUM_FUNC;           { SUM           }
+  |     WHEN_COMPILED_FUNC; { WHEN_COMPILED }
+
+let formatted_func_args :=
+  | formatted_func_args = rnel(argument);
+    formatted_func_system_offset = bo(SYSTEM_OFFSET);
+    { { formatted_func_args;
+        formatted_func_system_offset } }
+
+let locale_func_args :=
+  | locale_func_args = argument;
+    locale_func_locale = reference?;
+    { { locale_func_args;
+        locale_func_locale} }
+
+let trimming_tip :=
+  | LEADING;  { Leading }
+  | TRAILING; { Trailing }
 
 let base_ident ==                 (* identifier without reference modification *)
  | q = qualident;                {QualIdent q} (* Works for object property too *)

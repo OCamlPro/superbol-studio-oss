@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 module TEXT = Cobol_preproc.Text
 
 open Cobol_common.Srcloc.INFIX
@@ -55,6 +56,29 @@ let combined_tokens =
     NEXT_PAGE, "NEXT_PAGE";
     NEXT_SENTENCE, "NEXT_SENTENCE";
   ]
+
+let is_intrinsic_token = function
+  | BYTE_LENGTH_FUNC
+  | CHAR_FUNC
+  | CONTENT_OF_FUNC
+  | CONVERT_FUNC
+  | CURRENT_DATE_FUNC
+  | FORMATTED_DATETIME_FUNC
+  | FORMATTED_TIME_FUNC
+  | LENGTH_FUNC
+  | LOCALE_DATE_FUNC
+  | LOCALE_TIME_FROM_SECONDS_FUNC
+  | LOCALE_TIME_FUNC
+  | NUMVAL_C_FUNC
+  | RANDOM_FUNC
+  | RANGE_FUNC
+  | REVERSE_FUNC
+  | SIGN_FUNC
+  | SUM_FUNC
+  | TRIM_FUNC
+  | WHEN_COMPILED_FUNC
+  | INTRINSIC_FUNC _ -> true
+  | _ -> false
 
 let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
                                                 runtime_repr } =
@@ -105,6 +129,8 @@ let pp_token: token Pretty.printer = fun ppf ->
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
     | INTERVENING_ c -> print "<%c>" c
+    | tok when is_intrinsic_token tok ->
+        print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 
@@ -127,7 +153,7 @@ let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
 
 (* Tokenization of manipulated text, to feed the compilation group parser: *)
 
-let preproc_n_combine_tokens ~source_format =
+let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
   (* Simplifies the grammar, and applies some token-based pre-processsing to
      deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
@@ -141,8 +167,17 @@ let preproc_n_combine_tokens ~source_format =
     | t ->
         (* Try de-tokenizing to accept, e.g, PROGRAM-ID. nested. (as NESTED is a
            keyword). *)
-        try INFO_WORD (Hashtbl.find Text_lexer.keyword_of_token t)
+        try INFO_WORD (Hashtbl.find Text_lexer.word_of_token t)
         with Not_found -> t
+  and function_name = function
+    | t when not intrinsics_enabled ->
+        t
+    | WORD w | WORD_IN_AREA_A w as t ->
+        (try Text_lexer.token_of_intrinsic w with Not_found -> t)
+    | t ->
+        (try (Text_lexer.token_of_intrinsic @@
+              Hashtbl.find Text_lexer.word_of_token t)
+         with Not_found -> t)
   and comment_entry revtoks =
     COMMENT_ENTRY (List.rev_map (Pretty.to_string "%a" pp_token_string) revtoks)
   in
@@ -163,6 +198,11 @@ let preproc_n_combine_tokens ~source_format =
       match p with
       | [] -> Result.Error `MissingInputs
       | t :: _ -> aux (info_word t :: p', hd l :: l', dgs) (tl p, tl l)
+    and function_name_after n =
+      let (p', l', dgs), (p, l) = skip acc (p, l) n in
+      match p with
+      | [] -> Result.Error `MissingInputs
+      | t :: _ -> aux (function_name t :: p', hd l :: l', dgs) (tl p, tl l)
     and missing_continuation_of str =
       let (p', l', diags), pl = skip acc (p, l) 1 in
       let error = Missing { loc = hd l; stuff = Continuation_of str } in
@@ -255,6 +295,8 @@ let preproc_n_combine_tokens ~source_format =
     | END :: CLASS :: _
     | END :: INTERFACE :: _            -> info_word_after 2
 
+    | FUNCTION :: _                   -> function_name_after 1
+
     | [AUTHOR | INSTALLATION |
        DATE_WRITTEN | DATE_MODIFIED |
        DATE_COMPILED | REMARKS |
@@ -267,6 +309,7 @@ let preproc_n_combine_tokens ~source_format =
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
     | tok :: _                        -> subst_n tok 1
+
 
     | []                             -> Ok acc
 
@@ -325,6 +368,8 @@ type 'm state =
                                 errors out for lack of input tokens. *)
     memory: 'm memory;
     context_stack: Context.stack;
+    registered_intrinsics: Text_lexer.IntrinsicHandles.t;
+    intrinsics_enabled: bool;
     diags: Parser_diagnostics.t;
     persist: persist;
   }
@@ -334,6 +379,8 @@ and persist =
   {
     lexer: Text_lexer.lexer;
     context_tokens: Grammar_contexts.context_tokens;
+    known_intrinsics: Text_lexer.IntrinsicHandles.t;
+    default_intrinsics: Text_lexer.IntrinsicHandles.t;
     exec_scanners: Parser_options.exec_scanners;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
@@ -346,6 +393,8 @@ let init
     ?(show_if_verbose = [`Tks; `Ctx])
     ~exec_scanners
     ~memory
+    ~intrinsics
+    ?(default_intrinsics = StringSet.empty)       (* preregistered_intrinsics *)
     words
   =
   let lexer = Text_lexer.create () in
@@ -355,18 +404,29 @@ let init
     Grammar_contexts.init
       ~handle_of_token:(Text_lexer.handle_of_token lexer)
   in
-  Text_lexer.disable_tokens context_sensitive_tokens;
+  Text_lexer.disable_keywords context_sensitive_tokens;
   Text_lexer.reserve_words lexer words;
+  let known_intrinsics =
+    Text_lexer.intrinsic_handles lexer (StringSet.elements intrinsics)
+  in
+  let default_intrinsics =
+    Text_lexer.IntrinsicHandles.inter known_intrinsics @@
+    Text_lexer.intrinsic_handles lexer (StringSet.elements default_intrinsics)
+  in
   {
     expect_picture_string = false;
     leftover_tokens = [];
     memory;
     context_stack = Context.empty_stack;
+    registered_intrinsics = default_intrinsics;
+    intrinsics_enabled = false;
     diags = Parser_diagnostics.none;
     persist =
       {
         lexer;
         context_tokens;
+        known_intrinsics;
+        default_intrinsics;
         exec_scanners;
         verbose;
         show_if_verbose =
@@ -482,7 +542,7 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
         p :: acc, { s with expect_picture_string = true }
     | { payload = IS; _ } as p
       when expect_picture_string ->
-        p :: acc, { s with expect_picture_string = true }
+        p :: acc, s
     | p ->
         p :: acc, { s with expect_picture_string = false }
   in
@@ -525,7 +585,8 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   let state = { state with leftover_tokens = [] } in
   let new_tokens, state = tokens_of_text state text in
   let tokens = leftover_tokens @ new_tokens in
-  match preproc_n_combine_tokens ~source_format tokens with
+  let intrinsics_enabled = state.intrinsics_enabled in
+  match preproc_n_combine_tokens ~intrinsics_enabled ~source_format tokens with
   | Ok (tokens, diags) ->
       if show `Tks state then
         Pretty.error "Tks: %a@." pp_tokens tokens;
@@ -564,12 +625,34 @@ let next_token (s: _ state) =
   aux
 
 type lexer_update =
-  | Enabled of Text_lexer.TokenHandles.t
-  | Disabled of Text_lexer.TokenHandles.t
+  | Enabled_keywords of Text_lexer.TokenHandles.t
+  | Disabled_keywords of Text_lexer.TokenHandles.t
+  | Enabled_intrinsics
+  | Disabled_intrinsics
   | CommaBecomesDecimalPoint
 
 let tokens_of_string' { persist = { lexer; _ }; _ } =
   Text_lexer.tokens_of_string' lexer
+
+let reword_intrinsics s : tokens -> tokens =
+  (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
+     [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
+     unlikely). *)
+  let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let rec aux rev_prefix suffix =
+    match suffix with
+    | [] ->
+        List.rev rev_prefix
+    | ({ payload = k1_token; _ } as k1) ::
+      ({ payload = k2_token; _ } as k2) :: tl
+      when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
+        aux (EzList.tail_map distinguish_words @@
+             tokens_of_string' s (keyword_of_token k2_token &@<- k2) @
+             k1 :: rev_prefix) tl
+    | k1 :: tl ->
+        aux (k1 :: rev_prefix) tl
+  in
+  aux []
 
 (** Retokenizes the tokens {e after} the given operation has been perfomed on
     {!module:Text_lexer}. *)
@@ -577,26 +660,31 @@ let tokens_of_string' { persist = { lexer; _ }; _ } =
    could be moved to Text_lexer *)
 let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s ->
   match update with
-  | Enabled tokens | Disabled tokens
+  | Enabled_keywords tokens
+  | Disabled_keywords tokens
     when Text_lexer.TokenHandles.is_empty tokens ->
       Fun.id
-  | Enabled _ ->
+  | Enabled_keywords _
+  | Enabled_intrinsics ->          (* <- some words may have become intrinsics *)
       List.concat_map begin fun token -> match ~&token with
         | WORD_IN_AREA_A w
         | WORD w ->
-            List.map distinguish_words @@ tokens_of_string' s (w &@<- token)
+            EzList.tail_map distinguish_words @@
+            tokens_of_string' s (w &@<- token)
         | _ ->
             [token]
       end
-  | Disabled tokens ->
-      let keyword_of_token = Hashtbl.find Text_lexer.keyword_of_token in
-      List.map begin fun token ->
+  | Disabled_keywords tokens ->
+      let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+      EzList.tail_map begin fun token ->
         if Text_lexer.TokenHandles.mem_text_token ~&token tokens
         then match token_in_area_a token, keyword_of_token ~&token with
           | true, w -> WORD_IN_AREA_A w &@<- token
           | false, w -> WORD w &@<- token
         else token
       end
+  | Disabled_intrinsics ->
+      reword_intrinsics s
   | CommaBecomesDecimalPoint ->
       (* This may only happen when the comma becomes a decimal separator in
          numerical literals, instead of periods.  Before this (irreversible)
@@ -642,14 +730,68 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
 (** Enable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
 let enable_tokens state tokens incoming_tokens =
-  Text_lexer.enable_tokens incoming_tokens;
-  state, retokenize_after (Enabled incoming_tokens) state tokens
+  Text_lexer.enable_keywords incoming_tokens;
+  state, retokenize_after (Enabled_keywords incoming_tokens) state tokens
 
 (** Disable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
 let disable_tokens state tokens outgoing_tokens =
-  Text_lexer.disable_tokens outgoing_tokens;
-  state, retokenize_after (Disabled outgoing_tokens) state tokens
+  Text_lexer.disable_keywords outgoing_tokens;
+  state, retokenize_after (Disabled_keywords outgoing_tokens) state tokens
+
+
+let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.unregister_intrinsics lexer registered_intrinsics
+
+
+let reregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.register_intrinsics lexer registered_intrinsics
+
+
+let enable_intrinsics state token tokens =
+  if state.intrinsics_enabled then state, token, tokens else        (* error? *)
+    let state = put_token_back { state with intrinsics_enabled = true } in
+    reregister_intrinsics state;
+    let tokens = token :: tokens in
+    let tokens = retokenize_after Enabled_intrinsics state tokens in
+    let token, tokens = List.hd tokens, List.tl tokens in
+    if show `Tks state then
+      Pretty.error "Tks': %a@." pp_tokens tokens;
+    emit_token state token, token, tokens
+
+
+let disable_intrinsics state token tokens =
+  if not state.intrinsics_enabled then state, token, tokens else      (* error? *)
+    let state = put_token_back { state with intrinsics_enabled = false } in
+    unregister_intrinsics state;
+    let tokens = token :: tokens in
+    let tokens = retokenize_after Disabled_intrinsics state tokens in
+    let token, tokens = List.hd tokens, List.tl tokens in
+    if show `Tks state then
+      Pretty.error "Tks': %a@." pp_tokens tokens;
+    emit_token state token, token, tokens
+
+
+let reset_intrinsics state token tokens =
+  let state, token, tokens = disable_intrinsics state token tokens in
+  { state with registered_intrinsics = state.persist.default_intrinsics },
+  token,
+  tokens
+
+
+(** Replaces the set of registered intrinsics.  Registers the default set if
+    [intrinsics = None]. *)
+let replace_intrinsics state intrinsics =
+  assert (not state.intrinsics_enabled);
+  unregister_intrinsics state;
+  let registered_intrinsics = match intrinsics with
+    | None ->
+        state.persist.default_intrinsics
+    | Some s ->
+        Text_lexer.intrinsic_handles state.persist.lexer (List.map (~&) s)
+  in
+  { state with registered_intrinsics }
+
 
 let decimal_point_is_comma (type m) (state: m state) token tokens =
   let state = put_token_back state in
@@ -663,6 +805,7 @@ let decimal_point_is_comma (type m) (state: m state) token tokens =
   if show `Tks state then
     Pretty.error "Tks': %a@." pp_tokens tokens;
   emit_token state token, token, tokens
+
 
 let put_token_back state token tokens =
   put_token_back state, token :: tokens
@@ -711,7 +854,7 @@ let pop_context ({ context_stack; _ } as state) tokens =
   { state with context_stack }, tokens
 
 let enable_context_sensitive_tokens state =
-  Text_lexer.enable_tokens (Context.all_tokens state.context_stack)
+  Text_lexer.enable_keywords (Context.all_tokens state.context_stack)
 
 let disable_context_sensitive_tokens state =
-  Text_lexer.disable_tokens (Context.all_tokens state.context_stack)
+  Text_lexer.disable_keywords (Context.all_tokens state.context_stack)

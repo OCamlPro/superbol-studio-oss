@@ -1399,4 +1399,127 @@
 %token XML_NTEXT                    [@keyword.silenced]
 %token XML_TEXT                     [@keyword.silenced]
 
+(* INTRINSIC FUNCTIONS *)
+%token <Cobol_ptree.intrinsic_name>
+  INTRINSIC_FUNC [@intrinsics.generic
+                  "ABS",
+                  "ABSOLUTE-VALUE",
+                  "ACOS",
+                  "ANNUITY",
+                  "ASIN",
+                  "ATAN",
+                  "BASECONVERT",
+                  "BIT-OF",
+                  "BIT-TO-CHAR",
+                  "BOOLEAN-OF-INTEGER",
+                  "CHAR-NATIONAL",
+                  "COMBINED-DATETIME",
+                  "CONCAT",
+                  "CONCATENATE",
+                  "CONTENT-LENGTH",
+                  "COS",
+                  "CURRENCY-SYMBOL",
+                  "DATE-OF-INTEGER",
+                  "DATE-TO-YYYYMMDD",
+                  "DAY-OF-INTEGER",
+                  "DAY-TO-YYYYDDD",
+                  "DISPLAY-OF",
+                  "E",
+                  "EXCEPTION-FILE",
+                  "EXCEPTION-FILE-N",
+                  "EXCEPTION-LOCATION",
+                  "EXCEPTION-LOCATION-N",
+                  "EXCEPTION-STATEMENT",
+                  "EXCEPTION-STATUS",
+                  "EXP",
+                  "EXP10",
+                  "FACTORIAL",
+                  "FIND-STRING",
+                  "FORMATTED-CURRENT-DATE",
+                  "FORMATTED-DATE",
+                  "FRACTION-PART",
+                  "HEX-OF",
+                  "HEX-TO-CHAR",
+                  "HIGHEST-ALGEBRAIC",
+                  "INTEGER",
+                  "INTEGER-OF-BOOLEAN",
+                  "INTEGER-OF-DATE",
+                  "INTEGER-OF-DAY",
+                  "INTEGER-OF-FORMATTED-DATE",
+                  "INTEGER-PART",
+                  "LENGTH-AN",
+                  "LOCALE-COMPARE",
+                  "LOG",
+                  "LOG10",
+                  "LOWER-CASE",
+                  "LOWEST-ALGEBRAIC",
+                  "MAX",
+                  "MEAN",
+                  "MEDIAN",
+                  "MIDRANGE",
+                  "MIN",
+                  "MOD",
+                  "MODULE-CALLER-ID",
+                  "MODULE-DATE",
+                  "MODULE-FORMATTED-DATE",
+                  "MODULE-ID",
+                  "MODULE-NAME",
+                  "MODULE-PATH",
+                  "MODULE-SOURCE",
+                  "MODULE-TIME",
+                  "MONETARY-DECIMAL-POINT",
+                  "MONETARY-THOUSANDS-SEPARATOR",
+                  "NATIONAL-OF",
+                  "NUMERIC-DECIMAL-POINT",
+                  "NUMERIC-THOUSANDS-SEPARATOR",
+                  "NUMVAL",
+                  "NUMVAL-F",
+                  "ORD",
+                  "ORD-MAX",
+                  "ORD-MIN",
+                  "PI",
+                  "PRESENT-VALUE",
+                  "REM",
+                  "SECONDS-FROM-FORMATTED-TIME",
+                  "SECONDS-PAST-MIDNIGHT",
+                  "SIN",
+                  "SQRT",
+                  "STANDARD-COMPARE",
+                  "STANDARD-DEVIATION",
+                  "STORED-CHAR-LENGTH",
+                  "SUBSTITUTE",
+                  "SUBSTITUTE-CASE",
+                  "TAN",
+                  "TEST-DATE-YYYYMMDD",
+                  "TEST-DAY-YYYYDDD",
+                  "TEST-FORMATTED-DATETIME",
+                  "TEST-NUMVAL",
+                  "TEST-NUMVAL-C",
+                  "TEST-NUMVAL-F",
+                  "UPPER-CASE",
+                  "VARIANCE",
+                  "YEAR-TO-YYYY"]
+
+(* Intrinsic functions that need special care (either because their name is a
+   COBOL keyword or because they have special arguments) *)
+%token BYTE_LENGTH_FUNC              [@intrinsic.custom "BYTE-LENGTH"]
+%token CHAR_FUNC                     [@intrinsic.custom "CHAR"]
+%token CONTENT_OF_FUNC               [@intrinsic.custom "CONTENT-OF"]
+%token CONVERT_FUNC                  [@intrinsic.custom "CONVERT"]
+%token CURRENT_DATE_FUNC             [@intrinsic.custom "CURRENT-DATE"]
+%token FORMATTED_DATETIME_FUNC       [@intrinsic.custom "FORMATTED-DATETIME"]
+%token FORMATTED_TIME_FUNC           [@intrinsic.custom "FORMATTED-TIME"]
+%token LENGTH_FUNC                   [@intrinsic.custom "LENGTH"]
+%token LOCALE_DATE_FUNC              [@intrinsic.custom "LOCALE-DATE"]
+%token LOCALE_TIME_FROM_SECONDS_FUNC [@intrinsic.custom "LOCALE-TIME-FROM-SECONDS"]
+%token LOCALE_TIME_FUNC              [@intrinsic.custom "LOCALE-TIME"]
+%token NUMVAL_C_FUNC                 [@intrinsic.custom "NUMVAL-C"]
+%token RANDOM_FUNC                   [@intrinsic.custom "RANDOM"]
+%token RANGE_FUNC                    [@intrinsic.custom "RANGE"]
+%token REVERSE_FUNC                  [@intrinsic.custom "REVERSE"]
+%token SIGN_FUNC                     [@intrinsic.custom "SIGN"]
+%token SUM_FUNC                      [@intrinsic.custom "SUM"]
+%token TRIM_FUNC                     [@intrinsic.custom "TRIM"]
+%token WHEN_COMPILED_FUNC            [@intrinsic.custom "WHEN-COMPILED"]
+
 %%

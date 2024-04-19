@@ -3,32 +3,6 @@
 # superbol-free, in the future
 
 
-AT_SETUP([TRIM TRAILING])
-# promoted on 2024-04-05T13:38
-AT_DATA([prog.cob],[
-       IDENTIFICATION   DIVISION.
-       PROGRAM-ID.      prog.
-       PROCEDURE        DIVISION.
-           IF FUNCTION LENGTH (FUNCTION TRIM (WS-ARG TRAILING)) <> 4
-               DISPLAY "OK"
-           END-IF.
-])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [1], [Checking `prog.cob'
-prog.cob:5.53-5.61:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >            IF FUNCTION LENGTH (FUNCTION TRIM (WS-ARG TRAILING)) <> 4
-----                                                        ^^^^^^^^
-   6                  DISPLAY "OK"
-   7              END-IF.
->> Error: Invalid syntax
-
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
-])
-AT_CLEANUP
-
-
 AT_SETUP([MF TYPEDEF])
 # promoted on 2024-04-05T13:38
 AT_DATA([prog.cob],[

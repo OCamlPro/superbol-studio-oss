@@ -18,17 +18,30 @@ open Cobol_common.Srcloc.INFIX
 
 module TYPES = struct
 
-  type optional_token =
+  type optional_keyword =
     {
       token: Grammar_tokens.token;
       mutable reserved: bool;
       mutable enabled: bool;
     }
-  and token_handle = optional_token
+  and keyword_handle = optional_keyword
+
+  type intrinsic_handle =
+    {
+      (* `intrinsic_handle` stores the actual token; this is an optional_keyword
+         so we can use it to override "regular" keywords in `token_of_word` to
+         only ever perform single lookups while giving precedence to registered
+         intrinsics when they are enabled. *)
+      intrinsic_handle: optional_keyword;
+      intrinsic_word: string;                                 (* in uppercase *)
+      mutable intrinsic_shadowing: optional_keyword option;   (* keyword before
+                                                                 registration *)
+    }
 
   type lexer =
     {
-      token_of_keyword: (string, token_handle) Hashtbl.t;
+      token_of_word: (string, keyword_handle) Hashtbl.t;
+      handle_of_intrinsic: (string, intrinsic_handle) Hashtbl.t;
       decimal_point_is_comma: bool;
     }
 
@@ -38,25 +51,34 @@ include TYPES
 module TokenHandles = struct
   include Set.Make
       (struct
-        type t = token_handle
+        type t = keyword_handle
         let compare t1 t2 = Stdlib.compare t1.token t2.token
       end)
   let mem_text_token token =
     mem { token; enabled = false; reserved = false }
 end
 
+module IntrinsicHandles =
+  Set.Make (struct
+    type t = intrinsic_handle
+    let compare t1 t2 =
+      Stdlib.compare t1.intrinsic_handle.token t2.intrinsic_handle.token
+  end)
+
 (* --- *)
 
 let token_of_punct = Hashtbl.create 15
 let punct_of_token = Hashtbl.create 15
-let keyword_of_token = Hashtbl.create 257
-let __token_of_keyword = Hashtbl.create 257         (* copied in `Make` below *)
+let word_of_token = Hashtbl.create 257
+let __token_of_word = Hashtbl.create 257        (* copied in `Make` below *)
+let __token_of_intrinsic = Hashtbl.create 116  (* all intrinsic function name *)
+
 
 (** Raises {!Not_found} if the token is neither a keyword nor a
     punctuation. *)
 let show_token t =
-  try Hashtbl.find keyword_of_token t with
-  | Not_found -> Hashtbl.find punct_of_token t
+  try Hashtbl.find word_of_token t
+  with Not_found -> Hashtbl.find punct_of_token t
 
 let token_of_handle h = h.token
 
@@ -69,16 +91,40 @@ let pp_tokens_via_handles ppf toks =
     Pretty.string ppf (show_token_of_handle h)
   end ppf (TokenHandles.elements toks)
 
-let reserve_token   h = h.reserved <- true
-let unreserve_token h = h.reserved <- false
-let enable_token    h = h.enabled <- true
-let disable_token   h = h.enabled <- false
+let reserve_as_keyword   h = h.reserved <- true
+let unreserve_keyword    h = h.reserved <- false
+let enable_keyword       h = h.enabled <- true
+let disable_keyword      h = h.enabled <- false
 
-let enable_tokens tokens =
-  TokenHandles.iter enable_token tokens
+let enable_keywords tokens =
+  TokenHandles.iter enable_keyword tokens
 
-let disable_tokens tokens =
-  TokenHandles.iter disable_token tokens
+let disable_keywords tokens =
+  TokenHandles.iter disable_keyword tokens
+
+let register_intrinsic { token_of_word; _ } h =
+  if h.intrinsic_shadowing <> None
+  then Pretty.error "@[<2>>> Internal@ warning@ in@ `%s.register_intrinsic`:@ \
+                     registration@ of@ intrinsic@ function@ `%s',@ which@ was@ \
+                     already@ registered@]@." __MODULE__ h.intrinsic_word
+  else h.intrinsic_shadowing <- Hashtbl.find_opt token_of_word h.intrinsic_word;
+  Hashtbl.replace token_of_word h.intrinsic_word h.intrinsic_handle
+
+let unregister_intrinsic { token_of_word; _ } h =
+  match h.intrinsic_shadowing with
+  | None ->
+      Hashtbl.remove token_of_word h.intrinsic_word
+  | Some h' ->
+      Hashtbl.replace token_of_word h.intrinsic_word h';
+      h.intrinsic_shadowing <- None
+
+let register_intrinsics lexer : IntrinsicHandles.t -> unit = fun ih ->
+  IntrinsicHandles.iter (register_intrinsic lexer) ih
+
+let unregister_intrinsics lexer : IntrinsicHandles.t -> unit = fun ih ->
+  IntrinsicHandles.iter (unregister_intrinsic lexer) ih
+
+(* "Static", internal structures (possibly copied in actual lexers) *)
 
 let __init_puncts =
   List.iter begin fun (punct, token) ->
@@ -88,20 +134,47 @@ let __init_puncts =
 
 let __init_default_keywords =
   List.iter begin fun (kwd, token) ->
-    Hashtbl.add keyword_of_token token kwd;
+    Hashtbl.add word_of_token token kwd;
     (* Every default token needs to be reserved explicitly *)
-    Hashtbl.add __token_of_keyword kwd
+    Hashtbl.add __token_of_word kwd
       { token; enabled = true; reserved = false }
   end Text_keywords.keywords
+
+let __init_default_intrinsics =
+  List.iter begin fun (kwd, token) ->
+    Hashtbl.add word_of_token token kwd;
+    Hashtbl.add __token_of_intrinsic kwd
+      { intrinsic_word = String.uppercase_ascii kwd;
+        intrinsic_handle = { token; enabled = true; reserved = true };
+        intrinsic_shadowing = None }
+  end Text_keywords.intrinsic_functions
 
 let silenced_keywords =
   StringSet.of_list Text_keywords.silenced_keywords
 
 (* --- *)
 
+let copy_optional_keyword h =
+  { token = h.token;
+    enabled = h.enabled;
+    reserved = h.reserved }
+let copy_keyword_handle =
+  copy_optional_keyword
+let copy_intrinsic_handle h =
+  { intrinsic_handle = copy_optional_keyword h.intrinsic_handle;
+    intrinsic_word = h.intrinsic_word;
+    intrinsic_shadowing = h.intrinsic_shadowing }
+
 let create ?(decimal_point_is_comma = false) () =
+  let token_of_word = Hashtbl.copy __token_of_word in
+  Hashtbl.filter_map_inplace
+    (fun _ h -> Some (copy_keyword_handle h)) token_of_word;
+  let handle_of_intrinsic = Hashtbl.copy __token_of_intrinsic in
+  Hashtbl.filter_map_inplace
+    (fun _ h -> Some (copy_intrinsic_handle h)) handle_of_intrinsic;
   {
-    token_of_keyword = Hashtbl.copy __token_of_keyword;
+    token_of_word;
+    handle_of_intrinsic;
     decimal_point_is_comma;
   }
 
@@ -110,24 +183,24 @@ let decimal_point_is_comma lexer =
     lexer with decimal_point_is_comma = true;
   }
 
-let handle_of_keyword { token_of_keyword; _ } kwd =
-  Hashtbl.find token_of_keyword kwd
+let handle_of_word { token_of_word; _ } kwd =
+  Hashtbl.find token_of_word kwd
 
-let handle_of_token { token_of_keyword; _ } token =
-  Hashtbl.find token_of_keyword (Hashtbl.find keyword_of_token token)
+let handle_of_token { token_of_word; _ } token =
+  Hashtbl.find token_of_word (Hashtbl.find word_of_token token)
 
-let reserve_insensitive_token { token_of_keyword; _ } kwd token_handle =
-  Hashtbl.add token_of_keyword kwd
+let reserve_insensitive_token { token_of_word; _ } kwd token_handle =
+  Hashtbl.add token_of_word kwd
     { token_handle with enabled = true; reserved = true }
 
-let reserve_sensitive_alias { token_of_keyword; _ } kwd token_handle =
-  Hashtbl.add token_of_keyword kwd token_handle
+let reserve_sensitive_alias { token_of_word; _ } kwd token_handle =
+  Hashtbl.add token_of_word kwd token_handle
 
 let reserve_words lexer : Cobol_config.words_spec -> unit =
   let on_token_handle_of kwd descr ~f =
-    try f @@ handle_of_keyword lexer kwd with
+    try f @@ handle_of_word lexer kwd with
     | Not_found when StringSet.mem kwd silenced_keywords ->
-        ()                                        (* Ignore silently? Warn? *)
+        ()                                          (* Ignore silently? Warn? *)
     | Not_found ->
         Pretty.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
   in
@@ -136,7 +209,7 @@ let reserve_words lexer : Cobol_config.words_spec -> unit =
     | Cobol_config.ReserveWord { preserve_context_sensitivity } ->
         on_token_handle_of w "reserve" ~f:begin fun h ->
           if preserve_context_sensitivity
-          then reserve_token h
+          then reserve_as_keyword h
           else reserve_insensitive_token lexer w h
         end
     | ReserveAlias { alias_for; preserve_context_sensitivity } ->
@@ -146,15 +219,31 @@ let reserve_words lexer : Cobol_config.words_spec -> unit =
           else reserve_insensitive_token lexer w h
         end
     | NotReserved ->
-        on_token_handle_of w "unreserve" ~f:unreserve_token
+        on_token_handle_of w "unreserve" ~f:unreserve_keyword
   end
 
 (* --- *)
 
-let token_of_keyword { token_of_keyword; _ } s =
-  match Hashtbl.find token_of_keyword (String.uppercase_ascii s) with
-  | { token; enabled = true; reserved = true } -> token
+let intrinsic_handles lexer : string list -> IntrinsicHandles.t = fun intrinsics ->
+  List.fold_left begin fun acc w ->
+    try
+      let ih =
+        Hashtbl.find lexer.handle_of_intrinsic @@ String.uppercase_ascii w in
+      IntrinsicHandles.add ih acc
+    with Not_found ->                            (* TODO: symbolic diagnostics *)
+      Pretty.error "@[Unknown@ intrinsic:@ %s@]@." w; acc
+  end IntrinsicHandles.empty intrinsics
+
+(* --- *)
+
+let token_of_word { token_of_word; _ } s =
+  match Hashtbl.find token_of_word (String.uppercase_ascii s) with
+  | { token; enabled = true; reserved = true; _ } -> token
   | _ -> raise Not_found
+
+let token_of_intrinsic s =
+  match Hashtbl.find __token_of_intrinsic (String.uppercase_ascii s) with
+  | { intrinsic_handle = { token; _ }; _ } -> token
 
 let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
   let split_loc loc len =
@@ -200,13 +289,13 @@ let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
       when sep = if lexer.decimal_point_is_comma then ',' else '.' ->
         append (FLOATLIT (n, sep, d, e))
     | Word s ->
-        append (try token_of_keyword lexer s with Not_found -> WORD s)
+        append (try token_of_word lexer s with Not_found -> WORD s)
     | Punctuation s ->
         append (Hashtbl.find token_of_punct s)
     | Numeric (w, Some (c, d, e)) ->
         decimal_sep w c d e
     | Unexpected c -> (* likely to be a comma; will produce syntax errors
-                        otherwise *)
+                         otherwise *)
         append (INTERVENING_ c)
   in
   aux ~loc []

@@ -59,6 +59,14 @@ let silenced attrs =
   List.find_opt (Attribute.has_label "keyword.silenced") attrs |>
   Option.map Attribute.payload
 
+let generic_intrinsics attrs =
+  List.find_opt (Attribute.has_label "intrinsics.generic") attrs |>
+  Option.map Attribute.payload
+
+let intrinsic attrs =
+  List.find_opt (Attribute.has_label "intrinsic.custom") attrs |>
+  Option.map Attribute.payload
+
 let pp_terminal ppf t =
   Print.terminal ppf t;
   match Terminal.typ t with
@@ -66,6 +74,12 @@ let pp_terminal ppf t =
   | Some "string" -> Fmt.string ppf " \"\""
   | Some "int" -> Fmt.string ppf " 0"
   | Some t -> Fmt.failwith "unsupported token type: %s" t
+
+let cobolize name =
+  String.map (function '_' -> '-' | c -> c) name
+
+let uncobolize name =
+  String.map (function '-' -> '_' | c -> c) String.(sub name 1 @@ length name - 2)
 
 let emit_entry attribute_payload ?(comment_token = false) ppf t =
   let start_token ppf = if comment_token then Fmt.string ppf "(*"
@@ -79,13 +93,51 @@ let emit_entry attribute_payload ?(comment_token = false) ppf t =
           ()
       | Some payload when String.trim payload = "" ->         (* auto-generate *)
           Fmt.pf ppf "@\n\"%s\"%t, %a%t;"
-            (String.map (function '_' -> '-' | c -> c) (Terminal.name t))
+            (cobolize @@ Terminal.name t)
             start_token pp_terminal t end_token
       | Some payload ->
           List.iter
             (fun kwd -> Fmt.pf ppf "@\n%s%t, %a%t;" (String.trim kwd)
                 start_token pp_terminal t end_token)
             (String.split_on_char ',' payload)
+
+let emit_generic_intrinsics ppf t =
+  match Terminal.kind t with
+  | `ERROR | `EOF | `PSEUDO ->
+      ()                                                            (* ignore *)
+  | `REGULAR ->
+      match generic_intrinsics (Terminal.attributes t) with
+      | None ->
+          ()
+      | Some payload ->
+          List.iter
+            (fun kwd -> Fmt.pf ppf "@\n%s, %s %s;" kwd
+                (Terminal.name t) (uncobolize kwd)) @@
+          List.filter_map
+            (fun s -> match String.trim s with "" -> None | s -> Some s)
+            (String.split_on_char ',' payload)
+
+let emit_custom_intrinsics ppf t =
+  match Terminal.kind t with
+  | `ERROR | `EOF | `PSEUDO ->
+      ()                                                            (* ignore *)
+  | `REGULAR ->
+      match intrinsic (Terminal.attributes t) with
+      | None ->
+          ()
+      | Some payload ->
+          match
+            List.filter_map
+              (fun s -> match String.trim s with "" -> None | s -> Some s)
+              (String.split_on_char ',' payload)
+          with
+          | [] ->                                             (* auto-generate *)
+              Fmt.pf ppf "@\n\"%s\", %a;"
+                (cobolize @@ Terminal.name t) pp_terminal t
+          | kwds ->
+              List.iter
+                (fun kwd -> Fmt.pf ppf "@\n%s, %a;" kwd pp_terminal t)
+                kwds
 
 let emit_keywords_list ppf =
   Fmt.pf ppf "@[<2>let keywords = %s.[" tokens_module;
@@ -102,6 +154,12 @@ let emit_silenced_keywords_list ppf =
   Terminal.iter (emit_entry silenced ~comment_token:true ppf);
   Fmt.pf ppf "@]@\n]@."
 
+let emit_intrinsic_functions_list ppf =
+  Fmt.pf ppf "@[<2>let intrinsic_functions = %s.[" tokens_module;
+  Terminal.iter (emit_generic_intrinsics ppf);
+  Terminal.iter (emit_custom_intrinsics ppf);
+  Fmt.pf ppf "@]@\n]@."
+
 let emit ppf =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
@@ -110,10 +168,12 @@ let emit ppf =
      @\n%t\
      @\n%t\
      @\n%t\
+     @\n%t\
      @\n"
     cmlyname
     emit_prelude
     emit_keywords_list
+    emit_intrinsic_functions_list
     emit_puncts_list
     emit_silenced_keywords_list
 

@@ -104,6 +104,9 @@ let make_parser
     in
     let module Config = (val config) in
     Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
+      ~intrinsics: Config.intrinsic_functions
+      (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
+      (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)
   in
   {
     prev_limit = None;
@@ -287,21 +290,71 @@ let env_loc env =
   | None -> None
   | Some (Element (_, _, s, e)) -> Some (Overlay_manager.join_limits (s, e))
 
-let pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
+let on_pending ?(severity = Cobol_common.Diagnostics.Warn) descr ps env =
   if List.mem `Pending ps.preproc.persist.show
   then add_diag ps severity ?loc:(env_loc env) (Implementation_pending descr)
   else ps
 
-let post_production ({ preproc = { tokzr; _ }; _ } as ps)
-    token tokens prod env =
-  match Grammar_post_actions.post_production prod env with
-  | Post_special_names DecimalPointIsComma ->
+let on_special_names special_names ps token tokens =
+  match special_names with
+  | Cobol_ptree.DecimalPointIsComma ->
       let tokzr, token, tokens
-        = Tokzr.decimal_point_is_comma tokzr token tokens in
+        = Tokzr.decimal_point_is_comma ps.preproc.tokzr token tokens in
       update_tokzr ps tokzr, token, tokens
+  | _ ->
+      ps, token, tokens
+
+let on_repository_paragraph repository ps token tokens =
+  List.fold_left begin fun ((ps, token, tokens) as acc) -> function
+    | Cobol_ptree.IntrinsicFunctionSpecifier intrinsics ->
+        let tokzr
+          = Tokzr.replace_intrinsics ps.preproc.tokzr (Some intrinsics) in
+        update_tokzr ps tokzr, token, tokens
+    | IntrinsicFunctionAllSpecifier ->
+        let tokzr
+          = Tokzr.replace_intrinsics ps.preproc.tokzr None in
+        update_tokzr ps tokzr, token, tokens
+    | ClassSpecifier _
+    | InterfaceSpecifier _
+    | ProgramSpecifier _
+    | PropertySpecifier _
+    | UserFunctionSpecifier _ ->
+        acc
+  end (ps, token, tokens) repository
+
+let on_procedure_division_header ps token tokens =
+  let tokzr, token, tokens
+    = Tokzr.enable_intrinsics ps.preproc.tokzr token tokens in
+  update_tokzr ps tokzr, token, tokens
+
+let on_procedure_division _proc_div ps token tokens =
+  (* Note: for efficiency, that reset should be done at the start of each COBOL
+     unit instead of at its end.  To do that, we may just need post-actions on
+     program/function/...-id headers (or maybe IDENTIFICATION DIVISION). *)
+  let tokzr, token, tokens
+    = Tokzr.reset_intrinsics ps.preproc.tokzr token tokens in
+  update_tokzr ps tokzr, token, tokens
+
+let on_method_definitions _method_defs ps token tokens =
+  (* Note: (same as `on_procedure_division`) *)
+  let tokzr, token, tokens
+    = Tokzr.reset_intrinsics ps.preproc.tokzr token tokens in
+  update_tokzr ps tokzr, token, tokens
+
+let post_production ps token tokens prod env =
+  match Grammar_post_actions.post_production prod env with
+  | Post_special_names s ->
+      on_special_names s ps token tokens
+  | Post_repository_paragraph p ->
+      on_repository_paragraph p ps token tokens
+  | Post_procedure_division_header () ->
+      on_procedure_division_header ps token tokens
+  | Post_procedure_division p ->
+      on_procedure_division p ps token tokens
+  | Post_method_definitions d ->
+      on_method_definitions d ps token tokens
   | Post_pending descr ->
-      pending descr ps env, token, tokens
-  | Post_special_names _
+      on_pending descr ps env, token, tokens
   | NoPost ->
       ps, token, tokens
 
@@ -309,7 +362,7 @@ let post_production ({ preproc = { tokzr; _ }; _ } as ps)
 let after_reduction ps token tokens prod = function
   | Grammar_interpr.HandlingError env
   | AboutToReduce (env, _)
-  | Shifting (_, env, _) ->
+  | Shifting (env, _, _) ->
       post_production ps token tokens prod env
   | _ ->
       ps, token, tokens
@@ -527,11 +580,13 @@ let parse_with_history ?(save_stage = 10) rwps =
         in
         loop count { rwps with store; stage }
   in
-  Tokzr.enable_context_sensitive_tokens
-    (rewindable_parser_state rwps).preproc.tokzr;
+  let ps = rewindable_parser_state rwps in
+  Tokzr.enable_context_sensitive_tokens  ps.preproc.tokzr;
+  Tokzr.reregister_intrinsics            ps.preproc.tokzr;
   let res, rwps = loop 0 rwps in
-  Tokzr.disable_context_sensitive_tokens
-    (rewindable_parser_state rwps).preproc.tokzr;
+  let ps = rewindable_parser_state rwps in
+  Tokzr.unregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.disable_context_sensitive_tokens ps.preproc.tokzr;
   res, rwps
 
 let find_history_event_preceding ~position ({ store; _ } as rwps) =

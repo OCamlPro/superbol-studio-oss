@@ -104,7 +104,7 @@ let fold_function_unit (v: _#folder) =
                           function_proc; function_end_name } x -> x
       >> fold_name_or_literal' v function_name
       >> fold_strlit_opt v function_as
-      >> fold_bool v function_is_proto                      (* XXX: useful? *)
+      >> fold_bool v function_is_proto                        (* XXX: useful? *)
       >> fold_options_paragraph'_opt v function_options
       >> fold_environment_division'_opt v function_env
       >> fold_data_division'_opt v function_data

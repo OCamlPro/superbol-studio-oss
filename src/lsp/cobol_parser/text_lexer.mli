@@ -12,34 +12,44 @@
 (**************************************************************************)
 
 module TYPES: sig
-  type token_handle
+  type keyword_handle
+  type intrinsic_handle
   type lexer
 end
 include module type of TYPES
 
 module TokenHandles: sig
-  include Set.S with type elt = token_handle
+  include Set.S with type elt = keyword_handle
   val mem_text_token: Grammar_tokens.token -> t -> bool
 end
+
+module IntrinsicHandles: Set.S with type elt = intrinsic_handle
 
 (* --- *)
 
 val show_token: Grammar_tokens.token -> string
-val show_token_of_handle: token_handle -> string
+val show_token_of_handle: keyword_handle -> string
 val pp_tokens_via_handles: TokenHandles.t Pretty.printer
 
 (** Only for debugging *)
-val keyword_of_token : (Grammar_tokens.token, string) Hashtbl.t
+val word_of_token : (Grammar_tokens.token, string) Hashtbl.t
 val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
+
 
 (* --- *)
 
 val create: ?decimal_point_is_comma:bool -> unit -> lexer
-val handle_of_token: lexer -> Grammar_tokens.token -> token_handle
+val handle_of_token: lexer -> Grammar_tokens.token -> keyword_handle
 val reserve_words: lexer -> Cobol_config.words_spec -> unit
-val enable_tokens: TokenHandles.t -> unit
-val disable_tokens: TokenHandles.t -> unit
+val intrinsic_handles: lexer -> string list -> IntrinsicHandles.t
+
+val token_of_intrinsic: string -> Grammar_tokens.token
+
+val enable_keywords: TokenHandles.t -> unit
+val disable_keywords: TokenHandles.t -> unit
 val decimal_point_is_comma: lexer -> lexer
+val register_intrinsics: lexer -> IntrinsicHandles.t -> unit
+val unregister_intrinsics: lexer -> IntrinsicHandles.t -> unit
 
 (* --- *)
 
