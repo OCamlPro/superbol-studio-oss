@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
+
 (** Cobol text tokenization *)
 
 (** {2 Compilation group tokens} *)
@@ -45,10 +47,12 @@ type 'a state
     {!enable_tokens} or {!disable_tokens} are needed to enable or disable them
     when needed.  *)
 val init
-  : ?verbose:bool
-  -> ?show_if_verbose:[> `Tks | `Ctx] list
+  : ?verbose: bool
+  -> ?show_if_verbose: [> `Tks | `Ctx] list
   -> exec_scanners: Parser_options.exec_scanners
-  -> memory:'a memory
+  -> memory: 'a memory
+  -> intrinsics: StringSet.t
+  -> ?default_intrinsics: StringSet.t
   -> Cobol_config.words_spec
   -> 'a state
 
@@ -79,12 +83,28 @@ val put_token_back
 
 (* --- *)
 
-val intrinsic_functions_specifier
-  : ?intrinsics:string list
-  -> 'a state
+val enable_intrinsics
+  : 'a state
   -> token
   -> tokens
   -> 'a state * token * tokens
+
+val disable_intrinsics
+  : 'a state
+  -> token
+  -> tokens
+  -> 'a state * token * tokens
+
+val reset_intrinsics
+  : 'a state
+  -> token
+  -> tokens
+  -> 'a state * token * tokens
+
+val replace_intrinsics
+  : 'a state
+  -> string Cobol_ptree.with_loc list option
+  -> 'a state
 
 val decimal_point_is_comma
   : 'a state
@@ -111,3 +131,5 @@ val pop_context
 
 val enable_context_sensitive_tokens: _ state -> unit
 val disable_context_sensitive_tokens: _ state -> unit
+val unregister_intrinsics: _ state -> unit
+val reregister_intrinsics: _ state -> unit

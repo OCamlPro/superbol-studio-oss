@@ -460,20 +460,20 @@ let pp_specifier_aux kind ppf n en ex =
 
 let pp_specifier ppf = function
   | ClassSpecifier { name; external_name = en; expands = ex } ->
-    pp_specifier_aux "CLASS" ppf name en ex
+      pp_specifier_aux "CLASS" ppf name en ex
   | InterfaceSpecifier { name; external_name = en; expands = ex } ->
-    pp_specifier_aux "INTERFACE" ppf name en ex
+      pp_specifier_aux "INTERFACE" ppf name en ex
   | UserFunctionSpecifier { name; external_name = en } ->
-    pp_specifier_aux "FUNCTION" ppf name en None
+      pp_specifier_aux "FUNCTION" ppf name en None
   | IntrinsicFunctionSpecifier ns ->
-    Fmt.pf ppf "FUNCTION %a INTRINSIC"
-      Fmt.(list ~sep:sp pp_name') ns
+      Fmt.pf ppf "FUNCTION@ %a@ INTRINSIC"
+        Fmt.(list ~sep:sp pp_name') ns
   | IntrinsicFunctionAllSpecifier ->
-    Fmt.pf ppf "FUNCTION ALL INTRINSIC"
+      Fmt.pf ppf "FUNCTION@ ALL@ INTRINSIC"
   | ProgramSpecifier { name; external_name = en } ->
-    pp_specifier_aux "PROGRAM" ppf name en None
+      pp_specifier_aux "PROGRAM" ppf name en None
   | PropertySpecifier { name; external_name = en } ->
-    pp_specifier_aux "PROPERTY" ppf name en None
+      pp_specifier_aux "PROPERTY" ppf name en None
 
 let pp_repository_paragraph ppf rps =
   Fmt.pf ppf "REPOSITORY.";

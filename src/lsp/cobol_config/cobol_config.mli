@@ -22,7 +22,6 @@ include module type of Types
 module Options = Options
 module Default = Default
 module Diagnostics = Config_diagnostics
-module Reserved = Reserved_words
 
 exception ERROR of Diagnostics.error
 

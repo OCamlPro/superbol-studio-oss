@@ -137,6 +137,11 @@ let%expect_test "context-sensitive-tokens-lower-case" =
 let%expect_test "context-sensitive-tokens-weird-exit" =
   Parser_testing.show_parsed_tokens {|
        PROGRAM-ID.        prog.
+       ENVIRONMENT        DIVISION.
+       CONFIGURATION      SECTION.
+       REPOSITORY.
+      *    disable BYTE-LENGTH as an intrinsic (in case it's in defaults)
+           FUNCTION PI    INTRINSIC.
        DATA               DIVISION.
        WORKING-STORAGE    SECTION.
        01  X              CONSTANT IS GLOBAL 666.
@@ -147,9 +152,10 @@ let%expect_test "context-sensitive-tokens-weird-exit" =
            STOP RUN.
   |};
   [%expect {|
-    PROGRAM-ID, ., INFO_WORD[prog], ., DATA, DIVISION, ., WORKING-STORAGE,
-    SECTION, ., DIGITS[01], WORD[X], CONSTANT, IS_GLOBAL, DIGITS[666], .,
-    DIGITS[01], WORD[Y], CONSTANT, DIGITS[999], ., DIGITS[77], WORD[BYTE-LENGTH],
-    PICTURE, PICTURE_STRING[X], VALUE, "A", ., PROCEDURE, DIVISION, ., DISPLAY,
-    WORD[BYTE-LENGTH], ., STOP, RUN, ., EOF
+    PROGRAM-ID, ., INFO_WORD[prog], ., ENVIRONMENT, DIVISION, ., CONFIGURATION,
+    SECTION, ., REPOSITORY, ., FUNCTION, WORD[PI], INTRINSIC, ., DATA, DIVISION,
+    ., WORKING-STORAGE, SECTION, ., DIGITS[01], WORD[X], CONSTANT, IS_GLOBAL,
+    DIGITS[666], ., DIGITS[01], WORD[Y], CONSTANT, DIGITS[999], ., DIGITS[77],
+    WORD[BYTE-LENGTH], PICTURE, PICTURE_STRING[X], VALUE, "A", ., PROCEDURE,
+    DIVISION, ., DISPLAY, WORD[BYTE-LENGTH], ., STOP, RUN, ., EOF
 |}];;

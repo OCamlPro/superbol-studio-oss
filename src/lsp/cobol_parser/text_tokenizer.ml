@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open EzCompat
 module TEXT = Cobol_preproc.Text
 
 open Cobol_common.Srcloc.INFIX
@@ -84,7 +85,6 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
   | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
-  | INTRINSIC_FUNC f -> print "INTRINSIC-FUNC<%a>" Cobol_ptree.pp_generic_intrinsic_identifier f
   | t -> string @@
       try Text_lexer.show_token t
       with Not_found ->
@@ -106,6 +106,26 @@ let pp_token: token Pretty.printer = fun ppf ->
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
     | INTERVENING_ c -> print "<%c>" c
+    | BYTE_LENGTH_FUNC
+    | CHAR_FUNC
+    | CONTENT_OF_FUNC
+    | CONVERT_FUNC
+    | CURRENT_DATE_FUNC
+    | FORMATTED_DATETIME_FUNC
+    | FORMATTED_TIME_FUNC
+    | LENGTH_FUNC
+    | LOCALE_DATE_FUNC
+    | LOCALE_TIME_FROM_SECONDS_FUNC
+    | LOCALE_TIME_FUNC
+    | NUMVAL_C_FUNC
+    | RANDOM_FUNC
+    | RANGE_FUNC
+    | REVERSE_FUNC
+    | SIGN_FUNC
+    | SUM_FUNC
+    | TRIM_FUNC
+    | WHEN_COMPILED_FUNC
+    | INTRINSIC_FUNC _ -> print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 
@@ -128,7 +148,7 @@ let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
 
 (* Tokenization of manipulated text, to feed the compilation group parser: *)
 
-let preproc_n_combine_tokens ~source_format =
+let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
   (* Simplifies the grammar, and applies some token-based pre-processsing to
      deal with old-style informational paragraphs (COBOL85). *)
   let ( +@+ ) = Cobol_common.Srcloc.concat
@@ -142,8 +162,17 @@ let preproc_n_combine_tokens ~source_format =
     | t ->
         (* Try de-tokenizing to accept, e.g, PROGRAM-ID. nested. (as NESTED is a
            keyword). *)
-        try INFO_WORD (Hashtbl.find Text_lexer.keyword_of_token t)
+        try INFO_WORD (Hashtbl.find Text_lexer.word_of_token t)
         with Not_found -> t
+  and function_name = function
+    | t when not intrinsics_enabled ->
+        t
+    | WORD w | WORD_IN_AREA_A w as t ->
+        (try Text_lexer.token_of_intrinsic w with Not_found -> t)
+    | t ->
+        (try (Text_lexer.token_of_intrinsic @@
+              Hashtbl.find Text_lexer.word_of_token t)
+         with Not_found -> t)
   and comment_entry revtoks =
     COMMENT_ENTRY (List.rev_map (Pretty.to_string "%a" pp_token_string) revtoks)
   in
@@ -151,133 +180,6 @@ let preproc_n_combine_tokens ~source_format =
   let rec skip ((p', l', dgs) as acc) ((p, l) as pl) = function
     | 0 -> acc, pl
     | i -> skip (hd p :: p', hd l :: l', dgs) (tl p, tl l) (i - 1)
-  and subst_function ?(in_repo = false) ((p', l', dgs) as acc) ((p, l) as pl) =
-    if in_repo then
-      begin
-        match p with
-        | FUNCTION :: _ ->
-          subst_function ~in_repo:true (hd p :: p', hd l :: l', dgs) (tl p, tl l)
-        | name :: _ ->
-          begin match name with
-            | LENGTH ->
-              subst_function ~in_repo:true
-                ((WORD "LENGTH")::p', hd l::l', dgs) (tl p, tl l)
-            | RANDOM ->
-              subst_function ~in_repo:true
-                ((WORD "RANDOM")::p', hd l::l', dgs) (tl p, tl l)
-            | REVERSE ->
-              subst_function ~in_repo:true
-                ((WORD "REVERSE")::p', hd l::l', dgs) (tl p, tl l)
-            | SIGN ->
-              subst_function ~in_repo:true
-                ((WORD "SIGN")::p', hd l::l', dgs) (tl p, tl l)
-            | SUM ->
-              subst_function ~in_repo:true
-                ((WORD "SUM")::p', hd l::l', dgs) (tl p, tl l)
-            | INTRINSIC ->
-              aux (hd p :: p', hd l :: l', dgs) (tl p, tl l)
-            | WORD w ->
-              begin match String.uppercase_ascii w with
-                | "LENGTH" ->
-                  subst_function ~in_repo:true ((WORD "LENGTH")::p', hd l::l', dgs) (tl p, tl l)
-                | "RANDOM" ->
-                  subst_function ~in_repo:true ((WORD "RANDOM")::p', hd l::l', dgs) (tl p, tl l)
-                | "REVERSE" ->
-                  subst_function ~in_repo:true ((WORD "REVERSE")::p', hd l::l', dgs) (tl p, tl l)
-                | "SIGN" ->
-                  subst_function ~in_repo:true ((WORD "SIGN")::p', hd l::l', dgs) (tl p, tl l)
-                | "SUM" ->
-                  subst_function ~in_repo:true ((WORD "SUM")::p', hd l::l', dgs) (tl p, tl l)
-                | "INTRINSIC" ->
-                  aux (hd p :: p', hd l :: l', dgs) (tl p, tl l)
-                | "TRIM" ->
-                  subst_function ~in_repo:true ((WORD "TRIM")::p', hd l::l', dgs) (tl p, tl l)
-                | "NUMVAL-C" ->
-                  subst_function ~in_repo:true ((WORD "NUMVAL_C")::p', hd l::l', dgs) (tl p, tl l)
-                | "LOCALE-DATE" ->
-                  subst_function ~in_repo:true
-                    ((WORD "LOCALE_DATE")::p', hd l::l', dgs) (tl p, tl l)
-                | "LOCALE-TIME" ->
-                  subst_function ~in_repo:true
-                    ((WORD "LOCALE_TIME")::p', hd l::l', dgs) (tl p, tl l)
-                | "LOCALE-TIME-FROM-SECONDS" ->
-                  subst_function ~in_repo:true
-                    ((WORD "LOCALE_TIME_FROM_SECONDS")::p', hd l::l', dgs) (tl p, tl l)
-                | "FORMATTED-TIME" ->
-                  subst_function ~in_repo:true
-                    ((WORD "FORMATTED_TIME")::p', hd l::l', dgs) (tl p, tl l)
-                | "FORMATTED-DATETIME" ->
-                  subst_function ~in_repo:true
-                    ((WORD "FORMATTED_DATETIME")::p', hd l::l', dgs) (tl p, tl l)
-                | _ ->
-                    let acc, pl = skip acc pl 1 in
-                    aux acc pl
-              end
-            | _ ->
-              let acc, pl = skip acc pl 1 in
-              aux acc pl
-            end
-        | [] -> Ok acc
-        end
-    else
-      begin match p with
-        | FUNCTION :: name :: _ ->
-          let p'_fun = FUNCTION :: p' in
-          let l'_fun = hd l :: l' in
-          let l_fun = tl l in
-          let p_fun = tl p in
-          begin match name with
-            | LENGTH ->
-              aux (LENGTH_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
-            | RANDOM ->
-              aux (RANDOM_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
-            | REVERSE ->
-              aux (REVERSE_FUNC :: p'_fun, hd l_fun :: l'_fun, dgs) (tl p_fun, tl l_fun)
-            | SIGN ->
-              aux (SIGN_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-            | SUM ->
-              aux (SUM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-            | WORD w ->
-              begin match String.uppercase_ascii w with
-                | "LENGTH" ->
-                  aux (LENGTH_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "RANDOM" ->
-                  aux (RANDOM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "REVERSE" ->
-                  aux (REVERSE_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "SIGN" ->
-                  aux (SIGN_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "SUM" ->
-                  aux (SUM_FUNC :: p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "TRIM" ->
-                  subst_function (TRIM_FUNC::p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "NUMVAL-C" ->
-                  subst_function (NUMVAL_C_FUNC::p'_fun, hd l_fun::l'_fun, dgs) (tl p_fun, tl l_fun)
-                | "LOCALE-DATE" ->
-                  subst_function (LOCALE_DATE_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
-                    (tl p_fun, tl l_fun)
-                | "LOCALE-TIME" ->
-                  subst_function (LOCALE_TIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
-                    (tl p_fun, tl l_fun)
-                | "LOCALE-TIME-FROM-SECONDS" ->
-                  subst_function (LOCALE_TIME_FROM_SECONDS_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
-                    (tl p_fun, tl l_fun)
-                | "FORMATTED-TIME" ->
-                  subst_function (FORMATTED_TIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
-                    (tl p_fun, tl l_fun)
-                | "FORMATTED-DATETIME" ->
-                  subst_function (FORMATTED_DATETIME_FUNC::p'_fun, hd l_fun::l'_fun, dgs)
-                    (tl p_fun, tl l_fun)
-                | _ ->
-                  aux (p'_fun, l'_fun, dgs) (p_fun, l_fun)
-                end
-            | _ ->
-              aux (p'_fun, l'_fun, dgs) (p_fun, l_fun)
-            end
-        | tok :: _ ->
-            aux (tok :: p', hd l :: l', dgs) (tl p, tl l)
-        | [] -> Ok acc
-        end
   and aux acc (p, l) =
     let subst_n x y =
       let rec cons x ((p', l', dgs) as _acc) (p, l) = function
@@ -291,6 +193,11 @@ let preproc_n_combine_tokens ~source_format =
       match p with
       | [] -> Result.Error `MissingInputs
       | t :: _ -> aux (info_word t :: p', hd l :: l', dgs) (tl p, tl l)
+    and function_name_after n =
+      let (p', l', dgs), (p, l) = skip acc (p, l) n in
+      match p with
+      | [] -> Result.Error `MissingInputs
+      | t :: _ -> aux (function_name t :: p', hd l :: l', dgs) (tl p, tl l)
     and missing_continuation_of str =
       let (p', l', diags), pl = skip acc (p, l) 1 in
       let error = Missing { loc = hd l; stuff = Continuation_of str } in
@@ -311,51 +218,6 @@ let preproc_n_combine_tokens ~source_format =
         in
         consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
           Comment_entry acc suff
-    in
-    let function_specifier = function
-      | FUNCTION :: _ :: next :: _ ->
-        begin match next with (* if we have one of these words after then we are in repository *)
-          | LENGTH | RANDOM | REVERSE | SIGN | SUM | INTRINSIC ->
-            subst_function ~in_repo:true acc (p, l)
-          | WORD w ->
-            begin match String.uppercase_ascii w with
-              | "ABS" | "ABSOLUTE-VALUE" | "ACOS" | "ANNUITY" | "ASIN" | "ATAN" | "BASECONVERT"
-              | "BIT-OF" | "BIT-TO-CHAR" | "BOOLEAN-OF-INTEGER" | "BYTE-LENGTH" | "CHAR"
-              | "CHAR-NATIONAL" | "COMBINED-DATETIME" | "CONCAT" | "CONCATENATE" | "CONTENT-LENGTH"
-              | "CONTENT-OF" | "CONVERT" | "COS" | "CURRENCY-SYMBOL" | "CURRENT-DATE"
-              | "DATE-OF-INTEGER" | "DATE-TO-YYYYMMDD" | "DAY-OF-INTEGER" | "DAY-TO-YYYYDDD"
-              | "DISPLAY-OF" | "E" | "EXCEPTION-FILE" | "EXCEPTION-FILE-N" | "EXCEPTION-LOCATION"
-              | "EXCEPTION-LOCATION-N" | "EXCEPTION-STATEMENT" | "EXCEPTION-STATUS" | "EXP"
-              | "EXP10" | "FACTORIAL" | "FIND-STRING" | "FORMATTED-CURRENT-DATE" | "FORMATTED-DATE"
-              | "FORMATTED-DATETIME" | "FORMATTED-TIME" | "FRACTION-PART" | "HEX-OF"
-              | "HEX-TO-CHAR" | "HIGHEST-ALGEBRAIC" | "INTEGER" | "INTEGER-OF-BOOLEAN"
-              | "INTEGER-OF-DATE" | "INTEGER-OF-DAY" | "INTEGER-OF-FORMATTED-DATE" | "INTEGER-PART"
-              | "LENGTH" | "LENGTH-AN" | "LOCALE-COMPARE" | "LOCALE-DATE" | "LOCALE-TIME"
-              | "LOCALE-TIME-FROM-SECONDS" | "LOG" | "LOG10" | "LOWER_CASE" | "LOWEST-ALGEBRAIC"
-              | "MAX" | "MEAN" | "MEDIAN" | "MIDRANGE" | "MIN" | "MOD" | "MODULE-CALLER-ID"
-              | "MODULE-DATE" | "MODULE-FORMATTED-DATE" | "MODULE-ID" | "MODULE-NAME"
-              | "MODULE-PATH" | "MODULE-SOURCE" | "MODULE-TIME" | "MONETARY-DECIMAL-POINT"
-              | "MONETARY-THOUSANDS-SEPARATOR" | "NATIONAL-OF" | "NUMERIC-DECIMAL-POINT"
-              | "NUMERIC-THOUSANDS-SEPARATOR" | "NUMVAL" | "NUMVAL-C"
-              | "NUMVAL-F" | "ORD" | "ORD-MAX" | "ORD-MIN" | "PI" | "PRESENT-VALUE" | "RANDOM"
-              | "RANGE" | "REM" | "REVERSE" | "SECONDS-FROM-FORMATTED-TIME"
-              | "SECONDS-PAST-MIDNIGHT" | "SIGN" | "SIN" | "SQRT" | "STANDARD-COMPARE"
-              | "STANDARD-DEVIATION" | "STORED-CHAR-LENGTH" | "SUBSTITUTE" | "SUBSTITUTE-CASE"
-              | "SUM" | "TAN" | "TEST-DATE-YYYYMMDD" | "TEST-DAY-YYYYDDD"
-              | "TEST-FORMATTED-DATETIME" | "TEST-NUMVAL" | "TEST-NUMVAL-C" | "TEST-NUMVAL-F"
-              | "TRIM" | "UPPER-CASE" | "VARIANCE" | "WHEN-COMPILED" | "YEAR-TO-YYYY"
-              | "INTRINSIC" ->
-                subst_function ~in_repo:true acc (p, l)
-              | _ ->
-                  subst_function acc (p, l)
-            end
-          | _ -> subst_function acc (p, l)
-        end
-      | FUNCTION :: _ ->
-        subst_function acc (p, l)
-      | tok :: _ ->
-        subst_n tok 1
-      | [] -> Ok acc
     in
     match p with
 
@@ -428,6 +290,8 @@ let preproc_n_combine_tokens ~source_format =
     | END :: CLASS :: _
     | END :: INTERFACE :: _            -> info_word_after 2
 
+    | FUNCTION :: _                   -> function_name_after 1
+
     | [AUTHOR | INSTALLATION |
        DATE_WRITTEN | DATE_MODIFIED |
        DATE_COMPILED | REMARKS |
@@ -438,9 +302,6 @@ let preproc_n_combine_tokens ~source_format =
        SECURITY) :: PERIOD :: _        -> comment_entry_after 2
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
-
-    | [FUNCTION]                    -> Error `MissingInputs
-    | (FUNCTION :: _) as tks          -> function_specifier tks
 
     | tok :: _                        -> subst_n tok 1
 
@@ -502,6 +363,8 @@ type 'm state =
                                 errors out for lack of input tokens. *)
     memory: 'm memory;
     context_stack: Context.stack;
+    registered_intrinsics: Text_lexer.IntrinsicHandles.t;
+    intrinsics_enabled: bool;
     diags: Parser_diagnostics.t;
     persist: persist;
   }
@@ -511,6 +374,8 @@ and persist =
   {
     lexer: Text_lexer.lexer;
     context_tokens: Grammar_contexts.context_tokens;
+    known_intrinsics: Text_lexer.IntrinsicHandles.t;
+    default_intrinsics: Text_lexer.IntrinsicHandles.t;
     exec_scanners: Parser_options.exec_scanners;
     verbose: bool;
     show_if_verbose: [`Tks | `Ctx] list;
@@ -523,6 +388,8 @@ let init
     ?(show_if_verbose = [`Tks; `Ctx])
     ~exec_scanners
     ~memory
+    ~intrinsics
+    ?(default_intrinsics = StringSet.empty)       (* preregistered_intrinsics *)
     words
   =
   let lexer = Text_lexer.create () in
@@ -532,18 +399,29 @@ let init
     Grammar_contexts.init
       ~handle_of_token:(Text_lexer.handle_of_token lexer)
   in
-  Text_lexer.disable_tokens context_sensitive_tokens;
+  Text_lexer.disable_keywords context_sensitive_tokens;
   Text_lexer.reserve_words lexer words;
+  let known_intrinsics =
+    Text_lexer.intrinsic_handles lexer (StringSet.elements intrinsics)
+  in
+  let default_intrinsics =
+    Text_lexer.IntrinsicHandles.inter known_intrinsics @@
+    Text_lexer.intrinsic_handles lexer (StringSet.elements default_intrinsics)
+  in
   {
     expect_picture_string = false;
     leftover_tokens = [];
     memory;
     context_stack = Context.empty_stack;
+    registered_intrinsics = default_intrinsics;
+    intrinsics_enabled = false;
     diags = Parser_diagnostics.none;
     persist =
       {
         lexer;
         context_tokens;
+        known_intrinsics;
+        default_intrinsics;
         exec_scanners;
         verbose;
         show_if_verbose =
@@ -659,7 +537,7 @@ let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
         p :: acc, { s with expect_picture_string = true }
     | { payload = IS; _ } as p
       when expect_picture_string ->
-        p :: acc, { s with expect_picture_string = true }
+        p :: acc, s
     | p ->
         p :: acc, { s with expect_picture_string = false }
   in
@@ -702,7 +580,8 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   let state = { state with leftover_tokens = [] } in
   let new_tokens, state = tokens_of_text state text in
   let tokens = leftover_tokens @ new_tokens in
-  match preproc_n_combine_tokens ~source_format tokens with
+  let intrinsics_enabled = state.intrinsics_enabled in
+  match preproc_n_combine_tokens ~intrinsics_enabled ~source_format tokens with
   | Ok (tokens, diags) ->
       if show `Tks state then
         Pretty.error "Tks: %a@." pp_tokens tokens;
@@ -741,11 +620,11 @@ let next_token (s: _ state) =
   aux
 
 type lexer_update =
-  | Enabled of Text_lexer.TokenHandles.t
-  | Disabled of Text_lexer.TokenHandles.t
+  | Enabled_keywords of Text_lexer.TokenHandles.t
+  | Disabled_keywords of Text_lexer.TokenHandles.t
+  | Enabled_intrinsics
+  | Disabled_intrinsics
   | CommaBecomesDecimalPoint
-  | IntrinsicFunctionsSpecifier of string list option
-  (* | FunctionSpecifier of string list (*TODO: maybe other type*) *)
 
 let tokens_of_string' { persist = { lexer; _ }; _ } =
   Text_lexer.tokens_of_string' lexer
@@ -756,10 +635,11 @@ let tokens_of_string' { persist = { lexer; _ }; _ } =
    could be moved to Text_lexer *)
 let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s ->
   match update with
-  | Enabled tokens | Disabled tokens
+  | Enabled_keywords tokens
+  | Disabled_keywords tokens
     when Text_lexer.TokenHandles.is_empty tokens ->
       Fun.id
-  | Enabled _ ->
+  | Enabled_keywords _ ->
       List.concat_map begin fun token -> match ~&token with
         | WORD_IN_AREA_A w
         | WORD w ->
@@ -767,15 +647,19 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
         | _ ->
             [token]
       end
-  | Disabled tokens ->
-      let keyword_of_token = Hashtbl.find Text_lexer.keyword_of_token in
-      List.map begin fun token ->
+  | Disabled_keywords tokens ->
+      let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+      EzList.tail_map begin fun token ->
         if Text_lexer.TokenHandles.mem_text_token ~&token tokens
         then match token_in_area_a token, keyword_of_token ~&token with
           | true, w -> WORD_IN_AREA_A w &@<- token
           | false, w -> WORD w &@<- token
         else token
       end
+  | Enabled_intrinsics ->
+      Fun.id                                                          (* TODO *)
+  | Disabled_intrinsics ->
+      Fun.id                                                          (* TODO *)
   | CommaBecomesDecimalPoint ->
       (* This may only happen when the comma becomes a decimal separator in
          numerical literals, instead of periods.  Before this (irreversible)
@@ -817,56 +701,72 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
         aux (List.rev_append tks rev_prefix) suffix
       in
       aux []
-  | IntrinsicFunctionsSpecifier specs ->
-    begin match specs with
-      | Some _ ->
-        List.map (fun token ->
-              Fmt.epr "Trying with %a@." pp_token token;
-              try (Text_lexer.token_of_intrinsic_handle
-                @@ Text_lexer.as_intrinsic
-                @@ Text_lexer.handle_of_token s.persist.lexer ~&token) &@<- token
-              with _ ->
-                Fmt.epr "Not found;@.";
-                token)
-      | None ->
-        List.map (fun token ->
-              Fmt.epr "Trying with %a@." pp_token token;
-              try (Text_lexer.token_of_intrinsic_handle
-                @@ Text_lexer.as_intrinsic
-                @@ Text_lexer.handle_of_token s.persist.lexer ~&token) &@<- token
-              with _ ->
-                Fmt.epr "Not found;@.";
-                token)
-    end
 
 (** Enable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
 let enable_tokens state tokens incoming_tokens =
-  Text_lexer.enable_tokens incoming_tokens;
-  state, retokenize_after (Enabled incoming_tokens) state tokens
+  Text_lexer.enable_keywords incoming_tokens;
+  state, retokenize_after (Enabled_keywords incoming_tokens) state tokens
 
 (** Disable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
 let disable_tokens state tokens outgoing_tokens =
-  Text_lexer.disable_tokens outgoing_tokens;
-  state, retokenize_after (Disabled outgoing_tokens) state tokens
+  Text_lexer.disable_keywords outgoing_tokens;
+  state, retokenize_after (Disabled_keywords outgoing_tokens) state tokens
 
-let intrinsic_functions_specifier (type m) ?intrinsics (state: m state) token tokens =
-  let state = put_token_back state in
-  List.iter
-    (fun intrinsic ->
-      let intrinsic = String.uppercase_ascii intrinsic in
-      Text_lexer.specify_intrinsic state.persist.lexer intrinsic)
-    begin match intrinsics with
-      | Some specs -> specs
-      | None -> List.of_seq @@ EzCompat.StringSet.to_seq Cobol_config.Reserved.intrinsic_functions
-      end;
-  let tokens = token::tokens in
-  let tokens = retokenize_after (IntrinsicFunctionsSpecifier intrinsics) state tokens in
-  let token, tokens = List.hd tokens, List.tl tokens in
-  if show `Tks state then
-    Pretty.error "Tks': %a@." pp_tokens tokens;
-  emit_token state token, token, tokens
+
+let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.unregister_intrinsics lexer registered_intrinsics
+
+
+let reregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.register_intrinsics lexer registered_intrinsics
+
+
+let enable_intrinsics state token tokens =
+  if state.intrinsics_enabled then state, token, tokens else        (* error? *)
+    let state = put_token_back { state with intrinsics_enabled = true } in
+    reregister_intrinsics state;
+    let tokens = token :: tokens in
+    let tokens = retokenize_after Enabled_intrinsics state tokens in
+    let token, tokens = List.hd tokens, List.tl tokens in
+    if show `Tks state then
+      Pretty.error "Tks': %a@." pp_tokens tokens;
+    emit_token state token, token, tokens
+
+
+let disable_intrinsics state token tokens =
+  if not state.intrinsics_enabled then state, token, tokens else      (* error? *)
+    let state = put_token_back { state with intrinsics_enabled = false } in
+    unregister_intrinsics state;
+    let tokens = token :: tokens in
+    let tokens = retokenize_after Disabled_intrinsics state tokens in
+    let token, tokens = List.hd tokens, List.tl tokens in
+    if show `Tks state then
+      Pretty.error "Tks': %a@." pp_tokens tokens;
+    emit_token state token, token, tokens
+
+
+let reset_intrinsics state token tokens =
+  let state, token, tokens = disable_intrinsics state token tokens in
+  { state with registered_intrinsics = state.persist.default_intrinsics },
+  token,
+  tokens
+
+
+(** Replaces the set of registered intrinsics.  Registers the default set if
+    [intrinsics = None]. *)
+let replace_intrinsics state intrinsics =
+  assert (not state.intrinsics_enabled);
+  unregister_intrinsics state;
+  let registered_intrinsics = match intrinsics with
+    | None ->
+        state.persist.default_intrinsics
+    | Some s ->
+        Text_lexer.intrinsic_handles state.persist.lexer (List.map (~&) s)
+  in
+  { state with registered_intrinsics }
+
 
 let decimal_point_is_comma (type m) (state: m state) token tokens =
   let state = put_token_back state in
@@ -880,6 +780,7 @@ let decimal_point_is_comma (type m) (state: m state) token tokens =
   if show `Tks state then
     Pretty.error "Tks': %a@." pp_tokens tokens;
   emit_token state token, token, tokens
+
 
 let put_token_back state token tokens =
   put_token_back state, token :: tokens
@@ -928,7 +829,7 @@ let pop_context ({ context_stack; _ } as state) tokens =
   { state with context_stack }, tokens
 
 let enable_context_sensitive_tokens state =
-  Text_lexer.enable_tokens (Context.all_tokens state.context_stack)
+  Text_lexer.enable_keywords (Context.all_tokens state.context_stack)
 
 let disable_context_sensitive_tokens state =
-  Text_lexer.disable_tokens (Context.all_tokens state.context_stack)
+  Text_lexer.disable_keywords (Context.all_tokens state.context_stack)

@@ -21,7 +21,6 @@ include Types
 module Options = Options
 module Default = Default
 module Diagnostics = Config_diagnostics
-module Reserved = Reserved_words
 
 module DIAGS = Cobol_common.Diagnostics
 

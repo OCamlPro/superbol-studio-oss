@@ -955,6 +955,16 @@ run_file.at-3960-prog2.cob:54.8-54.16:
 >> Warning: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4000:0
+run_file.at-4000-prog.cob:15.49-15.57:
+  12           01 READ-BUFFER  PIC X(10).
+  13   
+  14           PROCEDURE DIVISION CHAINING FNAME.
+  15 >         DISPLAY 'RUN WITH ' FUNCTION TRIM (FNAME TRAILING).
+----                                                    ^^^^^^^^
+  16           CALL 'CBL_OPEN_FILE' USING FNAME 1 0 0 FHANDLE.
+  17           IF RETURN-CODE NOT = 0
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4113:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4111:0
 run_file.at-4111-prog2.cob:10.34:

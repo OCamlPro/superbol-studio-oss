@@ -29,6 +29,8 @@ class ['a] folder = object
   method fold_qualname': (qualname with_loc, 'a) fold = default
   method fold_procedure_name: (procedure_name, 'a) fold = default
   method fold_procedure_name': (procedure_name with_loc, 'a) fold = default
+  method fold_intrinsic_name: (intrinsic_name, 'a) fold = default
+  method fold_intrinsic_name': (intrinsic_name with_loc, 'a) fold = default
   method fold_qualident: (qualident, 'a) fold = default
   method fold_address: (address, 'a) fold = default
   method fold_counter: (counter, 'a) fold = default
@@ -114,6 +116,12 @@ let fold_object_ref (v: _ #folder) =
       | ExceptionObject | Null | Self -> Fun.id
       | Super s -> fold_name'_opt v s
     end
+
+let fold_intrinsic_name (v: _ #folder) =
+  leaf v#fold_intrinsic_name
+
+let fold_intrinsic_name' (v: _ #folder) =
+  handle' v#fold_intrinsic_name' v ~fold:fold_intrinsic_name
 
 let rec fold_literal (v: _ #folder) : literal -> 'a -> 'a = function
   | Boolean b -> fold_boolean v b
@@ -251,46 +259,43 @@ and fold_address (v: _ #folder) =
 and fold_inline_call (v: _ #folder) =
   handle v#fold_inline_call
     ~continue:begin fun c x -> match c with
-      | CallFunc { call_fun; call_args } ->
-        x
-        >> fold_name' v call_fun
-        >> fold_list ~fold:fold_effective_arg v call_args
-      | CallGenericIntrinsic {  args; _ } ->
-        x
-        (*TODO: fold_generic_intrinsic_idenitifier *)
-        >> fold_list ~fold:fold_effective_arg v args
-      | CallTrim { arg; tip } ->
-        x
-        >> fold_effective_arg v arg
-        >> fold_option ~fold:fold_trimming_tip v tip
-      | CallLength { arg; physical } ->
-        x
-        >> fold_ident_or_nonnum v arg
-        >> fold_bool v physical
-      | CallNumvalC args->
-        x
-        >> fold_list ~fold:fold_ident_or_nonnum v args
-      | CallLocaleDate { datetime; locale } ->
-        x
-        >> fold_effective_arg v datetime
-        >> fold_option ~fold:fold_qualname v locale
-      | CallLocaleTime { datetime; locale } ->
-        x
-        >> fold_effective_arg v datetime
-        >> fold_option ~fold:fold_qualname v locale
-      | CallLocaleTimeFromSeconds { datetime; locale } ->
-        x
-        >> fold_effective_arg v datetime
-        >> fold_option ~fold:fold_qualname v locale
-      | CallFormattedDatetime { args; system_offset } ->
-        x
-        >> fold_list ~fold:fold_effective_arg v args
-        >> fold_bool v system_offset
-      | CallFormattedTime { args; system_offset } ->
-        x
-        >> fold_list ~fold:fold_effective_arg v args
-        >> fold_bool v system_offset
+      | CallFunc { func; args } -> x
+          >> fold_name' v func
+          >> fold_list ~fold:fold_effective_arg v args
+      | CallGenericIntrinsic { func; args } -> x
+          >> fold_intrinsic_name' v func
+          >> fold_list ~fold:fold_effective_arg v args
+      | CallTrim { arg; tip } -> x
+          >> fold_effective_arg v arg
+          >> fold_option ~fold:fold_trimming_tip v tip
+      | CallLength { arg; physical } -> x
+          >> fold_ident_or_nonnum v arg
+          >> fold_bool v physical
+      | CallNumvalC args -> x
+          >> fold_list ~fold:fold_ident_or_nonnum v args
+      | CallLocaleDate args -> x
+          >> fold_locale_func_args v args
+      | CallLocaleTime args -> x
+          >> fold_locale_func_args v args
+      | CallLocaleTimeFromSeconds args -> x
+          >> fold_locale_func_args v args
+      | CallFormattedDatetime args -> x
+          >> fold_formatted_func_args v args
+      | CallFormattedTime args -> x
+          >> fold_formatted_func_args v args
     end
+
+and fold_locale_func_args (v: _ #folder) =
+  begin fun { locale_func_args; locale_func_locale } x -> x
+    >> fold_effective_arg v locale_func_args
+    >> fold_option ~fold:fold_qualname v locale_func_locale
+  end
+
+and fold_formatted_func_args (v: _ #folder) =
+  begin fun { formatted_func_args; formatted_func_system_offset } x -> x
+    >> fold_list ~fold:fold_effective_arg v formatted_func_args
+    >> fold_bool v formatted_func_system_offset
+  end
 
 and fold_inline_invocation (v: _ #folder) =
   handle v#fold_inline_invocation
