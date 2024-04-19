@@ -71,7 +71,7 @@ let fold_usage (v: _ #folder) =
       | Packed_decimal pic ->
           fold_picture v pic
       | Function_pointer name
-      | Object_reference Some Name { class_or_interface_name = name; _ }
+      | Object_reference Some NamedClass { class_or_interface_name = name; _ }
       | Pointer Some name
       | Program_pointer Some name ->
           Cobol_ptree.Terms_visitor.fold_name' v name

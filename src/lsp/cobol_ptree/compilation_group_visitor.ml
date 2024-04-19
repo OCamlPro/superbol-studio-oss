@@ -102,14 +102,14 @@ let fold_function_unit (v: _#folder) =
     ~continue:begin fun { function_name; function_as; function_is_proto;
                           function_options; function_env; function_data;
                           function_proc; function_end_name } x -> x
-      >> fold_name' v function_name
+      >> fold_name_or_literal' v function_name
       >> fold_strlit_opt v function_as
       >> fold_bool v function_is_proto                      (* XXX: useful? *)
       >> fold_options_paragraph'_opt v function_options
       >> fold_environment_division'_opt v function_env
       >> fold_data_division'_opt v function_data
       >> fold_procedure_division'_opt v function_proc
-      >> fold_name' v function_end_name                     (* XXX: useful? *)
+      >> fold_name_or_literal' v function_end_name            (* XXX: useful? *)
     end
 
 let fold_function_unit' (v: _#folder) =
@@ -136,7 +136,7 @@ let fold_method_definition (v: _#folder) =
       >> fold_environment_division'_opt v method_env
       >> fold_data_division'_opt v method_data
       >> fold_procedure_division'_opt v method_proc
-      >> fold_name' v method_end_name                       (* XXX: useful? *)
+      >> fold_name' v method_end_name                         (* XXX: useful? *)
     end
 
 let fold_method_definitions (v: _#folder) =
@@ -175,7 +175,7 @@ let fold_class_definition' (v: _#folder) =
     ~fold:begin fun v { class_name; class_as; class_final; class_inherits;
                         class_usings; class_options; class_env;
                         class_factory; class_instance; class_end_name } x -> x
-      >> fold_name' v class_name
+      >> fold_name_or_literal' v class_name
       >> fold_strlit_opt v class_as
       >> fold_bool v class_final
       >> fold_name'_list v class_inherits
@@ -184,7 +184,7 @@ let fold_class_definition' (v: _#folder) =
       >> fold_environment_division'_opt v class_env
       >> fold_option ~fold:fold_factory_definition v class_factory
       >> fold_option ~fold:fold_instance_definition v class_instance
-      >> fold_name' v class_end_name
+      >> fold_name_or_literal' v class_end_name
     end
 
 let fold_interface_definition' (v: _#folder) =
@@ -192,14 +192,14 @@ let fold_interface_definition' (v: _#folder) =
     ~fold:begin fun v { interface_name; interface_as; interface_inherits;
                         interface_usings; interface_options; interface_env;
                         interface_methods; interface_end_name } x -> x
-      >> fold_name' v interface_name
+      >> fold_name_or_literal' v interface_name
       >> fold_strlit_opt v interface_as
       >> fold_name'_list v interface_inherits
       >> fold_name'_list v interface_usings
       >> fold_options_paragraph'_opt v interface_options
       >> fold_environment_division'_opt v interface_env
       >> fold_method_definitions'_opt v interface_methods
-      >> fold_name' v interface_end_name
+      >> fold_name_or_literal' v interface_end_name
     end
 
 let fold_compilation_unit' (v: _#folder) =

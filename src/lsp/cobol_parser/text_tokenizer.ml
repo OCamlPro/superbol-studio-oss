@@ -241,13 +241,19 @@ let preproc_n_combine_tokens ~source_format =
     | [CONSTANT]                     -> Error `MissingInputs
     | CONSTANT :: RECORD :: _          -> subst_n CONSTANT_RECORD 2
 
-    | [PROGRAM_ID]
-    | [PROGRAM_ID; PERIOD]           -> Error `MissingInputs
-    | PROGRAM_ID :: PERIOD :: _        -> info_word_after 2
-    | PROGRAM_ID :: _                  -> info_word_after 1
+    | PROGRAM_ID :: PERIOD :: _
+    | FUNCTION_ID :: PERIOD :: _
+    | CLASS_ID :: PERIOD :: _
+    | INTERFACE_ID :: PERIOD :: _      -> info_word_after 2
 
-    | [END] | [END; PROGRAM]         -> Error `MissingInputs
-    | END :: PROGRAM :: _              -> info_word_after 2
+    | PROGRAM_ID :: _
+    | FUNCTION_ID :: _                -> info_word_after 1
+
+    | [END]                          -> Error `MissingInputs
+    | END :: PROGRAM :: _
+    | END :: FUNCTION :: _
+    | END :: CLASS :: _
+    | END :: INTERFACE :: _            -> info_word_after 2
 
     | [AUTHOR | INSTALLATION |
        DATE_WRITTEN | DATE_MODIFIED |

@@ -297,22 +297,22 @@ run_fundamental.at-1494-prog.cob:12.11-12.15:
   14          END FUNCTION reply.
 >> Error: Invalid syntax
 
+run_fundamental.at-1494-prog.cob:12.24:
+   9          01 result.
+  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
+  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
+  12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
+----                           ^
+  13              MOVE argument TO result.
+  14          END FUNCTION reply.
+>> Hint: Missing <word>
+
 run_fundamental.at-1494-prog.cob:12.25-12.31:
    9          01 result.
   10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
   11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
   12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
 ----                            ^^^^^^
-  13              MOVE argument TO result.
-  14          END FUNCTION reply.
->> Error: Invalid syntax
-
-run_fundamental.at-1494-prog.cob:12.41-12.42:
-   9          01 result.
-  10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
-  11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
-  12 >            MOVE FUNCTION LENGTH (argument) TO arg-len
-----                                            ^
   13              MOVE argument TO result.
   14          END FUNCTION reply.
 >> Error: Invalid syntax

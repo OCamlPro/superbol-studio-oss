@@ -387,7 +387,7 @@ and object_reference_kind =
       {
         factory_of: bool;
       }
-  | Name of
+  | NamedClass of
       {
         class_or_interface_name: name with_loc;
         factory_of: bool;
@@ -418,7 +418,7 @@ let pp_object_reference_kind ppf = function
   | ActiveClass { factory_of } ->
     if factory_of then Fmt.pf ppf "FACTORY OF ";
     Fmt.pf ppf "ACTIVE-CLASS"
-  | Name { class_or_interface_name = n; factory_of; only } ->
+  | NamedClass { class_or_interface_name = n; factory_of; only } ->
     if factory_of then Fmt.pf ppf "FACTORY OF ";
     pp_name' ppf n;
     if only then Fmt.pf ppf " ONLY"
