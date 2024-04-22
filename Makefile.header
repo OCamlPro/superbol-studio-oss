@@ -51,7 +51,9 @@ all: superbol-lsp-server
 compile: superbol-lsp-server build-release
 package: vsix-package
 
-superbol-lsp-server $(SUPERBOL_LSP): build vsix-dist-setup
+$(SUPERBOL_LSP_BUILT): build vsix-dist-setup
+
+superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
 # Only rebuild `package.json` when on Linux
 # TODO: maybe just check build platform matches target platform
 ifeq ($(TARGET_PLAT),linux)
