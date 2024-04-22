@@ -12,5 +12,6 @@
 (**************************************************************************)
 
 module Generic = Generic
+module Esql = Esql
 
 include Main

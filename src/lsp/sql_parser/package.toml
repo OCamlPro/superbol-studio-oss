@@ -1,6 +1,6 @@
 
 # name of package
-name = "superbol_preprocs"
+name = "sql_parser"
 skeleton = "library"
 
 # version if different from project version
@@ -23,7 +23,7 @@ gen-version = "version.ml"
 
 # supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
 # default is [ "ocamllex", "ocamlyacc" ] 
-# generators = [ "ocamllex", "menhir" ]
+generators = ["ocamllex"]
 
 # menhir options for the package
 #Example:
@@ -43,24 +43,32 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
-# preprocess = "pps ppx_deriving.show"
+preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = ["index.mld"]
+skip = ["main.ml", "index.mld"]
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
+sql_ast = "version"
+cobol_parser = "version"
 cobol_common = "version"
 cobol_preproc = "version"
-cobol_parser = "version"
-sql_parser = "version"
-pretty = "version"
+ebcdic_lib = "version"
+ez_file = ">=0.3"
+# autofonce_lib = { version = ">=0.8", for-test = true }
+
+[dependencies.menhir]
+libname = "menhirLib"
+version = ">=1.2"
 
 # package tools dependencies
 [tools]
+ppx_deriving = ">=5.2.1"
+menhir = "=20230415"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -74,4 +82,11 @@ pretty = "version"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
 #  static-clibs = "unix" 
 [fields]
-# ...
+dune-libraries = "str"
+dune-trailer = """
+(menhir (modules grammar)
+        (flags --explain 
+                --inspection --cmly --table --strict
+               --unused-tokens))
+
+"""

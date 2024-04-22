@@ -5,12 +5,13 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-a282dfcf4239a66bb8e4a624ea403a18:.
+aaa6fbc6dd406d00ada873dc71325fac:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
 5714f81b8a12cefeab3bd452453832b5:.github/workflows/workflow.yml
+aedabb02434649b101d3db2436821c08:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -25,7 +26,7 @@ a282dfcf4239a66bb8e4a624ea403a18:.
 
 # begin context for Makefile
 # file Makefile
-2fe54e6554e6cd7b6d77954e586061aa:Makefile
+3f4f386bc0fc3e2d8a239a5a4aa98ed3:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -75,7 +76,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-a2652ac66ab141a8ae971d7005691f7a:dune-project
+35a78fb41cb16e2969761f8af9d7ffa6:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -173,6 +174,16 @@ a7bda8dd33d23a0de35e725efa47970f:opam/interop-js-stubs.opam
 d12e1abf27b66f290445826a55a05817:opam/pretty.opam
 # end context for opam/pretty.opam
 
+# begin context for opam/sql_ast.opam
+# file opam/sql_ast.opam
+3497f0287f064ada1655718a6ca0edcd:opam/sql_ast.opam
+# end context for opam/sql_ast.opam
+
+# begin context for opam/sql_parser.opam
+# file opam/sql_parser.opam
+2f275e18bc70f20c97d8e89f50902c13:opam/sql_parser.opam
+# end context for opam/sql_parser.opam
+
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
 e6fa38ba6621730312cdfeca1b4c4ad8:opam/superbol-free.opam
@@ -196,6 +207,7 @@ fb18ebc46dd01f8e86198871cc4f81a1:opam/superbol-studio-oss.opam
 # begin context for opam/superbol_preprocs.opam
 # file opam/superbol_preprocs.opam
 23c0e1ba6bdc67d355ac7d8c769169a6:opam/superbol_preprocs.opam
+390a2c6cb9e78f1191549e7f18bdf0fe:opam/superbol_preprocs.opam
 # end context for opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
@@ -423,6 +435,26 @@ c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/ppx_cobcflags/version.mlt
 c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/pretty/version.mlt
 # end context for src/lsp/pretty/version.mlt
 
+# begin context for src/lsp/sql_ast/dune
+# file src/lsp/sql_ast/dune
+70efa058ccb4207520125c7a625f1849:src/lsp/sql_ast/dune
+# end context for src/lsp/sql_ast/dune
+
+# begin context for src/lsp/sql_ast/version.mlt
+# file src/lsp/sql_ast/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/sql_ast/version.mlt
+# end context for src/lsp/sql_ast/version.mlt
+
+# begin context for src/lsp/sql_parser/dune
+# file src/lsp/sql_parser/dune
+0e83040a0161a563d27c7d9e85c49e08:src/lsp/sql_parser/dune
+# end context for src/lsp/sql_parser/dune
+
+# begin context for src/lsp/sql_parser/version.mlt
+# file src/lsp/sql_parser/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/sql_parser/version.mlt
+# end context for src/lsp/sql_parser/version.mlt
+
 # begin context for src/lsp/superbol-free/dune
 # file src/lsp/superbol-free/dune
 095155be06e2840753e52b3d03d541b9:src/lsp/superbol-free/dune
@@ -445,7 +477,7 @@ c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/superbol_free_lib/version.mlt
 
 # begin context for src/lsp/superbol_preprocs/dune
 # file src/lsp/superbol_preprocs/dune
-f5b7c58bbac13fe6141368414f4cb96f:src/lsp/superbol_preprocs/dune
+9ac937ba500427e8309d8092a1554d60:src/lsp/superbol_preprocs/dune
 # end context for src/lsp/superbol_preprocs/dune
 
 # begin context for src/lsp/superbol_preprocs/version.mlt

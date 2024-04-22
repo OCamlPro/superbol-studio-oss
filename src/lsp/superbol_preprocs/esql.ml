@@ -11,8 +11,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let exec_scanners =  
-  Cobol_parser.Options.{
-    exec_scanner_fallback = Generic.scanner;  (* for now; TODO: Call.scanner? *)
-    exec_scanners = Cobol_preproc.Options.EXEC_MAP.singleton "SQL" Esql.scanner;
-  }
+type Cobol_common.Exec_block.TYPES.exec_block +=
+  | Esql_exec_block of Sql_ast.esql_instuction
+
+let () =
+  Cobol_common.Exec_block.register_exec_block_type
+    ~name:"ESQL-EXEC-BLOCK"
+    ~compare:begin fun a b -> match a, b with
+      | Esql_exec_block a, Esql_exec_block b ->
+          Some (Sql_ast.compare a b)
+      | _ ->
+          None
+    end
+    ~pp:begin function
+      | Esql_exec_block a ->
+          Some (Pretty.delayed "%a" Sql_ast.pp a)
+      | _ ->
+          None
+    end
+
+let scanner =
+  Cobol_parser.Options.Stateless_exec_scanner (fun text -> 
+    Esql_exec_block (Sql_parser.parse text)
+  )
