@@ -96,6 +96,9 @@ github-workflow-before-build = """
 
 # NB: a `before-tests` field would make more sense here.
 github-workflow-after-build = """
+      - name: check package.json
+        run: make check-package.json
+
       - name: install test dependencies
         if: matrix.skip_test  != 'true'
         run: make dev-deps

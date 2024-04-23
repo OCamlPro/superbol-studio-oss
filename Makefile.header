@@ -32,6 +32,18 @@ else
   SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
 endif
 
+# Setting `GENERATE_PACKAGE_DOT_JSON` to `no` skips generation of
+# `package.json` (which should always be updated/committed anyways).
+# This generation requires the compilation of `$(SUPERBOL_LSP_BUILT)`,
+# that itself depends on a phony target, and therefore triggers way
+# too many calls to `scripts/static-build.sh` when
+# `$(BUILD_STATIC_EXECS)` holds).
+ifeq ($(BUILD_STATIC_EXECS),true)
+  GENERATE_PACKAGE_DOT_JSON ?= no
+else
+  GENERATE_PACKAGE_DOT_JSON ?= yes
+endif
+
 YARN = npx --yes yarn 
 
 VSCE_ARGS = --yarn -t $(TARGET_SPEC)
@@ -59,13 +71,17 @@ superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
 ifeq ($(TARGET_PLAT),linux)
 	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
 
-  ifeq ($(shell uname),Linux)
+  ifeq ($(shell uname)_$(GENERATE_PACKAGE_DOT_JSON),Linux_yes)
   package.json: $(SUPERBOL_LSP_BUILT)
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
   endif
 endif				#linux
+
+.PHONY: check-package.json
+check-package.json:		#to be used after `build`
+	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
 
 .PHONY: build-debug yarn-debug
 
