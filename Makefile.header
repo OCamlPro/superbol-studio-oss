@@ -62,7 +62,7 @@ ifeq ($(TARGET_PLAT),linux)
   ifeq ($(shell uname),Linux)
   package.json: $(SUPERBOL_LSP_BUILT)
 	cp -f package.json package.json.prev
-	./$(SUPERBOL_LSP) json vscode --gen package.json
+	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
   endif
 endif				#linux
