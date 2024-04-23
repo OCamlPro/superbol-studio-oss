@@ -5,7 +5,7 @@
   (package superbol-free)
   ; use field 'dune-libraries' to add libraries without opam deps
   (libraries superbol_free_lib )
-  (flags ((:standard -g (:include linking.sexp))))
+  (flags ((:standard (:include linking.sexp))))
   ; use field 'dune-stanzas' to add more stanzas here
   
   
