@@ -84,6 +84,9 @@ jobs:
       - run: make build
 
       # Use fields.github-workflow-after-build to add something here
+      - name: check package.json
+        run: make check-package.json
+
       - name: install test dependencies
         if: matrix.skip_test  != 'true'
         run: make dev-deps

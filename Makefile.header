@@ -79,6 +79,10 @@ ifeq ($(TARGET_PLAT),linux)
   endif
 endif				#linux
 
+.PHONY: check-package.json
+check-package.json:		#to be used after `build`
+	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
+
 .PHONY: build-debug yarn-debug
 
 build-debug:
