@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-21c2e57c3575a920634dd25e9d7d0d21:.
+6bf2e4abb8cb466cc93b88bffdec31c6:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -25,7 +25,7 @@ version:0.9.0
 
 # begin context for Makefile
 # file Makefile
-4fd9d3e260f0052c9e9da5edf6d2f1c3:Makefile
+2fe54e6554e6cd7b6d77954e586061aa:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -75,157 +75,157 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-36cd02a1362d6a97e537b292d4f89fb1:dune-project
+4387972525cced3acdf1768dab3d6b75:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
-e1fabc309f25556d63d746b1d7451f11:opam/cobol_common.opam
+4668724ae52a1a68cb5e545f71e57a31:opam/cobol_common.opam
 # end context for opam/cobol_common.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-983d7bc86c88a696944dec1af8fd7240:opam/cobol_config.opam
+6c05e11aacf4cae9dc88c3c35bca6abc:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
 # file opam/cobol_data.opam
-2ac8a5cdac39784c91b3a73a33a5c396:opam/cobol_data.opam
+d814e8d009112ec2730c8c5ec6ddffa1:opam/cobol_data.opam
 # end context for opam/cobol_data.opam
 
 # begin context for opam/cobol_indent.opam
 # file opam/cobol_indent.opam
-f4f8f79bd215d13126947601f279fd0d:opam/cobol_indent.opam
+c3daa5f76bf9f391c9f0e9fc78bcec9b:opam/cobol_indent.opam
 # end context for opam/cobol_indent.opam
 
 # begin context for opam/cobol_indent_old.opam
 # file opam/cobol_indent_old.opam
-6289e6059c5ff1a262521a00f372310a:opam/cobol_indent_old.opam
+765318b0c51de4ff28c6f1ddda76102a:opam/cobol_indent_old.opam
 # end context for opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-b304a6f04e9643a7995f26d40624727f:opam/cobol_lsp.opam
+322f6069c063b296ae1fad134023abca:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-e39184f019d16de3bd84d1b9b77a6300:opam/cobol_parser.opam
+437ca1da29c751af1d505b7446baf342:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-1ebbace1a970f29b2c947d0ef09bf239:opam/cobol_preproc.opam
+055de99c1df3e509e2a157786c72a9d6:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
 # file opam/cobol_ptree.opam
-7ba8cccadf34a761465a6abc3eadb601:opam/cobol_ptree.opam
+9ac6974afd7e4515ba05f3dbdda733cf:opam/cobol_ptree.opam
 # end context for opam/cobol_ptree.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
-e74ceca227821d6b842df92b3785da14:opam/cobol_typeck.opam
+a9aaefd83b2ff61b41bba3215d088a18:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/cobol_unit.opam
 # file opam/cobol_unit.opam
-61d95c9a67fcaf5cfdf2b6658e4da171:opam/cobol_unit.opam
+81bef4166d47b4c37833c07fbd67bf8c:opam/cobol_unit.opam
 # end context for opam/cobol_unit.opam
 
 # begin context for opam/ebcdic_lib.opam
 # file opam/ebcdic_lib.opam
-f34f02b894919c55b150490d20497f37:opam/ebcdic_lib.opam
+6af9dd6aae728a3e409761c407f2278d:opam/ebcdic_lib.opam
 # end context for opam/ebcdic_lib.opam
 
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
-1d2add7e3bcaf7d7698cb83dfe38b3e6:opam/ez_toml.opam
+372424a0319ec3d3f74f980bbf1b754b:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
 
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
-e029cf4d43e37f03f5fc4c1ec315bbf0:opam/ezr_toml.opam
+1bba74dd3aac04a29632924a77968984:opam/ezr_toml.opam
 # end context for opam/ezr_toml.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
-b5f05997aebdb629273453fd78d590f2:opam/interop-js-stubs.opam
+fa8896a1c60638399c6ef217b1e08c47:opam/interop-js-stubs.opam
 # end context for opam/interop-js-stubs.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
-d1cf0ed5b5785c35ace3b4fd31421d0c:opam/node-js-stubs.opam
+18da2556619ed037e257255656b902f4:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
 # begin context for opam/polka-js-stubs.opam
 # file opam/polka-js-stubs.opam
-d8fc215e17e6b4b48b2decc66638445d:opam/polka-js-stubs.opam
+ef25116bec2042dd75058395f535808e:opam/polka-js-stubs.opam
 # end context for opam/polka-js-stubs.opam
 
 # begin context for opam/ppx_cobcflags.opam
 # file opam/ppx_cobcflags.opam
-23ba90fd48cf9408be4959512c9bfbf6:opam/ppx_cobcflags.opam
+66380ad5c47789a011ca27bbc64fa22e:opam/ppx_cobcflags.opam
 # end context for opam/ppx_cobcflags.opam
 
 # begin context for opam/pretty.opam
 # file opam/pretty.opam
-70157c8f4204be703080813698c1e552:opam/pretty.opam
+8cfa64a892515556b26ace7b8babbc9c:opam/pretty.opam
 # end context for opam/pretty.opam
 
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
-eaa52762ea6a03491c05ce8a833dbdf6:opam/superbol-free.opam
+55e720ad04400326ce2f6bf0d26e7147:opam/superbol-free.opam
 # end context for opam/superbol-free.opam
 
 # begin context for opam/superbol-studio-oss.opam
 # file opam/superbol-studio-oss.opam
-7e2ba364aef7eecedcfe2686d4eda99f:opam/superbol-studio-oss.opam
+26481d84bba195df576ae899eef3a425:opam/superbol-studio-oss.opam
 # end context for opam/superbol-studio-oss.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-4c495d9d59f21049612389f72f8c4a6a:opam/superbol-vscode-platform.opam
+3dda8ac121ddb51a6270c71fee50ecb2:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-6378ef2c82447b2ba4841befffe62d04:opam/superbol_free_lib.opam
+898787a8cb1dc3d1c848f0b151b3737e:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_preprocs.opam
 # file opam/superbol_preprocs.opam
-8338f1ad09b3d2aa0c8c2e5ed386e88e:opam/superbol_preprocs.opam
+ead3b6f16df694e5f2894aab85c6a729:opam/superbol_preprocs.opam
 # end context for opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
 # file opam/superbol_project.opam
-90be66dc525f6f90e4ff424a8a40d3f2:opam/superbol_project.opam
+75ec96e3d26336a087a2d10257b1b037:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
-b1994cf8068a4114dda5301746e65b3a:opam/vscode-debugadapter.opam
+af53d8a1d13c3fb62decbe8922e6eb50:opam/vscode-debugadapter.opam
 # end context for opam/vscode-debugadapter.opam
 
 # begin context for opam/vscode-debugprotocol.opam
 # file opam/vscode-debugprotocol.opam
-fec63e626dc5973f5f51c15306219da0:opam/vscode-debugprotocol.opam
+4bf5120b66c47f27ebf2394c01463f8a:opam/vscode-debugprotocol.opam
 # end context for opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-js-stubs.opam
 # file opam/vscode-js-stubs.opam
-1f60b14043fc48e50fe0abaea9639085:opam/vscode-js-stubs.opam
+dc9de828b8f37fca9ceb0a0d206c5d89:opam/vscode-js-stubs.opam
 # end context for opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-d2e38d365c7eec6596cdac01b1fc7a96:opam/vscode-json.opam
+185d9cd5fed9468127a5a0b7ad190819:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-06afcd1858b8ea36eb6e58f99ba9db2a:opam/vscode-languageclient-js-stubs.opam
+745440810a479278c3b92c70a477a7a1:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
 # begin context for scripts/after.sh
@@ -280,7 +280,7 @@ a4431c32911b7499fbdc49e2e62932d2:sphinx/about.rst
 
 # begin context for src/lsp/cobol_common/version.mlt
 # file src/lsp/cobol_common/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_common/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_common/version.mlt
 # end context for src/lsp/cobol_common/version.mlt
 
 # begin context for src/lsp/cobol_config/dune
@@ -290,7 +290,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_common/version.mlt
 
 # begin context for src/lsp/cobol_config/version.mlt
 # file src/lsp/cobol_config/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_config/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_config/version.mlt
 # end context for src/lsp/cobol_config/version.mlt
 
 # begin context for src/lsp/cobol_data/dune
@@ -300,7 +300,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_config/version.mlt
 
 # begin context for src/lsp/cobol_data/version.mlt
 # file src/lsp/cobol_data/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_data/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_data/version.mlt
 # end context for src/lsp/cobol_data/version.mlt
 
 # begin context for src/lsp/cobol_indent/dune
@@ -310,7 +310,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_data/version.mlt
 
 # begin context for src/lsp/cobol_indent/version.mlt
 # file src/lsp/cobol_indent/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_indent/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_indent/version.mlt
 # end context for src/lsp/cobol_indent/version.mlt
 
 # begin context for src/lsp/cobol_indent_old/dune
@@ -320,7 +320,7 @@ a98a08d36a2f65127f60832515b6ab47:src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_indent_old/version.mlt
 # file src/lsp/cobol_indent_old/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_indent_old/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_indent_old/version.mlt
 # end context for src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/dune
@@ -330,7 +330,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/version.mlt
 # file src/lsp/cobol_lsp/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_lsp/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_lsp/version.mlt
 # end context for src/lsp/cobol_lsp/version.mlt
 
 # begin context for src/lsp/cobol_parser/dune
@@ -340,7 +340,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_lsp/version.mlt
 
 # begin context for src/lsp/cobol_parser/version.mlt
 # file src/lsp/cobol_parser/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_parser/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_parser/version.mlt
 # end context for src/lsp/cobol_parser/version.mlt
 
 # begin context for src/lsp/cobol_preproc/dune
@@ -350,7 +350,7 @@ e31b22f1d241d75db90f170f9c6fd95d:src/lsp/cobol_preproc/dune
 
 # begin context for src/lsp/cobol_preproc/version.mlt
 # file src/lsp/cobol_preproc/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_preproc/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_preproc/version.mlt
 # end context for src/lsp/cobol_preproc/version.mlt
 
 # begin context for src/lsp/cobol_ptree/dune
@@ -360,7 +360,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_preproc/version.mlt
 
 # begin context for src/lsp/cobol_ptree/version.mlt
 # file src/lsp/cobol_ptree/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_ptree/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_ptree/version.mlt
 # end context for src/lsp/cobol_ptree/version.mlt
 
 # begin context for src/lsp/cobol_typeck/dune
@@ -370,7 +370,7 @@ ef30db283bff57bd7bfea9b29e9178fd:src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/cobol_typeck/version.mlt
 # file src/lsp/cobol_typeck/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_typeck/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_typeck/version.mlt
 # end context for src/lsp/cobol_typeck/version.mlt
 
 # begin context for src/lsp/cobol_unit/dune
@@ -380,7 +380,7 @@ d2c167a61ac9aa89964577228ccb49fa:src/lsp/cobol_unit/dune
 
 # begin context for src/lsp/cobol_unit/version.mlt
 # file src/lsp/cobol_unit/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_unit/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/cobol_unit/version.mlt
 # end context for src/lsp/cobol_unit/version.mlt
 
 # begin context for src/lsp/ebcdic_lib/dune
@@ -390,7 +390,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/cobol_unit/version.mlt
 
 # begin context for src/lsp/ebcdic_lib/ebcdic_version.mlt
 # file src/lsp/ebcdic_lib/ebcdic_version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/ebcdic_lib/ebcdic_version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/ebcdic_lib/ebcdic_version.mlt
 # end context for src/lsp/ebcdic_lib/ebcdic_version.mlt
 
 # begin context for src/lsp/ezr_toml/dune
@@ -400,7 +400,7 @@ eab335ce600887c59f1baf9b0983d0ac:src/lsp/ezr_toml/dune
 
 # begin context for src/lsp/ezr_toml/version.mlt
 # file src/lsp/ezr_toml/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/ezr_toml/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/ezr_toml/version.mlt
 # end context for src/lsp/ezr_toml/version.mlt
 
 # begin context for src/lsp/ppx_cobcflags/dune
@@ -410,7 +410,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/ezr_toml/version.mlt
 
 # begin context for src/lsp/ppx_cobcflags/version.mlt
 # file src/lsp/ppx_cobcflags/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/ppx_cobcflags/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/ppx_cobcflags/version.mlt
 # end context for src/lsp/ppx_cobcflags/version.mlt
 
 # begin context for src/lsp/pretty/dune
@@ -420,7 +420,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/ppx_cobcflags/version.mlt
 
 # begin context for src/lsp/pretty/version.mlt
 # file src/lsp/pretty/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/pretty/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/pretty/version.mlt
 # end context for src/lsp/pretty/version.mlt
 
 # begin context for src/lsp/superbol-free/dune
@@ -440,7 +440,7 @@ a8a051709a43fba5b6ab54b66b77cbcf:src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/version.mlt
 # file src/lsp/superbol_free_lib/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_free_lib/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/superbol_free_lib/version.mlt
 # end context for src/lsp/superbol_free_lib/version.mlt
 
 # begin context for src/lsp/superbol_preprocs/dune
@@ -450,7 +450,7 @@ f5b7c58bbac13fe6141368414f4cb96f:src/lsp/superbol_preprocs/dune
 
 # begin context for src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_preprocs/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_preprocs/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/superbol_preprocs/version.mlt
 # end context for src/lsp/superbol_preprocs/version.mlt
 
 # begin context for src/lsp/superbol_project/dune
@@ -460,7 +460,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_preprocs/version.mlt
 
 # begin context for src/lsp/superbol_project/version.mlt
 # file src/lsp/superbol_project/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/lsp/superbol_project/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
 
 # begin context for src/superbol-studio-oss/dune
@@ -485,7 +485,7 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vendor/ez_toml/version.mlt
 # file src/vendor/ez_toml/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/vendor/ez_toml/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/vendor/ez_toml/version.mlt
 # end context for src/vendor/ez_toml/version.mlt
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
@@ -545,7 +545,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/vendor/ez_toml/version.mlt
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt
 # file src/vscode/superbol-vscode-platform/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/superbol-vscode-platform/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/vscode/superbol-vscode-platform/version.mlt
 # end context for src/vscode/superbol-vscode-platform/version.mlt
 
 # begin context for src/vscode/vscode-debugadapter/dune
@@ -555,7 +555,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/superbol-vscode-platform/version.mlt
 
 # begin context for src/vscode/vscode-debugadapter/version.mlt
 # file src/vscode/vscode-debugadapter/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/vscode-debugadapter/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/vscode/vscode-debugadapter/version.mlt
 # end context for src/vscode/vscode-debugadapter/version.mlt
 
 # begin context for src/vscode/vscode-debugprotocol/dune
@@ -565,7 +565,7 @@ bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/vscode-debugadapter/version.mlt
 
 # begin context for src/vscode/vscode-debugprotocol/version.mlt
 # file src/vscode/vscode-debugprotocol/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/vscode-debugprotocol/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/vscode/vscode-debugprotocol/version.mlt
 # end context for src/vscode/vscode-debugprotocol/version.mlt
 
 # begin context for src/vscode/vscode-json/dune
@@ -580,5 +580,5 @@ c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-json/version.mlt
 # file src/vscode/vscode-json/version.mlt
-bc7d6018a6cdcfb9209efd8d5aeacb95:src/vscode/vscode-json/version.mlt
+c6738e0b12a586ddb07c1f790dcb4e9a:src/vscode/vscode-json/version.mlt
 # end context for src/vscode/vscode-json/version.mlt
