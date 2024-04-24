@@ -18,11 +18,6 @@ version:0.9.0
 51f9ea0869bc6b9d00819abfe13bfe0a:.gitignore
 # end context for .gitignore
 
-# begin context for CHANGES.md
-# file CHANGES.md
-d00f73c835ae4a1589d55ebda4ab381b:CHANGES.md
-# end context for CHANGES.md
-
 # begin context for LICENSE.md
 # file LICENSE.md
 00ad9741c95e3a196c11a24072f57bda:LICENSE.md
