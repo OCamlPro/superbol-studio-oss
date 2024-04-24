@@ -2,19 +2,11 @@
 
 [![Actions Status](https://github.com/ocamlpro/superbol-studio-oss/workflows/Main%20Workflow/badge.svg)](https://github.com/ocamlpro/superbol-studio-oss/actions)
 [![Release](https://img.shields.io/github/release/ocamlpro/superbol-studio-oss.svg)](https://github.com/ocamlpro/superbol-studio-oss/releases)
+[![Tag](https://img.shields.io/github/tag/ocamlpro/superbol-studio-oss.svg)](https://github.com/ocamlpro/superbol-studio-oss/tags)
 
 Visual Studio Code extension for COBOL.
 
 ## Getting started
-
-### Requirements
-
-> [!IMPORTANT]
->
-> This extensions assumes that version 3.2 of
-> [GnuCOBOL](https://sourceforge.net/projects/gnucobol/) is available
-> on the system running VS Code.  Debug features additionally assume
-> that [gdb](https://sourceware.org/gdb/) is installed.
 
 ### Installation
 
@@ -36,41 +28,13 @@ page](https://code.visualstudio.com/docs/editor/extension-marketplace).
 
 First, download a VSIX file from the
 [Marketplace](https://marketplace.visualstudio.com/items?itemName=superbol)
-or [Open VSX](https://open-vsx.org/extension/OCamlPro/SuperBOL).  
+or [Open VSX](https://open-vsx.org/extension/OCamlPro/SuperBOL).
 
 To install the extension from its VSIX file, open VS Code and go to
 the the "Extensions" view.  In the sidebar, click on the three dots
 (`⋅⋅⋅`) on the top right-hand side (just above `search`), select
 `Install from VSIX…`.  Pick the VSIX file you just downloaded to
 install it.
-
-### Configuration
-
-<!-- #### Locating GnuCOBOL's configuration files -->
-
-This extension should work out-of-the-box on Windows systems where
-GnuCOBOL has been installed using one of the dedicated installers
-(available **???**).  This should be the case with standard
-installations on Linux as well—*e.g*, if GnuCOBOL is installed in
-`/usr/local` or `/usr`.
-
-<!-- See section [Troubleshooting](#troubleshooting) below in case the -->
-<!-- extension reports errors that migth indicate if cannot find GnuCOBOL's -->
-<!-- configuration files. -->
-
-> [!NOTE]
-> (Temporary)
->
-> If the extension shows errors like "Configuration file … not found",
-> you may need to set the `COB_CONFIG_DIR` environment variable to the
-> directory shown by:
->
-> ```shell
-> cobc -i | grep COB_CONFIG_DIR
-> ```
->
-> You may need to restart VS Code (or your session) so the extension
-> reloads properly.
 
 ### Editing an existing project
 
@@ -185,6 +149,18 @@ replacement by a `REPLACE` directive in the same way.
 In order to debug a COBOL program, you first need to configure a
 dedicated *build task* with appropriate debug options.  Once this is
 done, you can *launch* the compiled program into a debugging session.
+
+> [!NOTE]
+>
+> We recomment that version 3.2 of
+> [GnuCOBOL](https://sourceforge.net/projects/gnucobol/) is available
+> on the system running VS Code.  Debug features additionally assume
+> that [gdb](https://sourceware.org/gdb/) is installed.
+>
+> On Windows systems, users may employ dedicated installers that are
+> available [here](https://get-superbol.com/software/gnucobol-aio/).
+> Linux users may rely on their favorite package manager and install
+> `gnucobol`.
 
 ### Setting up a Build Task for Debugging
 
@@ -309,6 +285,6 @@ server and the VSCode extension from sources.
 
 ## Resources
 
-* Website: https://ocamlpro.github.io/superbol-vscode-platform
-* General Documentation: https://ocamlpro.github.io/superbol-vscode-platform/sphinx
-* Sources: https://github.com/ocamlpro/superbol-vscode-platform
+* Website: https://ocamlpro.github.io/superbol-studio-oss
+* General Documentation: https://ocamlpro.github.io/superbol-studio-oss/sphinx
+* Sources: https://github.com/ocamlpro/superbol-studio-oss
