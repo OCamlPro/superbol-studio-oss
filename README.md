@@ -27,7 +27,7 @@ page](https://code.visualstudio.com/docs/editor/extension-marketplace).
 #### Installation via a VSIX file
 
 First, download a VSIX file from the
-[Marketplace](https://marketplace.visualstudio.com/items?itemName=superbol)
+[Marketplace](https://marketplace.visualstudio.com/items?itemName=OCamlPro.SuperBOL)
 or [Open VSX](https://open-vsx.org/extension/OCamlPro/SuperBOL).
 
 To install the extension from its VSIX file, open VS Code and go to
@@ -249,6 +249,12 @@ You can check further the documentation on using the extension on
 
 You can find [here](./emacs) a mode that allows you to use the
 SuperBOL LSP server with GNU/Emacs.
+
+### Using the SuperBOL LSP server with other editors
+
+[This
+page](https://github.com/OCamlPro/superbol-studio-oss/wiki/SuperBOL-LSP)
+documents how to use our LSP server functionnality with other editors.
 
 ### Building from sources
 
