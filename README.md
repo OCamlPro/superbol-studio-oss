@@ -90,7 +90,7 @@ From here, you can notably configure:
 > developers with false diagnostics about syntax errors.
 >
 > Reporting can be re-enabled for every dialect by setting the `Force
-> Syntax Diagnostics` flag in SuperBOL configuration setting.
+> Syntax Diagnostics` flag in SuperBOL configuration settings.
 
 ## Navigation features
 
@@ -98,7 +98,7 @@ From here, you can notably configure:
 
 When you want to locate the definition of a data item name in your
 source code, position your cursor on its name, right click, and
-select  `Go to Definition` (or press <kdb>F12</kbd>).
+select  `Go to Definition` (or press <kbd>F12</kbd>).
 
 ![Go to Definition](./assets/superbol-goto-definition.gif)
 
