@@ -10,14 +10,17 @@ Common arguments to all sub-commands:
 
 Overview of sub-commands::
   
+  check syntax
+    Check the syntax of a Cobol file
+  
+  ebcdic translate
+    Convert to or from EBCDIC
+  
   env
     Generate commands to set environment variables to use the specified switch
   
   indent file
     Indentation
-  
-  indent range
-    Indentation range
   
   json vscode
     parse VSODE JSON files or generate package.json
@@ -46,6 +49,9 @@ Overview of sub-commands::
   switch build
     Configure, build, install GnuCOBOL and add a switch
   
+  switch config
+    Change the current config
+  
   switch env
     Generate commands to set environment variables to use the specified switch
   
@@ -60,6 +66,81 @@ Overview of sub-commands::
   
   texi2rst
     build .texi documentation from gnucobol-docs
+  
+  util detect cycle
+    Detect a cycle of lines in a file
+  
+  util wc
+    Stats on file of lines (without taking UTF8 chars into account)
+
+
+main.exe check syntax
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Check the syntax of a Cobol file
+
+
+
+**DESCRIPTION**
+
+
+
+
+**USAGE**
+::
+  
+  main.exe check syntax FILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILE`   Cobol file to check
+
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
+
+* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
+
+* :code:`--conf CONF_FILE`   Set the configuration file to be used
+
+* :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--free`   Shorthand for `--source-format FREE`
+
+* :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
+
+* :code:`--silence STRING`   Silence specific messages
+
+* :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
+Overrides `format` from configuration file if present.
+
+
+main.exe ebcdic translate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Convert to or from EBCDIC
+
+
+
+**DESCRIPTION**
+
+
+This command translates to or from EBCDIC and ASCII.
+
+**USAGE**
+::
+  
+  main.exe ebcdic translate EBCDIC-FILE [OPTIONS]
+
+Where options are:
+
+
+* :code:`EBCDIC-FILE`   File in EBCDIC format (source or target)
+
+* :code:`--colseq FILE`   Collating sequence file to read from GnuCOBOL
+
+* :code:`--from-ascii ASCII-FILE`   File in ASCII format to translate
+
+* :code:`--to-ascii ASCII-FILE`   File in ASCII format to generate
 
 
 main.exe env
@@ -160,47 +241,7 @@ Where options are:
 
 * :code:`FILES`   Cobol files to indent
 
-* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
-
-* :code:`--conf CONF_FILE`   Set the configuration file to be used
-
-* :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
-
-* :code:`--free`   Shorthand for `--source-format FREE`
-
-* :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
-
-* :code:`--silence STRING`   Silence specific messages
-
-* :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
-Overrides `format` from configuration file if present.
-
-
-main.exe indent range
-~~~~~~~~~~~~~~~~~~~~~~~
-
-Indentation range
-
-
-
-**DESCRIPTION**
-
-
-
-
-**USAGE**
-::
-  
-  main.exe indent range FILE RANGE_START RANGE_END [OPTIONS]
-
-Where options are:
-
-
-* :code:`FILE`   file to check the indentation
-
-* :code:`RANGE_START`   start line of range
-
-* :code:`RANGE_END`   end line of range
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
@@ -210,12 +251,24 @@ Where options are:
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
+* :code:`--gen-config`   Generate a config file .superbol-indent in this directory
+
+* :code:`--inplace`   Modify files in place
+
+* :code:`--intext`   For numeric, indentation size is relative to area A
+
+* :code:`--lines LINE-LINE`   Indent only lines between these lines
+
+* :code:`--numeric`   Output indentation size at the beginning of each line
+
 * :code:`--recovery BOOL`   Enable/disable parser recovery after syntax errors (default: true)
 
 * :code:`--silence STRING`   Silence specific messages
 
 * :code:`--source-format SOURCE_FORMAT`   Set the format of source code; allowed values are: { FIXED (the default), FREE}
 Overrides `format` from configuration file if present.
+
+* :code:`--suffix EXT`   Set an extension for the file being generated
 
 
 main.exe json vscode
@@ -275,6 +328,8 @@ Where options are:
 
 * :code:`--caching`   Enable caching (enabled by default)
 
+* :code:`--force-syntax-diagnostics`   Force reporting of syntax error and hint diagnostics for dialects other than COBOL85 (for which they are always enabled)
+
 * :code:`--no-caching`   Disable caching (enabled by default)
 
 * :code:`--storage-directory DIR`   Directory under which to store cache data --- prevents the creation of a "_superbol" storage directory at the root of project trees.
@@ -301,6 +356,8 @@ Where options are:
 
 
 * :code:`FILE`   Cobol file to preprocess
+
+* :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
 * :code:`-I DIRECTORY`   Add DIRECTORY to library search path
 
@@ -653,11 +710,78 @@ Where options are:
 
 * :code:`DIR`   Directory where GnuCOBOL should be installed
 
+* :code:`--branch BRANCH`   Branch name to use instead of git branch (the auto-detected name from git will be 3.x-$DATE-$COMMIT)
+
 * :code:`--no-set`   Do not set this directory as the current one
 
 * :code:`--sudo`   Use sudo for 'make install'
 
 * :code:`--switch SWITCH`   Name of switch to add
+
+
+main.exe switch config
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Change the current config
+
+
+
+**DESCRIPTION**
+
+
+This command sets the current default switch.
+
+
+**ABOUT SWITCHES**
+
+
+Switches are used to easily handle multiple GnuCOBOL installations. The section **[switches]** in the user configuration file **$HOME/.config/superbol/config.toml** contains several variables:
+
+* * 'dir'
+  The directory where installations should be performed, and switches imported from.
+
+* * 'current'
+  The current switch name to use by default
+
+* * 'list'
+  The list of known switches, with the corresponding installation directory
+
+* * 'num'
+  A counter used to name switches
+
+Switches can be created, imported and used using the following commands:
+
+* **superbol env [SWITCH] [--last] [--global]**
+  Output a list of shell commands to set the environment variables to use a specific switch
+
+* **superbol import [DIRS] [--clear] [--no-set]**
+  Scan directories to detect GnuCOBOL installations, and created associated switches
+
+* **superbol add DIR [--switch SWITCH] [--no-set]**
+  Add a specific GnuCOBOL installation directory as a switch
+
+* **superbol build [DIR] [--sudo] [--switch SWITCH] [--no-set]**
+  From inside GnuCOBOL sources, configure, build and install and add the corresponding switch
+
+* **superbol list**
+  List known switches
+
+* **superbol set [SWITCH] [--last]**
+  Set the current default switch
+
+**USAGE**
+::
+  
+  main.exe switch config [OPTIONS]
+
+Where options are:
+
+
+* :code:`--compiler-coverage BOOL`   Set compiler coverage
+
+* :code:`--set-last`   Use the latest imported switch
+
+* :code:`--set-switch SWITCH`   Switch to use
 
 
 main.exe switch env
@@ -948,3 +1072,61 @@ Where options are:
 * :code:`-I DIR`   Add to lookup path for files
 
 * :code:`-o DIR`   Target directory for RST generation
+
+
+main.exe util detect cycle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Detect a cycle of lines in a file
+
+
+
+**DESCRIPTION**
+
+
+This command will take a file of lines and detect cycles in the lines, and simplify them.
+
+
+**ABOUT UTILS**
+
+
+This is a list of small sub-commands that may be useful from time to time.
+
+**USAGE**
+::
+  
+  main.exe util detect cycle FILES [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILES`   Files to unrec
+
+
+main.exe util wc
+~~~~~~~~~~~~~~~~~~
+
+Stats on file of lines (without taking UTF8 chars into account)
+
+
+
+**DESCRIPTION**
+
+
+This command will print different statistics on a file of lines. Contrarily to wc, it will not take into account UTF8 chars for the max line length.
+
+
+**ABOUT UTILS**
+
+
+This is a list of small sub-commands that may be useful from time to time.
+
+**USAGE**
+::
+  
+  main.exe util wc FILES [OPTIONS]
+
+Where options are:
+
+
+* :code:`FILES`   Files to wc

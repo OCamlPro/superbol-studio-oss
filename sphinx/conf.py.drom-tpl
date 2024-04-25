@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# superbol documentation build configuration file, created by
+# !{name} documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its
@@ -50,9 +50,9 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'superbol'
-copyright = 'OCamlPro SAS'
-author = 'Nicolas Berthier <nicolas.berthier@ocamlpro.com> & David Declerck <david.declerck@ocamlpro.com> & Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com> & Emilien Lemaire <emilien.lemaire@ocamlpro.com>'
+project = '!{name}'
+copyright = '!{sphinx-copyright}'
+author = '!{authors-ampersand}'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -71,7 +71,7 @@ release = version + datetime.datetime.now().strftime(" (%Y/%m/%d %H:%M)")
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -167,7 +167,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'superbol.tex', 'superbol Documentation',
+    (master_doc, '!{name}.tex', '!{name} Documentation',
      'author', 'manual'),
 ]
 
@@ -177,7 +177,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'superbol', 'superbol Documentation',
+    (master_doc, '!{name}', '!{name} Documentation',
      [author], 1)
 ]
 
@@ -188,8 +188,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'superbol', 'superbol Documentation',
-     author, 'superbol', 'One line description of project.',
+    (master_doc, '!{name}', '!{name} Documentation',
+     author, '!{name}', 'One line description of project.',
      'Miscellaneous'),
 ]
 

@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-e5a9352a408b7b7a139497266aafc85f:.
+d87386e0cbdff93ba30b97b43efd6494:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -255,12 +255,12 @@ a49b1a7726042e6f37ce09424b769fd8:scripts/static-build.sh
 
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
-a4431c32911b7499fbdc49e2e62932d2:sphinx/about.rst
+c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 # end context for sphinx/about.rst
 
 # begin context for sphinx/conf.py
 # file sphinx/conf.py
-0f6a35278b93d5d9ceca6431677766e6:sphinx/conf.py
+40b9c6366ef1072613aa9ab5738fd4f9:sphinx/conf.py
 # end context for sphinx/conf.py
 
 # begin context for sphinx/index.rst
