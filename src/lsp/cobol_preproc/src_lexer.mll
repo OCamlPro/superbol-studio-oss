@@ -181,7 +181,7 @@ let nonblank_area_A =(nonblank nnl nnl nnl |
                       blank blank nonblank nnl |
                       blank blank blank nonblank)
 let nonblank = nonblank # ['\t']    (* now, also exclude tab from blank chars *)
-let separators = ([ ',' ';' ]+)
+let separator = [ ',' ';' ]
 let epsilon = ""
 let letter = [ 'a'-'z' 'A'-'Z' ]                      (* TODO: '\128'-'\255'? *)
 let digit = [ '0'-'9' ]
@@ -224,7 +224,7 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # [';' '\'' '"']
+let text_char = nonblank # ['\'' '"']
 let neq = text_char # ['=']
 let text_word =
   (* Note: accepts words that include floating comment markers `*>'; these are
@@ -395,9 +395,14 @@ and fixed_debug_line state
       }
 and fixed_nominal_line state
   = parse
-  | blanks | separators
+  | blanks
       {
         fixed_nominal_line state lexbuf
+      }
+  | (separator as char) (blanks*)
+      {
+        Src_lexing.separator ~char ~ktkd:gobble_line ~knom:fixed_nominal
+          state lexbuf
       }
   | cdir_word
       {
@@ -409,9 +414,14 @@ and fixed_nominal_line state
       }
 and fixed_nominal state
   = parse
-  | blanks | separators
+  | blanks
       {
         fixed_nominal state lexbuf
+      }
+  | (separator as char) (blanks*)
+      {
+        Src_lexing.separator ~char ~ktkd:gobble_line ~knom:fixed_nominal
+          state lexbuf
       }
   | "*>" nnl* (newline | eof)                             (* floating comment *)
       {
@@ -574,10 +584,6 @@ and free_line state
       {
         free_line state lexbuf
       }
-  | separators                 (* Allow separators , &; at begining of line? *)
-      {
-        free_line (Src_lexing.flush_continued ~force:true state) lexbuf
-      }
   | (cdir_word | '$' blanks? cdir_word_suffix)
       {
         Src_lexing.cdir_word' ~k:free_nominal
@@ -599,9 +605,13 @@ and free_line state
       }
 and free_nominal state
   = parse
-  | blanks | separators
+  | blanks
       {
         free_nominal state lexbuf
+      }
+  | (separator as char) (blanks*)
+      {
+        Src_lexing.separator' ~char ~k:free_nominal state lexbuf
       }
   | "*>" nnl* (newline | eof)                             (* floating comment *)
       {
@@ -646,16 +656,6 @@ and comment_line marker state
       {
         Src_lexing.comment ~marker:(String.make 1 marker) state lexbuf
       }
-and free_gobble_line state
-  = parse
-  | (nnl* newline)
-      {
-        Src_lexing.new_line state lexbuf
-      }
-  | (nnl* eof)
-      {
-        Src_lexing.(flush @@ eof state lexbuf)
-      }
 
 and newline_or_eof state
   = parse
@@ -684,7 +684,7 @@ and free_newline_or_eof state
       }
   | _
       {
-        Src_lexing.unexpected Character state lexbuf ~k:free_gobble_line
+        Src_lexing.unexpected Character state lexbuf ~k:free_nominal
       }
 
 (* Text-word tokenizer (compiler directives) *)

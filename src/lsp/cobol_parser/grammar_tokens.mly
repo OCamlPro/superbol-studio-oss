@@ -27,7 +27,8 @@
 %token <string * char * string> FIXEDLIT [@recovery "0", '.', "0"]
 %token <string * char * string * string> FLOATLIT [@recovery "0", '.', "0", "1"]
 %token <string> DIGITS [@recovery integer_zero]
-%token <string> PICTURE_STRING [@recovery "X"]    (* picture character string *)
+%token <string> PICTURE_STRING [@recovery "X"]
+                  [@symbol "<picture character string>"]
 %token <Cobol_common.Exec_block.t> EXEC_BLOCK
 
 %token EIGHTY_EIGHT

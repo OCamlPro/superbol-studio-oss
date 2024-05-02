@@ -68,6 +68,7 @@ let with_source_format: Src_format.any with_loc -> t -> (t, error) result =
 (* Note: {!next_chunk} never outputs compiler-directive text-words in positions
    other than the first two.  Such a chunk also terminates at the end of the
    source line as it cannot be continued (contrary to normal source lines). *)
+(* CHECKME: weirdly placed separators? *)
 let lookup_compiler_directive: Text.text -> _ =
   let compdir prefix w text =
     try Ok (prefix, Src_lexer.distinguish_directive w, text)

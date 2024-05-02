@@ -71,3 +71,24 @@ let%expect_test "decimal-point-is-comma-with-missing-period" =
     COMMA, PROCEDURE, DIVISION, DISPLAY, DIGITS[1], ., DIGITS[1], DISPLAY,
     FIXED[1,1], DISPLAY, SINT[-1], ., DIGITS[1], DISPLAY, FIXED[-1,1], ., EOF
 |}];;
+
+let%expect_test "decimal-point-is-comma-with-separators" =
+  Parser_testing.show_parsed_tokens {|
+        IDENTIFICATION, DIVISION.
+        PROGRAM-ID. prog.
+        ENVIRONMENT; DIVISION.
+        CONFIGURATION SECTION.
+        SPECIAL-NAMES.
+            DECIMAL-POINT,
+              IS COMMA.
+        PROCEDURE DIVISION.
+            DISPLAY 1.1, 1,1, -1.1; "and", 999,999, 433,1;
+            DISPLAY -1,1, "done".
+  |};
+  [%expect {|
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., ENVIRONMENT,
+    DIVISION, ., CONFIGURATION, SECTION, ., SPECIAL-NAMES, ., DECIMAL-POINT, IS,
+    COMMA, ., PROCEDURE, DIVISION, ., DISPLAY, DIGITS[1], ., DIGITS[1],
+    FIXED[1,1], SINT[-1], ., DIGITS[1], "and", FIXED[999,999], FIXED[433,1],
+    DISPLAY, FIXED[-1,1], "done", ., EOF
+|}];;

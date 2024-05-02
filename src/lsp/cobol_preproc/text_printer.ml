@@ -134,6 +134,7 @@ let string_of_text ?(cobc=false) ?(max_line_gap=1) text =
           (Pretty.list ~fopen:"" ~fsep:"" ~fclose:""
              (fun ppf w -> Fmt.string ppf (string_of_word w.payload))) text
     (* Pretty.to_string "EXEC@ %s@ END-EXEC" string_of_text text *)
+    | Separator _
     | Eof -> ""
   in
   let rec iter pos text =

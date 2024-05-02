@@ -4642,16 +4642,6 @@ run_misc.at-11928-cmod.c:29.23-67.17:
   69            str = cob_get_picx_param (k, NULL, 0);
 >> Error: Unexpected pseudotext
 
-run_misc.at-11928-cmod.c:68.23-68.30:
-  65            printf ("BY REFERENCE ");
-  66         }
-  67         if (type == COB_TYPE_ALPHANUMERIC) {
-  68 >          sprintf (pic, "X(%d)", size);
-----                          ^^^^^^^
-  69            str = cob_get_picx_param (k, NULL, 0);
-  70            printf ("%-11s '%s'", pic, str);
->> Error: Missing PICTURE string (got `"X(%d)"' instead)
-
 run_misc.at-11928-cmod.c:73.6-73.7:
   70            printf ("%-11s '%s'", pic, str);
   71            cob_free ((void*)str);
@@ -4687,16 +4677,6 @@ run_misc.at-11928-cmod.c:73.22-76.24:
   77            sprintf (pic, "(%d)", size);
   78            str = cob_get_grp_param (k, NULL, 0);
 >> Error: Unexpected pseudotext
-
-run_misc.at-11928-cmod.c:77.23-77.29:
-  74            sprintf (pic, "N(%d)", size); /* FIXME */
-  75            printf ("exchange of national data is not supported yet");
-  76         } else if (type == COB_TYPE_GROUP) {
-  77 >          sprintf (pic, "(%d)", size);
-----                          ^^^^^^
-  78            str = cob_get_grp_param (k, NULL, 0);
-  79            printf ("%-11s '%.*s'", pic, size, str);
->> Error: Missing PICTURE string (got `"(%d)"' instead)
 
 run_misc.at-11928-cmod.c:84.6-84.7:
   81            memset (wrk,' ',sizeof(wrk));
@@ -5387,16 +5367,6 @@ run_misc.at-12158-cmod.c:29.23-69.17:
   71            printf ("%-11s '%s'", pic, str);
 >> Error: Unexpected pseudotext
 
-run_misc.at-12158-cmod.c:70.23-70.30:
-  67         }
-  68         str = (char *) cob_get_field_str_buffered (fld);
-  69         if (type == COB_TYPE_ALPHANUMERIC) {
-  70 >          sprintf (pic, "X(%d)", size);
-----                          ^^^^^^^
-  71            printf ("%-11s '%s'", pic, str);
-  72            cob_put_field_str (fld, "Bye!");
->> Error: Missing PICTURE string (got `"X(%d)"' instead)
-
 run_misc.at-12158-cmod.c:73.6-73.7:
   70            sprintf (pic, "X(%d)", size);
   71            printf ("%-11s '%s'", pic, str);
@@ -5432,16 +5402,6 @@ run_misc.at-12158-cmod.c:73.22-76.24:
   77            sprintf (pic,"(%d)",size);
   78            printf ("%-11s '%.*s'",pic,size,str);
 >> Error: Unexpected pseudotext
-
-run_misc.at-12158-cmod.c:77.22-77.28:
-  74            sprintf (pic,"N(%d)",size); /* FIXME */
-  75            printf ("exchange of national data is not supported yet");
-  76         } else if (type == COB_TYPE_GROUP) {
-  77 >          sprintf (pic,"(%d)",size);
-----                         ^^^^^^
-  78            printf ("%-11s '%.*s'",pic,size,str);
-  79            cob_put_field_str (fld, "Bye-Bye Birdie!");
->> Error: Missing PICTURE string (got `"(%d)"' instead)
 
 run_misc.at-12158-cmod.c:80.6-80.7:
   77            sprintf (pic,"(%d)",size);

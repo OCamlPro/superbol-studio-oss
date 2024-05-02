@@ -62,6 +62,8 @@ let cdtoks_of_word directive_kind
       boollit ~prefix_length:1 ~base:`Bool str
   | Alphanum { knd = BoolX; str; qte = _ } ->
       boollit ~prefix_length:2 ~base:`Hex str
+  | Separator _ ->
+      [], acc
   | Eof ->
       [EOL, ~@@word], acc
   | Pseudo _
@@ -101,6 +103,8 @@ let pptoks_of_word (word: text_word Cobol_common.Srcloc.with_loc) acc =
       -> [PSEUDO_TEXT p &@<- word]
     | ExecBlock text
       -> [EXEC_BLOCK text &@<- word]
+    | Separator _c
+      -> []
     | Eof
       -> [EOL &@<- word]
   in

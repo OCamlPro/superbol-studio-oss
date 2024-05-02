@@ -182,7 +182,7 @@ let new_line state lexbuf =
       newline_cnums = Lexing.lexeme_end lexbuf :: state.newline_cnums }
   in
   match state.lex_prods, state.cdir_seen with
-  | { payload = TextWord _ | Alphanum _ | Pseudo _ | Eof; _ } :: _, _
+  | { payload = TextWord _ | Separator _ | Alphanum _ | Pseudo _ | Eof; _ } :: _, _
   | _, true ->
       flush state
   | _ ->
@@ -229,6 +229,8 @@ let rev_pseudotext: text -> _ state -> pseudotext * _ state = fun text state ->
         (Text.pseudo_string (w &@<- pt)) :: acc, state
     | Alphanum a ->
         (PseudoAlphanum a &@<- pt) :: acc, state
+    | Separator _ ->
+        acc, state                                       (* ignore separators *)
     | word ->
         acc, lex_error state @@ Unexpected { loc = ~@pt;
                                              item = Word_in_pseudotext word }
@@ -263,15 +265,18 @@ let gen emit0 = function
   | { payload = TextWord str; loc } as s ->
       let len = String.length str in
       (* XXX: may pos' end up with an invalid column number? *)
-      if len > 1 && str.[String.length str - 1] = '.' then
+      if len > 1 && str.[len - 1] = '.' then
         let sloc = Cobol_common.Srcloc.trunc_suffix 1 loc
         and ploc = Cobol_common.Srcloc.suffix 1 loc in
         fun state ->
           emit0 (textword (String.sub str 0 (len - 1) &@ sloc)) state |>
           emit (TextWord "." &@ ploc)
-      else if len > 1 && str.[String.length str - 1] = ',' then
-        let sloc = Cobol_common.Srcloc.trunc_suffix 1 loc in
-        emit0 @@ textword (String.sub str 0 (len - 1) &@ sloc)
+      else if len > 1 && (str.[len - 1] = ',' || str.[len - 1] = ';') then
+        let sloc = Cobol_common.Srcloc.trunc_suffix 1 loc
+        and ploc = Cobol_common.Srcloc.suffix 1 loc in
+        fun state ->
+          emit0 (textword (String.sub str 0 (len - 1) &@ sloc)) state |>
+          emit (Separator str.[len - 1] &@ ploc)
       else
         emit0 s
   | s ->
@@ -361,6 +366,9 @@ let text_word ?(cont = false) ~start_pos ~end_pos ?(fitting = Nominal) w state =
       let state = lex_error state @@ Unexpected { loc = wloc; item = Word } in
       emit (textword w) state
 
+let separator ~char ~start_pos ~end_pos ?(fitting = Nominal) _s state =
+  ignore fitting;
+  emit (Separator char &@ raw_loc ~start_pos ~end_pos state) state
 
 let to_be_continued_alphanum: string -> bool =
   fun s -> match s.[0], Str.last_chars s 2 with
@@ -559,6 +567,9 @@ let fixed_eqeq: fixed state -> _ =
     else text_word ~start_pos ~end_pos ?fitting w state
   end
 
+let fixed_separator ~char : fixed state -> _ =
+  fixed_text (separator ~char)
+
 let continuing_unclosed_ebcdics = function
   | { continued = CText { txt = CAlphanum { unclosed_ebcdics; _ }; _ }; _ } ->
       Lazy.force unclosed_ebcdics
@@ -602,15 +613,16 @@ let fixed_alphanum_lit
 
 (* --- *)
 
-let fixed_text mk ~ktkd ~knom state lexbuf =
+let fixed_srctok mk ~ktkd ~knom state lexbuf =
   let state, fitting = mk state lexbuf in
   (if fitting = Tacked then ktkd else knom) state lexbuf
 
-let text_word ?cont = fixed_text (fixed_text_word ?cont)
-let cdir_word ?marker s = fixed_text (fixed_cdir_word ?marker) s
-let eqeq s = fixed_text fixed_eqeq s
+let text_word ?cont = fixed_srctok (fixed_text_word ?cont)
+let cdir_word ?marker s = fixed_srctok (fixed_cdir_word ?marker) s
+let eqeq s = fixed_srctok fixed_eqeq s
+let separator ~char s = fixed_srctok (fixed_separator ~char) s
 let alphanum_lit ?doubled_opener =
-  fixed_text (fixed_alphanum_lit ?doubled_opener)
+  fixed_srctok (fixed_alphanum_lit ?doubled_opener)
 
 (* Free-format versions: *)
 
@@ -634,6 +646,11 @@ let free_eqeq state =
     pseudotext_delimiter ~loc:(raw_loc ~start_pos ~end_pos state) state
   end state
 
+let free_separator ~char state =
+  free_srctok begin fun ~start_pos ~end_pos _ state ->
+    emit (Separator char &@ raw_loc ~start_pos ~end_pos state) state
+  end state
+
 let free_alphanum_lit state lexbuf =
   let s = Lexing.lexeme lexbuf
   and start_pos = Lexing.lexeme_start_p lexbuf
@@ -649,6 +666,7 @@ let free_text mk ~k state lexbuf = k (mk state lexbuf) lexbuf
 let text_word' ~k = free_text free_text_word ~k
 let cdir_word' ~k = free_text free_cdir_word ~k
 let eqeq' ~k = free_text free_eqeq ~k
+let separator' ~char ~k = free_text (free_separator ~char) ~k
 let alphanum_lit' ~k = free_text free_alphanum_lit ~k
 
 (* --- *)

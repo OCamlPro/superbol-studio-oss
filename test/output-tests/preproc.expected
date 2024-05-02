@@ -132,6 +132,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/ACCEPT.CBL':
  .
  DISPLAY
  "Name is "
+ ,
  Initials
  SPACE
  Surname
@@ -230,6 +231,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Accept/MULTIPLIER.CBL':
  .
  DISPLAY
  "Result is = "
+ ,
  Result
  .
  STOP
@@ -286,26 +288,37 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  Vowel
  VALUE
  "a"
+ ,
  "e"
+ ,
  "i"
+ ,
  "o"
+ ,
  "u"
  .
  88
  Consonant
  VALUE
  "b"
+ ,
  "c"
+ ,
  "d"
+ ,
  "f"
+ ,
  "g"
+ ,
  "h"
  "j"
  THRU
  "n"
+ ,
  "p"
  THRU
  "t"
+ ,
  "v"
  THRU
  "z"
@@ -323,6 +336,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/CONDITIONS.CBL'
  "a"
  THRU
  "z"
+ ,
  "0"
  THRU
  "9"
@@ -455,6 +469,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  THEN
  ADD
  Num1
+ ,
  Num2
  GIVING
  Result
@@ -473,6 +488,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Conditn/IterIf.cbl':
  END-IF
  DISPLAY
  "Result is = "
+ ,
  Result
  END-PERFORM
  .
@@ -639,6 +655,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  KEY
  DISPLAY
  "VIDEO STATUS :- "
+ ,
  VideoStatus
  END-READ
  END-IF
@@ -660,6 +677,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/DirectReadIdx.C
  KEY
  DISPLAY
  "VIDEO STATUS :- "
+ ,
  VideoStatus
  END-READ
  END-IF
@@ -843,6 +861,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  KEY
  DISPLAY
  "VIDEO STATUS :- "
+ ,
  VideoStatus
  END-WRITE
  READ
@@ -858,6 +877,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/Seq2Index.CBL':
  .
  CLOSE
  VideoFile
+ ,
  SeqVideoFile
  .
  STOP
@@ -1022,6 +1042,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Indexed/SeqReadIdx.cbl'
  KEY
  DISPLAY
  "VIDEO STATUS :- "
+ ,
  VideoStatus
  END-START
  END-IF
@@ -1191,6 +1212,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Merge/MERGE.CBL':
  WStudentId
  USING
  InsertionsFile
+ ,
  StudentFile
  GIVING
  NewStudentFile
@@ -1932,6 +1954,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/ReadREL.CBL':
  KEY
  DISPLAY
  "SUPP STATUS :-"
+ ,
  SupplierStatus
  END-READ
  PERFORM
@@ -2168,6 +2191,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Relative/Seq2Rel.cbl':
  .
  CLOSE
  SupplierFile
+ ,
  SupplierFileSeq
  .
  STOP
@@ -2575,6 +2599,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteA.
  .
  CLOSE
  SalesFile
+ ,
  PrintFile
  .
  STOP
@@ -3092,6 +3117,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteB.
  .
  CLOSE
  SalesFile
+ ,
  PrintFile
  .
  STOP
@@ -3880,6 +3906,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  .
  ADD
  Commission
+ ,
  FixedRate(CityCode,SalesPersonNum
  )
  GIVING
@@ -3924,6 +3951,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteFu
  .
  CLOSE
  SalesFile
+ ,
  PrintFile
  .
  STOP
@@ -4722,6 +4750,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  .
  ADD
  Commission
+ ,
  FixedRate(CityCode,SalesPersonNum
  )
  GIVING
@@ -4766,6 +4795,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/ReportWriter/RepWriteSu
  .
  CLOSE
  SalesFile
+ ,
  PrintFile
  .
  STOP
@@ -5400,6 +5430,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  Male
  VALUE
  "M"
+ ,
  "m"
  .
  FD
@@ -5542,6 +5573,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SeqRpt/SeqRpt.CBL':
  PrintReportLines
  CLOSE
  StudentFile
+ ,
  ReportFile
  STOP
  RUN
@@ -6306,8 +6338,11 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/Strings/UnstringFileEg.
  ValidTypeCode
  VALUE
  "1,"
+ ,
  "2,"
+ ,
  "3,"
+ ,
  "4,"
  .
  02
@@ -6618,6 +6653,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/DateD
  "Validate"
  USING
  InputDateIn
+ ,
  ValidationResult
  .
  DISPLAY
@@ -6811,6 +6847,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DateValid/ValiD
  DIVISION
  USING
  InputDateLA
+ ,
  ValidationResultLB
  .
  Begin
@@ -7079,12 +7116,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  "EuroDateToSortDate"
  USING
  FirstDate
+ ,
  FirstDate
  .
  CALL
  "EuroDateToSortDate"
  USING
  SecondDate
+ ,
  SecondDate
  .
  CALL
@@ -7093,6 +7132,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  BY
  CONTENT
  FirstDate
+ ,
  SecondDate
  BY
  REFERENCE
@@ -7102,12 +7142,14 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  "SortDateToEuroDate"
  USING
  FirstDate
+ ,
  FirstDate
  .
  CALL
  "SortDateToEuroDate"
  USING
  SecondDate
+ ,
  SecondDate
  .
  MOVE
@@ -7159,6 +7201,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  BY
  CONTENT
  FirstDate
+ ,
  BY
  REFERENCE
  ValidationResult
@@ -7188,6 +7231,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  BY
  CONTENT
  SecondDate
+ ,
  BY
  REFERENCE
  ValidationResult
@@ -7300,6 +7344,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  DIVISION
  USING
  DDMMYYYYDate
+ ,
  YYYYDDMMDate
  .
  Begin
@@ -7400,6 +7445,7 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  DIVISION
  USING
  YYYYDDMMDate
+ ,
  DDMMYYYYDate
  .
  Begin
@@ -7471,7 +7517,9 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/DayDiff/DayDiff
  DIVISION
  USING
  Date1
+ ,
  Date2
+ ,
  Difference
  .
  Begin
@@ -7615,11 +7663,15 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Driver
  BY
  CONTENT
  Number1
+ ,
  Number2
+ ,
  FirstString
+ ,
  BY
  REFERENCE
  SecondString
+ ,
  Result
  .
  DISPLAY
@@ -7873,9 +7925,13 @@ Pre-processing `test/testsuite/microfocus/www.csis.ul.ie/SubProg/Multiply/Multip
  DIVISION
  USING
  Param1
+ ,
  Param2
+ ,
  StrA
+ ,
  StrB
+ ,
  Answer
  .
  Begin
@@ -8793,6 +8849,7 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob14.cbl':
  DISPLAY
  B
  "NOT FOUND"
+ ,
  GO
  000X
  .
@@ -8804,11 +8861,13 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob14.cbl':
  "FOUND "
  MNO
  ":"
+ ,
  DISPLAY
  " AT POS:"
  A
  " FOR NAME: "
  MNAME
+ ,
  GO
  000X
  .
@@ -8967,7 +9026,9 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob14.cbl':
  .
  DISPLAY
  MNO
+ ,
  " "
+ ,
  MNAME
  .
  GO
@@ -9139,6 +9200,7 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob15.cbl':
  DISPLAY
  B
  "NOT FOUND"
+ ,
  GO
  000X
  .
@@ -9150,11 +9212,13 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob15.cbl':
  "FOUND "
  MNO
  ":"
+ ,
  DISPLAY
  " AT POS:"
  A
  " FOR NAME: "
  MNAME
+ ,
  GO
  000X
  .
@@ -9313,7 +9377,9 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob15.cbl':
  .
  DISPLAY
  MNO
+ ,
  " "
+ ,
  MNAME
  .
  GO
@@ -9519,6 +9585,7 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob16.cbl':
  DISPLAY
  B
  "NOT FOUND"
+ ,
  GO
  000X
  .
@@ -9530,11 +9597,13 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob16.cbl':
  "FOUND "
  MNO
  ":"
+ ,
  DISPLAY
  " AT POS:"
  A
  " FOR NAME: "
  MNAME
+ ,
  GO
  000X
  .
@@ -9679,7 +9748,9 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob16.cbl':
  .
  DISPLAY
  INO
+ ,
  " "
+ ,
  INAME
  .
  GO
@@ -9889,6 +9960,7 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob17.cbl':
  DISPLAY
  B
  "NOT FOUND"
+ ,
  GO
  000X
  .
@@ -9900,11 +9972,13 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob17.cbl':
  "FOUND "
  MNO
  ":"
+ ,
  DISPLAY
  " AT POS:"
  A
  " FOR NAME: "
  MNAME
+ ,
  GO
  000X
  .
@@ -10040,7 +10114,9 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob17.cbl':
  .
  DISPLAY
  INO
+ ,
  " "
+ ,
  INAME
  .
  GO
@@ -11798,6 +11874,7 @@ Pre-processing `test/testsuite/ibm/ibmmainframes.com/cob8.cbl':
  A2
  (
  I
+ ,
  J
  )
  =
