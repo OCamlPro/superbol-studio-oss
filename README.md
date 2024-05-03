@@ -200,7 +200,7 @@ program.
 
 ## Coverage
 
-### Generate coverage files
+### Generating Coverage Files
 
 GnuCOBOL can generate coverage files for your program. To enable this
 you can set the `enable-coverage` setting to `true` in your
@@ -210,15 +210,15 @@ The coverage files generated are in `gcov` format, so they are
 portable and you can use them as you would any other coverage
 files from other languages.
 
-### Display coverage hightlighting
+### Coverage Hightlighting
 
-After running a program and having its coverage files generated
-you might want to display its content on a line by line basis
+After running a program and having its coverage files generated.
+You might want to display their content on a line by line basis
 in your program source code.
 
-To enable this coverage highlighting you can set `coverage` to
+To enable coverage highlighting, you can set `coverage` to
 `true` in your `launch.json` file. If you do not have this
-file yet, you can generate it by selection the `Run and Debug`
+file yet, you can generate it by selecting the `Run and Debug`
 pane (or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>)
 and then click on `create a launch.json file`. The generated
 file should have all the configurations you need to run or
