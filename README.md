@@ -200,12 +200,29 @@ program.
 
 ## Coverage
 
-To enable coverage you can set `enable-coverage` to `true` in your
-`task.json` file, and `coverage` to `true` in your `launch.json` file.
+### Generate coverage files
 
-The first modification will enable the generation of coverage files
-(in `gcov` format) and the second one will enable the highlighting
-of covered lines in your source code.
+GnuCOBOL can generate coverage files for your program. To enable this
+you can set the `enable-coverage` setting to `true` in your
+`task.json` file.
+
+The coverage files generated are in `gcov` format, so they are
+portable and you can use them as you would any other coverage
+files from other languages.
+
+### Display coverage hightlighting
+
+After running a program and having its coverage files generated
+you might want to display its content on a line by line basis
+in your program source code.
+
+To enable this coverage highlighting you can set `coverage` to
+`true` in your `launch.json` file. If you do not have this
+file yet, you can generate it by selection the `Run and Debug`
+pane (or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>)
+and then click on `create a launch.json file`. The generated
+file should have all the configurations you need to run or
+debug your code.
 
 <!-- ## Formatting the source code -->
 
