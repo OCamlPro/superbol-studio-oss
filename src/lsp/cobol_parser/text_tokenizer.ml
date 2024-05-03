@@ -363,7 +363,7 @@ type 'a memory =
 
 type 'm state =
   {
-    expect_picture_string: bool;
+    lexer_state: Text_lexer.lexer_state;
     leftover_tokens: tokens; (* non-empty only when [preproc_n_combine_tokens]
                                 errors out for lack of input tokens. *)
     memory: 'm memory;
@@ -414,7 +414,7 @@ let init
     Text_lexer.intrinsic_handles lexer (StringSet.elements default_intrinsics)
   in
   {
-    expect_picture_string = false;
+    lexer_state = Text_lexer.initial_state;
     leftover_tokens = [];
     memory;
     context_stack = Context.empty_stack;
@@ -465,8 +465,8 @@ let scan_exec_block
   in
   match exec_scanner with
   | Stateless_exec_scanner s ->
-      state,
-      [ EXEC_BLOCK (s ~&text) &@<- text ]
+      [ EXEC_BLOCK (s ~&text) &@<- text ],
+      state
   | Stateful_exec_scanner (s, s_acc) ->
       let block, s_acc = s ~&text s_acc in
       let scanner = Parser_options.Stateful_exec_scanner (s, s_acc) in
@@ -478,108 +478,91 @@ let scan_exec_block
             { state.persist.exec_scanners with
               exec_scanners = EXEC_MAP.add lang scanner scanners }
       in
-      { state with persist = { state.persist with exec_scanners } },
-      [ EXEC_BLOCK block &@<- text ]
+      [ EXEC_BLOCK block &@<- text ],
+      { state with persist = { state.persist with exec_scanners } }
 
 
-let tokens_of_word ({ persist = { lexer; _ }; _ } as state)
-  : text_word with_loc -> _ * tokens =
-  fun { payload = c; loc } ->
-  let tok t = state, [t &@ loc] in
+let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
+  (* After text manipulation, a "word" of manipulated text may comprise some
+     separators like `,' and `;', so they may actually encode multiple tokens.
+     We additionally need special handling of `PICTURE [IS]` to bypass usual
+     tokenization of picture strings. *)
+  let generic ({ lexer_state; persist = { lexer; _ }; _ } as state) w =
+    let tokens, lexer_state =
+      Text_lexer.read_tokens lexer lexer_state (w &@ loc)
+    in
+    List.rev_map distinguish_words tokens @ rev_prefix_tokens,
+    if lexer_state != state.lexer_state
+    then { state with lexer_state }
+    else state
+  in
   let alphanum ~hexadecimal ?(repr = Cobol_ptree.Native_bytes) str qte =
-    Cobol_ptree.{
-      str;
-      hexadecimal;
-      quotation = (match qte with
-        | Apostrophe -> Simple_quote
-        | Quote -> Double_quote);
-      runtime_repr = repr;
-    }
+    let quotation: Cobol_ptree.alphanum_quote = match qte with
+      | Apostrophe -> Simple_quote
+      | Quote -> Double_quote
+    in
+    Cobol_ptree.{ str; hexadecimal; quotation; runtime_repr = repr }
   and boollit ~base str =
-    tok @@ BOOLIT (Cobol_ptree.boolean_of_string ~base str)
+    Cobol_ptree.boolean_of_string ~base str
   in
-  match c with
-  | TextWord w
-  | CDirWord w
-    -> let tokens = Text_lexer.tokens_of_string' lexer (w &@ loc) in
-      state, List.map distinguish_words tokens
-  (* | Alphanum { knd = Basic; str; qte = quotation; _ } *)
-  (*   (\* TODO: Leave those as is in the parse-tree, and decode later *\) *)
-  (*   when Config.ebcdic_symbolic_characters#value *)
-  (*   -> let token, diags = *)
-  (*        Text_lexer.decode_symbolic_ebcdics' ~quotation (str &@ loc) in *)
-  (*     [token], diags *)
-  | Alphanum { knd = Basic; str; qte; _ }
-    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte)
-  | Alphanum { knd = Bool; str; _ }
-    -> boollit ~base:`Bool str
-  | Alphanum { knd = BoolX; str; _ }
-    -> boollit ~base:`Hex str
-  | Alphanum { knd = Hex; str; qte }
-    -> tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
-  | Alphanum { knd = NullTerm; str; qte }
-    -> tok @@ ALPHANUM (alphanum ~hexadecimal:false ~repr:Null_terminated_bytes
-                          str qte)
-  | Alphanum { knd = National | NationalX; str; _ }  (* TODO: differentiate *)
-    -> tok @@ NATLIT str
-  | AlphanumPrefix { knd = Hex; str; qte }
-    -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:true str qte)
-  | AlphanumPrefix { knd = _; str; qte }
-    -> tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
-  | Eof
-    -> tok EOF
-  | ExecBlock text
-    -> scan_exec_block state (text &@ loc)
-  | Pseudo _
-    -> let error = Unexpected { loc; stuff = Pseudotext } in
-      { state with diags = Parser_diagnostics.add_error error state.diags }, []
+  let nominal state =
+    let tok t = (t &@ loc) :: rev_prefix_tokens, state in
+    match c with
+    | TextWord w
+    | CDirWord w ->
+        generic state w
+    (* | Alphanum { knd = Basic; str; qte = quotation; _ } *)
+    (*   (\* TODO: Leave those as is in the parse-tree, and decode later *\) *)
+    (*   when Config.ebcdic_symbolic_characters#value *)
+    (*   -> let token, diags = *)
+    (*        Text_lexer.decode_symbolic_ebcdics' ~quotation (str &@ loc) in *)
+    (*     [token], diags *)
+    | Alphanum { knd = Basic; str; qte; _ } ->
+        tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte)
+    | Alphanum { knd = Bool; str; _ } ->
+        tok @@ BOOLIT (boollit ~base:`Bool str)
+    | Alphanum { knd = BoolX; str; _ } ->
+        tok @@ BOOLIT (boollit ~base:`Hex str)
+    | Alphanum { knd = Hex; str; qte } ->
+        tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
+    | Alphanum { knd = NullTerm; str; qte } ->
+        tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte
+                           ~repr:Null_terminated_bytes)
+    | Alphanum { knd = National | NationalX; str; _ } ->
+        tok @@ NATLIT str                              (* TODO: differentiate *)
+    | AlphanumPrefix { knd = Hex; str; qte } ->
+        tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:true str qte)
+    | AlphanumPrefix { knd = _; str; qte } ->
+        tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
+    | Separator _ ->
+        rev_prefix_tokens, state
+    | Eof ->
+        tok EOF
+    | ExecBlock text ->
+        scan_exec_block state (text &@ loc)
+    | Pseudo _ ->
+        let error = Unexpected { loc; stuff = Pseudotext } in
+        rev_prefix_tokens,
+        { state with diags = Parser_diagnostics.add_error error state.diags }
+  in
+  let pic_string state =
+    match c with
+    | TextWord w ->
+        generic state w
+    | _ ->
+        let lexer_state
+          = Text_lexer.cancel_picture_string_expectation state.lexer_state in
+        nominal { state with lexer_state }
+  in
+  if Text_lexer.expecting_picture_string state.lexer_state
+  then pic_string state
+  else nominal state
 
-let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state ->
-  (* After text manipulation. We need special handling of `PICTURE [IS]` to
-     bypass usual tokenization of picture strings. *)
-  let prod (acc, ({ expect_picture_string; _ } as s)) = function
-    | { payload = PICTURE; _ } as p ->
-        p :: acc, { s with expect_picture_string = true }
-    | { payload = IS; _ } as p
-      when expect_picture_string ->
-        p :: acc, s
-    | p ->
-        p :: acc, { s with expect_picture_string = false }
-  in
-  let tokenize_text_word: string with_loc -> _ =
-    let tokenizer ~loc lb =
-      Text_lexer.tokens state.persist.lexer (lb &@ Lazy.force loc)
-    and prod_tokens t acc =
-      List.fold_left (fun acc t -> prod acc @@ distinguish_words t) acc ~&t
-    in
-    fun w ->
-      Cobol_common.Tokenizing.fold_tokens ~tokenizer ~f:prod_tokens w
-        ~until:(function [] | [{ payload = EOF; _ }] -> true | _ -> false)
-  and prod_word (acc, state) word =
-    let state, t = tokens_of_word state word in
-    List.fold_left prod (acc, state) t
-  in
-  let rec acc_text ((_, ({ expect_picture_string; _ })) as acc) word =
-    if expect_picture_string
-    then match ~&word with
-      | TextWord "IS" -> prod acc (IS &@<- word)
-      | TextWord w -> prod acc (PICTURE_STRING w &@<- word)
-      | _ -> missing_picstr acc word
-    else match ~&word with
-      | TextWord w -> tokenize_text_word (w &@<- word) acc
-      | _ -> prod_word acc word
-  and missing_picstr (acc, ({ diags; _ } as state)) ({ loc; _ } as word) =
-    let error = Missing { loc; stuff = Picture_string { instead = ~&word } } in
-    let state =
-      { state with
-        diags = add_error error diags;
-        expect_picture_string = false }
-    in
-    acc_text (acc, state) word
-  in
-  fun text ->
-    let acc, state = List.fold_left acc_text ([], state) text in
-    List.rev acc, state
+
+let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state text ->
+  let tokens, state = List.fold_left acc_tokens_of_text_word ([], state) text in
+  List.rev tokens, state
+
 
 let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   let state = { state with leftover_tokens = [] } in
@@ -613,7 +596,7 @@ let put_token_back (type m) (s: m state) : m state =
 
 let next_token (s: _ state) =
   let rec aux = function
-    | { payload = INTERVENING_ ','; _ } :: tokens ->
+    | { payload = INTERVENING_(',' | ';'); _ } :: tokens ->
         aux tokens
     | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
         Some (emit_token s (PERIOD &@ loc), token, tokens)
@@ -631,8 +614,12 @@ type lexer_update =
   | Disabled_intrinsics
   | CommaBecomesDecimalPoint
 
-let tokens_of_string' { persist = { lexer; _ }; _ } =
-  Text_lexer.tokens_of_string' lexer
+let retokenize { lexer_state; persist = { lexer; _ }; _ } w =
+  (* Note: for now we can forget the lexer state that is returned on rescan of
+     tokens, as this part of the state alters PICTURE_STRINGs, that we don't
+     need to reconsider, or else is updated before [retokenize] is called
+     (handling of DECIMAL POINT).  *)
+  fst @@ Text_lexer.read_tokens lexer lexer_state w
 
 let reword_intrinsics s : tokens -> tokens =
   (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
@@ -647,7 +634,7 @@ let reword_intrinsics s : tokens -> tokens =
       ({ payload = k2_token; _ } as k2) :: tl
       when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
         aux (EzList.tail_map distinguish_words @@
-             tokens_of_string' s (keyword_of_token k2_token &@<- k2) @
+             retokenize s (keyword_of_token k2_token &@<- k2) @
              k1 :: rev_prefix) tl
     | k1 :: tl ->
         aux (k1 :: rev_prefix) tl
@@ -670,7 +657,7 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
         | WORD_IN_AREA_A w
         | WORD w ->
             EzList.tail_map distinguish_words @@
-            tokens_of_string' s (w &@<- token)
+            retokenize s (w &@<- token)
         | _ ->
             [token]
       end
@@ -711,10 +698,10 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
             retokenize_with_comma rev_prefix suffix
               l lloc cloc (show_float f) rloc
         | _, { payload = FIXEDLIT f; loc } :: suffix ->
-            let toks = tokens_of_string' s (show_fixed f &@ loc) in
+            let toks = retokenize s (show_fixed f &@ loc) in
             aux (List.rev_append toks rev_prefix) suffix
         | _, { payload = FLOATLIT f; loc } :: suffix ->
-            let toks = tokens_of_string' s (show_float f &@ loc) in
+            let toks = retokenize s (show_float f &@ loc) in
             aux (List.rev_append toks rev_prefix) suffix
         | _, [] ->
             List.rev rev_prefix
@@ -722,7 +709,7 @@ let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s
             aux (x :: rev_prefix) tl
       and retokenize_with_comma rev_prefix suffix l l_loc sep_loc r r_loc =
         let loc = Cobol_common.Srcloc.(concat (concat l_loc sep_loc) r_loc) in
-        let tks = tokens_of_string' s (Pretty.to_string "%s,%s" l r &@ loc) in
+        let tks = retokenize s (Pretty.to_string "%s,%s" l r &@ loc) in
         aux (List.rev_append tks rev_prefix) suffix
       in
       aux []
@@ -796,8 +783,8 @@ let replace_intrinsics state intrinsics =
 let decimal_point_is_comma (type m) (state: m state) token tokens =
   let state = put_token_back state in
   let state =
-    let lexer = Text_lexer.decimal_point_is_comma state.persist.lexer in
-    { state with persist = { state.persist with lexer } }
+    { state with
+      lexer_state = Text_lexer.decimal_point_is_comma state.lexer_state }
   in
   let tokens = token :: tokens in
   let tokens = retokenize_after CommaBecomesDecimalPoint state tokens in

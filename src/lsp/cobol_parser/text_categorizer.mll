@@ -20,13 +20,18 @@ type output =
   | End
   | Unexpected of char
 
+type pic_output =
+  | PIC_string of string
+  | PIC_is
+  | PIC_end
+  | PIC_unexpected of char
+
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
   | AStr of string * alphanum_suffix
   | AEBCDIC of int
   | AEnd of { wellformed: bool }
   | AUnexpected of char * alphanum_suffix
-
 }
 
 let blank = [' ' '\009' '\r' ]
@@ -43,6 +48,9 @@ let identchar = [ 'a'-'z' 'A'-'Z' '0'-'9' '-' '_' ]  (* + extended characters *)
 let firstidentchar = [ 'a'-'z' 'A'-'Z' '0'-'9' ]
 let lastidentchar = firstidentchar
 let ident = (firstidentchar (identchar* lastidentchar)?)
+
+let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';']
+let picstring = (picchar # [',']) (picchar*)
 
 (* Text-word tokenizer (after text manipulation phase) *)
 rule token = parse
@@ -74,6 +82,23 @@ rule token = parse
 
   | (_ as c)
       { Unexpected c }
+
+and pic_token = parse
+
+  | blanks
+      { pic_token lexbuf }
+
+  | ['i' 'I'] ['s' 'S']
+      { PIC_is }
+
+  | (picstring as s)
+      { PIC_string s }
+
+  | eof
+      { PIC_end }
+
+  | (_ as c)
+      { PIC_unexpected c }
 
 (* TODO: distinguish lexing entry based on quotation *)
 and alphanum_string = parse

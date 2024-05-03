@@ -25,7 +25,6 @@ and malformed_stuff =
 
 and missing_stuff =
   | Continuation_of of string
-  | Picture_string of { instead: Cobol_preproc.Text.text_word }
 
 and unexpected_stuff =
   | Pseudotext
@@ -42,9 +41,6 @@ let pp_malformed_stuff ppf = function
 let pp_missing_stuff ppf = function
   | Continuation_of str ->
       Pretty.print ppf "continuation@ of@ `%s'" str
-  | Picture_string { instead } ->
-      Pretty.print ppf "PICTURE@ string@ (got@ `%a'@ instead)"
-        Cobol_preproc.Text.pp_word instead
 
 let pp_unexpected_stuff ppf = function
   | Pseudotext ->

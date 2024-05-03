@@ -21,6 +21,7 @@ and t = text                                                         (* alias *)
 and text_word =
   | TextWord of string                                         (* upper-cased *)
   | CDirWord of string                                         (* upper-cased *)
+  | Separator of char (* separator ',' or ';', followed by one or more spaces *)
   | Alphanum of alphanum
   | AlphanumPrefix of alphanum
   | Pseudo of pseudotext

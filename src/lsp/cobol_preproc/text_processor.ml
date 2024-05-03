@@ -234,6 +234,9 @@ let pseudotext_exact_match
             (* Matched an alphanumeric literal: simply recurse. *)
             aux ?prefix (~@t :: tlocs) pl tl
 
+        | Separator _, _ ->
+            aux ?prefix (~@t :: tlocs) pseudotext tl
+
         | _ ->
             Error `Mismatch
 

@@ -60,6 +60,8 @@ module FMT = struct
     | TextWord str
     | CDirWord str ->
         Pretty.string ppf str
+    | Separator c ->
+        Pretty.char ppf c
     | Alphanum a ->
         pp_alphanum ppf a
     | AlphanumPrefix { knd; qte; str } ->

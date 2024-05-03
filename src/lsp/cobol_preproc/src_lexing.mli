@@ -35,6 +35,17 @@ val comment
   -> Lexing.lexbuf
   -> 'a state * Text.text
 
+val separator
+  : char: char
+  -> (Src_format.fixed state as 's)
+  -> ktkd:('s -> Lexing.lexbuf -> 'a)
+  -> knom:('s -> Lexing.lexbuf -> 'a)
+  -> Lexing.lexbuf -> 'a
+val separator'
+  : char: char
+  -> k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's) -> Lexing.lexbuf -> 'b
+
 type alphanumeric_continuation =
   | Nominal
   | Closed of Text.quotation
@@ -62,24 +73,24 @@ val cdir_word
   -> knom:('s -> Lexing.lexbuf -> 'a)
   -> Lexing.lexbuf -> 'a
 val cdir_word'
-  : k:('a state -> Lexing.lexbuf -> 'b)
-  -> 'a state -> Lexing.lexbuf -> 'b
+  : k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's) -> Lexing.lexbuf -> 'b
 val text_word
   : ?cont:bool
   -> ktkd:('s -> Lexing.lexbuf -> 'a)
   -> knom:('s -> Lexing.lexbuf -> 'a)
   -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a
 val text_word'
-  : k:('a state -> Lexing.lexbuf -> 'b)
-  -> 'a state -> Lexing.lexbuf -> 'b
+  : k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's) -> Lexing.lexbuf -> 'b
 val alphanum_lit
   : ?doubled_opener:bool
   -> ktkd:('s -> Lexing.lexbuf -> 'a)
   -> knom:('s -> Lexing.lexbuf -> 'a)
   -> (Src_format.fixed state as 's) -> Lexing.lexbuf -> 'a
 val alphanum_lit'
-  : k:('a state -> Lexing.lexbuf -> 'b)
-  -> 'a state -> Lexing.lexbuf -> 'b
+  : k:('s -> Lexing.lexbuf -> 'b)
+  -> ('a state as 's) -> Lexing.lexbuf -> 'b
 
 (* --- *)
 

@@ -13,7 +13,6 @@
 
 open EzCompat
 
-open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
 module TYPES = struct
@@ -42,6 +41,12 @@ module TYPES = struct
     {
       token_of_word: (string, keyword_handle) Hashtbl.t;
       handle_of_intrinsic: (string, intrinsic_handle) Hashtbl.t;
+    }
+
+  (** Functional state for the lexer *)
+  type lexer_state =
+    {
+      expect_picture_string: bool;
       decimal_point_is_comma: bool;
     }
 
@@ -165,7 +170,7 @@ let copy_intrinsic_handle h =
     intrinsic_word = h.intrinsic_word;
     intrinsic_shadowing = h.intrinsic_shadowing }
 
-let create ?(decimal_point_is_comma = false) () =
+let create () =
   let token_of_word = Hashtbl.copy __token_of_word in
   Hashtbl.filter_map_inplace
     (fun _ h -> Some (copy_keyword_handle h)) token_of_word;
@@ -175,12 +180,6 @@ let create ?(decimal_point_is_comma = false) () =
   {
     token_of_word;
     handle_of_intrinsic;
-    decimal_point_is_comma;
-  }
-
-let decimal_point_is_comma lexer =
-  {
-    lexer with decimal_point_is_comma = true;
   }
 
 let handle_of_word { token_of_word; _ } kwd =
@@ -236,6 +235,22 @@ let intrinsic_handles lexer : string list -> IntrinsicHandles.t = fun intrinsics
 
 (* --- *)
 
+let initial_state =
+  {
+    expect_picture_string = false;
+    decimal_point_is_comma = false;
+  }
+
+let expecting_picture_string state = state.expect_picture_string
+
+let cancel_picture_string_expectation state =
+  if state.expect_picture_string = false
+  then state
+  else { state with expect_picture_string = false }
+
+let decimal_point_is_comma state =
+  { state with decimal_point_is_comma = true }
+
 let token_of_word { token_of_word; _ } s =
   match Hashtbl.find token_of_word (String.uppercase_ascii s) with
   | { token; enabled = true; reserved = true; _ } -> token
@@ -245,17 +260,19 @@ let token_of_intrinsic s =
   match Hashtbl.find __token_of_intrinsic (String.uppercase_ascii s) with
   | { intrinsic_handle = { token; _ }; _ } -> token
 
-let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
+let read_tokens lexer state w =
   let split_loc loc len =
     Cobol_common.Srcloc.prefix len loc,
     Cobol_common.Srcloc.trunc_prefix len loc
   in
-  let rec aux ~loc acc =
+  let lexbuf = Lexing.from_string ~&w in
+  let rec aux ~loc ~expect_picture_string acc =
     let open Grammar_tokens in
     let start_pos = lexbuf.Lexing.lex_curr_pos in
-    let append x =
+    let append ?(expect_picture_string = expect_picture_string) x =
+      let expect_picture_string = expect_picture_string || x = PICTURE in
       let xloc, loc = split_loc loc @@ lexbuf.Lexing.lex_curr_pos - start_pos in
-      aux ~loc ((x &@ xloc) :: acc)
+      aux ~loc ((x &@ xloc) :: acc) ~expect_picture_string
     in
     let decimal_sep w c d e =
       let head, head_len, loc =
@@ -272,41 +289,50 @@ let tokens lexer ~loc lexbuf : Grammar_tokens.token with_loc list =
       let tail_len = lexbuf.Lexing.lex_curr_pos - start_pos - 1 - head_len in
       let tail_loc, loc = split_loc loc tail_len in
       aux ~loc ([tail &@ tail_loc; INTERVENING_ c &@ sloc] @ head @ acc)
+        ~expect_picture_string
     in
-    match Text_categorizer.token lexbuf with
-    | End ->
-        List.rev acc
-    | Digits "88" ->
-        append EIGHTY_EIGHT
-    | Digits w ->
-        append (DIGITS w)
-    | Numeric (w, None) ->
-        append (SINTLIT w)
-    | Numeric (n, Some (sep, d, None))
-      when sep = if lexer.decimal_point_is_comma then ',' else '.' ->
-        append (FIXEDLIT (n, sep, d))
-    | Numeric (n, Some (sep, d, Some e))
-      when sep = if lexer.decimal_point_is_comma then ',' else '.' ->
-        append (FLOATLIT (n, sep, d, e))
-    | Word s ->
-        append (try token_of_word lexer s with Not_found -> WORD s)
-    | Punctuation s ->
-        append (Hashtbl.find token_of_punct s)
-    | Numeric (w, Some (c, d, e)) ->
-        decimal_sep w c d e
-    | Unexpected c -> (* likely to be a comma; will produce syntax errors
-                         otherwise *)
-        append (INTERVENING_ c)
+    if not expect_picture_string
+    then match Text_categorizer.token lexbuf with
+      | End ->
+          List.rev acc, cancel_picture_string_expectation state
+      | Word s ->
+          append (try token_of_word lexer s with Not_found -> WORD s)
+      | Punctuation s ->
+          append (Hashtbl.find token_of_punct s)
+      | Digits "88" ->
+          append EIGHTY_EIGHT
+      | Digits w ->
+          append (DIGITS w)
+      | Numeric (w, None) ->
+          append (SINTLIT w)
+      | Numeric (n, Some (sep, d, None))
+        when sep = if state.decimal_point_is_comma then ',' else '.' ->
+          append (FIXEDLIT (n, sep, d))
+      | Numeric (n, Some (sep, d, Some e))
+        when sep = if state.decimal_point_is_comma then ',' else '.' ->
+          append (FLOATLIT (n, sep, d, e))
+      | Numeric (w, Some (c, d, e)) ->
+          decimal_sep w c d e
+      | Unexpected (',' | ';') ->
+          aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc
+            ~expect_picture_string
+      | Unexpected c ->
+          append (INTERVENING_ c)
+    else match Text_categorizer.pic_token lexbuf with
+      | PIC_end ->
+          List.rev acc, { state with expect_picture_string }
+      | PIC_is ->
+          append IS ~expect_picture_string:true
+      | PIC_string w ->
+          append (PICTURE_STRING w) ~expect_picture_string:false
+      | PIC_unexpected (',' | ';') ->
+          aux ~loc:(Cobol_common.Srcloc.trunc_prefix 1 loc) acc
+            ~expect_picture_string
+      | PIC_unexpected c ->
+          append (INTERVENING_ c)
   in
-  aux ~loc []
+  aux ~loc:~@w [] ~expect_picture_string:state.expect_picture_string
 
-let tokens lexer
-  : Lexing.lexbuf with_loc -> Grammar_tokens.token with_loc list = fun t ->
-  tokens lexer ~loc:~@t ~&t
-
-let tokens_of_string' lexer
-  : string with_loc -> Grammar_tokens.token with_loc list =
-  fun t -> tokens lexer ((Lexing.from_string ~&t) &@<- t)
 
 (* --- Symbolic EBCDICs --- *)
 

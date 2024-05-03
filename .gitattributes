@@ -1,5 +1,5 @@
-dune             linguist-generated
 linking_flags.sh linguist-generated
+/dune            linguist-generated
 /.drom           linguist-generated
 /Makefile        linguist-generated
 /dune-project    linguist-generated

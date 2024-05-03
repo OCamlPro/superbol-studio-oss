@@ -4,6 +4,7 @@
 
 ### Fixed
 - Improvements to the grammar [#280](https://github.com/OCamlPro/superbol-studio-oss/pull/280)
+- Internal representation of separator comma and semicolon for proper handling in `EXEC`/`END-EXEC` blocks [#279](https://github.com/OCamlPro/superbol-studio-oss/pull/213)
 
 ## [0.1.1] Second α release (2024-04-23)
 
