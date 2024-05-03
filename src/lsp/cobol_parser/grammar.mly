@@ -307,7 +307,7 @@ let method_identification :=
  | ~ = identification_division_header; ~ = method_id_paragraph; < >
 
 let identification_division_header ==
-  | IDENTIFICATION; DIVISION; ".";
+  | or_(IDENTIFICATION, ID); DIVISION; ".";
     (* GnuCOBOL allows informational paragraphs before the `*-ID` entry; to
        simplify we allow them here for any kind of compilation unit (but ignore,
        except for normal programs, for now). *)

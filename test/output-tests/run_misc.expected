@@ -3004,6 +3004,22 @@ run_misc.at-10054-reference:2.6-2.7:
    4   Line:    292 Paragraph: MAINFILE
 >> Error: Unexpected indicator: `m'
 
+run_misc.at-10054-reference:2.10-2.11:
+   1   Source: 'prog.cob'
+   2 > Program-Id:  prog
+----             ^
+   3   Line:    292     Entry: prog
+   4   Line:    292 Paragraph: MAINFILE
+>> Error: Invalid syntax
+
+run_misc.at-10054-reference:2.10:
+   1   Source: 'prog.cob'
+   2 > Program-Id:  prog
+----             ^
+   3   Line:    292     Entry: prog
+   4   Line:    292 Paragraph: MAINFILE
+>> Hint: Missing DIVISION . PROGRAM_ID <word> .
+
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:10194:0
 run_misc.at-10194-reference_append:1.6-1.7:
    1 > Source: 'prog.cob'
@@ -3027,6 +3043,22 @@ run_misc.at-10194-reference_append:2.6-2.7:
    4   Paragraph: MAINFILE                        and now ...    292
 >> Error: Unexpected indicator: `m'
 
+run_misc.at-10194-reference_append:2.10-2.11:
+   1   Source: 'prog.cob'
+   2 > Program-Id:  prog
+----             ^
+   3       Entry: prog                            and now ...    292
+   4   Paragraph: MAINFILE                        and now ...    292
+>> Error: Invalid syntax
+
+run_misc.at-10194-reference_append:2.10:
+   1   Source: 'prog.cob'
+   2 > Program-Id:  prog
+----             ^
+   3       Entry: prog                            and now ...    292
+   4   Paragraph: MAINFILE                        and now ...    292
+>> Hint: Missing DIVISION
+
 run_misc.at-10194-reference_append:3.6-3.7:
    1   Source: 'prog.cob'
    2   Program-Id:  prog
@@ -3035,6 +3067,24 @@ run_misc.at-10194-reference_append:3.6-3.7:
    4   Paragraph: MAINFILE                        and now ...    292
    5   Paragraph: LOADFILE                        and now ...    335
 >> Error: Unexpected indicator: `t'
+
+run_misc.at-10194-reference_append:3.52-3.53:
+   1   Source: 'prog.cob'
+   2   Program-Id:  prog
+   3 >     Entry: prog                            and now ...    292
+----                                                       ^
+   4   Paragraph: MAINFILE                        and now ...    292
+   5   Paragraph: LOADFILE                        and now ...    335
+>> Error: Invalid syntax
+
+run_misc.at-10194-reference_append:3.52:
+   1   Source: 'prog.cob'
+   2   Program-Id:  prog
+   3 >     Entry: prog                            and now ...    292
+----                                                       ^
+   4   Paragraph: MAINFILE                        and now ...    292
+   5   Paragraph: LOADFILE                        and now ...    335
+>> Hint: Missing PROGRAM_ID <word> .
 
 run_misc.at-10194-reference_append:4.6-4.7:
    1   Source: 'prog.cob'
@@ -3246,6 +3296,26 @@ run_misc.at-10194-reference_append:24.6-24.7:
   26   Paragraph: MAINFILE                        -    292
 >> Error: Unexpected indicator: `m'
 
+run_misc.at-10194-reference_append:24.10-24.11:
+  21   Paragraph: 1000-LOAD-RECORD                and now ...    358
+  22   Paragraph: LISTFILE                        and now ...    387
+  23   Source: 'prog.cob'
+  24 > Program-Id:  prog
+----             ^
+  25       Entry: prog                            -    292
+  26   Paragraph: MAINFILE                        -    292
+>> Error: Invalid syntax
+
+run_misc.at-10194-reference_append:24.10:
+  21   Paragraph: 1000-LOAD-RECORD                and now ...    358
+  22   Paragraph: LISTFILE                        and now ...    387
+  23   Source: 'prog.cob'
+  24 > Program-Id:  prog
+----             ^
+  25       Entry: prog                            -    292
+  26   Paragraph: MAINFILE                        -    292
+>> Hint: Missing DIVISION . PROGRAM_ID <word> . END PROGRAM
+
 run_misc.at-10194-reference_append:25.6-25.7:
   22   Paragraph: LISTFILE                        and now ...    387
   23   Source: 'prog.cob'
@@ -3255,6 +3325,16 @@ run_misc.at-10194-reference_append:25.6-25.7:
   26   Paragraph: MAINFILE                        -    292
   27   Paragraph: LOADFILE                        -    335
 >> Error: Unexpected indicator: `t'
+
+run_misc.at-10194-reference_append:25.51:
+  22   Paragraph: LISTFILE                        and now ...    387
+  23   Source: 'prog.cob'
+  24   Program-Id:  prog
+  25 >     Entry: prog                            -    292
+----                                                      ^
+  26   Paragraph: MAINFILE                        -    292
+  27   Paragraph: LOADFILE                        -    335
+>> Hint: Missing . END PROGRAM
 
 run_misc.at-10194-reference_append:26.6-26.7:
   23   Source: 'prog.cob'
@@ -3266,6 +3346,26 @@ run_misc.at-10194-reference_append:26.6-26.7:
   28   Paragraph: 1000-LOAD-RECORD                -    358
 >> Error: Unexpected indicator: `a'
 
+run_misc.at-10194-reference_append:26.7-26.9:
+  23   Source: 'prog.cob'
+  24   Program-Id:  prog
+  25       Entry: prog                            -    292
+  26 > Paragraph: MAINFILE                        -    292
+----          ^^
+  27   Paragraph: LOADFILE                        -    335
+  28   Paragraph: 1000-LOAD-RECORD                -    358
+>> Error: Invalid syntax
+
+run_misc.at-10194-reference_append:26.51:
+  23   Source: 'prog.cob'
+  24   Program-Id:  prog
+  25       Entry: prog                            -    292
+  26 > Paragraph: MAINFILE                        -    292
+----                                                      ^
+  27   Paragraph: LOADFILE                        -    335
+  28   Paragraph: 1000-LOAD-RECORD                -    358
+>> Hint: Missing .
+
 run_misc.at-10194-reference_append:27.6-27.7:
   24   Program-Id:  prog
   25       Entry: prog                            -    292
@@ -3275,6 +3375,16 @@ run_misc.at-10194-reference_append:27.6-27.7:
   28   Paragraph: 1000-LOAD-RECORD                -    358
   29   Paragraph: 1000-LOAD-RECORD                -    358
 >> Error: Unexpected indicator: `a'
+
+run_misc.at-10194-reference_append:27.7-27.9:
+  24   Program-Id:  prog
+  25       Entry: prog                            -    292
+  26   Paragraph: MAINFILE                        -    292
+  27 > Paragraph: LOADFILE                        -    335
+----          ^^
+  28   Paragraph: 1000-LOAD-RECORD                -    358
+  29   Paragraph: 1000-LOAD-RECORD                -    358
+>> Warning: Invalid syntax
 
 run_misc.at-10194-reference_append:28.6-28.7:
   25       Entry: prog                            -    292

@@ -2,6 +2,9 @@
 
 ## [0.1.2] Next release
 
+### Fixed
+- Improvements to the grammar [#280](https://github.com/OCamlPro/superbol-studio-oss/pull/280)
+
 ## [0.1.1] Second α release (2024-04-23)
 
 ### Added

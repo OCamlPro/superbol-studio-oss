@@ -1,4 +1,14 @@
 Considering: import/gnucobol/tests/testsuite.src/run_ml.at:122:0
+run_ml.at-122-prog.cob:21.13:
+  18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
+  19   
+  20          01  employee.
+  21 >            05 id            PIC 9(1)  value 1.
+----                ^
+  22              05 name          PIC X(10) value "Someone".
+  23              05 dept          PIC X(10) value "Marketing".
+>> Hint: Missing .
+
 run_ml.at-122-prog.cob:21.14-21.16:
   18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
   19   
@@ -9,925 +19,99 @@ run_ml.at-122-prog.cob:21.14-21.16:
   23              05 dept          PIC X(10) value "Marketing".
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:26.11-26.14:
-  23              05 dept          PIC X(10) value "Marketing".
-  24   
-  25          PROCEDURE            DIVISION.
-  26 >            XML GENERATE out
-----              ^^^
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:26.27:
-  23              05 dept          PIC X(10) value "Marketing".
-  24   
-  25          PROCEDURE            DIVISION.
-  26 >            XML GENERATE out
-----                              ^
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:27.15-27.19:
-  24   
-  25          PROCEDURE            DIVISION.
-  26              XML GENERATE out
-  27 >                FROM rec
-----                  ^^^^
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:27.23:
-  24   
-  25          PROCEDURE            DIVISION.
-  26              XML GENERATE out
-  27 >                FROM rec
-----                          ^
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:28.15-28.19:
-  25          PROCEDURE            DIVISION.
-  26              XML GENERATE out
-  27                  FROM rec
-  28 >                WITH XML-DECLARATION
-----                  ^^^^
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30                  TYPE OF a IS ATTRIBUTE
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:28.35:
-  25          PROCEDURE            DIVISION.
-  26              XML GENERATE out
-  27                  FROM rec
-  28 >                WITH XML-DECLARATION
-----                                      ^
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30                  TYPE OF a IS ATTRIBUTE
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:29.15-29.19:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                  ^^^^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:29.19:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                      ^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:29.20-29.22:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                       ^^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:29.24:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                           ^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:29.25-29.27:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                            ^^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:29.38:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                                         ^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:29.39-29.41:
-  26              XML GENERATE out
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29 >                NAME OF a IS 'alpha', d IS 'ABCDEF';
-----                                          ^^
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:30.24:
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30 >                TYPE OF a IS ATTRIBUTE
-----                           ^
-  31                  SUPPRESS WHEN SPACES
-  32              IF out <> '<?xml version="1.0"?>' & X'0A'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:30.25-30.27:
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30 >                TYPE OF a IS ATTRIBUTE
-----                            ^^
-  31                  SUPPRESS WHEN SPACES
-  32              IF out <> '<?xml version="1.0"?>' & X'0A'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:30.37:
-  27                  FROM rec
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30 >                TYPE OF a IS ATTRIBUTE
-----                                        ^
-  31                  SUPPRESS WHEN SPACES
-  32              IF out <> '<?xml version="1.0"?>' & X'0A'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:31.15-31.23:
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30                  TYPE OF a IS ATTRIBUTE
-  31 >                SUPPRESS WHEN SPACES
-----                  ^^^^^^^^
-  32              IF out <> '<?xml version="1.0"?>' & X'0A'
-  33                      & '<rec alpha="A"><b>BBB</b></rec>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:31.24-31.28:
-  28                  WITH XML-DECLARATION
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30                  TYPE OF a IS ATTRIBUTE
-  31 >                SUPPRESS WHEN SPACES
-----                           ^^^^
-  32              IF out <> '<?xml version="1.0"?>' & X'0A'
-  33                      & '<rec alpha="A"><b>BBB</b></rec>'
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:32.45-32.46:
-  29                  NAME OF a IS 'alpha', d IS 'ABCDEF';
-  30                  TYPE OF a IS ATTRIBUTE
-  31                  SUPPRESS WHEN SPACES
-  32 >            IF out <> '<?xml version="1.0"?>' & X'0A'
-----                                                ^
-  33                      & '<rec alpha="A"><b>BBB</b></rec>'
-  34                  DISPLAY 'Test 1 failed: ' FUNCTION TRIM (out)
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:37.11-37.14:
-  34                  DISPLAY 'Test 1 failed: ' FUNCTION TRIM (out)
-  35              END-IF
-  36   
-  37 >            XML GENERATE out FROM d
-----              ^^^
-  38              IF out <> '<d> </d>'
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:37.27:
-  34                  DISPLAY 'Test 1 failed: ' FUNCTION TRIM (out)
-  35              END-IF
-  36   
-  37 >            XML GENERATE out FROM d
-----                              ^
-  38              IF out <> '<d> </d>'
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:37.28-37.32:
-  34                  DISPLAY 'Test 1 failed: ' FUNCTION TRIM (out)
-  35              END-IF
-  36   
-  37 >            XML GENERATE out FROM d
-----                               ^^^^
-  38              IF out <> '<d> </d>'
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:37.34:
-  34                  DISPLAY 'Test 1 failed: ' FUNCTION TRIM (out)
-  35              END-IF
-  36   
-  37 >            XML GENERATE out FROM d
-----                                     ^
-  38              IF out <> '<d> </d>'
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:38.11-38.13:
-  35              END-IF
-  36   
-  37              XML GENERATE out FROM d
-  38 >            IF out <> '<d> </d>'
-----              ^^
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:42.11-42.14:
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
-  41   
-  42 >            XML GENERATE out FROM c, WITH ATTRIBUTES.
-----              ^^^
-  43              IF out <> '<c d=" "/>'
-  44                  DISPLAY 'Test 3 failed: ' FUNCTION TRIM (out)
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:42.27:
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
-  41   
-  42 >            XML GENERATE out FROM c, WITH ATTRIBUTES.
-----                              ^
-  43              IF out <> '<c d=" "/>'
-  44                  DISPLAY 'Test 3 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:42.28-42.32:
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
-  41   
-  42 >            XML GENERATE out FROM c, WITH ATTRIBUTES.
-----                               ^^^^
-  43              IF out <> '<c d=" "/>'
-  44                  DISPLAY 'Test 3 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:42.34:
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
-  41   
-  42 >            XML GENERATE out FROM c, WITH ATTRIBUTES.
-----                                     ^
-  43              IF out <> '<c d=" "/>'
-  44                  DISPLAY 'Test 3 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:42.36-42.40:
-  39                  DISPLAY 'Test 2 failed: ' FUNCTION TRIM (out)
-  40              END-IF
-  41   
-  42 >            XML GENERATE out FROM c, WITH ATTRIBUTES.
-----                                       ^^^^
-  43              IF out <> '<c d=" "/>'
-  44                  DISPLAY 'Test 3 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:49.11-49.14:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----              ^^^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:49.27:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                              ^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:49.28-49.32:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                               ^^^^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:49.36:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                                       ^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:49.38-49.42:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                                         ^^^^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:49.47:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                                                  ^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:49.48-49.50:
-  46   
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-----                                                   ^^
-  50                  b IS CONTENT, d IS CONTENT
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:50.16:
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49              XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-  50 >                b IS CONTENT, d IS CONTENT
+run_ml.at-122-prog.cob:21.16:
+  18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
+  19   
+  20          01  employee.
+  21 >            05 id            PIC 9(1)  value 1.
 ----                   ^
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
+  22              05 name          PIC X(10) value "Someone".
+  23              05 dept          PIC X(10) value "Marketing".
+>> Hint: Missing DIVISION . PROGRAM_ID <word> . END PROGRAM
 
-run_ml.at-122-prog.cob:50.17-50.19:
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49              XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-  50 >                b IS CONTENT, d IS CONTENT
-----                    ^^
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:50.30:
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49              XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-  50 >                b IS CONTENT, d IS CONTENT
-----                                 ^
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:50.31-50.33:
-  47              MOVE ALL 'A' TO a
-  48              MOVE ALL 'C' TO c
-  49              XML GENERATE out FROM rec, TYPE OF a IS CONTENT,
-  50 >                b IS CONTENT, d IS CONTENT
-----                                  ^^
-  51              IF out <> '<rec>AAABBB<c>CCC</c></rec>'
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:55.11-55.14:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----              ^^^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
+run_ml.at-122-prog.cob:21.28-21.31:
+  18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
+  19   
+  20          01  employee.
+  21 >            05 id            PIC 9(1)  value 1.
+----                               ^^^
+  22              05 name          PIC X(10) value "Someone".
+  23              05 dept          PIC X(10) value "Marketing".
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:55.27:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                              ^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
+run_ml.at-122-prog.cob:21.46:
+  18          01  0SpecialTAGName  PIC X(3) VALUE "abc".
+  19   
+  20          01  employee.
+  21 >            05 id            PIC 9(1)  value 1.
+----                                                 ^
+  22              05 name          PIC X(10) value "Someone".
+  23              05 dept          PIC X(10) value "Marketing".
+>> Hint: Missing END PROGRAM
 
-run_ml.at-122-prog.cob:55.28-55.32:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                               ^^^^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:55.36:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                       ^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:55.38-55.42:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                         ^^^^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:55.47:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                                  ^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:55.48-55.50:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                                   ^^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:55.61:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                                                ^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:55.62-55.64:
-  52                  DISPLAY 'Test 4 failed: ' FUNCTION TRIM (out)
-  53              END-IF
-  54   
-  55 >            XML GENERATE out FROM rec, TYPE OF a IS CONTENT, d IS CONTENT
-----                                                                 ^^
-  56              IF out <> '<rec>AAA<b>BBB</b><c>CCC</c></rec>'
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:60.11-60.14:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----              ^^^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Error: Invalid syntax
-
-run_ml.at-122-prog.cob:60.27:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                              ^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:60.28-60.32:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                               ^^^^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:60.34:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                     ^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:60.36-60.45:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                       ^^^^^^^^^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:60.45:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                ^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:60.46-60.59:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                 ^^^^^^^^^^^^^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:60.59:
-  57                  DISPLAY 'Test 5 failed: ' FUNCTION TRIM (out)
-  58              END-IF
-  59   
-  60 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                              ^
-  61                  NAMESPACE-PREFIX prefix-str
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:61.15-61.31:
-  58              END-IF
-  59   
-  60              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  61 >                NAMESPACE-PREFIX prefix-str
-----                  ^^^^^^^^^^^^^^^^
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
-  63                      '<pre:d>CCC</pre:d></pre:c>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:61.31:
-  58              END-IF
-  59   
-  60              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  61 >                NAMESPACE-PREFIX prefix-str
-----                                  ^
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
-  63                      '<pre:d>CCC</pre:d></pre:c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:61.32-61.42:
-  58              END-IF
-  59   
-  60              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  61 >                NAMESPACE-PREFIX prefix-str
-----                                   ^^^^^^^^^^
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
-  63                      '<pre:d>CCC</pre:d></pre:c>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:61.42:
-  58              END-IF
-  59   
-  60              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  61 >                NAMESPACE-PREFIX prefix-str
-----                                             ^
-  62              IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
-  63                      '<pre:d>CCC</pre:d></pre:c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:62.11-62.13:
-  59   
-  60              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  61                  NAMESPACE-PREFIX prefix-str
-  62 >            IF out <> '<pre:c xmlns:pre="http://www.w3.org/1999/xhtml">'-
+run_ml.at-122-prog.cob:22.11-22.13:
+  19   
+  20          01  employee.
+  21              05 id            PIC 9(1)  value 1.
+  22 >            05 name          PIC X(10) value "Someone".
 ----              ^^
-  63                      '<pre:d>CCC</pre:d></pre:c>'
-  64                  DISPLAY 'Test 6 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:69.11-69.14:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----              ^^^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
+  23              05 dept          PIC X(10) value "Marketing".
+  24   
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:69.27:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                              ^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:69.28-69.32:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                               ^^^^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:69.34:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                     ^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:69.36-69.45:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                       ^^^^^^^^^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:69.45:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                ^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:69.46-69.59:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                 ^^^^^^^^^^^^^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:69.59:
-  66              END-IF
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69 >            XML GENERATE out FROM c, NAMESPACE namespace-str,
-----                                                              ^
-  70                  NAMESPACE-PREFIX prefix-str
-  71              IF out <> '<c><d>CCC</d></c>'
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:70.15-70.31:
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  70 >                NAMESPACE-PREFIX prefix-str
-----                  ^^^^^^^^^^^^^^^^
-  71              IF out <> '<c><d>CCC</d></c>'
-  72                  DISPLAY 'Test 7 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:70.31:
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  70 >                NAMESPACE-PREFIX prefix-str
-----                                  ^
-  71              IF out <> '<c><d>CCC</d></c>'
-  72                  DISPLAY 'Test 7 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:70.32-70.42:
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  70 >                NAMESPACE-PREFIX prefix-str
-----                                   ^^^^^^^^^^
-  71              IF out <> '<c><d>CCC</d></c>'
-  72                  DISPLAY 'Test 7 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:70.42:
-  67   
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  70 >                NAMESPACE-PREFIX prefix-str
-----                                             ^
-  71              IF out <> '<c><d>CCC</d></c>'
-  72                  DISPLAY 'Test 7 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:71.11-71.13:
-  68              MOVE SPACES TO namespace-str, prefix-str
-  69              XML GENERATE out FROM c, NAMESPACE namespace-str,
-  70                  NAMESPACE-PREFIX prefix-str
-  71 >            IF out <> '<c><d>CCC</d></c>'
-----              ^^
-  72                  DISPLAY 'Test 7 failed: ' FUNCTION TRIM (out)
-  73              END-IF
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:76.11-76.14:
-  73              END-IF
-  74   
-  75              MOVE ALL "&" TO d
-  76 >            XML GENERATE out FROM d
-----              ^^^
-  77              IF out <> '<d>&amp;&amp;&amp;</d>'
-  78                  DISPLAY 'Test 8 failed: ' FUNCTION TRIM (out)
+run_ml.at-122-prog.cob:22.14-22.18:
+  19   
+  20          01  employee.
+  21              05 id            PIC 9(1)  value 1.
+  22 >            05 name          PIC X(10) value "Someone".
+----                 ^^^^
+  23              05 dept          PIC X(10) value "Marketing".
+  24   
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:76.27:
-  73              END-IF
-  74   
-  75              MOVE ALL "&" TO d
-  76 >            XML GENERATE out FROM d
-----                              ^
-  77              IF out <> '<d>&amp;&amp;&amp;</d>'
-  78                  DISPLAY 'Test 8 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:76.28-76.32:
-  73              END-IF
-  74   
-  75              MOVE ALL "&" TO d
-  76 >            XML GENERATE out FROM d
-----                               ^^^^
-  77              IF out <> '<d>&amp;&amp;&amp;</d>'
-  78                  DISPLAY 'Test 8 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:76.34:
-  73              END-IF
-  74   
-  75              MOVE ALL "&" TO d
-  76 >            XML GENERATE out FROM d
-----                                     ^
-  77              IF out <> '<d>&amp;&amp;&amp;</d>'
-  78                  DISPLAY 'Test 8 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:77.11-77.13:
-  74   
-  75              MOVE ALL "&" TO d
-  76              XML GENERATE out FROM d
-  77 >            IF out <> '<d>&amp;&amp;&amp;</d>'
+run_ml.at-122-prog.cob:23.11-23.13:
+  20          01  employee.
+  21              05 id            PIC 9(1)  value 1.
+  22              05 name          PIC X(10) value "Someone".
+  23 >            05 dept          PIC X(10) value "Marketing".
 ----              ^^
-  78                  DISPLAY 'Test 8 failed: ' FUNCTION TRIM (out)
-  79              END-IF
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:82.11-82.14:
-  79              END-IF
-  80   
-  81              *> Test the case of the id in the DATA DIVISION is preserved.
-  82 >            XML GENERATE out FROM 0specialtagname
-----              ^^^
-  83              IF out <> '<_0SpecialTAGName>abc</_0SpecialTAGName>'
-  84                  DISPLAY 'Test 9 failed: ' FUNCTION TRIM (out)
+  24   
+  25          PROCEDURE            DIVISION.
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:82.27:
-  79              END-IF
-  80   
-  81              *> Test the case of the id in the DATA DIVISION is preserved.
-  82 >            XML GENERATE out FROM 0specialtagname
-----                              ^
-  83              IF out <> '<_0SpecialTAGName>abc</_0SpecialTAGName>'
-  84                  DISPLAY 'Test 9 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:82.28-82.32:
-  79              END-IF
-  80   
-  81              *> Test the case of the id in the DATA DIVISION is preserved.
-  82 >            XML GENERATE out FROM 0specialtagname
-----                               ^^^^
-  83              IF out <> '<_0SpecialTAGName>abc</_0SpecialTAGName>'
-  84                  DISPLAY 'Test 9 failed: ' FUNCTION TRIM (out)
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:82.48:
-  79              END-IF
-  80   
-  81              *> Test the case of the id in the DATA DIVISION is preserved.
-  82 >            XML GENERATE out FROM 0specialtagname
-----                                                   ^
-  83              IF out <> '<_0SpecialTAGName>abc</_0SpecialTAGName>'
-  84                  DISPLAY 'Test 9 failed: ' FUNCTION TRIM (out)
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:83.11-83.13:
-  80   
-  81              *> Test the case of the id in the DATA DIVISION is preserved.
-  82              XML GENERATE out FROM 0specialtagname
-  83 >            IF out <> '<_0SpecialTAGName>abc</_0SpecialTAGName>'
-----              ^^
-  84                  DISPLAY 'Test 9 failed: ' FUNCTION TRIM (out)
-  85              END-IF
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:89.11-89.14:
+run_ml.at-122-prog.cob:89.52:
   86              .
   87   
   88              *> Another test with mixed attributes and values
   89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----              ^^^
+----                                                       ^
+  90              IF out <> '<employee id="1">'-
+  91                        '<name>Someone</name>'-
+>> Hint: Missing DIVISION
+
+run_ml.at-122-prog.cob:89.53-89.55:
+  86              .
+  87   
+  88              *> Another test with mixed attributes and values
+  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
+----                                                        ^^
   90              IF out <> '<employee id="1">'-
   91                        '<name>Someone</name>'-
 >> Error: Invalid syntax
 
-run_ml.at-122-prog.cob:89.27:
-  86              .
-  87   
-  88              *> Another test with mixed attributes and values
-  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----                              ^
-  90              IF out <> '<employee id="1">'-
-  91                        '<name>Someone</name>'-
->> Hint: Missing .
+run_ml.at-122-prog.cob:96.12:
+  93                        '</employee>'
+  94                  DISPLAY 'Test 10 failed: ' FUNCTION TRIM (out)
+  95              END-IF
+  96 >            .
+----               ^
+>> Hint: Missing PROGRAM_ID <word> .
 
-run_ml.at-122-prog.cob:89.28-89.32:
-  86              .
-  87   
-  88              *> Another test with mixed attributes and values
-  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----                               ^^^^
-  90              IF out <> '<employee id="1">'-
-  91                        '<name>Someone</name>'-
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:89.41:
-  86              .
-  87   
-  88              *> Another test with mixed attributes and values
-  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----                                            ^
-  90              IF out <> '<employee id="1">'-
-  91                        '<name>Someone</name>'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:89.42-89.46:
-  86              .
-  87   
-  88              *> Another test with mixed attributes and values
-  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----                                             ^^^^
-  90              IF out <> '<employee id="1">'-
-  91                        '<name>Someone</name>'-
->> Warning: Invalid syntax
-
-run_ml.at-122-prog.cob:89.65:
-  86              .
-  87   
-  88              *> Another test with mixed attributes and values
-  89 >            XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-----                                                                    ^
-  90              IF out <> '<employee id="1">'-
-  91                        '<name>Someone</name>'-
->> Hint: Missing .
-
-run_ml.at-122-prog.cob:90.11-90.13:
-  87   
-  88              *> Another test with mixed attributes and values
-  89              XML GENERATE out FROM EMPLOYEE TYPE OF ID IS ATTRIBUTE
-  90 >            IF out <> '<employee id="1">'-
-----              ^^
-  91                        '<name>Someone</name>'-
-  92                        '<dept>Marketing</dept>'-
->> Warning: Invalid syntax
+run_ml.at-122-prog.cob:97.0:
+  94                  DISPLAY 'Test 10 failed: ' FUNCTION TRIM (out)
+  95              END-IF
+  96              .
+>> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_ml.at:199:0
 run_ml.at-199-prog.cob:22.11-22.14:

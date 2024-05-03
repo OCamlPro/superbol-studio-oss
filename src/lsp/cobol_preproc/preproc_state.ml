@@ -170,6 +170,7 @@ let find_preproc_phrase ?prefix =
   and find_full_phrase = find_full_phrase ?prefix in
   let find_cntrl_div_header = find_full_phrase ["CONTROL"; "DIVISION"]
   and find_ident_div_header = find_full_phrase ["IDENTIFICATION"; "DIVISION"]
+  and find_id_div_header    = find_full_phrase ["ID"; "DIVISION"]
   and find_subst_sec_header = find_full_phrase ["SUBSTITUTION"; "SECTION"]
   and find_exec_block
     = find_subtext ?prefix ("EXEC" :: One "EXECUTE") (One "END-EXEC")
@@ -187,10 +188,16 @@ let find_preproc_phrase ?prefix =
     | Error `NoneFound -> try_exec ~next src
     | Error _ as e -> e
   in
+  let try_id_division_header ?(next = AllowReplace) src =
+    match find_id_div_header src with
+    | Ok x -> Ok (Header (IdentificationDivision, x), next)
+    | Error `NoneFound -> try_replace ~next src
+    | Error _ as e -> e
+  in
   let try_identification_division_header ?(next = AllowReplace) src =
     match find_ident_div_header src with
     | Ok x -> Ok (Header (IdentificationDivision, x), next)
-    | Error `NoneFound -> try_replace ~next src
+    | Error `NoneFound -> try_id_division_header ~next src
     | Error _ as e -> e
   in
   let try_control_division_header src =
