@@ -198,6 +198,15 @@ Press <kbd>F10</kbd> to step to the next statement, or <kbd>F5</kbd>
 again to continue until the next breakpoint, or termination of the
 program.
 
+## Coverage
+
+To enable coverage you can set `enable-coverage` to `true` in your
+`task.json` file, and `coverage` to `true` in your `launch.json` file.
+
+The first modification will enable the generation of coverage files
+(in `gcov` format) and the second one will enable the highlighting
+of covered lines in your source code.
+
 <!-- ## Formatting the source code -->
 
 <!-- > [!NOTE] -->
