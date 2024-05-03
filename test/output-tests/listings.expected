@@ -5638,12 +5638,3 @@ listings.at-5827-prog.cob:20.39-20.48:
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:6143:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:6955:0
-listings.at-6955-prog.cob:3.0-3.2:
-   1   
-   2          >>SOURCE FORMAT IS FREE
-   3 > ID DIVISION.
-----   ^^
-   4   PROGRAM-ID. ED000MAIN IS INITIAL.
-   5   DATA DIVISION.
->> Error: Invalid syntax
-

@@ -660,14 +660,6 @@ run_extensions.at-900-prog.cob:32.32-32.34:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1034:0
-run_extensions.at-1034-ALLOC.cob:2.7-2.9:
-   1   
-   2 >        ID DIVISION.
-----          ^^
-   3           PROGRAM-ID. ALLOC.
-   4          ENVIRONMENT DIVISION.
->> Error: Invalid syntax
-
 run_extensions.at-1034-ALLOC.cob:18.34:
   15           01  VARGRP.
   16             02  OBJ     PIC 9(4) COMP.

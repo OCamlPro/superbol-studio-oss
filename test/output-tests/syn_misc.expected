@@ -1742,12 +1742,22 @@ Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4614:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4771:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4859:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4860:0
-syn_misc.at-4860-prog2.cob:2.7-2.9:
+syn_misc.at-4860-prog2.cob:3.19:
    1   
-   2 >        ID,;DIVISION;,.,;
-----          ^^
-   3              author,.;tester.
+   2          ID,;DIVISION;,.,;
+   3 >            author,.;tester.
+----                      ^
    4          PROGRAM-ID,;.;,prog2;,.;,
+   5              REMARKS;. Should work.,,
+>> Hint: Missing <comment entry>
+
+syn_misc.at-4860-prog2.cob:3.20-3.26:
+   1   
+   2          ID,;DIVISION;,.,;
+   3 >            author,.;tester.
+----                       ^^^^^^
+   4          PROGRAM-ID,;.;,prog2;,.;,
+   5              REMARKS;. Should work.,,
 >> Error: Invalid syntax
 
 syn_misc.at-4860-prog2.cob:12.7-12.9:
