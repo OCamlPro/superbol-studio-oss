@@ -452,9 +452,9 @@
             "type": "boolean",
             "description": "Build for debugging"
           },
-          "enable-coverage": {
+          "for-coverage": {
             "type": "boolean",
-            "description": "Enable coverage file generation"
+            "description": "Enable instrumentation for coverage"
           },
           "cobc-path": {
             "title": "GnuCOBOL Compiler Executable",

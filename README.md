@@ -209,10 +209,10 @@ debug annotations into generated executable files, as well as
 
 ## Coverage
 
-GnuCOBOL can make your programs generate coverage information at
-runtime.  To enable this feature, you can set the `enable-coverage`
-setting to `true` in the `Superbol: build (debug)` task in your
-`tasks.json` file (see [Section Customizing Build
+GnuCOBOL can instrument your programs so they can generate coverage
+information at runtime.  To enable this feature, you can set the
+`for-coverage` setting to `true` in the `Superbol: build (debug)` task
+in your `tasks.json` file (see [Section Customizing Build
 Tasks](#customizing-build-tasks)).
 
 ### Coverage Information
