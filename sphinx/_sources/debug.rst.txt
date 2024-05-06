@@ -166,7 +166,8 @@ Coverage
 --------
 
 If you are running the debugger with a :code:`launch` request and set :code:`coverage` to :code:`true`,
-then once the debugger has stopped running, you will see the coverage status of every line in the
+and set :code:`enable-coverage` to :code:`true` in your :code:`task.json` file.
+Once the debugger has stopped running, you will see the coverage status of every line in the
 :code:`PROCEDURE DIVISION`.
 
 A red line signifies that the line is never runned.
