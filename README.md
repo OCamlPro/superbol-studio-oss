@@ -213,7 +213,7 @@ files from other languages.
 ### Coverage Hightlighting
 
 After running a program and having its coverage files generated.
-You might want to display their content on a line by line basis
+You might want to display their contents on a line by line basis
 in your program source code.
 
 To enable coverage highlighting, you can set `coverage` to
