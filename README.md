@@ -198,6 +198,32 @@ Press <kbd>F10</kbd> to step to the next statement, or <kbd>F5</kbd>
 again to continue until the next breakpoint, or termination of the
 program.
 
+## Coverage
+
+### Generating Coverage Files
+
+GnuCOBOL can generate coverage files for your program. To enable this
+you can set the `enable-coverage` setting to `true` in your
+`task.json` file.
+
+The coverage files generated are in `gcov` format, so they are
+portable and you can use them as you would any other coverage
+files from other languages.
+
+### Coverage Hightlighting
+
+After running a program and having its coverage files generated.
+You might want to display their contents on a line by line basis
+in your program source code.
+
+To enable coverage highlighting, you can set `coverage` to
+`true` in your `launch.json` file. If you do not have this
+file yet, you can generate it by selecting the `Run and Debug`
+pane (or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>)
+and then click on `create a launch.json file`. The generated
+file should have all the configurations you need to run or
+debug your code.
+
 <!-- ## Formatting the source code -->
 
 <!-- > [!NOTE] -->

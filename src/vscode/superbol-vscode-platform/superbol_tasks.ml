@@ -22,10 +22,12 @@ let type_ = "superbol"
 type attribute_spec =
   | C: (Ojs.t -> 'a option) * ('a -> Ojs.t) * 'a -> attribute_spec
 
-let attributes_spec ~debug =
+let attributes_spec ~debug ~coverage =
   [
     "for-debug", C ([%js.to: bool or_undefined],
                     [%js.of: bool], debug);
+    "enable-coverage", C ([%js.to: bool or_undefined],
+                          [%js.of: bool], coverage);
     "cobc-path", C ([%js.to: string or_undefined],
                     [%js.of: string], "cobc");
     "extra-args", C ([%js.to: string list or_undefined],
@@ -111,9 +113,9 @@ let cobc_execution ?config attributes =
       ~mk:((^) "-fformat=") |>
     attr_bool_flag "for-debug" ~attributes
       ~ok:(fun args -> "-fsource-location" :: "-ftraceall" ::
-                       "-g" ::
-                       "-Q" :: "--coverage" ::
-                       "-A" :: "--coverage" :: args) |>
+                       "-g" :: args) |>
+    attr_bool_flag "enable-coverage" ~attributes
+      ~ok:(fun args -> "--coverage" :: args) |>
     attr_strings "extra-args" ~attributes
       ~append:(fun args' args -> args @ args')
   in
@@ -143,9 +145,9 @@ let cobc_build_task ~task ?config attributes =
     ~definition:(Task.definition task)
     ~execution:(cobc_execution ?config attributes)
 
-let define_cobc_build_task ?config ~debug name =
+let define_cobc_build_task ?config ~debug ~coverage name =
   let map_attributes = List.map (fun (a, C (_, f, d)) -> a, f d) in
-  let attributes = map_attributes @@ attributes_spec ~debug in
+  let attributes = map_attributes @@ attributes_spec ~debug ~coverage in
   make_default_cobc_task
     ~name
     ~definition:(TaskDefinition.create () ~type_ ~attributes)
@@ -160,8 +162,8 @@ let provide_tasks instance ~token:_ =
       | Ok config -> config
     in
     Promise.Option.return [
-      define_cobc_build_task "build"         ~config ~debug:false;
-      define_cobc_build_task "build (debug)" ~config ~debug:true;
+      define_cobc_build_task "build"         ~config ~debug:false ~coverage:false;
+      define_cobc_build_task "build (debug)" ~config ~debug:true ~coverage:false;
     ]
   end
 
@@ -180,7 +182,7 @@ let resolve_task =
           match f (TaskDefinition.get_attribute definition a) with
           | Some x -> Some (a, t x)
           | _ | exception _ -> None
-        end (attributes_spec ~debug:false)
+        end (attributes_spec ~debug:false ~coverage:false)
       in
       let* config = Superbol_instance.get_project_config instance in
       match config with
