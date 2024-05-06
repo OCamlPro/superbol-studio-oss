@@ -398,8 +398,8 @@ let contributes =
           Manifest.PROPERTY.bool "for-debug"
             ~description:"Build for debugging";
 
-          Manifest.PROPERTY.bool "enable-coverage"
-            ~description:"Enable coverage file generation";
+          Manifest.PROPERTY.bool "for-coverage"
+            ~description:"Enable instrumentation for coverage";
 
           Manifest.PROPERTY.null_string "cobc-path"
             ~title:"GnuCOBOL Compiler Executable"

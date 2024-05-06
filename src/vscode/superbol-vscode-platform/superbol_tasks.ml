@@ -26,8 +26,8 @@ let attributes_spec ~debug ~coverage =
   [
     "for-debug", C ([%js.to: bool or_undefined],
                     [%js.of: bool], debug);
-    "enable-coverage", C ([%js.to: bool or_undefined],
-                          [%js.of: bool], coverage);
+    "for-coverage", C ([%js.to: bool or_undefined],
+                       [%js.of: bool], coverage);
     "cobc-path", C ([%js.to: string or_undefined],
                     [%js.of: string], "cobc");
     "extra-args", C ([%js.to: string list or_undefined],
@@ -114,7 +114,7 @@ let cobc_execution ?config attributes =
     attr_bool_flag "for-debug" ~attributes
       ~ok:(fun args -> "-fsource-location" :: "-ftraceall" ::
                        "-g" :: args) |>
-    attr_bool_flag "enable-coverage" ~attributes
+    attr_bool_flag "for-coverage" ~attributes
       ~ok:(fun args -> "--coverage" :: args) |>
     attr_strings "extra-args" ~attributes
       ~append:(fun args' args -> args @ args')
@@ -145,7 +145,7 @@ let cobc_build_task ~task ?config attributes =
     ~definition:(Task.definition task)
     ~execution:(cobc_execution ?config attributes)
 
-let define_cobc_build_task ?config ~debug ~coverage name =
+let define_cobc_build_task ?config ~debug ?(coverage = false) name =
   let map_attributes = List.map (fun (a, C (_, f, d)) -> a, f d) in
   let attributes = map_attributes @@ attributes_spec ~debug ~coverage in
   make_default_cobc_task
@@ -162,8 +162,8 @@ let provide_tasks instance ~token:_ =
       | Ok config -> config
     in
     Promise.Option.return [
-      define_cobc_build_task "build"         ~config ~debug:false ~coverage:false;
-      define_cobc_build_task "build (debug)" ~config ~debug:true ~coverage:false;
+      define_cobc_build_task "build"         ~config ~debug:false;
+      define_cobc_build_task "build (debug)" ~config ~debug:true;
     ]
   end
 
