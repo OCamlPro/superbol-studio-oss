@@ -146,37 +146,31 @@ replacement by a `REPLACE` directive in the same way.
 
 ## Debugging
 
-In order to debug a COBOL program, you first need to configure a
-dedicated *build task* with appropriate debug options.  Once this is
-done, you can *launch* the compiled program into a debugging session.
+In order to debug a COBOL program, you first need to run a *build
+task* with appropriate debug options.  Once this is done, you can
+*launch* the compiled program in a debugging session.
 
 > [!NOTE]
 >
-> We recomment that version 3.2 of
-> [GnuCOBOL](https://sourceforge.net/projects/gnucobol/) is available
-> on the system running VS Code.  Debug features additionally assume
-> that [gdb](https://sourceware.org/gdb/) is installed.
+> We recommend that a version of
+> [GnuCOBOL](https://sourceforge.net/projects/gnucobol/) that is at
+> least as recent as version 3.2 be available on the system running VS
+> Code.  Debug and coverage features respectively assume that
+> [gdb](https://sourceware.org/gdb/) and
+> [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) are installed.
 >
 > On Windows systems, users may employ dedicated installers that are
 > available [here](https://get-superbol.com/software/gnucobol-aio/).
 > Linux users may rely on their favorite package manager and install
 > `gnucobol`.
 
-### Setting up a Build Task for Debugging
+### Running a Build Task for Debugging
 
 After having opened the program to debug, select `Terminal >
-Run Build Task…`  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>),
-`Configure Build Task…`, and then `SuperBOL: build (debug)`.
+Run Build Task…`  (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>), and
+then `SuperBOL: build (debug)`.
 
 ![Select `SuperBOL: build (debug)`](./assets/superbol-configure-build-tasks.png)
-
-Save the `task.json` as shown.  Definitions for this task notably
-include a `for-debug` flag, that instructs the compiler to insert
-debug annotations into generated executable files, as well as
-`extra-args`, that can be edited to pass additional arguments to the
-`cobc` compiler.
-
-![`tasks.json` for debug](./assets/superbol-tasks.json.png)
 
 ### Launching the Compiled Program for Debugging
 
@@ -198,31 +192,48 @@ Press <kbd>F10</kbd> to step to the next statement, or <kbd>F5</kbd>
 again to continue until the next breakpoint, or termination of the
 program.
 
+### Customizing Build Tasks
+
+To customize a build task, you can select `Terminal > Configure
+Default Build Task…`, and then `SuperBOL: build` or
+`SuperBOL: build (debug)` (the latter being the task that is run
+whenever you start a debugging session, *e.g* with <kbd>F5</kbd>).
+
+Save the `tasks.json` as shown.  Definitions for this task notably
+include a `for-debug` flag, that instructs the compiler to insert
+debug annotations into generated executable files, as well as
+`extra-args`, that can be edited to pass additional arguments to the
+`cobc` compiler.
+
+![`tasks.json` for debug](./assets/superbol-tasks.json.png)
+
 ## Coverage
 
-### Generating Coverage Files
+GnuCOBOL can make your programs generate coverage information at
+runtime.  To enable this feature, you can set the `enable-coverage`
+setting to `true` in the `Superbol: build (debug)` task in your
+`tasks.json` file (see [Section Customizing Build
+Tasks](#customizing-build-tasks)).
 
-GnuCOBOL can generate coverage files for your program. To enable this
-you can set the `enable-coverage` setting to `true` in your
-`task.json` file.
+### Coverage Information
 
-The coverage files generated are in `gcov` format, so they are
-portable and you can use them as you would any other coverage
-files from other languages.
+Generated coverage files are in [`gcov`
+format](https://gcc.gnu.org/onlinedocs/gcc/Gcov-Intro.html); they are
+portable, and you can use them as you would any other coverage file
+generated for programs written using other programming languages.
 
-### Coverage Hightlighting
+### Highlighting Coverage Information
 
-After running a program and having its coverage files generated.
-You might want to display their contents on a line by line basis
-in your program source code.
+Coverage data can be shown after the execution of a program that was
+compiled to generate this information terminates.  SuperBOL will
+display coverage on a line-by-line basis, by highlighting the lines of
+your source code using colors that represent their coverage status.
 
-To enable coverage highlighting, you can set `coverage` to
-`true` in your `launch.json` file. If you do not have this
-file yet, you can generate it by selecting the `Run and Debug`
-pane (or with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>)
-and then click on `create a launch.json file`. The generated
-file should have all the configurations you need to run or
-debug your code.
+> [!NOTE]
+>
+> At the moment, automatic coverage highlighting only works when the
+> program was run during a debugging session (*i.e,* with
+> <kbd>F5</kbd>).
 
 <!-- ## Formatting the source code -->
 
