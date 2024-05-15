@@ -228,12 +228,17 @@ Coverage data can be shown after the execution of a program that was
 compiled to generate this information terminates.  SuperBOL will
 display coverage on a line-by-line basis, by highlighting the lines of
 your source code using colors that represent their coverage status.
+To enable coverage highlighting, you can open the command palette
+(<kbd>Ctrl+Shift+P</kbd>), and select `SuperBOL: Show program coverage`.
+You can also hide the highlighting with the command
+`SuperBOL: Hide program coverage`, and update it after re-executing your
+program with `SuperBOL: Update program coverage`.
 
-> [!NOTE]
+<!-- > [!NOTE]
 >
 > At the moment, automatic coverage highlighting only works when the
 > program was run during a debugging session (*i.e,* with
-> <kbd>F5</kbd>).
+> <kbd>F5</kbd>). -->
 
 <!-- ## Formatting the source code -->
 
