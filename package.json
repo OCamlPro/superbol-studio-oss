@@ -23,6 +23,21 @@
         "command": "superbol.write.project.config",
         "title": "Write Project Configuration",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.coverage.show",
+        "title": "Show Coverage",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.coverage.hide",
+        "title": "Hide Coverage",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.coverage.reload",
+        "title": "Update Coverage",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -492,6 +507,9 @@
   },
   "extensionKind": [
     "workspace"
+  ],
+  "extensionDependencies": [
+    "JacquesLucke.gcov-viewer"
   ],
   "name": "SuperBOL",
   "displayName": "SuperBOL Studio OSS",

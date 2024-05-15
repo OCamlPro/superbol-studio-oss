@@ -524,6 +524,18 @@ let contributes =
         ~title:"Write Project Configuration"
         ~category:"SuperBOL"
       (* ~enablement:"!inDebugMode" *);
+      Manifest.command ()
+        ~command:"superbol.coverage.show"
+        ~title:"Show Coverage"
+        ~category:"SuperBOL";
+      Manifest.command ()
+        ~command:"superbol.coverage.hide"
+        ~title:"Hide Coverage"
+        ~category:"SuperBOL";
+      Manifest.command ()
+        ~command:"superbol.coverage.reload"
+        ~title:"Update Coverage"
+        ~category:"SuperBOL";
     ]
     ~tomlValidation: [
       Manifest.tomlValidation
@@ -550,3 +562,6 @@ let manifest =
       "workspace";                                 (* <- run on the workspace *)
     ]
     ~contributes
+    ~extensionDependencies: [
+      "JacquesLucke.gcov-viewer";
+    ]

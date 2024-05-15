@@ -51,6 +51,30 @@ let _write_project_config =
       in ()
     end
 
+let _show_coverage =
+  command "superbol.coverage.show" @@ Instance
+    (fun _instance ~args:_ ->
+      let _ =
+        Commands.executeCommand ~command:"gcov-viewer.show" ~args:[]
+      in
+      ())
+
+let _hide_coverage =
+  command "superbol.coverage.hide" @@ Instance
+    (fun _instance ~args:_ ->
+      let _ =
+        Commands.executeCommand ~command:"gcov-viewer.hide" ~args:[]
+      in
+      ())
+
+let _reload_coverage =
+  command "superbol.coverage.reload" @@ Instance
+    (fun _ ~args:_ ->
+      let _ =
+        Commands.executeCommand ~command:"gcov-viewer.reloadGcdaFiles" ~args:[]
+      in
+      ())
+
 let register extension instance { id; handler } =
   match handler with
   | Instance callback ->

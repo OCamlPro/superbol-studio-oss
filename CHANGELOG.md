@@ -3,6 +3,7 @@
 ## [0.1.2] Next release
 
 ### Added
+- Commands to show/hide/update coverage by highlighting the source code, using `gcov-viewer` [#285](https://github.com/OCamlPro/superbol-studio-oss/pull/285)
 - Ability to build modules instead of executable programs [#284](https://github.com/OCamlPro/superbol-studio-oss/pull/284)
 
 ### Fixed
