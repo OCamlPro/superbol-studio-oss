@@ -526,15 +526,15 @@ let contributes =
       (* ~enablement:"!inDebugMode" *);
       Manifest.command ()
         ~command:"superbol.coverage.show"
-        ~title:"Show program coverage"
+        ~title:"Show Coverage"
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.coverage.hide"
-        ~title:"Hide program coverage"
+        ~title:"Hide Coverage"
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.coverage.reload"
-        ~title:"Update program coverage"
+        ~title:"Update Coverage"
         ~category:"SuperBOL";
     ]
     ~tomlValidation: [

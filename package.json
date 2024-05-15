@@ -26,17 +26,17 @@
       },
       {
         "command": "superbol.coverage.show",
-        "title": "Show program coverage",
+        "title": "Show Coverage",
         "category": "SuperBOL"
       },
       {
         "command": "superbol.coverage.hide",
-        "title": "Hide program coverage",
+        "title": "Hide Coverage",
         "category": "SuperBOL"
       },
       {
         "command": "superbol.coverage.reload",
-        "title": "Update program coverage",
+        "title": "Update Coverage",
         "category": "SuperBOL"
       }
     ],
