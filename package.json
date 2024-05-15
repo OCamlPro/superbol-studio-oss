@@ -456,6 +456,11 @@
             "type": "boolean",
             "description": "Enable instrumentation for coverage"
           },
+          "executable": {
+            "type": "boolean",
+            "default": true,
+            "description": "Build an executable program instead of a module"
+          },
           "cobc-path": {
             "title": "GnuCOBOL Compiler Executable",
             "type": [

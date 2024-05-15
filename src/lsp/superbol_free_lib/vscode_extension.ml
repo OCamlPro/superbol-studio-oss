@@ -401,6 +401,10 @@ let contributes =
           Manifest.PROPERTY.bool "for-coverage"
             ~description:"Enable instrumentation for coverage";
 
+          Manifest.PROPERTY.bool "executable"
+            ~description:"Build an executable program instead of a module"
+            ~default:true;
+
           Manifest.PROPERTY.null_string "cobc-path"
             ~title:"GnuCOBOL Compiler Executable"
             ~description:"Path to the GnuCOBOL compiler executable; when `null`, \

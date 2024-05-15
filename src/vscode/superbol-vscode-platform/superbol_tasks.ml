@@ -22,17 +22,22 @@ let type_ = "superbol"
 type attribute_spec =
   | C: (Ojs.t -> 'a option) * ('a -> Ojs.t) * 'a -> attribute_spec
 
-let attributes_spec ~debug ~coverage =
+let attributes_spec ~debug ~coverage ~executable =
   [
     "for-debug", C ([%js.to: bool or_undefined],
                     [%js.of: bool], debug);
     "for-coverage", C ([%js.to: bool or_undefined],
                        [%js.of: bool], coverage);
+    "executable", C ([%js.to: bool or_undefined],
+                     [%js.of: bool], executable);
     "cobc-path", C ([%js.to: string or_undefined],
                     [%js.of: string], "cobc");
     "extra-args", C ([%js.to: string list or_undefined],
                      [%js.of: string list], []);
   ]
+
+let executable_spec = attributes_spec ~executable:true
+let module_spec = attributes_spec ~executable:false
 
 (* --- *)
 
@@ -93,7 +98,7 @@ let cobc_execution ?config attributes =
       Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
   in
   let args =
-    ["-x"; "${relativeFile}"] |>
+    ["${relativeFile}"] |>
     config_copybook_paths "cobol.copybooks" ~config
       ~append:begin fun l args ->
         List.flatten @@
@@ -112,10 +117,12 @@ let cobc_execution ?config attributes =
     config_string "cobol.source-format" ~config
       ~mk:((^) "-fformat=") |>
     attr_bool_flag "for-debug" ~attributes
-      ~ok:(fun args -> "-fsource-location" :: "-ftraceall" ::
-                       "-g" :: args) |>
+      ~ok:(fun args -> "-fsource-location" :: "-ftraceall" :: "-g" :: args) |>
     attr_bool_flag "for-coverage" ~attributes
-      ~ok:(fun args -> "--coverage" :: args) |>
+      ~ok:(List.cons "--coverage") |>
+    attr_bool_flag "executable" ~attributes
+      ~ok:(List.cons "-x")
+      ~ko:(List.cons "-m") |>
     attr_strings "extra-args" ~attributes
       ~append:(fun args' args -> args @ args')
   in
@@ -145,9 +152,9 @@ let cobc_build_task ~task ?config attributes =
     ~definition:(Task.definition task)
     ~execution:(cobc_execution ?config attributes)
 
-let define_cobc_build_task ?config ~debug ?(coverage = false) name =
+let define_cobc_build_task ?config ~debug ?(coverage = false) ~spec name =
   let map_attributes = List.map (fun (a, C (_, f, d)) -> a, f d) in
-  let attributes = map_attributes @@ attributes_spec ~debug ~coverage in
+  let attributes = map_attributes @@ spec ~debug ~coverage in
   make_default_cobc_task
     ~name
     ~definition:(TaskDefinition.create () ~type_ ~attributes)
@@ -161,9 +168,15 @@ let provide_tasks instance ~token:_ =
       | Error _ -> Hashtbl.create 0
       | Ok config -> config
     in
+    let define_exec_build_task
+      = define_cobc_build_task ~config ~spec:executable_spec
+    and define_modl_build_task
+      = define_cobc_build_task ~config ~spec:module_spec
+    in
     Promise.Option.return [
-      define_cobc_build_task "build"         ~config ~debug:false;
-      define_cobc_build_task "build (debug)" ~config ~debug:true;
+      define_exec_build_task "build"          ~debug:false;
+      define_exec_build_task "build (debug)"  ~debug:true;
+      define_modl_build_task "build (module)" ~debug:false;
     ]
   end
 
@@ -182,7 +195,7 @@ let resolve_task =
           match f (TaskDefinition.get_attribute definition a) with
           | Some x -> Some (a, t x)
           | _ | exception _ -> None
-        end (attributes_spec ~debug:false ~coverage:false)
+        end (executable_spec ~debug:false ~coverage:false)
       in
       let* config = Superbol_instance.get_project_config instance in
       match config with
