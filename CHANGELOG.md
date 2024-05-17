@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.2] Next release
+## [0.1.2] Third α release (2024-05-17)
 
 ### Added
 - Commands to show/hide/update coverage by highlighting the source code, using `gcov-viewer` [#285](https://github.com/OCamlPro/superbol-studio-oss/pull/285)
