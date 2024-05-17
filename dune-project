@@ -256,7 +256,6 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( = 20230415 ))
    odoc
   )
  )
@@ -293,8 +292,8 @@
    (superbol_project (= version))
    (superbol_preprocs (= version))
    (pretty (= version))
-   (lsp ( >= 1.17 ))
-   (jsonrpc ( >= 1.17 ))
+   (lsp ( >= 1.16.1 ))
+   (jsonrpc ( >= 1.16.1 ))
    (cobol_typeck (= version))
    (cobol_parser (= version))
    (cobol_indent (= version))
