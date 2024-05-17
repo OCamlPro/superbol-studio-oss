@@ -606,6 +606,7 @@ let on_request
     | WillCreateFiles  (* CreateFilesParams.t.t *) _
     | WillDeleteFiles  (* DeleteFilesParams.t.t *) _
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
+    | InlayHint (* InlayHintParams.t *) _
       ->
         Lsp_debug.message "Lsp_request: unhandled request";
         Error (UnhandledRequest client_req)

@@ -141,7 +141,7 @@ let pp_production_posts ppf =
       | func -> Fmt.pf ppf "%s (@[<2>(%a)@ value@])" tag Fmt.text func
     in
     match post_action (last_item_attrs p),
-          post_action (Production.attributes p) with
+          post_action (Nonterminal.attributes (Production.lhs p)) with
     | Some a, _ | _, Some a ->
         Fmt.pf ppf "@\n|@[<4> N N_%a, %d ->@;%a@]"
           Print.mangled_nonterminal (Production.lhs p) (Production.to_int p)
