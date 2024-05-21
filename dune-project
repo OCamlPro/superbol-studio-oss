@@ -256,7 +256,7 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( = 20230415 ))
+   (menhir ( >= 20230415 ))
    odoc
   )
  )
