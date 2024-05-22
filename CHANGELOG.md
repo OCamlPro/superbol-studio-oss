@@ -2,6 +2,9 @@
 
 ## [0.1.3] Next release
 
+### Added
+- Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
+
 
 ## [0.1.2] Third α release (2024-05-17)
 
