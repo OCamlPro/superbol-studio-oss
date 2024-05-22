@@ -600,13 +600,19 @@ let semtoks_of_ignored ~filename ?range rev_ignored =
   end []
 
 let semtoks_of_preproc_statements ~filename ?range pplog =
+  let acc_semtoks = acc_semtoks ~merge:true ~filename ?range in
   List.rev @@ List.fold_left begin fun acc -> function
     | Cobol_preproc.Trace.FileCopy { copyloc = loc; _ }
     | Cobol_preproc.Trace.Replace { replloc = loc }
     | Cobol_preproc.Trace.CompilerDirective { loc; _ } ->
-        acc_semtoks ~merge:true ~filename ?range TOKTYP.macro loc acc
+        acc_semtoks TOKTYP.macro loc acc
     | Cobol_preproc.Trace.Ignored { ignored_loc; _ } ->
-        acc_semtoks ~merge:true ~filename ?range TOKTYP.comment ignored_loc acc
+        acc_semtoks TOKTYP.comment ignored_loc acc
+    | Cobol_preproc.Trace.Exec_block { preamble_loc = loc;
+                                       postamble_loc = loc'; _ } ->
+        acc_semtoks TOKTYP.macro loc acc |>
+        (match loc' with Some loc -> acc_semtoks TOKTYP.macro loc
+                       | None -> Fun.id)
     | Cobol_preproc.Trace.Replacement _ ->
         acc
   end [] (Cobol_preproc.Trace.events pplog)
@@ -616,7 +622,8 @@ let semtoks_of_preproc_statements ~filename ?range pplog =
 let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
   List.rev @@ List.fold_left begin fun acc { payload = token; loc } ->
     let semtok_infos = match token with
-      | WORD _ | WORD_IN_AREA_A _ -> None
+      | WORD _ | WORD_IN_AREA_A _ | EXEC_BLOCK _ ->
+          None
       | ALPHANUM _ | ALPHANUM_PREFIX _ | NATLIT _ ->
           Some (TOKTYP.string, TOKMOD.none)
       | BOOLIT _ | SINTLIT _ | FIXEDLIT _ | FLOATLIT _ | DIGITS _
@@ -629,8 +636,6 @@ let semtoks_of_non_ambigious_tokens ~filename ?range tokens =
           Some (TOKTYP.operator, TOKMOD.none)
       | PARAGRAPH | STATEMENT | PROGRAM |SECTION | DIVISION ->
           Some (TOKTYP.namespace, TOKMOD.none)
-      | EXEC_BLOCK _ ->
-          Some (TOKTYP.macro, TOKMOD.none)
       | _ ->
           Some (TOKTYP.keyword, TOKMOD.none)
     in

@@ -460,6 +460,7 @@ let handle_hover registry (params: HoverParams.t) =
     List.find_opt begin function
       | Cobol_preproc.Trace.Replace _
       | CompilerDirective _
+      | Exec_block _
       | Ignored _ ->
           false
       | Replacement { matched_loc = loc; _ }
@@ -498,6 +499,7 @@ let handle_hover registry (params: HoverParams.t) =
       | Some FileCopy { status = MissingCopy _; _ }
       | Some Replace _
       | Some CompilerDirective _
+      | Some Exec_block _
       | Some Ignored _
       | None ->
           None
