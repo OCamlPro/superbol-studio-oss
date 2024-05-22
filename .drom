@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-aaa6fbc6dd406d00ada873dc71325fac:.
+f4b84c82d2944143075042bbe8e55929:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -76,7 +76,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-35a78fb41cb16e2969761f8af9d7ffa6:dune-project
+a7df559c8e9613633da6eb64e0e6e734:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -176,12 +176,12 @@ d12e1abf27b66f290445826a55a05817:opam/pretty.opam
 
 # begin context for opam/sql_ast.opam
 # file opam/sql_ast.opam
-3497f0287f064ada1655718a6ca0edcd:opam/sql_ast.opam
+947aa568243aa0d6d55c47ca4733a94e:opam/sql_ast.opam
 # end context for opam/sql_ast.opam
 
 # begin context for opam/sql_parser.opam
 # file opam/sql_parser.opam
-2f275e18bc70f20c97d8e89f50902c13:opam/sql_parser.opam
+4ab870b9866f51a81086b134357537b8:opam/sql_parser.opam
 # end context for opam/sql_parser.opam
 
 # begin context for opam/superbol-free.opam
@@ -437,7 +437,7 @@ c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/pretty/version.mlt
 
 # begin context for src/lsp/sql_ast/dune
 # file src/lsp/sql_ast/dune
-70efa058ccb4207520125c7a625f1849:src/lsp/sql_ast/dune
+e0c73ea039315b0cfa5b4a7ac54a1484:src/lsp/sql_ast/dune
 # end context for src/lsp/sql_ast/dune
 
 # begin context for src/lsp/sql_ast/version.mlt
@@ -447,7 +447,7 @@ c6738e0b12a586ddb07c1f790dcb4e9a:src/lsp/sql_ast/version.mlt
 
 # begin context for src/lsp/sql_parser/dune
 # file src/lsp/sql_parser/dune
-0e83040a0161a563d27c7d9e85c49e08:src/lsp/sql_parser/dune
+2408ff5956afa93ae2f3302928555c8e:src/lsp/sql_parser/dune
 # end context for src/lsp/sql_parser/dune
 
 # begin context for src/lsp/sql_parser/version.mlt

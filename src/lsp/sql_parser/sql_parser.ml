@@ -12,43 +12,55 @@ let supplier tokens =
 let init_checkpoint = Grammar.Incremental.main Lexing.dummy_pos
 
 let parse text =        
+  let module OM = Sql_overlay_manager in
   let tokens =
-    List.fold_left (fun tokens w' ->
+    List.fold_left (fun (tokens, prev_right_limit) w' ->
       match w'.payload with
       | Cobol_preproc.Text.TextWord tw ->
-        let tokenizer ~loc lexbuf =
+        let tokenizer ~loc:_ lexbuf =
           let s = Lexer.token lexbuf in
-          let lstart, lend = Srcloc.as_lexloc (Lazy.force loc) in
-          s, lstart, lend
+          (*let lstart, lend = OM.limits (Lazy.force loc) in
+          s, lstart, lend*)
+          s
         in
-        let until (t, _lstart, _lend) =
+        let until (t(*, _lstart, _lend*)) =
           t = Grammar.EOF
         in
 
-        let f (t': 'a with_loc) tokens =
+        let f (t': 'a with_loc) (tokens, prev_right_limit) =
           let t = t'.payload in
-          t :: tokens
+          let loc = t'.loc in
+          let lstart, lend = OM.limits ((*Lazy.force*) loc) in
+          (match prev_right_limit with
+          | None -> ()
+          | Some l -> OM.link_limits l lstart);
+          (t, lstart, lend) :: tokens, Some lend
         in
 
         let tw' : string with_loc = Srcloc.locfrom tw w' in
 
-        Tokenizing.fold_tokens ~tokenizer ~until ~f tw' tokens
+        Tokenizing.fold_tokens ~tokenizer ~until ~f tw' 
+          (tokens, prev_right_limit)
       | Cobol_preproc.Text.Separator s ->
         let t = match s with
           | ',' -> Grammar.COMMA
           | ';' -> Grammar.SEMICOLON
           | _ -> Grammar.SPECHAR(s)
-      in
-        let lstart, lend = Srcloc.as_lexloc w'.loc in
-        (t, lstart, lend) :: tokens
+        in
+        let lstart, lend = OM.limits w'.loc in
+        (match prev_right_limit with
+        | None -> ()
+        | Some l -> OM.link_limits l lstart);
+        (t, lstart, lend) :: tokens, Some lend
 
 
       | pl ->
         let t = Format.asprintf "%a" Cobol_preproc.Text.pp_word pl in
         let lstart, lend = Srcloc.as_lexloc w'.loc in
-        (Grammar.STRING t, lstart, lend) :: tokens
+        (Grammar.STRING t, lstart, lend) :: tokens,
+        prev_right_limit
 
-    ) [] text |> List.rev
+    ) ([], None) text |> fst |> List.rev
   in
 
   let ast = Grammar.MenhirInterpreter.loop (supplier tokens) init_checkpoint in

@@ -13,10 +13,7 @@
 (**************************************************************************)
 open Sql_ast
 open Cobol_common.Srcloc.INFIX
-module Overlay_manager =
-  Cobol_preproc.Src_overlay.New_manager (struct
-    let name = __MODULE__
-  end) ()
+module Overlay_manager = Sql_overlay_manager
 
 %}
 %token COMMA SEMICOLON EQUAL PLUS MINUS OR AND

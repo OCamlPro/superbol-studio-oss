@@ -49,6 +49,7 @@ depends: [
   "dune" {>= "2.8.0"}
   "pretty" {= version}
   "ocplib_stuff" {>= "0.4.0" & < "1.0.0"}
+  "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}
 ]

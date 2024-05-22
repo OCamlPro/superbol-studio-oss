@@ -466,6 +466,7 @@
    (ocaml (>= 4.14.0))
    (pretty (= version))
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
+   (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
   )
@@ -482,6 +483,7 @@
    (ez_file ( >= 0.3 ))
    (ebcdic_lib (= version))
    (cobol_preproc (= version))
+   (cobol_parser (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( = 20230415 ))
