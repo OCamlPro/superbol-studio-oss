@@ -179,6 +179,9 @@
         "editor.detectIndentation": false,
         "editor.semanticHighlighting.enabled": true,
         "editor.wordSeparators": "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?"
+      },
+      "[sql]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
       }
     },
     "debuggers": [
@@ -371,7 +374,10 @@
       {
         "language": "cobol",
         "scopeName": "source.cobol",
-        "path": "./syntaxes/COBOL.tmLanguage.json"
+        "path": "./syntaxes/COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.sql": "sql"
+        }
       }
     ],
     "tomlValidation": [

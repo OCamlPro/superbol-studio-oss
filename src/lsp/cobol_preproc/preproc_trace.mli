@@ -29,6 +29,12 @@ module TYPES: sig
           compdir: Preproc_directives.compiler_directive;
           loc: Cobol_common.srcloc;
         }
+    | Exec_block of
+        {
+          preamble_loc: Cobol_common.srcloc;
+          text: Text.text;
+          postamble_loc: Cobol_common.srcloc option;
+        }
     | Ignored of
         {
           text: Text.text;
@@ -70,6 +76,11 @@ val missing_copy
   -> log -> log
 val new_replace
   : loc: Cobol_common.srcloc
+  -> log -> log
+val exec_block
+  : preamble_loc: Cobol_common.srcloc
+  -> ?postamble_loc: Cobol_common.srcloc
+  -> Text.text
   -> log -> log
 val ignored
   : Text.text                                                    (* non-empty *)

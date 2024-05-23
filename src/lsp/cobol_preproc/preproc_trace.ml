@@ -34,6 +34,12 @@ module TYPES = struct
           compdir: Preproc_directives.compiler_directive;
           loc: srcloc;
         }
+    | Exec_block of
+        {
+          preamble_loc: srcloc;
+          text: Text.text;
+          postamble_loc: srcloc option;
+        }
     | Ignored of
         {
           (* TODO: explanation (compdir) *)
@@ -65,6 +71,8 @@ let missing_copy ~loc ~info : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = MissingCopy info }
 let new_replace ~loc : log -> log =
   List.cons @@ Replace { replloc = loc }
+let exec_block ~preamble_loc ?postamble_loc text : log -> log =
+  List.cons @@ Exec_block { preamble_loc; text; postamble_loc }
 let ignored text : log -> log =
   let ignored_loc = Option.get @@ Cobol_common.Srcloc.concat_locs text in
   List.cons @@ Ignored { text; ignored_loc }

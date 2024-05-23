@@ -433,6 +433,10 @@ let contributes =
         (* ]; *)
         "editor.semanticHighlighting.enabled", `Bool true;
         "editor.wordSeparators", `String "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?";
+      ];
+      "[sql]",
+      Defaults [
+        "editor.wordSeparators", `String "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?";
       ]
     ]
     ~semanticTokenScopes: [
@@ -452,7 +456,10 @@ let contributes =
       Manifest.grammar ()
         ~language: "cobol"
         ~scopeName: "source.cobol"
-        ~path:"./syntaxes/COBOL.tmLanguage.json";
+        ~path:"./syntaxes/COBOL.tmLanguage.json"
+        ~embeddedLanguages:[
+          "meta.embedded.block.sql", "sql";
+        ];
     ]
     ~problemPatterns: [
       Manifest.problemPattern

@@ -391,6 +391,12 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
     else lp
   in
   let emit lp exec_block =
+    let lp =
+      with_pplog lp @@ Preproc_trace.exec_block exec_block lp.pplog
+        ~preamble_loc: ~@(List.hd exec_block)
+        ?postamble_loc: (if partial then None
+                         else Some ~@(EzList.last exec_block))
+    in
     let block = Text.ExecBlock exec_block &@ loc in
     `ReplaceDone (lp, List.rev (block :: rev_prefix), suffix)
   in

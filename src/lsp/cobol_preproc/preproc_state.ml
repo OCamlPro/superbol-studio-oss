@@ -186,31 +186,27 @@ let find_preproc_phrase ?prefix =
     match find_phrase "REPLACE" src with
     | Ok repl -> Ok (Replace repl, next)
     | Error `NoneFound -> try_exec ~next src
-    | Error _ as e -> e
+    | Error `MissingPeriod as e -> e
   in
   let try_id_division_header ?(next = AllowReplace) src =
     match find_id_div_header src with
     | Ok x -> Ok (Header (IdentificationDivision, x), next)
-    | Error `NoneFound -> try_replace ~next src
-    | Error _ as e -> e
+    | Error _ -> try_replace ~next src
   in
   let try_identification_division_header ?(next = AllowReplace) src =
     match find_ident_div_header src with
     | Ok x -> Ok (Header (IdentificationDivision, x), next)
-    | Error `NoneFound -> try_id_division_header ~next src
-    | Error _ as e -> e
+    | Error _ -> try_id_division_header ~next src
   in
   let try_control_division_header src =
     match find_cntrl_div_header src with
     | Ok x -> Ok (Header (ControlDivision, x), AfterControlDivisionHeader)
-    | Error `NoneFound -> try_identification_division_header src
-    | Error _ as e -> e
+    | Error _ -> try_identification_division_header src
   in
   let try_substitution_section_header src =
     match find_subst_sec_header src with
     | Ok x -> Ok (Header (SubstitutionSection, x), AfterSubstitSectionHeader)
-    | Error `NoneFound -> try_identification_division_header src
-    | Error _ as e -> e
+    | Error _ -> try_identification_division_header src
   in
   fun state src ->
     (* Note COPY takes precedence over REPLACE, as per the ISO/IEC 2014
