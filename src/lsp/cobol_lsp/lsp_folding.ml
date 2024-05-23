@@ -65,12 +65,18 @@ let ranges_in ~filename ptree group =
 
       method! fold_data_division' = wide_region
       method! fold_file_section' = leaf_region
-      method! fold_working_storage_section' = leaf_region
+      method! fold_working_storage_section' = wide_region        (* for execs *)
       method! fold_linkage_section' = leaf_region
       method! fold_communication_section' = wide_region               (* TODO *)
-      method! fold_local_storage_section' = leaf_region
+      method! fold_local_storage_section' = wide_region          (* for execs *)
       method! fold_report_section' = wide_region                      (* TODO *)
       method! fold_screen_section' = wide_region                      (* TODO *)
+
+      method! fold_constant_item' _ = Visitor.skip
+      method! fold_rename_item' _ = Visitor.skip
+      method! fold_condition_name_item' _ = Visitor.skip
+      method! fold_data_item' _ = Visitor.skip
+      method! fold_exec_declarations' = leaf_region (* EXEC block in DATA DIV *)
 
       method! fold_environment_division' = wide_region
       method! fold_configuration_section' = wide_region
@@ -108,6 +114,7 @@ let ranges_in ~filename ptree group =
       method! fold_procedure_section' = wide_region
       method! fold_procedure_paragraph' = wide_region
       method! fold_statement' = wide_region
+      method! fold_exec_block' = leaf_region        (* EXEC block in PROC DIV *)
     end group ptree_ranges
   in
 
