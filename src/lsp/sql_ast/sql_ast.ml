@@ -6,7 +6,7 @@ type sql_token =
   | Sql_lit of literal
   | Sql_query of sql_query
   | Sql_equality of sql_equal (*TODO: remove*)
-  | Sql_search_condition of sql_where (*TODO: remove*)
+  | Sql_search_condition of search_condition (*TODO: remove*)
 and sql_var = string with_loc
 and cobol_var_id = string with_loc
 
@@ -113,11 +113,24 @@ and update_arg =
 and sql_query = sql_select * sql_select_option list
 
 and sql_select_option =
-  | From of sql_var list 
-  | Where of sql_where 
-  | OrderBy of sql_orderBy
+  | From of from_stm 
+  | Where of search_condition 
+  | OrderBy of sql_orderBy list
+  | GroupBy of literal list
 
-and sql_orderBy = Asc of sql_var | Desc of sql_var
+and from_stm = table_ref list
+
+and table_ref = 
+  | FromLitAs of table_ref * literal
+  | FromLit of literal
+  | FromSelect of sql_query
+  | Join of table_ref * join * table_ref * join_option option
+
+and join = InnerJoin | NaturalJoin | LeftJoin | RightJoin
+and join_option = 
+  | JoinOn of search_condition
+  | JoinUsing of sql_var list
+and sql_orderBy = Asc of literal | Desc of literal
 
 and sql_select = complex_literal list
 
@@ -131,11 +144,15 @@ and sql_op =
 and sql_binop = Add | Minus | Times | Or
 
 
-and sql_where = 
-  | WhereConditionOr of sql_where * sql_where
-  | WhereConditionAnd of sql_where * sql_where
-  | WhereConditionNot of sql_where
+and search_condition = 
+  | WhereConditionOr of search_condition * search_condition
+  | WhereConditionAnd of search_condition * search_condition
+  | WhereConditionNot of search_condition
   | WhereConditionCompare of sql_compare
+  | WhereConditionIn of sql_condition_in
+  
+and sql_condition_in =
+  | InVarLst of literal * (complex_literal list)
 
 and sql_compare = 
   | CompareQuery of complex_literal * compOperator * sql_instruction
@@ -169,7 +186,7 @@ and compare_whenever_continuation a b =
 
 (*PRETTY PRINTER*)
 
-let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC\n" pp_esql x
+let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC\n\n" pp_esql x
 
 and pp_esql fmt x = 
   match x with
@@ -282,6 +299,12 @@ and pp_sql_condition fmt = function
     | Diff -> "<>"
   in
   Format.fprintf fmt "%a" pp_compare c
+  | WhereConditionIn s -> Format.fprintf fmt "%a" pp_condition_in s
+
+and pp_condition_in fmt x =
+let pp_aux fmt = List.iter(Format.fprintf fmt "%a," pp_complex_literal) in
+match x with
+| InVarLst (l, vlist) -> Format.fprintf fmt "%a IN %a" pp_lit l pp_aux vlist 
 
 
 
@@ -381,20 +404,53 @@ and pp_sql_query fmt (s, o) =
 
 and pp_select_options_lst fmt lst =
   let pp_one_option fmt = function 
-  | From f -> pp_from fmt f
-  | Where w -> pp_sql_condition fmt w
-  | OrderBy ob -> pp_orderBy fmt ob
+  | From f -> Format.fprintf fmt "FROM %a" pp_from f
+  | Where w -> Format.fprintf fmt "WHERE %a" pp_sql_condition w
+  | OrderBy ob -> Format.fprintf fmt "ORDER BY %a" pp_orderBy ob
+  | GroupBy gb-> Format.fprintf fmt "GROUP BY %a" pp_group_by gb
   in
-  List.iter (Format.fprintf fmt "%a" pp_one_option) lst
+  List.iter (Format.fprintf fmt "\t%a\n" pp_one_option) lst
 
-and pp_from fmt f= 
-  let pp_aux fmt x = List.iter (Format.fprintf fmt "%s") (List.map(Srcloc.payload) x)
+and pp_from fmt f=  List.iter (Format.fprintf fmt "%a" pp_table_ref) f
+
+and pp_table_ref fmt = function
+| FromLit l -> Format.fprintf fmt "%a" pp_lit l
+| FromLitAs (l, a) -> Format.fprintf fmt "%a AS %a" pp_table_ref l pp_lit a
+| FromSelect (s) -> Format.fprintf fmt "(%a)" pp_sql_query s
+| Join (tr1, join, tr2, opt) ->
+    Format.fprintf fmt "%a %s JOIN %a %a"
+    pp_table_ref tr1
+    (str_join join)
+    pp_table_ref tr2
+    pp_table_opt_option opt
+
+and str_join = function
+| InnerJoin -> "INNER" 
+| NaturalJoin -> "NATURAL" 
+| LeftJoin -> "LEFT" 
+| RightJoin -> "RIGHT"
+
+and pp_table_opt_option fmt = function
+| Some w -> pp_table_opt fmt w
+| None -> Format.fprintf fmt ""
+
+and pp_table_opt fmt = function
+| JoinOn sc -> Format.fprintf fmt "ON %a" pp_sql_condition sc
+| JoinUsing lstvar -> 
+    let pp_aux fmt x = List.iter (Format.fprintf fmt "%s") (List.map(Srcloc.payload) x)
   in
-  Format.fprintf fmt "FROM %a" pp_aux f
+  Format.fprintf fmt "USING %a" pp_aux lstvar
 
-and pp_orderBy fmt = function
-  | Asc v -> Format.fprintf fmt "ORDER BY %s ASC" v.payload 
-  | Desc v -> Format.fprintf fmt "ORDER BY %s DESC" v.payload 
+
+and pp_group_by fmt x = Format.fprintf fmt "GROUP BY %a ASC" pp_list_lit x
+
+and pp_orderBy fmt = 
+  let pp_aux fmt =function
+  | Asc v -> Format.fprintf fmt "ORDER BY %a ASC" pp_lit v 
+  | Desc v -> Format.fprintf fmt "ORDER BY %a DESC" pp_lit v
+  in 
+  List.iter (Format.fprintf fmt "%a," pp_aux)
+
 
 and pp_select_lst fmt l = List.iter (Format.fprintf fmt "%a, " pp_complex_literal) l
 

@@ -16,7 +16,7 @@ open Cobol_common.Srcloc.INFIX
 module Overlay_manager = Sql_overlay_manager
 
 %}
-%token COMMA SEMICOLON EQUAL PLUS MINUS OR AND
+%token COMMA SEMICOLON EQUAL PLUS MINUS OR AND IN
 %token LESS_EQ LESS GREAT_EQ GREAT DIFF
 %token <char> SPECHAR
 %token EOF
@@ -37,8 +37,8 @@ module Overlay_manager = Sql_overlay_manager
 (*FOr other esql with opt at*)
 %token SELECT INTO STATEMENT CURSOR FOR PREPARE FROM EXECUTE IMMEDIATE WITH HOLD
 %token INSERT OPEN CLOSE FETCH DELETE UPDATE SET IGNORE ALL OF WHERE CURRENT TABLE
-%token WHEN ORDER VALUES NULL DEFAULT 
-
+%token WHEN ORDER VALUES NULL DEFAULT GROUP
+%token JOIN INNER NATURAL LEFT RIGHT OUTER ON 
 (*Sort by*)
 %token DESC ASC
 %token <string> TOKEN
@@ -149,7 +149,7 @@ let into_list_cob_var :=
 | INTO; into= separated_nonempty_list(COMMA,cobol_var); {into}
 
 let using_list_cob_var :=
-| USING; using= separated_nonempty_list(COMMA, cobol_var); {using}
+| USING; LPAR;  using= separated_nonempty_list(COMMA, cobol_var); RPAR; {using}
 
 let execute_immediate_arg :=
 | x = STRING; {[Sql_instr x]}
@@ -223,16 +223,56 @@ let whenever_continuation :=
 (*SQL Stuff*)
 
 let sql_query :=
-| s = sql_select; lst = list(select_option); {Sql_query (s, lst)}
+| s = sql_select; lst = list(select_option); {(s, lst)}
 
 let sql_select:=
 | SELECT; x = separated_list(COMMA, sql_complex_literal); {x}
 
 let select_option :=
-| FROM; f= separated_nonempty_list(COMMA, sql_var_name); {From f} 
-| ORDER; BY; v=sql_var_name; option(ASC); {OrderBy(Asc v)}
-| ORDER; BY; v=sql_var_name; DESC; {OrderBy(Desc v)}
+| FROM; f= from_stm; {From f} 
+| ORDER; BY; l=separated_nonempty_list(COMMA, order_by); {OrderBy(l)}
 | WHERE; s = search_condition; {Where s}
+| GROUP; BY; x = separated_list(COMMA, literal); {GroupBy x}
+
+let order_by:=
+| v=literal; option(ASC);{Asc v}
+| v=literal; DESC; {Desc v}
+
+
+let from_stm :=
+| lst = separated_nonempty_list(COMMA, table_ref); {lst}
+
+/* let table_ref :=
+| table_name = table_ref_aux; AS; correlation_name = literal; {FromLitAs(table_name, correlation_name)}
+| t = table_ref_aux;{t}  */
+
+let table_ref := 
+| j = qualified_join;{j} 
+| t = table_ref_non_rec; {t}
+
+let table_ref_simpl :=
+| LPAR; select= sql_query; RPAR; {FromSelect(select)}
+| LPAR; t = table_ref; RPAR; {t}
+| table_name = literal; {FromLit(table_name)}
+
+let table_ref_non_rec :=
+| table_name = table_ref_simpl; AS; correlation_name = literal; {FromLitAs(table_name, correlation_name)}
+| t = table_ref_simpl; {t}
+
+let qualified_join :=
+| t1=table_ref_non_rec; j=join_type; JOIN; t2=table_ref_non_rec; o=option(qualified_join_option); {Join(t1, j, t2, o)}
+
+let join_type :=
+| INNER; {InnerJoin}
+| NATURAL; {NaturalJoin}
+| LEFT; option(OUTER); {LeftJoin}
+| RIGHT; option(OUTER); {RightJoin}
+
+let qualified_join_option := 
+| ON; s = search_condition; {JoinOn(s)}
+(*| USING; s=separated_nonempty_list(COMMA, sql_var_name); {JoinUsing(s)}*)
+
+
 
 let search_condition :=
 | s1 = search_condition; OR; s2 = search_condition_aux; {WhereConditionOr(s1, s2)}
@@ -249,9 +289,13 @@ let search_condition_aux2 :=
 
 let predicate :=
 | c = comparison_predicate; {WhereConditionCompare c}
+| i = in_predicate; {WhereConditionIn i} 
+
+let in_predicate:= (*HGNC_GENE_SYMBOL IN ('MDM2', 'TP53', 'CDKN1A','CCNE1')*)
+| l = literal; IN; LPAR; lst = separated_nonempty_list(COMMA, sql_complex_literal); RPAR; {InVarLst(l, lst)}
 
 let comparison_predicate:=
-| l = sql_complex_literal; c = compOp; LPAR; sql = sql_query; RPAR; {CompareQuery(l, c, [sql])}
+| l = sql_complex_literal; c = compOp; LPAR; sql = sql_query; RPAR; {CompareQuery(l, c, [Sql_query sql])}
 | l = sql_complex_literal; c = compOp; l2 =  sql_complex_literal;  {CompareLit(l, c, l2)}
 
 let compOp :=  
@@ -300,7 +344,7 @@ let sql :=
 
 let sql_no_simpl_cobol :=
 | t = sql_first_token;  x = list(sql_token); {[t] @ x} (*Note for the futur me: a list can be empty*)
-| s = sql_query; {[s]}
+| s = sql_query; {[Sql_query s]}
 
 /* let sql_token_after_select:=
 | FROM; {Sql_instr "FROM" }
@@ -323,7 +367,7 @@ let sql_first_token :=
 | COUNT_STAR; {Sql_instr "(*)"}
 | TABLE; {Sql_instr "TABLE"}
 | FROM; {Sql_instr "FROM" }
-| WHERE; {Sql_instr"ORDER BY"}
+| WHERE; {Sql_instr"WHERE"}
 | ORDER; BY; {Sql_instr"ORDER BY"}
 | WHEN; {Sql_instr"WHEN"}
 

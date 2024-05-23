@@ -20,6 +20,7 @@
    | "ALL" -> ALL
    | "AND" -> AND
    | "AS" -> AS
+   | "ASC" -> ASC
    | "AT" -> AT
    | "BEGIN" -> BEGIN
    | "BY" -> BY
@@ -31,6 +32,7 @@
    | "DECLARE" -> DECLARE
    | "DEFAULT" -> DEFAULT
    | "DELETE" -> DELETE
+   | "DESC" -> DESC
    | "DISCONNECT" -> DISCONNECT
    | "END" -> END
    | "EXEC" -> EXEC
@@ -41,23 +43,32 @@
    | "FROM" -> FROM
    | "GOTO" -> GOTO
    | "GO" -> GO
+   | "GROUP" -> GROUP
    | "HOLD" -> HOLD
    | "IDENTIFIED" -> IDENTIFIED
    | "IGNORE" -> IGNORE
+   | "INNER" -> INNER
    | "IMMEDIATE" -> IMMEDIATE
+   | "IN" -> IN
    | "INCLUDE" -> INCLUDE
    | "INSERT" -> INSERT
    | "INTO" -> INTO
+   | "JOIN" -> JOIN
+   | "LEFT" -> LEFT
+   | "NATURAL" -> NATURAL
    | "NOT" -> NOT
    | "NULL" -> NULL
    | "OF" -> OF
+   | "ON" -> ON
    | "OR" -> OR
    | "ORDER" -> ORDER
    | "OPEN" -> OPEN
+   | "OUTER" -> OUTER
    | "PERFORM" -> PERFORM
    | "PREPARE" -> PREPARE
    | "RELEASE" -> RELEASE
    | "RESET" -> RESET
+   | "RIGHT" -> RIGHT
    | "ROLLBACK" -> ROLLBACK
    | "SAVEPOINT" -> SAVEPOINT
    | "SECTION" -> SECTION
