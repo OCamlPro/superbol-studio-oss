@@ -43,7 +43,7 @@ and esql_instuction =
   | Savepoint of variable
   | SelectInto of (cobol_var_id) list * sql_select * sql_select_option list (*select and option_select*)
   | DeclareTable of literal * sql_instruction 
-  | DeclareCursor of sql_var * sql_instruction
+  | DeclareCursor of sql_var * sql_query
   | Prepare of sql_var * sql_instruction 
   | ExecuteImmediate of sql_instruction
   | ExecuteIntoUsing of sql_var * (cobol_var_id list) option * (cobol_var_id list) option
@@ -186,9 +186,18 @@ and compare_whenever_continuation a b =
 
 (*PRETTY PRINTER*)
 
-let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC\n\n" pp_esql x
+let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 'a -> unit)) : unit = 
+  let (x, f) = g in 
+  match x with
+  | [] -> Format.fprintf fmt ""
+  | [ele] -> Format.fprintf fmt "%a" f ele
+  | ele::t -> Format.fprintf fmt "%a, %a" f ele list_comma (t, f)
 
-and pp_esql fmt x = 
+let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC\n\n" pp_esql x
+(* (l : 'a liste)  *)
+
+
+  and pp_esql fmt x = 
   match x with
   | At (v, instr) -> Format.fprintf fmt "AT %a %a" pp_var v pp_esql instr
   | Sql instr -> pp_sql fmt instr 
@@ -220,7 +229,7 @@ and pp_esql fmt x =
     pp_cob_lst into
     pp_select_options_lst sql2
   | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE %a" pp_lit var pp_sql sql
-  | DeclareCursor (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql sql
+  | DeclareCursor (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql
   | Prepare (str, sql) -> Format.fprintf fmt "PREPARE %s FROM %a" str.payload pp_sql sql
   | ExecuteImmediate sql -> Format.fprintf fmt "EXECUTE IMMEDIATE %a" pp_sql sql
   | ExecuteIntoUsing (var, into, using) -> 
@@ -249,11 +258,13 @@ and pp_table fmt x =
   match x with 
   | Table t -> Format.fprintf fmt "%s" t.payload
   | TableLst (t, lst) -> 
-      let pp_aux fmt x = List.iter (Format.fprintf fmt "%s") (List.map(Srcloc.payload) x)
-    in
+      let f  = pp_sql_var in  
+      let pp_aux fmt lst = list_comma fmt (lst, f) in
     Format.fprintf fmt "%s(%a)" t.payload pp_aux lst
 
-and pp_value fmt x = List.iter (Format.fprintf fmt "%a" pp_one_value) x 
+and pp_sql_var fmt x = Format.fprintf fmt "%s" x.payload
+and pp_value fmt x = list_comma fmt (x, (pp_one_value))
+
 and pp_one_value fmt x =
   match x with
   | ValueDefault -> Format.fprintf fmt "DEFAULT"
@@ -302,7 +313,7 @@ and pp_sql_condition fmt = function
   | WhereConditionIn s -> Format.fprintf fmt "%a" pp_condition_in s
 
 and pp_condition_in fmt x =
-let pp_aux fmt = List.iter(Format.fprintf fmt "%a," pp_complex_literal) in
+let pp_aux fmt lst = list_comma fmt (lst, pp_complex_literal) in
 match x with
 | InVarLst (l, vlist) -> Format.fprintf fmt "%a IN %a" pp_lit l pp_aux vlist 
 
@@ -312,7 +323,8 @@ and pp_complex_literal fmt = function
 | SqlCompLit v -> Format.fprintf fmt "%a" pp_lit v
 | SqlCompAs (l, v)  ->  Format.fprintf fmt "%a AS %s" pp_lit l v.payload 
 | SqlCompFun (funName, args) -> 
-  let pp_args fmt lst = List.iter(Format.fprintf fmt "%a," pp_sql_op) lst in
+  let pp_args fmt lst = list_comma fmt (lst, pp_sql_op)
+  in
   Format.fprintf fmt "%s(%a)" funName.payload pp_args args 
 | SqlCompStar -> Format.fprintf fmt "*"
 
@@ -324,9 +336,9 @@ and pp_binop = function
 and pp_some_cob_lst fmt = function
 | (Some x, s) -> Format.fprintf fmt "%s %a" s pp_cob_lst x
 | (None, _) -> Format.fprintf fmt ""
-and pp_cob_lst fmt x =  List.iter (Format.fprintf fmt ":%s, ") (List.map(Srcloc.payload) x)
+and pp_cob_lst fmt x =  list_comma fmt (x, pp_cob_var)
 
-
+and pp_cob_var fmt x = Format.fprintf fmt ":%s" x.payload
 and pp_some_rb_work_or_tran fmt = function
   | Some p ->  pp_rb_work_or_tran fmt p
   | None -> Format.fprintf fmt "" 
@@ -386,13 +398,13 @@ and pp_whenever_continuation fmt x =
 and pp_some_sql fmt = function
   | Some p ->  pp_sql fmt p
   | None -> Format.fprintf fmt "" 
-and  pp_sql fmt x =  Format.fprintf fmt "sql(%a)" pp_sql_rec x
+and  pp_sql fmt x =  Format.fprintf fmt " %a " pp_sql_rec x
 
-and pp_sql_rec fmt x =  List.iter (Format.fprintf fmt "[%a]" pp_one_token) x
+and pp_sql_rec fmt x =  List.iter (Format.fprintf fmt "%a " pp_one_token) x
 and pp_one_token fmt = function
 | Sql_instr(s) -> Format.fprintf fmt "%s" s
-| Sql_var(c) -> Format.fprintf fmt ":%a" pp_var c
-| Sql_lit l -> Format.fprintf fmt ":%a" pp_lit l
+| Sql_var(c) -> Format.fprintf fmt "%a" pp_var c
+| Sql_lit l -> Format.fprintf fmt "%a" pp_lit l
 | Sql_query s -> Format.fprintf fmt "%a" pp_sql_query s
 | Sql_equality e -> Format.fprintf fmt "%a" pp_sql_update_aux e
 | Sql_search_condition c -> Format.fprintf fmt "%a" pp_sql_condition c
@@ -411,7 +423,7 @@ and pp_select_options_lst fmt lst =
   in
   List.iter (Format.fprintf fmt "\t%a\n" pp_one_option) lst
 
-and pp_from fmt f=  List.iter (Format.fprintf fmt "%a" pp_table_ref) f
+and pp_from fmt f= list_comma fmt (f, pp_table_ref)
 
 and pp_table_ref fmt = function
 | FromLit l -> Format.fprintf fmt "%a" pp_lit l
@@ -437,24 +449,23 @@ and pp_table_opt_option fmt = function
 and pp_table_opt fmt = function
 | JoinOn sc -> Format.fprintf fmt "ON %a" pp_sql_condition sc
 | JoinUsing lstvar -> 
-    let pp_aux fmt x = List.iter (Format.fprintf fmt "%s") (List.map(Srcloc.payload) x)
+    let pp_aux fmt x = list_comma fmt (x, pp_sql_var)
   in
   Format.fprintf fmt "USING %a" pp_aux lstvar
 
 
 and pp_group_by fmt x = Format.fprintf fmt "GROUP BY %a ASC" pp_list_lit x
 
-and pp_orderBy fmt = 
+and pp_orderBy fmt x = 
   let pp_aux fmt =function
   | Asc v -> Format.fprintf fmt "ORDER BY %a ASC" pp_lit v 
   | Desc v -> Format.fprintf fmt "ORDER BY %a DESC" pp_lit v
   in 
-  List.iter (Format.fprintf fmt "%a," pp_aux)
+  list_comma fmt (x, pp_aux)
 
 
-and pp_select_lst fmt l = List.iter (Format.fprintf fmt "%a, " pp_complex_literal) l
+and pp_select_lst fmt l = list_comma fmt (l, pp_complex_literal)
 
-and pp_list_var fmt l = List.iter (Format.fprintf fmt "%a " pp_var) l
 and pp_some_var fmt (x, s) =
   match x with
   | Some v -> Format.fprintf fmt "%s %a" s pp_var v
@@ -469,12 +480,18 @@ match x with
 | Some v -> Format.fprintf fmt "%s %a" s pp_lit v
 | None -> Format.fprintf fmt ""
 
-and pp_list_lit fmt x = List.iter (Format.fprintf fmt "%a " pp_lit) x
-
+and pp_list_lit fmt x = list_comma fmt (x, pp_lit)
 
 and pp_lit fmt x = 
   match x with
   | LiteralNum n -> Format.fprintf fmt "%s" n.payload
   | LiteralStr n -> Format.fprintf fmt "%s" n.payload
-  | LiteralVar n -> (Format.fprintf fmt "%a" pp_var n)
-  | LiteralDot lst -> List.iter (Format.fprintf fmt ".%s") (List.map(Srcloc.payload) lst)
+  | LiteralVar n -> Format.fprintf fmt "%a" pp_var n
+  | LiteralDot lst -> 
+    let rec pp_aux fmt x = 
+      match x with
+      | [] -> Format.fprintf fmt ""
+      | [ele] -> Format.fprintf fmt "%s" ele.payload
+      | ele::t -> Format.fprintf fmt "%s.%a" ele.payload pp_aux t
+    in
+    pp_aux fmt lst

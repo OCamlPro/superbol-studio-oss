@@ -102,9 +102,9 @@ let esql_with_opt_at :=
   {StartTransaction}
 | DECLARE; table_name= literalVar; TABLE; sql=sql;
   {DeclareTable(table_name, sql)}
-| DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql; 
-  {DeclareCursor(crs, sql)}
-| DECLARE; crs= sql_var_name; CURSOR; WITH; HOLD; FOR; sql=sql; 
+| DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql_query; option(forUpdate);
+  {DeclareCursor(crs, sql)} (*TODO: COmplete For Update and create a type for it in ast*)
+| DECLARE; crs= sql_var_name; CURSOR; WITH; HOLD; FOR; sql=sql_query; option(forUpdate);
   {DeclareCursor(crs, sql)} (*TODO: With Hold in AST*)
 | PREPARE; name= sql_var_name; FROM; sql=sql; 
   {Prepare(name, sql)}
@@ -143,6 +143,16 @@ let value_list :=
 | LPAR; l = separated_nonempty_list(COMMA, literal); RPAR; {ValueList l}
 | NULL; {ValueNull}
 | DEFAULT; {ValueDefault}
+
+(*TODO: forUpdate is incomplete, I have to implement this syntaxe:
+FOR {
+  READ ONLY 
+| UPDATE [OF unqualified-column-name[, unqualified-column-name]. ..]
+}*)
+
+let forUpdate := 
+| FOR; UPDATE; {} 
+
 
 
 let into_list_cob_var :=
