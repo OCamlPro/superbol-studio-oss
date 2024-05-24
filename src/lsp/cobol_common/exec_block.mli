@@ -13,9 +13,11 @@
 
 module TYPES: sig
   type exec_block = ..
+  type diagnostic = ..
 end
 include module type of TYPES
   with type exec_block = TYPES.exec_block
+   and type diagnostic = TYPES.diagnostic
 
 type t = exec_block
 
@@ -24,6 +26,15 @@ val register_exec_block_type
   -> compare: (t -> t -> int option)
   -> pp: (t -> Pretty.delayed option)
   -> unit
-
 val compare: t -> t -> int
 val pp: t Pretty.printer
+
+val register_diagnostic_type
+  : name: string
+  -> severity: (diagnostic -> Diagnostics.severity option)
+  -> loc: (diagnostic -> Srcloc.srcloc option)
+  -> pp: (diagnostic -> Pretty.delayed option)
+  -> unit
+val diagnostic_severity: diagnostic -> Diagnostics.severity
+val diagnostic_loc: diagnostic -> Srcloc.srcloc option
+val pp_diagnostic: diagnostic Pretty.printer

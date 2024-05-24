@@ -6,6 +6,9 @@
 - Folding of `EXEC`/`END-EXEC` blocks [#291](https://github.com/OCamlPro/superbol-studio-oss/pull/291)
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
+### Fixed
+- Internal handling of diagnostics that may be issued when dealing with `EXEC`/`END-EXEC` blocks [#292](https://github.com/OCamlPro/superbol-studio-oss/pull/292)
+
 
 ## [0.1.2] Third α release (2024-05-17)
 
