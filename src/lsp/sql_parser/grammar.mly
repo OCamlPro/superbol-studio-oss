@@ -383,6 +383,8 @@ let sql_first_token :=
 
 let sql_token_not_first :=
 | TO; {Sql_instr "TO"}
+| AT; {Sql_instr "AT"}
+| IN; {Sql_instr "IN"}
 | UPDATE; {Sql_instr "UPDATE" }
 | EQUAL; {Sql_instr "=" }
 | COMMA; {Sql_instr "," }
