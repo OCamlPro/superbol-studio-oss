@@ -465,10 +465,12 @@ let scan_exec_block
   in
   match exec_scanner with
   | Stateless_exec_scanner s ->
-      [ EXEC_BLOCK (s ~&text) &@<- text ],
-      state
+      let block, diags = s ~&text in
+      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
+      [ EXEC_BLOCK block &@<- text ],
+      if diags == state.diags then state else { state with diags }
   | Stateful_exec_scanner (s, s_acc) ->
-      let block, s_acc = s ~&text s_acc in
+      let block, diags, s_acc = s ~&text s_acc in
       let scanner = Parser_options.Stateful_exec_scanner (s, s_acc) in
       let exec_scanners = match lang with
         | None ->
@@ -478,8 +480,9 @@ let scan_exec_block
             { state.persist.exec_scanners with
               exec_scanners = EXEC_MAP.add lang scanner scanners }
       in
+      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
       [ EXEC_BLOCK block &@<- text ],
-      { state with persist = { state.persist with exec_scanners } }
+      { state with diags; persist = { state.persist with exec_scanners } }
 
 
 let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =

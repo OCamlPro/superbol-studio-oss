@@ -12,5 +12,6 @@
 (**************************************************************************)
 
 module Generic = Generic
+module No_percentage_toy = No_percentage_toy
 
 include Main

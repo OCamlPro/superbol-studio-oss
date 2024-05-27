@@ -32,7 +32,9 @@ type exec_scanner =
   | Stateless_exec_scanner:
       (** Stateless EXEC block parsers just transform pre-processed text into an
           AST node, whatever the history of blocks already parsed. *)
-      (Cobol_preproc.Text.t -> Cobol_common.Exec_block.t) -> exec_scanner
+      (Cobol_preproc.Text.t ->
+       Cobol_common.Exec_block.t *
+       Cobol_common.Exec_block.diagnostic list) -> exec_scanner
   | Stateful_exec_scanner:
       (** Stateful parsers accumulate some data (their state), that is passed
           upon each call to the scanner on successive blocks of the same input
@@ -40,7 +42,9 @@ type exec_scanner =
           accumulated state MUST be an immutable structure (this is so that
           rewinds of the parser always re-trigger scanner executions from the
           proper state). *)
-      (Cobol_preproc.Text.t -> 'state -> Cobol_common.Exec_block.t * 'state) *
+      (Cobol_preproc.Text.t -> 'state ->
+       Cobol_common.Exec_block.t *
+       Cobol_common.Exec_block.diagnostic list * 'state) *
       'state -> exec_scanner
 type exec_scanners =
   {

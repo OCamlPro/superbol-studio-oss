@@ -80,6 +80,7 @@ type customizable_diagnostic =
   | Implementation_pending of string
   | Missing_tokens of Pretty.delayed     (* TODO: avoid this functional value *)
   | Invalid_syntax
+  | Exec_block_diagnostic of Cobol_common.Exec_block.diagnostic
 
 let pp_customizable_diagnostic ppf = function
   | Implementation_pending descr ->
@@ -89,6 +90,8 @@ let pp_customizable_diagnostic ppf = function
       Pretty.print ppf "Missing@ %t" pp_assumed
   | Invalid_syntax ->
       Pretty.print ppf "Invalid@ syntax"
+  | Exec_block_diagnostic d ->
+      Cobol_common.Exec_block.pp_diagnostic ppf d
 
 type custom =
   {
@@ -122,6 +125,17 @@ let has_errors diags =
 
 let add_diag ~severity ?loc diag diags =
   { diags with customs = { severity; loc; diag } :: diags.customs }
+
+let add_exec_block_diag d diags =
+  (* Note: here we may be duplicating severity and location info.  Ok for now,
+     but that may not be necessary: an extra_diagnostic type would avoid
+     this... *)
+  add_diag (Exec_block_diagnostic d) diags
+    ~severity: (Cobol_common.Exec_block.diagnostic_severity d)
+    ?loc: (Cobol_common.Exec_block.diagnostic_loc d)
+
+let add_exec_block_diags d diags =
+  List.fold_left (fun diags d -> add_exec_block_diag d diags) diags d
 
 let add_exn exn diags =
   match exn with

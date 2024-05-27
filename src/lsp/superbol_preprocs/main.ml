@@ -11,8 +11,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module EXEC_MAP = Cobol_preproc.Options.EXEC_MAP
+
 let exec_scanners =
   Cobol_parser.Options.{
     exec_scanner_fallback = Generic.scanner;  (* for now; TODO: Call.scanner? *)
-    exec_scanners = Cobol_preproc.Options.EXEC_MAP.empty;
+    exec_scanners = EXEC_MAP.empty;
   }
+
+let more scanners =
+  List.fold_left begin fun acc (name, scanner) ->
+    Cobol_parser.Options.{
+      exec_scanner_fallback = acc.exec_scanner_fallback;
+      exec_scanners = EXEC_MAP.add name scanner acc.exec_scanners
+    }
+  end exec_scanners scanners

@@ -31,4 +31,6 @@ let () =
     end
 
 let scanner =
-  Cobol_parser.Options.Stateless_exec_scanner (fun text -> Generic_exec_block text)
+  Cobol_parser.Options.Stateless_exec_scanner begin fun text ->
+    Generic_exec_block text, []
+  end

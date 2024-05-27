@@ -27,3 +27,29 @@ let%expect_test "exec-block-with-cobol-separators" =
                condition > 0 ; END-EXEC],
     ., STOP, RUN, ., EOF
 |}];;
+
+let%expect_test "exec-block-with-invalid-percentage-character" =
+  let exec_scanners =
+    Superbol_preprocs.more [
+      "NO-%", Superbol_preprocs.No_percentage_toy.scanner;
+    ]
+  in
+  Parser_testing.show_diagnostics ~exec_scanners {|
+       PROGRAM-ID.        prog.
+       PROCEDURE          DIVISION.
+           EXEC NO-%
+              a % b
+           END-EXEC.
+           STOP RUN.
+  |};
+  [%expect {|
+    prog.cob:5.16-5.17:
+       2          PROGRAM-ID.        prog.
+       3          PROCEDURE          DIVISION.
+       4              EXEC NO-%
+       5 >               a % b
+    ----                   ^
+       6              END-EXEC.
+       7              STOP RUN.
+    >> Error: Unexpected character `%' in no-percentage-allowed EXEC/END-EXEC
+              block |}];;
