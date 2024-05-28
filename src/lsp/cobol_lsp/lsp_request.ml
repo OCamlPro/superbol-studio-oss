@@ -454,6 +454,39 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
+let get_hover_text (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+  match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
+  | data_def ->
+      Some (Pretty.to_string "%a" Cobol_data.Hover.pp_data_definition data_def)
+  | exception Not_found
+  | exception Cobol_unit.Qualmap.Ambiguous _ ->
+      None
+
+let get_hover_text_and_loc cu_name element_at_pos group =
+  try
+    let { payload = cu; _ } = CUs.find_by_name cu_name group in
+    match element_at_pos with
+    | Data_item { full_qn = Some qn; def_loc } ->
+        get_hover_text qn cu, Some def_loc
+    | Data_full_name qn | Data_name qn ->
+         get_hover_text qn cu, Some (Lsp_lookup.baseloc_of_qualname qn)
+    | Data_item { full_qn = None; _ }
+    | Proc_name _ ->
+        None,None
+      with Not_found -> None,None
+
+let lookup_hover_definition_in_doc
+    HoverParams.{ textDocument = doc; position; _ }
+    Cobol_typeck.Outputs.{ group; _ }
+  =
+  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+  | { element_at_position = None; _ }
+  | { enclosing_compilation_unit_name = None; _ } ->
+      None, None
+  | { element_at_position = Some ele_at_pos;
+      enclosing_compilation_unit_name = Some cu_name } ->
+        get_hover_text_and_loc cu_name ele_at_pos group
+
 let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
   let find_hovered_pplog_event pplog =
@@ -472,13 +505,13 @@ let handle_hover registry (params: HoverParams.t) =
           with Invalid_argument _ -> false
     end (Cobol_preproc.Trace.events pplog)
   in
-  let hover_markdown ~loc value =
+  let hover_markdown ?loc value =
     let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
-    let range = Lsp_position.range_of_srcloc_in ~filename loc in
-    Some (Hover.create () ~contents:(`MarkupContent content) ~range)
+    let range = Option.map (Lsp_position.range_of_srcloc_in ~filename) loc in
+    Some (Hover.create () ~contents:(`MarkupContent content) ?range)
   in
-  try_main_doc registry params.textDocument
-    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
+  try_with_main_document_data registry params.textDocument
+    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } checked_doc ->
       match find_hovered_pplog_event pplog with
       | Some Replacement { matched_loc = loc;
                            replacement_text = []; _ } ->
@@ -500,9 +533,11 @@ let handle_hover registry (params: HoverParams.t) =
       | Some Replace _
       | Some CompilerDirective _
       | Some Exec_block _
-      | Some Ignored _
-      | None ->
+      | Some Ignored _ ->
           None
+      | None ->
+          let hover_def, loc = lookup_hover_definition_in_doc params checked_doc in
+          Option.bind hover_def (hover_markdown ?loc)
     end
 
 (** {3 Completion} *)

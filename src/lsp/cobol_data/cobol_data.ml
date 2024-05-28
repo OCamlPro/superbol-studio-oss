@@ -39,6 +39,7 @@ module Picture = Data_picture
 module Value = Data_value
 module Literal = Data_literal
 module Printer = Data_printer
+module Hover = Data_hover_printer
 module Visitor = Data_visitor
 
 module Diagnostics = Data_diagnostics                         (* for literals *)
