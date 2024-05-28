@@ -505,11 +505,24 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
   let (x, f) = g in 
   match x with
   | [] -> Format.fprintf fmt ""
-  | [ele] -> Format.fprintf fmt "%a" f ele
+  | [ele] -> Format.fprintf fmt "%a " f ele
   | ele::t -> Format.fprintf fmt "%a, %a" f ele list_comma (t, f)
 
-let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC\n\n" pp_esql x
-(* (l : 'a liste)  *)
+  (*Todo: Declaration are a separate case because else  
+   "WORKING-STORAGE SECTION.
+    EXEC SQL 
+      INCLUDE EMPREC 
+    END-EXEC"
+
+  becomes "WORKING-STORAGE SECTION.EXEC SQL INCLUDE EMPREC END-EXEC"
+     *)
+let rec pp fmt x = 
+  match (x) with
+  | BeginDeclare -> Format.fprintf fmt "\n EXEC SQL BEGIN DECLARE SECTION END-EXEC. \n"
+  | EndDeclare -> Format.fprintf fmt "\n EXEC SQL END DECLARE SECTION END-EXEC. \n"
+  | Include i -> Format.fprintf fmt "\n EXEC SQL INCLUDE %s END-EXEC. \n" i.payload
+  | _ -> Format.fprintf fmt "EXEC SQL %a END-EXEC" pp_esql x
+
 
 
   and pp_esql fmt x = 
@@ -594,7 +607,7 @@ and pp_where_arg fmt = function
 | None -> Format.fprintf fmt ""
 
 and pp_sql_update_aux fmt (var, op) = 
-  Format.fprintf fmt "%s = %a\n" var.payload pp_sql_op op
+  Format.fprintf fmt "%s = %a " var.payload pp_sql_op op
 
 and pp_sql_update fmt x = 
   List.iter (pp_sql_update_aux fmt) x  
@@ -736,7 +749,7 @@ and pp_select_options_lst fmt lst =
   | OrderBy ob -> Format.fprintf fmt "ORDER BY %a" pp_orderBy ob
   | GroupBy gb-> Format.fprintf fmt "GROUP BY %a" pp_group_by gb
   in
-  List.iter (Format.fprintf fmt "\t%a\n" pp_one_option) lst
+  List.iter (Format.fprintf fmt "%a" pp_one_option) lst
 
 and pp_from fmt f= list_comma fmt (f, pp_table_ref)
 
