@@ -220,9 +220,9 @@ let using_var:= USING; p= literalVar; {p}
 let as_var:= AS; v= literalVar; {v} 
 
 let whenever_condition :=
-| NOT; FOUND; {Not_found}
-| SQLERROR; {SqlError}
-| SQLWARNING; {SqlWarning}
+| NOT; FOUND; {Not_found_whenever}
+| SQLERROR; {SqlError_whenever}
+| SQLWARNING; {SqlWarning_whenever}
 
 let whenever_continuation :=
 | CONTINUE;  {Continue}
