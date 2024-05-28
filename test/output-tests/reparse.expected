@@ -102,3 +102,5 @@ Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob8.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob9.cbl':
  Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL001A.cbl':
+ Parse: OK. Reparse: OK.

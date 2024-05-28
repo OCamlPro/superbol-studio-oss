@@ -74,4 +74,12 @@ let () =
         (ibm_root // path);
       printf "@]@."
     end;
+  deep_iter sql_exec_root ~glob:"*.cbl"
+    ~f:begin fun path ->
+      printf "@[<v 1>Re-parsing `%s':@ " @@ sql_exec_testsuite // path;
+      reparse_file ~config ~source_format:(Cobol_config.SF SFxCard)
+        (sql_exec_root // path);
+      printf "@]@."
+    end;
+  (*TODO: add and pass the test in gixsql_testsuite*)
 ;;
