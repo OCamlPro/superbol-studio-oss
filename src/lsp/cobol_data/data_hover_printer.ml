@@ -27,15 +27,15 @@ let pp_cobol_block: _ Fmt.t -> _ Fmt.t = fun pp ->
 
 let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Data_picture.t) =
-      Fmt.(
-        any "USAGE "
+    Fmt.(
+      any "USAGE "
         ++ any name
         ++ any "\n\n"
-        ++ Data_picture.pp_category
-  ) ppf picture.category
+        ++ Data_picture.pp_category)
+    ppf picture.category
   and pp_usage_with_sign ppf name signed =
     pp_cobol_block Fmt.(any "USAGE " ++ any name ++ (if signed then any " SIGNED" else any " UNSIGNED"))
-      ppf ()
+    ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
     match tag with `W16 -> 16 | `W32 -> 32 | `W34 -> 34 | `W64 -> 64 | `W128 -> 128
@@ -80,7 +80,7 @@ let pp_usage: usage Pretty.printer =
     | Index ->
         Pretty.print ppf "Index"
     | National picture ->
-        pp_usage_with_picture ppf "national" picture
+        pp_usage_with_picture ppf "NATIONAL" picture
     | Object_reference _ ->
         Pretty.print ppf "Object reference"
     | Packed_decimal picture ->
@@ -123,16 +123,17 @@ and pp_item_redefinitions: item_redefinitions Pretty.printer = fun ppf ->
 
 
 (* fields *)
-and pp_field_layout: field_layout Fmt.t = fun ppf x -> (match x with
-| Elementary_field { usage; init_value} -> begin
-  Fmt.(
-    const pp_usage usage
+
+and pp_field_layout: field_layout Fmt.t = fun ppf x ->
+  (match x with
+  | Elementary_field { usage; init_value} ->
+      begin Fmt.(
+        const pp_usage usage
     ++ any "\n\n"
-    ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value
-  )
-end
-| Struct_field _ -> Fmt.any "Group"
-  ) ppf x
+    ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
+      end
+  | Struct_field _ -> Fmt.any "Group")
+  ppf x
 
 and pp_field_definition: field_definition Fmt.t = fun ppf x ->
   let pp_qualname_opt_in_block' = pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')  in
@@ -144,8 +145,8 @@ and pp_field_definition: field_definition Fmt.t = fun ppf x ->
     | Struct_field _ -> any "\n\n" ++ const pp_size x.field_size
     | _ -> nop
     ++ any "\n\n"
-    ++ const (option (any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')) x.field_redefines
-  ) ppf x
+    ++ const (option (any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')) x.field_redefines)
+  ppf x
 
 and pp_field_definition': field_definition with_loc Pretty.printer = fun ppf ->
   Cobol_ptree.pp_with_loc pp_field_definition ppf
@@ -158,11 +159,10 @@ and pp_table_definition: table_definition Pretty.printer = fun ppf x ->
     ++ pp_cobol_block (
       const pp_span x.table_range.range_span
       ++ any "\nINDEXED BY "
-      ++ const (list ~sep:(any ", ") Cobol_ptree.pp_qualname') x.table_range.range_indexes
-    )
+      ++ const (list ~sep:(any ", ") Cobol_ptree.pp_qualname') x.table_range.range_indexes)
     ++ any "\n\nFields:\n\n"
-    ++ const pp_field_definition' x.table_field
-    ) ppf x
+    ++ const pp_field_definition' x.table_field)
+  ppf x
 
 and pp_table_definition': table_definition with_loc Pretty.printer = fun ppf ->
   Cobol_ptree.pp_with_loc pp_table_definition ppf
@@ -192,14 +192,13 @@ let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
       const Cobol_ptree.pp_qualname' r.renaming_name
       ++ any "\nRENAMES "
       ++ const Cobol_ptree.pp_qualname' r.renaming_from
-      ++ const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname')) r.renaming_thru
-      )
+      ++ const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname')) r.renaming_thru)
     ++ any "\n\n"
     ++ const pp_renamed_item_layout r.renaming_layout
     ++ match r.renaming_layout with
     | Renamed_struct _ -> any "\n\n" ++ const pp_size r.renaming_size
-    | _ -> nop
-    ) ppf r
+    | _ -> nop )
+  ppf r
 
 let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
   Cobol_ptree.pp_with_loc pp_record_renaming ppf
@@ -218,10 +217,10 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->
-        Fmt.const pp_field_definition' def ppf ()
+      Fmt.const pp_field_definition' def ppf ()
   | Data_renaming { def; _ } ->
-        Fmt.const pp_record_renaming' def ppf ()
+      Fmt.const pp_record_renaming' def ppf ()
   | Data_condition { def; field; _ } ->
       Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
   | Table_index { table; _ } ->
-        Fmt.const pp_table_definition' table ppf ()
+      Fmt.const pp_table_definition' table ppf ()
