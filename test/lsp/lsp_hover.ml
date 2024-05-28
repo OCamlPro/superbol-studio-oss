@@ -714,8 +714,10 @@ let%expect_test "hover-typedef-renames" =
         DATA DIVISION.
         WORKING-STORAGE SECTION.
         01 X.
-            05 Y PIC 9.
-            66 Z_|_ R_|_ENAMES _|_Y.
+          05 Y PIC 9.
+          05 YY PIC XX.
+          66 Z_|_ R_|_ENAMES _|_Y.
+          66 Y-THRU-YY_|_ RENAMES Y THRU YY.
         PROCEDURE DIVISION.
             DISPLAY _|_Z.
             STOP RUN.
@@ -723,59 +725,75 @@ let%expect_test "hover-typedef-renames" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    (line 7, character 16):
-    __rootdir__/prog.cob:8.15-8.16:
-       5           WORKING-STORAGE SECTION.
+    (line 8, character 14):
+    __rootdir__/prog.cob:9.13-9.14:
        6           01 X.
-       7               05 Y PIC 9.
-       8 >             66 Z RENAMES Y.
-    ----                  ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+       7             05 Y PIC 9.
+       8             05 YY PIC XX.
+       9 >           66 Z RENAMES Y.
+    ----                ^
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11           PROCEDURE DIVISION.
     ```cobol
     Z IN X
     RENAMES Y IN X
     ```
     USAGE DISPLAY
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    (line 7, character 18):
-    __rootdir__/prog.cob:8.12-8.27:
-       5           WORKING-STORAGE SECTION.
+    (line 8, character 16):
+    __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
-       7               05 Y PIC 9.
-       8 >             66 Z RENAMES Y.
-    ----               ^^^^^^^^^^^^^^^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+       7             05 Y PIC 9.
+       8             05 YY PIC XX.
+       9 >           66 Z RENAMES Y.
+    ----             ^^^^^^^^^^^^^^^
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11           PROCEDURE DIVISION.
     ```cobol
     Z IN X
     RENAMES Y IN X
     ```
     USAGE DISPLAY
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    (line 7, character 25):
-    __rootdir__/prog.cob:8.25-8.26:
-       5           WORKING-STORAGE SECTION.
+    (line 8, character 23):
+    __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
-       7               05 Y PIC 9.
-       8 >             66 Z RENAMES Y.
-    ----                            ^
-       9           PROCEDURE DIVISION.
-      10               DISPLAY Z.
+       7             05 Y PIC 9.
+       8             05 YY PIC XX.
+       9 >           66 Z RENAMES Y.
+    ----                          ^
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11           PROCEDURE DIVISION.
     ```cobol
     Y IN X
     ```
     USAGE DISPLAY
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    (line 9, character 20):
-    __rootdir__/prog.cob:10.20-10.21:
-       7               05 Y PIC 9.
-       8               66 Z RENAMES Y.
-       9           PROCEDURE DIVISION.
-      10 >             DISPLAY Z.
+    (line 9, character 22):
+    __rootdir__/prog.cob:10.13-10.22:
+       7             05 Y PIC 9.
+       8             05 YY PIC XX.
+       9             66 Z RENAMES Y.
+      10 >           66 Y-THRU-YY RENAMES Y THRU YY.
+    ----                ^^^^^^^^^
+      11           PROCEDURE DIVISION.
+      12               DISPLAY Z.
+    ```cobol
+    Y-THRU-YY IN X
+    RENAMES Y IN X
+    THRU YY IN X
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(24)
+    (line 11, character 20):
+    __rootdir__/prog.cob:12.20-12.21:
+       9             66 Z RENAMES Y.
+      10             66 Y-THRU-YY RENAMES Y THRU YY.
+      11           PROCEDURE DIVISION.
+      12 >             DISPLAY Z.
     ----                       ^
-      11               STOP RUN.
-      12
+      13               STOP RUN.
+      14
     ```cobol
     Z IN X
     RENAMES Y IN X
