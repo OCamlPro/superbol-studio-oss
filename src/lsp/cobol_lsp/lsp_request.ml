@@ -462,28 +462,22 @@ let get_hover_text (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) 
       None
 
 let get_hover_text_and_loc cu_name element_at_pos group =
-  try
-    let { payload = cu; _ } = CUs.find_by_name cu_name group in
-    match element_at_pos with
+  let { payload = cu; _ } = CUs.find_by_name cu_name group in
+  match element_at_pos with
     | Data_item { full_qn = Some qn; def_loc } ->
-        (try get_hover_text qn cu with Not_found -> None),
-        Some def_loc
+        get_hover_text qn cu, Some def_loc
     | Data_full_name qn | Data_name qn ->
-         (try get_hover_text qn cu with Not_found -> None),
-         Some (Lsp_lookup.baseloc_of_qualname qn)
-    | Data_item { full_qn = None; _ }
-    | Proc_name _ ->
-        None,None
-      with Not_found -> None,None
+        get_hover_text qn cu, Some (Lsp_lookup.baseloc_of_qualname qn)
+    | Data_item _ | Proc_name _ ->
+        raise Not_found
 
 let lookup_hover_definition_in_doc
     HoverParams.{ textDocument = doc; position; _ }
-    Cobol_typeck.Outputs.{ group; _ }
-  =
-  match Lsp_lookup.element_at_position ~uri:doc.uri position group with
+    Cobol_typeck.Outputs.{ group; _ } =
+      match Lsp_lookup.element_at_position ~uri:doc.uri position group with
   | { element_at_position = None; _ }
   | { enclosing_compilation_unit_name = None; _ } ->
-      None, None
+      raise Not_found
   | { element_at_position = Some ele_at_pos;
       enclosing_compilation_unit_name = Some cu_name } ->
         get_hover_text_and_loc cu_name ele_at_pos group
@@ -537,8 +531,11 @@ let handle_hover registry (params: HoverParams.t) =
       | Some Ignored _ ->
           None
       | None ->
-          let hover_def, loc = lookup_hover_definition_in_doc params checked_doc in
-          Option.fold ~none:"" ~some:Fun.id hover_def |> hover_markdown ?loc
+          let hover_def, loc =
+            try lookup_hover_definition_in_doc params checked_doc
+            with Not_found -> None,None
+          in
+          Option.bind hover_def (hover_markdown ?loc)
     end
 
 (** {3 Completion} *)
