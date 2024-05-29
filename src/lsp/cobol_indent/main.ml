@@ -100,7 +100,8 @@ let indent
   if Engine.verbose then
     Printf.eprintf "Config: %s\n%!" (Config.to_string config);
 
-  let (tokens, revedits) = Scanner.tokenize ~filename ~config ~contents in
+  let { Scanner.toks = tokens; revedits ; _ } =
+    Scanner.tokenize ~filename ~config ~contents in
 
   Engine.indent_tokens ~config tokens ;
 
