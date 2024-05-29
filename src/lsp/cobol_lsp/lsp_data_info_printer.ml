@@ -106,6 +106,10 @@ let pp_span: span Pretty.printer = fun ppf -> function
   | Depending_span d -> pp_depending_span ppf d
   | Dynamic_span d -> pp_dynamic_span ppf d
 
+let pp_struct: item_definitions Pretty.printer = fun ppf subfields ->
+  let n = List.length (NEL.to_list subfields) in
+    Fmt.pf ppf "Group of %d subfield%s" n (if n > 1 then "s" else "")
+
 (* items *)
 
 let rec pp_item_definition: item_definition Pretty.printer = fun ppf -> function
@@ -133,8 +137,7 @@ and pp_field_layout: field_layout Fmt.t = fun ppf x ->
     ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
       end ppf x
   | Struct_field { subfields } ->
-      let n = List.length (NEL.to_list subfields) in
-      Fmt.pf ppf "Group of %d subfields" n
+      Fmt.const pp_struct subfields ppf x
 
 and pp_field_definition: field_definition Fmt.t = fun ppf x ->
   let pp_qualname_opt_in_block' = pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')  in
@@ -185,8 +188,7 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf x ->
   | Renamed_elementary { usage } ->
       Fmt.const pp_usage usage ppf x
   | Renamed_struct { subfields } ->
-      let n = List.length (NEL.to_list subfields) in
-      Fmt.pf ppf "Group of %d subfields" n
+      Fmt.const pp_struct subfields ppf x
 
 let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
   Fmt.(

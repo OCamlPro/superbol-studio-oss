@@ -259,7 +259,7 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT
     ```
-    Group
+    Group of 3 subfields
     Size: 80 bits
     (line 8, character 31):
     __rootdir__/prog.cob:9.10-9.44:
@@ -347,7 +347,7 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT
     ```
-    Group
+    Group of 3 subfields
     Size: 80 bits
     (line 13, character 36):
     __rootdir__/prog.cob:14.35-14.43:
@@ -551,7 +551,7 @@ let%expect_test "hover-typedef-filler-vars" =
     ```cobol
     STRUCT
     ```
-    Group
+    Group of 2 subfields
     Size: 32 bits
     (line 9, character 29):
     Hovering nothing worthy |}];;
@@ -667,7 +667,7 @@ let%expect_test "hover-typedef-group-condition" =
     ```cobol
     STRUCT
     ```
-    Group
+    Group of 2 subfields
     Size: 16 bits
     (line 9, character 17):
     Hovering nothing worthy
@@ -888,7 +888,7 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     T2
     ```
-    Group
+    Group of 1 subfield
     Size: 8 bits
     (line 8, character 49):
     __rootdir__/prog.cob:9.48-9.50:
@@ -908,7 +908,7 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     T2
     ```
-    Group
+    Group of 1 subfield
     Size: 8 bits
     (line 10, character 66):
     __rootdir__/prog.cob:11.65-11.67:
@@ -928,7 +928,7 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     FILLER
     ```
-    Group
+    Group of 1 subfield
     Size: 8 bits
     (line 14, character 24):
     __rootdir__/prog.cob:15.21-15.27:
