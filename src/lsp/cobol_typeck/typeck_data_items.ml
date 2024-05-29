@@ -696,9 +696,14 @@ let renaming acc
       let size_ = Cobol_data.Memory.size ~from:from_offset ~to_:end_ in
       let acc, renaming_layout =
         try
-          let size = Cobol_data.Memory.as_int size_ in
-          if size > 0 then
+          let bits = Cobol_data.Memory.as_bits size_ in
+          let size = bits / 8 in
+          if size > 0 && bits mod 8 = 0 then
             acc, Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
+          else if size > 0 then
+            error acc @@ Invalid_renaming_size { loc; from_field; thru_field;
+                                                 bits },
+            Renamed_elementary { usage = Display (PIC.alphanumeric ~size) }
           else
             error acc @@ Invalid_renaming_range { loc; from_field; thru_field },
             dummy_renamed_elementary

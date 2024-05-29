@@ -58,7 +58,7 @@ val size_of_index: size
 val size_of_pointer: size
 
 (** Raises {!NOT_SCALAR} in case of failure. *)
-val as_int: size -> int
+val as_bits: size -> int
 
 val add: size -> size -> size
 val diff: size -> size -> size
