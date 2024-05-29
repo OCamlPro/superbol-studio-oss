@@ -107,3 +107,22 @@ let%expect_test "renames-missing-target" =
       11
     >> Error: Item 'B3 IN B' not found
   |}];;
+
+let%expect_test "renames-errors-invalid-sizes" =
+  dotest @@ prog "renames-errors-invalid-sizes"
+    ~working_storage:{|
+       01 FILLER.
+         02 A PIC X.
+         02 B PIC 1 USAGE BIT.
+         66 C RENAMES A THRU B. *> should error
+    |};
+  [%expect {|
+    prog.cob:7.9-7.31:
+       4          01 FILLER.
+       5            02 A PIC X.
+       6            02 B PIC 1 USAGE BIT.
+       7 >          66 C RENAMES A THRU B. *> should error
+    ----            ^^^^^^^^^^^^^^^^^^^^^^
+       8          PROCEDURE DIVISION.
+       9
+    >> Error: Invalid range of 9 bits between RENAMES operands |}];;

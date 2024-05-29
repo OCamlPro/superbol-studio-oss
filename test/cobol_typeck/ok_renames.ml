@@ -147,7 +147,7 @@ let%expect_test "renames-with-redefines" =
         elementary
         usage: {
           display
-          category: ALPHANUMERIC(24)
+          category: ALPHANUMERIC(3)
         }
       }
     }
@@ -336,7 +336,7 @@ let%expect_test "renames-qualif" =
         elementary
         usage: {
           display
-          category: ALPHANUMERIC(56)
+          category: ALPHANUMERIC(7)
         }
       }
     }
@@ -483,7 +483,7 @@ let%expect_test "renames-qualif" =
         elementary
         usage: {
           display
-          category: ALPHANUMERIC(16)
+          category: ALPHANUMERIC(2)
         }
       }
     }

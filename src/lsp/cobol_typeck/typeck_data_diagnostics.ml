@@ -95,6 +95,13 @@ type error =
         from_field: Cobol_data.Types.field_definition with_loc;
         thru_field: Cobol_data.Types.field_definition with_loc;
       }
+  | Invalid_renaming_size of
+      {
+        loc: srcloc;
+        bits: int;
+        from_field: Cobol_data.Types.field_definition with_loc;
+        thru_field: Cobol_data.Types.field_definition with_loc;
+      }
   | Invalid_renaming_of_variable_length_range of
       {
         loc: srcloc;
@@ -169,6 +176,7 @@ let error_loc = function
   | Invalid_level_number { level = { loc; _ }; _ }
   | Invalid_renaming_of_variable_length_range { loc; _ }
   | Invalid_renaming_range { loc; _ }
+  | Invalid_renaming_size { loc; _ }
   | Item_not_allowed_in_section { level = { loc; _ }; _ }
   | Item_not_found { qualname = { loc; _ } }
   | Misplaced { loc; _ }
@@ -256,6 +264,9 @@ let pp_error ppf = function
                         should@ precede@ second@ field@ %a"
         (Fmt.option Cobol_ptree.pp_qualname') ~&from_field.field_qualname
         (Fmt.option Cobol_ptree.pp_qualname') ~&thru_field.field_qualname
+  | Invalid_renaming_size { bits; _ } ->
+      Pretty.print ppf "Invalid@ range@ of@ %u@ bits@ between@ RENAMES@ \
+                        operands" bits
   | Invalid_renaming_of_variable_length_range { depending_vars = vars; _ } ->
       Pretty.print ppf "Renaming@ of@ variable-length@ range@ (length@ depends@ \
                         on:@ %a)"
