@@ -951,6 +951,8 @@ let%expect_test "hover-typedef-table-and-index" =
     USAGE DISPLAY
     ALPHANUMERIC(1) |}];;
 
+(* TODO This is not yet supported, we should maybe store
+   CM qualname in the Cobol_unit.Qualmap, or elsewhere *)
 let%expect_test "hover-typedef-communication-section" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|

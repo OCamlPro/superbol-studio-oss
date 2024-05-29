@@ -11,12 +11,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Data_types
+open Cobol_data.Types
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 
-let pp_size = Fmt.(any "Size: " ++ Data_memory.pp_size ++ any " bits")
+let pp_size = Fmt.(any "Size: " ++ Cobol_data.Memory.pp_size ++ any " bits")
 
 let pp_int' = Cobol_ptree.pp_with_loc Fmt.int
 
@@ -26,12 +26,12 @@ let pp_cobol_block: _ Fmt.t -> _ Fmt.t = fun pp ->
 (* usage *)
 
 let pp_usage: usage Pretty.printer =
-  let pp_usage_with_picture ppf name (picture: Data_picture.t) =
+  let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =
     Fmt.(
       any "USAGE "
         ++ any name
         ++ any "\n\n"
-        ++ Data_picture.pp_category)
+        ++ Cobol_data.Picture.pp_category)
     ppf picture.category
   and pp_usage_with_sign ppf name signed =
     pp_cobol_block Fmt.(any "USAGE " ++ any name ++ (if signed then any " SIGNED" else any " UNSIGNED"))
@@ -125,15 +125,16 @@ and pp_item_redefinitions: item_redefinitions Pretty.printer = fun ppf ->
 (* fields *)
 
 and pp_field_layout: field_layout Fmt.t = fun ppf x ->
-  (match x with
+  match x with
   | Elementary_field { usage; init_value} ->
       begin Fmt.(
         const pp_usage usage
     ++ any "\n\n"
     ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
-      end
-  | Struct_field _ -> Fmt.any "Group")
-  ppf x
+      end ppf x
+  | Struct_field { subfields } ->
+      let n = List.length (NEL.to_list subfields) in
+      Fmt.pf ppf "Group of %d subfields" n
 
 and pp_field_definition: field_definition Fmt.t = fun ppf x ->
   let pp_qualname_opt_in_block' = pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')  in
@@ -183,8 +184,9 @@ let pp_renamed_item_layout: renamed_item_layout Pretty.printer = fun ppf x ->
   match x with
   | Renamed_elementary { usage } ->
       Fmt.const pp_usage usage ppf x
-  | Renamed_struct _ ->
-      Fmt.any "Group" ppf x
+  | Renamed_struct { subfields } ->
+      let n = List.length (NEL.to_list subfields) in
+      Fmt.pf ppf "Group of %d subfields" n
 
 let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
   Fmt.(

@@ -457,8 +457,7 @@ let handle_semtoks_full,
 let get_hover_text (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
   match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
   | data_def ->
-      Some (Pretty.to_string "%a" Cobol_data.Hover.pp_data_definition data_def)
-  | exception Not_found
+      Some (Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def)
   | exception Cobol_unit.Qualmap.Ambiguous _ ->
       None
 
@@ -467,9 +466,11 @@ let get_hover_text_and_loc cu_name element_at_pos group =
     let { payload = cu; _ } = CUs.find_by_name cu_name group in
     match element_at_pos with
     | Data_item { full_qn = Some qn; def_loc } ->
-        get_hover_text qn cu, Some def_loc
+        (try get_hover_text qn cu with Not_found -> None),
+        Some def_loc
     | Data_full_name qn | Data_name qn ->
-         get_hover_text qn cu, Some (Lsp_lookup.baseloc_of_qualname qn)
+         (try get_hover_text qn cu with Not_found -> None),
+         Some (Lsp_lookup.baseloc_of_qualname qn)
     | Data_item { full_qn = None; _ }
     | Proc_name _ ->
         None,None
@@ -537,7 +538,7 @@ let handle_hover registry (params: HoverParams.t) =
           None
       | None ->
           let hover_def, loc = lookup_hover_definition_in_doc params checked_doc in
-          Option.bind hover_def (hover_markdown ?loc)
+          Option.fold ~none:"" ~some:Fun.id hover_def |> hover_markdown ?loc
     end
 
 (** {3 Completion} *)
