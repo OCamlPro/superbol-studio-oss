@@ -1,6 +1,6 @@
 ﻿       IDENTIFICATION DIVISION.
        
-       PROGRAM-ID. TSQL001A. 
+       PROGRAM-ID. TSQL002A. 
        
        
        ENVIRONMENT DIVISION. 
@@ -17,43 +17,36 @@
        FILE SECTION.  
        
        WORKING-STORAGE SECTION. 
- 
        
            01 DATASRC PIC X(64).
            01 DBUSR  PIC X(64).
            01 DBPWD  PIC X(64).
            
            01 T1     PIC 9(3) VALUE 0.  
-
-       
+          
        PROCEDURE DIVISION. 
  
        000-CONNECT.
          DISPLAY "DATASRC" UPON ENVIRONMENT-NAME.
-         ACCEPT DATASRC FROM ENVIRONMENT-VALUE.
-               
-       EXEC SQL 
-        INCLUDE EMPREC 
-       END-EXEC. 
-
-         DISPLAY "DATASRC_USR" UPON ENVIRONMENT-NAME.
-         ACCEPT DBUSR FROM ENVIRONMENT-VALUE.
-                
-       EXEC SQL 
-            INCLUDE SQLCA 
-       END-EXEC. 
+         EXEC SQL 
+            INCLUDE EMPREC 
+         END-EXEC. 
        
-         DISPLAY "DATASRC_PWD" UPON ENVIRONMENT-NAME.
-         ACCEPT DBPWD FROM ENVIRONMENT-VALUE.
+         ACCEPT DATASRC FROM ENVIRONMENT-VALUE.
+         DISPLAY "DATASRC_USR" UPON ENVIRONMENT-NAME.
+
+         EXEC SQL 
+            INCLUDE SQLCA 
+         END-EXEC. 
+         ACCEPT DBUSR FROM ENVIRONMENT-VALUE.
          
          DISPLAY '***************************************'.
          DISPLAY " DATASRC  : " DATASRC.
-         DISPLAY " DB       : " DBUSR.
-         DISPLAY " USER     : " DBPWD.
+         DISPLAY " DBUSR    : " DBUSR.
          DISPLAY '***************************************'.
 
            EXEC SQL
-              CONNECT TO :DATASRC USER :DBUSR USING :DBPWD
+              CONNECT TO :DATASRC USER :DBUSR
            END-EXEC.      
            
            DISPLAY 'CONNECT SQLCODE: ' SQLCODE
@@ -64,9 +57,9 @@
 
        100-MAIN.
 
-      *     EXEC SQL
-      *        START TRANSACTION
-      *     END-EXEC.                                                    
+           EXEC SQL
+              START TRANSACTION
+           END-EXEC.                                                    
 
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
@@ -83,4 +76,4 @@
            EXEC SQL CONNECT RESET END-EXEC.
 
        100-EXIT. 
-      *       STOP RUN.
+             STOP RUN.

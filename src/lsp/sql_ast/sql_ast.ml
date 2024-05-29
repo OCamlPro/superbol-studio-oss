@@ -207,14 +207,15 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
 
   becomes "WORKING-STORAGE SECTION.EXEC SQL INCLUDE EMPREC END-EXEC"
      *)
-let rec pp fmt x = 
+(* let rec pp fmt x = 
   match (x) with
   | BeginDeclare -> Format.fprintf fmt "\n EXEC SQL BEGIN DECLARE SECTION END-EXEC. \n"
   | EndDeclare -> Format.fprintf fmt "\n EXEC SQL END DECLARE SECTION END-EXEC. \n"
   | Include i -> Format.fprintf fmt "\n EXEC SQL INCLUDE %s END-EXEC. \n" i.payload
   | _ -> Format.fprintf fmt "EXEC SQL %a END-EXEC" pp_esql x
 
-
+ *)
+ let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC" pp_esql x
 
   and pp_esql fmt x = 
   match x with
@@ -288,7 +289,11 @@ and pp_one_value fmt x =
   match x with
   | ValueDefault -> Format.fprintf fmt "DEFAULT"
   | ValueNull -> Format.fprintf fmt "NULL"
-  | ValueList l -> Format.fprintf fmt "(%a)" pp_list_lit l
+  | ValueList l -> 
+    match l with
+    | [x] -> Format.fprintf fmt "%a" pp_lit x
+    | [] -> Format.fprintf fmt ""
+    | _ -> Format.fprintf fmt "(%a)" pp_list_lit l
 
 and pp_where_arg fmt = function
 | Some x -> (
@@ -477,8 +482,8 @@ and pp_group_by fmt x = Format.fprintf fmt "GROUP BY %a ASC" pp_list_lit x
 
 and pp_orderBy fmt x = 
   let pp_aux fmt =function
-  | Asc v -> Format.fprintf fmt "ORDER BY %a ASC" pp_lit v 
-  | Desc v -> Format.fprintf fmt "ORDER BY %a DESC" pp_lit v
+  | Asc v -> Format.fprintf fmt "%a ASC" pp_lit v 
+  | Desc v -> Format.fprintf fmt "%a DESC" pp_lit v
   in 
   list_comma fmt (x, pp_aux)
 

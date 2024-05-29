@@ -104,3 +104,33 @@ Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob9.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL001A.cbl':
  Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL002A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL003A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL003B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL003C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL004A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL004B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL005A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL005B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL005C.cbl':
+ Parse: OK. Reparse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL006A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL006B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL006C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL007A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL008A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL009A.cbl':
+ Parse: OK. Reparse: Different.
