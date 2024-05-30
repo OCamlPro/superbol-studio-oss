@@ -30,10 +30,24 @@
            
            01 CURREC PIC 9(4).  
 
+
        
        PROCEDURE DIVISION. 
  
        000-CONNECT.
+        EXEC SQL AT CONN1
+            DECLARE CRSR01 CURSOR FOR
+                SELECT FLD1 FROM TAB1 ORDER BY FLD1
+       END-EXEC. 
+
+       EXEC SQL AT CONN2
+            DECLARE CRSR02 CURSOR FOR
+                SELECT FLD2 FROM TAB2 ORDER BY FLD2
+       END-EXEC. 
+       
+       EXEC SQL 
+            INCLUDE SQLCA 
+       END-EXEC. 
          DISPLAY "DATASRC1" UPON ENVIRONMENT-NAME.
          ACCEPT DATASRC-1 FROM ENVIRONMENT-VALUE.
          DISPLAY "DATASRC_USR1" UPON ENVIRONMENT-NAME.
@@ -50,30 +64,15 @@
          DISPLAY " DATASRC2  : " DATASRC-2.
          DISPLAY " USER2     : " DBUSR-2.         
          DISPLAY '***************************************'.
-           
-           EXEC SQL AT CONN1
-                DECLARE CRSR01 CURSOR FOR
-                    SELECT FLD1 FROM TAB1 ORDER BY FLD1
-           END-EXEC. 
-           
-           DISPLAY 'CONNECT SQLCODE(1): ' SQLCODE
 
-           EXEC SQL AT CONN2
-                DECLARE CRSR02 CURSOR FOR
-                    SELECT FLD2 FROM TAB2 ORDER BY FLD2
-           END-EXEC. 
-           
-           DISPLAY 'CONNECT SQLCODE(1): ' SQLCODE
-           
-           EXEC SQL 
-                INCLUDE SQLCA 
-           END-EXEC. 
-           
-           DISPLAY 'CONNECT SQLCODE(1): ' SQLCODE
 
            EXEC SQL
-              CONNECT TO :DATASRC-1 AS CONN1 USER :DBUSR-1
-           END-EXEC.    
+             CONNECT :DBUSR-1
+                     IDENTIFIED BY :DBPWD-1
+                     AT            :DBID-1
+                     USING         :DATASRC-1
+           END-EXEC.
+             
            
            DISPLAY 'CONNECT SQLCODE(1): ' SQLCODE
            IF SQLCODE <> 0 THEN
@@ -215,6 +214,7 @@
            MOVE 1 TO CURREC.
            MOVE 0 TO TOT.
 
+       
            EXEC SQL
                FETCH CRSR01 INTO :T1
            END-EXEC
@@ -228,7 +228,7 @@
                 ADD 1 TO CURREC
                 ADD T1 TO TOT
            END-IF
-
+           
            DISPLAY 'TOT CRSR01 :' TOT.
 
        100-CURSOR2-TEST.            
@@ -242,7 +242,7 @@
            MOVE 1 TO CURREC.
            MOVE 0 TO TOT.
 
-
+       
            EXEC SQL
                FETCH CRSR02 INTO :T2
            END-EXEC
@@ -256,7 +256,7 @@
                 ADD 1 TO CURREC
                 ADD T2 TO TOT
            END-IF
-
+           
            DISPLAY 'TOT CRSR02 :' TOT.
 
 

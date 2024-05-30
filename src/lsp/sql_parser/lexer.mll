@@ -23,6 +23,7 @@
    | "ASC" -> ASC
    | "AT" -> AT
    | "BEGIN" -> BEGIN
+   | "BETWEEN" -> BETWEEN
    | "BY" -> BY
    | "CLOSE" -> CLOSE
    | "COMMIT" -> COMMIT

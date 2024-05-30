@@ -52,9 +52,17 @@
 
        100-MAIN.
 
-           EXEC SQL
-              START TRANSACTION
-           END-EXEC.                                                    
+
+           EXEC SQL AT :DBS
+                EXECUTE ST2 
+                    INTO :TOT-KEY01, :TOT-COL1, :TOT-COL2
+                    USING :KEY01, :COL1
+           END-EXEC.
+
+           EXEC SQL AT :DBS
+               PREPARE ST1 FROM :S-SQLCOMMAND 
+           END-EXEC.
+
 
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE

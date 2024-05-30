@@ -104,33 +104,53 @@ Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob9.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL001A.cbl':
  Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL002A.cbl':
- Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL001B.cbl':
+ Parse: OK. Reparse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL003A.cbl':
  Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL003B.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL003C.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL004A.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL004B.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL005A.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL005B.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL005C.cbl':
- Parse: OK. Reparse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL006A.cbl':
  Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL006B.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL006C.cbl':
- Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL007A.cbl':
  Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL008A.cbl':
- Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL009A.cbl':
- Parse: OK. Reparse: Different.
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL015A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL017A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL017C.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL018A.cbl':
+ Parse: OK. Reparse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/TSQL021A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test1.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test10.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test11.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test12.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test13.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test14.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test15.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test2.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test3.cbl':
+ Parse: OK. Reparse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test4.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test5.cbl':
+ Parse: OK. Reparse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test6.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test7.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test8.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test9.cbl':
+ Parse: OK. Reparse: Failure.

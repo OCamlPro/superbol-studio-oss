@@ -29,14 +29,6 @@
            01 TOT    PIC 9(4) VALUE 0.  
            
            01 CURREC PIC 9(4).  
-       PROCEDURE DIVISION. 
- 
-       000-CONNECT.
-         DISPLAY "DATASRC1" UPON ENVIRONMENT-NAME.
-         ACCEPT DATASRC-1 FROM ENVIRONMENT-VALUE.
-         DISPLAY "DATASRC_USR1" UPON ENVIRONMENT-NAME.
-         ACCEPT DBUSR-1 FROM ENVIRONMENT-VALUE.
-
 
        EXEC SQL AT CONN1
             DECLARE CRSR01 CURSOR FOR
@@ -47,6 +39,14 @@
             INCLUDE SQLCA 
        END-EXEC. 
        
+       PROCEDURE DIVISION. 
+ 
+       000-CONNECT.
+         DISPLAY "DATASRC1" UPON ENVIRONMENT-NAME.
+         ACCEPT DATASRC-1 FROM ENVIRONMENT-VALUE.
+         DISPLAY "DATASRC_USR1" UPON ENVIRONMENT-NAME.
+         ACCEPT DBUSR-1 FROM ENVIRONMENT-VALUE.
+
          DISPLAY '***************************************'.
          DISPLAY " DATASRC1  : " DATASRC-1.
          DISPLAY " USER1     : " DBUSR-1.
@@ -114,6 +114,7 @@
            MOVE 1 TO CURREC.
            MOVE 0 TO TOT.
 
+           PERFORM UNTIL SQLCODE < 0 OR SQLCODE = 100
 
       *  fetch from cursor (bad syntax, should trigger an error)
            EXEC SQL AT CONN1
@@ -129,6 +130,7 @@
                 ADD 1 TO CURREC
                 ADD T1 TO TOT
            END-IF
+           END-PERFORM.  
 
            DISPLAY 'TOT CRSR01 :' TOT.
 

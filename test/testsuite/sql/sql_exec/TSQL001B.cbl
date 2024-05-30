@@ -1,4 +1,4 @@
-﻿       IDENTIFICATION DIVISION.
+       IDENTIFICATION DIVISION.
        
        PROGRAM-ID. TSQL001A. 
        
@@ -18,11 +18,19 @@
        
        WORKING-STORAGE SECTION. 
        
+       EXEC SQL 
+        INCLUDE EMPREC 
+       END-EXEC. 
+       
            01 DATASRC PIC X(64).
            01 DBUSR  PIC X(64).
            01 DBPWD  PIC X(64).
            
            01 T1     PIC 9(3) VALUE 0.  
+       
+       EXEC SQL 
+            INCLUDE SQLCA 
+       END-EXEC. 
        
        PROCEDURE DIVISION. 
  
@@ -52,9 +60,9 @@
 
        100-MAIN.
 
-           EXEC SQL
-              START TRANSACTION
-           END-EXEC.                                                    
+      *     EXEC SQL
+      *        START TRANSACTION
+      *     END-EXEC.                                                    
 
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE

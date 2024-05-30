@@ -1,6 +1,6 @@
 ﻿       IDENTIFICATION DIVISION.
        
-       PROGRAM-ID. TSQL002A. 
+       PROGRAM-ID. TSQL001A. 
        
        
        ENVIRONMENT DIVISION. 
@@ -23,30 +23,25 @@
            01 DBPWD  PIC X(64).
            
            01 T1     PIC 9(3) VALUE 0.  
-          
+       
        PROCEDURE DIVISION. 
  
        000-CONNECT.
          DISPLAY "DATASRC" UPON ENVIRONMENT-NAME.
-         EXEC SQL 
-            INCLUDE EMPREC 
-         END-EXEC. 
-       
          ACCEPT DATASRC FROM ENVIRONMENT-VALUE.
          DISPLAY "DATASRC_USR" UPON ENVIRONMENT-NAME.
-
-         EXEC SQL 
-            INCLUDE SQLCA 
-         END-EXEC. 
          ACCEPT DBUSR FROM ENVIRONMENT-VALUE.
+         DISPLAY "DATASRC_PWD" UPON ENVIRONMENT-NAME.
+         ACCEPT DBPWD FROM ENVIRONMENT-VALUE.
          
          DISPLAY '***************************************'.
          DISPLAY " DATASRC  : " DATASRC.
-         DISPLAY " DBUSR    : " DBUSR.
+         DISPLAY " DB       : " DBUSR.
+         DISPLAY " USER     : " DBPWD.
          DISPLAY '***************************************'.
 
            EXEC SQL
-              CONNECT TO :DATASRC USER :DBUSR
+              CONNECT TO :DATASRC USER :DBUSR USING :DBPWD
            END-EXEC.      
            
            DISPLAY 'CONNECT SQLCODE: ' SQLCODE
@@ -65,6 +60,17 @@
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
            END-EXEC. 
 
+           EXEC SQL
+              SELECT BFLD, VBFLD, CFLD, VCFLD, NUM1 
+                INTO :BFLD, :VBFLD, :CFLD, :VCFLD, :NUM1 FROM BINTEST
+           END-EXEC.
+
+           EXEC SQL AT :DBS
+                SELECT SUM(KEY01), SUM(COL1), SUM(COL2)
+                    INTO :TOT-KEY01, :TOT-COL1, :TOT-COL2
+                        FROM TAB_A
+           END-EXEC.
+                      
            DISPLAY 'SELECT SQLCODE : ' SQLCODE.
            
            IF SQLCODE <> 0 THEN
@@ -76,4 +82,4 @@
            EXEC SQL CONNECT RESET END-EXEC.
 
        100-EXIT. 
-             STOP RUN.
+      *       STOP RUN.

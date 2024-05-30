@@ -171,6 +171,10 @@ and search_condition =
   | WhereConditionNot of search_condition
   | WhereConditionCompare of sql_compare
   | WhereConditionIn of sql_condition_in
+  | WhereConditionBetween of between_condition
+
+and between_condition =
+  | Between of literal * literal * literal
   
 and sql_condition_in =
   | InVarLst of literal * (complex_literal list)
@@ -334,14 +338,16 @@ and pp_sql_condition fmt = function
     | Diff -> "<>"
   in
   Format.fprintf fmt "%a" pp_compare c
-  | WhereConditionIn s -> Format.fprintf fmt "%a" pp_condition_in s
+| WhereConditionIn s -> Format.fprintf fmt "%a" pp_condition_in s
+| WhereConditionBetween s -> Format.fprintf fmt "%a" pp_condition_between s
 
 and pp_condition_in fmt x =
 let pp_aux fmt lst = list_comma fmt (lst, pp_complex_literal) in
 match x with
 | InVarLst (l, vlist) -> Format.fprintf fmt "%a IN %a" pp_lit l pp_aux vlist 
 
-
+and pp_condition_between fmt = function
+| Between (l, l1, l2) -> Format.fprintf fmt "%a BETWEEN %a AND %a" pp_lit l pp_lit l1 pp_lit l2 
 
 and pp_complex_literal fmt = function
 | SqlCompLit v -> Format.fprintf fmt "%a" pp_lit v

@@ -38,7 +38,7 @@ module Overlay_manager = Sql_overlay_manager
 %token SELECT INTO STATEMENT CURSOR FOR PREPARE FROM EXECUTE IMMEDIATE WITH HOLD
 %token INSERT OPEN CLOSE FETCH DELETE UPDATE SET IGNORE ALL OF WHERE CURRENT TABLE
 %token WHEN ORDER VALUES NULL DEFAULT GROUP
-%token JOIN INNER NATURAL LEFT RIGHT OUTER ON 
+%token JOIN INNER NATURAL LEFT RIGHT OUTER ON BETWEEN
 (*Sort by*)
 %token DESC ASC
 %token <string> TOKEN
@@ -160,6 +160,7 @@ let into_list_cob_var :=
 
 let using_list_cob_var :=
 | USING; LPAR;  using= separated_nonempty_list(COMMA, cobol_var); RPAR; {using}
+| USING; using= separated_nonempty_list(COMMA, cobol_var); {using}
 
 let execute_immediate_arg :=
 | x = STRING; {[Sql_instr x]}
@@ -300,6 +301,10 @@ let search_condition_aux2 :=
 let predicate :=
 | c = comparison_predicate; {WhereConditionCompare c}
 | i = in_predicate; {WhereConditionIn i} 
+| b = between_predicate; { WhereConditionBetween b}
+
+let between_predicate :=
+| l=literal; BETWEEN; l1=literal; AND; l2=literal; {Between (l, l1, l2)}
 
 let in_predicate:= (*HGNC_GENE_SYMBOL IN ('MDM2', 'TP53', 'CDKN1A','CCNE1')*)
 | l = literal; IN; LPAR; lst = separated_nonempty_list(COMMA, sql_complex_literal); RPAR; {InVarLst(l, lst)}

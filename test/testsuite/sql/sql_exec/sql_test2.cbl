@@ -39,10 +39,19 @@
          DISPLAY " DB       : " DBUSR.
          DISPLAY " USER     : " DBPWD.
          DISPLAY '***************************************'.
+       
+           EXEC SQL 
+              INCLUDE SQLCA 
+           END-EXEC. 
 
            EXEC SQL
               CONNECT TO :DATASRC USER :DBUSR USING :DBPWD
-           END-EXEC.      
+           END-EXEC.   
+
+           EXEC SQL AT CONN1
+              DECLARE CRSR01 CURSOR FOR
+                  SELECT FLD1 FROM TAB1 ORDER BY FLD1
+           END-EXEC.    
            
            DISPLAY 'CONNECT SQLCODE: ' SQLCODE
 
@@ -58,9 +67,52 @@
 
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
-           END-EXEC. 
+           END-EXEC.  
 
+           EXEC SQL AT CONN1 
+                INSERT INTO TAB1 (FLD1) VALUES (1)
+           END-EXEC.
+           DISPLAY 'CONNECT INSERT(1-1): ' SQLCODE
+           DISPLAY 'CONNECT INSERT(1-1): ' SQLERRMC(1:SQLERRML)
+
+           EXEC SQL AT CONN1 
+                INSERT INTO TAB1 (FLD1) VALUES (3)
+           END-EXEC.
+           DISPLAY 'CONNECT INSERT(1-2): ' SQLCODE
+           DISPLAY 'CONNECT INSERT(1-2): ' SQLERRMC(1:SQLERRML)
+
+           EXEC SQL AT CONN1 
+                INSERT INTO TAB1 (FLD1) VALUES (5)
+           END-EXEC.
+           DISPLAY 'CONNECT INSERT(1-3): ' SQLCODE
+           DISPLAY 'CONNECT INSERT(1-3): ' SQLERRMC(1:SQLERRML)
+ 
            DISPLAY 'SELECT SQLCODE : ' SQLCODE.
+         
+           EXEC SQL AT CONN1
+               SELECT SUM(FLD1) INTO :T1 FROM TAB1
+           END-EXEC. 
+           DISPLAY 'CONNECT SUM(1): ' SQLCODE
+
+           EXEC SQL AT CONN1 SAVEPOINT SP1 END-EXEC.
+           DISPLAY 'SQLCODE SAVEPOINT SP1: ' SQLCODE.
+
+           EXEC SQL AT CONN2 SAVEPOINT SP2 END-EXEC.
+           DISPLAY 'SQLCODE SAVEPOINT SP2: ' SQLCODE.
+
+           EXEC SQL 
+               OPEN CRSR01
+           END-EXEC.
+     
+           EXEC SQL
+               FETCH CRSR01 INTO :T1
+           END-EXEC
+
+             
+
+           EXEC SQL CLOSE CRSR01 END-EXEC.     
+
+           EXEC SQL CLOSE CRSR02 END-EXEC.          
            
            IF SQLCODE <> 0 THEN
               GO TO 100-EXIT
@@ -69,6 +121,7 @@
            DISPLAY 'RES: ' T1.           
 
            EXEC SQL CONNECT RESET END-EXEC.
-
+           EXEC SQL DISCONNECT CONN2 END-EXEC.
+           
        100-EXIT. 
       *       STOP RUN.

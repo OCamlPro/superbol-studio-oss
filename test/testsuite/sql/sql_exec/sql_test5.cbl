@@ -54,11 +54,43 @@
 
            EXEC SQL
               START TRANSACTION
-           END-EXEC.                                                    
+           END-EXEC.   
+
 
            EXEC SQL
-               SELECT COUNT(*) INTO :T1 FROM EMPTABLE
-           END-EXEC. 
+             SELECT 1 INTO :T1
+           END-EXEC.           
+
+           EXEC SQL AT :DBS
+             SELECT
+                TABROWID INTO :TABROWID FROM TAB_A 
+             WHERE
+                HISTID = (SELECT MAX(HISTID) FROM TAB_A WHERE
+                           REFNR         = :T1)
+           END-EXEC.
+
+           EXEC SQL
+              SELECT CONCAT('[', CONCAT (VCFLD, ']'))
+              INTO :OUT1 FROM TAB00
+              WHERE CID = 99
+           END-EXEC.
+
+           EXEC SQL
+              SELECT CONCAT('[', CONCAT(CFLD, ']'))
+              INTO :OUT2 FROM TAB00
+              WHERE CID = 99
+           END-EXEC.
+
+           EXEC SQL
+              INSERT INTO TAB00 (CID, VCFLD, CFLD)
+                VALUES(98, :VCFLD2, :CFLD2)
+           END-EXEC.
+
+           EXEC SQL
+              COMMIT
+           END-EXEC.                 
+           
+
 
            DISPLAY 'SELECT SQLCODE : ' SQLCODE.
            

@@ -21,7 +21,6 @@
            01 DATASRC PIC X(64).
            01 DBUSR  PIC X(64).
 
-      *    01  DYNSTMT1   SQL TYPE IS VARCHAR(100).
            01  DNUM1   PIC S9(4)V99.
            01  DNUM2   PIC S9(4)V99.
            01  DNUM3   PIC S9(4)V99.
@@ -29,7 +28,6 @@
            01  T2      PIC 9(4) VALUE 4.
            01  TOT1    PIC 9(4) VALUE 0.
            01  TOT2    PIC 9(4) VALUE 0.
-         
        PROCEDURE DIVISION. 
  
        000-CONNECT.
@@ -38,10 +36,6 @@
            ACCEPT DATASRC FROM ENVIRONMENT-VALUE.
            DISPLAY "DATASRC_USR" UPON ENVIRONMENT-NAME.
            ACCEPT DBUSR FROM ENVIRONMENT-VALUE.
-
-       EXEC SQL 
-            INCLUDE SQLCA 
-       END-EXEC. 
 
            EXEC SQL
               CONNECT TO :DATASRC USER :DBUSR

@@ -52,13 +52,11 @@
 
        100-MAIN.
 
-           EXEC SQL
-              START TRANSACTION
-           END-EXEC.                                                    
+           EXEC SQL VAR NUM3 IS FLOAT END-EXEC .
+           EXEC SQL VAR VCFLD2 IS VARCHAR(100) END-EXEC.
+           EXEC SQL VAR CFLD2 IS CHAR(100)     END-EXEC.       
 
-           EXEC SQL
-               SELECT COUNT(*) INTO :T1 FROM EMPTABLE
-           END-EXEC. 
+
 
            DISPLAY 'SELECT SQLCODE : ' SQLCODE.
            
