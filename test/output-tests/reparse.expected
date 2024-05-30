@@ -131,13 +131,13 @@ Re-parsing `test/testsuite/sql/sql_exec/sql_test10.cbl':
 Re-parsing `test/testsuite/sql/sql_exec/sql_test11.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test12.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: Different.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test13.cbl':
- Parse: OK. Reparse: OK.
+ Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test14.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test15.cbl':
- Parse: OK. Reparse: OK.
+ Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test2.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test3.cbl':

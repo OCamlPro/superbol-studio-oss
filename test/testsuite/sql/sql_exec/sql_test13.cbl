@@ -24,51 +24,55 @@
            
            01 T1     PIC 9(3) VALUE 0.  
        
-       PROCEDURE DIVISION. 
+              PROCEDURE DIVISION. 
  
        000-CONNECT.
-         DISPLAY "DATASRC" UPON ENVIRONMENT-NAME.
-         ACCEPT DATASRC FROM ENVIRONMENT-VALUE.
-         DISPLAY "DATASRC_USR" UPON ENVIRONMENT-NAME.
-         ACCEPT DBUSR FROM ENVIRONMENT-VALUE.
-         DISPLAY "DATASRC_PWD" UPON ENVIRONMENT-NAME.
-         ACCEPT DBPWD FROM ENVIRONMENT-VALUE.
-         
-         DISPLAY '***************************************'.
-         DISPLAY " DATASRC  : " DATASRC.
-         DISPLAY " DB       : " DBUSR.
-         DISPLAY " USER     : " DBPWD.
-         DISPLAY '***************************************'.
 
            EXEC SQL
-              CONNECT TO :DATASRC USER :DBUSR USING :DBPWD
-           END-EXEC.      
-           
-           DISPLAY 'CONNECT SQLCODE: ' SQLCODE
-
-           IF SQLCODE <> 0 THEN
-              GO TO 100-EXIT
+              SELECT TXID_CURRENT() INTO :S-TXID
+           END-EXEC.
+      *
+           IF INTERNAL-TXID = S-TXID
+              EXIT SECTION
            END-IF.
+      *
+           EXEC SQL
+            BEGIN
+                SELECT ID INTO :EMPID FROM emp 
+                    WHERE empname = :EMPNAME;
+                EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                        RAISE EXCEPTION 
+                            'employee % not found', :EMPNAME;
+                    WHEN TOO_MANY_ROWS THEN
+                        RAISE EXCEPTION 
+                            'employee % not unique', :EMPNAME;
+            END;
+           END-EXEC.
+      *
+      
+           EXEC SQL
+              BEGIN
+           END-EXEC.
+      *
+           EXEC SQL
+              SELECT TXID_CURRENT() INTO :S-TXID
+           END-EXEC.
+      *
+           MOVE S-TXID TO INTERNAL-TXID.
+
+      *-----------------------------------------------------------*
+       DO-COMMIT SECTION.
+           EXEC SQL
+              COMMIT
+           END-EXEC.
+      *-----------------------------------------------------------*
+       DO-ROLLBACK SECTION.
+           EXEC SQL
+              ROLLBACK
+           END-EXEC.
 
        100-MAIN.
 
-           EXEC SQL
-              START TRANSACTION
-           END-EXEC.                                                    
 
-           EXEC SQL
-               SELECT COUNT(*) INTO :T1 FROM EMPTABLE
-           END-EXEC. 
-
-           DISPLAY 'SELECT SQLCODE : ' SQLCODE.
-           
-           IF SQLCODE <> 0 THEN
-              GO TO 100-EXIT
-           END-IF.     
-
-           DISPLAY 'RES: ' T1.           
-
-           EXEC SQL CONNECT RESET END-EXEC.
-
-       100-EXIT. 
-      *       STOP RUN.
+       200-END.

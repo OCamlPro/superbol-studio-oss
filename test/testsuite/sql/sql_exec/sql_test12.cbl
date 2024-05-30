@@ -54,9 +54,6 @@
          DISPLAY 'DATASRC-FULL: ' DATASRC-FULL.
 
        100-MAIN.
-       
-         MOVE 'CONN1' TO DBS
-
       * mode 1 (anonymous)
 
          EXEC SQL

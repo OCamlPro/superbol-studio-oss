@@ -97,15 +97,16 @@ preprare
 big select
 
 #### sql_test10
-big statement with no sense
+big statement with no sense (todo)
 
 #### sql_test11
-big declare
+big declare (todo)
 
 #### sql_test12
 different format for connect
 
 #### sql_test13
+exeption (todo)
 begin end
 
 #### sql_test14

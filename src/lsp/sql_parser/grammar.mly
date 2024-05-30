@@ -41,6 +41,8 @@ module Overlay_manager = Sql_overlay_manager
 %token JOIN INNER NATURAL LEFT RIGHT OUTER ON BETWEEN
 (*Sort by*)
 %token DESC ASC
+(*types*)
+%token VARCHAR DATE INTEGER TIMESTAMP
 %token <string> TOKEN
 %token <string> STRING
 %token <string> DIGITS
@@ -100,7 +102,7 @@ let esql_with_opt_at :=
   {SelectInto(s, i, lst)}
 | START; TRANSACTION; 
   {StartTransaction}
-| DECLARE; table_name= literalVar; TABLE; sql=sql;
+| DECLARE; table_name= literalVar; TABLE; LPAR; sql=separated_nonempty_list(COMMA, table_lst); RPAR;
   {DeclareTable(table_name, sql)}
 | DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql_query; option(forUpdate);
   {DeclareCursor(crs, sql)} (*TODO: COmplete For Update and create a type for it in ast*)
@@ -143,6 +145,19 @@ let value_list :=
 | LPAR; l = separated_nonempty_list(COMMA, literal); RPAR; {ValueList l}
 | NULL; {ValueNull}
 | DEFAULT; {ValueDefault}
+
+let table_lst :=
+| s = sql_var_name; t=sql_type; {(s, t)}
+
+let sql_type:=
+| s = sql_type_aux; NOT; NULL; {NotNull s}
+| s = sql_type_aux; {s}
+
+let sql_type_aux :=
+| DATE; {Date}
+| INTEGER; {Integer}
+| TIMESTAMP; {Timestamp}
+| VARCHAR; LPAR; l=literal; RPAR; {VarChar l}
 
 (*TODO: forUpdate is incomplete, I have to implement this syntaxe:
 FOR {

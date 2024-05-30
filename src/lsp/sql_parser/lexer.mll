@@ -30,6 +30,7 @@
    | "CONNECT" -> CONNECT
    | "CURRENT" -> CURRENT
    | "CURSOR" -> CURSOR
+   | "DATE" -> DATE
    | "DECLARE" -> DECLARE
    | "DEFAULT" -> DEFAULT
    | "DELETE" -> DELETE
@@ -53,6 +54,7 @@
    | "IN" -> IN
    | "INCLUDE" -> INCLUDE
    | "INSERT" -> INSERT
+   | "INTEGER" -> INTEGER
    | "INTO" -> INTO
    | "JOIN" -> JOIN
    | "LEFT" -> LEFT
@@ -81,6 +83,7 @@
    | "SQLERROR" -> SQLERROR
    | "SQLWARNING" -> SQLWARNING
    | "TABLE" -> TABLE
+   | "TIMESTAMP" -> TIMESTAMP
    | "TO" -> TO
    | "TRAN" -> TRANSACTION
    | "TRANSACTION" -> TRANSACTION
@@ -88,6 +91,7 @@
    | "USER" -> USER
    | "USING" -> USING
    | "VALUES" -> VALUES
+   | "VARCHAR" -> VARCHAR
    | "WHEN" -> WHEN
    | "WHERE" -> WHERE
    | "WHENEVER" -> WHENEVER

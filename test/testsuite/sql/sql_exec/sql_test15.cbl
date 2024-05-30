@@ -51,11 +51,26 @@
            END-IF.
 
        100-MAIN.
+                  EXEC SQL
+                       UPDATE TAB00
+                         SET 
+                           FLD01 = FLD01 + 20000,
+                           FLD02 = CONCAT(FLD02, 'XXXX')
+                         WHERE CURRENT OF CRSR_TAB00
+                   END-EXEC
 
-           EXEC SQL
-              START TRANSACTION
-           END-EXEC.                                                    
-
+                   
+           EXEC SQL DECLARE APXT.P_HISTORY_TD TABLE                     00120001
+           ( DATAVAL                        DATE NOT NULL,              00130001
+             DATARIL                        DATE NOT NULL,              00140001
+             PROGVER                        INTEGER NOT NULL,           00150001
+             DATAVERS                       DATE NOT NULL,              00160001
+             DATALOAD                       TIMESTAMP NOT NULL,         00170001
+             USERNAME                       VARCHAR(15) NOT NULL,       00180001
+             CID                            VARCHAR(60) NOT NULL,       00190001
+             FILENAME                       VARCHAR(60) NOT NULL        00200001
+           ) END-EXEC.                                                  00210001
+      *****************
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
            END-EXEC. 

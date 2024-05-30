@@ -76,5 +76,5 @@ let parse text =
   in
 
   let ast = Grammar.MenhirInterpreter.loop (supplier tokens) init_checkpoint in
- (*  Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.pp ast; *)
+(*   Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.pp ast; *)
   ast

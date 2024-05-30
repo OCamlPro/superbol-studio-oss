@@ -63,7 +63,7 @@ and esql_instuction =
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
   | SelectInto of (cobol_var_id) list * sql_select * sql_select_option list (*select and option_select*)
-  | DeclareTable of literal * sql_instruction 
+  | DeclareTable of literal * ((sql_var * sql_type) list)
   | DeclareCursor of sql_var * sql_query
   | Prepare of sql_var * sql_instruction 
   | ExecuteImmediate of sql_instruction
@@ -115,6 +115,12 @@ and connect_syntax =
   | Connect_reset of (literal option)
 
   (*WHENEVER*)
+and sql_type = 
+  | NotNull of sql_type
+  | Date
+  | Integer
+  | Timestamp
+  | VarChar of literal
 and whenever_condition = 
   | Not_found_whenever
   | SqlError_whenever
@@ -252,7 +258,7 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_select_lst sql
     pp_cob_lst into
     pp_select_options_lst sql2
-  | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE %a" pp_lit var pp_sql sql
+  | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE %a" pp_lit var pp_declare sql
   | DeclareCursor (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql
   | Prepare (str, sql) -> Format.fprintf fmt "PREPARE %s FROM %a" str.payload pp_sql sql
   | ExecuteImmediate sql -> Format.fprintf fmt "EXECUTE IMMEDIATE %a" pp_sql sql
@@ -288,6 +294,16 @@ and pp_table fmt x =
 
 and pp_sql_var fmt x = Format.fprintf fmt "%s" x.payload
 and pp_value fmt x = list_comma fmt (x, (pp_one_value))
+
+and pp_declare fmt x = list_comma fmt (x, pp_var_type)
+
+and pp_var_type fmt (l, t) = Format.fprintf fmt "%s\t %a" l.payload pp_sql_type t
+and pp_sql_type fmt = function
+| NotNull v -> Format.fprintf fmt "%a NOT NULL" pp_sql_type v
+| Date -> Format.fprintf fmt "DATE"
+| Integer -> Format.fprintf fmt "INTEGER"
+| Timestamp -> Format.fprintf fmt "TIMESTAMP"
+| VarChar i -> Format.fprintf fmt "VARCHAR(%a)" pp_lit i
 
 and pp_one_value fmt x =
   match x with
