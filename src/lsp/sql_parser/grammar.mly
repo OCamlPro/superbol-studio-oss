@@ -399,6 +399,10 @@ let sql_first_token :=
 | FROM; {Sql_instr "FROM" }
 | WHERE; {Sql_instr"WHERE"}
 | ORDER; BY; {Sql_instr"ORDER BY"}
+| VARCHAR; {Sql_instr"VARCHAR"}
+| DATE; {Sql_instr"DATE"}
+| INTEGER; {Sql_instr"INTEGER"}
+| TIMESTAMP; {Sql_instr"TIMESTAMP"}
 | WHEN; {Sql_instr"WHEN"}
 
 let sql_token_not_first :=

@@ -23,6 +23,6 @@ let%expect_test "exec-block-with-cobol-separators" =
   |};
   [%expect {|
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
-    EXEC_BLOCK[EXEC SQL  SELECT something_1, something_2  FROM some_table WHERE condition > 0   END-EXEC],
+    EXEC_BLOCK[EXEC SQL  SELECT something_1, something_2   FROM some_table  WHERE condition > 0   END-EXEC],
     ., STOP, RUN, ., EOF
 |}];;

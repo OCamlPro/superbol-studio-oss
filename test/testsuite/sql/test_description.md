@@ -26,7 +26,7 @@ I created the test in sql_exec uniquely for testing sql parsing, _these are not 
 
 ### Probleme description: 
  a display statement disappear between parse and reparse
-- Exemple of file where the problem is occuring: sql_exec/TSQL009A.cbl
+- Exemple of file where the problem is occuring: sql_exec/TSQL009A.cbl pr sql_exec/sql_test3.cbl
 
 ### Probleme description: 
  Invalid syntaxe for superbol
@@ -76,6 +76,8 @@ create table
 declare cursor
 fetch data
 
+Problem: like TSQL009A, there is a Cobol Instruction who disappear between parse and reparse???
+
 #### sql_test4
 var smt is type(size)
 
@@ -104,6 +106,8 @@ big declare (todo)
 
 #### sql_test12
 different format for connect
+
+Problem: like TSQL009A, there is a Cobol Instruction who disappear between parse and reparse???
 
 #### sql_test13
 exeption (todo)

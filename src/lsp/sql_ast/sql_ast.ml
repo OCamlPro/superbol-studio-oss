@@ -258,7 +258,7 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_select_lst sql
     pp_cob_lst into
     pp_select_options_lst sql2
-  | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE %a" pp_lit var pp_declare sql
+  | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE (%a)" pp_lit var pp_declare sql
   | DeclareCursor (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql
   | Prepare (str, sql) -> Format.fprintf fmt "PREPARE %s FROM %a" str.payload pp_sql sql
   | ExecuteImmediate sql -> Format.fprintf fmt "EXECUTE IMMEDIATE %a" pp_sql sql
@@ -275,7 +275,7 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
   | Fetch (sql, var) -> Format.fprintf fmt "FETCH %a INTO %a" 
     pp_sql sql
     pp_cob_lst var
-  | Insert (tab, v) -> Format.fprintf fmt "INSERT INTO %a VALUES (%a)" pp_table tab pp_value v
+  | Insert (tab, v) -> Format.fprintf fmt "INSERT INTO %a VALUES %a" pp_table tab pp_value v
   | Delete sql -> Format.fprintf fmt "DELETE %a" pp_sql sql
   | Update (table, equallst, swhere) -> 
     Format.fprintf fmt "UPDATE %s SET %a %a" 
@@ -311,7 +311,7 @@ and pp_one_value fmt x =
   | ValueNull -> Format.fprintf fmt "NULL"
   | ValueList l -> 
     match l with
-    | [x] -> Format.fprintf fmt "%a" pp_lit x
+    | [x] -> Format.fprintf fmt "(%a)" pp_lit x
     | [] -> Format.fprintf fmt ""
     | _ -> Format.fprintf fmt "(%a)" pp_list_lit l
 
@@ -326,7 +326,7 @@ and pp_sql_update_aux fmt (var, op) =
   Format.fprintf fmt "%s = %a " var.payload pp_sql_op op
 
 and pp_sql_update fmt x = 
-  List.iter (pp_sql_update_aux fmt) x  
+  list_comma fmt (x, pp_sql_update_aux)   
 
 and pp_sql_op fmt = function
 | SqlOpBinop (op, sql1, sql2) -> Format.fprintf fmt "%a %s %a" pp_complex_literal sql1 (pp_binop op) pp_sql_op sql2
@@ -339,11 +339,11 @@ and pp_sql_some_condition fmt = function
 and pp_sql_condition fmt = function 
 | WhereConditionAnd (s1, s2) -> Format.fprintf fmt "%a AND %a" pp_sql_condition s1 pp_sql_condition s2
 | WhereConditionOr (s1, s2) -> Format.fprintf fmt "%a OR %a" pp_sql_condition s1 pp_sql_condition s2
-| WhereConditionNot s -> Format.fprintf fmt "Not %a" pp_sql_condition s
+| WhereConditionNot s -> Format.fprintf fmt "NOT %a" pp_sql_condition s
 | WhereConditionCompare c -> 
   let rec pp_compare fmt = function 
     | CompareLit (l1, c, l2) -> Format.fprintf fmt "%a %s %a" pp_complex_literal l1 (comp_op_to_string c) pp_complex_literal l2
-    | CompareQuery (l1, c, s) -> Format.fprintf fmt "%a %s %a" pp_complex_literal l1 (comp_op_to_string c) pp_sql s
+    | CompareQuery (l1, c, s) -> Format.fprintf fmt "%a %s (%a)" pp_complex_literal l1 (comp_op_to_string c) pp_sql s
 
     and comp_op_to_string = function 
     | Less -> "<" 
@@ -360,7 +360,7 @@ and pp_sql_condition fmt = function
 and pp_condition_in fmt x =
 let pp_aux fmt lst = list_comma fmt (lst, pp_complex_literal) in
 match x with
-| InVarLst (l, vlist) -> Format.fprintf fmt "%a IN %a" pp_lit l pp_aux vlist 
+| InVarLst (l, vlist) -> Format.fprintf fmt "%a IN (%a)" pp_lit l pp_aux vlist 
 
 and pp_condition_between fmt = function
 | Between (l, l1, l2) -> Format.fprintf fmt "%a BETWEEN %a AND %a" pp_lit l pp_lit l1 pp_lit l2 
@@ -467,7 +467,7 @@ and pp_select_options_lst fmt lst =
   | OrderBy ob -> Format.fprintf fmt "ORDER BY %a" pp_orderBy ob
   | GroupBy gb-> Format.fprintf fmt "GROUP BY %a" pp_group_by gb
   in
-  List.iter (Format.fprintf fmt "%a" pp_one_option) lst
+  List.iter (Format.fprintf fmt " %a" pp_one_option) lst
 
 and pp_from fmt f= list_comma fmt (f, pp_table_ref)
 
@@ -500,7 +500,7 @@ and pp_table_opt fmt = function
   Format.fprintf fmt "USING %a" pp_aux lstvar
 
 
-and pp_group_by fmt x = Format.fprintf fmt "GROUP BY %a ASC" pp_list_lit x
+and pp_group_by fmt x = Format.fprintf fmt "%a" pp_list_lit x
 
 and pp_orderBy fmt x = 
   let pp_aux fmt =function

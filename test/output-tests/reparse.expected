@@ -121,10 +121,26 @@ Re-parsing `test/testsuite/sql/sql_exec/TSQL017A.cbl':
 Re-parsing `test/testsuite/sql/sql_exec/TSQL017C.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL018A.cbl':
- Parse: OK. Reparse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/TSQL021A.cbl':
  Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test1.cbl':
+Re-parsing `test/testsuite/sql/sql_exec/sql_test01.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test02.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test03.cbl':
+ Parse: OK. Reparse: Different.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test04.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test05.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test06.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test07.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test08.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test09.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test10.cbl':
  Parse: Failure.
@@ -138,19 +154,3 @@ Re-parsing `test/testsuite/sql/sql_exec/sql_test14.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test15.cbl':
  Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test2.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test3.cbl':
- Parse: OK. Reparse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test4.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test5.cbl':
- Parse: OK. Reparse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test6.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test7.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test8.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/sql_test9.cbl':
- Parse: OK. Reparse: Failure.
