@@ -454,60 +454,48 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
-let get_hover_text (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
-  match Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named with
-  | Data_field { def; _} as data_def ->
-      Some (Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def),
-      Some (~@def)
-  | Data_renaming { def; _} as data_def ->
-      Some (Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def),
-      Some (~@def)
-  | Data_condition { def; _} as data_def ->
-      Some (Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def),
-      Some (~@def)
-  | Table_index { table; _ } as data_def ->
-      Some (Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def),
-      Some (~@table)
-  | exception Cobol_unit.Qualmap.Ambiguous _ ->
-      None,None
-
-
 let always_show_hover_text_in_data_div = true
 
-let filter_data_div text def_loc pos filename =
-  let is_not_in_hovered_def = not @@ Lsp_position.is_in_srcloc ~filename pos def_loc in
-  if is_not_in_hovered_def || always_show_hover_text_in_data_div
-    then text
-    else raise Not_found
+let get_hover_text_and_defloc (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
+  let data_def =
+    try Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named
+    with _ -> raise Not_found
+  in
+  let hover_text = Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def in
+  let loc =
+    match data_def with
+      | Data_field { def; _} -> ~@def
+      | Data_renaming { def; _} -> ~@def
+      | Data_condition { def; _} -> ~@def
+      | Table_index { table; _ } -> ~@table
+  in hover_text, loc
 
-
-let get_hover_text_and_loc cu_name element_at_pos position group filename =
+let get_hover_info cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in
-  match element_at_pos with
-    | Data_item { full_qn = Some qn; def_loc } ->
-        let text,_ = get_hover_text qn cu in
-        filter_data_div text def_loc position filename, Some def_loc
-    | Data_full_name qn ->
-        let text,loc = get_hover_text qn cu in
-          Option.fold ~none:text ~some:(fun loc -> filter_data_div text loc position filename) loc,
-          Some (Lsp_lookup.baseloc_of_qualname qn)
-    | Data_name qn ->
-        let text,_ = get_hover_text qn cu in
-         text, Some (Lsp_lookup.baseloc_of_qualname qn)
-    | Data_item _ | Proc_name _ ->
-        raise Not_found
+    match element_at_pos with
+      | Data_item { full_qn = Some qn; def_loc } ->
+          let text, _ = get_hover_text_and_defloc qn cu in
+          text, def_loc, def_loc
+      | Data_full_name qn | Data_name qn ->
+          let text, def_loc = get_hover_text_and_defloc qn cu in
+          text, def_loc, Lsp_lookup.baseloc_of_qualname qn
+      | Data_item _ | Proc_name _ ->
+          raise Not_found
 
 let lookup_hover_definition_in_doc
     HoverParams.{ textDocument = doc; position; _ }
     Cobol_typeck.Outputs.{ group; _ } =
       let filename = Lsp.Uri.to_path doc.uri in
       match Lsp_lookup.element_at_position ~uri:doc.uri position group with
-  | { element_at_position = None; _ }
-  | { enclosing_compilation_unit_name = None; _ } ->
-      raise Not_found
-  | { element_at_position = Some ele_at_pos;
-      enclosing_compilation_unit_name = Some cu_name } ->
-        get_hover_text_and_loc cu_name ele_at_pos position group filename
+        | { element_at_position = None; _ }
+        | { enclosing_compilation_unit_name = None; _ } ->
+            raise Not_found
+        | { element_at_position = Some ele_at_pos;
+          enclosing_compilation_unit_name = Some cu_name } ->
+            let hover_text, def_loc, hover_loc = get_hover_info cu_name ele_at_pos group in
+            if always_show_hover_text_in_data_div || not (Lsp_position.is_in_srcloc ~filename position def_loc)
+            then hover_text, hover_loc
+            else raise Not_found
 
 let handle_hover registry (params: HoverParams.t) =
   let filename = Lsp.Uri.to_path params.textDocument.uri in
@@ -527,10 +515,10 @@ let handle_hover registry (params: HoverParams.t) =
           with Invalid_argument _ -> false
     end (Cobol_preproc.Trace.events pplog)
   in
-  let hover_markdown ?loc value =
+  let hover_markdown ~loc value =
     let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
-    let range = Option.map (Lsp_position.range_of_srcloc_in ~filename) loc in
-    Some (Hover.create () ~contents:(`MarkupContent content) ?range)
+    let range = Lsp_position.range_of_srcloc_in ~filename loc in
+    Some (Hover.create () ~contents:(`MarkupContent content) ~range)
   in
   try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } checked_doc ->
@@ -558,11 +546,10 @@ let handle_hover registry (params: HoverParams.t) =
       | Some Ignored _ ->
           None
       | None ->
-          let hover_def, loc =
-            try lookup_hover_definition_in_doc params checked_doc
-            with Not_found -> None,None
-          in
-          Option.bind hover_def (hover_markdown ?loc)
+          try
+            let hover_text, loc = lookup_hover_definition_in_doc params checked_doc in
+            hover_markdown ~loc hover_text
+          with Not_found -> None
     end
 
 (** {3 Completion} *)

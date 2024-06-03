@@ -31,7 +31,6 @@ module INTERNAL = struct
   end
   module Diagnostics = Lsp_diagnostics
   module Lookup = Lsp_lookup
-  module Info_printer = Lsp_data_info_printer
   module Project = Lsp_project
   module Project_cache = Lsp_project_cache
   module Document = Lsp_document

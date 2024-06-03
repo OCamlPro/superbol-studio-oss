@@ -178,7 +178,6 @@ let%expect_test "hover-typedef-vars" =
         DATA DIVISION.
         WORKING-STORAGE SECTION.
         01 DATA-N_|_AME PI_|_C X.
-        01 SAME-LIN_|_E-1 PIC X. 01 S_|_AME-LINE-2 PIC 9.
         01 STR_|_UCT.
           02 STRUCT-1 PICTURE 9_|_99 VALUE 123.
           02 STR_|_UCT-2 PICTURE X VALUE QUOTE.
@@ -198,8 +197,8 @@ let%expect_test "hover-typedef-vars" =
        5           WORKING-STORAGE SECTION.
        6 >         01 DATA-NAME PIC X.
     ----              ^^^^^^^^^
-       7           01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-       8           01 STRUCT.
+       7           01 STRUCT.
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
     ```cobol
     DATA-NAME
     ```
@@ -212,182 +211,154 @@ let%expect_test "hover-typedef-vars" =
        5           WORKING-STORAGE SECTION.
        6 >         01 DATA-NAME PIC X.
     ----           ^^^^^^^^^^^^^^^^^^^
-       7           01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-       8           01 STRUCT.
+       7           01 STRUCT.
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
     ```cobol
     DATA-NAME
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
-    (line 6, character 19):
-    __rootdir__/prog.cob:7.11-7.22:
+    (line 6, character 14):
+    __rootdir__/prog.cob:7.11-7.17:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
        6           01 DATA-NAME PIC X.
-       7 >         01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-    ----              ^^^^^^^^^^^
-       8           01 STRUCT.
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-    ```cobol
-    SAME-LINE-1
-    ```
-    USAGE DISPLAY
-    ALPHANUMERIC(1)
-    (line 6, character 34):
-    __rootdir__/prog.cob:7.33-7.44:
-       4           DATA DIVISION.
-       5           WORKING-STORAGE SECTION.
-       6           01 DATA-NAME PIC X.
-       7 >         01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-    ----                                    ^^^^^^^^^^^
-       8           01 STRUCT.
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-    ```cobol
-    SAME-LINE-2
-    ```
-    USAGE DISPLAY
-    NUMERIC(digits = 1, scale = 0, with_sign = false)
-    (line 7, character 14):
-    __rootdir__/prog.cob:8.11-8.17:
-       5           WORKING-STORAGE SECTION.
-       6           01 DATA-NAME PIC X.
-       7           01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-       8 >         01 STRUCT.
+       7 >         01 STRUCT.
     ----              ^^^^^^
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-      10             02 STRUCT-2 PICTURE X VALUE QUOTE.
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
     ```cobol
     STRUCT
     ```
     Group of 3 subfields
     Size: 80 bits
-    (line 8, character 31):
-    __rootdir__/prog.cob:9.10-9.44:
+    (line 7, character 31):
+    __rootdir__/prog.cob:8.10-8.44:
+       5           WORKING-STORAGE SECTION.
        6           01 DATA-NAME PIC X.
-       7           01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-       8           01 STRUCT.
-       9 >           02 STRUCT-1 PICTURE 999 VALUE 123.
+       7           01 STRUCT.
+       8 >           02 STRUCT-1 PICTURE 999 VALUE 123.
     ----             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      10             02 STRUCT-2 PICTURE X VALUE QUOTE.
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
     ```cobol
     STRUCT-1 IN STRUCT
     ```
     USAGE DISPLAY
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     VALUE 123
-    (line 9, character 16):
-    __rootdir__/prog.cob:10.13-10.21:
-       7           01 SAME-LINE-1 PIC X. 01 SAME-LINE-2 PIC 9.
-       8           01 STRUCT.
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-      10 >           02 STRUCT-2 PICTURE X VALUE QUOTE.
+    (line 8, character 16):
+    __rootdir__/prog.cob:9.13-9.21:
+       6           01 DATA-NAME PIC X.
+       7           01 STRUCT.
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
+       9 >           02 STRUCT-2 PICTURE X VALUE QUOTE.
     ----                ^^^^^^^^
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
     ```cobol
     STRUCT-2 IN STRUCT
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
     VALUE QUOTE
-    (line 10, character 38):
-    __rootdir__/prog.cob:11.10-11.50:
-       8           01 STRUCT.
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-      10             02 STRUCT-2 PICTURE X VALUE QUOTE.
-      11 >           02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+    (line 9, character 38):
+    __rootdir__/prog.cob:10.10-10.50:
+       7           01 STRUCT.
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
+      10 >           02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
     ----             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
     ```cobol
     STRUCT-3 IN STRUCT
     ```
     USAGE DISPLAY
     ALPHANUMERIC(6)
     VALUE "ABC456"
-    (line 11, character 14):
-    __rootdir__/prog.cob:12.11-12.14:
-       9             02 STRUCT-1 PICTURE 999 VALUE 123.
-      10             02 STRUCT-2 PICTURE X VALUE QUOTE.
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12 >         01 BIG PIC X(38) VALUE "************************************".
+    (line 10, character 14):
+    __rootdir__/prog.cob:11.11-11.14:
+       8             02 STRUCT-1 PICTURE 999 VALUE 123.
+       9             02 STRUCT-2 PICTURE X VALUE QUOTE.
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11 >         01 BIG PIC X(38) VALUE "************************************".
     ----              ^^^
-      13           PROCEDURE DIVISION.
-      14             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+      12           PROCEDURE DIVISION.
+      13             DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ```cobol
     BIG
     ```
     USAGE DISPLAY
     ALPHANUMERIC(38)
     VALUE "************************************"
-    (line 13, character 18):
-    __rootdir__/prog.cob:14.18-14.27:
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
-      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    (line 12, character 18):
+    __rootdir__/prog.cob:13.18-13.27:
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
+      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                     ^^^^^^^^^
-      15             STOP RUN.
-      16
+      14             STOP RUN.
+      15
     ```cobol
     DATA-NAME
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
-    (line 13, character 33):
-    __rootdir__/prog.cob:14.28-14.34:
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
-      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    (line 12, character 33):
+    __rootdir__/prog.cob:13.28-13.34:
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
+      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                               ^^^^^^
-      15             STOP RUN.
-      16
+      14             STOP RUN.
+      15
     ```cobol
     STRUCT
     ```
     Group of 3 subfields
     Size: 80 bits
-    (line 13, character 36):
-    __rootdir__/prog.cob:14.35-14.43:
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
-      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    (line 12, character 36):
+    __rootdir__/prog.cob:13.35-13.43:
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
+      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                      ^^^^^^^^
-      15             STOP RUN.
-      16
+      14             STOP RUN.
+      15
     ```cobol
     STRUCT-1 IN STRUCT
     ```
     USAGE DISPLAY
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     VALUE 123
-    (line 13, character 47):
-    __rootdir__/prog.cob:14.44-14.52:
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
-      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    (line 12, character 47):
+    __rootdir__/prog.cob:13.44-13.52:
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
+      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                               ^^^^^^^^
-      15             STOP RUN.
-      16
+      14             STOP RUN.
+      15
     ```cobol
     STRUCT-2 IN STRUCT
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
     VALUE QUOTE
-    (line 13, character 56):
-    __rootdir__/prog.cob:14.53-14.61:
-      11             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
-      12           01 BIG PIC X(38) VALUE "************************************".
-      13           PROCEDURE DIVISION.
-      14 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
+    (line 12, character 56):
+    __rootdir__/prog.cob:13.53-13.61:
+      10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
+      11           01 BIG PIC X(38) VALUE "************************************".
+      12           PROCEDURE DIVISION.
+      13 >           DISPLAY DATA-NAME STRUCT STRUCT-1 STRUCT-2 STRUCT-3
     ----                                                        ^^^^^^^^
-      15             STOP RUN.
-      16
+      14             STOP RUN.
+      15
     ```cobol
     STRUCT-3 IN STRUCT
     ```

@@ -128,18 +128,17 @@ and pp_item_redefinitions: item_redefinitions Pretty.printer = fun ppf ->
 
 (* fields *)
 
-and pp_field_layout: field_layout Fmt.t = fun ppf x ->
-  match x with
-  | Elementary_field { usage; init_value} ->
-      begin Fmt.(
+and pp_field_layout: field_layout Pretty.printer = fun ppf -> function
+  | Elementary_field { usage; init_value } ->
+      Fmt.(
         const pp_usage usage
-    ++ any "\n\n"
-    ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
-      end ppf x
+      ++ any "\n\n"
+      ++ const (option ~none:nop (any "VALUE " ++ Cobol_ptree.pp_literal')) init_value)
+      ppf
   | Struct_field { subfields } ->
-      Fmt.const pp_struct subfields ppf x
+      Fmt.const pp_struct subfields ppf
 
-and pp_field_definition: field_definition Fmt.t = fun ppf x ->
+and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
   let pp_qualname_opt_in_block' = pp_cobol_block Fmt.(option ~none:(any "FILLER") Cobol_ptree.pp_qualname')  in
   Fmt.(
     const pp_qualname_opt_in_block' x.field_qualname
