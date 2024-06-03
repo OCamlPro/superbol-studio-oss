@@ -801,6 +801,74 @@ let%expect_test "hover-typedef-renames" =
     USAGE DISPLAY
     NUMERIC(digits = 1, scale = 0, with_sign = false) |}];;
 
+let%expect_test "hover-typedef-redefines" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 X.
+          05 Y PIC 9.
+          05 _|_Z REDEFINES Y_|_
+        PROCEDURE DIVISION.
+            DISPLAY _|_Z.
+            STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":26,"line":7},"start":{"character":26,"line":7}},"severity":4},{"message":"Missing PICTURE clause for item 'Z'","range":{"end":{"character":26,"line":7},"start":{"character":10,"line":7}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 7, character 13):
+    __rootdir__/prog.cob:8.13-8.14:
+       5           WORKING-STORAGE SECTION.
+       6           01 X.
+       7             05 Y PIC 9.
+       8 >           05 Z REDEFINES Y
+    ----                ^
+       9           PROCEDURE DIVISION.
+      10               DISPLAY Z.
+    ```cobol
+    Z IN X
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Redefines:
+    ```cobol
+    Y IN X
+    ```
+    (line 7, character 26):
+    __rootdir__/prog.cob:8.25-8.26:
+       5           WORKING-STORAGE SECTION.
+       6           01 X.
+       7             05 Y PIC 9.
+       8 >           05 Z REDEFINES Y
+    ----                            ^
+       9           PROCEDURE DIVISION.
+      10               DISPLAY Z.
+    ```cobol
+    Y IN X
+    ```
+    USAGE DISPLAY
+    NUMERIC(digits = 1, scale = 0, with_sign = false)
+    (line 9, character 20):
+    __rootdir__/prog.cob:10.20-10.21:
+       7             05 Y PIC 9.
+       8             05 Z REDEFINES Y
+       9           PROCEDURE DIVISION.
+      10 >             DISPLAY Z.
+    ----                       ^
+      11               STOP RUN.
+      12
+    ```cobol
+    Z IN X
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Redefines:
+    ```cobol
+    Y IN X
+    ``` |}];;
+
 let%expect_test "hover-typedef-table-and-index" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
   print_hovered server ~projdir @@ extract_position_markers {cobol|
