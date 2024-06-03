@@ -522,34 +522,37 @@ let handle_hover registry (params: HoverParams.t) =
   in
   try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } checked_doc ->
-      match find_hovered_pplog_event pplog with
-      | Some Replacement { matched_loc = loc;
-                           replacement_text = []; _ } ->
-          Pretty.string_to (hover_markdown ~loc) "empty text"
-      | Some Replacement { matched_loc = loc;
-                           replacement_text; _ } ->
-          Pretty.string_to (hover_markdown ~loc) "```cobol\n%a\n```"
-            Cobol_preproc.Text.pp_text replacement_text (* TODO: ensure no ``` *)
-      | Some FileCopy { copyloc = loc;
-                        status = CopyDone lib | CyclicCopy lib } ->
-          begin match EzFile.read_file lib with
-            | "" ->
-                Pretty.string_to (hover_markdown ~loc) ""
-            | text ->
-                Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```"
-                  text                                 (* TODO: ensure no ``` *)
-          end
-      | Some FileCopy { status = MissingCopy _; _ }
-      | Some Replace _
-      | Some CompilerDirective _
-      | Some Exec_block _
-      | Some Ignored _ ->
-          None
-      | None ->
-          try
-            let hover_text, loc = lookup_hover_definition_in_doc params checked_doc in
-            hover_markdown ~loc hover_text
-          with Not_found -> None
+      let pp_hover_text_and_loc =
+        match find_hovered_pplog_event pplog with
+          | Some Replacement { matched_loc = loc; replacement_text = []; _ } ->
+              Some ("empty text", loc)
+          | Some Replacement { matched_loc = loc; replacement_text; _ } ->
+              Some (Pretty.to_string "```cobol\n%a\n```" Cobol_preproc.Text.pp_text replacement_text, (* TODO: ensure no ``` *)
+              loc)
+          | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
+              begin match EzFile.read_file lib with
+                | "" -> None
+                | text ->
+                    Some (Pretty.to_string "```cobol\n%s\n```" text, loc) (* TODO: ensure no ``` *)
+              end
+          | Some FileCopy { status = MissingCopy _; _ }
+          | Some Replace _
+          | Some CompilerDirective _
+          | Some Exec_block _
+          | Some Ignored _
+          | None ->
+              None
+      in
+      let info_hover_text_and_loc =
+        try Some (lookup_hover_definition_in_doc params checked_doc)
+        with Not_found -> None
+      in
+      match info_hover_text_and_loc,pp_hover_text_and_loc with
+        | None, None -> None
+        | None, Some(text,loc) | Some(text,loc), None -> hover_markdown ~loc text
+        | Some(info_text, info_loc), Some(pp_text, _) ->
+            let full_text = Pretty.to_string "%s\nAdditional pre-processing information:\n%s" info_text pp_text in
+            hover_markdown ~loc:info_loc full_text
     end
 
 (** {3 Completion} *)

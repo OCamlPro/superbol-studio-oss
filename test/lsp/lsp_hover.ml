@@ -67,6 +67,12 @@ let%expect_test "hover-copy" =
        7          PROCEDURE DIVISION.
        8             DISPLAY FIELD
     ```cobol
+    FIELD
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Additional pre-processing information:
+    ```cobol
            01 FIELD PIC X.
     ```
     (line 5, character 10):
@@ -78,6 +84,12 @@ let%expect_test "hover-copy" =
     ----          ^^^^^^^^^^^^^^^
        7          PROCEDURE DIVISION.
        8             DISPLAY FIELD
+    ```cobol
+    FIELD
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
     ```
@@ -91,6 +103,12 @@ let%expect_test "hover-copy" =
        7          PROCEDURE DIVISION.
        8             DISPLAY FIELD
     ```cobol
+    FIELD
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Additional pre-processing information:
+    ```cobol
            01 FIELD PIC X.
     ```
     (line 5, character 15):
@@ -102,6 +120,12 @@ let%expect_test "hover-copy" =
     ----          ^^^^^^^^^^^^^^^
        7          PROCEDURE DIVISION.
        8             DISPLAY FIELD
+    ```cobol
+    FIELD
+    ```
+    USAGE DISPLAY
+    ALPHANUMERIC(1)
+    Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
     ``` |}];;
