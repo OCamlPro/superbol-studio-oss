@@ -77,7 +77,7 @@ let () =
   deep_iter sql_exec_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ sql_exec_testsuite // path;
-      reparse_file ~config ~source_format:(Cobol_config.SF SFxCard)
+      reparse_file ~config ~source_format:(Cobol_config.Auto)
         (sql_exec_root // path);
       printf "@]@."
     end;
