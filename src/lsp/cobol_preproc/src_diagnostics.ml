@@ -44,7 +44,6 @@ and unexpected_stuff =
   | Non_blank_area_A_on_continuation_line
   | Opening_alphanumeric_literal_delimiter of string
   | Word
-  | Word_in_continuation of Text.text_word
   | Word_in_pseudotext of Text.text_word
 
 let pp_unexpected_stuff ppf = function
@@ -63,8 +62,6 @@ let pp_unexpected_stuff ppf = function
                         `%s'" str
   | Word ->
       Pretty.print ppf "text@ word"
-  | Word_in_continuation word ->
-      Pretty.print ppf "`%a'@ in@ continuation" Text.pp_word word
   | Word_in_pseudotext word ->
       Pretty.print ppf "`%a'@ in@ pseudotext" Text.pp_word word
 
@@ -88,17 +85,17 @@ let pp_error ppf = function
       Pretty.print ppf "Unterminated@ pseudotext"
 
 type warning =
-  | Ignoring_unexpected of
+  | Warn_unexpected of
       {
         loc: srcloc;
         item: unexpected_stuff;
       }
 
 let warning_loc = function
-  | Ignoring_unexpected { loc; _ } -> loc
+  | Warn_unexpected { loc; _ } -> loc
 
 let pp_warning ppf = function
-  | Ignoring_unexpected { item; _ } ->
+  | Warn_unexpected { item; _ } ->
       Pretty.print ppf "Unexpected@ %a" pp_unexpected_stuff item
 
 (* --- *)
