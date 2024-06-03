@@ -7,6 +7,7 @@
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
 ### Fixed
+- Internal pretty-printing routine for `EXEC`/`END-EXEC` blocks [#300](https://github.com/OCamlPro/superbol-studio-oss/pull/300)
 - Support for line continuations that start with a text word [#294](https://github.com/OCamlPro/superbol-studio-oss/pull/294)
 - Bug when computing the size of `RENAMES` ranges [#295](https://github.com/OCamlPro/superbol-studio-oss/pull/295)
 - Internal handling of diagnostics that may be issued when dealing with `EXEC`/`END-EXEC` blocks [#292](https://github.com/OCamlPro/superbol-studio-oss/pull/292)
