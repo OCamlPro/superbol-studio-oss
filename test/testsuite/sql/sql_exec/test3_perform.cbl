@@ -15,7 +15,7 @@
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
            END-EXEC
 
-           DISPLAY "HELLO WORLD".
+           DISPLAY "HELLO WORLD"
            END-PERFORM.  
            STOP RUN.
 

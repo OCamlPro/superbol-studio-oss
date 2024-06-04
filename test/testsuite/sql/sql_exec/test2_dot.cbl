@@ -1,8 +1,9 @@
-﻿      *  When there are several SQL statements in a row, 
-      *  the expression endpoint is white rather than blue.
+﻿
        IDENTIFICATION DIVISION.
        PROGRAM-ID. test2_dot.   
        PROCEDURE DIVISION. 
+      *  When there are several SQL statements in a row, 
+      *  the expression endpoint is white rather than blue.
            EXEC SQL
               CONNECT TO :DATASRC USER :DBUSR USING :DBPWD
            END-EXEC.      
@@ -14,3 +15,4 @@
            EXEC SQL
                SELECT COUNT(*) INTO :T1 FROM EMPTABLE
            END-EXEC. 
+           STOP RUN.

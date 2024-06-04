@@ -32,5 +32,5 @@ let () =
 
 let scanner =
   Cobol_parser.Options.Stateless_exec_scanner (fun text -> 
-    Esql_exec_block (Sql_parser.parse text)
+    Esql_exec_block (Sql_parser.parse text) , []
   )

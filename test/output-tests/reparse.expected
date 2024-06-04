@@ -102,34 +102,12 @@ Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob8.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/ibm/ibmmainframes.com/cob9.cbl':
  Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL001A.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL001B.cbl':
- Parse: OK. Reparse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL003A.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL006A.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL007A.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL009A.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL015A.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL017A.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL017C.cbl':
- Parse: Failure.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL018A.cbl':
- Parse: OK. Reparse: OK.
-Re-parsing `test/testsuite/sql/sql_exec/TSQL021A.cbl':
- Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test01.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test02.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test03.cbl':
- Parse: OK. Reparse: Different.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test04.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test05.cbl':
@@ -147,10 +125,20 @@ Re-parsing `test/testsuite/sql/sql_exec/sql_test10.cbl':
 Re-parsing `test/testsuite/sql/sql_exec/sql_test11.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test12.cbl':
- Parse: OK. Reparse: Different.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test13.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test14.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test15.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/test1_data_division.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/test2_dot.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/test3_perform.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/test4_line_break.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/test5_disappear.cbl':
+ Parse: OK. Reparse: OK.

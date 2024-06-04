@@ -64,5 +64,5 @@ let%expect_test "exec-block-sequence-without-separator-periods" =
   |};
   [%expect {|
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
-    EXEC_BLOCK[EXEC SQL A END-EXEC], EXEC_BLOCK[EXEC SQL B END-EXEC], DISPLAY,
-    'C', EXEC_BLOCK[EXEC SQL D END-EXEC], ., EOF |}];;
+    EXEC_BLOCK[EXEC SQL  A   END-EXEC], EXEC_BLOCK[EXEC SQL  B   END-EXEC],
+    DISPLAY, 'C', EXEC_BLOCK[EXEC SQL  D   END-EXEC], ., EOF |}];;
