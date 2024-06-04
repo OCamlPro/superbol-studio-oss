@@ -551,7 +551,8 @@ let handle_hover registry (params: HoverParams.t) =
         | None, None -> None
         | None, Some(text,loc) | Some(text,loc), None -> hover_markdown ~loc text
         | Some(info_text, info_loc), Some(pp_text, _) ->
-            let full_text = Pretty.to_string "%s\nAdditional pre-processing information:\n%s" info_text pp_text in
+            let full_text = Pretty.to_string
+            "%s\n---\nAdditional pre-processing information:\n%s" info_text pp_text in
             hover_markdown ~loc:info_loc full_text
     end
 

@@ -71,6 +71,7 @@ let%expect_test "hover-copy" =
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
+    ---
     Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
@@ -89,6 +90,7 @@ let%expect_test "hover-copy" =
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
+    ---
     Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
@@ -107,6 +109,7 @@ let%expect_test "hover-copy" =
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
+    ---
     Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
@@ -125,6 +128,7 @@ let%expect_test "hover-copy" =
     ```
     USAGE DISPLAY
     ALPHANUMERIC(1)
+    ---
     Additional pre-processing information:
     ```cobol
            01 FIELD PIC X.
@@ -779,7 +783,7 @@ let%expect_test "hover-typedef-renames" =
     THRU YY IN X
     ```
     USAGE DISPLAY
-    ALPHANUMERIC(24)
+    ALPHANUMERIC(3)
     (line 11, character 20):
     __rootdir__/prog.cob:12.20-12.21:
        9             66 Z RENAMES Y.
