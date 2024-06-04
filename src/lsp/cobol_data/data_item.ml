@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 open Data_types
+open Cobol_common.Srcloc.INFIX
 
 module Visitor = Cobol_common.Visitor
 
@@ -53,3 +54,10 @@ let qualname = function
 (** Note: may be a no-op *)
 let pp_item_qualname ?(leading = Fmt.nop) ppf item =
   Fmt.(option (leading ++ Cobol_ptree.pp_qualname')) ppf (qualname item)
+
+let def_loc data_definition =
+  match data_definition with
+    | Data_field { def; _} -> ~@def
+    | Data_renaming { def; _} -> ~@def
+    | Data_condition { def; _} -> ~@def
+    | Table_index { table; _ } -> ~@table
