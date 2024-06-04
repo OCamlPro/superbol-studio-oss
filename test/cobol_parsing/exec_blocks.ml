@@ -53,3 +53,17 @@ let%expect_test "exec-block-with-invalid-percentage-character" =
        7              STOP RUN.
     >> Error: Unexpected character `%' in no-percentage-allowed EXEC/END-EXEC
               block |}];;
+
+let%expect_test "exec-block-sequence-without-separator-periods" =
+  Parser_testing.show_parsed_tokens {|
+       PROGRAM-ID.         prog.
+       PROCEDURE           DIVISION.
+           EXEC SQL A END-EXEC
+           EXEC SQL B END-EXEC
+           DISPLAY 'C'
+           EXEC SQL D END-EXEC.
+  |};
+  [%expect {|
+    PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
+    EXEC_BLOCK[EXEC SQL A END-EXEC], EXEC_BLOCK[EXEC SQL B END-EXEC], DISPLAY,
+    'C', EXEC_BLOCK[EXEC SQL D END-EXEC], ., EOF |}];;
