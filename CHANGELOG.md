@@ -3,6 +3,7 @@
 ## [0.1.3] Next release
 
 ### Added
+- Show data item information on hover [#293](https://github.com/OCamlPro/superbol-studio-oss/pull/293)
 - Folding of `EXEC`/`END-EXEC` blocks [#291](https://github.com/OCamlPro/superbol-studio-oss/pull/291)
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
