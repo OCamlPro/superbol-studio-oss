@@ -461,10 +461,8 @@ let get_hover_text_and_defloc (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.c
     try Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named
     with _ -> raise Not_found
   in
-  let hover_text = Pretty.to_string "%a"
-    Lsp_data_info_printer.pp_data_definition data_def in
-  let data_def_loc = Cobol_data.Item.def_loc data_def
-  in hover_text, data_def_loc
+  Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def,
+  Cobol_data.Item.def_loc data_def
 
 let get_hover_info cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in
@@ -487,11 +485,11 @@ let lookup_hover_definition_in_doc
         | { enclosing_compilation_unit_name = None; _ } ->
             raise Not_found
         | { element_at_position = Some ele_at_pos;
-          enclosing_compilation_unit_name = Some cu_name } ->
+            enclosing_compilation_unit_name = Some cu_name } ->
             let hover_text, def_loc, hover_loc =
               get_hover_info cu_name ele_at_pos group in
             if always_show_hover_text_in_data_div ||
-            not (Lsp_position.is_in_srcloc ~filename position def_loc)
+               not (Lsp_position.is_in_srcloc ~filename position def_loc)
             then hover_text, hover_loc
             else raise Not_found
 
@@ -526,9 +524,9 @@ let handle_hover registry (params: HoverParams.t) =
               Some ("empty text", loc)
           | Some Replacement { matched_loc = loc; replacement_text; _ } ->
               (* TODO: ensure no ``` *)
-              Some (Pretty.to_string
-              "```cobol\n%a\n```" Cobol_preproc.Text.pp_text replacement_text,
-              loc)
+              Some (Pretty.to_string "```cobol\n%a\n```\
+                                     " Cobol_preproc.Text.pp_text replacement_text,
+                    loc)
           | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
               begin match EzFile.read_file lib with
                 | "" -> None
@@ -548,13 +546,14 @@ let handle_hover registry (params: HoverParams.t) =
         with Not_found -> None
       in
       match info_hover_text_and_loc, pp_hover_text_and_loc with
-        | None, None -> None
-        | None, Some(text,loc) | Some(text,loc), None -> hover_markdown ~loc text
-        | Some(info_text, info_loc), Some(pp_text, _) ->
-            hover_markdown ~loc:info_loc @@
-            Pretty.to_string
-            "%s\n---\nAdditional pre-processing information:\n%s"
-            info_text pp_text
+        | None, None ->
+            None
+        | None, Some (text, loc) | Some (text, loc), None -> 
+            hover_markdown ~loc text
+        | Some(info_text, loc), Some(pp_text, _) ->
+            hover_markdown ~loc @@
+            Pretty.to_string "%s\n---\nAdditional pre-processing information:\n%s"
+              info_text pp_text
     end
 
 (** {3 Completion} *)
