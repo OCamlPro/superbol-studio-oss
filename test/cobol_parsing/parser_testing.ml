@@ -46,12 +46,14 @@ let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
    then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
    else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
 
-let show_diagnostics ?(verbose = false) ?source_format ?filename contents =
+let show_diagnostics ?(verbose = false) ?source_format ?filename
+    ?(exec_scanners = Superbol_preprocs.exec_scanners) contents =
   preproc ?source_format ?filename contents |>
   Cobol_parser.parse_simple
     ~options: {
       default_parser_options with
       verbose;
+      exec_scanners;
       recovery = EnableRecovery { silence_benign_recoveries = true };
     } |>
   Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout

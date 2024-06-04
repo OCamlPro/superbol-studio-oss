@@ -179,6 +179,9 @@
         "editor.detectIndentation": false,
         "editor.semanticHighlighting.enabled": true,
         "editor.wordSeparators": "`~!#$%^&*()=+[{]}\\|;:'\",.<>/?"
+      },
+      "[sql]": {
+        "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?"
       }
     },
     "debuggers": [
@@ -371,7 +374,10 @@
       {
         "language": "cobol",
         "scopeName": "source.cobol",
-        "path": "./syntaxes/COBOL.tmLanguage.json"
+        "path": "./syntaxes/COBOL.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.sql": "sql"
+        }
       }
     ],
     "tomlValidation": [
@@ -515,7 +521,7 @@
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in Visual Studio Code, based on the SuperBOL LSP server for COBOL, a source level debugger, and commands for GnuCOBOL 3.2+",
   "license": "MIT",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-studio-oss"

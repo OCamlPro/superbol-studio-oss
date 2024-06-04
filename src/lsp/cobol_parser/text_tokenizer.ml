@@ -465,10 +465,12 @@ let scan_exec_block
   in
   match exec_scanner with
   | Stateless_exec_scanner s ->
-      [ EXEC_BLOCK (s ~&text) &@<- text ],
-      state
+      let block, diags = s ~&text in
+      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
+      EXEC_BLOCK block &@<- text,
+      if diags == state.diags then state else { state with diags }
   | Stateful_exec_scanner (s, s_acc) ->
-      let block, s_acc = s ~&text s_acc in
+      let block, diags, s_acc = s ~&text s_acc in
       let scanner = Parser_options.Stateful_exec_scanner (s, s_acc) in
       let exec_scanners = match lang with
         | None ->
@@ -478,8 +480,9 @@ let scan_exec_block
             { state.persist.exec_scanners with
               exec_scanners = EXEC_MAP.add lang scanner scanners }
       in
-      [ EXEC_BLOCK block &@<- text ],
-      { state with persist = { state.persist with exec_scanners } }
+      let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
+      EXEC_BLOCK block &@<- text,
+      { state with diags; persist = { state.persist with exec_scanners } }
 
 
 let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
@@ -539,7 +542,8 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     | Eof ->
         tok EOF
     | ExecBlock text ->
-        scan_exec_block state (text &@ loc)
+        let block, state = scan_exec_block state (text &@ loc) in
+        block :: rev_prefix_tokens, state
     | Pseudo _ ->
         let error = Unexpected { loc; stuff = Pseudotext } in
         rev_prefix_tokens,

@@ -43,7 +43,7 @@ let%expect_test "token-locations" =
     ~verbose:true
     {|(TMP:1)|};
   [%expect {|
-    Tks: (, WORD[TMP], :, DIGITS[1], ), EOF, EOF
+    Tks: (, WORD[TMP], :, DIGITS[1], ), EOF
     (@<prog.cob:1-0|1-1>
     WORD[TMP]@<prog.cob:1-1|1-4>
     :@<prog.cob:1-4|1-5>

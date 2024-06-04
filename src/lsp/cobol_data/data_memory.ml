@@ -75,7 +75,7 @@ let const_size: int -> size = function
 let valof_size s = AE.factor @@ valof s
 let elementary_size: elementary_size -> size = AE.const
 
-let as_int = AE.as_int
+let as_bits = AE.as_int
 
 let add: size -> size -> size = AE.add
 let diff: size -> size -> size = fun a b -> AE.sub a b
