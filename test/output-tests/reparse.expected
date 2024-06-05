@@ -142,3 +142,141 @@ Re-parsing `test/testsuite/sql/sql_exec/test4_line_break.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/test5_disappear.cbl':
  Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL001A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL002A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL003A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL003B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL003C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL004A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL004B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL005A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL005B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL005C.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL006A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL006B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL006C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL007A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL008A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL009A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL010A.cbl':
+ Parse: OK. Reparse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL011A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL012A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL013A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL014A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL014B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL014C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL014D.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL015A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL016A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL017A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL017B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL017C.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL017D.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL017E.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL018A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL018B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL019A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL019B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL020A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL021A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL021B.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL021C.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL022A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL022B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL022C.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL023A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL023B.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL024A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL025A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL026A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL027A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL028A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL029A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL030A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL031A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL033A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL034A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL035A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL036A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037A-MYSQL.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037A-PGSQL.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037A-SQLITE.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037B-MYSQL.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037B-PGSQL.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL037B-SQLITE.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL038A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL039A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL040A.cbl':
+ Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL041A-ORACLE.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL041A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL042A.cbl':
+ Parse: Failure.
+Re-parsing `test/testsuite/sql/gixsql_test/TSQL043A.cbl':
+ Parse: OK. Reparse: OK.
