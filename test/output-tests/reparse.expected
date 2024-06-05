@@ -201,9 +201,9 @@ Re-parsing `test/testsuite/sql/gixsql_test/TSQL017B.cbl':
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL017C.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL017D.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL017E.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL018A.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL018B.cbl':
@@ -235,9 +235,9 @@ Re-parsing `test/testsuite/sql/gixsql_test/TSQL024A.cbl':
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL025A.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL026A.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL027A.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL028A.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL029A.cbl':
