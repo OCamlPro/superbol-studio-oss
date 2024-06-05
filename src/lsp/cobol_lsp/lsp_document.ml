@@ -125,9 +125,37 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
       { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   | Some position, Some rewinder ->
       check doc @@
-      Cobol_parser.rewind_and_parse rewinder ~position @@
+      Cobol_parser.rewind_and_parse rewinder ~position @@ fun ~last_pp:_ ->
       Cobol_preproc.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
+
+(** [inspect_at ~position doc] returns the state that is reached by the parser
+    at [position] in [doc].  Returns [None] on copybooks. *)
+let rec inspect_at ~position ({ copybook; rewinder; textdoc; _ } as doc) =
+  match rewinder with
+  | None | Some _ when copybook ->                                     (* skip *)
+      None
+  | None ->
+      inspect_at ~position @@ parse_and_analyze doc
+  | Some rewinder ->
+      let Lsp.Types.Position.{ line; character = char } = position in
+      let exception FAILURE in
+      let preproc_rewind ~last_pp =
+        (* cut parsed program at given position *)
+        let pos =
+          try Cobol_preproc.position_at ~line ~char last_pp
+          with Not_found -> raise FAILURE
+        in
+        let input = Lsp.Text_document.text textdoc in
+        Cobol_preproc.reset_preprocessor_for_string @@
+        String.sub input 0 pos.pos_cnum
+      in
+      try
+        Option.some @@
+        Cobol_parser.rewind_for_inspection rewinder preproc_rewind
+          ~position:(Indexed { line; char })
+      with FAILURE ->
+        None
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
 let blank ~project ?copybook textdoc =

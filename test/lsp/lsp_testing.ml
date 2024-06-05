@@ -225,6 +225,8 @@ class srcloc_resuscitator_cache = object (self)
       f
   method of_ ~location:Location.{ uri; range } : srcloc =
     (self#for_ ~uri) range
+  method pp ppf location =
+    Pretty.print ppf "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
   method print location =
     Pretty.out "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
   method print_range_for ~uri range =
