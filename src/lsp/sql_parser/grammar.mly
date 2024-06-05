@@ -104,10 +104,12 @@ let esql_with_opt_at :=
   {StartTransaction}
 | DECLARE; table_name= literalVar; TABLE; LPAR; sql=separated_nonempty_list(COMMA, table_lst); RPAR;
   {DeclareTable(table_name, sql)}
+| DECLARE; crs= sql_var_name; CURSOR; FOR; var= variable; 
+  {DeclareCursor(DeclareCursorVar(crs, var))}
 | DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(crs, sql)} (*TODO: COmplete For Update and create a type for it in ast*)
+  {DeclareCursor(DeclareCursorSql(crs, sql))} (*TODO: COmplete For Update and create a type for it in ast*)
 | DECLARE; crs= sql_var_name; CURSOR; WITH; HOLD; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(crs, sql)} (*TODO: With Hold in AST*)
+  {DeclareCursor(DeclareCursorWhithHold(crs, sql))} (*TODO: With Hold in AST*)
 | PREPARE; name= sql_var_name; FROM; sql=sql; 
   {Prepare(name, sql)}
 | EXECUTE; IMMEDIATE; arg=execute_immediate_arg; 
@@ -252,7 +254,7 @@ let sql_query :=
 | s = sql_select; lst = list(select_option); {(s, lst)}
 
 let sql_select:=
-| SELECT; x = separated_list(COMMA, sql_complex_literal); {x}
+| SELECT; x = separated_list(COMMA, sql_op); {x}
 
 let select_option :=
 | FROM; f= from_stm; {From f} 
@@ -355,6 +357,7 @@ let sql_op :=
 | a = sql_complex_literal; { SqlOpLit a }
 
 let sql_complex_literal :=
+| LPAR; s= sql_complex_literal; RPAR; {s}
 | v= literal; AS; c=sql_var_name; {SqlCompAs(v, c)}
 | v= literal; {SqlCompLit v }
 | fun_name=sql_var_name; LPAR; args = separated_list(COMMA, sql_op) ; RPAR;

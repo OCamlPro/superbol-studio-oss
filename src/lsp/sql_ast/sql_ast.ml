@@ -64,7 +64,7 @@ and esql_instuction =
   | Savepoint of variable
   | SelectInto of (cobol_var_id) list * sql_select * sql_select_option list (*select and option_select*)
   | DeclareTable of literal * ((sql_var * sql_type) list)
-  | DeclareCursor of sql_var * sql_query
+  | DeclareCursor of cursor
   | Prepare of sql_var * sql_instruction 
   | ExecuteImmediate of sql_instruction
   | ExecuteIntoUsing of sql_var * (cobol_var_id list) option * (cobol_var_id list) option
@@ -77,6 +77,11 @@ and esql_instuction =
   | Delete of sql_instruction
   | Update of sql_var * sql_update * (update_arg option)
   | Ignore of sql_instruction
+
+and cursor =
+  | DeclareCursorSql of sql_var * sql_query
+  | DeclareCursorVar of sql_var * variable
+  | DeclareCursorWhithHold of sql_var * sql_query
 
 and table = 
   | Table of sql_var
@@ -159,7 +164,7 @@ and join_option =
   | JoinUsing of sql_var list
 and sql_orderBy = Asc of literal | Desc of literal
 
-and sql_select = complex_literal list
+and sql_select = sql_op list
 
 and sql_update = (sql_equal) list
 and sql_equal = sql_var * sql_op
@@ -259,7 +264,7 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_cob_lst into
     pp_select_options_lst sql2
   | DeclareTable (var, sql) -> Format.fprintf fmt "DECLARE %a TABLE (%a)" pp_lit var pp_declare sql
-  | DeclareCursor (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql
+  | DeclareCursor (cursor) -> pp_cursor fmt cursor
   | Prepare (str, sql) -> Format.fprintf fmt "PREPARE %s FROM %a" str.payload pp_sql sql
   | ExecuteImmediate sql -> Format.fprintf fmt "EXECUTE IMMEDIATE %a" pp_sql sql
   | ExecuteIntoUsing (var, into, using) -> 
@@ -283,6 +288,12 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_sql_update equallst 
     pp_where_arg swhere
   | Ignore lst -> Format.fprintf fmt "IGNORE %a" pp_sql lst
+
+and pp_cursor fmt = function
+| DeclareCursorSql (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql
+| DeclareCursorVar (var, v) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_var v
+| DeclareCursorWhithHold (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR WITH HOLD FOR %a" var.payload pp_sql_query sql
+
 
 and pp_table fmt x =
   match x with 
@@ -510,7 +521,7 @@ and pp_orderBy fmt x =
   list_comma fmt (x, pp_aux)
 
 
-and pp_select_lst fmt l = list_comma fmt (l, pp_complex_literal)
+and pp_select_lst fmt l = list_comma fmt (l, pp_sql_op)
 
 and pp_some_var fmt (x, s) =
   match x with
