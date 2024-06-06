@@ -45,14 +45,19 @@ module type MANAGER = sig
       built (via {!limits}) {i before} [end_limit]. *)
   val join_limits: limit * limit -> Cobol_common.Srcloc.srcloc
 
-  (** [dummy_limit] is a limit that may be fed to a parser or {!join_limits},
-      but not given to {!link_limits}. *)
-  val dummy_limit: limit
+  (** [restart ?at ()] instructs the manager that the limits that are {e
+      strictly at the right of} [at] are now outdated and should not be relied
+      upon.  When given [at] should be a {e right} limit.  If [at] is not given,
+      every managed limit is discarded.
 
-  (** [restart ()] instructs the manager that (a subset of) the limits
-      previously created are now outdated and should not be relied upon. *)
-  val restart: unit -> unit
+      Warning: when [at = None], the manager resets all its internal tables.
+      This may cause trouble in case it is shared among several independent
+      parsers for various input files. *)
+  val restart: ?at: limit -> unit -> unit
 
+  (** [with_temporary_copy ~f a] saves the internal state {i s} of the manager,
+      evaluates [f a], and then restores {i s}. *)
+  val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
 end
 
 (** Nanager module instantiation *)

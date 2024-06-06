@@ -94,6 +94,7 @@ val as_copy
   -> string with_loc option
 
 val in_area_a: srcloc -> bool
+val is_pointwise: srcloc -> bool
 val start_pos: srcloc -> Lexing.position    (* only suitable for Area A checks *)
 val start_pos_in: filename: string -> srcloc -> Lexing.position
 val end_pos_in: filename: string -> srcloc -> Lexing.position

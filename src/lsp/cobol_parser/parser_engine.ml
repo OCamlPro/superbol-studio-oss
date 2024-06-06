@@ -76,10 +76,10 @@ type 'm rewindable_parsing
     be called on results of eidetic parsers. *)
 type 'm state =
   {
-    prev_limit: Cobol_preproc.Src_overlay.limit option; (* last right-limit *)
-    (* `prev_limit'` is required to deal with the single-step backtracking
-       upon recovery: *)
-    prev_limit': Cobol_preproc.Src_overlay.limit option;  (* second-to-last *)
+    prev_limit: Cobol_preproc.Src_overlay.limit;          (* last right-limit *)
+    (* `prev_limit'` is required to deal with the single-step backtracking upon
+       recovery: *)
+    prev_limit': Cobol_preproc.Src_overlay.limit;           (* second-to-last *)
     preproc: 'm preproc;
   }
 
@@ -96,6 +96,7 @@ and 'm preproc =
 (** Part of the parser state that changes very rarely, if at all. *)
 and 'm persist =
   {
+    leftmost_limit: Cobol_preproc.Src_overlay.limit;
     tokenizer_memory: 'm memory;
     recovery: recovery;
     verbose: bool;
@@ -117,9 +118,12 @@ let make_parser
       (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
       (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)
   in
+  let first_pos = Cobol_preproc.position pp in
+  let first_loc = Cobol_common.Srcloc.raw (first_pos, first_pos) in
+  let leftmost_limit, right = Overlay_manager.limits first_loc in
   {
-    prev_limit = None;
-    prev_limit' = None;
+    prev_limit = right;
+    prev_limit' = right;        (* [right], in case (unlikely to be relevant) *)
     preproc =
       {
         pp;
@@ -127,6 +131,7 @@ let make_parser
         tokzr;
         persist =
           {
+            leftmost_limit;
             tokenizer_memory;
             recovery;
             verbose;
@@ -179,9 +184,9 @@ let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
       let ps, tokens = produce_tokens ps in
       next_token ps tokens
 
-let token_n_srcloc_limits ?prev_limit token =
+let token_n_srcloc_limits ~prev_limit token =
   let s, e = Overlay_manager.limits ~@token in
-  Option.iter (fun e -> Overlay_manager.link_limits e s) prev_limit;
+  Overlay_manager.link_limits prev_limit s;
   ~&token, s, e
 
 let put_token_back ({ preproc; _ } as ps) token tokens =
@@ -408,16 +413,15 @@ let rec normal ps tokens = function
   | Rejected | HandlingError _ ->
       assert false                                     (* should never happen *)
 
-and on_interim_stage ?(stop_before_eof = false)
-    ({ prev_limit; _ } as ps, tokens, env) =
+and on_interim_stage ?(stop_before_eof = false) (ps, tokens, env) =
   let c = Grammar_interpr.input_needed env in
-  let ps, token, tokens = next_token ps tokens in
+  let { prev_limit; _ } as ps, token, tokens = next_token ps tokens in
   match ~&token with
   | Grammar_tokens.EOF when stop_before_eof ->
       Final (ps, None, Env env)
   | _ ->
-      let _t, _, e as tok = token_n_srcloc_limits ?prev_limit token in
-      let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
+      let _t, _, e as tok = token_n_srcloc_limits ~prev_limit token in
+      let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
       check ps token tokens env @@ Grammar_interpr.offer c @@ match tok with
       | Grammar_tokens.INTERVENING_ '.', l, r -> Grammar_tokens.PERIOD, l, r
       | tok -> tok
@@ -465,8 +469,8 @@ and error ps token tokens env =
 
 and recover ps tokens candidates ~report_syntax_hints_n_error =
   let { prev_limit; _ } as ps, token, tokens = next_token ps tokens in
-  let _, _, e as tok = token_n_srcloc_limits ?prev_limit token in
-  let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
+  let _, _, e as tok = token_n_srcloc_limits ~prev_limit token in
+  let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
   match Grammar_recovery.attempt candidates tok with
   | `Fail when ~&token <> Grammar_tokens.EOF ->             (* ignore one token *)
       recover ps tokens candidates ~report_syntax_hints_n_error
@@ -493,11 +497,7 @@ let on_exn ps e =
     of a parser in state [ps]. *)
 let first_stage (ps: 'm state) ~make_checkpoint : ('a, 'm) stage =
   let ps, tokens = produce_tokens ps in
-  let first_pos = match tokens with
-    | [] -> Cobol_preproc.position ps.preproc.pp
-    | t :: _ -> Cobol_common.Srcloc.start_pos ~@t
-  in
-  normal ps tokens (make_checkpoint first_pos)
+  normal ps tokens (make_checkpoint ps.preproc.persist.leftmost_limit)
 
 (** [full_parse stage] completes parsing from the given stage [stage]. *)
 let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
@@ -505,7 +505,6 @@ let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
       res, ps
   | Trans ((ps, _, _) as state) ->
       full_parse @@ try on_interim_stage state with e -> on_exn ps e
-
 
 (* --- *)
 
@@ -649,12 +648,13 @@ let rec rewind_n_parse
       let pp = ps.preproc.pp in
       let pp = pp_rewind ~last_pp ~new_position:event.preproc_position pp in
       let ps = { ps with preproc = { ps.preproc with pp } } in
-      Overlay_manager.restart ();
+      Overlay_manager.restart ~at:ps.prev_limit ();
       let ps, tokens = produce_tokens ps in
       { rwps with stage = Trans (ps, tokens, env); store }
     with Not_found ->                     (* rewinding before first checkpoint *)
       let pp = pp_rewind ~last_pp rwps.init.preproc.pp in
       let ps = { rwps.init with preproc = { rwps.init.preproc with pp } } in
+      Overlay_manager.restart ~at:ps.prev_limit ();
       init_rewindable_parse ~make_checkpoint ps
   in
   let res, rwps = parse_with_history ?stop_before_eof rwps in
@@ -715,8 +715,11 @@ let rewind_and_parse { rewind_n_parse; _ } rewind_preproc ~position =
 (* Rewinding for inspection *)
 
 let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc ~position =
-  let { result = _, { last_env_stage; _ }; _ }
-    = rewind_n_parse ~stop_before_eof:true rewind_preproc ~position in
+  let { result = _, { last_env_stage; _ }; _ } =
+    Overlay_manager.with_temporary_copy ~f:begin fun () ->
+      rewind_n_parse ~stop_before_eof:true rewind_preproc ~position
+    end ()
+  in
   last_env_stage
 
 module INSPECT = Grammar_interpr
