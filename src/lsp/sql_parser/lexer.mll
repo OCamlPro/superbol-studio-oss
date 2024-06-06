@@ -56,6 +56,7 @@
    | "INSERT" -> INSERT
    | "INTEGER" -> INTEGER
    | "INTO" -> INTO
+   | "IS" -> IS
    | "JOIN" -> JOIN
    | "LEFT" -> LEFT
    | "NATURAL" -> NATURAL
@@ -137,7 +138,9 @@ rule token = parse
   | "<" 
         { LESS }
   | ">" 
-        { GREAT }  
+        { GREAT } 
+  | ":" 
+        { COLON } 
   | ','
       { COMMA }
   | '.'

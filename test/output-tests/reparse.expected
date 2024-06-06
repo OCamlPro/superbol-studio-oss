@@ -277,6 +277,6 @@ Re-parsing `test/testsuite/sql/gixsql_test/TSQL041A-ORACLE.cbl':
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL041A.cbl':
  Parse: Failure.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL042A.cbl':
- Parse: Failure.
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/gixsql_test/TSQL043A.cbl':
  Parse: OK. Reparse: OK.

@@ -19,9 +19,14 @@ type sql_var = string with_loc
 type cobol_var_id = string with_loc
 [@@deriving ord]
 
+type cobol_var =
+| NotNull of cobol_var_id
+| NullIndicator of cobol_var_id * cobol_var_id
+[@@deriving ord]
+
 type variable = 
   | SqlVar of sql_var
-  | CobolVar of cobol_var_id
+  | CobolVar of cobol_var
   [@@deriving ord]
   
 
@@ -62,17 +67,17 @@ and esql_instuction =
   | Rollback of rb_work_or_tran option * rb_args option
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
-  | SelectInto of (cobol_var_id) list * sql_select * sql_select_option list (*select and option_select*)
+  | SelectInto of (cobol_var) list * sql_select * sql_select_option list (*select and option_select*)
   | DeclareTable of literal * ((sql_var * sql_type) list)
   | DeclareCursor of cursor
   | Prepare of sql_var * sql_instruction 
   | ExecuteImmediate of sql_instruction
-  | ExecuteIntoUsing of sql_var * (cobol_var_id list) option * (cobol_var_id list) option
+  | ExecuteIntoUsing of sql_var * (cobol_var list) option * (cobol_var list) option
   | Disconnect of variable option (*db_id*)
   | DisconnectAll
-  | Open of sql_var * (cobol_var_id list) option  (*cursor name*)
+  | Open of sql_var * (cobol_var list) option  (*cursor name*)
   | Close of sql_var (*cursor name*)
-  | Fetch of sql_instruction * (cobol_var_id) list
+  | Fetch of sql_instruction * (cobol_var) list
   | Insert of table * (value list)
   | Delete of sql_instruction
   | Update of sql_var * sql_update * (update_arg option)
@@ -183,6 +188,7 @@ and search_condition =
   | WhereConditionCompare of sql_compare
   | WhereConditionIn of sql_condition_in
   | WhereConditionBetween of between_condition
+  | WhereConditionIsNull of variable
 
 and between_condition =
   | Between of literal * literal * literal
@@ -367,6 +373,7 @@ and pp_sql_condition fmt = function
   Format.fprintf fmt "%a" pp_compare c
 | WhereConditionIn s -> Format.fprintf fmt "%a" pp_condition_in s
 | WhereConditionBetween s -> Format.fprintf fmt "%a" pp_condition_between s
+| WhereConditionIsNull v -> Format.fprintf fmt "%a IS NULL" pp_var v
 
 and pp_condition_in fmt x =
 let pp_aux fmt lst = list_comma fmt (lst, pp_complex_literal) in
@@ -395,7 +402,11 @@ and pp_some_cob_lst fmt = function
 | (None, _) -> Format.fprintf fmt ""
 and pp_cob_lst fmt x =  list_comma fmt (x, pp_cob_var)
 
-and pp_cob_var fmt x = Format.fprintf fmt ":%s" x.payload
+and pp_cob_var fmt x = 
+  match x with
+  | NotNull c -> Format.fprintf fmt ":%s" c.payload
+  | NullIndicator (c, ni) -> Format.fprintf fmt ":%s:%s" c.payload ni.payload
+
 and pp_some_rb_work_or_tran fmt = function
   | Some p ->  pp_rb_work_or_tran fmt p
   | None -> Format.fprintf fmt "" 
@@ -530,7 +541,7 @@ and pp_some_var fmt (x, s) =
 and pp_var fmt x =
   match x with
   | SqlVar v -> Format.fprintf fmt "%s" v.payload
-  | CobolVar c -> Format.fprintf fmt ":%s" c.payload
+  | CobolVar c -> pp_cob_var fmt c
 
 and pp_some_lit fmt (x, s)= 
 match x with

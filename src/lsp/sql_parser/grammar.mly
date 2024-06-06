@@ -16,7 +16,7 @@ open Cobol_common.Srcloc.INFIX
 module Overlay_manager = Sql_overlay_manager
 
 %}
-%token COMMA SEMICOLON EQUAL PLUS MINUS OR AND IN
+%token COLON COMMA SEMICOLON EQUAL PLUS MINUS OR AND IN
 %token LESS_EQ LESS GREAT_EQ GREAT DIFF
 %token <char> SPECHAR
 %token EOF
@@ -37,7 +37,7 @@ module Overlay_manager = Sql_overlay_manager
 (*FOr other esql with opt at*)
 %token SELECT INTO STATEMENT CURSOR FOR PREPARE FROM EXECUTE IMMEDIATE WITH HOLD
 %token INSERT OPEN CLOSE FETCH DELETE UPDATE SET IGNORE ALL OF WHERE CURRENT TABLE
-%token WHEN ORDER VALUES NULL DEFAULT GROUP
+%token WHEN ORDER VALUES IS NULL DEFAULT GROUP
 %token JOIN INNER NATURAL LEFT RIGHT OUTER ON BETWEEN
 (*Sort by*)
 %token DESC ASC
@@ -57,47 +57,55 @@ let loc (X) ==
   | x = X; { x &@ Overlay_manager.join_limits $sloc }
 
 let main :=
-| EXEC; SQL; stm=esql; option(SEMICOLON); END_EXEC; EOF; {stm}
+| EXEC; SQL; stm = esql; option(SEMICOLON); END_EXEC; EOF; {stm}
+
+let cobol_var_id :=
+| c = loc(COBOL_VAR); {c}
 
 let cobol_var :=
-| c = loc(COBOL_VAR); {c}
+| c = cobol_var_id; {NotNull c}
+| c = loc(COBOL_VAR); ni=loc(COBOL_VAR); {NullIndicator(c, ni)}
 
 let sql_var_name :=
 | s = loc(TOKEN); {s} 
 (* | s = loc(STRING); {LiteralStr s} *) (*TODO*)
 
+let simpl_var :=
+| s = sql_var_name; {SqlVar s} 
+| s = cobol_var_id; {CobolVar(NotNull s)} 
+
 let variable := 
-| s=sql_var_name; {SqlVar s} 
-| s=cobol_var; {CobolVar s} 
+| s = sql_var_name; {SqlVar s} 
+| s = cobol_var; {CobolVar s} 
 
 let literalVar := 
 | v = variable; {LiteralVar v}
 | t = sql_var_name; DOT; lst = separated_nonempty_list(DOT, sql_var_name); {LiteralDot (t::lst)}
 
 let literal :=
-| l=literalVar; {l}
+| l = literalVar; {l}
 | v = loc(DIGITS); {LiteralNum v}
 | s = loc(STRING); {LiteralStr s} (*TODO Differentiate 'variable' and "string" and 'char' *)
 
 
 let esql := 
-| AT; v= variable; stm=esql_with_opt_at; {At(v, stm)}
-| stm=esql_with_opt_at; {stm}
+| AT; v = simpl_var; stm = esql_with_opt_at; {At(v, stm)}
+| stm = esql_with_opt_at; {stm}
 | BEGIN; {Begin}
-| BEGIN; stm=esql_with_opt_at; END; SEMICOLON; {stm} (*I don't know what this is for, but it is sometimes used*)
+| BEGIN; stm = esql_with_opt_at; END; SEMICOLON; {stm} (*I don't know what this is for, but it is sometimes used*)
 | BEGIN; DECLARE; SECTION; {BeginDeclare}
 | END; DECLARE; SECTION; {EndDeclare}
-| WHENEVER; c=whenever_condition; k= whenever_continuation; {Whenever(c, k)}
-| INCLUDE; i= sql_var_name; {Include i}
-| CONNECT; c=connect_stm; {Connect c}
-| DISCONNECT; s=option(variable); {Disconnect s}
+| WHENEVER; c = whenever_condition; k = whenever_continuation; {Whenever(c, k)}
+| INCLUDE; i = sql_var_name; {Include i}
+| CONNECT; c = connect_stm; {Connect c}
+| DISCONNECT; s = option(variable); {Disconnect s}
 | DISCONNECT; ALL; {DisconnectAll}
-| IGNORE; sql=sql; {Ignore sql} (*TODO the "sql" can be anything*)
+| IGNORE; sql = sql; {Ignore sql} (*TODO the "sql" can be anything*)
 
 let esql_with_opt_at := 
 | i = sql; {Sql i}
-| i=sql_select; INTO; 
-  s=separated_nonempty_list(COMMA, cobol_var); 
+| i = sql_select; INTO; 
+  s = separated_nonempty_list(COMMA, cobol_var); 
   lst = list(select_option);
   {SelectInto(s, i, lst)}
 | START; TRANSACTION; 
@@ -319,6 +327,7 @@ let predicate :=
 | c = comparison_predicate; {WhereConditionCompare c}
 | i = in_predicate; {WhereConditionIn i} 
 | b = between_predicate; { WhereConditionBetween b}
+| r = variable; IS; NULL; {WhereConditionIsNull r}
 
 let between_predicate :=
 | l=literal; BETWEEN; l1=literal; AND; l2=literal; {Between (l, l1, l2)}
@@ -379,13 +388,6 @@ let sql_no_simpl_cobol :=
 | t = sql_first_token;  x = list(sql_token); {[t] @ x} (*Note for the futur me: a list can be empty*)
 | s = sql_query; {[Sql_query s]}
 
-/* let sql_token_after_select:=
-| FROM; {Sql_instr "FROM" }
-| WHERE; s=search_condition; {Sql_search_condition s}
-| ORDER; BY; {Sql_instr"ORDER BY"}
-| WHEN; {Sql_instr"WHEN"}
- */
-
 let sql_first_token :=
 | t = TOKEN; {Sql_instr t }
 | d = DIGITS; {Sql_instr d }
@@ -397,6 +399,7 @@ let sql_first_token :=
 | SET; {Sql_instr "SET"}
 | FOR; {Sql_instr "FOR" }
 | BY; {Sql_instr "BY" }
+| IS; {Sql_instr "IS" }
 | COUNT_STAR; {Sql_instr "(*)"}
 | TABLE; {Sql_instr "TABLE"}
 | FROM; {Sql_instr "FROM" }
@@ -417,7 +420,7 @@ let sql_token_not_first :=
 | COMMA; {Sql_instr "," }
 (*| SEMICOLON; {Sql_instr ";" }*)
 | DOT ; {Sql_instr "." }
-| t = cobol_var; {Sql_var( CobolVar t) }
+| t = cobol_var_id; {Sql_var( CobolVar(NotNull t)) }
 
 
 let sql_token := 
