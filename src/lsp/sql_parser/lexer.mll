@@ -47,6 +47,7 @@
    | "GOTO" -> GOTO
    | "GO" -> GO
    | "GROUP" -> GROUP
+   | "HAVING" -> HAVING
    | "HOLD" -> HOLD
    | "IDENTIFIED" -> IDENTIFIED
    | "IGNORE" -> IGNORE

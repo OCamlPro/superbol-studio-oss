@@ -156,6 +156,7 @@ and sql_select_option =
   | Where of search_condition 
   | OrderBy of sql_orderBy list
   | GroupBy of literal list
+  | Having of search_condition
 
 and from_stm = table_ref list
 
@@ -499,6 +500,7 @@ and pp_select_options_lst fmt lst =
   | Where w -> Format.fprintf fmt "WHERE %a" pp_sql_condition w
   | OrderBy ob -> Format.fprintf fmt "ORDER BY %a" pp_orderBy ob
   | GroupBy gb-> Format.fprintf fmt "GROUP BY %a" pp_group_by gb
+  | Having w -> Format.fprintf fmt "HAVING %a" pp_sql_condition w
   in
   List.iter (Format.fprintf fmt " %a" pp_one_option) lst
 

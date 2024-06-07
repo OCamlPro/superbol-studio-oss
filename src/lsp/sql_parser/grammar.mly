@@ -37,7 +37,7 @@ module Overlay_manager = Sql_overlay_manager
 (*FOr other esql with opt at*)
 %token SELECT INTO STATEMENT CURSOR FOR PREPARE FROM EXECUTE IMMEDIATE WITH HOLD
 %token INSERT OPEN CLOSE FETCH DELETE UPDATE SET IGNORE ALL OF WHERE CURRENT TABLE
-%token WHEN ORDER VALUES IS NULL DEFAULT GROUP
+%token WHEN ORDER VALUES IS NULL DEFAULT GROUP HAVING
 %token JOIN INNER NATURAL LEFT RIGHT OUTER ON BETWEEN
 (*Sort by*)
 %token DESC ASC
@@ -278,6 +278,7 @@ let select_option :=
 | ORDER; BY; l=separated_nonempty_list(COMMA, order_by); {OrderBy(l)}
 | WHERE; s = search_condition; {Where s}
 | GROUP; BY; x = separated_list(COMMA, literal); {GroupBy x}
+| HAVING; s = search_condition; {Having s}
 
 let order_by:=
 | v=literal; option(ASC);{Asc v}
