@@ -39,6 +39,7 @@
    | "END" -> END
    | "EXEC" -> EXEC
    | "EXECUTE" -> EXECUTE
+   | "EXCEPTION" -> EXCEPTION
    | "FETCH" -> FETCH
    | "FOR" -> FOR
    | "FOUND" -> FOUND
@@ -70,6 +71,7 @@
    | "OUTER" -> OUTER
    | "PERFORM" -> PERFORM
    | "PREPARE" -> PREPARE
+   | "RAISE" -> RAISE
    | "RELEASE" -> RELEASE
    | "RESET" -> RESET
    | "RIGHT" -> RIGHT
@@ -84,6 +86,7 @@
    | "SQLERROR" -> SQLERROR
    | "SQLWARNING" -> SQLWARNING
    | "TABLE" -> TABLE
+   | "THEN" -> THEN
    | "TIMESTAMP" -> TIMESTAMP
    | "TO" -> TO
    | "TRAN" -> TRANSACTION

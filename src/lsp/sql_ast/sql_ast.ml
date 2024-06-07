@@ -59,6 +59,7 @@ and esql_instuction =
   | Sql of sql_instruction
   | Begin 
   | BeginDeclare
+  | Exeption of begin_end_stm
   | EndDeclare
   | StartTransaction
   | Whenever of whenever_condition * whenever_continuation
@@ -82,6 +83,9 @@ and esql_instuction =
   | Delete of sql_instruction
   | Update of sql_var * sql_update * (update_arg option)
   | Ignore of sql_instruction
+
+and begin_end_stm = esql_instuction * exeption list
+and exeption = sql_var * string with_loc * cobol_var
 
 and cursor =
   | DeclareCursorSql of sql_var * sql_query
@@ -243,6 +247,7 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
   | At (v, instr) -> Format.fprintf fmt "AT %a %a" pp_var v pp_esql instr
   | Sql instr -> pp_sql fmt instr 
   | Begin -> Format.fprintf fmt "BEGIN"
+  | Exeption e -> Format.fprintf fmt "BEGIN %a END;" pp_exeption e
   | BeginDeclare -> Format.fprintf fmt "BEGIN DECLARE SECTION"
   | EndDeclare -> Format.fprintf fmt "END DECLARE SECTION"
   | StartTransaction -> Format.fprintf fmt "START TRANSACTION"
@@ -294,6 +299,14 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_sql_update equallst 
     pp_where_arg swhere
   | Ignore lst -> Format.fprintf fmt "IGNORE %a" pp_sql lst
+
+and pp_exeption fmt (e, l) = Format.fprintf fmt "%a; EXCEPTION %a" pp_esql e pp_exeption_list l
+and pp_exeption_list fmt l = 
+  let pp_one_exeption fmt (name, str, cob_var) = 
+    Format.fprintf fmt "WHEN %s THEN RAISE EXCEPTION %s, %a"
+    name.payload str.payload pp_cob_var cob_var
+  in
+  List.iter (Format.fprintf fmt " %a; " pp_one_exeption) l
 
 and pp_cursor fmt = function
 | DeclareCursorSql (var, sql) -> Format.fprintf fmt "DECLARE %s CURSOR FOR %a" var.payload pp_sql_query sql

@@ -43,6 +43,8 @@ module Overlay_manager = Sql_overlay_manager
 %token DESC ASC
 (*types*)
 %token VARCHAR DATE INTEGER TIMESTAMP
+(*exeptions*)
+%token THEN RAISE EXCEPTION
 %token <string> TOKEN
 %token <string> STRING
 %token <string> DIGITS
@@ -57,7 +59,7 @@ let loc (X) ==
   | x = X; { x &@ Overlay_manager.join_limits $sloc }
 
 let main :=
-| EXEC; SQL; stm = esql; option(SEMICOLON); END_EXEC; EOF; {stm}
+| EXEC; SQL; stm = esql; END_EXEC; EOF; {stm}
 
 let cobol_var_id :=
 | c = loc(COBOL_VAR); {c}
@@ -92,7 +94,7 @@ let esql :=
 | AT; v = simpl_var; stm = esql_with_opt_at; {At(v, stm)}
 | stm = esql_with_opt_at; {stm}
 | BEGIN; {Begin}
-| BEGIN; stm = esql_with_opt_at; END; SEMICOLON; {stm} (*I don't know what this is for, but it is sometimes used*)
+| BEGIN; stm = begin_end_stm; END; SEMICOLON; {Exeption(stm)}
 | BEGIN; DECLARE; SECTION; {BeginDeclare}
 | END; DECLARE; SECTION; {EndDeclare}
 | WHENEVER; c = whenever_condition; k = whenever_continuation; {Whenever(c, k)}
@@ -115,9 +117,9 @@ let esql_with_opt_at :=
 | DECLARE; crs= sql_var_name; CURSOR; FOR; var= variable; 
   {DeclareCursor(DeclareCursorVar(crs, var))}
 | DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(DeclareCursorSql(crs, sql))} (*TODO: COmplete For Update and create a type for it in ast*)
+  {DeclareCursor(DeclareCursorSql(crs, sql))} 
 | DECLARE; crs= sql_var_name; CURSOR; WITH; HOLD; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(DeclareCursorWhithHold(crs, sql))} (*TODO: With Hold in AST*)
+  {DeclareCursor(DeclareCursorWhithHold(crs, sql))} 
 | PREPARE; name= sql_var_name; FROM; sql=sql; 
   {Prepare(name, sql)}
 | EXECUTE; IMMEDIATE; arg=execute_immediate_arg; 
@@ -126,7 +128,7 @@ let esql_with_opt_at :=
   {ExecuteIntoUsing(name,into, using)}
 | SAVEPOINT; s= variable; 
   {Savepoint s}
-| ROLLBACK; r=option(rb_work_or_tran); a=option(rb_args); 
+| ROLLBACK; r=option(rb_work_or_tran); a=option(rb_args);
   {Rollback(r, a)}
 | COMMIT; wt= option(rb_work_or_tran); RELEASE; 
   {Commit(wt, true)}
@@ -143,6 +145,13 @@ let esql_with_opt_at :=
 | OPEN; cursor = sql_var_name; ul = option(using_list_cob_var); {Open (cursor, ul)}
 | FETCH; sql=sql; l = into_list_cob_var; {Fetch(sql,l)}
 | CLOSE; cursor = sql_var_name; {Close cursor}
+
+let begin_end_stm :=
+| s = esql; SEMICOLON; EXCEPTION; l= nonempty_list(exeption); {s, l}
+
+let exeption :=
+| WHEN; exeption_name = sql_var_name; THEN; RAISE; EXCEPTION; s = loc(STRING); COMMA; c = cobol_var; SEMICOLON;
+{exeption_name, s, c}
 
 let table :=
 | s = sql_var_name;LPAR; l=separated_nonempty_list(COMMA, sql_var_name); RPAR; {TableLst (s, l)}
@@ -332,7 +341,7 @@ let predicate :=
 let between_predicate :=
 | l=literal; BETWEEN; l1=literal; AND; l2=literal; {Between (l, l1, l2)}
 
-let in_predicate:= (*HGNC_GENE_SYMBOL IN ('MDM2', 'TP53', 'CDKN1A','CCNE1')*)
+let in_predicate:= 
 | l = literal; IN; LPAR; lst = separated_nonempty_list(COMMA, sql_complex_literal); RPAR; {InVarLst(l, lst)}
 
 let comparison_predicate:=
@@ -385,7 +394,8 @@ let sql :=
 | t = cobol_var; {[Sql_var( CobolVar t)]}
 
 let sql_no_simpl_cobol :=
-| t = sql_first_token;  x = list(sql_token); {[t] @ x} (*Note for the futur me: a list can be empty*)
+| t = sql_first_token;  x = list(sql_token); {[t] @ x} 
+(*Note for the futur me: a list can be empty*)
 | s = sql_query; {[Sql_query s]}
 
 let sql_first_token :=
@@ -418,7 +428,7 @@ let sql_token_not_first :=
 | UPDATE; {Sql_instr "UPDATE" }
 | EQUAL; {Sql_instr "=" }
 | COMMA; {Sql_instr "," }
-(*| SEMICOLON; {Sql_instr ";" }*)
+(* | SEMICOLON; {Sql_instr ";" } *)
 | DOT ; {Sql_instr "." }
 | t = cobol_var_id; {Sql_var( CobolVar(NotNull t)) }
 
