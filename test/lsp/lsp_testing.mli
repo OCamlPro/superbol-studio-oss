@@ -38,6 +38,7 @@ val extract_position_markers: string -> string * positions
 
 class srcloc_resuscitator_cache: object
   method of_: location:Lsp.Types.Location.t -> Cobol_common.Srcloc.srcloc
+  method pp: Lsp.Types.Location.t Pretty.printer
   method print: Lsp.Types.Location.t -> unit
   method print_range_for: uri:Lsp.Uri.t -> Lsp.Types.Range.t -> unit
   method print_optional_range_for: uri:Lsp.Uri.t -> Lsp.Types.Range.t option -> unit

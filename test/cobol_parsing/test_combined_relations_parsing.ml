@@ -15,7 +15,7 @@ open Alcotest
 
 open Cobol_ptree
 open Testing_helpers.Make (Cobol_parser.INTERNAL.Dummy.Tags)
-open Cobol_parser.INTERNAL.Tokens
+open Cobol_parser.Tokens
 open Cobol_parser.INTERNAL.Grammar
 open Cobol_parser.INTERNAL.Dummy
 
