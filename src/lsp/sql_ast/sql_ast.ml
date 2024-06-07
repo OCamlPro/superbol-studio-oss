@@ -14,22 +14,21 @@ open Cobol_common
 (**************************************************************************)
 (*                              AST                                       *)
 (**************************************************************************)
-type sql_var = string with_loc 
+type sqlVarToken = string with_loc 
 [@@deriving ord]
-type cobol_var_id = string with_loc
+type cobolVarId = string with_loc
 [@@deriving ord]
 
 type cobol_var =
-| NotNull of cobol_var_id
-| NullIndicator of cobol_var_id * cobol_var_id
+| NotNull of cobolVarId
+| NullIndicator of cobolVarId * cobolVarId
 [@@deriving ord]
 
 type variable = 
-  | SqlVar of sql_var
+  | SqlVar of sqlVarToken
   | CobolVar of cobol_var
   [@@deriving ord]
   
-
 type literal =
   | LiteralVar of variable
   | LiteralNum of string with_loc
@@ -37,21 +36,20 @@ type literal =
   | LiteralDot of string with_loc list
   [@@deriving ord]
 
-
 type sql_token = 
-  | Sql_instr of string
-  | Sql_var of variable
-  | Sql_lit of literal
-  | Sql_query of sql_query
-  | Sql_equality of sql_equal (*TODO: remove*)
-  | Sql_search_condition of search_condition (*TODO: remove*)
+  | SqlInstr of string
+  | SqlVarToken of variable
+  | SqlLit of literal
+  | SqlQuery of sql_query
+  | SqlEquality of sql_equal (*TODO: remove*)
+  | SqlSearchCondition of search_condition (*TODO: remove*)
 
 and sql_instruction = sql_token list
 
 and complex_literal =
   | SqlCompLit of literal
-  | SqlCompAs of literal * sql_var (*ex: SMT AS INT*)
-  | SqlCompFun of sql_var * sql_op list
+  | SqlCompAs of literal * sqlVarToken (*ex: SMT AS INT*)
+  | SqlCompFun of sqlVarToken * sql_op list
   | SqlCompStar
 
 and esql_instuction =
@@ -63,38 +61,38 @@ and esql_instuction =
   | EndDeclare
   | StartTransaction
   | Whenever of whenever_condition * whenever_continuation
-  | Include of sql_var
+  | Include of sqlVarToken
   | Connect of connect_syntax
   | Rollback of rb_work_or_tran option * rb_args option
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
   | SelectInto of (cobol_var) list * sql_select * sql_select_option list (*select and option_select*)
-  | DeclareTable of literal * ((sql_var * sql_type) list)
+  | DeclareTable of literal * ((sqlVarToken * sql_type) list)
   | DeclareCursor of cursor
-  | Prepare of sql_var * sql_instruction 
+  | Prepare of sqlVarToken * sql_instruction 
   | ExecuteImmediate of sql_instruction
-  | ExecuteIntoUsing of sql_var * (cobol_var list) option * (cobol_var list) option
+  | ExecuteIntoUsing of sqlVarToken * (cobol_var list) option * (cobol_var list) option
   | Disconnect of variable option (*db_id*)
   | DisconnectAll
-  | Open of sql_var * (cobol_var list) option  (*cursor name*)
-  | Close of sql_var (*cursor name*)
+  | Open of sqlVarToken * (cobol_var list) option  (*cursor name*)
+  | Close of sqlVarToken (*cursor name*)
   | Fetch of sql_instruction * (cobol_var) list
   | Insert of table * (value list)
   | Delete of sql_instruction
-  | Update of sql_var * sql_update * (update_arg option)
+  | Update of sqlVarToken * sql_update * (update_arg option)
   | Ignore of sql_instruction
 
 and begin_end_stm = esql_instuction * exeption list
-and exeption = sql_var * string with_loc * cobol_var
+and exeption = sqlVarToken * string with_loc * cobol_var
 
 and cursor =
-  | DeclareCursorSql of sql_var * sql_query
-  | DeclareCursorVar of sql_var * variable
-  | DeclareCursorWhithHold of sql_var * sql_query
+  | DeclareCursorSql of sqlVarToken * sql_query
+  | DeclareCursorVar of sqlVarToken * variable
+  | DeclareCursorWhithHold of sqlVarToken * sql_query
 
 and table = 
-  | Table of sql_var
-  | TableLst of sql_var * (sql_var list)
+  | Table of sqlVarToken
+  | TableLst of sqlVarToken * (sqlVarToken list)
 
 and value =
   | ValueNull
@@ -102,7 +100,7 @@ and value =
   | ValueList of literal list
 
 and rb_work_or_tran = Work | Transaction
-and rb_args = Release | To of sql_var
+and rb_args = Release | To of sqlVarToken
 
 and connect_syntax =
   | Connect_to_idby of {
@@ -142,12 +140,12 @@ and whenever_condition =
 
 and whenever_continuation = 
   | Continue
-  | Perform of sql_var (*A label in cob program*)
-  | Goto of sql_var (*TODO doc*)
+  | Perform of sqlVarToken (*A label in cob program*)
+  | Goto of sqlVarToken (*TODO doc*)
 
 
 and update_arg = 
-  | WhereCurrentOf of sql_var 
+  | WhereCurrentOf of sqlVarToken 
   | UpdateSql of sql_instruction
 
 (*SQL*)
@@ -170,13 +168,13 @@ and table_ref =
 and join = InnerJoin | NaturalJoin | LeftJoin | RightJoin
 and join_option = 
   | JoinOn of search_condition
-  | JoinUsing of sql_var list
+  | JoinUsing of sqlVarToken list
 and sql_orderBy = Asc of literal | Desc of literal
 
 and sql_select = sql_op list
 
 and sql_update = (sql_equal) list
-and sql_equal = sql_var * sql_op
+and sql_equal = sqlVarToken * sql_op
 
 and sql_op = 
   | SqlOpLit of complex_literal
@@ -201,10 +199,10 @@ and sql_condition_in =
   | InVarLst of literal * (complex_literal list)
 
 and sql_compare = 
-  | CompareQuery of complex_literal * compOperator * sql_instruction
-  | CompareLit of complex_literal * compOperator * complex_literal
+  | CompareQuery of complex_literal * comp_operator * sql_instruction
+  | CompareLit of complex_literal * comp_operator * complex_literal
 
-and compOperator = Less | Great | LessEq | GreatEq | EqualComp | Diff 
+and comp_operator = Less | Great | LessEq | GreatEq | EqualComp | Diff 
 [@@deriving ord]
 
 
@@ -318,11 +316,11 @@ and pp_table fmt x =
   match x with 
   | Table t -> Format.fprintf fmt "%s" t.payload
   | TableLst (t, lst) -> 
-      let f  = pp_sql_var in  
+      let f  = pp_sqlVarToken in  
       let pp_aux fmt lst = list_comma fmt (lst, f) in
     Format.fprintf fmt "%s(%a)" t.payload pp_aux lst
 
-and pp_sql_var fmt x = Format.fprintf fmt "%s" x.payload
+and pp_sqlVarToken fmt x = Format.fprintf fmt "%s" x.payload
 and pp_value fmt x = list_comma fmt (x, (pp_one_value))
 
 and pp_declare fmt x = list_comma fmt (x, pp_var_type)
@@ -483,12 +481,12 @@ and  pp_sql fmt x =  Format.fprintf fmt " %a " pp_sql_rec x
 
 and pp_sql_rec fmt x =  List.iter (Format.fprintf fmt "%a " pp_one_token) x
 and pp_one_token fmt = function
-| Sql_instr(s) -> Format.fprintf fmt "%s" s
-| Sql_var(c) -> Format.fprintf fmt "%a" pp_var c
-| Sql_lit l -> Format.fprintf fmt "%a" pp_lit l
-| Sql_query s -> Format.fprintf fmt "%a" pp_sql_query s
-| Sql_equality e -> Format.fprintf fmt "%a" pp_sql_update_aux e
-| Sql_search_condition c -> Format.fprintf fmt "%a" pp_sql_condition c
+| SqlInstr(s) -> Format.fprintf fmt "%s" s
+| SqlVarToken(c) -> Format.fprintf fmt "%a" pp_var c
+| SqlLit l -> Format.fprintf fmt "%a" pp_lit l
+| SqlQuery s -> Format.fprintf fmt "%a" pp_sql_query s
+| SqlEquality e -> Format.fprintf fmt "%a" pp_sql_update_aux e
+| SqlSearchCondition c -> Format.fprintf fmt "%a" pp_sql_condition c
 
 and pp_sql_query fmt (s, o) = 
   Format.fprintf fmt "SELECT %a %a" 
@@ -530,7 +528,7 @@ and pp_table_opt_option fmt = function
 and pp_table_opt fmt = function
 | JoinOn sc -> Format.fprintf fmt "ON %a" pp_sql_condition sc
 | JoinUsing lstvar -> 
-    let pp_aux fmt x = list_comma fmt (x, pp_sql_var)
+    let pp_aux fmt x = list_comma fmt (x, pp_sqlVarToken)
   in
   Format.fprintf fmt "USING %a" pp_aux lstvar
 

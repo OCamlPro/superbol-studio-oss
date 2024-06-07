@@ -197,14 +197,14 @@ let using_list_cob_var :=
 | USING; using= separated_nonempty_list(COMMA, cobol_var); {using}
 
 let execute_immediate_arg :=
-| x = STRING; {[Sql_instr x]}
-| c = cobol_var; {[ Sql_var( CobolVar c) ]}
+| x = STRING; {[SqlInstr x]}
+| c = cobol_var; {[ SqlVarToken( CobolVar c) ]}
 
 
 
 let update_arg :=
 | WHERE; CURRENT; OF; v=sql_var_name; {WhereCurrentOf v}
-| FROM; sql=sql; {UpdateSql( [Sql_instr "FROM"] @ sql)}
+| FROM; sql=sql; {UpdateSql( [SqlInstr "FROM"] @ sql)}
 
 let rb_work_or_tran :=
 | WORK; {Work}
@@ -345,7 +345,7 @@ let in_predicate:=
 | l = literal; IN; LPAR; lst = separated_nonempty_list(COMMA, sql_complex_literal); RPAR; {InVarLst(l, lst)}
 
 let comparison_predicate:=
-| l = sql_complex_literal; c = compOp; LPAR; sql = sql_query; RPAR; {CompareQuery(l, c, [Sql_query sql])}
+| l = sql_complex_literal; c = compOp; LPAR; sql = sql_query; RPAR; {CompareQuery(l, c, [SqlQuery sql])}
 | l = sql_complex_literal; c = compOp; l2 =  sql_complex_literal;  {CompareLit(l, c, l2)}
 
 let compOp :=  
@@ -391,46 +391,46 @@ let binop :=
 
 let sql := 
 | t = sql_no_simpl_cobol; {t}
-| t = cobol_var; {[Sql_var( CobolVar t)]}
+| t = cobol_var; {[SqlVarToken( CobolVar t)]}
 
 let sql_no_simpl_cobol :=
 | t = sql_first_token;  x = list(sql_token); {[t] @ x} 
 (*Note for the futur me: a list can be empty*)
-| s = sql_query; {[Sql_query s]}
+| s = sql_query; {[SqlQuery s]}
 
 let sql_first_token :=
-| t = TOKEN; {Sql_instr t }
-| d = DIGITS; {Sql_instr d }
-| s = STRING; {Sql_instr ("\""^s^"\"")}
-| LPAR ; {Sql_instr "(" }
-| RPAR; {Sql_instr ")" }
-| NOT; {Sql_instr "NOT" }
-| STAR; {Sql_instr "*" }
-| SET; {Sql_instr "SET"}
-| FOR; {Sql_instr "FOR" }
-| BY; {Sql_instr "BY" }
-| IS; {Sql_instr "IS" }
-| COUNT_STAR; {Sql_instr "(*)"}
-| TABLE; {Sql_instr "TABLE"}
-| FROM; {Sql_instr "FROM" }
-| WHERE; {Sql_instr"WHERE"}
-| ORDER; BY; {Sql_instr"ORDER BY"}
-| VARCHAR; {Sql_instr"VARCHAR"}
-| DATE; {Sql_instr"DATE"}
-| INTEGER; {Sql_instr"INTEGER"}
-| TIMESTAMP; {Sql_instr"TIMESTAMP"}
-| WHEN; {Sql_instr"WHEN"}
+| t = TOKEN; {SqlInstr t }
+| d = DIGITS; {SqlInstr d }
+| s = STRING; {SqlInstr ("\""^s^"\"")}
+| LPAR ; {SqlInstr "(" }
+| RPAR; {SqlInstr ")" }
+| NOT; {SqlInstr "NOT" }
+| STAR; {SqlInstr "*" }
+| SET; {SqlInstr "SET"}
+| FOR; {SqlInstr "FOR" }
+| BY; {SqlInstr "BY" }
+| IS; {SqlInstr "IS" }
+| COUNT_STAR; {SqlInstr "(*)"}
+| TABLE; {SqlInstr "TABLE"}
+| FROM; {SqlInstr "FROM" }
+| WHERE; {SqlInstr"WHERE"}
+| ORDER; BY; {SqlInstr"ORDER BY"}
+| VARCHAR; {SqlInstr"VARCHAR"}
+| DATE; {SqlInstr"DATE"}
+| INTEGER; {SqlInstr"INTEGER"}
+| TIMESTAMP; {SqlInstr"TIMESTAMP"}
+| WHEN; {SqlInstr"WHEN"}
 
 let sql_token_not_first :=
-| TO; {Sql_instr "TO"}
-| AT; {Sql_instr "AT"}
-| IN; {Sql_instr "IN"}
-| UPDATE; {Sql_instr "UPDATE" }
-| EQUAL; {Sql_instr "=" }
-| COMMA; {Sql_instr "," }
-(* | SEMICOLON; {Sql_instr ";" } *)
-| DOT ; {Sql_instr "." }
-| t = cobol_var_id; {Sql_var( CobolVar(NotNull t)) }
+| TO; {SqlInstr "TO"}
+| AT; {SqlInstr "AT"}
+| IN; {SqlInstr "IN"}
+| UPDATE; {SqlInstr "UPDATE" }
+| EQUAL; {SqlInstr "=" }
+| COMMA; {SqlInstr "," }
+(* | SEMICOLON; {SqlInstr ";" } *)
+| DOT ; {SqlInstr "." }
+| t = cobol_var_id; {SqlVarToken( CobolVar(NotNull t)) }
 
 
 let sql_token := 
