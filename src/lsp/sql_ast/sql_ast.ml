@@ -149,7 +149,11 @@ and update_arg =
   | UpdateSql of sql_instruction
 
 (*SQL*)
-and sql_query = sql_select * sql_select_option list
+and sql_query = 
+  | SelectUnion of sql_query * sql_query
+  | SelectExcept of sql_query * sql_query
+  | SelectIntersect of sql_query * sql_query
+  | SelectQuery of sql_select * sql_select_option list
 
 and sql_select_option =
   | From of from_stm 
@@ -489,10 +493,25 @@ and pp_one_token fmt = function
 | SqlEquality e -> Format.fprintf fmt "%a" pp_sql_update_aux e
 | SqlSearchCondition c -> Format.fprintf fmt "%a" pp_sql_condition c
 
-and pp_sql_query fmt (s, o) = 
+and pp_sql_query fmt = function
+| SelectQuery (s, o) ->  
   Format.fprintf fmt "SELECT %a %a" 
   pp_select_lst s 
   pp_select_options_lst o
+| SelectUnion (s1, s2) -> 
+  Format.fprintf fmt "%a UNION %a" 
+  pp_sql_query s1 
+  pp_sql_query s2 
+| SelectExcept (s1, s2) -> 
+  Format.fprintf fmt "%a EXCEPT %a" 
+  pp_sql_query s1 
+  pp_sql_query s2 
+| SelectIntersect (s1, s2) -> 
+  Format.fprintf fmt "%a INTERSECT %a" 
+  pp_sql_query s1 
+  pp_sql_query s2 
+
+
 
 and pp_select_options_lst fmt lst =
   let pp_one_option fmt = function 

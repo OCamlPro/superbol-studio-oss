@@ -132,6 +132,8 @@ Re-parsing `test/testsuite/sql/sql_exec/sql_test14.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/sql_test15.cbl':
  Parse: OK. Reparse: OK.
+Re-parsing `test/testsuite/sql/sql_exec/sql_test16.cbl':
+ Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/test1_data_division.cbl':
  Parse: OK. Reparse: OK.
 Re-parsing `test/testsuite/sql/sql_exec/test2_dot.cbl':

@@ -28,6 +28,9 @@ let%expect_test "exec-block-with-cobol-separators" =
            STOP RUN.
   |};
   [%expect{|
+    prog.cob:11.20-11.42: Internal warning: unable to join locations via limits
+      in `Cobol_preproc__Src_overlay.join_limits`
+      [ctx=Sql_parser__Sql_overlay_manager-2]
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
     EXEC_BLOCK[EXEC SQL BEGIN  SELECT something_1, something_2   FROM some_table  WHERE condition > 0  ; EXCEPTION  WHEN NO_DATA_FOUND THEN RAISE EXCEPTION 'employee % not found', :EMPNAME;  END; END-EXEC],
     ., STOP, RUN, ., EOF |}];;

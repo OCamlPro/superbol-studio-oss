@@ -51,8 +51,6 @@ big declare (todo)
 #### sql_test12
 different format for connect
 
-Problem: like TSQL009A, there is a Cobol Instruction who disappear between parse and reparse???
-
 #### sql_test13
 exeption (todo)
 begin end

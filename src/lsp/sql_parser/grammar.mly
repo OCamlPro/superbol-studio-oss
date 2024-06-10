@@ -36,6 +36,7 @@ module Overlay_manager = Sql_overlay_manager
 %token COMMIT
 (*FOr other esql with opt at*)
 %token SELECT INTO STATEMENT CURSOR FOR PREPARE FROM EXECUTE IMMEDIATE WITH HOLD
+%token UNION EXCEPT INTERSECT
 %token INSERT OPEN CLOSE FETCH DELETE UPDATE SET IGNORE ALL OF WHERE CURRENT TABLE
 %token WHEN ORDER VALUES IS NULL DEFAULT GROUP HAVING
 %token JOIN INNER NATURAL LEFT RIGHT OUTER ON BETWEEN
@@ -267,8 +268,18 @@ let whenever_continuation :=
 
 (*SQL Stuff*)
 
+let sql_com_query := 
+| LPAR; s = sql_query; RPAR; {s}
+| s = sql_lil_query; {s}
+
 let sql_query :=
-| s = sql_select; lst = list(select_option); {(s, lst)}
+| s1 = sql_lil_query; UNION; s2 = sql_com_query; {SelectUnion (s1, s2)}
+| s1 = sql_lil_query; EXCEPT; s2 = sql_com_query; {SelectExcept (s1, s2)}
+| s1 = sql_lil_query; INTERSECT; s2 = sql_com_query; {SelectIntersect (s1, s2)}
+| s = sql_lil_query; {s}
+
+let sql_lil_query :=
+| s = sql_select; lst = list(select_option); {SelectQuery(s, lst)}
 
 let sql_select:=
 | SELECT; x = separated_list(COMMA, sql_op); {x}

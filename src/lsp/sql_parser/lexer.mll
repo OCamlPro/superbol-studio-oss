@@ -37,6 +37,7 @@
    | "DESC" -> DESC
    | "DISCONNECT" -> DISCONNECT
    | "END" -> END
+   | "EXCEPT" -> EXCEPT
    | "EXEC" -> EXEC
    | "EXECUTE" -> EXECUTE
    | "EXCEPTION" -> EXCEPTION
@@ -57,6 +58,7 @@
    | "INCLUDE" -> INCLUDE
    | "INSERT" -> INSERT
    | "INTEGER" -> INTEGER
+   | "INTERSECT" -> INTERSECT
    | "INTO" -> INTO
    | "IS" -> IS
    | "JOIN" -> JOIN
@@ -93,6 +95,7 @@
    | "TRAN" -> TRANSACTION
    | "TRANSACTION" -> TRANSACTION
    | "UPDATE" -> UPDATE
+   | "UNION" -> UNION
    | "USER" -> USER
    | "USING" -> USING
    | "VALUES" -> VALUES
