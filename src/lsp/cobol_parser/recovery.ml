@@ -83,22 +83,6 @@ struct
       candidates: 'a candidate list;
     }
 
-  module T = struct
-    (* FIXME: this is a bit ugly. We should ask for the type to be exported
-       publicly by MenhirLib. *)
-
-    [@@@ocaml.warning "-37"]
-
-    type 'a checkpoint =
-      | InputNeeded of 'a Parser.env
-      | Shifting of 'a Parser.env * 'a Parser.env * bool
-      | AboutToReduce of 'a Parser.env * Parser.production
-      | HandlingError of 'a Parser.env
-      | Accepted of 'a
-      | Rejected
-    external inj : 'a checkpoint -> 'a Parser.checkpoint = "%identity"
-  end
-
   let feed_token token visited env =
     let rec aux visited = function
       | Parser.HandlingError _ | Rejected ->
@@ -112,7 +96,7 @@ struct
       | InputNeeded env as c ->
           `Recovered (c, env, visited)
     in
-    aux visited (Parser.offer (T.inj (T.InputNeeded env)) token)
+    aux visited (Parser.offer (Parser.input_needed env) token)
 
   let candidate env = { env; visited = []; assumed = [] }
 

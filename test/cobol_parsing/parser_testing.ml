@@ -204,7 +204,7 @@ let iteratively_append_chunks ?config ~f (prog, positions) =
       Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
     succ i,
     rewind_n_parse ~f:(f i num_chunks) rewinder pos
-      (Cobol_preproc.reset_preprocessor_for_string prog)
+      (fun ~last_pp:_ -> Cobol_preproc.reset_preprocessor_for_string prog)
   end (1, rewinder) (pairwise positions.pos_anonymous)
 
 
@@ -236,7 +236,7 @@ let iteratively_append_chunks_stuttering ?config ~f
       Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
     let rewinder =
       rewind_n_parse ~f:(f i num_chunks) rewinder pos
-        (Cobol_preproc.reset_preprocessor_for_string prog)
+        (fun ~last_pp:_ -> Cobol_preproc.reset_preprocessor_for_string prog)
     in
     let rewinder =
       if i < num_chunks then begin
@@ -247,7 +247,7 @@ let iteratively_append_chunks_stuttering ?config ~f
           Fmt.(truncated ~max:30)
           Pretty.(to_string "%S" @@ EzString.after prog' (pos.cnum - 1));
         rewind_n_parse ~f:(f i num_chunks) rewinder next_pos_1
-          (Cobol_preproc.reset_preprocessor_for_string prog')
+          (fun ~last_pp:_ -> Cobol_preproc.reset_preprocessor_for_string prog')
       end else rewinder
     in
     succ i, rewinder
@@ -285,14 +285,14 @@ let simulate_cut_n_paste ?config ~f0 ~f ?verbose ?(repeat = 1)
       let prog_prefix = EzString.before prog pos.cnum
       and prog_suffix = EzString.after prog (next_pos.cnum - 1) in
       let rewinder =
-        rewind_n_parse ~f:(fun _ _ -> ()) rewinder pos @@
+        rewind_n_parse ~f:(fun _ _ -> ()) rewinder pos @@ fun ~last_pp:_ ->
         Cobol_preproc.reset_preprocessor_for_string @@
         prog_prefix ^ prog_suffix
       in
       Pretty.out "Putting it back@.";
       let rewinder =
         rewind_n_parse ~f:(f chunk_num num_chunks ~ptree0) rewinder pos @@
-        Cobol_preproc.reset_preprocessor_for_string prog
+        fun ~last_pp:_ -> Cobol_preproc.reset_preprocessor_for_string prog
       in
       loop (succ i) rewinder
     end

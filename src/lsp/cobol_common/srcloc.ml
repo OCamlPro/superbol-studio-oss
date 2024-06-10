@@ -273,6 +273,10 @@ let rec in_area_a: srcloc -> bool = function
   | Rpl { in_area_a; _ } -> in_area_a
   | Cat { left; _ } -> in_area_a left
 
+let is_pointwise: srcloc -> bool = function
+  | Raw (s, e, _) -> s.pos_cnum == e.pos_cnum && s.pos_fname = e.pos_fname
+  | _ -> false
+
 let scan ?(kind: [`TopDown | `BottomUp] = `TopDown) ~cpy ~rpl =
   let rec aux: type t. t slt -> 'a -> 'a = fun loc -> match loc, kind with
     | Raw _, _ -> Fun.id

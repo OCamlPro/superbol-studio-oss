@@ -35,8 +35,8 @@ module type MANAGER = sig
   val limits: srcloc -> limit * limit
   val link_limits: limit -> limit -> unit
   val join_limits: limit * limit -> srcloc
-  val dummy_limit: limit
-  val restart: unit -> unit
+  val restart: ?at: limit -> unit -> unit
+  val with_temporary_copy: f: ('a -> 'b) -> 'a -> 'b
 end
 
 (** Overlay limits (internal) *)
@@ -54,6 +54,7 @@ module Limit = struct
     l.pos_cnum < (-1)
 
   let equal (l1: t) (l2: t) =
+    l1 == l2 ||
     l1.pos_cnum == l2.pos_cnum  &&
     l1.pos_fname = l2.pos_fname
 
@@ -65,20 +66,22 @@ module Limit = struct
     then l2.pos_cnum <= l1.pos_cnum
     else l1.pos_cnum > 0 && l1.pos_cnum <= l2.pos_cnum &&
          l1.pos_fname = l2.pos_fname
+
 end
 
 (** Weak hashtable where keys are overlay limits (internal) *)
-module Links = Ephemeron.K1.Make (Limit)
+module WLnks = Ephemeron.K1.Make (Limit)
+module HLnks = Hashtbl.Make (Limit)
 
 (** Managers for sequences of overlay token limits *)
 type manager =
   {
-    right_of: (srcloc * limit) Links.t; (** associates the left limit of a token
+    right_of: (srcloc * limit) HLnks.t; (** associates the left limit of a token
                                             to its location and the
                                             corresponding right limit. *)
-    over_right_gap: limit Links.t;  (** associates the right limit of a token to
+    over_right_gap: limit HLnks.t;  (** associates the right limit of a token to
                                         the left limit of the next *)
-    cache: (srcloc * limit) Links.t;
+    cache: (srcloc * limit) WLnks.t;
     id: string;                (** manager identifier (for logging/debugging) *)
   }
 
@@ -88,9 +91,9 @@ let new_manager: string -> manager =
   fun manager_name ->
     incr id;
     {
-      right_of = Links.create 42;
-      over_right_gap = Links.create 42;
-      cache = Links.create 42;
+      right_of = HLnks.create 42;
+      over_right_gap = HLnks.create 42;
+      cache = WLnks.create 42;
       id = Pretty.to_string "%s-%u" manager_name !id;
     }
 
@@ -98,21 +101,25 @@ let new_manager: string -> manager =
     location; for any given file, must be called with the leftmost location
     first. *)
 let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
-  let left, right = match Cobol_common.Srcloc.as_unique_lexloc loc with
-    | Some lexloc -> lexloc
-    | _ -> Limit.make_virtual (), Limit.make_virtual ()
-  in
-  Links.replace ctx.right_of left (loc, right);          (* Replace to deal with
+  match Cobol_common.Srcloc.as_unique_lexloc loc with
+  | Some (left, right)  (* filter pointwise locs out to avoid cycles (in case of
+                           pointwise link) *)
+    when not (Cobol_common.Srcloc.is_pointwise loc) ->
+      HLnks.replace ctx.right_of left (loc, right);      (* Replace to deal with
                                                             duplicates. *)
-  Links.remove ctx.over_right_gap left;  (* `left' could have been a right-limit
-                                            before the previous `restart` *)
-  Links.remove ctx.cache left;                 (* Manually remove from cache. *)
-  left, right
+      WLnks.remove ctx.cache left;             (* Manually remove from cache. *)
+      WLnks.remove ctx.cache right;            (* same for `right` *)
+      left, right
+  | _ ->
+      let left = Limit.make_virtual () in
+      let right = Limit.make_virtual () in
+      HLnks.add ctx.right_of left (loc, right);
+      left, right
 
-(** Links token limits *)
+(** WLnks token limits *)
 let link_limits ctx left right =
   (* Replace to deal with overriding of limits during recovery. *)
-  Links.replace ctx.over_right_gap left right
+  HLnks.replace ctx.over_right_gap left right
 
 (** Returns a source location that spans between two given limits; returns a
     valid pointwise location if the two given limits are physically equal. *)
@@ -120,8 +127,8 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   let pointwise l =          (* pointwise: ensure this is not a virtual limit *)
     let pos =
       if Limit.is_virtual l then
-        let s = Links.find ctx.over_right_gap l in
-        let loc, _ = Links.find ctx.right_of s in
+        let s = HLnks.find ctx.over_right_gap l in
+        let loc, _ = HLnks.find ctx.right_of s in
         Cobol_common.Srcloc.start_pos loc
       else l
     in
@@ -130,7 +137,7 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
   let try_limits (s, e: limit * limit) =
 
     let rec proceed_from ?loc s =         (* start search from left limit [s] *)
-      check ?loc @@ Links.find ctx.right_of s
+      check ?loc @@ HLnks.find ctx.right_of s
 
     and check ?loc (loc', e') =
       (* continue search with ([loc] concatenated with) [loc'] if [e'] is not
@@ -140,22 +147,21 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
         | None -> loc'
         | Some loc -> Cobol_common.Srcloc.concat loc loc'
       in
-      if e.pos_cnum  = e'.pos_cnum &&   (* compare only the fields that matter *)
-         e.pos_fname = e'.pos_fname
-      then (Links.replace ctx.cache s (loc, e); loc)
-      else try_cache_from ~loc @@ Links.find ctx.over_right_gap e'
+      if Limit.equal e e'
+      then (WLnks.replace ctx.cache s (loc, e); loc)
+      else try_cache_from ~loc @@ HLnks.find ctx.over_right_gap e'
 
     and try_cache_from ?loc s =
       (* attempt with cache first; proceed via small-step upon miss or
          failure *)
-      match Links.find_opt ctx.cache s with
+      match WLnks.find_opt ctx.cache s with
       | Some ((_, e') as hit) when Limit.surely_predates e' e ->
           (try check ?loc hit with Not_found -> proceed_from ?loc s)
       | Some _ | None ->
           proceed_from ?loc s
     in
 
-    if s == e
+    if Limit.equal s e
     then pointwise s
     else try_cache_from s
   in
@@ -172,15 +178,49 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     try_limits (s, e)
   with Not_found ->
   try                        (* otherwise try assuming `s` is an end of token *)
-    try_limits (Links.find ctx.over_right_gap s, e)
+    try_limits (HLnks.find ctx.over_right_gap s, e)
   with Not_found ->
     join_failure (s, e)
 
-let restart ctx =
-  (* CHECKME: recursively traversing and emptying `right_of` and
-     `over_right_gap` from a given limit may allow us to remove one or two calls
-     ito `Links.remove` in `limits` above. *)
-  Links.clear ctx.cache
+let restart ?at ctx =
+  (* Recursively traverse and empty `right_of` and `over_right_gap` from the
+     given right limit. *)
+  let rec clear_right_of left =
+    match HLnks.find_opt ctx.right_of left with
+    | Some (_, right) ->
+        HLnks.remove ctx.right_of left;
+        clear_right_gap right
+    | None -> ()
+  and clear_right_gap right =
+    match HLnks.find_opt ctx.over_right_gap right with
+    | Some left ->
+        HLnks.remove ctx.over_right_gap right;
+        clear_right_of left
+    | None -> ()
+  in
+  WLnks.clear ctx.cache;
+  match at with
+  | Some right ->
+      clear_right_of @@ HLnks.find ctx.over_right_gap right
+  | None ->
+      HLnks.clear  ctx.right_of;
+      HLnks.clear  ctx.over_right_gap
+
+let with_temporary_copy ~f ctx a =
+  WLnks.clear ctx.cache;
+  let right_of       = HLnks.copy ctx.right_of
+  and over_right_gap = HLnks.copy ctx.over_right_gap in
+  let restore () =
+    WLnks.clear ctx.cache;
+    HLnks.(clear   ctx.right_of;
+           add_seq ctx.right_of        @@ to_seq right_of);
+    HLnks.(clear   ctx.over_right_gap;
+           add_seq ctx.over_right_gap  @@ to_seq over_right_gap);
+  in
+  let res =
+    try f a with e -> restore (); raise e
+  in
+  restore (); res
 
 module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let ctx = new_manager Id.name
@@ -188,6 +228,6 @@ module New_manager (Id: sig val name: string end) () : MANAGER = struct
   let limits = limits ctx
   let link_limits = link_limits ctx
   let join_limits = join_limits ctx
-  let dummy_limit = Lexing.dummy_pos
-  let restart () = restart ctx
+  let restart ?at () = restart ?at ctx
+  let with_temporary_copy = with_temporary_copy ctx
 end
