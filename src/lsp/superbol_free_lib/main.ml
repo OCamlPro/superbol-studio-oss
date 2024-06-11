@@ -27,6 +27,7 @@ let public_subcommands = [
   Command_check_syntax.cmd;
   Command_json_vscode.cmd;
   Command_snapshot.cmd;
+  Command_reformat.to_free_cmd;
 
   Command_ebcdic.ebcdic_translate_cmd ;
 

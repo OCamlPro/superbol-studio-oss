@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
-
 open Types
 
 let verbose = Engine.verbose
@@ -22,8 +20,13 @@ let verbose = Engine.verbose
 (* ~char: the position within the line. For now, it does not change with
    insertions/deletions, but it should, in the future... *)
 
-let apply_edits ~contents ~range ~config ~filename ~edits ~symbolic =
+let apply_edits (type t) ~contents ~range ~config ~edits
+    (output : t output) =
 
+  let symbolic = match output with
+    | Output_contents -> false
+    | Output_edits -> true
+  in
   let len = String.length contents in
   let b = Buffer.create (if symbolic then 4 else 2 * len ) in
   let ops = ref [] in
@@ -57,7 +60,7 @@ let apply_edits ~contents ~range ~config ~filename ~edits ~symbolic =
     if line = edit.lnum then
       skip_before ~pos ~char
         ~nbefore:(
-          (if config.source_format.free then 0 else 1) +
+          (if config.source_format.format = SFFree then 0 else 1) +
           config.source_format.skip_before )
         edit
         ~line edits
@@ -137,7 +140,7 @@ let apply_edits ~contents ~range ~config ~filename ~edits ~symbolic =
     if verbose then
       Printf.eprintf "iter_eol ~pos:%d ~line:%d ~addspaces:%d\n%!"
         pos line addspaces;
-    if config.source_format.free then
+    if config.source_format.format = SFFree then
       iter_edits ~pos ~char ~line edits
     else
       let textlen =
@@ -225,13 +228,8 @@ let apply_edits ~contents ~range ~config ~filename ~edits ~symbolic =
 
   in
   iter_edits ~pos:0 ~char:0 ~line:1 edits; (* lnum starts at 1 ? *)
-  if not symbolic then begin
-    let contents = Buffer.contents b in
-    if filename = "-" then
-      Printf.printf "%s%!" contents
-    else begin
-      EzFile.write_file filename contents ;
-      Printf.eprintf "File %S indented\n%!" filename
-    end;
-  end;
-  List.rev !ops
+  match output with
+  | Output_contents ->
+    ( Buffer.contents b : t )
+  | Output_edits ->
+    ( { edits ; operations = List.rev !ops } : t )

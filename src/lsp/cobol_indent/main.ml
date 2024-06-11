@@ -73,17 +73,12 @@ open Types
    closest line with a saved state. *)
 let indent
     ~source_format
-    ~config
-    ~dialect (* why ? we usually don't care about the dialect to indent *)
     ~filename
     ?(verbose=false)
-    ?output
     ?contents
     ?range
-    ()
+    output
   =
-  ignore ( config ) ;
-  ignore ( dialect ) ;
   let contents = match contents with
     | None -> EzFile.read_file filename
     | Some contents -> contents
@@ -138,12 +133,5 @@ let indent
   in
   let edits = iter [] edits in
 
-  let symbolic, filename =
-    match output with
-    | Some filename -> false, filename
-    | None -> true, "-"
-  in
-  let ops = Editor.apply_edits
-      ~contents ~edits ~range ~filename ~config ~symbolic
-  in
-  edits, ops
+  Editor.apply_edits
+    ~contents ~edits ~range ~config output
