@@ -69,7 +69,9 @@ let%expect_test "hover-copy" =
     ```cobol
     FIELD
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     ---
     Additional pre-processing information:
@@ -88,7 +90,9 @@ let%expect_test "hover-copy" =
     ```cobol
     FIELD
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     ---
     Additional pre-processing information:
@@ -107,7 +111,9 @@ let%expect_test "hover-copy" =
     ```cobol
     FIELD
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     ---
     Additional pre-processing information:
@@ -126,7 +132,9 @@ let%expect_test "hover-copy" =
     ```cobol
     FIELD
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     ---
     Additional pre-processing information:
@@ -165,7 +173,9 @@ let%expect_test "hover-typedef-from-copy" =
     ```cobol
     FIELD
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1) |}];;
 
 (* Hover replaced *)
@@ -230,7 +240,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     DATA-NAME
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 5, character 23):
     __rootdir__/prog.cob:6.8-6.27:
@@ -244,7 +256,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     DATA-NAME
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 6, character 14):
     __rootdir__/prog.cob:7.11-7.17:
@@ -272,7 +286,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-1 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 999 USAGE DISPLAY
+    ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     VALUE 123
     (line 8, character 16):
@@ -287,7 +303,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-2 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     VALUE QUOTE
     (line 9, character 38):
@@ -302,7 +320,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-3 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X(6) USAGE DISPLAY
+    ```
     ALPHANUMERIC(6)
     VALUE "ABC456"
     (line 10, character 14):
@@ -317,7 +337,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     BIG
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X(38) USAGE DISPLAY
+    ```
     ALPHANUMERIC(38)
     VALUE "************************************"
     (line 12, character 18):
@@ -332,7 +354,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     DATA-NAME
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 12, character 33):
     __rootdir__/prog.cob:13.28-13.34:
@@ -360,7 +384,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-1 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 999 USAGE DISPLAY
+    ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     VALUE 123
     (line 12, character 47):
@@ -375,7 +401,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-2 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     VALUE QUOTE
     (line 12, character 56):
@@ -390,7 +418,9 @@ let%expect_test "hover-typedef-vars" =
     ```cobol
     STRUCT-3 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X(6) USAGE DISPLAY
+    ```
     ALPHANUMERIC(6)
     VALUE "ABC456" |}];;
 
@@ -426,8 +456,10 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     VAR
     ```
-    USAGE DISPLAY
-    NUMERIC-EDITED(digits = 8, scale = 2, with_sign = false, editions = { Data_picture.TYPES.basics = [(Data_picture.TYPES.FixedInsertion { Data_picture.TYPES.fixed_insertion_symbol = -; fixed_insertion_offset = 0 }); (Data_picture.TYPES.SimpleInsertion { Data_picture.TYPES.simple_insertion_symbols = { Data_picture.TYPES.symbol = B; symbol_occurences = 1 }; simple_insertion_offset = 1 }); (Data_picture.TYPES.SimpleInsertion { Data_picture.TYPES.simple_insertion_symbols = { Data_picture.TYPES.symbol = grouping separator; symbol_occurences = 1 }; simple_insertion_offset = 5 }); (Data_picture.TYPES.SpecialInsertion { Data_picture.TYPES.special_insertion_offset = 9; special_insertion_length = 1 })]; floating = None; zerorepl = (Some { Data_picture.TYPES.zero_replacement_symbol = Z; zero_replacement_ranges = [{ Data_picture.TYPES.floating_range_offset = 2; floating_range_length = 3 }; { Data_picture.TYPES.floating_range_offset = 6; floating_range_length = 2 }] }) })
+    ```cobol
+    PIC -BZZZ,ZZ9.99 USAGE DISPLAY
+    ```
+    NUMERIC(digits = 8, scale = 2, with_sign = false)
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -440,7 +472,9 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     VAR1
     ```
-    USAGE BINARY
+    ```cobol
+    PIC 9 USAGE BINARY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
@@ -484,7 +518,9 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     VAR6
     ```
-    USAGE BIT
+    ```cobol
+    PIC 111 USAGE BIT
+    ```
     BOOLEAN(3)
     (line 10, character 11):
     __rootdir__/prog.cob:11.11-11.15:
@@ -511,7 +547,9 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     VAR8
     ```
-    USAGE PACKED-DECIMAL
+    ```cobol
+    PIC 9 USAGE PACKED-DECIMAL
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false) |}];;
 
 
@@ -587,7 +625,9 @@ let%expect_test "hover-typedef-simple-condition" =
     ```cobol
     VAL
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 6, character 14):
     Hovering nothing worthy
@@ -608,7 +648,9 @@ let%expect_test "hover-typedef-simple-condition" =
     ```cobol
     VAL
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 10, character 22):
     __rootdir__/prog.cob:11.14-11.22:
@@ -625,7 +667,9 @@ let%expect_test "hover-typedef-simple-condition" =
     ```cobol
     VAL
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1) |}];;
 
 let%expect_test "hover-typedef-group-condition" =
@@ -685,7 +729,9 @@ let%expect_test "hover-typedef-group-condition" =
     ```cobol
     VAL-1 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 12, character 14):
     __rootdir__/prog.cob:13.14-13.20:
@@ -702,7 +748,9 @@ let%expect_test "hover-typedef-group-condition" =
     ```cobol
     VAL-2 IN STRUCT
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1) |}];;
 
 let%expect_test "hover-typedef-renames" =
@@ -737,7 +785,9 @@ let%expect_test "hover-typedef-renames" =
     Z IN X
     RENAMES Y IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
@@ -752,7 +802,9 @@ let%expect_test "hover-typedef-renames" =
     Z IN X
     RENAMES Y IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
@@ -766,7 +818,9 @@ let%expect_test "hover-typedef-renames" =
     ```cobol
     Y IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
@@ -782,7 +836,9 @@ let%expect_test "hover-typedef-renames" =
     RENAMES Y IN X
     THRU YY IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC XXX USAGE DISPLAY
+    ```
     ALPHANUMERIC(3)
     (line 11, character 20):
     __rootdir__/prog.cob:12.20-12.21:
@@ -797,7 +853,9 @@ let%expect_test "hover-typedef-renames" =
     Z IN X
     RENAMES Y IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false) |}];;
 
 let%expect_test "hover-typedef-redefines" =
@@ -829,7 +887,9 @@ let%expect_test "hover-typedef-redefines" =
     ```cobol
     Z IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
@@ -847,7 +907,9 @@ let%expect_test "hover-typedef-redefines" =
     ```cobol
     Y IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC 9 USAGE DISPLAY
+    ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     (line 9, character 20):
     __rootdir__/prog.cob:10.20-10.21:
@@ -861,7 +923,9 @@ let%expect_test "hover-typedef-redefines" =
     ```cobol
     Z IN X
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     Redefines:
     ```cobol
@@ -915,7 +979,9 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     T1
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 7, character 52):
     __rootdir__/prog.cob:8.47-8.53:
@@ -935,7 +1001,9 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     T1
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1)
     (line 8, character 44):
     __rootdir__/prog.cob:9.41-9.47:
@@ -1015,7 +1083,9 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     T1
     ```
-    USAGE DISPLAY
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
     ALPHANUMERIC(1) |}];;
 
 let%expect_test "hover-typedef-communication-section" =

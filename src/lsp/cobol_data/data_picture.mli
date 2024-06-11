@@ -179,7 +179,9 @@ type t = TYPES.picture
 open TYPES
 
 val pp_category: category Pretty.printer
+val pp_category_no_editions: category Pretty.printer
 val pp_category_name: category Pretty.printer
+val pp_symbols_list: symbols list Pretty.printer
 
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)
