@@ -224,25 +224,9 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
   let (x, f) = g in 
   match x with
   | [] -> Format.fprintf fmt ""
-  | [ele] -> Format.fprintf fmt "%a " f ele
+  | [ele] -> Format.fprintf fmt "%a" f ele
   | ele::t -> Format.fprintf fmt "%a, %a" f ele list_comma (t, f)
 
-  (*Todo: Declaration are a separate case because else  
-   "WORKING-STORAGE SECTION.
-    EXEC SQL 
-      INCLUDE EMPREC 
-    END-EXEC"
-
-  becomes "WORKING-STORAGE SECTION.EXEC SQL INCLUDE EMPREC END-EXEC"
-     *)
-(* let rec pp fmt x = 
-  match (x) with
-  | BeginDeclare -> Format.fprintf fmt "\n EXEC SQL BEGIN DECLARE SECTION END-EXEC. \n"
-  | EndDeclare -> Format.fprintf fmt "\n EXEC SQL END DECLARE SECTION END-EXEC. \n"
-  | Include i -> Format.fprintf fmt "\n EXEC SQL INCLUDE %s END-EXEC. \n" i.payload
-  | _ -> Format.fprintf fmt "EXEC SQL %a END-EXEC" pp_esql x
-
- *)
  let rec pp fmt x = Format.fprintf fmt "EXEC SQL %a END-EXEC" pp_esql x
 
   and pp_esql fmt x = 
@@ -356,7 +340,7 @@ and pp_where_arg fmt = function
 | None -> Format.fprintf fmt ""
 
 and pp_sql_update_aux fmt (var, op) = 
-  Format.fprintf fmt "%s = %a " var.payload pp_sql_op op
+  Format.fprintf fmt "%s = %a" var.payload pp_sql_op op
 
 and pp_sql_update fmt x = 
   list_comma fmt (x, pp_sql_update_aux)   
@@ -465,7 +449,7 @@ and pp_connect fmt c =
     pp_some_lit (db_data_source, "USING" )
 
   | Connect_reset (name)-> 
-    Format.fprintf fmt "RESET%a" pp_some_lit (name, " " )
+    Format.fprintf fmt "RESET %a" pp_some_lit (name, "" )
 
 and pp_whenever_condtion fmt x =
   match x with
@@ -482,9 +466,13 @@ and pp_whenever_continuation fmt x =
 and pp_some_sql fmt = function
   | Some p ->  pp_sql fmt p
   | None -> Format.fprintf fmt "" 
-and  pp_sql fmt x =  Format.fprintf fmt " %a " pp_sql_rec x
+(* and  pp_sql fmt x =  Format.fprintf fmt "%a" pp_sql_rec x *)
 
-and pp_sql_rec fmt x =  List.iter (Format.fprintf fmt "%a " pp_one_token) x
+and pp_sql fmt = function
+| [h] -> Format.fprintf fmt "%a" pp_one_token h
+| h::t ->  Format.fprintf fmt "%a %a" pp_one_token h pp_sql t
+| [] -> Format.fprintf fmt ""
+
 and pp_one_token fmt = function
 | SqlInstr(s) -> Format.fprintf fmt "%s" s
 | SqlVarToken(c) -> Format.fprintf fmt "%a" pp_var c
