@@ -30,10 +30,10 @@ let pp_usage: usage Pretty.printer =
     Fmt.(
       pp_cobol_block (fun ppf _ ->
         pf ppf "PIC %a USAGE %s"
-        Cobol_data.Picture.pp_symbols_list picture.pic
+        Cobol_data.Picture.pp_picture_symbols picture.pic
         name)
       ++ const string "\n\n"
-      ++ const Cobol_data.Picture.pp_category_no_editions picture.category)
+      ++ const Cobol_data.Picture.pp_category picture.category)
     ppf ()
   and pp_usage_with_sign ppf name signed =
     pp_cobol_block Fmt.(any "USAGE " ++ any name ++ any (if signed then " SIGNED" else " UNSIGNED"))

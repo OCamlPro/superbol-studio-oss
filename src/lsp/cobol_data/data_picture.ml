@@ -185,8 +185,7 @@ module TYPES = struct
         }
   [@@deriving ord]
 
-
-  let pp_category ?(show_edition=true) ppf = function
+  let pp_category ?(with_edition=true) ppf = function
     | Alphabetic { length } ->
         Fmt.fmt "ALPHABETIC(%u)" ppf length
     | Alphanumeric { length; insertions = [] } ->
@@ -200,15 +199,17 @@ module TYPES = struct
     | National { length; insertions = _ } ->
         Fmt.fmt "NATIONAL-EDITED(%u)" ppf length
     | FixedNum { digits; scale; with_sign; editions }
-      when show_edition &&
-      (editions.basics <> [] || editions.floating <> None || editions.zerorepl <> None) ->
+      when with_edition && (editions.basics <> [] ||
+                            editions.floating <> None ||
+                            editions.zerorepl <> None) ->
         Fmt.fmt "NUMERIC-EDITED(@[digits = %u,@;scale = %d,@;\
                  with_sign = %B,@;editions = %a@])" ppf
           digits scale with_sign pp_editions editions
     | FixedNum { digits; scale; with_sign; _ } ->
         Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;with_sign = %B@])" ppf
           digits scale with_sign
-    | FloatNum { digits; scale; with_sign; exponent_digits; editions } when show_edition && editions <> [] ->
+    | FloatNum { digits; scale; with_sign; exponent_digits; editions }
+      when (with_edition && editions <> []) ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
                  %u,@;with_sign = %B,@;%a@])" ppf
           digits scale exponent_digits with_sign
@@ -270,8 +271,8 @@ module Symbol = struct type t = symbol let compare = Stdlib.compare end
 module Symbols = Set.Make (Symbol)
 module SymbolsMap = Map.Make (Symbol)
 
-let pp_category = TYPES.pp_category ~show_edition:true
-let pp_category_no_editions = TYPES.pp_category ~show_edition:false
+let pp_category = TYPES.pp_category ~with_edition:false
+let pp_detailed_category = TYPES.pp_category ~with_edition:true
 
 let pp_category_name ppf category =
   Pretty.string ppf @@ match category with
@@ -295,7 +296,7 @@ let pp_category_name ppf category =
   | FloatNum _ ->
       "numeric-edited"
 
-let pp_symbols_list: symbols list Pretty.printer = fun ppf symbols ->
+let pp_picture_symbols: symbols list Pretty.printer = fun ppf symbols ->
   List.iter (fun { symbol_occurences = occ; symbol } ->
     if occ > 3 then begin
       pp_symbol_cobolized ppf symbol;
@@ -1122,7 +1123,7 @@ let pp_error ppf error =
   | Unexpected_symbol (s, c) ->
       Format.fprintf ppf "Unexpected@ %a@ in@ PICTURE@ string%a"
         pp_symbol s
-        Fmt.(option (fun ppf -> fmt "@ of@ category@ %a" ppf pp_category))
+        Fmt.(option (fun ppf -> fmt "@ of@ category@ %a" ppf pp_detailed_category))
         (Option.map reverse_editions c)
   | Empty_picture_string ->
       Format.fprintf ppf "Empty@ PICTURE@ string"

@@ -33,7 +33,7 @@ let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Data_picture.t) =
     Pretty.record [
       Fmt.(styled `Yellow @@ any name);
-      Fmt.field "category" (fun () -> picture.category) Data_picture.pp_category;
+      Fmt.field "category" (fun () -> picture.category) Data_picture.pp_detailed_category;
     ] ppf ()
   and pp_usage_with_sign ppf name signed =
     Fmt.(styled `Yellow @@ (if signed then any "signed-" else nop) ++ any name)
