@@ -28,13 +28,15 @@ let pp_cobol_block: _ Fmt.t -> _ Fmt.t = fun pp ->
 let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =
     Fmt.(
-      any "USAGE "
-        ++ any name
-        ++ any "\n\n"
-        ++ Cobol_data.Picture.pp_category)
-    ppf picture.category
+      pp_cobol_block (fun ppf _ ->
+        pf ppf "PIC %a USAGE %s"
+        Cobol_data.Picture.pp_picture_symbols picture.pic
+        name)
+      ++ const string "\n\n"
+      ++ const Cobol_data.Picture.pp_category picture.category)
+    ppf ()
   and pp_usage_with_sign ppf name signed =
-    pp_cobol_block Fmt.(any "USAGE " ++ any name ++ (if signed then any " SIGNED" else any " UNSIGNED"))
+    pp_cobol_block Fmt.(any "USAGE " ++ any name ++ any (if signed then " SIGNED" else " UNSIGNED"))
     ppf ()
   and pp_width_tag ppf tag =
     Fmt.int ppf @@
