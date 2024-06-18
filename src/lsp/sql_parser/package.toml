@@ -68,7 +68,7 @@ version = ">=1.2"
 # package tools dependencies
 [tools]
 ppx_deriving = ">=5.2.1"
-menhir = "=20230415"
+menhir = ">=20230415"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -85,7 +85,7 @@ menhir = "=20230415"
 dune-libraries = "str"
 dune-trailer = """
 (menhir (modules grammar)
-        (flags --explain 
+        (flags  
                 --inspection --cmly --table --strict
                --unused-tokens))
 

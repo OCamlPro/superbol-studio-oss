@@ -25,7 +25,7 @@ let () =
     end
     ~pp:begin function
       | Esql_exec_block a ->
-          Some (Pretty.delayed "%a" Sql_ast.pp a)
+          Some (Pretty.delayed "%a" Sql_ast.Printer.pp a)
       | _ ->
           None
     end

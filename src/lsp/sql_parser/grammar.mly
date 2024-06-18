@@ -46,11 +46,11 @@ module Overlay_manager = Sql_overlay_manager
 %token VARCHAR DATE INTEGER TIMESTAMP
 (*exeptions*)
 %token THEN RAISE EXCEPTION
-%token <string> TOKEN
+%token <string> WORD
 %token <string> STRING
 %token <string> DIGITS
 %token <string> COBOL_VAR
-%token <string> BACKSLASHED_VAR
+%token <string> BACKSLASH_VAR
 %start <esql_instuction> main 
 
 %%
@@ -70,7 +70,7 @@ let cobol_var :=
 | c = loc(COBOL_VAR); ni=loc(COBOL_VAR); {NullIndicator(c, ni)}
 
 let sql_var_name :=
-| s = loc(TOKEN); {s} 
+| s = loc(WORD); {s} 
 (* | s = loc(STRING); {LiteralStr s} *) (*TODO*)
 
 let simpl_var :=
@@ -148,11 +148,11 @@ let esql_with_opt_at :=
 | CLOSE; cursor = sql_var_name; {Close cursor}
 
 let begin_end_stm :=
-| s = esql; SEMICOLON; EXCEPTION; l= nonempty_list(exeption); {s, l}
+| try_instruction = esql; SEMICOLON; EXCEPTION; try_exceptions= nonempty_list(exeption); {{try_instruction; try_exceptions}}
 
 let exeption :=
 | WHEN; exeption_name = sql_var_name; THEN; RAISE; EXCEPTION; s = loc(STRING); COMMA; c = cobol_var; SEMICOLON;
-{exeption_name, s, c}
+{RaiseAndPrint(exeption_name, s, c)}
 
 let table :=
 | s = sql_var_name;LPAR; l=separated_nonempty_list(COMMA, sql_var_name); RPAR; {TableLst (s, l)}
@@ -411,7 +411,7 @@ let sql_no_simpl_cobol :=
 | s = sql_query; {[SqlQuery s]}
 
 let sql_first_token :=
-| t = TOKEN; {SqlInstr t }
+| t = WORD; {SqlInstr t }
 | d = DIGITS; {SqlInstr d }
 | s = STRING; {SqlInstr ("\""^s^"\"")}
 | LPAR ; {SqlInstr "(" }

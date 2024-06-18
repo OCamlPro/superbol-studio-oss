@@ -1,4 +1,5 @@
 ﻿## List of simple tests:
+These test are only for testing the parser, they make no sense, dont try to compile them.
 #### sql_test1
 connect to
 start transaction
@@ -19,8 +20,6 @@ connect
 create table
 declare cursor
 fetch data
-
-Problem: like TSQL009A, there is a Cobol Instruction who disappear between parse and reparse???
 
 #### sql_test4
 var smt is type(size)
