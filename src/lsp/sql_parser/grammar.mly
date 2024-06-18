@@ -299,10 +299,6 @@ let order_by:=
 let from_stm :=
 | lst = separated_nonempty_list(COMMA, table_ref); {lst}
 
-/* let table_ref :=
-| table_name = table_ref_aux; AS; correlation_name = literal; {FromLitAs(table_name, correlation_name)}
-| t = table_ref_aux;{t}  */
-
 let table_ref := 
 | j = qualified_join;{j} 
 | t = table_ref_non_rec; {t}
@@ -328,7 +324,6 @@ let join_type :=
 let qualified_join_option := 
 | ON; s = search_condition; {JoinOn(s)}
 (*| USING; s=separated_nonempty_list(COMMA, sql_var_name); {JoinUsing(s)}*)
-
 
 
 let search_condition :=
@@ -440,7 +435,6 @@ let sql_token_not_first :=
 | UPDATE; {SqlInstr "UPDATE" }
 | EQUAL; {SqlInstr "=" }
 | COMMA; {SqlInstr "," }
-(* | SEMICOLON; {SqlInstr ";" } *)
 | DOT ; {SqlInstr "." }
 | t = cobol_var_id; {SqlVarToken( CobolVar(NotNull t)) }
 

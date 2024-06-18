@@ -126,16 +126,12 @@ rule token = parse
   | '\\' (['a'-'z' 'A'-'Z']['A'-'Z' 'a'-'z' '0'-'9' '_']* as s)
       { BACKSLASH_VAR s }
   | ['a'-'z' 'A'-'Z' '0'-'9']['A'-'Z' 'a'-'z' '0'-'9' '-' '_' '*' ]* as s 
-  (*If you want to make a better sql parsing, this is to rework*)
       { get_keyword s }
   | numbers as n
       { DIGITS n }
   | '\'' ( ['A'-'Z' 'a'-'z' '0'-'9' '_' '(' '*' ')' '.' '[' ']']* as s) '\''
       { STRING s}
 
-
-(*   | ['>' '<']+ as s (*sql opeatuin*)
-      { TOKEN s } *)
   | "||"
       { OR }
   | ['='] 
