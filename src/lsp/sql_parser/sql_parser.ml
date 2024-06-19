@@ -65,8 +65,9 @@ let parse text =
         (t, lstart, lend) :: tokens, Some lend
 
 
-      | pl -> let t = Grammar.STRING (Format.asprintf "%a" Cobol_preproc.Text.pp_word pl) in
-        emit ~loc:w'.loc t
+      | pl ->
+          emit ~loc:w'.loc @@
+          Grammar.STRING (Format.asprintf "%a" Cobol_preproc.Text.pp_word pl)
     ) ([], None) text |> fst |> List.rev
   in
 
