@@ -292,7 +292,9 @@ let rec list_comma (fmt : Format.formatter) (g : 'a list * (Format.formatter -> 
     pp_where_arg swhere
   | Ignore lst -> Format.fprintf fmt "IGNORE %a" pp_sql lst
 
-and pp_exception fmt e =  Format.fprintf fmt "%a; EXCEPTION %a" pp_esql e.try_instruction pp_exception_list e.try_exceptions
+and pp_exception fmt e =
+  Format.fprintf fmt "%a; EXCEPTION %a"
+    pp_esql e.try_instruction pp_exception_list e.try_exceptions
 and pp_exception_list fmt l = 
   let pp_one_exception fmt x = 
     match x with
