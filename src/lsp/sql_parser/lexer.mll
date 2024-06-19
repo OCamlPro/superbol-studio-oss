@@ -109,7 +109,9 @@
         "WORK", WORK;
     ]
 
-    let get_keyword s = try Hashtbl.find kwd_table (String.uppercase_ascii s) with Not_found -> WORD s 
+    let get_keyword s =
+      try Hashtbl.find kwd_table (String.uppercase_ascii s)
+      with Not_found -> WORD s 
 }
 
 let numbers = '-'? ['0'-'9']+ (','['0'-'9']+)?
