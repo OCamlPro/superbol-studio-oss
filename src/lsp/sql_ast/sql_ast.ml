@@ -296,8 +296,7 @@ and pp_exception fmt e =
   Format.fprintf fmt "%a; EXCEPTION %a"
     pp_esql e.try_instruction pp_exception_list e.try_exceptions
 and pp_exception_list fmt l = 
-  let pp_one_exception fmt x = 
-    match x with
+  let pp_one_exception fmt = function
     | RaiseAndPrint (name, str, cob_var) ->
       Format.fprintf fmt "WHEN %s THEN RAISE EXCEPTION %s, %a"
       name.payload str.payload pp_cob_var cob_var
