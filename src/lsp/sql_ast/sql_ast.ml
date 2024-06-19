@@ -82,7 +82,11 @@ and esql_instuction =
   | Update of sqlVarToken * sql_update * (update_arg option)
   | Ignore of sql_instruction
 
-and try_block = { try_instruction: esql_instuction; try_exceptions: sql_exception list }
+and try_block =
+  {
+    try_instruction: esql_instuction;
+    try_exceptions: sql_exception list;
+  }
 and sql_exception = 
   | RaiseAndPrint of sqlVarToken * string with_loc * cobol_var
 
