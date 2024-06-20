@@ -366,12 +366,12 @@ module Printer = struct
       | _ -> Format.fprintf fmt "(%a)" pp_list_lit l )
 
   and pp_where_arg fmt = function
-    | Some x -> (
-      match x with
-      | WhereCurrentOf swhere ->
+    | Some WhereCurrentOf swhere ->
         Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload
-      | UpdateSql sql -> pp_sql fmt sql )
-    | None -> Format.fprintf fmt ""
+    | Some UpdateSql sql ->
+        pp_sql fmt sql
+    | None ->
+        ()
 
   and pp_sql_update_aux fmt (var, op) =
     Format.fprintf fmt "%s = %a" var.payload pp_sql_op op
