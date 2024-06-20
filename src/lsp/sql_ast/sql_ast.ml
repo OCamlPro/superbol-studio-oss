@@ -67,15 +67,21 @@ and esql_instuction =
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
   | SelectInto of
-      cobol_var list
-      * sql_select
-      * sql_select_option list (*select and option_select*)
+      { 
+        vars : cobol_var list;
+        select : sql_select;
+        select_options : sql_select_option list
+      }
   | DeclareTable of literal * (sqlVarToken * sql_type) list
   | DeclareCursor of cursor
   | Prepare of sqlVarToken * sql_instruction
   | ExecuteImmediate of sql_instruction
   | ExecuteIntoUsing of
-      sqlVarToken * cobol_var list option * cobol_var list option
+      { 
+        executed_string : sqlVarToken;
+        opt_into_hostref_list : cobol_var list option;
+        opt_using_hostref_list : cobol_var list option
+      }
   | Disconnect of variable option (*db_id*)
   | DisconnectAll
   | Open of sqlVarToken * cobol_var list option (*cursor name*)
@@ -87,7 +93,8 @@ and esql_instuction =
   | Ignore of sql_instruction
 
 and try_block =
-  { try_instruction : esql_instuction;
+  { 
+    try_instruction : esql_instuction;
     try_exceptions : sql_exception list
   }
 
@@ -117,21 +124,24 @@ and rb_args =
 
 and connect_syntax =
   | Connect_to_idby of
-      { dbname : literal;
+      { 
+        dbname : literal;
         db_conn_id : literal option;
         username : literal;
         db_data_source : literal;
         password : literal
       }
   | Connect_to of
-      { db_data_source : literal;
+      { 
+        db_data_source : literal;
         db_conn_id : literal option;
         username : literal;
         password : literal option
       }
   | Connect_using of { db_data_source : literal }
   | Connect_user of
-      { username : literal;
+      { 
+        username : literal;
         password : literal;
         db_conn_id : literal option;
         db_data_source : literal option
@@ -282,9 +292,9 @@ module Printer = struct
       Format.fprintf fmt "COMMIT %a %s" pp_some_rb_work_or_tran rb_work_or_tran
         s
     | Savepoint s -> Format.fprintf fmt "SAVEPOINT %a" pp_var s
-    | SelectInto (into, sql, sql2) ->
-      Format.fprintf fmt "SELECT %a INTO %a %a" pp_select_lst sql pp_cob_lst
-        into pp_select_options_lst sql2
+    | SelectInto { vars; select; select_options } ->
+      Format.fprintf fmt "SELECT %a INTO %a %a" pp_select_lst select pp_cob_lst
+        vars pp_select_options_lst select_options
     | DeclareTable (var, sql) ->
       Format.fprintf fmt "DECLARE %a TABLE (%a)" pp_lit var pp_declare sql
     | DeclareCursor cursor -> pp_cursor fmt cursor
@@ -292,9 +302,13 @@ module Printer = struct
       Format.fprintf fmt "PREPARE %s FROM %a" str.payload pp_sql sql
     | ExecuteImmediate sql ->
       Format.fprintf fmt "EXECUTE IMMEDIATE %a" pp_sql sql
-    | ExecuteIntoUsing (var, into, using) ->
-      Format.fprintf fmt "EXECUTE %s %a %a" var.payload pp_some_cob_lst
-        (into, "INTO") pp_some_cob_lst (using, "USING")
+    | ExecuteIntoUsing
+        { executed_string; opt_into_hostref_list; opt_using_hostref_list } ->
+      Format.fprintf fmt "EXECUTE %s %a %a" executed_string.payload
+        pp_some_cob_lst
+        (opt_into_hostref_list, "INTO")
+        pp_some_cob_lst
+        (opt_using_hostref_list, "USING")
     | Disconnect sdbname ->
       Format.fprintf fmt "DISCONNECT %a" pp_some_var (sdbname, "")
     | DisconnectAll -> Format.fprintf fmt "DISCONNECT ALL"

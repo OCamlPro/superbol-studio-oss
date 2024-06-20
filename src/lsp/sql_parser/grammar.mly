@@ -106,10 +106,10 @@ let esql :=
 
 let esql_with_opt_at := 
 | i = sql; {Sql i}
-| i = sql_select; INTO; 
-  s = separated_nonempty_list(COMMA, cobol_var); 
-  lst = list(select_option);
-  {SelectInto(s, i, lst)}
+| select = sql_select; INTO; 
+  vars = separated_nonempty_list(COMMA, cobol_var); 
+  select_options = list(select_option);
+  {SelectInto{vars; select; select_options}}
 | START; TRANSACTION; 
   {StartTransaction}
 | DECLARE; table_name= literalVar; TABLE; LPAR; sql=separated_nonempty_list(COMMA, table_lst); RPAR;
@@ -124,8 +124,10 @@ let esql_with_opt_at :=
   {Prepare(name, sql)}
 | EXECUTE; IMMEDIATE; arg=execute_immediate_arg; 
   {ExecuteImmediate arg}
-| EXECUTE; name= sql_var_name; into = option(into_list_cob_var); using= option(using_list_cob_var); 
-  {ExecuteIntoUsing(name,into, using)}
+| EXECUTE; executed_string= sql_var_name; 
+  opt_into_hostref_list = option(into_list_cob_var); 
+  opt_using_hostref_list= option(using_list_cob_var); 
+  {ExecuteIntoUsing{executed_string; opt_into_hostref_list; opt_using_hostref_list}}
 | SAVEPOINT; s= variable; 
   {Savepoint s}
 | ROLLBACK; r=option(rb_work_or_tran); a=option(rb_args);
