@@ -61,6 +61,13 @@ module NEL = struct
           if c = 0 then aux a' b' else c
     in
     aux a b
+  let equal eq a b =
+    let rec aux a b = match a, b with
+      | One a, One b -> eq a b
+      | a :: a', b :: b' when eq a b -> aux a' b'
+      | _ -> false
+    in
+    aux a b
   let hd = function
     | One x
     | x :: _ -> x

@@ -13,7 +13,7 @@
 
 open EzCompat
 
-open Cobol_common                                                  (* Visitor *)
+open Cobol_common                                                  (* Visitor, NEL *)
 open Cobol_common.Srcloc.INFIX
 
 open Lsp_completion_keywords
@@ -148,12 +148,12 @@ let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
             to_completion_item
             ~kind:CompletionItemKind.Module ~range
             (procedure_proposals ~filename range.end_ group)
-        | K token ->
-            let token' = token &@ Srcloc.dummy in
-            try let token = Pretty.to_string "%a" Cobol_parser.INTERNAL.pp_token token' in
-              [completion_item ~kind:CompletionItemKind.Keyword ~range token]
-            with Not_found -> [])
-      comp_entries
+        | K tokens -> begin
+            let tokens' = List.map (fun t -> t &@ Srcloc.dummy) @@ Basics.NEL.to_list tokens in
+            try let tokens = Pretty.to_string "%a" (Fmt.list ~sep:Fmt.sp Cobol_parser.INTERNAL.pp_token) tokens' in
+              [completion_item ~kind:CompletionItemKind.Keyword ~range tokens]
+            with Not_found -> [] end)
+      (Expect.CompEntrySet.elements comp_entries)
 
 (** [listpop l i] pops [i] elements of the list [l]
     @return (h, t) where h is the list of popped element, t is the tail of the list *)
@@ -166,13 +166,10 @@ let listpop l i =
   in let h, t = inner [] l i in List.rev h, t
 
 let pp_state ppf state = (* for debug *)
-  let has_default = try let _ = Expect.get_default_nonterminal_produced state in true with _ -> false in
+  let has_default =
+    try let _ = Expect.default_nonterminals state in true
+    with _ -> false in
   Fmt.pf ppf "%d%s" (Expect.state_to_int state) (if has_default then "_" else "")
-
-let ce_compare ce1 ce2 =
-  String.compare
-  (Fmt.str "%a" Expect.pp_completion_entry ce1)
-  (Fmt.str "%a" Expect.pp_completion_entry ce2)
 
 let debug = false
 let expected_tokens env =
@@ -183,17 +180,18 @@ let expected_tokens env =
         | Some env -> state::(get_stack env) in
   let rec inner env_stack acc =
     match env_stack with
-      | [] -> []
+      | [] -> acc
       | state::_ ->
           if debug then (Lsp_io.log_debug "In State: %a" pp_state state; let tok = Expect.transition_tokens state in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
-          let defaults = try Expect.get_default_nonterminal_produced state with _ -> [] in
-          let acc = Expect.transition_tokens state @ acc in
+          let defaults = try Expect.default_nonterminals state with _ -> [] in
+          let acc = Expect.CompEntrySet.add_seq
+            (List.to_seq @@ Expect.transition_tokens state) acc in
           List.fold_left (fun acc (rhslen, lhs) ->
             let _, states = listpop env_stack rhslen in
             match List.hd states with
               | transition_state ->
                   let next = Expect.follow_transition transition_state lhs in
-                  if debug then Lsp_io.log_debug "From %a following %a -> %a" pp_state state pp_state transition_state pp_state next;
+                  if debug then Lsp_io.log_debug "Reduced %a, popped %d, following %a -> %a" pp_state state rhslen pp_state transition_state pp_state next;
                   inner (next::states) acc
               | exception Failure _ ->
                   Lsp_io.log_warn "Had to pop too many states during context completion [%a]"
@@ -202,14 +200,14 @@ let expected_tokens env =
                   acc)
           acc defaults in
   if debug then Lsp_io.log_debug "%a" (Fmt.list ~sep:(Fmt.any " ") pp_state) (get_stack env);
-  let comp_entries = inner (get_stack env) [] in
-  let comp_entries = List.sort_uniq ce_compare comp_entries in
-  if debug then (if List.length comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.pp_completion_entry) comp_entries else Lsp_io.log_debug "=> Comp entries are %d\n" (List.length comp_entries));
+  let comp_entries = inner (get_stack env) Expect.CompEntrySet.empty in
+  if debug then (if Expect.CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.pp_completion_entry) (Expect.CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (Expect.CompEntrySet.cardinal comp_entries));
   comp_entries
 
 let context_completion_items (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range = range pos doc.textdoc in
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
-    | Some Env env -> map_completion_items ~range ~group ~filename (expected_tokens env)
+    | Some Env env ->
+        map_completion_items ~range ~group ~filename (expected_tokens env)
     | _ -> [] end
