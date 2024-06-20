@@ -13,7 +13,6 @@
 (**************************************************************************)
 open Sql_ast
 open Cobol_common.Srcloc.INFIX
-module Sql_overlay_manager
 
 %}
 %token COLON COMMA SEMICOLON EQUAL PLUS MINUS OR AND IN

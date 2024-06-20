@@ -42,8 +42,15 @@ let parse text =
         match w'.payload with
         | Cobol_preproc.Text.TextWord tw ->
           let tokenizer ~loc:_ lexbuf = Lexer.token lexbuf in
-          let f (t' : 'a with_loc) (_, _) = emit ~loc:t'.loc t'.payload in
-
+          let f (t' : 'a with_loc) (tokens, prev_right_limit) =
+            let t = t'.payload in
+            let loc = t'.loc in
+            let lstart, lend = OM.limits loc in
+            ( match prev_right_limit with
+            | None -> ()
+            | Some l -> OM.link_limits l lstart );
+            ((t, lstart, lend) :: tokens, Some lend)
+          in
           let tw' : string with_loc = Srcloc.locfrom tw w' in
 
           Tokenizing.fold_tokens ~tokenizer ~until:(( = ) Grammar.EOF) ~f tw'
@@ -63,6 +70,6 @@ let parse text =
       ([], None) text
     |> fst |> List.rev
   in
-
   let ast = Grammar.MenhirInterpreter.loop (supplier tokens) init_checkpoint in
+(*   Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp ast; *)
   ast
