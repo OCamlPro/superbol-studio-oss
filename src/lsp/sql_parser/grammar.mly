@@ -13,7 +13,7 @@
 (**************************************************************************)
 open Sql_ast
 open Cobol_common.Srcloc.INFIX
-module Overlay_manager = Sql_overlay_manager
+module Sql_overlay_manager
 
 %}
 %token COLON COMMA SEMICOLON EQUAL PLUS MINUS OR AND IN
@@ -57,7 +57,7 @@ module Overlay_manager = Sql_overlay_manager
 
 
 let loc (X) ==
-  | x = X; { x &@ Overlay_manager.join_limits $sloc }
+  | x = X; { x &@ Sql_overlay_manager.join_limits $sloc }
 
 let main :=
 | EXEC; SQL; stm = esql; END_EXEC; EOF; {stm}

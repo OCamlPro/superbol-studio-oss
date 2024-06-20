@@ -114,7 +114,7 @@
       with Not_found -> WORD s 
 }
 
-let numbers = '-'? ['0'-'9']+ (','['0'-'9']+)?
+let number = '-'? ['0'-'9']+ (','['0'-'9']+)?
 
 rule token = parse
   | "END-EXEC"
@@ -129,7 +129,7 @@ rule token = parse
       { BACKSLASH_VAR s }
   | ['a'-'z' 'A'-'Z' '0'-'9']['A'-'Z' 'a'-'z' '0'-'9' '-' '_' '*' ]* as s 
       { get_keyword s }
-  | numbers as n
+  | number as n
       { DIGITS n }
   | '\'' ( ['A'-'Z' 'a'-'z' '0'-'9' '_' '(' '*' ')' '.' '[' ']']* as s) '\''
       { STRING s}
