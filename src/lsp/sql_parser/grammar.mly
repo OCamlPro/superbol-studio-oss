@@ -47,7 +47,7 @@ open Cobol_common.Srcloc.INFIX
 %token THEN RAISE EXCEPTION
 %token <string> WORD
 %token <string> STRING
-%token <string> DIGITS
+%token <string> NUMBER
 %token <string> COBOL_VAR
 %token <string> BACKSLASH_VAR
 %start <esql_instuction> main 
@@ -86,7 +86,7 @@ let literalVar :=
 
 let literal :=
 | l = literalVar; {l}
-| v = loc(DIGITS); {LiteralNum v}
+| v = loc(NUMBER); {LiteralNum v}
 | s = loc(STRING); {LiteralStr s} (*TODO Differentiate 'variable' and "string" and 'char' *)
 
 
@@ -149,7 +149,7 @@ let esql_with_opt_at :=
 | CLOSE; cursor = sql_var_name; {Close cursor}
 
 let begin_end_stm :=
-| try_instruction = esql; SEMICOLON; EXCEPTION; try_exceptions= nonempty_list(exeption); {{try_instruction; try_exceptions}}
+| try_instruction = esql; SEMICOLON; EXCEPTION; try_exceptions= list(exeption); {{try_instruction; try_exceptions}}
 
 let exeption :=
 | WHEN; exeption_name = sql_var_name; THEN; RAISE; EXCEPTION; s = loc(STRING); COMMA; c = cobol_var; SEMICOLON;
@@ -408,7 +408,7 @@ let sql_no_simpl_cobol :=
 
 let sql_first_token :=
 | t = WORD; {SqlInstr t }
-| d = DIGITS; {SqlInstr d }
+| d = NUMBER; {SqlInstr d }
 | s = STRING; {SqlInstr ("\""^s^"\"")}
 | LPAR ; {SqlInstr "(" }
 | RPAR; {SqlInstr ")" }

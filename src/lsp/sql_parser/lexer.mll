@@ -130,7 +130,7 @@ rule token = parse
   | ['a'-'z' 'A'-'Z' '0'-'9']['A'-'Z' 'a'-'z' '0'-'9' '-' '_' '*' ]* as s 
       { get_keyword s }
   | number as n
-      { DIGITS n }
+      { NUMBER n }
   | '\'' ( ['A'-'Z' 'a'-'z' '0'-'9' '_' '(' '*' ')' '.' '[' ']']* as s) '\''
       { STRING s}
 
@@ -168,7 +168,6 @@ rule token = parse
       { EOF }
 
 {
-  (* when empty lexbuf, we use an exeption... this is not very cool *)
   let token lexbuf =
-    try token lexbuf with _ -> EOF
+    token lexbuf
 }
