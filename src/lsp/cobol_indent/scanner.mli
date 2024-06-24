@@ -11,9 +11,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type result = {
+  toks : (Types.token * Types.token_descr) list ;
+  revedits : Types.indent_record list (* in reverse order *) ;
+  skipped_revlines : int list; (* only when not config.scan_for_indent *)
+}
+
 val tokenize :
   config:Types.config ->
   filename:string ->
-  contents:string ->
-  (Types.token * Types.token_descr) list *
-  Types.indent_record list (* in reverse order *)
+  contents:string -> result

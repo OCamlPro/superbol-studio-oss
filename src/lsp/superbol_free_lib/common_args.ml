@@ -111,7 +111,7 @@ let get () =
     ["silence"], Arg.String silence,
     EZCMD.info "Silence specific messages";
 
-    ["I"], Arg.String (fun s -> libpath := s :: !libpath),
+    ["I"], Arg.String (fun s -> libpath := !libpath @ [s]),
     EZCMD.info ~docv:"DIRECTORY" "Add DIRECTORY to library search path";
   ] in
 

@@ -4,7 +4,7 @@
 
 ### Added
 - Internal support for inspecting the parser's state right before EOF [#302](https://github.com/OCamlPro/superbol-studio-oss/pull/302)
-- Show data item information on hover [#293](https://github.com/OCamlPro/superbol-studio-oss/pull/293)
+- Show data item information on hover [#293](https://github.com/OCamlPro/superbol-studio-oss/pull/293) [#305](https://github.com/OCamlPro/superbol-studio-oss/pull/305)
 - Folding of `EXEC`/`END-EXEC` blocks [#291](https://github.com/OCamlPro/superbol-studio-oss/pull/291)
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
