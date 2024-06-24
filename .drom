@@ -5,12 +5,13 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-e124673eea7aaa012fdaf69a8523f04e:.
+8cea4e6583257460088512aeb1ad1f3c:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
 5714f81b8a12cefeab3bd452453832b5:.github/workflows/workflow.yml
+aedabb02434649b101d3db2436821c08:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -174,6 +175,16 @@ fe64489e50fc24d4ded58fb298f2b3ac:opam/node-js-stubs.opam
 # file opam/pretty.opam
 b12cc17cc4ed0083355236058d5a523d:opam/pretty.opam
 # end context for opam/pretty.opam
+
+# begin context for opam/sql_ast.opam
+# file opam/sql_ast.opam
+46a86088dd35038c08807fbc8617a944:opam/sql_ast.opam
+# end context for opam/sql_ast.opam
+
+# begin context for opam/sql_parser.opam
+# file opam/sql_parser.opam
+9905287d499b35a41caddb08b96975f7:opam/sql_parser.opam
+# end context for opam/sql_parser.opam
 
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
@@ -425,6 +436,26 @@ eab335ce600887c59f1baf9b0983d0ac:src/lsp/ezr_toml/dune
 835b44bd66a7d58831f72da5fd0822ba:src/lsp/pretty/version.mlt
 # end context for src/lsp/pretty/version.mlt
 
+# begin context for src/lsp/sql_ast/dune
+# file src/lsp/sql_ast/dune
+e0c73ea039315b0cfa5b4a7ac54a1484:src/lsp/sql_ast/dune
+# end context for src/lsp/sql_ast/dune
+
+# begin context for src/lsp/sql_ast/version.mlt
+# file src/lsp/sql_ast/version.mlt
+835b44bd66a7d58831f72da5fd0822ba:src/lsp/sql_ast/version.mlt
+# end context for src/lsp/sql_ast/version.mlt
+
+# begin context for src/lsp/sql_parser/dune
+# file src/lsp/sql_parser/dune
+2408ff5956afa93ae2f3302928555c8e:src/lsp/sql_parser/dune
+# end context for src/lsp/sql_parser/dune
+
+# begin context for src/lsp/sql_parser/version.mlt
+# file src/lsp/sql_parser/version.mlt
+835b44bd66a7d58831f72da5fd0822ba:src/lsp/sql_parser/version.mlt
+# end context for src/lsp/sql_parser/version.mlt
+
 # begin context for src/lsp/superbol-free/dune
 # file src/lsp/superbol-free/dune
 095155be06e2840753e52b3d03d541b9:src/lsp/superbol-free/dune
@@ -447,7 +478,7 @@ a8a051709a43fba5b6ab54b66b77cbcf:src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_preprocs/dune
 # file src/lsp/superbol_preprocs/dune
-f5b7c58bbac13fe6141368414f4cb96f:src/lsp/superbol_preprocs/dune
+9ac937ba500427e8309d8092a1554d60:src/lsp/superbol_preprocs/dune
 # end context for src/lsp/superbol_preprocs/dune
 
 # begin context for src/lsp/superbol_preprocs/version.mlt
@@ -477,7 +508,7 @@ b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-87fe96c228b8cb51be7268c7e3cdd5b5:src/vendor/ez_toml/dune
+aad8ac8a26ae15e3501dd5ea3b49ec9a:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld

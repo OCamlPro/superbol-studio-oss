@@ -206,6 +206,7 @@
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
    (ocaml (>= 4.14.0))
+   (sql_parser (= version))
    (pretty (= version))
    (cobol_preproc (= version))
    (cobol_parser (= version))
@@ -453,6 +454,39 @@
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ez_toml (= version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   odoc
+  )
+ )
+
+(package
+ (name sql_ast)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (pretty (= version))
+   (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
+   (cobol_common (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   odoc
+  )
+ )
+
+(package
+ (name sql_parser)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (sql_ast (= version))
+   (menhir ( >= 1.2 ))
+   (ez_file ( >= 0.3 ))
+   (ebcdic_lib (= version))
+   (cobol_preproc (= version))
+   (cobol_parser (= version))
+   (cobol_common (= version))
+   (ppx_deriving ( >= 5.2.1 ))
+   (menhir ( = 20230415 ))
    odoc
   )
  )

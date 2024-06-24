@@ -47,6 +47,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "sql_parser" {= version}
   "pretty" {= version}
   "cobol_preproc" {= version}
   "cobol_parser" {= version}

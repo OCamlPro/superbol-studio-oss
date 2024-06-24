@@ -16,17 +16,18 @@ let%expect_test "exec-block-with-cobol-separators" =
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
            EXEC SQL
+            BEGIN
               SELECT something_1, something_2 FROM some_table
-                 WHERE condition > 0;
+                WHERE condition > 0;
+              EXCEPTION
+            END;
            END-EXEC.
            STOP RUN.
   |};
-  [%expect {|
+  [%expect{|
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
-    EXEC_BLOCK[EXEC SQL SELECT something_1 , something_2 FROM some_table WHERE
-               condition > 0 ; END-EXEC],
-    ., STOP, RUN, ., EOF
-|}];;
+    EXEC_BLOCK[EXEC SQL BEGIN SELECT something_1, something_2  FROM some_table WHERE condition > 0; EXCEPTION  END; END-EXEC],
+    ., STOP, RUN, ., EOF |}];;
 
 let%expect_test "exec-block-with-invalid-percentage-character" =
   let exec_scanners =

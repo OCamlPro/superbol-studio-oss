@@ -46,6 +46,15 @@ let ibm_root = srcdir // ibm_testsuite
 let mf_testsuite = testsuites // "microfocus" // "www.csis.ul.ie"
 let mf_root = srcdir // mf_testsuite
 
+(*The tests in sql_exec_testsuite are not real Cobol programs but simplified*)
+let sql_exec_testsuite = testsuites // "sql" // "sql_exec"
+let sql_exec_root = srcdir // sql_exec_testsuite
+
+(*The tests in gixsql_testsuite are real Cobol programs using sql
+  They are not correctly parsed*)
+let gixsql_testsuite = testsuites // "sql" // "gixsql_test"
+let gixsql_root = srcdir // gixsql_testsuite
+
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget @@
   Cobol_config.from_dialect dialect

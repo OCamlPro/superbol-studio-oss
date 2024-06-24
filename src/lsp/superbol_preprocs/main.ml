@@ -16,7 +16,7 @@ module EXEC_MAP = Cobol_preproc.Options.EXEC_MAP
 let exec_scanners =
   Cobol_parser.Options.{
     exec_scanner_fallback = Generic.scanner;  (* for now; TODO: Call.scanner? *)
-    exec_scanners = EXEC_MAP.empty;
+    exec_scanners = Cobol_preproc.Options.EXEC_MAP.singleton "SQL" Esql.scanner;
   }
 
 let more scanners =

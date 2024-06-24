@@ -74,4 +74,20 @@ let () =
         (ibm_root // path);
       printf "@]@."
     end;
+  let config = Cobol_config.default in
+  deep_iter sql_exec_root ~glob:"*.cbl"
+    ~f:begin fun path ->
+      printf "@[<v 1>Re-parsing `%s':@ " @@ sql_exec_testsuite // path;
+      reparse_file ~config ~source_format:(Cobol_config.Auto)
+        (sql_exec_root // path);
+      printf "@]@."
+    end;
+  let config = Cobol_config.default in
+  deep_iter gixsql_root ~glob:"*.cbl"
+    ~f:begin fun path ->
+      printf "@[<v 1>Re-parsing `%s':@ " @@ gixsql_testsuite // path;
+      reparse_file ~config ~source_format:(Cobol_config.Auto)
+        (gixsql_root // path);
+      printf "@]@."
+    end;
 ;;
