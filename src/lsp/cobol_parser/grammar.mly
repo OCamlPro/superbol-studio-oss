@@ -494,7 +494,7 @@ let informational_paragraph_header ==
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
-let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
+let as__strlit_ [@default None] := ~ = ro (pf (AS, string_literal)); < >
 
 let unit_name := loc(infoword_or_literal)
 
@@ -815,7 +815,7 @@ let order_table_clause :=                                          (* +COB2002 *
   | ORDER; TABLE; i = name; IS?; l = string_literal;
     { OrderTable { ordering_name = i; cultural_ordering = l } }
 
-let for_alphanumeric_or_national_opt :=
+let for_alphanumeric_or_national_opt [@default Alphanumeric] :=
   | (* epsilon *)       {Alphanumeric}
   | FOR?; ALPHANUMERIC; {Alphanumeric}
   | FOR?; NATIONAL;     {National}
@@ -1020,7 +1020,7 @@ let same_area_clause :=
        same_area_file_name = i;
        same_area_file_names = il } }
 
-let area_source :=
+let area_source [@default AreaSourceFile] :=
  |             {AreaSourceFile}
  | RECORD;     {AreaSourceRecord}
  | SORT;       {AreaSourceSortMerge}
@@ -1300,7 +1300,7 @@ let recording_mode :=
  | FIXED;    { ModeFixed }
  | VARIABLE; { ModeVariable }
 
-from_to_characters_opt:
+from_to_characters_opt [@default (None, None)]:
  | CHARACTERS?                                    { None,    None }
  | FROM? i1 = integer CHARACTERS?                 { Some i1, None }
  | TO i2 = integer CHARACTERS?                    { None,    Some i2 }
@@ -1700,7 +1700,7 @@ let encoding_mode :=
   | BINARY_ENCODING;  { BinaryEncoding }
   | DECIMAL_ENCODING; { DecimalEncoding }
 
-let encoding_endianness_opt :=
+let encoding_endianness_opt [@default { encoding_mode = None; endianness_mode = None }] :=
   | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
@@ -1845,7 +1845,7 @@ let column_position :=
   | ~ = integer;                <ColumnAbsolute>
   | or_(PLUS,"+"); ~ = integer; <ColumnRelative>
 
-let alignment :=
+let alignment [@default AlignLeft] :=
   | LEFT?;  {AlignLeft}
   | CENTER; {AlignRight}
   | RIGHT;  {AlignCenter}
@@ -2800,7 +2800,7 @@ let rounded_ident :=
     { { rounded = i; rounded_rounding = rm } }
 let rounded_idents == ~ = rnel(rounded_ident); < >
 
-let rounded_phrase_opt :=
+let rounded_phrase_opt [@default RoundingNotAny] :=
   | (* epsilon *)                         {RoundingNotAny} (* = ROUNDED MODE TRUNCATION *)
   | ~ = rounded_phrase; < >
 
@@ -3372,7 +3372,7 @@ let when_phrase :=
 
 let when_selection_objects := WHEN; ~ = selection_objects; < >
 
-let when_other :=
+let when_other [@default []] :=
  | %prec lowest { [] }
  | WHEN; OTHER; ~ = imp_stmts; < >
 

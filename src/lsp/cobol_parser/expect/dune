@@ -1,4 +1,4 @@
 (executable
  (name gen_expect)
- (libraries unix fmt menhirSdk cobol_common))
+ (libraries unix fmt menhirSdk cobol_common ocplib_stuff))
  ; cobol_common is for NEL only

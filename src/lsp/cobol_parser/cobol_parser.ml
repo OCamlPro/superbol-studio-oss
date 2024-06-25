@@ -21,6 +21,7 @@ module Outputs = Parser_outputs
 module Diagnostics = Parser_diagnostics
 
 module Tokens = Grammar_tokens
+module Recover = Grammar_recover
 module Expect = Grammar_expect
 module Printer = Grammar_printer
 module Keywords = Text_keywords

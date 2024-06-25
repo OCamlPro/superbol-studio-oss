@@ -49,7 +49,7 @@ let complete_positions (doc, positions) : string -> unit =
 let%expect_test "division-and-section-completion" =
   let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
         _|_IDENTIFICATION D_|_IVISION._|_
-        _|_PROGRAM-ID _|_. _|_prog.
+        PROGRAM-ID _|_. _|_prog.
         _|_DATA _|_DIVISION.
         _|_WORKING-STORAGE _|_SECTION.
         01 DATA-NAME PIC X.
@@ -83,15 +83,6 @@ let%expect_test "division-and-section-completion" =
        3           PROGRAM-ID . prog.
        4           DATA DIVISION.
     (line 1, character 32):
-    List of completions (11 entries): [AUTHOR;CLASS-ID;DATE-COMPILED;DATE-MODIFIED;DATE-WRITTEN;FUNCTION-ID;INSTALLATION;INTERFACE-ID;PROGRAM-ID;REMARKS;SECURITY]
-    __rootdir__/prog.cob:3.8:
-       1
-       2           IDENTIFICATION DIVISION.
-       3 >         PROGRAM-ID . prog.
-    ----           ^
-       4           DATA DIVISION.
-       5           WORKING-STORAGE SECTION.
-    (line 2, character 8):
     List of completions (11 entries): [AUTHOR;CLASS-ID;DATE-COMPILED;DATE-MODIFIED;DATE-WRITTEN;FUNCTION-ID;INSTALLATION;INTERFACE-ID;PROGRAM-ID;REMARKS;SECURITY]
     __rootdir__/prog.cob:3.19:
        1

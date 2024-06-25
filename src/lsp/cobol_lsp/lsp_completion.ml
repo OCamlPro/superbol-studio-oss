@@ -19,25 +19,8 @@ open Cobol_common.Srcloc.INFIX
 open Lsp_completion_keywords
 open Lsp.Types
 
-module Menhir = struct include Cobol_parser.INTERNAL.Grammar.MenhirInterpreter end
-module Expect = struct include Cobol_parser.Expect end
-
-let name_proposals ast ~filename pos =
-  let visitor = object
-    inherit [StringSet.t] Cobol_ptree.Visitor.folder
-
-    method! fold_compilation_unit' cu =
-      if Lsp_position.is_in_srcloc ~filename pos ~@cu
-      then Visitor.do_children
-      else Visitor.skip_children
-
-    method! fold_name name acc =
-      Visitor.skip_children @@ StringSet.add name acc
-
-    end
-  in
-  Cobol_ptree.Visitor.fold_compilation_group visitor ast StringSet.empty
-  |> StringSet.elements
+module Menhir = Cobol_parser.INTERNAL.Grammar.MenhirInterpreter
+module Expect = Cobol_parser.Expect
 
 let qualname_proposals ~filename pos group =
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
@@ -166,41 +149,52 @@ let listpop l i =
   in let h, t = inner [] l i in List.rev h, t
 
 let pp_state ppf state = (* for debug *)
+  Fmt.pf ppf "%d" (Menhir.number state)
+
+let pp_env ppf env = (* for debug *)
   let has_default =
-    try let _ = Expect.default_nonterminals state in true
+    try let _ = Expect.reducable_productions_in ~env in true
     with _ -> false in
-  Fmt.pf ppf "%d%s" (Expect.state_to_int state) (if has_default then "_" else "")
+  Fmt.pf ppf "%d%s" (Menhir.current_state_number env) (if has_default then "_" else "")
+
+let pp_env_stack ppf env =
+  let rec get_stack env =
+    match Menhir.pop env with
+      | None -> [env]
+      | Some popped_env -> env::(get_stack popped_env)
+    in
+    Fmt.pf ppf "TOP(%a)  STACK: %a" pp_env env
+    (Fmt.list ~sep:(Fmt.any " ") pp_env) (get_stack env)
 
 let debug = false
-let expected_tokens env =
-  let rec get_stack env =
-    let state = Expect.state_of_int (Menhir.current_state_number env) in
-    match Menhir.pop env with
-        | None -> [state]
-        | Some env -> state::(get_stack env) in
-  let rec inner env_stack acc =
-    match env_stack with
-      | [] -> acc
-      | state::_ ->
-          if debug then (Lsp_io.log_debug "In State: %a" pp_state state; let tok = Expect.transition_tokens state in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
-          let defaults = try Expect.default_nonterminals state with _ -> [] in
-          let acc = Expect.CompEntrySet.add_seq
-            (List.to_seq @@ Expect.transition_tokens state) acc in
-          List.fold_left (fun acc (rhslen, lhs) ->
-            let _, states = listpop env_stack rhslen in
-            match List.hd states with
-              | transition_state ->
-                  let next = Expect.follow_transition transition_state lhs in
-                  if debug then Lsp_io.log_debug "Reduced %a, popped %d, following %a -> %a" pp_state state rhslen pp_state transition_state pp_state next;
-                  inner (next::states) acc
-              | exception Failure _ ->
-                  Lsp_io.log_warn "Had to pop too many states during context completion [%a]"
-                  (Fmt.list ~sep:(Fmt.any " ") Fmt.int)
-                  (List.map Expect.state_to_int env_stack);
-                  acc)
-          acc defaults in
-  if debug then Lsp_io.log_debug "%a" (Fmt.list ~sep:(Fmt.any " ") pp_state) (get_stack env);
-  let comp_entries = inner (get_stack env) Expect.CompEntrySet.empty in
+let expected_tokens base_env =
+  let rec inner env acc =
+    let pos = match Menhir.top env with
+      | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
+      | Some Menhir.Element (_, _, _, pos) -> pos in
+    if debug then (Lsp_io.log_debug "In State: %a" pp_env env; let tok = Expect.acceptable_terminals_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
+    let productions = Expect.reducable_productions_in ~env in
+    let nullables = Expect.accaptable_nullable_nonterminals_in ~env in
+    let acc = Expect.CompEntrySet.add_seq
+      (List.to_seq @@ Expect.acceptable_terminals_in ~env) acc in
+    let acc = List.fold_left (fun acc (Menhir.X sym) ->
+      let default_value =
+        try Some (Cobol_parser.Recover.default_value sym)
+        with Not_found -> try Some (Expect.guessed_default_value_of_nullables sym)
+        with Not_found -> if debug then  Lsp_io.log_debug "Not found"; None in
+      Option.fold ~none:acc ~some:(fun a ->
+        let new_env = Menhir.feed sym pos a pos env in
+        if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
+        inner new_env acc) default_value)
+    acc nullables in
+    List.fold_left (fun acc prod ->
+      let new_env = Menhir.force_reduction prod env in
+      if debug then Lsp_io.log_debug "Force prod %d, on %a\nGot to %a" (Menhir.production_index prod) pp_env_stack env pp_env_stack new_env;
+      inner new_env acc)
+    acc productions
+  in
+  if debug then Lsp_io.log_debug "%a" pp_env_stack base_env;
+  let comp_entries = inner base_env Expect.CompEntrySet.empty in
   if debug then (if Expect.CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.pp_completion_entry) (Expect.CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (Expect.CompEntrySet.cardinal comp_entries));
   comp_entries
 
