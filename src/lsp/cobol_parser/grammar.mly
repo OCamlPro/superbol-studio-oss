@@ -475,8 +475,7 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_end_name = em } }
 
 
-let informational_paragraphs :=                            (* ~COB85, -COB2002 *)
- rl(loc(informational_paragraph))
+let informational_paragraphs == rl(loc(informational_paragraph)) (* ~COB85, -COB2002 *)
 
 let informational_paragraph :=
   | ~ = informational_paragraph_header; "."; ~ = loc(comment_entry); < >
