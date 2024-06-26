@@ -68,3 +68,5 @@ let parse text =
   let ast = Grammar.MenhirInterpreter.loop (supplier tokens) init_checkpoint in
   (*   Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp ast; *)
   ast
+
+  let parseString str = Grammar.main Lexer.token str

@@ -47,6 +47,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
+  "superbol_preprocs" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "ez_file" {>= "0.3"}
   "cobol_indent" {= version}

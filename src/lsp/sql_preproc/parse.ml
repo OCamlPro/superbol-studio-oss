@@ -140,7 +140,10 @@ let parse ~config ~filename ~contents =
       if config.verbosity > 1 then
         Printf.eprintf "EXEC SQL found at line %d\n%!" loc.line;
       begin match tokens with
-        | (
+        | (tok, loc) :: _ ->
+          let cmd = Misc.string_of_token tok in
+          iter_sql loc cmd [] tokens
+(*         | (
           (IDENT _
           | RETURN
           | READ | FILE | WRITE | REWRITE | DELETE | SET
@@ -151,7 +154,7 @@ let parse ~config ~filename ~contents =
           iter_sql loc cmd [] tokens
         | (tok, loc) :: _ ->
           Misc.error ~loc "SQL syntax error on token %S for command"
-            (Misc.string_of_token tok)
+            (Misc.string_of_token tok) *)
         | [] ->
           Misc.error ~loc "SQL syntax error on end of file"
       end
@@ -172,8 +175,17 @@ let parse ~config ~filename ~contents =
         Printf.eprintf "END-EXEC found at %d\n%!" end_loc.line;
 
       let params = List.rev params in
+      let sqlStr = "EXEC SQL "^ (String.concat " " params) ^ " END-EXEC" in
+      Format.fprintf Format.std_formatter "\nSTRING\n"; 
+      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; 
+
+      let sql = Sql_parser.parseString (Lexing.from_string sqlStr) 
+      in
+      Format.fprintf Format.std_formatter "\nAST\n"; 
+      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; 
+
       sql_add_statement ~loc
-        (EXEC_SQL { end_loc ; with_dot ; cmd ; tokens = params });
+        (EXEC_SQL { end_loc ; with_dot ; cmd ; tokens = sql });
       iter tokens
     | [] -> failwith "missing END-EXEC."
     | (tok, _) :: tokens ->

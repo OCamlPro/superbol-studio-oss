@@ -162,6 +162,10 @@ rule token = parse
       { RPAR }
   | '*'
       { STAR }
+  | ' ' 
+      { token lexbuf }
+  | _ as c 
+      { failwith (Printf.sprintf "unexpected character: %C" c) }
 (*   | _ as s 
       { TOKEN s } *)
   | eof
