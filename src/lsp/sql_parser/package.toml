@@ -85,8 +85,7 @@ menhir = ">=20230415"
 dune-libraries = "str"
 dune-trailer = """
 (menhir (modules grammar)
-        (flags  
-                --inspection --cmly --table --strict
+        (flags --inspection --cmly --table --strict
                --unused-tokens))
 
 """

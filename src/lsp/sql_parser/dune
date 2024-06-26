@@ -25,8 +25,7 @@
 
 ; use field 'dune-trailer' to add more stuff here
 (menhir (modules grammar)
-        (flags --explain 
-                --inspection --cmly --table --strict
+        (flags --inspection --cmly --table --strict
                --unused-tokens))
 
 
