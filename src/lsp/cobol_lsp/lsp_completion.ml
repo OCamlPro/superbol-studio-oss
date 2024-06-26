@@ -16,9 +16,11 @@ open EzCompat
 open Cobol_common                                                  (* Visitor *)
 open Cobol_common.Srcloc.INFIX
 
-open Cobol_parser.Expect
 open Lsp_completion_keywords
 open Lsp.Types
+
+module Menhir = struct include Cobol_parser.INTERNAL.Grammar.MenhirInterpreter end
+module Expect = struct include Cobol_parser.Expect end
 
 let name_proposals ast ~filename pos =
   let visitor = object
@@ -105,6 +107,7 @@ let completion_item label ~range ~kind =
       ~textEdit:(`TextEdit textedit)
       ()
 
+let delimiters = [' '; '\t'; '.']
 let range (pos:Position.t) text =
   let { line; character }: Position.t = pos in
   let get_nthline s n =
@@ -118,14 +121,15 @@ let range (pos:Position.t) text =
       String.sub s start (end_-start)
       in
     let text_line = get_nthline (Lsp.Text_document.text text) line in
-    let index =
-      try 1 + String.rindex_from text_line (character - 1) ' ' with _ ->
-      try 1 + String.rindex_from text_line (character - 1) '\t'
-      with _ -> 0 in
+    let index = List.fold_left (fun acc delimiter ->
+      let current =
+        try 1 + String.rindex_from text_line (character - 1) delimiter
+        with _ -> 0 in
+      max acc current) 0 delimiters in
     let position_start = Position.create ~character:index ~line in
     Range.create ~start:position_start ~end_:pos
 
-let map_to_completion_item ~kind ~range qualnames =
+let to_completion_item ~kind ~range qualnames =
   List.flatten @@ List.map (function
     | Cobol_ptree.Name name -> [~&name]
     | Qual (name,_) as qualname ->
@@ -133,39 +137,79 @@ let map_to_completion_item ~kind ~range qualnames =
     | _ -> []) qualnames |>
     List.map @@ completion_item ~kind ~range
 
-let context_completion_items (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =
-  let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
-  let range = range pos doc.textdoc in
-  let start_pos = range.start in
-  begin match Lsp_document.inspect_at ~position:start_pos doc with
-    | Some Env env -> Some (
-      Cobol_parser.INTERNAL.Grammar.MenhirInterpreter.current_state_number env)
-    | _ -> None end
-  |> Option.fold ~none:[] ~some:(fun state_num ->
-      let tokens = Cobol_parser.Expect.next_symbol_of_state state_num in
-      (* Lsp_io.log_info "State %d is [%a]\n" state_num (Fmt.list ~sep:(Fmt.any ";") pp_completion_entry) tokens; *)
+let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
+      let pos = range.end_ in
       List.flatten @@ List.map (function
-        | QualifiedRef ->
-            map_to_completion_item
+        | Expect.QualifiedRef ->
+            to_completion_item
               ~kind:CompletionItemKind.Variable ~range
               (qualname_proposals ~filename pos group)
         | ProcedureRef ->
-            map_to_completion_item
+            to_completion_item
             ~kind:CompletionItemKind.Module ~range
-            (procedure_proposals ~filename pos group)
+            (procedure_proposals ~filename range.end_ group)
         | K token ->
             let token' = token &@ Srcloc.dummy in
             try let token = Pretty.to_string "%a" Cobol_parser.INTERNAL.pp_token token' in
               [completion_item ~kind:CompletionItemKind.Keyword ~range token]
             with Not_found -> [])
-      tokens)
+      comp_entries
 
-let completion_items (doc:Lsp_document.t) (pos:Position.t) ast =
-  let text = doc.textdoc in
-  let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri text) in
-  let range = range pos text in
-  let names = name_proposals ast ~filename pos in
-  let keywords = keyword_proposals ast pos in
-  let keywordsItem = List.map (completion_item ~kind:CompletionItemKind.Keyword ~range) keywords in
-  let namesItem = List.map (completion_item ~kind:CompletionItemKind.Method ~range) names in
-    keywordsItem @ namesItem
+(** [listpop l i] pops [i] elements of the list [l]
+    @return (h, t) where h is the list of popped element, t is the tail of the list *)
+let listpop l i =
+  let rec inner h t i =
+    if i == 0 then (h, t) else
+    match t with
+    | [] -> (h, [])
+    | hd::tl -> inner (hd::h) tl (i-1)
+  in let h, t = inner [] l i in List.rev h, t
+
+let pp_state ppf state = (* for debug *)
+  let has_default = try let _ = Expect.get_default_nonterminal_produced state in true with _ -> false in
+  Fmt.pf ppf "%d%s" (Expect.state_to_int state) (if has_default then "_" else "")
+
+let ce_compare ce1 ce2 =
+  String.compare
+  (Fmt.str "%a" Expect.pp_completion_entry ce1)
+  (Fmt.str "%a" Expect.pp_completion_entry ce2)
+
+let debug = false
+let expected_tokens env =
+  let rec get_stack env =
+    let state = Expect.state_of_int (Menhir.current_state_number env) in
+    match Menhir.pop env with
+        | None -> [state]
+        | Some env -> state::(get_stack env) in
+  let rec inner env_stack acc =
+    match env_stack with
+      | [] -> []
+      | state::_ ->
+          if debug then (Lsp_io.log_debug "In State: %a" pp_state state; let tok = Expect.transition_tokens state in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
+          let defaults = try Expect.get_default_nonterminal_produced state with _ -> [] in
+          let acc = Expect.transition_tokens state @ acc in
+          List.fold_left (fun acc (rhslen, lhs) ->
+            let _, states = listpop env_stack rhslen in
+            match List.hd states with
+              | transition_state ->
+                  let next = Expect.follow_transition transition_state lhs in
+                  if debug then Lsp_io.log_debug "From %a following %a -> %a" pp_state state pp_state transition_state pp_state next;
+                  inner (next::states) acc
+              | exception Failure _ ->
+                  Lsp_io.log_warn "Had to pop too many states during context completion [%a]"
+                  (Fmt.list ~sep:(Fmt.any " ") Fmt.int)
+                  (List.map Expect.state_to_int env_stack);
+                  acc)
+          acc defaults in
+  if debug then Lsp_io.log_debug "%a" (Fmt.list ~sep:(Fmt.any " ") pp_state) (get_stack env);
+  let comp_entries = inner (get_stack env) [] in
+  let comp_entries = List.sort_uniq ce_compare comp_entries in
+  if debug then (if List.length comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.pp_completion_entry) comp_entries else Lsp_io.log_debug "=> Comp entries are %d\n" (List.length comp_entries));
+  comp_entries
+
+let context_completion_items (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =
+  let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
+  let range = range pos doc.textdoc in
+  begin match Lsp_document.inspect_at ~position:(range.start) doc with
+    | Some Env env -> map_completion_items ~range ~group ~filename (expected_tokens env)
+    | _ -> [] end

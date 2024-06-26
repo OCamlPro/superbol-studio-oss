@@ -46,7 +46,7 @@
 %token LPAR            "("          [@symbol  "("]
 %token LT              "<"          [@symbol  "<"]
 %token NE              "<>"         [@symbol "<>"]
-%token PERIOD          "."          [@symbol  "."]
+%token PERIOD          "."          [@symbol  "."]    [@completion]
 %token PLUS_SIGN       "+"          [@symbol  "+"]
 %token RPAR            ")"          [@symbol  ")"]
 %token SLASH           "/"          [@symbol  "/"]
