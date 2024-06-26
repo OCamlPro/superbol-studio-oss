@@ -21,6 +21,8 @@ module Outputs = Parser_outputs
 module Diagnostics = Parser_diagnostics
 
 module Tokens = Grammar_tokens
+module Expect = Grammar_expect
+module Printer = Grammar_printer
 module Keywords = Text_keywords
 
 (** {1 Exported functions} *)
@@ -35,6 +37,7 @@ module INTERNAL = struct
 
   (** {2 COBOL tokens} *)
 
+  let show_token = Text_lexer.show_token
   let pp_token = Text_tokenizer.pp_token
   let pp_tokens = Text_tokenizer.pp_tokens
   let pp_tokens' = Text_tokenizer.pp_tokens'

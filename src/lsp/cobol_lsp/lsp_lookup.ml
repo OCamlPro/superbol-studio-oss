@@ -188,6 +188,17 @@ let element_at_position ~uri pos group : element_at_position =
 
 (* --- *)
 
+let cobol_unit_at_position ~filename pos group =
+  let visitor = object
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_cobol_unit' cu acc =
+      if Lsp_position.is_in_srcloc ~filename pos ~@cu
+      then Visitor.skip_children @@ Some ~&cu
+      else Visitor.skip_children acc
+    end
+  in
+  Cobol_unit.Visitor.fold_unit_group visitor group None
+
 let copy_at_pos ~filename pos ptree =
   Cobol_ptree.Visitor.fold_compilation_group object
     inherit [copy_operation option] Cobol_ptree.Visitor.folder

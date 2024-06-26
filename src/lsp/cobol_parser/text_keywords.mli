@@ -18,6 +18,8 @@
 (** Mapping from keywords to their respective tokens *)
 val keywords: (string * Grammar_tokens.token) list
 
+val combined_keywords: (string * Grammar_tokens.token) list
+
 (** Mapping from intrinsic functions name to their respective tokens *)
 val intrinsic_functions: (string * Grammar_tokens.token) list
 

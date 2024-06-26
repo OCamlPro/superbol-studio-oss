@@ -32,30 +32,10 @@ let combined_tokens =
      Rationale: this would considerably complicate retokenization (which is
      necessary with the current solution to handle context-sensitive
      keywords) *)
-  Hashtbl.of_seq @@ List.to_seq [
-    ON_EXCEPTION, "ON_EXCEPTION";
-    NOT_ON_EXCEPTION, "NOT_ON_EXCEPTION";
-    ON_OVERFLOW, "ON_OVERFLOW";
-    NOT_ON_OVERFLOW, "NOT_ON_OVERFLOW";
-    ON_SIZE_ERROR, "ON_SIZE_ERROR";
-    NOT_ON_SIZE_ERROR, "NOT_ON_SIZE_ERROR";
-    INVALID_KEY, "INVALID_KEY";
-    NOT_INVALID_KEY, "NOT_INVALID_KEY";
-    AT_END, "AT_END";
-    NOT_AT_END, "NOT_AT_END";
-    AT_EOP, "AT_EOP";
-    NOT_AT_EOP, "NOT_AT_EOP";
-    WITH_DATA, "WITH_DATA";
-    NO_DATA, "NO_DATA";
-    WITH_NO_ADVANCING, "WITH_NO_ADVANCING";
-    IS_GLOBAL, "IS_GLOBAL";
-    IS_EXTERNAL, "IS_EXTERNAL";
-    IS_TYPEDEF, "IS_TYPEDEF";
-    DATA_RECORD, "DATA_RECORD";
-    DATA_RECORDS, "DATA_RECORDS";
-    NEXT_PAGE, "NEXT_PAGE";
-    NEXT_SENTENCE, "NEXT_SENTENCE";
-  ]
+  Hashtbl.of_seq @@
+  List.to_seq @@
+  List.map (fun (a,b) -> (b,a))
+    Text_keywords.combined_keywords
 
 let is_intrinsic_token = function
   | BYTE_LENGTH_FUNC

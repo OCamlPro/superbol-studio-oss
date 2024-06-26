@@ -2154,7 +2154,7 @@ let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
+let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
 let qualname ==
@@ -2176,7 +2176,7 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] :=
+let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=

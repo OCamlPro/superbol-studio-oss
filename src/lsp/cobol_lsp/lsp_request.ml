@@ -548,7 +548,7 @@ let handle_hover registry (params: HoverParams.t) =
       match info_hover_text_and_loc, pp_hover_text_and_loc with
         | None, None ->
             None
-        | None, Some (text, loc) | Some (text, loc), None -> 
+        | None, Some (text, loc) | Some (text, loc), None ->
             hover_markdown ~loc text
         | Some(info_text, loc), Some(pp_text, _) ->
             hover_markdown ~loc @@
@@ -560,9 +560,9 @@ let handle_hover registry (params: HoverParams.t) =
 
 let handle_completion registry (params: CompletionParams.t) =
   try_with_main_document_data registry params.textDocument
-    ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
+    ~f:begin fun ~doc checked_doc->
       let items =
-        Lsp_completion.completion_items textdoc params.position ptree in
+        Lsp_completion.context_completion_items doc checked_doc params.position in
       Some (`CompletionList (CompletionList.create ()
                                ~isIncomplete:false ~items))
     end
@@ -697,5 +697,6 @@ module INTERNAL = struct
   let lookup_definition = handle_definition
   let lookup_references = handle_references
   let hover = handle_hover
+  let complete = handle_completion
   let formatting = handle_formatting
 end

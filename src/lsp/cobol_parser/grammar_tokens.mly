@@ -1018,37 +1018,37 @@
    RAISE, RAISING, USE EXCEPTION, and in the TURN directives *)
 
 (* Combined tokens for errors  *)
-%token ON_EXCEPTION
-%token NOT_ON_EXCEPTION
-%token ON_SIZE_ERROR
-%token NOT_ON_SIZE_ERROR
-%token ON_OVERFLOW
-%token NOT_ON_OVERFLOW
-%token INVALID_KEY
-%token NOT_INVALID_KEY
-%token AT_END
-%token NOT_AT_END
-%token AT_EOP
-%token NOT_AT_EOP
-%token WITH_DATA
-%token NO_DATA
-%token WITH_NO_ADVANCING
+%token ON_EXCEPTION                 [@keyword.combined]
+%token NOT_ON_EXCEPTION             [@keyword.combined]
+%token ON_SIZE_ERROR                [@keyword.combined]
+%token NOT_ON_SIZE_ERROR            [@keyword.combined]
+%token ON_OVERFLOW                  [@keyword.combined]
+%token NOT_ON_OVERFLOW              [@keyword.combined]
+%token INVALID_KEY                  [@keyword.combined]
+%token NOT_INVALID_KEY              [@keyword.combined]
+%token AT_END                       [@keyword.combined]
+%token NOT_AT_END                   [@keyword.combined]
+%token AT_EOP                       [@keyword.combined]
+%token NOT_AT_EOP                   [@keyword.combined]
+%token WITH_DATA                    [@keyword.combined]
+%token NO_DATA                      [@keyword.combined]
+%token WITH_NO_ADVANCING            [@keyword.combined]
 
 (* Combined WITH tokens *)
 (* %token WITH_LOCK_ON *)
 
 (* Combined IS tokens *)
-%token IS_GLOBAL
-%token IS_EXTERNAL
-%token IS_TYPEDEF
+%token IS_GLOBAL                    [@keyword.combined]
+%token IS_EXTERNAL                  [@keyword.combined]
+%token IS_TYPEDEF                   [@keyword.combined]
 
 (* Combined NEXT tokens *)
-%token NEXT_PAGE
-%token NEXT_SENTENCE
+%token NEXT_PAGE                    [@keyword.combined]
+%token NEXT_SENTENCE                [@keyword.combined]
 
 (* Combined DATA tokens *)
-%token DATA_RECORD
-%token DATA_RECORDS
+%token DATA_RECORD                  [@keyword.combined]
+%token DATA_RECORDS                 [@keyword.combined]
 
 (* Combined CONSTANT *)
 %token CONSTANT_RECORD
