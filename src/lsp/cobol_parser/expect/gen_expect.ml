@@ -107,7 +107,8 @@ module Make_set (OrderedType : Set.OrderedType) = struct
 
   let add_list l t = add_seq (List.to_seq l) t
 
-  let from_list_map ?(init=empty) ~add f l =
+  let from_list_map: ?init:t -> add:('b -> t -> t) -> ('a -> 'b) -> 'a list -> t =
+    fun ?(init=empty) ~add f l ->
     List.fold_left (fun acc value -> add (f value) acc) init l
 end
 

@@ -38,7 +38,6 @@ module INTERNAL = struct
 
   (** {2 COBOL tokens} *)
 
-  let show_token = Text_lexer.show_token
   let pp_token = Text_tokenizer.pp_token
   let pp_tokens = Text_tokenizer.pp_tokens
   let pp_tokens' = Text_tokenizer.pp_tokens'
