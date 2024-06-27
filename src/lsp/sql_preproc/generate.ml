@@ -10,6 +10,7 @@
 
 open EzCompat
 open Types
+open Sql_ast
 
 let working_storage_section =
   {|      *> SQL addition in working storage section:
@@ -43,6 +44,16 @@ let generate ~filename ~contents sql_statements =
                main_filename = filename ;
              } in
   let final_loc = { filename; line = -1; char = 0 } in
+
+  
+let _generatesql ~loc ~line ~ctxt esql_instuction = 
+    match esql_instuction with
+    | Include sqlvar -> 
+      let before_macro = String.sub line 0 loc.char in
+                Printf.bprintf ctxt.b "%sCOPY %s\n" before_macro
+                sqlvar.payload;
+    | _ -> ignore(loc, line, ctxt, esql_instuction)
+  in 
 
   let rec output lines statements =
     match statements with
@@ -97,13 +108,11 @@ let generate ~filename ~contents sql_statements =
                 Buffer.add_string ctxt.b working_storage_section;
                 output cur_lines statements
               end
-          | EXEC_SQL { end_loc ; with_dot ; cmd ; tokens } ->
+          | EXEC_SQL { end_loc ; with_dot ; tokens } ->
               Printf.bprintf ctxt.b "      *> REMOVED: %s\n" line;
               if i = end_loc.line then begin
-                (* TO BE DONE generate ~loc:begin_loc cmd ~line:i
-                   ~ctxt cmd params *)
-                  ignore (cmd, tokens);
-
+             (*    generatesql ~loc:begin_loc ~line:line ~ctxt tokens;  *)
+                ignore (tokens);
                 Misc.add_dot ~with_dot b;
                 output lines statements
               end else
