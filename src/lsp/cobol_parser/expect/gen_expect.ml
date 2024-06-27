@@ -97,28 +97,13 @@ let pp_xsymbol_of_nt ppf nonterminal =
 
 (* --- *)
 
-module Make_set (OrderedType : Set.OrderedType) = struct
-  include Set.Make(OrderedType)
-
-  let add_option elt t =
-    match elt with
-    | None -> t
-    | Some elt -> add elt t
-
-  let add_list l t = add_seq (List.to_seq l) t
-
-  let from_list_map: ?init:t -> add:('b -> t -> t) -> ('a -> 'b) -> 'a list -> t =
-    fun ?(init=empty) ~add f l ->
-    List.fold_left (fun acc value -> add (f value) acc) init l
-end
-
-module NonterminalSet = Make_set(struct
+module NonterminalSet = Set.Make(struct
     type t = nonterminal
     let compare = Nonterminal.compare
   end)
 
 module CompEntrySet = struct
-  include Make_set(struct
+  include Set.Make(struct
       type t = completion_entry
       let compare entry1 entry2 =
         match entry1, entry2 with
@@ -192,12 +177,12 @@ let emit_completion_entry ppf =
 
 let nullable_nonterminals: lr1 -> NonterminalSet.t =
   Lr1.tabulate begin fun lr1 ->
-    NonterminalSet.from_list_map ~add:NonterminalSet.add_option
-      (fun (prod, idx) ->
+    List.to_seq (Lr0.items @@ Lr1.lr0 lr1)
+    |> Seq.filter_map begin fun (prod, idx) ->
          match (Production.rhs prod).(idx) with
          | N nt, _, _ when Nonterminal.nullable nt -> Some nt
-         | _ | exception Invalid_argument _ -> None)
-      (Lr0.items @@ Lr1.lr0 lr1)
+         | _ | exception Invalid_argument _ -> None end
+    |> NonterminalSet.of_seq
   end
 
 let reducible_productions: lr1 -> production list =
@@ -257,23 +242,22 @@ let completion_entries_of: lr1 -> CompEntrySet.t =
     let (prod, idx) = item in
     let rhs = Production.rhs prod in
     match rhs.(idx) with
-    | N nt, _, _ -> List.filter_map terminal_filter_map (Nonterminal.first nt)
+    | N nt, _, _ -> Seq.filter_map terminal_filter_map (List.to_seq @@ Nonterminal.first nt)
     | T _, _, _ -> begin
         match continue_while_terminal rhs idx [] with
-        | [] -> []
-        | l -> [K (NEL.of_list l)] end
-    | exception Invalid_argument _ -> []
+        | [] -> Seq.empty
+        | l -> Seq.return @@ K (NEL.of_list l) end
+    | exception Invalid_argument _ -> Seq.empty
   in
   Lr1.tabulate begin fun lr1 ->
-    let custom_comp_entries = CompEntrySet.from_list_map
-        ~add:CompEntrySet.add_option
-        begin function
-          | N nonterm, _ -> nonterminal_filter_map nonterm
-          | _ -> None end
-        (Lr1.transitions lr1) in
-    CompEntrySet.from_list_map
-      ~init:custom_comp_entries ~add:CompEntrySet.add_list
-      next_tokens_from_item (Lr0.items @@ Lr1.lr0 lr1)
+    Seq.append
+      (List.to_seq (Lr1.transitions lr1)
+       |> Seq.filter_map begin function
+         | N nonterm, _ -> nonterminal_filter_map nonterm
+         | _ -> None end)
+      ((List.to_seq @@ Lr0.items @@ Lr1.lr0 lr1)
+       |> Seq.flat_map next_tokens_from_item)
+    |> CompEntrySet.of_seq
   end
 
 let emit_acceptable_terminals_in_env ppf = (* taking transitions *)
