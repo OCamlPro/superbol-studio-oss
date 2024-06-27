@@ -82,7 +82,7 @@ let pp_terminal ppf t =
 let cobolize name =
   String.map (function '_' -> '-' | c -> c) name
 
-let combined_cobolize name =
+let combined_name name =
   String.map (function '_' -> ' ' | c -> c) name
 
 let uncobolize name =
@@ -100,7 +100,8 @@ let emit_entry attribute_payload ?(with_spaces = false) ?(comment_token = false)
           ()
       | Some payload when String.trim payload = "" ->         (* auto-generate *)
           Fmt.pf ppf "@\n\"%s\"%t, %a%t;"
-            (if with_spaces then (combined_cobolize @@ Terminal.name t)
+            (if with_spaces
+            then (combined_name @@ Terminal.name t)
             else (cobolize @@ Terminal.name t))
             start_token pp_terminal t end_token
       | Some payload ->

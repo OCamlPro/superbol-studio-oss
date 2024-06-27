@@ -25,6 +25,7 @@ module Recover = Grammar_recover
 module Expect = Grammar_expect
 module Printer = Grammar_printer
 module Keywords = Text_keywords
+module Grammar_interpr = Grammar.MenhirInterpreter
 
 (** {1 Exported functions} *)
 

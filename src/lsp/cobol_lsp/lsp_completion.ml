@@ -18,7 +18,7 @@ open Cobol_common.Srcloc.INFIX
 
 open Lsp.Types
 
-module Menhir = Cobol_parser.INTERNAL.Grammar.MenhirInterpreter
+module Menhir = Cobol_parser.Grammar_interpr
 module Expect = Cobol_parser.Expect
 
 let qualname_proposals ~filename pos group =
@@ -43,12 +43,9 @@ let procedure_proposals ~filename pos group =
 let completion_item label ~range ~kind =
     (*we may change the ~sortText/preselect for reason of priority *)
     let textedit = TextEdit.create ~newText:label ~range in
-    CompletionItem.create
-      ~label
-      ~kind
-      ~preselect:false
+    CompletionItem.create ()
+      ~label ~kind ~preselect:false
       ~textEdit:(`TextEdit textedit)
-      ()
 
 let delimiters = [' '; '\t'; '.']
 let range (pos:Position.t) text =
@@ -110,10 +107,10 @@ let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
       (Expect.CompEntrySet.elements comp_entries)
 
 let pp_env ppf env = (* for debug *)
-  let has_default = Expect.reducable_productions_in ~env <> [] in
+  let has_default = Expect.reducible_productions_in ~env <> [] in
   Fmt.pf ppf "%d%s" (Menhir.current_state_number env) (if has_default then "_" else "")
 
-let pp_env_stack ppf env =
+let pp_env_stack ppf env = (* for debug *)
   let rec get_stack env =
     match Menhir.pop env with
       | None -> [env]
@@ -129,8 +126,8 @@ let expected_tokens base_env =
       | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
       | Some Menhir.Element (_, _, _, pos) -> pos in
     if debug then (Lsp_io.log_debug "In State: %a" pp_env env; let tok = Expect.acceptable_terminals_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
-    let productions = Expect.reducable_productions_in ~env in
-    let nullables = Expect.accaptable_nullable_nonterminals_in ~env in
+    let productions = Expect.reducible_productions_in ~env in
+    let nullables = Expect.acceptable_nullable_nonterminals_in ~env in
     let acc = Expect.CompEntrySet.add_seq
       (List.to_seq @@ Expect.acceptable_terminals_in ~env) acc in
     let acc = List.fold_left (fun acc (Menhir.X sym) ->

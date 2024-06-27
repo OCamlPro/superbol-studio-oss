@@ -1051,7 +1051,7 @@
 %token DATA_RECORDS                 [@keyword.combined]
 
 (* Combined CONSTANT *)
-%token CONSTANT_RECORD
+%token CONSTANT_RECORD              [@keyword.combined]
 
 (* Special token for retokenizations after `DECIMAL-POINT IS COMMA` in
    `SPECIAL-NAMES`; should never be fed to the parser (see Text_tokenizer and

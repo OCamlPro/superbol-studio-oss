@@ -15,7 +15,7 @@ open EzCompat                                                    (* StringMap *)
 open Lsp.Types
 open Lsp_testing
 
-let complete_positions (doc, positions) : string -> unit =
+let completion_positions (doc, positions) : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   (* let doc = LSP.Server.find_document prog server in *)
@@ -30,7 +30,7 @@ let complete_positions (doc, positions) : string -> unit =
       location_as_srcloc#pp location
       Fmt.(option ~none:nop (string ++ sp)) key
       position.line position.character;
-    match LSP.Request.complete server params with
+    match LSP.Request.completion server params with
     | None ->
         Pretty.out "Failed completion@."
     | Some `CompletionList { items; _ } when items == [] ->
@@ -38,7 +38,8 @@ let complete_positions (doc, positions) : string -> unit =
     | Some `CompletionList { items; _ } ->
         let pp_comp_item ppf (item: CompletionItem.t) =
           Fmt.string ppf item.label in
-        Pretty.out "List of completions (%d entries): [%a]\n" (List.length items) (Fmt.list ~sep:(Fmt.any ";") pp_comp_item) items;
+        Pretty.out "List of completions (%d entries): [%a]\n"
+          (List.length items) (Fmt.list ~sep:(Fmt.any ";") pp_comp_item) items;
 
   in
   StringMap.iter (fun n p -> completions_at_position ~key:n p) positions.pos_map;
@@ -47,7 +48,7 @@ let complete_positions (doc, positions) : string -> unit =
 ;;
 
 let%expect_test "division-and-section-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         _|_IDENTIFICATION D_|_IVISION._|_
         PROGRAM-ID _|_. _|_prog.
         _|_DATA _|_DIVISION.
@@ -164,7 +165,7 @@ let%expect_test "division-and-section-completion" =
     List of completions (1 entries): [DIVISION] |}];;
 
 let%expect_test "datadiv-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
@@ -188,7 +189,7 @@ let%expect_test "datadiv-completion" =
        7           01 VAR PICTURE X USAGE DISPLAY.
        8             88 BB VALUES ARE "x" THRU "Z".
     (line 5, character 11):
-    List of completions (73 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;DEFAULT;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FILLER;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
+    List of completions (74 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;CONSTANT RECORD;DEFAULT;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FILLER;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
     __rootdir__/prog.cob:6.21:
        3           PROGRAM-ID. prog.
        4           DATA DIVISION.
@@ -198,7 +199,7 @@ let%expect_test "datadiv-completion" =
        7           01 VAR PICTURE X USAGE DISPLAY.
        8             88 BB VALUES ARE "x" THRU "Z".
     (line 5, character 21):
-    List of completions (74 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;CONSTANT;DEFAULT;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;RENAMES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
+    List of completions (75 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;CONSTANT;CONSTANT RECORD;DEFAULT;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;RENAMES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
     __rootdir__/prog.cob:7.8:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -228,7 +229,7 @@ let%expect_test "datadiv-completion" =
        8             88 BB VALUES ARE "x" THRU "Z".
        9           PROCEDURE DIVISION.
     (line 6, character 25):
-    List of completions (74 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;DEFAULT;DEPENDING;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;LOCALE;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
+    List of completions (75 entries): [ALIGNED;ANY;BASED;BINARY;BINARY-CHAR;BINARY-C-LONG;BINARY-DOUBLE;BINARY-LONG;BINARY-SHORT;BIT;BLANK;CLASS;COMP;COMP-0;COMP-1;COMP-10;COMP-15;COMP-2;COMP-3;COMP-4;COMP-5;COMP-6;COMP-9;COMP-N;COMP-X;CONSTANT RECORD;DEFAULT;DEPENDING;DESTINATION;DISPLAY;DYNAMIC;EXTERNAL;FLOAT-BINARY-128;FLOAT-BINARY-32;FLOAT-BINARY-64;FLOAT-DECIMAL-16;FLOAT-DECIMAL-34;FLOAT-EXTENDED;FLOAT-LONG;FLOAT-SHORT;FUNCTION-POINTER;GLOBAL;GROUP-USAGE;INDEX;INVALID;IS EXTERNAL;IS GLOBAL;IS TYPEDEF;JUSTIFIED;LEADING;LOCALE;NATIONAL;OBJECT;OCCURS;PACKED-DECIMAL;.;PICTURE;POINTER;PRESENT;PROCEDURE-POINTER;PROGRAM-POINTER;PROPERTY;REDEFINES;SAME;SELECT;SIGN;SYNCHRONIZED;TRAILING;TYPE;TYPEDEF;USAGE;VAL-STATUS;VALUE;VALUES;VARYING]
     __rootdir__/prog.cob:7.31:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -271,7 +272,7 @@ let%expect_test "datadiv-completion" =
     List of completions (13 entries): [ALL;FALSE;HIGH-VALUES;IN;LOW-VALUES;.;QUOTES;SET;SPACES;THRU;TO;WHEN;ZEROS] |}]
 
 let%expect_test "procedure-paragraph-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
@@ -342,7 +343,7 @@ let%expect_test "procedure-paragraph-completion" =
     List of completions (78 entries): [FIRST-SECTION;FIRST-PARAGRAPH;FIRST-PARAGRAPH IN FIRST-SECTION;SECOND-SECTION;DATA-NAME;VAR;ACCEPT;ADD;ADDRESS;ALLOCATE;ALTER;CALL;CANCEL;CLOSE;COMPUTE;CONTINUE;DELETE;DISABLE;DISPLAY;DIVIDE;ENABLE;END-PERFORM;ENTER;ENTRY;EVALUATE;EXCEPTION-OBJECT;EXIT;FOREVER;FREE;FUNCTION;GENERATE;GO;GOBACK;IF;INITIALIZE;INITIATE;INSPECT;INVOKE;LINAGE-COUNTER;LINE-COUNTER;MERGE;MOVE;MULTIPLY;NEXT SENTENCE;NULL;OPEN;PAGE-COUNTER;PERFORM;PURGE;RAISE;READ;RECEIVE;RELEASE;RESUME;RETURN;REWRITE;SEARCH;SELF;SEND;SET;SORT;START;STOP;STRING;SUBTRACT;SUPER;SUPPRESS;TERMINATE;TEST;TRANSFORM;UNLOCK;UNSTRING;UNTIL;VALIDATE;VARYING;WITH;WRITE;ZEROS] |}]
 
 let%expect_test "qualified-data-ref-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
@@ -371,7 +372,7 @@ let%expect_test "qualified-data-ref-completion" =
     List of completions (23 entries): [AA;CC;CC IN AA;DD;DD IN CC IN AA;BB;CC;CC IN BB;ADDRESS;ALL;EXCEPTION-OBJECT;FUNCTION;HIGH-VALUES;LINAGE-COUNTER;LINE-COUNTER;LOW-VALUES;NULL;PAGE-COUNTER;QUOTES;SELF;SPACES;SUPER;ZEROS] |}]
 
 let%expect_test "procedure-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         DATA DIVISION.
@@ -557,7 +558,7 @@ let%expect_test "procedure-completion" =
 
 (* Testing completion with nullable expected tokens (default_section_clauses) *)
 let%expect_test "control-completion" =
-  let end_with_postproc = complete_positions @@ extract_position_markers {cobol|
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         CONTROL DIVISION.
         _|_DEFAULT _|_SECTION.
           _|_ACCEPT _|_TERMINAL

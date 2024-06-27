@@ -53,7 +53,8 @@
   (action
     (with-stdout-to %{targets}
        (run %{exe:./expect/gen_expect.exe} %{deps}
-            --external-tokens Grammar_tokens))))
+            --external-tokens Grammar_tokens
+            --nel-module Cobol_common.Basics.NEL))))
 
 (rule
   (targets grammar_post_actions.ml)

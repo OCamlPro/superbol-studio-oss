@@ -697,6 +697,6 @@ module INTERNAL = struct
   let lookup_definition = handle_definition
   let lookup_references = handle_references
   let hover = handle_hover
-  let complete = handle_completion
+  let completion = handle_completion
   let formatting = handle_formatting
 end

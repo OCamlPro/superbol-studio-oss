@@ -15,6 +15,7 @@ module NEL = Cobol_common.Basics.NEL
 
 let cmlyname = ref None
 let external_tokens = ref ""
+let nel_module = ref ""
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -26,6 +27,8 @@ let () =
     Arg.[
       ("--external-tokens", Set_string external_tokens,
        "<module> Import token type definition from <module>");
+      ("--nel-module", Set_string nel_module,
+       "<module> Import NEL (non-empty-list) type definition from <module>");
     ]
     anon usage_msg
 
@@ -45,9 +48,9 @@ let pp_pair pp_a pp_b = fun ppf (a, b) ->
 
 let pp_list pp = Fmt.list ~sep:(Fmt.any ";") pp
 
-let rec pp_nel pp ppf = function
+let rec pp_nel_constr pp ppf = function
   | NEL.One v -> Fmt.pf ppf "One %a" pp v
-  | v::nel -> Fmt.pf ppf "%a::" pp v; pp_nel pp ppf nel
+  | v::nel -> Fmt.pf ppf "%a::" pp v; pp_nel_constr pp ppf nel
 
 let pp_match_cases ppf pp_key pp_value default l =
   List.iter (fun (keys, value) ->
@@ -66,7 +69,7 @@ type completion_entry =
 (* [@@deriving ord] *)
 
 let pp_completion_entry: completion_entry Fmt.t = fun ppf -> function
-  | K list -> Fmt.pf ppf "K (%a)" (pp_nel Print.terminal) list
+  | K list -> Fmt.pf ppf "K (%a)" (pp_nel_constr Print.terminal) list
   | Custom custom_type -> Fmt.pf ppf "%s" custom_type
 
 let is_valid_for_comp: terminal -> bool = fun term ->
@@ -91,7 +94,7 @@ let pp_xsymbol_of_nt ppf nonterminal =
 
 (* --- *)
 
-module SuperSet (OrderedType : Set.OrderedType) = struct
+module Make_set (OrderedType : Set.OrderedType) = struct
   include Set.Make(OrderedType)
 
   let add_option elt t =
@@ -105,13 +108,13 @@ module SuperSet (OrderedType : Set.OrderedType) = struct
     List.fold_left (fun acc value -> add (f value) acc) init l
 end
 
-module SymbolSet = SuperSet(struct
-  type t = symbol
-  let compare = Symbol.compare
+module NonterminalSet = Make_set(struct
+  type t = nonterminal
+  let compare = Nonterminal.compare
 end)
 
 module CompEntrySet = struct
-  include SuperSet(struct
+  include Make_set(struct
     type t = completion_entry
     let compare entry1 entry2 =
       match entry1, entry2 with
@@ -122,7 +125,7 @@ module CompEntrySet = struct
   end)
 end
 
-module Map5 (OrderedType : Map.OrderedType) = struct
+module Make_map (OrderedType : Map.OrderedType) = struct
   include Map.Make(OrderedType)
 
   let add_to_list x data m =
@@ -130,27 +133,28 @@ module Map5 (OrderedType : Map.OrderedType) = struct
     update x add m
 end
 
-module CompEntryMap = Map5(struct
+module CompEntryMap = Make_map(struct
   type t = CompEntrySet.t
   let compare = CompEntrySet.compare
 end)
 
-module ProdMap = Map5(struct
+module ProdMap = Make_map(struct
   type t = Production.t list
   let compare = List.compare (fun p1 p2 ->
     Production.to_int p1 - Production.to_int p2)
 end)
 
-module SymbolMap = Map5(struct
-  type t = SymbolSet.t
-  let compare = SymbolSet.compare
+module NonterminalMap = Make_map(struct
+  type t = NonterminalSet.t
+  let compare = NonterminalSet.compare
 end)
 
 (* --- *)
 
 let emit_pp_completion_entry ppf custom_types = (* For debug *)
-  Fmt.pf ppf "\nlet pp_completion_entry: completion_entry Fmt.t = fun ppf -> function\n";
-  Fmt.pf ppf "  | K tokens -> Fmt.pf ppf \"%%a\" (Fmt.list ~sep:Fmt.sp Fmt.string) (List.map Grammar_printer.print_token @@@@ NEL.to_list tokens)\n";
+  Fmt.string ppf "\nlet pp_completion_entry: completion_entry Fmt.t = fun ppf -> function\n";
+  Fmt.string ppf "  | K tokens -> Fmt.(pf ppf \"%a\"\
+  (NEL.pp ~fopen:\"\" ~fclose:\"\" ~fsep:\" \" (using Grammar_printer.print_token string)) tokens)\n";
   List.iter
   (fun s -> Fmt.pf ppf "  | %s -> Fmt.pf ppf \"%s\"\n" s s)
   custom_types
@@ -172,8 +176,8 @@ end)
   (List.length custom_types))
 
 let emit_completion_entry ppf =
-  Fmt.pf ppf "type completion_entry =\n";
-  Fmt.pf ppf "  | K of token NEL.t\n";
+  Fmt.string ppf "type completion_entry =\n";
+  Fmt.string ppf "  | K of token NEL.t\n";
   let custom_types = Nonterminal.fold (fun nonterm acc ->
     match nonterminal_filter_map nonterm with
     | Some (Custom s) -> (Fmt.pf ppf "  | %s\n" s; s::acc)
@@ -181,49 +185,50 @@ let emit_completion_entry ppf =
   emit_pp_completion_entry ppf custom_types;
   emit_complentryset ppf custom_types
 
-let nullable_nonterminals = Lr1.tabulate begin fun lr1 ->
-  SymbolSet.from_list_map ~add:SymbolSet.add_option
-  (fun (prod, idx) ->
-    match (Production.rhs prod).(idx) with
-      | N nt, _, _ when Nonterminal.nullable nt -> Some (N nt)
-      | _ | exception Invalid_argument _ -> None)
-    (Lr0.items @@ Lr1.lr0 lr1)
+let nullable_nonterminals: lr1 -> NonterminalSet.t =
+  Lr1.tabulate begin fun lr1 ->
+    NonterminalSet.from_list_map ~add:NonterminalSet.add_option
+      (fun (prod, idx) ->
+         match (Production.rhs prod).(idx) with
+         | N nt, _, _ when Nonterminal.nullable nt -> Some nt
+         | _ | exception Invalid_argument _ -> None)
+      (Lr0.items @@ Lr1.lr0 lr1)
   end
 
-let reducable_productions = Lr1.tabulate begin fun lr1 ->
-  List.filter_map (function
-    | (prod, idx) when Array.length (Production.rhs prod) == idx ->
-        Some prod
-    | _ -> None)
-  (Lr0.items @@ Lr1.lr0 lr1)
-  |> List.sort_uniq Production.compare
-end
+let reducible_productions: lr1 -> production list =
+  Lr1.tabulate begin fun lr1 ->
+    List.filter_map (function
+        | (prod, idx) when Array.length (Production.rhs prod) == idx ->
+          Some prod
+        | _ -> None)
+      (Lr0.items @@ Lr1.lr0 lr1)
+    |> List.sort_uniq Production.compare
+  end
 
-let emit_accaptable_nullable_nonterminals_in_env ppf =
-  Fmt.pf ppf {|
-let accaptable_nullable_nonterminals_in ~env : Menhir.xsymbol list =
+let emit_acceptable_nullable_nonterminals_in_env ppf =
+  Fmt.string ppf {|
+let acceptable_nullable_nonterminals_in ~env : Menhir.xsymbol list =
   Menhir.(match current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
     match nullable_nonterminals lr1 with
-    | emtpy when SymbolSet.is_empty emtpy -> acc
-    | symbols -> SymbolMap.add_to_list symbols lr1 acc)
-  SymbolMap.empty
-  |> inv (SymbolMap.fold (fun s l acc -> (l,
-      List.map (function  N nt -> nt | T _ -> failwith "impossible" ) @@ SymbolSet.elements s)::acc)) []
+    | emtpy when NonterminalSet.is_empty emtpy -> acc
+    | symbols -> NonterminalMap.add_to_list symbols lr1 acc)
+  NonterminalMap.empty
+  |> inv (NonterminalMap.fold (fun s l acc -> (l, NonterminalSet.elements s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
     (pp_brackets @@ pp_list @@ pp_xsymbol_of_nt)
     "[])"
 
-let emit_reducable_productions_in_env ppf =
-  Fmt.pf ppf {|
-let reducable_productions_in ~env : Menhir.production list =
-  List.rev_map Menhir.find_production @@@@
+let emit_reducible_productions_in_env ppf =
+  Fmt.string ppf {|
+let reducible_productions_in ~env : Menhir.production list =
+  List.rev_map Menhir.find_production @@
   match Menhir.current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
-    match reducable_productions lr1 with
+    match reducible_productions lr1 with
     | [] -> acc
     | defaults -> ProdMap.add_to_list defaults lr1 acc)
   ProdMap.empty
@@ -233,12 +238,15 @@ let reducable_productions_in ~env : Menhir.production list =
     Fmt.(pp_brackets @@ pp_list @@ (using Production.to_int int))
     "[]"
 
-let completion_entries_of =
+let completion_entries_of: lr1 -> CompEntrySet.t =
   let rec continue_while_terminal rhs i l =
     match rhs.(i) with
-        | T t, _, _ when is_valid_for_comp t ->
+        | T t, _, _
+          when is_valid_for_comp t ->
             continue_while_terminal rhs (i+1) (t::l)
-        | _ | exception Invalid_argument _ -> List.rev l
+        | _
+        | exception Invalid_argument _ ->
+            List.rev l
   in
   let next_tokens_from_item item =
     let (prod, idx) = item in
@@ -264,7 +272,7 @@ let completion_entries_of =
   end
 
 let emit_acceptable_terminals_in_env ppf = (* taking transitions *)
-  Fmt.pf ppf {|
+  Fmt.string ppf {|
 let acceptable_terminals_in ~env : completion_entry list =
   NEL.(match Menhir.current_state_number env with
 |};
@@ -281,16 +289,16 @@ let acceptable_terminals_in ~env : completion_entry list =
 
 let guess_default_value ~mangled_name ~typ =
   match typ, mangled_name with
-  | _ when EzString.ends_with ~suffix:"option" typ ||
+  | _ when EzString.ends_with ~suffix:" option" typ ||
           EzString.starts_with ~prefix:"option_" mangled_name
   -> Some "None"
-  | _ when EzString.ends_with ~suffix:"list" typ ||
+  | _ when EzString.ends_with ~suffix:" list" typ ||
   EzString.starts_with ~prefix:"loption_" mangled_name ||
   EzString.starts_with ~prefix:"list_" mangled_name
   -> Some "[]"
-  | _ when EzString.ends_with ~suffix:"unit" typ
+  | _ when String.equal typ "unit"
   -> Some "()"
-  | _ when EzString.ends_with ~suffix:"bool" typ ||
+  | _ when String.equal typ "bool" ||
   EzString.starts_with ~prefix:"boption_" mangled_name
   -> Some "false"
   | _ -> None
@@ -319,10 +327,11 @@ let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
   end
 
 let emit_default_value_of_nullables ppf =
-  Fmt.pf ppf {|
+  Fmt.string ppf {|
 let guessed_default_value_of_nullables (type a): a Menhir.symbol -> a = function
-  (* If this function does not compile it probably means you're missing a
-     [@default] attribute on a nullable nonterminal in the grammar *)
+  (* If this function does not compile, it has probably incorrecly
+     guessed the type of a nonterinal, either change the name
+     or add a @default attribute on the faulty nonnterminal *)
   | T _ -> raise Not_found
   | N nt -> begin match nt with
 |};
@@ -368,8 +377,8 @@ let emit_temp ppf =
   Lr1.iter (fun lr1 -> begin
     let lr0 = Lr1.lr0 lr1 in
     let items = Lr0.items lr0 in
-    let r1 = reducable_productions lr1 in
-    let r2 = reducable_productions lr1 in
+    let r1 = reducible_productions lr1 in
+    let r2 = reducible_productions lr1 in
     if List.equal Production.equal r1 r2 then () else begin
     Fmt.pf ppf "\nState lr1-%d- lr0(%d):\n%a"
       (Lr1.to_int lr1) (Lr0.to_int lr0)
@@ -403,14 +412,14 @@ let () =
   let ppf = Fmt.stdout in
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
-     \nmodule NEL = Cobol_common.Basics.NEL\
+     \nmodule NEL = %s\
      \nmodule Menhir = Grammar.MenhirInterpreter\
-     \nopen Grammar_tokens@\n\n"
-    cmlyname;
+     \nopen %s@\n\n"
+    cmlyname !nel_module !external_tokens;
 
   emit_completion_entry ppf;
-  emit_reducable_productions_in_env ppf;
-  emit_accaptable_nullable_nonterminals_in_env ppf;
+  emit_reducible_productions_in_env ppf;
+  emit_acceptable_nullable_nonterminals_in_env ppf;
   emit_acceptable_terminals_in_env ppf;
   emit_default_value_of_nullables ppf;
 

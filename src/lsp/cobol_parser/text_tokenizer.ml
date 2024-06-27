@@ -33,9 +33,8 @@ let combined_tokens =
      necessary with the current solution to handle context-sensitive
      keywords) *)
   Hashtbl.of_seq @@
-  List.to_seq @@
-  List.map (fun (a,b) -> (b,a))
-    Text_keywords.combined_keywords
+  Seq.map (fun (a, b) -> b, a) @@
+  List.to_seq Text_keywords.combined_keywords
 
 let is_intrinsic_token = function
   | BYTE_LENGTH_FUNC

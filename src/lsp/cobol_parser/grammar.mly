@@ -475,7 +475,8 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_end_name = em } }
 
 
-let informational_paragraphs == rl(loc(informational_paragraph)) (* ~COB85, -COB2002 *)
+let informational_paragraphs ==                 (* ~COB85, -COB2002 *)
+  rl(loc(informational_paragraph))
 
 let informational_paragraph :=
   | ~ = informational_paragraph_header; "."; ~ = loc(comment_entry); < >
@@ -494,7 +495,8 @@ let informational_paragraph_header ==
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
-let as__strlit_ [@default None] := ~ = ro (pf (AS, string_literal)); < >
+let as__strlit_ [@default None] :=
+  | ~ = ro (pf (AS, string_literal)); < >
 
 let unit_name := loc(infoword_or_literal)
 
@@ -1700,7 +1702,8 @@ let encoding_mode :=
   | BINARY_ENCODING;  { BinaryEncoding }
   | DECIMAL_ENCODING; { DecimalEncoding }
 
-let encoding_endianness_opt [@default { encoding_mode = None; endianness_mode = None }] :=
+let encoding_endianness_opt [@default { encoding_mode = None;
+                                        endianness_mode = None }] :=
   | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
@@ -2153,7 +2156,8 @@ let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] [@completion QualifiedRef] :=
+let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"]
+              [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
 let qualname ==
@@ -2175,7 +2179,8 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] [@completion ProcedureRef] :=
+let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"]
+                   [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=

@@ -722,8 +722,6 @@ let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc ~position =
   in
   last_env_stage
 
-module INSPECT = Grammar_interpr
-
 (* Extracting artifacts *)
 
 let artifacts

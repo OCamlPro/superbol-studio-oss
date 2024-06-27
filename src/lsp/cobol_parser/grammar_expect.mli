@@ -11,28 +11,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Request.t -> (Lsp_server.state as 's) -> 's * Jsonrpc.Response.t
-val shutdown: Lsp_server.state -> unit
+open Grammar.MenhirInterpreter
 
-module INTERNAL: sig
-  val lookup_definition
-    : Lsp_server.t
-    -> Lsp.Types.DefinitionParams.t
-    -> [> `Location of Lsp.Types.Location.t list ] option
-  val lookup_references
-    : Lsp_server.t
-    -> Lsp.Types.ReferenceParams.t
-    -> Lsp.Types.Location.t list option
-  val hover
-    : Lsp_server.t
-    -> Lsp.Types.HoverParams.t
-    -> Lsp.Types.Hover.t option
-  val completion
-    : Lsp_server.t
-    -> Lsp.Types.CompletionParams.t
-    -> [> `CompletionList of Lsp.Types.CompletionList.t] option
-  val formatting
-    : Lsp_server.t
-    -> Lsp.Types.DocumentFormattingParams.t
-    -> Lsp.Types.TextEdit.t list option
-end
+type completion_entry =
+  | K of token Cobol_common.Basics.NEL.t
+  | QualifiedRef
+  | ProcedureRef
+
+val pp_completion_entry: completion_entry Fmt.t
+
+module CompEntrySet : (Set.S with type elt = completion_entry)
+
+val reducible_productions_in: env:_ env -> production list
+
+val acceptable_nullable_nonterminals_in: env:_ env -> xsymbol list
+
+val acceptable_terminals_in: env:_ env -> completion_entry list
+
+val guessed_default_value_of_nullables: 'a symbol -> 'a
+
