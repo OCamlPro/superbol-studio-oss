@@ -16,7 +16,6 @@ open EzCompat
 open Cobol_common                                                  (* Visitor, NEL *)
 open Cobol_common.Srcloc.INFIX
 
-open Lsp_completion_keywords
 open Lsp.Types
 
 module Menhir = Cobol_parser.INTERNAL.Grammar.MenhirInterpreter
@@ -40,45 +39,6 @@ let procedure_proposals ~filename pos group =
         | Section section ->
             List.flatten @@ List.map map_paragraph ~&section.section_paragraphs.list)
       cu.unit_procedure.list
-
-(*If need be, get the qualname_proposals "X OF Y"... from the definition maps*)
-
-
-(*TODO: If the partial parsing could give more information
-        like in which statement the position is(or even better, in which clause/phrase),
-        Then we can remove the keywords that cannot appear in this statement from
-        the keyword list.
-*)
-(* type div =
-| Ident_div
-| Env_div
-| Data_div
-| Proc_div
-
-let keyword_proposals ast pos =
-  let visitor = object
-    inherit [div option] Cobol_parser.PTree_visitor.folder
-
-    method! fold_data_division' {loc; _} _ =
-      Visitor.skip_children @@
-        if Lsp_position.is_in_srcloc pos loc
-        then Some Data_div
-        else None
-
-    method! fold_procedure_division' {loc; _} _ =
-      Visitor.skip_children @@
-        if Lsp_position.is_in_srcloc pos loc
-        then Some Proc_div
-        else None
-
-    end
-  in
-  match Cobol_parser.PTree_visitor.fold_compilation_group visitor ast None with
-  | Some Proc_div -> keywords_proc
-  | Some Data_div -> keywords_data (*does not work*)
-  | _ -> [] *)
-
-let keyword_proposals _ast _pos = keywords_all
 
 let completion_item label ~range ~kind =
     (*we may change the ~sortText/preselect for reason of priority *)
@@ -120,6 +80,18 @@ let to_completion_item ~kind ~range qualnames =
     | _ -> []) qualnames |>
     List.map @@ completion_item ~kind ~range
 
+let string_of_K tokens =
+  let pp ppf =
+    let rec inner ?(space_before=true) = function
+      | [] -> ()
+      | hd::tl ->
+          let token' = hd &@ Srcloc.dummy in
+          if hd <> Cobol_parser.Tokens.PERIOD && space_before then Fmt.sp ppf ();
+          Cobol_parser.INTERNAL.pp_token ppf token';
+          inner tl
+    in inner ~space_before:false
+  in Pretty.to_string "%a" pp (Basics.NEL.to_list tokens)
+
 let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
       let pos = range.end_ in
       List.flatten @@ List.map (function
@@ -132,29 +104,13 @@ let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
             ~kind:CompletionItemKind.Module ~range
             (procedure_proposals ~filename range.end_ group)
         | K tokens -> begin
-            let tokens' = List.map (fun t -> t &@ Srcloc.dummy) @@ Basics.NEL.to_list tokens in
-            try let tokens = Pretty.to_string "%a" (Fmt.list ~sep:Fmt.sp Cobol_parser.INTERNAL.pp_token) tokens' in
-              [completion_item ~kind:CompletionItemKind.Keyword ~range tokens]
+            try let tokens_string = string_of_K tokens in
+              [completion_item ~kind:CompletionItemKind.Keyword ~range tokens_string]
             with Not_found -> [] end)
       (Expect.CompEntrySet.elements comp_entries)
 
-(** [listpop l i] pops [i] elements of the list [l]
-    @return (h, t) where h is the list of popped element, t is the tail of the list *)
-let listpop l i =
-  let rec inner h t i =
-    if i == 0 then (h, t) else
-    match t with
-    | [] -> (h, [])
-    | hd::tl -> inner (hd::h) tl (i-1)
-  in let h, t = inner [] l i in List.rev h, t
-
-let pp_state ppf state = (* for debug *)
-  Fmt.pf ppf "%d" (Menhir.number state)
-
 let pp_env ppf env = (* for debug *)
-  let has_default =
-    try let _ = Expect.reducable_productions_in ~env in true
-    with _ -> false in
+  let has_default = Expect.reducable_productions_in ~env <> [] in
   Fmt.pf ppf "%d%s" (Menhir.current_state_number env) (if has_default then "_" else "")
 
 let pp_env_stack ppf env =

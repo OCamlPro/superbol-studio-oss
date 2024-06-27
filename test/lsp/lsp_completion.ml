@@ -75,7 +75,7 @@ let%expect_test "division-and-section-completion" =
        3           PROGRAM-ID . prog.
        4           DATA DIVISION.
     (line 1, character 24):
-    List of completions (1 entries): [DIVISION .]
+    List of completions (1 entries): [DIVISION.]
     __rootdir__/prog.cob:2.32:
        1
        2 >         IDENTIFICATION DIVISION.
@@ -121,7 +121,7 @@ let%expect_test "division-and-section-completion" =
        5           WORKING-STORAGE SECTION.
        6           01 DATA-NAME PIC X.
     (line 3, character 13):
-    List of completions (1 entries): [DIVISION .]
+    List of completions (1 entries): [DIVISION.]
     __rootdir__/prog.cob:5.8:
        2           IDENTIFICATION DIVISION.
        3           PROGRAM-ID . prog.
@@ -141,7 +141,7 @@ let%expect_test "division-and-section-completion" =
        6           01 DATA-NAME PIC X.
        7           PROCEDURE DIVISION.
     (line 4, character 24):
-    List of completions (1 entries): [SECTION .]
+    List of completions (1 entries): [SECTION.]
     __rootdir__/prog.cob:7.8:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -587,7 +587,7 @@ let%expect_test "control-completion" =
        4             ACCEPT TERMINAL
        5             DISPLAY IS TERMINAL.
     (line 2, character 16):
-    List of completions (1 entries): [SECTION .]
+    List of completions (1 entries): [SECTION.]
     __rootdir__/prog.cob:4.10:
        1
        2           CONTROL DIVISION.
