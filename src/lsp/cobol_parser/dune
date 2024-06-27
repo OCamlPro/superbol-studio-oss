@@ -54,6 +54,7 @@
     (with-stdout-to %{targets}
        (run %{exe:./expect/gen_expect.exe} %{deps}
             --external-tokens Grammar_tokens
+            --recover-module Grammar_recover
             --nel-module Cobol_common.Basics.NEL))))
 
 (rule

@@ -16,6 +16,7 @@ module NEL = Cobol_common.Basics.NEL
 let cmlyname = ref None
 let external_tokens = ref ""
 let nel_module = ref ""
+let recover_module = ref ""
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -29,6 +30,8 @@ let () =
        "<module> Import token type definition from <module>");
       ("--nel-module", Set_string nel_module,
        "<module> Import NEL (non-empty-list) type definition from <module>");
+      ("--recover-module", Set_string recover_module,
+       "<module> Import the default_value function from <module>");
     ]
     anon usage_msg
 
@@ -289,20 +292,19 @@ let acceptable_terminals_in ~env : completion_entry list =
     "[])"
 
 let guess_default_value ~mangled_name ~typ =
-  match typ, mangled_name with
-  | _ when EzString.ends_with ~suffix:" option" typ ||
-           EzString.starts_with ~prefix:"option_" mangled_name
-    -> Some "None"
-  | _ when EzString.ends_with ~suffix:" list" typ ||
-           EzString.starts_with ~prefix:"loption_" mangled_name ||
-           EzString.starts_with ~prefix:"list_" mangled_name
-    -> Some "[]"
-  | _ when String.equal typ "unit"
-    -> Some "()"
-  | _ when String.equal typ "bool" ||
-           EzString.starts_with ~prefix:"boption_" mangled_name
-    -> Some "false"
-  | _ -> None
+  if EzString.ends_with ~suffix:" option" typ ||
+     EzString.starts_with ~prefix:"option_" mangled_name
+  then Some "None"
+  else if EzString.ends_with ~suffix:" list" typ ||
+          EzString.starts_with ~prefix:"loption_" mangled_name ||
+          EzString.starts_with ~prefix:"list_" mangled_name
+  then Some "[]"
+  else if String.equal typ "unit"
+  then Some "()"
+  else if String.equal typ "bool" ||
+          EzString.starts_with ~prefix:"boption_" mangled_name
+  then Some "false"
+  else None
 
 let is_nullable_without_recovery = Nonterminal.tabulate begin fun nt ->
     Nonterminal.nullable nt &&
@@ -329,12 +331,12 @@ let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
 
 let emit_default_value_of_nullables ppf =
   Fmt.string ppf {|
-let guessed_default_value_of_nullables (type a): a Menhir.symbol -> a = function
+let guessed_default_value_of_nullables (type a): a Menhir.nonterminal -> a = fun nt ->
   (* If this function does not compile, it has probably incorrecly
      guessed the type of a nonterinal, either change the name
-     or add a @default attribute on the faulty nonnterminal *)
-  | T _ -> raise Not_found
-  | N nt -> begin match nt with
+     or add a @default attribute on the faulty nonterminal *)
+     try Recover.default_value Menhir.(N nt)
+     with Not_found -> match nt with
 |};
   Nonterminal.fold (fun nt acc -> begin
         match best_guess_default_value nt with
@@ -344,7 +346,7 @@ let guessed_default_value_of_nullables (type a): a Menhir.symbol -> a = function
   |> pp_match_cases ppf
     Fmt.(using Nonterminal.mangled_name (any "N_" ++ string))
     Fmt.string
-    "raise Not_found end"
+    "raise Not_found"
 
 module DEBUG = struct
 
@@ -414,9 +416,10 @@ let () =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
      \nmodule NEL = %s\
+     \nmodule Recover = %s\
      \nmodule Menhir = Grammar.MenhirInterpreter\
      \nopen %s@\n\n"
-    cmlyname !nel_module !external_tokens;
+    cmlyname !nel_module !recover_module !external_tokens;
 
   emit_completion_entry ppf;
   emit_reducible_productions_in_env ppf;

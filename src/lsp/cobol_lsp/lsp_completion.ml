@@ -130,15 +130,15 @@ let expected_tokens base_env =
     let nullables = Expect.acceptable_nullable_nonterminals_in ~env in
     let acc = Expect.CompEntrySet.add_seq
         (List.to_seq @@ Expect.acceptable_terminals_in ~env) acc in
-    let acc = List.fold_left (fun acc (Menhir.X sym) ->
-        let default_value =
-          try Some (Cobol_parser.Recover.default_value sym)
-          with Not_found -> try Some (Expect.guessed_default_value_of_nullables sym)
-            with Not_found -> if debug then  Lsp_io.log_debug "Not found"; None in
-        Option.fold ~none:acc ~some:(fun a ->
-            let new_env = Menhir.feed sym pos a pos env in
-            if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
-            inner new_env acc) default_value)
+    let acc = List.fold_left (fun acc -> function
+        | Menhir.X T _ -> acc
+        | X N nt ->
+          let default_value = try Some (Expect.guessed_default_value_of_nullables nt)
+            with Not_found -> if debug then  Lsp_io.log_debug "Default value of nullable not found"; None in
+          Option.fold ~none:acc ~some:(fun a ->
+              let new_env = Menhir.feed (N nt) pos a pos env in
+              if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
+              inner new_env acc) default_value)
         acc nullables in
     List.fold_left (fun acc prod ->
         let new_env = Menhir.force_reduction prod env in

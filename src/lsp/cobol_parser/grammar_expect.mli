@@ -28,5 +28,5 @@ val acceptable_nullable_nonterminals_in: env:_ env -> xsymbol list
 
 val acceptable_terminals_in: env:_ env -> completion_entry list
 
-val guessed_default_value_of_nullables: 'a symbol -> 'a
+val guessed_default_value_of_nullables: 'a nonterminal -> 'a
 
