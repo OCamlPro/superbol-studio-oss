@@ -302,15 +302,15 @@ let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
     if not (Nonterminal.nullable nt)
     then None
     else
-      let given_or_extra_default =
+      let given_default =
         Nonterminal.attributes nt
         |> List.find_opt begin fun attr ->
           Attribute.has_label "default" attr ||
           Option.fold ~none:false ~some:(inv Attribute.has_label attr) extra_default
         end
         |> Option.map Attribute.payload in
-      match given_or_extra_default with
-      | Some _ -> given_or_extra_default
+      match given_default with
+      | Some _ -> given_default
       | None ->
         let mangled_name = Nonterminal.mangled_name nt in
         Option.bind (Nonterminal.typ nt)
@@ -334,7 +334,7 @@ let default_nonterminal_value (type a): a Menhir.nonterminal -> a = function
     Fmt.string
     "raise Not_found"
 
-let ensure_all_nullable_nonterminal_have_default () =
+let __ensure_all_nullable_nonterminal_have_default =
   let nt_without_default = Nonterminal.fold (fun nt acc -> begin
         if Nonterminal.nullable nt
         && best_guess_default_value nt == None
@@ -342,10 +342,10 @@ let ensure_all_nullable_nonterminal_have_default () =
       end) [] in
   match List.hd nt_without_default with
   | nt ->
-      let error_msg = Pretty.to_string
-        "Unable to find default value for the nonterminal '%s', please provide a @default annotation"
-        (Nonterminal.mangled_name nt) in
-      failwith error_msg
+      Pretty.failwith
+        "Unable to find a default value for nonterminal '%s'; \
+        please provide a @default annotation"
+        (Nonterminal.mangled_name nt)
   | exception Failure _ -> ()
 
 module DEBUG = struct
@@ -412,7 +412,6 @@ end
 
 
 let () =
-  ensure_all_nullable_nonterminal_have_default ();
   let ppf = Fmt.stdout in
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
