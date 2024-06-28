@@ -11,4 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val context_completion_items: Lsp_document.t -> Lsp_document.checked_doc -> Lsp.Types.Position.t -> Lsp.Types.CompletionItem.t list
+val context_completion_items
+  : Lsp_document.t
+  -> Lsp_document.checked_doc
+  -> Lsp.Types.Position.t
+  -> Lsp.Types.CompletionItem.t list

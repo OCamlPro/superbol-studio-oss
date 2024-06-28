@@ -16,7 +16,6 @@ module NEL = Cobol_common.Basics.NEL
 let cmlyname = ref None
 let external_tokens = ref ""
 let nel_module = ref ""
-let recover_module = ref ""
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -30,8 +29,6 @@ let () =
        "<module> Import token type definition from <module>");
       ("--nel-module", Set_string nel_module,
        "<module> Import NEL (non-empty-list) type definition from <module>");
-      ("--recover-module", Set_string recover_module,
-       "<module> Import the default_value function from <module>");
     ]
     anon usage_msg
 
@@ -122,58 +119,56 @@ module Make_map (OrderedType : Map.OrderedType) = struct
     update x add m
 end
 
-module CompEntryMap = Make_map(struct
+module Compentries_mapping = Make_map(struct
     type t = CompEntrySet.t
     let compare = CompEntrySet.compare
   end)
 
-module ProdMap = Make_map(struct
+module Productions_mapping = Make_map(struct
     type t = Production.t list
     let compare = List.compare (fun p1 p2 ->
         Production.to_int p1 - Production.to_int p2)
   end)
 
-module NonterminalMap = Make_map(struct
+module Nonterminals_mapping = Make_map(struct
     type t = NonterminalSet.t
     let compare = NonterminalSet.compare
   end)
 
 (* --- *)
 
-let emit_pp_completion_entry ppf custom_types = (* For debug *)
-  Fmt.string ppf "\nlet pp_completion_entry: completion_entry Fmt.t = fun ppf -> function\n";
-  Fmt.string ppf "  | K tokens -> Fmt.(pf ppf \"%a\"\
-                  (NEL.pp ~fopen:\"\" ~fclose:\"\" ~fsep:\" \"\
-                  (using Grammar_printer.print_token string)) tokens)\n";
-  List.iter
-    (fun s -> Fmt.pf ppf "  | %s -> Fmt.pf ppf \"%s\"\n" s s)
-    custom_types
-
-let emit_complentryset ppf custom_types =
-  Fmt.(pf ppf {|
-module CompEntrySet = Set.Make(struct
-  type t = completion_entry
+let emit_completion_entry ppf =
+  Fmt.string ppf {|
+module Completion_entry = struct
+  type t =
+    | K of token NEL.t
+|};
+  let custom_types = Nonterminal.fold (fun nonterm acc ->
+      match nonterminal_filter_map nonterm with
+      | Some (Custom s) -> (Fmt.pf ppf "    | %s\n" s; s::acc)
+      | _ -> acc) [] in
+  Fmt.pf ppf {|
   let compare ce1 ce2 =
     let to_int = function
       %a| K _ -> %d in
     match ce1, ce2 with
       | K nel1, K nel2 -> NEL.compare Stdlib.compare nel2 nel1
       | _ -> to_int ce1 - to_int ce2
-end)
 |}
-         (list ~sep:nop (fun ppf (i,t) ->
-              pf ppf "| %s -> %d\n    " t i)) (List.mapi (fun i v -> (i,v)) custom_types)
-         (List.length custom_types))
-
-let emit_completion_entry ppf =
-  Fmt.string ppf "type completion_entry =\n";
-  Fmt.string ppf "  | K of token NEL.t\n";
-  let custom_types = Nonterminal.fold (fun nonterm acc ->
-      match nonterminal_filter_map nonterm with
-      | Some (Custom s) -> (Fmt.pf ppf "  | %s\n" s; s::acc)
-      | _ -> acc) [] in
-  emit_pp_completion_entry ppf custom_types;
-  emit_complentryset ppf custom_types
+    Fmt.(list ~sep:nop (fun ppf (i, t) ->
+        pf ppf "| %s -> %d\n      " t i))
+    (List.mapi (fun i t -> (i, t)) custom_types)
+    (List.length custom_types);
+  Fmt.pf ppf {|
+  let pp: t Fmt.t = fun ppf -> function
+     | K tokens -> Fmt.(pf ppf "%%a"
+         (NEL.pp ~fopen:"" ~fclose:"" ~fsep:" "
+         (using Grammar_printer.print_token string)) tokens)
+|};
+  List.iter
+    (fun s -> Fmt.pf ppf "    | %s -> Fmt.string ppf \"%s\"\n" s s)
+    custom_types;
+  Fmt.string ppf "end\n"
 
 let nullable_nonterminals: lr1 -> NonterminalSet.t =
   Lr1.tabulate begin fun lr1 ->
@@ -195,17 +190,17 @@ let reducible_productions: lr1 -> production list =
     |> List.sort_uniq Production.compare
   end
 
-let emit_acceptable_nullable_nonterminals_in_env ppf =
+let emit_nullable_nonterminals_in_env ppf =
   Fmt.string ppf {|
-let acceptable_nullable_nonterminals_in ~env : Menhir.xsymbol list =
+let nullable_nonterminals_in ~env : Menhir.xsymbol list =
   Menhir.(match current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
       match nullable_nonterminals lr1 with
       | emtpy when NonterminalSet.is_empty emtpy -> acc
-      | symbols -> NonterminalMap.add_to_list symbols lr1 acc)
-    NonterminalMap.empty
-  |> inv (NonterminalMap.fold (fun s l acc -> (l, NonterminalSet.elements s)::acc)) []
+      | symbols -> Nonterminals_mapping.add_to_list symbols lr1 acc)
+    Nonterminals_mapping.empty
+  |> inv (Nonterminals_mapping.fold (fun s l acc -> (l, NonterminalSet.elements s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
     (pp_brackets @@ pp_list @@ pp_xsymbol_of_nt)
@@ -220,15 +215,15 @@ let reducible_productions_in ~env : Menhir.production list =
   Lr1.fold (fun lr1 acc ->
       match reducible_productions lr1 with
       | [] -> acc
-      | defaults -> ProdMap.add_to_list defaults lr1 acc)
-    ProdMap.empty
-  |> inv (ProdMap.fold (fun s l acc -> (l, s)::acc)) []
+      | defaults -> Productions_mapping.add_to_list defaults lr1 acc)
+    Productions_mapping.empty
+  |> inv (Productions_mapping.fold (fun s l acc -> (l, s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
     Fmt.(pp_brackets @@ pp_list @@ (using Production.to_int int))
     "[]"
 
-let completion_entries_of: lr1 -> CompEntrySet.t =
+let accumulate_terminals: lr1 -> CompEntrySet.t =
   let rec continue_while_terminal rhs i l =
     match rhs.(i) with
     | T t, _, _
@@ -260,17 +255,17 @@ let completion_entries_of: lr1 -> CompEntrySet.t =
     |> CompEntrySet.of_seq
   end
 
-let emit_acceptable_terminals_in_env ppf = (* taking transitions *)
+let emit_completion_entries_in_env ppf =
   Fmt.string ppf {|
-let acceptable_terminals_in ~env : completion_entry list =
+let completion_entries_in ~env : Completion_entry.t list =
   NEL.(match Menhir.current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
-      match completion_entries_of lr1 with
+      match accumulate_terminals lr1 with
       | s when CompEntrySet.is_empty s -> acc
-      | s -> CompEntryMap.add_to_list s lr1 acc)
-    CompEntryMap.empty
-  |> inv (CompEntryMap.fold (fun s l acc -> (l, CompEntrySet.elements s)::acc)) []
+      | s -> Compentries_mapping.add_to_list s lr1 acc)
+    Compentries_mapping.empty
+  |> inv (Compentries_mapping.fold (fun s l acc -> (l, CompEntrySet.elements s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
     (pp_brackets @@ pp_list pp_completion_entry)
@@ -278,11 +273,14 @@ let acceptable_terminals_in ~env : completion_entry list =
 
 let guess_default_value ~mangled_name ~typ =
   if EzString.ends_with ~suffix:" option" typ ||
-     EzString.starts_with ~prefix:"option_" mangled_name
+     EzString.starts_with ~prefix:"option_" mangled_name ||
+     EzString.starts_with ~prefix:"ro_" mangled_name
   then Some "None"
   else if EzString.ends_with ~suffix:" list" typ ||
           EzString.starts_with ~prefix:"loption_" mangled_name ||
-          EzString.starts_with ~prefix:"list_" mangled_name
+          EzString.starts_with ~prefix:"list_" mangled_name ||
+          EzString.starts_with ~prefix:"rl_" mangled_name ||
+          EzString.starts_with ~prefix:"l_" mangled_name
   then Some "[]"
   else if String.equal typ "unit"
   then Some "()"
@@ -291,37 +289,28 @@ let guess_default_value ~mangled_name ~typ =
   then Some "false"
   else None
 
-let is_nullable_without_recovery = Nonterminal.tabulate begin fun nt ->
-    Nonterminal.nullable nt &&
-    Nonterminal.attributes nt
-    |> List.find_opt (Attribute.has_label "recovery")
-    |> Option.is_none
-  end
-
 let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
-    if not (is_nullable_without_recovery nt)
+    if not (Nonterminal.nullable nt)
     then None
     else
-      let mangled_name = Nonterminal.mangled_name nt in
-      let guessed_default = Option.bind
-          (Nonterminal.typ nt)
-          (fun typ -> guess_default_value ~mangled_name ~typ) in
-      let given_default = Nonterminal.attributes nt
-                          |> List.find_opt (Attribute.has_label "default")
-                          |> Option.map Attribute.payload in
+      let given_default =
+        Nonterminal.attributes nt
+        |> List.find_opt (Attribute.has_label "default")
+        |> Option.map Attribute.payload in
       match given_default with
       | Some _ -> given_default
-      | None -> guessed_default
+      | None ->
+        let mangled_name = Nonterminal.mangled_name nt in
+        Option.bind (Nonterminal.typ nt)
+          (fun typ -> guess_default_value ~mangled_name ~typ)
   end
 
-let emit_default_value_of_nullables ppf =
+let emit_default_nonterminal_value ppf =
   Fmt.string ppf {|
-let guessed_default_value_of_nullables (type a): a Menhir.nonterminal -> a = fun nt ->
+let default_nonterminal_value (type a): a Menhir.nonterminal -> a = function
   (* If this function does not compile, it has probably incorrecly
      guessed the type of a nonterinal, either change the name
      or add a @default attribute on the faulty nonterminal *)
-     try Recover.default_value Menhir.(N nt)
-     with Not_found -> match nt with
 |};
   Nonterminal.fold (fun nt acc -> begin
         match best_guess_default_value nt with
@@ -381,7 +370,7 @@ module DEBUG = struct
 
   let emit_nullable_unrecoverable ppf =
     let nt_without_default = Nonterminal.fold (fun nt acc -> begin
-          if is_nullable_without_recovery nt
+          if Nonterminal.nullable nt
           && best_guess_default_value nt == None
           then nt::acc else acc
         end) [] in
@@ -401,16 +390,15 @@ let () =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
      \nmodule NEL = %s\
-     \nmodule Recover = %s\
      \nmodule Menhir = Grammar.MenhirInterpreter\
      \nopen %s@\n\n"
-    cmlyname !nel_module !recover_module !external_tokens;
+    cmlyname !nel_module !external_tokens;
 
   emit_completion_entry ppf;
   emit_reducible_productions_in_env ppf;
-  emit_acceptable_nullable_nonterminals_in_env ppf;
-  emit_acceptable_terminals_in_env ppf;
-  emit_default_value_of_nullables ppf;
+  emit_nullable_nonterminals_in_env ppf;
+  emit_completion_entries_in_env ppf;
+  emit_default_nonterminal_value ppf;
 
   (* emit_follow_transition ppf; *)
   (* DEBUG.emit_firsts ppf; *)

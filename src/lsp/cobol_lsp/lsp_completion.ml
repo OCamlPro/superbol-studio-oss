@@ -21,31 +21,36 @@ open Lsp.Types
 module Menhir = Cobol_parser.Grammar_interpr
 module Expect = Cobol_parser.Expect
 
-let qualname_proposals ~filename pos group =
+let to_string qualnames =
+  List.flatten @@ List.rev_map (function
+      | Cobol_ptree.Name name -> [~&name]
+      | Qual (name,_) as qualname ->
+        [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
+      | _ -> []) qualnames
+
+let qualnames_proposal ~filename pos group =
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
   | None -> []
   | Some cu ->
     List.filter_map Cobol_data.Item.def_qualname cu.unit_data.data_items.list
+    |> to_string
 
-let procedure_proposals ~filename pos group =
+let procedures_proposal ~filename pos group =
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
   | None -> []
   | Some cu ->
-    let map_paragraph (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
-      Option.to_list @@ Option.map Cobol_common.Srcloc.payload ~&paragraph.paragraph_name
+    let paragraph_name (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
+      Option.map Cobol_common.Srcloc.payload ~&paragraph.paragraph_name
     in
-    List.flatten @@ List.map (function
-        | Cobol_unit.Types.Paragraph paragraph -> map_paragraph paragraph
+    List.flatten @@ List.rev_map (function
+        | Cobol_unit.Types.Paragraph paragraph ->
+          Option.to_list @@ paragraph_name paragraph
         | Section section ->
-          List.flatten @@ List.map map_paragraph ~&section.section_paragraphs.list)
+          List.filter_map paragraph_name ~&section.section_paragraphs.list)
       cu.unit_procedure.list
+    |> to_string
 
-let completion_item label ~range ~kind =
-  (*we may change the ~sortText/preselect for reason of priority *)
-  let textedit = TextEdit.create ~newText:label ~range in
-  CompletionItem.create ()
-    ~label ~kind ~preselect:false
-    ~textEdit:(`TextEdit textedit)
+module CompEntrySet = Set.Make(Expect.Completion_entry)
 
 let delimiters = [' '; '\t'; '.']
 let range (pos:Position.t) text =
@@ -69,42 +74,44 @@ let range (pos:Position.t) text =
   let position_start = Position.create ~character:index ~line in
   Range.create ~start:position_start ~end_:pos
 
-let to_completion_item ~kind ~range qualnames =
-  List.flatten @@ List.map (function
-      | Cobol_ptree.Name name -> [~&name]
-      | Qual (name,_) as qualname ->
-        [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
-      | _ -> []) qualnames |>
-  List.map @@ completion_item ~kind ~range
+let completion_item_create label ~range ~kind =
+  let textedit = TextEdit.create ~newText:label ~range in
+  CompletionItem.create ()
+  ~label ~kind ~preselect:false
+      ~textEdit:(`TextEdit textedit)
 
 let string_of_K tokens =
   let pp ppf =
     let rec inner ?(space_before=true) = function
       | [] -> ()
+      | Cobol_parser.Tokens.PERIOD::tl ->
+        Fmt.char ppf '.'; inner tl
       | hd::tl ->
         let token' = hd &@ Srcloc.dummy in
-        if hd <> Cobol_parser.Tokens.PERIOD && space_before then Fmt.sp ppf ();
-        Cobol_parser.INTERNAL.pp_token ppf token';
+        if space_before then Fmt.sp ppf ();
+        Cobol_parser.INTERNAL.pp_token ppf token'; (* TODO: Cobol_parser.Tokens.pp *)
         inner tl
-    in inner ~space_before:false
-  in Pretty.to_string "%a" pp (Basics.NEL.to_list tokens)
+    in
+    inner ~space_before:false
+  in
+  Pretty.to_string "%a" pp (Basics.NEL.to_list tokens)
 
 let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
   let pos = range.end_ in
-  List.flatten @@ List.map (function
-      | Expect.QualifiedRef ->
-        to_completion_item
-          ~kind:CompletionItemKind.Variable ~range
-          (qualname_proposals ~filename pos group)
+  List.flatten @@ List.rev_map (function
+      | Expect.Completion_entry.QualifiedRef ->
+        qualnames_proposal ~filename pos group
+        |> List.rev_map (completion_item_create
+                       ~kind:Variable ~range)
       | ProcedureRef ->
-        to_completion_item
-          ~kind:CompletionItemKind.Module ~range
-          (procedure_proposals ~filename range.end_ group)
+        procedures_proposal ~filename pos group
+        |> List.rev_map (completion_item_create
+                       ~kind:Function ~range)
       | K tokens -> begin
-          try let tokens_string = string_of_K tokens in
-            [completion_item ~kind:CompletionItemKind.Keyword ~range tokens_string]
+          try [ completion_item_create ~kind:Keyword ~range @@
+                string_of_K tokens ]
           with Not_found -> [] end)
-    (Expect.CompEntrySet.elements comp_entries)
+    (CompEntrySet.elements comp_entries)
 
 let pp_env ppf env = (* for debug *)
   let has_default = Expect.reducible_productions_in ~env <> [] in
@@ -125,16 +132,17 @@ let expected_tokens base_env =
     let pos = match Menhir.top env with
       | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
       | Some Menhir.Element (_, _, _, pos) -> pos in
-    if debug then (Lsp_io.log_debug "In State: %a" pp_env env; let tok = Expect.acceptable_terminals_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.pp_completion_entry) tok);
+    if debug then (Lsp_io.log_debug "In State: %a" pp_env env; let tok = Expect.completion_entries_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.Completion_entry.pp) tok);
     let productions = Expect.reducible_productions_in ~env in
-    let nullables = Expect.acceptable_nullable_nonterminals_in ~env in
-    let acc = Expect.CompEntrySet.add_seq
-        (List.to_seq @@ Expect.acceptable_terminals_in ~env) acc in
+    let nullables = Expect.nullable_nonterminals_in ~env in
+    let acc = CompEntrySet.add_seq
+        (List.to_seq @@ Expect.completion_entries_in ~env) acc in
     let acc = List.fold_left (fun acc -> function
         | Menhir.X T _ -> acc
         | X N nt ->
-          let default_value = try Some (Expect.guessed_default_value_of_nullables nt)
-            with Not_found -> if debug then  Lsp_io.log_debug "Default value of nullable not found"; None in
+          let default_value =
+            try Some (Expect.default_nonterminal_value nt)
+            with Not_found -> None in
           Option.fold ~none:acc ~some:(fun a ->
               let new_env = Menhir.feed (N nt) pos a pos env in
               if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
@@ -147,8 +155,8 @@ let expected_tokens base_env =
       acc productions
   in
   if debug then Lsp_io.log_debug "%a" pp_env_stack base_env;
-  let comp_entries = inner base_env Expect.CompEntrySet.empty in
-  if debug then (if Expect.CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.pp_completion_entry) (Expect.CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (Expect.CompEntrySet.cardinal comp_entries));
+  let comp_entries = inner base_env CompEntrySet.empty in
+  if debug then (if CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.Completion_entry.pp) (CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (CompEntrySet.cardinal comp_entries));
   comp_entries
 
 let context_completion_items (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =

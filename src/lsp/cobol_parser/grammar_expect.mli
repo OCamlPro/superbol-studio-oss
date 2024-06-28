@@ -13,20 +13,21 @@
 
 open Grammar.MenhirInterpreter
 
-type completion_entry =
-  | K of token Cobol_common.Basics.NEL.t
-  | QualifiedRef
-  | ProcedureRef
+module Completion_entry: sig
+  type t =
+    | K of token Cobol_common.Basics.NEL.t
+    | QualifiedRef
+    | ProcedureRef
+  val compare: t -> t -> int
+  val pp: t Fmt.t
+end
 
-val pp_completion_entry: completion_entry Fmt.t
-
-module CompEntrySet : (Set.S with type elt = completion_entry)
 
 val reducible_productions_in: env:_ env -> production list
 
-val acceptable_nullable_nonterminals_in: env:_ env -> xsymbol list
+val nullable_nonterminals_in: env:_ env -> xsymbol list
 
-val acceptable_terminals_in: env:_ env -> completion_entry list
+val completion_entries_in: env:_ env -> Completion_entry.t list
 
-val guessed_default_value_of_nullables: 'a nonterminal -> 'a
+val default_nonterminal_value: 'a nonterminal -> 'a
 
