@@ -140,9 +140,8 @@ let parse ~config ~filename ~contents =
       if config.verbosity > 1 then
         Printf.eprintf "EXEC SQL found at line %d\n%!" loc.line;
       begin match tokens with
-        | (tok, loc) :: _ ->
-          let cmd = Misc.string_of_token tok in
-          iter_sql loc cmd [] tokens
+        | (_, _loc) :: _ ->
+          iter_sql loc [] tokens
 (*         | (
           (IDENT _
           | RETURN
@@ -160,7 +159,7 @@ let parse ~config ~filename ~contents =
       end
     | _ :: tokens -> iter tokens
 
-  and iter_sql loc cmd params tokens =
+  and iter_sql loc params tokens =
     match tokens with
     | (END_EXEC, end_loc) ::  tokens ->
       (* TODO: check if there is a ending DOT on the same line. If
@@ -175,22 +174,22 @@ let parse ~config ~filename ~contents =
         Printf.eprintf "END-EXEC found at %d\n%!" end_loc.line;
 
       let params = List.rev params in
-      let sqlStr = "EXEC SQL "^ (String.concat " " params) ^ " END-EXEC" in
-(*       Format.fprintf Format.std_formatter "\nSTRING\n"; 
-      Format.fprintf Format.std_formatter "\n%s\n" sqlStr;  *)
+      let sqlStr = "EXEC SQL " ^ (String.concat " " params) ^ " END-EXEC" in
+      Format.fprintf Format.std_formatter "\nSTRING\n"; 
+      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; 
 
       let sql = Sql_parser.parseString (Lexing.from_string sqlStr) 
       in
-(*       Format.fprintf Format.std_formatter "\nAST\n"; 
-      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; 
- *)
+      Format.fprintf Format.std_formatter "\nAST\n"; 
+      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql;  
+
       sql_add_statement ~loc
         (EXEC_SQL { end_loc ; with_dot ; tokens = sql });
       iter tokens
     | [] -> failwith "missing END-EXEC."
     | (tok, _) :: tokens ->
       let tok = Misc.string_of_token tok in
-      iter_sql loc cmd ( tok :: params) tokens
+      iter_sql loc ( tok :: params) tokens
 
   and tokenize_file ~filename ~contents tokens =
     let { Cobol_indent.Scanner.toks = new_tokens ; _ } =

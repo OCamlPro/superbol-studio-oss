@@ -62,6 +62,7 @@ let main :=
 | EXEC; SQL; stm = esql; END_EXEC; EOF; {stm}
 
 let cobol_var_id :=
+| COLON; c=loc(WORD); {c}  
 | c = loc(COBOL_VAR); {c}
 
 let cobol_var :=

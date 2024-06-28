@@ -1,6 +1,0 @@
-﻿       IDENTIFICATION DIVISION.
-       PROGRAM-ID. test_1.   
-       PROCEDURE DIVISION. 
-
-           EXEC SQL INCLUDE SQLCA END-EXEC. 
-           STOP RUN.
