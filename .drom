@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-84aac90476911e934e37975e8ed10fc0:.
+13641abd6ca6e73931ed01a69e8a8934:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -346,7 +346,7 @@ a98a08d36a2f65127f60832515b6ab47:src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_parser/dune
 # file src/lsp/cobol_parser/dune
-75a8ca3c10b9cc71674d3bdf094996c4:src/lsp/cobol_parser/dune
+44b9b76fe2777a06cbe5a7eb212f7b16:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
 
 # begin context for src/lsp/cobol_parser/version.mlt

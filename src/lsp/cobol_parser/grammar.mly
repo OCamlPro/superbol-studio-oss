@@ -947,7 +947,7 @@ let lock_mode_clause [@context lock_mode_clause] :=                (* +COB2002 *
  | LOCK; MODE?; IS?; lm = lock_mode; wl = with_lock_clause;
    { SelectLockMode { mode = lm; with_lock = wl } }
 
-let with_lock_clause [@recovery WithLockNone] [@default WithLockNone] :=
+let with_lock_clause [@recovery WithLockNone] :=
   | { WithLockNone }
   | WITH; LOCK; ON; m = bo(MULTIPLE); or_(RECORD,RECORDS);
     { WithLock { multiple = m } }
@@ -3388,7 +3388,7 @@ let when_other [@default []] :=
 %public let unconditional_action := ~ = exit_statement; < >
 let exit_statement [@context exit_stmt] :=
  | EXIT; ~ = exit_spec; <Exit>
-let exit_spec [@recovery ExitSimple] [@default ExitSimple] :=
+let exit_spec [@recovery ExitSimple] :=
  | %prec lowest                          { ExitSimple }
  | PROGRAM; ro = ro(raising_exception);  { ExitProgram ro }
  | METHOD; ro = ro(raising_exception);   { ExitMethod ro }        (* COB2002+ *)

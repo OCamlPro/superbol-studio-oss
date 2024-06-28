@@ -16,6 +16,7 @@ module NEL = Cobol_common.Basics.NEL
 let cmlyname = ref None
 let external_tokens = ref ""
 let nel_module = ref ""
+let extra_default = ref ""
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -29,6 +30,8 @@ let () =
        "<module> Import token type definition from <module>");
       ("--nel-module", Set_string nel_module,
        "<module> Import NEL (non-empty-list) type definition from <module>");
+      ("--extra-default-attribute-name", Set_string extra_default,
+       "<string> The annotation representing extra default values");
     ]
     anon usage_msg
 
@@ -272,11 +275,13 @@ let completion_entries_in ~env : Completion_entry.t list =
     "[])"
 
 let guess_default_value ~mangled_name ~typ =
-  if EzString.ends_with ~suffix:" option" typ ||
+  let optionRegexp = Str.regexp "^[^*]+ option$" in
+  let listRegexp = Str.regexp "^[^*]+ list$" in
+  if Str.string_match optionRegexp typ 0 ||
      EzString.starts_with ~prefix:"option_" mangled_name ||
      EzString.starts_with ~prefix:"ro_" mangled_name
   then Some "None"
-  else if EzString.ends_with ~suffix:" list" typ ||
+  else if Str.string_match listRegexp typ 0 ||
           EzString.starts_with ~prefix:"loption_" mangled_name ||
           EzString.starts_with ~prefix:"list_" mangled_name ||
           EzString.starts_with ~prefix:"rl_" mangled_name ||
@@ -289,16 +294,23 @@ let guess_default_value ~mangled_name ~typ =
   then Some "false"
   else None
 
+let extra_default = match !extra_default with
+| "" -> None
+| s -> Some s
+
 let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
     if not (Nonterminal.nullable nt)
     then None
     else
-      let given_default =
+      let given_or_extra_default =
         Nonterminal.attributes nt
-        |> List.find_opt (Attribute.has_label "default")
+        |> List.find_opt begin fun attr ->
+          Attribute.has_label "default" attr ||
+          Option.fold ~none:false ~some:(inv Attribute.has_label attr) extra_default
+        end
         |> Option.map Attribute.payload in
-      match given_default with
-      | Some _ -> given_default
+      match given_or_extra_default with
+      | Some _ -> given_or_extra_default
       | None ->
         let mangled_name = Nonterminal.mangled_name nt in
         Option.bind (Nonterminal.typ nt)
@@ -312,15 +324,29 @@ let default_nonterminal_value (type a): a Menhir.nonterminal -> a = function
      guessed the type of a nonterinal, either change the name
      or add a @default attribute on the faulty nonterminal *)
 |};
-  Nonterminal.fold (fun nt acc -> begin
-        match best_guess_default_value nt with
-        | None -> acc
-        | Some default -> ([nt], default)::acc
-      end) []
+  Nonterminal.fold begin fun nt acc ->
+    match best_guess_default_value nt with
+    | None -> acc
+    | Some default -> ([nt], default)::acc
+  end []
   |> pp_match_cases ppf
     Fmt.(using Nonterminal.mangled_name (any "N_" ++ string))
     Fmt.string
     "raise Not_found"
+
+let ensure_all_nullable_nonterminal_have_default () =
+  let nt_without_default = Nonterminal.fold (fun nt acc -> begin
+        if Nonterminal.nullable nt
+        && best_guess_default_value nt == None
+        then nt::acc else acc
+      end) [] in
+  match List.hd nt_without_default with
+  | nt ->
+      let error_msg = Pretty.to_string
+        "Unable to find default value for the nonterminal '%s', please provide a @default annotation"
+        (Nonterminal.mangled_name nt) in
+      failwith error_msg
+  | exception Failure _ -> ()
 
 module DEBUG = struct
 
@@ -386,6 +412,7 @@ end
 
 
 let () =
+  ensure_all_nullable_nonterminal_have_default ();
   let ppf = Fmt.stdout in
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
@@ -403,5 +430,4 @@ let () =
   (* emit_follow_transition ppf; *)
   (* DEBUG.emit_firsts ppf; *)
   (* DEBUG.emit_state_productions ppf; *)
-  (* DEBUG.emit_nullable_unrecoverable ppf; *)
   ()
