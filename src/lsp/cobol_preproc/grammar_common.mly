@@ -14,6 +14,10 @@
 
 %}
 
+%attribute option [@default None]
+%attribute boption [@default false]
+%attribute loption list [@default []]
+
 %%
 
 (* TODO: add a `recovery.benign` attribute as this can be empty *)

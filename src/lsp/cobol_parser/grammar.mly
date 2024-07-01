@@ -475,8 +475,8 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_end_name = em } }
 
 
-let informational_paragraphs :=                            (* ~COB85, -COB2002 *)
- rl(loc(informational_paragraph))
+let informational_paragraphs ==                 (* ~COB85, -COB2002 *)
+  rl(loc(informational_paragraph))
 
 let informational_paragraph :=
   | ~ = informational_paragraph_header; "."; ~ = loc(comment_entry); < >
@@ -495,7 +495,8 @@ let informational_paragraph_header ==
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
-let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
+let as__strlit_ [@default None] :=
+  | ~ = ro (pf (AS, string_literal)); < >
 
 let unit_name := loc(infoword_or_literal)
 
@@ -816,7 +817,7 @@ let order_table_clause :=                                          (* +COB2002 *
   | ORDER; TABLE; i = name; IS?; l = string_literal;
     { OrderTable { ordering_name = i; cultural_ordering = l } }
 
-let for_alphanumeric_or_national_opt :=
+let for_alphanumeric_or_national_opt [@default Alphanumeric] :=
   | (* epsilon *)       {Alphanumeric}
   | FOR?; ALPHANUMERIC; {Alphanumeric}
   | FOR?; NATIONAL;     {National}
@@ -1021,7 +1022,7 @@ let same_area_clause :=
        same_area_file_name = i;
        same_area_file_names = il } }
 
-let area_source :=
+let area_source [@default AreaSourceFile] :=
  |             {AreaSourceFile}
  | RECORD;     {AreaSourceRecord}
  | SORT;       {AreaSourceSortMerge}
@@ -1301,7 +1302,7 @@ let recording_mode :=
  | FIXED;    { ModeFixed }
  | VARIABLE; { ModeVariable }
 
-from_to_characters_opt:
+from_to_characters_opt [@default (None, None)]:
  | CHARACTERS?                                    { None,    None }
  | FROM? i1 = integer CHARACTERS?                 { Some i1, None }
  | TO i2 = integer CHARACTERS?                    { None,    Some i2 }
@@ -1701,7 +1702,8 @@ let encoding_mode :=
   | BINARY_ENCODING;  { BinaryEncoding }
   | DECIMAL_ENCODING; { DecimalEncoding }
 
-let encoding_endianness_opt :=
+let encoding_endianness_opt [@default { encoding_mode = None;
+                                        endianness_mode = None }] :=
   | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
@@ -1846,7 +1848,7 @@ let column_position :=
   | ~ = integer;                <ColumnAbsolute>
   | or_(PLUS,"+"); ~ = integer; <ColumnRelative>
 
-let alignment :=
+let alignment [@default AlignLeft] :=
   | LEFT?;  {AlignLeft}
   | CENTER; {AlignRight}
   | RIGHT;  {AlignCenter}
@@ -2154,7 +2156,8 @@ let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
+let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"]
+              [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
 let qualname ==
@@ -2176,7 +2179,8 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] :=
+let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"]
+                   [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=
@@ -2801,7 +2805,7 @@ let rounded_ident :=
     { { rounded = i; rounded_rounding = rm } }
 let rounded_idents == ~ = rnel(rounded_ident); < >
 
-let rounded_phrase_opt :=
+let rounded_phrase_opt [@default RoundingNotAny] :=
   | (* epsilon *)                         {RoundingNotAny} (* = ROUNDED MODE TRUNCATION *)
   | ~ = rounded_phrase; < >
 
@@ -3373,7 +3377,7 @@ let when_phrase :=
 
 let when_selection_objects := WHEN; ~ = selection_objects; < >
 
-let when_other :=
+let when_other [@default []] :=
  | %prec lowest { [] }
  | WHEN; OTHER; ~ = imp_stmts; < >
 

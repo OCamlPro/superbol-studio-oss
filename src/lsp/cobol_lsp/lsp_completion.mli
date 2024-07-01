@@ -11,20 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* NOTE: the implementation of this module is automatically generated from the
-   token descriptions in `grammar_tokens.mly` by using the
-   `keywords/gen_keywords.ml` utility. *)
-
-(** Mapping from keywords to their respective tokens *)
-val keywords: (string * Grammar_tokens.token) list
-
-val combined_keywords: (string * Grammar_tokens.token) list
-
-(** Mapping from intrinsic functions name to their respective tokens *)
-val intrinsic_functions: (string * Grammar_tokens.token) list
-
-(** Set of {e inhibited} keywords *)
-val silenced_keywords: string list
-
-(** Mapping from punctuations to their respective tokens *)
-val puncts: (string * Grammar_tokens.token) list
+val context_completion_items
+  : Lsp_document.t
+  -> Lsp_document.checked_doc
+  -> Lsp.Types.Position.t
+  -> Lsp.Types.CompletionItem.t list

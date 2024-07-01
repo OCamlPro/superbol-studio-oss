@@ -52,7 +52,8 @@ let%expect_test "basic-inspection" =
         WORKING-STORAGE _|_SECTION.
         01 _|_DATA-NAME _|_PIC X.
         _|_PROCEDU_|_RE _|_DIVISION.
-          _|_DISPLAY _|_DATA-NAME
+          _|_DISP_|_LAY _|_DATA-NAME
+          _|_MOVE _|_DATA-NAME _|_TO _|_DATA-NAME.
           _|_STOP _|_RUN._|_
   |cobol} in
   gime_out [%expect.output];
@@ -137,7 +138,7 @@ let%expect_test "basic-inspection" =
        7 >         PROCEDURE DIVISION.
     ----           ^
        8             DISPLAY DATA-NAME
-       9             STOP RUN.
+       9             MOVE DATA-NAME TO DATA-NAME.
     (line 6, character 8): transitory state
     __rootdir__/prog.cob:7.15:
        4           DATA DIVISION.
@@ -146,7 +147,7 @@ let%expect_test "basic-inspection" =
        7 >         PROCEDURE DIVISION.
     ----                  ^
        8             DISPLAY DATA-NAME
-       9             STOP RUN.
+       9             MOVE DATA-NAME TO DATA-NAME.
     (line 6, character 15): accepting state
     __rootdir__/prog.cob:7.18:
        4           DATA DIVISION.
@@ -155,7 +156,7 @@ let%expect_test "basic-inspection" =
        7 >         PROCEDURE DIVISION.
     ----                     ^
        8             DISPLAY DATA-NAME
-       9             STOP RUN.
+       9             MOVE DATA-NAME TO DATA-NAME.
     (line 6, character 18): transitory state
     __rootdir__/prog.cob:8.10:
        5           WORKING-STORAGE SECTION.
@@ -163,39 +164,84 @@ let%expect_test "basic-inspection" =
        7           PROCEDURE DIVISION.
        8 >           DISPLAY DATA-NAME
     ----             ^
-       9             STOP RUN.
-      10
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10             STOP RUN.
     (line 7, character 10): transitory state
+    __rootdir__/prog.cob:8.14:
+       5           WORKING-STORAGE SECTION.
+       6           01 DATA-NAME PIC X.
+       7           PROCEDURE DIVISION.
+       8 >           DISPLAY DATA-NAME
+    ----                 ^
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10             STOP RUN.
+    (line 7, character 14): transitory state
     __rootdir__/prog.cob:8.18:
        5           WORKING-STORAGE SECTION.
        6           01 DATA-NAME PIC X.
        7           PROCEDURE DIVISION.
        8 >           DISPLAY DATA-NAME
     ----                     ^
-       9             STOP RUN.
-      10
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10             STOP RUN.
     (line 7, character 18): transitory state
     __rootdir__/prog.cob:9.10:
        6           01 DATA-NAME PIC X.
        7           PROCEDURE DIVISION.
        8             DISPLAY DATA-NAME
-       9 >           STOP RUN.
+       9 >           MOVE DATA-NAME TO DATA-NAME.
     ----             ^
-      10
+      10             STOP RUN.
+      11
     (line 8, character 10): transitory state
     __rootdir__/prog.cob:9.15:
        6           01 DATA-NAME PIC X.
        7           PROCEDURE DIVISION.
        8             DISPLAY DATA-NAME
-       9 >           STOP RUN.
+       9 >           MOVE DATA-NAME TO DATA-NAME.
     ----                  ^
-      10
+      10             STOP RUN.
+      11
     (line 8, character 15): transitory state
-    __rootdir__/prog.cob:9.19:
+    __rootdir__/prog.cob:9.25:
        6           01 DATA-NAME PIC X.
        7           PROCEDURE DIVISION.
        8             DISPLAY DATA-NAME
-       9 >           STOP RUN.
+       9 >           MOVE DATA-NAME TO DATA-NAME.
+    ----                            ^
+      10             STOP RUN.
+      11
+    (line 8, character 25): transitory state
+    __rootdir__/prog.cob:9.28:
+       6           01 DATA-NAME PIC X.
+       7           PROCEDURE DIVISION.
+       8             DISPLAY DATA-NAME
+       9 >           MOVE DATA-NAME TO DATA-NAME.
+    ----                               ^
+      10             STOP RUN.
+      11
+    (line 8, character 28): transitory state
+    __rootdir__/prog.cob:10.10:
+       7           PROCEDURE DIVISION.
+       8             DISPLAY DATA-NAME
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10 >           STOP RUN.
+    ----             ^
+      11
+    (line 9, character 10): transitory state
+    __rootdir__/prog.cob:10.15:
+       7           PROCEDURE DIVISION.
+       8             DISPLAY DATA-NAME
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10 >           STOP RUN.
+    ----                  ^
+      11
+    (line 9, character 15): transitory state
+    __rootdir__/prog.cob:10.19:
+       7           PROCEDURE DIVISION.
+       8             DISPLAY DATA-NAME
+       9             MOVE DATA-NAME TO DATA-NAME.
+      10 >           STOP RUN.
     ----                      ^
-      10
-    (line 8, character 19): transitory state |}];;
+      11
+    (line 9, character 19): transitory state |}];;

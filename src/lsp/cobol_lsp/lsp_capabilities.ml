@@ -36,8 +36,8 @@ let reply (_: ClientCapabilities.t) =
       ~legend
   and hover =
     HoverOptions.create ()
-  (* and completion_option = *)
-  (*   CompletionOptions.create () *)
+  and completion_option =
+    CompletionOptions.create ()
   and workspace =
     let workspaceFolders =
       WorkspaceFoldersServerCapabilities.create ()
@@ -56,5 +56,5 @@ let reply (_: ClientCapabilities.t) =
     ~semanticTokensProvider:(`SemanticTokensOptions semtoks)
     ~hoverProvider:(`HoverOptions hover)
     ~foldingRangeProvider:(`Bool true)
-    (* ~completionProvider:completion_option *)
+    ~completionProvider:completion_option
     ~workspace

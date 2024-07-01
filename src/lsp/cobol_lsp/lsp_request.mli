@@ -27,6 +27,10 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.HoverParams.t
     -> Lsp.Types.Hover.t option
+  val completion
+    : Lsp_server.t
+    -> Lsp.Types.CompletionParams.t
+    -> [> `CompletionList of Lsp.Types.CompletionList.t] option
   val formatting
     : Lsp_server.t
     -> Lsp.Types.DocumentFormattingParams.t

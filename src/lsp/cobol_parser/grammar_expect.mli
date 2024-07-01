@@ -11,20 +11,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* NOTE: the implementation of this module is automatically generated from the
-   token descriptions in `grammar_tokens.mly` by using the
-   `keywords/gen_keywords.ml` utility. *)
+open Grammar.MenhirInterpreter
 
-(** Mapping from keywords to their respective tokens *)
-val keywords: (string * Grammar_tokens.token) list
+module Completion_entry: sig
+  type t =
+    | K of token Cobol_common.Basics.NEL.t
+    | QualifiedRef
+    | ProcedureRef
+  val compare: t -> t -> int
+  val pp: t Fmt.t
+end
 
-val combined_keywords: (string * Grammar_tokens.token) list
 
-(** Mapping from intrinsic functions name to their respective tokens *)
-val intrinsic_functions: (string * Grammar_tokens.token) list
+val reducible_productions_in: env:_ env -> production list
 
-(** Set of {e inhibited} keywords *)
-val silenced_keywords: string list
+val nullable_nonterminals_in: env:_ env -> xsymbol list
 
-(** Mapping from punctuations to their respective tokens *)
-val puncts: (string * Grammar_tokens.token) list
+val completion_entries_in: env:_ env -> Completion_entry.t list
+
+val default_nonterminal_value: 'a nonterminal -> 'a
+
