@@ -274,23 +274,16 @@ let completion_entries_in ~env : Completion_entry.t list =
     (pp_brackets @@ pp_list pp_completion_entry)
     "[])"
 
-let guess_default_value ~mangled_name ~typ =
+let guess_default_value typ =
   let optionRegexp = Str.regexp "^[^*]+ option$" in
   let listRegexp = Str.regexp "^[^*]+ list$" in
-  if Str.string_match optionRegexp typ 0 ||
-     EzString.starts_with ~prefix:"option_" mangled_name ||
-     EzString.starts_with ~prefix:"ro_" mangled_name
+  if Str.string_match optionRegexp typ 0
   then Some "None"
-  else if Str.string_match listRegexp typ 0 ||
-          EzString.starts_with ~prefix:"loption_" mangled_name ||
-          EzString.starts_with ~prefix:"list_" mangled_name ||
-          EzString.starts_with ~prefix:"rl_" mangled_name ||
-          EzString.starts_with ~prefix:"l_" mangled_name
+  else if Str.string_match listRegexp typ 0
   then Some "[]"
   else if String.equal typ "unit"
   then Some "()"
-  else if String.equal typ "bool" ||
-          EzString.starts_with ~prefix:"boption_" mangled_name
+  else if String.equal typ "bool"
   then Some "false"
   else None
 
@@ -312,9 +305,7 @@ let best_guess_default_value = Nonterminal.tabulate begin fun nt ->
       match given_default with
       | Some _ -> given_default
       | None ->
-        let mangled_name = Nonterminal.mangled_name nt in
-        Option.bind (Nonterminal.typ nt)
-          (fun typ -> guess_default_value ~mangled_name ~typ)
+        Option.bind (Nonterminal.typ nt) guess_default_value
   end
 
 let emit_default_nonterminal_value ppf =
@@ -376,24 +367,6 @@ module DEBUG = struct
             Fmt.(list ~sep:(any "; ") (using fst Print.terminal)) (Lr1.get_reductions lr1);
         end)
 
-  let emit_temp ppf =
-    Lr1.iter (fun lr1 -> begin
-          let lr0 = Lr1.lr0 lr1 in
-          let items = Lr0.items lr0 in
-          let r1 = reducible_productions lr1 in
-          let r2 = reducible_productions lr1 in
-          if List.equal Production.equal r1 r2 then () else begin
-            Fmt.pf ppf "\nState lr1-%d- lr0(%d):\n%a"
-              (Lr1.to_int lr1) (Lr0.to_int lr0)
-              Fmt.(option ~none:nop (any "DEFAULT-PROD: " ++ Print.production))
-              (Lr1.default_reduction lr1);
-            Print.itemset ppf items;
-            Fmt.string ppf "R1:\n";
-            Print.itemset ppf (List.map (fun p -> (p, 0)) r1);
-            Fmt.string ppf "R2:\n";
-            Print.itemset ppf (List.map (fun p -> (p, 0)) r2) end
-        end)
-
   let emit_nullable_unrecoverable ppf =
     let nt_without_default = Nonterminal.fold (fun nt acc -> begin
           if Nonterminal.nullable nt
@@ -426,7 +399,6 @@ let () =
   emit_completion_entries_in_env ppf;
   emit_default_nonterminal_value ppf;
 
-  (* emit_follow_transition ppf; *)
   (* DEBUG.emit_firsts ppf; *)
   (* DEBUG.emit_state_productions ppf; *)
   ()
