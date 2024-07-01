@@ -12,7 +12,11 @@
   <span><span class="label">uri</span>:<span class="xref-unresolved">Lsp</span>.Uri.t <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Lsp</span>.Types.Position.t <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Stdlib</span>.Set.Make(<span class="xref-unresolved">Cobol_unit__.Unit_collections</span>.M).t <span class="arrow">&#45;&gt;</span></span>
-  <a href="TYPES/index.html#type-element_at_position">TYPES.element_at_position</a></span></code></div><div class="spec-doc"><p><code>element_at_position pos group</code> seeks the compilation unit name and qualified name at the given position <code>pos</code>, in typed compilation group <code>group</code>.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-copy_at_pos"><a href="#val-copy_at_pos" class="anchor"></a><code><span><span class="keyword">val</span> copy_at_pos : 
+  <a href="TYPES/index.html#type-element_at_position">TYPES.element_at_position</a></span></code></div><div class="spec-doc"><p><code>element_at_position pos group</code> seeks the compilation unit name and qualified name at the given position <code>pos</code>, in typed compilation group <code>group</code>.</p></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-cobol_unit_at_position"><a href="#val-cobol_unit_at_position" class="anchor"></a><code><span><span class="keyword">val</span> cobol_unit_at_position : 
+  <span><span class="label">filename</span>:string <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Lsp</span>.Types.Position.t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Stdlib</span>.Set.Make(<span class="xref-unresolved">Cobol_unit__.Unit_collections</span>.M).t <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_unit__.Unit_types.cobol_unit</span> option</span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-copy_at_pos"><a href="#val-copy_at_pos" class="anchor"></a><code><span><span class="keyword">val</span> copy_at_pos : 
   <span><span class="label">filename</span>:string <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Lsp</span>.Types.Position.t <span class="arrow">&#45;&gt;</span></span>
   <span><span class="xref-unresolved">Cobol_ptree__.Compilation_group.compilation_group</span> <span class="arrow">&#45;&gt;</span></span>
