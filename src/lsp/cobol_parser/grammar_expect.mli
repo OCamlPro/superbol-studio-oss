@@ -29,5 +29,7 @@ val nullable_nonterminals_in: env:_ env -> xsymbol list
 
 val completion_entries_in: env:_ env -> Completion_entry.t list
 
+val eager_completion_entries_in: env:_ env -> Completion_entry.t list
+
 val default_nonterminal_value: 'a nonterminal -> 'a
 

@@ -52,13 +52,34 @@ module NEL = struct
     | One of 'a
     | (::) of 'a * 'a t
   let compare cmp a b =
+    (** [compare cmp nel0 nel1] sorts [nel0] and [nel1] using [cmp]
+      in a size-first ordering. Longer list are always superior. *)
     let rec aux a b = match a, b with
       | One a, One b -> cmp a b
       | One _, _ -> -1
       | _, One _ -> 1
       | a :: a', b :: b' ->
-          let c = cmp a b in
-          if c = 0 then aux a' b' else c
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
+    in
+    aux a b
+  let compare_std cmp a b =
+    (** [compare_std cmp nel0 nel1] sorts [nel0] and [nel1] using [cmp]
+      in lexicographical order. Longer list are NOT always superior.
+
+        Example: ['a'::One 'b' < One 'b']
+     *)
+    let rec aux a b = match a, b with
+      | One a, One b -> cmp a b
+      | a :: _, One b  ->
+        let c = cmp a b in
+        if c = 0 then 1 else c
+      | One a, b :: _ ->
+        let c = cmp a b in
+        if c = 0 then -1 else c
+      | a :: a', b :: b' ->
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
     in
     aux a b
   let equal eq a b =
