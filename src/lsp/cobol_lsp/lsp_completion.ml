@@ -57,7 +57,9 @@ let range (pos:Position.t) text =
   let { line; character }: Position.t = pos in
   let get_nthline s n =
     let rec inner line_start i : int * int =
-      let line_end = try String.index_from s line_start '\n' with _ -> String.length s in
+      let line_end =
+        try String.index_from s line_start '\n'
+        with _ -> String.length s in
       if i >= n
       then (line_start, line_end)
       else inner (line_end+1) (i+1)
@@ -126,8 +128,14 @@ let pp_env_stack ppf env = (* for debug *)
   Fmt.pf ppf "TOP(%a)  STACK: %a" pp_env env
     (Fmt.list ~sep:(Fmt.any " ") pp_env) (get_stack env)
 
+let expected_comp_entries_in ~env ~eager =
+  List.to_seq @@
+  if eager
+  then  Expect.eager_completion_entries_in ~env
+  else Expect.completion_entries_in ~env
+
 let debug = false
-let expected_tokens base_env =
+let expected_tokens ?(eager=true) base_env =
   let rec inner env acc =
     let pos = match Menhir.top env with
       | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
@@ -135,8 +143,8 @@ let expected_tokens base_env =
     if debug then (Lsp_io.log_debug "In State: %a" pp_env env; let tok = Expect.completion_entries_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.Completion_entry.pp) tok);
     let productions = Expect.reducible_productions_in ~env in
     let nullables = Expect.nullable_nonterminals_in ~env in
-    let acc = CompEntrySet.add_seq
-        (List.to_seq @@ Expect.completion_entries_in ~env) acc in
+    let acc =
+      CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
     let acc = List.fold_left (fun acc -> function
         | Menhir.X T _ -> acc
         | X N nt ->
@@ -159,10 +167,10 @@ let expected_tokens base_env =
   if debug then (if CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.Completion_entry.pp) (CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (CompEntrySet.cardinal comp_entries));
   comp_entries
 
-let context_completion_items (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =
+let context_completion_items ?(eager=true) (doc:Lsp_document.t) Cobol_typeck.Outputs.{ group; _ } (pos:Position.t) =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range = range pos doc.textdoc in
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
     | Some Env env ->
-      map_completion_items ~range ~group ~filename (expected_tokens env)
+      map_completion_items ~range ~group ~filename (expected_tokens ~eager env)
     | _ -> [] end
