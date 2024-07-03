@@ -87,7 +87,7 @@ let string_of_K tokens =
     let rec inner ?(space_before=true) = function
       | [] -> ()
       | Cobol_parser.Tokens.PERIOD::tl ->
-        Fmt.char ppf '.'; inner tl
+        Fmt.string ppf ".\n"; inner tl
       | hd::tl ->
         let token' = hd &@ Srcloc.dummy in
         if space_before then Fmt.sp ppf ();
