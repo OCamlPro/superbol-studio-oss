@@ -91,8 +91,8 @@ let nonterminal_filter_map: nonterminal -> completion_entry option = fun nonterm
   List.find_opt (Attribute.has_label "completion") |>
   Option.map (fun attr -> Custom (Attribute.payload attr))
 
-let pp_xsymbol_of_nt ppf nonterminal =
-  Fmt.pf ppf "X(N N_%s)" (Nonterminal.mangled_name nonterminal)
+let pp_xnonterminal_of_nt ppf nonterminal =
+  Fmt.pf ppf "X N_%s" (Nonterminal.mangled_name nonterminal)
 
 (* --- *)
 
@@ -194,7 +194,10 @@ let reducible_productions: lr1 -> production list =
 
 let emit_nullable_nonterminals_in_env ppf =
   Fmt.string ppf {|
-let nullable_nonterminals_in ~env : Menhir.xsymbol list =
+type xnonterminal =
+  | X: 'a Menhir.nonterminal -> xnonterminal
+
+let nullable_nonterminals_in ~env : xnonterminal list =
   Menhir.(match current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
@@ -205,7 +208,7 @@ let nullable_nonterminals_in ~env : Menhir.xsymbol list =
   |> inv (Nonterminals_mapping.fold (fun s l acc -> (l, NonterminalSet.elements s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
-    (pp_brackets @@ pp_list @@ pp_xsymbol_of_nt)
+    (pp_brackets @@ pp_list @@ pp_xnonterminal_of_nt)
     "[])"
 
 let emit_reducible_productions_in_env ppf =

@@ -22,10 +22,12 @@ module Completion_entry: sig
   val pp: t Fmt.t
 end
 
+type xnonterminal =
+  | X: 'a nonterminal -> xnonterminal
 
 val reducible_productions_in: env:_ env -> production list
 
-val nullable_nonterminals_in: env:_ env -> xsymbol list
+val nullable_nonterminals_in: env:_ env -> xnonterminal list
 
 val completion_entries_in: env:_ env -> Completion_entry.t list
 

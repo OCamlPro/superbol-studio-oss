@@ -145,16 +145,14 @@ let expected_tokens ?(eager=true) base_env =
     let nullables = Expect.nullable_nonterminals_in ~env in
     let acc =
       CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
-    let acc = List.fold_left (fun acc -> function
-        | Menhir.X T _ -> acc
-        | X N nt ->
-          let default_value =
-            try Some (Expect.default_nonterminal_value nt)
-            with Not_found -> None in
-          Option.fold ~none:acc ~some:(fun a ->
-              let new_env = Menhir.feed (N nt) pos a pos env in
-              if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
-              inner new_env acc) default_value)
+    let acc = List.fold_left (fun acc (Expect.X nt) ->
+        let default_value =
+          try Some (Expect.default_nonterminal_value nt)
+          with Not_found -> None in
+        Option.fold ~none:acc ~some:(fun a ->
+            let new_env = Menhir.feed (N nt) pos a pos env in
+            if debug then Lsp_io.log_debug "NULLABLES: On %a\nGot to %a" pp_env_stack env pp_env_stack new_env;
+            inner new_env acc) default_value)
         acc nullables in
     List.fold_left (fun acc prod ->
         let new_env = Menhir.force_reduction prod env in
