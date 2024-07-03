@@ -245,3 +245,40 @@ let%expect_test "basic-inspection" =
     ----                      ^
       11
     (line 9, character 19): transitory state |}];;
+
+
+let%expect_test "inspect-empty" =
+  let gime_out = inspect_positions @@ extract_position_markers
+      {cobol|_|_|cobol}
+  in
+  gime_out [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:1.0:
+    (line 0, character 0): transitory state |}];;
+
+
+let%expect_test "inspect-spaces" =
+  let gime_out = inspect_positions @@ extract_position_markers
+      {cobol|       _|_|cobol}
+  in
+  gime_out [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:1.7:
+       1 >
+    ----          ^
+    (line 0, character 7): transitory state |}];;
+
+
+let%expect_test "inspect-spaces-in-line-numbers" =
+  let gime_out = inspect_positions @@ extract_position_markers
+      {cobol|  _|_|cobol}
+  in
+  gime_out [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:1.2:
+       1 >
+    ----     ^
+    (line 0, character 2): transitory state |}];;

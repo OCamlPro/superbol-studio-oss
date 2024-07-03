@@ -629,4 +629,3 @@ let%expect_test "control-completion" =
        8           PROCEDURE DIVISION.
     (line 5, character 8):
     List of completions (6 entries): [PROGRAM-ID;INTERFACE-ID;IDENTIFICATION;ID;FUNCTION-ID;CLASS-ID] |}]
-
