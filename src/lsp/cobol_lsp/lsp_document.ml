@@ -142,13 +142,14 @@ let rec inspect_at ~position ({ copybook; rewinder; textdoc; _ } as doc) =
       let exception FAILURE in
       let preproc_rewind ~last_pp =
         (* cut parsed program at given position *)
-        let pos =
-          try Cobol_preproc.position_at ~line ~char last_pp
-          with Not_found -> raise FAILURE
+        let pos_cnum =
+          try (Cobol_preproc.position_at ~line ~char last_pp).pos_cnum
+          with Not_found when line = 0 -> char
+             | Not_found -> raise FAILURE
         in
         let input = Lsp.Text_document.text textdoc in
         Cobol_preproc.reset_preprocessor_for_string @@
-        String.sub input 0 pos.pos_cnum
+        String.sub input 0 pos_cnum
       in
       try
         Option.some @@
