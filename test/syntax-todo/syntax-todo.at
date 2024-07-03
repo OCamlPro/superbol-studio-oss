@@ -876,14 +876,6 @@ program-id. prog.
 procedure division.
     cancel a as universal.
 ])
-AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [1], [Checking `prog.cob'
-prog.cob:4.13-4.15:
-   1   
-   2   program-id. prog.
-   3   procedure division.
-   4 >     cancel a as universal.
-----                ^^
->> Error: Invalid syntax
-
+AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [0], [Checking `prog.cob'
 ])
 AT_CLEANUP

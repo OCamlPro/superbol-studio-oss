@@ -190,6 +190,7 @@ let dual_handler_none =
 %left OR
 %left AND
 %right AMPERSAND
+%nonassoc below_ident_combinators
 %right DOUBLE_COLON AS
 
 %nonassoc OF IN
@@ -2511,8 +2512,8 @@ let name_or_string :=
  | s = string_literal; { UPCAST.string_with_name s }
 
 let ident_or_string :=
- | i = ident; %prec below_RPAR { UPCAST.ident_with_string i }
- | s = string_literal;         { UPCAST.string_with_ident s }
+ | i = ident; %prec below_ident_combinators { UPCAST.ident_with_string i }
+ | s = string_literal;                      { UPCAST.string_with_ident s }
 let idents_or_strings == ~ = rnel(ident_or_string); < >
 
 (* UNSTRING *)
@@ -3537,7 +3538,7 @@ let tallying_for :=
  | LEADING; l = ident_after_before_list;    {TallyingRange (TallyLeading, l)}
 
 let ident_after_before_list :=
- | iab = ident_after_before; %prec below_RPAR                { [iab] }
+ | iab = ident_after_before; %prec below_ident_combinators   { [iab] }
  | iab = ident_after_before; iabl = ident_after_before_list; { iab::iabl }
 
 let ident_after_before :=
