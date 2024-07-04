@@ -96,6 +96,8 @@ let pp_xnonterminal_of_nt ppf nonterminal =
 
 (* --- *)
 
+module StringSet = Set.Make(String)
+
 module NonterminalSet = Set.Make(struct
     type t = nonterminal
     let compare = Nonterminal.compare
@@ -145,11 +147,13 @@ module Completion_entry = struct
   type t =
     | K of token NEL.t
 |};
-  let custom_types = Nonterminal.fold (fun nonterm acc ->
-      match nonterminal_filter_map nonterm with
-      | Some (Custom s) -> (Fmt.pf ppf "    | %s\n" s; s::acc)
-      | _ -> acc) [] in
-  Fmt.pf ppf {|
+  let custom_types = StringSet.elements @@
+    Nonterminal.fold (fun nonterm acc ->
+        match nonterminal_filter_map nonterm with
+        | Some (Custom s) -> ( StringSet.add s acc)
+        | _ -> acc) StringSet.empty in
+  Fmt.pf ppf {|%a
+
   let compare ce1 ce2 =
     let to_int = function
       %a| K _ -> %d in
@@ -157,6 +161,8 @@ module Completion_entry = struct
       | K nel1, K nel2 -> NEL.compare_std Stdlib.compare nel2 nel1
       | _ -> to_int ce1 - to_int ce2
 |}
+    Fmt.(list ~sep:nop (fun ppf t -> pf ppf "    | %s\n" t))
+    custom_types
     Fmt.(list ~sep:nop (fun ppf (i, t) ->
         pf ppf "| %s -> %d\n      " t i))
     (List.mapi (fun i t -> (i, t)) custom_types)
