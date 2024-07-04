@@ -109,7 +109,7 @@ module CompEntrySet = struct
       let compare entry1 entry2 =
         match entry1, entry2 with
         | Custom s1, Custom s2 -> String.compare s2 s1
-        | K nel1, K nel2 -> NEL.compare_std Terminal.compare nel1 nel2
+        | K nel1, K nel2 -> NEL.compare Terminal.compare nel1 nel2
         | Custom _, K _ -> -1
         | K _, Custom _ -> 1
     end)
@@ -158,7 +158,7 @@ module Completion_entry = struct
     let to_int = function
       %a| K _ -> %d in
     match ce1, ce2 with
-      | K nel1, K nel2 -> NEL.compare_std Stdlib.compare nel2 nel1
+      | K nel1, K nel2 -> NEL.compare Stdlib.compare nel2 nel1
       | _ -> to_int ce1 - to_int ce2
 |}
     Fmt.(list ~sep:nop (fun ppf t -> pf ppf "    | %s\n" t))
@@ -311,12 +311,6 @@ let nonterminal_pre_comp_filter_map: nonterminal -> pre_comp option = fun nonter
   List.find_opt (Attribute.has_label "completion") |>
   Option.map (fun attr -> UserDefinedWords (Attribute.payload attr))
 
-let should_log stack =
-  let lr1 = NEL.last stack in
-  Lr1.to_int lr1 == -1
-
-let log_debug s = Fmt.pf Fmt.stderr s
-
 let rec listpop l n =
   if n==0
   then l
@@ -351,9 +345,7 @@ let reduce_prod (prod: production) (stack: lr1 NEL.t) : lr1 NEL.t option =
   | [] -> None
   | red_lr1::_ as popped ->
     follow_transition red_lr1 (N produced)
-    |> Option.map (fun new_lr1 ->
-        if should_log stack then log_debug "Reduction lead to %d (reduced from %d)\n" (Lr1.to_int new_lr1) (Lr1.to_int red_lr1);
-        NEL.of_list (new_lr1::popped))
+    |> Option.map (fun new_lr1 -> NEL.of_list (new_lr1::popped))
 
 let accumulate_precomp: lr1 -> PreCompSet.t =
   let rec nullable_firsts ?(first_call=false) lr1 item =
@@ -374,7 +366,7 @@ let accumulate_precomp: lr1 -> PreCompSet.t =
       Seq.map (fun t -> M t) (List.to_seq @@ Nonterminal.first nt)
     | T t, _, _ ->
       let transitions = List.map fst @@ Lr1.transitions lr1 in
-      (* this test should be removed once the grammar is fixed (state 3250 iirc) *)
+      (* this test should be removed once the grammar is fixed (CANCEL a AS UNIVERSAL.) *)
       if List.find_opt (Symbol.equal (T t)) transitions |> Option.is_none && first_call
       then Seq.empty
       else Seq.return @@ M t
@@ -395,18 +387,6 @@ let next_single_mandatory_terminal (stack: _ NEL.t) =
   let lr1 = NEL.hd stack in
   let comp_set = accumulate_precomp lr1 in
   let cardinal = PreCompSet.cardinal comp_set in
-  if should_log stack then begin
-    if cardinal > 1
-    then log_debug "In %d, too many comp, aborting\n" (Lr1.to_int lr1)
-    else match PreCompSet.choose_opt comp_set with
-      | Some O term
-        when is_valid_for_comp term ->
-        log_debug "Single optional comp entry in %d, ignoring %s\n" (Lr1.to_int lr1) (Terminal.name term)
-      | Some M term
-        when is_valid_for_comp term ->
-        log_debug "Single comp entry in %d, pushing with %s\n" (Lr1.to_int lr1) (Terminal.name term)
-      | _ -> log_debug "In %d, no comp, aborting\n" (Lr1.to_int lr1)
-  end;
   match PreCompSet.choose_opt comp_set with
   | Some M term
     when is_valid_for_comp term && cardinal == 1 ->
@@ -430,7 +410,6 @@ let eager_entries_of: lr1 -> CompEntrySet.t =
             eager_next_tokens reduced_stack current_term
         end
       | _, Some new_lr1, _ ->
-        if should_log stack then log_debug "Transition towards %d\n" (Lr1.to_int new_lr1);
         eager_next_tokens_consummed NEL.(new_lr1::stack) current_term
       | _ ->
         Pretty.failwith
@@ -463,11 +442,7 @@ let eager_entries_of: lr1 -> CompEntrySet.t =
       Seq.filter_map begin function
         | O term | M term
           when is_valid_for_comp term ->
-          if should_log stack then
-            log_debug "ENTRY(%d): %a\n" (Lr1.to_int lr1) Print.terminal term;
-          let v = K (eager_next_tokens stack term) in
-          if should_log stack then log_debug "OUTPUTED ENTRY is : %a\n\n" pp_completion_entry v;
-          Some v
+          Some (K (eager_next_tokens stack term))
         | UserDefinedWords s -> Some (Custom s)
         | Endrule | O _ | M _ -> None
       end
