@@ -365,12 +365,9 @@ let accumulate_precomp: lr1 -> PreCompSet.t =
     | N nt, _, _ ->
       Seq.map (fun t -> M t) (List.to_seq @@ Nonterminal.first nt)
     | T t, _, _ ->
-      let transitions = List.map fst @@ Lr1.transitions lr1 in
-      (* this test should be removed once the grammar is fixed (CANCEL a AS UNIVERSAL.) *)
-      if List.find_opt (Symbol.equal (T t)) transitions |> Option.is_none && first_call
-      then Seq.empty
-      else Seq.return @@ M t
-    | exception Invalid_argument _ -> Seq.return @@ Endrule
+      Seq.return @@ M t
+    | exception Invalid_argument _ ->
+      Seq.return @@ Endrule
   in
   Lr1.tabulate begin fun lr1 ->
     Seq.append
