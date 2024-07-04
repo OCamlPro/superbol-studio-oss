@@ -16,6 +16,7 @@ open Grammar.MenhirInterpreter
 module Completion_entry: sig
   type t =
     | K of token Cobol_common.Basics.NEL.t
+    | FunctionName
     | ProcedureRef
     | QualifiedRef
   val compare: t -> t -> int

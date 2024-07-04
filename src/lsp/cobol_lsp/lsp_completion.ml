@@ -50,6 +50,9 @@ let procedures_proposal ~filename pos group =
       cu.unit_procedure.list
     |> to_string
 
+let all_intrinsic_function_name =
+  List.map fst Cobol_parser.Keywords.intrinsic_functions
+
 module CompEntrySet = Set.Make(Expect.Completion_entry)
 
 let get_nthline s n =
@@ -109,6 +112,10 @@ let map_completion_items ~(range:Range.t) ~group ~filename comp_entries =
                        ~kind:Variable ~range)
       | ProcedureRef ->
         procedures_proposal ~filename pos group
+        |> List.rev_map (completion_item_create
+                       ~kind:Function ~range)
+      | FunctionName ->
+          all_intrinsic_function_name
         |> List.rev_map (completion_item_create
                        ~kind:Function ~range)
       | K tokens -> begin

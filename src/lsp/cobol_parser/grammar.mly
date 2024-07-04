@@ -854,7 +854,7 @@ let expands_phrase :=
 let function_specifier [@context function_specifier] :=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
-  | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>
+  | FUNCTION; ~ = rnel(function_name); INTRINSIC; <IntrinsicFunctionSpecifier>
   | FUNCTION; ALL; INTRINSIC;       {IntrinsicFunctionAllSpecifier}
 
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)
@@ -2218,7 +2218,8 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
  | "("; s = subscript_first; ")";                                 { [s] }
 
-let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
+let function_name [@recovery dummy_name] [@symbol "<function-name>"]
+                  [@completion FunctionName] :=
  | ~ = name;                         < >
 
 let inline_invocation :=
