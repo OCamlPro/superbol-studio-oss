@@ -58,6 +58,18 @@ let show_diagnostics ?(verbose = false) ?source_format ?filename
     } |>
   Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
 
+let just_parse ?(verbose = false) ?source_format ?filename
+    ?(exec_scanners = Superbol_preprocs.exec_scanners) contents =
+  preproc ?source_format ?filename contents |>
+  Cobol_parser.parse_simple
+    ~options: {
+      default_parser_options with
+      verbose;
+      exec_scanners;
+      recovery = EnableRecovery { silence_benign_recoveries = true };
+    } |>
+  ignore
+
 (* --- *)
 
 (** Structure returned by {!extract_position_markers} below. *)
