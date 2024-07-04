@@ -52,27 +52,29 @@ let procedures_proposal ~filename pos group =
 
 module CompEntrySet = Set.Make(Expect.Completion_entry)
 
-let delimiters = [' '; '\t'; '.']
+let get_nthline s n =
+  let rec inner line_start i : int * int =
+    let line_end =
+      try String.index_from s line_start '\n'
+      with Not_found | Invalid_argument _ -> String.length s in
+    if i >= n
+    then (line_start, line_end)
+    else inner (line_end+1) (i+1)
+  in
+  let (start,end_) = inner 0 0 in
+  String.sub s start (end_-start)
+
+let word_delimiters = [' '; '\t'; '.'; '('; ')']
+let rec first_delimiter_index_before text idx =
+  if idx == 0 then 0 else
+  if List.mem (String.get text (idx-1)) word_delimiters
+  then idx
+  else first_delimiter_index_before text (idx-1)
+
 let range (pos:Position.t) text =
   let { line; character }: Position.t = pos in
-  let get_nthline s n =
-    let rec inner line_start i : int * int =
-      let line_end =
-        try String.index_from s line_start '\n'
-        with _ -> String.length s in
-      if i >= n
-      then (line_start, line_end)
-      else inner (line_end+1) (i+1)
-    in
-    let (start,end_) = inner 0 0 in
-    String.sub s start (end_-start)
-  in
   let text_line = get_nthline (Lsp.Text_document.text text) line in
-  let index = List.fold_left (fun acc delimiter ->
-      let current =
-        try 1 + String.rindex_from text_line (character - 1) delimiter
-        with _ -> 0 in
-      max acc current) 0 delimiters in
+  let index = first_delimiter_index_before text_line character in
   let position_start = Position.create ~character:index ~line in
   Range.create ~start:position_start ~end_:pos
 
