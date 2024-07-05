@@ -65,6 +65,44 @@ let completion_positions (doc, positions) : string -> unit =
   List.iter (fun p -> completions_at_position p) positions.pos_anonymous;
   end_with_postproc
 
+let%expect_test "case-detection-testing-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION _|_DI_|_VISION.
+        PROGRAM-ID. prog.
+        PROCEDURE di_|_vision.
+          STOP RUN.
+  |cobol}
+ in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:2.23:
+       1
+       2 >         IDENTIFICATION DIVISION.
+    ----                          ^
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE division.
+    (line 1, character 23):
+    List of completions (1 entries): [DIVISION.\n]
+    __rootdir__/prog.cob:2.25:
+       1
+       2 >         IDENTIFICATION DIVISION.
+    ----                            ^
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE division.
+    (line 1, character 25):
+    List of completions (1 entries): [DIVISION.\n]
+    __rootdir__/prog.cob:4.20:
+       1
+       2           IDENTIFICATION DIVISION.
+       3           PROGRAM-ID. prog.
+       4 >         PROCEDURE division.
+    ----                       ^
+       5             STOP RUN.
+       6
+    (line 3, character 20):
+    List of completions (1 entries): [division] |}]
+
 let%expect_test "word-delimeter-testing-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
     _|_    IDENTIFICATION _|_DIVI_|_SION_|_._|_

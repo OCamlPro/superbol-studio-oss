@@ -561,10 +561,12 @@ let handle_hover registry (params: HoverParams.t) =
 let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
   try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc checked_doc->
+      let config = Lsp_completion.config ~eager () in
       let items =
-        Lsp_completion.context_completion_items ~eager doc checked_doc params.position in
-      Some (`CompletionList (CompletionList.create ()
-                               ~isIncomplete:false ~items))
+        Lsp_completion.context_completion_items ~config
+          doc checked_doc params.position
+      in Some (`CompletionList (CompletionList.create ()
+                                  ~isIncomplete:false ~items))
     end
 
 (** {3 Folding} *)
