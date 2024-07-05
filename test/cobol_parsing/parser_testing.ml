@@ -192,21 +192,32 @@ let rewind_n_parse ~f rewinder { line; char; _ } preproc_rewind =
   rewinder
 
 
-(** [iteratively_append_chunks ?config ~f (prog, positions)] starts a rewindable
-    parser on a first chunk of input (until the first position in
-    [positions.pos_anonymous]), and then iteralively appends the remaining
-    chunks (from one position to the next).  [f] is called after each successive
-    chunk has been parsed, with chunk number and total number of chunks as first
-    and second arguments, respectively.
+(** [iteratively_append_chunks ~config ~ignore_last_chunk ~f (prog, positions)]
+    starts a rewindable parser on a first chunk of input (until the first
+    position in [positions.pos_anonymous]), and then iteralively appends the
+    remaining chunks (from one position to the next).  [f] is called after each
+    successive chunk has been parsed, with chunk number and total number of
+    chunks as first and second arguments, respectively.
+
+    If [ignore_last_chunk] holds, then the last chunk in [positions] is always
+    kept as suffix of (re)parsed programs.
 
     Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
-let iteratively_append_chunks ?config ~f (prog, positions) =
+let iteratively_append_chunks ?config ?(ignore_last_chunk = false) ~f
+    (prog, positions) =
+  let positions = positions.pos_anonymous in
+  let (prog, prog_suffix), positions =
+    if ignore_last_chunk
+    then (let last = EzList.last positions in
+          EzString.cut prog last.cnum, EzList.removeq last positions)
+    else (prog, ""), positions
+  in
   let _, _, rewinder =
     rewindable_parse ?config @@            (* start with first chunk of input *)
-    EzString.before prog (List.hd positions.pos_anonymous).cnum
+    (EzString.before prog (List.hd positions).cnum ^ prog_suffix)
   in
-  let num_chunks = List.length positions.pos_anonymous - 1 in
+  let num_chunks = List.length positions - 1 in
   ignore @@ List.fold_left begin fun (i, rewinder) (pos, next_pos) ->
     let prog = EzString.before prog next_pos.cnum in
     Pretty.out "Appending chunk %u/%u @@ %d:%d-%d:%d (%a)@."
@@ -215,9 +226,9 @@ let iteratively_append_chunks ?config ~f (prog, positions) =
       Fmt.(truncated ~max:30)
       Pretty.(to_string "%S" @@ EzString.after prog (pos.cnum - 1));
     succ i,
-    rewind_n_parse ~f:(f i num_chunks) rewinder pos
-      (fun ~last_pp:_ -> Cobol_preproc.reset_preprocessor_for_string prog)
-  end (1, rewinder) (pairwise positions.pos_anonymous)
+    rewind_n_parse ~f:(f i num_chunks) rewinder pos @@ fun ~last_pp:_ ->
+    Cobol_preproc.reset_preprocessor_for_string (prog ^ prog_suffix)
+  end (1, rewinder) (pairwise positions)
 
 
 (** [iteratively_append_chunks_stuttering ?config ~f (prog, positions)] starts a

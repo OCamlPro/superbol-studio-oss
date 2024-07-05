@@ -18,7 +18,7 @@
 (library
  (name test_cobol_parser)
  (modules cS_tokens decimal_point tokens exec_blocks
- 	  test_intrinsics_registration)
+	  test_intrinsics_registration)
  (preprocess
   (pps ppx_expect))
  (inline_tests
@@ -28,7 +28,11 @@
 
 (library
  (name test_cobol_parser_rewind)
- (modules test_appending test_appending_large test_stuttering test_cutnpaste_large)
+ (modules test_appending
+	  test_appending_large
+	  test_stuttering
+	  test_cutnpaste_large
+	  test_targeted_insertions)
  (preprocess
   (pps ppx_expect))
  (inline_tests
