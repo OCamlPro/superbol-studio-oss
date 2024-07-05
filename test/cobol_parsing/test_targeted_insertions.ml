@@ -113,8 +113,6 @@ let%expect_test "invalid-intrinsics-reregistration-on-reparse" =
         STOP RUN.
 
     Appending chunk 6/6 @ 10:12-10:13 (" ")
-    >> Internal warning in `Cobol_parser__Text_lexer.register_intrinsic`:
-      registration of intrinsic function `TRIM', which was already registered
     Parse-tree:
       IDENTIFICATION DIVISION.
       PROGRAM-ID. testintrinsic.

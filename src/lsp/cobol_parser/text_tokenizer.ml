@@ -710,18 +710,27 @@ let disable_tokens state tokens outgoing_tokens =
   state, retokenize_after (Disabled_keywords outgoing_tokens) state tokens
 
 
+let register_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.register_intrinsics lexer registered_intrinsics
+
+
 let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
   Text_lexer.unregister_intrinsics lexer registered_intrinsics
 
 
-let reregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
-  Text_lexer.register_intrinsics lexer registered_intrinsics
+let save_intrinsics state =
+  unregister_intrinsics state
+
+
+let restore_intrinsics ({ intrinsics_enabled; _ } as state) =
+  if intrinsics_enabled
+  then register_intrinsics state
 
 
 let enable_intrinsics state token tokens =
   if state.intrinsics_enabled then state, token, tokens else        (* error? *)
     let state = put_token_back { state with intrinsics_enabled = true } in
-    reregister_intrinsics state;
+    register_intrinsics state;
     let tokens = token :: tokens in
     let tokens = retokenize_after Enabled_intrinsics state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in

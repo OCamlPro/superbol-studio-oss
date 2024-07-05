@@ -614,10 +614,10 @@ let parse_with_history ?stop_before_eof ?(save_stage = 10) rwps =
   in
   let ps = rewindable_parser_state rwps in
   Tokzr.enable_context_sensitive_tokens  ps.preproc.tokzr;
-  Tokzr.reregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.restore_intrinsics               ps.preproc.tokzr;
   let res, rwps = loop 0 rwps in
   let ps = rewindable_parser_state rwps in
-  Tokzr.unregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.save_intrinsics                  ps.preproc.tokzr;
   Tokzr.disable_context_sensitive_tokens ps.preproc.tokzr;
   res, rwps
 
