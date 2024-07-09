@@ -16,18 +16,23 @@ open Grammar.MenhirInterpreter
 module Completion_entry: sig
   type t =
     | K of token Cobol_common.Basics.NEL.t
-    | QualifiedRef
+    | FunctionName
     | ProcedureRef
+    | QualifiedRef
   val compare: t -> t -> int
   val pp: t Fmt.t
 end
 
+type xnonterminal =
+  | X: 'a nonterminal -> xnonterminal
 
 val reducible_productions_in: env:_ env -> production list
 
-val nullable_nonterminals_in: env:_ env -> xsymbol list
+val nullable_nonterminals_in: env:_ env -> xnonterminal list
 
 val completion_entries_in: env:_ env -> Completion_entry.t list
+
+val eager_completion_entries_in: env:_ env -> Completion_entry.t list
 
 val default_nonterminal_value: 'a nonterminal -> 'a
 

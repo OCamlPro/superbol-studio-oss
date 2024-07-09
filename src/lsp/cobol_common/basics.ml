@@ -51,14 +51,33 @@ module NEL = struct
   type 'a t =
     | One of 'a
     | (::) of 'a * 'a t
-  let compare cmp a b =
+  let compare_lazy cmp a b =
+    (** [compare_lazy cmp nel0 nel1] compares [nel0] and [nel1] using [cmp].
+      [compare_lazy] is slightly more lazy than its [compare] counterpart,
+      but the order is not lexicographical. *)
     let rec aux a b = match a, b with
       | One a, One b -> cmp a b
       | One _, _ -> -1
       | _, One _ -> 1
       | a :: a', b :: b' ->
-          let c = cmp a b in
-          if c = 0 then aux a' b' else c
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
+    in
+    aux a b
+  let compare cmp a b =
+    (** [compare_std cmp nel0 nel1] compares [nel0] and [nel1] using [cmp]
+      in lexicographical order. *)
+    let rec aux a b = match a, b with
+      | One a, One b -> cmp a b
+      | a :: _, One b  ->
+        let c = cmp a b in
+        if c = 0 then 1 else c
+      | One a, b :: _ ->
+        let c = cmp a b in
+        if c = 0 then -1 else c
+      | a :: a', b :: b' ->
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
     in
     aux a b
   let equal eq a b =
