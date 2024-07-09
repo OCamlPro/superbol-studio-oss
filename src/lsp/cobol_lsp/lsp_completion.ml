@@ -136,7 +136,7 @@ let string_of_K tokens =
 
 let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
   let pos = range.end_ in
-  List.flatten @@ List.rev_map (function
+  List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
         qualnames_proposal ~filename pos group
         |> List.rev_map (completion_item_create

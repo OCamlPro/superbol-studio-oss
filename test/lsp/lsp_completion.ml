@@ -122,21 +122,21 @@ _|_        PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
     (line 1, character 4):
     Basic (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID
-        IDENTIFICATION
-        ID
-        FUNCTION-ID
-        CONTROL
         CLASS-ID
-    Eager (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
+        CONTROL
         FUNCTION-ID
-        CONTROL DIVISION.\n
+        ID
+        IDENTIFICATION
+        INTERFACE-ID
+        PROGRAM-ID
+    Eager (7 entries):
         CLASS-ID.\n
+        CONTROL DIVISION.\n
+        FUNCTION-ID
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
     __rootdir__/prog.cob:2.23:
        1
        2 >         IDENTIFICATION DIVISION.
@@ -172,29 +172,29 @@ _|_        PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
     (line 1, character 32):
     Basic (11 entries):
-        SECURITY
-        REMARKS
-        PROGRAM-ID
-        INTERFACE-ID
-        INSTALLATION
-        FUNCTION-ID
-        DATE-WRITTEN
-        DATE-MODIFIED
-        DATE-COMPILED
-        CLASS-ID
         AUTHOR
-    Eager (11 entries):
-        SECURITY.\n
-        REMARKS.\n
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        INSTALLATION.\n
+        CLASS-ID
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
         FUNCTION-ID
-        DATE-WRITTEN.\n
-        DATE-MODIFIED.\n
-        DATE-COMPILED.\n
-        CLASS-ID.\n
+        INSTALLATION
+        INTERFACE-ID
+        PROGRAM-ID
+        REMARKS
+        SECURITY
+    Eager (11 entries):
         AUTHOR.\n
+        CLASS-ID.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        FUNCTION-ID
+        INSTALLATION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
+        REMARKS.\n
+        SECURITY.\n
     __rootdir__/prog.cob:3.0:
        1
        2           IDENTIFICATION DIVISION.
@@ -204,29 +204,29 @@ _|_        PROGRAM-ID. prog.
        5             DISPLAY FUNCTION MIN(1 2)
     (line 2, character 0):
     Basic (11 entries):
-        SECURITY
-        REMARKS
-        PROGRAM-ID
-        INTERFACE-ID
-        INSTALLATION
-        FUNCTION-ID
-        DATE-WRITTEN
-        DATE-MODIFIED
-        DATE-COMPILED
-        CLASS-ID
         AUTHOR
-    Eager (11 entries):
-        SECURITY.\n
-        REMARKS.\n
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        INSTALLATION.\n
+        CLASS-ID
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
         FUNCTION-ID
-        DATE-WRITTEN.\n
-        DATE-MODIFIED.\n
-        DATE-COMPILED.\n
-        CLASS-ID.\n
+        INSTALLATION
+        INTERFACE-ID
+        PROGRAM-ID
+        REMARKS
+        SECURITY
+    Eager (11 entries):
         AUTHOR.\n
+        CLASS-ID.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        FUNCTION-ID
+        INSTALLATION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
+        REMARKS.\n
+        SECURITY.\n
     __rootdir__/prog.cob:5.35:
        2           IDENTIFICATION DIVISION.
        3           PROGRAM-ID. prog.
@@ -237,211 +237,211 @@ _|_        PROGRAM-ID. prog.
        7
     (line 4, character 35):
     Basic (103 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        AS UNIVERSAL
-        AS FACTORY OF
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS
-        ADD
         ACCEPT
-    Eager (101 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS OF
         ADD
-        ACCEPT |}]
+        ADDRESS
+        ALL
+        ALLOCATE
+        ALTER
+        AS FACTORY OF
+        AS UNIVERSAL
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS
+    Eager (101 entries):
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALL
+        ALLOCATE
+        ALTER
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS |}]
 
 let%expect_test "division-and-section-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -465,21 +465,21 @@ let%expect_test "division-and-section-completion" =
        4           DATA DIVISION.
     (line 1, character 8):
     Basic (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID
-        IDENTIFICATION
-        ID
-        FUNCTION-ID
-        CONTROL
         CLASS-ID
-    Eager (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
+        CONTROL
         FUNCTION-ID
-        CONTROL DIVISION.\n
+        ID
+        IDENTIFICATION
+        INTERFACE-ID
+        PROGRAM-ID
+    Eager (7 entries):
         CLASS-ID.\n
+        CONTROL DIVISION.\n
+        FUNCTION-ID
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
     __rootdir__/prog.cob:2.32:
        1
        2 >         IDENTIFICATION DIVISION.
@@ -488,29 +488,29 @@ let%expect_test "division-and-section-completion" =
        4           DATA DIVISION.
     (line 1, character 32):
     Basic (11 entries):
-        SECURITY
-        REMARKS
-        PROGRAM-ID
-        INTERFACE-ID
-        INSTALLATION
-        FUNCTION-ID
-        DATE-WRITTEN
-        DATE-MODIFIED
-        DATE-COMPILED
-        CLASS-ID
         AUTHOR
-    Eager (11 entries):
-        SECURITY.\n
-        REMARKS.\n
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        INSTALLATION.\n
+        CLASS-ID
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
         FUNCTION-ID
-        DATE-WRITTEN.\n
-        DATE-MODIFIED.\n
-        DATE-COMPILED.\n
-        CLASS-ID.\n
+        INSTALLATION
+        INTERFACE-ID
+        PROGRAM-ID
+        REMARKS
+        SECURITY
+    Eager (11 entries):
         AUTHOR.\n
+        CLASS-ID.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        FUNCTION-ID
+        INSTALLATION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
+        REMARKS.\n
+        SECURITY.\n
     __rootdir__/prog.cob:3.19:
        1
        2           IDENTIFICATION DIVISION.
@@ -519,8 +519,8 @@ let%expect_test "division-and-section-completion" =
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
     (line 2, character 19):
-    Basic (7 entries): ZEROS SPACES QUOTES .\n LOW-VALUES HIGH-VALUES ALL
-    Eager (7 entries): ZEROS SPACES QUOTES .\n LOW-VALUES HIGH-VALUES ALL
+    Basic (7 entries): ALL HIGH-VALUES LOW-VALUES .\n QUOTES SPACES ZEROS
+    Eager (7 entries): ALL HIGH-VALUES LOW-VALUES .\n QUOTES SPACES ZEROS
     __rootdir__/prog.cob:3.21:
        1
        2           IDENTIFICATION DIVISION.
@@ -529,8 +529,8 @@ let%expect_test "division-and-section-completion" =
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
     (line 2, character 21):
-    Basic (6 entries): ZEROS SPACES QUOTES LOW-VALUES HIGH-VALUES ALL
-    Eager (6 entries): ZEROS SPACES QUOTES LOW-VALUES HIGH-VALUES ALL
+    Basic (6 entries): ALL HIGH-VALUES LOW-VALUES QUOTES SPACES ZEROS
+    Eager (6 entries): ALL HIGH-VALUES LOW-VALUES QUOTES SPACES ZEROS
     __rootdir__/prog.cob:4.8:
        1
        2           IDENTIFICATION DIVISION.
@@ -541,65 +541,65 @@ let%expect_test "division-and-section-completion" =
        6           01 DATA-NAME PIC X.
     (line 3, character 8):
     Basic (29 entries):
-        WORKING-STORAGE
-        SELECT
-        SECURITY
-        SD
-        SCREEN
-        REPORT
-        REMARKS
-        PROGRAM-ID
-        PROCEDURE
-        OPTIONS
-        LOCAL-STORAGE
-        LINKAGE
-        I-O-CONTROL
-        INSTALLATION
-        INPUT-OUTPUT
-        IDENTIFICATION
-        ID
-        FILE-CONTROL
-        FILE
-        FD
-        ENVIRONMENT
-        END PROGRAM
-        DATE-WRITTEN
-        DATE-MODIFIED
-        DATE-COMPILED
-        DATA
-        CONFIGURATION
-        COMMUNICATION
         AUTHOR
-    Eager (29 entries):
-        WORKING-STORAGE SECTION.\n
-        SELECT
-        SECURITY.\n
-        SD
-        SCREEN SECTION.\n
-        REPORT SECTION.\n
-        REMARKS.\n
-        PROGRAM-ID
-        PROCEDURE DIVISION
-        OPTIONS.\n
-        LOCAL-STORAGE SECTION.\n
-        LINKAGE SECTION.\n
-        I-O-CONTROL.\n
-        INSTALLATION.\n
-        INPUT-OUTPUT SECTION.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        FILE-CONTROL.\n
-        FILE SECTION.\n
-        FD
-        ENVIRONMENT DIVISION.\n
+        COMMUNICATION
+        CONFIGURATION
+        DATA
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
         END PROGRAM
-        DATE-WRITTEN.\n
-        DATE-MODIFIED.\n
-        DATE-COMPILED.\n
-        DATA DIVISION.\n
-        CONFIGURATION SECTION.\n
-        COMMUNICATION SECTION.\n
+        ENVIRONMENT
+        FD
+        FILE
+        FILE-CONTROL
+        ID
+        IDENTIFICATION
+        INPUT-OUTPUT
+        INSTALLATION
+        I-O-CONTROL
+        LINKAGE
+        LOCAL-STORAGE
+        OPTIONS
+        PROCEDURE
+        PROGRAM-ID
+        REMARKS
+        REPORT
+        SCREEN
+        SD
+        SECURITY
+        SELECT
+        WORKING-STORAGE
+    Eager (29 entries):
         AUTHOR.\n
+        COMMUNICATION SECTION.\n
+        CONFIGURATION SECTION.\n
+        DATA DIVISION.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        END PROGRAM
+        ENVIRONMENT DIVISION.\n
+        FD
+        FILE SECTION.\n
+        FILE-CONTROL.\n
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INPUT-OUTPUT SECTION.\n
+        INSTALLATION.\n
+        I-O-CONTROL.\n
+        LINKAGE SECTION.\n
+        LOCAL-STORAGE SECTION.\n
+        OPTIONS.\n
+        PROCEDURE DIVISION
+        PROGRAM-ID
+        REMARKS.\n
+        REPORT SECTION.\n
+        SCREEN SECTION.\n
+        SD
+        SECURITY.\n
+        SELECT
+        WORKING-STORAGE SECTION.\n
     __rootdir__/prog.cob:4.13:
        1
        2           IDENTIFICATION DIVISION.
@@ -621,37 +621,37 @@ let%expect_test "division-and-section-completion" =
        7           PROCEDURE DIVISION.
     (line 4, character 8):
     Basic (15 entries):
-        WORKING-STORAGE
-        SD
-        SCREEN
-        REPORT
-        PROGRAM-ID
-        PROCEDURE
-        LOCAL-STORAGE
-        LINKAGE
-        IDENTIFICATION
-        ID
-        FILE
-        FD
-        END PROGRAM
-        DATA
         COMMUNICATION
-    Eager (15 entries):
-        WORKING-STORAGE SECTION.\n
-        SD
-        SCREEN SECTION.\n
-        REPORT SECTION.\n
-        PROGRAM-ID
-        PROCEDURE DIVISION
-        LOCAL-STORAGE SECTION.\n
-        LINKAGE SECTION.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        FILE SECTION.\n
-        FD
+        DATA
         END PROGRAM
-        DATA DIVISION.\n
+        FD
+        FILE
+        ID
+        IDENTIFICATION
+        LINKAGE
+        LOCAL-STORAGE
+        PROCEDURE
+        PROGRAM-ID
+        REPORT
+        SCREEN
+        SD
+        WORKING-STORAGE
+    Eager (15 entries):
         COMMUNICATION SECTION.\n
+        DATA DIVISION.\n
+        END PROGRAM
+        FD
+        FILE SECTION.\n
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        LINKAGE SECTION.\n
+        LOCAL-STORAGE SECTION.\n
+        PROCEDURE DIVISION
+        PROGRAM-ID
+        REPORT SECTION.\n
+        SCREEN SECTION.\n
+        SD
+        WORKING-STORAGE SECTION.\n
     __rootdir__/prog.cob:5.24:
        2           IDENTIFICATION DIVISION.
        3           PROGRAM-ID . prog.
@@ -673,29 +673,29 @@ let%expect_test "division-and-section-completion" =
        9             STOP RUN.
     (line 6, character 8):
     Basic (11 entries):
-        WORKING-STORAGE
-        SCREEN
-        REPORT
-        PROGRAM-ID
-        PROCEDURE
-        LOCAL-STORAGE
-        LINKAGE
-        IDENTIFICATION
-        ID
-        END PROGRAM
         COMMUNICATION
-    Eager (11 entries):
-        WORKING-STORAGE SECTION.\n
-        SCREEN SECTION.\n
-        REPORT SECTION.\n
-        PROGRAM-ID
-        PROCEDURE DIVISION
-        LOCAL-STORAGE SECTION.\n
-        LINKAGE SECTION.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
         END PROGRAM
+        ID
+        IDENTIFICATION
+        LINKAGE
+        LOCAL-STORAGE
+        PROCEDURE
+        PROGRAM-ID
+        REPORT
+        SCREEN
+        WORKING-STORAGE
+    Eager (11 entries):
         COMMUNICATION SECTION.\n
+        END PROGRAM
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        LINKAGE SECTION.\n
+        LOCAL-STORAGE SECTION.\n
+        PROCEDURE DIVISION
+        PROGRAM-ID
+        REPORT SECTION.\n
+        SCREEN SECTION.\n
+        WORKING-STORAGE SECTION.\n
     __rootdir__/prog.cob:7.18:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -736,155 +736,155 @@ let%expect_test "datadiv-completion" =
        8           01 VAR PICTURE X USAGE DISPLAY.
     (line 5, character 11):
     Basic (74 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT
-        SAME
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT
-        NATIONAL
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        FILLER
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEFAULT
-        CONSTANT RECORD
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
-        BASED
+        ALIGNED
         ANY
-        ALIGNED
-    Eager (74 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT WHEN
-        SAME AS
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT WHEN
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT REFERENCE
-        NATIONAL
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID WHEN
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        FILLER
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEFAULT
-        CONSTANT RECORD
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
         BASED
-        ANY LENGTH
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT RECORD
+        DEFAULT
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FILLER
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        NATIONAL
+        OBJECT
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        SAME
+        SELECT
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
+    Eager (74 entries):
         ALIGNED
+        ANY LENGTH
+        BASED
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT RECORD
+        DEFAULT
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FILLER
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID WHEN
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        NATIONAL
+        OBJECT REFERENCE
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT WHEN
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        SAME AS
+        SELECT WHEN
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
     __rootdir__/prog.cob:6.14:
        3           PROGRAM-ID. prog.
        4           DATA DIVISION.
@@ -895,157 +895,157 @@ let%expect_test "datadiv-completion" =
        8           01 VAR PICTURE X USAGE DISPLAY.
     (line 5, character 14):
     Basic (75 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT
-        SAME
-        RENAMES
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT
-        NATIONAL
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEFAULT
-        CONSTANT RECORD
-        CONSTANT
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
-        BASED
+        ALIGNED
         ANY
-        ALIGNED
-    Eager (75 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT WHEN
-        SAME AS
-        RENAMES
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT WHEN
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT REFERENCE
-        NATIONAL
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID WHEN
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEFAULT
-        CONSTANT RECORD
-        CONSTANT
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
         BASED
-        ANY LENGTH
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT
+        CONSTANT RECORD
+        DEFAULT
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        NATIONAL
+        OBJECT
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        RENAMES
+        SAME
+        SELECT
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
+    Eager (75 entries):
         ALIGNED
+        ANY LENGTH
+        BASED
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT
+        CONSTANT RECORD
+        DEFAULT
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID WHEN
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        NATIONAL
+        OBJECT REFERENCE
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT WHEN
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        RENAMES
+        SAME AS
+        SELECT WHEN
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
     __rootdir__/prog.cob:7.34:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -1055,8 +1055,8 @@ let%expect_test "datadiv-completion" =
        8           01 VAR PICTURE X USAGE DISPLAY.
        9             88 BB VALUES ARE "x" THRU "Z".
     (line 6, character 34):
-    Basic (9 entries): WHEN OF OF SUPER NO IN ERROR AS AS UNIVERSAL AS FACTORY OF
-    Eager (6 entries): WHEN OF NO ERROR IN ERROR AS
+    Basic (9 entries): AS FACTORY OF AS UNIVERSAL AS ERROR IN NO OF SUPER OF WHEN
+    Eager (6 entries): AS ERROR IN NO ERROR OF WHEN
     __rootdir__/prog.cob:7.39:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -1066,8 +1066,8 @@ let%expect_test "datadiv-completion" =
        8           01 VAR PICTURE X USAGE DISPLAY.
        9             88 BB VALUES ARE "x" THRU "Z".
     (line 6, character 39):
-    Basic (2 entries): NO ERROR
-    Eager (2 entries): NO ERROR ERROR
+    Basic (2 entries): ERROR NO
+    Eager (2 entries): ERROR NO ERROR
     __rootdir__/prog.cob:7.45:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -1077,8 +1077,8 @@ let%expect_test "datadiv-completion" =
        8           01 VAR PICTURE X USAGE DISPLAY.
        9             88 BB VALUES ARE "x" THRU "Z".
     (line 6, character 45):
-    Basic (2 entries): ON FOR
-    Eager (2 entries): ON FOR
+    Basic (2 entries): FOR ON
+    Eager (2 entries): FOR ON
     __rootdir__/prog.cob:8.8:
        5           WORKING-STORAGE SECTION.
        6           01 AA PIC X.
@@ -1089,29 +1089,29 @@ let%expect_test "datadiv-completion" =
       10           PROCEDURE DIVISION.
     (line 7, character 8):
     Basic (11 entries):
-        WORKING-STORAGE
-        SCREEN
-        REPORT
-        PROGRAM-ID
-        PROCEDURE
-        LOCAL-STORAGE
-        LINKAGE
-        IDENTIFICATION
-        ID
-        END PROGRAM
         COMMUNICATION
-    Eager (11 entries):
-        WORKING-STORAGE SECTION.\n
-        SCREEN SECTION.\n
-        REPORT SECTION.\n
-        PROGRAM-ID
-        PROCEDURE DIVISION
-        LOCAL-STORAGE SECTION.\n
-        LINKAGE SECTION.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
         END PROGRAM
+        ID
+        IDENTIFICATION
+        LINKAGE
+        LOCAL-STORAGE
+        PROCEDURE
+        PROGRAM-ID
+        REPORT
+        SCREEN
+        WORKING-STORAGE
+    Eager (11 entries):
         COMMUNICATION SECTION.\n
+        END PROGRAM
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        LINKAGE SECTION.\n
+        LOCAL-STORAGE SECTION.\n
+        PROCEDURE DIVISION
+        PROGRAM-ID
+        REPORT SECTION.\n
+        SCREEN SECTION.\n
+        WORKING-STORAGE SECTION.\n
     __rootdir__/prog.cob:8.23:
        5           WORKING-STORAGE SECTION.
        6           01 AA PIC X.
@@ -1133,157 +1133,157 @@ let%expect_test "datadiv-completion" =
       10           PROCEDURE DIVISION.
     (line 7, character 25):
     Basic (75 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT
-        SAME
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT
-        NATIONAL
-        LOCALE
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEPENDING
-        DEFAULT
-        CONSTANT RECORD
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
-        BASED
+        ALIGNED
         ANY
-        ALIGNED
-    Eager (75 entries):
-        VARYING
-        VALUES
-        VALUE
-        VAL-STATUS
-        USAGE
-        TYPEDEF
-        TYPE
-        TRAILING
-        SYNCHRONIZED
-        SIGN
-        SELECT WHEN
-        SAME AS
-        REDEFINES
-        PROPERTY
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        PRESENT WHEN
-        POINTER
-        PICTURE
-        .\n
-        PACKED-DECIMAL
-        OCCURS
-        OBJECT REFERENCE
-        NATIONAL
-        LOCALE
-        LEADING
-        JUSTIFIED
-        IS TYPEDEF
-        IS GLOBAL
-        IS EXTERNAL
-        INVALID WHEN
-        INDEX
-        GROUP-USAGE
-        GLOBAL
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        EXTERNAL
-        DYNAMIC
-        DISPLAY
-        DESTINATION
-        DEPENDING
-        DEFAULT
-        CONSTANT RECORD
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        CLASS
-        BLANK
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
         BASED
-        ANY LENGTH
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT RECORD
+        DEFAULT
+        DEPENDING
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        LOCALE
+        NATIONAL
+        OBJECT
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        SAME
+        SELECT
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
+    Eager (75 entries):
         ALIGNED
+        ANY LENGTH
+        BASED
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        BLANK
+        CLASS
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        CONSTANT RECORD
+        DEFAULT
+        DEPENDING
+        DESTINATION
+        DISPLAY
+        DYNAMIC
+        EXTERNAL
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        GLOBAL
+        GROUP-USAGE
+        INDEX
+        INVALID WHEN
+        IS EXTERNAL
+        IS GLOBAL
+        IS TYPEDEF
+        JUSTIFIED
+        LEADING
+        LOCALE
+        NATIONAL
+        OBJECT REFERENCE
+        OCCURS
+        PACKED-DECIMAL
+        .\n
+        PICTURE
+        POINTER
+        PRESENT WHEN
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+        PROPERTY
+        REDEFINES
+        SAME AS
+        SELECT WHEN
+        SIGN
+        SYNCHRONIZED
+        TRAILING
+        TYPE
+        TYPEDEF
+        USAGE
+        VAL-STATUS
+        VALUE
+        VALUES
+        VARYING
     __rootdir__/prog.cob:8.31:
        5           WORKING-STORAGE SECTION.
        6           01 AA PIC X.
@@ -1294,83 +1294,83 @@ let%expect_test "datadiv-completion" =
       10           PROCEDURE DIVISION.
     (line 7, character 31):
     Basic (38 entries):
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        POINTER
-        PACKED-DECIMAL
+        BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        DISPLAY
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        INDEX
+        IS
+        NATIONAL
         OBJECT
-        NATIONAL
-        IS
-        INDEX
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        DISPLAY
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
-        BINARY
-    Eager (38 entries):
-        PROGRAM-POINTER
-        PROCEDURE-POINTER
-        POINTER
         PACKED-DECIMAL
-        OBJECT REFERENCE
-        NATIONAL
-        IS
-        INDEX
-        FUNCTION-POINTER
-        FLOAT-SHORT
-        FLOAT-LONG
-        FLOAT-EXTENDED
-        FLOAT-DECIMAL-34
-        FLOAT-DECIMAL-16
-        FLOAT-BINARY-64
-        FLOAT-BINARY-32
-        FLOAT-BINARY-128
-        DISPLAY
-        COMP-X
-        COMP-N
-        COMP-9
-        COMP-6
-        COMP-5
-        COMP-4
-        COMP-3
-        COMP-2
-        COMP-15
-        COMP-10
-        COMP-1
-        COMP-0
-        COMP
-        BIT
-        BINARY-SHORT
-        BINARY-LONG
-        BINARY-DOUBLE
-        BINARY-C-LONG
-        BINARY-CHAR
+        POINTER
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
+    Eager (38 entries):
         BINARY
+        BINARY-CHAR
+        BINARY-C-LONG
+        BINARY-DOUBLE
+        BINARY-LONG
+        BINARY-SHORT
+        BIT
+        COMP
+        COMP-0
+        COMP-1
+        COMP-10
+        COMP-15
+        COMP-2
+        COMP-3
+        COMP-4
+        COMP-5
+        COMP-6
+        COMP-9
+        COMP-N
+        COMP-X
+        DISPLAY
+        FLOAT-BINARY-128
+        FLOAT-BINARY-32
+        FLOAT-BINARY-64
+        FLOAT-DECIMAL-16
+        FLOAT-DECIMAL-34
+        FLOAT-EXTENDED
+        FLOAT-LONG
+        FLOAT-SHORT
+        FUNCTION-POINTER
+        INDEX
+        IS
+        NATIONAL
+        OBJECT REFERENCE
+        PACKED-DECIMAL
+        POINTER
+        PROCEDURE-POINTER
+        PROGRAM-POINTER
     __rootdir__/prog.cob:9.16:
        6           01 AA PIC X.
        7           01 BB PIC X VAL-STATUS AA WHEN ERROR ON RELATION FOR AA.
@@ -1380,8 +1380,8 @@ let%expect_test "datadiv-completion" =
       10           PROCEDURE DIVISION.
       11             DISPLAY DATA-NAME.
     (line 8, character 16):
-    Basic (2 entries): VALUES VALUE
-    Eager (2 entries): VALUES VALUE
+    Basic (2 entries): VALUE VALUES
+    Eager (2 entries): VALUE VALUES
     __rootdir__/prog.cob:9.27:
        6           01 AA PIC X.
        7           01 BB PIC X VAL-STATUS AA WHEN ERROR ON RELATION FOR AA.
@@ -1391,8 +1391,8 @@ let%expect_test "datadiv-completion" =
       10           PROCEDURE DIVISION.
       11             DISPLAY DATA-NAME.
     (line 8, character 27):
-    Basic (6 entries): ZEROS SPACES QUOTES LOW-VALUES HIGH-VALUES ALL
-    Eager (6 entries): ZEROS SPACES QUOTES LOW-VALUES HIGH-VALUES ALL
+    Basic (6 entries): ALL HIGH-VALUES LOW-VALUES QUOTES SPACES ZEROS
+    Eager (6 entries): ALL HIGH-VALUES LOW-VALUES QUOTES SPACES ZEROS
     __rootdir__/prog.cob:9.31:
        6           01 AA PIC X.
        7           01 BB PIC X VAL-STATUS AA WHEN ERROR ON RELATION FOR AA.
@@ -1403,33 +1403,33 @@ let%expect_test "datadiv-completion" =
       11             DISPLAY DATA-NAME.
     (line 8, character 31):
     Basic (13 entries):
-        ZEROS
-        WHEN
-        TO
-        THRU
-        SPACES
-        SET
-        QUOTES
-        .\n
-        LOW-VALUES
-        IN
-        HIGH-VALUES
-        FALSE
         ALL
-    Eager (13 entries):
-        ZEROS
-        WHEN
-        TO FALSE
-        THRU
-        SPACES
-        SET
-        QUOTES
-        .\n
-        LOW-VALUES
-        IN
-        HIGH-VALUES
         FALSE
-        ALL |}];;
+        HIGH-VALUES
+        IN
+        LOW-VALUES
+        .\n
+        QUOTES
+        SET
+        SPACES
+        THRU
+        TO
+        WHEN
+        ZEROS
+    Eager (13 entries):
+        ALL
+        FALSE
+        HIGH-VALUES
+        IN
+        LOW-VALUES
+        .\n
+        QUOTES
+        SET
+        SPACES
+        THRU
+        TO FALSE
+        WHEN
+        ZEROS |}];;
 
 let%expect_test "procedure-paragraph-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -1461,131 +1461,131 @@ let%expect_test "procedure-paragraph-completion" =
       11             FIRST-PARAGRAPH.
     (line 8, character 10):
     Basic (62 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION
-        ID
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
         DECLARATIVES
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
-        ACCEPT
-    Eager (62 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
         DELETE
-        DECLARATIVES.\n
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID
+        IDENTIFICATION
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (62 entries):
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DECLARATIVES.\n
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:9.24:
        6           01 DATA-NAME PIC X.
        7           01 VAR PICTURE X USAGE DISPLAY.
@@ -1595,8 +1595,8 @@ let%expect_test "procedure-paragraph-completion" =
       10               DISPLAY DATA-NAME.
       11             FIRST-PARAGRAPH.
     (line 8, character 24):
-    Basic (2 entries): SECTION .\n
-    Eager (2 entries): SECTION .\n
+    Basic (2 entries): .\n SECTION
+    Eager (2 entries): .\n SECTION
     __rootdir__/prog.cob:10.12:
        7           01 VAR PICTURE X USAGE DISPLAY.
        8           PROCEDURE DIVISION.
@@ -1607,129 +1607,129 @@ let%expect_test "procedure-paragraph-completion" =
       12               DISPLAY VAR.
     (line 9, character 12):
     Basic (61 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
         ID
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
-        ACCEPT
-    Eager (61 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
+        IDENTIFICATION
         IF
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (61 entries):
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:11.10:
        8           PROCEDURE DIVISION.
        9             FIRST-SECTION SECTION.
@@ -1740,129 +1740,129 @@ let%expect_test "procedure-paragraph-completion" =
       13               SECOND-SECTION SECTION.
     (line 10, character 10):
     Basic (61 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
         ID
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
-        ACCEPT
-    Eager (61 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
+        IDENTIFICATION
         IF
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (61 entries):
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:14.22:
       11             FIRST-PARAGRAPH.
       12               DISPLAY VAR.
@@ -1873,163 +1873,163 @@ let%expect_test "procedure-paragraph-completion" =
       16
     (line 13, character 22):
     Basic (78 entries):
-        ZEROS
-        WRITE
-        WITH
-        VARYING
-        VALIDATE
-        UNTIL
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TEST
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        NULL
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREVER
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-PERFORM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADDRESS
-        ADD
-        ACCEPT
-        DATA-NAME
-        VAR
         SECOND-SECTION
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
         FIRST-PARAGRAPH
-    Eager (78 entries):
-        ZEROS TIMES
-        WRITE
-        WITH TEST
-        VARYING
-        VALIDATE
-        UNTIL
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TEST
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        NULL
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREVER
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-PERFORM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADDRESS OF
-        ADD
-        ACCEPT
         DATA-NAME
         VAR
+        ACCEPT
+        ADD
+        ADDRESS
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-PERFORM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FOREVER
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NULL
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TEST
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        UNTIL
+        VALIDATE
+        VARYING
+        WITH
+        WRITE
+        ZEROS
+    Eager (78 entries):
         SECOND-SECTION
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
-        FIRST-PARAGRAPH |}];;
+        FIRST-PARAGRAPH
+        DATA-NAME
+        VAR
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-PERFORM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FOREVER
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NULL
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TEST
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        UNTIL
+        VALIDATE
+        VARYING
+        WITH TEST
+        WRITE
+        ZEROS TIMES |}];;
 
 let%expect_test "qualified-data-ref-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -2059,45 +2059,30 @@ let%expect_test "qualified-data-ref-completion" =
       14
     (line 11, character 18):
     Basic (23 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
-        ALL
+        AA
+        CC IN AA
+        CC
+        DD IN CC IN AA
+        DD
+        BB
+        CC IN BB
+        CC
         ADDRESS
-        AA
-        CC IN AA
-        CC
-        DD IN CC IN AA
-        DD
-        BB
-        CC IN BB
-        CC
-    Eager (23 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
         ALL
-        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (23 entries):
         AA
         CC IN AA
         CC
@@ -2105,7 +2090,22 @@ let%expect_test "qualified-data-ref-completion" =
         DD
         BB
         CC IN BB
-        CC |}];;
+        CC
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS |}];;
 
 let%expect_test "procedure-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -2141,131 +2141,131 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
     (line 8, character 10):
     Basic (62 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION
-        ID
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
         DECLARATIVES
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
-        ACCEPT
-    Eager (62 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PROGRAM-ID
-        .\n
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        END PROGRAM
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
         DELETE
-        DECLARATIVES.\n
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID
+        IDENTIFICATION
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (62 entries):
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DECLARATIVES.\n
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END PROGRAM
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PROGRAM-ID
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:9.21:
        6           01 AA PIC X.
        7           01 BB PIC X.
@@ -2276,220 +2276,220 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
     (line 8, character 21):
     Basic (108 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        OF
-        OF SUPER
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IN
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        AS UNIVERSAL
-        AS FACTORY OF
-        ALTER
-        ALLOCATE
-        ALL
+        AA
+        BB
+        ACCEPT
+        ADD
         ADDRESS
-        ADD
-        ACCEPT
-        AA
-        BB
-    Eager (105 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        OF
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IN
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        ALTER
-        ALLOCATE
         ALL
-        ADDRESS OF
-        ADD
-        ACCEPT
+        ALLOCATE
+        ALTER
+        AS FACTORY OF
+        AS UNIVERSAL
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        IN
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        OF SUPER
+        OF
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS
+    Eager (105 entries):
         AA
         BB
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALL
+        ALLOCATE
+        ALTER
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        IN
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        OF
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS
     __rootdir__/prog.cob:10.15:
        7           01 BB PIC X.
        8           PROCEDURE DIVISION.
@@ -2500,43 +2500,43 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 15):
     Basic (18 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
-        CORRESPONDING
-        ALL
+        AA
+        BB
         ADDRESS
-        AA
-        BB
-    Eager (18 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
-        CORRESPONDING
         ALL
-        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (18 entries):
         AA
         BB
+        ADDRESS OF
+        ALL
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
     __rootdir__/prog.cob:10.18:
        7           01 BB PIC X.
        8           PROCEDURE DIVISION.
@@ -2546,8 +2546,8 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
       12               ON SIZE ERROR
     (line 9, character 18):
-    Basic (7 entries): TO OF OF SUPER IN AS AS UNIVERSAL AS FACTORY OF
-    Eager (4 entries): TO OF IN AS
+    Basic (7 entries): AS FACTORY OF AS UNIVERSAL AS IN OF SUPER OF TO
+    Eager (4 entries): AS IN OF TO
     __rootdir__/prog.cob:10.21:
        7           01 BB PIC X.
        8           PROCEDURE DIVISION.
@@ -2558,29 +2558,29 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 21):
     Basic (11 entries):
-        SUPER
-        SELF
-        PAGE-COUNTER
-        NULL
-        LINE-COUNTER
-        LINAGE-COUNTER
-        FUNCTION
-        EXCEPTION-OBJECT
+        AA
+        BB
         ADDRESS
-        AA
-        BB
-    Eager (11 entries):
-        SUPER
-        SELF
-        PAGE-COUNTER
-        NULL
-        LINE-COUNTER
-        LINAGE-COUNTER
-        FUNCTION
         EXCEPTION-OBJECT
-        ADDRESS OF
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (11 entries):
         AA
         BB
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
     __rootdir__/prog.cob:11.21:
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
@@ -2612,8 +2612,8 @@ let%expect_test "procedure-completion" =
       16               ON SIZE ERROR
       17               DISPLAY "ERROR"
     (line 14, character 22):
-    Basic (7 entries): OF OF SUPER IN BY AS AS UNIVERSAL AS FACTORY OF
-    Eager (4 entries): OF IN BY AS
+    Basic (7 entries): AS FACTORY OF AS UNIVERSAL AS BY IN OF SUPER OF
+    Eager (4 entries): AS BY IN OF
     __rootdir__/prog.cob:15.28:
       12               ON SIZE ERROR
       13               DISPLAY "ERROR"
@@ -2624,162 +2624,162 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 28):
     Basic (79 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        ROUNDED
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        OF
-        OF SUPER
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IN
-        IF
-        GOBACK
-        GO
-        GIVING
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        AS
-        AS UNIVERSAL
-        AS FACTORY OF
-        ALTER
-        ALLOCATE
+        AA
+        BB
+        ACCEPT
+        ADD
         ADDRESS
-        ADD
-        ACCEPT
-        AA
-        BB
-    Eager (76 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        ROUNDED
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        OF
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IN
-        IF
-        GOBACK
-        GO
-        GIVING
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        AS
-        ALTER
         ALLOCATE
-        ADDRESS OF
-        ADD
-        ACCEPT
+        ALTER
+        AS FACTORY OF
+        AS UNIVERSAL
+        AS
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GIVING
+        GO
+        GOBACK
+        IF
+        IN
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        OF SUPER
+        OF
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        ROUNDED
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (76 entries):
         AA
         BB
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALLOCATE
+        ALTER
+        AS
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GIVING
+        GO
+        GOBACK
+        IF
+        IN
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        OF
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        ROUNDED
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:15.36:
       12               ON SIZE ERROR
       13               DISPLAY "ERROR"
@@ -2790,151 +2790,151 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 36):
     Basic (72 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
+        AA
+        BB
+        ACCEPT
+        ADD
         ADDRESS
-        ADD
-        ACCEPT
-        AA
-        BB
-    Eager (72 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
         ALLOCATE
-        ADDRESS OF
-        ADD
-        ACCEPT
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (72 entries):
         AA
         BB
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:15.41:
       12               ON SIZE ERROR
       13               DISPLAY "ERROR"
@@ -2945,25 +2945,25 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 41):
     Basic (9 entries):
-        TRUNCATION
-        TOWARD-LESSER
-        TOWARD-GREATER
-        PROHIBITED
-        NEAREST-TOWARD-ZERO
-        NEAREST-EVEN
-        NEAREST-AWAY-FROM-ZERO
-        IS
         AWAY-FROM-ZERO
+        IS
+        NEAREST-AWAY-FROM-ZERO
+        NEAREST-EVEN
+        NEAREST-TOWARD-ZERO
+        PROHIBITED
+        TOWARD-GREATER
+        TOWARD-LESSER
+        TRUNCATION
     Eager (9 entries):
-        TRUNCATION
-        TOWARD-LESSER
-        TOWARD-GREATER
-        PROHIBITED
-        NEAREST-TOWARD-ZERO
-        NEAREST-EVEN
-        NEAREST-AWAY-FROM-ZERO
-        IS
         AWAY-FROM-ZERO
+        IS
+        NEAREST-AWAY-FROM-ZERO
+        NEAREST-EVEN
+        NEAREST-TOWARD-ZERO
+        PROHIBITED
+        TOWARD-GREATER
+        TOWARD-LESSER
+        TRUNCATION
     __rootdir__/prog.cob:15.44:
       12               ON SIZE ERROR
       13               DISPLAY "ERROR"
@@ -2974,23 +2974,23 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 44):
     Basic (8 entries):
-        TRUNCATION
-        TOWARD-LESSER
-        TOWARD-GREATER
-        PROHIBITED
-        NEAREST-TOWARD-ZERO
-        NEAREST-EVEN
-        NEAREST-AWAY-FROM-ZERO
         AWAY-FROM-ZERO
+        NEAREST-AWAY-FROM-ZERO
+        NEAREST-EVEN
+        NEAREST-TOWARD-ZERO
+        PROHIBITED
+        TOWARD-GREATER
+        TOWARD-LESSER
+        TRUNCATION
     Eager (8 entries):
-        TRUNCATION
-        TOWARD-LESSER
-        TOWARD-GREATER
-        PROHIBITED
-        NEAREST-TOWARD-ZERO
-        NEAREST-EVEN
-        NEAREST-AWAY-FROM-ZERO
         AWAY-FROM-ZERO
+        NEAREST-AWAY-FROM-ZERO
+        NEAREST-EVEN
+        NEAREST-TOWARD-ZERO
+        PROHIBITED
+        TOWARD-GREATER
+        TOWARD-LESSER
+        TRUNCATION
     __rootdir__/prog.cob:16.12:
       13               DISPLAY "ERROR"
       14             END-MULTIPLY.
@@ -3001,149 +3001,149 @@ let%expect_test "procedure-completion" =
       18             END-MULTIPLY.
     (line 15, character 12):
     Basic (71 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
+        AA
+        BB
+        ACCEPT
+        ADD
         ADDRESS
-        ADD
-        ACCEPT
-        AA
-        BB
-    Eager (71 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OPEN
-        ON SIZE ERROR
-        NULL
-        NOT ON SIZE ERROR
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        LINE-COUNTER
-        LINAGE-COUNTER
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        EXIT
-        EXCEPTION-OBJECT
-        EVALUATE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
         ALLOCATE
-        ADDRESS OF
-        ADD
-        ACCEPT
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (71 entries):
         AA
         BB
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        EVALUATE
+        EXCEPTION-OBJECT
+        EXIT
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LINAGE-COUNTER
+        LINE-COUNTER
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON SIZE ERROR
+        NULL
+        ON SIZE ERROR
+        OPEN
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:16.20:
       13               DISPLAY "ERROR"
       14             END-MULTIPLY.
@@ -3165,119 +3165,119 @@ let%expect_test "procedure-completion" =
       19             STOP RUN.
     (line 16, character 12):
     Basic (56 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     Eager (56 entries):
-        WRITE
-        VALIDATE
-        UNSTRING
-        UNLOCK
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SORT
-        SET
-        SEND
-        SEARCH
-        REWRITE
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        PURGE
-        PERFORM
-        OPEN
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MERGE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        GOBACK
-        GO
-        GENERATE
-        FREE
-        EXIT
-        EVALUATE
-        ENTRY
-        ENTER
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTINUE
-        COMPUTE
-        CLOSE
-        CANCEL
-        CALL
-        ALTER
-        ALLOCATE
-        ADD
         ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
     __rootdir__/prog.cob:18.10:
       15             MULTIPLY AA BY BB ROUNDED MODE IS TRUNCATION
       16               ON SIZE ERROR
@@ -3288,215 +3288,215 @@ let%expect_test "procedure-completion" =
       20
     (line 17, character 10):
     Basic (104 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON SIZE ERROR
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS
-        ADD
-        ACCEPT
         AA
         BB
-    Eager (104 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON SIZE ERROR
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-MULTIPLY
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS OF
-        ADD
         ACCEPT
+        ADD
+        ADDRESS
+        ALL
+        ALLOCATE
+        ALTER
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NOT ON SIZE ERROR
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS
+    Eager (104 entries):
         AA
-        BB |}];;
+        BB
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALL
+        ALLOCATE
+        ALTER
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        END-MULTIPLY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NOT ON SIZE ERROR
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS |}];;
 
 let%expect_test "control-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -3521,21 +3521,21 @@ let%expect_test "control-completion" =
        5             DISPLAY IS TERMINAL.
     (line 2, character 8):
     Basic (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID
-        IDENTIFICATION
-        ID
-        FUNCTION-ID
-        DEFAULT
         CLASS-ID
-    Eager (7 entries):
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
+        DEFAULT
         FUNCTION-ID
-        DEFAULT SECTION.\n
+        ID
+        IDENTIFICATION
+        INTERFACE-ID
+        PROGRAM-ID
+    Eager (7 entries):
         CLASS-ID.\n
+        DEFAULT SECTION.\n
+        FUNCTION-ID
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
     __rootdir__/prog.cob:3.16:
        1
        2           CONTROL DIVISION.
@@ -3556,25 +3556,25 @@ let%expect_test "control-completion" =
        6           IDENTIFICATION DIVISION.
     (line 3, character 10):
     Basic (9 entries):
-        PROGRAM-ID
-        .\n
-        INTERFACE-ID
-        IDENTIFICATION
-        ID
-        FUNCTION-ID
-        DISPLAY
+        ACCEPT
         CLASS-ID
-        ACCEPT
-    Eager (9 entries):
-        PROGRAM-ID
-        .\n
-        INTERFACE-ID.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
-        FUNCTION-ID
         DISPLAY
-        CLASS-ID.\n
+        FUNCTION-ID
+        ID
+        IDENTIFICATION
+        INTERFACE-ID
+        .\n
+        PROGRAM-ID
+    Eager (9 entries):
         ACCEPT
+        CLASS-ID.\n
+        DISPLAY
+        FUNCTION-ID
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INTERFACE-ID.\n
+        .\n
+        PROGRAM-ID
     __rootdir__/prog.cob:4.17:
        1
        2           CONTROL DIVISION.
@@ -3584,8 +3584,8 @@ let%expect_test "control-completion" =
        5             DISPLAY IS TERMINAL.
        6           IDENTIFICATION DIVISION.
     (line 3, character 17):
-    Basic (2 entries): TERMINAL IS
-    Eager (2 entries): TERMINAL IS
+    Basic (2 entries): IS TERMINAL
+    Eager (2 entries): IS TERMINAL
     __rootdir__/prog.cob:5.10:
        2           CONTROL DIVISION.
        3           DEFAULT SECTION.
@@ -3595,8 +3595,8 @@ let%expect_test "control-completion" =
        6           IDENTIFICATION DIVISION.
        7           PROGRAM-ID. prog.
     (line 4, character 10):
-    Basic (2 entries): .\n DISPLAY
-    Eager (2 entries): .\n DISPLAY
+    Basic (2 entries): DISPLAY .\n
+    Eager (2 entries): DISPLAY .\n
     __rootdir__/prog.cob:6.8:
        3           DEFAULT SECTION.
        4             ACCEPT TERMINAL
@@ -3607,19 +3607,19 @@ let%expect_test "control-completion" =
        8           PROCEDURE DIVISION.
     (line 5, character 8):
     Basic (6 entries):
-        PROGRAM-ID
-        INTERFACE-ID
-        IDENTIFICATION
-        ID
-        FUNCTION-ID
         CLASS-ID
-    Eager (6 entries):
-        PROGRAM-ID
-        INTERFACE-ID.\n
-        IDENTIFICATION DIVISION.\n
-        ID DIVISION.\n
         FUNCTION-ID
-        CLASS-ID.\n |}];;
+        ID
+        IDENTIFICATION
+        INTERFACE-ID
+        PROGRAM-ID
+    Eager (6 entries):
+        CLASS-ID.\n
+        FUNCTION-ID
+        ID DIVISION.\n
+        IDENTIFICATION DIVISION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID |}];;
 
 let%expect_test "intrinsic-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -3646,7 +3646,6 @@ let%expect_test "intrinsic-completion" =
        9             DISPLAY FUNCTION ABS (1)
     (line 6, character 17):
     Basic (117 entries):
-        ALL INTRINSIC
         BYTE-LENGTH
         CHAR
         CONTENT-OF
@@ -3763,8 +3762,8 @@ let%expect_test "intrinsic-completion" =
         ACOS
         ABSOLUTE-VALUE
         ABS
+        ALL INTRINSIC
     Eager (117 entries):
-        ALL INTRINSIC
         BYTE-LENGTH
         CHAR
         CONTENT-OF
@@ -3881,6 +3880,7 @@ let%expect_test "intrinsic-completion" =
         ACOS
         ABSOLUTE-VALUE
         ABS
+        ALL INTRINSIC
     __rootdir__/prog.cob:7.21:
        4           ENVIRONMENT DIVISION.
        5           CONFIGURATION SECTION.
@@ -3891,14 +3891,6 @@ let%expect_test "intrinsic-completion" =
        9             DISPLAY FUNCTION ABS (1)
     (line 6, character 21):
     Basic (124 entries):
-        PROPERTY
-        PROGRAM
-        .\n
-        INTRINSIC
-        INTERFACE
-        FUNCTION
-        CLASS
-        AS
         BYTE-LENGTH
         CHAR
         CONTENT-OF
@@ -4015,15 +4007,15 @@ let%expect_test "intrinsic-completion" =
         ACOS
         ABSOLUTE-VALUE
         ABS
+        AS
+        CLASS
+        FUNCTION
+        INTERFACE
+        INTRINSIC
+        .\n
+        PROGRAM
+        PROPERTY
     Eager (124 entries):
-        PROPERTY
-        PROGRAM
-        .\n
-        INTRINSIC
-        INTERFACE
-        FUNCTION
-        CLASS
-        AS
         BYTE-LENGTH
         CHAR
         CONTENT-OF
@@ -4140,6 +4132,14 @@ let%expect_test "intrinsic-completion" =
         ACOS
         ABSOLUTE-VALUE
         ABS
+        AS
+        CLASS
+        FUNCTION
+        INTERFACE
+        INTRINSIC
+        .\n
+        PROGRAM
+        PROPERTY
     __rootdir__/prog.cob:9.18:
        6           REPOSITORY.
        7           FUNCTION ABS INTRINSIC.
@@ -4150,37 +4150,37 @@ let%expect_test "intrinsic-completion" =
       11
     (line 8, character 18):
     Basic (15 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
-        ALL
         ADDRESS
-    Eager (15 entries):
-        ZEROS
-        SUPER
-        SPACES
-        SELF
-        QUOTES
-        PAGE-COUNTER
-        NULL
-        LOW-VALUES
-        LINE-COUNTER
-        LINAGE-COUNTER
-        HIGH-VALUES
-        FUNCTION
-        EXCEPTION-OBJECT
         ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (15 entries):
         ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
     __rootdir__/prog.cob:9.27:
        6           REPOSITORY.
        7           FUNCTION ABS INTRINSIC.
@@ -4434,208 +4434,208 @@ let%expect_test "intrinsic-completion" =
       11
     (line 8, character 31):
     Basic (103 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        AS UNIVERSAL
-        AS FACTORY OF
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS
-        ADD
         ACCEPT
-    Eager (101 entries):
-        ZEROS
-        WRITE
-        WITH NO ADVANCING
-        WITH
-        VALIDATE
-        UPON
-        UNSTRING
-        UNLOCK
-        UNDERLINE
-        TRANSFORM
-        TERMINATE
-        SUPPRESS
-        SUPER
-        SUBTRACT
-        STRING
-        STOP
-        START
-        SPACES
-        SORT
-        SIZE
-        SET
-        SEND
-        SELF
-        SEARCH
-        REWRITE
-        REVERSE-VIDEO
-        RETURN
-        RESUME
-        RELEASE
-        RECEIVE
-        READ
-        RAISE
-        QUOTES
-        PURGE
-        POSITION
-        .\n
-        PERFORM
-        PAGE-COUNTER
-        OVERLINE
-        OPEN
-        ON EXCEPTION
-        NULL
-        NOT ON EXCEPTION
-        NEXT SENTENCE
-        MULTIPLY
-        MOVE
-        MODE
-        MERGE
-        LOW-VALUES
-        LOWLIGHT
-        LINE-COUNTER
-        LINE
-        LINAGE-COUNTER
-        LEFTLINE
-        INVOKE
-        INSPECT
-        INITIATE
-        INITIALIZE
-        IF
-        HIGH-VALUES
-        HIGHLIGHT
-        GRID
-        GOBACK
-        GO
-        GENERATE
-        FUNCTION
-        FREE
-        FOREGROUND-COLOR
-        EXIT
-        EXCEPTION-OBJECT
-        EXCEPTION
-        EVALUATE
-        ERASE
-        ENTRY
-        ENTER
-        END-DISPLAY
-        ENABLE
-        DIVIDE
-        DISPLAY
-        DISABLE
-        DELETE
-        CONTROL
-        CONTINUE
-        COMPUTE
-        COLUMN
-        COL
-        CLOSE
-        CANCEL
-        CALL
-        BLINK
-        BLANK
-        BELL
-        BACKGROUND-COLOR
-        AT
-        AS
-        ALTER
-        ALLOCATE
-        ALL
-        ADDRESS OF
         ADD
-        ACCEPT |}];;
+        ADDRESS
+        ALL
+        ALLOCATE
+        ALTER
+        AS FACTORY OF
+        AS UNIVERSAL
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS
+    Eager (101 entries):
+        ACCEPT
+        ADD
+        ADDRESS OF
+        ALL
+        ALLOCATE
+        ALTER
+        AS
+        AT
+        BACKGROUND-COLOR
+        BELL
+        BLANK
+        BLINK
+        CALL
+        CANCEL
+        CLOSE
+        COL
+        COLUMN
+        COMPUTE
+        CONTINUE
+        CONTROL
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        END-DISPLAY
+        ENTER
+        ENTRY
+        ERASE
+        EVALUATE
+        EXCEPTION
+        EXCEPTION-OBJECT
+        EXIT
+        FOREGROUND-COLOR
+        FREE
+        FUNCTION
+        GENERATE
+        GO
+        GOBACK
+        GRID
+        HIGHLIGHT
+        HIGH-VALUES
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        LEFTLINE
+        LINAGE-COUNTER
+        LINE
+        LINE-COUNTER
+        LOWLIGHT
+        LOW-VALUES
+        MERGE
+        MODE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        NOT ON EXCEPTION
+        NULL
+        ON EXCEPTION
+        OPEN
+        OVERLINE
+        PAGE-COUNTER
+        PERFORM
+        .\n
+        POSITION
+        PURGE
+        QUOTES
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REVERSE-VIDEO
+        REWRITE
+        SEARCH
+        SELF
+        SEND
+        SET
+        SIZE
+        SORT
+        SPACES
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPER
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNDERLINE
+        UNLOCK
+        UNSTRING
+        UPON
+        VALIDATE
+        WITH
+        WITH NO ADVANCING
+        WRITE
+        ZEROS |}];;
