@@ -12,11 +12,6 @@ open EzCompat
 open Types
 open Sql_ast
 
-let working_storage_section =
-  {|      *> SQL addition in working storage section:
-       01 MY-SQL-STUFF PIC X(9).
-|}
-
 let linkage_section =
   {|      *> SQL addition in linkage section:
        01 SOME-ARG PIC X(9).
@@ -30,24 +25,70 @@ let end_procedure_division ~ctxt:_ ~loc:_ =
   (* We might want to add something before the end of PROCEDURE DIVISION ? *)
   ()
 
-(*TODO*)
-let getsize _lit = 64
+(* let strlit lit = Format.asprintf "%a" Printer.pp_lit lit *)
 
-let getssomeize = function
-  | Some lit -> Some (getsize lit)
-  | None -> None
-
-let strlit lit = Format.asprintf "%a" Printer.pp_lit lit
-
-let strlitopt = function
+(* let strlitopt = function
   | Some lit -> Some (strlit lit)
+  | None -> None *)
+
+let cob_var_id_opt (cob_var:cobolVarId option) =
+  match cob_var with
+| Some cob -> Some (cob.payload)
+| None -> None
+
+
+let cob_var_opt = function
+  | Some var -> (
+    match var with
+    | CobVarNotNull cobolVarId -> Some cobolVarId.payload
+    | CobVarNullIndicator (var, _) -> Some var.payload )
   | None -> None
 
-  
-let generate ~filename ~contents sql_statements =
+let var_opt = function
+  | Some var -> (
+    match var with
+    | SqlVar sqlVarToken -> Some sqlVarToken.payload
+    | CobolVar cobol_var -> cob_var_opt (Some cobol_var) )
+  | None -> None
+
+let generate ~filename ~contents ~cobol_unit sql_statements =
+  (*TODO get function*)
+  let get_length str = Sql_typeck.get_size cobol_unit str in
+
+  let get_some_length var =
+    match var_opt var with
+    | Some x -> Some (get_length x)
+    | None -> None
+  in
+
+  let get_some_cob_var_length (cob_var:cobolVarId option) =
+    match cob_var with
+    | Some x -> Some (get_length x.payload)
+    | None -> None
+  in
+
+
+  let get_type _str = 16 in
+  let get_scale _str = 0 in
+  let get_flags _str = 0 in
+  let get_ind_addr _str = 0 in
+
+  let working_storage_section, _cobol_unit =
+    Transform.transform cobol_unit sql_statements
+  in
+
   (* split lines and numerotate them *)
   let lines = EzString.split contents '\n' in
   let lines = List.mapi (fun i line -> (filename, i + 1, line)) lines in
+  (*string to add at the end of every sql processed*)
+  let error_treatment = ref "" in
+  let print_error_treatement ctxt =
+    if !error_treatment <> "" then (
+      Printf.bprintf ctxt.b "           EVALUATE TRUE\n";
+      Printf.bprintf ctxt.b "%s\n" !error_treatment;
+      Printf.bprintf ctxt.b "           END-EVALUATE\n"
+    )
+  in
 
   (* The result will be stored in this buffer: *)
   let b = Buffer.create 1000 in
@@ -86,52 +127,133 @@ let generate ~filename ~contents sql_statements =
     ^ "\n           END-CALL"
   in
 
+  let generate_whenever_continuation = function
+    | Continue -> "CONTINUE"
+    | Perform sqlVarToken -> "PERFORM " ^ sqlVarToken.payload
+    | Goto sqlVarToken -> "GOTO " ^ sqlVarToken.payload
+  in
+
+  let generate_whenever c k =
+    match c with
+    | Not_found_whenever ->
+      "           WHEN SQLCODE = 100\n           "
+      ^ generate_whenever_continuation k
+      ^ "\n"
+    | SqlError_whenever ->
+      "           WHEN SQLCODE < 0\n           "
+      ^ generate_whenever_continuation k
+      ^ "\n"
+    | SqlWarning_whenever ->
+      "           WHEN SQLCODE < 0\n           "
+      ^ generate_whenever_continuation k
+      ^ "\n"
+  in
+
+  let get_name_cobol_var (cobol_var : cobol_var) =
+    match cobol_var with
+    | CobVarNotNull c -> c.payload
+    | CobVarNullIndicator (c, n) -> c.payload ^ n.payload
+  in
+
+  let rec generate_select_into_rec vars =
+    match vars with
+    | h :: t ->
+      let h = get_name_cobol_var h in
+      "           CALL STATIC \"GIXSQLSetResultParams\" USING\n\
+      \               BY VALUE "
+      ^ string_of_int (get_type h)
+      ^ "\n               BY VALUE "
+      ^ string_of_int (get_length h)
+      ^ "\n               BY VALUE "
+      ^ string_of_int (get_scale h)
+      ^ "\n               BY VALUE "
+      ^ string_of_int (get_flags h)
+      ^ "\n               BY REFERENCE " ^ h ^ "\n               BY REFERENCE "
+      ^ string_of_int (get_ind_addr h)
+      ^ "\n           END-CALL\n" ^ generate_select_into_rec t
+    | [] -> ""
+  in
+  let generate_select_into_one vars =
+    "           CALL STATIC \"GIXSQLExecSelectIntoOne\" USING\n\
+    \               BY REFERENCE SQLCA\n\
+    \               BY REFERENCE x\"00\"\n\
+    \               BY VALUE 0\n\
+    \               BY REFERENCE SQ0001\n\
+    \               BY VALUE 0\n\
+    \               BY VALUE 5\n"
+    ^ string_of_int (List.length vars)
+    ^ "\n               END-CALL\n"
+  in
+
+  let generate_select_into vars =
+    "               CALL STATIC \"GIXSQLStartSQL\"\n               END-CALL"
+    ^ generate_select_into_rec vars
+    ^ generate_select_into_one vars
+    ^ "               CALL STATIC \"GIXSQLEndSQL\"\n               END-CALL\n"
+  in
+
   let generatesql ~loc ~line ~ctxt esql_instuction =
     match esql_instuction with
     | Include sqlvar ->
       let before_macro = String.sub line 0 loc.char in
-      Printf.bprintf ctxt.b "%sCOPY %s\n" before_macro sqlvar.payload
-    | Connect cs -> begin
-      match cs with
-      | Connect_reset lit -> begin
-        match lit with
-        | Some lit ->
+      Printf.bprintf ctxt.b "%sCOPY %s\n" before_macro sqlvar.payload;
+      print_error_treatement ctxt
+    | Connect cs ->
+      begin
+        match cs with
+        | Connect_reset lit -> begin
+          match lit with
+          | Some lit ->
+            Printf.bprintf ctxt.b "%s"
+              (generatesql_connect_reset ~d_connection_id:lit.payload ())
+          | None -> Printf.bprintf ctxt.b "%s" (generatesql_connect_reset ())
+        end
+        | Connect_to_idby
+            { dbname; db_conn_id; db_data_source; username; password } ->
           Printf.bprintf ctxt.b "%s"
-            (generatesql_connect_reset ~d_connection_id:(strlit lit) ())
-        | None -> Printf.bprintf ctxt.b "%s" (generatesql_connect_reset ())
-      end
-      | Connect_to_idby
-          { dbname; db_conn_id; db_data_source; username; password } ->
-        Printf.bprintf ctxt.b "%s"
-          (generatesql_connect ~data_source:(strlit db_data_source)
-             ~data_source_tl:(getsize db_data_source)
-             ?d_connection_id:(strlitopt db_conn_id)
-             ?connection_id_tl:(getssomeize db_conn_id)
-             ~d_dbname:(strlit dbname) ~dbname_tl:(getsize dbname)
-             ~d_username:(strlit username) ~username_tl:(getsize username)
-             ~d_password:(strlit password) ~password_tl:(getsize password) () )
-      | Connect_to { db_conn_id; db_data_source; username; password } ->
-        Printf.bprintf ctxt.b "%s"
-          (generatesql_connect ~data_source:(strlit db_data_source)
-             ~data_source_tl:(getsize db_data_source)
-             ?d_connection_id:(strlitopt db_conn_id)
-             ?connection_id_tl:(getssomeize db_conn_id)
-             ~d_username:(strlit username) ~username_tl:(getsize username)
-             ?d_password:(strlitopt password)
-             ?password_tl:(getssomeize password) () )
-      | Connect_using { db_data_source } ->
-        Printf.bprintf ctxt.b "%s"
-          (generatesql_connect ~data_source:(strlit db_data_source)
-             ~data_source_tl:(getsize db_data_source) () )
-      | Connect_user { db_conn_id; db_data_source; username; password } ->
-        Printf.bprintf ctxt.b "%s"
-          (generatesql_connect ?data_source:(strlitopt db_data_source)
-             ?data_source_tl:(getssomeize db_data_source)
-             ?d_connection_id:(strlitopt db_conn_id)
-             ?connection_id_tl:(getssomeize db_conn_id)
-             ~d_username:(strlit username) ~username_tl:(getsize username)
-             ~d_password:(strlit password) ~password_tl:(getsize password) () )
-    end
+            (generatesql_connect ~data_source:db_data_source.payload
+               ~data_source_tl:(get_length db_data_source.payload)
+               ?d_connection_id:(var_opt db_conn_id)
+               ?connection_id_tl:(get_some_length db_conn_id)
+               ~d_dbname:dbname.payload
+               ~dbname_tl:(get_length dbname.payload)
+               ~d_username:username.payload
+               ~username_tl:(get_length username.payload)
+               ~d_password:password.payload
+               ~password_tl:(get_length password.payload)
+               () )
+        | Connect_to { db_conn_id; db_data_source; username; password } ->
+          Printf.bprintf ctxt.b "%s"
+            (generatesql_connect ~data_source:db_data_source.payload
+               ~data_source_tl:(get_length db_data_source.payload)
+               ?d_connection_id:(var_opt db_conn_id)
+               ?connection_id_tl:(get_some_length db_conn_id)
+               ~d_username:username.payload
+               ~username_tl:(get_length username.payload)
+               ?d_password:(cob_var_id_opt password)
+               ?password_tl:(get_some_cob_var_length password) () )
+        | Connect_using { db_data_source } ->
+          Printf.bprintf ctxt.b "%s"
+            (generatesql_connect ~data_source:db_data_source.payload
+               ~data_source_tl:(get_length db_data_source.payload)
+               () )
+        | Connect_user { db_conn_id; db_data_source; username; password } ->
+          Printf.bprintf ctxt.b "%s"
+            (generatesql_connect ?data_source:(cob_var_id_opt db_data_source)
+               ?data_source_tl:(get_some_cob_var_length db_data_source)
+               ?d_connection_id:(var_opt db_conn_id)
+               ?connection_id_tl:(get_some_length db_conn_id)
+               ~d_username:username.payload
+               ~username_tl:(get_length username.payload)
+               ~d_password:password.payload
+               ~password_tl:(get_length password.payload)
+               () )
+      end;
+      print_error_treatement ctxt
+    | Whenever (c, k) ->
+      error_treatment := generate_whenever c k ^ !error_treatment
+    | SelectInto { vars; _ } ->
+      Printf.bprintf ctxt.b "%s" (generate_select_into vars)
     | _ -> ignore (loc, line, ctxt, esql_instuction)
   in
 
@@ -139,7 +261,7 @@ let generate ~filename ~contents sql_statements =
     match statements with
     | [] ->
       List.iter (fun (_, _, line) -> Printf.bprintf ctxt.b "%s\n" line) lines
-    | (begin_loc, stmt) :: statements -> (
+    | (begin_loc, stmt) :: statements -> begin
       match begin_loc with
       | None ->
         List.iter (fun (_, _, line) -> Printf.bprintf ctxt.b "%s\n" line) lines;
@@ -149,7 +271,8 @@ let generate ~filename ~contents sql_statements =
             end_procedure_division ~ctxt ~loc:final_loc
           | _ -> ()
         end
-      | Some begin_loc -> output_statement lines begin_loc stmt statements )
+      | Some begin_loc -> output_statement lines begin_loc stmt statements
+    end
   and output_statement cur_lines begin_loc stmt statements =
     match cur_lines with
     | [] -> assert false

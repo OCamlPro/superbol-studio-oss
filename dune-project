@@ -465,8 +465,11 @@
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
    (ocaml (>= 4.14.0))
+   (superbol_preprocs (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (ez_file ( >= 0.3 ))
+   (cobol_unit (= version))
+   (cobol_typeck (= version))
    (cobol_indent (= version))
    odoc
   )
@@ -500,7 +503,7 @@
    (cobol_parser (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( = 20230415 ))
+   (menhir ( >= 20230415 ))
    odoc
   )
  )

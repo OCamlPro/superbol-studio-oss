@@ -10,4 +10,7 @@
 
 val generate :
   filename:string ->
-  contents:string -> (Types.loc option * Types.statements) list -> string
+  contents:string ->
+  cobol_unit:Cobol_unit.Types.cobol_unit ->
+  (Types.loc option * Types.statements) list ->
+  string

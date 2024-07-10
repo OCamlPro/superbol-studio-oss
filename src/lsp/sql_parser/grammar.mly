@@ -66,8 +66,8 @@ let cobol_var_id :=
 | c = loc(COBOL_VAR); {c}
 
 let cobol_var :=
-| c = cobol_var_id; {NotNull c}
-| c = loc(COBOL_VAR); ni=loc(COBOL_VAR); {NullIndicator(c, ni)}
+| c = cobol_var_id; {CobVarNotNull c}
+| c = loc(COBOL_VAR); ni=loc(COBOL_VAR); {CobVarNullIndicator(c, ni)}
 
 let sql_var_name :=
 | s = loc(WORD); {s} 
@@ -75,7 +75,7 @@ let sql_var_name :=
 
 let simpl_var :=
 | s = sql_var_name; {SqlVar s} 
-| s = cobol_var_id; {CobolVar(NotNull s)} 
+| s = cobol_var_id; {CobolVar(CobVarNotNull s)} 
 
 let variable := 
 | s = sql_var_name; {SqlVar s} 
@@ -224,8 +224,8 @@ EXEC SQL CONNECT TO :dbname [ AS :db_conn_id ]
 USER :username USING :db_data_source 
 IDENTIFIED BY :password 
 *)
-| TO; dbname=  literalVar; db_conn_id=option(as_var); USER; username= literalVar;
-  USING; db_data_source=  literalVar; IDENTIFIED; BY; password=  literalVar;
+| TO; dbname=  cobol_var_id; db_conn_id=option(as_var); USER; username= cobol_var_id;
+  USING; db_data_source=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id;
   { Connect_to_idby {dbname; db_conn_id; username; db_data_source; password} }
 
 (* 
@@ -233,29 +233,29 @@ EXEC SQL CONNECT TO :db_data_source [ AS :db_conn_id ]
 USER :username.:opt_password [ USING password ];
 -> Supporté si il n'y as pas de opt_passwod
 *)
-| TO; db_data_source=  literalVar; db_conn_id=option(as_var); USER; username= literalVar;
+| TO; db_data_source=  cobol_var_id; db_conn_id=option(as_var); USER; username= cobol_var_id;
   password = option(using_var);
   { Connect_to {db_data_source; db_conn_id; username; password} }
 (* 
 EXEC SQL CONNECT USING :db_data_source 
 (credentials must be embedded to be able to connect) 
 *)
-| USING; db_data_source= literalVar; {Connect_using{db_data_source}}
+| USING; db_data_source= cobol_var_id; {Connect_using{db_data_source}}
 (* 
 EXEC SQL CONNECT :username IDENTIFIED BY :password 
 [ AT :db_conn_id ] [ USING :db_data_source] (mode 4 is unsupported)
 *)
-| username=  literalVar; IDENTIFIED; BY; password=  literalVar; 
+| username=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id; 
   db_conn_id = option(at_var); db_data_source= option(using_var);
   {Connect_user{username; password; db_conn_id; db_data_source}}
-| RESET; name=option( literalVar); 
+| RESET; name=option( cobol_var_id); 
   {Connect_reset name }
 
-let at_var:= AT; p= literalVar; {p}
+let at_var:= AT; p= simpl_var; {p}
 
-let using_var:= USING; p= literalVar; {p}
+let using_var:= USING; p= cobol_var_id; {p}
 
-let as_var:= AS; v= literalVar; {v} 
+let as_var:= AS; v= simpl_var; {v} 
 
 let whenever_condition :=
 | NOT; FOUND; {Not_found_whenever}
@@ -438,7 +438,7 @@ let sql_token_not_first :=
 | EQUAL; {SqlInstr "=" }
 | COMMA; {SqlInstr "," }
 | DOT ; {SqlInstr "." }
-| t = cobol_var_id; {SqlVarToken( CobolVar(NotNull t)) }
+| t = cobol_var_id; {SqlVarToken( CobolVar(CobVarNotNull t)) }
 
 
 let sql_token := 

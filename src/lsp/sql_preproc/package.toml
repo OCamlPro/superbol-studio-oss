@@ -56,6 +56,8 @@ preprocess = "pps ppx_deriving.show"
 ppx_deriving = ">=5.2.1"
 ez_file = "0.3"
 cobol_indent = "version"
+cobol_typeck = "version"
+cobol_unit = "version"
 superbol_preprocs = "version"
 
 # package tools dependencies

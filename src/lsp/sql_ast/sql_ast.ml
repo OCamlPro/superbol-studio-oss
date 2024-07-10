@@ -20,8 +20,8 @@ type sqlVarToken = string with_loc [@@deriving ord]
 type cobolVarId = string with_loc [@@deriving ord]
 
 type cobol_var =
-  | NotNull of cobolVarId
-  | NullIndicator of cobolVarId * cobolVarId
+  | CobVarNotNull of cobolVarId
+  | CobVarNullIndicator of cobolVarId * cobolVarId
 [@@deriving ord]
 
 type variable =
@@ -125,28 +125,28 @@ and rb_args =
 and connect_syntax =
   | Connect_to_idby of
       { 
-        dbname : literal;
-        db_conn_id : literal option;
-        username : literal;
-        db_data_source : literal;
-        password : literal
+        dbname : cobolVarId;
+        db_conn_id : variable option;
+        username : cobolVarId;
+        db_data_source : cobolVarId;
+        password : cobolVarId
       }
   | Connect_to of
       { 
-        db_data_source : literal;
-        db_conn_id : literal option;
-        username : literal;
-        password : literal option
+        db_data_source : cobolVarId;
+        db_conn_id : variable option;
+        username : cobolVarId;
+        password : cobolVarId option
       }
-  | Connect_using of { db_data_source : literal }
+  | Connect_using of { db_data_source : cobolVarId }
   | Connect_user of
       { 
-        username : literal;
-        password : literal;
-        db_conn_id : literal option;
-        db_data_source : literal option
+        username : cobolVarId;
+        password : cobolVarId;
+        db_conn_id : variable option;
+        db_data_source : cobolVarId option
       }
-  | Connect_reset of literal option
+  | Connect_reset of cobolVarId option
 
 (*WHENEVER*)
 and sql_type =
@@ -460,8 +460,8 @@ module Printer = struct
   and pp_cob_lst fmt x = list_comma fmt (x, pp_cob_var)
 
   and pp_cob_var fmt = function
-    | NotNull c -> Format.fprintf fmt ":%s" c.payload
-    | NullIndicator (c, ni) -> Format.fprintf fmt ":%s:%s" c.payload ni.payload
+    | CobVarNotNull c -> Format.fprintf fmt ":%s" c.payload
+    | CobVarNullIndicator (c, ni) -> Format.fprintf fmt ":%s:%s" c.payload ni.payload
 
   and pp_some_rb_work_or_tran fmt = function
     | Some p -> pp_rb_work_or_tran fmt p
@@ -477,23 +477,28 @@ module Printer = struct
       Format.fprintf fmt "TO SAVEPOINT %s" variable.payload
     | None -> Format.fprintf fmt ""
 
+      and pp_some_cob_var fmt (x, s) =
+        match x with
+        | Some v -> Format.fprintf fmt "%s %s" s v.payload
+        | None -> Format.fprintf fmt ""
+
   and pp_connect fmt c =
     match c with
     | Connect_to_idby { dbname; db_conn_id; username; db_data_source; password }
       ->
-      Format.fprintf fmt "TO %a %a USER %a USING %a IDENTIFIED BY %a" pp_lit
-        dbname pp_some_lit (db_conn_id, "AS") pp_lit username pp_lit
-        db_data_source pp_lit password
+      Format.fprintf fmt "TO %s %a USER %s USING %s IDENTIFIED BY %s" 
+        dbname.payload pp_some_var (db_conn_id, "AS")  username.payload 
+        db_data_source.payload  password.payload
     | Connect_to { db_data_source; db_conn_id; username; password } ->
-      Format.fprintf fmt "TO %a %a USER %a %a" pp_lit db_data_source pp_some_lit
-        (db_conn_id, "AS") pp_lit username pp_some_lit (password, "USING")
+      Format.fprintf fmt "TO %s %a USER %s %a"  db_data_source.payload pp_some_var
+        (db_conn_id, "AS")  username.payload pp_some_cob_var (password, "USING")
     | Connect_using { db_data_source } ->
-      Format.fprintf fmt "USING %a" pp_lit db_data_source
+      Format.fprintf fmt "USING %s"  db_data_source.payload
     | Connect_user { username; password; db_conn_id; db_data_source } ->
-      Format.fprintf fmt "%a IDENTIFIED BY %a %a %a" pp_lit username pp_lit
-        password pp_some_lit (db_conn_id, "AT") pp_some_lit
+      Format.fprintf fmt "%s IDENTIFIED BY %s %a %a"  username.payload 
+        password.payload pp_some_var (db_conn_id, "AT") pp_some_cob_var
         (db_data_source, "USING")
-    | Connect_reset name -> Format.fprintf fmt "RESET %a" pp_some_lit (name, "")
+    | Connect_reset name -> Format.fprintf fmt "RESET%a" pp_some_cob_var (name, "")
 
   and pp_whenever_condtion fmt = function
     | Not_found_whenever -> Format.fprintf fmt "NOT FOUND"
@@ -587,11 +592,6 @@ module Printer = struct
   and pp_var fmt = function
     | SqlVar v -> Format.fprintf fmt "%s" v.payload
     | CobolVar c -> pp_cob_var fmt c
-
-  and pp_some_lit fmt (x, s) =
-    match x with
-    | Some v -> Format.fprintf fmt "%s %a" s pp_lit v
-    | None -> Format.fprintf fmt ""
 
   and pp_list_lit fmt x = list_comma fmt (x, pp_lit)
 

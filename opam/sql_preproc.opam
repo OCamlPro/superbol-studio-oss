@@ -50,6 +50,8 @@ depends: [
   "superbol_preprocs" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "ez_file" {>= "0.3"}
+  "cobol_unit" {= version}
+  "cobol_typeck" {= version}
   "cobol_indent" {= version}
   "odoc" {with-doc}
 ]
