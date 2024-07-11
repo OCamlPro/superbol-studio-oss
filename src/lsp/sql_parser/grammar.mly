@@ -248,7 +248,7 @@ EXEC SQL CONNECT :username IDENTIFIED BY :password
 | username=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id; 
   db_conn_id = option(at_var); db_data_source= option(using_var);
   {Connect_user{username; password; db_conn_id; db_data_source}}
-| RESET; name=option( cobol_var_id); 
+| RESET; name=option( simpl_var); 
   {Connect_reset name }
 
 let at_var:= AT; p= simpl_var; {p}

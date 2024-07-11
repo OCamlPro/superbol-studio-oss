@@ -28,14 +28,13 @@ let end_procedure_division ~ctxt:_ ~loc:_ =
 (* let strlit lit = Format.asprintf "%a" Printer.pp_lit lit *)
 
 (* let strlitopt = function
-  | Some lit -> Some (strlit lit)
-  | None -> None *)
+   | Some lit -> Some (strlit lit)
+   | None -> None *)
 
-let cob_var_id_opt (cob_var:cobolVarId option) =
+let cob_var_id_opt (cob_var : cobolVarId option) =
   match cob_var with
-| Some cob -> Some (cob.payload)
-| None -> None
-
+  | Some cob -> Some cob.payload
+  | None -> None
 
 let cob_var_opt = function
   | Some var -> (
@@ -61,12 +60,11 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | None -> None
   in
 
-  let get_some_cob_var_length (cob_var:cobolVarId option) =
+  let get_some_cob_var_length (cob_var : cobolVarId option) =
     match cob_var with
     | Some x -> Some (get_length x.payload)
     | None -> None
   in
-
 
   let get_type _str = 16 in
   let get_scale _str = 0 in
@@ -201,13 +199,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | Connect cs ->
       begin
         match cs with
-        | Connect_reset lit -> begin
-          match lit with
-          | Some lit ->
-            Printf.bprintf ctxt.b "%s"
-              (generatesql_connect_reset ~d_connection_id:lit.payload ())
-          | None -> Printf.bprintf ctxt.b "%s" (generatesql_connect_reset ())
-        end
+        | Connect_reset lit ->
+          Printf.bprintf ctxt.b "%s"
+            (generatesql_connect_reset ?d_connection_id:(var_opt lit) ())
         | Connect_to_idby
             { dbname; db_conn_id; db_data_source; username; password } ->
           Printf.bprintf ctxt.b "%s"
@@ -231,7 +225,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                ~d_username:username.payload
                ~username_tl:(get_length username.payload)
                ?d_password:(cob_var_id_opt password)
-               ?password_tl:(get_some_cob_var_length password) () )
+               ?password_tl:(get_some_cob_var_length password)
+               () )
         | Connect_using { db_data_source } ->
           Printf.bprintf ctxt.b "%s"
             (generatesql_connect ~data_source:db_data_source.payload
@@ -239,7 +234,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                () )
         | Connect_user { db_conn_id; db_data_source; username; password } ->
           Printf.bprintf ctxt.b "%s"
-            (generatesql_connect ?data_source:(cob_var_id_opt db_data_source)
+            (generatesql_connect
+               ?data_source:(cob_var_id_opt db_data_source)
                ?data_source_tl:(get_some_cob_var_length db_data_source)
                ?d_connection_id:(var_opt db_conn_id)
                ?connection_id_tl:(get_some_length db_conn_id)

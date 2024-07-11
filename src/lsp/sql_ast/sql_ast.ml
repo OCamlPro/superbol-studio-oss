@@ -67,8 +67,7 @@ and esql_instuction =
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
   | SelectInto of
-      { 
-        vars : cobol_var list;
+      { vars : cobol_var list;
         select : sql_select;
         select_options : sql_select_option list
       }
@@ -77,8 +76,7 @@ and esql_instuction =
   | Prepare of sqlVarToken * sql_instruction
   | ExecuteImmediate of sql_instruction
   | ExecuteIntoUsing of
-      { 
-        executed_string : sqlVarToken;
+      { executed_string : sqlVarToken;
         opt_into_hostref_list : cobol_var list option;
         opt_using_hostref_list : cobol_var list option
       }
@@ -93,8 +91,7 @@ and esql_instuction =
   | Ignore of sql_instruction
 
 and try_block =
-  { 
-    try_instruction : esql_instuction;
+  { try_instruction : esql_instuction;
     try_exceptions : sql_exception list
   }
 
@@ -124,29 +121,26 @@ and rb_args =
 
 and connect_syntax =
   | Connect_to_idby of
-      { 
-        dbname : cobolVarId;
+      { dbname : cobolVarId;
         db_conn_id : variable option;
         username : cobolVarId;
         db_data_source : cobolVarId;
         password : cobolVarId
       }
   | Connect_to of
-      { 
-        db_data_source : cobolVarId;
+      { db_data_source : cobolVarId;
         db_conn_id : variable option;
         username : cobolVarId;
         password : cobolVarId option
       }
   | Connect_using of { db_data_source : cobolVarId }
   | Connect_user of
-      { 
-        username : cobolVarId;
+      { username : cobolVarId;
         password : cobolVarId;
         db_conn_id : variable option;
         db_data_source : cobolVarId option
       }
-  | Connect_reset of cobolVarId option
+  | Connect_reset of variable option
 
 (*WHENEVER*)
 and sql_type =
@@ -380,12 +374,10 @@ module Printer = struct
       | _ -> Format.fprintf fmt "(%a)" pp_list_lit l )
 
   and pp_where_arg fmt = function
-    | Some WhereCurrentOf swhere ->
-        Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload
-    | Some UpdateSql sql ->
-        pp_sql fmt sql
-    | None ->
-        ()
+    | Some (WhereCurrentOf swhere) ->
+      Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload
+    | Some (UpdateSql sql) -> pp_sql fmt sql
+    | None -> ()
 
   and pp_sql_update_aux fmt (var, op) =
     Format.fprintf fmt "%s = %a" var.payload pp_sql_op op
@@ -461,7 +453,10 @@ module Printer = struct
 
   and pp_cob_var fmt = function
     | CobVarNotNull c -> Format.fprintf fmt ":%s" c.payload
-    | CobVarNullIndicator (c, ni) -> Format.fprintf fmt ":%s:%s" c.payload ni.payload
+    | CobVarNullIndicator (c, ni) ->
+      Format.fprintf fmt ":%s:%s" c.payload ni.payload
+
+  and pp_cob_var_id fmt c = Format.fprintf fmt ":%s" c.payload
 
   and pp_some_rb_work_or_tran fmt = function
     | Some p -> pp_rb_work_or_tran fmt p
@@ -477,28 +472,29 @@ module Printer = struct
       Format.fprintf fmt "TO SAVEPOINT %s" variable.payload
     | None -> Format.fprintf fmt ""
 
-      and pp_some_cob_var fmt (x, s) =
-        match x with
-        | Some v -> Format.fprintf fmt "%s %s" s v.payload
-        | None -> Format.fprintf fmt ""
+  and pp_some_cob_var fmt (x, s) =
+    match x with
+    | Some v -> Format.fprintf fmt "%s %a" s pp_cob_var_id v
+    | None -> Format.fprintf fmt ""
 
   and pp_connect fmt c =
     match c with
     | Connect_to_idby { dbname; db_conn_id; username; db_data_source; password }
       ->
-      Format.fprintf fmt "TO %s %a USER %s USING %s IDENTIFIED BY %s" 
-        dbname.payload pp_some_var (db_conn_id, "AS")  username.payload 
-        db_data_source.payload  password.payload
+      Format.fprintf fmt "TO %a %a USER %a USING %a IDENTIFIED BY %a"
+        pp_cob_var_id dbname pp_some_var (db_conn_id, "AS") pp_cob_var_id
+        username pp_cob_var_id db_data_source pp_cob_var_id password
     | Connect_to { db_data_source; db_conn_id; username; password } ->
-      Format.fprintf fmt "TO %s %a USER %s %a"  db_data_source.payload pp_some_var
-        (db_conn_id, "AS")  username.payload pp_some_cob_var (password, "USING")
+      Format.fprintf fmt "TO %a %a USER %a %a" pp_cob_var_id db_data_source
+        pp_some_var (db_conn_id, "AS") pp_cob_var_id username pp_some_cob_var
+        (password, "USING")
     | Connect_using { db_data_source } ->
-      Format.fprintf fmt "USING %s"  db_data_source.payload
+      Format.fprintf fmt "USING %a" pp_cob_var_id db_data_source
     | Connect_user { username; password; db_conn_id; db_data_source } ->
-      Format.fprintf fmt "%s IDENTIFIED BY %s %a %a"  username.payload 
-        password.payload pp_some_var (db_conn_id, "AT") pp_some_cob_var
+      Format.fprintf fmt "%a IDENTIFIED BY %a %a %a" pp_cob_var_id username
+        pp_cob_var_id password pp_some_var (db_conn_id, "AT") pp_some_cob_var
         (db_data_source, "USING")
-    | Connect_reset name -> Format.fprintf fmt "RESET%a" pp_some_cob_var (name, "")
+    | Connect_reset name -> Format.fprintf fmt "RESET%a" pp_some_var (name, "")
 
   and pp_whenever_condtion fmt = function
     | Not_found_whenever -> Format.fprintf fmt "NOT FOUND"
