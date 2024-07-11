@@ -155,55 +155,31 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
           with Not_found -> [] end)
     (CompEntrySet.elements comp_entries)
 
-let pp_env ppf env = (* for debug *)
-  let has_default = Expect.reducible_productions_in ~env <> [] in
-  Fmt.pf ppf "%d%s" (Menhir.current_state_number env) (if has_default then "_" else "")
-
-let pp_env_stack ppf env = (* for debug *)
-  let rec get_stack env =
-    match Menhir.pop env with
-    | None -> [env]
-    | Some popped_env -> env::(get_stack popped_env)
-  in
-  Fmt.pf ppf "TOP(%a)  STACK: %a" pp_env env
-    (Fmt.list ~sep:(Fmt.any " ") pp_env) (get_stack env)
-
 let expected_comp_entries_in ~env ~eager =
   List.to_seq @@
   if eager
   then Expect.eager_completion_entries_in ~env
   else Expect.completion_entries_in ~env
 
-let debug = false
 let expected_tokens ?(eager=true) base_env =
-  let rec inner env acc =
+  let rec inner acc env  =
     let pos = match Menhir.top env with
       | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
       | Some Menhir.Element (_, _, _, pos) -> pos in
-    if debug then (Lsp_io.log_debug "In State: %a" pp_env_stack env; let tok = Expect.completion_entries_in ~env in if List.length tok > 0 then Lsp_io.log_debug "Gained %d entries [%a]" (List.length tok) Fmt.(list ~sep:(any ";") Expect.Completion_entry.pp) tok);
-    let productions = Expect.reducible_productions_in ~env in
-    let nullables = Expect.nullable_nonterminals_in ~env in
     let acc =
       CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
-    let acc = List.fold_left (fun acc (Expect.X nt) ->
-        let default_value =
-          try Some (Expect.default_nonterminal_value nt)
-          with Not_found -> None in
-        Option.fold ~none:acc ~some:(fun a ->
-            let new_env = Menhir.feed (N nt) pos a pos env in
-            if debug then Lsp_io.log_debug "NULLABLES: On %a towards %a" pp_env env pp_env new_env;
-            inner new_env acc) default_value)
-        acc nullables in
-    List.fold_left (fun acc prod ->
-        let new_env = Menhir.force_reduction prod env in
-        if debug then Lsp_io.log_debug "REDUCTION: On %a towards %a" pp_env env pp_env new_env;
-        inner new_env acc)
-      acc productions
+    Expect.actions_in ~env
+    |> List.filter_map begin function
+      | Expect.Reduce prod -> Some ( Menhir.force_reduction prod env )
+      | Feed nt ->
+        try
+          let default_value = Expect.default_nonterminal_value nt in
+          Some ( Menhir.feed (N nt) pos default_value pos env )
+        with Not_found -> None
+    end
+    |> List.fold_left inner acc
   in
-  if debug then Lsp_io.log_debug "%a" pp_env_stack base_env;
-  let comp_entries = inner base_env CompEntrySet.empty in
-  if debug then (if CompEntrySet.cardinal comp_entries < 10 then Lsp_io.log_debug "=> Comp entries are [%a]\n" (Fmt.list ~sep:(Fmt.any ";") Expect.Completion_entry.pp) (CompEntrySet.elements comp_entries) else Lsp_io.log_debug "=> Comp entries are %d\n" (CompEntrySet.cardinal comp_entries));
-  comp_entries
+  inner CompEntrySet.empty base_env
 
 type config =
   {

@@ -91,16 +91,26 @@ let nonterminal_filter_map: nonterminal -> completion_entry option = fun nonterm
   List.find_opt (Attribute.has_label "completion") |>
   Option.map (fun attr -> Custom (Attribute.payload attr))
 
-let pp_xnonterminal_of_nt ppf nonterminal =
-  Fmt.pf ppf "X N_%s" (Nonterminal.mangled_name nonterminal)
+type dry_action =
+  | Nt of nonterminal
+  | Prod of production
+
+let pp_action ppf = function
+  | Nt nt -> Fmt.pf ppf "X N_%s" (Nonterminal.mangled_name nt)
+  | Prod p  -> Fmt.pf ppf "P %a" Fmt.(using Production.to_int int) p
 
 (* --- *)
 
 module StringSet = Set.Make(String)
 
-module NonterminalSet = Set.Make(struct
-    type t = nonterminal
-    let compare = Nonterminal.compare
+module ActionSet = Set.Make(struct
+    type t = dry_action
+    let compare = fun a1 a2 ->
+      match a1, a2 with
+      | Prod p1, Prod p2 -> Production.compare p1 p2
+      | Nt nt1, Nt nt2 -> Nonterminal.compare nt1 nt2
+      | Nt _, Prod _ -> -1
+      | Prod _, Nt _ -> 1
   end)
 
 module CompEntrySet = struct
@@ -128,15 +138,9 @@ module Compentries_mapping = Make_map(struct
     let compare = CompEntrySet.compare
   end)
 
-module Productions_mapping = Make_map(struct
-    type t = Production.t list
-    let compare = List.compare (fun p1 p2 ->
-        Production.to_int p1 - Production.to_int p2)
-  end)
-
-module Nonterminals_mapping = Make_map(struct
-    type t = NonterminalSet.t
-    let compare = NonterminalSet.compare
+module Action_mapping = Make_map(struct
+    type t = ActionSet.t
+    let compare = ActionSet.compare
   end)
 
 (* --- *)
@@ -178,60 +182,47 @@ module Completion_entry = struct
     custom_types;
   Fmt.string ppf "end\n"
 
-let nullable_nonterminals: lr1 -> NonterminalSet.t =
+let action_in: lr1 -> ActionSet.t =
   Lr1.tabulate begin fun lr1 ->
     List.to_seq (Lr0.items @@ Lr1.lr0 lr1)
-    |> Seq.filter_map begin fun (prod, idx) ->
-         match (Production.rhs prod).(idx) with
-         | N nt, _, _ when Nonterminal.nullable nt -> Some nt
-         | _ | exception Invalid_argument _ -> None end
-    |> NonterminalSet.of_seq
+    |> Seq.filter_map (fun (prod, idx) ->
+        let rhs = Production.rhs prod in
+        if Array.length rhs <= idx
+        then Some (Prod prod)
+        else
+          match rhs.(idx) with
+          | N nt, _, _
+            when Nonterminal.nullable nt -> Some (Nt nt)
+          | _ -> None)
+    |> ActionSet.of_seq
   end
 
-let reducible_productions: lr1 -> production list =
-  Lr1.tabulate begin fun lr1 ->
-    List.filter_map (function
-        | (prod, idx) when Array.length (Production.rhs prod) == idx ->
-          Some prod
-        | _ -> None)
-      (Lr0.items @@ Lr1.lr0 lr1)
-    |> List.sort_uniq Production.compare
-  end
-
-let emit_nullable_nonterminals_in_env ppf =
+let emit_action_in ppf =
   Fmt.string ppf {|
-type xnonterminal =
-  | X: 'a Menhir.nonterminal -> xnonterminal
+type action =
+  | Feed: 'a Menhir.nonterminal -> action
+  | Reduce: Menhir.production -> action
 
-let nullable_nonterminals_in ~env : xnonterminal list =
-  Menhir.(match current_state_number env with
-|};
-  Lr1.fold (fun lr1 acc ->
-      match nullable_nonterminals lr1 with
-      | emtpy when NonterminalSet.is_empty emtpy -> acc
-      | symbols -> Nonterminals_mapping.add_to_list symbols lr1 acc)
-    Nonterminals_mapping.empty
-  |> inv (Nonterminals_mapping.fold (fun s l acc -> (l, NonterminalSet.elements s)::acc)) []
-  |> pp_match_cases ppf
-    Fmt.(using Lr1.to_int int)
-    (pp_brackets @@ pp_list @@ pp_xnonterminal_of_nt)
-    "[])"
+type dry_action =
+  | X: 'a Menhir.nonterminal -> dry_action
+  | P: int -> dry_action
 
-let emit_reducible_productions_in_env ppf =
-  Fmt.string ppf {|
-let reducible_productions_in ~env : Menhir.production list =
-  List.rev_map Menhir.find_production @@
+let actions_in ~env : action list =
+  List.rev_map (function
+      | P prod_idx -> Reduce (Menhir.find_production prod_idx)
+      | X nt -> Feed nt)
+  @@
   match Menhir.current_state_number env with
 |};
   Lr1.fold (fun lr1 acc ->
-      match reducible_productions lr1 with
-      | [] -> acc
-      | defaults -> Productions_mapping.add_to_list defaults lr1 acc)
-    Productions_mapping.empty
-  |> inv (Productions_mapping.fold (fun s l acc -> (l, s)::acc)) []
+      match action_in lr1 with
+      | empty when ActionSet.is_empty empty -> acc
+      | actions -> Action_mapping.add_to_list actions lr1 acc)
+    Action_mapping.empty
+  |> inv (Action_mapping.fold (fun s l acc -> (l, ActionSet.elements s)::acc)) []
   |> pp_match_cases ppf
     Fmt.(using Lr1.to_int int)
-    Fmt.(pp_brackets @@ pp_list @@ (using Production.to_int int))
+    (pp_brackets @@ pp_list @@ pp_action)
     "[]"
 
 let accumulate_terminals: lr1 -> CompEntrySet.t =
@@ -588,8 +579,7 @@ let () =
     cmlyname !nel_module !external_tokens;
 
   emit_completion_entry ppf;
-  emit_reducible_productions_in_env ppf;
-  emit_nullable_nonterminals_in_env ppf;
+  emit_action_in ppf;
   emit_completion_entries_in_env ppf;
   emit_eager_completion_entries_in_env ppf;
   emit_default_nonterminal_value ppf;

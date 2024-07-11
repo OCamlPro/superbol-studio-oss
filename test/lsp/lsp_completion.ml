@@ -3621,6 +3621,124 @@ let%expect_test "control-completion" =
         INTERFACE-ID.\n
         PROGRAM-ID |}];;
 
+let%expect_test "double-program-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. progA.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 A1 PIC X.
+        01 A2 PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY _|_A1.
+          STOP RUN.
+        END PROGRAM progA.
+
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. progB.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 B1 PIC X.
+        01 B2 PIC X.
+        PROCEDURE DIVISION.
+          DISPLAY _|_B1.
+          STOP RUN.
+        END PROGRAM progB.
+  |cobol}  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:9.18:
+       6           01 A1 PIC X.
+       7           01 A2 PIC X.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY A1.
+    ----                     ^
+      10             STOP RUN.
+      11           END PROGRAM progA.
+    (line 8, character 18):
+    Basic (17 entries):
+        A1
+        A2
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (17 entries):
+        A1
+        A2
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:20.18:
+      17           01 B1 PIC X.
+      18           01 B2 PIC X.
+      19           PROCEDURE DIVISION.
+      20 >           DISPLAY B1.
+    ----                     ^
+      21             STOP RUN.
+      22           END PROGRAM progB.
+    (line 19, character 18):
+    Basic (17 entries):
+        B1
+        B2
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (17 entries):
+        B1
+        B2
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS |}]
+
 let%expect_test "intrinsic-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
