@@ -288,15 +288,6 @@ let on_reduction ps tokens prod =
   then pop_context ps tokens
   else ps, tokens
 
-(** Traverses a path (sequence of parser states or productions) that starts with
-    the state that matches the current context stack, and applies the induced
-    changes to the context stack. *)
-let seesaw_context_stack ps tokens recovery_operations =
-  List.fold_left begin fun (ps, tokens) -> function
-    | Grammar_recovery.Shift (e1, e2) -> on_shift ps tokens e1 e2
-    | Grammar_recovery.Reduce p -> on_reduction ps tokens p
-  end (ps, tokens) recovery_operations
-
 (* --- *)
 
 let env_loc env =
@@ -378,8 +369,25 @@ let after_reduction ps token tokens prod = function
   | AboutToReduce (env, _)
   | Shifting (env, _, _) ->
       post_production ps token tokens prod env
-  | _ ->
+  | InputNeeded _                                   (* <- normally unexpected *)
+  | Accepted _
+  | Rejected ->
       ps, token, tokens
+
+(** Traverses a path (sequence of parser states or productions) that starts with
+    the state that matches the current context stack, and applies the induced
+    changes to the context stack; also applies {!post_production} on the way. *)
+let traverse_recovery_path ps token tokens recovery_path =
+  List.fold_left begin fun (ps, tokens) -> function
+    | Grammar_recovery.Shift (e1, e2) ->
+        on_shift ps tokens e1 e2
+    | Reduce (prod, None) ->
+        on_reduction ps tokens prod
+    | Reduce (prod, Some env) ->
+        let ps, tokens = on_reduction ps tokens prod in
+        let ps, _, tokens = post_production ps token tokens prod env in
+        ps, tokens
+  end (ps, tokens) recovery_path
 
 (* Main code for driving the parser with recovery and lexical contexts: *)
 
@@ -482,7 +490,7 @@ and recover ps tokens candidates ~report_syntax_hints_n_error =
   | `Accept (v, assumed) ->
       accept (report_syntax_hints_n_error ps assumed) v
   | `Ok (c, _, visited, assumed) ->
-      let ps, tokens = seesaw_context_stack ps tokens visited in
+      let ps, tokens = traverse_recovery_path ps token tokens visited in
       normal (report_syntax_hints_n_error ps assumed) tokens c
 
 and accept ps v =
@@ -606,10 +614,10 @@ let parse_with_history ?stop_before_eof ?(save_stage = 10) rwps =
   in
   let ps = rewindable_parser_state rwps in
   Tokzr.enable_context_sensitive_tokens  ps.preproc.tokzr;
-  Tokzr.reregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.restore_intrinsics               ps.preproc.tokzr;
   let res, rwps = loop 0 rwps in
   let ps = rewindable_parser_state rwps in
-  Tokzr.unregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.save_intrinsics                  ps.preproc.tokzr;
   Tokzr.disable_context_sensitive_tokens ps.preproc.tokzr;
   res, rwps
 

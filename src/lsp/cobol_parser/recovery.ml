@@ -70,7 +70,7 @@ struct
     }
   and 'a operation =
     | Shift of 'a Parser.env * 'a Parser.env
-    | Reduce of Parser.production
+    | Reduce of Parser.production * 'a Parser.env option
   and assumption =
     {
       show: Pretty.delayed option;
@@ -92,9 +92,18 @@ struct
       | Shifting (e1, e2, _) as c ->
           aux (Shift (e1, e2) :: visited) (Parser.resume c)
       | AboutToReduce (_, p) as c ->
-          aux (Reduce p :: visited) (Parser.resume c)
+          let c' = Parser.resume c in
+          aux (Reduce (p, env_of c') :: visited) c'
       | InputNeeded env as c ->
           `Recovered (c, env, visited)
+    and env_of = function
+      | HandlingError env
+      | AboutToReduce (env, _)
+      | InputNeeded env
+      | Shifting (env, _, _) ->
+          Some env
+      | Accepted _ | Rejected ->
+          None
     in
     aux visited (Parser.offer (Parser.input_needed env) token)
 
@@ -143,7 +152,8 @@ struct
             List.fold_left aux path actions
         | R prod ->
             let prod = Parser.find_production prod in
-            Parser.force_reduction prod env, Reduce prod :: visited, assumed
+            let env = Parser.force_reduction prod env in
+            env, Reduce (prod, Some env) :: visited, assumed
         | S (N _ as sym) ->
             let env' =
               Parser.feed sym endp (Recovery.default_value sym) endp env
