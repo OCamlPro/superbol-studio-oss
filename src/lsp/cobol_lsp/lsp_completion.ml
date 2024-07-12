@@ -48,19 +48,25 @@ let change ~(case: actual_case) = match case with
   | Uppercase -> String.uppercase
   | Lowercase -> String.lowercase
 
-let to_string qualnames =
-  List.flatten @@ List.rev_map (function
-      | Cobol_ptree.Name name -> [~&name]
-      | Qual (name,_) as qualname ->
-        [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
-      | _ -> []) qualnames
+let to_string = function
+  | Cobol_ptree.Name name -> [~&name]
+  | Qual (name,_) as qualname ->
+    [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
+  | _ -> []
 
-let qualnames_proposal ~filename pos group =
+let qualnames_proposal ~filename pos group : (string * bool) list =
+  let comp_type = Lsp_comp_semantic.type_at_position ~filename pos group in
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
   | None -> []
   | Some cu ->
-    List.filter_map Cobol_data.Item.def_qualname cu.unit_data.data_items.list
-    |> to_string
+    cu.unit_data.data_items.list
+    |> List.filter_map begin fun d ->
+      Option.map (fun qn -> qn, Lsp_comp_semantic.is_valid ~comp_type d)
+      @@ Cobol_data.Item.def_qualname d
+    end
+    |> List.rev_map begin fun (qn, valid) ->
+      List.map (fun s -> s, valid) @@ to_string qn end
+    |> List.flatten
 
 let procedures_proposal ~filename pos group =
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
@@ -75,7 +81,8 @@ let procedures_proposal ~filename pos group =
         | Section section ->
           List.filter_map paragraph_name ~&section.section_paragraphs.list)
       cu.unit_procedure.list
-    |> to_string
+    |> List.rev_map to_string
+    |> List.flatten
 
 let all_intrinsic_function_name =
   List.map fst Cobol_parser.Keywords.intrinsic_functions
@@ -111,11 +118,13 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create label ~range ~kind ~case=
-  let label = change ~case label in
-  let textedit = TextEdit.create ~newText:label ~range in
+let completion_item_create ?(label=None) ?(delay=false) text  ~range ~kind ~case=
+  let text = change ~case text in
+  let label = Option.fold ~none:text ~some:(fun l -> text ^ l) label in
+  let textedit = TextEdit.create ~newText:text ~range in
   CompletionItem.create ()
   ~label ~kind ~preselect:false
+  ~sortText:(if delay then "Z" ^ text else text)
       ~textEdit:(`TextEdit textedit)
 
 let string_of_K tokens =
@@ -139,8 +148,12 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
   List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
         qualnames_proposal ~filename pos group
-        |> List.rev_map (completion_item_create
-                           ~kind:Variable ~range ~case)
+        |> List.rev_map begin fun (s, valid) ->
+          completion_item_create
+            ~label:(Some (if valid then "" else " [wrong type]"))
+            ~delay:(not valid)
+            ~kind:Variable ~range ~case s
+        end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
         |> List.rev_map (completion_item_create

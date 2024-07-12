@@ -28,4 +28,7 @@ type decision =
 val can_pop : 'a Grammar.MenhirInterpreter.terminal -> bool
 val depth : int array
 val recover : int -> decision
-val default_value : 'a Grammar.MenhirInterpreter.symbol -> 'a
+val default_value :
+  pos:Lexing.position
+  -> 'a Grammar.MenhirInterpreter.symbol
+  -> 'a

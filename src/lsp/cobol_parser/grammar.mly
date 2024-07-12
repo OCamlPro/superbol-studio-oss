@@ -1513,7 +1513,7 @@ let blank_when_zero_clause := BLANK; WHEN?; ZERO
 let justified_clause := JUSTIFIED; RIGHT?
 
 let picture_clause
-      [@recovery dummy_picture]
+      [@recovery_with_pos dummy_picture]
       [@symbol "<picture clause>"] :=
   | PICTURE; IS?; picture_string = loc(PICTURE_STRING);
     picture_locale = ro(picture_locale_phrase);
@@ -2151,13 +2151,13 @@ let at_eop := EOP | AT_EOP | END_OF_PAGE
 
 
 
-let name [@recovery dummy_name] [@symbol "<word>"] :=
+let name [@recovery_with_pos dummy_name] [@symbol "<word>"] :=
  | i = loc(WORD); < >
 let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"]
+let qualname_ [@recovery_with_pos dummy_qualname] [@symbol "<qualified name>"]
               [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
@@ -2180,7 +2180,7 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"]
+let procedure_name [@recovery_with_pos dummy_qualname'] [@symbol "<procedure name>"]
                    [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
@@ -2218,7 +2218,7 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
  | "("; s = subscript_first; ")";                                 { [s] }
 
-let function_name [@recovery dummy_name] [@symbol "<function-name>"]
+let function_name [@recovery_with_pos dummy_name] [@symbol "<function-name>"]
                   [@completion FunctionName] :=
  | ~ = name;                         < >
 
@@ -2331,7 +2331,7 @@ let base_ident ==                 (* identifier without reference modification *
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let ident [@symbol "<identifier>"] [@recovery dummy_ident] :=
+let ident [@symbol "<identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = base_ident; %prec below_RPAR { UPCAST.base_ident_with_refmod i }
   | i = base_ident; r = refmod;      { RefMod (i, r) }
 
@@ -2346,7 +2346,7 @@ let scalar_ident_ ==        (* scalar identifier without reference modification 
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let scalar_ident [@symbol "<scalar identifier>"] [@recovery dummy_ident] :=
+let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
@@ -2358,7 +2358,7 @@ let length_of_expr :=
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
-      [@recovery Cobol_ptree.UPCAST.ident_with_literal dummy_ident] :=
+      [@recovery_with_pos (fun ~pos -> Cobol_ptree.UPCAST.ident_with_literal @@ dummy_ident ~pos)] :=
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 

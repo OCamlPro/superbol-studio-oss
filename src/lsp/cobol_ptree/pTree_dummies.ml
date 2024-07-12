@@ -21,27 +21,24 @@ let integer_zero = "0"
 and integer_one = "1"
 and alphanum__ = "_"
 
-let dummy_loc =
-  Cobol_common.Srcloc.dummy
+let dummy_string ~pos = alphanum__ &@ Cobol_common.Srcloc.raw (pos, pos)
 
-let dummy_string = alphanum__ &@ dummy_loc
+let dummy_name ~pos = dummy_string ~pos
 
-let dummy_name = dummy_string
+let dummy_qualname ~pos : qualname =
+  Name (dummy_name ~pos)
 
-let dummy_qualname: qualname =
-  Name dummy_name
+let dummy_qualname' ~pos : qualname with_loc =
+  dummy_qualname ~pos &@ Cobol_common.Srcloc.raw (pos, pos)
 
-let dummy_qualname': qualname with_loc =
-  dummy_qualname &@ dummy_loc
-
-let dummy_qualident =
+let dummy_qualident ~pos =
   {
-    ident_name = dummy_qualname';
+    ident_name = dummy_qualname' ~pos;
     ident_subscripts = [];
   }
 
-let dummy_ident =
-  QualIdent dummy_qualident
+let dummy_ident ~pos =
+  QualIdent (dummy_qualident ~pos)
 
 let dummy_literal =
   Integer integer_zero
@@ -57,9 +54,9 @@ let dummy_alphanum =
 let dummy_expr =
   Atom (Fig Zero)
 
-let dummy_picture =
+let dummy_picture ~pos =
   {
-    picture_string = "X" &@ dummy_loc;
+    picture_string = "X" &@ Cobol_common.Srcloc.raw (pos, pos);
     picture_locale = None;
     picture_depending = None;
   }
@@ -92,11 +89,18 @@ let boolean_zero =
 
 (* --- *)
 
+let is_dummy_name name =
+  ~&name == alphanum__
+
+let is_dummy_qualname = function
+  | Name name -> is_dummy_name name
+  | _ -> false
+
 let strip_dummies_from_qualname =
   let rec aux: (Terms.qualname as 'a) -> 'a = function
     | Name _ as qn -> qn
-    | Qual (n, qn) when n == dummy_name -> aux qn
-    | Qual (n, qn) when qn == dummy_qualname -> Name n
+    | Qual (n, qn) when is_dummy_name n -> aux qn
+    | Qual (n, qn) when is_dummy_qualname qn -> Name n
     | Qual (n, qn) -> Qual (n, aux qn)
   in
   aux
