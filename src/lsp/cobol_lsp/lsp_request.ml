@@ -467,7 +467,7 @@ let lookup_data_definition_for_hover cu_name element_at_pos group =
   with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
 let data_definition_on_hover
-    ?(always_show_hover_text_in_data_div = true)
+    ?(always_show_hover_text_in_data_div = false)
     ~uri position Cobol_typeck.Outputs.{ group; _ } =
   let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~uri position group with
