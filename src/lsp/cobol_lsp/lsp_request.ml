@@ -454,106 +454,100 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
-let always_show_hover_text_in_data_div = true
-
-let get_hover_text_and_defloc (qn: Cobol_ptree.qualname) (cu: Cobol_unit.Types.cobol_unit) =
-  let data_def =
-    try Cobol_unit.Qualmap.find qn cu.unit_data.data_items.named
-    with _ -> raise Not_found
-  in
-  Pretty.to_string "%a" Lsp_data_info_printer.pp_data_definition data_def,
-  Cobol_data.Item.def_loc data_def
-
-let get_hover_info cu_name element_at_pos group =
+let lookup_data_definition_for_hover cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in
-    match element_at_pos with
-      | Data_item { full_qn = Some qn; def_loc } ->
-          let text, _ = get_hover_text_and_defloc qn cu in
-          text, def_loc, def_loc
-      | Data_full_name qn | Data_name qn ->
-          let text, def_loc = get_hover_text_and_defloc qn cu in
-          text, def_loc, Lsp_lookup.baseloc_of_qualname qn
-      | Data_item _ | Proc_name _ ->
-          raise Not_found
+  let named_data_defs = cu.unit_data.data_items.named in
+  try match element_at_pos with
+    | Data_item { full_qn = Some qn; def_loc } ->
+        Cobol_unit.Qualmap.find qn named_data_defs, def_loc
+    | Data_full_name qn | Data_name qn ->
+        Cobol_unit.Qualmap.find qn named_data_defs, Lsp_lookup.baseloc_of_qualname qn
+    | Data_item _ | Proc_name _ ->
+        raise Not_found
+  with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
-let lookup_hover_definition_in_doc
-    HoverParams.{ textDocument = doc; position; _ }
-    Cobol_typeck.Outputs.{ group; _ } =
-      let filename = Lsp.Uri.to_path doc.uri in
-      match Lsp_lookup.element_at_position ~uri:doc.uri position group with
-        | { element_at_position = None; _ }
-        | { enclosing_compilation_unit_name = None; _ } ->
-            raise Not_found
-        | { element_at_position = Some ele_at_pos;
-            enclosing_compilation_unit_name = Some cu_name } ->
-            let hover_text, def_loc, hover_loc =
-              get_hover_info cu_name ele_at_pos group in
-            if always_show_hover_text_in_data_div ||
-               not (Lsp_position.is_in_srcloc ~filename position def_loc)
-            then hover_text, hover_loc
-            else raise Not_found
+let data_definition_on_hover
+    ?(always_show_hover_text_in_data_div = true)
+    ~uri position Cobol_typeck.Outputs.{ group; _ } =
+  let filename = Lsp.Uri.to_path uri in
+  match Lsp_lookup.element_at_position ~uri position group with
+  | { element_at_position = None; _ }
+  | { enclosing_compilation_unit_name = None; _ } ->
+      None
+  | { element_at_position = Some ele_at_pos;
+      enclosing_compilation_unit_name = Some cu_name } ->
+      try
+        let data_def, hover_loc
+          = lookup_data_definition_for_hover cu_name ele_at_pos group in
+        if always_show_hover_text_in_data_div ||
+           not (Lsp_position.is_in_srcloc ~filename position @@
+                Cobol_data.Item.def_loc data_def)
+        then Some (Pretty.to_string
+                     "%a" Lsp_data_info_printer.pp_data_definition data_def,
+                   hover_loc)
+        else None
+      with Not_found ->
+        None
 
-let handle_hover registry (params: HoverParams.t) =
-  let filename = Lsp.Uri.to_path params.textDocument.uri in
-  let find_hovered_pplog_event pplog =
-    List.find_opt begin function
-      | Cobol_preproc.Trace.Replace _
-      | CompilerDirective _
-      | Exec_block _
-      | Ignored _ ->
-          false
-      | Replacement { matched_loc = loc; _ }
-      | FileCopy { copyloc = loc; _ } ->
-          try         (* Some locations in the pre-processor log may not involve
+
+let hover_markdown ~filename ~loc value =
+  let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
+  let range = Lsp_position.range_of_srcloc_in ~filename loc in
+  Some (Hover.create () ~contents:(`MarkupContent content) ~range)
+
+let cobol_code fmt =                                   (* TODO: ensure no ``` *)
+  Pretty.to_string ("```cobol\n" ^^ fmt ^^ "\n```")
+
+let find_hovered_pplog_event ~filename position pplog =
+  List.find_opt begin function
+    | Cobol_preproc.Trace.Replace _
+    | CompilerDirective _
+    | Exec_block _
+    | Ignored _ ->
+        false
+    | Replacement { matched_loc = loc; _ }
+    | FileCopy { copyloc = loc; _ } ->
+        try           (* Some locations in the pre-processor log may not involve
                          [filename], so we need to catch those cases. *)
-            Lsp_position.is_in_lexloc params.position
-              (Cobol_common.Srcloc.lexloc_in ~filename loc)
-          with Invalid_argument _ -> false
-    end (Cobol_preproc.Trace.events pplog)
-  in
-  let hover_markdown ~loc value =
-    let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
-    let range = Lsp_position.range_of_srcloc_in ~filename loc in
-    Some (Hover.create () ~contents:(`MarkupContent content) ~range)
-  in
-  try_with_main_document_data registry params.textDocument
+          Lsp_position.is_in_lexloc position
+            (Cobol_common.Srcloc.lexloc_in ~filename loc)
+        with Invalid_argument _ -> false
+  end (Cobol_preproc.Trace.events pplog)
+
+let preproc_info_on_hover ~filename position pplog =
+  match find_hovered_pplog_event ~filename position pplog with
+  | Some Replacement { matched_loc = loc; replacement_text = []; _ } ->
+      Some ("empty text", loc)
+  | Some Replacement { matched_loc = loc; replacement_text; _ } ->
+      Some (cobol_code "%a" Cobol_preproc.Text.pp_text replacement_text, loc)
+  | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
+      (match EzFile.read_file lib with
+       | "" -> None
+       | text -> Some (cobol_code "%s" text, loc))
+  | Some FileCopy { status = MissingCopy _; _ }
+  | Some Replace _
+  | Some CompilerDirective _
+  | Some Exec_block _
+  | Some Ignored _
+  | None ->
+      None
+
+let handle_hover ?always_show_hover_text_in_data_div
+    registry HoverParams.{ textDocument = doc; position; _ } =
+  let filename = Lsp.Uri.to_path doc.uri in
+  try_with_main_document_data registry doc
     ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } checked_doc ->
-      let pp_hover_text_and_loc =
-        match find_hovered_pplog_event pplog with
-          | Some Replacement { matched_loc = loc; replacement_text = []; _ } ->
-              Some ("empty text", loc)
-          | Some Replacement { matched_loc = loc; replacement_text; _ } ->
-              (* TODO: ensure no ``` *)
-              Some (Pretty.to_string "```cobol\n%a\n```\
-                                     " Cobol_preproc.Text.pp_text replacement_text,
-                    loc)
-          | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
-              begin match EzFile.read_file lib with
-                | "" -> None
-                (* TODO: ensure no ``` *)
-                | text -> Some (Pretty.to_string "```cobol\n%s\n```" text, loc)
-              end
-          | Some FileCopy { status = MissingCopy _; _ }
-          | Some Replace _
-          | Some CompilerDirective _
-          | Some Exec_block _
-          | Some Ignored _
-          | None ->
-              None
-      in
-      let info_hover_text_and_loc =
-        try Some (lookup_hover_definition_in_doc params checked_doc)
-        with Not_found -> None
-      in
-      match info_hover_text_and_loc, pp_hover_text_and_loc with
-        | None, None ->
-            None
-        | None, Some (text, loc) | Some (text, loc), None ->
-            hover_markdown ~loc text
-        | Some(info_text, loc), Some(pp_text, _) ->
-            hover_markdown ~loc @@
-            Pretty.to_string "%s\n---\nAdditional pre-processing information:\n%s"
-              info_text pp_text
+      match data_definition_on_hover ~uri:doc.uri position checked_doc
+              ?always_show_hover_text_in_data_div,
+            preproc_info_on_hover ~filename position pplog with
+      | None, None ->
+          None
+      | None, Some (text, loc) | Some (text, loc), None ->
+          hover_markdown ~filename ~loc text
+      | Some(info_text, loc), Some(pp_text, _) ->
+          hover_markdown ~filename ~loc @@
+          Pretty.to_string "%s\n---\nAdditional pre-processing:\n%s"
+            info_text pp_text
     end
 
 (** {3 Completion} *)

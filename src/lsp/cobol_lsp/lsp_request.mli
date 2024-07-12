@@ -24,7 +24,8 @@ module INTERNAL: sig
     -> Lsp.Types.ReferenceParams.t
     -> Lsp.Types.Location.t list option
   val hover
-    : Lsp_server.t
+    : ?always_show_hover_text_in_data_div: bool
+    -> Lsp_server.t
     -> Lsp.Types.HoverParams.t
     -> Lsp.Types.Hover.t option
   val completion
