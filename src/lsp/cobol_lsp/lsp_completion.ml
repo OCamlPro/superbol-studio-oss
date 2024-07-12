@@ -55,13 +55,14 @@ let to_string = function
   | _ -> []
 
 let qualnames_proposal ~filename pos group : (string * bool) list =
-  let comp_type = Lsp_comp_semantic.type_at_position ~filename pos group in
+  let comp_categories = Lsp_comp_semantic.type_at_position ~filename pos group in
+  Lsp_io.log_debug "[%a]" Fmt.(list ~sep:(any "; ") Lsp_comp_semantic.pp_comp_category) comp_categories;
   match Lsp_lookup.cobol_unit_at_position ~filename pos group with
   | None -> []
   | Some cu ->
     cu.unit_data.data_items.list
     |> List.filter_map begin fun d ->
-      Option.map (fun qn -> qn, Lsp_comp_semantic.is_valid ~comp_type d)
+      Option.map (fun qn -> qn, Lsp_comp_semantic.is_valid ~comp_categories d)
       @@ Cobol_data.Item.def_qualname d
     end
     |> List.rev_map begin fun (qn, valid) ->
