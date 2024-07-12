@@ -27,47 +27,36 @@ let preproc
         source_format
       }
 
-let default_parser_options =
-  Cobol_parser.Options.default
-    ~exec_scanners: Superbol_preprocs.exec_scanners
+let options
+    ?(verbose = false)
+    ?(exec_scanners = Superbol_preprocs.exec_scanners) () =
+  {
+    (Cobol_parser.Options.default ~exec_scanners) with
+    verbose;
+    recovery = EnableRecovery { silence_benign_recoveries = true }
+  }
 
-let show_parsed_tokens ?(verbose = false) ?(with_locations = false)
-    ?source_format ?filename contents =
+
+let show_parsed_tokens ?(parser_options = options ())
+    ?(with_locations = false) ?source_format ?filename contents =
   let { result = WithArtifacts (_, { tokens; _ }); _ } =
     preproc ?source_format ?filename contents |>
-    Cobol_parser.parse_with_artifacts
-      ~options: {
-        default_parser_options with
-        verbose;
-        recovery = EnableRecovery { silence_benign_recoveries = true };
-      }
+    Cobol_parser.parse_with_artifacts ~options:parser_options
   in
   (if with_locations
    then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
    else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
 
-let show_diagnostics ?(verbose = false) ?source_format ?filename
-    ?(exec_scanners = Superbol_preprocs.exec_scanners) contents =
+let show_diagnostics ?(parser_options = options ())
+    ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
-    ~options: {
-      default_parser_options with
-      verbose;
-      exec_scanners;
-      recovery = EnableRecovery { silence_benign_recoveries = true };
-    } |>
+  Cobol_parser.parse_simple ~options:parser_options |>
   Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
 
-let just_parse ?(verbose = false) ?source_format ?filename
-    ?(exec_scanners = Superbol_preprocs.exec_scanners) contents =
+let just_parse ?(parser_options = options ())
+    ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
-    ~options: {
-      default_parser_options with
-      verbose;
-      exec_scanners;
-      recovery = EnableRecovery { silence_benign_recoveries = true };
-    } |>
+  Cobol_parser.parse_simple ~options:parser_options |>
   ignore
 
 (* --- *)
@@ -158,7 +147,7 @@ let triplewise positions =
 (** Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
-    ?(verbose = false)
+    ?(parser_options = options ())
     ?(source_format = Cobol_config.(SF SFFixed))
     ?config
     prog
@@ -167,16 +156,17 @@ let rewindable_parse
     String { filename = "prog.cob"; contents = prog } |>
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
-          verbose; libpath = []; source_format;
+          verbose = parser_options.verbose;
+          libpath = []; source_format;
           exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:default.config;
         } |>
     Cobol_parser.rewindable_parse_simple
       ~options: {
-        default_parser_options with
-        verbose; recovery = DisableRecovery;
-        config = Option.value config ~default:default_parser_options.config;
+        parser_options with
+        recovery = DisableRecovery;
+        config = Option.value config ~default:parser_options.config;
       }
   in
   ptree, diags, rewinder
@@ -289,7 +279,8 @@ let iteratively_append_chunks_stuttering ?config ~f
 let simulate_cut_n_paste ?config ~f0 ~f ?verbose ?(repeat = 1)
     (prog, positions) =
   Random.init 42;
-  let ptree0, diags, rewinder = rewindable_parse ?verbose ?config prog in
+  let parser_options = options ?verbose () in
+  let ptree0, diags, rewinder = rewindable_parse ~parser_options ?config prog in
   f0 ~ptree0 diags;
   let positions = Array.of_list positions.pos_anonymous in
   let num_chunks = Array.length positions - 1 in

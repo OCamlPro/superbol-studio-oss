@@ -22,7 +22,9 @@ let print_hovered server ~projdir (prog, prog_positions) =
     Pretty.out "%a(line %d, character %d):@."
       Fmt.(option ~none:nop @@ fmt "%s ") key
       position.line position.character;
-    match LSP.Request.hover server params with
+    match
+      LSP.Request.hover ~always_show_hover_text_in_data_div:true server params
+    with
     | None ->
         Pretty.out "Hovering nothing worthy@."
     | Some { contents = `List strings; range } ->
@@ -74,7 +76,7 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
-    Additional pre-processing information:
+    Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
     ```
@@ -95,7 +97,7 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
-    Additional pre-processing information:
+    Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
     ```
@@ -116,7 +118,7 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
-    Additional pre-processing information:
+    Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
     ```
@@ -137,7 +139,7 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
-    Additional pre-processing information:
+    Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
     ``` |}];;
