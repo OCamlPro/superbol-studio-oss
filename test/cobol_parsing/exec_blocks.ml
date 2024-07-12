@@ -11,8 +11,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let exec_scanners =
+  Superbol_preprocs.more [
+    "SQL", Superbol_preprocs.Esql.scanner;
+  ]
+
 let%expect_test "exec-block-with-cobol-separators" =
-  Parser_testing.show_parsed_tokens {|
+  Parser_testing.show_parsed_tokens
+    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
+  {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
            EXEC SQL
@@ -35,7 +42,9 @@ let%expect_test "exec-block-with-invalid-percentage-character" =
       "NO-%", Superbol_preprocs.No_percentage_toy.scanner;
     ]
   in
-  Parser_testing.show_diagnostics ~exec_scanners {|
+  Parser_testing.show_diagnostics
+    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
+  {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
            EXEC NO-%
