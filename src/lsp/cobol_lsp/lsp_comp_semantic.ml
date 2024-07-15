@@ -18,17 +18,27 @@ open Cobol_common.Srcloc.INFIX
 type comp_category =
   | Alphanum
   | Numeric
+  | NumericEdited
+  | Group
   | Any
   (* numedited, boolean, procedure_pointer, group *)
 
 let pp_comp_category ppf = Fmt.(function
   | Alphanum -> string ppf "Alphanum"
   | Numeric -> string ppf "Numeric"
+  | NumericEdited -> string ppf "NumericEdited"
+  | Group -> string ppf "Group"
   | Any -> string ppf "Any")
 
 let category_of_pic ({ category; _ }: picture) =
   match category with
   | National _ | Alphabetic _ | Alphanumeric _ -> Alphanum
+  | FixedNum { editions; _ } when (editions.basics <> [] ||
+                                   editions.floating <> None ||
+                                   editions.zerorepl <> None)
+    -> NumericEdited
+  | FloatNum { editions; _ } when editions <> []
+    -> NumericEdited
   | FloatNum _ | FixedNum _ -> Numeric
   | Boolean _ -> Any
 
@@ -60,12 +70,12 @@ let category_of_datadef : data_definition -> comp_category = fun d ->
   | Data_field { def; _ } -> begin
       match ~&def.field_layout with
       | Elementary_field { usage; _ } -> category_of_usage usage
-      | Struct_field _ -> Alphanum
+      | Struct_field _ -> Group
     end
   | Data_renaming { def; _} -> begin
     match ~&def.renaming_layout with
     | Renamed_elementary { usage } -> category_of_usage usage
-    | Renamed_struct _ -> Alphanum
+    | Renamed_struct _ -> Group
   end
   | Data_condition _
   | Table_index _ ->
@@ -135,11 +145,11 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
             acc
             |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
             |> Numeric @>@ fold_ident_or_numlit v to_or_from_item
-            |> Numeric (* + numedited *) @>@ fold_rounded_idents v targets
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
           | ArithCorresponding { source; target } ->
             acc
-            |> Any (* group *) @>@ fold_qualname v source
-            |> Any (* group *) @>@ fold_rounded_ident v target
+            |> Group   @>@ fold_qualname v source
+            |> Group   @>@ fold_rounded_ident v target
         end
         |> skip
 
@@ -172,11 +182,10 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
         |> Alphanum @>@ fold_list ~fold:fold_ident_or_strlit v c
         |> skip
 
-      (* close -> filename @@ fold_name' *)
-
       method! fold_compute' { payload = c; _ } acc =
         acc
-        |> Numeric (* + edited + boolean *) @>@ fold_rounded_idents v c.compute_targets
+        |> [Numeric; NumericEdited] (* + boolean *)
+        @>>@ fold_rounded_idents v c.compute_targets
         |> fold_dual_handler v c.compute_on_size_error
         |> skip
 
@@ -190,8 +199,8 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
             acc
             |> Numeric @>@ fold_scalar v g.divisor
             |> Numeric @>@ fold_scalar v g.dividend
-            |> Numeric (* +edited *) @>@ fold_rounded_idents v g.giving
-            |> Numeric (* +edited *) @>@ fold_option ~fold:fold_ident v g.remainder
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.giving
+            |> [Numeric; NumericEdited] @>>@ fold_option ~fold:fold_ident v g.remainder
         end |> skip
 
       method! fold_entry_by_clause clause acc =
@@ -232,8 +241,8 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
         begin match m with
           | MoveCorresponding { from; to_ } ->
             acc
-            |> (* group *) fold_ident v from
-            |> (* group *) fold_list ~fold:fold_ident v to_
+            |> Group @>@ fold_ident v from
+            |> Group @>@ fold_list ~fold:fold_ident v to_
           | _ -> acc
         end
         |> skip
@@ -248,7 +257,7 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
             acc
             |> Numeric @>@ fold_scalar v g.multiplier
             |> Numeric @>@ fold_scalar v g.multiplicand
-            |> Numeric (* +edited *) @>@ fold_rounded_idents v g.targets
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.targets
         end
         |> skip
 
