@@ -2113,8 +2113,8 @@ let%expect_test "procedure-completion" =
         PROGRAM-ID. prog.
         DATA DIVISION.
         WORKING-STORAGE SECTION.
-        01 AA PIC X.
-        01 BB PIC X.
+        01 AA PIC 9.
+        01 BB PIC 9.
         PROCEDURE DIVISION.
           _|_DISPLAY AA _|_.
           MOVE _|_AA _|_TO _|_BB.
@@ -2132,8 +2132,8 @@ let%expect_test "procedure-completion" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     __rootdir__/prog.cob:9.10:
-       6           01 AA PIC X.
-       7           01 BB PIC X.
+       6           01 AA PIC 9.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9 >           DISPLAY AA .
     ----             ^
@@ -2267,8 +2267,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     __rootdir__/prog.cob:9.21:
-       6           01 AA PIC X.
-       7           01 BB PIC X.
+       6           01 AA PIC 9.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9 >           DISPLAY AA .
     ----                        ^
@@ -2491,7 +2491,7 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     __rootdir__/prog.cob:10.15:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -2538,7 +2538,7 @@ let%expect_test "procedure-completion" =
         SUPER
         ZEROS
     __rootdir__/prog.cob:10.18:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -2549,7 +2549,7 @@ let%expect_test "procedure-completion" =
     Basic (7 entries): AS FACTORY OF AS UNIVERSAL AS IN OF SUPER OF TO
     Eager (4 entries): AS IN OF TO
     __rootdir__/prog.cob:10.21:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -3497,6 +3497,413 @@ let%expect_test "procedure-completion" =
         WITH NO ADVANCING
         WRITE
         ZEROS |}];;
+
+
+let%expect_test "semantic-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 NUM PIC 9.
+        01 ALPHA PIC X.
+        01 ANYY USAGE BIT.
+        PROCEDURE DIVISION.
+          ADD _|_NUM TO _|_NUM.
+          DISPLAY _|_ANYY.
+          UNSTRING _|_ALPHA INTO _|_ANYY.
+          SEC SECTION.
+          MULTIPLY NUM BY NUM
+          ON SIZE ERROR
+            DISPLAY _|_ANYY
+          END-MULTIPLY.
+          STOP RUN.
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:10.14:
+       7           01 ALPHA PIC X.
+       8           01 ANYY USAGE BIT.
+       9           PROCEDURE DIVISION.
+      10 >           ADD NUM TO NUM.
+    ----                 ^
+      11             DISPLAY ANYY.
+      12             UNSTRING ALPHA INTO ANYY.
+    (line 9, character 14):
+    Basic (14 entries):
+        NUM
+        ALPHA [wrong type]
+        ANYY [wrong type]
+        ADDRESS
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (14 entries):
+        NUM
+        ALPHA [wrong type]
+        ANYY [wrong type]
+        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:10.21:
+       7           01 ALPHA PIC X.
+       8           01 ANYY USAGE BIT.
+       9           PROCEDURE DIVISION.
+      10 >           ADD NUM TO NUM.
+    ----                        ^
+      11             DISPLAY ANYY.
+      12             UNSTRING ALPHA INTO ANYY.
+    (line 9, character 21):
+    Basic (13 entries):
+        NUM
+        ALPHA [wrong type]
+        ANYY [wrong type]
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (13 entries):
+        NUM
+        ALPHA [wrong type]
+        ANYY [wrong type]
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS GIVING
+    __rootdir__/prog.cob:11.18:
+       8           01 ANYY USAGE BIT.
+       9           PROCEDURE DIVISION.
+      10             ADD NUM TO NUM.
+      11 >           DISPLAY ANYY.
+    ----                     ^
+      12             UNSTRING ALPHA INTO ANYY.
+      13             SEC SECTION.
+    (line 10, character 18):
+    Basic (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:12.19:
+       9           PROCEDURE DIVISION.
+      10             ADD NUM TO NUM.
+      11             DISPLAY ANYY.
+      12 >           UNSTRING ALPHA INTO ANYY.
+    ----                      ^
+      13             SEC SECTION.
+      14             MULTIPLY NUM BY NUM
+    (line 11, character 19):
+    Basic (12 entries):
+        NUM [wrong type]
+        ALPHA
+        ANYY [wrong type]
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM [wrong type]
+        ALPHA
+        ANYY [wrong type]
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:12.30:
+       9           PROCEDURE DIVISION.
+      10             ADD NUM TO NUM.
+      11             DISPLAY ANYY.
+      12 >           UNSTRING ALPHA INTO ANYY.
+    ----                                 ^
+      13             SEC SECTION.
+      14             MULTIPLY NUM BY NUM
+    (line 11, character 30):
+    Basic (12 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:16.20:
+      13             SEC SECTION.
+      14             MULTIPLY NUM BY NUM
+      15             ON SIZE ERROR
+      16 >             DISPLAY ANYY
+    ----                       ^
+      17             END-MULTIPLY.
+      18             STOP RUN.
+    (line 15, character 20):
+    Basic (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS |}];;
+
+let%expect_test "semantic-while-writing-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 NUM PIC 9.
+        01 ALPHA PIC X.
+        01 ANYY USAGE BIT.
+        PROCEDURE DIVISION.
+          ADD _|_
+
+          DISPLAY _|_
+
+          UNSTRING _|_
+          STOP RUN.
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":14},"start":{"character":10,"line":14}},"severity":1},{"message":"Missing <identifier> INTO","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:10.14:
+       7           01 ALPHA PIC X.
+       8           01 ANYY USAGE BIT.
+       9           PROCEDURE DIVISION.
+      10 >           ADD
+    ----                 ^
+      11
+      12             DISPLAY
+    (line 9, character 14):
+    Basic (14 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (14 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:12.18:
+       9           PROCEDURE DIVISION.
+      10             ADD
+      11
+      12 >           DISPLAY
+    ----                     ^
+      13
+      14             UNSTRING
+    (line 11, character 18):
+    Basic (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (18 entries):
+        NUM
+        ALPHA
+        ANYY
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:14.19:
+      11
+      12             DISPLAY
+      13
+      14 >           UNSTRING
+    ----                      ^
+      15             STOP RUN.
+      16
+    (line 13, character 19):
+    Basic (12 entries):
+        NUM [wrong type]
+        ALPHA
+        ANYY [wrong type]
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM [wrong type]
+        ALPHA
+        ANYY [wrong type]
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER |}];;
 
 let%expect_test "control-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|

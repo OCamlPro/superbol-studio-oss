@@ -105,21 +105,23 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
     object (v)
       inherit [acc] Cobol_unit.Visitor.folder
 
-      method! fold' _ acc =
+      method! fold_cobol_unit cu acc =
+        acc
+        |> Cobol_unit.Visitor.fold_procedure v cu.unit_procedure
+        |> skip
+
+      method! fold' { loc; _ } acc =
         if acc.after_pos
         then skip acc
-        else do_children acc
-
-      method! fold_qualname' { loc; _ } ({ context; _ } as acc) =
-        try
-          let (start, _) = Cobol_common.Srcloc.lexloc_in ~filename loc in
-          let start = start.pos_lnum - 1, start.pos_cnum - start.pos_bol in
-          let pos = (pos.line, pos.character) in
-          if start <= pos
-          then skip { acc with value = context }
-          else skip { acc with after_pos = true }
-        with Invalid_argument _ ->
-          skip acc
+        else try
+            let (start, _) = Cobol_common.Srcloc.lexloc_in ~filename loc in
+            let start = start.pos_lnum - 1, start.pos_cnum - start.pos_bol in
+            let pos = (pos.line, pos.character) in
+            if start <= pos
+            then do_children { acc with value = acc.context }
+            else skip { acc with after_pos = true }
+          with Invalid_argument _ ->
+            skip acc
 
       (* add / subtract *)
       method! fold_basic_arithmetic_operands o acc =
