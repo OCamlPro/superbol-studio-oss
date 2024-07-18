@@ -260,6 +260,51 @@ module Data
     |> result
 end
 
+module Env
+  : T with type t = Cobol_ptree.environment_division Cobol_common.with_loc
+= struct
+  type t = Cobol_ptree.environment_division Cobol_common.with_loc
+  type acc = doc_symbol list
+  let init_acc = []
+
+  let folder range_from: acc Cobol_ptree.Visitor.folder =
+    let module_folder ?(skip=false) ~name loc acc =
+      let range = range_from ~loc in
+      let parent = create
+          ~kind:Module
+          ~range
+          ~selectionRange:range
+          ~name
+      in
+      if skip
+      then
+        Visitor.skip (parent () :: acc)
+      else
+      Visitor.do_children_and_then init_acc
+        begin fun children ->
+          parent ~children:(List.rev children) () :: acc
+        end
+    in
+    object
+      inherit [acc] Cobol_ptree.Visitor.folder
+
+      method! fold_environment_division' { loc; _ } =
+        module_folder ~name:"ENVIRONMENT DIVISION" loc
+
+      method! fold_configuration_section' { loc; _ } =
+        module_folder ~skip:true ~name:"CONFIGURATION SECTION" loc
+
+      method! fold_input_output_section' { loc; _ } =
+        module_folder ~skip:true ~name:"INPUT-OUTPUT SECTION" loc
+    end
+
+  let fold range_from env_div =
+    Cobol_ptree.Visitor.fold_environment_division'
+      (folder range_from)
+      env_div
+      init_acc
+end
+
 let retrieve ~uri ptree : Lsp.Types.DocumentSymbol.t list =
   let filename = Lsp.Uri.to_path uri in
   let range_from ~loc = Lsp_position.range_of_srcloc_in ~filename loc in
@@ -286,11 +331,15 @@ let retrieve ~uri ptree : Lsp.Types.DocumentSymbol.t list =
           :: acc
         end
 
-    method! fold_data_division' data_div acc =
-      let result = Data.fold range_from data_div in
+    method! fold_environment_division' div acc =
+      let result = Env.fold range_from div in
       Visitor.skip (result @ acc)
 
-    method! fold_procedure_division' proc_div acc =
-      let result = Proc.fold range_from proc_div in
+    method! fold_data_division' div acc =
+      let result = Data.fold range_from div in
+      Visitor.skip (result @ acc)
+
+    method! fold_procedure_division' div acc =
+      let result = Proc.fold range_from div in
       Visitor.skip (result @ acc)
   end ptree []

@@ -208,10 +208,40 @@ let%expect_test "datadiv-symbol" =
             01 zz(Variable)	18:8 -> 19:22
               02 yy(Variable)	19:10 -> 19:22 |}]
 
+let%expect_test "envdiv-symbol" =
+  let end_with_postproc = document_symbol {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        ENVIRONMENT DIVISION.
+        CONFIGURATION SECTION.
+        SOURCE-COMPUTER.
+          LINUX.
+        REPOSITORY.
+          FUNCTION ALL INTRINSIC.
+        INPUT-OUTPUT SECTION.
+        FILE-CONTROL.
+        I-O-CONTROL.
+        END PROGRAM prog.
+  |cobol}
+ in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    Doc symbols (4 total):
+      PROGRAM-ID. prog(Module)	1:8 -> 12:25
+        ENVIRONMENT DIVISION(Module)	3:8 -> 11:20
+          CONFIGURATION SECTION(Module)	4:8 -> 8:33
+          INPUT-OUTPUT SECTION(Module)	9:8 -> 11:20 |}]
+
+
 let%expect_test "many-division-symbol" =
   let end_with_postproc = document_symbol {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
+        ENVIRONMENT DIVISION.
+        CONFIGURATION SECTION.
+        SOURCE-COMPUTER.
+          LINUX.
         DATA DIVISION.
         LOCAL-STORAGE SECTION.
         01 aa PIC X USAGE DISPLAY.
@@ -225,13 +255,15 @@ let%expect_test "many-division-symbol" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    Doc symbols (8 total):
-      PROGRAM-ID. prog(Module)	1:8 -> 10:25
-        DATA DIVISION(Module)	3:8 -> 7:34
-          WORKING-STORAGE SECTION(Module)	6:8 -> 7:34
-            01 bb(Variable)	7:8 -> 7:34
-          LOCAL-STORAGE SECTION(Module)	4:8 -> 5:34
-            01 aa(Variable)	5:8 -> 5:34
-        PROCEDURE DIVISION(Module)	8:8 -> 9:15
-          para(Function)	9:10 -> 9:15 |}]
+    Doc symbols (10 total):
+      PROGRAM-ID. prog(Module)	1:8 -> 14:25
+        ENVIRONMENT DIVISION(Module)	3:8 -> 6:16
+          CONFIGURATION SECTION(Module)	4:8 -> 6:16
+        DATA DIVISION(Module)	7:8 -> 11:34
+          WORKING-STORAGE SECTION(Module)	10:8 -> 11:34
+            01 bb(Variable)	11:8 -> 11:34
+          LOCAL-STORAGE SECTION(Module)	8:8 -> 9:34
+            01 aa(Variable)	9:8 -> 9:34
+        PROCEDURE DIVISION(Module)	12:8 -> 13:15
+          para(Function)	13:10 -> 13:15 |}]
 
