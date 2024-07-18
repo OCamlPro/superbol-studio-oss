@@ -577,6 +577,56 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
       Some (Lsp_folding.ranges_in ~filename ptree group)
     end
 
+(** { Document Symbol } *)
+
+let _u _f =
+  let pos = Position.create ~line:1 ~character:1 in
+  let range = Range.create ~end_:pos ~start:pos in
+  let l kind name = DocumentSymbol.create ()
+  ~kind
+  ~name
+  ~range
+  ~selectionRange:range
+  in
+  Some(`DocumentSymbol [
+    l File "File";
+    l Module "Module";
+    l Namespace "Namespace";
+    l Package "Package";
+    l Class "Class";
+    l Method "Method";
+    l Property "Property";
+    l Field "Field";
+    l Constructor "Constructor";
+    l Enum "Enum";
+    l Interface "Interface";
+    l Function "Function";
+    l Variable "Variable";
+    l Constant "Constant";
+    l String "String";
+    l Number "Number";
+    l Boolean "Boolean";
+    l Array "Array";
+    l Object "Object";
+    l Key "Key";
+    l Null "Null";
+    l EnumMember "EnumMember";
+    l Struct "Struct";
+    l Event "Event";
+    l Operator "Operator";
+    l TypeParameter "TypeParameter";
+      ])
+
+
+let handle_document_symbol registry (params: DocumentSymbolParams.t) =
+  try_with_main_document_data registry params.textDocument
+    ~f:begin fun ~doc { ptree; _ }->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      match Lsp_document_symbol.retrieve ~uri ptree with
+      | [] -> _u ()
+      | l -> Some (`DocumentSymbol l)
+    end
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -622,6 +672,8 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
+    | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
+        Ok (handle_document_symbol registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
@@ -633,7 +685,6 @@ let on_request
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) _
     | WorkspaceSymbol  (* WorkspaceSymbolParams.t.t *) _
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
@@ -694,5 +745,6 @@ module INTERNAL = struct
   let lookup_references = handle_references
   let hover = handle_hover
   let completion = handle_completion
+  let document_symbol = handle_document_symbol
   let formatting = handle_formatting
 end
