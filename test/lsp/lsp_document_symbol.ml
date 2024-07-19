@@ -267,3 +267,237 @@ let%expect_test "many-division-symbol" =
         PROCEDURE DIVISION(Module)	12:8 -> 13:15
           para(Function)	13:10 -> 13:15 |}]
 
+let%expect_test "object-symbol" =
+  let end_with_postproc = document_symbol {cobol|
+    CLASS-ID. Account INHERITS Base.
+    ENVIRONMENT DIVISION.
+    CONFIGURATION SECTION.
+    REPOSITORY.
+    CLASS Base.
+
+    FACTORY.
+    DATA DIVISION.
+    WORKING-STORAGE SECTION.
+    01 number-of-accounts PIC 9(5) VALUE ZERO.
+    PROCEDURE DIVISION.
+
+    METHOD-ID. newAccount
+    DATA DIVISION.
+    LOCAL-STORAGE SECTION.
+    LINKAGE SECTION.
+    01 an-object USAGE IS OBJECT REFERENCE ACTIVE-CLASS.
+    PROCEDURE DIVISION RETURNING an-object.
+    begin-here.
+      INVOKE SELF "new" RETURNING an-object.
+      INVOKE an-object "initializeAccount" USING BY CONTENT number-of-accounts.
+      GOBACK.
+    END METHOD newAccount.
+
+    METHOD-ID. addAccount
+    PROCEDURE DIVISION.
+    method-start.
+      ADD 1 TO number-of-accounts.
+      GOBACK.
+    END METHOD addAccount.
+
+    METHOD-ID. removeAccount
+    PROCEDURE DIVISION.
+    main-entry.
+      SUBTRACT 1 FROM number-of-accounts.
+      GOBACK.
+    END METHOD removeAccount.
+    END FACTORY.
+
+    OBJECT.
+    DATA DIVISION.
+    WORKING-STORAGE SECTION.
+    01 account-balance PIC S9(9)V99.
+    01 account-number PIC X(9).
+    01 the-date PIC 9(8).
+    PROCEDURE DIVISION.
+
+    METHOD-ID. displayUI
+    DATA DIVISION.
+    LOCAL-STORAGE SECTION.
+    01 in-data.
+      03 action-type PIC X.
+      03 in-amount PIC S9(9)V99.
+      03 in-wrk PIC X(12).
+    PROCEDURE DIVISION.
+    method-start.
+      DISPLAY "Enter D for Deposit, B for Balance or W for Withdrawal"
+      ACCEPT in-data
+      EVALUATE action-type
+        WHEN "D"
+          PERFORM get-amount
+          INVOKE SELF "deposit" USING in-amount
+        WHEN "W"
+          PERFORM get-amount
+          INVOKE SELF "withdraw" USING in-amount
+        WHEN "B"
+          INVOKE SELF "balance"
+        WHEN OTHER
+          DISPLAY "Enter valid transaction type."
+          GOBACK
+      END-EVALUATE
+      GOBACK.
+    get-amount.
+      DISPLAY "Enter amount 9(9).99"
+      ACCEPT in-wrk
+      COMPUTE in-amount = FUNCTION NUMVAL (in-wrk).
+    END METHOD displayUI.
+
+    METHOD-ID. balance
+    DATA DIVISION.
+    LOCAL-STORAGE SECTION.
+    01 display-balance PIC ZZZ,ZZZ,ZZ9.99B.
+    PROCEDURE DIVISION.
+    disp-balance.
+      MOVE account-balance to display-balance
+      DISPLAY "Your Account Balance is:" display-balance
+      GOBACK.
+    END METHOD balance.
+
+    METHOD-ID. deposit
+    DATA DIVISION.
+    LINKAGE SECTION.
+    01 in-deposit PIC S9(9)V99.
+    PROCEDURE DIVISION USING in-deposit.
+    make-deposit.
+      ADD in-deposit TO account-balance
+      GOBACK.
+    END METHOD deposit.
+
+    METHOD-ID. withdraw
+    DATA DIVISION.
+    LINKAGE SECTION.
+    01 in-withdraw PIC S9(9)V99.
+    PROCEDURE DIVISION USING in-withdraw.
+    withdraw-start.
+      IF account-balance >= in-withdraw
+        SUBTRACT in-withdraw FROM account-balance
+      ELSE
+        DISPLAY "Your Balance is Inadequate"
+      END-IF
+      GOBACK.
+    END METHOD withdraw.
+
+    METHOD-ID. initializeAccount
+    DATA DIVISION.
+    LINKAGE SECTION.
+    01 new-account-number PIC 9(5).
+    PROCEDURE DIVISION USING new-account-number.
+    Begin-initialization.
+      MOVE ZERO TO account-balance
+      MOVE new-account-number TO account-number
+      MOVE FUNCTION CURRENT-DATE (1: 8) TO the-date
+      GOBACK.
+    END METHOD initializeAccount.
+    END OBJECT.
+    END CLASS Account.
+  |cobol}
+ in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    Doc symbols (60 total):
+      CLASS-ID. Account(Class)	1:4 -> 126:22
+        ENVIRONMENT DIVISION(Module)	2:4 -> 5:15
+          CONFIGURATION SECTION(Module)	3:4 -> 5:15
+        FACTORY.(Object)	7:4 -> 38:16
+          DATA DIVISION(Module)	8:4 -> 10:46
+            WORKING-STORAGE SECTION(Module)	9:4 -> 10:46
+              01 number-of-accounts(Variable)	10:4 -> 10:46
+          METHOD-ID. newAccount(Method)	13:4 -> 23:26
+            DATA DIVISION(Module)	14:4 -> 17:56
+              LINKAGE SECTION(Module)	16:4 -> 17:56
+                01 an-object(Variable)	17:4 -> 17:56
+              LOCAL-STORAGE SECTION(Module)	15:4 -> 15:26
+            PROCEDURE DIVISION(Module)	18:4 -> 22:13
+              begin-here(Function)	19:4 -> 22:13
+          METHOD-ID. addAccount(Method)	25:4 -> 30:26
+            PROCEDURE DIVISION(Module)	26:4 -> 29:13
+              method-start(Function)	27:4 -> 29:13
+          METHOD-ID. removeAccount(Method)	32:4 -> 37:29
+            PROCEDURE DIVISION(Module)	33:4 -> 36:13
+              main-entry(Function)	34:4 -> 36:13
+        OBJECT.(Object)	40:4 -> 125:15
+          DATA DIVISION(Module)	41:4 -> 45:25
+            WORKING-STORAGE SECTION(Module)	42:4 -> 45:25
+              01 account-balance(Variable)	43:4 -> 43:36
+              01 account-number(Variable)	44:4 -> 44:31
+              01 the-date(Variable)	45:4 -> 45:25
+          METHOD-ID. displayUI(Method)	48:4 -> 77:25
+            DATA DIVISION(Module)	49:4 -> 54:26
+              LOCAL-STORAGE SECTION(Module)	50:4 -> 54:26
+                01 in-data(Variable)	51:4 -> 54:26
+                  03 action-type(Variable)	52:6 -> 52:27
+                  03 in-amount(Variable)	53:6 -> 53:32
+                  03 in-wrk(Variable)	54:6 -> 54:26
+            PROCEDURE DIVISION(Module)	55:4 -> 76:51
+              method-start(Function)	56:4 -> 72:13
+              get-amount(Function)	73:4 -> 76:51
+          METHOD-ID. balance(Method)	79:4 -> 88:23
+            DATA DIVISION(Module)	80:4 -> 82:43
+              LOCAL-STORAGE SECTION(Module)	81:4 -> 82:43
+                01 display-balance(Variable)	82:4 -> 82:43
+            PROCEDURE DIVISION(Module)	83:4 -> 87:13
+              disp-balance(Function)	84:4 -> 87:13
+          METHOD-ID. deposit(Method)	90:4 -> 98:23
+            DATA DIVISION(Module)	91:4 -> 93:31
+              LINKAGE SECTION(Module)	92:4 -> 93:31
+                01 in-deposit(Variable)	93:4 -> 93:31
+            PROCEDURE DIVISION(Module)	94:4 -> 97:13
+              make-deposit(Function)	95:4 -> 97:13
+          METHOD-ID. withdraw(Method)	100:4 -> 112:24
+            DATA DIVISION(Module)	101:4 -> 103:32
+              LINKAGE SECTION(Module)	102:4 -> 103:32
+                01 in-withdraw(Variable)	103:4 -> 103:32
+            PROCEDURE DIVISION(Module)	104:4 -> 111:13
+              withdraw-start(Function)	105:4 -> 111:13
+          METHOD-ID. initializeAccount(Method)	114:4 -> 124:33
+            DATA DIVISION(Module)	115:4 -> 117:35
+              LINKAGE SECTION(Module)	116:4 -> 117:35
+                01 new-account-number(Variable)	117:4 -> 117:35
+            PROCEDURE DIVISION(Module)	118:4 -> 123:13
+              Begin-initialization(Function)	119:4 -> 123:13 |}]
+
+let%expect_test "interface-symbol" =
+  let end_with_postproc = document_symbol {cobol|
+    INTERFACE-ID. BaseFactoryInterface.
+    PROCEDURE DIVISION.
+    METHOD-ID. New2
+    DATA DIVISION.
+    LINKAGE SECTION.
+    01 outObject USAGE OBJECT REFERENCE ACTIVE-CLASS.
+    PROCEDURE DIVISION RETURNING outObject.
+    END METHOD New2.
+    END INTERFACE BaseFactoryInterface.
+
+    INTERFACE-ID. Interface.
+    PROCEDURE DIVISION.
+    METHOD-ID. FactoryObject
+    DATA DIVISION.
+    LINKAGE SECTION.
+    01 outFactory USAGE OBJECT REFERENCE FACTORY OF ACTIVE-CLASS.
+    PROCEDURE DIVISION RETURNING outFactory.
+    END METHOD FactoryObject.
+    END INTERFACE BaseInterface.
+|cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    Doc symbols (12 total):
+      INTERFACE-ID. BaseFactoryInterface(Interface)	1:4 -> 9:39
+        METHOD-ID. New2(Method)	3:4 -> 8:20
+          DATA DIVISION(Module)	4:4 -> 6:53
+            LINKAGE SECTION(Module)	5:4 -> 6:53
+              01 outObject(Variable)	6:4 -> 6:53
+          PROCEDURE DIVISION(Module)	7:4 -> 7:43
+      INTERFACE-ID. INTERFACE(Interface)	11:4 -> 19:32
+        METHOD-ID. FactoryObject(Method)	13:4 -> 18:29
+          DATA DIVISION(Module)	14:4 -> 16:65
+            LINKAGE SECTION(Module)	15:4 -> 16:65
+              01 outFactory(Variable)	16:4 -> 16:65
+          PROCEDURE DIVISION(Module)	17:4 -> 17:44 |}]

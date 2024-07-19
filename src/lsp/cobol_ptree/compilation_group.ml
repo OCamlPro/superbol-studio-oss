@@ -253,8 +253,8 @@ type class_definition =
     class_usings: name with_loc list;
     class_options: options_paragraph with_loc option;
     class_env: environment_division with_loc option;
-    class_factory: factory_definition option;
-    class_instance: instance_definition option;
+    class_factory: factory_definition with_loc option;
+    class_instance: instance_definition with_loc option;
     class_end_name: name_or_literal with_loc;
   }
 [@@deriving ord]
@@ -279,8 +279,8 @@ let pp_class_definition ppf
     Fmt.(sp ++ pp_class_id_paragraph) (cn, cas, f, inh, us)
     Fmt.[ Option.map (const (pp_with_loc pp_options_paragraph)) opts;
           Option.map (const (pp_with_loc pp_environment_division)) env;
-          Option.map (const pp_factory_definition) fac;
-          Option.map (const pp_instance_definition) inst ]
+          Option.map (const (pp_with_loc pp_factory_definition)) fac;
+          Option.map (const (pp_with_loc pp_instance_definition)) inst ]
 
 
 type interface_definition =
