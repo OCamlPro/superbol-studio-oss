@@ -24,15 +24,9 @@ val config
   -> unit
   -> config
 
-type return =
-  {
-    items: Lsp.Types.CompletionItem.t list;
-    isIncomplete: bool;
-  }
-
-val context_completion_items
+val context_completion_list
   : config:config
   -> Lsp_document.t
   -> Lsp_document.checked_doc
   -> Lsp.Types.Position.t
-  -> return
+  -> Lsp.Types.CompletionList.t

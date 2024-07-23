@@ -207,13 +207,7 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-type return =
-  {
-    items: CompletionItem.t list;
-    isIncomplete: bool;
-  }
-
-let context_completion_items ~config
+let context_completion_list ~config
     (doc:Lsp_document.t)
     Cobol_typeck.Outputs.{ group; _ }
     (pos:Position.t) =
@@ -222,11 +216,11 @@ let context_completion_items ~config
   let pointwise = range.start.character == range.end_.character in
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
     | Some Env env ->
-      {
-        items =
-          map_completion_items ~range ~case ~group ~filename
-          @@ expected_tokens ~eager:config.eager env;
-        isIncomplete = pointwise
-      }
-    | _ -> { items = []; isIncomplete = true } end
+      let items =
+        map_completion_items ~range ~case ~group ~filename
+        @@ expected_tokens ~eager:config.eager env
+      in
+      CompletionList.create () ~isIncomplete:pointwise ~items
+    | _ -> CompletionList.create () ~isIncomplete:true ~items:[]
+  end
 
