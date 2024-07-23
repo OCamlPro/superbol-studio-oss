@@ -24,11 +24,11 @@ type comp_category =
   (* numedited, boolean, procedure_pointer, group *)
 
 let pp_comp_category ppf = Fmt.(function
-  | Alphanum -> string ppf "Alphanum"
-  | Numeric -> string ppf "Numeric"
-  | NumericEdited -> string ppf "NumericEdited"
-  | Group -> string ppf "Group"
-  | Any -> string ppf "Any")
+    | Alphanum -> string ppf "Alphanum"
+    | Numeric -> string ppf "Numeric"
+    | NumericEdited -> string ppf "NumericEdited"
+    | Group -> string ppf "Group"
+    | Any -> string ppf "Any")
 
 let category_of_pic ({ category; _ }: picture) =
   match category with
@@ -73,10 +73,10 @@ let category_of_datadef : data_definition -> (comp_category * bool) = fun d ->
       | Struct_field _ -> (Alphanum, true)
     end
   | Data_renaming { def; _} -> begin
-    match ~&def.renaming_layout with
-    | Renamed_elementary { usage } -> (category_of_usage usage, false)
-    | Renamed_struct _ -> (Alphanum, true)
-  end
+      match ~&def.renaming_layout with
+      | Renamed_elementary { usage } -> (category_of_usage usage, false)
+      | Renamed_struct _ -> (Alphanum, true)
+    end
   | Data_condition _
   | Table_index _ ->
     (Any, false)
@@ -236,9 +236,9 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
 
       method! fold_invoke' { payload = i; _ } acc =
         acc
-          |> (* object ref + 4byte*) fold_ident v i.invoke_target
-          |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
-          |> skip
+        |> (* object ref + 4byte*) fold_ident v i.invoke_target
+        |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
+        |> skip
 
       method! fold_move' { payload = m; _ } acc =
         begin match m with
@@ -251,7 +251,7 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
         |> skip
 
       method! fold_multiply_operands mo acc =
-          begin match mo with
+        begin match mo with
           | MultiplyBy b ->
             acc
             |> Numeric @>@ fold_scalar v b.multiplier

@@ -73,7 +73,7 @@ let%expect_test "case-detection-testing-completion" =
         PROCEDURE di_|_vision.
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -115,7 +115,7 @@ _|_        PROGRAM-ID. prog.
           DISPLAY FUNCTION MIN(1 2)_|_
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -727,7 +727,7 @@ let%expect_test "datadiv-completion" =
           DISPLAY DATA-NAME.
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
