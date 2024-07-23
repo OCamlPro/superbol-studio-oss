@@ -559,10 +559,10 @@ let interface_id_paragraph :=                                      (* +COB2002 *
 
 let method_id_paragraph :=                                         (* +COB2002 *)
   | METHOD_ID; "."; i = name; slo = as__strlit_;
-    o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
+    o = bo(OVERRIDE); f = bo(IS?; FINAL; {}); ".";
     { i, NamedMethod { as_ = slo }, o, f }
   | METHOD_ID; "."; pk = property_kind; PROPERTY; i = name;
-    o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
+    o = bo(OVERRIDE); f = bo(IS?; FINAL; {}); ".";
     { i, PropertyMethod { kind = pk }, o, f }
 
 let options_paragraph [@context options_paragraph] :=              (* +COB2002 *)
