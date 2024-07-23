@@ -37,4 +37,8 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.DocumentFormattingParams.t
     -> Lsp.Types.TextEdit.t list option
+  val document_symbol
+    : Lsp_server.t
+    -> Lsp.Types.DocumentSymbolParams.t
+    -> [> `DocumentSymbol of Lsp.Types.DocumentSymbol.t list ] option
 end

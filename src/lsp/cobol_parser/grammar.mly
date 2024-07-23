@@ -397,8 +397,8 @@ class_definition [@cost 999]:
  | cid = class_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   fdo = io(factory_definition) (* Note: inline to avoid conflict *)
-   ido = ro(instance_definition)
+   fdo = io(loc(factory_definition)) (* Note: inline to avoid conflict *)
+   ido = ro(loc(instance_definition))
    END CLASS ec = unit_name "."
    { let _, (class_name, class_as, class_final,
              class_inherits, class_usings) = cid in

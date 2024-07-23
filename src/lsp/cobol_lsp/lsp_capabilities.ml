@@ -58,3 +58,4 @@ let reply (_: ClientCapabilities.t) =
     ~foldingRangeProvider:(`Bool true)
     ~completionProvider:completion_option
     ~workspace
+    ~documentSymbolProvider:(`Bool true)

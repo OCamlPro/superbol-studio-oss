@@ -577,6 +577,16 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
       Some (Lsp_folding.ranges_in ~filename ptree group)
     end
 
+(** { Document Symbol } *)
+
+let handle_document_symbol registry (params: DocumentSymbolParams.t) =
+  try_with_main_document_data registry params.textDocument
+    ~f:begin fun ~doc { ptree; _ }->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
+      Some (`DocumentSymbol symbols)
+    end
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -622,6 +632,8 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
+    | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
+        Ok (handle_document_symbol registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
@@ -633,7 +645,6 @@ let on_request
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) _
     | WorkspaceSymbol  (* WorkspaceSymbolParams.t.t *) _
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
@@ -694,5 +705,6 @@ module INTERNAL = struct
   let lookup_references = handle_references
   let hover = handle_hover
   let completion = handle_completion
+  let document_symbol = handle_document_symbol
   let formatting = handle_formatting
 end

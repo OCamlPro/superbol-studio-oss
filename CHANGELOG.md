@@ -3,6 +3,7 @@
 ## [0.1.3] Next release
 
 ### Added
+- Support for LSP request `textDocument/documentSymbol` [#317](https://github.com/OCamlPro/superbol-studio-oss/pull/317)
 - Context-sensitive completion for keywords and user-defined words [#304](https://github.com/OCamlPro/superbol-studio-oss/pull/304), [#312](https://github.com/OCamlPro/superbol-studio-oss/pull/312), [#314](https://github.com/OCamlPro/superbol-studio-oss/pull/314)
 - Internal support for inspecting the parser's state right before EOF [#302](https://github.com/OCamlPro/superbol-studio-oss/pull/302)
 - Show data item information on hover [#293](https://github.com/OCamlPro/superbol-studio-oss/pull/293) [#305](https://github.com/OCamlPro/superbol-studio-oss/pull/305)

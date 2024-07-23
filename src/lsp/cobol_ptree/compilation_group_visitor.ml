@@ -38,8 +38,11 @@ class virtual ['a] folder = object
   method fold_function_unit        : (function_unit                , 'a) fold = default
   method fold_function_unit'       : (function_unit with_loc       , 'a) fold = default
   method fold_method_definition    : (method_definition            , 'a) fold = default
+  method fold_method_definition'   : (method_definition with_loc   , 'a) fold = default
   method fold_factory_definition   : (factory_definition           , 'a) fold = default
+  method fold_factory_definition'  : (factory_definition with_loc  , 'a) fold = default
   method fold_instance_definition  : (instance_definition          , 'a) fold = default
+  method fold_instance_definition' : (instance_definition with_loc , 'a) fold = default
   method fold_class_definition'    : (class_definition with_loc    , 'a) fold = default
   method fold_interface_definition': (interface_definition with_loc, 'a) fold = default
   method fold_compilation_unit'    : (compilation_unit with_loc    , 'a) fold = default
@@ -139,8 +142,11 @@ let fold_method_definition (v: _#folder) =
       >> fold_name' v method_end_name                         (* XXX: useful? *)
     end
 
+let fold_method_definition' (v: _#folder) =
+  handle' v#fold_method_definition' ~fold:fold_method_definition v
+
 let fold_method_definitions (v: _#folder) =
-  fold_with_loc_list ~fold:fold_method_definition v
+  fold_list ~fold:fold_method_definition' v
 
 let fold_method_definitions' (v: _#folder) =
   fold' ~fold:fold_method_definitions v
@@ -159,6 +165,9 @@ let fold_factory_definition (v: _#folder) =
       >> fold_method_definitions'_opt v factory_methods
     end
 
+let fold_factory_definition' (v: _#folder) =
+  handle' v#fold_factory_definition' ~fold:fold_factory_definition v
+
 let fold_instance_definition (v: _#folder) =
   handle v#fold_instance_definition
     ~continue:begin fun { instance_implements; instance_options; instance_env;
@@ -169,6 +178,9 @@ let fold_instance_definition (v: _#folder) =
       >> fold_data_division'_opt v instance_data
       >> fold_method_definitions'_opt v instance_methods
     end
+
+let fold_instance_definition' (v: _#folder) =
+  handle' v#fold_instance_definition' ~fold:fold_instance_definition v
 
 let fold_class_definition' (v: _#folder) =
   handle' v#fold_class_definition' v
@@ -182,8 +194,8 @@ let fold_class_definition' (v: _#folder) =
       >> fold_name'_list v class_usings
       >> fold_options_paragraph'_opt v class_options
       >> fold_environment_division'_opt v class_env
-      >> fold_option ~fold:fold_factory_definition v class_factory
-      >> fold_option ~fold:fold_instance_definition v class_instance
+      >> fold_option ~fold:fold_factory_definition' v class_factory
+      >> fold_option ~fold:fold_instance_definition' v class_instance
       >> fold_name_or_literal' v class_end_name
     end
 
