@@ -3836,11 +3836,10 @@ let%expect_test "semantic-while-writing-completion" =
           DISPLAY _|_
 
           UNSTRING _|_
-          STOP RUN.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":14,"line":14},"start":{"character":10,"line":14}},"severity":1},{"message":"Missing <identifier> INTO","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":2,"line":14},"start":{"character":0,"line":14}},"severity":1},{"message":"Missing <identifier> INTO .","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     __rootdir__/prog.cob:10.14:
        7           01 ALPHA PIC X.
        8           01 ANYY USAGE BIT.
@@ -3933,8 +3932,7 @@ let%expect_test "semantic-while-writing-completion" =
       13
       14 >           UNSTRING
     ----                      ^
-      15             STOP RUN.
-      16
+      15
     (line 13, character 19):
     Basic (12 entries):
         NUM wrong type
