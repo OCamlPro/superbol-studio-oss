@@ -45,7 +45,7 @@ let complete_section { result; prev_section; buffer=children } =
     create ~kind:Function ~name ~range ~children ()
     :: result
 
-let proc_folder range_from: proc_acc Cobol_ptree.Visitor.folder =
+let proc_folder range_from : proc_acc Cobol_ptree.Visitor.folder =
   object
     inherit [proc_acc] Cobol_ptree.Visitor.folder
 
@@ -66,7 +66,7 @@ let proc_folder range_from: proc_acc Cobol_ptree.Visitor.folder =
     method! fold_paragraph' { loc; payload = p } acc =
       let range = range_from ~loc in
       let name = Option.fold
-          ~none:"Unnamed paragraph"
+          ~none:"Anonymous paragraph"
           ~some:(fun s' ->
               ~&s' ^ if p.paragraph_is_section then " SECTION" else "" )
           p.paragraph_name in
@@ -120,18 +120,17 @@ let rec complete_entries current_level acc  =
     complete_entries current_level { acc with previous = prev2::tl }
 
 let data_folder range_from : data_acc Cobol_ptree.Visitor.folder =
-  let parent_folder: type a. _ =
-    fun name ({ loc; _ }: a with_loc) acc ->
-      let range = range_from ~loc in
-      let parent = create ~kind:Function ~range ~name in
-      Visitor.do_children_and_then data_init_acc
-        begin fun inner_acc ->
-          let { result = children; _ } = complete_entries 0 inner_acc in
-          {
-            result = parent ~children () :: acc.result;
-            previous = [];
-          }
-        end
+  let parent_folder (type a) name ({ loc; _ }: a with_loc) acc =
+    let range = range_from ~loc in
+    let parent = create ~kind:Function ~range ~name in
+    Visitor.do_children_and_then data_init_acc
+      begin fun inner_acc ->
+        let { result = children; _ } = complete_entries 0 inner_acc in
+        {
+          result = parent ~children () :: acc.result;
+          previous = [];
+        }
+      end
   in
   object
     inherit [data_acc] Cobol_ptree.Visitor.folder
@@ -174,8 +173,7 @@ let data_folder range_from : data_acc Cobol_ptree.Visitor.folder =
         ^ " "
         ^ data_name
       in
-      let level = if true_level == 77 then 01 else true_level
-      in
+      let level = if true_level == 77 then 01 else true_level in
       let current = { range; name; level; buffer = [] } in
       let acc = complete_entries current.level acc in
       { acc with previous = current::acc.previous }
@@ -222,16 +220,17 @@ type env_acc = doc_symbol list
 let env_init_acc = []
 
 let env_folder range_from : env_acc Cobol_ptree.Visitor.folder =
-  let parent_folder: type a. _ =
-    fun ?(skip=false) name ({ loc; _ }: a Cobol_common.with_loc ) acc ->
-      let range = range_from ~loc in
-      let parent = create ~kind:Function ~range ~name in
-      if skip
-      then
-        Visitor.skip (parent () :: acc)
-      else
-        Visitor.do_children_and_then env_init_acc
-          begin fun children -> parent ~children () :: acc end
+  let parent_folder (type a)
+      ?(skip=false) name ({ loc; _ }: a Cobol_common.with_loc ) acc =
+    let range = range_from ~loc in
+    let parent = create ~kind:Function ~range ~name in
+    if skip
+    then
+      Visitor.skip (parent () :: acc)
+    else
+      Visitor.do_children_and_then env_init_acc begin fun children ->
+        parent ~children () :: acc
+      end
   in
   object
     inherit [env_acc] Cobol_ptree.Visitor.folder
@@ -276,8 +275,7 @@ let from_ptree_at ~uri ptree : DocumentSymbol.t list =
   let string_of_name_or_lit (name_or_lit: name_or_literal) =
     let s = Pretty.to_string "%a" pp_term name_or_lit in s
   in
-  let parent_folder: type a. _ =
-    fun ~kind name ({ loc; payload }: a with_loc) acc ->
+  let parent_folder (type a) ~kind name ({ loc; payload }: a with_loc) acc =
       let range = range_from ~loc in
       let name =  name payload in
       Visitor.do_children_and_then []

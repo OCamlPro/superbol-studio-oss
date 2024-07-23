@@ -152,10 +152,10 @@ let%expect_test "procedure-symbol" =
           para1(Function)	21:10 -> 21:16
       PROGRAM-ID. anon(Function)	24:8 -> 28:25
         PROCEDURE DIVISION(Function)	26:8 -> 27:25
-          Unnamed paragraph(Function)	27:10 -> 27:25
+          Anonymous paragraph(Function)	27:10 -> 27:25
       PROGRAM-ID. anon_n_sec(Function)	30:8 -> 35:31
         PROCEDURE DIVISION(Function)	32:8 -> 34:23
-          Unnamed paragraph(Function)	33:10 -> 33:25
+          Anonymous paragraph(Function)	33:10 -> 33:25
           sec1 SECTION(Function)	34:10 -> 34:23
       PROGRAM-ID. emtpy(Function)	37:8 -> 40:26
         PROCEDURE DIVISION(Function)	39:8 -> 39:27 |}]
