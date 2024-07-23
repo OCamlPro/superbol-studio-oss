@@ -11,7 +11,7 @@
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
 ### Fixed
-- Improvements to the grammar [#310](https://github.com/OCamlPro/superbol-studio-oss/pull/310)
+- Improvements to the grammar [#310](https://github.com/OCamlPro/superbol-studio-oss/pull/310), [#319](https://github.com/OCamlPro/superbol-studio-oss/pull/319)
 - Internal mishandling of tokens when dealing with some `EXEC`/`END-EXEC` blocks [#301](https://github.com/OCamlPro/superbol-studio-oss/pull/301)
 - Internal pretty-printing routine for `EXEC`/`END-EXEC` blocks [#300](https://github.com/OCamlPro/superbol-studio-oss/pull/300)
 - Support for line continuations that start with a text word [#294](https://github.com/OCamlPro/superbol-studio-oss/pull/294)
