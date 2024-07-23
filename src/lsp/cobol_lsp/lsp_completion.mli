@@ -24,7 +24,7 @@ val config
   -> unit
   -> config
 
-val context_completion_list
+val contextual
   : config:config
   -> Lsp_document.t
   -> Lsp_document.checked_doc

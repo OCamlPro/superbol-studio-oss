@@ -61,8 +61,8 @@ module TYPES = struct
     | Numeric
     | NumericEdited
     | Group
+    | Pointer
     | Any
-    (* boolean, procedure_pointer *)
 end
 open TYPES
 
@@ -196,7 +196,7 @@ let element_at_position ~uri pos group : element_at_position =
 (* --- *)
 
 (* Using Lsp_position.sieve would be overkill for nodes that are close to the AST root, like COBOL units *)
-let cobol_unit_at_position ~filename pos group =
+let cobol_unit_at_pos ~filename pos group =
   Cobol_unit.Visitor.fold_unit_group object
     inherit [_] Cobol_unit.Visitor.folder
     method! fold_cobol_unit' cu acc =
@@ -205,7 +205,7 @@ let cobol_unit_at_position ~filename pos group =
       else Visitor.skip_children acc
   end group None
 
-let last_cobol_unit_before_position ~filename pos group =
+let last_cobol_unit_before_pos ~filename pos group =
   Cobol_unit.Visitor.fold_unit_group object
     inherit [_] Cobol_unit.Visitor.folder
     method! fold_cobol_unit' cu acc =
@@ -313,7 +313,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_allocate' { payload = al; _ } acc =
         acc
         |> fold_allocate_kind v al.allocate_kind
-        |> (* pointer || pointer32 *) fold_ident'_opt v al.allocate_returning
+        |> Pointer @>@ fold_ident'_opt v al.allocate_returning
         |> skip
 
       method! fold_call_prefix p acc =
@@ -362,7 +362,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_free' { payload = f; _ } acc =
         acc
-        |> (* pointer pointer32 *) fold_list ~fold:fold_name' v f
+        |> Pointer @>@ fold_list ~fold:fold_name' v f
         |> skip
 
       method! fold_goto' { payload = g; _ } acc =

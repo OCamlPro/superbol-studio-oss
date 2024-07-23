@@ -84,25 +84,33 @@ let approx_type_of_usage : usage -> approx_typing_info = function
   | Procedure_pointer
   | Function_pointer _
   | Pointer _
-  | Index
-  | Program_pointer _ -> Numeric
+  | Program_pointer _ -> Pointer
+  | Index -> Numeric
   | National _ -> Alphanum
   | Object_reference _
   | Bit _ -> Any
   | Display pic -> approx_type_of_pic pic
 
-let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) = fun d ->
-  match d with
-  | Data_field { def; _ } -> begin
-      match ~&def.field_layout with
-      | Elementary_field { usage; _ } -> (approx_type_of_usage usage, false)
-      | Struct_field _ -> (Alphanum, true)
-    end
-  | Data_renaming { def; _} -> begin
-      match ~&def.renaming_layout with
-      | Renamed_elementary { usage } -> (approx_type_of_usage usage, false)
-      | Renamed_struct _ -> (Alphanum, true)
-    end
+let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
+  function
+  | Data_field
+      { def = { payload = {
+            field_layout = Elementary_field { usage; _ };
+            _ }; _ }; _ }
+  | Data_renaming
+      { def = { payload = {
+            renaming_layout = Renamed_elementary { usage; _ };
+            _ }; _ }; _ } ->
+    (approx_type_of_usage usage, false)
+  | Data_field
+      { def = { payload = {
+            field_layout = Struct_field _;
+            _ }; _ }; _ }
+  | Data_renaming
+      { def = { payload = {
+            renaming_layout = Renamed_struct _;
+            _ }; _ }; _ } ->
+    (Alphanum, true)
   | Data_condition _
   | Table_index _ ->
     (Any, false)
@@ -119,7 +127,7 @@ let is_valid ~comp_categories data =
 
 let qualnames_proposal ~filename pos group : (string * bool) list =
   let comp_categories = Lsp_lookup.type_at_pos ~filename pos group in
-  match Lsp_lookup.last_cobol_unit_before_position ~filename pos group with
+  match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
     cu.unit_data.data_items.list
@@ -132,7 +140,7 @@ let qualnames_proposal ~filename pos group : (string * bool) list =
     |> List.flatten
 
 let procedures_proposal ~filename pos group =
-  match Lsp_lookup.last_cobol_unit_before_position ~filename pos group with
+  match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
     let paragraph_name (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
@@ -270,7 +278,7 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-let context_completion_list ~config
+let contextual ~config
     (doc:Lsp_document.t)
     Cobol_typeck.Outputs.{ group; _ }
     (pos:Position.t) =
@@ -284,6 +292,7 @@ let context_completion_list ~config
         @@ expected_tokens ~eager:config.eager env
       in
       CompletionList.create () ~isIncomplete:pointwise ~items
-    | _ -> CompletionList.create () ~isIncomplete:true ~items:[]
+    | _ ->
+        CompletionList.create () ~isIncomplete:true ~items:[]
   end
 

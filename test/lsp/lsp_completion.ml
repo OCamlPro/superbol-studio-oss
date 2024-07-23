@@ -3516,6 +3516,7 @@ let%expect_test "semantic-completion" =
         01 GROUPVAR.
           02 PIC X.
           02 PIC X.
+        01 POINT USAGE POINTER.
         PROCEDURE DIVISION.
           ADD _|_NUM TO _|_NUM.
           DISPLAY _|_ANYY.
@@ -3526,27 +3527,71 @@ let%expect_test "semantic-completion" =
           ON SIZE ERROR
             DISPLAY _|_ANYY
           END-MULTIPLY.
+          ALLOCATE name RETURNING _|_POINT.
           STOP RUN.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    __rootdir__/prog.cob:13.14:
-      10             02 PIC X.
+    __rootdir__/prog.cob:14.14:
       11             02 PIC X.
-      12           PROCEDURE DIVISION.
-      13 >           ADD NUM TO NUM.
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14 >           ADD NUM TO NUM.
     ----                 ^
-      14             DISPLAY ANYY.
-      15             UNSTRING ALPHA INTO ANYY.
-    (line 12, character 14):
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+    (line 13, character 14):
+    Basic (16 entries):
+        NUM
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
+        POINT wrong type
+        ADDRESS
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (16 entries):
+        NUM
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
+        POINT wrong type
+        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:14.21:
+      11             02 PIC X.
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14 >           ADD NUM TO NUM.
+    ----                        ^
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+    (line 13, character 21):
     Basic (15 entries):
         NUM
         ALPHA wrong type
         ANYY wrong type
         GROUPVAR wrong type
+        POINT wrong type
         ADDRESS
-        CORRESPONDING
         EXCEPTION-OBJECT
         FUNCTION
         LINAGE-COUNTER
@@ -3561,46 +3606,7 @@ let%expect_test "semantic-completion" =
         ALPHA wrong type
         ANYY wrong type
         GROUPVAR wrong type
-        ADDRESS OF
-        CORRESPONDING
-        EXCEPTION-OBJECT
-        FUNCTION
-        LINAGE-COUNTER
-        LINE-COUNTER
-        NULL
-        PAGE-COUNTER
-        SELF
-        SUPER
-        ZEROS
-    __rootdir__/prog.cob:13.21:
-      10             02 PIC X.
-      11             02 PIC X.
-      12           PROCEDURE DIVISION.
-      13 >           ADD NUM TO NUM.
-    ----                        ^
-      14             DISPLAY ANYY.
-      15             UNSTRING ALPHA INTO ANYY.
-    (line 12, character 21):
-    Basic (14 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        ADDRESS
-        EXCEPTION-OBJECT
-        FUNCTION
-        LINAGE-COUNTER
-        LINE-COUNTER
-        NULL
-        PAGE-COUNTER
-        SELF
-        SUPER
-        ZEROS
-    Eager (14 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
+        POINT wrong type
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3611,20 +3617,21 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
         ZEROS GIVING
-    __rootdir__/prog.cob:14.18:
-      11             02 PIC X.
-      12           PROCEDURE DIVISION.
-      13             ADD NUM TO NUM.
-      14 >           DISPLAY ANYY.
+    __rootdir__/prog.cob:15.18:
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15 >           DISPLAY ANYY.
     ----                     ^
-      15             UNSTRING ALPHA INTO ANYY.
-      16             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
-    (line 13, character 18):
-    Basic (19 entries):
+      16             UNSTRING ALPHA INTO ANYY.
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+    (line 14, character 18):
+    Basic (20 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3640,11 +3647,12 @@ let%expect_test "semantic-completion" =
         SPACES
         SUPER
         ZEROS
-    Eager (19 entries):
+    Eager (20 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3660,20 +3668,21 @@ let%expect_test "semantic-completion" =
         SPACES
         SUPER
         ZEROS
-    __rootdir__/prog.cob:15.19:
-      12           PROCEDURE DIVISION.
-      13             ADD NUM TO NUM.
-      14             DISPLAY ANYY.
-      15 >           UNSTRING ALPHA INTO ANYY.
+    __rootdir__/prog.cob:16.19:
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16 >           UNSTRING ALPHA INTO ANYY.
     ----                      ^
-      16             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
-      17             SEC SECTION.
-    (line 14, character 19):
-    Basic (13 entries):
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+      18             SEC SECTION.
+    (line 15, character 19):
+    Basic (14 entries):
         NUM wrong type
         ALPHA
         ANYY wrong type
         GROUPVAR
+        POINT wrong type
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3683,11 +3692,12 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    Eager (13 entries):
+    Eager (14 entries):
         NUM wrong type
         ALPHA
         ANYY wrong type
         GROUPVAR
+        POINT wrong type
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3697,20 +3707,21 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:15.30:
-      12           PROCEDURE DIVISION.
-      13             ADD NUM TO NUM.
-      14             DISPLAY ANYY.
-      15 >           UNSTRING ALPHA INTO ANYY.
+    __rootdir__/prog.cob:16.30:
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16 >           UNSTRING ALPHA INTO ANYY.
     ----                                 ^
-      16             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
-      17             SEC SECTION.
-    (line 14, character 30):
-    Basic (13 entries):
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+      18             SEC SECTION.
+    (line 15, character 30):
+    Basic (14 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3720,11 +3731,12 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    Eager (13 entries):
+    Eager (14 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3734,20 +3746,21 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:16.29:
-      13             ADD NUM TO NUM.
-      14             DISPLAY ANYY.
-      15             UNSTRING ALPHA INTO ANYY.
-      16 >           MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+    __rootdir__/prog.cob:17.29:
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+      17 >           MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
     ----                                ^
-      17             SEC SECTION.
-      18             MULTIPLY NUM BY NUM
-    (line 15, character 29):
-    Basic (13 entries):
+      18             SEC SECTION.
+      19             MULTIPLY NUM BY NUM
+    (line 16, character 29):
+    Basic (14 entries):
         NUM wrong type
         ALPHA wrong type
         ANYY wrong type
         GROUPVAR
+        POINT wrong type
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3757,11 +3770,12 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    Eager (13 entries):
+    Eager (14 entries):
         NUM wrong type
         ALPHA wrong type
         ANYY wrong type
         GROUPVAR
+        POINT wrong type
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3771,20 +3785,21 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:20.20:
-      17             SEC SECTION.
-      18             MULTIPLY NUM BY NUM
-      19             ON SIZE ERROR
-      20 >             DISPLAY ANYY
+    __rootdir__/prog.cob:21.20:
+      18             SEC SECTION.
+      19             MULTIPLY NUM BY NUM
+      20             ON SIZE ERROR
+      21 >             DISPLAY ANYY
     ----                       ^
-      21             END-MULTIPLY.
-      22             STOP RUN.
-    (line 19, character 20):
-    Basic (19 entries):
+      22             END-MULTIPLY.
+      23             ALLOCATE name RETURNING POINT.
+    (line 20, character 20):
+    Basic (20 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3800,11 +3815,12 @@ let%expect_test "semantic-completion" =
         SPACES
         SUPER
         ZEROS
-    Eager (19 entries):
+    Eager (20 entries):
         NUM
         ALPHA
         ANYY
         GROUPVAR
+        POINT
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3819,7 +3835,46 @@ let%expect_test "semantic-completion" =
         SELF
         SPACES
         SUPER
-        ZEROS |}];;
+        ZEROS
+    __rootdir__/prog.cob:23.34:
+      20             ON SIZE ERROR
+      21               DISPLAY ANYY
+      22             END-MULTIPLY.
+      23 >           ALLOCATE name RETURNING POINT.
+    ----                                     ^
+      24             STOP RUN.
+      25
+    (line 22, character 34):
+    Basic (14 entries):
+        NUM wrong type
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
+        POINT
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (14 entries):
+        NUM wrong type
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
+        POINT
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER |}];;
 
 let%expect_test "semantic-while-writing-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
