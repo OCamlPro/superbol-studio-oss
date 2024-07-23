@@ -143,7 +143,6 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
           | ArithSimple { sources; targets } ->
             acc
             |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
-            |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
             |> Numeric @>@ fold_rounded_idents v targets
           | ArithGiving { sources; to_or_from_item; targets } ->
             acc

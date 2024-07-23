@@ -56,7 +56,7 @@ let to_string = function
 
 let qualnames_proposal ~filename pos group : (string * bool) list =
   let comp_categories = Lsp_comp_semantic.type_at_position ~filename pos group in
-  match Lsp_lookup.cobol_unit_at_position ~filename pos group with
+  match Lsp_lookup.last_cobol_unit_before_position ~filename pos group with
   | None -> []
   | Some cu ->
     cu.unit_data.data_items.list
@@ -69,7 +69,7 @@ let qualnames_proposal ~filename pos group : (string * bool) list =
     |> List.flatten
 
 let procedures_proposal ~filename pos group =
-  match Lsp_lookup.cobol_unit_at_position ~filename pos group with
+  match Lsp_lookup.last_cobol_unit_before_position ~filename pos group with
   | None -> []
   | Some cu ->
     let paragraph_name (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
@@ -207,14 +207,26 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
+type return =
+  {
+    items: CompletionItem.t list;
+    isIncomplete: bool;
+  }
+
 let context_completion_items ~config
     (doc:Lsp_document.t)
     Cobol_typeck.Outputs.{ group; _ }
     (pos:Position.t) =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range, case = range_n_case config.case pos doc.textdoc in
+  let pointwise = range.start.character == range.end_.character in
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
     | Some Env env ->
-      map_completion_items ~range ~case ~group ~filename (expected_tokens ~eager:config.eager env)
-    | _ -> [] end
+      {
+        items =
+          map_completion_items ~range ~case ~group ~filename
+          @@ expected_tokens ~eager:config.eager env;
+        isIncomplete = pointwise
+      }
+    | _ -> { items = []; isIncomplete = true } end
 

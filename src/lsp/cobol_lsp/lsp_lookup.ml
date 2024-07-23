@@ -198,6 +198,22 @@ let cobol_unit_at_position ~filename pos group =
       else Visitor.skip_children acc
   end group None
 
+let last_cobol_unit_before_position ~filename pos group =
+  Cobol_unit.Visitor.fold_unit_group object
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_cobol_unit' cu acc =
+      let is_in_or_after =
+        try
+          let lexloc = Cobol_common.Srcloc.lexloc_in ~filename ~@cu in
+          Lsp_position.is_in_lexloc pos lexloc ||
+          Lsp_position.is_after_lexloc pos lexloc
+        with Invalid_argument _ -> false
+      in
+      if is_in_or_after
+      then Visitor.skip_children @@ Some ~&cu
+      else Visitor.skip_children acc
+  end group None
+
 let copy_at_pos ~filename pos ptree =
   Cobol_ptree.Visitor.fold_compilation_group object
     inherit [copy_operation option] Cobol_ptree.Visitor.folder

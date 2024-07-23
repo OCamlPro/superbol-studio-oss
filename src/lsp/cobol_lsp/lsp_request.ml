@@ -556,11 +556,10 @@ let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
   try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc checked_doc->
       let config = Lsp_completion.config ~eager () in
-      let items =
+      let { items; isIncomplete } : Lsp_completion.return =
         Lsp_completion.context_completion_items ~config
           doc checked_doc params.position
-      in Some (`CompletionList (CompletionList.create ()
-                                  ~isIncomplete:false ~items))
+      in Some (`CompletionList (CompletionList.create () ~isIncomplete ~items))
     end
 
 (** {3 Folding} *)
