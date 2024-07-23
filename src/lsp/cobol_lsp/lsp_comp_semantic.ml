@@ -65,27 +65,30 @@ let category_of_usage : usage -> comp_category = function
   | Bit _ -> Any
   | Display pic -> category_of_pic pic
 
-let category_of_datadef : data_definition -> comp_category = fun d ->
+let category_of_datadef : data_definition -> (comp_category * bool) = fun d ->
   match d with
   | Data_field { def; _ } -> begin
       match ~&def.field_layout with
-      | Elementary_field { usage; _ } -> category_of_usage usage
-      | Struct_field _ -> Group
+      | Elementary_field { usage; _ } -> (category_of_usage usage, false)
+      | Struct_field _ -> (Alphanum, true)
     end
   | Data_renaming { def; _} -> begin
     match ~&def.renaming_layout with
-    | Renamed_elementary { usage } -> category_of_usage usage
-    | Renamed_struct _ -> Group
+    | Renamed_elementary { usage } -> (category_of_usage usage, false)
+    | Renamed_struct _ -> (Alphanum, true)
   end
   | Data_condition _
   | Table_index _ ->
-    Any
+    (Any, false)
 
 let is_valid ~comp_categories data =
-  let data_cat = category_of_datadef data in
+  let (data_cat, is_group) = category_of_datadef data in
   List.exists
     begin fun cat ->
-      cat == data_cat || cat == Any end
+      cat == data_cat ||
+      cat == Any ||
+      (is_group && cat == Group)
+    end
     comp_categories
 
 let type_at_position ~filename (pos: Position.t) group : comp_category list =
@@ -123,8 +126,9 @@ let type_at_position ~filename (pos: Position.t) group : comp_category list =
       method! fold' { loc; _ } acc =
         if acc.after_pos
         then skip acc
-        else try
-            let (start, _) = Cobol_common.Srcloc.lexloc_in ~filename loc in
+        else
+          try
+            let start = Cobol_common.Srcloc.start_pos_in ~filename loc in
             let start = start.pos_lnum - 1, start.pos_cnum - start.pos_bol in
             let pos = (pos.line, pos.character) in
             if start <= pos
