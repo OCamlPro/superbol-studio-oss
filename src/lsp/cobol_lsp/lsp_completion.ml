@@ -17,6 +17,8 @@ open Cobol_common                                                  (* Visitor, N
 open Cobol_common.Srcloc.INFIX
 
 open Lsp.Types
+open Lsp_lookup.TYPES
+open Cobol_data.Types
 
 module Menhir = Cobol_parser.Grammar_interpr
 module Expect = Cobol_parser.Expect
@@ -54,14 +56,75 @@ let to_string = function
     [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
   | _ -> []
 
+let approx_type_of_pic ({ category; _ }: picture) =
+  match category with
+  | National _ | Alphabetic _ | Alphanumeric _ -> Alphanum
+  | FixedNum { editions; _ } when (editions.basics <> [] ||
+                                   editions.floating <> None ||
+                                   editions.zerorepl <> None)
+    -> NumericEdited
+  | FloatNum { editions; _ } when editions <> []
+    -> NumericEdited
+  | FloatNum _ | FixedNum _ -> Numeric
+  | Boolean _ -> Any
+
+let approx_type_of_usage : usage -> approx_typing_info = function
+  | Binary _
+  | Binary_C_long _
+  | Binary_char _
+  | Binary_double _
+  | Binary_long _
+  | Binary_short _
+  | Float_long
+  | Float_short
+  | Float_binary _
+  | Float_decimal _
+  | Float_extended
+  | Packed_decimal _ -> Numeric
+  | Procedure_pointer
+  | Function_pointer _
+  | Pointer _
+  | Index
+  | Program_pointer _ -> Numeric
+  | National _ -> Alphanum
+  | Object_reference _
+  | Bit _ -> Any
+  | Display pic -> approx_type_of_pic pic
+
+let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) = fun d ->
+  match d with
+  | Data_field { def; _ } -> begin
+      match ~&def.field_layout with
+      | Elementary_field { usage; _ } -> (approx_type_of_usage usage, false)
+      | Struct_field _ -> (Alphanum, true)
+    end
+  | Data_renaming { def; _} -> begin
+      match ~&def.renaming_layout with
+      | Renamed_elementary { usage } -> (approx_type_of_usage usage, false)
+      | Renamed_struct _ -> (Alphanum, true)
+    end
+  | Data_condition _
+  | Table_index _ ->
+    (Any, false)
+
+let is_valid ~comp_categories data =
+  let (data_cat, is_group) = approx_type_of_datadef data in
+  List.exists
+    begin fun cat ->
+      cat == data_cat ||
+      cat == Any ||
+      (is_group && cat == Group)
+    end
+    comp_categories
+
 let qualnames_proposal ~filename pos group : (string * bool) list =
-  let comp_categories = Lsp_comp_semantic.type_at_position ~filename pos group in
+  let comp_categories = Lsp_lookup.type_at_pos ~filename pos group in
   match Lsp_lookup.last_cobol_unit_before_position ~filename pos group with
   | None -> []
   | Some cu ->
     cu.unit_data.data_items.list
     |> List.filter_map begin fun d ->
-      Option.map (fun qn -> qn, Lsp_comp_semantic.is_valid ~comp_categories d)
+      Option.map (fun qn -> qn, is_valid ~comp_categories d)
       @@ Cobol_data.Item.def_qualname d
     end
     |> List.rev_map begin fun (qn, valid) ->
