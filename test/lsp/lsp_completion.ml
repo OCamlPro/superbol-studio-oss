@@ -17,8 +17,13 @@ open Lsp_testing
 
 let escaped_string ppf (item: CompletionItem.t) =
   let quoted = Pretty.to_string "%S" item.label in
-  Fmt.string ppf @@
-  String.sub quoted 1 (-2 + String.length quoted)
+  let detail = match item.labelDetails with
+    | Some { detail = Some detail; _ } -> detail
+    | _ -> ""
+  in
+  Fmt.pf ppf "%s%s"
+    (String.sub quoted 1 (-2 + String.length quoted))
+    detail
 
 let completion_positions (doc, positions) : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
@@ -3537,9 +3542,9 @@ let%expect_test "semantic-completion" =
     (line 12, character 14):
     Basic (15 entries):
         NUM
-        ALPHA [wrong type]
-        ANYY [wrong type]
-        GROUPVAR [wrong type]
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
         ADDRESS
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3553,9 +3558,9 @@ let%expect_test "semantic-completion" =
         ZEROS
     Eager (15 entries):
         NUM
-        ALPHA [wrong type]
-        ANYY [wrong type]
-        GROUPVAR [wrong type]
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
         ADDRESS OF
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3578,9 +3583,9 @@ let%expect_test "semantic-completion" =
     (line 12, character 21):
     Basic (14 entries):
         NUM
-        ALPHA [wrong type]
-        ANYY [wrong type]
-        GROUPVAR [wrong type]
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3593,9 +3598,9 @@ let%expect_test "semantic-completion" =
         ZEROS
     Eager (14 entries):
         NUM
-        ALPHA [wrong type]
-        ANYY [wrong type]
-        GROUPVAR [wrong type]
+        ALPHA wrong type
+        ANYY wrong type
+        GROUPVAR wrong type
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3665,9 +3670,9 @@ let%expect_test "semantic-completion" =
       17             SEC SECTION.
     (line 14, character 19):
     Basic (13 entries):
-        NUM [wrong type]
+        NUM wrong type
         ALPHA
-        ANYY [wrong type]
+        ANYY wrong type
         GROUPVAR
         ADDRESS
         EXCEPTION-OBJECT
@@ -3679,9 +3684,9 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (13 entries):
-        NUM [wrong type]
+        NUM wrong type
         ALPHA
-        ANYY [wrong type]
+        ANYY wrong type
         GROUPVAR
         ADDRESS OF
         EXCEPTION-OBJECT
@@ -3739,9 +3744,9 @@ let%expect_test "semantic-completion" =
       18             MULTIPLY NUM BY NUM
     (line 15, character 29):
     Basic (13 entries):
-        NUM [wrong type]
-        ALPHA [wrong type]
-        ANYY [wrong type]
+        NUM wrong type
+        ALPHA wrong type
+        ANYY wrong type
         GROUPVAR
         ADDRESS
         EXCEPTION-OBJECT
@@ -3753,9 +3758,9 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (13 entries):
-        NUM [wrong type]
-        ALPHA [wrong type]
-        ANYY [wrong type]
+        NUM wrong type
+        ALPHA wrong type
+        ANYY wrong type
         GROUPVAR
         ADDRESS OF
         EXCEPTION-OBJECT
@@ -3932,9 +3937,9 @@ let%expect_test "semantic-while-writing-completion" =
       16
     (line 13, character 19):
     Basic (12 entries):
-        NUM [wrong type]
+        NUM wrong type
         ALPHA
-        ANYY [wrong type]
+        ANYY wrong type
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3945,9 +3950,9 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
     Eager (12 entries):
-        NUM [wrong type]
+        NUM wrong type
         ALPHA
-        ANYY [wrong type]
+        ANYY wrong type
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION

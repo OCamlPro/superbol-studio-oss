@@ -118,14 +118,15 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create ?(label=None) ?(delay=false) text  ~range ~kind ~case=
+let completion_item_create ?(detail="") ?(delay=false) ~range ~kind ~case text=
   let text = change ~case text in
-  let label = Option.fold ~none:text ~some:(fun l -> text ^ l) label in
   let textedit = TextEdit.create ~newText:text ~range in
+  let labelDetails = CompletionItemLabelDetails.create ~detail () in
   CompletionItem.create ()
-  ~label ~kind ~preselect:false
-  ~sortText:(if delay then "Z" ^ text else text)
-      ~textEdit:(`TextEdit textedit)
+    ~labelDetails
+    ~label:text ~kind ~preselect:false
+    ~sortText:(if delay then "zz" ^ text else text)
+    ~textEdit:(`TextEdit textedit)
 
 let string_of_K tokens =
   let pp ppf =
@@ -150,9 +151,9 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
         qualnames_proposal ~filename pos group
         |> List.rev_map begin fun (s, valid) ->
           completion_item_create
-            ~label:(Some (if valid then "" else " [wrong type]"))
             ~delay:(not valid)
             ~kind:Variable ~range ~case s
+            ~detail:(if valid then "" else " wrong type")
         end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
