@@ -579,52 +579,12 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
 
 (** { Document Symbol } *)
 
-let _u _f =
-  let pos = Position.create ~line:1 ~character:1 in
-  let range = Range.create ~end_:pos ~start:pos in
-  let l kind name = DocumentSymbol.create ()
-  ~kind
-  ~name
-  ~range
-  ~selectionRange:range
-  in
-  Some(`DocumentSymbol [
-    l File "File";
-    l Module "Module";
-    l Namespace "Namespace";
-    l Package "Package";
-    l Class "Class";
-    l Method "Method";
-    l Property "Property";
-    l Field "Field";
-    l Constructor "Constructor";
-    l Enum "Enum";
-    l Interface "Interface";
-    l Function "Function";
-    l Variable "Variable";
-    l Constant "Constant";
-    l String "String";
-    l Number "Number";
-    l Boolean "Boolean";
-    l Array "Array";
-    l Object "Object";
-    l Key "Key";
-    l Null "Null";
-    l EnumMember "EnumMember";
-    l Struct "Struct";
-    l Event "Event";
-    l Operator "Operator";
-    l TypeParameter "TypeParameter";
-      ])
-
-
 let handle_document_symbol registry (params: DocumentSymbolParams.t) =
   try_with_main_document_data registry params.textDocument
     ~f:begin fun ~doc { ptree; _ }->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
-      match Lsp_document_symbol.retrieve ~uri ptree with
-      | [] -> _u ()
-      | l -> Some (`DocumentSymbol l)
+      let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
+      Some (`DocumentSymbol symbols)
     end
 
 (** {3 Generic handling} *)

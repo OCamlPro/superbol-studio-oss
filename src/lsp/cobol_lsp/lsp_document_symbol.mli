@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val retrieve
+val from_ptree_at
   : uri:Lsp.Uri.t
   -> Cobol_ptree.compilation_group
   -> Lsp.Types.DocumentSymbol.t list

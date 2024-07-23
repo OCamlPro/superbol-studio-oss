@@ -24,7 +24,7 @@ let pp_range ppf (range: Range.t) =
   Fmt.pf ppf "%d:%d -> %d:%d" range.start.line range.start.character
     range.end_.line range.end_.character
 
-let s_of_kind (kind: SymbolKind.t) =
+let string_of_kind (kind: SymbolKind.t) =
   match kind with
   | File -> "File"
   | Module -> "Module"
@@ -53,11 +53,10 @@ let s_of_kind (kind: SymbolKind.t) =
   | Operator -> "Operator"
   | TypeParameter -> "TypeParameter"
 
-
 let rec print_symbol_with_children ppf (doc_sym: DocumentSymbol.t) =
   Fmt.pf ppf "@[<v 2>%s(%s)\t%a@;%a@]"
     doc_sym.name
-    (s_of_kind doc_sym.kind)
+    (string_of_kind doc_sym.kind)
     pp_range doc_sym.range
     Fmt.(option (list ~sep:sp print_symbol_with_children)) doc_sym.children
 
@@ -87,7 +86,7 @@ let%expect_test "emtpy-document-symbol" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (1 total):
-      PROGRAM-ID. prog(Module)	1:8 -> 2:25 |}]
+      PROGRAM-ID. prog(Function)	1:8 -> 2:25 |}]
 
 let%expect_test "procedure-symbol" =
   let end_with_postproc = document_symbol {cobol|
@@ -137,29 +136,29 @@ let%expect_test "procedure-symbol" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (23 total):
-      PROGRAM-ID. full(Module)	1:8 -> 10:25
-        PROCEDURE DIVISION(Module)	3:8 -> 9:23
+      PROGRAM-ID. full(Function)	1:8 -> 10:25
+        PROCEDURE DIVISION(Function)	3:8 -> 9:23
           sec1 SECTION(Function)	4:10 -> 6:19
             para11(Function)	5:12 -> 5:19
             para12(Function)	6:12 -> 6:19
           sec2 SECTION(Function)	7:10 -> 8:19
             para21(Function)	8:12 -> 8:19
           sec3 SECTION(Function)	9:10 -> 9:23
-      PROGRAM-ID. onesection(Module)	12:8 -> 16:31
-        PROCEDURE DIVISION(Module)	14:8 -> 15:23
+      PROGRAM-ID. onesection(Function)	12:8 -> 16:31
+        PROCEDURE DIVISION(Function)	14:8 -> 15:23
           sec1 SECTION(Function)	15:10 -> 15:23
-      PROGRAM-ID. oneparagraph(Module)	18:8 -> 22:33
-        PROCEDURE DIVISION(Module)	20:8 -> 21:16
+      PROGRAM-ID. oneparagraph(Function)	18:8 -> 22:33
+        PROCEDURE DIVISION(Function)	20:8 -> 21:16
           para1(Function)	21:10 -> 21:16
-      PROGRAM-ID. anon(Module)	24:8 -> 28:25
-        PROCEDURE DIVISION(Module)	26:8 -> 27:25
+      PROGRAM-ID. anon(Function)	24:8 -> 28:25
+        PROCEDURE DIVISION(Function)	26:8 -> 27:25
           Unnamed paragraph(Function)	27:10 -> 27:25
-      PROGRAM-ID. anon_n_sec(Module)	30:8 -> 35:31
-        PROCEDURE DIVISION(Module)	32:8 -> 34:23
+      PROGRAM-ID. anon_n_sec(Function)	30:8 -> 35:31
+        PROCEDURE DIVISION(Function)	32:8 -> 34:23
           Unnamed paragraph(Function)	33:10 -> 33:25
           sec1 SECTION(Function)	34:10 -> 34:23
-      PROGRAM-ID. emtpy(Module)	37:8 -> 40:26
-        PROCEDURE DIVISION(Module)	39:8 -> 39:27 |}]
+      PROGRAM-ID. emtpy(Function)	37:8 -> 40:26
+        PROCEDURE DIVISION(Function)	39:8 -> 39:27 |}]
 
 let%expect_test "datadiv-symbol" =
   let end_with_postproc = document_symbol {cobol|
@@ -189,9 +188,9 @@ let%expect_test "datadiv-symbol" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (18 total):
-      PROGRAM-ID. prog(Module)	1:8 -> 20:25
-        DATA DIVISION(Module)	3:8 -> 19:22
-          WORKING-STORAGE SECTION(Module)	4:8 -> 19:22
+      PROGRAM-ID. prog(Function)	1:8 -> 20:25
+        DATA DIVISION(Function)	3:8 -> 19:22
+          WORKING-STORAGE SECTION(Function)	4:8 -> 19:22
             01 FILLER(Variable)	5:8 -> 16:41
               88 fillercond(Boolean)	6:10 -> 6:37
               02 aa(Variable)	7:10 -> 8:30
@@ -228,10 +227,10 @@ let%expect_test "envdiv-symbol" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (4 total):
-      PROGRAM-ID. prog(Module)	1:8 -> 12:25
-        ENVIRONMENT DIVISION(Module)	3:8 -> 11:20
-          CONFIGURATION SECTION(Module)	4:8 -> 8:33
-          INPUT-OUTPUT SECTION(Module)	9:8 -> 11:20 |}]
+      PROGRAM-ID. prog(Function)	1:8 -> 12:25
+        ENVIRONMENT DIVISION(Function)	3:8 -> 11:20
+          CONFIGURATION SECTION(Function)	4:8 -> 8:33
+          INPUT-OUTPUT SECTION(Function)	9:8 -> 11:20 |}]
 
 
 let%expect_test "many-division-symbol" =
@@ -256,15 +255,15 @@ let%expect_test "many-division-symbol" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (10 total):
-      PROGRAM-ID. prog(Module)	1:8 -> 14:25
-        ENVIRONMENT DIVISION(Module)	3:8 -> 6:16
-          CONFIGURATION SECTION(Module)	4:8 -> 6:16
-        DATA DIVISION(Module)	7:8 -> 11:34
-          WORKING-STORAGE SECTION(Module)	10:8 -> 11:34
+      PROGRAM-ID. prog(Function)	1:8 -> 14:25
+        ENVIRONMENT DIVISION(Function)	3:8 -> 6:16
+          CONFIGURATION SECTION(Function)	4:8 -> 6:16
+        DATA DIVISION(Function)	7:8 -> 11:34
+          WORKING-STORAGE SECTION(Function)	10:8 -> 11:34
             01 bb(Variable)	11:8 -> 11:34
-          LOCAL-STORAGE SECTION(Module)	8:8 -> 9:34
+          LOCAL-STORAGE SECTION(Function)	8:8 -> 9:34
             01 aa(Variable)	9:8 -> 9:34
-        PROCEDURE DIVISION(Module)	12:8 -> 13:15
+        PROCEDURE DIVISION(Function)	12:8 -> 13:15
           para(Function)	13:10 -> 13:15 |}]
 
 let%expect_test "object-symbol" =
@@ -402,64 +401,64 @@ let%expect_test "object-symbol" =
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     Doc symbols (60 total):
       CLASS-ID. Account(Class)	1:4 -> 126:22
-        ENVIRONMENT DIVISION(Module)	2:4 -> 5:15
-          CONFIGURATION SECTION(Module)	3:4 -> 5:15
+        ENVIRONMENT DIVISION(Function)	2:4 -> 5:15
+          CONFIGURATION SECTION(Function)	3:4 -> 5:15
         FACTORY.(Object)	7:4 -> 38:16
-          DATA DIVISION(Module)	8:4 -> 10:46
-            WORKING-STORAGE SECTION(Module)	9:4 -> 10:46
+          DATA DIVISION(Function)	8:4 -> 10:46
+            WORKING-STORAGE SECTION(Function)	9:4 -> 10:46
               01 number-of-accounts(Variable)	10:4 -> 10:46
           METHOD-ID. newAccount(Method)	13:4 -> 23:26
-            DATA DIVISION(Module)	14:4 -> 17:56
-              LINKAGE SECTION(Module)	16:4 -> 17:56
+            DATA DIVISION(Function)	14:4 -> 17:56
+              LINKAGE SECTION(Function)	16:4 -> 17:56
                 01 an-object(Variable)	17:4 -> 17:56
-              LOCAL-STORAGE SECTION(Module)	15:4 -> 15:26
-            PROCEDURE DIVISION(Module)	18:4 -> 22:13
+              LOCAL-STORAGE SECTION(Function)	15:4 -> 15:26
+            PROCEDURE DIVISION(Function)	18:4 -> 22:13
               begin-here(Function)	19:4 -> 22:13
           METHOD-ID. addAccount(Method)	25:4 -> 30:26
-            PROCEDURE DIVISION(Module)	26:4 -> 29:13
+            PROCEDURE DIVISION(Function)	26:4 -> 29:13
               method-start(Function)	27:4 -> 29:13
           METHOD-ID. removeAccount(Method)	32:4 -> 37:29
-            PROCEDURE DIVISION(Module)	33:4 -> 36:13
+            PROCEDURE DIVISION(Function)	33:4 -> 36:13
               main-entry(Function)	34:4 -> 36:13
         OBJECT.(Object)	40:4 -> 125:15
-          DATA DIVISION(Module)	41:4 -> 45:25
-            WORKING-STORAGE SECTION(Module)	42:4 -> 45:25
+          DATA DIVISION(Function)	41:4 -> 45:25
+            WORKING-STORAGE SECTION(Function)	42:4 -> 45:25
               01 account-balance(Variable)	43:4 -> 43:36
               01 account-number(Variable)	44:4 -> 44:31
               01 the-date(Variable)	45:4 -> 45:25
           METHOD-ID. displayUI(Method)	48:4 -> 77:25
-            DATA DIVISION(Module)	49:4 -> 54:26
-              LOCAL-STORAGE SECTION(Module)	50:4 -> 54:26
+            DATA DIVISION(Function)	49:4 -> 54:26
+              LOCAL-STORAGE SECTION(Function)	50:4 -> 54:26
                 01 in-data(Variable)	51:4 -> 54:26
                   03 action-type(Variable)	52:6 -> 52:27
                   03 in-amount(Variable)	53:6 -> 53:32
                   03 in-wrk(Variable)	54:6 -> 54:26
-            PROCEDURE DIVISION(Module)	55:4 -> 76:51
+            PROCEDURE DIVISION(Function)	55:4 -> 76:51
               method-start(Function)	56:4 -> 72:13
               get-amount(Function)	73:4 -> 76:51
           METHOD-ID. balance(Method)	79:4 -> 88:23
-            DATA DIVISION(Module)	80:4 -> 82:43
-              LOCAL-STORAGE SECTION(Module)	81:4 -> 82:43
+            DATA DIVISION(Function)	80:4 -> 82:43
+              LOCAL-STORAGE SECTION(Function)	81:4 -> 82:43
                 01 display-balance(Variable)	82:4 -> 82:43
-            PROCEDURE DIVISION(Module)	83:4 -> 87:13
+            PROCEDURE DIVISION(Function)	83:4 -> 87:13
               disp-balance(Function)	84:4 -> 87:13
           METHOD-ID. deposit(Method)	90:4 -> 98:23
-            DATA DIVISION(Module)	91:4 -> 93:31
-              LINKAGE SECTION(Module)	92:4 -> 93:31
+            DATA DIVISION(Function)	91:4 -> 93:31
+              LINKAGE SECTION(Function)	92:4 -> 93:31
                 01 in-deposit(Variable)	93:4 -> 93:31
-            PROCEDURE DIVISION(Module)	94:4 -> 97:13
+            PROCEDURE DIVISION(Function)	94:4 -> 97:13
               make-deposit(Function)	95:4 -> 97:13
           METHOD-ID. withdraw(Method)	100:4 -> 112:24
-            DATA DIVISION(Module)	101:4 -> 103:32
-              LINKAGE SECTION(Module)	102:4 -> 103:32
+            DATA DIVISION(Function)	101:4 -> 103:32
+              LINKAGE SECTION(Function)	102:4 -> 103:32
                 01 in-withdraw(Variable)	103:4 -> 103:32
-            PROCEDURE DIVISION(Module)	104:4 -> 111:13
+            PROCEDURE DIVISION(Function)	104:4 -> 111:13
               withdraw-start(Function)	105:4 -> 111:13
           METHOD-ID. initializeAccount(Method)	114:4 -> 124:33
-            DATA DIVISION(Module)	115:4 -> 117:35
-              LINKAGE SECTION(Module)	116:4 -> 117:35
+            DATA DIVISION(Function)	115:4 -> 117:35
+              LINKAGE SECTION(Function)	116:4 -> 117:35
                 01 new-account-number(Variable)	117:4 -> 117:35
-            PROCEDURE DIVISION(Module)	118:4 -> 123:13
+            PROCEDURE DIVISION(Function)	118:4 -> 123:13
               Begin-initialization(Function)	119:4 -> 123:13 |}]
 
 let%expect_test "interface-symbol" =
@@ -491,13 +490,13 @@ let%expect_test "interface-symbol" =
     Doc symbols (12 total):
       INTERFACE-ID. BaseFactoryInterface(Interface)	1:4 -> 9:39
         METHOD-ID. New2(Method)	3:4 -> 8:20
-          DATA DIVISION(Module)	4:4 -> 6:53
-            LINKAGE SECTION(Module)	5:4 -> 6:53
+          DATA DIVISION(Function)	4:4 -> 6:53
+            LINKAGE SECTION(Function)	5:4 -> 6:53
               01 outObject(Variable)	6:4 -> 6:53
-          PROCEDURE DIVISION(Module)	7:4 -> 7:43
+          PROCEDURE DIVISION(Function)	7:4 -> 7:43
       INTERFACE-ID. INTERFACE(Interface)	11:4 -> 19:32
         METHOD-ID. FactoryObject(Method)	13:4 -> 18:29
-          DATA DIVISION(Module)	14:4 -> 16:65
-            LINKAGE SECTION(Module)	15:4 -> 16:65
+          DATA DIVISION(Function)	14:4 -> 16:65
+            LINKAGE SECTION(Function)	15:4 -> 16:65
               01 outFactory(Variable)	16:4 -> 16:65
-          PROCEDURE DIVISION(Module)	17:4 -> 17:44 |}]
+          PROCEDURE DIVISION(Function)	17:4 -> 17:44 |}]
