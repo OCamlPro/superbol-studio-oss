@@ -58,11 +58,15 @@ module TYPES = struct
 
   type approx_typing_info =
     | Alphanum
+    | Any
+    | Boolean
+    | Condition
+    | Group
+    | Index
     | Numeric
     | NumericEdited
-    | Group
+    | ObjectRef
     | Pointer
-    | Any
 end
 open TYPES
 
@@ -332,7 +336,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_compute' { payload = c; _ } acc =
         acc
-        |> [Numeric; NumericEdited] (* + boolean *)
+        |> [Numeric; NumericEdited; Boolean]
         @>>@ fold_rounded_idents v c.compute_targets
         |> fold_dual_handler v c.compute_on_size_error
         |> skip
@@ -381,7 +385,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_invoke' { payload = i; _ } acc =
         acc
-        |> (* object ref + 4byte*) fold_ident v i.invoke_target
+        |> ObjectRef (* 4byte *) @>@ fold_ident v i.invoke_target
         |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
         |> skip
 
@@ -430,14 +434,14 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_raise' { payload = r; _ } acc =
         begin match r with
-          | RaiseIdent id -> acc |> (* object ref *) fold_ident v id
+          | RaiseIdent id -> acc |> ObjectRef @>@ fold_ident v id
           | _ -> acc
         end
         |> skip
 
       method! fold_search' { payload = s; _ } acc =
         acc
-        |> Numeric (* +index *) @>@ fold_option ~fold:fold_ident v s.search_varying
+        |> [Numeric; Index] @>>@ fold_option ~fold:fold_ident v s.search_varying
         |> skip
 
       method! fold_string_stmt' { payload = s; _ } acc =

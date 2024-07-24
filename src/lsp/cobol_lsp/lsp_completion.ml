@@ -58,11 +58,15 @@ let to_string = function
 
 let approx_type_to_string = function
   | Alphanum -> "Alphanum"
-  | Numeric -> "Numeric"
-  | NumericEdited -> "NumericEdited"
+  | Any -> ""
+  | Boolean -> "Boolean"
+  | Condition -> "Condition"
   | Group -> "Group"
+  | Index -> "Index"
+  | NumericEdited -> "NumericEdited"
+  | Numeric -> "Numeric"
+  | ObjectRef -> "Object Ref"
   | Pointer -> "Pointer"
-  | Any -> "Any"
 
 let approx_type_of_pic ({ category; _ }: picture) =
   match category with
@@ -74,7 +78,7 @@ let approx_type_of_pic ({ category; _ }: picture) =
   | FloatNum { editions; _ } when editions <> []
     -> NumericEdited
   | FloatNum _ | FixedNum _ -> Numeric
-  | Boolean _ -> Any
+  | Boolean _ -> Boolean
 
 let approx_type_of_usage : usage -> approx_typing_info = function
   | Binary _
@@ -93,10 +97,10 @@ let approx_type_of_usage : usage -> approx_typing_info = function
   | Function_pointer _
   | Pointer _
   | Program_pointer _ -> Pointer
-  | Index -> Numeric
+  | Index -> Index
   | National _ -> Alphanum
-  | Object_reference _
-  | Bit _ -> Any
+  | Object_reference _ -> ObjectRef
+  | Bit _ -> Boolean
   | Display pic -> approx_type_of_pic pic
 
 let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
@@ -119,11 +123,10 @@ let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
             renaming_layout = Renamed_struct _;
             _ }; _ }; _ } ->
     (Alphanum, true)
-  | Data_condition _
-  | Table_index _ ->
-    (Any, false)
+  | Data_condition _ -> (Condition, false)
+  | Table_index _ -> (Index, false)
 
-let is_valid ~comp_categories data =
+let is_valid ~expected data =
   let (data_cat, is_group) = approx_type_of_datadef data in
   List.exists
     begin fun cat ->
@@ -131,7 +134,7 @@ let is_valid ~comp_categories data =
       cat == Any ||
       (is_group && cat == Group)
     end
-    comp_categories
+    expected
 
 type typed_qualname = {
   name: string;
@@ -140,7 +143,7 @@ type typed_qualname = {
 }
 
 let qualnames_proposal ~filename pos group : typed_qualname list =
-  let comp_categories = Lsp_lookup.type_at_pos ~filename pos group in
+  let expected_approx_types = Lsp_lookup.type_at_pos ~filename pos group in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
@@ -148,7 +151,7 @@ let qualnames_proposal ~filename pos group : typed_qualname list =
     |> List.filter_map begin fun d ->
       let (typ, is_group) = approx_type_of_datadef d in
       let typ = if is_group then Group else typ in
-      Option.map (fun qn -> qn, typ, is_valid ~comp_categories d)
+      Option.map (fun qn -> qn, typ, is_valid ~expected:expected_approx_types d)
       @@ Cobol_data.Item.def_qualname d
     end
     |> List.rev_map begin fun (qn, typ, is_valid) ->
@@ -205,15 +208,15 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create ?(detail="") ?(delay=false) ~range ~kind ~case text=
+let completion_item_create ?(detail="") ?(priority_sort=0) ~range ~kind ~case text=
   let text = change ~case text in
-  let textedit = TextEdit.create ~newText:text ~range in
-  let labelDetails = CompletionItemLabelDetails.create ~detail () in
+  let textEdit =`TextEdit (TextEdit.create ~newText:text ~range) in
+  let sortText = String.init priority_sort (Fun.const '.') ^ text in
   CompletionItem.create ()
-    ~labelDetails
+    ~detail
     ~label:text ~kind ~preselect:false
-    ~sortText:(if delay then "zz" ^ text else text)
-    ~textEdit:(`TextEdit textedit)
+    ~sortText
+    ~textEdit
 
 let string_of_K tokens =
   let pp ppf =
@@ -239,14 +242,14 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
         |> List.rev_map begin fun { name; typ; is_valid } ->
           let typ = approx_type_to_string typ in
           completion_item_create
-            ~delay:(not is_valid)
+            ~priority_sort:(if is_valid then 2 else 1)
             ~kind:Variable ~range ~case name
-            ~detail:(" " ^ typ ^ if is_valid then "" else " (wrong type)")
+            ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
         end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
         |> List.rev_map (completion_item_create
-                           ~kind:Function ~range ~case)
+                           ~priority_sort:3 ~kind:Function ~range ~case)
       | FunctionName ->
         all_intrinsic_function_name
         |> List.rev_map (completion_item_create
