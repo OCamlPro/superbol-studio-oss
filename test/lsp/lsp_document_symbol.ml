@@ -280,7 +280,7 @@ let%expect_test "object-symbol" =
     01 number-of-accounts PIC 9(5) VALUE ZERO.
     PROCEDURE DIVISION.
 
-    METHOD-ID. newAccount
+    METHOD-ID. newAccount.
     DATA DIVISION.
     LOCAL-STORAGE SECTION.
     LINKAGE SECTION.
@@ -292,14 +292,14 @@ let%expect_test "object-symbol" =
       GOBACK.
     END METHOD newAccount.
 
-    METHOD-ID. addAccount
+    METHOD-ID. addAccount.
     PROCEDURE DIVISION.
     method-start.
       ADD 1 TO number-of-accounts.
       GOBACK.
     END METHOD addAccount.
 
-    METHOD-ID. removeAccount
+    METHOD-ID. removeAccount.
     PROCEDURE DIVISION.
     main-entry.
       SUBTRACT 1 FROM number-of-accounts.
@@ -315,7 +315,7 @@ let%expect_test "object-symbol" =
     01 the-date PIC 9(8).
     PROCEDURE DIVISION.
 
-    METHOD-ID. displayUI
+    METHOD-ID. displayUI.
     DATA DIVISION.
     LOCAL-STORAGE SECTION.
     01 in-data.
@@ -346,7 +346,7 @@ let%expect_test "object-symbol" =
       COMPUTE in-amount = FUNCTION NUMVAL (in-wrk).
     END METHOD displayUI.
 
-    METHOD-ID. balance
+    METHOD-ID. balance.
     DATA DIVISION.
     LOCAL-STORAGE SECTION.
     01 display-balance PIC ZZZ,ZZZ,ZZ9.99B.
@@ -357,7 +357,7 @@ let%expect_test "object-symbol" =
       GOBACK.
     END METHOD balance.
 
-    METHOD-ID. deposit
+    METHOD-ID. deposit.
     DATA DIVISION.
     LINKAGE SECTION.
     01 in-deposit PIC S9(9)V99.
@@ -367,7 +367,7 @@ let%expect_test "object-symbol" =
       GOBACK.
     END METHOD deposit.
 
-    METHOD-ID. withdraw
+    METHOD-ID. withdraw.
     DATA DIVISION.
     LINKAGE SECTION.
     01 in-withdraw PIC S9(9)V99.
@@ -381,7 +381,7 @@ let%expect_test "object-symbol" =
       GOBACK.
     END METHOD withdraw.
 
-    METHOD-ID. initializeAccount
+    METHOD-ID. initializeAccount.
     DATA DIVISION.
     LINKAGE SECTION.
     01 new-account-number PIC 9(5).
@@ -465,7 +465,7 @@ let%expect_test "interface-symbol" =
   let end_with_postproc = document_symbol {cobol|
     INTERFACE-ID. BaseFactoryInterface.
     PROCEDURE DIVISION.
-    METHOD-ID. New2
+    METHOD-ID. New2.
     DATA DIVISION.
     LINKAGE SECTION.
     01 outObject USAGE OBJECT REFERENCE ACTIVE-CLASS.
@@ -475,7 +475,7 @@ let%expect_test "interface-symbol" =
 
     INTERFACE-ID. Interface.
     PROCEDURE DIVISION.
-    METHOD-ID. FactoryObject
+    METHOD-ID. FactoryObject.
     DATA DIVISION.
     LINKAGE SECTION.
     01 outFactory USAGE OBJECT REFERENCE FACTORY OF ACTIVE-CLASS.
