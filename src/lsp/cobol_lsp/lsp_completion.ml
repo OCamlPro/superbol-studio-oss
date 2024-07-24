@@ -213,7 +213,7 @@ let completion_item_create ?(detail="") ?(priority_sort=0) ~range ~kind ~case te
   let textEdit =`TextEdit (TextEdit.create ~newText:text ~range) in
   let sortText = String.init priority_sort (Fun.const '.') ^ text in
   CompletionItem.create ()
-    ~detail
+    ?detail:(if detail == "" then None else Some detail)
     ~label:text ~kind ~preselect:false
     ~sortText
     ~textEdit

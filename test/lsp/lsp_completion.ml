@@ -17,10 +17,7 @@ open Lsp_testing
 
 let escaped_string ppf (item: CompletionItem.t) =
   let quoted = Pretty.to_string "%S" item.label in
-  let detail = match item.labelDetails with
-    | Some { detail = Some detail; _ } -> detail
-    | _ -> ""
-  in
+  let detail = Option.fold ~none:"" ~some:((^) " ") item.detail in
   Fmt.pf ppf "%s%s"
     (String.sub quoted 1 (-2 + String.length quoted))
     detail
@@ -3544,10 +3541,10 @@ let%expect_test "semantic-completion" =
     (line 13, character 14):
     Basic (16 entries):
         NUM Numeric
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
-        POINT Pointer (wrong type)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
         ADDRESS
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3561,10 +3558,10 @@ let%expect_test "semantic-completion" =
         ZEROS
     Eager (16 entries):
         NUM Numeric
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
-        POINT Pointer (wrong type)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
         ADDRESS OF
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3587,10 +3584,10 @@ let%expect_test "semantic-completion" =
     (line 13, character 21):
     Basic (15 entries):
         NUM Numeric
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
-        POINT Pointer (wrong type)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3603,10 +3600,10 @@ let%expect_test "semantic-completion" =
         ZEROS
     Eager (15 entries):
         NUM Numeric
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
-        POINT Pointer (wrong type)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3629,7 +3626,7 @@ let%expect_test "semantic-completion" =
     Basic (20 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS
@@ -3650,7 +3647,7 @@ let%expect_test "semantic-completion" =
     Eager (20 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS OF
@@ -3678,11 +3675,11 @@ let%expect_test "semantic-completion" =
       18             SEC SECTION.
     (line 15, character 19):
     Basic (14 entries):
-        NUM Numeric (wrong type)
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Any (wrong type)
+        ANYY Boolean (unexpected here)
         GROUPVAR Group
-        POINT Pointer (wrong type)
+        POINT Pointer (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3693,11 +3690,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM Numeric (wrong type)
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Any (wrong type)
+        ANYY Boolean (unexpected here)
         GROUPVAR Group
-        POINT Pointer (wrong type)
+        POINT Pointer (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3719,7 +3716,7 @@ let%expect_test "semantic-completion" =
     Basic (14 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS
@@ -3734,7 +3731,7 @@ let%expect_test "semantic-completion" =
     Eager (14 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS OF
@@ -3756,11 +3753,11 @@ let%expect_test "semantic-completion" =
       19             MULTIPLY NUM BY NUM
     (line 16, character 29):
     Basic (14 entries):
-        NUM Numeric (wrong type)
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
         GROUPVAR Group
-        POINT Pointer (wrong type)
+        POINT Pointer (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3771,11 +3768,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM Numeric (wrong type)
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
         GROUPVAR Group
-        POINT Pointer (wrong type)
+        POINT Pointer (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3797,7 +3794,7 @@ let%expect_test "semantic-completion" =
     Basic (20 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS
@@ -3818,7 +3815,7 @@ let%expect_test "semantic-completion" =
     Eager (20 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         GROUPVAR Group
         POINT Pointer
         ADDRESS OF
@@ -3846,10 +3843,10 @@ let%expect_test "semantic-completion" =
       25
     (line 22, character 34):
     Basic (14 entries):
-        NUM Numeric (wrong type)
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
         POINT Pointer
         ADDRESS
         EXCEPTION-OBJECT
@@ -3861,10 +3858,10 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM Numeric (wrong type)
-        ALPHA Alphanum (wrong type)
-        ANYY Any (wrong type)
-        GROUPVAR Group (wrong type)
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
         POINT Pointer
         ADDRESS OF
         EXCEPTION-OBJECT
@@ -3907,7 +3904,7 @@ let%expect_test "semantic-while-writing-completion" =
     Basic (14 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         ADDRESS
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3922,7 +3919,7 @@ let%expect_test "semantic-while-writing-completion" =
     Eager (14 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         ADDRESS OF
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3946,7 +3943,7 @@ let%expect_test "semantic-while-writing-completion" =
     Basic (18 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3965,7 +3962,7 @@ let%expect_test "semantic-while-writing-completion" =
     Eager (18 entries):
         NUM Numeric
         ALPHA Alphanum
-        ANYY Any
+        ANYY Boolean
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3990,9 +3987,9 @@ let%expect_test "semantic-while-writing-completion" =
       15
     (line 13, character 19):
     Basic (12 entries):
-        NUM Numeric (wrong type)
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Any (wrong type)
+        ANYY Boolean (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -4003,9 +4000,9 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
     Eager (12 entries):
-        NUM Numeric (wrong type)
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Any (wrong type)
+        ANYY Boolean (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
