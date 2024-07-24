@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.3] Next release
+## [0.1.3] Fourth α release (2024-07-24)
 
 ### Added
 - Support for LSP request `textDocument/documentSymbol` [#317](https://github.com/OCamlPro/superbol-studio-oss/pull/317)
