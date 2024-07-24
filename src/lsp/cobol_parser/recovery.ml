@@ -40,7 +40,7 @@
 module Make
     (Parser: MenhirLib.IncrementalEngine.EVERYTHING)
     (Recovery: sig
-       val default_value: 'a Parser.symbol -> 'a
+       val default_value: pos:Lexing.position -> 'a Parser.symbol -> 'a
        val token_of_terminal: 'a Parser.terminal -> 'a -> Parser.token
        val depth: int array
 
@@ -156,7 +156,7 @@ struct
             env, Reduce (prod, Some env) :: visited, assumed
         | S (N _ as sym) ->
             let env' =
-              Parser.feed sym endp (Recovery.default_value sym) endp env
+              Parser.feed sym endp (Recovery.default_value ~pos:endp sym) endp env
             and show = match Recovery.print_symbol @@ X sym with
               | "" -> None
               | sym_str -> Some (Pretty.delayed "%s" sym_str)
@@ -169,7 +169,7 @@ struct
             Shift (env, env') :: visited,
             { show; pos = endp; benign } :: assumed
         | S (T t as sym) ->
-            let v = Recovery.default_value sym in
+            let v = Recovery.default_value ~pos:endp sym in
             let token = Recovery.token_of_terminal t v in
             match feed_token (token, endp, endp) visited env with
             | `Fail ->

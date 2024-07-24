@@ -24,9 +24,9 @@ val config
   -> unit
   -> config
 
-val context_completion_items
+val contextual
   : config:config
   -> Lsp_document.t
   -> Lsp_document.checked_doc
   -> Lsp.Types.Position.t
-  -> Lsp.Types.CompletionItem.t list
+  -> Lsp.Types.CompletionList.t

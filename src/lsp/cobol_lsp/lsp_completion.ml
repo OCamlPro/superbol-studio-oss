@@ -17,6 +17,8 @@ open Cobol_common                                                  (* Visitor, N
 open Cobol_common.Srcloc.INFIX
 
 open Lsp.Types
+open Lsp_lookup.TYPES
+open Cobol_data.Types
 
 module Menhir = Cobol_parser.Grammar_interpr
 module Expect = Cobol_parser.Expect
@@ -48,22 +50,116 @@ let change ~(case: actual_case) = match case with
   | Uppercase -> String.uppercase
   | Lowercase -> String.lowercase
 
-let to_string qualnames =
-  List.flatten @@ List.rev_map (function
-      | Cobol_ptree.Name name -> [~&name]
-      | Qual (name,_) as qualname ->
-        [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
-      | _ -> []) qualnames
+let to_string = function
+  | Cobol_ptree.Name name -> [~&name]
+  | Qual (name,_) as qualname ->
+    [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
+  | _ -> []
 
-let qualnames_proposal ~filename pos group =
-  match Lsp_lookup.cobol_unit_at_position ~filename pos group with
+let approx_type_to_string = function
+  | Alphanum -> "Alphanum"
+  | Any -> ""
+  | Boolean -> "Boolean"
+  | Condition -> "Condition"
+  | Group -> "Group"
+  | Index -> "Index"
+  | NumericEdited -> "NumericEdited"
+  | Numeric -> "Numeric"
+  | ObjectRef -> "Object Ref"
+  | Pointer -> "Pointer"
+
+let approx_type_of_pic ({ category; _ }: picture) =
+  match category with
+  | National _ | Alphabetic _ | Alphanumeric _ -> Alphanum
+  | FixedNum { editions; _ } when (editions.basics <> [] ||
+                                   editions.floating <> None ||
+                                   editions.zerorepl <> None)
+    -> NumericEdited
+  | FloatNum { editions; _ } when editions <> []
+    -> NumericEdited
+  | FloatNum _ | FixedNum _ -> Numeric
+  | Boolean _ -> Boolean
+
+let approx_type_of_usage : usage -> approx_typing_info = function
+  | Binary _
+  | Binary_C_long _
+  | Binary_char _
+  | Binary_double _
+  | Binary_long _
+  | Binary_short _
+  | Float_long
+  | Float_short
+  | Float_binary _
+  | Float_decimal _
+  | Float_extended
+  | Packed_decimal _ -> Numeric
+  | Procedure_pointer
+  | Function_pointer _
+  | Pointer _
+  | Program_pointer _ -> Pointer
+  | Index -> Index
+  | National _ -> Alphanum
+  | Object_reference _ -> ObjectRef
+  | Bit _ -> Boolean
+  | Display pic -> approx_type_of_pic pic
+
+let approx_type_of_datadef : data_definition -> (approx_typing_info * bool) =
+  function
+  | Data_field
+      { def = { payload = {
+            field_layout = Elementary_field { usage; _ };
+            _ }; _ }; _ }
+  | Data_renaming
+      { def = { payload = {
+            renaming_layout = Renamed_elementary { usage; _ };
+            _ }; _ }; _ } ->
+    (approx_type_of_usage usage, false)
+  | Data_field
+      { def = { payload = {
+            field_layout = Struct_field _;
+            _ }; _ }; _ }
+  | Data_renaming
+      { def = { payload = {
+            renaming_layout = Renamed_struct _;
+            _ }; _ }; _ } ->
+    (Alphanum, true)
+  | Data_condition _ -> (Condition, false)
+  | Table_index _ -> (Index, false)
+
+let is_valid ~expected data =
+  let (data_cat, is_group) = approx_type_of_datadef data in
+  List.exists
+    begin fun cat ->
+      cat == data_cat ||
+      cat == Any ||
+      (is_group && cat == Group)
+    end
+    expected
+
+type typed_qualname = {
+  name: string;
+  typ: approx_typing_info;
+  is_valid: bool;
+}
+
+let qualnames_proposal ~filename pos group : typed_qualname list =
+  let expected_approx_types = Lsp_lookup.type_at_pos ~filename pos group in
+  match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    List.filter_map Cobol_data.Item.def_qualname cu.unit_data.data_items.list
-    |> to_string
+    cu.unit_data.data_items.list
+    |> List.filter_map begin fun d ->
+      let (typ, is_group) = approx_type_of_datadef d in
+      let typ = if is_group then Group else typ in
+      Option.map (fun qn -> qn, typ, is_valid ~expected:expected_approx_types d)
+      @@ Cobol_data.Item.def_qualname d
+    end
+    |> List.rev_map begin fun (qn, typ, is_valid) ->
+      List.map (fun name -> { name; typ; is_valid; }) @@ to_string qn end
+    |> List.flatten
 
 let procedures_proposal ~filename pos group =
-  match Lsp_lookup.cobol_unit_at_position ~filename pos group with
+  match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
     let paragraph_name (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
@@ -75,7 +171,8 @@ let procedures_proposal ~filename pos group =
         | Section section ->
           List.filter_map paragraph_name ~&section.section_paragraphs.list)
       cu.unit_procedure.list
-    |> to_string
+    |> List.rev_map to_string
+    |> List.flatten
 
 let all_intrinsic_function_name =
   List.map fst Cobol_parser.Keywords.intrinsic_functions
@@ -111,12 +208,15 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create label ~range ~kind ~case=
-  let label = change ~case label in
-  let textedit = TextEdit.create ~newText:label ~range in
+let completion_item_create ?(detail="") ?(priority_sort=0) ~range ~kind ~case text=
+  let text = change ~case text in
+  let textEdit =`TextEdit (TextEdit.create ~newText:text ~range) in
+  let sortText = String.init priority_sort (Fun.const '.') ^ text in
   CompletionItem.create ()
-  ~label ~kind ~preselect:false
-      ~textEdit:(`TextEdit textedit)
+    ?detail:(if detail == "" then None else Some detail)
+    ~label:text ~kind ~preselect:false
+    ~sortText
+    ~textEdit
 
 let string_of_K tokens =
   let pp ppf =
@@ -139,12 +239,17 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
   List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
         qualnames_proposal ~filename pos group
-        |> List.rev_map (completion_item_create
-                           ~kind:Variable ~range ~case)
+        |> List.rev_map begin fun { name; typ; is_valid } ->
+          let typ = approx_type_to_string typ in
+          completion_item_create
+            ~priority_sort:(if is_valid then 2 else 1)
+            ~kind:Variable ~range ~case name
+            ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
+        end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
         |> List.rev_map (completion_item_create
-                           ~kind:Function ~range ~case)
+                           ~priority_sort:3 ~kind:Function ~range ~case)
       | FunctionName ->
         all_intrinsic_function_name
         |> List.rev_map (completion_item_create
@@ -193,14 +298,21 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-let context_completion_items ~config
+let contextual ~config
     (doc:Lsp_document.t)
     Cobol_typeck.Outputs.{ group; _ }
     (pos:Position.t) =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range, case = range_n_case config.case pos doc.textdoc in
+  let pointwise = range.start.character == range.end_.character in
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
     | Some Env env ->
-      map_completion_items ~range ~case ~group ~filename (expected_tokens ~eager:config.eager env)
-    | _ -> [] end
+      let items =
+        map_completion_items ~range ~case ~group ~filename
+        @@ expected_tokens ~eager:config.eager env
+      in
+      CompletionList.create () ~isIncomplete:pointwise ~items
+    | _ ->
+      CompletionList.create () ~isIncomplete:true ~items:[]
+  end
 

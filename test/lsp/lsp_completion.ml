@@ -17,8 +17,10 @@ open Lsp_testing
 
 let escaped_string ppf (item: CompletionItem.t) =
   let quoted = Pretty.to_string "%S" item.label in
-  Fmt.string ppf @@
-  String.sub quoted 1 (-2 + String.length quoted)
+  let detail = Option.fold ~none:"" ~some:((^) " ") item.detail in
+  Fmt.pf ppf "%s%s"
+    (String.sub quoted 1 (-2 + String.length quoted))
+    detail
 
 let completion_positions (doc, positions) : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
@@ -68,7 +70,7 @@ let%expect_test "case-detection-testing-completion" =
         PROCEDURE di_|_vision.
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -110,7 +112,7 @@ _|_        PROGRAM-ID. prog.
           DISPLAY FUNCTION MIN(1 2)_|_
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -722,7 +724,7 @@ let%expect_test "datadiv-completion" =
           DISPLAY DATA-NAME.
           STOP RUN.
   |cobol}
- in
+  in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
@@ -1877,8 +1879,8 @@ let%expect_test "procedure-paragraph-completion" =
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
         FIRST-PARAGRAPH
-        DATA-NAME
-        VAR
+        DATA-NAME Alphanum
+        VAR Alphanum
         ACCEPT
         ADD
         ADDRESS
@@ -1956,8 +1958,8 @@ let%expect_test "procedure-paragraph-completion" =
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
         FIRST-PARAGRAPH
-        DATA-NAME
-        VAR
+        DATA-NAME Alphanum
+        VAR Alphanum
         ACCEPT
         ADD
         ADDRESS OF
@@ -2059,14 +2061,14 @@ let%expect_test "qualified-data-ref-completion" =
       14
     (line 11, character 18):
     Basic (23 entries):
-        AA
-        CC IN AA
-        CC
-        DD IN CC IN AA
-        DD
-        BB
-        CC IN BB
-        CC
+        AA Group
+        CC IN AA Group
+        CC Group
+        DD IN CC IN AA Alphanum
+        DD Alphanum
+        BB Group
+        CC IN BB Alphanum
+        CC Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -2083,14 +2085,14 @@ let%expect_test "qualified-data-ref-completion" =
         SUPER
         ZEROS
     Eager (23 entries):
-        AA
-        CC IN AA
-        CC
-        DD IN CC IN AA
-        DD
-        BB
-        CC IN BB
-        CC
+        AA Group
+        CC IN AA Group
+        CC Group
+        DD IN CC IN AA Alphanum
+        DD Alphanum
+        BB Group
+        CC IN BB Alphanum
+        CC Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -2113,8 +2115,8 @@ let%expect_test "procedure-completion" =
         PROGRAM-ID. prog.
         DATA DIVISION.
         WORKING-STORAGE SECTION.
-        01 AA PIC X.
-        01 BB PIC X.
+        01 AA PIC 9.
+        01 BB PIC 9.
         PROCEDURE DIVISION.
           _|_DISPLAY AA _|_.
           MOVE _|_AA _|_TO _|_BB.
@@ -2132,8 +2134,8 @@ let%expect_test "procedure-completion" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     __rootdir__/prog.cob:9.10:
-       6           01 AA PIC X.
-       7           01 BB PIC X.
+       6           01 AA PIC 9.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9 >           DISPLAY AA .
     ----             ^
@@ -2267,8 +2269,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     __rootdir__/prog.cob:9.21:
-       6           01 AA PIC X.
-       7           01 BB PIC X.
+       6           01 AA PIC 9.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9 >           DISPLAY AA .
     ----                        ^
@@ -2276,8 +2278,8 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
     (line 8, character 21):
     Basic (108 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2385,8 +2387,8 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     Eager (105 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -2491,7 +2493,7 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     __rootdir__/prog.cob:10.15:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -2500,8 +2502,8 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 15):
     Basic (18 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS
         ALL
         CORRESPONDING
@@ -2519,8 +2521,8 @@ let%expect_test "procedure-completion" =
         SUPER
         ZEROS
     Eager (18 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS OF
         ALL
         CORRESPONDING
@@ -2538,7 +2540,7 @@ let%expect_test "procedure-completion" =
         SUPER
         ZEROS
     __rootdir__/prog.cob:10.18:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -2549,7 +2551,7 @@ let%expect_test "procedure-completion" =
     Basic (7 entries): AS FACTORY OF AS UNIVERSAL AS IN OF SUPER OF TO
     Eager (4 entries): AS IN OF TO
     __rootdir__/prog.cob:10.21:
-       7           01 BB PIC X.
+       7           01 BB PIC 9.
        8           PROCEDURE DIVISION.
        9             DISPLAY AA .
       10 >           MOVE AA TO BB.
@@ -2558,8 +2560,8 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 21):
     Basic (11 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -2570,8 +2572,8 @@ let%expect_test "procedure-completion" =
         SELF
         SUPER
     Eager (11 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -2624,8 +2626,8 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 28):
     Basic (79 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2704,8 +2706,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (76 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -2790,8 +2792,8 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 36):
     Basic (72 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2863,8 +2865,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (72 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3001,8 +3003,8 @@ let%expect_test "procedure-completion" =
       18             END-MULTIPLY.
     (line 15, character 12):
     Basic (71 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -3073,8 +3075,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (71 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3288,8 +3290,8 @@ let%expect_test "procedure-completion" =
       20
     (line 17, character 10):
     Basic (104 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -3393,8 +3395,8 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     Eager (104 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3497,6 +3499,519 @@ let%expect_test "procedure-completion" =
         WITH NO ADVANCING
         WRITE
         ZEROS |}];;
+
+
+let%expect_test "semantic-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 NUM PIC 9.
+        01 ALPHA PIC X.
+        01 ANYY USAGE BIT.
+        01 GROUPVAR.
+          02 PIC X.
+          02 PIC X.
+        01 POINT USAGE POINTER.
+        PROCEDURE DIVISION.
+          ADD _|_NUM TO _|_NUM.
+          DISPLAY _|_ANYY.
+          UNSTRING _|_ALPHA INTO _|_ANYY.
+          MOVE CORRESPONDING _|_GROUPVAR TO GROUPVAR.
+          SEC SECTION.
+          MULTIPLY NUM BY NUM
+          ON SIZE ERROR
+            DISPLAY _|_ANYY
+          END-MULTIPLY.
+          ALLOCATE name RETURNING _|_POINT.
+          STOP RUN.
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:14.14:
+      11             02 PIC X.
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14 >           ADD NUM TO NUM.
+    ----                 ^
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+    (line 13, character 14):
+    Basic (16 entries):
+        NUM Numeric
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
+        ADDRESS
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (16 entries):
+        NUM Numeric
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
+        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:14.21:
+      11             02 PIC X.
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14 >           ADD NUM TO NUM.
+    ----                        ^
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+    (line 13, character 21):
+    Basic (15 entries):
+        NUM Numeric
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (15 entries):
+        NUM Numeric
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS GIVING
+    __rootdir__/prog.cob:15.18:
+      12           01 POINT USAGE POINTER.
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15 >           DISPLAY ANYY.
+    ----                     ^
+      16             UNSTRING ALPHA INTO ANYY.
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+    (line 14, character 18):
+    Basic (20 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (20 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:16.19:
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16 >           UNSTRING ALPHA INTO ANYY.
+    ----                      ^
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+      18             SEC SECTION.
+    (line 15, character 19):
+    Basic (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group
+        POINT Pointer (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group
+        POINT Pointer (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:16.30:
+      13           PROCEDURE DIVISION.
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16 >           UNSTRING ALPHA INTO ANYY.
+    ----                                 ^
+      17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+      18             SEC SECTION.
+    (line 15, character 30):
+    Basic (14 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (14 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:17.29:
+      14             ADD NUM TO NUM.
+      15             DISPLAY ANYY.
+      16             UNSTRING ALPHA INTO ANYY.
+      17 >           MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
+    ----                                ^
+      18             SEC SECTION.
+      19             MULTIPLY NUM BY NUM
+    (line 16, character 29):
+    Basic (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group
+        POINT Pointer (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group
+        POINT Pointer (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:21.20:
+      18             SEC SECTION.
+      19             MULTIPLY NUM BY NUM
+      20             ON SIZE ERROR
+      21 >             DISPLAY ANYY
+    ----                       ^
+      22             END-MULTIPLY.
+      23             ALLOCATE name RETURNING POINT.
+    (line 20, character 20):
+    Basic (20 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (20 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        GROUPVAR Group
+        POINT Pointer
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:23.34:
+      20             ON SIZE ERROR
+      21               DISPLAY ANYY
+      22             END-MULTIPLY.
+      23 >           ALLOCATE name RETURNING POINT.
+    ----                                     ^
+      24             STOP RUN.
+      25
+    (line 22, character 34):
+    Basic (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (14 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum (unexpected here)
+        ANYY Boolean (unexpected here)
+        GROUPVAR Group (unexpected here)
+        POINT Pointer
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER |}];;
+
+let%expect_test "semantic-while-writing-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 NUM PIC 9.
+        01 ALPHA PIC X.
+        01 ANYY USAGE BIT.
+        PROCEDURE DIVISION.
+          ADD _|_
+
+          DISPLAY _|_
+
+          UNSTRING _|_
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":2,"line":14},"start":{"character":0,"line":14}},"severity":1},{"message":"Missing <identifier> INTO .","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:10.14:
+       7           01 ALPHA PIC X.
+       8           01 ANYY USAGE BIT.
+       9           PROCEDURE DIVISION.
+      10 >           ADD
+    ----                 ^
+      11
+      12             DISPLAY
+    (line 9, character 14):
+    Basic (14 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    Eager (14 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS OF
+        CORRESPONDING
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:12.18:
+       9           PROCEDURE DIVISION.
+      10             ADD
+      11
+      12 >           DISPLAY
+    ----                     ^
+      13
+      14             UNSTRING
+    (line 11, character 18):
+    Basic (18 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    Eager (18 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS OF
+        ALL
+        EXCEPTION-OBJECT
+        FUNCTION
+        HIGH-VALUES
+        LINAGE-COUNTER
+        LINE-COUNTER
+        LOW-VALUES
+        NULL
+        PAGE-COUNTER
+        QUOTES
+        SELF
+        SPACES
+        SUPER
+        ZEROS
+    __rootdir__/prog.cob:14.19:
+      11
+      12             DISPLAY
+      13
+      14 >           UNSTRING
+    ----                      ^
+      15
+    (line 13, character 19):
+    Basic (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER |}];;
 
 let%expect_test "control-completion" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
@@ -3658,8 +4173,8 @@ let%expect_test "double-program-completion" =
       11           END PROGRAM progA.
     (line 8, character 18):
     Basic (17 entries):
-        A1
-        A2
+        A1 Alphanum
+        A2 Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3676,8 +4191,8 @@ let%expect_test "double-program-completion" =
         SUPER
         ZEROS
     Eager (17 entries):
-        A1
-        A2
+        A1 Alphanum
+        A2 Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3703,8 +4218,8 @@ let%expect_test "double-program-completion" =
       22           END PROGRAM progB.
     (line 19, character 18):
     Basic (17 entries):
-        B1
-        B2
+        B1 Alphanum
+        B2 Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3721,8 +4236,8 @@ let%expect_test "double-program-completion" =
         SUPER
         ZEROS
     Eager (17 entries):
-        B1
-        B2
+        B1 Alphanum
+        B2 Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
