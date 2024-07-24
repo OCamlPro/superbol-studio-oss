@@ -94,6 +94,24 @@ From here, you can notably configure:
 
 ## Navigation features
 
+### Outline & Breadcrumbs
+
+SuperBOL provides an outline view of your program once you open it,
+that you can use to navigate to specific sections or symbols (data
+items, paragraphs, etc).  The same information is also shown in the
+["breadcrumbs"](https://code.visualstudio.com/docs/editor/editingevolved#_breadcrumbs)
+bar, that is usually located above the text edition area.
+
+![Outline & Breadcrumb](./assets/superbol-outline.png)
+
+### Go to Symbol
+
+Symbols shown in Outline and Breadcrumbs views can also be searched
+and jumped to by pressing
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>.
+
+![Go to Symbol](./assets/superbol-goto-symbol.gif)
+
 ### Go to Definition
 
 When you want to locate the definition of a data item name in your
