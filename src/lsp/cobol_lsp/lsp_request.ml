@@ -648,6 +648,7 @@ let on_request
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
     | TextDocumentHighlight  (* DocumentHighlightParams.t.t *) _
+    | InlayHint (* InlayHintParams.t.t *) _
     | SignatureHelp  (* SignatureHelpParams.t.t *) _
     | CodeAction  (* CodeActionParams.t.t *) _
     | CodeActionResolve  (* CodeAction.t.t *) _
