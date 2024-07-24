@@ -56,6 +56,14 @@ let to_string = function
     [~&name; Pretty.to_string "%a" Cobol_ptree.pp_qualname qualname]
   | _ -> []
 
+let approx_type_to_string = function
+  | Alphanum -> "Alphanum"
+  | Numeric -> "Numeric"
+  | NumericEdited -> "NumericEdited"
+  | Group -> "Group"
+  | Pointer -> "Pointer"
+  | Any -> "Any"
+
 let approx_type_of_pic ({ category; _ }: picture) =
   match category with
   | National _ | Alphabetic _ | Alphanumeric _ -> Alphanum
@@ -125,18 +133,26 @@ let is_valid ~comp_categories data =
     end
     comp_categories
 
-let qualnames_proposal ~filename pos group : (string * bool) list =
+type typed_qualname = {
+  name: string;
+  typ: approx_typing_info;
+  is_valid: bool;
+}
+
+let qualnames_proposal ~filename pos group : typed_qualname list =
   let comp_categories = Lsp_lookup.type_at_pos ~filename pos group in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
     cu.unit_data.data_items.list
     |> List.filter_map begin fun d ->
-      Option.map (fun qn -> qn, is_valid ~comp_categories d)
+      let (typ, is_group) = approx_type_of_datadef d in
+      let typ = if is_group then Group else typ in
+      Option.map (fun qn -> qn, typ, is_valid ~comp_categories d)
       @@ Cobol_data.Item.def_qualname d
     end
-    |> List.rev_map begin fun (qn, valid) ->
-      List.map (fun s -> s, valid) @@ to_string qn end
+    |> List.rev_map begin fun (qn, typ, is_valid) ->
+      List.map (fun name -> { name; typ; is_valid; }) @@ to_string qn end
     |> List.flatten
 
 let procedures_proposal ~filename pos group =
@@ -220,11 +236,12 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
   List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
         qualnames_proposal ~filename pos group
-        |> List.rev_map begin fun (s, valid) ->
+        |> List.rev_map begin fun { name; typ; is_valid } ->
+          let typ = approx_type_to_string typ in
           completion_item_create
-            ~delay:(not valid)
-            ~kind:Variable ~range ~case s
-            ~detail:(if valid then "" else " wrong type")
+            ~delay:(not is_valid)
+            ~kind:Variable ~range ~case name
+            ~detail:(" " ^ typ ^ if is_valid then "" else " (wrong type)")
         end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
@@ -293,6 +310,6 @@ let contextual ~config
       in
       CompletionList.create () ~isIncomplete:pointwise ~items
     | _ ->
-        CompletionList.create () ~isIncomplete:true ~items:[]
+      CompletionList.create () ~isIncomplete:true ~items:[]
   end
 

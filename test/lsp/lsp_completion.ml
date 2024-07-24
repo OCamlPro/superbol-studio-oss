@@ -1882,8 +1882,8 @@ let%expect_test "procedure-paragraph-completion" =
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
         FIRST-PARAGRAPH
-        DATA-NAME
-        VAR
+        DATA-NAME Alphanum
+        VAR Alphanum
         ACCEPT
         ADD
         ADDRESS
@@ -1961,8 +1961,8 @@ let%expect_test "procedure-paragraph-completion" =
         FIRST-SECTION
         FIRST-PARAGRAPH IN FIRST-SECTION
         FIRST-PARAGRAPH
-        DATA-NAME
-        VAR
+        DATA-NAME Alphanum
+        VAR Alphanum
         ACCEPT
         ADD
         ADDRESS OF
@@ -2064,14 +2064,14 @@ let%expect_test "qualified-data-ref-completion" =
       14
     (line 11, character 18):
     Basic (23 entries):
-        AA
-        CC IN AA
-        CC
-        DD IN CC IN AA
-        DD
-        BB
-        CC IN BB
-        CC
+        AA Group
+        CC IN AA Group
+        CC Group
+        DD IN CC IN AA Alphanum
+        DD Alphanum
+        BB Group
+        CC IN BB Alphanum
+        CC Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -2088,14 +2088,14 @@ let%expect_test "qualified-data-ref-completion" =
         SUPER
         ZEROS
     Eager (23 entries):
-        AA
-        CC IN AA
-        CC
-        DD IN CC IN AA
-        DD
-        BB
-        CC IN BB
-        CC
+        AA Group
+        CC IN AA Group
+        CC Group
+        DD IN CC IN AA Alphanum
+        DD Alphanum
+        BB Group
+        CC IN BB Alphanum
+        CC Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -2281,8 +2281,8 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
     (line 8, character 21):
     Basic (108 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2390,8 +2390,8 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     Eager (105 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -2505,8 +2505,8 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 15):
     Basic (18 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS
         ALL
         CORRESPONDING
@@ -2524,8 +2524,8 @@ let%expect_test "procedure-completion" =
         SUPER
         ZEROS
     Eager (18 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS OF
         ALL
         CORRESPONDING
@@ -2563,8 +2563,8 @@ let%expect_test "procedure-completion" =
       12               ON SIZE ERROR
     (line 9, character 21):
     Basic (11 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -2575,8 +2575,8 @@ let%expect_test "procedure-completion" =
         SELF
         SUPER
     Eager (11 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -2629,8 +2629,8 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 28):
     Basic (79 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2709,8 +2709,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (76 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -2795,8 +2795,8 @@ let%expect_test "procedure-completion" =
       17               DISPLAY "ERROR"
     (line 14, character 36):
     Basic (72 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -2868,8 +2868,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (72 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3006,8 +3006,8 @@ let%expect_test "procedure-completion" =
       18             END-MULTIPLY.
     (line 15, character 12):
     Basic (71 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -3078,8 +3078,8 @@ let%expect_test "procedure-completion" =
         VALIDATE
         WRITE
     Eager (71 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3293,8 +3293,8 @@ let%expect_test "procedure-completion" =
       20
     (line 17, character 10):
     Basic (104 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS
@@ -3398,8 +3398,8 @@ let%expect_test "procedure-completion" =
         WRITE
         ZEROS
     Eager (104 entries):
-        AA
-        BB
+        AA Numeric
+        BB Numeric
         ACCEPT
         ADD
         ADDRESS OF
@@ -3543,11 +3543,11 @@ let%expect_test "semantic-completion" =
       16             UNSTRING ALPHA INTO ANYY.
     (line 13, character 14):
     Basic (16 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT wrong type
+        NUM Numeric
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer (wrong type)
         ADDRESS
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3560,11 +3560,11 @@ let%expect_test "semantic-completion" =
         SUPER
         ZEROS
     Eager (16 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT wrong type
+        NUM Numeric
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer (wrong type)
         ADDRESS OF
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3586,11 +3586,11 @@ let%expect_test "semantic-completion" =
       16             UNSTRING ALPHA INTO ANYY.
     (line 13, character 21):
     Basic (15 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT wrong type
+        NUM Numeric
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer (wrong type)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3602,11 +3602,11 @@ let%expect_test "semantic-completion" =
         SUPER
         ZEROS
     Eager (15 entries):
-        NUM
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT wrong type
+        NUM Numeric
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer (wrong type)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3627,11 +3627,11 @@ let%expect_test "semantic-completion" =
       17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
     (line 14, character 18):
     Basic (20 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3648,11 +3648,11 @@ let%expect_test "semantic-completion" =
         SUPER
         ZEROS
     Eager (20 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3678,11 +3678,11 @@ let%expect_test "semantic-completion" =
       18             SEC SECTION.
     (line 15, character 19):
     Basic (14 entries):
-        NUM wrong type
-        ALPHA
-        ANYY wrong type
-        GROUPVAR
-        POINT wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum
+        ANYY Any (wrong type)
+        GROUPVAR Group
+        POINT Pointer (wrong type)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3693,11 +3693,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM wrong type
-        ALPHA
-        ANYY wrong type
-        GROUPVAR
-        POINT wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum
+        ANYY Any (wrong type)
+        GROUPVAR Group
+        POINT Pointer (wrong type)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3717,11 +3717,11 @@ let%expect_test "semantic-completion" =
       18             SEC SECTION.
     (line 15, character 30):
     Basic (14 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3732,11 +3732,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3756,11 +3756,11 @@ let%expect_test "semantic-completion" =
       19             MULTIPLY NUM BY NUM
     (line 16, character 29):
     Basic (14 entries):
-        NUM wrong type
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR
-        POINT wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group
+        POINT Pointer (wrong type)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3771,11 +3771,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM wrong type
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR
-        POINT wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group
+        POINT Pointer (wrong type)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3795,11 +3795,11 @@ let%expect_test "semantic-completion" =
       23             ALLOCATE name RETURNING POINT.
     (line 20, character 20):
     Basic (20 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3816,11 +3816,11 @@ let%expect_test "semantic-completion" =
         SUPER
         ZEROS
     Eager (20 entries):
-        NUM
-        ALPHA
-        ANYY
-        GROUPVAR
-        POINT
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
+        GROUPVAR Group
+        POINT Pointer
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3846,11 +3846,11 @@ let%expect_test "semantic-completion" =
       25
     (line 22, character 34):
     Basic (14 entries):
-        NUM wrong type
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT
+        NUM Numeric (wrong type)
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -3861,11 +3861,11 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
     Eager (14 entries):
-        NUM wrong type
-        ALPHA wrong type
-        ANYY wrong type
-        GROUPVAR wrong type
-        POINT
+        NUM Numeric (wrong type)
+        ALPHA Alphanum (wrong type)
+        ANYY Any (wrong type)
+        GROUPVAR Group (wrong type)
+        POINT Pointer
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -3905,9 +3905,9 @@ let%expect_test "semantic-while-writing-completion" =
       12             DISPLAY
     (line 9, character 14):
     Basic (14 entries):
-        NUM
-        ALPHA
-        ANYY
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
         ADDRESS
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3920,9 +3920,9 @@ let%expect_test "semantic-while-writing-completion" =
         SUPER
         ZEROS
     Eager (14 entries):
-        NUM
-        ALPHA
-        ANYY
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
         ADDRESS OF
         CORRESPONDING
         EXCEPTION-OBJECT
@@ -3944,9 +3944,9 @@ let%expect_test "semantic-while-writing-completion" =
       14             UNSTRING
     (line 11, character 18):
     Basic (18 entries):
-        NUM
-        ALPHA
-        ANYY
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -3963,9 +3963,9 @@ let%expect_test "semantic-while-writing-completion" =
         SUPER
         ZEROS
     Eager (18 entries):
-        NUM
-        ALPHA
-        ANYY
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Any
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -3990,9 +3990,9 @@ let%expect_test "semantic-while-writing-completion" =
       15
     (line 13, character 19):
     Basic (12 entries):
-        NUM wrong type
-        ALPHA
-        ANYY wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum
+        ANYY Any (wrong type)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -4003,9 +4003,9 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
     Eager (12 entries):
-        NUM wrong type
-        ALPHA
-        ANYY wrong type
+        NUM Numeric (wrong type)
+        ALPHA Alphanum
+        ANYY Any (wrong type)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -4176,8 +4176,8 @@ let%expect_test "double-program-completion" =
       11           END PROGRAM progA.
     (line 8, character 18):
     Basic (17 entries):
-        A1
-        A2
+        A1 Alphanum
+        A2 Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -4194,8 +4194,8 @@ let%expect_test "double-program-completion" =
         SUPER
         ZEROS
     Eager (17 entries):
-        A1
-        A2
+        A1 Alphanum
+        A2 Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
@@ -4221,8 +4221,8 @@ let%expect_test "double-program-completion" =
       22           END PROGRAM progB.
     (line 19, character 18):
     Basic (17 entries):
-        B1
-        B2
+        B1 Alphanum
+        B2 Alphanum
         ADDRESS
         ALL
         EXCEPTION-OBJECT
@@ -4239,8 +4239,8 @@ let%expect_test "double-program-completion" =
         SUPER
         ZEROS
     Eager (17 entries):
-        B1
-        B2
+        B1 Alphanum
+        B2 Alphanum
         ADDRESS OF
         ALL
         EXCEPTION-OBJECT
