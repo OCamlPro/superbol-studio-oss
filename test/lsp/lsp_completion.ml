@@ -5285,36 +5285,18 @@ let%expect_test "string-concat-completion" =
           STOP RUN.
   |cobol} in
   end_with_postproc [%expect.output];
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
-  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-     This is strongly discouraged as backtraces are fragile.
-     Please change this test to not include a backtrace. *)
-
-  ("Jsonrpc.Response.Error.E(_)")
-  Raised at Jsonrpc.Response.Error.raise in file "jsonrpc/src/jsonrpc.ml", line 188, characters 18-29
-  Called from Lsp_test_all__Lsp_completion.completion_positions.completions_at_position in file "test/lsp/lsp_completion.ml", line 40, characters 12-61
-  Called from Stdlib__List.iter in file "list.ml", line 110, characters 12-15
-  Called from Lsp_test_all__Lsp_completion.completion_positions in file "test/lsp/lsp_completion.ml", line 63, characters 2-72
-  Called from Lsp_test_all__Lsp_completion.(fun) in file "test/lsp/lsp_completion.ml", line 5277, characters 26-309
-  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 234, characters 12-19
-
-  Trailing output
-  ---------------
-
-  Content-Length: 159
-  
-  {"params":{"diagnostics":[],"uri":"file:///tmp/build_915609_dune/superbol-project2c9454/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-
-  /tmp/build_915609_dune/superbol-project2c9454/prog.cob:8.23:
-     5           WORKING-STORAGE SECTION.
-     6           01 CC PIC X.
-     7           PROCEDURE DIVISION.
-     8 >           MOVE "A"&"B" TO CC.
-  ----                          ^
-     9             STOP RUN.
-    10
-
-  (line 7, character 23): |}];;
+  [%expect{|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:8.23:
+       5           WORKING-STORAGE SECTION.
+       6           01 CC PIC X.
+       7           PROCEDURE DIVISION.
+       8 >           MOVE "A"&"B" TO CC.
+    ----                          ^
+       9             STOP RUN.
+      10
+    (line 7, character 23):
+    Basic (1 entries): TO
+    Eager (1 entries): TO |}];;
 
 
