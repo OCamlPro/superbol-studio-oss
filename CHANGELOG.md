@@ -3,7 +3,10 @@
 ## [0.1.4] Next release
 
 ### Added
-- Vscode `language-configuration.json` for cobol to include hyphen in word wrapping [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+- COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed- format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+
+### Fixed
+- Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 
 ## [0.1.3] Fourth α release (2024-07-24)
