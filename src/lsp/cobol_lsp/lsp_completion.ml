@@ -142,8 +142,12 @@ type typed_qualname = {
   is_valid: bool;
 }
 
-let qualnames_proposal ~filename pos group : typed_qualname list =
-  let expected_approx_types = Lsp_lookup.type_at_pos ~filename pos group in
+let qualnames_proposal ?(avoid_type_check=false) ~filename pos group : typed_qualname list =
+  let is_valid : data_definition -> bool =
+    if avoid_type_check
+    then Fun.const true
+    else is_valid ~expected:(Lsp_lookup.type_at_pos ~filename pos group)
+  in
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
@@ -151,7 +155,7 @@ let qualnames_proposal ~filename pos group : typed_qualname list =
     |> List.filter_map begin fun d ->
       let (typ, is_group) = approx_type_of_datadef d in
       let typ = if is_group then Group else typ in
-      Option.map (fun qn -> qn, typ, is_valid ~expected:expected_approx_types d)
+      Option.map (fun qn -> qn, typ, is_valid d)
       @@ Cobol_data.Item.def_qualname d
     end
     |> List.rev_map begin fun (qn, typ, is_valid) ->
@@ -245,11 +249,11 @@ let string_of_K tokens =
   in
   Pretty.to_string "%a" pp (Basics.NEL.to_list tokens)
 
-let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
-  let pos = range.end_ in
+let map_completion_items ?(avoid_type_check=false) ~(range:Range.t) ~case ~group ~filename comp_entries =
+  let pos = range.start in
   List.flatten @@ EzList.tail_map (function
       | Expect.Completion_entry.QualifiedRef ->
-        qualnames_proposal ~filename pos group
+        qualnames_proposal ~avoid_type_check ~filename pos group
         |> List.rev_map begin fun { name; typ; is_valid } ->
           let typ = approx_type_to_string typ in
           completion_item_create
@@ -328,7 +332,9 @@ let contextual ~config
   begin match Lsp_document.inspect_at ~position:(range.start) doc with
     | Some Env env ->
       let items =
-        map_completion_items ~range ~case ~group ~filename
+        map_completion_items
+          ~avoid_type_check:pointwise
+          ~range ~case ~group ~filename
         @@ expected_tokens ~eager:config.eager env
       in
       CompletionList.create () ~isIncomplete:pointwise ~items
