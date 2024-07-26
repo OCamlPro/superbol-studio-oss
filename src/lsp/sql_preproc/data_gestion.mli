@@ -8,7 +8,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type t
+
+type variable_information =
+  { length : int;
+    vartype : int;
+    scale : int;
+    flags : int;
+    ind_addr : int
+  }
+
 val transform :
-  Cobol_unit.Types.cobol_unit ->
   (Types.loc option * Types.statements) list ->
-  (string * Cobol_unit.Types.cobol_unit)
+  (string * t)
+
+val find_opt : t -> string -> variable_information option

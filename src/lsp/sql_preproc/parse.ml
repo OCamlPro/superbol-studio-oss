@@ -21,7 +21,7 @@ let rec find_dot tokens =
 let parse ~config ~filename ~contents =
   let program_id = ref None in
   let sql_statements = ref [] in
-(*   let var_statements = ref [] in *)
+  (*   let var_statements = ref [] in *)
   let procedure_division_found = ref None in
   let working_storage_found = ref false in
   let linkage_section_found = ref false in
@@ -41,12 +41,21 @@ let parse ~config ~filename ~contents =
           Misc.error ~loc "multiple programs in the same file are not supported"
       end;
       iter tokens
-      (*TODO: Other case gestion (ex: 01 NUM1 PIC 99V99.)*)
-(*     | (NUMBER priority, loc) :: (IDENT name, _ ) :: (IDENT "PIC", _ ) :: (IDENT var_type, _ ) :: (LPAREN, _ ) :: (IDENT size, _ ) :: (RPAREN, _ ) :: tokens ->
-      var_add_statement ~loc (priority, name, var_type, size);
-      iter tokens *)
-    | (IDENT "IS", loc) :: (IDENT "SQLVAR", end_loc) :: tokens ->
-      sql_add_statement ~loc (IS_SQLVAR { end_loc });
+    (*Exemple : 01 VCFLD SQL TYPE IS VARCHAR(100).*)
+    | (INTEGER importance, loc)
+      :: (IDENT name, _)
+      :: (IDENT "SQL", _)
+      :: (IDENT "TYPE", _)
+      :: (IDENT "IS", _)
+      :: (IDENT sql_type, _)
+      :: (LPAREN, _)
+      :: (INTEGER sql_type_size, _)
+      :: (RPAREN, end_loc)
+      :: tokens ->
+      let declaration =
+        SQL_type_is { importance; name; sql_type; sql_type_size }
+      in
+      sql_add_statement ~loc (DECLARATION { end_loc; declaration });
       iter tokens
     | (PROCEDURE, loc) :: (DIVISION, _) :: tokens ->
       let end_loc, tokens = find_dot tokens in
@@ -155,12 +164,12 @@ let parse ~config ~filename ~contents =
       let params = List.rev params in
       let sqlStr = "EXEC SQL " ^ String.concat " " params ^ " END-EXEC" in
       (* Format.fprintf Format.std_formatter "\nSTRING\n";
-         Format.fprintf Format.std_formatter "\n%s\n" sqlStr;
-      *)
+      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; *)
+
       let sql = Sql_parser.parseString (Lexing.from_string sqlStr) in
-      (* Format.fprintf Format.std_formatter "\nAST\n";
-         Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql;
-      *)
+(*       Format.fprintf Format.std_formatter "\nAST\n";
+      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; *)
+
       sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql });
       iter tokens
     | [] -> failwith "missing END-EXEC."

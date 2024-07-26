@@ -19,6 +19,10 @@ type loc = { filename : string ;
              line : int ;
              char : int }
 
+(* type sql_type = BINARY | VARBINARY | CHAR | VARCHAR *)
+type declaration =
+  | SQL_type_is of { importance:string; name:string; sql_type : string; sql_type_size : string }
+
 (* These statements show how we could keep information and modify the
    corresponding places in the code *)
 
@@ -33,7 +37,8 @@ type statements =
   | BEGIN_PROCEDURE_DIVISION of { enabled : bool ref }
   | END_PROCEDURE_DIVISION
   | COPY of { end_loc : loc ; filename : string ; contents : string }
-  | IS_SQLVAR of { end_loc : loc }
+(*   | IS_SQLVAR of { end_loc : loc } *)
+  | DECLARATION of { end_loc:loc; declaration : declaration }
 
 
 type handle = {
