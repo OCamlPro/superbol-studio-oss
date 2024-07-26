@@ -97,6 +97,7 @@ let contributes =
       Manifest.language "cobol"
         ~aliases: [ "COBOL" ]
         ~filenamePatterns: [ "*." ^ cob_extensions_pattern ]
+        ~configuration: "./syntaxes/language-configuration.json"
     ]
     ~debuggers: [
       Manifest.debugger "gdb"

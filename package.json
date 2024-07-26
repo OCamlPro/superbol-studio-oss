@@ -394,7 +394,8 @@
         ],
         "filenamePatterns": [
           "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
-        ]
+        ],
+        "configuration": "./syntaxes/language-configuration.json"
       }
     ],
     "problemMatchers": [
