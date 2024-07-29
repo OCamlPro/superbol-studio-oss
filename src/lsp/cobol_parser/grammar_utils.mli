@@ -36,3 +36,12 @@ type data_division_sentence =
 (* Takes a *reversed* list of sentences. *)
 val build_data_division: data_division_sentence list with_loc ->
   data_division with_loc option
+
+type configuration_section_paragraph =
+  | P_SOURCE_COMPUTER_PARAGRAPH of source_computer_paragraph with_loc
+  | P_OBJECT_COMPUTER_PARAGRAPH of object_computer_paragraph with_loc
+  | P_SPECIAL_NAMES_PARAGRAPH of special_names_paragraph with_loc
+  | P_REPOSITORY_PARAGRAPH of repository_paragraph with_loc
+
+val build_configuration_section
+  : configuration_section_paragraph list -> configuration_section

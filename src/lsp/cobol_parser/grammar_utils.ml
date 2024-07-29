@@ -94,3 +94,29 @@ let build_data_division = function
               { d with screen_sections = ss :: d.screen_sections }
       in
       Some (rebuild_sections list empty_data_division &@ loc)
+
+type configuration_section_paragraph =
+  | P_SOURCE_COMPUTER_PARAGRAPH of source_computer_paragraph with_loc
+  | P_OBJECT_COMPUTER_PARAGRAPH of object_computer_paragraph with_loc
+  | P_SPECIAL_NAMES_PARAGRAPH of special_names_paragraph with_loc
+  | P_REPOSITORY_PARAGRAPH of repository_paragraph with_loc
+
+let rec build_configuration_section = function
+  | [] -> {
+      source_computer_paragraph = None;
+      object_computer_paragraph = None;
+      special_names_paragraph = None;
+      repository_paragraph = None;
+    }
+  | hd::tl ->
+    let section = build_configuration_section tl in
+    match hd with
+    | P_SOURCE_COMPUTER_PARAGRAPH p ->
+      { section with source_computer_paragraph = Some p }
+    | P_OBJECT_COMPUTER_PARAGRAPH p ->
+      { section with object_computer_paragraph = Some p }
+    | P_SPECIAL_NAMES_PARAGRAPH p ->
+      { section with special_names_paragraph = Some p }
+    | P_REPOSITORY_PARAGRAPH p ->
+      { section with repository_paragraph = Some p }
+

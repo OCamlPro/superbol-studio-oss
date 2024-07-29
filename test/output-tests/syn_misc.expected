@@ -1494,55 +1494,7 @@ syn_misc.at-2876-prog.cob:6.11-6.17:
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2910:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2943:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:2987:0
-syn_misc.at-2987-prog.cob:8.7-8.22:
-   5          ENVIRONMENT    DIVISION.
-   6          CONFIGURATION  SECTION.
-   7          OBJECT-COMPUTER. a.
-   8 >        SOURCE-COMPUTER. b.
-----          ^^^^^^^^^^^^^^^
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3048:0
-syn_misc.at-3048-prog.cob:8.7-8.22:
-   5          ENVIRONMENT    DIVISION.
-   6          CONFIGURATION  SECTION.
-   7          REPOSITORY.
-   8 >        SOURCE-COMPUTER. b.
-----          ^^^^^^^^^^^^^^^
-   9          OBJECT-COMPUTER. a.
-  10          SPECIAL-NAMES.
->> Error: Invalid syntax
-
-syn_misc.at-3048-prog.cob:22.7-22.20:
-  19          SOURCE-COMPUTER. b.
-  20          OBJECT-COMPUTER. a.
-  21          REPOSITORY.
-  22 >        SPECIAL-NAMES.
-----          ^^^^^^^^^^^^^
-  23   
-  24          END PROGRAM prog2.
->> Error: Invalid syntax
-
-syn_misc.at-3048-prog.cob:32.7-32.22:
-  29          ENVIRONMENT    DIVISION.
-  30          CONFIGURATION  SECTION.
-  31          REPOSITORY.
-  32 >        SOURCE-COMPUTER. b.
-----          ^^^^^^^^^^^^^^^
-  33          OBJECT-COMPUTER. a.
-  34   
->> Error: Invalid syntax
-
-syn_misc.at-3048-prog.cob:43.7-43.20:
-  40          ENVIRONMENT    DIVISION.
-  41          CONFIGURATION  SECTION.
-  42          REPOSITORY.
-  43 >        SPECIAL-NAMES.
-----          ^^^^^^^^^^^^^
-  44          SOURCE-COMPUTER. b.
-  45          OBJECT-COMPUTER. a.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3104:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3107:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3109:0

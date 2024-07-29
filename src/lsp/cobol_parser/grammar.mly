@@ -624,16 +624,14 @@ let environment_division :=
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
 let configuration_section :=
- | CONFIGURATION; SECTION; ".";
-   source_computer_paragraph = ro(loc(source_computer_paragraph));
-   object_computer_paragraph = ro(loc(object_computer_paragraph));
-   special_names_paragraph   = ro(loc(special_names_paragraph));
-   repository_paragraph      = ro(loc(repository_paragraph));     (* +COB2002 *)
-   { { source_computer_paragraph;
-       object_computer_paragraph;
-       special_names_paragraph;
-       repository_paragraph } }
+ | CONFIGURATION; SECTION; "."; body = rl(configuration_body);
+   { build_configuration_section body }
 
+let configuration_body ==
+ | p = loc(source_computer_paragraph); { P_SOURCE_COMPUTER_PARAGRAPH p }
+ | p = loc(object_computer_paragraph); { P_OBJECT_COMPUTER_PARAGRAPH p }
+ | p = loc(special_names_paragraph);   { P_SPECIAL_NAMES_PARAGRAPH p }
+ | p = loc(repository_paragraph);      { P_REPOSITORY_PARAGRAPH p } (* +COB2002 *)
 
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
