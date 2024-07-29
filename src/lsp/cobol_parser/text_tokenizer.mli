@@ -131,5 +131,5 @@ val pop_context
 
 val enable_context_sensitive_tokens: _ state -> unit
 val disable_context_sensitive_tokens: _ state -> unit
-val unregister_intrinsics: _ state -> unit
-val reregister_intrinsics: _ state -> unit
+val save_intrinsics: _ state -> unit
+val restore_intrinsics: _ state -> unit

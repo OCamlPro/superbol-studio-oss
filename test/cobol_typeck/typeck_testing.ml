@@ -15,15 +15,11 @@ open Parser_testing
 
 module DIAGS = Cobol_common.Diagnostics
 
-let show_diagnostics ?(show_data = false) ?(verbose = false)
+let show_diagnostics ?(show_data = false)
+    ?(parser_options = Parser_testing.options ())
     ?source_format ?filename contents =
   preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple
-    ~options: {
-      default_parser_options with
-      verbose;
-      recovery = EnableRecovery { silence_benign_recoveries = true };
-    } |>
+  Cobol_parser.parse_simple ~options:parser_options |>
   Cobol_parser.Outputs.translate_diags |>
   DIAGS.map_result ~f:Cobol_typeck.compilation_group |>
   DIAGS.more_result ~f:Cobol_typeck.Results.translate_diags |>

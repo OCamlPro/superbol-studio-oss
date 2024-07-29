@@ -17,8 +17,13 @@ open FileString.OP
 open Testsuite_utils
 
 let default_parser_options =
+  let exec_scanners =
+    Superbol_preprocs.more [
+      "SQL", Superbol_preprocs.Esql.scanner;
+    ]
+  in
   Cobol_parser.Options.{
-    (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
+    (default ~exec_scanners) with
     recovery = DisableRecovery
   }
 

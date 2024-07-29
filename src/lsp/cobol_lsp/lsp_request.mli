@@ -24,11 +24,21 @@ module INTERNAL: sig
     -> Lsp.Types.ReferenceParams.t
     -> Lsp.Types.Location.t list option
   val hover
-    : Lsp_server.t
+    : ?always_show_hover_text_in_data_div: bool
+    -> Lsp_server.t
     -> Lsp.Types.HoverParams.t
     -> Lsp.Types.Hover.t option
+  val completion
+    : ?eager:bool
+    -> Lsp_server.t
+    -> Lsp.Types.CompletionParams.t
+    -> [> `CompletionList of Lsp.Types.CompletionList.t] option
   val formatting
     : Lsp_server.t
     -> Lsp.Types.DocumentFormattingParams.t
     -> Lsp.Types.TextEdit.t list option
+  val document_symbol
+    : Lsp_server.t
+    -> Lsp.Types.DocumentSymbolParams.t
+    -> [> `DocumentSymbol of Lsp.Types.DocumentSymbol.t list ] option
 end

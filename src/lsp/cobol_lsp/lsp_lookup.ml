@@ -56,6 +56,17 @@ module TYPES = struct
 
   type copy_operation = string with_loc            (** with loc of [COPY ...] *)
 
+  type approx_typing_info =
+    | Alphanum
+    | Any
+    | Boolean
+    | Condition
+    | Group
+    | Index
+    | Numeric
+    | NumericEdited
+    | ObjectRef
+    | Pointer
 end
 open TYPES
 
@@ -188,6 +199,32 @@ let element_at_position ~uri pos group : element_at_position =
 
 (* --- *)
 
+(* Using Lsp_position.sieve would be overkill for nodes that are close to the AST root, like COBOL units *)
+let cobol_unit_at_pos ~filename pos group =
+  Cobol_unit.Visitor.fold_unit_group object
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_cobol_unit' cu acc =
+      if Lsp_position.is_in_srcloc ~filename pos ~@cu
+      then Visitor.skip_children @@ Some ~&cu
+      else Visitor.skip_children acc
+  end group None
+
+let last_cobol_unit_before_pos ~filename pos group =
+  Cobol_unit.Visitor.fold_unit_group object
+    inherit [_] Cobol_unit.Visitor.folder
+    method! fold_cobol_unit' cu acc =
+      let is_in_or_after =
+        try
+          let lexloc = Cobol_common.Srcloc.lexloc_in ~filename ~@cu in
+          Lsp_position.is_in_lexloc pos lexloc ||
+          Lsp_position.is_after_lexloc pos lexloc
+        with Invalid_argument _ -> false
+      in
+      if is_in_or_after
+      then Visitor.skip_children @@ Some ~&cu
+      else Visitor.skip_children acc
+  end group None
+
 let copy_at_pos ~filename pos ptree =
   Cobol_ptree.Visitor.fold_compilation_group object
     inherit [copy_operation option] Cobol_ptree.Visitor.folder
@@ -202,3 +239,240 @@ let copy_at_pos ~filename pos ptree =
           | _ ->
               Visitor.do_children None
   end ptree None
+
+let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info list =
+  let open Cobol_common.Visitor in
+  let open Cobol_ptree.Visitor in
+  let open struct
+    type acc = {
+      context: approx_typing_info list;
+      value: approx_typing_info list;
+      after_pos: bool;
+    }
+    let init = { context = [Any]; value = [Any]; after_pos = false }
+    let result acc = acc.value
+
+    let set context f acc =
+      if acc.after_pos
+      then acc
+      else { (f { acc with context }) with context = acc.context }
+
+    let (@>>@) ctx fold =
+      set ctx fold
+
+    let (@>@) ctx fold =
+      [ctx] @>>@ fold
+  end in
+  Cobol_unit.Visitor.fold_unit_group
+    object (v)
+      inherit [acc] Cobol_unit.Visitor.folder
+
+      method! fold_cobol_unit cu acc =
+        acc
+        |> Cobol_unit.Visitor.fold_procedure v cu.unit_procedure
+        |> skip
+
+      method! fold' { loc; _ } acc =
+        if acc.after_pos
+        then skip acc
+        else
+          try
+            let start = Cobol_common.Srcloc.start_pos_in ~filename loc in
+            let start = start.pos_lnum - 1, start.pos_cnum - start.pos_bol in
+            let pos = (pos.line, pos.character) in
+            if start <= pos
+            then do_children { acc with value = acc.context }
+            else skip { acc with after_pos = true }
+          with Invalid_argument _ ->
+            skip acc
+
+      (* add / subtract *)
+      method! fold_basic_arithmetic_operands o acc =
+        begin match o with
+          | ArithSimple { sources; targets } ->
+            acc
+            |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
+            |> Numeric @>@ fold_rounded_idents v targets
+          | ArithGiving { sources; to_or_from_item; targets } ->
+            acc
+            |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
+            |> Numeric @>@ fold_ident_or_numlit v to_or_from_item
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
+          | ArithCorresponding { source; target } ->
+            acc
+            |> Group   @>@ fold_qualname v source
+            |> Group   @>@ fold_rounded_ident v target
+        end
+        |> skip
+
+      method! fold_allocate_kind k acc =
+        begin match k with
+          | AllocateDataItem n ->
+            acc
+            |> Any (* linkage level 01 or 77 *) @>@ fold_name' v n
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_allocate' { payload = al; _ } acc =
+        acc
+        |> fold_allocate_kind v al.allocate_kind
+        |> Pointer @>@ fold_ident'_opt v al.allocate_returning
+        |> skip
+
+      method! fold_call_prefix p acc =
+        begin match p with
+          | CallGeneral i ->
+            acc
+            |> Alphanum (* +procedure_pointer *) @>@ fold_ident_or_strlit v i
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_cancel' { payload = c; _ } acc =
+        acc
+        |> Alphanum @>@ fold_list ~fold:fold_ident_or_strlit v c
+        |> skip
+
+      method! fold_compute' { payload = c; _ } acc =
+        acc
+        |> [Numeric; NumericEdited; Boolean]
+        @>>@ fold_rounded_idents v c.compute_targets
+        |> fold_dual_handler v c.compute_on_size_error
+        |> skip
+
+      method! fold_divide_operands dop acc =
+        begin match dop with
+          | DivideInto i ->
+            acc
+            |> Numeric @>@ fold_scalar v i.divisor
+            |> Numeric @>@ fold_rounded_idents v i.dividends
+          | DivideGiving g ->
+            acc
+            |> Numeric @>@ fold_scalar v g.divisor
+            |> Numeric @>@ fold_scalar v g.dividend
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.giving
+            |> [Numeric; NumericEdited] @>>@ fold_option ~fold:fold_ident v g.remainder
+        end |> skip
+
+      method! fold_entry_by_clause clause acc =
+        begin match clause with
+          | EntryByReference l ->
+            acc
+            |> Any (* linkage lvl 01 77*) @>@ fold_name'_list v l
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_free' { payload = f; _ } acc =
+        acc
+        |> Pointer @>@ fold_list ~fold:fold_name' v f
+        |> skip
+
+      method! fold_goto' { payload = g; _ } acc =
+        begin match g with
+          | GoToSimple { depending_on; _ }
+          | GoToEntry { depending_on; _ } ->
+            acc
+            |> Numeric (* int *) @>@ fold_option ~fold:fold_ident v depending_on
+        end
+        |> skip
+
+      method! fold_inspect' { payload = i; _ } acc =
+        acc
+        |> (* usage display *) fold_ident v i.inspect_item
+        |> skip
+
+      method! fold_invoke' { payload = i; _ } acc =
+        acc
+        |> ObjectRef (* 4byte *) @>@ fold_ident v i.invoke_target
+        |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
+        |> skip
+
+      method! fold_move' { payload = m; _ } acc =
+        begin match m with
+          | MoveCorresponding { from; to_ } ->
+            acc
+            |> Group @>@ fold_ident v from
+            |> Group @>@ fold_list ~fold:fold_ident v to_
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_multiply_operands mo acc =
+        begin match mo with
+          | MultiplyBy b ->
+            acc
+            |> Numeric @>@ fold_scalar v b.multiplier
+            |> Numeric @>@ fold_rounded_idents v b.multiplicand
+          | MultiplyGiving g ->
+            acc
+            |> Numeric @>@ fold_scalar v g.multiplier
+            |> Numeric @>@ fold_scalar v g.multiplicand
+            |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v g.targets
+        end
+        |> skip
+
+      method! fold_perform_mode pm acc =
+        begin match pm with
+          | PerformNTimes i ->
+            acc |> Numeric @>@ fold_ident_or_intlit v i
+          | PerformVarying pv ->
+            acc
+            |> fold_varying_phrase' v pv.varying
+            |> fold_list ~fold:fold_varying_phrase' v pv.after
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_varying_phrase vp acc =
+        acc
+        |> Numeric @>@ fold_ident v vp.varying_ident
+        |> Numeric @>@ fold_scalar v vp.varying_from
+        |> Numeric @>@ fold_option ~fold:fold_scalar v vp.varying_by
+        |> skip
+
+      method! fold_raise' { payload = r; _ } acc =
+        begin match r with
+          | RaiseIdent id -> acc |> ObjectRef @>@ fold_ident v id
+          | _ -> acc
+        end
+        |> skip
+
+      method! fold_search' { payload = s; _ } acc =
+        acc
+        |> [Numeric; Index] @>>@ fold_option ~fold:fold_ident v s.search_varying
+        |> skip
+
+      method! fold_string_stmt' { payload = s; _ } acc =
+        acc
+        |> Alphanum @>@ fold_ident v s.string_target
+        |> fold_dual_handler v s.string_on_overflow
+        |> skip
+
+      method! fold_transform' { payload = t; _ } acc =
+        acc
+        |> (* technically should not be (numeric without display) *)
+        fold_ident' v t.transform_ident
+        |> Alphanum @>@fold' ~fold:fold_ident_or_nonnum v t.transform_from
+        |> Alphanum @>@ fold' ~fold:fold_ident_or_nonnum v t.transform_to
+        |> skip
+
+      method! fold_unstring' { payload = u; _ } acc =
+        acc
+        |> Alphanum @>@ fold_ident v u.unstring_source
+        |> Alphanum @>@ fold_list ~fold:fold_unstring_delimiter v u.unstring_delimiters
+        |> (* usage display *) fold_list ~fold:fold_unstring_target v u.unstring_targets
+        |> Numeric  @>@ fold_option ~fold:fold_ident v u.unstring_pointer
+        |> Numeric  @>@ fold_option ~fold:fold_ident v u.unstring_tallying
+        |> fold_dual_handler v u.unstring_on_overflow
+        |> skip
+
+      method! fold_unstring_target t acc =
+        acc
+        |> Any      @>@ fold_ident v t.unstring_target
+        |> Alphanum @>@ fold_option ~fold:fold_ident v t.unstring_target_delimiter
+        |> Numeric  @>@ fold_option ~fold:fold_ident v t.unstring_target_count
+        |> skip
+
+    end group init |> result

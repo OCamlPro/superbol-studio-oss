@@ -40,7 +40,7 @@ let%expect_test "tokens-after-syntax-errors" =
 
 let%expect_test "token-locations" =
   Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
-    ~verbose:true
+    ~parser_options:(Parser_testing.options ~verbose:true ())
     {|(TMP:1)|};
   [%expect {|
     Tks: (, WORD[TMP], :, DIGITS[1], ), EOF

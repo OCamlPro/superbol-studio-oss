@@ -1,14 +1,26 @@
 # Changelog
 
-## [0.1.3] Next release
+## [0.1.4] Next release
 
 ### Added
+- COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed- format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+
+### Fixed
+- Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+
+
+## [0.1.3] Fourth α release (2024-07-24)
+
+### Added
+- Support for LSP request `textDocument/documentSymbol` [#317](https://github.com/OCamlPro/superbol-studio-oss/pull/317)
+- Context-sensitive completion for keywords and user-defined words [#304](https://github.com/OCamlPro/superbol-studio-oss/pull/304), [#312](https://github.com/OCamlPro/superbol-studio-oss/pull/312), [#314](https://github.com/OCamlPro/superbol-studio-oss/pull/314)
 - Internal support for inspecting the parser's state right before EOF [#302](https://github.com/OCamlPro/superbol-studio-oss/pull/302)
 - Show data item information on hover [#293](https://github.com/OCamlPro/superbol-studio-oss/pull/293) [#305](https://github.com/OCamlPro/superbol-studio-oss/pull/305)
 - Folding of `EXEC`/`END-EXEC` blocks [#291](https://github.com/OCamlPro/superbol-studio-oss/pull/291)
 - Basic syntax highlighting for SQL statements embedded in `EXEC`/`END-EXEC` blocks [#290](https://github.com/OCamlPro/superbol-studio-oss/pull/290)
 
 ### Fixed
+- Improvements to the grammar [#310](https://github.com/OCamlPro/superbol-studio-oss/pull/310), [#319](https://github.com/OCamlPro/superbol-studio-oss/pull/319)
 - Internal mishandling of tokens when dealing with some `EXEC`/`END-EXEC` blocks [#301](https://github.com/OCamlPro/superbol-studio-oss/pull/301)
 - Internal pretty-printing routine for `EXEC`/`END-EXEC` blocks [#300](https://github.com/OCamlPro/superbol-studio-oss/pull/300)
 - Support for line continuations that start with a text word [#294](https://github.com/OCamlPro/superbol-studio-oss/pull/294)

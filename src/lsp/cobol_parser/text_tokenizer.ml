@@ -32,30 +32,9 @@ let combined_tokens =
      Rationale: this would considerably complicate retokenization (which is
      necessary with the current solution to handle context-sensitive
      keywords) *)
-  Hashtbl.of_seq @@ List.to_seq [
-    ON_EXCEPTION, "ON_EXCEPTION";
-    NOT_ON_EXCEPTION, "NOT_ON_EXCEPTION";
-    ON_OVERFLOW, "ON_OVERFLOW";
-    NOT_ON_OVERFLOW, "NOT_ON_OVERFLOW";
-    ON_SIZE_ERROR, "ON_SIZE_ERROR";
-    NOT_ON_SIZE_ERROR, "NOT_ON_SIZE_ERROR";
-    INVALID_KEY, "INVALID_KEY";
-    NOT_INVALID_KEY, "NOT_INVALID_KEY";
-    AT_END, "AT_END";
-    NOT_AT_END, "NOT_AT_END";
-    AT_EOP, "AT_EOP";
-    NOT_AT_EOP, "NOT_AT_EOP";
-    WITH_DATA, "WITH_DATA";
-    NO_DATA, "NO_DATA";
-    WITH_NO_ADVANCING, "WITH_NO_ADVANCING";
-    IS_GLOBAL, "IS_GLOBAL";
-    IS_EXTERNAL, "IS_EXTERNAL";
-    IS_TYPEDEF, "IS_TYPEDEF";
-    DATA_RECORD, "DATA_RECORD";
-    DATA_RECORDS, "DATA_RECORDS";
-    NEXT_PAGE, "NEXT_PAGE";
-    NEXT_SENTENCE, "NEXT_SENTENCE";
-  ]
+  Hashtbl.of_seq @@
+  Seq.map (fun (a, b) -> b, a) @@
+  List.to_seq Text_keywords.combined_keywords
 
 let is_intrinsic_token = function
   | BYTE_LENGTH_FUNC
@@ -731,18 +710,27 @@ let disable_tokens state tokens outgoing_tokens =
   state, retokenize_after (Disabled_keywords outgoing_tokens) state tokens
 
 
+let register_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.register_intrinsics lexer registered_intrinsics
+
+
 let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
   Text_lexer.unregister_intrinsics lexer registered_intrinsics
 
 
-let reregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
-  Text_lexer.register_intrinsics lexer registered_intrinsics
+let save_intrinsics state =
+  unregister_intrinsics state
+
+
+let restore_intrinsics ({ intrinsics_enabled; _ } as state) =
+  if intrinsics_enabled
+  then register_intrinsics state
 
 
 let enable_intrinsics state token tokens =
   if state.intrinsics_enabled then state, token, tokens else        (* error? *)
     let state = put_token_back { state with intrinsics_enabled = true } in
-    reregister_intrinsics state;
+    register_intrinsics state;
     let tokens = token :: tokens in
     let tokens = retokenize_after Enabled_intrinsics state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in

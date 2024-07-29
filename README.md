@@ -92,7 +92,43 @@ From here, you can notably configure:
 > Reporting can be re-enabled for every dialect by setting the `Force
 > Syntax Diagnostics` flag in SuperBOL configuration settings.
 
+## IntelliSense (auto-completion)
+
+When editing a program, you can press <kbd>Ctrl</kbd>+<kbd>Space</kbd>
+to obtain suggestions on valid keywords, user-defined words (data item
+or paragraph names), and even complete COBOL sentences.  Select an
+option with the arrow keys, and press <kbd>Enter</kbd> to insert the
+selected suggestion.
+
+![IntelliSense sentence](./assets/superbol-completion-data-div-sentence.gif)
+![IntelliSense data item](./assets/superbol-completion-data-item.png)
+![IntelliSense paragraph](./assets/superbol-completion-paragraph.png)
+
+> [!NOTE]
+> (Temporary limitation)
+>
+> Suggestions of user-defined words may not comprise symbols that are
+> defined in some sections of the data division.
+
 ## Navigation features
+
+### Outline & Breadcrumbs
+
+SuperBOL provides an outline view of your program once you open it,
+that you can use to navigate to specific sections or symbols (data
+items, paragraphs, etc).  The same information is also shown in the
+["breadcrumbs"](https://code.visualstudio.com/docs/editor/editingevolved#_breadcrumbs)
+bar, that is usually located above the text edition area.
+
+![Outline & Breadcrumb](./assets/superbol-outline.png)
+
+### Go to Symbol
+
+Symbols shown in Outline and Breadcrumbs views can also be searched
+and jumped to by pressing
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd>.
+
+![Go to Symbol](./assets/superbol-goto-symbol.gif)
 
 ### Go to Definition
 
@@ -125,8 +161,8 @@ every reference to this item.
 > [!NOTE]
 > (Temporary limitation)
 >
-> At the moment, definitions that belong to some sections of the data
-> division, and some references to data items, are ignored by the
+> At the moment, definitions that belong to *some* sections of the
+> data division, and some references to data items, are ignored by the
 > extension.  They will be covered by the first stable release.
 
 ### Hover to Show Copybooks

@@ -4,7 +4,7 @@
 (cram enable)
 (name superbol-studio-oss)
 (generate_opam_files false)
-(version 0.1.3)
+(version 0.1.4)
 (formatting (enabled_for ocaml reason))
 (using menhir 2.0)
 
@@ -258,7 +258,7 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
-   (menhir ( >= 20230415 ))
+   (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
   )
  )

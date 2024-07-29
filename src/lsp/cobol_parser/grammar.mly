@@ -190,6 +190,7 @@ let dual_handler_none =
 %left OR
 %left AND
 %right AMPERSAND
+%nonassoc below_ident_combinators
 %right DOUBLE_COLON AS
 
 %nonassoc OF IN
@@ -396,8 +397,8 @@ class_definition [@cost 999]:
  | cid = class_identification
    opo = ro(loc(options_paragraph))
    edo = ro(loc(environment_division))
-   fdo = io(factory_definition) (* Note: inline to avoid conflict *)
-   ido = ro(instance_definition)
+   fdo = io(loc(factory_definition)) (* Note: inline to avoid conflict *)
+   ido = ro(loc(instance_definition))
    END CLASS ec = unit_name "."
    { let _, (class_name, class_as, class_final,
              class_inherits, class_usings) = cid in
@@ -475,8 +476,8 @@ method_definition: (* Note: used in PROCEDURE DIVISION within classes, see below
        method_end_name = em } }
 
 
-let informational_paragraphs :=                            (* ~COB85, -COB2002 *)
- rl(loc(informational_paragraph))
+let informational_paragraphs ==                 (* ~COB85, -COB2002 *)
+  rl(loc(informational_paragraph))
 
 let informational_paragraph :=
   | ~ = informational_paragraph_header; "."; ~ = loc(comment_entry); < >
@@ -495,7 +496,8 @@ let informational_paragraph_header ==
 let info_word [@recovery "_"] [@symbol "<word>"] := INFO_WORD
 let comment_entry [@recovery ["_"]] [@symbol "<comment entry>"] := COMMENT_ENTRY
 
-let as__strlit_ := ~ = ro (pf (AS, string_literal)); < >
+let as__strlit_ [@default None] :=
+  | ~ = ro (pf (AS, string_literal)); < >
 
 let unit_name := loc(infoword_or_literal)
 
@@ -557,10 +559,10 @@ let interface_id_paragraph :=                                      (* +COB2002 *
 
 let method_id_paragraph :=                                         (* +COB2002 *)
   | METHOD_ID; "."; i = name; slo = as__strlit_;
-    o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
+    o = bo(OVERRIDE); f = bo(IS?; FINAL; {}); ".";
     { i, NamedMethod { as_ = slo }, o, f }
   | METHOD_ID; "."; pk = property_kind; PROPERTY; i = name;
-    o = bo(OVERRIDE); f = bo(IS?; FINAL; {});
+    o = bo(OVERRIDE); f = bo(IS?; FINAL; {}); ".";
     { i, PropertyMethod { kind = pk }, o, f }
 
 let options_paragraph [@context options_paragraph] :=              (* +COB2002 *)
@@ -816,7 +818,7 @@ let order_table_clause :=                                          (* +COB2002 *
   | ORDER; TABLE; i = name; IS?; l = string_literal;
     { OrderTable { ordering_name = i; cultural_ordering = l } }
 
-let for_alphanumeric_or_national_opt :=
+let for_alphanumeric_or_national_opt [@default Alphanumeric] :=
   | (* epsilon *)       {Alphanumeric}
   | FOR?; ALPHANUMERIC; {Alphanumeric}
   | FOR?; NATIONAL;     {National}
@@ -852,7 +854,7 @@ let expands_phrase :=
 let function_specifier [@context function_specifier] :=
   | FUNCTION; i = name; lo = as__strlit_;
     { UserFunctionSpecifier { name = i; external_name = lo } }
-  | FUNCTION; ~ = names; INTRINSIC; <IntrinsicFunctionSpecifier>
+  | FUNCTION; ~ = rnel(function_name); INTRINSIC; <IntrinsicFunctionSpecifier>
   | FUNCTION; ALL; INTRINSIC;       {IntrinsicFunctionAllSpecifier}
 
 (* -------------- ENVIRONMENT DIVISION / INPUT-OUTPUT SECTION -------------- *)
@@ -1021,7 +1023,7 @@ let same_area_clause :=
        same_area_file_name = i;
        same_area_file_names = il } }
 
-let area_source :=
+let area_source [@default AreaSourceFile] :=
  |             {AreaSourceFile}
  | RECORD;     {AreaSourceRecord}
  | SORT;       {AreaSourceSortMerge}
@@ -1301,7 +1303,7 @@ let recording_mode :=
  | FIXED;    { ModeFixed }
  | VARIABLE; { ModeVariable }
 
-from_to_characters_opt:
+from_to_characters_opt [@default (None, None)]:
  | CHARACTERS?                                    { None,    None }
  | FROM? i1 = integer CHARACTERS?                 { Some i1, None }
  | TO i2 = integer CHARACTERS?                    { None,    Some i2 }
@@ -1511,7 +1513,7 @@ let blank_when_zero_clause := BLANK; WHEN?; ZERO
 let justified_clause := JUSTIFIED; RIGHT?
 
 let picture_clause
-      [@recovery dummy_picture]
+      [@recovery_with_pos dummy_picture]
       [@symbol "<picture clause>"] :=
   | PICTURE; IS?; picture_string = loc(PICTURE_STRING);
     picture_locale = ro(picture_locale_phrase);
@@ -1701,7 +1703,8 @@ let encoding_mode :=
   | BINARY_ENCODING;  { BinaryEncoding }
   | DECIMAL_ENCODING; { DecimalEncoding }
 
-let encoding_endianness_opt :=
+let encoding_endianness_opt [@default { encoding_mode = None;
+                                        endianness_mode = None }] :=
   | { { encoding_mode = None; endianness_mode = None } }
   | ~ = encoding_endianness; < >
 
@@ -1846,7 +1849,7 @@ let column_position :=
   | ~ = integer;                <ColumnAbsolute>
   | or_(PLUS,"+"); ~ = integer; <ColumnRelative>
 
-let alignment :=
+let alignment [@default AlignLeft] :=
   | LEFT?;  {AlignLeft}
   | CENTER; {AlignRight}
   | RIGHT;  {AlignCenter}
@@ -2148,13 +2151,14 @@ let at_eop := EOP | AT_EOP | END_OF_PAGE
 
 
 
-let name [@recovery dummy_name] [@symbol "<word>"] :=
+let name [@recovery_with_pos dummy_name] [@symbol "<word>"] :=
  | i = loc(WORD); < >
 let names := ~ = rnel(name); < >
 
 let in_of := IN | OF
 
-let qualname_ [@recovery dummy_qualname] [@symbol "<qualified name>"] :=
+let qualname_ [@recovery_with_pos dummy_qualname] [@symbol "<qualified name>"]
+              [@completion QualifiedRef] :=
  | n = name; %prec lowest            {Name n: qualname}
  | n = name; in_of; qdn = qualname_; {Qual (n, qdn)}
 let qualname ==
@@ -2176,7 +2180,8 @@ let procedure_name_decl :=
  | ~ = name;                < >
  | ~ = literal_int_ident;   < >
 
-let procedure_name [@recovery dummy_qualname'] [@symbol "<procedure name>"] :=
+let procedure_name [@recovery_with_pos dummy_qualname'] [@symbol "<procedure name>"]
+                   [@completion ProcedureRef] :=
  | loc(qualified_procedure_name)
 
 let qualified_procedure_name :=
@@ -2213,7 +2218,8 @@ let subscripts [@recovery []] [@symbol "<subscripts>"] [@cost 0] :=
  | "("; s = subscript_first; sl = rnel(subscript_following); ")"; { s::sl }
  | "("; s = subscript_first; ")";                                 { [s] }
 
-let function_name [@recovery dummy_name] [@symbol "<function-name>"] :=
+let function_name [@recovery_with_pos dummy_name] [@symbol "<function-name>"]
+                  [@completion FunctionName] :=
  | ~ = name;                         < >
 
 let inline_invocation :=
@@ -2325,7 +2331,7 @@ let base_ident ==                 (* identifier without reference modification *
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let ident [@symbol "<identifier>"] [@recovery dummy_ident] :=
+let ident [@symbol "<identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = base_ident; %prec below_RPAR { UPCAST.base_ident_with_refmod i }
   | i = base_ident; r = refmod;      { RefMod (i, r) }
 
@@ -2340,7 +2346,7 @@ let scalar_ident_ ==        (* scalar identifier without reference modification 
  | a = address;                  {Address a}
  | c = counter;                  {Counter c}
 
-let scalar_ident [@symbol "<scalar identifier>"] [@recovery dummy_ident] :=
+let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident] :=
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
@@ -2352,7 +2358,7 @@ let length_of_expr :=
 
 let ident_or_literal
       [@symbol "<identifier or literal>"] [@cost 0]
-      [@recovery Cobol_ptree.UPCAST.ident_with_literal dummy_ident] :=
+      [@recovery_with_pos (fun ~pos -> Cobol_ptree.UPCAST.ident_with_literal @@ dummy_ident ~pos)] :=
   | i = ident; %prec lowest { UPCAST.ident_with_literal i }
   | l = literal;            { UPCAST.literal_with_ident l }
 
@@ -2507,8 +2513,8 @@ let name_or_string :=
  | s = string_literal; { UPCAST.string_with_name s }
 
 let ident_or_string :=
- | i = ident; %prec below_RPAR { UPCAST.ident_with_string i }
- | s = string_literal;         { UPCAST.string_with_ident s }
+ | i = ident; %prec below_ident_combinators { UPCAST.ident_with_string i }
+ | s = string_literal;                      { UPCAST.string_with_ident s }
 let idents_or_strings == ~ = rnel(ident_or_string); < >
 
 (* UNSTRING *)
@@ -2801,7 +2807,7 @@ let rounded_ident :=
     { { rounded = i; rounded_rounding = rm } }
 let rounded_idents == ~ = rnel(rounded_ident); < >
 
-let rounded_phrase_opt :=
+let rounded_phrase_opt [@default RoundingNotAny] :=
   | (* epsilon *)                         {RoundingNotAny} (* = ROUNDED MODE TRUNCATION *)
   | ~ = rounded_phrase; < >
 
@@ -3373,7 +3379,7 @@ let when_phrase :=
 
 let when_selection_objects := WHEN; ~ = selection_objects; < >
 
-let when_other :=
+let when_other [@default []] :=
  | %prec lowest { [] }
  | WHEN; OTHER; ~ = imp_stmts; < >
 
@@ -3533,7 +3539,7 @@ let tallying_for :=
  | LEADING; l = ident_after_before_list;    {TallyingRange (TallyLeading, l)}
 
 let ident_after_before_list :=
- | iab = ident_after_before; %prec below_RPAR                { [iab] }
+ | iab = ident_after_before; %prec below_ident_combinators   { [iab] }
  | iab = ident_after_before; iabl = ident_after_before_list; { iab::iabl }
 
 let ident_after_before :=
