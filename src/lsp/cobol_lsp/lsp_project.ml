@@ -100,8 +100,9 @@ let update_source_format { config; _ } str : bool =
 let update_dialect ({ config; _ } as project) str : bool =
   try
     let { result; diags } =
-      Superbol_project.Config.cobol_config_from_dialect_name
-        ~verbose:false str in
+      Superbol_project.Config.cobol_config_from_dialect_name str
+        ~verbose:false
+    in
     if result = config.cobol_config            (* note: structural comparison *)
     then false
     else begin
@@ -124,9 +125,20 @@ let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
   in
   try
     let libpath = convert_each to_libdir json in
-    if libpath = config.libpath              (* note: structural comparison *)
+    if libpath = config.libpath                (* note: structural comparison *)
     then false
     else (config.libpath <- libpath; true)
+  with
+    Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
+      Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
+
+let update_copyexts: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
+  let open Yojson.Safe.Util in
+  try
+    let libexts = convert_each to_string json in
+    if libexts = config.libexts                (* note: structural comparison *)
+    then false
+    else (config.libexts <- libexts; true)
   with
     Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
       Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
@@ -156,6 +168,7 @@ let update_project_config assoc project : bool =
     "dialect", from_string ~f:update_dialect;
     "source-format", from_string ~f:update_source_format;
     "copybooks", update_copybooks;
+    "copyexts", update_copyexts;
   ]
 
 
@@ -199,6 +212,9 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
 
       "copybooks",
       `List copybooks;
+
+      "copyexts",
+      `List (List.map (fun s -> `String s) config.libexts);
     ]
   in
   if flat

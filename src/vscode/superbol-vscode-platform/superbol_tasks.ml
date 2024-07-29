@@ -60,6 +60,12 @@ let config_string key ~config =
   try Jsonoo.Decode.string @@ Hashtbl.find config key
   with Not_found -> Superbol_workspace.string key
 
+let config_strings key ~config ~append =
+  append @@
+  try Jsonoo.Decode.(list string) @@ Hashtbl.find config key
+  with Not_found -> Superbol_workspace.strings key
+     | Jsonoo.Decode_error _ -> []  (* Warning: silenced decode errors for now *)
+
 let attr_strings key ~append ~attributes args =
   match List.assoc_opt key attributes with
   | Some l -> append ([%js.to: string list] l) args
@@ -111,6 +117,10 @@ let cobc_execution ?config attributes =
            else dir]
         end l |>
         List.append args
+      end |>
+    config_strings "cobol.copyexts" ~config
+      ~append:begin fun exts args ->
+        List.append args @@ List.flatten @@ List.map (fun e -> ["-ext"; e]) exts
       end |>
     config_string "cobol.dialect" ~config
       ~mk:(function "gnucobol" -> "-std=default" | s -> "-std=" ^ s) |>

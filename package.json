@@ -120,6 +120,16 @@
           },
           "order": 3
         },
+        "superbol.cobol.copyexts": {
+          "markdownDescription": "File extensions for copybook resolution\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "array",
+          "default": [
+            "cpy",
+            "cbx"
+          ],
+          "items": "string",
+          "order": 1
+        },
         "superbol.cobc-path": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",

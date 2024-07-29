@@ -3,7 +3,8 @@
 ## [0.1.4] Next release
 
 ### Added
-- COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed- format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+- Configuration setting for copybook filename extensions [#332](https://github.com/OCamlPro/superbol-studio-oss/pull/332)
+- COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed-format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 ### Fixed
 - Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)

@@ -23,7 +23,7 @@ module TYPES: sig
     mutable cobol_config: Cobol_config.t;
     mutable source_format: Cobol_config.source_format_spec;
     mutable libpath: path list;
-    mutable copybook_extensions: string list;
+    mutable libexts: string list;
     mutable copybook_if_no_extension: bool;
     mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;

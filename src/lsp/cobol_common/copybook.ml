@@ -105,9 +105,14 @@ let find_lib ~lookup_config:({ lookup_path = libpath;
     in
     iter_path libpath_files
   in
+  (* Note: GnuCOBOL handles copybook names given as string literals or plain
+     text-words in the same way (except for distinct case-folding, that we don't
+     handle yet).
+
+     TODO: to handle case folding, a copybook name that is given as a text-word
+     should be put in uppercase unless [lookup_fold=Lower]. *)
   match textname with
-  | `Alphanum w ->                        (* assume no more filename extension *)
-      try_file w []
+  | `Alphanum w
   | `Word w ->
       match try_file w libexts with
       | Ok lib -> Ok lib
