@@ -7,7 +7,9 @@ syn_copy.at-112-prog.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: ./SUB)
+>> Error: Library `copy.inc' not found in search path
+          - path: ./SUB
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:113:0
 syn_copy.at-113-prog2.cob:6.7-6.30:
@@ -18,7 +20,9 @@ syn_copy.at-113-prog2.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: ./SUB)
+>> Error: Library `copy.inc' not found in search path
+          - path: ./SUB
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:114:0
 syn_copy.at-114-prog3.cob:6.7-6.31:
@@ -29,7 +33,9 @@ syn_copy.at-114-prog3.cob:6.7-6.31:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: ./sub2)
+>> Error: Library `copy.inc' not found in search path
+          - path: ./sub2
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:115:0
 syn_copy.at-115-prog4.cob:6.7-6.23:
@@ -40,7 +46,9 @@ syn_copy.at-115-prog4.cob:6.7-6.23:
 ----          ^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:116:0
 syn_copy.at-116-prog5.cob:6.7-6.30:
@@ -51,7 +59,9 @@ syn_copy.at-116-prog5.cob:6.7-6.30:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: ./CBD)
+>> Error: Library `copy.inc' not found in search path
+          - path: ./CBD
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:163:0
 Fatal: syn_copy.at-163-SUB/prog.cob: No such file or directory
@@ -64,7 +74,9 @@ syn_copy.at-247-prog.cob:6.7-6.23:
 ----          ^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:248:0
 syn_copy.at-248-prog2.cob:6.7-6.19:
@@ -75,7 +87,9 @@ syn_copy.at-248-prog2.cob:6.7-6.19:
 ----          ^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `copy' not found in search path (search path: )
+>> Error: Library `copy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:249:0
 syn_copy.at-249-prog3.cob:6.7-6.29:
@@ -86,7 +100,9 @@ syn_copy.at-249-prog3.cob:6.7-6.29:
 ----          ^^^^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub.inc' not found in search path (search path: ./SUB)
+>> Error: Library `sub.inc' not found in search path
+          - path: ./SUB
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:250:0
 syn_copy.at-250-prog4.cob:6.7-6.25:
@@ -97,7 +113,9 @@ syn_copy.at-250-prog4.cob:6.7-6.25:
 ----          ^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub' not found in search path (search path: ./SUB)
+>> Error: Library `sub' not found in search path
+          - path: ./SUB
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:251:0
 syn_copy.at-251-prog5.cob:6.7-6.26:
@@ -108,7 +126,9 @@ syn_copy.at-251-prog5.cob:6.7-6.26:
 ----          ^^^^^^^^^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub' not found in search path (search path: ./..)
+>> Error: Library `sub' not found in search path
+          - path: ./..
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:252:0
 syn_copy.at-252-prog6.cob:6.7-6.18:
@@ -119,7 +139,9 @@ syn_copy.at-252-prog6.cob:6.7-6.18:
 ----          ^^^^^^^^^^^
    7          PROCEDURE        DIVISION.
    8              DISPLAY TEST-VAR.
->> Error: Library `sub' not found in search path (search path: )
+>> Error: Library `sub' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:280:0
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:281:0
@@ -136,7 +158,9 @@ syn_copy.at-403-prog.cob:6.7-8.53:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE        DIVISION.
   10              DISPLAY FIRST-MATCH NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:432:0
 syn_copy.at-432-prog.cob:6.7-10.55:
@@ -155,7 +179,9 @@ syn_copy.at-432-prog.cob:6.7-10.55:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11          PROCEDURE        DIVISION.
   12              DISPLAY FIRST-MATCH NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:462:0
 syn_copy.at-462-prog.cob:6.7-8.44:
@@ -170,7 +196,9 @@ syn_copy.at-462-prog.cob:6.7-8.44:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE        DIVISION.
   10              DISPLAY COLON-VAR NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:492:0
 syn_copy.at-492-prog.cob:6.7-8.53:
@@ -185,7 +213,9 @@ syn_copy.at-492-prog.cob:6.7-8.53:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE        DIVISION.
   10              DISPLAY FIRST-VAR NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:522:0
 syn_copy.at-522-prog.cob:6.7-8.54:
@@ -200,7 +230,9 @@ syn_copy.at-522-prog.cob:6.7-8.54:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE        DIVISION.
   10              DISPLAY TEST-VAR1 NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:569:0
 syn_copy.at-569-prog.cob:9.37-9.39:
@@ -227,7 +259,9 @@ syn_copy.at-569-prog.cob:6.7-9.40:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   10          COPY "copy2.inc"
   11               REPLACING TRAILING "FIRST" BY "VAR1"
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_copy.at-569-prog.cob:13.38-13.40:
   10          COPY "copy2.inc"
@@ -253,7 +287,9 @@ syn_copy.at-569-prog.cob:10.7-13.41:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   14          PROCEDURE        DIVISION.
   15              DISPLAY FIRST-VAR  NO ADVANCING END-DISPLAY.
->> Error: Library `copy2.inc' not found in search path (search path: )
+>> Error: Library `copy2.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:654:0
 syn_copy.at-654-prog.cob:6.7-7.50:
@@ -266,7 +302,9 @@ syn_copy.at-654-prog.cob:6.7-7.50:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    8          PROCEDURE        DIVISION.
    9              DISPLAY COPY-VAR NO ADVANCING
->> Error: Library `copy-1.inc' not found in search path (search path: )
+>> Error: Library `copy-1.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:680:0
 syn_copy.at-680-prog.cob:6.2-6.18:
@@ -277,7 +315,9 @@ syn_copy.at-680-prog.cob:6.2-6.18:
 ----     ^^^^^^^^^^^^^^^^
    7     PROCEDURE        DIVISION.
    8      DISPLAY TEST-VAR NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:703:0
 syn_copy.at-703-prog.cob:4.36-4.42:
@@ -308,7 +348,9 @@ syn_copy.at-761-prog.cob:7.7-8.46:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE DIVISION.
   10          main.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:799:0
 syn_copy.at-799-prog.cob:7.7-12.57:
@@ -329,7 +371,9 @@ syn_copy.at-799-prog.cob:7.7-12.57:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13          PROCEDURE DIVISION.
   14          main.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:879:0
 syn_copy.at-879-prog.cob:7.7-13.62:
@@ -352,7 +396,9 @@ syn_copy.at-879-prog.cob:7.7-13.62:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   14          PROCEDURE DIVISION.
   15          main.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:918:0
 syn_copy.at-918-prog.cob:7.7-12.55:
@@ -373,7 +419,9 @@ syn_copy.at-918-prog.cob:7.7-12.55:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   13          PROCEDURE DIVISION.
   14          main.
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:968:0
 syn_copy.at-968-prog.cob:7.7-8.44:
@@ -386,7 +434,9 @@ syn_copy.at-968-prog.cob:7.7-8.44:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9          PROCEDURE        DIVISION.
   10              DISPLAY VAR-COLON NO ADVANCING
->> Error: Library `copy.inc' not found in search path (search path: )
+>> Error: Library `copy.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1072:0
 syn_copy.at-1072-prog.cob:8.30-8.32:
@@ -411,7 +461,9 @@ syn_copy.at-1072-prog.cob:12.7-14.49:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15              END-IF.
   16              STOP RUN.
->> Error: Library `proc.inc' not found in search path (search path: )
+>> Error: Library `proc.inc' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_copy.at-1072-prog.cob:15.11-15.17:
   12          COPY "proc.inc"

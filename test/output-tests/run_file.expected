@@ -3303,7 +3303,9 @@ run_file.at-8591-prog.cob:270.11-270.29:
 ----              ^^^^^^^^^^^^^^^^^^
  271   
  272          01 key-def.
->> Error: Library `xfhfcd.cpy' not found in search path (search path: )
+>> Error: Library `xfhfcd.cpy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-8591-prog.cob:304.16-304.22:
  301              DISPLAY "File assigned is '"
@@ -5058,7 +5060,9 @@ run_file.at-9245-prog.cob:49.11-49.30:
 ----              ^^^^^^^^^^^^^^^^^^^
   50   
   51         *================================================================*
->> Error: Library `xfhfcd3.cpy' not found in search path (search path: )
+>> Error: Library `xfhfcd3.cpy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-9245-prog.cob:74.15-74.21:
   71   
@@ -5080,7 +5084,9 @@ run_file.at-9434-prog.cob:17.11-17.24:
 ----              ^^^^^^^^^^^^^
   18          01  LSEQ-FILENAME PIC X(44)
   19               VALUE 'FCDLS'.
->> Error: Library `xfhfcd3' not found in search path (search path: )
+>> Error: Library `xfhfcd3' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-9434-prog.cob:46.16-46.22:
   43              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5163,7 +5169,9 @@ run_file.at-9643-prog.cob:19.11-19.24:
 ----              ^^^^^^^^^^^^^
   20          01  FIX-FILENAME PIC X(44)
   21               VALUE 'FCDFB'.
->> Error: Library `xfhfcd3' not found in search path (search path: )
+>> Error: Library `xfhfcd3' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-9643-prog.cob:48.16-48.22:
   45              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5254,7 +5262,9 @@ run_file.at-9824-prog.cob:66.11-66.30:
 ----              ^^^^^^^^^^^^^^^^^^^
   67   
   68          01  KEY-DEF.
->> Error: Library `xfhfcd3.cpy' not found in search path (search path: )
+>> Error: Library `xfhfcd3.cpy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-9824-prog.cob:93.17-93.21:
   90         *----------------------------------------------------------------*
@@ -5285,7 +5295,9 @@ run_file.at-10153-prog.cob:86.11-86.23:
 ----              ^^^^^^^^^^^^
   87   
   88          01  FILE-NAME                       PIC X(64).
->> Error: Library `xfhfcd' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-10153-prog.cob:155.16-155.22:
  152              SET  FCD-FILENAME-ADDRESS   TO ADDRESS OF FILE-NAME
@@ -5317,7 +5329,9 @@ run_file.at-10488-prog.cob:97.11-97.23:
 ----              ^^^^^^^^^^^^
   98   
   99          01  RECORD-AREA.
->> Error: Library `xfhfcd' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10488:0
 run_file.at-10488-progs.cob:2.6-2.19:
@@ -5337,7 +5351,9 @@ run_file.at-10676-prog.cob:86.12-86.24:
 ----               ^^^^^^^^^^^^
   87   
   88          01  RECORD-AREA.
->> Error: Library `xfhfcd' not found in search path (search path: )
+>> Error: Library `xfhfcd' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 run_file.at-10676-prog.cob:134.16-134.22:
  131         **   FIXED(0) OR VARIABLE(1)
@@ -5378,7 +5394,9 @@ run_file.at-10835-prog.cob:45.11-45.30:
 ----              ^^^^^^^^^^^^^^^^^^^
   46          01  EX-FILENAME         PIC X(260).
   47          01  EX-RECORD-BUFFER    PIC X(32767).
->> Error: Library `xfhfcd3.cpy' not found in search path (search path: )
+>> Error: Library `xfhfcd3.cpy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11193:0
 run_file.at-11193-prog.cob:15.50:

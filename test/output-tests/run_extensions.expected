@@ -1944,7 +1944,9 @@ run_extensions.at-4853-progc.cob:12.7-12.25:
   12 >        COPY "cllprg.cpy".
 ----          ^^^^^^^^^^^^^^^^^^
   13              GOBACK.
->> Error: Library `cllprg.cpy' not found in search path (search path: )
+>> Error: Library `cllprg.cpy' not found in search path
+          - path: <empty>
+          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4892:0
 run_extensions.at-4892-prog.cob:7.7-7.8:

@@ -17,6 +17,7 @@ type lookup_info =
   {
     libname: string;
     libpath: string list;
+    libexts: string list;
   }
 
 (* --- *)
