@@ -44,7 +44,7 @@ and preprocessor_persist =
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    libpath: string list;
+    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
   }
@@ -115,8 +115,9 @@ let source_format_config = function
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { libpath; verbose; source_format; env;
-                   exec_preprocs; config = (module Config) } ->
+  | `WithOptions { verbose; source_format; env;
+                   exec_preprocs; config = (module Config);
+                   copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -139,7 +140,7 @@ let preprocessor input = function
             dialect = Config.dialect;
             source_format;
             exec_preprocs;
-            libpath;
+            copybook_lookup_config;
             verbose;
             show_if_verbose = [`Src];
           };
@@ -424,15 +425,15 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
       emit lp exec_block                                  (* already reported *)
 
 
-and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
+and read_lib ({ persist = { copybook_lookup_config;
+                            copybooks; verbose; _ }; _ } as lp)
     loc { txtname; libname } =
   let text, diags, pplog =
     match
       Cobol_common.Copybook.find_lib ~&txtname ?libname:~&?libname
-        ?fromfile:(input_file lp) ~libpath
+        ?fromfile:(input_file lp) ~lookup_config:copybook_lookup_config
     with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
-        (* TODO: `note addendum *)
         [],
         Preproc_diagnostics.add_error
           (Cyclic_copy { copyloc = loc; filename }) lp.diags,
@@ -452,7 +453,7 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         [],
         Preproc_diagnostics.add_error
           (Copybook_lookup_error { copyloc = Some loc; lnf }) lp.diags,
-        Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
+        Preproc_trace.missing_copy ~loc ~error:lnf lp.pplog
   in
   text, with_diags_n_pplog lp diags pplog
 
@@ -546,8 +547,8 @@ let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
 let lex_file ~dialect ~source_format ?ppf filename =
   Src_input.from ~filename ~f:(lex_input ~dialect ~source_format ?ppf)
 
-let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) lib =
-  match Cobol_common.Copybook.find_lib ~libpath lib with
+let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
+  match Cobol_common.Copybook.find_lib ~lookup_config lib with
   | Ok filename ->
       Src_input.from ~filename ~f:begin fun input ->
         OUT.result @@

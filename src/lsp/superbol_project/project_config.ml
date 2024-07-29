@@ -257,6 +257,11 @@ let libpath_for ~filename { libpath; _ } =
     | RelativeToFileDir str -> Filename.dirname filename // str
   end libpath
 
+let copybook_lookup_config_for ~filename config =
+  Cobol_common.Copybook.lookup_config (libpath_for ~filename config)
+    ~libexts: config.copybook_extensions
+
+
 
 (* TODO: add config flags to libpath where some directories may only include
    copybooks. *)

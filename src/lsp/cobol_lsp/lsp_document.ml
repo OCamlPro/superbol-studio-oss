@@ -77,7 +77,8 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
+        copybook_lookup_config =
+          Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
         source_format = project.config.source_format
       } @@

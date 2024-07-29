@@ -24,8 +24,7 @@ let preprocess
     contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
-                                                  source_format } @@
+    ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
   Cobol_preproc.String { filename; contents }
 
 let show_text
@@ -36,8 +35,7 @@ let show_text
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input
-      ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
-                                                    source_format } @@
+      ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
     Cobol_preproc.String { filename; contents }
   in
   Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text
@@ -99,8 +97,7 @@ let preprocess_n_then_cut_n_paste_right_of_indicator
   Pretty.out " free: %a@." show_lines free_lines;
   Cobol_preproc.Input.string ~filename fixed_format_contents |>
   Cobol_preproc.preprocessor
-    ~options:Cobol_preproc.Options.{ default with verbose; libpath = [];
-                                                  source_format } |>
+    ~options:Cobol_preproc.Options.{ default with verbose; source_format } |>
   show_all_text |>
   Cobol_preproc.reset_preprocessor_for_string free_format_contents |>
   show_all_text |>

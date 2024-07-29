@@ -100,8 +100,8 @@ let for_ ~rootdir ~layout =
     TABLE.replace table rootdir project.result;
     project
 
-let libpath_for ~filename { config; _ } =
-  Project_config.libpath_for ~filename config
+let copybook_lookup_config_for ~filename { config; _ } =
+  Project_config.copybook_lookup_config_for ~filename config
 
 let detect_copybook ~filename { config; _ } =
   Project_config.detect_copybook ~filename config

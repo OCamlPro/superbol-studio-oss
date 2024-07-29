@@ -67,8 +67,9 @@ let for_ ~rootdir ~layout =
 let in_existing_dir dirname ~layout =
   for_ ~rootdir:(Superbol_project.rootdir_at ~dirname) ~layout
 
-let libpath_for ~uri project =
-  Superbol_project.libpath_for ~filename:(Lsp.Uri.to_path uri) project
+let copybook_lookup_config_for ~uri project =
+  Superbol_project.copybook_lookup_config_for ~filename:(Lsp.Uri.to_path uri)
+    project
 
 let detect_copybook ~uri project =
   Superbol_project.detect_copybook ~filename:(Lsp.Uri.to_path uri) project

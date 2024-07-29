@@ -9,9 +9,9 @@ used_binaries.at-254-prog.cob:10.8-10.18:
 ----           ^^^^^^^^^^
   11           END-PROC  SECTION.
   12           COPY PROCE in "sub".
->> Error: Library `PROC' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `PROC' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 used_binaries.at-254-prog.cob:12.8-12.28:
    9           00.
@@ -21,9 +21,9 @@ used_binaries.at-254-prog.cob:12.8-12.28:
 ----           ^^^^^^^^^^^^^^^^^^^^
   13           EX.
   14               STOP RUN.
->> Error: Library `PROCE' not found in search path
-          - path: ./sub
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `PROCE' not found
+          - search path: ./sub
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:277:0
 Fatal: used_binaries.at-277-sub/copy/PROC.cpy: No such file or directory
@@ -67,7 +67,7 @@ used_binaries.at-944-progprep.cob:7.7-7.23:
 ----          ^^^^^^^^^^^^^^^^
    8          PROCEDURE        DIVISION.
    9              DISPLAY TEST-VAR NO ADVANCING
->> Error: Library `CRUD.CPY' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `CRUD.CPY' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 

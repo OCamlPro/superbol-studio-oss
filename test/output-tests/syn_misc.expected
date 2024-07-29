@@ -1574,9 +1574,9 @@ syn_misc.at-3227-prog.cob:10.7-10.15:
 ----          ^^^^^^^^
   11   
   12          78  var VALUE "hello".
->> Error: Library `a.' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `a.' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_misc.at-3227-prog.cob:14.10-14.11:
   11   
@@ -1616,9 +1616,9 @@ syn_misc.at-3321-prog.cob:7.7-7.21:
 ----          ^^^^^^^^^^^^^^
    8   
    9          PROCEDURE DIVISION.
->> Error: Library `ok.inc' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `ok.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_misc.at-3321-prog.cob:16.11-16.28:
   13         * Directive purposefully in Area A
@@ -1628,9 +1628,9 @@ syn_misc.at-3321-prog.cob:16.11-16.28:
 ----              ^^^^^^^^^^^^^^^^^
   17         * Also purposefully in Area A
   18           COPY "sec-2.inc".
->> Error: Library `sec-1.inc' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `sec-1.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_misc.at-3321-prog.cob:18.8-18.25:
   15              STOP RUNNN
@@ -1638,9 +1638,9 @@ syn_misc.at-3321-prog.cob:18.8-18.25:
   17         * Also purposefully in Area A
   18 >         COPY "sec-2.inc".
 ----           ^^^^^^^^^^^^^^^^^
->> Error: Library `sec-2.inc' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `sec-2.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_misc.at-3321-prog.cob:19.0:
   16              COPY "sec-1.inc".
@@ -1668,9 +1668,9 @@ syn_misc.at-3436-prog.cob:7.11-9.12:
 ----  ^^^^^^^^^^^^^
   10   
   11              PERFORM SEC-2
->> Error: Library `ok.inc' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `ok.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 syn_misc.at-3436-prog.cob:11.11-11.18:
    8          01  OK PIC XX VALUE "OK". ==

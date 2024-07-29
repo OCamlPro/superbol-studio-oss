@@ -65,10 +65,14 @@ val reload
 
 (** {1 Accessors} *)
 
-(** [libpath_for ~filename project] constructs a list of directory names where
-    copybooks are looked up, for a given source file name, in a project with the
-    given configuration. *)
-val libpath_for: filename:string -> t -> string list
+(** [copybook_lookup_config_for ~filename project] constructs a copybook lookup
+    configuration (that notably indicates directory names where copybooks are
+    looked up) for a given source file name, in a project with the given
+    configuration. *)
+val copybook_lookup_config_for
+  : filename: string
+  -> t
+  -> Cobol_common.Copybook.lookup_config
 
 (** [detect_copybook ~filename config] indicates whether a document with the
     given filename should be treated as a copybook in a project with

@@ -3572,9 +3572,9 @@ run_misc.at-10503-prog.cob:198.12-198.25:
 ----               ^^^^^^^^^^^^^
  199               IF ADDRESS OF TEST-BASED NOT = NULL
  200                 DISPLAY TEST-BASED-SUB
->> Error: Library `cpyabrt' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `cpyabrt' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:10923:0
 run_misc.at-10923-reference_fdls_tmpl:2.7-2.11:
@@ -4092,9 +4092,9 @@ run_misc.at-10503-sub2.cob:84.11-84.24:
   84 >            COPY cpyabrt.
 ----              ^^^^^^^^^^^^^
   85          END PROGRAM sub2.
->> Error: Library `cpyabrt' not found in search path
-          - path: <empty>
-          - copybook filename extensions: "cpy" "cbl" "cob" "cbx"
+>> Error: Library `cpyabrt' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11129:0
 run_misc.at-11129-prog.cob:69.35:

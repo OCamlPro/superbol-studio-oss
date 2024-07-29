@@ -50,7 +50,7 @@ module TYPES = struct
   and copy_event_status =
     | CopyDone of string
     | CyclicCopy of string
-    | MissingCopy of Cobol_common.Copybook.lookup_info
+    | MissingCopy of Cobol_common.Copybook.lookup_error
 
   type log = log_entry list
 end
@@ -67,8 +67,8 @@ let copy_done ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CopyDone filename }
 let cyclic_copy ~loc ~filename : log -> log =
   List.cons @@ FileCopy { copyloc = loc; status = CyclicCopy filename }
-let missing_copy ~loc ~info : log -> log =
-  List.cons @@ FileCopy { copyloc = loc; status = MissingCopy info }
+let missing_copy ~loc ~error : log -> log =
+  List.cons @@ FileCopy { copyloc = loc; status = MissingCopy error }
 let new_replace ~loc : log -> log =
   List.cons @@ Replace { replloc = loc }
 let exec_block ~preamble_loc ?postamble_loc text : log -> log =

@@ -16,11 +16,16 @@ open Ez_file.V1
 
 type fileloc = [ `Word of string | `Alphanum of string ]
 
-type lookup_info =
+type lookup_config =
   {
-    libname: string;
-    libpath: string list;
-    libexts: string list;
+    lookup_path: string list;
+    lookup_exts: string list;
+  }
+
+type lookup_error =
+  {
+    lookup_libname: string;
+    lookup_config: lookup_config;
   }
 
 (** Filename extensions that we should treat as copybooks and not main
@@ -31,14 +36,33 @@ let copybook_extensions =  (* this must be a subset of {!libfile_extensions}. *)
 let libfile_extensions =
   ["cpy"; "cbl"; "cob"; "cbx"]
 
+let lookup_config ?(libexts = libfile_extensions) libpath =
+  {
+    lookup_path = libpath;
+    lookup_exts = List.map String.lowercase_ascii libexts;
+  }
+
+let pp_lookup_config ppf { lookup_path; lookup_exts } =
+  let pp_path ppf = function
+    | [] -> Pretty.string ppf "<empty>"
+    | path -> Pretty.path ppf path
+  in
+  Pretty.print ppf
+    "@[- search@ path:@ %a@]@;\
+     @[- filename@ extensions:@ %a@]"
+    pp_path lookup_path Fmt.(list ~sep:sp @@ fmt "%S") lookup_exts
+
+(* --- *)
+
 type directory =
   {
     dir: string;
     files: string StringMap.t;                (* key is basename in lowercase *)
   }
 
-let find_lib ~libpath ?(exts = libfile_extensions) ?fromfile ?libname
-    textname : (string, lookup_info) result =
+let find_lib ~lookup_config:({ lookup_path = libpath;
+                               lookup_exts = libexts } as lookup_config)
+    ?fromfile ?libname textname : (string, lookup_error) result =
   let libpath = match libname, fromfile with
     | None, _ ->
         libpath
@@ -61,7 +85,6 @@ let find_lib ~libpath ?(exts = libfile_extensions) ?fromfile ?libname
       { dir; files }
     end libpath
   in
-  let libexts = List.map String.lowercase_ascii exts in
   let try_file libname exts =
     let base = String.lowercase_ascii libname in
     let without_ext d =
@@ -71,7 +94,9 @@ let find_lib ~libpath ?(exts = libfile_extensions) ?fromfile ?libname
     in
     let rec iter_path path =
       match path with
-      | [] -> Error { libname; libpath; libexts }
+      | [] -> Error { lookup_libname = libname;
+                      lookup_config = { lookup_config with
+                                        lookup_path = libpath } }
       | d :: path -> iter_exts d path exts
     and iter_exts d path exts =
       match exts with
@@ -84,20 +109,11 @@ let find_lib ~libpath ?(exts = libfile_extensions) ?fromfile ?libname
   | `Alphanum w ->                        (* assume no more filename extension *)
       try_file w []
   | `Word w ->
-      match try_file w exts with
+      match try_file w libexts with
       | Ok lib -> Ok lib
-      | Error err -> Error { err with libname = w }
+      | Error err -> Error { err with lookup_libname = w }
 
-let pp_lookup_error ppf { libname; libpath; libexts } =
-  (* TODO: `note addendum about search path *)
-  let pp_path ppf = function
-    | [] -> Pretty.string ppf "<empty>"
-    | path -> Pretty.path ppf path
-  in
+let pp_lookup_error ppf { lookup_libname; lookup_config } =
   Pretty.print ppf
-    "@[<v>\
-     @[Library@ `%s'@ not@ found@ in@ search@ path@]@;\
-     @[- path:@ %a@]@;\
-     @[- copybook@ filename@ extensions:@ %a@]\
-     @]"
-    libname pp_path libpath Fmt.(list ~sep:sp @@ fmt "%S") libexts
+    "@[<v>@[Library@ `%s'@ not@ found@]@;%a@]"
+    lookup_libname pp_lookup_config lookup_config

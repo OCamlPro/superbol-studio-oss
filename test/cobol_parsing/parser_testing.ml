@@ -23,7 +23,6 @@ let preproc
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = [];
         source_format
       }
 
@@ -156,8 +155,9 @@ let rewindable_parse
     String { filename = "prog.cob"; contents = prog } |>
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
+          default with
           verbose = parser_options.verbose;
-          libpath = []; source_format;
+          source_format;
           exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:default.config;
