@@ -47,6 +47,7 @@ let transform_stm map (_, stm) =
         (Format.asprintf "SELECT %a%a" Printer.pp_select_lst select
            Printer.pp_select_options_lst select_options )
     | Begin -> create_new_var ("BEGIN")
+    | StartTransaction -> create_new_var("START TRANSACTION")
     | _ -> ("", map) )
   | DECLARATION { declaration; _ } -> (
     match declaration with

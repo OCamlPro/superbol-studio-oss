@@ -22,8 +22,8 @@ and whenever_condition =
 
 and whenever_continuation =
   | Continue
-  | Perform of string 
-  | Goto of string 
+  | Perform of string
+  | Goto of string
 
 type trans_stm =
   | CallStatic of
@@ -35,6 +35,7 @@ type trans_stm =
       { prefix : string;
         file_name : string
       }
+  | Todo of { prefix : string }
 
 type generated_stm =
   | NoChange of { content : string }
@@ -65,7 +66,7 @@ module Printer = struct
         else
           ""
       in
-      Format.fprintf fmt "%a\n%a\n%a%s" pp_old_stms old_stms pp_trans_stm
+      Format.fprintf fmt "%a\n%a%a%s" pp_old_stms old_stms pp_trans_stm
         trans_stm pp_error_treatment error_treatment dot
 
   and pp_old_stms fmt x =
@@ -87,10 +88,11 @@ module Printer = struct
   and pp_trans_stm_aux fmt x =
     match x with
     | CallStatic { prefix; fun_name; ref_value } ->
-      Format.fprintf fmt "%sCALL STATIC \"%s\" USING\n%a\n%sEND-CALL\n" prefix
-        fun_name pp_ref_value_list ref_value prefix
+      Format.fprintf fmt "%sCALL STATIC \"%s\"%a%sEND-CALL" prefix fun_name
+        pp_ref_value_list ref_value prefix
     | Copy { prefix; file_name } ->
       Format.fprintf fmt "%sCOPY %s" prefix file_name
+    | Todo { prefix } -> Format.fprintf fmt "%sTODO" prefix
 
   and pp_error_treatment_aux fmt = function
     | Error_treatment { prefix; condition; continuation } -> begin
@@ -113,9 +115,14 @@ module Printer = struct
     end
 
   and pp_ref_value_list fmt x =
+    let rec pp_ref_value_list_aux fmt x =
+      match x with
+      | h :: t -> Format.fprintf fmt "%a\n%a" pp_ref_value h pp_ref_value_list_aux t
+      | [] -> ()
+    in
     match x with
-    | h :: t -> Format.fprintf fmt "%a\n%a" pp_ref_value h pp_ref_value_list t
     | [] -> ()
+    | _ -> Format.fprintf fmt " USING\n%a" pp_ref_value_list_aux x
 
   and pp_ref_value fmt x =
     match x with

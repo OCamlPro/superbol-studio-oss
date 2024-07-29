@@ -112,6 +112,19 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   (*GENERATE FUNCTION*)
+  let generate_start_end_sql prefix smt =
+    let startSql =
+      Generated_type.CallStatic
+        { prefix; fun_name = "GIXSQLStartSQL"; ref_value = [] }
+    in
+    let endSql =
+      Generated_type.CallStatic
+        { prefix; fun_name = "GIXSQLEndSQL"; ref_value = [] }
+    in
+    let trans_stm = (startSql :: smt) @ [ endSql ] in
+    trans_stm
+  in
+
   let generatesql_connect_reset ~prefix ?(d_connection_id = "x\"00\"")
       ?(connection_id_tl = 0) () =
     let fun_name = "GIXSQLConnectReset" in
@@ -150,6 +163,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let generatesql_connect cs prefix =
+    (*TODO: Some of these a unsuported in gixSql -> emit a preproc warning
+      list of unsuported connection:
+      mode 5 and 6 when named ("AT/AS db_conn_id ") 
+      mode 4 (ex: CONNECT :DBUSR IDENTIFIED BY :DBPWD)*)
     match cs with
     | Connect_reset lit ->
       [ generatesql_connect_reset ~prefix ?d_connection_id:(var_opt lit)
@@ -258,27 +275,42 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let generate_select_into prefix vars =
-    let startSql =
-      Generated_type.CallStatic
-        { prefix; fun_name = "GIXSQLStartSQL"; ref_value = [] }
-    in
     let selects_into_vars = List.map (generate_select_into_rec prefix) vars in
     let selects_into = generate_select_into_one prefix vars in
-    let endSql =
-      Generated_type.CallStatic
-        { prefix; fun_name = "GIXSQLEndSQL"; ref_value = [] }
-    in
     let trans_stm =
-      (startSql :: selects_into_vars) @ (selects_into :: [ endSql ])
+      generate_start_end_sql prefix (selects_into_vars @ [ selects_into ])
     in
     trans_stm
   in
 
-  let generate_declare prefix =
-    let startSql =
-      Generated_type.CallStatic
-        { prefix; fun_name = "GIXSQLStartSQL"; ref_value = [] }
+  let generate_GIXSQLExec prefix name =
+    let fun_name = "GIXSQLExec" in
+    let ref_value =
+      let prefix = prefix ^ "    " in
+      [ Generated_type.Reference { prefix; var = "SQLCA" };
+        Generated_type.Reference { prefix; var = "x\"00\"" };
+        Generated_type.Value { prefix; var = "0" };
+        Generated_type.Reference { prefix; var = "\"" ^ name ^ "\" & x\"00\"" }
+      ]
     in
+    Generated_type.CallStatic { prefix; fun_name; ref_value }
+  in
+
+  let generate_rollback prefix rb_work_or_tran rb_args =
+    match (rb_work_or_tran, rb_args) with
+    | None, None ->
+      generate_start_end_sql prefix [ generate_GIXSQLExec prefix "ROLLBACK" ]
+    | _ -> [ Generated_type.Todo { prefix } ]
+  in
+
+  let generate_commit prefix rb_work_or_tran rb_args =
+    match (rb_work_or_tran, rb_args) with
+    | None, false ->
+      generate_start_end_sql prefix [ generate_GIXSQLExec prefix "COMMIT" ]
+    | _ -> [ Generated_type.Todo { prefix } ]
+  in
+
+  let generate_declare prefix =
     let fun_name = "GIXSQLExec" in
     let ref_value =
       let var_name =
@@ -294,13 +326,26 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
     let declare = Generated_type.CallStatic { prefix; fun_name; ref_value } in
 
-    let endSql =
-      Generated_type.CallStatic
-        { prefix; fun_name = "GIXSQLEndSQL"; ref_value = [] }
-    in
-    let trans_stm = startSql :: declare :: [ endSql ] in
+    let trans_stm = generate_start_end_sql prefix [ declare ] in
     trans_stm
   in
+
+let generate_close_cursor prefix sql_var_token = 
+  let fun_name = "GIXSQLCursorClose" in
+  let ref_value =
+    let prefix = prefix ^ "    " in
+    [ Generated_type.Reference { prefix; var = "SQLCA" };
+      Generated_type.Reference { prefix; var = "\"" ^ sql_var_token ^ "\" x\"00\"" }
+    ]
+  in
+  Generated_type.CallStatic { prefix; fun_name; ref_value }
+
+in
+
+  (* GIXSQL     CALL STATIC "GIXSQLCursorClose" USING
+GIXSQL         BY REFERENCE SQLCA
+GIXSQL         BY REFERENCE "TSQL029A_CRSR02" & x"00"
+GIXSQL     END-CALL. *)
 
   let generatesql ~loc ~line esql_instuction =
     let prefix = String.sub line 0 loc.char in
@@ -311,6 +356,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | Connect cs -> generatesql_connect cs prefix
     | Disconnect lit ->
       [ generatesql_connect_reset ~prefix ?d_connection_id:(var_opt lit) () ]
+    | DisconnectAll ->   [ generatesql_connect_reset ~prefix ?d_connection_id:(Some "\"*\" & x\"00\"") () ]
     | Whenever (c, k) ->
       error_treatment := generate_whenever ~prefix c k :: !error_treatment;
       []
@@ -319,13 +365,14 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | BeginDeclare
     | EndDeclare ->
       [] (*do nothing*)
-    | StartTransaction
-    | DisconnectAll
+    | Rollback (rb_work_or_tran, rb_args) ->
+      generate_rollback prefix rb_work_or_tran rb_args
+    | Commit (rb_work_or_tran, b) -> generate_commit prefix rb_work_or_tran b
+    | Close var -> [generate_close_cursor prefix var.payload]
+    | StartTransaction -> generate_declare prefix
     | At (_, _)
     | Sql _
     | Exeption _
-    | Rollback (_, _)
-    | Commit (_, _)
     | Savepoint _
     | DeclareTable (_, _)
     | DeclareCursor _
@@ -333,7 +380,6 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | ExecuteImmediate _
     | ExecuteIntoUsing _
     | Open (_, _)
-    | Close _
     | Fetch (_, _)
     | Insert (_, _)
     | Delete _
