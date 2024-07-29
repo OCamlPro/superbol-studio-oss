@@ -51,7 +51,7 @@ depends: [
   "superbol_project" {= version}
   "superbol_preprocs" {= version}
   "pretty" {= version}
-  "lsp" {= "1.18.0"}
+  "lsp" {>= "1.18"}
   "jsonrpc" {>= "1.15"}
   "cobol_typeck" {= version}
   "cobol_parser" {= version}

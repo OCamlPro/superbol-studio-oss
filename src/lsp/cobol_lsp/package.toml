@@ -62,7 +62,7 @@ cobol_typeck = "version"
 superbol_preprocs = "version"
 superbol_project = "version"
 jsonrpc = ">=1.15"
-lsp = "=1.18.0"
+lsp = "1.18"
 pretty = "version"
 toml = "7.1.0"
 
