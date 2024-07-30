@@ -49,7 +49,15 @@ let find_superbol root =
 
 
 let server_options ~context =
-  let root_uri = Vscode.ExtensionContext.extensionUri context in
+  let root_uri = Vscode.ExtensionContext.extensionUri context
+  and storage_uri =
+    (* Use the global state URI as the server stores caches on a per-project
+       basis (ie. for each workspace directory), not on a per-workspace
+       basis. *)
+    if Superbol_workspace.bool "cacheInGlobalStorage"
+    then Some (Vscode.ExtensionContext.globalStorageUri context)
+    else None
+  in
   let command =
     match Superbol_workspace.superbol_exe () with
     | Some cmd ->
@@ -72,7 +80,10 @@ let server_options ~context =
   let args =
     let force_diagnostics = Superbol_workspace.bool "forceSyntaxDiagnostics" in
     "lsp" ::
-    if force_diagnostics then ["--force-syntax-diagnostics"] else []
+    (if force_diagnostics then ["--force-syntax-diagnostics"] else []) @
+    (match storage_uri with
+     | None -> []
+     | Some uri -> ["--storage-directory"; Vscode.Uri.fsPath uri])
   in
   LSP.ServerOptions.create ()
     ~options ~command ~args
@@ -93,3 +104,4 @@ let server_needs_restart_after ~config_change =
   in
   affects "superbol.lsp-path"         (* machine setting: no need for a scope *)
   || affects "superbol.forceSyntaxDiagnostics"                       (* scope? *)
+  || affects "superbol.cacheInGlobalStorage"
