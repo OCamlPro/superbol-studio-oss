@@ -53,7 +53,7 @@ depends: [
   "superbol_project-windows" {= version}
   "superbol_preprocs-windows" {= version}
   "pretty-windows" {= version}
-  "lsp-windows" {>= "1.15" & < "1.16"}
+  "lsp-windows" {>= "1.18"}
   "jsonrpc-windows" {>= "1.15"}
   "cobol_typeck-windows" {= version}
   "cobol_parser-windows" {= version}

@@ -294,7 +294,7 @@
    (superbol_project (= version))
    (superbol_preprocs (= version))
    (pretty (= version))
-   (lsp (and ( >= 1.15 )( < 1.16 )))
+   (lsp ( >= 1.18 ))
    (jsonrpc ( >= 1.15 ))
    (cobol_typeck (= version))
    (cobol_parser (= version))
