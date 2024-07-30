@@ -46,7 +46,7 @@ let string ?scope key =
   | Some o when Ojs.is_null o -> ""
   | Some s -> Ojs.string_of_js s
 
-let string_list ?scope key =
+let strings ?scope key =
   let config = WS.getConfiguration ?scope ~section () in
   match WS_CONF.get ~section:key config with
   | None -> []

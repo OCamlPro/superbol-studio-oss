@@ -20,8 +20,8 @@ module EXEC_MAP = Stdlib.Map.Make (EXEC_LANG)
 type preproc_options =
   {
     verbose: bool;
-    libpath: string list;
     config: Cobol_config.t;
+    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
     source_format: Cobol_config.source_format_spec;
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     env: Preproc_env.t;
@@ -33,7 +33,7 @@ and exec_preprocessor =
 let default =
   {
     verbose = false;
-    libpath = [];
+    copybook_lookup_config = Cobol_common.Copybook.lookup_config [];
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;
     exec_preprocs = EXEC_MAP.empty;

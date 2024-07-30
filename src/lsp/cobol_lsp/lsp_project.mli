@@ -52,10 +52,10 @@ val in_existing_dir: string -> layout:layout -> t
     {!Superbol_project.rootdir_for}. *)
 val rootdir_for: uri:Lsp.Uri.t -> layout:layout -> rootdir
 
-(** [libpath_for ~uri project] constructs a list of directory names where
-    copybooks are looked up, for a source file at the given URI, in the given
-    project. *)
-val libpath_for: uri:Lsp.Uri.t -> t -> string list
+(** [copybook_lookup_config_for ~uri project] constructs a copybook lookup
+    configuration for a source file at the given URI, in the given project. *)
+val copybook_lookup_config_for
+  : uri:Lsp.Uri.t -> t -> Cobol_common.Copybook.lookup_config
 
 (** [detect_copybook ~uri project] indicates whether a document at the given URI
     for [project] should be treated as a copybook. *)

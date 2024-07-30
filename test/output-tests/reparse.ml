@@ -34,7 +34,6 @@ let reparse_file ~source_format ~config filename =
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
           default with
-          libpath = [];
           config;
           source_format
         } @@

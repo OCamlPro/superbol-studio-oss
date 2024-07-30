@@ -162,7 +162,9 @@ let get () =
     (*   Cobol_preproc.Env.pp env; *)
     { preproc_options = { config; verbose; source_format;
                           exec_preprocs = EXEC_MAP.empty;
-                          libpath = !libpath; env };
+                          copybook_lookup_config =
+                            Cobol_common.Copybook.lookup_config !libpath;
+                          env };
       parser_options = { config; recovery; verbose; show = !show;
                          exec_scanners = Superbol_preprocs.exec_scanners } }
 

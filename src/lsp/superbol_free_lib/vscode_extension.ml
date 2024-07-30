@@ -338,6 +338,13 @@ let contributes =
                (with_superbol_toml_note "List of copybooks paths.")
              ~order:3;
 
+           Manifest.PROPERTY.strings "superbol.cobol.copyexts"
+             ~markdownDescription:
+               (with_superbol_toml_note
+                  "File extensions for copybook resolution")
+             ~default:Cobol_common.Copybook.copybook_extensions
+             ~order:1;
+
            (* Paths *)
 
            Manifest.PROPERTY.string "superbol.cobc-path"
