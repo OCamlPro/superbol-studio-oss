@@ -556,7 +556,7 @@ let contributes =
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
-        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json";
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json";
     ]
 
 let manifest =
