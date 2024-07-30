@@ -345,11 +345,14 @@ let remove_project project r =
 let save_project_caches
     { params = { config = { cache_config = config; _ }; _ };
       docs; _ } =
-  try Lsp_project_cache.save ~config docs
-  with e ->
-    Lsp_error.internal
-      "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
-
+  try Lsp_project_cache.save ~config docs with
+  | Unix.Unix_error (e, op, args) ->
+      if config.cache_verbose then
+        Lsp_io.log_debug "While@ saving@ project@ caches:@ %s %s:@ %s"
+          op args (Unix.error_message e)
+  | e ->
+      Lsp_error.internal
+        "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
 
 let load_project_cache ~rootdir
     ({ params = { config = { project_layout = layout;
