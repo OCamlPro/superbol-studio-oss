@@ -3,7 +3,7 @@
 ## [0.1.4] Next release
 
 ### Added
-- Configuration setting for copybook filename extensions [#332](https://github.com/OCamlPro/superbol-studio-oss/pull/332)
+- Configuration setting for copybook filename extensions [#332](https://github.com/OCamlPro/superbol-studio-oss/pull/332), with updated JSON schema [#333](https://github.com/OCamlPro/superbol-studio-oss/pull/333)
 - COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed-format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 ### Fixed
