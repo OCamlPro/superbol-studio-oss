@@ -98,11 +98,13 @@ Where options are:
 
 * :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
-* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
+* :code:`-I DIR`   Add DIR to library search path
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
@@ -243,11 +245,13 @@ Where options are:
 
 * :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
-* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
+* :code:`-I DIR`   Add DIR to library search path
 
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
@@ -359,7 +363,7 @@ Where options are:
 
 * :code:`-D VAR=VAL`   Define a pre-processor variable VAR, with value VAL
 
-* :code:`-I DIRECTORY`   Add DIRECTORY to library search path
+* :code:`-I DIR`   Add DIR to library search path
 
 * :code:`--check`   If true, check the output (implies --parse)
 
@@ -368,6 +372,8 @@ Where options are:
 * :code:`--conf CONF_FILE`   Set the configuration file to be used
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
+
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 

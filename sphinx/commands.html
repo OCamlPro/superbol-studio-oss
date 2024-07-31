@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (d155fae
-) (2024/07/30 16:09) documentation</title>
+ (7141942
+) (2024/07/31 13:23) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
@@ -32,7 +32,7 @@
           </a>
               <div class="version">
                 master
- (d155fae
+ (7141942
 )
               </div>
 <div role="search">
@@ -190,9 +190,10 @@
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   Cobol file to check</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIRECTORY</span></code>   Add DIRECTORY to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbx</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
@@ -291,9 +292,10 @@ Set the current default switch</p></li>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILES</span></code>   Cobol files to indent</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIRECTORY</span></code>   Add DIRECTORY to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbx</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--gen-config</span></code>   Generate a config file .superbol-indent in this directory</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--inplace</span></code>   Modify files in place</p></li>
@@ -357,11 +359,12 @@ Set the current default switch</p></li>
 <ul class="simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   Cobol file to preprocess</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIRECTORY</span></code>   Add DIRECTORY to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--check</span></code>   If true, check the output (implies –parse)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--cobc</span></code>   Activate cobc specific features</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbx</cite>)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--output</span> <span class="pre">FILE</span></code> or <code class="code docutils literal notranslate"><span class="pre">-o</span> <span class="pre">FILE</span></code>   Output File (use ‘-’ for stdout)</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--parse</span></code>   If true, parse the generated cobol before printing</p></li>
