@@ -100,3 +100,10 @@ let resolve_copy ~config file =
         | file -> Filename.concat dir file
   in
   iter_exts config.copy_exts
+
+
+  let extract_filename path =
+    let parts = Str.split (Str.regexp "/") path in
+    let filename_with_ext = List.hd (List.rev parts) in
+    let filename_parts = Str.split (Str.regexp "\\.") filename_with_ext in
+    List.hd filename_parts

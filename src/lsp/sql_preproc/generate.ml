@@ -12,17 +12,17 @@ open EzCompat
 open Types
 open Sql_ast
 
+let comment str =
+  Generated_type.Added
+    { content = [ Generated_type.Comment { content = str } ] }
+
 let generate ~filename ~contents ~cobol_unit sql_statements =
-  let linkage_section = Generated_type.Added { content = "" } in
+  let linkage_section = comment "" in
   let begin_procedure_division ~loc:_ =
     (* We might want to add something at the begining of PROCEDURE DIVISION ? *)
-    [ Generated_type.Added { content = "" } ]
+    [ comment "" ]
   in
 
-  let end_procedure_division ~loc:_ =
-    (* TODO CURSOR DIVISION*)
-    [ Generated_type.Added { content = "" } ]
-  in
   (* split lines and numerotate them *)
   let lines = EzString.split contents '\n' in
   let lines = List.mapi (fun i line -> (filename, i + 1, line)) lines in
@@ -30,23 +30,27 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (*string to add at the end of every sql processed*)
 
   (* The result will be stored in this buffer: *)
-  let final_loc = { filename; line = -1; char = 0 } in
+  let _final_loc = { filename; line = -1; char = 0 } in
 
   let error_treatment = ref [] in
   let old_statements = ref [] in
+  let cursor_declararation = ref [] in
   let num = ref 0 in
 
   (*GET FUNCTION*)
   (*TODOOOO*)
   let working_storage_section, new_var_map =
-    let ws, nvm = Data_gestion.transform sql_statements in
-    ( [ Generated_type.Added
-          { content = "      *> Begin generated WORKING-STORAGE SECTION" };
+    let ws, nvm = Data_gestion.transform sql_statements filename in
+    ( [ comment ">Begin generated WORKING-STORAGE SECTION";
         Generated_type.Added { content = ws };
-        Generated_type.Added
-          { content = "      *> End genererated WORKING-STORAGE SECTION" }
+        comment "> End genererated WORKING-STORAGE SECTION"
       ],
       nvm )
+  in
+
+  let end_procedure_division cd =
+    (comment "> ESQL CURSOR DECLARATIONS (START)" :: cd)
+    @ [ comment "> ESQL CURSOR DECLARATIONS (END)" ]
   in
 
   let cob_var_id_opt (cob_var : cobolVarId option) =
@@ -165,7 +169,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let generatesql_connect cs prefix =
     (*TODO: Some of these a unsuported in gixSql -> emit a preproc warning
       list of unsuported connection:
-      mode 5 and 6 when named ("AT/AS db_conn_id ") 
+      mode 5 and 6 when named ("AT/AS db_conn_id ")
       mode 4 (ex: CONNECT :DBUSR IDENTIFIED BY :DBPWD)*)
     match cs with
     | Connect_reset lit ->
@@ -242,6 +246,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     let h = get_name_cobol_var arg in
     let fun_name = "GIXSQLSetResultParams" in
     let ref_value =
+      let prefix = prefix ^ "    " in
       [ Generated_type.Value { prefix; var = string_of_int (get_type h) };
         Generated_type.Value { prefix; var = string_of_int (get_length h) };
         Generated_type.Value { prefix; var = string_of_int (get_scale h) };
@@ -254,7 +259,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generate_select_into_one prefix vars =
+  let generate_select_into_one prefix vars ?(at = "x\"00\"") () =
     let size = string_of_int (List.length vars) in
     let fun_name = "GIXSQLExecSelectIntoOne" in
     let ref_value =
@@ -264,7 +269,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       in
       let prefix = prefix ^ "    " in
       [ Generated_type.Reference { prefix; var = "SQLCA" };
-        Generated_type.Reference { prefix; var = "x\"00\"" };
+        Generated_type.Reference { prefix; var = at };
         Generated_type.Value { prefix; var = "0" };
         Generated_type.Reference { prefix; var = var_name };
         Generated_type.Value { prefix; var = "0" };
@@ -274,21 +279,21 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generate_select_into prefix vars =
+  let generate_select_into prefix vars ?(at = "x\"00\"") () =
     let selects_into_vars = List.map (generate_select_into_rec prefix) vars in
-    let selects_into = generate_select_into_one prefix vars in
+    let selects_into = generate_select_into_one prefix vars ~at () in
     let trans_stm =
       generate_start_end_sql prefix (selects_into_vars @ [ selects_into ])
     in
     trans_stm
   in
 
-  let generate_GIXSQLExec prefix name =
+  let generate_GIXSQLExec prefix name ?(at = "x\"00\"") () =
     let fun_name = "GIXSQLExec" in
     let ref_value =
       let prefix = prefix ^ "    " in
       [ Generated_type.Reference { prefix; var = "SQLCA" };
-        Generated_type.Reference { prefix; var = "x\"00\"" };
+        Generated_type.Reference { prefix; var = at };
         Generated_type.Value { prefix; var = "0" };
         Generated_type.Reference { prefix; var = "\"" ^ name ^ "\" & x\"00\"" }
       ]
@@ -296,21 +301,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generate_rollback prefix rb_work_or_tran rb_args =
-    match (rb_work_or_tran, rb_args) with
-    | None, None ->
-      generate_start_end_sql prefix [ generate_GIXSQLExec prefix "ROLLBACK" ]
-    | _ -> [ Generated_type.Todo { prefix } ]
-  in
-
-  let generate_commit prefix rb_work_or_tran rb_args =
-    match (rb_work_or_tran, rb_args) with
-    | None, false ->
-      generate_start_end_sql prefix [ generate_GIXSQLExec prefix "COMMIT" ]
-    | _ -> [ Generated_type.Todo { prefix } ]
-  in
-
-  let generate_declare prefix =
+  let generate_declare prefix ?(at = "x\"00\"") () =
     let fun_name = "GIXSQLExec" in
     let ref_value =
       let var_name =
@@ -319,7 +310,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       in
       let prefix = prefix ^ "    " in
       [ Generated_type.Reference { prefix; var = "SQLCA" };
-        Generated_type.Reference { prefix; var = "x\"00\"" };
+        Generated_type.Reference { prefix; var = at };
         Generated_type.Value { prefix; var = "0" };
         Generated_type.Reference { prefix; var = var_name }
       ]
@@ -330,63 +321,155 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     trans_stm
   in
 
-let generate_close_cursor prefix sql_var_token = 
-  let fun_name = "GIXSQLCursorClose" in
-  let ref_value =
-    let prefix = prefix ^ "    " in
-    [ Generated_type.Reference { prefix; var = "SQLCA" };
-      Generated_type.Reference { prefix; var = "\"" ^ sql_var_token ^ "\" x\"00\"" }
-    ]
+  let generate_rollback prefix rb_work_or_tran rb_args ?(at = "x\"00\"") () =
+    match (rb_work_or_tran, rb_args) with
+    | None, None ->
+      generate_start_end_sql prefix
+        [ generate_GIXSQLExec prefix "ROLLBACK" ~at () ]
+    | _, Some (To _) -> generate_declare prefix ()
+    | _ -> [ Generated_type.Todo { prefix } ]
   in
-  Generated_type.CallStatic { prefix; fun_name; ref_value }
 
-in
+  let generate_commit prefix rb_work_or_tran rb_args ?(at = "x\"00\"") () =
+    match (rb_work_or_tran, rb_args) with
+    | None, false ->
+      generate_start_end_sql prefix
+        [ generate_GIXSQLExec prefix "COMMIT" ~at () ]
+    | _ -> [ Generated_type.Todo { prefix } ]
+  in
 
-  (* GIXSQL     CALL STATIC "GIXSQLCursorClose" USING
-GIXSQL         BY REFERENCE SQLCA
-GIXSQL         BY REFERENCE "TSQL029A_CRSR02" & x"00"
-GIXSQL     END-CALL. *)
+  let add_to_cursor_declararation prefix cur ?(at = "x\"00\"") () =
+    let adding =
+      match cur with
+      | DeclareCursorSql (cur_name, _) -> begin
+        let fun_name = "GIXSQLCursorDeclare" in
+        let ref_value =
+          let cursor_name = "\"TSQL003A_" ^ cur_name.payload ^ "\" & x\"00\"" in
+          let var_name =
+            num := !num + 1;
+            "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+          in
+          let prefix = prefix ^ "    " in
+          [ Generated_type.Reference { prefix; var = "SQLCA" };
+            Generated_type.Reference { prefix; var = at };
+            Generated_type.Value { prefix; var = "0" };
+            Generated_type.Reference { prefix; var = cursor_name };
+            Generated_type.Value { prefix; var = "0" };
+            Generated_type.Reference { prefix; var = var_name };
+            Generated_type.Value { prefix; var = "0" }
+          ]
+        in
+        [ Generated_type.GotoStatement
+            { prefix;
+              target =
+                "GIXSQL-CI-P-"
+                ^ Misc.extract_filename filename
+                ^ "-" ^ cur_name.payload
+            };
+          Generated_type.CallStatic { prefix; fun_name; ref_value }
+        ]
+      end
+      (* GIXSQL GIXSQL-CI-P-TSQL003A-CRSR01.
+         GIXSQL     CALL STATIC "GIXSQLCursorDeclare" USING
+         GIXSQL         BY REFERENCE SQLCA
+         GIXSQL         BY REFERENCE "CONN1" & x"00"
+         GIXSQL         BY VALUE 0
+         GIXSQL         BY REFERENCE "TSQL003A_CRSR01" & x"00"
+         GIXSQL         BY VALUE 0
+         GIXSQL         BY REFERENCE SQ0001
+         GIXSQL         BY VALUE 0
+         GIXSQL     END-CALL. *)
+      | DeclareCursorVar (_cur_name, _var_name) ->
+        [ Generated_type.Todo { prefix } ]
+      | DeclareCursorWhithHold (_cur_name, _query) ->
+        [ Generated_type.Todo { prefix } ]
+    in
+    let st = Generated_type.Added { content = adding } in
+    let cd = st :: !cursor_declararation in
+    cursor_declararation := cd
+  in
+
+  let generate_close_cursor prefix sql_var_token =
+    let fun_name = "GIXSQLCursorClose" in
+    let ref_value =
+      let prefix = prefix ^ "    " in
+      [ Generated_type.Reference { prefix; var = "SQLCA" };
+        Generated_type.Reference
+          { prefix; var = "\"" ^ sql_var_token ^ "\" x\"00\"" }
+      ]
+    in
+    Generated_type.CallStatic { prefix; fun_name; ref_value }
+  in
+
+  let generate_at prefix sql ?(at = "x\"00\"") () =
+    match sql with
+    | SelectInto { vars; _ } ->
+      generate_select_into prefix vars ~at () (*TODO AT*)
+    | Rollback (rb_work_or_tran, rb_args) ->
+      generate_rollback prefix rb_work_or_tran rb_args ~at ()
+    | Commit (rb_work_or_tran, b) ->
+      generate_commit prefix rb_work_or_tran b ~at ()
+    | DeclareCursor cur ->
+      add_to_cursor_declararation prefix cur ~at ();
+      []
+    | Insert _
+    | Savepoint _
+    | StartTransaction
+    | Sql _ ->
+      generate_declare prefix ~at ()
+    | DeclareTable _
+    | Prepare _
+    | ExecuteImmediate _
+    | ExecuteIntoUsing _
+    | Delete _
+    | Update _ ->
+      [ Generated_type.Todo { prefix } ]
+    | _ -> failwith "Unexeped At"
+  in
 
   let generatesql ~loc ~line esql_instuction =
     let prefix = String.sub line 0 loc.char in
     match esql_instuction with
+    | Sql _
+    | SelectInto _
+    | StartTransaction
+    | DeclareTable _
+    | DeclareCursor _
+    | Prepare _
+    | ExecuteImmediate _
+    | ExecuteIntoUsing _
+    | Savepoint _
+    | Rollback _
+    | Commit _
+    | Insert _
+    | Delete _
+    | Update _ ->
+      generate_at prefix esql_instuction ?at:(Some "x\"00\"") ()
     | Include sqlvar ->
       (*       let prefix = String.sub line 0 loc.char in *)
       [ Generated_type.Copy { prefix; file_name = sqlvar.payload } ]
     | Connect cs -> generatesql_connect cs prefix
     | Disconnect lit ->
       [ generatesql_connect_reset ~prefix ?d_connection_id:(var_opt lit) () ]
-    | DisconnectAll ->   [ generatesql_connect_reset ~prefix ?d_connection_id:(Some "\"*\" & x\"00\"") () ]
+    | DisconnectAll ->
+      [ generatesql_connect_reset ~prefix
+          ?d_connection_id:(Some "\"*\" & x\"00\"") ()
+      ]
     | Whenever (c, k) ->
       error_treatment := generate_whenever ~prefix c k :: !error_treatment;
       []
-    | SelectInto { vars; _ } -> generate_select_into prefix vars
-    | Begin -> generate_declare prefix
+    | Begin -> generate_declare prefix ()
     | BeginDeclare
     | EndDeclare ->
       [] (*do nothing*)
-    | Rollback (rb_work_or_tran, rb_args) ->
-      generate_rollback prefix rb_work_or_tran rb_args
-    | Commit (rb_work_or_tran, b) -> generate_commit prefix rb_work_or_tran b
-    | Close var -> [generate_close_cursor prefix var.payload]
-    | StartTransaction -> generate_declare prefix
-    | At (_, _)
-    | Sql _
+    | Close var -> [ generate_close_cursor prefix var.payload ]
+    | At (at, sql) -> generate_at prefix sql ?at:(var_opt (Some at)) ()
     | Exeption _
-    | Savepoint _
-    | DeclareTable (_, _)
-    | DeclareCursor _
-    | Prepare (_, _)
-    | ExecuteImmediate _
-    | ExecuteIntoUsing _
     | Open (_, _)
     | Fetch (_, _)
-    | Insert (_, _)
-    | Delete _
-    | Update (_, _, _)
     | Ignore _ ->
       (*TODO*)
-      []
+      [ Generated_type.Todo { prefix } ]
   in
 
   let rec output lines statements =
@@ -406,7 +489,7 @@ GIXSQL     END-CALL. *)
         begin
           match stmt with
           | END_PROCEDURE_DIVISION ->
-            res @ end_procedure_division ~loc:final_loc
+            res @ end_procedure_division (List.rev !cursor_declararation)
           | _ -> res
         end
       | Some begin_loc -> output_statement lines begin_loc stmt statements
@@ -425,9 +508,9 @@ GIXSQL     END-CALL. *)
             Generated_type.NoChange { content = line }
             :: ([ linkage_section ] @ output lines statements)
           end else begin
-            Generated_type.Added
-              { content = "      *> Add missing LINKAGE SECTION" }
-            :: Generated_type.Added { content = "       LINKAGE SECTION." }
+            comment "> Add missing LINKAGE SECTION"
+            :: Generated_type.Added
+                 { content = [ Generated_type.LinkageSection ] }
             :: ([ linkage_section ] @ output cur_lines statements)
           end
         | WORKING_STORAGE { defined } ->
@@ -435,25 +518,21 @@ GIXSQL     END-CALL. *)
             Generated_type.NoChange { content = line }
             :: (working_storage_section @ output lines statements)
           end else begin
-            Generated_type.Added
-              { content = "      *> Add missing WORKING-STORAGE SECTION" }
+            comment "> Add missing WORKING-STORAGE SECTION"
             :: Generated_type.Added
-                 { content = "       WORKING-STORAGE SECTION." }
+                 { content = [ Generated_type.WorkingStorageSection ] }
             :: (working_storage_section @ output cur_lines statements)
           end
         | EXEC_SQL { end_loc; with_dot; tokens } ->
-          let with_dot =
-            match tokens with
-            | BeginDeclare
-            | EndDeclare ->
-              false
-            | _ -> with_dot
-          in
           old_statements := line :: !old_statements;
           if i = end_loc.line then begin
             let trans_stm = generatesql ~loc:begin_loc ~line tokens in
-            let error_treatment = !error_treatment in
-            let old_stms = !old_statements in
+            let old_stms = List.rev !old_statements in
+            let with_dot, error_treatment =
+              match trans_stm with
+              | [] -> false, [] (*if nothing is generated, we don't need error treatment or dots *)
+              | _ -> with_dot, !error_treatment
+            in
             old_statements := [];
             Generated_type.Change
               { old_stms; trans_stm; error_treatment; with_dot }
@@ -462,17 +541,16 @@ GIXSQL     END-CALL. *)
             output_statement lines begin_loc stmt statements
         | PROCEDURE_DIVISION_DOT { end_loc } ->
           if i = end_loc.line then begin
-            Generated_type.Added { content = "      *> REMOVED: " ^ line }
+            comment ("> REMOVED: " ^ line)
             :: (* for now, just put it back *)
                Generated_type.Added
-                 { content = "          PROCEDURE DIVISION." }
+                 { content = [ Generated_type.ProcedureDivision ] }
             :: output lines statements
           end else
-            Generated_type.Added { content = "      *> REMOVED: " ^ line }
+            comment ("> REMOVED: " ^ line)
             :: output_statement lines begin_loc stmt statements
         | DECLARATION _ ->
-          Generated_type.Added { content = "      *> REMOVED: " ^ line }
-          :: output lines statements
+          comment ("> REMOVED: " ^ line) :: output lines statements
           (*
         | IS_SQLVAR { end_loc } ->
           
@@ -498,16 +576,13 @@ GIXSQL     END-CALL. *)
           ( if !enabled then
               begin_procedure_division ~loc:begin_loc
             else
-              [ Generated_type.Added
-                  { content = "      *> BEGIN PROCEDURE DIVISION disabled" }
-              ] )
+              [ comment "> BEGIN PROCEDURE DIVISION disabled" ] )
           @ output cur_lines statements
         | END_PROCEDURE_DIVISION ->
-          end_procedure_division ~loc:begin_loc @ output cur_lines statements
+          end_procedure_division (List.rev !cursor_declararation)
+          @ output cur_lines statements
         | COPY { end_loc; filename; contents } ->
-          let added =
-            Generated_type.Added { content = "      *> INLINED:" ^ line }
-          in
+          let added = comment ("> INLINED:" ^ line) in
           if i = end_loc.line then begin
             let copylines = EzString.split contents '\n' in
             let copylines =

@@ -24,3 +24,5 @@ val string_of_token : Cobol_indent.Types.token -> string
 val add_dot : with_dot:bool -> Buffer.t -> unit
 
 val resolve_copy : config:Types.config -> string -> string
+
+val extract_filename : string -> string
