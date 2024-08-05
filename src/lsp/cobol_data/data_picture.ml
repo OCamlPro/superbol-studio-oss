@@ -107,7 +107,7 @@ module TYPES = struct
 
   and basic_edition =
     | SimpleInsertion of simple_insertion
-    | SpecialInsertion of special_insertion
+    | SpecialInsertion of int
     | FixedInsertion of fixed_insertion
 
   (* The following may later becore mappings from Int to symbols, and even
@@ -117,12 +117,6 @@ module TYPES = struct
     {
       simple_insertion_symbols: symbols;
       simple_insertion_offset: int;
-    }
-
-  and special_insertion =
-    {
-      special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =
@@ -325,14 +319,13 @@ let data_size: category -> int = function
 
 let edited_size: category -> int =
   let simple_insertion_size { simple_insertion_symbols = symbols; _ } =
-    symbols.symbol_occurences
-  and special_insertion_size { special_insertion_length = n; _ } = n in
+    symbols.symbol_occurences in
   let simple_insertions_size =
     List.fold_left (fun s i -> s + simple_insertion_size i) 0
   and basic_editions_size basics =
     List.fold_left begin fun s -> function
       | SimpleInsertion i -> s + simple_insertion_size i
-      | SpecialInsertion i -> s + special_insertion_size i
+      | SpecialInsertion _
       | FixedInsertion _ -> s + 1
     end 0 basics
   in
@@ -563,8 +556,7 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
     | _ -> error
   and append_special_insertion offset = function
     | FixedNum { digits; scale; with_sign; editions } ->
-        let special = SpecialInsertion { special_insertion_offset = offset;
-                                         special_insertion_length = n } in
+        let special = SpecialInsertion offset in
         Ok (numeric ~with_sign digits scale
               ~editions:{ editions with basics = special :: editions.basics })
     | _ -> error

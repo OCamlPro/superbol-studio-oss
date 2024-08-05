@@ -90,19 +90,13 @@ module TYPES: sig
 
   and basic_edition =
     | SimpleInsertion of simple_insertion
-    | SpecialInsertion of special_insertion
+    | SpecialInsertion of int
     | FixedInsertion of fixed_insertion
 
   and simple_insertion =
     {
       simple_insertion_symbols: symbols;
       simple_insertion_offset: int;
-    }
-
-  and special_insertion =
-    {
-      special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =
