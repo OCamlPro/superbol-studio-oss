@@ -25,12 +25,20 @@ type environment_division =
 [@@deriving ord]
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
+(* and configuration_section =
+  {
+    source_computer_paragraph: source_computer_paragraph with_loc option order;
+    object_computer_paragraph: object_computer_paragraph with_loc option order;
+    special_names_paragraph: special_names_paragraph with_loc option order;
+    repository_paragraph: repository_paragraph with_loc option order;   (* +COB2002 *)
+  } *)
 and configuration_section =
   {
     source_computer_paragraph: source_computer_paragraph with_loc option;
     object_computer_paragraph: object_computer_paragraph with_loc option;
     special_names_paragraph: special_names_paragraph with_loc option;
     repository_paragraph: repository_paragraph with_loc option;   (* +COB2002 *)
+    order: permutation_quartet;
   }
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
@@ -561,13 +569,15 @@ let pp_special_names_paragraph ppf sncs =
 
 let pp_configuration_section ppf
   { source_computer_paragraph = scp; object_computer_paragraph = ocp;
-    special_names_paragraph = snp; repository_paragraph = rp }
-=
-  Fmt.pf ppf "CONFIGURATION SECTION.%a%a%a%a"
-    Fmt.(option (sp ++ pp_with_loc pp_source_computer_paragraph)) scp
-    Fmt.(option (sp ++ pp_with_loc pp_object_computer_paragraph)) ocp
-    Fmt.(option (sp ++ pp_with_loc pp_special_names_paragraph)) snp
-    Fmt.(option (sp ++ pp_with_loc pp_repository_paragraph)) rp
+    special_names_paragraph = snp; repository_paragraph = rp; order }
+  =
+  Fmt.pf ppf "CONFIGURATION SECTION.";
+  iter_quartet order (scp, ocp, snp, rp)
+    (Fmt.(option (sp ++ pp_with_loc pp_source_computer_paragraph)) ppf,
+     Fmt.(option (sp ++ pp_with_loc pp_object_computer_paragraph)) ppf,
+     Fmt.(option (sp ++ pp_with_loc pp_special_names_paragraph)) ppf,
+     Fmt.(option (sp ++ pp_with_loc pp_repository_paragraph)) ppf
+    )
 
 let pp_record_delimiter ppf = function
   | Standard_1 -> Fmt.pf ppf "STANDARD-1"

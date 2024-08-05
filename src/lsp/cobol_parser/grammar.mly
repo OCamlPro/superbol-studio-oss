@@ -623,16 +623,41 @@ let environment_division :=
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
+let unorder2_opt [@recovery (None, None, AB)] (A, B) :=
+ | a = A; b = ro(B); { (Some a, b, AB) }
+ | b = B; a = ro(A); { (a, Some b, BA) }
+ | { (None, None, AB) }
+
+let unorder3_opt [@recovery (None, None, None, (A3, AB))] (A, B, C) :=
+ | a = A; u = unorder2_opt(B, C); { prepend_as_trio @@ `A (Some a, u) }
+ | b = B; u = unorder2_opt(A, C); { prepend_as_trio @@ `B (Some b, u) }
+ | c = C; u = unorder2_opt(A, B); { prepend_as_trio @@ `C (Some c, u) }
+ | { (None, None, None, (A3, AB)) }
+
+let unorder4_opt [@recovery (None, None, None, None, (A4, (A3, AB)))]
+                 (A, B, C, D) :=
+ | a = A; u = unorder3_opt(B, C, D); { prepend_as_quartet @@ `A (Some a, u) }
+ | b = B; u = unorder3_opt(A, C, D); { prepend_as_quartet @@ `B (Some b, u) }
+ | c = C; u = unorder3_opt(A, B, D); { prepend_as_quartet @@ `C (Some c, u) }
+ | d = D; u = unorder3_opt(A, B, C); { prepend_as_quartet @@ `D (Some d, u) }
+ | { (None, None, None, None, (A4, (A3, AB))) }
+
 let configuration_section :=
- | CONFIGURATION; SECTION; "."; body = rl(configuration_body);
-   { build_configuration_section body }
-
-let configuration_body ==
- | p = loc(source_computer_paragraph); { P_SOURCE_COMPUTER_PARAGRAPH p }
- | p = loc(object_computer_paragraph); { P_OBJECT_COMPUTER_PARAGRAPH p }
- | p = loc(special_names_paragraph);   { P_SPECIAL_NAMES_PARAGRAPH p }
- | p = loc(repository_paragraph);      { P_REPOSITORY_PARAGRAPH p } (* +COB2002 *)
-
+ | CONFIGURATION; SECTION; ".";
+   unorder = unorder4_opt(loc(source_computer_paragraph),
+                          loc(object_computer_paragraph),
+                          loc(special_names_paragraph),
+                          loc(repository_paragraph));
+  { let (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph,
+         order) = unorder in
+    { source_computer_paragraph;
+      object_computer_paragraph;
+      special_names_paragraph;
+      repository_paragraph;
+      order } }
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
 

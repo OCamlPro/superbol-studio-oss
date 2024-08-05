@@ -451,15 +451,17 @@ let fold_configuration_section (v: _ #folder) =
     ~continue:begin fun { source_computer_paragraph;
                           object_computer_paragraph;
                           special_names_paragraph;
-                          repository_paragraph } x -> x
-      >> fold_option v source_computer_paragraph
-        ~fold:fold_source_computer_paragraph'
-      >> fold_option v object_computer_paragraph
-        ~fold:fold_object_computer_paragraph'
-      >> fold_option v special_names_paragraph
-        ~fold:fold_special_names_paragraph'
-      >> fold_option v repository_paragraph
-        ~fold:fold_repository_paragraph'
+                          repository_paragraph;
+                          order } x -> x
+      >> fold_quartet order
+        (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph)
+        (fold_option v ~fold:fold_source_computer_paragraph',
+         fold_option v ~fold:fold_object_computer_paragraph',
+         fold_option v ~fold:fold_special_names_paragraph',
+         fold_option v ~fold:fold_repository_paragraph')
     end
 
 let fold_configuration_section' (v: _ #folder) =
