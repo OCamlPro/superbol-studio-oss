@@ -237,3 +237,6 @@ val pp_meaning_of_precedence_index
    stderr and returns `false` *)
 val unit_test
   : ?config:TYPES.config -> expect:string -> string -> bool
+
+val example_of
+  : picture:t -> float -> string
