@@ -764,12 +764,11 @@ let char_order_checker_for_pic_string config =
 (* Maybe not in ISO/IEC 2014: Z/CS *)
 let mutual_exclusions =
   SymbolsMap.of_seq @@ List.to_seq [
-    CS, Symbols.singleton Z;
     DecimalSep, Symbols.of_list [P; V];
     P, Symbols.singleton DecimalSep;
     Star, Symbols.singleton Z;
     V, Symbols.singleton DecimalSep;
-    Z, Symbols.of_list [Star; CS];
+    Z, Symbols.singleton Star;
   ]
 
 type exp_sequence_state =
