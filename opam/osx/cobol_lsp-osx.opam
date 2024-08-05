@@ -53,7 +53,7 @@ depends: [
   "superbol_project-osx" {= version}
   "superbol_preprocs-osx" {= version}
   "pretty-osx" {= version}
-  "lsp-osx" {>= "1.18"}
+  "lsp-osx" {>= "1.18" & < "1.19"}
   "jsonrpc-osx" {>= "1.15"}
   "cobol_typeck-osx" {= version}
   "cobol_parser-osx" {= version}
