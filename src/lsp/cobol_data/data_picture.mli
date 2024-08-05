@@ -40,6 +40,9 @@ module TYPES: sig
     | Z
     | Zero
 
+  val pp_symbol: symbol Fmt.t
+  val pp_symbol_cobolized: symbol Fmt.t
+
   type symbols =
     {
       symbol: symbol;
@@ -90,13 +93,18 @@ module TYPES: sig
 
   and basic_edition =
     | SimpleInsertion of simple_insertion
-    | SpecialInsertion of int
+    | SpecialInsertion of special_insertion
     | FixedInsertion of fixed_insertion
 
   and simple_insertion =
     {
       simple_insertion_symbols: symbols;
       simple_insertion_offset: int;
+    }
+
+  and special_insertion =
+    {
+      special_insertion_offset: int;
     }
 
   and fixed_insertion =
@@ -237,6 +245,3 @@ val pp_meaning_of_precedence_index
    stderr and returns `false` *)
 val unit_test
   : ?config:TYPES.config -> expect:string -> string -> bool
-
-val example_of
-  : picture:t -> float -> string

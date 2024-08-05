@@ -328,7 +328,7 @@ module Pictures = struct
                           simple_insertion_offset = 0 };
         SimpleInsertion { simple_insertion_symbols = comma 1;
                           simple_insertion_offset = 5 };
-        SpecialInsertion 9 ]
+        SpecialInsertion { special_insertion_offset = 9 } ]
     in
     { category = fixednum 9 3 ~basics;
       pic = [comma 2; nine 3; comma 1; nine 3; dot 1; nine 3] }
@@ -360,7 +360,7 @@ module Pictures = struct
     and basics =
       [ SimpleInsertion { simple_insertion_symbols = comma 1;
                           simple_insertion_offset = 3 };
-        SpecialInsertion 7 ]
+        SpecialInsertion { special_insertion_offset = 7 } ]
     in
     { category = fixednum 9 3 ~basics ~zerorepl;
       pic = [z 3; comma 1; z 3; dot 1; z 3] }
@@ -411,7 +411,7 @@ module Pictures = struct
     let basics =
       [ SimpleInsertion { simple_insertion_symbols = comma 1;
                           simple_insertion_offset = 3 };
-        SpecialInsertion 7 ]
+        SpecialInsertion { special_insertion_offset = 7 } ]
     in
     { category = floatnum 9 3 3 ~basics;
       pic = [nine 3; comma 1; nine 3; dot 1; nine 3; e 1; plus 1; nine 3] }
@@ -443,7 +443,7 @@ module Pictures = struct
 
   let pic_ppvpp =
     let basics =
-      [ SpecialInsertion 2 ]
+      [ SpecialInsertion { special_insertion_offset = 2 } ]
     and floating =
       { floating_insertion_symbol = Plus;
         floating_insertion_ranges = [{ floating_range_offset = 0;

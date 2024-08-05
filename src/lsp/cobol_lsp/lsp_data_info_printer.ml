@@ -42,9 +42,9 @@ let pp_example_of ppf (picture: Cobol_data.Picture.t) =
       then string_of_int (int_of_float max)
       else string_of_float max in
     Fmt.pf ppf "\n\nExample display value:\n- 0: `%s`\n- %s: `%s`"
-      (Cobol_data.Picture.example_of ~picture 0.)
+      (Lsp_picture_interp.example_of ~picture 0.)
       max_str
-      (Cobol_data.Picture.example_of ~picture max)
+      (Lsp_picture_interp.example_of ~picture max)
   | _ -> ()
 
 let pp_usage: usage Pretty.printer =
