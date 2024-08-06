@@ -18,11 +18,12 @@ open EzCompat
 (** {2 Compilation group tokens} *)
 
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
-type token = Grammar_tokens.token Cobol_ptree.with_loc
-type tokens = token list
-val pp_token: token Pretty.printer
-val pp_tokens: tokens Pretty.printer
-val pp_tokens': ?fsep:Pretty.simple -> tokens Pretty.printer
+type token' = Grammar_tokens.token Cobol_ptree.with_loc
+
+val pp_token: Grammar_tokens.token Pretty.printer
+val pp_token': token' Pretty.printer
+val pp_token'_list: token' list Pretty.printer
+val pp_tokens_with_loc_info: ?fsep:Pretty.simple -> token' list Pretty.printer
 
 (* --- *)
 
@@ -62,44 +63,44 @@ val diagnostics
 
 val parsed_tokens
   : Cobol_common.Behaviors.eidetic state
-  -> tokens Lazy.t
+  -> token' list Lazy.t
 
 val tokenize_text
   : source_format: Cobol_preproc.Src_format.any
   -> 'a state
   -> Cobol_preproc.Text.t
-  -> (tokens, [>`MissingInputs | `ReachedEOF of tokens]) result * 'a state
+  -> (token' list, [>`MissingInputs | `ReachedEOF of token' list]) result * 'a state
 
 val next_token
   : 'a state
-  -> tokens
-  -> ('a state * token * tokens) option
+  -> token' list
+  -> ('a state * token' * token' list) option
 
 val put_token_back
   : 'a state
-  -> token
-  -> tokens
-  -> 'a state * tokens
+  -> token'
+  -> token' list
+  -> 'a state * token' list
 
 (* --- *)
 
 val enable_intrinsics
   : 'a state
-  -> token
-  -> tokens
-  -> 'a state * token * tokens
+  -> token'
+  -> token' list
+  -> 'a state * token' * token' list
 
 val disable_intrinsics
   : 'a state
-  -> token
-  -> tokens
-  -> 'a state * token * tokens
+  -> token'
+  -> token' list
+  -> 'a state * token' * token' list
 
 val reset_intrinsics
   : 'a state
-  -> token
-  -> tokens
-  -> 'a state * token * tokens
+  -> token'
+  -> token' list
+  -> 'a state * token' * token' list
 
 val replace_intrinsics
   : 'a state
@@ -108,17 +109,17 @@ val replace_intrinsics
 
 val decimal_point_is_comma
   : 'a state
-  -> token
-  -> tokens
-  -> 'a state * token * tokens
+  -> token'
+  -> token' list
+  -> 'a state * token' * token' list
 
 (* --- *)
 
 val push_contexts
   : 'a state
-  -> tokens
+  -> token' list
   -> Grammar_contexts.context list
-  -> 'a state * tokens
+  -> 'a state * token' list
 
 val top_context
   : _ state
@@ -126,8 +127,8 @@ val top_context
 
 val pop_context
   : 'a state
-  -> tokens
-  -> 'a state * tokens
+  -> token' list
+  -> 'a state * token' list
 
 val enable_context_sensitive_tokens: _ state -> unit
 val disable_context_sensitive_tokens: _ state -> unit

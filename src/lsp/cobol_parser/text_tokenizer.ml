@@ -22,8 +22,7 @@ open Parser_diagnostics
 
 (* --- *)
 
-type token = Grammar_tokens.token with_loc
-type tokens = token list
+type token' = Grammar_tokens.token with_loc
 
 let combined_tokens =
   (* /!\ WARNING: None of the constituents of combined tokens may be
@@ -93,40 +92,43 @@ let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
       try Hashtbl.find combined_tokens t
       with Not_found -> "<unknown/unexpected token>"
 
-let pp_token: token Pretty.printer = fun ppf ->
+let pp_token: Grammar_tokens.token Pretty.printer = fun ppf ->
   let string s = Pretty.string ppf s
   and print format = Pretty.print ppf format in
-  fun t -> match ~&t with
+  fun t -> match t with
     | WORD w -> print "WORD[%s]" w
     | WORD_IN_AREA_A w -> print "WORD_IN_AREA_A[%s]" w
     | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
     | INFO_WORD s -> print "INFO_WORD[%s]" s
-    | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
-    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string ~&t
+    | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string t
+    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string t
     | DIGITS i -> print "DIGITS[%s]" i
     | SINTLIT i -> print "SINT[%s]" i
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
     | INTERVENING_ c -> print "<%c>" c
     | tok when is_intrinsic_token tok ->
-        print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
+        print "INTRINSIC_FUNC[%a]" pp_token_string t
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 
-let pp_tokens =
-  Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
+let pp_token': token' Pretty.printer =
+  Cobol_common.Srcloc.pp_with_loc pp_token
 
-let pp_tokens' ?fsep =
+let pp_token'_list =
+  Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token'
+
+let pp_tokens_with_loc_info ?fsep =
   Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf t ->
     Pretty.print ppf "%a@@%a"
-      pp_token t
+      pp_token' t
       Cobol_common.Srcloc.pp_srcloc_struct ~@t
   end
 
 (* --- *)
 
 let loc_in_area_a: srcloc -> bool = Cobol_common.Srcloc.in_area_a
-let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
+let token_in_area_a: token' -> bool = fun t -> loc_in_area_a ~@t
 
 (* --- *)
 
@@ -338,12 +340,12 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
 
 type 'a memory =
   | Amnesic: Cobol_common.Behaviors.amnesic memory
-  | Eidetic: tokens -> Cobol_common.Behaviors.eidetic memory
+  | Eidetic: token' list -> Cobol_common.Behaviors.eidetic memory
 
 type 'm state =
   {
     lexer_state: Text_lexer.lexer_state;
-    leftover_tokens: tokens; (* non-empty only when [preproc_n_combine_tokens]
+    leftover_tokens: token' list; (* non-empty only when [preproc_n_combine_tokens]
                                 errors out for lack of input tokens. *)
     memory: 'm memory;
     context_stack: Context.stack;
@@ -542,7 +544,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
   else nominal state
 
 
-let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state text ->
+let tokens_of_text: 'a state -> text -> token' list * 'a state = fun state text ->
   let tokens, state = List.fold_left acc_tokens_of_text_word ([], state) text in
   List.rev tokens, state
 
@@ -555,7 +557,7 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   match preproc_n_combine_tokens ~intrinsics_enabled ~source_format tokens with
   | Ok (tokens, diags) ->
       if show `Tks state then
-        Pretty.error "Tks: %a@." pp_tokens tokens;
+        Pretty.error "Tks: %a@." pp_token'_list tokens;
       let diags = Parser_diagnostics.union diags state.diags in
       Ok tokens, { state with diags }
   | Error `MissingInputs ->
@@ -604,7 +606,7 @@ let retokenize { lexer_state; persist = { lexer; _ }; _ } w =
      (handling of DECIMAL POINT).  *)
   fst @@ Text_lexer.read_tokens lexer lexer_state w
 
-let reword_intrinsics s : tokens -> tokens =
+let reword_intrinsics s : token' list -> token' list =
   (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
@@ -628,7 +630,8 @@ let reword_intrinsics s : tokens -> tokens =
     {!module:Text_lexer}. *)
 (* TODO: Find whether everything related to Area A and comma-retokenization
    could be moved to Text_lexer *)
-let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s ->
+let retokenize_after: lexer_update -> _ state -> token' list -> token' list =
+  fun update s ->
   match update with
   | Enabled_keywords tokens
   | Disabled_keywords tokens
@@ -735,7 +738,7 @@ let enable_intrinsics state token tokens =
     let tokens = retokenize_after Enabled_intrinsics state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in
     if show `Tks state then
-      Pretty.error "Tks': %a@." pp_tokens tokens;
+      Pretty.error "Tks': %a@." pp_token'_list tokens;
     emit_token state token, token, tokens
 
 
@@ -747,7 +750,7 @@ let disable_intrinsics state token tokens =
     let tokens = retokenize_after Disabled_intrinsics state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in
     if show `Tks state then
-      Pretty.error "Tks': %a@." pp_tokens tokens;
+      Pretty.error "Tks': %a@." pp_token'_list tokens;
     emit_token state token, token, tokens
 
 
@@ -782,7 +785,7 @@ let decimal_point_is_comma (type m) (state: m state) token tokens =
   let tokens = retokenize_after CommaBecomesDecimalPoint state tokens in
   let token, tokens = List.hd tokens, List.tl tokens in
   if show `Tks state then
-    Pretty.error "Tks': %a@." pp_tokens tokens;
+    Pretty.error "Tks': %a@." pp_token'_list tokens;
   emit_token state token, token, tokens
 
 
@@ -816,7 +819,7 @@ let push_contexts state tokens : Context.t list -> 's * 'a = function
       (* Update tokenizer state *)
       let state, tokens = enable_tokens state tokens tokens_set in
       if show `Tks state then
-        Pretty.error "Tks': %a@." pp_tokens tokens;
+        Pretty.error "Tks': %a@." pp_token'_list tokens;
 
       with_context_stack state context_stack, tokens
 
