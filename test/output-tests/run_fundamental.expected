@@ -215,16 +215,6 @@ run_fundamental.at-1390-prog.cob:18.11-18.17:
   20          END FUNCTION f2.
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:29.7-29.20:
-  26          REPOSITORY.
-  27              FUNCTION f1
-  28              FUNCTION f2.
-  29 >        SPECIAL-NAMES.
-----          ^^^^^^^^^^^^^
-  30              CURRENCY SIGN IS "Y"
-  31              DECIMAL-POINT IS COMMA.
->> Error: Invalid syntax
-
 run_fundamental.at-1390-prog.cob:45.19-45.20:
   42          77  curr  PIC 9.9999,99Y.
   43   

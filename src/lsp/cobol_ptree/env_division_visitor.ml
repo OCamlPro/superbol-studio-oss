@@ -451,15 +451,17 @@ let fold_configuration_section (v: _ #folder) =
     ~continue:begin fun { source_computer_paragraph;
                           object_computer_paragraph;
                           special_names_paragraph;
-                          repository_paragraph } x -> x
-      >> fold_option v source_computer_paragraph
-        ~fold:fold_source_computer_paragraph'
-      >> fold_option v object_computer_paragraph
-        ~fold:fold_object_computer_paragraph'
-      >> fold_option v special_names_paragraph
-        ~fold:fold_special_names_paragraph'
-      >> fold_option v repository_paragraph
-        ~fold:fold_repository_paragraph'
+                          repository_paragraph;
+                          conf_sec_order } x -> x
+      >> fold_quartet conf_sec_order
+        (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph)
+        (fold_option v ~fold:fold_source_computer_paragraph',
+         fold_option v ~fold:fold_object_computer_paragraph',
+         fold_option v ~fold:fold_special_names_paragraph',
+         fold_option v ~fold:fold_repository_paragraph')
     end
 
 let fold_configuration_section' (v: _ #folder) =
@@ -468,9 +470,10 @@ let fold_configuration_section' (v: _ #folder) =
 
 let fold_environment_division (v: _ #folder) =
   handle v#fold_environment_division
-    ~continue:begin fun { env_configuration; env_input_output } x -> x
-      >> fold_option ~fold:fold_configuration_section' v env_configuration
-      >> fold_option ~fold:fold_input_output_section' v env_input_output
+    ~continue:begin fun { env_configuration; env_input_output; env_order } x -> x
+      >> fold_duo env_order (env_configuration, env_input_output)
+        (fold_option ~fold:fold_configuration_section' v,
+         fold_option ~fold:fold_input_output_section' v)
     end
 
 let fold_environment_division' (v: _ #folder) =
