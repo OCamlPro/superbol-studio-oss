@@ -162,16 +162,23 @@ let procedures_proposal ~filename pos group =
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    let paragraph_name (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
-      Option.map Cobol_common.Srcloc.payload ~&paragraph.paragraph_name
+    let to_string_with_type typ paragraph =
+      match ~&paragraph with
+      | Cobol_unit.Types.{ paragraph_name = Some { payload = qn; _ }; _ } ->
+        List.map (fun s -> typ, s) @@ to_string qn
+      | _ -> []
     in
-    List.flatten @@ List.rev_map (function
-        | Cobol_unit.Types.Paragraph paragraph ->
-          Option.to_list @@ paragraph_name paragraph
-        | Section section ->
-          List.filter_map paragraph_name ~&section.section_paragraphs.list)
-      cu.unit_procedure.list
-    |> List.rev_map to_string
+    cu.unit_procedure.list
+    |> List.rev_map begin function
+      | Cobol_unit.Types.Paragraph p ->
+        to_string_with_type "Paragraph" p
+      | Section section ->
+        List.mapi begin fun i paragraph ->
+          let typ = (if i == 0 then "Section" else "Paragraph") in
+          to_string_with_type typ paragraph end
+          ~&section.section_paragraphs.list
+        |> List.flatten
+    end
     |> List.flatten
 
 let all_intrinsic_function_name =
@@ -208,7 +215,12 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create ?(detail="") ?(priority_sort=0) ~range ~kind ~case text=
+let p_highest = 3
+let p_high = 2
+let p_low = 1
+let p_none = 0
+
+let completion_item_create ?(detail="") ?(priority_sort=p_none) ~range ~kind ~case text=
   let text = change ~case text in
   let textEdit =`TextEdit (TextEdit.create ~newText:text ~range) in
   let sortText = String.init priority_sort (Fun.const '.') ^ text in
@@ -242,17 +254,22 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
         |> List.rev_map begin fun { name; typ; is_valid } ->
           let typ = approx_type_to_string typ in
           completion_item_create
-            ~priority_sort:(if is_valid then 2 else 1)
-            ~kind:Variable ~range ~case name
+            ~priority_sort:(if is_valid then p_high else p_low)
             ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
+            ~kind:Variable ~range ~case name
         end
       | ProcedureRef ->
         procedures_proposal ~filename pos group
-        |> List.rev_map (completion_item_create
-                           ~priority_sort:3 ~kind:Function ~range ~case)
+        |> List.rev_map begin fun (typ, name) ->
+          completion_item_create
+            ~detail:typ
+            ~priority_sort:p_highest
+            ~kind:Function ~range ~case name
+        end
       | FunctionName ->
         all_intrinsic_function_name
         |> List.rev_map (completion_item_create
+                           ~detail:"Intrinsic"
                            ~kind:Function ~range ~case)
       | K tokens -> begin
           try [ completion_item_create ~kind:Keyword ~range ~case @@
