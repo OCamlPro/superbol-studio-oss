@@ -3515,30 +3515,30 @@ let%expect_test "semantic-completion" =
           02 PIC X.
         01 POINT USAGE POINTER.
         PROCEDURE DIVISION.
-          ADD N_|_UM TO N_|_UM.
-          DISPLAY A_|_NYY.
-          UNSTRING A_|_LPHA INTO A_|_NYY.
-          MOVE CORRESPONDING G_|_ROUPVAR TO GROUPVAR.
+          ADD _|_NUM TO _|_NUM.
+          DISPLAY _|_ANYY.
+          UNSTRING _|_ALPHA INTO _|_ANYY.
+          MOVE CORRESPONDING _|_GROUPVAR TO GROUPVAR.
           SEC SECTION.
           MULTIPLY NUM BY NUM
           ON SIZE ERROR
-            DISPLAY A_|_NYY
+            DISPLAY _|_ANYY
           END-MULTIPLY.
-          ALLOCATE name RETURNING P_|_OINT.
+          ALLOCATE name RETURNING _|_POINT.
           STOP RUN.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    __rootdir__/prog.cob:14.15:
+    __rootdir__/prog.cob:14.14:
       11             02 PIC X.
       12           01 POINT USAGE POINTER.
       13           PROCEDURE DIVISION.
       14 >           ADD NUM TO NUM.
-    ----                  ^
+    ----                 ^
       15             DISPLAY ANYY.
       16             UNSTRING ALPHA INTO ANYY.
-    (line 13, character 15):
+    (line 13, character 14):
     Basic (16 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
@@ -3573,15 +3573,15 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
         ZEROS
-    __rootdir__/prog.cob:14.22:
+    __rootdir__/prog.cob:14.21:
       11             02 PIC X.
       12           01 POINT USAGE POINTER.
       13           PROCEDURE DIVISION.
       14 >           ADD NUM TO NUM.
-    ----                         ^
+    ----                        ^
       15             DISPLAY ANYY.
       16             UNSTRING ALPHA INTO ANYY.
-    (line 13, character 22):
+    (line 13, character 21):
     Basic (15 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
@@ -3614,15 +3614,15 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
         ZEROS GIVING
-    __rootdir__/prog.cob:15.19:
+    __rootdir__/prog.cob:15.18:
       12           01 POINT USAGE POINTER.
       13           PROCEDURE DIVISION.
       14             ADD NUM TO NUM.
       15 >           DISPLAY ANYY.
-    ----                      ^
+    ----                     ^
       16             UNSTRING ALPHA INTO ANYY.
       17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
-    (line 14, character 19):
+    (line 14, character 18):
     Basic (20 entries):
         NUM Numeric
         ALPHA Alphanum
@@ -3665,15 +3665,15 @@ let%expect_test "semantic-completion" =
         SPACES
         SUPER
         ZEROS
-    __rootdir__/prog.cob:16.20:
+    __rootdir__/prog.cob:16.19:
       13           PROCEDURE DIVISION.
       14             ADD NUM TO NUM.
       15             DISPLAY ANYY.
       16 >           UNSTRING ALPHA INTO ANYY.
-    ----                       ^
+    ----                      ^
       17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
       18             SEC SECTION.
-    (line 15, character 20):
+    (line 15, character 19):
     Basic (14 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum
@@ -3704,15 +3704,15 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:16.31:
+    __rootdir__/prog.cob:16.30:
       13           PROCEDURE DIVISION.
       14             ADD NUM TO NUM.
       15             DISPLAY ANYY.
       16 >           UNSTRING ALPHA INTO ANYY.
-    ----                                  ^
+    ----                                 ^
       17             MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
       18             SEC SECTION.
-    (line 15, character 31):
+    (line 15, character 30):
     Basic (14 entries):
         NUM Numeric
         ALPHA Alphanum
@@ -3743,15 +3743,15 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:17.30:
+    __rootdir__/prog.cob:17.29:
       14             ADD NUM TO NUM.
       15             DISPLAY ANYY.
       16             UNSTRING ALPHA INTO ANYY.
       17 >           MOVE CORRESPONDING GROUPVAR TO GROUPVAR.
-    ----                                 ^
+    ----                                ^
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM
-    (line 16, character 30):
+    (line 16, character 29):
     Basic (14 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
@@ -3782,15 +3782,15 @@ let%expect_test "semantic-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:21.21:
+    __rootdir__/prog.cob:21.20:
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM
       20             ON SIZE ERROR
       21 >             DISPLAY ANYY
-    ----                        ^
+    ----                       ^
       22             END-MULTIPLY.
       23             ALLOCATE name RETURNING POINT.
-    (line 20, character 21):
+    (line 20, character 20):
     Basic (20 entries):
         NUM Numeric
         ALPHA Alphanum
@@ -3833,15 +3833,15 @@ let%expect_test "semantic-completion" =
         SPACES
         SUPER
         ZEROS
-    __rootdir__/prog.cob:23.35:
+    __rootdir__/prog.cob:23.34:
       20             ON SIZE ERROR
       21               DISPLAY ANYY
       22             END-MULTIPLY.
       23 >           ALLOCATE name RETURNING POINT.
-    ----                                      ^
+    ----                                     ^
       24             STOP RUN.
       25
-    (line 22, character 35):
+    (line 22, character 34):
     Basic (14 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
@@ -3889,7 +3889,7 @@ let%expect_test "semantic-while-writing-completion" =
 
           UNSTRING _|_
           UNSTRING ALPHA INTO _|_.
-          UNSTRING ALPHA INTO A_|_LPHA.
+          UNSTRING ALPHA INTO _|_ALPHA.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
@@ -4050,14 +4050,14 @@ let%expect_test "semantic-while-writing-completion" =
         PAGE-COUNTER
         SELF
         SUPER
-    __rootdir__/prog.cob:16.31:
+    __rootdir__/prog.cob:16.30:
       13
       14             UNSTRING
       15             UNSTRING ALPHA INTO .
       16 >           UNSTRING ALPHA INTO ALPHA.
-    ----                                  ^
+    ----                                 ^
       17
-    (line 15, character 31):
+    (line 15, character 30):
     Basic (12 entries):
         NUM Numeric
         ALPHA Alphanum
