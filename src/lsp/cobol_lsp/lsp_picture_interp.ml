@@ -166,11 +166,11 @@ let simple_example_of ~digits ~scale ~with_dot value =
 
 let example_of ~picture value =
   if List.exists (fun { symbol; _ } -> symbol == P) picture.pic
-  then "No example with P yet" (* /!\ scale can be negative: PIC 9P *)
+  then raise @@ Invalid_argument "No example with P yet" (* /!\ scale can be negative: PIC 9P *)
   else
     match picture.category with
     | Alphabetic _ | Boolean _ | National _ | Alphanumeric _ -> ""
-    | FloatNum _ -> "floatnum todo"
+    | FloatNum _ -> raise @@ Invalid_argument "No example for floatnum yet"
     | FixedNum { digits; scale; with_sign; _ }
       when not @@ is_edited picture  ->
       (if with_sign then "+" else "")

@@ -33,19 +33,23 @@ let max_value digits scale =
   let decimal_part = Str.string_before (Str.string_after s whole) scale in
   float_of_string (whole_part ^ "." ^ decimal_part)
 
+let nbsp_repl = Str.global_replace (Str.regexp " ") "&nbsp;"
+
 let pp_example_of ppf (picture: Cobol_data.Picture.t) =
-  match picture.category with
-  | FixedNum { digits; scale; _ } ->
+  try
+    match picture.category with
+    | FixedNum { digits; scale; _ } ->
       let max = max_value digits scale in
       let max_str =
-      if Float.is_integer max
-      then string_of_int (int_of_float max)
-      else string_of_float max in
-    Fmt.pf ppf "\n\nExample display value:\n- 0: `%s`\n- %s: `%s`"
-      (Lsp_picture_interp.example_of ~picture 0.)
-      max_str
-      (Lsp_picture_interp.example_of ~picture max)
-  | _ -> ()
+        if Float.is_integer max
+        then string_of_int (int_of_float max)
+        else string_of_float max in
+      Fmt.pf ppf "\n\nExample display values [%s] (0) [%s] (%s)"
+        (Lsp_picture_interp.example_of ~picture 0. |> nbsp_repl)
+        (Lsp_picture_interp.example_of ~picture max |> nbsp_repl)
+        max_str
+    | _ -> ()
+  with Invalid_argument _ -> ()
 
 let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =

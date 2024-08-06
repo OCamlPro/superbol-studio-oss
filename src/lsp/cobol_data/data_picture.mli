@@ -40,8 +40,8 @@ module TYPES: sig
     | Z
     | Zero
 
-  val pp_symbol: symbol Fmt.t
-  val pp_symbol_cobolized: symbol Fmt.t
+  val pp_symbol: symbol Pretty.printer
+  val pp_symbol_cobolized: symbol Pretty.printer
 
   type symbols =
     {
