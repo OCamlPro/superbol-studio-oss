@@ -162,17 +162,16 @@ let procedures_proposal ~filename pos group =
   match Lsp_lookup.last_cobol_unit_before_pos ~filename pos group with
   | None -> []
   | Some cu ->
-    let to_string_with_type
-    typ (paragraph:Cobol_unit.Types.procedure_paragraph with_loc) =
+    let to_string_with_type typ paragraph =
       match ~&paragraph with
-      | { paragraph_name = Some { payload = qn; _ }; _ } ->
+      | Cobol_unit.Types.{ paragraph_name = Some { payload = qn; _ }; _ } ->
         List.map (fun s -> typ, s) @@ to_string qn
       | _ -> []
     in
     cu.unit_procedure.list
     |> List.rev_map begin function
-      | Cobol_unit.Types.Paragraph paragraph ->
-        to_string_with_type "Paragraph" paragraph
+      | Cobol_unit.Types.Paragraph p ->
+        to_string_with_type "Paragraph" p
       | Section section ->
         List.mapi begin fun i paragraph ->
           let typ = (if i == 0 then "Section" else "Paragraph") in
@@ -216,7 +215,12 @@ let range_n_case case (pos:Position.t) text =
   Range.create ~start:position_start ~end_:pos,
   actual_case case start_of_word
 
-let completion_item_create ?(detail="") ?(priority_sort=0) ~range ~kind ~case text=
+let p_highest = 3
+let p_high = 2
+let p_low = 1
+let p_none = 0
+
+let completion_item_create ?(detail="") ?(priority_sort=p_none) ~range ~kind ~case text=
   let text = change ~case text in
   let textEdit =`TextEdit (TextEdit.create ~newText:text ~range) in
   let sortText = String.init priority_sort (Fun.const '.') ^ text in
@@ -250,7 +254,7 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
         |> List.rev_map begin fun { name; typ; is_valid } ->
           let typ = approx_type_to_string typ in
           completion_item_create
-            ~priority_sort:(if is_valid then 2 else 1)
+            ~priority_sort:(if is_valid then p_high else p_low)
             ~detail:(if is_valid then typ else typ ^ " (unexpected here)")
             ~kind:Variable ~range ~case name
         end
@@ -259,7 +263,7 @@ let map_completion_items ~(range:Range.t) ~case ~group ~filename comp_entries =
         |> List.rev_map begin fun (typ, name) ->
           completion_item_create
             ~detail:typ
-            ~priority_sort:3
+            ~priority_sort:p_highest
             ~kind:Function ~range ~case name
         end
       | FunctionName ->
