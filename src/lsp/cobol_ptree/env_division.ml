@@ -21,24 +21,18 @@ type environment_division =
   {
     env_configuration: configuration_section with_loc option;
     env_input_output: input_output_section with_loc option;
+    env_order: permutation_duo;
   }
 [@@deriving ord]
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
-(* and configuration_section =
-  {
-    source_computer_paragraph: source_computer_paragraph with_loc option order;
-    object_computer_paragraph: object_computer_paragraph with_loc option order;
-    special_names_paragraph: special_names_paragraph with_loc option order;
-    repository_paragraph: repository_paragraph with_loc option order;   (* +COB2002 *)
-  } *)
 and configuration_section =
   {
     source_computer_paragraph: source_computer_paragraph with_loc option;
     object_computer_paragraph: object_computer_paragraph with_loc option;
     special_names_paragraph: special_names_paragraph with_loc option;
     repository_paragraph: repository_paragraph with_loc option;   (* +COB2002 *)
-    order: permutation_quartet;
+    conf_sec_order: permutation_quartet;
   }
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
@@ -568,16 +562,15 @@ let pp_special_names_paragraph ppf sncs =
       Fmt.(list ~sep:sp (pp_with_loc pp_special_names_clause)) sncs
 
 let pp_configuration_section ppf
-  { source_computer_paragraph = scp; object_computer_paragraph = ocp;
-    special_names_paragraph = snp; repository_paragraph = rp; order }
+    { source_computer_paragraph = scp; object_computer_paragraph = ocp;
+      special_names_paragraph = snp; repository_paragraph = rp; conf_sec_order }
   =
   Fmt.pf ppf "CONFIGURATION SECTION.";
-  iter_quartet order (scp, ocp, snp, rp)
-    (Fmt.(option (sp ++ pp_with_loc pp_source_computer_paragraph)) ppf,
-     Fmt.(option (sp ++ pp_with_loc pp_object_computer_paragraph)) ppf,
-     Fmt.(option (sp ++ pp_with_loc pp_special_names_paragraph)) ppf,
-     Fmt.(option (sp ++ pp_with_loc pp_repository_paragraph)) ppf
-    )
+  iter_quartet conf_sec_order (scp, ocp, snp, rp) (
+    Fmt.(option (sp ++ pp_with_loc pp_source_computer_paragraph)) ppf,
+    Fmt.(option (sp ++ pp_with_loc pp_object_computer_paragraph)) ppf,
+    Fmt.(option (sp ++ pp_with_loc pp_special_names_paragraph)) ppf,
+    Fmt.(option (sp ++ pp_with_loc pp_repository_paragraph)) ppf)
 
 let pp_record_delimiter ppf = function
   | Standard_1 -> Fmt.pf ppf "STANDARD-1"
@@ -666,8 +659,9 @@ let pp_input_output_section ppf
   Fmt.(option (sp ++ pp_with_loc pp_io_control_paragraph)) ppf icp
 
 let pp_environment_division ppf
-  { env_configuration = ec; env_input_output = eio }
-=
-  Fmt.pf ppf "ENVIRONMENT DIVISION.%a%a"
-    Fmt.(option (sp ++ pp_with_loc pp_configuration_section)) ec
-    Fmt.(option (sp ++ pp_with_loc pp_input_output_section)) eio
+    { env_configuration = ec; env_input_output = eio; env_order }
+  =
+  Fmt.pf ppf "ENVIRONMENT DIVISION.";
+  iter_duo env_order (ec, eio) (
+    Fmt.(option (sp ++ pp_with_loc pp_configuration_section)) ppf,
+    Fmt.(option (sp ++ pp_with_loc pp_input_output_section)) ppf)

@@ -232,6 +232,34 @@ let ioloc (X) ==
   |             {None}
   | ~ = loc(X); <Some>
 
+let any_permut2 (A, B) :=
+ | a = A; b = ro(B); { (Some a, b, AB) }
+ | b = B; a = ro(A); { (a, Some b, BA) }
+
+let any_permut2_nullable [@recovery (None, None, AB)] (A, B) :=
+ | any_permut2(A, B)
+ | { (None, None, AB) }
+
+let any_permut3 (A, B, C) :=
+ | a = A; u = any_permut2_nullable(B, C); { prepend_as_trio @@ `A (Some a, u) }
+ | b = B; u = any_permut2_nullable(A, C); { prepend_as_trio @@ `B (Some b, u) }
+ | c = C; u = any_permut2_nullable(A, B); { prepend_as_trio @@ `C (Some c, u) }
+
+let any_permut3_nullable [@recovery (None, None, None, (A3, AB))] (A, B, C) :=
+ | any_permut3(A, B, C)
+ | { (None, None, None, (A3, AB)) }
+
+let any_permut4 (A, B, C, D) :=
+ | a = A; u = any_permut3_nullable(B, C, D); { prepend_as_quartet @@ `A (Some a, u) }
+ | b = B; u = any_permut3_nullable(A, C, D); { prepend_as_quartet @@ `B (Some b, u) }
+ | c = C; u = any_permut3_nullable(A, B, D); { prepend_as_quartet @@ `C (Some c, u) }
+ | d = D; u = any_permut3_nullable(A, B, C); { prepend_as_quartet @@ `D (Some d, u) }
+
+let any_permut4_nullable [@recovery (None, None, None, None, (A4, (A3, AB)))]
+                 (A, B, C, D) :=
+ | any_permut4(A, B, C, D)
+ | { (None, None, None, None, (A4, (A3, AB))) }
+
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
@@ -608,43 +636,23 @@ let intermediate_rounding_clause [@context intermediate_rounding_clause] :=
 
 let environment_division :=
  | ENVIRONMENT; DIVISION; ".";
-   env_configuration = ro(loc(configuration_section));
-   env_input_output  = ro(loc(input_output_section));
-   { { env_configuration; env_input_output } }
+   permuted = any_permut2_nullable(
+                       loc(configuration_section),
+                       loc(input_output_section));
+   { let (env_configuration, env_input_output, env_order) = permuted in
+     { env_configuration; env_input_output; env_order } }
  (* Allows skipping ENVIRONMENT DIVISION on MF *)
- | env_configuration = loc(configuration_section);
-   env_input_output  = ro(loc(input_output_section));
-   { { env_configuration = Some env_configuration;
-       env_input_output } }
- | env_input_output  = loc(input_output_section);
-   { { env_configuration = None;
-       env_input_output = Some env_input_output } }
+ | permuted = any_permut2(loc(configuration_section), loc(input_output_section));
+   { let (env_configuration, env_input_output, env_order) = permuted in
+     { env_configuration; env_input_output; env_order } }
 
 
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
-let unorder2_opt [@recovery (None, None, AB)] (A, B) :=
- | a = A; b = ro(B); { (Some a, b, AB) }
- | b = B; a = ro(A); { (a, Some b, BA) }
- | { (None, None, AB) }
-
-let unorder3_opt [@recovery (None, None, None, (A3, AB))] (A, B, C) :=
- | a = A; u = unorder2_opt(B, C); { prepend_as_trio @@ `A (Some a, u) }
- | b = B; u = unorder2_opt(A, C); { prepend_as_trio @@ `B (Some b, u) }
- | c = C; u = unorder2_opt(A, B); { prepend_as_trio @@ `C (Some c, u) }
- | { (None, None, None, (A3, AB)) }
-
-let unorder4_opt [@recovery (None, None, None, None, (A4, (A3, AB)))]
-                 (A, B, C, D) :=
- | a = A; u = unorder3_opt(B, C, D); { prepend_as_quartet @@ `A (Some a, u) }
- | b = B; u = unorder3_opt(A, C, D); { prepend_as_quartet @@ `B (Some b, u) }
- | c = C; u = unorder3_opt(A, B, D); { prepend_as_quartet @@ `C (Some c, u) }
- | d = D; u = unorder3_opt(A, B, C); { prepend_as_quartet @@ `D (Some d, u) }
- | { (None, None, None, None, (A4, (A3, AB))) }
-
 let configuration_section :=
  | CONFIGURATION; SECTION; ".";
-   unorder = unorder4_opt(loc(source_computer_paragraph),
+   permuted = any_permut4_nullable(
+                          loc(source_computer_paragraph),
                           loc(object_computer_paragraph),
                           loc(special_names_paragraph),
                           loc(repository_paragraph));
@@ -652,12 +660,12 @@ let configuration_section :=
          object_computer_paragraph,
          special_names_paragraph,
          repository_paragraph,
-         order) = unorder in
+         conf_sec_order) = permuted in
     { source_computer_paragraph;
       object_computer_paragraph;
       special_names_paragraph;
       repository_paragraph;
-      order } }
+      conf_sec_order } }
 
 (* ENVIRONMENT DIVISION / CONFIGURATION SECTION / SOURCE-COMPUTER PARAGRAPH *)
 

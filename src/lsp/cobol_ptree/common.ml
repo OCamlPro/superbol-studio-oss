@@ -31,20 +31,16 @@ type 'a nel = 'a NEL.t
 
 let pp_nel ppe = NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" ppe
 
-type permutation_duo =
-  | AB
-  | BA
+type permutation_duo = AB | BA
 [@@deriving ord]
 
-and trio_head =
-  | A3 | B3 | C3
+and trio_head = A3 | B3 | C3
 [@@deriving ord]
 
 and permutation_trio = trio_head * permutation_duo
 [@@deriving ord]
 
-and quartet_head =
-  | A4 | B4 | C4 | D4
+and quartet_head = A4 | B4 | C4 | D4
 [@@deriving ord]
 
 and permutation_quartet = quartet_head * permutation_trio
@@ -84,11 +80,11 @@ let unit_acc (f: 'a -> unit) = fun x () -> f x
 let iter_duo duo tuple (fa, fb) =
   fold_duo duo tuple (unit_acc fa, unit_acc fb) ()
 
-let iter_trio trio' tuple (fa, fb, fc) =
-  fold_trio trio' tuple
+let iter_trio trio tuple (fa, fb, fc) =
+  fold_trio trio tuple
     (unit_acc fa, unit_acc fb, unit_acc fc) ()
 
-let iter_quartet quartet' tuple (fa, fb, fc, fd) =
-  fold_quartet quartet' tuple
+let iter_quartet quartet tuple (fa, fb, fc, fd) =
+  fold_quartet quartet tuple
     (unit_acc fa, unit_acc fb, unit_acc fc, unit_acc fd) ()
 
