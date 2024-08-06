@@ -3,6 +3,7 @@
 ## [0.1.4] Next release
 
 ### Added
+- Completion for more grammar constructs [#322](https://github.com/OCamlPro/superbol-studio-oss/pull/322)
 - Show display example of `NUMERIC-EDITED` data on hover [#337](https://github.com/OCamlPro/superbol-studio-oss/pull/337)
 - Support for dump and listing files, along with a task attribute for outputting the latter [#347](https://github.com/OCamlPro/superbol-studio-oss/pull/347)
 - Improved information shown on completion [#336](https://github.com/OCamlPro/superbol-studio-oss/pull/336)
