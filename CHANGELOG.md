@@ -9,6 +9,7 @@
 
 ### Fixed
 - Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
+- Improvements to the grammar [#331](https://github.com/OCamlPro/superbol-studio-oss/pull/331)
 
 
 ## [0.1.3] Fourth α release (2024-07-24)
