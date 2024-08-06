@@ -3990,9 +3990,9 @@ let%expect_test "semantic-while-writing-completion" =
       16             UNSTRING ALPHA INTO ALPHA.
     (line 13, character 19):
     Basic (12 entries):
-        NUM Numeric
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Boolean
+        ANYY Boolean (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -4003,9 +4003,9 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
     Eager (12 entries):
-        NUM Numeric
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Boolean
+        ANYY Boolean (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -4025,9 +4025,9 @@ let%expect_test "semantic-while-writing-completion" =
       17
     (line 14, character 30):
     Basic (12 entries):
-        NUM Numeric
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Boolean
+        ANYY Boolean (unexpected here)
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
@@ -4038,9 +4038,9 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
     Eager (12 entries):
-        NUM Numeric
+        NUM Numeric (unexpected here)
         ALPHA Alphanum
-        ANYY Boolean
+        ANYY Boolean (unexpected here)
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
