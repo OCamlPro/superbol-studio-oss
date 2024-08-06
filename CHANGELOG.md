@@ -8,8 +8,8 @@
 - COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed-format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 ### Fixed
-- Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 - Improvements to the grammar [#331](https://github.com/OCamlPro/superbol-studio-oss/pull/331)
+- Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 
 ## [0.1.3] Fourth α release (2024-07-24)

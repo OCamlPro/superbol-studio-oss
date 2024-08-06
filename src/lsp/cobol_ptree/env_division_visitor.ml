@@ -470,10 +470,10 @@ let fold_configuration_section' (v: _ #folder) =
 
 let fold_environment_division (v: _ #folder) =
   handle v#fold_environment_division
-    ~continue:begin fun { env_configuration; env_input_output; env_order } x ->
-      x >> fold_duo env_order (env_configuration, env_input_output) (
-        fold_option ~fold:fold_configuration_section' v,
-        fold_option ~fold:fold_input_output_section' v)
+    ~continue:begin fun { env_configuration; env_input_output; env_order } x -> x
+      >> fold_duo env_order (env_configuration, env_input_output)
+        (fold_option ~fold:fold_configuration_section' v,
+         fold_option ~fold:fold_input_output_section' v)
     end
 
 let fold_environment_division' (v: _ #folder) =

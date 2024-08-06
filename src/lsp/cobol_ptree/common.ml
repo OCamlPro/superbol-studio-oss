@@ -32,16 +32,12 @@ type 'a nel = 'a NEL.t
 let pp_nel ppe = NEL.pp ~fsep:"@ " ~fopen:"" ~fclose:"" ppe
 
 type permutation_duo = AB | BA
-[@@deriving ord]
 
 and trio_head = A3 | B3 | C3
-[@@deriving ord]
 
 and permutation_trio = trio_head * permutation_duo
-[@@deriving ord]
 
 and quartet_head = A4 | B4 | C4 | D4
-[@@deriving ord]
 
 and permutation_quartet = quartet_head * permutation_trio
 [@@deriving ord]
