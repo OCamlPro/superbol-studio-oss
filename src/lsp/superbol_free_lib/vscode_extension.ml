@@ -450,10 +450,16 @@ let contributes =
 
           Manifest.PROPERTY.null_string "cobc-path"
             ~title:"GnuCOBOL Compiler Executable"
-            ~description:"Path to the GnuCOBOL compiler executable; when `null`, \
-                          defaults to the value of \"superbol.cobc-path\" from \
-                          the workspace configuration, if defined, to \"cobc\" \
-                          otherwise.";
+            ~markdownDescription:
+              "Path to the GnuCOBOL compiler executable; when `null`, defaults \
+               to the value of \"superbol.cobc-path\" from the workspace \
+               configuration, if defined, to \"cobc\" otherwise.";
+
+          Manifest.PROPERTY.null_string "listings-target"
+            ~title:"Output file or directory for preprocessed program listings"
+            ~markdownDescription:
+              "Path to a directory where preprocessed program listings are \
+               generated; no listing is saved when `null`";
 
           Manifest.PROPERTY.array "extra-args"
             ~description:"Additional arguments passed to `cobc`";
