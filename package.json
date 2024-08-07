@@ -394,6 +394,16 @@
         "embeddedLanguages": {
           "meta.embedded.block.sql": "sql"
         }
+      },
+      {
+        "language": "COBOL_GNU_LISTFILE",
+        "scopeName": "source.gnucobol_listfile",
+        "path": "./syntaxes/listfile.tmLanguage.json"
+      },
+      {
+        "language": "COBOL_GNU_DUMPFILE",
+        "scopeName": "source.gnucobol_dumpfile",
+        "path": "./syntaxes/dumpfile.tmLanguage.json"
       }
     ],
     "tomlValidation": [
@@ -412,6 +422,26 @@
           "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
         ],
         "configuration": "./syntaxes/language-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_LISTFILE",
+        "extensions": [
+          ".lst"
+        ],
+        "aliases": [
+          "LISTFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_DUMPFILE",
+        "extensions": [
+          ".dump"
+        ],
+        "aliases": [
+          "DUMPFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
     "problemMatchers": [
