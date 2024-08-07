@@ -34,6 +34,22 @@ let command id handler =
   commands := command :: !commands;
   command
 
+let _editor_action_findReferences =
+  command "superbol.editor.action.findReferences" @@ Instance
+    begin fun _instance ~args ->
+      match args with
+      | [arg1; arg2] ->
+        let uri = Uri.parse (Ojs.string_of_js arg1) () in
+        let line = Ojs.get_prop_ascii arg2 "line" |> Ojs.int_of_js in
+        let character = Ojs.get_prop_ascii arg2 "character" |> Ojs.int_of_js in
+        let pos = Position.make ~line ~character in
+        let _ = Commands.executeCommand
+            ~command:"editor.action.findReferences"
+            ~args:[Uri.t_to_js uri; Position.t_to_js pos ]
+        in ()
+      | _ -> ()
+    end
+
 let _restart_language_server =
   command "superbol.server.restart" @@ Instance
     begin fun instance ~args:_ ->

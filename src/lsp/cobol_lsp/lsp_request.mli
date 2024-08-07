@@ -41,4 +41,8 @@ module INTERNAL: sig
     : Lsp_server.t
     -> Lsp.Types.DocumentSymbolParams.t
     -> [> `DocumentSymbol of Lsp.Types.DocumentSymbol.t list ] option
+  val codelens
+    : Lsp_server.t
+    -> Lsp.Types.CodeLensParams.t
+    -> Lsp.Types.CodeLens.t list
 end

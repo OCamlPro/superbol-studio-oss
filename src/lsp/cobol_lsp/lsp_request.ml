@@ -586,6 +586,55 @@ let handle_document_symbol registry (params: DocumentSymbolParams.t) =
       Some (`DocumentSymbol symbols)
     end
 
+(** { Document Code Lens } *)
+
+module PosSet = Set.Make(struct
+    type t = Position.t
+    let compare (p1: t) (p2: t) =
+      let c = p2.line - p1.line in
+      if c <> 0 then c else p2.character - p1.character
+  end)
+
+let codelens_positions ~uri group =
+  let filename = Lsp.Uri.to_path uri in
+  Cobol_unit.Visitor.fold_unit_group
+    object
+      inherit [_] Cobol_unit.Visitor.folder
+      method! fold_procedure _ = Cobol_common.Visitor.skip
+      method! fold_qualname' { loc; _ } acc =
+        let range = Lsp_position.range_of_srcloc_in ~filename loc in
+        PosSet.add range.start acc
+        |> Cobol_common.Visitor.do_children
+    end group PosSet.empty
+
+let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let context = ReferenceContext.create ~includeDeclaration:true in
+      codelens_positions ~uri checked_doc.group
+      |> PosSet.to_seq
+      |> Seq.map begin fun position ->
+        let params =
+          ReferenceParams.create ~context ~position ~textDocument () in
+        let ref_count =
+          lookup_references_in_doc ~rootdir params checked_doc
+          |> Option.fold ~none:0 ~some:List.length in
+        let title = string_of_int ref_count
+                    ^ " reference"
+                    ^ if ref_count > 1 then "s" else "" in
+        let range = Range.create ~end_:position ~start:position in
+        let uri = DocumentUri.yojson_of_t textDocument.uri in
+        let command = Command.create () ~title
+            ~command:"superbol.editor.action.findReferences"
+            ~arguments:[uri; Position.yojson_of_t position] in
+        CodeLens.create ~command ~range ()
+      end
+      |> List.of_seq |> Option.some
+    end
+  |> Option.value ~default:[]
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -633,10 +682,11 @@ let on_request
         Ok (handle_shutdown registry, ShuttingDown)
     | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
         Ok (handle_document_symbol registry params, state)
+    | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
+        Ok (handle_codelens registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
-    | TextDocumentCodeLens  (* CodeLensParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
@@ -705,6 +755,7 @@ module INTERNAL = struct
   let lookup_references = handle_references
   let hover = handle_hover
   let completion = handle_completion
+  let codelens = handle_codelens
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
 end
