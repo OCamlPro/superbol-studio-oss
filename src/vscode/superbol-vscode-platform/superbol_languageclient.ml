@@ -94,6 +94,10 @@ let client_options () =
     ~documentSelector:[|
       `Filter (LSP.DocumentFilter.createLanguage ()
                  ~language:"cobol");
+      `Filter (LSP.DocumentFilter.createLanguage ()
+                 ~language:"COBOL_GNU_LISTFILE");
+      `Filter (LSP.DocumentFilter.createLanguage ()
+                 ~language:"COBOL_GNU_DUMPFILE");
     |]
 
 
