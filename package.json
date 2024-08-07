@@ -394,6 +394,16 @@
         "embeddedLanguages": {
           "meta.embedded.block.sql": "sql"
         }
+      },
+      {
+        "language": "COBOL_GNU_LISTFILE",
+        "scopeName": "source.gnucobol_listfile",
+        "path": "./syntaxes/listfile.tmLanguage.json"
+      },
+      {
+        "language": "COBOL_GNU_DUMPFILE",
+        "scopeName": "source.gnucobol_dumpfile",
+        "path": "./syntaxes/dumpfile.tmLanguage.json"
       }
     ],
     "tomlValidation": [
@@ -412,6 +422,26 @@
           "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
         ],
         "configuration": "./syntaxes/language-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_LISTFILE",
+        "extensions": [
+          ".lst"
+        ],
+        "aliases": [
+          "LISTFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_DUMPFILE",
+        "extensions": [
+          ".dump"
+        ],
+        "aliases": [
+          "DUMPFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
     "problemMatchers": [
@@ -501,11 +531,19 @@
           },
           "cobc-path": {
             "title": "GnuCOBOL Compiler Executable",
+            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
             "type": [
               "string",
               "null"
-            ],
-            "description": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise."
+            ]
+          },
+          "listings-target": {
+            "title": "Output file or directory for preprocessed program listings",
+            "markdownDescription": "Path to a directory where preprocessed program listings are generated; no listing is saved when `null`",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "extra-args": {
             "type": "array",

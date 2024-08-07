@@ -1,0 +1,34 @@
+{
+  "_copyright": "The MIT License (MIT)\nCopyright (c) 2015-2021 spgennard\nSource: https://github.com/spgennard/vscode_cobol/blob/master/syntaxes/COBOL_gnu_dumpfile.tmLanguage.json",
+  "fileTypes": [],
+  "name": "COBOL_GNU_DUMPFILE",
+  "patterns": [
+    {
+      "match": "(\\f)",
+      "name": "strong comment.line.form_feed.gnucobol_dumpfile"
+    },
+    {
+      "match": "(^\\*.*$)",
+      "name": "comment.line.modern"
+    },
+    {
+      "begin": "((?i:^WORKING-STORAGE|^LINKAGE|^FD))",
+      "name": "constant.numeric.gnucobol_dumpfile",
+      "patterns": [
+        {
+          "match": "(^\\*.*$)",
+          "name": "comment.line.modern"
+        },
+        {
+          "include": "source.cobol"
+        }
+      ],
+      "end": "(?=(?i:LINKAGE|END\\s+OF\\s+DUMP))"
+    },
+    {
+      "match": "(.*$)",
+      "name": ""
+    }
+  ],
+  "scopeName": "source.gnucobol_dumpfile"
+}

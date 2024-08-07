@@ -3,6 +3,7 @@
 ## [0.1.4] Next release
 
 ### Added
+- Support for dump and listing files, along with a task attribute for outputting the latter [#347](https://github.com/OCamlPro/superbol-studio-oss/pull/347)
 - Improved information shown on completion [#336](https://github.com/OCamlPro/superbol-studio-oss/pull/336)
 - Configuration flag for caching in storage provided by Visual Studio Code [#167](https://github.com/OCamlPro/superbol-studio-oss/pull/167)
 - Configuration setting for copybook filename extensions [#332](https://github.com/OCamlPro/superbol-studio-oss/pull/332), with updated JSON schema [#333](https://github.com/OCamlPro/superbol-studio-oss/pull/333)
