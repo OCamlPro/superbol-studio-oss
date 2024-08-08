@@ -196,7 +196,7 @@ let%expect_test "codelens-procedure" =
     ----               ^
        6               BB.
        7               PERFORM BB.
-    4 references
+    2 references
     __rootdir__/prog.cob:6.12:
        3           PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
@@ -205,7 +205,7 @@ let%expect_test "codelens-procedure" =
     ----               ^
        7               PERFORM BB.
        8               CC.
-    4 references
+    3 references
     __rootdir__/prog.cob:8.12:
        5               AA SECTION.
        6               BB.
@@ -214,7 +214,7 @@ let%expect_test "codelens-procedure" =
     ----               ^
        9               DD SECTION.
       10               PERFORM AA.
-    2 references
+    1 reference
     __rootdir__/prog.cob:9.12:
        6               BB.
        7               PERFORM BB.
@@ -223,4 +223,4 @@ let%expect_test "codelens-procedure" =
     ----               ^
       10               PERFORM AA.
       11               PERFORM BB.
-    4 references |}];;
+    2 references |}];;
