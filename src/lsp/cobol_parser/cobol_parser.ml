@@ -22,10 +22,10 @@ module Diagnostics = Parser_diagnostics
 
 module Tokens = struct
   include Grammar_tokens
-  let pp = Text_tokenizer.pp_token
-  let pp' = Text_tokenizer.pp_token'
-  let pp'_list = Text_tokenizer.pp_tokens
-  let pp'_list_with_loc_info = Text_tokenizer.pp_tokens_with_loc_info
+  let pp = Grammar_tokens_printer.pp_token
+  let pp' = Grammar_tokens_printer.pp_token'
+  let pp'_list = Grammar_tokens_printer.pp_tokens
+  let pp'_list_with_loc_info = Grammar_tokens_printer.pp_tokens_with_loc_info
 end
 module Expect = Grammar_expect
 module Printer = Grammar_printer

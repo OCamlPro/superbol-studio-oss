@@ -18,13 +18,8 @@ open EzCompat
 (** {2 Compilation group tokens} *)
 
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
-type token' = Grammar_tokens.token Cobol_ptree.with_loc
-type tokens = token' list
-
-val pp_token: Grammar_tokens.token Pretty.printer
-val pp_token': token' Pretty.printer
-val pp_tokens: tokens Pretty.printer
-val pp_tokens_with_loc_info: ?fsep:Pretty.simple -> tokens Pretty.printer
+type token = Grammar_tokens.token Cobol_ptree.with_loc
+type tokens = token list
 
 (* --- *)
 
@@ -75,11 +70,11 @@ val tokenize_text
 val next_token
   : 'a state
   -> tokens
-  -> ('a state * token' * tokens) option
+  -> ('a state * token * tokens) option
 
 val put_token_back
   : 'a state
-  -> token'
+  -> token
   -> tokens
   -> 'a state * tokens
 
@@ -87,21 +82,21 @@ val put_token_back
 
 val enable_intrinsics
   : 'a state
-  -> token'
+  -> token
   -> tokens
-  -> 'a state * token' * tokens
+  -> 'a state * token * tokens
 
 val disable_intrinsics
   : 'a state
-  -> token'
+  -> token
   -> tokens
-  -> 'a state * token' * tokens
+  -> 'a state * token * tokens
 
 val reset_intrinsics
   : 'a state
-  -> token'
+  -> token
   -> tokens
-  -> 'a state * token' * tokens
+  -> 'a state * token * tokens
 
 val replace_intrinsics
   : 'a state
@@ -110,9 +105,9 @@ val replace_intrinsics
 
 val decimal_point_is_comma
   : 'a state
-  -> token'
+  -> token
   -> tokens
-  -> 'a state * token' * tokens
+  -> 'a state * token * tokens
 
 (* --- *)
 

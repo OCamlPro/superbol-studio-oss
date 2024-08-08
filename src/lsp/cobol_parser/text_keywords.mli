@@ -28,3 +28,5 @@ val silenced_keywords: string list
 
 (** Mapping from punctuations to their respective tokens *)
 val puncts: (string * Grammar_tokens.token) list
+
+val is_intrinsic_token: Grammar_tokens.token -> bool

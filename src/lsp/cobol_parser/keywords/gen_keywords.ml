@@ -174,10 +174,25 @@ let emit_intrinsic_functions_list ppf =
   Terminal.iter (emit_custom_intrinsics ppf);
   Fmt.pf ppf "@]@\n]@."
 
+let emit_is_intrinsic ppf =
+  if String.equal cmlyname "grammar.cmly" then
+  let is_intrinsic t =
+    intrinsic (Terminal.attributes t) |> Option.is_some
+  in
+  Fmt.pf ppf "@[<2>let is_intrinsic_token = %s.(function@." tokens_module;
+  Terminal.iter begin fun t ->
+    if is_intrinsic t
+    then Fmt.pf ppf "| %a@." pp_terminal t
+  end;
+  Fmt.pf ppf "| INTRINSIC_FUNC _ -> true@.";
+  Fmt.pf ppf "| _ -> false@]\n)@."
+
+
 let emit ppf =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
      @\n[@@@@@@warning \"-33\"] (* <- do not warn on unused opens *)\
+     @\n%t\
      @\n%t\
      @\n%t\
      @\n%t\
@@ -192,6 +207,7 @@ let emit ppf =
     emit_intrinsic_functions_list
     emit_puncts_list
     emit_silenced_keywords_list
+    emit_is_intrinsic
 
 let () =
   emit Fmt.stdout
