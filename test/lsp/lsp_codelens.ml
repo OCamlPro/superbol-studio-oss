@@ -169,3 +169,58 @@ let%expect_test "codelens" =
       14           PROCEDURE DIVISION.
       15               MOVE aa TO aA.
     0 reference |}];;
+
+let%expect_test "codelens-procedure" =
+  let end_with_postproc = codelens {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        PROCEDURE DIVISION.
+            AA SECTION.
+            BB.
+            PERFORM BB.
+            CC.
+            DD SECTION.
+            PERFORM AA.
+            PERFORM BB.
+            GO DD.
+            STOP RUN.
+    |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:5.12:
+       2           IDENTIFICATION DIVISION.
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5 >             AA SECTION.
+    ----               ^
+       6               BB.
+       7               PERFORM BB.
+    4 references
+    __rootdir__/prog.cob:6.12:
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5               AA SECTION.
+       6 >             BB.
+    ----               ^
+       7               PERFORM BB.
+       8               CC.
+    4 references
+    __rootdir__/prog.cob:8.12:
+       5               AA SECTION.
+       6               BB.
+       7               PERFORM BB.
+       8 >             CC.
+    ----               ^
+       9               DD SECTION.
+      10               PERFORM AA.
+    2 references
+    __rootdir__/prog.cob:9.12:
+       6               BB.
+       7               PERFORM BB.
+       8               CC.
+       9 >             DD SECTION.
+    ----               ^
+      10               PERFORM AA.
+      11               PERFORM BB.
+    4 references |}];;

@@ -597,15 +597,33 @@ module PosSet = Set.Make(struct
 
 let codelens_positions ~uri group =
   let filename = Lsp.Uri.to_path uri in
+  let open struct
+    include Cobol_common.Visitor
+    type context =
+      | ProcedureDiv
+      | DataDiv
+      | None
+  end in
+  let set_context context (old, acc) =
+    do_children_and_then (context, acc) (fun (_, acc) -> (old, acc))
+  in
+  let take_when_in context { loc; _ } (current, acc) =
+    if context <> current
+    then skip (current, acc)
+    else
+      let range = Lsp_position.range_of_srcloc_in ~filename loc in
+      skip (context, PosSet.add range.start acc)
+  in
   Cobol_unit.Visitor.fold_unit_group
     object
       inherit [_] Cobol_unit.Visitor.folder
-      method! fold_procedure _ = Cobol_common.Visitor.skip
-      method! fold_qualname' { loc; _ } acc =
-        let range = Lsp_position.range_of_srcloc_in ~filename loc in
-        PosSet.add range.start acc
-        |> Cobol_common.Visitor.do_children
-    end group PosSet.empty
+      method! fold_procedure _ = set_context ProcedureDiv
+      method! fold_paragraph' _ = skip
+      method! fold_data_definitions _ = set_context DataDiv
+      method! fold_procedure_name' = take_when_in ProcedureDiv
+      method! fold_qualname' = take_when_in DataDiv
+    end group (None, PosSet.empty)
+  |> snd
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
   try_with_main_document_data registry textDocument
