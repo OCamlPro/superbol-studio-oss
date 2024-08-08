@@ -163,7 +163,7 @@ let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
 
 (* --- *)
 
-let rec produce_tokens (ps: _ state as 's) : 's * Tokzr.token' list =
+let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
   let text, pp = Cobol_preproc.next_chunk ps.preproc.pp in
   let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
   assert (text <> []);
@@ -400,7 +400,7 @@ type ('a, 'm) stage =
     rewound. *)
 and ('a, 'm) interim_stage =
   'm state *
-  Tokzr.token' list *
+  Text_tokenizer.tokens *
   'a Grammar_interpr.env                     (* Always valid input_needed env. *)
 
 (** Final stage, at which the parser has stopped processing. *)

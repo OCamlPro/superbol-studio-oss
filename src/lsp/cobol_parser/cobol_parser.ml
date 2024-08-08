@@ -24,7 +24,7 @@ module Tokens = struct
   include Grammar_tokens
   let pp = Text_tokenizer.pp_token
   let pp' = Text_tokenizer.pp_token'
-  let pp'_list = Text_tokenizer.pp_token'_list
+  let pp'_list = Text_tokenizer.pp_tokens
   let pp'_list_with_loc_info = Text_tokenizer.pp_tokens_with_loc_info
 end
 module Expect = Grammar_expect
