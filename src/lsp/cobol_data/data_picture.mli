@@ -40,6 +40,9 @@ module TYPES: sig
     | Z
     | Zero
 
+  val pp_symbol: symbol Pretty.printer
+  val pp_symbol_cobolized: symbol Pretty.printer
+
   type symbols =
     {
       symbol: symbol;
@@ -102,7 +105,6 @@ module TYPES: sig
   and special_insertion =
     {
       special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =

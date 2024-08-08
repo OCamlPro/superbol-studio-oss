@@ -36,6 +36,7 @@ module INTERNAL = struct
   module Document = Lsp_document
   module Server = Lsp_server
   module Loop = Lsp_server_loop
+  module Picture_interp = Lsp_picture_interp
   module Request = Lsp_request.INTERNAL
   module Utils = Lsp_utils
   module Debug = Lsp_debug

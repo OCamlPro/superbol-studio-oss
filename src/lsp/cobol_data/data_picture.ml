@@ -122,7 +122,6 @@ module TYPES = struct
   and special_insertion =
     {
       special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =
@@ -325,14 +324,13 @@ let data_size: category -> int = function
 
 let edited_size: category -> int =
   let simple_insertion_size { simple_insertion_symbols = symbols; _ } =
-    symbols.symbol_occurences
-  and special_insertion_size { special_insertion_length = n; _ } = n in
+    symbols.symbol_occurences in
   let simple_insertions_size =
     List.fold_left (fun s i -> s + simple_insertion_size i) 0
   and basic_editions_size basics =
     List.fold_left begin fun s -> function
       | SimpleInsertion i -> s + simple_insertion_size i
-      | SpecialInsertion i -> s + special_insertion_size i
+      | SpecialInsertion _
       | FixedInsertion _ -> s + 1
     end 0 basics
   in
@@ -561,10 +559,9 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
              Ok (numeric ~with_sign ~editions digits scale)
          | Error () -> error)
     | _ -> error
-  and append_special_insertion offset = function
+  and append_special_insertion special_insertion_offset = function
     | FixedNum { digits; scale; with_sign; editions } ->
-        let special = SpecialInsertion { special_insertion_offset = offset;
-                                         special_insertion_length = n } in
+        let special = SpecialInsertion { special_insertion_offset } in
         Ok (numeric ~with_sign digits scale
               ~editions:{ editions with basics = special :: editions.basics })
     | _ -> error
@@ -767,12 +764,11 @@ let char_order_checker_for_pic_string config =
 (* Maybe not in ISO/IEC 2014: Z/CS *)
 let mutual_exclusions =
   SymbolsMap.of_seq @@ List.to_seq [
-    CS, Symbols.singleton Z;
     DecimalSep, Symbols.of_list [P; V];
     P, Symbols.singleton DecimalSep;
     Star, Symbols.singleton Z;
     V, Symbols.singleton DecimalSep;
-    Z, Symbols.of_list [Star; CS];
+    Z, Symbols.singleton Star;
   ]
 
 type exp_sequence_state =
