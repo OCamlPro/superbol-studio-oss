@@ -292,7 +292,7 @@ let%expect_test "hover-typedef-vars" =
     PIC 999 USAGE DISPLAY
     ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
-    Example display values [000] (0) [123] (123)
+    *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     (line 8, character 16):
     __rootdir__/prog.cob:9.13-9.21:
@@ -391,7 +391,7 @@ let%expect_test "hover-typedef-vars" =
     PIC 999 USAGE DISPLAY
     ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
-    Example display values [000] (0) [123] (123)
+    *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     (line 12, character 47):
     __rootdir__/prog.cob:13.44-13.52:
@@ -465,7 +465,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC -BZZZ,ZZ9.99 USAGE DISPLAY
     ```
     NUMERIC(digits = 8, scale = 2, with_sign = false)
-    Example display values [&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.00] (0) [&nbsp;&nbsp;123,456.78] (123456.78)
+    *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -482,7 +482,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC 9 USAGE BINARY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
        5           WORKING-STORAGE SECTION.
@@ -558,7 +558,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC 9 USAGE PACKED-DECIMAL
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.15:
       10           01 VAR6 PIC 111 USAGE BIT.
@@ -575,7 +575,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC $++/+.+B+ USAGE DISPLAY
     ```
     NUMERIC(digits = 4, scale = 2, with_sign = false)
-    Example display values [&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;] (0) [$+1/2.3&nbsp;4] (12.34) |}];;
+    *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34) |}];;
 
 let%expect_test "hover-typedef-filler-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -813,7 +813,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
@@ -831,7 +831,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
@@ -848,7 +848,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -884,7 +884,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1) |}];;
+    *e.g,* [`0`] (0), [`1`] (1) |}];;
 
 let%expect_test "hover-typedef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -939,7 +939,7 @@ let%expect_test "hover-typedef-redefines" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    Example display values [0] (0) [1] (1)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 9, character 20):
     __rootdir__/prog.cob:10.20-10.21:
        7             05 Y PIC 9.
