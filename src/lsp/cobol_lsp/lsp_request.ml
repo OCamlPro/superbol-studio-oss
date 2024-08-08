@@ -599,6 +599,7 @@ let codelens_positions ~uri group =
   let filename = Lsp.Uri.to_path uri in
   let open struct
     include Cobol_common.Visitor
+    include Cobol_data.Visitor
     type context =
       | ProcedureDiv
       | DataDiv
@@ -615,13 +616,21 @@ let codelens_positions ~uri group =
       skip (context, PosSet.add range.start acc)
   in
   Cobol_unit.Visitor.fold_unit_group
-    object
+    object (v)
       inherit [_] Cobol_unit.Visitor.folder
       method! fold_procedure _ = set_context ProcedureDiv
-      method! fold_paragraph' _ = skip
       method! fold_data_definitions _ = set_context DataDiv
+      method! fold_paragraph' _ = skip
       method! fold_procedure_name' = take_when_in ProcedureDiv
       method! fold_qualname' = take_when_in DataDiv
+      method! fold_record_renaming { renaming_name; _ } =
+        take_when_in DataDiv renaming_name
+      method! fold_field_definition' { payload = field; _ } acc =
+        fold_field_definition v { field with field_redefines = None } acc
+        |> skip
+      method! fold_table_definition' { payload = table; _ } acc =
+        fold_table_definition v { table with table_redefines = None } acc
+        |> skip
     end group (None, PosSet.empty)
   |> snd
 

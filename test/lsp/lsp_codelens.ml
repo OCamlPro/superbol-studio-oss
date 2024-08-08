@@ -79,15 +79,6 @@ let%expect_test "codelens" =
        9             02 CC PIC X. 02 DD PIC X.
       10             66 ABCD RENAMES BB THRU DD.
     1 reference
-    __rootdir__/prog.cob:8.31:
-       5           WORKING-STORAGE SECTION.
-       6           01 AA.
-       7             02 BB PIC X.
-       8 >           02 BBprime REDEFINES BB PIC 9.
-    ----                                  ^
-       9             02 CC PIC X. 02 DD PIC X.
-      10             66 ABCD RENAMES BB THRU DD.
-    3 references
     __rootdir__/prog.cob:9.13:
        6           01 AA.
        7             02 BB PIC X.
@@ -115,24 +106,6 @@ let%expect_test "codelens" =
       11           01 ZZ OCCURS 5 TIMES INDEXED BY INDEX1.
       12             02 YY PIC X.
     1 reference
-    __rootdir__/prog.cob:10.26:
-       7             02 BB PIC X.
-       8             02 BBprime REDEFINES BB PIC 9.
-       9             02 CC PIC X. 02 DD PIC X.
-      10 >           66 ABCD RENAMES BB THRU DD.
-    ----                             ^
-      11           01 ZZ OCCURS 5 TIMES INDEXED BY INDEX1.
-      12             02 YY PIC X.
-    3 references
-    __rootdir__/prog.cob:10.34:
-       7             02 BB PIC X.
-       8             02 BBprime REDEFINES BB PIC 9.
-       9             02 CC PIC X. 02 DD PIC X.
-      10 >           66 ABCD RENAMES BB THRU DD.
-    ----                                     ^
-      11           01 ZZ OCCURS 5 TIMES INDEXED BY INDEX1.
-      12             02 YY PIC X.
-    2 references
     __rootdir__/prog.cob:11.11:
        8             02 BBprime REDEFINES BB PIC 9.
        9             02 CC PIC X. 02 DD PIC X.
