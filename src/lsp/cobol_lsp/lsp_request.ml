@@ -454,22 +454,29 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
-let documetation_of_datadef ~(comments: Cobol_preproc.Text.comments) ~filename data_def =
+let documetation_of_datadef ~rev_comments ~filename data_def =
+  let open Cobol_preproc.Text in
   let loc = Cobol_data.Item.def_loc data_def in
-  let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
-  let comments = List.rev @@
-    List.filter_map begin fun ({ comment_loc; comment_kind; comment_contents }: Cobol_preproc.Text.comment) ->
-      let com_range = Lsp_position.range_of_lexloc comment_loc in
-      if def_range.start.line = com_range.start.line
-      || def_range.start.line = com_range.start.line + 1
-         && comment_kind ==  `Line
-      then Some comment_contents
-      else None
-    end comments in
-  if List.length comments == 0
+  let def_filename = (fst @@ Cobol_common.Srcloc.as_lexloc loc).pos_fname in
+  if not (String.equal filename def_filename)
   then ""
-  else Pretty.to_string "\n```cobol\n%a\n```"
-      Fmt.(list ~sep:(any "\n") string) comments
+  else
+    let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
+    let comments =
+      List.rev @@
+      List.filter_map
+        begin fun { comment_loc; comment_kind; comment_contents } ->
+          let com_range = Lsp_position.range_of_lexloc comment_loc in
+          if def_range.start.line = com_range.start.line
+          || def_range.start.line = com_range.start.line + 1
+             && comment_kind ==  `Line
+          then Some comment_contents
+          else None
+        end rev_comments in
+    match comments with
+    | [] -> ""
+    | _ -> Pretty.to_string "\n```cobol\n%a\n```"
+             Fmt.(list ~sep:(any "\n") string) comments
 
 let lookup_data_definition_for_hover cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in
@@ -484,7 +491,7 @@ let lookup_data_definition_for_hover cu_name element_at_pos group =
   with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
 let data_definition_on_hover
-    ?(always_show_hover_text_in_data_div = false) ~comments
+    ?(always_show_hover_text_in_data_div = false) ~rev_comments
     ~uri position Cobol_typeck.Outputs.{ group; _ } =
   let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~uri position group with
@@ -496,7 +503,7 @@ let data_definition_on_hover
       try
         let data_def, hover_loc
           = lookup_data_definition_for_hover cu_name ele_at_pos group in
-        let doc_comments = documetation_of_datadef ~comments ~filename data_def in
+        let doc_comments = documetation_of_datadef ~rev_comments ~filename data_def in
         if always_show_hover_text_in_data_div ||
            not (Lsp_position.is_in_srcloc ~filename position @@
                 Cobol_data.Item.def_loc data_def)
@@ -554,11 +561,9 @@ let handle_hover ?always_show_hover_text_in_data_div
     registry HoverParams.{ textDocument = doc; position; _ } =
   let filename = Lsp.Uri.to_path doc.uri in
   try_with_main_document_data registry doc
-    ~f:begin fun
-      ~doc:{ artifacts = { pplog; rev_comments = comments; _ }; _ }
-      checked_doc ->
+    ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
       match data_definition_on_hover ~uri:doc.uri position checked_doc
-              ?always_show_hover_text_in_data_div ~comments,
+              ?always_show_hover_text_in_data_div ~rev_comments,
             preproc_info_on_hover ~filename position pplog with
       | None, None ->
           None
