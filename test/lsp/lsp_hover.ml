@@ -1253,8 +1253,4 @@ let%expect_test "hover-comment-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1)
-    ```cobol
-    * full line comment
-    *> inline comment
-    ``` |}]
+    ALPHANUMERIC(1) |}]
