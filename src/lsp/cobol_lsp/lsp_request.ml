@@ -464,15 +464,15 @@ let documetation_of_datadef ~rev_comments ~filename data_def =
     let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
     let comments =
       List.rev @@
-      List.filter_map
-        begin fun { comment_loc; comment_kind; comment_contents } ->
-          let com_range = Lsp_position.range_of_lexloc comment_loc in
-          if def_range.start.line = com_range.start.line
-          || def_range.start.line = com_range.start.line + 1
-             && comment_kind ==  `Line
-          then Some comment_contents
-          else None
-        end rev_comments in
+      List.filter_map begin fun { comment_loc; comment_kind; comment_contents } ->
+        let com_range = Lsp_position.range_of_lexloc comment_loc in
+        if def_range.start.line = com_range.start.line
+        || def_range.start.line = com_range.start.line + 1
+           && comment_kind ==  `Line
+        then Some comment_contents
+        else None
+      end rev_comments
+    in
     match comments with
     | [] -> ""
     | _ -> Pretty.to_string "\n```cobol\n%a\n```"
