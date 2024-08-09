@@ -222,7 +222,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       Visitor.skip { acc with current_section }
 
     method! fold_procedure_paragraph { paragraph; _ } acc =
-      Cobol_common.Visitor.skip @@
+      Visitor.skip @@
       Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
 
 

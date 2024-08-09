@@ -631,21 +631,21 @@ let codelens_positions ~uri group =
                                       field_conditions; field_redefinitions;
                                       field_length = _ } acc =
         ignore(field_redefines, field_leading_ranges, field_offset, field_size);
-        skip @@ begin
-          acc
+        skip @@ begin acc
           |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
           |> fold_field_layout v field_layout
           |> fold_condition_names v field_conditions
-          |> fold_item_redefinitions v field_redefinitions end
+          |> fold_item_redefinitions v field_redefinitions
+        end
       method! fold_table_definition { table_field; table_offset; table_size;
                                       table_range; table_init_values;
                                       table_redefines; table_redefinitions } acc =
         ignore(table_offset, table_size, table_init_values, table_redefines);
-        skip @@ begin
-          acc
+        skip @@ begin acc
           |> fold_field_definition' v table_field
           |> fold_table_range v table_range
-          |> fold_item_redefinitions v table_redefinitions end
+          |> fold_item_redefinitions v table_redefinitions
+        end
     end group (None, Positions.empty)
   |> snd
 
