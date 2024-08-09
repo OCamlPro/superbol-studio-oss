@@ -1141,3 +1141,120 @@ let%expect_test "hover-typedef-communication-section" =
     Hovering nothing worthy
     (line 10, character 17):
     Hovering nothing worthy |}];;
+
+let%expect_test "hover-comment" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+>>source format is fixed
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * full line comment
+       01 STRUCT. *> inline comment
+         02 VAL-1 PIC X. *> val1 inline comment
+         02 VAL-2 PIC X.
+       PROCEDURE DIVISION.
+         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2.
+         STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 11, character 18):
+    __rootdir__/prog.cob:12.17-12.23:
+       9            02 VAL-1 PIC X. *> val1 inline comment
+      10            02 VAL-2 PIC X.
+      11          PROCEDURE DIVISION.
+      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                    ^^^^^^
+      13            STOP RUN.
+      14
+    ```cobol
+    STRUCT
+    ```
+    Group of 2 subfields
+    Size: 16 bits
+    ```cobol
+    * full line comment
+    *> inline comment
+    ```
+    (line 11, character 25):
+    __rootdir__/prog.cob:12.24-12.29:
+       9            02 VAL-1 PIC X. *> val1 inline comment
+      10            02 VAL-2 PIC X.
+      11          PROCEDURE DIVISION.
+      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                           ^^^^^
+      13            STOP RUN.
+      14
+    ```cobol
+    VAL-1 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ```cobol
+    *> val1 inline comment
+    ```
+    (line 11, character 31):
+    __rootdir__/prog.cob:12.30-12.35:
+       9            02 VAL-1 PIC X. *> val1 inline comment
+      10            02 VAL-2 PIC X.
+      11          PROCEDURE DIVISION.
+      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                                 ^^^^^
+      13            STOP RUN.
+      14
+    ```cobol
+    VAL-2 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1) |}];;
+
+
+let%expect_test "hover-comment-copy" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+      * copy full line comment
+       01 FIELD PIC X. *> copy inline comment
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+  >>source format is fixed
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * full line comment
+       COPY lib. *> inline comment
+       PROCEDURE DIVISION.
+          DISPLAY F_|_IELD
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 9, character 19):
+    __rootdir__/prog.cob:10.18-10.23:
+       7         * full line comment
+       8          COPY lib. *> inline comment
+       9          PROCEDURE DIVISION.
+      10 >           DISPLAY FIELD
+    ----                     ^^^^^
+      11             STOP RUN.
+      12
+    ```cobol
+    FIELD
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ```cobol
+    * full line comment
+    *> inline comment
+    ``` |}]
