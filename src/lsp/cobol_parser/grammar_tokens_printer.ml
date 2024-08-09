@@ -77,8 +77,10 @@ let pp_token: token Pretty.printer = fun ppf ->
     | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
     | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
     | INTERVENING_ c -> print "<%c>" c
-    | tok when Text_keywords.is_intrinsic_token tok ->
+    | INTRINSIC_FUNC _ as tok ->
         print "INTRINSIC_FUNC[%a]" pp_token_string tok
+    | tok when Text_keywords.is_known_intrinsic_token tok ->
+        print "SPECIALIZED_INTRINSIC_FUNC[%a]" pp_token_string tok
     | EOF -> string "EOF"
     | t -> pp_token_string ppf t
 

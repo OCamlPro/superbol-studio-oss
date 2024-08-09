@@ -13,6 +13,7 @@
 
 let cmlyname = ref None
 let external_tokens = ref ""
+let with_is_intrinsic = ref false
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -23,6 +24,8 @@ let () =
   Arg.parse
     Arg.[
       ("--external-tokens", Set_string external_tokens,
+       "<module> Import token type definition from <module>");
+      ("--with-is-intrinsic", Set with_is_intrinsic,
        "<module> Import token type definition from <module>");
     ]
     anon usage_msg
@@ -175,16 +178,15 @@ let emit_intrinsic_functions_list ppf =
   Fmt.pf ppf "@]@\n]@."
 
 let emit_is_intrinsic ppf =
-  if String.equal cmlyname "grammar.cmly" then
+  if !with_is_intrinsic then
   let is_intrinsic t =
     intrinsic (Terminal.attributes t) |> Option.is_some
   in
-  Fmt.pf ppf "@[<2>let is_intrinsic_token = %s.(function@." tokens_module;
+  Fmt.pf ppf "@[<2>let is_known_intrinsic_token = %s.(function@." tokens_module;
   Terminal.iter begin fun t ->
     if is_intrinsic t
     then Fmt.pf ppf "| %a@." pp_terminal t
   end;
-  Fmt.pf ppf "| INTRINSIC_FUNC _ -> true@.";
   Fmt.pf ppf "| _ -> false@]\n)@."
 
 

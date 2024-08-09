@@ -510,13 +510,17 @@ let reword_intrinsics s : tokens -> tokens =
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
   let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let is_intrinsic_token = function
+    | INTRINSIC_FUNC _ -> true
+    | t when Text_keywords.is_known_intrinsic_token t -> true
+    | _ -> false in
   let rec aux rev_prefix suffix =
     match suffix with
     | [] ->
         List.rev rev_prefix
     | ({ payload = k1_token; _ } as k1) ::
       ({ payload = k2_token; _ } as k2) :: tl
-      when k1_token <> FUNCTION && Text_keywords.is_intrinsic_token k2_token ->
+      when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
         aux (EzList.tail_map distinguish_words @@
              retokenize s (keyword_of_token k2_token &@<- k2) @
              k1 :: rev_prefix) tl
