@@ -236,10 +236,9 @@ let string_of_K tokens =
       | [] -> ()
       | Cobol_parser.Tokens.PERIOD::tl ->
         Fmt.string ppf ".\n"; inner tl
-      | hd::tl ->
-        let token' = hd &@ Srcloc.dummy in
+      | token::tl ->
         if space_before then Fmt.sp ppf ();
-        Cobol_parser.INTERNAL.pp_token ppf token'; (* TODO: Cobol_parser.Tokens.pp *)
+        Cobol_parser.Tokens.pp ppf token;
         inner tl
     in
     inner ~space_before:false

@@ -43,8 +43,8 @@ let show_parsed_tokens ?(parser_options = options ())
     Cobol_parser.parse_with_artifacts ~options:parser_options
   in
   (if with_locations
-   then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
-   else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
+   then Cobol_parser.Tokens.pp'_list_with_loc_info ~fsep:"@\n"
+   else Cobol_parser.Tokens.pp'_list) Fmt.stdout (Lazy.force tokens)
 
 let show_diagnostics ?(parser_options = options ())
     ?source_format ?filename contents =

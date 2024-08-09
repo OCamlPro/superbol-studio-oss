@@ -20,9 +20,6 @@ open EzCompat
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
 type token = Grammar_tokens.token Cobol_ptree.with_loc
 type tokens = token list
-val pp_token: token Pretty.printer
-val pp_tokens: tokens Pretty.printer
-val pp_tokens': ?fsep:Pretty.simple -> tokens Pretty.printer
 
 (* --- *)
 

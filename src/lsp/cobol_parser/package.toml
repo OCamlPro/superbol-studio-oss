@@ -102,7 +102,7 @@ dune-trailer = """
   (action
     (with-stdout-to %{targets}
        (run %{exe:./keywords/gen_keywords.exe} %{deps}
-            --external-tokens Grammar_tokens))))
+            --external-tokens Grammar_tokens --with-is-intrinsic))))
 
 (rule
   (targets grammar_expect.ml)
