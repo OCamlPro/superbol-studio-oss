@@ -3888,10 +3888,12 @@ let%expect_test "semantic-while-writing-completion" =
           DISPLAY _|_
 
           UNSTRING _|_
+          UNSTRING ALPHA INTO _|_.
+          UNSTRING ALPHA INTO _|_ALPHA.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":2,"line":14},"start":{"character":0,"line":14}},"severity":1},{"message":"Missing <identifier> INTO .","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":31,"line":14},"start":{"character":30,"line":14}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":18,"line":14},"start":{"character":10,"line":14}},"severity":1},{"message":"Missing <identifier> INTO","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     __rootdir__/prog.cob:10.14:
        7           01 ALPHA PIC X.
        8           01 ANYY USAGE BIT.
@@ -3984,7 +3986,8 @@ let%expect_test "semantic-while-writing-completion" =
       13
       14 >           UNSTRING
     ----                      ^
-      15
+      15             UNSTRING ALPHA INTO .
+      16             UNSTRING ALPHA INTO ALPHA.
     (line 13, character 19):
     Basic (12 entries):
         NUM Numeric (unexpected here)
@@ -4003,6 +4006,75 @@ let%expect_test "semantic-while-writing-completion" =
         NUM Numeric (unexpected here)
         ALPHA Alphanum
         ANYY Boolean (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:15.30:
+      12             DISPLAY
+      13
+      14             UNSTRING
+      15 >           UNSTRING ALPHA INTO .
+    ----                                 ^
+      16             UNSTRING ALPHA INTO ALPHA.
+      17
+    (line 14, character 30):
+    Basic (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:16.30:
+      13
+      14             UNSTRING
+      15             UNSTRING ALPHA INTO .
+      16 >           UNSTRING ALPHA INTO ALPHA.
+    ----                                 ^
+      17
+    (line 15, character 30):
+    Basic (12 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -5272,3 +5344,29 @@ let%expect_test "intrinsic-completion" =
         WITH NO ADVANCING
         WRITE
         ZEROS |}];;
+
+let%expect_test "string-concat-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 CC PIC X.
+        PROCEDURE DIVISION.
+          MOVE "A"&"B" _|_TO CC.
+          STOP RUN.
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:8.23:
+       5           WORKING-STORAGE SECTION.
+       6           01 CC PIC X.
+       7           PROCEDURE DIVISION.
+       8 >           MOVE "A"&"B" TO CC.
+    ----                          ^
+       9             STOP RUN.
+      10
+    (line 7, character 23):
+    Basic (1 entries): TO
+    Eager (1 entries): TO |}];;

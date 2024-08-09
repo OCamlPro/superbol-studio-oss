@@ -531,6 +531,13 @@ module DEBUG = struct
             nullable kind
             (pp_list Print.terminal) (Nonterminal.first nonterm)))
 
+  let emit_productions_with_num ppf =
+    Production.iter begin fun production ->
+      Fmt.(
+        pf ppf "-%d- %a\n" (Production.to_int production)
+          Print.production production)
+    end
+
   let emit_state_productions ppf =
     Lr1.iter begin fun lr1 ->
       let lr0 = Lr1.lr0 lr1 in

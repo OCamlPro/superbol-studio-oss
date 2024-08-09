@@ -291,7 +291,11 @@ let expected_tokens ?(eager=true) base_env =
       CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
     Expect.actions_in ~env
     |> List.filter_map begin function
-      | Expect.Reduce prod -> Some ( Menhir.force_reduction prod env )
+      | Expect.Reduce prod ->
+        begin
+          try Some ( Menhir.force_reduction prod env )
+          with Invalid_argument _ -> None
+        end
       | Feed nt ->
         try
           let default_value = Expect.default_nonterminal_value nt in
