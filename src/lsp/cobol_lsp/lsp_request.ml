@@ -588,7 +588,7 @@ let handle_document_symbol registry (params: DocumentSymbolParams.t) =
 
 (** { Document Code Lens } *)
 
-module PosSet = Set.Make(struct
+module Positions = Set.Make (struct
     type t = Position.t
     let compare (p1: t) (p2: t) =
       let c = p2.line - p1.line in
@@ -613,7 +613,7 @@ let codelens_positions ~uri group =
     then skip (current, acc)
     else
       let range = Lsp_position.range_of_srcloc_in ~filename loc in
-      skip (context, PosSet.add range.start acc)
+      skip (context, Positions.add range.start acc)
   in
   Cobol_unit.Visitor.fold_unit_group
     object (v)
@@ -625,13 +625,28 @@ let codelens_positions ~uri group =
       method! fold_qualname' = take_when_in DataDiv
       method! fold_record_renaming { renaming_name; _ } =
         take_when_in DataDiv renaming_name
-      method! fold_field_definition' { payload = field; _ } acc =
-        fold_field_definition v { field with field_redefines = None } acc
-        |> skip
-      method! fold_table_definition' { payload = table; _ } acc =
-        fold_table_definition v { table with table_redefines = None } acc
-        |> skip
-    end group (None, PosSet.empty)
+      method! fold_field_definition { field_qualname; field_redefines;
+                                      field_leading_ranges;
+                                      field_offset; field_size; field_layout;
+                                      field_conditions; field_redefinitions;
+                                      field_length = _ } acc =
+        ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+        skip @@ begin
+          acc
+          |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
+          |> fold_field_layout v field_layout
+          |> fold_condition_names v field_conditions
+          |> fold_item_redefinitions v field_redefinitions end
+      method! fold_table_definition { table_field; table_offset; table_size;
+                                      table_range; table_init_values;
+                                      table_redefines; table_redefinitions } acc =
+        ignore(table_offset, table_size, table_init_values, table_redefines);
+        skip @@ begin
+          acc
+          |> fold_field_definition' v table_field
+          |> fold_table_range v table_range
+          |> fold_item_redefinitions v table_redefinitions end
+    end group (None, Positions.empty)
   |> snd
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
@@ -641,7 +656,7 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
       let context = ReferenceContext.create ~includeDeclaration:true in
       codelens_positions ~uri checked_doc.group
-      |> PosSet.to_seq
+      |> Positions.to_seq
       |> Seq.map begin fun position ->
         let params =
           ReferenceParams.create ~context ~position ~textDocument () in

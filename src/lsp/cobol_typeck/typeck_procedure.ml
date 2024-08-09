@@ -214,16 +214,16 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
 
     method! fold_procedure_section ({ section_paragraphs; _ } as s)
         ({ current_section; _ } as acc) =
-      { acc with current_section = Some s }
-      |> Cobol_common.Visitor.fold_list v section_paragraphs.list
-        ~fold:Cobol_unit.Visitor.fold_procedure_paragraph'
-      |> (fun acc -> { acc with current_section })
-      |> Cobol_common.Visitor.skip
+      let acc =
+        Visitor.fold_list v section_paragraphs.list
+          ~fold:Cobol_unit.Visitor.fold_procedure_paragraph'
+          { acc with current_section = Some s }
+      in
+      Visitor.skip { acc with current_section }
 
     method! fold_procedure_paragraph { paragraph; _ } acc =
-      acc
-      |> Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph
-      |> Cobol_common.Visitor.skip
+      Cobol_common.Visitor.skip @@
+      Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
 
 
     method! fold_procedure_name' ({ loc; _ } as qn)
