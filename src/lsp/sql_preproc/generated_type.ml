@@ -169,7 +169,7 @@ module Printer = struct
         | Some n -> n
         | None -> ""
       in
-      Format.fprintf fmt "%s%s %s %s %s." prefix var_importance var_name
+      Format.fprintf fmt "%s%s %s PIC %s %s." prefix var_importance var_name
         var_type var_content
     | Field_var_declaration { prefix; var_importance; var_name; field } ->
       Format.fprintf fmt "%s%s %s.%a" prefix var_importance var_name pp_field

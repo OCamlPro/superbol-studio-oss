@@ -306,9 +306,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generate_select_into_one prefix vars ?at () =
+  let generate_select_into_one prefix vars cob_vars ?at () =
     let at_name, at_size = get_at_info at in
-    let size = string_of_int (List.length vars) in
     let fun_name = "GIXSQLExecSelectIntoOne" in
     let ref_value =
       let var_name =
@@ -320,8 +319,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference { prefix; var = var_name };
-        Generated_type.Value { prefix; var = "0" };
-        Generated_type.Value { prefix; var = size }
+        Generated_type.Value
+          { prefix; var = string_of_int (List.length cob_vars) };
+        Generated_type.Value { prefix; var = string_of_int (List.length vars) }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
@@ -329,11 +329,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_select_into prefix vars select_options select ?at () =
     let selects_into_vars = List.map (generate_set_result_param prefix) vars in
-    let selects_into = generate_select_into_one prefix vars ?at () in
-    let cob_vars = Misc.extract_cob_var_select select @ (Misc.extract_cob_var_select_option_list select_options) in 
-    let trans_cob_var = List.map (generate_set_result_param prefix) cob_vars in
+    let cob_vars =
+      Misc.extract_cob_var_select select
+      @ Misc.extract_cob_var_select_option_list select_options
+    in
+    let trans_cob_var = List.map (generate_set_sql_param prefix) cob_vars in
+    let selects_into = generate_select_into_one prefix vars cob_vars ?at () in
     let trans_stm =
-      generate_start_end_sql prefix (selects_into_vars @ trans_cob_var @[ selects_into ])
+      generate_start_end_sql prefix
+        (selects_into_vars @ trans_cob_var @ [ selects_into ])
     in
     trans_stm
   in
@@ -496,7 +500,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference
           { prefix; var = "\"" ^ var_name.payload ^ "\" & x\"00\"" };
         Generated_type.Reference { prefix; var = sql_name };
-        Generated_type.Value { prefix; var = "0" } (*todo*)
+        Generated_type.Value
+          { prefix; var = string_of_int (get_length sql_name) }
+        (*todo*)
       ]
     in
     [ Generated_type.CallStatic
@@ -531,19 +537,48 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       { prefix; fun_name = "GIXSQLPrepareStatement"; ref_value }
   in
 
+  let generate_exec_prepared_into prefix (executed_string : sqlVarToken)
+  into_hostref_list opt_using_hostref_list ?at () =
+let at_name, at_size = get_at_info at in
+let ref_value =
+  let prefix = prefix ^ "    " in
+  [ Generated_type.Reference { prefix; var = "SQLCA" };
+    Generated_type.Reference { prefix; var = at_name };
+    Generated_type.Value { prefix; var = string_of_int at_size };
+    Generated_type.Reference
+      { prefix; var = "\"" ^ executed_string.payload ^ "\" & x\"00\"" };
+    Generated_type.Value
+      { prefix; var = string_of_int (List.length into_hostref_list) };
+      Generated_type.Value
+        { prefix; var = string_of_int (List.length opt_using_hostref_list) }
+    (*todo*)
+  ]
+in
+Generated_type.CallStatic
+  { prefix; fun_name = "GIXSQLExecPreparedInto"; ref_value }
+in
+
   let generate_execute_into_using prefix executed_string
       ?(opt_into_hostref_list = []) ?(opt_using_hostref_list = []) ?at () =
-    ignore opt_into_hostref_list;
-    (*todo*)
-    let execute_using_vars =
+    let into_hostref_set_result_param =
+      List.map (generate_set_result_param prefix) opt_into_hostref_list
+    in
+    let using_hostref_set_sql =
       List.map (generate_set_sql_param prefix) opt_using_hostref_list
     in
     let exec_prepared =
-      generate_exec_prepared prefix executed_string opt_using_hostref_list ?at
-        ()
+      match opt_into_hostref_list with
+      | [] ->
+        generate_exec_prepared prefix executed_string opt_using_hostref_list ?at
+          ()
+      | _ ->
+        generate_exec_prepared_into prefix executed_string
+          opt_using_hostref_list opt_into_hostref_list ?at ()
     in
     let trans_stm =
-      generate_start_end_sql prefix (execute_using_vars @ [ exec_prepared ])
+      generate_start_end_sql prefix
+        ( using_hostref_set_sql @ into_hostref_set_result_param
+        @ [ exec_prepared ] )
     in
     trans_stm
   in
@@ -621,7 +656,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_at prefix sql ?at () =
     match sql with
-    | SelectInto { vars; select_options; select} ->
+    | SelectInto { vars; select_options; select } ->
       generate_select_into prefix vars select_options select ?at () (*TODO AT*)
     | Rollback (rb_work_or_tran, rb_args) ->
       generate_rollback prefix rb_work_or_tran rb_args ?at ()
