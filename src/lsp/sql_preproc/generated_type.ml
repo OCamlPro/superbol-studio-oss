@@ -54,12 +54,28 @@ type trans_stm =
       { prefix : string;
         target : string
       }
+  | PerformStatement of
+      { prefix : string;
+        target : string
+      }
+  | If of
+      { prefix : string;
+        condition : string;
+        if_stm : trans_stm list
+      }
+  | Move of
+      { prefix : string;
+        src : string;
+        dest : string
+      }
   | Declaration of declaration
   | Comment of { content : string }
   | Section of { name : string }
   | LinkageSection
   | WorkingStorageSection
   | ProcedureDivision
+  (*these type are for debug*)
+  | NonFatalErrorWarning of { content : string }
   | Todo of { prefix : string }
 
 type generated_stm =
@@ -103,6 +119,7 @@ module Printer = struct
 
   and pp_trans_stm fmt x =
     match x with
+    | [ h ] -> Format.fprintf fmt "%a" pp_trans_stm_aux h
     | h :: t -> Format.fprintf fmt "%a\n%a" pp_trans_stm_aux h pp_trans_stm t
     | [] -> ()
 
@@ -121,11 +138,22 @@ module Printer = struct
         pp_ref_value_list ref_value prefix
     | Copy { prefix; file_name } ->
       Format.fprintf fmt "%sCOPY %s" prefix file_name
-    | GotoStatement { prefix; target } -> Format.fprintf fmt "%sGOTO %s" prefix target
+    | GotoStatement { prefix; target } ->
+      Format.fprintf fmt "%sGOTO %s" prefix target
+    | PerformStatement { prefix; target } ->
+      Format.fprintf fmt "%sPERFORM %s" prefix target
+    | If { prefix; condition; if_stm } ->
+      Format.fprintf fmt "%sIF %s THEN\n%a\n%sEND-IF" prefix condition
+        pp_trans_stm if_stm prefix
+    | Move { prefix; src; dest } ->
+      Format.fprintf fmt "%sMOVE '%s' TO %s" prefix src dest
     | Declaration d -> Format.fprintf fmt "%a" pp_declaration d
-    | LinkageSection -> Format.fprintf fmt "LINKAGE SECTION."
-    | WorkingStorageSection -> Format.fprintf fmt "WORKING-STORAGE SECTION."
-    | ProcedureDivision -> Format.fprintf fmt "PROCEDURE DIVISION."
+    | LinkageSection -> Format.fprintf fmt "       LINKAGE SECTION."
+    | WorkingStorageSection ->
+      Format.fprintf fmt "       WORKING-STORAGE SECTION."
+    | ProcedureDivision -> Format.fprintf fmt "       PROCEDURE DIVISION."
+    | NonFatalErrorWarning { content } ->
+      Format.fprintf fmt "      *> WARNING: %s" content
     | Todo { prefix } -> Format.fprintf fmt "%sTODO" prefix
 
   and pp_declaration fmt = function

@@ -146,7 +146,7 @@ let esql_with_opt_at :=
 
 (*Unexeped At, but we have to parse it*)
 | OPEN; cursor = sql_var_name; ul = option(using_list_cob_var); {Open (cursor, ul)}
-| FETCH; sql=sql; l = into_list_cob_var; {Fetch(sql,l)}
+| FETCH; sql=sql_var_name; l = into_list_cob_var; {Fetch(sql,l)}
 | CLOSE; cursor = sql_var_name; {Close cursor}
 
 let begin_end_stm :=

@@ -84,7 +84,7 @@ and esql_instuction =
   | DisconnectAll
   | Open of sqlVarToken * cobol_var list option (*cursor name*)
   | Close of sqlVarToken (*cursor name*)
-  | Fetch of sql_instruction * cobol_var list
+  | Fetch of sqlVarToken * cobol_var list
   | Insert of table * value list
   | Delete of sql_instruction
   | Update of sqlVarToken * sql_update * update_arg option
@@ -311,7 +311,7 @@ module Printer = struct
         (lst, "USING")
     | Close cursor -> Format.fprintf fmt "CLOSE %s" cursor.payload
     | Fetch (sql, var) ->
-      Format.fprintf fmt "FETCH %a INTO %a" pp_sql sql pp_cob_lst var
+      Format.fprintf fmt "FETCH %s INTO %a" sql.payload pp_cob_lst var
     | Insert (tab, v) ->
       Format.fprintf fmt "INSERT INTO %a VALUES %a" pp_table tab pp_value v
     | Delete sql -> Format.fprintf fmt "DELETE %a" pp_sql sql

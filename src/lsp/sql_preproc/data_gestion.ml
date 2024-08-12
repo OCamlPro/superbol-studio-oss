@@ -32,6 +32,7 @@ let num = ref 0
 let transform_stm map (_, stm) filename =
   let prefix = "      " in
   let create_new_var content =
+    let content = "\"" ^ Misc.replace_colon_words content ^ "\"" in
     let size = String.length content in
     num := !num + 1;
     let var_name = "SQ" ^ string_of_int !num in
@@ -60,7 +61,7 @@ let transform_stm map (_, stm) filename =
       add_var ~map ~name:("SQ" ^ string_of_int !num) ?length:(Some size) () )
   in
   let add_cur cur_name map ws filename =
-    let pre_cur_name = "GIXSQL-CI-F-"^Misc.extract_filename filename^"-" in
+    let pre_cur_name = "GIXSQL-CI-F-" ^ Misc.extract_filename filename ^ "-" in
     let ws =
       Declaration
         (Simple_var_declaration
@@ -94,16 +95,30 @@ let transform_stm map (_, stm) filename =
     | StartTransaction ->
       let ws, map = create_new_var "START TRANSACTION" in
       (ws, map)
-    | Sql sql ->
-      let ws, map =
-        create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql)
-      in
-      (ws, map)
-    | Insert _ | Savepoint _-> 
+    | Sql sql -> (
+      match sql with
+      | Sql_ast.SqlInstr w :: _ when w = "VAR" ->
+        ([], map)
+        (*TODO: find what this should be replaced with. I think Gix juste ignorer these instruction, but mabe not*)
+      | _ ->
+        let ws, map =
+          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql)
+        in
+        (ws, map) )
+    | Insert _
+    | Savepoint _ ->
       let ws, map =
         create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens)
       in
       (ws, map)
+    | ExecuteImmediate sql -> (
+      match sql with
+      | [ Sql_ast.SqlVarToken CobolVar CobVarNotNull _ ] -> ([], map)
+      | _ ->
+        let ws, map = 
+          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql)
+        in
+        (ws, map) )
     | Rollback (rb_work_or_tran, rb_args) -> begin
       match (rb_work_or_tran, rb_args) with
       | _, Some (To savepoint) ->
@@ -161,14 +176,14 @@ let transform_stm map (_, stm) filename =
           [ Simple_var_declaration
               { prefix;
                 var_importance = "49";
-                var_name = Some (name ^ "LEN");
+                var_name = Some (name ^ "-LEN");
                 var_type = "9(8) COMP-5";
                 var_content = None
               };
             Simple_var_declaration
               { prefix;
                 var_importance = "49";
-                var_name = Some (name ^ "ARR");
+                var_name = Some (name ^ "-ARR");
                 var_type = "X(" ^ sql_type_size ^ ")";
                 var_content = None
               }
@@ -186,7 +201,7 @@ let transform_stm map (_, stm) filename =
              ^ sql_type_size ^ ").\n", *)
           map )
       | _ -> failwith "Unknow type."
-    end 
+    end
   in
 
   match stm with
