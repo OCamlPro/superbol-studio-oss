@@ -586,6 +586,97 @@ let handle_document_symbol registry (params: DocumentSymbolParams.t) =
       Some (`DocumentSymbol symbols)
     end
 
+(** { Document Code Lens } *)
+
+module Positions = Set.Make (struct
+    type t = Position.t
+    let compare (p1: t) (p2: t) =
+      let c = p2.line - p1.line in
+      if c <> 0 then c else p2.character - p1.character
+  end)
+
+let codelens_positions ~uri group =
+  let filename = Lsp.Uri.to_path uri in
+  let open struct
+    include Cobol_common.Visitor
+    include Cobol_data.Visitor
+    type context =
+      | ProcedureDiv
+      | DataDiv
+      | None
+  end in
+  let set_context context (old, acc) =
+    do_children_and_then (context, acc) (fun (_, acc) -> (old, acc))
+  in
+  let take_when_in context { loc; _ } (current, acc) =
+    if context <> current
+    then skip (current, acc)
+    else
+      let range = Lsp_position.range_of_srcloc_in ~filename loc in
+      skip (context, Positions.add range.start acc)
+  in
+  Cobol_unit.Visitor.fold_unit_group
+    object (v)
+      inherit [_] Cobol_unit.Visitor.folder
+      method! fold_procedure _ = set_context ProcedureDiv
+      method! fold_data_definitions _ = set_context DataDiv
+      method! fold_paragraph' _ = skip
+      method! fold_procedure_name' = take_when_in ProcedureDiv
+      method! fold_qualname' = take_when_in DataDiv
+      method! fold_record_renaming { renaming_name; _ } =
+        take_when_in DataDiv renaming_name
+      method! fold_field_definition { field_qualname; field_redefines;
+                                      field_leading_ranges;
+                                      field_offset; field_size; field_layout;
+                                      field_conditions; field_redefinitions;
+                                      field_length = _ } acc =
+        ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+        skip @@ begin acc
+          |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
+          |> fold_field_layout v field_layout
+          |> fold_condition_names v field_conditions
+          |> fold_item_redefinitions v field_redefinitions
+        end
+      method! fold_table_definition { table_field; table_offset; table_size;
+                                      table_range; table_init_values;
+                                      table_redefines; table_redefinitions } acc =
+        ignore(table_offset, table_size, table_init_values, table_redefines);
+        skip @@ begin acc
+          |> fold_field_definition' v table_field
+          |> fold_table_range v table_range
+          |> fold_item_redefinitions v table_redefinitions
+        end
+    end group (None, Positions.empty)
+  |> snd
+
+let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let context = ReferenceContext.create ~includeDeclaration:true in
+      codelens_positions ~uri checked_doc.group
+      |> Positions.to_seq
+      |> Seq.map begin fun position ->
+        let params =
+          ReferenceParams.create ~context ~position ~textDocument () in
+        let ref_count =
+          lookup_references_in_doc ~rootdir params checked_doc
+          |> Option.fold ~none:0 ~some:List.length in
+        let title = string_of_int ref_count
+                    ^ " reference"
+                    ^ if ref_count > 1 then "s" else "" in
+        let range = Range.create ~end_:position ~start:position in
+        let uri = DocumentUri.yojson_of_t textDocument.uri in
+        let command = Command.create () ~title
+            ~command:"superbol.editor.action.findReferences"
+            ~arguments:[uri; Position.yojson_of_t position] in
+        CodeLens.create ~command ~range ()
+      end
+      |> List.of_seq |> Option.some
+    end
+  |> Option.value ~default:[]
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -633,10 +724,11 @@ let on_request
         Ok (handle_shutdown registry, ShuttingDown)
     | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
         Ok (handle_document_symbol registry params, state)
+    | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
+        Ok (handle_codelens registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
-    | TextDocumentCodeLens  (* CodeLensParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
@@ -705,6 +797,7 @@ module INTERNAL = struct
   let lookup_references = handle_references
   let hover = handle_hover
   let completion = handle_completion
+  let codelens = handle_codelens
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
 end

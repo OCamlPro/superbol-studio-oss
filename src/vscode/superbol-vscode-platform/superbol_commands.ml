@@ -27,12 +27,39 @@ type t =
     handler: handler;
   }
 
+let extension_oc : Vscode.OutputChannel.t Lazy.t =
+  lazy (Vscode.Window.createOutputChannel ~name:"SuperBOL Studio Extension")
+
 let commands = ref []
 
 let command id handler =
   let command = { id; handler } in
   commands := command :: !commands;
   command
+
+let _editor_action_findReferences =
+  let command_name = "superbol.editor.action.findReferences"  in
+  command command_name @@ Instance
+    begin fun _instance ~args ->
+      match args with
+      | [arg1; arg2] ->
+        let uri = Uri.t_to_js @@ Uri.parse (Ojs.string_of_js arg1) () in
+        let pos =
+          let line = Ojs.get_prop_ascii arg2 "line" |> Ojs.int_of_js in
+          let character = Ojs.get_prop_ascii arg2 "character" |> Ojs.int_of_js in
+          Position.t_to_js @@ Position.make ~line ~character in
+        let _ = Commands.executeCommand
+            ~command:"editor.action.findReferences"
+            ~args:[uri; pos]
+        in ()
+      | _ ->
+        let types_given = List.map Ojs.type_of args |> String.concat ", " in
+        let lazy oc = extension_oc in
+        let value = Printf.sprintf
+            "Internal warning: unexpected arguments given to %s: \
+             expected uri & position, got [%s]" command_name types_given in
+        OutputChannel.appendLine oc ~value
+    end
 
 let _restart_language_server =
   command "superbol.server.restart" @@ Instance

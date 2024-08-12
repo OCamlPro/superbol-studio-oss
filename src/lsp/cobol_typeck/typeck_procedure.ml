@@ -182,7 +182,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     { acc with diags = Proc_error err :: acc.diags }
   in
 
-  let visitor = object
+  let visitor = object (v)
     inherit [acc] Cobol_unit.Visitor.folder
 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
@@ -212,10 +212,19 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
           error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
                                              matching_qualnames }
 
-    method! fold_procedure_section s ({ current_section; _ } as acc) =
-      Visitor.do_children_and_then
-        { acc with current_section = Some s }
-        (fun acc -> { acc with current_section })
+    method! fold_procedure_section ({ section_paragraphs; _ } as s)
+        ({ current_section; _ } as acc) =
+      let acc =
+        Visitor.fold_list v section_paragraphs.list
+          ~fold:Cobol_unit.Visitor.fold_procedure_paragraph'
+          { acc with current_section = Some s }
+      in
+      Visitor.skip { acc with current_section }
+
+    method! fold_procedure_paragraph { paragraph; _ } acc =
+      Visitor.skip @@
+      Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
+
 
     method! fold_procedure_name' ({ loc; _ } as qn)
         ({ current_section = in_section; _ } as acc) =
