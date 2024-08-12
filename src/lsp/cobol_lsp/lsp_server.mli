@@ -53,6 +53,7 @@ module TYPES: sig
   and exit_status = (unit, string) result
 
   type 'a error =
+    | CopybookRenamingForbidden
     | InvalidStatus of state
     | UnhandledRequest of 'a Lsp.Client_request.t
     | UnknownRequest of string

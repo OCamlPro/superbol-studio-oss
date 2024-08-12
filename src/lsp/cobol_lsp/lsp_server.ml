@@ -82,6 +82,7 @@ module TYPES = struct
   and exit_status = (unit, string) result
 
   type 'a error =
+    | CopybookRenamingForbidden
     | InvalidStatus of state
     | UnhandledRequest of 'a Lsp.Client_request.t
     | UnknownRequest of string
@@ -735,5 +736,7 @@ let jsonrpc_of_error error method_ =
         RequestFailed, Fmt.str "Unhandled request: %s" method_
     | UnknownRequest method_ ->
         MethodNotFound, Fmt.str "Unknown request method: %s" method_
+    | CopybookRenamingForbidden ->
+        RequestFailed, Fmt.str "Cancelled rename of variable contained in a copybook"
   in
   Jsonrpc.Response.Error.make ~code ~message ()

@@ -605,7 +605,7 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
 
 let handle_document_symbol registry (params: DocumentSymbolParams.t) =
   try_with_main_document_data registry params.textDocument
-    ~f:begin fun ~doc { ptree; _ }->
+    ~f:begin fun ~doc { ptree; _ } ->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
       let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
       Some (`DocumentSymbol symbols)
@@ -702,6 +702,35 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
     end
   |> Option.value ~default:[]
 
+(** { Rename } *)
+
+exception CopybookRenameError
+
+let handle_rename registry (params: RenameParams.t) =
+  let { textDocument; position; newName = newText; _ }: RenameParams.t = params in
+  let doc = Lsp_server.find_document params.textDocument registry in
+  let checked_doc = Lsp_document.checked doc in
+  let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+  let locations = Option.value ~default:[] @@
+    let context = ReferenceContext.create ~includeDeclaration:true in
+    let params = ReferenceParams.create
+        ~context ~position ~textDocument () in
+    lookup_references_in_doc ~rootdir params checked_doc in
+  try
+    let changes = List.fold_left begin fun acc ({ range; uri }: Location.t) ->
+        if DocumentUri.compare uri params.textDocument.uri <> 0
+        then raise CopybookRenameError
+        else
+          let textEdit = TextEdit.create ~newText ~range in
+          URIMap.add_to_list uri textEdit acc
+      end URIMap.empty locations
+                  |> URIMap.to_seq
+                  |> List.of_seq
+    in
+    Ok(WorkspaceEdit.create ~changes ())
+  with CopybookRenameError ->
+    Error "Reference of variable found in copybook, aborting rename"
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -747,17 +776,21 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
+    | DocumentSymbol params ->
         Ok (handle_document_symbol registry params, state)
     | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
         Ok (handle_codelens registry params, state)
+    | TextDocumentRename params ->
+        begin match handle_rename registry params with
+          | Ok workspaceEdit -> Ok (workspaceEdit, state)
+          | Error _ -> Error (CopybookRenamingForbidden)
+        end
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
-    | TextDocumentRename  (* RenameParams.t.t *) _
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
@@ -825,4 +858,5 @@ module INTERNAL = struct
   let codelens = handle_codelens
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
+  let rename = handle_rename
 end
