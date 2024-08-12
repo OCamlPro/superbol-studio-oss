@@ -43,23 +43,21 @@ let _editor_action_findReferences =
     begin fun _instance ~args ->
       match args with
       | [arg1; arg2] ->
-        let uri = Uri.parse (Ojs.string_of_js arg1) () in
-        let line = Ojs.get_prop_ascii arg2 "line" |> Ojs.int_of_js in
-        let character = Ojs.get_prop_ascii arg2 "character" |> Ojs.int_of_js in
-        let pos = Position.make ~line ~character in
-        let lazy oc = extension_oc in
-        let value = Printf.sprintf
-            "Info: Performing %s on file %s at position %d:%d"
-            command_name (Ojs.string_of_js arg1) line character in
-        OutputChannel.appendLine oc ~value;
+        let uri = Uri.t_to_js @@ Uri.parse (Ojs.string_of_js arg1) () in
+        let pos =
+          let line = Ojs.get_prop_ascii arg2 "line" |> Ojs.int_of_js in
+          let character = Ojs.get_prop_ascii arg2 "character" |> Ojs.int_of_js in
+          Position.t_to_js @@ Position.make ~line ~character in
         let _ = Commands.executeCommand
             ~command:"editor.action.findReferences"
-            ~args:[Uri.t_to_js uri; Position.t_to_js pos ]
+            ~args:[uri; pos]
         in ()
       | _ ->
+        let types_given = List.map Ojs.type_of args |> String.concat ", " in
         let lazy oc = extension_oc in
         let value = Printf.sprintf
-            "Warning: %s requires 2 arguments" command_name in
+            "Internal warning: unexpected arguments given to %s: \
+             expected uri & position, got [%s]" command_name types_given in
         OutputChannel.appendLine oc ~value
     end
 
