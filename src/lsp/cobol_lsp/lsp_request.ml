@@ -458,25 +458,25 @@ let documetation_of_datadef ~rev_comments ~filename data_def =
   let open Cobol_preproc.Text in
   let loc = Cobol_data.Item.def_loc data_def in
   let def_filename = (fst @@ Cobol_common.Srcloc.as_lexloc loc).pos_fname in
-  if not (String.equal filename def_filename)
+  if not (String.equal filename def_filename) (** def is in copybook *)
   then ""
   else
     let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
-    let comments =
-      List.rev @@
-      List.filter_map begin fun { comment_loc; comment_kind; comment_contents } ->
+    let (inline, full_line) =
+      List.fold_left begin fun acc { comment_loc; comment_kind; comment_contents } ->
         let com_range = Lsp_position.range_of_lexloc comment_loc in
         if def_range.start.line = com_range.start.line
-        || def_range.start.line = com_range.start.line + 1
-           && comment_kind ==  `Line
-        then Some comment_contents
-        else None
-      end rev_comments
+        then (Some comment_contents, snd acc)
+        else if def_range.start.line = com_range.start.line + 1
+             && comment_kind == `Line
+        then (fst acc, Some comment_contents)
+        else acc
+      end (None, None) rev_comments
     in
-    match comments with
-    | [] -> ""
-    | _ -> Pretty.to_string "\n```cobol\n%a\n```"
-             Fmt.(list ~sep:(any "\n") string) comments
+    match inline, full_line with
+    | Some comment, _ -> "\n---\n" ^ String.sub comment 3 (String.length comment - 3)
+    | None, Some comment -> "\n---\n" ^ String.sub comment 2 (String.length comment - 2)
+    | _ -> ""
 
 let lookup_data_definition_for_hover cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in

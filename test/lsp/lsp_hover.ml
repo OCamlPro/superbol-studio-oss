@@ -1152,7 +1152,8 @@ let%expect_test "hover-comment" =
        WORKING-STORAGE SECTION.
       * full line comment
        01 STRUCT. *> inline comment
-         02 VAL-1 PIC X. *> val1 inline comment
+         02 VAL-1 PIC X. *> val1 only inline comment
+      * val2 only line comment
          02 VAL-2 PIC X.
        PROCEDURE DIVISION.
          DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2.
@@ -1161,33 +1162,31 @@ let%expect_test "hover-comment" =
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    (line 11, character 18):
-    __rootdir__/prog.cob:12.17-12.23:
-       9            02 VAL-1 PIC X. *> val1 inline comment
-      10            02 VAL-2 PIC X.
-      11          PROCEDURE DIVISION.
-      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    (line 12, character 18):
+    __rootdir__/prog.cob:13.17-13.23:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
     ----                    ^^^^^^
-      13            STOP RUN.
-      14
+      14            STOP RUN.
+      15
     ```cobol
     STRUCT
     ```
     Group of 2 subfields
     Size: 16 bits
-    ```cobol
-    * full line comment
-    *> inline comment
-    ```
-    (line 11, character 25):
-    __rootdir__/prog.cob:12.24-12.29:
-       9            02 VAL-1 PIC X. *> val1 inline comment
-      10            02 VAL-2 PIC X.
-      11          PROCEDURE DIVISION.
-      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ---
+    inline comment
+    (line 12, character 25):
+    __rootdir__/prog.cob:13.24-13.29:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
     ----                           ^^^^^
-      13            STOP RUN.
-      14
+      14            STOP RUN.
+      15
     ```cobol
     VAL-1 IN STRUCT
     ```
@@ -1195,25 +1194,26 @@ let%expect_test "hover-comment" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
-    ```cobol
-    *> val1 inline comment
-    ```
-    (line 11, character 31):
-    __rootdir__/prog.cob:12.30-12.35:
-       9            02 VAL-1 PIC X. *> val1 inline comment
-      10            02 VAL-2 PIC X.
-      11          PROCEDURE DIVISION.
-      12 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ---
+    val1 only inline comment
+    (line 12, character 31):
+    __rootdir__/prog.cob:13.30-13.35:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
     ----                                 ^^^^^
-      13            STOP RUN.
-      14
+      14            STOP RUN.
+      15
     ```cobol
     VAL-2 IN STRUCT
     ```
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}];;
+    ALPHANUMERIC(1)
+    ---
+    val2 only line comment |}];;
 
 
 let%expect_test "hover-comment-copy" =
