@@ -454,7 +454,7 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
-let documetation_of_datadef ~rev_comments ~filename data_def =
+let doc_of_datadef ~rev_comments ~filename data_def =
   let open Cobol_preproc.Text in
   let loc = Cobol_data.Item.def_loc data_def in
   let def_filename = (fst @@ Cobol_common.Srcloc.as_lexloc loc).pos_fname in
@@ -503,7 +503,7 @@ let data_definition_on_hover
       try
         let data_def, hover_loc
           = lookup_data_definition_for_hover cu_name ele_at_pos group in
-        let doc_comments = documetation_of_datadef ~rev_comments ~filename data_def in
+        let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
         if always_show_hover_text_in_data_div ||
            not (Lsp_position.is_in_srcloc ~filename position @@
                 Cobol_data.Item.def_loc data_def)
