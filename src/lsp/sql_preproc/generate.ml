@@ -35,6 +35,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let error_treatment = ref [] in
   let old_statements = ref [] in
   let cursor_declaration = ref [] in
+  let in_pro_div = ref true in
   let num = ref 0 in
 
   (*GET FUNCTION*)
@@ -54,7 +55,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           [ Generated_type.Comment
               { content = "> ESQL CURSOR DECLARATIONS (START)" };
             Generated_type.GotoStatement
-              { prefix = "      "; target = "GIX-SKIP-CRSR-INIT" }
+              { prefix = "           "; target = "GIX-SKIP-CRSR-INIT" }
           ]
       }
     :: cd
@@ -376,28 +377,34 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       [ Generated_type.Reference { prefix; var = "SQLCA" };
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
-        Generated_type.Reference { prefix; var = "\"" ^ name ^ "\" & x\"00\"" }
+        Generated_type.Reference { prefix; var = name }
+      ]
+    in
+    Generated_type.CallStatic { prefix; fun_name; ref_value }
+  in
+
+  let generate_GIXSQLExecParam prefix name value_list ?at () =
+    let at_name, at_size = get_at_info at in
+    let fun_name = "GIXSQLExecParams" in
+    let ref_value =
+      let prefix = prefix ^ "    " in
+      [ Generated_type.Reference { prefix; var = "SQLCA" };
+        Generated_type.Reference { prefix; var = at_name };
+        Generated_type.Value { prefix; var = string_of_int at_size };
+        Generated_type.Reference { prefix; var = name };
+        Generated_type.Value
+          { prefix; var = string_of_int (List.length value_list) }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
   let generate_declare prefix ?at () =
-    let at_name, at_size = get_at_info at in
-    let fun_name = "GIXSQLExec" in
-    let ref_value =
-      let var_name =
-        num := !num + 1;
-        "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
-      in
-      let prefix = prefix ^ "    " in
-      [ Generated_type.Reference { prefix; var = "SQLCA" };
-        Generated_type.Reference { prefix; var = at_name };
-        Generated_type.Value { prefix; var = string_of_int at_size };
-        Generated_type.Reference { prefix; var = var_name }
-      ]
+    let var_name =
+      num := !num + 1;
+      "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
     in
-    let declare = Generated_type.CallStatic { prefix; fun_name; ref_value } in
+    let declare = generate_GIXSQLExec prefix var_name ?at () in
 
     let trans_stm = generate_start_end_sql prefix [ declare ] in
     trans_stm
@@ -407,7 +414,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     match (rb_work_or_tran, rb_args) with
     | None, None ->
       generate_start_end_sql prefix
-        [ generate_GIXSQLExec prefix "ROLLBACK" ?at () ]
+        [ generate_GIXSQLExec prefix "\"ROLLBACK \" & x\"00\"" ?at () ]
     | _, Some (To _) -> generate_declare prefix ()
     | _ -> [ Generated_type.Todo { prefix } ]
   in
@@ -416,7 +423,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     match (rb_work_or_tran, rb_args) with
     | None, false ->
       generate_start_end_sql prefix
-        [ generate_GIXSQLExec prefix "COMMIT" ?at () ]
+        [ generate_GIXSQLExec prefix "\"COMMIT\" & x\"00\"" ?at () ]
     | _ -> [ Generated_type.Todo { prefix } ]
   in
 
@@ -444,39 +451,70 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let add_to_cursor_declaration prefix cur ?at () =
     let at_name, at_size = get_at_info at in
-    let adding =
+    let cur_name, cob_var_lst, _with_hold =
       match cur with
-      | DeclareCursorSql (cur_name, _) -> begin
-        let fun_name = "GIXSQLCursorDeclare" in
-        let ref_value =
-          let cursor_name = "\"TSQL003A_" ^ cur_name.payload ^ "\" & x\"00\"" in
-          let var_name =
-            num := !num + 1;
-            "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
-          in
-          let prefix = prefix ^ "    " in
-          [ Generated_type.Reference { prefix; var = "SQLCA" };
-            Generated_type.Reference { prefix; var = at_name };
-            Generated_type.Value { prefix; var = string_of_int at_size };
-            Generated_type.Reference { prefix; var = cursor_name };
-            Generated_type.Value { prefix; var = "0" };
-            Generated_type.Reference { prefix; var = var_name };
-            Generated_type.Value { prefix; var = "0" }
-          ]
+      | DeclareCursorSql (cur_name, sql) ->
+        (cur_name, Misc.extract_cob_var_query sql, false)
+      | DeclareCursorVar (cur_name, cob_var_lst) ->
+        let var =
+          match cob_var_lst with
+          | SqlVar _ -> []
+          | CobolVar v -> [ v ]
         in
-        [ Generated_type.Section
-            { name =
-                "GIXSQL-CI-P-"
-                ^ Misc.extract_filename filename
-                ^ "-" ^ cur_name.payload
-            };
-          Generated_type.CallStatic { prefix; fun_name; ref_value }
+        (cur_name, var, false)
+      | DeclareCursorWhithHold (cur_name, query) ->
+        (cur_name, Misc.extract_cob_var_query query, true)
+    in
+
+    let cursor_name = "\"TSQL003A_" ^ cur_name.payload ^ "\" & x\"00\"" in
+    let var_name =
+      num := !num + 1;
+      "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+    in
+
+    let fun_name, cursor_declare =
+      match cob_var_lst with
+      | [] ->
+        let prefix = prefix ^ "    " in
+        ( "GIXSQLCursorDeclare",
+          [ Generated_type.Reference { prefix; var = var_name };
+            Generated_type.Value { prefix; var = "0" }
+          ] )
+      | _ ->
+        let prefix = prefix ^ "    " in
+        ( "GIXSQLCursorDeclareParams",
+          [ Generated_type.Reference { prefix; var = var_name };
+            Generated_type.Value { prefix; var = "0" };
+            Generated_type.Value
+              { prefix; var = string_of_int (List.length cob_var_lst) }
+          ] )
+    in
+    let adding =
+      let ref_value =
+        let prefix = prefix ^ "    " in
+        [ Generated_type.Reference { prefix; var = "SQLCA" };
+          Generated_type.Reference { prefix; var = at_name };
+          Generated_type.Value { prefix; var = string_of_int at_size };
+          Generated_type.Reference { prefix; var = cursor_name };
+          Generated_type.Value { prefix; var = "0" }
         ]
-      end
-      | DeclareCursorVar (_cur_name, _var_name) ->
-        [ Generated_type.Todo { prefix } ]
-      | DeclareCursorWhithHold (_cur_name, _query) ->
-        [ Generated_type.Todo { prefix } ]
+        @ cursor_declare
+      in
+      List.map (generate_set_sql_param prefix) cob_var_lst
+      @ [ Generated_type.CallStatic { prefix; fun_name; ref_value } ]
+    in
+    let adding =
+      [ Generated_type.Section
+          { name =
+              "GIXSQL-CI-P-"
+              ^ Misc.extract_filename filename
+              ^ "-" ^ cur_name.payload
+          }
+      ]
+      @
+      match cob_var_lst with
+      | [] -> adding
+      | _ -> generate_start_end_sql prefix adding
     in
     let st = Generated_type.Added { content = adding } in
     let cd = st :: !cursor_declaration in
@@ -538,25 +576,25 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let generate_exec_prepared_into prefix (executed_string : sqlVarToken)
-  into_hostref_list opt_using_hostref_list ?at () =
-let at_name, at_size = get_at_info at in
-let ref_value =
-  let prefix = prefix ^ "    " in
-  [ Generated_type.Reference { prefix; var = "SQLCA" };
-    Generated_type.Reference { prefix; var = at_name };
-    Generated_type.Value { prefix; var = string_of_int at_size };
-    Generated_type.Reference
-      { prefix; var = "\"" ^ executed_string.payload ^ "\" & x\"00\"" };
-    Generated_type.Value
-      { prefix; var = string_of_int (List.length into_hostref_list) };
-      Generated_type.Value
-        { prefix; var = string_of_int (List.length opt_using_hostref_list) }
-    (*todo*)
-  ]
-in
-Generated_type.CallStatic
-  { prefix; fun_name = "GIXSQLExecPreparedInto"; ref_value }
-in
+      into_hostref_list opt_using_hostref_list ?at () =
+    let at_name, at_size = get_at_info at in
+    let ref_value =
+      let prefix = prefix ^ "    " in
+      [ Generated_type.Reference { prefix; var = "SQLCA" };
+        Generated_type.Reference { prefix; var = at_name };
+        Generated_type.Value { prefix; var = string_of_int at_size };
+        Generated_type.Reference
+          { prefix; var = "\"" ^ executed_string.payload ^ "\" & x\"00\"" };
+        Generated_type.Value
+          { prefix; var = string_of_int (List.length into_hostref_list) };
+        Generated_type.Value
+          { prefix; var = string_of_int (List.length opt_using_hostref_list) }
+        (*todo*)
+      ]
+    in
+    Generated_type.CallStatic
+      { prefix; fun_name = "GIXSQLExecPreparedInto"; ref_value }
+  in
 
   let generate_execute_into_using prefix executed_string
       ?(opt_into_hostref_list = []) ?(opt_using_hostref_list = []) ?at () =
@@ -600,27 +638,28 @@ in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
+  let generate_open_cursor_aux prefix cursor_name =
+    let prefix = prefix ^ "   " in
+    [ Generated_type.PerformStatement
+        { prefix; target = "GIXSQL-CI-P-" ^ cursor_name };
+      Generated_type.If
+        { prefix;
+          condition = "SQLCODE = 0";
+          if_stm =
+            (let prefix = prefix ^ "   " in
+             [ Generated_type.Move
+                 { prefix; src = "X"; dest = "GIXSQL-CI-F-" ^ cursor_name }
+             ] )
+        }
+    ]
+  in
+
   let generate_open_cursor prefix (cursor_name : sqlVarToken) cobol_lst =
     match cobol_lst with
     | Some _ -> [ Generated_type.Todo { prefix } ]
     | None ->
       let cursor_name' =
         Misc.extract_filename filename ^ "-" ^ cursor_name.payload
-      in
-      let if1 =
-        let prefix = prefix ^ "   " in
-        [ Generated_type.PerformStatement
-            { prefix; target = "GIXSQL-CI-P-" ^ cursor_name' };
-          Generated_type.If
-            { prefix;
-              condition = "SQLCODE = 0";
-              if_stm =
-                (let prefix = prefix ^ "   " in
-                 [ Generated_type.Move
-                     { prefix; src = "X"; dest = "GIXSQL-CI-F-" ^ cursor_name' }
-                 ] )
-            }
-        ]
       in
       let if2 =
         let prefix = prefix ^ "   " in
@@ -644,7 +683,7 @@ in
       [ Generated_type.If
           { prefix;
             condition = "GIXSQL-CI-F-" ^ cursor_name' ^ " = ' '";
-            if_stm = if1
+            if_stm = generate_open_cursor_aux prefix cursor_name'
           };
         Generated_type.If
           { prefix;
@@ -652,6 +691,46 @@ in
             if_stm = if2
           }
       ]
+  in
+
+  let generate_declare_cursor prefix cur =
+    let curname =
+      match cur with
+      | DeclareCursorSql (curname, _)
+      | DeclareCursorVar (curname, _)
+      | DeclareCursorWhithHold (curname, _) ->
+        curname
+    in
+    let curname = Misc.extract_filename filename ^ "-" ^ curname.payload in
+    let if1 = generate_open_cursor_aux prefix curname in
+    [ Generated_type.IfElse
+        { prefix;
+          condition = "GIXSQL-CI-F-" ^ curname ^ " = ' '";
+          if_stm = if1;
+          else_stm =
+            [ Generated_type.Move
+                { prefix = prefix ^ "   "; src = "0"; dest = "SQLCODE" }
+            ]
+        }
+    ]
+  in
+
+  let generate_insert prefix ?value_list ?at () =
+    match value_list with
+    | None -> generate_declare prefix ?at ()
+    | Some value_list ->
+      let rec generate_insert_rec prefix vl ?at () =
+        match vl with
+        | [] ->
+          let var_name =
+            num := !num + 1;
+            "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+          in
+          [ generate_GIXSQLExecParam prefix var_name value_list ?at () ]
+        | h :: t ->
+          generate_set_sql_param prefix h :: generate_insert_rec prefix t ?at ()
+      in
+      generate_insert_rec prefix value_list ?at ()
   in
 
   let generate_at prefix sql ?at () =
@@ -664,9 +743,28 @@ in
       generate_commit prefix rb_work_or_tran b ?at ()
     | DeclareCursor cur ->
       add_to_cursor_declaration prefix cur ?at ();
-      []
+      if !in_pro_div then begin
+        generate_declare_cursor prefix cur
+      end else
+        []
     | ExecuteImmediate var -> generate_simpl_execute_immediat prefix var ?at ()
-    | Insert _
+    | Insert (_, value_list) ->
+      let value_list =
+        let rec value_list_cob_var = function
+          | ValueList ll :: t ->
+            let rec ll_cob_value = function
+              | LiteralVar (CobolVar c) :: t -> c :: ll_cob_value t
+              | [] -> []
+              | _ :: t -> ll_cob_value t
+            in
+            ll_cob_value ll @ value_list_cob_var t
+          | [] -> []
+          | _ :: t -> value_list_cob_var t
+        in
+        value_list_cob_var value_list
+      in
+
+      generate_insert prefix ~value_list ?at ()
     | Savepoint _
     | StartTransaction ->
       generate_declare prefix ?at ()
@@ -674,7 +772,7 @@ in
       match sql with
       | Sql_ast.SqlInstr w :: _ when w = "VAR" ->
         []
-        (*TODO: find what this should be replaced with. I think Gix juste ignorer these instruction, but mabe not*)
+        (*TODO: find what this should be replaced with. I think Gix juste ignore these instruction, but mabe not*)
       | _ -> generate_declare prefix ?at () )
     | Prepare (var_name, sql_instr) ->
       generate_prepare_stm prefix var_name sql_instr ?at ()
@@ -857,6 +955,7 @@ in
              ) else
                output_statement lines begin_loc stmt statements *)
         | BEGIN_PROCEDURE_DIVISION { enabled } ->
+          in_pro_div := true;
           ( if !enabled then
               begin_procedure_division ~loc:begin_loc
             else

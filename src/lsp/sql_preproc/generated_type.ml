@@ -63,6 +63,12 @@ type trans_stm =
         condition : string;
         if_stm : trans_stm list
       }
+  | IfElse of
+      { prefix : string;
+        condition : string;
+        if_stm : trans_stm list;
+        else_stm : trans_stm list
+      }
   | Move of
       { prefix : string;
         src : string;
@@ -131,7 +137,7 @@ module Printer = struct
 
   and pp_trans_stm_aux fmt x =
     match x with
-    | Section { name } -> Format.fprintf fmt "      %s" name
+    | Section { name } -> Format.fprintf fmt "       %s" name
     | Comment { content } -> Format.fprintf fmt "ADDED *%s" content
     | CallStatic { prefix; fun_name; ref_value } ->
       Format.fprintf fmt "%sCALL STATIC \"%s\"%a%sEND-CALL" prefix fun_name
@@ -139,12 +145,15 @@ module Printer = struct
     | Copy { prefix; file_name } ->
       Format.fprintf fmt "%sCOPY %s" prefix file_name
     | GotoStatement { prefix; target } ->
-      Format.fprintf fmt "%sGOTO %s" prefix target
+      Format.fprintf fmt "%sGO TO %s" prefix target
     | PerformStatement { prefix; target } ->
       Format.fprintf fmt "%sPERFORM %s" prefix target
     | If { prefix; condition; if_stm } ->
       Format.fprintf fmt "%sIF %s THEN\n%a\n%sEND-IF" prefix condition
-        pp_trans_stm if_stm prefix
+      pp_trans_stm if_stm prefix
+    | IfElse { prefix; condition; if_stm; else_stm } ->
+      Format.fprintf fmt "%sIF %s THEN\n%a\n%sELSE\n%a\n%sEND-IF" prefix condition
+        pp_trans_stm if_stm prefix pp_trans_stm else_stm prefix
     | Move { prefix; src; dest } ->
       Format.fprintf fmt "%sMOVE '%s' TO %s" prefix src dest
     | Declaration d -> Format.fprintf fmt "%a" pp_declaration d
