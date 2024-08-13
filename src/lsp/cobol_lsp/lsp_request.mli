@@ -46,7 +46,8 @@ module INTERNAL: sig
     -> Lsp.Types.CodeLensParams.t
     -> Lsp.Types.CodeLens.t list
   val rename
-    : Lsp_server.t
+    : ?ignore_when_copybook:bool
+    -> Lsp_server.t
     -> Lsp.Types.RenameParams.t
     -> Lsp.Types.WorkspaceEdit.t
 end

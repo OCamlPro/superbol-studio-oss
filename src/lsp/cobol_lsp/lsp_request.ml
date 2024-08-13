@@ -704,7 +704,7 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
 
 (** { Rename } *)
 
-let handle_rename
+let handle_rename ?(ignore_when_copybook=false)
     registry
     ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
   try_with_main_document_data registry textDocument
@@ -715,17 +715,21 @@ let handle_rename
         let params = ReferenceParams.create
             ~context ~position ~textDocument () in
         lookup_references_in_doc ~rootdir params checked_doc in
-      try
-        let changes = List.fold_left begin fun acc ({ range; uri }: Location.t) ->
-            if DocumentUri.compare uri textDocument.uri <> 0
-            then raise Exit;
-            URIMap.add_to_list uri (TextEdit.create ~newText ~range) acc
-          end URIMap.empty locations |> URIMap.to_seq |> List.of_seq
-        in
-        Some ( WorkspaceEdit.create ~changes () )
-      with Exit ->
-        Lsp_io.notify_error "Ignored renaming of a reference that occurs in a copybook";
-        Some ( WorkspaceEdit.create () )
+      let changes, is_copybook =
+        List.fold_left begin fun (map, is_copybook) ({ range; uri }: Location.t) ->
+          URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
+          is_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations in
+      let changes = List.of_seq @@ URIMap.to_seq changes in
+      if is_copybook && ignore_when_copybook
+      then begin Lsp_io.notify_info
+          "Ignored renaming of a reference that occurs in a copybook";
+        Some ( WorkspaceEdit.create () ) end
+      else
+        begin if is_copybook
+          then Lsp_io.notify_warn
+              "Proceeded to rename of a reference that occurs in a copybook";
+          Some ( WorkspaceEdit.create ~changes () ) end
     end
   |> Option.get
 
