@@ -3,6 +3,7 @@
 ## [0.1.4] Next release
 
 ### Added
+- Support for LSP request `textDocument/rename` [#351](https://github.com/OCamlPro/superbol-studio-oss/pull/351)
 - Show documentation comments on hover information [#350](https://github.com/OCamlPro/superbol-studio-oss/pull/350)
 - Completion for more grammar constructs [#322](https://github.com/OCamlPro/superbol-studio-oss/pull/322)
 - Support for LSP request `textDocument/codeLens` [#349](https://github.com/OCamlPro/superbol-studio-oss/pull/349)
