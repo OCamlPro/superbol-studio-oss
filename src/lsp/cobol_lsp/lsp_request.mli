@@ -48,5 +48,5 @@ module INTERNAL: sig
   val rename
     : Lsp_server.t
     -> Lsp.Types.RenameParams.t
-    -> (Lsp.Types.WorkspaceEdit.t, string) result
+    -> Lsp.Types.WorkspaceEdit.t
 end

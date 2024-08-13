@@ -704,32 +704,31 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
 
 (** { Rename } *)
 
-exception CopybookRenameError
+let handle_rename
+    registry
+    ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let locations = Option.value ~default:[] @@
+        let context = ReferenceContext.create ~includeDeclaration:true in
+        let params = ReferenceParams.create
+            ~context ~position ~textDocument () in
+        lookup_references_in_doc ~rootdir params checked_doc in
+      try
+        let changes = List.fold_left begin fun acc ({ range; uri }: Location.t) ->
+            if DocumentUri.compare uri textDocument.uri <> 0
+            then raise Exit;
+            URIMap.add_to_list uri (TextEdit.create ~newText ~range) acc
+          end URIMap.empty locations |> URIMap.to_seq |> List.of_seq
+        in
+        Some ( WorkspaceEdit.create ~changes () )
+      with Exit ->
+        Lsp_io.notify_error "Ignored renaming of a reference that occurs in a copybook";
+        Some ( WorkspaceEdit.create () )
+    end
+  |> Option.get
 
-let handle_rename registry (params: RenameParams.t) =
-  let { textDocument; position; newName = newText; _ }: RenameParams.t = params in
-  let doc = Lsp_server.find_document params.textDocument registry in
-  let checked_doc = Lsp_document.checked doc in
-  let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
-  let locations = Option.value ~default:[] @@
-    let context = ReferenceContext.create ~includeDeclaration:true in
-    let params = ReferenceParams.create
-        ~context ~position ~textDocument () in
-    lookup_references_in_doc ~rootdir params checked_doc in
-  try
-    let changes = List.fold_left begin fun acc ({ range; uri }: Location.t) ->
-        if DocumentUri.compare uri params.textDocument.uri <> 0
-        then raise CopybookRenameError
-        else
-          let textEdit = TextEdit.create ~newText ~range in
-          URIMap.add_to_list uri textEdit acc
-      end URIMap.empty locations
-                  |> URIMap.to_seq
-                  |> List.of_seq
-    in
-    Ok(WorkspaceEdit.create ~changes ())
-  with CopybookRenameError ->
-    Error "Reference of variable found in copybook, aborting rename"
 
 (** {3 Generic handling} *)
 
@@ -781,10 +780,7 @@ let on_request
     | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
         Ok (handle_codelens registry params, state)
     | TextDocumentRename params ->
-        begin match handle_rename registry params with
-          | Ok workspaceEdit -> Ok (workspaceEdit, state)
-          | Error _ -> Error (CopybookRenamingForbidden)
-        end
+        Ok (handle_rename registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _

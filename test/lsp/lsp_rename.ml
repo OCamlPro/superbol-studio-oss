@@ -44,11 +44,9 @@ let rename_positions ?(copybooks=[]) (doc, positions) : string -> unit =
     begin
       try
       match LSP.Request.rename server params with
-      | Error e ->
-        Pretty.out "Renamed failed: %S@." e
-      | Ok { changes = None; _ } ->
+      | { changes = None; _ } ->
         Pretty.out "No renames@."
-      | Ok { changes = Some assoc; _ } ->
+      | { changes = Some assoc; _ } ->
         Pretty.out "@.@[<hv 4>%d rename entries:@;%a@]@\n"
           (count assoc)
           (Fmt.list ~sep:Fmt.sp pp_assoc_elem) assoc
@@ -113,7 +111,7 @@ let%expect_test "rename" =
     (line 8, character 11):
     0 rename entries: |}]
 
-let%expect_test "rename-copybook" =
+let%expect_test "rename-with-a-ref-in-a-copybook" =
   let copybooks = [
     ("lib.cpy", {cobol|
         01 copied-var pic 9.|cobol})
@@ -133,8 +131,9 @@ let%expect_test "rename-copybook" =
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"message":"Ignored renaming of a reference that occurs in a copybook","type":1},"method":"window/showMessage","jsonrpc":"2.0"}
     (line 7, character 21):
-    Renamed failed: "Reference of variable found in copybook, aborting rename" |}]
+    No renames |}]
 
 let%expect_test "rename-procedure" =
   let end_with_postproc = rename_positions @@ extract_position_markers {cobol|
