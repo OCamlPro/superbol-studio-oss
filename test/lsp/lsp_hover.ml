@@ -1177,7 +1177,7 @@ let%expect_test "hover-comment" =
     Group of 2 subfields
     Size: 16 bits
     ---
-    inline comment
+     inline comment
     (line 12, character 25):
     __rootdir__/prog.cob:13.24-13.29:
       10         * val2 only line comment
@@ -1195,7 +1195,7 @@ let%expect_test "hover-comment" =
     ```
     ALPHANUMERIC(1)
     ---
-    val1 only inline comment
+     val1 only inline comment
     (line 12, character 31):
     __rootdir__/prog.cob:13.30-13.35:
       10         * val2 only line comment
@@ -1213,7 +1213,7 @@ let%expect_test "hover-comment" =
     ```
     ALPHANUMERIC(1)
     ---
-    val2 only line comment |}];;
+     val2 only line comment |}];;
 
 
 let%expect_test "hover-comment-copy" =

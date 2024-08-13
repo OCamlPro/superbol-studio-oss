@@ -474,8 +474,8 @@ let doc_of_datadef ~rev_comments ~filename data_def =
       end (None, None) rev_comments
     in
     match inline, full_line with
-    | Some comment, _ -> "\n---\n" ^ String.sub comment 3 (String.length comment - 3)
-    | None, Some comment -> "\n---\n" ^ String.sub comment 2 (String.length comment - 2)
+    | Some comment, _ -> "\n---\n" ^ String.sub comment 2 (String.length comment - 2)
+    | None, Some comment -> "\n---\n" ^ String.sub comment 1 (String.length comment - 1)
     | _ -> ""
 
 let lookup_data_definition_for_hover cu_name element_at_pos group =
