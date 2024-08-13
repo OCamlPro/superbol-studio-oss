@@ -63,9 +63,9 @@ let%expect_test "rename" =
         PROGRAM-ID. prog.
         DATA DIVISION.
         WORKING-STORAGE SECTION.
-        01 o_|_ld-name PIC 9.
+        01 O_|_LD PIC 9.
         PROCEDURE DIVISION.
-          MOVE 1 TO old-na_|_me.
+          MOVE 1 TO old_|_.
           S_|_TOP RUN.
   |cobol}
   in
@@ -74,42 +74,95 @@ let%expect_test "rename" =
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     (line 5, character 12):
     2 rename entries:
-        aNewName at __rootdir__/prog.cob:8.20-8.28:
+        aNewName at __rootdir__/prog.cob:8.20-8.23:
            5           WORKING-STORAGE SECTION.
-       6           01 old-name PIC 9.
+       6           01 OLD PIC 9.
        7           PROCEDURE DIVISION.
-       8 >           MOVE 1 TO old-name.
-    ----                       ^^^^^^^^
+       8 >           MOVE 1 TO old.
+    ----                       ^^^
        9             STOP RUN.
       10
-    aNewName at __rootdir__/prog.cob:6.11-6.19:
+    aNewName at __rootdir__/prog.cob:6.11-6.14:
        3           PROGRAM-ID. prog.
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
-       6 >         01 old-name PIC 9.
-    ----              ^^^^^^^^
+       6 >         01 OLD PIC 9.
+    ----              ^^^
        7           PROCEDURE DIVISION.
-       8             MOVE 1 TO old-name.
-    (line 7, character 26):
+       8             MOVE 1 TO old.
+    (line 7, character 23):
     2 rename entries:
-        aNewName at __rootdir__/prog.cob:8.20-8.28:
+        aNewName at __rootdir__/prog.cob:8.20-8.23:
            5           WORKING-STORAGE SECTION.
-       6           01 old-name PIC 9.
+       6           01 OLD PIC 9.
        7           PROCEDURE DIVISION.
-       8 >           MOVE 1 TO old-name.
-    ----                       ^^^^^^^^
+       8 >           MOVE 1 TO old.
+    ----                       ^^^
        9             STOP RUN.
       10
-    aNewName at __rootdir__/prog.cob:6.11-6.19:
+    aNewName at __rootdir__/prog.cob:6.11-6.14:
        3           PROGRAM-ID. prog.
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
-       6 >         01 old-name PIC 9.
-    ----              ^^^^^^^^
+       6 >         01 OLD PIC 9.
+    ----              ^^^
        7           PROCEDURE DIVISION.
-       8             MOVE 1 TO old-name.
+       8             MOVE 1 TO old.
     (line 8, character 11):
     0 rename entries: |}]
+
+let%expect_test "rename-group" =
+  let end_with_postproc = rename_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 OLD.
+          02 CHILD PIC 9.
+        PROCEDURE DIVISION.
+          DISPLAY _|_child in old_|_.
+          STOP RUN.
+  |cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 8, character 18):
+    2 rename entries:
+        aNewName at __rootdir__/prog.cob:9.18-9.23:
+           6           01 OLD.
+       7             02 CHILD PIC 9.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY child in old.
+    ----                     ^^^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:7.13-7.18:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 OLD.
+       7 >           02 CHILD PIC 9.
+    ----                ^^^^^
+       8           PROCEDURE DIVISION.
+       9             DISPLAY child in old.
+    (line 8, character 30):
+    2 rename entries:
+        aNewName at __rootdir__/prog.cob:9.27-9.30:
+           6           01 OLD.
+       7             02 CHILD PIC 9.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY child in old.
+    ----                              ^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:6.11-6.14:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 OLD.
+    ----              ^^^
+       7             02 CHILD PIC 9.
+       8           PROCEDURE DIVISION. |}]
 
 let%expect_test "rename-with-a-ref-in-a-copybook" =
   let copybooks = [
@@ -177,21 +230,84 @@ let%expect_test "rename-procedure" =
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
         PROCEDURE DIVISION.
-          s_|newSectionName|_ec SECTION.
+          s_|sec-simple|_ec SECTION.
           PERFORM sec.
-          GO par_|_a.
+          GO par_|para-simple|_a.
           para.
+          PERFORM _|para-in-sec|_PARA IN _|sec-of-para|_SEC
           STOP RUN.
   |cobol}
   in
   end_with_postproc [%expect.output];
   [%expect {|
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    newSectionName
-    (line 4, character 11):
-    2 rename entries:
-        aNewName at __rootdir__/prog.cob:6.18-6.21:
-           3           PROGRAM-ID. prog.
+    para-in-sec
+    (line 8, character 18):
+    3 rename entries:
+        aNewName at __rootdir__/prog.cob:9.18-9.22:
+           6             PERFORM sec.
+       7             GO para.
+       8             para.
+       9 >           PERFORM PARA IN SEC
+    ----                     ^^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:7.13-7.17:
+       4           PROCEDURE DIVISION.
+       5             sec SECTION.
+       6             PERFORM sec.
+       7 >           GO para.
+    ----                ^^^^
+       8             para.
+       9             PERFORM PARA IN SEC
+    aNewName at __rootdir__/prog.cob:8.10-8.14:
+       5             sec SECTION.
+       6             PERFORM sec.
+       7             GO para.
+       8 >           para.
+    ----             ^^^^
+       9             PERFORM PARA IN SEC
+      10             STOP RUN.
+    para-simple
+    (line 6, character 16):
+    3 rename entries:
+        aNewName at __rootdir__/prog.cob:9.18-9.22:
+           6             PERFORM sec.
+       7             GO para.
+       8             para.
+       9 >           PERFORM PARA IN SEC
+    ----                     ^^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:7.13-7.17:
+       4           PROCEDURE DIVISION.
+       5             sec SECTION.
+       6             PERFORM sec.
+       7 >           GO para.
+    ----                ^^^^
+       8             para.
+       9             PERFORM PARA IN SEC
+    aNewName at __rootdir__/prog.cob:8.10-8.14:
+       5             sec SECTION.
+       6             PERFORM sec.
+       7             GO para.
+       8 >           para.
+    ----             ^^^^
+       9             PERFORM PARA IN SEC
+      10             STOP RUN.
+    sec-of-para
+    (line 8, character 26):
+    3 rename entries:
+        aNewName at __rootdir__/prog.cob:9.26-9.29:
+           6             PERFORM sec.
+       7             GO para.
+       8             para.
+       9 >           PERFORM PARA IN SEC
+    ----                             ^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:6.18-6.21:
+       3           PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
        5             sec SECTION.
        6 >           PERFORM sec.
@@ -206,22 +322,31 @@ let%expect_test "rename-procedure" =
     ----             ^^^
        6             PERFORM sec.
        7             GO para.
-    (line 6, character 16):
-    2 rename entries:
-        aNewName at __rootdir__/prog.cob:7.13-7.17:
-           4           PROCEDURE DIVISION.
-       5             sec SECTION.
-       6             PERFORM sec.
-       7 >           GO para.
-    ----                ^^^^
-       8             para.
-       9             STOP RUN.
-    aNewName at __rootdir__/prog.cob:8.10-8.14:
-       5             sec SECTION.
-       6             PERFORM sec.
+    sec-simple
+    (line 4, character 11):
+    3 rename entries:
+        aNewName at __rootdir__/prog.cob:9.26-9.29:
+           6             PERFORM sec.
        7             GO para.
-       8 >           para.
-    ----             ^^^^
-       9             STOP RUN.
-      10 |}]
+       8             para.
+       9 >           PERFORM PARA IN SEC
+    ----                             ^^^
+      10             STOP RUN.
+      11
+    aNewName at __rootdir__/prog.cob:6.18-6.21:
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5             sec SECTION.
+       6 >           PERFORM sec.
+    ----                     ^^^
+       7             GO para.
+       8             para.
+    aNewName at __rootdir__/prog.cob:5.10-5.13:
+       2           IDENTIFICATION DIVISION.
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5 >           sec SECTION.
+    ----             ^^^
+       6             PERFORM sec.
+       7             GO para. |}]
 

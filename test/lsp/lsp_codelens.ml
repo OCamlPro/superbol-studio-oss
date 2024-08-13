@@ -47,6 +47,7 @@ let%expect_test "codelens" =
           88 YYcond value "a".
         PROCEDURE DIVISION.
             MOVE aa TO aA.
+            DISPLAY BB IN AA.
             STOP RUN.
     |cobol} in
   end_with_postproc [%expect.output];
@@ -60,7 +61,7 @@ let%expect_test "codelens" =
     ----              ^
        7             02 BB PIC X.
        8             02 BBprime REDEFINES BB PIC 9.
-    3 references
+    4 references
     __rootdir__/prog.cob:7.13:
        4           DATA DIVISION.
        5           WORKING-STORAGE SECTION.
@@ -69,7 +70,7 @@ let%expect_test "codelens" =
     ----                ^
        8             02 BBprime REDEFINES BB PIC 9.
        9             02 CC PIC X. 02 DD PIC X.
-    3 references
+    4 references
     __rootdir__/prog.cob:8.13:
        5           WORKING-STORAGE SECTION.
        6           01 AA.
@@ -154,7 +155,7 @@ let%expect_test "codelens-procedure" =
             CC.
             DD SECTION.
             PERFORM AA.
-            PERFORM BB.
+            PERFORM BB IN AA.
             GO DD.
             STOP RUN.
     |cobol} in
@@ -169,7 +170,7 @@ let%expect_test "codelens-procedure" =
     ----               ^
        6               BB.
        7               PERFORM BB.
-    2 references
+    3 references
     __rootdir__/prog.cob:6.12:
        3           PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
@@ -195,5 +196,5 @@ let%expect_test "codelens-procedure" =
        9 >             DD SECTION.
     ----               ^
       10               PERFORM AA.
-      11               PERFORM BB.
+      11               PERFORM BB IN AA.
     2 references |}];;

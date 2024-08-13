@@ -187,7 +187,7 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
       let loc = baseloc_of_qualname qn in
-      Visitor.skip_children @@
+      Visitor.do_children @@
       (* match Qualmap.find qn data_definitions.data_items.named with *)
       (* | Data_field { def; _ } -> *)
       (*     { acc with *)
@@ -226,18 +226,27 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
       Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
 
 
-    method! fold_procedure_name' ({ loc; _ } as qn)
+    method! fold_procedure_name' qn
         ({ current_section = in_section; _ } as acc) =
-      Visitor.skip_children @@
-      match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
-      | block ->
+      let register ?in_section qn acc =
+        let loc = baseloc_of_qualname ~&qn in
+        match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
+        | block ->
           { acc with
             refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
-      | exception Not_found ->
+        | exception Not_found ->
           error acc @@ Unknown_proc_name qn
-      | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
+        | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
           error acc @@ Ambiguous_proc_name { given_qualname = qn;
-                                             matching_qualnames }
+                                             matching_qualnames } in
+      register ?in_section qn acc
+      |> begin match ~&qn with
+        | Name _ -> Fun.id
+        | Qual (_, section_qn) ->
+          let loc = baseloc_of_qualname section_qn in
+          register (section_qn &@ loc)
+      end
+      |> Visitor.skip_children
 
   end in
 

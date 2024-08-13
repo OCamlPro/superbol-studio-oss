@@ -638,11 +638,11 @@ let%expect_test "definition-index" =
            SET _|3-i|_I IN V-TAB TO 0
            SET _|4-j|_J IN w TO 0
            SET _|5-k|_K IN W-TAB IN W TO 0
-           SET _|6-missing|_L IN w-tab IN W TO 0
+           SET _|6-missing|_L IN w-tab IN W TO 0.
   |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":35,"line":11},"start":{"character":35,"line":11}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-j (line 4, character 41):
     __rootdir__/prog.cob:5.41-5.42:
        2          PROGRAM-ID. prog.
