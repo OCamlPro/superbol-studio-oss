@@ -249,10 +249,10 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->
-      Fmt.const pp_field_definition' def ppf ()
+      pp_field_definition' ppf def
   | Data_renaming { def; _ } ->
-      Fmt.const pp_record_renaming' def ppf ()
+      pp_record_renaming' ppf def
   | Data_condition { def; field; _ } ->
       Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
   | Table_index { table; _ } ->
-      Fmt.const pp_table_definition' table ppf ()
+      pp_table_definition' ppf table
