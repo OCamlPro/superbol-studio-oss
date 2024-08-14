@@ -131,16 +131,18 @@ rule token = parse
       { get_keyword s }
   | number as n
       { NUMBER n }
-  | '\'' ( ['A'-'Z' 'a'-'z' '0'-'9' '_' '(' '*' ')' '.' '[' ']' ' ' '+' '=' ',' ]* as s) '\''
+  | '\'' ( [^ '\'']* as s) '\''
+      { STRING s}
+  | '\"' ( [^ '\"']* as s) '\"'
       { STRING s}
 
   | "||"
       { OR }
-  | ['='] 
+  | '=' 
       { EQUAL }
-  | ['+'] 
+  | '+' 
       { PLUS }
-  | ['-'] 
+  | '-' 
       { MINUS }
   | "<=" 
       { LESS_EQ }
@@ -162,6 +164,8 @@ rule token = parse
       { RPAR }
   | '*'
       { STAR }
+  | ';'
+      { SEMICOLON }
   | ' ' 
       { token lexbuf }
   | _ as c 

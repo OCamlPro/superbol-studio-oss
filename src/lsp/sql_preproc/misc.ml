@@ -93,121 +93,23 @@ let resolve_copy ~config file =
   in
   iter_exts config.copy_exts
 
-let rec extract_cob_complex_lit = function
-  | Sql_ast.SqlCompLit (LiteralVar (CobolVar variable))
-  | SqlCompAs (LiteralVar (CobolVar variable), _) ->
-    [ variable ]
-  | SqlCompFun (_, sql_op_list) -> extract_cob_var_select sql_op_list
-  | _ -> []
-
-and extract_cob_var_sql_op = function
-  | Sql_ast.SqlOpLit compl_lit -> extract_cob_complex_lit compl_lit
-  | SqlOpBinop (_, compl_lit, sql_op) ->
-    extract_cob_complex_lit compl_lit @ extract_cob_var_sql_op sql_op
-
-and extract_cob_var_select = function
-  | h :: t -> extract_cob_var_sql_op h @ extract_cob_var_select t
-  | [] -> []
-
-and extract_lit = function
-  | Sql_ast.LiteralVar (CobolVar variable) -> [ variable ]
-  | _ -> []
-
-and extract_from_join_option = function
-  | Sql_ast.JoinOn sc -> extract_from_search_condition sc
-  | _ -> []
-
-and extract_from_search_condition = function
-  | WhereConditionOr (search_condition1, search_condition2)
-  | WhereConditionAnd (search_condition1, search_condition2) ->
-    extract_from_search_condition search_condition1
-    @ extract_from_search_condition search_condition2
-  | WhereConditionNot search_condition ->
-    extract_from_search_condition search_condition
-  | WhereConditionCompare sql_compare -> (
-    match sql_compare with
-    | CompareQuery (complex_literal, _, sql_instruction) ->
-      extract_cob_complex_lit complex_literal @ extract_cob_var sql_instruction
-    | CompareLit (complex_literal1, _, complex_literal2) ->
-      extract_cob_complex_lit complex_literal1
-      @ extract_cob_complex_lit complex_literal2 )
-  | WhereConditionIn (InVarLst (lit, comp_lit_list)) ->
-    let rec extract_comp_lit_list lst =
-      match lst with
-      | h :: t -> extract_cob_complex_lit h @ extract_comp_lit_list t
-      | [] -> []
-    in
-    extract_lit lit @ extract_comp_lit_list comp_lit_list
-  | WhereConditionBetween (Between (l1, l2, l3)) ->
-    extract_lit l1 @ extract_lit l2 @ extract_lit l3
-  | WhereConditionIsNull variable -> (
-    match variable with
-    | CobolVar v -> [ v ]
-    | SqlVar _ -> [] )
-
-and extract_cob_var_select_option = function
-  | Sql_ast.From from_stm ->
-    let rec extract_from_stm = function
-      | h :: t ->
-        let rec extract_from_tbl_ref = function
-          | Sql_ast.FromLitAs (table_ref, literal) ->
-            extract_from_tbl_ref table_ref @ extract_lit literal
-          | FromLit literal -> extract_lit literal
-          | FromSelect sql_query -> extract_cob_var_query sql_query
-          | Join (table_ref1, _, table_ref2, Some join_option) ->
-            extract_from_tbl_ref table_ref1
-            @ extract_from_tbl_ref table_ref2
-            @ extract_from_join_option join_option
-          | Join (table_ref1, _, table_ref2, _) ->
-            extract_from_tbl_ref table_ref1 @ extract_from_tbl_ref table_ref2
+ and extract_cob_var_name str = 
+    let len = String.length str in
+    let rec aux i acc =
+      if i >= len then List.rev acc
+      else if str.[i] = ':' then
+        let start = i + 1 in
+        let rec find_end j =
+          if j >= len || str.[j] = ' ' || str.[j] = ',' || str.[j] = ')' || str.[j] = '(' then j
+          else find_end (j + 1)
         in
-        extract_from_tbl_ref h @ extract_from_stm t
-      | [] -> []
+        let end_pos = find_end start in
+        let var_name = String.sub str start (end_pos - start) in
+        if List.mem var_name acc then aux end_pos acc
+        else aux end_pos (var_name :: acc)
+      else aux (i + 1) acc
     in
-    extract_from_stm from_stm
-  | Sql_ast.Where search_condition
-  | Having search_condition ->
-    extract_from_search_condition search_condition
-  | OrderBy sql_orderBy_list ->
-    let rec extract_sql_orderBy = function
-      | Sql_ast.Asc lit :: h
-      | Desc lit :: h ->
-        extract_lit lit @ extract_sql_orderBy h
-      | [] -> []
-    in
-    extract_sql_orderBy sql_orderBy_list
-  | GroupBy literal_list ->
-    let rec extract_sql_lit_list = function
-      | h :: t -> extract_lit h @ extract_sql_lit_list t
-      | [] -> []
-    in
-    extract_sql_lit_list literal_list
-
-and extract_cob_var_query sql_query =
-  match sql_query with
-  | Sql_ast.SelectUnion (sql_query1, sql_query2)
-  | Sql_ast.SelectExcept (sql_query1, sql_query2)
-  | Sql_ast.SelectIntersect (sql_query1, sql_query2) ->
-    extract_cob_var_query sql_query1 @ extract_cob_var_query sql_query2
-  | Sql_ast.SelectQuery (sql_select, sql_select_option_list) ->
-    extract_cob_var_select sql_select
-    @ extract_cob_var_select_option_list sql_select_option_list
-
-and extract_cob_var_select_option_list = function
-  | h :: t ->
-    extract_cob_var_select_option h @ extract_cob_var_select_option_list t
-  | [] -> []
-
-and extract_cob_var sql =
-  match sql with
-  | Sql_ast.SqlVarToken (CobolVar variable) :: t ->
-    variable :: extract_cob_var t
-  | Sql_ast.SqlLit (LiteralVar (CobolVar variable)) :: t ->
-    variable :: extract_cob_var t
-  | Sql_ast.SqlQuery sql_query :: t ->
-    extract_cob_var_query sql_query @ extract_cob_var t
-  | [] -> []
-  | _ :: t -> extract_cob_var t
+    aux 0 []
 
 let extract_filename path =
   let parts = Str.split (Str.regexp "/") path in
@@ -220,11 +122,11 @@ let replace_colon_words str =
   let count = ref 0 in
   let len = String.length str in
   let i = ref 0 in
+  let tbl = Hashtbl.create 10 in
 
   while !i < len do
     if str.[!i] = ':' then (
-      incr count;
-      Buffer.add_string buffer ("$" ^ string_of_int !count);
+      let start = !i + 1 in
       incr i;
       while
         !i < len
@@ -234,7 +136,16 @@ let replace_colon_words str =
         && str.[!i] <> '('
       do
         incr i
-      done
+      done;
+      let var_name = String.sub str start (!i - start) in
+      if Hashtbl.mem tbl var_name then
+        Buffer.add_string buffer
+          ("$" ^ string_of_int (Hashtbl.find tbl var_name))
+      else (
+        incr count;
+        Hashtbl.add tbl var_name !count;
+        Buffer.add_string buffer ("$" ^ string_of_int !count)
+      )
     ) else (
       Buffer.add_char buffer str.[!i];
       incr i

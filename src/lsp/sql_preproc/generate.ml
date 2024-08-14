@@ -290,8 +290,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   (* Todo: refactory *)
-  let generate_set_sql_param prefix arg =
-    let h = get_name_cobol_var arg in
+  let generate_set_sql_param prefix h =
     let fun_name = "GIXSQLSetSQLParams" in
     let ref_value =
       let prefix = prefix ^ "    " in
@@ -331,9 +330,13 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let generate_select_into prefix vars select_options select ?at () =
     let selects_into_vars = List.map (generate_set_result_param prefix) vars in
     let cob_vars =
-      Misc.extract_cob_var_select select
-      @ Misc.extract_cob_var_select_option_list select_options
+      Misc.extract_cob_var_name
+        (Format.asprintf "%a" Sql_ast.Printer.pp_select_lst select)
+      @ Misc.extract_cob_var_name
+          (Format.asprintf "%a" Sql_ast.Printer.pp_select_options_lst
+             select_options )
     in
+
     let trans_cob_var = List.map (generate_set_sql_param prefix) cob_vars in
     let selects_into = generate_select_into_one prefix vars cob_vars ?at () in
     let trans_stm =
@@ -454,16 +457,22 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     let cur_name, cob_var_lst, _with_hold =
       match cur with
       | DeclareCursorSql (cur_name, sql) ->
-        (cur_name, Misc.extract_cob_var_query sql, false)
-      | DeclareCursorVar (cur_name, cob_var_lst) ->
+        ( cur_name,
+          Misc.extract_cob_var_name
+            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query sql),
+          false )
+      | DeclareCursorVar (cur_name, cur_var) ->
         let var =
-          match cob_var_lst with
+          match cur_var with
           | SqlVar _ -> []
-          | CobolVar v -> [ v ]
+          | CobolVar v -> [ get_name_cobol_var v ]
         in
         (cur_name, var, false)
       | DeclareCursorWhithHold (cur_name, query) ->
-        (cur_name, Misc.extract_cob_var_query query, true)
+        ( cur_name,
+          Misc.extract_cob_var_name
+            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query query),
+          true )
     in
 
     let cursor_name = "\"TSQL003A_" ^ cur_name.payload ^ "\" & x\"00\"" in
@@ -598,6 +607,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_execute_into_using prefix executed_string
       ?(opt_into_hostref_list = []) ?(opt_using_hostref_list = []) ?at () =
+    let opt_using_hostref_list =
+      List.map get_name_cobol_var opt_using_hostref_list
+    in
     let into_hostref_set_result_param =
       List.map (generate_set_result_param prefix) opt_into_hostref_list
     in
@@ -730,7 +742,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         | h :: t ->
           generate_set_sql_param prefix h :: generate_insert_rec prefix t ?at ()
       in
-      generate_insert_rec prefix value_list ?at ()
+      generate_start_end_sql prefix
+        (generate_insert_rec prefix value_list ?at ())
   in
 
   let generate_at prefix sql ?at () =
@@ -750,18 +763,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | ExecuteImmediate var -> generate_simpl_execute_immediat prefix var ?at ()
     | Insert (_, value_list) ->
       let value_list =
-        let rec value_list_cob_var = function
-          | ValueList ll :: t ->
-            let rec ll_cob_value = function
-              | LiteralVar (CobolVar c) :: t -> c :: ll_cob_value t
-              | [] -> []
-              | _ :: t -> ll_cob_value t
-            in
-            ll_cob_value ll @ value_list_cob_var t
-          | [] -> []
-          | _ :: t -> value_list_cob_var t
-        in
-        value_list_cob_var value_list
+        Misc.extract_cob_var_name
+          (Format.asprintf "%a" Sql_ast.Printer.pp_value value_list)
       in
 
       generate_insert prefix ~value_list ?at ()
@@ -844,7 +847,18 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | Open (sql_var_token, cobol_lst) ->
       generate_open_cursor prefix sql_var_token cobol_lst
     | Fetch (sql, cob) -> generate_fetch prefix sql cob
-    | Exeption _
+    | Exeption e ->
+      let var_name =
+        num := !num + 1;
+        "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+      in
+      let cob_var_list =
+        Misc.extract_cob_var_name
+          (Format.asprintf "%a" Sql_ast.Printer.pp_exception e)
+      in
+      generate_start_end_sql prefix
+        ( List.map (generate_set_sql_param prefix) cob_var_list
+        @ [ generate_GIXSQLExecParam prefix var_name cob_var_list () ] )
     | Ignore _ ->
       (*TODO*)
       [ Generated_type.Todo { prefix } ]

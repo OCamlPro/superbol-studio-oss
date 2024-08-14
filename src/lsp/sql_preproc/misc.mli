@@ -22,12 +22,7 @@ val add_dot : with_dot:bool -> Buffer.t -> unit
 
 val resolve_copy : config:Types.config -> string -> string
 
-val extract_cob_var_query : Sql_ast.sql_query -> Sql_ast.cobol_var list
-
-val extract_cob_var_select_option_list :
-  Sql_ast.sql_select_option list -> Sql_ast.cobol_var list
-
-val extract_cob_var_select : Sql_ast.sql_select -> Sql_ast.cobol_var list
+val extract_cob_var_name : string -> string list
 
 val extract_filename : string -> string
 

@@ -143,6 +143,8 @@ let transform_stm map (_, stm) filename =
       | DeclareCursorWhithHold (_cur_name, _query) -> ([], map)
       (*TODO*)
     end
+    | Exeption _ -> create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens)
+
     | _ -> ([], map)
   in
 

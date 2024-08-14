@@ -277,9 +277,9 @@ module Printer = struct
     | Rollback (rb_work_or_tran, rb_args) ->
       Format.fprintf fmt "ROLLBACK %a %a" pp_some_rb_work_or_tran
         rb_work_or_tran pp_rb_args rb_args
-    | Commit (rb_work_or_tran, bool) ->
+    | Commit (rb_work_or_tran, b) ->
       let s =
-        match bool with
+        match b with
         | true -> "RELEASE"
         | false -> ""
       in
