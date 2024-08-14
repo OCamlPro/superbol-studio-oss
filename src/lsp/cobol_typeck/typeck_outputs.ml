@@ -20,6 +20,12 @@ type references_in_unit =
     data_refs: qualrefmap;
     proc_refs: qualrefmap;
     (* TODO: const_refs, prog_refs?, others... *)
+    (* TODO atm data_refs and proc_refs contains BOTH direct references and indirect references
+       e.g.: DISPLAY B IN A result in
+         - a direct reference to B
+         - a indirect reference to A
+      In the future we may need/want to split those 2 kind of references
+     *)
   }
 type references_in_group = references_in_unit Cobol_unit.Collections.MAP.t
 

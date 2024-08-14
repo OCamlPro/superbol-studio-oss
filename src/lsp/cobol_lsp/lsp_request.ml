@@ -605,7 +605,7 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
 
 let handle_document_symbol registry (params: DocumentSymbolParams.t) =
   try_with_main_document_data registry params.textDocument
-    ~f:begin fun ~doc { ptree; _ }->
+    ~f:begin fun ~doc { ptree; _ } ->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
       let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
       Some (`DocumentSymbol symbols)
@@ -702,6 +702,38 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
     end
   |> Option.value ~default:[]
 
+(** { Rename } *)
+
+let handle_rename ?(ignore_when_copybook=false)
+    registry
+    ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let locations = Option.value ~default:[] @@
+        let context = ReferenceContext.create ~includeDeclaration:true in
+        let params = ReferenceParams.create
+            ~context ~position ~textDocument () in
+        lookup_references_in_doc ~rootdir params checked_doc in
+      let changes, is_copybook =
+        List.fold_left begin fun (map, is_copybook) ({ range; uri }: Location.t) ->
+          URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
+          is_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations in
+      let changes = List.of_seq @@ URIMap.to_seq changes in
+      if is_copybook && ignore_when_copybook
+      then begin Lsp_io.notify_info
+          "Ignored renaming of a reference that occurs in a copybook";
+        Some ( WorkspaceEdit.create () ) end
+      else
+        begin if is_copybook
+          then Lsp_io.notify_warn
+              "Proceeded to rename of a reference that occurs in a copybook";
+          Some ( WorkspaceEdit.create ~changes () ) end
+    end
+  |> Option.get
+
+
 (** {3 Generic handling} *)
 
 let shutdown: state -> unit = function
@@ -747,17 +779,18 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
+    | DocumentSymbol params ->
         Ok (handle_document_symbol registry params, state)
     | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
         Ok (handle_codelens registry params, state)
+    | TextDocumentRename params ->
+        Ok (handle_rename registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
-    | TextDocumentRename  (* RenameParams.t.t *) _
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
@@ -825,4 +858,5 @@ module INTERNAL = struct
   let codelens = handle_codelens
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
+  let rename = handle_rename
 end
