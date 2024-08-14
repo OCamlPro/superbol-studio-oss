@@ -59,6 +59,7 @@ depends: [
   "cobol_data" {= version}
   "cobol_config" {= version}
   "cobol_common" {= version}
+  "cobol_cfg" {= version}
   "odoc" {with-doc}
 ]
 # Content of `opam-trailer` field:

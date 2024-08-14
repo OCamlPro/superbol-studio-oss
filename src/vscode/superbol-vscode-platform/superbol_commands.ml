@@ -37,6 +37,14 @@ let command id handler =
   commands := command :: !commands;
   command
 
+let _open_cfg =
+  command "superbol.cfg.open" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _ = Superbol_instance.open_cfg _instance in
+      ()
+    end
+
+
 let _editor_action_findReferences =
   let command_name = "superbol.editor.action.findReferences"  in
   command command_name @@ Instance

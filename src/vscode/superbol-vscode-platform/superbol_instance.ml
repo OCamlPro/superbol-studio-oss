@@ -127,3 +127,37 @@ let get_project_config instance =
             ]))
       in
       Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc
+
+
+let open_cfg ?text_editor instance =
+  let open_cfg_for ?uri client =
+    let uri = match uri with
+      | Some uri ->
+          Jsonoo.Encode.string @@ Vscode.Uri.path uri
+      | None ->
+          Jsonoo.Encode.string ""
+    in
+    Vscode_languageclient.LanguageClient.sendRequest client ()
+      ~meth:"superbol/openCFG"
+      ~data:uri |>
+    Promise.(then_ ~fulfilled:(fun res ->
+      let dotfile = Jsonoo.Decode.string res in
+      let webviewpanel = Vscode.Window.createWebviewPanel ~viewType:"cfg" ~title:"CFG webview"
+      ~showOptions:(Vscode.ViewColumn.Two) in
+      let webview = Vscode.WebviewPanel.webview webviewpanel in
+      Vscode.WebView.set_html webview dotfile;
+      return ()
+      ))
+  in
+  match client instance, current_document_uri ?text_editor () with
+  | Some client, uri ->
+      open_cfg_for ?uri client
+  | None, _ ->
+      (* TODO: is there a way to activate the extension from here?  Starting the
+         client/instance seems to launch two distinct LSP server processes. *)
+      Promise.(then_ ~fulfilled:(fun _ -> return ())) @@
+      Vscode.Window.showErrorMessage ()
+        ~message:"The SuperBOL LSP client is not running; please retry after a \
+                  COBOL file has been opened"
+
+
