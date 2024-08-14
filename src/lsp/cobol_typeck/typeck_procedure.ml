@@ -238,15 +238,16 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
           error acc @@ Unknown_proc_name qn
         | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
           error acc @@ Ambiguous_proc_name { given_qualname = qn;
-                                             matching_qualnames } in
-      register ?in_section qn acc
-      |> begin match ~&qn with
-        | Name _ -> Fun.id
+                                             matching_qualnames }
+      in
+      let acc = register ?in_section qn acc in
+      let acc = match ~&qn with
+        | Name _ -> acc
         | Qual (_, section_qn) ->
           let loc = baseloc_of_qualname section_qn in
-          register (section_qn &@ loc)
-      end
-      |> Visitor.skip_children
+          register (section_qn &@ loc) acc
+      in
+      Visitor.skip_children acc
 
   end in
 
