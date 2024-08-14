@@ -41,17 +41,13 @@ let rename_positions ?(ignore_when_copybook=false) ?(copybooks=[]) (doc, positio
     Pretty.out "%a(line %d, character %d):\n"
       Fmt.(option ~none:nop (string ++ sp)) key
       position.line position.character;
-    begin
-      try
-      match LSP.Request.rename ~ignore_when_copybook server params with
-      | { changes = None; _ } ->
-        Pretty.out "No renames@."
-      | { changes = Some assoc; _ } ->
-        Pretty.out "@.@[<hv 4>%d rename entries:@;%a@]@\n"
-          (count assoc)
-          (Fmt.list ~sep:Fmt.sp pp_assoc_elem) assoc
-      with _ -> Pretty.out "Failed rename@."
-    end
+    match LSP.Request.rename ~ignore_when_copybook server params with
+    | { changes = None; _ } ->
+      Pretty.out "No renames@."
+    | { changes = Some assoc; _ } ->
+      Pretty.out "@.@[<hv 4>%d rename entries:@;%a@]@\n"
+        (count assoc)
+        (Fmt.list ~sep:Fmt.sp pp_assoc_elem) assoc
   in
   StringMap.iter (fun n p -> rename_at_position ~key:n p) positions.pos_map;
   List.iter (fun p -> rename_at_position p) positions.pos_anonymous;
