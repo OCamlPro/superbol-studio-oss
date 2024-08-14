@@ -65,6 +65,7 @@ jsonrpc = ">=1.15"
 lsp = ">=1.18 <1.19"
 pretty = "version"
 toml = "7.1.0"
+ocamlgraph = "2.1.0"
 
 # package tools dependencies
 [tools]

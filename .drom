@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2ba85fda382f3e9534366a30e92a3d99:.
+b90f497bb0b77cfd3ae180d69673ad76:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -78,11 +78,12 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 bbe93981f3f89550246d41f768f73a28:dune-project
 c375da381bfae0c77c7af1cb51f96580:dune-project
 cde29409c1d991e499786d56924f8fc9:dune-project
+68f1f36e943a31bcb34b9b97f6830817:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
 # file opam/cobol_cfg.opam
-a7d72990bb64c714f9edad8a708695a1:opam/cobol_cfg.opam
+5b0d97854c33a01ceaa5eebf37fed47d:opam/cobol_cfg.opam
 # end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
@@ -112,7 +113,7 @@ d7c870139778d0a6e34395be1ea0c85b:opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-f1979dd618dbe096cbf3f6ebd7b764ad:opam/cobol_lsp.opam
+c8462fb8a72ea1c6c9ef4ad6aea10b73:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
@@ -292,7 +293,7 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
-4c4e485ad53793d3adbea7e96daab3bc:src/lsp/cobol_cfg/dune
+0719aadf966f84be3629fc49a10309d0:src/lsp/cobol_cfg/dune
 # end context for src/lsp/cobol_cfg/dune
 
 # begin context for src/lsp/cobol_cfg/version.mlt
@@ -352,7 +353,7 @@ de6c46a271140f4f52b2580e0d876351:src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-9d53073ccf454b19436ec96ace43b740:src/lsp/cobol_lsp/dune
+0930647d8c6aee7065011a0501e050ac:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/version.mlt

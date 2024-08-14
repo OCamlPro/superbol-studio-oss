@@ -38,6 +38,11 @@
         "command": "superbol.coverage.reload",
         "title": "Update Coverage",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open",
+        "title": "Open CFG of current file",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -565,7 +570,16 @@
           ]
         }
       }
-    ]
+    ],
+    "menus": {
+    "editor/context": [
+      {
+      "command": "superbol.cfg.open",
+      "group": "superbol",
+      "when": "editorTextFocus"
+      }
+            ]
+      }
   },
   "extensionKind": [
     "workspace"

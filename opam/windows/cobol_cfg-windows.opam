@@ -53,6 +53,7 @@ depends: [
   "superbol_project-windows" {= version}
   "superbol_preprocs-windows" {= version}
   "pretty-windows" {= version}
+  "ocamlgraph-windows" {>= "2.1.0" & < "3.0.0"}
   "lsp-windows" {>= "1.18" & < "1.19"}
   "jsonrpc-windows" {>= "1.15"}
   "cobol_typeck-windows" {= version}

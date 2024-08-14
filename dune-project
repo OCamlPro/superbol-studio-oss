@@ -304,6 +304,7 @@
    (cobol_data (= version))
    (cobol_config (= version))
    (cobol_common (= version))
+   (cobol_cfg (= version))
    odoc
   )
  )
@@ -503,6 +504,7 @@
    (superbol_project (= version))
    (superbol_preprocs (= version))
    (pretty (= version))
+   (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
    (lsp (and ( >= 1.18 )( < 1.19 )))
    (jsonrpc ( >= 1.15 ))
    (cobol_typeck (= version))

@@ -53,6 +53,7 @@ depends: [
   "superbol_project-osx" {= version}
   "superbol_preprocs-osx" {= version}
   "pretty-osx" {= version}
+  "ocamlgraph-osx" {>= "2.1.0" & < "3.0.0"}
   "lsp-osx" {>= "1.18" & < "1.19"}
   "jsonrpc-osx" {>= "1.15"}
   "cobol_typeck-osx" {= version}

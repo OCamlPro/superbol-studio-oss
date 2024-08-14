@@ -26,6 +26,11 @@ val write_project_config
   -> t
   -> unit Promise.t
 
+val open_cfg
+  : ?text_editor: Vscode.TextEditor.t
+  -> t
+  -> unit Promise.t
+
 val get_project_config
   : t
   -> ((string, Jsonoo.t) Hashtbl.t, string) result Promise.t

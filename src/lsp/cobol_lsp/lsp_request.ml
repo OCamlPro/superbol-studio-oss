@@ -133,6 +133,18 @@ let handle_get_project_config_command param registry =
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
+let handle_open_cfg registry params =
+  let args = Yojson.Safe.Util.to_list @@ Jsonrpc.Structured.yojson_of_t params in
+  let uri = Yojson.Safe.Util.to_string @@ List.hd args in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_main_doc registry textDoc
+      ~f:begin fun ~doc ->
+        let uri = Lsp.Text_document.documentUri doc.textdoc in
+        Lsp_io.log_debug "CFG of %s" (DocumentUri.to_path uri);
+        Some (`String "temp")
+      end
+    |> Option.value ~default:(`String "")
+
 (** {3 Definitions} *)
 
 
@@ -825,6 +837,9 @@ let on_request
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
         handle_get_project_config_command param registry
+    | UnknownRequest { meth = "superbol/openCFG";
+                       params = Some param } ->
+        Ok (handle_open_cfg registry param, state)
     | UnknownRequest { meth; _ } ->
         Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
         Error (UnknownRequest meth)
