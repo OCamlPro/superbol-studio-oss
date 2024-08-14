@@ -3,10 +3,10 @@
 ## [0.1.4] Next release
 
 ### Added
-- Support for LSP request `textDocument/rename` [#351](https://github.com/OCamlPro/superbol-studio-oss/pull/351)
+- Support for Symbol Renaming command [#351](https://github.com/OCamlPro/superbol-studio-oss/pull/351)
 - Show documentation comments on hover information [#350](https://github.com/OCamlPro/superbol-studio-oss/pull/350)
 - Completion for more grammar constructs [#322](https://github.com/OCamlPro/superbol-studio-oss/pull/322)
-- Support for LSP request `textDocument/codeLens` [#349](https://github.com/OCamlPro/superbol-studio-oss/pull/349)
+- Support for CodeLens [#349](https://github.com/OCamlPro/superbol-studio-oss/pull/349)
 - Show display example of `NUMERIC-EDITED` data on hover [#337](https://github.com/OCamlPro/superbol-studio-oss/pull/337)
 - Support for dump and listing files, along with a task attribute for outputting the latter [#347](https://github.com/OCamlPro/superbol-studio-oss/pull/347)
 - Improved information shown on completion [#336](https://github.com/OCamlPro/superbol-studio-oss/pull/336)
