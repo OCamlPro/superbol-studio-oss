@@ -5,13 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-770715578d99cec11afe5b129aa5930f:.
+2ba85fda382f3e9534366a30e92a3d99:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-5714f81b8a12cefeab3bd452453832b5:.github/workflows/workflow.yml
-aedabb02434649b101d3db2436821c08:.github/workflows/workflow.yml
+225f4c9dec0def7b46e5d3bc522e7dc7:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -26,7 +25,7 @@ aedabb02434649b101d3db2436821c08:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-0195ab922c6b2c04b5cc71036d59fe5e:Makefile
+0c73865932c3fbfc726666210af7def2:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -77,7 +76,14 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 bbe93981f3f89550246d41f768f73a28:dune-project
+c375da381bfae0c77c7af1cb51f96580:dune-project
+cde29409c1d991e499786d56924f8fc9:dune-project
 # end context for dune-project
+
+# begin context for opam/cobol_cfg.opam
+# file opam/cobol_cfg.opam
+a7d72990bb64c714f9edad8a708695a1:opam/cobol_cfg.opam
+# end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
@@ -283,6 +289,16 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 # file sphinx/license.rst
 13af61ba0b28e7fcb749a0c3b34e2322:sphinx/license.rst
 # end context for sphinx/license.rst
+
+# begin context for src/lsp/cobol_cfg/dune
+# file src/lsp/cobol_cfg/dune
+4c4e485ad53793d3adbea7e96daab3bc:src/lsp/cobol_cfg/dune
+# end context for src/lsp/cobol_cfg/dune
+
+# begin context for src/lsp/cobol_cfg/version.mlt
+# file src/lsp/cobol_cfg/version.mlt
+de6c46a271140f4f52b2580e0d876351:src/lsp/cobol_cfg/version.mlt
+# end context for src/lsp/cobol_cfg/version.mlt
 
 # begin context for src/lsp/cobol_common/dune
 # file src/lsp/cobol_common/dune

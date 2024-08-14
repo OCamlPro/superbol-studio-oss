@@ -493,4 +493,26 @@
   )
  )
 
+(package
+ (name cobol_cfg)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (toml (and (>= 7.1.0) (< 8.0.0)))
+   (superbol_project (= version))
+   (superbol_preprocs (= version))
+   (pretty (= version))
+   (lsp (and ( >= 1.18 )( < 1.19 )))
+   (jsonrpc ( >= 1.15 ))
+   (cobol_typeck (= version))
+   (cobol_parser (= version))
+   (cobol_indent (= version))
+   (cobol_data (= version))
+   (cobol_config (= version))
+   (cobol_common (= version))
+   odoc
+  )
+ )
+
 
