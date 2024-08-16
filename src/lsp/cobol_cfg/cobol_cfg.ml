@@ -15,3 +15,5 @@ module INTERNAL = struct
   module Types = struct
   end
 end
+
+let make = Cfg_builder.make

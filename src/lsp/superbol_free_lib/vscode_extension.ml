@@ -583,12 +583,20 @@ let contributes =
         ~command:"superbol.coverage.reload"
         ~title:"Update Coverage"
         ~category:"SuperBOL";
+      Manifest.command ()
+        ~command:"superbol.cfg.open"
+        ~title:"Open CFG"
+        ~category:"SuperBOL";
     ]
     ~tomlValidation: [
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
         ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json";
+    ]
+    ~menus: [
+      "editor/context",
+      [menu ~command:"superbol.cfg.open" ~group:"superbol" ~when_:"editorTextFocus" ()]
     ]
 
 let manifest =
