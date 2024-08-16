@@ -9,16 +9,11 @@ type ref_value =
       }
 
 type error_treatment =
-  | Error_treatment of
-      { prefix : string;
-        condition : whenever_condition;
-        continuation : whenever_continuation
-      }
-
-and whenever_condition =
-  | Not_found_whenever
-  | SqlError_whenever
-  | SqlWarning_whenever
+  { prefix : string;
+    not_found_whenever : whenever_continuation option;
+    sql_warning_whenever : whenever_continuation option;
+    sql_error_whenever : whenever_continuation option
+  }
 
 and whenever_continuation =
   | Continue
@@ -86,11 +81,15 @@ type trans_stm =
 
 type generated_stm =
   | NoChange of { content : string }
-  | Added of { content : trans_stm list }
+  | Added of
+      { content : trans_stm list;
+        error_treatment : error_treatment option;
+        with_dot : bool
+      }
   | Change of
       { old_stms : string list;
         trans_stm : trans_stm list;
-        error_treatment : error_treatment list;
+        error_treatment : error_treatment option;
         with_dot : bool
       }
 
@@ -107,7 +106,14 @@ module Printer = struct
   and pp_gene fmt x =
     match x with
     | NoChange { content } -> Format.fprintf fmt "%s\n" content
-    | Added { content } -> Format.fprintf fmt "%a\n" pp_trans_stm content
+    | Added { content; error_treatment; with_dot } -> 
+      let dot =
+        if with_dot then
+          "."
+        else
+          ""
+      in
+      Format.fprintf fmt "%a%a%s\n" pp_trans_stm content pp_error_treatment error_treatment dot
     | Change { old_stms; trans_stm; error_treatment; with_dot } ->
       let dot =
         if with_dot then
@@ -129,12 +135,6 @@ module Printer = struct
     | h :: t -> Format.fprintf fmt "%a\n%a" pp_trans_stm_aux h pp_trans_stm t
     | [] -> ()
 
-  and pp_error_treatment fmt x =
-    match x with
-    | h :: t ->
-      Format.fprintf fmt "%a\n%a" pp_error_treatment_aux h pp_error_treatment t
-    | [] -> ()
-
   and pp_trans_stm_aux fmt x =
     match x with
     | Section { name } -> Format.fprintf fmt "       %s" name
@@ -150,10 +150,10 @@ module Printer = struct
       Format.fprintf fmt "%sPERFORM %s" prefix target
     | If { prefix; condition; if_stm } ->
       Format.fprintf fmt "%sIF %s THEN\n%a\n%sEND-IF" prefix condition
-      pp_trans_stm if_stm prefix
+        pp_trans_stm if_stm prefix
     | IfElse { prefix; condition; if_stm; else_stm } ->
-      Format.fprintf fmt "%sIF %s THEN\n%a\n%sELSE\n%a\n%sEND-IF" prefix condition
-        pp_trans_stm if_stm prefix pp_trans_stm else_stm prefix
+      Format.fprintf fmt "%sIF %s THEN\n%a\n%sELSE\n%a\n%sEND-IF" prefix
+        condition pp_trans_stm if_stm prefix pp_trans_stm else_stm prefix
     | Move { prefix; src; dest } ->
       Format.fprintf fmt "%sMOVE '%s' TO %s" prefix src dest
     | Declaration d -> Format.fprintf fmt "%a" pp_declaration d
@@ -189,25 +189,33 @@ module Printer = struct
     | h :: t -> Format.fprintf fmt "\n%a%a" pp_declaration h pp_field t
     | [] -> Format.fprintf fmt ""
 
-  and pp_error_treatment_aux fmt = function
-    | Error_treatment { prefix; condition; continuation } -> begin
+  and pp_error_treatment fmt = function
+    | Some
+        { prefix; not_found_whenever; sql_warning_whenever; sql_error_whenever }
+      -> begin
       let print_continuation fmt continuation =
         match continuation with
-        | Continue -> Format.fprintf fmt "CONTINUE"
-        | Perform sqlVarToken -> Format.fprintf fmt "PERFORM %s" sqlVarToken
-        | Goto sqlVarToken -> Format.fprintf fmt "GOTO %s" sqlVarToken
+        | Continue -> Format.fprintf fmt "   CONTINUE"
+        | Perform sqlVarToken -> Format.fprintf fmt "   PERFORM %s" sqlVarToken
+        | Goto sqlVarToken -> Format.fprintf fmt "   GO TO %s" sqlVarToken
       in
-      match condition with
-      | Not_found_whenever ->
-        Format.fprintf fmt "%sWHEN SQLCODE = 100\n%s%a" prefix prefix
-          print_continuation continuation
-      | SqlError_whenever ->
-        Format.fprintf fmt "%sWHEN SQLCODE < 0\n%s%a" prefix prefix
-          print_continuation continuation
-      | SqlWarning_whenever ->
-        Format.fprintf fmt "%sWHEN SQLCODE < 0\n%s%a" prefix prefix
-          print_continuation continuation
+      let print_error fmt (not_found_whenever, str) =
+        match not_found_whenever with
+        | Some continuation ->
+          Format.fprintf fmt "\n%s%s\n%s%a" prefix str prefix print_continuation
+            continuation
+        | None -> Format.fprintf fmt "\n%s%s\n%s%s" prefix str prefix "   CONTINUE"
+      in
+      Format.fprintf fmt "\n%sEVALUATE TRUE%a%a%a\n%sEND-EVALUATE" prefix
+        print_error
+        (not_found_whenever, "WHEN SQLCODE = 100")
+        print_error
+        (sql_warning_whenever, "WHEN SQLCODE = 1")
+        print_error
+        (sql_error_whenever, "WHEN SQLCODE < 0")
+        prefix
     end
+    | None -> ()
 
   and pp_ref_value_list fmt x =
     let rec pp_ref_value_list_aux fmt x =

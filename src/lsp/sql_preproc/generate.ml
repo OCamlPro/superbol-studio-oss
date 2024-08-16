@@ -14,7 +14,10 @@ open Sql_ast
 
 let comment str =
   Generated_type.Added
-    { content = [ Generated_type.Comment { content = str } ] }
+    { content = [ Generated_type.Comment { content = str } ];
+      error_treatment = None;
+      with_dot = false
+    }
 
 let generate ~filename ~contents ~cobol_unit sql_statements =
   let linkage_section = comment "" in
@@ -32,7 +35,16 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (* The result will be stored in this buffer: *)
   let _final_loc = { filename; line = -1; char = 0 } in
 
-  let error_treatment = ref [] in
+  let error_treatment =
+    ref
+      Generated_type.
+        { prefix = "           ";
+          not_found_whenever = None;
+          sql_error_whenever = None;
+          sql_warning_whenever = None
+        }
+  in
+  let is_error_treatment = ref false in
   let old_statements = ref [] in
   let cursor_declaration = ref [] in
   let in_pro_div = ref true in
@@ -43,30 +55,11 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let working_storage_section, new_var_map =
     let ws, nvm = Data_gestion.transform sql_statements filename in
     ( [ comment ">Begin generated WORKING-STORAGE SECTION";
-        Generated_type.Added { content = ws };
+        Generated_type.Added
+          { content = ws; error_treatment = None; with_dot = false };
         comment "> End genererated WORKING-STORAGE SECTION"
       ],
       nvm )
-  in
-
-  let end_procedure_division cd =
-    Generated_type.Added
-      { content =
-          [ Generated_type.Comment
-              { content = "> ESQL CURSOR DECLARATIONS (START)" };
-            Generated_type.GotoStatement
-              { prefix = "           "; target = "GIX-SKIP-CRSR-INIT" }
-          ]
-      }
-    :: cd
-    @ [ Generated_type.Added
-          { content =
-              [ Generated_type.Section { name = "GIX-SKIP-CRSR-INIT" };
-                Generated_type.Comment
-                  { content = "> ESQL CURSOR DECLARATIONS (END)" }
-              ]
-          }
-      ]
   in
 
   let cob_var_id_opt (cob_var : cobolVarId option) =
@@ -250,20 +243,38 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       ]
   in
 
-  let generate_whenever ~prefix c k =
-    let condition =
-      match c with
-      | Sql_ast.Not_found_whenever -> Generated_type.Not_found_whenever
-      | Sql_ast.SqlError_whenever -> Generated_type.SqlError_whenever
-      | Sql_ast.SqlWarning_whenever -> Generated_type.SqlWarning_whenever
-    in
+  let change_error ~prefix c k =
+    let old_error = !error_treatment in
     let continuation =
       match k with
       | Sql_ast.Continue -> Generated_type.Continue
       | Sql_ast.Perform x -> Generated_type.Perform x.payload
       | Sql_ast.Goto x -> Generated_type.Goto x.payload
     in
-    Generated_type.Error_treatment { prefix; condition; continuation }
+    let new_error =
+      match c with
+      | Sql_ast.Not_found_whenever ->
+        Generated_type.
+          { prefix;
+            not_found_whenever = Some continuation;
+            sql_error_whenever = old_error.sql_error_whenever;
+            sql_warning_whenever = old_error.sql_warning_whenever
+          }
+      | Sql_ast.SqlError_whenever ->
+        { prefix;
+          not_found_whenever = old_error.not_found_whenever;
+          sql_error_whenever = Some continuation;
+          sql_warning_whenever = old_error.sql_warning_whenever
+        }
+      | Sql_ast.SqlWarning_whenever ->
+        { prefix;
+          not_found_whenever = old_error.not_found_whenever;
+          sql_error_whenever = old_error.sql_error_whenever;
+          sql_warning_whenever = Some continuation
+        }
+    in
+    error_treatment := new_error;
+    is_error_treatment := true
   in
 
   let get_name_cobol_var (cobol_var : cobol_var) =
@@ -289,7 +300,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  (* Todo: refactory *)
+  (* Todo: refactory? *)
   let generate_set_sql_param prefix h =
     let fun_name = "GIXSQLSetSQLParams" in
     let ref_value =
@@ -446,13 +457,20 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference { prefix; var = name };
-        Generated_type.Value { prefix; var = "0" } (*Todo*)
+        Generated_type.Value { prefix; var = string_of_int (get_length name) }
       ]
     in
     [ Generated_type.CallStatic { prefix; fun_name; ref_value } ]
   in
 
   let add_to_cursor_declaration prefix cur ?at () =
+    let adding = (prefix, cur, at) in
+    let cd = adding :: !cursor_declaration in
+    cursor_declaration := cd
+  in
+
+  let create_from_cursor_declaration (prefix, cur, at) =
+    let prefix = prefix ^ "    " in
     let at_name, at_size = get_at_info at in
     let cur_name, cob_var_lst, _with_hold =
       match cur with
@@ -525,9 +543,35 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       | [] -> adding
       | _ -> generate_start_end_sql prefix adding
     in
-    let st = Generated_type.Added { content = adding } in
-    let cd = st :: !cursor_declaration in
-    cursor_declaration := cd
+    Generated_type.Added
+      { content = adding;
+        error_treatment = (if !is_error_treatment then Some !error_treatment else None);
+        with_dot = true
+      }
+  in
+
+  let end_procedure_division cd_list =
+    Generated_type.Added
+      { content =
+          [ Generated_type.Comment
+              { content = "> ESQL CURSOR DECLARATIONS (START)" };
+            Generated_type.GotoStatement
+              { prefix = "           "; target = "GIX-SKIP-CRSR-INIT" }
+          ];
+        error_treatment = None;
+        with_dot = false
+      }
+    :: List.map create_from_cursor_declaration cd_list
+    @ [ Generated_type.Added
+          { content =
+              [ Generated_type.Section { name = "GIX-SKIP-CRSR-INIT" };
+                Generated_type.Comment
+                  { content = "> ESQL CURSOR DECLARATIONS (END)" }
+              ];
+            error_treatment = None;
+            with_dot = false
+          }
+      ]
   in
 
   let generate_prepare_stm prefix (var_name : sqlVarToken) sql_instr ?at () =
@@ -581,7 +625,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       ]
     in
     Generated_type.CallStatic
-      { prefix; fun_name = "GIXSQLPrepareStatement"; ref_value }
+      { prefix; fun_name = "GIXSQLExecPrepared"; ref_value }
   in
 
   let generate_exec_prepared_into prefix (executed_string : sqlVarToken)
@@ -783,8 +827,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         { executed_string; opt_into_hostref_list; opt_using_hostref_list } ->
       generate_execute_into_using prefix executed_string ?opt_into_hostref_list
         ?opt_using_hostref_list ?at ()
-    | DeclareTable _
-    | Delete _
+    | DeclareTable _ ->
+      (*Parser error on DECLARE TABLE statements in Gix, idk if Gix runtime can handle it*)
+      [ Generated_type.Todo { prefix } ]
+    | Delete sql_instr ->
+      let value_list =
+        Misc.extract_cob_var_name
+          (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql_instr)
+      in
+      generate_insert prefix ~value_list ?at ()
     | Update _ ->
       [ Generated_type.Todo { prefix } ]
       (*Unexeped At, should trigger an error*)
@@ -822,7 +873,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           ?d_connection_id:(Some "\"*\" & x\"00\"") ()
       ]
     | Whenever (c, k) ->
-      error_treatment := generate_whenever ~prefix c k :: !error_treatment;
+      change_error ~prefix c k;
       []
     | Begin -> generate_declare prefix ()
     | BeginDeclare
@@ -860,8 +911,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         ( List.map (generate_set_sql_param prefix) cob_var_list
         @ [ generate_GIXSQLExecParam prefix var_name cob_var_list () ] )
     | Ignore _ ->
-      (*TODO*)
-      [ Generated_type.Todo { prefix } ]
+      (*Ignore, not implemented in Gix (but if this is just ignore, this should do the trick)*)
+      [ ]
   in
 
   let rec output lines statements =
@@ -902,7 +953,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           end else begin
             comment "> Add missing LINKAGE SECTION"
             :: Generated_type.Added
-                 { content = [ Generated_type.LinkageSection ] }
+                 { content = [ Generated_type.LinkageSection ];
+                   error_treatment = None;
+                   with_dot = false
+                 }
             :: ([ linkage_section ] @ output cur_lines statements)
           end
         | WORKING_STORAGE { defined } ->
@@ -912,7 +966,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           end else begin
             comment "> Add missing WORKING-STORAGE SECTION"
             :: Generated_type.Added
-                 { content = [ Generated_type.WorkingStorageSection ] }
+                 { content = [ Generated_type.WorkingStorageSection ];
+                   error_treatment = None;
+                   with_dot = false
+                 }
             :: (working_storage_section @ output cur_lines statements)
           end
         | EXEC_SQL { end_loc; with_dot; tokens } ->
@@ -924,10 +981,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
               match trans_stm with
               | [] ->
                 ( false,
-                  []
+                  None
                   (*if nothing is generated, we don't need error treatment or dots *)
                 )
-              | _ -> (with_dot, !error_treatment)
+              | _ -> (with_dot, if !is_error_treatment then Some !error_treatment else None)
             in
             old_statements := [];
             Generated_type.Change
@@ -940,7 +997,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
             comment ("> REMOVED: " ^ line)
             :: (* for now, just put it back *)
                Generated_type.Added
-                 { content = [ Generated_type.ProcedureDivision ] }
+                 { content = [ Generated_type.ProcedureDivision ];
+                   error_treatment = None;
+                   with_dot = false
+                 }
             :: output lines statements
           end else
             comment ("> REMOVED: " ^ line)

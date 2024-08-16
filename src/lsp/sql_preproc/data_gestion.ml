@@ -32,8 +32,8 @@ let num = ref 0
 let transform_stm map (_, stm) filename =
   let prefix = "      " in
   let create_new_var content =
-    let content = "\"" ^ Misc.replace_colon_words content ^ "\"" in
-    let size = String.length content in
+    let new_content = "\"" ^ Misc.replace_colon_words content ^ "\"" in
+    let size = (String.length new_content) -2 in (*Because " are part of this string"*)
     num := !num + 1;
     let var_name = "SQ" ^ string_of_int !num in
     let field =
@@ -43,7 +43,7 @@ let transform_stm map (_, stm) filename =
             var_importance = "02";
             var_name = None;
             var_type = "X(" ^ string_of_int size ^ ")";
-            var_content = Some content
+            var_content = Some new_content
           };
         Simple_var_declaration
           { prefix;
@@ -106,7 +106,8 @@ let transform_stm map (_, stm) filename =
         in
         (ws, map) )
     | Insert _
-    | Savepoint _ ->
+    | Savepoint _ 
+    | Delete _ ->
       let ws, map =
         create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens)
       in
