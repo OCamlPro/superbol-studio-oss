@@ -128,6 +128,29 @@ let get_project_config instance =
       in
       Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc
 
+(** Credit @beiclause in https://github.com/beicause/call-graph/blob/master/src/html.ts *)
+let html dot = Printf.sprintf {|
+<!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Call Graph</title>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+        <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+    </head>
+
+    <body>
+        <div id="app"></div>
+    </body>
+    <script>
+        d3.select('#app').graphviz().renderDot(`%s`)
+    </script>
+    </html>`
+  |} dot
+
 let open_cfg ?text_editor instance =
   let open_cfg_for ?uri client =
     let uri = match uri with
@@ -140,7 +163,6 @@ let open_cfg ?text_editor instance =
       ~meth:"superbol/openCFG"
       ~data:uri |>
     Promise.(then_ ~fulfilled:(fun res ->
-        (* TODO? Vscode.Workspace.openTextDocument `Interactive *)
         (* TODO: do not reopen a different window for each call *)
         let dot_content = Jsonoo.Decode.string res in
         let newWebviewPanel =
@@ -148,7 +170,8 @@ let open_cfg ?text_editor instance =
             ~viewType:"cfg" ~title:"CFG webview"
             ~showOptions:(Vscode.ViewColumn.Two) in
         let webview = Vscode.WebviewPanel.webview newWebviewPanel in
-        Vscode.WebView.set_html webview dot_content;
+        Vscode.WebView.set_html webview (html dot_content);
+        Vscode.WebView.set_options webview (Vscode.WebviewOptions.create ~enableScripts:true ());
         return ()
       ))
   in

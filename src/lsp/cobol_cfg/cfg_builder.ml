@@ -8,130 +8,192 @@
 (*                                                                            *)
 (******************************************************************************)
 
-(* representation of a node -- must be hashable *)
-module Node = struct
-   type t = Cobol_ptree.qualname
-   let compare = Cobol_ptree.compare_qualname
-   let hash = Hashtbl.hash
-   let equal a b = Cobol_ptree.compare_qualname a b == 0
-end
-
-(* (* representation of an edge -- must be comparable *) *)
-(* module Edge = struct *)
-(*    type t = string *)
-(*    let compare = Stdlib.compare *)
-(*    let equal = (=) *)
-(*    let default = "" *)
-(* end *)
-
-(* a functional/persistent graph *)
-
-module Cfg =  Graph.Persistent.Digraph.Concrete(Node)
-
-module Dot = Graph.Graphviz.Dot(struct
-    include Cfg
-    let edge_attributes _ = []
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes _ = []
-    let default_vertex_attributes _ = [`Shape `Box]
-    let graph_attributes _ = []
-    let vertex_name qn =
-      Pretty.to_string "\"%a\""Cobol_ptree.pp_qualname qn
-      |> Str.global_replace (Str.regexp "\n") " "
-
-  end)
-
 open Cobol_unit
 open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_unit.Types
 open Cobol_common.Visitor
+type qualname = Cobol_ptree.qualname
 
-type 'a node = {
-  name: 'a;
-  has_unconditial_jump: bool;
-  jumps_to: 'a list;
+type unconditional_jumps =
+  | Goback
+  | Go of qualname
+
+type node = {
+  name: qualname;
+  conditional_jumps: qualname list;
+  unconditional_jumps: unconditional_jumps list;
 }
 
 let full_qn ~cu qn =
   (Qualmap.find_binding qn cu.unit_procedure.named).full_qn
 
+let full_qn' ~cu qn = full_qn ~cu ~&qn
 
-let build_jump_list ~cu paragraph =
-  Visitor.fold_procedure_paragraph'
-    object
-      inherit [_] Visitor.folder
-      method! fold_goback' _ (_, jumps) = skip (true, jumps)
-      method! fold_goto' { payload; _ } (unconditiona_jump, jumps) =
-        skip @@
-        match payload with
-        | GoToEntry _ -> (unconditiona_jump, jumps) (* TODO couldn't find doc *)
-        | GoToSimple { targets; depending_on } ->
-          (
-            unconditiona_jump || Option.is_none depending_on,
-            (Cobol_common.Basics.NEL.to_list targets
-            |> List.map (~&)
-            |> List.map (full_qn ~cu))
-            @ jumps
-          )
 
+let build_node ~default_name ~cu paragraph =
+  let open struct
+    type acc = {
+      conditionals: qualname list;
+      unconditional: unconditional_jumps list;
+    }
+    let add_unconditional uncond acc =
+      { acc with unconditional = uncond :: acc.unconditional }
+    let add_conditionals acc qn_to_jump =
+      { acc with conditionals = qn_to_jump :: acc.conditionals }
+  end in
+  let { conditionals; unconditional } =
+    Visitor.fold_procedure_paragraph'
+      object
+        inherit [acc] Visitor.folder
+        method! fold_goback' _ acc = skip @@ add_unconditional Goback acc
+        method! fold_goto' { payload; _ } acc =
+          skip @@
+          match payload with
+          | GoToEntry _ -> acc (* TODO couldn't find doc *)
+          | GoToSimple { targets; depending_on } ->
+              let targets = Cobol_common.Basics.NEL.to_list targets in
+            if Option.is_none depending_on
+            then
+              add_unconditional (Go (full_qn' ~cu @@ List.hd targets)) acc
+            else
+              targets
+              |> List.map (full_qn' ~cu)
+              |> List.fold_left add_conditionals acc
+        method! fold_perform_target' { payload; _ } acc =
+          skip @@
+          let { payload = start; _ } = payload.perform_target.procedure_start in
+          (* TODO: check that where we jump has no unconditional_jumps, /!\ cycle` *)
+          add_conditionals acc (full_qn ~cu start)
+      end
+      paragraph {conditionals = []; unconditional = [] }
+  in
+  let name = Option.fold
+      ~none:default_name
+      ~some:(full_qn' ~cu)
+      ~&paragraph.paragraph_name
+  in {
+      name;
+      conditional_jumps = conditionals;
+      unconditional_jumps = unconditional;
+    }
+
+module Node = struct
+  type t = node
+  let compare node other =
+    Cobol_ptree.compare_qualname node.name other.name
+  let hash node =
+    Hashtbl.hash node.name
+  let equal node other =
+    Cobol_ptree.compare_qualname node.name other.name == 0
+end
+
+type edge =
+  | Default
+  | Conditional
+  | Unconditional
+
+module Edge = struct
+   type t = edge
+   let compare = Stdlib.compare
+   let equal = (=)
+   let default = Default
+end
+
+module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
+
+module Qmap = Map.Make(struct
+    type t = qualname
+    let compare = Cobol_ptree.compare_qualname
+  end)
+
+let rec build_edges ~vertexes g = function
+  | ({ conditional_jumps; unconditional_jumps; _ } as current)::next::tl ->
+    let g = List.fold_left begin fun g jump_to ->
+        let next = Qmap.find jump_to vertexes in
+        Cfg.add_edge_e g (current, Conditional, next)
+      end g conditional_jumps in
+    begin match unconditional_jumps with
+      | [] ->
+        build_edges ~vertexes (Cfg.add_edge g current next) (next::tl)
+      | _ ->
+        let g = List.fold_left begin fun g -> function
+            | Goback -> g
+            | Go jump_to ->
+              let next = Qmap.find jump_to vertexes in
+              Cfg.add_edge_e g (current, Unconditional, next)
+          end g unconditional_jumps in
+        build_edges ~vertexes g (next::tl)
     end
-    paragraph (false, [])
-
-let rec build_edges g = function
-  | { name = current; jumps_to; has_unconditial_jump }::next::tl ->
-    let g = List.fold_left (Fun.flip Cfg.add_edge current) g jumps_to in
-    if has_unconditial_jump
-    then build_edges g (next::tl)
-    else build_edges (Cfg.add_edge g current next.name) (next::tl)
-  | [{ name = current; jumps_to; has_unconditial_jump = _ }] ->
-      List.fold_left (Fun.flip Cfg.add_edge current) g jumps_to
+  | [{ conditional_jumps; unconditional_jumps; _ } as current] ->
+    let g = List.fold_left begin fun g jump_to ->
+        let next = Qmap.find jump_to vertexes in
+        Cfg.add_edge_e g (current, Conditional, next)
+      end g conditional_jumps in
+    begin match unconditional_jumps with
+      | [] -> g
+      | _ ->
+        List.fold_left begin fun g -> function
+          | Goback -> g
+          | Go jump_to ->
+            let next = Qmap.find jump_to vertexes in
+            Cfg.add_edge_e g (current, Unconditional, next)
+        end g unconditional_jumps
+    end
   | [] -> g
 
 let cfg_of ~(cu: cobol_unit) =
-  let graph_name = Cobol_ptree.Name cu.unit_name in
+  let default_name = Cobol_ptree.Name cu.unit_name in
   let nodes = List.fold_left begin fun acc block ->
       match block with
       | Paragraph para ->
-        let name =
-          match block_name block with
-          | None -> graph_name
-          | Some { payload = qn; _ } -> full_qn ~cu qn
-        in
-        let has_unconditial_jump, jumps_to = build_jump_list ~cu para in
-        let node = { name; has_unconditial_jump ; jumps_to }
-        in [node] :: acc
+        build_node ~default_name ~cu para :: acc
       | Section { payload = { section_paragraphs; _ }; _ } ->
-        Fun.flip List.cons acc @@
-        List.filter_map (fun p ->
-            match block_name @@ Paragraph p with
-            | None -> None
-            | Some { payload = qn; _ } ->
-              let has_unconditial_jump, jumps_to = build_jump_list ~cu p in
-              Some { name = full_qn ~cu qn; has_unconditial_jump; jumps_to })
-          section_paragraphs.list
-    end [] cu.unit_procedure.list
-              |> List.rev |> List.flatten
+        List.fold_left begin fun acc p ->
+          build_node ~default_name ~cu p :: acc
+        end acc section_paragraphs.list
+    end [] cu.unit_procedure.list |> List.rev
   in
-  let g = List.fold_left begin fun g node ->
-      Cfg.add_vertex g node.name
-    end Cfg.empty nodes
-  in build_edges g nodes
+  let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
+      Cfg.add_vertex g node,
+      Qmap.add node.name node vertexes
+    end (Cfg.empty, Qmap.empty) nodes
+  in build_edges ~vertexes g nodes
+
+module Dot = Graph.Graphviz.Dot(struct
+    include Cfg
+    let edge_attributes (_,s,_) =
+      match s with
+      | Default -> [`Style `Dotted]
+      | Conditional -> [`Style `Dashed]
+      | Unconditional -> [`Style `Solid]
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes { unconditional_jumps; _ } =
+      if List.exists ((=) Goback) unconditional_jumps
+      then [`Style `Bold]
+      else []
+    let default_vertex_attributes _ = [`Shape `Box]
+    let graph_attributes _ = []
+    let vertex_name { name = qn; _} =
+      Pretty.to_string "\"%a\""Cobol_ptree.pp_qualname qn
+      |> Str.global_replace (Str.regexp "\n") " "
+  end)
 
 let string_of g =
   Pretty.to_string "%a" Dot.fprint_graph g
 
 let make (checked_doc: Cobol_typeck.Outputs.t) =
+  try
   let graphs = Cobol_unit.Collections.SET.fold
       begin fun { payload = cu; _ } acc ->
         acc ^ "\n" ^ (string_of @@ cfg_of ~cu)
       end checked_doc.group ""
   in
   graphs
+  with _ -> "no graph failed"
 
 (*
-
 List of node (sections & paragraphs)
 Visitor over procedure
   - perform
