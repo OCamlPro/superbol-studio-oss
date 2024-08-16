@@ -41,7 +41,7 @@
       },
       {
         "command": "superbol.cfg.open",
-        "title": "Open CFG of current file",
+        "title": "Open CFG",
         "category": "SuperBOL"
       }
     ],
@@ -450,6 +450,15 @@
         "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "superbol.cfg.open",
+          "group": "superbol",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
     "problemMatchers": [
       {
         "name": "gnucobol",
@@ -570,16 +579,7 @@
           ]
         }
       }
-    ],
-    "menus": {
-    "editor/context": [
-      {
-      "command": "superbol.cfg.open",
-      "group": "superbol",
-      "when": "editorTextFocus"
-      }
-            ]
-      }
+    ]
   },
   "extensionKind": [
     "workspace"

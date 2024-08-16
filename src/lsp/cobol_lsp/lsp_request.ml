@@ -137,13 +137,15 @@ let handle_open_cfg registry params =
   let args = Yojson.Safe.Util.to_list @@ Jsonrpc.Structured.yojson_of_t params in
   let uri = Yojson.Safe.Util.to_string @@ List.hd args in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
-  try_main_doc registry textDoc
-      ~f:begin fun ~doc ->
-        let uri = Lsp.Text_document.documentUri doc.textdoc in
-        Lsp_io.log_debug "CFG of %s" (DocumentUri.to_path uri);
-        Some (`String "temp")
-      end
-    |> Option.value ~default:(`String "")
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc checked_doc ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      Lsp_io.log_debug "CFG of %s" (DocumentUri.to_path uri);
+      let cfg_as_str = Str.global_replace (Str.regexp "\n") "<br/>"
+        @@ Cobol_cfg.make checked_doc
+      in Some (`String cfg_as_str)
+    end
+  |> Option.value ~default:(`String "")
 
 (** {3 Definitions} *)
 
