@@ -23,7 +23,10 @@ open Simple_statements
 
 (* GOTO *)
 type goto_stmt =
-  | GoToSimple of { target: procedure_name with_loc }
+  | GoToSimple of
+      {
+        target: procedure_name with_loc
+      }
   | GoToDepending of
       {
         targets: procedure_name with_loc nel;

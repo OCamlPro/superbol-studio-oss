@@ -3454,11 +3454,13 @@ let go_to_statement :=
   | GO; TO?; %prec lowest
     { LoneGoTo }    (* COB85; obsolete; should be sole statement of paragraph *)
   | GO; TO?; target = procedure_name;
-    depending_on_clause = o(pair(rl(procedure_name), DEPENDING; ON?; ident));
+    depending_on_clause = ro(pair(rl(procedure_name), DEPENDING; ON?; ident));
     { match depending_on_clause with
-      | None -> GoTo (GoToSimple { target = target })
-      | Some (other_targets, depending_on) -> GoTo (GoToDepending
-          { targets = NEL.of_list (target :: other_targets); depending_on }) }
+      | None ->
+          GoTo (GoToSimple { target })
+      | Some (other_targets, depending_on) ->
+          GoTo (GoToDepending { targets = NEL.of_list (target :: other_targets);
+                                depending_on }) }
   | GO; TO?; ENTRY; targets = nel_(loc(alphanum));
     depending_on = o(DEPENDING; ON?; ident);
     { GoTo (GoToEntry { targets; depending_on }) }
