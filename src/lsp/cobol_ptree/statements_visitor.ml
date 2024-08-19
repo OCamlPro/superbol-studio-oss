@@ -486,9 +486,11 @@ let fold_goback' (v: _ #folder) =
 let fold_goto' (v: _ #folder) =
   handle' v#fold_goto' v
     ~fold:begin fun v s x -> match s with
-      | GoToSimple { targets; depending_on } -> x
+      | GoToSimple { target } -> x
+          >> fold_procedure_name' v target
+      | GoToDepending { targets; depending_on } -> x
           >> fold_nel ~fold:fold_procedure_name' v targets
-          >> fold_option ~fold:fold_ident v depending_on
+          >> fold_ident v depending_on
       | GoToEntry { targets; depending_on } -> x
           >> fold_nel ~fold:fold_alphanum' v targets
           >> fold_option ~fold:fold_ident v depending_on
@@ -1000,7 +1002,7 @@ and fold_entry' (v: _ #folder) : entry_stmt with_loc -> 'a -> 'a =
   handle' v#fold_entry' v
     ~fold:begin fun v stmt x -> match stmt with
       | EntrySimple name -> x
-        >> fold_alphanum' v name 
+        >> fold_alphanum' v name
       | EntryUsing { entry_name; entry_by_clauses } -> x
         >> fold_alphanum' v entry_name
         >> fold_list ~fold:fold_entry_by_clause v entry_by_clauses

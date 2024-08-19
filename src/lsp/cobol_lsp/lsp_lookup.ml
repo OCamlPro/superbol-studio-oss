@@ -376,7 +376,10 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_goto' { payload = g; _ } acc =
         begin match g with
-          | GoToSimple { depending_on; _ }
+          | GoToSimple _ -> acc
+          | GoToDepending { depending_on; _ } ->
+            acc
+            |> Numeric (* int *) @>@ fold_ident v depending_on
           | GoToEntry { depending_on; _ } ->
             acc
             |> Numeric (* int *) @>@ fold_option ~fold:fold_ident v depending_on
