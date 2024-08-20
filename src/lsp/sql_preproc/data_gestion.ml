@@ -31,9 +31,10 @@ let num = ref 0
 
 let transform_stm map (_, stm) filename =
   let prefix = "      " in
-  let create_new_var content =
-    let new_content = "\"" ^ Misc.replace_colon_words content ^ "\"" in
-    let size = (String.length new_content) -2 in (*Because " are part of this string"*)
+  let create_new_var content ?(remplace=true) () =
+    let new_content = if remplace then "\"" ^ Misc.replace_colon_words content ^ "\"" else content in
+    let size = String.length new_content - 2 in
+    (*Because " are part of this string"*)
     num := !num + 1;
     let var_name = "SQ" ^ string_of_int !num in
     let field =
@@ -58,7 +59,7 @@ let transform_stm map (_, stm) filename =
           (Field_var_declaration
              { prefix; var_importance = "01"; var_name; field } )
       ],
-      add_var ~map ~name:("SQ" ^ string_of_int !num) ?length:(Some size) () )
+      add_var ~map ~name:("SQ" ^ string_of_int !num) ~length:size () )
   in
   let add_cur cur_name map ws filename =
     let pre_cur_name = "GIXSQL-CI-F-" ^ Misc.extract_filename filename ^ "-" in
@@ -74,7 +75,7 @@ let transform_stm map (_, stm) filename =
       :: ws
     in
     let map =
-      add_var ~map ~name:(pre_cur_name ^ cur_name) ?length:(Some 0) ()
+      add_var ~map ~name:(pre_cur_name ^ cur_name) ~length:0 ()
     in
     (ws, map)
   in
@@ -86,14 +87,14 @@ let transform_stm map (_, stm) filename =
       let ws, map =
         create_new_var
           (Format.asprintf "SELECT %a%a" Sql_ast.Printer.pp_select_lst select
-             Sql_ast.Printer.pp_select_options_lst select_options )
+             Sql_ast.Printer.pp_select_options_lst select_options ) ()
       in
       (ws, map)
     | Begin ->
-      let ws, map = create_new_var "BEGIN" in
+      let ws, map = create_new_var "BEGIN" () in
       (ws, map)
     | StartTransaction ->
-      let ws, map = create_new_var "START TRANSACTION" in
+      let ws, map = create_new_var "START TRANSACTION" () in
       (ws, map)
     | Sql sql -> (
       match sql with
@@ -102,50 +103,54 @@ let transform_stm map (_, stm) filename =
         (*TODO: find what this should be replaced with. I think Gix juste ignorer these instruction, but mabe not*)
       | _ ->
         let ws, map =
-          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql)
+          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql) ()
         in
         (ws, map) )
     | Insert _
-    | Savepoint _ 
+    | Savepoint _
     | Delete _ ->
       let ws, map =
-        create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens)
+        create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens) ()
       in
       (ws, map)
     | ExecuteImmediate sql -> (
       match sql with
-      | [ Sql_ast.SqlVarToken CobolVar CobVarNotNull _ ] -> ([], map)
+      | [ Sql_ast.SqlVarToken (CobolVar (CobVarNotNull _)) ] -> ([], map)
       | _ ->
-        let ws, map = 
-          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql)
+        let ws, map =
+          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql) ()
         in
         (ws, map) )
     | Rollback (rb_work_or_tran, rb_args) -> begin
       match (rb_work_or_tran, rb_args) with
       | _, Some (To savepoint) ->
         let ws, map =
-          create_new_var ("ROLLBACK TO SAVEPOINT " ^ savepoint.payload)
+          create_new_var ("ROLLBACK TO SAVEPOINT " ^ savepoint.payload) ()
         in
         (ws, map)
       | _ -> ([], map)
     end
     | DeclareCursor cur -> begin
       match cur with
-      | DeclareCursorSql (cur_name, query) ->
+      | DeclareCursorSql (cur_name, query)
+      | DeclareCursorWhithHold (cur_name, query) -> (*TODO: WhithHold specificity if there are any*)
         let ws, map =
           create_new_var
-            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query query)
+            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query query) ()
         in
         let ws, map = add_cur cur_name.payload map ws filename in
 
         (ws, map)
-        (*TODO*)
-      | DeclareCursorVar (_cur_name, _var_name) -> ([], map) (*TODO*)
-      | DeclareCursorWhithHold (_cur_name, _query) -> ([], map)
-      (*TODO*)
-    end
-    | Exeption _ -> create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens)
+      | DeclareCursorVar (cur_name, var_name) ->
+        let ws, map =
+          create_new_var (Format.asprintf "\"@%a\"" Sql_ast.Printer.pp_var var_name) ~remplace:false ()
+        in
+        let ws, map = add_cur cur_name.payload map ws filename in
 
+        (ws, map)
+    end
+    | Exeption _ ->
+      create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens) ()
     | _ -> ([], map)
   in
 
@@ -156,7 +161,7 @@ let transform_stm map (_, stm) filename =
       | "BINARY"
       | "CHAR" ->
         let map =
-          add_var ~map ~name ?length:(Some (int_of_string sql_type_size)) ()
+          add_var ~map ~name ~length:(int_of_string sql_type_size) ()
         in
 
         ( [ Declaration
@@ -172,7 +177,7 @@ let transform_stm map (_, stm) filename =
       | "VARBINARY"
       | "VARCHAR" ->
         let map =
-          add_var ~map ~name ?length:(Some (int_of_string sql_type_size)) ()
+          add_var ~map ~name ~length:(int_of_string sql_type_size) ()
         in
         let field =
           let prefix = prefix ^ "   " in

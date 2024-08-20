@@ -16,7 +16,7 @@ type variable_information =
     flags : int;
     ind_addr : int
   }
-(*return working_storage_section (only declaration),, new_var_map*)
+(*return working_storage_section (only declaration) * new_var_map*)
 val transform :
   (Types.loc option * Types.statements) list -> string ->
   (Generated_type.trans_stm list * t)

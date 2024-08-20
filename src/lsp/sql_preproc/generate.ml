@@ -47,7 +47,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let is_error_treatment = ref false in
   let old_statements = ref [] in
   let cursor_declaration = ref [] in
-  let in_pro_div = ref true in
+  let in_pro_div = ref false in
   let num = ref 0 in
 
   (*GET FUNCTION*)
@@ -464,39 +464,43 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let add_to_cursor_declaration prefix cur ?at () =
-    let adding = (prefix, cur, at) in
+    num := !num + 1;
+    let name = "SQ" ^ string_of_int !num in
+    let adding = (prefix, cur, at, name) in
     let cd = adding :: !cursor_declaration in
     cursor_declaration := cd
   in
 
-  let create_from_cursor_declaration (prefix, cur, at) =
+  let create_from_cursor_declaration (prefix, cur, at, var_name) =
     let prefix = prefix ^ "    " in
     let at_name, at_size = get_at_info at in
-    let cur_name, cob_var_lst, _with_hold =
+    let cur_name, cob_var_lst, var_name, _with_hold =
       match cur with
       | DeclareCursorSql (cur_name, sql) ->
         ( cur_name,
           Misc.extract_cob_var_name
             (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query sql),
+          var_name,
           false )
-      | DeclareCursorVar (cur_name, cur_var) ->
-        let var =
-          match cur_var with
-          | SqlVar _ -> []
-          | CobolVar v -> [ get_name_cobol_var v ]
-        in
-        (cur_name, var, false)
       | DeclareCursorWhithHold (cur_name, query) ->
         ( cur_name,
           Misc.extract_cob_var_name
             (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query query),
+          var_name,
           true )
+      | DeclareCursorVar (cur_name, cur_var) ->
+        let var =
+          match cur_var with
+          | SqlVar _ -> var_name
+          | CobolVar v -> get_name_cobol_var v
+        in
+        (cur_name, [], var, false)
     in
 
-    let cursor_name = "\"TSQL003A_" ^ cur_name.payload ^ "\" & x\"00\"" in
-    let var_name =
-      num := !num + 1;
-      "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+    let cursor_name =
+      "\""
+      ^ Misc.extract_filename filename
+      ^ "_" ^ cur_name.payload ^ "\" & x\"00\""
     in
 
     let fun_name, cursor_declare =
@@ -545,7 +549,11 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
     Generated_type.Added
       { content = adding;
-        error_treatment = (if !is_error_treatment then Some !error_treatment else None);
+        error_treatment =
+          ( if !is_error_treatment then
+              Some !error_treatment
+            else
+              None );
         with_dot = true
       }
   in
@@ -912,7 +920,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         @ [ generate_GIXSQLExecParam prefix var_name cob_var_list () ] )
     | Ignore _ ->
       (*Ignore, not implemented in Gix (but if this is just ignore, this should do the trick)*)
-      [ ]
+      []
   in
 
   let rec output lines statements =
@@ -984,7 +992,17 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                   None
                   (*if nothing is generated, we don't need error treatment or dots *)
                 )
-              | _ -> (with_dot, if !is_error_treatment then Some !error_treatment else None)
+              | _ -> (
+                match tokens with
+                | DeclareCursor _
+                | At (_, DeclareCursor _) ->
+                  (with_dot, None)
+                | _ ->
+                  ( with_dot,
+                    if !is_error_treatment then
+                      Some !error_treatment
+                    else
+                      None ) )
             in
             old_statements := [];
             Generated_type.Change

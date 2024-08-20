@@ -34,8 +34,75 @@ let get_length cu name =
     (*     Pretty.out " \"%s\" not found. qualname nel lazy_t found" name; *)
     0
 
-(*TODO*)
-let get_type _cu _name = 16
+type cobol_types =
+  | UNKNOWN
+  | COBOL_TYPE_UNSIGNED_NUMBER
+  | COBOL_TYPE_SIGNED_NUMBER_TS   (* trailing separate *)
+  | COBOL_TYPE_SIGNED_NUMBER_TC   (* trailing combined *)
+  | COBOL_TYPE_SIGNED_NUMBER_LS   (* leading separate  *)
+  | COBOL_TYPE_SIGNED_NUMBER_LC   (* leading combined  *)
+  | COBOL_TYPE_UNSIGNED_NUMBER_PD (* packed decimal    *)
+  | COBOL_TYPE_SIGNED_NUMBER_PD   (* packed decimal    *)
+  | COBOL_TYPE_ALPHANUMERIC
+  | COBOL_TYPE_UNSIGNED_BINARY
+  | COBOL_TYPE_SIGNED_BINARY
+  | COBOL_TYPE_JAPANESE
+  | COBOL_TYPE_GROUP
+  | COBOL_TYPE_FLOAT
+  | COBOL_TYPE_DOUBLE
+  | COBOL_TYPE_NATIONAL
+
+let cobol_types_to_int = function
+  | UNKNOWN -> 0
+  | COBOL_TYPE_UNSIGNED_NUMBER -> 1
+  | COBOL_TYPE_SIGNED_NUMBER_TS -> 2
+  | COBOL_TYPE_SIGNED_NUMBER_TC -> 3
+  | COBOL_TYPE_SIGNED_NUMBER_LS -> 4
+  | COBOL_TYPE_SIGNED_NUMBER_LC -> 5
+  | COBOL_TYPE_UNSIGNED_NUMBER_PD -> 8
+  | COBOL_TYPE_SIGNED_NUMBER_PD -> 9
+  | COBOL_TYPE_ALPHANUMERIC -> 16
+  | COBOL_TYPE_UNSIGNED_BINARY -> 22
+  | COBOL_TYPE_SIGNED_BINARY -> 23
+  | COBOL_TYPE_JAPANESE -> 24
+  | COBOL_TYPE_GROUP -> 25
+  | COBOL_TYPE_FLOAT -> 26
+  | COBOL_TYPE_DOUBLE -> 27
+  | COBOL_TYPE_NATIONAL -> 28
+
+let get_type cu name =
+  let cobol_type =
+    try
+      let x_info = get_x_info cu name in
+      match x_info with
+      | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
+        match field_layout with
+        | Elementary_field { usage = Display picture; _ } -> (
+          match picture.category with
+          | Alphabetic _ -> COBOL_TYPE_ALPHANUMERIC (*?*)
+          | Alphanumeric _ -> COBOL_TYPE_ALPHANUMERIC
+          | Boolean _ -> COBOL_TYPE_UNSIGNED_BINARY (*?*)
+          | National _ -> COBOL_TYPE_NATIONAL
+          | FixedNum { with_sign; _ } ->
+            if with_sign then
+              COBOL_TYPE_SIGNED_NUMBER_TS (*leading? combined? idk*)
+            else
+              COBOL_TYPE_UNSIGNED_NUMBER
+          | FloatNum _ -> UNKNOWN )
+        | Elementary_field _
+        | Struct_field _ ->
+          UNKNOWN
+      end
+      | _ -> UNKNOWN
+    with
+    | Not_found ->
+      (*     Pretty.out " \"%s\" not found " name; *)
+      UNKNOWN
+    | Cobol_unit.Qualmap.Ambiguous _ ->
+      (*     Pretty.out " \"%s\" not found. qualname nel lazy_t found" name; *)
+      UNKNOWN
+  in
+  cobol_types_to_int cobol_type
 
 let get_scale cu name =
   try
