@@ -20,7 +20,9 @@ type unconditional_jumps =
   | Go of qualname
 
 type node = {
+  num: int;
   name: qualname;
+  loc: srcloc;
   conditional_jumps: qualname list;
   unconditional_jumps: unconditional_jumps list;
 }
@@ -30,6 +32,7 @@ let full_qn ~cu qn =
 
 let full_qn' ~cu qn = full_qn ~cu ~&qn
 
+let id = ref 0
 
 let build_node ~default_name ~cu paragraph =
   let open struct
@@ -51,15 +54,12 @@ let build_node ~default_name ~cu paragraph =
           skip @@
           match payload with
           | GoToEntry _ -> acc (* TODO couldn't find doc *)
-          | GoToSimple { targets; depending_on } ->
-              let targets = Cobol_common.Basics.NEL.to_list targets in
-            if Option.is_none depending_on
-            then
-              add_unconditional (Go (full_qn' ~cu @@ List.hd targets)) acc
-            else
-              targets
-              |> List.map (full_qn' ~cu)
-              |> List.fold_left add_conditionals acc
+          | GoToSimple { target } ->
+            add_unconditional (Go (full_qn' ~cu target)) acc
+          | GoToDepending { targets; _ } ->
+            Cobol_common.Basics.NEL.to_list targets
+            |> List.map (full_qn' ~cu)
+            |> List.fold_left add_conditionals acc
         method! fold_perform_target' { payload; _ } acc =
           skip @@
           let { payload = start; _ } = payload.perform_target.procedure_start in
@@ -68,15 +68,17 @@ let build_node ~default_name ~cu paragraph =
       end
       paragraph {conditionals = []; unconditional = [] }
   in
-  let name = Option.fold
-      ~none:default_name
-      ~some:(full_qn' ~cu)
-      ~&paragraph.paragraph_name
+  id:=!id+1;
+  let name, loc = match ~&paragraph.paragraph_name with
+    | None -> default_name, ~@paragraph
+    | Some name -> full_qn' ~cu name, ~@name
   in {
-      name;
-      conditional_jumps = conditionals;
-      unconditional_jumps = unconditional;
-    }
+    num = !id;
+    name;
+    loc;
+    conditional_jumps = conditionals;
+    unconditional_jumps = unconditional;
+  }
 
 module Node = struct
   type t = node
@@ -160,6 +162,14 @@ let cfg_of ~(cu: cobol_unit) =
     end (Cfg.empty, Qmap.empty) nodes
   in build_edges ~vertexes g nodes
 
+let vertex_name_quoted { name = qn; _ } =
+  Pretty.to_string "\"%a\""Cobol_ptree.pp_qualname qn
+  |> Str.global_replace (Str.regexp "\n") " "
+
+let vertex_name { name = qn; _ } =
+  Pretty.to_string "%a"Cobol_ptree.pp_qualname qn
+  |> Str.global_replace (Str.regexp "\n") " "
+
 module Dot = Graph.Graphviz.Dot(struct
     include Cfg
     let edge_attributes (_,s,_) =
@@ -175,23 +185,53 @@ module Dot = Graph.Graphviz.Dot(struct
       else []
     let default_vertex_attributes _ = [`Shape `Box]
     let graph_attributes _ = []
-    let vertex_name { name = qn; _} =
-      Pretty.to_string "\"%a\""Cobol_ptree.pp_qualname qn
-      |> Str.global_replace (Str.regexp "\n") " "
+    let vertex_name = vertex_name_quoted
   end)
 
 let string_of g =
   Pretty.to_string "%a" Dot.fprint_graph g
 
-let make (checked_doc: Cobol_typeck.Outputs.t) =
-  try
-  let graphs = Cobol_unit.Collections.SET.fold
-      begin fun { payload = cu; _ } acc ->
-        acc ^ "\n" ^ (string_of @@ cfg_of ~cu)
-      end checked_doc.group ""
-  in
-  graphs
-  with _ -> "no graph failed"
+type graph = {
+  string_repr: string;
+  nodes_pos: (string * srcloc) list
+}
+
+let make_dot ({ group; _ }: Cobol_typeck.Outputs.t) =
+  Cobol_unit.Collections.SET.fold
+    begin fun { payload = cu; _ } acc ->
+      let cfg = cfg_of ~cu in
+      let nodes_pos = Cfg.fold_vertex begin fun n acc ->
+          (vertex_name n, n.loc)::acc
+        end cfg [] in
+      {
+        string_repr = string_of cfg;
+        nodes_pos;
+      } :: acc
+    end group []
+
+(* let make_d3 ({ group; _ }: Cobol_typeck.Outputs.t) = *)
+(*   Cobol_unit.Collections.SET.fold *)
+(*       begin fun { payload = cu; _ } acc -> *)
+(*         let cfg = cfg_of ~cu in *)
+(*         let cfg_edges = Cfg.fold_edges_e *)
+(*             begin fun (n1, _, n2) links -> *)
+(*               links *)
+(*               ^ Pretty.to_string "{source: '%s', target:'%s'}," *)
+(*                 (vertex_name n1) (vertex_name n2) *)
+(*             end cfg "[" ^ "]" in *)
+(*         let cfg_nodes = Cfg.fold_vertex *)
+(*             begin fun n nodes -> *)
+(*               nodes *)
+(*               ^ Pretty.to_string "{id:'%s',size:%d}," *)
+(*                 (vertex_name n) (Cfg.in_degree cfg n + Cfg.out_degree cfg n) *)
+(*             end cfg "[" ^ "]" in *)
+(*         acc ^ Pretty.to_string "{links:%s, nodes:%s}," cfg_edges cfg_nodes *)
+(*       end group "[" ^ "]" *)
+
+let make ?(d3=false) (checked_doc: Cobol_typeck.Outputs.t) =
+  if d3
+  then make_dot checked_doc
+  else make_dot checked_doc
 
 (*
 List of node (sections & paragraphs)
@@ -206,6 +246,7 @@ Visitor over procedure
   - debug_target
   - if else
   - evaluate
+  - exit
 
   paragraph lié au suivant
   section lié au suivant

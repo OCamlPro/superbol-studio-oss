@@ -3092,6 +3092,11 @@ module Window = struct
       -> StatusBarItem.t
       [@@js.global "vscode.window.createStatusBarItem"]
 
+    val createTextEditorDecorationType :
+         options:Ojs.t
+      -> TextEditorDecorationType.t
+      [@@js.global "vscode.window.createTextEditorDecorationType"]
+
     val createTerminal :
          ?name:string
       -> ?shellPath:string

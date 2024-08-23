@@ -44,6 +44,23 @@ let _open_cfg =
       ()
     end
 
+let _open_cfg_d3 =
+  command "superbol.cfg.open.d3" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _ = Superbol_instance.open_cfg ~d3:true _instance in
+      ()
+    end
+
+
+
+let _open_cfg2 =
+  command "superbol.cfg.test" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _ = Superbol_instance.open_webview _instance in
+      ()
+    end
+
+
 
 let _editor_action_findReferences =
   let command_name = "superbol.editor.action.findReferences"  in

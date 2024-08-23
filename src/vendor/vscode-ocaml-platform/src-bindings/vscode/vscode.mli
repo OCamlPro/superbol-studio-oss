@@ -2372,6 +2372,9 @@ module Window : sig
   val createStatusBarItem :
     ?alignment:StatusBarAlignment.t -> ?priority:int -> unit -> StatusBarItem.t
 
+  val createTextEditorDecorationType :
+     options:Ojs.t -> TextEditorDecorationType.t
+
   val createTerminal :
        ?name:string
     -> ?shellPath:string
