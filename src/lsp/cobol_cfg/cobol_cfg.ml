@@ -16,4 +16,7 @@ module INTERNAL = struct
   end
 end
 
-let make = Cfg_builder.make
+module Builder = struct
+  type graph = Cfg_builder.graph
+  let make = Cfg_builder.make
+end

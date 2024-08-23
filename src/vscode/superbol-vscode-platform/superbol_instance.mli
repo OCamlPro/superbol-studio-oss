@@ -27,6 +27,12 @@ val write_project_config
   -> unit Promise.t
 
 val open_cfg
+  : ?d3: bool
+  -> ?text_editor: Vscode.TextEditor.t
+  -> t
+  -> unit Promise.t
+
+val open_webview
   : ?text_editor: Vscode.TextEditor.t
   -> t
   -> unit Promise.t

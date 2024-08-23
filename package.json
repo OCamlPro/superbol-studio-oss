@@ -43,6 +43,16 @@
         "command": "superbol.cfg.open",
         "title": "Open CFG",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open.d3",
+        "title": "Open CFG D3",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.test",
+        "title": "Open as WEbview",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -454,6 +464,11 @@
       "editor/context": [
         {
           "command": "superbol.cfg.open",
+          "group": "superbol",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "superbol.cfg.open.d3",
           "group": "superbol",
           "when": "editorTextFocus"
         }
