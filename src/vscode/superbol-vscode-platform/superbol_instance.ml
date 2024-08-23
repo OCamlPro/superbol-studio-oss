@@ -49,27 +49,20 @@ let start_language_server ({ context; _ } as t) =
   let client =
     let cmd = Executable.command serverOptions in
     if String.starts_with ~prefix:"ws://" cmd then
-      LanguageClient.make_stream
-        ~id
-        ~name
+      LanguageClient.make_stream ~id ~name
         (fun () ->
           let njs_stream =
             Vscode_languageclient.StreamInfo.njs_stream_of_string cmd
           in
           Promise.return (
-              Vscode_languageclient.StreamInfo.create
-                ~writer:njs_stream
-                ~reader:njs_stream
-                ()
-            )
+            Vscode_languageclient.StreamInfo.create ()
+              ~writer:njs_stream
+              ~reader:njs_stream
+          )
         )
     else
       let clientOptions = Superbol_languageclient.client_options () in
-      LanguageClient.make ()
-        ~id
-        ~name
-        ~serverOptions
-        ~clientOptions
+      LanguageClient.make () ~id ~name ~serverOptions ~clientOptions
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
