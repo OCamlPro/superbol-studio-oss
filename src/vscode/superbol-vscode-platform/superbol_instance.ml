@@ -40,6 +40,24 @@ let stop_language_server t =
       else
         Promise.return ()
 
+let is_remote_lsp =
+  let prefix = "tcp://" in
+  fun serverOpt ->
+    let cmd = Executable.command serverOpt in
+    if String.starts_with ~prefix cmd then
+      let l = String.length prefix in
+      let url = String.sub cmd l (String.length cmd - l) in
+      Some url
+    else
+      None
+
+let host_and_port url =
+  let fail () = Format.ksprintf failwith "Invalid %S" url in
+  match String.split_on_char ':' url with
+  | [] | [_] -> fail ()
+  | host :: port :: _ ->
+    try host, int_of_string port with Invalid_argument _ -> fail ()
+
 let start_language_server ({ context; _ } as t) =
   let open Promise.Syntax in
   let* () = stop_language_server t in
@@ -47,21 +65,22 @@ let start_language_server ({ context; _ } as t) =
     Superbol_languageclient.server_options ~context
   in
   let client =
-    let cmd = Executable.command serverOptions in
-    if String.starts_with ~prefix:"tcp://" cmd then
+    match is_remote_lsp serverOptions with
+    | Some url ->
+      let host, port = host_and_port url in
       LanguageClient.make_stream ~id ~name begin fun () ->
         let njs_stream =
           Vscode_languageclient.StreamInfo.njs_stream_of_socket @@
           Node.Net.Socket.(connect (make ()))
-            ~host:"localhost"
-            ~port:8000
+            ~host
+            ~port
         in
         Promise.return @@
         Vscode_languageclient.StreamInfo.create ()
           ~writer:njs_stream
           ~reader:njs_stream
       end
-    else
+    | None ->
       let clientOptions = Superbol_languageclient.client_options () in
       LanguageClient.make () ~id ~name ~serverOptions ~clientOptions
   in
