@@ -71,7 +71,7 @@ let start_language_server ({ context; _ } as t) =
       LanguageClient.make_stream ~id ~name begin fun () ->
         let socket =
           (* Vscode_languageclient.StreamInfo.njs_stream_of_socket @@ *)
-          Node.Net.Socket.(to_ojs (connect (make ()) ~host ~port))
+          Node.Net.Socket.(t_to_js (connect (make ()) ~host ~port))
         in
         Promise.return @@
         Vscode_languageclient.StreamInfo.create ()

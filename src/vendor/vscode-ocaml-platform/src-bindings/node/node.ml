@@ -198,8 +198,6 @@ module Net = struct
   module Socket = struct
     include Class.Make ()
 
-    let to_ojs (t : t) : Ojs.t = (t :> Ojs.t)
-
     include
       [%js:
       val make : unit -> t [@@js.new "net.Socket"]
