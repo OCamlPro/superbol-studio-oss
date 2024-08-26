@@ -170,20 +170,15 @@ end
 module StreamInfo: sig
   include Js.T
 
-  type njs_stream
+  val writer : t -> Ojs.t [@@js.get]
 
-  val njs_stream_of_string : string -> njs_stream
-  val njs_stream_of_socket : 'a -> njs_stream
-
-  val writer : t -> njs_stream [@@js.get]
-
-  val reader : t -> njs_stream [@@js.get]
+  val reader : t -> Ojs.t [@@js.get]
 
   val detached : t -> bool option [@@js.get]
 
   val create :
-    writer:njs_stream
-    -> reader:njs_stream
+    writer:Ojs.t
+    -> reader:Ojs.t
     -> ?detached:bool
     -> unit
     -> t

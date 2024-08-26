@@ -69,16 +69,14 @@ let start_language_server ({ context; _ } as t) =
     | Some url ->
       let host, port = host_and_port url in
       LanguageClient.make_stream ~id ~name begin fun () ->
-        let njs_stream =
-          Vscode_languageclient.StreamInfo.njs_stream_of_socket @@
-          Node.Net.Socket.(connect (make ()))
-            ~host
-            ~port
+        let socket =
+          (* Vscode_languageclient.StreamInfo.njs_stream_of_socket @@ *)
+          Node.Net.Socket.(to_ojs (connect (make ()) ~host ~port))
         in
         Promise.return @@
         Vscode_languageclient.StreamInfo.create ()
-          ~writer:njs_stream
-          ~reader:njs_stream
+          ~writer:socket
+          ~reader:socket
       end
     | None ->
       let clientOptions = Superbol_languageclient.client_options () in

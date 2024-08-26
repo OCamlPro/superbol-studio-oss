@@ -193,31 +193,17 @@ end
 module StreamInfo = struct
   include Interface.Make ()
 
-  type njs_stream
-
-  let njs_stream_of_string str : njs_stream =
-    Format.ksprintf
-      Js_of_ocaml.Js.Unsafe.eval_string
-      "new webSocket (`%s`);"
-      str
-
-    let njs_stream_of_js = Obj.magic
-
-    let njs_stream_to_js = Obj.magic
-
-    let njs_stream_of_socket: _ -> njs_stream = njs_stream_of_js
-
   include
     [%js:
-    val writer : t -> njs_stream [@@js.get]
+    val writer : t -> Ojs.t [@@js.get]
 
-    val reader : t -> njs_stream [@@js.get]
+    val reader : t -> Ojs.t [@@js.get]
 
     val detached : t -> bool option [@@js.get]
 
     val create :
-         writer:njs_stream
-      -> reader:njs_stream
+         writer:Ojs.t
+      -> reader:Ojs.t
       -> ?detached:bool
       -> unit
       -> t

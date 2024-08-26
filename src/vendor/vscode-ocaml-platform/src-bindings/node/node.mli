@@ -156,6 +156,8 @@ module Net : sig
   module Socket : sig
     type t
 
+    val to_ojs : t -> Ojs.t
+
     val make : unit -> t
 
     val isPaused : t -> bool
