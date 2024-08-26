@@ -198,12 +198,14 @@ module StreamInfo = struct
   let njs_stream_of_string str : njs_stream =
     Format.ksprintf
       Js_of_ocaml.Js.Unsafe.eval_string
-      "new joo_global_object.webSocket (`%s`);"
+      "new webSocket (`%s`);"
       str
 
     let njs_stream_of_js = Obj.magic
 
     let njs_stream_to_js = Obj.magic
+
+    let njs_stream_of_socket: _ -> njs_stream = njs_stream_of_js
 
   include
     [%js:

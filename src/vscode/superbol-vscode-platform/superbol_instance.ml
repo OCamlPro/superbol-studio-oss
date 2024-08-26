@@ -48,18 +48,19 @@ let start_language_server ({ context; _ } as t) =
   in
   let client =
     let cmd = Executable.command serverOptions in
-    if String.starts_with ~prefix:"ws://" cmd then
-      LanguageClient.make_stream ~id ~name
-        (fun () ->
-          let njs_stream =
-            Vscode_languageclient.StreamInfo.njs_stream_of_string cmd
-          in
-          Promise.return (
-            Vscode_languageclient.StreamInfo.create ()
-              ~writer:njs_stream
-              ~reader:njs_stream
-          )
-        )
+    if String.starts_with ~prefix:"tcp://" cmd then
+      LanguageClient.make_stream ~id ~name begin fun () ->
+        let njs_stream =
+          Vscode_languageclient.StreamInfo.njs_stream_of_socket @@
+          Node.Net.Socket.(connect (make ()))
+            ~host:"localhost"
+            ~port:8000
+        in
+        Promise.return @@
+        Vscode_languageclient.StreamInfo.create ()
+          ~writer:njs_stream
+          ~reader:njs_stream
+      end
     else
       let clientOptions = Superbol_languageclient.client_options () in
       LanguageClient.make () ~id ~name ~serverOptions ~clientOptions

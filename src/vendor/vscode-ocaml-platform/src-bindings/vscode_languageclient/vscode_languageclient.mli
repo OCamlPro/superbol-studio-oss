@@ -167,12 +167,13 @@ module DidChangeConfiguration : sig
   val create : settings:Ojs.t -> unit -> t
 end
 
-module StreamInfo : sig
+module StreamInfo: sig
   include Js.T
 
   type njs_stream
 
   val njs_stream_of_string : string -> njs_stream
+  val njs_stream_of_socket : 'a -> njs_stream
 
   val writer : t -> njs_stream [@@js.get]
 
