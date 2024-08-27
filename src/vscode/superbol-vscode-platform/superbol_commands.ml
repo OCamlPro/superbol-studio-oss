@@ -40,14 +40,14 @@ let command id handler =
 let _open_cfg =
   command "superbol.cfg.open" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ = Superbol_instance.open_cfg _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg _instance in
       ()
     end
 
 let _open_cfg_d3 =
   command "superbol.cfg.open.d3" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ = Superbol_instance.open_cfg ~d3:true _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~d3:true _instance in
       ()
     end
 
@@ -56,7 +56,7 @@ let _open_cfg_d3 =
 let _open_cfg2 =
   command "superbol.cfg.test" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ = Superbol_instance.open_webview _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_webview _instance in
       ()
     end
 
