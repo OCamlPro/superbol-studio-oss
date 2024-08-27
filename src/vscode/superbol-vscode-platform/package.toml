@@ -21,8 +21,8 @@ kind = "program"
 # name of a file to generate with the current version
 gen-version = "version.ml"
 
-# supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
-# default is [ "ocamllex", "ocamlyacc" ] 
+# supported file generators are "ocamllex", "ocamlyacc" and "menhir"
+# default is [ "ocamllex", "ocamlyacc" ]
 # generators = [ "ocamllex", "menhir" ]
 
 # menhir options for the package
@@ -42,7 +42,7 @@ gen-version = "version.ml"
 # pack = "Mylib"
 
 # preprocessing options
-#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
 preprocess = "pps gen_js_api.ppx"
 
 # files to skip while updating at package level
@@ -51,7 +51,7 @@ skip = []
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
-#   base-unix = { libname = "unix", version = ">=base" } 
+#   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
 gen_js_api = "1.1.1"
 js_of_ocaml = ">=4"
@@ -62,6 +62,7 @@ polka-js-stubs = "version"
 promise_jsoo = "0.3.1"
 vscode-js-stubs = "version"
 vscode-languageclient-js-stubs = "version"
+ez_subst = ">=0.2.1"
 
 # package tools dependencies
 [tools]
@@ -69,15 +70,15 @@ js_of_ocaml-ppx = ">=4"
 
 # package fields (depends on package skeleton)
 #Examples:
-#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))" 
-#  dune-libraries = "bigstring" 
-#  dune-trailer = "(install (..))" 
-#  opam-trailer = "pin-depends: [..]" 
-#  no-opam-test = "yes" 
-#  no-opam-doc = "yes" 
-#  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
-#  static-clibs = "unix" 
+#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))"
+#  dune-libraries = "bigstring"
+#  dune-trailer = "(install (..))"
+#  opam-trailer = "pin-depends: [..]"
+#  no-opam-test = "yes"
+#  no-opam-doc = "yes"
+#  gen-opam = "some" | "all"
+#  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
+#  static-clibs = "unix"
 [fields]
 dune-stanzas = """
  (js_of_ocaml (flags --source-map --pretty))

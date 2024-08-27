@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+html, body {
+  height: 100%;
+}
+text {
+  font: 12px monospace;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+svg {
+    background-color: white;
+    height: 100%;
+    width: 100%;
+}
+button#refresh {
+  position: absolute;
+  margin: 5px;
+}
+
+</style></head>
+<html>
+<body>
+  <button id="refresh">Refresh</button>
+</body>
+<script src="https://d3js.org/d3.v7.js"></script>
+<script>
+const vscode = acquireVsCodeApi()
+// http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
+drag = simulation => {
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+  return d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended);
+}
+
+const LETTER_LEN = 7.25;
+const NODE_HEIGHT = 16;
+
+function nodeWidth(n) {
+  return (n.id.length + 2) * LETTER_LEN
+}
+
+function linkArc(d) {
+  const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+  return `M${d.source.x},${d.source.y}
+    A${r},${r} 0 0,1 ${d.target.x},${d.target.y}`;
+}
+
+function linkLine(d) {
+  return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
+}
+
+function linkShortestLine(d) {
+  function dist(a, b) {
+    return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
+  }
+  function getContactPoints(n) {
+    var w = nodeWidth(n) / 2;
+    var h = NODE_HEIGHT / 2;
+    return [{x:w, y:0}, {x:w, y:h}, {x:0, y:h}, {x:-w, y:h}, {x:-w, y:0}, {x:-w, y:-h}, {x:0, y:-h}, {x:w, y:-h}]
+      .map(({x, y}) => ({ x: x + n.x, y: y + n.y, center: x == 0 || y == 0 }))
+  }
+  function getBestContactPoint(s, t) {
+    var sPoints = getContactPoints(s);
+    var tPoints = getContactPoints(t);
+    var res;
+    var min = Number.MAX_VALUE;
+    sPoints.forEach(sCoord => {
+      tPoints.forEach(tCoord => {
+        var d = dist(sCoord, tCoord);
+        d += sCoord.center ? -1 : 0;
+        if (d < min) {
+          res = [sCoord, tCoord];
+          min = d;
+        }
+      })
+    })
+    return res;
+  }
+  if(d.source.dist == 3 || d.target.dist == 3) {
+    return ""
+  }
+  var [sourceContact, targetContact] = getBestContactPoint(d.source, d.target);
+  return `M${sourceContact.x},${sourceContact.y}
+    L${targetContact.x},${targetContact.y}`;
+}
+
+const width = window.innerWidth;
+const height = window.innerHeight;
+const { nodes, links } = %{graph};
+const types = Array.from(new Set(links.map(d => d.type)));
+
+function updateDistanceToCenter(center) {
+  nodes.forEach(n => { n.dist = 3 });
+  nodes[center].dist = 0;
+  var secondDegree = [];
+  nodes[center].neigh.forEach(idx => {
+    nodes[idx].dist = 1;
+    if(nodes[idx].neigh.length < 10) {
+      secondDegree.push(...nodes[idx].neigh);
+    }
+  });
+  Array.from(new Set(secondDegree)).forEach(idx => {
+    if(nodes[idx].dist > 2) {
+      nodes[idx].dist = 2;
+    }
+  })
+}
+
+function radialForce(d) {
+  return [0, 150, 350, 1000][d.dist]
+}
+
+const color = d3.scaleOrdinal(types, d3.schemeCategory10);
+const radial = d3.forceRadial(radialForce).strength(1)
+const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).strength(0.01))
+
+// setup node neighbours
+nodes.forEach(n => {
+  neigh = []
+  links.forEach(l => {
+    if(l.source.id == n.id) {
+      neigh.push(l.target.index)
+    }
+    else if (l.target.id == n.id) {
+      neigh.push(l.source.index)
+    }
+  })
+  n.neigh = Array.from(new Set(neigh))
+})
+updateDistanceToCenter(0)
+
+simulation.force("radial", radial)
+  .force("charge", d3.forceManyBody().strength(-300))
+
+// SVG creation
+const svg = d3.select('body').append("svg")
+  .attr("viewBox", [-width / 2, -height / 2, width, height])
+  .attr("width", width)
+  .attr("height", height);
+
+// Per-type markers, as they don't inherit styles.
+svg.append("defs").selectAll("marker")
+  .data(types)
+  .join("marker")
+  .attr("id", d => `arrow-${d}`)
+  .attr("viewBox", "0 -5 10 10")
+  .attr("refX", 10)
+  .attr("refY", 0)
+  .attr("markerWidth", 6)
+  .attr("markerHeight", 6)
+  .attr("orient", "auto")
+  .append("path")
+  .attr("fill", color)
+  .attr("d", "M0,-5L10,0L0,5");
+
+const link = svg.append("g")
+  .attr("fill", "none")
+  .attr("stroke-width", 1.5)
+  .selectAll("path")
+  .data(links)
+  .join("path")
+  .attr("stroke", d => color(d.type))
+  .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location)})`);
+
+const node = svg.append("g")
+  .attr("fill", "black")
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round")
+  .selectAll("g")
+  .data(nodes)
+  .join("g")
+  .call(drag(simulation))
+  .on('click', (d, n) => {
+    updateDistanceToCenter(n.index);
+    radial.radius(radialForce)
+    node.selectAll("rect")
+      .attr("stroke-width", d => (d.dist == 1 && d.neigh.length >= 10) ? 2.5 : 1.5)
+    vscode.postMessage({
+      command: 'click',
+      node: n.id
+    })
+    });
+node.append("rect")
+  .attr('fill', 'white')
+  .attr("stroke", "black")
+  .attr("stroke-width", d => (d.dist == 1 && d.neigh.length >= 10) ? 2.5 : 1.5)
+  .attr("x", (n) => - nodeWidth(n) / 2)
+  .attr("y", - NODE_HEIGHT / 2)
+  .attr("width", nodeWidth)
+  .attr("height", NODE_HEIGHT)
+node.append("text")
+  .attr("x", (n) => -n.id.length * LETTER_LEN / 2)
+  .attr("y", 4) // 1em - 8px
+  .text(d => d.id)
+
+simulation.on("tick", () => {
+  link.attr("d", linkShortestLine);
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+})
+</script>
+</html>

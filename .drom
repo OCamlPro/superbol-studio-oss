@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-dd08986c5df5ea11a012b12eb2968497:.
+6062bbdd30a0f090c868241e9de4b10d:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -78,6 +78,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 c375da381bfae0c77c7af1cb51f96580:dune-project
 cde29409c1d991e499786d56924f8fc9:dune-project
 68f1f36e943a31bcb34b9b97f6830817:dune-project
+afd60e19795dd45cbf2d203174f50a68:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -202,7 +203,7 @@ ec375db9ddc4ed967f4099edcb93ea4e:opam/pretty.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-696cf15f5579572d1a87320947a9413e:opam/superbol-vscode-platform.opam
+70ed3832042952f1fb3dd86f38ec4759:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
@@ -587,7 +588,7 @@ de6c46a271140f4f52b2580e0d876351:src/vendor/vscode-ocaml-platform/src-bindings/v
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-664342638a68e3f2f79d39343772e32f:src/vscode/superbol-vscode-platform/dune
+0e68ee450858b5a156784dda22a7c39a:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt

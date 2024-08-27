@@ -128,225 +128,6 @@ let get_project_config instance =
       in
       Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc
 
-(** Credit @beiclause in https://github.com/beicause/call-graph/blob/master/src/html.ts *)
-let html dot = Printf.sprintf {|
-<!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Call Graph</title>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-        <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
-    </head>
-
-    <body>
-        <div id="app"></div>
-    </body>
-    <script>
-        const vscode = acquireVsCodeApi()
-        d3.select('#app').graphviz().renderDot(`%s`).zoom(false)
-        .on('end', addListener);
-        function addListener() {
-          nodes = d3.selectAll('.node');
-          nodes
-          .on("click", function () {
-            console.log("click");
-            var title = d3.select(this).selectAll('title').text().trim();
-            vscode.postMessage({
-                command: 'click',
-                node:title
-            })
-          })
-        }
-    </script>
-    </html>
-  |} dot
-
-let _open_cfg ?text_editor instance =
-  let open_cfg_for ?uri client =
-    let uri, uri_ojs = match uri with
-      | Some uri ->
-        Jsonoo.Encode.string @@ Vscode.Uri.path uri,
-        Vscode.Uri.t_to_js uri
-      | None ->
-        Jsonoo.Encode.string "", Ojs.null
-    in
-    Vscode_languageclient.LanguageClient.sendRequest client ()
-      ~meth:"superbol/openCFG"
-      ~data:uri |>
-    Promise.(then_ ~fulfilled:(fun res ->
-        (* TODO: do not reopen a different window for each call *)
-        let dot_content = Jsonoo.Decode.string res in
-        let newWebviewPanel =
-          Vscode.Window.createWebviewPanel
-            ~viewType:"cfg" ~title:"CFG webview"
-            ~showOptions:(Vscode.ViewColumn.Two) in
-        let webview = Vscode.WebviewPanel.webview newWebviewPanel in
-        Vscode.WebView.set_html webview (html dot_content);
-        Vscode.WebView.set_options webview (Vscode.WebviewOptions.create ~enableScripts:true ());
-        let listener arg =
-          let node = Ojs.get_prop_ascii arg "node" |> Ojs.string_of_js in
-          let message = "Heard click on node: " ^ node in
-          let _ = Vscode.Window.showErrorMessage () ~message in
-          let pos = Vscode.Position.t_to_js @@ Vscode.Position.make ~line:12 ~character:20 in
-          let args = Ojs.empty_obj () in
-          Ojs.set_prop_ascii pos "position" args;
-          let _ = Vscode.Commands.executeCommand
-              ~command:"editor.action.goToLocations"
-              (* ~args:[uri_ojs; pos] *)
-              ~args:[uri_ojs; pos; Ojs.array_make 0]
-          in
-          ()
-        in
-        let _ = Vscode.WebView.onDidReceiveMessage webview ~listener ~thisArgs:Ojs.null ~disposables:[] () in
-        return ()
-      ))
-  in
-  match client instance, current_document_uri ?text_editor () with
-  | Some client, uri ->
-    open_cfg_for ?uri client
-  | None, _ ->
-    (* TODO: is there a way to activate the extension from here?  Starting the
-       client/instance seems to launch two distinct LSP server processes. *)
-    Promise.(then_ ~fulfilled:(fun _ -> return ())) @@
-    Vscode.Window.showErrorMessage ()
-      ~message:"The SuperBOL LSP client is not running; please retry after a \
-                COBOL file has been opened"
-
-let html_d3 = Printf.sprintf {|
-<!DOCTYPE html>
-<html>
-  <head>
-  <meta charset="utf-8">
-  <style>
-  html, body {
-    height: 100%%;
-  }
-  .link {
-    fill: none;
-    stroke: #666;
-    stroke-width: 1.5px;
-  }
-  #licensing {
-    fill: green;
-  }
-  .link.licensing {
-    stroke: green;
-  }
-  .link.resolved {
-    stroke-dasharray: 0,2 1;
-  }
-  circle {
-    fill: #ccc;
-    stroke: #333;
-    stroke-width: 1.5px;
-  }
-  text {
-    font: 10px sans-serif;
-    pointer-events: none;
-    text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
-  }
-  svg {
-      background-color: white;
-  }
-  </style>
-  </head>
-  <body></body>
-  <script src="https://d3js.org/d3.v3.min.js"></script>
-<script>
-
-// http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
-var links = %s;
-
-var nodes = {};
-
-// Compute the distinct nodes from the links.
-links.forEach(function(link) {
-  link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-  link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
-});
-
-var width = window.innerWidth,
-    height = window.innerHeight;
-
-var force = d3.layout.force()
-    .nodes(d3.values(nodes))
-    .links(links)
-    .size([width, height])
-    .linkDistance(50)
-    .charge(-300)
-    .on("tick", tick)
-    .start();
-
-
-var svg = d3.select("body").append("svg")
-    .attr("width", "")
-    .attr("height", "");
-
-// Per-type markers, as they don't inherit styles.
-svg.append("defs").selectAll("marker")
-    .data(["suit", "licensing", "resolved"])
-    .enter().append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .attr("orient", "auto")
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
-
-var path = svg.append("g").selectAll("path")
-    .data(force.links())
-  .enter().append("path")
-    .attr("class", function(d) { return "link " + d.type; })
-    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; });
-
-var circle = svg.append("g").selectAll("circle")
-    .data(force.nodes())
-    .enter().append("circle")
-    .attr("r", 6)
-    .call(force.drag);
-
-var text = svg.append("g").selectAll("text")
-    .data(force.nodes())
-  .enter().append("text")
-    .attr("x", 8)
-    .attr("y", ".31em")
-    .text(function(d) { return d.name; });
-
-addEventListener('resize', function() {
-    force.size([window.innerWidth, window.innerHeight]);
-    console.log('resized');
- });
-
-// Use elliptical arc path segments to doubly-encode directionality.
-function tick() {
-  path.attr("d", linkArc);
-  circle.attr("transform", transform);
-  text.attr("transform", transform);
-}
-
-function linkArc(d) {
-  var dx = d.target.x - d.source.x,
-      dy = d.target.y - d.source.y,
-      dr = Math.sqrt(dx * dx + dy * dy).toFixed(3);
-  return "M" + d.source.x.toFixed(3) + "," + d.source.y.toFixed(3)
-       + "A" + dr + "," + dr + " 0 0,1 " + d.target.x.toFixed(3) + "," + d.target.y.toFixed(3);
-}
-
-function transform(d) {
-  return "translate(" + d.x.toFixed(1) + "," + d.y.toFixed(1) + ")";
-}
-
-</script>
-</html>
-  |}
-
 let webview_panels = Hashtbl.create 1
 let create_or_get_webview ~uri =
   let filename = Vscode.Uri.path uri in
@@ -395,7 +176,14 @@ let on_click ~nodes_pos ~decorationType ~text_editor arg =
           Promise.return ())
     in ()
 
-let open_cfg_for ?(d3=false) ~text_editor client =
+let read_whole_file filename =
+  (* open_in_bin works correctly on Unix and Windows *)
+  let ch = open_in_bin filename in
+  let s = really_input_string ch (in_channel_length ch) in
+  close_in ch;
+  s
+
+let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
   let open Vscode in
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let data =
@@ -410,7 +198,11 @@ let open_cfg_for ?(d3=false) ~text_editor client =
         Jsonoo.Decode.field "string_repr" Jsonoo.Decode.string res in
       let nodes_pos = Jsonoo.Decode.field "nodes_pos" Jsonoo.Decode.(dict id) res in
       let webview = create_or_get_webview ~uri in
-      let html = (if d3 then html_d3 else html) graph_content in
+      let img_uri = Uri.joinPath extension_uri
+          ~pathSegments:["assets"; if d3 then "cfg-d3-renderer.html" else "cfg-dot-renderer.html"] in
+      let html_file =
+        read_whole_file @@ Uri.fsPath img_uri in
+      let html = Ez_subst.V2.EZ_SUBST.string ~sep:'%' ~brace:(fun () _ -> graph_content) ~ctxt:() html_file in
       WebView.set_html webview html;
       WebView.set_options webview (WebviewOptions.create ~enableScripts:true ());
       ignore(
@@ -426,7 +218,8 @@ let open_cfg ?(d3=false) ?text_editor instance =
     | e -> e in
   match client instance, text_editor with
   | Some client, Some text_editor ->
-    open_cfg_for ~d3 ~text_editor client
+    let extension_uri = Vscode.ExtensionContext.extensionUri instance.context in
+    open_cfg_for ~d3 ~extension_uri ~text_editor client
   | _ -> Promise.return ()
 
 (* debug TO REMOVE *)
