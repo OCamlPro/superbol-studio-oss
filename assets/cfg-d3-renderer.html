@@ -26,7 +26,7 @@ button#refresh {
 <body>
   <button id="refresh">Refresh</button>
 </body>
-<script src="https://d3js.org/d3.v7.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 const vscode = acquireVsCodeApi()
 // http://blog.thomsonreuters.com/index.php/mobile-patent-suits-graphic-of-the-day/
@@ -108,49 +108,38 @@ const height = window.innerHeight;
 const { nodes, links } = %{graph};
 const types = Array.from(new Set(links.map(d => d.type)));
 
-function updateDistanceToCenter(center) {
-  nodes.forEach(n => { n.dist = 3 });
-  nodes[center].dist = 0;
-  var secondDegree = [];
-  nodes[center].neigh.forEach(idx => {
-    nodes[idx].dist = 1;
-    if(nodes[idx].neigh.length < 10) {
-      secondDegree.push(...nodes[idx].neigh);
-    }
-  });
-  Array.from(new Set(secondDegree)).forEach(idx => {
-    if(nodes[idx].dist > 2) {
-      nodes[idx].dist = 2;
-    }
-  })
-}
-
-function radialForce(d) {
-  return [0, 150, 350, 1000][d.dist]
+const radial = d3.forceRadial(0).strength(1)
+function updateRadialForce(center) {
+  function radialForce(d) {
+    return [0, 150, 350, 1000][d.dist]
+  }
+  function updateDistanceToCenter(center) {
+    nodes.forEach(n => { n.dist = 3 });
+    nodes[center].dist = 0;
+    var secondDegree = [];
+    nodes[center].neigh.forEach(idx => {
+      nodes[idx].dist = 1;
+      if(nodes[idx].neigh.length < 10) {
+        secondDegree.push(...nodes[idx].neigh);
+      }
+    });
+    Array.from(new Set(secondDegree)).forEach(idx => {
+      if(nodes[idx].dist > 2) {
+        nodes[idx].dist = 2;
+      }
+    })
+  }
+  updateDistanceToCenter(center);
+  radial.radius(radialForce)
+  svgNode?.selectAll("rect")
+    .attr("stroke-width", d => (d.dist == 1 && d.neigh.length >= 10) ? 2.5 : 1.5)
 }
 
 const color = d3.scaleOrdinal(types, d3.schemeCategory10);
-const radial = d3.forceRadial(radialForce).strength(1)
 const simulation = d3.forceSimulation(nodes)
   .force("link", d3.forceLink(links).id(d => d.id).strength(0.01))
-
-// setup node neighbours
-nodes.forEach(n => {
-  neigh = []
-  links.forEach(l => {
-    if(l.source.id == n.id) {
-      neigh.push(l.target.index)
-    }
-    else if (l.target.id == n.id) {
-      neigh.push(l.source.index)
-    }
-  })
-  n.neigh = Array.from(new Set(neigh))
-})
-updateDistanceToCenter(0)
-
-simulation.force("radial", radial)
   .force("charge", d3.forceManyBody().strength(-300))
+  //Radial force setup later
 
 // SVG creation
 const svg = d3.select('body').append("svg")
@@ -173,7 +162,7 @@ svg.append("defs").selectAll("marker")
   .attr("fill", color)
   .attr("d", "M0,-5L10,0L0,5");
 
-const link = svg.append("g")
+const svgLink = svg.append("g")
   .attr("fill", "none")
   .attr("stroke-width", 1.5)
   .selectAll("path")
@@ -182,7 +171,7 @@ const link = svg.append("g")
   .attr("stroke", d => color(d.type))
   .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location)})`);
 
-const node = svg.append("g")
+const svgNode = svg.append("g")
   .attr("fill", "black")
   .attr("stroke-linecap", "round")
   .attr("stroke-linejoin", "round")
@@ -191,31 +180,53 @@ const node = svg.append("g")
   .join("g")
   .call(drag(simulation))
   .on('click', (d, n) => {
-    updateDistanceToCenter(n.index);
-    radial.radius(radialForce)
-    node.selectAll("rect")
-      .attr("stroke-width", d => (d.dist == 1 && d.neigh.length >= 10) ? 2.5 : 1.5)
+    simulation.alpha(.3).restart()
     vscode.postMessage({
       command: 'click',
       node: n.id
     })
+    updateRadialForce(n.index);
     });
-node.append("rect")
+
+svgNode.append("rect")
   .attr('fill', 'white')
   .attr("stroke", "black")
-  .attr("stroke-width", d => (d.dist == 1 && d.neigh.length >= 10) ? 2.5 : 1.5)
   .attr("x", (n) => - nodeWidth(n) / 2)
   .attr("y", - NODE_HEIGHT / 2)
   .attr("width", nodeWidth)
   .attr("height", NODE_HEIGHT)
-node.append("text")
+svgNode.append("text")
   .attr("x", (n) => -n.id.length * LETTER_LEN / 2)
   .attr("y", 4) // 1em - 8px
   .text(d => d.id)
 
-simulation.on("tick", () => {
-  link.attr("d", linkShortestLine);
-  node.attr("transform", d => `translate(${d.x},${d.y})`);
+// setup node neighbours
+nodes.forEach(n => {
+  neigh = []
+  links.forEach(l => {
+    if(l.source.id == n.id) {
+      neigh.push(l.target.index)
+    }
+    else if (l.target.id == n.id) {
+      neigh.push(l.source.index)
+    }
+  })
+  n.neigh = Array.from(new Set(neigh))
 })
+updateRadialForce(0)
+simulation.force("radial", radial)
+
+
+simulation.on("tick", () => {
+  svgLink.attr("d", linkShortestLine);
+  svgNode.attr("transform", d => `translate(${d.x},${d.y})`);
+})
+
+window.addEventListener('message', event => {
+  var n = nodes.find(n => n.id == event.data)
+  simulation.alpha(.3).restart()
+  updateRadialForce(n?.index || 0)
+ })
+
 </script>
 </html>

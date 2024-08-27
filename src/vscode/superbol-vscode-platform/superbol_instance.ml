@@ -128,13 +128,18 @@ let get_project_config instance =
       in
       Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc
 
+let _log message = ignore(Vscode.Window.showInformationMessage () ~message)
+
 let webview_panels = Hashtbl.create 1
+let window_listener = ref None
 let create_or_get_webview ~uri =
   let filename = Vscode.Uri.path uri in
   Vscode.WebviewPanel.webview @@
   match Hashtbl.find_opt webview_panels filename with
   | Some webview_panel ->
     Vscode.WebviewPanel.reveal webview_panel ();
+    let webview = Vscode.WebviewPanel.webview webview_panel in
+    let _ = Vscode.WebView.postMessage webview (Ojs.int_to_js 2) in
     webview_panel
   | None ->
     let webview_panel = Vscode.Window.createWebviewPanel
@@ -142,12 +147,19 @@ let create_or_get_webview ~uri =
         ~showOptions:(Vscode.ViewColumn.Beside) in
     ignore(
       Vscode.WebviewPanel.onDidDispose webview_panel ()
-        ~listener:(fun () -> Hashtbl.remove webview_panels filename)
-        ~thisArgs:Ojs.null ~disposables:[]);
+        ~listener:begin fun () ->
+          Hashtbl.remove webview_panels filename;
+          if Hashtbl.length webview_panels == 0
+          then (
+            ignore(Option.map Vscode.Disposable.dispose !window_listener);
+            window_listener := None)
+        end ~thisArgs:Ojs.null ~disposables:[]);
     Hashtbl.add webview_panels filename webview_panel;
     webview_panel
 
-let _log message = ignore(Vscode.Window.showInformationMessage () ~message)
+let webview_find_opt ~uri =
+  Hashtbl.find_opt webview_panels @@ Vscode.Uri.path uri
+  |> Option.map Vscode.WebviewPanel.webview
 
 let create_decoration_type () =
   let backgroundColor = Ojs.string_to_js "#75ff3388" in
@@ -175,6 +187,40 @@ let on_click ~nodes_pos ~decorationType ~text_editor arg =
             ~rangesOrOptions:(`Ranges [range]);
           Promise.return ())
     in ()
+
+let setup_window_listener ~client =
+  let open Vscode in
+  let listener event =
+    let text_editor = TextEditorSelectionChangeEvent.textEditor event in
+    let uri = TextEditor.document text_editor |> TextDocument.uri in
+    let webview = webview_find_opt ~uri in
+    match webview with
+    | None -> ()
+    | Some webview ->
+      match TextEditorSelectionChangeEvent.selections event with
+      | [] -> ()
+      | selection::_ ->
+        let pos_start = Selection.start selection in
+        let data =
+          let uri = Jsonoo.Encode.string @@ Vscode.Uri.path uri in
+          Jsonoo.Encode.object_
+            ["uri", uri;
+             "line", Jsonoo.Encode.int @@ Position.line pos_start;
+             "character", Jsonoo.Encode.int @@ Position.character pos_start]
+        in
+        ignore(
+          Vscode_languageclient.LanguageClient.sendRequest client ()
+            ~meth:"superbol/findProcedure" ~data
+          |> Promise.(then_ ~fulfilled:begin fun res ->
+              WebView.postMessage webview @@ Jsonoo.t_to_js res
+            end))
+  in
+  let disposable_listener =
+    match !window_listener with
+    | Some listener -> listener
+    | None -> Window.onDidChangeTextEditorSelection () ()
+                ~listener ~thisArgs:Ojs.null ~disposables:[] in
+  window_listener := Some disposable_listener
 
 let read_whole_file filename =
   (* open_in_bin works correctly on Unix and Windows *)
@@ -209,6 +255,7 @@ let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
         WebView.onDidReceiveMessage webview ()
           ~listener:(on_click ~text_editor ~decorationType ~nodes_pos)
           ~thisArgs:Ojs.null ~disposables:[]);
+      setup_window_listener ~client;
       return ()
     ))
 
