@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-718cb8b13f0858c7f365dd1cc0efd9bd:.
+20136047f51b526eb8e6687fe5da7afe:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -76,7 +76,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-4e989e0a9f2846286056c008047f99ff:dune-project
+c375da381bfae0c77c7af1cb51f96580:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -236,7 +236,7 @@ e44a633b92fe42cc1f4878b395dade73:opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-82cdf3a555c66031532140198aa74541:opam/vscode-languageclient-js-stubs.opam
+22f87d3eb763c55be00a0a1fdaf381b1:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
 # begin context for scripts/after.sh
@@ -561,7 +561,7 @@ de6c46a271140f4f52b2580e0d876351:src/vendor/vscode-ocaml-platform/src-bindings/v
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
-995d796d5acbb0b17aef1bc888c34531:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+538f01cd4e7ceae6575f3450677d672f:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt

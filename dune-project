@@ -110,6 +110,7 @@
    (ocaml (>= 4.14.0))
    (vscode-js-stubs (= version))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
+   (node-js-stubs (= version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
    (interop-js-stubs (= version))

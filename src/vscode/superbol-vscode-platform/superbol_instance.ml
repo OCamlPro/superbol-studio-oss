@@ -67,20 +67,17 @@ let start_language_server ({ context; _ } as t) =
   let client =
     match is_remote_lsp serverOptions with
     | Some url ->
-      let host, port = host_and_port url in
-      LanguageClient.make_stream ~id ~name begin fun () ->
-        let socket =
-          (* Vscode_languageclient.StreamInfo.njs_stream_of_socket @@ *)
-          Node.Net.Socket.(t_to_js (connect (make ()) ~host ~port))
-        in
-        Promise.return @@
-        Vscode_languageclient.StreamInfo.create ()
-          ~writer:socket
-          ~reader:socket
-      end
+        let host, port = host_and_port url in
+        LanguageClient.make_stream ~id ~name begin fun () ->
+          let socket = Node.Net.Socket.(connect (make ()) ~host ~port) in
+          Promise.return @@
+          Vscode_languageclient.StreamInfo.create ()
+            ~writer:socket
+            ~reader:socket
+        end
     | None ->
-      let clientOptions = Superbol_languageclient.client_options () in
-      LanguageClient.make () ~id ~name ~serverOptions ~clientOptions
+        let clientOptions = Superbol_languageclient.client_options () in
+        LanguageClient.make () ~id ~name ~serverOptions ~clientOptions
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client

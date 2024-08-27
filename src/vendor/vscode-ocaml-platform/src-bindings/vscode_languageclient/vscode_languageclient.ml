@@ -195,15 +195,15 @@ module StreamInfo = struct
 
   include
     [%js:
-    val writer : t -> Ojs.t [@@js.get]
+    val writer : t -> Node.Net.Socket.t [@@js.get]
 
-    val reader : t -> Ojs.t [@@js.get]
+    val reader : t -> Node.Net.Socket.t [@@js.get]
 
     val detached : t -> bool option [@@js.get]
 
     val create :
-         writer:Ojs.t
-      -> reader:Ojs.t
+         writer: Node.Net.Socket.t
+      -> reader: Node.Net.Socket.t
       -> ?detached:bool
       -> unit
       -> t
