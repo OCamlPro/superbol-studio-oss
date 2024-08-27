@@ -100,6 +100,10 @@ module Edge = struct
    let compare = Stdlib.compare
    let equal = (=)
    let default = Default
+   let to_string = function
+     | Default -> "d"
+     | Conditional -> "c"
+     | Unconditional -> "u"
 end
 
 module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
@@ -209,28 +213,32 @@ let make_dot ({ group; _ }: Cobol_typeck.Outputs.t) =
       } :: acc
     end group []
 
-(* let make_d3 ({ group; _ }: Cobol_typeck.Outputs.t) = *)
-(*   Cobol_unit.Collections.SET.fold *)
-(*       begin fun { payload = cu; _ } acc -> *)
-(*         let cfg = cfg_of ~cu in *)
-(*         let cfg_edges = Cfg.fold_edges_e *)
-(*             begin fun (n1, _, n2) links -> *)
-(*               links *)
-(*               ^ Pretty.to_string "{source: '%s', target:'%s'}," *)
-(*                 (vertex_name n1) (vertex_name n2) *)
-(*             end cfg "[" ^ "]" in *)
-(*         let cfg_nodes = Cfg.fold_vertex *)
-(*             begin fun n nodes -> *)
-(*               nodes *)
-(*               ^ Pretty.to_string "{id:'%s',size:%d}," *)
-(*                 (vertex_name n) (Cfg.in_degree cfg n + Cfg.out_degree cfg n) *)
-(*             end cfg "[" ^ "]" in *)
-(*         acc ^ Pretty.to_string "{links:%s, nodes:%s}," cfg_edges cfg_nodes *)
-(*       end group "[" ^ "]" *)
+let make_d3 ({ group; _ }: Cobol_typeck.Outputs.t) =
+  Cobol_unit.Collections.SET.fold
+    begin fun { payload = cu; _ } acc ->
+      let cfg = cfg_of ~cu in
+      let cfg_edges = Cfg.fold_edges_e
+          begin fun (n1, e, n2) links ->
+            links
+            ^ Pretty.to_string "{source: '%s', target:'%s', type:'%s'},"
+              (vertex_name n1) (vertex_name n2) (Edge.to_string e)
+          end cfg "[" ^ "]" in
+      let cfg_nodes = Cfg.fold_vertex
+          begin fun n nodes ->
+            nodes
+            ^ Pretty.to_string "{id:'%s'}," (vertex_name n)
+          end cfg "[" ^ "]" in
+      {
+        string_repr = Pretty.to_string "{links:%s, nodes:%s}" cfg_edges cfg_nodes;
+        nodes_pos = Cfg.fold_vertex begin fun n acc ->
+            (vertex_name n, n.loc)::acc
+          end cfg []
+      } :: acc
+    end group []
 
 let make ?(d3=false) (checked_doc: Cobol_typeck.Outputs.t) =
   if d3
-  then make_dot checked_doc
+  then make_d3 checked_doc
   else make_dot checked_doc
 
 (*

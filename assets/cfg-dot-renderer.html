@@ -1,0 +1,32 @@
+<!-- Credit @beicause in https://github.com/beicause/call-graph/blob/master/src/html.ts -->
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>COBOL CFG</title>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
+        <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+    </head>
+    <body>
+        <div id="app"></div>
+    </body>
+    <script>
+        const vscode = acquireVsCodeApi()
+        d3.select('#app').graphviz().renderDot(`%{graph}`).zoom(false)
+        .on('end', addListener);
+        function addListener() {
+          nodes = d3.selectAll('.node');
+          nodes
+          .on("click", function () {
+            console.log("click");
+            var title = d3.select(this).selectAll('title').text().trim();
+            vscode.postMessage({
+                command: 'click',
+                node:title
+            })
+          })
+        }
+    </script>
+    </html>

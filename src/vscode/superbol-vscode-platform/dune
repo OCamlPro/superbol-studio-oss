@@ -2,7 +2,7 @@
 
 (executable
   (name superbol_vscode_platform)
-  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo polka-js-stubs ocplib_stuff node-js-stubs jsonoo js_of_ocaml gen_js_api )
+  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo polka-js-stubs ocplib_stuff node-js-stubs jsonoo js_of_ocaml gen_js_api ez_subst )
   (modes js)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (flags --source-map --pretty))
