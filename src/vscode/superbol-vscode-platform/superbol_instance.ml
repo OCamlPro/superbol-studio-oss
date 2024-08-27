@@ -132,7 +132,7 @@ let _log message = ignore(Vscode.Window.showInformationMessage () ~message)
 
 let webview_panels = Hashtbl.create 1
 let window_listener = ref None
-let create_or_get_webview ~uri =
+let create_or_get_webview ~decorationType ~uri =
   let filename = Vscode.Uri.path uri in
   Vscode.WebviewPanel.webview @@
   match Hashtbl.find_opt webview_panels filename with
@@ -152,7 +152,15 @@ let create_or_get_webview ~uri =
           if Hashtbl.length webview_panels == 0
           then (
             ignore(Option.map Vscode.Disposable.dispose !window_listener);
-            window_listener := None)
+            window_listener := None);
+          match Vscode.Window.activeTextEditor () with
+          | None -> ()
+          | Some text_editor ->
+            let uri = Vscode.TextEditor.document text_editor
+                      |> Vscode.TextDocument.uri in
+            if String.equal filename @@ Vscode.Uri.path uri
+            then Vscode.TextEditor.setDecorations text_editor
+                ~decorationType ~rangesOrOptions:(`Ranges []);
         end ~thisArgs:Ojs.null ~disposables:[]);
     Hashtbl.add webview_panels filename webview_panel;
     webview_panel
@@ -243,7 +251,7 @@ let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
       let graph_content =
         Jsonoo.Decode.field "string_repr" Jsonoo.Decode.string res in
       let nodes_pos = Jsonoo.Decode.field "nodes_pos" Jsonoo.Decode.(dict id) res in
-      let webview = create_or_get_webview ~uri in
+      let webview = create_or_get_webview ~decorationType ~uri in
       let img_uri = Uri.joinPath extension_uri
           ~pathSegments:["assets"; if d3 then "cfg-d3-renderer.html" else "cfg-dot-renderer.html"] in
       let html_file =
