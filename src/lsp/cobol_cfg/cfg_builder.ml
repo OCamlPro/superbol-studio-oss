@@ -13,6 +13,8 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_unit.Types
 open Cobol_common.Visitor
+module NEL = Cobol_common.Basics.NEL
+
 type qualname = Cobol_ptree.qualname
 
 type unconditional_jumps =
@@ -22,6 +24,7 @@ type unconditional_jumps =
 type node = {
   num: int;
   name: qualname;
+  mutable procedures: qualname NEL.t;
   loc: srcloc;
   conditional_jumps: qualname list;
   unconditional_jumps: unconditional_jumps list;
@@ -40,6 +43,7 @@ let build_node ~default_name ~cu paragraph =
       conditionals: qualname list;
       unconditional: unconditional_jumps list;
     }
+    let init = {conditionals = []; unconditional = [] }
     let add_unconditional uncond acc =
       { acc with unconditional = uncond :: acc.unconditional }
     let add_conditionals acc qn_to_jump =
@@ -47,9 +51,24 @@ let build_node ~default_name ~cu paragraph =
   end in
   let { conditionals; unconditional } =
     Visitor.fold_procedure_paragraph'
-      object
+      object (v)
         inherit [acc] Visitor.folder
         method! fold_goback' _ acc = skip @@ add_unconditional Goback acc
+        method! fold_statement' _ ({ unconditional; _ } as acc) =
+          match unconditional with
+          | [] -> do_children acc
+          | _ -> skip acc
+
+        method! fold_if' { payload = { then_branch; else_branch; _ }; _ } acc =
+          let { conditionals; unconditional } =
+            Cobol_ptree.Visitor.fold_statements v then_branch init in
+          let { conditionals = else_cond; unconditional = else_uncond } =
+            Cobol_ptree.Visitor.fold_statements v else_branch init in
+          skip {
+            conditionals = acc.conditionals @ conditionals @ else_cond;
+            unconditional = acc.unconditional @ unconditional @ else_uncond;
+          }
+
         method! fold_goto' { payload; _ } acc =
           skip @@
           match payload with
@@ -66,7 +85,7 @@ let build_node ~default_name ~cu paragraph =
           (* TODO: check that where we jump has no unconditional_jumps, /!\ cycle` *)
           add_conditionals acc (full_qn ~cu start)
       end
-      paragraph {conditionals = []; unconditional = [] }
+      paragraph init
   in
   id:=!id+1;
   let name, loc = match ~&paragraph.paragraph_name with
@@ -75,6 +94,7 @@ let build_node ~default_name ~cu paragraph =
   in {
     num = !id;
     name;
+    procedures = NEL.One name;
     loc;
     conditional_jumps = conditionals;
     unconditional_jumps = unconditional;
@@ -91,7 +111,7 @@ module Node = struct
 end
 
 type edge =
-  | Default
+  | FallThrough
   | Conditional
   | Unconditional
 
@@ -99,14 +119,44 @@ module Edge = struct
    type t = edge
    let compare = Stdlib.compare
    let equal = (=)
-   let default = Default
+   let default = FallThrough
    let to_string = function
-     | Default -> "d"
+     | FallThrough -> "d"
      | Conditional -> "c"
      | Unconditional -> "u"
 end
 
 module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
+
+let vertex_name_quoted { procedures; _ } =
+  Pretty.to_string "%a"
+    (NEL.pp ~fopen:"\"" ~fclose:"\"" ~fsep:"\n" Cobol_ptree.pp_qualname)
+    (NEL.rev procedures)
+
+let vertex_name { name = qn; _ } =
+  Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
+  |> Str.global_replace (Str.regexp "\n") " "
+
+module Dot = Graph.Graphviz.Dot(struct
+    include Cfg
+    let edge_attributes (_,s,_) =
+      match s with
+      | FallThrough -> [`Style `Dotted]
+      | Conditional -> [`Style `Dashed]
+      | Unconditional -> [`Style `Solid]
+    let default_edge_attributes _ = []
+    let get_subgraph _ = None
+    let vertex_attributes { unconditional_jumps; _ } =
+      if List.exists ((=) Goback) unconditional_jumps
+      then [`Style `Bold]
+      else []
+    let default_vertex_attributes _ = [`Shape `Box]
+    let graph_attributes _ = []
+    let vertex_name = vertex_name_quoted
+  end)
+
+let string_of g =
+  Pretty.to_string "%a" Dot.fprint_graph g
 
 module Qmap = Map.Make(struct
     type t = qualname
@@ -121,6 +171,7 @@ let rec build_edges ~vertexes g = function
       end g conditional_jumps in
     begin match unconditional_jumps with
       | [] ->
+        (* build_edges ~vertexes g (next::tl) *)
         build_edges ~vertexes (Cfg.add_edge g current next) (next::tl)
       | _ ->
         let g = List.fold_left begin fun g -> function
@@ -164,36 +215,21 @@ let cfg_of ~(cu: cobol_unit) =
       Cfg.add_vertex g node,
       Qmap.add node.name node vertexes
     end (Cfg.empty, Qmap.empty) nodes
-  in build_edges ~vertexes g nodes
-
-let vertex_name_quoted { name = qn; _ } =
-  Pretty.to_string "\"%a\""Cobol_ptree.pp_qualname qn
-  |> Str.global_replace (Str.regexp "\n") " "
-
-let vertex_name { name = qn; _ } =
-  Pretty.to_string "%a"Cobol_ptree.pp_qualname qn
-  |> Str.global_replace (Str.regexp "\n") " "
-
-module Dot = Graph.Graphviz.Dot(struct
-    include Cfg
-    let edge_attributes (_,s,_) =
-      match s with
-      | Default -> [`Style `Dotted]
-      | Conditional -> [`Style `Dashed]
-      | Unconditional -> [`Style `Solid]
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes { unconditional_jumps; _ } =
-      if List.exists ((=) Goback) unconditional_jumps
-      then [`Style `Bold]
-      else []
-    let default_vertex_attributes _ = [`Shape `Box]
-    let graph_attributes _ = []
-    let vertex_name = vertex_name_quoted
-  end)
-
-let string_of g =
-  Pretty.to_string "%a" Dot.fprint_graph g
+  in
+  let g = build_edges ~vertexes g nodes in
+  Cfg.fold_vertex begin fun n cfg ->
+    match Cfg.pred_e cfg n with
+    | [(pred, FallThrough, _)] ->
+      Lsp_io.log_debug "before node %s (pred is %s):\n%s\n" (vertex_name n) (vertex_name pred) @@ string_of cfg;
+      let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
+          Cfg.add_edge_e cfg (pred, e, next)
+        end cfg n cfg in
+      Lsp_io.log_debug "after edge adding:\n%s\n" @@ string_of cfg;
+      pred.procedures <- NEL.(n.procedures @ pred.procedures);
+      Cfg.remove_vertex cfg n
+    | _ -> cfg
+  end g g
+(* g *)
 
 type graph = {
   string_repr: string;

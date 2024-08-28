@@ -110,6 +110,18 @@ module NEL = struct
       | x :: tl -> aux (List.cons x acc) tl
     in
     aux [] l
+  let rev = function
+    | One x -> One x
+    | hd :: tl ->
+      let rec aux acc = function
+        | One x -> x :: acc
+        | x :: tl -> aux (x::acc) tl
+      in aux (One hd) tl
+  let ( @ ) a b =
+    let rec aux b = function
+      | One x -> x :: b
+      | x :: tl -> x :: aux b tl
+    in aux b a
   let rev_to_list l =
     let rec aux acc = function
       | One x -> List.cons x acc
