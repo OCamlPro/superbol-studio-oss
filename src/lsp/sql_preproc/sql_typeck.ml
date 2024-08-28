@@ -37,20 +37,40 @@ let get_length cu name =
 type cobol_types =
   | UNKNOWN
   | COBOL_TYPE_UNSIGNED_NUMBER
+  (*ex: PIC 9(018).*)
   | COBOL_TYPE_SIGNED_NUMBER_TS   (* trailing separate *)
+  (*pas d'exemple dans les tests de gix que j'ai réussi a preprocesser*)
   | COBOL_TYPE_SIGNED_NUMBER_TC   (* trailing combined *)
+  (*ex: PIC S9(09)  
+        PIC S9(018)*)
   | COBOL_TYPE_SIGNED_NUMBER_LS   (* leading separate  *)
+  (*pas d'exemple*)
   | COBOL_TYPE_SIGNED_NUMBER_LC   (* leading combined  *)
+  (*pas d'exemple*)
   | COBOL_TYPE_UNSIGNED_NUMBER_PD (* packed decimal    *)
+    (*pas d'exemple*)
   | COBOL_TYPE_SIGNED_NUMBER_PD   (* packed decimal    *)
+    (*pas d'exemple*)
   | COBOL_TYPE_ALPHANUMERIC
+  (*ex: PIC 9(018)        COMP-3.
+        PIC 9(018)V9(12)  COMP-3*)
   | COBOL_TYPE_UNSIGNED_BINARY
+  (*ex: PIC S9(018)V9(12) COMP-3     (???????)
+        PIC S9(018)V9(12) COMP-3.
+        PIC S99V99 COMP-3.
+        03 FLD01      PIC S9(4) USAGE COMP-3.    (???? USAGE?) *)
   | COBOL_TYPE_SIGNED_BINARY
+  (*pas d'exemple*)
   | COBOL_TYPE_JAPANESE
+  (*pas d'exemple*)
   | COBOL_TYPE_GROUP
+  (*pas d'exemple*)
   | COBOL_TYPE_FLOAT
+  (*pas d'exemple*)
   | COBOL_TYPE_DOUBLE
+  (*pas d'exemple*)
   | COBOL_TYPE_NATIONAL
+  (*pas d'exemple*)
 
 let cobol_types_to_int = function
   | UNKNOWN -> 0

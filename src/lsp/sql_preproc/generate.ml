@@ -68,10 +68,12 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | None -> None
   in
 
+  (*TODO: CobVarCasted shoould act like the casted type (rn it's ignored)*)
   let cob_var_opt = function
     | Some var -> (
       match var with
       | CobVarNotNull cobolVarId -> Some cobolVarId.payload
+      | CobVarCasted (var, _) -> Some var.payload
       | CobVarNullIndicator (var, _) -> Some var.payload )
     | None -> None
   in
@@ -134,6 +136,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         match cobol_var with
         | CobVarNotNull cobolVarId ->
           (cobolVarId.payload, get_length cobolVarId.payload)
+        | CobVarCasted (var, _) -> (var.payload, get_length var.payload)
         | CobVarNullIndicator (var, _) -> (var.payload, get_length var.payload)
         ) )
   in
@@ -280,6 +283,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let get_name_cobol_var (cobol_var : cobol_var) =
     match cobol_var with
     | CobVarNotNull c -> c.payload
+    | CobVarCasted (c, _) -> c.payload
     | CobVarNullIndicator (c, n) -> c.payload ^ n.payload
   in
 
@@ -435,7 +439,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_commit prefix rb_work_or_tran rb_args ?at () =
     match (rb_work_or_tran, rb_args) with
-    | None, false ->
+    | None, false
+    | Some Work, false ->
       generate_start_end_sql prefix
         [ generate_GIXSQLExec prefix "\"COMMIT\" & x\"00\"" ?at () ]
     | _ -> [ Generated_type.Todo { prefix } ]
@@ -445,6 +450,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     let name =
       match var with
       | [ Sql_ast.SqlVarToken (CobolVar (CobVarNotNull var)) ] -> var.payload
+      | [ Sql_ast.SqlVarToken (CobolVar (CobVarCasted (var, _))) ] -> var.payload
       | _ ->
         num := !num + 1;
         "SQ" ^ string_of_int !num
@@ -452,7 +458,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     let at_name, at_size = get_at_info at in
     let fun_name = "GIXSQLExecImmediate" in
     let ref_value =
-      let prefix = prefix ^ "    " in
+      let prefix = prefix ^ "       " in
       [ Generated_type.Reference { prefix; var = "SQLCA" };
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
@@ -471,8 +477,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     cursor_declaration := cd
   in
 
-  let create_from_cursor_declaration (prefix, cur, at, var_name) =
-    let prefix = prefix ^ "    " in
+  let create_from_cursor_declaration (_prefix, cur, at, var_name) =
+    (*     let prefix = prefix ^ "    " in *)
+    let prefix = "           " in
     let at_name, at_size = get_at_info at in
     let cur_name, cob_var_lst, var_name, _with_hold =
       match cur with
@@ -506,13 +513,13 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     let fun_name, cursor_declare =
       match cob_var_lst with
       | [] ->
-        let prefix = prefix ^ "    " in
+        let prefix = "           " in
         ( "GIXSQLCursorDeclare",
           [ Generated_type.Reference { prefix; var = var_name };
             Generated_type.Value { prefix; var = "0" }
           ] )
       | _ ->
-        let prefix = prefix ^ "    " in
+        let prefix = "           " in
         ( "GIXSQLCursorDeclareParams",
           [ Generated_type.Reference { prefix; var = var_name };
             Generated_type.Value { prefix; var = "0" };
@@ -522,7 +529,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
     let adding =
       let ref_value =
-        let prefix = prefix ^ "    " in
+        let prefix = "               " in
         [ Generated_type.Reference { prefix; var = "SQLCA" };
           Generated_type.Reference { prefix; var = at_name };
           Generated_type.Value { prefix; var = string_of_int at_size };
@@ -588,6 +595,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       match sql_instr with
       | [ Sql_ast.SqlVarToken (CobolVar (CobVarNotNull cobolVarId)) ] ->
         cobolVarId.payload
+        | [ Sql_ast.SqlVarToken (CobolVar (CobVarCasted (cobolVarId, _))) ] ->
+          cobolVarId.payload
       | _ -> failwith "Not implemented in Gix"
       (*These case are not implemented in GixSql's runtime *)
     in
@@ -729,7 +738,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         let prefix = prefix ^ "   " in
         [ Generated_type.CallStatic
             { prefix;
-              fun_name = "SQGIXSQLCursorOpen";
+              fun_name = "GIXSQLCursorOpen";
               ref_value =
                 (let prefix = prefix ^ "   " in
                  [ Generated_type.Reference { prefix; var = "SQLCA" };
@@ -821,6 +830,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
       generate_insert prefix ~value_list ?at ()
     | Savepoint _
+    | ReleaseSavepoint _
     | StartTransaction ->
       generate_declare prefix ?at ()
     | Sql sql -> (
@@ -862,6 +872,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | ExecuteImmediate _
     | ExecuteIntoUsing _
     | Savepoint _
+    | ReleaseSavepoint _
     | Rollback _
     | Commit _
     | Insert _

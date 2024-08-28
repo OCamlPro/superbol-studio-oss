@@ -21,22 +21,23 @@ type cobolVarId = string with_loc [@@deriving ord]
 
 type cobol_var =
   | CobVarNotNull of cobolVarId
+  | CobVarCasted of cobolVarId * sql_type
   | CobVarNullIndicator of cobolVarId * cobolVarId
 [@@deriving ord]
 
-type variable =
+and variable =
   | SqlVar of sqlVarToken
   | CobolVar of cobol_var
 [@@deriving ord]
 
-type literal =
+and literal =
   | LiteralVar of variable
   | LiteralNum of string with_loc
   | LiteralStr of string with_loc
   | LiteralDot of string with_loc list
 [@@deriving ord]
 
-type sql_token =
+and sql_token =
   | SqlInstr of string
   | SqlVarToken of variable
   | SqlLit of literal
@@ -66,6 +67,7 @@ and esql_instuction =
   | Rollback of rb_work_or_tran option * rb_args option
   | Commit of rb_work_or_tran option * bool
   | Savepoint of variable
+  | ReleaseSavepoint of variable
   | SelectInto of
       { vars : cobol_var list;
         select : sql_select;
@@ -162,6 +164,7 @@ and whenever_continuation =
 
 and update_arg =
   | WhereCurrentOf of sqlVarToken
+  | WhereUpdate of search_condition
   | UpdateSql of sql_instruction
 
 (*SQL*)
@@ -183,6 +186,7 @@ and from_stm = table_ref list
 and table_ref =
   | FromLitAs of table_ref * literal
   | FromLit of literal
+  | FromFun of sqlVarToken * literal 
   | FromSelect of sql_query
   | Join of table_ref * join * table_ref * join_option option
 
@@ -286,6 +290,7 @@ module Printer = struct
       Format.fprintf fmt "COMMIT %a %s" pp_some_rb_work_or_tran rb_work_or_tran
         s
     | Savepoint s -> Format.fprintf fmt "SAVEPOINT %a" pp_var s
+    | ReleaseSavepoint s -> Format.fprintf fmt "RELEASE SAVEPOINT %a" pp_var s
     | SelectInto { vars; select; select_options } ->
       Format.fprintf fmt "SELECT %a INTO %a %a" pp_select_lst select pp_cob_lst
         vars pp_select_options_lst select_options
@@ -375,7 +380,9 @@ module Printer = struct
 
   and pp_where_arg fmt = function
     | Some (WhereCurrentOf swhere) ->
-      Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload
+      Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload 
+    | Some (WhereUpdate e) ->
+        Format.fprintf fmt "WHERE %a" pp_sql_condition e
     | Some (UpdateSql sql) -> pp_sql fmt sql
     | None -> ()
 
@@ -453,6 +460,8 @@ module Printer = struct
 
   and pp_cob_var fmt = function
     | CobVarNotNull c -> Format.fprintf fmt ":%s" c.payload
+    | CobVarCasted (c, t) -> 
+      Format.fprintf fmt ":%s::%a" c.payload pp_sql_type t
     | CobVarNullIndicator (c, ni) ->
       Format.fprintf fmt ":%s:%s" c.payload ni.payload
 
@@ -548,6 +557,7 @@ module Printer = struct
   and pp_table_ref fmt = function
     | FromLit l -> Format.fprintf fmt "%a" pp_lit l
     | FromLitAs (l, a) -> Format.fprintf fmt "%a AS %a" pp_table_ref l pp_lit a
+    | FromFun (v, t) -> Format.fprintf fmt "%a %a" pp_sqlVarToken v pp_lit t
     | FromSelect s -> Format.fprintf fmt "(%a)" pp_sql_query s
     | Join (tr1, join, tr2, opt) ->
       Format.fprintf fmt "%a %s JOIN %a %a" pp_table_ref tr1 (str_join join)

@@ -106,14 +106,15 @@ module Printer = struct
   and pp_gene fmt x =
     match x with
     | NoChange { content } -> Format.fprintf fmt "%s\n" content
-    | Added { content; error_treatment; with_dot } -> 
+    | Added { content; error_treatment; with_dot } ->
       let dot =
         if with_dot then
           "."
         else
           ""
       in
-      Format.fprintf fmt "%a%a%s\n" pp_trans_stm content pp_error_treatment error_treatment dot
+      Format.fprintf fmt "%a%a%s\n" pp_trans_stm content pp_error_treatment
+        error_treatment dot
     | Change { old_stms; trans_stm; error_treatment; with_dot } ->
       let dot =
         if with_dot then
@@ -137,7 +138,7 @@ module Printer = struct
 
   and pp_trans_stm_aux fmt x =
     match x with
-    | Section { name } -> Format.fprintf fmt "       %s" name
+    | Section { name } -> Format.fprintf fmt "       %s." name
     | Comment { content } -> Format.fprintf fmt "ADDED *%s" content
     | CallStatic { prefix; fun_name; ref_value } ->
       Format.fprintf fmt "%sCALL STATIC \"%s\"%a%sEND-CALL" prefix fun_name
@@ -145,7 +146,7 @@ module Printer = struct
     | Copy { prefix; file_name } ->
       Format.fprintf fmt "%sCOPY %s" prefix file_name
     | GotoStatement { prefix; target } ->
-      Format.fprintf fmt "%sGO TO %s" prefix target
+      Format.fprintf fmt "%sGO TO %s." prefix target
     | PerformStatement { prefix; target } ->
       Format.fprintf fmt "%sPERFORM %s" prefix target
     | If { prefix; condition; if_stm } ->
@@ -165,6 +166,22 @@ module Printer = struct
       Format.fprintf fmt "      *> WARNING: %s" content
     | Todo { prefix } -> Format.fprintf fmt "%sTODO" prefix
 
+
+    (*TODO: maybe redo this, but nicer*)
+  and  split_line max_length line =
+    let rec aux acc max_length current_line =
+      if String.length current_line <= max_length then
+        List.rev (current_line :: acc)
+      else
+        let part = String.sub current_line 0 max_length in
+        let rest =
+          String.sub current_line max_length
+            (String.length current_line - max_length)
+        in
+        aux ((part ^ "\"\n        &  \"") :: acc) 59 rest (*72 (character limit) - 12 (size of prefix '        &  "' ) - 1 (for the '"')*)
+    in
+    aux [] max_length line
+
   and pp_declaration fmt = function
     | Simple_var_declaration
         { prefix; var_importance; var_name; var_type; var_content } ->
@@ -175,11 +192,15 @@ module Printer = struct
       in
       let var_content =
         match var_content with
-        | Some n -> n
+        | Some n -> "VALUE " ^ n
         | None -> ""
       in
-      Format.fprintf fmt "%s%s %s PIC %s %s." prefix var_importance var_name
-        var_type var_content
+      let line =
+        Printf.sprintf "%s%s %s PIC %s %s." prefix var_importance var_name
+          var_type var_content
+      in
+      let lines = split_line 71 line in (*72 (character limit) - 1 (for the '"')*)
+      List.iter (Format.fprintf fmt "%s") lines
     | Field_var_declaration { prefix; var_importance; var_name; field } ->
       Format.fprintf fmt "%s%s %s.%a" prefix var_importance var_name pp_field
         field
@@ -197,14 +218,15 @@ module Printer = struct
         match continuation with
         | Continue -> Format.fprintf fmt "   CONTINUE"
         | Perform sqlVarToken -> Format.fprintf fmt "   PERFORM %s" sqlVarToken
-        | Goto sqlVarToken -> Format.fprintf fmt "   GO TO %s" sqlVarToken
+        | Goto sqlVarToken -> Format.fprintf fmt "   GO TO %s." sqlVarToken
       in
       let print_error fmt (not_found_whenever, str) =
         match not_found_whenever with
         | Some continuation ->
           Format.fprintf fmt "\n%s%s\n%s%a" prefix str prefix print_continuation
             continuation
-        | None -> Format.fprintf fmt "\n%s%s\n%s%s" prefix str prefix "   CONTINUE"
+        | None ->
+          Format.fprintf fmt "\n%s%s\n%s%s" prefix str prefix "   CONTINUE"
       in
       Format.fprintf fmt "\n%sEVALUATE TRUE%a%a%a\n%sEND-EVALUATE" prefix
         print_error

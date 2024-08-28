@@ -70,7 +70,29 @@ let parse ~sql_in_copybooks ~copy_exts common files =
         Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
           ~filename ~source_format () ~cobol_unit
       in
-      Printf.printf "%s%!" contents )
+      let output_file filename s =
+        match filename with
+        | "-" ->
+          Printf.printf "%s\n%!" s
+        | _ ->
+          let oc = open_out filename in
+          output_string oc s;
+          close_out oc;
+          Printf.eprintf "File %S generated\n%!" filename
+        in 
+        let name_change filename =           
+            if Filename.check_suffix filename ".cob" then
+              let base_name = Filename.chop_suffix filename ".cob" in
+              base_name ^ ".pp.cob"
+            else if Filename.check_suffix filename ".cbl" then
+              let base_name = Filename.chop_suffix filename ".cbl" in
+              base_name ^ ".pp.cbl"
+            else
+              filename
+            in
+
+        output_file (name_change filename) contents
+      (* Printf.printf "%s%!" contents *) )
     files
 
 let preproc_cmd =

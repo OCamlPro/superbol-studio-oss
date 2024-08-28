@@ -30,7 +30,7 @@ let add_var ~map ~name ?(length = 0) ?(vartype = 0) ?(scale = 0) ?(flags = 0)
 let num = ref 0
 
 let transform_stm map (_, stm) filename =
-  let prefix = "      " in
+  let prefix = "       " in
   let create_new_var content ?(remplace=true) () =
     let new_content = if remplace then "\"" ^ Misc.replace_colon_words content ^ "\"" else content in
     let size = String.length new_content - 2 in
@@ -108,6 +108,7 @@ let transform_stm map (_, stm) filename =
         (ws, map) )
     | Insert _
     | Savepoint _
+    | ReleaseSavepoint _
     | Delete _ ->
       let ws, map =
         create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens) ()

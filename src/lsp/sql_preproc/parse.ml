@@ -163,12 +163,12 @@ let parse ~config ~filename ~contents =
 
       let params = List.rev params in
       let sqlStr = "EXEC SQL " ^ String.concat " " params ^ " END-EXEC" in
-      (* Format.fprintf Format.std_formatter "\nSTRING\n";
-      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; *)
+      Format.fprintf Format.std_formatter "\nSTRING\n";
+      Format.fprintf Format.std_formatter "\n%s\n" sqlStr;
 
       let sql = Sql_parser.parseString (Lexing.from_string sqlStr) in
-(*       Format.fprintf Format.std_formatter "\nAST\n";
-      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; *)
+      Format.fprintf Format.std_formatter "\nAST\n";
+      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql;
 
       sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql });
       iter tokens

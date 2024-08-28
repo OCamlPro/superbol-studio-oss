@@ -67,7 +67,9 @@ let cobol_var_id :=
 
 let cobol_var :=
 | c = cobol_var_id; {CobVarNotNull c}
-| c = loc(COBOL_VAR); ni=loc(COBOL_VAR); {CobVarNullIndicator(c, ni)}
+| c = cobol_var_id; COLON; COLON; t = sql_type_aux; {CobVarCasted (c, t)} 
+(*TODO: fix this, it onely work in the context of the preproc*)
+| c = cobol_var_id; ni=cobol_var_id; {CobVarNullIndicator(c, ni)}
 
 let sql_var_name :=
 | s = loc(WORD); {s} 
@@ -131,6 +133,8 @@ let esql_with_opt_at :=
   {ExecuteIntoUsing{executed_string; opt_into_hostref_list; opt_using_hostref_list}}
 | SAVEPOINT; s= variable; 
   {Savepoint s}
+| RELEASE; SAVEPOINT; s=variable; 
+  {ReleaseSavepoint s}
 | ROLLBACK; r=option(rb_work_or_tran); a=option(rb_args);
   {Rollback(r, a)}
 | COMMIT; wt= option(rb_work_or_tran); RELEASE; 
@@ -207,6 +211,7 @@ let execute_immediate_arg :=
 
 let update_arg :=
 | WHERE; CURRENT; OF; v=sql_var_name; {WhereCurrentOf v}
+| WHERE; v=search_condition; {WhereUpdate v}
 | FROM; sql=sql; {UpdateSql( [SqlInstr "FROM"] @ sql)}
 
 let rb_work_or_tran :=
@@ -308,6 +313,7 @@ let table_ref :=
 let table_ref_simpl :=
 | LPAR; select= sql_query; RPAR; {FromSelect(select)}
 | LPAR; t = table_ref; RPAR; {t}
+| sql_var = sql_var_name; table_name = literal; {FromFun (sql_var, table_name)}
 | table_name = literal; {FromLit(table_name)}
 
 let table_ref_non_rec :=
@@ -414,6 +420,7 @@ let sql_first_token :=
 | LPAR ; {SqlInstr "(" }
 | RPAR; {SqlInstr ")" }
 | NOT; {SqlInstr "NOT" }
+| NULL; {SqlInstr "NULL" }
 | STAR; {SqlInstr "*" }
 | SET; {SqlInstr "SET"}
 | FOR; {SqlInstr "FOR" }
