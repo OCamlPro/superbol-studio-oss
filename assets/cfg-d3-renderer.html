@@ -48,7 +48,7 @@ const LETTER_LEN = 7.25;
 const NODE_HEIGHT = 16;
 
 function nodeWidth(n) {
-  return (n.id.length + 2) * LETTER_LEN
+  return (n.name.length + 2) * LETTER_LEN
 }
 
 function linkArc(d) {
@@ -195,9 +195,9 @@ svgNode.append("rect")
   .attr("width", nodeWidth)
   .attr("height", NODE_HEIGHT)
 svgNode.append("text")
-  .attr("x", (n) => -n.id.length * LETTER_LEN / 2)
+  .attr("x", (n) => -n.name.length * LETTER_LEN / 2)
   .attr("y", 4) // 1em - 8px
-  .text(d => d.id)
+  .text(d => d.name)
 
 // setup node neighbours
 nodes.forEach(n => {

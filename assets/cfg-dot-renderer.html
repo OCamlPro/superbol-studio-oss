@@ -14,14 +14,14 @@
     </body>
     <script>
         const vscode = acquireVsCodeApi()
-        d3.select('#app').graphviz().renderDot(`%{graph}`).zoom(false)
+        d3.select('#app').graphviz().renderDot(`%{graph}`)
         .on('end', addListener);
         function addListener() {
           nodes = d3.selectAll('.node');
           nodes
           .on("click", function () {
-            console.log("click");
             var title = d3.select(this).selectAll('title').text().trim();
+            console.log(`click ${title}`);
             vscode.postMessage({
                 command: 'click',
                 node:title
