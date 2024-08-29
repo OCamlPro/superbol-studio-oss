@@ -29,13 +29,13 @@ let create_or_get_webview ~decorationType ~uri =
     let webview_panel = Vscode.Window.createWebviewPanel
         ~viewType:"CFG" ~title:"COBOL CFG Viewer"
         ~showOptions:(Vscode.ViewColumn.Beside) in
-    ignore(
+    let _ : Vscode.Disposable.t =
       Vscode.WebviewPanel.onDidDispose webview_panel ()
         ~listener:begin fun () ->
           Hashtbl.remove webview_panels filename;
           if Hashtbl.length webview_panels == 0
           then (
-            ignore(Option.map Vscode.Disposable.dispose !window_listener);
+            Option.iter Vscode.Disposable.dispose !window_listener;
             window_listener := None);
           match Vscode.Window.activeTextEditor () with
           | None -> ()
@@ -45,7 +45,7 @@ let create_or_get_webview ~decorationType ~uri =
             if String.equal filename @@ Vscode.Uri.path uri
             then Vscode.TextEditor.setDecorations text_editor
                 ~decorationType ~rangesOrOptions:(`Ranges []);
-        end ~thisArgs:Ojs.null ~disposables:[]);
+        end ~thisArgs:Ojs.null ~disposables:[] in
     Hashtbl.add webview_panels filename webview_panel;
     webview_panel
 
@@ -100,12 +100,13 @@ let setup_window_listener ~client =
              "line", Jsonoo.Encode.int @@ Position.line pos_start;
              "character", Jsonoo.Encode.int @@ Position.character pos_start]
         in
-        ignore(
+        let _ : bool Promise.t =
           Vscode_languageclient.LanguageClient.sendRequest client ()
             ~meth:"superbol/findProcedure" ~data
           |> Promise.(then_ ~fulfilled:begin fun res ->
               WebView.postMessage webview @@ Jsonoo.t_to_js res
-            end))
+            end)
+        in ()
   in
   let disposable_listener =
     match !window_listener with
@@ -121,8 +122,21 @@ let read_whole_file filename =
   close_in ch;
   s
 
+type graph = {
+  string_repr: string;
+  nodes_pos: (string, Jsonoo.t) Hashtbl.t;
+  name: string;
+}
+let decode_graph res =
+  let string_repr =
+    Jsonoo.Decode.field "string_repr" Jsonoo.Decode.string res in
+  let nodes_pos = Jsonoo.Decode.field "nodes_pos" Jsonoo.Decode.(dict id) res in
+  let name = Jsonoo.Decode.field "name" Jsonoo.Decode.string res in
+  { name; nodes_pos; string_repr }
+
 let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
   let open Vscode in
+  let open Promise in
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let data =
     let uri = Jsonoo.Encode.string @@ Vscode.Uri.path uri in
@@ -131,25 +145,32 @@ let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
   let decorationType = create_decoration_type () in
   Vscode_languageclient.LanguageClient.sendRequest client ()
     ~meth:"superbol/openCFG" ~data
-  |> Promise.(then_ ~fulfilled:(fun res ->
-      let graph_content =
-        Jsonoo.Decode.field "string_repr" Jsonoo.Decode.string res in
-      let nodes_pos = Jsonoo.Decode.field "nodes_pos" Jsonoo.Decode.(dict id) res in
-      let webview = create_or_get_webview ~decorationType ~uri in
-      let img_uri = Uri.joinPath extension_uri
-          ~pathSegments:["assets"; if d3 then "cfg-d3-renderer.html" else "cfg-dot-renderer.html"] in
-      let html_file =
-        read_whole_file @@ Uri.fsPath img_uri in
-      let html = Ez_subst.V2.EZ_SUBST.string ~sep:'%' ~brace:(fun () _ -> graph_content) ~ctxt:() html_file in
-      WebView.set_html webview html;
-      WebView.set_options webview (WebviewOptions.create ~enableScripts:true ());
-      ignore(
-        WebView.onDidReceiveMessage webview ()
-          ~listener:(on_click ~text_editor ~decorationType ~nodes_pos)
-          ~thisArgs:Ojs.null ~disposables:[]);
-      setup_window_listener ~client;
-      return ()
-    ))
+  |> then_ ~fulfilled:begin fun jsonoo_graphs ->
+    let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
+    Window.showQuickPick ~items:(Stdlib.List.map (fun g -> g.name) graphs) ()
+    |> then_ ~fulfilled:begin function
+      | None -> return ()
+      | Some name ->
+        let { string_repr; nodes_pos; name = _ } = Stdlib.List.find begin fun g ->
+            String.equal g.name name end graphs in
+        let webview = create_or_get_webview ~decorationType ~uri in
+        let html_uri = Uri.joinPath extension_uri
+            ~pathSegments:
+              ["assets";
+               if d3 then "cfg-d3-renderer.html" else "cfg-dot-renderer.html"] in
+        let html_file =
+          read_whole_file @@ Uri.fsPath html_uri in
+        let html = Ez_subst.V2.EZ_SUBST.string ~sep:'%' ~brace:(fun () _ -> string_repr) ~ctxt:() html_file in
+        WebView.set_html webview html;
+        WebView.set_options webview (WebviewOptions.create ~enableScripts:true ());
+        let _ : Disposable.t =
+          WebView.onDidReceiveMessage webview ()
+            ~listener:(on_click ~text_editor ~decorationType ~nodes_pos)
+            ~thisArgs:Ojs.null ~disposables:[] in
+        setup_window_listener ~client;
+        return ()
+    end
+  end
 
 let open_cfg ?(d3=false) ?text_editor instance =
   let text_editor = match text_editor with
@@ -168,20 +189,20 @@ let open_webview ?text_editor instance =
   let open Vscode in
   let open_cfg_for ~text _client =
     let webviewPanel = match !debugWebviewPanelRef with
-    | None ->
-      Window.createWebviewPanel
-        ~viewType:"cfg" ~title:"Tester webview"
-        ~showOptions:(Vscode.ViewColumn.Two)
-    | Some wvp -> wvp in
+      | None ->
+        Window.createWebviewPanel
+          ~viewType:"cfg" ~title:"Tester webview"
+          ~showOptions:(Vscode.ViewColumn.Two)
+      | Some wvp -> wvp in
     debugWebviewPanelRef := Some webviewPanel;
     let webview = Vscode.WebviewPanel.webview webviewPanel in
     Vscode.WebView.set_html webview text;
     Vscode.WebView.set_options webview (Vscode.WebviewOptions.create ~enableScripts:true ());
     let thisArgs, disposables = Ojs.null, [] in
-    ignore(
+    let _ : Disposable.t =
       WebviewPanel.onDidDispose webviewPanel ()
         ~listener:(fun () -> debugWebviewPanelRef:=None)
-        ~thisArgs ~disposables);
+        ~thisArgs ~disposables in
     let listener arg =
       let typ = Ojs.type_of arg in
       let com = Ojs.get_prop_ascii arg "command" |> Ojs.string_of_js in
@@ -189,22 +210,9 @@ let open_webview ?text_editor instance =
       let _ : _ option Promise.t = Vscode.Window.showErrorMessage () ~message in
       ()
     in
-    let _ : Disposable.t = Vscode.WebView.onDidReceiveMessage webview ~listener ~thisArgs:Ojs.null ~disposables:[] () in
-    (* let onDidReceiveMessage ~listener ?thisArgs ?disposables () = *)
-    (*   ignore(listener, thisArgs, disposables); *)
-    (*   Vscode.Disposable.make ~dispose:Fun.id *)
-    (* in *)
-    (* let postMessage _ojs = Promise.return true in *)
-    (* let webview = Vscode.WebView.create *)
-    (*     ~onDidReceiveMessage *)
-    (*     ~cspSource:"" *)
-    (*     ~close:Fun.id *)
-    (*     ~asWebviewUri:Fun.id *)
-    (*     ~html:text *)
-    (*     ~postMessage *)
-    (*     ~options:(Vscode.WebviewOptions.create ~enableScripts:true ()) *)
-    (* in *)
-    (* Vscode.WebviewPanel.set_webview newWebviewPanel webview; *)
+    let _ : Disposable.t =
+      Vscode.WebView.onDidReceiveMessage webview ()
+        ~listener ~thisArgs:Ojs.null ~disposables:[] in
     WebviewPanel.reveal webviewPanel ~preserveFocus:true ();
     Promise.return ()
   in

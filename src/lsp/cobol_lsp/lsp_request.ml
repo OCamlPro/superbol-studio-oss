@@ -142,17 +142,22 @@ let handle_open_cfg registry params =
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
       let graphs = make ~d3 checked_doc in
-      let { string_repr; nodes_pos }: graph = List.hd graphs in
-      let nodes_pos = List.map begin fun (n,loc) ->
-        let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
-          (n, Range.yojson_of_t range)
-        end nodes_pos in
-      Lsp_io.log_debug "making cfg %s" string_repr;
-      let res = `Assoc [("string_repr", `String string_repr); ("nodes_pos", `Assoc nodes_pos)]
+      let yojsonify ({ string_repr; name; nodes_pos } : graph) =
+        Lsp_io.log_debug "%s %s" name string_repr;
+        let nodes_pos = List.map begin fun (n,loc) ->
+            let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
+            (string_of_int n, Range.yojson_of_t range)
+          end nodes_pos in
+        Lsp_io.log_debug "%s" name;
+        `Assoc [
+          ("string_repr", `String string_repr);
+          ("nodes_pos", `Assoc nodes_pos);
+          ("name", `String name);]
       in
-      Some res
+      let res = Some (`List (List.map yojsonify graphs)) in
+      Lsp_io.log_debug "seding"; res
     end
-  |> Option.value ~default:(`String "")
+  |> Option.value ~default:(`List [])
 
 let handle_find_procedure registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
