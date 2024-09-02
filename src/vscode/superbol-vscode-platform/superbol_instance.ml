@@ -28,6 +28,8 @@ let name = "SuperBOL Language Server"
 let make ~context = { context; language_client = None }
 
 let client { language_client; _ } = language_client
+let subscribe_disposable { context; _ } disposable =
+  Vscode.ExtensionContext.subscribe context ~disposable
 
 let stop_language_server t =
   match t.language_client with
@@ -40,50 +42,33 @@ let stop_language_server t =
       else
         Promise.return ()
 
-let is_remote_lsp =
-  let prefix = "tcp://" in
-  fun serverOpt ->
-    let cmd = Executable.command serverOpt in
-    if String.starts_with ~prefix cmd then
-      let l = String.length prefix in
-      let url = String.sub cmd l (String.length cmd - l) in
-      Some url
-    else
-      None
-
-let host_and_port url =
-  let fail () = Format.ksprintf failwith "Invalid %S" url in
-  match String.split_on_char ':' url with
-  | [] | [_] -> fail ()
-  | host :: port :: _ ->
-    try host, int_of_string port with Invalid_argument _ -> fail ()
-
 let start_language_server ({ context; _ } as t) =
   let open Promise.Syntax in
   let* () = stop_language_server t in
-  let serverOptions =
-    Superbol_languageclient.server_options ~context
-  in
   let client =
-    match is_remote_lsp serverOptions with
-    | Some url ->
-      let host, port = host_and_port url in
-      LanguageClient.make_stream ~id ~name begin fun () ->
-        let socket =
-          (* Vscode_languageclient.StreamInfo.njs_stream_of_socket @@ *)
-          Node.Net.Socket.(t_to_js (connect (make ()) ~host ~port))
-        in
-        Promise.return @@
-        Vscode_languageclient.StreamInfo.create ()
-          ~writer:socket
-          ~reader:socket
-      end
-    | None ->
-      let clientOptions = Superbol_languageclient.client_options () in
-      LanguageClient.make () ~id ~name ~serverOptions ~clientOptions
+    match Superbol_languageclient.server_access ~context with
+    | Sub_process serverOptions ->
+        LanguageClient.make () ~id ~name ~serverOptions
+          ~clientOptions:(Superbol_languageclient.client_options ())
+    | TCP { host; port } ->
+        LanguageClient.from_stream ~id ~name begin fun () ->
+          let socket = Node.Net.Socket.(connect (make ())) ~host ~port in
+          Node.Net.Socket.on socket @@ `Connect begin fun () ->
+            subscribe_disposable t @@
+            Vscode.Window.setStatusBarMessage ()
+              ~text:(Printf.sprintf "SuperBOL LSP client successfully connected \
+                                     to %s on port %u" host port)
+              ~hide:(`AfterTimeout 10000)
+          end;
+          Promise.return @@
+          Vscode_languageclient.StreamInfo.create ()
+            ~writer:socket
+            ~reader:socket
+        end
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
+
 
 
 let current_document_uri ?text_editor () =
