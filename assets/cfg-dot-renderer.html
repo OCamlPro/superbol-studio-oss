@@ -10,23 +10,42 @@
         <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
     </head>
     <body>
+        <div style="position: absolute">
+          <button onclick="reset()">Reset Zoom</button>
+        </div>
         <div id="app"></div>
     </body>
     <script>
-        const vscode = acquireVsCodeApi()
-        d3.select('#app').graphviz().renderDot(`%{graph}`)
-        .on('end', addListener);
-        function addListener() {
-          nodes = d3.selectAll('.node');
-          nodes
-          .on("click", function () {
-            var title = d3.select(this).selectAll('title').text().trim();
-            console.log(`click ${title}`);
-            vscode.postMessage({
-                command: 'click',
-                node:title
-            })
+      const vscode = acquireVsCodeApi()
+      var defaultTransform = "";
+
+      function reset() {
+        d3.select('#app g').attr('transform', defaultTransform)
+      }
+
+      function setupOnEnd() {
+        defaultTransform = d3.select('#app g').attr('transform')
+        nodes = d3.selectAll('.node');
+        nodes
+        .on("click", function () {
+          var title = d3.select(this).selectAll('title').text().trim();
+          console.log(`click ${title}`);
+          vscode.postMessage({
+              type: 'click',
+              node:title
           })
-        }
+        })
+      }
+
+      window.addEventListener('message', event => {
+          switch (event.data.type) {
+            case "graph_content":
+              d3.select('#app').graphviz().renderDot(event.data.graph)
+              .on('end', setupOnEnd)
+            break;
+          }
+        })
+        vscode.postMessage({type: 'ready'})
+
     </script>
     </html>

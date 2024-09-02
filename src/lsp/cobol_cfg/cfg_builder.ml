@@ -68,31 +68,35 @@ let build_node ~default_name ~cu paragraph =
     type acc = {
       conditionals: Qualnames.t;
       unconditional: Unconditionals.t;
+      unreachable: bool;
     }
-    let init = {conditionals = Qualnames.empty; unconditional = Unconditionals.empty }
+    let init = {conditionals = Qualnames.empty;
+                unconditional = Unconditionals.empty;
+                unreachable = false; }
     let add_unconditional uncond acc =
-      { acc with unconditional = Unconditionals.add uncond acc.unconditional }
+      { acc with unconditional = Unconditionals.add uncond acc.unconditional;
+                 unreachable = true; }
     let add_conditionals acc qn_to_jump =
       { acc with conditionals = Qualnames.add qn_to_jump acc.conditionals }
   end in
-  let { conditionals; unconditional } =
+  let { conditionals; unconditional; unreachable = _ } =
     Visitor.fold_procedure_paragraph'
       object (v)
         inherit [acc] Visitor.folder
         method! fold_goback' _ acc = skip @@ add_unconditional Goback acc
-        method! fold_statement' _ ({ unconditional; _ } as acc) =
-          match unconditional with
-          | u when Unconditionals.is_empty u -> do_children acc
-          | _ -> skip acc
-
+        method! fold_statement' _ ({ unreachable; _ } as acc) =
+          if unreachable
+          then skip acc
+          else do_children acc
         method! fold_if' { payload = { then_branch; else_branch; _ }; _ } acc =
-          let { conditionals; unconditional } =
+          let { conditionals; unconditional; unreachable } =
             Cobol_ptree.Visitor.fold_statements v then_branch acc in
-          let { conditionals = else_cond; unconditional = else_uncond } =
+          let { conditionals = else_cond; unconditional = else_uncond; unreachable = else_unreach } =
             Cobol_ptree.Visitor.fold_statements v else_branch init in
           skip {
             conditionals = Qualnames.union conditionals else_cond;
             unconditional = Unconditionals.union unconditional else_uncond;
+            unreachable = unreachable && else_unreach
           }
 
         method! fold_goto' { payload; _ } acc =

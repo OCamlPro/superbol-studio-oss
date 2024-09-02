@@ -35,7 +35,6 @@
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
-   (ez_subst ( >= 0.2.1 ))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
   )
