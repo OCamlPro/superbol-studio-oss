@@ -423,8 +423,8 @@ syn_copy.at-918-prog.cob:7.7-12.55:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob" "cbx"
 
-Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:968:0
-syn_copy.at-968-prog.cob:7.7-8.44:
+Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:949:0
+syn_copy.at-949-prog.cob:7.7-8.44:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          REPLACE   ==VAR-COLON== BY ==VAR-COMMA==.
@@ -473,4 +473,44 @@ syn_copy.at-1072-prog.cob:15.11-15.17:
 ----              ^^^^^^
   16              STOP RUN.
 >> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1110:0
+syn_copy.at-1110-prog.cob:2.7-2.12:
+   1   
+   2 >        BEGIN PROGRAM    prog.
+----          ^^^^^
+   3          PROCEDURE        DIVISION.
+   4              DISPLAY output
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1155:0
+syn_copy.at-1155-prog.cob:6.7-8.54:
+   3          PROGRAM-ID.      prog.
+   4          DATA             DIVISION.
+   5          WORKING-STORAGE  SECTION.
+   6 >        COPY "copy.inc"
+----          ^^^^^^^^^^^^^^^
+   7 >             REPLACING TRAILING ==FIRST== BY ==VAR1==
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   8 >                       TRAILING ==SECOND== BY ==VAR2==.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9          REPLACE ==
+  10                 01  TEST-VAR1  PIC X(2) VALUE "OK".
+>> Error: Library `copy.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
+
+syn_copy.at-1155-prog.cob:20.7-22.54:
+  17              END-DISPLAY.
+  18              STOP RUN.
+  19   	   ==.
+  20 >        COPY "copy.inc"
+----          ^^^^^^^^^^^^^^^
+  21 >             REPLACING TRAILING ==FIRST== BY ==VAR1==
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  22 >                       TRAILING ==SECOND== BY ==VAR2==.
+----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> Error: Library `copy.inc' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 

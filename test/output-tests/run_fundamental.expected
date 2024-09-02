@@ -76,26 +76,28 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:284:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:333:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:444:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:475:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:518:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:547:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:614:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:737:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:868:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:904:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:951:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:952:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:988:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1032:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1033:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1065:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1097:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1129:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1174:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1223:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1306:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1390:0
-run_fundamental.at-1390-prog.cob:7.11-7.15:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2122:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2427:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2494:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2546:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2575:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2641:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2764:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2895:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2931:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2978:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2979:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3015:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3059:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3060:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3092:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3124:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3156:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3201:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3250:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3333:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3417:0
+run_fundamental.at-3417-prog.cob:7.11-7.15:
    4          LINKAGE SECTION.
    5          01 r BINARY-LONG.
    6          PROCEDURE DIVISION RETURNING r.
@@ -105,7 +107,7 @@ run_fundamental.at-1390-prog.cob:7.11-7.15:
    9              .
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:7.17:
+run_fundamental.at-3417-prog.cob:7.17:
    4          LINKAGE SECTION.
    5          01 r BINARY-LONG.
    6          PROCEDURE DIVISION RETURNING r.
@@ -115,7 +117,7 @@ run_fundamental.at-1390-prog.cob:7.17:
    9              .
 >> Hint: Missing .
 
-run_fundamental.at-1390-prog.cob:7.18-7.20:
+run_fundamental.at-3417-prog.cob:7.18-7.20:
    4          LINKAGE SECTION.
    5          01 r BINARY-LONG.
    6          PROCEDURE DIVISION RETURNING r.
@@ -125,7 +127,7 @@ run_fundamental.at-1390-prog.cob:7.18-7.20:
    9              .
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:7.22:
+run_fundamental.at-3417-prog.cob:7.22:
    4          LINKAGE SECTION.
    5          01 r BINARY-LONG.
    6          PROCEDURE DIVISION RETURNING r.
@@ -135,7 +137,7 @@ run_fundamental.at-1390-prog.cob:7.22:
    9              .
 >> Hint: Missing .
 
-run_fundamental.at-1390-prog.cob:8.11-8.17:
+run_fundamental.at-3417-prog.cob:8.11-8.17:
    5          01 r BINARY-LONG.
    6          PROCEDURE DIVISION RETURNING r.
    7              move 1 to r
@@ -145,7 +147,7 @@ run_fundamental.at-1390-prog.cob:8.11-8.17:
   10          END FUNCTION f1.
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:17.11-17.14:
+run_fundamental.at-3417-prog.cob:17.11-17.14:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -155,7 +157,7 @@ run_fundamental.at-1390-prog.cob:17.11-17.14:
   19              .
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:17.16:
+run_fundamental.at-3417-prog.cob:17.16:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -165,7 +167,7 @@ run_fundamental.at-1390-prog.cob:17.16:
   19              .
 >> Hint: Missing .
 
-run_fundamental.at-1390-prog.cob:17.17-17.19:
+run_fundamental.at-3417-prog.cob:17.17-17.19:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -175,7 +177,7 @@ run_fundamental.at-1390-prog.cob:17.17-17.19:
   19              .
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:17.21:
+run_fundamental.at-3417-prog.cob:17.21:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -185,7 +187,7 @@ run_fundamental.at-1390-prog.cob:17.21:
   19              .
 >> Hint: Missing .
 
-run_fundamental.at-1390-prog.cob:17.22-17.28:
+run_fundamental.at-3417-prog.cob:17.22-17.28:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -195,7 +197,7 @@ run_fundamental.at-1390-prog.cob:17.22-17.28:
   19              .
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:17.30:
+run_fundamental.at-3417-prog.cob:17.30:
   14          01 i BINARY-LONG.
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
@@ -205,7 +207,7 @@ run_fundamental.at-1390-prog.cob:17.30:
   19              .
 >> Hint: Missing .
 
-run_fundamental.at-1390-prog.cob:18.11-18.17:
+run_fundamental.at-3417-prog.cob:18.11-18.17:
   15          01 r BINARY-LONG.
   16          PROCEDURE DIVISION USING i RETURNING r.
   17              add i to i giving r
@@ -215,7 +217,7 @@ run_fundamental.at-1390-prog.cob:18.11-18.17:
   20          END FUNCTION f2.
 >> Warning: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:45.19-45.20:
+run_fundamental.at-3417-prog.cob:45.19-45.20:
   42          77  curr  PIC 9.9999,99Y.
   43   
   44          PROCEDURE DIVISION.
@@ -225,7 +227,7 @@ run_fundamental.at-1390-prog.cob:45.19-45.20:
   47                DISPLAY "ERROR 1" GOBACK
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:45.19:
+run_fundamental.at-3417-prog.cob:45.19:
   42          77  curr  PIC 9.9999,99Y.
   43   
   44          PROCEDURE DIVISION.
@@ -235,7 +237,7 @@ run_fundamental.at-1390-prog.cob:45.19:
   47                DISPLAY "ERROR 1" GOBACK
 >> Hint: Missing <subscript>
 
-run_fundamental.at-1390-prog.cob:53.19-53.20:
+run_fundamental.at-3417-prog.cob:53.19-53.20:
   50              IF n1 NOT = 2
   51                DISPLAY "ERROR 2" GOBACK
   52              END-IF
@@ -245,7 +247,7 @@ run_fundamental.at-1390-prog.cob:53.19-53.20:
   55                DISPLAY "ERROR 1 2nd" GOBACK
 >> Error: Invalid syntax
 
-run_fundamental.at-1390-prog.cob:53.19:
+run_fundamental.at-3417-prog.cob:53.19:
   50              IF n1 NOT = 2
   51                DISPLAY "ERROR 2" GOBACK
   52              END-IF
@@ -255,9 +257,9 @@ run_fundamental.at-1390-prog.cob:53.19:
   55                DISPLAY "ERROR 1 2nd" GOBACK
 >> Hint: Missing <subscript>
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1412:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1494:0
-run_fundamental.at-1494-prog.cob:11.71:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3439:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3521:0
+run_fundamental.at-3521-prog.cob:11.71:
    8          01 argument  PIC X ANY LENGTH.
    9          01 result.
   10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
@@ -267,7 +269,7 @@ run_fundamental.at-1494-prog.cob:11.71:
   13              MOVE argument TO result.
 >> Hint: Missing END
 
-run_fundamental.at-1494-prog.cob:12.11-12.15:
+run_fundamental.at-3521-prog.cob:12.11-12.15:
    9          01 result.
   10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
   11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
@@ -277,7 +279,7 @@ run_fundamental.at-1494-prog.cob:12.11-12.15:
   14          END FUNCTION reply.
 >> Error: Invalid syntax
 
-run_fundamental.at-1494-prog.cob:12.24:
+run_fundamental.at-3521-prog.cob:12.24:
    9          01 result.
   10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
   11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
@@ -287,7 +289,7 @@ run_fundamental.at-1494-prog.cob:12.24:
   14          END FUNCTION reply.
 >> Hint: Missing <word>
 
-run_fundamental.at-1494-prog.cob:12.25-12.31:
+run_fundamental.at-3521-prog.cob:12.25-12.31:
    9          01 result.
   10             05 filler PIC X OCCURS 0 to 999 DEPENDING ON arg-len.
   11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
@@ -297,7 +299,7 @@ run_fundamental.at-1494-prog.cob:12.25-12.31:
   14          END FUNCTION reply.
 >> Error: Invalid syntax
 
-run_fundamental.at-1494-prog.cob:14.7-14.10:
+run_fundamental.at-3521-prog.cob:14.7-14.10:
   11          PROCEDURE DIVISION USING BY REFERENCE argument RETURNING result.
   12              MOVE FUNCTION LENGTH (argument) TO arg-len
   13              MOVE argument TO result.
@@ -307,10 +309,10 @@ run_fundamental.at-1494-prog.cob:14.7-14.10:
   16          IDENTIFICATION DIVISION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1526:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1525:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1558:0
-run_fundamental.at-1558-module.c:5.6-5.7:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3553:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3552:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3585:0
+run_fundamental.at-3585-module.c:5.6-5.7:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -320,7 +322,7 @@ run_fundamental.at-1558-module.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
-run_fundamental.at-1558-module.c:5.7-5.8:
+run_fundamental.at-3585-module.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -330,7 +332,7 @@ run_fundamental.at-1558-module.c:5.7-5.8:
    7   {
 >> Error: Invalid syntax
 
-run_fundamental.at-1558-module.c:6.6-6.7:
+run_fundamental.at-3585-module.c:6.6-6.7:
    3   #include <libcob.h>
    4   
    5   COB_EXT_EXPORT int
@@ -340,7 +342,7 @@ run_fundamental.at-1558-module.c:6.6-6.7:
    8     return 0;
 >> Error: Unexpected indicator: `v'
 
-run_fundamental.at-1558-module.c:8.6-8.7:
+run_fundamental.at-3585-module.c:8.6-8.7:
    5   COB_EXT_EXPORT int
    6   some (void)
    7   {
@@ -349,14 +351,14 @@ run_fundamental.at-1558-module.c:8.6-8.7:
    9   }
 >> Error: Unexpected indicator: `r'
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1557:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1617:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1670:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1723:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1777:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1856:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:1956:0
-run_fundamental.at-1956-prog.cob:60.50:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3584:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3644:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3697:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3750:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3804:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3883:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3983:0
+run_fundamental.at-3983-prog.cob:60.50:
   57   
   58          DATA            DIVISION.
   59          WORKING-STORAGE SECTION.
@@ -366,7 +368,7 @@ run_fundamental.at-1956-prog.cob:60.50:
   62   
 >> Hint: Missing <literal>
 
-run_fundamental.at-1956-prog.cob:60.51-60.55:
+run_fundamental.at-3983-prog.cob:60.51-60.55:
   57   
   58          DATA            DIVISION.
   59          WORKING-STORAGE SECTION.
@@ -376,8 +378,8 @@ run_fundamental.at-1956-prog.cob:60.51-60.55:
   62   
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2060:0
-run_fundamental.at-2060-prog.cob:28.50:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4087:0
+run_fundamental.at-4087-prog.cob:28.50:
   25              .
   26          DATA            DIVISION.
   27          WORKING-STORAGE SECTION.
@@ -387,7 +389,7 @@ run_fundamental.at-2060-prog.cob:28.50:
   30   
 >> Hint: Missing <literal>
 
-run_fundamental.at-2060-prog.cob:28.51-28.55:
+run_fundamental.at-4087-prog.cob:28.51-28.55:
   25              .
   26          DATA            DIVISION.
   27          WORKING-STORAGE SECTION.
@@ -397,24 +399,24 @@ run_fundamental.at-2060-prog.cob:28.51-28.55:
   30   
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2119:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2170:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2219:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2271:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2293:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2329:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2330:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2371:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2372:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2397:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2429:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2453:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2477:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2501:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2526:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2549:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2571:0
-run_fundamental.at-2571-prog.cob:11.20-11.26:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4146:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4197:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4246:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4298:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4320:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4356:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4357:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4398:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4399:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4424:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4455:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4480:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4504:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4528:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4553:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4576:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4598:0
+run_fundamental.at-4598-prog.cob:11.20-11.26:
    8          01  NORMAL       PIC 9 VALUE 0.
    9          PROCEDURE        DIVISION.
   10              DISPLAY NORMAL NO ADVANCING *> Intentionally no period or END-DISPLAY
@@ -422,22 +424,22 @@ run_fundamental.at-2571-prog.cob:11.20-11.26:
 ----                       ^^^^^^
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2598:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2625:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2688:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2751:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2814:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2877:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:2940:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3003:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3066:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3102:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3338:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3642:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3877:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4112:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4171:0
-run_fundamental.at-4171-dump.c:5.6-5.7:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4625:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4652:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4715:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4778:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4841:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4904:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4967:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5030:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5093:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5129:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5365:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5669:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5904:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6139:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6198:0
+run_fundamental.at-6198-dump.c:5.6-5.7:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -447,7 +449,7 @@ run_fundamental.at-4171-dump.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
-run_fundamental.at-4171-dump.c:5.7-5.8:
+run_fundamental.at-6198-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -457,7 +459,7 @@ run_fundamental.at-4171-dump.c:5.7-5.8:
    7   {
 >> Error: Invalid syntax
 
-run_fundamental.at-4171-dump.c:6.6-6.7:
+run_fundamental.at-6198-dump.c:6.6-6.7:
    3   #include <libcob.h>
    4   
    5   COB_EXT_EXPORT int
@@ -467,7 +469,7 @@ run_fundamental.at-4171-dump.c:6.6-6.7:
    8     printf ("%c%c", p[0], p[1]);
 >> Error: Unexpected indicator: `c'
 
-run_fundamental.at-4171-dump.c:8.6-8.7:
+run_fundamental.at-6198-dump.c:8.6-8.7:
    5   COB_EXT_EXPORT int
    6   dump (char *p)
    7   {
@@ -477,7 +479,7 @@ run_fundamental.at-4171-dump.c:8.6-8.7:
   10   }
 >> Error: Unexpected indicator: `t'
 
-run_fundamental.at-4171-dump.c:9.6-9.7:
+run_fundamental.at-6198-dump.c:9.6-9.7:
    6   dump (char *p)
    7   {
    8     printf ("%c%c", p[0], p[1]);
@@ -486,13 +488,13 @@ run_fundamental.at-4171-dump.c:9.6-9.7:
   10   }
 >> Error: Unexpected indicator: `r'
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4172:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4462:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4508:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4560:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4608:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4648:0
-run_fundamental.at-4648-prog.cob:12.7-12.19:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6199:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6489:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6535:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6587:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6635:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6675:0
+run_fundamental.at-6675-prog.cob:12.7-12.19:
    9                  05  misalign-1           PIC X.
   10                  05  ptr                  POINTER, SYNC.
   11                  05  ptr-num              REDEFINES ptr,
@@ -502,7 +504,7 @@ run_fundamental.at-4648-prog.cob:12.7-12.19:
   14          >>ELSE
 >> Error: Malformed compiler directive
 
-run_fundamental.at-4648-prog.cob:14.7-14.13:
+run_fundamental.at-6675-prog.cob:14.7-14.13:
   11                  05  ptr-num              REDEFINES ptr,
   12          >>IF P64 SET
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
@@ -512,7 +514,7 @@ run_fundamental.at-4648-prog.cob:14.7-14.13:
   16          >>END-IF
 >> Error: Unexpected >>ELSE compiler directive
 
-run_fundamental.at-4648-prog.cob:15.40-15.45:
+run_fundamental.at-6675-prog.cob:15.40-15.45:
   12          >>IF P64 SET
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
@@ -522,7 +524,7 @@ run_fundamental.at-4648-prog.cob:15.40-15.45:
   17                  05  misalign-2           PIC X.
 >> Error: Invalid syntax
 
-run_fundamental.at-4648-prog.cob:16.7-16.15:
+run_fundamental.at-6675-prog.cob:16.7-16.15:
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
   15                                           USAGE BINARY-LONG UNSIGNED.
@@ -532,17 +534,18 @@ run_fundamental.at-4648-prog.cob:16.7-16.15:
   18   
 >> Error: Unexpected >>END-IF compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4745:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4774:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4802:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4828:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4861:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4982:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5018:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5040:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5063:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5089:0
-run_fundamental.at-5089-prog.cob:12.36:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6772:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6801:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6829:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6855:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6888:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7009:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7045:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7078:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7100:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7123:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7149:0
+run_fundamental.at-7149-prog.cob:12.36:
    9          PROCEDURE        DIVISION.
   10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
   11         D    END-DISPLAY.
@@ -552,7 +555,7 @@ run_fundamental.at-5089-prog.cob:12.36:
   14              STOP RUN.
 >> Hint: Missing .
 
-run_fundamental.at-5089-prog.cob:12.37-12.41:
+run_fundamental.at-7149-prog.cob:12.37-12.41:
    9          PROCEDURE        DIVISION.
   10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
   11         D    END-DISPLAY.
@@ -562,7 +565,7 @@ run_fundamental.at-5089-prog.cob:12.37-12.41:
   14              STOP RUN.
 >> Warning: Invalid syntax
 
-run_fundamental.at-5089-prog.cob:13.11-13.22:
+run_fundamental.at-7149-prog.cob:13.11-13.22:
   10         D    DISPLAY "KO" NO ADVANCING UPON STDOUT
   11         D    END-DISPLAY.
   12              DISPLAY "OK" NO ADVANCING UPON STDOUT
@@ -571,8 +574,8 @@ run_fundamental.at-5089-prog.cob:13.11-13.22:
   14              STOP RUN.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5112:0
-run_fundamental.at-5112-prog.cob:9.6-9.38:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7172:0
+run_fundamental.at-7172-prog.cob:9.6-9.38:
    6          PROCEDURE        DIVISION.
    7                DISPLAY "OK" NO ADVANCING
    8                END-DISPLAY.
@@ -582,7 +585,7 @@ run_fundamental.at-5112-prog.cob:9.6-9.38:
   11                STOP RUN.
 >> Error: Invalid >>D compiler directive
 
-run_fundamental.at-5112-prog.cob:10.6-10.25:
+run_fundamental.at-7172-prog.cob:10.6-10.25:
    7                DISPLAY "OK" NO ADVANCING
    8                END-DISPLAY.
    9         >>D    DISPLAY "KO" NO ADVANCING
@@ -591,8 +594,8 @@ run_fundamental.at-5112-prog.cob:10.6-10.25:
   11                STOP RUN.
 >> Error: Invalid >>D compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5135:0
-run_fundamental.at-5135-prog.cob:9.6-9.38:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7195:0
+run_fundamental.at-7195-prog.cob:9.6-9.38:
    6          PROCEDURE        DIVISION.
    7                DISPLAY "OK" NO ADVANCING
    8                END-DISPLAY.
@@ -602,7 +605,7 @@ run_fundamental.at-5135-prog.cob:9.6-9.38:
   11                STOP RUN.
 >> Error: Invalid >>D compiler directive
 
-run_fundamental.at-5135-prog.cob:10.6-10.25:
+run_fundamental.at-7195-prog.cob:10.6-10.25:
    7                DISPLAY "OK" NO ADVANCING
    8                END-DISPLAY.
    9         >>D    DISPLAY "KO" NO ADVANCING
@@ -611,17 +614,17 @@ run_fundamental.at-5135-prog.cob:10.6-10.25:
   11                STOP RUN.
 >> Error: Invalid >>D compiler directive
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5172:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5217:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5262:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5313:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5363:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5426:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5486:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5538:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5576:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5623:0
-run_fundamental.at-5623-prog.cob:10.43:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7232:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7277:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7322:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7373:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7423:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7486:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7546:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7598:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7636:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7683:0
+run_fundamental.at-7683-prog.cob:10.43:
    7          DATA             DIVISION.
    8          WORKING-STORAGE  SECTION.
    9          01  DATA-FIELD   PIC X(40) VALUE "ABCD" BASED.
@@ -631,7 +634,7 @@ run_fundamental.at-5623-prog.cob:10.43:
   12          LINKAGE SECTION.
 >> Hint: Missing <literal>
 
-run_fundamental.at-5623-prog.cob:10.44-10.48:
+run_fundamental.at-7683-prog.cob:10.44-10.48:
    7          DATA             DIVISION.
    8          WORKING-STORAGE  SECTION.
    9          01  DATA-FIELD   PIC X(40) VALUE "ABCD" BASED.
@@ -641,19 +644,19 @@ run_fundamental.at-5623-prog.cob:10.44-10.48:
   12          LINKAGE SECTION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5670:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6013:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6072:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6161:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6229:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6281:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6280:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6308:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6385:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6348:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6440:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6484:0
-run_fundamental.at-6484-prog.cob:13.26:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7730:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8073:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8132:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8221:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8289:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8351:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8350:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8378:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8455:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8418:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8510:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8554:0
+run_fundamental.at-8554-prog.cob:13.26:
   10          PROCEDURE DIVISION.
   11          MAIN-PROGRAM SECTION.
   12          INIZIO.
@@ -663,7 +666,7 @@ run_fundamental.at-6484-prog.cob:13.26:
   15              END-IF
 >> Hint: Missing )
 
-run_fundamental.at-6484-prog.cob:13.27-13.30:
+run_fundamental.at-8554-prog.cob:13.27-13.30:
   10          PROCEDURE DIVISION.
   11          MAIN-PROGRAM SECTION.
   12          INIZIO.
@@ -673,7 +676,7 @@ run_fundamental.at-6484-prog.cob:13.27-13.30:
   15              END-IF
 >> Error: Invalid syntax
 
-run_fundamental.at-6484-prog.cob:13.44-13.45:
+run_fundamental.at-8554-prog.cob:13.44-13.45:
   10          PROCEDURE DIVISION.
   11          MAIN-PROGRAM SECTION.
   12          INIZIO.
@@ -683,7 +686,7 @@ run_fundamental.at-6484-prog.cob:13.44-13.45:
   15              END-IF
 >> Error: Invalid syntax
 
-run_fundamental.at-6484-prog.cob:16.30:
+run_fundamental.at-8554-prog.cob:16.30:
   13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
   14                 DISPLAY "TRUE 1"
   15              END-IF
@@ -693,7 +696,7 @@ run_fundamental.at-6484-prog.cob:16.30:
   18              END-IF
 >> Hint: Missing )
 
-run_fundamental.at-6484-prog.cob:16.31-16.34:
+run_fundamental.at-8554-prog.cob:16.31-16.34:
   13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
   14                 DISPLAY "TRUE 1"
   15              END-IF
@@ -703,7 +706,7 @@ run_fundamental.at-6484-prog.cob:16.31-16.34:
   18              END-IF
 >> Error: Invalid syntax
 
-run_fundamental.at-6484-prog.cob:16.48-16.49:
+run_fundamental.at-8554-prog.cob:16.48-16.49:
   13              IF VAR1 = (VAR2 AND VAR3 AND VAR4)
   14                 DISPLAY "TRUE 1"
   15              END-IF
@@ -713,7 +716,7 @@ run_fundamental.at-6484-prog.cob:16.48-16.49:
   18              END-IF
 >> Error: Invalid syntax
 
-run_fundamental.at-6484-prog.cob:19.30:
+run_fundamental.at-8554-prog.cob:19.30:
   16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
   17                 DISPLAY "TRUE 2"
   18              END-IF
@@ -723,7 +726,7 @@ run_fundamental.at-6484-prog.cob:19.30:
   21              END-IF
 >> Hint: Missing )
 
-run_fundamental.at-6484-prog.cob:19.31-19.34:
+run_fundamental.at-8554-prog.cob:19.31-19.34:
   16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
   17                 DISPLAY "TRUE 2"
   18              END-IF
@@ -733,7 +736,7 @@ run_fundamental.at-6484-prog.cob:19.31-19.34:
   21              END-IF
 >> Error: Invalid syntax
 
-run_fundamental.at-6484-prog.cob:19.48-19.49:
+run_fundamental.at-8554-prog.cob:19.48-19.49:
   16              IF VAR1 NOT = (VAR2 AND VAR3 AND VAR4)
   17                 DISPLAY "TRUE 2"
   18              END-IF
@@ -743,9 +746,9 @@ run_fundamental.at-6484-prog.cob:19.48-19.49:
   21              END-IF
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6560:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6764:0
-run_fundamental.at-6764-prog.cob:174.16-174.22:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8629:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8833:0
+run_fundamental.at-8833-prog.cob:174.16-174.22:
  171          CHECK-LENGTH.
  172         *>-----------
  173         *>
@@ -755,7 +758,7 @@ run_fundamental.at-6764-prog.cob:174.16-174.22:
  176              THEN
 >> Error: Invalid syntax
 
-run_fundamental.at-6764-prog.cob:179.16-179.22:
+run_fundamental.at-8833-prog.cob:179.16-179.22:
  176              THEN
  177                  DISPLAY 'Error 1 size <' W01-I '> !=2' .
  178         *>
@@ -765,7 +768,7 @@ run_fundamental.at-6764-prog.cob:179.16-179.22:
  181              THEN
 >> Error: Invalid syntax
 
-run_fundamental.at-6764-prog.cob:184.16-184.22:
+run_fundamental.at-8833-prog.cob:184.16-184.22:
  181              THEN
  182                  DISPLAY 'Error 2 size <' W01-I '> !=2' .
  183         *>
@@ -775,7 +778,7 @@ run_fundamental.at-6764-prog.cob:184.16-184.22:
  186              THEN
 >> Error: Invalid syntax
 
-run_fundamental.at-6764-prog.cob:190.16-190.22:
+run_fundamental.at-8833-prog.cob:190.16-190.22:
  187                  DISPLAY 'Error 3 size <' W01-I '> !=1' .
  188         *>
  189   
@@ -785,15 +788,15 @@ run_fundamental.at-6764-prog.cob:190.16-190.22:
  192              THEN
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6816:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6874:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6925:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6977:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7029:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7158:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:7232:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9015:0
-run_fundamental.at-9015-prog.cob:30.22-30.32:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8885:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8943:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8994:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9046:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9098:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9227:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9301:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:11084:0
+run_fundamental.at-11084-prog.cob:30.22-30.32:
   27             05 FIELD-15 FLOAT-DECIMAL-34 .
   28             05 FIELD-16 FLOAT-LONG .
   29             05 FIELD-17 FLOAT-SHORT .
@@ -803,7 +806,7 @@ run_fundamental.at-9015-prog.cob:30.22-30.32:
   32             05 FIELD-20 SIGNED-SHORT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:31.22-31.33:
+run_fundamental.at-11084-prog.cob:31.22-31.33:
   28             05 FIELD-16 FLOAT-LONG .
   29             05 FIELD-17 FLOAT-SHORT .
   30             05 FIELD-18 SIGNED-INT .
@@ -813,7 +816,7 @@ run_fundamental.at-9015-prog.cob:31.22-31.33:
   33             05 FIELD-21 UNSIGNED-INT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:32.22-32.34:
+run_fundamental.at-11084-prog.cob:32.22-32.34:
   29             05 FIELD-17 FLOAT-SHORT .
   30             05 FIELD-18 SIGNED-INT .
   31             05 FIELD-19 SIGNED-LONG .
@@ -823,7 +826,7 @@ run_fundamental.at-9015-prog.cob:32.22-32.34:
   34             05 FIELD-22 UNSIGNED-LONG .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:33.22-33.34:
+run_fundamental.at-11084-prog.cob:33.22-33.34:
   30             05 FIELD-18 SIGNED-INT .
   31             05 FIELD-19 SIGNED-LONG .
   32             05 FIELD-20 SIGNED-SHORT .
@@ -833,7 +836,7 @@ run_fundamental.at-9015-prog.cob:33.22-33.34:
   35             05 FIELD-23 UNSIGNED-SHORT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:34.22-34.35:
+run_fundamental.at-11084-prog.cob:34.22-34.35:
   31             05 FIELD-19 SIGNED-LONG .
   32             05 FIELD-20 SIGNED-SHORT .
   33             05 FIELD-21 UNSIGNED-INT .
@@ -843,7 +846,7 @@ run_fundamental.at-9015-prog.cob:34.22-34.35:
   36             05 FIELD-24            COMP-1 .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:35.22-35.36:
+run_fundamental.at-11084-prog.cob:35.22-35.36:
   32             05 FIELD-20 SIGNED-SHORT .
   33             05 FIELD-21 UNSIGNED-INT .
   34             05 FIELD-22 UNSIGNED-LONG .
@@ -853,7 +856,7 @@ run_fundamental.at-9015-prog.cob:35.22-35.36:
   37             05 FIELD-25            COMP-2 .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:66.22-66.32:
+run_fundamental.at-11084-prog.cob:66.22-66.32:
   63             05 FIELD-15 FLOAT-DECIMAL-34 .
   64             05 FIELD-16 FLOAT-LONG .
   65             05 FIELD-17 FLOAT-SHORT .
@@ -863,7 +866,7 @@ run_fundamental.at-9015-prog.cob:66.22-66.32:
   68             05 FIELD-20 SIGNED-SHORT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:67.22-67.33:
+run_fundamental.at-11084-prog.cob:67.22-67.33:
   64             05 FIELD-16 FLOAT-LONG .
   65             05 FIELD-17 FLOAT-SHORT .
   66             05 FIELD-18 SIGNED-INT .
@@ -873,7 +876,7 @@ run_fundamental.at-9015-prog.cob:67.22-67.33:
   69             05 FIELD-21 UNSIGNED-INT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:68.22-68.34:
+run_fundamental.at-11084-prog.cob:68.22-68.34:
   65             05 FIELD-17 FLOAT-SHORT .
   66             05 FIELD-18 SIGNED-INT .
   67             05 FIELD-19 SIGNED-LONG .
@@ -883,7 +886,7 @@ run_fundamental.at-9015-prog.cob:68.22-68.34:
   70             05 FIELD-22 UNSIGNED-LONG .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:69.22-69.34:
+run_fundamental.at-11084-prog.cob:69.22-69.34:
   66             05 FIELD-18 SIGNED-INT .
   67             05 FIELD-19 SIGNED-LONG .
   68             05 FIELD-20 SIGNED-SHORT .
@@ -893,7 +896,7 @@ run_fundamental.at-9015-prog.cob:69.22-69.34:
   71             05 FIELD-23 UNSIGNED-SHORT .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:70.22-70.35:
+run_fundamental.at-11084-prog.cob:70.22-70.35:
   67             05 FIELD-19 SIGNED-LONG .
   68             05 FIELD-20 SIGNED-SHORT .
   69             05 FIELD-21 UNSIGNED-INT .
@@ -903,7 +906,7 @@ run_fundamental.at-9015-prog.cob:70.22-70.35:
   72             05 FIELD-24            COMP-1 .
 >> Error: Invalid syntax
 
-run_fundamental.at-9015-prog.cob:71.22-71.36:
+run_fundamental.at-11084-prog.cob:71.22-71.36:
   68             05 FIELD-20 SIGNED-SHORT .
   69             05 FIELD-21 UNSIGNED-INT .
   70             05 FIELD-22 UNSIGNED-LONG .
@@ -913,9 +916,9 @@ run_fundamental.at-9015-prog.cob:71.22-71.36:
   73             05 FIELD-25            COMP-2 .
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9060:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:9123:0
-run_fundamental.at-9123-prog.cob:10.7-10.12:
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:11129:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:11192:0
+run_fundamental.at-11192-prog.cob:10.7-10.12:
    7          SPECIAL-NAMES         .
    8          CLASS HEXA IS '0' THRU '9'
    9                        'A' THRU 'F' .
