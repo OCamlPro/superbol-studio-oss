@@ -14,6 +14,10 @@
 
 module LSP = Vscode_languageclient
 
+type server_access =
+  | Sub_process of LSP.ServerOptions.t
+  | TCP of { host: string; port: int }
+
 
 (* Helpers to find the bundled superbol executable *)
 let rec find_existing = function
@@ -48,7 +52,26 @@ let find_superbol root =
   ]
 
 
-let server_options ~context =
+let scan_host_and_port url =
+  let fail () = Format.ksprintf failwith "Invalid %S" url in
+  match String.split_on_char ':' url with
+  | [host; port] ->
+      (try TCP { host; port = int_of_string port }
+       with Invalid_argument _ -> fail ())
+  | _ ->
+      fail ()
+
+let scan_server_command cmd =
+  let prefix = "tcp://" in
+  if String.starts_with ~prefix cmd then
+    let l = String.length prefix in
+    let url = String.sub cmd l (String.length cmd - l) in
+    Some (scan_host_and_port url)
+  else
+    None
+
+
+let server_command ~context ?cmd () =
   let root_uri = Vscode.ExtensionContext.extensionUri context
   and storage_uri =
     (* Use the global state URI as the server stores caches on a per-project
@@ -59,7 +82,7 @@ let server_options ~context =
     else None
   in
   let command =
-    match Superbol_workspace.superbol_exe () with
+    match cmd with
     | Some cmd ->
         cmd
     | None ->
@@ -85,8 +108,17 @@ let server_options ~context =
      | None -> []
      | Some uri -> ["--storage-directory"; Vscode.Uri.fsPath uri])
   in
-  LSP.ServerOptions.create ()
-    ~options ~command ~args
+  Sub_process (LSP.ServerOptions.create ~options ~command ~args ())
+
+
+let server_access ~context =
+  match Superbol_workspace.superbol_exe () with
+  | None ->
+      server_command ~context ()
+  | Some cmd ->
+      match scan_server_command cmd with
+      | Some access -> access
+      | None -> server_command ~context ~cmd ()
 
 
 let client_options () =

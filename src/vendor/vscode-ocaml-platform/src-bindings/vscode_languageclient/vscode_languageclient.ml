@@ -231,7 +231,7 @@ module LanguageClient = struct
       -> t
       [@@js.new "vscode_languageclient.LanguageClient"]
 
-    val make_stream :
+    val from_stream :
          id:string
       -> name:string
       -> (unit -> StreamInfo.t Promise.t)
