@@ -1431,8 +1431,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2143:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2166:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2213:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2210:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2279:0
-run_extensions.at-2279-prog.cob:14.31:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2286:0
+run_extensions.at-2286-prog.cob:14.31:
   11          PROCEDURE        DIVISION.
   12              DISPLAY tally WITH NO ADVANCING.
   13              GOBACK.
@@ -1440,27 +1440,27 @@ run_extensions.at-2279-prog.cob:14.31:
 ----                                  ^
 >> Hint: Missing END PROGRAM .
 
-run_extensions.at-2279-prog.cob:15.0:
+run_extensions.at-2286-prog.cob:15.0:
   12              DISPLAY tally WITH NO ADVANCING.
   13              GOBACK.
   14          END PROGRAM      nested.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2306:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2366:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2365:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2313:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2373:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2372:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2493:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2498:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2478:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2486:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2491:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2471:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2479:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2483:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2538:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2541:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2544:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2547:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2595:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2595:0
-run_extensions.at-2595-prog1.cob:5.24-5.33:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2490:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2545:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2548:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2551:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2554:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
+run_extensions.at-2602-prog1.cob:5.24-5.33:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog1.
    4          PROCEDURE        DIVISION.
@@ -1468,12 +1468,12 @@ run_extensions.at-2595-prog1.cob:5.24-5.33:
 ----                           ^^^^^^^^^
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2595:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2638:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2639:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2700:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2699:0
-run_extensions.at-2699-prog.cob:9.30:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2645:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2646:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2711:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2710:0
+run_extensions.at-2710-prog.cob:9.30:
    6          FILE-CONTROL.
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
@@ -1483,7 +1483,7 @@ run_extensions.at-2699-prog.cob:9.30:
   11          DATA             DIVISION.
 >> Hint: Missing USING <word>
 
-run_extensions.at-2699-prog.cob:9.32-9.39:
+run_extensions.at-2710-prog.cob:9.32-9.39:
    6          FILE-CONTROL.
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
@@ -1493,9 +1493,9 @@ run_extensions.at-2699-prog.cob:9.32-9.39:
   11          DATA             DIVISION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2761:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2760:0
-run_extensions.at-2760-prog.cob:9.30:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2772:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2771:0
+run_extensions.at-2771-prog.cob:9.30:
    6          FILE-CONTROL.
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
@@ -1505,7 +1505,7 @@ run_extensions.at-2760-prog.cob:9.30:
   11          SELECT SORT-FILE.
 >> Hint: Missing USING <word>
 
-run_extensions.at-2760-prog.cob:9.32-9.39:
+run_extensions.at-2771-prog.cob:9.32-9.39:
    6          FILE-CONTROL.
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
@@ -1515,7 +1515,7 @@ run_extensions.at-2760-prog.cob:9.32-9.39:
   11          SELECT SORT-FILE.
 >> Error: Invalid syntax
 
-run_extensions.at-2760-prog.cob:11.23-11.24:
+run_extensions.at-2771-prog.cob:11.23-11.24:
    8                           ORGANIZATION IS LINE SEQUENTIAL.
    9          SELECT TEST-OUT  ASSIGN  DISPLAY
   10                           ORGANIZATION IS LINE SEQUENTIAL.
@@ -1525,8 +1525,8 @@ run_extensions.at-2760-prog.cob:11.23-11.24:
   13          FILE             SECTION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2809:0
-run_extensions.at-2809-prog.cob:26.24:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2820:0
+run_extensions.at-2820-prog.cob:26.24:
   23              END-ACCEPT.
   24              DISPLAY "(" Y ")"
   25              END-DISPLAY.
@@ -1536,7 +1536,7 @@ run_extensions.at-2809-prog.cob:26.24:
   28              DISPLAY "(" Z ")"
 >> Hint: Missing <word>
 
-run_extensions.at-2809-prog.cob:26.25-26.40:
+run_extensions.at-2820-prog.cob:26.25-26.40:
   23              END-ACCEPT.
   24              DISPLAY "(" Y ")"
   25              END-DISPLAY.
@@ -1546,11 +1546,11 @@ run_extensions.at-2809-prog.cob:26.25-26.40:
   28              DISPLAY "(" Z ")"
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2835:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2861:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2885:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2998:0
-run_extensions.at-2998-prog.cob:11.11-11.17:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2846:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2872:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2896:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3009:0
+run_extensions.at-3009-prog.cob:11.11-11.17:
    8                ON  IS SWIT1-ON
    9                OFF IS SWIT1-OFF
   10              .
@@ -1560,8 +1560,8 @@ run_extensions.at-2998-prog.cob:11.11-11.17:
   13                OFF IS SWIT2-OFF
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3066:0
-run_extensions.at-3066-prog.cob:36.19-36.25:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3077:0
+run_extensions.at-3077-prog.cob:36.19-36.25:
   33               10 SECOND-VARIANT-B REDEFINES SECOND-HEADER.
   34                  20 PART-B-SECOND       PIC X(3879).
   35          PROCEDURE        DIVISION.
@@ -1571,7 +1571,7 @@ run_extensions.at-3066-prog.cob:36.19-36.25:
   38                 DISPLAY "Test 1 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:39.19-39.25:
+run_extensions.at-3077-prog.cob:39.19-39.25:
   36              MOVE    LENGTH OF XMAIN       TO Z.
   37              IF Z NOT = 8
   38                 DISPLAY "Test 1 " Z.
@@ -1581,7 +1581,7 @@ run_extensions.at-3066-prog.cob:39.19-39.25:
   41                 DISPLAY "Test 2 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:42.19-42.25:
+run_extensions.at-3077-prog.cob:42.19-42.25:
   39              MOVE    LENGTH OF XMAINRED    TO Z.
   40              IF Z NOT = 9
   41                 DISPLAY "Test 2 " Z.
@@ -1591,7 +1591,7 @@ run_extensions.at-3066-prog.cob:42.19-42.25:
   44                 DISPLAY "Test 3 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:45.19-45.25:
+run_extensions.at-3077-prog.cob:45.19-45.25:
   42              MOVE    LENGTH OF XMAIN03     TO Z.
   43              IF Z NOT = 5
   44                 DISPLAY "Test 3 " Z.
@@ -1601,7 +1601,7 @@ run_extensions.at-3066-prog.cob:45.19-45.25:
   47                 DISPLAY "Test 4 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:48.19-48.25:
+run_extensions.at-3077-prog.cob:48.19-48.25:
   45              MOVE    LENGTH OF XMAIN0501   TO Z.
   46              IF Z NOT = 4
   47                 DISPLAY "Test 4 " Z.
@@ -1611,7 +1611,7 @@ run_extensions.at-3066-prog.cob:48.19-48.25:
   50                 DISPLAY "Test 5 " Z.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:52.22-52.28:
+run_extensions.at-3077-prog.cob:52.22-52.28:
   49              IF Z NOT = 5
   50                 DISPLAY "Test 5 " Z.
   51              IF LENGTH OF USE-FIRST  NOT = 33211
@@ -1621,7 +1621,7 @@ run_extensions.at-3066-prog.cob:52.22-52.28:
   54                 DISPLAY LENGTH OF USE-SECOND  END-DISPLAY.
 >> Error: Invalid syntax
 
-run_extensions.at-3066-prog.cob:54.22-54.28:
+run_extensions.at-3077-prog.cob:54.22-54.28:
   51              IF LENGTH OF USE-FIRST  NOT = 33211
   52                 DISPLAY LENGTH OF USE-FIRST   END-DISPLAY.
   53              IF LENGTH OF USE-SECOND NOT = 27241
@@ -1630,9 +1630,9 @@ run_extensions.at-3066-prog.cob:54.22-54.28:
   55              STOP RUN.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3092:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3117:0
-run_extensions.at-3117-prog.cob:7.11-7.15:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3103:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3128:0
+run_extensions.at-3128-prog.cob:7.11-7.15:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          01  TERMINAL     PIC XX VALUE "OK".
@@ -1642,7 +1642,7 @@ run_extensions.at-3117-prog.cob:7.11-7.15:
    9              DISPLAY TERMINAL SEND.
 >> Error: Invalid syntax
 
-run_extensions.at-3117-prog.cob:9.32-9.33:
+run_extensions.at-3128-prog.cob:9.32-9.33:
    6          01  TERMINAL     PIC XX VALUE "OK".
    7          01  SEND         PIC XX VALUE "OK".
    8          PROCEDURE        DIVISION.
@@ -1651,7 +1651,7 @@ run_extensions.at-3117-prog.cob:9.32-9.33:
   10              STOP RUN.
 >> Error: Invalid syntax
 
-run_extensions.at-3117-prog.cob:9.32:
+run_extensions.at-3128-prog.cob:9.32:
    6          01  TERMINAL     PIC XX VALUE "OK".
    7          01  SEND         PIC XX VALUE "OK".
    8          PROCEDURE        DIVISION.
@@ -1660,30 +1660,30 @@ run_extensions.at-3117-prog.cob:9.32:
   10              STOP RUN.
 >> Hint: Missing <word> FROM <identifier>
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3162:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3238:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3237:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3240:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3283:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3282:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3329:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3328:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3354:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3383:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3403:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3429:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3454:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3479:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3506:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3533:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3560:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3587:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3614:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3641:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3667:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3694:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4117:0
-run_extensions.at-4117-prog.cob:11.53:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3173:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3249:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3248:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3251:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3294:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3293:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3340:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3339:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3365:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3394:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3414:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3440:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3465:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3490:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3517:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3544:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3571:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3598:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3625:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3652:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3678:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3705:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4128:0
+run_extensions.at-4128-prog.cob:11.53:
    8                   05 OPTIONRECORD OCCURS 2 TIMES.
    9                       10 ONAME        PIC X(25).
   10                       10 HAS-VALUE    PIC 9.
@@ -1693,7 +1693,7 @@ run_extensions.at-4117-prog.cob:11.53:
   13   
 >> Hint: Missing <literal>
 
-run_extensions.at-4117-prog.cob:11.54-11.58:
+run_extensions.at-4128-prog.cob:11.54-11.58:
    8                   05 OPTIONRECORD OCCURS 2 TIMES.
    9                       10 ONAME        PIC X(25).
   10                       10 HAS-VALUE    PIC 9.
@@ -1703,8 +1703,8 @@ run_extensions.at-4117-prog.cob:11.54-11.58:
   13   
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4119:0
-run_extensions.at-4119-prog2.cob:14.53:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4130:0
+run_extensions.at-4130-prog2.cob:14.53:
   11                   05 OPTIONRECORD OCCURS 3 TIMES.
   12                       10 ONAME        PIC X(25).
   13                       10 HAS-VALUE    PIC 9.
@@ -1714,7 +1714,7 @@ run_extensions.at-4119-prog2.cob:14.53:
   16   
 >> Hint: Missing <literal>
 
-run_extensions.at-4119-prog2.cob:14.54-14.58:
+run_extensions.at-4130-prog2.cob:14.54-14.58:
   11                   05 OPTIONRECORD OCCURS 3 TIMES.
   12                       10 ONAME        PIC X(25).
   13                       10 HAS-VALUE    PIC 9.
@@ -1724,8 +1724,8 @@ run_extensions.at-4119-prog2.cob:14.54-14.58:
   16   
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4123:0
-run_extensions.at-4123-prog3.cob:12.53:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4134:0
+run_extensions.at-4134-prog3.cob:12.53:
    9                   05 OPTIONRECORD OCCURS 3 TIMES.
   10                       10 ONAME        PIC X(25).
   11                       10 HAS-VALUE    PIC 9.
@@ -1735,7 +1735,7 @@ run_extensions.at-4123-prog3.cob:12.53:
   14               01 LONGIND        PIC 99.
 >> Hint: Missing <literal>
 
-run_extensions.at-4123-prog3.cob:12.54-12.58:
+run_extensions.at-4134-prog3.cob:12.54-12.58:
    9                   05 OPTIONRECORD OCCURS 3 TIMES.
   10                       10 ONAME        PIC X(25).
   11                       10 HAS-VALUE    PIC 9.
@@ -1745,8 +1745,8 @@ run_extensions.at-4123-prog3.cob:12.54-12.58:
   14               01 LONGIND        PIC 99.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4125:0
-run_extensions.at-4125-prog4.cob:12.53:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4136:0
+run_extensions.at-4136-prog4.cob:12.53:
    9                   05 OPTIONRECORD OCCURS 3 TIMES.
   10                       10 ONAME        PIC X(25).
   11                       10 HAS-VALUE    PIC 9.
@@ -1756,7 +1756,7 @@ run_extensions.at-4125-prog4.cob:12.53:
   14               01 LONGIND          PIC 99.
 >> Hint: Missing <literal>
 
-run_extensions.at-4125-prog4.cob:12.54-12.58:
+run_extensions.at-4136-prog4.cob:12.54-12.58:
    9                   05 OPTIONRECORD OCCURS 3 TIMES.
   10                       10 ONAME        PIC X(25).
   11                       10 HAS-VALUE    PIC 9.
@@ -1766,8 +1766,8 @@ run_extensions.at-4125-prog4.cob:12.54-12.58:
   14               01 LONGIND          PIC 99.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4129:0
-run_extensions.at-4129-prog5.cob:12.53:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4140:0
+run_extensions.at-4140-prog5.cob:12.53:
    9                   05 OPTIONRECORD OCCURS 2 TIMES.
   10                       10 ONAME        PIC X(45).
   11                       10 HAS-VALUE    PIC 9.
@@ -1777,7 +1777,7 @@ run_extensions.at-4129-prog5.cob:12.53:
   14               01 LONGIND       PIC 99.
 >> Hint: Missing <literal>
 
-run_extensions.at-4129-prog5.cob:12.54-12.58:
+run_extensions.at-4140-prog5.cob:12.54-12.58:
    9                   05 OPTIONRECORD OCCURS 2 TIMES.
   10                       10 ONAME        PIC X(45).
   11                       10 HAS-VALUE    PIC 9.
@@ -1787,10 +1787,10 @@ run_extensions.at-4129-prog5.cob:12.54-12.58:
   14               01 LONGIND       PIC 99.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4192:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4247:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4381:0
-run_extensions.at-4381-prog.cob:68.33:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4203:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4258:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4392:0
+run_extensions.at-4392-prog.cob:68.33:
   65              END-IF
   66   
   67              SET ENVIRONMENT "TZ" TO "PST8PDT"
@@ -1800,7 +1800,7 @@ run_extensions.at-4381-prog.cob:68.33:
   70              END-CALL
 >> Hint: Missing <identifier>
 
-run_extensions.at-4381-prog.cob:68.34-68.41:
+run_extensions.at-4392-prog.cob:68.34-68.41:
   65              END-IF
   66   
   67              SET ENVIRONMENT "TZ" TO "PST8PDT"
@@ -1810,8 +1810,8 @@ run_extensions.at-4381-prog.cob:68.34-68.41:
   70              END-CALL
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4379:0
-run_extensions.at-4379-test_errno.c:7.6-7.7:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4390:0
+run_extensions.at-4390-test_errno.c:7.6-7.7:
    4   
    5   #include <libcob.h>
    6   
@@ -1821,7 +1821,7 @@ run_extensions.at-4379-test_errno.c:7.6-7.7:
    9   {
 >> Error: Unexpected indicator: `T'
 
-run_extensions.at-4379-test_errno.c:7.7-7.8:
+run_extensions.at-4390-test_errno.c:7.7-7.8:
    4   
    5   #include <libcob.h>
    6   
@@ -1831,7 +1831,7 @@ run_extensions.at-4379-test_errno.c:7.7-7.8:
    9   {
 >> Error: Invalid syntax
 
-run_extensions.at-4379-test_errno.c:8.6-8.7:
+run_extensions.at-4390-test_errno.c:8.6-8.7:
    5   #include <libcob.h>
    6   
    7   COB_EXT_EXPORT int
@@ -1841,7 +1841,7 @@ run_extensions.at-4379-test_errno.c:8.6-8.7:
   10       FILE *fail;
 >> Error: Unexpected indicator: `r'
 
-run_extensions.at-4379-test_errno.c:10.6-10.7:
+run_extensions.at-4390-test_errno.c:10.6-10.7:
    7   COB_EXT_EXPORT int
    8   test_errno(void)
    9   {
@@ -1851,7 +1851,7 @@ run_extensions.at-4379-test_errno.c:10.6-10.7:
   12       if (errno != 2) {
 >> Error: Unexpected indicator: `L'
 
-run_extensions.at-4379-test_errno.c:11.6-11.7:
+run_extensions.at-4390-test_errno.c:11.6-11.7:
    8   test_errno(void)
    9   {
   10       FILE *fail;
@@ -1861,7 +1861,7 @@ run_extensions.at-4379-test_errno.c:11.6-11.7:
   13           printf("BAD ERRNO %d", errno);
 >> Error: Unexpected indicator: `i'
 
-run_extensions.at-4379-test_errno.c:14.6-14.7:
+run_extensions.at-4390-test_errno.c:14.6-14.7:
   11       fail = fopen("file-not-to-be-found", "r");
   12       if (errno != 2) {
   13           printf("BAD ERRNO %d", errno);
@@ -1871,7 +1871,7 @@ run_extensions.at-4379-test_errno.c:14.6-14.7:
   16       }
 >> Error: Unexpected indicator: `e'
 
-run_extensions.at-4379-test_errno.c:17.6-17.7:
+run_extensions.at-4390-test_errno.c:17.6-17.7:
   14       } else {
   15           if (fail) fclose(fail);
   16       }
@@ -1880,8 +1880,8 @@ run_extensions.at-4379-test_errno.c:17.6-17.7:
   18   }
 >> Error: Unexpected indicator: `t'
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4380:0
-run_extensions.at-4380-test_stdio.c:5.6-5.7:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4391:0
+run_extensions.at-4391-test_stdio.c:5.6-5.7:
    2   #include <stdio.h>
    3   
    4   #include <libcob.h>
@@ -1891,7 +1891,7 @@ run_extensions.at-4380-test_stdio.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
-run_extensions.at-4380-test_stdio.c:5.7-5.8:
+run_extensions.at-4391-test_stdio.c:5.7-5.8:
    2   #include <stdio.h>
    3   
    4   #include <libcob.h>
@@ -1901,7 +1901,7 @@ run_extensions.at-4380-test_stdio.c:5.7-5.8:
    7   {
 >> Error: Invalid syntax
 
-run_extensions.at-4380-test_stdio.c:6.6-6.7:
+run_extensions.at-4391-test_stdio.c:6.6-6.7:
    3   
    4   #include <libcob.h>
    5   COB_EXT_EXPORT int
@@ -1911,7 +1911,7 @@ run_extensions.at-4380-test_stdio.c:6.6-6.7:
    8       if (feof(si)) {
 >> Error: Unexpected indicator: `t'
 
-run_extensions.at-4380-test_stdio.c:11.6-11.7:
+run_extensions.at-4391-test_stdio.c:11.6-11.7:
    8       if (feof(si)) {
    9           fprintf(se, "BAD STDIN EOF\n");
   10       }
@@ -1921,7 +1921,7 @@ run_extensions.at-4380-test_stdio.c:11.6-11.7:
   13   }
 >> Error: Unexpected indicator: `r'
 
-run_extensions.at-4380-test_stdio.c:12.6-12.7:
+run_extensions.at-4391-test_stdio.c:12.6-12.7:
    9           fprintf(se, "BAD STDIN EOF\n");
   10       }
   11       fprintf(so, "OUT");
@@ -1930,14 +1930,14 @@ run_extensions.at-4380-test_stdio.c:12.6-12.7:
   13   }
 >> Error: Unexpected indicator: `t'
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4454:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4597:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4672:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4767:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4796:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4834:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4853:0
-run_extensions.at-4853-progc.cob:12.7-12.25:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4465:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4608:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4683:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4778:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4807:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4845:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4864:0
+run_extensions.at-4864-progc.cob:12.7-12.25:
    9              IF first-call NOT = SPACE
   10                 GOBACK.
   11              MOVE 'X' TO first-call
@@ -1948,8 +1948,8 @@ run_extensions.at-4853-progc.cob:12.7-12.25:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob" "cbx"
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4892:0
-run_extensions.at-4892-prog.cob:7.7-7.8:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4903:0
+run_extensions.at-4903-prog.cob:7.7-7.8:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          01 var1          pic x.
@@ -1959,7 +1959,7 @@ run_extensions.at-4892-prog.cob:7.7-7.8:
    9          >> DISPLAY some.text-here
 >> Error: Invalid syntax
 
-run_extensions.at-4892-prog.cob:9.7-9.32:
+run_extensions.at-4903-prog.cob:9.7-9.32:
    6          01 var1          pic x.
    7          $DISPLAY  MF compile time text # A.0-B;C *> without comment
    8          01 var2          pic x.
@@ -1969,7 +1969,7 @@ run_extensions.at-4892-prog.cob:9.7-9.32:
   11          PROCEDURE        DIVISION.
 >> Error: Invalid >>DISPLAY compiler directive
 
-run_extensions.at-4892-prog.cob:12.7-12.34:
+run_extensions.at-4903-prog.cob:12.7-12.34:
    9          >> DISPLAY some.text-here
   10          01 var3          pic x.
   11          PROCEDURE        DIVISION.
@@ -1979,7 +1979,7 @@ run_extensions.at-4892-prog.cob:12.7-12.34:
   14          $DISPLAY  "MF compile time text"
 >> Error: Invalid >>DISPLAY compiler directive
 
-run_extensions.at-4892-prog.cob:13.7-13.51:
+run_extensions.at-4903-prog.cob:13.7-13.51:
   10          01 var3          pic x.
   11          PROCEDURE        DIVISION.
   12          >> DISPLAY   other  text #2  *> comment
@@ -1989,7 +1989,7 @@ run_extensions.at-4892-prog.cob:13.7-13.51:
   15              GOBACK.
 >> Error: Invalid >>DISPLAY compiler directive
 
-run_extensions.at-4892-prog.cob:14.7-14.8:
+run_extensions.at-4903-prog.cob:14.7-14.8:
   11          PROCEDURE        DIVISION.
   12          >> DISPLAY   other  text #2  *> comment
   13          >> DISPLAY  "literal text...  *> no comment"
@@ -1998,22 +1998,22 @@ run_extensions.at-4892-prog.cob:14.7-14.8:
   15              GOBACK.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4921:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4946:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4974:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5000:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5065:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5049:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5101:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5149:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5131:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5231:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5188:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5266:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5290:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5315:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5351:0
-run_extensions.at-5351-prog.cob:5.11-5.12:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4932:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4957:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4985:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5011:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5076:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5060:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5112:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5160:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5142:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5242:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5199:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5277:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5301:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5326:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5362:0
+run_extensions.at-5362-prog.cob:5.11-5.12:
    2          >>IF BINARY-COMP-1 IS DEFINED
    3              $SET COMP-1(BINARY)
    4          >>ELSE
@@ -2023,8 +2023,8 @@ run_extensions.at-5351-prog.cob:5.11-5.12:
    7          IDENTIFICATION  DIVISION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5383:0
-run_extensions.at-5383-prog.cob:9.11-9.18:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5394:0
+run_extensions.at-5394-prog.cob:9.11-9.18:
    6          77 VAR-1         PIC X(8) VALUE SPACES.
    7          77 VAR-2         PIC 999.
    8          PROCEDURE        DIVISION.
@@ -2034,7 +2034,7 @@ run_extensions.at-5383-prog.cob:9.11-9.18:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
 >> Error: Invalid syntax
 
-run_extensions.at-5383-prog.cob:9.26:
+run_extensions.at-5394-prog.cob:9.26:
    6          77 VAR-1         PIC X(8) VALUE SPACES.
    7          77 VAR-2         PIC 999.
    8          PROCEDURE        DIVISION.
@@ -2044,7 +2044,7 @@ run_extensions.at-5383-prog.cob:9.26:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:9.27-9.32:
+run_extensions.at-5394-prog.cob:9.27-9.32:
    6          77 VAR-1         PIC X(8) VALUE SPACES.
    7          77 VAR-2         PIC 999.
    8          PROCEDURE        DIVISION.
@@ -2054,7 +2054,7 @@ run_extensions.at-5383-prog.cob:9.27-9.32:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:9.32:
+run_extensions.at-5394-prog.cob:9.32:
    6          77 VAR-1         PIC X(8) VALUE SPACES.
    7          77 VAR-2         PIC 999.
    8          PROCEDURE        DIVISION.
@@ -2064,7 +2064,7 @@ run_extensions.at-5383-prog.cob:9.32:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:9.33-9.36:
+run_extensions.at-5394-prog.cob:9.33-9.36:
    6          77 VAR-1         PIC X(8) VALUE SPACES.
    7          77 VAR-2         PIC 999.
    8          PROCEDURE        DIVISION.
@@ -2074,7 +2074,7 @@ run_extensions.at-5383-prog.cob:9.33-9.36:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:11.52:
+run_extensions.at-5394-prog.cob:11.52:
    8          PROCEDURE        DIVISION.
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
@@ -2084,7 +2084,7 @@ run_extensions.at-5383-prog.cob:11.52:
   13              EXHIBIT VAR-2
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:12.11-12.18:
+run_extensions.at-5394-prog.cob:12.11-12.18:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2094,7 +2094,7 @@ run_extensions.at-5383-prog.cob:12.11-12.18:
   14              EXHIBIT SORT-RETURN TALLY
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:12.24:
+run_extensions.at-5394-prog.cob:12.24:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2104,7 +2104,7 @@ run_extensions.at-5383-prog.cob:12.24:
   14              EXHIBIT SORT-RETURN TALLY
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:12.25-12.30:
+run_extensions.at-5394-prog.cob:12.25-12.30:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2114,7 +2114,7 @@ run_extensions.at-5383-prog.cob:12.25-12.30:
   14              EXHIBIT SORT-RETURN TALLY
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:12.30:
+run_extensions.at-5394-prog.cob:12.30:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2124,7 +2124,7 @@ run_extensions.at-5383-prog.cob:12.30:
   14              EXHIBIT SORT-RETURN TALLY
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:12.31-12.36:
+run_extensions.at-5394-prog.cob:12.31-12.36:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2134,7 +2134,7 @@ run_extensions.at-5383-prog.cob:12.31-12.36:
   14              EXHIBIT SORT-RETURN TALLY
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:12.36:
+run_extensions.at-5394-prog.cob:12.36:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2144,7 +2144,7 @@ run_extensions.at-5383-prog.cob:12.36:
   14              EXHIBIT SORT-RETURN TALLY
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:12.37-12.40:
+run_extensions.at-5394-prog.cob:12.37-12.40:
    9              EXHIBIT CHANGED VAR-1 'X'
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
@@ -2154,7 +2154,7 @@ run_extensions.at-5383-prog.cob:12.37-12.40:
   14              EXHIBIT SORT-RETURN TALLY
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:13.24:
+run_extensions.at-5394-prog.cob:13.24:
   10              MOVE ALL 'X' TO VAR-1
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
@@ -2164,7 +2164,7 @@ run_extensions.at-5383-prog.cob:13.24:
   15              STOP RUN.
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:14.11-14.18:
+run_extensions.at-5394-prog.cob:14.11-14.18:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
   13              EXHIBIT VAR-2
@@ -2173,7 +2173,7 @@ run_extensions.at-5383-prog.cob:14.11-14.18:
   15              STOP RUN.
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:14.30:
+run_extensions.at-5394-prog.cob:14.30:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
   13              EXHIBIT VAR-2
@@ -2182,7 +2182,7 @@ run_extensions.at-5383-prog.cob:14.30:
   15              STOP RUN.
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:14.31-14.36:
+run_extensions.at-5394-prog.cob:14.31-14.36:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
   13              EXHIBIT VAR-2
@@ -2191,7 +2191,7 @@ run_extensions.at-5383-prog.cob:14.31-14.36:
   15              STOP RUN.
 >> Warning: Invalid syntax
 
-run_extensions.at-5383-prog.cob:14.36:
+run_extensions.at-5394-prog.cob:14.36:
   11              STRING "123" DELIMITED BY SIZE INTO VAR-1
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
   13              EXHIBIT VAR-2
@@ -2200,7 +2200,7 @@ run_extensions.at-5383-prog.cob:14.36:
   15              STOP RUN.
 >> Hint: Missing .
 
-run_extensions.at-5383-prog.cob:15.11-15.15:
+run_extensions.at-5394-prog.cob:15.11-15.15:
   12              EXHIBIT NAMED VAR-1 VAR-2 'Y'
   13              EXHIBIT VAR-2
   14              EXHIBIT SORT-RETURN TALLY
@@ -2208,8 +2208,8 @@ run_extensions.at-5383-prog.cob:15.11-15.15:
 ----              ^^^^
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5468:0
-run_extensions.at-5468-prog.cob:33.18-33.19:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5479:0
+run_extensions.at-5479-prog.cob:33.18-33.19:
   30              DISPLAY "(" XX2 " B-XOR " XX3 ") + 1 is " XX1.
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
@@ -2219,7 +2219,7 @@ run_extensions.at-5468-prog.cob:33.18-33.19:
   35              COMPUTE XX1 = XX2 B-AND XX3 .
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:33.18:
+run_extensions.at-5479-prog.cob:33.18:
   30              DISPLAY "(" XX2 " B-XOR " XX3 ") + 1 is " XX1.
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
@@ -2229,7 +2229,7 @@ run_extensions.at-5468-prog.cob:33.18:
   35              COMPUTE XX1 = XX2 B-AND XX3 .
 >> Hint: Missing TO <identifiers> .
 
-run_extensions.at-5468-prog.cob:33.21:
+run_extensions.at-5479-prog.cob:33.21:
   30              DISPLAY "(" XX2 " B-XOR " XX3 ") + 1 is " XX1.
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
@@ -2239,7 +2239,7 @@ run_extensions.at-5468-prog.cob:33.21:
   35              COMPUTE XX1 = XX2 B-AND XX3 .
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:33.22-33.24:
+run_extensions.at-5479-prog.cob:33.22-33.24:
   30              DISPLAY "(" XX2 " B-XOR " XX3 ") + 1 is " XX1.
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
@@ -2249,7 +2249,7 @@ run_extensions.at-5468-prog.cob:33.22-33.24:
   35              COMPUTE XX1 = XX2 B-AND XX3 .
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:34.18-34.19:
+run_extensions.at-5479-prog.cob:34.18-34.19:
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
   33              MOVE  x#09 TO XX3.
@@ -2259,7 +2259,7 @@ run_extensions.at-5468-prog.cob:34.18-34.19:
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:34.18:
+run_extensions.at-5479-prog.cob:34.18:
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
   33              MOVE  x#09 TO XX3.
@@ -2269,7 +2269,7 @@ run_extensions.at-5468-prog.cob:34.18:
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
 >> Hint: Missing TO
 
-run_extensions.at-5468-prog.cob:34.21:
+run_extensions.at-5479-prog.cob:34.21:
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
   33              MOVE  x#09 TO XX3.
@@ -2279,7 +2279,7 @@ run_extensions.at-5468-prog.cob:34.21:
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:34.22-34.24:
+run_extensions.at-5479-prog.cob:34.22-34.24:
   31              COMPUTE XX1 = XX2 B-XOR (XX3 + 1).
   32              DISPLAY XX2 " B-XOR (" XX3 " + 1) is " XX1.
   33              MOVE  x#09 TO XX3.
@@ -2289,7 +2289,7 @@ run_extensions.at-5468-prog.cob:34.22-34.24:
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:37.27-37.28:
+run_extensions.at-5479-prog.cob:37.27-37.28:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2299,7 +2299,7 @@ run_extensions.at-5468-prog.cob:37.27-37.28:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:37.27:
+run_extensions.at-5479-prog.cob:37.27:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2309,7 +2309,7 @@ run_extensions.at-5468-prog.cob:37.27:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Hint: Missing ) .
 
-run_extensions.at-5468-prog.cob:37.30:
+run_extensions.at-5479-prog.cob:37.30:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2319,7 +2319,7 @@ run_extensions.at-5468-prog.cob:37.30:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:37.31-37.35:
+run_extensions.at-5479-prog.cob:37.31-37.35:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2329,7 +2329,7 @@ run_extensions.at-5468-prog.cob:37.31-37.35:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:37.37-37.38:
+run_extensions.at-5479-prog.cob:37.37-37.38:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2339,7 +2339,7 @@ run_extensions.at-5468-prog.cob:37.37-37.38:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:37.37:
+run_extensions.at-5479-prog.cob:37.37:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2349,7 +2349,7 @@ run_extensions.at-5468-prog.cob:37.37:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:37.40-37.41:
+run_extensions.at-5479-prog.cob:37.40-37.41:
   34              MOVE  x#0E TO XX2.
   35              COMPUTE XX1 = XX2 B-AND XX3 .
   36              DISPLAY XX2 " B-AND " XX3 " is " XX1.
@@ -2359,7 +2359,7 @@ run_extensions.at-5468-prog.cob:37.40-37.41:
   39              COMPUTE XX1 = B-NOT XX2 .
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:41.32-41.33:
+run_extensions.at-5479-prog.cob:41.32-41.33:
   38              DISPLAY "x#05 B-OR x#22 is " XX1.
   39              COMPUTE XX1 = B-NOT XX2 .
   40              DISPLAY "B-NOT " XX2 " is " XX1.
@@ -2369,7 +2369,7 @@ run_extensions.at-5468-prog.cob:41.32-41.33:
   43   
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:41.32:
+run_extensions.at-5479-prog.cob:41.32:
   38              DISPLAY "x#05 B-OR x#22 is " XX1.
   39              COMPUTE XX1 = B-NOT XX2 .
   40              DISPLAY "B-NOT " XX2 " is " XX1.
@@ -2379,7 +2379,7 @@ run_extensions.at-5468-prog.cob:41.32:
   43   
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:62.18-62.19:
+run_extensions.at-5479-prog.cob:62.18-62.19:
   59              DISPLAY "(" X2 " B-XOR " X3 ") + 1 is " X1.
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
@@ -2389,7 +2389,7 @@ run_extensions.at-5468-prog.cob:62.18-62.19:
   64              COMPUTE X1 = X2 B-AND X3 .
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:62.18:
+run_extensions.at-5479-prog.cob:62.18:
   59              DISPLAY "(" X2 " B-XOR " X3 ") + 1 is " X1.
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
@@ -2399,7 +2399,7 @@ run_extensions.at-5468-prog.cob:62.18:
   64              COMPUTE X1 = X2 B-AND X3 .
 >> Hint: Missing TO <identifiers> .
 
-run_extensions.at-5468-prog.cob:62.21:
+run_extensions.at-5479-prog.cob:62.21:
   59              DISPLAY "(" X2 " B-XOR " X3 ") + 1 is " X1.
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
@@ -2409,7 +2409,7 @@ run_extensions.at-5468-prog.cob:62.21:
   64              COMPUTE X1 = X2 B-AND X3 .
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:62.22-62.24:
+run_extensions.at-5479-prog.cob:62.22-62.24:
   59              DISPLAY "(" X2 " B-XOR " X3 ") + 1 is " X1.
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
@@ -2419,7 +2419,7 @@ run_extensions.at-5468-prog.cob:62.22-62.24:
   64              COMPUTE X1 = X2 B-AND X3 .
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:63.18-63.19:
+run_extensions.at-5479-prog.cob:63.18-63.19:
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
   62              MOVE  x#09 TO X3.
@@ -2429,7 +2429,7 @@ run_extensions.at-5468-prog.cob:63.18-63.19:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
 >> Error: Invalid syntax
 
-run_extensions.at-5468-prog.cob:63.18:
+run_extensions.at-5479-prog.cob:63.18:
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
   62              MOVE  x#09 TO X3.
@@ -2439,7 +2439,7 @@ run_extensions.at-5468-prog.cob:63.18:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
 >> Hint: Missing TO
 
-run_extensions.at-5468-prog.cob:63.21:
+run_extensions.at-5479-prog.cob:63.21:
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
   62              MOVE  x#09 TO X3.
@@ -2449,7 +2449,7 @@ run_extensions.at-5468-prog.cob:63.21:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
 >> Hint: Missing .
 
-run_extensions.at-5468-prog.cob:63.22-63.24:
+run_extensions.at-5479-prog.cob:63.22-63.24:
   60              COMPUTE X1 = X2 B-XOR (X3 + 1).
   61              DISPLAY X2 " B-XOR (" X3 " + 1) is " X1.
   62              MOVE  x#09 TO X3.
@@ -2459,7 +2459,7 @@ run_extensions.at-5468-prog.cob:63.22-63.24:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:68.31-68.32:
+run_extensions.at-5479-prog.cob:68.31-68.32:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
   66              COMPUTE X1 = B-NOT X2 .
   67              DISPLAY "B-NOT " X2 " is " X1.
@@ -2469,7 +2469,7 @@ run_extensions.at-5468-prog.cob:68.31-68.32:
   70              STOP RUN.
 >> Warning: Invalid syntax
 
-run_extensions.at-5468-prog.cob:68.31:
+run_extensions.at-5479-prog.cob:68.31:
   65              DISPLAY X2 " B-AND " X3 " is " X1.
   66              COMPUTE X1 = B-NOT X2 .
   67              DISPLAY "B-NOT " X2 " is " X1.
@@ -2479,8 +2479,8 @@ run_extensions.at-5468-prog.cob:68.31:
   70              STOP RUN.
 >> Hint: Missing .
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5547:0
-run_extensions.at-5547-prog.cob:11.18-11.19:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5558:0
+run_extensions.at-5558-prog.cob:11.18-11.19:
    8          01 N1 PIC 9(4) COMP-5 VALUE 0.
    9          01 N2 PIC 9(4) COMP-5 VALUE 0.
   10          PROCEDURE DIVISION.
@@ -2490,7 +2490,7 @@ run_extensions.at-5547-prog.cob:11.18-11.19:
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:11.18:
+run_extensions.at-5558-prog.cob:11.18:
    8          01 N1 PIC 9(4) COMP-5 VALUE 0.
    9          01 N2 PIC 9(4) COMP-5 VALUE 0.
   10          PROCEDURE DIVISION.
@@ -2500,7 +2500,7 @@ run_extensions.at-5547-prog.cob:11.18:
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
 >> Hint: Missing TO
 
-run_extensions.at-5547-prog.cob:11.21:
+run_extensions.at-5558-prog.cob:11.21:
    8          01 N1 PIC 9(4) COMP-5 VALUE 0.
    9          01 N2 PIC 9(4) COMP-5 VALUE 0.
   10          PROCEDURE DIVISION.
@@ -2510,7 +2510,7 @@ run_extensions.at-5547-prog.cob:11.21:
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:11.22-11.24:
+run_extensions.at-5558-prog.cob:11.22-11.24:
    8          01 N1 PIC 9(4) COMP-5 VALUE 0.
    9          01 N2 PIC 9(4) COMP-5 VALUE 0.
   10          PROCEDURE DIVISION.
@@ -2520,7 +2520,7 @@ run_extensions.at-5547-prog.cob:11.22-11.24:
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:13.26-13.27:
+run_extensions.at-5558-prog.cob:13.26-13.27:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2530,7 +2530,7 @@ run_extensions.at-5547-prog.cob:13.26-13.27:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:13.26:
+run_extensions.at-5558-prog.cob:13.26:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2540,7 +2540,7 @@ run_extensions.at-5547-prog.cob:13.26:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:13.29:
+run_extensions.at-5558-prog.cob:13.29:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2550,7 +2550,7 @@ run_extensions.at-5547-prog.cob:13.29:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:13.30-13.36:
+run_extensions.at-5558-prog.cob:13.30-13.36:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2560,7 +2560,7 @@ run_extensions.at-5547-prog.cob:13.30-13.36:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:13.36:
+run_extensions.at-5558-prog.cob:13.36:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2570,7 +2570,7 @@ run_extensions.at-5547-prog.cob:13.36:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:13.37-13.38:
+run_extensions.at-5558-prog.cob:13.37-13.38:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2580,7 +2580,7 @@ run_extensions.at-5547-prog.cob:13.37-13.38:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:13.38-13.39:
+run_extensions.at-5558-prog.cob:13.38-13.39:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2590,7 +2590,7 @@ run_extensions.at-5547-prog.cob:13.38-13.39:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:13.38:
+run_extensions.at-5558-prog.cob:13.38:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2600,7 +2600,7 @@ run_extensions.at-5547-prog.cob:13.38:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:13.41-13.42:
+run_extensions.at-5558-prog.cob:13.41-13.42:
   10          PROCEDURE DIVISION.
   11              MOVE  x#0A TO X2.
   12              DISPLAY "Using PIC XX COMP-X"
@@ -2610,7 +2610,7 @@ run_extensions.at-5547-prog.cob:13.41-13.42:
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:15.26-15.27:
+run_extensions.at-5558-prog.cob:15.26-15.27:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2620,7 +2620,7 @@ run_extensions.at-5547-prog.cob:15.26-15.27:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:15.26:
+run_extensions.at-5558-prog.cob:15.26:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2630,7 +2630,7 @@ run_extensions.at-5547-prog.cob:15.26:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:15.29:
+run_extensions.at-5558-prog.cob:15.29:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2640,7 +2640,7 @@ run_extensions.at-5547-prog.cob:15.29:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:15.30-15.37:
+run_extensions.at-5558-prog.cob:15.30-15.37:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2650,7 +2650,7 @@ run_extensions.at-5547-prog.cob:15.30-15.37:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:15.37:
+run_extensions.at-5558-prog.cob:15.37:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2660,7 +2660,7 @@ run_extensions.at-5547-prog.cob:15.37:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:15.38-15.39:
+run_extensions.at-5558-prog.cob:15.38-15.39:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2670,7 +2670,7 @@ run_extensions.at-5547-prog.cob:15.38-15.39:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:15.39-15.40:
+run_extensions.at-5558-prog.cob:15.39-15.40:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2680,7 +2680,7 @@ run_extensions.at-5547-prog.cob:15.39-15.40:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:15.39:
+run_extensions.at-5558-prog.cob:15.39:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2690,7 +2690,7 @@ run_extensions.at-5547-prog.cob:15.39:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:15.42-15.43:
+run_extensions.at-5558-prog.cob:15.42-15.43:
   12              DISPLAY "Using PIC XX COMP-X"
   13              COMPUTE X1 = (x#22 B-LEFT x#05).
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
@@ -2700,7 +2700,7 @@ run_extensions.at-5547-prog.cob:15.42-15.43:
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:17.26-17.27:
+run_extensions.at-5558-prog.cob:17.26-17.27:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2710,7 +2710,7 @@ run_extensions.at-5547-prog.cob:17.26-17.27:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:17.26:
+run_extensions.at-5558-prog.cob:17.26:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2720,7 +2720,7 @@ run_extensions.at-5547-prog.cob:17.26:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:17.29:
+run_extensions.at-5558-prog.cob:17.29:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2730,7 +2730,7 @@ run_extensions.at-5547-prog.cob:17.29:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:17.30-17.39:
+run_extensions.at-5558-prog.cob:17.30-17.39:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2740,7 +2740,7 @@ run_extensions.at-5547-prog.cob:17.30-17.39:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:17.41-17.42:
+run_extensions.at-5558-prog.cob:17.41-17.42:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2750,7 +2750,7 @@ run_extensions.at-5547-prog.cob:17.41-17.42:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:17.41:
+run_extensions.at-5558-prog.cob:17.41:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2760,7 +2760,7 @@ run_extensions.at-5547-prog.cob:17.41:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:17.44-17.45:
+run_extensions.at-5558-prog.cob:17.44-17.45:
   14              DISPLAY " x#22 B-LEFT  x#05   is " X1.
   15              COMPUTE X1 = (x#22 B-RIGHT x#02).
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
@@ -2770,7 +2770,7 @@ run_extensions.at-5547-prog.cob:17.44-17.45:
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:19.26-19.27:
+run_extensions.at-5558-prog.cob:19.26-19.27:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2780,7 +2780,7 @@ run_extensions.at-5547-prog.cob:19.26-19.27:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:19.26:
+run_extensions.at-5558-prog.cob:19.26:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2790,7 +2790,7 @@ run_extensions.at-5547-prog.cob:19.26:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:19.29:
+run_extensions.at-5558-prog.cob:19.29:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2800,7 +2800,7 @@ run_extensions.at-5547-prog.cob:19.29:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:19.30-19.39:
+run_extensions.at-5558-prog.cob:19.30-19.39:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2810,7 +2810,7 @@ run_extensions.at-5547-prog.cob:19.30-19.39:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:19.41-19.42:
+run_extensions.at-5558-prog.cob:19.41-19.42:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2820,7 +2820,7 @@ run_extensions.at-5547-prog.cob:19.41-19.42:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:19.41:
+run_extensions.at-5558-prog.cob:19.41:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2830,7 +2830,7 @@ run_extensions.at-5547-prog.cob:19.41:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:19.44-19.45:
+run_extensions.at-5558-prog.cob:19.44-19.45:
   16              DISPLAY " x#22 B-RIGHT x#02   is " X1.
   17              COMPUTE X1 = (x#22 B-SHIFT-L x#05).
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
@@ -2840,7 +2840,7 @@ run_extensions.at-5547-prog.cob:19.44-19.45:
   21              COMPUTE X1 = (X2 B-LEFT x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:21.27:
+run_extensions.at-5558-prog.cob:21.27:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2850,7 +2850,7 @@ run_extensions.at-5547-prog.cob:21.27:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:21.28-21.34:
+run_extensions.at-5558-prog.cob:21.28-21.34:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2860,7 +2860,7 @@ run_extensions.at-5547-prog.cob:21.28-21.34:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:21.34:
+run_extensions.at-5558-prog.cob:21.34:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2870,7 +2870,7 @@ run_extensions.at-5547-prog.cob:21.34:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:21.35-21.36:
+run_extensions.at-5558-prog.cob:21.35-21.36:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2880,7 +2880,7 @@ run_extensions.at-5547-prog.cob:21.35-21.36:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:21.36-21.37:
+run_extensions.at-5558-prog.cob:21.36-21.37:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2890,7 +2890,7 @@ run_extensions.at-5547-prog.cob:21.36-21.37:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:21.36:
+run_extensions.at-5558-prog.cob:21.36:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2900,7 +2900,7 @@ run_extensions.at-5547-prog.cob:21.36:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:21.39-21.40:
+run_extensions.at-5558-prog.cob:21.39-21.40:
   18              DISPLAY " x#22 B-SHIFT-L x#05 is " X1.
   19              COMPUTE X1 = (x#22 B-SHIFT-R x#02).
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
@@ -2910,7 +2910,7 @@ run_extensions.at-5547-prog.cob:21.39-21.40:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:23.27:
+run_extensions.at-5558-prog.cob:23.27:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2920,7 +2920,7 @@ run_extensions.at-5547-prog.cob:23.27:
   25              MOVE  x#7573 TO X2.
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:23.28-23.35:
+run_extensions.at-5558-prog.cob:23.28-23.35:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2930,7 +2930,7 @@ run_extensions.at-5547-prog.cob:23.28-23.35:
   25              MOVE  x#7573 TO X2.
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:23.35:
+run_extensions.at-5558-prog.cob:23.35:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2940,7 +2940,7 @@ run_extensions.at-5547-prog.cob:23.35:
   25              MOVE  x#7573 TO X2.
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:23.36-23.37:
+run_extensions.at-5558-prog.cob:23.36-23.37:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2950,7 +2950,7 @@ run_extensions.at-5547-prog.cob:23.36-23.37:
   25              MOVE  x#7573 TO X2.
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:23.37-23.38:
+run_extensions.at-5558-prog.cob:23.37-23.38:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2960,7 +2960,7 @@ run_extensions.at-5547-prog.cob:23.37-23.38:
   25              MOVE  x#7573 TO X2.
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:23.37:
+run_extensions.at-5558-prog.cob:23.37:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2970,7 +2970,7 @@ run_extensions.at-5547-prog.cob:23.37:
   25              MOVE  x#7573 TO X2.
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:23.40-23.41:
+run_extensions.at-5558-prog.cob:23.40-23.41:
   20              DISPLAY " x#22 B-SHIFT-R x#02 is " X1.
   21              COMPUTE X1 = (X2 B-LEFT x#05).
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
@@ -2980,7 +2980,7 @@ run_extensions.at-5547-prog.cob:23.40-23.41:
   25              MOVE  x#7573 TO X2.
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:25.18-25.19:
+run_extensions.at-5558-prog.cob:25.18-25.19:
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
@@ -2990,7 +2990,7 @@ run_extensions.at-5547-prog.cob:25.18-25.19:
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:25.18:
+run_extensions.at-5558-prog.cob:25.18:
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
@@ -3000,7 +3000,7 @@ run_extensions.at-5547-prog.cob:25.18:
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
 >> Hint: Missing TO <identifiers> .
 
-run_extensions.at-5547-prog.cob:25.23:
+run_extensions.at-5558-prog.cob:25.23:
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
@@ -3010,7 +3010,7 @@ run_extensions.at-5547-prog.cob:25.23:
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:25.24-25.26:
+run_extensions.at-5558-prog.cob:25.24-25.26:
   22              DISPLAY X2 " B-LEFT  x#05   is " X1.
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
@@ -3020,7 +3020,7 @@ run_extensions.at-5547-prog.cob:25.24-25.26:
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:26.27:
+run_extensions.at-5558-prog.cob:26.27:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
   25              MOVE  x#7573 TO X2.
@@ -3030,7 +3030,7 @@ run_extensions.at-5547-prog.cob:26.27:
   28              COMPUTE X1 = (X2 B-SHIFT-RC 4).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:26.28-26.38:
+run_extensions.at-5558-prog.cob:26.28-26.38:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
   25              MOVE  x#7573 TO X2.
@@ -3040,7 +3040,7 @@ run_extensions.at-5547-prog.cob:26.28-26.38:
   28              COMPUTE X1 = (X2 B-SHIFT-RC 4).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:26.40-26.41:
+run_extensions.at-5558-prog.cob:26.40-26.41:
   23              COMPUTE X1 = (X2 B-RIGHT x#02).
   24              DISPLAY X2 " B-RIGHT x#02   is " X1.
   25              MOVE  x#7573 TO X2.
@@ -3050,7 +3050,7 @@ run_extensions.at-5547-prog.cob:26.40-26.41:
   28              COMPUTE X1 = (X2 B-SHIFT-RC 4).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:28.27:
+run_extensions.at-5558-prog.cob:28.27:
   25              MOVE  x#7573 TO X2.
   26              COMPUTE X1 = (X2 B-SHIFT-LC 4).
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
@@ -3060,7 +3060,7 @@ run_extensions.at-5547-prog.cob:28.27:
   30   
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:28.28-28.38:
+run_extensions.at-5558-prog.cob:28.28-28.38:
   25              MOVE  x#7573 TO X2.
   26              COMPUTE X1 = (X2 B-SHIFT-LC 4).
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
@@ -3070,7 +3070,7 @@ run_extensions.at-5547-prog.cob:28.28-28.38:
   30   
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:28.40-28.41:
+run_extensions.at-5558-prog.cob:28.40-28.41:
   25              MOVE  x#7573 TO X2.
   26              COMPUTE X1 = (X2 B-SHIFT-LC 4).
   27              DISPLAY X2 " B-SHIFT-LC 4   is " X1.
@@ -3080,7 +3080,7 @@ run_extensions.at-5547-prog.cob:28.40-28.41:
   30   
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:33.26-33.27:
+run_extensions.at-5558-prog.cob:33.26-33.27:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3090,7 +3090,7 @@ run_extensions.at-5547-prog.cob:33.26-33.27:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:33.26:
+run_extensions.at-5558-prog.cob:33.26:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3100,7 +3100,7 @@ run_extensions.at-5547-prog.cob:33.26:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:33.29:
+run_extensions.at-5558-prog.cob:33.29:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3110,7 +3110,7 @@ run_extensions.at-5547-prog.cob:33.29:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:33.30-33.36:
+run_extensions.at-5558-prog.cob:33.30-33.36:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3120,7 +3120,7 @@ run_extensions.at-5547-prog.cob:33.30-33.36:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:33.36:
+run_extensions.at-5558-prog.cob:33.36:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3130,7 +3130,7 @@ run_extensions.at-5547-prog.cob:33.36:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:33.37-33.38:
+run_extensions.at-5558-prog.cob:33.37-33.38:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3140,7 +3140,7 @@ run_extensions.at-5547-prog.cob:33.37-33.38:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:33.38-33.39:
+run_extensions.at-5558-prog.cob:33.38-33.39:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3150,7 +3150,7 @@ run_extensions.at-5547-prog.cob:33.38-33.39:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:33.38:
+run_extensions.at-5558-prog.cob:33.38:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3160,7 +3160,7 @@ run_extensions.at-5547-prog.cob:33.38:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:33.41-33.42:
+run_extensions.at-5558-prog.cob:33.41-33.42:
   30   
   31              MOVE  10 TO N2.
   32              DISPLAY "Using PIC 9(4) COMP-5"
@@ -3170,7 +3170,7 @@ run_extensions.at-5547-prog.cob:33.41-33.42:
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:35.26-35.27:
+run_extensions.at-5558-prog.cob:35.26-35.27:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3180,7 +3180,7 @@ run_extensions.at-5547-prog.cob:35.26-35.27:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:35.26:
+run_extensions.at-5558-prog.cob:35.26:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3190,7 +3190,7 @@ run_extensions.at-5547-prog.cob:35.26:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:35.29:
+run_extensions.at-5558-prog.cob:35.29:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3200,7 +3200,7 @@ run_extensions.at-5547-prog.cob:35.29:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:35.30-35.37:
+run_extensions.at-5558-prog.cob:35.30-35.37:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3210,7 +3210,7 @@ run_extensions.at-5547-prog.cob:35.30-35.37:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:35.37:
+run_extensions.at-5558-prog.cob:35.37:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3220,7 +3220,7 @@ run_extensions.at-5547-prog.cob:35.37:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:35.38-35.39:
+run_extensions.at-5558-prog.cob:35.38-35.39:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3230,7 +3230,7 @@ run_extensions.at-5547-prog.cob:35.38-35.39:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:35.39-35.40:
+run_extensions.at-5558-prog.cob:35.39-35.40:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3240,7 +3240,7 @@ run_extensions.at-5547-prog.cob:35.39-35.40:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:35.39:
+run_extensions.at-5558-prog.cob:35.39:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3250,7 +3250,7 @@ run_extensions.at-5547-prog.cob:35.39:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:35.42-35.43:
+run_extensions.at-5558-prog.cob:35.42-35.43:
   32              DISPLAY "Using PIC 9(4) COMP-5"
   33              COMPUTE N1 = (x#22 B-LEFT x#05).
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
@@ -3260,7 +3260,7 @@ run_extensions.at-5547-prog.cob:35.42-35.43:
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:37.26-37.27:
+run_extensions.at-5558-prog.cob:37.26-37.27:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3270,7 +3270,7 @@ run_extensions.at-5547-prog.cob:37.26-37.27:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:37.26:
+run_extensions.at-5558-prog.cob:37.26:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3280,7 +3280,7 @@ run_extensions.at-5547-prog.cob:37.26:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:37.29:
+run_extensions.at-5558-prog.cob:37.29:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3290,7 +3290,7 @@ run_extensions.at-5547-prog.cob:37.29:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:37.30-37.39:
+run_extensions.at-5558-prog.cob:37.30-37.39:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3300,7 +3300,7 @@ run_extensions.at-5547-prog.cob:37.30-37.39:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:37.41-37.42:
+run_extensions.at-5558-prog.cob:37.41-37.42:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3310,7 +3310,7 @@ run_extensions.at-5547-prog.cob:37.41-37.42:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:37.41:
+run_extensions.at-5558-prog.cob:37.41:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3320,7 +3320,7 @@ run_extensions.at-5547-prog.cob:37.41:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:37.44-37.45:
+run_extensions.at-5558-prog.cob:37.44-37.45:
   34              DISPLAY " x#22 B-LEFT  x#05   is " N1.
   35              COMPUTE N1 = (x#22 B-RIGHT x#02).
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
@@ -3330,7 +3330,7 @@ run_extensions.at-5547-prog.cob:37.44-37.45:
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:39.26-39.27:
+run_extensions.at-5558-prog.cob:39.26-39.27:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3340,7 +3340,7 @@ run_extensions.at-5547-prog.cob:39.26-39.27:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:39.26:
+run_extensions.at-5558-prog.cob:39.26:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3350,7 +3350,7 @@ run_extensions.at-5547-prog.cob:39.26:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:39.29:
+run_extensions.at-5558-prog.cob:39.29:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3360,7 +3360,7 @@ run_extensions.at-5547-prog.cob:39.29:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:39.30-39.39:
+run_extensions.at-5558-prog.cob:39.30-39.39:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3370,7 +3370,7 @@ run_extensions.at-5547-prog.cob:39.30-39.39:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:39.41-39.42:
+run_extensions.at-5558-prog.cob:39.41-39.42:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3380,7 +3380,7 @@ run_extensions.at-5547-prog.cob:39.41-39.42:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:39.41:
+run_extensions.at-5558-prog.cob:39.41:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3390,7 +3390,7 @@ run_extensions.at-5547-prog.cob:39.41:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:39.44-39.45:
+run_extensions.at-5558-prog.cob:39.44-39.45:
   36              DISPLAY " x#22 B-RIGHT x#02   is " N1.
   37              COMPUTE N1 = (x#22 B-SHIFT-L x#05).
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
@@ -3400,7 +3400,7 @@ run_extensions.at-5547-prog.cob:39.44-39.45:
   41              COMPUTE N1 = (N2 B-LEFT x#05).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:41.27:
+run_extensions.at-5558-prog.cob:41.27:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3410,7 +3410,7 @@ run_extensions.at-5547-prog.cob:41.27:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:41.28-41.34:
+run_extensions.at-5558-prog.cob:41.28-41.34:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3420,7 +3420,7 @@ run_extensions.at-5547-prog.cob:41.28-41.34:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:41.34:
+run_extensions.at-5558-prog.cob:41.34:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3430,7 +3430,7 @@ run_extensions.at-5547-prog.cob:41.34:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:41.35-41.36:
+run_extensions.at-5558-prog.cob:41.35-41.36:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3440,7 +3440,7 @@ run_extensions.at-5547-prog.cob:41.35-41.36:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:41.36-41.37:
+run_extensions.at-5558-prog.cob:41.36-41.37:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3450,7 +3450,7 @@ run_extensions.at-5547-prog.cob:41.36-41.37:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:41.36:
+run_extensions.at-5558-prog.cob:41.36:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3460,7 +3460,7 @@ run_extensions.at-5547-prog.cob:41.36:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:41.39-41.40:
+run_extensions.at-5558-prog.cob:41.39-41.40:
   38              DISPLAY " x#22 B-SHIFT-L x#05 is " N1.
   39              COMPUTE N1 = (x#22 B-SHIFT-R x#02).
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
@@ -3470,7 +3470,7 @@ run_extensions.at-5547-prog.cob:41.39-41.40:
   43              COMPUTE N1 = (N2 B-RIGHT x#02).
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:43.27:
+run_extensions.at-5558-prog.cob:43.27:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3480,7 +3480,7 @@ run_extensions.at-5547-prog.cob:43.27:
   45              STOP RUN.
 >> Hint: Missing ) .
 
-run_extensions.at-5547-prog.cob:43.28-43.35:
+run_extensions.at-5558-prog.cob:43.28-43.35:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3490,7 +3490,7 @@ run_extensions.at-5547-prog.cob:43.28-43.35:
   45              STOP RUN.
 >> Error: Invalid syntax
 
-run_extensions.at-5547-prog.cob:43.35:
+run_extensions.at-5558-prog.cob:43.35:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3500,7 +3500,7 @@ run_extensions.at-5547-prog.cob:43.35:
   45              STOP RUN.
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:43.36-43.37:
+run_extensions.at-5558-prog.cob:43.36-43.37:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3510,7 +3510,7 @@ run_extensions.at-5547-prog.cob:43.36-43.37:
   45              STOP RUN.
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:43.37-43.38:
+run_extensions.at-5558-prog.cob:43.37-43.38:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3520,7 +3520,7 @@ run_extensions.at-5547-prog.cob:43.37-43.38:
   45              STOP RUN.
 >> Warning: Invalid syntax
 
-run_extensions.at-5547-prog.cob:43.37:
+run_extensions.at-5558-prog.cob:43.37:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3530,7 +3530,7 @@ run_extensions.at-5547-prog.cob:43.37:
   45              STOP RUN.
 >> Hint: Missing .
 
-run_extensions.at-5547-prog.cob:43.40-43.41:
+run_extensions.at-5558-prog.cob:43.40-43.41:
   40              DISPLAY " x#22 B-SHIFT-R x#02 is " N1.
   41              COMPUTE N1 = (N2 B-LEFT x#05).
   42              DISPLAY N2 " B-LEFT  x#05   is " N1.
@@ -3540,8 +3540,8 @@ run_extensions.at-5547-prog.cob:43.40-43.41:
   45              STOP RUN.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5599:0
-run_extensions.at-5599-prog.cob:12.18:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5610:0
+run_extensions.at-5610-prog.cob:12.18:
    9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
   10   
   11          PROCEDURE        DIVISION.
@@ -3551,7 +3551,7 @@ run_extensions.at-5599-prog.cob:12.18:
   14              DISPLAY FLOAT-BINARY-64
 >> Hint: Missing <identifier or literal>
 
-run_extensions.at-5599-prog.cob:12.19-12.34:
+run_extensions.at-5610-prog.cob:12.19-12.34:
    9            03 FLOAT-BINARY-128 USAGE COMPUTATIONAL-15 VALUE 1.0.
   10   
   11          PROCEDURE        DIVISION.
@@ -3561,7 +3561,7 @@ run_extensions.at-5599-prog.cob:12.19-12.34:
   14              DISPLAY FLOAT-BINARY-64
 >> Error: Invalid syntax
 
-run_extensions.at-5599-prog.cob:14.18:
+run_extensions.at-5610-prog.cob:14.18:
   11          PROCEDURE        DIVISION.
   12              DISPLAY FLOAT-BINARY-32
   13   
@@ -3571,7 +3571,7 @@ run_extensions.at-5599-prog.cob:14.18:
   16              DISPLAY FLOAT-BINARY-64
 >> Hint: Missing <identifier or literal>
 
-run_extensions.at-5599-prog.cob:14.19-14.34:
+run_extensions.at-5610-prog.cob:14.19-14.34:
   11          PROCEDURE        DIVISION.
   12              DISPLAY FLOAT-BINARY-32
   13   
@@ -3581,7 +3581,7 @@ run_extensions.at-5599-prog.cob:14.19-14.34:
   16              DISPLAY FLOAT-BINARY-64
 >> Error: Invalid syntax
 
-run_extensions.at-5599-prog.cob:15.38:
+run_extensions.at-5610-prog.cob:15.38:
   12              DISPLAY FLOAT-BINARY-32
   13   
   14              DISPLAY FLOAT-BINARY-64
@@ -3591,7 +3591,7 @@ run_extensions.at-5599-prog.cob:15.38:
   17              ADD -1.111111111011E302 TO FLOAT-BINARY-64
 >> Hint: Missing <identifiers>
 
-run_extensions.at-5599-prog.cob:15.39-15.54:
+run_extensions.at-5610-prog.cob:15.39-15.54:
   12              DISPLAY FLOAT-BINARY-32
   13   
   14              DISPLAY FLOAT-BINARY-64
@@ -3601,7 +3601,7 @@ run_extensions.at-5599-prog.cob:15.39-15.54:
   17              ADD -1.111111111011E302 TO FLOAT-BINARY-64
 >> Error: Invalid syntax
 
-run_extensions.at-5599-prog.cob:16.18:
+run_extensions.at-5610-prog.cob:16.18:
   13   
   14              DISPLAY FLOAT-BINARY-64
   15              MOVE 9.899999999999E+304 TO FLOAT-BINARY-64
@@ -3611,7 +3611,7 @@ run_extensions.at-5599-prog.cob:16.18:
   18              DISPLAY FLOAT-BINARY-64
 >> Hint: Missing <identifier or literal>
 
-run_extensions.at-5599-prog.cob:16.19-16.34:
+run_extensions.at-5610-prog.cob:16.19-16.34:
   13   
   14              DISPLAY FLOAT-BINARY-64
   15              MOVE 9.899999999999E+304 TO FLOAT-BINARY-64
@@ -3621,7 +3621,7 @@ run_extensions.at-5599-prog.cob:16.19-16.34:
   18              DISPLAY FLOAT-BINARY-64
 >> Error: Invalid syntax
 
-run_extensions.at-5599-prog.cob:17.38-17.53:
+run_extensions.at-5610-prog.cob:17.38-17.53:
   14              DISPLAY FLOAT-BINARY-64
   15              MOVE 9.899999999999E+304 TO FLOAT-BINARY-64
   16              DISPLAY FLOAT-BINARY-64
@@ -3631,7 +3631,7 @@ run_extensions.at-5599-prog.cob:17.38-17.53:
   19   
 >> Error: Invalid syntax
 
-run_extensions.at-5599-prog.cob:18.18:
+run_extensions.at-5610-prog.cob:18.18:
   15              MOVE 9.899999999999E+304 TO FLOAT-BINARY-64
   16              DISPLAY FLOAT-BINARY-64
   17              ADD -1.111111111011E302 TO FLOAT-BINARY-64
@@ -3641,7 +3641,7 @@ run_extensions.at-5599-prog.cob:18.18:
   20           *> NOTE: FLOAT-BINARY-128 is only syntax-checked as support for
 >> Hint: Missing <identifier or literal>
 
-run_extensions.at-5599-prog.cob:18.19-18.34:
+run_extensions.at-5610-prog.cob:18.19-18.34:
   15              MOVE 9.899999999999E+304 TO FLOAT-BINARY-64
   16              DISPLAY FLOAT-BINARY-64
   17              ADD -1.111111111011E302 TO FLOAT-BINARY-64
@@ -3651,14 +3651,14 @@ run_extensions.at-5599-prog.cob:18.19-18.34:
   20           *> NOTE: FLOAT-BINARY-128 is only syntax-checked as support for
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5732:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5786:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5757:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5865:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5934:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6022:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6094:0
-run_extensions.at-6094-prog.cob:15.42-15.50:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5743:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5797:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5768:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5876:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5945:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6033:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6105:0
+run_extensions.at-6105-prog.cob:15.42-15.50:
   12         *>   
   13              MOVE 0  TO W01-INDEX.
   14              INSPECT W01-STRING 
@@ -3668,7 +3668,7 @@ run_extensions.at-6094-prog.cob:15.42-15.50:
   17              THEN
 >> Error: Invalid syntax
 
-run_extensions.at-6094-prog.cob:21.40-21.48:
+run_extensions.at-6105-prog.cob:21.40-21.48:
   18                  DISPLAY 'Bad Result for Inspect Trailing Case 1'
   19              END-IF. 
   20         *>
@@ -3678,7 +3678,7 @@ run_extensions.at-6094-prog.cob:21.40-21.48:
   23              THEN
 >> Error: Invalid syntax
 
-run_extensions.at-6094-prog.cob:29.42-29.50:
+run_extensions.at-6105-prog.cob:29.42-29.50:
   26         *>
   27              MOVE 0  TO W01-INDEX.
   28              INSPECT W01-STRING 
@@ -3688,7 +3688,7 @@ run_extensions.at-6094-prog.cob:29.42-29.50:
   31         *>
 >> Error: Invalid syntax
 
-run_extensions.at-6094-prog.cob:30.29-30.37:
+run_extensions.at-6105-prog.cob:30.29-30.37:
   27              MOVE 0  TO W01-INDEX.
   28              INSPECT W01-STRING 
   29                      TALLYING W01-INDEX FOR TRAILING SPACE  
@@ -3698,7 +3698,7 @@ run_extensions.at-6094-prog.cob:30.29-30.37:
   32              IF     W01-STRING NOT = '0123456789BBBBBBBBBB' 
 >> Error: Invalid syntax
 
-run_extensions.at-6094-prog.cob:40.42-40.50:
+run_extensions.at-6105-prog.cob:40.42-40.50:
   37              MOVE 0  TO W01-INDEX.
   38              MOVE SPACES TO W01-STRING.
   39              INSPECT W01-STRING
@@ -3708,7 +3708,7 @@ run_extensions.at-6094-prog.cob:40.42-40.50:
   42              IF W01-INDEX  NOT = 0
 >> Error: Invalid syntax
 
-run_extensions.at-6094-prog.cob:51.42-51.50:
+run_extensions.at-6105-prog.cob:51.42-51.50:
   48              MOVE 0  TO W01-INDEX.
   49              MOVE SPACES TO W01-STRING.
   50              INSPECT W01-STRING
@@ -3718,8 +3718,8 @@ run_extensions.at-6094-prog.cob:51.42-51.50:
   53              IF W01-INDEX NOT = 20
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6116:0
-run_extensions.at-6116-prog.cob:8.31-8.39:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6127:0
+run_extensions.at-6127-prog.cob:8.31-8.39:
    5          WORKING-STORAGE  SECTION.
    6          01 X             PIC X(4) VALUE "1000".
    7          PROCEDURE        DIVISION.
@@ -3729,8 +3729,8 @@ run_extensions.at-6116-prog.cob:8.31-8.39:
   10                 DISPLAY X.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6151:0
-run_extensions.at-6151-prog.cob:12.13-12.21:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6162:0
+run_extensions.at-6162-prog.cob:12.13-12.21:
    9                ALL      "A" BY "Z"
   10                         "B" BY "Y"
   11                         "Z" BY "0"
@@ -3740,8 +3740,8 @@ run_extensions.at-6151-prog.cob:12.13-12.21:
   14                 DISPLAY "1 - " X.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6210:0
-run_extensions.at-6210-prog.cob:10.18:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6221:0
+run_extensions.at-6221-prog.cob:10.18:
    7          01 N             PIC S9(5)V9(2) VALUE -11122.55.
    8          01 T             PIC X(10) VALUE "    8     ".
    9          PROCEDURE        DIVISION.
@@ -3751,7 +3751,7 @@ run_extensions.at-6210-prog.cob:10.18:
   12                 DISPLAY "Should be 4 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:10.19-10.20:
+run_extensions.at-6221-prog.cob:10.19-10.20:
    7          01 N             PIC S9(5)V9(2) VALUE -11122.55.
    8          01 T             PIC X(10) VALUE "    8     ".
    9          PROCEDURE        DIVISION.
@@ -3761,7 +3761,7 @@ run_extensions.at-6210-prog.cob:10.19-10.20:
   12                 DISPLAY "Should be 4 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:10.20:
+run_extensions.at-6221-prog.cob:10.20:
    7          01 N             PIC S9(5)V9(2) VALUE -11122.55.
    8          01 T             PIC X(10) VALUE "    8     ".
    9          PROCEDURE        DIVISION.
@@ -3771,7 +3771,7 @@ run_extensions.at-6210-prog.cob:10.20:
   12                 DISPLAY "Should be 4 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:10.21-10.29:
+run_extensions.at-6221-prog.cob:10.21-10.29:
    7          01 N             PIC S9(5)V9(2) VALUE -11122.55.
    8          01 T             PIC X(10) VALUE "    8     ".
    9          PROCEDURE        DIVISION.
@@ -3781,7 +3781,7 @@ run_extensions.at-6210-prog.cob:10.21-10.29:
   12                 DISPLAY "Should be 4 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:13.18:
+run_extensions.at-6221-prog.cob:13.18:
   10              EXAMINE X TALLYING ALL "A"
   11              IF TALLY NOT = 4
   12                 DISPLAY "Should be 4 but is " TALLY.
@@ -3791,7 +3791,7 @@ run_extensions.at-6210-prog.cob:13.18:
   15                 DISPLAY "Should be 2 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:13.19-13.20:
+run_extensions.at-6221-prog.cob:13.19-13.20:
   10              EXAMINE X TALLYING ALL "A"
   11              IF TALLY NOT = 4
   12                 DISPLAY "Should be 4 but is " TALLY.
@@ -3801,7 +3801,7 @@ run_extensions.at-6210-prog.cob:13.19-13.20:
   15                 DISPLAY "Should be 2 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:13.20:
+run_extensions.at-6221-prog.cob:13.20:
   10              EXAMINE X TALLYING ALL "A"
   11              IF TALLY NOT = 4
   12                 DISPLAY "Should be 4 but is " TALLY.
@@ -3811,7 +3811,7 @@ run_extensions.at-6210-prog.cob:13.20:
   15                 DISPLAY "Should be 2 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:13.21-13.29:
+run_extensions.at-6221-prog.cob:13.21-13.29:
   10              EXAMINE X TALLYING ALL "A"
   11              IF TALLY NOT = 4
   12                 DISPLAY "Should be 4 but is " TALLY.
@@ -3821,7 +3821,7 @@ run_extensions.at-6210-prog.cob:13.21-13.29:
   15                 DISPLAY "Should be 2 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:16.18:
+run_extensions.at-6221-prog.cob:16.18:
   13              EXAMINE X TALLYING LEADING "A"
   14              IF TALLY NOT = 2
   15                 DISPLAY "Should be 2 but is " TALLY.
@@ -3831,7 +3831,7 @@ run_extensions.at-6210-prog.cob:16.18:
   18                 DISPLAY "Should be 5 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:16.19-16.20:
+run_extensions.at-6221-prog.cob:16.19-16.20:
   13              EXAMINE X TALLYING LEADING "A"
   14              IF TALLY NOT = 2
   15                 DISPLAY "Should be 2 but is " TALLY.
@@ -3841,7 +3841,7 @@ run_extensions.at-6210-prog.cob:16.19-16.20:
   18                 DISPLAY "Should be 5 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:16.20:
+run_extensions.at-6221-prog.cob:16.20:
   13              EXAMINE X TALLYING LEADING "A"
   14              IF TALLY NOT = 2
   15                 DISPLAY "Should be 2 but is " TALLY.
@@ -3851,7 +3851,7 @@ run_extensions.at-6210-prog.cob:16.20:
   18                 DISPLAY "Should be 5 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:16.21-16.29:
+run_extensions.at-6221-prog.cob:16.21-16.29:
   13              EXAMINE X TALLYING LEADING "A"
   14              IF TALLY NOT = 2
   15                 DISPLAY "Should be 2 but is " TALLY.
@@ -3861,7 +3861,7 @@ run_extensions.at-6210-prog.cob:16.21-16.29:
   18                 DISPLAY "Should be 5 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:19.18:
+run_extensions.at-6221-prog.cob:19.18:
   16              EXAMINE X TALLYING UNTIL FIRST "C"
   17              IF TALLY NOT = 5
   18                 DISPLAY "Should be 5 but is " TALLY.
@@ -3871,7 +3871,7 @@ run_extensions.at-6210-prog.cob:19.18:
   21                 DISPLAY "Should be 4 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:19.19-19.20:
+run_extensions.at-6221-prog.cob:19.19-19.20:
   16              EXAMINE X TALLYING UNTIL FIRST "C"
   17              IF TALLY NOT = 5
   18                 DISPLAY "Should be 5 but is " TALLY.
@@ -3881,7 +3881,7 @@ run_extensions.at-6210-prog.cob:19.19-19.20:
   21                 DISPLAY "Should be 4 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:19.20:
+run_extensions.at-6221-prog.cob:19.20:
   16              EXAMINE X TALLYING UNTIL FIRST "C"
   17              IF TALLY NOT = 5
   18                 DISPLAY "Should be 5 but is " TALLY.
@@ -3891,7 +3891,7 @@ run_extensions.at-6210-prog.cob:19.20:
   21                 DISPLAY "Should be 4 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:19.21-19.29:
+run_extensions.at-6221-prog.cob:19.21-19.29:
   16              EXAMINE X TALLYING UNTIL FIRST "C"
   17              IF TALLY NOT = 5
   18                 DISPLAY "Should be 5 but is " TALLY.
@@ -3901,7 +3901,7 @@ run_extensions.at-6210-prog.cob:19.21-19.29:
   21                 DISPLAY "Should be 4 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:24.18:
+run_extensions.at-6221-prog.cob:24.18:
   21                 DISPLAY "Should be 4 but is " TALLY.
   22              IF X NOT = "ZZBZBCZB"
   23                 DISPLAY "Should be ZZBZBCZB but is " X.
@@ -3911,7 +3911,7 @@ run_extensions.at-6210-prog.cob:24.18:
   26                 DISPLAY "Should be 2 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:24.19-24.20:
+run_extensions.at-6221-prog.cob:24.19-24.20:
   21                 DISPLAY "Should be 4 but is " TALLY.
   22              IF X NOT = "ZZBZBCZB"
   23                 DISPLAY "Should be ZZBZBCZB but is " X.
@@ -3921,7 +3921,7 @@ run_extensions.at-6210-prog.cob:24.19-24.20:
   26                 DISPLAY "Should be 2 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:24.20:
+run_extensions.at-6221-prog.cob:24.20:
   21                 DISPLAY "Should be 4 but is " TALLY.
   22              IF X NOT = "ZZBZBCZB"
   23                 DISPLAY "Should be ZZBZBCZB but is " X.
@@ -3931,7 +3931,7 @@ run_extensions.at-6210-prog.cob:24.20:
   26                 DISPLAY "Should be 2 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:24.21-24.29:
+run_extensions.at-6221-prog.cob:24.21-24.29:
   21                 DISPLAY "Should be 4 but is " TALLY.
   22              IF X NOT = "ZZBZBCZB"
   23                 DISPLAY "Should be ZZBZBCZB but is " X.
@@ -3941,7 +3941,7 @@ run_extensions.at-6210-prog.cob:24.21-24.29:
   26                 DISPLAY "Should be 2 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:29.18:
+run_extensions.at-6221-prog.cob:29.18:
   26                 DISPLAY "Should be 2 but is " TALLY.
   27              IF X NOT = "AABZBCZB"
   28                 DISPLAY "Should be AABZBCZB but is " X.
@@ -3951,7 +3951,7 @@ run_extensions.at-6210-prog.cob:29.18:
   31                 DISPLAY "Should be 5 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:29.19-29.20:
+run_extensions.at-6221-prog.cob:29.19-29.20:
   26                 DISPLAY "Should be 2 but is " TALLY.
   27              IF X NOT = "AABZBCZB"
   28                 DISPLAY "Should be AABZBCZB but is " X.
@@ -3961,7 +3961,7 @@ run_extensions.at-6210-prog.cob:29.19-29.20:
   31                 DISPLAY "Should be 5 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:29.20:
+run_extensions.at-6221-prog.cob:29.20:
   26                 DISPLAY "Should be 2 but is " TALLY.
   27              IF X NOT = "AABZBCZB"
   28                 DISPLAY "Should be AABZBCZB but is " X.
@@ -3971,7 +3971,7 @@ run_extensions.at-6210-prog.cob:29.20:
   31                 DISPLAY "Should be 5 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:29.21-29.29:
+run_extensions.at-6221-prog.cob:29.21-29.29:
   26                 DISPLAY "Should be 2 but is " TALLY.
   27              IF X NOT = "AABZBCZB"
   28                 DISPLAY "Should be AABZBCZB but is " X.
@@ -3981,7 +3981,7 @@ run_extensions.at-6210-prog.cob:29.21-29.29:
   31                 DISPLAY "Should be 5 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:34.18:
+run_extensions.at-6221-prog.cob:34.18:
   31                 DISPLAY "Should be 5 but is " TALLY.
   32              IF X NOT = "XXXXXCZB"
   33                 DISPLAY "Should be XXXXXCZB but is " X.
@@ -3991,7 +3991,7 @@ run_extensions.at-6210-prog.cob:34.18:
   36                 DISPLAY "Should be 8 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:34.19-34.20:
+run_extensions.at-6221-prog.cob:34.19-34.20:
   31                 DISPLAY "Should be 5 but is " TALLY.
   32              IF X NOT = "XXXXXCZB"
   33                 DISPLAY "Should be XXXXXCZB but is " X.
@@ -4001,7 +4001,7 @@ run_extensions.at-6210-prog.cob:34.19-34.20:
   36                 DISPLAY "Should be 8 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:34.20:
+run_extensions.at-6221-prog.cob:34.20:
   31                 DISPLAY "Should be 5 but is " TALLY.
   32              IF X NOT = "XXXXXCZB"
   33                 DISPLAY "Should be XXXXXCZB but is " X.
@@ -4011,7 +4011,7 @@ run_extensions.at-6210-prog.cob:34.20:
   36                 DISPLAY "Should be 8 but is " TALLY.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:34.21-34.29:
+run_extensions.at-6221-prog.cob:34.21-34.29:
   31                 DISPLAY "Should be 5 but is " TALLY.
   32              IF X NOT = "XXXXXCZB"
   33                 DISPLAY "Should be XXXXXCZB but is " X.
@@ -4021,7 +4021,7 @@ run_extensions.at-6210-prog.cob:34.21-34.29:
   36                 DISPLAY "Should be 8 but is " TALLY.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:39.18:
+run_extensions.at-6221-prog.cob:39.18:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4031,7 +4031,7 @@ run_extensions.at-6210-prog.cob:39.18:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:39.19-39.20:
+run_extensions.at-6221-prog.cob:39.19-39.20:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4041,7 +4041,7 @@ run_extensions.at-6210-prog.cob:39.19-39.20:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:39.20:
+run_extensions.at-6221-prog.cob:39.20:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4051,7 +4051,7 @@ run_extensions.at-6210-prog.cob:39.20:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:39.21-39.29:
+run_extensions.at-6221-prog.cob:39.21-39.29:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4061,7 +4061,7 @@ run_extensions.at-6210-prog.cob:39.21-39.29:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:39.43:
+run_extensions.at-6221-prog.cob:39.43:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4071,7 +4071,7 @@ run_extensions.at-6210-prog.cob:39.43:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:39.44-39.53:
+run_extensions.at-6221-prog.cob:39.44-39.53:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4081,7 +4081,7 @@ run_extensions.at-6210-prog.cob:39.44-39.53:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6210-prog.cob:39.58:
+run_extensions.at-6221-prog.cob:39.58:
   36                 DISPLAY "Should be 8 but is " TALLY.
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
@@ -4091,7 +4091,7 @@ run_extensions.at-6210-prog.cob:39.58:
   41                 DISPLAY "Should be -88888.55 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6210-prog.cob:40.11-40.13:
+run_extensions.at-6221-prog.cob:40.11-40.13:
   37              IF X NOT = "YYYYYYYY"
   38                 DISPLAY "Should be YYYYYYYY but is " X.
   39              EXAMINE N TALLYING UNTIL FIRST 5 REPLACING BY 8
@@ -4101,8 +4101,8 @@ run_extensions.at-6210-prog.cob:40.11-40.13:
   42         *    Re-mod is forbidden here (at least on GCOS):
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6246:0
-run_extensions.at-6246-prog.cob:10.18:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6257:0
+run_extensions.at-6257-prog.cob:10.18:
    7          01 Y             PIC X VALUE "Y".
    8          01 N             PIC S9(5) VALUE -11122.
    9          PROCEDURE        DIVISION.
@@ -4112,7 +4112,7 @@ run_extensions.at-6246-prog.cob:10.18:
   12                 DISPLAY "Should be XXBXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:10.19-10.20:
+run_extensions.at-6257-prog.cob:10.19-10.20:
    7          01 Y             PIC X VALUE "Y".
    8          01 N             PIC S9(5) VALUE -11122.
    9          PROCEDURE        DIVISION.
@@ -4122,7 +4122,7 @@ run_extensions.at-6246-prog.cob:10.19-10.20:
   12                 DISPLAY "Should be XXBXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:10.20:
+run_extensions.at-6257-prog.cob:10.20:
    7          01 Y             PIC X VALUE "Y".
    8          01 N             PIC S9(5) VALUE -11122.
    9          PROCEDURE        DIVISION.
@@ -4132,7 +4132,7 @@ run_extensions.at-6246-prog.cob:10.20:
   12                 DISPLAY "Should be XXBXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:10.21-10.30:
+run_extensions.at-6257-prog.cob:10.21-10.30:
    7          01 Y             PIC X VALUE "Y".
    8          01 N             PIC S9(5) VALUE -11122.
    9          PROCEDURE        DIVISION.
@@ -4142,7 +4142,7 @@ run_extensions.at-6246-prog.cob:10.21-10.30:
   12                 DISPLAY "Should be XXBXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:13.18:
+run_extensions.at-6257-prog.cob:13.18:
   10              EXAMINE X REPLACING ALL "A" BY "X"
   11              IF X NOT = "XXBXBCXB"
   12                 DISPLAY "Should be XXBXBCXB but is " X.
@@ -4152,7 +4152,7 @@ run_extensions.at-6246-prog.cob:13.18:
   15                 DISPLAY "Should be YYBXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:13.19-13.20:
+run_extensions.at-6257-prog.cob:13.19-13.20:
   10              EXAMINE X REPLACING ALL "A" BY "X"
   11              IF X NOT = "XXBXBCXB"
   12                 DISPLAY "Should be XXBXBCXB but is " X.
@@ -4162,7 +4162,7 @@ run_extensions.at-6246-prog.cob:13.19-13.20:
   15                 DISPLAY "Should be YYBXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:13.20:
+run_extensions.at-6257-prog.cob:13.20:
   10              EXAMINE X REPLACING ALL "A" BY "X"
   11              IF X NOT = "XXBXBCXB"
   12                 DISPLAY "Should be XXBXBCXB but is " X.
@@ -4172,7 +4172,7 @@ run_extensions.at-6246-prog.cob:13.20:
   15                 DISPLAY "Should be YYBXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:13.21-13.30:
+run_extensions.at-6257-prog.cob:13.21-13.30:
   10              EXAMINE X REPLACING ALL "A" BY "X"
   11              IF X NOT = "XXBXBCXB"
   12                 DISPLAY "Should be XXBXBCXB but is " X.
@@ -4182,7 +4182,7 @@ run_extensions.at-6246-prog.cob:13.21-13.30:
   15                 DISPLAY "Should be YYBXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:16.18:
+run_extensions.at-6257-prog.cob:16.18:
   13              EXAMINE X REPLACING LEADING "X" BY "Y"
   14              IF X NOT = "YYBXBCXB"
   15                 DISPLAY "Should be YYBXBCXB but is " X.
@@ -4192,7 +4192,7 @@ run_extensions.at-6246-prog.cob:16.18:
   18                 DISPLAY "Should be YYCXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:16.19-16.20:
+run_extensions.at-6257-prog.cob:16.19-16.20:
   13              EXAMINE X REPLACING LEADING "X" BY "Y"
   14              IF X NOT = "YYBXBCXB"
   15                 DISPLAY "Should be YYBXBCXB but is " X.
@@ -4202,7 +4202,7 @@ run_extensions.at-6246-prog.cob:16.19-16.20:
   18                 DISPLAY "Should be YYCXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:16.20:
+run_extensions.at-6257-prog.cob:16.20:
   13              EXAMINE X REPLACING LEADING "X" BY "Y"
   14              IF X NOT = "YYBXBCXB"
   15                 DISPLAY "Should be YYBXBCXB but is " X.
@@ -4212,7 +4212,7 @@ run_extensions.at-6246-prog.cob:16.20:
   18                 DISPLAY "Should be YYCXBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:16.21-16.30:
+run_extensions.at-6257-prog.cob:16.21-16.30:
   13              EXAMINE X REPLACING LEADING "X" BY "Y"
   14              IF X NOT = "YYBXBCXB"
   15                 DISPLAY "Should be YYBXBCXB but is " X.
@@ -4222,7 +4222,7 @@ run_extensions.at-6246-prog.cob:16.21-16.30:
   18                 DISPLAY "Should be YYCXBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:19.18:
+run_extensions.at-6257-prog.cob:19.18:
   16              EXAMINE X REPLACING FIRST "B" BY "C"
   17              IF X NOT = "YYCXBCXB"
   18                 DISPLAY "Should be YYCXBCXB but is " X.
@@ -4232,7 +4232,7 @@ run_extensions.at-6246-prog.cob:19.18:
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:19.19-19.20:
+run_extensions.at-6257-prog.cob:19.19-19.20:
   16              EXAMINE X REPLACING FIRST "B" BY "C"
   17              IF X NOT = "YYCXBCXB"
   18                 DISPLAY "Should be YYCXBCXB but is " X.
@@ -4242,7 +4242,7 @@ run_extensions.at-6246-prog.cob:19.19-19.20:
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:19.20:
+run_extensions.at-6257-prog.cob:19.20:
   16              EXAMINE X REPLACING FIRST "B" BY "C"
   17              IF X NOT = "YYCXBCXB"
   18                 DISPLAY "Should be YYCXBCXB but is " X.
@@ -4252,7 +4252,7 @@ run_extensions.at-6246-prog.cob:19.20:
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:19.21-19.30:
+run_extensions.at-6257-prog.cob:19.21-19.30:
   16              EXAMINE X REPLACING FIRST "B" BY "C"
   17              IF X NOT = "YYCXBCXB"
   18                 DISPLAY "Should be YYCXBCXB but is " X.
@@ -4262,7 +4262,7 @@ run_extensions.at-6246-prog.cob:19.21-19.30:
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:22.18:
+run_extensions.at-6257-prog.cob:22.18:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4272,7 +4272,7 @@ run_extensions.at-6246-prog.cob:22.18:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:22.19-22.20:
+run_extensions.at-6257-prog.cob:22.19-22.20:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4282,7 +4282,7 @@ run_extensions.at-6246-prog.cob:22.19-22.20:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:22.20:
+run_extensions.at-6257-prog.cob:22.20:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4292,7 +4292,7 @@ run_extensions.at-6246-prog.cob:22.20:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:22.21-22.30:
+run_extensions.at-6257-prog.cob:22.21-22.30:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4302,7 +4302,7 @@ run_extensions.at-6246-prog.cob:22.21-22.30:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:22.36:
+run_extensions.at-6257-prog.cob:22.36:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4312,7 +4312,7 @@ run_extensions.at-6246-prog.cob:22.36:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:22.37-22.39:
+run_extensions.at-6257-prog.cob:22.37-22.39:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4322,7 +4322,7 @@ run_extensions.at-6246-prog.cob:22.37-22.39:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Warning: Invalid syntax
 
-run_extensions.at-6246-prog.cob:22.41:
+run_extensions.at-6257-prog.cob:22.41:
   19              EXAMINE X REPLACING UNTIL FIRST "B" BY "Z"
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
@@ -4332,7 +4332,7 @@ run_extensions.at-6246-prog.cob:22.41:
   24                 DISPLAY "Should be -33322 but is " N.
 >> Hint: Missing .
 
-run_extensions.at-6246-prog.cob:23.11-23.13:
+run_extensions.at-6257-prog.cob:23.11-23.13:
   20              IF X NOT = "ZZZZBCXB"
   21                 DISPLAY "Should be ZZZZBCXB but is " X.
   22              EXAMINE N REPLACING ALL 1 BY 3
@@ -4342,4 +4342,4 @@ run_extensions.at-6246-prog.cob:23.11-23.13:
   25              STOP RUN.
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6286:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6297:0

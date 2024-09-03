@@ -529,3 +529,4 @@ syn_screen.at-880-prog.cob:7.19-7.23:
    8              STOP RUN.
 >> Error: Invalid syntax
 
+Considering: import/gnucobol/tests/testsuite.src/syn_screen.at:905:0
