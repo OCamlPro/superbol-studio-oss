@@ -5,31 +5,118 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>COBOL CFG</title>
-        <script src="https://d3js.org/d3.v5.min.js"></script>
-        <script src="https://unpkg.com/@hpcc-js/wasm@0.3.11/dist/index.min.js"></script>
-        <script src="https://unpkg.com/d3-graphviz@3.0.5/build/d3-graphviz.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://unpkg.com/@hpcc-js/wasm@2.20.0/dist/index.umd.js"></script>
+        <script src="https://unpkg.com/d3-graphviz@5.6.0/build/d3-graphviz.js"></script>
+        <style>
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-flow: column;
+  gap: .5em;
+}
+
+#app {
+  flex-grow: 1;
+}
+
+#rendering {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: -1;
+}
+.hidden {
+  display: none !important;
+}
+      #options {
+        display: flex;
+        flex-flow: column;
+        position: absolute;
+        margin-block-start: .5em;
+        background-color: var(--vscode-editor-background);
+        border: var(--vscode-focusBorder) 1px solid;
+      }
+      #hubcount {
+        width: 50px;
+      }
+        </style>
     </head>
     <body>
-        <div style="position: absolute">
+        <div id="buttons">
           <button onclick="reset()">Reset Zoom</button>
+          <button onclick="rerender()">Render</button>
+          <button onclick="toggleOptions()">Toggle Render Options</button>
+          <div id="options" class="hidden">
+            <div><input type="checkbox" id="unreachable" />
+            <label for="unreachable">Remove unreachable nodes</label></div>
+            <div><input type="checkbox" id="fallthru" checked />
+            <label for="fallthru">Collapse fallthrough transitions</label></div>
+            <div><input type="checkbox" id="hubshatter"/>
+            <label for="hubshatter">Split hub with more than
+            <input type="number" id="hubcount" value="20" /> entering connections</label>
+            </div>
+          </div>
         </div>
         <div id="app"></div>
+        <div id="rendering">
+          Rendering... Please wait <br/>
+          If this takes too much time, the CFG is probably too big to render.
+        </div>
     </body>
     <script>
       const vscode = acquireVsCodeApi()
-      var defaultTransform = "";
+      var defaultTransform = undefined;
+      var graphviz = undefined;
+      var rendering = document.getElementById('rendering')
 
       function reset() {
-        d3.select('#app g').attr('transform', defaultTransform)
+        graphviz?.resetZoom()
+      }
+
+      var optionIsVisible = false;
+      function toggleOptions() {
+        if(optionIsVisible) {
+          document.getElementById('options').classList = "hidden";
+        }
+        else {
+          document.getElementById('options').classList = "";
+        }
+        optionIsVisible = !optionIsVisible;
+      }
+
+
+      function rerender() {
+        var collapse_fallthru = document.getElementById('fallthru').checked;
+        var hide_unreachable = document.getElementById('unreachable').checked;
+        if(document.getElementById('hubshatter').checked) {
+          var shatter_hubs = Number(document.getElementById('hubcount').value)
+        }
+        else {
+          var shatter_hubs = undefined;
+        }
+        vscode.postMessage({
+            type: 'graph_update',
+            renderOptions: {
+              hide_unreachable,
+              collapse_fallthru,
+              shatter_hubs,
+            }
+        })
       }
 
       function setupOnEnd() {
-        defaultTransform = d3.select('#app g').attr('transform')
-        nodes = d3.selectAll('.node');
-        nodes
+        rendering.classList= "hidden";
+        if(defaultTransform === undefined) {
+          defaultTransform = d3.select('#app g').attr('transform')
+        }
+        d3.selectAll('.node')
         .on("click", function () {
           var title = d3.select(this).selectAll('title').text().trim();
-          console.log(`click ${title}`);
           vscode.postMessage({
               type: 'click',
               node:title
@@ -40,12 +127,21 @@
       window.addEventListener('message', event => {
           switch (event.data.type) {
             case "graph_content":
-              d3.select('#app').graphviz().renderDot(event.data.graph)
-              .on('end', setupOnEnd)
+              if(graphviz) {
+                graphviz.destroy()
+                d3.select('#app svg').remove()
+                defaultTransform = undefined;
+              }
+              graphviz = d3.select('#app').graphviz().fit(true);
+              graphviz.zoomScaleExtent([0.1, 50])
+              var rect = document.getElementById('app').getBoundingClientRect();
+              graphviz.width(rect.width).height(rect.height)
+              graphviz.renderDot(event.data.graph)
+                      .on('end', setupOnEnd)
+              rendering.classList= "";
             break;
           }
         })
-        vscode.postMessage({type: 'ready'})
-
+      vscode.postMessage({type: 'ready'})
     </script>
     </html>

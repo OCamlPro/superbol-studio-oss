@@ -135,27 +135,28 @@ let handle_get_project_config_command param registry =
 
 let handle_open_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
-  let uri = Yojson.Safe.Util.to_string @@ Yojson.Safe.Util.member "uri" params in
-  let d3 = Yojson.Safe.Util.to_bool @@ Yojson.Safe.Util.member "is_d3" params in
+  let uri, d3, options = Yojson.Safe.Util.(
+      to_string @@ member "uri" params,
+      to_bool @@ member "is_d3" params,
+      try to_assoc @@ member "render_options" params with Type_error _ -> []
+    ) in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
   try_with_main_document_data registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
-      let graphs = make ~d3 checked_doc in
+      let options = Options.from_yojson_assoc options in
+      let graphs = make ~d3 ~options checked_doc in
       let yojsonify ({ string_repr; name; nodes_pos } : graph) =
-        Lsp_io.log_debug "%s %s" name string_repr;
         let nodes_pos = List.map begin fun (n,loc) ->
             let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
             (string_of_int n, Range.yojson_of_t range)
           end nodes_pos in
-        Lsp_io.log_debug "%s" name;
         `Assoc [
           ("string_repr", `String string_repr);
           ("nodes_pos", `Assoc nodes_pos);
           ("name", `String name);]
       in
-      let res = Some (`List (List.map yojsonify graphs)) in
-      Lsp_io.log_debug "seding"; res
+      Some (`List (List.map yojsonify graphs))
     end
   |> Option.value ~default:(`List [])
 
@@ -871,7 +872,7 @@ let on_request
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
         handle_get_project_config_command param registry
-    | UnknownRequest { meth = "superbol/openCFG";
+    | UnknownRequest { meth = "superbol/CFG";
                        params = Some param } ->
         Ok (handle_open_cfg registry param, state)
     | UnknownRequest { meth = "superbol/findProcedure";
