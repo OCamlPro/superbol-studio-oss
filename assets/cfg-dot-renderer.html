@@ -101,6 +101,7 @@ body {
         }
         vscode.postMessage({
             type: 'graph_update',
+            graph_type: 'dot',
             renderOptions: {
               hide_unreachable,
               collapse_fallthru,
@@ -142,6 +143,6 @@ body {
             break;
           }
         })
-      vscode.postMessage({type: 'ready'})
+      vscode.postMessage({type: 'ready', graph_type: 'dot'})
     </script>
     </html>
