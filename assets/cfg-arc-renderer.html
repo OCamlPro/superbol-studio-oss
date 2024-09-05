@@ -9,7 +9,6 @@ html, body {
 text {
   font: 12px monospace;
   pointer-events: none;
-  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
 }
 svg {
     background-color: white;
@@ -24,7 +23,7 @@ path {
 
 @keyframes dash {
   to {
-    stroke-dashoffset: -60;
+    stroke-dashoffset: -50; // lcm of sum of dasharray values to avoid flicker
   }
 }
 </style></head>
@@ -112,9 +111,9 @@ function buildSVG(data) {
 
   function getDasharray(l) {
     if(l.type === "u")
-      return "55,5"
+      return "45,5"
     if(l.type === "c")
-      return "15,5"
+      return "18,7"
     return ""
   }
 
@@ -197,38 +196,40 @@ function buildSVG(data) {
       }
     })
 
+  var timeout = undefined;
 
     // Add the highlighting functionality
     nodes
       .on('mouseover', function (e, d) {
-        nodes.filter(n=> !d.neigh.includes(n.id) && n.id != d.id)
-          .style('fill', "#B8B8B8")
+        if(timeout) {
+          clearTimeout(timeout)
+          timeout = undefined;
+        }
+        nodes
+          .style('fill', n =>
+            !d.neigh.includes(n.id) && n.id != d.id
+            ? "#B8B8B8"
+            : getNodeColor(n))
 
-        links
-          .style('stroke', function (l) {
-            if(l.source === d.id) {
-              return '#69b3b2'
-            } else if (l.target === d.id) {
-              return '#b369b2'
-            }
-            return '#b8b8b855';
-          })
-          .style('stroke-width', function (l) { return l.source === d.id || l.target === d.id ? 4 : 1;})
-          .attr('class', l => {
-            if(l.source === d.id) {
-              return "animated"
-            } else if (l.target === d.id) {
-              return "animated"
-            }
-            return ""
-          })
+        links.filter(l => l.source !== d.id && l.target !== d.id)
+          .style('stroke', '#b8b8b855')
+            .style('stroke-width', '1')
+            .classed('animated', false)
+
+        links.filter(l => l.source === d.id || l.target === d.id)
+          .style('stroke', l => (l.source === d.id) ? '#69b3b2' : '#b369b2')
+          .style('stroke-width', 4)
+          .classed('animated', true)
       })
       .on('mouseout', function (d) {
-        nodes.style('fill', getNodeColor)
-        links
-          .style('stroke', 'black')
-          .style('stroke-width', '1')
-          .classed('animated', false)
+        timeout = setTimeout(() => {
+          timeout = undefined;
+          nodes.style('fill', getNodeColor)
+          links
+            .style('stroke', 'black')
+            .style('stroke-width', '1')
+            .classed('animated', false)
+        }, 300)
       })
 }
 </script>
