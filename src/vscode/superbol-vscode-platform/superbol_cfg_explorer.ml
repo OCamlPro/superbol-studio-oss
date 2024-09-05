@@ -113,16 +113,8 @@ let on_click ~nodes_pos ~text_editor arg =
   let uri = TextDocument.uri @@ TextEditor.document text_editor in
   let column = TextEditor.viewColumn text_editor in
   let node = Ojs.get_prop_ascii arg "node" |> Ojs.string_of_js in
-let message = List.split nodes_pos |> fst |> String.concat " " in
-  match List.assoc_opt node nodes_pos with
-  | None ->
-
-  let message = "NOT found " ^  node  ^ " $$$ " ^ message in
-  let _ = Window.showErrorMessage ~message () in
-      ()
-  | Some range ->
-  let message = "found " ^  node  ^ " $$$ " ^ message in
-  let _ = Window.showErrorMessage ~message () in
+  List.assoc_opt node nodes_pos
+  |> Option.iter begin fun range ->
     let range = Range.t_of_js @@ Jsonoo.t_to_js range in
     let _ : unit Promise.t =
       Window.showTextDocument ~document:(`Uri uri) ?column ()
@@ -136,6 +128,7 @@ let message = List.split nodes_pos |> fst |> String.concat " " in
             ~rangesOrOptions:(`Ranges [range]);
           Promise.return ())
     in ()
+  end
 
 let setup_window_listener ~client =
   let listener event =
@@ -184,47 +177,50 @@ let send_graph ~typ webview graph =
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
+let on_graph_update ~webview ~client ~uri name arg =
+  let options =
+    Ojs.get_prop_ascii arg "renderOptions"
+    |> begin fun ojs ->
+      Ojs.set_prop_ascii ojs "graph_name" @@ Ojs.string_to_js name;
+      ojs end
+    |> Jsonoo.t_of_js in
+  let data =
+    let uri = Jsonoo.Encode.string @@ Uri.path uri in
+    Jsonoo.Encode.object_ ["uri", uri; "render_options", options;] in
+  let _ : unit Promise.t =
+    Vscode_languageclient.LanguageClient.sendRequest client ()
+      ~meth:"superbol/CFG" ~data
+    |> Promise.then_ ~fulfilled:begin fun jsonoo_graphs ->
+      let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
+      match graphs with
+      | [] ->
+        Window.showErrorMessage ()
+          ~message:"Unable to perform operation, try reloading the CFG"
+        |> Promise.map (Fun.const ())
+      | graph::_ ->
+        update_graph ~uri graph;
+        let typ = Ojs.get_prop_ascii arg "graph_type"
+                  |> Ojs.string_of_js |> typ_of_string in
+        send_graph ~typ webview graph;
+        Promise.return ()
+    end
+  in ()
+
 let on_message ~client ~text_editor arg =
   let uri = TextEditor.document text_editor |> TextDocument.uri in
-  match webview_n_graph_find_opt ~uri with
-  | None -> ()
-  | Some (webview, graph) ->
-    let typ = Ojs.get_prop_ascii arg "type" |> Ojs.string_of_js in
-    match typ with
+  let request_type = Ojs.get_prop_ascii arg "type" |> Ojs.string_of_js in
+  webview_n_graph_find_opt ~uri
+  |> Option.iter begin fun (webview, graph) ->
+    match request_type with
     | "click" ->
       on_click ~nodes_pos:graph.nodes_pos ~text_editor arg
     | "graph_update" ->
-      let options =
-        Ojs.get_prop_ascii arg "renderOptions"
-        |> begin fun ojs ->
-          Ojs.set_prop_ascii ojs "graph_name" @@ Ojs.string_to_js graph.name;
-          ojs end
-        |> Jsonoo.t_of_js in
-      let data =
-        let uri = Jsonoo.Encode.string @@ Uri.path uri in
-        Jsonoo.Encode.object_ ["uri", uri; "render_options", options;] in
-      let _ : unit Promise.t =
-        Vscode_languageclient.LanguageClient.sendRequest client ()
-          ~meth:"superbol/CFG" ~data
-        |> Promise.then_ ~fulfilled:begin fun jsonoo_graphs ->
-          let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
-          match graphs with
-          | [] ->
-            Window.showErrorMessage ()
-              ~message:"Unable to perform operation, try reloading the CFG"
-            |> Promise.map (Fun.const ())
-          | graph::_ ->
-            update_graph ~uri graph;
-            let typ = Ojs.get_prop_ascii arg "graph_type"
-                      |> Ojs.string_of_js |> typ_of_string in
-            send_graph ~typ webview graph;
-            Promise.return ()
-        end
-      in ()
+      on_graph_update ~client ~webview ~uri graph.name arg
     | "ready" ->
       let typ = Ojs.get_prop_ascii arg "graph_type" |> Ojs.string_of_js in
       send_graph ~typ:(typ_of_string typ) webview graph
     | _ -> ()
+  end
 
 
 let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
@@ -326,6 +322,4 @@ let open_webview ?text_editor instance =
     Window.showErrorMessage ()
       ~message:"The SuperBOL LSP client is not running; please retry after a \
                 COBOL file has been opened"
-
-
 

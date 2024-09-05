@@ -283,7 +283,7 @@ let dummy_node qn =
     entry = false;
     names = NEL.One (qn_to_string qn);
     jumps = Jumps.empty;
-    will_fallthru = false;
+    will_fallthru = true;
     terminal = false;
     is_external = true;
   }
