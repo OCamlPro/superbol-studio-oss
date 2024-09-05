@@ -190,7 +190,7 @@ module Edge = struct
    let equal = (=)
    let default = FallThrough
    let to_string = function
-     | FallThrough -> "d"
+     | FallThrough -> "f"
      | Conditional -> "c"
      | Unconditional -> "u"
 end
@@ -208,11 +208,8 @@ let vertex_name { names; _ } =
     (NEL.rev names)
 
 
-let vertex_name_no_newline { names; _ } =
-  Pretty.to_string "%a"
-    (NEL.pp ~fopen:"" ~fclose:"" ~fsep:";" Fmt.string)
-    (NEL.rev names)
-  |> Str.global_replace (Str.regexp "\n") " "
+let qid_to_string { qid; _ } =
+  Pretty.to_string "%a" Cobol_ptree.pp_qualname qid
 
   (* Graph.Graphviz.DotAttributes *)
 module Dot = Graph.Graphviz.Dot(struct
@@ -236,7 +233,7 @@ module Dot = Graph.Graphviz.Dot(struct
     let vertex_name { id; _ } = string_of_int id
   end)
 
-let string_of g =
+let to_dot_string g =
   Pretty.to_string "%a" Dot.fprint_graph g
 
 let dummy_node qn =
@@ -330,13 +327,16 @@ let do_shatter_hubs ?(limit=20) g =
     else cfg
   end g g
 
-let cfg_of_nodes ~(options: Options.t) nodes =
+let cfg_of_nodes nodes =
   let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
       Cfg.add_vertex g node,
       Qmap.add node.qid node vertexes
     end (Cfg.empty, Qmap.empty) nodes
   in
   build_edges ~vertexes g nodes
+
+let handle_cfg_options ~(options: Options.t) cfg =
+  cfg
   |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
   |> (match options.shatter_hubs with
       | Some limit -> do_shatter_hubs ~limit
@@ -360,9 +360,9 @@ let cfg_of ~(cu: cobol_unit) =
   |> begin function (* adding entry point if not already present *)
     | ({ qid; _ } as hd )::tl
       when qn_equal qid default_name ->
-        { hd with entry = true; names = NEL.One "Entry\nparagraph" }::tl
+        { hd with id=0; entry = true; names = NEL.One "Entry\nparagraph" }::tl
     | l ->
-        { (dummy_node default_name) with entry = true; names = NEL.One "Entry\npoint" } :: l
+        { (dummy_node default_name) with id=0; entry = true; names = NEL.One "Entry\npoint" } :: l
   end
   |> cfg_of_nodes
 
@@ -381,7 +381,8 @@ let cfg_of_section ~cu ({ section_paragraphs; section_name }: procedure_section)
 
 type graph = {
   name: string;
-  string_repr: string;
+  string_repr_dot: string;
+  string_repr_d3: string;
   nodes_pos: (int * srcloc) list
 }
 
@@ -392,9 +393,25 @@ let nodes_pos cfg =
     | Some loc -> (n.id, loc)::acc
   end cfg []
 
-let make_dot ~(options: Options.t) ({ group; _ }: Cobol_typeck.Outputs.t) =
+let to_d3_string cfg =
+  let cfg_edges = Cfg.fold_edges_e
+      begin fun (n1, e, n2) acc ->
+        Pretty.to_string "{\"source\":%d,\"target\":%d,\"type\":\"%s\"}"
+          n1.id n2.id (Edge.to_string e)
+          ::acc
+      end cfg [] in
+  let cfg_nodes = Cfg.fold_vertex
+      begin fun n acc ->
+        Pretty.to_string "{\"id\":%d,\"name\":\"%s\"}" n.id (qid_to_string n)
+        :: acc
+      end cfg [] in
+  let str_nodes = String.concat "," cfg_nodes in
+  let str_edges = String.concat "," cfg_edges in
+  Pretty.to_string "{\"links\":[%s],\"nodes\":[%s]}" str_edges str_nodes
+
+let make_cfg ?(graph_name=None) ({ group; _ }: Cobol_typeck.Outputs.t) =
   let is_to_include : string -> bool =
-    match options.graph_name with
+    match graph_name with
     | None -> Fun.const true
     | Some name -> String.equal name in
   Cobol_unit.Collections.SET.fold
@@ -407,54 +424,26 @@ let make_dot ~(options: Options.t) ({ group; _ }: Cobol_typeck.Outputs.t) =
                 ((~&) cu.unit_name) in
             if not (is_to_include name)
             then None
-            else Some (
-                let cfg = cfg_of_section ~options ~cu ~&sec in
-                let nodes_pos = nodes_pos cfg in {
-                  name;
-                  string_repr = string_of cfg;
-                  nodes_pos;
-                })
+            else Some ( name, cfg_of_section ~cu ~&sec)
         end cu.unit_procedure.list in
       let cu_graph =
         if is_to_include ((~&) cu.unit_name)
-        then
-          let cfg = cfg_of ~options ~cu in
-          [{
-            name = (~&)cu.unit_name;
-            string_repr = string_of cfg;
-            nodes_pos = nodes_pos cfg;
-          }]
+        then [((~&)cu.unit_name, cfg_of ~cu)]
         else []
       in cu_graph @ section_graphs @ acc
     end group []
 
-let make_d3 ({ group; _ }: Cobol_typeck.Outputs.t) =
-  let options = Options.create ~collapse_fallthru:false () in
-  Cobol_unit.Collections.SET.fold
-    begin fun { payload = cu; _ } acc ->
-      let cfg = cfg_of ~options ~cu in
-      let cfg_edges = Cfg.fold_edges_e
-          begin fun (n1, e, n2) links ->
-            links
-            ^ Pretty.to_string "{source: %d, target:%d, type:'%s'},"
-              n1.id n2.id (Edge.to_string e)
-          end cfg "[" ^ "]" in
-      let cfg_nodes = Cfg.fold_vertex
-          begin fun n nodes ->
-            nodes
-            ^ Pretty.to_string "{id:%d, name: '%s'}," n.id (vertex_name_no_newline n)
-          end cfg "[" ^ "]" in
-      {
-        name = (~&)cu.unit_name;
-        string_repr = Pretty.to_string "{links:%s, nodes:%s}" cfg_edges cfg_nodes;
-        nodes_pos = nodes_pos cfg
-      } :: acc
-    end group []
-
-let make ?(d3=false) ~options (checked_doc: Cobol_typeck.Outputs.t) =
-  if d3
-  then make_d3 checked_doc
-  else make_dot ~options checked_doc
+let make ~(options: Options.t) (checked_doc: Cobol_typeck.Outputs.t) =
+  make_cfg ~graph_name:options.graph_name checked_doc
+  |> List.map begin fun (name, cfg) ->
+    let cfg_with_options = handle_cfg_options ~options cfg in
+    {
+      name;
+      string_repr_dot = to_dot_string cfg_with_options;
+      string_repr_d3 = to_d3_string cfg;
+      nodes_pos = nodes_pos cfg;
+    }
+  end
 
 (*
 List of node (sections & paragraphs)

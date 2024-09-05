@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<style>
+
+html, body {
+  height: 100%;
+}
+text {
+  font: 12px monospace;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
+}
+svg {
+    background-color: white;
+}
+path {
+  animation: dash 1.5s linear infinite;
+  animation-play-state: paused;
+}
+.animated {
+  animation-play-state: running;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -60;
+  }
+}
+</style></head>
+<html>
+<body> <div id="graph"></div></body>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+const vscode = acquireVsCodeApi()
+function addNeighbours(nodes, links) {
+  nodes.forEach(n => {
+    neigh = []
+    links.forEach(l => {
+      if(l.source == n.id) {
+        neigh.push(l.target)
+      }
+      else if (l.target == n.id) {
+        neigh.push(l.source)
+      }
+    })
+    n.neigh = Array.from(new Set(neigh))
+  })
+  return nodes;
+}
+
+window.addEventListener('message', event => {
+    switch (event.data.type) {
+      case "graph_content":
+        d3.select('#graph svg').remove()
+
+        buildSVG(JSON.parse(event.data.graph))
+        // buildSVG({
+        //   nodes: Array.from({ length: 50 }, (_, i) => i).map(x => ({ id:x, name: ""+x })),
+        //   links: Array.from({ length: 49 }, (_, i) => i).map(x => ({ source:0, target: x+1, type:"u" }))
+        // })
+      break;
+    }
+  })
+vscode.postMessage({type: 'ready', graph_type: 'd3'})
+
+
+function buildSVG(data) {
+
+  var rect = document.getElementById('graph').getBoundingClientRect();
+  console.log(data)
+  data.nodes = addNeighbours(data.nodes, data.links)
+  data.links.sort((l1,l2) => {
+    if(l1.source < l2.source) {
+      return -1;
+    } else if(l1.target < l2.target) {
+      return
+    }
+  })
+  // set the dimensions and margins of the graph
+  const margin = {top: 20, right: 30, bottom: 20, left: 30},
+    width = rect.width,
+    height = data.nodes.length * 32;
+  // append the svg object to the body of the page
+  const svg = d3.select("#graph")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+              .attr("transform",`translate(${margin.left},${margin.top})`);
+
+  // List of node names
+  const allNodes = data.nodes.map(d=>d.id).sort((a,b)=> a-b)
+
+  const sectionNames = data.nodes.filter(d=> !d.name.includes(" IN "))
+  const color = d3.scaleOrdinal(sectionNames, d3.schemeCategory10)
+  function getNodeColor(d) {
+    const name = d.name.split(" IN ");
+    if(name.length > 1) {
+      return color(name[1])
+    }
+    return color(d.name)
+  }
+
+  function getName(d) {
+    var name = d.name.split(" IN ")[0]
+    if(name.length > 14) {
+      return name.slice(0, 12) + ".."
+    }
+    return name
+  }
+
+  function getDasharray(l) {
+    if(l.type === "u")
+      return "55,5"
+    if(l.type === "c")
+      return "15,5"
+    return ""
+  }
+
+  // A linear scale to position the nodes on the X axis
+  const y = d3.scalePoint()
+            .range([0, height])
+            .domain(allNodes)
+
+  const NODE_CENTER_X = 100
+  NODE_RADIUS = 12,
+  LINK_MAX_SPREAD = width - NODE_CENTER_X - NODE_RADIUS - margin.right - margin.left
+  half_spread = LINK_MAX_SPREAD/2;
+  function map_to_max_spread(val, k) {
+    c = LINK_MAX_SPREAD
+    b = half_spread;
+    // return c * (1-Math.exp(-k*(val - b))/2)
+    return b + (c-b)*Math.atan(k*(val-b))*2/Math.PI
+
+  }
+
+  function getLinkPath(d) {
+    start = y(d.source)
+    end = y(d.target)
+    if(d.type === 'f') {
+      return `M ${NODE_CENTER_X} ${start+NODE_RADIUS} V ${end - NODE_RADIUS}`
+    } else {
+      half_distance = Math.abs((start-end)/2)
+      map = map_to_max_spread(half_distance, .001)
+      radius = half_distance > half_spread ? (half_distance**2 + map**2)/(2*map) : half_distance
+      return `M ${NODE_CENTER_X+NODE_RADIUS} ${start}\
+      A ${radius},${radius} 0 0,${start < end?1:0} ${NODE_CENTER_X+NODE_RADIUS},${end}`
+    }
+  }
+
+  // Add the circle for the nodes
+  const nodes = svg
+    .selectAll("mynodes")
+    .data(data.nodes)
+    .join("circle")
+      .attr("cx", NODE_CENTER_X)
+      .attr("cy", d=>y(d.id))
+      .attr("r", 12)
+      .style("fill", getNodeColor)
+
+  // And give them a label
+  const labels = svg
+    .selectAll("mylabels")
+    .data(data.nodes)
+    .join("text")
+    .attr("x", NODE_CENTER_X - NODE_RADIUS - 10)
+    .attr("y", d=>y(d.id))
+    .text(getName)
+    .style("text-anchor", "end")
+    .style("alignment-baseline", "middle")
+
+  // Add the links
+  const links = svg
+    .selectAll('mylinks')
+    .data(data.links)
+    .join('path')
+    .attr('d', getLinkPath)
+    .style("fill", "none")
+    .attr("stroke", "black")
+    .attr("stroke-dasharray", getDasharray)
+
+  links.select('path')
+    .attr('d', d => {
+      console.log('link log ?', d)
+      start = y(d.source)
+      end = y(d.target)
+      if(d.type === 'f') {
+        return `M ${NODE_CENTER_X} ${start+NODE_RADIUS} V ${end - NODE_RADIUS}`
+      } else {
+        max_width = width - NODE_CENTER_X - NODE_RADIUS
+        mid_point = (start-end)/2
+        map = max_width * (1-Math.exp(-(mid_point - max_width/2))/2)
+        radius = mid_point > max_width/2 ? (mid_point**2 + map**2)/(2*map) : mid_point
+        return `M ${NODE_CENTER_X+NODE_RADIUS} ${start}\
+        A ${radius},${radius} 0 0,${start < end?1:0} ${NODE_CENTER_X+NODE_RADIUS},${end}`
+      }
+    })
+
+
+    // Add the highlighting functionality
+    nodes
+      .on('mouseover', function (e, d) {
+        nodes.filter(n=> !d.neigh.includes(n.id) && n.id != d.id)
+          .style('fill', "#B8B8B8")
+
+        links
+          .style('stroke', function (l) {
+            if(l.source === d.id) {
+              return '#69b3b2'
+            } else if (l.target === d.id) {
+              return '#b369b2'
+            }
+            return '#b8b8b855';
+          })
+          .style('stroke-width', function (l) { return l.source === d.id || l.target === d.id ? 4 : 1;})
+          .attr('class', l => {
+            if(l.source === d.id) {
+              return "animated"
+            } else if (l.target === d.id) {
+              return "animated"
+            }
+            return ""
+          })
+      })
+      .on('mouseout', function (d) {
+        nodes.style('fill', getNodeColor)
+        links
+          .style('stroke', 'black')
+          .style('stroke-width', '1')
+          .classed('animated', false)
+      })
+}
+</script>

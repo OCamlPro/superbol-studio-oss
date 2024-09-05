@@ -30,20 +30,29 @@ let decorationType =
   let options = Ojs.obj [|("backgroundColor", backgroundColor)|] in
   Window.createTextEditorDecorationType ~options
 
+(* GRAPH TYPE*)
+
+let typ_of_string = function
+  | "d3" -> `D3
+  | _ -> `Dot
+
 (* GRAPH FROM LSP *)
 
 type graph = {
-  string_repr: string;
+  string_repr_dot: string;
+  string_repr_d3: string;
   nodes_pos: (string * Jsonoo.t) list;
   name: string;
 }
 let decode_graph res =
-  let string_repr =
-    Jsonoo.Decode.field "string_repr" Jsonoo.Decode.string res in
+  let string_repr_dot =
+    Jsonoo.Decode.field "string_repr_dot" Jsonoo.Decode.string res in
+  let string_repr_d3 =
+    Jsonoo.Decode.field "string_repr_d3" Jsonoo.Decode.string res in
   let nodes_pos = Jsonoo.Decode.field "nodes_pos" Jsonoo.Decode.(dict id) res in
   let nodes_pos = Hashtbl.to_seq nodes_pos |> List.of_seq in
   let name = Jsonoo.Decode.field "name" Jsonoo.Decode.string res in
-  { name; nodes_pos; string_repr }
+  { name; nodes_pos; string_repr_dot; string_repr_d3 }
 
 
 (* WEBVIEW MANAGEMENT *)
@@ -164,14 +173,18 @@ let setup_window_listener ~client =
 
 (* MESSAGE MANAGER *)
 
-let send_graph webview graph =
+let send_graph ~typ webview graph =
+  let string_repr = match typ with
+  | `Dot -> graph.string_repr_dot
+  | `D3 -> graph.string_repr_d3
+  in
   let ojs = Ojs.empty_obj () in
   Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "graph_content");
-  Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr);
+  Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js string_repr);
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
-let on_message  ~client ~text_editor arg =
+let on_message ~client ~text_editor arg =
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   match webview_n_graph_find_opt ~uri with
   | None -> ()
@@ -189,9 +202,7 @@ let on_message  ~client ~text_editor arg =
         |> Jsonoo.t_of_js in
       let data =
         let uri = Jsonoo.Encode.string @@ Uri.path uri in
-        Jsonoo.Encode.object_ ["uri", uri;
-                               "is_d3", Jsonoo.Encode.bool false;
-                               "render_options", options;] in
+        Jsonoo.Encode.object_ ["uri", uri; "render_options", options;] in
       let _ : unit Promise.t =
         Vscode_languageclient.LanguageClient.sendRequest client ()
           ~meth:"superbol/CFG" ~data
@@ -204,20 +215,24 @@ let on_message  ~client ~text_editor arg =
             |> Promise.map (Fun.const ())
           | graph::_ ->
             update_graph ~uri graph;
-            send_graph webview graph;
+            let typ = Ojs.get_prop_ascii arg "graph_type"
+                      |> Ojs.string_of_js |> typ_of_string in
+            send_graph ~typ webview graph;
             Promise.return ()
         end
       in ()
-    | "ready" -> send_graph webview graph
+    | "ready" ->
+      let typ = Ojs.get_prop_ascii arg "graph_type" |> Ojs.string_of_js in
+      send_graph ~typ:(typ_of_string typ) webview graph
     | _ -> ()
 
 
-let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
+let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
   let open Promise in
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let data =
     let uri = Jsonoo.Encode.string @@ Uri.path uri in
-    Jsonoo.Encode.object_ ["uri", uri; "is_d3", Jsonoo.Encode.bool d3]
+    Jsonoo.Encode.object_ ["uri", uri]
   in
   Vscode_languageclient.LanguageClient.sendRequest client ()
     ~meth:"superbol/CFG" ~data
@@ -239,19 +254,19 @@ let open_cfg_for ?(d3=false) ~text_editor ~extension_uri client =
         then begin
           let html_uri = Uri.joinPath extension_uri
               ~pathSegments:
-                ["assets";
-                 if d3 then "cfg-d3-renderer.html"
-                 else "cfg-dot-renderer.html"] in
+                ["assets"; match typ with
+                 | `Dot -> "cfg-dot-renderer.html"
+                 | `D3 -> "cfg-arc-renderer.html"] in
           let html_file = read_whole_file @@ Uri.fsPath html_uri in
           WebView.set_html webview html_file;
         end
-        else send_graph webview graph;
+        else send_graph ~typ webview graph;
         setup_window_listener ~client;
         return ()
     end
   end
 
-let open_cfg ?(d3=false) ?text_editor instance =
+let open_cfg ?(typ=`Dot) ?text_editor instance =
   let text_editor = match text_editor with
     | None -> Window.activeTextEditor ()
     | e -> e in
@@ -259,7 +274,7 @@ let open_cfg ?(d3=false) ?text_editor instance =
   | Some client, Some text_editor ->
     let extension_uri = ExtensionContext.extensionUri
       @@ Superbol_instance.context instance in
-    open_cfg_for ~d3 ~extension_uri ~text_editor client
+    open_cfg_for ~typ ~extension_uri ~text_editor client
   | _ -> Promise.return ()
 
 (* debug TO REMOVE *)

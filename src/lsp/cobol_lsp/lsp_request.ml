@@ -135,24 +135,24 @@ let handle_get_project_config_command param registry =
 
 let handle_open_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
-  let uri, d3, options = Yojson.Safe.Util.(
+  let uri, options = Yojson.Safe.Util.(
       to_string @@ member "uri" params,
-      to_bool @@ member "is_d3" params,
-      try to_assoc @@ member "render_options" params with Type_error _ -> []
-    ) in
+      try to_assoc @@ member "render_options" params with Type_error _ -> [])
+  in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
   try_with_main_document_data registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
       let options = Options.from_yojson_assoc options in
-      let graphs = make ~d3 ~options checked_doc in
-      let yojsonify ({ string_repr; name; nodes_pos } : graph) =
+      let graphs = make ~options checked_doc in
+      let yojsonify ({ string_repr_dot; string_repr_d3; name; nodes_pos } : graph) =
         let nodes_pos = List.map begin fun (n,loc) ->
             let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
             (string_of_int n, Range.yojson_of_t range)
           end nodes_pos in
         `Assoc [
-          ("string_repr", `String string_repr);
+          ("string_repr_d3", `String string_repr_d3);
+          ("string_repr_dot", `String string_repr_dot);
           ("nodes_pos", `Assoc nodes_pos);
           ("name", `String name);]
       in

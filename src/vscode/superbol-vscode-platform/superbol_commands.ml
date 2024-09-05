@@ -47,7 +47,7 @@ let _open_cfg =
 let _open_cfg_d3 =
   command "superbol.cfg.open.d3" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~d3:true _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`D3 _instance in
       ()
     end
 
