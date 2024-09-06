@@ -223,7 +223,7 @@ function buildSVG(data) {
   nodes.on("click", (_, n) => {
     vscode.postMessage({
         type: 'click',
-        node: String(n.id)
+        node: n.id
     })
   })
 }

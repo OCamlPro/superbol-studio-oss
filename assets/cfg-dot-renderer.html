@@ -72,6 +72,7 @@ body {
       const vscode = acquireVsCodeApi()
       var defaultTransform = undefined;
       var graphviz = undefined;
+      var graph = undefined;
       var rendering = document.getElementById('rendering')
 
       function reset() {
@@ -115,14 +116,20 @@ body {
         if(defaultTransform === undefined) {
           defaultTransform = d3.select('#app g').attr('transform')
         }
-        d3.selectAll('.node')
-        .on("click", function () {
-          var title = d3.select(this).selectAll('title').text().trim();
-          vscode.postMessage({
-              type: 'click',
-              node:title
+        d3.selectAll('svg text')
+          .on("click", (ev, e) => {
+            console.log(ev)
+            if(e.children[0].text) {
+              const node =
+                graph.nodes.find((n) => e.children[0].text === n.name)
+              if(node) {
+                vscode.postMessage({
+                    type: 'click',
+                    node: node.id
+                })
+              }
+            }
           })
-        })
       }
 
       window.addEventListener('message', event => {
@@ -137,9 +144,11 @@ body {
               graphviz.zoomScaleExtent([0.1, 50])
               var rect = document.getElementById('app').getBoundingClientRect();
               graphviz.width(rect.width).height(rect.height)
-              graphviz.renderDot(event.data.graph)
+              graphviz.renderDot(event.data.dot)
                       .on('end', setupOnEnd)
               rendering.classList= "";
+              graph = JSON.parse(event.data.graph)
+              console.log(event.data.dot)
             break;
           }
         })
