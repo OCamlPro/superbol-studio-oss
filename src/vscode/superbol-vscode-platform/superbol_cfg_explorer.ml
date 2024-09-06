@@ -103,10 +103,12 @@ let update_graph ~uri graph =
   let filename = Uri.path uri in
   match Hashtbl.find_opt webview_panels filename with
   | Some (wvp, _) ->
-    Hashtbl.add webview_panels filename (wvp, graph)
+    Hashtbl.replace webview_panels filename (wvp, graph)
   | None -> ()
 
 (* CLICK ON NODE *)
+
+let ignore_next_selection_change = ref false
 
 let on_click ~nodes_pos ~text_editor arg =
   let open Vscode in
@@ -126,36 +128,46 @@ let on_click ~nodes_pos ~text_editor arg =
           TextEditor.set_selection text_editor selection;
           TextEditor.setDecorations text_editor ~decorationType
             ~rangesOrOptions:(`Ranges [range]);
+          (* Avoids triggering selection change with previous set_selection *)
+          ignore_next_selection_change := true;
           Promise.return ())
     in ()
   end
 
 let setup_window_listener ~client =
   let listener event =
-    let text_editor = TextEditorSelectionChangeEvent.textEditor event in
-    let uri = TextEditor.document text_editor |> TextDocument.uri in
-    let webview = webview_n_graph_find_opt ~uri in
-    match webview with
-    | None -> ()
-    | Some (webview, _) ->
-      match TextEditorSelectionChangeEvent.selections event with
-      | [] -> ()
-      | selection::_ ->
-        let pos_start = Selection.start selection in
-        let data =
-          let uri = Jsonoo.Encode.string @@ Uri.path uri in
-          Jsonoo.Encode.object_
-            ["uri", uri;
-             "line", Jsonoo.Encode.int @@ Position.line pos_start;
-             "character", Jsonoo.Encode.int @@ Position.character pos_start]
-        in
-        let _ : bool Promise.t =
-          Vscode_languageclient.LanguageClient.sendRequest client ()
-            ~meth:"superbol/findProcedure" ~data
-          |> Promise.(then_ ~fulfilled:begin fun res ->
-              WebView.postMessage webview @@ Jsonoo.t_to_js res
-            end)
-        in ()
+    if !ignore_next_selection_change
+    then ignore_next_selection_change := false
+    else
+      let text_editor = TextEditorSelectionChangeEvent.textEditor event in
+      TextEditor.setDecorations text_editor ~decorationType
+        ~rangesOrOptions:(`Ranges []);
+      let uri = TextEditor.document text_editor |> TextDocument.uri in
+      let webview = webview_n_graph_find_opt ~uri in
+      match webview with
+      | None -> ()
+      | Some (webview, _) ->
+        match TextEditorSelectionChangeEvent.selections event with
+        | [] -> ()
+        | selection::_ ->
+          let pos_start = Selection.start selection in
+          let data =
+            let uri = Jsonoo.Encode.string @@ Uri.path uri in
+            Jsonoo.Encode.object_
+              ["uri", uri;
+               "line", Jsonoo.Encode.int @@ Position.line pos_start;
+               "character", Jsonoo.Encode.int @@ Position.character pos_start]
+          in
+          let _ : bool Promise.t =
+            Vscode_languageclient.LanguageClient.sendRequest client ()
+              ~meth:"superbol/findProcedure" ~data
+            |> Promise.(then_ ~fulfilled:begin fun res ->
+                let ojs = Ojs.empty_obj () in
+                Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "focused_proc");
+                Ojs.set_prop_ascii ojs "procedure" @@ Jsonoo.t_to_js res;
+                WebView.postMessage webview ojs
+              end)
+          in ()
   in
   let disposable_listener =
     match !window_listener with
