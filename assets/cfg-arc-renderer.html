@@ -32,6 +32,12 @@ path {
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 const vscode = acquireVsCodeApi()
+var graph = undefined;
+    nodes = undefined,
+    links = undefined,
+    y = undefined,
+    nodeColor = undefined;
+
 function addNeighbours(nodes, links) {
   nodes.forEach(n => {
     neigh = []
@@ -47,21 +53,6 @@ function addNeighbours(nodes, links) {
   })
   return nodes;
 }
-
-window.addEventListener('message', event => {
-    switch (event.data.type) {
-      case "graph_content":
-        d3.select('#graph svg').remove()
-
-        buildSVG(JSON.parse(event.data.graph))
-        // buildSVG({
-        //   nodes: Array.from({ length: 50 }, (_, i) => i).map(x => ({ id:x, name: ""+x })),
-        //   links: Array.from({ length: 49 }, (_, i) => i).map(x => ({ source:0, target: x+1, type:"u" }))
-        // })
-      break;
-    }
-  })
-vscode.postMessage({type: 'ready', graph_type: 'd3'})
 
 // set the dimensions and margins of the graph
 var rect = document.getElementById('graph').getBoundingClientRect();
@@ -119,12 +110,45 @@ function getLinkPath(y) {
   }
 }
 
+var unfocusTimeout = undefined;
+function focusNode(d) {
+  if(unfocusTimeout) {
+    clearTimeout(unfocusTimeout)
+    unfocusTimeout = undefined;
+  }
+  nodes.style('fill', n =>
+    !d.neigh.includes(n.id) && n.id != d.id
+    ? "#BBB"
+    : nodeColor(n))
+    .style("stroke", n => n.id === d.id ? "black" : "none")
+
+  links.filter(l => l.source !== d.id && l.target !== d.id)
+    .style('stroke', '#5553')
+    .style('stroke-width', '1')
+    .classed('animated', false)
+  links.filter(l => l.source === d.id || l.target === d.id)
+    .style('stroke', l => (l.source === d.id) ? '#7bb' : '#b7b')
+    .style('stroke-width', 4)
+    .classed('animated', true)
+}
+
+function unfocus(delay) {
+  unfocusTimeout = setTimeout(() => {
+    unfocusTimeout = undefined;
+    nodes.style('fill', nodeColor)
+         .style("stroke", "none")
+    links
+      .style('stroke', 'black')
+      .style('stroke-width', '1')
+      .classed('animated', false)
+  }, delay)
+}
+
 function buildSVG(data) {
 
   const height = data.nodes.length * 32;
 
   data.nodes = addNeighbours(data.nodes, data.links)
-  console.log(data)
 
   // append the svg object to the body of the page
   const svg = d3.select("#graph")
@@ -139,22 +163,13 @@ function buildSVG(data) {
 
   const sectionNames = data.nodes.filter(d=> !d.name.includes(" IN "))
   const color = d3.scaleOrdinal(sectionNames, d3.schemeCategory10)
+
   // A linear scale to position the nodes on the X axis
-  const y = d3.scalePoint()
+  y = d3.scalePoint()
             .range([0, height])
             .domain(allNodes)
 
-  const nodeColor = getNodeColor(color);
-
-  // Add the circle for the nodes
-  const nodes = svg
-    .selectAll("mynodes")
-    .data(data.nodes)
-    .join("circle")
-      .attr("cx", NODE_CENTER_X)
-      .attr("cy", d=>y(d.id))
-      .attr("r", 12)
-      .style("fill", nodeColor)
+  nodeColor = getNodeColor(color);
 
   // And give them a label
   const labels = svg
@@ -165,7 +180,7 @@ function buildSVG(data) {
   labels.append("rect")
     .attr("x", -margin.left)
     .attr("y", d => y(d.id) - 6)
-    .attr("width", NODE_CENTER_X-NODE_RADIUS + margin.left)
+    .attr("width", NODE_CENTER_X - NODE_RADIUS - 10 + margin.left)
     .attr("height", "1em")
     .attr("fill", "#fff")
     // .text(getShortenName)
@@ -178,7 +193,7 @@ function buildSVG(data) {
   labels.append("title").text(n => n.name)
 
   // Add the links
-  const links = svg
+  links = svg
     .selectAll('mylinks')
     .data(data.links)
     .join('path')
@@ -187,38 +202,21 @@ function buildSVG(data) {
     .attr("stroke", "black")
     .attr("stroke-dasharray", getDasharray)
 
-  var timeout = undefined;
-  // Add the highlighting functionality
-  nodes.on('mouseover', function (e, d) {
-    if(timeout) {
-      clearTimeout(timeout)
-      timeout = undefined;
-    }
-    nodes.style('fill', n =>
-      !d.neigh.includes(n.id) && n.id != d.id
-      ? "#BBB"
-      : nodeColor(n))
-
-    links.filter(l => l.source !== d.id && l.target !== d.id)
-      .style('stroke', '#5553')
-      .style('stroke-width', '1')
-      .classed('animated', false)
-
-    links.filter(l => l.source === d.id || l.target === d.id)
-      .style('stroke', l => (l.source === d.id) ? '#7bb' : '#b7b')
+  // Add the circle for the nodes
+  nodes = svg
+    .selectAll("mynodes")
+    .data(data.nodes)
+    .join("circle")
+      .attr("cx", NODE_CENTER_X)
+      .attr("cy", d=>y(d.id))
+      .attr("r", NODE_RADIUS)
+      .style("fill", nodeColor)
       .style('stroke-width', 4)
-      .classed('animated', true)
-    })
-    .on('mouseout', d => {
-      timeout = setTimeout(() => {
-        timeout = undefined;
-        nodes.style('fill', nodeColor)
-        links
-          .style('stroke', 'black')
-          .style('stroke-width', '1')
-          .classed('animated', false)
-      }, 300)
-    })
+
+  // Add the highlighting functionality
+  nodes
+    .on('mouseover', (_, n) => focusNode(n))
+    .on('mouseout', () => unfocus(300))
 
   nodes.on("click", (_, n) => {
     vscode.postMessage({
@@ -227,4 +225,24 @@ function buildSVG(data) {
     })
   })
 }
+
+window.addEventListener('message', event => {
+    switch (event.data.type) {
+      case "graph_content":
+        d3.select('#graph svg').remove()
+        graph = JSON.parse(event.data.graph)
+        buildSVG(graph)
+      break;
+        case "focused_proc":
+        const node = graph.nodes
+          .find(n => { return n.name === event.data.procedure })
+        window.scroll(0, y(node.id)-window.innerHeight/3)
+        focusNode(node)
+        unfocus(5000)
+        break;
+    }
+  })
+
+vscode.postMessage({type: 'ready', graph_type: 'd3'})
+
 </script>
