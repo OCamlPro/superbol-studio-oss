@@ -190,6 +190,26 @@ module StaticFeature = struct
       [@@js.builder]]
 end
 
+module StreamInfo = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val writer : t -> Node.Net.Socket.t [@@js.get]
+
+    val reader : t -> Node.Net.Socket.t [@@js.get]
+
+    val detached : t -> bool option [@@js.get]
+
+    val create :
+         writer: Node.Net.Socket.t
+      -> reader: Node.Net.Socket.t
+      -> ?detached:bool
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
 module DidChangeConfiguration = struct
   include Interface.Make ()
 
@@ -208,6 +228,13 @@ module LanguageClient = struct
       -> clientOptions:ClientOptions.t
       -> ?forceDebug:bool
       -> unit
+      -> t
+      [@@js.new "vscode_languageclient.LanguageClient"]
+
+    val from_stream :
+         id:string
+      -> name:string
+      -> (unit -> StreamInfo.t Promise.t)
       -> t
       [@@js.new "vscode_languageclient.LanguageClient"]
 

@@ -20,9 +20,16 @@ type t = {
 }
 type client = LanguageClient.t
 
+
+let id = "superbol-free-lsp"
+
+let name = "SuperBOL Language Server"
+
 let make ~context = { context; language_client = None }
 
 let client { language_client; _ } = language_client
+let subscribe_disposable { context; _ } disposable =
+  Vscode.ExtensionContext.subscribe context ~disposable
 
 let stop_language_server t =
   match t.language_client with
@@ -39,14 +46,29 @@ let start_language_server ({ context; _ } as t) =
   let open Promise.Syntax in
   let* () = stop_language_server t in
   let client =
-    LanguageClient.make ()
-      ~id: "superbol-free-lsp"
-      ~name: "SuperBOL Language Server"
-      ~serverOptions:(Superbol_languageclient.server_options ~context)
-      ~clientOptions:(Superbol_languageclient.client_options ())
+    match Superbol_languageclient.server_access ~context with
+    | Sub_process serverOptions ->
+        LanguageClient.make () ~id ~name ~serverOptions
+          ~clientOptions:(Superbol_languageclient.client_options ())
+    | TCP { host; port } ->
+        LanguageClient.from_stream ~id ~name begin fun () ->
+          let socket = Node.Net.Socket.(connect (make ())) ~host ~port in
+          Node.Net.Socket.on socket @@ `Connect begin fun () ->
+            subscribe_disposable t @@
+            Vscode.Window.setStatusBarMessage ()
+              ~text:(Printf.sprintf "SuperBOL LSP client successfully connected \
+                                     to %s on port %u" host port)
+              ~hide:(`AfterTimeout 10000)
+          end;
+          Promise.return @@
+          Vscode_languageclient.StreamInfo.create ()
+            ~writer:socket
+            ~reader:socket
+        end
   in
   let+ () = LanguageClient.start client in
   t.language_client <- Some client
+
 
 
 let current_document_uri ?text_editor () =

@@ -70,7 +70,7 @@ let package =
       "vscode-languageclient", "8.0.2";
       "polka", "^1.0.0-next.22";
       "sirv", "^2.0.2";
-
+      
       (* for the debug extension: *)
       "n-readlines", "^1.0.0";
     ]

@@ -167,6 +167,24 @@ module DidChangeConfiguration : sig
   val create : settings:Ojs.t -> unit -> t
 end
 
+module StreamInfo: sig
+  include Js.T
+
+  val writer : t -> Node.Net.Socket.t [@@js.get]
+
+  val reader : t -> Node.Net.Socket.t [@@js.get]
+
+  val detached : t -> bool option [@@js.get]
+
+  val create :
+    writer: Node.Net.Socket.t
+    -> reader: Node.Net.Socket.t
+    -> ?detached:bool
+    -> unit
+    -> t
+         [@@js.builder]
+end
+
 module LanguageClient : sig
   include Js.T
 
@@ -177,6 +195,12 @@ module LanguageClient : sig
     -> clientOptions:ClientOptions.t
     -> ?forceDebug:bool
     -> unit
+    -> t
+
+  val from_stream :
+    id:string
+    -> name:string
+    -> (unit -> StreamInfo.t Promise.t)
     -> t
 
   val start : t -> unit Promise.t

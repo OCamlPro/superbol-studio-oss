@@ -12,20 +12,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let lsp_server_autorestarter instance : Vscode.Disposable.t =
+let start_lsp_server_autorestarter instance =
+  Superbol_instance.subscribe_disposable instance @@
   Vscode.Workspace.onDidChangeConfiguration ()
     ~listener:begin fun config_change ->
       if Superbol_languageclient.server_needs_restart_after ~config_change
-      then
-        let _ =
-          Vscode.Window.setStatusBarMessage ()
-            ~text:"Restarting SuperBOL Language Server…"
-            ~hide:(`AfterTimeout 2000)
-        in
-        let _: unit Promise.t =
+      then begin
+        Superbol_instance.subscribe_disposable instance @@
+        Vscode.Window.setStatusBarMessage ()
+          ~text:"Restarting SuperBOL Language Server…"
+          ~hide:(`AfterTimeout 2000);
+        let _ : unit Promise.t =
           Superbol_instance.start_language_server instance
         in ()
-      else ()
+      end;
     end
 
 (* --- *)
@@ -36,15 +36,11 @@ let activate (extension: Vscode.ExtensionContext.t) =
   let instance = Superbol_instance.make ~context:extension in
   current_instance := Some instance;
 
-  let task =
-    Vscode.Tasks.registerTaskProvider
-      ~type_:Superbol_tasks.type_
-      ~provider:(Superbol_tasks.provider instance)
-  in
-  Vscode.ExtensionContext.subscribe extension ~disposable:task;
-
-  Vscode.ExtensionContext.subscribe extension
-    ~disposable:(lsp_server_autorestarter instance);
+  Superbol_instance.subscribe_disposable instance @@
+  Vscode.Tasks.registerTaskProvider
+    ~type_:Superbol_tasks.type_
+    ~provider:(Superbol_tasks.provider instance);
+  start_lsp_server_autorestarter instance;
 
   Superbol_commands.register_all extension instance;
   Superbol_instance.start_language_server instance

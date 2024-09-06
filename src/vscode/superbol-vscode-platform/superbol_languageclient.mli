@@ -12,9 +12,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val server_options
+type server_access =
+  | Sub_process of Vscode_languageclient.ServerOptions.t
+  | TCP of { host: string; port: int }
+
+val server_access
   : context: Vscode.ExtensionContext.t
-  -> Vscode_languageclient.ServerOptions.t
+  -> server_access
 
 val client_options
   : unit
