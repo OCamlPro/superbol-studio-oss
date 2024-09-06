@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search &mdash; superbol-studio-oss master
+  <title>&lt;no title&gt; &mdash; superbol-studio-oss master
  (ed344b4
 ) (2024/09/06 11:59) documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
-    
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
-    <script src="_static/searchtools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="#" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Copyright and License" href="license.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -36,7 +35,7 @@
 )
               </div>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="#" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -73,8 +72,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Search</li>
+      <li>&lt;no title&gt;</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="_sources/remote-lsp.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -82,22 +82,20 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <noscript>
-  <div id="fallback" class="admonition warning">
-    <p class="last">
-      Please activate JavaScript to enable the search functionality.
-    </p>
-  </div>
-  </noscript>
+  <p>You can simulate a remote LSP with the following script:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">$</span> <span class="pre">mkfifo</span> <span class="pre">/tmp/somewhere</span> <span class="pre">#</span> <span class="pre">possibly</span> <span class="pre">in</span> <span class="pre">a</span> <span class="pre">directory</span> <span class="pre">resulting</span> <span class="pre">from</span> <span class="pre">`mktemp</span> <span class="pre">-d`</span>
+<span class="pre">$</span> <span class="pre">nc</span> <span class="pre">-l</span> <span class="pre">8000</span> <span class="pre">&lt;</span> <span class="pre">/tmp/somewhere</span> <span class="pre">|</span> <span class="pre">superbol-free</span> <span class="pre">lsp</span> <span class="pre">&gt;</span> <span class="pre">/tmp/somewhere</span>
+<span class="pre">`</span></code></p>
+<p>Once this is running, you can enter <cite>tcp://localhost:8000</cite> in the <cite>superbol.lsp-path</cite> configuration setting. SuperBOL Studio will then rely on this LSP server instead of a binary that is bundled in the extension.
+Note: this “made up” remote server terminates once the first connection is closed.</p>
 
-  
-  <div id="search-results">
-  
-  </div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="license.html" class="btn btn-neutral float-left" title="Copyright and License" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 
@@ -119,14 +117,7 @@
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-  <script>
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
-  </script>
-  
-  <script id="searchindexloader"></script>
-   
-
+  </script> 
 
 </body>
 </html>
