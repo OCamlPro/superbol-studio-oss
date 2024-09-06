@@ -112,7 +112,7 @@ let on_click ~nodes_pos ~text_editor arg =
   let open Vscode in
   let uri = TextDocument.uri @@ TextEditor.document text_editor in
   let column = TextEditor.viewColumn text_editor in
-  let node = Ojs.get_prop_ascii arg "node" |> Ojs.string_of_js in
+  let node = Ojs.get_prop_ascii arg "node" |> Ojs.int_of_js |> string_of_int in
   List.assoc_opt node nodes_pos
   |> Option.iter begin fun range ->
     let range = Range.t_of_js @@ Jsonoo.t_to_js range in
@@ -167,13 +167,11 @@ let setup_window_listener ~client =
 (* MESSAGE MANAGER *)
 
 let send_graph ~typ webview graph =
-  let string_repr = match typ with
-  | `Dot -> graph.string_repr_dot
-  | `D3 -> graph.string_repr_d3
-  in
   let ojs = Ojs.empty_obj () in
   Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "graph_content");
-  Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js string_repr);
+  if typ == `Dot
+  then Ojs.set_prop_ascii ojs "dot" (Ojs.string_to_js graph.string_repr_dot);
+  Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr_d3);
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
