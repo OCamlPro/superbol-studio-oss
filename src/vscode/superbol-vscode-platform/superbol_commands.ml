@@ -44,23 +44,12 @@ let _open_cfg =
       ()
     end
 
-let _open_cfg_d3 =
-  command "superbol.cfg.open.d3" @@ Instance
+let _open_cfg_arc =
+  command "superbol.cfg.open.arc" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`D3 _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`Arc _instance in
       ()
     end
-
-
-
-let _open_cfg2 =
-  command "superbol.cfg.test" @@ Instance
-    begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_webview _instance in
-      ()
-    end
-
-
 
 let _editor_action_findReferences =
   let command_name = "superbol.editor.action.findReferences"  in

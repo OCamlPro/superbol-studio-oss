@@ -41,17 +41,12 @@
       },
       {
         "command": "superbol.cfg.open",
-        "title": "Open CFG",
+        "title": "Open a CFG of the current program",
         "category": "SuperBOL"
       },
       {
-        "command": "superbol.cfg.open.d3",
-        "title": "Open CFG D3",
-        "category": "SuperBOL"
-      },
-      {
-        "command": "superbol.cfg.test",
-        "title": "Open as WEbview",
+        "command": "superbol.cfg.open.arc",
+        "title": "Open an arc CFG of the current program",
         "category": "SuperBOL"
       }
     ],
@@ -465,12 +460,12 @@
         {
           "command": "superbol.cfg.open",
           "group": "superbol",
-          "when": "editorTextFocus"
+          "when": "editorTextFocus && editorLangId == 'cobol'"
         },
         {
-          "command": "superbol.cfg.open.d3",
+          "command": "superbol.cfg.open.arc",
           "group": "superbol",
-          "when": "editorTextFocus"
+          "when": "editorTextFocus && editorLangId == 'cobol'"
         }
       ]
     },

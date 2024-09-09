@@ -13,12 +13,7 @@
 (**************************************************************************)
 
 val open_cfg
-  : ?typ: [< `D3 | `Dot > `Dot]
+  : ?typ: [< `Arc | `Dot > `Dot]
   -> ?text_editor: Vscode.TextEditor.t
-  -> Superbol_instance.t
-  -> unit Promise.t
-
-val open_webview
-  : ?text_editor: Vscode.TextEditor.t
   -> Superbol_instance.t
   -> unit Promise.t

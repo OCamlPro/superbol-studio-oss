@@ -585,15 +585,11 @@ let contributes =
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open"
-        ~title:"Open CFG"
+        ~title:"Open a CFG of the current program"
         ~category:"SuperBOL";
       Manifest.command ()
-        ~command:"superbol.cfg.open.d3"
-        ~title:"Open CFG D3"
-        ~category:"SuperBOL";
-      Manifest.command ()
-        ~command:"superbol.cfg.test"
-        ~title:"Open as WEbview"
+        ~command:"superbol.cfg.open.arc"
+        ~title:"Open an arc CFG of the current program"
         ~category:"SuperBOL";
     ]
     ~tomlValidation: [
@@ -604,8 +600,8 @@ let contributes =
     ]
     ~menus: [
       "editor/context",
-      [menu ~command:"superbol.cfg.open" ~group:"superbol" ~when_:"editorTextFocus" ();
-      menu ~command:"superbol.cfg.open.d3" ~group:"superbol" ~when_:"editorTextFocus" ()]
+      [menu ~command:"superbol.cfg.open" ~group:"superbol" ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
+      menu ~command:"superbol.cfg.open.arc" ~group:"superbol" ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
     ]
 
 let manifest =
