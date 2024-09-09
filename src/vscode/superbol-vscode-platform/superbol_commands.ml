@@ -40,14 +40,16 @@ let command id handler =
 let _open_cfg =
   command "superbol.cfg.open" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`Dot _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg
+          ~typ:Graphviz _instance in
       ()
     end
 
 let _open_cfg_arc =
   command "superbol.cfg.open.arc" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`Arc _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg
+          ~typ:D3_arc_diagram _instance in
       ()
     end
 

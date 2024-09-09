@@ -133,6 +133,21 @@ let handle_get_project_config_command param registry =
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
+let create_cfg_options o =
+  let graph_name =
+    try Some (List.assoc "graph_name" o |> Yojson.Safe.Util.to_string)
+    with Not_found -> None in
+  let hide_unreachable =
+    try Some (List.assoc "hide_unreachable" o |> Yojson.Safe.Util.to_bool)
+    with Not_found -> None in
+  let collapse_fallthru =
+    try Some (List.assoc "collapse_fallthru" o |> Yojson.Safe.Util.to_bool)
+    with Not_found -> None in
+  let shatter_hubs =
+    try Some (List.assoc "shatter_hubs" o |> Yojson.Safe.Util.to_int)
+    with Not_found -> None in
+  Cobol_cfg.Options.create ~graph_name ?hide_unreachable ?collapse_fallthru ~shatter_hubs ()
+
 let handle_open_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri, options = Yojson.Safe.Util.(
@@ -143,7 +158,7 @@ let handle_open_cfg registry params =
   try_with_main_document_data registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
-      let options = Options.from_yojson_assoc options in
+      let options = create_cfg_options options in
       let graphs = make ~options checked_doc in
       let yojsonify ({ string_repr_dot; string_repr_d3; name; nodes_pos } : graph) =
         let nodes_pos = List.map begin fun (n,loc) ->
@@ -872,7 +887,7 @@ let on_request
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
         handle_get_project_config_command param registry
-    | UnknownRequest { meth = "superbol/CFG";
+    | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
         Ok (handle_open_cfg registry param, state)
     | UnknownRequest { meth = "superbol/findProcedure";

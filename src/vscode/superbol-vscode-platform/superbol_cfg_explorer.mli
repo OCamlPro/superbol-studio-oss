@@ -12,8 +12,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type cfg_type = Graphviz | D3_arc_diagram
+
 val open_cfg
   : ?text_editor: Vscode.TextEditor.t
-  -> typ:[ `Arc | `Dot ]
+  -> typ:cfg_type
   -> Superbol_instance.t
   -> unit Promise.t

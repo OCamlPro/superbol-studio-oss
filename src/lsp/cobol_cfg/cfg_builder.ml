@@ -15,38 +15,6 @@ open Cobol_unit.Types
 open Cobol_common.Visitor
 module NEL = Cobol_common.Basics.NEL
 
-module Options = struct
-  type t = {
-    graph_name: string option;
-    hide_unreachable: bool;
-    collapse_fallthru: bool;
-    shatter_hubs: int option;
-  }
-
-  let create
-  ?(graph_name=None)
-  ?(hide_unreachable=false)
-  ?(collapse_fallthru=true)
-  ?(shatter_hubs=None)
-  ()
-  = { hide_unreachable; collapse_fallthru; graph_name; shatter_hubs }
-
-let from_yojson_assoc o =
-  let graph_name =
-    try Some (List.assoc "graph_name" o |> Yojson.Safe.Util.to_string)
-    with Not_found -> None in
-  let hide_unreachable =
-    try Some (List.assoc "hide_unreachable" o |> Yojson.Safe.Util.to_bool)
-    with Not_found -> None in
-  let collapse_fallthru =
-    try Some (List.assoc "collapse_fallthru" o |> Yojson.Safe.Util.to_bool)
-    with Not_found -> None in
-  let shatter_hubs =
-    try Some (List.assoc "shatter_hubs" o |> Yojson.Safe.Util.to_int)
-    with Not_found -> None in
-  create ~graph_name ?hide_unreachable ?collapse_fallthru ~shatter_hubs ()
-end
-
 type qualname = Cobol_ptree.qualname
 
 type jumps =
@@ -119,16 +87,12 @@ module JumpCollector = struct
   let init = { jumps = Jumps.empty;
                terminal = false;
                will_fallthru = true; }
-  let add_unconditional uncond acc =
-    {
-      jumps = Jumps.add uncond acc.jumps;
-      terminal = false;
-      will_fallthru = true;
-    }
   let folder ~cu = object (v)
     inherit [acc] Visitor.folder
-    method! fold_goback' _ acc = skip @@ { acc with terminal = true; will_fallthru = false }
-    method! fold_stop' _ acc = skip @@ { acc with terminal = true; will_fallthru = false }
+    method! fold_goback' _ acc =
+      skip @@ { acc with terminal = true; will_fallthru = false }
+    method! fold_stop' _ acc =
+      skip @@ { acc with terminal = true; will_fallthru = false }
     method! fold_exit' { payload = exit_stmt; _ } acc =
       skip @@
       match exit_stmt with
@@ -227,7 +191,6 @@ type edge =
 module Edge = struct
    type t = edge
    let compare = Stdlib.compare
-   let equal = (=)
    let default = FallThrough
    let to_string = function
      | FallThrough -> "f"
@@ -371,7 +334,7 @@ let cfg_of_nodes nodes =
   in
   build_edges ~vertexes g nodes
 
-let handle_cfg_options ~(options: Options.t) cfg =
+let handle_cfg_options ~(options: Cfg_options.t) cfg =
   cfg
   |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
   |> (match options.shatter_hubs with
@@ -473,7 +436,7 @@ let make_cfg ?(graph_name=None) ({ group; _ }: Cobol_typeck.Outputs.t) =
       in cu_graph @ section_graphs @ acc
     end group []
 
-let make ~(options: Options.t) (checked_doc: Cobol_typeck.Outputs.t) =
+let make ~(options: Cfg_options.t) (checked_doc: Cobol_typeck.Outputs.t) =
   make_cfg ~graph_name:options.graph_name checked_doc
   |> List.map begin fun (name, cfg) ->
     let cfg_with_options = handle_cfg_options ~options cfg in
