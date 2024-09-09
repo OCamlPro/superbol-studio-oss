@@ -40,7 +40,7 @@ let command id handler =
 let _open_cfg =
   command "superbol.cfg.open" @@ Instance
     begin fun _instance ~args:_ ->
-      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg _instance in
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg ~typ:`Dot _instance in
       ()
     end
 

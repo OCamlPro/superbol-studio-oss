@@ -116,10 +116,10 @@ function focusNode(d) {
     clearTimeout(unfocusTimeout)
     unfocusTimeout = undefined;
   }
-  nodes.style('fill', n =>
+  nodes.style('opacity', n =>
     !d.neigh.includes(n.id) && n.id != d.id
-    ? "#BBB"
-    : nodeColor(n))
+    ? .4
+    : 1)
     .style("stroke", n => n.id === d.id ? "black" : "none")
 
   links.filter(l => l.source !== d.id && l.target !== d.id)
@@ -135,7 +135,7 @@ function focusNode(d) {
 function unfocus(delay) {
   unfocusTimeout = setTimeout(() => {
     unfocusTimeout = undefined;
-    nodes.style('fill', nodeColor)
+    nodes.style('opacity', 1)
          .style("stroke", "none")
     links
       .style('stroke', 'black')
@@ -247,7 +247,6 @@ window.addEventListener('message', event => {
         if(!node) return;
         window.scroll(0, y(node.id) - window.innerHeight/3)
         focusNode(node)
-        unfocus(5000)
       break;
     }
   })
