@@ -108,8 +108,6 @@ let update_graph ~uri graph =
 
 (* CLICK ON NODE *)
 
-let ignore_next_selection_change = ref false
-
 let on_click ~nodes_pos ~text_editor arg =
   let open Vscode in
   let uri = TextDocument.uri @@ TextEditor.document text_editor in
@@ -128,16 +126,15 @@ let on_click ~nodes_pos ~text_editor arg =
           TextEditor.set_selection text_editor selection;
           TextEditor.setDecorations text_editor ~decorationType
             ~rangesOrOptions:(`Ranges [range]);
-          (* Avoids triggering selection change with previous set_selection *)
-          ignore_next_selection_change := true;
           Promise.return ())
     in ()
   end
 
 let setup_window_listener ~client =
   let listener event =
-    if !ignore_next_selection_change
-    then ignore_next_selection_change := false
+    if TextEditorSelectionChangeEvent.kind event ==
+       TextEditorSelectionChangeKind.Command
+    then ()
     else
       let text_editor = TextEditorSelectionChangeEvent.textEditor event in
       TextEditor.setDecorations text_editor ~decorationType
@@ -262,7 +259,7 @@ let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
               ~pathSegments:
                 ["assets"; match typ with
                  | `Dot -> "cfg-dot-renderer.html"
-                 | `D3 -> "cfg-arc-renderer.html"] in
+                 | `Arc -> "cfg-arc-renderer.html"] in
           let html_file = read_whole_file @@ Uri.fsPath html_uri in
           WebView.set_html webview html_file;
         end
@@ -282,54 +279,3 @@ let open_cfg ?(typ=`Dot) ?text_editor instance =
       @@ Superbol_instance.context instance in
     open_cfg_for ~typ ~extension_uri ~text_editor client
   | _ -> Promise.return ()
-
-(* debug TO REMOVE *)
-let debugWebviewPanelRef = ref None
-let open_webview ?text_editor instance =
-  let open_cfg_for ~text _client =
-    let webviewPanel = match !debugWebviewPanelRef with
-      | None ->
-        Window.createWebviewPanel
-          ~viewType:"cfg" ~title:"Tester webview"
-          ~showOptions:(ViewColumn.Two)
-      | Some wvp -> wvp in
-    debugWebviewPanelRef := Some webviewPanel;
-    let webview = WebviewPanel.webview webviewPanel in
-    WebView.set_html webview text;
-    WebView.set_options webview (WebviewOptions.create ~enableScripts:true ());
-    let thisArgs, disposables = Ojs.null, [] in
-    let _ : Disposable.t =
-      WebviewPanel.onDidDispose webviewPanel ()
-        ~listener:(fun () -> debugWebviewPanelRef:=None)
-        ~thisArgs ~disposables in
-    let listener arg =
-      let typ = Ojs.type_of arg in
-      let com = Ojs.get_prop_ascii arg "command" |> Ojs.string_of_js in
-      let message = "Listener clicked " ^ typ ^ "    " ^ com in
-      let _ : _ option Promise.t = Window.showErrorMessage () ~message in
-      ()
-    in
-    let _ : Disposable.t =
-      WebView.onDidReceiveMessage webview ()
-        ~listener ~thisArgs:Ojs.null ~disposables:[] in
-    WebviewPanel.reveal webviewPanel ~preserveFocus:true ();
-    Promise.return ()
-  in
-  let current_text ?text_editor () =
-    match
-      match text_editor with None -> Window.activeTextEditor () | e -> e
-    with
-    | None -> None
-    | Some e -> Some (TextDocument.getText (TextEditor.document e) ())
-  in
-  match Superbol_instance.client instance, current_text ?text_editor () with
-  | Some client, Some text ->
-    open_cfg_for ~text client
-  | _ ->
-    (* TODO: is there a way to activate the extension from here?  Starting the
-       client/instance seems to launch two distinct LSP server processes. *)
-    Promise.(then_ ~fulfilled:(fun _ -> return ())) @@
-    Window.showErrorMessage ()
-      ~message:"The SuperBOL LSP client is not running; please retry after a \
-                COBOL file has been opened"
-

@@ -70,7 +70,6 @@ body {
     </body>
     <script>
       const vscode = acquireVsCodeApi()
-      var defaultTransform = undefined;
       var graphviz = undefined;
       var graph = undefined;
       var rendering = d3.select('#rendering')
@@ -122,23 +121,21 @@ body {
 
       function setupOnEnd() {
         rendering.classed("hidden", true);
-        if(defaultTransform === undefined) {
-          defaultTransform = d3.select('#app g').attr('transform')
-        }
         d3.selectAll('svg g title').remove()
         d3.selectAll('svg text')
           .on("click", (_, e) => {
-            if(e.children[0].text) {
-              const node =
-                graph.nodes.find((n) => e.children[0].text === n.name)
-              if(node) {
-                focus(node.name)
-                vscode.postMessage({
-                    type: 'click',
-                    node: node.id
-                })
-              }
-            }
+            const clickedName = e.children[0].text;
+            if(!clickedName) return;
+            const node =
+              graph.nodes
+              .find(n => clickedName === n.name
+                      || n.name.startsWith(clickedName + " IN ") )
+            if(!node) return;
+            focus(clickedName)
+            vscode.postMessage({
+                type: 'click',
+                node: node.id
+            })
           })
       }
 
@@ -148,7 +145,6 @@ body {
               if(graphviz) {
                 graphviz.destroy()
                 d3.select('#app svg').remove()
-                defaultTransform = undefined;
               }
               graphviz = d3.select('#app').graphviz().fit(true);
               graphviz.zoomScaleExtent([0.1, 50])

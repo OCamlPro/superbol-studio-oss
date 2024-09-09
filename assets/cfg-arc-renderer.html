@@ -161,13 +161,13 @@ function buildSVG(data) {
   // List of node names
   const allNodes = data.nodes.map(d=>d.id).sort((a,b)=> a-b)
 
-  const sectionNames = data.nodes.filter(d=> !d.name.includes(" IN "))
+  const sectionNames = data.nodes.filter(d => !d.name.includes(" IN "))
   const color = d3.scaleOrdinal(sectionNames, d3.schemeCategory10)
 
   // A linear scale to position the nodes on the X axis
   y = d3.scalePoint()
-            .range([0, height])
-            .domain(allNodes)
+        .range([0, height])
+        .domain(allNodes)
 
   nodeColor = getNodeColor(color);
 
@@ -199,8 +199,8 @@ function buildSVG(data) {
     .join('path')
     .attr('d', getLinkPath(y))
     .style("fill", "none")
-    .attr("stroke", "black")
-    .attr("stroke-dasharray", getDasharray)
+    .style("stroke", "black")
+    .style("stroke-dasharray", getDasharray)
 
   // Add the circle for the nodes
   nodes = svg
@@ -208,10 +208,19 @@ function buildSVG(data) {
     .data(data.nodes)
     .join("circle")
       .attr("cx", NODE_CENTER_X)
-      .attr("cy", d=>y(d.id))
+      .attr("cy", d => y(d.id))
       .attr("r", NODE_RADIUS)
       .style("fill", nodeColor)
       .style('stroke-width', 4)
+
+  svg
+    .selectAll("sectionnodes")
+    .data(sectionNames)
+    .join("circle")
+      .attr("cx", NODE_CENTER_X)
+      .attr("cy", d => y(d.id))
+      .attr("r", 2)
+      .style("fill", "white")
 
   // Add the highlighting functionality
   nodes
@@ -233,13 +242,13 @@ window.addEventListener('message', event => {
         graph = JSON.parse(event.data.graph)
         buildSVG(graph)
       break;
-        case "focused_proc":
-        const node = graph.nodes
-          .find(n => { return n.name === event.data.procedure })
-        window.scroll(0, y(node.id)-window.innerHeight/3)
+      case "focused_proc":
+        const node = graph.nodes.find(n => n.name === event.data.procedure)
+        if(!node) return;
+        window.scroll(0, y(node.id) - window.innerHeight/3)
         focusNode(node)
         unfocus(5000)
-        break;
+      break;
     }
   })
 

@@ -83,15 +83,18 @@ type node = {
   qid: qualname;
   mutable names: string NEL.t;
   loc: srcloc option;
-  entry: bool;
+  typ: [`External | `EntryPoint | `EntryPara | `EntrySection | `Internal ];
   jumps: Jumps.t;
   will_fallthru: bool;
   terminal: bool;
-  is_external: bool;
 }
 
-let qn_to_string qn =
+let fullqn_to_string qn =
   Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
+
+let name_to_string (qn: qualname) =
+  Cobol_ptree.(match qn with
+  | Name name | Qual (name, _) -> Pretty.to_string "%a" pp_name' name)
 
 let qn_equal qn1 qn2 = 0 == Cobol_ptree.compare_qualname qn1 qn2
 
@@ -194,17 +197,16 @@ let build_node ~default_name ~cu paragraph =
   let qid, loc = match ~&paragraph.paragraph_name with
     | None -> default_name, ~@paragraph
     | Some qn -> full_qn' ~cu qn, ~@qn in
-  let name = qn_to_string qid
+  let name = fullqn_to_string qid
   in {
     id = !node_idx;
     qid;
     names = NEL.One name;
     loc = Some loc;
-    entry = false;
     jumps;
     will_fallthru;
     terminal;
-    is_external = false;
+    typ = `Internal;
   }
 
 module Node = struct
@@ -240,16 +242,7 @@ let vertex_name_record { names; _ } =
     (NEL.pp ~fopen:"{" ~fclose:"}" ~fsep:"|" Fmt.string)
     (NEL.rev names)
 
-let vertex_name { names; _ } =
-  Pretty.to_string "%a"
-    (NEL.pp ~fopen:"" ~fclose:"" ~fsep:"\n" Fmt.string)
-    (NEL.rev names)
-
-
-let qid_to_string { qid; _ } =
-  Pretty.to_string "%a" Cobol_ptree.pp_qualname qid
-
-  (* Graph.Graphviz.DotAttributes *)
+(* Graph.Graphviz.DotAttributes *)
 module Dot = Graph.Graphviz.Dot(struct
     include Cfg
     let edge_attributes (_,s,_) =
@@ -259,13 +252,15 @@ module Dot = Graph.Graphviz.Dot(struct
            | Go -> `Solid)]
     let default_edge_attributes _ = []
     let get_subgraph _ = None
-    let vertex_attributes ({ entry; is_external; _ } as n) =
-      [`Label (if entry then vertex_name n else vertex_name_record n)]
-      @ (if entry
-      then [`Shape `Doubleoctagon]
-      else if is_external
-      then [`Shape `Plaintext]
-      else [])
+    let vertex_attributes ({ typ; _ } as n) =
+      let label, shape =
+        match typ with
+        | `EntryPara -> "Entry\nparagraph", [`Shape `Doubleoctagon]
+        | `EntryPoint -> "Entry\npoint", [`Shape `Doubleoctagon]
+        | `EntrySection -> NEL.hd n.names, [`Shape `Doubleoctagon]
+        | `External -> NEL.hd n.names, [`Shape `Plaintext]
+        | `Internal -> vertex_name_record n, []
+      in `Label label :: shape
     let default_vertex_attributes _ = [`Shape `Record]
     let graph_attributes _ = []
     let vertex_name { id; _ } = string_of_int id
@@ -274,18 +269,20 @@ module Dot = Graph.Graphviz.Dot(struct
 let to_dot_string g =
   Pretty.to_string "%a" Dot.fprint_graph g
 
-let dummy_node qn =
+let dummy_node ?(typ=`External) (qn: qualname) =
+  let loc = match qn with
+  | Cobol_ptree.Name name -> ~@name
+  | Qual (name, _) -> ~@name in
   node_idx:= !node_idx + 1;
   {
     id = !node_idx;
     qid = qn;
-    loc = None;
-    entry = false;
-    names = NEL.One (qn_to_string qn);
+    loc = Some loc;
+    names = NEL.One (fullqn_to_string qn);
     jumps = Jumps.empty;
     will_fallthru = true;
     terminal = false;
-    is_external = true;
+    typ;
   }
 
 let clone_node node =
@@ -295,7 +292,6 @@ let clone_node node =
 let qmap_find_or_add qmap qn =
   match Qmap.find_opt qn qmap with
   | None -> let node = dummy_node qn in
-    (* qmap, node *)
     Qmap.add qn node qmap, node
   | Some node -> qmap, node
 
@@ -327,7 +323,7 @@ let rec build_edges ~vertexes g nodes =
 let do_collapse_fallthru g =
   Cfg.fold_vertex begin fun n cfg ->
     match Cfg.pred_e cfg n with
-    | [(({ entry = false; _ } as pred), FallThrough, _)] ->
+    | [(({ typ = `Internal; _ } as pred), FallThrough, _)] ->
       let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
           if List.exists
               begin fun succ -> qn_equal succ.qid next.qid end
@@ -344,7 +340,7 @@ let do_hide_unreachable g =
   let rec aux cfg =
     let did_remove, cfg =
       Cfg.fold_vertex begin fun n (did_remove, cfg) ->
-        if Cfg.in_degree cfg n <= 0 && not n.entry
+        if Cfg.in_degree cfg n <= 0 && n.typ == `Internal
         then true, Cfg.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
@@ -354,7 +350,7 @@ let do_hide_unreachable g =
 
 let do_shatter_hubs ?(limit=20) g =
   Cfg.fold_vertex begin fun n cfg ->
-    if Cfg.in_degree cfg n >= limit && not n.entry
+    if Cfg.in_degree cfg n >= limit
     then begin
       Cfg.fold_pred_e begin fun edge cfg ->
         let cfg = Cfg.remove_edge_e cfg edge in
@@ -400,9 +396,10 @@ let cfg_of ~(cu: cobol_unit) =
   |> begin function (* adding entry point if not already present *)
     | ({ qid; _ } as hd )::tl
       when qn_equal qid default_name ->
-        { hd with id=0; entry = true; names = NEL.One "Entry\nparagraph" }::tl
+      { hd with id=0; typ = `EntryPara; names = NEL.One "Entry paragraph" }::tl
     | l ->
-        { (dummy_node default_name) with id=0; entry = true; names = NEL.One "Entry\npoint" } :: l
+      { (dummy_node ~typ:`EntryPoint default_name)
+        with id=0; names = NEL.One "Entry point" } :: l
   end
   |> cfg_of_nodes
 
@@ -411,11 +408,13 @@ let cfg_of_section ~cu ({ section_paragraphs; section_name }: procedure_section)
   let default_name = ~&section_name in
   let nodes =
     List.fold_left begin fun acc p ->
-      build_node ~default_name ~cu p :: acc
+      let node = build_node ~default_name ~cu p  in
+      let name = name_to_string node.qid in
+      { node with names = NEL.One name } :: acc
     end [] section_paragraphs.list
     |> List.rev in
   let nodes = match nodes with
-    | entry::tl -> { entry with entry = true }::tl
+    | entry::tl -> { entry with typ = `EntrySection }::tl
     | [] -> []
   in cfg_of_nodes nodes
 
@@ -438,11 +437,12 @@ let to_d3_string cfg =
       begin fun (n1, e, n2) acc ->
         Pretty.to_string "{\"source\":%d,\"target\":%d,\"type\":\"%s\"}"
           n1.id n2.id (Edge.to_string e)
-          ::acc
+        ::acc
       end cfg [] in
   let cfg_nodes = Cfg.fold_vertex
       begin fun n acc ->
-        Pretty.to_string "{\"id\":%d,\"name\":\"%s\"}" n.id (qid_to_string n)
+        Pretty.to_string "{\"id\":%d,\"name\":\"%s\"}"
+          n.id (fullqn_to_string n.qid)
         :: acc
       end cfg [] in
   let str_nodes = String.concat "," cfg_nodes in
@@ -484,24 +484,3 @@ let make ~(options: Options.t) (checked_doc: Cobol_typeck.Outputs.t) =
       nodes_pos = nodes_pos cfg;
     }
   end
-
-(*
-List of node (sections & paragraphs)
-Visitor over procedure
-  - perform
-  - go to
-  - output_or_giving
-  - input_or_using
-  - alter
-  - resume
-  - declaratives
-  - debug_target
-  - if else
-  - evaluate
-  - exit
-
-  paragraph lié au suivant
-  section lié au suivant
-
-pp_dot_format => Graph.Graphviz.Dot
-*)
