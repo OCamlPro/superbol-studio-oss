@@ -27,6 +27,7 @@
         "BEGIN", BEGIN;
         "BETWEEN", BETWEEN;
         "BY", BY;
+        "CHAR", CHAR;
         "CLOSE", CLOSE;
         "COMMIT", COMMIT;
         "CONNECT", CONNECT;

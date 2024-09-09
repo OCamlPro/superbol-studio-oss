@@ -49,7 +49,8 @@ and sql_instruction = sql_token list
 
 and complex_literal =
   | SqlCompLit of literal
-  | SqlCompAs of literal * sqlVarToken (*ex: SMT AS INT*)
+  | SqlCompAsType of literal * sql_type_name (*ex: SMT AS INT*)
+  | SqlCompAsVar of literal * sqlVarToken
   | SqlCompFun of sqlVarToken * sql_op list
   | SqlCompStar
 
@@ -146,11 +147,18 @@ and connect_syntax =
 
 (*WHENEVER*)
 and sql_type =
-  | NotNull of sql_type
+  { sql_type : sql_type_name;
+    size : literal option;
+    not_null : bool;
+    with_default : bool
+  }
+
+and sql_type_name =
+  | Char
   | Date
   | Integer
   | Timestamp
-  | VarChar of literal
+  | VarChar
 
 and whenever_condition =
   | Not_found_whenever
@@ -186,7 +194,7 @@ and from_stm = table_ref list
 and table_ref =
   | FromLitAs of table_ref * literal
   | FromLit of literal
-  | FromFun of sqlVarToken * literal 
+  | FromFun of sqlVarToken * literal
   | FromSelect of sql_query
   | Join of table_ref * join * table_ref * join_option option
 
@@ -362,12 +370,21 @@ module Printer = struct
   and pp_var_type fmt (l, t) =
     Format.fprintf fmt "%s\t %a" l.payload pp_sql_type t
 
-  and pp_sql_type fmt = function
-    | NotNull v -> Format.fprintf fmt "%a NOT NULL" pp_sql_type v
+  and pp_sql_type_name fmt test =
+    match test with
+    | Char -> Format.fprintf fmt "CHAR"
     | Date -> Format.fprintf fmt "DATE"
     | Integer -> Format.fprintf fmt "INTEGER"
     | Timestamp -> Format.fprintf fmt "TIMESTAMP"
-    | VarChar i -> Format.fprintf fmt "VARCHAR(%a)" pp_lit i
+    | VarChar -> Format.fprintf fmt "VARCHAR"
+  and pp_sql_type fmt { sql_type; size; not_null; with_default } =
+
+    pp_sql_type_name fmt sql_type;
+    ( match size with
+    | Some lit -> Format.fprintf fmt " (%a)" pp_lit lit
+    | None -> () );
+    if not_null then Format.fprintf fmt " NOT NULL";
+    if with_default then Format.fprintf fmt " WITH DEFAULT"
 
   and pp_one_value fmt = function
     | ValueDefault -> Format.fprintf fmt "DEFAULT"
@@ -380,9 +397,8 @@ module Printer = struct
 
   and pp_where_arg fmt = function
     | Some (WhereCurrentOf swhere) ->
-      Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload 
-    | Some (WhereUpdate e) ->
-        Format.fprintf fmt "WHERE %a" pp_sql_condition e
+      Format.fprintf fmt "WHERE CURRENT OF %s" swhere.payload
+    | Some (WhereUpdate e) -> Format.fprintf fmt "WHERE %a" pp_sql_condition e
     | Some (UpdateSql sql) -> pp_sql fmt sql
     | None -> ()
 
@@ -440,7 +456,8 @@ module Printer = struct
 
   and pp_complex_literal fmt = function
     | SqlCompLit v -> Format.fprintf fmt "%a" pp_lit v
-    | SqlCompAs (l, v) -> Format.fprintf fmt "%a AS %s" pp_lit l v.payload
+    | SqlCompAsType (l, v) -> Format.fprintf fmt "%a AS %a" pp_lit l pp_sql_type_name v
+    | SqlCompAsVar (l, v) -> Format.fprintf fmt "%a AS %s" pp_lit l v.payload
     | SqlCompFun (funName, args) ->
       let pp_args fmt lst = list_comma fmt (lst, pp_sql_op) in
       Format.fprintf fmt "%s(%a)" funName.payload pp_args args
@@ -460,7 +477,7 @@ module Printer = struct
 
   and pp_cob_var fmt = function
     | CobVarNotNull c -> Format.fprintf fmt ":%s" c.payload
-    | CobVarCasted (c, t) -> 
+    | CobVarCasted (c, t) ->
       Format.fprintf fmt ":%s::%a" c.payload pp_sql_type t
     | CobVarNullIndicator (c, ni) ->
       Format.fprintf fmt ":%s:%s" c.payload ni.payload

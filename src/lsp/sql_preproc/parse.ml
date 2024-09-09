@@ -122,11 +122,12 @@ let parse ~config ~filename ~contents =
       end;
       linkage_section_found := true;
       if config.verbosity > 1 then
-        Printf.eprintf "LINKAGE SECTION found at %d\n%!" loc.line;
+        Format.fprintf Format.std_formatter "LINKAGE SECTION found at %d\n%!" loc.line;
       sql_add_statement ~loc (LINKAGE_SECTION { defined = true });
       iter tokens
     | (COPY, loc) :: (tok, _) :: (DOT, end_loc) :: tokens
-      when config.sql_in_copybooks ->
+    | (EXEC, loc) :: (IDENT "SQL", _) :: (IDENT "INCLUDE", _) :: (tok, _) :: (END_EXEC, end_loc)  :: tokens 
+    when config.sql_in_copybooks && (Misc.string_of_token tok != "SQLCA")->
       let file = Misc.string_of_token tok in
       begin
         match Misc.resolve_copy ~config file with

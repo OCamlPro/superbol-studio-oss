@@ -42,7 +42,7 @@ open Cobol_common.Srcloc.INFIX
 (*Sort by*)
 %token DESC ASC
 (*types*)
-%token VARCHAR DATE INTEGER TIMESTAMP
+%token VARCHAR DATE INTEGER TIMESTAMP CHAR
 (*exeptions*)
 %token THEN RAISE EXCEPTION
 %token <string> WORD
@@ -67,8 +67,8 @@ let cobol_var_id :=
 
 let cobol_var :=
 | c = cobol_var_id; {CobVarNotNull c}
-| c = cobol_var_id; COLON; COLON; t = sql_type_aux; {CobVarCasted (c, t)} 
-(*TODO: fix this, it onely work in the context of the preproc*)
+| c = cobol_var_id; COLON; COLON; t = sql_type; {CobVarCasted (c, t)} 
+(*TODO: fix this, it maybe only work in the context of the preproc*)
 | c = cobol_var_id; ni=cobol_var_id; {CobVarNullIndicator(c, ni)}
 
 let sql_var_name :=
@@ -175,15 +175,39 @@ let value_list :=
 let table_lst :=
 | s = sql_var_name; t=sql_type; {(s, t)}
 
-let sql_type:=
-| s = sql_type_aux; NOT; NULL; {NotNull s}
-| s = sql_type_aux; {s}
 
-let sql_type_aux :=
-| DATE; {Date}
-| INTEGER; {Integer}
-| TIMESTAMP; {Timestamp}
-| VARCHAR; LPAR; l=literal; RPAR; {VarChar l}
+
+let sql_type:=
+| s = type_name; l=size_opt; b1=not_null_opt; b2=with_default_opt; {
+      {
+        sql_type = s;
+        size = l;
+        not_null = b1;
+        with_default = b2;
+      }
+    }
+
+let type_name:=
+  | CHAR;       { Char }
+  | DATE;       { Date }
+  | INTEGER;    { Integer }
+  | TIMESTAMP;  { Timestamp }
+  | VARCHAR;    { VarChar }
+
+let size_opt:=
+  | LPAR; l=literal; RPAR; { Some (l) }
+  | /* empty */                 { None }
+
+let not_null_opt:=
+  | NOT; NULL;     { true }
+  | /* empty */    { false }
+
+let with_default_opt:=
+  | WITH; DEFAULT; { true }
+  | /* empty */    { false }
+
+
+
 
 (*TODO: forUpdate is incomplete, I have to implement this syntaxe:
 FOR {
@@ -270,8 +294,8 @@ let whenever_condition :=
 let whenever_continuation :=
 | CONTINUE;  {Continue}
 | PERFORM; label= sql_var_name; {Perform label}
-| GOTO; stmt_label= sql_var_name; {Goto stmt_label}
-| GO; TO; stmt_label= sql_var_name; {Goto stmt_label}
+| GOTO; option(COLON); stmt_label= sql_var_name; {Goto stmt_label}
+| GO; TO; option(COLON); stmt_label= sql_var_name; {Goto stmt_label}
 
 (*SQL Stuff*)
 
@@ -391,7 +415,8 @@ let sql_op :=
 
 let sql_complex_literal :=
 | LPAR; s= sql_complex_literal; RPAR; {s}
-| v= literal; AS; c=sql_var_name; {SqlCompAs(v, c)}
+| v= literal; AS; c=type_name; {SqlCompAsType(v, c)}
+| v= literal; AS; c=sql_var_name; {SqlCompAsVar(v, c)}
 | v= literal; {SqlCompLit v }
 | fun_name=sql_var_name; LPAR; args = separated_list(COMMA, sql_op) ; RPAR;
   {SqlCompFun(fun_name, args)} 
@@ -431,6 +456,7 @@ let sql_first_token :=
 | FROM; {SqlInstr "FROM" }
 | WHERE; {SqlInstr"WHERE"}
 | ORDER; BY; {SqlInstr"ORDER BY"}
+| CHAR; {SqlInstr"CHAR"}
 | VARCHAR; {SqlInstr"VARCHAR"}
 | DATE; {SqlInstr"DATE"}
 | INTEGER; {SqlInstr"INTEGER"}
