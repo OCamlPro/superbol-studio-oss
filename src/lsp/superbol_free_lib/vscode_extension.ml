@@ -585,11 +585,11 @@ let contributes =
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open"
-        ~title:"Open a CFG of the current program"
+        ~title:"Show control-flow"
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open.arc"
-        ~title:"Open an arc CFG of the current program"
+        ~title:"Show control-flow as an arc-diagram"
         ~category:"SuperBOL";
     ]
     ~tomlValidation: [

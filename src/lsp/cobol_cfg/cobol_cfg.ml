@@ -11,8 +11,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Builder = struct
-  type graph = Cfg_builder.graph
-  module Options = Cfg_builder.Options
-  let make = Cfg_builder.make
-end
+module Builder = Cfg_builder
+module Options = Cfg_options

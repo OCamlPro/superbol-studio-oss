@@ -14,12 +14,36 @@
 
 open Vscode
 
+type cfg_type = Graphviz | D3_arc_diagram
+
 let read_whole_file filename =
   (* open_in_bin works correctly on Unix and Windows *)
   let ch = open_in_bin filename in
-  let s = really_input_string ch (in_channel_length ch) in
-  close_in ch;
-  s
+  Fun.protect
+    begin fun () -> really_input_string ch (in_channel_length ch) end
+    ~finally:begin fun () -> close_in ch end
+
+let graphviz_html = ref None
+let d3_arc_html = ref None
+let get_html_content ~extension_uri typ =
+  match typ, !graphviz_html, !d3_arc_html  with
+  | D3_arc_diagram, _, Some html
+  | Graphviz, Some html, _ -> Ok(html)
+  | _ ->
+    let html_uri = Uri.joinPath extension_uri
+        ~pathSegments:
+          ["assets"; match typ with
+            | Graphviz -> "cfg-dot-renderer.html"
+            | D3_arc_diagram -> "cfg-arc-renderer.html"] in
+    try
+      let html = read_whole_file @@ Uri.fsPath html_uri in
+      begin match typ with
+        | Graphviz -> graphviz_html := Some html
+        | D3_arc_diagram -> d3_arc_html := Some html end;
+      Ok(html)
+    with Sys_error e -> Error(e)
+       | End_of_file -> Error("End_of_file")
+
 
 let _log message = ignore(Window.showInformationMessage () ~message)
 
@@ -157,11 +181,11 @@ let setup_window_listener ~client =
               end)
           in ()
         in
-        let webview = webview_n_graph_find_opt ~uri ~typ:`Dot in
+        let webview = webview_n_graph_find_opt ~uri ~typ:Graphviz in
         begin match webview with
           | None -> ()
           | Some (webview, _) -> process_selection_change webview end;
-        let webview = webview_n_graph_find_opt ~uri ~typ:`Arc in
+        let webview = webview_n_graph_find_opt ~uri ~typ:D3_arc_diagram in
         match webview with
         | None -> ()
         | Some (webview, _) -> process_selection_change webview
@@ -178,7 +202,7 @@ let setup_window_listener ~client =
 let send_graph ~typ webview graph =
   let ojs = Ojs.empty_obj () in
   Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "graph_content");
-  if typ == `Dot
+  if typ == Graphviz
   then Ojs.set_prop_ascii ojs "dot" (Ojs.string_to_js graph.string_repr_dot);
   Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr_d3);
   let _ : bool Promise.t = WebView.postMessage webview ojs
@@ -196,7 +220,7 @@ let on_graph_update ~webview ~client ~uri ~typ name arg =
     Jsonoo.Encode.object_ ["uri", uri; "render_options", options;] in
   let _ : unit Promise.t =
     Vscode_languageclient.LanguageClient.sendRequest client ()
-      ~meth:"superbol/CFG" ~data
+      ~meth:"superbol/getCFG" ~data
     |> Promise.then_ ~fulfilled:begin fun jsonoo_graphs ->
       let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
       match graphs with
@@ -233,37 +257,35 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
     let uri = Jsonoo.Encode.string @@ Uri.path uri in
     Jsonoo.Encode.object_ ["uri", uri]
   in
-  Vscode_languageclient.LanguageClient.sendRequest client ()
-    ~meth:"superbol/CFG" ~data
-  |> then_ ~fulfilled:begin fun jsonoo_graphs ->
-    let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
-    Window.showQuickPick ~items:(Stdlib.List.map (fun g -> g.name) graphs) ()
-    |> then_ ~fulfilled:begin function
-      | None -> return ()
-      | Some name ->
-        let graph = Stdlib.List.find begin fun g ->
-            String.equal g.name name end graphs in
-        let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
-        let _ : Disposable.t =
-          WebView.onDidReceiveMessage webview ()
-            ~listener:(on_message ~client ~text_editor ~typ)
-            ~thisArgs:Ojs.null ~disposables:[]
-        in
-        if is_new
-        then begin
-          let html_uri = Uri.joinPath extension_uri
-              ~pathSegments:
-                ["assets"; match typ with
-                 | `Dot -> "cfg-dot-renderer.html"
-                 | `Arc -> "cfg-arc-renderer.html"] in
-          let html_file = read_whole_file @@ Uri.fsPath html_uri in
-          WebView.set_html webview html_file;
-        end
-        else send_graph ~typ webview graph;
-        setup_window_listener ~client;
-        return ()
+  match get_html_content ~extension_uri typ with
+  | Error e ->
+    let _ : _ option Promise.t = Window.showErrorMessage
+        ~message:("Unable to display control-flow: " ^ e) () in
+    return ()
+  | Ok html_content ->
+    Vscode_languageclient.LanguageClient.sendRequest client ()
+      ~meth:"superbol/getCFG" ~data
+    |> then_ ~fulfilled:begin fun jsonoo_graphs ->
+      let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
+      Window.showQuickPick ~items:(Stdlib.List.map (fun g -> g.name) graphs) ()
+      |> then_ ~fulfilled:begin function
+        | None -> return ()
+        | Some name ->
+          let graph = Stdlib.List.find begin fun g ->
+              String.equal g.name name end graphs in
+          let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
+          let _ : Disposable.t =
+            WebView.onDidReceiveMessage webview ()
+              ~listener:(on_message ~client ~text_editor ~typ)
+              ~thisArgs:Ojs.null ~disposables:[]
+          in
+          if is_new
+          then WebView.set_html webview html_content
+          else send_graph ~typ webview graph;
+          setup_window_listener ~client;
+          return ()
+      end
     end
-  end
 
 let open_cfg ?text_editor ~typ instance =
   let text_editor = match text_editor with
