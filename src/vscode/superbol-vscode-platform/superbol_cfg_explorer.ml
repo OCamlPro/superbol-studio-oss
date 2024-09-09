@@ -30,12 +30,6 @@ let decorationType =
   let options = Ojs.obj [|("backgroundColor", backgroundColor)|] in
   Window.createTextEditorDecorationType ~options
 
-(* GRAPH TYPE*)
-
-let typ_of_string = function
-  | "d3" -> `D3
-  | _ -> `Dot
-
 (* GRAPH FROM LSP *)
 
 type graph = {
@@ -60,8 +54,8 @@ let decode_graph res =
 let webview_panels = Hashtbl.create 1
 let window_listener = ref None
 
-let webviewpanel_disposal ~filename () =
-  Hashtbl.remove webview_panels filename;
+let webviewpanel_disposal ~filename ~typ () =
+  Hashtbl.remove webview_panels (filename, typ);
   if Hashtbl.length webview_panels == 0
   then (
     Option.iter Disposable.dispose !window_listener;
@@ -75,35 +69,35 @@ let webviewpanel_disposal ~filename () =
     then TextEditor.setDecorations text_editor
         ~decorationType ~rangesOrOptions:(`Ranges [])
 
-let create_or_get_webview ~graph ~uri =
+let create_or_get_webview ~graph ~uri ~typ =
   let filename = Uri.path uri in
-  match Hashtbl.find_opt webview_panels filename with
+  match Hashtbl.find_opt webview_panels (filename, typ) with
   | Some (webview_panel, _) ->
     WebviewPanel.reveal webview_panel ();
-    Hashtbl.replace webview_panels filename (webview_panel, graph);
+    Hashtbl.replace webview_panels (filename, typ) (webview_panel, graph);
     WebviewPanel.webview webview_panel, false
   | None ->
     let webview_panel = Window.createWebviewPanel
-        ~viewType:"CFG" ~title:"COBOL CFG Viewer"
+        ~viewType:"CFG" ~title:"SuperBOL CFG Viewer"
         ~showOptions:(ViewColumn.Beside) in
     let _ : Disposable.t =
       WebviewPanel.onDidDispose webview_panel ()
-        ~listener:(webviewpanel_disposal ~filename)
+        ~listener:(webviewpanel_disposal ~filename ~typ)
         ~thisArgs:Ojs.null ~disposables:[] in
     let webview = WebviewPanel.webview webview_panel in
     WebView.set_options webview (WebviewOptions.create ~enableScripts:true ());
-    Hashtbl.add webview_panels filename (webview_panel, graph);
+    Hashtbl.add webview_panels (filename, typ) (webview_panel, graph);
     webview, true
 
-let webview_n_graph_find_opt ~uri =
-  Hashtbl.find_opt webview_panels @@ Uri.path uri
+let webview_n_graph_find_opt ~uri ~typ =
+  Hashtbl.find_opt webview_panels (Uri.path uri, typ)
   |> Option.map begin fun (w,g) -> WebviewPanel.webview w, g end
 
-let update_graph ~uri graph =
+let update_graph ~uri ~typ graph =
   let filename = Uri.path uri in
-  match Hashtbl.find_opt webview_panels filename with
+  match Hashtbl.find_opt webview_panels (filename, typ) with
   | Some (wvp, _) ->
-    Hashtbl.replace webview_panels filename (wvp, graph)
+    Hashtbl.replace webview_panels (filename, typ) (wvp, graph)
   | None -> ()
 
 (* CLICK ON NODE *)
@@ -136,17 +130,14 @@ let setup_window_listener ~client =
        TextEditorSelectionChangeKind.Command
     then ()
     else
-      let text_editor = TextEditorSelectionChangeEvent.textEditor event in
-      TextEditor.setDecorations text_editor ~decorationType
-        ~rangesOrOptions:(`Ranges []);
-      let uri = TextEditor.document text_editor |> TextDocument.uri in
-      let webview = webview_n_graph_find_opt ~uri in
-      match webview with
-      | None -> ()
-      | Some (webview, _) ->
-        match TextEditorSelectionChangeEvent.selections event with
-        | [] -> ()
-        | selection::_ ->
+      match TextEditorSelectionChangeEvent.selections event with
+      | [] -> ()
+      | selection::_ ->
+        let text_editor = TextEditorSelectionChangeEvent.textEditor event in
+        TextEditor.setDecorations text_editor ~decorationType
+          ~rangesOrOptions:(`Ranges []);
+        let uri = TextEditor.document text_editor |> TextDocument.uri in
+        let process_selection_change webview =
           let pos_start = Selection.start selection in
           let data =
             let uri = Jsonoo.Encode.string @@ Uri.path uri in
@@ -165,6 +156,15 @@ let setup_window_listener ~client =
                 WebView.postMessage webview ojs
               end)
           in ()
+        in
+        let webview = webview_n_graph_find_opt ~uri ~typ:`Dot in
+        begin match webview with
+          | None -> ()
+          | Some (webview, _) -> process_selection_change webview end;
+        let webview = webview_n_graph_find_opt ~uri ~typ:`Arc in
+        match webview with
+        | None -> ()
+        | Some (webview, _) -> process_selection_change webview
   in
   let disposable_listener =
     match !window_listener with
@@ -184,7 +184,7 @@ let send_graph ~typ webview graph =
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
-let on_graph_update ~webview ~client ~uri name arg =
+let on_graph_update ~webview ~client ~uri ~typ name arg =
   let options =
     Ojs.get_prop_ascii arg "renderOptions"
     |> begin fun ojs ->
@@ -205,32 +205,28 @@ let on_graph_update ~webview ~client ~uri name arg =
           ~message:"Unable to perform operation, try reloading the CFG"
         |> Promise.map (Fun.const ())
       | graph::_ ->
-        update_graph ~uri graph;
-        let typ = Ojs.get_prop_ascii arg "graph_type"
-                  |> Ojs.string_of_js |> typ_of_string in
+        update_graph ~uri ~typ graph;
         send_graph ~typ webview graph;
         Promise.return ()
     end
   in ()
 
-let on_message ~client ~text_editor arg =
+let on_message ~client ~text_editor ~typ arg =
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let request_type = Ojs.get_prop_ascii arg "type" |> Ojs.string_of_js in
-  webview_n_graph_find_opt ~uri
+  webview_n_graph_find_opt ~uri ~typ
   |> Option.iter begin fun (webview, graph) ->
     match request_type with
     | "click" ->
       on_click ~nodes_pos:graph.nodes_pos ~text_editor arg
     | "graph_update" ->
-      on_graph_update ~client ~webview ~uri graph.name arg
+      on_graph_update ~client ~webview ~uri ~typ graph.name arg
     | "ready" ->
-      let typ = Ojs.get_prop_ascii arg "graph_type" |> Ojs.string_of_js in
-      send_graph ~typ:(typ_of_string typ) webview graph
+      send_graph ~typ webview graph
     | _ -> ()
   end
 
-
-let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
+let open_cfg_for ~typ ~text_editor ~extension_uri client =
   let open Promise in
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let data =
@@ -247,10 +243,10 @@ let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
       | Some name ->
         let graph = Stdlib.List.find begin fun g ->
             String.equal g.name name end graphs in
-        let webview, is_new = create_or_get_webview ~graph ~uri in
+        let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
         let _ : Disposable.t =
           WebView.onDidReceiveMessage webview ()
-            ~listener:(on_message ~client ~text_editor)
+            ~listener:(on_message ~client ~text_editor ~typ)
             ~thisArgs:Ojs.null ~disposables:[]
         in
         if is_new
@@ -269,7 +265,7 @@ let open_cfg_for ?(typ=`Dot) ~text_editor ~extension_uri client =
     end
   end
 
-let open_cfg ?(typ=`Dot) ?text_editor instance =
+let open_cfg ?text_editor ~typ instance =
   let text_editor = match text_editor with
     | None -> Window.activeTextEditor ()
     | e -> e in

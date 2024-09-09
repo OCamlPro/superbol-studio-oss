@@ -13,7 +13,7 @@
 (**************************************************************************)
 
 val open_cfg
-  : ?typ: [< `Arc | `Dot > `Dot]
-  -> ?text_editor: Vscode.TextEditor.t
+  : ?text_editor: Vscode.TextEditor.t
+  -> typ:[ `Arc | `Dot ]
   -> Superbol_instance.t
   -> unit Promise.t
