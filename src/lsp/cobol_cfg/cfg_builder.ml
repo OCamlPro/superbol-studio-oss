@@ -51,11 +51,16 @@ type node = {
   qid: qualname;
   mutable names: string NEL.t;
   loc: srcloc option;
-  typ: [`External | `EntryPoint | `EntryPara | `EntrySection | `Internal ];
+  typ: [`External | `EntryPoint | `EntryPara | `EntrySection | `Internal | `SplitHub ];
   jumps: Jumps.t;
   will_fallthru: bool;
   terminal: bool;
 }
+
+let is_entry n =
+  match n.typ with
+  | `EntryPara | `EntryPoint | `EntrySection -> true
+  | `External | `Internal | `SplitHub -> false
 
 let fullqn_to_string qn =
   Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
@@ -98,8 +103,8 @@ module JumpCollector = struct
       match exit_stmt with
       | ExitSimple | ExitPerform _
       | ExitMethod _ | ExitProgram _ | ExitFunction _ -> acc
-      | ExitParagraph -> { acc with will_fallthru = true }
-      | ExitSection -> { acc with will_fallthru = true } (* TODO: go to next section ? *)
+      | ExitParagraph -> { acc with will_fallthru = true } (* TODO change this to a goto next para *)
+      | ExitSection -> { acc with will_fallthru = false } (* TODO: go to next section ? *)
     method! fold_evaluate' { payload; _ } acc =
       let { eval_branches; eval_otherwise; _ }: Cobol_ptree.evaluate_stmt =
         payload in
@@ -222,6 +227,7 @@ module Dot = Graph.Graphviz.Dot(struct
         | `EntryPoint -> "Entry\npoint", [`Shape `Doubleoctagon]
         | `EntrySection -> NEL.hd n.names, [`Shape `Doubleoctagon]
         | `External -> NEL.hd n.names, [`Shape `Plaintext]
+        | `SplitHub -> vertex_name_record n, [`Style `Dashed]
         | `Internal -> vertex_name_record n, []
       in `Label label :: shape
     let default_vertex_attributes _ = [`Shape `Record]
@@ -303,7 +309,7 @@ let do_hide_unreachable g =
   let rec aux cfg =
     let did_remove, cfg =
       Cfg.fold_vertex begin fun n (did_remove, cfg) ->
-        if Cfg.in_degree cfg n <= 0 && n.typ == `Internal
+        if Cfg.in_degree cfg n <= 0 && not (is_entry n)
         then true, Cfg.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
@@ -317,7 +323,7 @@ let do_shatter_hubs ?(limit=20) g =
     then begin
       Cfg.fold_pred_e begin fun edge cfg ->
         let cfg = Cfg.remove_edge_e cfg edge in
-        let n_clone = clone_node n in
+        let n_clone = { (clone_node n) with typ = `SplitHub } in
         let (pred, edge, _) = edge in
         let cfg = Cfg.add_edge_e cfg (pred, edge, n_clone) in
         cfg
@@ -337,10 +343,10 @@ let cfg_of_nodes nodes =
 let handle_cfg_options ~(options: Cfg_options.t) cfg =
   cfg
   |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
+  |> (if options.hide_unreachable then do_hide_unreachable else Fun.id)
   |> (match options.shatter_hubs with
       | Some limit -> do_shatter_hubs ~limit
       | _ -> Fun.id)
-  |> (if options.hide_unreachable then do_hide_unreachable else Fun.id)
 
 let cfg_of ~(cu: cobol_unit) =
   node_idx := 0;
