@@ -25,8 +25,8 @@ body {
 #rendering {
   position: absolute;
   top: 50%;
-  left: 0;
-  right: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
   z-index: -1;
 }
@@ -38,6 +38,7 @@ body {
         flex-flow: column;
         position: absolute;
         margin-block-start: .5em;
+        padding: .5em .2em;
         background-color: var(--vscode-editor-background);
         border: var(--vscode-focusBorder) 1px solid;
       }
@@ -49,23 +50,27 @@ body {
     <body>
         <div id="buttons">
           <button onclick="reset()">Reset Zoom</button>
-          <button onclick="rerender()">Render</button>
-          <button onclick="toggleOptions()">Toggle Render Options</button>
+          <button onclick="toggleOptions()">Render Options</button>
           <div id="options" class="hidden">
             <div><input type="checkbox" id="unreachable" />
             <label for="unreachable">Remove unreachable nodes</label></div>
             <div><input type="checkbox" id="fallthru" checked />
             <label for="fallthru">Collapse fallthrough transitions</label></div>
             <div><input type="checkbox" id="hubshatter"/>
-            <label for="hubshatter">Split hub with more than
-            <input type="number" id="hubcount" value="20" /> entering connections</label>
+            <label for="hubshatter">Split hubs with more than
+            <input type="number" id="hubcount" value="20" /> incoming edges</label>
             </div>
+            <button style="align-self:center;margin-block-start:1em" onclick="rerender()">Render</button>
           </div>
         </div>
         <div id="app"></div>
         <div id="rendering">
           Rendering... Please wait <br/>
-          If this takes too much time, the CFG is probably too big to render.
+          If this takes too long, you can try changing the Render Options :
+          <ul>
+            <li>Reduce the incoming edge requirement for spliting hubs</li>
+            <li>Collapse nodes that are only linked via a fallthrough edge</li>
+          </ul>
         </div>
     </body>
     <script>
@@ -89,6 +94,9 @@ body {
         optionIsVisible = !optionIsVisible;
       }
 
+      function hideOptions() {
+        if(optionIsVisible) toggleOptions()
+      }
 
       function rerender() {
         var collapse_fallthru = document.getElementById('fallthru').checked;
@@ -101,7 +109,6 @@ body {
         }
         vscode.postMessage({
             type: 'graph_update',
-            graph_type: 'dot',
             renderOptions: {
               hide_unreachable,
               collapse_fallthru,
@@ -146,6 +153,7 @@ body {
                 graphviz.destroy()
                 d3.select('#app svg').remove()
               }
+              hideOptions()
               graphviz = d3.select('#app').graphviz().fit(true);
               graphviz.zoomScaleExtent([0.1, 50])
               var rect = document.getElementById('app').getBoundingClientRect();
@@ -160,6 +168,6 @@ body {
             break;
           }
         })
-      vscode.postMessage({type: 'ready', graph_type: 'dot'})
+      vscode.postMessage({type: 'ready'})
     </script>
     </html>
