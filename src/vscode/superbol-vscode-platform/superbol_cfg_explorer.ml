@@ -25,10 +25,10 @@ let read_whole_file filename =
 
 let graphviz_html = ref None
 let d3_arc_html = ref None
-let get_html_content ~extension_uri typ =
+let get_html_js_content ~extension_uri typ =
   match typ, !graphviz_html, !d3_arc_html  with
-  | D3_arc_diagram, _, Some html
-  | Graphviz, Some html, _ -> Ok(html)
+  | D3_arc_diagram, _, Some value
+  | Graphviz, Some value, _ -> Ok(`CompleteHtml value)
   | _ ->
     let html_uri = Uri.joinPath extension_uri
         ~pathSegments:
@@ -37,12 +37,28 @@ let get_html_content ~extension_uri typ =
             | D3_arc_diagram -> "cfg-arc-renderer.html"] in
     try
       let html = read_whole_file @@ Uri.fsPath html_uri in
-      begin match typ with
-        | Graphviz -> graphviz_html := Some html
-        | D3_arc_diagram -> d3_arc_html := Some html end;
-      Ok(html)
+      let js = match typ with
+        | Graphviz -> "cfg-dot.js"
+        | D3_arc_diagram -> "cfg-arc.js" in
+      let localResource =
+        Uri.joinPath extension_uri ~pathSegments:["assets"; js] in
+      Ok( `IncompleteHtml (html, localResource))
     with Sys_error e -> Error(e)
        | End_of_file -> Error("End_of_file")
+
+let setup_html_js_content ~webview ~typ html_js =
+  match html_js with
+  | `CompleteHtml html -> html
+  | `IncompleteHtml (html, js_path) ->
+    let html_content =
+      let path = Uri.toString
+          (WebView.asWebviewUri webview ~localResource:js_path) () in
+      Printf.sprintf "%s<script src=\"%s\"></script>"
+        html path in
+    begin match typ with
+      | Graphviz -> graphviz_html := Some (html_content)
+      | D3_arc_diagram -> d3_arc_html := Some (html_content) end;
+    html_content
 
 
 let _log message = ignore(Window.showInformationMessage () ~message)
@@ -101,9 +117,11 @@ let create_or_get_webview ~graph ~uri ~typ =
     Hashtbl.replace webview_panels (filename, typ) (webview_panel, graph);
     WebviewPanel.webview webview_panel, false
   | None ->
-    let webview_panel = Window.createWebviewPanel
-        ~viewType:"CFG" ~title:"SuperBOL CFG Viewer"
-        ~showOptions:(ViewColumn.Beside) in
+    let viewType = match typ with
+      | Graphviz -> "superbol.cfg.dot"
+      | D3_arc_diagram -> "superbol.cfg.arc" in
+    let webview_panel = Window.createWebviewPanel ~viewType
+        ~title:"SuperBOL CFG Viewer" ~showOptions:(ViewColumn.Beside) in
     let _ : Disposable.t =
       WebviewPanel.onDidDispose webview_panel ()
         ~listener:(webviewpanel_disposal ~filename ~typ)
@@ -261,12 +279,12 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
     let uri = Jsonoo.Encode.string @@ Uri.path uri in
     Jsonoo.Encode.object_ ["uri", uri]
   in
-  match get_html_content ~extension_uri typ with
+  match get_html_js_content ~extension_uri typ with
   | Error e ->
     let _ : _ option Promise.t = Window.showErrorMessage
         ~message:("Unable to display control-flow: " ^ e) () in
     return ()
-  | Ok html_content ->
+  | Ok html_js ->
     Vscode_languageclient.LanguageClient.sendRequest client ()
       ~meth:"superbol/getCFG" ~data
     |> then_ ~fulfilled:begin fun jsonoo_res ->
@@ -281,6 +299,7 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
           let graph = Stdlib.List.find begin fun g ->
               String.equal g.name name end graphs in
           let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
+          let html_content = setup_html_js_content ~webview ~typ html_js in
           let _ : Disposable.t =
             WebView.onDidReceiveMessage webview ()
               ~listener:(on_message ~legend:(Some legend) ~client ~text_editor ~typ)

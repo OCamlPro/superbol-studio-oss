@@ -1,14 +1,11 @@
 <!-- Credit @beicause in https://github.com/beicause/call-graph/blob/master/src/html.ts -->
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>COBOL CFG</title>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script src="https://unpkg.com/@hpcc-js/wasm@2.20.0/dist/index.umd.js"></script>
-        <script src="https://unpkg.com/d3-graphviz@5.6.0/build/d3-graphviz.js"></script>
-        <style>
+<html lang="en">
+<head>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm@2.20.0/dist/index.umd.js"></script>
+<script src="https://unpkg.com/d3-graphviz@5.6.0/build/d3-graphviz.js"></script>
+<style>
 html, body {
   height: 100%;
 }
@@ -53,147 +50,34 @@ body {
 #hubcount {
   width: 50px;
 }
-      </style>
-    </head>
-    <body>
-        <div id="buttons">
-          <button onclick="reset()">Reset Zoom</button>
-          <button onclick="toggleOptions()">Render Options</button>
-          <button onclick="toggleLegend()">Show legend</button>
-          <div id="options" class="hidden">
-            <div><input type="checkbox" id="unreachable" />
-            <label for="unreachable">Remove unreachable nodes</label></div>
-            <div><input type="checkbox" id="fallthru" checked />
-            <label for="fallthru">Collapse fallthrough transitions</label></div>
-            <div><input type="checkbox" id="hubshatter"/>
-            <label for="hubshatter">Split hubs with more than
-            <input type="number" id="hubcount" value="20" /> incoming edges</label>
-            </div>
-            <button style="align-self:center;margin-block-start:1em" onclick="rerender()">Render</button>
-          </div>
-          <div id="legend" class="hidden"></div>
-        </div>
-        <div id="app"></div>
-        <div id="rendering">
-          Rendering... Please wait <br/>
-          If this takes too long, you can try changing the Render Options :
-          <ul>
-            <li>Reduce the incoming edge requirement for spliting hubs</li>
-            <li>Collapse nodes that are only linked via a fallthrough edge</li>
-          </ul>
-        </div>
-    </body>
-    <script>
-      const vscode = acquireVsCodeApi()
-      var graphviz = undefined;
-      var graph = undefined;
-      var rendering = d3.select('#rendering')
-
-      function reset() {
-        graphviz?.resetZoom()
-      }
-
-      function toggleLegend() {
-        if(document.getElementById('legend').classList != "") {
-          document.getElementById('options').classList = "hidden";
-          document.getElementById('legend').classList = "";
-        }
-        else document.getElementById('legend').classList = "hidden";
-      }
-
-      function toggleOptions() {
-        if(document.getElementById('options').classList != "") {
-          document.getElementById('options').classList = "";
-          document.getElementById('legend').classList = "hidden";
-        }
-        else document.getElementById('options').classList = "hidden";
-      }
-
-      function hideOptions() {
-        document.getElementById('options').classList = "hidden";
-      }
-
-      function rerender() {
-        var collapse_fallthru = document.getElementById('fallthru').checked;
-        var hide_unreachable = document.getElementById('unreachable').checked;
-        if(document.getElementById('hubshatter').checked) {
-          var shatter_hubs = Number(document.getElementById('hubcount').value)
-        }
-        else {
-          var shatter_hubs = undefined;
-        }
-        vscode.postMessage({
-            type: 'graph_update',
-            renderOptions: {
-              hide_unreachable,
-              collapse_fallthru,
-              shatter_hubs,
-            }
-        })
-      }
-
-      function focus(name) {
-        d3.selectAll('svg .node polygon').attr("fill", "none")
-        d3.selectAll('svg .node text')
-          .filter(function () { return this.textContent === name})
-          .select(function () { return this.parentNode })
-          .select("polygon")
-          .attr("fill", "red")
-      }
-
-      function setupOnEnd() {
-        rendering.classed("hidden", true);
-        d3.selectAll('svg g title').remove()
-        d3.selectAll('svg text')
-          .on("click", (_, e) => {
-            const clickedName = e.children[0].text;
-            if(!clickedName) return;
-            const node =
-              graph.nodes
-              .find(n => clickedName === n.name
-                      || n.name.startsWith(clickedName + " IN ") )
-            if(!node) return;
-            focus(clickedName)
-            vscode.postMessage({
-                type: 'click',
-                node: node.id
-            })
-          })
-      }
-
-      function updateLegend(legend) {
-        d3.select("#legend").graphviz().renderDot(legend)
-        .zoom(false)
-        .width('100%')
-        .height(false)
-        .fit(true)
-      }
-
-      window.addEventListener('message', event => {
-          switch (event.data.type) {
-            case "graph_content":
-              if(graphviz) {
-                graphviz.destroy()
-                d3.select('#app svg').remove()
-              }
-              hideOptions()
-              if(event.data.legend) {
-                updateLegend(event.data.legend)
-              }
-              graphviz = d3.select('#app').graphviz().fit(true);
-              graphviz.zoomScaleExtent([0.1, 50])
-              var rect = document.getElementById('app').getBoundingClientRect();
-              graphviz.width(rect.width).height(rect.height)
-              graphviz.renderDot(event.data.dot)
-                      .on('end', setupOnEnd)
-              rendering.classed("hidden", false);
-              graph = JSON.parse(event.data.graph)
-            break;
-            case "focused_proc":
-              focus(event.data.procedure)
-            break;
-          }
-        })
-      vscode.postMessage({type: 'ready'})
-    </script>
-    </html>
+</style>
+</head>
+<body data-vscode-context='{"preventDefaultContextMenuItems": true}'>
+  <div id="buttons">
+    <button onclick="reset()">Reset Zoom</button>
+    <button onclick="toggleOptions()">Render Options</button>
+    <button onclick="toggleLegend()">Show legend</button>
+    <div id="options" class="hidden">
+      <div><input type="checkbox" id="unreachable" />
+      <label for="unreachable">Remove unreachable nodes</label></div>
+      <div><input type="checkbox" id="fallthru" checked />
+      <label for="fallthru">Collapse fallthrough transitions</label></div>
+      <div><input type="checkbox" id="hubshatter"/>
+      <label for="hubshatter">Split hubs with more than
+      <input type="number" id="hubcount" value="20" /> incoming edges</label>
+      </div>
+      <button style="align-self:center;margin-block-start:1em" onclick="rerender()">Render</button>
+    </div>
+    <div id="legend" class="hidden"></div>
+  </div>
+  <div id="app"></div>
+  <div id="rendering">
+    Rendering... Please wait <br/>
+    If this takes too long, you can try changing the Render Options :
+    <ul>
+      <li>Reduce the incoming edge requirement for spliting hubs</li>
+      <li>Collapse nodes that are only linked via a fallthrough edge</li>
+    </ul>
+  </div>
+</body>
+</html>
