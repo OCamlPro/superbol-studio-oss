@@ -19,3 +19,5 @@ val make
   : options:Cfg_options.t
   -> Cobol_typeck.Outputs.t
   -> graph list
+
+val graphviz_legend : string

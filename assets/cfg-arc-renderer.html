@@ -26,12 +26,29 @@ path {
     stroke-dashoffset: -51; // lcm of sum of dasharray values to avoid flicker
   }
 }
+.hidden {
+  display: none !important;
+}
 </style></head>
 <html>
-<body> <div id="graph"></div></body>
+<body>
+  <div id="buttons">
+    <button onclick="toggleLegend()">Toggle Legend</button>
+  </div>
+  <div id="legend" class="hidden"></div>
+  <div id="graph"></div>
+</body>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
 const vscode = acquireVsCodeApi()
+
+function toggleLegend() {
+  if(document.getElementById('legend').classList != "") {
+    document.getElementById('legend').classList = "";
+  }
+  else document.getElementById('legend').classList = "hidden";
+}
+
 var graph = undefined;
     nodes = undefined,
     links = undefined,
@@ -159,8 +176,9 @@ function buildSVG(data) {
 
   data.nodes = addNeighbours(data.nodes, data.links)
 
+  d3.select("#graph svg").remove()
   // append the svg object to the body of the page
-const svg = d3.select("#graph")
+  const svg = d3.select("#graph")
               .append("svg")
               .attr("width", width)
               .attr("height", height + margin.top + margin.bottom)
@@ -266,12 +284,81 @@ const svg = d3.select("#graph")
   })
 }
 
+function buildLegend() {
+  d3.select("#legend svg").remove()
+  const svg = d3.select("#legend")
+              .append("svg")
+              .attr("width", 400)
+              .attr("height", 260)
+
+  const svg_g = svg.append("g")
+
+  svg_g.append("path")
+    .attr("d", "M 100 20 v 20")
+    .attr("stroke", "black")
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 35)
+    .text("Fallthrough transition")
+
+
+  svg_g.append("path")
+    .attr("d", "M 50 70 h 60")
+    .attr("stroke", "black")
+    .classed("animated", true)
+    .attr("stroke-dasharray", getDasharray({ type: "u" }))
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 75)
+    .text("GO statement")
+
+  svg_g.append("path")
+    .attr('d', 'M 50 110 h 60')
+    .classed("animated", true)
+    .attr("stroke", "black")
+    .attr("stroke-dasharray", getDasharray({ type: "c" }))
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 115)
+    .text("PERFORM statement")
+
+  svg_g.append("circle")
+      .attr("cx", 100).attr("cy", 150).attr("r", NODE_RADIUS)
+      .style("fill", "red")
+
+  svg_g.append("circle")
+    .attr("cx", 100).attr("cy", 150).attr("r", 2)
+    .style("fill", "white")
+
+  svg_g.append("circle")
+      .attr("cx", 100).attr("cy", 190).attr("r", NODE_RADIUS)
+      .style("fill", "red")
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 155)
+    .text("SECTION")
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 195)
+    .text("PARAGRAPH")
+
+  svg_g.append("circle")
+      .attr("cx", 100).attr("cy", 230).attr("r", NODE_RADIUS)
+      .style("fill", "green")
+
+  svg_g.append("text")
+    .attr("x", 130).attr("y", 235)
+    .text("PARAGRAPH from another section")
+
+}
+
 window.addEventListener("message", event => {
     switch (event.data.type) {
       case "graph_content":
         d3.select("#graph svg").remove()
         graph = JSON.parse(event.data.graph)
         buildSVG(graph)
+        buildLegend()
       break;
       case "focused_proc":
         clickedNode = undefined;
