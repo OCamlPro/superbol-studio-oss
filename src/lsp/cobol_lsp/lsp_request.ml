@@ -171,9 +171,10 @@ let handle_open_cfg registry params =
           ("nodes_pos", `Assoc nodes_pos);
           ("name", `String name);]
       in
-      Some (`List (List.map yojsonify graphs))
+      Some (`Assoc ["graphviz_legend", `String graphviz_legend;
+        "graphs", `List (List.map yojsonify graphs)])
     end
-  |> Option.value ~default:(`List [])
+  |> Option.value ~default:(`Assoc [])
 
 let handle_find_procedure registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in

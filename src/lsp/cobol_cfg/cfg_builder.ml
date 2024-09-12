@@ -453,3 +453,24 @@ let make ~(options: Cfg_options.t) (checked_doc: Cobol_typeck.Outputs.t) =
       nodes_pos = nodes_pos cfg;
     }
   end
+
+let graphviz_legend =
+{|digraph legend {
+  1 [shape=doubleoctagon; label="An entry point\nof the program"]
+  2 [shape=rect; label="A section or paragraph"]
+  3 [shape=record; label="{2 collapsed paragraphs or sections|linked by a fallthrough transition}"]
+  4 [shape=rect; style=dashed; label="A copy of a split hub"]
+
+  10 [shape=plaintext; label=""]
+  11 [shape=plaintext; label=""]
+  12 [shape=plaintext; label=""]
+  13 [shape=plaintext; label=""]
+
+  10 -> 11 [style=solid; label="GO"]
+  11 -> 12 [style=dashed; label="PERFORM"]
+  12 -> 13 [style=dotted; label="fallthrough"]
+
+  {rank=source; 2; 1;}
+  {rank=same; 3; 4 }
+  {rank=sink; 10; 11; 12; 13 }
+}|}

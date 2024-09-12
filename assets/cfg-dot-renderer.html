@@ -33,24 +33,33 @@ body {
 .hidden {
   display: none !important;
 }
-      #options {
-        display: flex;
-        flex-flow: column;
-        position: absolute;
-        margin-block-start: .5em;
-        padding: .5em .2em;
-        background-color: var(--vscode-editor-background);
-        border: var(--vscode-focusBorder) 1px solid;
-      }
-      #hubcount {
-        width: 50px;
-      }
-        </style>
+#legend {
+  position: absolute;
+  margin-block-start: .5em;
+  padding: 2px 2px 0 2px;
+  width: 500px;
+  background-color: var(--vscode-editor-background);
+  border: var(--vscode-focusBorder) 1px solid;
+}
+#options {
+  display: flex;
+  flex-flow: column;
+  position: absolute;
+  margin-block-start: .5em;
+  padding: .5em .2em;
+  background-color: var(--vscode-editor-background);
+  border: var(--vscode-focusBorder) 1px solid;
+}
+#hubcount {
+  width: 50px;
+}
+      </style>
     </head>
     <body>
         <div id="buttons">
           <button onclick="reset()">Reset Zoom</button>
           <button onclick="toggleOptions()">Render Options</button>
+          <button onclick="toggleLegend()">Show legend</button>
           <div id="options" class="hidden">
             <div><input type="checkbox" id="unreachable" />
             <label for="unreachable">Remove unreachable nodes</label></div>
@@ -62,6 +71,7 @@ body {
             </div>
             <button style="align-self:center;margin-block-start:1em" onclick="rerender()">Render</button>
           </div>
+          <div id="legend" class="hidden"></div>
         </div>
         <div id="app"></div>
         <div id="rendering">
@@ -83,19 +93,24 @@ body {
         graphviz?.resetZoom()
       }
 
-      var optionIsVisible = false;
-      function toggleOptions() {
-        if(optionIsVisible) {
+      function toggleLegend() {
+        if(document.getElementById('legend').classList != "") {
           document.getElementById('options').classList = "hidden";
+          document.getElementById('legend').classList = "";
         }
-        else {
+        else document.getElementById('legend').classList = "hidden";
+      }
+
+      function toggleOptions() {
+        if(document.getElementById('options').classList != "") {
           document.getElementById('options').classList = "";
+          document.getElementById('legend').classList = "hidden";
         }
-        optionIsVisible = !optionIsVisible;
+        else document.getElementById('options').classList = "hidden";
       }
 
       function hideOptions() {
-        if(optionIsVisible) toggleOptions()
+        document.getElementById('options').classList = "hidden";
       }
 
       function rerender() {
@@ -146,6 +161,14 @@ body {
           })
       }
 
+      function updateLegend(legend) {
+        d3.select("#legend").graphviz().renderDot(legend)
+        .zoom(false)
+        .width('100%')
+        .height(false)
+        .fit(true)
+      }
+
       window.addEventListener('message', event => {
           switch (event.data.type) {
             case "graph_content":
@@ -154,6 +177,9 @@ body {
                 d3.select('#app svg').remove()
               }
               hideOptions()
+              if(event.data.legend) {
+                updateLegend(event.data.legend)
+              }
               graphviz = d3.select('#app').graphviz().fit(true);
               graphviz.zoomScaleExtent([0.1, 50])
               var rect = document.getElementById('app').getBoundingClientRect();

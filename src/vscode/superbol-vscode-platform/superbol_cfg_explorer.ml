@@ -199,12 +199,15 @@ let setup_window_listener ~client =
 
 (* MESSAGE MANAGER *)
 
-let send_graph ~typ webview graph =
+let send_graph ?(legend=None) ~typ webview graph =
   let ojs = Ojs.empty_obj () in
   Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "graph_content");
   if typ == Graphviz
   then Ojs.set_prop_ascii ojs "dot" (Ojs.string_to_js graph.string_repr_dot);
   Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr_d3);
+  Option.iter begin fun legend ->
+    Ojs.set_prop_ascii ojs "legend" (Ojs.string_to_js legend)
+  end legend;
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
@@ -221,8 +224,9 @@ let on_graph_update ~webview ~client ~uri ~typ name arg =
   let _ : unit Promise.t =
     Vscode_languageclient.LanguageClient.sendRequest client ()
       ~meth:"superbol/getCFG" ~data
-    |> Promise.then_ ~fulfilled:begin fun jsonoo_graphs ->
-      let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
+    |> Promise.then_ ~fulfilled:begin fun jsonoo_res ->
+      let graphs = Jsonoo.Decode.field "graphs"
+          (Jsonoo.Decode.list decode_graph) jsonoo_res in
       match graphs with
       | [] ->
         Window.showErrorMessage ()
@@ -235,7 +239,7 @@ let on_graph_update ~webview ~client ~uri ~typ name arg =
     end
   in ()
 
-let on_message ~client ~text_editor ~typ arg =
+let on_message ?(legend=None)~client ~text_editor ~typ arg =
   let uri = TextEditor.document text_editor |> TextDocument.uri in
   let request_type = Ojs.get_prop_ascii arg "type" |> Ojs.string_of_js in
   webview_n_graph_find_opt ~uri ~typ
@@ -246,7 +250,7 @@ let on_message ~client ~text_editor ~typ arg =
     | "graph_update" ->
       on_graph_update ~client ~webview ~uri ~typ graph.name arg
     | "ready" ->
-      send_graph ~typ webview graph
+      send_graph ~legend ~typ webview graph
     | _ -> ()
   end
 
@@ -265,8 +269,11 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
   | Ok html_content ->
     Vscode_languageclient.LanguageClient.sendRequest client ()
       ~meth:"superbol/getCFG" ~data
-    |> then_ ~fulfilled:begin fun jsonoo_graphs ->
-      let graphs = Jsonoo.Decode.list decode_graph jsonoo_graphs in
+    |> then_ ~fulfilled:begin fun jsonoo_res ->
+      let graphs = Jsonoo.Decode.field "graphs"
+          (Jsonoo.Decode.list decode_graph) jsonoo_res in
+      let legend = Jsonoo.Decode.field "graphviz_legend"
+          Jsonoo.Decode.string jsonoo_res in
       Window.showQuickPick ~items:(Stdlib.List.map (fun g -> g.name) graphs) ()
       |> then_ ~fulfilled:begin function
         | None -> return ()
@@ -276,7 +283,7 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
           let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
           let _ : Disposable.t =
             WebView.onDidReceiveMessage webview ()
-              ~listener:(on_message ~client ~text_editor ~typ)
+              ~listener:(on_message ~legend:(Some legend) ~client ~text_editor ~typ)
               ~thisArgs:Ojs.null ~disposables:[]
           in
           if is_new
