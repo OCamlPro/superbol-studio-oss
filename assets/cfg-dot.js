@@ -70,7 +70,7 @@ function setupOnEnd() {
                 || n.name.startsWith(clickedName + " IN ") )
       if(!node) return;
       focus(clickedName)
-      vscode.ostMessage({
+      vscode.postMessage({
           type: 'click',
           node: node.id
       })

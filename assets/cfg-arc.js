@@ -44,16 +44,16 @@ function getShortenName(d) {
 }
 
 function getDasharray(l) {
-  if(l.type === "u")
+  if(l.type === "g")
     return "45,6"
-  if(l.type === "c")
+  if(l.type === "p")
     return "12,5"
   return ""
 }
 
 function getNodeColor(color) {
   return function (d) {
-    const name = d.name.split(" IN ");
+    const name = d.fullname.split(" IN ");
     if(name.length > 1) {
       return color(name[1])
     }
