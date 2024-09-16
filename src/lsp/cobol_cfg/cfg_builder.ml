@@ -46,12 +46,18 @@ module Qmap = Map.Make(struct
     let compare = Cobol_ptree.compare_qualname
   end)
 
+type node_type =
+  | External of string
+  | Entry of [`Point | `Paragraph | `Section of string]
+  | Normal of string
+  | Collapsed of string NEL.t
+  | Split of string
+
 type node = {
   id: int;
   qid: qualname;
-  mutable names: string NEL.t;
   loc: srcloc option;
-  typ: [`External | `EntryPoint | `EntryPara | `EntrySection | `Internal | `SplitHub ];
+  typ: node_type;
   jumps: Jumps.t;
   will_fallthru: bool;
   terminal: bool;
@@ -59,8 +65,8 @@ type node = {
 
 let is_entry n =
   match n.typ with
-  | `EntryPara | `EntryPoint | `EntrySection -> true
-  | `External | `Internal | `SplitHub -> false
+  | External _ | Normal _ | Collapsed _ | Split _ -> false
+  | Entry _ -> true
 
 let fullqn_to_string qn =
   Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
@@ -158,7 +164,7 @@ module JumpCollector = struct
   end
 end
 
-let build_node ~default_name ~cu paragraph =
+let build_node ?(qn_to_string=fullqn_to_string) ~default_name ~cu paragraph =
   let open JumpCollector in
   let { jumps; will_fallthru; terminal; } =
     Visitor.fold_procedure_paragraph' (folder ~cu) paragraph init in
@@ -166,16 +172,15 @@ let build_node ~default_name ~cu paragraph =
   let qid, loc = match ~&paragraph.paragraph_name with
     | None -> default_name, ~@paragraph
     | Some qn -> full_qn' ~cu qn, ~@qn in
-  let name = fullqn_to_string qid
+  let name = qn_to_string qid
   in {
     id = !node_idx;
     qid;
-    names = NEL.One name;
     loc = Some loc;
     jumps;
     will_fallthru;
     terminal;
-    typ = `Internal;
+    typ = Normal name;
   }
 
 module Node = struct
@@ -199,16 +204,16 @@ module Edge = struct
    let default = FallThrough
    let to_string = function
      | FallThrough -> "f"
-     | Perform -> "c"
-     | Go -> "u"
+     | Perform -> "p"
+     | Go -> "g"
 end
 
 module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
 
-let vertex_name_record { names; _ } =
+let vertex_name_record names =
   Pretty.to_string "%a"
     (NEL.pp ~fopen:"{" ~fclose:"}" ~fsep:"|" Fmt.string)
-    (NEL.rev names)
+    names
 
 (* Graph.Graphviz.DotAttributes *)
 module Dot = Graph.Graphviz.Dot(struct
@@ -220,17 +225,18 @@ module Dot = Graph.Graphviz.Dot(struct
            | Go -> `Solid)]
     let default_edge_attributes _ = []
     let get_subgraph _ = None
-    let vertex_attributes ({ typ; _ } as n) =
-      let label, shape =
+    let vertex_attributes { typ; _ } =
+      let label, attributes =
         match typ with
-        | `EntryPara -> "Entry\nparagraph", [`Shape `Doubleoctagon]
-        | `EntryPoint -> "Entry\npoint", [`Shape `Doubleoctagon]
-        | `EntrySection -> NEL.hd n.names, [`Shape `Doubleoctagon]
-        | `External -> NEL.hd n.names, [`Shape `Plaintext]
-        | `SplitHub -> vertex_name_record n, [`Style `Dashed]
-        | `Internal -> vertex_name_record n, []
-      in `Label label :: shape
-    let default_vertex_attributes _ = [`Shape `Record]
+        | Entry (`Section name) -> name, [`Shape `Doubleoctagon]
+        | Entry `Point -> "Entry\npoint", [`Shape `Doubleoctagon]
+        | Entry `Paragraph -> "Entry\nparagraph", [`Shape `Doubleoctagon]
+        | External name -> name, [`Shape `Plaintext]
+        | Split name -> name, [`Style `Dashed]
+        | Normal name -> name, []
+        | Collapsed names -> vertex_name_record names, [`Shape `Record]
+      in `Label label :: attributes
+    let default_vertex_attributes _ = [`Shape `Box]
     let graph_attributes _ = []
     let vertex_name { id; _ } = string_of_int id
   end)
@@ -238,16 +244,18 @@ module Dot = Graph.Graphviz.Dot(struct
 let to_dot_string g =
   Pretty.to_string "%a" Dot.fprint_graph g
 
-let dummy_node ?(typ=`External) (qn: qualname) =
+let new_node ~typ (qn: qualname) =
   let loc = match qn with
-  | Cobol_ptree.Name name -> ~@name
-  | Qual (name, _) -> ~@name in
+    | Cobol_ptree.Name name -> ~@name
+    | Qual (name, _) -> ~@name in
   node_idx:= !node_idx + 1;
-  {
+  let typ = match typ with
+    | `External -> External (fullqn_to_string qn)
+    | `EntryPoint -> Entry `Point
+  in {
     id = !node_idx;
     qid = qn;
     loc = Some loc;
-    names = NEL.One (fullqn_to_string qn);
     jumps = Jumps.empty;
     will_fallthru = true;
     terminal = false;
@@ -260,7 +268,7 @@ let clone_node node =
 
 let qmap_find_or_add qmap qn =
   match Qmap.find_opt qn qmap with
-  | None -> let node = dummy_node qn in
+  | None -> let node = new_node ~typ:`External qn in
     Qmap.add qn node qmap, node
   | Some node -> qmap, node
 
@@ -290,20 +298,40 @@ let rec build_edges ~vertexes g nodes =
 
 
 let do_collapse_fallthru g =
-  Cfg.fold_vertex begin fun n cfg ->
-    match Cfg.pred_e cfg n with
-    | [(({ typ = `Internal; _ } as pred), FallThrough, _)] ->
-      let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
-          if List.exists
-              begin fun succ -> qn_equal succ.qid next.qid end
-              (Cfg.succ cfg pred)
-          then cfg
-          else Cfg.add_edge_e cfg (pred, e, next)
-        end cfg n cfg in
-      pred.names <- NEL.(n.names @ pred.names);
-      Cfg.remove_vertex cfg n
-    | _ -> cfg
-  end g g
+  let get_names_if_collapsable { typ; _ } =
+    match typ with
+    | Collapsed names -> Some names
+    | Normal name -> Some (NEL.One name)
+    | Entry _ | External _ | Split _ -> None in
+  let collapse_node ~cfg ~names_map ~node ~pred n_names pred_names =
+    let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
+        Cfg.add_edge_e cfg (pred, e, next)
+      end cfg node cfg in
+    let names_map = Qmap.update pred.qid
+        begin function
+          | None -> Some NEL.(n_names @ pred_names)
+          | Some names -> Some NEL.(n_names @ names)
+        end names_map in
+    Cfg.remove_vertex cfg node, names_map
+  in
+  let names_map = Qmap.empty in
+  let cfg, names_map =
+    Cfg.fold_vertex begin fun node (cfg, names_map) ->
+      match get_names_if_collapsable node with
+      | None -> (cfg, names_map)
+      | Some n_names ->
+        match Cfg.pred_e cfg node with
+        | [(({ typ = Normal pred_name ; _ } as pred), FallThrough, _)] ->
+          collapse_node ~cfg ~names_map ~node ~pred n_names (NEL.One pred_name)
+        | [(({ typ = Collapsed pred_names ; _ } as pred), FallThrough, _)] ->
+          collapse_node ~cfg ~names_map ~node ~pred n_names pred_names
+        | _ -> cfg, names_map
+    end g (g, names_map) in
+  Cfg.map_vertex begin fun node ->
+    match Qmap.find_opt node.qid names_map with
+    | None -> node
+    | Some names -> { node with typ = Collapsed (NEL.rev names) }
+  end cfg
 
 let do_hide_unreachable g =
   let rec aux cfg =
@@ -318,18 +346,22 @@ let do_hide_unreachable g =
   in aux g
 
 let do_shatter_hubs ?(limit=20) g =
+  let is_shatterable { typ; _ } =
+    match typ with
+    | Normal name -> Some name
+    | External _ | Entry _ | Split _ | Collapsed _ -> None
+  in
   Cfg.fold_vertex begin fun n cfg ->
-    if Cfg.in_degree cfg n >= limit
-    then begin
+    match Cfg.in_degree cfg n >= limit, is_shatterable n with
+    | true, Some name ->
       Cfg.fold_pred_e begin fun edge cfg ->
         let cfg = Cfg.remove_edge_e cfg edge in
-        let n_clone = { (clone_node n) with typ = `SplitHub } in
+        let n_clone = { (clone_node n) with typ = Split name } in
         let (pred, edge, _) = edge in
         let cfg = Cfg.add_edge_e cfg (pred, edge, n_clone) in
         cfg
       end cfg n cfg
-    end
-    else cfg
+    | _ -> cfg
   end g g
 
 let cfg_of_nodes nodes =
@@ -365,10 +397,9 @@ let cfg_of ~(cu: cobol_unit) =
   |> begin function (* adding entry point if not already present *)
     | ({ qid; _ } as hd )::tl
       when qn_equal qid default_name ->
-      { hd with id=0; typ = `EntryPara; names = NEL.One "Entry paragraph" }::tl
+      { hd with id=0; typ = Entry `Paragraph }::tl
     | l ->
-      { (dummy_node ~typ:`EntryPoint default_name)
-        with id=0; names = NEL.One "Entry point" } :: l
+      { (new_node ~typ:`EntryPoint default_name) with id=0 } :: l
   end
   |> cfg_of_nodes
 
@@ -377,15 +408,15 @@ let cfg_of_section ~cu ({ section_paragraphs; section_name }: procedure_section)
   let default_name = ~&section_name in
   let nodes =
     List.fold_left begin fun acc p ->
-      let node = build_node ~default_name ~cu p  in
-      let name = name_to_string node.qid in
-      { node with names = NEL.One name } :: acc
+      build_node ~qn_to_string:name_to_string ~default_name ~cu p
+      :: acc
     end [] section_paragraphs.list
     |> List.rev in
-  let nodes = match nodes with
-    | entry::tl -> { entry with typ = `EntrySection }::tl
-    | [] -> []
-  in cfg_of_nodes nodes
+  begin match nodes with
+    | ({ typ = Normal name; _ } as entry)::tl ->
+      { entry with typ = Entry (`Section name) }::tl
+    | l -> l end
+  |> cfg_of_nodes
 
 type graph = {
   name: string;
@@ -410,9 +441,17 @@ let to_d3_string cfg =
       end cfg [] in
   let cfg_nodes = Cfg.fold_vertex
       begin fun n acc ->
-        Pretty.to_string "{\"id\":%d,\"name\":\"%s\"}"
-          n.id (fullqn_to_string n.qid)
-        :: acc
+        let name =
+          match n.typ with
+          | Normal name | Entry (`Section name) | External name | Split name ->
+            name
+          | Collapsed names -> NEL.hd names
+          | Entry `Point -> "Entry point"
+          | Entry `Paragraph -> "Entry paragraph"
+        in Pretty.to_string
+          "{\"id\":%d,\"name\":\"%s\",\"fullname\":\"%s\"}"
+          n.id name (fullqn_to_string n.qid)
+           :: acc
       end cfg [] in
   let str_nodes = String.concat "," cfg_nodes in
   let str_edges = String.concat "," cfg_edges in
