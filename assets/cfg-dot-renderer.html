@@ -28,7 +28,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  z-index: -1;
 }
 .hidden {
   display: none !important;
@@ -111,7 +110,7 @@ hr {
     <div id="render-options" class="modal hidden">
       <div><input type="checkbox" id="unreachable" />
         <label for="unreachable">Remove unreachable nodes</label></div>
-      <div><input type="checkbox" id="fallthru" checked />
+      <div><input type="checkbox" id="fallthru" />
         <label for="fallthru">Collapse fallthrough transitions</label></div>
       <div><input type="checkbox" id="hubshatter"/>
         <label for="hubshatter">Split hubs with more than
@@ -129,7 +128,6 @@ hr {
       node options
     </div>
   </div>
-  <div id="app"></div>
   <div id="rendering">
     Rendering... Please wait <br/>
     If this takes too long, you can try changing the Render Options :
@@ -137,6 +135,8 @@ hr {
       <li>Reduce the incoming edge requirement for spliting hubs</li>
       <li>Collapse nodes that are only linked via a fallthrough edge</li>
     </ul>
+    <button onclick="toggleRenderOptions()">Render Options</button>
   </div>
+  <div id="app"></div>
 </body>
 </html>

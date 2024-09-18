@@ -25,7 +25,7 @@ type t = {
 let create
     ?(graph_name=None)
     ?(hide_unreachable=false)
-    ?(collapse_fallthru=true)
+    ?(collapse_fallthru=false)
     ?(shatter_hubs=None)
     ?(transformation=None)
     ?(hidden_nodes=[])
