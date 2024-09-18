@@ -134,21 +134,42 @@ let handle_get_project_config_command param registry =
                               expected)" Yojson.Safe.(to_string (param :> t))
 
 let create_cfg_options o =
+  let open Yojson.Safe.Util in
   let graph_name =
-    try Some (List.assoc "graph_name" o |> Yojson.Safe.Util.to_string)
-    with Not_found -> None in
+    List.assoc_opt "graph_name" o |> Option.map to_string in
   let hide_unreachable =
-    try Some (List.assoc "hide_unreachable" o |> Yojson.Safe.Util.to_bool)
-    with Not_found -> None in
+    List.assoc_opt "hide_unreachable" o |> Option.map to_bool in
   let collapse_fallthru =
-    try Some (List.assoc "collapse_fallthru" o |> Yojson.Safe.Util.to_bool)
-    with Not_found -> None in
+    List.assoc_opt "collapse_fallthru" o |> Option.map to_bool in
   let shatter_hubs =
-    try Some (List.assoc "shatter_hubs" o |> Yojson.Safe.Util.to_int)
-    with Not_found -> None in
-  Cobol_cfg.Options.create ~graph_name ?hide_unreachable ?collapse_fallthru ~shatter_hubs ()
+    List.assoc_opt "shatter_hubs" o |> Option.map to_int in
+  let transformation =
+    let id =
+      List.assoc_opt "id" o |> Option.map to_int in
+    let action = List.assoc_opt "action" o |> Option.map to_string in
+    match action, id with
+    | Some "descendents", Some id ->
+      Some (Cobol_cfg.Options.Descendents id)
+    | Some "neighborhood", Some id ->
+      Some (Cobol_cfg.Options.Neighborhood id)
+    | _ -> None
+  in
+  let hidden_nodes =
+    List.assoc_opt "hidden_nodes" o |> Option.map to_list
+    |> Option.map (List.map to_int) in
+  let split_nodes =
+    List.assoc_opt "split_nodes" o |> Option.map to_list
+    |> Option.map (List.map to_int) in
+  Cobol_cfg.Options.create ()
+    ~graph_name
+    ?hide_unreachable
+    ?collapse_fallthru
+    ~shatter_hubs
+    ~transformation
+    ?hidden_nodes
+    ?split_nodes
 
-let handle_open_cfg registry params =
+let handle_get_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri, options = Yojson.Safe.Util.(
       to_string @@ member "uri" params,
@@ -171,10 +192,9 @@ let handle_open_cfg registry params =
           ("nodes_pos", `Assoc nodes_pos);
           ("name", `String name);]
       in
-      Some (`Assoc ["graphviz_legend", `String graphviz_legend;
-        "graphs", `List (List.map yojsonify graphs)])
+      Some (`List (List.map yojsonify graphs))
     end
-  |> Option.value ~default:(`Assoc [])
+  |> Option.value ~default:(`List [])
 
 let handle_find_procedure registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
@@ -890,7 +910,7 @@ let on_request
         handle_get_project_config_command param registry
     | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
-        Ok (handle_open_cfg registry param, state)
+        Ok (handle_get_cfg registry param, state)
     | UnknownRequest { meth = "superbol/findProcedure";
                        params = Some param } ->
         Ok (handle_find_procedure registry param, state)

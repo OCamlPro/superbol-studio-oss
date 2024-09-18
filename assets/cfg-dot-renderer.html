@@ -18,6 +18,9 @@ body {
 #app {
   flex-grow: 1;
 }
+#modals {
+  height: 0;
+}
 
 #rendering {
   position: absolute;
@@ -30,45 +33,101 @@ body {
 .hidden {
   display: none !important;
 }
-#legend {
+.modal {
   position: absolute;
-  margin-block-start: .5em;
-  padding: 2px 2px 0 2px;
-  width: 500px;
-  background-color: var(--vscode-editor-background);
+  background-color: var(--vscode-sideBar-background);
   border: var(--vscode-focusBorder) 1px solid;
 }
-#options {
+#legend {
+  padding: 2px 2px 0 2px;
+  width: 500px;
+}
+#render-options {
   display: flex;
   flex-flow: column;
-  position: absolute;
-  margin-block-start: .5em;
   padding: .5em .2em;
-  background-color: var(--vscode-editor-background);
-  border: var(--vscode-focusBorder) 1px solid;
 }
 #hubcount {
   width: 50px;
 }
+#context-menu-background {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #0000;
+}
+#context-menu {
+  z-index: 10;
+  padding-block: .25em;
+}
+#context-menu p {
+  margin: 0;
+  padding-inline: .5em;
+  padding-block : .25em;
+}
+#context-menu p:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+hr {
+  margin: 0;
+  border-color: var(--vscode-editor-foreground);
+}
+#render-btn {
+  align-self:center;
+  margin-block-start:.5em;
+}
+.nodes-list {
+  padding-block: .5em;
+  margin: 0;
+}
+.nodes-list > p {
+  margin: 0;
+}
+.nodes-list > p:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
 </style>
 </head>
 <body data-vscode-context='{"preventDefaultContextMenuItems": true}'>
+  <div id="context-menu-background">
+    <div id="context-menu" class="modal">
+      <p onclick="actionDescendents()">Show descendents</p>
+      <p onclick="actionNeighborhood()">Show 3-hop neighborhood</p>
+      <hr />
+      <p onclick="actionHideNode()">Hide node</p>
+      <p onclick="actionSplitNode()">Split node</p>
+    </div>
+  </div>
   <div id="buttons">
     <button onclick="reset()">Reset Zoom</button>
-    <button onclick="toggleOptions()">Render Options</button>
+    <button onclick="toggleRenderOptions()">Render Options</button>
     <button onclick="toggleLegend()">Show legend</button>
-    <div id="options" class="hidden">
+    <button id='history-btn' onclick="historyGoBack()" disabled>&lt;&lt; Go back</button>
+  </div>
+  <div id="modals">
+    <div id="render-options" class="modal hidden">
       <div><input type="checkbox" id="unreachable" />
-      <label for="unreachable">Remove unreachable nodes</label></div>
+        <label for="unreachable">Remove unreachable nodes</label></div>
       <div><input type="checkbox" id="fallthru" checked />
-      <label for="fallthru">Collapse fallthrough transitions</label></div>
+        <label for="fallthru">Collapse fallthrough transitions</label></div>
       <div><input type="checkbox" id="hubshatter"/>
-      <label for="hubshatter">Split hubs with more than
-      <input type="number" id="hubcount" value="20" /> incoming edges</label>
+        <label for="hubshatter">Split hubs with more than
+          <input type="number" id="hubcount" value="20" /> incoming edges</label>
       </div>
-      <button style="align-self:center;margin-block-start:1em" onclick="rerender()">Render</button>
+      <hr/>
+      <label>List of hidden nodes</label>
+      <div id="hidden_nodes" class="nodes-list"></div>
+      <label>List of split nodes</label>
+      <div id="split_nodes" class="nodes-list"></div>
+      <button id="render-btn" onclick="rerender()">Render</button>
     </div>
-    <div id="legend" class="hidden"></div>
+    <div id="legend" class="modal hidden"></div>
+    <div id="node-options" class="modal hidden">
+      node options
+    </div>
   </div>
   <div id="app"></div>
   <div id="rendering">
