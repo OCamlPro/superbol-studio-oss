@@ -145,11 +145,14 @@ function actionNeighborhood() {
 
 function createClickableElement(node, parentId) {
   const el = document.createElement("p")
-  el.append(`Show "${node.name}" `)
+  if(parentId == "hidden_nodes") {
+    el.append(`Show "${node.name}" `)
+  }
+  else el.append(`Join "${node.name}" `);
   const linkedNodeId = node.id;
   el.onclick = (ev) => {
     ev.target.remove()
-    if(id == "hidden_nodes") {
+    if(parentId == "hidden_nodes") {
       renderOptions.hidden_nodes.splice(
         renderOptions.hidden_nodes.findIndex(i => i == linkedNodeId),
         1)
