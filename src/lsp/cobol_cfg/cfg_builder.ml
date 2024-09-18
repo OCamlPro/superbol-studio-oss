@@ -22,11 +22,6 @@ type jumps =
   | GoDepending of qualname
   | Perform of qualname
 
-module Qualnames = Set.Make(struct
-  type t = qualname
-  let compare = Cobol_ptree.compare_qualname
-end)
-
 module Jumps = Set.Make(struct
     type t = jumps
     let compare j1 j2 =
@@ -333,11 +328,12 @@ let do_collapse_fallthru g =
     | Some names -> { node with typ = Collapsed (NEL.rev names) }
   end cfg
 
-let do_hide_unreachable g =
+let do_hide_unreachable ~except g =
   let rec aux cfg =
     let did_remove, cfg =
       Cfg.fold_vertex begin fun n (did_remove, cfg) ->
         if Cfg.in_degree cfg n <= 0 && not (is_entry n)
+        && not (List.mem n.id except)
         then true, Cfg.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
@@ -345,15 +341,21 @@ let do_hide_unreachable g =
     if did_remove then aux cfg else cfg
   in aux g
 
-let do_shatter_hubs ?(limit=20) g =
+let do_shatter_nodes ~ids ~limit g =
   let is_shatterable { typ; _ } =
     match typ with
     | Normal name -> Some name
     | External _ | Entry _ | Split _ | Collapsed _ -> None
   in
+  let is_above_limit n =
+    match limit with
+    | Some limit -> Cfg.in_degree g n >= limit
+    | None -> false
+  in
   Cfg.fold_vertex begin fun n cfg ->
-    match Cfg.in_degree cfg n >= limit, is_shatterable n with
-    | true, Some name ->
+    match is_shatterable n with
+    | Some name
+      when is_above_limit n || List.mem n.id ids ->
       Cfg.fold_pred_e begin fun edge cfg ->
         let cfg = Cfg.remove_edge_e cfg edge in
         let n_clone = { (clone_node n) with typ = Split name } in
@@ -364,6 +366,64 @@ let do_shatter_hubs ?(limit=20) g =
     | _ -> cfg
   end g g
 
+let find_node_with ~id cfg =
+  Cfg.fold_vertex begin fun node -> function
+    | None when node.id == id -> Some node
+    | acc -> acc
+  end cfg None
+
+let restrict_to_descendents id cfg =
+  let module Ids = Set.Make(Int) in
+  match find_node_with ~id cfg with
+  | None -> cfg
+  | Some node ->
+    let ids = Ids.singleton node.id in
+    let module Dfs = Graph.Traverse.Dfs(Cfg) in
+    let ids = Dfs.fold_component begin fun node ids ->
+        Ids.add node.id ids
+      end ids cfg node in
+    Cfg.fold_vertex begin fun node cfg ->
+      if Ids.mem node.id ids
+      then cfg
+      else Cfg.remove_vertex cfg node
+    end cfg cfg
+
+
+let max_depth = 3
+let restrict_to_neighborhood id cfg =
+  let module Nodes = Set.Make(Node) in
+  match find_node_with ~id cfg with
+  | None -> cfg
+  | Some node ->
+    let nodes = Nodes.singleton node in
+    let rec explore prev_depth_nodes explored_nodes depth =
+      if depth > max_depth
+      then Nodes.empty, explored_nodes
+      else
+        let next_depth_nodes = Nodes.fold begin fun node new_nodes ->
+          Cfg.fold_succ begin fun succ new_nodes ->
+            if Nodes.mem succ explored_nodes
+            then new_nodes
+            else Nodes.add succ new_nodes
+          end cfg node new_nodes
+        end prev_depth_nodes Nodes.empty in
+        let explored_nodes = Nodes.union explored_nodes prev_depth_nodes in
+        explore next_depth_nodes explored_nodes (depth+1)
+    in
+    let _, reachables = explore nodes nodes 0 in
+    Cfg.fold_vertex begin fun node cfg ->
+      if Nodes.mem node reachables
+      then cfg
+      else Cfg.remove_vertex cfg node
+    end cfg cfg
+
+let remove_nodes ids cfg =
+  List.fold_left begin fun cfg id ->
+  match find_node_with ~id cfg with
+  | None -> cfg
+  | Some node -> Cfg.remove_vertex cfg node
+  end cfg ids
+
 let cfg_of_nodes nodes =
   let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
       Cfg.add_vertex g node,
@@ -373,12 +433,25 @@ let cfg_of_nodes nodes =
   build_edges ~vertexes g nodes
 
 let handle_cfg_options ~(options: Cfg_options.t) cfg =
+  let unreachable_expections =
+    match options.transformation with
+    | Some Cfg_options.Neighborhood id
+    | Some Cfg_options.Descendents id -> [id]
+    | None -> [] in
   cfg
-  |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
-  |> (if options.hide_unreachable then do_hide_unreachable else Fun.id)
-  |> (match options.shatter_hubs with
-      | Some limit -> do_shatter_hubs ~limit
+  |> (match options.transformation with
+      | Some Cfg_options.Descendents id -> restrict_to_descendents id
+      | Some Cfg_options.Neighborhood id -> restrict_to_neighborhood id
       | _ -> Fun.id)
+  |> (if options.hide_unreachable
+      then do_hide_unreachable ~except:unreachable_expections else Fun.id)
+  |> (match options.hidden_nodes with
+      | [] -> Fun.id
+      | l -> remove_nodes l)
+  |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
+  (* IMPORTANT: shatter needs to be after collapse, or else it's possible
+     to find a collapsed node linked to duplicate shattered nodes *)
+  |> do_shatter_nodes ~ids:options.split_nodes ~limit:options.shatter_hubs
 
 let cfg_of ~(cu: cobol_unit) =
   node_idx := 0;
@@ -470,9 +543,9 @@ let make_cfg ?(graph_name=None) ({ group; _ }: Cobol_typeck.Outputs.t) =
             let name = Pretty.to_string "%a (%s)"
                 Cobol_ptree.pp_qualname' ~&sec.section_name
                 ((~&) cu.unit_name) in
-            if not (is_to_include name)
-            then None
-            else Some ( name, cfg_of_section ~cu ~&sec)
+            if is_to_include name
+            then Some (name, cfg_of_section ~cu ~&sec)
+            else None
         end cu.unit_procedure.list in
       let cu_graph =
         if is_to_include ((~&) cu.unit_name)
@@ -492,24 +565,3 @@ let make ~(options: Cfg_options.t) (checked_doc: Cobol_typeck.Outputs.t) =
       nodes_pos = nodes_pos cfg;
     }
   end
-
-let graphviz_legend =
-{|digraph legend {
-  1 [shape=doubleoctagon; label="An entry point\nof the program"]
-  2 [shape=rect; label="A section or paragraph"]
-  3 [shape=record; label="{2 collapsed paragraphs or sections|linked by a fallthrough transition}"]
-  4 [shape=rect; style=dashed; label="A copy of a split hub"]
-
-  10 [shape=plaintext; label=""]
-  11 [shape=plaintext; label=""]
-  12 [shape=plaintext; label=""]
-  13 [shape=plaintext; label=""]
-
-  10 -> 11 [style=solid; label="GO"]
-  11 -> 12 [style=dashed; label="PERFORM"]
-  12 -> 13 [style=dotted; label="fallthrough"]
-
-  {rank=source; 2; 1;}
-  {rank=same; 3; 4 }
-  {rank=sink; 10; 11; 12; 13 }
-}|}
