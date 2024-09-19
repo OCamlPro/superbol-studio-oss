@@ -1,10 +1,12 @@
 const vscode = acquireVsCodeApi()
 
+const elementLegend = document.getElementById('legend');
+
 function toggleLegend() {
-  if(document.getElementById('legend').classList != "") {
-    document.getElementById('legend').classList = "";
+  if(elementLegend.classList.contains("hidden")) {
+    elementLegend.classList.remove("hidden");
   }
-  else document.getElementById('legend').classList = "hidden";
+  else elementLegend.classList.add("hidden");
 }
 
 var graph = undefined;
@@ -264,7 +266,7 @@ function buildLegend() {
     .attr("d", "M 50 70 h 60")
     .attr("stroke", "black")
     .classed("animated", true)
-    .attr("stroke-dasharray", getDasharray({ type: "u" }))
+    .attr("stroke-dasharray", getDasharray({ type: "g" }))
 
   svg_g.append("text")
     .attr("x", 130).attr("y", 75)
@@ -274,7 +276,7 @@ function buildLegend() {
     .attr('d', 'M 50 110 h 60')
     .classed("animated", true)
     .attr("stroke", "black")
-    .attr("stroke-dasharray", getDasharray({ type: "c" }))
+    .attr("stroke-dasharray", getDasharray({ type: "p" }))
 
   svg_g.append("text")
     .attr("x", 130).attr("y", 115)
