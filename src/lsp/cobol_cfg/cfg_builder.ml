@@ -88,8 +88,8 @@ type edge =
   | Perform
   | Go
 
-  module Node = struct
-    type t = node
+module Node = struct
+  type t = node
   let compare node other =
     Int.compare node.id other.id
   let hash node =
@@ -99,13 +99,13 @@ type edge =
 end
 
 module Edge = struct
-   type t = edge
-   let compare = Stdlib.compare
-   let default = FallThrough
-   let to_string = function
-     | FallThrough -> "f"
-     | Perform -> "p"
-     | Go -> "g"
+  type t = edge
+  let compare = Stdlib.compare
+  let default = FallThrough
+  let to_string = function
+    | FallThrough -> "f"
+    | Perform -> "p"
+    | Go -> "g"
 end
 
 module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
@@ -233,9 +233,9 @@ let cfg_of ~(cu: cobol_unit) =
         build_node ~cu para :: acc
       | Section { payload = { section_paragraphs; _ }; _ } ->
         fst @@ List.fold_left begin fun (acc, is_section) p ->
-            build_node ~is_section ~cu p :: acc,
-            false
-          end (acc, true) section_paragraphs.list
+          build_node ~is_section ~cu p :: acc,
+          false
+        end (acc, true) section_paragraphs.list
     end [] cu.unit_procedure.list
   in
   List.rev nodes
@@ -328,7 +328,7 @@ let do_hide_unreachable ~except g =
     let did_remove, cfg =
       Cfg.fold_vertex begin fun n (did_remove, cfg) ->
         if Cfg.in_degree cfg n <= 0 && not (is_entry n)
-        && not (List.mem n.id except)
+           && not (List.mem n.id except)
         then true, Cfg.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
@@ -355,13 +355,13 @@ let do_shatter_nodes ~ids ~limit g =
     match shatter_typ n with
     | Some (typ, remove_original)
       when is_above_limit n || List.mem n.id ids ->
-        let cfg = Cfg.fold_pred_e begin fun edge cfg ->
-        let cfg = Cfg.remove_edge_e cfg edge in
-        let n_clone = { (clone_node n) with typ } in
-        let (pred, edge, _) = edge in
-        let cfg = Cfg.add_edge_e cfg (pred, edge, n_clone) in
-        cfg
-      end cfg n cfg in
+      let cfg = Cfg.fold_pred_e begin fun edge cfg ->
+          let cfg = Cfg.remove_edge_e cfg edge in
+          let n_clone = { (clone_node n) with typ } in
+          let (pred, edge, _) = edge in
+          let cfg = Cfg.add_edge_e cfg (pred, edge, n_clone) in
+          cfg
+        end cfg n cfg in
       if remove_original
       then Cfg.remove_vertex cfg n
       else cfg
@@ -403,12 +403,12 @@ let restrict_to_neighborhood id cfg =
       then Nodes.empty, explored_nodes
       else
         let next_depth_nodes = Nodes.fold begin fun node new_nodes ->
-          Cfg.fold_succ begin fun succ new_nodes ->
-            if Nodes.mem succ explored_nodes
-            then new_nodes
-            else Nodes.add succ new_nodes
-          end cfg node new_nodes
-        end prev_depth_nodes Nodes.empty in
+            Cfg.fold_succ begin fun succ new_nodes ->
+              if Nodes.mem succ explored_nodes
+              then new_nodes
+              else Nodes.add succ new_nodes
+            end cfg node new_nodes
+          end prev_depth_nodes Nodes.empty in
         let explored_nodes = Nodes.union explored_nodes prev_depth_nodes in
         explore next_depth_nodes explored_nodes (depth+1)
     in
@@ -421,9 +421,9 @@ let restrict_to_neighborhood id cfg =
 
 let remove_nodes ids cfg =
   List.fold_left begin fun cfg id ->
-  match find_node_with ~id cfg with
-  | None -> cfg
-  | Some node -> Cfg.remove_vertex cfg node
+    match find_node_with ~id cfg with
+    | None -> cfg
+    | Some node -> Cfg.remove_vertex cfg node
   end cfg ids
 
 let handle_cfg_options ~(options: Cfg_options.t) cfg =
