@@ -58,20 +58,20 @@ module JumpsCollector = struct
                terminal = false;
                will_fallthru = true;
                skip_remaining = false;
-  }
+             }
 
   let folder ~cu = object (v)
     inherit [acc] Visitor.folder
 
     method! fold_goback' _ acc =
       skip @@ { acc with terminal = true;
-      will_fallthru = false;
-      skip_remaining = true }
+                         will_fallthru = false;
+                         skip_remaining = true }
 
     method! fold_stop' _ acc =
       skip @@ { acc with terminal = true;
-      will_fallthru = false;
-      skip_remaining = true }
+                         will_fallthru = false;
+                         skip_remaining = true }
 
     method! fold_exit' { payload = exit_stmt; _ } acc =
       skip @@
@@ -85,17 +85,20 @@ module JumpsCollector = struct
       | ExitSection -> { acc with skip_remaining = true } (* TODO: go to next section ? *)
 
     method! fold_evaluate' { payload; _ } acc =
-      let listsplit4 l =
-        List.fold_left begin fun (a_acc, b_acc, c_acc, d_acc) (a, b, c, d) ->
-          (a::a_acc, b::b_acc, c::c_acc, d::d_acc)
+      let acc_list_split l =
+        List.fold_left begin fun
+          (a_acc, b_acc, c_acc, d_acc)
+          { jumps; terminal; will_fallthru; skip_remaining } ->
+          (jumps::a_acc,
+           terminal::b_acc,
+           will_fallthru::c_acc,
+           skip_remaining::d_acc)
         end ([], [], [], []) l in
       let { eval_branches; eval_otherwise; _ }: Cobol_ptree.evaluate_stmt =
         payload in
       let jumps, terminals, unreachables, skips = List.map begin fun branch ->
-        let { jumps; terminal; will_fallthru; skip_remaining } =
-            Cobol_ptree.Visitor.fold_evaluate_branch v branch init
-        in (jumps, terminal, will_fallthru, skip_remaining)
-        end eval_branches |> listsplit4 in
+          Cobol_ptree.Visitor.fold_evaluate_branch v branch init
+        end eval_branches |> acc_list_split in
       let other =
         Cobol_ptree.Visitor.fold_statements v eval_otherwise init in
       skip {

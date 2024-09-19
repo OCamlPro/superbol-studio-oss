@@ -60,7 +60,7 @@ type node = {
   typ: node_type;
   jumps: Jumps.t;
   will_fallthru: bool;
-  terminal: bool;
+  terminal: bool; (* unused atm *)
 }
 
 let is_entry n =
@@ -98,18 +98,25 @@ module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
 (* DEFAULT CFG BUILDER FUNCTION *)
 
 let node_idx = ref 0
+
+let reset_global_counter () =
+  node_idx := 0
+
+let incr ref =
+  ref := !ref + 1;
+  !ref
+
 let build_node ?(qn_to_string=fullqn_to_string) ~cu paragraph =
   let { jumps; will_fallthru; terminal; skip_remaining = _ }
     : JumpsCollector.acc = Visitor.fold_procedure_paragraph'
       (JumpsCollector.folder ~cu) paragraph JumpsCollector.init in
-  node_idx:=!node_idx+1;
   let typ, loc = match ~&paragraph.paragraph_name with
     | None -> Entry `Paragraph, ~@paragraph
     | Some qn ->
       let fullqn = full_qn' ~cu qn in
       Normal (fullqn, qn_to_string fullqn), ~@qn
   in {
-    id = !node_idx;
+    id = incr node_idx;
     loc = Some loc;
     jumps;
     will_fallthru;
@@ -118,7 +125,6 @@ let build_node ?(qn_to_string=fullqn_to_string) ~cu paragraph =
   }
 
 let new_node ~typ =
-  node_idx:= !node_idx + 1;
   let loc_of ~(qn: qualname) = match qn with
     | Cobol_ptree.Name name
     | Qual (name, _) -> ~@name in
@@ -128,7 +134,7 @@ let new_node ~typ =
     | `Entry (name, loc) -> Entry (`Statement name), Some loc
     | `Call s -> External s, None
   in {
-    id = !node_idx;
+    id = incr node_idx;
     loc;
     jumps = Jumps.empty;
     will_fallthru = true;
@@ -194,7 +200,7 @@ let build_edges nodes =
   edge_builder_aux ~vertexes g nodes
 
 let cfg_of ~(cu: cobol_unit) =
-  node_idx := 0;
+  reset_global_counter ();
   let nodes = List.fold_left begin fun acc block ->
       match block with
       | Paragraph para ->
@@ -213,7 +219,7 @@ let cfg_of ~(cu: cobol_unit) =
   |> build_edges
 
 let cfg_of_section ~cu ({ section_paragraphs; _ }: procedure_section) =
-  node_idx := 0;
+  reset_global_counter ();
   let nodes =
     List.fold_left begin fun acc p ->
       build_node ~qn_to_string:name_to_string ~cu p :: acc
@@ -302,8 +308,7 @@ let do_hide_unreachable ~except g =
   in aux g
 
 let clone_node node =
-  node_idx:= !node_idx + 1;
-  { node with id = !node_idx; }
+  { node with id = incr node_idx; }
 
 let do_shatter_nodes ~ids ~limit g =
   let shatter_typ { typ; _ } =
