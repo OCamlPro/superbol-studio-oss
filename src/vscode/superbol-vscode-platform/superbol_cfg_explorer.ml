@@ -152,10 +152,10 @@ let update_webview_data ~uri ~typ ?graph ?render_options () =
   let filename = Uri.path uri in
   match Hashtbl.find_opt webview_panels (filename, typ) with
   | Some { webview_panel; render_options=current_ro; graph=current_g } ->
-      let render_options = Option.value ~default:current_ro render_options in
-      let graph = Option.value ~default:current_g graph in
+    let render_options = Option.value ~default:current_ro render_options in
+    let graph = Option.value ~default:current_g graph in
     Hashtbl.replace webview_panels (filename, typ)
-    { webview_panel; graph; render_options }
+      { webview_panel; graph; render_options }
   | None -> ()
 
 (* CLICK ON NODE *)
