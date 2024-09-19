@@ -37,8 +37,8 @@ var rect = document.getElementById("graph").getBoundingClientRect();
 const margin = {top: 20, right: 30, bottom: 20, left: 30},
       width = rect.width;
 
-function getShortenName(d) {
-  var name = d.name.split(" IN ")[0]
+function getShortenName(n) {
+  var name = n.name.split(" IN ")[0]
   if(name.length > 14) {
     return name.slice(0, 12) + ".."
   }
@@ -54,12 +54,8 @@ function getDasharray(l) {
 }
 
 function getNodeColor(color) {
-  return function (d) {
-    const name = d.fullname.split(" IN ");
-    if(name.length > 1) {
-      return color(name[1])
-    }
-    return color(d.name)
+  return function (n) {
+    return color(n.section ? n.section : n.name)
   }
 }
 const NODE_CENTER_X = 100
@@ -73,10 +69,10 @@ function map_to_max_spread(val, k) {
 }
 
 function getLinkPath(y) {
-  return function (d) {
-    start = y(d.source)
-    end = y(d.target)
-    if(d.type === "f") {
+  return function (l) {
+    start = y(l.source)
+    end = y(l.target)
+    if(l.type === "f") {
       return `M ${NODE_CENTER_X} ${start+NODE_RADIUS} V ${end - NODE_RADIUS}`
     } else {
       path_x_offset = NODE_CENTER_X + NODE_RADIUS;
@@ -92,27 +88,27 @@ function getLinkPath(y) {
 }
 
 var unfocusTimeout = undefined;
-function focusNode(d) {
+function focusNode(focused) {
   clickedNode = undefined;
   if(unfocusTimeout) {
     clearTimeout(unfocusTimeout)
     unfocusTimeout = undefined;
   }
   nodes.style("opacity", n =>
-    !d.neigh.includes(n.id) && n.id != d.id
+    !focused.neigh.includes(n.id) && n.id != focused.id
     ? .4
     : 1)
-    .style("stroke", n => n.id === d.id ? "black" : "none")
+    .style("stroke", n => n.id === focused.id ? "black" : "none")
 
-  links.filter(l => l.source !== d.id && l.target !== d.id)
+  links.filter(l => l.source !== focused.id && l.target !== focused.id)
     .style("stroke", "#5553")
     .style("stroke-width", 1)
     .classed("animated", false)
     .attr("marker-mid", "")
-  links.filter(l => l.source === d.id || l.target === d.id)
-    .style("stroke", l => (l.source === d.id) ? "#7bb" : "#b7b")
+  links.filter(l => l.source === focused.id || l.target === focused.id)
+    .style("stroke", l => (l.source === focused.id) ? "#7bb" : "#b7b")
     .style("stroke-width", 3)
-    .attr("marker-mid", l => `url(#arrow-${(l.source===d.id)?"out":"in"})`)
+    .attr("marker-mid", l => `url(#arrow-${(l.source===focused.id)?"out":"in"})`)
     .classed("animated", true)
 }
 
@@ -167,10 +163,12 @@ function buildSVG(data) {
 
 
   // List of node names
-  const allNodes = data.nodes.map(d=>d.id).sort((a,b)=> a-b)
+  const allNodes = data.nodes.map(n => n.id).sort((a,b)=> a-b)
+  const sectionNodes = data.nodes.filter(n => n.section === n.name)
 
-  const sectionNames = data.nodes.filter(d => !d.name.includes(" IN "))
-  const color = d3.scaleOrdinal(sectionNames, d3.schemeCategory10)
+  const colorDiffNames =
+    Array.from(new Set(data.nodes.map(n => n.section ? n.section : n.name)))
+  const color = d3.scaleOrdinal(colorDiffNames, d3.schemeCategory10)
 
   // A linear scale to position the nodes on the X axis
   y = d3.scalePoint()
@@ -187,14 +185,14 @@ function buildSVG(data) {
 
   labels.append("rect")
     .attr("x", -margin.left)
-    .attr("y", d => y(d.id) - 6)
+    .attr("y", n => y(n.id) - 6)
     .attr("width", NODE_CENTER_X - NODE_RADIUS - 10 + margin.left)
     .attr("height", "1em")
     .attr("fill", "#fff")
 
   labels.append("text").text(getShortenName)
     .attr("x", NODE_CENTER_X - NODE_RADIUS - 10)
-    .attr("y", d=>y(d.id))
+    .attr("y", n => y(n.id))
     .style("text-anchor", "end")
     .style("alignment-baseline", "middle")
   labels.append("title").text(n => n.name)
@@ -216,17 +214,17 @@ function buildSVG(data) {
     .data(data.nodes)
     .join("circle")
       .attr("cx", NODE_CENTER_X)
-      .attr("cy", d => y(d.id))
+      .attr("cy", n => y(n.id))
       .attr("r", NODE_RADIUS)
       .style("fill", nodeColor)
       .style("stroke-width", 4)
 
   svg_g
     .selectAll("sectionnodes")
-    .data(sectionNames)
+    .data(sectionNodes)
     .join("circle")
       .attr("cx", NODE_CENTER_X)
-      .attr("cy", d => y(d.id))
+      .attr("cy", n => y(n.id))
       .attr("r", 2)
       .style("fill", "white")
 
@@ -300,7 +298,7 @@ function buildLegend() {
 
   svg_g.append("text")
     .attr("x", 130).attr("y", 195)
-    .text("PARAGRAPH")
+    .text("PARAGRAPH IN SECTION")
 
   svg_g.append("circle")
       .attr("cx", 100).attr("cy", 230).attr("r", NODE_RADIUS)
@@ -308,8 +306,17 @@ function buildLegend() {
 
   svg_g.append("text")
     .attr("x", 130).attr("y", 235)
-    .text("PARAGRAPH from another section")
+    .text("PARAGRAPH IN ANOTHER-SECTION")
 
+}
+
+function removeEntryStmt() {
+  removedIds = graph.nodes
+    .filter(n => n.name.startsWith("ENTRY "))
+    .map(n => n.id)
+  graph.nodes = graph.nodes.filter(n => !removedIds.includes(n.id))
+  graph.links = graph.links.filter(l =>
+    !removedIds.includes(l.source) && !removedIds.includes(l.target))
 }
 
 window.addEventListener("message", event => {
@@ -317,6 +324,7 @@ window.addEventListener("message", event => {
       case "graph_content":
         d3.select("#graph svg").remove()
         graph = JSON.parse(event.data.graph)
+        removeEntryStmt()
         buildSVG(graph)
         buildLegend()
       break;

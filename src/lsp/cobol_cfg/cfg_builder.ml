@@ -19,12 +19,26 @@ module NEL = Cobol_common.Basics.NEL
 
 type qualname = Cobol_ptree.qualname
 
-let fullqn_to_string qn =
-  Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
+type display_name_type =
+  | Full
+  | Short
 
-let name_to_string (qn: qualname) =
-  Cobol_ptree.(match qn with
-  | Name name | Qual (name, _) -> Pretty.to_string "%a" pp_name' name)
+let qn_to_strings : qualname -> string * string = function
+  | Name { payload; _ } -> payload, ""
+  | Qual({ payload = para; _ }, Name { payload = sec; _ }) -> para, sec
+  | _ -> raise @@ Invalid_argument
+      "qn with more than 2 qualification levels cannot \
+       come from a paragraph or section"
+
+let qn_to_fullname qn =
+  let name, qual = qn_to_strings qn in
+  if qual == ""
+  then name
+  else name ^ " IN " ^ qual
+
+let incr ref =
+  ref := !ref + 1;
+  !ref
 
 let prefix_to_string prefix =
   begin match prefix with
@@ -50,12 +64,13 @@ let entry_stmt_to_string_loc = function
 type node_type =
   | External of string
   | Entry of [`Point | `Paragraph | `Section of string | `Statement of string]
-  | Normal of qualname * string (* qn * display string *)
+  | Normal of string * string (* fullname * display_name *)
   | Collapsed of string NEL.t
   | Split of string
 
 type node = {
   id: int;
+  section_name: string;
   loc: srcloc option;
   typ: node_type;
   jumps: Jumps.t;
@@ -98,25 +113,31 @@ module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
 (* DEFAULT CFG BUILDER FUNCTION *)
 
 let node_idx = ref 0
+let call_stmt_section_name = "__CALL_STMT__"
 
 let reset_global_counter () =
   node_idx := 0
 
-let incr ref =
-  ref := !ref + 1;
-  !ref
-
-let build_node ?(qn_to_string=fullqn_to_string) ~cu paragraph =
+let build_node ?(is_section=false) ?(display_name_type=Full) ~cu paragraph =
   let { jumps; will_fallthru; terminal; skip_remaining = _ }
     : JumpsCollector.acc = Visitor.fold_procedure_paragraph'
       (JumpsCollector.folder ~cu) paragraph JumpsCollector.init in
-  let typ, loc = match ~&paragraph.paragraph_name with
-    | None -> Entry `Paragraph, ~@paragraph
+  let typ, loc, section_name = match ~&paragraph.paragraph_name with
+    | None -> Entry `Paragraph, ~@paragraph, ""
     | Some qn ->
       let fullqn = full_qn' ~cu qn in
-      Normal (fullqn, qn_to_string fullqn), ~@qn
+      let full_name = qn_to_fullname fullqn in
+      let short_name, section_name =
+        let name, qualifier = qn_to_strings fullqn in
+        name, if is_section then name else qualifier
+      in
+      let display_name = match display_name_type with
+        | Full -> full_name
+        | Short -> short_name
+      in Normal (full_name, display_name), ~@qn, section_name
   in {
     id = incr node_idx;
+    section_name;
     loc = Some loc;
     jumps;
     will_fallthru;
@@ -128,13 +149,18 @@ let new_node ~typ =
   let loc_of ~(qn: qualname) = match qn with
     | Cobol_ptree.Name name
     | Qual (name, _) -> ~@name in
-  let typ, loc = match typ with
-    | `External qn -> External (fullqn_to_string qn), Some (loc_of ~qn)
-    | `EntryPoint -> Entry `Point, None
-    | `Entry (name, loc) -> Entry (`Statement name), Some loc
-    | `Call s -> External s, None
+  let typ, loc, section_name = match typ with
+    | `External qn ->
+      let _para, section = qn_to_strings qn in
+      External (qn_to_fullname qn), Some (loc_of ~qn), section
+    | `EntryPoint -> Entry `Point, None, ""
+    | `EntryStmt ({ payload; loc }, id) ->
+      Entry (`Statement payload), Some loc, id
+    | `Call s ->
+      External s, None, call_stmt_section_name
   in {
     id = incr node_idx;
+    section_name;
     loc;
     jumps = Jumps.empty;
     will_fallthru = true;
@@ -146,8 +172,8 @@ let build_edges nodes =
   let module StringMap = Map.Make(String) in
   let find_or_add smap ~typ =
     let string_id = match typ with
-      | `External qn -> fullqn_to_string qn
-      | `Entry (name, _) -> name
+      | `External qn -> qn_to_fullname qn
+      | `EntryStmt ({ payload; _ }, _) -> payload
       | `Call name -> name in
     match StringMap.find_opt string_id smap with
     | Some node -> smap, node
@@ -177,7 +203,7 @@ let build_edges nodes =
           | Entry entry_stmt ->
             let name, loc = entry_stmt_to_string_loc entry_stmt in
             let vertexes, next =
-              find_or_add vertexes ~typ:(`Entry (name, loc)) in
+              find_or_add vertexes ~typ:(`EntryStmt (name &@ loc, current.section_name)) in
             Cfg.add_edge_e g (next, FallThrough, current),
             vertexes
         end jumps (g, vertexes)
@@ -193,7 +219,7 @@ let build_edges nodes =
   let g, vertexes = List.fold_left begin fun (g, vertexes) node ->
       Cfg.add_vertex g node,
       match node.typ with
-      | Normal (qn, _) -> StringMap.add (fullqn_to_string qn) node vertexes
+      | Normal (full_name, _) -> StringMap.add full_name node vertexes
       | _ ->  vertexes
     end (Cfg.empty, StringMap.empty) nodes
   in
@@ -206,9 +232,10 @@ let cfg_of ~(cu: cobol_unit) =
       | Paragraph para ->
         build_node ~cu para :: acc
       | Section { payload = { section_paragraphs; _ }; _ } ->
-        List.fold_left begin fun acc p ->
-          build_node ~cu p :: acc
-        end acc section_paragraphs.list
+        fst @@ List.fold_left begin fun (acc, is_section) p ->
+            build_node ~is_section ~cu p :: acc,
+            false
+          end (acc, true) section_paragraphs.list
     end [] cu.unit_procedure.list
   in
   List.rev nodes
@@ -221,9 +248,11 @@ let cfg_of ~(cu: cobol_unit) =
 let cfg_of_section ~cu ({ section_paragraphs; _ }: procedure_section) =
   reset_global_counter ();
   let nodes =
-    List.fold_left begin fun acc p ->
-      build_node ~qn_to_string:name_to_string ~cu p :: acc
-    end [] section_paragraphs.list
+    List.fold_left begin fun (acc, is_section) p ->
+      build_node ~is_section ~display_name_type:Short ~cu p :: acc,
+      false
+    end ([], true) section_paragraphs.list
+    |> fst
     |> List.rev in
   begin match nodes with
     | ({ typ = Normal (_, name); _ } as entry)::tl ->
@@ -463,22 +492,18 @@ let to_d3_string cfg =
       end cfg [] in
   let cfg_nodes = Cfg.fold_vertex
       begin fun n acc ->
-        let fullname, name =
+        let name =
           match n.typ with
-          | Normal (qn, name) -> fullqn_to_string qn, name
+          | Normal (_, name)
           | Entry (`Statement name) | Entry (`Section name)
-          | External name | Split name ->
-            name, name
+          | External name | Split name -> name
           | Collapsed _ ->
             raise @@ Invalid_argument
               "Impossible to provide d3 string with collapsed node"
-          | Entry `Point -> "Entry point", "Entry point"
-          | Entry `Paragraph -> "Entry paragraph", "Entry paragraph"
-        in Pretty.to_string
-          (* TODO: fullname is used in cfg-arc.js for correct coloring when displaying
-             section graphs, it could be refactored to only be a section_id *)
-          "{\"id\":%d,\"name\":\"%s\",\"fullname\":\"%s\"}"
-          n.id name fullname
+          | Entry `Point -> "Entry point"
+          | Entry `Paragraph -> "Entry paragraph"
+        in Pretty.to_string "{\"id\":%d,\"name\":\"%s\",\"section\":\"%s\"}"
+          n.id name n.section_name
            :: acc
       end cfg [] in
   let str_nodes = String.concat "," cfg_nodes in
