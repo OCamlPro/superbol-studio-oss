@@ -21,7 +21,6 @@ let rec find_dot tokens =
 let parse ~config ~filename ~contents =
   let program_id = ref None in
   let sql_statements = ref [] in
-  (*   let var_statements = ref [] in *)
   let procedure_division_found = ref None in
   let working_storage_found = ref false in
   let linkage_section_found = ref false in
@@ -164,12 +163,12 @@ let parse ~config ~filename ~contents =
 
       let params = List.rev params in
       let sqlStr = "EXEC SQL " ^ String.concat " " params ^ " END-EXEC" in
-      Format.fprintf Format.std_formatter "\nSTRING\n";
-      Format.fprintf Format.std_formatter "\n%s\n" sqlStr;
+(*       Format.fprintf Format.std_formatter "\nSTRING\n";
+      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; *)
 
       let sql = Sql_parser.parseString (Lexing.from_string sqlStr) in
-      Format.fprintf Format.std_formatter "\nAST\n";
-      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql;
+(*       Format.fprintf Format.std_formatter "\nAST\n";
+      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; *)
 
       sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql });
       iter tokens
