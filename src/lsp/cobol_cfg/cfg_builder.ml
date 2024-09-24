@@ -400,7 +400,7 @@ let restrict_to_neighborhood id cfg =
     let nodes = Nodes.singleton node in
     let rec explore prev_depth_nodes explored_nodes depth =
       if depth > max_depth
-      then Nodes.empty, explored_nodes
+      then explored_nodes
       else
         let next_depth_nodes = Nodes.fold begin fun node new_nodes ->
             Cfg.fold_succ begin fun succ new_nodes ->
@@ -412,9 +412,12 @@ let restrict_to_neighborhood id cfg =
         let explored_nodes = Nodes.union explored_nodes prev_depth_nodes in
         explore next_depth_nodes explored_nodes (depth+1)
     in
-    let _, reachables = explore nodes nodes 0 in
+    let reachables = explore nodes nodes 0 in
+    let all_nodes = Cfg.fold_pred begin fun pred reachables ->
+        Nodes.add pred reachables
+      end cfg node reachables in
     Cfg.fold_vertex begin fun node cfg ->
-      if Nodes.mem node reachables
+      if Nodes.mem node all_nodes
       then cfg
       else Cfg.remove_vertex cfg node
     end cfg cfg

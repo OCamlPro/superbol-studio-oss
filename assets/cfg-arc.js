@@ -324,6 +324,7 @@ window.addEventListener("message", event => {
       case "graph_content":
         d3.select("#graph svg").remove()
         graph = JSON.parse(event.data.graph)
+        document.getElementById("title").innerText = event.data.graph_name;
         removeEntryStmt()
         buildSVG(graph)
         buildLegend()
