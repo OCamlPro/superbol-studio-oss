@@ -239,6 +239,7 @@ let send_graph ~typ webview graph =
   if typ == Graphviz
   then Ojs.set_prop_ascii ojs "dot" (Ojs.string_to_js graph.string_repr_dot);
   Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr_d3);
+  Ojs.set_prop_ascii ojs "graph_name" (Ojs.string_to_js graph.name);
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 

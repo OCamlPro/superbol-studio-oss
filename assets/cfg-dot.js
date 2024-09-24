@@ -56,7 +56,8 @@ function reset() {
 
 function historyGoBack() {
   history.pop();
-  const [dot, graph, options] = JSON.parse(history[history.length - 1]);
+  const [dot, graph, options, name] = JSON.parse(history[history.length - 1]);
+  document.getElementById('title').innerText = name;
   renderOptions = options;
   renderGraph(dot, graph)
   if(history.length == 1) {
@@ -235,10 +236,11 @@ function renderGraph(dot, _graph) {
 window.addEventListener('message', event => {
     switch (event.data.type) {
       case "graph_content":
+        document.getElementById('title').innerText = event.data.graph_name;
         graph = JSON.parse(event.data.graph)
         renderGraph(event.data.dot, graph)
         hideModals()
-        history.push(JSON.stringify([event.data.dot, graph, renderOptions]))
+        history.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
         if(history.length > 1) {
           document.getElementById('history-btn').disabled = false
         }
