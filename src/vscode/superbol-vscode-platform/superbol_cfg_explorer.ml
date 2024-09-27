@@ -70,6 +70,19 @@ let decorationType =
   let options = Ojs.obj [|("backgroundColor", backgroundColor)|] in
   Window.createTextEditorDecorationType ~options
 
+(* PERSISTENT OPTION MANAGEMENT *)
+
+let state = ref None
+
+let update_state ~key value =
+  match !state with
+  | None -> ()
+  | Some state ->
+    let _ : Promise.void =
+      Memento.update state ~key ~value in ()
+
+let get_state_value ~key = Option.bind !state (Memento.get ~key)
+
 (* GRAPH FROM LSP *)
 
 type graph = {
@@ -89,6 +102,27 @@ let decode_graph res =
   let name = Jsonoo.Decode.field "name" Jsonoo.Decode.string res in
   { name; nodes_pos; string_repr_dot; string_repr_d3 }
 
+let callGetCFG ?render_options ~uri ~name client =
+  let path = Uri.path uri in
+  let data =
+    let base = ["uri", Jsonoo.Encode.string path;
+                "name", Jsonoo.Encode.string name] in
+    let full =
+      match render_options,
+            get_state_value ~key:(path ^ ":" ^ name) with
+      | Some options, _ -> ("render_options", options) :: base
+      | _, Some options -> ("render_options", Jsonoo.t_of_js options) :: base
+      | _ -> base
+    in Jsonoo.Encode.object_ full in
+  Vscode_languageclient.LanguageClient.sendRequest client ()
+    ~meth:"superbol/getCFG" ~data
+  |> Promise.then_ ~fulfilled:begin fun jsonoo ->
+    try Promise.return (Some (decode_graph jsonoo))
+    with Jsonoo.Decode_error _ ->
+      Window.showErrorMessage
+        ~message:"Impossible to render graph, \
+                  try closing and reopening the webview" ()
+  end
 
 (* WEBVIEW MANAGEMENT *)
 
@@ -233,9 +267,15 @@ let setup_window_listener ~client =
 
 (* MESSAGE MANAGER *)
 
-let send_graph ~typ webview graph =
+let send_graph ?(as_new_graph=false) ~uri ~typ webview graph =
+  let message_type = if as_new_graph
+    then "new_graph_content"
+    else "graph_content" in
   let ojs = Ojs.empty_obj () in
-  Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js "graph_content");
+  (match get_state_value ~key:(Uri.path uri ^ ":" ^ graph.name) with
+   | None -> ()
+   | Some options -> Ojs.set_prop_ascii ojs "render_options" options);
+  Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js message_type);
   if typ == Graphviz
   then Ojs.set_prop_ascii ojs "dot" (Ojs.string_to_js graph.string_repr_dot);
   Ojs.set_prop_ascii ojs "graph" (Ojs.string_to_js graph.string_repr_d3);
@@ -243,35 +283,21 @@ let send_graph ~typ webview graph =
   let _ : bool Promise.t = WebView.postMessage webview ojs
   in ()
 
-let get_and_send_graph ~client ~uri ~typ ~webview ~render_options =
-  let data =
-    let uri = Jsonoo.Encode.string @@ Uri.path uri in
-    Jsonoo.Encode.object_ ["uri", uri; "render_options", render_options] in
-  let _ : unit Promise.t =
-    Vscode_languageclient.LanguageClient.sendRequest client ()
-      ~meth:"superbol/getCFG" ~data
-    |> Promise.then_ ~fulfilled:begin fun jsonoo_res ->
-      let graphs = (Jsonoo.Decode.list decode_graph) jsonoo_res in
-      match graphs with
-      | [] ->
-        Window.showErrorMessage ()
-          ~message:"Unable to perform operation, try reloading the CFG"
-        |> Promise.map (Fun.const ())
-      | graph::_ ->
-        update_webview_data ~uri ~typ ~graph ~render_options ();
-        send_graph ~typ webview graph;
-        Promise.return ()
-    end
-  in ()
-
 let on_graph_update ~webview ~client ~uri ~typ name arg =
-  let render_options =
-    Ojs.get_prop_ascii arg "renderOptions"
-    |> begin fun ojs ->
-      Ojs.set_prop_ascii ojs "graph_name" @@ Ojs.string_to_js name;
-      ojs end
-    |> Jsonoo.t_of_js in
-  get_and_send_graph ~client ~uri ~typ ~webview ~render_options
+  let render_options_ojs = Ojs.get_prop_ascii arg "renderOptions" in
+  let render_options = Jsonoo.t_of_js render_options_ojs in
+  let path = Uri.path uri in
+  let _ : unit Promise.t = Promise.then_
+      (callGetCFG ~uri ~name ~render_options client)
+      ~fulfilled:begin function
+        | None -> Promise.return ()
+        | Some graph ->
+          update_webview_data ~uri ~typ ~graph ~render_options ();
+          update_state ~key:(path ^ ":" ^ name) render_options_ojs;
+          send_graph ~typ ~uri webview graph;
+          Promise.return ()
+      end
+  in ()
 
 let on_message ~client ~text_editor ~typ arg =
   let uri = TextEditor.document text_editor |> TextDocument.uri in
@@ -284,9 +310,11 @@ let on_message ~client ~text_editor ~typ arg =
     | "graph_update" ->
       on_graph_update ~client ~webview ~uri ~typ graph.name arg
     | "ready" ->
-      send_graph ~typ webview graph
+      send_graph ~as_new_graph:true ~typ ~uri webview graph
     | _ -> ()
   end
+
+(* USER REQUEST LOGIC *)
 
 let open_cfg_for ~typ ~text_editor ~extension_uri client =
   let open Promise in
@@ -302,27 +330,29 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
     return ()
   | Ok html_js ->
     Vscode_languageclient.LanguageClient.sendRequest client ()
-      ~meth:"superbol/getCFG" ~data
-    |> then_ ~fulfilled:begin fun jsonoo_graphs ->
-      let graphs = (Jsonoo.Decode.list decode_graph) jsonoo_graphs in
-      Window.showQuickPick ~items:(Stdlib.List.map (fun g -> g.name) graphs) ()
+      ~meth:"superbol/getPossibleCFG" ~data
+    |> then_ ~fulfilled:begin fun jsonoo_graph_names ->
+      let items = Jsonoo.Decode.(list string) jsonoo_graph_names in
+      Window.showQuickPick ~items ()
       |> then_ ~fulfilled:begin function
         | None -> return ()
         | Some name ->
-          let graph = Stdlib.List.find begin fun g ->
-              String.equal g.name name end graphs in
-          let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
-          let html_content = setup_html_js_content ~webview ~typ html_js in
-          let _ : Disposable.t =
-            WebView.onDidReceiveMessage webview ()
-              ~listener:(on_message ~client ~text_editor ~typ)
-              ~thisArgs:Ojs.null ~disposables:[]
-          in
-          if is_new
-          then WebView.set_html webview html_content
-          else send_graph ~typ webview graph;
-          setup_window_listener ~client;
-          return ()
+          then_ (callGetCFG ~uri ~name client) ~fulfilled:begin function
+            | None -> return ()
+            | Some graph ->
+              let webview, is_new = create_or_get_webview ~graph ~typ ~uri in
+              let html_content = setup_html_js_content ~webview ~typ html_js in
+              let _ : Disposable.t =
+                WebView.onDidReceiveMessage webview ()
+                  ~listener:(on_message ~client ~text_editor ~typ)
+                  ~thisArgs:Ojs.null ~disposables:[]
+              in
+              if is_new
+              then WebView.set_html webview html_content
+              else send_graph ~as_new_graph:true ~typ ~uri webview graph;
+              setup_window_listener ~client;
+              return ()
+          end
       end
     end
 
@@ -334,5 +364,7 @@ let open_cfg ?text_editor ~typ instance =
   | Some client, Some text_editor ->
     let extension_uri = ExtensionContext.extensionUri
       @@ Superbol_instance.context instance in
+    state := Some (ExtensionContext.workspaceState
+      @@ Superbol_instance.context instance);
     open_cfg_for ~typ ~extension_uri ~text_editor client
   | _ -> Promise.return ()

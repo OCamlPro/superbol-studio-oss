@@ -171,8 +171,9 @@ let create_cfg_options o =
 
 let handle_get_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
-  let uri, options = Yojson.Safe.Util.(
+  let uri, name, options = Yojson.Safe.Util.(
       to_string @@ member "uri" params,
+      to_string @@ member "name" params,
       try to_assoc @@ member "render_options" params with Type_error _ -> [])
   in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
@@ -180,21 +181,35 @@ let handle_get_cfg registry params =
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
       let options = create_cfg_options options in
-      let graphs = make ~options checked_doc in
-      let yojsonify ({ string_repr_dot; string_repr_d3; name; nodes_pos } : graph) =
+      try
+        let { string_repr_dot; string_repr_d3; name; nodes_pos } : graph =
+          make ~options ~name checked_doc in
         let nodes_pos = List.map begin fun (n,loc) ->
             let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
             (string_of_int n, Range.yojson_of_t range)
           end nodes_pos in
-        `Assoc [
-          ("string_repr_d3", `String string_repr_d3);
-          ("string_repr_dot", `String string_repr_dot);
-          ("nodes_pos", `Assoc nodes_pos);
-          ("name", `String name);]
-      in
-      Some (`List (List.map yojsonify graphs))
+        Some (`Assoc [
+            ("string_repr_d3", `String string_repr_d3);
+            ("string_repr_dot", `String string_repr_dot);
+            ("nodes_pos", `Assoc nodes_pos);
+            ("name", `String name);])
+      with Invalid_argument _ -> None
+    end
+  |> Option.value ~default:(`Assoc [])
+
+let handle_get_possible_cfg registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let uri = Yojson.Safe.Util.(to_string @@ member "uri" params) in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let open Cobol_cfg.Builder in
+      let possibles = possible_cfgs_of_doc checked_doc in
+      let yojsonify cfg_name = `String cfg_name in
+      Some (`List (List.map yojsonify possibles))
     end
   |> Option.value ~default:(`List [])
+
 
 let handle_find_procedure registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
@@ -911,6 +926,9 @@ let on_request
     | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
         Ok (handle_get_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/getPossibleCFG";
+                       params = Some param } ->
+        Ok (handle_get_possible_cfg registry param, state)
     | UnknownRequest { meth = "superbol/findProcedure";
                        params = Some param } ->
         Ok (handle_find_procedure registry param, state)

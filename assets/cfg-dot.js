@@ -32,9 +32,18 @@ const vscode = acquireVsCodeApi()
 var graphviz = undefined;
 var graph = undefined;
 var contextNode = undefined;
-var renderOptions = { ...options(), hidden_nodes: [], split_nodes: [] };
+const defaultOptions = {
+  hidden_nodes: [],
+  split_nodes: [],
+  hide_unreachable: false,
+  collapse_fallthru: false,
+  shatter_hubs: undefined,
+}
+var renderOptions = defaultOptions;
 var rendering = d3.select('#rendering')
-const history = []
+var dataHistory = []
+
+/// MODAL MANAGEMENT
 
 function hideContextMenu() {
   elementContextMenuBack.style.display = "none";
@@ -50,19 +59,53 @@ function showContextMenu(x, y) {
   elementContextMenu.style.top = `${y}px`;
 }
 
-function reset() {
-  graphviz?.resetZoom()
+function toggleLegend() {
+  if(elementLegend.classList.contains("hidden")) {
+    hideModals();
+    elementLegend.classList.remove("hidden");
+  }
+  else hideModals()
 }
 
-function historyGoBack() {
-  history.pop();
-  const [dot, graph, options, name] = JSON.parse(history[history.length - 1]);
-  document.getElementById('title').innerText = name;
-  renderOptions = options;
-  renderGraph(dot, graph)
-  if(history.length == 1) {
-    document.getElementById("history-btn").disabled = true
+function toggleRenderOptions() {
+  if(elementOptions.classList.contains("hidden")) {
+    hideModals();
+    elementOptions.classList.remove("hidden");
   }
+  else hideModals()
+}
+
+function hideModals() {
+  elementOptions.classList.add("hidden");
+  elementLegend.classList.add("hidden");
+}
+
+/// RENDER OPTION MANAGEMENT
+
+function createClickableElement(node, parentId) {
+  const el = document.createElement("p")
+  if(parentId == "hidden_nodes") {
+    el.append(`Show "${node.name}" `)
+  }
+  else el.append(`Join "${node.name}" `);
+  const linkedNodeId = node.id;
+  el.onclick = (ev) => {
+    ev.target.remove()
+    if(parentId == "hidden_nodes") {
+      renderOptions.hidden_nodes.splice(
+        renderOptions.hidden_nodes.findIndex(i => i == linkedNodeId),
+        1)
+    } else {
+      renderOptions.split_nodes.splice(
+        renderOptions.split_nodes.findIndex(i => i == linkedNodeId),
+        1)
+    }
+  }
+  document.getElementById(parentId).append(el)
+}
+
+function setRenderOptions(renderOptions_) {
+  renderOptions = { ...renderOptions, ...renderOptions_ };
   document.getElementById("unreachable").checked =
     renderOptions.hide_unreachable;
   document.getElementById("fallthru").checked =
@@ -87,28 +130,9 @@ function historyGoBack() {
   }
 }
 
-function toggleLegend() {
-  if(elementLegend.classList.contains("hidden")) {
-    hideModals();
-    elementLegend.classList.remove("hidden");
-  }
-  else hideModals()
-}
+/// RERENDERERS
 
-function toggleRenderOptions() {
-  if(elementOptions.classList.contains("hidden")) {
-    hideModals();
-    elementOptions.classList.remove("hidden");
-  }
-  else hideModals()
-}
-
-function hideModals() {
-  elementOptions.classList.add("hidden");
-  elementLegend.classList.add("hidden");
-}
-
-function options() {
+function rerender() {
   var collapse_fallthru = document.getElementById('fallthru').checked;
   var hide_unreachable = document.getElementById('unreachable').checked;
   if(document.getElementById('hubshatter').checked) {
@@ -117,18 +141,17 @@ function options() {
   else {
     var shatter_hubs = undefined;
   }
-  return {
+  renderOptions = {
+    ...renderOptions,
     hide_unreachable,
     collapse_fallthru,
     shatter_hubs,
-  }
+  };
+  vscode.postMessage({ type: 'graph_update', renderOptions })
 }
 
-function rerender() {
-  renderOptions = {
-    ...renderOptions,
-    ...options(),
-  };
+function rerenderWithDefault() {
+  renderOptions = defaultOptions;
   vscode.postMessage({ type: 'graph_update', renderOptions })
 }
 
@@ -144,28 +167,6 @@ function actionNeighborhood() {
   vscode.postMessage({ type: 'graph_update', renderOptions })
 }
 
-function createClickableElement(node, parentId) {
-  const el = document.createElement("p")
-  if(parentId == "hidden_nodes") {
-    el.append(`Show "${node.name}" `)
-  }
-  else el.append(`Join "${node.name}" `);
-  const linkedNodeId = node.id;
-  el.onclick = (ev) => {
-    ev.target.remove()
-    if(parentId == "hidden_nodes") {
-      renderOptions.hidden_nodes.splice(
-        renderOptions.hidden_nodes.findIndex(i => i == linkedNodeId),
-        1)
-    } else {
-      renderOptions.split_nodes.splice(
-        renderOptions.split_nodes.findIndex(i => i == linkedNodeId),
-        1)
-    }
-  }
-  document.getElementById(parentId).append(el)
-}
-
 function actionHideNode() {
   renderOptions.hidden_nodes.push(contextNode.id)
   createClickableElement(contextNode, "hidden_nodes")
@@ -178,6 +179,25 @@ function actionSplitNode() {
   vscode.postMessage({ type: "graph_update", renderOptions })
 }
 
+/// OTHER OPTIONS MANAGEMENT
+
+function reset() {
+  graphviz?.resetZoom()
+}
+
+function historyGoBack() {
+  dataHistory.pop();
+  const [dot, graph, options, name] = JSON.parse(dataHistory[dataHistory.length - 1]);
+  document.getElementById('title').innerText = name;
+  renderGraph(dot, graph)
+  setRenderOptions(options)
+  if(dataHistory.length == 1) {
+    document.getElementById("history-btn").disabled = true
+  }
+}
+
+/// GRAPH MANAGEMENT
+
 function focus(name) {
   d3.selectAll('svg .node polygon').attr("fill", "none")
   d3.selectAll('svg .node text')
@@ -185,6 +205,22 @@ function focus(name) {
     .select(function () { return this.parentNode })
     .select("polygon")
     .attr("fill", "red")
+}
+
+function updateTitle(graph, graph_name) {
+  const node = graph.nodes.find(n => n.id === renderOptions.id);
+  switch (renderOptions.action) {
+    case "neighborhood":
+      title = `${graph_name} : Neighborhood of ${node.name}`
+      break;
+    case "descendents":
+      title = `${graph_name} : Descendents of ${node.name}`
+      break;
+    default:
+      title = graph_name;
+      break;
+  }
+  document.getElementById('title').innerText = title;
 }
 
 function setupOnEnd() {
@@ -233,15 +269,28 @@ function renderGraph(dot, _graph) {
   graph = _graph
 }
 
+/// MAIN LISTENER
+
 window.addEventListener('message', event => {
     switch (event.data.type) {
+      case "new_graph_content":
+        graph = JSON.parse(event.data.graph)
+        setRenderOptions(event.data.render_options || {})
+        renderGraph(event.data.dot, graph)
+        updateTitle(graph, event.data.graph_name)
+        hideModals()
+        dataHistory = [];
+        dataHistory.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
+        document.getElementById('history-btn').disabled = true
+      break;
       case "graph_content":
-        document.getElementById('title').innerText = event.data.graph_name;
         graph = JSON.parse(event.data.graph)
         renderGraph(event.data.dot, graph)
+        updateTitle(graph, event.data.graph_name)
+        setRenderOptions(event.data.render_options || {})
         hideModals()
-        history.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
-        if(history.length > 1) {
+        dataHistory.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
+        if(dataHistory.length > 1) {
           document.getElementById('history-btn').disabled = false
         }
       break;

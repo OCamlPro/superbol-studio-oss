@@ -17,5 +17,10 @@ type graph = {
 
 val make
   : options:Cfg_options.t
+  -> name:string
   -> Cobol_typeck.Outputs.t
-  -> graph list
+  -> graph
+
+val possible_cfgs_of_doc
+  : Cobol_typeck.Outputs.t
+  -> string list
