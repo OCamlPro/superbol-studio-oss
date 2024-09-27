@@ -260,11 +260,7 @@ let cfg_of_section ~cu ({ section_paragraphs; _ }: procedure_section) =
     | l -> l end
   |> build_edges
 
-let cfgs_of_doc ?(graph_name=None) ({ group; _ }: Cobol_typeck.Outputs.t) =
-  let is_to_include : string -> bool =
-    match graph_name with
-    | None -> Fun.const true
-    | Some name -> String.equal name in
+let graph_material_of_doc ({ group; _ }: Cobol_typeck.Outputs.t) =
   Cobol_unit.Collections.SET.fold
     begin fun { payload = cu; _ } acc ->
       let section_graphs = List.filter_map begin function
@@ -273,16 +269,25 @@ let cfgs_of_doc ?(graph_name=None) ({ group; _ }: Cobol_typeck.Outputs.t) =
             let name = Pretty.to_string "%a (%s)"
                 Cobol_ptree.pp_qualname' ~&sec.section_name
                 ((~&) cu.unit_name) in
-            if is_to_include name
-            then Some (name, cfg_of_section ~cu ~&sec)
-            else None
+            Some (name, `Section (cu, ~&sec))
         end cu.unit_procedure.list in
-      let cu_graph =
-        if is_to_include ((~&) cu.unit_name)
-        then [((~&)cu.unit_name, cfg_of ~cu)]
-        else []
-      in cu_graph @ section_graphs @ acc
+      let cu_name = (~&)cu.unit_name in
+      (cu_name, `Cu cu) :: section_graphs @ acc
     end group []
+
+let cfg_of_doc ~name checked_doc =
+  graph_material_of_doc checked_doc
+  |> List.find_opt
+    begin fun (corr_name, _) -> String.equal name corr_name end
+  |> function
+  | None -> raise @@
+    Pretty.invalid_arg "%s is invalid for requested document" name
+  | Some (_, `Cu cu) -> cfg_of ~cu
+  | Some (_, `Section (cu, sec)) -> cfg_of_section ~cu sec
+
+let possible_cfgs_of_doc checked_doc =
+  graph_material_of_doc checked_doc
+  |> List.map fst
 
 (* CFG OPTIONS HANDLER *)
 
@@ -529,14 +534,12 @@ type graph = {
   nodes_pos: (int * srcloc) list
 }
 
-let make ~(options: Cfg_options.t) (checked_doc: Cobol_typeck.Outputs.t) =
-  cfgs_of_doc ~graph_name:options.graph_name checked_doc
-  |> List.map begin fun (name, cfg) ->
-    let cfg_with_options = handle_cfg_options ~options cfg in
-    {
-      name;
-      string_repr_dot = to_dot_string cfg_with_options;
-      string_repr_d3 = to_d3_string cfg;
-      nodes_pos = nodes_pos cfg;
-    }
-  end
+let make ~(options: Cfg_options.t) ~name (checked_doc: Cobol_typeck.Outputs.t) =
+  let cfg = cfg_of_doc ~name checked_doc in
+  let cfg_with_options = handle_cfg_options ~options cfg in
+  {
+    name;
+    string_repr_dot = to_dot_string cfg_with_options;
+    string_repr_d3 = to_d3_string cfg;
+    nodes_pos = nodes_pos cfg;
+  }
