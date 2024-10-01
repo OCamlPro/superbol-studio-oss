@@ -31,7 +31,8 @@ module Jumps = Set.Make(struct
         | Perform _ -> 2
         | Call _ -> 3
         | Entry _ -> 4
-      in match j1, j2 with
+      in
+      match j1, j2 with
       | Go qn1, Go qn2
       | GoDepending qn1, GoDepending qn2
       | Perform qn1, Perform qn2 -> Cobol_ptree.compare_qualname qn1 qn2

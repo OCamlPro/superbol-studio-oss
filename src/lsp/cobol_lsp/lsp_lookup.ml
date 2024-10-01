@@ -68,9 +68,10 @@ module TYPES = struct
     | ObjectRef
     | Pointer
 
-    type procedure_at_position = {
-      cu: Cobol_unit.Types.cobol_unit option;
-      proc_name: Cobol_ptree.qualname option;
+    type procedure_at_position =
+      {
+        cu: Cobol_unit.Types.cobol_unit option;
+        proc_name: Cobol_ptree.qualname option;
       }
 end
 open TYPES
