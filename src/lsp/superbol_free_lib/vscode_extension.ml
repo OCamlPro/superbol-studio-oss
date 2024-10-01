@@ -600,8 +600,10 @@ let contributes =
     ]
     ~menus: [
       "editor/context",
-      [menu ~command:"superbol.cfg.open" ~group:"superbol" ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
-      menu ~command:"superbol.cfg.open.arc" ~group:"superbol" ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
+      [menu ~command:"superbol.cfg.open" ~group:"superbol"
+         ~when_:"editorTextFocus && editorLangId == 'cobol'" ();
+       menu ~command:"superbol.cfg.open.arc" ~group:"superbol"
+         ~when_:"editorTextFocus && editorLangId == 'cobol'" ()]
     ]
 
 let manifest =
