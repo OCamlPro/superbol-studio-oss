@@ -90,12 +90,9 @@ type edge =
 
 module Node = struct
   type t = node
-  let compare node other =
-    Int.compare node.id other.id
-  let hash node =
-    Hashtbl.hash node.id
-  let equal node other =
-    Int.equal node.id other.id
+  let compare node other = Int.compare node.id other.id
+  let hash node = Hashtbl.hash node.id
+  let equal node other = Int.equal node.id other.id
 end
 
 module Edge = struct
@@ -300,7 +297,19 @@ let do_collapse_fallthru g =
     | Entry _ | External _ | Split _ -> None in
   let collapse_node ~cfg ~id_map ~node ~pred n_names pred_names =
     let cfg = Cfg.fold_succ_e begin fun (_, e, next) cfg ->
-        Cfg.add_edge_e cfg (pred, e, next)
+        match next.typ with
+        | Split next_name
+          (* when the same split node already exist, remove the duplicate one *)
+          when
+            Cfg.fold_succ_e begin fun pred_edge acc ->
+              acc || match pred_edge with
+              | (_, pred_e, { typ = Split name; _ }) ->
+                Stdlib.(=) pred_e e &&
+                String.equal name next_name
+              | _ -> false
+            end cfg pred false
+          -> Cfg.remove_vertex cfg next
+        | _ -> Cfg.add_edge_e cfg (pred, e, next)
       end cfg node cfg in
     let id_map = IdMap.update pred.id
         begin function
@@ -328,12 +337,11 @@ let do_collapse_fallthru g =
     | Some names -> { node with typ = Collapsed (NEL.rev names) }
   end cfg
 
-let do_hide_unreachable ~except g =
+let do_hide_unreachable g =
   let rec aux cfg =
     let did_remove, cfg =
       Cfg.fold_vertex begin fun n (did_remove, cfg) ->
         if Cfg.in_degree cfg n <= 0 && not (is_entry n)
-           && not (List.mem n.id except)
         then true, Cfg.remove_vertex cfg n
         else did_remove, cfg
       end cfg (false, cfg)
@@ -435,25 +443,18 @@ let remove_nodes ids cfg =
   end cfg ids
 
 let handle_cfg_options ~(options: Cfg_options.t) cfg =
-  let unreachable_expections =
-    match options.transformation with
-    | Some Cfg_options.Neighborhood id
-    | Some Cfg_options.Descendents id -> [id]
-    | None -> [] in
   cfg
   |> (match options.transformation with
       | Some Cfg_options.Descendents id -> restrict_to_descendents id
       | Some Cfg_options.Neighborhood id -> restrict_to_neighborhood id
       | _ -> Fun.id)
-  |> (if options.hide_unreachable
-      then do_hide_unreachable ~except:unreachable_expections else Fun.id)
+  |> (if options.hide_unreachable && Option.is_none options.transformation
+      then do_hide_unreachable else Fun.id)
   |> (match options.hidden_nodes with
       | [] -> Fun.id
       | l -> remove_nodes l)
-  |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
-  (* IMPORTANT: shatter needs to be after collapse, or else it's possible
-     to find a collapsed node linked to duplicate shattered nodes *)
   |> do_shatter_nodes ~ids:options.split_nodes ~limit:options.shatter_hubs
+  |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
 
 (* CFG TO STRING FORMATTERS *)
 
