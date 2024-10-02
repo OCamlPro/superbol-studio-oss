@@ -1,7 +1,7 @@
 
 # name of package
-name = "superbol-vscode-platform"
-skeleton = "js_program"
+name = "cobol_cfg"
+skeleton = "library"
 
 # version if different from project version
 # version = "0.1.0"
@@ -13,7 +13,7 @@ skeleton = "js_program"
 # description = ...
 
 # kind is either "library", "program" or "virtual"
-kind = "program"
+kind = "library"
 
 # authors if different from project authors
 # authors = [ "Me <me@metoo.org>" ]
@@ -43,29 +43,21 @@ gen-version = "version.ml"
 
 # preprocessing options
 #  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
-preprocess = "pps gen_js_api.ppx"
+preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = []
+skip = ["index.mld"]
 
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
-gen_js_api = "1.1.1"
-js_of_ocaml = ">=4"
-jsonoo = "0.2.1"
-node-js-stubs = "version"
-ocplib_stuff = "0.4.0"
-polka-js-stubs = "version"
-promise_jsoo = "0.3.1"
-vscode-js-stubs = "version"
-vscode-languageclient-js-stubs = "version"
+cobol_typeck = "version"
+ocamlgraph = "2.1.0"
 
 # package tools dependencies
 [tools]
-js_of_ocaml-ppx = ">=4"
 
 # package fields (depends on package skeleton)
 #Examples:
@@ -79,16 +71,4 @@ js_of_ocaml-ppx = ">=4"
 #  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
 #  static-clibs = "unix"
 [fields]
-dune-stanzas = """
- (js_of_ocaml (flags --source-map --pretty))
- (enabled_if (= %{context_name} \"default\"))
-"""
-# Hack to workaround the fact that Dune does not allow `enabled_if`
-# on `install` stanzas ; this is needed because we disable building
-# this executable (and all JS libraries) when cross-compiling
-dune-trailer = """
-(rule
- (target superbol_vscode_platform.bc.js)
- (action (write-file %{target} ""))
- (enabled_if (<> %{context_name} \"default\")))
-"""
+# ...

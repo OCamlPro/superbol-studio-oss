@@ -133,6 +133,55 @@ let handle_get_project_config_command param registry =
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
+let handle_get_cfg registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let uri, name, options = Yojson.Safe.Util.(
+      to_string @@ member "uri" params,
+      to_string @@ member "name" params,
+      try to_assoc @@ member "render_options" params with Type_error _ -> [])
+  in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let jsoono =
+        Lsp_cfg.doc_to_cfg_jsoono ~filename:uri ~name ~options checked_doc
+      in Some jsoono
+    end |>
+  Option.get
+
+let handle_get_possible_cfg registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let uri = Yojson.Safe.Util.(to_string @@ member "uri" params) in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let open Cobol_cfg.Builder in
+      let possibles = possible_cfgs_of_doc checked_doc in
+      let yojsonify cfg_name = `String cfg_name in
+      Some (`List (List.map yojsonify possibles))
+    end |>
+  Option.get
+
+
+let handle_find_procedure registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let filename = Yojson.Safe.Util.to_string @@ Yojson.Safe.Util.member "uri" params in
+  let line = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "line" params in
+  let character = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "character" params in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path filename) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let pos = Position.create ~character ~line in
+      let { cu; proc_name } =
+        Lsp_lookup.proc_at_pos ~filename pos checked_doc.group in
+      let proc = match proc_name, cu with
+        | Some qn, _ -> Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
+                        |> Str.global_replace (Str.regexp "\n") " "
+        | _ -> raise Not_found in
+      Some (`String proc)
+    end |>
+  Option.get
+
 (** {3 Definitions} *)
 
 
@@ -825,6 +874,15 @@ let on_request
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
         handle_get_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getCFG";
+                       params = Some param } ->
+        Ok (handle_get_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/getPossibleCFG";
+                       params = Some param } ->
+        Ok (handle_get_possible_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/findProcedure";
+                       params = Some param } ->
+        Ok (handle_find_procedure registry param, state)
     | UnknownRequest { meth; _ } ->
         Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
         Error (UnknownRequest meth)
