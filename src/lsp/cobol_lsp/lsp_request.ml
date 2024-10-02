@@ -133,42 +133,6 @@ let handle_get_project_config_command param registry =
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
-let create_cfg_options o =
-  let open Yojson.Safe.Util in
-  let graph_name =
-    List.assoc_opt "graph_name" o |> Option.map to_string in
-  let hide_unreachable =
-    List.assoc_opt "hide_unreachable" o |> Option.map to_bool in
-  let collapse_fallthru =
-    List.assoc_opt "collapse_fallthru" o |> Option.map to_bool in
-  let shatter_hubs =
-    List.assoc_opt "shatter_hubs" o |> Option.map to_int in
-  let transformation =
-    let id =
-      List.assoc_opt "id" o |> Option.map to_int in
-    let action = List.assoc_opt "action" o |> Option.map to_string in
-    match action, id with
-    | Some "descendents", Some id ->
-      Some (Cobol_cfg.Options.Descendents id)
-    | Some "neighborhood", Some id ->
-      Some (Cobol_cfg.Options.Neighborhood id)
-    | _ -> None
-  in
-  let hidden_nodes =
-    List.assoc_opt "hidden_nodes" o |> Option.map to_list
-    |> Option.map (List.map to_int) in
-  let split_nodes =
-    List.assoc_opt "split_nodes" o |> Option.map to_list
-    |> Option.map (List.map to_int) in
-  Cobol_cfg.Options.create ()
-    ~graph_name
-    ?hide_unreachable
-    ?collapse_fallthru
-    ~shatter_hubs
-    ~transformation
-    ?hidden_nodes
-    ?split_nodes
-
 let handle_get_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri, name, options = Yojson.Safe.Util.(
@@ -179,23 +143,11 @@ let handle_get_cfg registry params =
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
   try_with_main_document_data registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
-      let open Cobol_cfg.Builder in
-      let options = create_cfg_options options in
-      try
-        let { string_repr_dot; string_repr_d3; name; nodes_pos } : graph =
-          make ~options ~name checked_doc in
-        let nodes_pos = List.map begin fun (n,loc) ->
-            let range = Lsp_position.range_of_srcloc_in ~filename:uri loc in
-            (string_of_int n, Range.yojson_of_t range)
-          end nodes_pos in
-        Some (`Assoc [
-            ("string_repr_d3", `String string_repr_d3);
-            ("string_repr_dot", `String string_repr_dot);
-            ("nodes_pos", `Assoc nodes_pos);
-            ("name", `String name);])
-      with Invalid_argument _ -> None
-    end
-  |> Option.value ~default:(`Assoc [])
+      let jsoono =
+        Lsp_cfg.doc_to_cfg_jsoono ~filename:uri ~name ~options checked_doc
+      in Some jsoono
+    end |>
+  Option.get
 
 let handle_get_possible_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
@@ -207,8 +159,8 @@ let handle_get_possible_cfg registry params =
       let possibles = possible_cfgs_of_doc checked_doc in
       let yojsonify cfg_name = `String cfg_name in
       Some (`List (List.map yojsonify possibles))
-    end
-  |> Option.value ~default:(`List [])
+    end |>
+  Option.get
 
 
 let handle_find_procedure registry params =
@@ -225,11 +177,10 @@ let handle_find_procedure registry params =
       let proc = match proc_name, cu with
         | Some qn, _ -> Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
                         |> Str.global_replace (Str.regexp "\n") " "
-        | None, Some cu -> ~&(cu.unit_name)
-        | _ -> "" in
+        | _ -> raise Not_found in
       Some (`String proc)
-    end
-  |> Option.value ~default:(`String "")
+    end |>
+  Option.get
 
 (** {3 Definitions} *)
 

@@ -1,3 +1,5 @@
+// JS file attached to cfg-dot-renderer.html
+
 const legend = `digraph legend {
   1 [shape=doubleoctagon; label="An entry point\nof the program"]
   2 [shape=rect; label="A section or paragraph"]
@@ -272,31 +274,21 @@ function renderGraph(dot, _graph) {
 /// MAIN LISTENER
 
 window.addEventListener('message', event => {
-    switch (event.data.type) {
-      case "new_graph_content":
-        graph = JSON.parse(event.data.graph)
-        setRenderOptions(event.data.render_options || {})
-        renderGraph(event.data.dot, graph)
-        updateTitle(graph, event.data.graph_name)
-        hideModals()
+  if(event.data.type === "focused_proc") {
+    focus(event.data.procedure)
+  }
+  else if (event.data.type === "graph_content"
+          || event.data.type === "new_graph_content") {
+    graph = JSON.parse(event.data.graph)
+    setRenderOptions(event.data.render_options || {})
+    renderGraph(event.data.dot, graph)
+    updateTitle(graph, event.data.graph_name)
+    hideModals()
+    if(event.data.type.startsWith("new")) {
         dataHistory = [];
-        dataHistory.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
-        document.getElementById('history-btn').disabled = true
-      break;
-      case "graph_content":
-        graph = JSON.parse(event.data.graph)
-        renderGraph(event.data.dot, graph)
-        updateTitle(graph, event.data.graph_name)
-        setRenderOptions(event.data.render_options || {})
-        hideModals()
-        dataHistory.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
-        if(dataHistory.length > 1) {
-          document.getElementById('history-btn').disabled = false
-        }
-      break;
-      case "focused_proc":
-        focus(event.data.procedure)
-      break;
     }
+    dataHistory.push(JSON.stringify([event.data.dot, graph, renderOptions, event.data.graph_name]))
+    document.getElementById('history-btn').disabled = dataHistory.length <= 1
+  }
   })
 vscode.postMessage({type: 'ready'})

@@ -1,0 +1,86 @@
+html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-flow: column;
+  gap: .5em;
+}
+
+#title {
+  margin-block: .2em;
+}
+
+#app {
+  flex-grow: 1;
+}
+#modals {
+  height: 0;
+}
+
+#rendering {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.hidden {
+  display: none !important;
+}
+.modal {
+  position: absolute;
+  background-color: var(--vscode-sideBar-background);
+  border: var(--vscode-focusBorder) 1px solid;
+}
+#legend {
+  padding: 2px 2px 0 2px;
+  width: 500px;
+}
+#render-options {
+  display: flex;
+  flex-flow: column;
+  padding: .5em .2em;
+}
+#hubcount {
+  width: 50px;
+}
+#context-menu-background {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #0000;
+}
+#context-menu {
+  z-index: 10;
+  padding-block: .25em;
+}
+#context-menu p {
+  margin: 0;
+  padding-inline: .5em;
+  padding-block : .25em;
+}
+#context-menu p:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+hr {
+  margin: 0;
+  border-color: var(--vscode-editor-foreground);
+}
+#render-btn {
+  align-self:center;
+  margin-block-start:.5em;
+}
+.nodes-list {
+  padding-block: .5em;
+  margin: 0;
+}
+.nodes-list > p {
+  margin: 0;
+}
+.nodes-list > p:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}

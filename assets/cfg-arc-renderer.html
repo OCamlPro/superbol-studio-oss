@@ -1,38 +1,9 @@
+<!-- Base html file used to render arc cfg variant -->
 <!DOCTYPE html>
 <head>
 <meta charset="utf-8">
-<style>
-
-html, body {
-  height: 100%;
-}
-text {
-  font: 12px monospace;
-  pointer-events: none;
-}
-svg {
-    background-color: white;
-}
-path {
-  animation: dash 1.5s linear infinite;
-  animation-play-state: paused;
-}
-.animated {
-  animation-play-state: running;
-}
-
-@keyframes dash {
-  to {
-    stroke-dashoffset: -51; // lcm of sum of dasharray values to avoid flicker
-  }
-}
-.hidden {
-  display: none !important;
-}
-#title {
-  margin-block: .2em;
-}
-</style></head>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
 <body>
   <h2 id="title">Title</h2>
   <div id="buttons">
@@ -41,4 +12,3 @@ path {
   <div id="legend" class="hidden"></div>
   <div id="graph"></div>
 </body>
-<script src="https://d3js.org/d3.v7.min.js"></script>

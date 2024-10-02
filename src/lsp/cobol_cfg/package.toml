@@ -53,18 +53,7 @@ skip = ["index.mld"]
 #   ez_file = ">=0.1 <1.3"
 #   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
-cobol_common = "version"
-cobol_config = "version"
-cobol_data = "version"
-cobol_indent = "version"
-cobol_parser = "version"
 cobol_typeck = "version"
-superbol_preprocs = "version"
-superbol_project = "version"
-jsonrpc = ">=1.15"
-lsp = ">=1.18 <1.19"
-pretty = "version"
-toml = "7.1.0"
 ocamlgraph = "2.1.0"
 
 # package tools dependencies
