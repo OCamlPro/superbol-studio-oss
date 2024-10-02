@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2e98390cc73b915e0bf317cb253bec56:.
+d3322e46fe7329e9bbda1b7042625e6a:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -81,11 +81,12 @@ cde29409c1d991e499786d56924f8fc9:dune-project
 68f1f36e943a31bcb34b9b97f6830817:dune-project
 afd60e19795dd45cbf2d203174f50a68:dune-project
 68f1f36e943a31bcb34b9b97f6830817:dune-project
+f3f8f40142982198dd2b7096346d98e4:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
 # file opam/cobol_cfg.opam
-5b0d97854c33a01ceaa5eebf37fed47d:opam/cobol_cfg.opam
+535909f451064f672cd8c6a798512ba1:opam/cobol_cfg.opam
 # end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
@@ -295,7 +296,7 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
-0719aadf966f84be3629fc49a10309d0:src/lsp/cobol_cfg/dune
+c6c7cd50f0ebff63bab991bf9a1633e6:src/lsp/cobol_cfg/dune
 # end context for src/lsp/cobol_cfg/dune
 
 # begin context for src/lsp/cobol_cfg/version.mlt

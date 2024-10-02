@@ -1,15 +1,12 @@
-(**************************************************************************)
-(*                                                                        *)
-(*                        SuperBOL OSS Studio                             *)
-(*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
-(*                                                                        *)
-(* All rights reserved.                                                   *)
-(* This source code is licensed under the GNU Affero General Public       *)
-(* License version 3 found in the LICENSE.md file in the root directory   *)
-(* of this source tree.                                                   *)
-(*                                                                        *)
-(**************************************************************************)
+(******************************************************************************)
+(*                                                                            *)
+(*     Copyright (c) 2021-2024 OCamlPro SAS                                   *)
+(*                                                                            *)
+(*     All rights reserved.                                                   *)
+(*     This file is distributed under the terms of the                        *)
+(*     OCAMLPRO-NON-COMMERCIAL license.                                       *)
+(*                                                                            *)
+(******************************************************************************)
 
-module Builder = Cfg_builder
 module Options = Cfg_options
+module Builder = Cfg_builder

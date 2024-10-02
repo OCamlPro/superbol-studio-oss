@@ -1,3 +1,5 @@
+// JS file attached to cfg-arc-renderer.html
+
 const vscode = acquireVsCodeApi()
 
 const elementLegend = document.getElementById('legend');
@@ -320,23 +322,21 @@ function removeEntryStmt() {
 }
 
 window.addEventListener("message", event => {
-    switch (event.data.type) {
-      case "graph_content":
-        d3.select("#graph svg").remove()
-        graph = JSON.parse(event.data.graph)
-        document.getElementById("title").innerText = event.data.graph_name;
-        removeEntryStmt()
-        buildSVG(graph)
-        buildLegend()
-      break;
-      case "focused_proc":
-        clickedNode = undefined;
-        const node = graph.nodes.find(n => n.name === event.data.procedure)
-        if(!node) return;
-        window.scroll(0, y(node.id) - window.innerHeight/3)
-        focusNode(node)
-      break;
-    }
+  if(event.data.type === "focused_proc") {
+      clickedNode = undefined;
+      const node = graph.nodes.find(n => n.name === event.data.procedure)
+      if(!node) return;
+      window.scroll(0, y(node.id) - window.innerHeight/3)
+      focusNode(node)
+  } else if(event.data.type === "graph_content"
+            || event.data.type === "new_graph_content"){
+    d3.select("#graph svg").remove()
+    graph = JSON.parse(event.data.graph)
+    document.getElementById("title").innerText = event.data.graph_name;
+    removeEntryStmt()
+    buildSVG(graph)
+    buildLegend()
+  }
   })
 
 vscode.postMessage({type: "ready"})

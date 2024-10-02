@@ -49,19 +49,8 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.8.0"}
-  "toml-windows" {>= "7.1.0" & < "8.0.0"}
-  "superbol_project-windows" {= version}
-  "superbol_preprocs-windows" {= version}
-  "pretty-windows" {= version}
   "ocamlgraph-windows" {>= "2.1.0" & < "3.0.0"}
-  "lsp-windows" {>= "1.18" & < "1.19"}
-  "jsonrpc-windows" {>= "1.15"}
   "cobol_typeck-windows" {= version}
-  "cobol_parser-windows" {= version}
-  "cobol_indent-windows" {= version}
-  "cobol_data-windows" {= version}
-  "cobol_config-windows" {= version}
-  "cobol_common-windows" {= version}
   "odoc" {with-doc}
 ]
 # Content of `opam-trailer` field:

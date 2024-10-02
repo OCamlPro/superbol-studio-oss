@@ -13,7 +13,6 @@ type transformation =
   | Neighborhood of int
 
 type t = {
-  graph_name: string option;
   hide_unreachable: bool;
   collapse_fallthru: bool;
   shatter_hubs: int option;
@@ -21,23 +20,4 @@ type t = {
   hidden_nodes: int list;
   split_nodes: int list;
 }
-
-let create
-    ?(graph_name=None)
-    ?(hide_unreachable=false)
-    ?(collapse_fallthru=false)
-    ?(shatter_hubs=None)
-    ?(transformation=None)
-    ?(hidden_nodes=[])
-    ?(split_nodes=[])
-    () =
-  {
-    hide_unreachable;
-    collapse_fallthru;
-    graph_name;
-    shatter_hubs;
-    transformation;
-    hidden_nodes;
-    split_nodes;
-  }
 

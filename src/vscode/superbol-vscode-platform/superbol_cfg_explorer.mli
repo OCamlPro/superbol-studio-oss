@@ -14,6 +14,15 @@
 
 type cfg_type = Graphviz | D3_arc_diagram
 
+(*
+  [open_cfg ~text_editor typ instance] will load a CFG of type [typ] after the user
+  has selected the CFG scope (which program or which section of the program).
+  The different scopes are listed based on the code of [text_editor], or
+  the active text editor if no editor is given.
+  The CFG are computed via the LSP [instance] given.
+  Calling [open_cfg] twice with the same arguments will simply reload the CFG
+  and refocus the existing webview.
+ *)
 val open_cfg
   : ?text_editor: Vscode.TextEditor.t
   -> typ:cfg_type

@@ -17,8 +17,6 @@ module NEL = Cobol_common.Basics.NEL
 
 (* TYPES AND HELPERS *)
 
-type qualname = Cobol_ptree.qualname
-
 type display_name_type =
   | Full
   | Short
@@ -35,10 +33,6 @@ let qn_to_fullname qn =
   if qual == ""
   then name
   else name ^ " IN " ^ qual
-
-let incr ref =
-  ref := !ref + 1;
-  !ref
 
 let prefix_to_string prefix =
   begin match prefix with
@@ -99,10 +93,6 @@ module Edge = struct
   type t = edge
   let compare = Stdlib.compare
   let default = FallThrough
-  let to_string = function
-    | FallThrough -> "f"
-    | Perform -> "p"
-    | Go -> "g"
 end
 
 module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
@@ -110,6 +100,10 @@ module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
 (* DEFAULT CFG BUILDER FUNCTION *)
 
 let node_idx = ref 0
+let next_node_idx () =
+  node_idx := !node_idx + 1;
+  !node_idx
+
 let call_stmt_section_name = "__CALL_STMT__"
 
 let reset_global_counter () =
@@ -133,7 +127,7 @@ let build_node ?(is_section=false) ?(display_name_type=Full) ~cu paragraph =
         | Short -> short_name
       in Normal (full_name, display_name), ~@qn, section_name
   in {
-    id = incr node_idx;
+    id = next_node_idx ();
     section_name;
     loc = Some loc;
     jumps;
@@ -156,7 +150,7 @@ let new_node ~typ =
     | `Call s ->
       External s, None, call_stmt_section_name
   in {
-    id = incr node_idx;
+    id = next_node_idx ();
     section_name;
     loc;
     jumps = Jumps.empty;
@@ -350,7 +344,7 @@ let do_hide_unreachable g =
   in aux g
 
 let clone_node node =
-  { node with id = incr node_idx; }
+  { node with id = next_node_idx (); }
 
 let do_shatter_nodes ~ids ~limit g =
   let shatter_typ { typ; _ } =
@@ -456,91 +450,9 @@ let handle_cfg_options ~(options: Cfg_options.t) cfg =
   |> do_shatter_nodes ~ids:options.split_nodes ~limit:options.shatter_hubs
   |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
 
-(* CFG TO STRING FORMATTERS *)
-
-let vertex_name_record names =
-  Pretty.to_string "%a"
-    (NEL.pp ~fopen:"{" ~fclose:"}" ~fsep:"|" Fmt.string)
-    names
-
-module Dot = Graph.Graphviz.Dot(struct
-    include Cfg
-    let edge_attributes (_,s,_) =
-      [`Style (match s with
-           | FallThrough -> `Dotted
-           | Perform -> `Dashed
-           | Go -> `Solid)]
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes { typ; _ } =
-      let label, attributes =
-        match typ with
-        | Entry (`Section name) -> name, [`Shape `Doubleoctagon]
-        | Entry (`Statement name) -> name, [`Shape `Doubleoctagon]
-        | Entry `Point -> "Entry\npoint", [`Shape `Doubleoctagon]
-        | Entry `Paragraph -> "Entry\nparagraph", [`Shape `Doubleoctagon]
-        | External name -> name, [`Shape `Plaintext]
-        | Split name -> name, [`Style `Dashed]
-        | Normal (_, name) -> name, []
-        | Collapsed names -> vertex_name_record names, [`Shape `Record]
-      in `Label label :: attributes
-    let default_vertex_attributes _ = [`Shape `Box]
-    let graph_attributes _ = []
-    let vertex_name { id; _ } = string_of_int id
-  end)
-
-let to_dot_string g =
-  Pretty.to_string "%a" Dot.fprint_graph g
-
-let to_d3_string cfg =
-  let cfg_edges = Cfg.fold_edges_e
-      begin fun (n1, e, n2) acc ->
-        Pretty.to_string "{\"source\":%d,\"target\":%d,\"type\":\"%s\"}"
-          n1.id n2.id (Edge.to_string e)
-        ::acc
-      end cfg [] in
-  let cfg_nodes = Cfg.fold_vertex
-      begin fun n acc ->
-        let name =
-          match n.typ with
-          | Normal (_, name)
-          | Entry (`Statement name) | Entry (`Section name)
-          | External name | Split name -> name
-          | Collapsed _ ->
-            raise @@ Invalid_argument
-              "Impossible to provide d3 string with collapsed node"
-          | Entry `Point -> "Entry point"
-          | Entry `Paragraph -> "Entry paragraph"
-        in Pretty.to_string "{\"id\":%d,\"name\":\"%s\",\"section\":\"%s\"}"
-          n.id name n.section_name
-           :: acc
-      end cfg [] in
-  let str_nodes = String.concat "," cfg_nodes in
-  let str_edges = String.concat "," cfg_edges in
-  Pretty.to_string "{\"links\":[%s],\"nodes\":[%s]}" str_edges str_nodes
-
 (* GRAPH OUTPUT FORMAT *)
-
-let nodes_pos cfg =
-  Cfg.fold_vertex begin fun n acc ->
-    match n.loc with
-    | None -> acc
-    | Some loc -> (n.id, loc)::acc
-  end cfg []
-
-type graph = {
-  name: string;
-  string_repr_dot: string;
-  string_repr_d3: string;
-  nodes_pos: (int * srcloc) list
-}
 
 let make ~(options: Cfg_options.t) ~name (checked_doc: Cobol_typeck.Outputs.t) =
   let cfg = cfg_of_doc ~name checked_doc in
   let cfg_with_options = handle_cfg_options ~options cfg in
-  {
-    name;
-    string_repr_dot = to_dot_string cfg_with_options;
-    string_repr_d3 = to_d3_string cfg;
-    nodes_pos = nodes_pos cfg;
-  }
+  (cfg, cfg_with_options)
