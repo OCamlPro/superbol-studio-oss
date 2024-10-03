@@ -134,9 +134,9 @@ syn_file.at-1592-prog.cob:16.50-16.58:
   18          FILE SECTION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1738:0
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1829:0
-syn_file.at-1829-prog.cob:10.26-10.33:
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1737:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1827:0
+syn_file.at-1827-prog.cob:10.26-10.33:
    7              SELECT file1 ASSIGN DISK.
    8          DATA DIVISION.
    9          FILE SECTION.
@@ -146,7 +146,7 @@ syn_file.at-1829-prog.cob:10.26-10.33:
   12          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
-syn_file.at-1829-prog.cob:10.43-10.44:
+syn_file.at-1827-prog.cob:10.43-10.44:
    7              SELECT file1 ASSIGN DISK.
    8          DATA DIVISION.
    9          FILE SECTION.
@@ -156,7 +156,7 @@ syn_file.at-1829-prog.cob:10.43-10.44:
   12          PROCEDURE DIVISION.
 >> Error: Invalid syntax
 
-syn_file.at-1829-prog.cob:10.43:
+syn_file.at-1827-prog.cob:10.43:
    7              SELECT file1 ASSIGN DISK.
    8          DATA DIVISION.
    9          FILE SECTION.
@@ -166,10 +166,10 @@ syn_file.at-1829-prog.cob:10.43:
   12          PROCEDURE DIVISION.
 >> Hint: Missing <literal>
 
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1856:0
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1937:0
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2011:0
-syn_file.at-2011-prog.cob:14.17-14.25:
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1854:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:1935:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2009:0
+syn_file.at-2009-prog.cob:14.17-14.25:
   11                 RECORD KEY    TESTKEY-P1
   12                 ALTERNATE RECORD KEY TESTKEY-P2
   13                    WITH DUPLICATES
@@ -179,7 +179,7 @@ syn_file.at-2011-prog.cob:14.17-14.25:
   16                    WITH DUPLICATES
 >> Error: Invalid syntax
 
-syn_file.at-2011-prog.cob:17.17-17.25:
+syn_file.at-2009-prog.cob:17.17-17.25:
   14                    SUPPRESS WHEN ZEROES
   15                 ALTERNATE RECORD KEY TESTKEY-P3
   16                    WITH DUPLICATES
@@ -189,7 +189,7 @@ syn_file.at-2011-prog.cob:17.17-17.25:
   19                    WITH DUPLICATES
 >> Error: Invalid syntax
 
-syn_file.at-2011-prog.cob:20.17-20.25:
+syn_file.at-2009-prog.cob:20.17-20.25:
   17                    SUPPRESS WHEN SPACES
   18                 ALTERNATE RECORD KEY TESTKEY-P4
   19                    WITH DUPLICATES
@@ -199,7 +199,7 @@ syn_file.at-2011-prog.cob:20.17-20.25:
   22                    WITH DUPLICATES
 >> Error: Invalid syntax
 
-syn_file.at-2011-prog.cob:23.17-23.25:
+syn_file.at-2009-prog.cob:23.17-23.25:
   20                    SUPPRESS WHEN ALL "A"
   21                 ALTERNATE RECORD KEY TESTKEY-P5
   22                    WITH DUPLICATES
@@ -209,8 +209,8 @@ syn_file.at-2011-prog.cob:23.17-23.25:
   25          DATA             DIVISION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2062:0
-syn_file.at-2062-prog.cob:13.27-13.28:
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2060:0
+syn_file.at-2060-prog.cob:13.27-13.28:
   10                 ORGANIZATION   INDEXED
   11                 RECORD KEY     TESTKEY-P1 OF TEST-REC1
   12                 ALTERNATE RECORD KEY
@@ -220,7 +220,7 @@ syn_file.at-2062-prog.cob:13.27-13.28:
   15                    WITH DUPLICATES
 >> Error: Invalid syntax
 
-syn_file.at-2062-prog.cob:23.48-23.50:
+syn_file.at-2060-prog.cob:23.48-23.50:
   20                 ORGANIZATION   INDEXED
   21                 RECORD KEY     TESTKEY-P1 OF TEST-REC2
   22                 ALTERNATE RECORD KEY
@@ -230,7 +230,7 @@ syn_file.at-2062-prog.cob:23.48-23.50:
   25                    WITH DUPLICATES
 >> Error: Invalid syntax
 
-syn_file.at-2062-prog.cob:24.48-24.50:
+syn_file.at-2060-prog.cob:24.48-24.50:
   21                 RECORD KEY     TESTKEY-P1 OF TEST-REC2
   22                 ALTERNATE RECORD KEY
   23                    TEST2KEY2 SOURCE IS TESTKEY-P2 OF TEST-REC2,
@@ -240,10 +240,10 @@ syn_file.at-2062-prog.cob:24.48-24.50:
   26                    .
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2092:0
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2121:0
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2203:0
-syn_file.at-2203-prog.cob:16.18:
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2090:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2119:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2201:0
+syn_file.at-2201-prog.cob:16.18:
   13                    WITH DUPLICATES
   14                 ALTERNATE RECORD KEY TESTKEY-1P2
   15                    WITH NO DUPLICATES
@@ -253,7 +253,7 @@ syn_file.at-2203-prog.cob:16.18:
   18          SELECT TEST-FILE2
 >> Hint: Missing AUTOMATIC
 
-syn_file.at-2203-prog.cob:16.19-16.28:
+syn_file.at-2201-prog.cob:16.19-16.28:
   13                    WITH DUPLICATES
   14                 ALTERNATE RECORD KEY TESTKEY-1P2
   15                    WITH NO DUPLICATES
@@ -263,7 +263,7 @@ syn_file.at-2203-prog.cob:16.19-16.28:
   18          SELECT TEST-FILE2
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:41.16-41.25:
+syn_file.at-2201-prog.cob:41.16-41.25:
   38              03  ALLOWING    PIC X(4).
   39              03  TESTKEY-2P2 PIC 9(4).
   40          PROCEDURE DIVISION.
@@ -273,7 +273,7 @@ syn_file.at-2203-prog.cob:41.16-41.25:
   43              OPEN I-O TEST-FILE1 TEST-FILE2 ALLOWING UPDATERS
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:54.40-54.43:
+syn_file.at-2201-prog.cob:54.40-54.43:
   51              OPEN I-O TEST-FILE1 ALLOWING WRITERS
   52              CLOSE TEST-FILE1
   53              CLOSE TEST-FILE1
@@ -283,7 +283,7 @@ syn_file.at-2203-prog.cob:54.40-54.43:
   56              CLOSE TEST-FILE1
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:57.42:
+syn_file.at-2201-prog.cob:57.42:
   54              OPEN I-O TEST-FILE1 ALLOWING ALL
   55              CLOSE TEST-FILE1
   56              CLOSE TEST-FILE1
@@ -293,7 +293,7 @@ syn_file.at-2203-prog.cob:57.42:
   59              OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
 >> Hint: Missing REWIND
 
-syn_file.at-2203-prog.cob:58.11-58.16:
+syn_file.at-2201-prog.cob:58.11-58.16:
   55              CLOSE TEST-FILE1
   56              CLOSE TEST-FILE1
   57              OPEN I-O TEST-FILE1 ALLOWING NO
@@ -303,7 +303,7 @@ syn_file.at-2203-prog.cob:58.11-58.16:
   60              CLOSE TEST-FILE1
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:59.42:
+syn_file.at-2201-prog.cob:59.42:
   56              CLOSE TEST-FILE1
   57              OPEN I-O TEST-FILE1 ALLOWING NO
   58              CLOSE TEST-FILE1
@@ -313,7 +313,7 @@ syn_file.at-2203-prog.cob:59.42:
   61              OPEN I-O TEST-FILE1 FOR LOCK
 >> Hint: Missing REWIND
 
-syn_file.at-2203-prog.cob:59.43-59.49:
+syn_file.at-2201-prog.cob:59.43-59.49:
   56              CLOSE TEST-FILE1
   57              OPEN I-O TEST-FILE1 ALLOWING NO
   58              CLOSE TEST-FILE1
@@ -323,7 +323,7 @@ syn_file.at-2203-prog.cob:59.43-59.49:
   61              OPEN I-O TEST-FILE1 FOR LOCK
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:61.31-61.34:
+syn_file.at-2201-prog.cob:61.31-61.34:
   58              CLOSE TEST-FILE1
   59              OPEN I-O TEST-FILE1 ALLOWING NO OTHERS
   60              CLOSE TEST-FILE1
@@ -333,7 +333,7 @@ syn_file.at-2203-prog.cob:61.31-61.34:
   63              OPEN I-O TEST-FILE1 LOCK
 >> Error: Invalid syntax
 
-syn_file.at-2203-prog.cob:63.31-63.35:
+syn_file.at-2201-prog.cob:63.31-63.35:
   60              CLOSE TEST-FILE1
   61              OPEN I-O TEST-FILE1 FOR LOCK
   62              CLOSE TEST-FILE1
@@ -343,4 +343,4 @@ syn_file.at-2203-prog.cob:63.31-63.35:
   65              OPEN I-O TEST-FILE1 BULK-ADDITION
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2253:0
+Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2251:0

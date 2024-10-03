@@ -1875,10 +1875,10 @@ let%expect_test "procedure-paragraph-completion" =
       16
     (line 13, character 22):
     Basic (78 entries):
-        SECOND-SECTION
-        FIRST-SECTION
-        FIRST-PARAGRAPH IN FIRST-SECTION
-        FIRST-PARAGRAPH
+        FIRST-PARAGRAPH IN FIRST-SECTION Paragraph
+        FIRST-PARAGRAPH Paragraph
+        FIRST-SECTION Section
+        SECOND-SECTION Section
         DATA-NAME Alphanum
         VAR Alphanum
         ACCEPT
@@ -1954,10 +1954,10 @@ let%expect_test "procedure-paragraph-completion" =
         WRITE
         ZEROS
     Eager (78 entries):
-        SECOND-SECTION
-        FIRST-SECTION
-        FIRST-PARAGRAPH IN FIRST-SECTION
-        FIRST-PARAGRAPH
+        FIRST-PARAGRAPH IN FIRST-SECTION Paragraph
+        FIRST-PARAGRAPH Paragraph
+        FIRST-SECTION Section
+        SECOND-SECTION Section
         DATA-NAME Alphanum
         VAR Alphanum
         ACCEPT
@@ -3888,10 +3888,12 @@ let%expect_test "semantic-while-writing-completion" =
           DISPLAY _|_
 
           UNSTRING _|_
+          UNSTRING ALPHA INTO _|_.
+          UNSTRING ALPHA INTO _|_ALPHA.
   |cobol} in
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":2,"line":14},"start":{"character":0,"line":14}},"severity":1},{"message":"Missing <identifier> INTO .","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":31,"line":14},"start":{"character":30,"line":14}},"severity":1},{"message":"Invalid syntax","range":{"end":{"character":18,"line":14},"start":{"character":10,"line":14}},"severity":1},{"message":"Missing <identifier> INTO","range":{"end":{"character":18,"line":13},"start":{"character":18,"line":13}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":18,"line":13},"start":{"character":10,"line":13}},"severity":1},{"message":"Missing <identifier or literal>","range":{"end":{"character":17,"line":11},"start":{"character":17,"line":11}},"severity":4},{"message":"Invalid syntax","range":{"end":{"character":17,"line":11},"start":{"character":10,"line":11}},"severity":1},{"message":"Missing TO","range":{"end":{"character":13,"line":9},"start":{"character":13,"line":9}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     __rootdir__/prog.cob:10.14:
        7           01 ALPHA PIC X.
        8           01 ANYY USAGE BIT.
@@ -3984,7 +3986,8 @@ let%expect_test "semantic-while-writing-completion" =
       13
       14 >           UNSTRING
     ----                      ^
-      15
+      15             UNSTRING ALPHA INTO .
+      16             UNSTRING ALPHA INTO ALPHA.
     (line 13, character 19):
     Basic (12 entries):
         NUM Numeric (unexpected here)
@@ -4003,6 +4006,75 @@ let%expect_test "semantic-while-writing-completion" =
         NUM Numeric (unexpected here)
         ALPHA Alphanum
         ANYY Boolean (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:15.30:
+      12             DISPLAY
+      13
+      14             UNSTRING
+      15 >           UNSTRING ALPHA INTO .
+    ----                                 ^
+      16             UNSTRING ALPHA INTO ALPHA.
+      17
+    (line 14, character 30):
+    Basic (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM Numeric (unexpected here)
+        ALPHA Alphanum
+        ANYY Boolean (unexpected here)
+        ADDRESS OF
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    __rootdir__/prog.cob:16.30:
+      13
+      14             UNSTRING
+      15             UNSTRING ALPHA INTO .
+      16 >           UNSTRING ALPHA INTO ALPHA.
+    ----                                 ^
+      17
+    (line 15, character 30):
+    Basic (12 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
+        ADDRESS
+        EXCEPTION-OBJECT
+        FUNCTION
+        LINAGE-COUNTER
+        LINE-COUNTER
+        NULL
+        PAGE-COUNTER
+        SELF
+        SUPER
+    Eager (12 entries):
+        NUM Numeric
+        ALPHA Alphanum
+        ANYY Boolean
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
@@ -4279,240 +4351,240 @@ let%expect_test "intrinsic-completion" =
        9             DISPLAY FUNCTION ABS (1)
     (line 6, character 17):
     Basic (117 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
         ALL INTRINSIC
     Eager (117 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
         ALL INTRINSIC
     __rootdir__/prog.cob:7.21:
        4           ENVIRONMENT DIVISION.
@@ -4524,122 +4596,122 @@ let%expect_test "intrinsic-completion" =
        9             DISPLAY FUNCTION ABS (1)
     (line 6, character 21):
     Basic (124 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
         AS
         CLASS
         FUNCTION
@@ -4649,122 +4721,122 @@ let%expect_test "intrinsic-completion" =
         PROGRAM
         PROPERTY
     Eager (124 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
         AS
         CLASS
         FUNCTION
@@ -4824,239 +4896,239 @@ let%expect_test "intrinsic-completion" =
       11
     (line 8, character 27):
     Basic (116 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
     Eager (116 entries):
-        BYTE-LENGTH
-        CHAR
-        CONTENT-OF
-        CONVERT
-        CURRENT-DATE
-        FORMATTED-DATETIME
-        FORMATTED-TIME
-        LENGTH
-        LOCALE-DATE
-        LOCALE-TIME-FROM-SECONDS
-        LOCALE-TIME
-        NUMVAL-C
-        RANDOM
-        RANGE
-        REVERSE
-        SIGN
-        SUM
-        TRIM
-        WHEN-COMPILED
-        YEAR-TO-YYYY
-        VARIANCE
-        UPPER-CASE
-        TEST-NUMVAL-F
-        TEST-NUMVAL-C
-        TEST-NUMVAL
-        TEST-FORMATTED-DATETIME
-        TEST-DAY-YYYYDDD
-        TEST-DATE-YYYYMMDD
-        TAN
-        SUBSTITUTE-CASE
-        SUBSTITUTE
-        STORED-CHAR-LENGTH
-        STANDARD-DEVIATION
-        STANDARD-COMPARE
-        SQRT
-        SIN
-        SECONDS-PAST-MIDNIGHT
-        SECONDS-FROM-FORMATTED-TIME
-        REM
-        PRESENT-VALUE
-        PI
-        ORD-MIN
-        ORD-MAX
-        ORD
-        NUMVAL-F
-        NUMVAL
-        NUMERIC-THOUSANDS-SEPARATOR
-        NUMERIC-DECIMAL-POINT
-        NATIONAL-OF
-        MONETARY-THOUSANDS-SEPARATOR
-        MONETARY-DECIMAL-POINT
-        MODULE-TIME
-        MODULE-SOURCE
-        MODULE-PATH
-        MODULE-NAME
-        MODULE-ID
-        MODULE-FORMATTED-DATE
-        MODULE-DATE
-        MODULE-CALLER-ID
-        MOD
-        MIN
-        MIDRANGE
-        MEDIAN
-        MEAN
-        MAX
-        LOWEST-ALGEBRAIC
-        LOWER-CASE
-        LOG10
-        LOG
-        LOCALE-COMPARE
-        LENGTH-AN
-        INTEGER-PART
-        INTEGER-OF-FORMATTED-DATE
-        INTEGER-OF-DAY
-        INTEGER-OF-DATE
-        INTEGER-OF-BOOLEAN
-        INTEGER
-        HIGHEST-ALGEBRAIC
-        HEX-TO-CHAR
-        HEX-OF
-        FRACTION-PART
-        FORMATTED-DATE
-        FORMATTED-CURRENT-DATE
-        FIND-STRING
-        FACTORIAL
-        EXP10
-        EXP
-        EXCEPTION-STATUS
-        EXCEPTION-STATEMENT
-        EXCEPTION-LOCATION-N
-        EXCEPTION-LOCATION
-        EXCEPTION-FILE-N
-        EXCEPTION-FILE
-        E
-        DISPLAY-OF
-        DAY-TO-YYYYDDD
-        DAY-OF-INTEGER
-        DATE-TO-YYYYMMDD
-        DATE-OF-INTEGER
-        CURRENCY-SYMBOL
-        COS
-        CONTENT-LENGTH
-        CONCATENATE
-        CONCAT
-        COMBINED-DATETIME
-        CHAR-NATIONAL
-        BOOLEAN-OF-INTEGER
-        BIT-TO-CHAR
-        BIT-OF
-        BASECONVERT
-        ATAN
-        ASIN
-        ANNUITY
-        ACOS
-        ABSOLUTE-VALUE
-        ABS
+        BYTE-LENGTH Intrinsic
+        CHAR Intrinsic
+        CONTENT-OF Intrinsic
+        CONVERT Intrinsic
+        CURRENT-DATE Intrinsic
+        FORMATTED-DATETIME Intrinsic
+        FORMATTED-TIME Intrinsic
+        LENGTH Intrinsic
+        LOCALE-DATE Intrinsic
+        LOCALE-TIME-FROM-SECONDS Intrinsic
+        LOCALE-TIME Intrinsic
+        NUMVAL-C Intrinsic
+        RANDOM Intrinsic
+        RANGE Intrinsic
+        REVERSE Intrinsic
+        SIGN Intrinsic
+        SUM Intrinsic
+        TRIM Intrinsic
+        WHEN-COMPILED Intrinsic
+        YEAR-TO-YYYY Intrinsic
+        VARIANCE Intrinsic
+        UPPER-CASE Intrinsic
+        TEST-NUMVAL-F Intrinsic
+        TEST-NUMVAL-C Intrinsic
+        TEST-NUMVAL Intrinsic
+        TEST-FORMATTED-DATETIME Intrinsic
+        TEST-DAY-YYYYDDD Intrinsic
+        TEST-DATE-YYYYMMDD Intrinsic
+        TAN Intrinsic
+        SUBSTITUTE-CASE Intrinsic
+        SUBSTITUTE Intrinsic
+        STORED-CHAR-LENGTH Intrinsic
+        STANDARD-DEVIATION Intrinsic
+        STANDARD-COMPARE Intrinsic
+        SQRT Intrinsic
+        SIN Intrinsic
+        SECONDS-PAST-MIDNIGHT Intrinsic
+        SECONDS-FROM-FORMATTED-TIME Intrinsic
+        REM Intrinsic
+        PRESENT-VALUE Intrinsic
+        PI Intrinsic
+        ORD-MIN Intrinsic
+        ORD-MAX Intrinsic
+        ORD Intrinsic
+        NUMVAL-F Intrinsic
+        NUMVAL Intrinsic
+        NUMERIC-THOUSANDS-SEPARATOR Intrinsic
+        NUMERIC-DECIMAL-POINT Intrinsic
+        NATIONAL-OF Intrinsic
+        MONETARY-THOUSANDS-SEPARATOR Intrinsic
+        MONETARY-DECIMAL-POINT Intrinsic
+        MODULE-TIME Intrinsic
+        MODULE-SOURCE Intrinsic
+        MODULE-PATH Intrinsic
+        MODULE-NAME Intrinsic
+        MODULE-ID Intrinsic
+        MODULE-FORMATTED-DATE Intrinsic
+        MODULE-DATE Intrinsic
+        MODULE-CALLER-ID Intrinsic
+        MOD Intrinsic
+        MIN Intrinsic
+        MIDRANGE Intrinsic
+        MEDIAN Intrinsic
+        MEAN Intrinsic
+        MAX Intrinsic
+        LOWEST-ALGEBRAIC Intrinsic
+        LOWER-CASE Intrinsic
+        LOG10 Intrinsic
+        LOG Intrinsic
+        LOCALE-COMPARE Intrinsic
+        LENGTH-AN Intrinsic
+        INTEGER-PART Intrinsic
+        INTEGER-OF-FORMATTED-DATE Intrinsic
+        INTEGER-OF-DAY Intrinsic
+        INTEGER-OF-DATE Intrinsic
+        INTEGER-OF-BOOLEAN Intrinsic
+        INTEGER Intrinsic
+        HIGHEST-ALGEBRAIC Intrinsic
+        HEX-TO-CHAR Intrinsic
+        HEX-OF Intrinsic
+        FRACTION-PART Intrinsic
+        FORMATTED-DATE Intrinsic
+        FORMATTED-CURRENT-DATE Intrinsic
+        FIND-STRING Intrinsic
+        FACTORIAL Intrinsic
+        EXP10 Intrinsic
+        EXP Intrinsic
+        EXCEPTION-STATUS Intrinsic
+        EXCEPTION-STATEMENT Intrinsic
+        EXCEPTION-LOCATION-N Intrinsic
+        EXCEPTION-LOCATION Intrinsic
+        EXCEPTION-FILE-N Intrinsic
+        EXCEPTION-FILE Intrinsic
+        E Intrinsic
+        DISPLAY-OF Intrinsic
+        DAY-TO-YYYYDDD Intrinsic
+        DAY-OF-INTEGER Intrinsic
+        DATE-TO-YYYYMMDD Intrinsic
+        DATE-OF-INTEGER Intrinsic
+        CURRENCY-SYMBOL Intrinsic
+        COS Intrinsic
+        CONTENT-LENGTH Intrinsic
+        CONCATENATE Intrinsic
+        CONCAT Intrinsic
+        COMBINED-DATETIME Intrinsic
+        CHAR-NATIONAL Intrinsic
+        BOOLEAN-OF-INTEGER Intrinsic
+        BIT-TO-CHAR Intrinsic
+        BIT-OF Intrinsic
+        BASECONVERT Intrinsic
+        ATAN Intrinsic
+        ASIN Intrinsic
+        ANNUITY Intrinsic
+        ACOS Intrinsic
+        ABSOLUTE-VALUE Intrinsic
+        ABS Intrinsic
     __rootdir__/prog.cob:9.31:
        6           REPOSITORY.
        7           FUNCTION ABS INTRINSIC.
@@ -5272,3 +5344,29 @@ let%expect_test "intrinsic-completion" =
         WITH NO ADVANCING
         WRITE
         ZEROS |}];;
+
+let%expect_test "string-concat-completion" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 CC PIC X.
+        PROCEDURE DIVISION.
+          MOVE "A"&"B" _|_TO CC.
+          STOP RUN.
+  |cobol} in
+  end_with_postproc [%expect.output];
+  [%expect{|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:8.23:
+       5           WORKING-STORAGE SECTION.
+       6           01 CC PIC X.
+       7           PROCEDURE DIVISION.
+       8 >           MOVE "A"&"B" TO CC.
+    ----                          ^
+       9             STOP RUN.
+      10
+    (line 7, character 23):
+    Basic (1 entries): TO
+    Eager (1 entries): TO |}];;

@@ -25,16 +25,42 @@ let pp_cobol_block: _ Fmt.t -> _ Fmt.t = fun pp ->
 
 (* usage *)
 
+let max_value digits scale =
+  let s = "123456789123456789123456789123456789" in
+  let whole = (digits - scale) in
+  let scale = if scale < 0 then 0 else scale in
+  let whole_part = Str.string_before s whole in
+  let decimal_part = Str.string_before (Str.string_after s whole) scale in
+  float_of_string (whole_part ^ "." ^ decimal_part)
+
+let nbsp_repl = Str.global_replace (Str.regexp " ") " " (* <- utf8 nbsp *)
+
+let pp_example_of ppf (picture: Cobol_data.Picture.t) =
+  try
+    match picture.category with
+    | FixedNum { digits; scale; _ } ->
+      let max = max_value digits scale in
+      let max_str =
+        if Float.is_integer max
+        then string_of_int (int_of_float max)
+        else string_of_float max in
+      Fmt.pf ppf "\n\n*e.g,* [`%s`] (0), [`%s`] (%s)"
+        (Lsp_picture_interp.example_of ~picture 0. |> nbsp_repl)
+        (Lsp_picture_interp.example_of ~picture max |> nbsp_repl)
+        max_str
+    | _ -> ()
+
+  with Invalid_argument _ -> ()
+
 let pp_usage: usage Pretty.printer =
   let pp_usage_with_picture ppf name (picture: Cobol_data.Picture.t) =
-    Fmt.(
-      pp_cobol_block (fun ppf _ ->
-        pf ppf "PIC %a USAGE %s"
-        Cobol_data.Picture.pp_picture_symbols picture.pic
-        name)
-      ++ const string "\n\n"
-      ++ const Cobol_data.Picture.pp_category picture.category)
-    ppf ()
+    Fmt.pf ppf "%a\n\n%a%a"
+      (pp_cobol_block (fun ppf _ ->
+           Fmt.pf ppf "PIC %a USAGE %s"
+             Cobol_data.Picture.pp_picture_symbols picture.pic
+             name)) ()
+      Cobol_data.Picture.pp_category picture.category
+      pp_example_of picture
   and pp_usage_with_sign ppf name signed =
     pp_cobol_block Fmt.(any "USAGE " ++ any name ++ any (if signed then " SIGNED" else " UNSIGNED"))
     ppf ()
@@ -223,10 +249,10 @@ let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
 
 let pp_data_definition ppf = function
   | Data_field { def; _ } ->
-      Fmt.const pp_field_definition' def ppf ()
+      pp_field_definition' ppf def
   | Data_renaming { def; _ } ->
-      Fmt.const pp_record_renaming' def ppf ()
+      pp_record_renaming' ppf def
   | Data_condition { def; field; _ } ->
       Fmt.pf ppf "%a\n\n%a" pp_condition_name ~&def pp_field_definition ~&field
   | Table_index { table; _ } ->
-      Fmt.const pp_table_definition' table ppf ()
+      pp_table_definition' ppf table

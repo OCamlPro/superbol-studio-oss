@@ -70,7 +70,7 @@ let package =
       "vscode-languageclient", "8.0.2";
       "polka", "^1.0.0-next.22";
       "sirv", "^2.0.2";
-
+      
       (* for the debug extension: *)
       "n-readlines", "^1.0.0";
     ]
@@ -95,9 +95,34 @@ let contributes =
   Manifest.contributes ()
     ~languages: [
       Manifest.language "cobol"
-        ~aliases: [ "COBOL" ]
-        ~filenamePatterns: [ "*." ^ cob_extensions_pattern ]
-        ~configuration: "./syntaxes/language-configuration.json"
+        ~aliases: ["COBOL"]
+        ~filenamePatterns: ["*." ^ cob_extensions_pattern]
+        ~configuration: "./syntaxes/language-configuration.json";
+      Manifest.language "COBOL_GNU_LISTFILE"
+        ~aliases: ["LISTFILE"]
+        ~extensions: [".lst"]
+        ~configuration: "./syntaxes/list-n-dump-configuration.json";
+      Manifest.language "COBOL_GNU_DUMPFILE"
+        ~aliases: ["DUMPFILE"]
+        ~extensions: [".dump"]
+        ~configuration: "./syntaxes/list-n-dump-configuration.json";
+    ]
+    ~grammars: [
+      Manifest.grammar ()
+        ~language: "cobol"
+        ~scopeName: "source.cobol"
+        ~path: "./syntaxes/COBOL.tmLanguage.json"
+        ~embeddedLanguages: [
+          "meta.embedded.block.sql", "sql";
+        ];
+      Manifest.grammar ()
+        ~language: "COBOL_GNU_LISTFILE"
+        ~scopeName: "source.gnucobol_listfile"
+        ~path: "./syntaxes/listfile.tmLanguage.json";
+      Manifest.grammar ()
+        ~language: "COBOL_GNU_DUMPFILE"
+        ~scopeName: "source.gnucobol_dumpfile"
+        ~path: "./syntaxes/dumpfile.tmLanguage.json"
     ]
     ~debuggers: [
       Manifest.debugger "gdb"
@@ -338,6 +363,13 @@ let contributes =
                (with_superbol_toml_note "List of copybooks paths.")
              ~order:3;
 
+           Manifest.PROPERTY.strings "superbol.cobol.copyexts"
+             ~markdownDescription:
+               (with_superbol_toml_note
+                  "File extensions for copybook resolution")
+             ~default:Cobol_common.Copybook.copybook_extensions
+             ~order:4;
+
            (* Paths *)
 
            Manifest.PROPERTY.string "superbol.cobc-path"
@@ -365,6 +397,16 @@ let contributes =
                "Force reporting of syntax diagnostics for dialects other than \
                 ``COBOL85``."
              ~order:21;
+
+           Manifest.PROPERTY.bool "superbol.cacheInGlobalStorage"
+             ~default:false
+             ~markdownDescription:
+               "Use storage provided by Visual Studio Code for caching.  When \
+                this setting is set to *false*, the cache related to the \
+                contents of a given workspace folder *f* is stored in a file \
+                named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
+                removed automatically, whatever their location."
+             ~order:22;
 
            (* Debugger-specific: *)
 
@@ -408,10 +450,16 @@ let contributes =
 
           Manifest.PROPERTY.null_string "cobc-path"
             ~title:"GnuCOBOL Compiler Executable"
-            ~description:"Path to the GnuCOBOL compiler executable; when `null`, \
-                          defaults to the value of \"superbol.cobc-path\" from \
-                          the workspace configuration, if defined, to \"cobc\" \
-                          otherwise.";
+            ~markdownDescription:
+              "Path to the GnuCOBOL compiler executable; when `null`, defaults \
+               to the value of \"superbol.cobc-path\" from the workspace \
+               configuration, if defined, to \"cobc\" otherwise.";
+
+          Manifest.PROPERTY.null_string "listings-target"
+            ~title:"Output file or directory for preprocessed program listings"
+            ~markdownDescription:
+              "Path to a directory where preprocessed program listings are \
+               generated; no listing is saved when `null`";
 
           Manifest.PROPERTY.array "extra-args"
             ~description:"Additional arguments passed to `cobc`";
@@ -452,15 +500,6 @@ let contributes =
           "macro", `A [`String "keyword.control.directive.cobol"];
         ];
       ]
-    ]
-    ~grammars: [
-      Manifest.grammar ()
-        ~language: "cobol"
-        ~scopeName: "source.cobol"
-        ~path:"./syntaxes/COBOL.tmLanguage.json"
-        ~embeddedLanguages:[
-          "meta.embedded.block.sql", "sql";
-        ];
     ]
     ~problemPatterns: [
       Manifest.problemPattern
@@ -549,7 +588,7 @@ let contributes =
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
-        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json";
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json";
     ]
 
 let manifest =

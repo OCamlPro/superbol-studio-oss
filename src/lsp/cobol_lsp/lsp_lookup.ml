@@ -310,7 +310,8 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
           | AllocateDataItem n ->
             acc
             |> Any (* linkage level 01 or 77 *) @>@ fold_name' v n
-          | _ -> acc
+          | AllocateCharacters e ->
+            acc |> Any @>@ fold_expression v e
         end
         |> skip
 
@@ -325,7 +326,10 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
           | CallGeneral i ->
             acc
             |> Alphanum (* +procedure_pointer *) @>@ fold_ident_or_strlit v i
-          | _ -> acc
+          | CallProto { called; prototype } ->
+            acc
+            |> fold_option ~fold:fold_ident_or_strlit v called
+            |> fold_call_proto v prototype
         end
         |> skip
 
@@ -338,6 +342,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         acc
         |> [Numeric; NumericEdited; Boolean]
         @>>@ fold_rounded_idents v c.compute_targets
+        |> Any @>@ fold_expr v c.compute_expr
         |> fold_dual_handler v c.compute_on_size_error
         |> skip
 
@@ -358,9 +363,9 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_entry_by_clause clause acc =
         begin match clause with
           | EntryByReference l ->
-            acc
-            |> Any (* linkage lvl 01 77*) @>@ fold_name'_list v l
-          | _ -> acc
+            acc |> Any (* linkage lvl 01 77*) @>@ fold_name'_list v l
+          | EntryByValue l ->
+            acc |> fold_name'_list v l
         end
         |> skip
 
@@ -371,7 +376,10 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_goto' { payload = g; _ } acc =
         begin match g with
-          | GoToSimple { depending_on; _ }
+          | GoToSimple _ -> acc
+          | GoToDepending { depending_on; _ } ->
+            acc
+            |> Numeric (* int *) @>@ fold_ident v depending_on
           | GoToEntry { depending_on; _ } ->
             acc
             |> Numeric (* int *) @>@ fold_option ~fold:fold_ident v depending_on
@@ -381,12 +389,21 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
       method! fold_inspect' { payload = i; _ } acc =
         acc
         |> (* usage display *) fold_ident v i.inspect_item
+        |> fold_inspect_spec v i.inspect_spec
+        |> skip
+
+      method! fold_tallying t acc =
+        acc
+        |> Numeric @>@ fold_qualident v t.tallying_target
+        |> fold_list ~fold:fold_tallying_clause' v t.tallying_clauses
         |> skip
 
       method! fold_invoke' { payload = i; _ } acc =
         acc
         |> ObjectRef (* 4byte *) @>@ fold_ident v i.invoke_target
         |> Alphanum @>@ fold_ident_or_strlit v i.invoke_method
+        |> fold_list ~fold:fold_call_using_clause' v i.invoke_using
+        |> fold_ident'_opt v i.invoke_returning
         |> skip
 
       method! fold_move' { payload = m; _ } acc =
@@ -430,6 +447,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         |> Numeric @>@ fold_ident v vp.varying_ident
         |> Numeric @>@ fold_scalar v vp.varying_from
         |> Numeric @>@ fold_option ~fold:fold_scalar v vp.varying_by
+        |> fold_condition v vp.varying_until
         |> skip
 
       method! fold_raise' { payload = r; _ } acc =
@@ -441,12 +459,17 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
 
       method! fold_search' { payload = s; _ } acc =
         acc
+        |> fold_qualname v s.search_item
+        |> fold_handler v s.search_at_end
         |> [Numeric; Index] @>>@ fold_option ~fold:fold_ident v s.search_varying
+        |> fold_list ~fold:fold_search_when_clause' v s.search_when_clauses
         |> skip
 
       method! fold_string_stmt' { payload = s; _ } acc =
         acc
+        |> fold_list ~fold:fold_string_source v s.string_sources
         |> Alphanum @>@ fold_ident v s.string_target
+        |> fold_option ~fold:fold_ident v s.string_pointer
         |> fold_dual_handler v s.string_on_overflow
         |> skip
 

@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-878df3cde45b12780e5fa7889241d3c2:.
+dd76e362dbef053fcde8cdf4d7f62239:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -75,7 +75,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-5671e0e7f179775b968fb9689a157783:dune-project
+c375da381bfae0c77c7af1cb51f96580:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_common.opam
@@ -105,7 +105,7 @@ d7c870139778d0a6e34395be1ea0c85b:opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-97a55d9d0fd8dc94c0be5ddc8297c71b:opam/cobol_lsp.opam
+f1979dd618dbe096cbf3f6ebd7b764ad:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
@@ -240,7 +240,7 @@ e44a633b92fe42cc1f4878b395dade73:opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-82cdf3a555c66031532140198aa74541:opam/vscode-languageclient-js-stubs.opam
+22f87d3eb763c55be00a0a1fdaf381b1:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
 # begin context for scripts/after.sh
@@ -350,7 +350,7 @@ a98a08d36a2f65127f60832515b6ab47:src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_parser/dune
 # file src/lsp/cobol_parser/dune
-44b9b76fe2777a06cbe5a7eb212f7b16:src/lsp/cobol_parser/dune
+0bdd09727ecc330598da0a5c0582a262:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
 
 # begin context for src/lsp/cobol_parser/version.mlt
@@ -525,7 +525,7 @@ b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-aad8ac8a26ae15e3501dd5ea3b49ec9a:src/vendor/ez_toml/dune
+87fe96c228b8cb51be7268c7e3cdd5b5:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld
@@ -580,7 +580,7 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
-995d796d5acbb0b17aef1bc888c34531:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+538f01cd4e7ceae6575f3450677d672f:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt

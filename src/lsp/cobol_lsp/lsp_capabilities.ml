@@ -46,7 +46,7 @@ let reply (_: ClientCapabilities.t) =
     in
     ServerCapabilities.create_workspace ()
       ~workspaceFolders
-  in
+  and codeLensProvider = CodeLensOptions.create () in
   ServerCapabilities.create ()
     ~textDocumentSync:(`TextDocumentSyncOptions sync)
     ~definitionProvider:(`Bool true)
@@ -59,3 +59,5 @@ let reply (_: ClientCapabilities.t) =
     ~completionProvider:completion_option
     ~workspace
     ~documentSymbolProvider:(`Bool true)
+    ~codeLensProvider
+    ~renameProvider:(`Bool true)

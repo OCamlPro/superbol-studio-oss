@@ -120,6 +120,16 @@
           },
           "order": 3
         },
+        "superbol.cobol.copyexts": {
+          "markdownDescription": "File extensions for copybook resolution\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "array",
+          "default": [
+            "cpy",
+            "cbx"
+          ],
+          "items": "string",
+          "order": 4
+        },
         "superbol.cobc-path": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",
@@ -141,6 +151,12 @@
           "type": "boolean",
           "default": false,
           "order": 21
+        },
+        "superbol.cacheInGlobalStorage": {
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching.  When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.",
+          "type": "boolean",
+          "default": false,
+          "order": 22
         },
         "superbol.debugger.display-variable-attributes": {
           "title": "Display Variable Attributes",
@@ -378,12 +394,22 @@
         "embeddedLanguages": {
           "meta.embedded.block.sql": "sql"
         }
+      },
+      {
+        "language": "COBOL_GNU_LISTFILE",
+        "scopeName": "source.gnucobol_listfile",
+        "path": "./syntaxes/listfile.tmLanguage.json"
+      },
+      {
+        "language": "COBOL_GNU_DUMPFILE",
+        "scopeName": "source.gnucobol_dumpfile",
+        "path": "./syntaxes/dumpfile.tmLanguage.json"
       }
     ],
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
-        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json"
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json"
       }
     ],
     "languages": [
@@ -396,6 +422,26 @@
           "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
         ],
         "configuration": "./syntaxes/language-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_LISTFILE",
+        "extensions": [
+          ".lst"
+        ],
+        "aliases": [
+          "LISTFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_DUMPFILE",
+        "extensions": [
+          ".dump"
+        ],
+        "aliases": [
+          "DUMPFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
     "problemMatchers": [
@@ -485,11 +531,19 @@
           },
           "cobc-path": {
             "title": "GnuCOBOL Compiler Executable",
+            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
             "type": [
               "string",
               "null"
-            ],
-            "description": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise."
+            ]
+          },
+          "listings-target": {
+            "title": "Output file or directory for preprocessed program listings",
+            "markdownDescription": "Path to a directory where preprocessed program listings are generated; no listing is saved when `null`",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "extra-args": {
             "type": "array",

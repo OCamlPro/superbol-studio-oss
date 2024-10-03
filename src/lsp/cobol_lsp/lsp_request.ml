@@ -454,6 +454,30 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
+let doc_of_datadef ~rev_comments ~filename data_def =
+  let open Cobol_preproc.Text in
+  let loc = Cobol_data.Item.def_loc data_def in
+  let def_filename = (fst @@ Cobol_common.Srcloc.as_lexloc loc).pos_fname in
+  if not (String.equal filename def_filename) (** def is in copybook *)
+  then ""
+  else
+    let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
+    let (inline, full_line) =
+      List.fold_left begin fun acc { comment_loc; comment_kind; comment_contents } ->
+        let com_range = Lsp_position.range_of_lexloc comment_loc in
+        if def_range.start.line = com_range.start.line
+        then (Some comment_contents, snd acc)
+        else if def_range.start.line = com_range.start.line + 1
+             && comment_kind == `Line
+        then (fst acc, Some comment_contents)
+        else acc
+      end (None, None) rev_comments
+    in
+    match inline, full_line with
+    | Some comment, _ -> "\n---\n" ^ String.sub comment 2 (String.length comment - 2)
+    | None, Some comment -> "\n---\n" ^ String.sub comment 1 (String.length comment - 1)
+    | _ -> ""
+
 let lookup_data_definition_for_hover cu_name element_at_pos group =
   let { payload = cu; _ } = CUs.find_by_name cu_name group in
   let named_data_defs = cu.unit_data.data_items.named in
@@ -467,7 +491,7 @@ let lookup_data_definition_for_hover cu_name element_at_pos group =
   with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
 let data_definition_on_hover
-    ?(always_show_hover_text_in_data_div = false)
+    ?(always_show_hover_text_in_data_div = false) ~rev_comments
     ~uri position Cobol_typeck.Outputs.{ group; _ } =
   let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~uri position group with
@@ -479,11 +503,12 @@ let data_definition_on_hover
       try
         let data_def, hover_loc
           = lookup_data_definition_for_hover cu_name ele_at_pos group in
+        let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
         if always_show_hover_text_in_data_div ||
            not (Lsp_position.is_in_srcloc ~filename position @@
                 Cobol_data.Item.def_loc data_def)
-        then Some (Pretty.to_string
-                     "%a" Lsp_data_info_printer.pp_data_definition data_def,
+        then Some (Pretty.to_string "%a%s"
+                     Lsp_data_info_printer.pp_data_definition data_def doc_comments,
                    hover_loc)
         else None
       with Not_found ->
@@ -536,9 +561,9 @@ let handle_hover ?always_show_hover_text_in_data_div
     registry HoverParams.{ textDocument = doc; position; _ } =
   let filename = Lsp.Uri.to_path doc.uri in
   try_with_main_document_data registry doc
-    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } checked_doc ->
+    ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
       match data_definition_on_hover ~uri:doc.uri position checked_doc
-              ?always_show_hover_text_in_data_div,
+              ?always_show_hover_text_in_data_div ~rev_comments,
             preproc_info_on_hover ~filename position pplog with
       | None, None ->
           None
@@ -580,11 +605,134 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
 
 let handle_document_symbol registry (params: DocumentSymbolParams.t) =
   try_with_main_document_data registry params.textDocument
-    ~f:begin fun ~doc { ptree; _ }->
+    ~f:begin fun ~doc { ptree; _ } ->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
       let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
       Some (`DocumentSymbol symbols)
     end
+
+(** { Document Code Lens } *)
+
+module Positions = Set.Make (struct
+    type t = Position.t
+    let compare (p1: t) (p2: t) =
+      let c = p2.line - p1.line in
+      if c <> 0 then c else p2.character - p1.character
+  end)
+
+let codelens_positions ~uri group =
+  let filename = Lsp.Uri.to_path uri in
+  let open struct
+    include Cobol_common.Visitor
+    include Cobol_data.Visitor
+    type context =
+      | ProcedureDiv
+      | DataDiv
+      | None
+  end in
+  let set_context context (old, acc) =
+    do_children_and_then (context, acc) (fun (_, acc) -> (old, acc))
+  in
+  let take_when_in context { loc; _ } (current, acc) =
+    if context <> current
+    then skip (current, acc)
+    else
+      let range = Lsp_position.range_of_srcloc_in ~filename loc in
+      skip (context, Positions.add range.start acc)
+  in
+  Cobol_unit.Visitor.fold_unit_group
+    object (v)
+      inherit [_] Cobol_unit.Visitor.folder
+      method! fold_procedure _ = set_context ProcedureDiv
+      method! fold_data_definitions _ = set_context DataDiv
+      method! fold_paragraph' _ = skip
+      method! fold_procedure_name' = take_when_in ProcedureDiv
+      method! fold_qualname' = take_when_in DataDiv
+      method! fold_record_renaming { renaming_name; _ } =
+        take_when_in DataDiv renaming_name
+      method! fold_field_definition { field_qualname; field_redefines;
+                                      field_leading_ranges;
+                                      field_offset; field_size; field_layout;
+                                      field_conditions; field_redefinitions;
+                                      field_length = _ } acc =
+        ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+        skip @@ begin acc
+          |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
+          |> fold_field_layout v field_layout
+          |> fold_condition_names v field_conditions
+          |> fold_item_redefinitions v field_redefinitions
+        end
+      method! fold_table_definition { table_field; table_offset; table_size;
+                                      table_range; table_init_values;
+                                      table_redefines; table_redefinitions } acc =
+        ignore(table_offset, table_size, table_init_values, table_redefines);
+        skip @@ begin acc
+          |> fold_field_definition' v table_field
+          |> fold_table_range v table_range
+          |> fold_item_redefinitions v table_redefinitions
+        end
+    end group (None, Positions.empty)
+  |> snd
+
+let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let context = ReferenceContext.create ~includeDeclaration:true in
+      codelens_positions ~uri checked_doc.group
+      |> Positions.to_seq
+      |> Seq.map begin fun position ->
+        let params =
+          ReferenceParams.create ~context ~position ~textDocument () in
+        let ref_count =
+          lookup_references_in_doc ~rootdir params checked_doc
+          |> Option.fold ~none:0 ~some:List.length in
+        let title = string_of_int ref_count
+                    ^ " reference"
+                    ^ if ref_count > 1 then "s" else "" in
+        let range = Range.create ~end_:position ~start:position in
+        let uri = DocumentUri.yojson_of_t textDocument.uri in
+        let command = Command.create () ~title
+            ~command:"superbol.editor.action.findReferences"
+            ~arguments:[uri; Position.yojson_of_t position] in
+        CodeLens.create ~command ~range ()
+      end
+      |> List.of_seq |> Option.some
+    end
+  |> Option.value ~default:[]
+
+(** { Rename } *)
+
+let handle_rename ?(ignore_when_copybook=false)
+    registry
+    ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let locations = Option.value ~default:[] @@
+        let context = ReferenceContext.create ~includeDeclaration:true in
+        let params = ReferenceParams.create
+            ~context ~position ~textDocument () in
+        lookup_references_in_doc ~rootdir params checked_doc in
+      let changes, is_copybook =
+        List.fold_left begin fun (map, is_copybook) ({ range; uri }: Location.t) ->
+          URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
+          is_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations in
+      let changes = List.of_seq @@ URIMap.to_seq changes in
+      if is_copybook && ignore_when_copybook
+      then begin Lsp_io.notify_info
+          "Ignored renaming of a reference that occurs in a copybook";
+        Some ( WorkspaceEdit.create () ) end
+      else
+        begin if is_copybook
+          then Lsp_io.notify_warn
+              "Proceeded to rename of a reference that occurs in a copybook";
+          Some ( WorkspaceEdit.create ~changes () ) end
+    end
+  |> Option.get
+
 
 (** {3 Generic handling} *)
 
@@ -631,16 +779,18 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) params ->
+    | DocumentSymbol params ->
         Ok (handle_document_symbol registry params, state)
+    | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
+        Ok (handle_codelens registry params, state)
+    | TextDocumentRename params ->
+        Ok (handle_rename registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
-    | TextDocumentCodeLens  (* CodeLensParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
-    | TextDocumentRename  (* RenameParams.t.t *) _
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
@@ -648,6 +798,7 @@ let on_request
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
     | TextDocumentHighlight  (* DocumentHighlightParams.t.t *) _
+    | InlayHint (* InlayHintParams.t.t *) _
     | SignatureHelp  (* SignatureHelpParams.t.t *) _
     | CodeAction  (* CodeActionParams.t.t *) _
     | CodeActionResolve  (* CodeAction.t.t *) _
@@ -704,6 +855,8 @@ module INTERNAL = struct
   let lookup_references = handle_references
   let hover = handle_hover
   let completion = handle_completion
+  let codelens = handle_codelens
   let document_symbol = handle_document_symbol
   let formatting = handle_formatting
+  let rename = handle_rename
 end

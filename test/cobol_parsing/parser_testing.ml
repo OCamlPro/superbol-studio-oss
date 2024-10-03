@@ -23,7 +23,6 @@ let preproc
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = [];
         source_format
       }
 
@@ -44,8 +43,8 @@ let show_parsed_tokens ?(parser_options = options ())
     Cobol_parser.parse_with_artifacts ~options:parser_options
   in
   (if with_locations
-   then Cobol_parser.INTERNAL.pp_tokens' ~fsep:"@\n"
-   else Cobol_parser.INTERNAL.pp_tokens) Fmt.stdout (Lazy.force tokens)
+   then Cobol_parser.Tokens.pp'_list_with_loc_info ~fsep:"@\n"
+   else Cobol_parser.Tokens.pp'_list) Fmt.stdout (Lazy.force tokens)
 
 let show_diagnostics ?(parser_options = options ())
     ?source_format ?filename contents =
@@ -156,8 +155,9 @@ let rewindable_parse
     String { filename = "prog.cob"; contents = prog } |>
     Cobol_preproc.preprocessor
       ~options:Cobol_preproc.Options.{
+          default with
           verbose = parser_options.verbose;
-          libpath = []; source_format;
+          source_format;
           exec_preprocs = EXEC_MAP.empty;
           env = Cobol_preproc.Env.empty;
           config = Option.value config ~default:default.config;

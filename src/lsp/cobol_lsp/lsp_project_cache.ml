@@ -150,6 +150,11 @@ let load ~rootdir ~layout ~config =
       fallback
   | Some cache_file ->
       try load_cache cache_file with
+      | Unix.Unix_error (e, op, args) ->
+          if config.cache_verbose then
+            Lsp_io.log_debug "Failed@ to@ read@ cache:@ %s %s:@ %s"
+              op args (Unix.error_message e);
+          fallback
       | Sys_error msg ->
           if config.cache_verbose then
             Lsp_io.log_info "Failed@ to@ read@ cache:@ %s" msg;

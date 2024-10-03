@@ -18,112 +18,13 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_preproc.Text.TYPES
 open Grammar_tokens                              (* import token constructors *)
+open Grammar_tokens_printer
 open Parser_diagnostics
 
 (* --- *)
 
 type token = Grammar_tokens.token with_loc
 type tokens = token list
-
-let combined_tokens =
-  (* /!\ WARNING: None of the constituents of combined tokens may be
-     context-sensitive.
-
-     Rationale: this would considerably complicate retokenization (which is
-     necessary with the current solution to handle context-sensitive
-     keywords) *)
-  Hashtbl.of_seq @@
-  Seq.map (fun (a, b) -> b, a) @@
-  List.to_seq Text_keywords.combined_keywords
-
-let is_intrinsic_token = function
-  | BYTE_LENGTH_FUNC
-  | CHAR_FUNC
-  | CONTENT_OF_FUNC
-  | CONVERT_FUNC
-  | CURRENT_DATE_FUNC
-  | FORMATTED_DATETIME_FUNC
-  | FORMATTED_TIME_FUNC
-  | LENGTH_FUNC
-  | LOCALE_DATE_FUNC
-  | LOCALE_TIME_FROM_SECONDS_FUNC
-  | LOCALE_TIME_FUNC
-  | NUMVAL_C_FUNC
-  | RANDOM_FUNC
-  | RANGE_FUNC
-  | REVERSE_FUNC
-  | SIGN_FUNC
-  | SUM_FUNC
-  | TRIM_FUNC
-  | WHEN_COMPILED_FUNC
-  | INTRINSIC_FUNC _ -> true
-  | _ -> false
-
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
-                                                runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s" str
-  | Double_quote -> Fmt.pf ppf "\"%s" str
-
-let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
-  let string s = Pretty.string ppf s
-  and print format = Pretty.print ppf format in
-  function
-  | WORD w
-  | WORD_IN_AREA_A w
-  | PICTURE_STRING w
-  | INFO_WORD w
-  | DIGITS w
-  | SINTLIT w -> string w
-  | EIGHTY_EIGHT -> string "88"
-  | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
-  | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
-  | ALPHANUM a -> Cobol_ptree.pp_alphanum ppf a
-  | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
-  | NATLIT s -> print "N\"%s\"" s
-  | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
-  | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
-  | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
-  | INTERVENING_ c -> print "%c" c
-  | t -> string @@
-      try Text_lexer.show_token t
-      with Not_found ->
-      try Hashtbl.find combined_tokens t
-      with Not_found -> "<unknown/unexpected token>"
-
-let pp_token: token Pretty.printer = fun ppf ->
-  let string s = Pretty.string ppf s
-  and print format = Pretty.print ppf format in
-  fun t -> match ~&t with
-    | WORD w -> print "WORD[%s]" w
-    | WORD_IN_AREA_A w -> print "WORD_IN_AREA_A[%s]" w
-    | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
-    | INFO_WORD s -> print "INFO_WORD[%s]" s
-    | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
-    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string ~&t
-    | DIGITS i -> print "DIGITS[%s]" i
-    | SINTLIT i -> print "SINT[%s]" i
-    | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
-    | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
-    | INTERVENING_ c -> print "<%c>" c
-    | tok when is_intrinsic_token tok ->
-        print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
-    | EOF -> string "EOF"
-    | t -> pp_token_string ppf t
-
-let pp_tokens =
-  Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
-
-let pp_tokens' ?fsep =
-  Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf t ->
-    Pretty.print ppf "%a@@%a"
-      pp_token t
-      Cobol_common.Srcloc.pp_srcloc_struct ~@t
-  end
-
-(* --- *)
 
 let loc_in_area_a: srcloc -> bool = Cobol_common.Srcloc.in_area_a
 let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
@@ -609,6 +510,10 @@ let reword_intrinsics s : tokens -> tokens =
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
   let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let is_intrinsic_token = function
+    | INTRINSIC_FUNC _ -> true
+    | t when Text_keywords.is_known_intrinsic_token t -> true
+    | _ -> false in
   let rec aux rev_prefix suffix =
     match suffix with
     | [] ->

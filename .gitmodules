@@ -1,6 +1,7 @@
 [submodule "import/gnucobol"]
 	path = import/gnucobol
 	url = https://github.com/OcamlPro/gnucobol.git
+	branch = gnucobol-3.x
 [submodule "import/merlin"]
 	path = import/merlin
 	url = https://github.com/OCamlPro/merlin.git

@@ -4,7 +4,7 @@
   (name vscode_languageclient)
   (public_name vscode-languageclient-js-stubs)
   (wrapped true)
-  (libraries vscode-js-stubs promise_jsoo jsonoo js_of_ocaml interop-js-stubs gen_js_api )
+  (libraries vscode-js-stubs promise_jsoo node-js-stubs jsonoo js_of_ocaml interop-js-stubs gen_js_api )
   (modes byte)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (javascript_files vscode_languageclient_stub.js))

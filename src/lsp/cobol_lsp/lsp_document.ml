@@ -66,6 +66,7 @@ include TYPES
 
 type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
+let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
@@ -77,9 +78,13 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
+        copybook_lookup_config =
+          Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
-        source_format = project.config.source_format
+        source_format = match language_id doc with
+          | "COBOL_GNU_LISTFILE"
+          | "COBOL_GNU_DUMPFILE" -> SF SFVariable
+          | _ -> project.config.source_format
       } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }

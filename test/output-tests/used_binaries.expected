@@ -1,7 +1,7 @@
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:71:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:193:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:254:0
-used_binaries.at-254-prog.cob:10.8-10.18:
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:69:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:206:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:259:0
+used_binaries.at-259-prog.cob:10.8-10.18:
    7           PROCEDURE DIVISION.
    8           MAIN-PROC SECTION.
    9           00.
@@ -9,9 +9,11 @@ used_binaries.at-254-prog.cob:10.8-10.18:
 ----           ^^^^^^^^^^
   11           END-PROC  SECTION.
   12           COPY PROCE in "sub".
->> Error: Library `PROC' not found in search path (search path: )
+>> Error: Library `PROC' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
-used_binaries.at-254-prog.cob:12.8-12.28:
+used_binaries.at-259-prog.cob:12.8-12.28:
    9           00.
   10           COPY PROC.
   11           END-PROC  SECTION.
@@ -19,33 +21,36 @@ used_binaries.at-254-prog.cob:12.8-12.28:
 ----           ^^^^^^^^^^^^^^^^^^^^
   13           EX.
   14               STOP RUN.
->> Error: Library `PROCE' not found in search path (search path: ./sub)
+>> Error: Library `PROCE' not found
+          - search path: ./sub
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
 
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:277:0
-Fatal: used_binaries.at-277-sub/copy/PROC.cpy: No such file or directory
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:315:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:343:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:390:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:421:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:439:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:533:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:534:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:602:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:603:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:610:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:654:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:655:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:706:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:707:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:743:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:826:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:844:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:865:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:882:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:911:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:944:0
-used_binaries.at-944-progprep.cob:5.36-5.37:
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:286:0
+Fatal: used_binaries.at-286-sub/copy/PROC.cpy: No such file or directory
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:324:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:361:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:399:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:430:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:463:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:519:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:613:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:614:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:682:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:683:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:690:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:734:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:735:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:786:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:787:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:906:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:924:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:945:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:962:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:991:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1024:0
+used_binaries.at-1024-progprep.cob:5.36-5.37:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
@@ -55,7 +60,7 @@ used_binaries.at-944-progprep.cob:5.36-5.37:
    7          COPY 'CRUD.CPY'.
 >> Error: Invalid syntax
 
-used_binaries.at-944-progprep.cob:7.7-7.23:
+used_binaries.at-1024-progprep.cob:7.7-7.23:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.	  	#
    6          01 TEST-VAR PIC 9(2) VALUE 'A'.
@@ -63,5 +68,83 @@ used_binaries.at-944-progprep.cob:7.7-7.23:
 ----          ^^^^^^^^^^^^^^^^
    8          PROCEDURE        DIVISION.
    9              DISPLAY TEST-VAR NO ADVANCING
->> Error: Library `CRUD.CPY' not found in search path (search path: )
+>> Error: Library `CRUD.CPY' not found
+          - search path: <empty>
+          - filename extensions: "cpy" "cbl" "cob" "cbx"
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1167:0
+used_binaries.at-1167-f.copy:8.54:
+   5          LINKAGE SECTION.
+   6          01  a PIC X(20).
+   7          01  b BINARY-C-LONG.
+   8 >        PROCEDURE DIVISION USING a BY VALUE b RETURNING OMITTED.
+----                                                         ^
+   9          END PROGRAM f.
+>> Hint: Missing <identifier>
+
+used_binaries.at-1167-f.copy:8.55-8.62:
+   5          LINKAGE SECTION.
+   6          01  a PIC X(20).
+   7          01  b BINARY-C-LONG.
+   8 >        PROCEDURE DIVISION USING a BY VALUE b RETURNING OMITTED.
+----                                                          ^^^^^^^
+   9          END PROGRAM f.
+>> Error: Invalid syntax
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1136:0
+used_binaries.at-1136-filec.c:2.7-2.21:
+   1   
+   2 > /* for COB_EXT_EXPORT */
+----          ^^^^^^^^^^^^^^
+   3   #include <libcob.h>
+   4   COB_EXT_EXPORT void f (char *str, long num) {};
+>> Error: Invalid syntax
+
+used_binaries.at-1136-filec.c:4.6-4.7:
+   1   
+   2   /* for COB_EXT_EXPORT */
+   3   #include <libcob.h>
+   4 > COB_EXT_EXPORT void f (char *str, long num) {};
+----         ^
+>> Error: Unexpected indicator: `T'
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1140:0
+used_binaries.at-1140-filec.h:2.6-2.7:
+   1   
+   2 > /* COB_EXT_IMPORT will be defined by libcob.h up-front */
+----         ^
+   3   COB_EXT_IMPORT void f (char *, long);
+>> Error: Unexpected indicator: `_'
+
+used_binaries.at-1140-filec.h:2.7-2.17:
+   1   
+   2 > /* COB_EXT_IMPORT will be defined by libcob.h up-front */
+----          ^^^^^^^^^^
+   3   COB_EXT_IMPORT void f (char *, long);
+>> Error: Invalid syntax
+
+used_binaries.at-1140-filec.h:3.6-3.7:
+   1   
+   2   /* COB_EXT_IMPORT will be defined by libcob.h up-front */
+   3 > COB_EXT_IMPORT void f (char *, long);
+----         ^
+>> Error: Unexpected indicator: `T'
+
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1112:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1140:0
+used_binaries.at-1140-prog2.cob:8.57:
+   5          WORKING-STORAGE SECTION.
+   6          01 long USAGE BINARY-C-LONG.
+   7          PROCEDURE        DIVISION.
+   8 >            CALL "f" USING "Hello" BY VALUE long RETURNING NOTHING.
+----                                                            ^
+>> Hint: Missing <identifier>
+
+used_binaries.at-1140-prog2.cob:8.58-8.65:
+   5          WORKING-STORAGE SECTION.
+   6          01 long USAGE BINARY-C-LONG.
+   7          PROCEDURE        DIVISION.
+   8 >            CALL "f" USING "Hello" BY VALUE long RETURNING NOTHING.
+----                                                             ^^^^^^^
+>> Error: Invalid syntax
 

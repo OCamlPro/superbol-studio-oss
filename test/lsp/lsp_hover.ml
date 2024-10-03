@@ -292,6 +292,7 @@ let%expect_test "hover-typedef-vars" =
     PIC 999 USAGE DISPLAY
     ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
+    *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     (line 8, character 16):
     __rootdir__/prog.cob:9.13-9.21:
@@ -390,6 +391,7 @@ let%expect_test "hover-typedef-vars" =
     PIC 999 USAGE DISPLAY
     ```
     NUMERIC(digits = 3, scale = 0, with_sign = false)
+    *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
     (line 12, character 47):
     __rootdir__/prog.cob:13.44-13.52:
@@ -440,6 +442,7 @@ let%expect_test "hover-typedef-vars-usage" =
         01 _|_VAR6 PIC 111 USAGE BIT.
         01 _|_VAR7 USAGE POINTER.
         01 _|_VAR8 PIC 9 USAGE PACKED-DECIMAL.
+        01 _|_VAR9 PIC $++/+.+B+.
         PROCEDURE DIVISION.
           STOP RUN.
     |cobol};
@@ -462,6 +465,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC -BZZZ,ZZ9.99 USAGE DISPLAY
     ```
     NUMERIC(digits = 8, scale = 2, with_sign = false)
+    *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -478,6 +482,7 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC 9 USAGE BINARY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
        5           WORKING-STORAGE SECTION.
@@ -532,7 +537,7 @@ let%expect_test "hover-typedef-vars-usage" =
       11 >         01 VAR7 USAGE POINTER.
     ----              ^^^^
       12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
-      13           PROCEDURE DIVISION.
+      13           01 VAR9 PIC $++/+.+B+.
     ```cobol
     VAR7
     ```
@@ -544,16 +549,33 @@ let%expect_test "hover-typedef-vars-usage" =
       11           01 VAR7 USAGE POINTER.
       12 >         01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
     ----              ^^^^
-      13           PROCEDURE DIVISION.
-      14             STOP RUN.
+      13           01 VAR9 PIC $++/+.+B+.
+      14           PROCEDURE DIVISION.
     ```cobol
     VAR8
     ```
     ```cobol
     PIC 9 USAGE PACKED-DECIMAL
     ```
-    NUMERIC(digits = 1, scale = 0, with_sign = false) |}];;
-
+    NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
+    (line 12, character 11):
+    __rootdir__/prog.cob:13.11-13.15:
+      10           01 VAR6 PIC 111 USAGE BIT.
+      11           01 VAR7 USAGE POINTER.
+      12           01 VAR8 PIC 9 USAGE PACKED-DECIMAL.
+      13 >         01 VAR9 PIC $++/+.+B+.
+    ----              ^^^^
+      14           PROCEDURE DIVISION.
+      15             STOP RUN.
+    ```cobol
+    VAR9
+    ```
+    ```cobol
+    PIC $++/+.+B+ USAGE DISPLAY
+    ```
+    NUMERIC(digits = 4, scale = 2, with_sign = false)
+    *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34) |}];;
 
 let%expect_test "hover-typedef-filler-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -791,6 +813,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
@@ -808,6 +831,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
@@ -824,6 +848,7 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -858,7 +883,8 @@ let%expect_test "hover-typedef-renames" =
     ```cobol
     PIC 9 USAGE DISPLAY
     ```
-    NUMERIC(digits = 1, scale = 0, with_sign = false) |}];;
+    NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1) |}];;
 
 let%expect_test "hover-typedef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -913,6 +939,7 @@ let%expect_test "hover-typedef-redefines" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
+    *e.g,* [`0`] (0), [`1`] (1)
     (line 9, character 20):
     __rootdir__/prog.cob:10.20-10.21:
        7             05 Y PIC 9.
@@ -1114,3 +1141,116 @@ let%expect_test "hover-typedef-communication-section" =
     Hovering nothing worthy
     (line 10, character 17):
     Hovering nothing worthy |}];;
+
+let%expect_test "hover-comment" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+>>source format is fixed
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * full line comment
+       01 STRUCT. *> inline comment
+         02 VAL-1 PIC X. *> val1 only inline comment
+      * val2 only line comment
+         02 VAL-2 PIC X.
+       PROCEDURE DIVISION.
+         DISPLAY S_|_TRUCT V_|_AL-1 V_|_AL-2.
+         STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 12, character 18):
+    __rootdir__/prog.cob:13.17-13.23:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                    ^^^^^^
+      14            STOP RUN.
+      15
+    ```cobol
+    STRUCT
+    ```
+    Group of 2 subfields
+    Size: 16 bits
+    ---
+     inline comment
+    (line 12, character 25):
+    __rootdir__/prog.cob:13.24-13.29:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                           ^^^^^
+      14            STOP RUN.
+      15
+    ```cobol
+    VAL-1 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     val1 only inline comment
+    (line 12, character 31):
+    __rootdir__/prog.cob:13.30-13.35:
+      10         * val2 only line comment
+      11            02 VAL-2 PIC X.
+      12          PROCEDURE DIVISION.
+      13 >          DISPLAY STRUCT VAL-1 VAL-2.
+    ----                                 ^^^^^
+      14            STOP RUN.
+      15
+    ```cobol
+    VAL-2 IN STRUCT
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1)
+    ---
+     val2 only line comment |}];;
+
+
+let%expect_test "hover-comment-copy" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  let server,    _ = add_cobol_doc server ~projdir "lib.cpy" {cobol|
+      * copy full line comment
+       01 FIELD PIC X. *> copy inline comment
+  |cobol} in
+  print_hovered server ~projdir @@ extract_position_markers {cobol|
+  >>source format is fixed
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+      * full line comment
+       COPY lib. *> inline comment
+       PROCEDURE DIVISION.
+          DISPLAY F_|_IELD
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 9, character 19):
+    __rootdir__/prog.cob:10.18-10.23:
+       7         * full line comment
+       8          COPY lib. *> inline comment
+       9          PROCEDURE DIVISION.
+      10 >           DISPLAY FIELD
+    ----                     ^^^^^
+      11             STOP RUN.
+      12
+    ```cobol
+    FIELD
+    ```
+    ```cobol
+    PIC X USAGE DISPLAY
+    ```
+    ALPHANUMERIC(1) |}]
