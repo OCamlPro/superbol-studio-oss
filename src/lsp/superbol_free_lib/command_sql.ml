@@ -57,9 +57,8 @@ let typeck_file { preproc_options; parser_options } filename =
       end
 
 let parse ~sql_in_copybooks ~copy_exts common files =
-  let { preproc_options = { source_format; libpath = copy_path; _ }; _ } =
-    common
-  in
+  let source_format = common.preproc_options.source_format in
+  let copy_path = common.preproc_options.copybook_lookup_config.lookup_path in
   let source_format = Cobol_indent.Config.source_format source_format in
   List.iter
     (fun filename ->
@@ -79,8 +78,8 @@ let parse ~sql_in_copybooks ~copy_exts common files =
           output_string oc s;
           close_out oc;
           Printf.eprintf "File %S generated\n%!" filename
-        in 
-        let name_change filename =           
+        in
+        let name_change filename =
             if Filename.check_suffix filename ".cob" then
               let base_name = Filename.chop_suffix filename ".cob" in
               base_name ^ ".pp.cob"
@@ -114,9 +113,10 @@ let preproc_cmd =
           ( [ "copybooks" ],
             Arg.Set sql_in_copybooks,
             EZCMD.info "Preprocess copybooks also (without REPLACING)" );
-          ( [ "ext" ],
-            Arg.String (fun s -> copy_exts := !copy_exts @ [ "." ^ s ]),
-            EZCMD.info ~docv:"EXT"
-              "Add .EXT as an extension to find copybooks (default is cpy)" )
+          (* I (@NeoKaios) removed that as it conflicts with another option *)
+          (* ( [ "ext" ], *)
+          (*   Arg.String (fun s -> copy_exts := !copy_exts @ [ "." ^ s ]), *)
+          (*   EZCMD.info ~docv:"EXT" *)
+          (*     "Add .EXT as an extension to find copybooks (default is cpy)" ) *)
         ] )
     ~doc:"Preprocess SQL EXECs"
