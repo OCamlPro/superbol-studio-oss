@@ -96,7 +96,7 @@ type generated_stm =
 type generated = generated_stm list
 
 module Printer = struct
-  (*TODO: a function that cut (with &) the resquest if too long*)
+  let preproc_prefix = "SQLBOL"
 
   let rec pp fmt gen =
     match gen with
@@ -122,12 +122,14 @@ module Printer = struct
         else
           ""
       in
-      Format.fprintf fmt "%a\n%a%a%s\n" pp_old_stms old_stms pp_trans_stm
+      Format.fprintf fmt "%a%a%a%s\n" pp_old_stms old_stms pp_trans_stm
         trans_stm pp_error_treatment error_treatment dot
 
   and pp_old_stms fmt x =
     match x with
-    | h :: t -> Format.fprintf fmt "      *> REMOVED: %s\n%a" h pp_old_stms t
+    | h :: t ->
+        let old_line = String.sub h 7 (String.length h - 7) in
+        Format.fprintf fmt "%s*%s\n%a" preproc_prefix old_line pp_old_stms t
     | [] -> ()
 
   and pp_trans_stm fmt x =
@@ -138,8 +140,8 @@ module Printer = struct
 
   and pp_trans_stm_aux fmt x =
     match x with
-    | Section { name } -> Format.fprintf fmt "       %s." name
-    | Comment { content } -> Format.fprintf fmt "ADDED *%s" content
+    | Section { name } -> Format.fprintf fmt "%s %s." preproc_prefix name
+    | Comment { content } -> Format.fprintf fmt "%s*%s" preproc_prefix content
     | CallStatic { prefix; fun_name; ref_value } ->
       Format.fprintf fmt "%sCALL STATIC \"%s\"%a%sEND-CALL" prefix fun_name
         pp_ref_value_list ref_value prefix
@@ -158,29 +160,38 @@ module Printer = struct
     | Move { prefix; src; dest } ->
       Format.fprintf fmt "%sMOVE '%s' TO %s" prefix src dest
     | Declaration d -> Format.fprintf fmt "%a" pp_declaration d
-    | LinkageSection -> Format.fprintf fmt "       LINKAGE SECTION."
+    | LinkageSection -> Format.fprintf fmt "%s LINKAGE SECTION." preproc_prefix
     | WorkingStorageSection ->
-      Format.fprintf fmt "       WORKING-STORAGE SECTION."
-    | ProcedureDivision -> Format.fprintf fmt "       PROCEDURE DIVISION."
+      Format.fprintf fmt "%s WORKING-STORAGE SECTION." preproc_prefix
+    | ProcedureDivision -> Format.fprintf fmt "%s PROCEDURE DIVISION." preproc_prefix
     | NonFatalErrorWarning { content } ->
-      Format.fprintf fmt "      *> WARNING: %s" content
+      Format.fprintf fmt "%s* WARNING: %s" preproc_prefix content
     | Todo { prefix } -> Format.fprintf fmt "%sTODO" prefix
 
 
-    (*TODO: maybe redo this, but nicer*)
-  and  split_line max_length line =
-    let rec aux acc max_length current_line =
-      if String.length current_line <= max_length then
-        List.rev (current_line :: acc)
-      else
-        let part = String.sub current_line 0 max_length in
-        let rest =
-          String.sub current_line max_length
-            (String.length current_line - max_length)
-        in
-        aux ((part ^ "\"\n        &  \"") :: acc) 59 rest (*72 (character limit) - 12 (size of prefix '        &  "' ) - 1 (for the '"')*)
-    in
-    aux [] max_length line
+    and max_line_width = 72
+    and split_line line =
+      (* NOTE: this function makes a lot of assumptions, mainly the fact that
+       the reason a line is too long is because of a VALUE literal clause
+       where literal is a double quoted string *)
+      let rec aux acc current_line =
+        let len = String.length current_line in
+        if len <= max_line_width then
+          List.rev (current_line :: acc)
+        else if len == max_line_width + 1
+        then
+          (* only closing period remains *)
+          let line = String.sub current_line 0 max_line_width in
+          List.rev ((preproc_prefix ^ "-.") :: line :: acc)
+        else
+          let first = String.sub current_line 0 max_line_width in
+          let rest =
+            String.sub current_line max_line_width
+              (String.length current_line - max_line_width)
+          in
+          aux (first :: acc) (preproc_prefix ^ "-\"" ^ rest)
+      in
+      aux [] line
 
   and pp_declaration fmt = function
     | Simple_var_declaration
@@ -199,8 +210,8 @@ module Printer = struct
         Printf.sprintf "%s%s %s PIC %s %s." prefix var_importance var_name
           var_type var_content
       in
-      let lines = split_line 71 line in (*72 (character limit) - 1 (for the '"')*)
-      List.iter (Format.fprintf fmt "%s") lines
+      let lines = split_line line in
+      Format.fprintf fmt "%s" (String.concat "\n" lines)
     | Field_var_declaration { prefix; var_importance; var_name; field } ->
       Format.fprintf fmt "%s%s %s.%a" prefix var_importance var_name pp_field
         field

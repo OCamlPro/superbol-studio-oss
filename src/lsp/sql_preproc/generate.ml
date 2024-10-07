@@ -861,7 +861,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let rec generatesql ~loc ~line esql_instuction =
-    let prefix = String.sub line 0 loc.char in
+    let prefix = Generated_type.Printer.preproc_prefix
+                 ^ String.sub line 6 (loc.char-6) in
     match esql_instuction with
     | Sql _
     | SelectInto _
