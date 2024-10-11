@@ -19,6 +19,11 @@ let comment str =
       with_dot = false
     }
 
+let line_if_not_empty line =
+  if String.length (String.trim (String.sub line 7 (String.length line - 7))) > 0
+  then [Generated_type.NoChange { content = line }]
+  else []
+
 let generate ~filename ~contents ~cobol_unit sql_statements =
   let linkage_section = comment "" in
   let begin_procedure_division ~loc:_ =
@@ -35,16 +40,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (* The result will be stored in this buffer: *)
   let _final_loc = { filename; line = -1; char = 0 } in
 
-  let error_treatment =
-    ref
-      Generated_type.
-        { prefix = "           ";
-          not_found_whenever = None;
-          sql_error_whenever = None;
-          sql_warning_whenever = None
-        }
-  in
-  let is_error_treatment = ref false in
+  let error_treatment = ref None in
   let old_statements = ref [] in
   let cursor_declaration = ref [] in
   let in_pro_div = ref false in
@@ -86,9 +82,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | None -> None
   in
 
-  let get_length str =
+  let get_length ?(negative_if_varlen=false) str =
     match Data_gestion.find_opt new_var_map str with
-    | Some a -> a.length
+    | Some a ->
+        if a.flags land Gix_enum.Flag.varlen > 0
+        then
+          if negative_if_varlen
+          then -(a.length + 4)
+          else a.length + 4
+        else a.length
     | None -> Sql_typeck.get_length cobol_unit str
   in
 
@@ -112,8 +114,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
   let get_scale str =
     match Data_gestion.find_opt new_var_map str with
-    | Some a -> a.scale
-    | None -> Sql_typeck.get_scale cobol_unit str
+    | Some a -> - a.scale
+    | None -> - Sql_typeck.get_scale cobol_unit str
   in
   let get_flags str =
     match Data_gestion.find_opt new_var_map str with
@@ -247,7 +249,12 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let change_error ~prefix c k =
-    let old_error = !error_treatment in
+    let old_not_found_whenever, old_warning_whenever, old_error_whenever =
+      match !error_treatment with
+      | Some Generated_type.
+      { sql_error_whenever; not_found_whenever; sql_warning_whenever ; _ } ->
+       not_found_whenever, sql_warning_whenever, sql_error_whenever
+      | None -> None, None, None in
     let continuation =
       match k with
       | Sql_ast.Continue -> Generated_type.Continue
@@ -260,24 +267,23 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.
           { prefix;
             not_found_whenever = Some continuation;
-            sql_error_whenever = old_error.sql_error_whenever;
-            sql_warning_whenever = old_error.sql_warning_whenever
+            sql_error_whenever = old_error_whenever;
+            sql_warning_whenever = old_warning_whenever
           }
       | Sql_ast.SqlError_whenever ->
         { prefix;
-          not_found_whenever = old_error.not_found_whenever;
+          not_found_whenever = old_not_found_whenever;
           sql_error_whenever = Some continuation;
-          sql_warning_whenever = old_error.sql_warning_whenever
+          sql_warning_whenever = old_warning_whenever
         }
       | Sql_ast.SqlWarning_whenever ->
         { prefix;
-          not_found_whenever = old_error.not_found_whenever;
-          sql_error_whenever = old_error.sql_error_whenever;
+          not_found_whenever = old_not_found_whenever;
+          sql_error_whenever = old_error_whenever;
           sql_warning_whenever = Some continuation
         }
     in
-    error_treatment := new_error;
-    is_error_treatment := true
+    error_treatment := Some new_error;
   in
 
   let get_name_cobol_var (cobol_var : cobol_var) =
@@ -463,7 +469,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference { prefix; var = name };
-        Generated_type.Value { prefix; var = string_of_int (get_length name) }
+        Generated_type.Value { prefix; var =
+          string_of_int (get_length ~negative_if_varlen:true name) }
       ]
     in
     [ Generated_type.CallStatic { prefix; fun_name; ref_value } ]
@@ -477,9 +484,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     cursor_declaration := cd
   in
 
-  let create_from_cursor_declaration (_prefix, cur, at, var_name) =
-    (*     let prefix = prefix ^ "    " in *)
-    let prefix = "           " in
+  let create_from_cursor_declaration (prefix, cur, at, var_name) =
     let at_name, at_size = get_at_info at in
     let cur_name, cob_var_lst, var_name, _with_hold =
       match cur with
@@ -511,15 +516,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
 
     let fun_name, cursor_declare =
+      let prefix = prefix ^ "    " in
       match cob_var_lst with
       | [] ->
-        let prefix = "           " in
         ( "GIXSQLCursorDeclare",
           [ Generated_type.Reference { prefix; var = var_name };
-            Generated_type.Value { prefix; var = "0" }
+            Generated_type.Value { prefix; var =
+            string_of_int (get_length ~negative_if_varlen:true var_name) }
           ] )
       | _ ->
-        let prefix = "           " in
         ( "GIXSQLCursorDeclareParams",
           [ Generated_type.Reference { prefix; var = var_name };
             Generated_type.Value { prefix; var = "0" };
@@ -529,7 +534,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
     let adding =
       let ref_value =
-        let prefix = "               " in
+        let prefix = prefix ^ "    " in
         [ Generated_type.Reference { prefix; var = "SQLCA" };
           Generated_type.Reference { prefix; var = at_name };
           Generated_type.Value { prefix; var = string_of_int at_size };
@@ -556,11 +561,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     in
     Generated_type.Added
       { content = adding;
-        error_treatment =
-          ( if !is_error_treatment then
-              Some !error_treatment
-            else
-              None );
+        error_treatment = !error_treatment;
         with_dot = true
       }
   in
@@ -609,7 +610,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           { prefix; var = "\"" ^ var_name.payload ^ "\" & x\"00\"" };
         Generated_type.Reference { prefix; var = sql_name };
         Generated_type.Value
-          { prefix; var = string_of_int (get_length sql_name) }
+          { prefix; var =
+            string_of_int (get_length ~negative_if_varlen:true sql_name) }
         (*todo*)
       ]
     in
@@ -727,10 +729,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     ]
   in
 
-  let generate_open_cursor prefix (cursor_name : sqlVarToken) cobol_lst =
-    match cobol_lst with
-    | Some _ -> [ Generated_type.Todo { prefix } ]
-    | None ->
+    let generate_open_cursor prefix (cursor_name : sqlVarToken) cobol_lst =
+      (* in TSQL004B, the using statment doesn't seem to change the open statement *)
+      ignore(cobol_lst);
       let cursor_name' =
         Misc.extract_filename filename ^ "-" ^ cursor_name.payload
       in
@@ -764,7 +765,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
             if_stm = if2
           }
       ]
-  in
+    in
 
   let generate_declare_cursor prefix cur =
     let curname =
@@ -847,6 +848,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         ?opt_using_hostref_list ?at ()
     | DeclareTable _ ->
       (*Parser error on DECLARE TABLE statements in Gix, idk if Gix runtime can handle it*)
+      (* indeed, gix *seems* to not be doing anything with it, this requires further testing tho *)
       [ Generated_type.Todo { prefix } ]
     | Delete sql_instr ->
       let value_list =
@@ -861,6 +863,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let rec generatesql ~loc ~line esql_instuction =
+    (* tabulation makes this fails somehow, TSQL009A *)
     let prefix = Generated_type.Printer.preproc_prefix
                  ^ String.sub line 6 (loc.char-6) in
     match esql_instuction with
@@ -971,6 +974,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
             Generated_type.NoChange { content = line }
             :: ([ linkage_section ] @ output lines statements)
           end else begin
+            (* idk why she added that, it makes the test 7A fail *)
             comment "> Add missing LINKAGE SECTION"
             :: Generated_type.Added
                  { content = [ Generated_type.LinkageSection ];
@@ -992,6 +996,37 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                  }
             :: (working_storage_section @ output cur_lines statements)
           end
+        | EXEC_SQL_IGNORE { end_loc; begin_of_ignore_loc } ->
+            Printf.eprintf "%d,%d\n" begin_of_ignore_loc.line begin_of_ignore_loc.char;
+          begin if i = begin_loc.line
+            then [comment "ESQL IGNORED SECTION"]
+            else [] end
+          @
+          begin if i = begin_of_ignore_loc.line
+            then
+              let end_char_pos =
+                if i = end_loc.line
+                then end_loc.char
+                else String.length line
+              in
+              let start_char_pos = begin_of_ignore_loc.char in
+              let len = end_char_pos - start_char_pos in
+              let prefix = String.sub line 0 7 in
+              let line = String.sub line start_char_pos len in
+              line_if_not_empty (prefix ^ line)
+            else if end_loc.line = i
+            then
+              let line = String.sub line 0 end_loc.char in
+              line_if_not_empty line
+            else [] end
+          @
+          if i = end_loc.line
+          then comment "END OF ESQL IGNORED SECTION"
+               :: output lines statements
+          else
+            (if i > begin_of_ignore_loc.line
+            then [Generated_type.NoChange { content = line }]
+            else []) @ output_statement lines begin_loc stmt statements
         | EXEC_SQL { end_loc; with_dot; tokens } ->
           old_statements := line :: !old_statements;
           if i = end_loc.line then begin
@@ -1010,11 +1045,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                 | At (_, DeclareCursor _) ->
                   (with_dot, None)
                 | _ ->
-                  ( with_dot,
-                    if !is_error_treatment then
-                      Some !error_treatment
-                    else
-                      None ) )
+                  ( with_dot, !error_treatment))
             in
             old_statements := [];
             Generated_type.Change
@@ -1039,7 +1070,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           comment ("> REMOVED: " ^ line) :: output lines statements
           (*
         | IS_SQLVAR { end_loc } ->
-          
+
              if i = begin_loc.line then begin
                let before_macro = String.sub line 0 begin_loc.char in
                Printf.bprintf ctxt.b "%s%s" before_macro

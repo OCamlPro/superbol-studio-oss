@@ -48,9 +48,10 @@ Things to consider :
 - This require dotnet 6.0 SDK
 - The command `dotnet build gixsql-tests-nunit/gixsql-tests-nunit.csproj` is slow and will block at `Determining projects to restore...` for some time (5 minutes).
 
+Before executing the testsuite, the `GIXTEST_LOCAL_CONFIG` env variable needs to exists and be set to full path of your `gixsql_test_local_linux.xml` file.
 Executing the testsuite with `dotnet gixsql-tests-nunit/bin/Debug/net6.0/gixsql-tests-nunit.dll` should work and execute the test either with GixSQL preprocessor or SuperBOL preprocessor if the patch file was applied
 
-### Additionnal considerations
+### Additionnal considerations for gixpp tests
 
 At the moment of writing, and with my config (Postgres on linux), the following test seemed to fail even when executed with `gixpp` :
 
@@ -64,4 +65,17 @@ Run: 71 - Success: 68 - Failed: 3
 
 The test `TSQL004A` fails due to a invalid preprocessor option. (line 237 of `gixsql_test_data.xml`)
 The other two fail due to preprocessor errors.
+
+### What I discovered for our test
+
+- TSQL005A : some BY VALUE are different (2 instead of -2 for NUM1)
+- TSQL009A 42A : fails due to issue in cobol_indent maybe ? there is a tabulation as a first caracter in the line 66
+- TSQL018 : preproc error due to invalid arguments covers a grammar error in test TSQL018B-1
+- TSQL022A : varying not supported, also the test depends on preprocess file content
+- TSQL025A : group vars need to be split into their elementary element
+- TSQL026A - 27A : requires detecting varlen group var from non esql variable (eg SQLCOMMAND)
+- TSQL033-1 : --no-rec-code option to implement somehow
+- TSQL037A B : implement -P varchar option, seems to activate flag autotrim on some fields
+- TSQL041A : grammar error 'SELECT CASE WHEN'
+- TSQL042A : some var have :VAR:NULL-IND form, this is not supported
 

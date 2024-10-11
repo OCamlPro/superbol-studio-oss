@@ -11,6 +11,7 @@
 open Cobol_data.Types
 
 let get_x_info (cu : Cobol_unit.Types.cobol_unit) name_str =
+  (* TODO: this needs to include refs from EXEC SQL INCLUDE stmt : TSQL042A *)
   (* May raise Not_found | Cobol_unit.Qualmap.Ambiguous _ *)
   Cobol_unit.Qualmap.find
     (Cobol_unit.Qual.name
@@ -21,10 +22,14 @@ let get_length cu name =
   try
     let x_info = get_x_info cu name in
     match x_info with
-    | Data_field { def = { payload = { field_size; _ }; _ }; _ } ->
-      let size = Cobol_data.Memory.(as_bits field_size / 8) in
-      (*  Pretty.out "Size of \"%s\" is %u Bytes@." name size; *)
-      size
+    | Data_field { def = { payload = { field_size; field_layout; _ }; _ }; _ } ->
+        let size = Cobol_data.Memory.(as_bits field_size / 8) in
+        begin match field_layout with
+        | Elementary_field { usage = Packed_decimal pic; _ } ->
+            begin match pic.category with
+            | FixedNum { digits; _ } -> digits
+            | _ -> size end
+        | _ -> size end
     | _ -> 0
   with
   | Not_found ->
@@ -41,24 +46,22 @@ type cobol_types =
   | COBOL_TYPE_SIGNED_NUMBER_TS   (* trailing separate *)
   (*pas d'exemple dans les tests de gix que j'ai réussi a preprocesser*)
   | COBOL_TYPE_SIGNED_NUMBER_TC   (* trailing combined *)
-  (*ex: PIC S9(09)  
+  (*ex: PIC S9(09)
         PIC S9(018)*)
   | COBOL_TYPE_SIGNED_NUMBER_LS   (* leading separate  *)
   (*pas d'exemple*)
   | COBOL_TYPE_SIGNED_NUMBER_LC   (* leading combined  *)
   (*pas d'exemple*)
   | COBOL_TYPE_UNSIGNED_NUMBER_PD (* packed decimal    *)
-    (*pas d'exemple*)
-  | COBOL_TYPE_SIGNED_NUMBER_PD   (* packed decimal    *)
-    (*pas d'exemple*)
-  | COBOL_TYPE_ALPHANUMERIC
   (*ex: PIC 9(018)        COMP-3.
         PIC 9(018)V9(12)  COMP-3*)
-  | COBOL_TYPE_UNSIGNED_BINARY
-  (*ex: PIC S9(018)V9(12) COMP-3     (???????)
+  | COBOL_TYPE_SIGNED_NUMBER_PD   (* packed decimal    *)
+  (*ex: PIC S9(018)V9(12) COMP-3
         PIC S9(018)V9(12) COMP-3.
         PIC S99V99 COMP-3.
         03 FLD01      PIC S9(4) USAGE COMP-3.    (???? USAGE?) *)
+  | COBOL_TYPE_ALPHANUMERIC
+  | COBOL_TYPE_UNSIGNED_BINARY
   | COBOL_TYPE_SIGNED_BINARY
   (*pas d'exemple*)
   | COBOL_TYPE_JAPANESE
@@ -97,6 +100,13 @@ let get_type cu name =
       match x_info with
       | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
         match field_layout with
+        | Elementary_field { usage = Packed_decimal picture; _ } ->
+            (match picture.category with
+            | FixedNum { with_sign=true; _ } ->
+            COBOL_TYPE_SIGNED_NUMBER_PD
+            | FixedNum { with_sign=false; _ } ->
+            COBOL_TYPE_UNSIGNED_NUMBER_PD
+            | _ -> UNKNOWN)
         | Elementary_field { usage = Display picture; _ } -> (
           match picture.category with
           | Alphabetic _ -> COBOL_TYPE_ALPHANUMERIC (*?*)
@@ -105,7 +115,7 @@ let get_type cu name =
           | National _ -> COBOL_TYPE_NATIONAL
           | FixedNum { with_sign; _ } ->
             if with_sign then
-              COBOL_TYPE_SIGNED_NUMBER_TS (*leading? combined? idk*)
+              COBOL_TYPE_SIGNED_NUMBER_TC
             else
               COBOL_TYPE_UNSIGNED_NUMBER
           | FloatNum _ -> UNKNOWN )
@@ -130,6 +140,7 @@ let get_scale cu name =
     match x_info with
     | Data_field { def = { payload = { field_layout; _ }; _ }; _ } -> begin
       match field_layout with
+      | Elementary_field { usage = Packed_decimal picture; _ }
       | Elementary_field { usage = Display picture; _ } -> (
         match picture.category with
         | FixedNum { scale; _ }

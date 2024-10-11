@@ -19,9 +19,15 @@ type loc = { filename : string ;
              line : int ;
              char : int }
 
-(* type sql_type = BINARY | VARBINARY | CHAR | VARCHAR *)
+type sql_type =
+  | Binary of int
+  | Varbinary of int
+  | Char of int
+  | Varchar of int
+  | Float of int * int option (* FLOAT(8) or FLOAT(4,2) *)
+
 type declaration =
-  | SQL_type_is of { importance:string; name:string; sql_type : string; sql_type_size : string }
+  | SQL_type_is of { importance:string; name:string; sql_type: sql_type }
 
 (* These statements show how we could keep information and modify the
    corresponding places in the code *)
@@ -39,6 +45,7 @@ type statements =
   | COPY of { end_loc : loc ; filename : string ; contents : string }
 (*   | IS_SQLVAR of { end_loc : loc } *)
   | DECLARATION of { end_loc:loc; declaration : declaration }
+  | EXEC_SQL_IGNORE of { end_loc: loc; begin_of_ignore_loc: loc }
 
 
 type handle = {

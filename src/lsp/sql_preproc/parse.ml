@@ -46,13 +46,39 @@ let parse ~config ~filename ~contents =
       :: (IDENT "SQL", _)
       :: (IDENT "TYPE", _)
       :: (IDENT "IS", _)
-      :: (IDENT sql_type, _)
+      :: (IDENT typ, _)
       :: (LPAREN, _)
-      :: (INTEGER sql_type_size, _)
+      :: (INTEGER size, _)
       :: (RPAREN, end_loc)
       :: tokens ->
+      let size = int_of_string size in
+      let sql_type = match typ with
+        | "BINARY" -> Binary size
+        | "VARBINARY" -> Varbinary size
+        | "VARCHAR" -> Varchar size
+        | "CHAR" -> Char size
+        | "FLOAT" -> Float (size, None)
+        | unknown -> Pretty.failwith "Unknow type %s" unknown
+      in
       let declaration =
-        SQL_type_is { importance; name; sql_type; sql_type_size }
+        SQL_type_is { importance; name; sql_type }
+      in
+      sql_add_statement ~loc (DECLARATION { end_loc; declaration });
+      iter tokens
+    | (INTEGER importance, loc)
+      :: (IDENT name, _)
+      :: (IDENT "SQL", _) :: (IDENT "TYPE", _) :: (IDENT "IS", _)
+      :: (IDENT "FLOAT", _) :: (LPAREN, _)
+      :: (NUMBER digits_n_scale, _) :: (RPAREN, end_loc) :: tokens ->
+      let digits, scale =
+        match String.split_on_char ',' digits_n_scale with
+        | [digits; scale] -> int_of_string digits, int_of_string scale
+        | _ ->
+          Pretty.failwith
+          "ERROR: invalid argument for FLOAT sql type : FLOAT(%s)" digits_n_scale
+      in
+      let declaration =
+        SQL_type_is { importance; name; sql_type=Float (digits, Some scale) }
       in
       sql_add_statement ~loc (DECLARATION { end_loc; declaration });
       iter tokens
@@ -120,12 +146,12 @@ let parse ~config ~filename ~contents =
         working_storage_found := true
       end;
       linkage_section_found := true;
-      if config.verbosity > 1 then
+      if config.verbosity > 0 then
         Format.fprintf Format.std_formatter "LINKAGE SECTION found at %d\n%!" loc.line;
       sql_add_statement ~loc (LINKAGE_SECTION { defined = true });
       iter tokens
     | (COPY, loc) :: (tok, _) :: (DOT, end_loc) :: tokens
-    | (EXEC, loc) :: (IDENT "SQL", _) :: (IDENT "INCLUDE", _) :: (tok, _) :: (END_EXEC, end_loc)  :: tokens 
+    | (EXEC, loc) :: (IDENT "SQL", _) :: (IDENT "INCLUDE", _) :: (tok, _) :: (END_EXEC, end_loc)  :: tokens
     when config.sql_in_copybooks && (Misc.string_of_token tok != "SQLCA")->
       let file = Misc.string_of_token tok in
       begin
@@ -138,8 +164,12 @@ let parse ~config ~filename ~contents =
           sql_add_statement ~loc (COPY { end_loc; filename; contents });
           tokenize_file ~filename ~contents tokens
       end
+    | (EXEC, loc) :: (IDENT "SQL", _) :: (IDENT "IGNORE", loc2) :: tokens ->
+      if config.verbosity > 0 then
+        Printf.eprintf "EXEC SQL IGNORE found at line %d\n%!" loc.line;
+        iter_ignored_sql loc { loc2 with char = loc2.char + 6 } tokens
     | (EXEC, loc) :: (IDENT "SQL", _) :: tokens ->
-      if config.verbosity > 1 then
+      if config.verbosity > 0 then
         Printf.eprintf "EXEC SQL found at line %d\n%!" loc.line;
       begin
         match tokens with
@@ -150,32 +180,32 @@ let parse ~config ~filename ~contents =
   and iter_sql loc params tokens =
     match tokens with
     | (END_EXEC, end_loc) :: tokens ->
-      (* TODO: check if there is a ending DOT on the same line. If
-         yes, we need to output also a DOT at the end of the
-         translation. *)
       let end_loc, with_dot, tokens =
         match tokens with
         | (DOT, end_loc) :: tokens -> (end_loc, true, tokens)
         | tokens -> (end_loc, false, tokens)
       in
-      if config.verbosity > 1 then
+      if config.verbosity > 0 then
         Printf.eprintf "END-EXEC found at %d\n%!" end_loc.line;
 
       let params = List.rev params in
       let sqlStr = "EXEC SQL " ^ String.concat " " params ^ " END-EXEC" in
-(*       Format.fprintf Format.std_formatter "\nSTRING\n";
-      Format.fprintf Format.std_formatter "\n%s\n" sqlStr; *)
-
       let sql = Sql_parser.parseString (Lexing.from_string sqlStr) in
-(*       Format.fprintf Format.std_formatter "\nAST\n";
-      Format.fprintf Format.std_formatter "\n%a\n" Sql_ast.Printer.pp sql; *)
-
       sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql });
       iter tokens
     | [] -> failwith "missing END-EXEC."
     | (tok, _) :: tokens ->
       let tok = Misc.string_of_token tok in
       iter_sql loc (tok :: params) tokens
+  and iter_ignored_sql loc begin_of_ignore_loc tokens =
+    match tokens with
+    | (END_EXEC, end_loc) :: tokens ->
+      if config.verbosity > 0 then
+        Printf.eprintf "END-EXEC found at %d\n%!" end_loc.line;
+      sql_add_statement ~loc (EXEC_SQL_IGNORE { end_loc; begin_of_ignore_loc });
+      iter tokens
+    | _ :: tokens -> iter_ignored_sql loc begin_of_ignore_loc tokens
+    | [] -> failwith "missing END-EXEC."
   and tokenize_file ~filename ~contents tokens =
     let { Cobol_indent.Scanner.toks = new_tokens; _ } =
       Cobol_indent.Scanner.tokenize ~filename ~config:config.scanner_config

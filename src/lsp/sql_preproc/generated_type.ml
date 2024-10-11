@@ -180,9 +180,10 @@ module Printer = struct
           List.rev (current_line :: acc)
         else if len == max_line_width + 1
         then
-          (* only closing period remains *)
-          let line = String.sub current_line 0 max_line_width in
-          List.rev ((preproc_prefix ^ "-.") :: line :: acc)
+          (* only closing period remains, this hack is required to avoid cobc warnings *)
+          let line = String.sub current_line 0 (max_line_width-2) ^ "\"" in
+          let end_of_string = String.sub current_line (max_line_width-2) 3 in
+          List.rev ((preproc_prefix ^ " & \"" ^ end_of_string) :: line :: acc)
         else
           let first = String.sub current_line 0 max_line_width in
           let rest =
@@ -229,7 +230,7 @@ module Printer = struct
         match continuation with
         | Continue -> Format.fprintf fmt "   CONTINUE"
         | Perform sqlVarToken -> Format.fprintf fmt "   PERFORM %s" sqlVarToken
-        | Goto sqlVarToken -> Format.fprintf fmt "   GO TO %s." sqlVarToken
+        | Goto sqlVarToken -> Format.fprintf fmt "   GO TO %s" sqlVarToken
       in
       let print_error fmt (not_found_whenever, str) =
         match not_found_whenever with

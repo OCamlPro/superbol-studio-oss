@@ -23,8 +23,24 @@ type variable_information =
 
 type t = variable_information StringMap.t
 
-let add_var ~map ~name ?(length = 0) ?(vartype = 0) ?(scale = 0) ?(flags = 0)
-    ?(ind_addr = 0) () =
+let get_length = function
+  | Binary size | Varbinary size | Varchar size | Char size -> size
+  | Float (digit, scale_opt) ->
+      Printf.eprintf "WARNING : Untested length of FLOAT field\n";
+      digit + Option.value ~default:0 scale_opt
+
+let get_type = function
+  | Float _ -> Sql_typeck.(cobol_types_to_int COBOL_TYPE_FLOAT) (* not sure of that, may be double? *)
+  | _ -> Sql_typeck.(cobol_types_to_int COBOL_TYPE_ALPHANUMERIC)
+
+let get_flags = function
+  | Binary _ -> Gix_enum.Flag.binary
+  | Varbinary _ -> Gix_enum.Flag.binary lor Gix_enum.Flag.varlen
+  | Varchar _ -> Gix_enum.Flag.varlen
+  | Char _ | Float _ -> Gix_enum.Flag.none
+
+let add_var ?(length = 0) ?(vartype = 0) ?(scale = 0) ?(flags = 0)
+    ?(ind_addr = 0) map name =
   StringMap.add name { length; vartype; scale; flags; ind_addr } map
 
 let num = ref 0
@@ -59,7 +75,7 @@ let transform_stm map (_, stm) filename =
           (Field_var_declaration
              { prefix; var_importance = "01"; var_name; field } )
       ],
-      add_var ~map ~name:("SQ" ^ string_of_int !num) ~length:size () )
+      add_var ~length:size map ("SQ" ^ string_of_int !num) )
   in
   let add_cur cur_name map ws filename =
     let pre_cur_name = "GIXSQL-CI-F-" ^ Misc.extract_filename filename ^ "-" in
@@ -74,9 +90,7 @@ let transform_stm map (_, stm) filename =
            } )
       :: ws
     in
-    let map =
-      add_var ~map ~name:(pre_cur_name ^ cur_name) ~length:0 ()
-    in
+    let map = add_var ~length:0 map (pre_cur_name ^ cur_name) in
     (ws, map)
   in
 
@@ -98,9 +112,38 @@ let transform_stm map (_, stm) filename =
       (ws, map)
     | Sql sql -> (
       match sql with
+      | Sql_ast.SqlInstr "VAR" ::
+        Sql_ast.SqlInstr varname ::
+        Sql_ast.SqlInstr "IS" ::
+        Sql_ast.SqlInstr typ ::
+        Sql_ast.SqlInstr "(" ::
+        Sql_ast.SqlInstr size ::
+        Sql_ast.SqlInstr ")" :: _ ->
+          (* patch to fix TSQL005C, this is surely not generic enough
+            and should probably be treated in parse.ml ? *)
+          Printf.eprintf "Warning : EXEC SQL VAR with %s %s %s\n" varname typ size;
+          let flags =
+            if String.starts_with ~prefix:"VAR" typ
+            then Gix_enum.Flag.autotrim
+            else Gix_enum.Flag.none
+          in
+          let length = int_of_string size in
+          let typ = match typ with
+            | "BINARY" -> Binary length
+            | "VARBINARY" -> Varbinary length
+            | "VARCHAR" -> Varchar length
+            | "CHAR" -> Char length
+            | "FLOAT" -> Float (length, None)
+            | unknown -> Pretty.failwith "Unknow type %s" unknown
+          in
+          let vartype = get_type typ in
+          ([], add_var ~vartype ~length ~flags map varname)
       | Sql_ast.SqlInstr w :: _ when w = "VAR" ->
+          Printf.eprintf "Warning : ignoring EXEC SQL VAR statement\n";
         ([], map)
-        (*TODO: find what this should be replaced with. I think Gix juste ignorer these instruction, but mabe not*)
+        (*TODO: GIX uses this to add flag on certain variable
+        (see TSQL005C, where VCFLD2 has flag varlen due to an EXEC SQL VAR statement)
+         *)
       | _ ->
         let ws, map =
           create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql) ()
@@ -156,61 +199,71 @@ let transform_stm map (_, stm) filename =
   in
 
   let trans_declaration declaration =
-    match declaration with
-    | SQL_type_is { importance; name; sql_type; sql_type_size } -> begin
-      match sql_type with
-      | "BINARY"
-      | "CHAR" ->
-        let map =
-          add_var ~map ~name ~length:(int_of_string sql_type_size) ()
-        in
-
-        ( [ Declaration
-              (Simple_var_declaration
-                 { prefix;
-                   var_importance = importance;
-                   var_name = Some name;
-                   var_type = "X(" ^ sql_type_size ^ ")";
-                   var_content = None
-                 } )
-          ],
-          map )
-      | "VARBINARY"
-      | "VARCHAR" ->
-        let map =
-          add_var ~map ~name ~length:(int_of_string sql_type_size) ()
-        in
-        let field =
-          let prefix = prefix ^ "   " in
-          [ Simple_var_declaration
+    let SQL_type_is { importance; name; sql_type } =
+      declaration in
+    let vartype = get_type sql_type in
+    let flags = get_flags sql_type in
+    let field_length = (get_length sql_type) in
+    let map = add_var
+        ~length:field_length
+        ~vartype
+        ~flags
+        map name
+    in
+    let field_length = string_of_int field_length in
+    (match sql_type with
+     | Binary _
+     | Char _ ->
+       [ Declaration
+           (Simple_var_declaration
               { prefix;
-                var_importance = "49";
-                var_name = Some (name ^ "-LEN");
-                var_type = "9(8) COMP-5";
+                var_importance = importance;
+                var_name = Some name;
+                var_type = "X(" ^ field_length ^ ")";
                 var_content = None
-              };
-            Simple_var_declaration
+              } )
+       ]
+     | Float (digit, scale) ->
+       let var_type =
+         let scale = match scale with
+         | None -> ""
+         | Some scale -> Printf.sprintf "V9(%d)" scale
+         in
+         Printf.sprintf "S9(%d)%s" digit scale
+       in
+       [ Declaration
+           (Simple_var_declaration
               { prefix;
-                var_importance = "49";
-                var_name = Some (name ^ "-ARR");
-                var_type = "X(" ^ sql_type_size ^ ")";
+                var_importance = importance;
+                var_name = Some name;
+                var_type;
                 var_content = None
-              }
-          ]
-        in
-
-        let decl =
-          Field_var_declaration
-            { prefix; var_importance = importance; var_name = name; field }
-        in
-
-        ( [ Declaration decl ],
-          (* "       " ^ importance ^ "  " ^ name ^ ".\n           49 " ^ name
-             ^ "-LEN PIC 9(8) COMP-5.\n           49 " ^ name ^ "-ARR PIC X("
-             ^ sql_type_size ^ ").\n", *)
-          map )
-      | _ -> failwith "Unknow type."
-    end
+              } )
+       ]
+     | Varbinary _
+     | Varchar _ ->
+       let field =
+         let prefix = prefix ^ "   " in
+         [ Simple_var_declaration
+             { prefix;
+               var_importance = "49";
+               var_name = Some (name ^ "-LEN");
+               var_type = "9(8) COMP-5";
+               var_content = None
+             };
+           Simple_var_declaration
+             { prefix;
+               var_importance = "49";
+               var_name = Some (name ^ "-ARR");
+               var_type = "X(" ^ field_length ^ ")";
+               var_content = None
+             }
+         ]
+       in
+       let decl =
+         Field_var_declaration
+           { prefix; var_importance = importance; var_name = name; field }
+       in [ Declaration decl ]) , map
   in
 
   match stm with
