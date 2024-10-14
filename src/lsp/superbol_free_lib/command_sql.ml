@@ -56,46 +56,48 @@ let typeck_file { preproc_options; parser_options } filename =
         *)
       end
 
-let parse ~sql_in_copybooks ~copy_exts common files =
+let parse ~sql_in_copybooks ~copy_exts ~test_extension common files =
   let source_format = common.preproc_options.source_format in
   let copy_path = common.preproc_options.copybook_lookup_config.lookup_path in
   let source_format = Cobol_indent.Config.source_format source_format in
   List.iter
     (fun filename ->
-      let common, _ = Common_args.get () in
-      let cobol_unit = typeck_file (common ()) filename in
-      (*TODO appel a typeck ici*)
-      let contents =
-        Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
-          ~filename ~source_format () ~cobol_unit
-      in
-      let output_file filename s =
-        match filename with
-        | "-" ->
-          Printf.printf "%s\n%!" s
-        | _ ->
-          let oc = open_out filename in
-          output_string oc s;
-          close_out oc;
-          Printf.eprintf "File %S generated\n%!" filename
-        in
-        let name_change filename =
-            if Filename.check_suffix filename ".cob" then
-              let base_name = Filename.chop_suffix filename ".cob" in
-              base_name ^ ".pp.cob"
-            else if Filename.check_suffix filename ".cbl" then
-              let base_name = Filename.chop_suffix filename ".cbl" in
-              base_name ^ ".pp.cbl"
-            else
-              filename
-            in
-
-        output_file (name_change filename) contents
-      (* Printf.printf "%s%!" contents *) )
+       let common, _ = Common_args.get () in
+       let cobol_unit = typeck_file (common ()) filename in
+       (*TODO appel a typeck ici*)
+       let contents =
+         Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
+           ~filename ~source_format () ~cobol_unit
+       in
+       let output_file filename s =
+         match filename with
+         | "-" ->
+           Printf.printf "%s\n%!" s
+         | _ ->
+           let oc = open_out filename in
+           output_string oc s;
+           close_out oc;
+           Printf.eprintf "File %S generated\n%!" filename
+       in
+       let new_filename =
+         let extension = Filename.extension filename in
+         if test_extension
+         then
+           let base_name = Filename.chop_suffix filename extension in
+           base_name ^ ".cbsql"
+         else if String.equal extension ".cob" || String.equal extension ".cbl"
+         then
+           let base_name = Filename.chop_suffix filename extension in
+           base_name ^ ".pp" ^ extension
+         else
+           filename
+       in
+       output_file new_filename contents)
     files
 
 let preproc_cmd =
   let sql_in_copybooks = ref false in
+  let test_extension = ref false in
   let copy_exts = ref [] in
   let files = ref [] in
   let common, common_args = Common_args.get () in
@@ -104,7 +106,7 @@ let preproc_cmd =
       let common = common () in
       Printexc.record_backtrace true;
       parse ~sql_in_copybooks:!sql_in_copybooks ~copy_exts:!copy_exts common
-        !files )
+      ~test_extension:!test_extension !files )
     ~args:
       ( common_args
       @ [ ( [],
@@ -113,6 +115,9 @@ let preproc_cmd =
           ( [ "copybooks" ],
             Arg.Set sql_in_copybooks,
             EZCMD.info "Preprocess copybooks also (without REPLACING)" );
+          ( [ "test-ext" ],
+            Arg.Set test_extension,
+            EZCMD.info "Set file extension to .cbsql" );
           (* I (@NeoKaios) removed that as it conflicts with another option *)
           (* ( [ "ext" ], *)
           (*   Arg.String (fun s -> copy_exts := !copy_exts @ [ "." ^ s ]), *)

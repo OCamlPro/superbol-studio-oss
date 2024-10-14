@@ -30,7 +30,7 @@ open Cobol_common.Srcloc.INFIX
 (*For Transaction*)
 %token START TRANSACTION
 (*For Rollback*)
-%token ROLLBACK WORK RELEASE SAVEPOINT 
+%token ROLLBACK WORK RELEASE SAVEPOINT
 (*For commit*)
 %token COMMIT
 (*FOr other esql with opt at*)
@@ -50,7 +50,7 @@ open Cobol_common.Srcloc.INFIX
 %token <string> NUMBER
 %token <string> COBOL_VAR
 %token <string> BACKSLASH_VAR
-%start <esql_instuction> main 
+%start <esql_instuction> main
 
 %%
 
@@ -59,31 +59,31 @@ let loc (X) ==
   | x = X; { x &@ Sql_overlay_manager.join_limits $sloc }
 
 let main :=
-| EXEC; SQL; stm = esql; END_EXEC; EOF; {stm}
+| EXEC; SQL; stm = esql; SEMICOLON?; END_EXEC; EOF; {stm}
 
 let cobol_var_id :=
-| COLON; c=loc(WORD); {c}  
+| COLON; c=loc(WORD); {c}
 | c = loc(COBOL_VAR); {c}
 
 let cobol_var :=
 | c = cobol_var_id; {CobVarNotNull c}
-| c = cobol_var_id; COLON; COLON; t = sql_type; {CobVarCasted (c, t)} 
+| c = cobol_var_id; COLON; COLON; t = sql_type; {CobVarCasted (c, t)}
 (*TODO: fix this, it maybe only work in the context of the preproc*)
 | c = cobol_var_id; ni=cobol_var_id; {CobVarNullIndicator(c, ni)}
 
 let sql_var_name :=
-| s = loc(WORD); {s} 
+| s = loc(WORD); {s}
 (* | s = loc(STRING); {LiteralStr s} *) (*TODO*)
 
 let simpl_var :=
-| s = sql_var_name; {SqlVar s} 
-| s = cobol_var_id; {CobolVar(CobVarNotNull s)} 
+| s = sql_var_name; {SqlVar s}
+| s = cobol_var_id; {CobolVar(CobVarNotNull s)}
 
-let variable := 
-| s = sql_var_name; {SqlVar s} 
-| s = cobol_var; {CobolVar s} 
+let variable :=
+| s = sql_var_name; {SqlVar s}
+| s = cobol_var; {CobolVar s}
 
-let literalVar := 
+let literalVar :=
 | v = variable; {LiteralVar v}
 | t = sql_var_name; DOT; lst = separated_nonempty_list(DOT, sql_var_name); {LiteralDot (t::lst)}
 
@@ -93,7 +93,7 @@ let literal :=
 | s = loc(STRING); {LiteralStr s} (*TODO Differentiate 'variable' and "string" and 'char' *)
 
 
-let esql := 
+let esql :=
 | AT; v = simpl_var; stm = esql_with_opt_at; {At(v, stm)}
 | stm = esql_with_opt_at; {stm}
 | BEGIN; {Begin}
@@ -107,45 +107,45 @@ let esql :=
 | DISCONNECT; ALL; {DisconnectAll}
 | IGNORE; sql = sql; {Ignore sql} (*TODO the "sql" can be anything*)
 
-let esql_with_opt_at := 
+let esql_with_opt_at :=
 | i = sql; {Sql i}
-| select = sql_select; INTO; 
-  vars = separated_nonempty_list(COMMA, cobol_var); 
+| select = sql_select; INTO;
+  vars = separated_nonempty_list(COMMA, cobol_var);
   select_options = list(select_option);
   {SelectInto{vars; select; select_options}}
-| START; TRANSACTION; 
+| START; TRANSACTION;
   {StartTransaction}
 | DECLARE; table_name= literalVar; TABLE; LPAR; sql=separated_nonempty_list(COMMA, table_lst); RPAR;
   {DeclareTable(table_name, sql)}
-| DECLARE; crs= sql_var_name; CURSOR; FOR; var= variable; 
+| DECLARE; crs= sql_var_name; CURSOR; FOR; var= variable;
   {DeclareCursor(DeclareCursorVar(crs, var))}
 | DECLARE; crs= sql_var_name; CURSOR; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(DeclareCursorSql(crs, sql))} 
+  {DeclareCursor(DeclareCursorSql(crs, sql))}
 | DECLARE; crs= sql_var_name; CURSOR; WITH; HOLD; FOR; sql=sql_query; option(forUpdate);
-  {DeclareCursor(DeclareCursorWhithHold(crs, sql))} 
-| PREPARE; name= sql_var_name; FROM; sql=sql; 
+  {DeclareCursor(DeclareCursorWhithHold(crs, sql))}
+| PREPARE; name= sql_var_name; FROM; sql=sql;
   {Prepare(name, sql)}
-| EXECUTE; IMMEDIATE; arg=execute_immediate_arg; 
+| EXECUTE; IMMEDIATE; arg=execute_immediate_arg;
   {ExecuteImmediate arg}
-| EXECUTE; executed_string= sql_var_name; 
-  opt_into_hostref_list = option(into_list_cob_var); 
-  opt_using_hostref_list= option(using_list_cob_var); 
+| EXECUTE; executed_string= sql_var_name;
+  opt_into_hostref_list = option(into_list_cob_var);
+  opt_using_hostref_list= option(using_list_cob_var);
   {ExecuteIntoUsing{executed_string; opt_into_hostref_list; opt_using_hostref_list}}
-| SAVEPOINT; s= variable; 
+| SAVEPOINT; s= variable;
   {Savepoint s}
-| RELEASE; SAVEPOINT; s=variable; 
+| RELEASE; SAVEPOINT; s=variable;
   {ReleaseSavepoint s}
 | ROLLBACK; r=option(rb_work_or_tran); a=option(rb_args);
   {Rollback(r, a)}
-| COMMIT; wt= option(rb_work_or_tran); RELEASE; 
+| COMMIT; wt= option(rb_work_or_tran); RELEASE;
   {Commit(wt, true)}
-| COMMIT; wt= option(rb_work_or_tran); 
+| COMMIT; wt= option(rb_work_or_tran);
   {Commit(wt, false)}
 | INSERT; INTO; tab = table; VALUES; v=value;
   {Insert (tab, v)}
-| DELETE; sql= sql; 
+| DELETE; sql= sql;
   {Delete sql}
-| UPDATE; table=sql_var_name; sql=sql_update; x=option(update_arg); 
+| UPDATE; table=sql_var_name; sql=sql_update; x=option(update_arg);
   {Update(table, sql, x)}
 
 (*Unexeped At, but we have to parse it*)
@@ -211,12 +211,12 @@ let with_default_opt:=
 
 (*TODO: forUpdate is incomplete, I have to implement this syntaxe:
 FOR {
-  READ ONLY 
+  READ ONLY
 | UPDATE [OF unqualified-column-name[, unqualified-column-name]. ..]
 }*)
 
-let forUpdate := 
-| FOR; UPDATE; {} 
+let forUpdate :=
+| FOR; UPDATE; {}
 
 
 
@@ -245,19 +245,19 @@ let rb_work_or_tran :=
 let rb_args :=
 | RELEASE; {Release}
 | TO; SAVEPOINT; v =  sql_var_name; {To v}
-| TO; v =  sql_var_name; {To v} 
+| TO; v =  sql_var_name; {To v}
 
 let connect_stm :=
 (*
-EXEC SQL CONNECT TO :dbname [ AS :db_conn_id ] 
-USER :username USING :db_data_source 
-IDENTIFIED BY :password 
+EXEC SQL CONNECT TO :dbname [ AS :db_conn_id ]
+USER :username USING :db_data_source
+IDENTIFIED BY :password
 *)
 | TO; dbname=  cobol_var_id; db_conn_id=option(as_var); USER; username= cobol_var_id;
   USING; db_data_source=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id;
   { Connect_to_idby {dbname; db_conn_id; username; db_data_source; password} }
 
-(* 
+(*
 EXEC SQL CONNECT TO :db_data_source [ AS :db_conn_id ]
 USER :username.:opt_password [ USING password ];
 -> Supporté si il n'y as pas de opt_passwod
@@ -265,26 +265,26 @@ USER :username.:opt_password [ USING password ];
 | TO; db_data_source=  cobol_var_id; db_conn_id=option(as_var); USER; username= cobol_var_id;
   password = option(using_var);
   { Connect_to {db_data_source; db_conn_id; username; password} }
-(* 
-EXEC SQL CONNECT USING :db_data_source 
-(credentials must be embedded to be able to connect) 
+(*
+EXEC SQL CONNECT USING :db_data_source
+(credentials must be embedded to be able to connect)
 *)
 | USING; db_data_source= cobol_var_id; {Connect_using{db_data_source}}
-(* 
-EXEC SQL CONNECT :username IDENTIFIED BY :password 
+(*
+EXEC SQL CONNECT :username IDENTIFIED BY :password
 [ AT :db_conn_id ] [ USING :db_data_source] (mode 4 is unsupported)
 *)
-| username=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id; 
+| username=  cobol_var_id; IDENTIFIED; BY; password=  cobol_var_id;
   db_conn_id = option(at_var); db_data_source= option(using_var);
   {Connect_user{username; password; db_conn_id; db_data_source}}
-| RESET; name=option( simpl_var); 
+| RESET; name=option( simpl_var);
   {Connect_reset name }
 
 let at_var:= AT; p= simpl_var; {p}
 
 let using_var:= USING; p= cobol_var_id; {p}
 
-let as_var:= AS; v= simpl_var; {v} 
+let as_var:= AS; v= simpl_var; {v}
 
 let whenever_condition :=
 | NOT; FOUND; {Not_found_whenever}
@@ -299,7 +299,7 @@ let whenever_continuation :=
 
 (*SQL Stuff*)
 
-let sql_com_query := 
+let sql_com_query :=
 | LPAR; s = sql_query; RPAR; {s}
 | s = sql_lil_query; {s}
 
@@ -316,7 +316,7 @@ let sql_select:=
 | SELECT; x = separated_list(COMMA, sql_op); {x}
 
 let select_option :=
-| FROM; f= from_stm; {From f} 
+| FROM; f= from_stm; {From f}
 | ORDER; BY; l=separated_nonempty_list(COMMA, order_by); {OrderBy(l)}
 | WHERE; s = search_condition; {Where s}
 | GROUP; BY; x = separated_list(COMMA, literal); {GroupBy x}
@@ -330,8 +330,8 @@ let order_by:=
 let from_stm :=
 | lst = separated_nonempty_list(COMMA, table_ref); {lst}
 
-let table_ref := 
-| j = qualified_join;{j} 
+let table_ref :=
+| j = qualified_join;{j}
 | t = table_ref_non_rec; {t}
 
 let table_ref_simpl :=
@@ -353,7 +353,7 @@ let join_type :=
 | LEFT; option(OUTER); {LeftJoin}
 | RIGHT; option(OUTER); {RightJoin}
 
-let qualified_join_option := 
+let qualified_join_option :=
 | ON; s = search_condition; {JoinOn(s)}
 (*| USING; s=separated_nonempty_list(COMMA, sql_var_name); {JoinUsing(s)}*)
 
@@ -373,21 +373,21 @@ let search_condition_aux2 :=
 
 let predicate :=
 | c = comparison_predicate; {WhereConditionCompare c}
-| i = in_predicate; {WhereConditionIn i} 
+| i = in_predicate; {WhereConditionIn i}
 | b = between_predicate; { WhereConditionBetween b}
 | r = variable; IS; NULL; {WhereConditionIsNull r}
 
 let between_predicate :=
 | l=literal; BETWEEN; l1=literal; AND; l2=literal; {Between (l, l1, l2)}
 
-let in_predicate:= 
+let in_predicate:=
 | l = literal; IN; LPAR; lst = separated_nonempty_list(COMMA, sql_complex_literal); RPAR; {InVarLst(l, lst)}
 
 let comparison_predicate:=
 | l = sql_complex_literal; c = compOp; LPAR; sql = sql_query; RPAR; {CompareQuery(l, c, [SqlQuery sql])}
 | l = sql_complex_literal; c = compOp; l2 =  sql_complex_literal;  {CompareLit(l, c, l2)}
 
-let compOp :=  
+let compOp :=
 | LESS; {Less} (* < *)
 | GREAT; {Great} (* > *)
 | LESS_EQ; {LessEq} (* <= *)
@@ -397,8 +397,8 @@ let compOp :=
 
 
 
-(*For exemple 
-SET 
+(*For exemple
+SET
    CID = CID + :VAR1,
    FLD01 = FLD01 + :VAR2,
    FLD02 = CONCAT(FLD02, CAST(:VAR3 AS VARCHAR))
@@ -409,7 +409,7 @@ let sql_update :=
 let sql_equal :=
   s = sql_var_name; EQUAL; op = sql_op; {(s, op)}
 
-let sql_op := 
+let sql_op :=
 | c=sql_complex_literal; o= binop; v=sql_op; {SqlOpBinop(o, c, v)}
 | a = sql_complex_literal; { SqlOpLit a }
 
@@ -419,22 +419,22 @@ let sql_complex_literal :=
 | v= literal; AS; c=sql_var_name; {SqlCompAsVar(v, c)}
 | v= literal; {SqlCompLit v }
 | fun_name=sql_var_name; LPAR; args = separated_list(COMMA, sql_op) ; RPAR;
-  {SqlCompFun(fun_name, args)} 
+  {SqlCompFun(fun_name, args)}
 | STAR; {SqlCompStar}
 
-let binop := 
+let binop :=
 | PLUS; {Add}
 | MINUS; {Minus}
 | STAR; {Times}
 | OR; {Or}
 
 
-let sql := 
+let sql :=
 | t = sql_no_simpl_cobol; {t}
 | t = cobol_var; {[SqlVarToken( CobolVar t)]}
 
 let sql_no_simpl_cobol :=
-| t = sql_first_token;  x = list(sql_token); {[t] @ x} 
+| t = sql_first_token;  x = list(sql_token); {[t] @ x}
 (*Note for the futur me: a list can be empty*)
 | s = sql_query; {[SqlQuery s]}
 
@@ -474,7 +474,7 @@ let sql_token_not_first :=
 | t = cobol_var_id; {SqlVarToken( CobolVar(CobVarNotNull t)) }
 
 
-let sql_token := 
+let sql_token :=
 | s = sql_first_token; {s}
 | s = sql_token_not_first; {s}
 
