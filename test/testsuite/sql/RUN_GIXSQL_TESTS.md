@@ -3,6 +3,7 @@
 ## Install GixSQL
 
 Following https://github.com/mridoni/gixsql/tree/main?tab=readme-ov-file#linux you can build GixSQL locally
+Or with the PR https://github.com/OCamlPro/gixsql/pull/2.
 
 ## Configure at least one database type
 
@@ -14,17 +15,13 @@ Note: mysql tests fails on Linux, it seems to be a case sensitivity issue betwee
 From the doc https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
 > In MySQL, databases correspond to directories within the data directory. Each table within a database corresponds to at least one file within the database directory (and possibly more, depending on the storage engine). Triggers also correspond to files. Consequently, the case sensitivity of the underlying operating system plays a part in the case sensitivity of database, table, and trigger names. This means such names are not case-sensitive in Windows, but are case-sensitive in most varieties of Unix.
 
-## Patch file
+## Modifying gixsql testsuite
 
-I created a git patch file with my modification of GixSQL : `superbol-preproc-for-gixsql.patch`
-The command `git am path/to/patch` inside the GixSQL repo will apply those changes.
+The following PR https://github.com/OCamlPro/gixsql/pull/4 contains modification to the test runner source code that allows executing the testsuite with `superbol sql preproc` instead of `gixpp`.
+The superbol-free executable needs to be accessible at `/opt/superbol-free-linux-x64` (symbolic linking works)
 
-The patch file contains the following changes :
-- Setup `gixsql_test_local_linux.xml` for a standard install
-- Edition of two `.cs` file for the execution of superbol's preprocessor
-
-- Make sure the temp folder `/tmp/gixsql-test` exists
-- The superbol-free executable is accessible at `/opt/superbol-free-linux-x64` (symbolic linking works)
+Configuring and running the testsuite can be done in 1 command using the PR https://github.com/OCamlPro/gixsql/pull/2.
+Or manually by following the next two section
 
 ## GixSQL XML config file
 
@@ -66,7 +63,7 @@ Run: 71 - Success: 68 - Failed: 3
 The test `TSQL004A` fails due to a invalid preprocessor option. (line 237 of `gixsql_test_data.xml`)
 The other two fail due to preprocessor errors.
 
-### What I discovered for our test
+### What I discovered using gixsql testsuite
 
 - TSQL005A : some BY VALUE are different (2 instead of -2 for NUM1)
 - TSQL009A 42A : fails due to issue in cobol_indent maybe ? there is a tabulation as a first caracter in the line 66
@@ -79,3 +76,4 @@ The other two fail due to preprocessor errors.
 - TSQL041A : grammar error 'SELECT CASE WHEN'
 - TSQL042A : some var have :VAR:NULL-IND form, this is not supported
 
+[This issue](https://github.com/OCamlPro/superbol-studio-oss/issues/371) explains that in more details.
