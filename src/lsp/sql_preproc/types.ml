@@ -38,7 +38,7 @@ type statements =
   | LINKAGE_SECTION of { defined: bool }
   | EXEC_SQL of { end_loc : loc ;
                    with_dot : bool ;
-                   tokens : Sql_ast.esql_instuction ;
+                   tokens : Sql_ast.esql_instruction ;
                  }
   | BEGIN_PROCEDURE_DIVISION of { enabled : bool ref }
   | END_PROCEDURE_DIVISION

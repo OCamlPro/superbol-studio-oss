@@ -50,7 +50,7 @@ open Cobol_common.Srcloc.INFIX
 %token <string> NUMBER
 %token <string> COBOL_VAR
 %token <string> BACKSLASH_VAR
-%start <esql_instuction> main
+%start <esql_instruction> main
 
 %%
 
