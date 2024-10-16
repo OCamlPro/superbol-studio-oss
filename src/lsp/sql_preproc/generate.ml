@@ -12,6 +12,9 @@ open EzCompat
 open Types
 open Sql_ast
 
+let c_formatted_string str = "\"" ^ str ^ "\" & x\"00\""
+let empty_c_string = "x\"00\""
+
 let comment str =
   Generated_type.Added
     { content = [ Generated_type.Comment { content = str } ];
@@ -77,7 +80,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let var_opt = function
     | Some var -> (
       match var with
-      | SqlVar sqlVarToken -> Some ("\"" ^ sqlVarToken.payload ^ "\" & x\"00\"")
+      | SqlVar sqlVarToken -> Some (c_formatted_string sqlVarToken.payload)
       | CobolVar cobol_var -> cob_var_opt (Some cobol_var) )
     | None -> None
   in
@@ -122,18 +125,12 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | Some a -> a.flags
     | None -> Sql_typeck.get_flags cobol_unit str
   in
-  let get_ind_addr str =
-    match Data_gestion.find_opt new_var_map str with
-    | Some a -> a.ind_addr
-    | None -> Sql_typeck.get_ind_addr cobol_unit str
-  in
-
   let get_at_info some_var =
     match some_var with
-    | None -> ("x\"00\"", 0)
+    | None -> (empty_c_string, 0)
     | Some var -> (
       match var with
-      | SqlVar sqlVarToken -> ("\"" ^ sqlVarToken.payload ^ "\" & x\"00\"", 0)
+      | SqlVar sqlVarToken -> (c_formatted_string sqlVarToken.payload, 0)
       | CobolVar cobol_var -> (
         match cobol_var with
         | CobVarNotNull cobolVarId ->
@@ -157,7 +154,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     trans_stm
   in
 
-  let generatesql_connect_reset ~prefix ?(d_connection_id = "x\"00\"")
+  let generatesql_connect_reset ~prefix ?(d_connection_id = empty_c_string)
       ?(connection_id_tl = 0) () =
     let fun_name = "GIXSQLConnectReset" in
     let ref_value =
@@ -170,10 +167,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generatesql_connect_aux ~prefix ?(data_source = "x\"00\"")
-      ?(data_source_tl = 0) ?(d_connection_id = "x\"00\"")
-      ?(connection_id_tl = 0) ?(d_dbname = "x\"00\"") ?(dbname_tl = 0)
-      ?(d_username = "x\"00\"") ?(username_tl = 0) ?(d_password = "x\"00\"")
+  let generatesql_connect_aux ~prefix ?(data_source = empty_c_string)
+      ?(data_source_tl = 0) ?(d_connection_id = empty_c_string)
+      ?(connection_id_tl = 0) ?(d_dbname = empty_c_string) ?(dbname_tl = 0)
+      ?(d_username = empty_c_string) ?(username_tl = 0) ?(d_password = empty_c_string)
       ?(password_tl = 0) () =
     let fun_name = "GIXSQLConnect" in
     let ref_value =
@@ -290,8 +287,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     match cobol_var with
     | CobVarNotNull c -> c.payload
     | CobVarCasted (c, _) -> c.payload
-    | CobVarNullIndicator (c, n) -> c.payload ^ n.payload
+    | CobVarNullIndicator (c, _) -> c.payload
   in
+
+  let get_null_indicator (cobol_var : cobol_var) =
+    match cobol_var with
+    | CobVarNullIndicator (_, n) -> n.payload
+    | _ -> "0"
+  in
+
 
   let generate_set_result_param prefix arg =
     let h = get_name_cobol_var arg in
@@ -304,14 +308,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Value { prefix; var = string_of_int (get_flags h) };
         Generated_type.Reference { prefix; var = h };
         Generated_type.Reference
-          { prefix; var = string_of_int (get_ind_addr h) }
+          { prefix; var = get_null_indicator arg }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
   (* Todo: refactory? *)
-  let generate_set_sql_param prefix h =
+  let generate_set_sql_param prefix arg =
+    let h = get_name_cobol_var arg in
     let fun_name = "GIXSQLSetSQLParams" in
     let ref_value =
       let prefix = prefix ^ "    " in
@@ -321,7 +326,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Value { prefix; var = string_of_int (get_flags h) };
         Generated_type.Reference { prefix; var = h };
         Generated_type.Reference
-          { prefix; var = string_of_int (get_ind_addr h) }
+          { prefix; var = get_null_indicator arg }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
@@ -351,13 +356,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let generate_select_into prefix vars select_options select ?at () =
     let selects_into_vars = List.map (generate_set_result_param prefix) vars in
     let cob_vars =
-      Misc.extract_cob_var_name
-        (Format.asprintf "%a" Sql_ast.Printer.pp_select_lst select)
-      @ Misc.extract_cob_var_name
-          (Format.asprintf "%a" Sql_ast.Printer.pp_select_options_lst
-             select_options )
+      let option_vars =
+        Cobol_common.Visitor.fold_list
+          ~fold:Sql_ast.Visitor.fold_sql_select_option
+          Misc.cob_var_extractor_folder select_options []
+      in
+      let select_vars = Sql_ast.Visitor.fold_sql_select
+          Misc.cob_var_extractor_folder select []
+      in List.rev (option_vars @ select_vars)
     in
-
     let trans_cob_var = List.map (generate_set_sql_param prefix) cob_vars in
     let selects_into = generate_select_into_one prefix vars cob_vars ?at () in
     let trans_stm =
@@ -368,10 +375,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let generate_fetch_into_one prefix (sql : sqlVarToken) =
-    let var =
-      "\""
-      ^ Misc.extract_filename filename
-      ^ "_" ^ sql.payload ^ "\" & x\"00\" "
+    let var = c_formatted_string
+      (Misc.extract_filename filename ^ "_" ^ sql.payload)
     in
     Generated_type.CallStatic
       { prefix;
@@ -438,7 +443,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     match (rb_work_or_tran, rb_args) with
     | None, None ->
       generate_start_end_sql prefix
-        [ generate_GIXSQLExec prefix "\"ROLLBACK \" & x\"00\"" ?at () ]
+        [ generate_GIXSQLExec prefix (c_formatted_string "ROLLBACK") ?at () ]
     | _, Some (To _) -> generate_declare prefix ()
     | _ -> [ Generated_type.Todo { prefix } ]
   in
@@ -448,7 +453,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     | None, false
     | Some Work, false ->
       generate_start_end_sql prefix
-        [ generate_GIXSQLExec prefix "\"COMMIT\" & x\"00\"" ?at () ]
+        [ generate_GIXSQLExec prefix (c_formatted_string "COMMIT") ?at () ]
     | _ -> [ Generated_type.Todo { prefix } ]
   in
 
@@ -486,18 +491,17 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let create_from_cursor_declaration (prefix, cur, at, var_name) =
     let at_name, at_size = get_at_info at in
-    let cur_name, cob_var_lst, var_name, _with_hold =
+    let cob_var_lst = List.rev @@
+      Sql_ast.Visitor.fold_cursor Misc.cob_var_extractor_folder cur []
+    in
+    let cur_name, var_name, _with_hold =
       match cur with
-      | DeclareCursorSql (cur_name, sql) ->
+      | DeclareCursorSql (cur_name, _sql) ->
         ( cur_name,
-          Misc.extract_cob_var_name
-            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query sql),
           var_name,
           false )
-      | DeclareCursorWhithHold (cur_name, query) ->
+      | DeclareCursorWhithHold (cur_name, _query) ->
         ( cur_name,
-          Misc.extract_cob_var_name
-            (Format.asprintf "%a" Sql_ast.Printer.pp_sql_query query),
           var_name,
           true )
       | DeclareCursorVar (cur_name, cur_var) ->
@@ -506,13 +510,12 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           | SqlVar _ -> var_name
           | CobolVar v -> get_name_cobol_var v
         in
-        (cur_name, [], var, false)
+        (cur_name, var, false)
     in
 
-    let cursor_name =
-      "\""
-      ^ Misc.extract_filename filename
-      ^ "_" ^ cur_name.payload ^ "\" & x\"00\""
+    let cursor_name = c_formatted_string
+      (Misc.extract_filename filename
+      ^ "_" ^ cur_name.payload)
     in
 
     let fun_name, cursor_declare =
@@ -607,7 +610,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference
-          { prefix; var = "\"" ^ var_name.payload ^ "\" & x\"00\"" };
+          { prefix; var = c_formatted_string var_name.payload };
         Generated_type.Reference { prefix; var = sql_name };
         Generated_type.Value
           { prefix; var =
@@ -637,7 +640,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference
-          { prefix; var = "\"" ^ executed_string.payload ^ "\" & x\"00\"" };
+          { prefix; var = c_formatted_string executed_string.payload };
         Generated_type.Value
           { prefix; var = string_of_int (List.length into_hostref_list) }
         (*todo*)
@@ -656,7 +659,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference
-          { prefix; var = "\"" ^ executed_string.payload ^ "\" & x\"00\"" };
+          { prefix; var = c_formatted_string executed_string.payload };
         Generated_type.Value
           { prefix; var = string_of_int (List.length into_hostref_list) };
         Generated_type.Value
@@ -670,9 +673,6 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_execute_into_using prefix executed_string
       ?(opt_into_hostref_list = []) ?(opt_using_hostref_list = []) ?at () =
-    let opt_using_hostref_list =
-      List.map get_name_cobol_var opt_using_hostref_list
-    in
     let into_hostref_set_result_param =
       List.map (generate_set_result_param prefix) opt_into_hostref_list
     in
@@ -703,10 +703,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       [ Generated_type.Reference { prefix; var = "SQLCA" };
         Generated_type.Reference
           { prefix;
-            var =
-              "\""
-              ^ Misc.extract_filename filename
-              ^ "_" ^ sql_var_token ^ "\" x\"00\""
+            var = c_formatted_string
+              (Misc.extract_filename filename
+              ^ "_" ^ sql_var_token)
           }
       ]
     in
@@ -745,10 +744,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
                  [ Generated_type.Reference { prefix; var = "SQLCA" };
                    Generated_type.Reference
                      { prefix;
-                       var =
-                         "\""
-                         ^ Misc.extract_filename filename
-                         ^ "_" ^ cursor_name.payload ^ "\" & x\"00\""
+                       var = c_formatted_string
+                         (Misc.extract_filename filename
+                         ^ "_" ^ cursor_name.payload)
                      }
                  ] )
             }
@@ -824,12 +822,11 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         []
     | ExecuteImmediate var -> generate_simpl_execute_immediat prefix var ?at ()
     | Insert (_, value_list) ->
-      let value_list =
-        Misc.extract_cob_var_name
-          (Format.asprintf "%a" Sql_ast.Printer.pp_value value_list)
-      in
-
-      generate_insert prefix ~value_list ?at ()
+      let value_list = List.rev @@
+        Cobol_common.Visitor.fold_list
+        ~fold:Sql_ast.Visitor.fold_value Misc.cob_var_extractor_folder
+        value_list []
+      in generate_insert prefix ~value_list ?at ()
     | Savepoint _
     | ReleaseSavepoint _
     | StartTransaction ->
@@ -851,9 +848,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       (* indeed, gix *seems* to not be doing anything with it, this requires further testing tho *)
       [ Generated_type.Todo { prefix } ]
     | Delete sql_instr ->
-      let value_list =
-        Misc.extract_cob_var_name
-          (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql_instr)
+      let value_list = List.rev @@
+        Sql_ast.Visitor.fold_sql_instruction Misc.cob_var_extractor_folder
+        sql_instr []
       in
       generate_insert prefix ~value_list ?at ()
     | Update _ ->
@@ -893,7 +890,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       ]
     | DisconnectAll ->
       [ generatesql_connect_reset ~prefix
-          ?d_connection_id:(Some "\"*\" & x\"00\"") ()
+          ?d_connection_id:(Some (c_formatted_string "*")) ()
       ]
     | Whenever (c, k) ->
       change_error ~prefix c k;
@@ -926,9 +923,8 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         num := !num + 1;
         "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
       in
-      let cob_var_list =
-        Misc.extract_cob_var_name
-          (Format.asprintf "%a" Sql_ast.Printer.pp_exception e)
+      let cob_var_list = List.rev @@
+        Sql_ast.Visitor.fold_try_block Misc.cob_var_extractor_folder e []
       in
       generate_start_end_sql prefix
         ( List.map (generate_set_sql_param prefix) cob_var_list

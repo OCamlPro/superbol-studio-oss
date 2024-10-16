@@ -22,8 +22,8 @@ val add_dot : with_dot:bool -> Buffer.t -> unit
 
 val resolve_copy : config:Types.config -> string -> string
 
-val extract_cob_var_name : string -> string list
-
 val extract_filename : string -> string
 
 val replace_colon_words : string -> string
+
+val cob_var_extractor_folder : Sql_ast.cobol_var list Sql_ast.Visitor.folder

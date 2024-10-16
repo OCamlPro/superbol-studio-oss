@@ -65,6 +65,7 @@ let parse ~config ~filename ~contents =
       in
       sql_add_statement ~loc (DECLARATION { end_loc; declaration });
       iter tokens
+    (*Exemple : 01 VCFLD SQL TYPE IS FLOAT(4,2).*)
     | (INTEGER importance, loc)
       :: (IDENT name, _)
       :: (IDENT "SQL", _) :: (IDENT "TYPE", _) :: (IDENT "IS", _)

@@ -93,23 +93,13 @@ let resolve_copy ~config file =
   in
   iter_exts config.copy_exts
 
- and extract_cob_var_name str = 
-    let len = String.length str in
-    let rec aux i acc =
-      if i >= len then List.rev acc
-      else if str.[i] = ':' then
-        let start = i + 1 in
-        let rec find_end j =
-          if j >= len || str.[j] = ' ' || str.[j] = ',' || str.[j] = ')' || str.[j] = '(' then j
-          else find_end (j + 1)
-        in
-        let end_pos = find_end start in
-        let var_name = String.sub str start (end_pos - start) in
-        if List.mem var_name acc then aux end_pos acc
-        else aux end_pos (var_name :: acc)
-      else aux (i + 1) acc
-    in
-    aux 0 []
+let cob_var_extractor_folder = object
+  inherit [Sql_ast.cobol_var list] Sql_ast.Visitor.folder
+  method! fold_cobol_var cob_var acc =
+    if List.exists (fun c -> Sql_ast.compare_cobol_var cob_var c == 0) acc
+    then Cobol_common.Visitor.skip acc
+    else Cobol_common.Visitor.skip (cob_var::acc)
+end
 
 let extract_filename path =
   let parts = Str.split (Str.regexp "/") path in
