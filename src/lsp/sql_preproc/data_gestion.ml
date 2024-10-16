@@ -162,7 +162,14 @@ let transform_stm map (_, stm) filename =
       | [ Sql_ast.SqlVarToken (CobolVar (CobVarNotNull _)) ] -> ([], map)
       | _ ->
         let ws, map =
-          create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_sql sql) ()
+          let content =
+            let content = Format.asprintf "%a" Sql_ast.Printer.pp_sql sql in
+            if String.starts_with ~prefix:"'" content ||
+               String.starts_with ~prefix:"\"" content
+            then String.sub content 1 (String.length content - 2)
+            else content
+          in
+          create_new_var content ()
         in
         (ws, map) )
     | Rollback (rb_work_or_tran, rb_args) -> begin

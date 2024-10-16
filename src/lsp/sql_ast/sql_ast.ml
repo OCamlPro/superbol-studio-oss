@@ -620,7 +620,7 @@ module Printer = struct
 
   and pp_lit fmt = function
     | LiteralNum n -> Format.fprintf fmt "%s" n.payload
-    | LiteralStr n -> Format.fprintf fmt "'%s'" n.payload
+    | LiteralStr n -> Format.fprintf fmt "%s" n.payload
     | LiteralVar n -> Format.fprintf fmt "%a" pp_var n
     | LiteralDot lst ->
       let rec pp_aux fmt = function
