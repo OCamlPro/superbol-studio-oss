@@ -88,6 +88,7 @@ test:
 	./scripts/before.sh test
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @runtest
 	${MAKE} test-syntax
+	./scripts/test-gixsql.sh
 	./scripts/after.sh test
 
 clean:
