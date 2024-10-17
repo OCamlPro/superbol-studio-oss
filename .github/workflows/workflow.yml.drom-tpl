@@ -84,6 +84,12 @@ jobs:
 
       # Use fields.github-workflow-after-build to add something here
 !(github-workflow-after-build)
+      - name: install nix
+        if: matrix.skip_test != 'true'
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
       - name: run test suite
         run: make test
         if: matrix.skip_test  != 'true'
