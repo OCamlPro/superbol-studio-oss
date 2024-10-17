@@ -71,7 +71,7 @@ jobs:
 #        if: steps.cache-opam.outputs.cache-hit == 'true'
 
       # Use fields.build-scripts to add more scripts to convert here
-      - run: dos2unix scripts/*.sh 
+      - run: dos2unix scripts/*.sh
         if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
@@ -90,6 +90,12 @@ jobs:
       - name: install test dependencies
         if: matrix.skip_test  != 'true'
         run: make dev-deps
+
+      - name: install nix
+        if: matrix.skip_test != 'true'
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: run test suite
         run: make test
