@@ -11,4 +11,4 @@
 	branch = superbol-vscode-debug
 [submodule "import/gixsql"]
 	path = import/gixsql
-	url = git@github.com:OCamlPro/gixsql.git
+	url = https://github.com/OCamlPro/gixsql.git
