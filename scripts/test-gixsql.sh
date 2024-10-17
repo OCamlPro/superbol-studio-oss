@@ -12,3 +12,7 @@ cd "import/gixsql"
 
 # Run tests with the legacy preprocessor
 LEGACY_PP="" nix develop --command ./run_test.sh
+
+# Run tests with the new preprocessor
+SUPERBOL_BIN="_build/install/default/bin/superbol-free" \
+  nix develop -- command ./run_test.sh
