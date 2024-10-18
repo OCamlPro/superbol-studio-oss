@@ -61,7 +61,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_ast sql_parser
+      - run: opam depext -y superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_preproc sql_ast sql_parser
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test
@@ -91,9 +91,17 @@ jobs:
         if: matrix.skip_test  != 'true'
         run: make dev-deps
 
+      - name: install nix
+        if: matrix.skip_test != 'true'
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
       - name: run test suite
         run: make test
         if: matrix.skip_test  != 'true'
+        env:
+          SUPERBOL_PP: "${{ github.workspace }}/_build/install/default/bin/superbol-free"
 
       - name: show test result on failure
         if: failure()
