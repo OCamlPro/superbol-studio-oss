@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-if ! command -v nix 2>&1 >/dev/null
+if ! command -v nix >/dev/null 2>&1
 then
   echo "GixSQL tests ignored. Install nix to run them."
   exit 0
@@ -14,5 +14,4 @@ cd "import/gixsql"
 
 # Run tests with the new preprocessor
 export TEST_VERBOSITY=1
-SUPERBOL_PP="/home/tiky/git/superbol-studio-oss/_build/install/default/bin/superbol-free" \
-  nix develop --command ./run_test.sh
+nix develop --command ./run_test.sh

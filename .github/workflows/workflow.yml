@@ -100,6 +100,8 @@ jobs:
       - name: run test suite
         run: make test
         if: matrix.skip_test  != 'true'
+        env:
+          SUPERBOL_PP: "${{ github.workspace }}/_build/install/default/bin/superbol-free"
 
       - name: show test result on failure
         if: failure()
