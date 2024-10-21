@@ -3564,7 +3564,7 @@ run_misc.at-10517-prog.cob:198.12-198.25:
  200                 DISPLAY TEST-BASED-SUB
 >> Error: Library `cpyabrt' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:10935:0
 run_misc.at-10935-reference_fdls_tmpl:2.7-2.11:
@@ -4152,7 +4152,7 @@ run_misc.at-10517-sub2.cob:84.11-84.24:
   85          END PROGRAM sub2.
 >> Error: Library `cpyabrt' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:11143:0
 run_misc.at-11143-prog.cob:69.35:
@@ -6608,7 +6608,7 @@ run_misc.at-14647-prog.cob:22.7-23.58:
   25                              ==:PROG-KIND:== BY ====.
 >> Error: Library `prog' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_misc.at-14647-prog.cob:24.7-25.51:
   21              STOP RUN.
@@ -6622,7 +6622,7 @@ run_misc.at-14647-prog.cob:24.7-25.51:
   27          COPY prog REPLACING ==:PROG-NAME:== BY ==nonnested_init==
 >> Error: Library `prog' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_misc.at-14647-prog.cob:27.7-28.58:
   24          COPY prog REPLACING ==:PROG-NAME:== BY ==nested_noninit==
@@ -6636,7 +6636,7 @@ run_misc.at-14647-prog.cob:27.7-28.58:
   30                              ==:PROG-KIND:== BY ====.
 >> Error: Library `prog' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_misc.at-14647-prog.cob:29.7-30.51:
   26          END PROGRAM prog.
@@ -6648,7 +6648,7 @@ run_misc.at-14647-prog.cob:29.7-30.51:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14677:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:14735:0

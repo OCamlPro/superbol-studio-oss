@@ -3328,7 +3328,7 @@ run_file.at-8744-prog.cob:270.11-270.29:
  272          01 key-def.
 >> Error: Library `xfhfcd.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-8744-prog.cob:304.16-304.22:
  301              DISPLAY "File assigned is '"
@@ -5105,7 +5105,7 @@ run_file.at-9400-prog.cob:49.11-49.30:
   51         *================================================================*
 >> Error: Library `xfhfcd3.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-9400-prog.cob:74.15-74.21:
   71   
@@ -5129,7 +5129,7 @@ run_file.at-9589-prog.cob:17.11-17.24:
   19               VALUE 'FCDLS'.
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-9589-prog.cob:46.16-46.22:
   43              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5214,7 +5214,7 @@ run_file.at-9798-prog.cob:19.11-19.24:
   21               VALUE 'FCDFB'.
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-9798-prog.cob:48.16-48.22:
   45              DISPLAY PROGRAM-NAME ': STARTING.'
@@ -5307,7 +5307,7 @@ run_file.at-9979-prog.cob:66.11-66.30:
   68          01  KEY-DEF.
 >> Error: Library `xfhfcd3.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-9979-prog.cob:93.17-93.21:
   90         *----------------------------------------------------------------*
@@ -5340,7 +5340,7 @@ run_file.at-10308-prog.cob:86.11-86.23:
   88          01  FILE-NAME                       PIC X(64).
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-10308-prog.cob:155.16-155.22:
  152              SET  FCD-FILENAME-ADDRESS   TO ADDRESS OF FILE-NAME
@@ -5374,7 +5374,7 @@ run_file.at-10643-prog.cob:97.11-97.23:
   99          01  RECORD-AREA.
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10643:0
 run_file.at-10643-progs.cob:2.6-2.19:
@@ -5396,7 +5396,7 @@ run_file.at-10831-prog.cob:86.12-86.24:
   88          01  RECORD-AREA.
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 run_file.at-10831-prog.cob:134.16-134.22:
  131         **   FIXED(0) OR VARIABLE(1)
@@ -5439,7 +5439,7 @@ run_file.at-10990-prog.cob:45.11-45.30:
   47          01  EX-RECORD-BUFFER    PIC X(32767).
 >> Error: Library `xfhfcd3.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11348:0
 run_file.at-11348-prog.cob:15.50:
@@ -7167,7 +7167,7 @@ run_file.at-12694-prog1.cob:2.7-4.32:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12704:0
 run_file.at-12704-prog2.cob:2.7-4.32:
@@ -7180,7 +7180,7 @@ run_file.at-12704-prog2.cob:2.7-4.32:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12715:0
 run_file.at-12715-prog3.cob:2.7-4.72:
@@ -7193,7 +7193,7 @@ run_file.at-12715-prog3.cob:2.7-4.72:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12725:0
 run_file.at-12725-prog4.cob:2.7-4.72:
@@ -7206,7 +7206,7 @@ run_file.at-12725-prog4.cob:2.7-4.72:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12735:0
 run_file.at-12735-prog5.cob:2.7-4.72:
@@ -7219,7 +7219,7 @@ run_file.at-12735-prog5.cob:2.7-4.72:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12745:0
 run_file.at-12745-prog6.cob:2.7-4.32:
@@ -7232,7 +7232,7 @@ run_file.at-12745-prog6.cob:2.7-4.32:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12755:0
 run_file.at-12755-prog7.cob:2.7-4.71:
@@ -7245,7 +7245,7 @@ run_file.at-12755-prog7.cob:2.7-4.71:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12765:0
 run_file.at-12765-prog8.cob:2.7-4.71:
@@ -7258,7 +7258,7 @@ run_file.at-12765-prog8.cob:2.7-4.71:
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 >> Error: Library `prog.cpy' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12696:0
 run_file.at-12696-reference_ascii:1.6-1.7:

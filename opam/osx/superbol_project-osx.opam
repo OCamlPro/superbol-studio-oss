@@ -53,6 +53,7 @@ depends: [
   "ocplib_stuff-osx" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-osx" {= version}
   "ez_file-osx" {>= "0.3.0" & < "1.0.0"}
+  "cobol_preproc-osx" {= version}
   "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}

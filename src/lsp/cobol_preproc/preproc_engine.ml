@@ -568,9 +568,48 @@ let fold_source_lines ~dialect ~source_format ?on_initial_source_format
     | Some f -> f (Src_reader.source_format reader) acc
     | None -> acc
   in
-  OUT.result @@
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
+
+let fold_source_words ~dialect ~source_format ~f input acc =
+  fold_source_lines ~dialect ~source_format input acc
+    ~skip_compiler_directives_text:true
+    ~f:begin fun _ line acc ->
+      ListLabels.fold_left line ~init:acc ~f:(fun acc word -> f word acc)
+    end
+
+let scan_prefix_for_copybook ~dialect ~source_format input =
+  let open struct
+    exception Res of [`Program | `Copybook]
+    type copybook_prefix_state =
+      | Expect_first_digits
+      | Expect_word
+    let digit_chars s =
+      let rec aux i =
+        i < 0 || match s.[i] with '0'..'9' -> aux (pred i) | _ -> false
+      in
+      aux (String.length s - 1)
+    let is_digits = function
+      | Text.TextWord s -> digit_chars s
+      | _ -> false
+    let is_word = function
+      | Text.TextWord _ as w -> not (is_digits w)
+      | _ -> false
+  end in
+  match
+    fold_source_words ~dialect ~source_format input Expect_first_digits
+      ~f:begin fun word -> function
+        | Expect_first_digits when is_digits ~&word ->
+            Expect_word
+        | Expect_word when is_word ~&word ->
+            raise @@ Res `Copybook
+        | _ ->
+            raise @@ Res `Program
+      end
+  with
+  | exception Res res -> res
+  | Expect_first_digits -> `Program                                  (* maybe? *)
+  | Expect_word -> `Copybook                                         (* maybe? *)
 
 let text_of_input ?options input =
   let text, pp = full_text ~item:"file" @@ preprocessor ?options input in

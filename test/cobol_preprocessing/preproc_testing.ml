@@ -49,7 +49,6 @@ let show_source_lines
     ?(source_format = Cobol_config.(SF SFFixed))
     contents
   =
-  Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.fold_source_lines ~dialect ~source_format
     ~f:begin fun lnum line () ->
       if with_line_numbers then Pretty.out "@\n%u: " lnum else Pretty.out "@\n";

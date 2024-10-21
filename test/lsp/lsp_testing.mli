@@ -25,7 +25,7 @@ val make_lsp_project
   -> unit
   -> test_project * LSP.Types.registry
 val add_cobol_doc
-  : LSP.Types.registry -> ?copybook:bool -> projdir:string -> string -> string
+  : LSP.Types.registry -> projdir:string -> string -> string
   -> LSP.Types.registry * Lsp.Types.TextDocumentIdentifier.t
 
 type positions =

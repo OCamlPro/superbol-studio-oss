@@ -24,7 +24,6 @@ module TYPES: sig
     mutable source_format: Cobol_config.source_format_spec;
     mutable libpath: path list;
     mutable libexts: string list;
-    mutable copybook_if_no_extension: bool;
     mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;
   }
@@ -73,11 +72,6 @@ val copybook_lookup_config_for
   : filename: string
   -> t
   -> Cobol_common.Copybook.lookup_config
-
-(** [detect_copybook ~filename config] indicates whether a document with the
-    given filename should be treated as a copybook in a project with
-    configuration [config]. *)
-val detect_copybook: filename:string -> t -> bool
 
 (** {1 Intermediate conversion utilities}
 

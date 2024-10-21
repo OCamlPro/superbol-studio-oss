@@ -164,12 +164,14 @@ let rec inspect_at ~position ({ copybook; rewinder; textdoc; _ } as doc) =
         None
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
-let blank ~project ?copybook textdoc =
-  let copybook = match copybook with
-    | Some p -> p
-    | None -> Lsp_project.detect_copybook project
-                ~uri:(Lsp.Text_document.documentUri textdoc)
+let blank ~project textdoc =
+  let uri = Lsp.Text_document.documentUri textdoc in
+  let copybook =
+    Lsp_project.detect_copybook project ~uri
+      ~contents:(Lsp.Text_document.text textdoc)
   in
+  if copybook then
+    Lsp_io.log_debug "%s appears to be a copybook" (Lsp.Uri.to_string uri);
   {
     project;
     textdoc;
@@ -183,9 +185,9 @@ let blank ~project ?copybook textdoc =
 
 let position_encoding = `UTF8
 
-let load ~project ?copybook doc =
+let load ~project doc =
   let textdoc = Lsp.Text_document.make ~position_encoding doc in
-  let doc = blank ~project ?copybook textdoc in
+  let doc = blank ~project textdoc in
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 
