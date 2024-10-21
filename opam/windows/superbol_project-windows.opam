@@ -53,6 +53,7 @@ depends: [
   "ocplib_stuff-windows" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-windows" {= version}
   "ez_file-windows" {>= "0.3.0" & < "1.0.0"}
+  "cobol_preproc-windows" {= version}
   "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}
   "odoc" {with-doc}

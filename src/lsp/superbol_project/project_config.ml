@@ -28,7 +28,6 @@ module TYPES = struct
     mutable source_format: Cobol_config.source_format_spec;
     mutable libpath: path list;
     mutable libexts: string list;
-    mutable copybook_if_no_extension: bool;
     mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;
   }
@@ -69,7 +68,6 @@ let cobol_source_format source_format_name =
 
 let default_libpath = [RelativeToProjectRoot "."]
 let default_libexts = Cobol_common.Copybook.copybook_extensions
-let default_copybook_if_no_extension = true
 let default_indent_config = []
 
 let default = {
@@ -78,7 +76,6 @@ let default = {
   libpath = default_libpath;
   libexts = default_libexts;
   indent_config = default_indent_config;
-  copybook_if_no_extension = default_copybook_if_no_extension;
   toml_handle = Ezr_toml.make_empty ();
 }
 
@@ -197,8 +194,7 @@ let load_file ?(verbose=false) config_filename =
     let DIAGS.{ result = cobol_config; diags } =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section in
     DIAGS.result ~diags
-      { default with
-        cobol_config;
+      { cobol_config;
         toml_handle;
         source_format = get_source_format section;
         libpath = get_libpath section;
@@ -277,14 +273,6 @@ let libpath_for ~filename { libpath; _ } =
 let copybook_lookup_config_for ~filename config =
   Cobol_common.Copybook.lookup_config (libpath_for ~filename config)
     ~libexts: config.libexts
-
-
-
-(* TODO: add config flags to libpath where some directories may only include
-   copybooks. *)
-let detect_copybook ~filename { libexts; copybook_if_no_extension; _ } =
-  List.exists (Filename.check_suffix filename) libexts ||
-  (copybook_if_no_extension && Filename.extension filename = "")
 
 
 (** Persistent representation (for caching) *)

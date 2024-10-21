@@ -79,12 +79,10 @@ val init
 val on_change_workspace_folders
   : Lsp.Types.DidChangeWorkspaceFoldersParams.t -> t -> t
 
-(** When given, [copybook] indicates whether the document is a copybook (in
-    which case it is not parsed directly as a normal program).  When absent,
-    copybook detection is performed via project configuration (see
-    {!Project.detect_copybook}). *)
+(** Copybook detection is performed via project configuration (see
+    {!Lsp_project.detect_copybook}). *)
 val did_open
-  : Lsp.Types.DidOpenTextDocumentParams.t -> ?copybook: bool -> t -> t
+  : Lsp.Types.DidOpenTextDocumentParams.t -> t -> t
 
 val did_change
   : Lsp.Types.DidChangeTextDocumentParams.t -> t -> t
