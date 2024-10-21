@@ -104,7 +104,7 @@ Where options are:
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
-* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
@@ -251,7 +251,7 @@ Where options are:
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
-* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
@@ -373,7 +373,7 @@ Where options are:
 
 * :code:`--dialect DIALECT` or :code:`--std DIALECT`   Set the dialect to bu used (overriden by `--conf` if used)
 
-* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbx`)
+* :code:`--ext EXT`   Add EXT as a filename extension for copybook resolution (default: `cpy` `cbl` `cob`)
 
 * :code:`--free`   Shorthand for `--source-format FREE`
 
