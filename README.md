@@ -51,26 +51,26 @@ be presented with a screen that resembles:
 
 From here, you can notably configure:
 
-- The COBOL dialect used in the project (see
+- The COBOL dialect used in the project `"superbol.cobol.dialect"` (see
   [here](https://get-superbol.com/gnucobol/manual/chapter2.html#configuration-options)
-  for a documentation on every available dialect).  In SuperBOL, the
-  `default` dialect corresponds to GnuCOBOL's default, that supports
+  for a documentation on every available dialect).  
+  In SuperBOL, the `default` dialect corresponds to GnuCOBOL's default, that supports
   many features from dialects such as `COBOL2014`, `IBM`, `Micro
   Focus` (`mf`), or `GCOS` for instance;
 
-- The default reference source-format (see
+- The default reference source-format `"superbol.cobol.source-format"` (see
   [here](https://get-superbol.com/gnucobol/manual/chapter2.html#source-format)
-  for a documentation on the supported source formats).  When `auto`
-  is selected, which is the default, SuperBOL (and GnuCOBOL) will
+  for a documentation on the supported source formats).  
+  When `auto` is selected, which is the default, SuperBOL (and GnuCOBOL) will
   automagically try to guess whether the source is in `free` or
   `fixed` format.  Other source formats need to be configured
   explicitly.
 
-- The path to copybooks.  To configure this setting, you will need to
-  select `Edit in settings.json`.  This is a list, where each entry
-  describes an element of the search path where your copybooks will be
-  looked for.  Each entry must contain a directory name `dir`, and may
-  feature an optional `file-relative` flag.  When absent or set to
+- The path to copybooks `"superbol.cobol.copybooks"`.  
+  To configure this setting, you will need to select `Edit in settings.json`. This is
+  a list, where each entry describes an element of the search path where your
+  copybooks will be looked for.  Each entry must contain a directory name `dir`,
+  and may feature an optional `file-relative` flag.  When absent or set to
   `false`, the latter field indicates that the directory name is
   either absolute, or relative to the root of the project's directory.
   When `file-relative` is `true`, the element of the search path is
@@ -78,6 +78,14 @@ From here, you can notably configure:
   is located.
 
   ![Editing copybook paths in `.vscode/settings.json`](./assets/superbol-editing-copybooks-path-in-vscode-settings.png)
+
+- The copybook extensions `"superbol.cobol.copyexts"`.  
+  To configure this setting, you will need to select `Edit in settings.json`. This is
+  a list, where each entry describes a file extension if the copybook name cannot
+  be found as-is (for example `COPY "mycpy.lib"`).
+  In SuperBOL, the `default` option corresponds to GnuCOBOL's default, which
+  is `"cpy"`, `"cbl"`, and `"cob"` (searched in upper-case first, and then in
+  lower-case).
 
 ## Syntax diagnostics
 
@@ -172,6 +180,9 @@ cursor over such a statement, and you will be presented with the
 contents of the copybook.
 
 ![Hover over `COPY`](./assets/superbol-hover-copy.png)
+
+To ensure this works correctly, check your `"superbol.cobol.copybooks"`
+and `"superbol.cobol.copyexts"` settings.
 
 ### Hover to Show Source Text Replacements
 
