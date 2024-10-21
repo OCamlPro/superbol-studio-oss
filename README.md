@@ -83,8 +83,9 @@ From here, you can notably configure:
   To configure this setting, you will need to select `Edit in settings.json`. This is
   a list, where each entry describes a file extension if the copybook name cannot
   be found as-is (for example `COPY "mycpy.lib"`).
-  In SuperBOL, the `default` option does not correspond to GnuCOBOL's default, but to "cpy" and
-  "cbx" only.
+  In SuperBOL, the `default` option corresponds to GnuCOBOL's default, which
+  is `"cpy"`, `"cbl"`, and `"cob"` (searched in upper-case first, and then in
+  lower-case).
 
 ## Syntax diagnostics
 
