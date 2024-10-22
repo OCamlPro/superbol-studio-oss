@@ -20,4 +20,7 @@ type t = {
   hidden_nodes: int list; (* id list *)
   split_nodes: int list;  (* id list *)
 }
+(* NOTE: the ids of hidden_nodes and split_nodes params come from the builder
+   before any option-related modification occurs, if the file is unchanged,
+   those id will always be synced with the correct underlying paragraph *)
 
