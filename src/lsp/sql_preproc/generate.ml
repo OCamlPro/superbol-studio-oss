@@ -298,41 +298,49 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
 
   let generate_set_result_param prefix arg =
-    let h = get_name_cobol_var arg in
     let fun_name = "GIXSQLSetResultParams" in
-    let ref_value =
-      let prefix = prefix ^ "    " in
-      [ Generated_type.Value { prefix; var = string_of_int (get_type h) };
-        Generated_type.Value { prefix; var = string_of_int (get_length h) };
-        Generated_type.Value { prefix; var = string_of_int (get_scale h) };
-        Generated_type.Value { prefix; var = string_of_int (get_flags h) };
-        Generated_type.Reference { prefix; var = h };
-        Generated_type.Reference
-          { prefix; var = get_null_indicator arg }
-      ]
+    let var_name = get_name_cobol_var arg in
+    let vars = Sql_typeck.get_child_vars cobol_unit var_name in
+    let aux var_name =
+      let ref_value =
+        let prefix = prefix ^ "    " in
+        [ Generated_type.Value { prefix; var = string_of_int (get_type var_name) };
+          Generated_type.Value { prefix; var = string_of_int (get_length var_name) };
+          Generated_type.Value { prefix; var = string_of_int (get_scale var_name) };
+          Generated_type.Value { prefix; var = string_of_int (get_flags var_name) };
+          Generated_type.Reference { prefix; var = var_name };
+          Generated_type.Reference
+            { prefix; var = get_null_indicator arg }
+        ]
+      in
+      Generated_type.CallStatic { prefix; fun_name; ref_value }
     in
-    Generated_type.CallStatic { prefix; fun_name; ref_value }
+    List.map aux vars
   in
 
   (* Todo: refactory? *)
   let generate_set_sql_param prefix arg =
-    let h = get_name_cobol_var arg in
     let fun_name = "GIXSQLSetSQLParams" in
-    let ref_value =
-      let prefix = prefix ^ "    " in
-      [ Generated_type.Value { prefix; var = string_of_int (get_type h) };
-        Generated_type.Value { prefix; var = string_of_int (get_length h) };
-        Generated_type.Value { prefix; var = string_of_int (get_scale h) };
-        Generated_type.Value { prefix; var = string_of_int (get_flags h) };
-        Generated_type.Reference { prefix; var = h };
-        Generated_type.Reference
-          { prefix; var = get_null_indicator arg }
-      ]
+    let var_name = get_name_cobol_var arg in
+    let vars = Sql_typeck.get_child_vars cobol_unit var_name in
+    let aux h =
+      let ref_value =
+        let prefix = prefix ^ "    " in
+        [ Generated_type.Value { prefix; var = string_of_int (get_type h) };
+          Generated_type.Value { prefix; var = string_of_int (get_length h) };
+          Generated_type.Value { prefix; var = string_of_int (get_scale h) };
+          Generated_type.Value { prefix; var = string_of_int (get_flags h) };
+          Generated_type.Reference { prefix; var = h };
+          Generated_type.Reference
+            { prefix; var = get_null_indicator arg }
+        ]
+      in
+      Generated_type.CallStatic { prefix; fun_name; ref_value }
     in
-    Generated_type.CallStatic { prefix; fun_name; ref_value }
+    List.map aux vars
   in
 
-  let generate_select_into_one prefix vars cob_vars ?at () =
+  let generate_select_into_one ?at prefix param_count into_count =
     let at_name, at_size = get_at_info at in
     let fun_name = "GIXSQLExecSelectIntoOne" in
     let ref_value =
@@ -346,15 +354,17 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference { prefix; var = var_name };
         Generated_type.Value
-          { prefix; var = string_of_int (List.length cob_vars) };
-        Generated_type.Value { prefix; var = string_of_int (List.length vars) }
+          { prefix; var = string_of_int param_count };
+        Generated_type.Value { prefix; var = string_of_int into_count }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
   let generate_select_into prefix vars select_options select ?at () =
-    let selects_into_vars = List.map (generate_set_result_param prefix) vars in
+    let selects_into_vars =
+      List.flatten @@ List.map (generate_set_result_param prefix) vars
+    in
     let cob_vars =
       let option_vars =
         Cobol_common.Visitor.fold_list
@@ -365,11 +375,15 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           Misc.cob_var_extractor_folder select []
       in List.rev (option_vars @ select_vars)
     in
-    let trans_cob_var = List.map (generate_set_sql_param prefix) cob_vars in
-    let selects_into = generate_select_into_one prefix vars cob_vars ?at () in
+    let selects_param_vars = List.flatten @@
+      List.map (generate_set_sql_param prefix) cob_vars
+    in
+    let selects_into = generate_select_into_one prefix
+      (List.length selects_param_vars) (List.length selects_into_vars) ?at
+    in
     let trans_stm =
       generate_start_end_sql prefix
-        (selects_into_vars @ trans_cob_var @ [ selects_into ])
+        (selects_into_vars @ selects_param_vars @ [ selects_into ])
     in
     trans_stm
   in
@@ -390,7 +404,9 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let generate_fetch prefix sql cob =
-    let fetch_into_vars = List.map (generate_set_result_param prefix) cob in
+    let fetch_into_vars =
+      List.flatten @@ List.map (generate_set_result_param prefix) cob
+    in
     let fetch_into = generate_fetch_into_one prefix sql in
     let trans_stm =
       generate_start_end_sql prefix (fetch_into_vars @ [ fetch_into ])
@@ -412,7 +428,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     Generated_type.CallStatic { prefix; fun_name; ref_value }
   in
 
-  let generate_GIXSQLExecParam prefix name value_list ?at () =
+  let generate_GIXSQLExecParam ?at prefix name params_count =
     let at_name, at_size = get_at_info at in
     let fun_name = "GIXSQLExecParams" in
     let ref_value =
@@ -422,7 +438,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference { prefix; var = name };
         Generated_type.Value
-          { prefix; var = string_of_int (List.length value_list) }
+          { prefix; var = string_of_int params_count }
       ]
     in
     Generated_type.CallStatic { prefix; fun_name; ref_value }
@@ -546,7 +562,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
         ]
         @ cursor_declare
       in
-      List.map (generate_set_sql_param prefix) cob_var_lst
+      (List.flatten @@ List.map (generate_set_sql_param prefix) cob_var_lst)
       @ [ Generated_type.CallStatic { prefix; fun_name; ref_value } ]
     in
     let adding =
@@ -673,10 +689,10 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let generate_execute_into_using prefix executed_string
       ?(opt_into_hostref_list = []) ?(opt_using_hostref_list = []) ?at () =
-    let into_hostref_set_result_param =
+    let into_hostref_set_result_param = List.flatten @@
       List.map (generate_set_result_param prefix) opt_into_hostref_list
     in
-    let using_hostref_set_sql =
+    let using_hostref_set_sql = List.flatten @@
       List.map (generate_set_sql_param prefix) opt_using_hostref_list
     in
     let exec_prepared =
@@ -791,19 +807,18 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
     match value_list with
     | None -> generate_declare prefix ?at ()
     | Some value_list ->
-      let rec generate_insert_rec prefix vl ?at () =
-        match vl with
-        | [] ->
-          let var_name =
-            num := !num + 1;
-            "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
-          in
-          [ generate_GIXSQLExecParam prefix var_name value_list ?at () ]
-        | h :: t ->
-          generate_set_sql_param prefix h :: generate_insert_rec prefix t ?at ()
+      let set_param_stmts = List.flatten @@
+        List.map (generate_set_sql_param prefix) value_list
       in
-      generate_start_end_sql prefix
-        (generate_insert_rec prefix value_list ?at ())
+      let var_name =
+        num := !num + 1;
+        "SQ" ^ string_of_int !num (*I pray for it to be in the good order*)
+      in
+      let exec_stmt =
+        let param_count = List.length set_param_stmts in
+        generate_GIXSQLExecParam prefix var_name param_count ?at
+      in
+      generate_start_end_sql prefix (set_param_stmts @ [exec_stmt])
   in
 
   let generate_at prefix sql ?at () =
@@ -926,9 +941,13 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       let cob_var_list = List.rev @@
         Sql_ast.Visitor.fold_try_block Misc.cob_var_extractor_folder e []
       in
+      let set_sql_params_stmts = List.flatten @@
+      List.map (generate_set_sql_param prefix) cob_var_list
+      in
       generate_start_end_sql prefix
-        ( List.map (generate_set_sql_param prefix) cob_var_list
-        @ [ generate_GIXSQLExecParam prefix var_name cob_var_list () ] )
+      set_sql_params_stmts @
+      [generate_GIXSQLExecParam
+        prefix var_name (List.length set_sql_params_stmts)]
     | Ignore _ ->
       (*Ignore, not implemented in Gix (but if this is just ignore, this should do the trick)*)
       []

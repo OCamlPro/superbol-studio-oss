@@ -18,7 +18,7 @@ type variable_information =
     vartype : int;
     scale : int;
     flags : int;
-    ind_addr : int
+    ind_addr : int (* probably unused since my refactor *)
   }
 
 type t = variable_information StringMap.t

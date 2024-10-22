@@ -108,6 +108,8 @@ let extract_filename path =
   List.hd filename_parts
 
 let replace_colon_words str =
+  (* FIXME needs to be change by splitting group var
+     to fully fix "Group var need to be split into their elementary element" *)
   let buffer = Buffer.create (String.length str) in
   let count = ref 0 in
   let len = String.length str in

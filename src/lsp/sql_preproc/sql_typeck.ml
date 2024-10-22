@@ -160,6 +160,37 @@ let get_scale cu name =
     (*     Pretty.out " \"%s\" not found. qualname nel lazy_t found" name; *)
     0
 
+let get_child_vars cu name =
+  let rec aux { field_layout; field_qualname; _ } =
+    let name = match field_qualname with
+      | None -> []
+      | Some { payload = Qual (name, _) ; _ }
+      | Some { payload = Name name; _ } ->
+        [name.payload]
+    in
+    match field_layout with
+    | Elementary_field _ -> name
+    | Struct_field { subfields } ->
+      List.rev @@
+      NEL.fold_left [] subfields
+        ~f:begin fun acc (item_def: _ Cobol_common.with_loc) ->
+          match item_def.payload with
+          | Field field_def ->
+            aux field_def @ acc
+          | Table { table_field = { payload; _ }; _ } ->
+            aux payload @ acc
+        end
+  in
+  try
+    let x_info = get_x_info cu name in
+    match x_info with
+    | Data_field { def = { payload; _ }; _ } ->
+      aux payload
+    | _ -> [name]
+  with
+  | Not_found | Cobol_unit.Qualmap.Ambiguous _ -> [name]
+
+
 (*TODO*)
 let get_flags _cu _name = 0
 
