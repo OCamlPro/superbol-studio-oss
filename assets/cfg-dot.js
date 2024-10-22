@@ -1,3 +1,16 @@
+// -----------------------------------------------------------------------
+//
+//                        SuperBOL OSS Studio
+//
+//
+//  Copyright (c) 2024 OCamlPro SAS
+//
+//  All rights reserved.
+//  This source code is licensed under the MIT license found in the
+//  LICENSE.md file in the root directory of this source tree.
+//
+// -----------------------------------------------------------------------
+//
 // JS file attached to cfg-dot-renderer.html
 
 const legend = `digraph legend {
@@ -39,7 +52,7 @@ const defaultOptions = {
   split_nodes: [],
   hide_unreachable: false,
   collapse_fallthru: false,
-  shatter_hubs: undefined,
+  in_degree_upper_limit: undefined,
 }
 var renderOptions = defaultOptions;
 var rendering = d3.select('#rendering')
@@ -112,12 +125,12 @@ function setRenderOptions(renderOptions_) {
     renderOptions.hide_unreachable;
   document.getElementById("fallthru").checked =
     renderOptions.collapse_fallthru;
-  document.getElementById("hubshatter").checked =
-    renderOptions.shatter_hubs != undefined;
+  document.getElementById("in_degree_upper_limit").checked =
+    renderOptions.in_degree_upper_limit != undefined;
   document.getElementById("hubcount").value =
-    renderOptions.shatter_hubs == undefined
+    renderOptions.in_degree_upper_limit == undefined
     ? "20"
-    : String(renderOptions.shatter_hubs);
+    : String(renderOptions.in_degree_upper_limit);
   const nodeElements = document.querySelectorAll(".nodes-list > p");
   for (let p of nodeElements) {
     p.remove();
@@ -137,17 +150,17 @@ function setRenderOptions(renderOptions_) {
 function rerender() {
   var collapse_fallthru = document.getElementById('fallthru').checked;
   var hide_unreachable = document.getElementById('unreachable').checked;
-  if(document.getElementById('hubshatter').checked) {
-    var shatter_hubs = Number(document.getElementById('hubcount').value)
+  if(document.getElementById('in_degree_upper_limit').checked) {
+    var in_degree_upper_limit = Number(document.getElementById('hubcount').value)
   }
   else {
-    var shatter_hubs = undefined;
+    var in_degree_upper_limit = undefined;
   }
   renderOptions = {
     ...renderOptions,
     hide_unreachable,
     collapse_fallthru,
-    shatter_hubs,
+    in_degree_upper_limit,
   };
   vscode.postMessage({ type: 'graph_update', renderOptions })
 }

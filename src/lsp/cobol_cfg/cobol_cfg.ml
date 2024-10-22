@@ -8,5 +8,6 @@
 (*                                                                            *)
 (******************************************************************************)
 
+module Types = Cfg_types
 module Options = Cfg_options
 module Builder = Cfg_builder

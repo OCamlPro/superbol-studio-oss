@@ -1,5 +1,6 @@
 (* what licence here ? *)
 
+open Cobol_cfg.Types
 open Cobol_cfg.Builder
 
 let create_cfg_options o =
@@ -14,8 +15,8 @@ let create_cfg_options o =
       List.assoc "collapse_fallthru" o |> to_bool
     with Not_found -> false
   in
-  let shatter_hubs =
-    List.assoc_opt "shatter_hubs" o |> Option.map to_int in
+  let in_degree_upper_limit =
+    List.assoc_opt "in_degree_upper_limit" o |> Option.map to_int in
   let transformation =
     let id =
       List.assoc_opt "id" o |> Option.map to_int in
@@ -40,7 +41,7 @@ let create_cfg_options o =
   ({
     hide_unreachable;
     collapse_fallthru;
-    shatter_hubs;
+    in_degree_upper_limit;
     transformation;
     hidden_nodes;
     split_nodes;
@@ -52,7 +53,7 @@ let vertex_name_record names =
     names
 
 module Dot = Graph.Graphviz.Dot(struct
-    include Cobol_cfg.Builder.Cfg
+    include Cobol_cfg.Types.Cfg
     let edge_attributes (_,s,_) =
       [`Style (match s with
            | FallThrough -> `Dotted

@@ -1,3 +1,16 @@
+<!-- ----------------------------------------------------------------------- -->
+<!--                                                                         -->
+<!--                        SuperBOL OSS Studio                              -->
+<!--                                                                         -->
+<!--                                                                         -->
+<!--  Copyright (c) 2024 OCamlPro SAS                                        -->
+<!--                                                                         -->
+<!--  All rights reserved.                                                   -->
+<!--  This source code is licensed under the MIT license found in the        -->
+<!--  LICENSE.md file in the root directory of this source tree.             -->
+<!--                                                                         -->
+<!-- ----------------------------------------------------------------------- -->
+
 <!-- Credit @beicause in https://github.com/beicause/call-graph/blob/master/src/html.ts -->
 <!-- Base html file for rendering graphviz cfg variant -->
 <!DOCTYPE html>
@@ -31,8 +44,8 @@
         <label for="unreachable">Remove unreachable nodes</label></div>
       <div><input type="checkbox" id="fallthru" />
         <label for="fallthru">Collapse fallthrough transitions</label></div>
-      <div><input type="checkbox" id="hubshatter"/>
-        <label for="hubshatter">Split nodes with more than
+      <div><input type="checkbox" id="in_degree_upper_limit"/>
+        <label for="in_degree_upper_limit">Split nodes with more than
           <input type="number" id="hubcount" value="20" /> incoming edges</label>
       </div>
       <hr/>

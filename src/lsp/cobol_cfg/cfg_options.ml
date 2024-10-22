@@ -15,9 +15,9 @@ type transformation =
 type t = {
   hide_unreachable: bool;
   collapse_fallthru: bool;
-  shatter_hubs: int option;
+  in_degree_upper_limit: int option;
   transformation: transformation option;
-  hidden_nodes: int list;
-  split_nodes: int list;
+  hidden_nodes: int list; (* id list *)
+  split_nodes: int list;  (* id list *)
 }
 

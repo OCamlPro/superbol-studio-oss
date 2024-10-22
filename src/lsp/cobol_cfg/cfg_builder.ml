@@ -13,6 +13,7 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_unit.Types
 open Cfg_jumps
+open Cfg_types
 module NEL = Cobol_common.Basics.NEL
 
 (* TYPES AND HELPERS *)
@@ -55,47 +56,10 @@ let entry_stmt_to_string_loc = function
 
 (* CFG MODULE *)
 
-type node_type =
-  | External of string
-  | Entry of [`Point | `Paragraph | `Section of string | `Statement of string]
-  | Normal of string * string (* fullname * display_name *)
-  | Collapsed of string NEL.t
-  | Split of string
-
-type node = {
-  id: int;
-  section_name: string;
-  loc: srcloc option;
-  typ: node_type;
-  jumps: Jumps.t;
-  will_fallthru: bool;
-  terminal: bool; (* unused atm *)
-}
-
 let is_entry n =
   match n.typ with
   | External _ | Normal _ | Collapsed _ | Split _ -> false
   | Entry _ -> true
-
-type edge =
-  | FallThrough
-  | Perform
-  | Go
-
-module Node = struct
-  type t = node
-  let compare node other = Int.compare node.id other.id
-  let hash node = Hashtbl.hash node.id
-  let equal node other = Int.equal node.id other.id
-end
-
-module Edge = struct
-  type t = edge
-  let compare = Stdlib.compare
-  let default = FallThrough
-end
-
-module Cfg = Graph.Persistent.Digraph.ConcreteLabeled(Node)(Edge)
 
 (* DEFAULT CFG BUILDER FUNCTION *)
 
@@ -346,8 +310,8 @@ let do_hide_unreachable g =
 let clone_node node =
   { node with id = next_node_idx (); }
 
-let do_shatter_nodes ~ids ~limit g =
-  let shatter_typ { typ; _ } =
+let do_split_nodes ~ids ~limit g =
+  let split_typ { typ; _ } =
     match typ with
     | External name -> Some (External name, true)
     | Normal (_, name) -> Some (Split name, false)
@@ -359,7 +323,7 @@ let do_shatter_nodes ~ids ~limit g =
     | None -> false
   in
   Cfg.fold_vertex begin fun n cfg ->
-    match shatter_typ n with
+    match split_typ n with
     | Some (typ, remove_original)
       when is_above_limit n || List.mem n.id ids ->
       let cfg = Cfg.fold_pred_e begin fun edge cfg ->
@@ -447,7 +411,9 @@ let handle_cfg_options ~(options: Cfg_options.t) cfg =
   |> (match options.hidden_nodes with
       | [] -> Fun.id
       | l -> remove_nodes l)
-  |> do_shatter_nodes ~ids:options.split_nodes ~limit:options.shatter_hubs
+  |> do_split_nodes
+    ~ids:options.split_nodes
+    ~limit:options.in_degree_upper_limit
   |> (if options.collapse_fallthru then do_collapse_fallthru else Fun.id)
 
 (* GRAPH OUTPUT FORMAT *)
