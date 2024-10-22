@@ -125,7 +125,8 @@
           "type": "array",
           "default": [
             "cpy",
-            "cbx"
+            "cbl",
+            "cob"
           ],
           "items": "string",
           "order": 4

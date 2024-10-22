@@ -95,9 +95,9 @@ val copybook_lookup_config_for
   -> t
   -> Cobol_common.Copybook.lookup_config
 
-(** [detect_copybook ~filename project] indicates whether a file name should be
-    treated as a copybook within [project]. *)
-val detect_copybook: filename:string -> t -> bool
+(** [detect_copybook ~filename project] indicates whether a document with the
+    given [filename] should be treated as a copybook in [project]. *)
+val detect_copybook: filename:string -> ?contents:string -> t -> bool
 
 (** {1 Cached representation} *)
 

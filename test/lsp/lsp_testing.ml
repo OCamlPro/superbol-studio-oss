@@ -56,12 +56,13 @@ let make_server ?(with_semantic_tokens = false) () =
                             with_client_file_watcher = false;
                             with_client_config_watcher = false }
 
-let add_cobol_doc server ?copybook ~projdir filename text =
+let add_cobol_doc server ~projdir filename text =
   let path = projdir // filename in
   let uri = Lsp.Uri.of_path path in
+  EzFile.(safe_mkdir @@ dirname path);
   EzFile.write_file path text;
   let server =
-    LSP.Server.did_open ?copybook
+    LSP.Server.did_open
       DidOpenTextDocumentParams.{
         textDocument = TextDocumentItem.{
             languageId = "cobol"; version = 0; text; uri;

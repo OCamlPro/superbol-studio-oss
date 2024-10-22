@@ -178,6 +178,7 @@ let%expect_test "rename-with-a-ref-in-a-copybook" =
   in
   end_with_postproc [%expect.output];
   [%expect {|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"message":"Proceeded to rename of a reference that occurs in a copybook","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
@@ -215,6 +216,7 @@ let%expect_test "rename-with-a-ignored-ref-in-a-copybook" =
   in
   end_with_postproc [%expect.output];
   [%expect {|
+    {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"message":"Ignored renaming of a reference that occurs in a copybook","type":3},"method":"window/showMessage","jsonrpc":"2.0"}

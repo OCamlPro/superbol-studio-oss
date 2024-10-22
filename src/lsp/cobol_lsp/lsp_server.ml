@@ -663,10 +663,10 @@ let on_change_workspace_folders
 
 
 let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
-    ?copybook registry =
+    registry =
   let add_in_project project registry =
     try
-      let doc = Lsp_document.load ~project ?copybook doc in
+      let doc = Lsp_document.load ~project doc in
       let registry = dispatch_diagnostics doc registry in
       add_or_replace_doc doc registry
     with Lsp_document.Internal_error (doc, e, backtrace) ->
@@ -677,7 +677,7 @@ let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
 
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
-                                          _ } as doc) ?copybook registry =
+                                          _ } as doc) registry =
   (* Try first with a lookup for the project in a cache, and then by
      creating/loading the project. *)
   let rec aux ~try_cache registry =
@@ -690,7 +690,7 @@ let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
         retrieve_project_for ~uri registry |>
         aux ~try_cache:false                   (* try again without the cache *)
     | None | Some _ ->
-        add ~doc ?copybook registry
+        add ~doc registry
   in
   aux ~try_cache:true registry
 

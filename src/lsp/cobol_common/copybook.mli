@@ -37,6 +37,7 @@ val pp_lookup_error: lookup_error Pretty.printer
 (* --- *)
 
 val copybook_extensions: string list
+val copybookonly_extensions: string list
 
 (** [find_lib ~lookup_config ?fromfile ?libname txtname] attempts to locate a
     file containing the copybook [txtname], which is a file named [txtname],

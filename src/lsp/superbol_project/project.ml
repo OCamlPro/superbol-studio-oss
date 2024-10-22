@@ -103,9 +103,6 @@ let for_ ~rootdir ~layout =
 let copybook_lookup_config_for ~filename { config; _ } =
   Project_config.copybook_lookup_config_for ~filename config
 
-let detect_copybook ~filename { config; _ } =
-  Project_config.detect_copybook ~filename config
-
 let relative_path_for ~filename { rootdir; _ } =
   try Project_utils.relative_path ~filename rootdir
   with Invalid_argument _ -> filename             (* if not in project rootdir *)
@@ -114,6 +111,39 @@ let absolute_path_for ~filename { rootdir; _ } =
   if EzFile.is_absolute filename
   then filename       (* in case the file is not within its project directory *)
   else rootdir // filename
+
+let file_contents_looks_like_a_copybook ~filename ?contents { config; _ } =
+  let decide input =
+    Cobol_preproc.scan_prefix_for_copybook input
+      ~dialect:(Cobol_config.dialect config.cobol_config)
+      ~source_format:config.source_format = `Copybook
+  in
+  match contents with
+  | None ->
+      Cobol_preproc.Input.from ~filename ~f:decide
+  | Some c ->
+      decide @@ Cobol_preproc.Input.string ~filename c
+
+let is_a_copybook_extension ext =
+  List.mem (String.lowercase_ascii (EzString.after ext 1))    (* trim the `.` *)
+    Cobol_common.Copybook.copybookonly_extensions
+
+let file_is_in_libpath ~filename ({ config; _ } as project) =
+  let filename = relative_path_for ~filename project in
+  List.exists begin function
+    | Project_config.RelativeToProjectRoot prefix ->
+        EzString.starts_with ~prefix filename
+    | RelativeToFileDir suffix ->
+        EzString.ends_with ~suffix (Filename.dirname filename)
+  end config.libpath
+
+let detect_copybook ~filename ?contents project =
+  let ext = Filename.extension filename in
+  (if ext = "" (* assume files with no extension that appear in copybook paths
+                  are copybooks *)
+   then file_is_in_libpath ~filename project
+   else is_a_copybook_extension ext) ||
+  file_contents_looks_like_a_copybook ~filename ?contents project
 
 let save_config ?verbose { config_filename; config; _ } =
   Project_config.save ?verbose ~config_filename config

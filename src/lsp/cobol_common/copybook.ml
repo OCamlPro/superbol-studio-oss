@@ -28,15 +28,16 @@ type lookup_error =
     lookup_config: lookup_config;
   }
 
-(** Filename extensions that we should treat as copybooks and not main
-    programs. *)
-let copybook_extensions =  (* this must be a subset of {!libfile_extensions}. *)
-  ["cpy"; "cbx"]
+(** Filename extensions that are searched when looking up copybooks. *)
+let copybook_extensions =
+  ["cpy"; "cbl"; "cob"]
 
-let libfile_extensions =
-  ["cpy"; "cbl"; "cob"; "cbx"]
+(** Filename extensions that we should not treat as main programs, but as
+    copybooks instead. *)
+let copybookonly_extensions =
+  ["cpy"; "copy"; "copybook"]
 
-let lookup_config ?(libexts = libfile_extensions) libpath =
+let lookup_config ?(libexts = copybook_extensions) libpath =
   {
     lookup_path = libpath;
     lookup_exts = List.map String.lowercase_ascii libexts;

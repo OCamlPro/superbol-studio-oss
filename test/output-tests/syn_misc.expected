@@ -1528,7 +1528,7 @@ syn_misc.at-3261-prog.cob:10.7-10.15:
   12          78  var VALUE "hello".
 >> Error: Library `a.' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 syn_misc.at-3261-prog.cob:14.10-14.11:
   11   
@@ -1570,7 +1570,7 @@ syn_misc.at-3355-prog.cob:7.7-7.21:
    9          PROCEDURE DIVISION.
 >> Error: Library `ok.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 syn_misc.at-3355-prog.cob:16.11-16.28:
   13         * Directive purposefully in Area A
@@ -1582,7 +1582,7 @@ syn_misc.at-3355-prog.cob:16.11-16.28:
   18           COPY "sec-2.inc".
 >> Error: Library `sec-1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 syn_misc.at-3355-prog.cob:18.8-18.25:
   15              STOP RUNNN
@@ -1592,7 +1592,7 @@ syn_misc.at-3355-prog.cob:18.8-18.25:
 ----           ^^^^^^^^^^^^^^^^^
 >> Error: Library `sec-2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 syn_misc.at-3355-prog.cob:19.0:
   16              COPY "sec-1.inc".
@@ -1622,7 +1622,7 @@ syn_misc.at-3470-prog.cob:7.11-9.12:
   11              PERFORM SEC-2
 >> Error: Library `ok.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 syn_misc.at-3470-prog.cob:11.11-11.18:
    8          01  OK PIC XX VALUE "OK". ==

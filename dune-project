@@ -227,6 +227,7 @@
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ezr_toml (= version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
+   (cobol_preproc (= version))
    (cobol_config (= version))
    (cobol_common (= version))
    odoc

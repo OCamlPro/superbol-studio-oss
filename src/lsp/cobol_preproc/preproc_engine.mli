@@ -90,7 +90,13 @@ val fold_source_lines
   -> f:(int -> Text.text -> 'a -> 'a)
   -> Src_input.t
   -> 'a
-  -> 'a Preproc_outputs.with_diags
+  -> 'a
+
+val scan_prefix_for_copybook
+  : dialect: Cobol_config.dialect
+  -> source_format: Cobol_config.source_format_spec
+  -> Src_input.t
+  -> [`Program | `Copybook]
 
 val preprocess_input
   : ?options: Preproc_options.preproc_options

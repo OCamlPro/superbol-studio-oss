@@ -335,7 +335,7 @@ listings.at-289-prog.cob:7.7-8.70:
   10              DISPLAY TEST-AVR.
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:349:0
 listings.at-349-prog.cob:7.7-12.48:
@@ -358,7 +358,7 @@ listings.at-349-prog.cob:7.7-12.48:
   14              DISPLAY TEST-AVR.
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:413:0
 listings.at-413-prog2.cob:7.7-12.55:
@@ -381,7 +381,7 @@ listings.at-413-prog2.cob:7.7-12.55:
   14              DISPLAY TEST-AVR.
 >> Error: Library `copy2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:477:0
 listings.at-477-prog3.cob:7.7-12.55:
@@ -404,7 +404,7 @@ listings.at-477-prog3.cob:7.7-12.55:
   14              DISPLAY TEST-AVR.
 >> Error: Library `copy3.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:538:0
 listings.at-538-prog.cob:6.7-8.53:
@@ -421,7 +421,7 @@ listings.at-538-prog.cob:6.7-8.53:
   10              DISPLAY FIRST-MATCH NO ADVANCING
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:631:0
 listings.at-631-prog.cob:6.7-10.55:
@@ -442,7 +442,7 @@ listings.at-631-prog.cob:6.7-10.55:
   12              DISPLAY FIRST-MATCH NO ADVANCING                              PROG011
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:691:0
 listings.at-691-prog.cob:6.7-8.44:
@@ -459,7 +459,7 @@ listings.at-691-prog.cob:6.7-8.44:
   10              DISPLAY COLON-VAR NO ADVANCING
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:774:0
 listings.at-774-prog1.cob:11.10-13.52:
@@ -476,7 +476,7 @@ listings.at-774-prog1.cob:11.10-13.52:
   15             copy 'copy1.inc' replacing 'YYY-' by a20-
 >> Error: Library `copy1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-774-prog1.cob:15.10-17.52:
   12                                        'yy1-' by a11-
@@ -492,7 +492,7 @@ listings.at-774-prog1.cob:15.10-17.52:
   19             copy 'copy1.inc' replacing 'YYY-' by a30-
 >> Error: Library `copy1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-774-prog1.cob:19.10-21.52:
   16                                        'yy1-' by a21-
@@ -508,7 +508,7 @@ listings.at-774-prog1.cob:19.10-21.52:
   23          procedure division.
 >> Error: Library `copy1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:893:0
 listings.at-893-prog.cob:6.7-8.53:
@@ -525,7 +525,7 @@ listings.at-893-prog.cob:6.7-8.53:
   10              DISPLAY FIRST-VAR NO ADVANCING
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:957:0
 listings.at-957-prog.cob:6.7-8.54:
@@ -542,7 +542,7 @@ listings.at-957-prog.cob:6.7-8.54:
   10              DISPLAY TEST-VAR1 NO ADVANCING
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:1020:0
 listings.at-1020-prog.cob:6.7-7.50:
@@ -557,7 +557,7 @@ listings.at-1020-prog.cob:6.7-7.50:
    9              DISPLAY COPY-VAR NO ADVANCING
 >> Error: Library `copy-1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:1146:0
 listings.at-1146-tstcpybk.cob:13.11-13.32:
@@ -570,7 +570,7 @@ listings.at-1146-tstcpybk.cob:13.11-13.32:
   15   
 >> Error: Library `copy-sl-1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-1146-tstcpybk.cob:14.11-14.32:
   11          INPUT-OUTPUT SECTION.
@@ -582,7 +582,7 @@ listings.at-1146-tstcpybk.cob:14.11-14.32:
   16          DATA DIVISION.
 >> Error: Library `copy-sl-2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-1146-tstcpybk.cob:18.11-18.32:
   15   
@@ -594,7 +594,7 @@ listings.at-1146-tstcpybk.cob:18.11-18.32:
   20   
 >> Error: Library `copy-fd-1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-1146-tstcpybk.cob:19.11-19.32:
   16          DATA DIVISION.
@@ -606,7 +606,7 @@ listings.at-1146-tstcpybk.cob:19.11-19.32:
   21          WORKING-STORAGE SECTION.
 >> Error: Library `copy-fd-2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-1146-tstcpybk.cob:30.11-30.32:
   27         *
@@ -618,7 +618,7 @@ listings.at-1146-tstcpybk.cob:30.11-30.32:
   32   
 >> Error: Library `copy-ws-1.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-1146-tstcpybk.cob:31.11-31.32:
   28          77  GLOB              PIC 99         GLOBAL.
@@ -630,7 +630,7 @@ listings.at-1146-tstcpybk.cob:31.11-31.32:
   33          PROCEDURE DIVISION.
 >> Error: Library `copy-ws-2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:1394:0
 listings.at-1394-prog.cob:4.7-4.23:
@@ -643,7 +643,7 @@ listings.at-1394-prog.cob:4.7-4.23:
    6          WORKING-STORAGE  SECTION.
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:1613:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:1613:0
@@ -5266,7 +5266,7 @@ listings.at-3810-prog.cob:6.7-6.23:
    8          PROCEDURE        DIVISION.
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-3810-prog.cob:7.7-7.24:
    4          DATA             DIVISION.
@@ -5278,7 +5278,7 @@ listings.at-3810-prog.cob:7.7-7.24:
    9          >>LISTING OFF
 >> Error: Library `copy2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-3810-prog.cob:9.7-9.20:
    6          COPY "copy.inc".
@@ -5310,7 +5310,7 @@ listings.at-3906-prog.cob:6.7-6.23:
    8          PROCEDURE        DIVISION.
 >> Error: Library `copy.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-3906-prog.cob:7.7-7.24:
    4          DATA             DIVISION.
@@ -5322,7 +5322,7 @@ listings.at-3906-prog.cob:7.7-7.24:
    9   >>LISTING OFF
 >> Error: Library `copy2.inc' not found
           - search path: <empty>
-          - filename extensions: "cpy" "cbl" "cob" "cbx"
+          - filename extensions: "cpy" "cbl" "cob"
 
 listings.at-3906-prog.cob:9.0-9.13:
    6          COPY "copy.inc".

@@ -40,5 +40,4 @@ let indent_range ~dialect ~source_format ~indent_config ~range ~filename ~conten
       ; acc = []
       ; range }
   in
-  (* NB: note here we ignore diagnostics *)
-  state.result.acc
+  state.acc
