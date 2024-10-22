@@ -195,45 +195,6 @@ let element_at_position ~uri pos group : element_at_position =
       Visitor.skip_children @@
       on_proc_name (qualname_at_pos ~filename qn pos) acc
 
-    method! fold_exec_block' exec_block acc =
-      let acc = match exec_block.payload with
-        | Superbol_preprocs.Generic.Generic_exec_block _ ->
-            acc
-        | Superbol_preprocs.Esql.Esql_exec_block esql ->
-          let cob_var_extractor_folder = object
-            inherit [Sql_ast.cobol_var list] Sql_ast.Visitor.folder
-            method! fold_cobol_var cob_var acc =
-              if List.exists (fun c -> Sql_ast.compare_cobol_var cob_var c == 0) acc
-              then Cobol_common.Visitor.skip acc
-              else Cobol_common.Visitor.skip (cob_var::acc)
-          end in
-          let cobol_vars =
-            Sql_ast.Visitor.fold_esql_instruction cob_var_extractor_folder
-              esql []
-          in
-          let string_name_opt = List.filter_map begin function
-            | Sql_ast.CobVarNotNull cobol_var_id
-            | CobVarCasted (cobol_var_id, _) ->
-                if Lsp_position.is_in_srcloc ~filename pos ~@cobol_var_id
-                then Some cobol_var_id
-                else None
-            | CobVarNullIndicator (cobol_var_id, _)
-              when Lsp_position.is_in_srcloc ~filename pos ~@cobol_var_id ->
-                Some cobol_var_id
-            | CobVarNullIndicator (_, cobol_var_id)
-              when Lsp_position.is_in_srcloc ~filename pos ~@cobol_var_id ->
-                Some cobol_var_id
-            | CobVarNullIndicator _ -> None
-          end cobol_vars
-          in
-          let acc = match string_name_opt with
-          | [name] -> on_data_name (Name name) acc
-          | _ -> acc
-          in acc
-        | _ -> acc
-      in
-      Visitor.skip_children acc
-
   end group init |> result
 
 (* --- *)

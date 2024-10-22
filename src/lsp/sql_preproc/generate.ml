@@ -1012,6 +1012,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
             :: (working_storage_section @ output cur_lines statements)
           end
         | EXEC_SQL_IGNORE { end_loc; begin_of_ignore_loc } ->
+            Printf.eprintf "%d,%d\n" begin_of_ignore_loc.line begin_of_ignore_loc.char;
           begin if i = begin_loc.line
             then [comment "ESQL IGNORED SECTION"]
             else [] end
