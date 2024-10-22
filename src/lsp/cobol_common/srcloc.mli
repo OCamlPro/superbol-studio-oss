@@ -39,6 +39,7 @@ module INFIX: sig
   val ( ~&@ ): 'a with_loc -> 'a * srcloc
 end
 
+val pp_lexpos: Lexing.position Pretty.printer
 val pp_srcloc: srcloc Pretty.printer
 val pp_srcloc_struct: srcloc Pretty.printer
 val pp_file_loc: srcloc Pretty.printer

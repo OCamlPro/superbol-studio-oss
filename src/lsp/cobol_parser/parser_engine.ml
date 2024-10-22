@@ -722,13 +722,14 @@ let rewind_and_parse { rewind_n_parse; _ } rewind_preproc ~position =
 
 (* Rewinding for inspection *)
 
-let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc ~position =
-  let { result = _, { last_env_stage; _ }; _ } =
-    Overlay_manager.with_temporary_copy ~f:begin fun () ->
+let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc
+    ~position ~inspect =
+  Overlay_manager.with_temporary_copy ~f:begin fun () ->
+    let { result = _, { last_env_stage; _ }; _ } =
       rewind_n_parse ~stop_before_eof:true rewind_preproc ~position
-    end ()
-  in
-  last_env_stage
+    in
+    inspect last_env_stage
+  end ()
 
 (* Extracting artifacts *)
 
