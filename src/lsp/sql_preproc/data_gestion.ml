@@ -45,10 +45,10 @@ let add_var ?(length = 0) ?(vartype = 0) ?(scale = 0) ?(flags = 0)
 
 let num = ref 0
 
-let transform_stm map (_, stm) filename =
+let transform_stm ~cobol_unit map (_, stm) filename =
   let prefix = Generated_type.Printer.preproc_prefix ^ " " in
   let create_new_var content ?(remplace=true) () =
-    let new_content = if remplace then "\"" ^ Misc.replace_colon_words content ^ "\"" else content in
+    let new_content = if remplace then "\"" ^ Misc.replace_colon_words ~cobol_unit content ^ "\"" else content in
     let size = String.length new_content - 2 in
     (*Because " are part of this string"*)
     num := !num + 1;
@@ -154,7 +154,8 @@ let transform_stm map (_, stm) filename =
     | ReleaseSavepoint _
     | Delete _ ->
       let ws, map =
-        create_new_var (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens) ()
+        create_new_var
+        (Format.asprintf "%a" Sql_ast.Printer.pp_esql tokens) ()
       in
       (ws, map)
     | ExecuteImmediate sql -> (
@@ -278,11 +279,11 @@ let transform_stm map (_, stm) filename =
   | DECLARATION { declaration; _ } -> trans_declaration declaration
   | _ -> ([], map)
 
-let transform sql_statements filename =
+let transform ~cobol_unit sql_statements filename =
   let rec transform_rec map sql_statements =
     match sql_statements with
     | h :: t ->
-      let ws, map = transform_stm map h filename in
+      let ws, map = transform_stm ~cobol_unit map h filename in
       let ws', map = transform_rec map t in
       (ws @ ws', map)
     | [] -> ([], map)

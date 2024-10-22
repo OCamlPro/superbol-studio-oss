@@ -52,7 +52,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (*GET FUNCTION*)
   (*TODOOOO*)
   let working_storage_section, new_var_map =
-    let ws, nvm = Data_gestion.transform sql_statements filename in
+    let ws, nvm = Data_gestion.transform ~cobol_unit sql_statements filename in
     ( [ comment ">Begin generated WORKING-STORAGE SECTION";
         Generated_type.Added
           { content = ws; error_treatment = None; with_dot = false };
@@ -300,7 +300,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let generate_set_result_param prefix arg =
     let fun_name = "GIXSQLSetResultParams" in
     let var_name = get_name_cobol_var arg in
-    let vars = Sql_typeck.get_child_vars cobol_unit var_name in
+    let vars = Sql_typeck.get_elementary_component cobol_unit var_name in
     let aux var_name =
       let ref_value =
         let prefix = prefix ^ "    " in
@@ -322,7 +322,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   let generate_set_sql_param prefix arg =
     let fun_name = "GIXSQLSetSQLParams" in
     let var_name = get_name_cobol_var arg in
-    let vars = Sql_typeck.get_child_vars cobol_unit var_name in
+    let vars = Sql_typeck.get_elementary_component cobol_unit var_name in
     let aux h =
       let ref_value =
         let prefix = prefix ^ "    " in

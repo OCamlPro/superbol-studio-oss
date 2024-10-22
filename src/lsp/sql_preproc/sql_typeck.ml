@@ -160,7 +160,7 @@ let get_scale cu name =
     (*     Pretty.out " \"%s\" not found. qualname nel lazy_t found" name; *)
     0
 
-let get_child_vars cu name =
+let get_elementary_component cu name =
   let rec aux { field_layout; field_qualname; _ } =
     let name = match field_qualname with
       | None -> []

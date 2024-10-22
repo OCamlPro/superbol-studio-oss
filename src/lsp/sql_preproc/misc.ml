@@ -107,11 +107,18 @@ let extract_filename path =
   let filename_parts = Str.split (Str.regexp "\\.") filename_with_ext in
   List.hd filename_parts
 
-let replace_colon_words str =
-  (* FIXME needs to be change by splitting group var
-     to fully fix "Group var need to be split into their elementary element" *)
+
+let rec build_args_string starting_arg_nb arg_amount =
+  if arg_amount < 2
+  then "$" ^ string_of_int starting_arg_nb
+  else
+    "$" ^ string_of_int starting_arg_nb ^ ","
+    ^ build_args_string (starting_arg_nb+1) (arg_amount-1)
+
+let replace_colon_words ~cobol_unit str =
+  (* Ensure correct behaviour for several :COM:NULL-IND *)
   let buffer = Buffer.create (String.length str) in
-  let count = ref 0 in
+  let count = ref 1 in
   let len = String.length str in
   let i = ref 0 in
   let tbl = Hashtbl.create 10 in
@@ -130,18 +137,20 @@ let replace_colon_words str =
         incr i
       done;
       let var_name = String.sub str start (!i - start) in
-      if Hashtbl.mem tbl var_name then
-        Buffer.add_string buffer
-          ("$" ^ string_of_int (Hashtbl.find tbl var_name))
-      else (
-        incr count;
-        Hashtbl.add tbl var_name !count;
-        Buffer.add_string buffer ("$" ^ string_of_int !count)
-      )
-    ) else (
+      match Hashtbl.find_opt tbl var_name with
+      | Some s ->
+        Buffer.add_string buffer s
+      | None ->
+        let arg_amount = List.length @@
+          Sql_typeck.get_elementary_component cobol_unit var_name
+        in
+        let s = build_args_string !count arg_amount in
+        count := !count + arg_amount;
+        Hashtbl.add tbl var_name s;
+        Buffer.add_string buffer s)
+    else (
       Buffer.add_char buffer str.[!i];
-      incr i
-    )
+      incr i)
   done;
 
   Buffer.contents buffer

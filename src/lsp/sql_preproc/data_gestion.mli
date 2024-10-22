@@ -18,6 +18,7 @@ type variable_information =
   }
 (*return working_storage_section (only declaration) * new_var_map*)
 val transform :
+  cobol_unit:Cobol_unit.Types.cobol_unit ->
   (Types.loc option * Types.statements) list -> string ->
   (Generated_type.trans_stm list * t)
 

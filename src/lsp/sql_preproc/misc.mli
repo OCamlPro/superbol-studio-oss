@@ -24,6 +24,7 @@ val resolve_copy : config:Types.config -> string -> string
 
 val extract_filename : string -> string
 
-val replace_colon_words : string -> string
+val replace_colon_words :
+  cobol_unit:Cobol_unit.Types.cobol_unit -> string -> string
 
 val cob_var_extractor_folder : Sql_ast.cobol_var list Sql_ast.Visitor.folder
