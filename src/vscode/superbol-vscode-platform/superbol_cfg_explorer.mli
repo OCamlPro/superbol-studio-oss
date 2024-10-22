@@ -12,23 +12,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t
-type client = Vscode_languageclient.LanguageClient.t
+type cfg_type = Graphviz | D3_arc_diagram
 
-val make: context:Vscode.ExtensionContext.t -> t
-val subscribe_disposable: t -> Vscode.Disposable.t -> unit
-
-val client: t -> client option
-val context: t -> Vscode.ExtensionContext.t
-
-val stop_language_server: t -> unit Promise.t
-val start_language_server: t -> unit Promise.t
-
-val write_project_config
+(*
+  [open_cfg ~text_editor typ instance] will load a CFG of type [typ] after the user
+  has selected the CFG scope (which program or which section of the program).
+  The different scopes are listed based on the code of [text_editor], or
+  the active text editor if no editor is given.
+  The CFG are computed via the LSP [instance] given.
+  Calling [open_cfg] twice with the same arguments will simply reload the CFG
+  and refocus the existing webview.
+ *)
+val open_cfg
   : ?text_editor: Vscode.TextEditor.t
-  -> t
+  -> typ:cfg_type
+  -> Superbol_instance.t
   -> unit Promise.t
-
-val get_project_config
-  : t
-  -> ((string, Jsonoo.t) Hashtbl.t, string) result Promise.t

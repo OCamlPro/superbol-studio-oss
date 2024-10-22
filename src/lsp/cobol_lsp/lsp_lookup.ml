@@ -67,6 +67,12 @@ module TYPES = struct
     | NumericEdited
     | ObjectRef
     | Pointer
+
+    type procedure_at_position =
+      {
+        cu: Cobol_unit.Types.cobol_unit option;
+        proc_name: Cobol_ptree.qualname option;
+      }
 end
 open TYPES
 
@@ -499,3 +505,23 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         |> skip
 
     end group init |> result
+
+let proc_at_pos ~filename (pos: Lsp.Types.Position.t) group : procedure_at_position =
+  let open Cobol_common.Visitor in
+  Cobol_unit.Visitor.fold_unit_group object
+    inherit [_] Cobol_unit.Visitor.folder
+    inherit! [_] Lsp_position.sieve ~filename ~pos
+
+    method! fold_cobol_unit cu acc =
+      do_children { acc with cu = Some cu }
+
+    method! fold_procedure_paragraph { paragraph_name; _ } { cu; _ } =
+      let proc_name = match cu, paragraph_name with
+        | Some cu, Some qn ->
+          Some (Cobol_unit.Qualmap.find_binding
+                  ~&qn cu.unit_procedure.named).full_qn
+        | _ -> None
+      in
+      skip { cu; proc_name }
+
+  end group { cu = None; proc_name = None }
