@@ -125,11 +125,12 @@ type inspectable_parser_state =
   | Env: 'a Grammar.MenhirInterpreter.env -> inspectable_parser_state
   | Sink
 
+(** Note: given parser state should not escapre [inspect]. *)
 val rewind_for_inspection
   : 'x rewinder
   -> preprocessor_rewind
   -> position: position
-  -> inspectable_parser_state
+  -> inspect: (inspectable_parser_state -> 'a) -> 'a
 
 (** {1 Accessing artifacts} *)
 

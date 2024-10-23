@@ -134,14 +134,15 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
       Cobol_preproc.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
 
-(** [inspect_at ~position doc] returns the state that is reached by the parser
-    at [position] in [doc].  Returns [None] on copybooks. *)
-let rec inspect_at ~position ({ copybook; rewinder; textdoc; _ } as doc) =
+(** [inspect_at ~position ~f doc] passes to [f] the state that is reached by the
+    parser at [position] in [doc].  Returns [None] on copybooks, or [Some r] for
+    [r] the result of [f]. *)
+let rec inspect_at ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
   match rewinder with
   | None | Some _ when copybook ->                                     (* skip *)
       None
   | None ->
-      inspect_at ~position @@ parse_and_analyze doc
+      inspect_at ~position ~f @@ parse_and_analyze doc
   | Some rewinder ->
       let Lsp.Types.Position.{ line; character = char } = position in
       let exception FAILURE in
@@ -160,6 +161,7 @@ let rec inspect_at ~position ({ copybook; rewinder; textdoc; _ } as doc) =
         Option.some @@
         Cobol_parser.rewind_for_inspection rewinder preproc_rewind
           ~position:(Indexed { line; char })
+          ~inspect:f
       with FAILURE ->
         None
 

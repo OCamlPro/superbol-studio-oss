@@ -39,25 +39,29 @@ let completion_positions (doc, positions) : string -> unit =
     begin
       match LSP.Request.completion ~eager:false server params with
       | None ->
-        Pretty.out "Failed completion@."
+          Pretty.out "Failed completion@."
       | Some `CompletionList { items; _ } when items == [] ->
-        Pretty.out "Empty completion list@."
+          Pretty.out "Empty completion list@."
       | Some `CompletionList { items; _ } ->
-        Pretty.out "@.@[<hv 4>Basic (%d entries):@;%a@]@\n"
-          (List.length items)
-          (Fmt.list ~sep:Fmt.sp escaped_string)
-          items
+          Pretty.out "@.@[<hv 4>Basic (%d entries):@;%a@]@\n"
+            (List.length items)
+            (Fmt.list ~sep:Fmt.sp escaped_string)
+            items
+      | exception Jsonrpc.Response.Error.E { message; _ } ->
+          Pretty.out "%s@;" message
     end;
     match LSP.Request.completion ~eager:true server params with
     | None ->
-      Pretty.out "Failed eager-completion@."
+        Pretty.out "Failed eager-completion@."
     | Some `CompletionList { items; _ } when items == [] ->
-      Pretty.out "Empty eager-completion list@."
+        Pretty.out "Empty eager-completion list@."
     | Some `CompletionList { items; _ } ->
-      Pretty.out "@[<hv 4>Eager (%d entries):@;%a@]@\n"
-        (List.length items)
-        (Fmt.list ~sep:Fmt.sp escaped_string)
-        items;
+        Pretty.out "@[<hv 4>Eager (%d entries):@;%a@]@\n"
+          (List.length items)
+          (Fmt.list ~sep:Fmt.sp escaped_string)
+          items;
+    | exception Jsonrpc.Response.Error.E { message; _ } ->
+        Pretty.out "%s@;" message
   in
   StringMap.iter (fun n p -> completions_at_position ~key:n p) positions.pos_map;
   List.iter (fun p -> completions_at_position p) positions.pos_anonymous;
@@ -5370,3 +5374,72 @@ let%expect_test "string-concat-completion" =
     (line 7, character 23):
     Basic (1 entries): TO
     Eager (1 entries): TO |}];;
+
+let%expect_test "preproc-interaction" =
+  let end_with_postproc = completion_positions @@ extract_position_markers
+      "IDENTIFICATION DIVISION.\nAUTHOR._|_ foo\n_|_\n"
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":0,"line":3},"start":{"character":0,"line":3}},"severity":1},{"message":"Missing PROGRAM_ID <word> .","range":{"end":{"character":11,"line":1},"start":{"character":11,"line":1}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:2.7:
+       1   IDENTIFICATION DIVISION.
+       2 > AUTHOR. foo
+    ----          ^
+       3
+    (line 1, character 7):
+    Basic (11 entries):
+        AUTHOR
+        CLASS-ID
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
+        FUNCTION-ID
+        INSTALLATION
+        INTERFACE-ID
+        PROGRAM-ID
+        REMARKS
+        SECURITY
+    Eager (11 entries):
+        AUTHOR.\n
+        CLASS-ID.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        FUNCTION-ID
+        INSTALLATION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
+        REMARKS.\n
+        SECURITY.\n
+    __rootdir__/prog.cob:3.0:
+       1   IDENTIFICATION DIVISION.
+       2   AUTHOR. foo
+       3 >
+    ----   ^
+    (line 2, character 0):
+    Basic (11 entries):
+        AUTHOR
+        CLASS-ID
+        DATE-COMPILED
+        DATE-MODIFIED
+        DATE-WRITTEN
+        FUNCTION-ID
+        INSTALLATION
+        INTERFACE-ID
+        PROGRAM-ID
+        REMARKS
+        SECURITY
+    Eager (11 entries):
+        AUTHOR.\n
+        CLASS-ID.\n
+        DATE-COMPILED.\n
+        DATE-MODIFIED.\n
+        DATE-WRITTEN.\n
+        FUNCTION-ID
+        INSTALLATION.\n
+        INTERFACE-ID.\n
+        PROGRAM-ID
+        REMARKS.\n
+        SECURITY.\n
+  |}]
