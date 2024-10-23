@@ -201,9 +201,9 @@ let get_nthline s n =
 let word_delimiters = [' '; '\t'; '.'; '('; ')']
 let rec first_delimiter_index_before text idx =
   if idx == 0 then 0 else
-  if List.mem (String.get text (idx-1)) word_delimiters
+  if List.mem text.[idx - 1] word_delimiters
   then idx
-  else first_delimiter_index_before text (idx-1)
+  else first_delimiter_index_before text (idx - 1)
 
 let range_n_case case (pos:Position.t) text =
   let { line; character = caret_column }: Position.t = pos in
@@ -284,25 +284,20 @@ let expected_comp_entries_in ~env ~eager =
 
 let expected_tokens ?(eager=true) base_env =
   let rec inner acc env  =
-    let pos = match Menhir.top env with
-      | None -> snd (Srcloc.as_lexloc Srcloc.dummy)
-      | Some Menhir.Element (_, _, _, pos) -> pos in
-    let acc =
-      CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
-    Expect.actions_in ~env
-    |> List.filter_map begin function
+    let _, pos = Menhir.positions env in
+    let expected_tokens_after_action = function
       | Expect.Reduce prod ->
-        begin
-          try Some ( Menhir.force_reduction prod env )
-          with Invalid_argument _ -> None
-        end
+          (try Some (Menhir.force_reduction prod env)
+           with Invalid_argument _ -> None)
       | Feed nt ->
-        try
-          let default_value = Expect.default_nonterminal_value nt in
-          Some ( Menhir.feed (N nt) pos default_value pos env )
-        with Not_found -> None
-    end
-    |> List.fold_left inner acc
+          (try
+             let default_value = Expect.default_nonterminal_value nt in
+             Some (Menhir.feed (N nt) pos default_value pos env)
+           with Not_found -> None)
+    in
+    let acc = CompEntrySet.add_seq (expected_comp_entries_in ~env ~eager) acc in
+    List.fold_left inner acc @@
+    List.filter_map expected_tokens_after_action (Expect.actions_in ~env)
   in
   inner CompEntrySet.empty base_env
 
@@ -318,21 +313,23 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-let contextual ~config
-    (doc:Lsp_document.t)
-    Cobol_typeck.Outputs.{ group; _ }
-    (pos:Position.t) =
+let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ group; _ }
+    (pos: Position.t)
+  =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range, case = range_n_case config.case pos doc.textdoc in
-  let pointwise = range.start.character == range.end_.character in
-  begin match Lsp_document.inspect_at ~position:(range.start) doc with
-    | Some Env env ->
-      let items =
-        map_completion_items ~range ~case ~group ~filename
-        @@ expected_tokens ~eager:config.eager env
-      in
-      CompletionList.create () ~isIncomplete:pointwise ~items
-    | _ ->
-      CompletionList.create () ~isIncomplete:true ~items:[]
-  end
-
+  let items, incomplete =
+    Option.value ~default:([], true) @@
+    Lsp_document.inspect_at ~position:(range.start) doc
+      ~f:begin function
+        | Env env ->
+            let items =
+              map_completion_items ~range ~case ~group ~filename @@
+              expected_tokens ~eager:config.eager env
+            in
+            items, range.start.character == range.end_.character
+        | Sink ->
+            [], true
+      end
+  in
+  CompletionList.create () ~isIncomplete:incomplete ~items

@@ -37,6 +37,22 @@ let command id handler =
   commands := command :: !commands;
   command
 
+let _open_cfg =
+  command "superbol.cfg.open" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg
+          ~typ:Graphviz _instance in
+      ()
+    end
+
+let _open_cfg_arc =
+  command "superbol.cfg.open.arc" @@ Instance
+    begin fun _instance ~args:_ ->
+      let _ : unit Promise.t = Superbol_cfg_explorer.open_cfg
+          ~typ:D3_arc_diagram _instance in
+      ()
+    end
+
 let _editor_action_findReferences =
   let command_name = "superbol.editor.action.findReferences"  in
   command command_name @@ Instance

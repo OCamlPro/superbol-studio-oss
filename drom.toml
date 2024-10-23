@@ -239,3 +239,6 @@ dir = "src/lsp/sql_ast"
 [[package]]
 dir = "src/lsp/sql_parser"
 # edit 'src/lsp/sql_parser/package.toml' for package-specific options
+
+[[package]]
+dir = "src/lsp/cobol_cfg"

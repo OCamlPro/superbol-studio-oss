@@ -1,0 +1,74 @@
+<!-- ----------------------------------------------------------------------- -->
+<!--                                                                         -->
+<!--                        SuperBOL OSS Studio                              -->
+<!--                                                                         -->
+<!--                                                                         -->
+<!--  Copyright (c) 2024 OCamlPro SAS                                        -->
+<!--                                                                         -->
+<!--  All rights reserved.                                                   -->
+<!--  This source code is licensed under the MIT license found in the        -->
+<!--  LICENSE.md file in the root directory of this source tree.             -->
+<!--                                                                         -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- Credit @beicause in https://github.com/beicause/call-graph/blob/master/src/html.ts -->
+<!-- Base html file for rendering graphviz cfg variant -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://unpkg.com/@hpcc-js/wasm@2.20.0/dist/index.umd.js"></script>
+<script src="https://unpkg.com/d3-graphviz@5.6.0/build/d3-graphviz.js"></script>
+</head>
+<body data-vscode-context='{"preventDefaultContextMenuItems": true}'>
+  <div id="context-menu-background">
+    <div id="context-menu" class="modal">
+      <p onclick="actionDescendents()">Show descendents</p>
+      <p onclick="actionNeighborhood()">Show 3-hop neighborhood</p>
+      <hr />
+      <p onclick="actionHideNode()">Hide node</p>
+      <p onclick="actionSplitNode()">Split node</p>
+    </div>
+  </div>
+  <h2 id="title">Title</h2>
+  <div id="buttons">
+    <button onclick="reset()">Reset Zoom</button>
+    <button id="reset-btn" onclick="rerenderWithDefault()">Reset options</button>
+    <button onclick="toggleRenderOptions()">Render Options</button>
+    <button onclick="toggleLegend()">Show legend</button>
+    <button id='history-btn' onclick="historyGoBack()" disabled>&lt;&lt; Go back</button>
+  </div>
+  <div id="modals">
+    <div id="render-options" class="modal hidden">
+      <div><input type="checkbox" id="unreachable" />
+        <label for="unreachable">Remove unreachable nodes</label></div>
+      <div><input type="checkbox" id="fallthru" />
+        <label for="fallthru">Collapse fallthrough transitions</label></div>
+      <div><input type="checkbox" id="in_degree_upper_limit"/>
+        <label for="in_degree_upper_limit">Split nodes with more than
+          <input type="number" id="hubcount" value="20" /> incoming edges</label>
+      </div>
+      <hr/>
+      <label>List of hidden nodes</label>
+      <div id="hidden_nodes" class="nodes-list"></div>
+      <label>List of split nodes</label>
+      <div id="split_nodes" class="nodes-list"></div>
+      <button id="render-btn" onclick="rerender()">Render</button>
+    </div>
+    <div id="legend" class="modal hidden"></div>
+    <div id="node-options" class="modal hidden">
+      node options
+    </div>
+  </div>
+  <div id="rendering">
+    Rendering… Please wait <br/>
+    If this takes too long, you can try changing the
+    <button onclick="toggleRenderOptions()">Render Options</button> :
+    <ul>
+      <li>Reduce the incoming edge requirement for splitting nodes</li>
+      <li>Collapse nodes that are only linked via a fallthrough edge</li>
+    </ul>
+  </div>
+  <div id="app"></div>
+</body>
+</html>

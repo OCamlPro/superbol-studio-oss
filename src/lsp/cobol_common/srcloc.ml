@@ -69,16 +69,17 @@ include TYPES
 
 (* For debugging: *)
 
+let pp_lexpos ppf Lexing.{ pos_fname; pos_lnum; pos_cnum; pos_bol } =
+  Pretty.print ppf "%s:%d-%d" pos_fname pos_lnum (pos_cnum - pos_bol)
+
 let pp_srcloc_struct: srcloc Pretty.printer =
-  let pp_lexloc ppf Lexing.{ pos_fname; pos_lnum; pos_cnum; pos_bol } =
-    Pretty.print ppf "%s:%d-%d" pos_fname pos_lnum (pos_cnum - pos_bol)
-  and pp_lexloc' ppf Lexing.{ pos_lnum; pos_cnum; pos_bol; _ } =
+  let pp_lexpos' ppf Lexing.{ pos_lnum; pos_cnum; pos_bol; _ } =
     Pretty.print ppf "%d-%d" pos_lnum (pos_cnum - pos_bol)
   in
   let rec pp: type t. t slt Pretty.printer = fun ppf -> function
     | Raw (s, e, _) ->
         Pretty.print ppf "<%a|%a>"
-          pp_lexloc s pp_lexloc' e
+          pp_lexpos s pp_lexpos' e
     | Cpy { copied; _ } ->
         Pretty.print ppf "Cpy { copied = %a }"
           pp copied

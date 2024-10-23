@@ -30,7 +30,10 @@ let inspect_positions (doc, positions) : string -> unit =
       location_as_srcloc#pp location
       Fmt.(option ~none:nop (string ++ sp)) position_name
       position.line position.character;
-    match LSP.Document.inspect_at ~position doc with
+    (* Note: parser state escapes [f], but that should be avoided to avoid
+       messing up with the internal overlay manager.  Ok for these simple tests
+       though. *)
+    match LSP.Document.inspect_at ~position doc ~f:Fun.id with
     | None ->
         Pretty.error "failed inspection@."
     | Some Sink ->

@@ -38,6 +38,16 @@
         "command": "superbol.coverage.reload",
         "title": "Update Coverage",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open",
+        "title": "Show control-flow",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open.arc",
+        "title": "Show control-flow as an arc-diagram",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -445,6 +455,20 @@
         "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "superbol.cfg.open",
+          "group": "superbol",
+          "when": "editorTextFocus && editorLangId == 'cobol'"
+        },
+        {
+          "command": "superbol.cfg.open.arc",
+          "group": "superbol",
+          "when": "editorTextFocus && editorLangId == 'cobol'"
+        }
+      ]
+    },
     "problemMatchers": [
       {
         "name": "gnucobol",

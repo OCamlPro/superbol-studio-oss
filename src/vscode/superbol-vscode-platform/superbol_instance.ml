@@ -28,6 +28,9 @@ let name = "SuperBOL Language Server"
 let make ~context = { context; language_client = None }
 
 let client { language_client; _ } = language_client
+
+let context { context; _ } = context
+
 let subscribe_disposable { context; _ } disposable =
   Vscode.ExtensionContext.subscribe context ~disposable
 

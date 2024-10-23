@@ -17,11 +17,11 @@ let debug_oc = ref None
 
 (*
 let message fmt =
-  Printf.kprintf (fun s ->
+  Format.kasprintf (fun s ->
       match !debug_oc with
       | None -> ()
       | Some oc ->
-        Printf.fprintf oc "OVERLAY: %s\n%!" s) fmt
+          Printf.fprintf oc "OVERLAY: %s\n%!" s) fmt
 *)
 
 module TYPES = struct
@@ -116,9 +116,9 @@ let limits: manager -> srcloc -> limit * limit = fun ctx loc ->
       HLnks.add ctx.right_of left (loc, right);
       left, right
 
-(** WLnks token limits *)
+(** Links token limits *)
 let link_limits ctx left right =
-  (* Replace to deal with overriding of limits during recovery. *)
+  (* Replace to deal with overriding of limits during recovery/rewind. *)
   HLnks.replace ctx.over_right_gap left right
 
 (** Returns a source location that spans between two given limits; returns a
@@ -166,12 +166,11 @@ let join_limits: manager -> limit * limit -> srcloc = fun ctx (s, e) ->
     else try_cache_from s
   in
   let join_failure (s, e) =
-    let loc = Cobol_common.Srcloc.raw (s, e) in
     Pretty.error "@[<2>%a:@ Internal@ warning:@ unable@ to@ join@ locations@ \
                   via@ limits@ in@ `%s.join_limits`@ [ctx=%s]@]@."
-      Cobol_common.Srcloc.pp_file_loc loc __MODULE__ ctx.id;
+      Cobol_common.Srcloc.pp_lexpos s __MODULE__ ctx.id;
     (* Printexc.(print_raw_backtrace Stdlib.stderr @@ get_callstack 10); *)
-    loc
+    Cobol_common.Srcloc.raw (e, e)
   in
   try   (* first attempt assumes proper token limits: `s` is a left and `e` is a
            right of tokens *)

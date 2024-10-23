@@ -305,6 +305,7 @@
    (cobol_data (= version))
    (cobol_config (= version))
    (cobol_common (= version))
+   (cobol_cfg (= version))
    odoc
   )
  )
@@ -506,6 +507,18 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 20230415 ))
+   odoc
+  )
+ )
+
+(package
+ (name cobol_cfg)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
+   (cobol_typeck (= version))
    odoc
   )
  )

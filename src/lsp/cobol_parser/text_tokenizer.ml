@@ -88,7 +88,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
       let error = Missing { loc = hd l; stuff = Continuation_of str } in
       aux (p', l', Parser_diagnostics.add_error error diags) pl
     and comment_entry_after n =
-      let acc, ((p, _) as suff) = skip acc (p, l) n in
+      let acc, ((p, l) as suff) = skip acc (p, l) n in
       if p = [] then Result.Error `MissingInputs else
         let consume_comment = match comment_entry_termination with
           | Newline ->
@@ -98,8 +98,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
           | AreaB { first_area_b_column } ->
               comment_paragraph ~stop_column:first_area_b_column
         and at_end ~loc ~revtoks (p', l', diags) =
-          let p', l' = comment_entry revtoks :: p', loc :: l' in
-          p', l', diags
+          comment_entry revtoks :: p', loc :: l', diags
         in
         consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
           Comment_entry acc suff
@@ -215,6 +214,8 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
   and comment_line ~init_pos ~loc ~revtoks ~at_end descr acc = function
     | [], _ ->                  (* found no word starting on anther line (yet) *)
         Result.Error `MissingInputs
+    | EOF :: _ as p, l ->                                (* non-terminated line *)
+        aux (at_end ~loc ~revtoks acc) (p, l)
     | p, (p_loc :: _ as l)
       when (let Lexing.{ pos_fname; pos_bol; _ } = start_pos p_loc in
             pos_bol > init_pos.Lexing.pos_bol ||

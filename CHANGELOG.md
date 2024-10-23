@@ -3,6 +3,7 @@
 ## [0.1.4] Next release
 
 ### Added
+- CFG explorer for COBOL programs [368](https://github.com/OCamlPro/superbol-studio-oss/pull/368)
 - Detection of copybooks based on contents prefix and configured search path [373](https://github.com/OCamlPro/superbol-studio-oss/pull/373)
 - Support for connecting to the LSP server remotely (TCP only) [#102](https://github.com/OCamlPro/superbol-studio-oss/pull/102)
 - Support for Symbol Renaming command [#351](https://github.com/OCamlPro/superbol-studio-oss/pull/351)
@@ -17,6 +18,7 @@
 - COBOL language configuration for highlighting matching brackets and auto-insertion of line numbers in fixed-format code [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 
 ### Fixed
+- Issues with completion requests in informational paragraphs [#374](https://github.com/OCamlPro/superbol-studio-oss/pull/374)
 - Improvements to the grammar [#331](https://github.com/OCamlPro/superbol-studio-oss/pull/331), [#353](https://github.com/OCamlPro/superbol-studio-oss/pull/353)
 - Word wrapping in presence of hyphens [#330](https://github.com/OCamlPro/superbol-studio-oss/pull/330)
 

@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-43e55d50fde244e0187112b3ea95d88e:.
+762a246ae905fcf6f10fcde0be25dce8:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-73b824a03b4a4f5c15db8791f70c6bc6:.github/workflows/workflow.yml
+af7371493f46441c2fd9d1a6c1364a6b:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -25,7 +25,7 @@ version:0.9.0
 
 # begin context for Makefile
 # file Makefile
-0195ab922c6b2c04b5cc71036d59fe5e:Makefile
+29872918f90282f1b0500998019ce4a6:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -76,7 +76,18 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # begin context for dune-project
 # file dune-project
 bbe93981f3f89550246d41f768f73a28:dune-project
+c375da381bfae0c77c7af1cb51f96580:dune-project
+cde29409c1d991e499786d56924f8fc9:dune-project
+68f1f36e943a31bcb34b9b97f6830817:dune-project
+afd60e19795dd45cbf2d203174f50a68:dune-project
+68f1f36e943a31bcb34b9b97f6830817:dune-project
+f3f8f40142982198dd2b7096346d98e4:dune-project
 # end context for dune-project
+
+# begin context for opam/cobol_cfg.opam
+# file opam/cobol_cfg.opam
+535909f451064f672cd8c6a798512ba1:opam/cobol_cfg.opam
+# end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
@@ -105,7 +116,7 @@ d7c870139778d0a6e34395be1ea0c85b:opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-f1979dd618dbe096cbf3f6ebd7b764ad:opam/cobol_lsp.opam
+c8462fb8a72ea1c6c9ef4ad6aea10b73:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
@@ -288,6 +299,16 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 13af61ba0b28e7fcb749a0c3b34e2322:sphinx/license.rst
 # end context for sphinx/license.rst
 
+# begin context for src/lsp/cobol_cfg/dune
+# file src/lsp/cobol_cfg/dune
+c6c7cd50f0ebff63bab991bf9a1633e6:src/lsp/cobol_cfg/dune
+# end context for src/lsp/cobol_cfg/dune
+
+# begin context for src/lsp/cobol_cfg/version.mlt
+# file src/lsp/cobol_cfg/version.mlt
+de6c46a271140f4f52b2580e0d876351:src/lsp/cobol_cfg/version.mlt
+# end context for src/lsp/cobol_cfg/version.mlt
+
 # begin context for src/lsp/cobol_common/dune
 # file src/lsp/cobol_common/dune
 9edd2c6c082e67ed0b683e87e60c485e:src/lsp/cobol_common/dune
@@ -340,7 +361,7 @@ a98a08d36a2f65127f60832515b6ab47:src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-9d53073ccf454b19436ec96ace43b740:src/lsp/cobol_lsp/dune
+0930647d8c6aee7065011a0501e050ac:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/version.mlt

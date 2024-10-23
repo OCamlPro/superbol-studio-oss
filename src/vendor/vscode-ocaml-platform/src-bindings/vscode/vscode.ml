@@ -759,6 +759,24 @@ module TextEditor = struct
     insertSnippet this ~snippet ?location options
 end
 
+module TextEditorSelectionChangeKind = struct
+  type t =
+    | Keyboard [@js 1]
+    | Mouse [@js 2]
+    | Command [@js 3]
+  [@@js.enum] [@@js]
+end
+
+module TextEditorSelectionChangeEvent = struct
+  include Class.Make ()
+
+  include
+    [%js:
+    val kind: t -> TextEditorSelectionChangeKind.t [@@js.get]
+    val selections: t -> Selection.t list [@@js.get]
+    val textEditor: t -> TextEditor.t [@@js.get]]
+end
+
 module ConfigurationTarget = struct
   type t =
     | Global [@js 1]
@@ -2984,6 +3002,7 @@ end
 module Window = struct
   module OnDidChangeActiveTextEditor = Event.Make (TextEditor)
   module OnDidChangeVisibleTextEditors = Event.Make (Js.List (TextEditor))
+  module OnDidChangeTextEditorSelection = Event.Make (TextEditorSelectionChangeEvent)
   module OnDidChangeActiveTerminal = Event.Make (Js.Or_undefined (Terminal))
   module OnDidOpenTerminal = Event.Make (Terminal)
   module OnDidCloseTerminal = Event.Make (Terminal)
@@ -3001,6 +3020,9 @@ module Window = struct
 
     val onDidChangeVisibleTextEditors : unit -> OnDidChangeVisibleTextEditors.t
       [@@js.get "vscode.window.onDidChangeVisibleTextEditors"]
+
+    val onDidChangeTextEditorSelection : unit -> OnDidChangeTextEditorSelection.t
+      [@@js.get "vscode.window.onDidChangeTextEditorSelection"]
 
     val terminals : unit -> Terminal.t list [@@js.get "vscode.window.terminals"]
 
@@ -3091,6 +3113,11 @@ module Window = struct
       -> unit
       -> StatusBarItem.t
       [@@js.global "vscode.window.createStatusBarItem"]
+
+    val createTextEditorDecorationType :
+         options:Ojs.t
+      -> TextEditorDecorationType.t
+      [@@js.global "vscode.window.createTextEditorDecorationType"]
 
     val createTerminal :
          ?name:string
