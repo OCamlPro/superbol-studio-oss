@@ -190,6 +190,34 @@ let get_elementary_component cu name =
   with
   | Not_found | Cobol_unit.Qualmap.Ambiguous _ -> [name]
 
+let is_varying_len cu name =
+  try
+    let x_info = get_x_info cu name in
+    match x_info with
+    | Data_field { def = { payload = { field_layout; _ }; _ }; _ } ->
+      (match field_layout with
+       | Struct_field { subfields =
+                          {payload = Field len; _ }::NEL.One {payload = Field arr; _} } ->
+         (match len.field_layout with
+          | Elementary_field {
+            (* FIXME this is wrong, it should be PIC 9(8) USAGE COMP-5 but
+             for now it's unsupported *)
+              usage = Display {
+                category = Alphanumeric { length = 1; _ }; _ }; _ } ->
+                  true
+          | _ -> false)
+         &&
+         (match arr.field_layout with
+          | Elementary_field {
+              usage = Display {
+                category = Alphanumeric { length = _; _ }; _ }; _ } ->
+                  true
+          | _ -> false)
+        | _ -> false)
+    | _ -> false
+  with
+  | Not_found | Cobol_unit.Qualmap.Ambiguous _ -> false
+
 
 (*TODO*)
 let get_flags _cu _name = 0
