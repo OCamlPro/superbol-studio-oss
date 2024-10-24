@@ -174,10 +174,17 @@ every reference to this item.
 
 ![Go to References](./assets/superbol-goto-references.gif)
 
+> [!NOTE]
+> (Temporary limitation)
+>
+> In addition to limitations mentioned in [Go to
+> Definition](#go-to-definition), references that occur in
+> `EXEC`/`END-EXEC` blocks are also not taken into account yet.
+
 ### Reference Information
 
 The extension shows inline reference information above definitons of
-data item and elements of the procedure division.  
+data items and elements of the procedure division.  
 The same limitations as for [Go to Definition](#go-to-definition)
 apply.
 
@@ -221,7 +228,7 @@ which case the renaming of every reference is not performed).
 
 Sections and paragraphs of the procedure division can also be renamed
 in the same way.  
-The same limitations as for [Go to Definition](#go-to-definition)
+The same limitations as for [Go to References](#go-to-references)
 apply to this feature.
 
 ## Exploring the Control-flow
