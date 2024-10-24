@@ -227,7 +227,7 @@ apply to this feature.
 ## Exploring the Control-flow
 
 Navigating a graphical representation of a COBOL program's
-control-flow proves invaluable when in comes to decypher its overall
+control-flow proves invaluable when it comes to decipher its overall
 logic.  To do this, open the command palette (or type
 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select `SuperBOL:
 Show control-flow` (you can also right click and select `Show
@@ -245,7 +245,7 @@ Various settings are provided to tune the rendering of CFGs.
 ### CFG as an arc diagram
 
 A rendering of CFGs as arc diagrams is also available.  In this
-representation, sections and paragraph named are layed out vertically,
+representation, named sections and paragraphs are laid out vertically,
 and arcs show the direction of control-flow between them.
 
 ![CFG Explorer as Arc Diagram](./assets/superbol-cfg-explorer-arc.gif)
