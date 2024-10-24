@@ -29,19 +29,23 @@ let pp_assoc_elem ppf ((uri, edits): DocumentUri.t * TextEdit.t list) =
 let count l =
   List.fold_left begin fun acc (_, t) -> acc + List.length t end 0 l
 
-let rename_positions ?(ignore_when_copybook=false) ?(copybooks=[]) (doc, positions) : string -> unit =
+let rename_positions ?(abort_when_in_copybook = false) ?(copybooks = [])
+    (doc, positions) : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
-  let server = List.fold_left begin fun server (name, document) ->
-      add_cobol_doc server ~projdir name document
-      |> fst
-    end server copybooks in
+  let server =
+    List.fold_left begin fun server (name, document) ->
+      fst @@ add_cobol_doc server ~projdir name document
+    end server copybooks
+  in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let rename_at_position ?key (position: Position.t) =
-    let params = RenameParams.create ~newName:"aNewName" ~position ~textDocument:prog () in
+    let params =
+      RenameParams.create ~newName:"aNewName" ~position ~textDocument:prog ()
+    in
     Pretty.out "%a(line %d, character %d):\n"
       Fmt.(option ~none:nop (string ++ sp)) key
       position.line position.character;
-    match LSP.Request.rename ~ignore_when_copybook server params with
+    match LSP.Request.rename ~abort_when_in_copybook server params with
     | { changes = None; _ } ->
       Pretty.out "No renames@."
     | { changes = Some assoc; _ } ->
@@ -181,7 +185,7 @@ let%expect_test "rename-with-a-ref-in-a-copybook" =
     {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"message":"Proceeded to rename of a reference that occurs in a copybook","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
+    {"params":{"message":"Renamed reference that occurs in a copybook","type":2},"method":"window/showMessage","jsonrpc":"2.0"}
     (line 7, character 21):
     2 rename entries:
         aNewName at __rootdir__/lib.cpy:2.11-2.21:
@@ -202,7 +206,7 @@ let%expect_test "rename-with-a-ignored-ref-in-a-copybook" =
     ("lib.cpy", {cobol|
         01 copied-var pic 9.|cobol})
   ] in
-  let end_with_postproc = rename_positions ~ignore_when_copybook:true ~copybooks
+  let end_with_postproc = rename_positions ~abort_when_in_copybook:true ~copybooks
     @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
         PROGRAM-ID. prog.
@@ -219,7 +223,7 @@ let%expect_test "rename-with-a-ignored-ref-in-a-copybook" =
     {"params":{"message":"file://__rootdir__/lib.cpy appears to be a copybook","type":4},"method":"window/logMessage","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/lib.cpy"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
-    {"params":{"message":"Ignored renaming of a reference that occurs in a copybook","type":3},"method":"window/showMessage","jsonrpc":"2.0"}
+    {"params":{"message":"Reference occurs in a copybook: not renaming","type":1},"method":"window/showMessage","jsonrpc":"2.0"}
     (line 7, character 21):
     No renames |}]
 
@@ -347,4 +351,3 @@ let%expect_test "rename-procedure" =
     ----             ^^^
        6             PERFORM sec.
        7             GO para. |}]
-
