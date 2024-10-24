@@ -116,7 +116,8 @@ selected suggestion.
 > (Temporary limitation)
 >
 > Suggestions of user-defined words may not comprise symbols that are
-> defined in some sections of the data division.
+> defined in some sections of the data division.  They do not include
+> preprocessor-related variables or phrases either.
 
 ## Navigation features
 
@@ -146,6 +147,13 @@ select  `Go to Definition` (or press <kbd>F12</kbd>).
 
 ![Go to Definition](./assets/superbol-goto-definition.gif)
 
+> [!NOTE]
+> (Temporary limitation)
+>
+> At the moment, definitions that belong to *some* sections of the
+> data division, and some references to data items, are ignored by the
+> extension.  They will be covered by the first stable release.
+
 ### Peek Definition
 
 To only have a peek at where such a data item defined, you can
@@ -166,12 +174,19 @@ every reference to this item.
 
 ![Go to References](./assets/superbol-goto-references.gif)
 
-> [!NOTE]
-> (Temporary limitation)
->
-> At the moment, definitions that belong to *some* sections of the
-> data division, and some references to data items, are ignored by the
-> extension.  They will be covered by the first stable release.
+### Reference Information
+
+The extension shows inline reference information above definitons of
+data item and elements of the procedure division.  
+The same limitations as for [Go to Definition](#go-to-definition)
+apply.
+
+> [!TIP]
+> 
+> This feature can be turned on or off by tuning the
+> `"editor.codeLens"` configuration setting (you can type
+> <kbd>Ctrl</kbd>+<kbd>,</kbd> and then `codelens` to change this
+> setting).
 
 ### Hover to Show Copybooks
 
@@ -190,6 +205,50 @@ What's more?  You can see the source text that results from
 replacement by a `REPLACE` directive in the same way.
 
 ![Hover over replacement](./assets/superbol-hover-replacement.gif)
+
+## Editing
+
+### Rename Data Items, Sections, and Paragraphs
+
+You can rename any data item by pressing <kbd>F2</kbd> while your
+cursor is positioned on one of its references.  The extension will
+warn you if a reference to the renamed item appears in a copybook (in
+which case the renaming of every reference is not performed).
+
+![Rename Symbol](./assets/superbol-rename-symbol.gif)
+
+![Rename Symbol in Copybook](./assets/superbol-rename-symbol-in-copybook.gif)
+
+Sections and paragraphs of the procedure division can also be renamed
+in the same way.  
+The same limitations as for [Go to Definition](#go-to-definition)
+apply to this feature.
+
+## Exploring the Control-flow
+
+Navigating a graphical representation of a COBOL program's
+control-flow proves invaluable when in comes to decypher its overall
+logic.  To do this, open the command palette (or type
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select `SuperBOL:
+Show control-flow` (you can also right click and select `Show
+control-flow` in the menu).  You are then presented with a list of
+portions of program to consider (either the entire program, or
+individiual sections): select one element to see the corresponding
+CFG.
+
+![CFG Explorer](./assets/superbol-cfg-explorer.gif)
+
+Various settings are provided to tune the rendering of CFGs.
+
+![CFG Explorer Collapse Fallthrough](./assets/superbol-cfg-explorer-collapse-fallthrough.gif)
+
+### CFG as an arc diagram
+
+A rendering of CFGs as arc diagrams is also available.  In this
+representation, sections and paragraph named are layed out vertically,
+and arcs show the direction of control-flow between them.
+
+![CFG Explorer as Arc Diagram](./assets/superbol-cfg-explorer-arc.gif)
 
 ## Debugging
 
