@@ -190,6 +190,8 @@ data items and elements of the procedure division.
 The same limitations as for [Go to Definition](#go-to-definition)
 apply.
 
+![Reference Information](./assets/superbol-reference-information.png)
+
 > [!TIP]
 > 
 > This feature can be turned on or off by tuning the
