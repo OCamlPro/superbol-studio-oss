@@ -318,9 +318,9 @@ whenever you start a debugging session, *e.g* with <kbd>F5</kbd>).
 
 Save the `tasks.json` as shown.  Definitions for this task notably
 include a `for-debug` flag, that instructs the compiler to insert
-debug annotations into generated executable files, as well as
-`extra-args`, that can be edited to pass additional arguments to the
-`cobc` compiler.
+debug annotations into generated executable files (this effectively
+passes flags `-ftraceall` and `-g` to `cobc`).  The `extra-args`
+setting can be edited to pass additional arguments to `cobc`.
 
 ![`tasks.json` for debug](./assets/superbol-tasks.json.png)
 
