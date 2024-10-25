@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.4] Next release
+## [0.1.4] Fifth α release (2024-10-25)
 
 ### Added
 - CFG explorer for COBOL programs [368](https://github.com/OCamlPro/superbol-studio-oss/pull/368)
