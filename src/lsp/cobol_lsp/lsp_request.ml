@@ -753,34 +753,38 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
 
 (** { Rename } *)
 
-let handle_rename ?(ignore_when_copybook=false)
+let handle_rename
+    ?(abort_when_in_copybook = true)
     registry
     ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  Option.value ~default:(WorkspaceEdit.create ()) @@
   try_with_main_document_data registry textDocument
     ~f:begin fun ~doc checked_doc ->
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
-      let locations = Option.value ~default:[] @@
+      let locations =
         let context = ReferenceContext.create ~includeDeclaration:true in
-        let params = ReferenceParams.create
-            ~context ~position ~textDocument () in
-        lookup_references_in_doc ~rootdir params checked_doc in
-      let changes, is_copybook =
-        List.fold_left begin fun (map, is_copybook) ({ range; uri }: Location.t) ->
+        Option.value ~default:[] @@
+        lookup_references_in_doc ~rootdir
+          (ReferenceParams.create () ~context ~position ~textDocument )
+          checked_doc
+      in
+      let changes, in_copybook =
+        List.fold_left begin fun (map, in_copybook) Location.{ range; uri } ->
           URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
-          is_copybook || DocumentUri.compare uri textDocument.uri <> 0
-        end (URIMap.empty, false) locations in
-      let changes = List.of_seq @@ URIMap.to_seq changes in
-      if is_copybook && ignore_when_copybook
-      then begin Lsp_io.notify_info
-          "Ignored renaming of a reference that occurs in a copybook";
-        Some ( WorkspaceEdit.create () ) end
-      else
-        begin if is_copybook
-          then Lsp_io.notify_warn
-              "Proceeded to rename of a reference that occurs in a copybook";
-          Some ( WorkspaceEdit.create ~changes () ) end
+          in_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations
+      in
+      if in_copybook && abort_when_in_copybook
+      then begin
+        Lsp_io.notify_error "Reference occurs in a copybook: not renaming";
+        None
+      end else begin
+        if in_copybook then
+          Lsp_io.notify_warn "Renamed reference that occurs in a copybook";
+        let changes = List.of_seq @@ URIMap.to_seq changes in
+        Some (WorkspaceEdit.create ~changes ())
+      end
     end
-  |> Option.get
 
 
 (** {3 Generic handling} *)

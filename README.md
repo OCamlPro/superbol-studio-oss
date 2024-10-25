@@ -116,7 +116,10 @@ selected suggestion.
 > (Temporary limitation)
 >
 > Suggestions of user-defined words may not comprise symbols that are
-> defined in some sections of the data division.
+> defined in the communication, report, or screen section of the data
+> division.  Although user-defined words that occur in [configured
+> copybooks](#editing-an-existing-project) are also suggested,
+> preprocessor-related variables or phrases are not.
 
 ## Navigation features
 
@@ -146,6 +149,13 @@ select  `Go to Definition` (or press <kbd>F12</kbd>).
 
 ![Go to Definition](./assets/superbol-goto-definition.gif)
 
+> [!NOTE]
+> (Temporary limitation)
+>
+> At the moment, definitions that belong to communication, report, or
+> screen sections of the data division are ignored by the extension.
+> They will be covered by the first stable release.
+
 ### Peek Definition
 
 To only have a peek at where such a data item defined, you can
@@ -169,9 +179,25 @@ every reference to this item.
 > [!NOTE]
 > (Temporary limitation)
 >
-> At the moment, definitions that belong to *some* sections of the
-> data division, and some references to data items, are ignored by the
-> extension.  They will be covered by the first stable release.
+> In addition to limitations mentioned in [Go to
+> Definition](#go-to-definition), references that occur in
+> `EXEC`/`END-EXEC` blocks are also not taken into account yet.
+
+### Reference Information
+
+The extension shows inline reference information above definitons of
+data items and elements of the procedure division.  
+The same limitations as for [Go to Definition](#go-to-definition)
+apply.
+
+![Reference Information](./assets/superbol-reference-information.png)
+
+> [!TIP]
+> 
+> This feature can be turned on or off by tuning the
+> `"editor.codeLens"` configuration setting (you can type
+> <kbd>Ctrl</kbd>+<kbd>,</kbd> and then `codelens` to change this
+> setting).
 
 ### Hover to Show Copybooks
 
@@ -190,6 +216,50 @@ What's more?  You can see the source text that results from
 replacement by a `REPLACE` directive in the same way.
 
 ![Hover over replacement](./assets/superbol-hover-replacement.gif)
+
+## Editing
+
+### Rename Data Items, Sections, and Paragraphs
+
+You can rename any data item by pressing <kbd>F2</kbd> while your
+cursor is positioned on one of its references.  The extension will
+warn you if a reference to the renamed item appears in a copybook (in
+which case the renaming of every reference is not performed).
+
+![Rename Symbol](./assets/superbol-rename-symbol.gif)
+
+![Rename Symbol in Copybook](./assets/superbol-rename-symbol-in-copybook.gif)
+
+Sections and paragraphs of the procedure division can also be renamed
+in the same way.  
+The same limitations as for [Go to References](#go-to-references)
+apply to this feature.
+
+## Exploring the Control-flow
+
+Navigating a graphical representation of a COBOL program's
+control-flow proves invaluable when it comes to decipher its overall
+logic.  To do this, open the command palette (or type
+<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select `SuperBOL:
+Show Control-flow` (you can also right click and select `Show
+Control-flow` in the menu).  You are then presented with a list of
+portions of program to consider (either the entire program, or
+individiual sections): select one element to see the corresponding
+CFG.
+
+![CFG Explorer](./assets/superbol-cfg-explorer.gif)
+
+Various settings are provided to tune the rendering of CFGs.
+
+![CFG Explorer Collapse Fallthrough](./assets/superbol-cfg-explorer-collapse-fallthrough.gif)
+
+### CFG as an arc diagram
+
+A rendering of CFGs as arc diagrams is also available.  In this
+representation, named sections and paragraphs are laid out vertically,
+and arcs show the direction of control-flow between them.
+
+![CFG Explorer as Arc Diagram](./assets/superbol-cfg-explorer-arc.gif)
 
 ## Debugging
 
@@ -248,9 +318,9 @@ whenever you start a debugging session, *e.g* with <kbd>F5</kbd>).
 
 Save the `tasks.json` as shown.  Definitions for this task notably
 include a `for-debug` flag, that instructs the compiler to insert
-debug annotations into generated executable files, as well as
-`extra-args`, that can be edited to pass additional arguments to the
-`cobc` compiler.
+debug annotations into generated executable files (this effectively
+passes flags `-ftraceall` and `-g` to `cobc`).  The `extra-args`
+setting can be edited to pass additional arguments to `cobc`.
 
 ![`tasks.json` for debug](./assets/superbol-tasks.json.png)
 
@@ -259,8 +329,9 @@ debug annotations into generated executable files, as well as
 GnuCOBOL can instrument your programs so they can generate coverage
 information at runtime.  To enable this feature, you can set the
 `for-coverage` setting to `true` in the `Superbol: build (debug)` task
-in your `tasks.json` file (see [Section Customizing Build
-Tasks](#customizing-build-tasks)).
+in your `tasks.json` file (see [Customizing Build
+Tasks](#customizing-build-tasks)).  This flag instructs the extension
+to pass the `--coverage` flag to the `cobc` compiler.
 
 ### Coverage Information
 
@@ -275,11 +346,13 @@ Coverage data can be shown after the execution of a program that was
 compiled to generate this information terminates.  SuperBOL will
 display coverage on a line-by-line basis, by highlighting the lines of
 your source code using colors that represent their coverage status.
-To enable coverage highlighting, you can open the command palette
-(or type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select
-`SuperBOL: Show Coverage`.
-You can also hide the highlighting with the command `SuperBOL: Hide Coverage`,
-and update it after re-executing your program with `SuperBOL: Update Coverage`.
+To enable coverage highlighting, you can open the command palette (or
+type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select
+`SuperBOL: Show Coverage`.  You can also hide the highlighting with
+the command `SuperBOL: Hide Coverage`, and update it after
+re-executing your program with `SuperBOL: Update Coverage`.
+
+![Show Coverage](./assets/superbol-show-coverage.png)
 
 <!-- ## Formatting the source code -->
 
