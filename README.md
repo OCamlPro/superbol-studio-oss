@@ -325,8 +325,9 @@ debug annotations into generated executable files, as well as
 GnuCOBOL can instrument your programs so they can generate coverage
 information at runtime.  To enable this feature, you can set the
 `for-coverage` setting to `true` in the `Superbol: build (debug)` task
-in your `tasks.json` file (see [Section Customizing Build
-Tasks](#customizing-build-tasks)).
+in your `tasks.json` file (see [Customizing Build
+Tasks](#customizing-build-tasks)).  This flag instructs the extension
+to pass the `--coverage` flag to the `cobc` compiler.
 
 ### Coverage Information
 
@@ -341,11 +342,13 @@ Coverage data can be shown after the execution of a program that was
 compiled to generate this information terminates.  SuperBOL will
 display coverage on a line-by-line basis, by highlighting the lines of
 your source code using colors that represent their coverage status.
-To enable coverage highlighting, you can open the command palette
-(or type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select
-`SuperBOL: Show Coverage`.
-You can also hide the highlighting with the command `SuperBOL: Hide Coverage`,
-and update it after re-executing your program with `SuperBOL: Update Coverage`.
+To enable coverage highlighting, you can open the command palette (or
+type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select
+`SuperBOL: Show Coverage`.  You can also hide the highlighting with
+the command `SuperBOL: Hide Coverage`, and update it after
+re-executing your program with `SuperBOL: Update Coverage`.
+
+![Show Coverage](./assets/superbol-show-coverage.png)
 
 <!-- ## Formatting the source code -->
 
