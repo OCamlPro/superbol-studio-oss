@@ -23,21 +23,18 @@ let get_length cu name =
     let x_info = get_x_info cu name in
     match x_info with
     | Data_field { def = { payload = { field_size; field_layout; _ }; _ }; _ } ->
-        let size = Cobol_data.Memory.(as_bits field_size / 8) in
-        begin match field_layout with
+      let size =
+        try Cobol_data.Memory.(as_bits field_size + 7) / 8
+        with Cobol_data.Memory.NOT_SCALAR _ -> 0
+      in
+      begin match field_layout with
         | Elementary_field { usage = Packed_decimal pic; _ } ->
-            begin match pic.category with
+          begin match pic.category with
             | FixedNum { digits; _ } -> digits
             | _ -> size end
         | _ -> size end
     | _ -> 0
-  with
-  | Not_found ->
-    (*     Pretty.out " \"%s\" not found " name; *)
-    0
-  | Cobol_unit.Qualmap.Ambiguous _ ->
-    (*     Pretty.out " \"%s\" not found. qualname nel lazy_t found" name; *)
-    0
+  with Not_found | Cobol_unit.Qualmap.Ambiguous _ -> 0
 
 type cobol_types =
   | UNKNOWN

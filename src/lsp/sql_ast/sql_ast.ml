@@ -12,4 +12,5 @@
 (**************************************************************************)
 
 include Types
+module Printer = Printer
 module Visitor = Visitor

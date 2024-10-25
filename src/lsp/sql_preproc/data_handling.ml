@@ -57,14 +57,14 @@ let transform_stm ~cobol_unit map (_, stm) filename =
       let prefix = prefix ^ "   " in
       [ Simple_var_declaration
           { prefix;
-            var_importance = "02";
+            var_level = "02";
             var_name = None;
             var_type = "X(" ^ string_of_int size ^ ")";
             var_content = Some new_content
           };
         Simple_var_declaration
           { prefix;
-            var_importance = "02";
+            var_level = "02";
             var_name = None;
             var_type = "X(1)";
             var_content = Some "X\"00\""
@@ -73,7 +73,7 @@ let transform_stm ~cobol_unit map (_, stm) filename =
     in
     ( [ Declaration
           (Field_var_declaration
-             { prefix; var_importance = "01"; var_name; field } )
+             { prefix; var_level = "01"; var_name; field } )
       ],
       add_var ~length:size map ("SQ" ^ string_of_int !num) )
   in
@@ -83,7 +83,7 @@ let transform_stm ~cobol_unit map (_, stm) filename =
       Declaration
         (Simple_var_declaration
            { prefix;
-             var_importance = "01";
+             var_level = "01";
              var_name = Some (pre_cur_name ^ cur_name);
              var_type = "X";
              var_content = None
@@ -225,7 +225,7 @@ let transform_stm ~cobol_unit map (_, stm) filename =
        [ Declaration
            (Simple_var_declaration
               { prefix;
-                var_importance = importance;
+                var_level = importance;
                 var_name = Some name;
                 var_type = "X(" ^ field_length ^ ")";
                 var_content = None
@@ -242,7 +242,7 @@ let transform_stm ~cobol_unit map (_, stm) filename =
        [ Declaration
            (Simple_var_declaration
               { prefix;
-                var_importance = importance;
+                var_level = importance;
                 var_name = Some name;
                 var_type;
                 var_content = None
@@ -254,14 +254,14 @@ let transform_stm ~cobol_unit map (_, stm) filename =
          let prefix = prefix ^ "   " in
          [ Simple_var_declaration
              { prefix;
-               var_importance = "49";
+               var_level = "49";
                var_name = Some (name ^ "-LEN");
                var_type = "9(8) COMP-5";
                var_content = None
              };
            Simple_var_declaration
              { prefix;
-               var_importance = "49";
+               var_level = "49";
                var_name = Some (name ^ "-ARR");
                var_type = "X(" ^ field_length ^ ")";
                var_content = None
@@ -270,7 +270,7 @@ let transform_stm ~cobol_unit map (_, stm) filename =
        in
        let decl =
          Field_var_declaration
-           { prefix; var_importance = importance; var_name = name; field }
+           { prefix; var_level = importance; var_name = name; field }
        in [ Declaration decl ]) , map
   in
 

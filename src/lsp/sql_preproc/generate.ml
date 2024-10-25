@@ -52,7 +52,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (*GET FUNCTION*)
   (*TODOOOO*)
   let working_storage_section, new_var_map =
-    let ws, nvm = Data_gestion.transform ~cobol_unit sql_statements filename in
+    let ws, nvm = Data_handling.transform ~cobol_unit sql_statements filename in
     ( [ comment ">Begin generated WORKING-STORAGE SECTION";
         Generated_type.Added
           { content = ws; error_treatment = None; with_dot = false };
@@ -86,7 +86,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let get_length ?(negative_if_varlen=false) str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a ->
       if a.flags land Gix_enum.Flag.varlen > 0
       then
@@ -117,17 +117,17 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let get_type str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> a.vartype
     | None -> Sql_typeck.get_type cobol_unit str
   in
   let get_scale str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> - a.scale
     | None -> - Sql_typeck.get_scale cobol_unit str
   in
   let get_flags str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> a.flags
     | None -> Sql_typeck.get_flags cobol_unit str
   in
