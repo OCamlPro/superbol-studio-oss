@@ -116,8 +116,10 @@ selected suggestion.
 > (Temporary limitation)
 >
 > Suggestions of user-defined words may not comprise symbols that are
-> defined in some sections of the data division.  They do not include
-> preprocessor-related variables or phrases either.
+> defined in the communication, report, or screen section of the data
+> division.  Although user-defined words that occur in [configured
+> copybooks](#editing-an-existing-project) are also suggested,
+> preprocessor-related variables or phrases are not.
 
 ## Navigation features
 
@@ -150,9 +152,9 @@ select  `Go to Definition` (or press <kbd>F12</kbd>).
 > [!NOTE]
 > (Temporary limitation)
 >
-> At the moment, definitions that belong to *some* sections of the
-> data division, and some references to data items, are ignored by the
-> extension.  They will be covered by the first stable release.
+> At the moment, definitions that belong to communication, report, or
+> screen sections of the data division are ignored by the extension.
+> They will be covered by the first stable release.
 
 ### Peek Definition
 
