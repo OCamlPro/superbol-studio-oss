@@ -11,6 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Types
-module Printer = Printer
-module Visitor = Visitor
+include Ast_types
+module Printer = Ast_printer
+module Visitor = Ast_visitor

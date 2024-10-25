@@ -11,9 +11,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Types
 open Cobol_common.Visitor
 open Cobol_common.Visitor.INFIX                         (* for `>>` (== `|>`) *)
+open Ast_types
 
 (* --- *)
 
