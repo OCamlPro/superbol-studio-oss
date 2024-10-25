@@ -9,7 +9,7 @@ DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 
-VERSION = 0.1.4
+VERSION = 0.1.5
 DEV_DEPS := merlin ocamlformat odoc
 
 

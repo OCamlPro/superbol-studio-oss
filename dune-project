@@ -4,7 +4,7 @@
 (cram enable)
 (name superbol-studio-oss)
 (generate_opam_files false)
-(version 0.1.4)
+(version 0.1.5)
 (formatting (enabled_for ocaml reason))
 (using menhir 2.0)
 
