@@ -585,11 +585,11 @@ let contributes =
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open"
-        ~title:"Show control-flow"
+        ~title:"Show Control-flow"
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open.arc"
-        ~title:"Show control-flow as an arc-diagram"
+        ~title:"Show Control-flow as an Arc-diagram"
         ~category:"SuperBOL";
     ]
     ~tomlValidation: [

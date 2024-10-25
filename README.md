@@ -237,8 +237,8 @@ Navigating a graphical representation of a COBOL program's
 control-flow proves invaluable when it comes to decipher its overall
 logic.  To do this, open the command palette (or type
 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), and select `SuperBOL:
-Show control-flow` (you can also right click and select `Show
-control-flow` in the menu).  You are then presented with a list of
+Show Control-flow` (you can also right click and select `Show
+Control-flow` in the menu).  You are then presented with a list of
 portions of program to consider (either the entire program, or
 individiual sections): select one element to see the corresponding
 CFG.
