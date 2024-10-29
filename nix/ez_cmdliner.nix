@@ -2,23 +2,22 @@
 
 ocamlPackages.buildDunePackage {
   strictDeps = true;
-  pname = "ez_api";
-  inherit (sources.ez_api) version;
+  pname = "ez_cmdliner";
+  inherit (sources.ez_cmdliner) version;
 
   minimalOCamlVersion = "4.08";
   duneVersion = "3";
 
-  src = sources.ez_api;
+  src = sources.ez_cmdliner;
 
   propagatedBuildInputs = with ocamlPackages; [
-    json-data-encoding
-    lwt
-    ezjsonm
-    uuidm
+    ocplib_stuff
+    ez_subst
+    cmdliner
   ];
 
   meta = with lib; {
-    inherit (sources.ez_api) homepage description;
+    inherit (sources.ez_cmdliner) homepage description;
   };
 }
 

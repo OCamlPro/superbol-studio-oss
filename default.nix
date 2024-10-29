@@ -150,7 +150,7 @@ let
     ];
 
     configurePhase = ''
-    dune promote
+      dune build src/lsp/cobol_parser
     '';
 
     propagatedBuildInputs = with ocamlPackages; [
@@ -158,6 +158,8 @@ let
       cobol_ptree
       cobol_preproc
       cobol_unit
+
+      menhirSdk
     ];
 
   };
@@ -309,6 +311,21 @@ let
 
   };
 
+  vscode-json = ocamlPackages.buildDunePackage {
+    pname = "vscode-json";
+    inherit version src;
+
+    minimalOcamlVersion = "4.14";
+    duneVersion = "3";
+
+    propagatedBuildInputs = with ocamlPackages; [
+      ez_file
+      ppx_deriving
+      ppx_deriving_encoding
+      ezjsonm
+    ];
+  };
+
   superbol_free_lib = ocamlPackages.buildDunePackage {
     pname = "superbol_free_lib";
     inherit version src;
@@ -319,8 +336,11 @@ let
     propagatedBuildInputs = with ocamlPackages; [
       cobol_lsp
       ppx_cobcflags
-      ppx_deriving_encoding
+      vscode-json
+
       ez_api
+      ez_cmdliner
+      ppx_deriving_encoding
     ];
 
   };
@@ -337,7 +357,7 @@ let
     ];
   };
 
-  superbol = ocamlPackages.buildDunePackage {
+  superbol-studio-oss = ocamlPackages.buildDunePackage {
     pname = "superbol-studio-oss";
     inherit version src;
 
@@ -351,6 +371,9 @@ let
 in
 
 {
-  superbol = superbol;
+  inherit superbol-studio-oss superbol-free superbol_free_lib vscode-json ppx_cobcflags cobol_lsp
+            superbol_project ezr_toml ez_toml superbol_preprocs sql_parser sql_ast cobol_cfg
+            cobol_typeck cobol_parser cobol_unit cobol_preproc ebcdic_lib cobol_data cobol_ptree
+            cobol_indent cobol_config cobol_common;
 }
 

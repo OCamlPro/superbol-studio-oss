@@ -6,12 +6,33 @@
         "url_template": "https://github.com/ocamlpro/ez_api/archive/refs/tags/<version>.tar.gz",
         "version": "2.1.0"
     },
+    "ez_cmdliner": {
+        "sha256": "0ls7w2dbd7k1y718sfc987rbycycmy19mk9hp614zcjrrjn50llp",
+        "type": "tarball",
+        "url": "https://github.com/ocamlpro/ez_cmdliner/archive/v0.4.3.tar.gz",
+        "url_template": "https://github.com/ocamlpro/ez_cmdliner/archive/v<version>.tar.gz",
+        "version": "0.4.3"
+    },
     "ez_file": {
         "sha256": "1apk1id9s5ybn8z7p8vm2gff6qgcn4yn2f8z10306sjfzvfsfxql",
         "type": "tarball",
         "url": "https://github.com/ocamlpro/ez_file/archive/v0.3.0.tar.gz",
         "url_template": "https://github.com/ocamlpro/ez_file/archive/v0.3.0.tar.gz",
         "version": "0.3.0"
+    },
+    "ez_subst": {
+        "sha256": "0jxz5q6x95crhq0vcwxigbmkj69hgrhxmpvr82yqd2jbvksqfkvp",
+        "type": "tarball",
+        "url": "https://github.com/ocamlpro/ez_subst/archive/v0.2.1.tar.gz",
+        "url_template": "https://github.com/ocamlpro/ez_subst/archive/v<version>.tar.gz",
+        "version": "0.2.1"
+    },
+    "json-data-encoding": {
+        "sha256": "1pwx4dzfb0w7vz4lbm1ppq1lpzd1ss7v4r3ydnx2hdrdgv2ki01a",
+        "type": "tarball",
+        "url": "https://gitlab.com/nomadic-labs/data-encoding/-/archive/v1.0.1/data-encoding-v1.0.1.tar.gz",
+        "url_template": "https://gitlab.com/nomadic-labs/data-encoding/-/archive/v<version>/data-encoding-v<version>.tar.gz",
+        "version": "1.0.1"
     },
     "lsp": {
         "sha256": "0qzpx6l03c27zx260wy28pqdn0xd2sfy7s8mspcddcb00vg0rzva",

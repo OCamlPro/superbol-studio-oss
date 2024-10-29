@@ -6,7 +6,10 @@ import sources.nixpkgs {
     (_: pkgs: {
         ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14.overrideScope' (self: super: {
           ez_api = pkgs.callPackage ./ez_api.nix { };
+          ez_cmdliner = pkgs.callPackage ./ez_cmdliner.nix { };
           ez_file = pkgs.callPackage ./ez_file.nix { };
+          ez_subst = pkgs.callPackage ./ez_subst.nix { };
+          json-data-encoding = pkgs.callPackage ./json-data-encoding.nix { };
           lsp = pkgs.callPackage ./lsp.nix { };
           menhir = pkgs.callPackage ./menhir.nix { };
           menhirLib = pkgs.callPackage ./menhirLib.nix { };
