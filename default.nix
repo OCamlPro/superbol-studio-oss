@@ -109,15 +109,21 @@ let
     minimalOcamlVersion = "4.14";
     duneVersion = "3";
 
-
     nativeBuildInputs = [
       ocamlPackages.menhir
     ];
 
     propagatedBuildInputs = with ocamlPackages; [
       cobol_data
+
+      menhirSdk
       ppx_import
     ];
+
+    /* Used to build generated OCaml files */
+    configurePhase = ''
+      dune build src/lsp/cobol_preproc
+    '';
 
   };
 
@@ -149,6 +155,7 @@ let
       ocamlPackages.menhir
     ];
 
+    /* Used to build generated OCaml files */
     configurePhase = ''
       dune build src/lsp/cobol_parser
     '';
