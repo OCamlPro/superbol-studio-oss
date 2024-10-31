@@ -378,9 +378,30 @@ let
 in
 
 {
-  inherit superbol-studio-oss superbol-free superbol_free_lib vscode-json ppx_cobcflags cobol_lsp
-            superbol_project ezr_toml ez_toml superbol_preprocs sql_parser sql_ast cobol_cfg
-            cobol_typeck cobol_parser cobol_unit cobol_preproc ebcdic_lib cobol_data cobol_ptree
-            cobol_indent cobol_config cobol_common;
+  inherit
+    superbol-studio-oss
+    superbol-free
+    superbol_free_lib
+    vscode-json
+    ppx_cobcflags
+    cobol_lsp
+    superbol_project
+    ezr_toml
+    ez_toml
+    superbol_preprocs
+    sql_parser
+    sql_ast
+    cobol_cfg
+    cobol_typeck
+    cobol_parser
+    cobol_unit
+    cobol_preproc
+    ebcdic_lib
+    cobol_data
+    cobol_ptree
+    cobol_indent
+    cobol_config
+    cobol_common
+    pretty;
 }
 

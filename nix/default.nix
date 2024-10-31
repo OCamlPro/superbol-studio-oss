@@ -4,7 +4,7 @@ import sources.nixpkgs {
   overlays = [
     (_: pkgs: { inherit sources; })
     (_: pkgs: {
-        ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14.overrideScope' (self: super: {
+        ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14.overrideScope (self: super: {
           ez_api = pkgs.callPackage ./ez_api.nix { };
           ez_cmdliner = pkgs.callPackage ./ez_cmdliner.nix { };
           ez_file = pkgs.callPackage ./ez_file.nix { };

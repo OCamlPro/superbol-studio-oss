@@ -63,15 +63,15 @@
         "version": "20231231"
     },
     "nixpkgs": {
-        "branch": "nixos-unstable",
+        "branch": "master",
         "description": "Nix Packages collection",
         "homepage": null,
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "6c43a3495a11e261e5f41e5d7eda2d71dae1b2fe",
-        "sha256": "16f329z831bq7l3wn1dfvbkh95l2gcggdwn6rk3cisdmv2aa3189",
+        "rev": "b4f480fea347cec3ac599d77986aa17a817bb591",
+        "sha256": "1dq2xg36n4yvihdl37rgs89bxi5imd4bl69g7lfpf2x663madyzd",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs/archive/6c43a3495a11e261e5f41e5d7eda2d71dae1b2fe.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs/archive/b4f480fea347cec3ac599d77986aa17a817bb591.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "ocplib_stuff": {
