@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Fixed
+- Binaries included in VSIXs for Darwin [#383](https://github.com/OCamlPro/superbol-studio-oss/pull/383)
 - Name of debugger, to avoid conflicts with the official "gdb" [#381](https://github.com/OCamlPro/superbol-studio-oss/pull/381)
 
 
