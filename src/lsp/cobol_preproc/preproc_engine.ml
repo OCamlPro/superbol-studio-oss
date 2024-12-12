@@ -224,6 +224,8 @@ and apply_compiler_directive ({ reader; pplog; _ } as lp)
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
+  | CDir_control_section ->                              (* nothing to do here *)
+      lp
   | CDir_preproc preproc_directive ->
       apply_preproc_directive lp (preproc_directive &@ loc)
 
@@ -324,15 +326,18 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
         ~error:(fun e -> `ReplaceDone (add_error lp e,
                                        List.rev rev_prefix, suffix))
   | Header (header, { prefix = rev_prefix; phrase; suffix }) ->
-      let prefix = match header with
+      let prefix, lp = match header with
         | ControlDivision
         | IdentificationDivision ->
             (* keep phrases that are further syntax-checked by the parser, and
                used to perform dialect-related checks there. *)
-            List.rev_append rev_prefix phrase
+            List.rev_append rev_prefix phrase, lp
         | SubstitutionSection ->
-            (* discard this phrase, which is not checked by the parser *)
-            List.rev rev_prefix
+            (* discard this phrase, which is not checked by the parser; keep it
+               in pplog anyways, so as to keep its location for later use. *)
+            let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
+            let section = Preproc_directives.CDir_control_section &@ loc in
+            List.rev rev_prefix, apply_compiler_directive lp section
       in
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
