@@ -125,7 +125,7 @@ let contributes =
         ~path: "./syntaxes/dumpfile.tmLanguage.json"
     ]
     ~debuggers: [
-      Manifest.debugger "gdb"
+      Manifest.debugger "superbol-gdb"
         ~label: "SuperBOL Debugger for GnuCOBOL"
         ~languages: ["cobol"; "COBOL"]
         ~program: "./_dist/superbol-vscode-gdb.js"
@@ -262,7 +262,7 @@ let contributes =
                                 "description": "New SuperBOL launch request",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (launch)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "launch",
                                         "preLaunchTask": "SuperBOL: build (debug)",
                                         "target": "$${_:{file}}",
@@ -279,7 +279,7 @@ let contributes =
                                 "description": "Attach to a local debug session",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (attach local)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "attach",
                                         "pid": "${3:0}",
                                         "target": "$${_:{file}}",
@@ -294,7 +294,7 @@ let contributes =
                                 "description": "Attach to a remote debug session",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (attach remote)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "attach",
                                         "remote-debugger": "${3:host:port}",
                                         "target": "$${_:{file}}",

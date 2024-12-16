@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Fixed
+- Name of debugger, to avoid conflicts with the official "gdb" [#381](https://github.com/OCamlPro/superbol-studio-oss/pull/381)
+
 
 ## [0.1.4] Fifth α release (2024-10-25)
 
