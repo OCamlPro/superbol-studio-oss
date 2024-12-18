@@ -161,6 +161,7 @@ let fold_chunks
         (match with_source_format sf pl with
          | Ok pl -> pl
          | Error _error -> pl)                                       (* ignore *)
+    | CDir_control_section
     | CDir_preproc _ -> pl                                           (* ignore *)
   in
   aux pl acc
