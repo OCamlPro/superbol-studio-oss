@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Fixed
+- Check for x86 binaries when on `darwin-arm64` [#385](https://github.com/OCamlPro/superbol-studio-oss/pull/385)
 - Binaries included in VSIXs for Darwin [#383](https://github.com/OCamlPro/superbol-studio-oss/pull/383)
 - Name of debugger, to avoid conflicts with the official "gdb" [#381](https://github.com/OCamlPro/superbol-studio-oss/pull/381)
 
