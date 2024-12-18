@@ -8,6 +8,9 @@ DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
+ifeq ($(BUILD_STATIC_EXECS),true)
+  export LINKING_MODE=static
+endif
 
 VERSION = 0.1.5
 DEV_DEPS := merlin ocamlformat odoc
