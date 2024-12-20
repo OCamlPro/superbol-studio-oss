@@ -393,6 +393,7 @@
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
    (ocaml (>= 4.14.0))
+   (zarith_stubs_js ( >= 0.17 ))
    (zarith ( >= 1 ))
    (cobol_ptree (= version))
    (cobol_config (= version))
