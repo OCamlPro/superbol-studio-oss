@@ -5,3 +5,4 @@ linking_flags.sh linguist-generated
 /dune-project    linguist-generated
 /sphinx/conf.py  linguist-generated
 /package.json    linguist-generated
+/**/version.mlt  linguist-generated
