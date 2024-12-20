@@ -57,6 +57,7 @@ cobol_common = "version"
 cobol_config = "version"
 cobol_ptree = "version"
 zarith = ">=1"
+zarith_stubs_js = ">=0.17"
 
 # package tools dependencies
 [tools]

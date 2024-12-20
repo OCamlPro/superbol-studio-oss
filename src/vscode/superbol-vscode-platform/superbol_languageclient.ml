@@ -48,11 +48,12 @@ let find_superbol root =
     Vscode.Uri.joinPath root ~pathSegments:[name]) @@ [
     Format.asprintf "%s-%s-%s%s" prefix platform arch suffix;
     Format.asprintf "%s-%s%s" prefix platform suffix;
-    Format.asprintf "%s%s" prefix suffix
+    Format.asprintf "%s%s" prefix suffix;
   ] @ if platform = "darwin" && arch = "arm64" then
-    [ Format.sprintf "%s-%s-%s%s" prefix platform "x64" suffix]
+    [ Format.sprintf "%s-%s-%s%s" prefix platform "x64" suffix;
+      "main.bc.js" ]
   else
-    []
+    [ "main.bc.js" ]
 
 let scan_host_and_port url =
   let fail () = Format.ksprintf failwith "Invalid %S" url in
