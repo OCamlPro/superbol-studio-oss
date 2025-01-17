@@ -28,7 +28,7 @@ module TYPES: sig
     workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
     with_semantic_tokens: bool;
     with_client_config_watcher: bool;
-    with_client_file_watcher: bool;
+    with_client_file_watcher: [`no | `yes of [`absolute | `any]];
   }
 
   type registry = private {

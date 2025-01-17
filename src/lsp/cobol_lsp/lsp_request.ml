@@ -70,18 +70,22 @@ let initialize ~config (params: InitializeParams.t) =
     | _ ->
         false
   and with_client_file_watcher = match params.capabilities.workspace with
-    | Some { didChangeWatchedFiles = Some { dynamicRegistration; _ }; _ } ->
-        (* Note: for now we rely on the client's dynamic registration ability;
-           for clients that do not support that it could just be simpler to
-           trigger server restarts when relevant changes happen. *)
-        Option.value ~default:false dynamicRegistration
+    | Some { didChangeWatchedFiles = Some { dynamicRegistration = Some true;
+                                            relativePatternSupport };
+             _ } ->
+        `yes (if relativePatternSupport = Some true then `any else `absolute)
     | _ ->
-        false
+        `no
+  in
+  let watcher ppf = function
+    | `no -> Fmt.string ppf "none"
+    | `yes `absolute -> Fmt.string ppf "absolute patterns only"
+    | `yes `any -> Fmt.string ppf "any pattern"
   in
   Lsp_io.log_info "Negociated@ server@ parameters:@\n@[%t@]" @@
   Pretty.delayed_record [
     Fmt.(field "client_config_watcher" (fun _ -> with_client_config_watcher) bool);
-    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) bool);
+    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) watcher);
   ];
   let result =
     InitializeResult.create ()
