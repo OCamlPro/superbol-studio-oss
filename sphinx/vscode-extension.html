@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL VSCode Extension &mdash; superbol-studio-oss master
- (922588f
-) (2024/12/18 14:40) documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+ (767e0a3
+) (2025/01/17 11:16) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6ec657c1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -28,16 +31,20 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> superbol-studio-oss
+
+          
+          
+          <a href="index.html">
+            
           </a>
               <div class="version">
                 master
- (922588f
+ (767e0a3
 )
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -88,8 +95,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>SuperBOL VSCode Extension</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SuperBOL VSCode Extension</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/vscode-extension.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -100,30 +107,30 @@
            <div itemprop="articleBody">
              
   <section id="superbol-vscode-extension">
-<span id="id1"></span><h1>SuperBOL VSCode Extension<a class="headerlink" href="#superbol-vscode-extension" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>SuperBOL VSCode Extension<a class="headerlink" href="#superbol-vscode-extension" title="Link to this heading"></a></h1>
 <p><strong>TODO:</strong> Update this Section if still relevant; remove it otherwise.</p>
 <p>This VSCode extension is used to interface VSCode with the SuperBOL LSP Server and provides building
 tasks for your COBOL projects.</p>
 <p>The extension can be used as a standalone, but is required for the <cite>SuperBOL VSCode Extension</cite> to
 work.</p>
 <section id="tasks">
-<h2>Tasks<a class="headerlink" href="#tasks" title="Permalink to this headline"></a></h2>
+<h2>Tasks<a class="headerlink" href="#tasks" title="Link to this heading"></a></h2>
 <p>We provide a task definition to build your COBOL files.
 The task is defined as follow:</p>
-<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;superbol&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;copybooks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;sourceFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;dialect&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;extensions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;forDebugging&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;problemMatcher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;superbol: Build file&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;build&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="nt">&quot;isDefault&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;superbol&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;copybooks&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;sourceFormat&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;dialect&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;extensions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;forDebugging&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;problemMatcher&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;label&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;superbol: Build file&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;group&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;build&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;isDefault&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 <p>You can fill the fields with the following values:</p>
@@ -138,19 +145,19 @@ inside</p></li>
 <p>To trigger the building task just push <code class="code docutils literal notranslate"><span class="pre">Ctrl</span> <span class="pre">+</span> <span class="pre">Shift</span> <span class="pre">+</span> <span class="pre">B</span></code>.</p>
 </section>
 <section id="settings">
-<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline"></a></h2>
+<h2>Settings<a class="headerlink" href="#settings" title="Link to this heading"></a></h2>
 <p>The settings for the extension are to be modified by going to <code class="code docutils literal notranslate"><span class="pre">File</span></code> &gt; <code class="code docutils literal notranslate"><span class="pre">Preferences</span></code> &gt;
 <code class="code docutils literal notranslate"><span class="pre">Settings</span></code>.</p>
 <p>Then select the <code class="code docutils literal notranslate"><span class="pre">Extension</span></code> submenu and select <code class="code docutils literal notranslate"><span class="pre">SuperBOL</span> <span class="pre">COBOL</span></code>.</p>
 <section id="path">
-<h3><code class="code docutils literal notranslate"><span class="pre">Path</span></code><a class="headerlink" href="#path" title="Permalink to this headline"></a></h3>
+<h3><code class="code docutils literal notranslate"><span class="pre">Path</span></code><a class="headerlink" href="#path" title="Link to this heading"></a></h3>
 <p>This is the path to the <code class="code docutils literal notranslate"><span class="pre">superbol</span></code> executable.</p>
 </section>
 </section>
 <section id="superbol-extension-features">
-<span id="superbol-vscode-features"></span><h2>SuperBOL extension features<a class="headerlink" href="#superbol-extension-features" title="Permalink to this headline"></a></h2>
+<span id="superbol-vscode-features"></span><h2>SuperBOL extension features<a class="headerlink" href="#superbol-extension-features" title="Link to this heading"></a></h2>
 <section id="go-to-definition">
-<h3>Go to definition<a class="headerlink" href="#go-to-definition" title="Permalink to this headline"></a></h3>
+<h3>Go to definition<a class="headerlink" href="#go-to-definition" title="Link to this heading"></a></h3>
 <p>You can navigate to the defintion of any variable in your code. Push <code class="code docutils literal notranslate"><span class="pre">F12</span></code> on a variable name to go
 to it’s defintion. This works on:
 * every variable in the <code class="code docutils literal notranslate"><span class="pre">PROCEDURE</span> <span class="pre">DIVISION</span></code>,
@@ -158,33 +165,29 @@ to it’s defintion. This works on:
 * every variable that is used by a <code class="code docutils literal notranslate"><span class="pre">REDEFINES</span></code> clause</p>
 </section>
 <section id="go-to-references">
-<h3>Go to references<a class="headerlink" href="#go-to-references" title="Permalink to this headline"></a></h3>
+<h3>Go to references<a class="headerlink" href="#go-to-references" title="Link to this heading"></a></h3>
 <p>You can have a list of references of every variables in your code. Push <code class="code docutils literal notranslate"><span class="pre">Shift</span> <span class="pre">+</span> <span class="pre">F12</span></code> on a variable
 name to find all the places it is referenced.</p>
 </section>
 <section id="semantic-highlighting">
-<h3>Semantic highlighting<a class="headerlink" href="#semantic-highlighting" title="Permalink to this headline"></a></h3>
+<h3>Semantic highlighting<a class="headerlink" href="#semantic-highlighting" title="Link to this heading"></a></h3>
 <p>The extension understands your code on a semantic level, giving you better highlighting to make
 reading your code easier and focus on the important information of the source code.</p>
 </section>
 <section id="peek-copy">
-<h3>Peek copy<a class="headerlink" href="#peek-copy" title="Permalink to this headline"></a></h3>
+<h3>Peek copy<a class="headerlink" href="#peek-copy" title="Link to this heading"></a></h3>
 <p>Place your cursor on <code class="code docutils literal notranslate"><span class="pre">COPY</span></code> statement and a pop up with the content of the copied file will
 appear, giving you all the information you need to understand the code at a glance.</p>
 </section>
 <section id="indentation">
-<h3>Indentation<a class="headerlink" href="#indentation" title="Permalink to this headline"></a></h3>
+<h3>Indentation<a class="headerlink" href="#indentation" title="Link to this heading"></a></h3>
 <p>You can indent your code for a better understanding of the control flow at a glance. Simply push
 <code class="code docutils literal notranslate"><span class="pre">Ctrl</span> <span class="pre">+</span> <span class="pre">Shift</span> <span class="pre">+</span> <span class="pre">I</span></code> and all the file is indented.</p>
 <p>You can also just select a part of your code and push the same shortcut just to indent the selection.</p>
 </section>
 <section id="keyboard-shortcuts">
-<h3>Keyboard shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Permalink to this headline"></a></h3>
+<h3>Keyboard shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Link to this heading"></a></h3>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 27%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Shortcut</p></th>
 <th class="head"><p>Action</p></th>

@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL mode for GNU/Emacs &mdash; superbol-studio-oss master
- (922588f
-) (2024/12/18 14:40) documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+ (767e0a3
+) (2025/01/17 11:16) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6ec657c1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -28,16 +31,20 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> superbol-studio-oss
+
+          
+          
+          <a href="index.html">
+            
           </a>
               <div class="version">
                 master
- (922588f
+ (767e0a3
 )
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -88,8 +95,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>SuperBOL mode for GNU/Emacs</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SuperBOL mode for GNU/Emacs</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/emacs.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -100,12 +107,12 @@
            <div itemprop="articleBody">
              
   <section id="superbol-mode-for-gnu-emacs">
-<h1>SuperBOL mode for GNU/Emacs<a class="headerlink" href="#superbol-mode-for-gnu-emacs" title="Permalink to this headline"></a></h1>
+<h1>SuperBOL mode for GNU/Emacs<a class="headerlink" href="#superbol-mode-for-gnu-emacs" title="Link to this heading"></a></h1>
 <p>We provide an extension of the <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> of ELPA under the
 name <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> that provides some fixes and run
 with our LSP server for COBOL.</p>
 <section id="standard-file-cobol-superbol-mode-el">
-<h2>Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code><a class="headerlink" href="#standard-file-cobol-superbol-mode-el" title="Permalink to this headline"></a></h2>
+<h2>Standard file <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code><a class="headerlink" href="#standard-file-cobol-superbol-mode-el" title="Link to this heading"></a></h2>
 <p>We provide <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> as a fork of
 <code class="code docutils literal notranslate"><span class="pre">cobol-mode.el</span></code> from ELPA, with a few fixes:</p>
 <ul class="simple">
@@ -114,7 +121,7 @@ with our LSP server for COBOL.</p>
 <li><p>Documentation accessible from the COBOL menu</p></li>
 </ul>
 <section id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h3>
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h3>
 <p>If you are already using the Cobol mode by ELPA, you need to
 desinstall it. For that, use <cite>M-x list-packages</cite>, go to <cite>cobol-mode</cite>,
 type <cite>D</cite> to select it for deletion, and then <cite>x</cite> to execute the
@@ -148,7 +155,7 @@ format. If you want to change the source format, you will need to
 change this option using <code class="code docutils literal notranslate"><span class="pre">M-x</span> <span class="pre">customize</span></code>, save and then restart emacs.</p>
 </section>
 <section id="features">
-<h3>Features<a class="headerlink" href="#features" title="Permalink to this headline"></a></h3>
+<h3>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h3>
 <p>The <code class="code docutils literal notranslate"><span class="pre">cobol-superbol-mode.el</span></code> provides the following features:</p>
 <ul class="simple">
 <li><p>colorization</p></li>
@@ -166,7 +173,7 @@ change this option using <code class="code docutils literal notranslate"><span c
 </ul>
 </section>
 <section id="customization">
-<h3>Customization<a class="headerlink" href="#customization" title="Permalink to this headline"></a></h3>
+<h3>Customization<a class="headerlink" href="#customization" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>cobol-skeleton-alist (check the <cite>cobol–def-skeleton</cite> function)</p></li>
 </ul>
@@ -176,14 +183,14 @@ complete).</p>
 </section>
 </section>
 <section id="superbol-mode-with-lsp">
-<h2>Superbol-mode with LSP<a class="headerlink" href="#superbol-mode-with-lsp" title="Permalink to this headline"></a></h2>
+<h2>Superbol-mode with LSP<a class="headerlink" href="#superbol-mode-with-lsp" title="Link to this heading"></a></h2>
 <p>The new Superbol-mode provides an IDE that makes use of the SuperBOL
 LSP to provide advanced navigation and editing facilities for COBOL
 projects.  It can be used in combination with any of the two main LSP
 clients that exist within the GNU/Emacs ecosystem to interact with LSP
 servers: <cite>lsp-mode</cite> and <cite>eglot</cite>.</p>
 <section id="superbol-mode-with-lsp-mode">
-<h3>Superbol-mode with <cite>lsp-mode</cite><a class="headerlink" href="#superbol-mode-with-lsp-mode" title="Permalink to this headline"></a></h3>
+<h3>Superbol-mode with <cite>lsp-mode</cite><a class="headerlink" href="#superbol-mode-with-lsp-mode" title="Link to this heading"></a></h3>
 <p><a class="reference external" href="https://github.com/emacs-lsp/lsp-mode">lsp-mode</a> appears to be the most prominent at the moment.  This
 client benefits from a large user-base, but is also considered
 “bloated” by some.</p>
@@ -195,55 +202,56 @@ highlighting can drastically improve code readability of various
 source code elements based on their syntactic location;</p>
 </section>
 <section id="superbol-mode-with-eglot">
-<h3>Superbol-mode with <cite>eglot</cite><a class="headerlink" href="#superbol-mode-with-eglot" title="Permalink to this headline"></a></h3>
+<h3>Superbol-mode with <cite>eglot</cite><a class="headerlink" href="#superbol-mode-with-eglot" title="Link to this heading"></a></h3>
 <p>Another possibility is to use <a class="reference external" href="https://elpa.gnu.org/packages/eglot.html">eglot</a>, that is sometimes considered
 easier to configure and more lightweight than <cite>lsp-mode</cite> (which
 notably makes it more reactive to user inputs).  Being more recent, it
 lacks some of the features of <cite>lsp-mode</cite>, among which is the support
-for semantic tokens <a class="footnote-reference brackets" href="#eglot-semtok-issue" id="id1">1</a>.  However, additionally
+for semantic tokens <a class="footnote-reference brackets" href="#eglot-semtok-issue" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.  However, additionally
 enabling the aforementioned <cite>cobol-mode.el</cite> provides reasonable syntax
 highlighting.</p>
 </section>
 <section id="setup">
-<h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline"></a></h3>
+<h3>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h3>
 <p>Let us first define an environment variable that indicates where the
 <code class="docutils literal notranslate"><span class="pre">superbol-free</span></code> executable can be found.  Additionally, define a
 variable that points to the root of the source directory for the
 extension:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">SUPERBOL_DIR</span><span class="o">=</span><span class="s2">&quot;&lt;directory where superbol-free can be found&gt;&quot;</span><span class="p">;</span>
-<span class="nb">export</span> <span class="nv">SUPERBOL_STUDIO_OSS_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="p">;</span>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">SUPERBOL_DIR</span><span class="o">=</span><span class="s2">&quot;&lt;directory where superbol-free can be found&gt;&quot;</span><span class="p">;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">SUPERBOL_STUDIO_OSS_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$PWD</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>After this, the following command launches a GNU/Emacs instance with
 an <cite>lsp-mode</cite>-based client configured for COBOL files:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
-      --load lsp-superbol <span class="se">\</span>
-      --eval <span class="s2">&quot;(custom-set-variables &#39;(lsp-superbol-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;))&quot;</span> <span class="se">\</span>
-      --funcall superbol-mode-enable-for-default-extensions
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--load<span class="w"> </span>lsp-superbol<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--eval<span class="w"> </span><span class="s2">&quot;(custom-set-variables &#39;(lsp-superbol-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;))&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--funcall<span class="w"> </span>superbol-mode-enable-for-default-extensions
 </pre></div>
 </div>
 <p>To use <cite>eglot</cite>, type the following instead:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs -L <span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span> <span class="se">\</span>
-      --load eglot-superbol <span class="se">\</span>
-      --eval <span class="s2">&quot;(add-to-list &#39;exec-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;)&quot;</span> <span class="se">\</span>
-      --funcall superbol-mode-enable-for-default-extensions
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>emacs<span class="w"> </span>-L<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SUPERBOL_STUDIO_OSS_DIR</span><span class="s2">/emacs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--load<span class="w"> </span>eglot-superbol<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--eval<span class="w"> </span><span class="s2">&quot;(add-to-list &#39;exec-path \&quot;</span><span class="nv">$SUPERBOL_DIR</span><span class="s2">\&quot;)&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>--funcall<span class="w"> </span>superbol-mode-enable-for-default-extensions
 </pre></div>
 </div>
 </section>
 <section id="further-configuration-for-auto-indentation">
-<h3>Further configuration for auto-indentation:<a class="headerlink" href="#further-configuration-for-auto-indentation" title="Permalink to this headline"></a></h3>
+<h3>Further configuration for auto-indentation:<a class="headerlink" href="#further-configuration-for-auto-indentation" title="Link to this heading"></a></h3>
 <p><cite>lsp-mode</cite> provides a <code class="docutils literal notranslate"><span class="pre">lsp-format-region</span></code> function that may be used
 to use the LSP-provided intentation.  When using <cite>eglot</cite>, the same
 functionality is provided by <code class="docutils literal notranslate"><span class="pre">eglot-format</span></code>.</p>
-<dl class="footnote brackets">
-<dt class="label" id="eglot-semtok-issue"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>Note there is a pending issue on this point
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="eglot-semtok-issue" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Note there is a pending issue on this point
 at <a class="reference external" href="https://github.com/joaotavora/eglot/issues/615">https://github.com/joaotavora/eglot/issues/615</a> .</p>
-</dd>
-</dl>
+</aside>
+</aside>
 </section>
 <section id="known-issues">
-<h3>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline"></a></h3>
+<h3>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><cite>void-function -compose</cite>: install the <cite>dash</cite> package on ELPA</p></li>
 <li><p>Install <cite>yasnippet</cite> ?</p></li>

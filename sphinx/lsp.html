@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SuperBOL LSP Server &mdash; superbol-studio-oss master
- (922588f
-) (2024/12/18 14:40) documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/fixes.css" type="text/css" />
+ (767e0a3
+) (2025/01/17 11:16) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=6ec657c1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -28,16 +31,20 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> superbol-studio-oss
+
+          
+          
+          <a href="index.html">
+            
           </a>
               <div class="version">
                 master
- (922588f
+ (767e0a3
 )
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -87,8 +94,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>SuperBOL LSP Server</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SuperBOL LSP Server</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/lsp.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,11 +106,11 @@
            <div itemprop="articleBody">
              
   <section id="superbol-lsp-server">
-<h1>SuperBOL LSP Server<a class="headerlink" href="#superbol-lsp-server" title="Permalink to this headline"></a></h1>
+<h1>SuperBOL LSP Server<a class="headerlink" href="#superbol-lsp-server" title="Link to this heading"></a></h1>
 <p><em>SuperBOL</em> provides an LSP server for COBOL. Every dialect supported by superbol is supported by the LSP server.</p>
 <p>The server operates on the notion of <em>projects</em>, that bundle COBOL source files within a <em>root directory</em>, along with a configuration.</p>
 <section id="project-layout">
-<h2>Project layout<a class="headerlink" href="#project-layout" title="Permalink to this headline"></a></h2>
+<h2>Project layout<a class="headerlink" href="#project-layout" title="Link to this heading"></a></h2>
 <p>A project layout associates a configuration given in a file named <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> that is located at the root of the project, with a set of files that contain COBOL source code.  A typical structure for a project may look as follows:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project
 ├── superbol.toml
@@ -124,7 +131,7 @@
 </div>
 </section>
 <section id="project-configuration">
-<h2>Project configuration<a class="headerlink" href="#project-configuration" title="Permalink to this headline"></a></h2>
+<h2>Project configuration<a class="headerlink" href="#project-configuration" title="Link to this heading"></a></h2>
 <p>The <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> at the root of a project is a <a class="reference external" href="https://toml.io/">TOML</a> file with a <code class="code docutils literal notranslate"><span class="pre">[cobol]</span></code> secton that defines the following configuration fields for the project:</p>
 <ul>
 <li><p><code class="code docutils literal notranslate"><span class="pre">dialect</span></code>: Sets the dialect for your project.  Case insensitive. Possible values are:</p>
@@ -169,7 +176,7 @@
 <p>The <code class="code docutils literal notranslate"><span class="pre">superbol-free</span> <span class="pre">project</span> <span class="pre">init</span></code> command enables you to automatically create a <code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code> file with the default configuration.  You can append a directory argument to indicate where the file should be placed; otherwise, the file is created in the current working directory.</p>
 </div>
 <section id="example-configuration">
-<h3>Example configuration<a class="headerlink" href="#example-configuration" title="Permalink to this headline"></a></h3>
+<h3>Example configuration<a class="headerlink" href="#example-configuration" title="Link to this heading"></a></h3>
 <p>Consider the following project layout:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>project
 ├── superbol.toml
@@ -188,17 +195,17 @@
 </div>
 <p>Then you can provide the following configuration file:</p>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text"><code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code></span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[cobol]</span><span class="w"></span>
-<span class="n">dialect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GCOS&quot;</span><span class="w"></span>
-<span class="n">source-format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;COBOLX&quot;</span><span class="w"></span>
+<div class="code-block-caption"><span class="caption-text"><code class="file docutils literal notranslate"><span class="pre">superbol.toml</span></code></span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[cobol]</span>
+<span class="n">dialect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;GCOS&quot;</span>
+<span class="n">source-format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;COBOLX&quot;</span>
 
-<span class="k">[[cobol.copybook]]</span><span class="w"></span>
-<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;GLOBAL_COPYBOOKS&quot;</span><span class="w"></span>
+<span class="k">[[cobol.copybook]]</span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;GLOBAL_COPYBOOKS&quot;</span>
 
-<span class="k">[[cobol.copybook]]</span><span class="w"></span>
-<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;LOCAL_COPYBOOKS&quot;</span><span class="w"></span>
-<span class="n">file-relative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="k">[[cobol.copybook]]</span>
+<span class="n">dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;LOCAL_COPYBOOKS&quot;</span>
+<span class="n">file-relative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
 </pre></div>
 </div>
 </div>
@@ -208,31 +215,31 @@ Furthermore, a <code class="code docutils literal notranslate"><span class="pre"
 </section>
 </section>
 <section id="server-capabilities">
-<h2>Server capabilities<a class="headerlink" href="#server-capabilities" title="Permalink to this headline"></a></h2>
+<h2>Server capabilities<a class="headerlink" href="#server-capabilities" title="Link to this heading"></a></h2>
 <p>This is a list the LSP server’s capabilities.  To see how they are used in VSCode, you
 can check <a class="reference internal" href="vscode-extension.html#superbol-vscode-features"><span class="std std-ref">SuperBOL extension features</span></a>.</p>
 <section id="go-to-definition">
-<h3>Go to definition<a class="headerlink" href="#go-to-definition" title="Permalink to this headline"></a></h3>
+<h3>Go to definition<a class="headerlink" href="#go-to-definition" title="Link to this heading"></a></h3>
 <p>The server handles the <code class="code docutils literal notranslate"><span class="pre">textDocument/definition</span></code> request, and can find definition of any
 data item in your code.</p>
 </section>
 <section id="find-references">
-<h3>Find references<a class="headerlink" href="#find-references" title="Permalink to this headline"></a></h3>
+<h3>Find references<a class="headerlink" href="#find-references" title="Link to this heading"></a></h3>
 <p>The server can list all the references to a data item in your code with the <code class="code docutils literal notranslate"><span class="pre">textDocument/references</span></code>
 request</p>
 </section>
 <section id="code-formatting">
-<h3>Code formatting<a class="headerlink" href="#code-formatting" title="Permalink to this headline"></a></h3>
+<h3>Code formatting<a class="headerlink" href="#code-formatting" title="Link to this heading"></a></h3>
 <p>The server provides a formatter both for the full file or for a selection range. This formatter handles
 the <code class="code docutils literal notranslate"><span class="pre">FIXED</span></code> and <code class="code docutils literal notranslate"><span class="pre">FREE</span></code> format.</p>
 </section>
 <section id="hover">
-<h3>Hover<a class="headerlink" href="#hover" title="Permalink to this headline"></a></h3>
+<h3>Hover<a class="headerlink" href="#hover" title="Link to this heading"></a></h3>
 <p>The server provides a way to peek into copybooks via the <code class="code docutils literal notranslate"><span class="pre">textDocument/hover</span></code> request (more
 hovering features to come)</p>
 </section>
 <section id="semantic-tokens">
-<h3>Semantic tokens<a class="headerlink" href="#semantic-tokens" title="Permalink to this headline"></a></h3>
+<h3>Semantic tokens<a class="headerlink" href="#semantic-tokens" title="Link to this heading"></a></h3>
 <p>The server can provide semantic tokens data via the <code class="code docutils literal notranslate"><span class="pre">textDocument/semanticTokens/full</span></code> request.</p>
 </section>
 </section>
