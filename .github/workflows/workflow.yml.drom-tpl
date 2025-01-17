@@ -45,11 +45,10 @@ jobs:
 #            v2-${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
-        uses: avsm/setup-ocaml@v2
+        uses: avsm/setup-ocaml@v3
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-pin: false
-          opam-depext: false
 
       - name: Set git user
         run: |
