@@ -37,13 +37,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Retrieve opam cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: cache-opam
         with:
           path: ~/.opam
-          key: v2-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
-#          restore-keys: |
-#            v2-${{ runner.os }}-opam-${{ matrix.ocaml-compiler }}-
+          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
