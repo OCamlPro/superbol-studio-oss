@@ -155,7 +155,7 @@ let ignore_promise_result: 'a promise * t -> t = fun after ->
   perform (fun _ registry -> registry) ~after
 
 
-let on_response id response
+let on_client_response id response
     ({ pending_tasks = { delayed; _ }; _ } as registry) =
   try                                      (* TODO: handle malformed response *)
     let Sink { request; f } = IMap.find id delayed in
@@ -183,6 +183,12 @@ let on_response id response
   with Not_found ->
     Lsp_io.log_error "Response@ with@ unkown@ ID@ %d@ received" id;
     registry
+
+
+let on_client_error id ({ pending_tasks = { delayed; _ }; _ } as registry) =
+  { registry with
+    pending_tasks = { registry.pending_tasks with
+                      delayed = IMap.remove id delayed } }
 
 
 (** {2 Handling of diagnostics for non-opened documents} *)

@@ -96,8 +96,11 @@ val find_document
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t
 
-val on_response
+val on_client_response
   : int -> Lsp.Import.Json.t -> t -> t
+
+val on_client_error
+  : int -> t -> t
 
 val on_client_config_changes
   : ?changes:Yojson.Safe.t -> t -> t
