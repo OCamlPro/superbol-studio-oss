@@ -10,7 +10,7 @@ d369e2949d85dee79233d322ce6f7587:.
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-225f4c9dec0def7b46e5d3bc522e7dc7:.github/workflows/workflow.yml
+a51f7ccbbef51f78cc2ad9827220c722:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -285,7 +285,7 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 
 # begin context for sphinx/license.rst
 # file sphinx/license.rst
-13af61ba0b28e7fcb749a0c3b34e2322:sphinx/license.rst
+1a550d0faec617a46b3852b8104c5509:sphinx/license.rst
 # end context for sphinx/license.rst
 
 # begin context for src/lsp/cobol_cfg/dune
