@@ -47,9 +47,9 @@ endif
 YARN = npx --yes yarn 
 
 VSCE_ARGS = --yarn -t $(TARGET_SPEC)
-VSCE_PACKAGE_ARGS ?= --pre-release
-VSCE_PUBLISH_ARGS ?= --pre-release
-OVSX_PUBLISH_ARGS ?= --pre-release
+VSCE_PACKAGE_ARGS ?=
+VSCE_PUBLISH_ARGS ?=
+OVSX_PUBLISH_ARGS ?=
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
