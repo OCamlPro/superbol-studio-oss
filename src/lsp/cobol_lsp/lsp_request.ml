@@ -45,6 +45,15 @@ let try_with_main_document_data ~f =
 
 (** {3 Initialization} *)
 
+let log_initialization_info () =
+  Lsp_io.log_info "Initializing SuperBOL LSP Server";
+  match Version.commit_hash, Version.commit_date with
+  | None, _ | _, None ->
+      Lsp_io.log_info "Version: %s" Version.version
+  | Some h, Some d ->
+      Lsp_io.log_info "Commit: %s (%s)" h d;
+      Lsp_io.log_info "Version tag: %s" Version.version
+
 let initialize ~config (params: InitializeParams.t) =
   let root_uri = match params.rootUri with
     | None -> None
@@ -54,8 +63,9 @@ let initialize ~config (params: InitializeParams.t) =
     | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
     | _ -> Option.to_list root_uri
   in
-  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a"
-    Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
+  log_initialization_info ();
+  Lsp_io.log_info "Initial workspace folders: %a"
+    Pretty.(list ~fopen:"" ~fclose:"" string)
     (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
   let capabilities = Lsp_capabilities.reply params.capabilities in
   let with_semantic_tokens =
