@@ -21,11 +21,14 @@ jobs:
           - 4.14.1
         skip_test:
           - false
+        build_vsix:
+          - true
 
         include:
           - os: ubuntu-latest
             ocaml-compiler: 4.14.0
             skip_test: true
+            build_vsix: false
 
 
     runs-on: ${{ matrix.os }}
@@ -41,7 +44,7 @@ jobs:
         id: cache-opam
         with:
           path: ~/.opam
-          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
+          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
@@ -57,53 +60,75 @@ jobs:
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 
       - run: opam pin add . -y --no-action
+        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
 
-      - run: opam depext -y superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_ast sql_parser cobol_cfg
-#        if: steps.cache-opam.outputs.cache-hit != 'true'
+#     - run: opam depext -y superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_ast sql_parser cobol_cfg
+#        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
 
-      - run: opam install -y opam/*.opam --deps-only --with-test
-#        if: steps.cache-opam.outputs.cache-hit != 'true'
+      - run: |
+          if ${{ matrix.skip_test }}
+          then opam install -y opam/*.opam --deps-only
+          else opam install -y opam/*.opam --deps-only --with-test
+          fi
+        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
+        name: Run opam install -y opam/*.opam --deps-only [ --with-test ]
 
 #     - run: opam upgrade --fixup
-#        if: steps.cache-opam.outputs.cache-hit == 'true'
+#        if: steps.cache-opam.outputs.cache-hit
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh 
         if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
-
       - run: git submodule init
 
       - run: git submodule update
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+        if: matrix.build_vsix
 
 
       - run: make build
 
       # Use fields.github-workflow-after-build to add something here
-      - name: check package.json
-        run: make check-package.json
+      - run: make check-package.json
 
-      - name: install test dependencies
-        if: matrix.skip_test  != 'true'
-        run: make dev-deps
+      - run: make dev-deps # install test dependencies
+        if: ${{ ! matrix.skip_test }}
 
-      - name: run test suite
-        run: make test
-        if: matrix.skip_test  != 'true'
+      - run: make test
+        if: ${{ ! matrix.skip_test }}
 
-      - name: show test result on failure
+      - name: Show test result on failure
         if: failure()
         run: cat _build/_autofonce/results.log
 
       # Use fields.github-workflow-after-test to add something here
+      - run: yarn install && npm install esbuild
+        if: matrix.build_vsix
 
-      - name: test source is well formatted
-        run: make fmt
-        continue-on-error: true
-        if: matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
+      - run: make vsix-debug
+        if: matrix.build_vsix
 
-      - name: build-doc
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-${{ matrix.os }}
+          path: superbol-vscode-platform-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: matrix.build_vsix
+
+      # - name: Check whether source is well formatted
+      #   run: make fmt
+      #   continue-on-error: true
+      #   if: matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
+
+      - name: Build documentation
         if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
         run: |
              sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme
@@ -113,7 +138,7 @@ jobs:
              touch _drom/docs/sphinx/.nojekyll
              touch _drom/docs/doc/.nojekyll
 
-      - name: deploy-doc
+      - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@3.6.2
         if: github.ref == 'refs/heads/master' && matrix.ocaml-compiler == '4.14.1' && matrix.os == 'ubuntu-latest'
         with:

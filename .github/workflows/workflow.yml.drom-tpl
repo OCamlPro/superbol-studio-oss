@@ -20,11 +20,14 @@ jobs:
           - !{edition}
         skip_test:
           - false
+        build_vsix:
+          - true
 ![if:min-edition]
         include:
           - os: !{ci-first-system}
             ocaml-compiler: !{min-edition}
             skip_test: true
+            build_vsix: false
 ![fi]
 
     runs-on: ${{ matrix.os }}
@@ -40,7 +43,7 @@ jobs:
         id: cache-opam
         with:
           path: ~/.opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}
+          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
@@ -61,15 +64,21 @@ jobs:
 
 ![fi]
       - run: opam pin add . -y --no-action
+        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
 
-      - run: opam depext -y !{packages}
-#        if: steps.cache-opam.outputs.cache-hit != 'true'
+#     - run: opam depext -y !{packages}
+#        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
 
-      - run: opam install -y opam/*.opam --deps-only --with-test
-#        if: steps.cache-opam.outputs.cache-hit != 'true'
+      - run: |
+          if ${{ matrix.skip_test }}
+          then opam install -y opam/*.opam --deps-only
+          else opam install -y opam/*.opam --deps-only --with-test
+          fi
+        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
+        name: Run opam install -y opam/*.opam --deps-only [ --with-test ]
 
 #     - run: opam upgrade --fixup
-#        if: steps.cache-opam.outputs.cache-hit == 'true'
+#        if: steps.cache-opam.outputs.cache-hit
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh !(build-scripts)
@@ -81,22 +90,21 @@ jobs:
 
       # Use fields.github-workflow-after-build to add something here
 !(github-workflow-after-build)
-      - name: run test suite
-        run: make test
-        if: matrix.skip_test  != 'true'
+      - run: make test
+        if: ${{ ! matrix.skip_test }}
 
-      - name: show test result on failure
+      - name: Show test result on failure
         if: failure()
         run: cat _build/_autofonce/results.log
 
       # Use fields.github-workflow-after-test to add something here
 !(github-workflow-after-test)
-      - name: test source is well formatted
-        run: make fmt
-        continue-on-error: true
-        if: matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
+      # - name: Check whether source is well formatted
+      #   run: make fmt
+      #   continue-on-error: true
+      #   if: matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
 
-      - name: build-doc
+      - name: Build documentation
         if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
         run: |
              sudo apt install -yqq python3-sphinx python3-sphinx-rtd-theme
@@ -106,7 +114,7 @@ jobs:
              touch _drom/docs/!{sphinx-target}/.nojekyll
              touch _drom/docs/!{odoc-target}/.nojekyll
 
-      - name: deploy-doc
+      - name: Deploy documentation
         uses: JamesIves/github-pages-deploy-action@3.6.2
         if: github.ref == 'refs/heads/!(git-main-branch:default:master)' && matrix.ocaml-compiler == '!{edition}' && matrix.os == '!{ci-first-system}'
         with:

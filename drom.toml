@@ -87,23 +87,42 @@ ATTIC
 /emacs/lsp-superbol-customs.el
 """
 github-workflow-before-build = """
-
       - run: git submodule init
 
       - run: git submodule update
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+        if: matrix.build_vsix
 
 """
 
 # NB: a `before-tests` field would make more sense here.
 github-workflow-after-build = """
-      - name: check package.json
-        run: make check-package.json
+      - run: make check-package.json
 
-      - name: install test dependencies
-        if: matrix.skip_test  != 'true'
-        run: make dev-deps
+      - run: make dev-deps # install test dependencies
+        if: ${{ ! matrix.skip_test }}
 """
 
+github-workflow-after-test = """
+      - run: yarn install && npm install esbuild
+        if: matrix.build_vsix
+
+      - run: make vsix-debug
+        if: matrix.build_vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-${{ matrix.os }}
+          path: superbol-vscode-platform-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: matrix.build_vsix
+"""
 
 [[package]]
 dir = "src/superbol-studio-oss"
