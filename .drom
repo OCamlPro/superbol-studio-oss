@@ -5,12 +5,12 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-c82f21b36b6a69519d1a7931677b6f3b:.
+2a04d205937f6730009378ae9652f014:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-b1e0fa1a1ac8c07b3167ea4bee36db02:.github/workflows/workflow.yml
+c8394c99add62eff7b848191186e90fe:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
@@ -25,7 +25,7 @@ b1e0fa1a1ac8c07b3167ea4bee36db02:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-53e82ff2391c1529bd29cb25dec75aac:Makefile
+47a1f06175119e41d07c168651c1a645:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -70,12 +70,12 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune
 # file dune
-0d57afa9756f983af2551804954af609:dune
+0f196603ba1d505a9fa4e542bd6df3ea:dune
 # end context for dune
 
 # begin context for dune-project
 # file dune-project
-b31bfdac90731aba7623d6bace37737f:dune-project
+4edb90ed72cb3d9d9143678413f825e9:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam

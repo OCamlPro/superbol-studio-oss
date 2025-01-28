@@ -123,6 +123,17 @@ jobs:
           compression-level: 0 # no compression (already a zip archive)
         if: matrix.build_vsix
 
+      - run: make vsix-debug TARGET_PLAT=universal
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
+      - name: Upload universal VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-universal
+          path: superbol-vscode-platform-*-universal-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
       # - name: Check whether source is well formatted
       #   run: make fmt
       #   continue-on-error: true
