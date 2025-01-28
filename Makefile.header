@@ -172,7 +172,7 @@ vsix-dist-setup:
 
 vsix-package: gnucobol-config
 #	needs 'make build-debug' or 'make build-release' before
-	rm -f _dist/superbol-free-*-*
+	rm -f _dist/superbol-free-*-* _dist/$(SUPERBOL_LSP)
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
 	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
