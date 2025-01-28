@@ -16,8 +16,6 @@ open EZCMD.TYPES
 
 
 let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage =
-  Cobol_lsp.INTERNAL.Debug.message "LSP Started with pid %d\n%!"
-    (Unix.getpid ());
   Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.INTERNAL.Debug.debug_oc;
 
   let project_layout, fallback_storage_directory =
@@ -39,6 +37,18 @@ let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage =
   | Ok () -> ()
   | Error exit_msg -> Pretty.error "%s@." exit_msg; exit 1
 
+let js_specific_args =
+  match Sys.backend_type with
+  | Other "js_of_ocaml" ->
+      let compat_info =
+        EZCMD.info "(Ignored, passed by Visual Studio Code to LSP servers that \
+                    are implemented as node modules)"
+      in
+      [ ["stdio"],           Arg.Bool   ignore, compat_info;
+        ["node-ipc"],        Arg.Bool   ignore, compat_info;
+        ["clientProcessId"], Arg.String ignore, compat_info ]
+  | Native | Bytecode | Other _ ->
+      []
 
 let cmd =
   let caching, caching_args =
@@ -55,7 +65,7 @@ let cmd =
          ~force_syntax_diagnostics:!syntax_diagnostics
          ~storage:!storage)
     ~doc:"run LSP server"
-    ~args: (caching_args @ syntax_diagnostics_args @ [
+    ~args: (caching_args @ syntax_diagnostics_args @ js_specific_args @ [
         ["storage-directory"], Arg.String (fun s -> storage := Some s),
         EZCMD.info ~docv:"DIR"
           "Directory under which to store cache data --- prevents the creation \
