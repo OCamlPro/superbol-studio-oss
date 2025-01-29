@@ -19,7 +19,7 @@ DUNE_BUILD_SRCDIR =							\
 
 # TARGET_PLAT is defined in Makefile
 TARGET_ARCH ?= x64
-ifeq ($(TARGET_PLAT),web)
+ifeq ($(TARGET_PLAT),universal)
   TARGET_SPEC = $(TARGET_PLAT)
 else
   TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
@@ -30,7 +30,7 @@ TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 
 DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
 SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
-ifeq ($(TARGET_PLAT),web)
+ifeq ($(TARGET_PLAT),universal)
   SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.bc.js
   SUPERBOL_LSP = superbol-free.js
 else
@@ -56,7 +56,7 @@ endif
 
 YARN = npx --yes yarn 
 
-VSCE_ARGS = --yarn -t $(TARGET_SPEC)
+VSCE_ARGS = --yarn $(if $(subst universal,,$(TARGET_PLAT)),-t $(TARGET_SPEC))
 VSCE_PACKAGE_ARGS ?=
 VSCE_PUBLISH_ARGS ?=
 OVSX_PUBLISH_ARGS ?=
@@ -73,8 +73,6 @@ all: superbol-lsp-server
 compile: superbol-lsp-server build-release
 package: vsix-package
 
-$(SUPERBOL_LSP_BUILT): build vsix-dist-setup
-
 superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
 # Only rebuild `package.json` when on Linux
 # TODO: maybe just check build platform matches target platform
@@ -89,9 +87,16 @@ ifeq ($(TARGET_PLAT),linux)
   endif
 endif				#linux
 
-.PHONY: check-package.json
-check-package.json:		#to be used after `build`
+ifeq ($(TARGET_PLAT),universal)
+  $(SUPERBOL_LSP_BUILT): vsix-dist-setup
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @install
+else				#platform-specific
+  $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
+
+  .PHONY: check-package.json
+  check-package.json:		#to be used after `build`
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
+endif
 
 .PHONY: build-debug yarn-debug
 
@@ -172,7 +177,7 @@ vsix-dist-setup:
 
 vsix-package: gnucobol-config
 #	needs 'make build-debug' or 'make build-release' before
-	rm -f _dist/superbol-free-*-* _dist/$(SUPERBOL_LSP)
+	rm -f _dist/superbol-free-*-* _dist/superbol-free.js
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
 	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\

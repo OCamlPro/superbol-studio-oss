@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "ppx_deriving_encoding-osx" {>= "0.3.0" & < "1.0.0"}
   "ezjsonm-osx" {}
   "ez_file-osx" {>= "0.3.0" & < "1.0.0"}

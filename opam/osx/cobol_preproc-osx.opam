@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "ppx_import-osx" {>= "1"}
   "ppx_deriving-osx" {>= "5.2.1"}
   "menhir-osx" {>= "1.2"}

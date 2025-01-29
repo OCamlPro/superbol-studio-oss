@@ -13,6 +13,9 @@
 
 open Lsp.Types
 
+let degraded =
+  Sys.backend_type = Other "js_of_ocaml"
+
 (* Client capabilities are to be used for special request response, for example
    a definition request can be answered with a LocationLink iff the client
    supports it.
@@ -29,11 +32,12 @@ let reply (_: ClientCapabilities.t) =
       SemanticTokensLegend.create
         ~tokenTypes:Lsp_semtoks.token_types
         ~tokenModifiers:Lsp_semtoks.token_modifiers
+    and full =
+      if degraded
+      then `Bool false
+      else `Full (SemanticTokensOptions.create_full ~delta:false ())
     in
-    SemanticTokensOptions.create ()
-      ~full:(`Full (SemanticTokensOptions.create_full ~delta:false ()))
-      ~range:true
-      ~legend
+    SemanticTokensOptions.create () ~full ~range:true ~legend
   and hover =
     HoverOptions.create ()
   and completion_option =

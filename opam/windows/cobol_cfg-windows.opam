@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "ocamlgraph-windows" {>= "2.1.0" & < "3.0.0"}
   "cobol_typeck-windows" {= version}
   "odoc" {with-doc}
