@@ -89,7 +89,7 @@ endif				#linux
 
 ifeq ($(TARGET_PLAT),universal)
   $(SUPERBOL_LSP_BUILT): vsix-dist-setup
-	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @install
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @build
 else				#platform-specific
   $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
 
@@ -141,7 +141,6 @@ yarn-release: _out/superbol-vscode-platform-bundle.js	\
                 --target=es6 \
                 --minify-whitespace \
                 --minify-syntax \
-                --sourcemap \
                 --sources-content=false
 
 # ---

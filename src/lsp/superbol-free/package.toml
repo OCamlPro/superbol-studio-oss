@@ -80,10 +80,16 @@ dune-trailer = """
 (env
  (universal (js_of_ocaml (enabled_if true)))
  (_         (js_of_ocaml (enabled_if false))))
-(install
- (section share)
- (package superbol-free)
- (files (glob_files *.bc.js)))
+
+(alias
+ (name build)
+ (deps (glob_files *.exe))
+ (enabled_if (<> %{profile} \"universal\")))
+
+(alias
+ (name build)
+ (deps (glob_files *.bc.js))
+ (enabled_if (= %{profile} \"universal\")))
 """
 static-macos-clibs = "zarith ${MACPORTS:-/usr/local/osxcross/macports/pkgs/opt/local}/lib/libgmp.a camlstr bigstringaf_stubs cstruct_stubs"
 static-alpine-clibs = "zarith gmp bigstringaf_stubs cstruct_stubs"

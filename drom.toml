@@ -147,10 +147,6 @@ dir = "src/vscode/superbol-vscode-platform"
 # edit 'src/vscode/superbol-vscode-platform/package.toml' for package-specific options
 
 [[package]]
-dir = "src/vendor/vscode-ocaml-platform/src-bindings/polka"
-# edit 'src/vscode/polka-js-stubs/package.toml' for package-specific options
-
-[[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/interop"
 # edit 'src/vscode/interop-js-stubs/package.toml' for package-specific options
 

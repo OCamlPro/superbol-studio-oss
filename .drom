@@ -5,17 +5,17 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-2a04d205937f6730009378ae9652f014:.
+bb11455b9f2433c568303f8f347a0c82:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-c8394c99add62eff7b848191186e90fe:.github/workflows/workflow.yml
+aad9973877fd2a2007a0edd3d2dd87cf:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .gitignore
 # file .gitignore
-51f9ea0869bc6b9d00819abfe13bfe0a:.gitignore
+5b8fd7d1edf09886753a0ef0c92081dd:.gitignore
 # end context for .gitignore
 
 # begin context for LICENSE.md
@@ -25,7 +25,7 @@ c8394c99add62eff7b848191186e90fe:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-47a1f06175119e41d07c168651c1a645:Makefile
+67eb19c27b881cd1c27aecd202f2efdd:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -75,7 +75,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-4edb90ed72cb3d9d9143678413f825e9:dune-project
+da0e98ac4e71d833b5bbdce4f40d9bff:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -160,7 +160,7 @@ cb948a72cf6228555625cdb5b317c231:opam/ezr_toml.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
-d747aeae15d92a2adca43bc2664ba385:opam/node-js-stubs.opam
+c047ab9de805e8c01ddac699852c118d:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
 # begin context for opam/polka-js-stubs.opam
@@ -200,7 +200,7 @@ e94ae927af0af6d70197ce963716a523:opam/superbol-free.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-6e88e35d7f14f7d4be09e0945858f174:opam/superbol-vscode-platform.opam
+a15400c98add45c2a553ef1295d66eec:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
@@ -220,12 +220,12 @@ fd5ee61241cf8358537814b090819d15:opam/superbol_project.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
-886d3edf43730c2ae2a982a39bde0c91:opam/vscode-debugadapter.opam
+8023e539c4ecae4ba3a69bc2dee25a1e:opam/vscode-debugadapter.opam
 # end context for opam/vscode-debugadapter.opam
 
 # begin context for opam/vscode-debugprotocol.opam
 # file opam/vscode-debugprotocol.opam
-ac1adf1dc863151ad7b040db515083b0:opam/vscode-debugprotocol.opam
+361b06189a917a880ec48b5ed1eae327:opam/vscode-debugprotocol.opam
 # end context for opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-js-stubs.opam
@@ -470,7 +470,7 @@ c222bcf238c7b0cd7c910fc5ec8e2dcd:src/lsp/sql_parser/dune
 
 # begin context for src/lsp/superbol-free/dune
 # file src/lsp/superbol-free/dune
-721b224aabeca41a8b5737de973df655:src/lsp/superbol-free/dune
+9c95b61a5d9a0eef714e570b97050004:src/lsp/superbol-free/dune
 # end context for src/lsp/superbol-free/dune
 
 # begin context for src/lsp/superbol-free/linking_flags.sh
@@ -545,23 +545,13 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/node/dune
-38cc9d96ddb1981744e3ccc33a974d5a:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
+1ca558040c049a3ba0e5f97570d7f993:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 # file src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 3b5d23165644aee0c651353e188a647f:src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
-
-# begin context for src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
-# file src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
-35cfe02c249a09237f452bc126cfe703:src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
-# end context for src/vendor/vscode-ocaml-platform/src-bindings/polka/dune
-
-# begin context for src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
-# file src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
-3b5d23165644aee0c651353e188a647f:src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
-# end context for src/vendor/vscode-ocaml-platform/src-bindings/polka/version.mlt
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
@@ -585,7 +575,7 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-664342638a68e3f2f79d39343772e32f:src/vscode/superbol-vscode-platform/dune
+b86fb500c6d426b59c311bb6655e6916:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt
@@ -595,7 +585,7 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vscode/vscode-debugadapter/dune
 # file src/vscode/vscode-debugadapter/dune
-95d8c6a4d92e07ecf1c81ba45560bc3a:src/vscode/vscode-debugadapter/dune
+330735d078b86256c242f86e7fe30bd2:src/vscode/vscode-debugadapter/dune
 # end context for src/vscode/vscode-debugadapter/dune
 
 # begin context for src/vscode/vscode-debugadapter/version.mlt
@@ -605,7 +595,7 @@ c5cd7b2d0a3de0d33ec14e3d433c1cae:src/vendor/ez_toml/index.mld
 
 # begin context for src/vscode/vscode-debugprotocol/dune
 # file src/vscode/vscode-debugprotocol/dune
-592b86dca8fd4200e8550eae713517e3:src/vscode/vscode-debugprotocol/dune
+4fd582a4b944e0a80d793fd95f2123d8:src/vscode/vscode-debugprotocol/dune
 # end context for src/vscode/vscode-debugprotocol/dune
 
 # begin context for src/vscode/vscode-debugprotocol/version.mlt
