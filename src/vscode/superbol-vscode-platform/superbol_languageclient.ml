@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2023-2025 OCamlPro SAS                                  *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -20,39 +20,57 @@ type server_access =
 
 
 (* Helpers to find the bundled superbol executable *)
-let rec find_existing = function
-  | [] -> raise Not_found
-  | uri :: uris ->
-    if Node.Fs.existsSync (Vscode.Uri.fsPath uri) then uri
-    else find_existing uris
-
+let find_existing_in ~root_uri : (([<`exe | `js] * string) as 'a) list -> 'a =
+  let actual_uri = function
+    | `exe, exe_name when Node.Process.platform = "win32" ->
+        Vscode.Uri.joinPath root_uri ~pathSegments:[exe_name ^ ".exe"]
+    | `exe, exe_name ->
+        Vscode.Uri.joinPath root_uri ~pathSegments:[exe_name]
+    | `js, js_name ->
+        Vscode.Uri.joinPath root_uri ~pathSegments:[js_name]
+  in
+  let rec aux = function
+    | [] ->
+        raise Not_found
+    | (kind, _) as next_candidate :: remaining_candidates ->
+        let uri = actual_uri next_candidate in
+        let path = Vscode.Uri.fsPath uri in
+        if Node.Fs.existsSync path
+        then kind, path
+        else aux remaining_candidates
+  in
+  aux
 
 (* Look for the most specific `superbol-free` executable amongst (in order):
 
-  - `superbol-free-${platform}-${arch}${suffix}`
-  - `superbol-free-${platform}${suffix}`
-  - `superbol-free${suffix}`
+   - `superbol-free-${platform}-${arch}${suffix}`
+   - `superbol-free-${platform}${suffix}`
+   - `superbol-free${suffix}`
+   - `superbol-free.js` (as fallback)
 
-  The `platform` and `arch` used are from the corresponding `process`
-  attributes in node.js. The `suffix` is `".exe"` on Windows, and empty
-  otherwise.
+   The `platform` and `arch` used are from the corresponding `process`
+   attributes in node.js. The `suffix` is `".exe"` on Windows, and empty
+   otherwise.
 
-  https://nodejs.org/api/process.html#processplatform
-  https://nodejs.org/api/process.html#processarch
+   https://nodejs.org/api/process.html#processplatform
+   https://nodejs.org/api/process.html#processarch
 *)
-let find_superbol root =
-  let open Node.Process in
+let find_superbol root_uri =
+  let platform = Node.Process.platform and arch = Node.Process.arch in
   let prefix = "superbol-free" in
-  let suffix = if platform == "win32" then ".exe" else "" in
-  Vscode.Uri.fsPath @@ find_existing @@ List.map (fun name ->
-    Vscode.Uri.joinPath root ~pathSegments:[name]) @@ [
-    Format.asprintf "%s-%s-%s%s" prefix platform arch suffix;
-    Format.asprintf "%s-%s%s" prefix platform suffix;
-    Format.asprintf "%s%s" prefix suffix
-  ] @ if platform = "darwin" && arch = "arm64" then
-    [ Format.sprintf "%s-%s-%s%s" prefix platform "x64" suffix]
-  else
-    []
+  let alt_arch_execs =
+    if platform = "darwin" && arch = "arm64"
+    then [ `exe, Format.asprintf "%s-%s-x64" prefix platform ]
+    else []
+  in
+  find_existing_in ~root_uri @@
+  [
+    `exe, Format.asprintf "%s-%s-%s" prefix platform arch;
+    `exe, Format.asprintf "%s-%s" prefix platform;
+  ] @ alt_arch_execs @ [
+    `exe, prefix;
+    `js, "superbol-free.js";
+  ]
 
 let scan_host_and_port url =
   let fail () = Format.ksprintf failwith "Invalid %S" url in
@@ -83,24 +101,23 @@ let server_command ~context ?cmd () =
     then Some (Vscode.ExtensionContext.globalStorageUri context)
     else None
   in
-  let command =
+  let server_kind, command =
     match cmd with
     | Some cmd ->
-        cmd
+        `exe, cmd
     | None ->
         try find_superbol (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
         with Not_found ->
           (* If there is no bundled executable for the current platform, fall
              back to looking for superbol-free in the PATH *)
-          "superbol-free"
+          `exe, "superbol-free"
   and fallback_config_dir =
     Vscode.Uri.fsPath @@
     Vscode.Uri.joinPath root_uri ~pathSegments:["gnucobol-config"]
   in
-  let options =
-    LSP.ExecutableOptions.create ()
-      ~env:(Interop.Dict.add "COB_CONFIG_DIR_FALLBACK" fallback_config_dir
-              Node.Process.Env.env)
+  let env =
+    Interop.Dict.add "COB_CONFIG_DIR_FALLBACK" fallback_config_dir
+      Node.Process.Env.env
   in
   let args =
     let force_diagnostics = Superbol_workspace.bool "forceSyntaxDiagnostics" in
@@ -110,7 +127,17 @@ let server_command ~context ?cmd () =
      | None -> []
      | Some uri -> ["--storage-directory"; Vscode.Uri.fsPath uri])
   in
-  Sub_process (LSP.ServerOptions.create ~options ~command ~args ())
+  let server_options =
+    match server_kind with
+    | `exe ->
+        `Executable (LSP.Executable.create () ~command ~args
+                       ~options:(LSP.ExecutableOptions.create ~env ()))
+    | `js ->
+        `NodeModule (LSP.NodeModule.create ()
+                       ~module_:command ~transport:`stdio ~args
+                       ~options:(LSP.ForkOptions.create ~env ()))
+  in
+  Sub_process server_options
 
 
 let server_access ~context =

@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "fmt-osx" {>= "0.9"}
   "cobol_config-osx" {= version}
   "odoc" {with-doc}

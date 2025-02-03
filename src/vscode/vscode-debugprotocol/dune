@@ -4,7 +4,7 @@
   (name debugProtocol)
   (public_name vscode-debugprotocol)
   (wrapped true)
-  (libraries promise_jsoo jsonoo js_of_ocaml interop-js-stubs gen_js_api )
+  (libraries js_of_ocaml interop-js-stubs gen_js_api )
   (modes byte)
   (preprocess (pps gen_js_api.ppx))
     (js_of_ocaml (javascript_files vscode_debugprotocol_stub.js))
