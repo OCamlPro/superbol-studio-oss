@@ -38,12 +38,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Retrieve opam cache
-        uses: actions/cache@v4
-        id: cache-opam
-        with:
-          path: ~/.opam
-          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
+      - name: Set git user
+        run: |
+          git config --global user.name github-actions
+          git config --global user.email github-actions-bot@users.noreply.github.com
 
       - name: Use OCaml ${{ matrix.ocaml-compiler }}
         uses: avsm/setup-ocaml@v3
@@ -51,10 +49,12 @@ jobs:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
           opam-pin: false
 
-      - name: Set git user
-        run: |
-          git config --global user.name github-actions
-          git config --global user.email github-actions-bot@users.noreply.github.com
+      - name: Retrieve cache of local opam switch
+        uses: actions/cache@v4
+        id: cache-opam
+        with:
+          path: _opam
+          key: v4-${{ runner.os }}-!{name}-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=!(opam-repo)
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 ![if:field:opam-repo]
@@ -64,21 +64,14 @@ jobs:
 
 ![fi]
       - run: opam pin add . -y --no-action
-        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
-
-#     - run: opam depext -y !{packages}
-#        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
 
       - run: |
           if ${{ matrix.skip_test }}
           then opam install -y opam/*.opam --deps-only
           else opam install -y opam/*.opam --deps-only --with-test
           fi
-        if: ${{ ! steps.cache-opam.outputs.cache-hit }}
+        if: steps.cache-opam.outputs.cache-hit != 'true'
         name: Run opam install -y opam/*.opam --deps-only [ --with-test ]
-
-#     - run: opam upgrade --fixup
-#        if: steps.cache-opam.outputs.cache-hit
 
       # Use fields.build-scripts to add more scripts to convert here
       - run: dos2unix scripts/*.sh !(build-scripts)
@@ -125,3 +118,10 @@ jobs:
 
 # Use fields.github-workflow-trailer to add a trailer here
 !(github-workflow-trailer)
+
+      - name: Cleanup local opam switch before caching
+        run: |
+          opam pin remove . --yes
+          opam clean --switch-cleanup --logs
+          find _opam -type f -a \( -name '*.cmt' -o -name '*.cmti' \) -delete
+        if: steps.cache-opam.outputs.cache-hit != 'true'
