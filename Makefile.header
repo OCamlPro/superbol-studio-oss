@@ -288,6 +288,7 @@ test-syntax-promote:
 
 MASTER_REMOTE ?= origin
 
+.PHONY: build-master
 build-master:
 	git checkout master
 	git checkout .
