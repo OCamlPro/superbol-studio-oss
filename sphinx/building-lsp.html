@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Building the LSP binary &mdash; superbol-studio-oss master
+ (1020167
+) (2025/05/22 12:49) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
+
+  
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=4d31a5a9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Sub-commands and Arguments" href="commands.html" />
+    <link rel="prev" title="SuperBOL VSCode Debug" href="debug.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                master
+ (1020167
+)
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Home</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About SuperBOL</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installing and building VSIX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installing-superbol-vsix.html">Installing the VSCode extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-vsix.html">Building the VSIX from Sources</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VSCode extension</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lsp.html">SuperBOL LSP Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode-extension.html">SuperBOL VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Building the LSP binary</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building the LSP binary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#you-don-t-know-opam">You don’t know <code class="code docutils literal notranslate"><span class="pre">opam</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#you-know-opam">You know <code class="code docutils literal notranslate"><span class="pre">opam</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extension for other editors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="emacs.html">SuperBOL mode for GNU/Emacs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vim.html">SuperBOL plugin for Vim/Neovim</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/doc">API doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-studio-oss">Sources and Issues on Github</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">superbol-studio-oss</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Building the LSP binary</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/building-lsp.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="building-the-lsp-binary">
+<h1>Building the LSP binary<a class="headerlink" href="#building-the-lsp-binary" title="Link to this heading"></a></h1>
+<section id="you-don-t-know-opam">
+<h2>You don’t know <code class="code docutils literal notranslate"><span class="pre">opam</span></code><a class="headerlink" href="#you-don-t-know-opam" title="Link to this heading"></a></h2>
+<p>The first thing you want to do is to install and initialize <code class="code docutils literal notranslate"><span class="pre">opam</span></code>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># install opam</span>
+bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;sh &lt;(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)&quot;</span>
+
+<span class="c1"># initialize opam</span>
+opam<span class="w"> </span>init
+</pre></div>
+</div>
+<p>Then you’ll need a switch with the good version of <code class="code docutils literal notranslate"><span class="pre">ocaml</span></code> to install
+SuperBOL with.</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>opam<span class="w"> </span>switch<span class="w"> </span>create<span class="w"> </span>superbol-studio<span class="w"> </span><span class="m">4</span>.14.1
+<span class="c1"># you can change the `superbol-studio` by any name you want, just replace it</span>
+<span class="c1"># in the following occurences</span>
+</pre></div>
+</div>
+<p>You can now check the next section (<a class="reference internal" href="#know-opam"><span class="std std-ref">You know opam</span></a>) to install the SuperBOL
+LSP on your system.</p>
+</section>
+<section id="you-know-opam">
+<span id="know-opam"></span><h2>You know <code class="code docutils literal notranslate"><span class="pre">opam</span></code><a class="headerlink" href="#you-know-opam" title="Link to this heading"></a></h2>
+<p>First you must clone the repo and install a dependency:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OCamlPro/superbol-studio-oss.git
+<span class="nb">cd</span><span class="w"> </span>superbol-studio-oss
+opam<span class="w"> </span>install<span class="w"> </span>drom<span class="w"> </span>-y
+</pre></div>
+</div>
+<p>Then you want to install SuperBOL (assuming the targeted install opam switch is
+<code class="code docutils literal notranslate"><span class="pre">superbol-studio</span></code>):</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>drom<span class="w"> </span>install<span class="w"> </span>--switch<span class="w"> </span>superbol-studio<span class="w"> </span>-y
+</pre></div>
+</div>
+<p>Once the command is done running, you can check if everything went well with</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>opam<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>--<span class="w"> </span>superbol-free<span class="w"> </span>--version
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="debug.html" class="btn btn-neutral float-left" title="SuperBOL VSCode Debug" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="commands.html" class="btn btn-neutral float-right" title="Sub-commands and Arguments" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright OCamlPro SAS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,6 +1,11 @@
 SuperBOL mode for GNU/Emacs
 ===========================
 
+.. warning::
+
+   You have to build the SuperBOL Studio binary first. See:
+   `How to build the SuperBOL Studio binary <building-lsp.html>`_.
+
 We provide an extension of the :code:`cobol-mode.el` of ELPA under the
 name :code:`cobol-superbol-mode.el` that provides some fixes and run
 with our LSP server for COBOL.

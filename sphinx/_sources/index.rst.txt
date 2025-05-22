@@ -8,21 +8,46 @@ Welcome to SuperBOL Studio OSS
 
 .. toctree::
    :maxdepth: 2
-   :caption: Documentation
+   :caption: Home
 
-   Home <https://ocamlpro.github.io/superbol-studio-oss/sphinx>
    about
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Installing and building VSIX
+
    installing-superbol-vsix
-   building-superbol
+   building-vsix
+
+.. toctree::
+   :maxdepth: 2
+   :caption: VSCode extension
+
    lsp
    vscode-extension
    debug
-   emacs
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Building the LSP binary
+
+   building-lsp
    commands
-   API doc <https://ocamlpro.github.io/superbol-studio-oss/doc>
-   license
    remote-lsp
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Extension for other editors
+
+   emacs
+   vim
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Other resources
+
+   API doc <https://ocamlpro.github.io/superbol-studio-oss/doc>
+   license
    Sources and Issues on Github <https://github.com/ocamlpro/superbol-studio-oss>
 
 

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SuperBOL plugin for Vim/Neovim &mdash; superbol-studio-oss master
+ (1020167
+) (2025/05/22 12:49) documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
+      <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
+
+  
+  
+        <script src="_static/jquery.js?v=8dae8fb0"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=4d31a5a9"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Copyright and License" href="license.html" />
+    <link rel="prev" title="SuperBOL mode for GNU/Emacs" href="emacs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+          </a>
+              <div class="version">
+                master
+ (1020167
+)
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Home</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About SuperBOL</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installing and building VSIX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installing-superbol-vsix.html">Installing the VSCode extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-vsix.html">Building the VSIX from Sources</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">VSCode extension</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lsp.html">SuperBOL LSP Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="vscode-extension.html">SuperBOL VSCode Extension</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">SuperBOL VSCode Debug</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Building the LSP binary</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="building-lsp.html">Building the LSP binary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">Sub-commands and Arguments</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extension for other editors</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="emacs.html">SuperBOL mode for GNU/Emacs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SuperBOL plugin for Vim/Neovim</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#install-for-vim">Install for Vim</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#coc">Coc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#vim-lsp">vim-lsp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-for-neovim">Install for Neovim</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Other resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://ocamlpro.github.io/superbol-studio-oss/doc">API doc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">Copyright and License</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/ocamlpro/superbol-studio-oss">Sources and Issues on Github</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">superbol-studio-oss</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SuperBOL plugin for Vim/Neovim</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/vim.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="superbol-plugin-for-vim-neovim">
+<h1>SuperBOL plugin for Vim/Neovim<a class="headerlink" href="#superbol-plugin-for-vim-neovim" title="Link to this heading"></a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You have to build the SuperBOL Studio binary first. See:
+<a class="reference external" href="building-lsp.html">How to build the SuperBOL Studio binary</a>.</p>
+</div>
+<section id="install-for-vim">
+<h2>Install for Vim<a class="headerlink" href="#install-for-vim" title="Link to this heading"></a></h2>
+<section id="coc">
+<h3>Coc<a class="headerlink" href="#coc" title="Link to this heading"></a></h3>
+<p>You can add the SuperBOL LSP to your <code class="code docutils literal notranslate"><span class="pre">coc</span></code> configuration:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;colors.enable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;languageserver&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;cobol&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;command&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;opam&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;args&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="s2">&quot;exec&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;--switch&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;superbol-studio&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;--&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;superbol-free&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;lsp&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="s2">&quot;--force-syntax-diagnostics&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;filetypes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;cobol&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you wish to use semantic highlighting with <code class="code docutils literal notranslate"><span class="pre">coc</span></code>, you  must add to the
+<code class="code docutils literal notranslate"><span class="pre">coc</span></code> configuration:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;semanticTokens.enable&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+</pre></div>
+</div>
+<p>and to your vim configuration:</p>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span><span class="k">au</span> <span class="nb">FileType</span> cobol <span class="k">setlocal</span> <span class="nb">syntax</span><span class="p">=</span>OFF
+</pre></div>
+</div>
+</section>
+<section id="vim-lsp">
+<h3>vim-lsp<a class="headerlink" href="#vim-lsp" title="Link to this heading"></a></h3>
+<p>To work with <code class="code docutils literal notranslate"><span class="pre">vim-lsp</span></code> you should add to your configuration:</p>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> executable<span class="p">(</span><span class="s1">&#39;opam&#39;</span><span class="p">)</span>
+    <span class="k">au</span> <span class="nb">User</span> lsp_setup <span class="k">call</span> <span class="nb">lsp</span>#register_server<span class="p">(</span>{
+        \ <span class="s1">&#39;name&#39;</span>: <span class="s1">&#39;superbol&#39;</span><span class="p">,</span>
+        \ <span class="s1">&#39;cmd&#39;</span>: {server_info<span class="p">-&gt;</span>[<span class="s1">&#39;opam&#39;</span><span class="p">,</span> <span class="s1">&#39;exec&#39;</span><span class="p">,</span> <span class="s1">&#39;--switch&#39;</span><span class="p">,</span> <span class="s1">&#39;superbol-studio&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;superbol-free&#39;</span><span class="p">,</span> <span class="s1">&#39;lsp&#39;</span><span class="p">,</span> <span class="s1">&#39;--force-syntax-diagnostics&#39;</span>]}<span class="p">,</span>
+        \ <span class="s1">&#39;allowlist&#39;</span>: [<span class="s1">&#39;cobol&#39;</span>]<span class="p">,</span>
+        \ }<span class="p">)</span>
+<span class="k">endif</span>
+</pre></div>
+</div>
+<p>If you want semantic highlighting to work with <code class="code docutils literal notranslate"><span class="pre">vim-lsp</span></code> you can add to
+your configuration:</p>
+<div class="highlight-vim notranslate"><div class="highlight"><pre><span></span><span class="k">let</span> <span class="k">g</span>:lsp_semantic_enabled <span class="p">=</span> <span class="m">1</span>
+<span class="k">au</span> <span class="nb">FileType</span> cobol <span class="k">setlocal</span> <span class="nb">syntax</span><span class="p">=</span>OFF
+</pre></div>
+</div>
+</section>
+</section>
+<section id="install-for-neovim">
+<h2>Install for Neovim<a class="headerlink" href="#install-for-neovim" title="Link to this heading"></a></h2>
+<p>You must have <code class="code docutils literal notranslate"><span class="pre">neovim/nvim-lspconfig</span></code> installed.</p>
+<p>Add these lines to your neovim configuration:</p>
+<div class="highlight-lua notranslate"><div class="highlight"><pre><span></span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig.configs&quot;</span><span class="p">).</span><span class="n">cobol</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s2">&quot;opam&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;exec&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;--switch&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;superbol-studio&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;--&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;superbol-free&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;lsp&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;--force-syntax-diagnostics&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">filetypes</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;cobol&quot;</span> <span class="p">},</span>
+    <span class="n">root_dir</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
+      <span class="kr">return</span> <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">util</span><span class="p">.</span><span class="n">find_git_ancestor</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">util</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">startpath</span><span class="p">)</span>
+    <span class="kr">end</span><span class="p">,</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="p">{},</span>
+  <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;lspconfig&quot;</span><span class="p">).</span><span class="n">cobol</span><span class="p">.</span><span class="n">setup</span><span class="p">({</span>
+  <span class="n">on_attach</span> <span class="o">=</span> <span class="n">my_attach_function</span><span class="p">,</span> <span class="c1">-- should be the same as your other lsp</span>
+  <span class="n">capabilities</span> <span class="o">=</span> <span class="n">my_capabilities</span><span class="p">,</span> <span class="c1">-- should be the same as other lsp</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="emacs.html" class="btn btn-neutral float-left" title="SuperBOL mode for GNU/Emacs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="license.html" class="btn btn-neutral float-right" title="Copyright and License" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright OCamlPro SAS.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
