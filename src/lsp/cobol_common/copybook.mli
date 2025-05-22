@@ -13,24 +13,37 @@
 
 type fileloc = [ `Word of string | `Alphanum of string ]
 
-type lookup_info =
+type lookup_config =
   {
-    libname: string;
-    libpath: string list;
+    lookup_path: string list;
+    lookup_exts: string list;
   }
+
+val pp_lookup_config: lookup_config Pretty.printer
+
+val lookup_config
+  : ?libexts: string list
+  -> string list
+  -> lookup_config
+
+type lookup_error =
+  {
+    lookup_libname: string;
+    lookup_config: lookup_config;
+  }
+
+val pp_lookup_error: lookup_error Pretty.printer
 
 (* --- *)
 
 val copybook_extensions: string list
+val copybookonly_extensions: string list
 
-val pp_lookup_error: lookup_info Pretty.printer
-
-(** [find_lib ~libpath ?exts ?fromfile ?libname txtname] attempts to locate a file
-    containing the copybook [txtname], which is a file named [txtname], possibly
-    appended with an extension from {[".CPY"; ".CBL"; ".COB"; ".CBX"; ".cpy";
-    ".cbl"; ".cob"; ".cbx"]} (considered in order), {e unless} [txtname] is
-    given as an alphanumeric literal ({i e.g, [txtname = `Alphanum filname] ---
-    in which case no extension is assumed).
+(** [find_lib ~lookup_config ?fromfile ?libname txtname] attempts to locate a
+    file containing the copybook [txtname], which is a file named [txtname],
+    possibly appended with an extension from [libexts] (considered in order), {e
+    unless} [txtname] is given as an alphanumeric literal ({i e.g, [txtname =
+    `Alphanum filname] --- in which case no extension is assumed).
 
     If [libname] is not provided, then the file is searched within the
     directories listed in [libpath] (considered in order).  Otherwise, a single
@@ -42,9 +55,8 @@ val pp_lookup_error: lookup_info Pretty.printer
     of the path in the provided order.
  *)
 val find_lib
-  : libpath:string list
-  -> ?exts:string list
+  : lookup_config: lookup_config
   -> ?fromfile:string
   -> ?libname:fileloc
   -> fileloc
-  -> (string, lookup_info) result
+  -> (string, lookup_error) result

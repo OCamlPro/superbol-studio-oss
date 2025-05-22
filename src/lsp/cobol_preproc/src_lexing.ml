@@ -159,7 +159,11 @@ let append t state =
       { state with pseudotext = Some (start_loc, prod :: prods);
                    newline = false }
   | _, { loc; payload = word } ->
-      lex_error state @@ Unexpected { loc; item = Word_in_continuation word }
+      (* NB: this seems to be allowed after all: *)
+      (* lex_warn state @@ Warn_unexpected { loc; *)
+      (*                                     item = Word_in_continuation word } *)
+      ignore (loc, word);
+      emit t state
 
 let sna ({ config = { source_format; _ }; _ } as state) lexbuf =
   let indicator_pos, FixedWidth _ = source_format in
@@ -201,7 +205,7 @@ let unexpected
   in
   let state = match severity with
     | `Error -> lex_error state @@ Unexpected { loc; item }
-    | `Warn -> lex_warn state @@ Ignoring_unexpected { loc; item }
+    | `Warn -> lex_warn state @@ Warn_unexpected { loc; item }
   in
   k state lexbuf
 

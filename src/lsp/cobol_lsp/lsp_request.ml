@@ -45,6 +45,15 @@ let try_with_main_document_data ~f =
 
 (** {3 Initialization} *)
 
+let log_initialization_info () =
+  Lsp_io.log_info "Initializing SuperBOL LSP Server";
+  match Version.commit_hash, Version.commit_date with
+  | None, _ | _, None ->
+      Lsp_io.log_info "Version: %s" Version.version
+  | Some h, Some d ->
+      Lsp_io.log_info "Commit: %s (%s)" h d;
+      Lsp_io.log_info "Version tag: %s" Version.version
+
 let initialize ~config (params: InitializeParams.t) =
   let root_uri = match params.rootUri with
     | None -> None
@@ -54,8 +63,9 @@ let initialize ~config (params: InitializeParams.t) =
     | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
     | _ -> Option.to_list root_uri
   in
-  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a"
-    Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
+  log_initialization_info ();
+  Lsp_io.log_info "Initial workspace folders: %a"
+    Pretty.(list ~fopen:"" ~fclose:"" string)
     (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
   let capabilities = Lsp_capabilities.reply params.capabilities in
   let with_semantic_tokens =
@@ -70,18 +80,22 @@ let initialize ~config (params: InitializeParams.t) =
     | _ ->
         false
   and with_client_file_watcher = match params.capabilities.workspace with
-    | Some { didChangeWatchedFiles = Some { dynamicRegistration; _ }; _ } ->
-        (* Note: for now we rely on the client's dynamic registration ability;
-           for clients that do not support that it could just be simpler to
-           trigger server restarts when relevant changes happen. *)
-        Option.value ~default:false dynamicRegistration
+    | Some { didChangeWatchedFiles = Some { dynamicRegistration = Some true;
+                                            relativePatternSupport };
+             _ } ->
+        `yes (if relativePatternSupport = Some true then `any else `absolute)
     | _ ->
-        false
+        `no
+  in
+  let watcher ppf = function
+    | `no -> Fmt.string ppf "none"
+    | `yes `absolute -> Fmt.string ppf "absolute patterns only"
+    | `yes `any -> Fmt.string ppf "any pattern"
   in
   Lsp_io.log_info "Negociated@ server@ parameters:@\n@[%t@]" @@
   Pretty.delayed_record [
     Fmt.(field "client_config_watcher" (fun _ -> with_client_config_watcher) bool);
-    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) bool);
+    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) watcher);
   ];
   let result =
     InitializeResult.create ()
@@ -132,6 +146,55 @@ let handle_get_project_config_command param registry =
   with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
+
+let handle_get_cfg registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let uri, name, options = Yojson.Safe.Util.(
+      to_string @@ member "uri" params,
+      to_string @@ member "name" params,
+      try to_assoc @@ member "render_options" params with Type_error _ -> [])
+  in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let jsoono =
+        Lsp_cfg.doc_to_cfg_jsoono ~filename:uri ~name ~options checked_doc
+      in Some jsoono
+    end |>
+  Option.get
+
+let handle_get_possible_cfg registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let uri = Yojson.Safe.Util.(to_string @@ member "uri" params) in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let open Cobol_cfg.Builder in
+      let possibles = possible_cfgs_of_doc checked_doc in
+      let yojsonify cfg_name = `String cfg_name in
+      Some (`List (List.map yojsonify possibles))
+    end |>
+  Option.get
+
+
+let handle_find_procedure registry params =
+  let params = Jsonrpc.Structured.yojson_of_t params in
+  let filename = Yojson.Safe.Util.to_string @@ Yojson.Safe.Util.member "uri" params in
+  let line = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "line" params in
+  let character = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "character" params in
+  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path filename) in
+  try_with_main_document_data registry textDoc
+    ~f:begin fun ~doc:_ checked_doc ->
+      let pos = Position.create ~character ~line in
+      let { cu; proc_name } =
+        Lsp_lookup.proc_at_pos ~filename pos checked_doc.group in
+      let proc = match proc_name, cu with
+        | Some qn, _ -> Pretty.to_string "%a" Cobol_ptree.pp_qualname qn
+                        |> Str.global_replace (Str.regexp "\n") " "
+        | _ -> raise Not_found in
+      Some (`String proc)
+    end |>
+  Option.get
 
 (** {3 Definitions} *)
 
@@ -454,66 +517,137 @@ let handle_semtoks_full,
 
 (** {3 Hover} *)
 
-let handle_hover registry (params: HoverParams.t) =
-  let filename = Lsp.Uri.to_path params.textDocument.uri in
-  let find_hovered_pplog_event pplog =
-    List.find_opt begin function
-      | Cobol_preproc.Trace.Replace _
-      | CompilerDirective _
-      | Exec_block _
-      | Ignored _ ->
-          false
-      | Replacement { matched_loc = loc; _ }
-      | FileCopy { copyloc = loc; _ } ->
-          try         (* Some locations in the pre-processor log may not involve
+let doc_of_datadef ~rev_comments ~filename data_def =
+  let open Cobol_preproc.Text in
+  let loc = Cobol_data.Item.def_loc data_def in
+  let def_filename = (fst @@ Cobol_common.Srcloc.as_lexloc loc).pos_fname in
+  if not (String.equal filename def_filename) (** def is in copybook *)
+  then ""
+  else
+    let def_range = Lsp_position.range_of_srcloc_in ~filename loc in
+    let (inline, full_line) =
+      List.fold_left begin fun acc { comment_loc; comment_kind; comment_contents } ->
+        let com_range = Lsp_position.range_of_lexloc comment_loc in
+        if def_range.start.line = com_range.start.line
+        then (Some comment_contents, snd acc)
+        else if def_range.start.line = com_range.start.line + 1
+             && comment_kind == `Line
+        then (fst acc, Some comment_contents)
+        else acc
+      end (None, None) rev_comments
+    in
+    match inline, full_line with
+    | Some comment, _ -> "\n---\n" ^ String.sub comment 2 (String.length comment - 2)
+    | None, Some comment -> "\n---\n" ^ String.sub comment 1 (String.length comment - 1)
+    | _ -> ""
+
+let lookup_data_definition_for_hover cu_name element_at_pos group =
+  let { payload = cu; _ } = CUs.find_by_name cu_name group in
+  let named_data_defs = cu.unit_data.data_items.named in
+  try match element_at_pos with
+    | Data_item { full_qn = Some qn; def_loc } ->
+        Cobol_unit.Qualmap.find qn named_data_defs, def_loc
+    | Data_full_name qn | Data_name qn ->
+        Cobol_unit.Qualmap.find qn named_data_defs, Lsp_lookup.baseloc_of_qualname qn
+    | Data_item _ | Proc_name _ ->
+        raise Not_found
+  with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
+
+let data_definition_on_hover
+    ?(always_show_hover_text_in_data_div = false) ~rev_comments
+    ~uri position Cobol_typeck.Outputs.{ group; _ } =
+  let filename = Lsp.Uri.to_path uri in
+  match Lsp_lookup.element_at_position ~uri position group with
+  | { element_at_position = None; _ }
+  | { enclosing_compilation_unit_name = None; _ } ->
+      None
+  | { element_at_position = Some ele_at_pos;
+      enclosing_compilation_unit_name = Some cu_name } ->
+      try
+        let data_def, hover_loc
+          = lookup_data_definition_for_hover cu_name ele_at_pos group in
+        let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
+        if always_show_hover_text_in_data_div ||
+           not (Lsp_position.is_in_srcloc ~filename position @@
+                Cobol_data.Item.def_loc data_def)
+        then Some (Pretty.to_string "%a%s"
+                     Lsp_data_info_printer.pp_data_definition data_def doc_comments,
+                   hover_loc)
+        else None
+      with Not_found ->
+        None
+
+
+let hover_markdown ~filename ~loc value =
+  let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
+  let range = Lsp_position.range_of_srcloc_in ~filename loc in
+  Some (Hover.create () ~contents:(`MarkupContent content) ~range)
+
+let cobol_code fmt =                                   (* TODO: ensure no ``` *)
+  Pretty.to_string ("```cobol\n" ^^ fmt ^^ "\n```")
+
+let find_hovered_pplog_event ~filename position pplog =
+  List.find_opt begin function
+    | Cobol_preproc.Trace.Replace _
+    | CompilerDirective _
+    | Exec_block _
+    | Ignored _ ->
+        false
+    | Replacement { matched_loc = loc; _ }
+    | FileCopy { copyloc = loc; _ } ->
+        try           (* Some locations in the pre-processor log may not involve
                          [filename], so we need to catch those cases. *)
-            Lsp_position.is_in_lexloc params.position
-              (Cobol_common.Srcloc.lexloc_in ~filename loc)
-          with Invalid_argument _ -> false
-    end (Cobol_preproc.Trace.events pplog)
-  in
-  let hover_markdown ~loc value =
-    let content = MarkupContent.create ~kind:MarkupKind.Markdown ~value in
-    let range = Lsp_position.range_of_srcloc_in ~filename loc in
-    Some (Hover.create () ~contents:(`MarkupContent content) ~range)
-  in
-  try_main_doc registry params.textDocument
-    ~f:begin fun ~doc:{ artifacts = { pplog; _ }; _ } ->
-      match find_hovered_pplog_event pplog with
-      | Some Replacement { matched_loc = loc;
-                           replacement_text = []; _ } ->
-          Pretty.string_to (hover_markdown ~loc) "empty text"
-      | Some Replacement { matched_loc = loc;
-                           replacement_text; _ } ->
-          Pretty.string_to (hover_markdown ~loc) "```cobol\n%a\n```"
-            Cobol_preproc.Text.pp_text replacement_text (* TODO: ensure no ``` *)
-      | Some FileCopy { copyloc = loc;
-                        status = CopyDone lib | CyclicCopy lib } ->
-          begin match EzFile.read_file lib with
-            | "" ->
-                Pretty.string_to (hover_markdown ~loc) ""
-            | text ->
-                Pretty.string_to (hover_markdown ~loc) "```cobol\n%s\n```"
-                  text                                 (* TODO: ensure no ``` *)
-          end
-      | Some FileCopy { status = MissingCopy _; _ }
-      | Some Replace _
-      | Some CompilerDirective _
-      | Some Exec_block _
-      | Some Ignored _
-      | None ->
+          Lsp_position.is_in_lexloc position
+            (Cobol_common.Srcloc.lexloc_in ~filename loc)
+        with Invalid_argument _ -> false
+  end (Cobol_preproc.Trace.events pplog)
+
+let preproc_info_on_hover ~filename position pplog =
+  match find_hovered_pplog_event ~filename position pplog with
+  | Some Replacement { matched_loc = loc; replacement_text = []; _ } ->
+      Some ("empty text", loc)
+  | Some Replacement { matched_loc = loc; replacement_text; _ } ->
+      Some (cobol_code "%a" Cobol_preproc.Text.pp_text replacement_text, loc)
+  | Some FileCopy { copyloc = loc; status = CopyDone lib | CyclicCopy lib } ->
+      (match EzFile.read_file lib with
+       | "" -> None
+       | text -> Some (cobol_code "%s" text, loc))
+  | Some FileCopy { status = MissingCopy _; _ }
+  | Some Replace _
+  | Some CompilerDirective _
+  | Some Exec_block _
+  | Some Ignored _
+  | None ->
+      None
+
+let handle_hover ?always_show_hover_text_in_data_div
+    registry HoverParams.{ textDocument = doc; position; _ } =
+  let filename = Lsp.Uri.to_path doc.uri in
+  try_with_main_document_data registry doc
+    ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
+      match data_definition_on_hover ~uri:doc.uri position checked_doc
+              ?always_show_hover_text_in_data_div ~rev_comments,
+            preproc_info_on_hover ~filename position pplog with
+      | None, None ->
           None
+      | None, Some (text, loc) | Some (text, loc), None ->
+          hover_markdown ~filename ~loc text
+      | Some(info_text, loc), Some(pp_text, _) ->
+          hover_markdown ~filename ~loc @@
+          Pretty.to_string "%s\n---\nAdditional pre-processing:\n%s"
+            info_text pp_text
     end
 
 (** {3 Completion} *)
 
-let handle_completion registry (params: CompletionParams.t) =
+let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
   try_with_main_document_data registry params.textDocument
-    ~f:begin fun ~doc:{ textdoc; _ } { ptree; _ } ->
-      let items =
-        Lsp_completion.completion_items textdoc params.position ptree in
-      Some (`CompletionList (CompletionList.create ()
-                               ~isIncomplete:false ~items))
+    ~f:begin fun ~doc checked_doc->
+      let config = Lsp_completion.config ~eager () in
+      let completion_list =
+        Lsp_completion.contextual ~config
+          doc checked_doc params.position
+      in Some (`CompletionList completion_list)
     end
 
 (** {3 Folding} *)
@@ -529,6 +663,143 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
       let filename = Lsp.Uri.to_path params.textDocument.uri in
       Some (Lsp_folding.ranges_in ~filename ptree group)
     end
+
+(** { Document Symbol } *)
+
+let handle_document_symbol registry (params: DocumentSymbolParams.t) =
+  try_with_main_document_data registry params.textDocument
+    ~f:begin fun ~doc { ptree; _ } ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
+      Some (`DocumentSymbol symbols)
+    end
+
+(** { Document Code Lens } *)
+
+module Positions = Set.Make (struct
+    type t = Position.t
+    let compare (p1: t) (p2: t) =
+      let c = p2.line - p1.line in
+      if c <> 0 then c else p2.character - p1.character
+  end)
+
+let codelens_positions ~uri group =
+  let filename = Lsp.Uri.to_path uri in
+  let open struct
+    include Cobol_common.Visitor
+    include Cobol_data.Visitor
+    type context =
+      | ProcedureDiv
+      | DataDiv
+      | None
+  end in
+  let set_context context (old, acc) =
+    do_children_and_then (context, acc) (fun (_, acc) -> (old, acc))
+  in
+  let take_when_in context { loc; _ } (current, acc) =
+    if context <> current
+    then skip (current, acc)
+    else
+      let range = Lsp_position.range_of_srcloc_in ~filename loc in
+      skip (context, Positions.add range.start acc)
+  in
+  Cobol_unit.Visitor.fold_unit_group
+    object (v)
+      inherit [_] Cobol_unit.Visitor.folder
+      method! fold_procedure _ = set_context ProcedureDiv
+      method! fold_data_definitions _ = set_context DataDiv
+      method! fold_paragraph' _ = skip
+      method! fold_procedure_name' = take_when_in ProcedureDiv
+      method! fold_qualname' = take_when_in DataDiv
+      method! fold_record_renaming { renaming_name; _ } =
+        take_when_in DataDiv renaming_name
+      method! fold_field_definition { field_qualname; field_redefines;
+                                      field_leading_ranges;
+                                      field_offset; field_size; field_layout;
+                                      field_conditions; field_redefinitions;
+                                      field_length = _ } acc =
+        ignore(field_redefines, field_leading_ranges, field_offset, field_size);
+        skip @@ begin acc
+          |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
+          |> fold_field_layout v field_layout
+          |> fold_condition_names v field_conditions
+          |> fold_item_redefinitions v field_redefinitions
+        end
+      method! fold_table_definition { table_field; table_offset; table_size;
+                                      table_range; table_init_values;
+                                      table_redefines; table_redefinitions } acc =
+        ignore(table_offset, table_size, table_init_values, table_redefines);
+        skip @@ begin acc
+          |> fold_field_definition' v table_field
+          |> fold_table_range v table_range
+          |> fold_item_redefinitions v table_redefinitions
+        end
+    end group (None, Positions.empty)
+  |> snd
+
+let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let uri = Lsp.Text_document.documentUri doc.textdoc in
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let context = ReferenceContext.create ~includeDeclaration:true in
+      codelens_positions ~uri checked_doc.group
+      |> Positions.to_seq
+      |> Seq.map begin fun position ->
+        let params =
+          ReferenceParams.create ~context ~position ~textDocument () in
+        let ref_count =
+          lookup_references_in_doc ~rootdir params checked_doc
+          |> Option.fold ~none:0 ~some:List.length in
+        let title = string_of_int ref_count
+                    ^ " reference"
+                    ^ if ref_count > 1 then "s" else "" in
+        let range = Range.create ~end_:position ~start:position in
+        let uri = DocumentUri.yojson_of_t textDocument.uri in
+        let command = Command.create () ~title
+            ~command:"superbol.editor.action.findReferences"
+            ~arguments:[uri; Position.yojson_of_t position] in
+        CodeLens.create ~command ~range ()
+      end
+      |> List.of_seq |> Option.some
+    end
+  |> Option.value ~default:[]
+
+(** { Rename } *)
+
+let handle_rename
+    ?(abort_when_in_copybook = true)
+    registry
+    ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  Option.value ~default:(WorkspaceEdit.create ()) @@
+  try_with_main_document_data registry textDocument
+    ~f:begin fun ~doc checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
+      let locations =
+        let context = ReferenceContext.create ~includeDeclaration:true in
+        Option.value ~default:[] @@
+        lookup_references_in_doc ~rootdir
+          (ReferenceParams.create () ~context ~position ~textDocument )
+          checked_doc
+      in
+      let changes, in_copybook =
+        List.fold_left begin fun (map, in_copybook) Location.{ range; uri } ->
+          URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
+          in_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations
+      in
+      if in_copybook && abort_when_in_copybook
+      then begin
+        Lsp_io.notify_error "Reference occurs in a copybook: not renaming";
+        None
+      end else begin
+        if in_copybook then
+          Lsp_io.notify_warn "Renamed reference that occurs in a copybook";
+        let changes = List.of_seq @@ URIMap.to_seq changes in
+        Some (WorkspaceEdit.create ~changes ())
+      end
+    end
+
 
 (** {3 Generic handling} *)
 
@@ -575,22 +846,26 @@ let on_request
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
         Ok (handle_shutdown registry, ShuttingDown)
+    | DocumentSymbol params ->
+        Ok (handle_document_symbol registry params, state)
+    | TextDocumentCodeLens (* CodeLensParams.t.t *) params ->
+        Ok (handle_codelens registry params, state)
+    | TextDocumentRename params ->
+        Ok (handle_rename registry params, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
-    | TextDocumentCodeLens  (* CodeLensParams.t.t *) _
     | TextDocumentCodeLensResolve  (* CodeLens.t.t *) _
     | TextDocumentPrepareCallHierarchy  (* CallHierarchyPrepareParams.t.t *) _
     | TextDocumentPrepareRename  (* PrepareRenameParams.t.t *) _
-    | TextDocumentRename  (* RenameParams.t.t *) _
     | TextDocumentLink  (* DocumentLinkParams.t.t *) _
     | TextDocumentLinkResolve  (* DocumentLink.t.t *) _
     | TextDocumentMoniker  (* MonikerParams.t.t *) _
-    | DocumentSymbol  (* DocumentSymbolParams.t.t *) _
     | WorkspaceSymbol  (* WorkspaceSymbolParams.t.t *) _
     | DebugEcho (* DebugEcho.Params.t *) _
     | DebugTextDocumentGet  (* DebugTextDocumentGet.Params.t *) _
     | TextDocumentHighlight  (* DocumentHighlightParams.t.t *) _
+    | InlayHint (* InlayHintParams.t.t *) _
     | SignatureHelp  (* SignatureHelpParams.t.t *) _
     | CodeAction  (* CodeActionParams.t.t *) _
     | CodeActionResolve  (* CodeAction.t.t *) _
@@ -617,6 +892,15 @@ let on_request
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
         handle_get_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getCFG";
+                       params = Some param } ->
+        Ok (handle_get_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/getPossibleCFG";
+                       params = Some param } ->
+        Ok (handle_get_possible_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/findProcedure";
+                       params = Some param } ->
+        Ok (handle_find_procedure registry param, state)
     | UnknownRequest { meth; _ } ->
         Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
         Error (UnknownRequest meth)
@@ -646,5 +930,9 @@ module INTERNAL = struct
   let lookup_definition = handle_definition
   let lookup_references = handle_references
   let hover = handle_hover
+  let completion = handle_completion
+  let codelens = handle_codelens
+  let document_symbol = handle_document_symbol
   let formatting = handle_formatting
+  let rename = handle_rename
 end

@@ -18,133 +18,13 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_preproc.Text.TYPES
 open Grammar_tokens                              (* import token constructors *)
+open Grammar_tokens_printer
 open Parser_diagnostics
 
 (* --- *)
 
 type token = Grammar_tokens.token with_loc
 type tokens = token list
-
-let combined_tokens =
-  (* /!\ WARNING: None of the constituents of combined tokens may be
-     context-sensitive.
-
-     Rationale: this would considerably complicate retokenization (which is
-     necessary with the current solution to handle context-sensitive
-     keywords) *)
-  Hashtbl.of_seq @@ List.to_seq [
-    ON_EXCEPTION, "ON_EXCEPTION";
-    NOT_ON_EXCEPTION, "NOT_ON_EXCEPTION";
-    ON_OVERFLOW, "ON_OVERFLOW";
-    NOT_ON_OVERFLOW, "NOT_ON_OVERFLOW";
-    ON_SIZE_ERROR, "ON_SIZE_ERROR";
-    NOT_ON_SIZE_ERROR, "NOT_ON_SIZE_ERROR";
-    INVALID_KEY, "INVALID_KEY";
-    NOT_INVALID_KEY, "NOT_INVALID_KEY";
-    AT_END, "AT_END";
-    NOT_AT_END, "NOT_AT_END";
-    AT_EOP, "AT_EOP";
-    NOT_AT_EOP, "NOT_AT_EOP";
-    WITH_DATA, "WITH_DATA";
-    NO_DATA, "NO_DATA";
-    WITH_NO_ADVANCING, "WITH_NO_ADVANCING";
-    IS_GLOBAL, "IS_GLOBAL";
-    IS_EXTERNAL, "IS_EXTERNAL";
-    IS_TYPEDEF, "IS_TYPEDEF";
-    DATA_RECORD, "DATA_RECORD";
-    DATA_RECORDS, "DATA_RECORDS";
-    NEXT_PAGE, "NEXT_PAGE";
-    NEXT_SENTENCE, "NEXT_SENTENCE";
-  ]
-
-let is_intrinsic_token = function
-  | BYTE_LENGTH_FUNC
-  | CHAR_FUNC
-  | CONTENT_OF_FUNC
-  | CONVERT_FUNC
-  | CURRENT_DATE_FUNC
-  | FORMATTED_DATETIME_FUNC
-  | FORMATTED_TIME_FUNC
-  | LENGTH_FUNC
-  | LOCALE_DATE_FUNC
-  | LOCALE_TIME_FROM_SECONDS_FUNC
-  | LOCALE_TIME_FUNC
-  | NUMVAL_C_FUNC
-  | RANDOM_FUNC
-  | RANGE_FUNC
-  | REVERSE_FUNC
-  | SIGN_FUNC
-  | SUM_FUNC
-  | TRIM_FUNC
-  | WHEN_COMPILED_FUNC
-  | INTRINSIC_FUNC _ -> true
-  | _ -> false
-
-let pp_alphanum_string_prefix ppf Cobol_ptree.{ hexadecimal; quotation; str;
-                                                runtime_repr } =
-  if runtime_repr = Null_terminated_bytes then Fmt.char ppf 'Z';
-  if hexadecimal then Fmt.char ppf 'X';
-  match quotation with
-  | Simple_quote -> Fmt.pf ppf "'%s" str
-  | Double_quote -> Fmt.pf ppf "\"%s" str
-
-let pp_token_string: Grammar_tokens.token Pretty.printer = fun ppf ->
-  let string s = Pretty.string ppf s
-  and print format = Pretty.print ppf format in
-  function
-  | WORD w
-  | WORD_IN_AREA_A w
-  | PICTURE_STRING w
-  | INFO_WORD w
-  | DIGITS w
-  | SINTLIT w -> string w
-  | EIGHTY_EIGHT -> string "88"
-  | FIXEDLIT (i, sep, d) -> print "%s%c%s" i sep d
-  | FLOATLIT (i, sep, d, e) -> print "%s%c%sE%s" i sep d e
-  | ALPHANUM a -> Cobol_ptree.pp_alphanum ppf a
-  | ALPHANUM_PREFIX a -> pp_alphanum_string_prefix ppf a
-  | NATLIT s -> print "N\"%s\"" s
-  | BOOLIT b -> print "B\"%a\"" Cobol_ptree.pp_boolean b
-  | COMMENT_ENTRY e -> print "%a" Fmt.(list ~sep:sp string) e
-  | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
-  | INTERVENING_ c -> print "%c" c
-  | t -> string @@
-      try Text_lexer.show_token t
-      with Not_found ->
-      try Hashtbl.find combined_tokens t
-      with Not_found -> "<unknown/unexpected token>"
-
-let pp_token: token Pretty.printer = fun ppf ->
-  let string s = Pretty.string ppf s
-  and print format = Pretty.print ppf format in
-  fun t -> match ~&t with
-    | WORD w -> print "WORD[%s]" w
-    | WORD_IN_AREA_A w -> print "WORD_IN_AREA_A[%s]" w
-    | PICTURE_STRING w -> print "PICTURE_STRING[%s]" w
-    | INFO_WORD s -> print "INFO_WORD[%s]" s
-    | COMMENT_ENTRY _ -> print "COMMENT_ENTRY[%a]" pp_token_string ~&t
-    | EXEC_BLOCK _ -> print "EXEC_BLOCK[%a]" pp_token_string ~&t
-    | DIGITS i -> print "DIGITS[%s]" i
-    | SINTLIT i -> print "SINT[%s]" i
-    | FIXEDLIT (i, sep, d) -> print "FIXED[%s%c%s]" i sep d
-    | FLOATLIT (i, sep, d, e) -> print "FLOAT[%s%c%sE%s]" i sep d e
-    | INTERVENING_ c -> print "<%c>" c
-    | tok when is_intrinsic_token tok ->
-        print "INTRINSIC_FUNC[%a]" pp_token_string ~&t
-    | EOF -> string "EOF"
-    | t -> pp_token_string ppf t
-
-let pp_tokens =
-  Pretty.list ~fopen:"@[" ~fclose:"@]" pp_token
-
-let pp_tokens' ?fsep =
-  Pretty.list ~fopen:"@[" ?fsep ~fclose:"@]" begin fun ppf t ->
-    Pretty.print ppf "%a@@%a"
-      pp_token t
-      Cobol_common.Srcloc.pp_srcloc_struct ~@t
-  end
-
-(* --- *)
 
 let loc_in_area_a: srcloc -> bool = Cobol_common.Srcloc.in_area_a
 let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
@@ -208,7 +88,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
       let error = Missing { loc = hd l; stuff = Continuation_of str } in
       aux (p', l', Parser_diagnostics.add_error error diags) pl
     and comment_entry_after n =
-      let acc, ((p, _) as suff) = skip acc (p, l) n in
+      let acc, ((p, l) as suff) = skip acc (p, l) n in
       if p = [] then Result.Error `MissingInputs else
         let consume_comment = match comment_entry_termination with
           | Newline ->
@@ -218,8 +98,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
           | AreaB { first_area_b_column } ->
               comment_paragraph ~stop_column:first_area_b_column
         and at_end ~loc ~revtoks (p', l', diags) =
-          let p', l' = comment_entry revtoks :: p', loc :: l' in
-          p', l', diags
+          comment_entry revtoks :: p', loc :: l', diags
         in
         consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
           Comment_entry acc suff
@@ -335,6 +214,8 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
   and comment_line ~init_pos ~loc ~revtoks ~at_end descr acc = function
     | [], _ ->                  (* found no word starting on anther line (yet) *)
         Result.Error `MissingInputs
+    | EOF :: _ as p, l ->                                (* non-terminated line *)
+        aux (at_end ~loc ~revtoks acc) (p, l)
     | p, (p_loc :: _ as l)
       when (let Lexing.{ pos_fname; pos_bol; _ } = start_pos p_loc in
             pos_bol > init_pos.Lexing.pos_bol ||
@@ -467,7 +348,7 @@ let scan_exec_block
   | Stateless_exec_scanner s ->
       let block, diags = s ~&text in
       let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
-      [ EXEC_BLOCK block &@<- text ],
+      EXEC_BLOCK block &@<- text,
       if diags == state.diags then state else { state with diags }
   | Stateful_exec_scanner (s, s_acc) ->
       let block, diags, s_acc = s ~&text s_acc in
@@ -481,7 +362,7 @@ let scan_exec_block
               exec_scanners = EXEC_MAP.add lang scanner scanners }
       in
       let diags = Parser_diagnostics.add_exec_block_diags diags state.diags in
-      [ EXEC_BLOCK block &@<- text ],
+      EXEC_BLOCK block &@<- text,
       { state with diags; persist = { state.persist with exec_scanners } }
 
 
@@ -542,7 +423,8 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     | Eof ->
         tok EOF
     | ExecBlock text ->
-        scan_exec_block state (text &@ loc)
+        let block, state = scan_exec_block state (text &@ loc) in
+        block :: rev_prefix_tokens, state
     | Pseudo _ ->
         let error = Unexpected { loc; stuff = Pseudotext } in
         rev_prefix_tokens,
@@ -629,6 +511,10 @@ let reword_intrinsics s : tokens -> tokens =
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
   let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let is_intrinsic_token = function
+    | INTRINSIC_FUNC _ -> true
+    | t when Text_keywords.is_known_intrinsic_token t -> true
+    | _ -> false in
   let rec aux rev_prefix suffix =
     match suffix with
     | [] ->
@@ -730,18 +616,27 @@ let disable_tokens state tokens outgoing_tokens =
   state, retokenize_after (Disabled_keywords outgoing_tokens) state tokens
 
 
+let register_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
+  Text_lexer.register_intrinsics lexer registered_intrinsics
+
+
 let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
   Text_lexer.unregister_intrinsics lexer registered_intrinsics
 
 
-let reregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
-  Text_lexer.register_intrinsics lexer registered_intrinsics
+let save_intrinsics state =
+  unregister_intrinsics state
+
+
+let restore_intrinsics ({ intrinsics_enabled; _ } as state) =
+  if intrinsics_enabled
+  then register_intrinsics state
 
 
 let enable_intrinsics state token tokens =
   if state.intrinsics_enabled then state, token, tokens else        (* error? *)
     let state = put_token_back { state with intrinsics_enabled = true } in
-    reregister_intrinsics state;
+    register_intrinsics state;
     let tokens = token :: tokens in
     let tokens = retokenize_after Enabled_intrinsics state tokens in
     let token, tokens = List.hd tokens, List.tl tokens in

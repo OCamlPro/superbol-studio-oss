@@ -1,0 +1,43 @@
+/* -----------------------------------------------------------------------
+ *
+ *                        SuperBOL OSS Studio
+ *
+ *
+ *  Copyright (c) 2024 OCamlPro SAS
+ *
+ *  All rights reserved.
+ *  This source code is licensed under the MIT license found in the
+ *  LICENSE.md file in the root directory of this source tree.
+ *
+ * -----------------------------------------------------------------------
+ */
+
+html, body {
+  height: 100%;
+}
+text {
+  font: 12px monospace;
+  pointer-events: none;
+}
+svg {
+    background-color: white;
+}
+path {
+  animation: dash 1.5s linear infinite;
+  animation-play-state: paused;
+}
+.animated {
+  animation-play-state: running;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -51; // lcm of sum of dasharray values to avoid flicker
+  }
+}
+.hidden {
+  display: none !important;
+}
+#title {
+  margin-block: .2em;
+}

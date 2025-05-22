@@ -40,7 +40,7 @@ let%expect_test "tokens-after-syntax-errors" =
 
 let%expect_test "token-locations" =
   Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
-    ~verbose:true
+    ~parser_options:(Parser_testing.options ~verbose:true ())
     {|(TMP:1)|};
   [%expect {|
     Tks: (, WORD[TMP], :, DIGITS[1], ), EOF
@@ -50,3 +50,18 @@ let%expect_test "token-locations" =
     DIGITS[1]@<prog.cob:1-5|1-6>
     )@<prog.cob:1-6|1-7>
     EOF@<prog.cob:1-7|1-7> |}];;
+
+let%expect_test "token-locations-with-missing-comment-paragraph" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+    "IDENTIFICATION DIVISION.\nAUTHOR.";
+  [%expect {|
+    Tks: IDENTIFICATION, DIVISION, .
+    Tks: AUTHOR, ., COMMENT_ENTRY[], EOF
+    IDENTIFICATION@<prog.cob:1-0|1-14>
+    DIVISION@<prog.cob:1-15|1-23>
+    .@<prog.cob:1-23|1-24>
+    AUTHOR@<prog.cob:2-0|2-6>
+    .@<prog.cob:2-6|2-7>
+    COMMENT_ENTRY[]@<prog.cob:2-7|2-7>
+    EOF@<prog.cob:2-7|2-7> |}];;

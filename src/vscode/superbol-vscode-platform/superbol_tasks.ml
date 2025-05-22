@@ -32,6 +32,8 @@ let attributes_spec ~debug ~coverage ~executable =
                      [%js.of: bool], executable);
     "cobc-path", C ([%js.to: string or_undefined],
                     [%js.of: string], "cobc");
+    "listings-target", C ([%js.to: string option or_undefined],
+                          [%js.of: string option], None);
     "extra-args", C ([%js.to: string list or_undefined],
                      [%js.of: string list], []);
   ]
@@ -47,23 +49,31 @@ let attr_bool_flag key ~ok ?(ko = Fun.id) ~attributes args =
   | None when Superbol_workspace.bool key -> ok args
   | _ -> ko args
 
-let string_arg ?(allow_empty = false) ~mk s args =
-  if s = "" && not allow_empty then args else mk s :: args
-
-(* let attr_string ?allow_empty key ~mk ~attributes args = *)
-(*   match List.assoc_opt key attributes with *)
-(*   | Some s -> string_arg ([%js.to: string] s) ?allow_empty ~mk args *)
-(*   | None -> args *)
+let string_arg ?(allow_empty = false) ~append s args =
+  if s = "" && not allow_empty then args else append s args
 
 let config_string key ~config =
   string_arg @@
   try Jsonoo.Decode.string @@ Hashtbl.find config key
   with Not_found -> Superbol_workspace.string key
 
-let attr_strings key ~append ~attributes args =
+let config_strings key ~config ~append =
+  append @@
+  try Jsonoo.Decode.(list string) @@ Hashtbl.find config key
+  with Not_found -> Superbol_workspace.strings key
+     | Jsonoo.Decode_error _ -> []  (* Warning: silenced decode errors for now *)
+
+let attr_strings key ?(append = List.append) ~attributes args =
   match List.assoc_opt key attributes with
   | Some l -> append ([%js.to: string list] l) args
   | None -> args
+
+let attr_string_opt key ~append ~attributes args =
+  match List.assoc_opt key attributes with
+  | None -> args
+  | Some s -> match [%js.to: string option] s with
+    | None -> args
+    | Some s -> string_arg s ~allow_empty:false ~append args
 
 (* let config_strings key ~config:_ ~append args = *)
 (*   append (Superbol_workspace.string_list key) args *)
@@ -112,19 +122,27 @@ let cobc_execution ?config attributes =
         end l |>
         List.append args
       end |>
+    config_strings "cobol.copyexts" ~config
+      ~append:begin fun exts ->
+        List.append @@ List.flatten @@ List.map (fun e -> ["-ext"; e]) exts
+      end |>
     config_string "cobol.dialect" ~config
-      ~mk:(function "gnucobol" -> "-std=default" | s -> "-std=" ^ s) |>
+      ~append:begin function
+        | "gnucobol" -> List.cons "-std=default"
+        | s -> List.cons ("-std=" ^ s)
+      end|>
     config_string "cobol.source-format" ~config
-      ~mk:((^) "-fformat=") |>
+      ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>
     attr_bool_flag "for-debug" ~attributes
-      ~ok:(fun args -> "-fsource-location" :: "-ftraceall" :: "-g" :: args) |>
+      ~ok:(List.append ["-ftraceall"; "-g"]) |>
     attr_bool_flag "for-coverage" ~attributes
       ~ok:(List.cons "--coverage") |>
     attr_bool_flag "executable" ~attributes
       ~ok:(List.cons "-x")
       ~ko:(List.cons "-m") |>
+    attr_string_opt "listings-target" ~attributes
+      ~append:(fun t -> List.append ["-P"; t]) |>
     attr_strings "extra-args" ~attributes
-      ~append:(fun args' args -> args @ args')
   in
   `ShellExecution (ShellExecution.makeCommandArgs ()
                      ~command:(`String cobc)

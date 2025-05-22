@@ -38,6 +38,17 @@ type source_format = {
 }
 
 type config = {
+
+  (* the scanner currently loses some tokens to improve indentation,
+     for example the name after PROGRAM-ID if it is on the next
+     line. Use this flag to prevent this behavior.
+
+     Also, Scanner.skipped_revlines is only filled when this option is
+     set to false.
+*)
+  scan_for_indent : bool ;
+  verbosity : int ; (* global verbosity *)
+
   source_format : source_format ;
   arg_offset : int ;
   inner_offset : int ;
@@ -112,13 +123,16 @@ type token =
   | DIVISION
   | ELSE
   | END
+  | END_EXEC
   | END_OF_PAGE
   | ENTRY
   | ENVIRONMENT
   | ERROR
   | EVALUATE | END_EVALUATE
   | EXCEPTION
+  | EXEC
   | EXIT
+  | EXTERNAL
   | FD
   | FILE
   | FILE_CONTROL
@@ -133,10 +147,12 @@ type token =
   | IF       | END_IF
   | INITIALIZE
   | INITIATE
+  | INPUT
   | INPUT_OUTPUT
   | INSPECT
   | INVALID
   | INVOKE
+  | I_O
   | I_O_CONTROL
   | JSON     | END_JSON
   | LINKAGE
@@ -149,6 +165,8 @@ type token =
   | OBJECT_COMPUTER
   | ON
   | OPEN
+  | OPTIONAL
+  | OUTPUT
   | OVERFLOW
   | PERFORM  | END_PERFORM
   | PERFORM_PAR
@@ -230,15 +248,18 @@ let keywords = [
   "DIVIDE", DIVIDE ;      "END-DIVIDE", END_DIVIDE ;
   "DIVISION", DIVISION ;
   "ELSE", ELSE ;
-  "END-OF-PAGE", END_OF_PAGE ;
   "EOP", END_OF_PAGE ;
   "END", END ;
+  "END-EXEC", END_EXEC ;
+  "END-OF-PAGE", END_OF_PAGE ;
   "ENTRY", ENTRY ;
   "ENVIRONMENT", ENVIRONMENT ;
   "ERROR", ERROR ;
   "EVALUATE", EVALUATE ;  "END-EVALUATE", END_EVALUATE ;
   "EXCEPTION", EXCEPTION ;
+  "EXEC", EXEC ;
   "EXIT", EXIT ;
+  "EXTERNAL", EXTERNAL ;
   "FD", FD ;
   "FILE", FILE ;
   "FILE-CONTROL", FILE_CONTROL ;
@@ -253,10 +274,12 @@ let keywords = [
   "IF", IF ;              "END-IF", END_IF ;
   "INITIALIZE", INITIALIZE ;
   "INITIATE", INITIATE ;
+  "INPUT", INPUT ;
   "INPUT-OUTPUT", INPUT_OUTPUT ;
   "INSPECT", INSPECT ;
   "INVALID", INVALID ;
   "INVOKE", INVOKE ;
+  "I-O", I_O ;
   "I-O-CONTROL", I_O_CONTROL ;
   "JSON", JSON ;          "END-JSON", END_JSON ;
   "LINKAGE", LINKAGE ;
@@ -269,6 +292,8 @@ let keywords = [
   "OBJECT-COMPUTER", OBJECT_COMPUTER ;
   "ON", ON ;
   "OPEN", OPEN ;
+  "OPTIONAL", OPTIONAL ;
+  "OUTPUT", OUTPUT ;
   "OVERFLOW", OVERFLOW ;
   "PERFORM", PERFORM ;    "END-PERFORM", END_PERFORM ;
   "PROCEDURE", PROCEDURE ;

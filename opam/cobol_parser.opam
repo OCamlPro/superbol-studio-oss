@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "cobol_parser"
-version: "0.1.3"
+version: "0.1.5"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -46,7 +46,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "menhir" {>= "1.2"}
   "ez_file" {>= "0.3"}
   "ebcdic_lib" {= version}
@@ -54,7 +54,7 @@ depends: [
   "cobol_preproc" {= version}
   "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
-  "menhir" {>= "20230415"}
+  "menhir" {>= "20231231" & < "20240715"}
   "odoc" {with-doc}
 ]
 # Content of `opam-trailer` field:

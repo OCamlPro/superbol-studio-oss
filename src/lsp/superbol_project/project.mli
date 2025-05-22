@@ -87,14 +87,17 @@ val with_default_config: rootdir:rootdir -> layout:layout -> t
 
 val rootdir: t -> rootdir
 
-(** [libpath_for ~filename project] constructs a list of directory names where
-    copybooks are looked up, for a given source file name, in the given
+(** [copybook_lookup_config_for ~uri project] constructs a copybook lookup
+    configuration for a source file with name [filename], in the given
     project. *)
-val libpath_for: filename:string -> t -> string list
+val copybook_lookup_config_for
+  : filename:string
+  -> t
+  -> Cobol_common.Copybook.lookup_config
 
-(** [detect_copybook ~filename project] indicates whether a file name should be
-    treated as a copybook within [project]. *)
-val detect_copybook: filename:string -> t -> bool
+(** [detect_copybook ~filename project] indicates whether a document with the
+    given [filename] should be treated as a copybook in [project]. *)
+val detect_copybook: filename:string -> ?contents:string -> t -> bool
 
 (** {1 Cached representation} *)
 

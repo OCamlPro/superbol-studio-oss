@@ -302,3 +302,173 @@ let%expect_test "references-requests-filler" =
     ----                       ^
       14             STOP RUN.
       15 |}]
+
+let%expect_test "references-requests-group-var" =
+  let { end_with_postproc; projdir }, server = make_lsp_project () in
+  print_references ~projdir server @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 _|parent-in-def|_A.
+          05 _|child-in-def|_B PIC 9.
+        PROCEDURE DIVISION.
+          DISPLAY _|parent-alone|_A.
+          DISPLAY _|child-alone|_B.
+          DISPLAY _|child-in-parent|_B IN _|parent-of-child|_A.
+          MOVE 1 TO X.
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    child-alone (line 9, character 18):
+    __rootdir__/prog.cob:7.13-7.14:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 A.
+       7 >           05 B PIC 9.
+    ----                ^
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+    __rootdir__/prog.cob:10.18-10.19:
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10 >           DISPLAY B.
+    ----                     ^
+      11             DISPLAY B IN A.
+      12             MOVE 1 TO X.
+    __rootdir__/prog.cob:11.18-11.19:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                     ^
+      12             MOVE 1 TO X.
+      13             STOP RUN.
+    child-in-def (line 6, character 13):
+    __rootdir__/prog.cob:7.13-7.14:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 A.
+       7 >           05 B PIC 9.
+    ----                ^
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+    __rootdir__/prog.cob:10.18-10.19:
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10 >           DISPLAY B.
+    ----                     ^
+      11             DISPLAY B IN A.
+      12             MOVE 1 TO X.
+    __rootdir__/prog.cob:11.18-11.19:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                     ^
+      12             MOVE 1 TO X.
+      13             STOP RUN.
+    child-in-parent (line 10, character 18):
+    __rootdir__/prog.cob:7.13-7.14:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 A.
+       7 >           05 B PIC 9.
+    ----                ^
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+    __rootdir__/prog.cob:10.18-10.19:
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10 >           DISPLAY B.
+    ----                     ^
+      11             DISPLAY B IN A.
+      12             MOVE 1 TO X.
+    __rootdir__/prog.cob:11.18-11.19:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                     ^
+      12             MOVE 1 TO X.
+      13             STOP RUN.
+    parent-alone (line 8, character 18):
+    __rootdir__/prog.cob:6.11-6.12:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 A.
+    ----              ^
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:9.18-9.19:
+       6           01 A.
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY A.
+    ----                     ^
+      10             DISPLAY B.
+      11             DISPLAY B IN A.
+    __rootdir__/prog.cob:11.23-11.24:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                          ^
+      12             MOVE 1 TO X.
+      13             STOP RUN.
+    parent-in-def (line 5, character 11):
+    __rootdir__/prog.cob:6.11-6.12:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 A.
+    ----              ^
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:9.18-9.19:
+       6           01 A.
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY A.
+    ----                     ^
+      10             DISPLAY B.
+      11             DISPLAY B IN A.
+    __rootdir__/prog.cob:11.23-11.24:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                          ^
+      12             MOVE 1 TO X.
+      13             STOP RUN.
+    parent-of-child (line 10, character 23):
+    __rootdir__/prog.cob:6.11-6.12:
+       3           PROGRAM-ID. prog.
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6 >         01 A.
+    ----              ^
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+    __rootdir__/prog.cob:9.18-9.19:
+       6           01 A.
+       7             05 B PIC 9.
+       8           PROCEDURE DIVISION.
+       9 >           DISPLAY A.
+    ----                     ^
+      10             DISPLAY B.
+      11             DISPLAY B IN A.
+    __rootdir__/prog.cob:11.23-11.24:
+       8           PROCEDURE DIVISION.
+       9             DISPLAY A.
+      10             DISPLAY B.
+      11 >           DISPLAY B IN A.
+    ----                          ^
+      12             MOVE 1 TO X.
+      13             STOP RUN. |}]

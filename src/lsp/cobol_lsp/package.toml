@@ -21,8 +21,8 @@ kind = "library"
 # name of a file to generate with the current version
 gen-version = "version.ml"
 
-# supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
-# default is [ "ocamllex", "ocamlyacc" ] 
+# supported file generators are "ocamllex", "ocamlyacc" and "menhir"
+# default is [ "ocamllex", "ocamlyacc" ]
 # generators = [ "ocamllex", "menhir" ]
 
 # menhir options for the package
@@ -42,7 +42,7 @@ gen-version = "version.ml"
 # pack = "Mylib"
 
 # preprocessing options
-#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
 preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
@@ -51,8 +51,9 @@ skip = ["index.mld"]
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
-#   base-unix = { libname = "unix", version = ">=base" } 
+#   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
+cobol_cfg = "version"
 cobol_common = "version"
 cobol_config = "version"
 cobol_data = "version"
@@ -62,7 +63,7 @@ cobol_typeck = "version"
 superbol_preprocs = "version"
 superbol_project = "version"
 jsonrpc = ">=1.15"
-lsp = ">=1.15 <1.16"
+lsp = ">=1.18 <1.19"
 pretty = "version"
 toml = "7.1.0"
 
@@ -71,14 +72,14 @@ toml = "7.1.0"
 
 # package fields (depends on package skeleton)
 #Examples:
-#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))" 
-#  dune-libraries = "bigstring" 
-#  dune-trailer = "(install (..))" 
-#  opam-trailer = "pin-depends: [..]" 
-#  no-opam-test = "yes" 
-#  no-opam-doc = "yes" 
-#  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
-#  static-clibs = "unix" 
+#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))"
+#  dune-libraries = "bigstring"
+#  dune-trailer = "(install (..))"
+#  opam-trailer = "pin-depends: [..]"
+#  no-opam-test = "yes"
+#  no-opam-doc = "yes"
+#  gen-opam = "some" | "all"
+#  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
+#  static-clibs = "unix"
 [fields]
 # ...

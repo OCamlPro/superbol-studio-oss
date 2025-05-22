@@ -51,14 +51,40 @@ module NEL = struct
   type 'a t =
     | One of 'a
     | (::) of 'a * 'a t
-  let compare cmp a b =
+  let compare_lazy cmp a b =
+    (** [compare_lazy cmp nel0 nel1] compares [nel0] and [nel1] using [cmp].
+      [compare_lazy] is slightly more lazy than its [compare] counterpart,
+      but the order is not lexicographical. *)
     let rec aux a b = match a, b with
       | One a, One b -> cmp a b
       | One _, _ -> -1
       | _, One _ -> 1
       | a :: a', b :: b' ->
-          let c = cmp a b in
-          if c = 0 then aux a' b' else c
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
+    in
+    aux a b
+  let compare cmp a b =
+    (** [compare_std cmp nel0 nel1] compares [nel0] and [nel1] using [cmp]
+      in lexicographical order. *)
+    let rec aux a b = match a, b with
+      | One a, One b -> cmp a b
+      | a :: _, One b  ->
+        let c = cmp a b in
+        if c = 0 then 1 else c
+      | One a, b :: _ ->
+        let c = cmp a b in
+        if c = 0 then -1 else c
+      | a :: a', b :: b' ->
+        let c = cmp a b in
+        if c = 0 then aux a' b' else c
+    in
+    aux a b
+  let equal eq a b =
+    let rec aux a b = match a, b with
+      | One a, One b -> eq a b
+      | a :: a', b :: b' when eq a b -> aux a' b'
+      | _ -> false
     in
     aux a b
   let hd = function
@@ -84,6 +110,18 @@ module NEL = struct
       | x :: tl -> aux (List.cons x acc) tl
     in
     aux [] l
+  let rev = function
+    | One x -> One x
+    | hd :: tl ->
+      let rec aux acc = function
+        | One x -> x :: acc
+        | x :: tl -> aux (x::acc) tl
+      in aux (One hd) tl
+  let ( @ ) a b =
+    let rec aux b = function
+      | One x -> x :: b
+      | x :: tl -> x :: aux b tl
+    in aux b a
   let rev_to_list l =
     let rec aux acc = function
       | One x -> List.cons x acc

@@ -28,7 +28,7 @@ module TYPES: sig
     workspace_folders: Lsp.Types.DocumentUri.t list;     (* includes root_uri *)
     with_semantic_tokens: bool;
     with_client_config_watcher: bool;
-    with_client_file_watcher: bool;
+    with_client_file_watcher: [`no | `yes of [`absolute | `any]];
   }
 
   type registry = private {
@@ -79,12 +79,10 @@ val init
 val on_change_workspace_folders
   : Lsp.Types.DidChangeWorkspaceFoldersParams.t -> t -> t
 
-(** When given, [copybook] indicates whether the document is a copybook (in
-    which case it is not parsed directly as a normal program).  When absent,
-    copybook detection is performed via project configuration (see
-    {!Project.detect_copybook}). *)
+(** Copybook detection is performed via project configuration (see
+    {!Lsp_project.detect_copybook}). *)
 val did_open
-  : Lsp.Types.DidOpenTextDocumentParams.t -> ?copybook: bool -> t -> t
+  : Lsp.Types.DidOpenTextDocumentParams.t -> t -> t
 
 val did_change
   : Lsp.Types.DidChangeTextDocumentParams.t -> t -> t
@@ -98,8 +96,11 @@ val find_document
 val jsonrpc_of_error
   : 'a error -> string -> Jsonrpc.Response.Error.t
 
-val on_response
+val on_client_response
   : int -> Lsp.Import.Json.t -> t -> t
+
+val on_client_error
+  : int -> t -> t
 
 val on_client_config_changes
   : ?changes:Yojson.Safe.t -> t -> t

@@ -40,7 +40,7 @@
 module Make
     (Parser: MenhirLib.IncrementalEngine.EVERYTHING)
     (Recovery: sig
-       val default_value: 'a Parser.symbol -> 'a
+       val default_value: pos:Lexing.position -> 'a Parser.symbol -> 'a
        val token_of_terminal: 'a Parser.terminal -> 'a -> Parser.token
        val depth: int array
 
@@ -70,7 +70,7 @@ struct
     }
   and 'a operation =
     | Shift of 'a Parser.env * 'a Parser.env
-    | Reduce of Parser.production
+    | Reduce of Parser.production * 'a Parser.env option
   and assumption =
     {
       show: Pretty.delayed option;
@@ -83,22 +83,6 @@ struct
       candidates: 'a candidate list;
     }
 
-  module T = struct
-    (* FIXME: this is a bit ugly. We should ask for the type to be exported
-       publicly by MenhirLib. *)
-
-    [@@@ocaml.warning "-37"]
-
-    type 'a checkpoint =
-      | InputNeeded of 'a Parser.env
-      | Shifting of 'a Parser.env * 'a Parser.env * bool
-      | AboutToReduce of 'a Parser.env * Parser.production
-      | HandlingError of 'a Parser.env
-      | Accepted of 'a
-      | Rejected
-    external inj : 'a checkpoint -> 'a Parser.checkpoint = "%identity"
-  end
-
   let feed_token token visited env =
     let rec aux visited = function
       | Parser.HandlingError _ | Rejected ->
@@ -108,11 +92,20 @@ struct
       | Shifting (e1, e2, _) as c ->
           aux (Shift (e1, e2) :: visited) (Parser.resume c)
       | AboutToReduce (_, p) as c ->
-          aux (Reduce p :: visited) (Parser.resume c)
+          let c' = Parser.resume c in
+          aux (Reduce (p, env_of c') :: visited) c'
       | InputNeeded env as c ->
           `Recovered (c, env, visited)
+    and env_of = function
+      | HandlingError env
+      | AboutToReduce (env, _)
+      | InputNeeded env
+      | Shifting (env, _, _) ->
+          Some env
+      | Accepted _ | Rejected ->
+          None
     in
-    aux visited (Parser.offer (T.inj (T.InputNeeded env)) token)
+    aux visited (Parser.offer (Parser.input_needed env) token)
 
   let candidate env = { env; visited = []; assumed = [] }
 
@@ -159,10 +152,11 @@ struct
             List.fold_left aux path actions
         | R prod ->
             let prod = Parser.find_production prod in
-            Parser.force_reduction prod env, Reduce prod :: visited, assumed
+            let env = Parser.force_reduction prod env in
+            env, Reduce (prod, Some env) :: visited, assumed
         | S (N _ as sym) ->
             let env' =
-              Parser.feed sym endp (Recovery.default_value sym) endp env
+              Parser.feed sym endp (Recovery.default_value ~pos:endp sym) endp env
             and show = match Recovery.print_symbol @@ X sym with
               | "" -> None
               | sym_str -> Some (Pretty.delayed "%s" sym_str)
@@ -175,7 +169,7 @@ struct
             Shift (env, env') :: visited,
             { show; pos = endp; benign } :: assumed
         | S (T t as sym) ->
-            let v = Recovery.default_value sym in
+            let v = Recovery.default_value ~pos:endp sym in
             let token = Recovery.token_of_terminal t v in
             match feed_token (token, endp, endp) visited env with
             | `Fail ->

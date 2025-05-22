@@ -27,8 +27,7 @@ module TYPES = struct
     mutable cobol_config: Cobol_config.t;
     mutable source_format: Cobol_config.source_format_spec;
     mutable libpath: path list;
-    mutable copybook_extensions: string list;
-    mutable copybook_if_no_extension: bool;
+    mutable libexts: string list;
     mutable indent_config: (string * int) list;
     toml_handle: Ezr_toml.toml_handle;
   }
@@ -68,17 +67,15 @@ let cobol_source_format source_format_name =
 (* --- *)
 
 let default_libpath = [RelativeToProjectRoot "."]
-let default_copybook_extensions = Cobol_common.Copybook.copybook_extensions
-let default_copybook_if_no_extension = true
+let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
 
 let default = {
   cobol_config = Cobol_config.default;
   source_format = Cobol_config.Auto;
   libpath = default_libpath;
-  copybook_extensions = default_copybook_extensions;
+  libexts = default_libexts;
   indent_config = default_indent_config;
-  copybook_if_no_extension = default_copybook_if_no_extension;
   toml_handle = Ezr_toml.make_empty ();
 }
 
@@ -108,6 +105,9 @@ let path_repr = function
 let libpath_repr libpath =
   TOML.value_of_array @@ Array.of_list @@ List.map path_repr libpath
 
+let libexts_repr libexts =
+  TOML.value_of_strings @@ Array.of_list libexts
+
 let indent_repr indent =
   TOML.value_of_table @@
   List.fold_left
@@ -133,6 +133,11 @@ let config_repr config ~name =
         ~name: "copybooks"
         ~after_comments: ["Where to find copybooks"]
         (libpath_repr config.libpath);
+
+      option
+        ~name: "copyexts"
+        ~after_comments: ["Copybook filename extensions"]
+        (libexts_repr config.libexts);
 
       option
         ~name: "indent"
@@ -165,6 +170,10 @@ let get_libpath toml =
     Array.to_list @@ TOML.get_array toml ["copybooks"]
   with Not_found -> default_libpath
 
+let get_libexts toml =
+  try Array.to_list @@ TOML.get_strings toml ["copyexts"]
+  with Not_found -> default_libexts
+
 let get_indent_config toml =
   try
     EzCompat.StringMap.fold (fun name node v ->
@@ -185,11 +194,11 @@ let load_file ?(verbose=false) config_filename =
     let DIAGS.{ result = cobol_config; diags } =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section in
     DIAGS.result ~diags
-      { default with
-        cobol_config;
+      { cobol_config;
         toml_handle;
         source_format = get_source_format section;
         libpath = get_libpath section;
+        libexts = get_libexts section;
         indent_config = get_indent_config section }
   in
   try
@@ -220,16 +229,19 @@ let reload ?(verbose=false) ~config_filename config =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section
     and source_format = get_source_format section
     and libpath = get_libpath section
+    and libexts = get_libexts section
     and indent_config = get_indent_config section in
     let changed =
       config.source_format <> source_format ||
       config.libpath <> libpath ||
+      config.libexts <> libexts ||
       config.indent_config <> indent_config ||
       config.cobol_config <> cobol_config
     in
     config.cobol_config <- cobol_config;
     config.source_format <- source_format;
     config.libpath <- libpath;
+    config.libexts <- libexts;
     config.indent_config <- indent_config;
     DIAGS.result changed ~diags
   in
@@ -242,6 +254,7 @@ let reload ?(verbose=false) ~config_filename config =
       config.cobol_config <- default.cobol_config;
       config.source_format <- default.source_format;
       config.libpath <- default.libpath;
+      config.libexts <- default.libexts;
       config.indent_config <- default.indent_config;
       DIAGS.result true
   with TOML.Types.Error (loc, _code, error) ->
@@ -257,13 +270,9 @@ let libpath_for ~filename { libpath; _ } =
     | RelativeToFileDir str -> Filename.dirname filename // str
   end libpath
 
-
-(* TODO: add config flags to libpath where some directories may only include
-   copybooks. *)
-let detect_copybook ~filename { copybook_extensions;
-                                copybook_if_no_extension; _ } =
-  List.exists (Filename.check_suffix filename) copybook_extensions ||
-  (copybook_if_no_extension && Filename.extension filename = "")
+let copybook_lookup_config_for ~filename config =
+  Cobol_common.Copybook.lookup_config (libpath_for ~filename config)
+    ~libexts: config.libexts
 
 
 (** Persistent representation (for caching) *)

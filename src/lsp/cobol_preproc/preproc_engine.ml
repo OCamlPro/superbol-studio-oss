@@ -44,7 +44,7 @@ and preprocessor_persist =
     dialect: Cobol_config.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
-    libpath: string list;
+    copybook_lookup_config: Cobol_common.Copybook.lookup_config;
     verbose: bool;
     show_if_verbose: [`Txt | `Src] list;
   }
@@ -115,8 +115,9 @@ let source_format_config = function
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { libpath; verbose; source_format; env;
-                   exec_preprocs; config = (module Config) } ->
+  | `WithOptions { verbose; source_format; env;
+                   exec_preprocs; config = (module Config);
+                   copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
       let module Pp = Preproc_grammar.Make (Config) (Om) in
@@ -139,7 +140,7 @@ let preprocessor input = function
             dialect = Config.dialect;
             source_format;
             exec_preprocs;
-            libpath;
+            copybook_lookup_config;
             verbose;
             show_if_verbose = [`Src];
           };
@@ -223,6 +224,8 @@ and apply_compiler_directive ({ reader; pplog; _ } as lp)
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
+  | CDir_control_section ->                              (* nothing to do here *)
+      lp
   | CDir_preproc preproc_directive ->
       apply_preproc_directive lp (preproc_directive &@ loc)
 
@@ -323,15 +326,18 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
         ~error:(fun e -> `ReplaceDone (add_error lp e,
                                        List.rev rev_prefix, suffix))
   | Header (header, { prefix = rev_prefix; phrase; suffix }) ->
-      let prefix = match header with
+      let prefix, lp = match header with
         | ControlDivision
         | IdentificationDivision ->
             (* keep phrases that are further syntax-checked by the parser, and
                used to perform dialect-related checks there. *)
-            List.rev_append rev_prefix phrase
+            List.rev_append rev_prefix phrase, lp
         | SubstitutionSection ->
-            (* discard this phrase, which is not checked by the parser *)
-            List.rev rev_prefix
+            (* discard this phrase, which is not checked by the parser; keep it
+               in pplog anyways, so as to keep its location for later use. *)
+            let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
+            let section = Preproc_directives.CDir_control_section &@ loc in
+            List.rev rev_prefix, apply_compiler_directive lp section
       in
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
@@ -424,15 +430,15 @@ and do_exec ?(partial = false) lp rev_prefix exec_block suffix =
       emit lp exec_block                                  (* already reported *)
 
 
-and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
+and read_lib ({ persist = { copybook_lookup_config;
+                            copybooks; verbose; _ }; _ } as lp)
     loc { txtname; libname } =
   let text, diags, pplog =
     match
       Cobol_common.Copybook.find_lib ~&txtname ?libname:~&?libname
-        ?fromfile:(input_file lp) ~libpath
+        ?fromfile:(input_file lp) ~lookup_config:copybook_lookup_config
     with
     | Ok filename when Cobol_common.Srcloc.mem_copy filename copybooks ->
-        (* TODO: `note addendum *)
         [],
         Preproc_diagnostics.add_error
           (Cyclic_copy { copyloc = loc; filename }) lp.diags,
@@ -452,7 +458,7 @@ and read_lib ({ persist = { libpath; copybooks; verbose; _ }; _ } as lp)
         [],
         Preproc_diagnostics.add_error
           (Copybook_lookup_error { copyloc = Some loc; lnf }) lp.diags,
-        Preproc_trace.missing_copy ~loc ~info:lnf lp.pplog
+        Preproc_trace.missing_copy ~loc ~error:lnf lp.pplog
   in
   text, with_diags_n_pplog lp diags pplog
 
@@ -546,8 +552,8 @@ let lex_input ~dialect ~source_format ?(ppf = default_oppf) input =
 let lex_file ~dialect ~source_format ?ppf filename =
   Src_input.from ~filename ~f:(lex_input ~dialect ~source_format ?ppf)
 
-let lex_lib ~dialect ~source_format ~libpath ?(ppf = default_oppf) lib =
-  match Cobol_common.Copybook.find_lib ~libpath lib with
+let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
+  match Cobol_common.Copybook.find_lib ~lookup_config lib with
   | Ok filename ->
       Src_input.from ~filename ~f:begin fun input ->
         OUT.result @@
@@ -567,9 +573,48 @@ let fold_source_lines ~dialect ~source_format ?on_initial_source_format
     | Some f -> f (Src_reader.source_format reader) acc
     | None -> acc
   in
-  OUT.result @@
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
+
+let fold_source_words ~dialect ~source_format ~f input acc =
+  fold_source_lines ~dialect ~source_format input acc
+    ~skip_compiler_directives_text:true
+    ~f:begin fun _ line acc ->
+      ListLabels.fold_left line ~init:acc ~f:(fun acc word -> f word acc)
+    end
+
+let scan_prefix_for_copybook ~dialect ~source_format input =
+  let open struct
+    exception Res of [`Program | `Copybook]
+    type copybook_prefix_state =
+      | Expect_first_digits
+      | Expect_word
+    let digit_chars s =
+      let rec aux i =
+        i < 0 || match s.[i] with '0'..'9' -> aux (pred i) | _ -> false
+      in
+      aux (String.length s - 1)
+    let is_digits = function
+      | Text.TextWord s -> digit_chars s
+      | _ -> false
+    let is_word = function
+      | Text.TextWord _ as w -> not (is_digits w)
+      | _ -> false
+  end in
+  match
+    fold_source_words ~dialect ~source_format input Expect_first_digits
+      ~f:begin fun word -> function
+        | Expect_first_digits when is_digits ~&word ->
+            Expect_word
+        | Expect_word when is_word ~&word ->
+            raise @@ Res `Copybook
+        | _ ->
+            raise @@ Res `Program
+      end
+  with
+  | exception Res res -> res
+  | Expect_first_digits -> `Program                                  (* maybe? *)
+  | Expect_word -> `Copybook                                         (* maybe? *)
 
 let text_of_input ?options input =
   let text, pp = full_text ~item:"file" @@ preprocessor ?options input in

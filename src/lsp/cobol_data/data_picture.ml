@@ -66,6 +66,30 @@ module TYPES = struct
     | Z -> Fmt.char ppf 'Z'
     | Zero -> Fmt.char ppf '0'
 
+  let pp_symbol_cobolized ppf = function
+    | A -> Fmt.char ppf 'A'
+    | B -> Fmt.char ppf 'B'
+    | CR -> Fmt.string ppf "CR"
+    | CS -> Fmt.fmt "$" ppf
+    | DB -> Fmt.string ppf "DB"
+    | DecimalSep -> Fmt.fmt "." ppf
+    | E -> Fmt.char ppf 'E'
+    | GroupingSep -> Fmt.fmt "," ppf
+    | Minus -> Fmt.char ppf '-'
+    | N -> Fmt.char ppf 'N'
+    | Nine -> Fmt.char ppf '9'
+    | One -> Fmt.char ppf '1'
+    | P -> Fmt.char ppf 'P'
+    | Plus -> Fmt.char ppf '+'
+    | L -> Fmt.char ppf 'L'
+    | S -> Fmt.char ppf 'S'
+    | Slant -> Fmt.char ppf '/'
+    | Star -> Fmt.char ppf '*'
+    | V -> Fmt.char ppf 'V'
+    | X -> Fmt.char ppf 'X'
+    | Z -> Fmt.char ppf 'Z'
+    | Zero -> Fmt.char ppf '0'
+
   type symbols =
     {
       symbol: symbol;
@@ -98,7 +122,6 @@ module TYPES = struct
   and special_insertion =
     {
       special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =
@@ -161,8 +184,7 @@ module TYPES = struct
         }
   [@@deriving ord]
 
-
-  let pp_category ppf = function
+  let pp_category ?(with_edition=true) ppf = function
     | Alphabetic { length } ->
         Fmt.fmt "ALPHABETIC(%u)" ppf length
     | Alphanumeric { length; insertions = [] } ->
@@ -175,25 +197,26 @@ module TYPES = struct
         Fmt.fmt "NATIONAL(%u)" ppf length
     | National { length; insertions = _ } ->
         Fmt.fmt "NATIONAL-EDITED(%u)" ppf length
-    | FixedNum { digits; scale; with_sign;
-                 editions = { basics = [];
-                              floating = None;
-                              zerorepl = None } } ->
-        Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;with_sign = %B@])" ppf
-          digits scale with_sign
-    | FixedNum { digits; scale; with_sign; editions } ->
+    | FixedNum { digits; scale; with_sign; editions }
+      when with_edition && (editions.basics <> [] ||
+                            editions.floating <> None ||
+                            editions.zerorepl <> None) ->
         Fmt.fmt "NUMERIC-EDITED(@[digits = %u,@;scale = %d,@;\
                  with_sign = %B,@;editions = %a@])" ppf
           digits scale with_sign pp_editions editions
-    | FloatNum { digits; scale; with_sign; exponent_digits; editions = [] } ->
-        Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
-                 %u,@;with_sign = %B@])" ppf
-          digits scale exponent_digits with_sign
-    | FloatNum { digits; scale; with_sign; exponent_digits; editions } ->
+    | FixedNum { digits; scale; with_sign; _ } ->
+        Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;with_sign = %B@])" ppf
+          digits scale with_sign
+    | FloatNum { digits; scale; with_sign; exponent_digits; editions }
+      when (with_edition && editions <> []) ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
                  %u,@;with_sign = %B,@;%a@])" ppf
           digits scale exponent_digits with_sign
           (Fmt.list pp_basic_edition) editions
+    | FloatNum { digits; scale; with_sign; exponent_digits; _ } ->
+        Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
+                 %u,@;with_sign = %B@])" ppf
+          digits scale exponent_digits with_sign
 
 
   type picture =
@@ -247,7 +270,8 @@ module Symbol = struct type t = symbol let compare = Stdlib.compare end
 module Symbols = Set.Make (Symbol)
 module SymbolsMap = Map.Make (Symbol)
 
-let pp_category = TYPES.pp_category
+let pp_category = TYPES.pp_category ~with_edition:false
+let pp_detailed_category = TYPES.pp_category ~with_edition:true
 
 let pp_category_name ppf category =
   Pretty.string ppf @@ match category with
@@ -271,6 +295,14 @@ let pp_category_name ppf category =
   | FloatNum _ ->
       "numeric-edited"
 
+let pp_picture_symbols: symbols list Pretty.printer = fun ppf symbols ->
+  List.iter (fun { symbol_occurences = occ; symbol } ->
+    if occ > 3 then begin
+      pp_symbol_cobolized ppf symbol;
+      Fmt.pf ppf "(%d)" occ end
+    else List.iter (fun _ -> pp_symbol_cobolized ppf symbol) @@ List.init occ Fun.id)
+  symbols
+
 (* --- *)
 
 let is_edited: category -> bool = function
@@ -292,14 +324,13 @@ let data_size: category -> int = function
 
 let edited_size: category -> int =
   let simple_insertion_size { simple_insertion_symbols = symbols; _ } =
-    symbols.symbol_occurences
-  and special_insertion_size { special_insertion_length = n; _ } = n in
+    symbols.symbol_occurences in
   let simple_insertions_size =
     List.fold_left (fun s i -> s + simple_insertion_size i) 0
   and basic_editions_size basics =
     List.fold_left begin fun s -> function
       | SimpleInsertion i -> s + simple_insertion_size i
-      | SpecialInsertion i -> s + special_insertion_size i
+      | SpecialInsertion _
       | FixedInsertion _ -> s + 1
     end 0 basics
   in
@@ -528,10 +559,9 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
              Ok (numeric ~with_sign ~editions digits scale)
          | Error () -> error)
     | _ -> error
-  and append_special_insertion offset = function
+  and append_special_insertion special_insertion_offset = function
     | FixedNum { digits; scale; with_sign; editions } ->
-        let special = SpecialInsertion { special_insertion_offset = offset;
-                                         special_insertion_length = n } in
+        let special = SpecialInsertion { special_insertion_offset } in
         Ok (numeric ~with_sign digits scale
               ~editions:{ editions with basics = special :: editions.basics })
     | _ -> error
@@ -734,12 +764,11 @@ let char_order_checker_for_pic_string config =
 (* Maybe not in ISO/IEC 2014: Z/CS *)
 let mutual_exclusions =
   SymbolsMap.of_seq @@ List.to_seq [
-    CS, Symbols.singleton Z;
     DecimalSep, Symbols.of_list [P; V];
     P, Symbols.singleton DecimalSep;
     Star, Symbols.singleton Z;
     V, Symbols.singleton DecimalSep;
-    Z, Symbols.of_list [Star; CS];
+    Z, Symbols.singleton Star;
   ]
 
 type exp_sequence_state =
@@ -1090,7 +1119,7 @@ let pp_error ppf error =
   | Unexpected_symbol (s, c) ->
       Format.fprintf ppf "Unexpected@ %a@ in@ PICTURE@ string%a"
         pp_symbol s
-        Fmt.(option (fun ppf -> fmt "@ of@ category@ %a" ppf pp_category))
+        Fmt.(option (fun ppf -> fmt "@ of@ category@ %a" ppf pp_detailed_category))
         (Option.map reverse_editions c)
   | Empty_picture_string ->
       Format.fprintf ppf "Empty@ PICTURE@ string"

@@ -1,0 +1,9 @@
+{1 Library sql_ast}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package contains all the ast definition
+
+The entry point of this library is the module: {!Sql_ast}.
+

@@ -21,8 +21,8 @@ kind = "library"
 # name of a file to generate with the current version
 gen-version = "version.ml"
 
-# supported file generators are "ocamllex", "ocamlyacc" and "menhir" 
-# default is [ "ocamllex", "ocamlyacc" ] 
+# supported file generators are "ocamllex", "ocamlyacc" and "menhir"
+# default is [ "ocamllex", "ocamlyacc" ]
 generators = ["ocamllex"]
 
 # menhir options for the package
@@ -42,7 +42,7 @@ generators = ["ocamllex"]
 # pack = "Mylib"
 
 # preprocessing options
-#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))" 
+#  preprocess = "per-module (((action (run ./toto.sh %{input-file})) mod))"
 preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
@@ -51,7 +51,7 @@ skip = ["main.ml", "index.mld"]
 # package library dependencies
 #   [dependencies]
 #   ez_file = ">=0.1 <1.3"
-#   base-unix = { libname = "unix", version = ">=base" } 
+#   base-unix = { libname = "unix", version = ">=base" }
 [dependencies]
 cobol_ptree = "version"
 cobol_common = "version"
@@ -67,19 +67,19 @@ version = ">=1.2"
 # package tools dependencies
 [tools]
 ppx_deriving = ">=5.2.1"
-menhir = ">=20230415"
+menhir = ">=20231231 <20240715"
 
 # package fields (depends on package skeleton)
 #Examples:
-#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))" 
-#  dune-libraries = "bigstring" 
-#  dune-trailer = "(install (..))" 
-#  opam-trailer = "pin-depends: [..]" 
-#  no-opam-test = "yes" 
-#  no-opam-doc = "yes" 
-#  gen-opam = "some" | "all" 
-#  dune-stanzas = "(flags (:standard (:include linking.sexp)))" 
-#  static-clibs = "unix" 
+#  dune-stanzas = "(preprocess (pps ppx_deriving_encoding))"
+#  dune-libraries = "bigstring"
+#  dune-trailer = "(install (..))"
+#  opam-trailer = "pin-depends: [..]"
+#  no-opam-test = "yes"
+#  no-opam-doc = "yes"
+#  gen-opam = "some" | "all"
+#  dune-stanzas = "(flags (:standard (:include linking.sexp)))"
+#  static-clibs = "unix"
 [fields]
 dune-libraries = "str"
 dune-trailer = """
@@ -102,7 +102,19 @@ dune-trailer = """
   (action
     (with-stdout-to %{targets}
        (run %{exe:./keywords/gen_keywords.exe} %{deps}
-            --external-tokens Grammar_tokens))))
+            --external-tokens Grammar_tokens --with-is-intrinsic))))
+
+(rule
+  (targets grammar_expect.ml)
+  (enabled_if (<> %{profile} "release"))
+  (deps    grammar.cmly)
+  (mode    promote)
+  (action
+    (with-stdout-to %{targets}
+       (run %{exe:./expect/gen_expect.exe} %{deps}
+            --external-tokens Grammar_tokens
+            --extra-default-attribute-name recovery
+            --nel-module Cobol_common.Basics.NEL))))
 
 (rule
   (targets grammar_post_actions.ml)

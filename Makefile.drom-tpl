@@ -8,6 +8,9 @@ DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
+ifeq ($(BUILD_STATIC_EXECS),true)
+  export LINKING_MODE=static
+endif
 
 VERSION = !{version}
 DEV_DEPS := merlin ocamlformat odoc![if:gen:test] ppx_expect ppx_inline_test![fi]
@@ -30,8 +33,11 @@ build:
 ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
 	./scripts/static-build.sh
 else
+	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
+  ifeq ($(TARGET_PLAT),linux)
 	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh !{packages}
+  endif
 endif
 	./scripts/after.sh build
 

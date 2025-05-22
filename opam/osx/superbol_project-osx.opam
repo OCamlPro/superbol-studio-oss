@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "superbol_project"
-version: "0.1.3"
+version: "0.1.5"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -48,11 +48,12 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "pretty-osx" {= version}
   "ocplib_stuff-osx" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-osx" {= version}
   "ez_file-osx" {>= "0.3.0" & < "1.0.0"}
+  "cobol_preproc-osx" {= version}
   "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}

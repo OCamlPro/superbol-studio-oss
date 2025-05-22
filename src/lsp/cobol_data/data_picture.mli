@@ -40,6 +40,9 @@ module TYPES: sig
     | Z
     | Zero
 
+  val pp_symbol: symbol Pretty.printer
+  val pp_symbol_cobolized: symbol Pretty.printer
+
   type symbols =
     {
       symbol: symbol;
@@ -102,7 +105,6 @@ module TYPES: sig
   and special_insertion =
     {
       special_insertion_offset: int;
-      special_insertion_length: int;
     }
 
   and fixed_insertion =
@@ -178,8 +180,10 @@ type t = TYPES.picture
 
 open TYPES
 
+val pp_detailed_category: category Pretty.printer
 val pp_category: category Pretty.printer
 val pp_category_name: category Pretty.printer
+val pp_picture_symbols: symbols list Pretty.printer
 
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)

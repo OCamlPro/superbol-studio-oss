@@ -342,8 +342,8 @@ type exec_declarations =
   Cobol_common.Exec_block.t
 [@@deriving ord]
 
-let pp_exec_declarations =
-  Cobol_common.Exec_block.pp
+let pp_exec_declarations ppf =
+  Fmt.fmt "%a." ppf Cobol_common.Exec_block.pp
 
 (* --- *)
 
@@ -418,14 +418,14 @@ let compare_report_item_descr = compare_item_descr
 let compare_screen_item_descr = compare_item_descr
 let compare_any_item_descr = compare_item_descr
 
-let item_descr_level (type k) : k item_descr -> data_level option = function
+let item_descr_level (type k) : k item_descr -> data_level = function
   | Constant { constant_level = l ; _ }
   | Data { data_level = l; _ }
   | Renames { rename_level = l; _ }
-  | CondName { condition_name_level = l; _ } -> Some l.payload
+  | CondName { condition_name_level = l; _ } -> l.payload
   | Screen { screen_level = l; _ }
-  | ReportGroup { report_level = l; _ } -> Some l
-  | Exec _ -> None
+  | ReportGroup { report_level = l; _ } -> l
+  | Exec _ -> 01                                     (* always assume level 01 *)
 
 type working_storage_item_descr = working_item_descr
 type linkage_item_descr         = working_item_descr
@@ -522,10 +522,8 @@ let rec pp_item_descr_list boxes ppf = function
   | [] ->
       pp_close_boxes ppf boxes
   | id :: ids ->
-      let boxes = match item_descr_level id.payload with
-        | Some idl -> pp_close_boxes_until idl ppf boxes
-        | None -> boxes                                       (* EXEC block... *)
-      in
+      let level = item_descr_level id.payload in
+      let boxes = pp_close_boxes_until level ppf boxes in
       Fmt.box (pp_with_loc pp_item_descr) ppf id;
       pp_item_descr_list boxes ppf ids
 

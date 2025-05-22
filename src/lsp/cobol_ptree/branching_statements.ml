@@ -25,8 +25,12 @@ open Simple_statements
 type goto_stmt =
   | GoToSimple of
       {
+        target: procedure_name with_loc
+      }
+  | GoToDepending of
+      {
         targets: procedure_name with_loc nel;
-        depending_on: ident option;
+        depending_on: ident;
       }
   | GoToEntry of
       {
@@ -36,13 +40,12 @@ type goto_stmt =
 [@@deriving ord]
 
 let pp_goto_stmt ppf = function
-  | GoToSimple { targets; depending_on = None } ->
-      Fmt.pf ppf "@[GO TO @[%a@]@]"
-        (pp_nel pp_procedure_name') targets
-  | GoToSimple { targets; depending_on = Some i } ->
+  | GoToSimple { target } ->
+      Fmt.pf ppf "@[GO TO %a@]" pp_procedure_name' target
+  | GoToDepending { targets; depending_on } ->
       Fmt.pf ppf "@[GO TO @[%a@]@ DEPENDING ON %a@]"
         (pp_nel pp_procedure_name') targets
-        pp_ident i
+        pp_ident depending_on
   | GoToEntry { targets; depending_on = None } ->
       Fmt.pf ppf "@[GO TO ENTRY @[%a@]@]"
         (pp_nel @@ pp_with_loc pp_alphanum)

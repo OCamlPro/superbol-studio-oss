@@ -34,14 +34,23 @@ module Grammar_recovery =
 
 type 'x rewinder =
   {
-    rewind_n_parse: preprocessor_rewind -> position: position ->
+    rewind_n_parse:
+      ?stop_before_eof:bool -> preprocessor_rewind -> position: position ->
       ('x * ('x rewinder)) with_diags;
+    last_env_stage: inspectable_parser_state;
   }
-and preprocessor_rewind =
-  ?new_position: Lexing.position -> (Cobol_preproc.preprocessor as 'r) -> 'r
+and preprocessor_rewind
+  = last_pp: (Cobol_preproc.preprocessor as 'r)
+  -> ?new_position: Lexing.position
+  -> 'r -> 'r
 and position =
   | Lexing of Lexing.position
   | Indexed of { line: int; char: int }                  (* all starting at 0 *)
+and inspectable_parser_state =
+  | Env:
+      'a Grammar_interpr.env                 (* always valid input_needed env. *)
+      -> inspectable_parser_state
+  | Sink
 
 type 'm simple_parsing
   = options: parser_options
@@ -67,10 +76,10 @@ type 'm rewindable_parsing
     be called on results of eidetic parsers. *)
 type 'm state =
   {
-    prev_limit: Cobol_preproc.Src_overlay.limit option; (* last right-limit *)
-    (* `prev_limit'` is required to deal with the single-step backtracking
-       upon recovery: *)
-    prev_limit': Cobol_preproc.Src_overlay.limit option;  (* second-to-last *)
+    prev_limit: Cobol_preproc.Src_overlay.limit;          (* last right-limit *)
+    (* `prev_limit'` is required to deal with the single-step backtracking upon
+       recovery: *)
+    prev_limit': Cobol_preproc.Src_overlay.limit;           (* second-to-last *)
     preproc: 'm preproc;
   }
 
@@ -87,6 +96,7 @@ and 'm preproc =
 (** Part of the parser state that changes very rarely, if at all. *)
 and 'm persist =
   {
+    leftmost_limit: Cobol_preproc.Src_overlay.limit;
     tokenizer_memory: 'm memory;
     recovery: recovery;
     verbose: bool;
@@ -108,9 +118,12 @@ let make_parser
       (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
       (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)
   in
+  let first_pos = Cobol_preproc.position pp in
+  let first_loc = Cobol_common.Srcloc.raw (first_pos, first_pos) in
+  let leftmost_limit, right = Overlay_manager.limits first_loc in
   {
-    prev_limit = None;
-    prev_limit' = None;
+    prev_limit = right;
+    prev_limit' = right;        (* [right], in case (unlikely to be relevant) *)
     preproc =
       {
         pp;
@@ -118,6 +131,7 @@ let make_parser
         tokzr;
         persist =
           {
+            leftmost_limit;
             tokenizer_memory;
             recovery;
             verbose;
@@ -170,9 +184,9 @@ let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
       let ps, tokens = produce_tokens ps in
       next_token ps tokens
 
-let token_n_srcloc_limits ?prev_limit token =
+let token_n_srcloc_limits ~prev_limit token =
   let s, e = Overlay_manager.limits ~@token in
-  Option.iter (fun e -> Overlay_manager.link_limits e s) prev_limit;
+  Overlay_manager.link_limits prev_limit s;
   ~&token, s, e
 
 let put_token_back ({ preproc; _ } as ps) token tokens =
@@ -274,15 +288,6 @@ let on_reduction ps tokens prod =
   then pop_context ps tokens
   else ps, tokens
 
-(** Traverses a path (sequence of parser states or productions) that starts with
-    the state that matches the current context stack, and applies the induced
-    changes to the context stack. *)
-let seesaw_context_stack ps tokens recovery_operations =
-  List.fold_left begin fun (ps, tokens) -> function
-    | Grammar_recovery.Shift (e1, e2) -> on_shift ps tokens e1 e2
-    | Grammar_recovery.Reduce p -> on_reduction ps tokens p
-  end (ps, tokens) recovery_operations
-
 (* --- *)
 
 let env_loc env =
@@ -364,15 +369,32 @@ let after_reduction ps token tokens prod = function
   | AboutToReduce (env, _)
   | Shifting (env, _, _) ->
       post_production ps token tokens prod env
-  | _ ->
+  | InputNeeded _                                   (* <- normally unexpected *)
+  | Accepted _
+  | Rejected ->
       ps, token, tokens
+
+(** Traverses a path (sequence of parser states or productions) that starts with
+    the state that matches the current context stack, and applies the induced
+    changes to the context stack; also applies {!post_production} on the way. *)
+let traverse_recovery_path ps token tokens recovery_path =
+  List.fold_left begin fun (ps, tokens) -> function
+    | Grammar_recovery.Shift (e1, e2) ->
+        on_shift ps tokens e1 e2
+    | Reduce (prod, None) ->
+        on_reduction ps tokens prod
+    | Reduce (prod, Some env) ->
+        let ps, tokens = on_reduction ps tokens prod in
+        let ps, _, tokens = post_production ps token tokens prod env in
+        ps, tokens
+  end (ps, tokens) recovery_path
 
 (* Main code for driving the parser with recovery and lexical contexts: *)
 
 (** We call "stage" a high(er)-level parsing state (than {!type:state}). *)
 type ('a, 'm) stage =
   | Trans of ('a, 'm) interim_stage
-  | Final of ('a option * 'm state)
+  | Final of ('a, 'm) final_stage
 
 (** Interim stage, at which the parser may be stopped, restarted or
     rewound. *)
@@ -380,6 +402,12 @@ and ('a, 'm) interim_stage =
   'm state *
   Text_tokenizer.tokens *
   'a Grammar_interpr.env                     (* Always valid input_needed env. *)
+
+(** Final stage, at which the parser has stopped processing. *)
+and ('a, 'm) final_stage =
+  'm state *
+  'a option *
+  inspectable_parser_state                                   (* last env seen *)
 
 let rec normal ps tokens = function
   | Grammar_interpr.InputNeeded env ->
@@ -393,14 +421,18 @@ let rec normal ps tokens = function
   | Rejected | HandlingError _ ->
       assert false                                     (* should never happen *)
 
-and on_interim_stage ({ prev_limit; _ } as ps, tokens, env) =
+and on_interim_stage ?(stop_before_eof = false) (ps, tokens, env) =
   let c = Grammar_interpr.input_needed env in
-  let ps, token, tokens = next_token ps tokens in
-  let _t, _, e as tok = token_n_srcloc_limits ?prev_limit token in
-  let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
-  check ps token tokens env @@ Grammar_interpr.offer c @@ match tok with
-    | Grammar_tokens.INTERVENING_ '.', l, r -> Grammar_tokens.PERIOD, l, r
-    | tok -> tok
+  let { prev_limit; _ } as ps, token, tokens = next_token ps tokens in
+  match ~&token with
+  | Grammar_tokens.EOF when stop_before_eof ->
+      Final (ps, None, Env env)
+  | _ ->
+      let _t, _, e as tok = token_n_srcloc_limits ~prev_limit token in
+      let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
+      check ps token tokens env @@ Grammar_interpr.offer c @@ match tok with
+      | Grammar_tokens.INTERVENING_ '.', l, r -> Grammar_tokens.PERIOD, l, r
+      | tok -> tok
 
 and check ps token tokens env = function
   | Grammar_interpr.HandlingError env ->
@@ -441,31 +473,31 @@ and error ps token tokens env =
                                         ~report_invalid_syntax
                                         ~recovery_options)
   | DisableRecovery ->
-      Final (None, report_invalid_syntax Error ps)
+      Final (report_invalid_syntax Error ps, None, Env env)
 
 and recover ps tokens candidates ~report_syntax_hints_n_error =
   let { prev_limit; _ } as ps, token, tokens = next_token ps tokens in
-  let _, _, e as tok = token_n_srcloc_limits ?prev_limit token in
-  let ps = { ps with prev_limit = Some e; prev_limit' = prev_limit } in
+  let _, _, e as tok = token_n_srcloc_limits ~prev_limit token in
+  let ps = { ps with prev_limit = e; prev_limit' = prev_limit } in
   match Grammar_recovery.attempt candidates tok with
   | `Fail when ~&token <> Grammar_tokens.EOF ->             (* ignore one token *)
       recover ps tokens candidates ~report_syntax_hints_n_error
-  | `Fail when Option.is_none candidates.final ->
-      Final (None, report_syntax_hints_n_error ps [])    (* unable to recover *)
+  | `Fail when Option.is_none candidates.final ->         (* unable to recover *)
+      Final (report_syntax_hints_n_error ps [], None, Sink)
   | `Fail ->
       let v, assumed = Option.get candidates.final in
       accept (report_syntax_hints_n_error ps assumed) v
   | `Accept (v, assumed) ->
       accept (report_syntax_hints_n_error ps assumed) v
   | `Ok (c, _, visited, assumed) ->
-      let ps, tokens = seesaw_context_stack ps tokens visited in
+      let ps, tokens = traverse_recovery_path ps token tokens visited in
       normal (report_syntax_hints_n_error ps assumed) tokens c
 
 and accept ps v =
-  Final (Some v, ps)
+  Final (ps, Some v, Sink)
 
 let on_exn ps e =
-  Final (None, add_exn ps e)
+  Final (add_exn ps e, None, Sink)
 
 (* --- *)
 
@@ -473,15 +505,11 @@ let on_exn ps e =
     of a parser in state [ps]. *)
 let first_stage (ps: 'm state) ~make_checkpoint : ('a, 'm) stage =
   let ps, tokens = produce_tokens ps in
-  let first_pos = match tokens with
-    | [] -> Cobol_preproc.position ps.preproc.pp
-    | t :: _ -> Cobol_common.Srcloc.start_pos ~@t
-  in
-  normal ps tokens (make_checkpoint first_pos)
+  normal ps tokens (make_checkpoint ps.preproc.persist.leftmost_limit)
 
 (** [full_parse stage] completes parsing from the given stage [stage]. *)
 let rec full_parse: ('a, 'm) stage -> 'a option * 'm state = function
-  | Final (res, ps) ->
+  | Final (ps, res, _) ->
       res, ps
   | Trans ((ps, _, _) as state) ->
       full_parse @@ try on_interim_stage state with e -> on_exn ps e
@@ -563,29 +591,33 @@ let save_interim_stage (ps, _, env) (store: _ rewindable_history) =
       { preproc_position; event_stage = (ps, env) } :: store'
 
 let rewindable_parser_state = function
-  | { stage = Final (_, ps) | Trans (ps, _, _); _ } -> ps
+  | { stage = Final (ps, _, _) | Trans (ps, _, _); _ } -> ps
+
+let last_env_stage: _ -> inspectable_parser_state = function
+  | { stage = Trans (_, _, env); _ } -> Env env
+  | { stage = Final (_, _, env); _ } -> env
 
 (** Parses all the input, saving some rewindable history along the way. *)
 (* TODO: configurable [save_stage] *)
-let parse_with_history ?(save_stage = 10) rwps =
+let parse_with_history ?stop_before_eof ?(save_stage = 10) rwps =
   let rec loop count ({ store; stage; _ } as rwps) = match stage with
-    | Final (res, _) ->
+    | Final (_, res, _) ->
         res, rwps
     | Trans ((ps, _, _) as state) ->
         let store, count =
           if count = save_stage then store, succ count
           else save_interim_stage state store, 0
         and stage =
-          try on_interim_stage state with e -> on_exn ps e
+          try on_interim_stage ?stop_before_eof state with e -> on_exn ps e
         in
         loop count { rwps with store; stage }
   in
   let ps = rewindable_parser_state rwps in
   Tokzr.enable_context_sensitive_tokens  ps.preproc.tokzr;
-  Tokzr.reregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.restore_intrinsics               ps.preproc.tokzr;
   let res, rwps = loop 0 rwps in
   let ps = rewindable_parser_state rwps in
-  Tokzr.unregister_intrinsics            ps.preproc.tokzr;
+  Tokzr.save_intrinsics                  ps.preproc.tokzr;
   Tokzr.disable_context_sensitive_tokens ps.preproc.tokzr;
   res, rwps
 
@@ -613,29 +645,32 @@ let find_history_event_preceding ~position ({ store; _ } as rwps) =
 
 let rec rewind_n_parse
   : type m. ('a, m) rewindable_parsing_state -> make_checkpoint:_
-    -> preprocessor_rewind -> position: position
+    -> ?stop_before_eof:bool -> preprocessor_rewind -> position: position
     -> ((('a option, m) output as 'x) * 'x rewinder) with_diags =
-  fun rwps ~make_checkpoint pp_rewind ~position ->
+  fun rwps ~make_checkpoint ?stop_before_eof pp_rewind ~position ->
   let rwps =
+    let last_pp = (rewindable_parser_state rwps).preproc.pp in
     try
       let event, store = find_history_event_preceding ~position rwps in
       let ps, env = event.event_stage in
       let pp = ps.preproc.pp in
-      let pp = pp_rewind ~new_position:event.preproc_position pp in
+      let pp = pp_rewind ~last_pp ~new_position:event.preproc_position pp in
       let ps = { ps with preproc = { ps.preproc with pp } } in
-      Overlay_manager.restart ();
+      Overlay_manager.restart ~at:ps.prev_limit ();
       let ps, tokens = produce_tokens ps in
       { rwps with stage = Trans (ps, tokens, env); store }
     with Not_found ->                     (* rewinding before first checkpoint *)
-      let pp = pp_rewind rwps.init.preproc.pp in
+      let pp = pp_rewind ~last_pp rwps.init.preproc.pp in
       let ps = { rwps.init with preproc = { rwps.init.preproc with pp } } in
+      Overlay_manager.restart ~at:ps.prev_limit ();
       init_rewindable_parse ~make_checkpoint ps
   in
-  let res, rwps = parse_with_history rwps in
+  let res, rwps = parse_with_history ?stop_before_eof rwps in
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
-  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
-  OUT.with_diags (output, { rewind_n_parse }) (all_diags ps)
+  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
+  and last_env_stage = last_env_stage rwps in
+  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
 
 let rewindable_parse
   : options:_ -> memory:'m memory -> make_checkpoint:_
@@ -649,8 +684,9 @@ let rewindable_parse
   in
   let ps = rewindable_parser_state rwps in
   let output = aggregate_output ps res in
-  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint in
-  OUT.with_diags (output, { rewind_n_parse }) (all_diags ps)
+  let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
+  and last_env_stage = last_env_stage rwps in
+  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
 
 (* --- *)
 
@@ -681,8 +717,21 @@ let rewindable_parse
 let rewindable_parse_simple = rewindable_parse ~memory:Amnesic
 let rewindable_parse_with_artifacts = rewindable_parse ~memory:Eidetic
 
-let rewind_and_parse { rewind_n_parse } rewind_preproc ~position =
+let rewind_and_parse { rewind_n_parse; _ } rewind_preproc ~position =
   rewind_n_parse rewind_preproc ~position
+
+(* Rewinding for inspection *)
+
+let rewind_for_inspection { rewind_n_parse; _ } rewind_preproc
+    ~position ~inspect =
+  Overlay_manager.with_temporary_copy ~f:begin fun () ->
+    let { result = _, { last_env_stage; _ }; _ } =
+      rewind_n_parse ~stop_before_eof:true rewind_preproc ~position
+    in
+    inspect last_env_stage
+  end ()
+
+(* Extracting artifacts *)
 
 let artifacts
   : (_, Cobol_common.Behaviors.eidetic) output -> _ = function

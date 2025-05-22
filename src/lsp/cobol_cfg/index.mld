@@ -1,0 +1,9 @@
+{1 Library cobol_cfg}
+
+Superbol is a set of utilities for COBOL developers,
+that can be selected by sub-commands.
+
+This package is gives control flow representation for COBOL programs.
+
+The entry point of this library is the module: {!Cobol_cfg}.
+

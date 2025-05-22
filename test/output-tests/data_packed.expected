@@ -1,5 +1,5 @@
-Considering: import/gnucobol/tests/testsuite.src/data_packed.at:47:0
-data_packed.at-47-dump.c:5.6-5.7:
+Considering: import/gnucobol/tests/testsuite.src/data_packed.at:45:0
+data_packed.at-45-dump.c:5.6-5.7:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -9,7 +9,7 @@ data_packed.at-47-dump.c:5.6-5.7:
    7   {
 >> Error: Unexpected indicator: `T'
 
-data_packed.at-47-dump.c:5.7-5.8:
+data_packed.at-45-dump.c:5.7-5.8:
    2   #include <stdio.h>
    3   #include <libcob.h>
    4   
@@ -19,7 +19,7 @@ data_packed.at-47-dump.c:5.7-5.8:
    7   {
 >> Error: Invalid syntax
 
-data_packed.at-47-dump.c:6.6-6.7:
+data_packed.at-45-dump.c:6.6-6.7:
    3   #include <libcob.h>
    4   
    5   COB_EXT_EXPORT int
@@ -29,7 +29,7 @@ data_packed.at-47-dump.c:6.6-6.7:
    8     int i;
 >> Error: Unexpected indicator: `u'
 
-data_packed.at-47-dump.c:8.6-8.7:
+data_packed.at-45-dump.c:8.6-8.7:
    5   COB_EXT_EXPORT int
    6   dump (unsigned char *data)
    7   {
@@ -39,7 +39,7 @@ data_packed.at-47-dump.c:8.6-8.7:
   10       printf ("%02x", data[i]);
 >> Error: Unexpected indicator: `i'
 
-data_packed.at-47-dump.c:9.6-9.7:
+data_packed.at-45-dump.c:9.6-9.7:
    6   dump (unsigned char *data)
    7   {
    8     int i;
@@ -49,7 +49,7 @@ data_packed.at-47-dump.c:9.6-9.7:
   11     puts ("");
 >> Error: Unexpected indicator: `('
 
-data_packed.at-47-dump.c:10.6-10.7:
+data_packed.at-45-dump.c:10.6-10.7:
    7   {
    8     int i;
    9     for (i = 0; i < 10; i++)
@@ -59,7 +59,7 @@ data_packed.at-47-dump.c:10.6-10.7:
   12     return 0;
 >> Error: Unexpected indicator: `i'
 
-data_packed.at-47-dump.c:12.6-12.7:
+data_packed.at-45-dump.c:12.6-12.7:
    9     for (i = 0; i < 10; i++)
   10       printf ("%02x", data[i]);
   11     puts ("");
@@ -741,5 +741,6 @@ Considering: import/gnucobol/tests/testsuite.src/data_packed.at:7277:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:12320:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:20531:0
 Considering: import/gnucobol/tests/testsuite.src/data_packed.at:28740:0
-Considering: import/gnucobol/tests/testsuite.src/data_packed.at:34793:0
-Considering: import/gnucobol/tests/testsuite.src/data_packed.at:40840:0
+Considering: import/gnucobol/tests/testsuite.src/data_packed.at:28779:0
+Considering: import/gnucobol/tests/testsuite.src/data_packed.at:34832:0
+Considering: import/gnucobol/tests/testsuite.src/data_packed.at:40879:0

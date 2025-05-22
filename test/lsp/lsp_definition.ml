@@ -159,6 +159,47 @@ let%expect_test "simple-definition-requests-3" =
        7               05 Y PIC 9.
        8           PROCEDURE DIVISION. |}]
 
+(* This is wrong atm due to Lsp_position.sieve and item_definition with_loc interaction *)
+let%expect_test "definition-requests-condition" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_definitions server ~projdir @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        01 PIC X.
+          88 COND_|1-cond-in-def|_ VALUE "A".
+        PROCEDURE DIVISION.
+          SET _|1-cond-in-stmt|_COND TO TRUE
+          IF CO_|2-cond-in-stmt|_ND
+            DISPLAY "A"
+          END-IF
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    1-cond-in-def (line 6, character 17):
+    No definition found
+    1-cond-in-stmt (line 8, character 14):
+    __rootdir__/prog.cob:7.13-7.17:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 PIC X.
+       7 >           88 COND VALUE "A".
+    ----                ^^^^
+       8           PROCEDURE DIVISION.
+       9             SET COND TO TRUE
+    2-cond-in-stmt (line 9, character 15):
+    __rootdir__/prog.cob:7.13-7.17:
+       4           DATA DIVISION.
+       5           WORKING-STORAGE SECTION.
+       6           01 PIC X.
+       7 >           88 COND VALUE "A".
+    ----                ^^^^
+       8           PROCEDURE DIVISION.
+       9             SET COND TO TRUE |}];;
+
 
 let doc =
   extract_position_markers {cobol|
@@ -597,11 +638,11 @@ let%expect_test "definition-index" =
            SET _|3-i|_I IN V-TAB TO 0
            SET _|4-j|_J IN w TO 0
            SET _|5-k|_K IN W-TAB IN W TO 0
-           SET _|6-missing|_L IN w-tab IN W TO 0
+           SET _|6-missing|_L IN w-tab IN W TO 0.
   |cobol};
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Missing .","range":{"end":{"character":35,"line":11},"start":{"character":35,"line":11}},"severity":4}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     1-j (line 4, character 41):
     __rootdir__/prog.cob:5.41-5.42:
        2          PROGRAM-ID. prog.

@@ -1,0 +1,14 @@
+{
+  "wordPattern": "[a-zA-Z0-9_-]+",
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "onEnterRules": [
+    {
+      "beforeText": "^[0-9]{6}.*",
+      "action": { "indent": "none", "appendText": "000000 " }
+    }
+  ]
+}

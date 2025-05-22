@@ -56,7 +56,7 @@ val lex_file
 val lex_lib
   : dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
-  -> libpath:string list
+  -> lookup_config: Cobol_common.Copybook.lookup_config
   -> ?ppf:Format.formatter
   -> Cobol_common.Copybook.fileloc
   -> unit Preproc_outputs.with_diags
@@ -90,7 +90,13 @@ val fold_source_lines
   -> f:(int -> Text.text -> 'a -> 'a)
   -> Src_input.t
   -> 'a
-  -> 'a Preproc_outputs.with_diags
+  -> 'a
+
+val scan_prefix_for_copybook
+  : dialect: Cobol_config.dialect
+  -> source_format: Cobol_config.source_format_spec
+  -> Src_input.t
+  -> [`Program | `Copybook]
 
 val preprocess_input
   : ?options: Preproc_options.preproc_options

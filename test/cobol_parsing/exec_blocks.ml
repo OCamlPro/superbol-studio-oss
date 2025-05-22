@@ -11,22 +11,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let exec_scanners =
+  Superbol_preprocs.more [
+    "SQL", Superbol_preprocs.Esql.scanner;
+  ]
+
 let%expect_test "exec-block-with-cobol-separators" =
-  Parser_testing.show_parsed_tokens {|
+  Parser_testing.show_parsed_tokens
+    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
+  {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
            EXEC SQL
+            BEGIN
               SELECT something_1, something_2 FROM some_table
-                 WHERE condition > 0;
+                WHERE condition > 0;
+              EXCEPTION
+            END;
            END-EXEC.
            STOP RUN.
   |};
-  [%expect {|
+  [%expect{|
     PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
-    EXEC_BLOCK[EXEC SQL SELECT something_1 , something_2 FROM some_table WHERE
-               condition > 0 ; END-EXEC],
-    ., STOP, RUN, ., EOF
-|}];;
+    EXEC_BLOCK[EXEC SQL BEGIN SELECT something_1, something_2  FROM some_table WHERE condition > 0; EXCEPTION  END; END-EXEC],
+    ., STOP, RUN, ., EOF |}];;
 
 let%expect_test "exec-block-with-invalid-percentage-character" =
   let exec_scanners =
@@ -34,7 +42,9 @@ let%expect_test "exec-block-with-invalid-percentage-character" =
       "NO-%", Superbol_preprocs.No_percentage_toy.scanner;
     ]
   in
-  Parser_testing.show_diagnostics ~exec_scanners {|
+  Parser_testing.show_diagnostics
+    ~parser_options:(Parser_testing.options ~exec_scanners ()) @@
+  {|
        PROGRAM-ID.        prog.
        PROCEDURE          DIVISION.
            EXEC NO-%
@@ -53,3 +63,17 @@ let%expect_test "exec-block-with-invalid-percentage-character" =
        7              STOP RUN.
     >> Error: Unexpected character `%' in no-percentage-allowed EXEC/END-EXEC
               block |}];;
+
+let%expect_test "exec-block-sequence-without-separator-periods" =
+  Parser_testing.show_parsed_tokens {|
+       PROGRAM-ID.         prog.
+       PROCEDURE           DIVISION.
+           EXEC SQL A END-EXEC
+           EXEC SQL B END-EXEC
+           DISPLAY 'C'
+           EXEC SQL D END-EXEC.
+  |};
+  [%expect {|
+    PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE, DIVISION, .,
+    EXEC_BLOCK[EXEC SQL A END-EXEC], EXEC_BLOCK[EXEC SQL B END-EXEC], DISPLAY,
+    'C', EXEC_BLOCK[EXEC SQL D END-EXEC], ., EOF |}];;

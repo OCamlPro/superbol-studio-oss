@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "cobol_indent"
-version: "0.1.3"
+version: "0.1.5"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "fmt-windows" {>= "0.9"}
   "cobol_config-windows" {= version}
   "odoc" {with-doc}

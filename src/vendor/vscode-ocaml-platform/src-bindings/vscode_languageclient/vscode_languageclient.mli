@@ -95,6 +95,18 @@ module ClientOptions : sig
     -> t
 end
 
+module TransportKind : sig
+  type t =
+    [ `stdio
+    | `ipc
+    | `pipe
+    | `socket
+    ]
+  include Js.T with type t := t
+end
+
+module Transport = TransportKind
+
 module ExecutableOptions : sig
   include Js.T
 
@@ -120,19 +132,72 @@ module Executable : sig
 
   val command : t -> string
 
+  val transport : t -> Transport.t option
+
   val args : t -> string list option
 
   val options : t -> ExecutableOptions.t option
 
   val create :
        command:string
+    -> ?transport: Transport.t
     -> ?args:string list
     -> ?options:ExecutableOptions.t
     -> unit
     -> t
 end
 
-module ServerOptions = Executable
+module ForkOptions : sig
+  include Js.T
+
+  val cwd : t -> string option
+
+  val env : t -> string Interop.Dict.t option
+
+  val encoding : t -> string option
+
+  val execArgv : t -> string list option
+
+  val create :
+       ?cwd:string
+    -> ?env:string Interop.Dict.t
+    -> ?encoding:string
+    -> ?execArgv:string list
+    -> unit
+    -> t
+end
+
+module NodeModule : sig
+  include Js.T
+
+  val module_: t -> string
+
+  val transport : t -> Transport.t or_undefined [@@js.get]
+
+  val args : t -> string list option
+
+  val runtime : t -> string option
+
+  val options : t -> ForkOptions.t option
+
+  val create :
+    module_:string
+    -> ?transport: Transport.t
+    -> ?args:string list
+    -> ?runtime:string
+    -> ?options:ForkOptions.t
+    -> unit
+    -> t
+end
+
+module ServerOptions : sig
+  type t =
+    [ `Executable of Executable.t
+    | `NodeModule of NodeModule.t
+    ]
+
+  include Js.T with type t := t
+end
 
 module InitializeParams : sig
   include Js.T
@@ -167,6 +232,24 @@ module DidChangeConfiguration : sig
   val create : settings:Ojs.t -> unit -> t
 end
 
+module StreamInfo: sig
+  include Js.T
+
+  val writer : t -> Node.Net.Socket.t [@@js.get]
+
+  val reader : t -> Node.Net.Socket.t [@@js.get]
+
+  val detached : t -> bool option [@@js.get]
+
+  val create :
+    writer: Node.Net.Socket.t
+    -> reader: Node.Net.Socket.t
+    -> ?detached:bool
+    -> unit
+    -> t
+         [@@js.builder]
+end
+
 module LanguageClient : sig
   include Js.T
 
@@ -177,6 +260,12 @@ module LanguageClient : sig
     -> clientOptions:ClientOptions.t
     -> ?forceDebug:bool
     -> unit
+    -> t
+
+  val from_stream :
+    id:string
+    -> name:string
+    -> (unit -> StreamInfo.t Promise.t)
     -> t
 
   val start : t -> unit Promise.t

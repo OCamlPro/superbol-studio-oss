@@ -20,9 +20,6 @@ open EzCompat
 (** Tokens passed to {!Parser}; can be obtained via {!tokenize_text}. *)
 type token = Grammar_tokens.token Cobol_ptree.with_loc
 type tokens = token list
-val pp_token: token Pretty.printer
-val pp_tokens: tokens Pretty.printer
-val pp_tokens': ?fsep:Pretty.simple -> tokens Pretty.printer
 
 (* --- *)
 
@@ -131,5 +128,5 @@ val pop_context
 
 val enable_context_sensitive_tokens: _ state -> unit
 val disable_context_sensitive_tokens: _ state -> unit
-val unregister_intrinsics: _ state -> unit
-val reregister_intrinsics: _ state -> unit
+val save_intrinsics: _ state -> unit
+val restore_intrinsics: _ state -> unit

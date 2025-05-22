@@ -32,7 +32,7 @@ module TYPES = struct
     workspace_folders: DocumentUri.t list;               (* includes root_uri *)
     with_semantic_tokens: bool;
     with_client_config_watcher: bool;
-    with_client_file_watcher: bool;
+    with_client_file_watcher: [`no | `yes of [`absolute | `any]];
   }
 
   type registry = {                                                (* private *)
@@ -155,7 +155,7 @@ let ignore_promise_result: 'a promise * t -> t = fun after ->
   perform (fun _ registry -> registry) ~after
 
 
-let on_response id response
+let on_client_response id response
     ({ pending_tasks = { delayed; _ }; _ } as registry) =
   try                                      (* TODO: handle malformed response *)
     let Sink { request; f } = IMap.find id delayed in
@@ -183,6 +183,12 @@ let on_response id response
   with Not_found ->
     Lsp_io.log_error "Response@ with@ unkown@ ID@ %d@ received" id;
     registry
+
+
+let on_client_error id ({ pending_tasks = { delayed; _ }; _ } as registry) =
+  { registry with
+    pending_tasks = { registry.pending_tasks with
+                      delayed = IMap.remove id delayed } }
 
 
 (** {2 Handling of diagnostics for non-opened documents} *)
@@ -240,18 +246,20 @@ let config_watch_registration_id ~rooturi =
   Digest.(to_hex @@ string @@ DocumentUri.to_string rooturi)
 
 
-let start_watching_config_of ~project registry =
+let start_watching_config_of ~project registry ~pattern_kind =
   let registration =
     RegistrationParams.create ~registrations:[
       let rooturi = Lsp_project.rooturi project in
       let watchers =
         (* Note: basic glob patterns that try matching only in rootdir do not
            seem to work (in VS Code).  Watch in any sub-dir? *)
-        let pattern = "**/superbol.toml" in
-        let globPattern =
-          (* `Pattern pattern *)
-          `RelativePattern
-            (RelativePattern.create ~pattern ~baseUri:(`URI rooturi))
+        let globPattern = match pattern_kind with
+          | `any ->
+              `RelativePattern (RelativePattern.create
+                                  ~pattern:"**/superbol.toml"
+                                  ~baseUri:(`URI rooturi))
+          | `absolute ->                (* assume root path is ok as a pattern *)
+              `Pattern (DocumentUri.to_path rooturi ^ "/superbol.toml")
         in
         FileSystemWatcher.[
           create () ~globPattern ~kind:Create;
@@ -272,9 +280,11 @@ let start_watching_config_of ~project registry =
 
 
 let maybe_start_watching_config_of ~project registry =
-  if registry.params.with_client_file_watcher
-  then start_watching_config_of ~project registry
-  else registry
+  match registry.params.with_client_file_watcher with
+  | `yes pattern_kind ->
+      start_watching_config_of ~project registry ~pattern_kind
+  | `no ->
+      registry
 
 
 let stop_watching_config_of ~project registry =
@@ -291,7 +301,7 @@ let stop_watching_config_of ~project registry =
 
 
 let maybe_stop_watching_config_of ~project registry =
-  if registry.params.with_client_file_watcher
+  if registry.params.with_client_file_watcher <> `no
   then stop_watching_config_of ~project registry
   else registry
 
@@ -345,11 +355,14 @@ let remove_project project r =
 let save_project_caches
     { params = { config = { cache_config = config; _ }; _ };
       docs; _ } =
-  try Lsp_project_cache.save ~config docs
-  with e ->
-    Lsp_error.internal
-      "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
-
+  try Lsp_project_cache.save ~config docs with
+  | Unix.Unix_error (e, op, args) ->
+      if config.cache_verbose then
+        Lsp_io.log_debug "While@ saving@ project@ caches:@ %s %s:@ %s"
+          op args (Unix.error_message e)
+  | e ->
+      Lsp_error.internal
+        "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
 
 let load_project_cache ~rootdir
     ({ params = { config = { project_layout = layout;
@@ -423,10 +436,12 @@ let use_client_config_for ~project (configs: Yojson.Safe.t list) registry =
     let registry, out_of_date_docs = match configs with
       | [`Assoc assoc] ->
           if Lsp_project.update_project_config assoc project
-          then extract_docs_of ~project registry (* configuration changed *)
-          else registry, URIMap.empty            (* no doc is outdated *)
+          then extract_docs_of ~project registry     (* configuration changed *)
+          else registry, URIMap.empty                (* no doc is outdated *)
+      | [`Null] ->
+          registry, URIMap.empty
       | _ ->
-          Lsp_io.log_error "Invalid@ configuration@ item: %s"
+          Lsp_io.log_warn "Invalid@ configuration@ item: %s"
             (Yojson.Safe.to_string @@ `List configs);
           registry, URIMap.empty
     in
@@ -660,10 +675,10 @@ let on_change_workspace_folders
 
 
 let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
-    ?copybook registry =
+    registry =
   let add_in_project project registry =
     try
-      let doc = Lsp_document.load ~project ?copybook doc in
+      let doc = Lsp_document.load ~project doc in
       let registry = dispatch_diagnostics doc registry in
       add_or_replace_doc doc registry
     with Lsp_document.Internal_error (doc, e, backtrace) ->
@@ -674,7 +689,7 @@ let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
 
 
 let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
-                                          _ } as doc) ?copybook registry =
+                                          _ } as doc) registry =
   (* Try first with a lookup for the project in a cache, and then by
      creating/loading the project. *)
   let rec aux ~try_cache registry =
@@ -687,7 +702,7 @@ let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
         retrieve_project_for ~uri registry |>
         aux ~try_cache:false                   (* try again without the cache *)
     | None | Some _ ->
-        add ~doc ?copybook registry
+        add ~doc registry
   in
   aux ~try_cache:true registry
 

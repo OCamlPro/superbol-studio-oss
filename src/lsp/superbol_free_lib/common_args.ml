@@ -65,6 +65,7 @@ let get () =
                  "cobolx"; "Cobolx"; "CobolX"; "COBOLX";
                  "auto"; "AUTO"] in
   let libpath = ref ["."] in
+  let libexts = ref Cobol_common.Copybook.copybook_extensions in
   let definitions = ref [] in
   let recovery = ref true in
   let show = ref [`Pending] in                                     (* default *)
@@ -104,15 +105,22 @@ let get () =
     EZCMD.info "Shorthand for `--source-format FREE`";
 
     ["recovery"], Arg.Set_bool recovery,
-    EZCMD.info @@
+    EZCMD.info ~docv:"BOOL" @@
     Pretty.to_string "Enable/disable parser recovery after syntax errors \
                       (default: %b)" !recovery;
 
     ["silence"], Arg.String silence,
     EZCMD.info "Silence specific messages";
 
-    ["I"], Arg.String (fun s -> libpath := s :: !libpath),
-    EZCMD.info ~docv:"DIRECTORY" "Add DIRECTORY to library search path";
+    ["I"], Arg.String (fun s -> libpath := !libpath @ [s]),
+    EZCMD.info ~docv:"DIR" "Add DIR to library search path";
+
+    ["ext"], Arg.String (fun s -> libexts := !libexts @ [s]),
+    EZCMD.info ~docv:"EXT" @@
+    Pretty.to_string
+      "Add EXT as a filename extension for copybook resolution (default: %a)"
+      Fmt.(list ~sep:sp @@ fmt "`%s`")
+      Cobol_common.Copybook.copybook_extensions;
   ] in
 
   let get () =
@@ -162,7 +170,10 @@ let get () =
     (*   Cobol_preproc.Env.pp env; *)
     { preproc_options = { config; verbose; source_format;
                           exec_preprocs = EXEC_MAP.empty;
-                          libpath = !libpath; env };
+                          copybook_lookup_config =
+                            Cobol_common.Copybook.lookup_config !libpath
+                              ~libexts:!libexts;
+                          env };
       parser_options = { config; recovery; verbose; show = !show;
                          exec_scanners = Superbol_preprocs.exec_scanners } }
 

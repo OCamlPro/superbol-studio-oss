@@ -16,6 +16,10 @@ type t
 type client = Vscode_languageclient.LanguageClient.t
 
 val make: context:Vscode.ExtensionContext.t -> t
+val subscribe_disposable: t -> Vscode.Disposable.t -> unit
+
+val client: t -> client option
+val context: t -> Vscode.ExtensionContext.t
 
 val stop_language_server: t -> unit Promise.t
 val start_language_server: t -> unit Promise.t

@@ -13,6 +13,7 @@
 
 let cmlyname = ref None
 let external_tokens = ref ""
+let with_is_intrinsic = ref false
 
 let usage_msg = Fmt.str "%s [OPTIONS] file.cmly" Sys.argv.(0)
 let anon str = match !cmlyname with
@@ -23,6 +24,8 @@ let () =
   Arg.parse
     Arg.[
       ("--external-tokens", Set_string external_tokens,
+       "<module> Import token type definition from <module>");
+      ("--with-is-intrinsic", Set with_is_intrinsic,
        "<module> Import token type definition from <module>");
     ]
     anon usage_msg
@@ -55,6 +58,10 @@ let keyword attrs =
   List.find_opt (Attribute.has_label "keyword") attrs |>
   Option.map Attribute.payload
 
+let combined attrs =
+  List.find_opt (Attribute.has_label "keyword.combined") attrs |>
+  Option.map Attribute.payload
+
 let silenced attrs =
   List.find_opt (Attribute.has_label "keyword.silenced") attrs |>
   Option.map Attribute.payload
@@ -78,10 +85,13 @@ let pp_terminal ppf t =
 let cobolize name =
   String.map (function '_' -> '-' | c -> c) name
 
+let combined_name name =
+  String.map (function '_' -> ' ' | c -> c) name
+
 let uncobolize name =
   String.map (function '-' -> '_' | c -> c) String.(sub name 1 @@ length name - 2)
 
-let emit_entry attribute_payload ?(comment_token = false) ppf t =
+let emit_entry attribute_payload ?(with_spaces = false) ?(comment_token = false) ppf t =
   let start_token ppf = if comment_token then Fmt.string ppf "(*"
   and end_token   ppf = if comment_token then Fmt.string ppf "*)" in
   match Terminal.kind t with
@@ -93,7 +103,9 @@ let emit_entry attribute_payload ?(comment_token = false) ppf t =
           ()
       | Some payload when String.trim payload = "" ->         (* auto-generate *)
           Fmt.pf ppf "@\n\"%s\"%t, %a%t;"
-            (cobolize @@ Terminal.name t)
+            (if with_spaces
+            then (combined_name @@ Terminal.name t)
+            else (cobolize @@ Terminal.name t))
             start_token pp_terminal t end_token
       | Some payload ->
           List.iter
@@ -144,6 +156,11 @@ let emit_keywords_list ppf =
   Terminal.iter (emit_entry keyword ~comment_token:false ppf);
   Fmt.pf ppf "@]@\n]@."
 
+let emit_combined_list ppf =
+  Fmt.pf ppf "@[<2>let combined_keywords = %s.[" tokens_module;
+  Terminal.iter (emit_entry combined ~with_spaces:true ~comment_token:false ppf);
+  Fmt.pf ppf "@]@\n]@."
+
 let emit_puncts_list ppf =
   Fmt.pf ppf "@[<2>let puncts = %s.[" tokens_module;
   Terminal.iter (emit_entry punct ~comment_token:false ppf);
@@ -160,6 +177,19 @@ let emit_intrinsic_functions_list ppf =
   Terminal.iter (emit_custom_intrinsics ppf);
   Fmt.pf ppf "@]@\n]@."
 
+let emit_is_intrinsic ppf =
+  if !with_is_intrinsic then
+  let is_intrinsic t =
+    intrinsic (Terminal.attributes t) |> Option.is_some
+  in
+  Fmt.pf ppf "@[<2>let is_known_intrinsic_token = %s.(function@." tokens_module;
+  Terminal.iter begin fun t ->
+    if is_intrinsic t
+    then Fmt.pf ppf "| %a@." pp_terminal t
+  end;
+  Fmt.pf ppf "| _ -> false@]\n)@."
+
+
 let emit ppf =
   Fmt.pf ppf
     "(* Caution: this file was automatically generated from %s; do not edit *)\
@@ -169,13 +199,17 @@ let emit ppf =
      @\n%t\
      @\n%t\
      @\n%t\
+     @\n%t\
+     @\n%t\
      @\n"
     cmlyname
     emit_prelude
     emit_keywords_list
+    emit_combined_list
     emit_intrinsic_functions_list
     emit_puncts_list
     emit_silenced_keywords_list
+    emit_is_intrinsic
 
 let () =
   emit Fmt.stdout

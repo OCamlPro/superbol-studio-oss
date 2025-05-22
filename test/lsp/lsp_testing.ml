@@ -53,15 +53,16 @@ let make_server ?(with_semantic_tokens = false) () =
                             root_uri = None;
                             workspace_folders = [];
                             with_semantic_tokens;
-                            with_client_file_watcher = false;
+                            with_client_file_watcher = `no;
                             with_client_config_watcher = false }
 
-let add_cobol_doc server ?copybook ~projdir filename text =
+let add_cobol_doc server ~projdir filename text =
   let path = projdir // filename in
   let uri = Lsp.Uri.of_path path in
+  EzFile.(safe_mkdir @@ dirname path);
   EzFile.write_file path text;
   let server =
-    LSP.Server.did_open ?copybook
+    LSP.Server.did_open
       DidOpenTextDocumentParams.{
         textDocument = TextDocumentItem.{
             languageId = "cobol"; version = 0; text; uri;
@@ -225,6 +226,8 @@ class srcloc_resuscitator_cache = object (self)
       f
   method of_ ~location:Location.{ uri; range } : srcloc =
     (self#for_ ~uri) range
+  method pp ppf location =
+    Pretty.print ppf "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
   method print location =
     Pretty.out "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
   method print_range_for ~uri range =

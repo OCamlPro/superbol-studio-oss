@@ -38,6 +38,16 @@
         "command": "superbol.coverage.reload",
         "title": "Update Coverage",
         "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open",
+        "title": "Show Control-flow",
+        "category": "SuperBOL"
+      },
+      {
+        "command": "superbol.cfg.open.arc",
+        "title": "Show Control-flow as an Arc-diagram",
+        "category": "SuperBOL"
       }
     ],
     "configuration": {
@@ -120,6 +130,17 @@
           },
           "order": 3
         },
+        "superbol.cobol.copyexts": {
+          "markdownDescription": "File extensions for copybook resolution\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "array",
+          "default": [
+            "cpy",
+            "cbl",
+            "cob"
+          ],
+          "items": "string",
+          "order": 4
+        },
         "superbol.cobc-path": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",
@@ -141,6 +162,12 @@
           "type": "boolean",
           "default": false,
           "order": 21
+        },
+        "superbol.cacheInGlobalStorage": {
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching.  When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.",
+          "type": "boolean",
+          "default": false,
+          "order": 22
         },
         "superbol.debugger.display-variable-attributes": {
           "title": "Display Variable Attributes",
@@ -186,7 +213,7 @@
     },
     "debuggers": [
       {
-        "type": "gdb",
+        "type": "superbol-gdb",
         "label": "SuperBOL Debugger for GnuCOBOL",
         "program": "./_dist/superbol-vscode-gdb.js",
         "runtime": "node",
@@ -325,7 +352,7 @@
             "description": "New SuperBOL launch request",
             "body": {
               "name": "${2:SuperBOL: debug (launch)}",
-              "type": "gdb",
+              "type": "superbol-gdb",
               "request": "launch",
               "preLaunchTask": "SuperBOL: build (debug)",
               "target": "$${_:{file}}",
@@ -342,7 +369,7 @@
             "description": "Attach to a local debug session",
             "body": {
               "name": "${2:SuperBOL: debug (attach local)}",
-              "type": "gdb",
+              "type": "superbol-gdb",
               "request": "attach",
               "pid": "${3:0}",
               "target": "$${_:{file}}",
@@ -357,7 +384,7 @@
             "description": "Attach to a remote debug session",
             "body": {
               "name": "${2:SuperBOL: debug (attach remote)}",
-              "type": "gdb",
+              "type": "superbol-gdb",
               "request": "attach",
               "remote-debugger": "${3:host:port}",
               "target": "$${_:{file}}",
@@ -378,12 +405,22 @@
         "embeddedLanguages": {
           "meta.embedded.block.sql": "sql"
         }
+      },
+      {
+        "language": "COBOL_GNU_LISTFILE",
+        "scopeName": "source.gnucobol_listfile",
+        "path": "./syntaxes/listfile.tmLanguage.json"
+      },
+      {
+        "language": "COBOL_GNU_DUMPFILE",
+        "scopeName": "source.gnucobol_dumpfile",
+        "path": "./syntaxes/dumpfile.tmLanguage.json"
       }
     ],
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
-        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema.json"
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json"
       }
     ],
     "languages": [
@@ -394,9 +431,44 @@
         ],
         "filenamePatterns": [
           "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX}"
-        ]
+        ],
+        "configuration": "./syntaxes/language-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_LISTFILE",
+        "extensions": [
+          ".lst"
+        ],
+        "aliases": [
+          "LISTFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
+      },
+      {
+        "id": "COBOL_GNU_DUMPFILE",
+        "extensions": [
+          ".dump"
+        ],
+        "aliases": [
+          "DUMPFILE"
+        ],
+        "configuration": "./syntaxes/list-n-dump-configuration.json"
       }
     ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "superbol.cfg.open",
+          "group": "superbol",
+          "when": "editorTextFocus && editorLangId == 'cobol'"
+        },
+        {
+          "command": "superbol.cfg.open.arc",
+          "group": "superbol",
+          "when": "editorTextFocus && editorLangId == 'cobol'"
+        }
+      ]
+    },
     "problemMatchers": [
       {
         "name": "gnucobol",
@@ -484,11 +556,19 @@
           },
           "cobc-path": {
             "title": "GnuCOBOL Compiler Executable",
+            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
             "type": [
               "string",
               "null"
-            ],
-            "description": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise."
+            ]
+          },
+          "listings-target": {
+            "title": "Output file or directory for preprocessed program listings",
+            "markdownDescription": "Path to a directory where preprocessed program listings are generated; no listing is saved when `null`",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "extra-args": {
             "type": "array",
@@ -521,7 +601,7 @@
   "displayName": "SuperBOL Studio OSS",
   "description": "Provides a COBOL mode in Visual Studio Code, based on the SuperBOL LSP server for COBOL, a source level debugger, and commands for GnuCOBOL 3.2+",
   "license": "MIT",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-studio-oss"
@@ -546,20 +626,14 @@
     "@vscode/debugadapter": "^1.61.0",
     "@vscode/debugprotocol": "^1.61.0",
     "vscode-languageclient": "8.0.2",
-    "polka": "^1.0.0-next.22",
-    "sirv": "^2.0.2",
     "n-readlines": "^1.0.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.64.0",
-    "esbuild": "^0.15.16",
-    "fs-extra": "^10.0.1",
-    "mocha": "^9.2.2",
-    "npm-run-all": "^4.1.5",
-    "ovsx": "^0.1.0",
-    "prettier": "^2.5.1",
-    "@vscode/vsce": "^2.15.0",
     "@vscode/test-electron": "^1.6.1",
+    "@vscode/vsce": "^2.15.0",
+    "esbuild": "^0.15.16",
+    "ovsx": "^0.1.0",
     "typescript": "^5.1.6",
     "@types/node": "^20.3.2"
   },

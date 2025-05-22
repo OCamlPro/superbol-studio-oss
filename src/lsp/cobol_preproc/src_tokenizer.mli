@@ -20,6 +20,9 @@ val cdtoks_of_text_supplier
   -> Text.t
   -> Compdir_grammar.token supplier * (unit -> Preproc_diagnostics.t)
 
+(** Note: [pptoks_of_text_supplier (module Om)] hides an internal state (in
+    addition to [Om]).  This state is reset whenever the resulting function is
+    given some new text to supply. *)
 val pptoks_of_text_supplier
   : (module Src_overlay.MANAGER)
   -> Text.t

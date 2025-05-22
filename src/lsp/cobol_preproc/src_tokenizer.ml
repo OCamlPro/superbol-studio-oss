@@ -144,17 +144,18 @@ let cdtoks_of_text_supplier directive_kind text =
     ~endlimit:(fun () -> Lexing.dummy_pos)
 
 let pptoks_of_text_supplier (module Om: Src_overlay.MANAGER) text =
+  assert (text <> []);
   Om.restart ();
-  let prev_limit = ref None in
+  let prev_right = ref None in
   fst @@ ondemand_list_supplier text ()
     ~eoi:Preproc_tokens.EOL
     ~pp:pptoks_of_word
     ~decompose:begin fun y ->
       let s, e = Om.limits ~@y in
-      Option.iter (fun e -> Om.link_limits e s) !prev_limit;
-      prev_limit := Some e;
+      Option.iter (fun e -> Om.link_limits e s) !prev_right;
+      prev_right := Some e;
       ~&y, s, e
     end
     ~endlimit:begin fun () ->
-      Option.value !prev_limit ~default:Om.dummy_limit
+      Option.get !prev_right                  (* assume [text] is never empty *)
     end

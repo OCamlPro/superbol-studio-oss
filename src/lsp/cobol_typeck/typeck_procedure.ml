@@ -182,12 +182,12 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
     { acc with diags = Proc_error err :: acc.diags }
   in
 
-  let visitor = object
+  let visitor = object (v)
     inherit [acc] Cobol_unit.Visitor.folder
 
     method! fold_qualname qn acc =                (* TODO: data_name' instead *)
       let loc = baseloc_of_qualname qn in
-      Visitor.skip_children @@
+      Visitor.do_children @@
       (* match Qualmap.find qn data_definitions.data_items.named with *)
       (* | Data_field { def; _ } -> *)
       (*     { acc with *)
@@ -212,23 +212,42 @@ let references ~(data_definitions: Cobol_unit.Types.data_definitions) procedure 
           error acc @@ Ambiguous_data_name { given_qualname = qn &@ loc;
                                              matching_qualnames }
 
-    method! fold_procedure_section s ({ current_section; _ } as acc) =
-      Visitor.do_children_and_then
-        { acc with current_section = Some s }
-        (fun acc -> { acc with current_section })
+    method! fold_procedure_section ({ section_paragraphs; _ } as s)
+        ({ current_section; _ } as acc) =
+      let acc =
+        Visitor.fold_list v section_paragraphs.list
+          ~fold:Cobol_unit.Visitor.fold_procedure_paragraph'
+          { acc with current_section = Some s }
+      in
+      Visitor.skip { acc with current_section }
 
-    method! fold_procedure_name' ({ loc; _ } as qn)
+    method! fold_procedure_paragraph { paragraph; _ } acc =
+      Visitor.skip @@
+      Cobol_ptree.Proc_division_visitor.fold_paragraph' v paragraph acc
+
+
+    method! fold_procedure_name' qn
         ({ current_section = in_section; _ } as acc) =
-      Visitor.skip_children @@
-      match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
-      | block ->
+      let register ?in_section qn acc =
+        let loc = baseloc_of_qualname ~&qn in
+        match Cobol_unit.Procedure.find ~&qn ?in_section procedure with
+        | block ->
           { acc with
             refs = Typeck_outputs.register_procedure_ref ~loc block acc.refs }
-      | exception Not_found ->
+        | exception Not_found ->
           error acc @@ Unknown_proc_name qn
-      | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
+        | exception Qualmap.Ambiguous (lazy matching_qualnames) ->
           error acc @@ Ambiguous_proc_name { given_qualname = qn;
                                              matching_qualnames }
+      in
+      let acc = register ?in_section qn acc in
+      let acc = match ~&qn with
+        | Name _ -> acc
+        | Qual (_, section_qn) ->
+          let loc = baseloc_of_qualname section_qn in
+          register (section_qn &@ loc) acc
+      in
+      Visitor.skip_children acc
 
   end in
 

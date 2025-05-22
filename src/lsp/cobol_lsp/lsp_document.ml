@@ -66,6 +66,7 @@ include TYPES
 
 type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
+let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
@@ -77,9 +78,13 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
-        libpath = Lsp_project.libpath_for ~uri:(uri doc) project;
+        copybook_lookup_config =
+          Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
-        source_format = project.config.source_format
+        source_format = match language_id doc with
+          | "COBOL_GNU_LISTFILE"
+          | "COBOL_GNU_DUMPFILE" -> SF SFVariable
+          | _ -> project.config.source_format
       } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }
@@ -125,17 +130,50 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
       { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   | Some position, Some rewinder ->
       check doc @@
-      Cobol_parser.rewind_and_parse rewinder ~position @@
+      Cobol_parser.rewind_and_parse rewinder ~position @@ fun ~last_pp:_ ->
       Cobol_preproc.reset_preprocessor_for_string @@
       Lsp.Text_document.text textdoc
 
+(** [inspect_at ~position ~f doc] passes to [f] the state that is reached by the
+    parser at [position] in [doc].  Returns [None] on copybooks, or [Some r] for
+    [r] the result of [f]. *)
+let rec inspect_at ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
+  match rewinder with
+  | None | Some _ when copybook ->                                     (* skip *)
+      None
+  | None ->
+      inspect_at ~position ~f @@ parse_and_analyze doc
+  | Some rewinder ->
+      let Lsp.Types.Position.{ line; character = char } = position in
+      let exception FAILURE in
+      let preproc_rewind ~last_pp =
+        (* cut parsed program at given position *)
+        let pos_cnum =
+          try (Cobol_preproc.position_at ~line ~char last_pp).pos_cnum
+          with Not_found when line = 0 -> char
+             | Not_found -> raise FAILURE
+        in
+        let input = Lsp.Text_document.text textdoc in
+        Cobol_preproc.reset_preprocessor_for_string @@
+        String.sub input 0 pos_cnum
+      in
+      try
+        Option.some @@
+        Cobol_parser.rewind_for_inspection rewinder preproc_rewind
+          ~position:(Indexed { line; char })
+          ~inspect:f
+      with FAILURE ->
+        None
+
 (** Creates a record for a document that is not yet parsed or analyzed. *)
-let blank ~project ?copybook textdoc =
-  let copybook = match copybook with
-    | Some p -> p
-    | None -> Lsp_project.detect_copybook project
-                ~uri:(Lsp.Text_document.documentUri textdoc)
+let blank ~project textdoc =
+  let uri = Lsp.Text_document.documentUri textdoc in
+  let copybook =
+    Lsp_project.detect_copybook project ~uri
+      ~contents:(Lsp.Text_document.text textdoc)
   in
+  if copybook then
+    Lsp_io.log_debug "%s appears to be a copybook" (Lsp.Uri.to_string uri);
   {
     project;
     textdoc;
@@ -149,9 +187,9 @@ let blank ~project ?copybook textdoc =
 
 let position_encoding = `UTF8
 
-let load ~project ?copybook doc =
+let load ~project doc =
   let textdoc = Lsp.Text_document.make ~position_encoding doc in
-  let doc = blank ~project ?copybook textdoc in
+  let doc = blank ~project textdoc in
   try parse_and_analyze doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 

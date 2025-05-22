@@ -15,4 +15,10 @@
 
 module CUs = Cobol_unit.Collections.SET
 module CUMap = Cobol_unit.Collections.MAP
-module URIMap = Map.Make (Lsp.Uri)
+module URIMap = struct
+  include Map.Make (Lsp.Uri)
+
+  let add_to_list x data m =
+      let add = function None -> Some [data] | Some l -> Some (data :: l) in
+      update x add m
+end

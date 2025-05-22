@@ -20,8 +20,17 @@ module Options = Parser_options
 module Outputs = Parser_outputs
 module Diagnostics = Parser_diagnostics
 
-module Tokens = Grammar_tokens
+module Tokens = struct
+  include Grammar_tokens
+  let pp = Grammar_tokens_printer.pp_token
+  let pp' = Grammar_tokens_printer.pp_token'
+  let pp'_list = Grammar_tokens_printer.pp_tokens
+  let pp'_list_with_loc_info = Grammar_tokens_printer.pp_tokens_with_loc_info
+end
+module Expect = Grammar_expect
+module Printer = Grammar_printer
 module Keywords = Text_keywords
+module Grammar_interpr = Grammar.MenhirInterpreter
 
 (** {1 Exported functions} *)
 
@@ -32,14 +41,6 @@ include Parser_engine
     Signatures of modules below may change unexpectedly. *)
 
 module INTERNAL = struct
-
-  (** {2 COBOL tokens} *)
-
-  module Tokens = Grammar_tokens
-
-  let pp_token = Text_tokenizer.pp_token
-  let pp_tokens = Text_tokenizer.pp_tokens
-  let pp_tokens' = Text_tokenizer.pp_tokens'
 
   (** {2 COBOL grammar} *)
 
