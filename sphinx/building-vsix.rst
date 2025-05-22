@@ -1,4 +1,4 @@
-Building SuperBOL from Sources
+Building the VSIX from Sources
 ==============================
 
 If you build from a clone of the git repository, make sure to update submodules:
@@ -18,7 +18,7 @@ to install a few external dependencies.
    command:
 
    .. code-block:: shell
-   
+
       opam pin add https://github.com/OCamlPro/drom.git
 
 3. Install `node.js`_ (version >=5.2.0) if it is not already installed.
@@ -27,7 +27,7 @@ to install a few external dependencies.
    LSP server along with the VSCode extension:
 
    .. code-block:: shell
-   
+
       make build-deps vsix-release
 
 You should obtain a file :code:`superbol-vscode-platform.vsix` in the
