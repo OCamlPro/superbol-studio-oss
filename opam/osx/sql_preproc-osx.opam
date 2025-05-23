@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "sql_preproc"
-version: "0.1.4"
+version: "0.1.5"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -48,7 +48,7 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "superbol_preprocs-osx" {= version}
   "ppx_deriving-osx" {>= "5.2.1"}
   "ez_file-osx" {>= "0.3"}
@@ -56,5 +56,6 @@ depends: [
   "cobol_typeck-osx" {= version}
   "cobol_indent-osx" {= version}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

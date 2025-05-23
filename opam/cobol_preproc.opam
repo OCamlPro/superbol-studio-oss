@@ -54,5 +54,6 @@ depends: [
   "cobol_config" {= version}
   "cobol_common" {= version}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

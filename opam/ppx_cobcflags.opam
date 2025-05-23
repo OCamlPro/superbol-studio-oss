@@ -49,5 +49,6 @@ depends: [
   "dune" {>= "3.17.0"}
   "ppxlib" {>= "0.15"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

@@ -52,5 +52,6 @@ depends: [
   "fmt-osx" {>= "0.9"}
   "ez_file-osx" {>= "0.3"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:
