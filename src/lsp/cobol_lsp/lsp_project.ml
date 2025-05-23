@@ -167,7 +167,7 @@ let update_project_config assoc project : bool =
     update_config assoc key update project || u
   end false [
     "dialect", from_string ~f:update_dialect;
-    "source-format", from_string ~f:update_source_format;
+    "sourceFormat", from_string ~f:update_source_format;
     "copybooks", update_copybooks;
     "copyexts", update_copyexts;
   ]
