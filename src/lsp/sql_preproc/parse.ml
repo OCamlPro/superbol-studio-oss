@@ -191,8 +191,11 @@ let parse ~config ~filename ~contents =
 
       let params = List.rev params in
       let sqlStr = "EXEC SQL " ^ String.concat " " params ^ " END-EXEC" in
-      let sql = Sql_parser.parseString (Lexing.from_string sqlStr) in
-      sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql });
+      (match Sql_parser.parse_string sqlStr with
+       | Ok sql ->
+           sql_add_statement ~loc (EXEC_SQL { end_loc; with_dot; tokens = sql })
+       | Error _ ->
+           ());
       iter tokens
     | [] -> failwith "missing END-EXEC."
     | (tok, _) :: tokens ->

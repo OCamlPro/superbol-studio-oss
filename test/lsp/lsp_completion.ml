@@ -5444,7 +5444,8 @@ let%expect_test "preproc-interaction" =
         SECURITY.\n
   |}]
 
-(* FIXME *)
+(* FIXME: The best would be to suggest SQL keywords. But let's consider this
+   future work. *)
 let%expect_test "sql-preproc-interaction" =
   let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
         IDENTIFICATION DIVISION.
@@ -5464,6 +5465,120 @@ let%expect_test "sql-preproc-interaction" =
     ----                                ^
        6
     (line 4, character 29):
-    Caught exception: Sql_parser__Grammar.MenhirBasics.Error
-    Caught exception: Sql_parser__Grammar.MenhirBasics.Error
+    Basic (57 entries):
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (57 entries):
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
   |}]
