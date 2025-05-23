@@ -17,6 +17,7 @@
    (superbol-vscode-platform (= version))
    (superbol-free (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -34,6 +35,7 @@
    (js_of_ocaml ( >= 4 ))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -47,6 +49,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -62,6 +65,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -78,6 +82,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -96,6 +101,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -110,6 +116,7 @@
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -126,6 +133,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -140,6 +148,7 @@
    (gen_js_api (and (>= 1.1.1) (< 2.0.0)))
    (js_of_ocaml-ppx ( >= 3.0 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -151,6 +160,7 @@
    (ocaml (>= 4.14.0))
    (superbol_free_lib (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -174,6 +184,7 @@
    (cobol_indent (= version))
    (cobol_common (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -189,6 +200,7 @@
    (cobol_parser (= version))
    (cobol_common (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -206,6 +218,7 @@
    (cobol_config (= version))
    (cobol_common (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -219,6 +232,7 @@
    (ocplib_stuff (and (>= 0.4.0) (< 1.0.0)))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -237,6 +251,7 @@
    (ppx_deriving ( >= 5.2.1 ))
    (menhir (and ( >= 20231231 )( < 20240715 )))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -249,6 +264,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -259,6 +275,7 @@
  (depends
    (ocaml (>= 4.14.0))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -282,6 +299,7 @@
    (cobol_common (= version))
    (cobol_cfg (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -293,6 +311,7 @@
    (ocaml (>= 4.14.0))
    (ppxlib ( >= 0.15 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -305,6 +324,7 @@
    (fmt ( >= 0.9 ))
    (ez_file ( >= 0.3 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -319,6 +339,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -331,6 +352,7 @@
    (fmt ( >= 0.9 ))
    (cobol_config (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -344,6 +366,7 @@
    (cobol_preproc (= version))
    (cobol_common (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -360,6 +383,7 @@
    (cobol_config (= version))
    (cobol_common (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -376,6 +400,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -392,6 +417,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -407,6 +433,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -421,6 +448,7 @@
    (ez_file ( >= 0.3 ))
    (ISO8601 ( >= 0.2 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -435,6 +463,7 @@
    (ez_toml (= version))
    (ez_file (and (>= 0.3.0) (< 1.0.0)))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -451,6 +480,7 @@
    (cobol_typeck (= version))
    (cobol_indent (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -465,6 +495,7 @@
    (cobol_common (= version))
    (ppx_deriving ( >= 5.2.1 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -484,6 +515,7 @@
    (ppx_deriving ( >= 5.2.1 ))
    (menhir ( >= 20230415 ))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 
@@ -496,6 +528,7 @@
    (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))
    (cobol_typeck (= version))
    odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
  )
 

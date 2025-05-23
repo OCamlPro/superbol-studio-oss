@@ -52,5 +52,6 @@ depends: [
   "ez_file" {>= "0.3"}
   "ISO8601" {>= "0.2"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

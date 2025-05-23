@@ -55,5 +55,6 @@ depends: [
   "js_of_ocaml" {>= "4"}
   "js_of_ocaml-ppx" {>= "4"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

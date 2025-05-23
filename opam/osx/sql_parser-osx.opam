@@ -59,5 +59,6 @@ depends: [
   "ppx_deriving" {>= "5.2.1"}
   "menhir" {>= "20230415"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

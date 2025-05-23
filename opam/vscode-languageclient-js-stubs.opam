@@ -56,5 +56,6 @@ depends: [
   "gen_js_api" {>= "1.1.1" & < "2.0.0"}
   "js_of_ocaml-ppx" {>= "4"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

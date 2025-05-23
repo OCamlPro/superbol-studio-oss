@@ -50,5 +50,6 @@ depends: [
   "ocamlgraph" {>= "2.1.0" & < "3.0.0"}
   "cobol_typeck" {= version}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:

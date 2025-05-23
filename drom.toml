@@ -39,6 +39,7 @@ skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "sphi
 
 # project-wide tools dependencies (not for package-specific deps)
 [tools]
+dune = ">=3.17.0 <3.19.0"
 [tools.odoc]
 for-doc = true
 
