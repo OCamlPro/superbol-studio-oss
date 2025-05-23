@@ -5,8 +5,8 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sub-commands and Arguments &mdash; superbol-studio-oss master
- (1020167
-) (2025/05/22 12:49) documentation</title>
+ (bf7f526
+) (2025/05/23 07:43) documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d8449d71" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=86f27845" />
       <link rel="stylesheet" type="text/css" href="_static/css/fixes.css" />
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=8dae8fb0"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=4d31a5a9"></script>
+        <script src="_static/documentation_options.js?v=e3540164"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -39,7 +39,7 @@
           </a>
               <div class="version">
                 master
- (1020167
+ (bf7f526
 )
               </div>
 <div role="search">
@@ -79,6 +79,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-project-config">main.exe project config</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-project-init">main.exe project init</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-snapshot">main.exe snapshot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#main-exe-sql-preproc">main.exe sql preproc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch">main.exe switch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-add">main.exe switch add</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-exe-switch-build">main.exe switch build</a></li>
@@ -166,6 +167,9 @@
 
 <span class="n">snapshot</span>
   <span class="nc">Manage</span> <span class="n">environment</span> <span class="n">snapshots</span>
+
+<span class="n">sql</span> <span class="n">preproc</span>
+  <span class="nc">Preprocess</span> <span class="nc">SQL</span> <span class="nc">EXECs</span>
 
 <span class="n">switch</span>
   <span class="nc">Print</span> <span class="n">current</span> <span class="n">switch</span>
@@ -500,6 +504,32 @@ Set the current default switch</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--no-cd</span></code>   Do not change directory to run the command</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--quit</span></code>   Do not run the command, just exit</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">--save</span> <span class="pre">ID</span></code>   Create snapshot ID from state</p></li>
+</ul>
+</section>
+<section id="main-exe-sql-preproc">
+<h2>main.exe sql preproc<a class="headerlink" href="#main-exe-sql-preproc" title="Link to this heading"></a></h2>
+<p>Preprocess SQL EXECs</p>
+<p><strong>USAGE</strong></p>
+<div class="highlight-ocaml notranslate"><div class="highlight"><pre><span></span><span class="n">main</span><span class="o">.</span><span class="n">exe</span> <span class="n">sql</span> <span class="n">preproc</span> <span class="nc">FILE</span> <span class="o">[</span><span class="nc">OPTIONS</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Where options are:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">FILE</span></code>   COBOL files to preproc</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-D</span> <span class="pre">VAR=VAL</span></code>   Define a pre-processor variable VAR, with value VAL</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">-I</span> <span class="pre">DIR</span></code>   Add DIR to library search path</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--conf</span> <span class="pre">CONF_FILE</span></code>   Set the configuration file to be used</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--copybooks</span></code>   Preprocess copybooks also (without REPLACING)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--dialect</span> <span class="pre">DIALECT</span></code> or <code class="code docutils literal notranslate"><span class="pre">--std</span> <span class="pre">DIALECT</span></code>   Set the dialect to bu used (overriden by <cite>–conf</cite> if used)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--ext</span> <span class="pre">EXT</span></code>   Add EXT as a filename extension for copybook resolution (default: <cite>cpy</cite> <cite>cbl</cite> <cite>cob</cite>)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--free</span></code>   Shorthand for <cite>–source-format FREE</cite></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--recovery</span> <span class="pre">BOOL</span></code>   Enable/disable parser recovery after syntax errors (default: true)</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--silence</span> <span class="pre">STRING</span></code>   Silence specific messages</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">--source-format</span> <span class="pre">SOURCE_FORMAT</span></code>   Set the format of source code; allowed values are: { FIXED (the default), FREE}</p></li>
+</ul>
+<p>Overrides <cite>format</cite> from configuration file if present.</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">--test-ext</span></code>   Set file extension to .cbsql</p></li>
 </ul>
 </section>
 <section id="main-exe-switch">
