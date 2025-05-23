@@ -84,7 +84,7 @@
           ],
           "order": 1
         },
-        "superbol.cobol.source-format": {
+        "superbol.cobol.sourceFormat": {
           "title": "Source Reference-format",
           "markdownDescription": "Default source reference-format.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "string",
@@ -141,7 +141,7 @@
           "items": "string",
           "order": 4
         },
-        "superbol.cobc-path": {
+        "superbol.cobcPath": {
           "title": "GnuCOBOL Compiler Executable",
           "type": "string",
           "default": "cobc",
@@ -149,7 +149,7 @@
           "scope": "machine-overridable",
           "order": 11
         },
-        "superbol.lsp-path": {
+        "superbol.lspPath": {
           "title": "SuperBOL Executable",
           "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
           "type": "string",
@@ -169,7 +169,7 @@
           "default": false,
           "order": 22
         },
-        "superbol.debugger.display-variable-attributes": {
+        "superbol.debugger.displayVariableAttributes": {
           "title": "Display Variable Attributes",
           "type": "boolean",
           "default": false,
@@ -177,7 +177,7 @@
           "scope": "resource",
           "order": 31
         },
-        "superbol.debugger.libcob-path": {
+        "superbol.debugger.libcobPath": {
           "title": "GnuCOBOL Runtime Library",
           "type": [
             "string",
@@ -187,7 +187,7 @@
           "scope": "machine-overridable",
           "order": 32
         },
-        "superbol.debugger.gdb-path": {
+        "superbol.debugger.gdbPath": {
           "title": "GNU Debugger Executable",
           "type": "string",
           "default": "gdb",
@@ -554,7 +554,7 @@
             "default": true,
             "description": "Build an executable program instead of a module"
           },
-          "cobc-path": {
+          "cobcPath": {
             "title": "GnuCOBOL Compiler Executable",
             "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
             "type": [

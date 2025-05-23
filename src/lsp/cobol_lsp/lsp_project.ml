@@ -192,6 +192,7 @@ let reload_project_config project =
 (* --- *)
 
 
+(** Reconstruct a JSON `Assoc from the current configuration.  *)
 let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let config = Superbol_project.config project in
   let module Config = (val config.cobol_config) in
