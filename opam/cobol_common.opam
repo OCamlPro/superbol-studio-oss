@@ -51,5 +51,6 @@ depends: [
   "ocplib_stuff" {>= "0.4.0" & < "1.0.0"}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}
+  "dune" {>= "3.17.0" & < "3.19.0"}
 ]
 # Content of `opam-trailer` field:
