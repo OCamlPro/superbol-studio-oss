@@ -2,6 +2,11 @@
 
 ## [_] Next release
 
+### Added
+- Improved support for `EXEC SQL` blocks, with detection of COBOL variables [#375](https://github.com/OCamlPro/superbol-studio-oss/pull/375)
+- Information on how to get support for the extension and GnuCOBOL [#401](https://github.com/OCamlPro/superbol-studio-oss/pull/401)
+- Universal VSIX, with LSP server transpiled into JavaScript [#93](https://github.com/OCamlPro/superbol-studio-oss/pull/93)
+
 ### Fixed
 - Check for x86 binaries when on `darwin-arm64` [#385](https://github.com/OCamlPro/superbol-studio-oss/pull/385)
 - Binaries included in VSIXs for Darwin [#383](https://github.com/OCamlPro/superbol-studio-oss/pull/383)
