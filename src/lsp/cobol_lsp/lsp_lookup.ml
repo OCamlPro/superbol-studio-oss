@@ -202,14 +202,16 @@ let element_at_position ~uri pos group : element_at_position =
       on_proc_name (qualname_at_pos ~filename qn pos) acc
 
     method! fold_exec_block' exec_block acc =
-      let acc = match exec_block.payload with
-        | Superbol_preprocs.Generic.Generic_exec_block _ ->
+      Visitor.skip_children @@
+      match exec_block.payload with
+      | Superbol_preprocs.Generic.Generic_exec_block _ ->
           acc
-        | Superbol_preprocs.Esql.Esql_exec_block esql ->
+      | Superbol_preprocs.Esql.Esql_exec_block esql ->
           let cob_var_extractor_folder = object
+            (* TODO: also use a sieve *)
             inherit [Sql_ast.cobolVarId list] Sql_ast.Visitor.folder
             method! fold_cobol_var_id cob_var acc =
-              Cobol_common.Visitor.skip (cob_var::acc)
+              Visitor.skip (cob_var::acc)
           end in
           let cobol_vars =
             Sql_ast.Visitor.fold_esql_instruction cob_var_extractor_folder
@@ -219,13 +221,11 @@ let element_at_position ~uri pos group : element_at_position =
               Lsp_position.is_in_srcloc ~filename pos ~@cobol_var_id
             end cobol_vars
           in
-          let acc = match string_name_opt with
-            | Some name -> on_data_name (Name name) acc
-            | None -> acc
-          in acc
-        | _ -> acc
-      in
-      Visitor.skip_children acc
+          (match string_name_opt with
+           | Some name -> on_data_name (Name name) acc
+           | None -> acc)
+      | _ ->                        (* unknow/unimplemented kind of EXEC block *)
+          acc
 
   end group init |> result
 

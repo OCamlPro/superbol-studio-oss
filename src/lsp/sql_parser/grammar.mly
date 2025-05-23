@@ -63,7 +63,9 @@ let main :=
 
 let cobol_var_id :=
 | COLON; c=loc(WORD); {c}
-| c = loc(COBOL_VAR); {c}
+| c = loc(COBOL_VAR); {
+    Cobol_common.Srcloc.(map_loc (trunc_prefix 1)) c          (* take `:` out *)
+  }
 
 let cobol_var :=
 | c = cobol_var_id; {CobVarNotNull c}
