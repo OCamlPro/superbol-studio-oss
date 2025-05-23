@@ -87,7 +87,7 @@ let pp: t Pretty.printer = fun ppf map ->
 let empty = MAP.empty
 
 let var = VAR.of_string
-let var' = Cobol_common.Srcloc.locmap var
+let var' = Cobol_common.Srcloc.map_payload var
 
 let mem v = MAP.mem v
 let mem' v = MAP.mem ~&v

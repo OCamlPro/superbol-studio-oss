@@ -669,8 +669,10 @@ let loc: 'a with_loc -> srcloc = fun e -> e.loc
 let as_pair e = e.payload, e.loc
 let locfrom: 'a -> 'b with_loc -> 'a with_loc = fun payload b ->
   flagit payload (loc b)
-let locmap: ('a -> 'b) -> 'a with_loc -> 'b with_loc = fun f a ->
+let map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc = fun f a ->
   flagit (f (payload a)) (loc a)
+let map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc = fun f a ->
+  flagit (payload a) (f (loc a))
 
 module INFIX : sig
   (* Meaning of letters:
