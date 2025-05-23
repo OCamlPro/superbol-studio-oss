@@ -16,10 +16,11 @@ open Lsp_server.TYPES
 let handle (Jsonrpc.Response.{ id; result } as response) state =
   match id, result, state with
   | `Int id, Ok json, Running registry ->
-      Running (Lsp_server.on_response id json registry)
-  | `Int _, Error e, Running _ ->
-      Jsonrpc.Response.Error.raise e
+      Running (Lsp_server.on_client_response id json registry)
+  | `Int id, Error error, Running registry ->
+      Pretty.error "@[Ignoring@ client@ error:@ %s@]@." error.message;
+      Running (Lsp_server.on_client_error id registry)
   | _ ->
-      Pretty.error "Unexpected@ response:@ %S@."
+      Pretty.error "@[Unexpected@ response:@ %S@]@."
         (Yojson.Safe.to_string @@ Jsonrpc.Response.yojson_of_t response);
       state

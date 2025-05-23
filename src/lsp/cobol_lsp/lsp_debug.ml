@@ -22,7 +22,9 @@ let () =
       let use_counter = ref false in
       let b = Buffer.create 1000 in
       Buffer.add_substitute b (function
-          | "pid" -> string_of_int ( Unix.getpid () )
+          (* NB: not available in JS backend *)
+          (* | "pid" -> *)
+          (*     string_of_int ( Unix.getpid () ) *)
           | "count" ->
             use_counter := true ;
             string_of_int counter

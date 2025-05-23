@@ -4,7 +4,7 @@
   (name node)
   (public_name node-js-stubs)
   (wrapped true)
-  (libraries promise_jsoo jsonoo js_of_ocaml interop-js-stubs gen_js_api )
+  (libraries promise_jsoo js_of_ocaml interop-js-stubs gen_js_api )
   (modes byte)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (javascript_files node_stub.js))

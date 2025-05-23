@@ -68,22 +68,16 @@ let package =
       "@vscode/debugadapter", "^1.61.0";
       "@vscode/debugprotocol", "^1.61.0";
       "vscode-languageclient", "8.0.2";
-      "polka", "^1.0.0-next.22";
-      "sirv", "^2.0.2";
 
       (* for the debug extension: *)
       "n-readlines", "^1.0.0";
     ]
     ~devDependencies: [
       "@types/vscode", "^" ^ vscode_engine;
-      "esbuild", "^0.15.16";
-      "fs-extra", "^10.0.1";
-      "mocha", "^9.2.2";
-      "npm-run-all", "^4.1.5";
-      "ovsx", "^0.1.0";
-      "prettier", "^2.5.1";
-      "@vscode/vsce", "^2.15.0";
       "@vscode/test-electron", "^1.6.1";
+      "@vscode/vsce", "^2.15.0";
+      "esbuild", "^0.15.16";
+      "ovsx", "^0.1.0";
 
       (* for the debug extension: *)
       "typescript", "^5.1.6";
@@ -125,7 +119,7 @@ let contributes =
         ~path: "./syntaxes/dumpfile.tmLanguage.json"
     ]
     ~debuggers: [
-      Manifest.debugger "gdb"
+      Manifest.debugger "superbol-gdb"
         ~label: "SuperBOL Debugger for GnuCOBOL"
         ~languages: ["cobol"; "COBOL"]
         ~program: "./_dist/superbol-vscode-gdb.js"
@@ -262,7 +256,7 @@ let contributes =
                                 "description": "New SuperBOL launch request",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (launch)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "launch",
                                         "preLaunchTask": "SuperBOL: build (debug)",
                                         "target": "$${_:{file}}",
@@ -279,7 +273,7 @@ let contributes =
                                 "description": "Attach to a local debug session",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (attach local)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "attach",
                                         "pid": "${3:0}",
                                         "target": "$${_:{file}}",
@@ -294,7 +288,7 @@ let contributes =
                                 "description": "Attach to a remote debug session",
                                 "body": {
                                         "name": "${2:SuperBOL: debug (attach remote)}",
-                                        "type": "gdb",
+                                        "type": "superbol-gdb",
                                         "request": "attach",
                                         "remote-debugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
@@ -585,11 +579,11 @@ let contributes =
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open"
-        ~title:"Show control-flow"
+        ~title:"Show Control-flow"
         ~category:"SuperBOL";
       Manifest.command ()
         ~command:"superbol.cfg.open.arc"
-        ~title:"Show control-flow as an arc-diagram"
+        ~title:"Show Control-flow as an Arc-diagram"
         ~category:"SuperBOL";
     ]
     ~tomlValidation: [

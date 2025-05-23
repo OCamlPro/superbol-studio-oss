@@ -1,10 +1,18 @@
 # Changelog
 
-## [0.1.4] Next release
+## [_] Next release
+
+### Fixed
+- Check for x86 binaries when on `darwin-arm64` [#385](https://github.com/OCamlPro/superbol-studio-oss/pull/385)
+- Binaries included in VSIXs for Darwin [#383](https://github.com/OCamlPro/superbol-studio-oss/pull/383)
+- Name of debugger, to avoid conflicts with the official "gdb" [#381](https://github.com/OCamlPro/superbol-studio-oss/pull/381)
+
+
+## [0.1.4] Fifth α release (2024-10-25)
 
 ### Added
-- CFG explorer for COBOL programs [368](https://github.com/OCamlPro/superbol-studio-oss/pull/368)
-- Detection of copybooks based on contents prefix and configured search path [373](https://github.com/OCamlPro/superbol-studio-oss/pull/373)
+- CFG explorer for COBOL programs [#368](https://github.com/OCamlPro/superbol-studio-oss/pull/368)
+- Detection of copybooks based on contents prefix and configured search path [#373](https://github.com/OCamlPro/superbol-studio-oss/pull/373)
 - Support for connecting to the LSP server remotely (TCP only) [#102](https://github.com/OCamlPro/superbol-studio-oss/pull/102)
 - Support for Symbol Renaming command [#351](https://github.com/OCamlPro/superbol-studio-oss/pull/351)
 - Show documentation comments on hover information [#350](https://github.com/OCamlPro/superbol-studio-oss/pull/350)

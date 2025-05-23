@@ -45,6 +45,15 @@ let try_with_main_document_data ~f =
 
 (** {3 Initialization} *)
 
+let log_initialization_info () =
+  Lsp_io.log_info "Initializing SuperBOL LSP Server";
+  match Version.commit_hash, Version.commit_date with
+  | None, _ | _, None ->
+      Lsp_io.log_info "Version: %s" Version.version
+  | Some h, Some d ->
+      Lsp_io.log_info "Commit: %s (%s)" h d;
+      Lsp_io.log_info "Version tag: %s" Version.version
+
 let initialize ~config (params: InitializeParams.t) =
   let root_uri = match params.rootUri with
     | None -> None
@@ -54,8 +63,9 @@ let initialize ~config (params: InitializeParams.t) =
     | Some Some (_ :: _ as l) -> List.map (fun x -> x.WorkspaceFolder.uri) l
     | _ -> Option.to_list root_uri
   in
-  Lsp_io.log_info "Initializing@ for@ workspace@ folders:@ %a"
-    Pretty.(list ~fopen:"@[" ~fclose:"@]" string)
+  log_initialization_info ();
+  Lsp_io.log_info "Initial workspace folders: %a"
+    Pretty.(list ~fopen:"" ~fclose:"" string)
     (List.map (fun x -> DocumentUri.to_path x) workspace_folders);
   let capabilities = Lsp_capabilities.reply params.capabilities in
   let with_semantic_tokens =
@@ -70,18 +80,22 @@ let initialize ~config (params: InitializeParams.t) =
     | _ ->
         false
   and with_client_file_watcher = match params.capabilities.workspace with
-    | Some { didChangeWatchedFiles = Some { dynamicRegistration; _ }; _ } ->
-        (* Note: for now we rely on the client's dynamic registration ability;
-           for clients that do not support that it could just be simpler to
-           trigger server restarts when relevant changes happen. *)
-        Option.value ~default:false dynamicRegistration
+    | Some { didChangeWatchedFiles = Some { dynamicRegistration = Some true;
+                                            relativePatternSupport };
+             _ } ->
+        `yes (if relativePatternSupport = Some true then `any else `absolute)
     | _ ->
-        false
+        `no
+  in
+  let watcher ppf = function
+    | `no -> Fmt.string ppf "none"
+    | `yes `absolute -> Fmt.string ppf "absolute patterns only"
+    | `yes `any -> Fmt.string ppf "any pattern"
   in
   Lsp_io.log_info "Negociated@ server@ parameters:@\n@[%t@]" @@
   Pretty.delayed_record [
     Fmt.(field "client_config_watcher" (fun _ -> with_client_config_watcher) bool);
-    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) bool);
+    Fmt.(field "client_file_watcher" (fun _ -> with_client_file_watcher) watcher);
   ];
   let result =
     InitializeResult.create ()
@@ -753,34 +767,38 @@ let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
 
 (** { Rename } *)
 
-let handle_rename ?(ignore_when_copybook=false)
+let handle_rename
+    ?(abort_when_in_copybook = true)
     registry
     ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
+  Option.value ~default:(WorkspaceEdit.create ()) @@
   try_with_main_document_data registry textDocument
     ~f:begin fun ~doc checked_doc ->
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
-      let locations = Option.value ~default:[] @@
+      let locations =
         let context = ReferenceContext.create ~includeDeclaration:true in
-        let params = ReferenceParams.create
-            ~context ~position ~textDocument () in
-        lookup_references_in_doc ~rootdir params checked_doc in
-      let changes, is_copybook =
-        List.fold_left begin fun (map, is_copybook) ({ range; uri }: Location.t) ->
+        Option.value ~default:[] @@
+        lookup_references_in_doc ~rootdir
+          (ReferenceParams.create () ~context ~position ~textDocument )
+          checked_doc
+      in
+      let changes, in_copybook =
+        List.fold_left begin fun (map, in_copybook) Location.{ range; uri } ->
           URIMap.add_to_list uri (TextEdit.create ~newText ~range) map,
-          is_copybook || DocumentUri.compare uri textDocument.uri <> 0
-        end (URIMap.empty, false) locations in
-      let changes = List.of_seq @@ URIMap.to_seq changes in
-      if is_copybook && ignore_when_copybook
-      then begin Lsp_io.notify_info
-          "Ignored renaming of a reference that occurs in a copybook";
-        Some ( WorkspaceEdit.create () ) end
-      else
-        begin if is_copybook
-          then Lsp_io.notify_warn
-              "Proceeded to rename of a reference that occurs in a copybook";
-          Some ( WorkspaceEdit.create ~changes () ) end
+          in_copybook || DocumentUri.compare uri textDocument.uri <> 0
+        end (URIMap.empty, false) locations
+      in
+      if in_copybook && abort_when_in_copybook
+      then begin
+        Lsp_io.notify_error "Reference occurs in a copybook: not renaming";
+        None
+      end else begin
+        if in_copybook then
+          Lsp_io.notify_warn "Renamed reference that occurs in a copybook";
+        let changes = List.of_seq @@ URIMap.to_seq changes in
+        Some (WorkspaceEdit.create ~changes ())
+      end
     end
-  |> Option.get
 
 
 (** {3 Generic handling} *)

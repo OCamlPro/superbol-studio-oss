@@ -19,17 +19,27 @@ DUNE_BUILD_SRCDIR =							\
 
 # TARGET_PLAT is defined in Makefile
 TARGET_ARCH ?= x64
-TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
+ifeq ($(TARGET_PLAT),universal)
+  TARGET_SPEC = $(TARGET_PLAT)
+else
+  TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
+endif
+
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 
 DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
-SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
 SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
-ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
-  SUPERBOL_LSP_BUILT = superbol-free
+ifeq ($(TARGET_PLAT),universal)
+  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.bc.js
+  SUPERBOL_LSP = superbol-free.js
 else
-  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
+  SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
+  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+    SUPERBOL_LSP_BUILT = superbol-free
+  else
+    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
+  endif
 endif
 
 # Setting `GENERATE_PACKAGE_DOT_JSON` to `no` skips generation of
@@ -46,10 +56,10 @@ endif
 
 YARN = npx --yes yarn 
 
-VSCE_ARGS = --yarn -t $(TARGET_SPEC)
-VSCE_PACKAGE_ARGS ?= --pre-release
-VSCE_PUBLISH_ARGS ?= --pre-release
-OVSX_PUBLISH_ARGS ?= --pre-release
+VSCE_ARGS = --yarn $(if $(subst universal,,$(TARGET_PLAT)),-t $(TARGET_SPEC))
+VSCE_PACKAGE_ARGS ?=
+VSCE_PUBLISH_ARGS ?=
+OVSX_PUBLISH_ARGS ?=
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
@@ -62,8 +72,6 @@ LSP_MODE_SRCDIR ?= ../lsp-mode
 all: superbol-lsp-server
 compile: superbol-lsp-server build-release
 package: vsix-package
-
-$(SUPERBOL_LSP_BUILT): build vsix-dist-setup
 
 superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
 # Only rebuild `package.json` when on Linux
@@ -79,9 +87,16 @@ ifeq ($(TARGET_PLAT),linux)
   endif
 endif				#linux
 
-.PHONY: check-package.json
-check-package.json:		#to be used after `build`
+ifeq ($(TARGET_PLAT),universal)
+  $(SUPERBOL_LSP_BUILT): vsix-dist-setup
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @build
+else				#platform-specific
+  $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
+
+  .PHONY: check-package.json
+  check-package.json:		#to be used after `build`
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
+endif
 
 .PHONY: build-debug yarn-debug
 
@@ -126,7 +141,6 @@ yarn-release: _out/superbol-vscode-platform-bundle.js	\
                 --target=es6 \
                 --minify-whitespace \
                 --minify-syntax \
-                --sourcemap \
                 --sources-content=false
 
 # ---
@@ -162,7 +176,7 @@ vsix-dist-setup:
 
 vsix-package: gnucobol-config
 #	needs 'make build-debug' or 'make build-release' before
-	rm -f _dist/superbol-free-*-*
+	rm -f _dist/superbol-free-*-* _dist/superbol-free.js
 	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
 	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
@@ -271,3 +285,15 @@ test-syntax: superbol-lsp-server
 test-syntax-promote:
 	-$(MAKE) test-syntax	# To avoid promoting past tests
 	\! opam exec -- autofonce 2>/dev/null || opam exec -- autofonce promote -t syntax --apply
+
+MASTER_REMOTE ?= origin
+
+.PHONY: build-master
+build-master:
+	git checkout master
+	git checkout .
+	git pull $(MASTER_REMOTE) master
+	git submodule update --recursive --init
+	$(MAKE) build-deps
+	$(MAKE) clean
+	$(MAKE)

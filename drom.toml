@@ -14,7 +14,7 @@ min-edition = "4.14.0"
 name = "superbol-studio-oss"
 skeleton = "program"
 synopsis = "SuperBOL Studio OSS Project"
-version = "0.1.4"
+version = "0.1.5"
 dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
 bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 
@@ -58,6 +58,8 @@ share-dirs = ["share"]
 #    dev = { ocaml-flags = "-w +a-4-40-41-42-44" }
 #    release = { ocaml-flags = "-w -a" }
 [profile]
+dev       = { ocaml-flags = "-w -32-67-69" } #unused value(-declaration), unused field
+universal = { ocaml-flags = "-w -32-67-69" }
 # ...
 
 # project-wide fields (depends on project skeleton)
@@ -67,7 +69,7 @@ share-dirs = ["share"]
 #  readme-trailer = "..."
 #  dot-gitignore-trailer = "..."
 [fields]
-dune = "2.8.0"
+dune = "3.17.0"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
@@ -87,23 +89,53 @@ ATTIC
 /emacs/lsp-superbol-customs.el
 """
 github-workflow-before-build = """
-
       - run: git submodule init
 
       - run: git submodule update
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '>=16'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+        if: matrix.build_vsix
 
 """
 
 # NB: a `before-tests` field would make more sense here.
 github-workflow-after-build = """
-      - name: check package.json
-        run: make check-package.json
+      - run: make check-package.json
 
-      - name: install test dependencies
-        if: matrix.skip_test  != 'true'
-        run: make dev-deps
+      - run: make dev-deps # install test dependencies
+        if: ${{ ! matrix.skip_test }}
 """
 
+github-workflow-after-test = """
+      - run: yarn install && npm install esbuild
+        if: matrix.build_vsix
+
+      - run: make vsix-debug
+        if: matrix.build_vsix
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-${{ matrix.os }}
+          path: superbol-vscode-platform-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: matrix.build_vsix
+
+      - run: make vsix-debug TARGET_PLAT=universal
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+
+      - name: Upload universal VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VSIX-universal
+          path: superbol-vscode-platform-*-universal-*.vsix
+          compression-level: 0 # no compression (already a zip archive)
+        if: ${{ matrix.build_vsix && matrix.os == 'ubuntu-latest' }}
+"""
 
 [[package]]
 dir = "src/superbol-studio-oss"
@@ -113,10 +145,6 @@ dir = "src/superbol-studio-oss"
 [[package]]
 dir = "src/vscode/superbol-vscode-platform"
 # edit 'src/vscode/superbol-vscode-platform/package.toml' for package-specific options
-
-[[package]]
-dir = "src/vendor/vscode-ocaml-platform/src-bindings/polka"
-# edit 'src/vscode/polka-js-stubs/package.toml' for package-specific options
 
 [[package]]
 dir = "src/vendor/vscode-ocaml-platform/src-bindings/interop"
