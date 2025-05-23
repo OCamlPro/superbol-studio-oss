@@ -134,7 +134,7 @@ let cobc_execution ?config attributes =
     config_string "cobol.source-format" ~config
       ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>
     attr_bool_flag "for-debug" ~attributes
-      ~ok:(List.append ["-fsource-location"; "-ftraceall"; "-g"]) |>
+      ~ok:(List.append ["-ftraceall"; "-g"]) |>
     attr_bool_flag "for-coverage" ~attributes
       ~ok:(List.cons "--coverage") |>
     attr_bool_flag "executable" ~attributes

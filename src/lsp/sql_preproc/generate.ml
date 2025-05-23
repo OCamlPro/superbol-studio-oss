@@ -52,7 +52,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   (*GET FUNCTION*)
   (*TODOOOO*)
   let working_storage_section, new_var_map =
-    let ws, nvm = Data_gestion.transform ~cobol_unit sql_statements filename in
+    let ws, nvm = Data_handling.transform ~cobol_unit sql_statements filename in
     ( [ comment ">Begin generated WORKING-STORAGE SECTION";
         Generated_type.Added
           { content = ws; error_treatment = None; with_dot = false };
@@ -86,15 +86,21 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let get_length ?(negative_if_varlen=false) str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a ->
-        if a.flags land Gix_enum.Flag.varlen > 0
-        then
-          if negative_if_varlen
-          then -(a.length + 4)
-          else a.length + 4
-        else a.length
-    | None -> Sql_typeck.get_length cobol_unit str
+      if a.flags land Gix_enum.Flag.varlen > 0
+      then
+        if negative_if_varlen
+        then -(a.length + 4)
+        else a.length + 4
+      else a.length
+    | None ->
+      let len = Sql_typeck.get_length cobol_unit str in
+      if negative_if_varlen &&
+         Sql_typeck.is_varying_len cobol_unit str &&
+         len > 0
+      then -len
+      else len
   in
 
   let get_some_cob_var_length (cob_var : cobolVarId option) =
@@ -111,17 +117,17 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
   in
 
   let get_type str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> a.vartype
     | None -> Sql_typeck.get_type cobol_unit str
   in
   let get_scale str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> - a.scale
     | None -> - Sql_typeck.get_scale cobol_unit str
   in
   let get_flags str =
-    match Data_gestion.find_opt new_var_map str with
+    match Data_handling.find_opt new_var_map str with
     | Some a -> a.flags
     | None -> Sql_typeck.get_flags cobol_unit str
   in
@@ -507,17 +513,18 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
 
   let create_from_cursor_declaration (prefix, cur, at, var_name) =
     let at_name, at_size = get_at_info at in
-    let cob_var_lst = List.rev @@
-      Sql_ast.Visitor.fold_cursor Misc.cob_var_extractor_folder cur []
-    in
-    let cur_name, var_name, _with_hold =
+    let cur_name, cob_var_lst, var_name, _with_hold =
       match cur with
-      | DeclareCursorSql (cur_name, _sql) ->
+      | DeclareCursorSql (cur_name, sql) ->
         ( cur_name,
+          List.rev @@ Sql_ast.Visitor.fold_sql_query
+            Misc.cob_var_extractor_folder sql [],
           var_name,
           false )
-      | DeclareCursorWhithHold (cur_name, _query) ->
+      | DeclareCursorWhithHold (cur_name, query) ->
         ( cur_name,
+          List.rev @@ Sql_ast.Visitor.fold_sql_query
+            Misc.cob_var_extractor_folder query [],
           var_name,
           true )
       | DeclareCursorVar (cur_name, cur_var) ->
@@ -526,7 +533,7 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
           | SqlVar _ -> var_name
           | CobolVar v -> get_name_cobol_var v
         in
-        (cur_name, var, false)
+        (cur_name, [], var, false)
     in
 
     let cursor_name = c_formatted_string
@@ -615,23 +622,21 @@ let generate ~filename ~contents ~cobol_unit sql_statements =
       match sql_instr with
       | [ Sql_ast.SqlVarToken (CobolVar (CobVarNotNull cobolVarId)) ] ->
         cobolVarId.payload
-        | [ Sql_ast.SqlVarToken (CobolVar (CobVarCasted (cobolVarId, _))) ] ->
-          cobolVarId.payload
+      | [ Sql_ast.SqlVarToken (CobolVar (CobVarCasted (cobolVarId, _))) ] ->
+        cobolVarId.payload
       | _ -> failwith "Not implemented in Gix"
       (*These case are not implemented in GixSql's runtime *)
     in
     let ref_value =
       let prefix = prefix ^ "    " in
+      let len = get_length ~negative_if_varlen:true sql_name in
       [ Generated_type.Reference { prefix; var = "SQLCA" };
         Generated_type.Reference { prefix; var = at_name };
         Generated_type.Value { prefix; var = string_of_int at_size };
         Generated_type.Reference
           { prefix; var = c_formatted_string var_name.payload };
         Generated_type.Reference { prefix; var = sql_name };
-        Generated_type.Value
-          { prefix; var =
-            string_of_int (get_length ~negative_if_varlen:true sql_name) }
-        (*todo*)
+        Generated_type.Value { prefix; var = string_of_int len }
       ]
     in
     [ Generated_type.CallStatic

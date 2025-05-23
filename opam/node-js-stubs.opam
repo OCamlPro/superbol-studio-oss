@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "node-js-stubs"
-version: "0.1.4"
+version: "0.1.5"
 license: "MIT"
 synopsis: "SuperBOL Studio OSS Project"
 description: "SuperBOL Studio OSS is a new platform for COBOL"
@@ -46,9 +46,8 @@ install: [
 ]
 depends: [
   "ocaml" {>= "4.14.0"}
-  "dune" {>= "2.8.0"}
+  "dune" {>= "3.17.0"}
   "promise_jsoo" {>= "0.3.1" & < "1.0.0"}
-  "jsonoo" {>= "0.2.1" & < "1.0.0"}
   "js_of_ocaml" {>= "4"}
   "interop-js-stubs" {= version}
   "gen_js_api" {>= "1.1.1" & < "2.0.0"}

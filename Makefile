@@ -8,8 +8,11 @@ DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
+ifeq ($(BUILD_STATIC_EXECS),true)
+  export LINKING_MODE=static
+endif
 
-VERSION = 0.1.4
+VERSION = 0.1.5
 DEV_DEPS := merlin ocamlformat odoc
 
 
@@ -30,8 +33,11 @@ build:
 ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
 	./scripts/static-build.sh
 else
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
+  ifeq ($(TARGET_PLAT),linux)
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
-	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-platform polka-js-stubs interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_preproc sql_ast sql_parser cobol_cfg
+	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-platform interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_preproc sql_ast sql_parser cobol_cfg
+  endif
 endif
 	./scripts/after.sh build
 

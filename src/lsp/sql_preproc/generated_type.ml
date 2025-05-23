@@ -1,3 +1,13 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  Copyright (c) 2021-2023 OCamlPro SAS                                  *)
+(*                                                                        *)
+(*  All rights reserved.                                                  *)
+(*  This file is distributed under the terms of the                       *)
+(*  OCAMLPRO-NON-COMMERCIAL license.                                      *)
+(*                                                                        *)
+(**************************************************************************)
+
 type ref_value =
   | Reference of
       { prefix : string;
@@ -23,14 +33,14 @@ and whenever_continuation =
 type declaration =
   | Simple_var_declaration of
       { prefix : string;
-        var_importance : string;
+        var_level : string;
         var_name : string option;
         var_type : string;
         var_content : string option
       }
   | Field_var_declaration of
       { prefix : string;
-        var_importance : string;
+        var_level : string;
         var_name : string;
         field : declaration list
       }
@@ -196,7 +206,7 @@ module Printer = struct
 
   and pp_declaration fmt = function
     | Simple_var_declaration
-        { prefix; var_importance; var_name; var_type; var_content } ->
+        { prefix; var_level; var_name; var_type; var_content } ->
       let var_name =
         match var_name with
         | Some n -> n
@@ -208,13 +218,13 @@ module Printer = struct
         | None -> ""
       in
       let line =
-        Printf.sprintf "%s%s %s PIC %s %s." prefix var_importance var_name
+        Printf.sprintf "%s%s %s PIC %s %s." prefix var_level var_name
           var_type var_content
       in
       let lines = split_line line in
       Format.fprintf fmt "%s" (String.concat "\n" lines)
-    | Field_var_declaration { prefix; var_importance; var_name; field } ->
-      Format.fprintf fmt "%s%s %s.%a" prefix var_importance var_name pp_field
+    | Field_var_declaration { prefix; var_level; var_name; field } ->
+      Format.fprintf fmt "%s%s %s.%a" prefix var_level var_name pp_field
         field
 
   and pp_field fmt x =

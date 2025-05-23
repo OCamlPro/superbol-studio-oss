@@ -16,6 +16,7 @@ open Text.TYPES
 
 type compiler_directive =
   | CDir_source of Src_format.any with_loc
+  | CDir_control_section                       (* SECTION in CONTROL DIVISION *)
   | CDir_preproc of Compdir_tree.preproc_directive
 
 type copy_statement =

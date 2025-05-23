@@ -1,5 +1,10 @@
 # How to run GixSQL testsuite :
 
+Note: This file can mainly be ignored as the testsuite of gixsql has been automated
+in https://github.com/OCamlPro/gixsql
+
+The failing tests are described in more detailed in [this issue](https://github.com/OCamlPro/superbol-studio-oss/issues/371).
+
 ## Install GixSQL
 
 Following https://github.com/mridoni/gixsql/tree/main?tab=readme-ov-file#linux you can build GixSQL locally
@@ -10,7 +15,7 @@ Or with the PR https://github.com/OCamlPro/gixsql/pull/2.
 This requires creating one user (e.g. `test`) with password access (e.g. `test`), and 2 databases (e.g. `testdb1` and `testdb2`).
 Postgres with the provided user, password and database names will be used for the rest of the setup.
 
-Note: mysql tests fails on Linux, it seems to be a case sensitivity issue between Windows and Linux.
+Note: mysql tests fail on Linux, it seems to be a case sensitivity issue between Windows and Linux.
 
 From the doc https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
 > In MySQL, databases correspond to directories within the data directory. Each table within a database corresponds to at least one file within the database directory (and possibly more, depending on the storage engine). Triggers also correspond to files. Consequently, the case sensitivity of the underlying operating system plays a part in the case sensitivity of database, table, and trigger names. This means such names are not case-sensitive in Windows, but are case-sensitive in most varieties of Unix.
@@ -63,17 +68,3 @@ Run: 71 - Success: 68 - Failed: 3
 The test `TSQL004A` fails due to a invalid preprocessor option. (line 237 of `gixsql_test_data.xml`)
 The other two fail due to preprocessor errors.
 
-### What I discovered using gixsql testsuite
-
-- TSQL005A : some BY VALUE are different (2 instead of -2 for NUM1)
-- TSQL009A 42A : fails due to issue in cobol_indent maybe ? there is a tabulation as a first caracter in the line 66
-- TSQL018 : preproc error due to invalid arguments covers a grammar error in test TSQL018B-1
-- TSQL022A : varying not supported, also the test depends on preprocess file content
-- TSQL025A : group vars need to be split into their elementary element
-- TSQL026A - 27A : requires detecting varlen group var from non esql variable (eg SQLCOMMAND)
-- TSQL033-1 : --no-rec-code option to implement somehow
-- TSQL037A B : implement -P varchar option, seems to activate flag autotrim on some fields
-- TSQL041A : grammar error 'SELECT CASE WHEN'
-- TSQL042A : some var have :VAR:NULL-IND form, this is not supported
-
-[This issue](https://github.com/OCamlPro/superbol-studio-oss/issues/371) explains that in more details.

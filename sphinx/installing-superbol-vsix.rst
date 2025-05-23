@@ -1,12 +1,24 @@
 .. _install-superbol-vsix:
 
-Installing the SuperBOL VSCode extension
-========================================
+Installing the VSCode extension
+===============================
 
 From marketplace
 ----------------
 
-TODO
+Microsoft Marketplace
+~~~~~~~~~~~~~~~~~~~~~
+
+Download the SuperBOL Studio VSCode extension on
+`the Visual Studio marketplace <https://marketplace.visualstudio.com/items?itemName=OCamlPro.SuperBOL>`_
+
+It can also be found directly on the "extension" tab of VSCode.
+
+OpenVSX
+~~~~~~~
+
+Download the SuperBOL Studio VSCode extension on
+`the OpenVSX marketplace <https://open-vsx.org/extension/OCamlPro/SuperBOL>`_
 
 From :code:`.vsix` files
 ------------------------

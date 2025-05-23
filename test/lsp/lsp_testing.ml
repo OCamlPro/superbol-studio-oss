@@ -53,7 +53,7 @@ let make_server ?(with_semantic_tokens = false) () =
                             root_uri = None;
                             workspace_folders = [];
                             with_semantic_tokens;
-                            with_client_file_watcher = false;
+                            with_client_file_watcher = `no;
                             with_client_config_watcher = false }
 
 let add_cobol_doc server ~projdir filename text =

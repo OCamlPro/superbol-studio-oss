@@ -113,6 +113,17 @@ module ClientOptions = struct
       [@@js.builder]]
 end
 
+module TransportKind = struct
+  type t =
+    [ `stdio  [@js 0]
+    | `ipc    [@js 1]
+    | `pipe   [@js 2]
+    | `socket [@js 3]
+    ] [@@js.enum] [@@js]
+end
+
+module Transport = TransportKind
+
 module ExecutableOptions = struct
   include Interface.Make ()
 
@@ -143,12 +154,15 @@ module Executable = struct
     [%js:
     val command : t -> string [@@js.get]
 
+    val transport : t -> Transport.t or_undefined [@@js.get]
+
     val args : t -> string list or_undefined [@@js.get]
 
     val options : t -> ExecutableOptions.t or_undefined [@@js.get]
 
     val create :
          command:string
+      -> ?transport: Transport.t
       -> ?args:string list
       -> ?options:ExecutableOptions.t
       -> unit
@@ -156,7 +170,68 @@ module Executable = struct
       [@@js.builder]]
 end
 
-module ServerOptions = Executable
+module ForkOptions = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val cwd : t -> string or_undefined [@@js.get]
+
+    val env : t -> string Dict.t or_undefined [@@js.get]
+
+    val encoding : t -> string or_undefined [@@js.get]
+
+    val execArgv : t -> string list or_undefined [@@js.get]
+
+    val create :
+      ?cwd:string
+      -> ?env:string Dict.t
+      -> ?encoding:string
+      -> ?execArgv:string list
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
+module NodeModule = struct
+  include Interface.Make ()
+
+  include
+    [%js:
+    val module_: t -> string [@@js.get "module"]
+
+    val transport : t -> Transport.t or_undefined [@@js.get]
+
+    val args : t -> string list or_undefined [@@js.get]
+
+    val runtime : t -> string or_undefined [@@js.get]
+
+    val options : t -> ForkOptions.t or_undefined [@@js.get]
+
+    val create :
+      module_:string
+      -> ?transport: Transport.t
+      -> ?args:string list
+      -> ?runtime:string
+      -> ?options:ForkOptions.t
+      -> unit
+      -> t
+      [@@js.builder]]
+end
+
+module ServerOptions = struct
+  type t =
+    ([ `Executable of Executable.t
+     | `NodeModule of NodeModule.t
+     ]
+     [@js.union])
+  [@@js]
+
+  let t_of_js js_val =
+    if Ojs.has_property js_val "module"
+    then `NodeModule ([%js.to: NodeModule.t] js_val)
+    else `Executable ([%js.to: Executable.t] js_val)
+end
 
 module ClientCapabilities = struct
   include Interface.Make ()

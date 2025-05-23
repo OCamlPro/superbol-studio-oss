@@ -16,45 +16,42 @@ open Common_args
 
 let typeck_file { preproc_options; parser_options } filename =
   Cobol_preproc.Input.from ~filename
-    ~f:
-      begin
-        fun input ->
-          input
-          |> Cobol_preproc.preprocessor ~options:preproc_options
-          |> Cobol_parser.parse_simple ~options:parser_options
-          |> Cobol_parser.Outputs.result_only
-          |> (* ignoe diagnostics *)
-          Cobol_typeck.compilation_group ~config:parser_options.config
-          |> Cobol_typeck.Results.result_only
-          |> fun checked_group ->
-          (* in group: *)
-          let cu' = Cobol_unit.Collections.SET.choose checked_group.group in
-          let cu = cu'.payload in
-          cu
-        (* let x_info =
-             (* May raise Not_found | Cobol_unit.Qualmap.Ambiguous _ *)
-             Cobol_unit.Qualmap.find
-               (Cobol_unit.Qual.name ( Cobol_common.Srcloc.flagit "VBFLD" Cobol_common.Srcloc.dummy))
-               cu.unit_data.data_items.named
-           in
-           match x_info with
-           | Data_field { def = { payload = { field_layout; field_size; _ } ; _ } ; _ } ->
-               Pretty.out "Size of VBFLD is %u Bytes@."
-                 Cobol_data.Memory.(as_bits field_size / 8);
-               begin match field_layout with
-                 | Elementary_field { usage = Display picture; _ } ->
-                     Pretty.out "PIC is %a@."
-                       Cobol_data.Picture.pp picture;
-                     (match picture.category with
-                      | FixedNum { digits = _; scale = _; with_sign = _; _ } -> ()
-                      | _ -> ())
-                 | Elementary_field _
-                 | Struct_field _ ->
-                     ()
-               end
-           | _ -> ()
-        *)
-      end
+    ~f: begin fun input ->
+      input
+      |> Cobol_preproc.preprocessor ~options:preproc_options
+      |> Cobol_parser.parse_simple ~options:parser_options
+      |> Cobol_parser.Outputs.result_only
+      |> Cobol_typeck.compilation_group ~config:parser_options.config
+      |> Cobol_typeck.Results.result_only
+      |> fun checked_group ->
+      (* in group: *)
+      let cu' = Cobol_unit.Collections.SET.choose checked_group.group in
+      let cu = cu'.payload in
+      cu
+      (* let x_info =
+           (* May raise Not_found | Cobol_unit.Qualmap.Ambiguous _ *)
+           Cobol_unit.Qualmap.find
+             (Cobol_unit.Qual.name ( Cobol_common.Srcloc.flagit "VBFLD" Cobol_common.Srcloc.dummy))
+             cu.unit_data.data_items.named
+         in
+         match x_info with
+         | Data_field { def = { payload = { field_layout; field_size; _ } ; _ } ; _ } ->
+             Pretty.out "Size of VBFLD is %u Bytes@."
+               Cobol_data.Memory.(as_bits field_size / 8);
+             begin match field_layout with
+               | Elementary_field { usage = Display picture; _ } ->
+                   Pretty.out "PIC is %a@."
+                     Cobol_data.Picture.pp picture;
+                   (match picture.category with
+                    | FixedNum { digits = _; scale = _; with_sign = _; _ } -> ()
+                    | _ -> ())
+               | Elementary_field _
+               | Struct_field _ ->
+                   ()
+             end
+         | _ -> ()
+      *)
+    end
 
 let parse ~sql_in_copybooks ~copy_exts ~test_extension common files =
   let source_format = common.preproc_options.source_format in
@@ -64,7 +61,6 @@ let parse ~sql_in_copybooks ~copy_exts ~test_extension common files =
     (fun filename ->
        let common, _ = Common_args.get () in
        let cobol_unit = typeck_file (common ()) filename in
-       (*TODO appel a typeck ici*)
        let contents =
          Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
            ~filename ~source_format () ~cobol_unit
