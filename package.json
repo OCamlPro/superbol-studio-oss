@@ -106,7 +106,7 @@
         },
         "superbol.cobol.copybooks": {
           "title": "Copybook Paths",
-          "markdownDescription": "List of copybooks paths.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "markdownDescription": "List of paths to copybooks.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "array",
           "default": [
             {
@@ -151,7 +151,7 @@
         },
         "superbol.lsp-path": {
           "title": "SuperBOL Executable",
-          "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.",
+          "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.\n<!-- COBOL -->",
           "type": "string",
           "default": "",
           "scope": "machine",
@@ -164,16 +164,16 @@
           "order": 21
         },
         "superbol.cacheInGlobalStorage": {
-          "markdownDescription": "Use storage provided by Visual Studio Code for caching.  When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.",
+          "markdownDescription": "Use storage provided by Visual Studio Code for caching. When this setting is set to *false*, the cache related to the contents of a given workspace folder *f* is stored in a file named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not removed automatically, whatever their location.\n<!-- COBOL -->",
           "type": "boolean",
           "default": false,
           "order": 22
         },
         "superbol.debugger.display-variable-attributes": {
           "title": "Display Variable Attributes",
+          "markdownDescription": "Display storage property and field attributes (e.g. size of alphanumerics, digits and scale of numerics).\n<!-- COBOL -->",
           "type": "boolean",
           "default": false,
-          "description": "Display storage property and field attributes (e.g. size of alphanumerics, digits and scale of numerics).",
           "scope": "resource",
           "order": 31
         },
@@ -189,9 +189,9 @@
         },
         "superbol.debugger.gdb-path": {
           "title": "GNU Debugger Executable",
+          "markdownDescription": "Path to the GNU debugger executable.\n<!-- COBOL -->",
           "type": "string",
           "default": "gdb",
-          "description": "Path to the GNU debugger executable.",
           "scope": "machine-overridable",
           "order": 33
         }
