@@ -5443,3 +5443,142 @@ let%expect_test "preproc-interaction" =
         REMARKS.\n
         SECURITY.\n
   |}]
+
+(* FIXME: The best would be to suggest SQL keywords. But let's consider this
+   future work. *)
+let%expect_test "sql-preproc-interaction" =
+  let end_with_postproc = completion_positions @@ extract_position_markers {cobol|
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. prog.
+        PROCEDURE DIVISION.
+            EXEC SQL CONNECT _|_RESET END-EXEC.
+  |cobol}
+  in
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    __rootdir__/prog.cob:5.29:
+       2           IDENTIFICATION DIVISION.
+       3           PROGRAM-ID. prog.
+       4           PROCEDURE DIVISION.
+       5 >             EXEC SQL CONNECT RESET END-EXEC.
+    ----                                ^
+       6
+    (line 4, character 29):
+    Basic (57 entries):
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+    Eager (57 entries):
+        ACCEPT
+        ADD
+        ALLOCATE
+        ALTER
+        CALL
+        CANCEL
+        CLOSE
+        COMPUTE
+        CONTINUE
+        DELETE
+        DISABLE
+        DISPLAY
+        DIVIDE
+        ENABLE
+        ENTER
+        ENTRY
+        EVALUATE
+        EXIT
+        FREE
+        GENERATE
+        GO
+        GOBACK
+        IF
+        INITIALIZE
+        INITIATE
+        INSPECT
+        INVOKE
+        MERGE
+        MOVE
+        MULTIPLY
+        NEXT SENTENCE
+        OPEN
+        PERFORM
+        .\n
+        PURGE
+        RAISE
+        READ
+        RECEIVE
+        RELEASE
+        RESUME
+        RETURN
+        REWRITE
+        SEARCH
+        SEND
+        SET
+        SORT
+        START
+        STOP
+        STRING
+        SUBTRACT
+        SUPPRESS
+        TERMINATE
+        TRANSFORM
+        UNLOCK
+        UNSTRING
+        VALIDATE
+        WRITE
+  |}]

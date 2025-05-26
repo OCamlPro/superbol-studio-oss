@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-66d05aa8b8594f963a22439d34251418:.
+ec0b5a1ce136da2b847c9ac86abea9f3:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -75,6 +75,15 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
+bbe93981f3f89550246d41f768f73a28:dune-project
+c375da381bfae0c77c7af1cb51f96580:dune-project
+cde29409c1d991e499786d56924f8fc9:dune-project
+68f1f36e943a31bcb34b9b97f6830817:dune-project
+afd60e19795dd45cbf2d203174f50a68:dune-project
+68f1f36e943a31bcb34b9b97f6830817:dune-project
+f3f8f40142982198dd2b7096346d98e4:dune-project
+7fce661d51287721f46c47607d6ed8f6:dune-project
+da0e98ac4e71d833b5bbdce4f40d9bff:dune-project
 3d7652c7d37a784f8b754da3849f659a:dune-project
 # end context for dune-project
 
@@ -130,6 +139,7 @@ b486e1e4dd606cb4ee3e14c639683c44:opam/cobol_indent.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
+2e9474aabe01e3af9a7a52031c254e97:opam/cobol_typeck.opam
 fb51a1d01468bd7c1fafe046ade71650:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
@@ -395,7 +405,7 @@ e31b22f1d241d75db90f170f9c6fd95d:src/lsp/cobol_preproc/dune
 
 # begin context for src/lsp/cobol_typeck/dune
 # file src/lsp/cobol_typeck/dune
-ef30db283bff57bd7bfea9b29e9178fd:src/lsp/cobol_typeck/dune
+11df07aa7e59dd5f6f690da14b82b8b5:src/lsp/cobol_typeck/dune
 # end context for src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/cobol_typeck/version.mlt

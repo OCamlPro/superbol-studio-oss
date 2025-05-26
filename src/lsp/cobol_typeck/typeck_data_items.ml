@@ -278,7 +278,7 @@ let item_range acc ~item_qualifier
   let qualify_as_subordinate n = qual n item_qualifier &@<- n in
   let qualify n = qualify n item_stack in                         (* CHECKME! *)
   let opt = Option.map in
-  let int = Cobol_common.Srcloc.locmap int_of_string in
+  let int = Cobol_common.Srcloc.map_payload int_of_string in
   let range = match Option.map (~&) item_clauses.occurs with
     | None ->
         None

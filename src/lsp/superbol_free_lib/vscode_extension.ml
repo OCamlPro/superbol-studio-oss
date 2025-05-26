@@ -306,6 +306,11 @@ let contributes =
     ~configuration:
       (let with_superbol_toml_note md =
          md ^ "\n\n*(May be overriden in project-specific `superbol.toml` files)*."
+       and with_extra_keyword_commment md =
+         (* Be sure to include "COBOL" in descriptions, as users are more likely
+            to type "cobol" than "superbol" when searching for extension
+            settings. *)
+         md ^ "\n<!-- COBOL -->"
        in
        Manifest.configuration ~title:"SuperBOL"
          [
@@ -355,7 +360,7 @@ let contributes =
                  ];
                ])
              ~markdownDescription:
-               (with_superbol_toml_note "List of copybooks paths.")
+               (with_superbol_toml_note "List of paths to copybooks.")
              ~order:3;
 
            Manifest.PROPERTY.strings "superbol.cobol.copyexts"
@@ -379,9 +384,10 @@ let contributes =
              ~default:""
              ~scope:"machine"
              ~markdownDescription:
-               "Name of the `superbol-free` executable if available in PATH; may \
-                be an absolute path otherwise. Leave empty to use the bundled \
-                `superbol-free`, if available."
+               (with_extra_keyword_commment
+                  "Name of the `superbol-free` executable if available in PATH; \
+                   may be an absolute path otherwise. Leave empty to use the \
+                   bundled `superbol-free`, if available.")
              ~order:12;
 
            (* Flags *)
@@ -396,11 +402,12 @@ let contributes =
            Manifest.PROPERTY.bool "superbol.cacheInGlobalStorage"
              ~default:false
              ~markdownDescription:
-               "Use storage provided by Visual Studio Code for caching.  When \
-                this setting is set to *false*, the cache related to the \
-                contents of a given workspace folder *f* is stored in a file \
-                named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
-                removed automatically, whatever their location."
+               (with_extra_keyword_commment
+                  "Use storage provided by Visual Studio Code for caching. When \
+                   this setting is set to *false*, the cache related to the \
+                   contents of a given workspace folder *f* is stored in a file \
+                   named *f*`/_superbol/lsp-cache`.\n\nNote: cache files are not \
+                   removed automatically, whatever their location.")
              ~order:22;
 
            (* Debugger-specific: *)
@@ -410,9 +417,10 @@ let contributes =
              ~title:"Display Variable Attributes"
              ~default:false
              ~scope:"resource"
-             ~description:"Display storage property and field attributes \
-                           (e.g. size of alphanumerics, digits and scale of \
-                           numerics)."
+             ~markdownDescription:
+               (with_extra_keyword_commment
+                  "Display storage property and field attributes (e.g. size of \
+                   alphanumerics, digits and scale of numerics).")
              ~order:31;
 
            Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
@@ -425,7 +433,9 @@ let contributes =
              ~title:"GNU Debugger Executable"
              ~default:"gdb"
              ~scope:"machine-overridable"
-             ~description:"Path to the GNU debugger executable."
+             ~markdownDescription:
+               (with_extra_keyword_commment
+                  "Path to the GNU debugger executable.")
              ~order:33;
 
          ])

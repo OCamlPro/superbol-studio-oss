@@ -116,7 +116,8 @@ val payload: 'a with_loc -> 'a
 val loc: 'a with_loc -> srcloc
 val as_pair: 'a with_loc -> 'a * srcloc
 val locfrom: 'a -> 'b with_loc -> 'a with_loc
-val locmap: ('a -> 'b) -> 'a with_loc -> 'b with_loc
+val map_payload: ('a -> 'b) -> 'a with_loc -> 'b with_loc
+val map_loc: (srcloc -> srcloc) -> 'a with_loc -> 'a with_loc
 
 val lift_option: 'a option with_loc -> 'a with_loc option
 val lift_result: ('a, 'e) result with_loc -> ('a with_loc, 'e with_loc) result
