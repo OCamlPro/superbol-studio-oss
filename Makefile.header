@@ -248,18 +248,20 @@ build-deps: node-setup
 # ok as those files are only there to grab external dependencies
 # before cross-compiling.
 opam-cross:
-	drom dep --cross osx
+	opam exec -- drom dep --cross osx
 	rm -f opam/osx/*-js-*.opam
 	rm -f opam/osx/vscode-debug*.opam
 	rm -f opam/osx/*-vscode-*.opam
 	sed -i '/"superbol-vscode-platform-osx"/ d'	\
 		opam/osx/superbol-studio-oss-osx.opam
-	drom dep --cross windows
+	sed -i '/"zarith_stubs_js-osx"/ d' opam/osx/*.opam
+	opam exec -- drom dep --cross windows
 	rm -f opam/windows/*-js-*.opam
 	rm -f opam/windows/vscode-debug*.opam
 	rm -f opam/windows/*-vscode-*.opam
 	sed -i '/"superbol-vscode-platform-windows"/ d'	\
 		opam/windows/superbol-studio-oss-windows.opam
+	sed -i '/"zarith_stubs_js-windows"/ d' opam/windows/*.opam
 
 # emacs-lsp:
 emacs/lsp-superbol-customs.el: $(LSP_MODE_SRCDIR) package.json
