@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2] First release (2025-05-27)
+## [0.2.0] First release (2025-05-27)
 
 ### Added
 - Improved support for `EXEC SQL` blocks, with detection of COBOL variables [#375](https://github.com/OCamlPro/superbol-studio-oss/pull/375)

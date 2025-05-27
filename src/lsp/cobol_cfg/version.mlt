@@ -18,7 +18,7 @@ let commit_hash =
   query ("git -C \""^gitdir^"\" show -s --pretty=format:%H")
 let commit_date =
   query ("git -C \""^gitdir^"\" show -s --pretty=format:%ci")
-let version = "0.1.5"
+let version = "0.2.0"
 
 let string_option = function
   | None -> "None"
