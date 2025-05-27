@@ -318,7 +318,8 @@ let contributes =
            (* Note: entries that belong to the `superbol.cobol` section is
               transmitted to the LSP server, and needs to exactly mirror the
               `[cobol]` section in `superbol.toml`.  There, convention for keys
-              is to use dash-separated words in lowercase.  *)
+              is to use dash-separated words in lowercase in order to keep
+              consistency with GnuCOBOL's configurations.  *)
 
            Manifest.PROPERTY.enum "superbol.cobol.dialect"
              ~cases:Cobol_config.DIALECT.all_canonical_names
@@ -329,7 +330,7 @@ let contributes =
              ~default:(`String Cobol_config.(DIALECT.to_string Default))
              ~order:1;
 
-           Manifest.PROPERTY.enum "superbol.cobol.source-format"
+           Manifest.PROPERTY.enum "superbol.cobol.sourceFormat"
              ~title:"Source Reference-format"
              ~markdownDescription:
                (with_superbol_toml_note "Default source reference-format.")
@@ -371,14 +372,14 @@ let contributes =
 
            (* Paths *)
 
-           Manifest.PROPERTY.string "superbol.cobc-path"
+           Manifest.PROPERTY.string "superbol.cobcPath"
              ~title:"GnuCOBOL Compiler Executable"
              ~default:"cobc"
              ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL compiler executable."
              ~order:11;
 
-           Manifest.PROPERTY.string "superbol.lsp-path"
+           Manifest.PROPERTY.string "superbol.lspPath"
              ~title:"SuperBOL Executable"
              ~default:""
              ~scope:"machine"
@@ -412,7 +413,7 @@ let contributes =
            (* Debugger-specific: *)
 
            Manifest.PROPERTY.bool
-             "superbol.debugger.display-variable-attributes"
+             "superbol.debugger.displayVariableAttributes"
              ~title:"Display Variable Attributes"
              ~default:false
              ~scope:"resource"
@@ -422,13 +423,13 @@ let contributes =
                    alphanumerics, digits and scale of numerics).")
              ~order:31;
 
-           Manifest.PROPERTY.null_string "superbol.debugger.libcob-path"
+           Manifest.PROPERTY.null_string "superbol.debugger.libcobPath"
              ~title:"GnuCOBOL Runtime Library"
              ~scope:"machine-overridable"
              ~description:"Path to the GnuCOBOL runtime library file."
              ~order:32;
 
-           Manifest.PROPERTY.string "superbol.debugger.gdb-path"
+           Manifest.PROPERTY.string "superbol.debugger.gdbPath"
              ~title:"GNU Debugger Executable"
              ~default:"gdb"
              ~scope:"machine-overridable"
@@ -452,7 +453,7 @@ let contributes =
             ~description:"Build an executable program instead of a module"
             ~default:true;
 
-          Manifest.PROPERTY.null_string "cobc-path"
+          Manifest.PROPERTY.null_string "cobcPath"
             ~title:"GnuCOBOL Compiler Executable"
             ~markdownDescription:
               "Path to the GnuCOBOL compiler executable; when `null`, defaults \

@@ -20,14 +20,14 @@ let non_empy s = if s = "" then None else Some s
 
 let superbol_exe ?scope () =
   let config = WS.getConfiguration ?scope ~section () in
-  match WS_CONF.get ~section:"lsp-path" config with
+  match WS_CONF.get ~section:"lspPath" config with
   | None -> None
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)
 
 let cobc_exe ?scope () =
   let config = WS.getConfiguration ?scope ~section () in
-  match WS_CONF.get ~section:"cobc-path" config with
+  match WS_CONF.get ~section:"cobcPath" config with
   | None -> None
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)

@@ -58,7 +58,7 @@ From here, you can notably configure:
   many features from dialects such as `COBOL2014`, `IBM`, `Micro
   Focus` (`mf`), or `GCOS` for instance;
 
-- The default reference source-format `"superbol.cobol.source-format"` (see
+- The default reference source-format `"superbol.cobol.sourceFormat"` (see
   [here](https://get-superbol.com/gnucobol/manual/chapter2.html#source-format)
   for a documentation on the supported source formats).  
   When `auto` is selected, which is the default, SuperBOL (and GnuCOBOL) will

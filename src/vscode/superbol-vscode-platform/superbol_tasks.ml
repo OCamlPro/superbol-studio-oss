@@ -103,7 +103,7 @@ let config_copybook_paths key ~config ~append =
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
   let cobc =
-    try [%js.to: string] @@ List.assoc "cobc-path" attributes
+    try [%js.to: string] @@ List.assoc "cobcPath" attributes
     with Not_found ->                                 (* fallback to WS config *)
       Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
   in

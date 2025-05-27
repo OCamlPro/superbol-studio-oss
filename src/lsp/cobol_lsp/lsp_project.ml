@@ -167,7 +167,7 @@ let update_project_config assoc project : bool =
     update_config assoc key update project || u
   end false [
     "dialect", from_string ~f:update_dialect;
-    "source-format", from_string ~f:update_source_format;
+    "sourceFormat", from_string ~f:update_source_format;
     "copybooks", update_copybooks;
     "copyexts", update_copyexts;
   ]
@@ -192,6 +192,7 @@ let reload_project_config project =
 (* --- *)
 
 
+(** Reconstruct a JSON `Assoc from the current configuration.  *)
 let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let config = Superbol_project.config project in
   let module Config = (val config.cobol_config) in
@@ -208,7 +209,7 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
       "dialect",
       `String (Cobol_config.DIALECT.to_string Config.dialect);
 
-      "source-format",
+      "sourceFormat",
       `String (Cobol_config.Options.string_of_format config.source_format);
 
       "copybooks",

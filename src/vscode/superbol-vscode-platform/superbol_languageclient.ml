@@ -167,6 +167,6 @@ let server_needs_restart_after ~config_change =
     Vscode.ConfigurationChangeEvent.affectsConfiguration config_change ()
       ~section ?scope
   in
-  affects "superbol.lsp-path"         (* machine setting: no need for a scope *)
+  affects "superbol.lspPath"         (* machine setting: no need for a scope *)
   || affects "superbol.forceSyntaxDiagnostics"                       (* scope? *)
   || affects "superbol.cacheInGlobalStorage"
