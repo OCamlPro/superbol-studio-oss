@@ -12,7 +12,7 @@ ifeq ($(BUILD_STATIC_EXECS),true)
   export LINKING_MODE=static
 endif
 
-VERSION = 0.2.0
+VERSION = 0.2.1
 DEV_DEPS := merlin ocamlformat odoc
 
 

@@ -1,5 +1,8 @@
 # Changelog
 
+## [_] Next release
+
+
 ## [0.2.0] First release (2025-05-27)
 
 ### Added
