@@ -154,7 +154,8 @@ select  `Go to Definition` (or press <kbd>F12</kbd>).
 >
 > At the moment, definitions that belong to communication, report, or
 > screen sections of the data division are ignored by the extension.
-> They will be covered by the first stable release.
+> In addition, some definitions in embedded SQL blocks (`EXEC SQL`)
+> are not taken into account yet.
 
 ### Peek Definition
 
@@ -179,9 +180,8 @@ every reference to this item.
 > [!NOTE]
 > (Temporary limitation)
 >
-> In addition to limitations mentioned in [Go to
-> Definition](#go-to-definition), references that occur in
-> `EXEC`/`END-EXEC` blocks are also not taken into account yet.
+> Limitations mentioned in [Go to Definition](#go-to-definition) also
+> apply.
 
 ### Reference Information
 
