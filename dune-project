@@ -43,6 +43,7 @@
  (name interop-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
@@ -57,6 +58,7 @@
  (name node-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
@@ -73,6 +75,7 @@
  (name vscode-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and ( >= 0.3.1 )( < 0.4 )))
@@ -90,6 +93,7 @@
  (name vscode-languageclient-js-stubs)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (vscode-js-stubs (= version))
@@ -124,6 +128,7 @@
  (name vscode-debugadapter)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (vscode-debugprotocol (= version))
@@ -141,6 +146,7 @@
  (name vscode-debugprotocol)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (allow_empty)
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
