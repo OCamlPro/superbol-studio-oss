@@ -209,7 +209,7 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
       "dialect",
       `String (Cobol_config.DIALECT.to_string Config.dialect);
 
-      "source-format",
+      "sourceFormat",
       `String (Cobol_config.Options.string_of_format config.source_format);
 
       "copybooks",
