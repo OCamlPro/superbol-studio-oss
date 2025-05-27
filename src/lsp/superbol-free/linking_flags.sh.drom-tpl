@@ -58,8 +58,9 @@ case "$1" in
                 echo2 ' -cclib -static)'
                 ;;
             *)
-                echo2 "Error: static linking is only supported in Alpine, to avoids glibc constraints (use scripts/static-build.sh to build through an Alpine Docker container)" >&2
-                exit 3
+                echo2 "Warning: static linking is only supported in Alpine, to avoids glibc constraints (use scripts/static-build.sh to build through an Alpine Docker container)" >&2
+                echo2 "()"
+                # exit 3
         esac
         ;;
     macosx)
