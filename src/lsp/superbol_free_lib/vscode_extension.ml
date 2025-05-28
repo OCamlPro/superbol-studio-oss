@@ -44,7 +44,7 @@ let package =
       type_ = Some "git" ;
       url = "https://github.com/OCamlPro/superbol-studio-oss"
     }
-    ~homepage: "https://get-superbol.com"
+    ~homepage: "https://superbol.eu"
     ~author: {
       author_name = "SuperBOL at OCamlPro" ;
       author_email = Some "contact@ocamlpro.com"
