@@ -51,6 +51,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package
@@ -67,6 +69,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package
@@ -84,6 +88,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package
@@ -103,6 +109,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package
@@ -135,6 +143,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package
@@ -150,6 +160,8 @@
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))
   )
+  (allow_empty)
+
  )
 
 (package

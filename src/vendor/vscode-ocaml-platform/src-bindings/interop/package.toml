@@ -75,3 +75,6 @@ js_of_ocaml-ppx = ">=4"
 dune-stanzas = """
  (enabled_if (= %{context_name} \"default\"))
 """
+dune-project-stanzas = """
+ (allow_empty)
+"""
