@@ -507,7 +507,7 @@
         "name": "gnucobol",
         "regexp": "^(.*): ?(\\d+): (error|warning): ([^[]*)(\\[(.*)\\])?$",
         "file": 1,
-        "line": 2,
+        "location": 2,
         "severity": 3,
         "code": 6,
         "message": 4
@@ -516,7 +516,7 @@
         "name": "gnucobol-warning",
         "regexp": "^(.*):(\\d+):\\s?(warning|Warnung|[wW]aarschuwing|[aA]lerta|avertissement|упозорење)\\s?:([^[]*)(\\[(.*)\\])?$",
         "file": 1,
-        "line": 2,
+        "location": 2,
         "code": 6,
         "message": 4
       },
@@ -524,7 +524,7 @@
         "name": "gnucobol-error",
         "regexp": "^(.*): ?(\\d+):\\s?(error|Fehler|[fF]out|[eE]rrores|[eE]rrores|erreur|грешка)\\s?:\\s?([^[]*)(\\[(.*)\\])?$",
         "file": 1,
-        "line": 2,
+        "location": 2,
         "code": 6,
         "message": 4
       },
@@ -532,7 +532,7 @@
         "name": "gnucobol-note",
         "regexp": "^(.*): ?(\\d+): (note|Anmerkung|[nN]ota): ([^[]*)(\\[(.*)\\])?$",
         "file": 1,
-        "line": 2,
+        "location": 2,
         "code": 6,
         "message": 4
       }
