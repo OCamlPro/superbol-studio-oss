@@ -317,10 +317,10 @@ Default Build Task…`, and then `SuperBOL: build` or
 whenever you start a debugging session, *e.g* with <kbd>F5</kbd>).
 
 Save the `tasks.json` as shown.  Definitions for this task notably
-include a `for-debug` flag, that instructs the compiler to insert
-debug annotations into generated executable files (this effectively
-passes flags `-ftraceall` and `-g` to `cobc`).  The `extra-args`
-setting can be edited to pass additional arguments to `cobc`.
+include a `forDebug` flag, that instructs the compiler to insert debug
+annotations into generated executable files (this effectively passes
+flags `-ftraceall` and `-g` to `cobc`).  The `extraArgs` setting can
+be edited to pass additional arguments to `cobc`.
 
 ![`tasks.json` for debug](./assets/superbol-tasks.json.png)
 
@@ -328,7 +328,7 @@ setting can be edited to pass additional arguments to `cobc`.
 
 GnuCOBOL can instrument your programs so they can generate coverage
 information at runtime.  To enable this feature, you can set the
-`for-coverage` setting to `true` in the `Superbol: build (debug)` task
+`forCoverage` setting to `true` in the `Superbol: build (debug)` task
 in your `tasks.json` file (see [Customizing Build
 Tasks](#customizing-build-tasks)).  This flag instructs the extension
 to pass the `--coverage` flag to the `cobc` compiler.

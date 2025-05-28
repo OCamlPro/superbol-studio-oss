@@ -24,18 +24,18 @@ type attribute_spec =
 
 let attributes_spec ~debug ~coverage ~executable =
   [
-    "for-debug", C ([%js.to: bool or_undefined],
-                    [%js.of: bool], debug);
-    "for-coverage", C ([%js.to: bool or_undefined],
-                       [%js.of: bool], coverage);
+    "forDebug", C ([%js.to: bool or_undefined],
+                   [%js.of: bool], debug);
+    "forCoverage", C ([%js.to: bool or_undefined],
+                      [%js.of: bool], coverage);
     "executable", C ([%js.to: bool or_undefined],
                      [%js.of: bool], executable);
-    "cobc-path", C ([%js.to: string or_undefined],
-                    [%js.of: string], "cobc");
-    "listings-target", C ([%js.to: string option or_undefined],
-                          [%js.of: string option], None);
-    "extra-args", C ([%js.to: string list or_undefined],
-                     [%js.of: string list], []);
+    "cobcPath", C ([%js.to: string or_undefined],
+                   [%js.of: string], "cobc");
+    "listingsTarget", C ([%js.to: string option or_undefined],
+                         [%js.of: string option], None);
+    "extraArgs", C ([%js.to: string list or_undefined],
+                    [%js.of: string list], []);
   ]
 
 let executable_spec = attributes_spec ~executable:true
@@ -100,13 +100,15 @@ let config_copybook_paths key ~config ~append =
     (* Warning: silenced decode errors for now *)
     []
 
+let cobc_path attributes =
+  match [%js.to: string] @@ List.assoc "cobcPath" attributes with
+  | exception Not_found | "" ->                       (* fallback to WS config *)
+      Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
+  | path ->
+      path
+
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
-  let cobc =
-    try [%js.to: string] @@ List.assoc "cobcPath" attributes
-    with Not_found ->                                 (* fallback to WS config *)
-      Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
-  in
   let args =
     ["${relativeFile}"] |>
     config_copybook_paths "cobol.copybooks" ~config
@@ -131,21 +133,21 @@ let cobc_execution ?config attributes =
         | "gnucobol" -> List.cons "-std=default"
         | s -> List.cons ("-std=" ^ s)
       end|>
-    config_string "cobol.source-format" ~config
+    config_string "cobol.sourceFormat" ~config
       ~append:(fun f -> List.cons ("-fformat=" ^ f)) |>
-    attr_bool_flag "for-debug" ~attributes
+    attr_bool_flag "forDebug" ~attributes
       ~ok:(List.append ["-ftraceall"; "-g"]) |>
-    attr_bool_flag "for-coverage" ~attributes
+    attr_bool_flag "forCoverage" ~attributes
       ~ok:(List.cons "--coverage") |>
     attr_bool_flag "executable" ~attributes
       ~ok:(List.cons "-x")
       ~ko:(List.cons "-m") |>
-    attr_string_opt "listings-target" ~attributes
+    attr_string_opt "listingsTarget" ~attributes
       ~append:(fun t -> List.append ["-P"; t]) |>
-    attr_strings "extra-args" ~attributes
+    attr_strings "extraArgs" ~attributes
   in
   `ShellExecution (ShellExecution.makeCommandArgs ()
-                     ~command:(`String cobc)
+                     ~command:(`String (cobc_path attributes))
                      ~args:(List.map (fun elt -> `String elt) args))
 
 let make_default_cobc_task ~name ~definition ~execution =

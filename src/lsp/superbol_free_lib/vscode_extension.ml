@@ -144,12 +144,12 @@ let contributes =
                                         "description": "Path to project",
                                         "default": "${workspaceFolder}"
                                 },
-                                "gdb-path": {
+                                "gdbPath": {
                                         "type": "string",
                                         "description": "Path to gdb",
                                         "default": "gdb"
                                 },
-                                "libcob-path": {
+                                "libcobPath": {
                                         "type": "string",
                                         "description": "Path to libcob",
                                         "default": null
@@ -212,12 +212,12 @@ let contributes =
                                         "description": "Path to project",
                                         "default": "${workspaceFolder}"
                                 },
-                                "gdb-path": {
+                                "gdbPath": {
                                         "type": "string",
                                         "description": "Path to gdb",
                                         "default": "gdb"
                                 },
-                                "libcob-path": {
+                                "libcobPath": {
                                         "type": "string",
                                         "description": "Path to libcob",
                                         "default": null
@@ -242,7 +242,7 @@ let contributes =
                                         "description": "PID of the executable",
                                         "default": null
                                 },
-                                "remote-debugger": {
+                                "remoteDebugger": {
                                         "type": "string",
                                         "description": "GDB Server host:port",
                                         "default": null
@@ -290,7 +290,7 @@ let contributes =
                                         "name": "${2:SuperBOL: debug (attach remote)}",
                                         "type": "superbol-gdb",
                                         "request": "attach",
-                                        "remote-debugger": "${3:host:port}",
+                                        "remoteDebugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
@@ -443,10 +443,10 @@ let contributes =
       Manifest.taskDefinition
         "superbol"
         ~properties: [
-          Manifest.PROPERTY.bool "for-debug"
+          Manifest.PROPERTY.bool "forDebug"
             ~description:"Build for debugging";
 
-          Manifest.PROPERTY.bool "for-coverage"
+          Manifest.PROPERTY.bool "forCoverage"
             ~description:"Enable instrumentation for coverage";
 
           Manifest.PROPERTY.bool "executable"
@@ -456,17 +456,17 @@ let contributes =
           Manifest.PROPERTY.null_string "cobcPath"
             ~title:"GnuCOBOL Compiler Executable"
             ~markdownDescription:
-              "Path to the GnuCOBOL compiler executable; when `null`, defaults \
-               to the value of \"superbol.cobc-path\" from the workspace \
+              "Path to the GnuCOBOL compiler executable; when `null` or \"\", \
+               defaults to the value of \"superbol.cobcPath\" from the workspace \
                configuration, if defined, to \"cobc\" otherwise.";
 
-          Manifest.PROPERTY.null_string "listings-target"
+          Manifest.PROPERTY.null_string "listingsTarget"
             ~title:"Output file or directory for preprocessed program listings"
             ~markdownDescription:
               "Path to a directory where preprocessed program listings are \
-               generated; no listing is saved when `null`";
+               generated; no listing is saved when `null`.";
 
-          Manifest.PROPERTY.array "extra-args"
+          Manifest.PROPERTY.array "extraArgs"
             ~description:"Additional arguments passed to `cobc`";
         ]
     ]
