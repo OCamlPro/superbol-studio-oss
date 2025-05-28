@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-11cc95ed25c9536d9ff3d1f81b90273e:.
+9ef542cdf49ae5359db55910d69a98d4:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -75,7 +75,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-afc758d8ae20185aa232f0f9eef5d996:dune-project
+6c508dbeab7b1c398856e6909c9d6739:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
