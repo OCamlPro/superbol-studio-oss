@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Fixed
+- Lookup of task configuration settings [#425](https://github.com/OCamlPro/superbol-studio-oss/pull/425)
+
 
 ## [0.2.0] First release (2025-05-27)
 

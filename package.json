@@ -240,12 +240,12 @@
                 "description": "Path to project",
                 "default": "${workspaceFolder}"
               },
-              "gdb-path": {
+              "gdbPath": {
                 "type": "string",
                 "description": "Path to gdb",
                 "default": "gdb"
               },
-              "libcob-path": {
+              "libcobPath": {
                 "type": "string",
                 "description": "Path to libcob",
                 "default": null
@@ -308,12 +308,12 @@
                 "description": "Path to project",
                 "default": "${workspaceFolder}"
               },
-              "gdb-path": {
+              "gdbPath": {
                 "type": "string",
                 "description": "Path to gdb",
                 "default": "gdb"
               },
-              "libcob-path": {
+              "libcobPath": {
                 "type": "string",
                 "description": "Path to libcob",
                 "default": null
@@ -338,7 +338,7 @@
                 "description": "PID of the executable",
                 "default": null
               },
-              "remote-debugger": {
+              "remoteDebugger": {
                 "type": "string",
                 "description": "GDB Server host:port",
                 "default": null
@@ -386,7 +386,7 @@
               "name": "${2:SuperBOL: debug (attach remote)}",
               "type": "superbol-gdb",
               "request": "attach",
-              "remote-debugger": "${3:host:port}",
+              "remoteDebugger": "${3:host:port}",
               "target": "$${_:{file}}",
               "arguments": "",
               "cwd": "$${_:{workspaceFolder}}",
@@ -541,11 +541,11 @@
       {
         "type": "superbol",
         "properties": {
-          "for-debug": {
+          "forDebug": {
             "type": "boolean",
             "description": "Build for debugging"
           },
-          "for-coverage": {
+          "forCoverage": {
             "type": "boolean",
             "description": "Enable instrumentation for coverage"
           },
@@ -556,21 +556,21 @@
           },
           "cobcPath": {
             "title": "GnuCOBOL Compiler Executable",
-            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null`, defaults to the value of \"superbol.cobc-path\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
+            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null` or \"\", defaults to the value of \"superbol.cobcPath\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
             "type": [
               "string",
               "null"
             ]
           },
-          "listings-target": {
+          "listingsTarget": {
             "title": "Output file or directory for preprocessed program listings",
-            "markdownDescription": "Path to a directory where preprocessed program listings are generated; no listing is saved when `null`",
+            "markdownDescription": "Path to a directory where preprocessed program listings are generated; no listing is saved when `null`.",
             "type": [
               "string",
               "null"
             ]
           },
-          "extra-args": {
+          "extraArgs": {
             "type": "array",
             "description": "Additional arguments passed to `cobc`"
           }
@@ -606,7 +606,7 @@
     "type": "git",
     "url": "https://github.com/OCamlPro/superbol-studio-oss"
   },
-  "homepage": "https://get-superbol.com",
+  "homepage": "https://superbol.eu",
   "author": {
     "name": "SuperBOL at OCamlPro",
     "email": "contact@ocamlpro.com"
