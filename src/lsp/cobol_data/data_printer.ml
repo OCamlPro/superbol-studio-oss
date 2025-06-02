@@ -286,11 +286,11 @@ let pp_data_definition ppf = function
         I'(~&field.field_qualname <> None,
            Fmt.field "field" (fun () -> ~&field.field_qualname) pp_qualname'_opt,
            Fmt.field "field-offset" (fun () -> ~&field.field_offset) pp_offset);
-	T (Pretty.vfield "def" (fun () -> def) pp_condition_name');
+  T (Pretty.vfield "def" (fun () -> def) pp_condition_name');
       ] ppf ()
   | Table_index { table; record = { record_name; _ }; _ } ->
       Pretty.record_with_conditional_fields [
         T Fmt.(styled `Yellow @@ any "table index");
         T (Fmt.field "record" (fun () -> record_name) Fmt.string);
-	T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
+  T (Pretty.vfield "table" (fun () -> table) pp_table_definition');
       ] ppf ()
