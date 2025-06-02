@@ -78,6 +78,8 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
+    References: 2
+    ---
     Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
@@ -98,6 +100,8 @@ let%expect_test "hover-copy" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     ---
     Additional pre-processing:
     ```cobol
@@ -120,6 +124,8 @@ let%expect_test "hover-copy" =
     ```
     ALPHANUMERIC(1)
     ---
+    References: 2
+    ---
     Additional pre-processing:
     ```cobol
            01 FIELD PIC X.
@@ -140,6 +146,8 @@ let%expect_test "hover-copy" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     ---
     Additional pre-processing:
     ```cobol
@@ -181,7 +189,9 @@ let%expect_test "hover-typedef-from-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}];;
+    ALPHANUMERIC(1)
+    ---
+    References: 2 |}];;
 
 (* Hover replaced *)
 
@@ -249,6 +259,8 @@ let%expect_test "hover-typedef-vars" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 5, character 23):
     __rootdir__/prog.cob:6.8-6.27:
        3           PROGRAM-ID. prog.
@@ -265,6 +277,8 @@ let%expect_test "hover-typedef-vars" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 6, character 14):
     __rootdir__/prog.cob:7.11-7.17:
        4           DATA DIVISION.
@@ -279,6 +293,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     Group of 3 subfields
     Size: 80 bits
+    ---
+    References: 2
     (line 7, character 31):
     __rootdir__/prog.cob:8.10-8.44:
        5           WORKING-STORAGE SECTION.
@@ -297,6 +313,8 @@ let%expect_test "hover-typedef-vars" =
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
+    ---
+    References: 2
     (line 8, character 16):
     __rootdir__/prog.cob:9.13-9.21:
        6           01 DATA-NAME PIC X.
@@ -314,6 +332,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     ALPHANUMERIC(1)
     VALUE QUOTE
+    ---
+    References: 2
     (line 9, character 38):
     __rootdir__/prog.cob:10.10-10.50:
        7           01 STRUCT.
@@ -331,6 +351,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     ALPHANUMERIC(6)
     VALUE "ABC456"
+    ---
+    References: 2
     (line 10, character 14):
     __rootdir__/prog.cob:11.11-11.14:
        8             02 STRUCT-1 PICTURE 999 VALUE 123.
@@ -348,6 +370,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     ALPHANUMERIC(38)
     VALUE "************************************"
+    ---
+    References: 1
     (line 12, character 18):
     __rootdir__/prog.cob:13.18-13.27:
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
@@ -364,6 +388,8 @@ let%expect_test "hover-typedef-vars" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 12, character 33):
     __rootdir__/prog.cob:13.28-13.34:
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
@@ -378,6 +404,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     Group of 3 subfields
     Size: 80 bits
+    ---
+    References: 2
     (line 12, character 36):
     __rootdir__/prog.cob:13.35-13.43:
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
@@ -396,6 +424,8 @@ let%expect_test "hover-typedef-vars" =
     NUMERIC(digits = 3, scale = 0, with_sign = false)
     *e.g,* [`000`] (0), [`123`] (123)
     VALUE 123
+    ---
+    References: 2
     (line 12, character 47):
     __rootdir__/prog.cob:13.44-13.52:
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
@@ -413,6 +443,8 @@ let%expect_test "hover-typedef-vars" =
     ```
     ALPHANUMERIC(1)
     VALUE QUOTE
+    ---
+    References: 2
     (line 12, character 56):
     __rootdir__/prog.cob:13.53-13.61:
       10             02 STRUCT-3 PICTURE X(6) VALUE "ABC456".
@@ -429,7 +461,9 @@ let%expect_test "hover-typedef-vars" =
     PIC X(6) USAGE DISPLAY
     ```
     ALPHANUMERIC(6)
-    VALUE "ABC456" |}];;
+    VALUE "ABC456"
+    ---
+    References: 2 |}];;
 
 let%expect_test "hover-typedef-vars-usage" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -469,6 +503,8 @@ let%expect_test "hover-typedef-vars-usage" =
     ```
     NUMERIC(digits = 8, scale = 2, with_sign = false)
     *e.g,* [`        0.00`] (0), [`  123,456.78`] (123456.78)
+    ---
+    References: 1
     (line 6, character 11):
     __rootdir__/prog.cob:7.11-7.15:
        4           DATA DIVISION.
@@ -486,6 +522,8 @@ let%expect_test "hover-typedef-vars-usage" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 1
     (line 7, character 11):
     __rootdir__/prog.cob:8.11-8.15:
        5           WORKING-STORAGE SECTION.
@@ -501,6 +539,8 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     USAGE BINARY-SHORT SIGNED
     ```
+    ---
+    References: 1
     (line 8, character 11):
     __rootdir__/prog.cob:9.11-9.15:
        6           01 VAR PIC -BZZZ,ZZ9.99.
@@ -516,6 +556,8 @@ let%expect_test "hover-typedef-vars-usage" =
     ```cobol
     USAGE BINARY-C-LONG SIGNED
     ```
+    ---
+    References: 1
     (line 9, character 11):
     __rootdir__/prog.cob:10.11-10.15:
        7           01 VAR1 PIC 9 USAGE BINARY.
@@ -532,6 +574,8 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC 111 USAGE BIT
     ```
     BOOLEAN(3)
+    ---
+    References: 1
     (line 10, character 11):
     __rootdir__/prog.cob:11.11-11.15:
        8           01 VAR4 USAGE BINARY-SHORT.
@@ -545,6 +589,8 @@ let%expect_test "hover-typedef-vars-usage" =
     VAR7
     ```
     Pointer
+    ---
+    References: 1
     (line 11, character 11):
     __rootdir__/prog.cob:12.11-12.15:
        9           01 VAR3 USAGE BINARY-C-LONG.
@@ -562,6 +608,8 @@ let%expect_test "hover-typedef-vars-usage" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 1
     (line 12, character 11):
     __rootdir__/prog.cob:13.11-13.15:
       10           01 VAR6 PIC 111 USAGE BIT.
@@ -578,7 +626,9 @@ let%expect_test "hover-typedef-vars-usage" =
     PIC $++/+.+B+ USAGE DISPLAY
     ```
     NUMERIC(digits = 4, scale = 2, with_sign = false)
-    *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34) |}];;
+    *e.g,* [`         `] (0), [`$+1/2.3 4`] (12.34)
+    ---
+    References: 1 |}];;
 
 let%expect_test "hover-typedef-filler-vars" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -617,6 +667,8 @@ let%expect_test "hover-typedef-filler-vars" =
     ```
     Group of 2 subfields
     Size: 32 bits
+    ---
+    References: 1
     (line 9, character 29):
     Hovering nothing worthy |}];;
 
@@ -656,6 +708,8 @@ let%expect_test "hover-typedef-simple-condition" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 1
     (line 6, character 14):
     Hovering nothing worthy
     (line 7, character 15):
@@ -679,6 +733,8 @@ let%expect_test "hover-typedef-simple-condition" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 10, character 22):
     __rootdir__/prog.cob:11.14-11.22:
        8             88 CONDTHRU VALUE "a" THRU "z".
@@ -697,7 +753,9 @@ let%expect_test "hover-typedef-simple-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}];;
+    ALPHANUMERIC(1)
+    ---
+    References: 2 |}];;
 
 let%expect_test "hover-typedef-group-condition" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -739,6 +797,8 @@ let%expect_test "hover-typedef-group-condition" =
     ```
     Group of 2 subfields
     Size: 16 bits
+    ---
+    References: 1
     (line 9, character 17):
     Hovering nothing worthy
     (line 11, character 14):
@@ -760,6 +820,8 @@ let%expect_test "hover-typedef-group-condition" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 12, character 14):
     __rootdir__/prog.cob:13.14-13.20:
       10               88 COND-2 VALUE "a".
@@ -778,7 +840,9 @@ let%expect_test "hover-typedef-group-condition" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}];;
+    ALPHANUMERIC(1)
+    ---
+    References: 2 |}];;
 
 let%expect_test "hover-typedef-renames" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -817,6 +881,8 @@ let%expect_test "hover-typedef-renames" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2
     (line 8, character 16):
     __rootdir__/prog.cob:9.10-9.25:
        6           01 X.
@@ -835,6 +901,8 @@ let%expect_test "hover-typedef-renames" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2
     (line 8, character 23):
     __rootdir__/prog.cob:9.23-9.24:
        6           01 X.
@@ -852,6 +920,8 @@ let%expect_test "hover-typedef-renames" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 3
     (line 9, character 22):
     __rootdir__/prog.cob:10.13-10.22:
        7             05 Y PIC 9.
@@ -870,6 +940,8 @@ let%expect_test "hover-typedef-renames" =
     PIC XXX USAGE DISPLAY
     ```
     ALPHANUMERIC(3)
+    ---
+    References: 1
     (line 11, character 20):
     __rootdir__/prog.cob:12.20-12.21:
        9             66 Z RENAMES Y.
@@ -887,7 +959,9 @@ let%expect_test "hover-typedef-renames" =
     PIC 9 USAGE DISPLAY
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
-    *e.g,* [`0`] (0), [`1`] (1) |}];;
+    *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2 |}];;
 
 let%expect_test "hover-typedef-redefines" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -926,6 +1000,8 @@ let%expect_test "hover-typedef-redefines" =
     ```cobol
     Y IN X
     ```
+    ---
+    References: 2
     (line 7, character 26):
     __rootdir__/prog.cob:8.25-8.26:
        5           WORKING-STORAGE SECTION.
@@ -943,6 +1019,8 @@ let%expect_test "hover-typedef-redefines" =
     ```
     NUMERIC(digits = 1, scale = 0, with_sign = false)
     *e.g,* [`0`] (0), [`1`] (1)
+    ---
+    References: 2
     (line 9, character 20):
     __rootdir__/prog.cob:10.20-10.21:
        7             05 Y PIC 9.
@@ -962,7 +1040,9 @@ let%expect_test "hover-typedef-redefines" =
     Redefines:
     ```cobol
     Y IN X
-    ``` |}];;
+    ```
+    ---
+    References: 2 |}];;
 
 let%expect_test "hover-typedef-table-and-index" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -999,6 +1079,8 @@ let%expect_test "hover-typedef-table-and-index" =
     IDX
     ```
     Index
+    ---
+    References: 2
     (line 7, character 13):
     __rootdir__/prog.cob:8.11-8.13:
        5           WORKING-STORAGE SECTION.
@@ -1015,6 +1097,8 @@ let%expect_test "hover-typedef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 2
     (line 7, character 52):
     __rootdir__/prog.cob:8.47-8.53:
        5           WORKING-STORAGE SECTION.
@@ -1037,6 +1121,8 @@ let%expect_test "hover-typedef-table-and-index" =
     PIC X USAGE DISPLAY
     ```
     ALPHANUMERIC(1)
+    ---
+    References: 3
     (line 8, character 44):
     __rootdir__/prog.cob:9.41-9.47:
        6           77 IDX USAGE IS INDEX.
@@ -1057,6 +1143,8 @@ let%expect_test "hover-typedef-table-and-index" =
     ```
     Group of 1 subfield
     Size: 8 bits
+    ---
+    References: 1
     (line 8, character 49):
     __rootdir__/prog.cob:9.48-9.50:
        6           77 IDX USAGE IS INDEX.
@@ -1077,6 +1165,8 @@ let%expect_test "hover-typedef-table-and-index" =
     ```
     Group of 1 subfield
     Size: 8 bits
+    ---
+    References: 1
     (line 10, character 66):
     __rootdir__/prog.cob:11.65-11.67:
        8           01 T1 PIC X OCCURS 10 TIMES INDEXED BY INDEX1.
@@ -1097,6 +1187,8 @@ let%expect_test "hover-typedef-table-and-index" =
     ```
     Group of 1 subfield
     Size: 8 bits
+    ---
+    References: 1
     (line 14, character 24):
     __rootdir__/prog.cob:15.21-15.27:
       12             02 SUB-FIELD pic 9.
@@ -1118,7 +1210,9 @@ let%expect_test "hover-typedef-table-and-index" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}];;
+    ALPHANUMERIC(1)
+    ---
+    References: 3 |}];;
 
 let%expect_test "hover-typedef-communication-section" =
   let { projdir; end_with_postproc }, server = make_lsp_project () in
@@ -1181,6 +1275,8 @@ let%expect_test "hover-comment" =
     Size: 16 bits
     ---
      inline comment
+    ---
+    References: 2
     (line 12, character 25):
     __rootdir__/prog.cob:13.24-13.29:
       10         * val2 only line comment
@@ -1199,6 +1295,8 @@ let%expect_test "hover-comment" =
     ALPHANUMERIC(1)
     ---
      val1 only inline comment
+    ---
+    References: 2
     (line 12, character 31):
     __rootdir__/prog.cob:13.30-13.35:
       10         * val2 only line comment
@@ -1216,7 +1314,9 @@ let%expect_test "hover-comment" =
     ```
     ALPHANUMERIC(1)
     ---
-     val2 only line comment |}];;
+     val2 only line comment
+    ---
+    References: 2 |}];;
 
 
 let%expect_test "hover-comment-copy" =
@@ -1257,4 +1357,6 @@ let%expect_test "hover-comment-copy" =
     ```cobol
     PIC X USAGE DISPLAY
     ```
-    ALPHANUMERIC(1) |}]
+    ALPHANUMERIC(1)
+    ---
+    References: 2 |}]

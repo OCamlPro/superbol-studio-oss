@@ -574,8 +574,10 @@ let lookup_data_definition_for_hover cu_name element_at_pos group =
   with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
 let data_definition_on_hover
+    ~rootdir ~textDocument
     ?(always_show_hover_text_in_data_div = false) ~rev_comments
-    ~uri position Cobol_typeck.Outputs.{ group; _ } =
+    ~uri position (checked_doc : Cobol_typeck.Outputs.t) =
+  let Cobol_typeck.Outputs.{ group; _ } = checked_doc in
   let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~uri position group with
   | { element_at_position = None; _ }
@@ -586,12 +588,19 @@ let data_definition_on_hover
       try
         let data_def, hover_loc
           = lookup_data_definition_for_hover cu_name ele_at_pos group in
+        let context = ReferenceContext.create ~includeDeclaration:true in
+        let params =
+          ReferenceParams.create ~context ~position ~textDocument () in
+        let ref_count =
+          lookup_references_in_doc ~rootdir params checked_doc
+          |> Option.fold ~none:0 ~some:List.length in
         let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
         if always_show_hover_text_in_data_div ||
            not (Lsp_position.is_in_srcloc ~filename position @@
                 Cobol_data.Item.def_loc data_def)
-        then Some (Pretty.to_string "%a%s"
-                     Lsp_data_info_printer.pp_data_definition data_def doc_comments,
+        then Some (Pretty.to_string "%a%s%s"
+                     Lsp_data_info_printer.pp_data_definition data_def doc_comments
+                     (Printf.sprintf "\n\n---\nReferences: %d" ref_count),
                    hover_loc)
         else None
       with Not_found ->
@@ -644,8 +653,10 @@ let handle_hover ?always_show_hover_text_in_data_div
     registry HoverParams.{ textDocument = doc; position; _ } =
   let filename = Lsp.Uri.to_path doc.uri in
   try_with_checked_doc registry doc
-    ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
-      match data_definition_on_hover ~uri:doc.uri position checked_doc
+    ~f:begin fun ~doc:{ project; artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+      match data_definition_on_hover
+              ~rootdir ~textDocument:doc ~uri:doc.uri position checked_doc
               ?always_show_hover_text_in_data_div ~rev_comments,
             preproc_info_on_hover ~filename position pplog with
       | None, None ->
