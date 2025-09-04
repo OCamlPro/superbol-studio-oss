@@ -130,11 +130,11 @@ let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
     with
     | Failure msg | Sys_error msg ->
         if config.cache_verbose then
-          Lsp_io.log_info "Failed@ to@ read@ document@ cache@ for@ %s:@ %s"
+          Lsp_io.log_info "Not@ reading@ document@ cache@ for@ %s:@ %s"
             cached_doc.doc_cache_filename msg;
         docs
     | e ->
-        Lsp_io.log_warn "Failed@ to@ read@ document@ cache@ for@ %s:@ %a"
+        Lsp_io.log_warn "Not@ reading@ document@ cache@ for@ %s:@ %a"
           cached_doc.doc_cache_filename Fmt.exn e;
         docs
   end cached_docs URIMap.empty
@@ -152,18 +152,18 @@ let load ~rootdir ~layout ~config =
       try load_cache cache_file with
       | Unix.Unix_error (e, op, args) ->
           if config.cache_verbose then
-            Lsp_io.log_debug "Failed@ to@ read@ cache:@ %s %s:@ %s"
+            Lsp_io.log_debug "Not@ reading@ cache:@ %s %s:@ %s"
               op args (Unix.error_message e);
           fallback
       | Sys_error msg ->
           if config.cache_verbose then
-            Lsp_io.log_info "Failed@ to@ read@ cache:@ %s" msg;
+            Lsp_io.log_info "Not@ reading@ cache:@ %s" msg;
           fallback
       | Failure msg ->
           if config.cache_verbose then
-            Lsp_io.log_info "Failed@ to@ read@ cache@ %s:@ %s" cache_file msg;
+            Lsp_io.log_info "Not@ reading@ cache@ %s:@ %s" cache_file msg;
           fallback
       | e ->
-          Lsp_io.log_warn "Failed@ to@ read@ cache@ %s:@ %a\
+          Lsp_io.log_warn "Not@ reading@ cache@ %s:@ %a\
                           " cache_file Fmt.exn e;
           fallback

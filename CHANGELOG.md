@@ -4,6 +4,7 @@
 
 ### Fixed
 - Lookup of task configuration settings [#425](https://github.com/OCamlPro/superbol-studio-oss/pull/425)
+- Clarity of some log messages, and inclusion of version and platform info on startup [#442](https://github.com/OCamlPro/superbol-studio-oss/pull/442)
 
 
 ## [0.2.0] First release (2025-05-27)
