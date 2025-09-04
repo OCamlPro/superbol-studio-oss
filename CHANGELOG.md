@@ -4,6 +4,7 @@
 
 ### Fixed
 - Lookup of task configuration settings [#425](https://github.com/OCamlPro/superbol-studio-oss/pull/425)
+- Stack overflows on semantic tokens retrieval on large files [441](https://github.com/OCamlPro/superbol-studio-oss/pull/441)
 
 
 ## [0.2.0] First release (2025-05-27)
