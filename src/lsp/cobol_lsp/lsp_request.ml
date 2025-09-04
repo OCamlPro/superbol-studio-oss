@@ -45,14 +45,26 @@ let try_with_main_document_data ~f =
 
 (** {3 Initialization} *)
 
-let log_initialization_info () =
-  Lsp_io.log_info "Initializing SuperBOL LSP Server";
+let log_version_info () =
   match Version.commit_hash, Version.commit_date with
   | None, _ | _, None ->
       Lsp_io.log_info "Version: %s" Version.version
   | Some h, Some d ->
       Lsp_io.log_info "Commit: %s (%s)" h d;
       Lsp_io.log_info "Version tag: %s" Version.version
+
+let log_backend_info () =
+  Lsp_io.log_info "OS type: %s" Sys.os_type;
+  Lsp_io.log_info "Backend: %s"
+    (match Sys.backend_type with
+     | Native -> "native"
+     | Bytecode -> "bytecode"
+     | Other s -> s)
+
+let log_initialization_info () =
+  Lsp_io.log_info "Initializing SuperBOL LSP Server";
+  log_version_info ();
+  log_backend_info ()
 
 let initialize ~config (params: InitializeParams.t) =
   let root_uri = match params.rootUri with
