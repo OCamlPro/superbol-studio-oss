@@ -250,6 +250,20 @@ let contributes =
                         }
                 }
         } |})
+        ~initialConfigurations: [(
+          Manifest.any {| {
+                  "name": "SuperBOL: debug (launch)",
+                  "type": "superbol-gdb",
+                  "request": "launch",
+                  "preLaunchTask": "SuperBOL: build (debug)",
+                  "target": "${file}",
+                  "arguments": "",
+                  "cwd": "${workspaceFolder}",
+                  "group": [],
+                  "coverage": true,
+                  "verbose": false,
+                  "gdbtty": true
+          } |})]
         ~configurationSnippets: [
           Manifest.any {| {
                                 "label": "SuperBOL: debug (launch)",
