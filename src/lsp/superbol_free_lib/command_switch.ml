@@ -646,8 +646,12 @@ let switch_build ?dir ?switch_name ?branch ~set ~sudo () =
       let branch = String.trim branch in
       Printf.eprintf "Current branch: %S\n%!" branch;
       if branch = "gnucobol-3.x" then
-        let commit = Call.call_stdout_string [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ] in
-        let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ] in
+        let commit = Call.call_stdout_string
+                       [ "git" ;  "rev-parse" ; "--short" ; "HEAD" ]
+                   |> String.trim
+        in
+        let date = Call.call_stdout_string [ "date" ; "+%Y-%m-%d" ]
+                 |> String.trim in
         Printf.sprintf "3.x-%s-%s" date commit
       else
       if branch = "master" then
