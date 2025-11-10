@@ -2,6 +2,8 @@
 
 ## [_] Next release
 
+### Fixed
+- Use a default launch configuration when no `launch.json` file is present [452](https://github.com/OCamlPro/superbol-studio-oss/pull/452)
 
 ## [0.2.1] Bugfix release (2025-09-23)
 

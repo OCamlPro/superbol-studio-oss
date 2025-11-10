@@ -263,7 +263,7 @@
               "coverage": {
                 "type": "boolean",
                 "description": "Enable code coverage",
-                "default": true
+                "default": false
               },
               "verbose": {
                 "type": "boolean",
@@ -356,7 +356,7 @@
             "arguments": "",
             "cwd": "${workspaceFolder}",
             "group": [],
-            "coverage": true,
+            "coverage": false,
             "verbose": false,
             "gdbtty": true
           }
@@ -374,7 +374,7 @@
               "arguments": "",
               "cwd": "$${_:{workspaceFolder}}",
               "group": [],
-              "coverage": true,
+              "coverage": false,
               "verbose": false,
               "gdbtty": true
             }

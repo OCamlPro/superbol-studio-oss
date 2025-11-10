@@ -167,7 +167,7 @@ let contributes =
                                 "coverage": {
                                         "type": "boolean",
                                         "description": "Enable code coverage",
-                                        "default": true
+                                        "default": false
                                 },
                                 "verbose": {
                                         "type": "boolean",
@@ -260,7 +260,7 @@ let contributes =
                   "arguments": "",
                   "cwd": "${workspaceFolder}",
                   "group": [],
-                  "coverage": true,
+                  "coverage": false,
                   "verbose": false,
                   "gdbtty": true
           } |})]
@@ -277,7 +277,7 @@ let contributes =
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
                                         "group": [],
-                                        "coverage": true,
+                                        "coverage": false,
                                         "verbose": false,
                                         "gdbtty": true
                                 }
