@@ -2,6 +2,12 @@
 
 ## [_] Next release
 
+### Added
+- Ability to launch a debug session when only a single file is opened (without a workspace) [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #355](https://github.com/OCamlPro/superbol-studio-oss/issues/355))
+
+### Fixed
+- Handling of program names with dashes by the debugger [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #451](https://github.com/OCamlPro/superbol-studio-oss/issues/451))
+
 
 ## [0.2.1] Bugfix release (2025-09-23)
 

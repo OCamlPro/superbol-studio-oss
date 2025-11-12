@@ -167,11 +167,11 @@ let contributes =
                                 "coverage": {
                                         "type": "boolean",
                                         "description": "Enable code coverage",
-                                        "default": true
+                                        "default": false
                                 },
                                 "verbose": {
                                         "type": "boolean",
-                                        "description": "Debug GDB",
+                                        "description": "Debug interactions with GDB",
                                         "default": false
                                 },
                                 "gdbtty": {
@@ -263,7 +263,7 @@ let contributes =
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
                                         "group": [],
-                                        "coverage": true,
+                                        "coverage": false,
                                         "verbose": false,
                                         "gdbtty": true
                                 }
