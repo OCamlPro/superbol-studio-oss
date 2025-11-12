@@ -32,6 +32,8 @@ let attributes_spec ~debug ~coverage ~executable =
                      [%js.of: bool], executable);
     "cobcPath", C ([%js.to: string or_undefined],
                    [%js.of: string], "cobc");
+    "cobcrunPath", C ([%js.to: string or_undefined],
+                   [%js.of: string], "cobcrun");
     "listingsTarget", C ([%js.to: string option or_undefined],
                          [%js.of: string option], None);
     "extraArgs", C ([%js.to: string list or_undefined],
@@ -106,6 +108,14 @@ let cobc_path attributes =
       Option.value (Superbol_workspace.cobc_exe ()) ~default:"cobc"
   | path ->
       path
+
+let cobcrun_path attributes =
+  match [%js.to: string] @@ List.assoc "cobcrunPath" attributes with
+  | exception Not_found | "" ->                       (* fallback to WS config *)
+      Option.value (Superbol_workspace.cobcrun_exe ()) ~default:"cobcrun"
+  | path ->
+      path
+
 
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
@@ -197,6 +207,7 @@ let provide_tasks instance ~token:_ =
       define_exec_build_task "build"          ~debug:false;
       define_exec_build_task "build (debug)"  ~debug:true;
       define_modl_build_task "build (module)" ~debug:false;
+      define_modl_build_task "build (module + debug)" ~debug:true;
     ]
   end
 

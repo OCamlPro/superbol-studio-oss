@@ -149,13 +149,21 @@
           "scope": "machine-overridable",
           "order": 11
         },
+        "superbol.cobcrunPath": {
+          "title": "GnuCOBOL Compiler Executable",
+          "type": "string",
+          "default": "cobcrun",
+          "description": "Path to the GnuCOBOL runner executable.",
+          "scope": "machine-overridable",
+          "order": 12
+        },
         "superbol.lspPath": {
           "title": "SuperBOL Executable",
           "markdownDescription": "Name of the `superbol-free` executable if available in PATH; may be an absolute path otherwise. Leave empty to use the bundled `superbol-free`, if available.\n<!-- COBOL -->",
           "type": "string",
           "default": "",
           "scope": "machine",
-          "order": 12
+          "order": 13
         },
         "superbol.forceSyntaxDiagnostics": {
           "markdownDescription": "Force reporting of syntax diagnostics for dialects other than ``COBOL85``.",
@@ -287,6 +295,11 @@
                   "konsole",
                   "external"
                 ]
+              },
+              "module": {
+                "type": "boolean",
+                "description": "Debug the target as a module of cobcrun",
+                "default": false
               }
             }
           },
@@ -557,6 +570,14 @@
           "cobcPath": {
             "title": "GnuCOBOL Compiler Executable",
             "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null` or \"\", defaults to the value of \"superbol.cobcPath\" from the workspace configuration, if defined, to \"cobc\" otherwise.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "cobcrunPath": {
+            "title": "GnuCOBOL Compiler Executable",
+            "markdownDescription": "Path to the GnuCOBOL compiler executable; when `null` or \"\", defaults to the value of \"superbol.cobcrunPath\" from the workspace configuration, if defined, to \"cobcrun\" otherwise.",
             "type": [
               "string",
               "null"
