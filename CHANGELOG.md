@@ -5,6 +5,7 @@
 ### Added
 - Support for debugging dynamically loaded sub-modules (e.g, via CALL + literal) [#454](https://github.com/OCamlPro/superbol-studio-oss/pull/454)
 - Ability to launch a debug session when only a single file is opened (without a workspace) [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #355](https://github.com/OCamlPro/superbol-studio-oss/issues/355))
+- Ability for debugging modules ran with `cobcrun` [#457](https://github.com/OCamlPro/superbol-studio-oss/pull/457)
 
 ### Fixed
 - Handling of program names with dashes by the debugger [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #451](https://github.com/OCamlPro/superbol-studio-oss/issues/451))
