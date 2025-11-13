@@ -196,6 +196,11 @@ let contributes =
                                         "type": "boolean",
                                         "description": "Debug the target as a module of cobcrun",
                                         "default": false
+                                },
+                                "cSourcesDirs": {
+                                        "type": "array",
+                                        "descriptions": "Location of c sources, by default only the current directory",
+                                        "default": []
                                 }
                         }
                 },
@@ -251,7 +256,13 @@ let contributes =
                                         "type": "string",
                                         "description": "GDB Server host:port",
                                         "default": null
+                                },
+                                "cSourcesDirs": {
+                                        "type": "array",
+                                        "descriptions": "Location of c sources, by default only the current directory",
+                                        "default": []
                                 }
+
                         }
                 }
         } |})
