@@ -7,6 +7,7 @@
 - Ability to launch a debug session when only a single file is opened (without a workspace) [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #355](https://github.com/OCamlPro/superbol-studio-oss/issues/355))
 
 ### Fixed
+- Handling of nested subprograms by the debugger [#455](https://github.com/OCamlPro/superbol-studio-oss/pull/455) (fix for [issue #303](https://github.com/OCamlPro/superbol-studio-oss/issues/303))
 - Handling of program names with dashes by the debugger [#453](https://github.com/OCamlPro/superbol-studio-oss/pull/453) (fix for [issue #451](https://github.com/OCamlPro/superbol-studio-oss/issues/451))
 
 
