@@ -109,13 +109,6 @@ let cobc_path attributes =
   | path ->
       path
 
-let cobcrun_path attributes =
-  match [%js.to: string] @@ List.assoc "cobcrunPath" attributes with
-  | exception Not_found | "" ->                       (* fallback to WS config *)
-      Option.value (Superbol_workspace.cobcrun_exe ()) ~default:"cobcrun"
-  | path ->
-      path
-
 
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in

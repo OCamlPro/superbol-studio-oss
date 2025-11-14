@@ -192,7 +192,7 @@ let contributes =
                                                 "external"
                                         ]
                                 },
-                                "module": {
+                                "useCobcrun": {
                                         "type": "boolean",
                                         "description": "Debug the target as a module of cobcrun",
                                         "default": false
@@ -384,13 +384,6 @@ let contributes =
              ~description:"Path to the GnuCOBOL compiler executable."
              ~order:11;
 
-           Manifest.PROPERTY.string "superbol.cobcrunPath"
-             ~title:"GnuCOBOL Compiler Executable"
-             ~default:"cobcrun"
-             ~scope:"machine-overridable"
-             ~description:"Path to the GnuCOBOL runner executable."
-             ~order:12;
-
            Manifest.PROPERTY.string "superbol.lspPath"
              ~title:"SuperBOL Executable"
              ~default:""
@@ -400,7 +393,7 @@ let contributes =
                   "Name of the `superbol-free` executable if available in PATH; \
                    may be an absolute path otherwise. Leave empty to use the \
                    bundled `superbol-free`, if available.")
-             ~order:13;
+             ~order:12;
 
            (* Flags *)
 
@@ -450,6 +443,12 @@ let contributes =
                   "Path to the GNU debugger executable.")
              ~order:33;
 
+           Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
+             ~title:"GnuCOBOL Compiler Executable"
+             ~default:"cobcrun"
+             ~scope:"machine-overridable"
+             ~description:"Path to the GnuCOBOL runner executable."
+             ~order:34;
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition
@@ -476,7 +475,7 @@ let contributes =
             ~title:"GnuCOBOL Compiler Executable"
             ~markdownDescription:
               "Path to the GnuCOBOL compiler executable; when `null` or \"\", \
-               defaults to the value of \"superbol.cobcrunPath\" from the workspace \
+               defaults to the value of \"superbol.debugger.cobcrunPath\" from the workspace \
                configuration, if defined, to \"cobcrun\" otherwise.";
 
           Manifest.PROPERTY.null_string "listingsTarget"

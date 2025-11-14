@@ -32,13 +32,6 @@ let cobc_exe ?scope () =
   | Some o when Ojs.is_null o -> None
   | Some s -> non_empy (Ojs.string_of_js s)
 
-let cobcrun_exe ?scope () =
-  let config = WS.getConfiguration ?scope ~section () in
-  match WS_CONF.get ~section:"cobcrunPath" config with
-  | None -> None
-  | Some o when Ojs.is_null o -> None
-  | Some s -> non_empy (Ojs.string_of_js s)
-
 let bool ?scope key =
   let config = WS.getConfiguration ?scope ~section () in
   match WS_CONF.get ~section:key config with
