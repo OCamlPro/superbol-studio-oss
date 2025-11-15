@@ -131,7 +131,7 @@ let contributes =
                         "properties": {
                                 "target": {
                                         "type": "string",
-                                        "description": "Path to debugged executable",
+                                        "description": "Path to the executable, or name of the module to launch",
                                         "default": "${file}"
                                 },
                                 "arguments": {
@@ -146,7 +146,7 @@ let contributes =
                                 },
                                 "gdbPath": {
                                         "type": "string",
-                                        "description": "Path to gdb",
+                                        "markdownDescription": "Path to `gdb`",
                                         "default": "gdb"
                                 },
                                 "libcobPath": {
@@ -161,7 +161,7 @@ let contributes =
                                 },
                                 "env": {
                                         "type": "object",
-                                        "description": "Environment variables",
+                                        "markdownDescription": "Environment variables.\n\nExample: `{ \"COB_LIBRARY_PATH\": \"/usr/lib/cobol/modules\" }`",
                                         "default": null
                                 },
                                 "coverage": {
@@ -171,7 +171,7 @@ let contributes =
                                 },
                                 "verbose": {
                                         "type": "boolean",
-                                        "description": "Debug interactions with GDB",
+                                        "description": "Debug interactions with gdb",
                                         "default": false
                                 },
                                 "gdbtty": {
@@ -191,6 +191,16 @@ let contributes =
                                                 "konsole",
                                                 "external"
                                         ]
+                                },
+                                "useCobcrun": {
+                                        "type": "boolean",
+                                        "markdownDescription": "Debug the target as a module of `cobcrun`",
+                                        "default": false
+                                },
+                                "sourceDirs": {
+                                        "type": "array",
+                                        "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
+                                        "default": []
                                 }
                         }
                 },
@@ -199,7 +209,7 @@ let contributes =
                         "properties": {
                                 "target": {
                                         "type": "string",
-                                        "description": "Path to executable",
+                                        "description": "Path to the executable",
                                         "default": "${file}"
                                 },
                                 "arguments": {
@@ -229,12 +239,12 @@ let contributes =
                                 },
                                 "env": {
                                         "type": "object",
-                                        "description": "Environment variables",
+                                        "markdownDescription": "Environment variables.\n\nExample: `{ \"COB_LIBRARY_PATH\": \"/usr/lib/cobol/modules\" }`",
                                         "default": null
                                 },
                                 "verbose": {
                                         "type": "boolean",
-                                        "description": "Debug GDB",
+                                        "description": "Debug interactions with gdb",
                                         "default": false
                                 },
                                 "pid": {
@@ -246,7 +256,13 @@ let contributes =
                                         "type": "string",
                                         "description": "GDB Server host:port",
                                         "default": null
+                                },
+                                "sourceDirs": {
+                                        "type": "array",
+                                        "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
+                                        "default": []
                                 }
+
                         }
                 }
         } |})
@@ -262,9 +278,6 @@ let contributes =
                                         "target": "$${_:{file}}",
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "coverage": false,
-                                        "verbose": false,
                                         "gdbtty": true
                                 }
                         } |};
@@ -278,9 +291,7 @@ let contributes =
                                         "pid": "${3:0}",
                                         "target": "$${_:{file}}",
                                         "arguments": "",
-                                        "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "verbose": false
+                                        "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
           Manifest.any {| {
@@ -293,9 +304,7 @@ let contributes =
                                         "remoteDebugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
                                         "arguments": "",
-                                        "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "verbose": false
+                                        "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
         ]
@@ -438,6 +447,14 @@ let contributes =
                   "Path to the GNU debugger executable.")
              ~order:33;
 
+           Manifest.PROPERTY.string "superbol.debugger.cobcrunPath"
+             ~title:"GnuCOBOL module loader"
+             ~default:"cobcrun"
+             ~scope:"machine-overridable"
+             ~markdownDescription:
+               (with_extra_keyword_commment
+                  "Path to `cobcrun`, the GnuCOBOL module loader.")
+             ~order:34;
          ])
     ~taskDefinitions: [
       Manifest.taskDefinition

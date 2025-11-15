@@ -194,6 +194,14 @@
           "default": "gdb",
           "scope": "machine-overridable",
           "order": 33
+        },
+        "superbol.debugger.cobcrunPath": {
+          "title": "GnuCOBOL module loader",
+          "markdownDescription": "Path to `cobcrun`, the GnuCOBOL module loader.\n<!-- COBOL -->",
+          "type": "string",
+          "default": "cobcrun",
+          "scope": "machine-overridable",
+          "order": 34
         }
       }
     },
@@ -227,7 +235,7 @@
             "properties": {
               "target": {
                 "type": "string",
-                "description": "Path to debugged executable",
+                "description": "Path to the executable, or name of the module to launch",
                 "default": "${file}"
               },
               "arguments": {
@@ -242,7 +250,7 @@
               },
               "gdbPath": {
                 "type": "string",
-                "description": "Path to gdb",
+                "markdownDescription": "Path to `gdb`",
                 "default": "gdb"
               },
               "libcobPath": {
@@ -257,7 +265,7 @@
               },
               "env": {
                 "type": "object",
-                "description": "Environment variables",
+                "markdownDescription": "Environment variables.\n\nExample: `{ \"COB_LIBRARY_PATH\": \"/usr/lib/cobol/modules\" }`",
                 "default": null
               },
               "coverage": {
@@ -267,7 +275,7 @@
               },
               "verbose": {
                 "type": "boolean",
-                "description": "Debug interactions with GDB",
+                "description": "Debug interactions with gdb",
                 "default": false
               },
               "gdbtty": {
@@ -287,6 +295,16 @@
                   "konsole",
                   "external"
                 ]
+              },
+              "useCobcrun": {
+                "type": "boolean",
+                "markdownDescription": "Debug the target as a module of `cobcrun`",
+                "default": false
+              },
+              "sourceDirs": {
+                "type": "array",
+                "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
+                "default": []
               }
             }
           },
@@ -295,7 +313,7 @@
             "properties": {
               "target": {
                 "type": "string",
-                "description": "Path to executable",
+                "description": "Path to the executable",
                 "default": "${file}"
               },
               "arguments": {
@@ -325,12 +343,12 @@
               },
               "env": {
                 "type": "object",
-                "description": "Environment variables",
+                "markdownDescription": "Environment variables.\n\nExample: `{ \"COB_LIBRARY_PATH\": \"/usr/lib/cobol/modules\" }`",
                 "default": null
               },
               "verbose": {
                 "type": "boolean",
-                "description": "Debug GDB",
+                "description": "Debug interactions with gdb",
                 "default": false
               },
               "pid": {
@@ -342,6 +360,11 @@
                 "type": "string",
                 "description": "GDB Server host:port",
                 "default": null
+              },
+              "sourceDirs": {
+                "type": "array",
+                "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
+                "default": []
               }
             }
           }
@@ -358,9 +381,6 @@
               "target": "$${_:{file}}",
               "arguments": "",
               "cwd": "$${_:{workspaceFolder}}",
-              "group": [],
-              "coverage": false,
-              "verbose": false,
               "gdbtty": true
             }
           },
@@ -374,9 +394,7 @@
               "pid": "${3:0}",
               "target": "$${_:{file}}",
               "arguments": "",
-              "cwd": "$${_:{workspaceFolder}}",
-              "group": [],
-              "verbose": false
+              "cwd": "$${_:{workspaceFolder}}"
             }
           },
           {
@@ -389,9 +407,7 @@
               "remoteDebugger": "${3:host:port}",
               "target": "$${_:{file}}",
               "arguments": "",
-              "cwd": "$${_:{workspaceFolder}}",
-              "group": [],
-              "verbose": false
+              "cwd": "$${_:{workspaceFolder}}"
             }
           }
         ]
