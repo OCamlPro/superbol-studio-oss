@@ -278,9 +278,6 @@ let contributes =
                                         "target": "$${_:{file}}",
                                         "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "coverage": false,
-                                        "verbose": false,
                                         "gdbtty": true
                                 }
                         } |};
@@ -294,9 +291,7 @@ let contributes =
                                         "pid": "${3:0}",
                                         "target": "$${_:{file}}",
                                         "arguments": "",
-                                        "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "verbose": false
+                                        "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
           Manifest.any {| {
@@ -309,9 +304,7 @@ let contributes =
                                         "remoteDebugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
                                         "arguments": "",
-                                        "cwd": "$${_:{workspaceFolder}}",
-                                        "group": [],
-                                        "verbose": false
+                                        "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
         ]

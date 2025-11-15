@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Simpler launch configuration snippets [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458)
 - Support for debuging programs with binaries and sources located in distinct directories [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458)
 - Ability to debug modules via `cobcrun` [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458)
 - Support for debugging dynamically loaded sub-modules (e.g, via CALL + literal) [#454](https://github.com/OCamlPro/superbol-studio-oss/pull/454)
