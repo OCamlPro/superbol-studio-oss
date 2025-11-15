@@ -32,8 +32,6 @@ let attributes_spec ~debug ~coverage ~executable =
                      [%js.of: bool], executable);
     "cobcPath", C ([%js.to: string or_undefined],
                    [%js.of: string], "cobc");
-    "cobcrunPath", C ([%js.to: string or_undefined],
-                   [%js.of: string], "cobcrun");
     "listingsTarget", C ([%js.to: string option or_undefined],
                          [%js.of: string option], None);
     "extraArgs", C ([%js.to: string list or_undefined],
