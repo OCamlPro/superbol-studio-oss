@@ -107,7 +107,6 @@ let cobc_path attributes =
   | path ->
       path
 
-
 let cobc_execution ?config attributes =
   let config = match config with Some t -> t | None -> Hashtbl.create 0 in
   let args =
@@ -198,7 +197,6 @@ let provide_tasks instance ~token:_ =
       define_exec_build_task "build"          ~debug:false;
       define_exec_build_task "build (debug)"  ~debug:true;
       define_modl_build_task "build (module)" ~debug:false;
-      define_modl_build_task "build (module + debug)" ~debug:true;
     ]
   end
 
