@@ -3,6 +3,8 @@
 ## [_] Next release
 
 ### Added
+- Support for launching the debugger on COBOL code that is in a different directory than its intermediate compilation files [#460](https://github.com/OCamlPro/superbol-studio-oss/pull/460)
+- Simpler default launch configurations [#460](https://github.com/OCamlPro/superbol-studio-oss/pull/460)
 - Simpler launch configuration snippets [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458) [#459](https://github.com/OCamlPro/superbol-studio-oss/pull/459)
 - Support for debuging programs with binaries and sources located in distinct directories [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458)
 - Ability to debug modules via `cobcrun` [#458](https://github.com/OCamlPro/superbol-studio-oss/pull/458)

@@ -214,7 +214,7 @@ let contributes =
                                 },
                                 "arguments": {
                                         "type": "string",
-                                        "description": "Extra arguments for executable",
+                                        "description": "Extra arguments (only used when the program is restarted)",
                                         "default": null
                                 },
                                 "cwd": {
@@ -290,7 +290,6 @@ let contributes =
                                         "request": "attach",
                                         "pid": "${3:0}",
                                         "target": "$${_:{file}}",
-                                        "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
@@ -303,7 +302,6 @@ let contributes =
                                         "request": "attach",
                                         "remoteDebugger": "${3:host:port}",
                                         "target": "$${_:{file}}",
-                                        "arguments": "",
                                         "cwd": "$${_:{workspaceFolder}}"
                                 }
                         } |};
