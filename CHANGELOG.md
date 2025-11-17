@@ -1,6 +1,6 @@
 # Changelog
 
-## [_] Next release
+## [0.2.2] Second release (2025-11-17)
 
 ### Added
 - Support for launching the debugger on COBOL code that is in a different directory than its intermediate compilation files [#460](https://github.com/OCamlPro/superbol-studio-oss/pull/460)
