@@ -1,5 +1,8 @@
 # Changelog
 
+## [_] Next release
+
+
 ## [0.2.2] Second release (2025-11-17)
 
 ### Added
