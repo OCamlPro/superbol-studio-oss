@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Added
+- Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
+
 
 ## [0.2.2] Second release (2025-11-17)
 
