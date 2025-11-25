@@ -411,8 +411,8 @@ module DIALECT = struct
     | MVS        of dialect_strictness
     | Realia     of dialect_strictness
     | RM         of dialect_strictness
-    | MFAIX      of dialect_strictness
     | XOpen
+    | Custom     of string * dialect_strictness option
   and dialect_strictness = { strict: bool }
 
   let default       = Default
@@ -430,8 +430,6 @@ module DIALECT = struct
   let ibm_strict    = IBM        { strict = true }
   let mf            = MicroFocus { strict = false }
   let mf_strict     = MicroFocus { strict = true }
-  let mf_aix        = MFAIX      { strict = false }
-  let mf_aix_strict = MFAIX      { strict = true }
   let mvs           = MVS        { strict = false }
   let mvs_strict    = MVS        { strict = true }
   let realia        = Realia     { strict = false }
@@ -456,8 +454,6 @@ module DIALECT = struct
     | IBM        { strict = true  } -> "ibm-strict"
     | MicroFocus { strict = false } -> "mf"
     | MicroFocus { strict = true  } -> "mf-strict"
-    | MFAIX      { strict = false } -> "mf-aix"
-    | MFAIX      { strict = true  } -> "mf-aix-strict"
     | MVS        { strict = false } -> "mvs"
     | MVS        { strict = true  } -> "mvs-strict"
     | Realia     { strict = false } -> "realia"
@@ -465,6 +461,8 @@ module DIALECT = struct
     | RM         { strict = false } -> "rm"
     | RM         { strict = true  } -> "rm-strict"
     | XOpen                         -> "xopen"
+    | Custom (n, Some { strict = true}) -> Fmt.str "%s-strict" n
+    | Custom (n, _)                     -> n
 
   let of_string: string -> t = fun s ->
     match String.lowercase_ascii s with
@@ -485,11 +483,10 @@ module DIALECT = struct
         | "gcos"              -> GCOS { strict }
         | "ibm"               -> IBM { strict }
         | "mf" | "microfocus" -> MicroFocus { strict }
-        | "mf-aix"            -> MFAIX { strict }
         | "mvs"               -> MVS { strict }
         | "realia"            -> Realia { strict }
         | "rm"                -> RM { strict }
-        | _ -> invalid_arg s
+        | s                   -> Custom (s, if strict then Some { strict } else None)
 
   let all_canonical_names =
     [
@@ -512,30 +509,28 @@ module DIALECT = struct
     ]
 
   let of_gnucobol_config_name: string -> t = function
-    | "COBOL 85"                    -> COBOL85
-    | "COBOL 2002"                  -> COBOL2002
-    | "COBOL 2014"                  -> COBOL2014
-    | "GnuCOBOL"                    -> GnuCOBOL
-    | "ACUCOBOL-GT"                 -> ACU        { strict = true  }
-    | "ACUCOBOL-GT (lax)"           -> ACU        { strict = false }
-    | "BS2000 COBOL"                -> BS2000     { strict = true  }
-    | "BS2000 COBOL (lax)"          -> BS2000     { strict = false }
-    | "GCOS"                        -> GCOS       { strict = true  }
-    | "GCOS (lax)"                  -> GCOS       { strict = false }
-    | "IBM COBOL"                   -> IBM        { strict = true  }
-    | "IBM COBOL (lax)"             -> IBM        { strict = false }
-    | "Micro Focus COBOL"           -> MicroFocus { strict = true  }
-    | "Micro Focus COBOL (lax)"     -> MicroFocus { strict = false }
-    | "Micro Focus AIX COBOL"       -> MFAIX      { strict = true  }
-    | "Micro Focus AIX COBOL (lax)" -> MFAIX      { strict = false  }
-    | "IBM COBOL for MVS & VM"      -> MVS        { strict = true  }
-    | "MVS/VM COBOL (lax)"          -> MVS        { strict = false }
-    | "CA Realia II"                -> Realia     { strict = true  }
-    | "CA Realia II (lax)"          -> Realia     { strict = false }
-    | "RM-COBOL"                    -> RM         { strict = true  }
-    | "RM-COBOL (lax)"              -> RM         { strict = false }
-    | "X/Open COBOL"                -> XOpen
-    | s                             -> of_string s
+    | "COBOL 85"                -> COBOL85
+    | "COBOL 2002"              -> COBOL2002
+    | "COBOL 2014"              -> COBOL2014
+    | "GnuCOBOL"                -> GnuCOBOL
+    | "ACUCOBOL-GT"             -> ACU        { strict = true  }
+    | "ACUCOBOL-GT (lax)"       -> ACU        { strict = false }
+    | "BS2000 COBOL"            -> BS2000     { strict = true  }
+    | "BS2000 COBOL (lax)"      -> BS2000     { strict = false }
+    | "GCOS"                    -> GCOS       { strict = true  }
+    | "GCOS (lax)"              -> GCOS       { strict = false }
+    | "IBM COBOL"               -> IBM        { strict = true  }
+    | "IBM COBOL (lax)"         -> IBM        { strict = false }
+    | "Micro Focus COBOL"       -> MicroFocus { strict = true  }
+    | "Micro Focus COBOL (lax)" -> MicroFocus { strict = false }
+    | "IBM COBOL for MVS & VM"  -> MVS        { strict = true  }
+    | "MVS/VM COBOL (lax)"      -> MVS        { strict = false }
+    | "CA Realia II"            -> Realia     { strict = true  }
+    | "CA Realia II (lax)"      -> Realia     { strict = false }
+    | "RM-COBOL"                -> RM         { strict = true  }
+    | "RM-COBOL (lax)"          -> RM         { strict = false }
+    | "X/Open COBOL"            -> XOpen
+    | s                         -> of_string s
 
 end
 type dialect = DIALECT.t
