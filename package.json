@@ -414,7 +414,7 @@
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
-        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json"
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json"
       }
     ],
     "languages": [
