@@ -144,16 +144,6 @@ let contributes =
                                         "description": "Path to project",
                                         "default": "${workspaceFolder}"
                                 },
-                                "gdbPath": {
-                                        "type": "string",
-                                        "markdownDescription": "Path to `gdb`",
-                                        "default": "gdb"
-                                },
-                                "libcobPath": {
-                                        "type": "string",
-                                        "description": "Path to libcob",
-                                        "default": null
-                                },
                                 "group": {
                                         "type": "array",
                                         "description": "Compilation groups of executable",
@@ -221,16 +211,6 @@ let contributes =
                                         "type": "string",
                                         "description": "Path to project",
                                         "default": "${workspaceFolder}"
-                                },
-                                "gdbPath": {
-                                        "type": "string",
-                                        "description": "Path to gdb",
-                                        "default": "gdb"
-                                },
-                                "libcobPath": {
-                                        "type": "string",
-                                        "description": "Path to libcob",
-                                        "default": null
                                 },
                                 "group": {
                                         "type": "array",
