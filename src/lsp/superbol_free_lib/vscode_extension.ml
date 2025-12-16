@@ -311,8 +311,13 @@ let contributes =
            Manifest.PROPERTY.string "superbol.cobol.dialect"
              ~markdownDescription:
                (with_superbol_toml_note
-                  "Default COBOL dialect; \"default\" is equivalent to \
-                   \"gnucobol\".")
+                  "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
+                  The available dialects are `gnucobol`, `cobol85`, `cobol2002`, \
+                  `cobol2014`, `acu`, `bs2000`, `gcos`, `ibm`, `mf`, `mvs`, \
+                  `realia`, `rm`, and `xopen` and their `strict` version. \
+                  You can also create a custom GnuCOBOL dialect configuration \
+                  file and set it here by name. The file must be available in \
+                  the directory pointed by `COB_CONFIG_DIR`.")
              ~default:"default"
              ~order:1;
 
