@@ -3,7 +3,14 @@
 ## [_] Next release
 
 ### Added
+- Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
+- Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
+
+### Fixed
+- Bug that made the extension hang when debugged programs displayed signed numbers [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
+- Requirement for specifying `gdbpath` and `libcobpath` in launch configurations (these are actually provided in extension settings) [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
+- Enforcement of a default `preLaunchTask` that is not available [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 
 
 ## [0.2.2] Second release (2025-11-17)
