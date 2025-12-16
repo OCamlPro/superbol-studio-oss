@@ -308,13 +308,12 @@ let contributes =
               is to use dash-separated words in lowercase in order to keep
               consistency with GnuCOBOL's configurations.  *)
 
-           Manifest.PROPERTY.enum "superbol.cobol.dialect"
-             ~cases:Cobol_config.DIALECT.all_canonical_names
+           Manifest.PROPERTY.string "superbol.cobol.dialect"
              ~markdownDescription:
                (with_superbol_toml_note
                   "Default COBOL dialect; \"default\" is equivalent to \
                    \"gnucobol\".")
-             ~default:(`String Cobol_config.(DIALECT.to_string Default))
+             ~default:"default"
              ~order:1;
 
            Manifest.PROPERTY.enum "superbol.cobol.sourceFormat"
