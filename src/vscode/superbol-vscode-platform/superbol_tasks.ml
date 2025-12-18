@@ -21,6 +21,7 @@ let type_ = "superbol"
 
 type attribute_spec =
   | C: (Ojs.t -> 'a option) * ('a -> Ojs.t) * 'a -> attribute_spec
+  | O: (Ojs.t -> 'a option) * ('a -> Ojs.t) -> attribute_spec       (* w/o default *)
 
 let attributes_spec ~debug ~coverage ~executable =
   [
@@ -30,8 +31,8 @@ let attributes_spec ~debug ~coverage ~executable =
                       [%js.of: bool], coverage);
     "executable", C ([%js.to: bool or_undefined],
                      [%js.of: bool], executable);
-    "cobcPath", C ([%js.to: string or_undefined],
-                   [%js.of: string], "cobc");
+    "cobcPath", O ([%js.to: string or_undefined],
+                   [%js.of: string]);
     "listingsTarget", C ([%js.to: string option or_undefined],
                          [%js.of: string option], None);
     "extraArgs", C ([%js.to: string list or_undefined],
@@ -173,8 +174,10 @@ let cobc_build_task ~task ?config attributes =
     ~execution:(cobc_execution ?config attributes)
 
 let define_cobc_build_task ?config ~debug ?(coverage = false) ~spec name =
-  let map_attributes = List.map (fun (a, C (_, f, d)) -> a, f d) in
-  let attributes = map_attributes @@ spec ~debug ~coverage in
+  let attributes =
+    List.filter_map (function a, C (_, f, d) -> Some (a, f d) | _ -> None) @@
+    spec ~debug ~coverage
+  in
   make_default_cobc_task
     ~name
     ~definition:(TaskDefinition.create () ~type_ ~attributes)
@@ -211,10 +214,14 @@ let resolve_task =
       OutputChannel.appendLine oc ~value:"Starting new resolution.";
       let definition = Task.definition task in
       let attributes =
-        List.filter_map begin fun (a, C (f, t, _)) ->
+        let retrieve a f t =
           match f (TaskDefinition.get_attribute definition a) with
           | Some x -> Some (a, t x)
           | _ | exception _ -> None
+        in
+        List.filter_map begin function
+          | a, C (f, t, _) -> retrieve a f t
+          | a, O (f, t) -> retrieve a f t
         end (executable_spec ~debug:false ~coverage:false)
       in
       let* config = Superbol_instance.get_project_config instance in

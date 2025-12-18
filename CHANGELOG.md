@@ -8,6 +8,7 @@
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
 
 ### Fixed
+- Fallback to extension settings when `cobcPath` is not provided in task definitions [#468](https://github.com/OCamlPro/superbol-studio-oss/pull/468) (fix for [Issue #467](https://github.com/OCamlPro/superbol-studio-oss/issues/467))
 - Bug that made the extension hang when debugged programs displayed signed numbers [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Requirement for specifying `gdbpath` and `libcobpath` in launch configurations (these are actually provided in extension settings) [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Enforcement of a default `preLaunchTask` that is not available [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
