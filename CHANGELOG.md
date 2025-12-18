@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support for customized GnuCOBOL configuration file, via the `dialect` setting [#464](https://github.com/OCamlPro/superbol-studio-oss/pull/464)
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)

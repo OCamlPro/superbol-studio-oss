@@ -308,13 +308,17 @@ let contributes =
               is to use dash-separated words in lowercase in order to keep
               consistency with GnuCOBOL's configurations.  *)
 
-           Manifest.PROPERTY.enum "superbol.cobol.dialect"
-             ~cases:Cobol_config.DIALECT.all_canonical_names
+           Manifest.PROPERTY.string "superbol.cobol.dialect"
              ~markdownDescription:
                (with_superbol_toml_note
-                  "Default COBOL dialect; \"default\" is equivalent to \
-                   \"gnucobol\".")
-             ~default:(`String Cobol_config.(DIALECT.to_string Default))
+                  "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
+                  The available dialects are `gnucobol`, `cobol85`, `cobol2002`, \
+                  `cobol2014`, `acu`, `bs2000`, `gcos`, `ibm`, `mf`, `mvs`, \
+                  `realia`, `rm`, and `xopen` and their `strict` version. \
+                  You can also create a custom GnuCOBOL dialect configuration \
+                  file and set it here by name. The file must be available in \
+                  the directory pointed by `COB_CONFIG_DIR`.")
+             ~default:"default"
              ~order:1;
 
            Manifest.PROPERTY.enum "superbol.cobol.sourceFormat"
@@ -596,7 +600,7 @@ let contributes =
       Manifest.tomlValidation
         ~fileMatch:"superbol.toml"
         (* TODO: change this address to a more permanent one; also, substitute `master` for a version tag *)
-        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json";
+        ~url:"https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json";
     ]
     ~menus: [
       "editor/context",
