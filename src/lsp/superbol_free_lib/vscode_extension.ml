@@ -311,15 +311,13 @@ let contributes =
            Manifest.PROPERTY.string "superbol.cobol.dialect"
              ~markdownDescription:
                (with_superbol_toml_note
-                  @@ Fmt.str "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
+                  @@ Pretty.to_string "Default COBOL dialect; `default` is equivalent to `gnucobol`. \
                   The available dialects are %a. \
-                  The `strict` version of each dialect allow using reserved words from \
-                  other dialects as custom COBOL words, as the non-strict version also \
+                  The `-strict` version of a dialect permits using reserved words from \
+                  all other dialects as custom COBOL words, as the non-strict version also \
                   reserve these words. \
-                  You can also create a custom GnuCOBOL dialect configuration \
-                  file and set it here by name. The file must be available in \
-                  the directory pointed by `COB_CONFIG_DIR` or must be given \
-                  as an absolute path."
+                  You may also specify an absolute path to a custom GnuCOBOL dialect \
+                  configuration file (see `cobc`'s `-conf` option)."
                    Fmt.(list ~sep:(any ",@ ") (quote ~mark:"`" string))
                    Cobol_config.DIALECT.all_canonical_names)
              ~default:"default"

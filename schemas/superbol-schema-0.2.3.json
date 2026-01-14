@@ -10,7 +10,7 @@
 	    "required": ["dialect", "source-format"],
 	    "properties": {
 		"dialect": {
-		    "description": "Default COBOL dialect; `default` is equivalent to `gnucobol`. The available dialects are `gnucobol`, `cobol85`, `cobol2002`, `cobol2014`, `acu`, `bs2000`, `gcos`, `ibm`, `mf`, `mvs`, `realia`, `rm`, and `xopen` and their `strict` version. You can also create a custom GnuCOBOL dialect configuration file and set it here by name. The file must be available in the directory pointed by `COB_CONFIG_DIR`.",
+		    "description": "Default COBOL dialect; default is equivalent to gnucobol. The available dialects are default, gnucobol, cobol85, cobol2002, cobol2014, acu, acu-strict, bs2000, bs2000-strict, gcos, gcos-strict, ibm, ibm-strict, mf, mf-strict, mvs, mvs-strict, realia, realia-strict, rm, rm-strict, xopen. The -strict version of a dialect permits using reserved words from all other dialects as custom COBOL words, as the non-strict version also reserve these words. You may also specify an absolute path to a custom GnuCOBOL dialect configuration file (see cobc's -conf option).",
 		  "type": "string"
 		},
 		"source-format": {

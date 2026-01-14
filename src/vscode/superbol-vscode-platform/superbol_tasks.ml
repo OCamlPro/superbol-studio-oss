@@ -131,8 +131,7 @@ let cobc_execution ?config attributes =
     config_string "cobol.dialect" ~config
       ~append:begin function
         | "gnucobol" -> List.cons "-std=default"
-        | s when String.starts_with ~prefix:"/" s
-                && String.ends_with ~suffix:".conf" s ->
+        | s when s <> "" && not (Filename.is_relative s) ->
                   List.cons ("-conf=" ^ s)
         | s -> List.cons ("-std=" ^ s)
       end|>
