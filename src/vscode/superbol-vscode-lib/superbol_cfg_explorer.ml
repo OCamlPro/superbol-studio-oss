@@ -119,14 +119,14 @@ let decode_graph res =
   { name; nodes_pos; string_repr_dot; string_repr_d3 }
 
 let callGetCFG ?render_options ~uri ~name client =
-  let path = VS.Uri.path uri in
+  let uri = VS.Uri.toString uri () in
   let data =
-    let base = ["uri", Jsonoo.Encode.string path;
+    let base = ["uri", Jsonoo.Encode.string uri;
                 "name", Jsonoo.Encode.string name]
     in
     let full =
       match render_options,
-            get_state_value ~key:(path ^ ":" ^ name) with
+            get_state_value ~key:(uri ^ ":" ^ name) with
       | Some options, _ -> ("render_options", options) :: base
       | _, Some options -> ("render_options", Jsonoo.t_of_js options) :: base
       | _ -> base
@@ -257,7 +257,7 @@ let setup_window_listener ~client =
         let process_selection_change webview =
           let pos_start = VS.Selection.start selection in
           let data =
-            let uri = Jsonoo.Encode.string @@ VS.Uri.path uri in
+            let uri = Jsonoo.Encode.string @@ VS.Uri.toString uri () in
             Jsonoo.Encode.object_
               ["uri", uri;
                "line", Jsonoo.Encode.int @@ VS.Position.line pos_start;
@@ -301,7 +301,7 @@ let send_graph ?(as_new_graph=false) ~uri ~typ webview graph =
     else "graph_content"
   in
   let ojs = Ojs.empty_obj () in
-  (match get_state_value ~key:(VS.Uri.path uri ^ ":" ^ graph.name) with
+  (match get_state_value ~key:((VS.Uri.toString uri ()) ^ ":" ^ graph.name) with
    | None -> ()
    | Some options -> Ojs.set_prop_ascii ojs "render_options" options);
   Ojs.set_prop_ascii ojs "type" (Ojs.string_to_js message_type);
@@ -315,7 +315,6 @@ let send_graph ?(as_new_graph=false) ~uri ~typ webview graph =
 let on_graph_update ~webview ~client ~uri ~typ name arg =
   let render_options_ojs = Ojs.get_prop_ascii arg "renderOptions" in
   let render_options = Jsonoo.t_of_js render_options_ojs in
-  let path = VS.Uri.path uri in
   let _ : unit Promise.t = Promise.then_
       (callGetCFG ~uri ~name ~render_options client)
       ~fulfilled:begin function
@@ -323,7 +322,7 @@ let on_graph_update ~webview ~client ~uri ~typ name arg =
           Promise.return ()
         | Some graph ->
           update_webview_data ~uri ~typ ~graph ~render_options ();
-          update_state ~key:(path ^ ":" ^ name) render_options_ojs;
+          update_state ~key:((VS.Uri.toString uri ()) ^ ":" ^ name) render_options_ojs;
           send_graph ~typ ~uri webview graph;
           Promise.return ()
       end
@@ -351,7 +350,7 @@ let open_cfg_for ~typ ~text_editor ~extension_uri client =
   let open Promise in
   let uri = VS.TextEditor.document text_editor |> VS.TextDocument.uri in
   let data =
-    let uri = Jsonoo.Encode.string @@ VS.Uri.path uri in
+    let uri = Jsonoo.Encode.string @@ VS.Uri.toString uri () in
     Jsonoo.Encode.object_ ["uri", uri]
   in
   match get_html_js_content ~extension_uri typ with
