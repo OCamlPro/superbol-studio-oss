@@ -54,34 +54,9 @@
       "title": "SuperBOL",
       "properties": {
         "superbol.cobol.dialect": {
-          "markdownDescription": "Default COBOL dialect; \"default\" is equivalent to \"gnucobol\".\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "markdownDescription": "Default COBOL dialect; `default` is equivalent to `gnucobol`. The available dialects are `default`, `gnucobol`, `cobol85`, `cobol2002`, `cobol2014`, `acu`, `acu-strict`, `bs2000`, `bs2000-strict`, `gcos`, `gcos-strict`, `ibm`, `ibm-strict`, `mf`, `mf-strict`, `mvs`, `mvs-strict`, `realia`, `realia-strict`, `rm`, `rm-strict`, `xopen`. The `-strict` version of a dialect permits using reserved words from all other dialects as custom COBOL words, as the non-strict version also reserve these words. You may also specify an absolute path to a custom GnuCOBOL dialect configuration file (see `cobc`'s `-conf` option).\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "string",
           "default": "default",
-          "items": "string",
-          "enum": [
-            "default",
-            "gnucobol",
-            "cobol85",
-            "cobol2002",
-            "cobol2014",
-            "acu",
-            "acu-strict",
-            "bs2000",
-            "bs2000-strict",
-            "gcos",
-            "gcos-strict",
-            "ibm",
-            "ibm-strict",
-            "mf",
-            "mf-strict",
-            "mvs",
-            "mvs-strict",
-            "realia",
-            "realia-strict",
-            "rm",
-            "rm-strict",
-            "xopen"
-          ],
           "order": 1
         },
         "superbol.cobol.sourceFormat": {
@@ -414,7 +389,7 @@
     "tomlValidation": [
       {
         "fileMatch": "superbol.toml",
-        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.1.4.json"
+        "url": "https://raw.githubusercontent.com/OCamlPro/superbol-studio-oss/master/schemas/superbol-schema-0.2.3.json"
       }
     ],
     "languages": [
