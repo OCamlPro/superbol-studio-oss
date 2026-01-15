@@ -412,6 +412,7 @@ module DIALECT = struct
     | Realia     of dialect_strictness
     | RM         of dialect_strictness
     | XOpen
+    | Custom     of string * dialect_strictness
   and dialect_strictness = { strict: bool }
 
   let default       = Default
@@ -460,6 +461,8 @@ module DIALECT = struct
     | RM         { strict = false } -> "rm"
     | RM         { strict = true  } -> "rm-strict"
     | XOpen                         -> "xopen"
+    | Custom (n, { strict = true}) -> Fmt.str "%s-strict" n
+    | Custom (n, _)                     -> n
 
   let of_string: string -> t = fun s ->
     match String.lowercase_ascii s with
@@ -483,7 +486,7 @@ module DIALECT = struct
         | "mvs"               -> MVS { strict }
         | "realia"            -> Realia { strict }
         | "rm"                -> RM { strict }
-        | _ -> invalid_arg s
+        | s                   -> Custom (s, { strict })
 
   let all_canonical_names =
     [
