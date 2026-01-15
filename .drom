@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-eaccd607969c96ca4de1ce262eb26b92:.
+fd37079e7a90bf82da3b73118543f7cf:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -25,7 +25,7 @@ e19c028c5001efe8207e97273c9a227c:.github/workflows/workflow.yml
 
 # begin context for Makefile
 # file Makefile
-769785ada82d5c3c07b2ea82bf710cca:Makefile
+59d73b3a879f99f687ea1e302581c019:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -75,7 +75,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-d64d97e5a9fcb1994b7b6ae54fdef5c0:dune-project
+0cae48e9a2b56c1765dd4640422e23ed:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -198,9 +198,14 @@ c620f14db180c6340b59419211a9d1b3:opam/sql_parser.opam
 2d49cf3ab0b9d2343cde4338f56faa6f:opam/superbol-studio-oss.opam
 # end context for opam/superbol-studio-oss.opam
 
+# begin context for opam/superbol-vscode-lib.opam
+# file opam/superbol-vscode-lib.opam
+df2dd3c3fe84ccf102f3a288fb55aaa0:opam/superbol-vscode-lib.opam
+# end context for opam/superbol-vscode-lib.opam
+
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-3218d43177398590b46f77e1c1b6d345:opam/superbol-vscode-platform.opam
+4cb6d5f2cb3b3b20fae02b4487f49573:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
@@ -285,7 +290,7 @@ c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
 
 # begin context for sphinx/license.rst
 # file sphinx/license.rst
-1a550d0faec617a46b3852b8104c5509:sphinx/license.rst
+d626b5f615a4691b6788eaf63ad2dd14:sphinx/license.rst
 # end context for sphinx/license.rst
 
 # begin context for src/lsp/cobol_cfg/dune
@@ -588,9 +593,19 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/v
 d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
 
+# begin context for src/vscode/superbol-vscode-lib/dune
+# file src/vscode/superbol-vscode-lib/dune
+dc4b8933e575a293349e210048d78708:src/vscode/superbol-vscode-lib/dune
+# end context for src/vscode/superbol-vscode-lib/dune
+
+# begin context for src/vscode/superbol-vscode-lib/version.mlt
+# file src/vscode/superbol-vscode-lib/version.mlt
+d32caec25e714e824fce17600c2cb75d:src/vscode/superbol-vscode-lib/version.mlt
+# end context for src/vscode/superbol-vscode-lib/version.mlt
+
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-b86fb500c6d426b59c311bb6655e6916:src/vscode/superbol-vscode-platform/dune
+894ee1e9d14911c1985308b2950f9f5a:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt

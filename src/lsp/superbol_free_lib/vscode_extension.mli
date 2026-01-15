@@ -12,4 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val contributes : Vscode_json.Manifest.contributes
 val manifest : Vscode_json.Manifest.vscode

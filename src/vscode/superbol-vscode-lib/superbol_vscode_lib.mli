@@ -12,14 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let activate =
-  Superbol_vscode_lib.activate
-
-let deactivate =
-  Superbol_vscode_lib.deactivate
-
-(* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
-   activate() *)
-let () =
-  Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
-  Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
+val activate: Vscode.ExtensionContext.t -> unit Promise.t
+val deactivate: unit -> unit Promise.t
