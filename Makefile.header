@@ -1,5 +1,4 @@
 # -*- Makefile -*-
-TARGET_PLATFORMS ?= linux # win32 darwin
 TARGET_NAME = superbol-vscode-platform
 
 MAIN_SRCDIR ?= src

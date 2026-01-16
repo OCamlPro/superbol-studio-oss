@@ -1,5 +1,7 @@
 # -*- Makefile -*-
 
+AVAILABLE_NATIVE_PLATFORMS = linux darwin win32
+
 CP ?= cp -fl # ln -srf
 
 DUNE_BUILD_DIR ?= _build
@@ -10,18 +12,23 @@ DUNE_BUILD_SRCDIR =							\
 		$(if $(filter darwin,$(TARGET_PLAT)),.osx)		\
 							  )/$(MAIN_SRCDIR)
 
-# TARGET_PLAT is defined in Makefile; conditionally define anyway
-AVAILABLE_NATIVE_PLATFORMS = linux darwin win32
-TARGET_PLAT ?= linux
-TARGET_ARCH ?= x64
+BUILD_PLAT = $(shell node --print process.platform)
+BUILD_ARCH = $(shell node --print process.arch)
+
+# TARGET_PLAT should already be defined in Makefile; conditionally assign anyway
+TARGET_PLAT ?= $(BUILD_PLAT)
+TARGET_ARCH ?= $(BUILD_ARCH)
 ifeq ($(TARGET_PLAT),universal)
-  TARGET_SPEC = $(TARGET_PLAT)
+  TARGET_SPEC = universal
 else
   TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
 endif
 
 TARGET_PROFILE ?= release
 TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
+
+# For `all-*` targets
+TARGET_PLATFORMS ?= linux # win32 darwin
 
 # ---
 
@@ -35,7 +42,7 @@ ifeq ($(TARGET_PLAT),universal)
 else
   DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
-  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
     SUPERBOL_LSP_BUILT = $(SUPERBOL_LSP)
   else
     SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_PKG)/main.exe
@@ -71,17 +78,17 @@ package: vsix-package
 
 superbol-lsp-server $(SUPERBOL_LSP_EXE): $(SUPERBOL_LSP_BUILT)
 # Only check/rebuild `package.json` on matching target and build platforms
-ifeq ($(TARGET_PLAT),linux)
+ifeq ($(TARGET_PLAT),$(BUILD_PLAT))
 	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP_EXE)
 
-  ifeq ($(shell uname)_$(GENERATE_PACKAGE_DOT_JSON),Linux_yes)
+  ifeq ($(GENERATE_PACKAGE_DOT_JSON),yes)
     .PHONY: rebuild-package.json
     rebuild-package.json package.json: $(SUPERBOL_LSP_BUILT)
 	cp -f package.json package.json.prev
 	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
 	diff -u package.json.prev package.json && rm -f package.json.prev 
    endif
-endif				#linux
+endif
 
 ifeq ($(TARGET_PLAT),universal)
   $(SUPERBOL_LSP_BUILT): vsix-dist-setup
