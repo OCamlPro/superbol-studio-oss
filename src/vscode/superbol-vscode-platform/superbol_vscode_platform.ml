@@ -13,7 +13,7 @@
 (**************************************************************************)
 
 let activate =
-  Superbol_vscode_lib.activate
+  Superbol_vscode_lib.activate ~lsp_server_prefix:"superbol-free"
 
 let deactivate =
   Superbol_vscode_lib.deactivate

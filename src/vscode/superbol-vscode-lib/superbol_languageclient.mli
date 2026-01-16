@@ -18,6 +18,7 @@ type server_access =
 
 val server_access
   : context: Vscode.ExtensionContext.t
+  -> server_prefix: string
   -> server_access
 
 val client_options

@@ -74,7 +74,6 @@ dune = "3.17.0"
 dot-gitignore-trailer = """
 # Edit drom.toml to change the following lines
 /superbol-free-*
-/dist
 /_*
 /node_modules
 /yarn-error.log

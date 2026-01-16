@@ -41,12 +41,12 @@ let find_existing_in ~root_uri : (([<`exe | `js] * string) as 'a) list -> 'a =
   in
   aux
 
-(* Look for the most specific `superbol-free` executable amongst (in order):
+(* Look for the most specific `${server_prefix}` executable amongst (in order):
 
-   - `superbol-free-${platform}-${arch}${suffix}`
-   - `superbol-free-${platform}${suffix}`
-   - `superbol-free${suffix}`
-   - `superbol-free.js` (as fallback)
+   - `${server_prefix}-${platform}-${arch}${suffix}`
+   - `${server_prefix}-${platform}${suffix}`
+   - `${server_prefix}${suffix}`
+   - `${server_prefix}.js` (as fallback)
 
    The `platform` and `arch` used are from the corresponding `process`
    attributes in node.js. The `suffix` is `".exe"` on Windows, and empty
@@ -55,21 +55,20 @@ let find_existing_in ~root_uri : (([<`exe | `js] * string) as 'a) list -> 'a =
    https://nodejs.org/api/process.html#processplatform
    https://nodejs.org/api/process.html#processarch
 *)
-let find_superbol root_uri =
+let find_superbol ?(server_prefix = "superbol") root_uri =
   let platform = Node.Process.platform and arch = Node.Process.arch in
-  let prefix = "superbol-free" in
   let alt_arch_execs =
     if platform = "darwin" && arch = "arm64"
-    then [ `exe, Format.asprintf "%s-%s-x64" prefix platform ]
+    then [ `exe, Format.asprintf "%s-%s-x64" server_prefix platform ]
     else []
   in
   find_existing_in ~root_uri @@
   [
-    `exe, Format.asprintf "%s-%s-%s" prefix platform arch;
-    `exe, Format.asprintf "%s-%s" prefix platform;
+    `exe, Format.asprintf "%s-%s-%s" server_prefix platform arch;
+    `exe, Format.asprintf "%s-%s" server_prefix platform;
   ] @ alt_arch_execs @ [
-    `exe, prefix;
-    `js, "superbol-free.js";
+    `exe, server_prefix;
+    `js, Format.asprintf "%s.js" server_prefix;
   ]
 
 let scan_host_and_port url =
@@ -91,7 +90,7 @@ let scan_server_command cmd =
     None
 
 
-let server_command ~context ?cmd () =
+let server_command ?server_prefix ~context ?cmd () =
   let root_uri = Vscode.ExtensionContext.extensionUri context
   and storage_uri =
     (* Use the global state URI as the server stores caches on a per-project
@@ -106,7 +105,9 @@ let server_command ~context ?cmd () =
     | Some cmd ->
         `exe, cmd
     | None ->
-        try find_superbol (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
+        try
+          find_superbol ?server_prefix
+            (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
         with Not_found ->
           (* If there is no bundled executable for the current platform, fall
              back to looking for superbol-free in the PATH *)
@@ -140,10 +141,10 @@ let server_command ~context ?cmd () =
   Sub_process server_options
 
 
-let server_access ~context =
+let server_access ~context ~server_prefix =
   match Superbol_workspace.superbol_exe () with
   | None ->
-      server_command ~context ()
+      server_command ~server_prefix ~context ()
   | Some cmd ->
       match scan_server_command cmd with
       | Some access -> access

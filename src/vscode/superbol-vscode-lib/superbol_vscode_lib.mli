@@ -12,5 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val activate: Vscode.ExtensionContext.t -> unit Promise.t
+val activate: lsp_server_prefix:string -> Vscode.ExtensionContext.t -> unit Promise.t
 val deactivate: unit -> unit Promise.t

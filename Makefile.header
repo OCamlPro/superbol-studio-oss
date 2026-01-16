@@ -1,241 +1,38 @@
 # -*- Makefile -*-
-STUDIO = superbol_vscode_platform
 TARGET_PLATFORMS ?= linux # win32 darwin
 TARGET_NAME = superbol-vscode-platform
 
-SRCDIR ?= src
-STUDIO_SRCDIR = $(SRCDIR)/vscode/superbol-vscode-platform
+MAIN_SRCDIR ?= src
+STUDIO = superbol_vscode_platform
+STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
 GNUCOBOL_SRCDIR = import/gnucobol
+SUPERBOL_EXE = lsp/superbol-free
 
-CP ?= cp -f # ln -srf
-
-DUNE_BUILD_DIR ?= _build
-DUNE_BUILD_ARGS = ${DUNE_CROSS_ARGS}
-DUNE_BUILD_SRCDIR =							\
-	${DUNE_BUILD_DIR}/default$(strip				\
-		$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
-		$(if $(filter darwin,$(TARGET_PLAT)),.osx)		\
-							  )/$(SRCDIR)
-
-# TARGET_PLAT is defined in Makefile
-TARGET_ARCH ?= x64
-ifeq ($(TARGET_PLAT),universal)
-  TARGET_SPEC = $(TARGET_PLAT)
-else
-  TARGET_SPEC = $(TARGET_PLAT)-$(TARGET_ARCH)
-endif
-
-TARGET_PROFILE ?= release
-TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
-
-DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
-SUPERBOL_LSPs = $(wildcard superbol-free-*-*)
-ifeq ($(TARGET_PLAT),universal)
-  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.bc.js
-  SUPERBOL_LSP = superbol-free.js
-else
-  SUPERBOL_LSP = superbol-free-$(TARGET_SPEC)$(DOT_EXE)
-  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
-    SUPERBOL_LSP_BUILT = superbol-free
-  else
-    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/lsp/superbol-free/main.exe
-  endif
-endif
-
-# Setting `GENERATE_PACKAGE_DOT_JSON` to `no` skips generation of
-# `package.json` (which should always be updated/committed anyways).
-# This generation requires the compilation of `$(SUPERBOL_LSP_BUILT)`,
-# that itself depends on a phony target, and therefore triggers way
-# too many calls to `scripts/static-build.sh` when
-# `$(BUILD_STATIC_EXECS)` holds).
-ifeq ($(BUILD_STATIC_EXECS),true)
-  GENERATE_PACKAGE_DOT_JSON ?= no
-else
-  GENERATE_PACKAGE_DOT_JSON ?= yes
-endif
-
-YARN = npx --yes yarn 
-
-VSCE_ARGS = --yarn $(if $(subst universal,,$(TARGET_PLAT)),-t $(TARGET_SPEC))
-VSCE_PACKAGE_ARGS ?=
-VSCE_PUBLISH_ARGS ?=
-OVSX_PUBLISH_ARGS ?=
+JS_OUTDIR = _out
+JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
+				       superbol-vscode-gdb.js)
 
 # Emacs lsp-mode source directory (https://github.com/emacs-lsp/lsp-mode):
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
-# --- leading rules ---
+# ---
 
-.PHONY: compile package
-
-all: superbol-lsp-server
-compile: superbol-lsp-server build-release
-package: vsix-package
-
-superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
-# Only rebuild `package.json` when on Linux
-# TODO: maybe just check build platform matches target platform
-ifeq ($(TARGET_PLAT),linux)
-	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
-
-  ifeq ($(shell uname)_$(GENERATE_PACKAGE_DOT_JSON),Linux_yes)
-  package.json: $(SUPERBOL_LSP_BUILT)
-	cp -f package.json package.json.prev
-	./$(SUPERBOL_LSP_BUILT) json vscode --gen package.json
-	diff -u package.json.prev package.json && rm -f package.json.prev 
-  endif
-endif				#linux
-
-ifeq ($(TARGET_PLAT),universal)
-  $(SUPERBOL_LSP_BUILT): vsix-dist-setup
-	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @build
-else				#platform-specific
-  $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
-
-  .PHONY: check-package.json
-  check-package.json:		#to be used after `build`
-	./$(SUPERBOL_LSP_BUILT) json vscode --gen - | diff -u package.json -
-endif
-
-.PHONY: build-debug yarn-debug
-
-build-debug:
-	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS}	\
-	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
-	@mkdir -p _out
-	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js _out/
-	$(MAKE) yarn-debug
-
-# Use 'make build-debug' before to copy the JS file in _out/
-yarn-debug: package.json
-yarn-debug: _out/superbol-vscode-platform-bundle.js	\
-	    _out/superbol-vscode-gdb.js
-	$(YARN) esbuild $(filter %.js, $+) \
-                --bundle \
-                --external:vscode \
-                --outdir=_dist \
-                --platform=node \
-                --target=es6 \
-                --sourcemap
-# the last command generated _dist/$(STUDIO).bs.js
-
-.PHONY: build-release yarn-release
-
-build-release:
-	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release	\
-	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
-	@mkdir -p _out
-	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js _out/
-	$(MAKE) yarn-release
-
-# Use 'make build-release' before to copy the JS file in _out/
-yarn-release: package.json
-yarn-release: _out/superbol-vscode-platform-bundle.js	\
-	      _out/superbol-vscode-gdb.js
-	$(YARN) esbuild $(filter %.js, $+) \
-                --bundle \
-                --external:vscode \
-                --outdir=_dist \
-                --platform=node \
-                --target=es6 \
-                --minify-whitespace \
-                --minify-syntax \
-                --sources-content=false
+include Makefile.vsix-rules
 
 # ---
 
-_out/superbol-vscode-platform-bundle.js:			\
+# js assembly
+
+$(JS_OUTDIR)/superbol-vscode-platform-bundle.js:			\
 		src/vscode/superbol-vscode-platform/bundle.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
 
-_out/superbol-vscode-gdb.js:					\
+$(JS_OUTDIR)/superbol-vscode-gdb.js:					\
 		src/vscode/superbol-vscode-platform/gdb.js
 	@mkdir -p $(dir $@);
 	cp -f $< $@
-
-# ---
-
-# packaging
-
-.PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
-	all-vsix-release-packages				\
-	all-vsix-debug-packages					\
-	all-vsix-packages
-
-gnucobol-config: $(GNUCOBOL_SRCDIR)/config
-	@mkdir -p $@
-	rm -r -f $@/*.*
-	find $(GNUCOBOL_SRCDIR)/config -type f					\
-		-a -regex '.*.\(conf\|conf-inc\|words\|ttbl\)' -print0 |	\
-		xargs -0 cp -f -t $@
-
-vsix-dist-setup:
-	@mkdir -p _dist
-
-vsix-package: gnucobol-config
-#	needs 'make build-debug' or 'make build-release' before
-	rm -f _dist/superbol-free-*-* _dist/superbol-free.js
-	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
-	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
-		--no-git-tag-version				\
-		--no-update-package-json			\
-		--out $(TARGET_VSIX) $(VERSION)
-
-vsix-release: superbol-lsp-server build-release
-	$(MAKE) vsix-package TARGET_PROFILE=release
-
-vsix-debug: superbol-lsp-server build-debug
-	$(MAKE) vsix-package TARGET_PROFILE=debug
-
-all-vsix-release-packages: build-release
-	for plat in $(TARGET_PLATFORMS); do			\
-		$(MAKE) vsix-release TARGET_PLAT=$${plat};	\
-	done
-
-all-vsix-debug-packages: build-debug
-	for plat in $(TARGET_PLATFORMS); do			\
-		$(MAKE) vsix-debug TARGET_PLAT=$${plat};	\
-	done
-
-all-vsix-packages: all-vsix-debug-packages all-vsix-release-packages
-
-vsix-clean: clean
-	rm -rf _out gnucobol-config _dist *.vsix
-
-# publishing (requires vsce/ovsx login)
-
-.PHONY: ovsx-deploy vsce-deploy deploy-all
-
-vsce-deploy:
-	$(YARN) vsce publish $(VSCE_ARGS) $(VSCE_PUBLISH_ARGS)	\
-	        --packagePath $(TARGET_VSIX)
-
-ovsx-deploy:
-#	Note: should fail in case of duplicate version
-	$(YARN) ovsx publish $(VSCE_ARGS) $(OVSX_PUBLISH_ARGS)	\
-	        --packagePath $(TARGET_VSIX)
-
-deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
-#	$(MAKE) all-vsix-release-packages;
-	for plat in $(TARGET_PLATFORMS); do				\
-		$(MAKE) ovsx-deploy vsce-deploy TARGET_PROFILE=release;	\
-	done
-
-# vsix-specific cleanup
-
-.PHONY: clean-execs
-clean-execs:
-	rm -f superbol-free $(SUPERBOL_LSPs)
-
-distclean: clean-execs vsix-clean
-clean: clean-execs
-
-.PHONY: node-setup
-node-setup:
-	$(YARN) install
-build-deps: node-setup
 
 # ---
 

@@ -12,6 +12,8 @@ ifeq ($(BUILD_STATIC_EXECS),true)
   export LINKING_MODE=static
 endif
 
+CP ?= cp -fl
+
 VERSION = !{version}
 DEV_DEPS := merlin ocamlformat odoc![if:gen:test] ppx_expect ppx_inline_test![fi]
 

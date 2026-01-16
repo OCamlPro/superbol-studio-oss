@@ -32,8 +32,8 @@ let start_lsp_server_autorestarter instance =
 
 let current_instance = ref None
 
-let activate (extension: Vscode.ExtensionContext.t) =
-  let instance = Superbol_instance.make ~context:extension in
+let activate ~lsp_server_prefix (extension: Vscode.ExtensionContext.t) =
+  let instance = Superbol_instance.make ~lsp_server_prefix ~context:extension in
   current_instance := Some instance;
 
   Superbol_instance.subscribe_disposable instance @@
