@@ -6,7 +6,7 @@ MAIN_SRCDIR ?= src
 STUDIO = superbol_vscode_platform
 STUDIO_SRCDIR = $(MAIN_SRCDIR)/vscode/superbol-vscode-platform
 GNUCOBOL_SRCDIR = import/gnucobol
-SUPERBOL_EXE = lsp/superbol-free
+SUPERBOL_LSP_PKG = lsp/superbol-free
 
 JS_OUTDIR = _out
 JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\

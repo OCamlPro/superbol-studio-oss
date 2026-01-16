@@ -11,6 +11,7 @@ DUNE_BUILD_SRCDIR =							\
 							  )/$(MAIN_SRCDIR)
 
 # TARGET_PLAT is defined in Makefile; conditionally define anyway
+AVAILABLE_NATIVE_PLATFORMS = linux darwin win32
 TARGET_PLAT ?= linux
 TARGET_ARCH ?= x64
 ifeq ($(TARGET_PLAT),universal)
@@ -24,17 +25,20 @@ TARGET_VSIX = $(TARGET_NAME)-$(VERSION)-$(TARGET_SPEC)-$(TARGET_PROFILE).vsix
 
 # ---
 
-SUPERBOL = $(basename $(notdir $(SUPERBOL_EXE)))
+STUDIO_JS = $(STUDIO_SRCDIR)/$(STUDIO).bc.js
+
+SUPERBOL_LSP = $(basename $(notdir $(SUPERBOL_LSP_PKG)))
 ifeq ($(TARGET_PLAT),universal)
-  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_EXE)/main.bc.js
-  SUPERBOL_LSP = $(SUPERBOL).js
+  SUPERBOL_LSP_JS = $(SUPERBOL_LSP_PKG)/main.bc.js
+  SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_JS)
+  SUPERBOL_LSP_EXE = $(SUPERBOL_LSP).js
 else
   DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
-  SUPERBOL_LSP = $(SUPERBOL)-$(TARGET_SPEC)$(DOT_EXE)
+  SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
   ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
-    SUPERBOL_LSP_BUILT = $(SUPERBOL)
+    SUPERBOL_LSP_BUILT = $(SUPERBOL_LSP)
   else
-    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_EXE)/main.exe
+    SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_PKG)/main.exe
   endif
 endif
 
@@ -65,11 +69,10 @@ all: superbol-lsp-server
 compile: superbol-lsp-server build-release
 package: vsix-package
 
-superbol-lsp-server $(SUPERBOL_LSP): $(SUPERBOL_LSP_BUILT)
-# Only rebuild `package.json` when on Linux
-# TODO: maybe just check build platform matches target platform
+superbol-lsp-server $(SUPERBOL_LSP_EXE): $(SUPERBOL_LSP_BUILT)
+# Only check/rebuild `package.json` on matching target and build platforms
 ifeq ($(TARGET_PLAT),linux)
-	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP)
+	$(CP) $(SUPERBOL_LSP_BUILT) $(SUPERBOL_LSP_EXE)
 
   ifeq ($(shell uname)_$(GENERATE_PACKAGE_DOT_JSON),Linux_yes)
     .PHONY: rebuild-package.json
@@ -82,7 +85,8 @@ endif				#linux
 
 ifeq ($(TARGET_PLAT),universal)
   $(SUPERBOL_LSP_BUILT): vsix-dist-setup
-	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal @build
+	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} --profile universal \
+		      $(MAIN_SRCDIR)/$(SUPERBOL_LSP_JS)
 else				#platform-specific
   $(SUPERBOL_LSP_BUILT): build vsix-dist-setup
 
@@ -94,10 +98,9 @@ endif
 .PHONY: build-debug yarn-debug
 
 build-debug:
-	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS}	\
-	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
+	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
-	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js $(JS_OUTDIR)/
+	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) yarn-debug
 
 # Use 'make build-debug' before to copy the JS file in $(JS_OUTDIR)
@@ -115,10 +118,10 @@ yarn-debug: $(JS_TARGETS)
 .PHONY: build-release yarn-release
 
 build-release:
-	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release	\
-	              $(STUDIO_SRCDIR)/$(STUDIO).bc.js
+	${DUNE} build ${DUNE_ARGS} ${DUNE_BUILD_ARGS} --profile=release \
+		      $(STUDIO_JS)
 	@mkdir -p $(JS_OUTDIR)
-	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_SRCDIR)/$(STUDIO).bc.js $(JS_OUTDIR)/
+	$(CP) ${DUNE_BUILD_DIR}/default/$(STUDIO_JS) $(JS_OUTDIR)/
 	$(MAKE) yarn-release
 
 # Use 'make build-release' before to copy the JS file in $(JS_OUTDIR)
@@ -139,9 +142,12 @@ yarn-release: $(JS_TARGETS)
 # packaging
 
 .PHONY: vsix-dist-setup vsix-package vsix-debug vsix-release	\
-	all-vsix-release-packages				\
 	all-vsix-debug-packages					\
-	all-vsix-packages
+	all-vsix-debug						\
+	all-vsix-release-packages				\
+	all-vsix-release					\
+	all-vsix-packages					\
+	all-vsix
 
 gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 	@mkdir -p $@
@@ -153,10 +159,13 @@ gnucobol-config: $(GNUCOBOL_SRCDIR)/config
 vsix-dist-setup:
 	@mkdir -p _dist
 
-vsix-package: package.json gnucobol-config $(EXE_TARGETS)
+vsix-package: package.json gnucobol-config $(EXE_TARGETS) $(SUPERBOL_LSP_BUILT)
 #	needs 'make build-debug' or 'make build-release' before
-#	rm -f _dist/$(SUPERBOL)-*-* _dist/$(SUPERBOL).js
-	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP)
+#       remove native versions to avoid accidental includion in wrong VSIXs
+	rm -f $(addsuffix -*,							\
+		$(addprefix _dist/$(SUPERBOL_LSP)-,$(AVAILABLE_NATIVE_PLATFORMS)))	\
+	      _dist/$(SUPERBOL_LSP).js
+	$(CP) $(SUPERBOL_LSP_BUILT) _dist/$(SUPERBOL_LSP_EXE)
 	$(YARN) vsce package $(VSCE_ARGS) $(VSCE_PACKAGE_ARGS)	\
 		--no-git-tag-version				\
 		--no-update-package-json			\
@@ -168,17 +177,17 @@ vsix-release: build-release
 vsix-debug: build-debug
 	$(MAKE) vsix-package TARGET_PROFILE=debug
 
-all-vsix-release-packages: build-release
+all-vsix-release all-vsix-release-packages:
 	for plat in $(TARGET_PLATFORMS); do			\
 		$(MAKE) vsix-release TARGET_PLAT=$${plat};	\
 	done
 
-all-vsix-debug-packages: build-debug
+all-vsix-debug all-vsix-debug-packages:
 	for plat in $(TARGET_PLATFORMS); do			\
 		$(MAKE) vsix-debug TARGET_PLAT=$${plat};	\
 	done
 
-all-vsix-packages: all-vsix-debug-packages all-vsix-release-packages
+all-vsix all-vsix-packages: all-vsix-debug-packages all-vsix-release-packages
 
 vsix-clean: clean
 	rm -rf $(JS_OUTDIR) gnucobol-config _dist *.vsix
@@ -206,7 +215,7 @@ deploy-all: # Make sure to run target `all-vsix-release-packages` beforehand
 
 .PHONY: clean-execs
 clean-execs:
-	rm -f $(SUPERBOL) $(wildcard $(SUPERBOL)-*-*)
+	rm -f $(SUPERBOL_LSP) $(wildcard $(SUPERBOL_LSP)-*-*)
 
 distclean: clean-execs vsix-clean
 clean: clean-execs
