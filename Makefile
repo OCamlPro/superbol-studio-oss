@@ -3,7 +3,11 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
-TARGET_PLAT ?= linux
+# Note: assume node is installed instead, for matching system names
+# BUILD_PLAT = $(shell opam exec -- ocamlc -config-var system)
+BUILD_PLAT = $(shell node --print process.platform)
+TARGET_PLAT ?= $(BUILD_PLAT)
+
 DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
@@ -32,10 +36,12 @@ all: build
 
 build:
 	./scripts/before.sh build
-ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
 	./scripts/static-build.sh
 else
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
+  # NB: Using $(BUILD_PLAT) below would require generalizing every
+  # check on %context_name in dune files.
   ifeq ($(TARGET_PLAT),linux)
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh superbol-studio-oss superbol-vscode-lib superbol-vscode-platform interop-js-stubs node-js-stubs vscode-js-stubs vscode-languageclient-js-stubs vscode-json vscode-debugadapter vscode-debugprotocol superbol-free superbol_free_lib superbol_preprocs superbol_project cobol_common cobol_parser cobol_ptree ebcdic_lib cobol_lsp ppx_cobcflags pretty cobol_config cobol_indent cobol_indent_old cobol_preproc cobol_data cobol_typeck cobol_unit ez_toml ezr_toml sql_preproc sql_ast sql_parser cobol_cfg

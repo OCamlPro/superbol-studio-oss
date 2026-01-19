@@ -3,7 +3,11 @@
 .PHONY: all build build-deps fmt fmt-check install dev-deps test
 .PHONY: clean distclean
 
-TARGET_PLAT ?= linux
+# Note: assume node is installed instead, for matching system names
+# BUILD_PLAT = $(shell opam exec -- ocamlc -config-var system)
+BUILD_PLAT = $(shell node --print process.platform)
+TARGET_PLAT ?= $(BUILD_PLAT)
+
 DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
@@ -32,10 +36,12 @@ all: build
 
 build:
 	./scripts/before.sh build
-ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),linux_true)
+ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
 	./scripts/static-build.sh
 else
 	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
+  # NB: Using $(BUILD_PLAT) below would require generalizing every
+  # check on %context_name in dune files.
   ifeq ($(TARGET_PLAT),linux)
 	${DUNE} build!{build-profile} ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @install
 	./scripts/copy-bin.sh !{packages}
