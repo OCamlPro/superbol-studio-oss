@@ -2,7 +2,7 @@
 
 (executable
   (name superbol_vscode_platform)
-  (libraries vscode-languageclient-js-stubs vscode-js-stubs promise_jsoo node-js-stubs jsonoo js_of_ocaml )
+  (libraries superbol-vscode-lib )
   (modes js)
   (preprocess (pps gen_js_api.ppx))
    (js_of_ocaml (flags --disable=genprim))

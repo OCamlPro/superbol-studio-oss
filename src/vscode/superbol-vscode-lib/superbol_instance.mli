@@ -12,14 +12,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let activate =
-  Superbol_vscode_lib.activate ~lsp_server_prefix:"superbol-free"
+type t
+type client = Vscode_languageclient.LanguageClient.t
 
-let deactivate =
-  Superbol_vscode_lib.deactivate
+val make: lsp_server_prefix: string -> context:Vscode.ExtensionContext.t -> t
+val subscribe_disposable: t -> Vscode.Disposable.t -> unit
 
-(* see {{:https://code.visualstudio.com/api/references/vscode-api#Extension}
-   activate() *)
-let () =
-  Js_of_ocaml.Js.(export "activate" (wrap_callback activate));
-  Js_of_ocaml.Js.(export "deactivate" (wrap_callback deactivate))
+val client: t -> client option
+val context: t -> Vscode.ExtensionContext.t
+
+val stop_language_server: t -> unit Promise.t
+val start_language_server: t -> unit Promise.t
+
+val write_project_config
+  : ?text_editor: Vscode.TextEditor.t
+  -> t
+  -> unit Promise.t
+
+val get_project_config
+  : t
+  -> ((string, Jsonoo.t) Hashtbl.t, string) result Promise.t

@@ -12,23 +12,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t
-type client = Vscode_languageclient.LanguageClient.t
+type server_access =
+  | Sub_process of Vscode_languageclient.ServerOptions.t
+  | TCP of { host: string; port: int }
 
-val make: context:Vscode.ExtensionContext.t -> t
-val subscribe_disposable: t -> Vscode.Disposable.t -> unit
+val server_access
+  : context: Vscode.ExtensionContext.t
+  -> server_prefix: string
+  -> server_access
 
-val client: t -> client option
-val context: t -> Vscode.ExtensionContext.t
+val client_options
+  : unit
+  -> Vscode_languageclient.ClientOptions.t
 
-val stop_language_server: t -> unit Promise.t
-val start_language_server: t -> unit Promise.t
-
-val write_project_config
-  : ?text_editor: Vscode.TextEditor.t
-  -> t
-  -> unit Promise.t
-
-val get_project_config
-  : t
-  -> ((string, Jsonoo.t) Hashtbl.t, string) result Promise.t
+val server_needs_restart_after
+  : config_change: Vscode.ConfigurationChangeEvent.t
+  -> bool

@@ -22,7 +22,7 @@
  )
 
 (package
- (name superbol-vscode-platform)
+ (name superbol-vscode-lib)
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  (depends
@@ -33,6 +33,19 @@
    (node-js-stubs (= version))
    (jsonoo (and (>= 0.2.1) (< 1.0.0)))
    (js_of_ocaml ( >= 4 ))
+   (js_of_ocaml-ppx ( >= 4 ))
+   odoc
+   (dune (and ( >= 3.17.0 )( < 3.19.0 )))
+  )
+ )
+
+(package
+ (name superbol-vscode-platform)
+ (synopsis "SuperBOL Studio OSS Project")
+ (description "SuperBOL Studio OSS is a new platform for COBOL")
+ (depends
+   (ocaml (>= 4.14.0))
+   (superbol-vscode-lib (= version))
    (js_of_ocaml-ppx ( >= 4 ))
    odoc
    (dune (and ( >= 3.17.0 )( < 3.19.0 )))

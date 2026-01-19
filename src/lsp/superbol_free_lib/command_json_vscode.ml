@@ -40,7 +40,7 @@ type kind =
   | GRAMMAR
   | LANGUAGE
 
-let cmd =
+let make_cmd ~extension_manifest =
   let generate = ref None in
   let kind = ref MANIFEST in
   let files = ref [] in
@@ -78,7 +78,7 @@ let cmd =
          List.iter parse files
        | Some file, [] ->
          Vscode_json.Main.write_file file
-           Vscode_json.Manifest.vscode_enc Vscode_extension.manifest
+           Vscode_json.Manifest.vscode_enc extension_manifest
        | Some _, _ ->
          Printf.eprintf
            "Actions --gen TARGET and parse files are exclusive\n%!";
@@ -114,3 +114,6 @@ let cmd =
         `P ""
       ];
     ]
+
+let cmd =
+  make_cmd ~extension_manifest:Vscode_extension.manifest

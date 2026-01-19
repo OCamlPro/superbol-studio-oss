@@ -12,18 +12,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type server_access =
-  | Sub_process of Vscode_languageclient.ServerOptions.t
-  | TCP of { host: string; port: int }
-
-val server_access
-  : context: Vscode.ExtensionContext.t
-  -> server_access
-
-val client_options
-  : unit
-  -> Vscode_languageclient.ClientOptions.t
-
-val server_needs_restart_after
-  : config_change: Vscode.ConfigurationChangeEvent.t
-  -> bool
+val activate: lsp_server_prefix:string -> Vscode.ExtensionContext.t -> unit Promise.t
+val deactivate: unit -> unit Promise.t
