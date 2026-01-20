@@ -13,6 +13,11 @@
 (**************************************************************************)
 
 open Vscode_languageclient
+open Superbol_types
+
+open Promise.Syntax
+
+(* --- *)
 
 type t = {
   context: Vscode.ExtensionContext.t;
@@ -20,7 +25,6 @@ type t = {
   mutable language_client: LanguageClient.t option
 }
 type client = LanguageClient.t
-
 
 let id = "superbol-lsp"
 
@@ -78,6 +82,30 @@ let start_language_server ({ lsp_server_prefix = server_prefix; context; _ } as 
   t.language_client <- Some client
 
 
+let start_autorestarter instance =
+  subscribe_disposable instance @@
+  Vscode.Workspace.onDidChangeConfiguration ()
+    ~listener:begin fun config_change ->
+      if Superbol_languageclient.server_needs_restart_after ~config_change
+      then begin
+        subscribe_disposable instance @@
+        Vscode.Window.setStatusBarMessage ()
+          ~text:"Restarting SuperBOL Language Server…"
+          ~hide:(`AfterTimeout 2000);
+        let _ : unit Promise.t = start_language_server instance in ()
+      end;
+    end
+
+
+module JSON = struct
+
+  let current_text_document_id text_editor =
+    let document = Vscode.TextEditor.document text_editor in
+    let uri = Vscode.TextDocument.uri document in
+    Jsonoo.Encode.(object_ ["uri", string @@ Vscode.Uri.toString uri ()])
+
+end
+
 
 let current_document_uri ?text_editor () =
   match
@@ -86,52 +114,49 @@ let current_document_uri ?text_editor () =
   | None -> None
   | Some e -> Some (Vscode.TextDocument.uri @@ Vscode.TextEditor.document e)
 
-
-let write_project_config ?text_editor instance =
-  let write_project_config_for ?uri client =
-    let assoc = match uri with
-      | Some uri ->
-          ["uri", Jsonoo.Encode.string @@ Vscode.Uri.toString uri ()]
-      | None ->
-          [] (* send without URI: the server will consider every known folder *)
-    in
-    Vscode_languageclient.LanguageClient.sendRequest client ()
-      ~meth:"superbol/writeProjectConfiguration"
-      ~data:(Jsonoo.Encode.object_ assoc) |>
-    Promise.(then_ ~fulfilled:(fun _ -> return ()))
+let write_project_config_for ?uri client =
+  let assoc = match uri with
+    | Some uri ->
+        ["uri", Jsonoo.Encode.string @@ Vscode.Uri.toString uri ()]
+    | None ->
+        [] (* send without URI: the server will consider every known folder *)
   in
-  match client instance, current_document_uri ?text_editor () with
-  | Some client, uri ->
-      write_project_config_for ?uri client
-  (* | Some client, None -> *)
-  (*     Promise.race_list @@ List.map begin fun workspace_folder -> *)
-  (*       let uri = Vscode.WorkspaceFolder.uri workspace_folder in *)
-  (*       write_project_config_for ~uri ~client *)
-  (*     end @@ Vscode.Workspace.workspaceFolders () *)
-  | None, _ ->
+  Vscode_languageclient.LanguageClient.sendRequest client ()
+    ~meth:"superbol/writeProjectConfiguration"
+    ~data:(Jsonoo.Encode.object_ assoc) |>
+  Promise.(then_ ~fulfilled:(fun _ -> return ()))
+
+let with_context_and_client ~f instance =
+  match client instance with
+  | Some client ->
+      f ~context:(context instance) ~client
+  | None ->
       (* TODO: is there a way to activate the extension from here?  Starting the
          client/instance seems to launch two distinct LSP server processes. *)
-      Promise.(then_ ~fulfilled:(fun _ -> return ())) @@
-      Vscode.Window.showErrorMessage ()
-        ~message:"The SuperBOL LSP client is not running; please retry after a \
-                  COBOL file has been opened"
+      Promise.return @@ Error Client_not_running
 
+let write_project_config ?text_editor instance =
+  with_context_and_client instance ~f:begin fun ~context:_ ~client ->
+    let uri = current_document_uri ?text_editor () in
+    write_project_config_for ?uri client >>=
+    Promise.Result.return
+  end >>= Superbol_printer.show_error_message
+
+let lsp_request ~meth ~data instance =
+  with_context_and_client instance ~f:begin fun ~context:_ ~client ->
+    let* result =
+      Vscode_languageclient.LanguageClient.sendRequest client ()
+        ~meth ~data
+    in
+    Promise.Result.return result
+  end
 
 let get_project_config instance =
-  let open Promise.Syntax in
-  match client instance, Vscode.Window.activeTextEditor () with
-  | None, _ ->
-      Promise.return @@ Error "SuperBOL client is not running"
-  | _, None ->
-      Promise.return @@ Error "Found no active text editor"
-  | Some client, Some textEditor ->
-      let document = Vscode.TextEditor.document textEditor in
-      let uri = Vscode.TextDocument.uri document in
-      let* assoc =
-        Vscode_languageclient.LanguageClient.sendRequest client ()
-          ~meth:"superbol/getProjectConfiguration"
-          ~data:(Jsonoo.Encode.(object_ [
-              "uri", string @@ Vscode.Uri.toString uri ();
-            ]))
-      in
-      Promise.Result.return @@ Jsonoo.Decode.(dict id) assoc
+  match Vscode.Window.activeTextEditor () with
+  | None ->
+      Promise.return @@ Error No_active_text_editor
+  | Some text_editor ->
+      lsp_request instance
+        ~meth:"superbol/getProjectConfiguration"
+        ~data:(JSON.current_text_document_id text_editor) |>
+      Promise.Result.map Jsonoo.Decode.(dict id)

@@ -12,21 +12,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let start_lsp_server_autorestarter instance =
-  Superbol_instance.subscribe_disposable instance @@
-  Vscode.Workspace.onDidChangeConfiguration ()
-    ~listener:begin fun config_change ->
-      if Superbol_languageclient.server_needs_restart_after ~config_change
-      then begin
-        Superbol_instance.subscribe_disposable instance @@
-        Vscode.Window.setStatusBarMessage ()
-          ~text:"Restarting SuperBOL Language Server…"
-          ~hide:(`AfterTimeout 2000);
-        let _ : unit Promise.t =
-          Superbol_instance.start_language_server instance
-        in ()
-      end;
-    end
+open Promise.Syntax
+
+module Types = struct
+  type superbol_instance = Superbol_instance.t
+  include Superbol_types
+end
 
 (* --- *)
 
@@ -40,10 +31,11 @@ let activate ~lsp_server_prefix (extension: Vscode.ExtensionContext.t) =
   Vscode.Tasks.registerTaskProvider
     ~type_:Superbol_tasks.type_
     ~provider:(Superbol_tasks.provider instance);
-  start_lsp_server_autorestarter instance;
+  Superbol_instance.start_autorestarter instance;
 
   Superbol_commands.register_all extension instance;
-  Superbol_instance.start_language_server instance
+  let* () = Superbol_instance.start_language_server instance in
+  Promise.return instance
 
 let deactivate () =
   match !current_instance with
@@ -51,3 +43,7 @@ let deactivate () =
       Superbol_instance.stop_language_server instance
   | None ->
       Promise.return ()
+
+module Printer = Superbol_printer
+module Instance = Superbol_instance
+module Workspace = Superbol_workspace

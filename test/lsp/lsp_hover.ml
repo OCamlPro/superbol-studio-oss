@@ -23,7 +23,8 @@ let print_hovered server ~projdir (prog, prog_positions) =
       Fmt.(option ~none:nop @@ fmt "%s ") key
       position.line position.character;
     match
-      LSP.Request.hover ~always_show_hover_text_in_data_div:true server params
+      LSP.Request.INTERNAL.hover server params
+        ~always_show_hover_text_in_data_div:true
     with
     | None ->
         Pretty.out "Hovering nothing worthy@."

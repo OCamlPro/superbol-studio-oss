@@ -23,7 +23,7 @@ let print_definitions ~projdir server (doc, positions) : unit =
     let params = DefinitionParams.create ~position ~textDocument:prog () in
     Pretty.out "%s (line %d, character %d):@."
       position_name position.line position.character;
-    match LSP.Request.lookup_definition server params with
+    match LSP.Request.INTERNAL.lookup_definition server params with
     | None | Some (`Location []) ->
         Pretty.out "No definition found@."
     | Some (`Location locs) ->

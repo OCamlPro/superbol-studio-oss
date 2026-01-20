@@ -23,7 +23,7 @@ open Ez_file.V1
 open Ez_file.FileString.OP
 
 module StrMap = EzCompat.StringMap
-module LSP = Cobol_lsp.INTERNAL
+module LSP = Cobol_lsp
 
 (* Used to remove full-path and lines in the test files *)
 let () =
@@ -34,7 +34,7 @@ let () =
 let layout =
   Superbol_free_lib.Project.layout;
 and cache_config =
-  LSP.Project_cache.{
+  LSP.INTERNAL.Project_cache.{
     cache_storage = No_storage;
     cache_verbose = false;
   }

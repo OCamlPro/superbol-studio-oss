@@ -13,31 +13,34 @@
 
 include Lsp_server_loop
 
+(** {2 Modules and functions exported for extensibility purposes} *)
+
+module Types = struct
+  include Lsp_imports
+  include Lsp_server.TYPES
+  include Lsp_diagnostics.TYPES
+  include Lsp_lookup.TYPES
+  include Lsp_document.TYPES
+  include Lsp_project.TYPES
+  include Lsp_project_cache.TYPES
+  include Lsp_request.TYPES
+end
+
+module Server = Lsp_server
+module Project = Lsp_project
+module Document = Lsp_document
+module Diagnostics = Lsp_diagnostics
+module Request = Lsp_request
+module Lookup = Lsp_lookup
+module Utils = Lsp_utils
+module Error = Lsp_error
+
 (* --- *)
 
-(** {1 Modules and functions exported for testing purposes}
-
-    Signatures of modules below may change unexpectedly. *)
+(** {2 Modules and functions exported for testing purposes} *)
 
 module INTERNAL = struct
-  module Types = struct
-    include Lsp_imports
-    include Lsp_diagnostics.TYPES
-    include Lsp_lookup.TYPES
-    include Lsp_document.TYPES
-    include Lsp_project.TYPES
-    include Lsp_project_cache.TYPES
-    include Lsp_server.TYPES
-  end
-  module Diagnostics = Lsp_diagnostics
-  module Lookup = Lsp_lookup
-  module Project = Lsp_project
   module Project_cache = Lsp_project_cache
-  module Document = Lsp_document
-  module Server = Lsp_server
-  module Loop = Lsp_server_loop
   module Picture_interp = Lsp_picture_interp
-  module Request = Lsp_request.INTERNAL
-  module Utils = Lsp_utils
   module Debug = Lsp_debug
 end

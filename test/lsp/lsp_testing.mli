@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 module StrMap = EzCompat.StringMap
-module LSP = Cobol_lsp.INTERNAL
+module LSP = Cobol_lsp
 
 type test_project =
   {

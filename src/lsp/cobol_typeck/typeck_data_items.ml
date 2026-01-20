@@ -79,7 +79,7 @@ let requal = Cobol_unit.Qual.requal
 
 let init (config: unit_config) =
   {
-    current_storage = File;
+    current_storage = Local_storage;                         (* dummy default *)
     current_qualification = None;
     current_qualmap = Qualmap.empty;
     item_stack = [];
@@ -778,8 +778,8 @@ let data_definitions = object
   method! fold_nested_programs _ =
     Visitor.skip
 
-  method! fold_file_section _ acc =
-    Visitor.do_children @@ enter_section File acc
+  method! fold_file_descr { file_name; _ } acc =
+    Visitor.do_children @@ enter_section (File file_name) acc
   method! fold_working_storage_section _ acc =
     Visitor.do_children @@ enter_section Working_storage acc
   method! fold_local_storage_section _ acc =

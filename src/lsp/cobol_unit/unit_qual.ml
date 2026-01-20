@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Manipulation of qualified names *)
+
 open EzCompat                                                    (* StringSet *)
 module StrSet = StringSet
 
@@ -23,8 +25,11 @@ let compare = Cobol_ptree.compare_qualname
 
 let name n : Cobol_ptree.qualname = Name n
 
-let name_of : Cobol_ptree.qualname -> string = function
-  | Qual (n, _) | Name n -> String.uppercase_ascii ~&n
+let original_name_of : Cobol_ptree.qualname -> string = function
+  | Qual (n, _) | Name n -> ~&n
+
+let name_of : Cobol_ptree.qualname -> string = fun qn ->
+  String.uppercase_ascii @@ original_name_of qn
 
 let qual_of : Cobol_ptree.qualname -> _ option = function
   | Qual (_, qn) -> Some qn | Name _ -> None
@@ -50,6 +55,15 @@ let names_of : Cobol_ptree.qualname -> StrSet.t =
     | Qual (_, qn) as n -> aux (StrSet.add (name_of n) acc) qn
   in
   aux StrSet.empty
+
+let original_qualifiers_list_of : Cobol_ptree.qualname -> string list =
+  let rec aux acc : Cobol_ptree.qualname -> string list = function
+    | Name _ as n -> original_name_of n :: acc
+    | Qual (_, qn) as n -> aux (original_name_of n :: acc) qn
+  in
+  function
+  | Name _ -> []
+  | Qual (_, qn) -> aux [] qn
 
 let indirect_quals_of : Cobol_ptree.qualname -> StrSet.t = function
   | Name _ -> StrSet.empty

@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023 OCamlPro SAS                                       *)
+(*  Copyright (c) 2026 OCamlPro SAS                                       *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -12,20 +12,33 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Types: sig
-  type superbol_instance = Superbol_instance.t
-  include module type of Superbol_types
-end
-open Types
+open Superbol_types
 
-val activate
-  : lsp_server_prefix:string
-  -> Vscode.ExtensionContext.t
-  -> superbol_instance Promise.t
-val deactivate
-  : unit
-  -> unit Promise.t
+let show_error = function
+  | Client_not_running ->
+      Option.some @@
+      Format.asprintf "The SuperBOL LSP client is not running; please retry \
+                       after a COBOL file has been opened"
+  | No_active_text_editor ->
+      Option.some @@
+      Format.asprintf "Found no active text editor"
+  | _ ->
+      None
 
-module Printer = Superbol_printer
-module Instance = Superbol_instance
-module Workspace = Superbol_workspace
+let error_reporters =
+  ref [show_error]
+
+let register_error_reporter f =
+  error_reporters := !error_reporters @ f
+
+let show_error error =
+  Option.value ~default:"Unknown internal error" @@
+  List.find_map (fun show -> show error) !error_reporters
+
+let show_error_message = function
+  | Ok _ ->
+      Promise.return ()
+  | Error error ->
+      let message = show_error error in
+      let _ = Vscode.Window.showErrorMessage () ~message in
+      Promise.return ()

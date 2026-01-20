@@ -12,20 +12,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Types: sig
-  type superbol_instance = Superbol_instance.t
-  include module type of Superbol_types
-end
-open Types
-
-val activate
-  : lsp_server_prefix:string
-  -> Vscode.ExtensionContext.t
-  -> superbol_instance Promise.t
-val deactivate
-  : unit
-  -> unit Promise.t
-
-module Printer = Superbol_printer
-module Instance = Superbol_instance
-module Workspace = Superbol_workspace
+type error = ..
+type error +=
+  | Client_not_running
+  | No_active_text_editor

@@ -11,6 +11,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module TYPES: sig
+  type extensions =
+    {
+      alternate_request_handers: Lsp_request.TYPES.alternate_handler list;
+    }
+end
+include module type of TYPES
+  with type extensions = TYPES.extensions
+
+val default_extensions: extensions
+
 val config
   : project_layout: Superbol_project.layout
   -> ?enable_caching: bool
@@ -22,4 +33,5 @@ val config
 
 val run
   : config: Lsp_server.config
+  -> extensions: extensions
   -> Lsp_server.exit_status
