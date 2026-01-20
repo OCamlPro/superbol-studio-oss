@@ -1,5 +1,5 @@
 const DOCUMENTATION_OPTIONS = {
-    VERSION: 'master (5dd7e1d) (2026/01/19 15:42)',
+    VERSION: 'master (d46efb9) (2026/01/20 11:00)',
     LANGUAGE: 'en',
     COLLAPSE_INDEX: false,
     BUILDER: 'html',
