@@ -16,6 +16,19 @@
 open Ez_file.V1
 open Ez_file.V1.EzFile.OP
 
+module TYPES = struct
+  type extensions =
+    {
+      alternate_request_handers: Lsp_request.TYPES.alternate_handler list;
+    }
+end
+include TYPES
+
+let default_extensions =
+  {
+    alternate_request_handers = [];
+  }
+
 (** [config ~project_layout ~enable_caching ~enable_client_configs
     ~fallback_storage_directory ()] creates an LSP configuration structure for
     identifying and managing projects.
@@ -80,14 +93,14 @@ let config
     blocking (driven by standard input), and shutdown is triggered by a client
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
-let run ~config =
+let run ~config ~extensions:{ alternate_request_handers = alternate_handlers } =
   Lsp_io.initialize_channels ();
   let rec loop state =
     match Lsp_io.read_message () with
     | Jsonrpc.Packet.Notification n ->
         continue @@ Lsp_notif.handle n state
     | Jsonrpc.Packet.Request r ->
-        continue @@ reply @@ Lsp_request.handle r state
+        continue @@ reply @@ Lsp_request.handle ~alternate_handlers r state
     | Jsonrpc.Packet.Batch_call calls ->
         batch_calls calls state
     | Jsonrpc.Packet.Response r ->

@@ -15,7 +15,8 @@ open Ezcmd.V2
 open EZCMD.TYPES
 
 
-let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage =
+let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage
+    ?(extensions = Cobol_lsp.default_extensions) () =
   Cobol_preproc.Src_overlay.debug_oc := !Cobol_lsp.INTERNAL.Debug.debug_oc;
 
   let project_layout, fallback_storage_directory =
@@ -33,7 +34,7 @@ let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage =
       ~project_layout
       ?fallback_storage_directory
   in
-  match Cobol_lsp.run ~config:lsp_config with
+  match Cobol_lsp.run ~config:lsp_config ~extensions with
   | Ok () -> ()
   | Error exit_msg -> Pretty.error "%s@." exit_msg; exit 1
 
@@ -50,7 +51,7 @@ let js_specific_args =
   | Native | Bytecode | Other _ ->
       []
 
-let cmd =
+let make_cmd ?extensions () =
   let caching, caching_args =
     Arg_utils.switch `enable_disable ~name:"caching" ~default:true
   and syntax_diagnostics, syntax_diagnostics_args =
@@ -60,10 +61,9 @@ let cmd =
   in
   let storage = ref None in
   EZCMD.sub "lsp"
-    (fun () ->
-       run_lsp ~enable_caching:!caching
-         ~force_syntax_diagnostics:!syntax_diagnostics
-         ~storage:!storage)
+    (run_lsp ~enable_caching:!caching
+       ~force_syntax_diagnostics:!syntax_diagnostics
+       ~storage:!storage ?extensions)
     ~doc:"run LSP server"
     ~args: (caching_args @ syntax_diagnostics_args @ js_specific_args @ [
         ["storage-directory"], Arg.String (fun s -> storage := Some s),
@@ -77,3 +77,6 @@ let cmd =
         `P "Start a COBOL LSP server"
       ];
     ]
+
+let cmd =
+  make_cmd ()

@@ -37,7 +37,7 @@ let completion_positions (doc, positions) : string -> unit =
       Fmt.(option ~none:nop (string ++ sp)) key
       position.line position.character;
     begin
-      match LSP.Request.completion ~eager:false server params with
+      match LSP.Request.INTERNAL.completion ~eager:false server params with
       | None ->
           Pretty.out "Failed completion@."
       | Some `CompletionList { items; _ } when items == [] ->
@@ -50,7 +50,7 @@ let completion_positions (doc, positions) : string -> unit =
       | exception Jsonrpc.Response.Error.E { message; _ } ->
           Pretty.out "%s@;" message
     end;
-    match LSP.Request.completion ~eager:true server params with
+    match LSP.Request.INTERNAL.completion ~eager:true server params with
     | None ->
         Pretty.out "Failed eager-completion@."
     | Some `CompletionList { items; _ } when items == [] ->

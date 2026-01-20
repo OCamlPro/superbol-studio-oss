@@ -23,6 +23,35 @@ val context: t -> Vscode.ExtensionContext.t
 
 val stop_language_server: t -> unit Promise.t
 val start_language_server: t -> unit Promise.t
+val start_autorestarter: t -> unit
+
+(* --- *)
+
+(** {2 Generic access functions} *)
+
+val with_context_and_client
+  : f:(context:Vscode.ExtensionContext.t -> client:client -> 'result)
+  -> t
+  -> (('a, Superbol_types.error) result Promise.t as 'result)
+
+val lsp_request
+  : meth:string
+  -> data:Jsonoo.t
+  -> t
+  -> (Jsonoo.t, Superbol_types.error) result Promise.t
+
+val current_document_uri
+  : ?text_editor:Vscode.TextEditor.t
+  -> unit
+  -> Vscode.Uri.t option
+
+module JSON: sig
+  val current_text_document_id
+    : Vscode.TextEditor.t
+    -> Jsonoo.t
+end
+
+(* --- *)
 
 val write_project_config
   : ?text_editor: Vscode.TextEditor.t
@@ -31,4 +60,4 @@ val write_project_config
 
 val get_project_config
   : t
-  -> ((string, Jsonoo.t) Hashtbl.t, string) result Promise.t
+  -> ((string, Jsonoo.t) Hashtbl.t, Superbol_types.error) result Promise.t

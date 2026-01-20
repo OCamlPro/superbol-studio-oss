@@ -19,7 +19,7 @@ let codelens doc : string -> unit =
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let location_as_srcloc = new srcloc_resuscitator_cache in
   let params = CodeLensParams.create () ~textDocument:prog in
-  LSP.Request.codelens server params |> List.rev
+  LSP.Request.INTERNAL.codelens server params |> List.rev
   |> List.iter begin fun (codelens: CodeLens.t) ->
     let location = Location.create ~range:codelens.range ~uri:prog.uri in
     codelens.command

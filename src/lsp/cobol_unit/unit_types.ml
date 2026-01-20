@@ -34,6 +34,9 @@ type unit_config =
     unit_decimal_point: char;
   }
 
+(* TODO: add a dedicated type to hold info from the INPUT-OUTPUT SECTION. Maybe
+   building up a more global `unit_env` type in that process. *)
+
 (* data items *)
 
 type data_definitions =

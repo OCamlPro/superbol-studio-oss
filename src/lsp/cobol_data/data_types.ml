@@ -52,17 +52,16 @@ type usage =
 and signedness = { signed: bool }
 
 type data_storage =
-  | File
+  | File of Cobol_ptree.name with_loc
   | Local_storage
   | Working_storage
   | Linkage                                                          (* file? *)
 
-let pp_data_storage ppf s =
-  Fmt.string ppf @@ match s with
-  | File -> "FILE"
-  | Local_storage -> "LOCAL-STORAGE"
-  | Working_storage -> "WORKING-STORAGE"
-  | Linkage -> "LINKAGE"
+let pp_data_storage ppf = function
+  | File n -> Fmt.pf ppf "FILE@ %a" Cobol_ptree.pp_name' n
+  | Local_storage -> Fmt.string ppf "LOCAL-STORAGE"
+  | Working_storage -> Fmt.string ppf "WORKING-STORAGE"
+  | Linkage -> Fmt.string ppf "LINKAGE"
 
 type length =
   | Fixed_length

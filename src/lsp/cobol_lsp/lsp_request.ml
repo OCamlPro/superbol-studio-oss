@@ -20,12 +20,20 @@ open Lsp_lookup.TYPES
 open Lsp.Types
 open Ez_file.V1
 
+module TYPES = struct
+  type alternate_handler =
+    {
+      h: 'r. 'r Lsp.Client_request.t -> registry -> ('r * registry, 'r error) result;
+    }
+end
+open TYPES
+
 (** {2 Handling requests} *)
 
 (** Catch generic exception cases, and report errors using {!Lsp_error}.
     Returns [None] in case the document cannot be parsed (or is a copybook, for
     now).  [f] has to return an optional value. *)
-let try_main_doc ~f registry doc_id =
+let try_with_doc ~f registry doc_id =
   let doc =
     try Lsp_server.find_document doc_id registry
     with Not_found ->
@@ -39,9 +47,9 @@ let try_main_doc ~f registry doc_id =
   with Lsp_document.(Unparseable _ | Copybook _) -> None
      | e -> Lsp_error.internal "Caught exception: %a" Fmt.exn e
 
-(** Same as {!try_main_doc}, with some additional document data. *)
-let try_with_main_document_data ~f =
-  try_main_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
+(** Same as {!try_with_doc}, with some additional document data. *)
+let try_with_checked_doc ~f =
+  try_with_doc ~f:(fun ~doc -> f ~doc @@ Lsp_document.checked doc)
 
 (** {3 Initialization} *)
 
@@ -167,7 +175,7 @@ let handle_get_cfg registry params =
       try to_assoc @@ member "render_options" params with Type_error _ -> [])
   in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
-  try_with_main_document_data registry textDoc
+  try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let jsoono =
         Lsp_cfg.doc_to_cfg_jsoono ~filename:uri ~name ~options checked_doc
@@ -179,7 +187,7 @@ let handle_get_possible_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri = Yojson.Safe.Util.(to_string @@ member "uri" params) in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
-  try_with_main_document_data registry textDoc
+  try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in
       let possibles = possible_cfgs_of_doc checked_doc in
@@ -195,7 +203,7 @@ let handle_find_procedure registry params =
   let line = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "line" params in
   let character = Yojson.Safe.Util.to_int @@ Yojson.Safe.Util.member "character" params in
   let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path filename) in
-  try_with_main_document_data registry textDoc
+  try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let pos = Position.create ~character ~line in
       let { cu; proc_name } =
@@ -299,7 +307,7 @@ let lookup_definition_in_doc ~rootdir
       Some (`Location (find_definitions loc_translator cu_name qn group))
 
 let handle_definition registry (params: DefinitionParams.t) =
-  try_with_main_document_data registry params.textDocument
+  try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc:{ project; _ } ->
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
       lookup_definition_in_doc ~rootdir params
@@ -386,7 +394,7 @@ let lookup_references_in_doc
       Some (def_locs @ ref_locs)
 
 let handle_references state (params: ReferenceParams.t) =
-  try_with_main_document_data state params.textDocument
+  try_with_checked_doc state params.textDocument
     ~f:begin fun ~doc:{ project; _ } ->
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
       lookup_references_in_doc ~rootdir params
@@ -510,7 +518,7 @@ let handle_formatting registry params =
 let handle_semtoks_full,
     handle_semtoks_range =
   let handle registry ?range (doc: TextDocumentIdentifier.t) =
-    try_with_main_document_data registry doc
+    try_with_checked_doc registry doc
       ~f:begin fun ~doc:{ artifacts = { pplog; tokens;
                                         rev_comments; rev_ignored; _ };
                           _ } Cobol_typeck.Outputs.{ ptree; _ } ->
@@ -635,7 +643,7 @@ let preproc_info_on_hover ~filename position pplog =
 let handle_hover ?always_show_hover_text_in_data_div
     registry HoverParams.{ textDocument = doc; position; _ } =
   let filename = Lsp.Uri.to_path doc.uri in
-  try_with_main_document_data registry doc
+  try_with_checked_doc registry doc
     ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
       match data_definition_on_hover ~uri:doc.uri position checked_doc
               ?always_show_hover_text_in_data_div ~rev_comments,
@@ -653,7 +661,7 @@ let handle_hover ?always_show_hover_text_in_data_div
 (** {3 Completion} *)
 
 let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
-  try_with_main_document_data registry params.textDocument
+  try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc checked_doc->
       let config = Lsp_completion.config ~eager () in
       let completion_list =
@@ -670,7 +678,7 @@ let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
     not support FoldingRangeKind or CollapsedText
     (To support these features, need to change the client capability) *)
 let handle_folding_range registry (params: FoldingRangeParams.t) =
-  try_with_main_document_data registry params.textDocument
+  try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc:_ { ptree; group; _ } ->
       let filename = Lsp.Uri.to_path params.textDocument.uri in
       Some (Lsp_folding.ranges_in ~filename ptree group)
@@ -679,7 +687,7 @@ let handle_folding_range registry (params: FoldingRangeParams.t) =
 (** { Document Symbol } *)
 
 let handle_document_symbol registry (params: DocumentSymbolParams.t) =
-  try_with_main_document_data registry params.textDocument
+  try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc { ptree; _ } ->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
       let symbols = Lsp_document_symbol.from_ptree_at ~uri ptree in
@@ -750,7 +758,7 @@ let codelens_positions ~uri group =
   |> snd
 
 let handle_codelens registry ({ textDocument; _ }: CodeLensParams.t) =
-  try_with_main_document_data registry textDocument
+  try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
       let uri = Lsp.Text_document.documentUri doc.textdoc in
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
@@ -784,7 +792,7 @@ let handle_rename
     registry
     ({ textDocument; position; newName = newText; _ }: RenameParams.t) =
   Option.value ~default:(WorkspaceEdit.create ()) @@
-  try_with_main_document_data registry textDocument
+  try_with_checked_doc registry textDocument
     ~f:begin fun ~doc checked_doc ->
       let rootdir = Lsp_project.(string_of_rootdir @@ rootdir doc.project) in
       let locations =
@@ -823,6 +831,14 @@ let shutdown: state -> unit = function
       ()                                                             (* no-op *)
   | Running registry ->
       handle_shutdown registry
+
+let fallback (type t) : t Lsp.Client_request.t -> _ = function
+  | UnknownRequest { meth; _ } ->
+      Lsp_debug.message "%s: unknown request (%s)" __MODULE__ meth;
+      Error (UnknownRequest meth)
+  | req ->
+      Lsp_debug.message "%s: unhandled request" __MODULE__;
+      Error (UnhandledRequest req)
 
 let on_request
   : type r. state -> r Lsp.Client_request.t ->
@@ -864,6 +880,21 @@ let on_request
         Ok (handle_codelens registry params, state)
     | TextDocumentRename params ->
         Ok (handle_rename registry params, state)
+    | UnknownRequest { meth = "superbol/writeProjectConfiguration";
+                       params = Some param } ->
+        handle_write_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getProjectConfiguration";
+                       params = Some param } ->
+        handle_get_project_config_command param registry
+    | UnknownRequest { meth = "superbol/getCFG";
+                       params = Some param } ->
+        Ok (handle_get_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/getPossibleCFG";
+                       params = Some param } ->
+        Ok (handle_get_possible_cfg registry param, state)
+    | UnknownRequest { meth = "superbol/findProcedure";
+                       params = Some param } ->
+        Ok (handle_find_procedure registry param, state)
     | TextDocumentDeclaration  (* TextDocumentPositionParams.t.t *) _
     | TextDocumentTypeDefinition  (* TypeDefinitionParams.t.t *) _
     | TextDocumentImplementation  (* ImplementationParams.t.t *) _
@@ -895,45 +926,36 @@ let on_request
     | WillCreateFiles  (* CreateFilesParams.t.t *) _
     | WillDeleteFiles  (* DeleteFilesParams.t.t *) _
     | WillRenameFiles  (* RenameFilesParams.t.t *) _
-      ->
-        Lsp_debug.message "Lsp_request: unhandled request";
-        Error (UnhandledRequest client_req)
-    | UnknownRequest { meth = "superbol/writeProjectConfiguration";
-                       params = Some param } ->
-        handle_write_project_config_command param registry
-    | UnknownRequest { meth = "superbol/getProjectConfiguration";
-                       params = Some param } ->
-        handle_get_project_config_command param registry
-    | UnknownRequest { meth = "superbol/getCFG";
-                       params = Some param } ->
-        Ok (handle_get_cfg registry param, state)
-    | UnknownRequest { meth = "superbol/getPossibleCFG";
-                       params = Some param } ->
-        Ok (handle_get_possible_cfg registry param, state)
-    | UnknownRequest { meth = "superbol/findProcedure";
-                       params = Some param } ->
-        Ok (handle_find_procedure registry param, state)
-    | UnknownRequest { meth; _ } ->
-        Lsp_debug.message "Lsp_request: unknown request (%s)" meth;
-        Error (UnknownRequest meth)
+    | _ ->
+        fallback client_req
 
-let handle (Jsonrpc.Request.{ id; _ } as req) state =
+let handle ?(alternate_handlers = []) (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
   | Error message ->
       let err = Jsonrpc.Response.Error.make ~message ~code:InvalidRequest () in
       state, Jsonrpc.Response.(error id err)
-  | Ok (E r) ->
-      match on_request state r ~id with
-      | Ok (reply, state) ->
-          let reply_json = Lsp.Client_request.yojson_of_result r reply in
-          state, Jsonrpc.Response.ok id reply_json
-      | Error server_error ->
-          state,
-          Jsonrpc.Response.error id @@
-          Lsp_server.jsonrpc_of_error server_error req.method_
-      | exception Jsonrpc.Response.Error.E e ->
+  | Ok E r ->
+      let rec try_alternate_on_error status handlers =
+        match status, state, handlers with
+        | Ok (reply, state), _, _ ->
+            state,
+            Jsonrpc.Response.ok id @@ Lsp.Client_request.yojson_of_result r reply
+        | Error (UnhandledRequest _ | UnknownRequest _), Running registry,
+          handler :: remaining_handlers ->
+            let repl = match handler.h r registry with
+              | Ok (reply, registry) -> Ok (reply, Running registry)
+              | Error e -> Error e
+            in
+            try_alternate_on_error repl remaining_handlers
+        | Error server_error, _, _ ->
+            state,
+            Jsonrpc.Response.error id @@
+            Lsp_server.jsonrpc_of_error server_error req.method_
+      in
+      try try_alternate_on_error (on_request state r ~id) alternate_handlers with
+      | Jsonrpc.Response.Error.E e ->
           state, Jsonrpc.Response.error id e
-      | exception e ->
+      | e ->
           state, Jsonrpc.Response.(error id @@ Error.of_exn e)
 
 (** {2 Access to internal stuff} *)

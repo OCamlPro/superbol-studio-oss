@@ -45,7 +45,7 @@ let rename_positions ?(abort_when_in_copybook = false) ?(copybooks = [])
     Pretty.out "%a(line %d, character %d):\n"
       Fmt.(option ~none:nop (string ++ sp)) key
       position.line position.character;
-    match LSP.Request.rename ~abort_when_in_copybook server params with
+    match LSP.Request.INTERNAL.rename ~abort_when_in_copybook server params with
     | { changes = None; _ } ->
       Pretty.out "No renames@."
     | { changes = Some assoc; _ } ->

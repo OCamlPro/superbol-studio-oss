@@ -228,8 +228,8 @@ let resolve_task =
       in
       let* config = Superbol_instance.get_project_config instance in
       match config with
-      | Error value ->
-          OutputChannel.appendLine oc ~value;
+      | Error error ->
+          OutputChannel.appendLine oc ~value:(Superbol_printer.show_error error);
           OutputChannel.appendLine oc ~value:"Aborting task resolution.";
           Promise.return None
       | Ok config ->

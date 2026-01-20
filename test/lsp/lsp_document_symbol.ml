@@ -64,7 +64,7 @@ let document_symbol doc : string -> unit =
   let { end_with_postproc; projdir }, server = make_lsp_project () in
   let server, prog = add_cobol_doc server ~projdir "prog.cob" doc in
   let params = DocumentSymbolParams.create () ~textDocument:prog in
-  begin match LSP.Request.document_symbol server params with
+  begin match LSP.Request.INTERNAL.document_symbol server params with
     | None ->
       Pretty.out "No document symbol@."
     | Some `DocumentSymbol document_symbols ->

@@ -28,7 +28,7 @@ let format_doc doc =
     DocumentFormattingParams.create ~options ~textDocument:prog ()
   in
   let doc = (LSP.Types.URIMap.find prog.uri server.docs).textdoc in
-  let formatted = LSP.Request.formatting server params in
+  let formatted = LSP.Request.INTERNAL.formatting server params in
   Option.map (fun edits ->
     Lsp.Text_document.apply_text_document_edits doc edits |> Lsp.Text_document.text
   ) formatted, end_with_postproc

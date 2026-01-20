@@ -59,16 +59,17 @@ let () =
     { max_pic_length = 100; decimal_char = '.';
       currency_signs = CHARS.add '$' CHARS.empty }
   in
-  let rec test = function
-    | [] -> ()
-    | (pic, value, expected)::tl ->
-      match Cobol_data.Picture.of_string config pic with
-      | Ok picture ->
-        let example = LSP.Picture_interp.example_of ~picture value in
-        let error_msg = Pretty.to_string "ERROR: different result (%s, %f) -> '%s' (expected: '%s')" pic value example expected in
-        if String.equal example expected
-        then test tl
-        else failwith error_msg
-      | Error _ ->
-        failwith @@ Pretty.to_string "ERROR: Unable to form picture with picture-string '%s'\n" pic
-  in test unit_tests
+  List.iter begin fun (pic, value, expected) ->
+    match Cobol_data.Picture.of_string config pic with
+    | Ok picture ->
+        let example = LSP.INTERNAL.Picture_interp.example_of ~picture value in
+        let error_msg =
+          Pretty.to_string "ERROR: different result (%s, %f) -> '%s' \
+                            (expected: '%s')" pic value example expected in
+        if not (String.equal example expected)
+        then failwith error_msg
+    | Error _ ->
+        failwith @@
+        Pretty.to_string "ERROR: Unable to form picture with picture-string \
+                          '%s'\n" pic
+  end unit_tests
