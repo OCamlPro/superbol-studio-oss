@@ -15,7 +15,7 @@
 - Bug that made the extension hang when debugged programs displayed signed numbers [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Requirement for specifying `gdbpath` and `libcobpath` in launch configurations (these are actually provided in extension settings) [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Enforcement of a default `preLaunchTask` that is not available [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
-- Support for showing control-flow graphs on Windows [#479](https://github.com/OCamlPro/superbol-studio-oss/pull/479) (fix for [Issue #423](https://github.com/OCamlPro/superbol-studio-oss/issues/423)
+- Support for showing control-flow graphs on Windows [#479](https://github.com/OCamlPro/superbol-studio-oss/pull/479) (fix for [Issue #423](https://github.com/OCamlPro/superbol-studio-oss/issues/423))
 
 
 ## [0.2.2] Second release (2025-11-17)
