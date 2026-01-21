@@ -170,23 +170,23 @@ let handle_get_project_config_command param registry =
 let handle_get_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
   let uri, name, options = Yojson.Safe.Util.(
-      to_string @@ member "uri" params,
+      DocumentUri.t_of_yojson @@ member "uri" params,
       to_string @@ member "name" params,
       try to_assoc @@ member "render_options" params with Type_error _ -> [])
   in
-  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  let textDoc = TextDocumentIdentifier.create ~uri in
   try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let jsoono =
-        Lsp_cfg.doc_to_cfg_jsoono ~filename:uri ~name ~options checked_doc
+        Lsp_cfg.doc_to_cfg_jsoono ~filename:(DocumentUri.to_path uri) ~name ~options checked_doc
       in Some jsoono
     end |>
   Option.get
 
 let handle_get_possible_cfg registry params =
   let params = Jsonrpc.Structured.yojson_of_t params in
-  let uri = Yojson.Safe.Util.(to_string @@ member "uri" params) in
-  let textDoc = TextDocumentIdentifier.create ~uri:(DocumentUri.of_path uri) in
+  let uri = Yojson.Safe.Util.(DocumentUri.t_of_yojson @@ member "uri" params) in
+  let textDoc = TextDocumentIdentifier.create ~uri in
   try_with_checked_doc registry textDoc
     ~f:begin fun ~doc:_ checked_doc ->
       let open Cobol_cfg.Builder in

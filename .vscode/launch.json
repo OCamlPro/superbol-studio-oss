@@ -30,7 +30,8 @@
       "outFiles": [
         "${workspaceRoot}/_build/default/src/superbol-vscode-extension/superbol_vscode_extension.bc.js"
       ],
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"]
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+	  "preLaunchTask": "${defaultBuildTask}"
     }
   ]
 }
