@@ -63,7 +63,7 @@ let pp_data_storage ppf = function
   | Working_storage -> Fmt.string ppf "WORKING-STORAGE"
   | Linkage -> Fmt.string ppf "LINKAGE"
 
-type length =
+type length_variability =
   | Fixed_length
   | Variable_length
   (* Note: OCCURS DYNAMIC is considered fixed-length in ISO/IEC *)
@@ -90,7 +90,7 @@ and field_definition =
     field_offset: Data_memory.offset;         (** offset w.r.t record address *)
     field_size: Data_memory.size;
     field_layout: field_layout;
-    field_length: length;
+    field_length_variability: length_variability;
     field_conditions: condition_names;
     field_redefinitions: item_redefinitions;
   }
