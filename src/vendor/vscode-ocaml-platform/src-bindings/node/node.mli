@@ -216,7 +216,7 @@ module ChildProcess : sig
     -> [ `Close of code:int -> ?signal:string -> unit -> unit
        | `Disconnect of unit -> unit
        | `Error of err:JsError.t -> unit
-       | `Exit of code:int -> signal:string -> unit
+       | `Exit of code:int -> ?signal:string -> unit -> unit
        ]
     -> unit
 

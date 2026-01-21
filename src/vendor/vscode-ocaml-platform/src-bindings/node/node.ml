@@ -262,7 +262,7 @@ module ChildProcess = struct
       on t "close" @@ [%js.of: code:int -> ?signal:string -> unit -> unit] f
     | `Disconnect f -> on t "disconnect" @@ [%js.of: unit -> unit] f
     | `Error f -> on t "error" @@ [%js.of: err:JsError.t -> unit] f
-    | `Exit f -> on t "exit" @@ [%js.of: code:int -> signal:string -> unit] f
+    | `Exit f -> on t "exit" @@ [%js.of: code:int -> ?signal:string -> unit -> unit] f
     | `Message f ->
       on t "message" @@ [%js.of: message:Ojs.t -> sendHandle:Ojs.t -> unit] f
 
