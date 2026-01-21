@@ -251,7 +251,11 @@ module ChildProcess = struct
 
     val get_stdin : t -> Stream.Writable.t [@@js.get "stdin"]
 
+    val kill : t -> ?signal:string -> unit -> unit [@@js.call]
+
     val on : t -> string -> Ojs.t -> unit [@@js.call]]
+
+  let spawn_process = spawn
 
   let on t = function
     | `Close f ->
@@ -424,4 +428,12 @@ module Events = struct
            t
         -> string list [@@js.call]]
   end
+end
+
+module Console = struct
+  include [%js:
+    val log : string -> unit [@@js.global "console.log"]
+    val warn : string -> unit [@@js.global "console.warn"]
+    val error : string -> unit [@@js.global "console.error"]
+  ]
 end

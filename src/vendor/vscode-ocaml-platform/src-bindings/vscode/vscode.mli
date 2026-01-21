@@ -2308,6 +2308,20 @@ module RegisterCustomEditorProviderOptions : sig
   val create : ?supportsMultipleEditorsPerDocument:bool -> unit -> t
 end
 
+module ColorThemeKind : sig
+  type t =
+    | Light
+    | Dark
+    | HighContrast
+    | HighContrastLight
+end
+
+module ColorTheme : sig
+  include Js.T
+
+  val kind : t -> ColorThemeKind.t
+end
+
 module Window : sig
   val activeTextEditor : unit -> TextEditor.t option
 
@@ -2322,6 +2336,8 @@ module Window : sig
   val terminals : unit -> Terminal.t List.t
 
   val activeTerminal : unit -> Terminal.t option
+
+  val activeColorTheme : unit -> ColorTheme.t
 
   val onDidChangeActiveTerminal : unit -> Terminal.t option Event.t
 
