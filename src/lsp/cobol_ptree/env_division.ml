@@ -290,6 +290,7 @@ and organization =
   | OrganizationIndexed
   | OrganizationRelative
   | OrganizationSequential
+  | OrganizationLineSequential
 
 and record_delimiter =
   | Standard_1
@@ -579,6 +580,7 @@ let pp_organization ppf = function
   | OrganizationIndexed -> Fmt.pf ppf "INDEXED"
   | OrganizationRelative -> Fmt.pf ppf "RELATIVE"
   | OrganizationSequential -> Fmt.pf ppf "SEQUENTIAL"
+  | OrganizationLineSequential -> Fmt.pf ppf "LINE@ SEQUENTIAL"
 
 let pp_with_lock ppf = function
   | WithLockNone -> ()
