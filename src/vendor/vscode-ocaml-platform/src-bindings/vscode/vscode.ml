@@ -2999,6 +2999,36 @@ module RegisterCustomEditorProviderOptions = struct
       [@@js.builder]]
 end
 
+module ColorThemeKind = struct
+  type t =
+    | Light
+    | Dark
+    | HighContrast
+    | HighContrastLight
+
+  let t_of_js js =
+    match Ojs.int_of_js js with
+    | 1 -> Light
+    | 2 -> Dark
+    | 3 -> HighContrast
+    | 4 -> HighContrastLight
+    | _ -> Light
+
+  let t_to_js = function
+    | Light -> Ojs.int_to_js 1
+    | Dark -> Ojs.int_to_js 2
+    | HighContrast -> Ojs.int_to_js 3
+    | HighContrastLight -> Ojs.int_to_js 4
+end
+
+module ColorTheme = struct
+  include Interface.Make ()
+
+  include [%js:
+    val kind : t -> ColorThemeKind.t [@@js.get]
+  ]
+end
+
 module Window = struct
   module OnDidChangeActiveTextEditor = Event.Make (TextEditor)
   module OnDidChangeVisibleTextEditors = Event.Make (Js.List (TextEditor))
@@ -3028,6 +3058,9 @@ module Window = struct
 
     val activeTerminal : unit -> Terminal.t or_undefined
       [@@js.get "vscode.window.activeTerminal"]
+
+    val activeColorTheme : unit -> ColorTheme.t
+      [@@js.get "vscode.window.activeColorTheme"]
 
     val onDidChangeActiveTerminal : unit -> OnDidChangeActiveTerminal.t
       [@@js.get "vscode.window.onDidChangeActiveTerminal"]

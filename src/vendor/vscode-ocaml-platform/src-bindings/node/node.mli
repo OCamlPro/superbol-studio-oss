@@ -180,6 +180,8 @@ module Net : sig
 end
 
 module ChildProcess : sig
+  type t
+
   module Options : sig
     type t
 
@@ -198,6 +200,27 @@ module ChildProcess : sig
     | Stderr of string
     | Closed
     | ProcessError of JsError.t
+
+  (** Low-level API for long-running processes *)
+
+  val spawn_process : string -> string array -> ?options:Options.t -> unit -> t
+
+  val get_stdout : t -> Stream.Readable.t
+
+  val get_stderr : t -> Stream.Readable.t
+
+  val kill : t -> ?signal:string -> unit -> unit
+
+  val on :
+       t
+    -> [ `Close of code:int -> ?signal:string -> unit -> unit
+       | `Disconnect of unit -> unit
+       | `Error of err:JsError.t -> unit
+       | `Exit of code:int -> ?signal:string -> unit -> unit
+       ]
+    -> unit
+
+  (** High-level API that waits for process to complete *)
 
   val exec :
        ?logger:(event -> unit)
@@ -246,4 +269,10 @@ module Events : sig
     val prependOnceListener: t -> eventName: string -> listener: listener -> t
     val eventNames: t -> string list
   end
+end
+
+module Console : sig
+  val log : string -> unit
+  val warn : string -> unit
+  val error : string -> unit
 end
