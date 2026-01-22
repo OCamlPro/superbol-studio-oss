@@ -374,7 +374,7 @@ let item_definition acc ({ item_loc;
       field_layout;
       field_offset = item_offset;
       field_size;
-      field_length = Fixed_length;
+      field_length_variability = Fixed_length;
       field_conditions = List.rev item_rev_conditions;
       field_redefinitions = [] } &@ item_loc
   in
@@ -550,17 +550,17 @@ let on_redefinition_item acc item_clauses
       let acc =
         List.fold_left begin fun acc field_def ->
           match ~&field_def with
-          | Field { field_length = Variable_length; _ }
-          | Table { table_range = { range_span = Depending_span _;
-                                    _ }; _ }
-          | Table { table_field = { payload = { field_length = Variable_length;
-                                                _ }; _ }; _ } ->
+          | Field { field_length_variability = Variable_length; _ }
+          | Table { table_range = { range_span = Depending_span _; _ }; _ }
+          | Table { table_field =
+                      { payload = { field_length_variability = Variable_length;
+                                    _ }; _ }; _ } ->
               error acc @@
               Redefinition_of_ODO_item { redef_loc = loc;
                                          redef_name = item_name;
                                          redef_redefines = redefined_name;
                                          odo_item = field_def }
-          | Field { field_length = Fixed_length; _ }
+          | Field { field_length_variability = Fixed_length; _ }
           | Table _ ->
               acc                                                       (* ok *)
         end acc redefined_item.item_rev_fields

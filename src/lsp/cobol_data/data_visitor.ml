@@ -171,7 +171,7 @@ and fold_field_definition (v: _ #folder) =
                           field_leading_ranges;
                           field_offset; field_size; field_layout;
                           field_conditions; field_redefinitions;
-                          field_length = _ } x -> x
+                          field_length_variability = _ } x -> x
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
       >> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_redefines
       >> fold_list ~fold:fold_table_range v field_leading_ranges

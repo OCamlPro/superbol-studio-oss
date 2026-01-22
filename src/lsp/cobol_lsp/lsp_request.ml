@@ -737,7 +737,7 @@ let codelens_positions ~uri group =
                                       field_leading_ranges;
                                       field_offset; field_size; field_layout;
                                       field_conditions; field_redefinitions;
-                                      field_length = _ } acc =
+                                      field_length_variability = _ } acc =
         ignore(field_redefines, field_leading_ranges, field_offset, field_size);
         skip @@ begin acc
           |> Cobol_ptree.Terms_visitor.fold_qualname'_opt v field_qualname
