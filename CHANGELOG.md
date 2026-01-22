@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Syntactic support for `LINE SEQUENTIAL` file organization [#485](https://github.com/OCamlPro/superbol-studio-oss/pull/485)
 - Dedicated library for the OCaml code of the extension [#478](https://github.com/OCamlPro/superbol-studio-oss/pull/478)
 - Support for customized GnuCOBOL configuration file, via the `dialect` setting [#464](https://github.com/OCamlPro/superbol-studio-oss/pull/464)
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)

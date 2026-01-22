@@ -992,9 +992,10 @@ let organization_clause :=
  | io(ORGANIZATION; IS?; {}); ~ = organization; <SelectOrganization>
 
 let organization :=
- | INDEXED;           {OrganizationIndexed}
- | RELATIVE;          {OrganizationRelative}
- | LINE?; SEQUENTIAL; {OrganizationSequential}         (* LINE for microfocus *)
+ | INDEXED;          {OrganizationIndexed}
+ | RELATIVE;         {OrganizationRelative}
+ | SEQUENTIAL;       {OrganizationSequential}
+ | LINE; SEQUENTIAL; {OrganizationLineSequential}      (* LINE for microfocus *)
 
 let padding_character_clause :=                                    (* -COB2002 *)
  | PADDING; CHARACTER?; IS?; ~ = qualname_or_alphanum;
