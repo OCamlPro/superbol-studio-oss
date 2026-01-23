@@ -23,9 +23,32 @@ end
 
 let current_instance = ref None
 
+let check_first_run (context : Vscode.ExtensionContext.t) =
+  let global_state = Vscode.ExtensionContext.globalState context in
+  let key = "superbol.hasShownWelcome" in
+  match Vscode.Memento.get global_state ~key with
+  | Some _ -> ()
+  | None ->
+    let _ =
+      let* () = Vscode.Memento.update global_state ~key
+          ~value:(Ojs.bool_to_js true) in
+      let options = Vscode.MessageOptions.create ~modal:true () in
+      let* _ = Vscode.Window.showInformationMessage
+          ~message:"Welcome to SuperBOL! Enter a license key to unlock Pro features."
+          ~options
+          ~choices:[
+            ("Enter License Key", `EnterKey);
+            ("Continue", `Continue);
+          ] () in
+      Promise.return ()
+    in
+    ()
+
 let activate ~lsp_server_prefix (extension: Vscode.ExtensionContext.t) =
   let instance = Superbol_instance.make ~lsp_server_prefix ~context:extension in
   current_instance := Some instance;
+
+  check_first_run extension;
 
   Superbol_instance.subscribe_disposable instance @@
   Vscode.Tasks.registerTaskProvider
