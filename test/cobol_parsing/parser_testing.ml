@@ -13,50 +13,7 @@
 
 module StrMap = EzCompat.StringMap
 
-let preproc
-    ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
-    contents
-  =
-  Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;
-  String { filename; contents } |>
-  Cobol_preproc.preprocessor
-    ~options:Cobol_preproc.Options.{
-        default with
-        source_format
-      }
-
-let options
-    ?(verbose = false)
-    ?(exec_scanners = Superbol_preprocs.exec_scanners) () =
-  {
-    (Cobol_parser.Options.default ~exec_scanners) with
-    verbose;
-    recovery = EnableRecovery { silence_benign_recoveries = true }
-  }
-
-
-let show_parsed_tokens ?(parser_options = options ())
-    ?(with_locations = false) ?source_format ?filename contents =
-  let { result = WithArtifacts (_, { tokens; _ }); _ } =
-    preproc ?source_format ?filename contents |>
-    Cobol_parser.parse_with_artifacts ~options:parser_options
-  in
-  (if with_locations
-   then Cobol_parser.Tokens.pp'_list_with_loc_info ~fsep:"@\n"
-   else Cobol_parser.Tokens.pp'_list) Fmt.stdout (Lazy.force tokens)
-
-let show_diagnostics ?(parser_options = options ())
-    ?source_format ?filename contents =
-  preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple ~options:parser_options |>
-  Cobol_parser.Outputs.sink_result ~set_status:false ~ppf:Fmt.stdout
-
-let just_parse ?(parser_options = options ())
-    ?source_format ?filename contents =
-  preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple ~options:parser_options |>
-  ignore
+include Prog_parser
 
 (* --- *)
 
@@ -146,7 +103,7 @@ let triplewise positions =
 (** Note: won't show detailed source locations as the openned file is neither
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
-    ?(parser_options = options ())
+    ?(parser_options = Prog_parser.options ())
     ?(source_format = Cobol_config.(SF SFFixed))
     ?config
     prog
@@ -279,7 +236,7 @@ let iteratively_append_chunks_stuttering ?config ~f
 let simulate_cut_n_paste ?config ~f0 ~f ?verbose ?(repeat = 1)
     (prog, positions) =
   Random.init 42;
-  let parser_options = options ?verbose () in
+  let parser_options = Prog_parser.options ?verbose () in
   let ptree0, diags, rewinder = rewindable_parse ~parser_options ?config prog in
   f0 ~ptree0 diags;
   let positions = Array.of_list positions.pos_anonymous in

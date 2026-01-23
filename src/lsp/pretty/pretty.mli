@@ -27,6 +27,7 @@ include module type of Types
 val print: Format.formatter -> 'a proc
 val out: 'a proc
 val error: 'a proc
+val sink: 'a proc
 val delayed: ('a, delayed) func
 val delayed_to: (delayed -> 'b) -> ('a, 'b) func
 val pp_set_margin: Format.formatter -> int -> unit

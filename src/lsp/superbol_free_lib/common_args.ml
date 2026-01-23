@@ -23,6 +23,7 @@ open Cobol_parser.Options
 type t = {
   preproc_options: preproc_options;
   parser_options: parser_options;
+  pretty_verbose: 'a. 'a Pretty.proc;
 }
 
 let showable =
@@ -50,7 +51,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
                 (list ~fopen:"" ~fsep:",@ " ~fclose:"" string)
                 (StringSet.elements unknowns))
 
-let get () =
+let get ?(verbose_on = `Stdout) () =
   let conf = ref "" in
   let dialect = ref None in
   let format = ref Cobol_config.Auto in
@@ -175,7 +176,11 @@ let get () =
                               ~libexts:!libexts;
                           env };
       parser_options = { config; recovery; verbose; show = !show;
-                         exec_scanners = Superbol_preprocs.exec_scanners } }
+                         exec_scanners = Superbol_preprocs.exec_scanners };
+      pretty_verbose = match verbose_on with
+        | `Stdout -> Pretty.out
+        | `Stderr -> Pretty.error
+        | `Stdnul -> Pretty.sink }
 
   in
   get, args

@@ -10,13 +10,12 @@
     ok_redefines  ko_redefines
     ok_conditions ko_conditions
                   ko_proc_names
-                  ko_syntax
-    prog_printer)
+                  ko_syntax)
  (preprocess
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries cobol_typeck typeck_testing)
+ (libraries cobol_typeck typeck_testing testing_utils)
  )
 
 (library
