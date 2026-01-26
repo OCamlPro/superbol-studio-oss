@@ -14,7 +14,7 @@ open Ezcmd.V2
 open EZCMD.TYPES
 open Common_args
 
-let typeck_file { preproc_options; parser_options } filename =
+let typeck_file { preproc_options; parser_options; _ } filename =
   Cobol_preproc.Input.from ~filename
     ~f: begin fun input ->
       input

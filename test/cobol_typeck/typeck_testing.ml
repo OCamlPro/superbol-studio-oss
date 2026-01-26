@@ -11,19 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Parser_testing
-
-module DIAGS = Cobol_common.Diagnostics
-
 let show_diagnostics ?(show_data = false)
-    ?(parser_options = Parser_testing.options ())
-    ?source_format ?filename contents =
-  preproc ?source_format ?filename contents |>
-  Cobol_parser.parse_simple ~options:parser_options |>
-  Cobol_parser.Outputs.translate_diags |>
-  DIAGS.map_result ~f:Cobol_typeck.compilation_group |>
-  DIAGS.more_result ~f:Cobol_typeck.Results.translate_diags |>
-  DIAGS.show_n_forget ~set_status:false ~ppf:Fmt.stdout |>
+    ?parser_options ?source_format ?filename contents =
+  Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout |>
   begin fun Cobol_typeck.Outputs.{ group; _ } ->
     if show_data then
       Cobol_unit.Visitor.fold_unit_group object

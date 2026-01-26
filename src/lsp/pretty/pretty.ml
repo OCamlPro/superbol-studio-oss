@@ -46,6 +46,10 @@ let print: Format.formatter -> 'a proc = Fmt.pf
 (** [out] is a synonym for {!Format.printf}. *)
 let out: 'a proc = Fmt.pr
 
+(** [sink] is a synonym for [Format.ifprintf Fmt.stdout] (that silently ignores
+    its inputs). *)
+let sink: _ proc = fun fmt -> Format.ifprintf Fmt.stdout fmt
+
 (** [error] is a synonym for {!Format.eprintf}. *)
 let error: 'a proc = Fmt.epr
 

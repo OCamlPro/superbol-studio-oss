@@ -1,7 +1,7 @@
 (library
  (name preproc_testing)
  (modules Preproc_testing)
- (libraries cobol_preproc)
+ (libraries cobol_preproc testing_utils)
  )
 
 (library
