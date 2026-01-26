@@ -21,7 +21,7 @@ type elementary_size =
   | Size_of_pointer
 [@@deriving show, ord]
 
-type symbolic_var = private
+type symbolic_var =
   | Valof of Cobol_ptree.qualname
 [@@deriving show, ord]
 
@@ -37,6 +37,21 @@ type offset = size
 exception NON_LINEAR of symbolic_var Cobol_common.Basics.NEL.t
 exception NOT_SCALAR of [ `Vars of symbolic_var Cobol_common.Basics.NEL.t
                         | `Consts of elementary_size Cobol_common.Basics.NEL.t ]
+
+(* symbolic variable valuations *)
+
+module SymbolicVarMap: Map.S with type key = symbolic_var
+type valuation = int SymbolicVarMap.t
+
+val valuation_of_list: (Cobol_ptree.qualname * int) list -> valuation
+
+(* architecture-specific memory configurations *)
+
+module ElementarySizeMap: Map.S with type key = elementary_size
+
+type memory_config = int ElementarySizeMap.t
+
+val amd64_memory_config: memory_config
 
 (* --- *)
 
@@ -58,7 +73,7 @@ val size_of_index: size
 val size_of_pointer: size
 
 (** Raises {!NOT_SCALAR} in case of failure. *)
-val as_bits: size -> int
+val as_bits: ?memory_config:memory_config -> size -> int
 
 val add: size -> size -> size
 val diff: size -> size -> size
@@ -68,6 +83,10 @@ val increase: size -> by:size -> size
 val repeat: size -> by:factor -> size
 
 val mult_int: size -> int -> size
+
+val assign_value: Cobol_ptree.qualname -> int -> size -> size
+val assign_values: valuation -> size -> size
+val assign_consts: memory_config -> size -> size
 
 (* --- *)
 
