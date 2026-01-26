@@ -23,6 +23,8 @@ module type LINEXPR = sig
   type linexpr
   type var
   type const
+  type 'a valuation
+  type const_values
   exception NON_LINEAR of var NEL.t
   exception NOT_SCALAR of [ `Vars of var NEL.t | `Consts of const NEL.t ]
   val pp_factor: factor Pretty.printer
@@ -35,15 +37,25 @@ module type LINEXPR = sig
   val add: linexpr -> linexpr -> linexpr
   val sub: linexpr -> linexpr -> linexpr
   val mult: linexpr -> by:factor -> linexpr
-  val as_int: linexpr -> int
+  val as_int: ?const_values:const_values -> linexpr -> int
+  val subst_vars: linexpr -> int valuation -> linexpr
+  val subst_consts: linexpr -> const_values -> linexpr
 end
 
 module Linear_exprs (Var: SYMBOL) (Const: SYMBOL)
   : LINEXPR with type var := Var.t
-             and type const := Const.t =
+             and type const := Const.t
+             and type 'a valuation := 'a Map.Make (Var).t
+             and type const_values := int Map.Make (Const).t =
 struct
   type var = Var.t
   type const = Const.t
+
+  module VarMap = Map.Make (Var)
+  type 'a valuation = 'a VarMap.t
+
+  module ConstMap = Map.Make (Const)
+  type const_values = int ConstMap.t
 
   module Factor_group = struct
     type t =
@@ -216,5 +228,48 @@ struct
   let add = add_terms
   let sub = sub_terms
   let mult = mult_factors
+
+  (* --- *)
+
+  let subst_vars_in_factors (f: factors) (valuation: int valuation) : factors =
+    let f', n =
+      Factors.fold begin fun fg m (acc, n) ->
+        match fg with
+        | N ->
+            acc, n + m
+        | S s ->
+            match VarMap.find_opt s valuation with
+            | Some i ->
+                acc, n + m * i
+            | None ->
+                Factors.add fg m acc, n
+      end f (Factors.empty, 0)
+    in
+    add_factors f' @@ int n
+
+  let subst_vars (l: linexpr) (valuation: int valuation) : linexpr =
+    Terms.filter_map begin fun _ f ->
+      elim_empty @@ subst_vars_in_factors f valuation
+    end l
+
+  let subst_consts (l: linexpr) (const_values: const_values) : linexpr =
+    let t', g =
+      Terms.fold begin fun tg f (acc, g) ->
+        match tg with
+        | Unit ->
+            acc, add_factors f g
+        | E c ->
+            match ConstMap.find_opt c const_values with
+            | Some i ->
+                acc, add_factors (mult_factors_with_scalar f i) g
+            | None ->
+                Terms.add tg f acc, g
+      end l (Terms.empty, int 0)
+    in
+    add_terms t' @@ factor g
+
+  let as_int ?const_values l =
+    as_int @@
+    match const_values with None -> l | Some consts -> subst_consts l consts
 
 end

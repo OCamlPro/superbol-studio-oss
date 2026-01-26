@@ -16,8 +16,8 @@ module NEL = Cobol_common.Basics.NEL
 
 module Memory = Cobol_data.Memory
 
-let show_size size =
-  Pretty.out "@[%a@]@." Memory.pp_size size
+let show_size ?name size =
+  Pretty.out "@[%a%a@]@." Fmt.(option (fmt "%s = ")) name Memory.pp_size size
 
 let show_factor factor =
   Pretty.out "@[%a@]@." Memory.pp_factor factor
@@ -111,22 +111,35 @@ let%expect_test "valof-size" =
   show_factor Memory.(valof Term.(name "A"));
   [%expect  {| (valof A) |}];;
 
-let%expect_test "valof-size" =
+let%expect_test "valof-size/substitutions" =
   let a = Term.name "A" and b = Term.name "B" in
   show_size Memory.(valof_size a |>
                     increase ~by:(valof_size b));
-  show_size Memory.(valof_size a |>
+  let x = Memory.(valof_size a |>
                     increase ~by:(valof_size b) |>
                     increase ~by:(valof_size a) |>
-                    increase ~by:(valof_size b));
-  show_size Memory.(valof_size a |>
-                    increase ~by:(valof_size b) |>
-                    increase ~by:(valof_size a) |>
-                    increase ~by:(repeat (valof_size b) ~by:(int 5)) |>
-                    increase ~by:(const_size 42));
+                    increase ~by:(valof_size b)) in
+  show_size ~name:"X"
+    x;
+  show_size ~name:"X[A=0]"
+    Memory.(assign_value Term.(name "A") 0 x);
+  show_size ~name:"X[B=0]"
+    Memory.(assign_value b 0 x);
+  show_size ~name:"X[A=1,B=0]"
+    Memory.(x |>
+            assign_values @@ valuation_of_list [a, 1; b, 0]);
+  show_size
+    Memory.(valof_size a |>
+            increase ~by:(valof_size b) |>
+            increase ~by:(valof_size a) |>
+            increase ~by:(repeat (valof_size b) ~by:(int 5)) |>
+            increase ~by:(const_size 42));
   [%expect  {|
     (+ (valof A) (valof B))
-    (+ (* 2 (valof A)) (* 2 (valof B)))
+    X = (+ (* 2 (valof A)) (* 2 (valof B)))
+    X[A=0] = (* 2 (valof B))
+    X[B=0] = (* 2 (valof A))
+    X[A=1,B=0] = 2
     (+ 42 (* 2 (valof A)) (* 6 (valof B))) |}];;
 
 let%expect_test "hybrid-size" =
@@ -181,3 +194,40 @@ let%expect_test "non-linear-size" =
   [%expect  {|
     non-linearity: (valof A)
     non-linearity: (valof A), (valof B) |}];;
+
+let%expect_test "elementary-sizes" =
+  show_size ~name:"C-long"
+    Memory.size_of_C_long;
+  show_size ~name:"C-long{amd64|bits}"
+    Memory.(assign_consts amd64_memory_config size_of_C_long);
+  show_size ~name:"C-long*3{amd64|bits}"
+    Memory.(size_of_C_long |>
+            repeat ~by:(int 3) |>
+            assign_consts amd64_memory_config);
+  [%expect  {|
+    C-long = size-of-C-long
+    C-long{amd64|bits} = 64
+    C-long*3{amd64|bits} = 192 |}];;
+
+let%expect_test "valof-n-elementary-size/substitutions" =
+  let a = Term.name "A" and b = Term.name "B" in
+  let x = Memory.(valof_size a |>
+                  increase ~by:size_of_C_long |>
+                  repeat ~by:(int 2) |>
+                  increase ~by:(valof_size b)) in
+  show_size ~name:"X" x;
+  show_size ~name:"X[A=0,B=0]"
+    Memory.(x |>
+            assign_values @@ valuation_of_list [a, 0; b, 0]);
+  show_size ~name:"X[A=3,B=4]"
+    Memory.(x |>
+            assign_values @@ valuation_of_list [a, 3; b, 4]);
+  show_size ~name:"X[A=3,B=4]{amd64}"
+    Memory.(x |>
+            assign_values @@ valuation_of_list [a, 3; b, 4] |>
+            assign_consts amd64_memory_config);
+  [%expect  {|
+    X = (+ (* 2 (valof A)) (valof B) (* 2 size-of-C-long))
+    X[A=0,B=0] = (* 2 size-of-C-long)
+    X[A=3,B=4] = (+ 10 (* 2 size-of-C-long))
+    X[A=3,B=4]{amd64} = 138 |}];;
