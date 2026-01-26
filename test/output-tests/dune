@@ -18,12 +18,6 @@
  (libraries cobol_parser testsuite_utils)
  )
 
-(library
- (name testsuite_utils)
- (modules Testsuite_utils)
- (libraries ez_file cobol_common cobol_config superbol_preprocs)
- )
-
 (alias
  (name buildtest)
  (deps preproc.exe gnucobol.exe))

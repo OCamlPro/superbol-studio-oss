@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,13 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type t = {
-  preproc_options: Cobol_preproc.Options.preproc_options;
-  parser_options: Cobol_parser.Options.parser_options;
-  pretty_verbose: 'a. 'a Pretty.proc;
-}
-
-(** [verbose_on] specifies where formatted output via [pretty_verbose] goes.
-    The default behavior is [stdout].  Use [`Stdnul] to ignore such outputs. *)
-val get : ?verbose_on:[`Stderr | `Stdout | `Stdnul] -> unit ->
-  (unit -> t) * Ezcmd.V2.EZCMD.TYPES.arg_list
+let typeck ?parser_options ?source_format ?filename contents =
+  Prog_parser.parse ?parser_options ?source_format ?filename contents |>
+  Cobol_parser.Outputs.translate_diags |>
+  Cobol_common.Diagnostics.map_result
+    ~f:Cobol_typeck.compilation_group |>
+  Cobol_common.Diagnostics.more_result
+    ~f:Cobol_typeck.Results.translate_diags

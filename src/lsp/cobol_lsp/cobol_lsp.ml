@@ -34,6 +34,7 @@ module Request = Lsp_request
 module Lookup = Lsp_lookup
 module Utils = Lsp_utils
 module Error = Lsp_error
+module IO = Lsp_io
 
 (* --- *)
 
