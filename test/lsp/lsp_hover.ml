@@ -24,7 +24,7 @@ let print_hovered server ~projdir (prog, prog_positions) =
       position.line position.character;
     match
       LSP.Request.INTERNAL.hover server params
-        ~always_show_hover_text_in_data_div:true
+        ~always_show_hover_definition_text_in_data_div:true
     with
     | None ->
         Pretty.out "Hovering nothing worthy@."
