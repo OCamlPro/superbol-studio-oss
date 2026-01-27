@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Display reference count in hover information for data items [#429](https://github.com/OCamlPro/superbol-studio-oss/pull/429) (fix for [Issue #354](https://github.com/OCamlPro/superbol-studio-oss/issues/354))
 - Dedicated libraries for testing internal behaviors of the LSP server [#487](https://github.com/OCamlPro/superbol-studio-oss/pull/487)
 - Syntactic support for `LINE SEQUENTIAL` file organization [#485](https://github.com/OCamlPro/superbol-studio-oss/pull/485)
 - Dedicated library for the OCaml code of the extension [#478](https://github.com/OCamlPro/superbol-studio-oss/pull/478)

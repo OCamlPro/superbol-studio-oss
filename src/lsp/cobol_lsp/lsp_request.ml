@@ -574,8 +574,9 @@ let lookup_data_definition_for_hover cu_name element_at_pos group =
   with Cobol_unit.Qualmap.Ambiguous _ -> raise Not_found
 
 let data_definition_on_hover
-    ?(always_show_hover_text_in_data_div = false) ~rev_comments
-    ~uri position Cobol_typeck.Outputs.{ group; _ } =
+    ?(always_show_hover_definition_text_in_data_div = false) ~rev_comments
+    ~uri position (checked_doc : Cobol_typeck.Outputs.t) =
+  let Cobol_typeck.Outputs.{ group; _ } = checked_doc in
   let filename = Lsp.Uri.to_path uri in
   match Lsp_lookup.element_at_position ~uri position group with
   | { element_at_position = None; _ }
@@ -587,15 +588,23 @@ let data_definition_on_hover
         let data_def, hover_loc
           = lookup_data_definition_for_hover cu_name ele_at_pos group in
         let doc_comments = doc_of_datadef ~rev_comments ~filename data_def in
-        if always_show_hover_text_in_data_div ||
-           not (Lsp_position.is_in_srcloc ~filename position @@
-                Cobol_data.Item.def_loc data_def)
-        then Some (Pretty.to_string "%a%s"
-                     Lsp_data_info_printer.pp_data_definition data_def doc_comments,
-                   hover_loc)
-        else None
+        let text =
+          if always_show_hover_definition_text_in_data_div ||
+             not (Lsp_position.is_in_srcloc ~filename position @@
+                  Cobol_data.Item.def_loc data_def)
+          then Some (Pretty.to_string "%a%s"
+                       Lsp_data_info_printer.pp_data_definition data_def doc_comments)
+          else None
+        in
+        Some (text, hover_loc)
       with Not_found ->
         None
+
+let data_references_on_hover ~rootdir ~textDocument position checked_doc =
+  let context = ReferenceContext.create ~includeDeclaration:true in
+  let params = ReferenceParams.create ~context ~position ~textDocument () in
+  lookup_references_in_doc ~rootdir params checked_doc
+  |> Option.map List.length
 
 
 let hover_markdown ~filename ~loc value =
@@ -640,22 +649,39 @@ let preproc_info_on_hover ~filename position pplog =
   | None ->
       None
 
-let handle_hover ?always_show_hover_text_in_data_div
+let handle_hover ?always_show_hover_definition_text_in_data_div
     registry HoverParams.{ textDocument = doc; position; _ } =
   let filename = Lsp.Uri.to_path doc.uri in
   try_with_checked_doc registry doc
-    ~f:begin fun ~doc:{ artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
+    ~f:begin fun ~doc:{ project; artifacts = { pplog; rev_comments; _ }; _ } checked_doc ->
+      let rootdir = Lsp_project.(string_of_rootdir @@ rootdir project) in
+      let ref_count () =
+        data_references_on_hover ~rootdir ~textDocument:doc position checked_doc
+      in
       match data_definition_on_hover ~uri:doc.uri position checked_doc
-              ?always_show_hover_text_in_data_div ~rev_comments,
+              ?always_show_hover_definition_text_in_data_div ~rev_comments,
             preproc_info_on_hover ~filename position pplog with
       | None, None ->
           None
-      | None, Some (text, loc) | Some (text, loc), None ->
+      | Some (None, loc), None ->
+          Option.bind (ref_count ()) @@ fun n ->
+          hover_markdown ~filename ~loc @@ Printf.sprintf "References: %d" n
+      | None, Some (text, loc) ->
           hover_markdown ~filename ~loc text
-      | Some(info_text, loc), Some(pp_text, _) ->
+      | Some (Some text, loc), None ->
+          let ref_text =
+            Option.fold ~none:"" ~some:(Printf.sprintf "\n\n---\nReferences: %d")
+              (ref_count ()) in
+          hover_markdown ~filename ~loc @@ text ^ ref_text
+      | Some (def_text, loc), Some (pp_text, _) ->
+          let ref_text =
+            Option.fold ~none:"" ~some:(Printf.sprintf "\n\n---\nReferences: %d")
+              (ref_count ()) in
           hover_markdown ~filename ~loc @@
-          Pretty.to_string "%s\n---\nAdditional pre-processing:\n%s"
-            info_text pp_text
+          Pretty.to_string "%s%s\n---\nAdditional pre-processing:\n%s"
+            (Option.value ~default:"" def_text)
+            ref_text
+            pp_text
     end
 
 (** {3 Completion} *)

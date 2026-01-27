@@ -173,10 +173,10 @@ and pp_field_definition: field_definition Pretty.printer = fun ppf x ->
     const pp_qualname_opt_in_block' x.field_qualname
     ++ any "\n\n"
     ++ const pp_field_layout x.field_layout
-    ++ match x.field_layout with
-    | Struct_field _ -> any "\n\n" ++ const pp_size x.field_size
-    | _ -> nop
-    ++ any "\n\n"
+    ++ (match x.field_layout with
+    | Struct_field _ -> any "  \n" ++ const pp_size x.field_size
+    | _ -> nop)
+    ++ any "  \n"
     ++ const (option (any "Redefines:\n" ++ pp_cobol_block Cobol_ptree.pp_qualname')) x.field_redefines)
   ppf x
 
@@ -227,9 +227,9 @@ let pp_record_renaming: record_renaming Pretty.printer = fun ppf r ->
       ++ const (option (any "\nTHRU " ++ Cobol_ptree.pp_qualname')) r.renaming_thru)
     ++ any "\n\n"
     ++ const pp_renamed_item_layout r.renaming_layout
-    ++ match r.renaming_layout with
-    | Renamed_struct _ -> any "\n\n" ++ const pp_size r.renaming_size
-    | _ -> nop )
+    ++ (match r.renaming_layout with
+    | Renamed_struct _ -> any "  \n" ++ const pp_size r.renaming_size
+    | _ -> nop) )
   ppf r
 
 let pp_record_renaming': record_renaming with_loc Pretty.printer = fun ppf ->
