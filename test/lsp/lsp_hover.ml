@@ -14,7 +14,8 @@
 open Lsp.Types
 open Lsp_testing
 
-let print_hovered server ~projdir (prog, prog_positions) =
+let print_hovered ?(always_show_hover_definition_text_in_data_div=true)
+    server ~projdir (prog, prog_positions) =
   let server, prog = add_cobol_doc server ~projdir "prog.cob" prog in
   let location_as_srcloc = new srcloc_resuscitator_cache in
   let hover_position ?key position =
@@ -24,7 +25,7 @@ let print_hovered server ~projdir (prog, prog_positions) =
       position.line position.character;
     match
       LSP.Request.INTERNAL.hover server params
-        ~always_show_hover_definition_text_in_data_div:true
+        ~always_show_hover_definition_text_in_data_div
     with
     | None ->
         Pretty.out "Hovering nothing worthy@."
@@ -1360,3 +1361,31 @@ let%expect_test "hover-comment-copy" =
     ALPHANUMERIC(1)
     ---
     References: 2 |}]
+
+let%expect_test "hover-data-division-ref-count-only" =
+  let { projdir; end_with_postproc }, server = make_lsp_project () in
+  print_hovered ~always_show_hover_definition_text_in_data_div:false
+    server ~projdir @@ extract_position_markers {cobol|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 VA_|_R PIC X.
+       PROCEDURE DIVISION.
+          DISPLAY VAR.
+          DISPLAY VAR.
+          STOP RUN.
+    |cobol};
+  end_with_postproc [%expect.output];
+  [%expect {|
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    (line 5, character 12):
+    __rootdir__/prog.cob:6.10-6.13:
+       3          PROGRAM-ID. prog.
+       4          DATA DIVISION.
+       5          WORKING-STORAGE SECTION.
+       6 >        01 VAR PIC X.
+    ----             ^^^
+       7          PROCEDURE DIVISION.
+       8             DISPLAY VAR.
+    References: 3 |}]
