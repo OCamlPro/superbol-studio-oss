@@ -51,7 +51,7 @@ endif
 
 build-deps:
 	if ! [ -e _opam ]; then \
-	   opam switch create . 4.14.1 --no-install ; \
+	   opam switch create . 4.14.2 --no-install ; \
 	fi
 	opam install ./opam/*.opam --deps-only
 

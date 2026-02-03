@@ -19,7 +19,7 @@ SuperBOL with.
 
 .. code-block:: sh
 
-  opam switch create superbol-studio 4.14.1
+  opam switch create superbol-studio 4.14.2
   # you can change the `superbol-studio` by any name you want, just replace it
   # in the following occurences
 
