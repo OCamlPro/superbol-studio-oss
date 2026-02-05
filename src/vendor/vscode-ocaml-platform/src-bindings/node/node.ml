@@ -184,7 +184,13 @@ module Fs = struct
 
     val exists : string -> bool Promise.t [@@js.global "fs.exists"]
 
-    val existsSync : string -> bool [@@js.global "fs.existsSync"]]
+    val existsSync : string -> bool [@@js.global "fs.existsSync"]
+
+    val writeFileSync : string -> string -> unit [@@js.global "fs.writeFileSync"]
+
+    val mkdirSync : string -> recursive:bool -> unit [@@js.global "fs.mkdirSync"]
+
+    val unlinkSync : string -> unit [@@js.global "fs.unlinkSync"]]
 
   let readDir path =
     readDir path
