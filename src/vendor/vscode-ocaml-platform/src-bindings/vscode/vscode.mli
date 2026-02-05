@@ -1709,6 +1709,36 @@ module MessageOptions : sig
   val create : ?modal:bool -> unit -> t
 end
 
+
+module OpenDialogOptions : sig
+  include Js.T
+
+  val canSelectFiles : t -> bool option
+
+  val canSelectFolders : t -> bool option
+
+  val canSelectMany : t -> bool option
+
+  val defaultUri : t -> string option
+
+  val filters : t -> (string * string list) list
+
+  val openLabel : t -> string
+
+  val title : t -> string option
+
+  val create :
+       ?canSelectFiles:bool
+    -> ?canSelectFolders:bool
+    -> ?canSelectMany:bool
+    -> ?defaultUri:string
+    -> ?filters:((string * string list) list)
+    -> ?openLabel:string
+    -> ?title:string
+    -> unit
+    -> t
+end
+
 module Progress : sig
   include Js.T
 
@@ -2372,6 +2402,11 @@ module Window : sig
     -> ?choices:(string * 'a) list
     -> unit
     -> 'a option Promise.t
+
+  val showOpenDialog :
+       ?options:OpenDialogOptions.t
+    -> unit
+    -> Uri.t array option Promise.t
 
   val showQuickPickItems :
        choices:(QuickPickItem.t * 'a) list
