@@ -21,5 +21,6 @@ type output =
 
 val of_compilation_unit
   : data_definitions: Cobol_unit.Types.data_definitions
+  -> fold_exec_block': Typeck_outputs.fold_exec_block'
   -> Cobol_ptree.compilation_unit with_loc
   -> output * Typeck_diagnostics.t

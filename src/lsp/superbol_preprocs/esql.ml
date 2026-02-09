@@ -34,3 +34,23 @@ let scanner =
   Cobol_parser.Options.Stateless_exec_scanner (fun text ->
     Esql_exec_block (Sql_parser.parse text) , []
   )
+
+let fold_exec_block': Cobol_typeck.Outputs.fold_exec_block'
+  = fun ~register_name exec_block acc ->
+    match exec_block.payload with
+    | Esql_exec_block esql ->
+      let cob_var_extractor_folder = object
+        inherit [Sql_ast.cobolVarId list] Sql_ast.Visitor.folder
+        method! fold_cobol_var_id cob_var acc =
+          Cobol_common.Visitor.skip (cob_var::acc)
+      end in
+      let cobol_vars =
+        Sql_ast.Visitor.fold_esql_instruction cob_var_extractor_folder
+          esql []
+      in
+      List.fold_left begin fun acc cobol_var_id ->
+        register_name cobol_var_id acc
+      end acc cobol_vars
+    | _ -> acc
+
+
