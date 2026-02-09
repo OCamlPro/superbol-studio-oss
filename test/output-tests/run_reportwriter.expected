@@ -1,26 +1,6 @@
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:82:0
-run_reportwriter.at-82-prog.cob:11.44-11.52:
-   8          ENVIRONMENT DIVISION.
-   9          INPUT-OUTPUT SECTION.
-  10          FILE-CONTROL.
-  11 >            SELECT REPORT-FILE     ASSIGN TO EXTERNAL PRINTOUT
-----                                               ^^^^^^^^
-  12                                          LINE SEQUENTIAL.
-  13          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:115:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:163:0
-run_reportwriter.at-163-prog.cob:11.49-11.57:
-   8          ENVIRONMENT DIVISION.
-   9          INPUT-OUTPUT SECTION.
-  10          FILE-CONTROL.
-  11 >            SELECT REPORT-FILE          ASSIGN TO EXTERNAL PRINTOUT
-----                                                    ^^^^^^^^
-  12                                          LINE SEQUENTIAL.
-  13          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:184:0
 run_reportwriter.at-184-reference:4.6-4.7:
    1   
@@ -43,16 +23,6 @@ run_reportwriter.at-184-reference:4.7-4.20:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:232:0
-run_reportwriter.at-232-prog.cob:12.49-12.57:
-   9          ENVIRONMENT DIVISION.
-  10          INPUT-OUTPUT SECTION.
-  11          FILE-CONTROL.
-  12 >            SELECT REPORT-FILE          ASSIGN TO EXTERNAL PRINTOUT
-----                                                    ^^^^^^^^
-  13                                          LINE SEQUENTIAL.
-  14          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:253:0
 run_reportwriter.at-253-reference:4.6-4.7:
    1   
@@ -75,28 +45,8 @@ run_reportwriter.at-253-reference:4.7-4.20:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:313:0
-run_reportwriter.at-313-prog.cob:11.49-11.57:
-   8          ENVIRONMENT DIVISION.
-   9          INPUT-OUTPUT SECTION.
-  10          FILE-CONTROL.
-  11 >            SELECT REPORT-FILE          ASSIGN TO EXTERNAL PRINTOUT
-----                                                    ^^^^^^^^
-  12                                          LINE SEQUENTIAL.
-  13          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:322:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:371:0
-run_reportwriter.at-371-prog.cob:8.33-8.41:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >        SELECT report-file ASSIGN EXTERNAL PRINTOUT
-----                                    ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:383:0
 run_reportwriter.at-383-reference:1.31-1.32:
    1 > hello                          <--->
@@ -113,16 +63,6 @@ run_reportwriter.at-383-reference:2.6-2.7:
 >> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:440:0
-run_reportwriter.at-440-prog.cob:7.33-7.41:
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7 >        SELECT report-file ASSIGN EXTERNAL PRINTOUT
-----                                    ^^^^^^^^
-   8               ORGANIZATION LINE SEQUENTIAL.
-   9   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:455:0
 run_reportwriter.at-455-reference:1.31-1.32:
    1 > hello                          <--->
@@ -690,56 +630,6 @@ run_reportwriter.at-632-inp_data:55.6-55.7:
 >> Error: Unexpected indicator: `.'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:630:0
-run_reportwriter.at-630-prog.cob:16.25-16.33:
-  13          FILE-CONTROL.
-  14         
-  15              SELECT TRANSACTION-DATA
-  16 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-630-prog.cob:20.25-20.33:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  21         
-  22          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-630-prog.cob:20.34-20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  21         
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-630-prog.cob:20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  21         
-  22          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-630-prog.cob:20.39-20.48:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  21         
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:770:0
 run_reportwriter.at-770-reference:1.26-1.27:
    1 >                           C U S T O M E R  C H A R G E  R E P O R T
@@ -1317,56 +1207,6 @@ run_reportwriter.at-985-inp_data:55.6-55.7:
 >> Error: Unexpected indicator: `.'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:983:0
-run_reportwriter.at-983-prog.cob:15.25-15.33:
-  12          FILE-CONTROL.
-  13         
-  14              SELECT TRANSACTION-DATA
-  15 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-983-prog.cob:19.25-19.33:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  20         
-  21          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-983-prog.cob:19.34-19.38:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  20         
-  21          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-983-prog.cob:19.38:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  20         
-  21          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-983-prog.cob:19.39-19.48:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  20         
-  21          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1123:0
 run_reportwriter.at-1123-reference:1.26-1.27:
    1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
@@ -1944,56 +1784,6 @@ run_reportwriter.at-1355-inp_data:55.6-55.7:
 >> Error: Unexpected indicator: `.'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1353:0
-run_reportwriter.at-1353-prog.cob:15.25-15.33:
-  12          FILE-CONTROL.
-  13         
-  14              SELECT TRANSACTION-DATA
-  15 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-1353-prog.cob:19.25-19.33:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  20         
-  21          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-1353-prog.cob:19.34-19.38:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  20         
-  21          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-1353-prog.cob:19.38:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  20         
-  21          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-1353-prog.cob:19.39-19.48:
-  16                            ORGANIZATION IS LINE SEQUENTIAL.
-  17         
-  18              SELECT REPORT-FILE
-  19 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  20         
-  21          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1493:0
 run_reportwriter.at-1493-reference:1.26-1.27:
    1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
@@ -2571,56 +2361,6 @@ run_reportwriter.at-1720-inp_data:55.6-55.7:
 >> Error: Unexpected indicator: `.'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1718:0
-run_reportwriter.at-1718-prog.cob:22.25-22.33:
-  19          FILE-CONTROL.
-  20         
-  21              SELECT TRANSACTION-DATA
-  22 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  23                            ORGANIZATION IS LINE SEQUENTIAL.
-  24         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-1718-prog.cob:26.25-26.33:
-  23                            ORGANIZATION IS LINE SEQUENTIAL.
-  24         
-  25              SELECT REPORT-FILE
-  26 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  27         
-  28          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-1718-prog.cob:26.34-26.38:
-  23                            ORGANIZATION IS LINE SEQUENTIAL.
-  24         
-  25              SELECT REPORT-FILE
-  26 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  27         
-  28          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-1718-prog.cob:26.38:
-  23                            ORGANIZATION IS LINE SEQUENTIAL.
-  24         
-  25              SELECT REPORT-FILE
-  26 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  27         
-  28          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-1718-prog.cob:26.39-26.48:
-  23                            ORGANIZATION IS LINE SEQUENTIAL.
-  24         
-  25              SELECT REPORT-FILE
-  26 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  27         
-  28          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1793:0
 run_reportwriter.at-1793-reference:1.26-1.27:
    1 >                           C U S T O M E R  C H A R G E  R E P O R T                      PAGE     1
@@ -3638,56 +3378,6 @@ run_reportwriter.at-2071-inp_data:100.6-100.7:
 >> Error: Unexpected indicator: `9'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2069:0
-run_reportwriter.at-2069-prog.cob:16.25-16.33:
-  13          FILE-CONTROL.
-  14         
-  15              SELECT SALES-DATA
-  16 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-2069-prog.cob:20.25-20.33:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  21         
-  22          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-2069-prog.cob:20.34-20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  21         
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-2069-prog.cob:20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  21         
-  22          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-2069-prog.cob:20.39-20.48:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18         
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  21         
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2209:0
 run_reportwriter.at-2209-reference:1.26-1.27:
    1 >                           D I S T R I C T   S A L E S   R E P O R T                      PAGE     1
@@ -4656,56 +4346,6 @@ run_reportwriter.at-2796-inp_data:96.6-96.7:
 >> Error: Unexpected indicator: `1'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:2794:0
-run_reportwriter.at-2794-prog.cob:20.25-20.33:
-  17          FILE-CONTROL.
-  18         
-  19              SELECT PAYROLL-REGISTER-DATA
-  20 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  21                            ORGANIZATION IS LINE SEQUENTIAL.
-  22         
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-2794-prog.cob:24.25-24.33:
-  21                            ORGANIZATION IS LINE SEQUENTIAL.
-  22         
-  23              SELECT REPORT-FILE
-  24 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  25         
-  26          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-2794-prog.cob:24.34-24.38:
-  21                            ORGANIZATION IS LINE SEQUENTIAL.
-  22         
-  23              SELECT REPORT-FILE
-  24 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  25         
-  26          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-2794-prog.cob:24.38:
-  21                            ORGANIZATION IS LINE SEQUENTIAL.
-  22         
-  23              SELECT REPORT-FILE
-  24 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  25         
-  26          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-2794-prog.cob:24.39-24.48:
-  21                            ORGANIZATION IS LINE SEQUENTIAL.
-  22         
-  23              SELECT REPORT-FILE
-  24 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  25         
-  26          DATA DIVISION.
->> Error: Invalid syntax
-
 run_reportwriter.at-2794-prog.cob:154.38:
  151              02  LINE + 1.
  152                  03  COLUMN 01   PIC X(27) SOURCE PRR-EMPLOYEE-KEY.
@@ -5054,56 +4694,6 @@ run_reportwriter.at-3019-inp_data:10.6-10.7:
 >> Error: Unexpected indicator: `o'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3014:0
-run_reportwriter.at-3014-prog.cob:9.43-9.51:
-   6          INPUT-OUTPUT SECTION.
-   7   
-   8          FILE-CONTROL.
-   9 >                SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-----                                              ^^^^^^^^
-  10                                 ORGANIZATION IS LINE SEQUENTIAL.
-  11                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3014-prog.cob:11.43-11.51:
-   8          FILE-CONTROL.
-   9                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-  10                                 ORGANIZATION IS LINE SEQUENTIAL.
-  11 >                SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-----                                              ^^^^^^^^
-  12                                 LINE ADVANCING REPORT1.
-  13   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3014-prog.cob:12.30-12.34:
-   9                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-  10                                 ORGANIZATION IS LINE SEQUENTIAL.
-  11                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  12 >                               LINE ADVANCING REPORT1.
-----                                 ^^^^
-  13   
-  14          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3014-prog.cob:12.34:
-   9                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-  10                                 ORGANIZATION IS LINE SEQUENTIAL.
-  11                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  12 >                               LINE ADVANCING REPORT1.
-----                                     ^
-  13   
-  14          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-3014-prog.cob:12.35-12.44:
-   9                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-  10                                 ORGANIZATION IS LINE SEQUENTIAL.
-  11                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  12 >                               LINE ADVANCING REPORT1.
-----                                      ^^^^^^^^^
-  13   
-  14          DATA DIVISION.
->> Error: Invalid syntax
-
 run_reportwriter.at-3014-prog.cob:39.21:
   36              HEADING 1
   37              FIRST DETAIL  5
@@ -5329,56 +4919,6 @@ run_reportwriter.at-3173-inp_data:10.6-10.7:
 >> Error: Unexpected indicator: `o'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3171:0
-run_reportwriter.at-3171-prog.cob:8.43-8.51:
-   5          CONFIGURATION SECTION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >                SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-----                                              ^^^^^^^^
-   9                                 ORGANIZATION IS LINE SEQUENTIAL. 
-  10                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3171-prog.cob:10.43-10.51:
-   7          FILE-CONTROL.
-   8                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-   9                                 ORGANIZATION IS LINE SEQUENTIAL. 
-  10 >                SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-----                                              ^^^^^^^^
-  11                                 LINE ADVANCING REPORT1.
-  12   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3171-prog.cob:11.30-11.34:
-   8                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-   9                                 ORGANIZATION IS LINE SEQUENTIAL. 
-  10                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                               LINE ADVANCING REPORT1.
-----                                 ^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3171-prog.cob:11.34:
-   8                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-   9                                 ORGANIZATION IS LINE SEQUENTIAL. 
-  10                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                               LINE ADVANCING REPORT1.
-----                                     ^
-  12   
-  13          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-3171-prog.cob:11.35-11.44:
-   8                  SELECT INPUT-FILE ASSIGN TO EXTERNAL STUDENT
-   9                                 ORGANIZATION IS LINE SEQUENTIAL. 
-  10                  SELECT PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                               LINE ADVANCING REPORT1.
-----                                      ^^^^^^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3210:0
 run_reportwriter.at-3210-reference:3.6-3.7:
    1   
@@ -6398,56 +5938,6 @@ run_reportwriter.at-3441-inp_data:91.6-91.7:
 >> Error: Unexpected indicator: `9'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3439:0
-run_reportwriter.at-3439-prog.cob:8.44-8.52:
-   5          CONFIGURATION SECTION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >            SELECT CUST-ORDER-FILE ASSIGN TO EXTERNAL CUSTORD
-----                                               ^^^^^^^^
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT CUST-PRINT-FILE ASSIGN TO EXTERNAL 
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3439-prog.cob:10.44-10.52:
-   7          FILE-CONTROL.
-   8              SELECT CUST-ORDER-FILE ASSIGN TO EXTERNAL CUSTORD
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10 >            SELECT CUST-PRINT-FILE ASSIGN TO EXTERNAL 
-----                                               ^^^^^^^^
-  11                             LINE ADVANCING REPORT2.
-  12   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3439-prog.cob:11.26-11.30:
-   8              SELECT CUST-ORDER-FILE ASSIGN TO EXTERNAL CUSTORD
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT CUST-PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                           LINE ADVANCING REPORT2.
-----                             ^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3439-prog.cob:11.30:
-   8              SELECT CUST-ORDER-FILE ASSIGN TO EXTERNAL CUSTORD
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT CUST-PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                           LINE ADVANCING REPORT2.
-----                                 ^
-  12   
-  13          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-3439-prog.cob:11.31-11.40:
-   8              SELECT CUST-ORDER-FILE ASSIGN TO EXTERNAL CUSTORD
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT CUST-PRINT-FILE ASSIGN TO EXTERNAL 
-  11 >                           LINE ADVANCING REPORT2.
-----                                  ^^^^^^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3558:0
 run_reportwriter.at-3558-reference:1.43-1.51:
    1 >                                            CUSTOMER ORDER REPORT
@@ -6626,56 +6116,6 @@ run_reportwriter.at-3706-inp_data:17.6-17.7:
 >> Error: Unexpected indicator: `a'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3704:0
-run_reportwriter.at-3704-prog.cob:8.41-8.49:
-   5          CONFIGURATION SECTION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >            SELECT STUDENT-FILE ASSIGN TO EXTERNAL STUDREC
-----                                            ^^^^^^^^
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT PRINT-FILE ASSIGN TO EXTERNAL
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3704-prog.cob:10.39-10.47:
-   7          FILE-CONTROL.
-   8              SELECT STUDENT-FILE ASSIGN TO EXTERNAL STUDREC
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10 >            SELECT PRINT-FILE ASSIGN TO EXTERNAL
-----                                          ^^^^^^^^
-  11                             LINE ADVANCING REPORT3.
-  12   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3704-prog.cob:11.26-11.30:
-   8              SELECT STUDENT-FILE ASSIGN TO EXTERNAL STUDREC
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT PRINT-FILE ASSIGN TO EXTERNAL
-  11 >                           LINE ADVANCING REPORT3.
-----                             ^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3704-prog.cob:11.30:
-   8              SELECT STUDENT-FILE ASSIGN TO EXTERNAL STUDREC
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT PRINT-FILE ASSIGN TO EXTERNAL
-  11 >                           LINE ADVANCING REPORT3.
-----                                 ^
-  12   
-  13          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-3704-prog.cob:11.31-11.40:
-   8              SELECT STUDENT-FILE ASSIGN TO EXTERNAL STUDREC
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT PRINT-FILE ASSIGN TO EXTERNAL
-  11 >                           LINE ADVANCING REPORT3.
-----                                  ^^^^^^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
 run_reportwriter.at-3704-prog.cob:70.37:
   67                   10  COLUMN 26    PIC 99    SOURCE COURSE-PTS.
   68                   10  COLUMN 34    PIC X(15) SOURCE CAMPUS.
@@ -7089,56 +6529,6 @@ run_reportwriter.at-3901-inp_data:3.6-3.7:
 >> Error: Unexpected indicator: `s'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3897:0
-run_reportwriter.at-3897-prog.cob:8.37-8.45:
-   5          CONFIGURATION SECTION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >            SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
-----                                        ^^^^^^^^
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT REPORT-FILE ASSIGN TO EXTERNAL
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3897-prog.cob:10.40-10.48:
-   7          FILE-CONTROL.
-   8              SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10 >            SELECT REPORT-FILE ASSIGN TO EXTERNAL
-----                                           ^^^^^^^^
-  11                                 LINE ADVANCING REPORT4.
-  12   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-3897-prog.cob:11.30-11.34:
-   8              SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT REPORT-FILE ASSIGN TO EXTERNAL
-  11 >                               LINE ADVANCING REPORT4.
-----                                 ^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
-run_reportwriter.at-3897-prog.cob:11.34:
-   8              SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT REPORT-FILE ASSIGN TO EXTERNAL
-  11 >                               LINE ADVANCING REPORT4.
-----                                     ^
-  12   
-  13          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-run_reportwriter.at-3897-prog.cob:11.35-11.44:
-   8              SELECT INV-FILE ASSIGN TO EXTERNAL INVFILE
-   9                             ORGANIZATION IS LINE SEQUENTIAL. 
-  10              SELECT REPORT-FILE ASSIGN TO EXTERNAL
-  11 >                               LINE ADVANCING REPORT4.
-----                                      ^^^^^^^^^
-  12   
-  13          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3981:0
 run_reportwriter.at-3981-reference:2.49-2.58:
    1   
@@ -7179,16 +6569,6 @@ run_reportwriter.at-3981-reference:35.6-35.7:
 >> Error: Unexpected indicator: `T'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4055:0
-run_reportwriter.at-4055-prog.cob:10.21-10.29:
-   7          FILE-CONTROL.
-   8              SELECT REPORT-FILE
-   9              LINE SEQUENTIAL 
-  10 >            ASSIGN TO EXTERNAL DUPDTL.
-----                        ^^^^^^^^
-  11          DATA DIVISION.
-  12          FILE SECTION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4109:0
 run_reportwriter.at-4109-reference:1.6-1.7:
    1 > HEADING SAVE-ITEM
@@ -7254,16 +6634,6 @@ run_reportwriter.at-4109-reference:34.6-34.7:
 >> Error: Unexpected indicator: `F'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4194:0
-run_reportwriter.at-4194-prog.cob:8.34-8.42:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >             SELECT rp-file ASSIGN EXTERNAL PRINTOUT
-----                                     ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4213:0
 run_reportwriter.at-4213-reference:1.9-1.10:
    1 >          1         2         3         4         5
@@ -7291,16 +6661,6 @@ run_reportwriter.at-4213-reference:5.6-5.7:
 >> Error: Unexpected indicator: `T'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4406:0
-run_reportwriter.at-4406-progl.cob:8.34-8.42:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >             SELECT RP-FILE ASSIGN EXTERNAL PRINTOUT
-----                                     ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_reportwriter.at-4406-progl.cob:23.18:
   20   
   21          REPORT SECTION.
@@ -7322,16 +6682,6 @@ run_reportwriter.at-4406-progl.cob:23.19-23.27:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4311:0
-run_reportwriter.at-4311-progv.cob:8.34-8.42:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >             SELECT RP-FILE ASSIGN EXTERNAL PRINTOUT
-----                                     ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_reportwriter.at-4311-progv.cob:27.22-27.28:
   24          RD  RP 
   25              CODE IS MYCODE *> variable
@@ -7391,16 +6741,6 @@ run_reportwriter.at-4430-reference:7.6-7.7:
 >> Error: Unexpected indicator: `4'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4554:0
-run_reportwriter.at-4554-prog.cob:8.34-8.42:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >             SELECT RP-FILE ASSIGN EXTERNAL PRINTOUT
-----                                     ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_reportwriter.at-4554-prog.cob:35.18:
   32   
   33          REPORT SECTION.
@@ -7478,16 +6818,6 @@ run_reportwriter.at-4576-reference:7.6-7.7:
 >> Error: Unexpected indicator: `4'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4627:0
-run_reportwriter.at-4627-prog.cob:8.33-8.41:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >        SELECT report-file ASSIGN EXTERNAL PRINTOUT
-----                                    ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4642:0
 run_reportwriter.at-4642-reference:1.30-1.31:
    1 > hello                         <--->
@@ -7504,28 +6834,8 @@ run_reportwriter.at-4642-reference:2.6-2.7:
 >> Error: Unexpected indicator: `e'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4690:0
-run_reportwriter.at-4690-prog.cob:8.33-8.41:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >        SELECT report-file ASSIGN EXTERNAL PRINTOUT
-----                                    ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4702:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4744:0
-run_reportwriter.at-4744-prog.cob:8.33-8.41:
-   5          ENVIRONMENT DIVISION.
-   6          INPUT-OUTPUT SECTION.
-   7          FILE-CONTROL.
-   8 >        SELECT report-file ASSIGN EXTERNAL PRINTOUT
-----                                    ^^^^^^^^
-   9               ORGANIZATION LINE SEQUENTIAL.
-  10   
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4756:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:5052:0
 run_reportwriter.at-5052-inp_data:1.6-1.7:
@@ -8527,26 +7837,6 @@ run_reportwriter.at-5052-inp_data:100.6-100.7:
 >> Error: Unexpected indicator: `8'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:5050:0
-run_reportwriter.at-5050-prog.cob:14.24-14.32:
-  11          FILE-CONTROL.
-  12          
-  13          SELECT REPORT-FILE
-  14 >               ASSIGN TO EXTERNAL REPORTFILE
-----                           ^^^^^^^^
-  15                 ORGANIZATION IS LINE SEQUENTIAL.
-  16          
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-5050-prog.cob:18.24-18.32:
-  15                 ORGANIZATION IS LINE SEQUENTIAL.
-  16          
-  17          SELECT TEMP-FILE
-  18 >               ASSIGN TO EXTERNAL TEMPFILE
-----                           ^^^^^^^^
-  19                 ORGANIZATION IS LINE SEQUENTIAL.
-  20          
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_reportwriter.at-5050-prog.cob:122.43:
  119                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
  120          
@@ -11626,26 +10916,6 @@ run_reportwriter.at-9268-inp_data:5.6-5.7:
 >> Error: Unexpected indicator: `K'
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:9266:0
-run_reportwriter.at-9266-prog.cob:8.38-8.46:
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7   
-   8 >            SELECT IN-FILE   ASSIGN TO EXTERNAL INFILE
-----                                         ^^^^^^^^
-   9                     LINE SEQUENTIAL
-  10                     FILE STATUS IS WS-INPUT-STATUS.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_reportwriter.at-9266-prog.cob:12.38-12.46:
-   9                     LINE SEQUENTIAL
-  10                     FILE STATUS IS WS-INPUT-STATUS.
-  11   
-  12 >            SELECT OUT-FILE  ASSIGN TO EXTERNAL OREPORT
-----                                         ^^^^^^^^
-  13                     LINE SEQUENTIAL
-  14                     FILE STATUS IS WS-OUTPUT-STATUS.
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_reportwriter.at-9266-prog.cob:68.10-68.14:
   65   
   66          RD REPORT1
