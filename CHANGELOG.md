@@ -3,6 +3,8 @@
 ## [_] Next release
 
 ### Added
+- Allow arbitrary number of spaces before `$`-prefixed compiler directives in some fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498)
+- Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 - Display reference count in hover information for data items [#429](https://github.com/OCamlPro/superbol-studio-oss/pull/429) (fix for [Issue #354](https://github.com/OCamlPro/superbol-studio-oss/issues/354))
 - Dedicated libraries for testing internal behaviors of the LSP server [#487](https://github.com/OCamlPro/superbol-studio-oss/pull/487)
 - Syntactic support for `LINE SEQUENTIAL` file organization [#485](https://github.com/OCamlPro/superbol-studio-oss/pull/485)
@@ -11,7 +13,6 @@
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
-- Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 
 ### Fixed
 - Name of VSIX file included in CI build artifacts [#480](https://github.com/OCamlPro/superbol-studio-oss/pull/480) (fix for [Issue #408](https://github.com/OCamlPro/superbol-studio-oss/issues/408))
