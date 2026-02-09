@@ -29,6 +29,8 @@
 %token LT              "<"          [@keyword (* symbol *)  "<"]
 %token NE              "<>"         [@keyword (* symbol *) "<>"]
 
+%token PERIOD          "."          [@keyword (* symbol *) "."]
+
 %token CDIR_DEFINE     [@keyword ">>DEFINE"]
 %token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF"           (* GC extensions *)
                         , ">>ELSE-IF", "$ELSE-IF"]
@@ -118,7 +120,7 @@ let compiler_directive :=
 (* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
 
 let source_directive :=
-  | ~ = source_format; EOL; < >
+  | ~ = source_format; PERIOD?; EOL; < >
 
 let source_format :=
   | FORMAT?; IS?; free = loc(FREE);
@@ -127,13 +129,13 @@ let source_format :=
     { Source_format_is i }
 
 let set_sourceformat :=
-  | SOURCEFORMAT; i = loc(ALPHANUM); EOL;       (* elementary_string_literal? *)
+  | SOURCEFORMAT; i = loc(ALPHANUM); PERIOD?; EOL;       (* elementary_string_literal? *)
     { Set_sourceformat i }
 
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
 
 let set_directive :=
-  | ~ = set; EOL; < >
+  | ~ = set; PERIOD?; EOL; < >
 
 let set :=
   | ~ = loc(set_operand); <Set>

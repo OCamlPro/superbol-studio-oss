@@ -375,26 +375,6 @@ run_file.at-2551-prog.cob:206.18-206.22:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2927:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:3242:0
-run_file.at-3242-prog.cob:9.34-9.42:
-   6   
-   7          INPUT-OUTPUT SECTION.
-   8          FILE-CONTROL.
-   9 >            SELECT FLATFILE ASSIGN EXTERNAL RELFIX
-----                                     ^^^^^^^^
-  10              ORGANIZATION RELATIVE
-  11              ACCESS IS SEQUENTIAL RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-3242-prog.cob:14.35-14.43:
-  11              ACCESS IS SEQUENTIAL RELATIVE KEY IS REC-NUM
-  12              FILE STATUS IS CUST-STAT.
-  13   
-  14 >            SELECT FLATFILE2 ASSIGN EXTERNAL RELFIX
-----                                      ^^^^^^^^
-  15              ORGANIZATION RELATIVE
-  16              ACCESS IS RANDOM RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-3242-prog.cob:57.54:
   54              05  FILLER PIC X(8) VALUE "GAM00000".
   55   
@@ -1179,26 +1159,6 @@ run_file.at-4709-inp_data:1.7-1.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4707:0
-run_file.at-4707-prog.cob:7.39-7.47:
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7 >            SELECT INFILE     ASSIGN TO EXTERNAL INFILE
-----                                          ^^^^^^^^
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-4707-prog.cob:11.38-11.46:
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
-  10   
-  11 >            SELECT OUTFILE   ASSIGN TO EXTERNAL OUTFILE
-----                                         ^^^^^^^^
-  12                   ORGANIZATION IS LINE SEQUENTIAL
-  13                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4722:0
 run_file.at-4722-reference:1.7-1.8:
    1 > Record 1.
@@ -1215,26 +1175,6 @@ run_file.at-4838-inp_data:1.7-1.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4836:0
-run_file.at-4836-prog.cob:7.39-7.47:
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7 >            SELECT INFILE     ASSIGN TO EXTERNAL INFILE
-----                                          ^^^^^^^^
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-4836-prog.cob:11.38-11.46:
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
-  10   
-  11 >            SELECT OUTFILE   ASSIGN TO EXTERNAL OUTFILE
-----                                         ^^^^^^^^
-  12                   ORGANIZATION IS LINE SEQUENTIAL
-  13                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4857:0
 run_file.at-4857-reference:1.7-1.8:
    1 > Record 1.
@@ -2937,16 +2877,6 @@ run_file.at-8181-cmod.c:50.6-50.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8181:0
-run_file.at-8181-prog.cob:26.34-26.42:
-  23              ALTERNATE RECORD KEY IS TS-DISK WITH DUPLICATES
-  24              FILE STATUS IS CUST-STAT .
-  25   
-  26 >            SELECT FLATFILE ASSIGN EXTERNAL RELFIX
-----                                     ^^^^^^^^
-  27              ORGANIZATION RELATIVE
-  28              ACCESS IS RANDOM RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-8181-prog.cob:110.54:
  107              05  FILLER PIC X(8) VALUE "PRE00000".
  108   
@@ -4974,16 +4904,6 @@ run_file.at-9162-cmod.c:134.6-134.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9162:0
-run_file.at-9162-prog.cob:10.34-10.42:
-   7   
-   8          INPUT-OUTPUT SECTION.
-   9          FILE-CONTROL.
-  10 >            SELECT FLATFILE ASSIGN EXTERNAL SEQFIX
-----                                     ^^^^^^^^
-  11              ORGANIZATION SEQUENTIAL
-  12              FILE STATUS IS CUST-STAT .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-9162-prog.cob:44.54:
   41              05  FILLER PIC X(8) VALUE "FOR00000".
   42   
@@ -5612,16 +5532,6 @@ run_file.at-11385-reference:8.6-8.7:
 >> Error: Unexpected indicator: `j'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11598:0
-run_file.at-11598-prog.cob:9.34-9.42:
-   6   
-   7          INPUT-OUTPUT SECTION.
-   8          FILE-CONTROL.
-   9 >            SELECT FLATFILE ASSIGN EXTERNAL RELVAR
-----                                     ^^^^^^^^
-  10              ORGANIZATION RELATIVE
-  11              ACCESS IS SEQUENTIAL
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-11598-prog.cob:57.54:
   54              05  FILLER PIC X(8) VALUE "FOR00000".
   55   
@@ -5703,16 +5613,6 @@ run_file.at-11598-prog.cob:90.62-90.69:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12316:0
-run_file.at-12316-prog.cob:12.21-12.29:
-   9          INPUT-OUTPUT SECTION.
-  10          FILE-CONTROL.
-  11              SELECT TSPFILE
-  12 >            ASSIGN TO EXTERNAL TSPFILE
-----                        ^^^^^^^^
-  13              ORGANIZATION INDEXED ACCESS DYNAMIC
-  14              RECORD KEY IS CM-CUST-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-12316-prog.cob:84.54:
   81              05  FILLER PIC X(8) VALUE "PRE00000".
   82   
@@ -7777,16 +7677,6 @@ run_file.at-12943-prog.cob:46.11-46.38:
 >> Error: Invalid >>TURN compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13156:0
-run_file.at-13156-prog.cob:10.34-10.42:
-   7   
-   8          INPUT-OUTPUT SECTION.
-   9          FILE-CONTROL.
-  10 >            SELECT FLATFILE ASSIGN EXTERNAL SEQFIX
-----                                     ^^^^^^^^
-  11              ORGANIZATION LINE SEQUENTIAL
-  12              FILE STATUS IS CUST-STAT .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-13156-prog.cob:44.54:
   41              05  FILLER PIC X(8) VALUE "FOR00000".
   42   

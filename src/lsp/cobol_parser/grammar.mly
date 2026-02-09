@@ -933,14 +933,34 @@ let select_clause :=                  (* Note: some can be used multiple times *
   | ~ = sharing_clause;              < >                    (* +COB2002 *)
 
 let assign_clause :=                                 (* USING added in COB2002 *)
-  | ASSIGN; TO?; _assign_external_?;
+  | ASSIGN; TO?; ed = external_dynamic?; fd = assign_file_or_device?;
     il = rnel(name_or_alphanum); io = ro(pf(USING,name));
-    { SelectAssign { to_ = il; using = io } }
+    { SelectAssign { to_ = { type_ = ed; file_device = fd; target = il }; using = io } }
   | ASSIGN; USING; i = name;
-    { SelectAssign { to_ = []; using = Some i; } }
+    { SelectAssign { to_ = { type_ = None; file_device = None; target = [] }; using = Some i; } }
 
-let _assign_external_ [@post.pending fun () -> "EXTERNAL"] :=
-  | EXTERNAL
+let external_dynamic :=
+  | EXTERNAL; { External }
+  | DYNAMIC;  { Dynamic }
+
+let assign_file_or_device :=
+  | af = assign_file;
+    { File af }
+  | ad = assign_device;
+    { Device ad }
+  | DISK; FROM; n = name;
+    { DiskFrom n }
+
+let assign_file :=
+  | LINE; ADVANCING; FILE?;          { LineAdvancing }
+  | MULTIPLE; or_(REEL,UNIT); FILE?; { MultipleUnitReel }
+
+let assign_device :=
+  | DISK;      { Disk }
+  | KEYBOARD;  { Keyboard }
+  | DISPLAY;   { Display }
+  | PRINTER_1; { Printer_1 }
+  | PRINTER_2; { Printer_2 }
 
 let access_mode_clause :=
   | ACCESS; MODE?; IS?; ~ = access_mode; <SelectAccessMode>

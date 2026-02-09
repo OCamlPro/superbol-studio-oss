@@ -2951,16 +2951,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7800:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:7802:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:8117:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:8722:0
-run_misc.at-8722-prog.cob:27.18-27.26:
-  24              FILE STATUS IS CUST-STAT.
-  25   
-  26              SELECT FLATFILE
-  27 >            ASSIGN EXTERNAL RELFIX
-----                     ^^^^^^^^
-  28              ORGANIZATION RELATIVE
-  29              ACCESS IS RANDOM RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:10068:0
 run_misc.at-10068-reference:1.6-1.7:
    1 > Source: 'prog.cob'
@@ -3534,16 +3524,6 @@ run_misc.at-10208-reference_append:44.6-44.7:
 >> Error: Unexpected indicator: `a'
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:10517:0
-run_misc.at-10517-prog.cob:9.34-9.42:
-   6   
-   7          INPUT-OUTPUT SECTION.
-   8          FILE-CONTROL.
-   9 >            SELECT FLATFILE ASSIGN EXTERNAL RELFIX
-----                                     ^^^^^^^^
-  10              ORGANIZATION RELATIVE
-  11              ACCESS IS SEQUENTIAL RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_misc.at-10517-prog.cob:198.12-198.25:
  195               ADD 1 TO X.
  196               DISPLAY "X is " X.
