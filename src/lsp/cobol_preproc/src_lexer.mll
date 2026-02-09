@@ -135,6 +135,7 @@
       CDIR_SOURCE;
       FORMAT;
       IS;
+      PERIOD;
     ]
 
   let else_endif_keywords =
