@@ -123,6 +123,7 @@
       NOSSRANGE;
       ODOSLIDE;
       OVERRIDE;
+      PERIOD;
       REMOVE;
       SOURCEFORMAT;
       SPZERO;
@@ -134,6 +135,7 @@
       CDIR_SOURCE;
       FORMAT;
       IS;
+      PERIOD;
     ]
 
   let else_endif_keywords =
