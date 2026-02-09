@@ -123,6 +123,7 @@
       NOSSRANGE;
       ODOSLIDE;
       OVERRIDE;
+      PERIOD;
       REMOVE;
       SOURCEFORMAT;
       SPZERO;
