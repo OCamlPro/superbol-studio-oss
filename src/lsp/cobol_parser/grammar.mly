@@ -3265,6 +3265,8 @@ let display_device_mnemonic :=
  | ENVIRONMENT_VALUE; {DisplayDeviceEnvValue}
  | ARGUMENT_NUMBER;   {DisplayDeviceArgNumber}
  | COMMAND_LINE;      {DisplayDeviceCommandLine}
+ | PRINTER;           {DisplayDevicePrinter}
+ | TERMINAL;          {DisplayDeviceTerminal}
 
 let display_with_clause [@recovery DisplayAttribute Highlight] [@symbol "<display-with-clause>"] := (* MF *)
   | ~ = screen_attribute_clause; <DisplayAttribute>
