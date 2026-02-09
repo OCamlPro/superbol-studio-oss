@@ -66,16 +66,6 @@ syn_file.at-416-prog.cob:11.40-11.47:
   13              SELECT test-file-4 ASSIGN DISK USING var-4
 >> Error: Invalid syntax
 
-syn_file.at-416-prog.cob:15.37-15.44:
-  12                  ORGANIZATION IS SEQUENTIAL.
-  13              SELECT test-file-4 ASSIGN DISK USING var-4
-  14                  ORGANIZATION IS SEQUENTIAL.
-  15 >            SELECT test-file-5 ASSIGN DYNAMIC DISK var-5
-----                                        ^^^^^^^
-  16                  ORGANIZATION IS SEQUENTIAL.
-  17              SELECT test-file-6 ASSIGN DISK FROM var-6
->> Error: Invalid syntax
-
 syn_file.at-416-prog.cob:17.42-17.46:
   14                  ORGANIZATION IS SEQUENTIAL.
   15              SELECT test-file-5 ASSIGN DYNAMIC DISK var-5

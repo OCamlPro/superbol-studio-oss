@@ -123,6 +123,7 @@
       NOSSRANGE;
       ODOSLIDE;
       OVERRIDE;
+      PERIOD;
       REMOVE;
       SOURCEFORMAT;
       SPZERO;
@@ -134,6 +135,7 @@
       CDIR_SOURCE;
       FORMAT;
       IS;
+      PERIOD;
     ]
 
   let else_endif_keywords =
@@ -333,7 +335,7 @@ and acutrm_line state   (* ACUCOBOL-GT Terminal (compat with VAX COBOL term.) *)
       }
 and xopen_or_crt_or_acutrm_followup state
   = parse
-  | ('$' as marker)
+  | blanks? ('$' as marker)
       {
         fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
