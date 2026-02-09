@@ -208,7 +208,7 @@ type data_occurs_clause =
       }
   | OccursDepending of
       {
-        from: integer with_loc;
+        from: integer with_loc option;
         to_: integer with_loc;
         depending: qualname with_loc;
         key_is: sort_spec list;
@@ -258,8 +258,9 @@ let pp_data_occurs_clause ppf = function
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
   | OccursDepending { from; to_; depending; key_is; indexed_by } ->
-    Fmt.pf ppf "OCCURS %a TO %a %a %a%a"
-      pp_integer' from pp_integer' to_
+    Fmt.pf ppf "OCCURS %a%a %a%a%a"
+      Fmt.(option (pp_integer' ++ any " TO ")) from
+      pp_integer' to_
       pp_depending_phrase depending
       Fmt.(list ~sep:nop (sp ++ pp_sort_spec)) key_is
       pp_indexed_by_opt indexed_by
