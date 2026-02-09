@@ -11,6 +11,7 @@
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
+- Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 
 ### Fixed
 - Name of VSIX file included in CI build artifacts [#480](https://github.com/OCamlPro/superbol-studio-oss/pull/480) (fix for [Issue #408](https://github.com/OCamlPro/superbol-studio-oss/issues/408))
