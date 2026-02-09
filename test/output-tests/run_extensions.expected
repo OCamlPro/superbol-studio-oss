@@ -350,26 +350,6 @@ run_extensions.at-445-prog.cob:29.34-29.40:
   31          PROCEDURE        DIVISION.
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:53.16-53.22:
-  50         *>      DISPLAY "Length n'001'" L
-  51         *>      END-DISPLAY
-  52         *>   END-IF
-  53 >            MOVE LENGTH OF X  TO L
-----                   ^^^^^^
-  54              IF L NOT = 2
-  55                 DISPLAY "Length 1 " L
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:58.16-58.22:
-  55                 DISPLAY "Length 1 " L
-  56                 END-DISPLAY
-  57              END-IF
-  58 >            MOVE LENGTH OF X  TO L
-----                   ^^^^^^
-  59              IF L NOT = 2
-  60                 DISPLAY "Length 1a " L LENGTH X
->> Error: Invalid syntax
-
 run_extensions.at-445-prog.cob:60.37-60.43:
   57              END-IF
   58              MOVE LENGTH OF X  TO L
@@ -380,16 +360,6 @@ run_extensions.at-445-prog.cob:60.37-60.43:
   62              END-IF
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:63.16-63.22:
-  60                 DISPLAY "Length 1a " L LENGTH X
-  61                 END-DISPLAY
-  62              END-IF
-  63 >            MOVE LENGTH OF Y  TO L
-----                   ^^^^^^
-  64              IF L NOT = 2
-  65                 DISPLAY "Length 2 " L
->> Error: Invalid syntax
-
 run_extensions.at-445-prog.cob:69.37-69.43:
   66                 END-DISPLAY
   67              END-IF
@@ -398,26 +368,6 @@ run_extensions.at-445-prog.cob:69.37-69.43:
 ----                                        ^^^^^^
   70                 END-DISPLAY
   71              END-IF
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:72.16-72.22:
-  69                 DISPLAY "Length 2a " L LENGTH OF Y
-  70                 END-DISPLAY
-  71              END-IF
-  72 >            MOVE LENGTH OF Y(1) TO L
-----                   ^^^^^^
-  73              IF L NOT = 2
-  74                 DISPLAY "Length 3 " L
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:77.16-77.22:
-  74                 DISPLAY "Length 3 " L
-  75                 END-DISPLAY
-  76              END-IF
-  77 >            MOVE LENGTH Y(1) TO L
-----                   ^^^^^^
-  78              IF L NOT = 2
-  79                 DISPLAY "Length 3a " L LENGTH OF Y(1)
 >> Error: Invalid syntax
 
 run_extensions.at-445-prog.cob:79.37-79.43:
@@ -470,46 +420,6 @@ run_extensions.at-445-prog.cob:100.19-100.25:
  102              END-PERFORM
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:127.16-127.22:
- 124                 DISPLAY "Length 7a " L " - " I
- 125                 END-DISPLAY
- 126              END-IF
- 127 >            MOVE LENGTH OF RENAME-STD-SG  TO L
-----                   ^^^^^^
- 128              IF L NOT = 33
- 129                 DISPLAY "Length 8a " L
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:132.16-132.22:
- 129                 DISPLAY "Length 8a " L
- 130                 END-DISPLAY
- 131              END-IF
- 132 >            MOVE LENGTH OF RENAME-STD-G  TO L
-----                   ^^^^^^
- 133              IF L NOT = 43
- 134                 DISPLAY "Length 8b " L
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:137.16-137.22:
- 134                 DISPLAY "Length 8b " L
- 135                 END-DISPLAY
- 136              END-IF
- 137 >            MOVE LENGTH OF RENAME-STD  TO L
-----                   ^^^^^^
- 138              IF L NOT = 33
- 139                 DISPLAY "Length 8c " L
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:142.16-142.22:
- 139                 DISPLAY "Length 8c " L
- 140                 END-DISPLAY
- 141              END-IF
- 142 >            MOVE LENGTH OF RENAME-G  TO L
-----                   ^^^^^^
- 143              IF L NOT = 63
- 144                 DISPLAY "Length 8d " L
->> Error: Invalid syntax
-
 run_extensions.at-445-prog.cob:148.19-148.25:
  145                 END-DISPLAY
  146              END-IF
@@ -544,89 +454,9 @@ run_extensions.at-482-prog.cob:21.21-21.25:
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:510:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:540:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:600:0
-run_extensions.at-600-prog.cob:26.19-26.25:
-  23              MOVE    '1'    TO VXX (1).
-  24              MOVE    '22'   TO VYY (1).
-  25              MOVE    '333'  TO VZZ (1).
-  26 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  27              DISPLAY VLEN   NO ADVANCING
-  28              END-DISPLAY.
->> Error: Invalid syntax
-
-run_extensions.at-600-prog.cob:41.19-41.25:
-  38              MOVE    '3'    TO VXX (3).
-  39              MOVE    '22'   TO VYY (2).
-  40              MOVE    '111'  TO VZZ (1).
-  41 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  42              DISPLAY VLEN   NO ADVANCING
-  43              END-DISPLAY.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:664:0
-run_extensions.at-664-prog.cob:26.19-26.25:
-  23              MOVE    '1'    TO VXX (1).
-  24              MOVE    '22'   TO VYY (1).
-  25              MOVE    '333'  TO VZZ (1).
-  26 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  27              DISPLAY VLEN   NO ADVANCING
-  28              END-DISPLAY.
->> Error: Invalid syntax
-
-run_extensions.at-664-prog.cob:41.19-41.25:
-  38              MOVE    '3'    TO VXX (3).
-  39              MOVE    '22'   TO VYY (2).
-  40              MOVE    '111'  TO VZZ (1).
-  41 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  42              DISPLAY VLEN   NO ADVANCING
-  43              END-DISPLAY.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:730:0
-run_extensions.at-730-prog.cob:28.19-28.25:
-  25              MOVE    '22'   TO VYY (1).
-  26              MOVE    '333'  TO VZZ (1).
-  27              MOVE    '444'  TO VFIX.
-  28 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  29              DISPLAY VLEN   NO ADVANCING
-  30              END-DISPLAY.
->> Error: Invalid syntax
-
-run_extensions.at-730-prog.cob:44.19-44.25:
-  41              MOVE    '22'   TO VYY (2).
-  42              MOVE    '111'  TO VZZ (1).
-  43              MOVE    '000'  TO VFIX.
-  44 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  45              DISPLAY VLEN   NO ADVANCING
-  46              END-DISPLAY.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:796:0
-run_extensions.at-796-prog.cob:28.19-28.25:
-  25              MOVE    '22'   TO VYY (1).
-  26              MOVE    '333'  TO VZZ (1).
-  27              MOVE    '444'  TO VFIX.
-  28 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  29              DISPLAY VLEN   NO ADVANCING
-  30              END-DISPLAY.
->> Error: Invalid syntax
-
-run_extensions.at-796-prog.cob:44.19-44.25:
-  41              MOVE    '22'   TO VYY (2).
-  42              MOVE    '111'  TO VZZ (1).
-  43              MOVE    '000'  TO VFIX.
-  44 >            MOVE    LENGTH OF VGROUP         TO VLEN.
-----                      ^^^^^^
-  45              DISPLAY VLEN   NO ADVANCING
-  46              END-DISPLAY.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:840:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:900:0
 run_extensions.at-900-prog.cob:17.35:
@@ -861,58 +691,8 @@ run_extensions.at-1142-prog.cob:15.36-15.45:
   17                  05 col1  PIC X.
 >> Error: Invalid syntax
 
-run_extensions.at-1142-prog.cob:35.19-35.25:
-  32              INITIALIZE prefix ALL TO VALUE
-  33   
-  34              IF LENGTH OF a-table NOT = 372
-  35 >               MOVE LENGTH OF a-table TO dlen
-----                      ^^^^^^
-  36                 DISPLAY "BAD SIZE: " dlen.
-  37   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1235:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1418:0
-run_extensions.at-1418-prog.cob:108.16-108.22:
- 105   
- 106          WRITE-REC SECTION.
- 107              ADD 1 TO SEQ.
- 108 >            MOVE LENGTH OF TSTREC TO LN.
-----                   ^^^^^^
- 109              DISPLAY "Write SEQ " SEQ ", DEP-X = " DEP-X
- 110                      " & DEP-Y = " DEP-Y
->> Error: Invalid syntax
-
-run_extensions.at-1418-prog.cob:118.16-118.22:
- 115                        UNTIL IX > DEP-X
- 116                  MOVE IX TO TSTG-1 (IX)
- 117              END-PERFORM.
- 118 >            MOVE LENGTH OF TSTGRP1 TO LN.
-----                   ^^^^^^
- 119              DISPLAY "Group1: '" TSTGRP1 "' len:" LN.
- 120              PERFORM VARYING IX FROM 1 BY 1
->> Error: Invalid syntax
-
-run_extensions.at-1418-prog.cob:148.16-148.22:
- 145                  MOVE IX TO TSTG2-1 (IX)
- 146              END-PERFORM.
- 147              MOVE "<>"    TO TST2TAIL1.
- 148 >            MOVE LENGTH OF TSTGRP2 TO LN.
-----                   ^^^^^^
- 149              DISPLAY "Group2: '" TSTGRP2 "' len:" LN.
- 150              WRITE TSTREC.
->> Error: Invalid syntax
-
-run_extensions.at-1418-prog.cob:155.16-155.22:
- 152          READ-REC SECTION.
- 153          READ-10.
- 154              READ FLATFILE AT END GO TO READ-99.
- 155 >            MOVE LENGTH OF TSTREC TO LN.
-----                   ^^^^^^
- 156              DISPLAY "Read SEQ " SEQ ", DEP-X = " DEP-X
- 157                      " & DEP-Y = " DEP-Y
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1458:0
 run_extensions.at-1458-reference:1.6-1.7:
    1 > 010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
@@ -1561,56 +1341,6 @@ run_extensions.at-3009-prog.cob:11.11-11.17:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:3077:0
-run_extensions.at-3077-prog.cob:36.19-36.25:
-  33               10 SECOND-VARIANT-B REDEFINES SECOND-HEADER.
-  34                  20 PART-B-SECOND       PIC X(3879).
-  35          PROCEDURE        DIVISION.
-  36 >            MOVE    LENGTH OF XMAIN       TO Z.
-----                      ^^^^^^
-  37              IF Z NOT = 8
-  38                 DISPLAY "Test 1 " Z.
->> Error: Invalid syntax
-
-run_extensions.at-3077-prog.cob:39.19-39.25:
-  36              MOVE    LENGTH OF XMAIN       TO Z.
-  37              IF Z NOT = 8
-  38                 DISPLAY "Test 1 " Z.
-  39 >            MOVE    LENGTH OF XMAINRED    TO Z.
-----                      ^^^^^^
-  40              IF Z NOT = 9
-  41                 DISPLAY "Test 2 " Z.
->> Error: Invalid syntax
-
-run_extensions.at-3077-prog.cob:42.19-42.25:
-  39              MOVE    LENGTH OF XMAINRED    TO Z.
-  40              IF Z NOT = 9
-  41                 DISPLAY "Test 2 " Z.
-  42 >            MOVE    LENGTH OF XMAIN03     TO Z.
-----                      ^^^^^^
-  43              IF Z NOT = 5
-  44                 DISPLAY "Test 3 " Z.
->> Error: Invalid syntax
-
-run_extensions.at-3077-prog.cob:45.19-45.25:
-  42              MOVE    LENGTH OF XMAIN03     TO Z.
-  43              IF Z NOT = 5
-  44                 DISPLAY "Test 3 " Z.
-  45 >            MOVE    LENGTH OF XMAIN0501   TO Z.
-----                      ^^^^^^
-  46              IF Z NOT = 4
-  47                 DISPLAY "Test 4 " Z.
->> Error: Invalid syntax
-
-run_extensions.at-3077-prog.cob:48.19-48.25:
-  45              MOVE    LENGTH OF XMAIN0501   TO Z.
-  46              IF Z NOT = 4
-  47                 DISPLAY "Test 4 " Z.
-  48 >            MOVE    LENGTH OF XMAIN0502   TO Z.
-----                      ^^^^^^
-  49              IF Z NOT = 5
-  50                 DISPLAY "Test 5 " Z.
->> Error: Invalid syntax
-
 run_extensions.at-3077-prog.cob:52.22-52.28:
   49              IF Z NOT = 5
   50                 DISPLAY "Test 5 " Z.

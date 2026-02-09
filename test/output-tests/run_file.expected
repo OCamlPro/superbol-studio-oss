@@ -3330,16 +3330,6 @@ run_file.at-8744-prog.cob:270.11-270.29:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-run_file.at-8744-prog.cob:304.16-304.22:
- 301              DISPLAY "File assigned is '"
- 302                      TSP-FILENAME (1:FCD-NAME-LENGTH) "'".
- 303              SET FCD-FILENAME-ADDRESS TO ADDRESS OF OUT-FILE-NAME.
- 304 >            MOVE LENGTH OF OUT-FILE-NAME TO FCD-NAME-LENGTH.
-----                   ^^^^^^
- 305              DISPLAY "*** Dump FCD before changes"
- 306              PERFORM DUMP-FCD.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8825:0
 run_file.at-8825-reference:1.6-1.7:
    1 > Other Flags 32.
@@ -5107,16 +5097,6 @@ run_file.at-9400-prog.cob:49.11-49.30:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-run_file.at-9400-prog.cob:74.15-74.21:
-  71   
-  72             MOVE "TESTOUT" TO WS-FCD-DDNAME
-  73   
-  74 >           MOVE LENGTH OF FCD-MAP TO WS-FCD-SIZE
-----                  ^^^^^^
-  75             DISPLAY "FCD SIZE " WS-FCD-SIZE.
-  76   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9425:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9589:0
 run_file.at-9589-prog.cob:17.11-17.24:
@@ -5130,56 +5110,6 @@ run_file.at-9589-prog.cob:17.11-17.24:
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-9589-prog.cob:46.16-46.22:
-  43              DISPLAY PROGRAM-NAME ': STARTING.'
-  44              DISPLAY PROGRAM-NAME ': CREATING LINE SEQUENTIAL FILE.'
-  45              SET EXTFH-OPCODE-ISOPENOUTPUT      TO TRUE
-  46 >            MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-----                   ^^^^^^
-  47              MOVE fcd--version-number           TO FCD-VERSION
-  48              MOVE fcd--open-closed              TO FCD-OPEN-MODE
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:49.16-49.22:
-  46              MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-  47              MOVE fcd--version-number           TO FCD-VERSION
-  48              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  49 >            MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  50              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  51              MOVE fcd--format-cobol2            TO FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:52.16-52.22:
-  49              MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-  50              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  51              MOVE fcd--format-cobol2            TO FCD-FILE-FORMAT
-  52 >            MOVE LENGTH OF LSEQ-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  53              MOVE fcd--recmode-variable TO FCD-RECORDING-MODE
-  54              MOVE 0 TO FCD-MIN-REC-LENGTH
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:94.16-94.22:
-  91              DISPLAY PROGRAM-NAME ': READING LINE SEQUENTIAL FILE.'
-  92              SET EXTFH-OPCODE-ISOPENINPUT       TO TRUE
-  93              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  94 >            MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  95              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  96              MOVE LENGTH OF LSEQ-RECORDAREA     TO FCD-MAX-REC-LENGTH
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:96.16-96.22:
-  93              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  94              MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-  95              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  96 >            MOVE LENGTH OF LSEQ-RECORDAREA     TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  97              MOVE 0 TO FCD-MIN-REC-LENGTH
-  98              SET FCD-FILENAME-ADDRESS TO ADDRESS OF LSEQ-FILENAME
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9618:0
 run_file.at-9618-reference:1.6-1.7:
@@ -5215,56 +5145,6 @@ run_file.at-9798-prog.cob:19.11-19.24:
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-9798-prog.cob:48.16-48.22:
-  45              DISPLAY PROGRAM-NAME ': STARTING.'
-  46              DISPLAY PROGRAM-NAME ': CREATING FIXED  SEQ FILE.'
-  47              SET EXTFH-OPCODE-ISOPENOUTPUT      TO TRUE
-  48 >            MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-----                   ^^^^^^
-  49              move fcd--version-number TO FCD-VERSION
-  50              MOVE fcd--sequential-org TO FCD-ORGANIZATION
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:52.16-52.22:
-  49              move fcd--version-number TO FCD-VERSION
-  50              MOVE fcd--sequential-org TO FCD-ORGANIZATION
-  51              MOVE fcd--open-closed TO FCD-OPEN-MODE
-  52 >            MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  53              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
-  54              move fcd--format-cobol2 to FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:55.16-55.22:
-  52              MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-  53              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
-  54              move fcd--format-cobol2 to FCD-FILE-FORMAT
-  55 >            MOVE LENGTH OF FIX-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  56              MOVE 0 TO FCD-MIN-REC-LENGTH
-  57              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FIX-FILENAME
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:100.16-100.22:
-  97              SET EXTFH-OPCODE-ISOPENINPUT       TO TRUE
-  98              MOVE fcd--sequential-org TO FCD-ORGANIZATION
-  99              MOVE fcd--open-closed TO FCD-OPEN-MODE
- 100 >            MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-----                   ^^^^^^
- 101              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
- 102              move fcd--format-cobol2 to FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:103.16-103.22:
- 100              MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
- 101              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
- 102              move fcd--format-cobol2 to FCD-FILE-FORMAT
- 103 >            MOVE LENGTH OF FIX-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
- 104              MOVE 0 TO FCD-MIN-REC-LENGTH
- 105              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FIX-FILENAME
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9979:0
 run_file.at-9979-prog.cob:15.16-15.24:
@@ -5319,16 +5199,6 @@ run_file.at-9979-prog.cob:93.17-93.21:
   95             WRITE TSPFL-RECORD.
 >> Error: Invalid syntax
 
-run_file.at-9979-prog.cob:101.15-101.21:
-  98             SET FCD-KEY-DEF-ADDRESS  TO ADDRESS OF KEY-DEF.
-  99             SET FCD-FILENAME-ADDRESS TO ADDRESS OF FCD-FILENAME.
- 100             MOVE 64 TO FCD-NAME-LENGTH
- 101 >           MOVE LENGTH OF KEY-DEF TO KDB-LEN.
-----                  ^^^^^^
- 102             SET FCD-RECORD-ADDRESS   TO ADDRESS OF FCD-RECORD.
- 103             MOVE 512 TO FCD-CURRENT-REC-LEN
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10308:0
 run_file.at-10308-prog.cob:86.11-86.23:
   83                  78  UNLOCK-RECORD               VALUE X'0F'.
@@ -5341,26 +5211,6 @@ run_file.at-10308-prog.cob:86.11-86.23:
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-10308-prog.cob:155.16-155.22:
- 152              SET  FCD-FILENAME-ADDRESS   TO ADDRESS OF FILE-NAME
- 153              SET  FCD-KEY-DEF-ADDRESS    TO ADDRESS OF KEY-DEF-AREA
- 154              MOVE 16                     TO FCD-FS-FLAGS
- 155 >            MOVE LENGTH OF RECORD-AREA  TO FCD-CURRENT-REC-LEN
-----                   ^^^^^^
- 156              MOVE 1                      TO NUMBER-OF-KEYS
- 157              MOVE LENGTH OF PRIME-KEY    TO COMPONENT-LENGTH
->> Error: Invalid syntax
-
-run_file.at-10308-prog.cob:157.16-157.22:
- 154              MOVE 16                     TO FCD-FS-FLAGS
- 155              MOVE LENGTH OF RECORD-AREA  TO FCD-CURRENT-REC-LEN
- 156              MOVE 1                      TO NUMBER-OF-KEYS
- 157 >            MOVE LENGTH OF PRIME-KEY    TO COMPONENT-LENGTH
-----                   ^^^^^^
- 158              MOVE 8                      TO FCD-ACCESS-MODE
- 159              MOVE 0                      TO FCD-LOCK-MODE
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10307:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10643:0
@@ -5397,36 +5247,6 @@ run_file.at-10831-prog.cob:86.12-86.24:
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-10831-prog.cob:134.16-134.22:
- 131         **   FIXED(0) OR VARIABLE(1)
- 132              MOVE 0 TO FCD-RECORDING-MODE
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134 >            MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
-----                   ^^^^^^
- 135              MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
- 136              MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
->> Error: Invalid syntax
-
-run_file.at-10831-prog.cob:135.16-135.22:
- 132              MOVE 0 TO FCD-RECORDING-MODE
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134              MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
- 135 >            MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
- 136              MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
- 137              PERFORM A-200-CALL-EXTFH.
->> Error: Invalid syntax
-
-run_file.at-10831-prog.cob:136.16-136.22:
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134              MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
- 135              MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
- 136 >            MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
-----                   ^^^^^^
- 137              PERFORM A-200-CALL-EXTFH.
- 138   
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10990:0
 run_file.at-10990-prog.cob:45.11-45.30:
@@ -5750,16 +5570,6 @@ run_file.at-11348-prog.cob:160.19-160.37:
 ----                      ^^^^^^^^^^^^^^^^^^
  161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
  162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:212.15-212.21:
- 209   
- 210             MOVE "TESTOUT" TO WS-FCD-DDNAME
- 211   
- 212 >           MOVE LENGTH OF FCD-MAP TO WS-FCD-SIZE
-----                  ^^^^^^
- 213             DISPLAY "FCD SIZE " WS-FCD-SIZE '.'.
- 214             DISPLAY "Writing " WS-FCD-DDNAME '.'.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11385:0

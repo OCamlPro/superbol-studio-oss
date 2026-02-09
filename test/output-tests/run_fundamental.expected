@@ -748,46 +748,6 @@ run_fundamental.at-8554-prog.cob:19.48-19.49:
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8629:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8833:0
-run_fundamental.at-8833-prog.cob:174.16-174.22:
- 171          CHECK-LENGTH.
- 172         *>-----------
- 173         *>
- 174 >            MOVE LENGTH OF P-PIC-1 TO W01-I .
-----                   ^^^^^^
- 175              IF W01-I NOT = 2
- 176              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:179.16-179.22:
- 176              THEN
- 177                  DISPLAY 'Error 1 size <' W01-I '> !=2' .
- 178         *>
- 179 >            MOVE LENGTH OF P-PIC-2 TO W01-I .
-----                   ^^^^^^
- 180              IF W01-I NOT = 2
- 181              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:184.16-184.22:
- 181              THEN
- 182                  DISPLAY 'Error 2 size <' W01-I '> !=2' .
- 183         *>
- 184 >            MOVE LENGTH OF P-PIC-3 TO W01-I .
-----                   ^^^^^^
- 185              IF W01-I NOT = 1
- 186              THEN
->> Error: Invalid syntax
-
-run_fundamental.at-8833-prog.cob:190.16-190.22:
- 187                  DISPLAY 'Error 3 size <' W01-I '> !=1' .
- 188         *>
- 189   
- 190 >            MOVE LENGTH OF P-PIC-4 TO W01-I .
-----                   ^^^^^^
- 191              IF W01-I NOT = 1
- 192              THEN
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8885:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8943:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:8994:0

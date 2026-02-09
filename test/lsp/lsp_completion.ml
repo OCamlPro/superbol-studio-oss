@@ -2505,7 +2505,7 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
       12               ON SIZE ERROR
     (line 9, character 15):
-    Basic (18 entries):
+    Basic (19 entries):
         AA Numeric
         BB Numeric
         ADDRESS
@@ -2514,6 +2514,7 @@ let%expect_test "procedure-completion" =
         EXCEPTION-OBJECT
         FUNCTION
         HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         LOW-VALUES
@@ -2524,7 +2525,7 @@ let%expect_test "procedure-completion" =
         SPACES
         SUPER
         ZEROS
-    Eager (18 entries):
+    Eager (19 entries):
         AA Numeric
         BB Numeric
         ADDRESS OF
@@ -2533,6 +2534,7 @@ let%expect_test "procedure-completion" =
         EXCEPTION-OBJECT
         FUNCTION
         HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         LOW-VALUES
@@ -3756,36 +3758,50 @@ let%expect_test "semantic-completion" =
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM
     (line 16, character 29):
-    Basic (14 entries):
+    Basic (21 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
         GROUPVAR Group
         POINT Pointer (unexpected here)
         ADDRESS
+        ALL
         EXCEPTION-OBJECT
         FUNCTION
+        HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
+        LOW-VALUES
         NULL
         PAGE-COUNTER
+        QUOTES
         SELF
+        SPACES
         SUPER
-    Eager (14 entries):
+        ZEROS
+    Eager (21 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
         GROUPVAR Group
         POINT Pointer (unexpected here)
         ADDRESS OF
+        ALL
         EXCEPTION-OBJECT
         FUNCTION
+        HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
+        LOW-VALUES
         NULL
         PAGE-COUNTER
+        QUOTES
         SELF
+        SPACES
         SUPER
+        ZEROS
     __rootdir__/prog.cob:21.20:
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM

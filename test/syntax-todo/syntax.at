@@ -798,7 +798,7 @@ AT_CLEANUP
 
 
 AT_SETUP([LENGTH])
-# promoted on 2024-04-05T13:38
+# promoted on 2026-02-09T14:56
 AT_DATA([prog.cob],[
 identification division.
 program-id.             acas-get-params.
@@ -806,12 +806,12 @@ program-id.             acas-get-params.
               MOVE LENGTH(Buffer) TO Buffer-Length
 ])
 AT_CHECK([$SUPERBOL check --recovery=false --free prog.cob], [1], [Checking `prog.cob'
-prog.cob:5.19-5.25:
+prog.cob:5.25-5.26:
    2   identification division.
    3   program-id.             acas-get-params.
    4    procedure division.
    5 >               MOVE LENGTH(Buffer) TO Buffer-Length
-----                      ^^^^^^
+----                            ^
 >> Error: Invalid syntax
 
 ], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
