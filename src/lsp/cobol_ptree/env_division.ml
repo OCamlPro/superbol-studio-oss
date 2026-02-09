@@ -236,7 +236,7 @@ and select =
 and select_clause =
   | SelectAssign of
       {
-        to_: name_or_alphanum list;
+        to_: assign_target;
         using: name with_loc option;
       }
   | SelectAccessMode of access_mode
@@ -272,6 +272,32 @@ and select_clause =
   | SelectRelativeKey of name with_loc
   | SelectReserve of integer
   | SelectSharing of sharing_mode                                 (* +COB2002 *)
+
+and assign_target = {
+    type_: assign_type option;
+    file_device: assign_file_device option;
+    target: name_or_alphanum list
+  }
+
+and assign_type =
+  | External
+  | Dynamic
+
+and assign_file_device =
+  | File of assign_file
+  | Device of assign_device
+  | DiskFrom of name with_loc
+
+and assign_file =
+  | LineAdvancing
+  | MultipleUnitReel
+
+and assign_device =
+  | Disk
+  | Keyboard
+  | Display
+  | Printer_1
+  | Printer_2
 
 and access_mode =
   | AccessModeDynamic
@@ -600,10 +626,41 @@ let pp_access_mode ppf = function
   | AccessModeRandom -> Fmt.pf ppf "RANDOM"
   | AccessModeSequential -> Fmt.pf ppf "SEQUENTIAL"
 
+
+
+let pp_assign_type ppf = function
+  | External -> Fmt.pf ppf "EXTERNAL"
+  | Dynamic -> Fmt.pf ppf "DYNAMIC"
+
+let pp_assign_file ppf = function
+  | LineAdvancing -> Fmt.pf ppf "LINE@ ADVANCING"
+  | MultipleUnitReel -> Fmt.pf ppf "MULTIPLE@ REEL"
+
+let pp_assign_device ppf = function
+  | Disk -> Fmt.pf ppf "DISK"
+  | Keyboard -> Fmt.pf ppf "KEYBOARD"
+  | Display -> Fmt.pf ppf "DISK"
+  | Printer_1 -> Fmt.pf ppf "PRINTER-1"
+  | Printer_2 -> Fmt.pf ppf "PRINTER-2"
+
+let pp_assign_file_device ppf = function
+  | File f ->
+      Fmt.pf ppf "%a@ FILE" pp_assign_file f
+  | Device d ->
+      Fmt.pf ppf "%a@" pp_assign_device d
+  | DiskFrom n ->
+      Fmt.pf ppf "DISK@ FROM@ %a" pp_name' n
+
+let pp_assign_target ppf { type_; file_device; target } =
+  Fmt.pf ppf "%a%a%a"
+    Fmt.(option (sp ++ pp_assign_type)) type_
+    Fmt.(option (sp ++ pp_assign_file_device)) file_device
+    Fmt.(list ~sep:nop (sp ++ pp_name_or_alphanum)) target
+
 let pp_select_clause ppf = function
   | SelectAssign { to_; using } ->
     Fmt.pf ppf "@[ASSIGN%a@]%a"
-      Fmt.(list ~sep:nop (sp ++ pp_name_or_alphanum)) to_
+      pp_assign_target to_
       Fmt.(option (any "@ USING " ++ pp_name')) using
   | SelectAccessMode am ->
     Fmt.pf ppf "ACCESS %a" pp_access_mode am

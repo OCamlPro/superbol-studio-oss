@@ -703,6 +703,7 @@
 %token PRINT                        [@keyword]                [@contexts ]
 %token PRINTER                      [@keyword]                [@contexts ]
 %token PRINTER_1                    [@keyword]                [@contexts ]
+%token PRINTER_2                    [@keyword]                [@contexts ]
 %token PRINTING                     [@keyword]
 %token PRINT_NO_PROMPT              [@keyword]                [@contexts ]
 %token PRINT_PREVIEW                [@keyword]                [@contexts ]

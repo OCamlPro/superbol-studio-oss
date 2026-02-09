@@ -1473,46 +1473,26 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2645:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2646:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2711:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2710:0
-run_extensions.at-2710-prog.cob:9.30:
-   6          FILE-CONTROL.
+run_extensions.at-2710-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                 ^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
+   9          SELECT TEST-OUT  ASSIGN  DISPLAY
+  10 >                         ORGANIZATION IS LINE SEQUENTIAL.
+----                           ^^^^^^^^^^^^
   11          DATA             DIVISION.
->> Hint: Missing USING <word>
-
-run_extensions.at-2710-prog.cob:9.32-9.39:
-   6          FILE-CONTROL.
-   7          SELECT TEST-FILE ASSIGN  KEYBOARD
-   8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                   ^^^^^^^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
-  11          DATA             DIVISION.
+  12          FILE             SECTION.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2772:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2771:0
-run_extensions.at-2771-prog.cob:9.30:
-   6          FILE-CONTROL.
+run_extensions.at-2771-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                 ^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
+   9          SELECT TEST-OUT  ASSIGN  DISPLAY
+  10 >                         ORGANIZATION IS LINE SEQUENTIAL.
+----                           ^^^^^^^^^^^^
   11          SELECT SORT-FILE.
->> Hint: Missing USING <word>
-
-run_extensions.at-2771-prog.cob:9.32-9.39:
-   6          FILE-CONTROL.
-   7          SELECT TEST-FILE ASSIGN  KEYBOARD
-   8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                   ^^^^^^^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
-  11          SELECT SORT-FILE.
+  12          DATA             DIVISION.
 >> Error: Invalid syntax
 
 run_extensions.at-2771-prog.cob:11.23-11.24:
