@@ -251,6 +251,8 @@ let fold_file_sd_clause (v: _ #folder) =
           x
       | FileSDRecord c -> x
           >> Data_descr_visitor.fold_record_clause v c
+      | FileSDLabel c -> x
+          >> Data_descr_visitor.fold_label_clause v c
       | FileSDData d -> x
           >> Data_descr_visitor.fold_file_data_clause v d
     end
