@@ -933,26 +933,6 @@ run_extensions.at-1458-reference:4.6-4.7:
 >> Error: Unexpected indicator: `H'
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1556:0
-run_extensions.at-1556-prog.cob:59.38-59.47:
-  56            10 ARRAY OCCURS 2 TIMES.
-  57              20 L1-1.
-  58                25 L1-1-1 PIC X(3).
-  59 >              25 L1-1-2 OCCURS 4 TIMES DEPENDING ON L1-1-2-S.
-----                                         ^^^^^^^^^
-  60                  30 L1-1-2-1 OCCURS 5 TIMES DEPENDING ON L1-1-2-1-S
-  61                     PIC XXX.
->> Error: Invalid syntax
-
-run_extensions.at-1556-prog.cob:60.42-60.51:
-  57              20 L1-1.
-  58                25 L1-1-1 PIC X(3).
-  59                25 L1-1-2 OCCURS 4 TIMES DEPENDING ON L1-1-2-S.
-  60 >                30 L1-1-2-1 OCCURS 5 TIMES DEPENDING ON L1-1-2-1-S
-----                                             ^^^^^^^^^
-  61                     PIC XXX.
-  62              20 L1-2 OCCURS 0 TO 1 TIMES DEPENDING ON L1-2-S PIC XX.
->> Error: Invalid syntax
-
 run_extensions.at-1556-prog.cob:76.32-76.38:
   73                                   L1-2-S
   74                                   L1-3-S
@@ -1453,46 +1433,26 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2645:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2646:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2711:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2710:0
-run_extensions.at-2710-prog.cob:9.30:
-   6          FILE-CONTROL.
+run_extensions.at-2710-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                 ^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
+   9          SELECT TEST-OUT  ASSIGN  DISPLAY
+  10 >                         ORGANIZATION IS LINE SEQUENTIAL.
+----                           ^^^^^^^^^^^^
   11          DATA             DIVISION.
->> Hint: Missing USING <word>
-
-run_extensions.at-2710-prog.cob:9.32-9.39:
-   6          FILE-CONTROL.
-   7          SELECT TEST-FILE ASSIGN  KEYBOARD
-   8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                   ^^^^^^^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
-  11          DATA             DIVISION.
+  12          FILE             SECTION.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2772:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2771:0
-run_extensions.at-2771-prog.cob:9.30:
-   6          FILE-CONTROL.
+run_extensions.at-2771-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
    8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                 ^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
+   9          SELECT TEST-OUT  ASSIGN  DISPLAY
+  10 >                         ORGANIZATION IS LINE SEQUENTIAL.
+----                           ^^^^^^^^^^^^
   11          SELECT SORT-FILE.
->> Hint: Missing USING <word>
-
-run_extensions.at-2771-prog.cob:9.32-9.39:
-   6          FILE-CONTROL.
-   7          SELECT TEST-FILE ASSIGN  KEYBOARD
-   8                           ORGANIZATION IS LINE SEQUENTIAL.
-   9 >        SELECT TEST-OUT  ASSIGN  DISPLAY
-----                                   ^^^^^^^
-  10                           ORGANIZATION IS LINE SEQUENTIAL.
-  11          SELECT SORT-FILE.
+  12          DATA             DIVISION.
 >> Error: Invalid syntax
 
 run_extensions.at-2771-prog.cob:11.23-11.24:

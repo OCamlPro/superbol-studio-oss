@@ -5424,55 +5424,5 @@ listings.at-4076-prog2.cob:6.0-6.6:
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:4162:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:5812:0
-listings.at-5812-prog.cob:16.25-16.33:
-  13          FILE-CONTROL.
-  14   
-  15              SELECT TRANSACTION-DATA
-  16 >                ASSIGN TO EXTERNAL DATAIN
-----                            ^^^^^^^^
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18   
->> Warning: Ignored EXTERNAL (implementation pending)
-
-listings.at-5812-prog.cob:20.25-20.33:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18   
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                            ^^^^^^^^
-  21   
-  22          DATA DIVISION.
->> Warning: Ignored EXTERNAL (implementation pending)
-
-listings.at-5812-prog.cob:20.34-20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18   
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                     ^^^^
-  21   
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
-listings.at-5812-prog.cob:20.38:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18   
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                         ^
-  21   
-  22          DATA DIVISION.
->> Hint: Missing SEQUENTIAL
-
-listings.at-5812-prog.cob:20.39-20.48:
-  17                            ORGANIZATION IS LINE SEQUENTIAL.
-  18   
-  19              SELECT REPORT-FILE
-  20 >                ASSIGN TO EXTERNAL LINE ADVANCING SYSPRINT.
-----                                          ^^^^^^^^^
-  21   
-  22          DATA DIVISION.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/listings.at:6128:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:6940:0

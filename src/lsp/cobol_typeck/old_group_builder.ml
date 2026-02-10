@@ -110,9 +110,10 @@ let rec from_item_descrs config prog_env data_group : _ with_diags =
                                             length = Fixed ~&(occurs_fixed.times) };
                                     level } &@ loc)
       | Some element, Some OccursDepending { from; to_; depending; _ } ->
+          let min_size = match from with Some f -> ~&f | None -> "1" in
           DIAGS.some_result @@
           (Cobol_data.Types.Table { typ = { elements_type = element;
-                                            length = OccursDepending { min_size = ~&from;
+                                            length = OccursDepending { min_size;
                                                                        max_size = ~&to_;
                                                                        depending } };
                    level } &@ loc)

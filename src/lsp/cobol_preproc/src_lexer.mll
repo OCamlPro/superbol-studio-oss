@@ -123,6 +123,7 @@
       NOSSRANGE;
       ODOSLIDE;
       OVERRIDE;
+      PERIOD;
       REMOVE;
       SOURCEFORMAT;
       SPZERO;
@@ -134,6 +135,7 @@
       CDIR_SOURCE;
       FORMAT;
       IS;
+      PERIOD;
     ]
 
   let else_endif_keywords =
@@ -224,12 +226,12 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # ['\'' '"']
+let text_char = nonblank # ['\'' '"' '&']
 let neq = text_char # ['=']
 let text_word =
   (* Note: accepts words that include floating comment markers `*>'; these are
      processed in `Src_lexing.text_word`. *)
-  (neq* '='? neq+)+ | '=' | ">=" | "<="
+  (neq* '='? neq+)+ | '=' | ">=" | "<=" | '&'
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
@@ -333,7 +335,7 @@ and acutrm_line state   (* ACUCOBOL-GT Terminal (compat with VAX COBOL term.) *)
       }
 and xopen_or_crt_or_acutrm_followup state
   = parse
-  | ('$' as marker)
+  | blanks? ('$' as marker)
       {
         fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
