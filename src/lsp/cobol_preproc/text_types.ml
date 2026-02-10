@@ -40,6 +40,7 @@ and literal_kind =
   | Basic
   | Bool | BoolX                                           (* B, BX *)
   | Hex                                                    (* X *)
+  | HexH                                                   (* H *)
   | NullTerm                                               (* Z (not ISO/IEC) *)
   | National | NationalX                                   (* N, NX *)
 and pseudotext =
