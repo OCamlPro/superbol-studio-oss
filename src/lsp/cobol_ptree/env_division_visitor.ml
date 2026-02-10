@@ -45,6 +45,12 @@ class virtual ['a] folder = object
   method fold_rerun_clause: (rerun_clause, 'a) fold = default
   method fold_rerun_frequency: (rerun_frequency, 'a) fold = default
   method fold_same_area_clause: (same_area_clause, 'a) fold = default
+
+  method fold_assign_type: (assign_type, 'a) fold = default
+  method fold_assign_file: (assign_file, 'a) fold = default
+  method fold_assign_device: (assign_device, 'a) fold = default
+  method fold_assign_file_device: (assign_file_device, 'a) fold = default
+  method fold_assign_target: (assign_target, 'a) fold = default
   method fold_select: (select, 'a) fold = default
   method fold_select_clause: (select_clause, 'a) fold = default
   method fold_source_computer: (source_computer, 'a) fold = default
@@ -329,11 +335,51 @@ let fold_special_names_clause (v: _ #folder) =
 let fold_special_names_clause' (v: _ #folder) =
   handle' v#fold_special_names_clause' ~fold:fold_special_names_clause v
 
+let fold_assign_type (v: _ #folder) =
+  handle v#fold_assign_type
+    ~continue:begin function
+      | External
+      | Dynamic -> Fun.id
+    end
+
+let fold_assign_file (v: _ #folder) =
+  handle v#fold_assign_file
+    ~continue:begin function
+      | LineAdvancing
+      | MultipleUnitReel -> Fun.id
+    end
+
+let fold_assign_device (v: _ #folder) =
+  handle v#fold_assign_device
+    ~continue:begin function
+      | Disk
+      | Keyboard
+      | Display
+      | Printer_1
+      | Printer_2 -> Fun.id
+    end
+
+let fold_assign_file_device (v: _ #folder) =
+  handle v#fold_assign_file_device
+    ~continue:begin function
+      | File f -> fold_assign_file v f
+      | Device d -> fold_assign_device v d
+      | DiskFrom n -> fold_name' v n
+    end
+
+let fold_assign_target (v: _ #folder) =
+  handle v#fold_assign_target
+    ~continue:begin fun { type_; file_device; target } x -> x
+      >> fold_option ~fold:fold_assign_type v type_
+      >> fold_option ~fold:fold_assign_file_device v file_device
+      >> fold_list ~fold:fold_name_or_alphanum v target
+    end
+
 let fold_select_clause (v: _ #folder) =
   handle v#fold_select_clause
     ~continue:begin fun c x -> match c with
       | SelectAssign { to_; using } -> x
-          >> fold_list ~fold:fold_name_or_alphanum v to_
+          >> fold_assign_target v to_
           >> fold_name'_opt v using
       | SelectAccessMode a -> x
           >> fold_access_mode v a
