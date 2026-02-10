@@ -471,6 +471,7 @@ and file_fd_clause =
 
 and file_sd_clause =
   | FileSDRecord of record_clause
+  | FileSDLabel of label_clause
   | FileSDData of file_data_clause
   | FileSDGlobal
 [@@deriving ord]
@@ -505,6 +506,7 @@ let pp_file_fd_clause ppf = function
 
 let pp_file_sd_clause ppf = function
   | FileSDRecord rc -> pp_record_clause ppf rc
+  | FileSDLabel lc -> pp_label_clause ppf lc
   | FileSDData fdc -> pp_file_data_clause ppf fdc
   | FileSDGlobal -> Fmt.pf ppf "GLOBAL"
 

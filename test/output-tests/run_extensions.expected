@@ -360,26 +360,6 @@ run_extensions.at-445-prog.cob:79.37-79.43:
   81              END-IF
 >> Error: Invalid syntax
 
-run_extensions.at-445-prog.cob:87.23-87.29:
-  84                 END-DISPLAY
-  85              END-IF
-  86              IF LENGTH OF L + 2 NOT = 8
-  87 >               ADD 2 TO LENGTH OF L GIVING L
-----                          ^^^^^^
-  88                 DISPLAY "Length 5 + 2" L
-  89                 END-DISPLAY
->> Error: Invalid syntax
-
-run_extensions.at-445-prog.cob:92.23-92.29:
-  89                 END-DISPLAY
-  90              END-IF
-  91              IF LENGTH L + 2 NOT = 8
-  92 >               ADD 2 TO LENGTH L GIVING L
-----                          ^^^^^^
-  93                 DISPLAY "Length 5a + 2 " L
-  94                 END-DISPLAY
->> Error: Invalid syntax
-
 run_extensions.at-445-prog.cob:97.19-97.25:
   94                 END-DISPLAY
   95              END-IF
