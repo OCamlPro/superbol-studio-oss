@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Syntactic support for EXIT PROGRAM RETURNING [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
 - Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
