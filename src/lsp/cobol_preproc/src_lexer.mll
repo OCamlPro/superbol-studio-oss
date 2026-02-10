@@ -123,7 +123,6 @@
       NOSSRANGE;
       ODOSLIDE;
       OVERRIDE;
-      PERIOD;
       REMOVE;
       SOURCEFORMAT;
       SPZERO;
@@ -135,7 +134,6 @@
       CDIR_SOURCE;
       FORMAT;
       IS;
-      PERIOD;
     ]
 
   let else_endif_keywords =
@@ -695,7 +693,11 @@ and cdtoken keywords = parse
   | blanks
       { cdtoken keywords lexbuf }
 
-  | (nonblank+ as s)
+  | '.' { CDTok PERIOD }
+  | '(' { CDTok LPAR }
+  | ')' { CDTok RPAR }
+
+  | ((nonblank # ['.' '(' ')'])+ as s)
       { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
@@ -707,13 +709,17 @@ and cdtoken_with_numerics keywords = parse
   | blanks
       { cdtoken_with_numerics keywords lexbuf }
 
+  | '.' { CDTok PERIOD }
+  | '(' { CDTok LPAR }
+  | ')' { CDTok RPAR }
+
   | (sign? digit+ as s)
       { CDInt s }
 
   | (sign? digit* as n) (['.' ','] as sep) (digit+ as d)
       { CDFxd (n, sep, d) }
 
-  | (nonblank+ as s)
+  | ((nonblank # ['.' '(' ')'])+ as s)
       { CDTok (try Hashtbl.find keywords (String.uppercase_ascii s)
                with Not_found -> TEXT_WORD s) }
 
