@@ -2478,14 +2478,12 @@ literal_no_all:
 
 
 
-
 let numeric_literal [@symbol "<numeric literal>"] :=
  | i = integer;  { Integer i : numlit }
  | f = fixedlit; { Fixed f }
  | f = floatlit; { Floating f }
  | ZERO;         { NumFig Zero }
 (* Note: numeric literals do NOT allow figurative constants with ALL *)
-
 
 
 
@@ -2553,18 +2551,17 @@ let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
  | l = literal;  { UPCAST.literal_with_qualdatname l }
 
-(* Used in ADD, DIVIDE, MULTIPLY, PERFORM, SUBTRACT *)
-
-let ident_or_numeric :=
- | i = ident;           { UPCAST.ident_with_numeric i }
- | l = numeric_literal; { UPCAST.numeric_with_ident l }
-let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
-
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
- | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
- | l = literal;         { UPCAST.literal_as_scalar l }
- | l = length_of_expr;  { l }
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = numeric_literal;    { UPCAST.numeric_as_scalar l }
+ | l = length_of_expr;     { l }
+
+(* Used in MOVE *)
+let scalar_or_nonnumeric :=
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = literal;            { UPCAST.literal_as_scalar l }
+ | l = length_of_expr;     { l }
 
 (* Used in CALL *)
 let name_or_string :=
@@ -3104,12 +3101,12 @@ let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-w
 
 %public let unconditional_action := ~ = add_statement; < >
 add_statement:
- | ADD inl = idents_or_numerics TO irl = rounded_idents
+ | ADD inl = rnel(x) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithSimple { sources = inl; targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics TO in_ = ident_or_numeric
+ | ADD inl = rnel(x) TO in_ = x
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
@@ -3117,7 +3114,7 @@ add_statement:
                            to_or_from_item = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics (* Same as above without 'TO' *)
+ | ADD inl = rnel(x) (* Same as above without 'TO' *)
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
@@ -3217,7 +3214,7 @@ let close_format :=
 
 %public let unconditional_action := ~ = compute_statement; < >
 let compute_statement :=
-  | COMPUTE; irl = rounded_idents; "="; e = expression;
+  | COMPUTE; irl = rounded_idents; or_(EQUAL, "="); e = expression;
     h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);
     oterm_(END_COMPUTE);
     { Compute { compute_targets = irl; compute_expr = e;
@@ -3659,7 +3656,7 @@ let merge_statement :=
 
 %public let unconditional_action := ~ = move_statement; < >
 let move_statement :=
- | MOVE; from = x; TO; to_ = idents;
+ | MOVE; from = scalar_or_nonnumeric; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
  | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }
@@ -4189,12 +4186,12 @@ let s_delimited_by :=
 
 %public let unconditional_action := ~ = subtract_statement; < >
 let subtract_statement :=
- | SUBTRACT; inl = idents_or_numerics; FROM; irl = rounded_idents;
+ | SUBTRACT; inl = rnel(x); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithSimple { sources = inl; targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; inl = idents_or_numerics; FROM; in_ = ident_or_numeric;
+ | SUBTRACT; inl = rnel(x); FROM; in_ = x;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
