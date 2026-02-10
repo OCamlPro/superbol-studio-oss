@@ -3,16 +3,18 @@
 ## [_] Next release
 
 ### Added
+- Extend syntax of `ORGANIZATION` to allow `RECORD` and `BINARY` optional prefix [#511](https://github.com/OCamlPro/superbol-studio-oss/pull/511)
 - Allow national literals to be used as arithmetic terms [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
-- Syntactic support for EXIT PROGRAM RETURNING [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
+- Syntactic support for `EXIT PROGRAM RETURNING` [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
 - Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
 - Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
 - Allow EQUAL as synonym of `=` in COMPUTE [#507](https://github.com/OCamlPro/superbol-studio-oss/pull/507)
 - Support for `ADD` and `SUBTRACT` with `LENGTH OF` argument [#503](https://github.com/OCamlPro/superbol-studio-oss/pull/503)
+- Syntactic support for file and device clauses on `SELECT` [#495](https://github.com/OCamlPro/superbol-studio-oss/pull/495)
 - Support for `MOVE` with `LENGTH OF` sender [#494](https://github.com/OCamlPro/superbol-studio-oss/pull/494)
-- Support for Hexadecimal literals using 'H' and 'h' prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
+- Support for Hexadecimal literals using `H` and `h` prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
 - Support for `OCCURS N DEPENDING` syntax [#497](https://github.com/OCamlPro/superbol-studio-oss/pull/497)
 - Allow arbitrary number of spaces before `$`-prefixed compiler directives in fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498), [#512](https://github.com/OCamlPro/superbol-studio-oss/pull/512)
 - Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
@@ -24,7 +26,6 @@
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
-- Syntactic support for file and device clauses on SELECT [#495](https://github.com/OCamlPro/superbol-studio-oss/pull/495)
 
 ### Fixed
 - Handling of concatenation characters that are not followed by a separator space [#500](https://github.com/OCamlPro/superbol-studio-oss/pull/500)
