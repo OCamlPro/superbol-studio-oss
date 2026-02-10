@@ -2406,8 +2406,8 @@ let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
-(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] := *)
-(*   | ~ = rnel(scalar_ident); < > *)
+(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
+  | ~ = rnel(scalar_ident); < > *)
 
 let length_of_expr :=
   | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
@@ -2560,7 +2560,7 @@ let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
  | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
- | l = numeric_literal; { UPCAST.numeric_as_scalar l }
+ | l = literal;         { UPCAST.literal_as_scalar l }
  | l = length_of_expr;  { l }
 
 (* Used in CALL *)
@@ -3657,7 +3657,7 @@ let merge_statement :=
 
 %public let unconditional_action := ~ = move_statement; < >
 let move_statement :=
- | MOVE; from = ident_or_literal; TO; to_ = idents;
+ | MOVE; from = x; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
  | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }

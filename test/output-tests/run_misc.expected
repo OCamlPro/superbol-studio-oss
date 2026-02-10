@@ -2106,16 +2106,6 @@ run_misc.at-5078-callee.c:7.13-14.0:
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5078:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5116:0
-run_misc.at-5116-callee.cob:10.16-10.22:
-   7          LINKAGE          SECTION.
-   8          01 P1            PIC X ANY LENGTH.
-   9          PROCEDURE        DIVISION USING P1.
-  10 >            MOVE LENGTH OF P1 TO P2.
-----                   ^^^^^^
-  11              IF P2 NOT = 6
-  12                 DISPLAY P2.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5117:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5156:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:5157:0
