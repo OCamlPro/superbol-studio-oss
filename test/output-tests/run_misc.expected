@@ -5601,13 +5601,22 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12591:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12683:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12759:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12849:0
-run_misc.at-12849-prog.cob:2.7-2.8:
+run_misc.at-12849-prog.cob:2.7-2.34:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
+
+run_misc.at-12849-prog.cob:3.7-3.34:
+   1   
+   2          $SET CONSTANT DOGGY "Barky"
+   3 >        $SET CONSTANT PONY "Blacky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4          IDENTIFICATION DIVISION.
+   5          PROGRAM-ID. prog.
+>> Error: Malformed compiler directive
 
 run_misc.at-12849-prog.cob:8.35:
    5          PROGRAM-ID. prog.
@@ -5649,15 +5658,15 @@ run_misc.at-12849-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-run_misc.at-12849-prog.cob:10.7-10.8:
+run_misc.at-12849-prog.cob:10.7-10.33:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12860:0
 run_misc.at-12860-prog2.cob:2.7-2.35:

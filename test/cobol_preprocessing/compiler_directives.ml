@@ -49,6 +49,7 @@ let%expect_test "hybrid-format-cdirs" =
 
 let%expect_test "malformed-cdirs" =
   (* TODO: what should we do with the lonesome `>>`? *)
+  (* TODO: what should we do with the lonesome `$`? *)
   Preproc_testing.preprocess {|
       >>foo
       >>
@@ -59,21 +60,16 @@ let%expect_test "malformed-cdirs" =
 $
   |};
   [%expect {|
+    $
     prog.cob:2.6-2.11:
     >> Error: Invalid >>foo compiler directive
 
-    prog.cob:3.6-3.8:
-    >> Error: Invalid >> compiler directive
+    prog.cob:4.8-4.21:
+    >> Error: Unexpected characters
 
-    prog.cob:4.6-4.8:
-    >> Error: Invalid >> compiler directive
-
-    prog.cob:5.6-5.7:
-    >> Error: Invalid $ compiler directive
+    prog.cob:5.7-5.28:
+    >> Error: Unexpected characters
 
     prog.cob:7.0-7.4:
     >> Error: Invalid >> compiler directive
-
-    prog.cob:8.0-8.1:
-    >> Error: Invalid $ compiler directive
 |}];;
