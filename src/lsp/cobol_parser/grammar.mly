@@ -2035,7 +2035,7 @@ let procedure_division_header [@post.procedure_division_header] :=
 let procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = rl(loc(section_paragraph));
@@ -2048,7 +2048,7 @@ let procedure_division [@post.procedure_division] :=
 let program_procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = section_paragraphs;
@@ -2893,7 +2893,7 @@ let rounding_mode :=
 
 (* ALLOCATE, CALL, INVOKE, Procedure division header *)
 
-let returning := RETURNING; ~ = loc(ident); < >
+let returning_ident := RETURNING; ~ = loc(ident); < >
 
 
 
@@ -3144,11 +3144,11 @@ let end_add := oterm_(END_ADD)
 
 %public let unconditional_action := ~ = allocate_statement; < >
 let allocate_statement [@context allocate_stmt] :=
- | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning;
+ | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning_ident;
    { Allocate { allocate_kind = AllocateCharacters e;
                 allocate_initialized = ib;
                 allocate_returning = Some r } }
- | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning);
+ | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning_ident);
    { Allocate { allocate_kind = AllocateDataItem i;
                 allocate_initialized = ib;
                 allocate_returning = ro } }
@@ -3191,7 +3191,7 @@ let ident_or_nested :=
   | NESTED;    {CallProtoNested}
 
 let returning_or_giving :=
-  | ~ = returning; < >
+  | ~ = returning_ident; < >
   | GIVING; ~ = loc(ident); < > (* MF equivalent for RETURNING *)
 
 
@@ -3451,12 +3451,28 @@ let when_other [@default []] :=
 
 (* EXIT STATEMENT *)
 
+let returning :=
+ | ~ = scalar; <ReturningScalar>
+ | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
+    <ReturningAddress>
+ | or_(GIVING, RETURNING); v = integer;
+    { ReturningInt { value = Integer v;
+                     size = None } }
+ | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
+    { ReturningInt { value = Integer v;
+                     size = Some (Integer s) } }
+
+let program_exit_status [@default ExitDefault] :=
+ | { ExitDefault }
+ | ~ = returning; <ExitReturning>
+ | ~ = raising_exception; <ExitRaising>
+
 %public let unconditional_action := ~ = exit_statement; < >
 let exit_statement [@context exit_stmt] :=
  | EXIT; ~ = exit_spec; <Exit>
 let exit_spec [@recovery ExitSimple] :=
  | %prec lowest                          { ExitSimple }
- | PROGRAM; ro = ro(raising_exception);  { ExitProgram ro }
+ | PROGRAM; s = program_exit_status;     { ExitProgram s }
  | METHOD; ro = ro(raising_exception);   { ExitMethod ro }        (* COB2002+ *)
  | FUNCTION; ro = ro(raising_exception); { ExitFunction ro }      (* COB2002+ *)
  | PERFORM; c = bo(CYCLE);               { ExitPerform c }        (* COB2002+ *)
@@ -3638,7 +3654,7 @@ let ident_by_after_before :=
 %public let unconditional_action := ~ = invoke_statement; < >
 let invoke_statement :=
  | INVOKE; i = ident; is = ident_or_string;
-   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning);
+   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning_ident);
    { Invoke { invoke_target = i;
               invoke_method = is;
               invoke_using = ul;
@@ -4141,16 +4157,8 @@ let stop_body [@context stop_stmt] := (* with context: should not accept empty *
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_run_returning_body :=
-  | ~ = scalar; <StopReturningScalar>
-  | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
-    <StopReturningAddress>
-  | or_(GIVING, RETURNING); v = integer;
-    { StopReturningInt { value = Integer v;
-                         size = None } }
-  | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
-    { StopReturningInt { value = Integer v;
-                         size = Some (Integer s) } }
-  | ~ = with_status; <StopReturningStatus>
+  | ~ = returning; <StopReturning>
+  | ~ = with_status; <StopWithStatus>
 
 let stop_with_arg :=
   | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
