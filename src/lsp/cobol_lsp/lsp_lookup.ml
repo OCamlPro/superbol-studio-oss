@@ -323,12 +323,12 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         begin match o with
           | ArithSimple { sources; targets } ->
             acc
-            |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
+            |> Numeric @>@ fold_list ~fold:fold_scalar v sources
             |> Numeric @>@ fold_rounded_idents v targets
           | ArithGiving { sources; to_or_from_item; targets } ->
             acc
-            |> Numeric @>@ fold_list ~fold:fold_ident_or_numlit v sources
-            |> Numeric @>@ fold_ident_or_numlit v to_or_from_item
+            |> Numeric @>@ fold_list ~fold:fold_scalar v sources
+            |> Numeric @>@ fold_scalar v to_or_from_item
             |> [Numeric; NumericEdited] @>>@ fold_rounded_idents v targets
           | ArithCorresponding { source; target } ->
             acc
