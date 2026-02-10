@@ -226,12 +226,12 @@ let currency_sign_char =                                    (* as per ISO/IEC *)
               'A'-'E' 'N' 'P' 'R' 'S' 'V' 'X' 'Z'
               'a'-'e' 'n' 'p' 'r' 's' 'v' 'x' 'z'
                 ' ' '+' '-' ',' '.' '*' '/' ';' '(' ')' '\'' '"' '=']
-let text_char = nonblank # ['\'' '"']
+let text_char = nonblank # ['\'' '"' '&']
 let neq = text_char # ['=']
 let text_word =
   (* Note: accepts words that include floating comment markers `*>'; these are
      processed in `Src_lexing.text_word`. *)
-  (neq* '='? neq+)+ | '=' | ">=" | "<="
+  (neq* '='? neq+)+ | '=' | ">=" | "<=" | '&'
 
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)

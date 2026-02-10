@@ -1657,7 +1657,11 @@ let occurs_fixed_clause [@context occurs_clause] :=
 let occurs_depending_clause [@context occurs_clause] :=
   | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = i1; to_ = i2; depending = d;
+    { OccursDepending { from = Some i1; to_ = i2; depending = d;
+                        key_is = kl; indexed_by = il; } }
+  | OCCURS; i = loc(integer); TIMES?;
+    d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
+    { OccursDepending { from = None; to_ = i; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=

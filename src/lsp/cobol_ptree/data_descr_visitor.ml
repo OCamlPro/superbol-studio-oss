@@ -481,7 +481,7 @@ let fold_data_occurs_clause (v: _ #folder) =
           >> fold_name'_list v indexed_by
       | OccursDepending { from; to_; depending;
                           key_is; indexed_by } -> x
-          >> fold_integer' v from
+          >> fold_integer'_opt v from
           >> fold_integer' v to_
           >> fold_qualname' v depending
           >> fold_list ~fold:fold_sort_spec v key_is

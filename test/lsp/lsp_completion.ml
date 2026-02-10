@@ -3758,50 +3758,36 @@ let%expect_test "semantic-completion" =
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM
     (line 16, character 29):
-    Basic (21 entries):
+    Basic (14 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
         GROUPVAR Group
         POINT Pointer (unexpected here)
         ADDRESS
-        ALL
         EXCEPTION-OBJECT
         FUNCTION
-        HIGH-VALUES
-        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
-        LOW-VALUES
         NULL
         PAGE-COUNTER
-        QUOTES
         SELF
-        SPACES
         SUPER
-        ZEROS
-    Eager (21 entries):
+    Eager (14 entries):
         NUM Numeric (unexpected here)
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
         GROUPVAR Group
         POINT Pointer (unexpected here)
         ADDRESS OF
-        ALL
         EXCEPTION-OBJECT
         FUNCTION
-        HIGH-VALUES
-        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
-        LOW-VALUES
         NULL
         PAGE-COUNTER
-        QUOTES
         SELF
-        SPACES
         SUPER
-        ZEROS
     __rootdir__/prog.cob:21.20:
       18             SEC SECTION.
       19             MULTIPLY NUM BY NUM
