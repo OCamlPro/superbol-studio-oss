@@ -1286,6 +1286,7 @@ let file_descr_clause :=
 
 let sort_merge_file_descr_clause :=
  | ~ = record_clause; <FileSDRecord>
+ | ~ = label_clause;  <FileSDLabel>
  | ~ = data_clause;   <FileSDData>                                (* -COB2002 *)
  |     global_clause; {FileSDGlobal}
 
