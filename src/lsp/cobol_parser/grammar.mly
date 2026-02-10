@@ -1014,7 +1014,7 @@ let organization_clause :=
 let organization :=
  | INDEXED;                       {OrganizationIndexed}
  | RELATIVE;                      {OrganizationRelative}
- | RECORD?; BINARY?; SEQUENTIAL;  {OrganizationSequential}
+ | or_(RECORD, BINARY)?; SEQUENTIAL;  {OrganizationSequential}
  | LINE; SEQUENTIAL;              {OrganizationLineSequential}     (* LINE for microfocus *)
 
 let padding_character_clause :=                                    (* -COB2002 *)
