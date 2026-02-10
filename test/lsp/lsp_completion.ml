@@ -3545,7 +3545,7 @@ let%expect_test "semantic-completion" =
       15             DISPLAY ANYY.
       16             UNSTRING ALPHA INTO ANYY.
     (line 13, character 14):
-    Basic (16 entries):
+    Basic (17 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
@@ -3555,6 +3555,7 @@ let%expect_test "semantic-completion" =
         CORRESPONDING
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
@@ -3562,7 +3563,7 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
         ZEROS
-    Eager (16 entries):
+    Eager (17 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
@@ -3572,6 +3573,7 @@ let%expect_test "semantic-completion" =
         CORRESPONDING
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
@@ -3588,7 +3590,7 @@ let%expect_test "semantic-completion" =
       15             DISPLAY ANYY.
       16             UNSTRING ALPHA INTO ANYY.
     (line 13, character 21):
-    Basic (15 entries):
+    Basic (16 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
@@ -3597,6 +3599,7 @@ let%expect_test "semantic-completion" =
         ADDRESS
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
@@ -3604,7 +3607,7 @@ let%expect_test "semantic-completion" =
         SELF
         SUPER
         ZEROS
-    Eager (15 entries):
+    Eager (16 entries):
         NUM Numeric
         ALPHA Alphanum (unexpected here)
         ANYY Boolean (unexpected here)
@@ -3613,6 +3616,7 @@ let%expect_test "semantic-completion" =
         ADDRESS OF
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
@@ -3909,7 +3913,7 @@ let%expect_test "semantic-while-writing-completion" =
       11
       12             DISPLAY
     (line 9, character 14):
-    Basic (14 entries):
+    Basic (15 entries):
         NUM Numeric
         ALPHA Alphanum
         ANYY Boolean
@@ -3917,6 +3921,7 @@ let%expect_test "semantic-while-writing-completion" =
         CORRESPONDING
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
@@ -3924,7 +3929,7 @@ let%expect_test "semantic-while-writing-completion" =
         SELF
         SUPER
         ZEROS
-    Eager (14 entries):
+    Eager (15 entries):
         NUM Numeric
         ALPHA Alphanum
         ANYY Boolean
@@ -3932,6 +3937,7 @@ let%expect_test "semantic-while-writing-completion" =
         CORRESPONDING
         EXCEPTION-OBJECT
         FUNCTION
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         NULL
