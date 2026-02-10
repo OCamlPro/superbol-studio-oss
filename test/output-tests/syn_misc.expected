@@ -1045,7 +1045,7 @@ syn_misc.at-2702-prog.cob:47.14-47.21:
 ----                 ^^^^^^^
   48                 IF selection-idx > ZERO
   49                    MODIFY  lb-frm QUERY-INDEX = selection-idx
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-2702-prog.cob:47.28:
   44              DISPLAY lb-screen
@@ -1125,7 +1125,7 @@ syn_misc.at-2702-prog.cob:49.17-49.23:
 ----                    ^^^^^^
   50                    INQUIRE lb-frm ITEM-VALUE IN lb-row
   51                 END-IF
->> Error: Invalid syntax
+>> Warning: Invalid syntax
 
 syn_misc.at-2702-prog.cob:49.31:
   46              IF lb-row = SPACES
@@ -1770,46 +1770,6 @@ syn_misc.at-5295-prog.cob:9.27-9.33:
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5344:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5520:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:5611:0
-syn_misc.at-5611-prog.cob:16.11-16.15:
-  13          PROCEDURE DIVISION.
-  14   
-  15              IF var-len < 16
-  16 >            ELSE
-----              ^^^^
-  17                  move othervar to var
-  18              END-IF
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:21.11-21.15:
-  18              END-IF
-  19   
-  20              IF var-len > 16
-  21 >            ELSE
-----              ^^^^
-  22                  move othervar to var
-  23              END-IF
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:26.11-26.15:
-  23              END-IF
-  24   
-  25              IF (2 = 3)
-  26 >            ELSE
-----              ^^^^
-  27                 IF 1 = 1
-  28                 ELSE
->> Error: Invalid syntax
-
-syn_misc.at-5611-prog.cob:28.14-28.18:
-  25              IF (2 = 3)
-  26              ELSE
-  27                 IF 1 = 1
-  28 >               ELSE
-----                 ^^^^
-  29                    IF 1 = 1
-  30                       move var to othervar
->> Error: Invalid syntax
-
 syn_misc.at-5611-prog.cob:39.11-39.23:
   36              WHEN  A = B
   37                  move var      to othervar

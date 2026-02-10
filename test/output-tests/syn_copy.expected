@@ -465,15 +465,6 @@ syn_copy.at-1072-prog.cob:12.7-14.49:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-syn_copy.at-1072-prog.cob:15.11-15.17:
-  12          COPY "proc.inc"
-  13             REPLACING VAR       BY IN-A IN INPUT-REC
-  14                       ==VAR-2== BY ==IN-WS (1:1)==.
-  15 >            END-IF.
-----              ^^^^^^
-  16              STOP RUN.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:1110:0
 syn_copy.at-1110-prog.cob:2.7-2.12:
    1   
