@@ -149,10 +149,44 @@ let pp_entry_stmt ppf = function
     Fmt.pf ppf "ENTRY@ FOR GO TO %a"
       (pp_with_loc pp_alphanum) entry_name
 
+(* RETURNING/GIVING x *)
+type returning =
+  | ReturningScalar of scalar
+  | ReturningAddress of qualident
+  | ReturningInt of
+    {
+      value : literal;
+      size : literal option;
+    }
+[@@deriving ord]
+
+let pp_returning ppf = function
+  | ReturningScalar s ->
+    pp_scalar ppf s
+  | ReturningAddress n ->
+    Fmt.pf ppf "RETURNING@ ADDRESS@ OF@ %a"
+    pp_qualident n
+  | ReturningInt { value = v; size = None } ->
+    Fmt.pf ppf "RETURNING@ %a" pp_literal v
+  | ReturningInt { value = v; size = Some v' } ->
+    Fmt.pf ppf "RETURNING@ %a WITH SIZE %a"
+    pp_literal v pp_literal v'
+
+type program_exit_status =
+  | ExitDefault
+  | ExitReturning of returning
+  | ExitRaising of raising
+[@@deriving ord]
+
+let pp_program_exit_status ppf = function
+  | ExitDefault -> ()
+  | ExitReturning x -> Fmt.(sp ++ pp_returning) ppf x
+  | ExitRaising r -> Fmt.(sp ++ pp_raising) ppf r
+
 (* EXIT *)
 type exit_stmt =
   | ExitSimple
-  | ExitProgram of raising option
+  | ExitProgram of program_exit_status
   | ExitMethod of raising option
   | ExitFunction of raising option
   | ExitPerform of bool
@@ -162,8 +196,8 @@ type exit_stmt =
 
 let pp_exit_stmt ppf = function
   | ExitSimple -> Fmt.pf ppf "EXIT"
-  | ExitProgram ro ->
-    Fmt.pf ppf "EXIT PROGRAM%a" Fmt.(option (sp ++ pp_raising)) ro
+  | ExitProgram s ->
+    Fmt.pf ppf "EXIT PROGRAM%a" pp_program_exit_status s
   | ExitMethod ro ->
     Fmt.pf ppf "EXIT METHOD%a" Fmt.(option (sp ++ pp_raising)) ro
   | ExitFunction ro ->
@@ -792,14 +826,8 @@ and stop_arg =
   | StopWithLiteral of literal
 
 and stop_run_return =
-  | StopReturningScalar of scalar
-  | StopReturningAddress of qualident
-  | StopReturningInt of
-    {
-      value : literal;
-      size : literal option;
-    }
-  | StopReturningStatus of stop_run_status
+  | StopReturning of returning
+  | StopWithStatus of stop_run_status
 [@@deriving ord]
 
 and stop_run_status =
@@ -828,17 +856,10 @@ let pp_stop_stmt ppf = function
   | StopArg Some StopWithQualIdent i -> Fmt.pf ppf "STOP %a" pp_qualident i
   | StopArg Some StopWithLiteral l -> Fmt.pf ppf "STOP %a" pp_literal l
   | StopRun None -> Fmt.pf ppf "STOP RUN"
-  | StopRun Some StopReturningScalar s ->
-    Fmt.pf ppf "STOP@ RUN@ %a" pp_scalar s
-  | StopRun Some StopReturningAddress n ->
-    Fmt.pf ppf "STOP@ RUN@ RETURNING@ ADDRESS@ OF@ %a"
-    pp_qualident n
-  | StopRun Some StopReturningInt { value = v; size = None } ->
-    Fmt.pf ppf "STOP@ RUN@ RETURNING@ %a" pp_literal v
-  | StopRun Some StopReturningInt { value = v; size = Some v' } ->
-    Fmt.pf ppf "STOP@ RUN@ RETURNING@ %a WITH SIZE %a"
-    pp_literal v pp_literal v'
-  | StopRun Some StopReturningStatus s ->
+  | StopRun Some StopReturning r ->
+    Fmt.pf ppf "STOP@ RUN%a"
+      Fmt.(sp ++ pp_returning) r
+  | StopRun Some StopWithStatus s ->
     Fmt.pf ppf "STOP@ RUN%a"
       Fmt.(sp ++ pp_stop_run_status) s
   | StopError -> Fmt.pf ppf "STOP ERROR"

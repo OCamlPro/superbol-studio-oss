@@ -3,7 +3,8 @@
 ## [_] Next release
 
 ### Added
-- Allow national literals to be used as arithmetic term [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
+- Allow national literals to be used as arithmetic terms [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
+- Syntactic support for EXIT PROGRAM RETURNING [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
 - Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
@@ -13,7 +14,7 @@
 - Support for `MOVE` with `LENGTH OF` sender [#494](https://github.com/OCamlPro/superbol-studio-oss/pull/494)
 - Support for Hexadecimal literals using 'H' and 'h' prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
 - Support for `OCCURS N DEPENDING` syntax [#497](https://github.com/OCamlPro/superbol-studio-oss/pull/497)
-- Allow arbitrary number of spaces before `$`-prefixed compiler directives in some fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498)
+- Allow arbitrary number of spaces before `$`-prefixed compiler directives in fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498), [#512](https://github.com/OCamlPro/superbol-studio-oss/pull/512)
 - Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 - Display reference count in hover information for data items [#429](https://github.com/OCamlPro/superbol-studio-oss/pull/429) (fix for [Issue #354](https://github.com/OCamlPro/superbol-studio-oss/issues/354))
 - Dedicated libraries for testing internal behaviors of the LSP server [#487](https://github.com/OCamlPro/superbol-studio-oss/pull/487)

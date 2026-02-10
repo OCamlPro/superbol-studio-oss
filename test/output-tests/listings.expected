@@ -5247,13 +5247,6 @@ listings.at-3669-expected.lst:316.6-316.7:
 >> Error: Unexpected indicator: `o'
 
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3688:0
-listings.at-3688-prog.cob:1.7-1.8:
-   1 > 000001 $SET SOURCEFORMAT "VARIABLE"
-----          ^
-   2   000010 IDENTIFICATION DIVISION.
-   3   000020 PROGRAM-ID. prog.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3725:0
 Considering: import/gnucobol/tests/testsuite.src/listings.at:3810:0
 listings.at-3810-prog.cob:6.7-6.23:
