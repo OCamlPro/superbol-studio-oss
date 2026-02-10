@@ -2407,7 +2407,7 @@ let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
 (* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
-  | ~ = rnel(scalar); < > *)
+  | ~ = rnel(scalar_ident); < > *)
 
 let length_of_expr :=
   | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
