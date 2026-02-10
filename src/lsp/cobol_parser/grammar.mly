@@ -650,12 +650,27 @@ let environment_division :=
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
 let configuration_section :=
- | CONFIGURATION; SECTION; ".";
+  | CONFIGURATION; SECTION; ".";
    permuted = any_permut4_nullable(
                           loc(source_computer_paragraph),
                           loc(object_computer_paragraph),
                           loc(special_names_paragraph),
                           loc(repository_paragraph));
+  { let (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph,
+         conf_sec_order) = permuted in
+    { source_computer_paragraph;
+      object_computer_paragraph;
+      special_names_paragraph;
+      repository_paragraph;
+      conf_sec_order } }
+  | permuted = any_permut4(
+      loc(source_computer_paragraph),
+      loc(object_computer_paragraph),
+      loc(special_names_paragraph),
+      loc(repository_paragraph));
   { let (source_computer_paragraph,
          object_computer_paragraph,
          special_names_paragraph,
