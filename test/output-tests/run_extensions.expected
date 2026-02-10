@@ -1619,15 +1619,15 @@ run_extensions.at-4864-progc.cob:12.7-12.25:
           - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4903:0
-run_extensions.at-4903-prog.cob:7.7-7.8:
+run_extensions.at-4903-prog.cob:7.7-7.47:
    4          DATA             DIVISION.
    5          WORKING-STORAGE  SECTION.
    6          01 var1          pic x.
    7 >        $DISPLAY  MF compile time text # A.0-B;C *> without comment
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    8          01 var2          pic x.
    9          >> DISPLAY some.text-here
->> Error: Invalid syntax
+>> Error: Invalid $DISPLAY compiler directive
 
 run_extensions.at-4903-prog.cob:9.7-9.32:
    6          01 var1          pic x.
@@ -1659,14 +1659,14 @@ run_extensions.at-4903-prog.cob:13.7-13.51:
   15              GOBACK.
 >> Error: Invalid >>DISPLAY compiler directive
 
-run_extensions.at-4903-prog.cob:14.7-14.8:
+run_extensions.at-4903-prog.cob:14.7-14.39:
   11          PROCEDURE        DIVISION.
   12          >> DISPLAY   other  text #2  *> comment
   13          >> DISPLAY  "literal text...  *> no comment"
   14 >        $DISPLAY  "MF compile time text"
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   15              GOBACK.
->> Error: Invalid syntax
+>> Error: Invalid $DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4932:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4957:0
@@ -1683,15 +1683,24 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5277:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5301:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5326:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5362:0
-run_extensions.at-5362-prog.cob:5.11-5.12:
+run_extensions.at-5362-prog.cob:3.11-3.30:
+   1   
+   2          >>IF BINARY-COMP-1 IS DEFINED
+   3 >            $SET COMP-1(BINARY)
+----              ^^^^^^^^^^^^^^^^^^^
+   4          >>ELSE
+   5              $SET COMP1 "float"
+>> Error: Malformed compiler directive
+
+run_extensions.at-5362-prog.cob:5.11-5.29:
    2          >>IF BINARY-COMP-1 IS DEFINED
    3              $SET COMP-1(BINARY)
    4          >>ELSE
    5 >            $SET COMP1 "float"
-----              ^
+----              ^^^^^^^^^^^^^^^^^^
    6          >>END-IF
    7          IDENTIFICATION  DIVISION.
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5394:0
 run_extensions.at-5394-prog.cob:9.11-9.18:

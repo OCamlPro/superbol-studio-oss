@@ -1801,6 +1801,56 @@ run_reportwriter.at-1493-reference:3.6-3.7:
    5      152   J. LANGDON            8       87653       $24.75         09%          $2.23         $22.52
 >> Error: Unexpected indicator: `N'
 
+run_reportwriter.at-1493-reference:9.51-9.59:
+   6                                  6       64025        $9.45         22%          $2.08          $7.37
+   7                                  4       41915       $13.70         15%          $2.06         $11.64
+   8                                  1       17410        $2.51         05%           $.13          $2.38
+   9 >                                                    $50.41 *                    $6.50 *       $43.91 *
+----                                                      ^^^^^^^^
+  10   
+  11   
+>> Error: Invalid $50 compiler directive
+
+run_reportwriter.at-1493-reference:21.50-21.59:
+  18                                  7       79204       $51.70         12%          $6.20         $45.50
+  19                                  8       85075       $37.84         09%          $3.41         $34.43
+  20                                  9       98476       $87.94         20%         $17.59         $70.35
+  21 >                                                   $268.33 *                   $39.66 *      $228.67 *
+----                                                     ^^^^^^^^^
+  22   
+  23   
+>> Error: Invalid $268 compiler directive
+
+run_reportwriter.at-1493-reference:29.50-29.59:
+  26                                  6       60010       $20.40         22%          $4.49         $15.91
+  27                                  8       85260       $78.52         09%          $7.07         $71.45
+  28                                  9       90520       $27.52         20%          $5.50         $22.02
+  29 >                                                   $222.84 *                   $23.96 *      $198.88 *
+----                                                     ^^^^^^^^^
+  30   
+  31   
+>> Error: Invalid $222 compiler directive
+
+run_reportwriter.at-1493-reference:39.50-39.59:
+  36                                  8       85278       $49.75         09%          $4.48         $45.27
+  37                                  8       87492       $64.25         09%          $5.78         $58.47
+  38                                  9       97204       $84.75         20%         $16.95         $67.80
+  39 >                                                   $383.18 *                   $45.88 *      $337.30 *
+----                                                     ^^^^^^^^^
+  40   
+  41   
+>> Error: Invalid $383 compiler directive
+
+run_reportwriter.at-1493-reference:54.50-54.59:
+  51                                  9       90275        $4.60         20%           $.92          $3.68
+  52                                  9       91572       $18.57         20%          $3.71         $14.86
+  53                                  9       97576       $84.95         20%         $16.99         $67.96
+  54 >                                                   $543.41 *                   $60.50 *      $482.91 *
+----                                                     ^^^^^^^^^
+  55   
+  56   
+>> Error: Invalid $543 compiler directive
+
 run_reportwriter.at-1493-reference:68.6-68.7:
   65   
   66                             C U S T O M E R  C H A R G E  R E P O R T                      PAGE     2
@@ -1810,6 +1860,26 @@ run_reportwriter.at-1493-reference:68.6-68.7:
   69   
   70     6213   Z. HAMPTON            3       34576       $51.15         10%          $5.12         $46.03
 >> Error: Unexpected indicator: `N'
+
+run_reportwriter.at-1493-reference:72.50-72.59:
+  69   
+  70     6213   Z. HAMPTON            3       34576       $51.15         10%          $5.12         $46.03
+  71                                  4       49512       $85.20         15%         $12.78         $72.42
+  72 >                                                   $299.35 *                   $26.05 *      $273.30 *
+----                                                     ^^^^^^^^^
+  73   
+  74   
+>> Error: Invalid $299 compiler directive
+
+run_reportwriter.at-1493-reference:89.50-89.59:
+  86                                  8       82462       $20.15         09%          $1.81         $18.34
+  87                                  9       91520       $18.15         20%          $3.63         $14.52
+  88                                  9       93715       $40.15         20%          $8.03         $32.12
+  89 >                                                   $798.87 *                   $75.57 *      $723.30 *
+----                                                     ^^^^^^^^^
+  90            GRAND TOTALS                           $2,566.39 **                 $278.12 **   $2,288.27 **
+  91   
+>> Error: Invalid $798 compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:1720:0
 run_reportwriter.at-1720-inp_data:1.6-1.7:
@@ -4593,6 +4663,14 @@ run_reportwriter.at-2890-reference:50.6-50.7:
   51   
   52                DEPARTMENT TOTALS       $1,744.00 *    $102.04 *    $210.54 *     $13.25 *    $1,418.17 *
 >> Error: Unexpected indicator: `0'
+
+run_reportwriter.at-2890-reference:87.36-87.72:
+  84   
+  85       25 MAINTENANCE                   $1,744.00  10%     $102.04  10%     $210.54   9%      $13.25  17%     $1,418.17  10%
+  86   
+  87 >                                     $17,208.00 100%   $1,006.78 100%   $2,456.42 100%      $80.00 100%    $13,843.92 100%
+----                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> Error: Invalid $17 compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:3019:0
 run_reportwriter.at-3019-inp_data:1.6-1.7:

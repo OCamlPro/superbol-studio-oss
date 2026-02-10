@@ -2089,13 +2089,22 @@ syn_misc.at-6882-prog.cob:5.6-5.17:
 >> Error: Invalid $DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6961:0
-syn_misc.at-6961-prog.cob:2.7-2.8:
+syn_misc.at-6961-prog.cob:2.7-2.34:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
+
+syn_misc.at-6961-prog.cob:3.7-3.34:
+   1   
+   2          $SET CONSTANT DOGGY "Barky"
+   3 >        $SET CONSTANT PONY "Blacky"
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   4          IDENTIFICATION DIVISION.
+   5          PROGRAM-ID. prog.
+>> Error: Malformed compiler directive
 
 syn_misc.at-6961-prog.cob:8.35:
    5          PROGRAM-ID. prog.
@@ -2137,35 +2146,25 @@ syn_misc.at-6961-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-syn_misc.at-6961-prog.cob:10.7-10.8:
+syn_misc.at-6961-prog.cob:10.7-10.33:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12         * ensure to test a numeric, too (not actually used):
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
 
-syn_misc.at-6961-prog.cob:13.35:
+syn_misc.at-6961-prog.cob:13.7-13.35:
   10          $SET CONSTANT PONY "White"
   11         *
   12         * ensure to test a numeric, too (not actually used):
   13 >        $SET CONSTANT C-UNUSED-NUM 0
-----                                      ^
+----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   14          PROCEDURE DIVISION.
   15          MAIN.
->> Hint: Missing .
-
-syn_misc.at-6961-prog.cob:14.7-14.16:
-  11         *
-  12         * ensure to test a numeric, too (not actually used):
-  13          $SET CONSTANT C-UNUSED-NUM 0
-  14 >        PROCEDURE DIVISION.
-----          ^^^^^^^^^
-  15          MAIN.
-  16              DISPLAY "Your Dog's name is " DOGGY ";".
->> Error: Invalid syntax
+>> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6967:0
 syn_misc.at-6967-prog2.cob:2.7-2.35:
@@ -2764,43 +2763,23 @@ syn_misc.at-7955-prog.cob:9.17-9.26:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8055:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8093:0
-syn_misc.at-8093-prog.cob:2.7-2.8:
+syn_misc.at-8093-prog.cob:2.7-2.25:
    1   
    2 >        $SET NO-AREA-CHECK
-----          ^
+----          ^^^^^^^^^^^^^^^^^^
    3          IDENTIFICATION  DIVISION.
    4          PROGRAM-ID.     prog.
->> Error: Invalid syntax
+>> Warning: Ignored compiler directive
 
-syn_misc.at-8093-prog.cob:10.7-10.8:
+syn_misc.at-8093-prog.cob:10.7-10.22:
    7          PROCEDURE       DIVISION.
    8          MAIN-1 SECTION.
    9          DISPLAY "SOMETHING".
   10 >        $SET AREA-CHECK
-----          ^
+----          ^^^^^^^^^^^^^^^
   11          MAIN-2 SECTION.
   12              CONTINUE.
->> Error: Invalid syntax
-
-syn_misc.at-8093-prog.cob:10.22:
-   7          PROCEDURE       DIVISION.
-   8          MAIN-1 SECTION.
-   9          DISPLAY "SOMETHING".
-  10 >        $SET AREA-CHECK
-----                         ^
-  11          MAIN-2 SECTION.
-  12              CONTINUE.
->> Hint: Missing ATTRIBUTE .
-
-syn_misc.at-8093-prog.cob:11.7-11.13:
-   8          MAIN-1 SECTION.
-   9          DISPLAY "SOMETHING".
-  10          $SET AREA-CHECK
-  11 >        MAIN-2 SECTION.
-----          ^^^^^^
-  12              CONTINUE.
-  13          CONTINUE.
->> Error: Invalid syntax
+>> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8195:0
 syn_misc.at-8195-cobol85.cob:2.31:

@@ -236,9 +236,12 @@ let text_word =
 let cdir_char =
   (letter | digit | ':')                            (* colon for pseudo-words *)
 let cdir_word_suffix =
-  (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)? (* CHECKME: allow empty? *)
+  (cdir_char ((cdir_char | '_' | '-') cdir_char*)*)
 let cdir_word =
-  (">>" ' '* cdir_word_suffix)
+  (">>" ' '* cdir_word_suffix?) (* CHECKME: allow empty? *)
+
+let mf_cdir_word =
+  ('$' ' '* cdir_word_suffix)
 
 (* Fixed format *)
 
@@ -335,7 +338,7 @@ and acutrm_line state   (* ACUCOBOL-GT Terminal (compat with VAX COBOL term.) *)
       }
 and xopen_or_crt_or_acutrm_followup state
   = parse
-  | blanks? ('$' as marker)
+  | ('$' as marker)
       {
         fixed_mf_cdir_line (String.make 1 marker) state lexbuf
       }
@@ -405,6 +408,10 @@ and fixed_nominal_line state
       {
         Src_lexing.separator ~char ~ktkd:gobble_line ~knom:fixed_nominal
           state lexbuf
+      }
+  | mf_cdir_word
+      {
+        Src_lexing.cdir_word ~ktkd:gobble_line ~knom:fixed_nominal state lexbuf
       }
   | cdir_word
       {
@@ -586,7 +593,7 @@ and free_line state
       {
         free_line state lexbuf
       }
-  | (cdir_word | '$' blanks? cdir_word_suffix)
+  | (cdir_word | mf_cdir_word)
       {
         Src_lexing.cdir_word' ~k:free_nominal
           (Src_lexing.flush_continued ~force:true state) lexbuf
