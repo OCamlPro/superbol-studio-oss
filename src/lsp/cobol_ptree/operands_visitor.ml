@@ -89,11 +89,11 @@ let fold_basic_arithmetic_operands (v: _ #folder) =
   handle v#fold_basic_arithmetic_operands
     ~continue:begin fun o x -> match o with
       | ArithSimple { sources; targets } -> x
-          >> fold_list ~fold:fold_ident_or_numlit v sources
+          >> fold_list ~fold:fold_scalar v sources
           >> fold_rounded_idents v targets
       | ArithGiving { sources; to_or_from_item; targets } -> x
-          >> fold_list ~fold:fold_ident_or_numlit v sources
-          >> fold_ident_or_numlit v to_or_from_item
+          >> fold_list ~fold:fold_scalar v sources
+          >> fold_scalar v to_or_from_item
           >> fold_rounded_idents v targets
       | ArithCorresponding { source; target } -> x
           >> fold_qualname v source
