@@ -494,7 +494,7 @@ type move_stmt =              (* TODO: maybe split in two distinct statements *)
       }
   | MoveCorresponding of
       {
-        from: scalar;
+        from: ident;
         to_: ident list;
       }
 [@@deriving ord]
@@ -506,7 +506,7 @@ let pp_move_stmt ppf = function
       Fmt.(list ~sep:sp pp_ident) to_
   | MoveCorresponding { from; to_ } ->
     Fmt.pf ppf "MOVE CORRESPONDING@ %a@ TO@ %a"
-      pp_scalar from
+      pp_ident from
       Fmt.(list ~sep:sp pp_ident) to_
 
 

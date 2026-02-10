@@ -442,7 +442,7 @@ let type_at_pos ~filename (pos: Lsp.Types.Position.t) group : approx_typing_info
         begin match m with
           | MoveCorresponding { from; to_ } ->
             acc
-            |> Group @>@ fold_scalar v from
+            |> Group @>@ fold_ident v from
             |> Group @>@ fold_list ~fold:fold_ident v to_
           | _ -> acc
         end

@@ -421,7 +421,7 @@ let semtoks_from_ptree ~filename ?range ptree =
           |> add_list add_ident to_ VarModif
           |> Visitor.skip_children
       | MoveCorresponding { from; to_ } -> acc
-          |> fold_scalar self from
+          |> fold_ident self from
           |> add_list add_ident to_ VarModif
           |> Visitor.skip_children
 

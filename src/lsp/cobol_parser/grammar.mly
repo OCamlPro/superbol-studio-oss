@@ -3635,7 +3635,7 @@ let merge_statement :=
 let move_statement :=
  | MOVE; from = x; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
- | MOVE; CORRESPONDING; from = scalar; TO; to_ = idents;
+ | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }
 
 

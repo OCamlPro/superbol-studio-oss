@@ -547,7 +547,7 @@ let fold_move' (v: _ #folder) =
           >> fold_scalar v from
           >> fold_list ~fold:fold_ident v to_
       | MoveCorresponding { from; to_ } -> x
-          >> fold_scalar v from
+          >> fold_ident v from
           >> fold_list ~fold:fold_ident v to_
     end
 
