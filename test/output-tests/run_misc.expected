@@ -5607,7 +5607,7 @@ run_misc.at-12849-prog.cob:2.7-2.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12849-prog.cob:3.7-3.34:
    1   
@@ -5616,7 +5616,7 @@ run_misc.at-12849-prog.cob:3.7-3.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12849-prog.cob:8.35:
    5          PROGRAM-ID. prog.
@@ -5666,7 +5666,7 @@ run_misc.at-12849-prog.cob:10.7-10.33:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12860:0
 run_misc.at-12860-prog2.cob:2.7-2.35:
@@ -5675,7 +5675,7 @@ run_misc.at-12860-prog2.cob:2.7-2.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    3          >>SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12860-prog2.cob:3.7-3.35:
    1   
@@ -5684,7 +5684,7 @@ run_misc.at-12860-prog2.cob:3.7-3.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog2.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12860-prog2.cob:8.35:
    5          PROGRAM-ID. prog2.
@@ -5734,7 +5734,7 @@ run_misc.at-12860-prog2.cob:10.7-10.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12871:0
 run_misc.at-12871-prog3.cob:2.7-2.38:
@@ -5813,7 +5813,7 @@ run_misc.at-12934-prog.cob:5.7-5.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12934-prog.cob:6.7-6.34:
    3          PROGRAM-ID. prog.
@@ -5823,7 +5823,7 @@ run_misc.at-12934-prog.cob:6.7-6.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-12934-prog.cob:8.35:
    5          >>SET CONSTANT DOGGY "Pluto"
@@ -5894,7 +5894,7 @@ run_misc.at-13000-prog.cob:5.7-5.35:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-13000-prog.cob:6.7-6.34:
    3          PROGRAM-ID. prog.
@@ -5904,7 +5904,7 @@ run_misc.at-13000-prog.cob:6.7-6.34:
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 run_misc.at-13000-prog.cob:8.35:
    5          >>SET CONSTANT DOGGY "Pluto"
