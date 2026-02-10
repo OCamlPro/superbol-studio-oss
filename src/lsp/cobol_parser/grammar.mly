@@ -1650,14 +1650,21 @@ let data_occurs_clause :=
   | ~ = occurs_depending_clause; < >
   | ~ = occurs_dynamic_clause;   < >
 
+let count_in_phrase := COUNT; IN?; ~ = loc(reference); < >
+
 let occurs_fixed_clause [@context occurs_clause] :=
   | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
-    { OccursFixed { times = i; key_is = kl; indexed_by = ib; } }
+    { OccursFixed { times = i; count_in = None;
+                    key_is = kl; indexed_by = ib; } }
+  | OCCURS; _from = loc(integer); TO; to_ = loc(integer); TIMES?;
+    co = count_in_phrase;
+    { OccursFixed { times = to_; count_in = Some co;
+                    key_is = []; indexed_by = []; } }
 
 let occurs_depending_clause [@context occurs_clause] :=
-  | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
+  | OCCURS; from = loc(integer); TO; to_ = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = Some i1; to_ = i2; depending = d;
+    { OccursDepending { from = Some from; to_; depending = d;
                         key_is = kl; indexed_by = il; } }
   | OCCURS; i = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
