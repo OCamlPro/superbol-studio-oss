@@ -4,6 +4,7 @@
 
 ### Added
 - Extend syntax of ORGANIZATION to allow RECORD and BINARY optional prefix [#511](https://github.com/OCamlPro/superbol-studio-oss/pull/511)
+- Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
 - Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
