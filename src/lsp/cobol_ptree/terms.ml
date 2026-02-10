@@ -1319,6 +1319,18 @@ module UPCAST = struct
     | Floating _ as v -> v
     | NumFig _ as v -> v
 
+  let literal_as_scalar: literal -> scalar = function
+    | Alphanum _ as v -> v
+    | National _ as v -> v
+    | Boolean _ as v -> v
+    | Integer _ as v -> v
+    | Fixed _ as v -> v
+    | Floating _ as v -> v
+    | NumFig _ as v -> v
+    | Fig _ as v -> v
+    | StrConcat _ as v -> v
+    | Concat _ as v -> v
+
   let simple_cond: simple_condition -> condition = function
     | Expr _ as c -> c
     | Relation _ as c -> c

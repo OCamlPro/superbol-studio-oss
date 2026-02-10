@@ -544,7 +544,7 @@ let fold_move' (v: _ #folder) =
   handle' v#fold_move' v
     ~fold:begin fun v m x -> match m with
       | MoveSimple { from; to_ } -> x
-          >> fold_ident_or_literal v from
+          >> fold_scalar v from
           >> fold_list ~fold:fold_ident v to_
       | MoveCorresponding { from; to_ } -> x
           >> fold_ident v from
