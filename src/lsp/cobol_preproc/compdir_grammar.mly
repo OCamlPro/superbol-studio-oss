@@ -29,7 +29,9 @@
 %token LT              "<"          [@keyword (* symbol *)  "<"]
 %token NE              "<>"         [@keyword (* symbol *) "<>"]
 
-%token PERIOD          "."          [@keyword (* symbol *) "."]
+%token PERIOD          "."
+%token LPAR            "("
+%token RPAR            ")"
 
 %token CDIR_DEFINE     [@keyword ">>DEFINE"]
 %token CDIR_ELIF       [@keyword ">>ELIF", "$ELIF"           (* GC extensions *)
@@ -130,6 +132,8 @@ let source_format :=
 
 let set_sourceformat :=
   | SOURCEFORMAT; i = loc(ALPHANUM); PERIOD?; EOL;       (* elementary_string_literal? *)
+    { Set_sourceformat i }
+  | SOURCEFORMAT; LPAR; i = loc(TEXT_WORD); RPAR; PERIOD?; EOL;
     { Set_sourceformat i }
 
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
