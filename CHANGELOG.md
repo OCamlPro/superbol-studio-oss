@@ -4,6 +4,8 @@
 
 ### Added
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
+- Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
+- Allow EQUAL as synonym of `=` in COMPUTE [#507](https://github.com/OCamlPro/superbol-studio-oss/pull/507)
 - Support for `ADD` and `SUBTRACT` with `LENGTH OF` argument [#503](https://github.com/OCamlPro/superbol-studio-oss/pull/503)
 - Support for `MOVE` with `LENGTH OF` sender [#494](https://github.com/OCamlPro/superbol-studio-oss/pull/494)
 - Support for Hexadecimal literals using 'H' and 'h' prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
