@@ -60,7 +60,9 @@ let parse ~sql_in_copybooks ~copy_exts ~test_extension common files =
   List.iter
     (fun filename ->
        let common, _ = Common_args.get () in
-       let cobol_unit = typeck_file (common ()) filename in
+       let common = common () in
+       let platform = common.platform in
+       let cobol_unit = typeck_file ~platform common filename in
        let contents =
          Sql_preproc.Main.preproc ~sql_in_copybooks ~copy_path ~copy_exts
            ~filename ~source_format () ~cobol_unit

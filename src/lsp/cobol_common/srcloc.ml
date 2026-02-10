@@ -11,7 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Ez_file.V1
+open Platform.TYPES
 
 module TYPES = struct
 
@@ -330,11 +330,13 @@ let retrieve_file_lines, register_file_contents =
     end)
   in
   let file_cache = lazy (Cache.create 3) in
-  begin fun file ->
+  begin fun ~platform file ->
     let file_cache = Lazy.force file_cache in
     try Cache.find file_cache file
     with Not_found ->
-      let lines = EzFile.read_lines file in
+      let contents = platform.read_file file in
+      let lines = String.split_on_char '\n' contents in
+      let lines = Array.of_list lines in
       Cache.add file_cache file lines;
       lines
   end,
@@ -350,16 +352,16 @@ let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
   Pretty.print ppf "%s:%a" file Fmt.text_loc (pos1, pos2)
 
 (** Note this should always end with a newline character *)
-let pp_raw_loc: raw_loc Pretty.printer =
+let pp_raw_loc: ?platform:Platform.TYPES.platform -> raw_loc Pretty.printer =
   let b = lazy (Buffer.create 1000) in
-  let find_source (file, pos1, pos2) =
+  let find_source ~platform (file, pos1, pos2) =
     let line1 = fst pos1 in
     let line2 = fst pos2 in
     let col1 = snd pos1 in
     let col2 = snd pos2 in
     let col2, pad2 =
       if line1 == line2 && col1 == col2 then succ col2, 1 else col2, 0 in
-    let lines = retrieve_file_lines file in
+    let lines = retrieve_file_lines ~platform file in
     let b = Lazy.force b in
     Buffer.clear b;
     for l = max 1 (line1 - 3) to min (Array.length lines) (line2 + 2) do
@@ -395,9 +397,13 @@ let pp_raw_loc: raw_loc Pretty.printer =
     done;
     Buffer.contents b
   in
-  fun ppf raw_loc ->
-    let text = try find_source raw_loc with _ -> "" in
+  fun ?platform ppf raw_loc ->
+    let text = match platform with
+      | None -> ""
+      | Some platform -> try find_source ~platform raw_loc with _ -> "" in
     Pretty.print ppf "%a:@\n@[@<0>%s@]" pp_file_loc raw_loc text
+
+let pp_raw_loc_no_context = pp_raw_loc ?platform:None
 
 let same_copyloc { filename = f1; _ } { filename = f2; _ } =
   f1 = f2                                                             (* berk *)
@@ -407,7 +413,7 @@ let to_raw_loc
             { pos_lnum = l2; pos_bol = b2; pos_cnum = c2; _ }) =
   pos_fname, (l1, c1 - b1), (l2, c2 - b2)
 
-let pp_srcloc: srcloc Pretty.printer =
+let pp_srcloc: ?platform:Platform.TYPES.platform -> srcloc Pretty.printer =
   let pp_transform_operation ~partial ppf = function
     | `Cpy { filename; copyloc }
       when partial ->
@@ -446,12 +452,14 @@ let pp_srcloc: srcloc Pretty.printer =
         else List.cons (`Rpl replloc) acc
       end
   in
-  fun ppf loc ->
+  fun ?platform ppf loc ->
     let toplevel_transforms, loc = toplevel_transform_stack loc in
     let lexloc = as_lexloc loc in
-    pp_raw_loc ppf (to_raw_loc lexloc);
+    pp_raw_loc ?platform ppf (to_raw_loc lexloc);
     pp_transform_operations ~partial:false ppf toplevel_transforms;
     pp_transform_operations ~partial:true ppf (partial_transform_operations loc)
+
+let pp_srcloc_no_context = pp_srcloc ?platform:None
 
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
@@ -468,7 +476,7 @@ let raw ?(in_area_a = false) ((s, e): lexloc) : srcloc =
   if Lexing.(s.pos_fname <> e.pos_fname) then
     Pretty.error
       "%a@\n>> Internal warning in `%s.raw`: file names mismatch (`%s` != `%s`)\
-      " pp_srcloc loc __MODULE__ s.pos_fname e.pos_fname;
+      " pp_srcloc_no_context loc __MODULE__ s.pos_fname e.pos_fname;
   loc
 
 let copy ~filename ~copyloc copied : srcloc =
@@ -584,7 +592,8 @@ let take direction length loc =
     Pretty.error
       "%a@\n>> Internal warning in `%s.take`: requested %s (%d) is longer than \
        source location (by %d)@.\
-      " pp_srcloc loc __MODULE__ (show_direction direction) length (- rem);
+      " pp_srcloc_no_context
+      loc __MODULE__ (show_direction direction) length (- rem);
   loc'
 
 (** [trunc direction length l] truncates a prefix or suffix of length [length]
@@ -636,7 +645,7 @@ let trunc direction length loc =
         Pretty.error
           "%a@\n>> Internal warning in `%s.trunc`: taken out %s (%d) is longer \
            than source location (by %d)@.\
-          " pp_srcloc loc __MODULE__ (show_direction direction) length (- rem);
+          " pp_srcloc_no_context loc __MODULE__ (show_direction direction) length (- rem);
       Option.value loc' ~default:loc
 
 (** [prefix prefix_length l] computes a source location for the prefix of length

@@ -68,7 +68,7 @@ type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
-let rewindable_parse ({ project; textdoc; _ } as doc) =
+let rewindable_parse ~platform ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
         (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
@@ -77,7 +77,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
-        default with
+        (default ~platform) with
         copybook_lookup_config =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
         config = project.config.cobol_config;
@@ -116,16 +116,17 @@ let check doc ptree =
              rewinder = Some rewinder;
              checked = Some checked; }
 
-let parse_and_analyze ({ copybook; _ } as doc) =
+let parse_and_analyze ~platform ({ copybook; _ } as doc) =
   if copybook then                                                    (* skip *)
     { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   else
-    check doc @@ rewindable_parse doc
+    check doc @@ rewindable_parse ~platform doc
 
-let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
+let reparse_and_analyze
+    ~platform ?position ({ copybook; rewinder; textdoc; _ } as doc) =
   match position, rewinder with
   | None, _ | _, None ->
-      parse_and_analyze doc
+      parse_and_analyze ~platform doc
   | _, Some _ when copybook ->                                         (* skip *)
       { doc with artifacts = no_artifacts; rewinder = None; checked = None }
   | Some position, Some rewinder ->
@@ -137,12 +138,12 @@ let reparse_and_analyze ?position ({ copybook; rewinder; textdoc; _ } as doc) =
 (** [inspect_at ~position ~f doc] passes to [f] the state that is reached by the
     parser at [position] in [doc].  Returns [None] on copybooks, or [Some r] for
     [r] the result of [f]. *)
-let rec inspect_at ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
+let rec inspect_at ~platform ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
   match rewinder with
   | None | Some _ when copybook ->                                     (* skip *)
       None
   | None ->
-      inspect_at ~position ~f @@ parse_and_analyze doc
+      inspect_at ~platform ~position ~f @@ parse_and_analyze ~platform doc
   | Some rewinder ->
       let Lsp.Types.Position.{ line; character = char } = position in
       let exception FAILURE in
@@ -166,10 +167,10 @@ let rec inspect_at ~position ~f ({ copybook; rewinder; textdoc; _ } as doc) =
         None
 
 (** Creates a record for a document that is not yet parsed or analyzed. *)
-let blank ~project textdoc =
+let blank ~platform ~project textdoc =
   let uri = Lsp.Text_document.documentUri textdoc in
   let copybook =
-    Lsp_project.detect_copybook project ~uri
+    Lsp_project.detect_copybook ~platform project ~uri
       ~contents:(Lsp.Text_document.text textdoc)
   in
   if copybook then
@@ -187,10 +188,10 @@ let blank ~project textdoc =
 
 let position_encoding = `UTF8
 
-let load ~project doc =
+let load ~platform ~project doc =
   let textdoc = Lsp.Text_document.make ~position_encoding doc in
-  let doc = blank ~project textdoc in
-  try parse_and_analyze doc
+  let doc = blank ~platform ~project textdoc in
+  try parse_and_analyze ~platform doc
   with e -> raise @@ Internal_error (doc, e, Printexc.get_raw_backtrace ())
 
 let first_change_pos changes =
@@ -254,7 +255,7 @@ let to_cache ({ project; textdoc; checked; parsing_diags; typecking_diags;
 (* NB: Note this checks against the actual file on disk, which may be different
    from what a client sends upon opening. *)
 (** Raises [Failure] in case of bad checksum. *)
-let of_cache ~project
+let of_cache ~platform ~project
     { doc_cache_filename = filename;
       doc_cache_checksum = checksum;
       doc_cache_langid = languageId;
@@ -275,7 +276,8 @@ let of_cache ~project
     let doc = Lsp.Types.DidOpenTextDocumentParams.create
         ~textDocument:(Lsp.Types.TextDocumentItem.create
                          ~languageId ~text ~uri ~version) in
-    let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
+    let doc = Lsp.Text_document.make ~position_encoding doc
+      |> blank ~platform ~project in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
                parsing_diags;

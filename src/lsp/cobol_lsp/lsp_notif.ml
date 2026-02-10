@@ -13,7 +13,7 @@
 
 open Lsp_server.TYPES
 
-let on_notification state notif =
+let on_notification ~platform state notif =
   match state, notif with
   | ShuttingDown, Lsp.Client_notification.Exit ->
       Exit (Ok ())
@@ -22,17 +22,17 @@ let on_notification state notif =
   | NotInitialized _ | Exit _ as state, _ ->
       state                   (* spec indicate notif should just be discarded *)
   | Initialized params, Initialized ->
-      Running (Lsp_server.init ~params)
+      Running (Lsp_server.init ~platform ~params)
   | Running registry, ChangeWorkspaceFolders params ->
-      Running (Lsp_server.on_change_workspace_folders params registry)
+      Running (Lsp_server.on_change_workspace_folders ~platform params registry)
   | Running registry, ChangeConfiguration { settings = changes } ->
-      Running (Lsp_server.on_client_config_changes ~changes registry)
+      Running (Lsp_server.on_client_config_changes ~platform ~changes registry)
   | Running registry, DidChangeWatchedFiles { changes } ->
-      Running (Lsp_server.on_watched_file_changes changes registry)
+      Running (Lsp_server.on_watched_file_changes ~platform changes registry)
   | Running registry, TextDocumentDidOpen params ->
-      Running (Lsp_server.did_open params registry)
+      Running (Lsp_server.did_open ~platform params registry)
   | Running registry, TextDocumentDidChange params ->
-      Running (Lsp_server.did_change params registry)
+      Running (Lsp_server.did_change ~platform params registry)
   | Running registry, TextDocumentDidClose params ->
       Running (Lsp_server.did_close params registry)
   | Running _, Exit ->
@@ -42,13 +42,13 @@ let on_notification state notif =
       state
 
 
-let handle json_notif state =
+let handle ~platform json_notif state =
   match Lsp.Client_notification.of_jsonrpc json_notif with
   | Error str ->
       Lsp_io.log_error "Invalid@ notification:@ %s" str;
       state
   | Ok notif ->
-      try on_notification state notif with
+      try on_notification ~platform state notif with
       | Lsp_server.Document_not_found { uri } ->
           Lsp_io.log_error "Document@ %s@ is@ not@ opened@ yet"
             (Lsp.Types.DocumentUri.to_string uri);

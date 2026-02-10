@@ -15,7 +15,7 @@ open EZCMD.TYPES
 
 open Common_args
 
-let action { preproc_options; parser_options; pretty_verbose } files =
+let action { platform; preproc_options; parser_options; pretty_verbose; _ } files =
   let parse input =
     input |>
     Cobol_preproc.preprocessor ~options:preproc_options |>
@@ -25,7 +25,7 @@ let action { preproc_options; parser_options; pretty_verbose } files =
   List.iter begin fun filename ->
     pretty_verbose "@[Checking@ `%s'@]@." filename;
     Cobol_parser.Outputs.sink_result ~ppf:Fmt.stdout @@
-    Cobol_preproc.Input.from ~filename ~f:parse;
+    Cobol_preproc.Input.from ~platform ~filename ~f:parse;
   end
 
 let cmd =

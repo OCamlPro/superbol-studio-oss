@@ -93,14 +93,16 @@ let config
     blocking (driven by standard input), and shutdown is triggered by a client
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
-let run ~config ~extensions:{ alternate_request_handers = alternate_handlers } =
+let run ~platform ~config
+    ~extensions:{ alternate_request_handers = alternate_handlers } =
   Lsp_io.initialize_channels ();
   let rec loop state =
     match Lsp_io.read_message () with
     | Jsonrpc.Packet.Notification n ->
-        continue @@ Lsp_notif.handle n state
+        continue @@ Lsp_notif.handle ~platform n state
     | Jsonrpc.Packet.Request r ->
-        continue @@ reply @@ Lsp_request.handle ~alternate_handlers r state
+        continue @@ reply @@
+        Lsp_request.handle ~platform ~alternate_handlers r state
     | Jsonrpc.Packet.Batch_call calls ->
         batch_calls calls state
     | Jsonrpc.Packet.Response r ->
@@ -118,9 +120,9 @@ let run ~config ~extensions:{ alternate_request_handers = alternate_handlers } =
     | [] ->
         continue state
     | `Notification n :: calls' ->
-        batch_calls calls' @@ Lsp_notif.handle n state
+        batch_calls calls' @@ Lsp_notif.handle ~platform n state
     | `Request n :: calls' ->
-        batch_calls calls' @@ reply @@ Lsp_request.handle n state
+        batch_calls calls' @@ reply @@ Lsp_request.handle ~platform n state
   and batch_responses resps state =
     match resps with
     | [] ->

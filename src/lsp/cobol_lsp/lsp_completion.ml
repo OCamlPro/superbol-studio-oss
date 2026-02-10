@@ -313,14 +313,15 @@ let config ?(eager=true) ?(case=Auto) () =
     case;
   }
 
-let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ group; _ }
+let contextual ~platform ~config (doc: Lsp_document.t)
+    Cobol_typeck.Outputs.{ group; _ }
     (pos: Position.t)
   =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range, case = range_n_case config.case pos doc.textdoc in
   let items, incomplete =
     Option.value ~default:([], true) @@
-    Lsp_document.inspect_at ~position:(range.start) doc
+    Lsp_document.inspect_at ~platform ~position:(range.start) doc
       ~f:begin function
         | Env env ->
             let items =

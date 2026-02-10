@@ -115,14 +115,14 @@ let save ~config docs =
   Lsp_project.MAP.iter (save_project_cache ~config)
 
 (** (Internal) *)
-let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
+let load_project ~platform ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
   let project = Lsp_project.of_cache ~rootdir ~layout cached_project in
   Lsp_io.log_info "Successfully@ read@ project@ cache@ for@ %s"
     Lsp.Uri.(to_string @@ Lsp_project.rooturi project);
   let add_doc doc docs = URIMap.add (Lsp_document.uri doc) doc docs in
   CACHED_DOCS.fold begin fun cached_doc docs ->
     try
-      let doc = Lsp_document.of_cache ~project cached_doc in
+      let doc = Lsp_document.of_cache ~platform ~project cached_doc in
       if config.cache_verbose then
         Lsp_io.log_info "Successfully@ read@ document@ cache@ for@ %s"
           (Lsp.Uri.to_string @@ Lsp_document.uri doc);
@@ -139,11 +139,11 @@ let load_project ~rootdir ~layout ~config { cached_project; cached_docs; _ } =
         docs
   end cached_docs URIMap.empty
 
-let load ~rootdir ~layout ~config =
+let load ~platform ~rootdir ~layout ~config =
   let fallback = URIMap.empty in
   let load_cache cache_file =
     let cached_project = Lsp_utils.read_from cache_file read_project_cache in
-    load_project ~rootdir ~layout ~config cached_project
+    load_project ~platform ~rootdir ~layout ~config cached_project
   in
   match cache_filename ~config ~rootdir with
   | None ->

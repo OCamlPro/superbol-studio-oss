@@ -16,7 +16,7 @@ open Cobol_common.Srcloc.TYPES
 type preprocessor
 
 val preprocessor
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> Src_input.t
   -> preprocessor
 val reset_preprocessor_for_string
@@ -29,7 +29,8 @@ val reset_preprocessor_for_string
 
 val diags: preprocessor -> Preproc_diagnostics.t
 val position: preprocessor -> Lexing.position
-val position_at: line:int -> char: int -> preprocessor -> Lexing.position
+val position_at:
+  line:int -> char: int -> preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
 val rev_log: preprocessor -> Preproc_trace.log
 val rev_comments: preprocessor -> Text.comments
@@ -47,14 +48,16 @@ val lex_input
   -> unit Preproc_outputs.with_diags
 
 val lex_file
-  : dialect: Cobol_config.dialect
+  : platform : Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val lex_lib
-  : dialect: Cobol_config.dialect
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
   -> lookup_config: Cobol_common.Copybook.lookup_config
   -> ?ppf:Format.formatter
@@ -99,23 +102,25 @@ val scan_prefix_for_copybook
   -> [`Program | `Copybook]
 
 val preprocess_input
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> Src_input.t
   -> unit Preproc_outputs.with_diags
 
 val preprocess_file
-  : ?options: Preproc_options.preproc_options
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val text_of_file
-  : ?options: Preproc_options.preproc_options
+  : platform: Cobol_common.Platform.TYPES.platform
+  -> options: Preproc_options.preproc_options
   -> string
   -> Text.t Preproc_outputs.with_diags
 
 val text_of_input
-  : ?options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> Src_input.t
   -> Text.t Preproc_outputs.with_diags

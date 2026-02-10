@@ -40,7 +40,8 @@ module INFIX: sig
 end
 
 val pp_lexpos: Lexing.position Pretty.printer
-val pp_srcloc: srcloc Pretty.printer
+val pp_srcloc: ?platform:Platform.TYPES.platform -> srcloc Pretty.printer
+val pp_srcloc_no_context: srcloc Pretty.printer
 val pp_srcloc_struct: srcloc Pretty.printer
 val pp_file_loc: srcloc Pretty.printer
 val compare: srcloc -> srcloc -> int
@@ -110,7 +111,9 @@ val sub : srcloc -> pos:int -> len:int -> srcloc
 
 val pp: 'a Pretty.printer -> 'a with_loc Pretty.printer
 val pp_with_loc: 'a Pretty.printer -> 'a with_loc Pretty.printer
-val pp_raw_loc: (string * (int * int) * (int * int)) Pretty.printer
+val pp_raw_loc: ?platform:Platform.TYPES.platform ->
+  (string * (int * int) * (int * int)) Pretty.printer
+val pp_raw_loc_no_context: (string * (int * int) * (int * int)) Pretty.printer
 val flagit: 'a -> srcloc -> 'a with_loc
 val payload: 'a with_loc -> 'a
 val loc: 'a with_loc -> srcloc

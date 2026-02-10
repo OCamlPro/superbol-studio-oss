@@ -53,9 +53,10 @@ let cmd =
                in
                if filename = file then
                  Pretty.failwith "Source file conflicts with target %s" file;
+               let common = common_get () in
+               let platform = common.platform in
                if !parse || !check then
                  let parse ?source_format input =
-                   let common = common_get () in
                    let preproc_options =
                      { common.preproc_options with
                        source_format =
@@ -66,7 +67,8 @@ let cmd =
                    Cobol_preproc.preprocessor ~options:preproc_options |>
                    Cobol_parser.parse_simple ~options:common.parser_options
                  in
-                 let my_text = Cobol_preproc.Input.from ~filename:file ~f:parse in
+                 let my_text = Cobol_preproc.Input.from
+                     ~platform ~filename:file ~f:parse in
                  let my_text = Cobol_parser.Outputs.translate_diags my_text in
                  Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
                  match my_text.result with
@@ -98,8 +100,9 @@ let cmd =
                else
                  let text =
                    let common = common_get () in
+                   let platform = common.platform in
                    Cobol_preproc.Outputs.show_n_forget @@
-                   Cobol_preproc.text_of_file file
+                   Cobol_preproc.text_of_file ~platform file
                      ~options:common.preproc_options
                  in
                  let s =

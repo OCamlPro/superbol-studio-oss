@@ -21,6 +21,7 @@ module Visitor = Visitor
 module Behaviors = Behaviors
 module Tokenizing = Tokenizing
 module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
+module Platform = Platform
 
 exception FatalError of string
 val fatal: ('a, Format.formatter, unit, _) format4 -> 'a
