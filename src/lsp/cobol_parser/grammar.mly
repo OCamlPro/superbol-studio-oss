@@ -3214,7 +3214,7 @@ let close_format :=
 
 %public let unconditional_action := ~ = compute_statement; < >
 let compute_statement :=
-  | COMPUTE; irl = rounded_idents; "="; e = expression;
+  | COMPUTE; irl = rounded_idents; or_(EQUAL, "="); e = expression;
     h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);
     oterm_(END_COMPUTE);
     { Compute { compute_targets = irl; compute_expr = e;
