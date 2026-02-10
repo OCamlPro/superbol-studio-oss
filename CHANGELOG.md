@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
 - Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
