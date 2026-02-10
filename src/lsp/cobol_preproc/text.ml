@@ -24,6 +24,7 @@ let prefix_of_literal_kind: literal_kind -> string = function
   | Bool -> "B"
   | BoolX ->  "BX"
   | Hex ->  "X"
+  | HexH ->  "H"
   | NullTerm ->  "Z"
   | National ->  "N"
   | NationalX -> "NX"

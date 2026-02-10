@@ -486,6 +486,7 @@ let extract_knd str state lexbuf =
     let s, knd = match str.[0] with
       | '"' | '\'' -> str, Basic
       | 'B' | 'b' -> Str.string_after str 1, Bool
+      | 'H' | 'h'
       | 'X' | 'x' -> Str.string_after str 1, Hex
       | 'Z' | 'z' -> Str.string_after str 1, NullTerm
       | 'N' | 'n' -> Str.string_after str 1, National

@@ -207,26 +207,6 @@ run_extensions.at-180-prog.cob:36.16-36.17:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:206:0
-run_extensions.at-206-prog.cob:6.39-6.40:
-   3          PROGRAM-ID.      prog.
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6 >        01 X-1           PIC 9(8) VALUE H"012345".
-----                                          ^
-   7          01 X-2           PIC 9(8) VALUE H"FFFFFF".
-   8          PROCEDURE        DIVISION.
->> Error: Invalid syntax
-
-run_extensions.at-206-prog.cob:7.39-7.40:
-   4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION.
-   6          01 X-1           PIC 9(8) VALUE H"012345".
-   7 >        01 X-2           PIC 9(8) VALUE H"FFFFFF".
-----                                          ^
-   8          PROCEDURE        DIVISION.
-   9              DISPLAY X-1
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:231:0
 run_extensions.at-231-prog.cob:5.20:
    2          IDENTIFICATION   DIVISION.

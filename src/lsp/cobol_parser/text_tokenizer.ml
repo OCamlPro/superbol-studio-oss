@@ -407,14 +407,16 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
         tok @@ BOOLIT (boollit ~base:`Bool str)
     | Alphanum { knd = BoolX; str; _ } ->
         tok @@ BOOLIT (boollit ~base:`Hex str)
-    | Alphanum { knd = Hex; str; qte } ->
+    | Alphanum { knd = Hex; str; qte }
+    | Alphanum { knd = HexH; str; qte } ->
         tok @@ ALPHANUM (alphanum ~hexadecimal:true str qte)
     | Alphanum { knd = NullTerm; str; qte } ->
         tok @@ ALPHANUM (alphanum ~hexadecimal:false str qte
                            ~repr:Null_terminated_bytes)
     | Alphanum { knd = National | NationalX; str; _ } ->
         tok @@ NATLIT str                              (* TODO: differentiate *)
-    | AlphanumPrefix { knd = Hex; str; qte } ->
+    | AlphanumPrefix { knd = Hex; str; qte }
+    | AlphanumPrefix { knd = HexH; str; qte } ->
         tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:true str qte)
     | AlphanumPrefix { knd = _; str; qte } ->
         tok @@ ALPHANUM_PREFIX (alphanum ~hexadecimal:false str qte)
