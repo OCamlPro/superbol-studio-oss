@@ -1286,6 +1286,7 @@ let file_descr_clause :=
 
 let sort_merge_file_descr_clause :=
  | ~ = record_clause; <FileSDRecord>
+ | ~ = label_clause;  <FileSDLabel>
  | ~ = data_clause;   <FileSDData>                                (* -COB2002 *)
  |     global_clause; {FileSDGlobal}
 
@@ -2158,6 +2159,9 @@ let imp_stmts [@recovery []] [@symbol ""] :=
    { List.filter_map Result.to_option stmts }
 (* prec annotation needed to solve a conflict involving IF and WRITE *)
 
+let imp_stmts_opt [@default []] :=
+  | /* epsilon */ %prec lowest { []  }
+  | isl = imp_stmts;           { isl }
 
 let oterm_(X) == er(X | {} %prec no_term)              (* optional terminators *)
 
@@ -3508,10 +3512,9 @@ let if_statement :=
      If {condition = c; then_branch = sn; else_branch = sno} }
 (* COB2002: END IF mandatory on ELSE, NEXT SENTENCE archaic *)
 
-let if_body :=
- | isl = imp_stmts; %prec lowest             { isl, [] }
- | isl1 = imp_stmts; ELSE; isl2 = imp_stmts; { isl1, isl2 }
-
+let if_body [@default [], []] :=
+ | isl = imp_stmts_opt; %prec lowest                 { isl, [] }
+ | isl1 = imp_stmts_opt; ELSE; isl2 = imp_stmts_opt; { isl1, isl2 }
 
 
 (* INITIALIZE STATEMENT (+COB85) *)
