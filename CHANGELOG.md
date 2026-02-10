@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Allow national literals to be used as arithmetic terms [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
 - Syntactic support for EXIT PROGRAM RETURNING [#506](https://github.com/OCamlPro/superbol-studio-oss/pull/506)
 - Support `OCCURS` with `COUNT IN` clause [#505](https://github.com/OCamlPro/superbol-studio-oss/pull/505)
 - Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)

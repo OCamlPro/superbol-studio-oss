@@ -2722,6 +2722,7 @@ let arithmetic_term :=                                            (* `arith_x` *
  | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
  | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
+ | n = NATLIT;               { Atom (National n) }
  | l = length_of_expression; { Atom l }
 
 let arithmetic_term_no_all :=
@@ -2731,6 +2732,7 @@ let arithmetic_term_no_all :=
  | f = floatlit; { Atom (Floating f) }
  | b = BOOLIT;   { Atom (Boolean b) } (* boolean *)
  | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
+ | n = NATLIT;   { Atom (National n) }
  | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | l = length_of_expression; { Atom l }
 
@@ -2742,6 +2744,7 @@ let arithmetic_term_no_length :=
  | b = BOOLIT;               { Atom (Boolean b) }
  | f = figurative_constant;  { Atom (Fig f) }
  | a = alphanum;             { Atom (Alphanum a) }
+ | n = NATLIT;               { Atom (National n) }
 
 let length_of_expression ==
   | ~ = length_of_expr; < >
