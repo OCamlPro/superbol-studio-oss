@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support `$set sourceformat(fmt)` syntax [#509](https://github.com/OCamlPro/superbol-studio-oss/pull/509)
 - Allow `LABEL RECORD` clause in `SD` entries [#508](https://github.com/OCamlPro/superbol-studio-oss/pull/508)
 - Support for empty `IF`/`ELSE` branches [#504](https://github.com/OCamlPro/superbol-studio-oss/pull/504)
 - Allow EQUAL as synonym of `=` in COMPUTE [#507](https://github.com/OCamlPro/superbol-studio-oss/pull/507)
