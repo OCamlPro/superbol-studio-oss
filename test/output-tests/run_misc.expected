@@ -3038,15 +3038,6 @@ run_misc.at-10208-reference_append:3.6-3.7:
    5   Paragraph: LOADFILE                        and now ...    335
 >> Error: Unexpected indicator: `t'
 
-run_misc.at-10208-reference_append:3.52-3.53:
-   1   Source: 'prog.cob'
-   2   Program-Id:  prog
-   3 >     Entry: prog                            and now ...    292
-----                                                       ^
-   4   Paragraph: MAINFILE                        and now ...    292
-   5   Paragraph: LOADFILE                        and now ...    335
->> Error: Invalid syntax
-
 run_misc.at-10208-reference_append:3.52:
    1   Source: 'prog.cob'
    2   Program-Id:  prog
@@ -3055,6 +3046,15 @@ run_misc.at-10208-reference_append:3.52:
    4   Paragraph: MAINFILE                        and now ...    292
    5   Paragraph: LOADFILE                        and now ...    335
 >> Hint: Missing PROGRAM_ID <word> .
+
+run_misc.at-10208-reference_append:3.58-3.61:
+   1   Source: 'prog.cob'
+   2   Program-Id:  prog
+   3 >     Entry: prog                            and now ...    292
+----                                                             ^^^
+   4   Paragraph: MAINFILE                        and now ...    292
+   5   Paragraph: LOADFILE                        and now ...    335
+>> Error: Invalid syntax
 
 run_misc.at-10208-reference_append:4.6-4.7:
    1   Source: 'prog.cob'
