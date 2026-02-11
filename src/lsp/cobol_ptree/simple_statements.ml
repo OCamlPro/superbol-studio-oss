@@ -489,7 +489,7 @@ let pp_merge_stmt ppf { merge_file = mf;
 type move_stmt =              (* TODO: maybe split in two distinct statements *)
   | MoveSimple of
       {
-        from: ident_or_literal;
+        from: scalar;
         to_: ident list;
       }
   | MoveCorresponding of
@@ -502,7 +502,7 @@ type move_stmt =              (* TODO: maybe split in two distinct statements *)
 let pp_move_stmt ppf = function
   | MoveSimple { from; to_ } ->
     Fmt.pf ppf "MOVE@ %a@ TO@ %a"
-      pp_ident_or_literal from
+      pp_scalar from
       Fmt.(list ~sep:sp pp_ident) to_
   | MoveCorresponding { from; to_ } ->
     Fmt.pf ppf "MOVE CORRESPONDING@ %a@ TO@ %a"

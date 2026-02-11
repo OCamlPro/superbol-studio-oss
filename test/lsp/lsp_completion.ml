@@ -2505,7 +2505,7 @@ let%expect_test "procedure-completion" =
       11             MULTIPLY 4 BY 2 GIVING BB
       12               ON SIZE ERROR
     (line 9, character 15):
-    Basic (18 entries):
+    Basic (19 entries):
         AA Numeric
         BB Numeric
         ADDRESS
@@ -2514,6 +2514,7 @@ let%expect_test "procedure-completion" =
         EXCEPTION-OBJECT
         FUNCTION
         HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         LOW-VALUES
@@ -2524,7 +2525,7 @@ let%expect_test "procedure-completion" =
         SPACES
         SUPER
         ZEROS
-    Eager (18 entries):
+    Eager (19 entries):
         AA Numeric
         BB Numeric
         ADDRESS OF
@@ -2533,6 +2534,7 @@ let%expect_test "procedure-completion" =
         EXCEPTION-OBJECT
         FUNCTION
         HIGH-VALUES
+        LENGTH
         LINAGE-COUNTER
         LINE-COUNTER
         LOW-VALUES

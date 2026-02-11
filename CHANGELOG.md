@@ -3,6 +3,9 @@
 ## [_] Next release
 
 ### Added
+- Support for `MOVE` with `LENGTH OF` sender [#494](https://github.com/OCamlPro/superbol-studio-oss/pull/494)
+- Support for Hexadecimal literals using 'H' and 'h' prefix [#499](https://github.com/OCamlPro/superbol-studio-oss/pull/499)
+- Support for `OCCURS N DEPENDING` syntax [#497](https://github.com/OCamlPro/superbol-studio-oss/pull/497)
 - Allow arbitrary number of spaces before `$`-prefixed compiler directives in some fixed-width source formats [#498](https://github.com/OCamlPro/superbol-studio-oss/pull/498)
 - Support for extraneous periods at the end of `SET` or `SOURCE` compiler directives [#493](https://github.com/OCamlPro/superbol-studio-oss/pull/493)
 - Display reference count in hover information for data items [#429](https://github.com/OCamlPro/superbol-studio-oss/pull/429) (fix for [Issue #354](https://github.com/OCamlPro/superbol-studio-oss/issues/354))
@@ -13,8 +16,10 @@
 - Global data items in the Variables panel during debug sessions [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Current COBOL statement in toplevel entry of stackframe summary [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
+- Syntactic support for file and device clauses on SELECT [#495](https://github.com/OCamlPro/superbol-studio-oss/pull/495)
 
 ### Fixed
+- Handling of concatenation characters that are not followed by a separator space [#500](https://github.com/OCamlPro/superbol-studio-oss/pull/500)
 - Name of VSIX file included in CI build artifacts [#480](https://github.com/OCamlPro/superbol-studio-oss/pull/480) (fix for [Issue #408](https://github.com/OCamlPro/superbol-studio-oss/issues/408))
 - Fallback to extension settings when `cobcPath` is not provided in task definitions [#468](https://github.com/OCamlPro/superbol-studio-oss/pull/468) (fix for [Issue #467](https://github.com/OCamlPro/superbol-studio-oss/issues/467))
 - Bug that made the extension hang when debugged programs displayed signed numbers [#466](https://github.com/OCamlPro/superbol-studio-oss/pull/466)

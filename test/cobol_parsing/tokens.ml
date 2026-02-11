@@ -38,6 +38,25 @@ let%expect_test "tokens-after-syntax-errors" =
     WORD[Y], STOP, RUN, ., EOF
 |}];;
 
+let%expect_test "tokens-with-attached-ampersand" =
+  (* Just check we extract tokens properly *)
+  Parser_testing.show_parsed_tokens {|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+           DISPLAY X"00"&A.
+           DISPLAY A&B.
+           DISPLAY A&X"00".
+           DISPLAY X"100"&X"00".
+  |};
+  [%expect {|
+    IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
+    DIVISION, ., DISPLAY, X"00", &, WORD[A], ., DISPLAY, WORD[A], &, WORD[B], .,
+    DISPLAY, WORD[A], &, X"00", ., DISPLAY, X"100", &, X"00", ., EOF
+|}];;
+
+(* --- *)
+
 let%expect_test "token-locations" =
   Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
     ~parser_options:(Parser_testing.options ~verbose:true ())

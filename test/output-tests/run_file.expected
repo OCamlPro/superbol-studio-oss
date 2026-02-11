@@ -375,26 +375,6 @@ run_file.at-2551-prog.cob:206.18-206.22:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:2927:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:3242:0
-run_file.at-3242-prog.cob:9.34-9.42:
-   6   
-   7          INPUT-OUTPUT SECTION.
-   8          FILE-CONTROL.
-   9 >            SELECT FLATFILE ASSIGN EXTERNAL RELFIX
-----                                     ^^^^^^^^
-  10              ORGANIZATION RELATIVE
-  11              ACCESS IS SEQUENTIAL RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-3242-prog.cob:14.35-14.43:
-  11              ACCESS IS SEQUENTIAL RELATIVE KEY IS REC-NUM
-  12              FILE STATUS IS CUST-STAT.
-  13   
-  14 >            SELECT FLATFILE2 ASSIGN EXTERNAL RELFIX
-----                                      ^^^^^^^^
-  15              ORGANIZATION RELATIVE
-  16              ACCESS IS RANDOM RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-3242-prog.cob:57.54:
   54              05  FILLER PIC X(8) VALUE "GAM00000".
   55   
@@ -1179,26 +1159,6 @@ run_file.at-4709-inp_data:1.7-1.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4707:0
-run_file.at-4707-prog.cob:7.39-7.47:
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7 >            SELECT INFILE     ASSIGN TO EXTERNAL INFILE
-----                                          ^^^^^^^^
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-4707-prog.cob:11.38-11.46:
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
-  10   
-  11 >            SELECT OUTFILE   ASSIGN TO EXTERNAL OUTFILE
-----                                         ^^^^^^^^
-  12                   ORGANIZATION IS LINE SEQUENTIAL
-  13                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4722:0
 run_file.at-4722-reference:1.7-1.8:
    1 > Record 1.
@@ -1215,26 +1175,6 @@ run_file.at-4838-inp_data:1.7-1.8:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4836:0
-run_file.at-4836-prog.cob:7.39-7.47:
-   4          ENVIRONMENT DIVISION.
-   5          INPUT-OUTPUT SECTION.
-   6          FILE-CONTROL.
-   7 >            SELECT INFILE     ASSIGN TO EXTERNAL INFILE
-----                                          ^^^^^^^^
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
-run_file.at-4836-prog.cob:11.38-11.46:
-   8                   ORGANIZATION IS LINE SEQUENTIAL
-   9                   FILE STATUS  IS INPUT-STATUS .
-  10   
-  11 >            SELECT OUTFILE   ASSIGN TO EXTERNAL OUTFILE
-----                                         ^^^^^^^^
-  12                   ORGANIZATION IS LINE SEQUENTIAL
-  13                   FILE STATUS  IS INPUT-STATUS .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:4857:0
 run_file.at-4857-reference:1.7-1.8:
    1 > Record 1.
@@ -2937,16 +2877,6 @@ run_file.at-8181-cmod.c:50.6-50.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8181:0
-run_file.at-8181-prog.cob:26.34-26.42:
-  23              ALTERNATE RECORD KEY IS TS-DISK WITH DUPLICATES
-  24              FILE STATUS IS CUST-STAT .
-  25   
-  26 >            SELECT FLATFILE ASSIGN EXTERNAL RELFIX
-----                                     ^^^^^^^^
-  27              ORGANIZATION RELATIVE
-  28              ACCESS IS RANDOM RELATIVE KEY IS REC-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-8181-prog.cob:110.54:
  107              05  FILLER PIC X(8) VALUE "PRE00000".
  108   
@@ -3329,16 +3259,6 @@ run_file.at-8744-prog.cob:270.11-270.29:
 >> Error: Library `xfhfcd.cpy' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-8744-prog.cob:304.16-304.22:
- 301              DISPLAY "File assigned is '"
- 302                      TSP-FILENAME (1:FCD-NAME-LENGTH) "'".
- 303              SET FCD-FILENAME-ADDRESS TO ADDRESS OF OUT-FILE-NAME.
- 304 >            MOVE LENGTH OF OUT-FILE-NAME TO FCD-NAME-LENGTH.
-----                   ^^^^^^
- 305              DISPLAY "*** Dump FCD before changes"
- 306              PERFORM DUMP-FCD.
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:8825:0
 run_file.at-8825-reference:1.6-1.7:
@@ -4984,16 +4904,6 @@ run_file.at-9162-cmod.c:134.6-134.7:
 >> Error: Unexpected indicator: `u'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9162:0
-run_file.at-9162-prog.cob:10.34-10.42:
-   7   
-   8          INPUT-OUTPUT SECTION.
-   9          FILE-CONTROL.
-  10 >            SELECT FLATFILE ASSIGN EXTERNAL SEQFIX
-----                                     ^^^^^^^^
-  11              ORGANIZATION SEQUENTIAL
-  12              FILE STATUS IS CUST-STAT .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-9162-prog.cob:44.54:
   41              05  FILLER PIC X(8) VALUE "FOR00000".
   42   
@@ -5107,16 +5017,6 @@ run_file.at-9400-prog.cob:49.11-49.30:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-run_file.at-9400-prog.cob:74.15-74.21:
-  71   
-  72             MOVE "TESTOUT" TO WS-FCD-DDNAME
-  73   
-  74 >           MOVE LENGTH OF FCD-MAP TO WS-FCD-SIZE
-----                  ^^^^^^
-  75             DISPLAY "FCD SIZE " WS-FCD-SIZE.
-  76   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9425:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9589:0
 run_file.at-9589-prog.cob:17.11-17.24:
@@ -5130,56 +5030,6 @@ run_file.at-9589-prog.cob:17.11-17.24:
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-9589-prog.cob:46.16-46.22:
-  43              DISPLAY PROGRAM-NAME ': STARTING.'
-  44              DISPLAY PROGRAM-NAME ': CREATING LINE SEQUENTIAL FILE.'
-  45              SET EXTFH-OPCODE-ISOPENOUTPUT      TO TRUE
-  46 >            MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-----                   ^^^^^^
-  47              MOVE fcd--version-number           TO FCD-VERSION
-  48              MOVE fcd--open-closed              TO FCD-OPEN-MODE
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:49.16-49.22:
-  46              MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-  47              MOVE fcd--version-number           TO FCD-VERSION
-  48              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  49 >            MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  50              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  51              MOVE fcd--format-cobol2            TO FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:52.16-52.22:
-  49              MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-  50              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  51              MOVE fcd--format-cobol2            TO FCD-FILE-FORMAT
-  52 >            MOVE LENGTH OF LSEQ-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  53              MOVE fcd--recmode-variable TO FCD-RECORDING-MODE
-  54              MOVE 0 TO FCD-MIN-REC-LENGTH
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:94.16-94.22:
-  91              DISPLAY PROGRAM-NAME ': READING LINE SEQUENTIAL FILE.'
-  92              SET EXTFH-OPCODE-ISOPENINPUT       TO TRUE
-  93              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  94 >            MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  95              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  96              MOVE LENGTH OF LSEQ-RECORDAREA     TO FCD-MAX-REC-LENGTH
->> Error: Invalid syntax
-
-run_file.at-9589-prog.cob:96.16-96.22:
-  93              MOVE fcd--open-closed              TO FCD-OPEN-MODE
-  94              MOVE LENGTH OF LSEQ-FILENAME       TO FCD-NAME-LENGTH
-  95              MOVE fcd--exclusive-bit            TO FCD-LOCK-MODE
-  96 >            MOVE LENGTH OF LSEQ-RECORDAREA     TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  97              MOVE 0 TO FCD-MIN-REC-LENGTH
-  98              SET FCD-FILENAME-ADDRESS TO ADDRESS OF LSEQ-FILENAME
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9618:0
 run_file.at-9618-reference:1.6-1.7:
@@ -5215,56 +5065,6 @@ run_file.at-9798-prog.cob:19.11-19.24:
 >> Error: Library `xfhfcd3' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-9798-prog.cob:48.16-48.22:
-  45              DISPLAY PROGRAM-NAME ': STARTING.'
-  46              DISPLAY PROGRAM-NAME ': CREATING FIXED  SEQ FILE.'
-  47              SET EXTFH-OPCODE-ISOPENOUTPUT      TO TRUE
-  48 >            MOVE LENGTH OF FCD-PARAMETER-BLOCK TO FCD-LENGTH
-----                   ^^^^^^
-  49              move fcd--version-number TO FCD-VERSION
-  50              MOVE fcd--sequential-org TO FCD-ORGANIZATION
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:52.16-52.22:
-  49              move fcd--version-number TO FCD-VERSION
-  50              MOVE fcd--sequential-org TO FCD-ORGANIZATION
-  51              MOVE fcd--open-closed TO FCD-OPEN-MODE
-  52 >            MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-----                   ^^^^^^
-  53              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
-  54              move fcd--format-cobol2 to FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:55.16-55.22:
-  52              MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-  53              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
-  54              move fcd--format-cobol2 to FCD-FILE-FORMAT
-  55 >            MOVE LENGTH OF FIX-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
-  56              MOVE 0 TO FCD-MIN-REC-LENGTH
-  57              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FIX-FILENAME
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:100.16-100.22:
-  97              SET EXTFH-OPCODE-ISOPENINPUT       TO TRUE
-  98              MOVE fcd--sequential-org TO FCD-ORGANIZATION
-  99              MOVE fcd--open-closed TO FCD-OPEN-MODE
- 100 >            MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
-----                   ^^^^^^
- 101              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
- 102              move fcd--format-cobol2 to FCD-FILE-FORMAT
->> Error: Invalid syntax
-
-run_file.at-9798-prog.cob:103.16-103.22:
- 100              MOVE LENGTH OF FIX-FILENAME TO FCD-NAME-LENGTH
- 101              MOVE fcd--exclusive-bit TO FCD-LOCK-MODE
- 102              move fcd--format-cobol2 to FCD-FILE-FORMAT
- 103 >            MOVE LENGTH OF FIX-RECORDAREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
- 104              MOVE 0 TO FCD-MIN-REC-LENGTH
- 105              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FIX-FILENAME
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:9979:0
 run_file.at-9979-prog.cob:15.16-15.24:
@@ -5319,16 +5119,6 @@ run_file.at-9979-prog.cob:93.17-93.21:
   95             WRITE TSPFL-RECORD.
 >> Error: Invalid syntax
 
-run_file.at-9979-prog.cob:101.15-101.21:
-  98             SET FCD-KEY-DEF-ADDRESS  TO ADDRESS OF KEY-DEF.
-  99             SET FCD-FILENAME-ADDRESS TO ADDRESS OF FCD-FILENAME.
- 100             MOVE 64 TO FCD-NAME-LENGTH
- 101 >           MOVE LENGTH OF KEY-DEF TO KDB-LEN.
-----                  ^^^^^^
- 102             SET FCD-RECORD-ADDRESS   TO ADDRESS OF FCD-RECORD.
- 103             MOVE 512 TO FCD-CURRENT-REC-LEN
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10308:0
 run_file.at-10308-prog.cob:86.11-86.23:
   83                  78  UNLOCK-RECORD               VALUE X'0F'.
@@ -5341,26 +5131,6 @@ run_file.at-10308-prog.cob:86.11-86.23:
 >> Error: Library `xfhfcd' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-run_file.at-10308-prog.cob:155.16-155.22:
- 152              SET  FCD-FILENAME-ADDRESS   TO ADDRESS OF FILE-NAME
- 153              SET  FCD-KEY-DEF-ADDRESS    TO ADDRESS OF KEY-DEF-AREA
- 154              MOVE 16                     TO FCD-FS-FLAGS
- 155 >            MOVE LENGTH OF RECORD-AREA  TO FCD-CURRENT-REC-LEN
-----                   ^^^^^^
- 156              MOVE 1                      TO NUMBER-OF-KEYS
- 157              MOVE LENGTH OF PRIME-KEY    TO COMPONENT-LENGTH
->> Error: Invalid syntax
-
-run_file.at-10308-prog.cob:157.16-157.22:
- 154              MOVE 16                     TO FCD-FS-FLAGS
- 155              MOVE LENGTH OF RECORD-AREA  TO FCD-CURRENT-REC-LEN
- 156              MOVE 1                      TO NUMBER-OF-KEYS
- 157 >            MOVE LENGTH OF PRIME-KEY    TO COMPONENT-LENGTH
-----                   ^^^^^^
- 158              MOVE 8                      TO FCD-ACCESS-MODE
- 159              MOVE 0                      TO FCD-LOCK-MODE
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10307:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10643:0
@@ -5398,36 +5168,6 @@ run_file.at-10831-prog.cob:86.12-86.24:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-run_file.at-10831-prog.cob:134.16-134.22:
- 131         **   FIXED(0) OR VARIABLE(1)
- 132              MOVE 0 TO FCD-RECORDING-MODE
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134 >            MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
-----                   ^^^^^^
- 135              MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
- 136              MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
->> Error: Invalid syntax
-
-run_file.at-10831-prog.cob:135.16-135.22:
- 132              MOVE 0 TO FCD-RECORDING-MODE
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134              MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
- 135 >            MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
-----                   ^^^^^^
- 136              MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
- 137              PERFORM A-200-CALL-EXTFH.
->> Error: Invalid syntax
-
-run_file.at-10831-prog.cob:136.16-136.22:
- 133              SET FCD-FILENAME-ADDRESS TO ADDRESS OF FILE-NAME
- 134              MOVE LENGTH OF RECORD-AREA TO FCD-MIN-REC-LENGTH
- 135              MOVE LENGTH OF RECORD-AREA TO FCD-MAX-REC-LENGTH
- 136 >            MOVE LENGTH OF RECORD-AREA TO FCD-CURRENT-REC-LEN
-----                   ^^^^^^
- 137              PERFORM A-200-CALL-EXTFH.
- 138   
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10990:0
 run_file.at-10990-prog.cob:45.11-45.30:
   42          78  OP-CLOSE            VALUE X"fa80".
@@ -5462,96 +5202,6 @@ run_file.at-11348-prog.cob:15.51-15.55:
   17          01  WS-FCD-SIZE             PIC 9(04) VALUE   0       COMP-5.
 >> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:72.52-72.53:
-  69                78 fcd--dup-prime-access         value 1.
-  70                78 fcd--random-access            value 4.
-  71                78 fcd--dynamic-access           value 8.
-  72 >              78 fcd--status-defined           value h"80".
-----                                                       ^
-  73              05  FCD-OPEN-MODE        PIC 9(2) COMP-X.
-  74                78 fcd--open-input               value 0.
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:88.52-88.53:
-  85              05  FCD-TRANS-LOG        PIC 9(2) COMP-X.
-  86              05  FILLER               PIC X(1).
-  87              05  FCD-LOCK-MODE        PIC 9(2) COMP-X.
-  88 >              78 fcd--multilock-bit            value h"80".
-----                                                       ^
-  89                78 fcd--writelock-bit            value h"40".
-  90                78 fcd--retry-open-bit           value h"20".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:89.52-89.53:
-  86              05  FILLER               PIC X(1).
-  87              05  FCD-LOCK-MODE        PIC 9(2) COMP-X.
-  88                78 fcd--multilock-bit            value h"80".
-  89 >              78 fcd--writelock-bit            value h"40".
-----                                                       ^
-  90                78 fcd--retry-open-bit           value h"20".
-  91                78 fcd--skip-lock-bit            value h"10".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:90.52-90.53:
-  87              05  FCD-LOCK-MODE        PIC 9(2) COMP-X.
-  88                78 fcd--multilock-bit            value h"80".
-  89                78 fcd--writelock-bit            value h"40".
-  90 >              78 fcd--retry-open-bit           value h"20".
-----                                                       ^
-  91                78 fcd--skip-lock-bit            value h"10".
-  92                78 fcd--retry-lock-bit           value h"08".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:91.52-91.53:
-  88                78 fcd--multilock-bit            value h"80".
-  89                78 fcd--writelock-bit            value h"40".
-  90                78 fcd--retry-open-bit           value h"20".
-  91 >              78 fcd--skip-lock-bit            value h"10".
-----                                                       ^
-  92                78 fcd--retry-lock-bit           value h"08".
-  93                78 fcd--manual-lock-bit          value h"04".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:92.52-92.53:
-  89                78 fcd--writelock-bit            value h"40".
-  90                78 fcd--retry-open-bit           value h"20".
-  91                78 fcd--skip-lock-bit            value h"10".
-  92 >              78 fcd--retry-lock-bit           value h"08".
-----                                                       ^
-  93                78 fcd--manual-lock-bit          value h"04".
-  94                78 fcd--auto-lock-bit            value h"02".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:93.52-93.53:
-  90                78 fcd--retry-open-bit           value h"20".
-  91                78 fcd--skip-lock-bit            value h"10".
-  92                78 fcd--retry-lock-bit           value h"08".
-  93 >              78 fcd--manual-lock-bit          value h"04".
-----                                                       ^
-  94                78 fcd--auto-lock-bit            value h"02".
-  95                78 fcd--exclusive-bit            value h"01".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:94.52-94.53:
-  91                78 fcd--skip-lock-bit            value h"10".
-  92                78 fcd--retry-lock-bit           value h"08".
-  93                78 fcd--manual-lock-bit          value h"04".
-  94 >              78 fcd--auto-lock-bit            value h"02".
-----                                                       ^
-  95                78 fcd--exclusive-bit            value h"01".
-  96                78 fcd--sharing-bits
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:95.52-95.53:
-  92                78 fcd--retry-lock-bit           value h"08".
-  93                78 fcd--manual-lock-bit          value h"04".
-  94                78 fcd--auto-lock-bit            value h"02".
-  95 >              78 fcd--exclusive-bit            value h"01".
-----                                                       ^
-  96                78 fcd--sharing-bits
-  97                value fcd--manual-lock-bit + fcd--auto-lock-bit.
->> Error: Invalid syntax
-
 run_file.at-11348-prog.cob:97.18:
   94                78 fcd--auto-lock-bit            value h"02".
   95                78 fcd--exclusive-bit            value h"01".
@@ -5570,86 +5220,6 @@ run_file.at-11348-prog.cob:97.19-97.39:
 ----                      ^^^^^^^^^^^^^^^^^^^^
   98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
   99                78 fcd--optional-file            value h"80".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:99.52-99.53:
-  96                78 fcd--sharing-bits
-  97                value fcd--manual-lock-bit + fcd--auto-lock-bit.
-  98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
-  99 >              78 fcd--optional-file            value h"80".
-----                                                       ^
- 100                78 fcd--nodetectlock-input       value h"40".
- 101                78 fcd--not-optional             value h"20".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:100.52-100.53:
-  97                value fcd--manual-lock-bit + fcd--auto-lock-bit.
-  98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
-  99                78 fcd--optional-file            value h"80".
- 100 >              78 fcd--nodetectlock-input       value h"40".
-----                                                       ^
- 101                78 fcd--not-optional             value h"20".
- 102                78 fcd--external-name            value h"10".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:101.52-101.53:
-  98              05  FCD-OTHER-FLAGS      PIC 9(2) COMP-X.
-  99                78 fcd--optional-file            value h"80".
- 100                78 fcd--nodetectlock-input       value h"40".
- 101 >              78 fcd--not-optional             value h"20".
-----                                                       ^
- 102                78 fcd--external-name            value h"10".
- 103                78 fcd--get-info                 value h"08".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:102.52-102.53:
-  99                78 fcd--optional-file            value h"80".
- 100                78 fcd--nodetectlock-input       value h"40".
- 101                78 fcd--not-optional             value h"20".
- 102 >              78 fcd--external-name            value h"10".
-----                                                       ^
- 103                78 fcd--get-info                 value h"08".
- 104                78 fcd--nodetectlock             value h"04".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:103.52-103.53:
- 100                78 fcd--nodetectlock-input       value h"40".
- 101                78 fcd--not-optional             value h"20".
- 102                78 fcd--external-name            value h"10".
- 103 >              78 fcd--get-info                 value h"08".
-----                                                       ^
- 104                78 fcd--nodetectlock             value h"04".
- 105                78 fcd--multiple-reel            value h"02".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:104.52-104.53:
- 101                78 fcd--not-optional             value h"20".
- 102                78 fcd--external-name            value h"10".
- 103                78 fcd--get-info                 value h"08".
- 104 >              78 fcd--nodetectlock             value h"04".
-----                                                       ^
- 105                78 fcd--multiple-reel            value h"02".
- 106                78 fcd--line-advancing           value h"01".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:105.52-105.53:
- 102                78 fcd--external-name            value h"10".
- 103                78 fcd--get-info                 value h"08".
- 104                78 fcd--nodetectlock             value h"04".
- 105 >              78 fcd--multiple-reel            value h"02".
-----                                                       ^
- 106                78 fcd--line-advancing           value h"01".
- 107                78 fcd--special-sequential
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:106.52-106.53:
- 103                78 fcd--get-info                 value h"08".
- 104                78 fcd--nodetectlock             value h"04".
- 105                78 fcd--multiple-reel            value h"02".
- 106 >              78 fcd--line-advancing           value h"01".
-----                                                       ^
- 107                78 fcd--special-sequential
- 108                value fcd--optional-file
 >> Error: Invalid syntax
 
 run_file.at-11348-prog.cob:108.18:
@@ -5672,66 +5242,6 @@ run_file.at-11348-prog.cob:108.19-108.37:
  110              05  FILLER               PIC X(2).
 >> Error: Invalid syntax
 
-run_file.at-11348-prog.cob:153.52-153.53:
- 150              05  FCD-ADDITIONAL-STATUS REDEFINES FCD-BLOCKING
- 151                                       PIC X    COMP-X.
- 152              05  FCD-LOCKTYPES        PIC 99   COMP-X.
- 153 >              78 fcd--interlang-locking        value h"80".
-----                                                       ^
- 154                78 fcd--allow-readers            value h"40".
- 155                78 fcd--separate-lock-file       value h"20".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:154.52-154.53:
- 151                                       PIC X    COMP-X.
- 152              05  FCD-LOCKTYPES        PIC 99   COMP-X.
- 153                78 fcd--interlang-locking        value h"80".
- 154 >              78 fcd--allow-readers            value h"40".
-----                                                       ^
- 155                78 fcd--separate-lock-file       value h"20".
- 156                78 fcd--single-open              value h"10".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:155.52-155.53:
- 152              05  FCD-LOCKTYPES        PIC 99   COMP-X.
- 153                78 fcd--interlang-locking        value h"80".
- 154                78 fcd--allow-readers            value h"40".
- 155 >              78 fcd--separate-lock-file       value h"20".
-----                                                       ^
- 156                78 fcd--single-open              value h"10".
- 157                78 fcd--nfs-file-lock            value h"08".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:156.52-156.53:
- 153                78 fcd--interlang-locking        value h"80".
- 154                78 fcd--allow-readers            value h"40".
- 155                78 fcd--separate-lock-file       value h"20".
- 156 >              78 fcd--single-open              value h"10".
-----                                                       ^
- 157                78 fcd--nfs-file-lock            value h"08".
- 158                78 fcd--nfs-file-lock-hp         value h"04".
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:157.52-157.53:
- 154                78 fcd--allow-readers            value h"40".
- 155                78 fcd--separate-lock-file       value h"20".
- 156                78 fcd--single-open              value h"10".
- 157 >              78 fcd--nfs-file-lock            value h"08".
-----                                                       ^
- 158                78 fcd--nfs-file-lock-hp         value h"04".
- 159                78 fcd--nfs-file-locks
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:158.52-158.53:
- 155                78 fcd--separate-lock-file       value h"20".
- 156                78 fcd--single-open              value h"10".
- 157                78 fcd--nfs-file-lock            value h"08".
- 158 >              78 fcd--nfs-file-lock-hp         value h"04".
-----                                                       ^
- 159                78 fcd--nfs-file-locks
- 160                value fcd--nfs-file-lock + fcd--nfs-file-lock-hp.
->> Error: Invalid syntax
-
 run_file.at-11348-prog.cob:160.18:
  157                78 fcd--nfs-file-lock            value h"08".
  158                78 fcd--nfs-file-lock-hp         value h"04".
@@ -5750,16 +5260,6 @@ run_file.at-11348-prog.cob:160.19-160.37:
 ----                      ^^^^^^^^^^^^^^^^^^
  161              05  FCD-FS-FLAGS         PIC 99   COMP-X.
  162              05  FCD-CONFIG-FLAGS     PIC 99   COMP-X.
->> Error: Invalid syntax
-
-run_file.at-11348-prog.cob:212.15-212.21:
- 209   
- 210             MOVE "TESTOUT" TO WS-FCD-DDNAME
- 211   
- 212 >           MOVE LENGTH OF FCD-MAP TO WS-FCD-SIZE
-----                  ^^^^^^
- 213             DISPLAY "FCD SIZE " WS-FCD-SIZE '.'.
- 214             DISPLAY "Writing " WS-FCD-DDNAME '.'.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11385:0
@@ -5802,16 +5302,6 @@ run_file.at-11385-reference:8.6-8.7:
 >> Error: Unexpected indicator: `j'
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:11598:0
-run_file.at-11598-prog.cob:9.34-9.42:
-   6   
-   7          INPUT-OUTPUT SECTION.
-   8          FILE-CONTROL.
-   9 >            SELECT FLATFILE ASSIGN EXTERNAL RELVAR
-----                                     ^^^^^^^^
-  10              ORGANIZATION RELATIVE
-  11              ACCESS IS SEQUENTIAL
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-11598-prog.cob:57.54:
   54              05  FILLER PIC X(8) VALUE "FOR00000".
   55   
@@ -5893,16 +5383,6 @@ run_file.at-11598-prog.cob:90.62-90.69:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:12316:0
-run_file.at-12316-prog.cob:12.21-12.29:
-   9          INPUT-OUTPUT SECTION.
-  10          FILE-CONTROL.
-  11              SELECT TSPFILE
-  12 >            ASSIGN TO EXTERNAL TSPFILE
-----                        ^^^^^^^^
-  13              ORGANIZATION INDEXED ACCESS DYNAMIC
-  14              RECORD KEY IS CM-CUST-NUM
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-12316-prog.cob:84.54:
   81              05  FILLER PIC X(8) VALUE "PRE00000".
   82   
@@ -7967,16 +7447,6 @@ run_file.at-12943-prog.cob:46.11-46.38:
 >> Error: Invalid >>TURN compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:13156:0
-run_file.at-13156-prog.cob:10.34-10.42:
-   7   
-   8          INPUT-OUTPUT SECTION.
-   9          FILE-CONTROL.
-  10 >            SELECT FLATFILE ASSIGN EXTERNAL SEQFIX
-----                                     ^^^^^^^^
-  11              ORGANIZATION LINE SEQUENTIAL
-  12              FILE STATUS IS CUST-STAT .
->> Warning: Ignored EXTERNAL (implementation pending)
-
 run_file.at-13156-prog.cob:44.54:
   41              05  FILLER PIC X(8) VALUE "FOR00000".
   42   

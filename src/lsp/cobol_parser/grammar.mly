@@ -933,14 +933,34 @@ let select_clause :=                  (* Note: some can be used multiple times *
   | ~ = sharing_clause;              < >                    (* +COB2002 *)
 
 let assign_clause :=                                 (* USING added in COB2002 *)
-  | ASSIGN; TO?; _assign_external_?;
+  | ASSIGN; TO?; ed = external_dynamic?; fd = assign_file_or_device?;
     il = rnel(name_or_alphanum); io = ro(pf(USING,name));
-    { SelectAssign { to_ = il; using = io } }
+    { SelectAssign { to_ = { type_ = ed; file_device = fd; target = il }; using = io } }
   | ASSIGN; USING; i = name;
-    { SelectAssign { to_ = []; using = Some i; } }
+    { SelectAssign { to_ = { type_ = None; file_device = None; target = [] }; using = Some i; } }
 
-let _assign_external_ [@post.pending fun () -> "EXTERNAL"] :=
-  | EXTERNAL
+let external_dynamic :=
+  | EXTERNAL; { External }
+  | DYNAMIC;  { Dynamic }
+
+let assign_file_or_device :=
+  | af = assign_file;
+    { File af }
+  | ad = assign_device;
+    { Device ad }
+  | DISK; FROM; n = name;
+    { DiskFrom n }
+
+let assign_file :=
+  | LINE; ADVANCING; FILE?;          { LineAdvancing }
+  | MULTIPLE; or_(REEL,UNIT); FILE?; { MultipleUnitReel }
+
+let assign_device :=
+  | DISK;      { Disk }
+  | KEYBOARD;  { Keyboard }
+  | DISPLAY;   { Display }
+  | PRINTER_1; { Printer_1 }
+  | PRINTER_2; { Printer_2 }
 
 let access_mode_clause :=
   | ACCESS; MODE?; IS?; ~ = access_mode; <SelectAccessMode>
@@ -1637,7 +1657,11 @@ let occurs_fixed_clause [@context occurs_clause] :=
 let occurs_depending_clause [@context occurs_clause] :=
   | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = i1; to_ = i2; depending = d;
+    { OccursDepending { from = Some i1; to_ = i2; depending = d;
+                        key_is = kl; indexed_by = il; } }
+  | OCCURS; i = loc(integer); TIMES?;
+    d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
+    { OccursDepending { from = None; to_ = i; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=
@@ -2382,8 +2406,8 @@ let scalar_ident [@symbol "<scalar identifier>"] [@recovery_with_pos dummy_ident
   | i = scalar_ident_; %prec below_RPAR { i }
   | i = scalar_ident_; r = refmod;      { ScalarRefMod (i, r) }
 
-(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] := *)
-(*   | ~ = rnel(scalar_ident); < > *)
+(* let scalar_idents [@symbol "<scalar identifiers>"] [@recovery []] :=
+  | ~ = rnel(scalar_ident); < > *)
 
 let length_of_expr :=
   | LENGTH; OF?; ~ = ident_or_literal; <LengthOf>
@@ -2536,7 +2560,7 @@ let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
  | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
- | l = numeric_literal; { UPCAST.numeric_as_scalar l }
+ | l = literal;         { UPCAST.literal_as_scalar l }
  | l = length_of_expr;  { l }
 
 (* Used in CALL *)
@@ -3635,7 +3659,7 @@ let merge_statement :=
 
 %public let unconditional_action := ~ = move_statement; < >
 let move_statement :=
- | MOVE; from = ident_or_literal; TO; to_ = idents;
+ | MOVE; from = x; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
  | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }
