@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Support for debugging programs launched via custom COBOL runtimes [#522](https://github.com/OCamlPro/superbol-studio-oss/pull/522)
 - Parse `OR` in inspect regions [#519](https://github.com/OCamlPro/superbol-studio-oss/pull/519)
 - Support `NOT OPTIONAL` argument for `SELECT` [#517](https://github.com/OCamlPro/superbol-studio-oss/pull/517)
 - Handle redundant periods in `DATA DIVISION` [#521](https://github.com/OCamlPro/superbol-studio-oss/pull/521)

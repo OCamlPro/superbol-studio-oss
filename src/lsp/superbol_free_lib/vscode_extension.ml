@@ -187,6 +187,11 @@ let contributes =
                                         "markdownDescription": "Debug the target as a module of `cobcrun`",
                                         "default": false
                                 },
+                                "cobcrunPath": {
+                                        "type": "string",
+                                        "markdownDescription": "Path to the GnuCOBOL runtime (typically `cobcrun`)",
+                                        "default": null
+                                },
                                 "sourceDirs": {
                                         "type": "array",
                                         "markdownDescription": "Where to find the source code, in addition to the current directory.\n\nExample: `[ \"/usr/share/cobol/sources\" ]`",
@@ -235,6 +240,16 @@ let contributes =
                                 "remoteDebugger": {
                                         "type": "string",
                                         "description": "GDB Server host:port",
+                                        "default": null
+                                },
+                                "useCobcrun": {
+                                        "type": "boolean",
+                                        "markdownDescription": "Debug the target as a module of `cobcrun`",
+                                        "default": false
+                                },
+                                "cobcrunPath": {
+                                        "type": "string",
+                                        "markdownDescription": "Path to the GnuCOBOL runtime (typically `cobcrun`)",
                                         "default": null
                                 },
                                 "sourceDirs": {
