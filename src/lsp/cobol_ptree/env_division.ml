@@ -307,6 +307,7 @@ and access_mode =
 and lock_mode =
   | LockManual
   | LockAutomatic
+  | LockExclusive
 
 and with_lock =
   | WithLockNone
@@ -620,6 +621,7 @@ let pp_with_lock ppf = function
 let pp_lock_mode ppf = function
   | LockManual -> Fmt.pf ppf "MANUAL"
   | LockAutomatic -> Fmt.pf ppf "AUTOMATIC"
+  | LockExclusive -> Fmt.pf ppf "EXCLUSIVE"
 
 let pp_access_mode ppf = function
   | AccessModeDynamic -> Fmt.pf ppf "DYNAMIC"

@@ -1027,6 +1027,7 @@ let with_lock_clause [@recovery WithLockNone] :=
 let lock_mode :=
  | MANUAL;    {LockManual}
  | AUTOMATIC; {LockAutomatic}
+ | EXCLUSIVE; {LockExclusive}
 
 let organization_clause :=
  | io(ORGANIZATION; IS?; {}); ~ = organization; <SelectOrganization>
