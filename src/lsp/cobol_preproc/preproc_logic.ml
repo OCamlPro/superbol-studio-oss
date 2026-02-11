@@ -169,6 +169,11 @@ let eval_boolexpr env
   match ~&e with
   | Defined_condition { var; polarity } ->
       OUT.result (ENV.mem' var env = polarity)
+  | Set_condition { var = _; polarity } ->
+      OUT.result (not polarity)
+        ~diags:(warn diags (Ignored { loc = ~@e;
+                                      item = Compiler_set_condition }))
+            
   | Value_condition { var; polarity } ->
       begin
         match (ENV.definition_of ~var env).def_value with

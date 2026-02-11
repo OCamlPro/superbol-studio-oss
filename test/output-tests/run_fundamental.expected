@@ -494,45 +494,15 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6535:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6587:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6635:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6675:0
-run_fundamental.at-6675-prog.cob:12.7-12.19:
+run_fundamental.at-6675-prog.cob:12.12-12.19:
    9                  05  misalign-1           PIC X.
   10                  05  ptr                  POINTER, SYNC.
   11                  05  ptr-num              REDEFINES ptr,
   12 >        >>IF P64 SET
-----          ^^^^^^^^^^^^
+----               ^^^^^^^
   13                                           USAGE BINARY-DOUBLE UNSIGNED.
   14          >>ELSE
->> Error: Malformed compiler directive
-
-run_fundamental.at-6675-prog.cob:14.7-14.13:
-  11                  05  ptr-num              REDEFINES ptr,
-  12          >>IF P64 SET
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14 >        >>ELSE
-----          ^^^^^^
-  15                                           USAGE BINARY-LONG UNSIGNED.
-  16          >>END-IF
->> Error: Unexpected >>ELSE compiler directive
-
-run_fundamental.at-6675-prog.cob:15.40-15.45:
-  12          >>IF P64 SET
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14          >>ELSE
-  15 >                                         USAGE BINARY-LONG UNSIGNED.
-----                                           ^^^^^
-  16          >>END-IF
-  17                  05  misalign-2           PIC X.
->> Error: Invalid syntax
-
-run_fundamental.at-6675-prog.cob:16.7-16.15:
-  13                                           USAGE BINARY-DOUBLE UNSIGNED.
-  14          >>ELSE
-  15                                           USAGE BINARY-LONG UNSIGNED.
-  16 >        >>END-IF
-----          ^^^^^^^^
-  17                  05  misalign-2           PIC X.
-  18   
->> Error: Unexpected >>END-IF compiler directive
+>> Warning: Ignored compiler SET condition (assuming unset)
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6772:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6801:0
