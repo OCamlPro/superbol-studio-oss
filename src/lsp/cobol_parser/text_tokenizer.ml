@@ -481,12 +481,18 @@ let put_token_back (type m) (s: m state) : m state =
   | Eidetic [] -> Fmt.invalid_arg "put_token_back: unexpected memory state"
   | Eidetic (_ :: toks) -> { s with memory = Eidetic toks }
 
+let rec skip_redundant_periods = function
+    | { payload = PERIOD; _ } :: rest -> skip_redundant_periods rest
+    | rest -> rest
+
 let next_token (s: _ state) =
   let rec aux = function
     | { payload = INTERVENING_(',' | ';'); _ } :: tokens ->
         aux tokens
     | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
         Some (emit_token s (PERIOD &@ loc), token, tokens)
+    | { payload = PERIOD; _ } as token :: tokens ->
+        Some (emit_token s token, token, skip_redundant_periods tokens)
     | token :: tokens ->
         Some (emit_token s token, token, tokens)
     | [] ->
