@@ -2328,26 +2328,6 @@ run_file.at-5590-prog.cob:47.28-47.33:
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:5711:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:5783:0
-run_file.at-5783-prog1.cob:8.23:
-   5          input-output section.
-   6          file-control.
-   7          select file1 assign disk
-   8 >            lock mode is exclusive
-----                          ^
-   9              status is fs.
-  10          data division.
->> Hint: Missing AUTOMATIC
-
-run_file.at-5783-prog1.cob:8.24-8.33:
-   5          input-output section.
-   6          file-control.
-   7          select file1 assign disk
-   8 >            lock mode is exclusive
-----                           ^^^^^^^^^
-   9              status is fs.
-  10          data division.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:5784:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:5851:0
 run_file.at-5851-prog1.cob:21.32:
@@ -2483,26 +2463,6 @@ run_file.at-6336-prog.cob:53.28-53.33:
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:6426:0
-run_file.at-6426-prog1.cob:10.23:
-   7          select file1 assign disk
-   8              organization indexed
-   9              record key file1-key
-  10 >            lock mode is exclusive
-----                          ^
-  11              status is fs.
-  12          data division.
->> Hint: Missing AUTOMATIC
-
-run_file.at-6426-prog1.cob:10.24-10.33:
-   7          select file1 assign disk
-   8              organization indexed
-   9              record key file1-key
-  10 >            lock mode is exclusive
-----                           ^^^^^^^^^
-  11              status is fs.
-  12          data division.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:6427:0
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:6504:0
 run_file.at-6504-prog1.cob:25.32:
