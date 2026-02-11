@@ -19,7 +19,7 @@ data_display.at-205-prog.cob:12.24-12.36:
   12 >        01 X-UI          UNSIGNED-INT.
 ----                           ^^^^^^^^^^^^
   13          PROCEDURE        DIVISION.
-  14              MOVE 127 TO X-BCU.               DISPLAY X-BCU END-DISPLAY.  
+  14              MOVE 127 TO X-BCU.               DISPLAY X-BCU END-DISPLAY.
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/data_display.at:402:0

@@ -88,11 +88,13 @@ ATTIC
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 """
-github-workflow-before-build = """
+github-workflow-before-opam = """
       - run: git submodule init
 
       - run: git submodule update
+"""
 
+github-workflow-before-build = """
       - uses: actions/setup-node@v4
         with:
           node-version: '>=16'

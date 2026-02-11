@@ -40,7 +40,7 @@ run_subscripts.at-495-progn2.cob:2.6-2.19:
 Considering: import/gnucobol/tests/testsuite.src/run_subscripts.at:532:0
 run_subscripts.at-532-prog.cob:13.6-13.20:
   10          01  idx         PIC 99 VALUE 6.
-  11              
+  11   
   12          PROCEDURE DIVISION.
   13 >       $SET NOSSRANGE
 ----         ^^^^^^^^^^^^^^

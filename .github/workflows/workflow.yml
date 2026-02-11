@@ -55,29 +55,33 @@ jobs:
         id: cache-opam
         with:
           path: _opam
-          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
+          key: v4-${{ runner.os }}-superbol-studio-oss-${{ matrix.ocaml-compiler }}-${{ hashFiles('opam/*.opam vendors/autofonce/opam/*.opam') }}-skip_tests=${{ matrix.skip_test }}-repo=
 
       # use fields.opam-repo = "git+https://" to add an 'extra' opam repository
 
-      - run: opam pin add . -y --no-action
-
-      - run: |
-          if ${{ matrix.skip_test }}
-          then opam install -y opam/*.opam --deps-only
-          else opam install -y opam/*.opam --deps-only --with-test
-          fi
-        if: steps.cache-opam.outputs.cache-hit != 'true'
-        name: Run opam install -y opam/*.opam --deps-only [ --with-test ]
-
-      # Use fields.build-scripts to add more scripts to convert here
-      - run: dos2unix scripts/*.sh 
-        if: matrix.os == 'windows-latest'
 
       # Use fields.github-workflow-before-build to add something here
       - run: git submodule init
 
       - run: git submodule update
 
+      - run: opam pin add . -y --no-action
+
+      - run: |
+          if ${{ matrix.skip_test }}
+          then
+            opam install -y opam/*.opam vendors/autofonce/opam/*.opam --deps-only
+          else
+            opam install -y opam/*.opam vendors/autofonce/opam/*.opam --deps-only --with-test
+          fi
+        if: steps.cache-opam.outputs.cache-hit != 'true'
+        name: Run opam install -y **/opam/*.opam --deps-only [ --with-test ]
+
+      # Use fields.build-scripts to add more scripts to convert here
+      - run: dos2unix scripts/*.sh 
+        if: matrix.os == 'windows-latest'
+
+      # Use fields.github-workflow-before-build to add something here
       - uses: actions/setup-node@v4
         with:
           node-version: '>=16'

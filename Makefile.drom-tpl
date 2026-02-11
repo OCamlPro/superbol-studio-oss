@@ -90,7 +90,6 @@ uninstall:
 	opam uninstall .
 
 dev-deps:
-	opam install autofonce
 	opam install ./opam/*.opam ./test/opam/*.opam --deps-only --with-doc --with-test
 
 test:
