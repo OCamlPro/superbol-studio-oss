@@ -4,6 +4,7 @@
 
 ### Added
 - Support EXCLUSIVE lock mode [#514](https://github.com/OCamlPro/superbol-studio-oss/pull/514)
+- Support more compiler directive syntaxes [#515](https://github.com/OCamlPro/superbol-studio-oss/pull/515)
 - `CONFIGURATION SECTION` header is now optionnal [513](https://github.com/OCamlPro/superbol-studio-oss/pull/513)
 - Extend syntax of `ORGANIZATION` to allow `RECORD` and `BINARY` optional prefix [#511](https://github.com/OCamlPro/superbol-studio-oss/pull/511)
 - Allow national literals to be used as arithmetic terms [#510](https://github.com/OCamlPro/superbol-studio-oss/pull/510)
