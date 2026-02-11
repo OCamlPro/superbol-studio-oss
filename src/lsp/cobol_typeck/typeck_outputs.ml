@@ -42,6 +42,24 @@ type outputs =
   }
 type t = outputs
 
+
+(* An accumulator for fold_exec_block', used to collect references in
+   EXEC blocks *)
+type references_acc =
+  {
+    current_section: Cobol_unit.Types.procedure_section option;
+    refs: references_in_unit;
+    diags: Typeck_diagnostics.t;
+  }
+
+type fold_exec_block' =
+  register_name:(string
+                   Cobol_common.Srcloc.TYPES.with_loc ->
+                 references_acc -> references_acc) ->
+  Cobol_common.Exec_block.TYPES.exec_block
+    Cobol_common.Srcloc.TYPES.with_loc ->
+  references_acc -> references_acc
+
 (* --- *)
 
 let no_refs =

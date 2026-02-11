@@ -22,6 +22,7 @@ let typeck_file { preproc_options; parser_options; _ } filename =
       |> Cobol_parser.parse_simple ~options:parser_options
       |> Cobol_parser.Outputs.result_only
       |> Cobol_typeck.compilation_group ~config:parser_options.config
+        ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
       |> Cobol_typeck.Results.result_only
       |> fun checked_group ->
       (* in group: *)

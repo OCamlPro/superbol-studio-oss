@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-25db47586cb73c1945be5ffe66ee5ea7:.
+78546d792a38f9dfb68fbf706c5dd4c3:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -17,6 +17,11 @@ version:0.9.0
 # file .gitignore
 38f28a9baf11ccf9dd74b68dd8c37d97:.gitignore
 # end context for .gitignore
+
+# begin context for CHANGES.md
+# file CHANGES.md
+191d0e7391982aeb2ee3f0c0dafabd3c:CHANGES.md
+# end context for CHANGES.md
 
 # begin context for LICENSE.md
 # file LICENSE.md
@@ -75,7 +80,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-0cae48e9a2b56c1765dd4640422e23ed:dune-project
+c4ee603ce4a62e1a164e2655fac46a9e:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -130,7 +135,7 @@ d09da32baf3c733888056f43ff1f4b44:opam/cobol_parser.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
-a8898fa7867f8e3bcd382e3780233d44:opam/cobol_typeck.opam
+aec0917c0448d7b070e4918890e987f6:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/cobol_unit.opam
@@ -215,7 +220,7 @@ c1b983ec86a07f977651b30175b8b29f:opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_preprocs.opam
 # file opam/superbol_preprocs.opam
-1bc2f1a4b034097c5a2d6caefa048a23:opam/superbol_preprocs.opam
+7a76057b1e104d98bad50c158d6f473a:opam/superbol_preprocs.opam
 # end context for opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
@@ -295,7 +300,7 @@ d626b5f615a4691b6788eaf63ad2dd14:sphinx/license.rst
 
 # begin context for src/lsp/cobol_cfg/dune
 # file src/lsp/cobol_cfg/dune
-c6c7cd50f0ebff63bab991bf9a1633e6:src/lsp/cobol_cfg/dune
+cfee3e13c13fa1890123d30809d7a1a3:src/lsp/cobol_cfg/dune
 # end context for src/lsp/cobol_cfg/dune
 
 # begin context for src/lsp/cobol_cfg/version.mlt
@@ -305,7 +310,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_cfg/version.mlt
 
 # begin context for src/lsp/cobol_common/dune
 # file src/lsp/cobol_common/dune
-9edd2c6c082e67ed0b683e87e60c485e:src/lsp/cobol_common/dune
+94ba3ebd883a94b4b7a783d1b5c2e261:src/lsp/cobol_common/dune
 # end context for src/lsp/cobol_common/dune
 
 # begin context for src/lsp/cobol_common/version.mlt
@@ -315,7 +320,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_common/version.mlt
 
 # begin context for src/lsp/cobol_config/dune
 # file src/lsp/cobol_config/dune
-631869db8237af96d5ff71c2c8209654:src/lsp/cobol_config/dune
+ee51a53d308eff8484e9ccea75be597b:src/lsp/cobol_config/dune
 # end context for src/lsp/cobol_config/dune
 
 # begin context for src/lsp/cobol_config/version.mlt
@@ -325,7 +330,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_config/version.mlt
 
 # begin context for src/lsp/cobol_data/dune
 # file src/lsp/cobol_data/dune
-805bc16e08adbaf3eb464cf85f49c6fb:src/lsp/cobol_data/dune
+75911661b652121bf5bed6958ebddb90:src/lsp/cobol_data/dune
 # end context for src/lsp/cobol_data/dune
 
 # begin context for src/lsp/cobol_data/version.mlt
@@ -335,7 +340,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_data/version.mlt
 
 # begin context for src/lsp/cobol_indent/dune
 # file src/lsp/cobol_indent/dune
-4771291c2535f87f191f109bd83d0440:src/lsp/cobol_indent/dune
+d3b7ae62f945ba98a321709cb807d516:src/lsp/cobol_indent/dune
 # end context for src/lsp/cobol_indent/dune
 
 # begin context for src/lsp/cobol_indent/version.mlt
@@ -345,7 +350,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_indent/version.mlt
 
 # begin context for src/lsp/cobol_indent_old/dune
 # file src/lsp/cobol_indent_old/dune
-a98a08d36a2f65127f60832515b6ab47:src/lsp/cobol_indent_old/dune
+95e29a1e4344b6f6db820680fe2b2475:src/lsp/cobol_indent_old/dune
 # end context for src/lsp/cobol_indent_old/dune
 
 # begin context for src/lsp/cobol_indent_old/version.mlt
@@ -355,7 +360,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_indent_old/version.mlt
 
 # begin context for src/lsp/cobol_lsp/dune
 # file src/lsp/cobol_lsp/dune
-0930647d8c6aee7065011a0501e050ac:src/lsp/cobol_lsp/dune
+7f644cbe5fbc6dd6242f157d8e740a9f:src/lsp/cobol_lsp/dune
 # end context for src/lsp/cobol_lsp/dune
 
 # begin context for src/lsp/cobol_lsp/version.mlt
@@ -365,7 +370,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_lsp/version.mlt
 
 # begin context for src/lsp/cobol_parser/dune
 # file src/lsp/cobol_parser/dune
-0bdd09727ecc330598da0a5c0582a262:src/lsp/cobol_parser/dune
+83b3c6d594312b56b0c6d9132fde105b:src/lsp/cobol_parser/dune
 # end context for src/lsp/cobol_parser/dune
 
 # begin context for src/lsp/cobol_parser/version.mlt
@@ -375,7 +380,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_parser/version.mlt
 
 # begin context for src/lsp/cobol_preproc/dune
 # file src/lsp/cobol_preproc/dune
-e31b22f1d241d75db90f170f9c6fd95d:src/lsp/cobol_preproc/dune
+a04e2ae75dcea5e8b5d0462a1c184b1b:src/lsp/cobol_preproc/dune
 # end context for src/lsp/cobol_preproc/dune
 
 # begin context for src/lsp/cobol_preproc/version.mlt
@@ -385,7 +390,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_preproc/version.mlt
 
 # begin context for src/lsp/cobol_ptree/dune
 # file src/lsp/cobol_ptree/dune
-398fdf21aa93d043e422d9bd67b9d3c9:src/lsp/cobol_ptree/dune
+8c16b85b8b250ca5809d8eac211149fc:src/lsp/cobol_ptree/dune
 # end context for src/lsp/cobol_ptree/dune
 
 # begin context for src/lsp/cobol_ptree/version.mlt
@@ -395,7 +400,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_ptree/version.mlt
 
 # begin context for src/lsp/cobol_typeck/dune
 # file src/lsp/cobol_typeck/dune
-11df07aa7e59dd5f6f690da14b82b8b5:src/lsp/cobol_typeck/dune
+248d3b43484038697848d8ad03696224:src/lsp/cobol_typeck/dune
 # end context for src/lsp/cobol_typeck/dune
 
 # begin context for src/lsp/cobol_typeck/version.mlt
@@ -405,7 +410,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_typeck/version.mlt
 
 # begin context for src/lsp/cobol_unit/dune
 # file src/lsp/cobol_unit/dune
-d2c167a61ac9aa89964577228ccb49fa:src/lsp/cobol_unit/dune
+af41b915dad9926cd22ae734de26cb04:src/lsp/cobol_unit/dune
 # end context for src/lsp/cobol_unit/dune
 
 # begin context for src/lsp/cobol_unit/version.mlt
@@ -415,7 +420,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/cobol_unit/version.mlt
 
 # begin context for src/lsp/ebcdic_lib/dune
 # file src/lsp/ebcdic_lib/dune
-963d41cf5fce1985fce4ba6f43244817:src/lsp/ebcdic_lib/dune
+3e7609a56674230c3675b5f5504dedf4:src/lsp/ebcdic_lib/dune
 # end context for src/lsp/ebcdic_lib/dune
 
 # begin context for src/lsp/ebcdic_lib/ebcdic_version.mlt
@@ -425,7 +430,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/ebcdic_lib/ebcdic_version.mlt
 
 # begin context for src/lsp/ezr_toml/dune
 # file src/lsp/ezr_toml/dune
-eab335ce600887c59f1baf9b0983d0ac:src/lsp/ezr_toml/dune
+0595a0e0d515c62357253e67f7d2e43c:src/lsp/ezr_toml/dune
 # end context for src/lsp/ezr_toml/dune
 
 # begin context for src/lsp/ezr_toml/version.mlt
@@ -435,8 +440,13 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/ezr_toml/version.mlt
 
 # begin context for src/lsp/ppx_cobcflags/dune
 # file src/lsp/ppx_cobcflags/dune
-86758f07c1c4f6bef04e0520a41cb8f6:src/lsp/ppx_cobcflags/dune
+ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 # end context for src/lsp/ppx_cobcflags/dune
+
+# begin context for src/lsp/ppx_cobcflags/main.ml
+# file src/lsp/ppx_cobcflags/main.ml
+57746d4bdf961b2ab0fbffc2bdab793f:src/lsp/ppx_cobcflags/main.ml
+# end context for src/lsp/ppx_cobcflags/main.ml
 
 # begin context for src/lsp/ppx_cobcflags/version.mlt
 # file src/lsp/ppx_cobcflags/version.mlt
@@ -445,7 +455,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/ppx_cobcflags/version.mlt
 
 # begin context for src/lsp/pretty/dune
 # file src/lsp/pretty/dune
-99a706a3180a431ed103230d66dd9013:src/lsp/pretty/dune
+0e8eb67ce55fcd4c99df3c4d0a3cc860:src/lsp/pretty/dune
 # end context for src/lsp/pretty/dune
 
 # begin context for src/lsp/pretty/version.mlt
@@ -455,7 +465,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/pretty/version.mlt
 
 # begin context for src/lsp/sql_ast/dune
 # file src/lsp/sql_ast/dune
-e0c73ea039315b0cfa5b4a7ac54a1484:src/lsp/sql_ast/dune
+3fd19e719bc677c046721e1acc91f181:src/lsp/sql_ast/dune
 # end context for src/lsp/sql_ast/dune
 
 # begin context for src/lsp/sql_ast/version.mlt
@@ -465,7 +475,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/sql_ast/version.mlt
 
 # begin context for src/lsp/sql_parser/dune
 # file src/lsp/sql_parser/dune
-2408ff5956afa93ae2f3302928555c8e:src/lsp/sql_parser/dune
+008c9577668aba9b4564d538f056858b:src/lsp/sql_parser/dune
 # end context for src/lsp/sql_parser/dune
 
 # begin context for src/lsp/sql_parser/version.mlt
@@ -475,13 +485,18 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/sql_parser/version.mlt
 
 # begin context for src/lsp/sql_preproc/dune
 # file src/lsp/sql_preproc/dune
-0ba9e49a0d53de4b8076614f39543fd4:src/lsp/sql_preproc/dune
+75154167098c84baaebdedad635bb22a:src/lsp/sql_preproc/dune
 # end context for src/lsp/sql_preproc/dune
 
 # begin context for src/lsp/sql_preproc/index.mld
 # file src/lsp/sql_preproc/index.mld
 463623160e481efaf9123695b0a1db58:src/lsp/sql_preproc/index.mld
 # end context for src/lsp/sql_preproc/index.mld
+
+# begin context for src/lsp/sql_preproc/main.ml
+# file src/lsp/sql_preproc/main.ml
+0d086c8a4c8b0013efb6f073d1daca64:src/lsp/sql_preproc/main.ml
+# end context for src/lsp/sql_preproc/main.ml
 
 # begin context for src/lsp/sql_preproc/version.mlt
 # file src/lsp/sql_preproc/version.mlt
@@ -498,9 +513,14 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/sql_preproc/version.mlt
 236a0354fe949a020f31913b39b31663:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
 
+# begin context for src/lsp/superbol-free/main.ml
+# file src/lsp/superbol-free/main.ml
+6d5783a078a274d9151f7fb17fef485b:src/lsp/superbol-free/main.ml
+# end context for src/lsp/superbol-free/main.ml
+
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
-ef5dde01e364ecef0f87af4d4a869a37:src/lsp/superbol_free_lib/dune
+cdafea2faf6852d419929169f5ace4f6:src/lsp/superbol_free_lib/dune
 # end context for src/lsp/superbol_free_lib/dune
 
 # begin context for src/lsp/superbol_free_lib/version.mlt
@@ -510,8 +530,13 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_free_lib/version.mlt
 
 # begin context for src/lsp/superbol_preprocs/dune
 # file src/lsp/superbol_preprocs/dune
-9ac937ba500427e8309d8092a1554d60:src/lsp/superbol_preprocs/dune
+421867647c81bf6b06ed5e36640415f9:src/lsp/superbol_preprocs/dune
 # end context for src/lsp/superbol_preprocs/dune
+
+# begin context for src/lsp/superbol_preprocs/main.ml
+# file src/lsp/superbol_preprocs/main.ml
+02c845b78847d32540953b41268807b0:src/lsp/superbol_preprocs/main.ml
+# end context for src/lsp/superbol_preprocs/main.ml
 
 # begin context for src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_preprocs/version.mlt
@@ -520,7 +545,7 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_preprocs/version.mlt
 
 # begin context for src/lsp/superbol_project/dune
 # file src/lsp/superbol_project/dune
-a7e1e69bff3d4c180af5f42cce7f6764:src/lsp/superbol_project/dune
+3d075790a8d9c7cd85514d3f22c7397e:src/lsp/superbol_project/dune
 # end context for src/lsp/superbol_project/dune
 
 # begin context for src/lsp/superbol_project/version.mlt
@@ -540,7 +565,7 @@ b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-87fe96c228b8cb51be7268c7e3cdd5b5:src/vendor/ez_toml/dune
+0778f52cc1225df698a5fcd42310b6ff:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld
@@ -555,7 +580,7 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/ez_toml/version.mlt
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
-16728fcdbeb298d01bad407ec5bb76eb:src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
+e088a3c55f477e639db0362f02455e24:src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/interop/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/interop/version.mlt
@@ -565,7 +590,7 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/i
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/node/dune
-1ca558040c049a3ba0e5f97570d7f993:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
+95595bb68f3287a7e05183d919be06d6:src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/node/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/node/version.mlt
@@ -575,7 +600,7 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/n
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
-1abfa6d0707e3727987cd9e4f74d47f6:src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
+a66598082ef653ebcf0ce0fd10729a0d:src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode/version.mlt
@@ -585,7 +610,7 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/v
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # file src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
-538f01cd4e7ceae6575f3450677d672f:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
+672e8ec2d88abcb1dc38cdea9e78f4c4:src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 # end context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/dune
 
 # begin context for src/vendor/vscode-ocaml-platform/src-bindings/vscode_languageclient/version.mlt
@@ -595,7 +620,7 @@ d32caec25e714e824fce17600c2cb75d:src/vendor/vscode-ocaml-platform/src-bindings/v
 
 # begin context for src/vscode/superbol-vscode-lib/dune
 # file src/vscode/superbol-vscode-lib/dune
-dc4b8933e575a293349e210048d78708:src/vscode/superbol-vscode-lib/dune
+2b3e504969f971e5138555ccc9f6a649:src/vscode/superbol-vscode-lib/dune
 # end context for src/vscode/superbol-vscode-lib/dune
 
 # begin context for src/vscode/superbol-vscode-lib/version.mlt
@@ -605,7 +630,7 @@ d32caec25e714e824fce17600c2cb75d:src/vscode/superbol-vscode-lib/version.mlt
 
 # begin context for src/vscode/superbol-vscode-platform/dune
 # file src/vscode/superbol-vscode-platform/dune
-894ee1e9d14911c1985308b2950f9f5a:src/vscode/superbol-vscode-platform/dune
+8e474db028efea60c5774c81daa92012:src/vscode/superbol-vscode-platform/dune
 # end context for src/vscode/superbol-vscode-platform/dune
 
 # begin context for src/vscode/superbol-vscode-platform/version.mlt
@@ -615,7 +640,7 @@ d32caec25e714e824fce17600c2cb75d:src/vscode/superbol-vscode-platform/version.mlt
 
 # begin context for src/vscode/vscode-debugadapter/dune
 # file src/vscode/vscode-debugadapter/dune
-330735d078b86256c242f86e7fe30bd2:src/vscode/vscode-debugadapter/dune
+7a660cd154ab627381fb7d8d78c4f6b4:src/vscode/vscode-debugadapter/dune
 # end context for src/vscode/vscode-debugadapter/dune
 
 # begin context for src/vscode/vscode-debugadapter/version.mlt
@@ -625,7 +650,7 @@ d32caec25e714e824fce17600c2cb75d:src/vscode/vscode-debugadapter/version.mlt
 
 # begin context for src/vscode/vscode-debugprotocol/dune
 # file src/vscode/vscode-debugprotocol/dune
-4fd582a4b944e0a80d793fd95f2123d8:src/vscode/vscode-debugprotocol/dune
+35adced8214d24af89d82ea73f050d33:src/vscode/vscode-debugprotocol/dune
 # end context for src/vscode/vscode-debugprotocol/dune
 
 # begin context for src/vscode/vscode-debugprotocol/version.mlt
@@ -635,7 +660,7 @@ d32caec25e714e824fce17600c2cb75d:src/vscode/vscode-debugprotocol/version.mlt
 
 # begin context for src/vscode/vscode-json/dune
 # file src/vscode/vscode-json/dune
-c57e4311cc67d76a32541e4dc3132913:src/vscode/vscode-json/dune
+4e07bd1a335774488b459d859123bbb6:src/vscode/vscode-json/dune
 # end context for src/vscode/vscode-json/dune
 
 # begin context for src/vscode/vscode-json/index.mld

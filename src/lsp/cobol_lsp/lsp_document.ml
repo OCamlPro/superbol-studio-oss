@@ -101,7 +101,9 @@ let check doc ptree =
                              diags = parsing_diags } = ptree in
   let Cobol_typeck.Results.{ result = checked;
                              diags = typecking_diags }
-    = Cobol_typeck.compilation_group ~config ptree in
+    = Cobol_typeck.compilation_group ~config
+      ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
+      ptree in
   let artifacts = Cobol_parser.artifacts ptree in
   let typecking_diags =
     (* Do not report typeck diagnostics in case of syntax or pre-processing

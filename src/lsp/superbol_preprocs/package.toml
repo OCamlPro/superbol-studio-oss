@@ -46,7 +46,7 @@ gen-version = "version.ml"
 # preprocess = "pps ppx_deriving.show"
 
 # files to skip while updating at package level
-skip = ["index.mld"]
+skip = ["index.mld", "main.ml"]
 
 # package library dependencies
 #   [dependencies]
@@ -56,6 +56,7 @@ skip = ["index.mld"]
 cobol_common = "version"
 cobol_preproc = "version"
 cobol_parser = "version"
+cobol_typeck = "version"
 sql_parser = "version"
 pretty = "version"
 
