@@ -14,6 +14,7 @@
 open EzCompat
 
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Reserved.TYPES
 
 module TYPES = struct
 
@@ -195,31 +196,31 @@ let reserve_insensitive_token { token_of_word; _ } kwd token_handle =
 let reserve_sensitive_alias { token_of_word; _ } kwd token_handle =
   Hashtbl.add token_of_word kwd token_handle
 
-let reserve_words lexer : Cobol_config.words_spec -> unit =
+let reserve_words lexer words =
   let on_token_handle_of kwd descr ~f =
     try f @@ handle_of_word lexer kwd with
     | Not_found when StringSet.mem kwd silenced_keywords ->
-        ()                                          (* Ignore silently? Warn? *)
+      ()                                          (* Ignore silently? Warn? *)
     | Not_found ->
-        Pretty.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
+      Pretty.error "@[Unable@ to@ %s@ keyword:@ %s@]@." descr kwd
   in
-  List.iter begin fun (w, word_spec) ->
-    match word_spec with
-    | Cobol_config.ReserveWord { preserve_context_sensitivity } ->
-        on_token_handle_of w "reserve" ~f:begin fun h ->
-          if preserve_context_sensitivity
-          then reserve_as_keyword h
-          else reserve_insensitive_token lexer w h
-        end
-    | ReserveAlias { alias_for; preserve_context_sensitivity } ->
-        on_token_handle_of alias_for "alias" ~f:begin fun h ->
-          if preserve_context_sensitivity
-          then reserve_sensitive_alias lexer w h
-          else reserve_insensitive_token lexer w h
-        end
-    | NotReserved ->
+  List.iter ( fun (w, word_spec) ->
+      match word_spec with
+      | ReserveWord { preserve_context_sensitivity } ->
+        on_token_handle_of w "reserve" ~f:( fun h ->
+            if preserve_context_sensitivity
+            then reserve_as_keyword h
+            else reserve_insensitive_token lexer w h
+          )
+      | ReserveAlias { alias_for; preserve_context_sensitivity } ->
+        on_token_handle_of alias_for "alias" ~f:( fun h ->
+            if preserve_context_sensitivity
+            then reserve_sensitive_alias lexer w h
+            else reserve_insensitive_token lexer w h
+          )
+      | NotReserved ->
         on_token_handle_of w "unreserve" ~f:unreserve_keyword
-  end
+    ) words
 
 (* --- *)
 

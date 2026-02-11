@@ -2,5 +2,5 @@
 (library
  (name testsuite_utils)
  (modules Testsuite_utils)
- (libraries ez_file cobol_common cobol_config superbol_preprocs)
+ (libraries ez_file cobol_common gnucobol_config superbol_preprocs)
  )

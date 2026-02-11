@@ -61,7 +61,7 @@ type parser_options =
     verbose: bool;
     show: [`Pending] list;
     recovery: recovery;
-    config: Cobol_config.t;
+    config: Cobol_common.Config.TYPES.cobol_config;
     exec_scanners: exec_scanners;
   }
 
@@ -73,6 +73,6 @@ let default ~exec_scanners =
     verbose = false;
     show = [`Pending];
     recovery = default_recovery;
-    config = Cobol_config.default;
+    config = Cobol_common.Config.default;
     exec_scanners;
   }

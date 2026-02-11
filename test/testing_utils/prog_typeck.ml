@@ -17,9 +17,10 @@ let typeck ?parser_options ?source_format ?filename contents =
        SQL statements*)
     acc
   in
+  let c = Cobol_common.Config.default in
   Prog_parser.parse ?parser_options ?source_format ?filename contents |>
   Cobol_parser.Outputs.translate_diags |>
   Cobol_common.Diagnostics.map_result
-    ~f:(Cobol_typeck.compilation_group ~fold_exec_block') |>
+    ~f:(Cobol_typeck.compilation_group ~c ~fold_exec_block') |>
   Cobol_common.Diagnostics.more_result
     ~f:Cobol_typeck.Results.translate_diags

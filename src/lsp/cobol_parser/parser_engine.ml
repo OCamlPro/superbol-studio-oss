@@ -16,9 +16,6 @@ open Cobol_common.Srcloc.INFIX
 open Parser_options                               (* import types for options *)
 open Parser_outputs                               (* import types for outputs *)
 
-module OUT = Parser_outputs
-
-module Tokzr = Text_tokenizer
 module Overlay_manager = Grammar_utils.Overlay_manager
 module Grammar_interpr = Grammar.MenhirInterpreter
 module Grammar_recovery =
@@ -89,7 +86,7 @@ and 'm preproc =
   {
     pp: Cobol_preproc.preprocessor;
     diags: Parser_diagnostics.t;
-    tokzr: 'm Tokzr.state;
+    tokzr: 'm Text_tokenizer.state;
     persist: 'm persist;
   }
 
@@ -107,14 +104,13 @@ and 'm persist =
 let make_parser
     (type m) Parser_options.{ verbose; show; recovery; config; exec_scanners }
     ?show_if_verbose ~(tokenizer_memory: m memory) pp =
-  let tokzr: m Tokzr.state =
-    let memory: m Tokzr.memory = match tokenizer_memory with
-      | Parser_options.Amnesic -> Tokzr.amnesic
-      | Parser_options.Eidetic -> Tokzr.eidetic
+  let tokzr: m Text_tokenizer.state =
+    let memory: m Text_tokenizer.memory = match tokenizer_memory with
+      | Parser_options.Amnesic -> Text_tokenizer.amnesic
+      | Parser_options.Eidetic -> Text_tokenizer.eidetic
     in
-    let module Config = (val config) in
-    Tokzr.init ~verbose ?show_if_verbose ~exec_scanners ~memory Config.words
-      ~intrinsics: Config.intrinsic_functions
+    Text_tokenizer.init ~verbose ?show_if_verbose ~exec_scanners ~memory config.words
+      ~intrinsics: config.intrinsic_functions
       (* CHECKME: no default intrinsics for now (shouldn't it be in `Config`?): *)
       (* ~default_intrinsics: Cobol_config.Reserved.default_intrinsics *)
   in
@@ -157,7 +153,7 @@ let add_exn ({ preproc = ({ diags; _ } as pp); _ } as ps) e =
 
 let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
   Parser_diagnostics.ALL.{
-    parser_diags = Parser_diagnostics.union diags @@ Tokzr.diagnostics tokzr;
+    parser_diags = Parser_diagnostics.union diags @@ Text_tokenizer.diagnostics tokzr;
     preproc_diags = Cobol_preproc.diags pp;
   }
 
@@ -169,7 +165,7 @@ let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
   assert (text <> []);
   (* Note: this is the source format in use at the end of the sentence. *)
   let source_format = Cobol_preproc.source_format pp in
-  match Tokzr.tokenize_text ~source_format tokzr text with
+  match Text_tokenizer.tokenize_text ~source_format tokzr text with
   | Error `MissingInputs, tokzr ->
       produce_tokens (update_tokzr ps tokzr)
   | Error `ReachedEOF tokens, tokzr
@@ -177,7 +173,7 @@ let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
       update_tokzr ps tokzr, tokens
 
 let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
-  match Tokzr.next_token tokzr tokens with
+  match Text_tokenizer.next_token tokzr tokens with
   | Some (tokzr, token, tokens) ->
       (update_tokzr ps tokzr, token, tokens)
   | None ->
@@ -190,7 +186,7 @@ let token_n_srcloc_limits ~prev_limit token =
   ~&token, s, e
 
 let put_token_back ({ preproc; _ } as ps) token tokens =
-  let tokzr, tokens = Tokzr.put_token_back preproc.tokzr token tokens in
+  let tokzr, tokens = Text_tokenizer.put_token_back preproc.tokzr token tokens in
   (* The limits of the re-submitted token will be re-constructed in
      `token_n_srcloc_limits`, so `prev_limit` needs to be re-adjusted to the
      second-to-last right-limit. *)
@@ -248,7 +244,7 @@ let report_syntax_hints_n_error ps
 (* --- *)
 
 let leaving_context_on_reduction { preproc = { tokzr; _ }; _ } prod =
-  match Tokzr.top_context tokzr with
+  match Text_tokenizer.top_context tokzr with
   | None -> false
   | Some top_ctx ->
       match Grammar_interpr.lhs prod with
@@ -258,7 +254,7 @@ let leaving_context_on_reduction { preproc = { tokzr; _ }; _ } prod =
         | _ -> false
 
 let leaving_context_on_shift { preproc = { tokzr; _ }; _ } e1 e2 =
-  match Tokzr.top_context tokzr with
+  match Text_tokenizer.top_context tokzr with
   | None -> false
   | Some top_ctx ->
       Grammar_context.context_sinks_on_shift' top_ctx
@@ -266,7 +262,7 @@ let leaving_context_on_shift { preproc = { tokzr; _ }; _ } e1 e2 =
         (Grammar_interpr.current_state_number e2)
 
 let pop_context ({ preproc = { tokzr; _ }; _ } as ps) tokens =
-  let tokzr, tokens = Tokzr.pop_context tokzr tokens in
+  let tokzr, tokens = Text_tokenizer.pop_context tokzr tokens in
   update_tokzr ps tokzr, tokens
 
 
@@ -277,7 +273,7 @@ let on_shift ps tokens e1 e2 =
     else ps, tokens
   in
   let tokzr, tokens =
-    Tokzr.push_contexts ps.preproc.tokzr tokens @@
+    Text_tokenizer.push_contexts ps.preproc.tokzr tokens @@
     Grammar_context.contexts_for_state_num @@
     Grammar_interpr.current_state_number e2
   in
@@ -304,7 +300,7 @@ let on_special_names special_names ps token tokens =
   match special_names with
   | Cobol_ptree.DecimalPointIsComma ->
       let tokzr, token, tokens
-        = Tokzr.decimal_point_is_comma ps.preproc.tokzr token tokens in
+        = Text_tokenizer.decimal_point_is_comma ps.preproc.tokzr token tokens in
       update_tokzr ps tokzr, token, tokens
   | _ ->
       ps, token, tokens
@@ -313,11 +309,11 @@ let on_repository_paragraph repository ps token tokens =
   List.fold_left begin fun ((ps, token, tokens) as acc) -> function
     | Cobol_ptree.IntrinsicFunctionSpecifier intrinsics ->
         let tokzr
-          = Tokzr.replace_intrinsics ps.preproc.tokzr (Some intrinsics) in
+          = Text_tokenizer.replace_intrinsics ps.preproc.tokzr (Some intrinsics) in
         update_tokzr ps tokzr, token, tokens
     | IntrinsicFunctionAllSpecifier ->
         let tokzr
-          = Tokzr.replace_intrinsics ps.preproc.tokzr None in
+          = Text_tokenizer.replace_intrinsics ps.preproc.tokzr None in
         update_tokzr ps tokzr, token, tokens
     | ClassSpecifier _
     | InterfaceSpecifier _
@@ -329,7 +325,7 @@ let on_repository_paragraph repository ps token tokens =
 
 let on_procedure_division_header ps token tokens =
   let tokzr, token, tokens
-    = Tokzr.enable_intrinsics ps.preproc.tokzr token tokens in
+    = Text_tokenizer.enable_intrinsics ps.preproc.tokzr token tokens in
   update_tokzr ps tokzr, token, tokens
 
 let on_procedure_division _proc_div ps token tokens =
@@ -337,13 +333,13 @@ let on_procedure_division _proc_div ps token tokens =
      unit instead of at its end.  To do that, we may just need post-actions on
      program/function/...-id headers (or maybe IDENTIFICATION DIVISION). *)
   let tokzr, token, tokens
-    = Tokzr.reset_intrinsics ps.preproc.tokzr token tokens in
+    = Text_tokenizer.reset_intrinsics ps.preproc.tokzr token tokens in
   update_tokzr ps tokzr, token, tokens
 
 let on_method_definitions _method_defs ps token tokens =
   (* Note: (same as `on_procedure_division`) *)
   let tokzr, token, tokens
-    = Tokzr.reset_intrinsics ps.preproc.tokzr token tokens in
+    = Text_tokenizer.reset_intrinsics ps.preproc.tokzr token tokens in
   update_tokzr ps tokzr, token, tokens
 
 let post_production ps token tokens prod env =
@@ -524,7 +520,7 @@ let aggregate_output (type m) (ps: m state) res
       Only res
   | Eidetic ->
       let artifacts =
-        { tokens = Tokzr.parsed_tokens ps.preproc.tokzr;
+        { tokens = Text_tokenizer.parsed_tokens ps.preproc.tokzr;
           pplog = Cobol_preproc.rev_log ps.preproc.pp;
           rev_comments = Cobol_preproc.rev_comments ps.preproc.pp;
           rev_ignored = Cobol_preproc.rev_ignored ps.preproc.pp } in
@@ -535,7 +531,7 @@ let parse_once ~options (type m) ~(memory: m memory) ~make_checkpoint pp
   : (('a option, m) output) with_diags =
   let ps = make_parser options ~tokenizer_memory:memory pp in
   let res, ps = full_parse @@ first_stage ~make_checkpoint ps in
-  OUT.with_diags (aggregate_output ps res) (all_diags ps)
+  Parser_outputs.with_diags (aggregate_output ps res) (all_diags ps)
 
 (* --- *)
 
@@ -613,12 +609,12 @@ let parse_with_history ?stop_before_eof ?(save_stage = 10) rwps =
         loop count { rwps with store; stage }
   in
   let ps = rewindable_parser_state rwps in
-  Tokzr.enable_context_sensitive_tokens  ps.preproc.tokzr;
-  Tokzr.restore_intrinsics               ps.preproc.tokzr;
+  Text_tokenizer.enable_context_sensitive_tokens  ps.preproc.tokzr;
+  Text_tokenizer.restore_intrinsics               ps.preproc.tokzr;
   let res, rwps = loop 0 rwps in
   let ps = rewindable_parser_state rwps in
-  Tokzr.save_intrinsics                  ps.preproc.tokzr;
-  Tokzr.disable_context_sensitive_tokens ps.preproc.tokzr;
+  Text_tokenizer.save_intrinsics                  ps.preproc.tokzr;
+  Text_tokenizer.disable_context_sensitive_tokens ps.preproc.tokzr;
   res, rwps
 
 let find_history_event_preceding ~position ({ store; _ } as rwps) =
@@ -670,7 +666,7 @@ let rec rewind_n_parse
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
   and last_env_stage = last_env_stage rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
+  Parser_outputs.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
 
 let rewindable_parse
   : options:_ -> memory:'m memory -> make_checkpoint:_
@@ -686,7 +682,7 @@ let rewindable_parse
   let output = aggregate_output ps res in
   let rewind_n_parse = rewind_n_parse rwps ~make_checkpoint
   and last_env_stage = last_env_stage rwps in
-  OUT.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
+  Parser_outputs.with_diags (output, { rewind_n_parse; last_env_stage }) (all_diags ps)
 
 (* --- *)
 

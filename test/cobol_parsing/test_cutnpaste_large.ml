@@ -29,12 +29,13 @@ let check_new_ptree i n ~ptree0 ptree' diags =
   else Test_appending.show_ptree i n ptree' diags
 
 let%expect_test "cut-n-paste-mf" =
-  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
+  let config = Testsuite_utils.from_dialect Gnucobol_config.DIALECT.mf_strict in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter mf_root ~glob:"DayDiffDriver.[cC][bB][lL]" (* <- pick large-ish file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in
       Pretty.out "Considering `%s'.@." file;
-      Parser_testing.simulate_cut_n_paste ~config ~repeat:200
+      Parser_testing.simulate_cut_n_paste ~config:c ~repeat:200
         ~f0:check_initial_ptree ~f:check_new_ptree @@
       Parser_testing.extract_position_markers @@
       Parser_testing.insert_periodic_position_markers ~period:51 @@

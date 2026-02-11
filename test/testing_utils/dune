@@ -2,7 +2,7 @@
  (name testing_utils)
  (modules prog_preproc prog_parser prog_typeck prog_printer)
  (wrapped false)
- (libraries cobol_common cobol_config cobol_preproc cobol_typeck superbol_preprocs pretty testing_helpers)
+ (libraries cobol_common gnucobol_config cobol_preproc cobol_typeck superbol_preprocs pretty testing_helpers)
  )
 
 (library

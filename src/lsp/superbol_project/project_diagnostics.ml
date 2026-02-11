@@ -17,7 +17,7 @@ type error =
   | Invalid_toml of { loc: TOML.Types.location; error: TOML.Types.error }
   | Unknown_dialect of string
   | Unknown_source_format of string
-  | Cobol_config_error of Cobol_config.Diagnostics.error
+  | Cobol_config_error of Gnucobol_config.Diagnostics.error
 
 let pp_error ppf = function
   | Invalid_toml { loc; error } ->
@@ -28,4 +28,4 @@ let pp_error ppf = function
   | Unknown_source_format name ->
       Pretty.print ppf "Unknown@ reference@ source-format: `%s'" name
   | Cobol_config_error e ->
-      Cobol_config.Diagnostics.pp_error ppf e
+      Gnucobol_config.Diagnostics.pp_error ppf e

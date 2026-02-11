@@ -14,15 +14,16 @@
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Preproc_outputs.TYPES
+open Cobol_common.Config.TYPES
 
-module OUT = Preproc_outputs
-
-module Make (Config: Cobol_config.T) = struct
+module Make (Config: Cobol_common.Config.TYPES.CONFIG) = struct
 
   let safe_partial_replacing_when_src_literal ~loc =
-    Config.safe_partial_replacing_when_src_literal#verify ~loc |>
-    OUT.of_config_verif |>
-    OUT.map_result ~f:(function Some s -> s = `Safe | None -> false)
+    Cobol_common.Config.verify ~loc
+      Config.c.features.safe_partial_replacing_when_src_literal |>
+    Preproc_outputs.of_config_verif |>
+    Preproc_outputs.map_result ~f:(function Some s -> s
+                                          | None -> false)
 
   let replacing' ?repl_dir repl_from repl_to =
     match repl_dir, ~&repl_from with
@@ -41,15 +42,15 @@ module Make (Config: Cobol_config.T) = struct
           | [{ payload = PseudoWord [{ payload = PwText str; _ }]; _ }]
             when String.contains str ' ' ||     (* TODO: properly check spaces *)
                  String.contains str '\t' ->                         (* reject *)
-              OUT.error_result false @@
+              Preproc_outputs.error_result false @@
               Forbidden { loc; stuff = Operand_with_spaces }
           | [{ payload = PseudoWord (_::_::_); _ }] | _::_::_ ->
-              OUT.error_result false @@
+              Preproc_outputs.error_result false @@
               Forbidden { loc; stuff = Multiword_operand }
           | _ ->
-              OUT.result false
+              Preproc_outputs.result false
         in
-        OUT.with_more_diags ~diags @@
+        Preproc_outputs.with_more_diags ~diags @@
         Text_processor.replacing ~partial:{ repl_dir; repl_strict }
           (src &@<- repl_from) repl_to
 

@@ -20,7 +20,7 @@ open Cobol_common.Srcloc.INFIX
 let preprocess
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Gnucobol_config.(SF SFFixed))
     contents =
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
@@ -30,7 +30,7 @@ let preprocess
 let show_text
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Gnucobol_config.(SF SFFixed))
     contents =
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
@@ -45,11 +45,12 @@ let show_source_lines
     ?(with_source_cdir_markers = false)
     ?(with_compiler_directives_text = true)
     ?(filename = "prog.cob")
-    ?(dialect = Cobol_config.DIALECT.Default)
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(dialect = Gnucobol_config.DIALECT.Default)
+    ?(source_format = Gnucobol_config.(SF SFFixed))
     contents
   =
-  Cobol_preproc.fold_source_lines ~dialect ~source_format
+  Cobol_preproc.fold_source_lines
+    ~dialect:(Gnucobol_config.COMMON_CONFIG.of_dialect dialect) ~source_format
     ~f:begin fun lnum line () ->
       if with_line_numbers then Pretty.out "@\n%u: " lnum else Pretty.out "@\n";
       Pretty.out "%a" Cobol_preproc.Text.pp_text line;

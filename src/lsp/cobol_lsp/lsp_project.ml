@@ -89,7 +89,7 @@ let absolute_path_for =
 
 let update_source_format { config; _ } str : bool =
   try
-    let source_format = Cobol_config.Options.format_of_string str in
+    let source_format = Gnucobol_config.Options.format_of_string str in
     if source_format = config.source_format
     then false
     else (config.source_format <- source_format; true)
@@ -104,10 +104,10 @@ let update_dialect ({ config; _ } as project) str : bool =
       Superbol_project.Config.cobol_config_from_dialect_name str
         ~verbose:false
     in
-    if result = config.cobol_config            (* note: structural comparison *)
+    if result = config.superbol_config            (* note: structural comparison *)
     then false
     else begin
-      config.cobol_config <- result;
+      config.superbol_config <- result;
       show_diagnostics project diags;
       true
     end
@@ -195,7 +195,7 @@ let reload_project_config project =
 (** Reconstruct a JSON `Assoc from the current configuration.  *)
 let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let config = Superbol_project.config project in
-  let module Config = (val config.cobol_config) in
+  let module Config = (val config.superbol_config) in
   let copybooks =
     List.map begin function
       | RelativeToProjectRoot dir ->
@@ -207,10 +207,10 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
   let cobol =
     [
       "dialect",
-      `String (Cobol_config.DIALECT.to_string Config.dialect);
+      `String (Gnucobol_config.DIALECT.to_string Config.dialect);
 
       "sourceFormat",
-      `String (Cobol_config.Options.string_of_format config.source_format);
+      `String (Gnucobol_config.Options.string_of_format config.source_format);
 
       "copybooks",
       `List copybooks;

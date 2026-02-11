@@ -219,7 +219,7 @@ let generate ?(config=default) ?(only_comment = true) filename =
 
 
 
-open Cobol_config.Types
+open Cobol_common.Config.TYPES
 
 let source_format format =
   let source_format = match format with

@@ -54,7 +54,7 @@ let iter_comma_separated_spec ~showable ~option_name ~f spec =
 let get ?(verbose_on = `Stdout) () =
   let conf = ref "" in
   let dialect = ref None in
-  let format = ref Cobol_config.Auto in
+  let format = ref Gnucobol_config.Auto in
   let formats = ["free"; "Free"; "FREE";
                  "fixed"; "Fixed"; "FIXED";
                  "cobol85"; "COBOL85";
@@ -81,14 +81,14 @@ let get ?(verbose_on = `Stdout) () =
     EZCMD.info ~docv:"CONF_FILE" "Set the configuration file to be used";
 
     ["dialect"; "std"], Arg.Symbol
-      (Cobol_config.DIALECT.all_canonical_names,
-       fun d -> dialect := Some (Cobol_config.DIALECT.of_string d)),
+      (Gnucobol_config.DIALECT.all_canonical_names,
+       fun d -> dialect := Some (Gnucobol_config.DIALECT.of_string d)),
     EZCMD.info ~docv:"DIALECT"
       "Set the dialect to bu used (overriden by `--conf` if used)";
 
     ["source-format"],
     Arg.Symbol (formats, fun f ->
-        format := try Cobol_config.Options.format_of_string f with
+        format := try Gnucobol_config.Options.format_of_string f with
           | Invalid_argument _ ->
               DIAGS.Now.warn Fmt.stderr
                 "Unkown source format: %s, setting to default" f;
@@ -130,11 +130,11 @@ let get ?(verbose_on = `Stdout) () =
       DIAGS.show_n_forget @@
       match !conf, !dialect with
       | "", None ->
-          DIAGS.result Cobol_config.default
+          DIAGS.result Gnucobol_config.default
       | "", Some d ->
-          Cobol_config.from_dialect ~verbose d
+          Gnucobol_config.from_dialect ~verbose d
       | s, None ->
-          Cobol_config.from_file ~verbose s
+          Gnucobol_config.from_file ~verbose s
       | _ ->
           Pretty.failwith "Flags `--conf` and `--dialect` or `--std` cannot be \
                            used together"
@@ -142,7 +142,7 @@ let get ?(verbose_on = `Stdout) () =
     let source_format =
       match !format with
       | Auto ->
-          let module Config = (val config: Cobol_config.T) in
+          let module Config = (val config: Gnucobol_config.T) in
           Config.format#value
       | SF _ -> !format
     in
@@ -169,6 +169,7 @@ let get ?(verbose_on = `Stdout) () =
     in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
+    let config = Gnucobol_config.COMMON_CONFIG.of_config config in
     { preproc_options = { config; verbose; source_format;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =

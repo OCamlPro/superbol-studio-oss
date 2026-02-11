@@ -50,7 +50,7 @@ val init
   -> memory: 'a memory
   -> intrinsics: StringSet.t
   -> ?default_intrinsics: StringSet.t
-  -> Cobol_config.words_spec
+  -> Cobol_common.Reserved.TYPES.words_spec
   -> 'a state
 
 val diagnostics

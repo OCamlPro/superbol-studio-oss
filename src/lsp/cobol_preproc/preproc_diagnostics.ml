@@ -18,7 +18,7 @@ type error =
   | Copybook_lookup_error of { copyloc: srcloc option;
                                lnf: Cobol_common.Copybook.lookup_error }
   | Cyclic_copy of { copyloc: srcloc; filename: string }
-  | Feature_error of Cobol_config.DIAG.error
+  | Feature_error of Cobol_common.Config.DIAG.error
   | Forbidden of { loc: srcloc; stuff: forbidden_stuff }
   | Invalid of { loc: srcloc; stuff: invalid_stuff }
   | Literal_error of Cobol_data.Diagnostics.error
@@ -62,7 +62,7 @@ and unterminated_stuff =
 
 let error_loc = function
   | Feature_error e ->
-      Some (Cobol_config.DIAG.error_loc e)
+    Some (Cobol_common.Config.DIAG.error_loc e)
   | Src_error e ->
       Some (Src_diagnostics.error_loc e)
   | Literal_error e ->
@@ -138,7 +138,7 @@ let pp_error ppf = function
   | Cyclic_copy { filename; _ } ->
       Pretty.print ppf "Cyclic@ COPY@ of@ `%s'" filename
   | Feature_error e ->
-      Cobol_config.DIAG.pp_error ppf e
+    Cobol_common.Config.DIAG.pp_error ppf e
   | Forbidden { stuff; _ } ->
       Pretty.print ppf "Forbidden@ %a" pp_forbidden_stuff stuff
   | Invalid { stuff; _ } ->
@@ -163,7 +163,7 @@ let pp_error ppf = function
 (* --- *)
 
 type warning =
-  | Feature_warning of Cobol_config.DIAG.warning
+  | Feature_warning of Cobol_common.Config.DIAG.warning
   | Ignored of { loc: srcloc; item: ignored_item }
   | Incompatible of { loc: srcloc; stuff: incompatible_warning_stuff }
   | Src_warning of Src_diagnostics.warning
@@ -212,7 +212,7 @@ and unexpected_warning_stuff =
 
 let warning_loc = function
   | Feature_warning w ->
-      Cobol_config.DIAG.warning_loc w
+    Cobol_common.Config.DIAG.warning_loc w
   | Ignored { loc; _ }
   | Incompatible { loc; _ }
   | Undefine_of_unknown_env_variable { loc; _ }
@@ -244,7 +244,7 @@ let pp_unexpected_warning_stuff ppf = function
 
 let pp_warning ppf = function
   | Feature_warning w ->
-      Cobol_config.DIAG.pp_warning ppf w
+      Cobol_common.Config.DIAG.pp_warning ppf w
   | Ignored { item; _ } ->
       Pretty.print ppf "Ignored@ %a" pp_ignored_item item
   | Incompatible { stuff; _ } ->

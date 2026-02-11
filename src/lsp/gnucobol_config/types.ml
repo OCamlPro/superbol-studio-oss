@@ -135,31 +135,31 @@ module FEATURE = struct
     object (* (self) *)
       val feature: 'a support_level configurable = feature
       val level: 'a support_level = level
-      (* method verify ~loc : _ result = *)
-      (*   let open Cobol_common.Diagnostics.One in *)
-      (*   let short = feature#short and config = config.name in *)
-      (*   match level with *)
-      (*   | Ok s -> *)
-      (*       Ok (s, None) *)
-      (*   | Warning s -> *)
-      (*       Ok (s, Some (warn ?loc "%(%)@ used" short)) *)
-      (*   | Archaic s -> *)
-      (*       Ok (s, Some (warn ?loc "%(%)@ is@ archaic@ in@ %s" short config)) *)
-      (*   | Obsolete s -> *)
-      (*       Ok (s, Some (warn ?loc "%(%)@ is@ obsolete@ in@ %s" short config)) *)
-      (*   | Skip -> *)
-      (*       Error None *)
-      (*   | Ignore -> *)
-      (*       Error (Some (warn ?loc "%(%)@ ignored" short)) *)
-      (*   | Error -> *)
-      (*       Error (Some (error ?loc "%(%)@ used" short)) *)
-      (*   | Unconformable -> *)
-      (*       Error (Some (error ?loc "%(%)@ does@ not@ conform@ to@ \ *)
-      (*                                %s" short config)) *)
-      (* method verify' ~loc : _ option with_diags =             (\* transitional *\) *)
-      (*   match self#verify ~loc with *)
-      (*   | Ok (s, diag) -> DIAGS.some_result s ~diags:(DIAGS.Set.maybe diag) *)
-      (*   | Error diag -> DIAGS.no_result ~diags:(DIAGS.Set.maybe diag) *)
+      (* method verify ~loc : _ result =
+        let open Cobol_common.Diagnostics.One in
+        let short = feature#short and config = config.name in
+        match level with
+        | Ok s ->
+            Ok (s, None)
+        | Warning s ->
+            Ok (s, Some (warn ?loc "%(%)@ used" short))
+        | Archaic s ->
+            Ok (s, Some (warn ?loc "%(%)@ is@ archaic@ in@ %s" short config))
+        | Obsolete s ->
+            Ok (s, Some (warn ?loc "%(%)@ is@ obsolete@ in@ %s" short config))
+        | Skip ->
+            Error None
+        | Ignore ->
+            Error (Some (warn ?loc "%(%)@ ignored" short))
+        | Error ->
+            Error (Some (error ?loc "%(%)@ used" short))
+        | Unconformable ->
+            Error (Some (error ?loc "%(%)@ does@ not@ conform@ to@ \
+                                     %s" short config))
+      method verify' ~loc : _ option with_diags =             (* transitional *)
+        match self#verify ~loc with
+        | Ok (s, diag) -> DIAGS.some_result s ~diags:(DIAGS.Set.maybe diag)
+        | Error diag -> DIAGS.no_result ~diags:(DIAGS.Set.maybe diag) *)
       method verify ~loc : _ verification_result =
         match level with
         | Ok s ->
@@ -338,7 +338,7 @@ type standard =
   | STD2002
   | STD2014
 
-type source_format =
+type source_format = Cobol_common.Config.TYPES.source_format =
   | SFFree
   | SFFixed
   | SFVariable
@@ -348,7 +348,7 @@ type source_format =
   | SFTrm
   | SFCOBOLX
 
-type source_format_spec =
+type source_format_spec = Cobol_common.Config.TYPES.source_format_spec =
   | Auto
   | SF of source_format
 
@@ -381,19 +381,6 @@ type dpc_in_data =
   | XML
   | Json
   | All
-
-type words_spec = (string * word_spec) list
-and word_spec =
-  | ReserveWord of
-      {
-        preserve_context_sensitivity: bool;
-      }
-  | ReserveAlias of
-      {
-        alias_for: string;
-        preserve_context_sensitivity: bool;
-      }
-  | NotReserved
 
 module DIALECT = struct
 
@@ -555,7 +542,7 @@ module type COMP_OPTS = sig
   (** Compiler options *)
 
   (* reserved words *)
-  val words: words_spec
+  val words: Cobol_common.Reserved.TYPES.words_spec
   val intrinsic_functions: StringSet.t
   val system_names: StringSet.t
   val registers: StringSet.t

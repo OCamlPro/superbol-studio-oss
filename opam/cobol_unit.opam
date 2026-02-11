@@ -49,7 +49,6 @@ depends: [
   "dune" {>= "3.17.0"}
   "cobol_ptree" {= version}
   "cobol_data" {= version}
-  "cobol_config" {= version}
   "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}

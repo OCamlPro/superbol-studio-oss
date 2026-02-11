@@ -590,12 +590,12 @@ let on_redefinition_item acc item_clauses
                        item_rev_conditions = [] } :: acc.item_stack }
 
 
-let on_item acc ~at_level
+let on_item ~c acc ~at_level
     { payload = Cobol_ptree.{ data_level;
                               data_name = item_name;
                               data_clauses }; loc }
   =
-  let item_clauses = Typeck_clauses.of_data_item data_clauses in
+  let item_clauses = Typeck_clauses.of_data_item ~c data_clauses in
   let acc =
     { acc with
       diags = Typeck_diagnostics.union acc.diags item_clauses.clause_diags } in
@@ -773,7 +773,7 @@ let enter_section section acc =
   let acc = flush_item_stack acc in
   { acc with current_storage = section }
 
-let data_definitions = object
+let data_definitions ~c = object
   inherit [acc] Cobol_ptree.Visitor.folder
 
   method! fold_nested_programs _ =
@@ -797,9 +797,9 @@ let data_definitions = object
                              loc } as item) acc =
     Visitor.skip_children @@ match ~&data_level, acc.current_storage with
     | l, _ when 1 <= l && l <= 49 ->
-        on_item ~at_level:~&data_level acc item                    (* regular *)
+        on_item ~c ~at_level:~&data_level acc item                    (* regular *)
     | 77, (Linkage | Local_storage | Working_storage) ->
-        on_item ~at_level:01 acc item            (* non-contiguous elementary *)
+        on_item ~c ~at_level:01 acc item            (* non-contiguous elementary *)
     | 77, section ->
         error acc (Item_not_allowed_in_section { level = data_level; section })
     | 78, _ ->
@@ -831,8 +831,9 @@ let data_definitions = object
   (* TODO: fold_report_group_item' *)
 end
 
-let of_compilation_unit config cu' =
+let of_compilation_unit ~c config cu' =
   init config |>
-  Cobol_ptree.Visitor.fold_compilation_unit' data_definitions cu' |>
+  Cobol_ptree.Visitor.fold_compilation_unit'
+    (data_definitions ~c) cu' |>
   flush_item_stack |>
   result

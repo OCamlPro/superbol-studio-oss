@@ -51,6 +51,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "sql_parser-windows" {= version}
   "pretty-windows" {= version}
+  "cobol_typeck-windows" {= version}
   "cobol_preproc-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_common-windows" {= version}

@@ -213,7 +213,8 @@ let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
        protocol does not seem to forbid that (but some editors just ignore
        those).  *)
     if registry.params.config.force_syntax_diagnostics ||
-       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+       Gnucobol_config.dialect
+         (Lsp_project.config project).superbol_config = COBOL85
     then Lsp_diagnostics.publish all_diags;
     { registry with
       indirect_diags =
@@ -228,7 +229,7 @@ let dispatch_diagnostics (Lsp_document.{ project; _ } as doc) registry =
       end indirect4uri URIMap.empty
     in
     if registry.params.config.force_syntax_diagnostics ||
-       Cobol_config.dialect (Lsp_project.config project).cobol_config = COBOL85
+       Gnucobol_config.dialect (Lsp_project.config project).superbol_config = COBOL85
     then Lsp_diagnostics.publish all_diags;
     registry
   end

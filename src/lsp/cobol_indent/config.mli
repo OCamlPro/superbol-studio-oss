@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 val source_format :
-  Cobol_config.Types.source_format_spec -> Types.source_format
+  Cobol_common.Config.TYPES.source_format_spec -> Types.source_format
 
 
 (* [load ~source_format filename] tries to load ".superbol-indent" in

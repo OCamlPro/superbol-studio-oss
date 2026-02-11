@@ -57,3 +57,9 @@ val from_dialect
   -> (module T) Cobol_common.Diagnostics.with_diags
 
 val dialect: t -> dialect
+
+module COMMON_CONFIG : sig
+  val dialect : t -> Cobol_common.Config.TYPES.dialect
+  val of_dialect : Types.DIALECT.t -> Cobol_common.Config.TYPES.dialect
+  val of_config : t -> Cobol_common.Config.TYPES.cobol_config
+end

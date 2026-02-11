@@ -10,7 +10,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-%parameter <CONFIG: Cobol_config.T>
+%parameter <CONFIG: Cobol_common.Config.TYPES.CONFIG>
 %parameter <Overlay_manager: Src_overlay.MANAGER>
 %{
   open Cobol_common.Srcloc.INFIX

@@ -334,7 +334,7 @@ let contributes =
                   You may also specify an absolute path to a custom GnuCOBOL dialect \
                   configuration file (see `cobc`'s `-conf` option)."
                    Fmt.(list ~sep:(any ",@ ") (quote ~mark:"`" string))
-                   Cobol_config.DIALECT.all_canonical_names)
+                   Gnucobol_config.DIALECT.all_canonical_names)
              ~default:"default"
              ~order:1;
 
@@ -342,7 +342,7 @@ let contributes =
              ~title:"Source Reference-format"
              ~markdownDescription:
                (with_superbol_toml_note "Default source reference-format.")
-             ~cases:Cobol_config.Options.all_format_names
+             ~cases:Gnucobol_config.Options.all_format_names
              ~default:(`String "auto")
              ~order:2;
 

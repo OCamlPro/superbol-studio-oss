@@ -50,7 +50,7 @@ depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
   "fmt-osx" {>= "0.9"}
-  "cobol_config-osx" {= version}
+  "cobol_common-osx" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}
 ]

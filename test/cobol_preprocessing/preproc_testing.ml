@@ -16,7 +16,7 @@ include Prog_preproc
 let preprocess_n_then_cut_n_paste_right_of_indicator
     ?(verbose = false)
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.Auto)
+    ?(source_format = Gnucobol_config.Auto)
     fixed_format_contents =
   let fixed_lines = EzString.split fixed_format_contents '\n' in
   let free_lines =

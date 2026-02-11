@@ -115,7 +115,7 @@ let absolute_path_for ~filename { rootdir; _ } =
 let file_contents_looks_like_a_copybook ~filename ?contents { config; _ } =
   let decide input =
     Cobol_preproc.scan_prefix_for_copybook input
-      ~dialect:(Cobol_config.dialect config.cobol_config)
+      ~dialect:(Gnucobol_config.COMMON_CONFIG.dialect config.superbol_config)
       ~source_format:config.source_format = `Copybook
   in
   match contents with
