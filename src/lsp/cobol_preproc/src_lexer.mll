@@ -111,6 +111,7 @@
       CONSTANT;
       DPCINDATA;
       FOLDCOPYNAME;
+      INTLEVEL;
       MAKESYN;
       NESTCALL;
       NOAREACHECK;
@@ -121,9 +122,11 @@
       NOODOSLIDE;
       NOSPZERO;
       NOSSRANGE;
+      NSYMBOL;
       ODOSLIDE;
       OVERRIDE;
       REMOVE;
+      SIGN;
       SOURCEFORMAT;
       SPZERO;
       SSRANGE;
@@ -770,6 +773,7 @@ and pptoken = parse
     | Else_directive
     | EndIf_directive
     | If_directive
+    | Set_directive
     (* | On_off/Turn_directive *)
     | Source_directive as d ->
         cdtoken_with_numerics (keywords_for_directive d)

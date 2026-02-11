@@ -83,6 +83,11 @@ and boolexpr =
         var: var with_loc;
         polarity: bool;                        (* false for `var NOT DEFINED' *)
       }
+  | Set_condition of
+      {
+        var: var with_loc;
+        polarity: bool;                        (* false for `var NOT SET' *)
+      }
 
 and condition_operator = Eq | Ge | Gt | Le | Lt | Ne
 
@@ -95,13 +100,16 @@ and set_operand =
   | Call_FH
   | Check_num of bool
   | Comp_1
-  | Constant
+  | Constant of var with_loc * literal
   | DPC_in_data of bool
   | Fold_copy_name of bool
+  | Int_level of Cobol_data.Literal.fixed with_loc
   | Make_syn
   | Nest_call
+  | N_symbol of string with_loc
   | ODO_slide of bool
   | Remove
+  | Sign of string with_loc
   | SP_zero of bool
   | SS_range of bool
 
