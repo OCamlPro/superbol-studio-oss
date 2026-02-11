@@ -242,7 +242,7 @@ let fold_init_replacing (v: _ #folder) =
 let fold_inspect_where (v: _ #folder) =
   handle v#fold_inspect_where
     ~continue:begin fun (_, reference) ->
-      fold_ident_or_nonnum v reference
+      fold_list ~fold:fold_ident_or_nonnum v reference
     end
 
 let fold_tallying_spec (v: _ #folder) =

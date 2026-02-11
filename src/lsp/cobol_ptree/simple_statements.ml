@@ -389,7 +389,7 @@ and inspect_direction =
   | InspectBefore
 [@@deriving ord]
 
-and inspect_reference = ident_or_nonnum
+and inspect_reference = ident_or_nonnum list
 [@@deriving ord]
 
 let pp_replacing_range ppf = function
@@ -402,7 +402,7 @@ let pp_inspect_direction ppf = function
   | InspectBefore -> Fmt.pf ppf "BEFORE"
 
 let pp_inspect_where =
-  Fmt.(pair ~sep:sp pp_inspect_direction pp_ident_or_nonnum)
+  Fmt.(pair ~sep:sp pp_inspect_direction (list ~sep:(any "@ OR@ ") pp_ident_or_nonnum))
 
 let pp_converting ppf {
   converting_from = cf; converting_to = ct; converting_where = cw
