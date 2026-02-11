@@ -650,12 +650,27 @@ let environment_division :=
 (* ------------- ENVIRONMENT DIVISION / CONFIGURATION SECTION -------------- *)
 
 let configuration_section :=
- | CONFIGURATION; SECTION; ".";
+  | CONFIGURATION; SECTION; ".";
    permuted = any_permut4_nullable(
                           loc(source_computer_paragraph),
                           loc(object_computer_paragraph),
                           loc(special_names_paragraph),
                           loc(repository_paragraph));
+  { let (source_computer_paragraph,
+         object_computer_paragraph,
+         special_names_paragraph,
+         repository_paragraph,
+         conf_sec_order) = permuted in
+    { source_computer_paragraph;
+      object_computer_paragraph;
+      special_names_paragraph;
+      repository_paragraph;
+      conf_sec_order } }
+  | permuted = any_permut4(
+      loc(source_computer_paragraph),
+      loc(object_computer_paragraph),
+      loc(special_names_paragraph),
+      loc(repository_paragraph));
   { let (source_computer_paragraph,
          object_computer_paragraph,
          special_names_paragraph,
@@ -910,8 +925,13 @@ let file_control_paragraph :=
  | FILE_CONTROL; "." ; ~ = rl(select); < > (* COB85: non-empty list *)
  | ~ = rnel(select); < >
 
+let flag_optional ==
+ |                 { false }
+ | OPTIONAL;       { true }
+ | NOT; OPTIONAL;  { false }
+
 let select :=
- | SELECT; o = bo(OPTIONAL); i = name;
+ | SELECT; o = flag_optional; i = name;
    fcl = rnel(loc(select_clause)); ".";
    { { select_optional = o;
        select_name = i;
@@ -1007,15 +1027,16 @@ let with_lock_clause [@recovery WithLockNone] :=
 let lock_mode :=
  | MANUAL;    {LockManual}
  | AUTOMATIC; {LockAutomatic}
+ | EXCLUSIVE; {LockExclusive}
 
 let organization_clause :=
  | io(ORGANIZATION; IS?; {}); ~ = organization; <SelectOrganization>
 
 let organization :=
- | INDEXED;          {OrganizationIndexed}
- | RELATIVE;         {OrganizationRelative}
- | SEQUENTIAL;       {OrganizationSequential}
- | LINE; SEQUENTIAL; {OrganizationLineSequential}      (* LINE for microfocus *)
+ | INDEXED;                       {OrganizationIndexed}
+ | RELATIVE;                      {OrganizationRelative}
+ | or_(RECORD, BINARY)?; SEQUENTIAL;  {OrganizationSequential}
+ | LINE; SEQUENTIAL;              {OrganizationLineSequential}     (* LINE for microfocus *)
 
 let padding_character_clause :=                                    (* -COB2002 *)
  | PADDING; CHARACTER?; IS?; ~ = qualname_or_alphanum;
@@ -1286,6 +1307,7 @@ let file_descr_clause :=
 
 let sort_merge_file_descr_clause :=
  | ~ = record_clause; <FileSDRecord>
+ | ~ = label_clause;  <FileSDLabel>
  | ~ = data_clause;   <FileSDData>                                (* -COB2002 *)
  |     global_clause; {FileSDGlobal}
 
@@ -1650,14 +1672,21 @@ let data_occurs_clause :=
   | ~ = occurs_depending_clause; < >
   | ~ = occurs_dynamic_clause;   < >
 
+let count_in_phrase := COUNT; IN?; ~ = loc(reference); < >
+
 let occurs_fixed_clause [@context occurs_clause] :=
   | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
-    { OccursFixed { times = i; key_is = kl; indexed_by = ib; } }
+    { OccursFixed { times = i; count_in = None;
+                    key_is = kl; indexed_by = ib; } }
+  | OCCURS; _from = loc(integer); TO; to_ = loc(integer); TIMES?;
+    co = count_in_phrase;
+    { OccursFixed { times = to_; count_in = Some co;
+                    key_is = []; indexed_by = []; } }
 
 let occurs_depending_clause [@context occurs_clause] :=
-  | OCCURS; i1 = loc(integer); TO; i2 = loc(integer); TIMES?;
+  | OCCURS; from = loc(integer); TO; to_ = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = Some i1; to_ = i2; depending = d;
+    { OccursDepending { from = Some from; to_; depending = d;
                         key_is = kl; indexed_by = il; } }
   | OCCURS; i = loc(integer); TIMES?;
     d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
@@ -2027,7 +2056,7 @@ let procedure_division_header [@post.procedure_division_header] :=
 let procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = rl(loc(section_paragraph));
@@ -2040,7 +2069,7 @@ let procedure_division [@post.procedure_division] :=
 let program_procedure_division [@post.procedure_division] :=
  | procedure_division_header;
    procedure_args = ro(procedure_args);
-   ro = ro(returning);                                            (* +COB2002 *)
+   ro = ro(returning_ident);                                            (* +COB2002 *)
    rl = ilo(raising_phrase); ".";                                 (* +COB2002 *)
    dl = lo(declaratives);
    sl = section_paragraphs;
@@ -2158,6 +2187,9 @@ let imp_stmts [@recovery []] [@symbol ""] :=
    { List.filter_map Result.to_option stmts }
 (* prec annotation needed to solve a conflict involving IF and WRITE *)
 
+let imp_stmts_opt [@default []] :=
+  | /* epsilon */ %prec lowest { []  }
+  | isl = imp_stmts;           { isl }
 
 let oterm_(X) == er(X | {} %prec no_term)              (* optional terminators *)
 
@@ -2475,14 +2507,12 @@ literal_no_all:
 
 
 
-
 let numeric_literal [@symbol "<numeric literal>"] :=
  | i = integer;  { Integer i : numlit }
  | f = fixedlit; { Fixed f }
  | f = floatlit; { Floating f }
  | ZERO;         { NumFig Zero }
 (* Note: numeric literals do NOT allow figurative constants with ALL *)
-
 
 
 
@@ -2550,18 +2580,17 @@ let qualname_or_literal :=
  | n = qualname; { UPCAST.qualname_with_literal n }
  | l = literal;  { UPCAST.literal_with_qualdatname l }
 
-(* Used in ADD, DIVIDE, MULTIPLY, PERFORM, SUBTRACT *)
-
-let ident_or_numeric :=
- | i = ident;           { UPCAST.ident_with_numeric i }
- | l = numeric_literal; { UPCAST.numeric_with_ident l }
-let idents_or_numerics == ~ = rnel(ident_or_numeric); < >
-
 let x == scalar                                       (* alias, as in GnuCOBOL *)
 let scalar :=
- | i = scalar_ident;    { UPCAST.scalar_ident_as_scalar i }
- | l = literal;         { UPCAST.literal_as_scalar l }
- | l = length_of_expr;  { l }
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = numeric_literal;    { UPCAST.numeric_as_scalar l }
+ | l = length_of_expr;     { l }
+
+(* Used in MOVE *)
+let scalar_or_nonnumeric :=
+ | i = scalar_ident;       { UPCAST.scalar_ident_as_scalar i }
+ | l = literal;            { UPCAST.literal_as_scalar l }
+ | l = length_of_expr;     { l }
 
 (* Used in CALL *)
 let name_or_string :=
@@ -2714,6 +2743,7 @@ let arithmetic_term :=                                            (* `arith_x` *
  | b = BOOLIT;               { Atom (Boolean b) } (* boolean *)
  | f = figurative_constant;  { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | a = alphanum;             { Atom (Alphanum a) } (* NB: quick relaxation for now *)
+ | n = NATLIT;               { Atom (National n) }
  | l = length_of_expression; { Atom l }
 
 let arithmetic_term_no_all :=
@@ -2723,6 +2753,7 @@ let arithmetic_term_no_all :=
  | f = floatlit; { Atom (Floating f) }
  | b = BOOLIT;   { Atom (Boolean b) } (* boolean *)
  | a = alphanum; { Atom (Alphanum a) }         (* NB: quick relaxation for now *)
+ | n = NATLIT;   { Atom (National n) }
  | f = figurative_constant_no_all; { Atom (Fig f) } (* numeric or boolean (NB: or strlits) *)
  | l = length_of_expression; { Atom l }
 
@@ -2734,6 +2765,7 @@ let arithmetic_term_no_length :=
  | b = BOOLIT;               { Atom (Boolean b) }
  | f = figurative_constant;  { Atom (Fig f) }
  | a = alphanum;             { Atom (Alphanum a) }
+ | n = NATLIT;               { Atom (National n) }
 
 let length_of_expression ==
   | ~ = length_of_expr; < >
@@ -2885,7 +2917,7 @@ let rounding_mode :=
 
 (* ALLOCATE, CALL, INVOKE, Procedure division header *)
 
-let returning := RETURNING; ~ = loc(ident); < >
+let returning_ident := RETURNING; ~ = loc(ident); < >
 
 
 
@@ -3101,12 +3133,12 @@ let accept_with_clause [@recovery AcceptAttribute Highlight] [@symbol "<accept-w
 
 %public let unconditional_action := ~ = add_statement; < >
 add_statement:
- | ADD inl = idents_or_numerics TO irl = rounded_idents
+ | ADD inl = rnel(x) TO irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
              ArithSimple { sources = inl; targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics TO in_ = ident_or_numeric
+ | ADD inl = rnel(x) TO in_ = x
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { Add { basic_arith_operands =
@@ -3114,7 +3146,7 @@ add_statement:
                            to_or_from_item = in_;
                            targets = irl };
            basic_arith_on_size_error = h } }
- | ADD inl = idents_or_numerics (* Same as above without 'TO' *)
+ | ADD inl = rnel(x) (* Same as above without 'TO' *)
    GIVING irl = rounded_idents
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR) end_add
    { let in_, inl = split_last inl in
@@ -3136,11 +3168,11 @@ let end_add := oterm_(END_ADD)
 
 %public let unconditional_action := ~ = allocate_statement; < >
 let allocate_statement [@context allocate_stmt] :=
- | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning;
+ | ALLOCATE; e = expression; CHARACTERS; ib = bo(INITIALIZED); r = returning_ident;
    { Allocate { allocate_kind = AllocateCharacters e;
                 allocate_initialized = ib;
                 allocate_returning = Some r } }
- | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning);
+ | ALLOCATE; i = name; ib = bo(INITIALIZED); ro = ro(returning_ident);
    { Allocate { allocate_kind = AllocateDataItem i;
                 allocate_initialized = ib;
                 allocate_returning = ro } }
@@ -3183,7 +3215,7 @@ let ident_or_nested :=
   | NESTED;    {CallProtoNested}
 
 let returning_or_giving :=
-  | ~ = returning; < >
+  | ~ = returning_ident; < >
   | GIVING; ~ = loc(ident); < > (* MF equivalent for RETURNING *)
 
 
@@ -3214,7 +3246,7 @@ let close_format :=
 
 %public let unconditional_action := ~ = compute_statement; < >
 let compute_statement :=
-  | COMPUTE; irl = rounded_idents; "="; e = expression;
+  | COMPUTE; irl = rounded_idents; or_(EQUAL, "="); e = expression;
     h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR);
     oterm_(END_COMPUTE);
     { Compute { compute_targets = irl; compute_expr = e;
@@ -3445,12 +3477,28 @@ let when_other [@default []] :=
 
 (* EXIT STATEMENT *)
 
+let returning :=
+ | ~ = scalar; <ReturningScalar>
+ | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
+    <ReturningAddress>
+ | or_(GIVING, RETURNING); v = integer;
+    { ReturningInt { value = Integer v;
+                     size = None } }
+ | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
+    { ReturningInt { value = Integer v;
+                     size = Some (Integer s) } }
+
+let program_exit_status [@default ExitDefault] :=
+ | { ExitDefault }
+ | ~ = returning; <ExitReturning>
+ | ~ = raising_exception; <ExitRaising>
+
 %public let unconditional_action := ~ = exit_statement; < >
 let exit_statement [@context exit_stmt] :=
  | EXIT; ~ = exit_spec; <Exit>
 let exit_spec [@recovery ExitSimple] :=
  | %prec lowest                          { ExitSimple }
- | PROGRAM; ro = ro(raising_exception);  { ExitProgram ro }
+ | PROGRAM; s = program_exit_status;     { ExitProgram s }
  | METHOD; ro = ro(raising_exception);   { ExitMethod ro }        (* COB2002+ *)
  | FUNCTION; ro = ro(raising_exception); { ExitFunction ro }      (* COB2002+ *)
  | PERFORM; c = bo(CYCLE);               { ExitPerform c }        (* COB2002+ *)
@@ -3513,10 +3561,9 @@ let if_statement :=
      If {condition = c; then_branch = sn; else_branch = sno} }
 (* COB2002: END IF mandatory on ELSE, NEXT SENTENCE archaic *)
 
-let if_body :=
- | isl = imp_stmts; %prec lowest             { isl, [] }
- | isl1 = imp_stmts; ELSE; isl2 = imp_stmts; { isl1, isl2 }
-
+let if_body [@default [], []] :=
+ | isl = imp_stmts_opt; %prec lowest                 { isl, [] }
+ | isl1 = imp_stmts_opt; ELSE; isl2 = imp_stmts_opt; { isl1, isl2 }
 
 
 (* INITIALIZE STATEMENT (+COB85) *)
@@ -3633,7 +3680,7 @@ let ident_by_after_before :=
 %public let unconditional_action := ~ = invoke_statement; < >
 let invoke_statement :=
  | INVOKE; i = ident; is = ident_or_string;
-   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning);
+   ul = lo(pf(USING,rnel(loc(using_by)))); ro = ro(returning_ident);
    { Invoke { invoke_target = i;
               invoke_method = is;
               invoke_using = ul;
@@ -3659,7 +3706,7 @@ let merge_statement :=
 
 %public let unconditional_action := ~ = move_statement; < >
 let move_statement :=
- | MOVE; from = x; TO; to_ = idents;
+ | MOVE; from = scalar_or_nonnumeric; TO; to_ = idents;
    { Move (MoveSimple { from; to_ }) }
  | MOVE; CORRESPONDING; from = ident; TO; to_ = idents;
    { Move (MoveCorresponding { from; to_ }) }
@@ -4136,16 +4183,8 @@ let stop_body [@context stop_stmt] := (* with context: should not accept empty *
   | THREAD; ~ = o(qualident); <StopThread>
 
 let stop_run_returning_body :=
-  | ~ = scalar; <StopReturningScalar>
-  | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
-    <StopReturningAddress>
-  | or_(GIVING, RETURNING); v = integer;
-    { StopReturningInt { value = Integer v;
-                         size = None } }
-  | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
-    { StopReturningInt { value = Integer v;
-                         size = Some (Integer s) } }
-  | ~ = with_status; <StopReturningStatus>
+  | ~ = returning; <StopReturning>
+  | ~ = with_status; <StopWithStatus>
 
 let stop_with_arg :=
   | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
@@ -4189,12 +4228,12 @@ let s_delimited_by :=
 
 %public let unconditional_action := ~ = subtract_statement; < >
 let subtract_statement :=
- | SUBTRACT; inl = idents_or_numerics; FROM; irl = rounded_idents;
+ | SUBTRACT; inl = rnel(x); FROM; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =
                   ArithSimple { sources = inl; targets = irl };
                 basic_arith_on_size_error = h } }
- | SUBTRACT; inl = idents_or_numerics; FROM; in_ = ident_or_numeric;
+ | SUBTRACT; inl = rnel(x); FROM; in_ = x;
    GIVING; irl = rounded_idents;
    h = handler_opt(ON_SIZE_ERROR,NOT_ON_SIZE_ERROR); end_subtract;
    { Subtract { basic_arith_operands =

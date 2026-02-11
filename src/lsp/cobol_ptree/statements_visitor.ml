@@ -60,6 +60,7 @@ class virtual ['a] folder = object
   method fold_replacing           : (replacing               , 'a) fold = default
   method fold_replacing_clause    : (replacing_clause        , 'a) fold = default
   method fold_replacing_range_spec: (replacing_range_spec    , 'a) fold = default
+  method fold_returning           : (returning               , 'a) fold = default
   method fold_selection_object    : (selection_object        , 'a) fold = default
   method fold_selection_subject   : (selection_subject       , 'a) fold = default
   method fold_send_operands       : (send_operands           , 'a) fold = default
@@ -458,14 +459,28 @@ let fold_close' (v: _ #folder) =
 let fold_exec_block' (v: _ #folder) =
   leaf' v#fold_exec_block' v                                    (* Note: leaf *)
 
+let fold_returning (v: _ #folder) =
+  handle v#fold_returning
+    ~continue:begin fun r x -> match r with
+      | ReturningScalar s -> x
+        >> fold_scalar v s
+      | ReturningAddress a -> x
+        >> fold_qualident v a
+      | ReturningInt { value; size } -> x
+        >> fold_literal v value
+        >> fold_option ~fold:fold_literal v size
+    end
+
 let fold_exit' (v: _ #folder) =
   handle' v#fold_exit' v
     ~fold:begin fun v -> function
       | ExitSimple
+      | ExitProgram ExitDefault
       | ExitParagraph
       | ExitSection -> Fun.id
       | ExitPerform b -> fold_bool v b
-      | ExitProgram r
+      | ExitProgram ExitReturning r -> fold_returning v r
+      | ExitProgram ExitRaising r -> fold_raising v r
       | ExitMethod r
       | ExitFunction r -> fold_option ~fold:fold_raising v r
     end
@@ -643,14 +658,9 @@ let fold_sort' (v: _ #folder) =
 let fold_stop_run_return (v: _ #folder) =
   handle v#fold_stop_run_return
     ~continue:begin fun r x -> match r with
-      | StopReturningScalar s -> x
-        >> fold_scalar v s
-      | StopReturningAddress a -> x
-        >> fold_qualident v a
-      | StopReturningInt { value; size } -> x
-        >> fold_literal v value
-        >> fold_option ~fold:fold_literal v size
-      | StopReturningStatus { status_kind = _st; status_value} -> x
+      | StopReturning s -> x
+        >> fold_returning v s
+      | StopWithStatus { status_kind = _st; status_value} -> x
         >> fold_option ~fold:fold_scalar v status_value
     end
 

@@ -233,22 +233,12 @@ syn_file.at-2060-prog.cob:24.48-24.50:
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2090:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2119:0
 Considering: import/gnucobol/tests/testsuite.src/syn_file.at:2201:0
-syn_file.at-2201-prog.cob:16.18:
+syn_file.at-2201-prog.cob:16.29-16.40:
   13                    WITH DUPLICATES
   14                 ALTERNATE RECORD KEY TESTKEY-1P2
   15                    WITH NO DUPLICATES
   16 >               LOCK EXCLUSIVE MASS-UPDATE
-----                     ^
-  17                 .
-  18          SELECT TEST-FILE2
->> Hint: Missing AUTOMATIC
-
-syn_file.at-2201-prog.cob:16.19-16.28:
-  13                    WITH DUPLICATES
-  14                 ALTERNATE RECORD KEY TESTKEY-1P2
-  15                    WITH NO DUPLICATES
-  16 >               LOCK EXCLUSIVE MASS-UPDATE
-----                      ^^^^^^^^^
+----                                ^^^^^^^^^^^
   17                 .
   18          SELECT TEST-FILE2
 >> Error: Invalid syntax

@@ -13,13 +13,13 @@
   
   )
 
-(menhir (modules internal_parser))
 (ocamllex internal_lexer)
+(menhir (modules internal_parser))
 
 (rule
     (targets version.ml)
     (deps (:script version.mlt) package.toml)
-    (action (with-stdout-to %{targets} (run %{ocaml} unix.cma %{script}))))
+    (action (with-stdout-to %{targets} (run %{ocaml} -I +unix unix.cma %{script}))))
 
 (documentation
   (package ez_toml))
