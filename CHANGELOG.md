@@ -4,6 +4,7 @@
 
 ### Added
 - Parse `OR` in inspect regions [#519](https://github.com/OCamlPro/superbol-studio-oss/pull/519)
+- Support `NOT OPTIONAL` argument for `SELECT` [#517](https://github.com/OCamlPro/superbol-studio-oss/pull/517)
 - Support EXCLUSIVE lock mode [#514](https://github.com/OCamlPro/superbol-studio-oss/pull/514)
 - Support more compiler directive syntaxes [#515](https://github.com/OCamlPro/superbol-studio-oss/pull/515)
 - `CONFIGURATION SECTION` header is now optionnal [#513](https://github.com/OCamlPro/superbol-studio-oss/pull/513)

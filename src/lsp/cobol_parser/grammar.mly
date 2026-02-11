@@ -925,8 +925,13 @@ let file_control_paragraph :=
  | FILE_CONTROL; "." ; ~ = rl(select); < > (* COB85: non-empty list *)
  | ~ = rnel(select); < >
 
+let flag_optional ==
+ |                 { false }
+ | OPTIONAL;       { true }
+ | NOT; OPTIONAL;  { false }
+
 let select :=
- | SELECT; o = bo(OPTIONAL); i = name;
+ | SELECT; o = flag_optional; i = name;
    fcl = rnel(loc(select_clause)); ".";
    { { select_optional = o;
        select_name = i;
