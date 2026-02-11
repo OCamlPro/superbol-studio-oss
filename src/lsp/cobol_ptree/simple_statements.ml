@@ -404,10 +404,7 @@ let pp_inspect_direction ppf = function
 let pp_inspect_where =
   Fmt.(pair
     ~sep:sp pp_inspect_direction
-      Pretty.(NEL.pp ~fopen:(Simple.string " ")
-                     ~fsep:(Pretty.Simple.string "@ OR@ ")
-                     ~fclose:(Simple.string " ")
-                      pp_ident_or_nonnum))
+      (NEL.pp ~fopen:"@ " ~fsep:"@ OR@ "~fclose:"@ " pp_ident_or_nonnum))
 
 let pp_converting ppf {
   converting_from = cf; converting_to = ct; converting_where = cw
