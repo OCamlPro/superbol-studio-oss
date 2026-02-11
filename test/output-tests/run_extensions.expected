@@ -1,97 +1,3 @@
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:62:0
-run_extensions.at-62-dump.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   dump (unsigned char *data, int *p)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-62-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (unsigned char *data, int *p)
-   7   {
->> Error: Invalid syntax
-
-run_extensions.at-62-dump.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > dump (unsigned char *data, int *p)
-----         ^
-   7   {
-   8     int i;
->> Error: Unexpected indicator: `u'
-
-run_extensions.at-62-dump.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   dump (unsigned char *data, int *p)
-   7   {
-   8 >   int i;
-----         ^
-   9     if ( *p == 1 ) {
-  10        for (i = 0; i < 4; i++)
->> Error: Unexpected indicator: `i'
-
-run_extensions.at-62-dump.c:10.6-10.7:
-   7   {
-   8     int i;
-   9     if ( *p == 1 ) {
-  10 >      for (i = 0; i < 4; i++)
-----         ^
-  11          printf ("%02x", data[i]);
-  12     } else {
->> Error: Unexpected indicator: `o'
-
-run_extensions.at-62-dump.c:12.6-12.7:
-   9     if ( *p == 1 ) {
-  10        for (i = 0; i < 4; i++)
-  11          printf ("%02x", data[i]);
-  12 >   } else {
-----         ^
-  13          printf ("%8.8d", *((int *)data));
-  14     }
->> Error: Unexpected indicator: `s'
-
-run_extensions.at-62-dump.c:16.6-16.7:
-  13          printf ("%8.8d", *((int *)data));
-  14     }
-  15     puts ("");
-  16 >   return 0;
-----         ^
-  17   }
->> Error: Unexpected indicator: `r'
-
-run_extensions.at-62-dump.c:9.10-18.0:
-   6   dump (unsigned char *data, int *p)
-   7   {
-   8     int i;
-   9 >   if ( *p == 1 ) {
-----             ^^^^^^^^
-  10 >      for (i = 0; i < 4; i++)
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  11 >        printf ("%02x", data[i]);
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  12 >   } else {
-----  ^^^^^^^^^^^
-  13 >        printf ("%8.8d", *((int *)data));
-----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  14 >   }
-----  ^^^^
-  15 >   puts ("");
-----  ^^^^^^^^^^^^^
-  16 >   return 0;
-----  ^^^^^^^^^^^^
-  17 > }
-----  ^^
->> Error: Unterminated pseudotext
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:63:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:92:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:116:0
@@ -653,45 +559,6 @@ run_extensions.at-1142-prog.cob:15.36-15.45:
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1235:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1418:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1458:0
-run_extensions.at-1458-reference:1.6-1.7:
-   1 > 010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
-----         ^
-   2   020102Howdy 1<>  01***Ab. 3<>
-   3   030303Howdy 1 2 3<>  01***Abc. 34545656702***Abc. 45656767803***Abc. 567678789<>
->> Error: Unexpected indicator: `H'
-
-run_extensions.at-1458-reference:1.7-1.11:
-   1 > 010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
-----          ^^^^
-   2   020102Howdy 1<>  01***Ab. 3<>
-   3   030303Howdy 1 2 3<>  01***Abc. 34545656702***Abc. 45656767803***Abc. 567678789<>
->> Error: Invalid syntax
-
-run_extensions.at-1458-reference:2.6-2.7:
-   1   010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
-   2 > 020102Howdy 1<>  01***Ab. 3<>
-----         ^
-   3   030303Howdy 1 2 3<>  01***Abc. 34545656702***Abc. 45656767803***Abc. 567678789<>
-   4   040310Howdy 1 2 3<>  01***Abcdefghij. 34545656702***Abcdefghij. 45656767803***Abcdefghij. 567678789<>
->> Error: Unexpected indicator: `H'
-
-run_extensions.at-1458-reference:3.6-3.7:
-   1   010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
-   2   020102Howdy 1<>  01***Ab. 3<>
-   3 > 030303Howdy 1 2 3<>  01***Abc. 34545656702***Abc. 45656767803***Abc. 567678789<>
-----         ^
-   4   040310Howdy 1 2 3<>  01***Abcdefghij. 34545656702***Abcdefghij. 45656767803***Abcdefghij. 567678789<>
->> Error: Unexpected indicator: `H'
-
-run_extensions.at-1458-reference:4.6-4.7:
-   1   010205Howdy 1 2<>  01***Abcde. 344502***Abcde. 4556<>
-   2   020102Howdy 1<>  01***Ab. 3<>
-   3   030303Howdy 1 2 3<>  01***Abc. 34545656702***Abc. 45656767803***Abc. 567678789<>
-   4 > 040310Howdy 1 2 3<>  01***Abcdefghij. 34545656702***Abcdefghij. 45656767803***Abcdefghij. 567678789<>
-----         ^
->> Error: Unexpected indicator: `H'
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1556:0
 run_extensions.at-1556-prog.cob:76.32-76.38:
   73                                   L1-2-S
@@ -706,56 +573,6 @@ run_extensions.at-1556-prog.cob:76.32-76.38:
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1619:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1695:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1754:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1753:0
-run_extensions.at-1753-setfilename.c:6.6-6.7:
-   3   #include <string.h>
-   4   #include <libcob.h>
-   5   
-   6 > COB_EXT_EXPORT int
-----         ^
-   7   setfilename (cob_file *f, unsigned char *name)
-   8   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-1753-setfilename.c:6.7-6.8:
-   3   #include <string.h>
-   4   #include <libcob.h>
-   5   
-   6 > COB_EXT_EXPORT int
-----          ^
-   7   setfilename (cob_file *f, unsigned char *name)
-   8   {
->> Error: Invalid syntax
-
-run_extensions.at-1753-setfilename.c:7.6-7.7:
-   4   #include <libcob.h>
-   5   
-   6   COB_EXT_EXPORT int
-   7 > setfilename (cob_file *f, unsigned char *name)
-----         ^
-   8   {
-   9     memcpy (f->assign->data, name, strlen ((char *)name));
->> Error: Unexpected indicator: `e'
-
-run_extensions.at-1753-setfilename.c:9.6-9.7:
-   6   COB_EXT_EXPORT int
-   7   setfilename (cob_file *f, unsigned char *name)
-   8   {
-   9 >   memcpy (f->assign->data, name, strlen ((char *)name));
-----         ^
-  10     return 0;
-  11   }
->> Error: Unexpected indicator: `p'
-
-run_extensions.at-1753-setfilename.c:10.6-10.7:
-   7   setfilename (cob_file *f, unsigned char *name)
-   8   {
-   9     memcpy (f->assign->data, name, strlen ((char *)name));
-  10 >   return 0;
-----         ^
-  11   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1816:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1817:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:1815:0
@@ -1035,106 +852,6 @@ run_extensions.at-1999-prog.cob:64.55-64.60:
   66                 WHEN 1
 >> Warning: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2086:0
-run_extensions.at-2086-callee32.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   callee32(cob_s32_t val)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-2086-callee32.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   callee32(cob_s32_t val)
-   7   {
->> Error: Invalid syntax
-
-run_extensions.at-2086-callee32.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > callee32(cob_s32_t val)
-----         ^
-   7   {
-   8     printf("VAL received: %d\n", val);
->> Error: Unexpected indicator: `3'
-
-run_extensions.at-2086-callee32.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   callee32(cob_s32_t val)
-   7   {
-   8 >   printf("VAL received: %d\n", val);
-----         ^
-   9     return 0;
-  10   }
->> Error: Unexpected indicator: `t'
-
-run_extensions.at-2086-callee32.c:9.6-9.7:
-   6   callee32(cob_s32_t val)
-   7   {
-   8     printf("VAL received: %d\n", val);
-   9 >   return 0;
-----         ^
-  10   }
->> Error: Unexpected indicator: `r'
-
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2086:0
-run_extensions.at-2086-callee64.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   callee64(cob_s64_t val)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-2086-callee64.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   callee64(cob_s64_t val)
-   7   {
->> Error: Invalid syntax
-
-run_extensions.at-2086-callee64.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > callee64(cob_s64_t val)
-----         ^
-   7   {
-   8     printf("VAL received: " CB_FMT_LLD "\n", val);
->> Error: Unexpected indicator: `6'
-
-run_extensions.at-2086-callee64.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   callee64(cob_s64_t val)
-   7   {
-   8 >   printf("VAL received: " CB_FMT_LLD "\n", val);
-----         ^
-   9     return 0;
-  10   }
->> Error: Unexpected indicator: `t'
-
-run_extensions.at-2086-callee64.c:9.6-9.7:
-   6   callee64(cob_s64_t val)
-   7   {
-   8     printf("VAL received: " CB_FMT_LLD "\n", val);
-   9 >   return 0;
-----         ^
-  10   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2060:0
 run_extensions.at-2060-caller.cob:33.42-33.46:
   30              CALL "callee64" USING BY VALUE BIG-BUFF
@@ -1182,8 +899,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2602:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2645:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2646:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2711:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2656:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2710:0
 run_extensions.at-2710-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
@@ -1195,7 +911,6 @@ run_extensions.at-2710-prog.cob:10.24-10.36:
   12          FILE             SECTION.
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2772:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:2771:0
 run_extensions.at-2771-prog.cob:10.24-10.36:
    7          SELECT TEST-FILE ASSIGN  KEYBOARD
@@ -1452,132 +1167,12 @@ run_extensions.at-4392-prog.cob:68.34-68.41:
   70              END-CALL
 >> Error: Invalid syntax
 
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4390:0
-run_extensions.at-4390-test_errno.c:7.6-7.7:
-   4   
-   5   #include <libcob.h>
-   6   
-   7 > COB_EXT_EXPORT int
-----         ^
-   8   test_errno(void)
-   9   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-4390-test_errno.c:7.7-7.8:
-   4   
-   5   #include <libcob.h>
-   6   
-   7 > COB_EXT_EXPORT int
-----          ^
-   8   test_errno(void)
-   9   {
->> Error: Invalid syntax
-
-run_extensions.at-4390-test_errno.c:8.6-8.7:
-   5   #include <libcob.h>
-   6   
-   7   COB_EXT_EXPORT int
-   8 > test_errno(void)
-----         ^
-   9   {
-  10       FILE *fail;
->> Error: Unexpected indicator: `r'
-
-run_extensions.at-4390-test_errno.c:10.6-10.7:
-   7   COB_EXT_EXPORT int
-   8   test_errno(void)
-   9   {
-  10 >     FILE *fail;
-----         ^
-  11       fail = fopen("file-not-to-be-found", "r");
-  12       if (errno != 2) {
->> Error: Unexpected indicator: `L'
-
-run_extensions.at-4390-test_errno.c:11.6-11.7:
-   8   test_errno(void)
-   9   {
-  10       FILE *fail;
-  11 >     fail = fopen("file-not-to-be-found", "r");
-----         ^
-  12       if (errno != 2) {
-  13           printf("BAD ERRNO %d", errno);
->> Error: Unexpected indicator: `i'
-
-run_extensions.at-4390-test_errno.c:14.6-14.7:
-  11       fail = fopen("file-not-to-be-found", "r");
-  12       if (errno != 2) {
-  13           printf("BAD ERRNO %d", errno);
-  14 >     } else {
-----         ^
-  15           if (fail) fclose(fail);
-  16       }
->> Error: Unexpected indicator: `e'
-
-run_extensions.at-4390-test_errno.c:17.6-17.7:
-  14       } else {
-  15           if (fail) fclose(fail);
-  16       }
-  17 >     return 0;
-----         ^
-  18   }
->> Error: Unexpected indicator: `t'
-
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4391:0
-run_extensions.at-4391-test_stdio.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   
-   4   #include <libcob.h>
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   test_stdio(FILE *si, FILE *so, FILE *se)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_extensions.at-4391-test_stdio.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   
-   4   #include <libcob.h>
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   test_stdio(FILE *si, FILE *so, FILE *se)
-   7   {
->> Error: Invalid syntax
-
-run_extensions.at-4391-test_stdio.c:6.6-6.7:
-   3   
-   4   #include <libcob.h>
-   5   COB_EXT_EXPORT int
-   6 > test_stdio(FILE *si, FILE *so, FILE *se)
-----         ^
-   7   {
-   8       if (feof(si)) {
->> Error: Unexpected indicator: `t'
-
-run_extensions.at-4391-test_stdio.c:11.6-11.7:
-   8       if (feof(si)) {
-   9           fprintf(se, "BAD STDIN EOF\n");
-  10       }
-  11 >     fprintf(so, "OUT");
-----         ^
-  12       return fprintf(se, "ERR");
-  13   }
->> Error: Unexpected indicator: `r'
-
-run_extensions.at-4391-test_stdio.c:12.6-12.7:
-   9           fprintf(se, "BAD STDIN EOF\n");
-  10       }
-  11       fprintf(so, "OUT");
-  12 >     return fprintf(se, "ERR");
-----         ^
-  13   }
->> Error: Unexpected indicator: `t'
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4465:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4608:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4683:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4778:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4807:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4845:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4834:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4864:0
 run_extensions.at-4864-progc.cob:12.7-12.25:
    9              IF first-call NOT = SPACE
@@ -1646,16 +1241,16 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:4985:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5011:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5076:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5060:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5112:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5106:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5160:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5142:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5144:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5242:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5199:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5277:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5301:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5274:0
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5298:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5326:0
-Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5362:0
-run_extensions.at-5362-prog.cob:3.11-3.30:
+Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5366:0
+run_extensions.at-5366-prog.cob:3.11-3.30:
    1   
    2          >>IF BINARY-COMP-1 IS DEFINED
    3 >            $SET COMP-1(BINARY)
@@ -1664,7 +1259,7 @@ run_extensions.at-5362-prog.cob:3.11-3.30:
    5              $SET COMP1 "float"
 >> Error: Malformed compiler directive
 
-run_extensions.at-5362-prog.cob:5.11-5.29:
+run_extensions.at-5366-prog.cob:5.11-5.29:
    2          >>IF BINARY-COMP-1 IS DEFINED
    3              $SET COMP-1(BINARY)
    4          >>ELSE

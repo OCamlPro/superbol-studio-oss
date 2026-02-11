@@ -1,5 +1,5 @@
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:69:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:206:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:202:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:259:0
 used_binaries.at-259-prog.cob:10.8-10.18:
    7           PROCEDURE DIVISION.
@@ -25,13 +25,11 @@ used_binaries.at-259-prog.cob:12.8-12.28:
           - search path: ./sub
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:286:0
-Fatal: used_binaries.at-286-sub/copy/PROC.cpy: No such file or directory
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:324:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:361:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:352:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:399:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:430:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:463:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:450:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:519:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:613:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:614:0
@@ -46,7 +44,7 @@ Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:823:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:906:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:924:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:945:0
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:946:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:962:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:991:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1024:0
@@ -72,67 +70,9 @@ used_binaries.at-1024-progprep.cob:7.7-7.23:
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
 
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1167:0
-used_binaries.at-1167-f.copy:8.54:
-   5          LINKAGE SECTION.
-   6          01  a PIC X(20).
-   7          01  b BINARY-C-LONG.
-   8 >        PROCEDURE DIVISION USING a BY VALUE b RETURNING OMITTED.
-----                                                         ^
-   9          END PROGRAM f.
->> Hint: Missing <identifier>
-
-used_binaries.at-1167-f.copy:8.55-8.62:
-   5          LINKAGE SECTION.
-   6          01  a PIC X(20).
-   7          01  b BINARY-C-LONG.
-   8 >        PROCEDURE DIVISION USING a BY VALUE b RETURNING OMITTED.
-----                                                          ^^^^^^^
-   9          END PROGRAM f.
->> Error: Invalid syntax
-
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1136:0
-used_binaries.at-1136-filec.c:2.7-2.21:
-   1   
-   2 > /* for COB_EXT_EXPORT */
-----          ^^^^^^^^^^^^^^
-   3   #include <libcob.h>
-   4   COB_EXT_EXPORT void f (char *str, long num) {};
->> Error: Invalid syntax
-
-used_binaries.at-1136-filec.c:4.6-4.7:
-   1   
-   2   /* for COB_EXT_EXPORT */
-   3   #include <libcob.h>
-   4 > COB_EXT_EXPORT void f (char *str, long num) {};
-----         ^
->> Error: Unexpected indicator: `T'
-
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1140:0
-used_binaries.at-1140-filec.h:2.6-2.7:
-   1   
-   2 > /* COB_EXT_IMPORT will be defined by libcob.h up-front */
-----         ^
-   3   COB_EXT_IMPORT void f (char *, long);
->> Error: Unexpected indicator: `_'
-
-used_binaries.at-1140-filec.h:2.7-2.17:
-   1   
-   2 > /* COB_EXT_IMPORT will be defined by libcob.h up-front */
-----          ^^^^^^^^^^
-   3   COB_EXT_IMPORT void f (char *, long);
->> Error: Invalid syntax
-
-used_binaries.at-1140-filec.h:3.6-3.7:
-   1   
-   2   /* COB_EXT_IMPORT will be defined by libcob.h up-front */
-   3 > COB_EXT_IMPORT void f (char *, long);
-----         ^
->> Error: Unexpected indicator: `T'
-
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1112:0
-Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1140:0
-used_binaries.at-1140-prog2.cob:8.57:
+Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1144:0
+used_binaries.at-1144-prog2.cob:8.57:
    5          WORKING-STORAGE SECTION.
    6          01 long USAGE BINARY-C-LONG.
    7          PROCEDURE        DIVISION.
@@ -140,7 +80,7 @@ used_binaries.at-1140-prog2.cob:8.57:
 ----                                                            ^
 >> Hint: Missing <identifier>
 
-used_binaries.at-1140-prog2.cob:8.58-8.65:
+used_binaries.at-1144-prog2.cob:8.58-8.65:
    5          WORKING-STORAGE SECTION.
    6          01 long USAGE BINARY-C-LONG.
    7          PROCEDURE        DIVISION.
