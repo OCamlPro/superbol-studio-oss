@@ -3657,8 +3657,13 @@ let ident_after_before :=
    { { tallying_item = il; tallying_where = ab } }
 
 let inspect_where :=
- | AFTER;  INITIAL?; i = ident_or_nonnumeric_no_all; {InspectAfter, i}
- | BEFORE; INITIAL?; i = ident_or_nonnumeric_no_all; {InspectBefore, i}
+ | AFTER;  INITIAL?; i = inspect_reference; {InspectAfter, i}
+ | BEFORE; INITIAL?; i = inspect_reference; {InspectBefore, i}
+
+let inspect_reference :=
+  | i = ident_or_nonnumeric_no_all; is = rnell(pf(OR, ident_or_nonnumeric_no_all)); { NEL.of_list @@ i::is }
+  | i = ident_or_nonnumeric_no_all; { NEL.of_list @@ [ i ] }
+  (* ~ = separated_nonempty_list(OR, ~ = ident_or_nonnumeric_no_all; < >); < > *)
 
 let replacing_phrase :=
  | CHARACTERS; BY; il = ident_or_nonnumeric_no_all; abo = rl(inspect_where);
