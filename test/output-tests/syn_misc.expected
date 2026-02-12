@@ -1508,16 +1508,6 @@ syn_misc.at-3143-prog3.cob:2.7-2.32:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3209:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3261:0
-syn_misc.at-3261-prog.cob:7.30-7.31:
-   4   
-   5          DATA DIVISION.
-   6          WORKING-STORAGE SECTION.
-   7 >        REPLACE ==a== BY ==b==.. *> blah blah
-----                                 ^
-   8          .
-   9   
->> Error: Invalid syntax
-
 syn_misc.at-3261-prog.cob:10.7-10.15:
    7          REPLACE ==a== BY ==b==.. *> blah blah
    8          .
@@ -1529,14 +1519,6 @@ syn_misc.at-3261-prog.cob:10.7-10.15:
 >> Error: Library `a.' not found
           - search path: <empty>
           - filename extensions: "cpy" "cbl" "cob"
-
-syn_misc.at-3261-prog.cob:14.10-14.11:
-  11   
-  12          78  var VALUE "hello".
-  13         * blah blah
-  14 >           .
-----             ^
->> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:3300:0
 syn_misc.at-3300-prog.cob:14.19:

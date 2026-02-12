@@ -3179,12 +3179,12 @@ listings.at-3669-expected.lst:28.7-28.8:
   30   000019             03  PIC 99..9.
 >> Error: Invalid syntax
 
-listings.at-3669-expected.lst:31.7-31.8:
+listings.at-3669-expected.lst:31.9-31.12:
   28   error: S may only occur once in a PICTURE string
   29   error: S must be at start of PICTURE string
   30   000019             03  PIC 99..9.
   31 > error: . may only occur once in a PICTURE string
-----          ^
+----            ^^^
   32   000020             03  PIC 99VV9.
   33   error: V may only occur once in a PICTURE string
 >> Error: Invalid syntax
@@ -3369,22 +3369,22 @@ listings.at-3669-expected.lst:56.7-56.18:
   58   000034             03  PIC P(3)9.9.
 >> Error: Invalid syntax
 
-listings.at-3669-expected.lst:59.7-59.8:
+listings.at-3669-expected.lst:59.9-59.15:
   56   error: parentheses must contain an unsigned integer
   57   000033         01  mutually-exclusive-symbols.
   58   000034             03  PIC P(3)9.9.
   59 > error: . cannot follow a P which is after the decimal point
-----          ^
+----            ^^^^^^
   60   000035             03  PIC 9V.9.
   61   error: . cannot follow V
 >> Error: Invalid syntax
 
-listings.at-3669-expected.lst:61.7-61.8:
+listings.at-3669-expected.lst:61.9-61.15:
   58   000034             03  PIC P(3)9.9.
   59   error: . cannot follow a P which is after the decimal point
   60   000035             03  PIC 9V.9.
   61 > error: . cannot follow V
-----          ^
+----            ^^^^^^
   62   000036             03  PIC Z*.
   63   error: cannot have both Z and * in PICTURE string
 >> Error: Invalid syntax
