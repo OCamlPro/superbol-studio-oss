@@ -194,3 +194,93 @@ let%expect_test "signed-numeric-sizes" =
         }
       }
     } |}];;
+
+let%expect_test "pic-with-space-in-parens" =
+  dotest @@ prog "pic-with-space-in-parens"
+  ~working_storage:{|
+            77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
+            77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
+            77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
+            77 DB-KEY-NAME      PIC X( 30 ) IS EXTERNAL.
+  |};
+[%expect {|
+  prog.cob:4.7-4.51:
+     1          PROGRAM-ID. pic-with-space-in-parens.
+     2          DATA DIVISION.
+     3          WORKING-STORAGE SECTION.
+     4 >        77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
+  ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     5               77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
+     6               77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
+  Item definition: {
+    qualname: DB-REALM-NAME
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  }
+  prog.cob:5.12-5.56:
+     2          DATA DIVISION.
+     3          WORKING-STORAGE SECTION.
+     4          77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
+     5 >             77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     6               77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
+     7               77 DB-KEY-NAME      PIC X( 30 ) IS EXTERNAL.
+  Item definition: {
+    qualname: DB-RECORD-NAME
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  }
+  prog.cob:6.12-6.56:
+     3          WORKING-STORAGE SECTION.
+     4          77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
+     5               77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
+     6 >             77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     7               77 DB-KEY-NAME      PIC X( 30 ) IS EXTERNAL.
+     8          PROCEDURE DIVISION.
+  Item definition: {
+    qualname: DB-SET-NAME
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  }
+  prog.cob:7.12-7.56:
+     4          77 DB-REALM-NAME    PIC X( 30 ) IS EXTERNAL.
+     5               77 DB-RECORD-NAME   PIC X( 30 ) IS EXTERNAL.
+     6               77 DB-SET-NAME      PIC X( 30 ) IS EXTERNAL.
+     7 >             77 DB-KEY-NAME      PIC X( 30 ) IS EXTERNAL.
+  ----               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     8          PROCEDURE DIVISION.
+     9
+  Item definition: {
+    qualname: DB-KEY-NAME
+    offset: 0
+    size: 240
+    layout: {
+      elementary
+      usage: {
+        display
+        category: ALPHANUMERIC(30)
+      }
+    }
+  } |}]

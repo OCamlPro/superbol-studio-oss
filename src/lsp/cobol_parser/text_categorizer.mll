@@ -26,6 +26,9 @@ type pic_output =
   | PIC_end
   | PIC_unexpected of char
 
+let pic_buf = Buffer.create 32
+let in_pic_paren = ref false
+
 type alphanum_suffix = STR | EBCDIC
 type alphanum_content =
   | AStr of string * alphanum_suffix
@@ -35,7 +38,7 @@ type alphanum_content =
 }
 
 let blank = [' ' '\009' '\r' ]
-let blanks = (blank+ | '\t')
+let blanks = (blank | '\t')+
 let digit = [ '0'-'9' ]
 let sign = [ '+' '-' ]
 let opers = sign | ['*' '/' '>' '<' '=' '&'] | "**" | "::" | ">=" | "<=" | "<>"
@@ -49,8 +52,9 @@ let firstidentchar = [ 'a'-'z' 'A'-'Z' '0'-'9' ]
 let lastidentchar = firstidentchar
 let ident = (firstidentchar (identchar* lastidentchar)?)
 
-let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';']
+let picchar   = _ # [' ' '\t' '\009' '\n' '\r' '\'' '"' ';' '(' ')']
 let picstring = (picchar # [',']) (picchar*)
+
 
 (* Text-word tokenizer (after text manipulation phase) *)
 rule token = parse
@@ -91,11 +95,53 @@ and pic_token = parse
   | ['i' 'I'] ['s' 'S']
       { PIC_is }
 
+  | ((picstring '(') as s)
+      { Buffer.add_string pic_buf s;
+        pic_string true lexbuf }
+
   | (picstring as s)
-      { PIC_string s }
+      { in_pic_paren := false;
+        PIC_string s }
 
   | eof
       { PIC_end }
+
+  | (_ as c)
+      { PIC_unexpected c }
+
+and pic_string in_paren = parse
+
+  | blanks
+      { if not in_paren then begin
+          in_pic_paren := false;
+          let s = Buffer.contents pic_buf in
+          Buffer.clear pic_buf;
+          PIC_string s
+        end else
+          pic_string in_paren lexbuf }
+
+  | (picchar+) as s
+      { Buffer.add_string pic_buf s;
+        pic_string in_paren lexbuf }
+
+  | ')'
+      { Buffer.add_char pic_buf ')';
+        pic_string false lexbuf }
+
+  | '('
+      { if in_paren then
+          PIC_unexpected '('
+        else begin
+          Buffer.add_char pic_buf '(';
+          pic_string true lexbuf
+        end }
+
+  | eof
+      { in_pic_paren := in_paren;
+        let s = Buffer.contents pic_buf in
+        (* Don't clear the buffer when still inside parens; next word will continue *)
+        if not in_paren then Buffer.clear pic_buf;
+        PIC_string s }
 
   | (_ as c)
       { PIC_unexpected c }
