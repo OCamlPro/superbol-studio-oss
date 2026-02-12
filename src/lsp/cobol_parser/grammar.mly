@@ -34,6 +34,8 @@ let with_loc token location_limits =
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
 
+let dummy_loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)
+
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)
@@ -263,6 +265,7 @@ let any_permut4_nullable [@recovery (None, None, None, None, (A4, (A3, AB)))]
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
+  | ~=simple_program; EOF; < >
   | control_division = option(loc(control_division));
     ul = ll(loc(compilation_unit));
     pdo = loc(program_definition_no_end)?; EOF;
@@ -271,6 +274,32 @@ let compilation_group :=
           match pdo with
             | None -> ul
             | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
+
+let simple_program := 
+  | opo = ro(loc(options_paragraph));
+    edo = ro(loc(environment_division));
+    ddo = ro(loc(ne_data_division));
+    pd = loc(program_procedure_division);
+    { { control_division = None;
+        compilation_units =
+            [((Program {
+              program_name =
+                  (Name ("" &@ dummy_loc)) &@ dummy_loc;
+              program_as = None;
+              program_level = ProgramDefinition {
+                  mode = None;
+                  has_identification_division_header = false;
+                  preliminary_informational_paragraphs = [];
+                  supplementary_informational_paragraphs = [];
+                  nested_programs = []; };
+              program_options = opo;
+              program_env = edo;
+              program_data = (match ddo with
+                | Some dd -> build_data_division dd
+                | None -> None);
+              program_proc = Some pd;
+              program_end_name = None;
+            }): compilation_unit) &@<- pd] } }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -1159,6 +1188,11 @@ type declaration entry =
 *)
 
 *)
+
+let ne_data_division :=
+  | l1 = rnel(data_division_sentence_1);
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
 let data_division :=
   | l1 = rl(data_division_sentence_1);
