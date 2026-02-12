@@ -84,3 +84,19 @@ let%expect_test "token-locations-with-missing-comment-paragraph" =
     .@<prog.cob:2-6|2-7>
     COMMENT_ENTRY[]@<prog.cob:2-7|2-7>
     EOF@<prog.cob:2-7|2-7> |}];;
+
+let%expect_test "token-locations-with-missing-program-id" =
+  Parser_testing.show_parsed_tokens ~source_format:Auto ~with_locations:true
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+    {|PROCEDURE DIVISION.
+    para-1.
+        IF X>9
+        THEN
+           IF X>6
+           THEN
+              DISPLAY "2"
+           else
+              move 1 to x
+        else
+          move 1 to x.|};
+    [%expect {||}];;
