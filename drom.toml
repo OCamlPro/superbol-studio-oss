@@ -88,6 +88,7 @@ ATTIC
 *.vsix
 *.opam.locked
 /emacs/lsp-superbol-customs.el
+**/_superbol
 """
 github-workflow-before-opam = """
       - run: git submodule init

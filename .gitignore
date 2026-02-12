@@ -32,5 +32,6 @@ ATTIC
 *.vsix
 *.opam.locked
 /emacs/lsp-superbol-customs.el
+**/_superbol
 
 
