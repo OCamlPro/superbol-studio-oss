@@ -108,7 +108,10 @@ let extract_data_file_of_check_command: check * test -> _ = function
       List.to_seq test_actions |>
       Seq.filter_map begin function
         | AT_DATA { file; content } when STR.contains check_command file ->
-            Some (file, content, test, check)
+            if String.ends_with ~suffix:".cob" file then
+              Some (file, content, test, check)
+            else
+              None
         | _ ->
             None
       end

@@ -1,75 +1,5 @@
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:50:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:92:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:137:0
-run_fundamental.at-137-dump.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-137-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (unsigned char *data)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-137-dump.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > dump (unsigned char *data)
-----         ^
-   7   {
-   8     int i;
->> Error: Unexpected indicator: `u'
-
-run_fundamental.at-137-dump.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   dump (unsigned char *data)
-   7   {
-   8 >   int i;
-----         ^
-   9     for (i = 0; i < 4; i++)
-  10       printf ("%02x", data[i]);
->> Error: Unexpected indicator: `i'
-
-run_fundamental.at-137-dump.c:9.6-9.7:
-   6   dump (unsigned char *data)
-   7   {
-   8     int i;
-   9 >   for (i = 0; i < 4; i++)
-----         ^
-  10       printf ("%02x", data[i]);
-  11     return 0;
->> Error: Unexpected indicator: `('
-
-run_fundamental.at-137-dump.c:10.6-10.7:
-   7   {
-   8     int i;
-   9     for (i = 0; i < 4; i++)
-  10 >     printf ("%02x", data[i]);
-----         ^
-  11     return 0;
-  12   }
->> Error: Unexpected indicator: `i'
-
-run_fundamental.at-137-dump.c:11.6-11.7:
-   8     int i;
-   9     for (i = 0; i < 4; i++)
-  10       printf ("%02x", data[i]);
-  11 >   return 0;
-----         ^
-  12   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:138:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:179:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:233:0
@@ -311,46 +241,6 @@ run_fundamental.at-3521-prog.cob:14.7-14.10:
 
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3553:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3552:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3585:0
-run_fundamental.at-3585-module.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   some (void)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-3585-module.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   some (void)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-3585-module.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > some (void)
-----         ^
-   7   {
-   8     return 0;
->> Error: Unexpected indicator: `v'
-
-run_fundamental.at-3585-module.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   some (void)
-   7   {
-   8 >   return 0;
-----         ^
-   9   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3584:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3644:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:3697:0
@@ -409,7 +299,7 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4357:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4398:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4399:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4424:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4455:0
+Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4456:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4480:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4504:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:4528:0
@@ -438,56 +328,6 @@ Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5365:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5669:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:5904:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6139:0
-Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6198:0
-run_fundamental.at-6198-dump.c:5.6-5.7:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----         ^
-   6   dump (char *p)
-   7   {
->> Error: Unexpected indicator: `T'
-
-run_fundamental.at-6198-dump.c:5.7-5.8:
-   2   #include <stdio.h>
-   3   #include <libcob.h>
-   4   
-   5 > COB_EXT_EXPORT int
-----          ^
-   6   dump (char *p)
-   7   {
->> Error: Invalid syntax
-
-run_fundamental.at-6198-dump.c:6.6-6.7:
-   3   #include <libcob.h>
-   4   
-   5   COB_EXT_EXPORT int
-   6 > dump (char *p)
-----         ^
-   7   {
-   8     printf ("%c%c", p[0], p[1]);
->> Error: Unexpected indicator: `c'
-
-run_fundamental.at-6198-dump.c:8.6-8.7:
-   5   COB_EXT_EXPORT int
-   6   dump (char *p)
-   7   {
-   8 >   printf ("%c%c", p[0], p[1]);
-----         ^
-   9     return 0;
-  10   }
->> Error: Unexpected indicator: `t'
-
-run_fundamental.at-6198-dump.c:9.6-9.7:
-   6   dump (char *p)
-   7   {
-   8     printf ("%c%c", p[0], p[1]);
-   9 >   return 0;
-----         ^
-  10   }
->> Error: Unexpected indicator: `r'
-
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6199:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6489:0
 Considering: import/gnucobol/tests/testsuite.src/run_fundamental.at:6535:0
