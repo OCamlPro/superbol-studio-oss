@@ -5585,16 +5585,6 @@ run_misc.at-12175-cmod.c:81.22-110.0:
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12175:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12264:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12360:0
-run_misc.at-12360-prog.cob:26.18-26.27:
-  23              05  DBI-RECORD-NAMES
-  24                     OCCURS 7 TIMES
-  25                     INDEXED BY REC-NAME-IDX
-  26 >                   ASCENDING KEY IS DBI-RECORD-NAME
-----                     ^^^^^^^^^
-  27                     .
-  28                10  DBI-RECORD-NAME PIC X(30).
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12428:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12527:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12591:0

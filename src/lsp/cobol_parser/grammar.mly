@@ -1674,9 +1674,18 @@ let data_occurs_clause :=
 
 let count_in_phrase := COUNT; IN?; ~ = loc(reference); < >
 
+let occurs_key_indexed [@recovery ([], [])] [@symbol ""] :=
+  | k = key_is; kl = rl(key_is); ib = lo(indexed_by);
+    { (k :: kl, ib) }
+  | ib = indexed_by; kl = rl(key_is);
+    { (kl, ib) }
+  | (* empty *)
+    { ([], []) }
+
 let occurs_fixed_clause [@context occurs_clause] :=
-  | OCCURS; i = loc(integer); TIMES?; kl = rl(key_is); ib = lo(indexed_by);
-    { OccursFixed { times = i; count_in = None;
+  | OCCURS; i = loc(integer); TIMES?; ki = occurs_key_indexed;
+    { let kl, ib = ki in
+      OccursFixed { times = i; count_in = None;
                     key_is = kl; indexed_by = ib; } }
   | OCCURS; _from = loc(integer); TO; to_ = loc(integer); TIMES?;
     co = count_in_phrase;
@@ -1685,19 +1694,22 @@ let occurs_fixed_clause [@context occurs_clause] :=
 
 let occurs_depending_clause [@context occurs_clause] :=
   | OCCURS; from = loc(integer); TO; to_ = loc(integer); TIMES?;
-    d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = Some from; to_; depending = d;
+    d = depending_phrase; ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDepending { from = Some from; to_; depending = d;
                         key_is = kl; indexed_by = il; } }
   | OCCURS; i = loc(integer); TIMES?;
-    d = depending_phrase; kl = rl(key_is); il = lo(indexed_by);
-    { OccursDepending { from = None; to_ = i; depending = d;
+    d = depending_phrase; ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDepending { from = None; to_ = i; depending = d;
                         key_is = kl; indexed_by = il; } }
 
 let occurs_dynamic_clause [@context occurs_clause] :=
   | OCCURS; DYNAMIC; co = ro(capacity_phrase);
     i1o = ro(pf(FROM,loc(integer))); i2o = ro(pf(TO,loc(integer)));
-    i = loc(bo(INITIALIZED)); kl = rl(key_is); il = lo(indexed_by);
-    { OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
+    i = loc(bo(INITIALIZED)); ki = occurs_key_indexed;
+    { let kl, il = ki in
+      OccursDynamic { capacity_in = co; from = i1o; to_ = i2o;
                       initialized = i; key_is = kl; indexed_by = il; } }
 
 let capacity_phrase := CAPACITY; IN?; ~ = name; < >

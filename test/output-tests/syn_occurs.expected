@@ -46,44 +46,4 @@ syn_occurs.at-339-prog2.cob:12.19-12.28:
 Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:418:0
 Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:503:0
 Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:590:0
-syn_occurs.at-590-prog.cob:10.18-10.27:
-   7              05  TAB-ENTRY1
-   8                     OCCURS 5 TIMES
-   9                     INDEXED BY IDX1
-  10 >                   ASCENDING KEY IS X1
-----                     ^^^^^^^^^
-  11                     DESCENDING Y1.
-  12                10  X1 PIC 9(4).
->> Error: Invalid syntax
-
-syn_occurs.at-590-prog.cob:11.18-11.28:
-   8                     OCCURS 5 TIMES
-   9                     INDEXED BY IDX1
-  10                     ASCENDING KEY IS X1
-  11 >                   DESCENDING Y1.
-----                     ^^^^^^^^^^
-  12                10  X1 PIC 9(4).
-  13                10  Y1 PIC X.
->> Error: Invalid syntax
-
-syn_occurs.at-590-prog.cob:17.18-17.28:
-  14              05  TAB-ENTRY
-  15                     OCCURS 2 TIMES
-  16                     INDEXED BY IDX2
-  17 >                   DESCENDING KEY IS X2
-----                     ^^^^^^^^^^
-  18                     ASCENDING  Y2.
-  19                10  X2 PIC 9(4).
->> Error: Invalid syntax
-
-syn_occurs.at-590-prog.cob:18.18-18.27:
-  15                     OCCURS 2 TIMES
-  16                     INDEXED BY IDX2
-  17                     DESCENDING KEY IS X2
-  18 >                   ASCENDING  Y2.
-----                     ^^^^^^^^^
-  19                10  X2 PIC 9(4).
-  20                10  Y2 PIC X.
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/syn_occurs.at:617:0
