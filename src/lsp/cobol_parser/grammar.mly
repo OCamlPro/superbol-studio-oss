@@ -34,7 +34,7 @@ let with_loc token location_limits =
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
 
-let dummy_loc = Cobol_common.Srcloc.raw Lexing.(dummy_pos, dummy_pos)
+let dummy_loc = Cobol_common.Srcloc.dummy
 
 %}
 
@@ -284,7 +284,7 @@ let simple_program :=
         compilation_units =
             [((Program {
               program_name =
-                  (Name ("" &@ dummy_loc)) &@ dummy_loc;
+                  (Name ("" &@ dummy_loc)) &@ dummy_loc; (* TODO: Use filename *)
               program_as = None;
               program_level = ProgramDefinition {
                   mode = None;
