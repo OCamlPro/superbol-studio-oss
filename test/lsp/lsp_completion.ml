@@ -686,25 +686,27 @@ let%expect_test "division-and-section-completion" =
        8             DISPLAY DATA-NAME
        9             STOP RUN.
     (line 6, character 8):
-    Basic (11 entries):
+    Basic (12 entries):
         COMMUNICATION
         END PROGRAM
         ID
         IDENTIFICATION
         LINKAGE
         LOCAL-STORAGE
+        .\n
         PROCEDURE
         PROGRAM-ID
         REPORT
         SCREEN
         WORKING-STORAGE
-    Eager (11 entries):
+    Eager (12 entries):
         COMMUNICATION SECTION.\n
         END PROGRAM
         ID DIVISION.\n
         IDENTIFICATION DIVISION.\n
         LINKAGE SECTION.\n
         LOCAL-STORAGE SECTION.\n
+        .\n
         PROCEDURE DIVISION
         PROGRAM-ID
         REPORT SECTION.\n
@@ -1102,25 +1104,27 @@ let%expect_test "datadiv-completion" =
        9             88 BB VALUES ARE "x" THRU "Z".
       10           PROCEDURE DIVISION.
     (line 7, character 8):
-    Basic (11 entries):
+    Basic (12 entries):
         COMMUNICATION
         END PROGRAM
         ID
         IDENTIFICATION
         LINKAGE
         LOCAL-STORAGE
+        .\n
         PROCEDURE
         PROGRAM-ID
         REPORT
         SCREEN
         WORKING-STORAGE
-    Eager (11 entries):
+    Eager (12 entries):
         COMMUNICATION SECTION.\n
         END PROGRAM
         ID DIVISION.\n
         IDENTIFICATION DIVISION.\n
         LINKAGE SECTION.\n
         LOCAL-STORAGE SECTION.\n
+        .\n
         PROCEDURE DIVISION
         PROGRAM-ID
         REPORT SECTION.\n

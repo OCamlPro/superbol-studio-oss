@@ -251,7 +251,6 @@ type 'm state =
     context_stack: Context.stack;
     registered_intrinsics: Text_lexer.IntrinsicHandles.t;
     intrinsics_enabled: bool;
-    prev_was_period: bool;
     diags: Parser_diagnostics.t;
     persist: persist;
   }
@@ -302,7 +301,6 @@ let init
     context_stack = Context.empty_stack;
     registered_intrinsics = default_intrinsics;
     intrinsics_enabled = false;
-    prev_was_period = false;
     diags = Parser_diagnostics.none;
     persist =
       {
@@ -479,10 +477,9 @@ let emit_token (type m) (s: m state) tok : m state =
 
 let put_token_back (type m) (s: m state) : m state =
   match s.memory with
-  | Amnesic -> { s with prev_was_period = false }
+  | Amnesic -> s
   | Eidetic [] -> Fmt.invalid_arg "put_token_back: unexpected memory state"
-  | Eidetic (_ :: toks) -> { s with memory = Eidetic toks;
-                                    prev_was_period = false }
+  | Eidetic (_ :: toks) -> { s with memory = Eidetic toks }
 
 let rec skip_redundant_periods = function
     | { payload = PERIOD; _ } :: rest -> skip_redundant_periods rest
@@ -494,14 +491,10 @@ let next_token (s: _ state) =
         aux tokens
     | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
         Some (emit_token s (PERIOD &@ loc), token, tokens)
-    | { payload = PERIOD; _ } :: tokens when s.prev_was_period ->
-        aux (skip_redundant_periods tokens)
     | { payload = PERIOD; _ } as token :: tokens ->
-        let s = { (emit_token s token) with prev_was_period = true } in
-        Some (s, token, skip_redundant_periods tokens)
+        Some (emit_token s token, token, skip_redundant_periods tokens)
     | token :: tokens ->
-        Some ({ (emit_token s token) with prev_was_period = false },
-              token, tokens)
+        Some (emit_token s token, token, tokens)
     | [] ->
         None
   in

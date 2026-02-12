@@ -1616,6 +1616,24 @@ syn_misc.at-3470-prog.cob:11.11-11.18:
   13              CONTINUE
 >> Error: Invalid syntax
 
+syn_misc.at-3470-prog.cob:15.11-15.13:
+  12              STOP RUN
+  13              CONTINUE
+  14          SEC-1 SECTION.
+  15 >            IF OK NOT EQUAL "OK" DISPLAY OK
+----              ^^
+  16          SEC-2 SECTION.
+  17              IF OK NOT EQUAL "OK" DISPLAY OK.
+>> Error: Invalid syntax
+
+syn_misc.at-3470-prog.cob:17.11-17.13:
+  14          SEC-1 SECTION.
+  15              IF OK NOT EQUAL "OK" DISPLAY OK
+  16          SEC-2 SECTION.
+  17 >            IF OK NOT EQUAL "OK" DISPLAY OK.
+----              ^^
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4003:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:4244:0
 syn_misc.at-4244-prog.cob:9.27-9.28:
