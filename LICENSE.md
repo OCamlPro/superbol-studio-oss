@@ -11,6 +11,9 @@ The sources in this project are distributed:
 * Under the terms of the ISC License for some vendored content
   in src/vendor;
 
+* Under their own licenses for vendored JavaScript dependencies in
+  assets/vendor; see the corresponding .LICENSE files therein;
+
 ## Affero GPL License v3
 
                     GNU AFFERO GENERAL PUBLIC LICENSE
