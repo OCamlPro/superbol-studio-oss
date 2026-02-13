@@ -3490,12 +3490,12 @@ let when_other [@default []] :=
 (* EXIT STATEMENT *)
 
 let returning :=
- | ~ = scalar; <ReturningScalar>
- | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
+ | ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ADDRESS; OF?; ~ = qualident;
     <ReturningAddress>
- | or_(GIVING, RETURNING); v = integer;
-    { ReturningInt { value = Integer v;
-                     size = None } }
  | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
     { ReturningInt { value = Integer v;
                      size = Some (Integer s) } }
@@ -4195,13 +4195,11 @@ let stop_statement :=
   | STOP; ~ = stop_body; < >
 let stop_body [@context stop_stmt] := (* with context: should not accept empty *)
   | a = stop_with_arg; { StopArg (Some a) }             (* RM/COBOL extension *)
-  | RUN; ~ = o(stop_run_returning_body); <StopRun>
+  | RUN; { StopRun None }
+  | RUN; r = returning; { StopRun (Some (StopReturning r)) }
+  | RUN; s = with_status; { StopRun (Some (StopWithStatus s)) }
   | ERROR; { StopError }                                              (* GCOS *)
   | THREAD; ~ = o(qualident); <StopThread>
-
-let stop_run_returning_body :=
-  | ~ = returning; <StopReturning>
-  | ~ = with_status; <StopWithStatus>
 
 let stop_with_arg :=
   | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)
