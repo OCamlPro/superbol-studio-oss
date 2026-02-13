@@ -4,12 +4,34 @@ Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:292:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:420:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:731:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:773:0
-syn_misc.at-773-prog.cob:2.7-2.22:
-   1   
-   2 >        SOURCE-COMPUTER. GNU-LINUX.
-----          ^^^^^^^^^^^^^^^
+syn_misc.at-773-prog.cob:6.12-6.19:
    3          SPECIAL-NAMES.
    4               SYMBOLIC NL IS 101
+   5                        NL2   102
+   6 >             NUMERIC SIGN TRAILING SEPARATE
+----               ^^^^^^^
+   7               DECIMAL-POINT IS COMMA
+   8               .
+>> Error: Invalid syntax
+
+syn_misc.at-773-prog.cob:15.40:
+  12               .
+  13          DATA DIVISION.
+  14          FD  PRINT-FILE EXTERNAL.
+  15 >        01  PRINT-REC          PIC X(64).
+----                                           ^
+  16   
+  17              DISPLAY "X"
+>> Hint: Missing PROCEDURE DIVISION .
+
+syn_misc.at-773-prog.cob:17.11-17.18:
+  14          FD  PRINT-FILE EXTERNAL.
+  15          01  PRINT-REC          PIC X(64).
+  16   
+  17 >            DISPLAY "X"
+----              ^^^^^^^
+  18              END-DISPLAY
+  19              ACCEPT OMITTED
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:804:0
@@ -1917,6 +1939,31 @@ syn_misc.at-5911-valid.cob:2.7-2.8:
 ----          ^
    3   000200 @OPTIONS APOST
    4   000300 IDENTIFICATION  DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-5911-valid.cob:2.16-2.22:
+   1   
+   2 > 000100 @OPTIONS NOMAIN,APOST
+----                   ^^^^^^
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-5911-valid.cob:4.32:
+   1   
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4 > 000300 IDENTIFICATION  DIVISION.
+----                                   ^
+   5   000400 PROGRAM-ID. VALID.
+>> Hint: Missing PROCEDURE DIVISION .
+
+syn_misc.at-5911-valid.cob:5.7-5.17:
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+   5 > 000400 PROGRAM-ID. VALID.
+----          ^^^^^^^^^^
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6000:0
