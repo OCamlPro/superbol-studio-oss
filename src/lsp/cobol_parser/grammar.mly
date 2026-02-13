@@ -1178,10 +1178,16 @@ let data_division_sentence_2 :=
   | s = report_section;          { S_REPORT_SECTION s }
   | s = screen_section;          { S_SCREEN_SECTION s }
 
+let section_entries [@recovery []] [@symbol ""] (L) :=
+  | (* empty *)                                    { [] }
+  | "."; ~ = section_entries(L);                   < >
+  | x = loc(L); xl = section_entries(L);           { x :: xl }
+
 let section(K, L) ==
   | ~ = loc(section_header_n_items(K,L)); < >
+
 let section_header_n_items(K, L) ==
-  | K; SECTION; "."; ~ = rl(loc(L)); < >
+  | K; SECTION; "."; ~ = section_entries(L); < >
 
 let working_storage_section :=
   | ~ = section (WORKING_STORAGE, constant_or_data_descr_entry); < >
