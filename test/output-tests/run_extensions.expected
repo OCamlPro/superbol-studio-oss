@@ -114,36 +114,6 @@ run_extensions.at-180-prog.cob:36.16-36.17:
 
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:206:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:231:0
-run_extensions.at-231-prog.cob:5.20:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >            IF 1 = (1 OR 2)
-----                       ^
-   6                DISPLAY "OK" NO ADVANCING
-   7                END-DISPLAY
->> Hint: Missing )
-
-run_extensions.at-231-prog.cob:5.21-5.23:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >            IF 1 = (1 OR 2)
-----                        ^^
-   6                DISPLAY "OK" NO ADVANCING
-   7                END-DISPLAY
->> Error: Invalid syntax
-
-run_extensions.at-231-prog.cob:5.25-5.26:
-   2          IDENTIFICATION   DIVISION.
-   3          PROGRAM-ID.      prog.
-   4          PROCEDURE        DIVISION.
-   5 >            IF 1 = (1 OR 2)
-----                            ^
-   6                DISPLAY "OK" NO ADVANCING
-   7                END-DISPLAY
->> Error: Invalid syntax
-
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:281:0
 run_extensions.at-281-prog.cob:9.43:
    6          01 X-1           PIC X(3) VALUE "X-1".

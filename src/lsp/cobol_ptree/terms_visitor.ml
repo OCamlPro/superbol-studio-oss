@@ -64,7 +64,7 @@ class ['a] folder = object
   method fold_class: (class_, 'a) fold = default
   method fold_cond: 'k. ('k cond, 'a) fold = default
   method fold_simple_cond: (simple_condition, 'a) fold = default
-  method fold_flat_combined_relation: (flat_combined_relation, 'a) fold = default
+  method fold_abbrev_relation_operand: (abbrev_relation_operand, 'a) fold = default
   method fold_logop: (logop, 'a) fold = default
   method fold_relop: (relop, 'a) fold = default
   method fold_rounding_mode: (rounding_mode, 'a) fold = default
@@ -434,10 +434,9 @@ and fold_simple_cond (v: _ #folder) =
           >> fold_expr v e
       | Relation rel -> x
           >> fold_binary_relation v rel
-      | Abbrev (_n, rel, o, comb) -> x
-          >> fold_binary_relation v rel
-          >> fold_logop v o
-          >> fold_flat_combined_relation v comb
+      | Abbrev (_n, e, a) -> x
+          >> fold_expr v e
+          >> fold_abbrev_relation_operand v a
       | ClassCond (e, c) -> x
           >> fold_expr v e
           >> fold_class v c
@@ -451,23 +450,26 @@ and fold_binary_relation (v: _ #folder) (e, r, f) x = x
   >> fold_relop v r
   >> fold_expr v f
 
-and fold_flat_combined_relation (v: _ #folder) =
-  handle v#fold_flat_combined_relation
+and fold_abbrev_relation_operand (v: _ #folder) =
+  handle v#fold_abbrev_relation_operand
     ~continue:begin fun c x -> match c with
-      | FlatAmbiguous (r, e) -> x
-          >> fold_option ~fold:fold_relop v r
+      | AbbrevRelOp (r, a) -> x
+          >> fold_relop v r
+          >> fold_abbrev_relation_operand v a
+      | AbbrevObject (_n, e) -> x
           >> fold_expr v e
-      | FlatNotExpr e -> x
-          >> fold_expr v e
-      | FlatRel (neg, rel) -> x
+      | AbbrevSubject (neg, e, a) -> x
           >> fold_bool v neg
-          >> fold_binary_relation v rel
-      | FlatOther c -> x
+          >> fold_expr v e
+          >> fold_abbrev_relation_operand v a
+      | AbbrevNot a -> x
+          >> fold_abbrev_relation_operand v a
+      | AbbrevOther c -> x
           >> fold_cond v c
-      | FlatComb (c1, o, c2) -> x
-          >> fold_flat_combined_relation v c1
+      | AbbrevComb (a1, o, a2) -> x
+          >> fold_abbrev_relation_operand v a1
           >> fold_logop v o
-          >> fold_flat_combined_relation v c2
+          >> fold_abbrev_relation_operand v a2
     end
 
 let fold_expression = fold_expr                                      (* alias *)

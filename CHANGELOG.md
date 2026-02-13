@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Handle OSVS parentheses in abbreviated combined relation conditions [#532](https://github.com/OCamlPro/superbol-studio-oss/pull/532)
 - Support STOP RUN RETURNING syntax with scalar argument [#529](https://github.com/OCamlPro/superbol-studio-oss/pull/529)
 - Support INDEXED BY and sort direction in any order in OCCURS clause [#526](https://github.com/OCamlPro/superbol-studio-oss/pull/526)
 - Support for debugging programs launched via custom COBOL runtimes [#522](https://github.com/OCamlPro/superbol-studio-oss/pull/522)

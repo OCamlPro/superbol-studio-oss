@@ -73,6 +73,12 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
         | i -> cons x acc (tl p, hd l +@+ hd (tl l) :: tl (tl l)) (i - 1)
       in
       cons x acc (p, l) y
+    and replace_n x y =
+      let rec cons x ((p', l', dgs) as acc) ((p, l) as pl) = function
+        | 0 -> aux acc pl
+        | i -> cons x (x :: p', hd l :: l', dgs) (tl p, tl l) (i - 1)
+      in
+      cons x acc (p, l) y
     and info_word_after n =
       let (p', l', dgs), (p, l) = skip acc (p, l) n in
       match p with
@@ -184,6 +190,18 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
        DATE_WRITTEN | DATE_MODIFIED |
        DATE_COMPILED | REMARKS |
        SECURITY) :: PERIOD :: _        -> comment_entry_after 2
+
+    | LPAR :: rest ->
+      let rec check_par nb_par = function
+        | LPAR :: rest -> check_par (nb_par + 1) rest
+        | [IS] | [IS; NOT] -> Error `MissingInputs
+        | (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
+        | (IS | NOT) :: (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
+        | IS :: NOT :: (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
+            -> replace_n LPAR_BEFORE_RELOP nb_par
+        | _ -> replace_n LPAR nb_par
+      in
+      check_par 1 rest
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
