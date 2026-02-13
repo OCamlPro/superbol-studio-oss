@@ -21,6 +21,7 @@ open Cobol_preproc.Options
 open Cobol_parser.Options
 
 type t = {
+  platform : Cobol_common.Platform.TYPES.platform;
   preproc_options: preproc_options;
   parser_options: parser_options;
   pretty_verbose: 'a. 'a Pretty.proc;
@@ -167,9 +168,14 @@ let get ?(verbose_on = `Stdout) () =
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty
     in
+
+    let platform = { Cobol_common.Platform.default_platform
+                     with verbosity = !Globals.verbosity }
+    in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)
-    { preproc_options = { config; verbose; source_format;
+    { platform ;
+      preproc_options = { config; platform; source_format;
                           exec_preprocs = EXEC_MAP.empty;
                           copybook_lookup_config =
                             Cobol_common.Copybook.lookup_config !libpath

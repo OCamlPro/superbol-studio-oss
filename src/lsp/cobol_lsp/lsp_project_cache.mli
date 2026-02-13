@@ -62,7 +62,8 @@ val save
     {!Lsp_io.send_notification}.  May raise some IO-related exceptions
     ([Sys_error], [Failure]). *)
 val load
-  : rootdir:Lsp_project.rootdir
+  : platform:Cobol_common.Platform.TYPES.platform
+  -> rootdir:Lsp_project.rootdir
   -> layout: Lsp_project.layout
   -> config: TYPES.config
   -> Lsp_document.t URIMap.t

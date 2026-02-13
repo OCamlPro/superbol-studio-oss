@@ -61,8 +61,9 @@ type directory =
     files: string StringMap.t;                (* key is basename in lowercase *)
   }
 
-let find_lib ~lookup_config:({ lookup_path = libpath;
-                               lookup_exts = libexts } as lookup_config)
+let find_lib
+    ~lookup_config:({ lookup_path = libpath;
+                      lookup_exts = libexts } as lookup_config)
     ?fromfile ?libname textname : (string, lookup_error) result =
   let libpath = match libname, fromfile with
     | None, _ ->

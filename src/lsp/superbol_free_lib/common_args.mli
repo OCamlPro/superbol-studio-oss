@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 type t = {
+  platform : Cobol_common.Platform.TYPES.platform;
   preproc_options: Cobol_preproc.Options.preproc_options;
   parser_options: Cobol_parser.Options.parser_options;
   pretty_verbose: 'a. 'a Pretty.proc;

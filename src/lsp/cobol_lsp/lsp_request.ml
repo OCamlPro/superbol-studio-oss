@@ -143,24 +143,25 @@ let assoc_of_jsonrpc_struct params =
   Yojson.Safe.Util.to_assoc @@ Jsonrpc.Structured.yojson_of_t params
 
 
-let handle_write_project_config_command param registry =
+let handle_write_project_config_command ~platform param registry =
   try
     let uri = match List.assoc_opt "uri" @@ assoc_of_jsonrpc_struct param with
       | Some uri -> Some (Lsp.Uri.t_of_yojson uri)
       | None -> None
     in
-    let registry = Lsp_server.on_write_project_config_command ?uri registry in
+    let registry =
+      Lsp_server.on_write_project_config_command ~platform ?uri registry in
     Ok (`Null, Running registry)
   with Yojson.Safe.Util.(Type_error _ | Undefined _) ->
     Lsp_error.invalid_params "param = %s (association list with \"uri\" key \
                               expected)" Yojson.Safe.(to_string (param :> t))
 
 
-let handle_get_project_config_command param registry =
+let handle_get_project_config_command ~platform param registry =
   try
     let assoc = assoc_of_jsonrpc_struct param in
     let uri = Lsp.Uri.t_of_yojson (List.assoc "uri" assoc) in
-    let reply = Lsp_server.get_project_config_command uri registry in
+    let reply = Lsp_server.get_project_config_command ~platform uri registry in
     Lsp_io.log_debug "Reply: %a" (Yojson.Safe.pretty_print ~std:false) reply;
     Ok (reply, Running registry)
   with Yojson.Safe.Util.(Type_error _ | Undefined _) | Not_found ->
@@ -686,12 +687,13 @@ let handle_hover ?always_show_hover_definition_text_in_data_div
 
 (** {3 Completion} *)
 
-let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
+let handle_completion ~platform ?(eager=true) registry
+    (params: CompletionParams.t) =
   try_with_checked_doc registry params.textDocument
     ~f:begin fun ~doc checked_doc->
       let config = Lsp_completion.config ~eager () in
       let completion_list =
-        Lsp_completion.contextual ~config
+        Lsp_completion.contextual ~platform ~config
           doc checked_doc params.position
       in Some (`CompletionList completion_list)
     end
@@ -867,9 +869,11 @@ let fallback (type t) : t Lsp.Client_request.t -> _ = function
       Error (UnhandledRequest req)
 
 let on_request
-  : type r. state -> r Lsp.Client_request.t ->
+  : type r.
+    platform:Cobol_common.Platform.TYPES.platform ->
+    state -> r Lsp.Client_request.t ->
     id:Jsonrpc.Id.t -> (r * state, r error) result =
-  fun state client_req ~id:_ ->
+  fun ~platform state client_req ~id:_ ->
   match state, client_req with
   | NotInitialized config, Initialize init_params ->
       initialize ~config init_params
@@ -895,7 +899,7 @@ let on_request
     | TextDocumentHover params ->
         Ok (handle_hover registry params, state)
     | TextDocumentCompletion params ->
-        Ok (handle_completion registry params, state)
+        Ok (handle_completion ~platform registry params, state)
     | TextDocumentFoldingRange params ->
         Ok (handle_folding_range registry params, state)
     | Shutdown ->
@@ -908,10 +912,10 @@ let on_request
         Ok (handle_rename registry params, state)
     | UnknownRequest { meth = "superbol/writeProjectConfiguration";
                        params = Some param } ->
-        handle_write_project_config_command param registry
+        handle_write_project_config_command ~platform param registry
     | UnknownRequest { meth = "superbol/getProjectConfiguration";
                        params = Some param } ->
-        handle_get_project_config_command param registry
+        handle_get_project_config_command ~platform param registry
     | UnknownRequest { meth = "superbol/getCFG";
                        params = Some param } ->
         Ok (handle_get_cfg registry param, state)
@@ -955,7 +959,8 @@ let on_request
     | _ ->
         fallback client_req
 
-let handle ?(alternate_handlers = []) (Jsonrpc.Request.{ id; _ } as req) state =
+let handle ~platform
+    ?(alternate_handlers = []) (Jsonrpc.Request.{ id; _ } as req) state =
   match Lsp.Client_request.of_jsonrpc req with
   | Error message ->
       let err = Jsonrpc.Response.Error.make ~message ~code:InvalidRequest () in
@@ -978,7 +983,8 @@ let handle ?(alternate_handlers = []) (Jsonrpc.Request.{ id; _ } as req) state =
             Jsonrpc.Response.error id @@
             Lsp_server.jsonrpc_of_error server_error req.method_
       in
-      try try_alternate_on_error (on_request state r ~id) alternate_handlers with
+      try try_alternate_on_error
+            (on_request ~platform state r ~id) alternate_handlers with
       | Jsonrpc.Response.Error.E e ->
           state, Jsonrpc.Response.error id e
       | e ->

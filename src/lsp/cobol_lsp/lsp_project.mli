@@ -59,7 +59,9 @@ val copybook_lookup_config_for
 
 (** [detect_copybook ~uri ?contents project] indicates whether a document at the
     given URI for [project] should be treated as a copybook. *)
-val detect_copybook: uri:Lsp.Uri.t -> ?contents:string -> t -> bool
+val detect_copybook:
+  platform : Cobol_common.Platform.TYPES.platform ->
+  uri:Lsp.Uri.t -> ?contents:string -> t -> bool
 
 (** {1 Cached representation} *)
 

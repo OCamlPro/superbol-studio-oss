@@ -22,9 +22,10 @@ let error ?loc =
 
 (* --- *)
 
-let pp_msg ?loc ppf fmt =
+let pp_msg ?platform ?loc ppf fmt =
   (* Source text right above message for now: *)
-  Pretty.print ppf ("%a"^^fmt) (Pretty.option Srcloc.pp_srcloc) loc
+  Pretty.print ppf ("%a"^^fmt)
+    (Pretty.option @@ Srcloc.pp_srcloc ?platform) loc
 
 (* --- *)
 
@@ -32,18 +33,21 @@ let pp_kuncaught k exn fmt =
   Pretty.string_to k ("Fatal error: uncaught exception %s:@\n"^^fmt) exn
 
 (* Register some printing functions, useful upon misuse of
-   `Cobol_common.catch_diagnostics` and co. *);;
-Stdlib.Printexc.register_printer begin
-  let uncaught exn fmt =
-    pp_kuncaught Option.some (__MODULE__^exn) @@ fmt ^^
+   `Cobol_common.catch_diagnostics` and co. *)
+let () =
+  Stdlib.Printexc.register_printer begin
+    let uncaught exn fmt =
+      pp_kuncaught Option.some (__MODULE__^exn) @@
+      fmt ^^
       "@\n(Dev hint: this is probably due to a missing call to \
        Cobol_common.catch_diagnostics)@."
-  in
-  function
-  | LocalizedError (msg, loc, _) ->
-      uncaught "LocalizedError" "%a" (fun ppf -> pp_msg ~loc ppf "%t") msg
-  | Error msg ->
-      uncaught "Error" "%t" msg
-  | _ ->
-      None
-end
+    in
+    function
+    | LocalizedError (msg, loc, _) ->
+        uncaught "LocalizedError" "%a"
+          (fun ppf -> pp_msg ~loc ppf "%t") msg
+    | Error msg ->
+        uncaught "Error" "%t" msg
+    | _ ->
+        None
+  end
