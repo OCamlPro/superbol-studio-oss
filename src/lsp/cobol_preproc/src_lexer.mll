@@ -171,13 +171,23 @@
 
 }
 
+let tab = '\t'
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
 let sna = nnl nnl nnl nnl nnl nnl              (* 6 chars; TODO: exclude tabs *)
+let tabs =
+  (tab |
+   nnl tab |
+   nnl nnl tab |
+   nnl nnl nnl tab |
+   nnl nnl nnl nnl tab |
+   nnl nnl nnl nnl nnl tab |
+   nnl nnl nnl nnl nnl nnl tab |
+   nnl nnl nnl nnl nnl nnl nnl tab)
 let spaces = ([' ' '\t']*)
 let    blank        = [' ' '\009' '\r']
 let nonblank        = nnl # blank
-let    blanks       =(blank+ | '\t')
+let    blanks       =(blank | '\t')+
 let    blank_area_A = blank blank blank blanks | '\t'
 let nonblank_area_A =(nonblank nnl nnl nnl |
                       blank nonblank nnl nnl |
@@ -252,7 +262,7 @@ rule fixed_line state
       {
         fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
       }
-  | '\t'
+  | tabs
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
       }
