@@ -2791,34 +2791,51 @@ condition:
 
 complex_condition:
  | nonrel_condition { $1 }
- | flat_relation_condition %prec lowest { $1 }
+ | relation_condition %prec lowest { $1 }
  | complex_condition logop complex_condition { Logop ($1, $2, $3) }
 
 %inline logop:
  | AND           { LAnd }
  | OR            { LOr }
 
-%inline flat_relation_condition:
- | neg = ibo(NOT) c = relation_condition
-   suff = io (pair (logop, flat_combination_operand))
-   { relation_condition ~neg c suff }
+%inline any_lpar:
+ | LPAR              {}
+ | LPAR_BEFORE_RELOP {}
+
+%inline relation_condition:
+ | neg = ibo(NOT) e = expression pred = abbrev_relop_operand { relation_condition (neg, e, pred) }
 
 nonrel_condition:
  | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
  | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
  | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
 
-flat_combination_operand:
- | r = io(relop)    e = expression             { FlatAmbiguous (r, e) }
- |         NOT      e = expression             { FlatNotExpr e }
- | n = ibo(NOT)     c = relation_condition     { FlatRel (n, c) }
- | n = ibo(NOT)     c = extended_condition     { FlatOther (neg_condition ~neg:n c) }
- | n = ibo(NOT) "(" c =  complex_condition ")" { FlatOther (neg_condition ~neg:n c) }
- | flat_combination_operand logop flat_combination_operand
-                                               { FlatComb ($1, $2, $3) }
+abbrev_relop_atom:
+ | r = relop      e = abbrev_object_atom         { AbbrevRelOp (r, e) }
+ |     LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR  { c }
+ | NOT LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR  { AbbrevNot c }
 
-relation_condition:
- | expression relop expression { $1, $2, $3 }
+abbrev_relop_operand:
+ | abbrev_relop_atom { $1 }
+ | abbrev_relop_operand logop abbrev_relation_operand     { AbbrevComb ($1, $2, $3) }
+
+abbrev_object_atom:
+ | n = ibo(NOT)     e = expression   %prec lowest               { AbbrevObject (n, e) }
+ |              "(" c = abbrev_object_operand ")"                 { c }
+ |         NOT  "(" c = abbrev_object_operand ")"                 { AbbrevNot c }
+
+abbrev_object_operand:
+ | abbrev_object_atom { $1 }
+ | abbrev_object_operand logop abbrev_relation_operand     { AbbrevComb ($1, $2, $3) }
+
+abbrev_relation_operand:
+ | r = relop        e = abbrev_object_atom   { AbbrevRelOp (r, e) }
+ | n = ibo(NOT)     e = expression              %prec lowest        { AbbrevObject (n, e) }
+ | n = ibo(NOT)     e = expression a = abbrev_relop_atom { AbbrevSubject (n, e, a) }
+ | n = ibo(NOT)     c = extended_condition                          { AbbrevOther (neg_condition ~neg:n c) }
+ |     any_lpar c = abbrev_relation_operand RPAR                 { c }
+ | NOT any_lpar c = abbrev_relation_operand RPAR                 { AbbrevNot c }
+ | abbrev_relation_operand logop abbrev_relation_operand            { AbbrevComb ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
