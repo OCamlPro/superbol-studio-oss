@@ -10,8 +10,10 @@ TARGET_PLAT ?= $(BUILD_PLAT)
 
 DUNE = opam exec -- dune
 DUNE_ARGS ?= --root=$$(pwd)
+ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
+endif
 ifeq ($(BUILD_STATIC_EXECS),true)
   export LINKING_MODE=static
 endif

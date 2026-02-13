@@ -6,11 +6,15 @@ CP ?= cp -fl # ln -srf
 
 DUNE_BUILD_DIR ?= _build
 DUNE_BUILD_ARGS = ${DUNE_CROSS_ARGS}
-DUNE_BUILD_DEFAULT =							\
+ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
+  DUNE_BUILD_DEFAULT =							\
 	${DUNE_BUILD_DIR}/default$(strip				\
 		$(if $(filter  win32,$(TARGET_PLAT)),.windows)		\
-		$(if $(filter darwin,$(TARGET_PLAT)),.osx)		\
-							  )
+		$(if $(filter darwin,$(TARGET_PLAT)),.osx))
+else
+  DUNE_BUILD_DEFAULT =							\
+	${DUNE_BUILD_DIR}/default
+endif
 DUNE_BUILD_SRCDIR = ${DUNE_BUILD_DEFAULT}/${MAIN_SRCDIR}
 
 BUILD_PLAT = $(shell node --print process.platform)
