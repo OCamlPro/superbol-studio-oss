@@ -1167,7 +1167,7 @@ let error_diagnostics ~loc errors =
     add_diags acc ~loc:(Srcloc.sub loc ~pos ~len) error
   end DIAGS.Set.none (List.rev errors)
 
-module Make (Config: Cobol_config.T) (Env: ENV) = struct
+module Make (Config: Cobol_common.Config.TYPES.CONFIG) (Env: ENV) = struct
 
   exception InvalidPicture of
       string with_loc * Cobol_common.Diagnostics.diagnostics * picture
@@ -1175,7 +1175,7 @@ module Make (Config: Cobol_config.T) (Env: ENV) = struct
   let of_string ({ payload; loc } as str) =
 
     let config = {
-      max_pic_length = Config.pic_length#value;
+      max_pic_length = Config.c.pic_length;
       decimal_char = Env.decimal_char;
       currency_signs = Env.currency_signs;
     } in

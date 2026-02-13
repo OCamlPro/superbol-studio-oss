@@ -24,8 +24,8 @@ module TYPES = struct
     | RelativeToFileDir of string
 
   type config = {
-    mutable cobol_config: Cobol_config.t;
-    mutable source_format: Cobol_config.source_format_spec;
+    mutable superbol_config: Gnucobol_config.Types.t;
+    mutable source_format: Gnucobol_config.source_format_spec;
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
@@ -53,14 +53,14 @@ let __init_default_exn_printers =
 (* Intermediate converters *)
 
 let cobol_config_from_dialect_name ~verbose dialect_name =
-  try Cobol_config.(from_dialect ~verbose @@ DIALECT.of_string dialect_name) with
+  try Gnucobol_config.(from_dialect ~verbose @@ DIALECT.of_string dialect_name) with
   | Invalid_argument e ->
       raise @@ ERROR (Unknown_dialect e)
-  | Cobol_config.ERROR e ->
+  | Gnucobol_config.ERROR e ->
       raise @@ ERROR (Cobol_config_error e)
 
 let cobol_source_format source_format_name =
-  try Cobol_config.Options.format_of_string source_format_name
+  try Gnucobol_config.Options.format_of_string source_format_name
   with Invalid_argument e ->
     raise @@ ERROR (Unknown_source_format e)
 
@@ -71,8 +71,8 @@ let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
 
 let default = {
-  cobol_config = Cobol_config.default;
-  source_format = Cobol_config.Auto;
+  superbol_config = Gnucobol_config.default;
+  source_format = Gnucobol_config.Auto;
   libpath = default_libpath;
   libexts = default_libexts;
   indent_config = default_indent_config;
@@ -85,10 +85,10 @@ let new_default () =
 (* Translation to TOML *)
 
 let dialect_repr dialect =
-  TOML.value_of_string @@ Cobol_config.DIALECT.to_string dialect
+  TOML.value_of_string @@ Gnucobol_config.DIALECT.to_string dialect
 
 let format_repr format =
-  TOML.value_of_string @@ Cobol_config.Options.string_of_format format
+  TOML.value_of_string @@ Gnucobol_config.Options.string_of_format format
 
 let path_repr = function
   | RelativeToProjectRoot dir ->
@@ -122,7 +122,7 @@ let config_repr config ~name =
       option
         ~name: "dialect"
         ~after_comments: ["Default dialect for COBOL source files"]
-        (dialect_repr @@ Cobol_config.dialect config.cobol_config);
+        (dialect_repr @@ Gnucobol_config.dialect config.superbol_config);
 
       option
         ~name: "source-format"
@@ -191,10 +191,10 @@ let get_indent_config toml =
 let load_file ?(verbose=false) config_filename =
   let load_section toml_handle keys toml =
     let section = TOML.get keys toml in
-    let DIAGS.{ result = cobol_config; diags } =
+    let DIAGS.{ result = superbol_config; diags } =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section in
     DIAGS.result ~diags
-      { cobol_config;
+      { superbol_config;
         toml_handle;
         source_format = get_source_format section;
         libpath = get_libpath section;
@@ -225,7 +225,7 @@ let reload ?(verbose=false) ~config_filename config =
        parsed/checked, so that [config] remains unchanged in case an exception
        is thrown. *)
     let section = TOML.get keys toml in
-    let DIAGS.{ result = cobol_config; diags } =
+    let DIAGS.{ result = superbol_config; diags } =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section
     and source_format = get_source_format section
     and libpath = get_libpath section
@@ -236,9 +236,9 @@ let reload ?(verbose=false) ~config_filename config =
       config.libpath <> libpath ||
       config.libexts <> libexts ||
       config.indent_config <> indent_config ||
-      config.cobol_config <> cobol_config
+      config.superbol_config <> superbol_config
     in
-    config.cobol_config <- cobol_config;
+    config.superbol_config <- superbol_config;
     config.source_format <- source_format;
     config.libpath <- libpath;
     config.libexts <- libexts;
@@ -251,7 +251,7 @@ let reload ?(verbose=false) ~config_filename config =
     try
       reload_section toml [config_section_name]
     with Not_found ->                         (* missing section: use defaults *)
-      config.cobol_config <- default.cobol_config;
+      config.superbol_config <- default.superbol_config;
       config.source_format <- default.source_format;
       config.libpath <- default.libpath;
       config.libexts <- default.libexts;

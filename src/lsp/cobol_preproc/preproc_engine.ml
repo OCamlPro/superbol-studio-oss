@@ -41,7 +41,7 @@ and preprocessor_persist =
     overlay_manager: (module Src_overlay.MANAGER);
     replacing: Preproc_directives.replacing with_loc list list;
     copybooks: Cobol_common.Srcloc.copylocs;              (* opened copybooks *)
-    dialect: Cobol_config.dialect;
+    dialect: Cobol_common.Config.TYPES.dialect;
     source_format: Src_format.any option;  (* to keep auto-detecting on reset *)
     exec_preprocs: exec_preprocessor EXEC_MAP.t;
     copybook_lookup_config: Cobol_common.Copybook.lookup_config;
@@ -111,16 +111,17 @@ let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
   verbose && List.mem tag show_if_verbose
 
 let source_format_config = function
-  | Cobol_config.SF sf -> Some (Src_format.from_config sf)
+  | Cobol_common.Config.TYPES.SF sf -> Some (Src_format.from_config sf)
   | Auto -> None
 
 let preprocessor input = function
   | `WithOptions { verbose; source_format; env;
-                   exec_preprocs; config = (module Config);
+                   exec_preprocs; config = c;
                    copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
       let module Om = Src_overlay.New_manager (Om_name) () in
-      let module Pp = Preproc_grammar.Make (Config) (Om) in
+      let module Pp = Preproc_grammar.Make (struct
+          let c = c end) (Om) in
       let source_format = source_format_config source_format in
       {
         buff = [];
@@ -137,7 +138,7 @@ let preprocessor input = function
             overlay_manager = (module Om);
             replacing = [];
             copybooks = Cobol_common.Srcloc.no_copy;
-            dialect = Config.dialect;
+            dialect = c.dialect;
             source_format;
             exec_preprocs;
             copybook_lookup_config;
@@ -537,7 +538,7 @@ let reset_preprocessor_for_string string ?new_position pp =
 
 (* --- *)
 
-let preprocessor ?(options = Preproc_options.default) input =
+let preprocessor ~options (* ?(options = Preproc_options.default) *) input =
   preprocessor input (`WithOptions options)
 
 (** Default pretty-printing formatter for {!lex_file}, {!lex_lib}, and
@@ -616,16 +617,16 @@ let scan_prefix_for_copybook ~dialect ~source_format input =
   | Expect_first_digits -> `Program                                  (* maybe? *)
   | Expect_word -> `Copybook                                         (* maybe? *)
 
-let text_of_input ?options input =
-  let text, pp = full_text ~item:"file" @@ preprocessor ?options input in
+let text_of_input ~options input =
+  let text, pp = full_text ~item:"file" @@ preprocessor ~options input in
   OUT.result text ~diags:(diags pp)
 
-let text_of_file ?options filename =
-  Src_input.from ~filename ~f:(text_of_input ?options)
+let text_of_file ~options filename =
+  Src_input.from ~filename ~f:(text_of_input ~options)
 
-let preprocess_input ?options ?(ppf = default_oppf) input =
-  text_of_input ?options input |>
+let preprocess_input ~options ?(ppf = default_oppf) input =
+  text_of_input ~options input |>
   OUT.map_result ~f:(Pretty.print ppf "%a@." Text.pp_text)
 
-let preprocess_file ?options ?ppf filename =
-  Src_input.from ~filename ~f:(preprocess_input ?options ?ppf)
+let preprocess_file ~options ?ppf filename =
+  Src_input.from ~filename ~f:(preprocess_input ~options ?ppf)

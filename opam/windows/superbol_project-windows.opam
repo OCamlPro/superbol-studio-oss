@@ -49,12 +49,12 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
+  "superbol_config-windows" {= version}
   "pretty-windows" {= version}
   "ocplib_stuff-windows" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-windows" {= version}
   "ez_file-windows" {>= "0.3.0" & < "1.0.0"}
   "cobol_preproc-windows" {= version}
-  "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

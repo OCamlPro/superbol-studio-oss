@@ -51,6 +51,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "sql_parser-osx" {= version}
   "pretty-osx" {= version}
+  "cobol_typeck-osx" {= version}
   "cobol_preproc-osx" {= version}
   "cobol_parser-osx" {= version}
   "cobol_common-osx" {= version}

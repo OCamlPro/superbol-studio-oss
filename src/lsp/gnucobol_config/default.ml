@@ -13,33 +13,7 @@
 
 (** Module containing all the default options *)
 open EzCompat
-
-let not_reserved =
-  ["TERMINAL"; "EXAMINE"]
-
-let default_aliases =
-  [ "AUTO-SKIP", "AUTO";
-    "AUTOTERMINATE", "AUTO";
-    "BACKGROUND-COLOUR", "BACKGROUND-COLOR";
-    "BEEP", "BELL";
-    "BINARY-INT", "BINARY-LONG";
-    "BINARY-LONG-LONG", "BINARY-DOUBLE";
-    "CELLS", "CELL";
-    "COLOURS", "COLORS";
-    "EMPTY-CHECK", "REQUIRED";
-    "EQUALS", "EQUAL";
-    "FOREGROUND-COLOUR", "FOREGROUND-COLOR";
-    "HIGH-VALUES", "HIGH-VALUE";
-    "INITIALISE", "INITIALIZE";
-    "INITIALISED", "INITIALIZED";
-    "LENGTH-CHECK", "FULL";
-    "LOW-VALUES", "LOW-VALUE";
-    "ORGANISATION", "ORGANIZATION";
-    "PIXELS", "PIXEL";
-    "SYNCHRONISED", "SYNCHRONIZED";
-    "TIMEOUT", "TIME-OUT";
-    "ZEROES", "ZERO";
-    "ZEROS", "ZERO"]
+open Cobol_common.Reserved.TYPES
 
 module Default: Types.T = struct
   open Types
@@ -49,14 +23,20 @@ module Default: Types.T = struct
   let words =
     let alias_for b = ReserveAlias { alias_for = b;
                                      preserve_context_sensitivity = false } in
-    Reserved_words.words @
-    List.map (fun w -> w, NotReserved) not_reserved @
-    List.map (fun (a, b) -> a, alias_for b) default_aliases
+    Cobol_common.Reserved.words @
+    List.map (fun w -> w, NotReserved)
+      Cobol_common.Reserved.not_reserved @
+    List.map (fun (a, b) -> a, alias_for b)
+      Cobol_common.Reserved.default_aliases
 
-  let not_reserved = StringSet.of_list not_reserved
-  let intrinsic_functions = StringSet.diff Reserved_words.default_intrinsics not_reserved
-  let system_names = StringSet.diff Reserved_words.default_system_names not_reserved
-  let registers = StringSet.diff Reserved_words.default_registers not_reserved
+  let not_reserved = StringSet.of_list
+      Cobol_common.Reserved.not_reserved
+  let intrinsic_functions = StringSet.diff
+      Cobol_common.Reserved.default_intrinsics not_reserved
+  let system_names = StringSet.diff
+      Cobol_common.Reserved.default_system_names not_reserved
+  let registers = StringSet.diff
+      Cobol_common.Reserved.default_registers not_reserved
 
   (* int options *)
   open Options

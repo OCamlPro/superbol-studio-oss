@@ -54,7 +54,6 @@ skip = ["main.ml", "index.mld"]
 #   base-unix = { libname = "unix", version = ">=base" } 
 [dependencies]
 cobol_common = "version"
-cobol_config = "version"
 cobol_data = "version"
 ppx_deriving = ">=5.2.1"
 ppx_import = "1"

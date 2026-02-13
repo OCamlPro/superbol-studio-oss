@@ -48,11 +48,11 @@ exception INVALID of string
 
 val equal: 'k source_format -> 'r source_format -> bool
 
-val from_config: Cobol_config.source_format -> any
-(* val to_config: 'k source_format -> Cobol_config.source_format *)
+val from_config: Cobol_common.Config.TYPES.source_format -> any
+(* val to_config: 'k source_format -> Cobol_common.Config.source_format *)
 
 (** May raise {!INVALID_SOURCE_FORMAT}. *)
-val decypher: dialect: Cobol_config.dialect -> string -> any
+val decypher: dialect: Cobol_common.Config.TYPES.dialect -> string -> any
 
 val guess_from: contents_prefix: string -> any
 

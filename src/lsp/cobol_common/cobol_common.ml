@@ -21,6 +21,8 @@ module Visitor = Visitor
 module Behaviors = Behaviors
 module Tokenizing = Tokenizing
 module Symbolic = Symbolic           (* for now; may be moved elsewhere later *)
+module Config = Common_config
+module Reserved = Reserved_words
 
 exception FatalError of string
 let fatal fmt = Pretty.string_to (fun s -> raise @@ FatalError s) fmt

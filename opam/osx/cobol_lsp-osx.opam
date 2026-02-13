@@ -59,7 +59,6 @@ depends: [
   "cobol_parser-osx" {= version}
   "cobol_indent-osx" {= version}
   "cobol_data-osx" {= version}
-  "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
   "cobol_cfg-osx" {= version}
   "odoc" {with-doc}

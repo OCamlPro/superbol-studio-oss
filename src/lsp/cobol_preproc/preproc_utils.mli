@@ -14,7 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 open Preproc_outputs.TYPES
 
-module Make (Config: Cobol_config.T) : sig
+module Make (Config: Cobol_common.Config.TYPES.CONFIG) : sig
 
   val replacing'
     : ?repl_dir:Preproc_directives.replacing_direction

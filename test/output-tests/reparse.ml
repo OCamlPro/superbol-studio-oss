@@ -59,38 +59,42 @@ let reparse_file ~source_format ~config filename =
 let () =
   (* Print one token per line so we can diff outputs more easily. *)
   Pretty.pp_set_margin std_formatter 3;
-  let config = from_dialect Cobol_config.DIALECT.mf_strict in
+  let config = from_dialect Gnucobol_config.DIALECT.mf_strict in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter mf_root ~glob:"*.[cC][bB][lL]"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ mf_testsuite // path;
-      reparse_file ~source_format:(Cobol_config.SF SFFixed) ~config
+      reparse_file ~source_format:(Gnucobol_config.SF SFFixed) ~config:c
         (mf_root // path);
       printf "@]@."
     end;
-  let config = Cobol_config.default in
+  let config = Gnucobol_config.default in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter ibm_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ ibm_testsuite // path;
       (* Note: we (and GnuCOBOL) don't appear to provide IBM's "EXTENDED" format
          that has lines of 252 bytes. Closest we have is xCard (with lines of
          255 bytes). *)
-      reparse_file ~config ~source_format:(Cobol_config.SF SFxCard)
+      reparse_file ~config:c ~source_format:(Gnucobol_config.SF SFxCard)
         (ibm_root // path);
       printf "@]@."
     end;
-  let config = Cobol_config.default in
+  let config = Gnucobol_config.default in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter sql_exec_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ sql_exec_testsuite // path;
-      reparse_file ~config ~source_format:(Cobol_config.Auto)
+      reparse_file ~config:c ~source_format:(Gnucobol_config.Auto)
         (sql_exec_root // path);
       printf "@]@."
     end;
-  let config = Cobol_config.default in
+  let config = Gnucobol_config.default in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter gixsql_root ~glob:"*.cbl"
     ~f:begin fun path ->
       printf "@[<v 1>Re-parsing `%s':@ " @@ gixsql_testsuite // path;
-      reparse_file ~config ~source_format:(Cobol_config.Auto)
+      reparse_file ~config:c ~source_format:(Gnucobol_config.Auto)
         (gixsql_root // path);
       printf "@]@."
     end;

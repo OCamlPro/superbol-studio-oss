@@ -57,4 +57,4 @@ let gixsql_root = srcdir // gixsql_testsuite
 
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget @@
-  Cobol_config.from_dialect dialect
+  Gnucobol_config.from_dialect dialect

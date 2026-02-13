@@ -21,7 +21,7 @@ module Make
     (Conf: sig
        include Types.CONFIG
        val options: Conf_ast.value StringMap.t
-       val words: Types.words_spec
+       val words: Cobol_common.Reserved.TYPES.words_spec
        val intrinsic_functions: StringSet.t
        val system_names: StringSet.t
        val registers: StringSet.t

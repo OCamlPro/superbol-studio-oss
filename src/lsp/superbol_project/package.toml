@@ -55,7 +55,7 @@ skip = ["index.mld", "main.ml"]
 [dependencies]
 cobol_common = "version"
 cobol_preproc = "version"
-cobol_config = "version"
+gnucobol_config = "version"
 ocplib_stuff = "0.4.0"
 ez_file = "0.3.0"
 ezr_toml = "version"

@@ -53,7 +53,6 @@ depends: [
   "ppx_deriving-osx" {>= "5.2.1"}
   "menhir-osx" {>= "1.2"}
   "cobol_data-osx" {= version}
-  "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

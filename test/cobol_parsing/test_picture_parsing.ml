@@ -18,10 +18,10 @@ module CHARS = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
 
 module Config = struct
-  include Cobol_config.Default
+  include Gnucobol_config.Default
   let pic_length =
     (* CHECKME: 63 in ISO/IEC 2014. *)
-    Cobol_config.Options.pic_length#from_val ~config 38
+    Gnucobol_config.Options.pic_length#from_val ~config 38
 end
 
 module Env = struct
@@ -29,7 +29,10 @@ module Env = struct
   let currency_signs = CHARS.singleton '$'
 end
 
-module PIC = Cobol_data.Picture.Make (Config) (Env)
+module PIC = Cobol_data.Picture.Make (struct
+    let c = Gnucobol_config.COMMON_CONFIG.of_config
+        (module Config)
+  end) (Env)
 
 (* --- *)
 

@@ -12,7 +12,7 @@
 (**************************************************************************)
 
 val compilation_group
-  : ?config: Cobol_config.t
+  : c: Cobol_common.Config.TYPES.cobol_config
   -> fold_exec_block':Typeck_outputs.fold_exec_block'
   -> _ Cobol_parser.Outputs.parsed_compilation_group
   -> Typeck_outputs.t Typeck_results.with_diags

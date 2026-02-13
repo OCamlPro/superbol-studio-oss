@@ -225,10 +225,6 @@ dir = "src/lsp/pretty"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
 [[package]]
-dir = "src/lsp/cobol_config"
-# edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
-
-[[package]]
 dir = "src/lsp/cobol_indent"
 # edit 'src/lsp/cobol_lsp/package.toml' for package-specific options
 
@@ -274,3 +270,6 @@ dir = "src/lsp/sql_parser"
 
 [[package]]
 dir = "src/lsp/cobol_cfg"
+
+[[package]]
+dir = "src/lsp/gnucobol_config"

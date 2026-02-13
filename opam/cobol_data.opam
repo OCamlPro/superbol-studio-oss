@@ -50,7 +50,6 @@ depends: [
   "zarith_stubs_js" {>= "0.17"}
   "zarith" {>= "1"}
   "cobol_ptree" {= version}
-  "cobol_config" {= version}
   "cobol_common" {= version}
   "ppx_deriving" {>= "5.2.1"}
   "odoc" {with-doc}

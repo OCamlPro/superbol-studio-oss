@@ -13,7 +13,7 @@
 
 let preproc
     ?(filename = "prog.cob")
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Gnucobol_config.(SF SFFixed))
     contents
   =
   Cobol_common.Srcloc.TESTING.register_file_contents ~filename contents;

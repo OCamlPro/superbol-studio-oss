@@ -288,3 +288,60 @@ let from_dialect ?search_path ?verbose d =
   | d               -> load_gnucobol_conf d
 
 let dialect (module C: T) = C.dialect
+
+module COMMON_CONFIG = struct
+  open Cobol_common.Config.TYPES
+
+  let of_dialect dialect =
+    match dialect with
+    | DIALECT.MicroFocus _ -> Dialect_MicroFocus
+    | GnuCOBOL -> Dialect_GnuCOBOL
+    | COBOL85 -> Dialect_STD85
+    | COBOL2002 -> Dialect_STD2002
+    | COBOL2014 -> Dialect_STD2014
+    | XOpen -> Dialect_Other "XOpen"
+    | ACU _ -> Dialect_ACU
+    | BS2000 _ -> Dialect_BS2000
+    | GCOS _ -> Dialect_Other "GCOS"
+    | IBM _ -> Dialect_IBM
+    | MVS _ -> Dialect_MVS
+    | Realia _ -> Dialect_Other "Realia"
+    | RM _ -> Dialect_RM
+    | Custom (name, _) -> Dialect_Other name
+    | Default -> Dialect_Other "Default"
+
+  let dialect (module C : T) = of_dialect C.dialect
+
+  let of_level = function
+    | FEATURE.Ok _ -> Level_ok
+    | Error -> Level_error
+    | Skip -> Level_skip
+    | Ignore -> Level_ignore
+    | Unconformable -> Level_unconformable
+    | Warning _ -> Level_warning
+    | Archaic _ -> Level_archaic
+    | Obsolete _ -> Level_obsolete
+
+  let of_config (module C : T) =
+      {
+        Cobol_common.Config.TYPES.pic_length = C.pic_length#value ;
+        dialect = of_dialect C.dialect ;
+        features = {
+          safe_partial_replacing_when_src_literal = {
+            feature_name = { name = "safe_partial_replacing_when_src_literal" };
+            feature_safe = false ;
+            feature_level =
+              of_level C.safe_partial_replacing_when_src_literal#level ;
+          };
+          free_redefines_position = {
+            feature_name = { name = "free_redefines_position" };
+            feature_safe = true ;
+            feature_level =
+              of_level C.free_redefines_position#level ;
+          };
+        };
+        intrinsic_functions = C.intrinsic_functions ;
+        words = C.words ;
+      }
+
+end

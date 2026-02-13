@@ -23,7 +23,7 @@ type diagnostic =
   | Proc_error of Typeck_procedure_diagnostics.error
   | Dialect_feature_used of
       {
-        feature: unit Cobol_config.feature;
+        feature: Cobol_common.Config.TYPES.feature;
         usage_loc: srcloc;
       }
 
@@ -65,7 +65,7 @@ let pp_diagnostic ppf = function
   | Proc_error e ->
       Typeck_procedure_diagnostics.pp_error ppf e
   | Dialect_feature_used { feature; _ } ->
-      Pretty.print ppf "%(%)@ used" feature#short
+      Pretty.print ppf "%s@ used" feature.feature_name.name
 
 let translate diagnostics =
   (* Temporary hack: reverse errors list so order of generated diagnostics

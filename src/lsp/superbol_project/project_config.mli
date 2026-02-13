@@ -20,8 +20,8 @@ module TYPES: sig
     | RelativeToFileDir of string
 
   type config = (* private *) {
-    mutable cobol_config: Cobol_config.t;
-    mutable source_format: Cobol_config.source_format_spec;
+    mutable superbol_config: Gnucobol_config.Types.t;
+    mutable source_format: Cobol_common.Config.TYPES.source_format_spec;
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
@@ -79,11 +79,11 @@ val copybook_lookup_config_for
 
 val cobol_config_from_dialect_name
   : verbose:bool -> string
-  -> Cobol_config.t Cobol_common.Diagnostics.with_diags
+  -> Gnucobol_config.t Cobol_common.Diagnostics.with_diags
 
 val cobol_source_format
   : string
-  -> Cobol_config.source_format_spec
+  -> Gnucobol_config.source_format_spec
 
 (** {1 Cached representation} *)
 
@@ -92,3 +92,4 @@ exception BAD_CHECKSUM
 type cached
 val to_cache: t -> cached
 val of_cache: config_filename:string -> cached -> t
+

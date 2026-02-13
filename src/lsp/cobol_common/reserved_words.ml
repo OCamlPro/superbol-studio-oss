@@ -13,6 +13,24 @@
 
 open EzCompat
 
+module TYPES = struct
+  type word_spec =
+    | ReserveWord of
+        {
+          preserve_context_sensitivity: bool;
+        }
+    | ReserveAlias of
+        {
+          alias_for: string;
+          preserve_context_sensitivity: bool;
+        }
+    | NotReserved
+
+  (* TODO: we should probably use a StringMap.t *)
+  type words_spec = (string * word_spec) list
+end
+open TYPES
+
 (* Please, use `Word` module to access these words *)
 
 (** The list of all default reserved words. *)
@@ -987,7 +1005,7 @@ let reserved_words =
     "ZERO-FILL"; ]
 
 let words =
-  let reserve w = w, Types.ReserveWord { preserve_context_sensitivity = true } in
+  let reserve w = w, ReserveWord { preserve_context_sensitivity = true } in
   List.rev @@ List.rev_map reserve reserved_words
 
 (** The set of all available intrinsic functions *)
@@ -1674,3 +1692,31 @@ let must_be_enabled_registers =
 (** Default registers *)
 let default_registers =
   StringSet.diff registers must_be_enabled_registers
+
+
+let not_reserved =
+  ["TERMINAL"; "EXAMINE"]
+
+let default_aliases =
+  [ "AUTO-SKIP", "AUTO";
+    "AUTOTERMINATE", "AUTO";
+    "BACKGROUND-COLOUR", "BACKGROUND-COLOR";
+    "BEEP", "BELL";
+    "BINARY-INT", "BINARY-LONG";
+    "BINARY-LONG-LONG", "BINARY-DOUBLE";
+    "CELLS", "CELL";
+    "COLOURS", "COLORS";
+    "EMPTY-CHECK", "REQUIRED";
+    "EQUALS", "EQUAL";
+    "FOREGROUND-COLOUR", "FOREGROUND-COLOR";
+    "HIGH-VALUES", "HIGH-VALUE";
+    "INITIALISE", "INITIALIZE";
+    "INITIALISED", "INITIALIZED";
+    "LENGTH-CHECK", "FULL";
+    "LOW-VALUES", "LOW-VALUE";
+    "ORGANISATION", "ORGANIZATION";
+    "PIXELS", "PIXEL";
+    "SYNCHRONISED", "SYNCHRONIZED";
+    "TIMEOUT", "TIME-OUT";
+    "ZEROES", "ZERO";
+    "ZEROS", "ZERO"]

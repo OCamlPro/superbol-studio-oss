@@ -49,12 +49,12 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "3.17.0"}
+  "superbol_config-osx" {= version}
   "pretty-osx" {= version}
   "ocplib_stuff-osx" {>= "0.4.0" & < "1.0.0"}
   "ezr_toml-osx" {= version}
   "ez_file-osx" {>= "0.3.0" & < "1.0.0"}
   "cobol_preproc-osx" {= version}
-  "cobol_config-osx" {= version}
   "cobol_common-osx" {= version}
   "odoc" {with-doc}
   "dune" {>= "3.17.0" & < "3.19.0"}

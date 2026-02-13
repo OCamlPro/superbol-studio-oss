@@ -1,6 +1,6 @@
 
 # name of package
-name = "cobol_config"
+name = "gnucobol_config"
 skeleton = "library"
 
 # version if different from project version

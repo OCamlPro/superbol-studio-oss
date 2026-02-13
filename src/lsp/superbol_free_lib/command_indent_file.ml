@@ -22,7 +22,6 @@ open Common_args
 
 let action ~numeric ~intext ~inplace ?suffix ?range
     { preproc_options = { source_format; config; _ } ; _ } files =
-  let module Config = (val config) in
 
   let f ?contents filename =
     let project = Project.for_ ~filename in
@@ -41,7 +40,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
     let edits, _ops = Cobol_indent.Main.indent
         ~source_format
         ~config:project.config.indent_config
-        ~dialect:Config.dialect
+        ~dialect:config.dialect
         ~filename
         ?output
         ?range
@@ -112,7 +111,7 @@ let action ~numeric ~intext ~inplace ?suffix ?range
 
 let generate_config () =
   let config = Cobol_indent.Config.load
-      ~source_format:(Cobol_indent.Config.source_format Cobol_config.Types.(SF SFFixed))
+      ~source_format:(Cobol_indent.Config.source_format Gnucobol_config.Types.(SF SFFixed))
       ~filename:"file.cob" in
   Cobol_indent.Config.generate ~config ".superbol-indent"
 

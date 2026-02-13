@@ -14,6 +14,7 @@
 open Cobol_data.Types
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Config.TYPES
 open Typeck_diagnostics
 
 module PIC = Cobol_data.Picture
@@ -83,13 +84,13 @@ let on_value_clause acc =
     ~f:(fun acc clause -> { acc with value = Some clause })
 
 
-let on_redefines_clause acc =
+let on_redefines_clause ~c acc =
   on_unique_clause ~clause_name:"REDEFINES" acc.redefines acc
     ~f:begin fun acc clause ->
       let acc =
         if acc != init_clauses then  (* note: hackish use of physical equality *)
           register_used_feature acc
-            ~feature:Cobol_config.Options.free_redefines_position
+            ~feature:c.features.free_redefines_position
             ~loc:~@clause
         else acc
       in
@@ -97,11 +98,11 @@ let on_redefines_clause acc =
     end
 
 
-let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
+let of_data_item ~c (data_clauses: Cobol_ptree.data_clause with_loc list) =
   List.fold_left begin fun acc { payload = clause; loc } ->
     match (clause: Cobol_ptree.data_clause) with
     | DataOccurs    o -> on_occurs_clause acc (o &@ loc)
-    | DataRedefines r -> on_redefines_clause acc (r &@ loc)
+    | DataRedefines r -> on_redefines_clause ~c acc (r &@ loc)
     | DataUsage     u -> on_usage_clause acc (u &@ loc)
     | DataPicture   p -> on_picture_clause acc p
     | DataValue     d -> on_value_clause acc (d &@ loc)

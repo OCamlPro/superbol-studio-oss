@@ -11,10 +11,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cobol_common.Diagnostics.TYPES
+open EzCompat
 
-val working_data_of_compilation_unit'
-  : Cobol_config.t
-  -> Cobol_data.OLD.PROG_ENV.t
-  -> Cobol_ptree.compilation_unit Cobol_ptree.with_loc
-  -> Cobol_data.OLD.Group.t' Cobol_ptree.with_loc list with_diags
+(** This functor is used to build a config ({! Types.T}) module from a file *)
+module Make
+    (Diags: Cobol_common.Diagnostics.STATEFUL)
+    (Conf: sig
+       include Types.CONFIG
+       val options: Conf_ast.value StringMap.t
+       val words: Cobol_common.Reserved.TYPES.words_spec
+       val intrinsic_functions: StringSet.t
+       val system_names: StringSet.t
+       val registers: StringSet.t
+     end): Types.T

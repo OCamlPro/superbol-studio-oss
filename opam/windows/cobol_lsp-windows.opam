@@ -59,7 +59,6 @@ depends: [
   "cobol_parser-windows" {= version}
   "cobol_indent-windows" {= version}
   "cobol_data-windows" {= version}
-  "cobol_config-windows" {= version}
   "cobol_common-windows" {= version}
   "cobol_cfg-windows" {= version}
   "odoc" {with-doc}

@@ -104,7 +104,7 @@ let triplewise positions =
     actually on disk nor registered via {!Srcloc.register_file_contents}. *)
 let rewindable_parse
     ?(parser_options = Prog_parser.options ())
-    ?(source_format = Cobol_config.(SF SFFixed))
+    ?(source_format = Gnucobol_config.(SF SFFixed))
     ?config
     prog
   =

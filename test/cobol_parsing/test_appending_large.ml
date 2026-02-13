@@ -30,12 +30,13 @@ let%expect_test "line-by-line-incremental-mf" =
   (* 3142 ./ReportWriter/RepWriteA.cbl *)
   (* 3087 ./Strings/UnstringFileEg.cbl *)
   (* 2413 ./SubProg/DateValid/ValiDate.cbl *)
-  let config = Testsuite_utils.from_dialect Cobol_config.DIALECT.mf_strict in
+  let config = Testsuite_utils.from_dialect Gnucobol_config.DIALECT.mf_strict in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   deep_iter mf_root ~glob:"RepWriteSumm.[cC][bB][lL]" (* <- pick largest file *)
     ~f:begin fun path ->
       let file = srcdir // mf_testsuite // path in
       Pretty.out "Considering `%s'.@." file;
-      Parser_testing.iteratively_append_chunks ~config ~f:show_last_ptree @@
+      Parser_testing.iteratively_append_chunks ~config:c ~f:show_last_ptree @@
       Parser_testing.extract_position_markers @@
       Parser_testing.insert_periodic_position_markers ~period:42 @@
       FileString.read_file file;

@@ -41,7 +41,7 @@ module type S = sig
     val add_reserved : string -> unit
     val add_alias : string -> string -> unit
     val remove_reserved : string -> unit
-    val words : unit -> (string * Types.word_spec) list
+    val words : unit -> Cobol_common.Reserved.TYPES.words_spec
   end
   module INTRINSIC: sig
     val add_intrinsic : string -> unit
@@ -65,7 +65,7 @@ module Make () : S = struct
 (** This module is used to build reserved words set and aliases map. *)
 module RESERVED = struct
 
-  let conf : Types.words_spec ref = ref []
+  let conf : Cobol_common.Reserved.TYPES.words_spec ref = ref []
   let cons s = conf := s :: !conf
 
   let categorize word =
@@ -76,18 +76,18 @@ module RESERVED = struct
   let add_reserved str =
     match kind_of_string str with
     | DialectAll ->
-        conf := List.rev_append Reserved_words.words !conf
+        conf := List.rev_append Cobol_common.Reserved.words !conf
     | Word str ->
       let w, preserve_context_sensitivity = categorize str in
-      cons (w, Types.ReserveWord { preserve_context_sensitivity })
+      cons (w, ReserveWord { preserve_context_sensitivity })
     | _ -> Pretty.failwith "Wrong DIALECT-* word" str
 
   let add_alias alias alias_for =
     let w, preserve_context_sensitivity = categorize alias in
-    cons (w, Types.ReserveAlias { preserve_context_sensitivity; alias_for })
+    cons (w, ReserveAlias { preserve_context_sensitivity; alias_for })
 
   let remove_reserved w =
-    cons (w, Types.NotReserved)
+    cons (w, NotReserved)
 
   let words () = List.rev !conf
 
@@ -95,14 +95,14 @@ end
 
 (** Module used to build the intrinsic functions set *)
 module INTRINSIC = struct
-  let intrinsic = ref Reserved_words.default_intrinsics
+  let intrinsic = ref Cobol_common.Reserved.default_intrinsics
 
   let add_intrinsic word =
     match kind_of_string word with
     | DialectAll ->
-        intrinsic := StringSet.union Reserved_words.intrinsic_functions !intrinsic
+        intrinsic := StringSet.union Cobol_common.Reserved.intrinsic_functions !intrinsic
     | Word word ->
-        if not @@ StringSet.mem word Reserved_words.intrinsic_functions then
+        if not @@ StringSet.mem word Cobol_common.Reserved.intrinsic_functions then
           FATAL.error "Unknown intrinsic function %s" word
         else
           intrinsic := StringSet.add word !intrinsic
@@ -112,7 +112,9 @@ module INTRINSIC = struct
     match kind_of_string word with
     | DialectAll ->
         intrinsic :=
-          StringSet.filter (fun v -> not @@ StringSet.mem v Reserved_words.intrinsic_functions) !intrinsic
+          StringSet.filter
+            (fun v -> not @@ StringSet.mem v
+                Cobol_common.Reserved.intrinsic_functions) !intrinsic
     | Word word ->
         intrinsic := StringSet.remove word !intrinsic
     | _ -> Pretty.failwith "Wrong DIALECT-* word" word
@@ -122,20 +124,20 @@ end
 
 (** Module used to build the system names set *)
 module SYSTEM_NAMES = struct
-  let system_names = ref Reserved_words.default_system_names
+  let system_names = ref Cobol_common.Reserved.default_system_names
 
   let add_system_name name =
     match kind_of_string name with
     | DialectAll ->
-        system_names := StringSet.union Reserved_words.system_names !system_names
+        system_names := StringSet.union Cobol_common.Reserved.system_names !system_names
     | DialectAllDevices ->
-        system_names := StringSet.union Reserved_words.device_system_names !system_names
+        system_names := StringSet.union Cobol_common.Reserved.device_system_names !system_names
     | DialectAllSwitches ->
-        system_names := StringSet.union Reserved_words.switch_system_names !system_names
+        system_names := StringSet.union Cobol_common.Reserved.switch_system_names !system_names
     | DialectAllFeatures ->
-        system_names := StringSet.union Reserved_words.feature_system_names !system_names
+        system_names := StringSet.union Cobol_common.Reserved.feature_system_names !system_names
     | Word name ->
-        if StringSet.mem name Reserved_words.system_names then
+        if StringSet.mem name Cobol_common.Reserved.system_names then
           system_names := StringSet.add name !system_names
         else
           FATAL.error "Unknown system name: %s" name
@@ -143,13 +145,13 @@ module SYSTEM_NAMES = struct
   let remove_system_name name =
     match kind_of_string name with
     | DialectAll ->
-      system_names := StringSet.diff !system_names Reserved_words.system_names
+      system_names := StringSet.diff !system_names Cobol_common.Reserved.system_names
     | DialectAllDevices ->
-      system_names := StringSet.diff !system_names Reserved_words.device_system_names
+      system_names := StringSet.diff !system_names Cobol_common.Reserved.device_system_names
     | DialectAllSwitches ->
-      system_names := StringSet.diff !system_names Reserved_words.switch_system_names
+      system_names := StringSet.diff !system_names Cobol_common.Reserved.switch_system_names
     | DialectAllFeatures ->
-      system_names := StringSet.diff !system_names Reserved_words.feature_system_names
+      system_names := StringSet.diff !system_names Cobol_common.Reserved.feature_system_names
     | Word name ->
       system_names := StringSet.remove name !system_names
 
@@ -158,14 +160,14 @@ end
 
 (** Module used to build the registers set *)
 module REGISTERS = struct
-  let registers = ref Reserved_words.default_registers
+  let registers = ref Cobol_common.Reserved.default_registers
 
   let add_register register =
     match kind_of_string register with
     | DialectAll ->
-        registers := StringSet.union !registers Reserved_words.default_registers
+        registers := StringSet.union !registers Cobol_common.Reserved.default_registers
     |  Word register ->
-        if not @@ StringSet.mem register Reserved_words.registers then
+        if not @@ StringSet.mem register Cobol_common.Reserved.registers then
           FATAL.error "Unknown register: %s" register
         else
           registers := StringSet.add register !registers
@@ -174,7 +176,7 @@ module REGISTERS = struct
   let remove_register register =
     match kind_of_string register with
     | DialectAll ->
-        registers := StringSet.diff !registers Reserved_words.default_registers
+        registers := StringSet.diff !registers Cobol_common.Reserved.default_registers
     | Word register ->
         registers := StringSet.remove register !registers
     | _ -> Pretty.failwith "Wrong DIALECT-* word %S" register

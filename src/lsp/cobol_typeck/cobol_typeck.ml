@@ -11,6 +11,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(*
 module OLD = struct
   include Old_typeck_engine
 
@@ -18,6 +19,7 @@ module OLD = struct
   module Group_builder = Old_group_builder
   module Prog_builder = Old_prog_builder
 end
+*)
 
 module Outputs = Typeck_outputs
 module Diagnostics = Typeck_diagnostics

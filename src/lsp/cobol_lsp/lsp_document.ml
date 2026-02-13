@@ -73,14 +73,16 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
     ~options:Cobol_parser.Options.{
         (default ~exec_scanners: Superbol_preprocs.exec_scanners) with
         recovery = EnableRecovery { silence_benign_recoveries = true };
-        config = project.config.cobol_config;
+        config = Gnucobol_config.COMMON_CONFIG.of_config
+            project.config.superbol_config;
       } @@
   Cobol_preproc.preprocessor
     ~options:Cobol_preproc.Options.{
         default with
         copybook_lookup_config =
           Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
-        config = project.config.cobol_config;
+        config =
+          Gnucobol_config.COMMON_CONFIG.of_config project.config.superbol_config;
         source_format = match language_id doc with
           | "COBOL_GNU_LISTFILE"
           | "COBOL_GNU_DUMPFILE" -> SF SFVariable
@@ -96,12 +98,13 @@ let no_artifacts =
                          rev_ignored = [] }
 
 let check doc ptree =
-  let config = doc.project.config.cobol_config in
+  let config = doc.project.config.superbol_config in
+  let c = Gnucobol_config.COMMON_CONFIG.of_config config in
   let Cobol_parser.Outputs.{ result = ptree, rewinder;
                              diags = parsing_diags } = ptree in
   let Cobol_typeck.Results.{ result = checked;
                              diags = typecking_diags }
-    = Cobol_typeck.compilation_group ~config
+    = Cobol_typeck.compilation_group ~c
       ~fold_exec_block':Superbol_preprocs.Esql.fold_exec_block'
       ptree in
   let artifacts = Cobol_parser.artifacts ptree in

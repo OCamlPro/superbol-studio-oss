@@ -5,4 +5,4 @@
   (pps ppx_inline_test))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries cobol_config testsuite_utils))
+ (libraries gnucobol_config testsuite_utils))

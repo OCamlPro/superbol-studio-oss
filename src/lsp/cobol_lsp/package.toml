@@ -55,7 +55,6 @@ skip = ["index.mld", "main.ml"]
 [dependencies]
 cobol_cfg = "version"
 cobol_common = "version"
-cobol_config = "version"
 cobol_data = "version"
 cobol_indent = "version"
 cobol_parser = "version"

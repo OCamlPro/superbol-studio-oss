@@ -40,7 +40,7 @@ val punct_of_token : (Grammar_tokens.token, string) Hashtbl.t
 
 val create: unit -> lexer
 val handle_of_token: lexer -> Grammar_tokens.token -> keyword_handle
-val reserve_words: lexer -> Cobol_config.words_spec -> unit
+val reserve_words: lexer -> Cobol_common.Reserved.TYPES.words_spec -> unit
 val intrinsic_handles: lexer -> string list -> IntrinsicHandles.t
 
 val token_of_intrinsic: string -> Grammar_tokens.token

@@ -16,12 +16,12 @@
 module DIAGS = Cobol_common.Diagnostics
 
 let compilation_group
-    (type m) : ?config: _ ->
+    (type m) : c:Cobol_common.Config.TYPES.cobol_config ->
   fold_exec_block': Typeck_outputs.fold_exec_block' ->
   m Cobol_parser.Outputs.parsed_compilation_group -> _
-  = fun ?(config = Cobol_config.default) ~fold_exec_block' ->
+  = fun ~c ~fold_exec_block' ->
     function
     | Only None | WithArtifacts (None, _) ->
       Typeck_results.simple_result Typeck_outputs.none
     | Only Some cg | WithArtifacts (Some cg, _) ->
-      Typeck_units.of_compilation_group config ~fold_exec_block' cg
+      Typeck_units.of_compilation_group ~fold_exec_block' ~c cg
