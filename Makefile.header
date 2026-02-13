@@ -15,6 +15,8 @@ JS_TARGETS = $(addprefix $(JS_OUTDIR)/,superbol-vscode-platform-bundle.js	\
 # (could be a submodule)
 LSP_MODE_SRCDIR ?= ../lsp-mode
 
+AUTOFONCE_EXE = dune exec -- vendors/autofonce/src/autofonce/main.exe
+
 # ---
 
 include Makefile.vsix-rules
@@ -75,13 +77,14 @@ test-promote: test-syntax-promote
 
 .PHONY: test-syntax
 test-syntax: superbol-lsp-server
-	cp -f ${DUNE_BUILD_DEFAULT}/vendors/autofonce/src/autofonce/main.exe autofonce.exe
-	\! opam exec -- ./autofonce.exe 2>/dev/null || opam exec -- ./autofonce.exe run -t syntax
+	\! opam exec -- $(AUTOFONCE_EXE) 2>/dev/null || \
+	   opam exec -- $(AUTOFONCE_EXE) run -t syntax
 
 .PHONY: test-syntax-promote
 test-syntax-promote:
 	-$(MAKE) test-syntax	# To avoid promoting past tests
-	\! opam exec -- ./autofonce.exe 2>/dev/null || opam exec -- ./autofonce.exe promote -t syntax --apply
+	\! opam exec -- $(AUTOFONCE_EXE) 2>/dev/null || \
+	   opam exec -- $(AUTOFONCE_EXE) promote -t syntax --apply
 
 MASTER_REMOTE ?= origin
 
