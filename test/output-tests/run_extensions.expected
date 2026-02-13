@@ -2905,9 +2905,9 @@ Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:5945:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6033:0
 Considering: import/gnucobol/tests/testsuite.src/run_extensions.at:6105:0
 run_extensions.at-6105-prog.cob:15.42-15.50:
-  12         *>   
+  12         *>
   13              MOVE 0  TO W01-INDEX.
-  14              INSPECT W01-STRING 
+  14              INSPECT W01-STRING
   15 >                    TALLYING W01-INDEX FOR TRAILING SPACE.
 ----                                             ^^^^^^^^
   16              IF W01-INDEX NOT = 10
@@ -2916,19 +2916,19 @@ run_extensions.at-6105-prog.cob:15.42-15.50:
 
 run_extensions.at-6105-prog.cob:21.40-21.48:
   18                  DISPLAY 'Bad Result for Inspect Trailing Case 1'
-  19              END-IF. 
+  19              END-IF.
   20         *>
-  21 >            INSPECT W01-STRING REPLACING TRAILING SPACE BY 'A'. 
+  21 >            INSPECT W01-STRING REPLACING TRAILING SPACE BY 'A'.
 ----                                           ^^^^^^^^
-  22              IF W01-STRING NOT = '0123456789AAAAAAAAAA' 
+  22              IF W01-STRING NOT = '0123456789AAAAAAAAAA'
   23              THEN
 >> Error: Invalid syntax
 
 run_extensions.at-6105-prog.cob:29.42-29.50:
   26         *>
   27              MOVE 0  TO W01-INDEX.
-  28              INSPECT W01-STRING 
-  29 >                    TALLYING W01-INDEX FOR TRAILING SPACE  
+  28              INSPECT W01-STRING
+  29 >                    TALLYING W01-INDEX FOR TRAILING SPACE
 ----                                             ^^^^^^^^
   30                      REPLACING TRAILING 'A' BY 'B'.
   31         *>
@@ -2936,12 +2936,12 @@ run_extensions.at-6105-prog.cob:29.42-29.50:
 
 run_extensions.at-6105-prog.cob:30.29-30.37:
   27              MOVE 0  TO W01-INDEX.
-  28              INSPECT W01-STRING 
-  29                      TALLYING W01-INDEX FOR TRAILING SPACE  
+  28              INSPECT W01-STRING
+  29                      TALLYING W01-INDEX FOR TRAILING SPACE
   30 >                    REPLACING TRAILING 'A' BY 'B'.
 ----                                ^^^^^^^^
   31         *>
-  32              IF     W01-STRING NOT = '0123456789BBBBBBBBBB' 
+  32              IF     W01-STRING NOT = '0123456789BBBBBBBBBB'
 >> Error: Invalid syntax
 
 run_extensions.at-6105-prog.cob:40.42-40.50:

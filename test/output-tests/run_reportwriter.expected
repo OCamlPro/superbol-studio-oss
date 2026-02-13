@@ -110,7 +110,7 @@ run_reportwriter.at-3704-prog.cob:72.30-72.36:
   71                   10  COLUMN 51    PIC X(5) VALUE '  "  '
   72 >                               ABSENT AFTER PAGE OR ADVISOR.
 ----                                 ^^^^^^
-  73                   10  COLUMN 60    PIC X(20) SOURCE ADVISOR 
+  73                   10  COLUMN 60    PIC X(20) SOURCE ADVISOR
   74                                          GROUP INDICATE.
 >> Error: Invalid syntax
 
@@ -121,28 +121,28 @@ Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4406:0
 run_reportwriter.at-4406-progl.cob:23.18:
   20   
   21          REPORT SECTION.
-  22          RD  RP 
+  22          RD  RP
   23 >            CODE IS "Hi-Q: " *> literal
 ----                     ^
-  24              PAGE LIMIT 10 LINES 
+  24              PAGE LIMIT 10 LINES
   25                         50 COLUMNS *> literal
 >> Hint: Missing <identifier>
 
 run_reportwriter.at-4406-progl.cob:23.19-23.27:
   20   
   21          REPORT SECTION.
-  22          RD  RP 
+  22          RD  RP
   23 >            CODE IS "Hi-Q: " *> literal
 ----                      ^^^^^^^^
-  24              PAGE LIMIT 10 LINES 
+  24              PAGE LIMIT 10 LINES
   25                         50 COLUMNS *> literal
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4311:0
 run_reportwriter.at-4311-progv.cob:27.22-27.28:
-  24          RD  RP 
+  24          RD  RP
   25              CODE IS MYCODE *> variable
-  26              PAGE LIMIT 10 LINES 
+  26              PAGE LIMIT 10 LINES
   27 >                       MAXCOL COLUMNS *> variable
 ----                         ^^^^^^
   28              HEADING 1
@@ -153,20 +153,20 @@ Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4554:0
 run_reportwriter.at-4554-prog.cob:35.18:
   32   
   33          REPORT SECTION.
-  34          RD  RP 
+  34          RD  RP
   35 >            CODE IS "Hi-Q: "
 ----                     ^
-  36              PAGE LIMIT 10 LINES 
+  36              PAGE LIMIT 10 LINES
   37                         50 COLUMNS
 >> Hint: Missing <identifier>
 
 run_reportwriter.at-4554-prog.cob:35.19-35.27:
   32   
   33          REPORT SECTION.
-  34          RD  RP 
+  34          RD  RP
   35 >            CODE IS "Hi-Q: "
 ----                      ^^^^^^^^
-  36              PAGE LIMIT 10 LINES 
+  36              PAGE LIMIT 10 LINES
   37                         50 COLUMNS
 >> Error: Invalid syntax
 
@@ -176,8 +176,8 @@ Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:4744:0
 Considering: import/gnucobol/tests/testsuite.src/run_reportwriter.at:5050:0
 run_reportwriter.at-5050-prog.cob:122.43:
  119                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
- 120          
- 121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH 
+ 120   
+ 121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH
  122 >                                  NEXT GROUP NEXT PAGE.
 ----                                              ^
  123             03  LINE NUMBER IS PLUS 2.
@@ -186,8 +186,8 @@ run_reportwriter.at-5050-prog.cob:122.43:
 
 run_reportwriter.at-5050-prog.cob:122.44-122.53:
  119                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
- 120          
- 121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH 
+ 120   
+ 121          01 RPTA-BRANCH-FOOTING TYPE CONTROL FOOTING TEMP-BRANCH
  122 >                                  NEXT GROUP NEXT PAGE.
 ----                                               ^^^^^^^^^
  123             03  LINE NUMBER IS PLUS 2.
@@ -196,8 +196,8 @@ run_reportwriter.at-5050-prog.cob:122.44-122.53:
 
 run_reportwriter.at-5050-prog.cob:129.43:
  126                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
- 127          
- 128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION 
+ 127   
+ 128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION
  129 >                                  NEXT GROUP NEXT PAGE.
 ----                                              ^
  130             03  LINE NUMBER IS PLUS 2.
@@ -206,8 +206,8 @@ run_reportwriter.at-5050-prog.cob:129.43:
 
 run_reportwriter.at-5050-prog.cob:129.44-129.53:
  126                05 COLUMN 113        PIC ZZZZZZZ9.99 SUM TEMP-COST.
- 127          
- 128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION 
+ 127   
+ 128          01 RPTA-REGION-FOOTING TYPE CONTROL FOOTING TEMP-REGION
  129 >                                  NEXT GROUP NEXT PAGE.
 ----                                               ^^^^^^^^^
  130             03  LINE NUMBER IS PLUS 2.

@@ -9,3 +9,6 @@
 	path = import/superbol-vscode-debug
 	url = https://github.com/OCamlPro/superbol-vscode-debug.git
 	branch = superbol-vscode-debug
+[submodule "vendors/autofonce"]
+	path = vendors/autofonce
+	url = https://github.com/OCamlPro/autofonce

@@ -1,5 +1,5 @@
 [project]
-drom-version = "0.1"
+drom-version = "0.9.3"
 share-repo = "https://github.com/OCamlPro/drom-share"
 share-version = "0.9.2"
 
@@ -30,7 +30,7 @@ bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 description = """SuperBOL Studio OSS is a new platform for COBOL"""
 
 [project]
-skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "sphinx/index.rst", "sphinx/install.rst"]
+skip = ["@test", "@ocamlformat", "@ocp-indent", "README.md", "LICENSE.md", "CHANGES.md", "sphinx/index.rst", "sphinx/install.rst"]
 
 # project-wide library dependencies (not for package-specific deps)
 [dependencies]
@@ -79,6 +79,7 @@ dot-gitignore-trailer = """
 /yarn-error.log
 /yarn.lock
 /package-json
+/package.json.prev
 /gnucobol-config
 ATTIC
 /out
@@ -88,11 +89,13 @@ ATTIC
 *.opam.locked
 /emacs/lsp-superbol-customs.el
 """
-github-workflow-before-build = """
+github-workflow-before-opam = """
       - run: git submodule init
 
       - run: git submodule update
+"""
 
+github-workflow-before-build = """
       - uses: actions/setup-node@v4
         with:
           node-version: '>=16'

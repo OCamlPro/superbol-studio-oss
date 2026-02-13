@@ -74,38 +74,48 @@ AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.c
 AT_CLEANUP
 
 AT_SETUP([MF NO PROGRAM-ID])
+
 # promoted on 2024-04-05T13:38
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
        display "Hello, COBOL World!"
 ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+[Checking `prog.cob'
 prog.cob:2.7-2.14:
-   1   
+   1   @&t@
    2 >        display "Hello, COBOL World!"
 ----          ^^^^^^^
 >> Error: Invalid syntax
 
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 
 
 
 AT_SETUP([MF NO PROGRAM-ID])
+
 # promoted on 2024-04-05T13:38
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
        display "Hello, COBOL World!"
 ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+[Checking `prog.cob'
 prog.cob:2.7-2.14:
-   1   
+   1   @&t@
    2 >        display "Hello, COBOL World!"
 ----          ^^^^^^^
 >> Error: Invalid syntax
 
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 
@@ -418,8 +428,9 @@ AT_CLEANUP
 
 
 AT_SETUP([MF OBJECT ORIENTED EXAMPLE])
+
 # promoted on 2024-04-05T13:38
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
       *
       * Implements a calendar editor column for use in the data grid
       *
@@ -655,41 +666,50 @@ AT_DATA([prog.cob],[
 
        end class.
 ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+[Checking `prog.cob'
 prog.cob:6.16-6.33:
    3         * Implements a calendar editor column for use in the data grid
    4         *
    5         *
    6 >        class-id OrderFormsLibrary.CalendarColumn inherits type DataGridViewColumn.
 ----                   ^^^^^^^^^^^^^^^^^
-   7   
+   7   @&t@
    8          working-storage section.
 >> Error: Invalid syntax
 
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 
 
 AT_SETUP([MF AND85 DIRECTIVE])
+
 # promoted on 2024-04-05T13:38
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
       $SET ans85
        IDENTIFICATION DIVISION.
        PROGRAM-ID. customer.
 ])
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1], [Checking `prog.cob'
+
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+[Checking `prog.cob'
 prog.cob:2.6-2.16:
-   1   
+   1   @&t@
    2 >       $SET ans85
 ----         ^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. customer.
 >> Error: Malformed compiler directive
 
-], [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 
@@ -822,6 +842,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -836,6 +858,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -850,6 +874,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -859,15 +885,21 @@ AT_CLEANUP
 
 
 AT_SETUP([CANCEL ... AS ...])
+
 # Note: this program's semantics makes no sense; it is used to test
 # proper parsing of `AS` in object views.
-AT_DATA([prog.cob],[
+AT_DATA([prog.cob], [
 program-id. prog.
 procedure division.
     cancel a as universal.
 ])
-AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [0], [Checking `prog.cob'
+
+AT_CHECK([$SUPERBOL check syntax --recovery=false --std=default prog.cob], [0],
+[Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
+
 AT_CLEANUP
 
 
@@ -893,7 +925,10 @@ AT_DATA([prog.cob], [
            STOP RUN.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0], [Checking `prog.cob'
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf --source-format=xcard prog.cob], [0],
+[Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -910,6 +945,8 @@ program-id.             acas-get-params.
 
 AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -926,6 +963,8 @@ program-id.             acas-get-params.
 
 AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -942,6 +981,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -958,6 +999,8 @@ program-id.             acas-get-params.
 
 AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -976,6 +1019,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -997,6 +1042,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -1014,6 +1061,8 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP
@@ -1038,6 +1087,8 @@ file-control.
 
 AT_CHECK([$SUPERBOL check --recovery=false --free --std=mf prog.cob], [0],
 [Checking `prog.cob'
+],
+[SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.
 ])
 
 AT_CLEANUP

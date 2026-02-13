@@ -13,6 +13,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "Virtual package that depends on both the VSCode extension and the LSP server.")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (superbol-vscode-platform (= :version))
@@ -27,6 +31,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (vscode-languageclient-js-stubs (= :version))
@@ -46,6 +54,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (superbol-vscode-lib (= :version))
@@ -60,6 +72,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
@@ -77,6 +93,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and (>= 0.3.1) (< 1.0.0)))
@@ -96,6 +116,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (promise_jsoo (and ( >= 0.3.1 )( < 0.4 )))
@@ -116,6 +140,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (vscode-js-stubs (= :version))
@@ -138,6 +166,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppx_deriving_encoding (and (>= 0.3.0) (< 1.0.0)))
@@ -154,6 +186,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (vscode-debugprotocol (= :version))
@@ -174,6 +210,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (js_of_ocaml ( >= 4 ))
@@ -192,6 +232,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (superbol_free_lib (= :version))
@@ -205,6 +249,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (vscode-json (= :version))
@@ -230,6 +278,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (sql_parser (= :version))
@@ -248,6 +300,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
@@ -267,6 +323,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
@@ -282,6 +342,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (menhir ( >= 1.2 ))
@@ -302,6 +366,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (cobol_common (= :version))
@@ -316,6 +384,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    odoc
@@ -328,6 +400,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (toml (and (>= 7.1.0) (< 8.0.0)))
@@ -353,6 +429,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppxlib ( >= 0.15 ))
@@ -366,6 +446,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
@@ -380,6 +464,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
@@ -396,6 +484,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
@@ -410,6 +502,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (fmt ( >= 0.9 ))
@@ -425,6 +521,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ppx_import ( >= 1 ))
@@ -443,6 +543,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (zarith_stubs_js ( >= 0.17 ))
@@ -461,6 +565,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (cobol_unit (= :version))
@@ -479,6 +587,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (cobol_ptree (= :version))
@@ -496,6 +608,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    ocplib_stuff
@@ -512,6 +628,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
@@ -528,6 +648,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (superbol_preprocs (= :version))
@@ -546,6 +670,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (pretty (= :version))
@@ -562,6 +690,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (sql_ast (= :version))
@@ -583,6 +715,10 @@
  (synopsis "SuperBOL Studio OSS Project")
  (description "SuperBOL Studio OSS is a new platform for COBOL")
  
+  (sites
+    
+  )
+
  (depends
    (ocaml (>= 4.14.0))
    (ocamlgraph (and (>= 2.1.0) (< 3.0.0)))

@@ -23,6 +23,7 @@ _build
 /yarn-error.log
 /yarn.lock
 /package-json
+/package.json.prev
 /gnucobol-config
 ATTIC
 /out

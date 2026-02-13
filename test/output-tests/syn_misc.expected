@@ -2425,12 +2425,12 @@ syn_misc.at-7197-prog.cob:21.6-21.21:
   21 >       $DISPLAY BROKEN
 ----         ^^^^^^^^^^^^^^^
   22         $END
-  23         
+  23   
 >> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7197-prog.cob:25.6-25.28:
   22         $END
-  23         
+  23   
   24         $IF X > Y
   25 >       $DISPLAY correct X > Y
 ----         ^^^^^^^^^^^^^^^^^^^^^^
@@ -2638,7 +2638,7 @@ syn_misc.at-7454-prog.cob:63.43:
   63 >                                        WHEN IN-TYPE = 8.
 ----                                              ^
   64      *>exceptional cases can be specified using PRESENT WHEN
-  65               05  IN-CODE                PIC AX(3)9(4) 
+  65               05  IN-CODE                PIC AX(3)9(4)
 >> Hint: Missing FALSE
 
 syn_misc.at-7454-prog.cob:63.44-63.51:
@@ -2648,12 +2648,12 @@ syn_misc.at-7454-prog.cob:63.44-63.51:
   63 >                                        WHEN IN-TYPE = 8.
 ----                                               ^^^^^^^
   64      *>exceptional cases can be specified using PRESENT WHEN
-  65               05  IN-CODE                PIC AX(3)9(4) 
+  65               05  IN-CODE                PIC AX(3)9(4)
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7561:0
 syn_misc.at-7561-prog.cob:79.45-79.47:
-  76          01  x-rms.                  
+  76          01  x-rms.
   77              05  x-rms-a             pic x(01) value space.
   78          01 filler redefines x-rms   pic x(01).
   79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
@@ -2663,7 +2663,7 @@ syn_misc.at-7561-prog.cob:79.45-79.47:
 >> Error: Invalid syntax
 
 syn_misc.at-7561-prog.cob:79.61-79.63:
-  76          01  x-rms.                  
+  76          01  x-rms.
   77              05  x-rms-a             pic x(01) value space.
   78          01 filler redefines x-rms   pic x(01).
   79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
