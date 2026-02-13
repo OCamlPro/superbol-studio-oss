@@ -278,28 +278,12 @@ let compilation_group :=
 let simple_program := 
   | opo = ro(loc(options_paragraph));
     edo = ro(loc(environment_division));
-    ddo = ro(loc(ne_data_division));
+    ddo = ro(loc(non_empty_data_division));
     pd = loc(program_procedure_division);
     { { control_division = None;
         compilation_units =
-            [((Program {
-              program_name =
-                  (Name ("" &@ dummy_loc)) &@ dummy_loc; (* TODO: Use filename *)
-              program_as = None;
-              program_level = ProgramDefinition {
-                  mode = None;
-                  has_identification_division_header = false;
-                  preliminary_informational_paragraphs = [];
-                  supplementary_informational_paragraphs = [];
-                  nested_programs = []; };
-              program_options = opo;
-              program_env = edo;
-              program_data = (match ddo with
-                | Some dd -> build_data_division dd
-                | None -> None);
-              program_proc = Some pd;
-              program_end_name = None;
-            }): compilation_unit) &@<- pd] } }
+          [ with_loc (build_simple_program opo edo ddo pd) $sloc ];
+      } }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -1189,7 +1173,7 @@ type declaration entry =
 
 *)
 
-let ne_data_division :=
+let non_empty_data_division :=
   | l1 = rnel(data_division_sentence_1);
     l2 = rll_rev(data_division_sentence_2);
     { List.rev_append l1 l2 }

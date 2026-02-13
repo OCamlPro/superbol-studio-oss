@@ -31,3 +31,9 @@ type data_division_sentence =
 (* Takes a *reversed* list of sentences. *)
 val build_data_division: data_division_sentence list with_loc ->
   data_division with_loc option
+
+val build_simple_program: Cobol_ptree.options_paragraph with_loc option ->
+  environment_division with_loc option ->
+  data_division_sentence list with_loc option ->
+  procedure_division with_loc ->
+  compilation_unit
