@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-63287a4a0e5a27be98f57a4624109a4d:.
+43a91e0b1f783ca5bf516b0076675adc:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,13 +15,8 @@ version:0.9.0
 
 # begin context for .gitignore
 # file .gitignore
-38f28a9baf11ccf9dd74b68dd8c37d97:.gitignore
+4f235cace0086f589f670358bf17e04a:.gitignore
 # end context for .gitignore
-
-# begin context for CHANGES.md
-# file CHANGES.md
-191d0e7391982aeb2ee3f0c0dafabd3c:CHANGES.md
-# end context for CHANGES.md
 
 # begin context for LICENSE.md
 # file LICENSE.md
@@ -30,7 +25,7 @@ version:0.9.0
 
 # begin context for Makefile
 # file Makefile
-30d821dbc89595f1a137946def6f1be9:Makefile
+35bc54454e7958e952e11a1284bab4ca:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -80,8 +75,7 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 
 # begin context for dune-project
 # file dune-project
-c4ee603ce4a62e1a164e2655fac46a9e:dune-project
-9216610dfc736fdf0d437fe8ca3a42e5:dune-project
+bce13d92ef8319070a816fd5716bdb96:dune-project
 # end context for dune-project
 
 # begin context for opam/cobol_cfg.opam
@@ -566,7 +560,7 @@ b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
 
 # begin context for src/vendor/ez_toml/dune
 # file src/vendor/ez_toml/dune
-0778f52cc1225df698a5fcd42310b6ff:src/vendor/ez_toml/dune
+5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
 # end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld

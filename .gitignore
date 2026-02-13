@@ -18,11 +18,13 @@ _build
 .drom.config
 # Edit drom.toml to change the following lines
 /superbol-free-*
+/autofonce.exe
 /_*
 /node_modules
 /yarn-error.log
 /yarn.lock
 /package-json
+/package.json.prev
 /gnucobol-config
 ATTIC
 /out
