@@ -15,6 +15,7 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Preproc_outputs.TYPES
 open Preproc_options
+module LIST = Cobol_common.Basics.LIST
 
 module OUT = Preproc_outputs
 module ENV = Preproc_env
@@ -186,7 +187,7 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
   | reader, ([{ payload = Eof; loc }] as eof) ->
       let context, diags = Preproc_logic.flush_contexts ~loc lp.context in
       let lp = add_diags { lp with context } diags in
-      let text, pplog = apply_active_replacing_full lp (buff @ eof) in
+      let text, pplog = apply_active_replacing_full lp (LIST.append ~loc:__LOC__ buff eof) in
       text, { lp with reader; pplog; buff = [] }
   | reader, text ->
       if show `Src lp then
@@ -197,7 +198,7 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           let rev_ignored = List.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
       | Ok None ->
-          preprocess_line { lp with reader; buff = [] } (buff @ text)
+          preprocess_line { lp with reader; buff = [] } (LIST.append ~loc:__LOC__ buff text)
       | Ok Some ([], compdir, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
           next_chunk (apply_compiler_directive lp compdir)
@@ -207,14 +208,14 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
       | Ok Some (text, compdir, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
+          preprocess_line (apply_compiler_directive lp compdir) (LIST.append ~loc:__LOC__ buff text)
       | Error (text, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
           next_chunk lp                                        (* ignore text *)
       | Error (text, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp (buff @ text)
+          preprocess_line lp (LIST.append ~loc:__LOC__ buff text)
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
@@ -355,7 +356,7 @@ and do_copy lp rev_prefix copy suffix =
   in
   let lp = with_pplog lp pplog in
   (* eprintf "Library text: %a@." pp_text libtext; *)
-  let text = List.rev_append rev_prefix libtext @ suffix in
+  let text = LIST.append ~loc:__LOC__ ( List.rev_append rev_prefix libtext ) suffix in
   `CopyDone (lp, text)
 
 
@@ -375,7 +376,7 @@ and do_replace lp rev_prefix repl suffix =
     | CDirReplace { replacing = repl; also = false }, replacing ->
         with_replacing lp (repl :: replacing)
     | CDirReplace { replacing = repl; also = true }, (r :: _ as replacing) ->
-        with_replacing lp ((repl @ r) :: replacing)
+        with_replacing lp ((LIST.append ~loc:__LOC__ repl r) :: replacing)
     | CDirReplaceOff _, []
     | CDirReplaceOff { last = false }, _ ->
         with_replacing lp []

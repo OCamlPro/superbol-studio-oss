@@ -273,7 +273,9 @@ let pop_context ({ preproc = { tokzr; _ }; _ } as ps) tokens =
 let on_shift ps tokens e1 e2 =
   let ps, tokens =
     if leaving_context_on_shift ps e1 e2
-    then pop_context ps tokens
+    then begin
+      pop_context ps tokens
+    end
     else ps, tokens
   in
   let tokzr, tokens =
@@ -285,7 +287,9 @@ let on_shift ps tokens e1 e2 =
 
 let on_reduction ps tokens prod =
   if leaving_context_on_reduction ps prod
-  then pop_context ps tokens
+  then begin
+    pop_context ps tokens
+  end
   else ps, tokens
 
 (* --- *)

@@ -15,6 +15,7 @@ open Cobol_common.Srcloc.TYPES
 open Text.TYPES
 
 module NEL = Cobol_common.Basics.NEL
+module LIST = Cobol_common.Basics.LIST
 
 type state =
   | AllowAll
@@ -95,7 +96,7 @@ let find_phrase first_word ?(prefix = `Same) text : _ result =
 let find_full_phrase all_words
     ?(prefix = `Same) ?(search_deep = false) ?(try_hard = false)
   : text -> _ result =
-  let all_words = all_words @ ["."] in
+  let all_words = LIST.append ~loc:__LOC__ all_words ["."] in
   let split_at_first = Cobol_common.Basics.LIST.split_at_first in
   let split_before_word first_word =
     split_at_first ~prefix ~where:`Before (Text.textword_eqp ~eq:first_word)
@@ -136,9 +137,9 @@ let find_full_phrase all_words
             | Error _ as e, _ ->
                 e
             | Ok phrase, `Same ->
-                Ok { phrase with prefix = prefix_text @ phrase.prefix }
+                Ok { phrase with prefix = LIST.append ~loc:__LOC__ prefix_text phrase.prefix }
             | Ok phrase, `Rev ->
-                Ok { phrase with prefix = phrase.prefix @ prefix_text }
+                Ok { phrase with prefix = LIST.append ~loc:__LOC__ phrase.prefix prefix_text }
   in
   if search_deep
   then try_from

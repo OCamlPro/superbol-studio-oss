@@ -14,6 +14,8 @@
 open EzCompat
 
 open Cobol_common.Srcloc.INFIX
+(* open Cobol_common.Reserved.TYPES *)
+module LIST = Cobol_common.Basics.LIST
 
 module TYPES = struct
 
@@ -59,8 +61,13 @@ module TokenHandles = struct
         type t = keyword_handle
         let compare t1 t2 = Stdlib.compare t1.token t2.token
       end)
-  let mem_text_token token =
-    mem { token; enabled = false; reserved = false }
+  let mem_text_token token set =
+    mem { token; enabled = false; reserved = false } set
+  let union_ set ~normalize:tokens =
+    union set (map (fun k ->
+        let token = k.token in
+        { token; enabled = false; reserved = false }
+      ) tokens)
 end
 
 module IntrinsicHandles =
@@ -81,24 +88,29 @@ let __token_of_intrinsic = Hashtbl.create 116  (* all intrinsic function name *)
 
 (** Raises {!Not_found} if the token is neither a keyword nor a
     punctuation. *)
-let show_token t =
+let string_of_token t =
   try Hashtbl.find word_of_token t
-  with Not_found -> Hashtbl.find punct_of_token t
+  with Not_found ->
+  try
+    Hashtbl.find punct_of_token t
+  with Not_found ->
+    Grammar_printer.print_token t
 
 let token_of_handle h = h.token
 
 (** Never raises {!Not_found}. *)
-let show_token_of_handle h =
-  show_token @@ token_of_handle h
+let string_of_keyword_handle h =
+  string_of_token @@ token_of_handle h
 
 let pp_tokens_via_handles ppf toks =
   Pretty.list ~fopen:"{@[" ~fclose:"@]}" ~fempty:"{}" begin fun ppf h ->
-    Pretty.string ppf (show_token_of_handle h)
+    Pretty.string ppf (string_of_keyword_handle h)
   end ppf (TokenHandles.elements toks)
 
 let reserve_as_keyword   h = h.reserved <- true
 let unreserve_keyword    h = h.reserved <- false
-let enable_keyword       h = h.enabled <- true
+let enable_keyword       h =
+  h.enabled <- true
 let disable_keyword      h = h.enabled <- false
 
 let enable_keywords tokens =
@@ -272,7 +284,7 @@ let read_tokens lexer state w =
     let append ?(expect_picture_string = expect_picture_string) x =
       let expect_picture_string = expect_picture_string || x = PICTURE in
       let xloc, loc = split_loc loc @@ lexbuf.Lexing.lex_curr_pos - start_pos in
-      aux ~loc ((x &@ xloc) :: acc) ~expect_picture_string
+      aux ~loc ~expect_picture_string ((x &@ xloc) :: acc)
     in
     let decimal_sep w c d e =
       let head, head_len, loc =
@@ -288,7 +300,8 @@ let read_tokens lexer state w =
       let sloc, loc = split_loc loc 1 in
       let tail_len = lexbuf.Lexing.lex_curr_pos - start_pos - 1 - head_len in
       let tail_loc, loc = split_loc loc tail_len in
-      aux ~loc ([tail &@ tail_loc; INTERVENING_ c &@ sloc] @ head @ acc)
+      aux ~loc (LIST.append ~loc:__LOC__ [tail &@ tail_loc; INTERVENING_ c &@ sloc]
+                  (LIST.append ~loc:__LOC__ head acc))
         ~expect_picture_string
     in
     if not expect_picture_string

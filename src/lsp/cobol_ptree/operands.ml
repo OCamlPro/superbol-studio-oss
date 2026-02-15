@@ -14,6 +14,8 @@
 open Common
 open Terms
 
+module LIST = Cobol_common.Basics.LIST
+
 (* Used in ENVIRONMENT, and SORT/MERGE statements *)
 
 type alphabet_specification =                      (* At least one is required *)
@@ -282,7 +284,7 @@ let pp_divide_operands ppf = function
     let pair = if into then divisor, dividend else dividend, divisor in
     pp_arithmetic_operands ~sep:(if into then "INTO" else "BY")
       pp_scalar pp_scalar
-      ppf (pair, pp_giving giving @ pp_remainder_opt remainder)
+      ppf (pair, LIST.append ~loc:__LOC__ (pp_giving giving) (pp_remainder_opt remainder))
 
 
 (* EVALUATE *)

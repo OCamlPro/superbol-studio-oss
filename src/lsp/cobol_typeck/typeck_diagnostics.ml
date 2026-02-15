@@ -14,6 +14,7 @@
 open Cobol_common.Srcloc.TYPES
 
 module DIAGS = Cobol_common.Diagnostics
+module LIST = Cobol_common.Basics.LIST
 
 (** more general diagnostics *)
 type diagnostic =
@@ -30,7 +31,7 @@ type diagnostic =
 type diagnostics = diagnostic list
 type t = diagnostics
 let none: diagnostics = []
-let union d1 d2 = d2 @ d1
+let union d1 d2 = LIST.append ~loc:__LOC__ d2 d1
 
 let diagnostic_severity = function
   | Config_error _

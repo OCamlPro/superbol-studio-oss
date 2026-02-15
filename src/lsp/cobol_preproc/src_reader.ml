@@ -204,11 +204,11 @@ let fold_lines
         (fun tok -> loc_lnum tok > cur_lnum) chunk
     with
     | Error () ->                                    (* still on the same line *)
-        (acc, cur_lnum, cur_prefix @ chunk)
+        (acc, cur_lnum, LIST.append ~loc:__LOC__ cur_prefix chunk)
     | Ok (prefix, []) ->           (* should not happen (in case, just append) *)
-        (acc, cur_lnum, cur_prefix @ prefix)
+        (acc, cur_lnum, LIST.append ~loc:__LOC__ cur_prefix prefix)
     | Ok (prefix, (tok :: _ as suffix)) ->                (* terminating a line *)
-        let acc = f cur_lnum (cur_prefix @ prefix) acc in
+        let acc = f cur_lnum (LIST.append ~loc:__LOC__ cur_prefix prefix) acc in
         let new_lnum = loc_lnum tok in
         let acc = spit_empty_lines ~until_lnum:new_lnum (succ cur_lnum) acc in
         spit_chunk suffix (acc, new_lnum, [])

@@ -13,6 +13,7 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+module LIST = Cobol_common.Basics.LIST
 
 type qualrefmap = srcloc list Cobol_unit.Qual.MAP.t
 type references_in_unit =
@@ -82,7 +83,7 @@ let none: t =
   }
 
 let merge_qualrefmaps: qualrefmap -> qualrefmap -> qualrefmap =
-  Cobol_unit.Qual.MAP.union (fun _ a b -> Some (b @ a))   (* keep reversed order *)
+  Cobol_unit.Qual.MAP.union (fun _ a b -> Some (LIST.append ~loc:__LOC__ b a))   (* keep reversed order *)
 
 let register_qualref qn ~loc refs =
   Cobol_unit.Qual.MAP.update qn
