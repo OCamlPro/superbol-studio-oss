@@ -104,7 +104,8 @@ let test_conditions =
        OR; DIGITS "2"]                       ((ae ==. one) ||. (ae ==. two));
     chk "A = 1 OR 2 OR 2 = B"
       [a; EQ; DIGITS "1"; OR;
-       DIGITS "2"; OR; DIGITS "2"; EQ; b]    (((ae ==. one) ||. (ae ==. two)) ||. (two ==. be));
+       DIGITS "2"; OR; DIGITS "2"; EQ; b]    (((ae ==. one) ||. (ae ==. two)) ||.
+                                              (two ==. be));
     chk "A = 1 OR 1 + 1 OR 1 + 1 = B"
       [a; EQ; DIGITS "1";
        OR; DIGITS "1"; PLUS_SIGN; DIGITS "1";

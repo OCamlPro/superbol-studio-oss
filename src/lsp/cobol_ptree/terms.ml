@@ -1067,7 +1067,8 @@ module FMT = struct
           not_ pos (pp_cond ~pos:true) a pp_logop o (pp_cond ~pos:true) b
 
   and pp_abbrev_combined_relation ppf (neg, e, a) =
-    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expression e pp_abbrev_relation_operand a
+    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expression e 
+      pp_abbrev_relation_operand a
 
   and pp_abbrev_relation_operand ppf = function
     | AbbrevRelOp (o, a) ->
