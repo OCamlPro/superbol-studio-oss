@@ -11,6 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val expand_tabs: ?tab_stop:int -> ?starting_col:int -> string -> string
+
+(** -- *)
+
 type 'k state
 
 val init_state: 'k Src_format.source_format -> 'k state

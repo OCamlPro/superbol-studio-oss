@@ -146,3 +146,54 @@ let%expect_test "token-locations-with-missing-program-id" =
       WORD[x]@<prog.cob:11-20|11-21>
       .@<prog.cob:11-21|11-22>
       EOF@<prog.cob:11-22|11-22> |}];;
+
+let%expect_test "tokens-with-tabs" =
+  Parser_testing.show_parsed_tokens ~source_format:(SF SFFixed)
+    ~parser_options:(Parser_testing.options ~verbose:true ())
+    {|
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. prog.
+       PROCEDURE DIVISION.
+      		STRING 	W-AGT ";"   W-RUBNUM (J) ";" 
+      		W-RENVOINOTE W-DEST-NOM  ";" 
+      		W-DEST-RUE1  ";"  W-DEST-RUE2  ";" 
+      		W-DEST-CP ";"  W-DEST-VILLE 
+      		";" W-DEST-TEL1 (1:2)  " "
+                   W-DEST-TEL1 (3:2)  " "
+                   W-DEST-TEL1 (5:2)  " "
+                   W-DEST-TEL1 (7:2)  " "
+                   W-DEST-TEL1 (9:2)
+             delimited  by  "   "  into  LARTISAN.
+|};
+    [%expect {|
+      Tks: IDENTIFICATION, DIVISION, .
+      Tks: PROGRAM-ID, ., INFO_WORD[prog], .
+      Incoming: {RECURSIVE}
+      Tks': ., INFO_WORD[prog], .
+      Tks: PROCEDURE, DIVISION, .
+      Outgoing: {RECURSIVE}
+      Tks':
+      Tks: STRING, WORD[W-AGT], ";", WORD[W-RUBNUM], (, WORD[J], ), ";"
+      Tks: WORD_IN_AREA_A[W-RENVOINOTE], WORD[W-DEST-NOM], ";"
+      Tks: WORD_IN_AREA_A[W-DEST-RUE1], ";", WORD[W-DEST-RUE2], ";"
+      Tks: WORD_IN_AREA_A[W-DEST-CP], ";"
+      Tks: WORD[W-DEST-VILLE], ";", WORD[W-DEST-TEL1], (, DIGITS[1], :, DIGITS[2],
+           ), " "
+      Tks: WORD[W-DEST-TEL1], (, DIGITS[3], :, DIGITS[2], ), " "
+      Tks: WORD[W-DEST-TEL1], (, DIGITS[5], :, DIGITS[2], ), " "
+      Tks: WORD[W-DEST-TEL1], (, DIGITS[7], :, DIGITS[2], ), " "
+      Tks: WORD[W-DEST-TEL1]
+      Tks: (, DIGITS[9], :, DIGITS[2], ), DELIMITED, BY, "   ", INTO,
+           WORD[LARTISAN], .
+      Tks: EOF
+      Tks':
+      IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
+      DIVISION, ., STRING, WORD[W-AGT], ";", WORD[W-RUBNUM], (, WORD[J], ), ";",
+      WORD_IN_AREA_A[W-RENVOINOTE], WORD[W-DEST-NOM], ";",
+      WORD_IN_AREA_A[W-DEST-RUE1], ";", WORD[W-DEST-RUE2], ";",
+      WORD_IN_AREA_A[W-DEST-CP], ";", WORD[W-DEST-VILLE], ";", WORD[W-DEST-TEL1],
+      (, DIGITS[1], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[3], :,
+      DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[5], :, DIGITS[2], ), " ",
+      WORD[W-DEST-TEL1], (, DIGITS[7], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (,
+      DIGITS[9], :, DIGITS[2], ), DELIMITED, BY, "   ", INTO, WORD[LARTISAN], .,
+      EOF |}];;

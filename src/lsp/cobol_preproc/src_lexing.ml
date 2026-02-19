@@ -20,6 +20,27 @@ open Src_format
 
 (* --- *)
 
+let expand_tabs ?(tab_stop=8) ?(starting_col=0) src =
+  match String.index_opt src '\t' with
+  | None -> src
+  | Some _ ->
+      let buf = Buffer.create (String.length src) in
+      let col = ref starting_col in
+      let spaces = String.make tab_stop ' ' in
+      String.iter (function
+        | '\t' ->
+            let n = (tab_stop - !col mod tab_stop) in
+            Buffer.add_substring buf spaces 0 n;
+            col := !col + 1
+        | ('\n' | '\r') as c ->
+            Buffer.add_char buf c;
+            col := 0;
+        | c ->
+            Buffer.add_char buf c;
+            incr col)
+      src;
+      Buffer.contents buf
+
 let remove_blanks = Str.global_replace (Str.regexp " ") ""           (* '\t'? *)
 
 (* --- *)
