@@ -171,29 +171,18 @@
 
 }
 
-let tab = '\t'
 let newline = '\r'* '\n'
 let nnl = _ # ['\r' '\n']                             (* anything but newline *)
-let sna = nnl nnl nnl nnl nnl nnl              (* 6 chars; TODO: exclude tabs *)
-let tabs =
-  (tab |
-   nnl tab |
-   nnl nnl tab |
-   nnl nnl nnl tab |
-   nnl nnl nnl nnl tab |
-   nnl nnl nnl nnl nnl tab |
-   nnl nnl nnl nnl nnl nnl tab |
-   nnl nnl nnl nnl nnl nnl nnl tab)
-let spaces = ([' ' '\t']*)
+let sna = nnl nnl nnl nnl nnl nnl                     (* 6 chars *)
+let spaces = ' '*
 let    blank        = [' ' '\009' '\r']
 let nonblank        = nnl # blank
-let    blanks       =(blank | '\t')+
-let    blank_area_A = blank blank blank blanks | '\t'
+let    blanks       = blank+
+let    blank_area_A = blank blank blank blanks
 let nonblank_area_A =(nonblank nnl nnl nnl |
                       blank nonblank nnl nnl |
                       blank blank nonblank nnl |
                       blank blank blank nonblank)
-let nonblank = nonblank # ['\t']    (* now, also exclude tab from blank chars *)
 let separator = [ ',' ';' ]
 let epsilon = ""
 let letter = [ 'a'-'z' 'A'-'Z' ]                      (* TODO: '\128'-'\255'? *)
@@ -262,10 +251,6 @@ rule fixed_line state
       {
         fixed_indicator (Src_lexing.sna state lexbuf) lexbuf
       }
-  | tabs
-      {
-        fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
-      }
   | (nnl* newline)                                  (* blank line (too short) *)
       {
         Src_lexing.new_line (Src_lexing.sna state lexbuf) lexbuf
@@ -276,7 +261,7 @@ rule fixed_line state
       }
 and fixed_indicator state
   = parse
-  | ' ' | '\t' (* second tab *)                                    (* nominal *)
+  | ' '
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
       }
@@ -367,7 +352,7 @@ and xopen_or_crt_or_acutrm_followup state
       }
 and cobolx_line state                                 (* COBOLX format (GCOS) *)
   = parse
-  | [' ' '\t']                                                     (* nominal *)
+  | ' '                                                 (* nominal *)
       {
         fixed_nominal_line (Src_lexing.flush_continued state) lexbuf
       }
@@ -600,7 +585,7 @@ and fixed_continue_quoted_ebcdics state
 
 and free_line state
   = parse
-  | blanks | '\t'
+  | blanks
       {
         free_line state lexbuf
       }
