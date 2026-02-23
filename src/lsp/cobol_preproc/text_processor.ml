@@ -381,14 +381,15 @@ let rec try_replacing_phrase
 let apply_replacing k repl log =
   let rec aux: type p q. (p, q) repl_attempt -> text -> log -> text -> q =
     fun k rev_done_text log text ->
-
       match k, try_replacing_phrase k repl text, text with
       | OnPartText, Ok (done_text', le, []), _ ->
-          Ok (List.rev done_text' @ rev_done_text, Preproc_trace.append le log)
+          Ok (List.rev_append done_text' rev_done_text,
+              Preproc_trace.append le log)
       | OnFullText, Ok (done_text', le, []), _ ->
-        List.rev done_text' @ rev_done_text , Preproc_trace.append le log
+          List.rev_append done_text' rev_done_text, Preproc_trace.append le log
       | _, Ok (done_text', le, text), _ ->
-          aux k (List.rev done_text' @ rev_done_text ) (Preproc_trace.append le log) text
+          aux k (List.rev_append done_text' rev_done_text)
+            (Preproc_trace.append le log) text
       | OnPartText, Error `MissingText, _ ->
           Error (`MissingText (List.rev rev_done_text, log, text))
       | OnPartText, Error `NoReplacement, [] ->
