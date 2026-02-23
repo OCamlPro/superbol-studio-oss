@@ -26,6 +26,17 @@ type abbrev_condition_expansion_state =
   | AfterRelOp of bool * expression * relop
   | AfterNonAbbrev
 
+(** [AbbrevMissingSubjectAfterNonAbbrev] is raised by [expand_abbrev_cond] on
+    invalid conditions such as [a < b OR c IS POSITIVE OR > d] where there is no
+    rule to expand [> d] accoding to the COBOL standard. *)
+exception AbbrevMissingSubjectAfterNonAbbrev
+
+(** [AbbrevMissingRelOpAfterSubject] is raised by [expand_abbrev_cond] on invalid
+    conditions where there is no [AbbrevRelOp] in leftmost position after an
+    [AbbrevSubject]. Normally such cases are forbidden by parsing rules so this
+    exception is an internal error. *)
+exception AbbrevMissingRelOpAfterSubject
+
 (** [expand_every_abbrev_cond cond] recursively substitutes every abbreviated
     combined relation condition from [cond] by an equivalent non-abbreviated
     condition (with abbreviated relations replaced with binary relations). *)
@@ -60,19 +71,18 @@ and expand_abbrev_cond (abbrev : abbrev_combined_relation) : condition =
     | AbbrevRelOp (rel, a), (AfterSubject (neg, subj) | AfterRelOp (neg, subj, _)) ->
         disambiguate a (AfterRelOp (neg, subj, rel))
     | AbbrevRelOp _, AfterNonAbbrev ->
-        failwith "Unexpected relation condition operator: missing condition subject"
+        raise AbbrevMissingSubjectAfterNonAbbrev
     | AbbrevObject (obj_neg, obj), AfterRelOp (subj_neg, subj, rel) ->
         let neg = if subj_neg then not obj_neg else obj_neg in
         let expanded_cond = neg_condition ~neg @@ UPCAST.simple_cond @@ Relation (subj, rel, obj) in
         (* If present a NOT before the subject only applies to the first object *)
         let sr = AfterRelOp (false, subj, rel) in
         expanded_cond, sr
-    | AbbrevObject _, AfterSubject _ ->
-        failwith "Unexpected relation condition object: missing relation operator"
     | AbbrevObject (neg, e), AfterNonAbbrev ->
         neg_condition ~neg @@ Expr e, AfterNonAbbrev
+    | AbbrevObject _, AfterSubject _
     | AbbrevSubject _, AfterSubject _ ->
-        failwith "Unexpected relation condition: missing relation operator"
+        raise AbbrevMissingRelOpAfterSubject
     | AbbrevSubject (neg, subj, a), _ ->
         let c, sr = disambiguate a (AfterSubject (neg, subj)) in
         neg_condition ~neg c, sr
