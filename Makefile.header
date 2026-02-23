@@ -86,6 +86,10 @@ test-syntax-promote:
 	\! opam exec -- $(AUTOFONCE_EXE) 2>/dev/null || \
 	   opam exec -- $(AUTOFONCE_EXE) promote -t syntax --apply
 
+.PHONY: test-deps
+test-deps:
+	opam install opam/*.opam --deps-only --with-test
+
 MASTER_REMOTE ?= origin
 
 .PHONY: build-master

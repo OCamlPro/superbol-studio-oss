@@ -57,7 +57,7 @@ let pp_token_string: token Pretty.printer = fun ppf ->
   | EXEC_BLOCK b -> Cobol_common.Exec_block.pp ppf b
   | INTERVENING_ c -> print "%c" c
   | t -> string @@
-      try Text_lexer.show_token t
+      try Text_lexer.string_of_token t
       with Not_found ->
       try Hashtbl.find combined_tokens t
       with Not_found -> "<unknown/unexpected token>"

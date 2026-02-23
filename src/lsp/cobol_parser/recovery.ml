@@ -37,6 +37,8 @@
 
 (* Note that's heavily inspired from merlin's own code for recovery *)
 
+module LIST = Cobol_common.Basics.LIST
+
 module Make
     (Parser: MenhirLib.IncrementalEngine.EVERYTHING)
     (Recovery: sig
@@ -200,7 +202,7 @@ struct
           | [] ->
               None, acc
           | ({ env; visited; assumed } :: _) as candidates ->
-              aux (candidates @ acc) (env, visited, assumed)
+              aux (LIST.append ~loc:__LOC__ candidates acc) (env, visited, assumed)
           | exception Not_found ->
               None, acc
           | exception (E.Result v) ->

@@ -12,6 +12,7 @@
 (**************************************************************************)
 
 open Cobol_common.Srcloc.TYPES
+module LIST = Cobol_common.Basics.LIST
 
 type error =
   | Caught_exception of { msg: string }
@@ -112,8 +113,8 @@ let none =
   }
 let union d1 d2 =
   {
-    errors = d1.errors @ d2.errors;
-    customs = d1.customs @ d2.customs;
+    errors = LIST.append ~loc:__LOC__ d1.errors d2.errors;
+    customs = LIST.append ~loc:__LOC__ d1.customs d2.customs;
   }
 let add_error e diags =
   { diags with errors = e :: diags.errors }

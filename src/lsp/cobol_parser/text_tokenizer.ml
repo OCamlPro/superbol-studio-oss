@@ -18,13 +18,30 @@ open Cobol_common.Srcloc.INFIX
 open Cobol_common.Srcloc.TYPES
 open Cobol_preproc.Text.TYPES
 open Grammar_tokens                              (* import token constructors *)
-open Grammar_tokens_printer
 open Parser_diagnostics
 
 (* --- *)
 
+type lexer_update =
+  | Enabled_keywords of Text_lexer.TokenHandles.t
+  | Disabled_keywords of Text_lexer.TokenHandles.t
+  | Enabled_intrinsics
+  | Disabled_intrinsics
+  | CommaBecomesDecimalPoint
+
 type token = Grammar_tokens.token with_loc
-type tokens = token list
+type stream = {
+  toks : token list ;
+  enabled_keywords : Text_lexer.TokenHandles.t ;
+}
+
+type tokens = {
+  former_stream : stream ;
+  new_stream : stream ;
+}
+
+let pp_tokens ppf { former_stream ; _ } =
+  Grammar_tokens_printer.pp_tokens ppf former_stream.toks
 
 let loc_in_area_a: srcloc -> bool = Cobol_common.Srcloc.in_area_a
 let token_in_area_a: token -> bool = fun t -> loc_in_area_a ~@t
@@ -59,18 +76,17 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
               Hashtbl.find Text_lexer.word_of_token t)
          with Not_found -> t)
   and comment_entry revtoks =
-    COMMENT_ENTRY (List.rev_map (Pretty.to_string "%a" pp_token_string) revtoks)
+    COMMENT_ENTRY (LIST.rev_map (Pretty.to_string "%a" Grammar_tokens_printer.pp_token_string) revtoks)
   in
-  let open List in
   let rec skip ((p', l', dgs) as acc) ((p, l) as pl) = function
     | 0 -> acc, pl
-    | i -> skip (hd p :: p', hd l :: l', dgs) (tl p, tl l) (i - 1)
+    | i -> skip (LIST.hd p :: p', LIST.hd l :: l', dgs) (LIST.tl p, LIST.tl l) (i - 1)
   and aux acc (p, l) =
     let subst_n x y =
       let rec cons x ((p', l', dgs) as _acc) (p, l) = function
         | 0 -> assert false
-        | 1 -> aux (x :: p', hd l :: l', dgs) (tl p, tl l)
-        | i -> cons x acc (tl p, hd l +@+ hd (tl l) :: tl (tl l)) (i - 1)
+        | 1 -> aux (x :: p', LIST.hd l :: l', dgs) (LIST.tl p, LIST.tl l)
+        | i -> cons x acc (LIST.tl p, LIST.hd l +@+ LIST.hd (LIST.tl l) :: LIST.tl (LIST.tl l)) (i - 1)
       in
       cons x acc (p, l) y
     and replace_n x y =
@@ -83,22 +99,22 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
       let (p', l', dgs), (p, l) = skip acc (p, l) n in
       match p with
       | [] -> Result.Error `MissingInputs
-      | t :: _ -> aux (info_word t :: p', hd l :: l', dgs) (tl p, tl l)
+      | t :: _ -> aux (info_word t :: p', LIST.hd l :: l', dgs) (LIST.tl p, LIST.tl l)
     and function_name_after n =
       let (p', l', dgs), (p, l) = skip acc (p, l) n in
       match p with
       | [] -> Result.Error `MissingInputs
-      | t :: _ -> aux (function_name t :: p', hd l :: l', dgs) (tl p, tl l)
+      | t :: _ -> aux (function_name t :: p', LIST.hd l :: l', dgs) (LIST.tl p, LIST.tl l)
     and missing_continuation_of str =
       let (p', l', diags), pl = skip acc (p, l) 1 in
-      let error = Missing { loc = hd l; stuff = Continuation_of str } in
+      let error = Missing { loc = LIST.hd l; stuff = Continuation_of str } in
       aux (p', l', Parser_diagnostics.add_error error diags) pl
     and comment_entry_after n =
       let acc, ((p, l) as suff) = skip acc (p, l) n in
       if p = [] then Result.Error `MissingInputs else
         let consume_comment = match comment_entry_termination with
           | Newline ->
-              comment_line ~init_pos:(Cobol_common.Srcloc.start_pos @@ hd l)
+              comment_line ~init_pos:(Cobol_common.Srcloc.start_pos @@ LIST.hd l)
           | Period ->
               comment_paragraph ?stop_column:None
           | AreaB { first_area_b_column } ->
@@ -106,7 +122,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
         and at_end ~loc ~revtoks (p', l', diags) =
           comment_entry revtoks :: p', loc :: l', diags
         in
-        consume_comment ~loc:(hd l) ~revtoks:[] ~at_end
+        consume_comment ~loc:(LIST.hd l) ~revtoks:[] ~at_end
           Comment_entry acc suff
     in
     match p with
@@ -226,8 +242,8 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
               ~some:(fun col -> pos_cnum - pos_bol + 1 < col) ~none:false) ->
         aux (at_end ~loc ~revtoks acc) (p, l)
     | t :: tlp, l ->
-        comment_paragraph ?stop_column ~at_end descr acc (tlp, tl l)
-          ~loc:(loc +@+ hd l) ~revtoks:(t :: revtoks)
+        comment_paragraph ?stop_column ~at_end descr acc (tlp, LIST.tl l)
+          ~loc:(loc +@+ LIST.hd l) ~revtoks:(t :: revtoks)
 
   and comment_line ~init_pos ~loc ~revtoks ~at_end descr acc = function
     | [], _ ->                  (* found no word starting on anther line (yet) *)
@@ -240,17 +256,17 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
             pos_fname <> init_pos.pos_fname) ->
         aux (at_end ~loc ~revtoks acc) (p, l)
     | t :: tlp, l ->
-        comment_line ~init_pos ~at_end descr acc (tlp, tl l)
-          ~loc:(loc +@+ hd l) ~revtoks:(t :: revtoks)
+        comment_line ~init_pos ~at_end descr acc (tlp, LIST.tl l)
+          ~loc:(loc +@+ LIST.hd l) ~revtoks:(t :: revtoks)
 
   in
   fun tokens ->
-    let p, srclocs = split @@ map (~&@) tokens in
+    let p, srclocs = LIST.split @@ LIST.map (~&@) tokens in
     match aux ([], [], Parser_diagnostics.none) (p, srclocs) with
     | Ok (p, l, dgs) ->
-        Ok (rev_map2 (&@) p l, dgs)
+        Ok (LIST.rev_map2 (&@) p l, dgs)
     | Error (`ReachedEOF (loc, descr, dgs, p, l)) ->
-        Error (`ReachedEOF (loc, descr, dgs, rev_map2 (&@) p l))
+        Error (`ReachedEOF (loc, descr, dgs, LIST.rev_map2 (&@) p l))
     | Error `MissingInputs ->
         Error `MissingInputs
 
@@ -258,13 +274,13 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
 
 type 'a memory =
   | Amnesic: Cobol_common.Behaviors.amnesic memory
-  | Eidetic: tokens -> Cobol_common.Behaviors.eidetic memory
+  | Eidetic: token list -> Cobol_common.Behaviors.eidetic memory
 
 type 'm state =
   {
     lexer_state: Text_lexer.lexer_state;
-    leftover_tokens: tokens; (* non-empty only when [preproc_n_combine_tokens]
-                                errors out for lack of input tokens. *)
+    leftover_tokens: token list; (* non-empty only when [preproc_n_combine_tokens]
+                                    errors out for lack of input tokens. *)
     memory: 'm memory;
     context_stack: Context.stack;
     registered_intrinsics: Text_lexer.IntrinsicHandles.t;
@@ -314,7 +330,7 @@ let init
   in
   {
     lexer_state = Text_lexer.initial_state;
-    leftover_tokens = [];
+    leftover_tokens = [] ;
     memory;
     context_stack = Context.empty_stack;
     registered_intrinsics = default_intrinsics;
@@ -329,16 +345,16 @@ let init
         exec_scanners;
         verbose;
         show_if_verbose =
-          (if List.mem `Tks show_if_verbose then [`Tks] else []) @
-          (if List.mem `Ctx show_if_verbose then [`Ctx] else []);
+          (if LIST.mem `Tks show_if_verbose then [`Tks] else []) @
+          (if LIST.mem `Ctx show_if_verbose then [`Ctx] else []);
       }
   }
 
 let diagnostics { diags; _ } = diags
-let parsed_tokens { memory = Eidetic tokens; _ } = lazy (List.rev tokens)
+let parsed_tokens { memory = Eidetic tokens ; _ } = lazy ( LIST.rev tokens )
 
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
-  verbose && List.mem tag show_if_verbose
+  verbose && LIST.mem tag show_if_verbose
 
 (* --- *)
 
@@ -393,7 +409,7 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
     let tokens, lexer_state =
       Text_lexer.read_tokens lexer lexer_state (w &@ loc)
     in
-    List.rev_map distinguish_words tokens @ rev_prefix_tokens,
+    LIST.append ~loc:__LOC__ ( LIST.rev_map distinguish_words tokens ) rev_prefix_tokens,
     if lexer_state != state.lexer_state
     then { state with lexer_state }
     else state
@@ -463,27 +479,37 @@ let acc_tokens_of_text_word (rev_prefix_tokens, state) { payload = c; loc } =
   then pic_string state
   else nominal state
 
+let new_stream toks = { toks ;
+                     enabled_keywords = Text_lexer.TokenHandles.empty }
+
+let new_tokens toks = {
+  former_stream = new_stream toks ;
+  new_stream = new_stream toks ;
+}
 
 let tokens_of_text: 'a state -> text -> tokens * 'a state = fun state text ->
-  let tokens, state = List.fold_left acc_tokens_of_text_word ([], state) text in
-  List.rev tokens, state
+  let tokens, state = LIST.fold_left acc_tokens_of_text_word ([], state) text in
+  new_tokens ( LIST.rev tokens ), state
 
+let remaining_tokens stream =
+  stream.former_stream.toks
 
 let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
   let state = { state with leftover_tokens = [] } in
-  let new_tokens, state = tokens_of_text state text in
-  let tokens = leftover_tokens @ new_tokens in
+  let tokens, state = tokens_of_text state text in
+  let tokens = LIST.append ~loc:__LOC__ leftover_tokens
+      (remaining_tokens tokens) in
   let intrinsics_enabled = state.intrinsics_enabled in
   match preproc_n_combine_tokens ~intrinsics_enabled ~source_format tokens with
   | Ok (tokens, diags) ->
       if show `Tks state then
-        Pretty.error "Tks: %a@." pp_tokens tokens;
+        Pretty.error "Tks: %a@." Grammar_tokens_printer.pp_tokens tokens;
       let diags = Parser_diagnostics.union diags state.diags in
-      Ok tokens, { state with diags }
+      Ok ( new_tokens tokens ), { state with diags }
   | Error `MissingInputs ->
       Error `MissingInputs, { state with leftover_tokens = tokens }
   | Error (`ReachedEOF (loc, unterminated_item, diags, tokens)) ->
-      Error (`ReachedEOF tokens),
+      Error (`ReachedEOF ( new_tokens tokens )),
       let error = Unterminated { loc; stuff = unterminated_item } in
       let diags = Parser_diagnostics.union diags state.diags in
       { state with diags = add_error error diags }
@@ -491,39 +517,17 @@ let tokenize_text ~source_format ({ leftover_tokens; _ } as state) text =
 let emit_token (type m) (s: m state) tok : m state =
   match s.memory with
   | Amnesic -> s
-  | Eidetic toks -> { s with memory = Eidetic (tok :: toks) }
+  | Eidetic toks -> { s with memory = Eidetic ( tok :: toks ) }
 
 let put_token_back (type m) (s: m state) : m state =
   match s.memory with
   | Amnesic -> s
-  | Eidetic [] -> Fmt.invalid_arg "put_token_back: unexpected memory state"
-  | Eidetic (_ :: toks) -> { s with memory = Eidetic toks }
+  | Eidetic  [] -> Fmt.invalid_arg "put_token_back: unexpected memory state"
+  | Eidetic  ( _ :: toks ) -> { s with memory = Eidetic toks }
 
 let rec skip_redundant_periods = function
     | { payload = PERIOD; _ } :: rest -> skip_redundant_periods rest
     | rest -> rest
-
-let next_token (s: _ state) =
-  let rec aux = function
-    | { payload = INTERVENING_(',' | ';'); _ } :: tokens ->
-        aux tokens
-    | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
-        Some (emit_token s (PERIOD &@ loc), token, tokens)
-    | { payload = PERIOD; _ } as token :: tokens ->
-        Some (emit_token s token, token, skip_redundant_periods tokens)
-    | token :: tokens ->
-        Some (emit_token s token, token, tokens)
-    | [] ->
-        None
-  in
-  aux
-
-type lexer_update =
-  | Enabled_keywords of Text_lexer.TokenHandles.t
-  | Disabled_keywords of Text_lexer.TokenHandles.t
-  | Enabled_intrinsics
-  | Disabled_intrinsics
-  | CommaBecomesDecimalPoint
 
 let retokenize { lexer_state; persist = { lexer; _ }; _ } w =
   (* Note: for now we can forget the lexer state that is returned on rescan of
@@ -532,11 +536,53 @@ let retokenize { lexer_state; persist = { lexer; _ }; _ } w =
      (handling of DECIMAL POINT).  *)
   fst @@ Text_lexer.read_tokens lexer lexer_state w
 
-let reword_intrinsics s : tokens -> tokens =
+let comma_becomes_decimal_point s toks =
+  (* This may only happen when the comma becomes a decimal separator in
+     numerical literals, instead of periods.  Before this (irreversible)
+     change, any intervening comma is represented with a special
+     [INTERVENING_ ','] token in the list of tokens procuded by
+     {!tokenize_text}. *)
+  (* Find any INTERVENING_COMMA and retokenize with the two adjacent words
+     if they are SINTLIT on the left, and DIGITS (or FLOATLIT) on the
+     right (possible combinations are generated in {!Text_lexer.token}).
+     To deal with periods, we need to retokenize any FIXEDLIT and
+     FLOATLIT. *)
+  let show_fixed (i, c, d) = Pretty.to_string "%s%c%s" i c d in
+  let show_float (i, c, d, e) = Pretty.to_string "%s%c%sE%s" i c d e in
+  let rec aux rev_prefix suffix =
+    match rev_prefix, suffix with
+    | { payload = SINTLIT l; loc = lloc } :: rev_prefix,
+      { payload = INTERVENING_ ','; loc = cloc } ::
+      { payload = DIGITS r; loc = rloc } :: suffix ->
+      retokenize_with_comma rev_prefix suffix
+        l lloc cloc r rloc
+    | { payload = SINTLIT l; loc = lloc } :: rev_prefix,
+      { payload = INTERVENING_ ','; loc = cloc } ::
+      { payload = FLOATLIT f; loc = rloc } :: suffix ->
+      retokenize_with_comma rev_prefix suffix
+        l lloc cloc (show_float f) rloc
+    | _, { payload = FIXEDLIT f; loc } :: suffix ->
+      let toks = retokenize s (show_fixed f &@ loc) in
+      aux (LIST.rev_append toks rev_prefix) suffix
+    | _, { payload = FLOATLIT f; loc } :: suffix ->
+      let toks = retokenize s (show_float f &@ loc) in
+      aux (LIST.rev_append toks rev_prefix) suffix
+    | _, [] ->
+      LIST.rev rev_prefix
+    | _, x :: tl ->
+      aux (x :: rev_prefix) tl
+  and retokenize_with_comma rev_prefix suffix l l_loc sep_loc r r_loc =
+    let loc = Cobol_common.Srcloc.(concat (concat l_loc sep_loc) r_loc) in
+    let tks = retokenize s (Pretty.to_string "%s,%s" l r &@ loc) in
+    aux (LIST.rev_append tks rev_prefix) suffix
+  in
+  aux [] toks
+
+let reword_intrinsics s tokens =
   (* Some intrinsics NOT preceded with FUNCTION may now be words; assumes
      [Disabled_intrinsics] does not occur on a `FUNCTION` keyword (but that's
      unlikely). *)
-  let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
+  let keyword_of_token token = Hashtbl.find Text_lexer.word_of_token token in
   let is_intrinsic_token = function
     | INTRINSIC_FUNC _ -> true
     | t when Text_keywords.is_known_intrinsic_token t -> true
@@ -544,94 +590,245 @@ let reword_intrinsics s : tokens -> tokens =
   let rec aux rev_prefix suffix =
     match suffix with
     | [] ->
-        List.rev rev_prefix
+      LIST.rev rev_prefix
     | ({ payload = k1_token; _ } as k1) ::
       ({ payload = k2_token; _ } as k2) :: tl
       when k1_token <> FUNCTION && is_intrinsic_token k2_token ->
-        aux (EzList.tail_map distinguish_words @@
-             retokenize s (keyword_of_token k2_token &@<- k2) @
-             k1 :: rev_prefix) tl
+      aux (LIST.tail_map ~loc:__LOC__ distinguish_words @@
+           retokenize s (keyword_of_token k2_token &@<- k2) @
+           k1 :: rev_prefix) tl
     | k1 :: tl ->
-        aux (k1 :: rev_prefix) tl
+      aux (k1 :: rev_prefix) tl
   in
-  aux []
+  aux [] tokens
 
-(** Retokenizes the tokens {e after} the given operation has been perfomed on
-    {!module:Text_lexer}. *)
-(* TODO: Find whether everything related to Area A and comma-retokenization
-   could be moved to Text_lexer *)
-let retokenize_after: lexer_update -> _ state -> tokens -> tokens = fun update s ->
-  match update with
-  | Enabled_keywords tokens
-  | Disabled_keywords tokens
-    when Text_lexer.TokenHandles.is_empty tokens ->
-      Fun.id
-  | Enabled_keywords _
-  | Enabled_intrinsics ->          (* <- some words may have become intrinsics *)
-      List.concat_map begin fun token -> match ~&token with
+module type INTERFACE = sig
+
+  val retokenize_after : lexer_update -> 'a state -> stream -> stream
+  val next_token :
+    'a state ->
+    stream ->
+    ('a state * Grammar_tokens.token with_loc * stream) option
+
+  val put_back_token : token -> stream -> stream
+
+end
+
+module FORMER_IMPLEMENTATION : INTERFACE = struct
+
+  (** Retokenizes the tokens {e after} the given operation has been perfomed on
+      {!module:Text_lexer}. *)
+  (* TODO: Find whether everything related to Area A and comma-retokenization
+     could be moved to Text_lexer *)
+  let retokenize_after = fun update s stream ->
+    let toks = stream.toks in
+    let toks =
+      match update with
+      | Enabled_keywords tokens
+      | Disabled_keywords tokens
+        when Text_lexer.TokenHandles.is_empty tokens ->
+        toks
+      | Enabled_keywords _
+      | Enabled_intrinsics ->          (* <- some words may have become intrinsics *)
+        LIST.concat_map ~loc:__LOC__ ( fun token -> match ~&token with
+            | WORD_IN_AREA_A w
+            | WORD w ->
+              (* translate WORD in a area_a to WORD_IN_AREA_A *)
+              LIST.tail_map ~loc:__LOC__ distinguish_words
+              @@
+              (* why would we need to retokenize this WORD differently ? *)
+              retokenize s (w &@<- token)
+            | _ ->
+              [token]
+          ) toks
+      | Disabled_keywords tokens ->
+        (*
+        Printf.eprintf "Disabled_keywords:\n%!";
+        Text_lexer.TokenHandles.iter (fun s ->
+            Printf.eprintf "   * %S\n%!"
+              (Text_lexer.string_of_keyword_handle s)) tokens;
+           *)
+        (* When removing these keywords, translate back any such keyword to
+           the corresponding WORD/WORD_IN_AREA_A *)
+        LIST.tail_map ~loc:__LOC__ ( fun token ->
+            if Text_lexer.TokenHandles.mem_text_token ~&token tokens
+            then
+              let w = Hashtbl.find Text_lexer.word_of_token ~&token in
+              if token_in_area_a token then WORD_IN_AREA_A w &@<- token
+              else WORD w &@<- token
+            else token
+          ) toks
+      | Disabled_intrinsics ->
+        reword_intrinsics s toks
+      | CommaBecomesDecimalPoint -> comma_becomes_decimal_point s toks
+    in
+    (* We don't store updates as we have already applied them ! *)
+    {  toks = toks ; enabled_keywords = Text_lexer.TokenHandles.empty }
+
+  let rec next_token (s: _ state) stream =
+    match stream.toks with
+    | { payload = INTERVENING_(',' | ';'); _ } :: tokens ->
+      next_token s { stream with toks = tokens }
+    | { payload = INTERVENING_ '.'; loc } as token :: tokens ->
+      Some (emit_token s (PERIOD &@ loc), token, { stream with toks = tokens })
+    | { payload = PERIOD; _ } as token :: tokens ->
+      let tokens = skip_redundant_periods tokens in
+      Some (emit_token s token, token, { stream with toks = tokens  } )
+    | token :: tokens ->
+      Some (emit_token s token, token, { stream with toks = tokens })
+    | [] ->
+      None
+
+  let put_back_token token stream =
+    { stream with toks = token :: stream.toks }
+
+end
+
+module NEW_IMPLEMENTATION : INTERFACE = struct
+
+  (** Retokenizes the tokens {e after} the given operation has been perfomed on
+      {!module:Text_lexer}. *)
+  (* TODO: Find whether everything related to Area A and comma-retokenization
+     could be moved to Text_lexer *)
+  let retokenize_after = fun update s stream ->
+      match update with
+      | Enabled_keywords tokens ->
+        let enabled_keywords = stream.enabled_keywords in
+        let enabled_keywords =
+          Text_lexer.TokenHandles.union_
+            enabled_keywords ~normalize:tokens in
+        (*
+        Printf.eprintf "Newly Enabled_keywords:\n%!";
+          Text_lexer.TokenHandles.iter (fun s ->
+              Printf.eprintf "   * %S\n%!"
+                (Text_lexer.string_of_keyword_handle s)) enabled_keywords;
+           *)
+        { stream with enabled_keywords }
+      | Disabled_keywords tokens -> 
+        let enabled_keywords = stream.enabled_keywords in
+        (*
+        if not @@ Text_lexer.TokenHandles.subset tokens enabled_keywords then begin
+          Printf.eprintf "NEW Disabled_keywords:\n%!";
+          Text_lexer.TokenHandles.iter (fun s ->
+              Printf.eprintf "   * %S\n%!"
+                (Text_lexer.string_of_keyword_handle s)) tokens;
+          Printf.eprintf "Formerly Enabled_keywords:\n%!";
+          Text_lexer.TokenHandles.iter (fun s ->
+              Printf.eprintf "   * %S\n%!"
+                (Text_lexer.string_of_keyword_handle s)) enabled_keywords;
+        end; *)
+        let enabled_keywords =
+          Text_lexer.TokenHandles.diff enabled_keywords tokens in
+        { stream with enabled_keywords }
+      | _ ->
+        FORMER_IMPLEMENTATION.retokenize_after update s stream
+
+  let rec next_token (s: _ state) stream =
+    match stream.toks with
+    | [] -> None
+    | token :: toks ->
+      let token =
+        match ~&token with
         | WORD_IN_AREA_A w
         | WORD w ->
-            EzList.tail_map distinguish_words @@
-            retokenize s (w &@<- token)
+          (* translate WORD in a area_a to WORD_IN_AREA_A *)
+              LIST.tail_map ~loc:__LOC__ distinguish_words
+              @@
+              (* why would we need to retokenize this WORD differently ? *)
+              retokenize
+                { s with
+                  lexer_state =
+                    Text_lexer.cancel_picture_string_expectation s.lexer_state }
+                (w &@<- token)
         | _ ->
-            [token]
-      end
-  | Disabled_keywords tokens ->
-      let keyword_of_token = Hashtbl.find Text_lexer.word_of_token in
-      EzList.tail_map begin fun token ->
-        if Text_lexer.TokenHandles.mem_text_token ~&token tokens
-        then match token_in_area_a token, keyword_of_token ~&token with
-          | true, w -> WORD_IN_AREA_A w &@<- token
-          | false, w -> WORD w &@<- token
-        else token
-      end
-  | Disabled_intrinsics ->
-      reword_intrinsics s
-  | CommaBecomesDecimalPoint ->
-      (* This may only happen when the comma becomes a decimal separator in
-         numerical literals, instead of periods.  Before this (irreversible)
-         change, any intervening comma is represented with a special
-         [INTERVENING_ ','] token in the list of tokens procuded by
-         {!tokenize_text}. *)
-      (* Find any INTERVENING_COMMA and retokenize with the two adjacent words
-         if they are SINTLIT on the left, and DIGITS (or FLOATLIT) on the
-         right (possible combinations are generated in {!Text_lexer.token}).
-         To deal with periods, we need to retokenize any FIXEDLIT and
-         FLOATLIT. *)
-      let show_fixed (i, c, d) = Pretty.to_string "%s%c%s" i c d in
-      let show_float (i, c, d, e) = Pretty.to_string "%s%c%sE%s" i c d e in
-      let rec aux rev_prefix suffix =
-        match rev_prefix, suffix with
-        | { payload = SINTLIT l; loc = lloc } :: rev_prefix,
-          { payload = INTERVENING_ ','; loc = cloc } ::
-          { payload = DIGITS r; loc = rloc } :: suffix ->
-            retokenize_with_comma rev_prefix suffix
-              l lloc cloc r rloc
-        | { payload = SINTLIT l; loc = lloc } :: rev_prefix,
-          { payload = INTERVENING_ ','; loc = cloc } ::
-          { payload = FLOATLIT f; loc = rloc } :: suffix ->
-            retokenize_with_comma rev_prefix suffix
-              l lloc cloc (show_float f) rloc
-        | _, { payload = FIXEDLIT f; loc } :: suffix ->
-            let toks = retokenize s (show_fixed f &@ loc) in
-            aux (List.rev_append toks rev_prefix) suffix
-        | _, { payload = FLOATLIT f; loc } :: suffix ->
-            let toks = retokenize s (show_float f &@ loc) in
-            aux (List.rev_append toks rev_prefix) suffix
-        | _, [] ->
-            List.rev rev_prefix
-        | _, x :: tl ->
-            aux (x :: rev_prefix) tl
-      and retokenize_with_comma rev_prefix suffix l l_loc sep_loc r r_loc =
-        let loc = Cobol_common.Srcloc.(concat (concat l_loc sep_loc) r_loc) in
-        let tks = retokenize s (Pretty.to_string "%s,%s" l r &@ loc) in
-        aux (List.rev_append tks rev_prefix) suffix
+          [token]
       in
-      aux []
+      let token = match token with
+        | [] -> assert false
+        | [ token ] -> token
+        | _ -> assert false
+      in
+      let loc = token.Cobol_common.Srcloc.loc in
+      match token.payload with
+      | INTERVENING_(',' | ';') -> next_token s { stream with toks }
+      | INTERVENING_ '.' ->
+        Some (emit_token s (PERIOD &@ loc), token, { stream with toks })
+      | PERIOD ->
+        let toks = skip_redundant_periods toks in
+        Some (emit_token s token, token, { stream with toks  } )
+      | _ ->
+        Some (emit_token s token, token, { stream with toks })
+
+  let put_back_token token stream =
+    { stream with toks = token :: stream.toks }
+
+end
+
+module COMPARISON = struct
+  let retokenize_after enable state { former_stream ; new_stream } =
+    let former_stream = FORMER_IMPLEMENTATION.retokenize_after
+        enable state former_stream in
+    let new_stream = NEW_IMPLEMENTATION.retokenize_after
+        enable state new_stream in
+    { former_stream ; new_stream }
+
+  let put_back_token token  { former_stream ; new_stream } =
+    let former_stream = FORMER_IMPLEMENTATION.put_back_token token former_stream in
+    let new_stream = NEW_IMPLEMENTATION.put_back_token token new_stream in
+    { former_stream ; new_stream }
+
+  let next_token state { former_stream ; new_stream } =
+    let output1 = FORMER_IMPLEMENTATION.next_token state former_stream in
+    let output2 = NEW_IMPLEMENTATION.next_token state new_stream in
+    match output1 with
+    | None -> None
+    | Some (state1, token1, former_stream) ->
+      match output2 with
+      | None -> assert false
+      | Some (state2, token2, new_stream) ->
+        if token1.payload <> token2.payload then begin
+          Printf.eprintf "former_stream returned %s\n%!"
+            ( Text_lexer.string_of_token token1.payload);
+          Printf.eprintf "new_stream returned %s\n%!"
+            ( Text_lexer.string_of_token token2.payload);
+          assert false
+        end;
+        (*
+        Printf.eprintf "next_token returned %s\n%!"
+          ( Text_lexer.string_of_token token1.payload);
+           *)
+        ignore (state1, state2);
+        Some (state2, token2, { former_stream ; new_stream })
+
+end
+
+module ONE_IMPLEMENTATION = struct
+  let retokenize_after enable state { former_stream ; new_stream } =
+    let new_stream = NEW_IMPLEMENTATION.retokenize_after
+        enable state new_stream in
+    { former_stream ; new_stream }
+
+  let put_back_token token  { former_stream ; new_stream } =
+    let new_stream = NEW_IMPLEMENTATION.put_back_token token new_stream in
+    { former_stream ; new_stream }
+
+  let next_token state { former_stream ; new_stream } =
+    let output2 = NEW_IMPLEMENTATION.next_token state new_stream in
+    match output2 with
+    | None -> None
+    | Some (state, token2, new_stream) ->
+        Some (state, token2, { former_stream ; new_stream })
+
+end
+
+include COMPARISON
+
 
 (** Enable incoming tokens w.r.t the lexer, and retokenize awaiting tokens
     (i.e. that may have been tokenized according to out-of-date rules) *)
-let enable_tokens state tokens incoming_tokens =
+let enable_tokens
+  : 'a state -> tokens -> Text_lexer.TokenHandles.t -> 'a state * tokens =
+  fun state tokens incoming_tokens ->
   Text_lexer.enable_keywords incoming_tokens;
   state, retokenize_after (Enabled_keywords incoming_tokens) state tokens
 
@@ -653,35 +850,29 @@ let unregister_intrinsics { persist = { lexer; _ }; registered_intrinsics; _ } =
 let save_intrinsics state =
   unregister_intrinsics state
 
-
 let restore_intrinsics ({ intrinsics_enabled; _ } as state) =
   if intrinsics_enabled
   then register_intrinsics state
 
-
-let enable_intrinsics state token tokens =
-  if state.intrinsics_enabled then state, token, tokens else        (* error? *)
+let enable_intrinsics state token stream =
+  if state.intrinsics_enabled then state, token, stream else        (* error? *)
     let state = put_token_back { state with intrinsics_enabled = true } in
     register_intrinsics state;
-    let tokens = token :: tokens in
-    let tokens = retokenize_after Enabled_intrinsics state tokens in
-    let token, tokens = List.hd tokens, List.tl tokens in
-    if show `Tks state then
-      Pretty.error "Tks': %a@." pp_tokens tokens;
-    emit_token state token, token, tokens
+    let stream = put_back_token token stream in
+    let stream = retokenize_after Enabled_intrinsics state stream in
+    match next_token state stream with
+    | None -> assert false
+    | Some (state, token, stream) -> state, token, stream
 
-
-let disable_intrinsics state token tokens =
-  if not state.intrinsics_enabled then state, token, tokens else      (* error? *)
+let disable_intrinsics state token stream =
+  if not state.intrinsics_enabled then state, token, stream else      (* error? *)
     let state = put_token_back { state with intrinsics_enabled = false } in
     unregister_intrinsics state;
-    let tokens = token :: tokens in
-    let tokens = retokenize_after Disabled_intrinsics state tokens in
-    let token, tokens = List.hd tokens, List.tl tokens in
-    if show `Tks state then
-      Pretty.error "Tks': %a@." pp_tokens tokens;
-    emit_token state token, token, tokens
-
+    let stream = put_back_token token stream in
+    let stream = retokenize_after Disabled_intrinsics state stream in
+    match next_token state stream with
+    | None -> assert false
+    | Some (state, token, stream) -> state, token, stream
 
 let reset_intrinsics state token tokens =
   let state, token, tokens = disable_intrinsics state token tokens in
@@ -699,27 +890,26 @@ let replace_intrinsics state intrinsics =
     | None ->
         state.persist.default_intrinsics
     | Some s ->
-        Text_lexer.intrinsic_handles state.persist.lexer (List.map (~&) s)
+        Text_lexer.intrinsic_handles state.persist.lexer (LIST.map (~&) s)
   in
   { state with registered_intrinsics }
 
 
-let decimal_point_is_comma (type m) (state: m state) token tokens =
+let decimal_point_is_comma (type m) (state: m state) token stream =
   let state = put_token_back state in
   let state =
     { state with
       lexer_state = Text_lexer.decimal_point_is_comma state.lexer_state }
   in
-  let tokens = token :: tokens in
-  let tokens = retokenize_after CommaBecomesDecimalPoint state tokens in
-  let token, tokens = List.hd tokens, List.tl tokens in
-  if show `Tks state then
-    Pretty.error "Tks': %a@." pp_tokens tokens;
-  emit_token state token, token, tokens
+  let stream = put_back_token token stream in
+  let stream = retokenize_after CommaBecomesDecimalPoint state stream in
+  match next_token state stream with
+  | None -> assert false
+  | Some (state, token, stream) -> state, token, stream
 
 
-let put_token_back state token tokens =
-  put_token_back state, token :: tokens
+let put_token_back state token stream =
+  put_token_back state, put_back_token token stream
 
 (* --- *)
 
@@ -731,9 +921,9 @@ let push_contexts state tokens : Context.t list -> 's * 'a = function
   | [] ->
       state, tokens
   | contexts ->
-      let context_stack, tokens_set =
+    let context_stack, tokens_set =
         let context_tokens = state.persist.context_tokens in
-        List.fold_left begin fun (stack, set) ctx ->
+        LIST.fold_left begin fun (stack, set) ctx ->
           if show `Ctx state then
             Pretty.error "Incoming: %a@."
               (Context.pp_context context_tokens) ctx;
@@ -749,7 +939,6 @@ let push_contexts state tokens : Context.t list -> 's * 'a = function
       let state, tokens = enable_tokens state tokens tokens_set in
       if show `Tks state then
         Pretty.error "Tks': %a@." pp_tokens tokens;
-
       with_context_stack state context_stack, tokens
 
 let top_context state =

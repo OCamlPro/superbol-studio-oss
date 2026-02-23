@@ -44,6 +44,56 @@ module LIST = struct
     in
     aux acc l
 
+  let check = false
+  let check_10 fname ~loc l =
+    if check then
+      let len = List.length l in
+      if len > 50 then
+        Printf.eprintf "%s %d %s\n%!" fname len
+          (match loc with
+           | None -> ""
+           | Some loc -> loc)
+
+  let append ?loc a b =
+    match a,b with
+    | [], _
+    | [_], _
+    | _, [] -> a @ b
+    | _ ->
+      check_10 "append" ~loc a;
+      a @ b
+
+  let rev_map ?loc f list =
+    check_10 "rev_map" ~loc list;
+    List.rev_map f list
+  let map ?loc f list =
+    check_10 "map" ~loc list;
+    List.map f list
+  let rev_append ?loc list b =
+    check_10 "rev_append" ~loc list;
+    List.rev_append list b
+  let rev ?loc l =
+    check_10 "rev" ~loc l;
+    List.rev l
+  let hd = List.hd
+  let tl = List.tl
+  let split ?loc l =
+    check_10 "split" ~loc l;
+    List.split l
+  let rev_map2 ?loc f l1 l2 =
+    check_10 "rev_map2" ~loc l1;
+    List.rev_map2 f l1 l2
+  let mem ?loc x l =
+    check_10 "mem" ~loc l;
+    List.mem x l
+  let fold_left f a b  =
+    List.fold_left f a b
+  let concat_map ?loc f l =
+    check_10 "concat_map" ~loc l;
+    List.concat_map f l
+  let tail_map ?loc f l =
+    check_10 "tail_map" ~loc l;
+    EzList.tail_map f l
 end
 
 (** Representation for non-empty lists *)
@@ -117,7 +167,7 @@ module NEL = struct
         | One x -> x :: acc
         | x :: tl -> aux (x::acc) tl
       in aux (One hd) tl
-  let ( @ ) a b =
+  let append a b =
     let rec aux b = function
       | One x -> x :: b
       | x :: tl -> x :: aux b tl

@@ -383,11 +383,11 @@ let apply_replacing k repl log =
     fun k done_text log text ->
       match k, try_replacing_phrase k repl text, text with
       | OnPartText, Ok (done_text', le, []), _ ->
-          Ok (done_text @ done_text', Preproc_trace.append le log)
+          Ok (LIST.append ~loc:__LOC__ done_text done_text', Preproc_trace.append le log)
       | OnFullText, Ok (done_text', le, []), _ ->
-          done_text @ done_text', Preproc_trace.append le log
+          LIST.append ~loc:__LOC__ done_text done_text', Preproc_trace.append le log
       | _, Ok (done_text', le, text), _ ->
-          aux k (done_text @ done_text') (Preproc_trace.append le log) text
+          aux k (LIST.append ~loc:__LOC__ done_text done_text') (Preproc_trace.append le log) text
       | OnPartText, Error `MissingText, _ ->
           Error (`MissingText (done_text, log, text))
       | OnPartText, Error `NoReplacement, [] ->
@@ -395,7 +395,32 @@ let apply_replacing k repl log =
       | OnFullText, Error `NoReplacement, [] ->
           done_text, log
       | _, Error _, x :: text ->
-          aux k (done_text @ [x]) log text
+          aux k (LIST.append ~loc:__LOC__ done_text [x]) log text
+  in
+  aux k [] log
+
+(** [apply_replacing attempt repl text] applies the replacing clauses [repl] to
+    [text], and returns a result that depends on whether the given text may be
+    continued ([attempt = OnPartText]) or not ([attempt = OnFullText]). *)
+let apply_replacing k repl log =
+  let rec aux: type p q. (p, q) repl_attempt -> text -> log -> text -> q =
+    fun k rev_done_text log text ->
+
+      match k, try_replacing_phrase k repl text, text with
+      | OnPartText, Ok (done_text', le, []), _ ->
+          Ok (LIST.append ~loc:__LOC__ (List.rev done_text') rev_done_text, Preproc_trace.append le log)
+      | OnFullText, Ok (done_text', le, []), _ ->
+          LIST.append ~loc:__LOC__ (List.rev done_text') rev_done_text , Preproc_trace.append le log
+      | _, Ok (done_text', le, text), _ ->
+          aux k (LIST.append ~loc:__LOC__ (List.rev done_text') rev_done_text ) (Preproc_trace.append le log) text
+      | OnPartText, Error `MissingText, _ ->
+          Error (`MissingText (List.rev rev_done_text, log, text))
+      | OnPartText, Error `NoReplacement, [] ->
+          Ok (List.rev rev_done_text, log)
+      | OnFullText, Error `NoReplacement, [] ->
+          List.rev rev_done_text, log
+      | _, Error _, x :: text ->
+          aux k (x :: rev_done_text) log text
   in
   aux k [] log
 
