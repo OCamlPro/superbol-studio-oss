@@ -42,9 +42,14 @@
   <span><span>(<span class="xref-unresolved">Cobol_ptree__.Terms.expression</span>
    * <span class="xref-unresolved">Cobol_ptree__.Terms.relop</span>
    * <span class="xref-unresolved">Cobol_ptree__.Terms.expression</span>)</span> <span class="arrow">&#45;&gt;</span></span>
-  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_cond"><a href="#val-pp_cond" class="anchor"></a><code><span><span class="keyword">val</span> pp_cond : 'k. <span><span class="optlabel">?pos</span>:bool <span class="arrow">&#45;&gt;</span></span> <span><span><span class="type-var">'k</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span> <a href="../../../pretty/Pretty/index.html#type-printer">Pretty.printer</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_flat_combined_relation"><a href="#val-pp_flat_combined_relation" class="anchor"></a><code><span><span class="keyword">val</span> pp_flat_combined_relation : 
+  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_cond"><a href="#val-pp_cond" class="anchor"></a><code><span><span class="keyword">val</span> pp_cond : 'k. <span><span class="optlabel">?pos</span>:bool <span class="arrow">&#45;&gt;</span></span> <span><span><span class="type-var">'k</span> <span class="xref-unresolved">Cobol_ptree__.Terms.cond</span></span> <a href="../../../pretty/Pretty/index.html#type-printer">Pretty.printer</a></span></span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_abbrev_combined_relation"><a href="#val-pp_abbrev_combined_relation" class="anchor"></a><code><span><span class="keyword">val</span> pp_abbrev_combined_relation : 
   <span><span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
-  <span><span class="xref-unresolved">Cobol_ptree__.Terms.flat_combined_relation</span> <span class="arrow">&#45;&gt;</span></span>
+  <span><span>(bool
+   * <span class="xref-unresolved">Cobol_ptree__.Terms.expression</span>
+   * <span class="xref-unresolved">Cobol_ptree__.Terms.abbrev_relation_operand</span>)</span> <span class="arrow">&#45;&gt;</span></span>
+  unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_abbrev_relation_operand"><a href="#val-pp_abbrev_relation_operand" class="anchor"></a><code><span><span class="keyword">val</span> pp_abbrev_relation_operand : 
+  <span><span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
+  <span><span class="xref-unresolved">Cobol_ptree__.Terms.abbrev_relation_operand</span> <span class="arrow">&#45;&gt;</span></span>
   unit</span></code></div></div><div class="odoc-spec"><div class="spec value anchored" id="val-pp_condition"><a href="#val-pp_condition" class="anchor"></a><code><span><span class="keyword">val</span> pp_condition : 
   <span><span class="xref-unresolved">Stdlib</span>.Format.formatter <span class="arrow">&#45;&gt;</span></span>
   <span><span><span>[ <span class="xref-unresolved">Cobol_ptree__.Terms.simple_</span> <span>| <span class="xref-unresolved">Cobol_ptree__.Terms.complex_</span></span> ]</span>
