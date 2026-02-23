@@ -18,6 +18,25 @@ let neg_simple_cond ~neg : simple_condition -> condition =
 let neg_condition ~neg : condition -> condition =
   if not neg then Fun.id else fun c -> Not c
 
+(** [abbrev_condition_expansion_state] is used internally by [expand_abbrev_cond]
+    to remember the previous subject and relational operator that are omitted
+    in the abbreviation. *)
+type abbrev_condition_expansion_state =
+  | AfterSubject of bool * expression
+  | AfterRelOp of bool * expression * relop
+  | AfterNonAbbrev
+
+(** [AbbrevMissingSubjectAfterNonAbbrev] is raised by [expand_abbrev_cond] on
+    invalid conditions such as [a < b OR c IS POSITIVE OR > d] where there is no
+    rule to expand [> d] accoding to the COBOL standard. *)
+exception AbbrevMissingSubjectAfterNonAbbrev
+
+(** [AbbrevMissingRelOpAfterSubject] is raised by [expand_abbrev_cond] on invalid
+    conditions where there is no [AbbrevRelOp] in leftmost position after an
+    [AbbrevSubject]. Normally such cases are forbidden by parsing rules so this
+    exception is an internal error. *)
+exception AbbrevMissingRelOpAfterSubject
+
 (** [expand_every_abbrev_cond cond] recursively substitutes every abbreviated
     combined relation condition from [cond] by an equivalent non-abbreviated
     condition (with abbreviated relations replaced with binary relations). *)
@@ -41,43 +60,43 @@ let rec expand_every_abbrev_cond
     {i NOT [relation_condition] [logop] abbrev-combined-conditions} if [neg]
     holds), where [logop] and {i abbrev-combined-conditions} are given via
     [logop], and [flatop]. *)
-and expand_abbrev_cond: abbrev_combined_relation -> condition =
+and expand_abbrev_cond (abbrev : abbrev_combined_relation) : condition =
 
-  let rec disambiguate ?cond_prefix flatop sr =
-    (* Recursively constructs a valid condition based on the non-parenthesized
-       relational combined condition [flatop], assuming [sr] is the most recent
+  let rec disambiguate abbrevop sr =
+    (* Recursively constructs a valid condition based on the abbreviated
+       relational combined condition [abbrevop], assuming [sr] is the most recent
        subject and relation operator (when reading from the left of the
-       sentence, canceling out on non-relational conditions).
-
-       If [cond_prefix] is given, places it with a conjunction at the
-       bottom-left of the result, i.e, substitutes the bottom-left node [c] with
-       [Logop (cond_prefix, LAnd, c)]. *)
-    let c, sr = match flatop, sr with
-      | FlatAmbiguous (Some rel, e), Some (subj,   _)
-      | FlatAmbiguous (None,     e), Some (subj, rel) ->
-          UPCAST.simple_cond @@ Relation (subj, rel, e), Some (subj, rel)
-      | FlatAmbiguous (_, e), None ->
-          Expr e, sr
-      | FlatNotExpr e, Some (subj, rel) ->
-          Not (UPCAST.simple_cond @@ Relation (subj, rel, e)), sr
-      | FlatNotExpr e, None ->
-          Not (UPCAST.simple_cond @@ Expr e), sr
-      | FlatRel (neg, (e1, rel, e2)), _ ->
-          neg_condition ~neg @@ Relation (e1, rel, e2), Some (e1, rel)
-      | FlatOther c, _ ->
-          expand_every_abbrev_cond c, None
-      | FlatComb (f1, logop, f2), sr ->
-          let c1, sr = disambiguate ?cond_prefix f1 sr in
-          let c2, sr = disambiguate f2 sr in
-          Logop (c1, logop, c2), sr
-    in
-    match flatop, cond_prefix with
-    | FlatComb _, _ | _, None -> c, sr
-    | _, Some c0 -> Logop (c0, LAnd, c), sr
+       sentence, canceling out on non-relational conditions). *)
+    match abbrevop, sr with
+    | AbbrevRelOp (rel, a), (AfterSubject (neg, subj) | AfterRelOp (neg, subj, _)) ->
+        disambiguate a (AfterRelOp (neg, subj, rel))
+    | AbbrevRelOp _, AfterNonAbbrev ->
+        raise AbbrevMissingSubjectAfterNonAbbrev
+    | AbbrevObject (obj_neg, obj), AfterRelOp (subj_neg, subj, rel) ->
+        let neg = if subj_neg then not obj_neg else obj_neg in
+        let expanded_cond = neg_condition ~neg @@ UPCAST.simple_cond @@ Relation (subj, rel, obj) in
+        (* If present a NOT before the subject only applies to the first object *)
+        let sr = AfterRelOp (false, subj, rel) in
+        expanded_cond, sr
+    | AbbrevObject (neg, e), AfterNonAbbrev ->
+        neg_condition ~neg @@ Expr e, AfterNonAbbrev
+    | AbbrevObject _, AfterSubject _
+    | AbbrevSubject _, AfterSubject _ ->
+        raise AbbrevMissingRelOpAfterSubject
+    | AbbrevSubject (neg, subj, a), _ ->
+        let c, sr = disambiguate a (AfterSubject (neg, subj)) in
+        neg_condition ~neg c, sr
+    | AbbrevNot a, sr ->
+        let c, sr = disambiguate a sr in
+        Not c, sr
+    | AbbrevOther c, _ ->
+        expand_every_abbrev_cond c, AfterNonAbbrev
+    | AbbrevComb (a1, logop, a2), sr ->
+        let c1, sr = disambiguate a1 sr in
+        let c2, sr = disambiguate a2 sr in
+        Logop (c1, logop, c2), sr
   in
 
-  fun (neg, (e1, relop, e2), logop, flatop) ->
-    let c0 = neg_condition ~neg @@ Relation (e1, relop, e2) in
-    match logop with
-    | LOr -> Logop (c0, LOr, fst @@ disambiguate flatop (Some (e1, relop)))
-    | LAnd -> fst @@ disambiguate ~cond_prefix:c0 flatop (Some (e1, relop))
+  let neg, subj, abbrevop = abbrev in
+  let c, _ = disambiguate abbrevop (AfterSubject (neg, subj)) in
+  c

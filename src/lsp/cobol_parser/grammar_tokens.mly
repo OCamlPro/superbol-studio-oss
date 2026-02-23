@@ -1054,6 +1054,9 @@
 (* Combined CONSTANT *)
 %token CONSTANT_RECORD              [@keyword.combined]
 
+(* LPAR when the next non-LPAR tokens form a relational operator *)
+%token LPAR_BEFORE_RELOP            [@keyword.combined]
+
 (* Special token for retokenizations after `DECIMAL-POINT IS COMMA` in
    `SPECIAL-NAMES`; should never be fed to the parser (see Text_tokenizer and
    Parser_engine). *)
