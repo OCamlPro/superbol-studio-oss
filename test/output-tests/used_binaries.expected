@@ -48,12 +48,12 @@ Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:946:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:962:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:991:0
 Considering: import/gnucobol/tests/testsuite.src/used_binaries.at:1024:0
-used_binaries.at-1024-progprep.cob:5.36-5.37:
+used_binaries.at-1024-progprep.cob:5.47-5.48:
    2          IDENTIFICATION   DIVISION.
    3          PROGRAM-ID.      prog.
    4          DATA             DIVISION.
    5 >        WORKING-STORAGE  SECTION.	  	#
-----                                       ^
+----                                        
    6          01 TEST-VAR PIC 9(2) VALUE 'A'.
    7          COPY 'CRUD.CPY'.
 >> Error: Invalid syntax

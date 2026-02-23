@@ -94,3 +94,24 @@ let build_data_division = function
               { d with screen_sections = ss :: d.screen_sections }
       in
       Some (rebuild_sections list empty_data_division &@ loc)
+
+let build_simple_program opts_par env_div datat_div proc_div =
+  (Program {
+    program_name =
+      (Cobol_ptree.Dummies.dummy_name' ~pos:Lexing.dummy_pos) &@ Cobol_common.Srcloc.dummy;
+      (* TODO: Use filename *)
+    program_as = None;
+    program_level = ProgramDefinition {
+      mode = None;
+      has_identification_division_header = false;
+      preliminary_informational_paragraphs = [];
+      supplementary_informational_paragraphs = [];
+      nested_programs = []; };
+    program_options = opts_par;
+    program_env = env_div;
+    program_data = (match datat_div with
+      | Some dd -> build_data_division dd
+      | None -> None);
+    program_proc = Some proc_div;
+    program_end_name = None;
+  })

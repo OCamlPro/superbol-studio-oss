@@ -242,10 +242,54 @@ let make make_lexing ?filename ~source_format input =
   Option.iter (Lexing.set_filename lexbuf) filename;
   Plx (Src_lexing.init_state source_format, lexbuf)
 
+let from_channel_expanding_tabs ?with_positions ?(tab_stop = 8) ic : Lexing.lexbuf =
+    let read_buf = Bytes.create 4096 in
+    let read_pos = ref 0 in    (* current position in read_buf *)
+    let read_len = ref 0 in    (* valid bytes in read_buf *)
+    let col = ref 0 in         (* current column (0-based) *)
+    let refill buf len =
+      let written = ref 0 in
+      let rec loop () =
+        if !written >= len then ()       (* lexer buffer full *)
+        else begin
+          (* Refill read_buf if exhausted *)
+          if !read_pos >= !read_len then begin
+            let n = input ic read_buf 0 (Bytes.length read_buf) in
+            if n = 0 then ()             (* EOF *)
+            else begin read_pos := 0; read_len := n; loop () end
+          end else
+            let c = Bytes.get read_buf !read_pos in
+            if c = '\t' then begin
+              let spaces = tab_stop - (!col mod tab_stop) in
+              let n = min spaces (len - !written) in
+              Bytes.fill buf !written n ' ';
+              written := !written + n;
+              col := !col + n;
+              if n = spaces then           (* fully expanded this tab *)
+                incr read_pos
+              (* else: partially expanded; we'll resume next refill *)
+            end else begin
+              Bytes.set buf !written c;
+              incr written;
+              incr read_pos;
+              if c = '\n' then col := 0
+              else col := !col + 1
+            end;
+            loop ()
+        end
+      in
+      loop ();
+      !written
+    in
+    Lexing.from_function ?with_positions refill
+
 (* --- *)
 
 let from_string = make Lexing.from_string
 let from_channel = make Lexing.from_channel
+let from_channel_no_tabs ?(tab_stop=8) =
+    make (from_channel_expanding_tabs ~tab_stop)
+
 
 let fill buff ~lookup_len (input: Src_input.t) =
   match input with
@@ -272,9 +316,9 @@ let from ?source_format (input: Src_input.t) =
   let source_format, input = start_reading input ?source_format in
   match input with
   | String { contents; filename } ->
-      from_string ~source_format ~filename contents
+      from_string ~source_format ~filename (Src_lexing.expand_tabs contents)
   | Channel { ic; filename } ->
-      from_channel ~source_format ~filename ic
+      from_channel_no_tabs ~source_format ~filename ic
 
 (* --- *)
 

@@ -127,22 +127,54 @@ _|_        PROGRAM-ID. prog.
        3           PROGRAM-ID. prog.
        4           PROCEDURE DIVISION.
     (line 1, character 4):
-    Basic (7 entries):
+    Basic (23 entries):
         CLASS-ID
+        CONFIGURATION
         CONTROL
+        DATA
+        ENVIRONMENT
+        FD
+        FILE
+        FILE-CONTROL
         FUNCTION-ID
         ID
         IDENTIFICATION
+        INPUT-OUTPUT
         INTERFACE-ID
+        I-O-CONTROL
+        OBJECT-COMPUTER
+        OPTIONS
+        PROCEDURE
         PROGRAM-ID
-    Eager (7 entries):
+        REPOSITORY
+        SD
+        SELECT
+        SOURCE-COMPUTER
+        SPECIAL-NAMES
+    Eager (23 entries):
         CLASS-ID.\n
+        CONFIGURATION SECTION.\n
         CONTROL DIVISION.\n
+        DATA DIVISION.\n
+        ENVIRONMENT DIVISION.\n
+        FD
+        FILE SECTION.\n
+        FILE-CONTROL.\n
         FUNCTION-ID
         ID DIVISION.\n
         IDENTIFICATION DIVISION.\n
+        INPUT-OUTPUT SECTION.\n
         INTERFACE-ID.\n
+        I-O-CONTROL.\n
+        OBJECT-COMPUTER.\n
+        OPTIONS.\n
+        PROCEDURE DIVISION
         PROGRAM-ID
+        REPOSITORY.\n
+        SD
+        SELECT
+        SOURCE-COMPUTER.\n
+        SPECIAL-NAMES.\n
     __rootdir__/prog.cob:2.23:
        1
        2 >         IDENTIFICATION DIVISION.
@@ -470,22 +502,54 @@ let%expect_test "division-and-section-completion" =
        3           PROGRAM-ID . prog.
        4           DATA DIVISION.
     (line 1, character 8):
-    Basic (7 entries):
+    Basic (23 entries):
         CLASS-ID
+        CONFIGURATION
         CONTROL
+        DATA
+        ENVIRONMENT
+        FD
+        FILE
+        FILE-CONTROL
         FUNCTION-ID
         ID
         IDENTIFICATION
+        INPUT-OUTPUT
         INTERFACE-ID
+        I-O-CONTROL
+        OBJECT-COMPUTER
+        OPTIONS
+        PROCEDURE
         PROGRAM-ID
-    Eager (7 entries):
+        REPOSITORY
+        SD
+        SELECT
+        SOURCE-COMPUTER
+        SPECIAL-NAMES
+    Eager (23 entries):
         CLASS-ID.\n
+        CONFIGURATION SECTION.\n
         CONTROL DIVISION.\n
+        DATA DIVISION.\n
+        ENVIRONMENT DIVISION.\n
+        FD
+        FILE SECTION.\n
+        FILE-CONTROL.\n
         FUNCTION-ID
         ID DIVISION.\n
         IDENTIFICATION DIVISION.\n
+        INPUT-OUTPUT SECTION.\n
         INTERFACE-ID.\n
+        I-O-CONTROL.\n
+        OBJECT-COMPUTER.\n
+        OPTIONS.\n
+        PROCEDURE DIVISION
         PROGRAM-ID
+        REPOSITORY.\n
+        SD
+        SELECT
+        SOURCE-COMPUTER.\n
+        SPECIAL-NAMES.\n
     __rootdir__/prog.cob:2.32:
        1
        2 >         IDENTIFICATION DIVISION.
