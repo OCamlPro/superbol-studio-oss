@@ -563,15 +563,25 @@ let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
-let fold_source_lines ~dialect ~source_format ?on_initial_source_format
+let fold_source_lines ~dialect ~source_format ?on_source_format_change
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
   let reader =
     Src_reader.from input ?source_format:(source_format_config source_format)
   in
-  let acc = match on_initial_source_format with
-    | Some f -> f (Src_reader.source_format reader) acc
-    | None -> acc
+  let acc, on_compiler_directive = match on_source_format_change with
+    | Some f ->
+      let check_source_format_compdir _ { payload = cdir; _ } acc =
+        match cdir with
+        | Preproc_directives.CDir_source { payload = sf; _ } -> f sf acc
+        | _ -> acc
+      in
+      let f_compdir = match on_compiler_directive with
+        | Some f -> fun l cdir acc -> f l cdir @@ check_source_format_compdir l cdir acc
+        | None -> check_source_format_compdir
+      in
+      f (Src_reader.source_format reader) acc, Some f_compdir
+    | None -> acc, on_compiler_directive
   in
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
