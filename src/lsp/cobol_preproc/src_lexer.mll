@@ -102,6 +102,7 @@
       CDIR_SET;
       ADDRSV;
       ADDSYN;
+      ANS85;
       AREACHECK;
       ASSIGN;
       BOUND;
@@ -114,6 +115,7 @@
       INTLEVEL;
       MAKESYN;
       NESTCALL;
+      NOANS85;
       NOAREACHECK;
       NOBOUND;
       NOCHECKNUM;
@@ -126,6 +128,7 @@
       ODOSLIDE;
       OVERRIDE;
       REMOVE;
+      SEQUENTIAL;
       SIGN;
       SOURCEFORMAT;
       SPZERO;

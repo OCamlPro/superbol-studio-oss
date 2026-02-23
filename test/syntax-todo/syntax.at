@@ -687,7 +687,7 @@ AT_CLEANUP
 
 
 
-AT_SETUP([MF AND85 DIRECTIVE])
+AT_SETUP([MF ANS85 DIRECTIVE])
 
 # promoted on 2024-04-05T13:38
 AT_DATA([prog.cob], [
@@ -696,7 +696,7 @@ AT_DATA([prog.cob], [
        PROGRAM-ID. customer.
 ])
 
-AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [1],
+AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
 prog.cob:2.6-2.16:
    1   @&t@
@@ -704,7 +704,7 @@ prog.cob:2.6-2.16:
 ----         ^^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. customer.
->> Error: Malformed compiler directive
+>> Warning: Ignored compiler directive
 
 ],
 [SuperBOL, by OCamlPro. https://get-superbol.com. Affero GPL version.

@@ -46,6 +46,7 @@
 
 %token ADDRSV          [@keyword "ADDRSV", "ADD-RSV"]
 %token ADDSYN          [@keyword "ADDSYN", "ADD-SYN"]
+%token ANS85           [@keyword]
 %token AREACHECK       [@keyword "AREACHECK", "AREA-CHECK"]
 %token AS              [@keyword]
 %token ASSIGN          [@keyword]
@@ -66,6 +67,7 @@
 %token LESS            [@keyword]
 %token MAKESYN         [@keyword "MAKESYN", "MAKE-SYN"]
 %token NESTCALL        [@keyword]
+%token NOANS85         [@keyword "NOANS85", "NO-ANS85"]
 %token NOAREACHECK     [@keyword "NOAREACHECK", "NO-AREACHECK", "NO-AREA-CHECK"]
 %token NOBOUND         [@keyword "NOBOUND", "NO-BOUND"]
 %token NOCHECKNUM      [@keyword "NOCHECKNUM", "NO-CHECKNUM", "NO-CHECK-NUM"]
@@ -82,6 +84,7 @@
 %token OVERRIDE        [@keyword]
 %token PARAMETER       [@keyword]
 %token REMOVE          [@keyword]
+%token SEQUENTIAL      [@keyword]
 %token SET             [@keyword]
 %token SIGN            [@keyword]
 %token SOURCEFORMAT    [@keyword "SOURCEFORMAT", "SOURCE-FORMAT"]
@@ -156,6 +159,7 @@ let string_value :=
 let set_operand :=
   | ADDRSV;                                             {Add_srv}
   | ADDSYN;                                             {Add_syn}
+  | ANS85;                                              {ANSI_85 true}
   | AREACHECK;                                          {Area_check true}
   | ASSIGN;                                             {Assign}
   | BOUND;                                              {Bound true}
@@ -169,6 +173,7 @@ let set_operand :=
   | INTLEVEL; LPAR; l = loc(FIXEDLIT); RPAR;            {Int_level l}
   | MAKESYN;                                            {Make_syn}
   | NESTCALL;                                           {Nest_call}
+  | NOANS85;                                            {ANSI_85 false}
   | NOAREACHECK;                                        {Area_check false}
   | NOBOUND;                                            {Bound false}
   | NOCHECKNUM;                                         {Check_num false}
@@ -180,6 +185,7 @@ let set_operand :=
   | NSYMBOL; v = string_value;                          {N_symbol v}
   | ODOSLIDE;                                           {ODO_slide true}
   | REMOVE;                                             {Remove}
+  | SEQUENTIAL; v = string_value;                       {Sequential v}
   | SIGN; v = string_value;                             {Sign v}
   | SPZERO;                                             {SP_zero true}
   | SSRANGE;                                            {SS_range true}

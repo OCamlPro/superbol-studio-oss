@@ -94,6 +94,7 @@ and condition_operator = Eq | Ge | Gt | Le | Lt | Ne
 and set_operand =
   | Add_srv
   | Add_syn
+  | ANSI_85 of bool
   | Area_check of bool
   | Assign
   | Bound of bool
@@ -109,6 +110,7 @@ and set_operand =
   | N_symbol of string with_loc
   | ODO_slide of bool
   | Remove
+  | Sequential of string with_loc
   | Sign of string with_loc
   | SP_zero of bool
   | SS_range of bool
