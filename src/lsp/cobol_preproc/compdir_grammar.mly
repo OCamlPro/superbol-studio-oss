@@ -115,9 +115,8 @@ let loc (X) ==
 (* --- Entry points --------------------------------------------------------- *)
 
 let compiler_directive :=
-  | CDIR_SOURCE; ~ = source_directive; <Lexing>
-  | CDIR_SET; ~ = set_sourceformat; <Lexing>
-  | CDIR_SET; ~ = set_directive; <Preproc>
+  | CDIR_SOURCE; ~ = source_directive; <Source>
+  | CDIR_SET; ~ = set_directive; <Set>
   | CDIR_DEFINE; ~ = define_directive; <Preproc>
   | CDIR_IF; ~ = if_directive; <Preproc>
   | CDIR_ELIF; ~ = elif_directive; <Preproc>
@@ -125,7 +124,7 @@ let compiler_directive :=
   | CDIR_END; EOL; { Preproc End }
   | CDIR_END_IF; EOL; { Preproc End_if }
 
-(* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
+(* --- >>SOURCE | $ SOURCE -------------------------------------------------- *)
 
 let source_directive :=
   | ~ = source_format; PERIOD?; EOL; < >
@@ -136,17 +135,15 @@ let source_format :=
   | FORMAT?; IS?; i = text_word;
     { Source_format_is i }
 
-let set_sourceformat :=
-  | SOURCEFORMAT; i = string_value; PERIOD?; EOL;       (* elementary_string_literal? *)
-    { Set_sourceformat i }
 
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
 
 let set_directive :=
-  | ~ = set; PERIOD?; EOL; < >
+  | ~ = nonempty_list(loc(set_directive_item)); PERIOD?; EOL; <>
 
-let set :=
-  | ~ = loc(set_operand); <Set>
+let set_directive_item :=
+  | ~ = set_operand; <Set_preproc>
+  | SOURCEFORMAT; ~ = string_value; <Set_source_format>
 
 let const_value :=
   | ~ = loc(ALPHANUM);             <Alphanum>

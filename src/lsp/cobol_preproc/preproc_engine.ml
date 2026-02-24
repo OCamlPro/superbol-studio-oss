@@ -193,28 +193,21 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
         Pretty.error "Src: %a@." Text.pp_text text;
       let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
-      | Ok None when not emitting ->                              (* ignore text *)
+      | None when not emitting ->                              (* ignore text *)
           let rev_ignored = List.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
-      | Ok None ->
+      | None ->
           preprocess_line { lp with reader; buff = [] } (buff @ text)
-      | Ok Some ([], compdir, _compdir_text, diags) ->
+      | Some ([], compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
-          next_chunk (apply_compiler_directive lp compdir)
-      | Ok Some (text, compdir, _compdir_text, diags) when not emitting ->
+          next_chunk (List.fold_left apply_compiler_directive lp compdirs)
+      | Some (text, compdirs, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
-      | Ok Some (text, compdir, _compdir_text, diags) ->
+          next_chunk (List.fold_left apply_compiler_directive lp compdirs)     (* ignore text *)
+      | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
-      | Error (text, _compdir_text, diags) when not emitting ->
-          let rev_ignored = List.rev_append text lp.rev_ignored in
-          let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk lp                                        (* ignore text *)
-      | Error (text, _compdir_text, diags) ->
-          let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp (buff @ text)
+          preprocess_line (List.fold_left apply_compiler_directive lp compdirs) (buff @ text)
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =

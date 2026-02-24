@@ -698,10 +698,10 @@ AT_DATA([prog.cob], [
 
 AT_CHECK([$SUPERBOL check --recovery=false --std=mf prog.cob], [0],
 [Checking `prog.cob'
-prog.cob:2.6-2.16:
+prog.cob:2.11-2.16:
    1   @&t@
    2 >       $SET ans85
-----         ^^^^^^^^^^
+----              ^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. customer.
 >> Warning: Ignored compiler directive

@@ -25,16 +25,20 @@ type directive_kind =
   | Source_directive
 
 type directive =
-  | Lexing of lexing_directive
+  | Source of source_directive
+  | Set of set_directive_item with_loc list
   | Preproc of preproc_directive
 
-and lexing_directive =
+and source_directive =
   | Source_format_is_free of srcloc [@printer fun _ _ -> ()]
   | Source_format_is of Cobol_data.Literal.alphanum with_loc
-  | Set_sourceformat of Cobol_data.Literal.alphanum with_loc
+
+and set_directive_item =
+  | Set_source_format of Cobol_data.Literal.alphanum with_loc
+  | Set_preproc of set_operand
 
 and preproc_directive =
-  | Set of set_operand with_loc
+  | Set of set_operand
   | Define_off of var with_loc
   | Define of definition
   | If of boolexpr with_loc
