@@ -97,10 +97,10 @@ let decode_compiler_directive ~compdir_kind ~dialect compdir_text =
     let open Preproc_directives in
     match Compdir_grammar.MenhirInterpreter.loop supplier parser with
     | Lexing Source_format_is_free loc ->
-        Ok (CDir_source (Src_format.from_config SFFree &@ loc))
+        Ok (CDir_source_format (Src_format.from_config SFFree &@ loc))
     | Lexing Source_format_is { payload = format; loc }
     | Lexing Set_sourceformat { payload = format; loc } ->
-        (try Ok (CDir_source (Src_format.decypher ~dialect format &@ loc))
+        (try Ok (CDir_source_format (Src_format.decypher ~dialect format &@ loc))
          with Src_format.INVALID _ ->
            Error (Invalid { loc; stuff = Source_format format }))
     | Preproc directive ->
@@ -157,7 +157,7 @@ let fold_chunks
             then aux pl acc
             else aux pl (f text acc)
   and apply_compdir { payload = compdir; _ } pl = match compdir with
-    | CDir_source sf ->
+    | CDir_source_format sf ->
         (match with_source_format sf pl with
          | Ok pl -> pl
          | Error _error -> pl)                                       (* ignore *)

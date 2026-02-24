@@ -220,7 +220,7 @@ and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
   let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
   match compdir with
-  | Preproc_directives.CDir_source sf ->
+  | Preproc_directives.CDir_source_format sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
@@ -573,7 +573,7 @@ let fold_source_lines ~dialect ~source_format ?on_source_format_change
     | Some f ->
       let check_source_format_compdir _ { payload = cdir; _ } acc =
         match cdir with
-        | Preproc_directives.CDir_source { payload = sf; _ } -> f sf acc
+        | Preproc_directives.CDir_source_format { payload = sf; _ } -> f sf acc
         | _ -> acc
       in
       let f_compdir = match on_compiler_directive with
