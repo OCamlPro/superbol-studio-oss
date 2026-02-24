@@ -34,8 +34,6 @@ let with_loc token location_limits =
 let dual_handler_none =
   { dual_handler_pos = []; dual_handler_neg = [] }
 
-let dummy_loc = Cobol_common.Srcloc.dummy
-
 %}
 
 (* Tokens are listed in `grammar_tokens.mly' *)

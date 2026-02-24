@@ -96,7 +96,7 @@ let build_data_division = function
       Some (rebuild_sections list empty_data_division &@ loc)
 
 let build_simple_program opts_par env_div datat_div proc_div =
-  (Program {
+  Program {
     program_name =
       (Cobol_ptree.Dummies.dummy_name_or_literal ~pos:Lexing.dummy_pos) &@ Cobol_common.Srcloc.dummy;
       (* TODO: Use filename *)
@@ -114,4 +114,4 @@ let build_simple_program opts_par env_div datat_div proc_div =
       | None -> None);
     program_proc = Some proc_div;
     program_end_name = None;
-  })
+  }
