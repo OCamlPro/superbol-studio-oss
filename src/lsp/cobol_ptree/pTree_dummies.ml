@@ -25,7 +25,7 @@ let dummy_string ~pos = alphanum__ &@ Cobol_common.Srcloc.raw (pos, pos)
 
 let dummy_name ~pos = dummy_string ~pos
 
-let dummy_name' ~pos : name_or_literal = Name (dummy_string ~pos)
+let dummy_name_or_literal ~pos : name_or_literal = Name (dummy_string ~pos)
 
 let dummy_qualname ~pos : qualname =
   Name (dummy_name ~pos)
