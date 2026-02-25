@@ -556,13 +556,13 @@ let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
-let fold_source_lines ~dialect ~source_format ?on_source_format_change
+let fold_source_lines ~dialect ~source_format ?on_change_of_source_format
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
   let reader =
     Src_reader.from input ?source_format:(source_format_config source_format)
   in
-  let acc, on_compiler_directive = match on_source_format_change with
+  let acc, on_compiler_directive = match on_change_of_source_format with
     | Some f ->
       let check_source_format_compdir _ { payload = cdir; _ } acc =
         match cdir with
