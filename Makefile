@@ -55,7 +55,11 @@ build-deps:
 	if ! [ -e _opam ]; then \
 	   opam switch create . 4.14.2 --no-install ; \
 	fi
-	opam install ./opam/*.opam --deps-only
+	opam install ./opam/*.opam $(MORE_OPAM_FILES) --deps-only
+
+.PHONY: cross-osx-build-deps cross-windows-build-deps
+cross-%-build-deps: build-deps
+	opam install ./opam/$*/*.opam --deps-only
 
 
 .PHONY: doc-common odoc view sphinx
@@ -92,7 +96,8 @@ uninstall:
 	opam uninstall .
 
 dev-deps:
-	opam install ./opam/*.opam ./test/opam/*.opam --deps-only --with-doc --with-test
+	opam install ./opam/*.opam $(MORE_OPAM_FILES) $(MORE_DEV_OPAM_FILES) \
+	             ./test/opam/*.opam --deps-only --with-doc --with-test
 
 test:
 	./scripts/before.sh test

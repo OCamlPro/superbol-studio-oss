@@ -55,7 +55,10 @@ build-deps:
 	if ! [ -e _opam ]; then \
 	   opam switch create . !{edition} --no-install ; \
 	fi
-	opam install ./opam/*.opam --deps-only
+	opam install ./opam/*.opam $(MORE_OPAM_FILES) --deps-only
+
+cross-%-build-deps: build-deps
+	opam install ./opam/$*/*.opam --deps-only
 
 ![if:gen:docs]
 .PHONY: doc-common odoc view![if:gen:sphinx] sphinx![fi]
@@ -92,7 +95,8 @@ uninstall:
 	opam uninstall .
 
 dev-deps:
-	opam install ./opam/*.opam ./test/opam/*.opam --deps-only --with-doc --with-test
+	opam install ./opam/*.opam $(MORE_OPAM_FILES) $(MORE_DEV_OPAM_FILES) \
+	             ./test/opam/*.opam --deps-only --with-doc --with-test
 
 test:
 	./scripts/before.sh test

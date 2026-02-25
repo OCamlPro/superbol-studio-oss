@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-b56d6ab292cffd32be60f0d957120147:.
+75cff7117b36e224d630bd9a0186c27d:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -25,7 +25,7 @@ c201d9d64df08fdab3af4fd896fd5575:.gitignore
 
 # begin context for Makefile
 # file Makefile
-35bc54454e7958e952e11a1284bab4ca:Makefile
+e7feea448acd83e06428314877b92c68:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -50,7 +50,7 @@ e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
 
 # begin context for docs/index.html
 # file docs/index.html
-149a7e99c25de549ab1d4a128d2377e6:docs/index.html
+a71393c473a75ddf9f67dac1ce7c65be:docs/index.html
 # end context for docs/index.html
 
 # begin context for docs/sphinx/index.html
@@ -80,172 +80,172 @@ bce13d92ef8319070a816fd5716bdb96:dune-project
 
 # begin context for opam/cobol_cfg.opam
 # file opam/cobol_cfg.opam
-8df5e8347a9409bd2b85a02d9048def1:opam/cobol_cfg.opam
+1a95d91e0e39feced9a8ed84569b25fb:opam/cobol_cfg.opam
 # end context for opam/cobol_cfg.opam
 
 # begin context for opam/cobol_common.opam
 # file opam/cobol_common.opam
-ec0d396dca675840252d06c2e73aa1de:opam/cobol_common.opam
+5d3f68afacb40bde777b2d19bfb0fcdb:opam/cobol_common.opam
 # end context for opam/cobol_common.opam
 
 # begin context for opam/cobol_config.opam
 # file opam/cobol_config.opam
-0b6d41c76a49ea6b0aecf3a5b46c0bd6:opam/cobol_config.opam
+3e274c57cf9cb2298f880230b7edfe96:opam/cobol_config.opam
 # end context for opam/cobol_config.opam
 
 # begin context for opam/cobol_data.opam
 # file opam/cobol_data.opam
-ff6177bd94efc10fe485db5f172141d8:opam/cobol_data.opam
+99000d76ad02d0667bf0a9923b31f449:opam/cobol_data.opam
 # end context for opam/cobol_data.opam
 
 # begin context for opam/cobol_indent.opam
 # file opam/cobol_indent.opam
-fc70c5dea42d140071781dcc21772057:opam/cobol_indent.opam
+13d544daf1d0dc3eabe019eaa4fc3120:opam/cobol_indent.opam
 # end context for opam/cobol_indent.opam
 
 # begin context for opam/cobol_indent_old.opam
 # file opam/cobol_indent_old.opam
-15d1fd7c3217909dfc150e5a28b42f61:opam/cobol_indent_old.opam
+1136645ca198c3a1c397db09a2f6cd28:opam/cobol_indent_old.opam
 # end context for opam/cobol_indent_old.opam
 
 # begin context for opam/cobol_lsp.opam
 # file opam/cobol_lsp.opam
-f430994cda5bc319d05d0e5b306018e5:opam/cobol_lsp.opam
+3902651881a2400ca1ebd16eecaef9a5:opam/cobol_lsp.opam
 # end context for opam/cobol_lsp.opam
 
 # begin context for opam/cobol_parser.opam
 # file opam/cobol_parser.opam
-d09da32baf3c733888056f43ff1f4b44:opam/cobol_parser.opam
+4e2d9631338b399095aa32e2ed786a13:opam/cobol_parser.opam
 # end context for opam/cobol_parser.opam
 
 # begin context for opam/cobol_preproc.opam
 # file opam/cobol_preproc.opam
-586d4cb18fa3a7e8c2a257cec58c08f7:opam/cobol_preproc.opam
+e148630e4a33d5caa5b5676338f2c94d:opam/cobol_preproc.opam
 # end context for opam/cobol_preproc.opam
 
 # begin context for opam/cobol_ptree.opam
 # file opam/cobol_ptree.opam
-57167206add4685c9f957cf95d77448d:opam/cobol_ptree.opam
+2f2538c795afd7a224999bbff4c4ee3c:opam/cobol_ptree.opam
 # end context for opam/cobol_ptree.opam
 
 # begin context for opam/cobol_typeck.opam
 # file opam/cobol_typeck.opam
-aec0917c0448d7b070e4918890e987f6:opam/cobol_typeck.opam
+277760f4ed854e959584e215f284eb3b:opam/cobol_typeck.opam
 # end context for opam/cobol_typeck.opam
 
 # begin context for opam/cobol_unit.opam
 # file opam/cobol_unit.opam
-1947bb438d9731d114a04d2a1c2c70dc:opam/cobol_unit.opam
+f5c60ff860242935d9759723d9c245b4:opam/cobol_unit.opam
 # end context for opam/cobol_unit.opam
 
 # begin context for opam/ebcdic_lib.opam
 # file opam/ebcdic_lib.opam
-aba8dddc59a446028cd90e9dbbe76139:opam/ebcdic_lib.opam
+e6eef67fdfc6f1311385e115e0895735:opam/ebcdic_lib.opam
 # end context for opam/ebcdic_lib.opam
 
 # begin context for opam/ez_toml.opam
 # file opam/ez_toml.opam
-8d8e1053c91dfb25fd5bbe6ce6143e25:opam/ez_toml.opam
+c8de06f6cbf0113aa6f34d4d640b2863:opam/ez_toml.opam
 # end context for opam/ez_toml.opam
 
 # begin context for opam/ezr_toml.opam
 # file opam/ezr_toml.opam
-bcbd4fe0927160908ae6b691b8b30448:opam/ezr_toml.opam
+156ab405b18e7e2fc6a367f83f33c023:opam/ezr_toml.opam
 # end context for opam/ezr_toml.opam
 
 # begin context for opam/interop-js-stubs.opam
 # file opam/interop-js-stubs.opam
-701acc41dbe80b54d94297c0b5182eb5:opam/interop-js-stubs.opam
+4574db73be7afdc490d28e16d940b7f1:opam/interop-js-stubs.opam
 # end context for opam/interop-js-stubs.opam
 
 # begin context for opam/node-js-stubs.opam
 # file opam/node-js-stubs.opam
-00a71ffa910a75cdeb4a97bf79ec3852:opam/node-js-stubs.opam
+080ee201bc2e99cec9749e39988afff7:opam/node-js-stubs.opam
 # end context for opam/node-js-stubs.opam
 
 # begin context for opam/ppx_cobcflags.opam
 # file opam/ppx_cobcflags.opam
-62f1474cb2b4cacb107b6ae9da8e980d:opam/ppx_cobcflags.opam
+f013e0ab1c8878f2ace3479e248e0476:opam/ppx_cobcflags.opam
 # end context for opam/ppx_cobcflags.opam
 
 # begin context for opam/pretty.opam
 # file opam/pretty.opam
-69c0f191ddce1ba2cd695ba5fdc164c8:opam/pretty.opam
+ccc6b17d2bd378b2f9bd1af6f8df2a07:opam/pretty.opam
 # end context for opam/pretty.opam
 
 # begin context for opam/sql_ast.opam
 # file opam/sql_ast.opam
-260ca41d1e3caec07dd3a1008ef9b1f3:opam/sql_ast.opam
+288cfc192d85cd0a54f397cd526f7a09:opam/sql_ast.opam
 # end context for opam/sql_ast.opam
 
 # begin context for opam/sql_parser.opam
 # file opam/sql_parser.opam
-c620f14db180c6340b59419211a9d1b3:opam/sql_parser.opam
+aac4311edbf6b48a260f8dc80a9661e3:opam/sql_parser.opam
 # end context for opam/sql_parser.opam
 
 # begin context for opam/sql_preproc.opam
 # file opam/sql_preproc.opam
-7674b0c73e3bc84a2f7be6ffd678b235:opam/sql_preproc.opam
+8667b0232ece3ec495abece809d8ccca:opam/sql_preproc.opam
 # end context for opam/sql_preproc.opam
 
 # begin context for opam/superbol-free.opam
 # file opam/superbol-free.opam
-78bbfa21a02eab15f1fc924644a5418b:opam/superbol-free.opam
+00d02c0447a00aec98a9987c3fda4945:opam/superbol-free.opam
 # end context for opam/superbol-free.opam
 
 # begin context for opam/superbol-studio-oss.opam
 # file opam/superbol-studio-oss.opam
-2d49cf3ab0b9d2343cde4338f56faa6f:opam/superbol-studio-oss.opam
+057ff2a70b0ef1df2917815cfb06eb05:opam/superbol-studio-oss.opam
 # end context for opam/superbol-studio-oss.opam
 
 # begin context for opam/superbol-vscode-lib.opam
 # file opam/superbol-vscode-lib.opam
-df2dd3c3fe84ccf102f3a288fb55aaa0:opam/superbol-vscode-lib.opam
+3df8a9be1da969e8ecce18e69e1ec85c:opam/superbol-vscode-lib.opam
 # end context for opam/superbol-vscode-lib.opam
 
 # begin context for opam/superbol-vscode-platform.opam
 # file opam/superbol-vscode-platform.opam
-4cb6d5f2cb3b3b20fae02b4487f49573:opam/superbol-vscode-platform.opam
+edb130a89dd2331e90bda4ba05c88fbd:opam/superbol-vscode-platform.opam
 # end context for opam/superbol-vscode-platform.opam
 
 # begin context for opam/superbol_free_lib.opam
 # file opam/superbol_free_lib.opam
-c1b983ec86a07f977651b30175b8b29f:opam/superbol_free_lib.opam
+805cf2e33038aa044d04439c546201dc:opam/superbol_free_lib.opam
 # end context for opam/superbol_free_lib.opam
 
 # begin context for opam/superbol_preprocs.opam
 # file opam/superbol_preprocs.opam
-7a76057b1e104d98bad50c158d6f473a:opam/superbol_preprocs.opam
+6fb48e220dc3f16b56744162b9b0176b:opam/superbol_preprocs.opam
 # end context for opam/superbol_preprocs.opam
 
 # begin context for opam/superbol_project.opam
 # file opam/superbol_project.opam
-fa422b9958df6ce53e03d339a78c618c:opam/superbol_project.opam
+21c672115659315be403c634fe02e171:opam/superbol_project.opam
 # end context for opam/superbol_project.opam
 
 # begin context for opam/vscode-debugadapter.opam
 # file opam/vscode-debugadapter.opam
-5290651fc8e5b0705d3fa562e0092bf1:opam/vscode-debugadapter.opam
+48b7e6ca344bcf7c9e741ebb18badb3a:opam/vscode-debugadapter.opam
 # end context for opam/vscode-debugadapter.opam
 
 # begin context for opam/vscode-debugprotocol.opam
 # file opam/vscode-debugprotocol.opam
-3a8a9c7e31b33e1548a28a4cf5bac940:opam/vscode-debugprotocol.opam
+11f75e1b721f021083824b3ad4d20a06:opam/vscode-debugprotocol.opam
 # end context for opam/vscode-debugprotocol.opam
 
 # begin context for opam/vscode-js-stubs.opam
 # file opam/vscode-js-stubs.opam
-e038da8f510658b96c475ea22ea5dfda:opam/vscode-js-stubs.opam
+07b8c0199eeab22d28bccb7a747f5859:opam/vscode-js-stubs.opam
 # end context for opam/vscode-js-stubs.opam
 
 # begin context for opam/vscode-json.opam
 # file opam/vscode-json.opam
-02c2cb919fa4c2d612cb409c1d8dfb7c:opam/vscode-json.opam
+3738e689143c0d7f26311d0008b0ba0b:opam/vscode-json.opam
 # end context for opam/vscode-json.opam
 
 # begin context for opam/vscode-languageclient-js-stubs.opam
 # file opam/vscode-languageclient-js-stubs.opam
-3b92e20dbae5f96644a51b309ff8f4f6:opam/vscode-languageclient-js-stubs.opam
+587b2e401094c7413914c7b58624b182:opam/vscode-languageclient-js-stubs.opam
 # end context for opam/vscode-languageclient-js-stubs.opam
 
 # begin context for scripts/after.sh
@@ -275,12 +275,12 @@ a49b1a7726042e6f37ce09424b769fd8:scripts/static-build.sh
 
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
-c882aea48ff6d4b120283f41153810ee:sphinx/about.rst
+77ae71ebf0aead9eb003d42cb717d01d:sphinx/about.rst
 # end context for sphinx/about.rst
 
 # begin context for sphinx/conf.py
 # file sphinx/conf.py
-40b9c6366ef1072613aa9ab5738fd4f9:sphinx/conf.py
+fa07cf77f110a174b5443570324d1b6d:sphinx/conf.py
 # end context for sphinx/conf.py
 
 # begin context for sphinx/index.rst

@@ -12,6 +12,7 @@ authors: [
   "Boris Eng <boris.eng@ocamlpro.com>"
   "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
   "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
+  "Guillaume Bertholon <guillaume.bertholon@ocamlpro.com>"
 ]
 maintainer: [
   "Nicolas Berthier <nicolas.berthier@ocamlpro.com>"
@@ -19,6 +20,7 @@ maintainer: [
   "Boris Eng <boris.eng@ocamlpro.com>"
   "Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>"
   "Emilien Lemaire <emilien.lemaire@ocamlpro.com>"
+  "Guillaume Bertholon <guillaume.bertholon@ocamlpro.com>"
 ]
 homepage: "https://ocamlpro.github.io/superbol-studio-oss"
 doc: "https://ocamlpro.github.io/superbol-studio-oss/sphinx"
@@ -51,6 +53,7 @@ depends: [
   "dune" {>= "3.17.0"}
   "sql_parser-windows" {= version}
   "pretty-windows" {= version}
+  "cobol_typeck-windows" {= version}
   "cobol_preproc-windows" {= version}
   "cobol_parser-windows" {= version}
   "cobol_common-windows" {= version}
