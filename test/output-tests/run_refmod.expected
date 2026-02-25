@@ -32,10 +32,10 @@ Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:305:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:337:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:374:0
 Considering: import/gnucobol/tests/testsuite.src/run_refmod.at:413:0
-run_refmod.at-413-prog.cob:2.6-2.20:
+run_refmod.at-413-prog.cob:2.11-2.20:
    1   
    2 >       $SET NOSSRANGE
-----         ^^^^^^^^^^^^^^
+----              ^^^^^^^^^
    3          IDENTIFICATION DIVISION.
    4          PROGRAM-ID. prog.
 >> Warning: Ignored compiler directive

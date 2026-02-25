@@ -48,9 +48,8 @@ val print_lines
 
 val try_compiler_directive
   : dialect: Cobol_config.dialect -> Text.t
-  -> ((Text.t * Preproc_directives.compiler_directive with_loc * Text.t
-       * Preproc_diagnostics.t) option,
-      Text.t * Text.t * Preproc_diagnostics.t) result
+  -> (Text.t * Preproc_directives.compiler_directive with_loc list * Text.t
+      * Preproc_diagnostics.t) option
 
 (** {1 Change of source format} *)
 

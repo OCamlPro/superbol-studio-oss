@@ -193,34 +193,30 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
         Pretty.error "Src: %a@." Text.pp_text text;
       let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
-      | Ok None when not emitting ->                              (* ignore text *)
+      | None when not emitting ->                              (* ignore text *)
           let rev_ignored = List.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
-      | Ok None ->
+      | None ->
           preprocess_line { lp with reader; buff = [] } (buff @ text)
-      | Ok Some ([], compdir, _compdir_text, diags) ->
+      | Some ([], compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
-          next_chunk (apply_compiler_directive lp compdir)
-      | Ok Some (text, compdir, _compdir_text, diags) when not emitting ->
+          next_chunk (apply_compiler_directives lp compdirs)
+      | Some (text, compdirs, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
-      | Ok Some (text, compdir, _compdir_text, diags) ->
+          next_chunk (apply_compiler_directives lp compdirs)     (* ignore text *)
+      | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir) (buff @ text)
-      | Error (text, _compdir_text, diags) when not emitting ->
-          let rev_ignored = List.rev_append text lp.rev_ignored in
-          let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk lp                                        (* ignore text *)
-      | Error (text, _compdir_text, diags) ->
-          let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp (buff @ text)
+          preprocess_line (apply_compiler_directives lp compdirs) (buff @ text)
+
+and apply_compiler_directives lp compdirs =
+  List.fold_left apply_compiler_directive lp compdirs
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
   let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
   match compdir with
-  | Preproc_directives.CDir_source sf ->
+  | Preproc_directives.CDir_source_format sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
@@ -563,15 +559,26 @@ let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
-let fold_source_lines ~dialect ~source_format ?on_initial_source_format
+let fold_source_lines ~dialect ~source_format ?on_change_of_source_format
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
   let reader =
     Src_reader.from input ?source_format:(source_format_config source_format)
   in
-  let acc = match on_initial_source_format with
-    | Some f -> f (Src_reader.source_format reader) acc
-    | None -> acc
+  let acc, on_compiler_directive = match on_change_of_source_format with
+    | Some f ->
+      let check_source_format_compdir _ { payload = cdir; _ } acc =
+        match cdir with
+        | Preproc_directives.CDir_source_format { payload = sf; _ } -> f sf acc
+        | _ -> acc
+      in
+      let f_compdir = match on_compiler_directive with
+        | Some f -> fun l cdir acc -> f l cdir @@ check_source_format_compdir l cdir acc
+        | None -> check_source_format_compdir
+      in
+      f (Src_reader.source_format reader) acc, Some f_compdir
+    | None ->
+       acc, on_compiler_directive
   in
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc

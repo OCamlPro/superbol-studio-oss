@@ -1643,19 +1643,19 @@ Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12591:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12683:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12759:0
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12849:0
-run_misc.at-12849-prog.cob:2.7-2.34:
+run_misc.at-12849-prog.cob:2.12-2.34:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Warning: Ignored compiler directive
 
-run_misc.at-12849-prog.cob:3.7-3.34:
+run_misc.at-12849-prog.cob:3.12-3.34:
    1   
    2          $SET CONSTANT DOGGY "Barky"
    3 >        $SET CONSTANT PONY "Blacky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog.
 >> Warning: Ignored compiler directive
@@ -1700,30 +1700,30 @@ run_misc.at-12849-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-run_misc.at-12849-prog.cob:10.7-10.33:
+run_misc.at-12849-prog.cob:10.12-10.33:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
 >> Warning: Ignored compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12860:0
-run_misc.at-12860-prog2.cob:2.7-2.35:
+run_misc.at-12860-prog2.cob:2.13-2.35:
    1   
    2 >        >>SET CONSTANT DOGGY "Barky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    3          >>SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Warning: Ignored compiler directive
 
-run_misc.at-12860-prog2.cob:3.7-3.35:
+run_misc.at-12860-prog2.cob:3.13-3.35:
    1   
    2          >>SET CONSTANT DOGGY "Barky"
    3 >        >>SET CONSTANT PONY "Blacky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog2.
 >> Warning: Ignored compiler directive
@@ -1768,12 +1768,12 @@ run_misc.at-12860-prog2.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-run_misc.at-12860-prog2.cob:10.7-10.34:
+run_misc.at-12860-prog2.cob:10.13-10.34:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        >>SET CONSTANT PONY "White"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
 >> Warning: Ignored compiler directive
@@ -1847,22 +1847,22 @@ run_misc.at-12871-prog3.cob:10.7-10.46:
 >> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:12934:0
-run_misc.at-12934-prog.cob:5.7-5.35:
+run_misc.at-12934-prog.cob:5.13-5.35:
    2          IDENTIFICATION DIVISION.
    3          PROGRAM-ID. prog.
    4          DATA DIVISION.
    5 >        >>SET CONSTANT DOGGY "Pluto"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
 >> Warning: Ignored compiler directive
 
-run_misc.at-12934-prog.cob:6.7-6.34:
+run_misc.at-12934-prog.cob:6.13-6.34:
    3          PROGRAM-ID. prog.
    4          DATA DIVISION.
    5          >>SET CONSTANT DOGGY "Pluto"
    6 >        >>SET CONSTANT PONY "Piper"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
 >> Warning: Ignored compiler directive
@@ -1928,22 +1928,22 @@ run_misc.at-12934-prog.cob:40.7-40.57:
 >> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/run_misc.at:13000:0
-run_misc.at-13000-prog.cob:5.7-5.35:
+run_misc.at-13000-prog.cob:5.13-5.35:
    2          IDENTIFICATION DIVISION.
    3          PROGRAM-ID. prog.
    4          DATA DIVISION.
    5 >        >>SET CONSTANT DOGGY "Pluto"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    6          >>SET CONSTANT PONY "Piper"
    7          WORKING-STORAGE SECTION.
 >> Warning: Ignored compiler directive
 
-run_misc.at-13000-prog.cob:6.7-6.34:
+run_misc.at-13000-prog.cob:6.13-6.34:
    3          PROGRAM-ID. prog.
    4          DATA DIVISION.
    5          >>SET CONSTANT DOGGY "Pluto"
    6 >        >>SET CONSTANT PONY "Piper"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
 >> Warning: Ignored compiler directive
