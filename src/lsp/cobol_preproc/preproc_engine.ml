@@ -200,14 +200,17 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
           preprocess_line { lp with reader; buff = [] } (buff @ text)
       | Some ([], compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
-          next_chunk (List.fold_left apply_compiler_directive lp compdirs)
+          next_chunk (apply_compiler_directives lp compdirs)
       | Some (text, compdirs, _compdir_text, diags) when not emitting ->
           let rev_ignored = List.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (List.fold_left apply_compiler_directive lp compdirs)     (* ignore text *)
+          next_chunk (apply_compiler_directives lp compdirs)     (* ignore text *)
       | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (List.fold_left apply_compiler_directive lp compdirs) (buff @ text)
+          preprocess_line (apply_compiler_directives lp compdirs) (buff @ text)
+
+and apply_compiler_directives lp compdirs =
+  List.fold_left apply_compiler_directive lp compdirs
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
