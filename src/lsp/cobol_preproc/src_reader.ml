@@ -114,9 +114,7 @@ let decode_compiler_directive ~compdir_kind ~dialect compdir_text =
         | Compdir_tree.Set_source_format fmt ->
           (match decode_source_format fmt with
           | Ok cdir -> Some (cdir &@ loc)
-          | Error err ->
-            diags := add_error err !diags;
-            None)
+          | Error err -> diags := add_error err !diags; None)
         | Set_preproc p -> Some (CDir_preproc (Set p) &@ loc)
         ) set_list
       in

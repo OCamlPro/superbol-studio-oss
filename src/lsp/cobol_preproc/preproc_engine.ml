@@ -574,7 +574,8 @@ let fold_source_lines ~dialect ~source_format ?on_source_format_change
         | None -> check_source_format_compdir
       in
       f (Src_reader.source_format reader) acc, Some f_compdir
-    | None -> acc, on_compiler_directive
+    | None ->
+       acc, on_compiler_directive
   in
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc
