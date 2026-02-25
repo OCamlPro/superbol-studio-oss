@@ -13,3 +13,4 @@ Authors
 * Boris Eng <boris.eng@ocamlpro.com>
 * Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com>
 * Emilien Lemaire <emilien.lemaire@ocamlpro.com>
+* Guillaume Bertholon <guillaume.bertholon@ocamlpro.com>
