@@ -14,6 +14,9 @@ ifneq ($(BUILD_PLAT),$(TARGET_PLAT))
 DUNE_CROSS_ARGS = $(strip $(if $(filter  win32,${TARGET_PLAT}),-x windows)	\
 			  $(if $(filter darwin,${TARGET_PLAT}),-x osx))
 endif
+ifeq ($(BUILD_STATIC_EXECS),true)
+  export LINKING_MODE=static
+endif
 
 CP ?= cp -fl
 
@@ -35,7 +38,7 @@ all: build
 
 build:
 	./scripts/before.sh build
-ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
+ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
 	./scripts/static-build.sh
 else
 	${DUNE} build ${DUNE_ARGS} ${DUNE_CROSS_ARGS} @build
