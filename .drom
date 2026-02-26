@@ -25,7 +25,7 @@ c201d9d64df08fdab3af4fd896fd5575:.gitignore
 
 # begin context for Makefile
 # file Makefile
-eb71111f63681385b42b21969be45098:Makefile
+9f9f31de8fbcb9ace8d0c0b2bd3314e6:Makefile
 # end context for Makefile
 
 # begin context for README.md
@@ -265,7 +265,7 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 
 # begin context for scripts/static-build.sh
 # file scripts/static-build.sh
-a49b1a7726042e6f37ce09424b769fd8:scripts/static-build.sh
+02c01ee43dfe5e0ef25aeffa71e6908b:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
 # begin context for sphinx/_static/css/fixes.css

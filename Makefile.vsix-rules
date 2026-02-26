@@ -47,7 +47,7 @@ ifeq ($(TARGET_PLAT),universal)
 else
   DOT_EXE = $(if $(filter win32,$(TARGET_PLAT)),.exe)
   SUPERBOL_LSP_EXE = $(SUPERBOL_LSP)-$(TARGET_SPEC)$(DOT_EXE)
-  ifeq ($(TARGET_PLAT)_$(BUILD_STATIC_EXECS),$(BUILD_PLAT)_true)
+  ifeq ($(TARGET_PLAT)_$(LINKING_MODE),$(BUILD_PLAT)_static)
     SUPERBOL_LSP_BUILT = $(SUPERBOL_LSP)
   else
     SUPERBOL_LSP_BUILT = ${DUNE_BUILD_SRCDIR}/$(SUPERBOL_LSP_PKG)/main.exe
@@ -59,8 +59,8 @@ endif
 # This generation requires the compilation of `$(SUPERBOL_LSP_BUILT)`,
 # that itself depends on a phony target, and therefore triggers way
 # too many calls to `scripts/static-build.sh` when
-# `$(BUILD_STATIC_EXECS)` holds).
-ifeq ($(BUILD_STATIC_EXECS),true)
+# `$(LINKING_MODE)` equals "static").
+ifeq ($(LINKING_MODE),static)
   GENERATE_PACKAGE_DOT_JSON ?= no
 else
   GENERATE_PACKAGE_DOT_JSON ?= yes
