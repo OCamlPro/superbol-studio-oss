@@ -3,9 +3,9 @@
 .PHONY: all build build-deps install dev-deps test
 .PHONY: clean distclean
 
-# Note: assume node is installed instead, for matching system names
+# Note: We use node for matching system names, and force to linux if it is missing
 # BUILD_PLAT = $(shell opam exec -- ocamlc -config-var system)
-BUILD_PLAT = $(shell node --print process.platform)
+BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
 TARGET_PLAT ?= $(BUILD_PLAT)
 
 DUNE = opam exec -- dune
@@ -57,7 +57,6 @@ build-deps:
 	fi
 	opam install ./opam/*.opam $(MORE_OPAM_FILES) --deps-only
 
-.PHONY: cross-osx-build-deps cross-windows-build-deps
 cross-%-build-deps: build-deps
 	opam install ./opam/$*/*.opam --deps-only
 
