@@ -17,8 +17,8 @@ else
 endif
 DUNE_BUILD_SRCDIR = ${DUNE_BUILD_DEFAULT}/${MAIN_SRCDIR}
 
-BUILD_PLAT = $(shell node --print process.platform)
-BUILD_ARCH = $(shell node --print process.arch)
+BUILD_PLAT = $(shell node --print process.platform 2>/dev/null || echo linux)
+BUILD_ARCH = $(shell node --print process.arch 2>/dev/null || echo x64)
 
 # TARGET_PLAT should already be defined in Makefile; conditionally assign anyway
 TARGET_PLAT ?= $(BUILD_PLAT)
