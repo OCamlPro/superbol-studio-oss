@@ -238,6 +238,7 @@ type property = {
   prop_maximum : int option ;
   prop_minItems : int option ;
   prop_order: int option;
+  prop_additionalProperties : any option ;
 }
 [@@deriving json_encoding,show]
 
@@ -258,6 +259,7 @@ let property
     ?maximum: prop_maximum
     ?minItems: prop_minItems
     ?order: prop_order
+    ?additionalProperties: prop_additionalProperties
 
     name =
   name,
@@ -277,6 +279,7 @@ let property
     prop_maximum ;
     prop_minItems ;
     prop_order;
+    prop_additionalProperties ;
   }
 
 module PROPERTY = struct

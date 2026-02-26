@@ -346,6 +346,23 @@ let contributes =
              ~default:(`String "auto")
              ~order:2;
 
+           Manifest.property "superbol.cobol.sourceFormatByExtension"
+             ~title:"Source Format by File Extension"
+             ~type_:(`String "object")
+             ~additionalProperties:(`O [
+                 "type", `String "string";
+                 "enum", `A (List.map (fun s -> `String s)
+                               Cobol_config.Options.all_format_names);
+               ])
+             ~default:(`O [])
+             ~markdownDescription:
+               (with_superbol_toml_note
+                  "Per-extension source reference-format overrides. \
+                   Each entry maps a file extension (without dot, e.g. \
+                   `cbl`, `cob`) to a source format, taking precedence \
+                   over the global `#superbol.cobol.sourceFormat#` setting.")
+             ~order:3;
+
            Manifest.PROPERTY.array "superbol.cobol.copybooks"
              ~title:"Copybook Paths"
              ~items:(`O [
@@ -369,14 +386,14 @@ let contributes =
                ])
              ~markdownDescription:
                (with_superbol_toml_note "List of paths to copybooks.")
-             ~order:3;
+             ~order:4;
 
            Manifest.PROPERTY.strings "superbol.cobol.copyexts"
              ~markdownDescription:
                (with_superbol_toml_note
                   "File extensions for copybook resolution")
              ~default:Cobol_common.Copybook.copybook_extensions
-             ~order:4;
+             ~order:5;
 
            (* Paths *)
 

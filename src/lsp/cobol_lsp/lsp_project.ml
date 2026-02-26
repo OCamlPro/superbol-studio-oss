@@ -115,6 +115,24 @@ let update_dialect ({ config; _ } as project) str : bool =
     Lsp_io.notify_error "%a" Superbol_project.Diagnostics.pp_error e;
     false
 
+(** Parse a JSON object mapping file extensions to source formats (e.g.
+    [{"cbl": "fixed", "cob": "free"}]) into the project config. *)
+let update_source_format_by_extension: t -> Yojson.Safe.t -> bool =
+  fun { config; _ } json ->
+    let open Yojson.Safe.Util in
+    try
+      let entries =
+        to_assoc json |> List.map begin fun (ext, v) ->
+          (ext, Cobol_config.Options.format_of_string (to_string v))
+        end
+      in
+      if entries = config.source_format_by_extension
+      then false
+      else (config.source_format_by_extension <- entries; true)
+    with
+      Yojson.Safe.Util.(Type_error _ | Undefined _) as e ->
+        Pretty.invalid_arg "%s: %a" (Yojson.Safe.to_string json) Fmt.exn e
+
 let update_copybooks: t -> Yojson.Safe.t -> bool = fun { config; _ } json ->
   let open Yojson.Safe.Util in
   let to_libdir s =
@@ -168,6 +186,7 @@ let update_project_config assoc project : bool =
   end false [
     "dialect", from_string ~f:update_dialect;
     "sourceFormat", from_string ~f:update_source_format;
+    "sourceFormatByExtension", update_source_format_by_extension;
     "copybooks", update_copybooks;
     "copyexts", update_copyexts;
   ]
@@ -204,6 +223,11 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
           `Assoc ["dir", `String dir; "file-relative", `Bool true]
     end config.libpath
   in
+  let source_format_by_extension =
+    List.map begin fun (ext, fmt) ->
+      (ext, `String (Cobol_config.Options.string_of_format fmt))
+    end config.source_format_by_extension
+  in
   let cobol =
     [
       "dialect",
@@ -211,6 +235,9 @@ let get_project_config ?(flat = true) project : Yojson.Safe.t =
 
       "sourceFormat",
       `String (Cobol_config.Options.string_of_format config.source_format);
+
+      "sourceFormatByExtension",
+      `Assoc source_format_by_extension;
 
       "copybooks",
       `List copybooks;

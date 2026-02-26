@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Added
+- Per-extension source reference-format overrides, via VSCode and `superbol.toml` settings [#538](https://github.com/OCamlPro/superbol-studio-oss/pull/538)
 - Support for multiple arguments in `SET` compiler directives [#536](https://github.com/OCamlPro/superbol-studio-oss/pull/536)
 - Handle OSVS parentheses in abbreviated combined relation conditions [#532](https://github.com/OCamlPro/superbol-studio-oss/pull/532)
 - Support STOP RUN RETURNING syntax with scalar argument [#529](https://github.com/OCamlPro/superbol-studio-oss/pull/529)
