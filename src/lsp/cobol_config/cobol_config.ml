@@ -31,7 +31,8 @@ exception ERROR of Config_diagnostics.error
 let __init_default_exn_printers =
   Printexc.register_printer begin function
     | ERROR e ->
-        Some (Pretty.to_string "@[<h>%a@]" Config_diagnostics.pp_error e)
+        Some (Pretty.to_string "@[<h>%a@]"
+                (Config_diagnostics.pp_error ?platform:None) e)
     | _ ->
         None
   end

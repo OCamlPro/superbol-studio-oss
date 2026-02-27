@@ -11,4 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Notification.t -> (Lsp_server.state as 's) -> 's
+val handle:
+  platform:Cobol_common.Platform.TYPES.platform
+  -> Jsonrpc.Notification.t -> (Lsp_server.state as 's) -> 's

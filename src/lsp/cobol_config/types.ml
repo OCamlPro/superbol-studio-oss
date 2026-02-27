@@ -338,7 +338,7 @@ type standard =
   | STD2002
   | STD2014
 
-type source_format =
+type source_format = Cobol_common.Platform.TYPES.source_format_id =
   | SFFree
   | SFFixed
   | SFVariable

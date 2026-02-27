@@ -13,6 +13,7 @@
 
 open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
+open Cobol_common.Platform.TYPES
 
 open Preproc_diagnostics
 
@@ -78,7 +79,7 @@ let on_define_off ~loc var ~(env: ENV.t) =
   else OUT.result env ~diags:(undefined ~loc var)
 
 
-let on_define ~loc Compdir_tree.{ var; value; override } ~env =
+let on_define ~platform ~loc Compdir_tree.{ var; value; override } ~env =
   let open struct exception KEEP_UNDEFINED end in
   try
     let value = match ~&value with
@@ -93,7 +94,7 @@ let on_define ~loc Compdir_tree.{ var; value; override } ~env =
                         pp_loc = Source_location ~@l }
       | Parameter_definition ->                                (* [sys.getenv] *)
           let v = ENV.VAR.to_uppercase_string ~&var in
-          match Sys.getenv_opt v with
+          match platform.getenv_opt v with
           | Some value -> ENV.Alphanum { pp_payload = value;
                                          pp_loc = Process_environment }
           | None -> raise KEEP_UNDEFINED

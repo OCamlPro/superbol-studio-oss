@@ -53,9 +53,10 @@ val copybookonly_extensions: string list
     Lookup is performed in a case-insensitive way. Every directory in the path
     is considered in order, and all extensions are tried for a given directory
     of the path in the provided order.
- *)
+*)
+
 val find_lib
-  : lookup_config: lookup_config
+  :  lookup_config: lookup_config
   -> ?fromfile:string
   -> ?libname:fileloc
   -> fileloc

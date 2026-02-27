@@ -14,6 +14,8 @@
 open Ezcmd.V2
 open EZCMD.TYPES
 
+let platform = { Cobol_common.Platform.default_platform with
+                 verbosity = 0 }
 
 let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage
     ?(extensions = Cobol_lsp.default_extensions) () =
@@ -34,7 +36,7 @@ let run_lsp ~enable_caching ~force_syntax_diagnostics ~storage
       ~project_layout
       ?fallback_storage_directory
   in
-  match Cobol_lsp.run ~config:lsp_config ~extensions with
+  match Cobol_lsp.run ~platform ~config:lsp_config ~extensions with
   | Ok () -> ()
   | Error exit_msg -> Pretty.error "%s@." exit_msg; exit 1
 
