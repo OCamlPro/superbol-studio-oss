@@ -81,7 +81,7 @@
         },
         "superbol.cobol.sourceFormatByExtension": {
           "title": "Source Format by File Extension",
-          "markdownDescription": "Per-extension source reference-format overrides. Each entry maps a file extension (without dot, e.g. `cbl`, `cob`) to a source format, taking precedence over the global `sourceFormat` setting.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "markdownDescription": "Per-extension source reference-format overrides. Each entry maps a file extension (without dot, e.g. `cbl`, `cob`) to a source format, taking precedence over the global `#superbol.cobol.sourceFormat#` setting.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
           "type": "object",
           "default": {},
           "order": 3,
