@@ -95,10 +95,10 @@ let build_data_division = function
       in
       Some (rebuild_sections list empty_data_division &@ loc)
 
-let build_simple_program opts_par env_div datat_div proc_div =
+let build_simple_program opts_par env_div datat_div proc_div ~pos =
   Program {
     program_name =
-      (Cobol_ptree.Dummies.dummy_name_or_literal ~pos:Lexing.dummy_pos) &@ Cobol_common.Srcloc.dummy;
+      (Cobol_ptree.Dummies.dummy_name_or_literal ~pos) &@ Cobol_common.Srcloc.dummy;
       (* TODO: Use filename *)
     program_as = None;
     program_level = ProgramDefinition {

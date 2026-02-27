@@ -280,7 +280,7 @@ let simple_program :=
     pd = loc(program_procedure_division);
     { { control_division = None;
         compilation_units =
-          [ with_loc (build_simple_program opo edo ddo pd) $sloc ];
+          [ with_loc (build_simple_program opo edo ddo pd ~pos:$symbolstartpos) $sloc ];
       } }
 
 (* --- CONTROL DIVISION --- *)
