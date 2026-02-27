@@ -5,6 +5,7 @@
   "activationEvents": [
     "onLanguage:cobol",
     "workspaceContains:**/*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}",
+    "workspaceContains:**/*.[pP]{co,CO}",
     "workspaceContains:{_superbol,superbol.toml}"
   ],
   "contributes": {
@@ -414,7 +415,8 @@
           "COBOL"
         ],
         "filenamePatterns": [
-          "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"
+          "*.[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}",
+          "*.[pP]{co,CO}"
         ],
         "configuration": "./syntaxes/language-configuration.json"
       },

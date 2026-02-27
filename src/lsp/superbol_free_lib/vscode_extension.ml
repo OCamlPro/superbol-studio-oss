@@ -84,13 +84,14 @@ let package =
       "@types/node", "^20.3.2";
     ]
 
-let cob_extensions_pattern = "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"
+let cob_extensions_pattern = [ "[cC]{ob,OB,bl,BL,py,PY,bx,BX,bsql}"; "[pP]{co,CO}" ]
+
 let contributes =
   Manifest.contributes ()
     ~languages: [
       Manifest.language "cobol"
         ~aliases: ["COBOL"]
-        ~filenamePatterns: ["*." ^ cob_extensions_pattern]
+        ~filenamePatterns:(List.map (fun elt -> "*." ^ elt) cob_extensions_pattern)
         ~configuration: "./syntaxes/language-configuration.json";
       Manifest.language "COBOL_GNU_LISTFILE"
         ~aliases: ["LISTFILE"]
@@ -632,15 +633,16 @@ let manifest =
     package
     ~marketplace
     ~engines: ("^" ^ vscode_engine)
-    ~activationEvents: [
-      "onLanguage:cobol"; (* Note: optional since VS Code 1.74, as in
+    ~activationEvents: (
+      "onLanguage:cobol" (* Note: optional since VS Code 1.74, as in
                              `contributes`) *)
       (* XXX: should we really expect mixed-case file extensions like
          `prog.coB`? *)
-      "workspaceContains:**/*." ^ cob_extensions_pattern;
+     ::(List.map (fun elt -> "workspaceContains:**/*." ^ elt) cob_extensions_pattern)
+      @ [
       "workspaceContains:{_superbol,superbol.toml}";
       (* "onDebug"; *) (* <- not relevant yet *)
-    ]
+    ])
     ~extensionKind: [
       "workspace";                                 (* <- run on the workspace *)
     ]
