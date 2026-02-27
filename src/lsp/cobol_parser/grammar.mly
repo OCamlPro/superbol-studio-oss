@@ -263,6 +263,7 @@ let any_permut4_nullable [@recovery (None, None, None, None, (A4, (A3, AB)))]
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
+  | ~=simple_program; EOF; < >
   | control_division = option(loc(control_division));
     ul = ll(loc(compilation_unit));
     pdo = loc(program_definition_no_end)?; EOF;
@@ -271,6 +272,16 @@ let compilation_group :=
           match pdo with
             | None -> ul
             | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
+
+let simple_program := 
+  | opo = ro(loc(options_paragraph));
+    edo = ro(loc(environment_division));
+    ddo = ro(loc(non_empty_data_division));
+    pd = loc(program_procedure_division);
+    { { control_division = None;
+        compilation_units =
+          [ with_loc (build_simple_program opo edo ddo pd ~pos:$symbolstartpos) $sloc ];
+      } }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -1159,6 +1170,11 @@ type declaration entry =
 *)
 
 *)
+
+let non_empty_data_division :=
+  | l1 = rnel(data_division_sentence_1);
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
 let data_division :=
   | l1 = rl(data_division_sentence_1);

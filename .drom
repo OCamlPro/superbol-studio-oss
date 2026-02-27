@@ -5,7 +5,7 @@ version:0.9.0
 
 # hash of toml configuration files
 # used for generation of all files
-75cff7117b36e224d630bd9a0186c27d:.
+91ca8046e5d05b2b2b5eb572eff678a4:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
@@ -15,33 +15,18 @@ version:0.9.0
 
 # begin context for .gitignore
 # file .gitignore
-c201d9d64df08fdab3af4fd896fd5575:.gitignore
+1ac4166aab2c29244a36f9ec1709c44b:.gitignore
 # end context for .gitignore
-
-# begin context for LICENSE.md
-# file LICENSE.md
-00ad9741c95e3a196c11a24072f57bda:LICENSE.md
-# end context for LICENSE.md
 
 # begin context for Makefile
 # file Makefile
 eb71111f63681385b42b21969be45098:Makefile
 # end context for Makefile
 
-# begin context for README.md
-# file README.md
-292425d1654e9d13b4140ef9188ddbe1:README.md
-# end context for README.md
-
 # begin context for docs/README.txt
 # file docs/README.txt
 bfbacf00053bb9ab2a6e2ce94ed4a642:docs/README.txt
 # end context for docs/README.txt
-
-# begin context for docs/doc/index.html
-# file docs/doc/index.html
-972cbb364863f844c85b9d889635c5f2:docs/doc/index.html
-# end context for docs/doc/index.html
 
 # begin context for docs/favicon.png
 # file docs/favicon.png
@@ -53,20 +38,10 @@ e739f3026aa997af4026bc428f4c9ef6:docs/favicon.png
 a71393c473a75ddf9f67dac1ce7c65be:docs/index.html
 # end context for docs/index.html
 
-# begin context for docs/sphinx/index.html
-# file docs/sphinx/index.html
-4e71c95414de93447be3b81ac62ec959:docs/sphinx/index.html
-# end context for docs/sphinx/index.html
-
 # begin context for docs/style.css
 # file docs/style.css
 c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 # end context for docs/style.css
-
-# begin context for drom.toml
-# file drom.toml
-993ba9bf5caea5d4ea944358649139a3:drom.toml
-# end context for drom.toml
 
 # begin context for dune
 # file dune
@@ -268,11 +243,6 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 02c01ee43dfe5e0ef25aeffa71e6908b:scripts/static-build.sh
 # end context for scripts/static-build.sh
 
-# begin context for sphinx/_static/css/fixes.css
-# file sphinx/_static/css/fixes.css
-20bbe7a5dbb3c3278a1511d960616fe5:sphinx/_static/css/fixes.css
-# end context for sphinx/_static/css/fixes.css
-
 # begin context for sphinx/about.rst
 # file sphinx/about.rst
 77ae71ebf0aead9eb003d42cb717d01d:sphinx/about.rst
@@ -282,11 +252,6 @@ bb3a9d286f0dc64021db4194427263ee:scripts/copy-bin.sh
 # file sphinx/conf.py
 fa07cf77f110a174b5443570324d1b6d:sphinx/conf.py
 # end context for sphinx/conf.py
-
-# begin context for sphinx/index.rst
-# file sphinx/index.rst
-15f9d714c36b467b4d6bb3eb5bf3ebbb:sphinx/index.rst
-# end context for sphinx/index.rst
 
 # begin context for sphinx/license.rst
 # file sphinx/license.rst
@@ -438,11 +403,6 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/ezr_toml/version.mlt
 ef52691ec3bef505aa901bf197009fd1:src/lsp/ppx_cobcflags/dune
 # end context for src/lsp/ppx_cobcflags/dune
 
-# begin context for src/lsp/ppx_cobcflags/main.ml
-# file src/lsp/ppx_cobcflags/main.ml
-57746d4bdf961b2ab0fbffc2bdab793f:src/lsp/ppx_cobcflags/main.ml
-# end context for src/lsp/ppx_cobcflags/main.ml
-
 # begin context for src/lsp/ppx_cobcflags/version.mlt
 # file src/lsp/ppx_cobcflags/version.mlt
 d32caec25e714e824fce17600c2cb75d:src/lsp/ppx_cobcflags/version.mlt
@@ -488,11 +448,6 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/sql_parser/version.mlt
 463623160e481efaf9123695b0a1db58:src/lsp/sql_preproc/index.mld
 # end context for src/lsp/sql_preproc/index.mld
 
-# begin context for src/lsp/sql_preproc/main.ml
-# file src/lsp/sql_preproc/main.ml
-0d086c8a4c8b0013efb6f073d1daca64:src/lsp/sql_preproc/main.ml
-# end context for src/lsp/sql_preproc/main.ml
-
 # begin context for src/lsp/sql_preproc/version.mlt
 # file src/lsp/sql_preproc/version.mlt
 d32caec25e714e824fce17600c2cb75d:src/lsp/sql_preproc/version.mlt
@@ -507,11 +462,6 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/sql_preproc/version.mlt
 # file src/lsp/superbol-free/linking_flags.sh
 236a0354fe949a020f31913b39b31663:src/lsp/superbol-free/linking_flags.sh
 # end context for src/lsp/superbol-free/linking_flags.sh
-
-# begin context for src/lsp/superbol-free/main.ml
-# file src/lsp/superbol-free/main.ml
-6d5783a078a274d9151f7fb17fef485b:src/lsp/superbol-free/main.ml
-# end context for src/lsp/superbol-free/main.ml
 
 # begin context for src/lsp/superbol_free_lib/dune
 # file src/lsp/superbol_free_lib/dune
@@ -528,11 +478,6 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_free_lib/version.mlt
 421867647c81bf6b06ed5e36640415f9:src/lsp/superbol_preprocs/dune
 # end context for src/lsp/superbol_preprocs/dune
 
-# begin context for src/lsp/superbol_preprocs/main.ml
-# file src/lsp/superbol_preprocs/main.ml
-02c845b78847d32540953b41268807b0:src/lsp/superbol_preprocs/main.ml
-# end context for src/lsp/superbol_preprocs/main.ml
-
 # begin context for src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_preprocs/version.mlt
 d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_preprocs/version.mlt
@@ -547,21 +492,6 @@ d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_preprocs/version.mlt
 # file src/lsp/superbol_project/version.mlt
 d32caec25e714e824fce17600c2cb75d:src/lsp/superbol_project/version.mlt
 # end context for src/lsp/superbol_project/version.mlt
-
-# begin context for src/superbol-studio-oss/dune
-# file src/superbol-studio-oss/dune
-b3a1a4662424391d83d94daf0c79756b:src/superbol-studio-oss/dune
-# end context for src/superbol-studio-oss/dune
-
-# begin context for src/superbol-studio-oss/index.mld
-# file src/superbol-studio-oss/index.mld
-3c0830d9429dc7acd5a88dfe735f9d26:src/superbol-studio-oss/index.mld
-# end context for src/superbol-studio-oss/index.mld
-
-# begin context for src/vendor/ez_toml/dune
-# file src/vendor/ez_toml/dune
-5b0adf2706d3d163581192a5fe88cf03:src/vendor/ez_toml/dune
-# end context for src/vendor/ez_toml/dune
 
 # begin context for src/vendor/ez_toml/index.mld
 # file src/vendor/ez_toml/index.mld
