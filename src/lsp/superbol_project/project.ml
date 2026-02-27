@@ -116,7 +116,7 @@ let file_contents_looks_like_a_copybook ~filename ?contents { config; _ } =
   let decide input =
     Cobol_preproc.scan_prefix_for_copybook input
       ~dialect:(Cobol_config.dialect config.cobol_config)
-      ~source_format:config.source_format = `Copybook
+      ~source_format:(Project_config.source_format_for ~filename config) = `Copybook
   in
   match contents with
   | None ->

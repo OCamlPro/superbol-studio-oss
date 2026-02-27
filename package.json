@@ -80,6 +80,28 @@
           ],
           "order": 2
         },
+        "superbol.cobol.sourceFormatByExtension": {
+          "title": "Source Format by File Extension",
+          "markdownDescription": "Per-extension source reference-format overrides. Each entry maps a file extension (without dot, e.g. `cbl`, `cob`) to a source format, taking precedence over the global `#superbol.cobol.sourceFormat#` setting.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
+          "type": "object",
+          "default": {},
+          "order": 3,
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "fixed",
+              "free",
+              "cobol85",
+              "variable",
+              "xopen",
+              "xcard",
+              "crt",
+              "terminal",
+              "cobolx"
+            ]
+          }
+        },
         "superbol.cobol.copybooks": {
           "title": "Copybook Paths",
           "markdownDescription": "List of paths to copybooks.\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
@@ -104,7 +126,7 @@
               }
             }
           },
-          "order": 3
+          "order": 4
         },
         "superbol.cobol.copyexts": {
           "markdownDescription": "File extensions for copybook resolution\n\n*(May be overriden in project-specific `superbol.toml` files)*.",
@@ -115,7 +137,7 @@
             "cob"
           ],
           "items": "string",
-          "order": 4
+          "order": 5
         },
         "superbol.cobcPath": {
           "title": "GnuCOBOL Compiler Executable",

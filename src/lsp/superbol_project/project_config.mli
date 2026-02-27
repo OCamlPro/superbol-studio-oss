@@ -22,6 +22,8 @@ module TYPES: sig
   type config = (* private *) {
     mutable cobol_config: Cobol_config.t;
     mutable source_format: Cobol_config.source_format_spec;
+    mutable source_format_by_extension:
+      (string * Cobol_config.source_format_spec) list;
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
@@ -63,6 +65,14 @@ val reload
   -> bool Cobol_common.Diagnostics.with_diags
 
 (** {1 Accessors} *)
+
+(** [source_format_for ~filename config] returns the source format for the given
+    file, checking per-extension overrides before falling back to the global
+    source format. *)
+val source_format_for
+  : filename: string
+  -> t
+  -> Cobol_config.source_format_spec
 
 (** [copybook_lookup_config_for ~filename project] constructs a copybook lookup
     configuration (that notably indicates directory names where copybooks are
