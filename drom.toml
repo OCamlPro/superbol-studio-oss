@@ -14,7 +14,7 @@ min-edition = "4.14.0"
 name = "superbol-studio-oss"
 skeleton = "program"
 synopsis = "SuperBOL Studio OSS Project"
-version = "0.2.3"
+version = "0.3.0"
 dev-repo = "https://github.com/ocamlpro/superbol-studio-oss"
 bug-reports = "https://github.com/ocamlpro/superbol-studio-oss/issues"
 

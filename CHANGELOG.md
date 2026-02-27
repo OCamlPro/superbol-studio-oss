@@ -1,6 +1,6 @@
 # Changelog
 
-## [_] Next release
+## [0.3.0] Third release (2026-02-27)
 
 ### Added
 - Per-extension source reference-format overrides, via VSCode and `superbol.toml` settings [#538](https://github.com/OCamlPro/superbol-studio-oss/pull/538)

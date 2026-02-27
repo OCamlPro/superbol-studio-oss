@@ -20,7 +20,7 @@ endif
 
 CP ?= cp -fl
 
-VERSION = 0.2.3
+VERSION = 0.3.0
 DEV_DEPS := merlin ocamlformat odoc
 
 
