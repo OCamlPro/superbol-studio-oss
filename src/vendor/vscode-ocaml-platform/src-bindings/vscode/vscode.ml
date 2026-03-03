@@ -2208,7 +2208,7 @@ module OpenDialogOptions = struct
 
     val defaultUri : t -> string option [@@js.get]
 
-    val filters : t -> (string * string list) list [@@js.get]
+    val filters : t -> string list Dict.t [@@js.get]
 
     val openLabel : t -> string [@@js.get]
 
@@ -2219,7 +2219,7 @@ module OpenDialogOptions = struct
       -> ?canSelectFolders:bool
       -> ?canSelectMany:bool
       -> ?defaultUri:string
-      -> ?filters:((string * string list) list)
+      -> ?filters:(string list Dict.t)
       -> ?openLabel:string
       -> ?title:string
       -> unit
