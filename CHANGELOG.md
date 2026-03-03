@@ -1,5 +1,8 @@
 # Changelog
 
+## [_] Next release
+
+
 ## [0.3.0] Third release (2026-02-27)
 
 ### Added
