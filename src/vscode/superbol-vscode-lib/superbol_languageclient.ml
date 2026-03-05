@@ -3,7 +3,7 @@
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
 (*                                                                        *)
-(*  Copyright (c) 2023-2025 OCamlPro SAS                                  *)
+(*  Copyright (c) 2023-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (*  All rights reserved.                                                  *)
 (*  This source code is licensed under the MIT license found in the       *)
@@ -18,58 +18,14 @@ type server_access =
   | Sub_process of LSP.ServerOptions.t
   | TCP of { host: string; port: int }
 
-
-(* Helpers to find the bundled superbol executable *)
-let find_existing_in ~root_uri : (([<`exe | `js] * string) as 'a) list -> 'a =
-  let actual_uri = function
-    | `exe, exe_name when Node.Process.platform = "win32" ->
-        Vscode.Uri.joinPath root_uri ~pathSegments:[exe_name ^ ".exe"]
-    | `exe, exe_name ->
-        Vscode.Uri.joinPath root_uri ~pathSegments:[exe_name]
-    | `js, js_name ->
-        Vscode.Uri.joinPath root_uri ~pathSegments:[js_name]
-  in
-  let rec aux = function
-    | [] ->
-        raise Not_found
-    | (kind, _) as next_candidate :: remaining_candidates ->
-        let uri = actual_uri next_candidate in
-        let path = Vscode.Uri.fsPath uri in
-        if Node.Fs.existsSync path
-        then kind, path
-        else aux remaining_candidates
-  in
-  aux
-
-(* Look for the most specific `${server_prefix}` executable amongst (in order):
-
-   - `${server_prefix}-${platform}-${arch}${suffix}`
-   - `${server_prefix}-${platform}${suffix}`
-   - `${server_prefix}${suffix}`
-   - `${server_prefix}.js` (as fallback)
-
-   The `platform` and `arch` used are from the corresponding `process`
-   attributes in node.js. The `suffix` is `".exe"` on Windows, and empty
-   otherwise.
-
-   https://nodejs.org/api/process.html#processplatform
-   https://nodejs.org/api/process.html#processarch
-*)
-let find_superbol ?(server_prefix = "superbol") root_uri =
-  let platform = Node.Process.platform and arch = Node.Process.arch in
-  let alt_arch_execs =
-    if platform = "darwin" && arch = "arm64"
-    then [ `exe, Format.asprintf "%s-%s-x64" server_prefix platform ]
-    else []
-  in
-  find_existing_in ~root_uri @@
-  [
-    `exe, Format.asprintf "%s-%s-%s" server_prefix platform arch;
-    `exe, Format.asprintf "%s-%s" server_prefix platform;
-  ] @ alt_arch_execs @ [
-    `exe, server_prefix;
-    `js, Format.asprintf "%s.js" server_prefix;
-  ]
+let find_superbol ~server_prefix ~root_uri =
+  try
+    Superbol_extension.find_executable ~prog_prefix:server_prefix
+      (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
+  with Not_found ->
+    (* If there is no bundled executable for the current platform, fall back to
+       looking for the server binary in the PATH *)
+    `exe, server_prefix
 
 let scan_host_and_port url =
   let fail () = Format.ksprintf failwith "Invalid %S" url in
@@ -90,7 +46,7 @@ let scan_server_command cmd =
     None
 
 
-let server_command ?server_prefix ~context ?cmd () =
+let server_command ~server_prefix ~context ?cmd () =
   let root_uri = Vscode.ExtensionContext.extensionUri context
   and storage_uri =
     (* Use the global state URI as the server stores caches on a per-project
@@ -105,13 +61,7 @@ let server_command ?server_prefix ~context ?cmd () =
     | Some cmd ->
         `exe, cmd
     | None ->
-        try
-          find_superbol ?server_prefix
-            (Vscode.Uri.joinPath root_uri ~pathSegments:["_dist"])
-        with Not_found ->
-          (* If there is no bundled executable for the current platform, fall
-             back to looking for superbol-free in the PATH *)
-          `exe, "superbol-free"
+        find_superbol ~server_prefix ~root_uri
   and fallback_config_dir =
     Vscode.Uri.fsPath @@
     Vscode.Uri.joinPath root_uri ~pathSegments:["gnucobol-config"]
@@ -148,7 +98,7 @@ let server_access ~context ~server_prefix =
   | Some cmd ->
       match scan_server_command cmd with
       | Some access -> access
-      | None -> server_command ~context ~cmd ()
+      | None -> server_command ~server_prefix ~context ~cmd ()
 
 
 let client_options () =
