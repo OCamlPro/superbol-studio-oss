@@ -349,16 +349,87 @@ type raw_loc = string * (int * int) * (int * int)
 let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
   Pretty.print ppf "%s:%a" file Fmt.text_loc (pos1, pos2)
 
+(** Retrieve the character position of a column number in a line that was
+      tab expanded *)
+let original_col_of_expanded ?(tab_stop = 8) ~fname ~line expanded_col =
+  try
+    let lines = retrieve_file_lines fname in
+    let original_line = lines.(line - 1) in
+    let n = String.length original_line in
+    let orig_col = ref 0 in
+    let exp_col = ref 0 in
+    while !orig_col < n && !exp_col < expanded_col do
+      let c = String.get original_line !orig_col in
+      let advance =
+        if c = '\t' then
+          tab_stop - (!exp_col mod tab_stop)
+        else
+          1
+      in
+      exp_col := !exp_col + advance;
+      incr orig_col
+    done;
+    !orig_col
+  with _ ->
+    expanded_col
+
+(** Creates an underline of `^` for a line with tab expansion for
+    the width of the underline *)
+let tab_underline ?(tab_stop = 8) ~lo ~hi line =
+  let buf = Buffer.create (hi + 2) in
+  let visual_col = ref 0 in
+  String.iter
+    (fun c ->
+      let w =
+        if c = '\t' then
+          tab_stop - (!visual_col mod tab_stop)
+        else
+          1
+      in
+      for dv = 0 to w - 1 do
+        let v = !visual_col + dv in
+        if v <= hi then
+          Buffer.add_char buf (if v > lo then '^' else ' ')
+      done;
+      visual_col := !visual_col + w )
+    line;
+  while !visual_col <= hi do
+    Buffer.add_char buf (if !visual_col > lo then '^' else ' ');
+    incr visual_col
+  done;
+  Buffer.contents buf
+
+(** Creates an underline of `^` for a line until its end with tab
+   expansion for the width of the underline *)
+let tab_underline_to_end ?(tab_stop = 8) ~lo line =
+  let buf = Buffer.create (String.length line + 1) in
+  let vcol = ref 0 in
+  String.iter
+    (fun c ->
+      let w =
+        if c = '\t' then
+          tab_stop - (!vcol mod tab_stop)
+        else
+          1
+      in
+      for dv = 0 to w - 1 do
+        Buffer.add_char buf (if !vcol + dv > lo then '^' else ' ')
+      done;
+      vcol := !vcol + w )
+    line;
+  Buffer.add_char buf (if !vcol > lo then '^' else ' ');
+  Buffer.contents buf
+
 (** Note this should always end with a newline character *)
-let pp_raw_loc: raw_loc Pretty.printer =
+let pp_raw_loc ?(tab_stop = 8) () : raw_loc Pretty.printer =
   let b = lazy (Buffer.create 1000) in
   let find_source (file, pos1, pos2) =
     let line1 = fst pos1 in
     let line2 = fst pos2 in
     let col1 = snd pos1 in
     let col2 = snd pos2 in
-    let col2, pad2 =
-      if line1 == line2 && col1 == col2 then succ col2, 1 else col2, 0 in
+    let col2 =
+      if line1 == line2 && col1 == col2 then succ col2 else col2 in
     let lines = retrieve_file_lines file in
     let b = Lazy.force b in
     Buffer.clear b;
@@ -369,29 +440,20 @@ let pp_raw_loc: raw_loc Pretty.printer =
         (if l>=line1 && l<=line2 then '>' else ' ')
         line;
       if l = line1 && l = line2 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx > col1 && idx <= col2 then '^' else c)
-            (String.make (min (len + 1 + pad2) (col2 + 1)) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n"
+          (tab_underline ~tab_stop ~lo:col1 ~hi:col2 line)
       else if l = line1 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx > col1 then '^' else c)
-            (String.make (len + 1) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n"
+          (tab_underline_to_end
+          ~tab_stop
+          ~lo:col1
+          line)
       else if l > line1 && l < line2 then
         let str = String.make (len + 1) '^' in
         Printf.bprintf b "----  %s\n" str;
       else if l = line2 then
-        let str =
-          String.mapi
-            (fun idx c -> if idx <= col2 then '^' else c )
-            (String.make (min (len + 1 + pad2) (col2 + 1)) ' ')
-        in
-        Printf.bprintf b "----  %s\n" str;
+        Printf.bprintf b "----  %s\n"
+          (tab_underline ~tab_stop ~lo:(-1) ~hi:col2 line)
     done;
     Buffer.contents b
   in
@@ -449,7 +511,7 @@ let pp_srcloc: srcloc Pretty.printer =
   fun ppf loc ->
     let toplevel_transforms, loc = toplevel_transform_stack loc in
     let lexloc = as_lexloc loc in
-    pp_raw_loc ppf (to_raw_loc lexloc);
+    pp_raw_loc () ppf (to_raw_loc lexloc);
     pp_transform_operations ~partial:false ppf toplevel_transforms;
     pp_transform_operations ~partial:true ppf (partial_transform_operations loc)
 

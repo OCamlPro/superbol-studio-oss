@@ -27,7 +27,7 @@
 (menhir (modules grammar_tokens grammar_common grammar)
         (merge_into grammar)
         (flags --inspection --cmly --table --strict
-
+               --explain
                --external-tokens Grammar_tokens
                --unused-tokens))
 
