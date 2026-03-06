@@ -22,7 +22,7 @@ let expand_tabs ?(tab_stop=8) ?(starting_col=0) src =
         | '\t' ->
             let n = (tab_stop - !col mod tab_stop) in
             Buffer.add_substring buf spaces 0 n;
-            col := !col + 1
+            col := !col + n
         | ('\n' | '\r') as c ->
             Buffer.add_char buf c;
             col := 0;

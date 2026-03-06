@@ -32,7 +32,7 @@ let __init_default_exn_printers =
   Printexc.register_printer begin function
     | ERROR e ->
         Some (Pretty.to_string "@[<h>%a@]"
-                (Config_diagnostics.pp_error ?platform:None) e)
+                (Config_diagnostics.pp_error ?tab_stop:None ?platform:None) e)
     | _ ->
         None
   end

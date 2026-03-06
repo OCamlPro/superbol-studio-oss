@@ -174,9 +174,9 @@ let%expect_test "tokens-with-tabs" =
       Outgoing: {RECURSIVE}
       Tks':
       Tks: STRING, WORD[W-AGT], ";", WORD[W-RUBNUM], (, WORD[J], ), ";"
-      Tks: WORD_IN_AREA_A[W-RENVOINOTE], WORD[W-DEST-NOM], ";"
-      Tks: WORD_IN_AREA_A[W-DEST-RUE1], ";", WORD[W-DEST-RUE2], ";"
-      Tks: WORD_IN_AREA_A[W-DEST-CP], ";"
+      Tks: WORD[W-RENVOINOTE], WORD[W-DEST-NOM], ";"
+      Tks: WORD[W-DEST-RUE1], ";", WORD[W-DEST-RUE2], ";"
+      Tks: WORD[W-DEST-CP], ";"
       Tks: WORD[W-DEST-VILLE], ";", WORD[W-DEST-TEL1], (, DIGITS[1], :, DIGITS[2],
            ), " "
       Tks: WORD[W-DEST-TEL1], (, DIGITS[3], :, DIGITS[2], ), " "
@@ -189,11 +189,10 @@ let%expect_test "tokens-with-tabs" =
       Tks':
       IDENTIFICATION, DIVISION, ., PROGRAM-ID, ., INFO_WORD[prog], ., PROCEDURE,
       DIVISION, ., STRING, WORD[W-AGT], ";", WORD[W-RUBNUM], (, WORD[J], ), ";",
-      WORD_IN_AREA_A[W-RENVOINOTE], WORD[W-DEST-NOM], ";",
-      WORD_IN_AREA_A[W-DEST-RUE1], ";", WORD[W-DEST-RUE2], ";",
-      WORD_IN_AREA_A[W-DEST-CP], ";", WORD[W-DEST-VILLE], ";", WORD[W-DEST-TEL1],
-      (, DIGITS[1], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[3], :,
-      DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[5], :, DIGITS[2], ), " ",
-      WORD[W-DEST-TEL1], (, DIGITS[7], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (,
-      DIGITS[9], :, DIGITS[2], ), DELIMITED, BY, "   ", INTO, WORD[LARTISAN], .,
-      EOF |}];;
+      WORD[W-RENVOINOTE], WORD[W-DEST-NOM], ";", WORD[W-DEST-RUE1], ";",
+      WORD[W-DEST-RUE2], ";", WORD[W-DEST-CP], ";", WORD[W-DEST-VILLE], ";",
+      WORD[W-DEST-TEL1], (, DIGITS[1], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (,
+      DIGITS[3], :, DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[5], :,
+      DIGITS[2], ), " ", WORD[W-DEST-TEL1], (, DIGITS[7], :, DIGITS[2], ), " ",
+      WORD[W-DEST-TEL1], (, DIGITS[9], :, DIGITS[2], ), DELIMITED, BY, "   ", INTO,
+      WORD[LARTISAN], ., EOF |}];;

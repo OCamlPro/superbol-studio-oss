@@ -18,18 +18,18 @@ type error =
   | Unknown_dialect of string
   | Missing_file of string * string list
 
-let pp_error ?platform ppf = function
+let pp_error ?tab_stop ?platform ppf = function
   | Invalid_key_value_pair (k, v) ->
       Pretty.print ppf "Invalid@ type@ of@ value@ (%a)@ given@ for@ key@ %s"
         Conf_ast.pp_value v k
   | Lexing_error (Unexpected_char (c, lexloc)) ->
       let loc = Cobol_common.Srcloc.raw lexloc in
       Pretty.print ppf "%aUnexpected@ character@ `%c'"
-        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc c
+        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?tab_stop ?platform) loc c
   | Lexing_error (Unexpected_end_of_string lexloc) ->
       let loc = Cobol_common.Srcloc.raw lexloc in
       Pretty.print ppf "%aUnexpected@ end@ of@ string"
-        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc
+        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?tab_stop ?platform) loc
   | Syntax_error (loc, msg) ->
       Pretty.print ppf "%aSyntax@ error%a"
         (Pretty.option @@

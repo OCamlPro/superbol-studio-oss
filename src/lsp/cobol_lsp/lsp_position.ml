@@ -32,14 +32,20 @@ let pointwise_range_at_start =
 let start_of_lexloc ((start_pos, _end_pos): lexloc) =
   Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
     ~line:(start_pos.pos_lnum - 1)
-    ~character:(start_pos.pos_cnum - start_pos.pos_bol)
+    ~character:(Srcloc.original_col_of_expanded
+                  ?tab_stop:None ~platform:Lsp_platform.record
+                  ~fname:start_pos.pos_fname ~line:start_pos.pos_lnum
+                  (start_pos.pos_cnum - start_pos.pos_bol))
 
 (** [end_of_lexloc] creates a representation of the end of the given lexical
     location that is suitable for the LSP library. *)
 let end_of_lexloc ((_start_pos, end_pos): lexloc) =
   Position.create           (* NOTE: Line numbers start at 0 in LSP protocol. *)
     ~line:(end_pos.pos_lnum - 1)
-    ~character:(end_pos.pos_cnum - end_pos.pos_bol)
+    ~character:(Srcloc.original_col_of_expanded
+                  ?tab_stop:None ~platform:Lsp_platform.record
+                  ~fname:end_pos.pos_fname ~line:end_pos.pos_lnum
+                  (end_pos.pos_cnum - end_pos.pos_bol))
 
 (** [range_of_lexloc] creates a representation of the given lexical location
     that is suitable for the LSP library. *)
