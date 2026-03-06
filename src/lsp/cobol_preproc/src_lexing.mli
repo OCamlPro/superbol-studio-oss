@@ -11,8 +11,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val expand_tabs: ?tab_stop:int -> ?starting_col:int -> string -> string
-
 (** -- *)
 
 type 'k state
@@ -103,3 +101,4 @@ val unexpected
   -> ?severity: [`Error | `Warn]
   -> k: ('k state -> Lexing.lexbuf -> 'b)
   -> 'k state -> Lexing.lexbuf -> 'b
+

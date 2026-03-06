@@ -150,21 +150,21 @@ let%expect_test "token-locations-with-missing-program-id" =
 let%expect_test "tokens-with-tabs" =
   Parser_testing.show_parsed_tokens ~source_format:(SF SFFixed)
     ~parser_options:(Parser_testing.options ~verbose:true ())
-    {|
+     "
        IDENTIFICATION DIVISION.
        PROGRAM-ID. prog.
        PROCEDURE DIVISION.
-      		STRING 	W-AGT ";"   W-RUBNUM (J) ";" 
-      		W-RENVOINOTE W-DEST-NOM  ";" 
-      		W-DEST-RUE1  ";"  W-DEST-RUE2  ";" 
-      		W-DEST-CP ";"  W-DEST-VILLE 
-      		";" W-DEST-TEL1 (1:2)  " "
-                   W-DEST-TEL1 (3:2)  " "
-                   W-DEST-TEL1 (5:2)  " "
-                   W-DEST-TEL1 (7:2)  " "
+      \t\tSTRING \tW-AGT \";\"   W-RUBNUM (J) \";\" 
+      \t\tW-RENVOINOTE W-DEST-NOM  \";\" 
+      \t\tW-DEST-RUE1  \";\"  W-DEST-RUE2  \";\" 
+      \t\tW-DEST-CP \";\"  W-DEST-VILLE 
+      \t\t\";\" W-DEST-TEL1 (1:2)  \" \"
+                   W-DEST-TEL1 (3:2)  \" \"
+                   W-DEST-TEL1 (5:2)  \" \"
+                   W-DEST-TEL1 (7:2)  \" \"
                    W-DEST-TEL1 (9:2)
-             delimited  by  "   "  into  LARTISAN.
-|};
+             delimited  by  \"   \"  into  LARTISAN.
+";
     [%expect {|
       Tks: IDENTIFICATION, DIVISION, .
       Tks: PROGRAM-ID, ., INFO_WORD[prog], .
