@@ -170,9 +170,12 @@ let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
 
 let select_text_chunk ?(max_words = 10) text =
   let rec aux n acc : (Cobol_preproc.Text.t as 'text) -> 'text * 'text = function
-    | w :: tl when n > 0 -> aux (n - 1) (w :: acc) tl
-    | w :: tl -> List.rev_append acc [w], tl
-    | [] -> List.rev acc, []
+    | w :: tl ->
+        if n > 0
+        then aux (n - 1) (w :: acc) tl
+        else List.rev_append acc [w], tl
+    | [] ->
+        List.rev acc, []
   in
   aux max_words [] text
 
