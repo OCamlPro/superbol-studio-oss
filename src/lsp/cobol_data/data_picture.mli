@@ -16,6 +16,16 @@ open Cobol_common.Srcloc.TYPES
 (* --- *)
 
 module TYPES: sig
+  type sign_position = Leading | Trailing
+
+  type sign_config = {
+    sign_position: sign_position;
+    sign_separate: bool;
+  }
+
+  val default_sign_config: sign_config
+  val pp_sign_config: sign_config option Pretty.printer
+
   type symbol =
     | A
     | B
@@ -72,14 +82,14 @@ module TYPES: sig
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          sign: sign_config option;
           editions: editions;
         }
     | FloatNum of
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          sign: sign_config option;
           exponent_digits: int;
           editions: basic_edition list;
         }
@@ -185,6 +195,10 @@ val pp_category: category Pretty.printer
 val pp_category_name: category Pretty.printer
 val pp_picture_symbols: symbols list Pretty.printer
 
+(** [set_sign_encoding sign pic] returns a picture with the sign configuration of
+    signed fixed-point numeric categories updated to [sign]. *)
+val set_sign_encoding: sign_config -> picture -> (picture, picture) result
+
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)
 val is_edited: picture -> bool
@@ -216,7 +230,7 @@ val digits: int -> picture
 val fixed_numeric
   : ?basics: basic_edition list
   -> ?floating: floating_insertion
-  -> ?with_sign: bool
+  -> ?sign: sign_config option
   -> (* integral_digits: *)int
   -> (* decimal_digits: *)int
   -> picture

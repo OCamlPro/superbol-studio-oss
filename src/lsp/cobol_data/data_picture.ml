@@ -17,6 +17,19 @@ module CHARS = Cobol_common.Basics.CharSet
 
 module TYPES = struct
 
+  type sign_position = Leading | Trailing
+  [@@deriving ord]
+
+  type sign_config = {
+    sign_position: sign_position;
+    sign_separate: bool;  (** [true] = separate character (extra byte) *)
+  }
+  [@@deriving ord]
+
+  (** Default sign configuration: trailing, non-separate. *)
+  let default_sign_config =
+    { sign_position = Trailing; sign_separate = false }
+
   type symbol =
     | A
     | B
@@ -171,18 +184,25 @@ module TYPES = struct
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          sign: sign_config option;
           editions: editions;
         }
     | FloatNum of
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          sign: sign_config option;
           exponent_digits: int;
           editions: basic_edition list;
         }
   [@@deriving ord]
+
+  let pp_sign_config ppf = function
+    | None -> Fmt.string ppf "unsigned"
+    | Some { sign_position; sign_separate } ->
+        Fmt.pf ppf "%s %s"
+          (match sign_position with Leading -> "leading" | Trailing -> "trailing")
+          (if sign_separate then "separate" else "nonseparate")
 
   let pp_category ?(with_edition=true) ppf = function
     | Alphabetic { length } ->
@@ -197,26 +217,26 @@ module TYPES = struct
         Fmt.fmt "NATIONAL(%u)" ppf length
     | National { length; insertions = _ } ->
         Fmt.fmt "NATIONAL-EDITED(%u)" ppf length
-    | FixedNum { digits; scale; with_sign; editions }
+    | FixedNum { digits; scale; sign; editions }
       when with_edition && (editions.basics <> [] ||
                             editions.floating <> None ||
                             editions.zerorepl <> None) ->
         Fmt.fmt "NUMERIC-EDITED(@[digits = %u,@;scale = %d,@;\
-                 with_sign = %B,@;editions = %a@])" ppf
-          digits scale with_sign pp_editions editions
-    | FixedNum { digits; scale; with_sign; _ } ->
-        Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;with_sign = %B@])" ppf
-          digits scale with_sign
-    | FloatNum { digits; scale; with_sign; exponent_digits; editions }
+                 sign = %a,@;editions = %a@])" ppf
+          digits scale pp_sign_config sign pp_editions editions
+    | FixedNum { digits; scale; sign; _ } ->
+        Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;sign = %a@])" ppf
+          digits scale pp_sign_config sign
+    | FloatNum { digits; scale; sign; exponent_digits; editions }
       when (with_edition && editions <> []) ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
-                 %u,@;with_sign = %B,@;%a@])" ppf
-          digits scale exponent_digits with_sign
+                 %u,@;sign = %a,@;%a@])" ppf
+          digits scale exponent_digits pp_sign_config sign
           (Fmt.list pp_basic_edition) editions
-    | FloatNum { digits; scale; with_sign; exponent_digits; _ } ->
+    | FloatNum { digits; scale; sign; exponent_digits; _ } ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
-                 %u,@;with_sign = %B@])" ppf
-          digits scale exponent_digits with_sign
+                 %u,@;sign = %a@])" ppf
+          digits scale exponent_digits pp_sign_config sign
 
 
   type picture =
@@ -319,9 +339,13 @@ let data_size: category -> int = function
   | Boolean { length }
   | Alphanumeric { length; _ } -> length
   | National { length; _ } -> length * 2
-  | FixedNum { digits; _ } -> digits
+  | FixedNum { digits; sign; _ } ->
+      digits + (match sign with Some { sign_separate = true; _ } -> 1 | _ -> 0)
   | FloatNum { digits; exponent_digits; _ } -> digits + exponent_digits
 
+(** Display size including editing characters (insertion symbols, sign
+    position, etc.), as opposed to {!data_size} which gives the underlying
+    storage size (digits only for numerics). *)
 let edited_size: category -> int =
   let simple_insertion_size { simple_insertion_symbols = symbols; _ } =
     symbols.symbol_occurences in
@@ -347,9 +371,9 @@ let edited_size: category -> int =
   | National { length; insertions } ->
       length * 2 +
       simple_insertions_size insertions
-  | FixedNum { digits; with_sign; editions; _ } ->
+  | FixedNum { digits; sign; editions; _ } ->
       digits + editions_size editions +
-      if with_sign then 1 else 0  (* WARNING: depends on SIGN/SEPARATE phrase *)
+      (match sign with None -> 0 | Some _ -> 1)
   | FloatNum { digits; exponent_digits; editions; _ } ->
       digits + exponent_digits + basic_editions_size editions
 
@@ -377,15 +401,15 @@ let reverse_editions =
       Alphanumeric {length; insertions = List.rev insertions }
   | National { length; insertions } ->
       National {length; insertions = List.rev insertions }
-  | FixedNum { digits; scale; with_sign;
+  | FixedNum { digits; scale; sign;
                editions = { basics; floating; zerorepl } } ->
       let basics = List.rev basics
       and floating = Option.map reverse_floating floating
       and zerorepl = Option.map reverse_zerorepl zerorepl in
-      FixedNum { digits; scale; with_sign;
+      FixedNum { digits; scale; sign;
                  editions = { basics; floating; zerorepl } }
-  | FloatNum { digits; scale; with_sign; exponent_digits; editions } ->
-      FloatNum { digits; scale; with_sign; exponent_digits;
+  | FloatNum { digits; scale; sign; exponent_digits; editions } ->
+      FloatNum { digits; scale; sign; exponent_digits;
                  editions = List.rev editions }
 
 
@@ -488,22 +512,22 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
   let alphanum length insertions =
     Ok (Alphanumeric { length; insertions })
   and numeric
-      ?(with_sign = false)
+      ?(sign = None)
       ?(editions = { basics = []; floating = None; zerorepl = None })
       digits scale =
-    FixedNum { digits; scale; with_sign; editions }
+    FixedNum { digits; scale; sign; editions }
   and float
-      ?(with_sign = false)
+      ?(sign = None)
       ?(editions = [])
       digits scale exponent_digits =
-    FloatNum { digits; scale; with_sign; exponent_digits; editions }
+    FloatNum { digits; scale; sign; exponent_digits; editions }
   in
   let append_A = function
     | Alphabetic { length } ->
         Ok (Alphabetic { length = length + n })
     | Alphanumeric { length; insertions } ->
         Ok (Alphanumeric { length = length + n; insertions })
-    | FixedNum { digits; scale = 0; with_sign = false; editions } ->
+    | FixedNum { digits; scale = 0; sign = None; editions } ->
         (try alphanum (digits + n) (as_simple_insertions editions)
          with Exit -> error)                (* 'cause of non-simple insertions *)
     | _ -> error
@@ -512,24 +536,24 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
         alphanum (length + n) []
     | Alphanumeric { length; insertions } ->
         alphanum (length + n) insertions
-    | FixedNum { digits; scale; with_sign; editions } ->
+    | FixedNum { digits; scale; sign; editions } ->
         Ok (numeric (digits + n) (if after_v then scale + n else scale)
-              ~with_sign ~editions)
-    | FloatNum { digits; scale; with_sign; exponent_digits; editions } ->
-        Ok (float digits scale (exponent_digits + n) ~with_sign ~editions)
+              ~sign ~editions)
+    | FloatNum { digits; scale; sign; exponent_digits; editions } ->
+        Ok (float digits scale (exponent_digits + n) ~sign ~editions)
     | _ -> error
   and append_X = function
     | Alphabetic { length } ->
         alphanum (length + n) []
     | Alphanumeric { length; insertions } ->
         alphanum (length + n) insertions
-    | FixedNum { digits; scale = 0; with_sign = false; editions }  ->
+    | FixedNum { digits; scale = 0; sign = None; editions }  ->
         (try alphanum (digits + n) (as_simple_insertions editions)
          with Exit -> error)
     | _ -> error
   and append_P = function
-    | FixedNum { digits; scale; with_sign; editions } ->
-        Ok (numeric ~with_sign ~editions
+    | FixedNum { digits; scale; sign; editions } ->
+        Ok (numeric ~sign ~editions
               (digits + n)
               (scale + if digits = 0 then n else - n))
     | _ -> error
@@ -543,41 +567,41 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
         alphanum length [simple_insertion c]
     | Alphanumeric { length; insertions } as c ->
         alphanum length (simple_insertion c :: insertions)
-    | FixedNum { digits; scale; with_sign; editions } as c ->
+    | FixedNum { digits; scale; sign; editions } as c ->
         let editions =
           { editions with
             basics = SimpleInsertion (simple_insertion c) :: editions.basics } in
-        Ok (numeric ~with_sign ~editions digits scale)
+        Ok (numeric ~sign ~editions digits scale)
     | _ -> error
   and append_fixed_or_floating_insertion = function
-    | FixedNum { digits; scale; with_sign; editions } as c
-      when not with_sign || digits > 0 ->    (* forbidden in between S and digits *)
+    | FixedNum { digits; scale; sign; editions } as c
+      when sign = None || digits > 0 ->    (* forbidden in between S and digits *)
         (match append_insertion editions symbols (edited_size c) with
          | Ok (editions, digits') ->
              let digits = digits + digits'
              and scale = if after_v then scale + digits' else scale in
-             Ok (numeric ~with_sign ~editions digits scale)
+             Ok (numeric ~sign ~editions digits scale)
          | Error () -> error)
     | _ -> error
   and append_special_insertion special_insertion_offset = function
-    | FixedNum { digits; scale; with_sign; editions } ->
+    | FixedNum { digits; scale; sign; editions } ->
         let special = SpecialInsertion { special_insertion_offset } in
-        Ok (numeric ~with_sign digits scale
+        Ok (numeric ~sign digits scale
               ~editions:{ editions with basics = special :: editions.basics })
     | _ -> error
   and append_zero_replacement = function
-    | FixedNum { digits; scale; with_sign; editions } as c ->
+    | FixedNum { digits; scale; sign; editions } as c ->
         (match append_zero_replacement editions symbols (edited_size c) with
          | Ok editions ->
              let digits = digits + n
              and scale = if after_v then scale + n else scale in
-             Ok (numeric ~with_sign ~editions digits scale)
+             Ok (numeric ~sign ~editions digits scale)
          | Error () -> error)
     | _ -> error
   and append_E = function
-    | FixedNum { digits; scale; with_sign;
+    | FixedNum { digits; scale; sign;
                  editions = { basics; floating = None; zerorepl = None } } ->
-        Ok (float digits scale 0 ~with_sign ~editions:basics)
+        Ok (float digits scale 0 ~sign ~editions:basics)
     | _ -> error
   in
   (* TODO: always numeric-edited when BLANK WHEN ZERO *)
@@ -593,7 +617,7 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
   | None, Nine ->
       Ok (numeric n 0)
   | None, S ->
-      Ok (numeric 0 0 ~with_sign:true)
+      Ok (numeric 0 0 ~sign:(Some default_sign_config))
   | None, V ->
       Ok (numeric 0 0)
   | None, P ->
@@ -1213,9 +1237,9 @@ let boolean n =
 
 (* --- *)
 
-let fixednum ?(with_sign = false) ?(basics = []) ?floating ?zerorepl
+let fixednum ?(sign = None) ?(basics = []) ?floating ?zerorepl
     digits scale =
-  FixedNum { digits; scale; with_sign;
+  FixedNum { digits; scale; sign;
              editions = { basics; floating; zerorepl } }
 
 let digits n =
@@ -1224,9 +1248,9 @@ let digits n =
     pic = [symb Nine n];
   }
 
-let fixed_numeric ?basics ?floating ?(with_sign = false)
+let fixed_numeric ?basics ?floating ?(sign = None)
     i d = (* |int_part| |dec_part| *)
-  let pic_s = if with_sign then [symb S 1] else []
+  let pic_s = if Option.is_some sign then [symb S 1] else []
   and pic_i = if i = 0 then [] else [symb Nine i]
   and pic_d = if d = 0 then [] else [symb Nine d] in
   {
@@ -1234,11 +1258,20 @@ let fixed_numeric ?basics ?floating ?(with_sign = false)
     pic = pic_s @ pic_i @ [symb V 1] @ pic_d;
   }
 
-(* let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits = *)
-(*   FloatNum { digits; scale; with_sign; exponent_digits = exp_digits; *)
+(* let floatnum ?(sign = None) ?(basics = []) digits scale exp_digits = *)
+(*   FloatNum { digits; scale; sign; exponent_digits = exp_digits; *)
 (*              editions = basics; } *)
 
 (* --- *)
+
+let set_sign_encoding sign pic =
+  match pic.category with
+  | FixedNum ({ sign = Some _; _ } as r) ->
+      Ok { pic with category = FixedNum { r with sign = Some sign } }
+  | FixedNum { sign = None; _ }
+  | FloatNum _
+  | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ ->
+      Error pic
 
 let is_edited pic = is_edited pic.category
 let is_boolean pic = match pic.category with
@@ -1251,7 +1284,7 @@ let is_numeric pic = match pic.category with
   | FixedNum _ | FloatNum _ -> true
   | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ -> false
 let is_signed_numeric pic = match pic.category with
-  | FixedNum { with_sign; _ } | FloatNum { with_sign; _ } -> with_sign
+  | FixedNum { sign; _ } | FloatNum { sign; _ } -> Option.is_some sign
   | _ -> false
 let data_size pic = data_size pic.category
 let size pic = size pic.category

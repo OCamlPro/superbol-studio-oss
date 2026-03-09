@@ -145,7 +145,7 @@ let%expect_test "redefines-77" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 2, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 2, scale = 0, sign = unsigned)
         }
         value: 5
       }
@@ -158,7 +158,7 @@ let%expect_test "redefines-77" =
           elementary
           usage: {
             display
-            category: NUMERIC(digits = 2, scale = 0, with_sign = false)
+            category: NUMERIC(digits = 2, scale = 0, sign = unsigned)
           }
         }
       }

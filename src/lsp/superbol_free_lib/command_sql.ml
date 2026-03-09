@@ -44,7 +44,7 @@ let typeck_file { preproc_options; parser_options; _ } filename =
                    Pretty.out "PIC is %a@."
                      Cobol_data.Picture.pp picture;
                    (match picture.category with
-                    | FixedNum { digits = _; scale = _; with_sign = _; _ } -> ()
+                    | FixedNum { digits = _; scale = _; sign = _; _ } -> ()
                     | _ -> ())
                | Elementary_field _
                | Struct_field _ ->

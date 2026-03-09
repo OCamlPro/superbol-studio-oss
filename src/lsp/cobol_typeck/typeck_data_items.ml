@@ -257,6 +257,18 @@ let check_inherited_usage acc ~item_name item_clauses item_stack =
     | [] -> None
     | { item_clauses; _ } :: _ -> item_clauses.usage
   in
+  let item_clauses =
+    (* Inherit sign clause from enclosing group if not specified on this item *)
+    match item_clauses.Typeck_clauses.sign with
+    | Some _ -> item_clauses
+    | None ->
+        let top_item_sign =
+          match item_stack with
+          | [] -> None
+          | { item_clauses; _ } :: _ -> item_clauses.sign
+        in
+        { item_clauses with sign = top_item_sign }
+  in
   match item_clauses.Typeck_clauses.usage, top_item_usage with
   | _, None ->
       acc, item_clauses

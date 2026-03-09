@@ -86,12 +86,12 @@ module Pictures = struct
   let basic_national n =
     { category = National { length = n; insertions = [] };
       pic = [{symbol = N; symbol_occurences = n}] }
-  let fixednum ?(with_sign = false) ?(basics = []) ?floating ?zerorepl
+  let fixednum ?(sign = None) ?(basics = []) ?floating ?zerorepl
       digits scale =
-    FixedNum { digits; scale; with_sign;
+    FixedNum { digits; scale; sign;
                editions = { basics; floating; zerorepl } }
-  let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits =
-    FloatNum { digits; scale; with_sign; exponent_digits = exp_digits;
+  let floatnum ?(sign = None) ?(basics = []) digits scale exp_digits =
+    FloatNum { digits; scale; sign; exponent_digits = exp_digits;
                editions = basics; }
 
   (* --- *)
@@ -130,7 +130,7 @@ module Pictures = struct
       pic = [nine 1; a 1] }
 
   let pic_S99 =
-    { category = fixednum ~with_sign:true 2 0;
+    { category = fixednum ~sign:(Some { sign_position = Trailing; sign_separate = false }) 2 0;
       pic = [s 1; nine 2] }
 
   (* let pic_S99p = *)
@@ -138,7 +138,7 @@ module Pictures = struct
   (*     [ FixedInsertion { fixed_insertion_symbol = Plus; *)
   (*                        fixed_insertion_offset = 3 } ] *)
   (*   in *)
-  (*   { category = fixednum ~with_sign:true 2 0 ~basics; *)
+  (*   { category = fixednum ~sign:(Some { sign_position = Trailing; sign_separate = false }) 2 0 ~basics; *)
   (*     pic = [s 1; nine 2; plus 1] } *)
 
   let pic_V999 = fixed_numeric 0 3

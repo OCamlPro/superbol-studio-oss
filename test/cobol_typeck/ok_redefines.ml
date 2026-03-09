@@ -361,7 +361,7 @@ let%expect_test "redefines-index" =
           elementary
           usage: {
             display
-            category: NUMERIC(digits = 4, scale = 0, with_sign = false)
+            category: NUMERIC(digits = 4, scale = 0, sign = unsigned)
           }
         }
       }
