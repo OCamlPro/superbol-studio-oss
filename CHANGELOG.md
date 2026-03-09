@@ -2,6 +2,9 @@
 
 ## [_] Next release
 
+### Fixed
+- Internal logic of the parser to limit the amount of text rescans [#544](https://github.com/OCamlPro/superbol-studio-oss/pull/544)
+
 
 ## [0.3.0] Third release (2026-02-27)
 

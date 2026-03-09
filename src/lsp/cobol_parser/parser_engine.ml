@@ -80,6 +80,7 @@ type 'm state =
     (* `prev_limit'` is required to deal with the single-step backtracking upon
        recovery: *)
     prev_limit': Cobol_preproc.Src_overlay.limit;           (* second-to-last *)
+    text_buff: Cobol_preproc.Text.text;
     preproc: 'm preproc;
   }
 
@@ -124,6 +125,7 @@ let make_parser
   {
     prev_limit = right;
     prev_limit' = right;        (* [right], in case (unlikely to be relevant) *)
+    text_buff = [];
     preproc =
       {
         pp;
@@ -144,6 +146,9 @@ let make_parser
 let update_pp ps pp =
   if pp == ps.preproc.pp then ps
   else { ps with preproc = { ps.preproc with pp } }
+let update_text_buff ps text_buff =
+  if text_buff == ps.text_buff then ps
+  else { ps with text_buff }
 and update_tokzr ps tokzr =
   if tokzr == ps.preproc.tokzr then ps
   else { ps with preproc = { ps.preproc with tokzr } }
@@ -163,10 +168,25 @@ let all_diags { preproc = { pp; diags; tokzr; _ }; _ } =
 
 (* --- *)
 
+let select_text_chunk ?(max_words = 10) text =
+  let rec aux n acc : (Cobol_preproc.Text.t as 'text) -> 'text * 'text = function
+    | w :: tl when n > 0 -> aux (n - 1) (w :: acc) tl
+    | w :: tl -> List.rev_append acc [w], tl
+    | [] -> List.rev acc, []
+  in
+  aux max_words [] text
+
 let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
-  let text, pp = Cobol_preproc.next_chunk ps.preproc.pp in
-  let { preproc = { pp; tokzr; _ }; _ } as ps = update_pp ps pp in
+  let text, ps =
+    if ps.text_buff = [] then
+      let text, pp = Cobol_preproc.next_chunk ps.preproc.pp in
+      text, update_pp ps pp
+    else
+      ps.text_buff, { ps with text_buff = [] }
+  in
   assert (text <> []);
+  let text, text_buff = select_text_chunk text in
+  let { preproc = { pp; tokzr; _ }; _ } as ps = update_text_buff ps text_buff in
   (* Note: this is the source format in use at the end of the sentence. *)
   let source_format = Cobol_preproc.source_format pp in
   match Tokzr.tokenize_text ~source_format tokzr text with
@@ -179,7 +199,7 @@ let rec produce_tokens (ps: _ state as 's) : 's * Text_tokenizer.tokens =
 let rec next_token ({ preproc = { tokzr; _ }; _ } as ps) tokens =
   match Tokzr.next_token tokzr tokens with
   | Some (tokzr, token, tokens) ->
-      (update_tokzr ps tokzr, token, tokens)
+      update_tokzr ps tokzr, token, tokens
   | None ->
       let ps, tokens = produce_tokens ps in
       next_token ps tokens
