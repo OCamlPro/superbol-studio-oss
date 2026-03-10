@@ -147,7 +147,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     | NO :: DATA :: _                  -> subst_n NO_DATA 2
 
     | [WITH; NO]                     -> Error `MissingInputs
-    | WITH :: NO :: ADVANCING :: _     -> subst_n WITH_NO_ADVANCING 3
+    | WITH :: NO :: ADVANCING :: _      -> subst_n WITH_NO_ADVANCING 3
     | NO :: ADVANCING :: _             -> subst_n WITH_NO_ADVANCING 2
 
     | [IS]                           -> Error `MissingInputs
@@ -166,6 +166,8 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     | [CONSTANT]                     -> Error `MissingInputs
     | CONSTANT :: RECORD :: _          -> subst_n CONSTANT_RECORD 2
 
+    | [PROGRAM_ID | FUNCTION_ID |
+       CLASS_ID | INTERFACE_ID]      -> Error `MissingInputs
     | PROGRAM_ID :: PERIOD :: _
     | FUNCTION_ID :: PERIOD :: _
     | CLASS_ID :: PERIOD :: _
@@ -180,6 +182,7 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
     | END :: CLASS :: _
     | END :: INTERFACE :: _            -> info_word_after 2
 
+    | [FUNCTION]                     -> Error `MissingInputs
     | FUNCTION :: _                   -> function_name_after 1
 
     | [AUTHOR | INSTALLATION |
@@ -191,17 +194,26 @@ let preproc_n_combine_tokens ~intrinsics_enabled ~source_format =
        DATE_COMPILED | REMARKS |
        SECURITY) :: PERIOD :: _        -> comment_entry_after 2
 
+    | [LPAR]                         -> Error `MissingInputs
     | LPAR :: rest ->
       let rec check_par nb_par = function
-        | LPAR :: rest -> check_par (nb_par + 1) rest
-        | [IS] | [IS; NOT] -> Error `MissingInputs
+        | [LPAR] | [IS] | [IS; NOT]
+          -> Error `MissingInputs
+        | LPAR :: rest
+          -> check_par (nb_par + 1) rest
         | (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
         | (IS | NOT) :: (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
         | IS :: NOT :: (GREATER | LESS | EQUAL | EQ | NE | GT | LT | GE | LE) :: _
-            -> replace_n LPAR_BEFORE_RELOP nb_par
-        | _ -> replace_n LPAR nb_par
+          -> replace_n LPAR_BEFORE_RELOP nb_par
+        | _
+          -> replace_n LPAR nb_par
       in
       check_par 1 rest
+
+    (* Note: we forbid PIC/PIC IS at the end of tokenized text to avoid issues
+       with retokenization (to allow this, we'd need to restore the PICTURE
+       string expectation flag upon retokenization). *)
+    | [PICTURE] | [PICTURE; IS]      -> Error `MissingInputs
 
     | ALPHANUM_PREFIX { str; _ } :: _ -> missing_continuation_of str
 
