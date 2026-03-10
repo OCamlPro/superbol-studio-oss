@@ -276,6 +276,9 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
   let sign_config =
     Option.map (fun s -> sign_config_of_clause ~&s) item_clauses.sign
   in
+  let picture_config =
+    { picture_config with PIC.TYPES.sign_config }
+  in
   let diags, picture =
     match item_clauses.picture with
     | None ->
@@ -283,14 +286,6 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
     | Some picture_clause ->
         match translate_picture_clause ~picture_config picture_clause with
         | Ok pic ->
-            let pic = match sign_config with
-              | None -> pic
-              | Some sign ->
-                  Cobol_common.Srcloc.INFIX.(
-                    match PIC.set_sign_encoding sign ~&pic with
-                    | Ok pic' -> pic' &@<- pic
-                    | Error _ -> pic)
-            in
             diags, Some (Ok pic)
         | Error diags' ->
             LIST.append ~loc:__LOC__ diags' diags, Some (Error picture_clause)

@@ -90,8 +90,8 @@ module Pictures = struct
       digits scale =
     FixedNum { digits; scale; sign;
                editions = { basics; floating; zerorepl } }
-  let floatnum ?(sign = None) ?(basics = []) digits scale exp_digits =
-    FloatNum { digits; scale; sign; exponent_digits = exp_digits;
+  let floatnum ?(with_sign = false) ?(basics = []) digits scale exp_digits =
+    FloatNum { digits; scale; with_sign; exponent_digits = exp_digits;
                editions = basics; }
 
   (* --- *)

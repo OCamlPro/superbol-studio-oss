@@ -89,7 +89,7 @@ module TYPES: sig
         {
           digits: int;
           scale: int;
-          sign: sign_config option;
+          with_sign: bool;
           exponent_digits: int;
           editions: basic_edition list;
         }
@@ -152,6 +152,7 @@ module TYPES: sig
     max_pic_length : int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
+    sign_config: sign_config option;
   }
 
   type error =
@@ -194,10 +195,6 @@ val pp_detailed_category: category Pretty.printer
 val pp_category: category Pretty.printer
 val pp_category_name: category Pretty.printer
 val pp_picture_symbols: symbols list Pretty.printer
-
-(** [set_sign_encoding sign pic] returns a picture with the sign configuration of
-    signed fixed-point numeric categories updated to [sign]. *)
-val set_sign_encoding: sign_config -> picture -> (picture, picture) result
 
 (** [is_edited pic] indicates whether the given picture string represents an
     edited item *)

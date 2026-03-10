@@ -191,7 +191,7 @@ module TYPES = struct
         {
           digits: int;
           scale: int;
-          sign: sign_config option;
+          with_sign: bool;
           exponent_digits: int;
           editions: basic_edition list;
         }
@@ -227,16 +227,16 @@ module TYPES = struct
     | FixedNum { digits; scale; sign; _ } ->
         Fmt.fmt "NUMERIC(@[digits = %u,@;scale = %d,@;sign = %a@])" ppf
           digits scale pp_sign_config sign
-    | FloatNum { digits; scale; sign; exponent_digits; editions }
+    | FloatNum { digits; scale; with_sign; exponent_digits; editions }
       when (with_edition && editions <> []) ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
-                 %u,@;sign = %a,@;%a@])" ppf
-          digits scale exponent_digits pp_sign_config sign
+                 %u,@;with_sign = %B,@;%a@])" ppf
+          digits scale exponent_digits with_sign
           (Fmt.list pp_basic_edition) editions
-    | FloatNum { digits; scale; sign; exponent_digits; _ } ->
+    | FloatNum { digits; scale; with_sign; exponent_digits; _ } ->
         Fmt.fmt "FLOAT(@[digits = %u,@;scale = %d,@;exponent_digits = \
-                 %u,@;sign = %a@])" ppf
-          digits scale exponent_digits pp_sign_config sign
+                 %u,@;with_sign = %B@])" ppf
+          digits scale exponent_digits with_sign
 
 
   type picture =
@@ -250,6 +250,7 @@ module TYPES = struct
     max_pic_length : int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
+    sign_config: sign_config option;
   }
 
   type error =
@@ -408,8 +409,8 @@ let reverse_editions =
       and zerorepl = Option.map reverse_zerorepl zerorepl in
       FixedNum { digits; scale; sign;
                  editions = { basics; floating; zerorepl } }
-  | FloatNum { digits; scale; sign; exponent_digits; editions } ->
-      FloatNum { digits; scale; sign; exponent_digits;
+  | FloatNum { digits; scale; with_sign; exponent_digits; editions } ->
+      FloatNum { digits; scale; with_sign; exponent_digits;
                  editions = List.rev editions }
 
 
@@ -507,7 +508,7 @@ let append_zero_replacement ({ zerorepl; _ } as editions) symbols offset =
       Error ()
 
 
-let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
+let append category ~sign_config ~after_v ({ symbol; symbol_occurences = n } as symbols) =
   let error = Result.Error (category, symbol) in
   let alphanum length insertions =
     Ok (Alphanumeric { length; insertions })
@@ -517,10 +518,10 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
       digits scale =
     FixedNum { digits; scale; sign; editions }
   and float
-      ?(sign = None)
+      ?(with_sign = false)
       ?(editions = [])
       digits scale exponent_digits =
-    FloatNum { digits; scale; sign; exponent_digits; editions }
+    FloatNum { digits; scale; with_sign; exponent_digits; editions }
   in
   let append_A = function
     | Alphabetic { length } ->
@@ -539,8 +540,8 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
     | FixedNum { digits; scale; sign; editions } ->
         Ok (numeric (digits + n) (if after_v then scale + n else scale)
               ~sign ~editions)
-    | FloatNum { digits; scale; sign; exponent_digits; editions } ->
-        Ok (float digits scale (exponent_digits + n) ~sign ~editions)
+    | FloatNum { digits; scale; with_sign; exponent_digits; editions } ->
+        Ok (float digits scale (exponent_digits + n) ~with_sign ~editions)
     | _ -> error
   and append_X = function
     | Alphabetic { length } ->
@@ -601,7 +602,7 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
   and append_E = function
     | FixedNum { digits; scale; sign;
                  editions = { basics; floating = None; zerorepl = None } } ->
-        Ok (float digits scale 0 ~sign ~editions:basics)
+        Ok (float digits scale 0 ~with_sign:(Option.is_some sign) ~editions:basics)
     | _ -> error
   in
   (* TODO: always numeric-edited when BLANK WHEN ZERO *)
@@ -617,7 +618,8 @@ let append category ~after_v ({ symbol; symbol_occurences = n } as symbols) =
   | None, Nine ->
       Ok (numeric n 0)
   | None, S ->
-      Ok (numeric 0 0 ~sign:(Some default_sign_config))
+      let sign = Option.value ~default:default_sign_config sign_config in
+      Ok (numeric 0 0 ~sign:(Some sign))
   | None, V ->
       Ok (numeric 0 0)
   | None, P ->
@@ -910,7 +912,7 @@ let of_string config str =
           | Error acc -> acc, false
         in
         if ok then
-          let category = append ~after_v category symbols in
+          let category = append ~sign_config:config.sign_config ~after_v category symbols in
           let acc = match symbols.symbol with
             | V | DecimalSep when acc.v_idx = None ->
                 { acc with v_idx = Some idx }
@@ -1202,6 +1204,7 @@ module Make (Config: Cobol_config.T) (Env: ENV) = struct
       max_pic_length = Config.pic_length#value;
       decimal_char = Env.decimal_char;
       currency_signs = Env.currency_signs;
+      sign_config = None;
     } in
     match of_string config payload with
     | Ok pic ->
@@ -1264,15 +1267,6 @@ let fixed_numeric ?basics ?floating ?(sign = None)
 
 (* --- *)
 
-let set_sign_encoding sign pic =
-  match pic.category with
-  | FixedNum ({ sign = Some _; _ } as r) ->
-      Ok { pic with category = FixedNum { r with sign = Some sign } }
-  | FixedNum { sign = None; _ }
-  | FloatNum _
-  | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ ->
-      Error pic
-
 let is_edited pic = is_edited pic.category
 let is_boolean pic = match pic.category with
   | Boolean _ -> true
@@ -1284,7 +1278,8 @@ let is_numeric pic = match pic.category with
   | FixedNum _ | FloatNum _ -> true
   | Alphabetic _ | Alphanumeric _ | Boolean _ | National _ -> false
 let is_signed_numeric pic = match pic.category with
-  | FixedNum { sign; _ } | FloatNum { sign; _ } -> Option.is_some sign
+  | FixedNum { sign; _ } -> Option.is_some sign
+  | FloatNum { with_sign; _ } -> with_sign
   | _ -> false
 let data_size pic = data_size pic.category
 let size pic = size pic.category
@@ -1292,7 +1287,8 @@ let size pic = size pic.category
 (* --- *)
 
 let config = { max_pic_length = 100; decimal_char = '.';
-               currency_signs = CHARS.add '$' CHARS.empty }
+               currency_signs = CHARS.add '$' CHARS.empty;
+               sign_config = None }
 
 let unit_test ?(config=config) ~expect picture =
   let ppf = Format.str_formatter in
