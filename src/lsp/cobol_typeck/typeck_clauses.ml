@@ -25,6 +25,7 @@ type data_clauses =
     picture: Cobol_ptree.picture_clause with_loc option;
     value: Cobol_ptree.data_value_clause with_loc option;
     redefines: Cobol_ptree.name with_loc option;
+    sign: Cobol_ptree.sign_clause with_loc option;
     clause_diags: diagnostics;
   }
 
@@ -36,6 +37,7 @@ let init_clauses =
     picture = None;
     value = None;
     redefines = None;
+    sign = None;
     clause_diags = [];
   }
 
@@ -97,6 +99,11 @@ let on_redefines_clause acc =
     end
 
 
+let on_sign_clause acc =
+  on_unique_clause ~clause_name:"SIGN" acc.sign acc
+    ~f:(fun acc clause -> { acc with sign = Some clause })
+
+
 let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
   List.fold_left begin fun acc { payload = clause; loc } ->
     match (clause: Cobol_ptree.data_clause) with
@@ -105,6 +112,7 @@ let of_data_item (data_clauses: Cobol_ptree.data_clause with_loc list) =
     | DataUsage     u -> on_usage_clause acc (u &@ loc)
     | DataPicture   p -> on_picture_clause acc p
     | DataValue     d -> on_value_clause acc (d &@ loc)
+    | DataSign      s -> on_sign_clause acc (s &@ loc)
     | _ -> acc
   end init_clauses data_clauses
 
@@ -129,12 +137,25 @@ let translate_picture_clause
       Result.error
 
 
+let sign_config_of_clause
+    (sign_clause: Cobol_ptree.sign_clause) =
+  let open Cobol_data.Picture.TYPES in
+  let sign_position = match sign_clause with
+    | { sign_position = LeadingSign; _ } -> Leading
+    | _ -> Trailing
+  in
+  let sign_separate = sign_clause.sign_separate_character in
+  { sign_position; sign_separate }
+
+
 let display_usage_from_literal: Cobol_ptree.literal -> usage =
+  let open Cobol_data.Picture.TYPES in
   (* TODO: `Display|`National *)
   let detect_sign i =
     if EzString.starts_with ~prefix:"-" i
-    then true, String.length i - 1
-    else false, String.length i
+    then Some default_sign_config,
+         String.length i - 1
+    else None, String.length i
   in
   function
   | Alphanum { str; hexadecimal = false; _ } ->
@@ -146,12 +167,12 @@ let display_usage_from_literal: Cobol_ptree.literal -> usage =
   | Boolean { bool_base = `Hex; bool_value } ->
       Display (PIC.boolean (String.length bool_value * 4))
   | Integer i ->
-      let with_sign, digits = detect_sign i in
-      Display (PIC.fixed_numeric ~with_sign digits 0)
+      let sign, digits = detect_sign i in
+      Display (PIC.fixed_numeric ~sign digits 0)
   | Fixed { fixed_integral; fixed_fractional } ->
-      let with_sign, int_digits = detect_sign fixed_integral
+      let sign, int_digits = detect_sign fixed_integral
       and frac_digits = String.length fixed_fractional in
-      Display (PIC.fixed_numeric ~with_sign int_digits frac_digits)
+      Display (PIC.fixed_numeric ~sign int_digits frac_digits)
   | _ ->                                                            (* TODO... *)
       Display (PIC.alphanumeric ~size:1)
 
@@ -251,6 +272,12 @@ let to_usage_n_value ~item_name ~item_loc ~picture_config item_clauses =
         diags, Some literal
     | None ->
         diags, None
+  in
+  let sign_config =
+    Option.map (fun s -> sign_config_of_clause ~&s) item_clauses.sign
+  in
+  let picture_config =
+    { picture_config with PIC.TYPES.sign_config }
   in
   let diags, picture =
     match item_clauses.picture with

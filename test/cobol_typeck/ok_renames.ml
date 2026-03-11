@@ -75,7 +75,7 @@ let%expect_test "renames-with-redefines" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
             }
           }
         }{
@@ -86,7 +86,7 @@ let%expect_test "renames-with-redefines" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
             }
           }
         }{
@@ -97,7 +97,7 @@ let%expect_test "renames-with-redefines" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
             }
             value: 5
           }
@@ -110,7 +110,7 @@ let%expect_test "renames-with-redefines" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
               }
             }
           }{
@@ -122,7 +122,7 @@ let%expect_test "renames-with-redefines" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
               }
             }
           }
@@ -168,7 +168,7 @@ let%expect_test "renames-with-redefines" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
         }
       }
     }
@@ -256,7 +256,7 @@ let%expect_test "renames-qualif" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 2, scale = 0, with_sign = false)
+              category: NUMERIC(digits = 2, scale = 0, sign = unsigned)
             }
           }
         }{
@@ -286,7 +286,7 @@ let%expect_test "renames-qualif" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
               }
             }
           }
@@ -298,7 +298,7 @@ let%expect_test "renames-qualif" =
             elementary
             usage: {
               display
-              category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+              category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
             }
             value: 5
           }
@@ -311,7 +311,7 @@ let%expect_test "renames-qualif" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
               }
             }
           }
@@ -357,7 +357,7 @@ let%expect_test "renames-qualif" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
         }
       }
     }
@@ -391,7 +391,7 @@ let%expect_test "renames-qualif" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 3, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 3, scale = 0, sign = unsigned)
         }
       }
       redefs: {
@@ -428,7 +428,7 @@ let%expect_test "renames-qualif" =
                           usage: {
                             display
                             category:
-                             NUMERIC(digits = 1, scale = 0, with_sign = false)
+                             NUMERIC(digits = 1, scale = 0, sign = unsigned)
                           }
                         }
                       }{
@@ -440,7 +440,7 @@ let%expect_test "renames-qualif" =
                           usage: {
                             display
                             category:
-                             NUMERIC(digits = 1, scale = 0, with_sign = false)
+                             NUMERIC(digits = 1, scale = 0, sign = unsigned)
                           }
                         }
                       }{
@@ -452,7 +452,7 @@ let%expect_test "renames-qualif" =
                           usage: {
                             display
                             category:
-                             NUMERIC(digits = 1, scale = 0, with_sign = false)
+                             NUMERIC(digits = 1, scale = 0, sign = unsigned)
                           }
                         }
                       }

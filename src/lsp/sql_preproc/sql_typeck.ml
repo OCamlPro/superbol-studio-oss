@@ -99,9 +99,9 @@ let get_type cu name =
         match field_layout with
         | Elementary_field { usage = Packed_decimal picture; _ } ->
             (match picture.category with
-            | FixedNum { with_sign=true; _ } ->
+            | FixedNum { sign = Some _; _ } ->
             COBOL_TYPE_SIGNED_NUMBER_PD
-            | FixedNum { with_sign=false; _ } ->
+            | FixedNum _ ->
             COBOL_TYPE_UNSIGNED_NUMBER_PD
             | _ -> UNKNOWN)
         | Elementary_field { usage = Display picture; _ } -> (
@@ -110,10 +110,9 @@ let get_type cu name =
           | Alphanumeric _ -> COBOL_TYPE_ALPHANUMERIC
           | Boolean _ -> COBOL_TYPE_UNSIGNED_BINARY (*?*)
           | National _ -> COBOL_TYPE_NATIONAL
-          | FixedNum { with_sign; _ } ->
-            if with_sign then
+          | FixedNum { sign = Some _; _ } ->
               COBOL_TYPE_SIGNED_NUMBER_TC
-            else
+          | FixedNum { sign = None; _ } ->
               COBOL_TYPE_UNSIGNED_NUMBER
           | FloatNum _ -> UNKNOWN )
         | Elementary_field _
@@ -233,7 +232,7 @@ let print_name (cu : Cobol_unit.Types.cobol_unit) =
       | Elementary_field { usage = Display picture; _ } -> (
         Pretty.out "PIC is %a@." Cobol_data.Picture.pp picture;
         match picture.category with
-        | FixedNum { digits = _; scale = _; with_sign = _; _ } -> ()
+        | FixedNum { digits = _; scale = _; sign = _; _ } -> ()
         | _ -> () )
       | Elementary_field _
       | Struct_field _ ->

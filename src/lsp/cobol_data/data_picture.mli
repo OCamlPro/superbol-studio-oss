@@ -16,6 +16,16 @@ open Cobol_common.Srcloc.TYPES
 (* --- *)
 
 module TYPES: sig
+  type sign_position = Leading | Trailing
+
+  type sign_config = {
+    sign_position: sign_position;
+    sign_separate: bool;
+  }
+
+  val default_sign_config: sign_config
+  val pp_sign_config: sign_config option Pretty.printer
+
   type symbol =
     | A
     | B
@@ -72,7 +82,7 @@ module TYPES: sig
         {
           digits: int;
           scale: int;
-          with_sign: bool;
+          sign: sign_config option;
           editions: editions;
         }
     | FloatNum of
@@ -142,6 +152,7 @@ module TYPES: sig
     max_pic_length : int;
     decimal_char: char;
     currency_signs: Cobol_common.Basics.CharSet.t;
+    sign_config: sign_config option;
   }
 
   type error =
@@ -216,7 +227,7 @@ val digits: int -> picture
 val fixed_numeric
   : ?basics: basic_edition list
   -> ?floating: floating_insertion
-  -> ?with_sign: bool
+  -> ?sign: sign_config option
   -> (* integral_digits: *)int
   -> (* decimal_digits: *)int
   -> picture

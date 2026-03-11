@@ -57,7 +57,8 @@ let unit_tests =
 let () =
   let config: Cobol_data.Picture.TYPES.config =
     { max_pic_length = 100; decimal_char = '.';
-      currency_signs = CHARS.add '$' CHARS.empty }
+      currency_signs = CHARS.add '$' CHARS.empty;
+      sign_config = None }
   in
   List.iter begin fun (pic, value, expected) ->
     match Cobol_data.Picture.of_string config pic with

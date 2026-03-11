@@ -154,7 +154,7 @@ let%expect_test "occurs-fixed-3" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 2, scale = 1, with_sign = false)
+                category: NUMERIC(digits = 2, scale = 1, sign = unsigned)
               }
             }
           }
@@ -270,7 +270,7 @@ let%expect_test "occurs-fixed-nested" =
                             usage: {
                               display
                               category:
-                               NUMERIC(digits = 1, scale = 0, with_sign = false)
+                               NUMERIC(digits = 1, scale = 0, sign = unsigned)
                             }
                           }
                         }
@@ -328,7 +328,7 @@ let%expect_test "occurs-depending-1" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
         }
       }
     }
@@ -424,7 +424,7 @@ let%expect_test "occurs-depending-2" =
         elementary
         usage: {
           display
-          category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+          category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
         }
       }
     } |}];;
@@ -501,7 +501,7 @@ let%expect_test "occurs-with-index" =
               elementary
               usage: {
                 display
-                category: NUMERIC(digits = 1, scale = 0, with_sign = false)
+                category: NUMERIC(digits = 1, scale = 0, sign = unsigned)
               }
             }
           }
