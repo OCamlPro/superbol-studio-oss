@@ -3,6 +3,7 @@
 ## [_] Next release
 
 ### Fixed
+- Size reported for numeric items with `SIGN SEPARATE` clause
 - Internal logic of the parser to limit the amount of text rescans [#544](https://github.com/OCamlPro/superbol-studio-oss/pull/544)
 
 
