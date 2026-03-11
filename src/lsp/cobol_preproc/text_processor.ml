@@ -398,7 +398,7 @@ let apply_replacing k repl log =
       | OnFullText, Error `NoReplacement, [] ->
           List.rev rev_done_text, log
       | _, Error _, x :: text ->
-          aux k (LIST.rev_append ~loc:__LOC__ rev_done_text [x]) log text
+          aux k (x :: rev_done_text) log text
   in
   aux k [] log
 

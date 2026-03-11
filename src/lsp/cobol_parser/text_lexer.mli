@@ -22,7 +22,6 @@ include module type of TYPES
 module TokenHandles: sig
   include Set.S with type elt = keyword_handle
   val mem_text_token: Grammar_tokens.token -> t -> bool
-  val union_ : t -> normalize:t -> t
 end
 
 module IntrinsicHandles: Set.S with type elt = intrinsic_handle

@@ -202,7 +202,8 @@ struct
           | [] ->
               None, acc
           | ({ env; visited; assumed } :: _) as candidates ->
-              aux (LIST.append ~loc:__LOC__ candidates acc) (env, visited, assumed)
+              aux (LIST.append ~loc:__LOC__ candidates acc)
+                (env, visited, assumed)
           | exception Not_found ->
               None, acc
           | exception (E.Result v) ->

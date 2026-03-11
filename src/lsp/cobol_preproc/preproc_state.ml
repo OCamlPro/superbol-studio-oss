@@ -137,9 +137,13 @@ let find_full_phrase all_words
             | Error _ as e, _ ->
                 e
             | Ok phrase, `Same ->
-                Ok { phrase with prefix = LIST.append ~loc:__LOC__ prefix_text phrase.prefix }
+                Ok { phrase with
+                     prefix = LIST.append ~loc:__LOC__
+                         prefix_text phrase.prefix }
             | Ok phrase, `Rev ->
-                Ok { phrase with prefix = LIST.append ~loc:__LOC__ phrase.prefix prefix_text }
+                Ok { phrase with
+                     prefix = LIST.append ~loc:__LOC__
+                         phrase.prefix prefix_text }
   in
   if search_deep
   then try_from

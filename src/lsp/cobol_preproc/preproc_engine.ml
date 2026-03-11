@@ -187,14 +187,16 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
   | reader, ([{ payload = Eof; loc }] as eof) ->
       let context, diags = Preproc_logic.flush_contexts ~loc lp.context in
       let lp = add_diags { lp with context } diags in
-      let text, pplog = apply_active_replacing_full lp (LIST.append ~loc:__LOC__ buff eof) in
+      let text, pplog =
+        apply_active_replacing_full lp (LIST.append ~loc:__LOC__ buff eof)
+      in
       text, { lp with reader; pplog; buff = [] }
   | reader, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
       let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
-      | None when not emitting ->                              (* ignore text *)
+      | None when not emitting ->                                 (* ignore text *)
           let rev_ignored = LIST.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
       | None ->
@@ -206,7 +208,7 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
       | Some (text, compdirs, _compdir_text, diags) when not emitting ->
           let rev_ignored = LIST.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (apply_compiler_directives lp compdirs)     (* ignore text *)
+          next_chunk (apply_compiler_directives lp compdirs)   (* ignore text *)
       | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
           preprocess_line (apply_compiler_directives lp compdirs)
@@ -375,7 +377,7 @@ and do_replace lp rev_prefix repl suffix =
     | CDirReplace { replacing = repl; also = false }, replacing ->
         with_replacing lp (repl :: replacing)
     | CDirReplace { replacing = repl; also = true }, (r :: _ as replacing) ->
-        with_replacing lp ((LIST.append ~loc:__LOC__ repl r) :: replacing)
+        with_replacing lp (LIST.append ~loc:__LOC__ repl r :: replacing)
     | CDirReplaceOff _, []
     | CDirReplaceOff { last = false }, _ ->
         with_replacing lp []

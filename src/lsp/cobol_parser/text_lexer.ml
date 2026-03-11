@@ -14,7 +14,6 @@
 open EzCompat
 
 open Cobol_common.Srcloc.INFIX
-(* open Cobol_common.Reserved.TYPES *)
 module LIST = Cobol_common.Basics.LIST
 
 module TYPES = struct
@@ -63,11 +62,6 @@ module TokenHandles = struct
       end)
   let mem_text_token token set =
     mem { token; enabled = false; reserved = false } set
-  let union_ set ~normalize:tokens =
-    union set (map (fun k ->
-        let token = k.token in
-        { token; enabled = false; reserved = false }
-      ) tokens)
 end
 
 module IntrinsicHandles =
@@ -90,11 +84,7 @@ let __token_of_intrinsic = Hashtbl.create 116  (* all intrinsic function name *)
     punctuation. *)
 let string_of_token t =
   try Hashtbl.find word_of_token t
-  with Not_found ->
-  try
-    Hashtbl.find punct_of_token t
-  with Not_found ->
-    Grammar_printer.print_token t
+  with Not_found -> Hashtbl.find punct_of_token t
 
 let token_of_handle h = h.token
 
@@ -109,8 +99,7 @@ let pp_tokens_via_handles ppf toks =
 
 let reserve_as_keyword   h = h.reserved <- true
 let unreserve_keyword    h = h.reserved <- false
-let enable_keyword       h =
-  h.enabled <- true
+let enable_keyword       h = h.enabled <- true
 let disable_keyword      h = h.enabled <- false
 
 let enable_keywords tokens =
@@ -300,7 +289,8 @@ let read_tokens lexer state w =
       let sloc, loc = split_loc loc 1 in
       let tail_len = lexbuf.Lexing.lex_curr_pos - start_pos - 1 - head_len in
       let tail_loc, loc = split_loc loc tail_len in
-      aux ~loc (LIST.append ~loc:__LOC__ [tail &@ tail_loc; INTERVENING_ c &@ sloc]
+      aux ~loc (LIST.append ~loc:__LOC__
+                  [tail &@ tail_loc; INTERVENING_ c &@ sloc]
                   (LIST.append ~loc:__LOC__ head acc))
         ~expect_picture_string
     in
