@@ -1912,10 +1912,10 @@ run_file.at-10643-prog.cob:97.11-97.23:
           - filename extensions: "cpy" "cbl" "cob"
 
 Considering: import/gnucobol/tests/testsuite.src/run_file.at:10643:0
-run_file.at-10643-progs.cob:2.6-2.19:
+run_file.at-10643-progs.cob:2.11-2.19:
    1   
    2 >       $SET ODOSLIDE
-----         ^^^^^^^^^^^^^
+----              ^^^^^^^^
    3         **  CREATE KEY-DEF-AREA FROM ACB ARRAY
    4          IDENTIFICATION DIVISION.
 >> Warning: Ignored compiler directive

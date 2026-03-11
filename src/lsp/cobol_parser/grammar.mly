@@ -263,6 +263,7 @@ let any_permut4_nullable [@recovery (None, None, None, None, (A4, (A3, AB)))]
 (* --------------------- COMPILATION GROUPS AND UNITS ---------------------- *)
 
 let compilation_group :=
+  | ~=simple_program; EOF; < >
   | control_division = option(loc(control_division));
     ul = ll(loc(compilation_unit));
     pdo = loc(program_definition_no_end)?; EOF;
@@ -271,6 +272,16 @@ let compilation_group :=
           match pdo with
             | None -> ul
             | Some pd -> ul @ [((Program ~&pd): compilation_unit) &@<- pd] } }
+
+let simple_program := 
+  | opo = ro(loc(options_paragraph));
+    edo = ro(loc(environment_division));
+    ddo = ro(loc(non_empty_data_division));
+    pd = loc(program_procedure_division);
+    { { control_division = None;
+        compilation_units =
+          [ with_loc (build_simple_program opo edo ddo pd ~pos:$symbolstartpos) $sloc ];
+      } }
 
 (* --- CONTROL DIVISION --- *)
 
@@ -1159,6 +1170,11 @@ type declaration entry =
 *)
 
 *)
+
+let non_empty_data_division :=
+  | l1 = rnel(data_division_sentence_1);
+    l2 = rll_rev(data_division_sentence_2);
+    { List.rev_append l1 l2 }
 
 let data_division :=
   | l1 = rl(data_division_sentence_1);
@@ -2791,34 +2807,51 @@ condition:
 
 complex_condition:
  | nonrel_condition { $1 }
- | flat_relation_condition %prec lowest { $1 }
+ | relation_condition %prec lowest { $1 }
  | complex_condition logop complex_condition { Logop ($1, $2, $3) }
 
 %inline logop:
  | AND           { LAnd }
  | OR            { LOr }
 
-%inline flat_relation_condition:
- | neg = ibo(NOT) c = relation_condition
-   suff = io (pair (logop, flat_combination_operand))
-   { relation_condition ~neg c suff }
+%inline any_lpar:
+ | LPAR              {}
+ | LPAR_BEFORE_RELOP {}
+
+%inline relation_condition:
+ | neg = ibo(NOT) e = expression pred = abbrev_relop_operand { relation_condition (neg, e, pred) }
 
 nonrel_condition:
  | n = ibo(NOT)     e = expression %prec lowest { neg_simple_cond ~neg:n @@ Expr e }
  | n = ibo(NOT)     c = extended_condition      { neg_condition ~neg:n c }
  | n = ibo(NOT) "(" c  = complex_condition ")"  { neg_condition ~neg:n c }
 
-flat_combination_operand:
- | r = io(relop)    e = expression             { FlatAmbiguous (r, e) }
- |         NOT      e = expression             { FlatNotExpr e }
- | n = ibo(NOT)     c = relation_condition     { FlatRel (n, c) }
- | n = ibo(NOT)     c = extended_condition     { FlatOther (neg_condition ~neg:n c) }
- | n = ibo(NOT) "(" c =  complex_condition ")" { FlatOther (neg_condition ~neg:n c) }
- | flat_combination_operand logop flat_combination_operand
-                                               { FlatComb ($1, $2, $3) }
+abbrev_relop_atom:
+ | r = relop             e = abbrev_object_atom          { AbbrevRelOp (r, e) }
+ |     LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { c }
+ | NOT LPAR_BEFORE_RELOP c = abbrev_relop_operand RPAR   { AbbrevNot c }
 
-relation_condition:
- | expression relop expression { $1, $2, $3 }
+abbrev_relop_operand:
+ | abbrev_relop_atom { $1 }
+ | abbrev_relop_operand logop abbrev_relation_operand    { AbbrevComb ($1, $2, $3) }
+
+abbrev_object_atom:
+ | n = ibo(NOT)     e = expression          %prec lowest { AbbrevObject (n, e) }
+ |      "(" c = abbrev_object_operand ")"                { c }
+ | NOT  "(" c = abbrev_object_operand ")"                { AbbrevNot c }
+
+abbrev_object_operand:
+ | abbrev_object_atom { $1 }
+ | abbrev_object_operand logop abbrev_relation_operand   { AbbrevComb ($1, $2, $3) }
+
+abbrev_relation_operand:
+ | r = relop    e = abbrev_object_atom                   { AbbrevRelOp (r, e) }
+ | n = ibo(NOT) e = expression              %prec lowest { AbbrevObject (n, e) }
+ | n = ibo(NOT) e = expression a = abbrev_relop_atom     { AbbrevSubject (n, e, a) }
+ | n = ibo(NOT) c = extended_condition                   { AbbrevOther (neg_condition ~neg:n c) }
+ |     any_lpar c = abbrev_relation_operand RPAR         { c }
+ | NOT any_lpar c = abbrev_relation_operand RPAR         { AbbrevNot c }
+ | abbrev_relation_operand logop abbrev_relation_operand { AbbrevComb ($1, $2, $3) }
 
 extended_condition:
  | e = expression io(IS) n = bo(NOT) c = class_condition
@@ -3490,12 +3523,12 @@ let when_other [@default []] :=
 (* EXIT STATEMENT *)
 
 let returning :=
- | ~ = scalar; <ReturningScalar>
- | or_(GIVING, RETURNING); o(ADDRESS; OF); ~ = qualident;
+ | ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ~ = scalar;
+    <ReturningScalar>
+ | or_(GIVING, RETURNING); ADDRESS; OF?; ~ = qualident;
     <ReturningAddress>
- | or_(GIVING, RETURNING); v = integer;
-    { ReturningInt { value = Integer v;
-                     size = None } }
  | or_(GIVING, RETURNING); v = integer; s = pf(SIZE; IS, integer);
     { ReturningInt { value = Integer v;
                      size = Some (Integer s) } }
@@ -4195,13 +4228,11 @@ let stop_statement :=
   | STOP; ~ = stop_body; < >
 let stop_body [@context stop_stmt] := (* with context: should not accept empty *)
   | a = stop_with_arg; { StopArg (Some a) }             (* RM/COBOL extension *)
-  | RUN; ~ = o(stop_run_returning_body); <StopRun>
+  | RUN; { StopRun None }
+  | RUN; r = returning; { StopRun (Some (StopReturning r)) }
+  | RUN; s = with_status; { StopRun (Some (StopWithStatus s)) }
   | ERROR; { StopError }                                              (* GCOS *)
   | THREAD; ~ = o(qualident); <StopThread>
-
-let stop_run_returning_body :=
-  | ~ = returning; <StopReturning>
-  | ~ = with_status; <StopWithStatus>
 
 let stop_with_arg :=
   | ~ = qualident; <StopWithQualIdent>                   (* ~COB85, -COB2002 *)

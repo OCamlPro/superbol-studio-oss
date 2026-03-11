@@ -71,8 +71,11 @@ val lex_lib
     When given, [on_compiler_directive] is called {e after} [f] has been fed
     with the text of a compiler directive, with the same line number.
 
-    When given, [on_initial_source_format] is called {e before} either [f] or
-    [on_compiler_directive] has been called.
+    When given, [on_change_of_source_format] is called each time the source
+    format changes: once at the begining {e before} [f] has been called,
+    and then once each time a compiler directive that changes the source format
+    is encountered (right after the text is fed to [f] but before
+    [on_compiler_directive] is called).
 
     When set, [skip_compiler_directives_text] ([false] by default) prevents the
     text of compiler directives from being fed to [f].  If given,
@@ -83,7 +86,7 @@ val lex_lib
 val fold_source_lines
   : dialect: Cobol_config.dialect
   -> source_format: Cobol_config.source_format_spec
-  -> ?on_initial_source_format: (Src_format.any -> 'a -> 'a)
+  -> ?on_change_of_source_format: (Src_format.any -> 'a -> 'a)
   -> ?skip_compiler_directives_text: bool
   -> ?on_compiler_directive
      : (int -> Preproc_directives.compiler_directive with_loc -> 'a -> 'a)

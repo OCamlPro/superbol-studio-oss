@@ -52,7 +52,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'superbol-studio-oss'
 copyright = 'OCamlPro SAS'
-author = 'Nicolas Berthier <nicolas.berthier@ocamlpro.com> & David Declerck <david.declerck@ocamlpro.com> & Boris Eng <boris.eng@ocamlpro.com> & Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com> & Emilien Lemaire <emilien.lemaire@ocamlpro.com>'
+author = 'Nicolas Berthier <nicolas.berthier@ocamlpro.com> & David Declerck <david.declerck@ocamlpro.com> & Boris Eng <boris.eng@ocamlpro.com> & Fabrice Le Fessant <fabrice.le_fessant@ocamlpro.com> & Emilien Lemaire <emilien.lemaire@ocamlpro.com> & Guillaume Bertholon <guillaume.bertholon@ocamlpro.com>'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

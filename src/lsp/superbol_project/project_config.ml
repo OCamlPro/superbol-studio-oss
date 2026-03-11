@@ -26,6 +26,8 @@ module TYPES = struct
   type config = {
     mutable cobol_config: Cobol_config.t;
     mutable source_format: Cobol_config.source_format_spec;
+    mutable source_format_by_extension:
+      (string * Cobol_config.source_format_spec) list;
     mutable libpath: path list;
     mutable libexts: string list;
     mutable indent_config: (string * int) list;
@@ -69,10 +71,12 @@ let cobol_source_format source_format_name =
 let default_libpath = [RelativeToProjectRoot "."]
 let default_libexts = Cobol_common.Copybook.copybook_extensions
 let default_indent_config = []
+let default_source_format_by_extension = []
 
 let default = {
   cobol_config = Cobol_config.default;
   source_format = Cobol_config.Auto;
+  source_format_by_extension = default_source_format_by_extension;
   libpath = default_libpath;
   libexts = default_libexts;
   indent_config = default_indent_config;
@@ -108,6 +112,17 @@ let libpath_repr libpath =
 let libexts_repr libexts =
   TOML.value_of_strings @@ Array.of_list libexts
 
+let source_format_by_extension_entry_repr (ext, fmt) =
+  TOML.table_of_list [
+    "extension", TOML.string ext;
+    "source-format", TOML.string @@
+    Cobol_config.Options.string_of_format fmt;
+  ]
+
+let source_format_by_extension_repr entries =
+  TOML.value_of_array @@ Array.of_list @@
+  List.map source_format_by_extension_entry_repr entries
+
 let indent_repr indent =
   TOML.value_of_table @@
   List.fold_left
@@ -128,6 +143,11 @@ let config_repr config ~name =
         ~name: "source-format"
         ~after_comments: ["Default source reference-format"]
         (format_repr config.source_format);
+
+      option
+        ~name: "source-format-by-extension"
+        ~after_comments: ["Per-extension source reference-format overrides"]
+        (source_format_by_extension_repr config.source_format_by_extension);
 
       option
         ~name: "copybooks"
@@ -157,6 +177,17 @@ let get_source_format toml =
 
 let get_dialect toml =
   TOML.get_string toml ["dialect"] ~default:"default"
+
+let get_source_format_by_extension_entry toml =
+  let ext = TOML.get_string toml ["extension"] in
+  let fmt = cobol_source_format @@ TOML.get_string toml ["source-format"] in
+  (ext, fmt)
+
+let get_source_format_by_extension toml =
+  try
+    List.map get_source_format_by_extension_entry @@
+    Array.to_list @@ TOML.get_array toml ["source-format-by-extension"]
+  with Not_found -> default_source_format_by_extension
 
 let get_path_entry toml =
   let dir = TOML.get_string toml ["dir"] in
@@ -197,6 +228,7 @@ let load_file ?(verbose=false) config_filename =
       { cobol_config;
         toml_handle;
         source_format = get_source_format section;
+        source_format_by_extension = get_source_format_by_extension section;
         libpath = get_libpath section;
         libexts = get_libexts section;
         indent_config = get_indent_config section }
@@ -228,11 +260,13 @@ let reload ?(verbose=false) ~config_filename config =
     let DIAGS.{ result = cobol_config; diags } =
       cobol_config_from_dialect_name ~verbose @@ get_dialect section
     and source_format = get_source_format section
+    and source_format_by_extension = get_source_format_by_extension section
     and libpath = get_libpath section
     and libexts = get_libexts section
     and indent_config = get_indent_config section in
     let changed =
       config.source_format <> source_format ||
+      config.source_format_by_extension <> source_format_by_extension ||
       config.libpath <> libpath ||
       config.libexts <> libexts ||
       config.indent_config <> indent_config ||
@@ -240,6 +274,7 @@ let reload ?(verbose=false) ~config_filename config =
     in
     config.cobol_config <- cobol_config;
     config.source_format <- source_format;
+    config.source_format_by_extension <- source_format_by_extension;
     config.libpath <- libpath;
     config.libexts <- libexts;
     config.indent_config <- indent_config;
@@ -253,6 +288,8 @@ let reload ?(verbose=false) ~config_filename config =
     with Not_found ->                         (* missing section: use defaults *)
       config.cobol_config <- default.cobol_config;
       config.source_format <- default.source_format;
+      config.source_format_by_extension <-
+        default.source_format_by_extension;
       config.libpath <- default.libpath;
       config.libexts <- default.libexts;
       config.indent_config <- default.indent_config;
@@ -263,6 +300,21 @@ let reload ?(verbose=false) ~config_filename config =
 
 (* --- *)
 
+
+(** Returns the source format for the given file: checks for a per-extension
+    override first, and falls back to the global [source_format] setting. *)
+let source_format_for ~filename config =
+  let ext = Filename.extension filename in
+  let ext =
+    if ext <> ""
+    then String.sub ext 1 (String.length ext - 1)
+    else ext
+  in
+  (* search for user-defined association *)
+  match List.assoc_opt (String.lowercase_ascii ext)
+          config.source_format_by_extension with
+  | Some fmt -> fmt
+  | None -> config.source_format (* fallback to global setting *)
 
 let libpath_for ~filename { libpath; _ } =
   List.map begin function

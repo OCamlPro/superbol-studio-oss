@@ -84,7 +84,9 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
         source_format = match language_id doc with
           | "COBOL_GNU_LISTFILE"
           | "COBOL_GNU_DUMPFILE" -> SF SFVariable
-          | _ -> project.config.source_format
+          | _ ->
+            Superbol_project.Config.source_format_for
+              ~filename:(Lsp.Uri.to_path (uri doc)) project.config
       } @@
   String { contents = Lsp.Text_document.text textdoc;
            filename = Lsp.Uri.to_path (uri doc) }

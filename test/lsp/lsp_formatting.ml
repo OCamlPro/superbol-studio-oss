@@ -101,7 +101,7 @@ let%expect_test "formatting-request-nested-if" =
   end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     PROCEDURE DIVISION.
     para-1.
         IF X>9
@@ -255,7 +255,7 @@ let%expect_test "formatting-request-alignment-argument" =
   end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     PROCEDURE DIVISION.
         MOVE VAR-1 TO VAR-2 VAR-3
                       VAR-4
@@ -282,7 +282,7 @@ let%expect_test "formatting-request-else-if" =
   end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     PROCEDURE DIVISION.
         if x>1
            move 1 to x
@@ -505,7 +505,7 @@ let%expect_test "formatting-request-on-exception" =
   end;
   end_with_postproc [%expect.output];
   [%expect{|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     PROCEDURE DIVISION.
         CALL STH
            NOT ON EXCEPTION
@@ -534,7 +534,7 @@ let%expect_test "formatting-request-perform" =
   end;
   end_with_postproc [%expect.output];
   [%expect {|
-    {"params":{"diagnostics":[{"message":"Invalid syntax","range":{"end":{"character":16,"line":1},"start":{"character":7,"line":1}},"severity":1}],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
+    {"params":{"diagnostics":[],"uri":"file://__rootdir__/prog.cob"},"method":"textDocument/publishDiagnostics","jsonrpc":"2.0"}
     PROCEDURE DIVISION.
     para-1.
         PERFORM 3 TIMES

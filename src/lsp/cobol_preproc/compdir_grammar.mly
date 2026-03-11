@@ -46,6 +46,7 @@
 
 %token ADDRSV          [@keyword "ADDRSV", "ADD-RSV"]
 %token ADDSYN          [@keyword "ADDSYN", "ADD-SYN"]
+%token ANS85           [@keyword]
 %token AREACHECK       [@keyword "AREACHECK", "AREA-CHECK"]
 %token AS              [@keyword]
 %token ASSIGN          [@keyword]
@@ -66,6 +67,7 @@
 %token LESS            [@keyword]
 %token MAKESYN         [@keyword "MAKESYN", "MAKE-SYN"]
 %token NESTCALL        [@keyword]
+%token NOANS85         [@keyword "NOANS85", "NO-ANS85"]
 %token NOAREACHECK     [@keyword "NOAREACHECK", "NO-AREACHECK", "NO-AREA-CHECK"]
 %token NOBOUND         [@keyword "NOBOUND", "NO-BOUND"]
 %token NOCHECKNUM      [@keyword "NOCHECKNUM", "NO-CHECKNUM", "NO-CHECK-NUM"]
@@ -82,6 +84,7 @@
 %token OVERRIDE        [@keyword]
 %token PARAMETER       [@keyword]
 %token REMOVE          [@keyword]
+%token SEQUENTIAL      [@keyword]
 %token SET             [@keyword]
 %token SIGN            [@keyword]
 %token SOURCEFORMAT    [@keyword "SOURCEFORMAT", "SOURCE-FORMAT"]
@@ -112,9 +115,8 @@ let loc (X) ==
 (* --- Entry points --------------------------------------------------------- *)
 
 let compiler_directive :=
-  | CDIR_SOURCE; ~ = source_directive; <Lexing>
-  | CDIR_SET; ~ = set_sourceformat; <Lexing>
-  | CDIR_SET; ~ = set_directive; <Preproc>
+  | CDIR_SOURCE; ~ = source_directive; <Source>
+  | CDIR_SET; ~ = set_directive; <Set>
   | CDIR_DEFINE; ~ = define_directive; <Preproc>
   | CDIR_IF; ~ = if_directive; <Preproc>
   | CDIR_ELIF; ~ = elif_directive; <Preproc>
@@ -122,7 +124,7 @@ let compiler_directive :=
   | CDIR_END; EOL; { Preproc End }
   | CDIR_END_IF; EOL; { Preproc End_if }
 
-(* --- >>SOURCE | $ SET SOURCEFORMAT ---------------------------------------- *)
+(* --- >>SOURCE | $ SOURCE -------------------------------------------------- *)
 
 let source_directive :=
   | ~ = source_format; PERIOD?; EOL; < >
@@ -133,17 +135,15 @@ let source_format :=
   | FORMAT?; IS?; i = text_word;
     { Source_format_is i }
 
-let set_sourceformat :=
-  | SOURCEFORMAT; i = string_value; PERIOD?; EOL;       (* elementary_string_literal? *)
-    { Set_sourceformat i }
 
 (* --- >>SET ... | $ SET ... ------------------------------------------------ *)
 
 let set_directive :=
-  | ~ = set; PERIOD?; EOL; < >
+  | ~ = nonempty_list(loc(set_directive_item)); PERIOD?; EOL; <>
 
-let set :=
-  | ~ = loc(set_operand); <Set>
+let set_directive_item :=
+  | ~ = set_operand; <Set_preproc>
+  | SOURCEFORMAT; ~ = string_value; <Set_source_format>
 
 let const_value :=
   | ~ = loc(ALPHANUM);             <Alphanum>
@@ -156,6 +156,7 @@ let string_value :=
 let set_operand :=
   | ADDRSV;                                             {Add_srv}
   | ADDSYN;                                             {Add_syn}
+  | ANS85;                                              {ANSI_85 true}
   | AREACHECK;                                          {Area_check true}
   | ASSIGN;                                             {Assign}
   | BOUND;                                              {Bound true}
@@ -169,6 +170,7 @@ let set_operand :=
   | INTLEVEL; LPAR; l = loc(FIXEDLIT); RPAR;            {Int_level l}
   | MAKESYN;                                            {Make_syn}
   | NESTCALL;                                           {Nest_call}
+  | NOANS85;                                            {ANSI_85 false}
   | NOAREACHECK;                                        {Area_check false}
   | NOBOUND;                                            {Bound false}
   | NOCHECKNUM;                                         {Check_num false}
@@ -180,6 +182,7 @@ let set_operand :=
   | NSYMBOL; v = string_value;                          {N_symbol v}
   | ODOSLIDE;                                           {ODO_slide true}
   | REMOVE;                                             {Remove}
+  | SEQUENTIAL; v = string_value;                       {Sequential v}
   | SIGN; v = string_value;                             {Sign v}
   | SPZERO;                                             {SP_zero true}
   | SSRANGE;                                            {SS_range true}

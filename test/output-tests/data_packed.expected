@@ -630,7 +630,7 @@ Considering: import/gnucobol/tests/testsuite.src/data_packed.at:2230:0
 data_packed.at-2230-prog.cob:8.37:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
-   7          01 FILLER.      
+   7          01 FILLER.
    8 >          05 FENCE-A     PIC XXX VALUE FENCE.
 ----                                        ^
    9            05 RESULT      PIC 9(03) PACKED-DECIMAL.
@@ -640,7 +640,7 @@ data_packed.at-2230-prog.cob:8.37:
 data_packed.at-2230-prog.cob:8.38-8.43:
    5          WORKING-STORAGE  SECTION.
    6          78 FENCE         VALUE x'ABBAAB'.
-   7          01 FILLER.      
+   7          01 FILLER.
    8 >          05 FENCE-A     PIC XXX VALUE FENCE.
 ----                                         ^^^^^
    9            05 RESULT      PIC 9(03) PACKED-DECIMAL.
@@ -648,7 +648,7 @@ data_packed.at-2230-prog.cob:8.38-8.43:
 >> Error: Invalid syntax
 
 data_packed.at-2230-prog.cob:10.37:
-   7          01 FILLER.      
+   7          01 FILLER.
    8            05 FENCE-A     PIC XXX VALUE FENCE.
    9            05 RESULT      PIC 9(03) PACKED-DECIMAL.
   10 >          05 FENCE-B     PIC XXX VALUE FENCE.
@@ -658,7 +658,7 @@ data_packed.at-2230-prog.cob:10.37:
 >> Hint: Missing <literal>
 
 data_packed.at-2230-prog.cob:10.38-10.43:
-   7          01 FILLER.      
+   7          01 FILLER.
    8            05 FENCE-A     PIC XXX VALUE FENCE.
    9            05 RESULT      PIC 9(03) PACKED-DECIMAL.
   10 >          05 FENCE-B     PIC XXX VALUE FENCE.

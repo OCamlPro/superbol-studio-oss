@@ -338,29 +338,25 @@ and _ cond =
       _ cond * logop * _ cond -> [>complex_] cond      (** {v c <AND/OR> c' v} *)
 
 and binary_relation =
-  expression * relop * expression                      (** {v e <relop> e' v} *)
+  expression * relop * expression                       (** {v e <relop> e' v} *)
 
-(** An abbreviated combined relation describes a non-parenthesized condition:
-
-    - {v e <relop> e' <AND/OR> <abbreviated-suffix> v} if [not neg] holds (the
-      first item in the tuple);
-
-    - {v NOT e <relop> e' <AND/OR> <abbreviated-suffix> v} otherwise. *)
+(** An abbreviated combined relation describes a condition of the form
+    {v NOT? subject <abbrev-relation-operand> v}.
+    The leftmost non AbbrevCond element is always an AbbrevRelOp.
+    Be careful: the COBOL standard imposes that the optional NOT only applies to the leftmost object in the abbreviated relational condition.
+    *)
 and abbrev_combined_relation =
-  bool * binary_relation * logop * flat_combined_relation
+  bool * expression * abbrev_relation_operand
 
-(** Suffix of non-parenthesized relational combined conditions ({v a v}) *)
-and flat_combined_relation =
-  | FlatAmbiguous of
-      relop option * expression                          (** {v <relop>? e v} *)
-  | FlatNotExpr of
-      expression                                              (** {v NOT e v} *)
-  | FlatRel of
-      bool * binary_relation                     (**  {v NOT? e <relop> e' v} *)
-  | FlatOther of
-      condition            (** {v <non-relational/parenthesized condition> v} *)
-  | FlatComb of
-      (flat_combined_relation as 'x) * logop * 'x   (** {v a' <AND/OR> a'' v} *)
+(** Suffix of relational combined conditions ({v a v}) *)
+and abbrev_relation_operand =
+  | AbbrevRelOp of relop * abbrev_relation_operand         (** {v <relop> a v} *)
+  | AbbrevObject of bool * expression                         (** {v NOT? e v} *)
+  | AbbrevSubject of abbrev_combined_relation                   (** {v NOT? e a v} *)
+  | AbbrevNot of abbrev_relation_operand                     (** {v NOT (a) v} *)
+  | AbbrevOther of condition              (** {v <non-relational condition> v} *)
+  | AbbrevComb of
+      (abbrev_relation_operand as 'x) * logop * 'x   (** {v a' <AND/OR> a'' v} *)
 
 and condition = [simple_|complex_] cond
 and simple_condition = simple_ cond
@@ -609,32 +605,36 @@ module COMPARE = struct
     compare_struct (compare_expression x1 x2) @@
     lazy (compare_struct (compare r1 r2) @@
           lazy (compare_expression y1 y2))
-  and compare_abbrev_combined_relation (b1, r1, x1, y1) (b2, r2, x2, y2) =
+  and compare_abbrev_combined_relation (b1, e1, a1) (b2, e2, a2) =
     compare_struct (Bool.compare b1 b2) @@
-    lazy (compare_struct (compare_binary_relation r1 r2) @@
-          lazy (compare_struct (compare_logop x1 x2) @@
-                lazy (compare_flat_combined_relation y1 y2)))
-  and compare_flat_combined_relation a b = match a, b with
-    | FlatAmbiguous (ro1, e1), FlatAmbiguous (ro2, e2) ->
-        compare_struct (Option.compare compare_relop ro1 ro2) @@
-        lazy (compare_expression e1 e2)
-    | FlatAmbiguous _, _ -> -1
-    | _, FlatAmbiguous _ -> 1
-    | FlatNotExpr e1, FlatNotExpr e2 -> compare_expression e1 e2
-    | FlatNotExpr _, _ -> -1
-    | _, FlatNotExpr _ -> 1
-    | FlatRel (b1, r1), FlatRel (b2, r2) ->
+    lazy (compare_struct (compare_expression e1 e2) @@
+          lazy (compare_abbrev_relation_operand a1 a2))
+  and compare_abbrev_relation_operand a b = match a, b with
+    | AbbrevRelOp (r1, a1), AbbrevRelOp (r2, a2) ->
+        compare_struct (compare_relop r1 r2) @@
+        lazy (compare_abbrev_relation_operand a1 a2)
+    | AbbrevRelOp _, _ -> -1
+    | _, AbbrevRelOp _ -> 1
+    | AbbrevObject (b1, e1), AbbrevObject (b2, e2) ->
         compare_struct (Bool.compare b1 b2) @@
-        lazy (compare_binary_relation r1 r2)
-    | FlatRel _, _ -> -1
-    | _, FlatRel _ -> 1
-    | FlatOther c1, FlatOther c2 -> compare_cond c1 c2
-    | FlatOther _, _ -> -1
-    | _, FlatOther _ -> 1
-    | FlatComb (x1, o1, y1), FlatComb (x2, o2, y2) ->
-        compare_struct (compare_flat_combined_relation x1 x2) @@
+        lazy (compare_expression e1 e2)
+    | AbbrevObject _, _ -> -1
+    | _, AbbrevObject _ -> 1
+    | AbbrevSubject r1, AbbrevSubject r2 ->
+        compare_abbrev_combined_relation r1 r2
+    | AbbrevSubject _, _ -> -1
+    | _, AbbrevSubject _ -> 1
+    | AbbrevNot a1, AbbrevNot a2 ->
+        compare_abbrev_relation_operand a1 a2
+    | AbbrevNot _, _ -> -1
+    | _, AbbrevNot _ -> 1
+    | AbbrevOther c1, AbbrevOther c2 -> compare_cond c1 c2
+    | AbbrevOther _, _ -> -1
+    | _, AbbrevOther _ -> 1
+    | AbbrevComb (x1, o1, y1), AbbrevComb (x2, o2, y2) ->
+        compare_struct (compare_abbrev_relation_operand x1 x2) @@
         lazy (compare_struct (compare_logop o1 o2) @@
-              lazy (compare_flat_combined_relation y1 y2))
+              lazy (compare_abbrev_relation_operand y1 y2))
 
   and compare_cond : type a b. a cond -> b cond -> int =
     fun a b -> match a, b with
@@ -1052,10 +1052,8 @@ module FMT = struct
         fmt "%a%a" ppf not_ pos pp_expression e
     | Relation rel ->
         fmt "%a@[<1>(%a)@]" ppf not_ pos pp_binary_relation rel
-    | Abbrev (neg, rel, o, comb) ->
-        fmt "%a@[<1>(%a%a@ %a@ %a)@]" ppf
-          not_ pos not_ (not neg) pp_binary_relation rel pp_logop o
-          pp_flat_combined_relation comb
+    | Abbrev r ->
+        fmt "%a%a" ppf not_ pos pp_abbrev_combined_relation r
     | ClassCond (e, c) ->
         fmt "%a@ %a%a" ppf pp_expression e not_ pos pp_class_ c
     | SignCond (e, s) ->
@@ -1068,22 +1066,26 @@ module FMT = struct
         fmt "@[<1>%a(%a@ %a@ %a)@]" ppf
           not_ pos (pp_cond ~pos:true) a pp_logop o (pp_cond ~pos:true) b
 
-  and pp_flat_combined_relation ppf = function
-    | FlatAmbiguous (None, e) ->
-        pp_expression ppf e
-    | FlatAmbiguous (Some r, e) ->
-        fmt "%a@ %a" ppf pp_relop r pp_expression e
-    | FlatNotExpr e ->
-        fmt "NOT@ %a" ppf pp_expression e
-    | FlatRel (neg, rel) ->
-        fmt "%a%a" ppf not_ (not neg) pp_binary_relation rel
-    | FlatOther c ->
+  and pp_abbrev_combined_relation ppf (neg, e, a) =
+    fmt "@[<1>(%a%a@ %a)@]" ppf not_ (not neg) pp_expression e 
+      pp_abbrev_relation_operand a
+
+  and pp_abbrev_relation_operand ppf = function
+    | AbbrevRelOp (o, a) ->
+        fmt "%a@ %a" ppf pp_relop o pp_abbrev_relation_operand a
+    | AbbrevObject (neg, e) ->
+        fmt "%a%a" ppf not_ (not neg) pp_expression e
+    | AbbrevSubject r ->
+        pp_abbrev_combined_relation ppf r
+    | AbbrevNot a ->
+        fmt "NOT@ @[<1>(%a)@]" ppf pp_abbrev_relation_operand a
+    | AbbrevOther c ->
         fmt "@[<1>(%a)@]" ppf pp_condition c
-    | FlatComb (c1, o, c2) ->
-        fmt "%a@ %a@ %a" ppf
-          pp_flat_combined_relation c1
+    | AbbrevComb (a1, o, a2) ->
+        fmt "@[<1>(%a@ %a@ %a)@]" ppf
+          pp_abbrev_relation_operand a1
           pp_logop o
-          pp_flat_combined_relation c2
+          pp_abbrev_relation_operand a2
 
   and pp_condition ppf = pp_cond ppf
   and not_ ppf = function false -> fmt "NOT@ " ppf | true -> ()

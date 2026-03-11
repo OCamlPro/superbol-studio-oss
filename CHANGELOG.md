@@ -2,7 +2,17 @@
 
 ## [_] Next release
 
+### Fixed
+- Internal logic of the parser to limit the amount of text rescans [#544](https://github.com/OCamlPro/superbol-studio-oss/pull/544)
+
+
+## [0.3.0] Third release (2026-02-27)
+
 ### Added
+- Per-extension source reference-format overrides, via VSCode and `superbol.toml` settings [#538](https://github.com/OCamlPro/superbol-studio-oss/pull/538)
+- Support for multiple arguments in `SET` compiler directives [#536](https://github.com/OCamlPro/superbol-studio-oss/pull/536)
+- Handle OSVS parentheses in abbreviated combined relation conditions [#532](https://github.com/OCamlPro/superbol-studio-oss/pull/532)
+- Support STOP RUN RETURNING syntax with scalar argument [#529](https://github.com/OCamlPro/superbol-studio-oss/pull/529)
 - Support INDEXED BY and sort direction in any order in OCCURS clause [#526](https://github.com/OCamlPro/superbol-studio-oss/pull/526)
 - Support for debugging programs launched via custom COBOL runtimes [#522](https://github.com/OCamlPro/superbol-studio-oss/pull/522)
 - Parse `OR` in inspect regions [#519](https://github.com/OCamlPro/superbol-studio-oss/pull/519)
@@ -37,6 +47,7 @@
 - Basic language definition for toggling line comments [#463](https://github.com/OCamlPro/superbol-studio-oss/pull/463)
 
 ### Fixed
+- Issues with the debugger extension (*cf* latest changes [here](https://github.com/OCamlPro/superbol-vscode-debug/blob/5ff970d7d3ab905ce39f9ec267944615b05c9161/CHANGELOG.md))
 - Handling of concatenation characters that are not followed by a separator space [#500](https://github.com/OCamlPro/superbol-studio-oss/pull/500)
 - Name of VSIX file included in CI build artifacts [#480](https://github.com/OCamlPro/superbol-studio-oss/pull/480) (fix for [Issue #408](https://github.com/OCamlPro/superbol-studio-oss/issues/408))
 - Fallback to extension settings when `cobcPath` is not provided in task definitions [#468](https://github.com/OCamlPro/superbol-studio-oss/pull/468) (fix for [Issue #467](https://github.com/OCamlPro/superbol-studio-oss/issues/467))

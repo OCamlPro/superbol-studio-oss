@@ -1721,7 +1721,7 @@ module OpenDialogOptions : sig
 
   val defaultUri : t -> string option
 
-  val filters : t -> (string * string list) list
+  val filters : t -> string list Interop.Dict.t
 
   val openLabel : t -> string
 
@@ -1732,7 +1732,7 @@ module OpenDialogOptions : sig
     -> ?canSelectFolders:bool
     -> ?canSelectMany:bool
     -> ?defaultUri:string
-    -> ?filters:((string * string list) list)
+    -> ?filters:(string list Interop.Dict.t)
     -> ?openLabel:string
     -> ?title:string
     -> unit

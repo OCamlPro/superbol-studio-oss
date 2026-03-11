@@ -109,7 +109,7 @@ let with_replacing lp replacing =
   { lp with persist = { lp.persist with replacing } }
 
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
-  verbose && List.mem tag show_if_verbose
+  verbose && LIST.mem tag show_if_verbose
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)
@@ -194,34 +194,32 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
         Pretty.error "Src: %a@." Text.pp_text text;
       let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
-      | Ok None when not emitting ->                              (* ignore text *)
-          let rev_ignored = List.rev_append text lp.rev_ignored in
+      | None when not emitting ->                              (* ignore text *)
+          let rev_ignored = LIST.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
-      | Ok None ->
-          preprocess_line { lp with reader; buff = [] } (LIST.append ~loc:__LOC__ buff text)
-      | Ok Some ([], compdir, _compdir_text, diags) ->
+      | None ->
+          preprocess_line { lp with reader; buff = [] }
+            (LIST.append ~loc:__LOC__ buff text)
+      | Some ([], compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
-          next_chunk (apply_compiler_directive lp compdir)
-      | Ok Some (text, compdir, _compdir_text, diags) when not emitting ->
-          let rev_ignored = List.rev_append text lp.rev_ignored in
+          next_chunk (apply_compiler_directives lp compdirs)
+      | Some (text, compdirs, _compdir_text, diags) when not emitting ->
+          let rev_ignored = LIST.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (apply_compiler_directive lp compdir)     (* ignore text *)
-      | Ok Some (text, compdir, _compdir_text, diags) ->
+          next_chunk (apply_compiler_directives lp compdirs)     (* ignore text *)
+      | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directive lp compdir) (LIST.append ~loc:__LOC__ buff text)
-      | Error (text, _compdir_text, diags) when not emitting ->
-          let rev_ignored = List.rev_append text lp.rev_ignored in
-          let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk lp                                        (* ignore text *)
-      | Error (text, _compdir_text, diags) ->
-          let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line lp (LIST.append ~loc:__LOC__ buff text)
+          preprocess_line (apply_compiler_directives lp compdirs)
+            (LIST.append ~loc:__LOC__ buff text)
+
+and apply_compiler_directives lp compdirs =
+  LIST.fold_left apply_compiler_directive lp compdirs
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
   let lp = with_pplog lp @@ Preproc_trace.new_compdir ~loc ~compdir pplog in
   match compdir with
-  | Preproc_directives.CDir_source sf ->
+  | Preproc_directives.CDir_source_format sf ->
       (match Src_reader.with_source_format sf reader with
        | Ok reader -> with_reader lp reader
        | Error e -> add_error lp e)
@@ -261,7 +259,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
       if Preproc_logic.emitting lp.context && lp.rev_ignored <> []
       then { lp with
              rev_ignored = [];
-             pplog = Preproc_trace.ignored (List.rev lp.rev_ignored) lp.pplog }
+             pplog = Preproc_trace.ignored (LIST.rev lp.rev_ignored) lp.pplog }
       else lp
   | Set _ ->
       add_warn lp @@ Ignored { loc; item = Compiler_directive }
@@ -320,25 +318,25 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       Result.fold (parse ~stmt:`COPY Pp.Incremental.copy_statement phrase)
         ~ok:(fun copy -> do_copy lp rev_prefix copy suffix)
         ~error:(fun e -> `CopyDone (add_error lp e,
-                                    List.rev_append rev_prefix suffix))
+                                    LIST.rev_append rev_prefix suffix))
   | Replace { prefix = rev_prefix; phrase; suffix } ->
       Result.fold (parse ~stmt:`REPLACE Pp.Incremental.replace_statement phrase)
         ~ok:(fun repl -> do_replace lp rev_prefix repl suffix)
         ~error:(fun e -> `ReplaceDone (add_error lp e,
-                                       List.rev rev_prefix, suffix))
+                                       LIST.rev rev_prefix, suffix))
   | Header (header, { prefix = rev_prefix; phrase; suffix }) ->
       let prefix, lp = match header with
         | ControlDivision
         | IdentificationDivision ->
             (* keep phrases that are further syntax-checked by the parser, and
                used to perform dialect-related checks there. *)
-            List.rev_append rev_prefix phrase, lp
+            LIST.rev_append rev_prefix phrase, lp
         | SubstitutionSection ->
             (* discard this phrase, which is not checked by the parser; keep it
                in pplog anyways, so as to keep its location for later use. *)
             let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
             let section = Preproc_directives.CDir_control_section &@ loc in
-            List.rev rev_prefix, apply_compiler_directive lp section
+            LIST.rev rev_prefix, apply_compiler_directive lp section
       in
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
@@ -356,7 +354,8 @@ and do_copy lp rev_prefix copy suffix =
   in
   let lp = with_pplog lp pplog in
   (* eprintf "Library text: %a@." pp_text libtext; *)
-  let text = LIST.append ~loc:__LOC__ ( List.rev_append rev_prefix libtext ) suffix in
+  let prefix_n_libtext = LIST.rev_append rev_prefix libtext in
+  let text = LIST.append ~loc:__LOC__ prefix_n_libtext suffix in
   `CopyDone (lp, text)
 
 
@@ -564,15 +563,26 @@ let lex_lib ~dialect ~source_format ~lookup_config ?(ppf = default_oppf) lib =
   | Error lnf ->
       OUT.error_result () @@ Copybook_lookup_error { lnf; copyloc = None }
 
-let fold_source_lines ~dialect ~source_format ?on_initial_source_format
+let fold_source_lines ~dialect ~source_format ?on_change_of_source_format
     ?skip_compiler_directives_text ?on_compiler_directive
     ~f input acc =
   let reader =
     Src_reader.from input ?source_format:(source_format_config source_format)
   in
-  let acc = match on_initial_source_format with
-    | Some f -> f (Src_reader.source_format reader) acc
-    | None -> acc
+  let acc, on_compiler_directive = match on_change_of_source_format with
+    | Some f ->
+      let check_source_format_compdir _ { payload = cdir; _ } acc =
+        match cdir with
+        | Preproc_directives.CDir_source_format { payload = sf; _ } -> f sf acc
+        | _ -> acc
+      in
+      let f_compdir = match on_compiler_directive with
+        | Some f -> fun l cdir acc -> f l cdir @@ check_source_format_compdir l cdir acc
+        | None -> check_source_format_compdir
+      in
+      f (Src_reader.source_format reader) acc, Some f_compdir
+    | None ->
+       acc, on_compiler_directive
   in
   Src_reader.fold_lines ~dialect ~f reader
     ?skip_compiler_directives_text ?on_compiler_directive acc

@@ -4,12 +4,34 @@ Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:292:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:420:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:731:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:773:0
-syn_misc.at-773-prog.cob:2.7-2.22:
-   1   
-   2 >        SOURCE-COMPUTER. GNU-LINUX.
-----          ^^^^^^^^^^^^^^^
+syn_misc.at-773-prog.cob:6.12-6.19:
    3          SPECIAL-NAMES.
    4               SYMBOLIC NL IS 101
+   5                        NL2   102
+   6 >             NUMERIC SIGN TRAILING SEPARATE
+----               ^^^^^^^
+   7               DECIMAL-POINT IS COMMA
+   8               .
+>> Error: Invalid syntax
+
+syn_misc.at-773-prog.cob:15.40:
+  12               .
+  13          DATA DIVISION.
+  14          FD  PRINT-FILE EXTERNAL.
+  15 >        01  PRINT-REC          PIC X(64).
+----                                           ^
+  16   
+  17              DISPLAY "X"
+>> Hint: Missing PROCEDURE DIVISION .
+
+syn_misc.at-773-prog.cob:17.11-17.18:
+  14          FD  PRINT-FILE EXTERNAL.
+  15          01  PRINT-REC          PIC X(64).
+  16   
+  17 >            DISPLAY "X"
+----              ^^^^^^^
+  18              END-DISPLAY
+  19              ACCEPT OMITTED
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:804:0
@@ -1919,6 +1941,31 @@ syn_misc.at-5911-valid.cob:2.7-2.8:
    4   000300 IDENTIFICATION  DIVISION.
 >> Error: Invalid syntax
 
+syn_misc.at-5911-valid.cob:2.16-2.22:
+   1   
+   2 > 000100 @OPTIONS NOMAIN,APOST
+----                   ^^^^^^
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+>> Error: Invalid syntax
+
+syn_misc.at-5911-valid.cob:4.32:
+   1   
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4 > 000300 IDENTIFICATION  DIVISION.
+----                                   ^
+   5   000400 PROGRAM-ID. VALID.
+>> Hint: Missing PROCEDURE DIVISION .
+
+syn_misc.at-5911-valid.cob:5.7-5.17:
+   2   000100 @OPTIONS NOMAIN,APOST
+   3   000200 @OPTIONS APOST
+   4   000300 IDENTIFICATION  DIVISION.
+   5 > 000400 PROGRAM-ID. VALID.
+----          ^^^^^^^^^^
+>> Error: Invalid syntax
+
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6000:0
 syn_misc.at-6000-valid.cob:2.7-2.14:
    1   
@@ -2049,19 +2096,19 @@ syn_misc.at-6882-prog.cob:5.6-5.17:
 >> Error: Invalid $DISPLAY compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6961:0
-syn_misc.at-6961-prog.cob:2.7-2.34:
+syn_misc.at-6961-prog.cob:2.12-2.34:
    1   
    2 >        $SET CONSTANT DOGGY "Barky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^^
    3          $SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Warning: Ignored compiler directive
 
-syn_misc.at-6961-prog.cob:3.7-3.34:
+syn_misc.at-6961-prog.cob:3.12-3.34:
    1   
    2          $SET CONSTANT DOGGY "Barky"
    3 >        $SET CONSTANT PONY "Blacky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog.
 >> Warning: Ignored compiler directive
@@ -2106,12 +2153,12 @@ syn_misc.at-6961-prog.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-syn_misc.at-6961-prog.cob:10.7-10.33:
+syn_misc.at-6961-prog.cob:10.12-10.33:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        $SET CONSTANT PONY "White"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^^^^^^^^^
   11         *
   12         * ensure to test a numeric, too (not actually used):
 >> Warning: Ignored compiler directive
@@ -2127,19 +2174,19 @@ syn_misc.at-6961-prog.cob:13.7-13.35:
 >> Error: Malformed compiler directive
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:6967:0
-syn_misc.at-6967-prog2.cob:2.7-2.35:
+syn_misc.at-6967-prog2.cob:2.13-2.35:
    1   
    2 >        >>SET CONSTANT DOGGY "Barky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    3          >>SET CONSTANT PONY "Blacky"
    4          IDENTIFICATION DIVISION.
 >> Warning: Ignored compiler directive
 
-syn_misc.at-6967-prog2.cob:3.7-3.35:
+syn_misc.at-6967-prog2.cob:3.13-3.35:
    1   
    2          >>SET CONSTANT DOGGY "Barky"
    3 >        >>SET CONSTANT PONY "Blacky"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^^
    4          IDENTIFICATION DIVISION.
    5          PROGRAM-ID. prog2.
 >> Warning: Ignored compiler directive
@@ -2184,12 +2231,12 @@ syn_misc.at-6967-prog2.cob:9.36-9.40:
   11         *
 >> Error: Invalid syntax
 
-syn_misc.at-6967-prog2.cob:10.7-10.34:
+syn_misc.at-6967-prog2.cob:10.13-10.34:
    7          WORKING-STORAGE SECTION.
    8          01  THEDOG    PIC X(6) VALUE DOGGY.
    9          77  MYHORSE   PIC X(7) VALUE PONY.
   10 >        >>SET CONSTANT PONY "White"
-----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----                ^^^^^^^^^^^^^^^^^^^^^
   11         *
   12          PROCEDURE DIVISION.
 >> Warning: Ignored compiler directive
@@ -2425,12 +2472,12 @@ syn_misc.at-7197-prog.cob:21.6-21.21:
   21 >       $DISPLAY BROKEN
 ----         ^^^^^^^^^^^^^^^
   22         $END
-  23         
+  23   
 >> Error: Invalid $DISPLAY compiler directive
 
 syn_misc.at-7197-prog.cob:25.6-25.28:
   22         $END
-  23         
+  23   
   24         $IF X > Y
   25 >       $DISPLAY correct X > Y
 ----         ^^^^^^^^^^^^^^^^^^^^^^
@@ -2638,7 +2685,7 @@ syn_misc.at-7454-prog.cob:63.43:
   63 >                                        WHEN IN-TYPE = 8.
 ----                                              ^
   64      *>exceptional cases can be specified using PRESENT WHEN
-  65               05  IN-CODE                PIC AX(3)9(4) 
+  65               05  IN-CODE                PIC AX(3)9(4)
 >> Hint: Missing FALSE
 
 syn_misc.at-7454-prog.cob:63.44-63.51:
@@ -2648,12 +2695,12 @@ syn_misc.at-7454-prog.cob:63.44-63.51:
   63 >                                        WHEN IN-TYPE = 8.
 ----                                               ^^^^^^^
   64      *>exceptional cases can be specified using PRESENT WHEN
-  65               05  IN-CODE                PIC AX(3)9(4) 
+  65               05  IN-CODE                PIC AX(3)9(4)
 >> Error: Invalid syntax
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:7561:0
 syn_misc.at-7561-prog.cob:79.45-79.47:
-  76          01  x-rms.                  
+  76          01  x-rms.
   77              05  x-rms-a             pic x(01) value space.
   78          01 filler redefines x-rms   pic x(01).
   79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
@@ -2663,7 +2710,7 @@ syn_misc.at-7561-prog.cob:79.45-79.47:
 >> Error: Invalid syntax
 
 syn_misc.at-7561-prog.cob:79.61-79.63:
-  76          01  x-rms.                  
+  76          01  x-rms.
   77              05  x-rms-a             pic x(01) value space.
   78          01 filler redefines x-rms   pic x(01).
   79 >            88  sw-x-rms-full       value "X" or "A" thru "C" or QUOTE.
@@ -2723,20 +2770,20 @@ syn_misc.at-7955-prog.cob:9.17-9.26:
 
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8055:0
 Considering: import/gnucobol/tests/testsuite.src/syn_misc.at:8093:0
-syn_misc.at-8093-prog.cob:2.7-2.25:
+syn_misc.at-8093-prog.cob:2.12-2.25:
    1   
    2 >        $SET NO-AREA-CHECK
-----          ^^^^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^^^^
    3          IDENTIFICATION  DIVISION.
    4          PROGRAM-ID.     prog.
 >> Warning: Ignored compiler directive
 
-syn_misc.at-8093-prog.cob:10.7-10.22:
+syn_misc.at-8093-prog.cob:10.12-10.22:
    7          PROCEDURE       DIVISION.
    8          MAIN-1 SECTION.
    9          DISPLAY "SOMETHING".
   10 >        $SET AREA-CHECK
-----          ^^^^^^^^^^^^^^^
+----               ^^^^^^^^^^
   11          MAIN-2 SECTION.
   12              CONTINUE.
 >> Warning: Ignored compiler directive

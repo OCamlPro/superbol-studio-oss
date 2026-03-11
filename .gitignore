@@ -23,6 +23,7 @@ _build
 /yarn-error.log
 /yarn.lock
 /package-json
+/package.json.prev
 /gnucobol-config
 ATTIC
 /out
@@ -31,5 +32,6 @@ ATTIC
 *.vsix
 *.opam.locked
 /emacs/lsp-superbol-customs.el
+_superbol
 
 
