@@ -15,6 +15,7 @@ open Cobol_common.Srcloc.TYPES
 open Cobol_common.Srcloc.INFIX
 open Preproc_outputs.TYPES
 open Preproc_options
+module LIST = Cobol_common.Basics.LIST
 
 module OUT = Preproc_outputs
 module ENV = Preproc_env
@@ -108,7 +109,7 @@ let with_replacing lp replacing =
   { lp with persist = { lp.persist with replacing } }
 
 let show tag { persist = { verbose; show_if_verbose; _ }; _ } =
-  verbose && List.mem tag show_if_verbose
+  verbose && LIST.mem tag show_if_verbose
 
 let source_format_config = function
   | Cobol_config.SF sf -> Some (Src_format.from_config sf)
@@ -186,31 +187,35 @@ let rec next_chunk ({ reader; buff; persist = { dialect; _ }; _ } as lp) =
   | reader, ([{ payload = Eof; loc }] as eof) ->
       let context, diags = Preproc_logic.flush_contexts ~loc lp.context in
       let lp = add_diags { lp with context } diags in
-      let text, pplog = apply_active_replacing_full lp (buff @ eof) in
+      let text, pplog =
+        apply_active_replacing_full lp (LIST.append ~loc:__LOC__ buff eof)
+      in
       text, { lp with reader; pplog; buff = [] }
   | reader, text ->
       if show `Src lp then
         Pretty.error "Src: %a@." Text.pp_text text;
       let emitting = Preproc_logic.emitting lp.context in
       match Src_reader.try_compiler_directive ~dialect text with
-      | None when not emitting ->                              (* ignore text *)
-          let rev_ignored = List.rev_append text lp.rev_ignored in
+      | None when not emitting ->                                 (* ignore text *)
+          let rev_ignored = LIST.rev_append text lp.rev_ignored in
           next_chunk { lp with reader; rev_ignored }
       | None ->
-          preprocess_line { lp with reader; buff = [] } (buff @ text)
+          preprocess_line { lp with reader; buff = [] }
+            (LIST.append ~loc:__LOC__ buff text)
       | Some ([], compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader } diags in
           next_chunk (apply_compiler_directives lp compdirs)
       | Some (text, compdirs, _compdir_text, diags) when not emitting ->
-          let rev_ignored = List.rev_append text lp.rev_ignored in
+          let rev_ignored = LIST.rev_append text lp.rev_ignored in
           let lp = add_diags { lp with reader; rev_ignored } diags in
-          next_chunk (apply_compiler_directives lp compdirs)     (* ignore text *)
+          next_chunk (apply_compiler_directives lp compdirs)   (* ignore text *)
       | Some (text, compdirs, _compdir_text, diags) ->
           let lp = add_diags { lp with reader; buff = [] } diags in
-          preprocess_line (apply_compiler_directives lp compdirs) (buff @ text)
+          preprocess_line (apply_compiler_directives lp compdirs)
+            (LIST.append ~loc:__LOC__ buff text)
 
 and apply_compiler_directives lp compdirs =
-  List.fold_left apply_compiler_directive lp compdirs
+  LIST.fold_left apply_compiler_directive lp compdirs
 
 and apply_compiler_directive ({ reader; pplog; _ } as lp)
     { payload = compdir; loc } =
@@ -256,7 +261,7 @@ and apply_preproc_directive ({ env; context; _ } as lp)
       if Preproc_logic.emitting lp.context && lp.rev_ignored <> []
       then { lp with
              rev_ignored = [];
-             pplog = Preproc_trace.ignored (List.rev lp.rev_ignored) lp.pplog }
+             pplog = Preproc_trace.ignored (LIST.rev lp.rev_ignored) lp.pplog }
       else lp
   | Set _ ->
       add_warn lp @@ Ignored { loc; item = Compiler_directive }
@@ -315,25 +320,25 @@ and process_preproc_phrase ({ persist = { pparser = (module Pp);
       Result.fold (parse ~stmt:`COPY Pp.Incremental.copy_statement phrase)
         ~ok:(fun copy -> do_copy lp rev_prefix copy suffix)
         ~error:(fun e -> `CopyDone (add_error lp e,
-                                    List.rev_append rev_prefix suffix))
+                                    LIST.rev_append rev_prefix suffix))
   | Replace { prefix = rev_prefix; phrase; suffix } ->
       Result.fold (parse ~stmt:`REPLACE Pp.Incremental.replace_statement phrase)
         ~ok:(fun repl -> do_replace lp rev_prefix repl suffix)
         ~error:(fun e -> `ReplaceDone (add_error lp e,
-                                       List.rev rev_prefix, suffix))
+                                       LIST.rev rev_prefix, suffix))
   | Header (header, { prefix = rev_prefix; phrase; suffix }) ->
       let prefix, lp = match header with
         | ControlDivision
         | IdentificationDivision ->
             (* keep phrases that are further syntax-checked by the parser, and
                used to perform dialect-related checks there. *)
-            List.rev_append rev_prefix phrase, lp
+            LIST.rev_append rev_prefix phrase, lp
         | SubstitutionSection ->
             (* discard this phrase, which is not checked by the parser; keep it
                in pplog anyways, so as to keep its location for later use. *)
             let loc = Option.get @@ Cobol_common.Srcloc.concat_locs phrase in
             let section = Preproc_directives.CDir_control_section &@ loc in
-            List.rev rev_prefix, apply_compiler_directive lp section
+            LIST.rev rev_prefix, apply_compiler_directive lp section
       in
       `ReplaceDone (lp, prefix, suffix)
   | ExecBlock { prefix = rev_prefix; phrase; suffix } ->
@@ -351,7 +356,8 @@ and do_copy lp rev_prefix copy suffix =
   in
   let lp = with_pplog lp pplog in
   (* eprintf "Library text: %a@." pp_text libtext; *)
-  let text = List.rev_append rev_prefix libtext @ suffix in
+  let prefix_n_libtext = LIST.rev_append rev_prefix libtext in
+  let text = LIST.append ~loc:__LOC__ prefix_n_libtext suffix in
   `CopyDone (lp, text)
 
 
@@ -371,7 +377,7 @@ and do_replace lp rev_prefix repl suffix =
     | CDirReplace { replacing = repl; also = false }, replacing ->
         with_replacing lp (repl :: replacing)
     | CDirReplace { replacing = repl; also = true }, (r :: _ as replacing) ->
-        with_replacing lp ((repl @ r) :: replacing)
+        with_replacing lp (LIST.append ~loc:__LOC__ repl r :: replacing)
     | CDirReplaceOff _, []
     | CDirReplaceOff { last = false }, _ ->
         with_replacing lp []

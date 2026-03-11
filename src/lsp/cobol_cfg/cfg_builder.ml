@@ -271,8 +271,8 @@ let do_collapse_fallthru g =
       end cfg node cfg in
     let id_map = IdMap.update pred.id
         begin function
-          | None -> Some NEL.(n_names @ pred_names)
-          | Some names -> Some NEL.(n_names @ names)
+          | None -> Some (NEL.append n_names pred_names)
+          | Some names -> Some (NEL.append n_names names)
         end id_map in
     Cfg.remove_vertex cfg node, id_map
   in
