@@ -20,8 +20,7 @@ module TYPES: sig
 end
 
 val handle
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> ?alternate_handlers: TYPES.alternate_handler list
+  : ?alternate_handlers: TYPES.alternate_handler list
   -> Jsonrpc.Request.t
   -> (Lsp_server.state as 's)
   -> 's * Jsonrpc.Response.t
@@ -57,8 +56,7 @@ module INTERNAL: sig
     -> Lsp.Types.HoverParams.t
     -> Lsp.Types.Hover.t option
   val completion
-    : platform:Cobol_common.Platform.TYPES.platform
-    -> ?eager:bool
+    : ?eager:bool
     -> Lsp_server.t
     -> Lsp.Types.CompletionParams.t
     -> [> `CompletionList of Lsp.Types.CompletionList.t] option

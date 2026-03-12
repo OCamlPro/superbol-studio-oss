@@ -32,17 +32,17 @@ let reparse_file ~source_format ~config filename =
     Cobol_parser.parse_simple
       ~options:default_parser_options @@
     Cobol_preproc.preprocessor
-      ~options:Cobol_preproc.Options.{
-          default with
-          config;
-          source_format
-        } @@
+      ~options:{ default_preproc_options with
+                 config; source_format } @@
     input
   in
   let print =
     Format.asprintf "@[%a@]@." Cobol_ptree.pp_compilation_group
   in
-  match Cobol_preproc.Input.from ~filename ~f:(parse ~source_format) with
+  match
+    Cobol_preproc.Input.from ~filename ~f:(parse ~source_format)
+      ~platform:default_platform
+  with
   | { result = Only Some cg; _ } -> (
       Format.printf "Parse: OK. ";
       let contents = print cg in

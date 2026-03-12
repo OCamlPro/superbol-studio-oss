@@ -108,15 +108,13 @@ val preprocess_input
   -> unit Preproc_outputs.with_diags
 
 val preprocess_file
-  : platform: Cobol_common.Platform.TYPES.platform
-  -> options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> ?ppf:Format.formatter
   -> string
   -> unit Preproc_outputs.with_diags
 
 val text_of_file
-  : platform: Cobol_common.Platform.TYPES.platform
-  -> options: Preproc_options.preproc_options
+  : options: Preproc_options.preproc_options
   -> string
   -> Text.t Preproc_outputs.with_diags
 

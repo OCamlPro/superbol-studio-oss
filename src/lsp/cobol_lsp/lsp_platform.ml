@@ -11,4 +11,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Notification.t -> (Lsp_server.state as 's) -> 's
+let record = Cobol_common.Platform.default

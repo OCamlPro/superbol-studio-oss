@@ -11,6 +11,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Platform.TYPES
+
 module TYPES: sig
   type severity = Diagnostics_sigs.severity =
     | Hint
@@ -38,7 +40,7 @@ include module type of TYPES
    and type 'a with_diags = 'a TYPES.with_diags
 type t = diagnostic
 
-val pp: t Pretty.printer
+val pp: ?platform:platform -> t Pretty.printer
 val pp_msg: t Pretty.printer
 
 val message: t -> Pretty.delayed
@@ -50,8 +52,8 @@ val location: t -> Srcloc.srcloc option
 module Set: sig
   (** Persistent set of diagnostics *)
   type t = diagnostics
-  val pp: t Pretty.printer
-  val pp_above: level:severity -> t Pretty.printer
+  val pp: ?platform:platform -> t Pretty.printer
+  val pp_above: level:severity -> ?platform:platform -> t Pretty.printer
   val none: t
   val one: diagnostic -> t
   val maybe: diagnostic option -> t
@@ -84,8 +86,9 @@ module One: Diagnostics_sigs.REPORT
    and type blind := t -> t
 
 module Now: Diagnostics_sigs.REPORT
-  with type 'a t := Format.formatter -> ?loc:Srcloc.srcloc -> 'a Pretty.proc
-   and type blind := Format.formatter -> t -> unit
+  with type 'a t := Format.formatter -> ?platform:platform -> ?loc:Srcloc.srcloc ->
+    'a Pretty.proc
+   and type blind := ?platform:platform -> Format.formatter -> t -> unit
 
 module Acc: Diagnostics_sigs.REPORT
   with type 'a t := (Set.t as 's) -> ?loc:Srcloc.srcloc -> ('a, 's) Pretty.func
@@ -116,9 +119,15 @@ val more_result: f:('a -> 'b with_diags) -> 'a with_diags -> 'b with_diags
 val cons_option_result: 'a option with_diags -> 'a list with_diags -> 'a list with_diags
 val forget_result: _ with_diags -> diagnostics
 (* val merge_results: f:('a -> 'b -> 'c) -> 'a with_diags -> 'b with_diags -> 'c with_diags *)
-val show_n_forget: ?set_status:bool -> ?min_level:severity ->
-  ?ppf:Format.formatter -> 'a with_diags -> 'a
-val sink_result: ?set_status:bool -> ?ppf:Format.formatter -> _ with_diags -> unit
+val show_n_forget
+  : ?set_status:bool
+  -> ?min_level:severity
+  -> ?platform:platform
+  -> ?ppf:Format.formatter -> 'a with_diags -> 'a
+val sink_result
+  : ?set_status:bool
+  -> ?platform:platform
+  -> ?ppf:Format.formatter -> _ with_diags -> unit
 
 val hint_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func
 val note_result: 'a -> ?loc:Srcloc.srcloc -> ('b, 'a with_diags) Pretty.func

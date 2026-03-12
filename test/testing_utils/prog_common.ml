@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                        SuperBOL OSS Studio                             *)
 (*                                                                        *)
-(*  Copyright (c) 2022-2023 OCamlPro SAS                                  *)
+(*  Copyright (c) 2022-2026 OCamlPro SAS                                  *)
 (*                                                                        *)
 (* All rights reserved.                                                   *)
 (* This source code is licensed under the GNU Affero General Public       *)
@@ -11,4 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val handle: Jsonrpc.Notification.t -> (Lsp_server.state as 's) -> 's
+(** Note: won't show detailed source locations as the openned file is not
+    actually on disk (that may be fixed later with a custom internal file
+    store). *)
+
+let platform = Cobol_common.Platform.default
+
+let pp_srcloc = Cobol_common.Srcloc.pp_srcloc ~platform

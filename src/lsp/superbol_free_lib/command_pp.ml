@@ -26,6 +26,9 @@ let output_file filename s =
     close_out oc;
     Printf.eprintf "File %S generated\n%!" filename
 
+let pp_diagnostics =
+  Cobol_common.Diagnostics.Set.pp ~platform:Cobol_common.Platform.default
+
 let cmd =
   let files = ref [] in
   let cobc = ref false in
@@ -70,7 +73,7 @@ let cmd =
                  let my_text = Cobol_preproc.Input.from
                      ~platform ~filename:file ~f:parse in
                  let my_text = Cobol_parser.Outputs.translate_diags my_text in
-                 Format.eprintf "%a@." Cobol_common.Diagnostics.Set.pp my_text.diags;
+                 Format.eprintf "%a@." pp_diagnostics my_text.diags;
                  match my_text.result with
                  | Only (Some cg) -> (
                      let print =
@@ -89,8 +92,7 @@ let cmd =
                            )
                        | { diags; _ } ->
                            let diags = Cobol_parser.Diagnostics.ALL.translate diags in
-                           Format.eprintf "Reparse: %a@."
-                             Cobol_common.Diagnostics.Set.pp diags;
+                           Format.eprintf "Reparse: %a@." pp_diagnostics diags;
                            exit 1
                        | exception _ ->
                            Format.eprintf "Reparse: ERROR!!!@.";
@@ -100,9 +102,8 @@ let cmd =
                else
                  let text =
                    let common = common_get () in
-                   let platform = common.platform in
                    Cobol_preproc.Outputs.show_n_forget @@
-                   Cobol_preproc.text_of_file ~platform file
+                   Cobol_preproc.text_of_file file
                      ~options:common.preproc_options
                  in
                  let s =

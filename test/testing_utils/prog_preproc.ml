@@ -17,14 +17,20 @@ open Cobol_common.Srcloc.INFIX
     actually on disk (that may be fixed later with a custom internal file
     store). *)
 
+let default_preproc_options ~verbose =
+  Cobol_preproc.Options.default
+    ~platform: { Prog_common.platform with
+                 verbosity = if verbose then 1 else 0 }
+
 let preprocess
     ?(verbose = false)
     ?(filename = "prog.cob")
     ?(source_format = Cobol_config.(SF SFFixed))
     contents =
+  let preproc_options = default_preproc_options ~verbose in
   Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
   Cobol_preproc.preprocess_input
-    ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
+    ~options:{ preproc_options with source_format } @@
   Cobol_preproc.String { filename; contents }
 
 let show_text
@@ -32,10 +38,11 @@ let show_text
     ?(filename = "prog.cob")
     ?(source_format = Cobol_config.(SF SFFixed))
     contents =
+  let preproc_options = default_preproc_options ~verbose in
   let text =
     Cobol_preproc.Outputs.show_n_forget ~ppf:Fmt.stdout @@
     Cobol_preproc.text_of_input
-      ~options:Cobol_preproc.Options.{ default with verbose; source_format } @@
+      ~options:{ preproc_options with source_format } @@
     Cobol_preproc.String { filename; contents }
   in
   Pretty.out "%a@\n" (Cobol_preproc.Text.pp_text' ~fsep:"@\n") text

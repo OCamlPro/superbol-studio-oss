@@ -14,7 +14,8 @@
 let show_diagnostics ?(show_data = false)
     ?parser_options ?source_format ?filename contents =
   Prog_typeck.typeck ?parser_options ?source_format ?filename contents |>
-  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout |>
+  Cobol_common.Diagnostics.show_n_forget ~set_status:false ~ppf:Fmt.stdout
+    ~platform:Prog_common.platform |>
   begin fun Cobol_typeck.Outputs.{ group; _ } ->
     if show_data then
       Cobol_unit.Visitor.fold_unit_group object
@@ -22,12 +23,12 @@ let show_diagnostics ?(show_data = false)
         method! fold_item_definition' { loc; payload = def } () =
           Cobol_common.Visitor.skip_children @@
           Pretty.out "%a@[<v>Item definition: %a@]@."
-            Cobol_common.Srcloc.pp_srcloc loc
+            (Cobol_common.Srcloc.pp_srcloc ~platform:Prog_common.platform) loc
             Cobol_data.Printer.pp_item_definition def
         method! fold_record_renaming' { loc; payload = ren } () =
           Cobol_common.Visitor.skip_children @@
           Pretty.out "%a@[<v>Record renaming: %a@]@."
-            Cobol_common.Srcloc.pp_srcloc loc
+            (Cobol_common.Srcloc.pp_srcloc ~platform:Prog_common.platform) loc
             Cobol_data.Printer.pp_record_renaming ren
       end group ()
   end

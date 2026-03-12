@@ -169,8 +169,9 @@ let get ?(verbose_on = `Stdout) () =
       end !definitions Cobol_preproc.Env.empty
     in
 
-    let platform = { Cobol_common.Platform.default_platform
-                     with verbosity = !Globals.verbosity }
+    let platform =
+      { Cobol_common.Platform.default with
+        verbosity = !Globals.verbosity }
     in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)

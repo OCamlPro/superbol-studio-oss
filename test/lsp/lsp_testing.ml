@@ -31,8 +31,10 @@ let () =
 
 (** {1 Server initialization} *)
 
-let layout =
-  Superbol_free_lib.Project.layout;
+let platform =
+  Cobol_common.Platform.default
+and layout =
+  Superbol_free_lib.Project.layout
 and cache_config =
   LSP.INTERNAL.Project_cache.{
     cache_storage = No_storage;
@@ -46,6 +48,7 @@ let init_temp_project ?(toml = "") () =
   projdir
 
 let make_server ?(with_semantic_tokens = false) () =
+  Cobol_common.Platform.copy ~dst:LSP.Platform.record ~src:platform;
   LSP.Server.init ~params:{ config = { project_layout = layout;
                                        cache_config;
                                        enable_client_configs = false;
@@ -227,9 +230,11 @@ class srcloc_resuscitator_cache = object (self)
   method of_ ~location:Location.{ uri; range } : srcloc =
     (self#for_ ~uri) range
   method pp ppf location =
-    Pretty.print ppf "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
+    Pretty.print ppf "%a@."
+      (Cobol_common.Srcloc.pp_srcloc ~platform) (self#of_ ~location)
   method print location =
-    Pretty.out "%a@." Cobol_common.Srcloc.pp_srcloc (self#of_ ~location)
+    Pretty.out "%a@."
+      (Cobol_common.Srcloc.pp_srcloc ~platform) (self#of_ ~location)
   method print_range_for ~uri range =
     self#print (Location.create ~uri ~range)
   method print_optional_range_for ~uri range =

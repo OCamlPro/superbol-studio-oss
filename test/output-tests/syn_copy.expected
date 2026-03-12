@@ -340,7 +340,7 @@ syn_copy.at-709-prog2.cob:2.45-2.51:
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:761:0
 syn_copy.at-761-prog.cob:7.7-8.46:
    4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION. 
+   5          WORKING-STORAGE  SECTION.
    6          01 GET-VALUE.
    7 >        COPY "copy.inc" REPLACING ==TEST-VAR== BY ==TEST-AVR==
 ----          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -355,7 +355,7 @@ syn_copy.at-761-prog.cob:7.7-8.46:
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:799:0
 syn_copy.at-799-prog.cob:7.7-12.57:
    4          DATA             DIVISION.
-   5          WORKING-STORAGE  SECTION. 
+   5          WORKING-STORAGE  SECTION.
    6          01 GET-VALUE.
    7 >        COPY "copy.inc"
 ----          ^^^^^^^^^^^^^^^
@@ -378,10 +378,10 @@ syn_copy.at-799-prog.cob:7.7-12.57:
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:879:0
 syn_copy.at-879-prog.cob:7.7-13.62:
    4          DATA DIVISION.
-   5          WORKING-STORAGE SECTION. 
+   5          WORKING-STORAGE SECTION.
    6          01 GET-VALUE.
-   7 >        COPY "copy.inc" 
-----          ^^^^^^^^^^^^^^^^
+   7 >        COPY "copy.inc"
+----          ^^^^^^^^^^^^^^^
    8 >         REPLACING LEADING ==TEST-VAR==           BY ==TEST-AVR==
 ----  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    9 >          ==         02       TEST-OK         ==  BY == 02 TEST-KO ==
@@ -403,7 +403,7 @@ syn_copy.at-879-prog.cob:7.7-13.62:
 Considering: import/gnucobol/tests/testsuite.src/syn_copy.at:918:0
 syn_copy.at-918-prog.cob:7.7-12.55:
    4          DATA DIVISION.
-   5          WORKING-STORAGE SECTION. 
+   5          WORKING-STORAGE SECTION.
    6          01 GET-VALUE.
    7 >        COPY "copy.inc"
 ----          ^^^^^^^^^^^^^^^

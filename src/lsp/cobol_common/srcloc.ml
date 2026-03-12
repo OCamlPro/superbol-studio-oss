@@ -337,6 +337,13 @@ let retrieve_file_lines, register_file_contents =
       let contents = platform.read_file file in
       let lines = String.split_on_char '\n' contents in
       let lines = Array.of_list lines in
+      let lines =
+        (* Retain the behavior of `EzFile.read_lines` that do not automatically
+           append an empty line at the end *)
+        if lines.(Array.length lines - 1) = ""
+        then Array.sub lines 0 (Array.length lines - 1)
+        else lines
+      in
       Cache.add file_cache file lines;
       lines
   end,
@@ -352,7 +359,7 @@ let pp_file_loc ppf ((file, pos1, pos2): raw_loc) =
   Pretty.print ppf "%s:%a" file Fmt.text_loc (pos1, pos2)
 
 (** Note this should always end with a newline character *)
-let pp_raw_loc: ?platform:Platform.TYPES.platform -> raw_loc Pretty.printer =
+let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
   let b = lazy (Buffer.create 1000) in
   let find_source ~platform (file, pos1, pos2) =
     let line1 = fst pos1 in
@@ -413,7 +420,7 @@ let to_raw_loc
             { pos_lnum = l2; pos_bol = b2; pos_cnum = c2; _ }) =
   pos_fname, (l1, c1 - b1), (l2, c2 - b2)
 
-let pp_srcloc: ?platform:Platform.TYPES.platform -> srcloc Pretty.printer =
+let pp_srcloc: ?platform:platform -> srcloc Pretty.printer =
   let pp_transform_operation ~partial ppf = function
     | `Cpy { filename; copyloc }
       when partial ->

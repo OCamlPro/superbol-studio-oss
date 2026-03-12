@@ -17,6 +17,9 @@ open Cobol_common.Srcloc.INFIX
 module CHARS = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
 
+let pp_diagnostics =
+  DIAGS.Set.pp ~platform:Cobol_common.Platform.default
+
 module Config = struct
   include Cobol_config.Default
   let pic_length =
@@ -41,7 +44,7 @@ let picture =
 let of_string s =
   try ~&(PIC.of_string (s &@ dummy_loc))
   with PIC.InvalidPicture (_, diags, pic) ->
-    Pretty.failwith "%a" DIAGS.Set.pp diags Picture.pp pic
+    Pretty.failwith "%a" pp_diagnostics diags Picture.pp pic
 
 let check_ok s repr =
   Alcotest.check picture "Picture parsed" repr (of_string s)

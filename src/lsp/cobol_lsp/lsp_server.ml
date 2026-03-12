@@ -364,11 +364,11 @@ let save_project_caches
       Lsp_error.internal
         "Exception@ caught@ while@ saving@ project@ caches:@ %a@." Fmt.exn e
 
-let load_project_cache ~platform ~rootdir
+let load_project_cache ~rootdir
     ({ params = { config = { project_layout = layout;
                              cache_config = config; _ }; _ };
        docs = old_docs; _ } as registry) =
-  let new_docs = Lsp_project_cache.load ~platform ~config ~layout ~rootdir in
+  let new_docs = Lsp_project_cache.load ~config ~layout ~rootdir in
   let registry =
     { registry with
       docs = URIMap.union (fun _ _old new_ -> Some new_) old_docs new_docs }
@@ -410,12 +410,12 @@ let extract_docs_of ~project registry =
   { registry with docs }, out_of_date_docs
 
 
-let reload_docs_of ~platform ~project out_of_date_docs registry =
+let reload_docs_of ~project out_of_date_docs registry =
   (* FIXME: may there be out-of-date diagnostics in
      `registry.indirect_diags`? *)
   URIMap.fold begin fun _ doc registry ->
     (* TODO: send relevant "refresh" server requests. *)
-    let doc = Lsp_document.reload ~platform { doc with project } in
+    let doc = Lsp_document.reload { doc with project } in
     let registry = dispatch_diagnostics doc registry in
     let registry = add_or_replace_doc doc registry in
     if registry.params.with_semantic_tokens
@@ -425,8 +425,7 @@ let reload_docs_of ~platform ~project out_of_date_docs registry =
   end out_of_date_docs registry
 
 
-let use_client_config_for ~platform ~project (configs: Yojson.Safe.t list)
-    registry =
+let use_client_config_for ~project (configs: Yojson.Safe.t list) registry =
   (* Every call to this function should be guarded with this flag: *)
   assert registry.params.config.enable_client_configs;
   if Sys.file_exists project.Lsp_project.config_filename
@@ -446,11 +445,11 @@ let use_client_config_for ~platform ~project (configs: Yojson.Safe.t list)
             (Yojson.Safe.to_string @@ `List configs);
           registry, URIMap.empty
     in
-    now project @@ reload_docs_of ~platform ~project out_of_date_docs registry
+    now project @@ reload_docs_of ~project out_of_date_docs registry
   end
 
 
-let request_n_use_client_config_for ~platform ~project
+let request_n_use_client_config_for ~project
     ?(silence_ignored_settings_warning = false) registry =
   (* Every call to this function should be guarded with this flag: *)
   assert registry.params.config.enable_client_configs;
@@ -472,11 +471,11 @@ let request_n_use_client_config_for ~platform ~project
                   { items = [ ConfigurationItem.create ()
                                 ~scopeUri:(Lsp.Uri.to_string uri)
                                 ~section:"superbol.cobol" ] })
-      ~f:(use_client_config_for ~platform ~project)
+      ~f:(use_client_config_for ~project)
   end
 
 
-let on_client_config_changes ~platform ?changes registry =
+let on_client_config_changes ?changes registry =
   if not registry.params.config.enable_client_configs
   then registry
   else if registry.sub_state.ignore_next_client_config_changes
@@ -492,12 +491,12 @@ let on_client_config_changes ~platform ?changes registry =
     ignore changes;
     Lsp_project.SET.fold begin fun project registry ->
       ignore_promise_result @@
-      request_n_use_client_config_for ~platform ~project registry
+      request_n_use_client_config_for ~project registry
     end registry.projects registry
   end
 
 
-let on_project_config_file_changes ~platform changes registry =
+let on_project_config_file_changes changes registry =
   List.fold_left begin fun registry FileEvent.{ type_; uri } ->
     try
       let project = Lsp_project.SET.for_ ~uri registry.projects in
@@ -508,10 +507,10 @@ let on_project_config_file_changes ~platform changes registry =
             then extract_docs_of ~project registry
             else registry, URIMap.empty
           in
-          reload_docs_of ~platform ~project out_of_date_docs registry
+          reload_docs_of ~project out_of_date_docs registry
       | Deleted when registry.params.config.enable_client_configs ->
           ignore_promise_result @@
-          request_n_use_client_config_for ~platform ~project registry
+          request_n_use_client_config_for ~project registry
       | Deleted ->                            (* TODO: reset to default config *)
           registry
     with Not_found ->                             (* change in unknown project *)
@@ -519,16 +518,16 @@ let on_project_config_file_changes ~platform changes registry =
   end registry changes
 
 
-let on_watched_file_changes ~platform changes registry =
+let on_watched_file_changes changes registry =
   (* Note: for now, we only watch configuration files. *)
-  on_project_config_file_changes ~platform changes registry
+  on_project_config_file_changes changes registry
 
 
 
 (** [retrieve_project_for ~uri registry] tries to load the project where a
     document at the given URI belongs.  Does nothing if the project is already
     loaded. *)
-let retrieve_project_for ~platform ~uri registry =
+let retrieve_project_for ~uri registry =
   try
     ignore @@ Lsp_project.SET.for_ ~uri registry.projects;
     (* CHECKME: at this point, we have overlooked any `superbol.toml` that lies
@@ -540,10 +539,10 @@ let retrieve_project_for ~platform ~uri registry =
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
     if Lsp_project.SET.mem_rootdir ~rootdir registry.projects
     then registry
-    else load_project_cache ~platform ~rootdir registry
+    else load_project_cache ~rootdir registry
 
 
-let create_or_retrieve_project_promise ~platform ~rootdir registry =    (* from rootdir *)
+let create_or_retrieve_project_promise ~rootdir registry =    (* from rootdir *)
   try
     now (Lsp_project.SET.for_rootdir ~rootdir registry.projects) registry
   with Not_found ->                                (* load or init new project *)
@@ -552,22 +551,22 @@ let create_or_retrieve_project_promise ~platform ~rootdir registry =    (* from 
     add_project project registry |>
     if registry.params.config.enable_client_configs
     then
-      request_n_use_client_config_for ~platform ~project
+      request_n_use_client_config_for ~project
         ~silence_ignored_settings_warning:true
     else
       now project
 
 
-let create_or_retrieve_doc_project_promise ~platform ~uri registry =    (* from doc uri *)
+let create_or_retrieve_doc_project_promise ~uri registry =    (* from doc uri *)
   try
     now (Lsp_project.SET.for_ ~uri registry.projects) registry
   with Not_found ->
     let layout = registry.params.config.project_layout in
     let rootdir = Lsp_project.rootdir_for ~uri ~layout in
-    create_or_retrieve_project_promise ~platform ~rootdir registry
+    create_or_retrieve_project_promise ~rootdir registry
 
 
-let on_write_project_config_command ~platform ?uri registry =
+let on_write_project_config_command ?uri registry =
   let write_project_config project registry =
     Lsp_io.log_info "Saving@ configuration@ for@ project@ at@ %s"
       Lsp_project.(string_of_rootdir @@ rootdir project);
@@ -580,7 +579,7 @@ let on_write_project_config_command ~platform ?uri registry =
   | Some uri
     when not (Sys.is_directory (Lsp.Uri.to_path uri)) ->
       perform write_project_config
-        ~after:(create_or_retrieve_doc_project_promise ~platform ~uri registry)
+        ~after:(create_or_retrieve_doc_project_promise ~uri registry)
   | Some uri ->
       try
         let dirname = Lsp.Uri.to_path uri in
@@ -593,10 +592,10 @@ let on_write_project_config_command ~platform ?uri registry =
           (Lsp.Uri.to_string uri)
 
 
-let get_project_config_command ~platform uri registry =
+let get_project_config_command uri registry =
   Lsp_io.log_info "Getting@ configuration@ for@ project@ of@ %s"
     (Lsp.Uri.to_string uri);
-  let registry = retrieve_project_for ~platform ~uri registry in
+  let registry = retrieve_project_for ~uri registry in
   try
     Lsp_project.get_project_config @@
     Lsp_project.SET.for_ ~uri registry.projects
@@ -610,35 +609,34 @@ let get_project_config_command ~platform uri registry =
 (** {3 Initialization} *)
 
 
-let load_project_in ~platform ~dir registry =
+let load_project_in ~dir registry =
   let layout = registry.params.config.project_layout in
   let project = Lsp_project.in_existing_dir dir ~layout in
   let registry =
     add_project project @@
-    load_project_cache ~platform ~rootdir:(Lsp_project.rootdir project) registry
+    load_project_cache ~rootdir:(Lsp_project.rootdir project) registry
   in
   ignore_promise_result @@                   (* retrieve client configuration *)
-  request_n_use_client_config_for ~platform ~project registry
+  request_n_use_client_config_for ~project registry
     ~silence_ignored_settings_warning:true
 
 
-let add_workspace_folders ~platform folders registry =
+let add_workspace_folders folders registry =
   List.fold_left begin fun registry workspace_folder_uri ->
-    load_project_in ~platform ~dir:(Lsp.Uri.to_path workspace_folder_uri)
-      registry
+    load_project_in ~dir:(Lsp.Uri.to_path workspace_folder_uri) registry
   end registry folders |>
   dispatch_all_diagnostics
 
 
 
-let init ~platform ~params : registry =
+let init ~params : registry =
   { params;
     projects = Lsp_project.SET.empty;
     docs = URIMap.empty;
     indirect_diags = URIMap.empty;
     pending_tasks = { delayed_id = 0; delayed = IMap.empty };
     sub_state = { ignore_next_client_config_changes = true } } |>
-  add_workspace_folders ~platform params.workspace_folders |>
+  add_workspace_folders params.workspace_folders |>
   maybe_start_watching_client_config
 
 
@@ -666,33 +664,31 @@ let remove_workspace_folders folders registry =
   end registry folders
 
 
-let on_change_workspace_folders ~platform
+let on_change_workspace_folders
     DidChangeWorkspaceFoldersParams.{ event = { added; removed } } registry =
   registry |>
   remove_workspace_folders (List.map (fun x -> x.WorkspaceFolder.uri) removed) |>
-  add_workspace_folders ~platform
-    (List.map (fun x -> x.WorkspaceFolder.uri) added)
+  add_workspace_folders    (List.map (fun x -> x.WorkspaceFolder.uri) added)
 
 
 (** {2 Handling of document notifications} *)
 
 
-let add ~platform ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
+let add ~doc:(DidOpenTextDocumentParams.{ textDocument = { uri; _ }; _ } as doc)
     registry =
   let add_in_project project registry =
     try
-      let doc = Lsp_document.load ~platform ~project doc in
+      let doc = Lsp_document.load ~project doc in
       let registry = dispatch_diagnostics doc registry in
       add_or_replace_doc doc registry
     with Lsp_document.Internal_error (doc, e, backtrace) ->
       document_error_while_"opening" doc e backtrace registry
   in
   perform add_in_project
-    ~after:(create_or_retrieve_doc_project_promise ~platform ~uri registry)
+    ~after:(create_or_retrieve_doc_project_promise ~uri registry)
 
 
-let did_open ~platform
-    (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
+let did_open (DidOpenTextDocumentParams.{ textDocument = { uri; text; _ };
                                           _ } as doc) registry =
   (* Try first with a lookup for the project in a cache, and then by
      creating/loading the project. *)
@@ -703,10 +699,10 @@ let did_open ~platform
     | Some doc when String.equal (Lsp.Text_document.text doc.textdoc) text ->
         dispatch_diagnostics doc registry
     | None | Some _ when try_cache ->
-        retrieve_project_for ~platform ~uri registry |>
+        retrieve_project_for ~uri registry |>
         aux ~try_cache:false                   (* try again without the cache *)
     | None | Some _ ->
-        add ~platform ~doc registry
+        add ~doc registry
   in
   aux ~try_cache:true registry
 
@@ -717,12 +713,11 @@ let find_document (TextDocumentIdentifier.{ uri; _ } as doc) { docs; _ } =
   with Not_found -> raise @@ Document_not_found doc
 
 
-let did_change ~platform
-    DidChangeTextDocumentParams.{ textDocument = { uri; _ };
-                                  contentChanges; _ } registry =
+let did_change DidChangeTextDocumentParams.{ textDocument = { uri; _ };
+                                             contentChanges; _ } registry =
   try
     let doc = find_document TextDocumentIdentifier.{ uri } registry in
-    let doc = Lsp_document.update ~platform doc contentChanges in
+    let doc = Lsp_document.update doc contentChanges in
     let registry = dispatch_diagnostics doc registry in
     add_or_replace_doc doc registry
   with Lsp_document.Internal_error (doc, e, backtrace) ->

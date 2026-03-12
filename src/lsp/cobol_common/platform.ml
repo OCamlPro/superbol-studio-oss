@@ -12,19 +12,18 @@
 (**************************************************************************)
 
 (*
-   This module implement a `platform` record, that is used to virtualize
-   the system and some choices in the application that is running
-   our COBOL parser. All system calls (Sys, Unix, open_) should go through
-   this record, so that the application can override them, typically to
-   run in full-memory.
+   This module implements a `platform` record, that is used to virtualize the
+   system and some choices in the application that is running our COBOL
+   parser. All system calls (Sys, Unix, open_) should go through this record, so
+   that the application can override them, typically to run in full-memory.
 
-   Some heuristics are also implemented through this record, so that they
-   can be specialize by the application. For example, `autodetect_format`
-   can be used to automatically detect the format, or `find_lib` can
-   be used to decide how to lookup copybooks.
+   Some heuristics are also implemented through this record, so that they can be
+   specialize by the application. For example, `autodetect_format` can be used
+   to automatically detect the format, or `find_lib` can be used to decide how
+   to lookup copybooks.
 
-   The 'context argument is used to pass the application configuration
-   to these functions.
+   The 'context argument is used to pass the application configuration to these
+   functions.
 *)
 
 
@@ -62,12 +61,22 @@ end
 
 open TYPES
 
-let default_platform = {
-  verbosity = 1 ;
-  eprintf = Printf.eprintf ;
-  error = Pretty.error ;
-  read_file = (fun file -> Ez_file.V1.EzFile.read_file file) ;
+let default = {
+  verbosity = 0;
+  eprintf = Printf.eprintf;
+  error = Pretty.error;
+  read_file = (fun file -> Ez_file.V1.EzFile.read_file file);
   autodetect_format = (fun ?source_contents:_ _ -> SFFixed);
   find_lib = Copybook.find_lib;
-  getenv_opt = (fun variable -> Sys.getenv_opt variable) ;
+  getenv_opt = (fun variable -> Sys.getenv_opt variable);
 }
+
+let copy ~dst ~src:{ verbosity; eprintf; error; read_file; autodetect_format;
+                     find_lib; getenv_opt }  =
+  dst.verbosity <- verbosity;
+  dst.eprintf <- eprintf;
+  dst.error <- error;
+  dst.read_file <- read_file;
+  dst.autodetect_format <- autodetect_format;
+  dst.find_lib <- find_lib;
+  dst.getenv_opt <- getenv_opt

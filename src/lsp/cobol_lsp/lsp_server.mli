@@ -73,23 +73,19 @@ include module type of TYPES
 type t = registry                                                    (* alias *)
 
 val init
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> params: params
+  : params: params
   -> t
 
 val on_change_workspace_folders
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> Lsp.Types.DidChangeWorkspaceFoldersParams.t -> t -> t
+  : Lsp.Types.DidChangeWorkspaceFoldersParams.t -> t -> t
 
 (** Copybook detection is performed via project configuration (see
     {!Lsp_project.detect_copybook}). *)
 val did_open
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> Lsp.Types.DidOpenTextDocumentParams.t -> t -> t
+  : Lsp.Types.DidOpenTextDocumentParams.t -> t -> t
 
 val did_change
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> Lsp.Types.DidChangeTextDocumentParams.t -> t -> t
+  : Lsp.Types.DidChangeTextDocumentParams.t -> t -> t
 
 val did_close
   : Lsp.Types.DidCloseTextDocumentParams.t -> t -> t
@@ -107,20 +103,16 @@ val on_client_error
   : int -> t -> t
 
 val on_client_config_changes
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> ?changes:Yojson.Safe.t -> t -> t
+  : ?changes:Yojson.Safe.t -> t -> t
 
 val on_watched_file_changes
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> Lsp.Types.FileEvent.t list -> t -> t
+  : Lsp.Types.FileEvent.t list -> t -> t
 
 val on_write_project_config_command
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> ?uri:Lsp.Uri.t -> t -> t
+  : ?uri:Lsp.Uri.t -> t -> t
 
 val get_project_config_command
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> Lsp.Uri.t -> t -> Yojson.Safe.t
+  : Lsp.Uri.t -> t -> Yojson.Safe.t
 
 (** Note: May only raise {!Jsonrpc.Response.Error.E} *)
 val save_project_caches

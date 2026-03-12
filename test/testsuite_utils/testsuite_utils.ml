@@ -58,3 +58,14 @@ let gixsql_root = srcdir // gixsql_testsuite
 let from_dialect dialect =
   Cobol_common.Diagnostics.show_n_forget @@
   Cobol_config.from_dialect dialect
+
+let default_platform =
+  Cobol_common.Platform.default
+
+let default_preproc_options =
+  Cobol_preproc.Options.default
+    ~platform:default_platform
+
+let pp_diagnostics =
+  Cobol_common.Diagnostics.Set.pp
+    ~platform:default_platform

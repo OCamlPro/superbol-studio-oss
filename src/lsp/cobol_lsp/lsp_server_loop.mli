@@ -32,7 +32,7 @@ val config
   -> Lsp_server.config
 
 val run
-  : platform:Cobol_common.Platform.TYPES.platform
+  : platform: Cobol_common.Platform.TYPES.platform
   -> config: Lsp_server.config
   -> extensions: extensions
   -> Lsp_server.exit_status

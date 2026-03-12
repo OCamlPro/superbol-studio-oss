@@ -32,7 +32,7 @@ and exec_preprocessor =
 
 let default ~platform =
   {
-    platform ;
+    platform;
     copybook_lookup_config = Cobol_common.Copybook.lookup_config [];
     config = Cobol_config.default;
     source_format = Cobol_config.Auto;

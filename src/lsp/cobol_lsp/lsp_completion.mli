@@ -25,8 +25,7 @@ val config
   -> config
 
 val contextual
-  : platform:Cobol_common.Platform.TYPES.platform
-  -> config:config
+  : config:config
   -> Lsp_document.t
   -> Lsp_document.checked_doc
   -> Lsp.Types.Position.t
