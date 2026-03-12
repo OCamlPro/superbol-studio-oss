@@ -94,8 +94,7 @@ let config
     request.  Returns [Ok ()] if the server ran and shut down properly, or
     [Error error_message] otherwise. *)
 let run ~platform ~config
-    ~extensions:{ alternate_request_handers = alternate_handlers }
-  =
+    ~extensions:{ alternate_request_handers = alternate_handlers } =
   Cobol_common.Platform.copy ~dst:Lsp_platform.record ~src:platform;
   Lsp_io.initialize_channels ();
   let rec loop state =

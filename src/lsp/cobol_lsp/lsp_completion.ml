@@ -314,7 +314,8 @@ let config ?(eager=true) ?(case=Auto) () =
   }
 
 let contextual ~config (doc: Lsp_document.t) Cobol_typeck.Outputs.{ group; _ }
-    (pos: Position.t) =
+    (pos: Position.t)
+  =
   let filename = Lsp.Uri.to_path (Lsp.Text_document.documentUri doc.textdoc) in
   let range, case = range_n_case config.case pos doc.textdoc in
   let items, incomplete =

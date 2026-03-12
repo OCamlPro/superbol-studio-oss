@@ -25,14 +25,15 @@ let pp_error ?platform ppf = function
   | Lexing_error (Unexpected_char (c, lexloc)) ->
       let loc = Cobol_common.Srcloc.raw lexloc in
       Pretty.print ppf "%aUnexpected@ character@ `%c'"
-        (Cobol_common.Srcloc.pp_srcloc ?platform) loc c
+        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc c
   | Lexing_error (Unexpected_end_of_string lexloc) ->
       let loc = Cobol_common.Srcloc.raw lexloc in
       Pretty.print ppf "%aUnexpected@ end@ of@ string"
-        (Cobol_common.Srcloc.pp_srcloc ?platform) loc
+        (Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc
   | Syntax_error (loc, msg) ->
       Pretty.print ppf "%aSyntax@ error%a"
-        (Pretty.option (Cobol_common.Srcloc.pp_srcloc ?platform)) loc
+        (Pretty.option @@
+         Cobol_common.Srcloc.pp_srcloc_with_optional_caret ?platform) loc
         Fmt.(option (any ": " ++ string)) msg
   | Unknown_dialect name ->
       Pretty.print ppf "Unknown@ dialect@ `%s'" name

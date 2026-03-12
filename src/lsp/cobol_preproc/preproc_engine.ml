@@ -117,7 +117,7 @@ let source_format_config = function
   | Auto -> None
 
 let preprocessor input = function
-  | `WithOptions { source_format; env; platform;
+  | `WithOptions { platform; source_format; env;
                    exec_preprocs; config = (module Config);
                    copybook_lookup_config } ->
       let module Om_name = struct let name = __MODULE__ end in
@@ -634,8 +634,7 @@ let scan_prefix_for_copybook ~dialect ~source_format input =
   | Expect_word -> `Copybook                                         (* maybe? *)
 
 let text_of_input ~options input =
-  let text, pp =
-    full_text ~item:"file" @@ preprocessor ~options input in
+  let text, pp = full_text ~item:"file" @@ preprocessor ~options input in
   OUT.result text ~diags:(diags pp)
 
 let text_of_file ~options filename =

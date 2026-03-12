@@ -41,7 +41,7 @@ let reparse_file ~source_format ~config filename =
   in
   match
     Cobol_preproc.Input.from ~filename ~f:(parse ~source_format)
-      ~platform:default_platform
+      ~platform
   with
   | { result = Only Some cg; _ } -> (
       Format.printf "Parse: OK. ";

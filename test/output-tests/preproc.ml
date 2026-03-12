@@ -16,8 +16,6 @@ open Ez_file
 open FileString.OP
 open Testsuite_utils
 
-let platform = Testsuite_utils.default_platform
-
 let preprocess_file ~source_format ~config filename =
   Cobol_preproc.Outputs.show_n_forget ~min_level:Error ~platform @@
   Cobol_preproc.preprocess_file filename

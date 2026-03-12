@@ -128,7 +128,7 @@ let get ?(verbose_on = `Stdout) () =
   let get () =
     let verbose = !Globals.verbosity > 0 in
     let config =
-      DIAGS.show_n_forget @@
+      DIAGS.show_n_forget ~platform:Cobol_common.Platform.default @@
       match !conf, !dialect with
       | "", None ->
           DIAGS.result Cobol_config.default
@@ -168,10 +168,8 @@ let get ?(verbose_on = `Stdout) () =
           Pretty.failwith "Invalid argument `%s' given to flag `-D`" definition
       end !definitions Cobol_preproc.Env.empty
     in
-
     let platform =
-      { Cobol_common.Platform.default with
-        verbosity = !Globals.verbosity }
+      { Cobol_common.Platform.default with verbosity = !Globals.verbosity }
     in
     (* Pretty.error "@[Preprocessor environment:@;<1 2>@[%a@]@]@." *)
     (*   Cobol_preproc.Env.pp env; *)

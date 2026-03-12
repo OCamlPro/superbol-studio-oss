@@ -11,10 +11,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let platform = Cobol_common.Platform.default
+
 (** Note: won't show detailed source locations as the openned file is not
     actually on disk (that may be fixed later with a custom internal file
     store). *)
 
-let platform = Cobol_common.Platform.default
-
-let pp_srcloc = Cobol_common.Srcloc.pp_srcloc ~platform
+let pp_srcloc = Cobol_common.Srcloc.pp_srcloc_without_caret

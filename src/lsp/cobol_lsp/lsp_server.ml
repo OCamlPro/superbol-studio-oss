@@ -668,7 +668,7 @@ let on_change_workspace_folders
     DidChangeWorkspaceFoldersParams.{ event = { added; removed } } registry =
   registry |>
   remove_workspace_folders (List.map (fun x -> x.WorkspaceFolder.uri) removed) |>
-  add_workspace_folders    (List.map (fun x -> x.WorkspaceFolder.uri) added)
+  add_workspace_folders (List.map (fun x -> x.WorkspaceFolder.uri) added)
 
 
 (** {2 Handling of document notifications} *)

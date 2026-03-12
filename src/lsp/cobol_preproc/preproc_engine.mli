@@ -29,8 +29,7 @@ val reset_preprocessor_for_string
 
 val diags: preprocessor -> Preproc_diagnostics.t
 val position: preprocessor -> Lexing.position
-val position_at:
-  line:int -> char: int -> preprocessor -> Lexing.position
+val position_at: line:int -> char: int -> preprocessor -> Lexing.position
 val source_format: preprocessor -> Src_format.any
 val rev_log: preprocessor -> Preproc_trace.log
 val rev_comments: preprocessor -> Text.comments

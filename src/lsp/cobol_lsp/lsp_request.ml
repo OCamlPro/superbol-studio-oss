@@ -699,7 +699,8 @@ let handle_completion ?(eager=true) registry (params: CompletionParams.t) =
     ~f:begin fun ~doc checked_doc->
       let config = Lsp_completion.config ~eager () in
       let completion_list =
-        Lsp_completion.contextual ~config doc checked_doc params.position
+        Lsp_completion.contextual ~config
+          doc checked_doc params.position
       in Some (`CompletionList completion_list)
     end
 

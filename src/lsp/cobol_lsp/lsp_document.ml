@@ -68,9 +68,6 @@ type t = document
 let uri { textdoc; _ } = Lsp.Text_document.documentUri textdoc
 let language_id { textdoc; _ } = Lsp.Text_document.languageId textdoc
 
-let default_preproc_options =
-  Cobol_preproc.Options.default ~platform:Lsp_platform.record
-
 let rewindable_parse ({ project; textdoc; _ } as doc) =
   Cobol_parser.rewindable_parse_with_artifacts
     ~options:Cobol_parser.Options.{
@@ -80,7 +77,7 @@ let rewindable_parse ({ project; textdoc; _ } as doc) =
       } @@
   Cobol_preproc.preprocessor
     ~options:{
-      default_preproc_options with
+      (Cobol_preproc.Options.default ~platform:Lsp_platform.record) with
       copybook_lookup_config =
         Lsp_project.copybook_lookup_config_for ~uri:(uri doc) project;
       config = project.config.cobol_config;
@@ -281,8 +278,7 @@ let of_cache ~project
     let doc = Lsp.Types.DidOpenTextDocumentParams.create
         ~textDocument:(Lsp.Types.TextDocumentItem.create
                          ~languageId ~text ~uri ~version) in
-    let doc = Lsp.Text_document.make ~position_encoding doc
-              |> blank ~project in
+    let doc = Lsp.Text_document.make ~position_encoding doc |> blank ~project in
     { doc with artifacts = { pplog; tokens = lazy tokens;
                              rev_comments; rev_ignored };
                parsing_diags;

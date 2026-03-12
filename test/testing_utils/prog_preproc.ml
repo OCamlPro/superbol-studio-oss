@@ -13,10 +13,6 @@
 
 open Cobol_common.Srcloc.INFIX
 
-(** Note: won't show detailed source locations as the openned file is not
-    actually on disk (that may be fixed later with a custom internal file
-    store). *)
-
 let default_preproc_options ~verbose =
   Cobol_preproc.Options.default
     ~platform: { Prog_common.platform with

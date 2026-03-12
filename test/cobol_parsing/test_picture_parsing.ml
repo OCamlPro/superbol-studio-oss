@@ -18,7 +18,7 @@ module CHARS = Cobol_common.Basics.CharSet
 module DIAGS = Cobol_common.Diagnostics
 
 let pp_diagnostics =
-  DIAGS.Set.pp ~platform:Cobol_common.Platform.default
+  DIAGS.Set.pp ~platform:Prog_common.platform
 
 module Config = struct
   include Cobol_config.Default

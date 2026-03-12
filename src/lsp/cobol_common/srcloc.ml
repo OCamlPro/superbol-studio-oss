@@ -410,7 +410,8 @@ let pp_raw_loc: ?platform:platform -> raw_loc Pretty.printer =
       | Some platform -> try find_source ~platform raw_loc with _ -> "" in
     Pretty.print ppf "%a:@\n@[@<0>%s@]" pp_file_loc raw_loc text
 
-let pp_raw_loc_no_context = pp_raw_loc ?platform:None
+let pp_raw_loc_without_caret =
+  pp_raw_loc ?platform:None
 
 let same_copyloc { filename = f1; _ } { filename = f2; _ } =
   f1 = f2                                                             (* berk *)
@@ -420,7 +421,7 @@ let to_raw_loc
             { pos_lnum = l2; pos_bol = b2; pos_cnum = c2; _ }) =
   pos_fname, (l1, c1 - b1), (l2, c2 - b2)
 
-let pp_srcloc: ?platform:platform -> srcloc Pretty.printer =
+let pp_srcloc_with_optional_caret: ?platform:platform -> srcloc Pretty.printer =
   let pp_transform_operation ~partial ppf = function
     | `Cpy { filename; copyloc }
       when partial ->
@@ -466,7 +467,8 @@ let pp_srcloc: ?platform:platform -> srcloc Pretty.printer =
     pp_transform_operations ~partial:false ppf toplevel_transforms;
     pp_transform_operations ~partial:true ppf (partial_transform_operations loc)
 
-let pp_srcloc_no_context = pp_srcloc ?platform:None
+let pp_srcloc_without_caret = pp_srcloc_with_optional_caret ?platform:None
+let pp_srcloc ~platform = pp_srcloc_with_optional_caret ~platform
 
 let pp_file_loc ppf loc =
   pp_file_loc ppf (to_raw_loc @@ as_lexloc loc)
@@ -483,7 +485,7 @@ let raw ?(in_area_a = false) ((s, e): lexloc) : srcloc =
   if Lexing.(s.pos_fname <> e.pos_fname) then
     Pretty.error
       "%a@\n>> Internal warning in `%s.raw`: file names mismatch (`%s` != `%s`)\
-      " pp_srcloc_no_context loc __MODULE__ s.pos_fname e.pos_fname;
+      " pp_srcloc_without_caret loc __MODULE__ s.pos_fname e.pos_fname;
   loc
 
 let copy ~filename ~copyloc copied : srcloc =
@@ -598,9 +600,9 @@ let take direction length loc =
   if rem < 0 then
     Pretty.error
       "%a@\n>> Internal warning in `%s.take`: requested %s (%d) is longer than \
-       source location (by %d)@.\
-      " pp_srcloc_no_context
-      loc __MODULE__ (show_direction direction) length (- rem);
+       source location (by %d)@."
+      pp_srcloc_without_caret loc __MODULE__ (show_direction direction) length
+      (- rem);
   loc'
 
 (** [trunc direction length l] truncates a prefix or suffix of length [length]
@@ -651,8 +653,9 @@ let trunc direction length loc =
       if rem < 0 then
         Pretty.error
           "%a@\n>> Internal warning in `%s.trunc`: taken out %s (%d) is longer \
-           than source location (by %d)@.\
-          " pp_srcloc_no_context loc __MODULE__ (show_direction direction) length (- rem);
+           than source location (by %d)@."
+          pp_srcloc_without_caret loc __MODULE__ (show_direction direction)
+          length (- rem);
       Option.value loc' ~default:loc
 
 (** [prefix prefix_length l] computes a source location for the prefix of length
